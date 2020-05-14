@@ -12,8 +12,6 @@ use jni::JNIEnv;
 use jni::objects::{JObject, JString};
 use jni::sys::{jstring};
 
-use rustlib;
-
 #[no_mangle]
 pub unsafe extern fn Java_com_ysimple2_WalletHelper_initlogging(env: JNIEnv, _: JObject) -> jstring {
     android_logger::init_once(
@@ -59,7 +57,7 @@ pub unsafe extern fn Java_com_ysimple2_WalletHelper_initfromseed(env: JNIEnv, _:
         CStr::from_ptr(
             env.get_string(j_birthday).unwrap().as_ptr()
         )
-    ).into_string().unwrap().parse::<u64>();
+    ).into_string().unwrap().parse::<u64>().unwrap();
 
     let seed = rustlib::init_from_seed(server_uri, seed, birthday);
 
