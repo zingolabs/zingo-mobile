@@ -1,8 +1,7 @@
-import {TotalBalance, AddressBalance, Transaction, RPCConfig, TxDetail, Info} from './AppState';
+import {TotalBalance, AddressBalance, Transaction, TxDetail, Info} from './AppState';
 import RPCModule from '../components/RPCModule';
 
 export default class RPC {
-  rpcConfig: RPCConfig | null;
   fnSetInfo: (info: Info) => void;
   fnSetTotalBalance: (totalBalance: TotalBalance) => void;
   fnSetAddressesWithBalance: (addressBalances: AddressBalance[]) => void;
@@ -32,12 +31,9 @@ export default class RPC {
     this.priceTimerID = null;
 
     this.lastBlockHeight = 0;
-    this.rpcConfig = null;
   }
 
-  async configure(rpcConfig: RPCConfig) {
-    this.rpcConfig = rpcConfig;
-
+  async configure() {
     if (!this.refreshTimerID) {
       this.refreshTimerID = setInterval(() => this.refresh(false), 60 * 1000);
     }

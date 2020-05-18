@@ -14,16 +14,248 @@ import cstyles from './components/CommonStyles';
 import Toast from 'react-native-simple-toast';
 import {PrimaryButton, BoldText, RegText, RegTextInput} from './components/Components';
 import RPCModule from './components/RPCModule';
+import RPC from 'app/rpc';
+import AppState, {
+  TotalBalance,
+  SendPageState,
+  ReceivePageState,
+  Info,
+  AddressBalance,
+  Transaction,
+  ToAddr,
+  ErrorModalData,
+} from 'app/AppState';
+import Utils from 'app/utils';
 
 declare const global: {HermesInternal: null | {}};
 
-type LoadedAppProps = {
-  colors: any;
-};
+type LoadedAppProps = {};
 
-const LoadedApp: React.FunctionComponent<LoadedAppProps> = () => {
-  return <Text>Loaded App</Text>;
-};
+class LoadedApp extends Component<LoadedAppProps, AppState> {
+  rpc: RPC;
+
+  constructor(props: any) {
+    super(props);
+
+    this.state = {
+      totalBalance: new TotalBalance(),
+      addressesWithBalance: [],
+      addressPrivateKeys: new Map(),
+      addresses: [],
+      addressBook: [],
+      transactions: null,
+      sendPageState: new SendPageState(),
+      receivePageState: new ReceivePageState(),
+      info: null,
+      rescanning: false,
+      errorModalData: new ErrorModalData(),
+    };
+
+    this.rpc = new RPC(
+      this.setTotalBalance,
+      this.setAddressesWithBalances,
+      this.setTransactionList,
+      this.setAllAddresses,
+      this.setInfo,
+      this.setZecPrice,
+    );
+
+    // Create the initial ToAddr box
+    this.state.sendPageState.toaddrs = [new ToAddr(Utils.getNextToAddrID())];
+  }
+
+  getFullState = (): AppState => {
+    return this.state;
+  };
+
+  openErrorModal = (title: string, body: string) => {
+    const errorModalData = new ErrorModalData();
+    errorModalData.modalIsOpen = true;
+    errorModalData.title = title;
+    errorModalData.body = body;
+
+    this.setState({errorModalData});
+  };
+
+  closeErrorModal = () => {
+    const errorModalData = new ErrorModalData();
+    errorModalData.modalIsOpen = false;
+
+    this.setState({errorModalData});
+  };
+
+  unlockWallet = async (password: string): Promise<boolean> => {
+    const success = await this.rpc.unlockWallet(password);
+
+    return success;
+  };
+
+  lockWallet = async (): Promise<boolean> => {
+    const success = await this.rpc.lockWallet();
+    return success;
+  };
+
+  encryptWallet = async (password: string): Promise<boolean> => {
+    const success = await this.rpc.encryptWallet(password);
+    return success;
+  };
+
+  decryptWallet = async (password: string): Promise<boolean> => {
+    const success = await this.rpc.decryptWallet(password);
+    return success;
+  };
+
+  setTotalBalance = (totalBalance: TotalBalance) => {
+    this.setState({totalBalance});
+  };
+
+  setAddressesWithBalances = (addressesWithBalance: AddressBalance[]) => {
+    this.setState({addressesWithBalance});
+
+    const {sendPageState} = this.state;
+
+    // If there is no 'from' address, we'll set a default one
+    if (!sendPageState.fromaddr) {
+      // Find a z-address with the highest balance
+      const defaultAB = addressesWithBalance
+        .filter((ab) => Utils.isSapling(ab.address))
+        .reduce((prev: AddressBalance | null, ab: AddressBalance) => {
+          // We'll start with a sapling address
+          if (prev == null) {
+            return ab;
+          }
+          // Find the sapling address with the highest balance
+          if (prev.balance < ab.balance) {
+            return ab;
+          }
+
+          return prev;
+        }, null);
+
+      if (defaultAB) {
+        const newSendPageState = new SendPageState();
+        newSendPageState.fromaddr = defaultAB.address;
+        newSendPageState.toaddrs = sendPageState.toaddrs;
+
+        this.setState({sendPageState: newSendPageState});
+      }
+    }
+  };
+
+  setTransactionList = (transactions: Transaction[]) => {
+    this.setState({transactions});
+  };
+
+  setAllAddresses = (addresses: string[]) => {
+    this.setState({addresses});
+  };
+
+  setSendPageState = (sendPageState: SendPageState) => {
+    this.setState({sendPageState});
+  };
+
+  setSendTo = (address: string, amount: number | null, memo: string | null) => {
+    // Clear the existing send page state and set up the new one
+    const {sendPageState} = this.state;
+
+    const newSendPageState = new SendPageState();
+    newSendPageState.fromaddr = sendPageState.fromaddr;
+
+    const to = new ToAddr(Utils.getNextToAddrID());
+    if (address) {
+      to.to = address;
+    }
+    if (amount) {
+      to.amount = amount;
+    }
+    if (memo) {
+      to.memo = memo;
+    }
+    newSendPageState.toaddrs = [to];
+
+    this.setState({sendPageState: newSendPageState});
+  };
+
+  setZecPrice = (price: number | null) => {
+    console.log(`Price = ${price}`);
+    const {info} = this.state;
+
+    const newInfo = Object.assign({}, info);
+    newInfo.zecPrice = price;
+
+    this.setState({info: newInfo});
+  };
+
+  setRescanning = (rescanning: boolean) => {
+    this.setState({rescanning});
+  };
+
+  setInfo = (newInfo: Info) => {
+    // If the price is not set in this object, copy it over from the current object
+    const {info} = this.state;
+    if (info && !newInfo.zecPrice) {
+      newInfo.zecPrice = info.zecPrice;
+    }
+
+    this.setState({info: newInfo});
+  };
+
+  sendTransaction = async (sendJson: []): Promise<string> => {
+    try {
+      const txid = await this.rpc.sendTransaction(sendJson);
+      return txid;
+    } catch (err) {
+      console.log('route sendtx error', err);
+      throw err;
+    }
+  };
+
+  // Get a single private key for this address, and return it as a string.
+  // Wallet needs to be unlocked
+  getPrivKeyAsString = async (address: string): Promise<string> => {
+    const pk = await RPC.getPrivKeyAsString(address);
+    return pk;
+  };
+
+  // Getter methods, which are called by the components to update the state
+  fetchAndSetSinglePrivKey = async (address: string) => {
+    const key = await RPC.getPrivKeyAsString(address);
+    const addressPrivateKeys = new Map<string, string>();
+    addressPrivateKeys.set(address, key);
+
+    this.setState({addressPrivateKeys});
+  };
+
+  createNewAddress = async (zaddress: boolean) => {
+    // Create a new address
+    const newaddress = await RPC.createNewAddress(zaddress);
+    console.log(`Created new Address ${newaddress}`);
+
+    // And then fetch the list of addresses again to refresh (totalBalance gets all addresses)
+    this.rpc.fetchTotalBalance();
+
+    const {receivePageState} = this.state;
+    const newRerenderKey = receivePageState.rerenderKey + 1;
+
+    const newReceivePageState = new ReceivePageState();
+    newReceivePageState.newAddress = newaddress;
+    newReceivePageState.rerenderKey = newRerenderKey;
+
+    this.setState({receivePageState: newReceivePageState});
+  };
+
+  doRefresh = () => {
+    this.rpc.refresh(false);
+  };
+
+  clearTimers = () => {
+    this.rpc.clearTimers();
+  };
+
+  render() {
+    return <Text>Loaded App</Text>;
+  }
+}
 
 // -----------------
 // Loading View

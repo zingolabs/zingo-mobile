@@ -1,4 +1,4 @@
-export interface TotalBalance {
+export class TotalBalance {
   // Total t address, confirmed and spendable
   transparentBal: number;
 
@@ -10,6 +10,13 @@ export interface TotalBalance {
 
   // Total unconfirmed + spendable
   total: number;
+
+  constructor() {
+    this.transparentBal = 0;
+    this.privateBal = 0;
+    this.verifiedPrivate = 0;
+    this.total = 0;
+  }
 }
 
 export class AddressBalance {
@@ -95,14 +102,6 @@ export class ReceivePageState {
   }
 }
 
-export class RPCConfig {
-  url: string;
-
-  constructor() {
-    this.url = '';
-  }
-}
-
 export interface Info {
   testnet: boolean;
   latestBlock: number;
@@ -140,6 +139,19 @@ export class PasswordState {
   }
 }
 
+export class ErrorModalData {
+  title: string;
+  body: string;
+
+  modalIsOpen: boolean;
+
+  constructor() {
+    this.modalIsOpen = false;
+    this.title = '';
+    this.body = '';
+  }
+}
+
 export interface ConnectedCompanionApp {
   name: string;
   lastSeen: number;
@@ -165,7 +177,7 @@ export default interface AppState {
   addressBook: AddressBookEntry[];
 
   // List of all T and Z transactions
-  transactions: Transaction[];
+  transactions: Transaction[] | null;
 
   // The state of the send page, as the user constructs a transaction
   sendPageState: SendPageState;
@@ -173,19 +185,17 @@ export default interface AppState {
   // Any state for the receive page
   receivePageState: ReceivePageState;
 
-  // The Current configuration of the RPC params
-  rpcConfig: RPCConfig;
-
   // getinfo and getblockchaininfo result
-  info: Info;
+  info: Info | null;
 
   // Is the app rescanning?
   rescanning: boolean;
 
   // Callbacks for the password dialog box
-  passwordState: PasswordState;
+  //passwordState: PasswordState;
 
-  // The last seen connected companion app
-  connectedCompanionApp: ConnectedCompanionApp;
+  // Data for any error or info modal
+  errorModalData: ErrorModalData;
+
   // eslint-disable-next-line semi
 }
