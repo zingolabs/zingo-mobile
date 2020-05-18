@@ -151,6 +151,14 @@ RCT_REMAP_METHOD(loadExistingWallet,
   resolve(seedStr);
 }
 
+RCT_REMAP_METHOD(doSave,
+                 doSaveWithResolver:(RCTPromiseResolveBlock)resolve
+                 rejected:(RCTPromiseRejectBlock)reject) {
+  [self saveWallet];
+  
+  resolve(@"true");
+}
+
 
 // Send a Tx. React needs to construct the sendJSON and pass it in as a string
 RCT_REMAP_METHOD(doSend,
@@ -184,14 +192,15 @@ RCT_REMAP_METHOD(doSync,
   resolve(respStr);
 }
 
-// Generic Execute the command. This doesn't support arg lists yet
+// Generic Execute the command.
 RCT_REMAP_METHOD(execute,
                  method:(NSString *)method
+                 args:(NSString *)args
                  executeWithResolver:(RCTPromiseResolveBlock)resolve
                  rejected:(RCTPromiseRejectBlock)reject) {
   RCTLogInfo(@"execute called with %@", method);
   
-  char *resp = execute([method UTF8String], "");
+  char *resp = execute([method UTF8String], [args UTF8String]);
   NSString* respStr = [NSString stringWithUTF8String:resp];
   rust_free(resp);
   
