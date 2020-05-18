@@ -21,6 +21,10 @@ DerivedData
 *.ipa
 *.xcuserstate
 
+# Exclude compiled libs
+android/app/src/main/jniLibs
+ios/librustios.a
+
 # Android/IntelliJ
 #
 build/
