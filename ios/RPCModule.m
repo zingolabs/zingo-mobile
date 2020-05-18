@@ -184,6 +184,7 @@ RCT_REMAP_METHOD(doSync,
   resolve(respStr);
 }
 
+// Generic Execute the command. This doesn't support arg lists yet
 RCT_REMAP_METHOD(execute,
                  method:(NSString *)method
                  executeWithResolver:(RCTPromiseResolveBlock)resolve
