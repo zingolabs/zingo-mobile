@@ -122,7 +122,7 @@ RCT_REMAP_METHOD(restoreWallet,
                  birthday:(NSString*)birthday
                  restoreWalletWithResolver:(RCTPromiseResolveBlock)resolve
                  rejected:(RCTPromiseRejectBlock)reject) {
-  RCTLogInfo(@"restoreWallet called");
+  RCTLogInfo(@"restoreWallet called with %@ %@", restoreSeed, birthday);
   char* seed = initfromseed([URL UTF8String], [restoreSeed UTF8String], [birthday UTF8String]);
   NSString* seedStr = [NSString stringWithUTF8String:seed];
   rust_free(seed);

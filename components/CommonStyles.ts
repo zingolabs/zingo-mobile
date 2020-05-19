@@ -8,14 +8,17 @@ const cstyles = StyleSheet.create({
   marginbottom: {
     marginBottom: 50,
   },
+  marginbottomsmall: {
+    marginBottom: 10,
+  },
   marginright: {
     marginRight: 50,
   },
   margintop: {
     marginTop: 50,
   },
-  padbottomsmall: {
-    paddingBottom: 4,
+  innerpaddingsmall: {
+    padding: 10,
   },
   containermargin: {
     margin: 10,

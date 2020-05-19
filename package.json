@@ -20,7 +20,8 @@
     "react-native-gesture-handler": "^1.6.1",
     "react-native-safe-area-context": "^1.0.0",
     "react-native-screens": "^2.7.0",
-    "react-native-simple-toast": "^1.1.2"
+    "react-native-simple-toast": "^1.1.2",
+    "react-native-status-bar-height": "^2.5.0"
   },
   "devDependencies": {
     "@babel/core": "^7.6.2",

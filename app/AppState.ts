@@ -21,9 +21,7 @@ export class TotalBalance {
 
 export class AddressBalance {
   address: string;
-
   balance: number;
-
   containsPending: boolean;
 
   constructor(address: string, balance: number) {
