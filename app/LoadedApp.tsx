@@ -49,6 +49,11 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
     this.state.sendPageState.toaddrs = [new ToAddr(Utils.getNextToAddrID())];
   }
 
+  componentDidMount = () => {
+    // Configure the RPC to start doing refreshes
+    this.rpc.configure();
+  };
+
   getFullState = (): AppState => {
     return this.state;
   };

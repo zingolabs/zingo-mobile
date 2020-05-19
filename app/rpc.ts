@@ -64,12 +64,12 @@ export default class RPC {
   }
 
   static async doRescan() {
-    const syncstr = await RPCModule.execute('rescan');
+    const syncstr = await RPCModule.execute('rescan', '');
     console.log(`rescan exec result: ${syncstr}`);
   }
 
   static async doSyncStatus(): Promise<string> {
-    const syncstr = await RPCModule.execute('syncstatus');
+    const syncstr = await RPCModule.execute('syncstatus', '');
     console.log(`syncstatus: ${syncstr}`);
     return syncstr;
   }
@@ -114,7 +114,7 @@ export default class RPC {
   // Special method to get the Info object. This is used both internally and by the Loading screen
   static async getInfoObject(): Promise<Info | null> {
     try {
-      const infostr = await RPCModule.execute('info');
+      const infostr = await RPCModule.execute('info', '');
       const infoJSON = JSON.parse(infostr);
 
       const encStatus = await RPCModule.execute('encryptionstatus', '');
@@ -152,7 +152,7 @@ export default class RPC {
 
   // This method will get the total balances
   async fetchTotalBalance() {
-    const balanceStr = await RPCModule.execute('balance');
+    const balanceStr = await RPCModule.execute('balance', '');
     const balanceJSON = JSON.parse(balanceStr);
 
     const privateBal = balanceJSON.zbalance / 10 ** 8;
@@ -168,7 +168,7 @@ export default class RPC {
     this.fnSetTotalBalance(balance);
 
     // Fetch pending notes and UTXOs
-    const pendingNotes = await RPCModule.execute('notes');
+    const pendingNotes = await RPCModule.execute('notes', '');
     const pendingJSON = JSON.parse(pendingNotes);
 
     const pendingAddressBalances = new Map();
