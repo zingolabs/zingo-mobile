@@ -1,5 +1,9 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, {Component} from 'react';
-import {RegText} from '../components/Components';
+
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
+import {faList, faUpload, faDownload, faCog} from '@fortawesome/free-solid-svg-icons';
 
 import RPC from './rpc';
 import AppState, {
@@ -13,9 +17,13 @@ import AppState, {
   ErrorModalData,
 } from './AppState';
 import Utils from './utils';
+import TransactionsScreen from '../components/TransactionsScreen';
+import SendScreen from '../components/SendScreen';
+import ReceiveScreen from '../components/ReceiveScreen';
+
+const Tab = createBottomTabNavigator();
 
 type LoadedAppProps = {};
-
 export default class LoadedApp extends Component<LoadedAppProps, AppState> {
   rpc: RPC;
 
@@ -243,6 +251,49 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
   };
 
   render() {
-    return <RegText>Loaded App</RegText>;
+    const {totalBalance, transactions, info} = this.state;
+
+    const standardProps = {
+      openErrorModal: this.openErrorModal,
+      closeErrorModal: this.closeErrorModal,
+      setSendTo: this.setSendTo,
+      info,
+    };
+
+    return (
+      <Tab.Navigator
+        initialRouteName="Transactions"
+        screenOptions={({route}) => ({
+          tabBarIcon: ({focused}) => {
+            var iconName;
+
+            if (route.name === 'Transactions') {
+              iconName = focused ? faList : faList;
+            } else if (route.name === 'Send') {
+              iconName = focused ? faUpload : faUpload;
+            } else if (route.name === 'Receive') {
+              iconName = focused ? faDownload : faDownload;
+            } else {
+              iconName = focused ? faCog : faCog;
+            }
+
+            // You can return any component that you like here!
+            return <FontAwesomeIcon icon={iconName} color="rgb( 220, 220, 220)" />;
+          },
+        })}
+        tabBarOptions={{
+          activeTintColor: '#BB86FC',
+          inactiveTintColor: '#777777',
+          labelStyle: {fontSize: 14},
+        }}>
+        <Tab.Screen name="Send">{(props) => <SendScreen {...props} {...standardProps} />}</Tab.Screen>
+        <Tab.Screen name="Transactions">
+          {(props) => (
+            <TransactionsScreen {...props} {...standardProps} transactions={transactions} totalBalance={totalBalance} />
+          )}
+        </Tab.Screen>
+        <Tab.Screen name="Receive">{(props) => <ReceiveScreen {...props} {...standardProps} />}</Tab.Screen>
+      </Tab.Navigator>
+    );
   }
 }

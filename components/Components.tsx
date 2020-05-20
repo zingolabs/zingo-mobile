@@ -1,6 +1,32 @@
+/* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import {Button, Text, TextInput} from 'react-native';
+import {Button, Text, TextInput, View} from 'react-native';
 import {useTheme} from '@react-navigation/native';
+import Utils from '../app/utils';
+
+type ZecAmountProps = {
+  color?: string;
+  size?: number;
+  amtZec: number;
+};
+export const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({color, size, amtZec}) => {
+  const splits = Utils.splitZecAmountIntoBigSmall(amtZec);
+  const {colors} = useTheme();
+
+  if (!size) {
+    size = 18;
+  }
+  if (!color) {
+    color = colors.text;
+  }
+
+  return (
+    <View style={{flexDirection: 'row', alignItems: 'baseline'}}>
+      <Text style={{fontSize: size, color}}>{splits.bigPart}</Text>
+      <Text style={{fontSize: size - 6, color}}>{splits.smallPart}</Text>
+    </View>
+  );
+};
 
 export const PrimaryButton: React.FunctionComponent<any> = (props) => {
   const {colors} = useTheme();

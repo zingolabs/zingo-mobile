@@ -305,6 +305,8 @@ PODS:
     - React
   - RNScreens (2.7.0):
     - React
+  - RNSVG (12.1.0):
+    - React
   - Toast (4.0.0)
   - Yoga (1.14.0)
   - YogaKit (1.18.1):
@@ -363,6 +365,7 @@ DEPENDENCIES:
   - "RNCMaskedView (from `../node_modules/@react-native-community/masked-view`)"
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNScreens (from `../node_modules/react-native-screens`)
+  - RNSVG (from `../node_modules/react-native-svg`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -442,6 +445,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-gesture-handler"
   RNScreens:
     :path: "../node_modules/react-native-screens"
+  RNSVG:
+    :path: "../node_modules/react-native-svg"
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
@@ -487,6 +492,7 @@ SPEC CHECKSUMS:
   RNCMaskedView: 5a8ec07677aa885546a0d98da336457e2bea557f
   RNGestureHandler: 8f09cd560f8d533eb36da5a6c5a843af9f056b38
   RNScreens: cf198f915f8a2bf163de94ca9f5bfc8d326c3706
+  RNSVG: ce9d996113475209013317e48b05c21ee988d42e
   Toast: 91b396c56ee72a5790816f40d3a94dd357abc196
   Yoga: 3ebccbdd559724312790e7742142d062476b698e
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a

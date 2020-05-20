@@ -1,5 +1,10 @@
 export const NO_CONNECTION: string = 'Could not connect to zcashd';
 
+type ZecAmountSplitType = {
+  bigPart: string;
+  smallPart: string;
+};
+
 export default class Utils {
   static isSapling(addr: string): boolean {
     if (!addr) {
@@ -51,11 +56,7 @@ export default class Utils {
     return s;
   }
 
-  static splitZecAmountIntoBigSmall(zecValue: number) {
-    if (!zecValue) {
-      return {bigPart: zecValue, smallPart: ''};
-    }
-
+  static splitZecAmountIntoBigSmall(zecValue: number): ZecAmountSplitType {
     let bigPart = Utils.maxPrecision(zecValue);
     let smallPart = '';
 
@@ -72,14 +73,14 @@ export default class Utils {
       }
     }
 
-    if (smallPart === '0000') {
-      smallPart = '';
-    }
+    // if (smallPart === '0000') {
+    //   smallPart = '';
+    // }
 
     return {bigPart, smallPart};
   }
 
-  static splitStringIntoChunks(s: string, numChunks: number) {
+  static splitAddressIntoChunks(s: string, numChunks: number): string[] {
     if (numChunks > s.length) {
       return [s];
     }
