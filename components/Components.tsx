@@ -14,7 +14,7 @@ export const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({color, size,
   const {colors} = useTheme();
 
   if (!size) {
-    size = 18;
+    size = 24;
   }
   if (!color) {
     color = colors.text;

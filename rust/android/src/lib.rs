@@ -13,7 +13,7 @@ use jni::objects::{JObject, JString};
 use jni::sys::{jstring};
 
 #[no_mangle]
-pub unsafe extern fn Java_com_ysimple2_WalletHelper_initlogging(env: JNIEnv, _: JObject) -> jstring {
+pub unsafe extern fn Java_com_zecwalletmobile_RPCModule_initlogging(env: JNIEnv, _: JObject) -> jstring {
     android_logger::init_once(
         Config::default().with_min_level(Level::Trace),
     );
@@ -24,7 +24,7 @@ pub unsafe extern fn Java_com_ysimple2_WalletHelper_initlogging(env: JNIEnv, _: 
 }
 
 #[no_mangle]
-pub unsafe extern fn Java_com_ysimple2_WalletHelper_initnew(env: JNIEnv, _: JObject, j_serveruri: JString) -> jstring {
+pub unsafe extern fn Java_com_zecwalletmobile_RPCModule_initnew(env: JNIEnv, _: JObject, j_serveruri: JString) -> jstring {
     let server_uri = CString::from(
         CStr::from_ptr(
             env.get_string(j_serveruri).unwrap().as_ptr()
@@ -39,7 +39,7 @@ pub unsafe extern fn Java_com_ysimple2_WalletHelper_initnew(env: JNIEnv, _: JObj
 
 
 #[no_mangle]
-pub unsafe extern fn Java_com_ysimple2_WalletHelper_initfromseed(env: JNIEnv, _: JObject, j_serveruri: JString, j_seed: JString, j_birthday: JString) -> jstring {
+pub unsafe extern fn Java_com_zecwalletmobile_RPCModule_initfromseed(env: JNIEnv, _: JObject, j_serveruri: JString, j_seed: JString, j_birthday: JString) -> jstring {
     let server_uri = CString::from(
         CStr::from_ptr(
             env.get_string(j_serveruri).unwrap().as_ptr()
@@ -67,7 +67,7 @@ pub unsafe extern fn Java_com_ysimple2_WalletHelper_initfromseed(env: JNIEnv, _:
 
 
 #[no_mangle]
-pub unsafe extern fn Java_com_ysimple2_WalletHelper_initfromb64(env: JNIEnv, _: JObject, j_serveruri: JString, j_base64: JString) -> jstring {
+pub unsafe extern fn Java_com_zecwalletmobile_RPCModule_initfromb64(env: JNIEnv, _: JObject, j_serveruri: JString, j_base64: JString) -> jstring {
     let base64 = CString::from(
         CStr::from_ptr(
             env.get_string(j_base64).unwrap().as_ptr()
@@ -87,14 +87,14 @@ pub unsafe extern fn Java_com_ysimple2_WalletHelper_initfromb64(env: JNIEnv, _: 
 }
 
 #[no_mangle]
-pub unsafe extern fn Java_com_ysimple2_WalletHelper_save(env: JNIEnv, _: JObject) -> jstring {
+pub unsafe extern fn Java_com_zecwalletmobile_RPCModule_save(env: JNIEnv, _: JObject) -> jstring {
     let encoded = rustlib::save_to_b64();
     let output = env.new_string(encoded.as_str()).unwrap();
     output.into_inner()
 }
 
 #[no_mangle]
-pub unsafe extern fn Java_com_ysimple2_RPCModule_execute(env: JNIEnv, _: JObject, j_command: JString, j_argslist: JString) -> jstring {
+pub unsafe extern fn Java_com_zecwalletmobile_RPCModule_execute(env: JNIEnv, _: JObject, j_command: JString, j_argslist: JString) -> jstring {
     let cmd = CString::from(
         CStr::from_ptr(
             env.get_string(j_command).unwrap().as_ptr()
