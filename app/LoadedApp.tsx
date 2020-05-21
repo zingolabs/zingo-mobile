@@ -251,7 +251,7 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
   };
 
   render() {
-    const {totalBalance, transactions, info} = this.state;
+    const {totalBalance, transactions, addresses, info} = this.state;
 
     const standardProps = {
       openErrorModal: this.openErrorModal,
@@ -292,7 +292,7 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
             <TransactionsScreen {...props} {...standardProps} transactions={transactions} totalBalance={totalBalance} />
           )}
         </Tab.Screen>
-        <Tab.Screen name="Receive">{(props) => <ReceiveScreen {...props} {...standardProps} />}</Tab.Screen>
+        <Tab.Screen name="Receive">{(props) => <ReceiveScreen {...props} {...standardProps} addresses={addresses} />}</Tab.Screen>
       </Tab.Navigator>
     );
   }
