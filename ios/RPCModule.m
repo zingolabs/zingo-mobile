@@ -175,21 +175,27 @@ RCT_REMAP_METHOD(doSend,
   resolve(respStr);
 }
 
+-(void) doSyncOnThread:(RCTPromiseResolveBlock)resolve {
+  @autoreleasepool {
+    char *resp = execute("sync", "");
+    NSString* respStr = [NSString stringWithUTF8String:resp];
+    rust_free(resp);
+    
+    // Also save the wallet after sync
+    [self saveWallet];
+    
+    RCTLogInfo(@"Got sync response: %@", respStr);
+    resolve(respStr);
+  }
+}
+
 // doSync.
 RCT_REMAP_METHOD(doSync,
                  doSyncWithResolver:(RCTPromiseResolveBlock)resolve
                  rejected:(RCTPromiseRejectBlock)reject) {
   RCTLogInfo(@"doSync called");
     
-  char *resp = execute("sync", "");
-  NSString* respStr = [NSString stringWithUTF8String:resp];
-  rust_free(resp);
-  
-  // Also save the wallet after sync
-  [self saveWallet];
-  
-  RCTLogInfo(@"Got sync response: %@", respStr);
-  resolve(respStr);
+  [NSThread detachNewThreadSelector:@selector(doSyncOnThread:) toTarget:self withObject:resolve];
 }
 
 // Generic Execute the command.

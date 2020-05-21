@@ -12,6 +12,8 @@ export default class RPC {
   priceTimerID: number | null;
   lastBlockHeight: number;
 
+  inRefresh: boolean;
+
   constructor(
     fnSetTotalBalance: (totalBalance: TotalBalance) => void,
     fnSetAddressesWithBalance: (ab: AddressBalance[]) => void,
@@ -31,6 +33,8 @@ export default class RPC {
     this.priceTimerID = null;
 
     this.lastBlockHeight = 0;
+
+    this.inRefresh = false;
   }
 
   async configure() {
@@ -75,6 +79,11 @@ export default class RPC {
   }
 
   async refresh(fullRefresh: boolean) {
+    // If we're in refresh, we don't overlap
+    if (this.inRefresh) {
+      return;
+    }
+
     const latestBlockHeight = await this.fetchInfo();
     if (!latestBlockHeight) {
       return;
@@ -82,6 +91,7 @@ export default class RPC {
 
     if (fullRefresh || !this.lastBlockHeight || this.lastBlockHeight < latestBlockHeight) {
       // If the latest block height has changed, make sure to sync. This will happen in a new thread
+      this.inRefresh = true;
       RPC.doSync();
 
       // We need to wait for the sync to finish. The way we know the sync is done is
@@ -101,7 +111,9 @@ export default class RPC {
           this.fetchTandZTransactions(latestBlockHeight);
 
           this.lastBlockHeight = latestBlockHeight;
-          // All done, set up next fetch
+
+          // All done
+          this.inRefresh = false;
           console.log(`Finished full refresh at ${latestBlockHeight}`);
         }
       }, 1000);
