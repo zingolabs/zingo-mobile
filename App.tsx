@@ -3,7 +3,7 @@
  * @format
  */
 import React, {Component} from 'react';
-import {View, Alert, TouchableOpacity, Clipboard} from 'react-native';
+import {View, ScrollView, Alert, TouchableOpacity, Clipboard} from 'react-native';
 
 import {NavigationContainer, DarkTheme} from '@react-navigation/native';
 import {AppearanceProvider} from 'react-native-appearance';
@@ -167,15 +167,16 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
           </View>
         )}
         {screen === 3 && (
-          <View
-            style={[
+          <ScrollView
+            contentContainerStyle={[
               {
                 flex: 1,
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
               },
-            ]}>
+            ]}
+            keyboardShouldPersistTaps="handled">
             <RegText style={[cstyles.marginbottomsmall]}>Enter your seed phrase (24 words)</RegText>
             <RegTextInput
               multiline
@@ -212,7 +213,7 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
             <View style={cstyles.margintop}>
               <PrimaryButton title="Restore Wallet" onPress={doRestore} />
             </View>
-          </View>
+          </ScrollView>
         )}
       </View>
     );

@@ -18,7 +18,7 @@ const SingleAddressDisplay: React.FunctionComponent<SingleAddress> = ({address})
     address = 'No Address';
   }
 
-  const chunks = Utils.splitAddressIntoChunks(address, 8);
+  const chunks = Utils.splitAddressIntoChunks(address, Utils.isSapling(address) ? 8 : 4);
 
   return (
     <View style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
@@ -27,7 +27,9 @@ const SingleAddressDisplay: React.FunctionComponent<SingleAddress> = ({address})
       </View>
       <View style={{display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center'}}>
         {chunks.map((c) => (
-          <RegText style={{flexBasis: '40%', textAlign: 'center'}}>{c}</RegText>
+          <RegText key={c} style={{flexBasis: '40%', textAlign: 'center'}}>
+            {c}
+          </RegText>
         ))}
       </View>
     </View>
@@ -48,7 +50,7 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({addresses})
   const {colors} = useTheme();
 
   const zaddr = addresses.find((a) => Utils.isSapling(a)) || null;
-  const taddr = addresses.find((a) => Utils.isSapling(a)) || null;
+  const taddr = addresses.find((a) => Utils.isTransparent(a)) || null;
 
   const renderScene: (routes: any) => JSX.Element | undefined = ({route}) => {
     switch (route.key) {

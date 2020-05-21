@@ -1,4 +1,3 @@
-/* eslint-disable react-native/no-inline-styles */
 import React, {Component} from 'react';
 
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
@@ -292,7 +291,9 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
             <TransactionsScreen {...props} {...standardProps} transactions={transactions} totalBalance={totalBalance} />
           )}
         </Tab.Screen>
-        <Tab.Screen name="Receive">{(props) => <ReceiveScreen {...props} {...standardProps} addresses={addresses} />}</Tab.Screen>
+        <Tab.Screen name="Receive">
+          {(props) => <ReceiveScreen {...props} {...standardProps} addresses={addresses} />}
+        </Tab.Screen>
       </Tab.Navigator>
     );
   }
