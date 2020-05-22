@@ -30,21 +30,30 @@ type ZecAmountProps = {
   color?: string;
   size?: number;
   amtZec: number;
+  style?: any;
+  zecSymbol?: string;
 };
-export const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({color, size, amtZec}) => {
+export const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({color, style, size, zecSymbol, amtZec}) => {
   const splits = Utils.splitZecAmountIntoBigSmall(amtZec);
   const {colors} = useTheme();
 
   if (!size) {
     size = 24;
   }
+
+  if (!zecSymbol) {
+    zecSymbol = 'ZEC';
+  }
+
   if (!color) {
     color = colors.text;
   }
 
   return (
-    <View style={{flexDirection: 'row', alignItems: 'baseline'}}>
-      <Text style={{fontSize: size, color}}>ZEC {splits.bigPart}</Text>
+    <View style={{...style, flexDirection: 'row', alignItems: 'baseline'}}>
+      <Text style={{fontSize: size, color}}>
+        {zecSymbol} {splits.bigPart}
+      </Text>
       <Text style={{fontSize: size / 2, color}}>{splits.smallPart}</Text>
     </View>
   );

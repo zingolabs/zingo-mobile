@@ -24,10 +24,13 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({tx}) => {
         {tx.time * 1000}
       </Moment>
       <RegText> ago</RegText>
-      <RegText style={{flexGrow: 1, textAlign: 'right', paddingRight: 5, color: spendColor}}>
-        {tx.amount > 0 ? '+' : ''}
-        {Math.abs(tx.amount)} ᙇ
-      </RegText>
+      <ZecAmount
+        style={{flexGrow: 1, alignSelf: 'baseline', justifyContent: 'flex-end', paddingRight: 5}}
+        size={18}
+        zecSymbol={'ᙇ'}
+        color={spendColor}
+        amtZec={tx.amount}
+      />
     </View>
   );
 };
@@ -44,8 +47,8 @@ const TransactionsScreen: React.FunctionComponent<TransactionsScreenProps> = ({i
 
   return (
     <View style={{display: 'flex', flexDirection: 'column', justifyContent: 'flex-start'}}>
-      <View style={{display: 'flex', alignItems: 'center', height: 150, backgroundColor: colors.card}}>
-        <RegText style={{marginTop: 10}}>Balance</RegText>
+      <View style={{display: 'flex', alignItems: 'center', height: 140, backgroundColor: colors.card}}>
+        <RegText style={{marginTop: 10, marginBottom: 5}}>Balance</RegText>
         <ZecAmount size={36} amtZec={totalBalance.total} />
         <UsdAmount style={{marginTop: 5}} price={zecPrice} amtZec={totalBalance.total} />
       </View>

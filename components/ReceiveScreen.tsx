@@ -8,6 +8,7 @@ import {RegText} from '../components/Components';
 import {Info} from '../app/AppState';
 import Utils from '../app/utils';
 import {useTheme} from '@react-navigation/native';
+import {Colors} from 'react-native/Libraries/NewAppScreen';
 
 type SingleAddress = {
   address: string | null;
@@ -18,16 +19,27 @@ const SingleAddressDisplay: React.FunctionComponent<SingleAddress> = ({address})
     address = 'No Address';
   }
 
+  const {colors} = useTheme();
+
   const chunks = Utils.splitAddressIntoChunks(address, Utils.isSapling(address) ? 8 : 4);
 
   return (
     <View style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-      <View style={[{padding: 10, backgroundColor: 'rgb(255, 255, 255)'}]}>
+      <View style={{padding: 10, backgroundColor: 'rgb(255, 255, 255)', marginTop: 20}}>
         <QRCode value={address} size={300} ecl="M" />
       </View>
-      <View style={{display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center'}}>
+      <View style={{display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', marginTop: 20}}>
         {chunks.map((c) => (
-          <RegText key={c} style={{flexBasis: '40%', textAlign: 'center'}}>
+          <RegText
+            key={c}
+            style={{
+              flexBasis: '40%',
+              textAlign: 'center',
+              fontFamily: 'Courier',
+              fontSize: 20,
+              color: colors.text,
+              opacity: 0.55,
+            }}>
             {c}
           </RegText>
         ))}
@@ -62,7 +74,11 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({addresses})
   };
 
   const renderTabBar: (props: any) => JSX.Element = (props) => (
-    <TabBar {...props} indicatorStyle={{backgroundColor: 'white'}} style={{backgroundColor: colors.background}} />
+    <TabBar
+      {...props}
+      indicatorStyle={{backgroundColor: colors.primary}}
+      style={{backgroundColor: colors.background}}
+    />
   );
 
   return (
