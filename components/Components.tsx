@@ -4,6 +4,28 @@ import {Button, Text, TextInput, View} from 'react-native';
 import {useTheme} from '@react-navigation/native';
 import Utils from '../app/utils';
 
+type UsdAmountProps = {
+  price: number | null;
+  amtZec: number;
+  style?: any;
+};
+export const UsdAmount: React.FunctionComponent<UsdAmountProps> = ({price, style, amtZec}) => {
+  const {colors} = useTheme();
+  var usdString;
+
+  if (!price) {
+    usdString = '--';
+  } else {
+    const usdAmount = price * amtZec;
+    usdString = usdAmount.toFixed(2);
+    if (usdString === '0.00' && amtZec > 0) {
+      usdString = '< 0.01';
+    }
+  }
+
+  return <Text style={{color: colors.text, ...style}}>$ {usdString}</Text>;
+};
+
 type ZecAmountProps = {
   color?: string;
   size?: number;
@@ -22,8 +44,8 @@ export const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({color, size,
 
   return (
     <View style={{flexDirection: 'row', alignItems: 'baseline'}}>
-      <Text style={{fontSize: size, color}}>{splits.bigPart}</Text>
-      <Text style={{fontSize: size - 6, color}}>{splits.smallPart}</Text>
+      <Text style={{fontSize: size, color}}>ZEC {splits.bigPart}</Text>
+      <Text style={{fontSize: size / 2, color}}>{splits.smallPart}</Text>
     </View>
   );
 };
@@ -50,17 +72,8 @@ export const BoldText: React.FunctionComponent<any> = ({style, children}) => {
 
 export const RegText: React.FunctionComponent<any> = ({style, children}) => {
   const {colors} = useTheme();
-  let arrayed = [];
 
-  if (Array.isArray(style)) {
-    arrayed = style;
-  } else if (style) {
-    arrayed.push(style);
-  }
-
-  arrayed.push({color: colors.text}, {fontSize: 18}, {fontWeight: '600'}, {opacity: 0.87});
-
-  return <Text style={arrayed}>{children}</Text>;
+  return <Text style={{color: colors.text, fontSize: 18, fontWeight: '600', opacity: 0.87, ...style}}>{children}</Text>;
 };
 
 export const RegTextInput: React.FunctionComponent<any> = (props) => {

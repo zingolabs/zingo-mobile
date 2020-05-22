@@ -58,8 +58,7 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
       }
     } else {
       console.log('Loading new wallet');
-      // And after 1.5s, go to the wallet screen
-      setTimeout(() => this.setState({screen: 1, walletExists: false}), 1500);
+      this.setState({screen: 1, walletExists: false});
     }
   };
 
