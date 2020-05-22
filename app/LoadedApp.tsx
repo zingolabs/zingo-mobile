@@ -57,6 +57,8 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
   }
 
   componentDidMount = () => {
+    this.clearToAddrs();
+
     // Configure the RPC to start doing refreshes
     this.rpc.configure();
   };
@@ -149,6 +151,18 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
 
   setSendPageState = (sendPageState: SendPageState) => {
     this.setState({sendPageState});
+  };
+
+  clearToAddrs = () => {
+    const {sendPageState} = this.state;
+    const newToAddrs = [new ToAddr(Utils.getNextToAddrID())];
+
+    // Create the new state object
+    const newState = new SendPageState();
+    newState.fromaddr = sendPageState.fromaddr;
+    newState.toaddrs = newToAddrs;
+
+    this.setSendPageState(newState);
   };
 
   setSendTo = (address: string, amount: number | null, memo: string | null) => {
@@ -250,7 +264,7 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
   };
 
   render() {
-    const {totalBalance, transactions, addresses, info} = this.state;
+    const {totalBalance, transactions, addresses, info, sendPageState} = this.state;
 
     const standardProps = {
       openErrorModal: this.openErrorModal,
@@ -285,7 +299,16 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
           inactiveTintColor: '#777777',
           labelStyle: {fontSize: 14},
         }}>
-        <Tab.Screen name="Send">{(props) => <SendScreen {...props} {...standardProps} />}</Tab.Screen>
+        <Tab.Screen name="Send">
+          {(props) => (
+            <SendScreen
+              {...props}
+              {...standardProps}
+              sendPageState={sendPageState}
+              setSendPageState={this.setSendPageState}
+            />
+          )}
+        </Tab.Screen>
         <Tab.Screen name="Transactions">
           {(props) => (
             <TransactionsScreen {...props} {...standardProps} transactions={transactions} totalBalance={totalBalance} />

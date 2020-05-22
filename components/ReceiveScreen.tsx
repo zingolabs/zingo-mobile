@@ -8,7 +8,6 @@ import {RegText} from '../components/Components';
 import {Info} from '../app/AppState';
 import Utils from '../app/utils';
 import {useTheme} from '@react-navigation/native';
-import {Colors} from 'react-native/Libraries/NewAppScreen';
 
 type SingleAddress = {
   address: string | null;

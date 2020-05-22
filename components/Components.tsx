@@ -80,13 +80,22 @@ export const BoldText: React.FunctionComponent<any> = ({style, children}) => {
 };
 
 export const FadeText: React.FunctionComponent<any> = (props) => {
-  return <RegText style={{opacity: 0.65, fontSize: -1}}>{props.children}</RegText>;
+  return <RegText style={{...props.style, opacity: 0.65, fontSize: -1}}>{props.children}</RegText>;
 };
 
 export const RegText: React.FunctionComponent<any> = ({style, children}) => {
   const {colors} = useTheme();
 
-  return <Text style={{color: colors.text, fontSize: 18, fontWeight: '600', opacity: 0.87, ...style}}>{children}</Text>;
+  let arrayed = [];
+
+  if (Array.isArray(style)) {
+    arrayed = style;
+  } else if (style) {
+    arrayed.push(style);
+  }
+  arrayed.push({color: colors.text, fontSize: 18, fontWeight: '600', opacity: 0.87});
+
+  return <Text style={arrayed}>{children}</Text>;
 };
 
 export const RegTextInput: React.FunctionComponent<any> = (props) => {
