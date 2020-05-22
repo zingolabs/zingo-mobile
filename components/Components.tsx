@@ -5,15 +5,15 @@ import {useTheme} from '@react-navigation/native';
 import Utils from '../app/utils';
 
 type UsdAmountProps = {
-  price: number | null;
-  amtZec: number;
+  price?: number | null;
+  amtZec?: number;
   style?: any;
 };
 export const UsdAmount: React.FunctionComponent<UsdAmountProps> = ({price, style, amtZec}) => {
   const {colors} = useTheme();
   var usdString;
 
-  if (!price) {
+  if (!price || typeof amtZec === 'undefined') {
     usdString = '--';
   } else {
     const usdAmount = price * amtZec;
@@ -29,7 +29,7 @@ export const UsdAmount: React.FunctionComponent<UsdAmountProps> = ({price, style
 type ZecAmountProps = {
   color?: string;
   size?: number;
-  amtZec: number;
+  amtZec?: number;
   style?: any;
   zecSymbol?: string;
 };
@@ -77,6 +77,10 @@ export const BoldText: React.FunctionComponent<any> = ({style, children}) => {
   arrayed.push({color: colors.text}, {fontSize: 18}, {fontWeight: 'bold'}, {opacity: 0.87});
 
   return <Text style={arrayed}>{children}</Text>;
+};
+
+export const FadeText: React.FunctionComponent<any> = (props) => {
+  return <RegText style={{opacity: 0.65, fontSize: -1}}>{props.children}</RegText>;
 };
 
 export const RegText: React.FunctionComponent<any> = ({style, children}) => {

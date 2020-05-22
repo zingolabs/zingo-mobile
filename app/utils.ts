@@ -34,6 +34,15 @@ export default class Utils {
     return new RegExp('^t[a-zA-Z0-9]{34}$').test(addr);
   }
 
+  static trimToSmall(addr?: string, numChars?: number): string | undefined {
+    const trimSize = numChars || 5;
+    if (!addr) {
+      return addr;
+    }
+
+    return `${addr.slice(0, trimSize)}...${addr.slice(addr.length - trimSize)}`;
+  }
+
   // Convert to max 8 decimal places, and remove trailing zeros
   static maxPrecision(v: number): string {
     return v.toFixed(8);
@@ -56,7 +65,11 @@ export default class Utils {
     return s;
   }
 
-  static splitZecAmountIntoBigSmall(zecValue: number): ZecAmountSplitType {
+  static splitZecAmountIntoBigSmall(zecValue?: number): ZecAmountSplitType {
+    if (typeof zecValue === 'undefined') {
+      return {bigPart: '--', smallPart: ''};
+    }
+
     let bigPart = Utils.maxPrecision(zecValue);
     let smallPart = '';
 
