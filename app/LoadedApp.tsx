@@ -304,6 +304,7 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
             <SendScreen
               {...props}
               {...standardProps}
+              totalBalance={totalBalance}
               sendPageState={sendPageState}
               setSendPageState={this.setSendPageState}
             />

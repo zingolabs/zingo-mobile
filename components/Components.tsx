@@ -80,7 +80,9 @@ export const BoldText: React.FunctionComponent<any> = ({style, children}) => {
 };
 
 export const FadeText: React.FunctionComponent<any> = (props) => {
-  return <RegText style={{...props.style, opacity: 0.65, fontSize: -1}}>{props.children}</RegText>;
+  const {colors} = useTheme();
+
+  return <Text style={{...props.style, opacity: 0.65, color: colors.text}}>{props.children}</Text>;
 };
 
 export const RegText: React.FunctionComponent<any> = ({style, children}) => {
