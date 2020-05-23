@@ -1,9 +1,11 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, {Component} from 'react';
-
+import {ScrollView, StyleSheet, Dimensions} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faList, faUpload, faDownload, faCog} from '@fortawesome/free-solid-svg-icons';
 
+import SideMenu from 'react-native-side-menu';
 import RPC from './rpc';
 import AppState, {
   TotalBalance,
@@ -15,14 +17,48 @@ import AppState, {
   ToAddr,
   ErrorModalData,
 } from './AppState';
+import {RegText} from '../components/Components';
 import Utils from './utils';
 import TransactionsScreen from '../components/TransactionsScreen';
 import SendScreen from '../components/SendScreen';
 import ReceiveScreen from '../components/ReceiveScreen';
 
+const window = Dimensions.get('window');
+const styles = StyleSheet.create({
+  menu: {
+    flex: 1,
+    width: window.width,
+    height: window.height,
+    backgroundColor: '#000000',
+    padding: 20,
+  },
+  item: {
+    fontSize: 14,
+    fontWeight: '300',
+    paddingTop: 5,
+    color: '#ffffff',
+  },
+});
+
+function Menu({onItemSelected}: any) {
+  return (
+    <ScrollView scrollsToTop={false} style={styles.menu}>
+      <RegText onPress={() => onItemSelected('Contacts')} style={styles.item}>
+        Wallet Seed
+      </RegText>
+
+      <RegText onPress={() => onItemSelected('About')} style={styles.item}>
+        About
+      </RegText>
+    </ScrollView>
+  );
+}
+
 const Tab = createBottomTabNavigator();
 
-type LoadedAppProps = {};
+type LoadedAppProps = {
+  navigation: any;
+};
 export default class LoadedApp extends Component<LoadedAppProps, AppState> {
   rpc: RPC;
 
@@ -41,6 +77,8 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
       info: null,
       rescanning: false,
       errorModalData: new ErrorModalData(),
+      isMenuDrawerOpen: false,
+      selectedMenuDrawerItem: 'About',
     };
 
     this.rpc = new RPC(
@@ -263,6 +301,23 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
     this.rpc.clearTimers();
   };
 
+  toggleMenuDrawer = () => {
+    this.setState({
+      isMenuDrawerOpen: !this.state.isMenuDrawerOpen,
+    });
+  };
+
+  updateMenuState = (isMenuDrawerOpen: boolean) => {
+    this.setState({isMenuDrawerOpen});
+  };
+
+  onMenuItemSelected = (item: string) => {
+    this.setState({
+      isMenuDrawerOpen: false,
+      selectedMenuDrawerItem: item,
+    });
+  };
+
   render() {
     const {totalBalance, transactions, addresses, info, sendPageState} = this.state;
 
@@ -271,54 +326,64 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
       closeErrorModal: this.closeErrorModal,
       setSendTo: this.setSendTo,
       info,
+      toggleMenuDrawer: this.toggleMenuDrawer,
     };
 
+    const menu = <Menu onItemSelected={this.onMenuItemSelected} />;
+
     return (
-      <Tab.Navigator
-        initialRouteName="Transactions"
-        screenOptions={({route}) => ({
-          tabBarIcon: ({focused}) => {
-            var iconName;
+      <SideMenu menu={menu} isOpen={this.state.isMenuDrawerOpen} onChange={(isOpen) => this.updateMenuState(isOpen)}>
+        <Tab.Navigator
+          initialRouteName="Transactions"
+          screenOptions={({route}) => ({
+            tabBarIcon: ({focused}) => {
+              var iconName;
 
-            if (route.name === 'Transactions') {
-              iconName = focused ? faList : faList;
-            } else if (route.name === 'Send') {
-              iconName = focused ? faUpload : faUpload;
-            } else if (route.name === 'Receive') {
-              iconName = focused ? faDownload : faDownload;
-            } else {
-              iconName = focused ? faCog : faCog;
-            }
+              if (route.name === 'Transactions') {
+                iconName = focused ? faList : faList;
+              } else if (route.name === 'Send') {
+                iconName = focused ? faUpload : faUpload;
+              } else if (route.name === 'Receive') {
+                iconName = focused ? faDownload : faDownload;
+              } else {
+                iconName = focused ? faCog : faCog;
+              }
 
-            // You can return any component that you like here!
-            return <FontAwesomeIcon icon={iconName} color="rgb( 220, 220, 220)" />;
-          },
-        })}
-        tabBarOptions={{
-          activeTintColor: '#BB86FC',
-          inactiveTintColor: '#777777',
-          labelStyle: {fontSize: 14},
-        }}>
-        <Tab.Screen name="Send">
-          {(props) => (
-            <SendScreen
-              {...props}
-              {...standardProps}
-              totalBalance={totalBalance}
-              sendPageState={sendPageState}
-              setSendPageState={this.setSendPageState}
-            />
-          )}
-        </Tab.Screen>
-        <Tab.Screen name="Transactions">
-          {(props) => (
-            <TransactionsScreen {...props} {...standardProps} transactions={transactions} totalBalance={totalBalance} />
-          )}
-        </Tab.Screen>
-        <Tab.Screen name="Receive">
-          {(props) => <ReceiveScreen {...props} {...standardProps} addresses={addresses} />}
-        </Tab.Screen>
-      </Tab.Navigator>
+              // You can return any component that you like here!
+              return <FontAwesomeIcon icon={iconName} color="rgb( 220, 220, 220)" />;
+            },
+          })}
+          tabBarOptions={{
+            activeTintColor: '#BB86FC',
+            inactiveTintColor: '#777777',
+            labelStyle: {fontSize: 14},
+          }}>
+          <Tab.Screen name="Send">
+            {(props) => (
+              <SendScreen
+                {...props}
+                {...standardProps}
+                totalBalance={totalBalance}
+                sendPageState={sendPageState}
+                setSendPageState={this.setSendPageState}
+              />
+            )}
+          </Tab.Screen>
+          <Tab.Screen name="Transactions">
+            {(props) => (
+              <TransactionsScreen
+                {...props}
+                {...standardProps}
+                transactions={transactions}
+                totalBalance={totalBalance}
+              />
+            )}
+          </Tab.Screen>
+          <Tab.Screen name="Receive">
+            {(props) => <ReceiveScreen {...props} {...standardProps} addresses={addresses} />}
+          </Tab.Screen>
+        </Tab.Navigator>
+      </SideMenu>
     );
   }
 }

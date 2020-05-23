@@ -8,6 +8,8 @@ import Utils from '../app/utils';
 import Moment from 'react-moment';
 import {useTheme} from '@react-navigation/native';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
+import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
+import {faBars} from '@fortawesome/free-solid-svg-icons';
 
 type TxDetailProps = {
   tx: Transaction | null;
@@ -134,12 +136,14 @@ type TransactionsScreenViewProps = {
   info: Info | null;
   totalBalance: TotalBalance;
   transactions: Transaction[] | null;
+  toggleMenuDrawer: () => void;
 };
 
 const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProps> = ({
   info,
   totalBalance,
   transactions,
+  toggleMenuDrawer,
 }) => {
   const [isTxDetailModalShowing, setTxDetailModalShowing] = React.useState(false);
   const [txDetail, setTxDetail] = React.useState<Transaction | null>(null);
@@ -157,11 +161,18 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
         <TxDetail tx={txDetail} price={info?.zecPrice} closeModal={() => setTxDetailModalShowing(false)} />
       </Modal>
 
-      <View style={{display: 'flex', alignItems: 'center', height: 140, backgroundColor: colors.card}}>
+      <View style={{display: 'flex', alignItems: 'center', height: 140, backgroundColor: colors.card, zIndex: -1}}>
         <RegText style={{marginTop: 10, marginBottom: 5}}>Balance</RegText>
         <ZecAmount size={36} amtZec={totalBalance.total} />
         <UsdAmount style={{marginTop: 5}} price={zecPrice} amtZec={totalBalance.total} />
       </View>
+
+      <View style={{backgroundColor: '#353535', padding: 10, position: 'absolute'}}>
+        <TouchableOpacity onPress={toggleMenuDrawer}>
+          <FontAwesomeIcon icon={faBars} size={20} color={'#ffffff'} />
+        </TouchableOpacity>
+      </View>
+
       <View style={{display: 'flex', alignItems: 'center', marginTop: -25}}>
         <Image source={require('../assets/img/logobig.png')} style={{width: 50, height: 50, resizeMode: 'contain'}} />
       </View>

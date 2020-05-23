@@ -85,7 +85,7 @@ export const FadeText: React.FunctionComponent<any> = (props) => {
   return <Text style={{...props.style, opacity: 0.65, color: colors.text}}>{props.children}</Text>;
 };
 
-export const RegText: React.FunctionComponent<any> = ({style, children}) => {
+export const RegText: React.FunctionComponent<any> = ({style, onPress, children}) => {
   const {colors} = useTheme();
 
   let arrayed = [];
@@ -97,7 +97,11 @@ export const RegText: React.FunctionComponent<any> = ({style, children}) => {
   }
   arrayed.push({color: colors.text, fontSize: 18, fontWeight: '600', opacity: 0.87});
 
-  return <Text style={arrayed}>{children}</Text>;
+  return (
+    <Text style={arrayed} onPress={onPress}>
+      {children}
+    </Text>
+  );
 };
 
 export const RegTextInput: React.FunctionComponent<any> = (props) => {

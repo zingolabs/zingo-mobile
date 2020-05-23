@@ -26,7 +26,6 @@ function ScanScreen({setToAddress}: ScannerProps) {
 
   const onRead = (e: any) => {
     const scandata = e.data.trim();
-
     let scannedAddress = scandata;
 
     validateAddress(scannedAddress);

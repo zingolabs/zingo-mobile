@@ -195,5 +195,9 @@ export default interface AppState {
   // Data for any error or info modal
   errorModalData: ErrorModalData;
 
+  isMenuDrawerOpen: boolean;
+
+  selectedMenuDrawerItem: string;
+
   // eslint-disable-next-line semi
 }
