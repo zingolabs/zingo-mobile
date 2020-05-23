@@ -53,5 +53,7 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>NSCameraUsageDescription</key>
+	<string>Zecwallet needs access to the camera to scan address QRCodes</string>
 </dict>
 </plist>

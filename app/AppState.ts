@@ -63,14 +63,14 @@ export interface Transaction {
 export class ToAddr {
   id: number;
   to: string;
-  amount: number;
+  amount: string;
   memo: string;
 
   constructor(id: number) {
     this.id = id;
 
     this.to = '';
-    this.amount = 0;
+    this.amount = '';
     this.memo = '';
   }
 }

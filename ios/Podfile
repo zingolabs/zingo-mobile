@@ -46,6 +46,9 @@ end
 
 target 'ZecwalletMobile' do
   # Pods for ZecwalletMobile
+  permissions_path = '../node_modules/react-native-permissions/ios'
+  
+  pod 'Permission-Camera', :path => "#{permissions_path}/Camera.podspec"
   pod 'FBLazyVector', :path => "../node_modules/react-native/Libraries/FBLazyVector"
   pod 'FBReactNativeSpec', :path => "../node_modules/react-native/Libraries/FBReactNativeSpec"
   pod 'RCTRequired', :path => "../node_modules/react-native/Libraries/RCTRequired"

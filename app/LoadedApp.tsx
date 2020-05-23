@@ -165,7 +165,7 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
     this.setSendPageState(newState);
   };
 
-  setSendTo = (address: string, amount: number | null, memo: string | null) => {
+  setSendTo = (address: string, amount: string | null, memo: string | null) => {
     // Clear the existing send page state and set up the new one
     const {sendPageState} = this.state;
 

@@ -1,11 +1,66 @@
 /* eslint-disable react-native/no-inline-styles */
-import React from 'react';
-import {View, ScrollView} from 'react-native';
-import {FadeText, RegTextInput, PrimaryButton} from '../components/Components';
+import React, {useState} from 'react';
+import QRCodeScanner from 'react-native-qrcode-scanner';
+import {View, ScrollView, Modal} from 'react-native';
+import {FadeText, RegTextInput, PrimaryButton, RegText} from '../components/Components';
 import {Info, SendPageState} from '../app/AppState';
 import {faQrcode, faUpload} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {useTheme} from '@react-navigation/native';
+import Utils from '../app/utils';
+import {TouchableOpacity} from 'react-native-gesture-handler';
+
+type ScannerProps = {
+  setToAddress: (addr: string | null) => void;
+};
+function ScanScreen({setToAddress}: ScannerProps) {
+  const [error, setError] = useState<String | null>(null);
+
+  const validateAddress = (scannedAddress: string) => {
+    if (Utils.isSapling(scannedAddress) || Utils.isTransparent(scannedAddress)) {
+      setToAddress(scannedAddress);
+    } else {
+      setError(`"${scannedAddress}" is not a valid Zcash Address`);
+    }
+  };
+
+  const onRead = (e: any) => {
+    const scandata = e.data.trim();
+
+    let scannedAddress = scandata;
+
+    validateAddress(scannedAddress);
+  };
+
+  const doCancel = () => {
+    setToAddress(null);
+  };
+
+  const {colors} = useTheme();
+  return (
+    <QRCodeScanner
+      onRead={onRead}
+      reactivate={true}
+      containerStyle={{backgroundColor: colors.background}}
+      topContent={<RegText>Scan a Zcash Address</RegText>}
+      bottomContent={
+        <View
+          style={{
+            flex: 1,
+            flexDirection: 'column',
+            alignItems: 'stretch',
+            justifyContent: 'center',
+            width: '100%',
+          }}>
+          {error && <RegText style={{textAlign: 'center'}}>{error}</RegText>}
+          <View style={{flexDirection: 'row', alignItems: 'stretch', justifyContent: 'space-evenly'}}>
+            <PrimaryButton style={{marginLeft: 50}} title="Cancel" onPress={doCancel} />
+          </View>
+        </View>
+      }
+    />
+  );
+}
 
 type SendScreenProps = {
   info: Info | null;
@@ -15,6 +70,7 @@ type SendScreenProps = {
 
 const SendScreen: React.FunctionComponent<SendScreenProps> = ({sendPageState, setSendPageState}) => {
   const {colors} = useTheme();
+  const [qrcodeModalVisble, setQrcodeModalVisible] = useState(false);
 
   const updateToField = (address: string | null, amount: string | null, memo: string | null) => {
     const newToAddrs = sendPageState.toaddrs.slice(0);
@@ -29,13 +85,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({sendPageState, se
     }
 
     if (amount !== null) {
-      // Check to see the new amount if valid
-      // $FlowFixMe
-      const newAmount = parseFloat(amount);
-      if (newAmount < 0 || newAmount > 21 * 10 ** 6) {
-        return;
-      }
-      toAddr.amount = newAmount;
+      toAddr.amount = amount;
     }
 
     if (memo !== null) {
@@ -50,10 +100,25 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({sendPageState, se
     setSendPageState(newState);
   };
 
+  const setToAddress = (address: string | null) => {
+    if (address !== null) {
+      updateToField(address, null, null);
+    }
+    setQrcodeModalVisible(false);
+  };
+
   return (
     <ScrollView
       keyboardShouldPersistTaps="handled"
       contentContainerStyle={{display: 'flex', flexDirection: 'column', justifyContent: 'flex-start'}}>
+      <Modal
+        animationType="slide"
+        transparent={false}
+        visible={qrcodeModalVisble}
+        onRequestClose={() => setQrcodeModalVisible(false)}>
+        <ScanScreen setToAddress={setToAddress} />
+      </Modal>
+
       <FadeText>To</FadeText>
       <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-start'}}>
         <RegTextInput
@@ -61,7 +126,9 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({sendPageState, se
           value={sendPageState.toaddrs[0].to}
           onChangeText={(text: string) => updateToField(text, null, null)}
         />
-        <FontAwesomeIcon style={{margin: 5}} size={24} icon={faQrcode} color={colors.text} />
+        <TouchableOpacity onPress={() => setQrcodeModalVisible(true)}>
+          <FontAwesomeIcon style={{margin: 5}} size={24} icon={faQrcode} color={colors.text} />
+        </TouchableOpacity>
       </View>
 
       <FadeText style={{marginTop: 20}}>Amount</FadeText>
