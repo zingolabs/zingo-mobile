@@ -154,7 +154,7 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
                   Toast.show('Copied Seed to Clipboard', Toast.LONG);
                 }
               }}>
-              <RegText>{JSON.parse(seedPhrase).seed}</RegText>
+              <RegText style={{textAlign: 'center'}}>{JSON.parse(seedPhrase).seed}</RegText>
             </TouchableOpacity>
             <View style={[cstyles.margintop]}>
               <RegText style="">Birthday: </RegText>
