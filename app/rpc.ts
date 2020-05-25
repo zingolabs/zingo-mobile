@@ -1,4 +1,4 @@
-import {TotalBalance, AddressBalance, Transaction, TxDetail, Info} from './AppState';
+import {TotalBalance, AddressBalance, Transaction, TxDetail, Info, SendJsonToType} from './AppState';
 import RPCModule from '../components/RPCModule';
 
 export default class RPC {
@@ -385,10 +385,10 @@ export default class RPC {
   }
 
   // Send a transaction using the already constructed sendJson structure
-  async sendTransaction(sendJson: []): Promise<string> {
+  async sendTransaction(sendJson: Array<SendJsonToType>): Promise<string> {
     let sendStr;
     try {
-      sendStr = RPCModule.doSend(JSON.stringify(sendJson));
+      sendStr = await RPCModule.doSend(JSON.stringify(sendJson));
     } catch (err) {
       // TODO Show a modal with the error
       console.log(`Error sending Tx: ${err}`);

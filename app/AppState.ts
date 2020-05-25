@@ -60,6 +60,13 @@ export interface Transaction {
   detailedTxns: TxDetail[];
 }
 
+// This is the type that the RPC interface expects for sending
+export interface SendJsonToType {
+  address: string;
+  amount: number;
+  memo?: string;
+}
+
 export class ToAddr {
   id: number;
   to: string;

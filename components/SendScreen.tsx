@@ -1,14 +1,16 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useState} from 'react';
 import QRCodeScanner from 'react-native-qrcode-scanner';
-import {View, ScrollView, Modal, Image} from 'react-native';
-import {FadeText, RegTextInput, PrimaryButton, RegText, ZecAmount, UsdAmount} from '../components/Components';
+import {View, ScrollView, Modal, Image, Alert} from 'react-native';
+import {FadeText, BoldText, RegTextInput, PrimaryButton, RegText, ZecAmount, UsdAmount} from '../components/Components';
 import {Info, SendPageState, TotalBalance} from '../app/AppState';
 import {faQrcode, faUpload} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {useTheme} from '@react-navigation/native';
 import Utils from '../app/utils';
 import {TouchableOpacity} from 'react-native-gesture-handler';
+import {getStatusBarHeight} from 'react-native-status-bar-height';
+import Toast from 'react-native-simple-toast';
 
 type ScannerProps = {
   setToAddress: (addr: string | null) => void;
@@ -61,11 +63,111 @@ function ScanScreen({setToAddress}: ScannerProps) {
   );
 }
 
+const ComputingTxModalContent: React.FunctionComponent<any> = ({}) => {
+  const {colors} = useTheme();
+
+  return (
+    <View
+      style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'stretch',
+        height: '100%',
+        marginTop: getStatusBarHeight(),
+        backgroundColor: colors.background,
+      }}>
+      <RegText>Computing Transaction</RegText>
+      <RegText>Please wait...</RegText>
+    </View>
+  );
+};
+
+type ConfirmModalProps = {
+  sendPageState: SendPageState;
+  price?: number | null;
+  closeModal: () => void;
+  confirmSend: () => void;
+};
+const ConfirmModalContent: React.FunctionComponent<ConfirmModalProps> = ({
+  closeModal,
+  confirmSend,
+  sendPageState,
+  price,
+}) => {
+  const {colors} = useTheme();
+
+  const sendingTotal =
+    sendPageState.toaddrs.reduce((s, t) => s + parseFloat(t.amount || '0'), 0.0) + Utils.getDefaultFee();
+
+  return (
+    <View
+      style={{
+        display: 'flex',
+        justifyContent: 'flex-start',
+        alignItems: 'stretch',
+        height: '100%',
+        marginTop: getStatusBarHeight(),
+        backgroundColor: colors.background,
+      }}>
+      <ScrollView contentContainerStyle={{display: 'flex', justifyContent: 'flex-start'}}>
+        <BoldText style={{textAlign: 'center', margin: 10}}>Confirm Transaction</BoldText>
+
+        <View style={{display: 'flex', alignItems: 'center', padding: 10, backgroundColor: colors.card}}>
+          <BoldText style={{textAlign: 'center'}}>Sending</BoldText>
+
+          <ZecAmount amtZec={sendingTotal} />
+          <UsdAmount amtZec={sendingTotal} price={price} />
+        </View>
+        {sendPageState.toaddrs.map((to) => {
+          return (
+            <View key={to.id} style={{margin: 10}}>
+              <RegText>{to.to}</RegText>
+              <View
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'baseline',
+                }}>
+                <ZecAmount amtZec={parseFloat(to.amount)} />
+                <UsdAmount amtZec={parseFloat(to.amount)} price={price} />
+              </View>
+              <RegText>{to.memo || ''}</RegText>
+            </View>
+          );
+        })}
+
+        <View style={{margin: 10}}>
+          <RegText>Fee</RegText>
+          <View
+            style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline'}}>
+            <ZecAmount amtZec={Utils.getDefaultFee()} />
+            <UsdAmount amtZec={Utils.getDefaultFee()} price={price} />
+          </View>
+        </View>
+      </ScrollView>
+
+      <View
+        style={{
+          flexGrow: 1,
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'space-around',
+          alignItems: 'center',
+        }}>
+        <PrimaryButton title={'Confirm'} onPress={confirmSend} />
+        <PrimaryButton title={'Cancel'} onPress={closeModal} />
+      </View>
+    </View>
+  );
+};
+
 type SendScreenProps = {
   info: Info | null;
   totalBalance: TotalBalance;
   sendPageState: SendPageState;
   setSendPageState: (sendPageState: SendPageState) => void;
+  sendTransaction: () => void;
 };
 
 const SendScreen: React.FunctionComponent<SendScreenProps> = ({
@@ -73,9 +175,12 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
   totalBalance,
   sendPageState,
   setSendPageState,
+  sendTransaction,
 }) => {
   const {colors} = useTheme();
   const [qrcodeModalVisble, setQrcodeModalVisible] = useState(false);
+  const [confirmModalVisible, setConfirmModalVisible] = useState(false);
+  const [computingModalVisible, setComputingModalVisible] = useState(false);
 
   const updateToField = (address: string | null, amount: string | null, memo: string | null) => {
     const newToAddrs = sendPageState.toaddrs.slice(0);
@@ -112,6 +217,27 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
     setQrcodeModalVisible(false);
   };
 
+  const confirmSend = async () => {
+    // First, close the confirm modal and show the "computing" modal
+    setConfirmModalVisible(false);
+    setComputingModalVisible(true);
+
+    // call the sendTransaction method in a timeout, allowing the modals to show properly
+    setTimeout(async () => {
+      try {
+        const txid = await sendTransaction();
+        setComputingModalVisible(false);
+
+        Toast.show(`Successfully Broadcast Tx: ${txid}`, Toast.LONG);
+      } catch (err) {
+        console.log('sendtx error', err);
+
+        setComputingModalVisible(false);
+        Alert.alert('Error sending Tx', `${err}`);
+      }
+    }, 100);
+  };
+
   const memoEnabled = Utils.isSapling(sendPageState.toaddrs[0].to);
   const zecPrice = info ? info.zecPrice : null;
   const spendable = totalBalance.transparentBal + totalBalance.verifiedPrivate;
@@ -130,6 +256,30 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
         onRequestClose={() => setQrcodeModalVisible(false)}>
         <ScanScreen setToAddress={setToAddress} />
       </Modal>
+
+      <Modal
+        animationType="slide"
+        transparent={false}
+        visible={confirmModalVisible}
+        onRequestClose={() => setConfirmModalVisible(false)}>
+        <ConfirmModalContent
+          sendPageState={sendPageState}
+          price={info?.zecPrice}
+          closeModal={() => {
+            setConfirmModalVisible(false);
+          }}
+          confirmSend={confirmSend}
+        />
+      </Modal>
+
+      <Modal
+        animationType="slide"
+        transparent={false}
+        visible={computingModalVisible}
+        onRequestClose={() => setComputingModalVisible(false)}>
+        <ComputingTxModalContent />
+      </Modal>
+
       <View style={{display: 'flex', alignItems: 'center', height: 140, backgroundColor: colors.card}}>
         <RegText style={{marginTop: 10, marginBottom: 5}}>Spendable</RegText>
         <ZecAmount size={36} amtZec={spendable} />
@@ -161,7 +311,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
           </TouchableOpacity>
         </View>
 
-        <FadeText style={{marginTop: 30}}>Amount</FadeText>
+        <FadeText style={{marginTop: 30}}>Amount (ZEC)</FadeText>
         <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-start'}}>
           <RegTextInput
             placeholder="0.0"
@@ -188,7 +338,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
         </View>
 
         <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: 20}}>
-          <PrimaryButton title="Send" />
+          <PrimaryButton title="Send" onPress={() => setConfirmModalVisible(true)} />
         </View>
       </ScrollView>
     </View>
