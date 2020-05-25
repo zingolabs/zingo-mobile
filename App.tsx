@@ -3,18 +3,18 @@
  * @format
  */
 import React, {Component} from 'react';
-import {View, ScrollView, Alert, TouchableOpacity, Clipboard} from 'react-native';
+import {View, ScrollView, Alert} from 'react-native';
 
 import {NavigationContainer, DarkTheme} from '@react-navigation/native';
 import {AppearanceProvider} from 'react-native-appearance';
 import {createStackNavigator} from '@react-navigation/stack';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
-import Toast from 'react-native-simple-toast';
 
 import cstyles from './components/CommonStyles';
 import {PrimaryButton, BoldText, RegText, RegTextInput} from './components/Components';
 import RPCModule from './components/RPCModule';
 import LoadedApp from './app/LoadedApp';
+import SeedComponent from './components/SeedComponent';
 
 // -----------------
 // Loading View
@@ -70,40 +70,42 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
     });
   };
 
+  createNewWallet = async () => {
+    const seed = await RPCModule.createNewWallet();
+    if (!seed.startsWith('Error')) {
+      this.setState({seedPhrase: seed, screen: 2});
+    } else {
+      Alert.alert('Error creating Wallet', seed);
+    }
+  };
+
+  getSeedPhraseToRestore = async () => {
+    this.setState({seedPhrase: '', birthday: '0', screen: 3});
+  };
+
+  doRestore = async () => {
+    // Don't call with null values
+    const {birthday, seedPhrase} = this.state;
+
+    if (!seedPhrase) {
+      Alert.alert('Invalid Seed Phrase', 'The seed phrase was invalid');
+      return;
+    }
+
+    const error = await RPCModule.restoreWallet(seedPhrase, birthday || '0');
+    if (!error.startsWith('Error')) {
+      this.navigateToLoaded();
+    } else {
+      Alert.alert('Error reading Wallet', error);
+    }
+  };
+
+  loadWallet = () => {
+    this.navigateToLoaded();
+  };
+
   render() {
     const {screen, birthday, seedPhrase} = this.state;
-
-    const createNewWallet = async () => {
-      const seed = await RPCModule.createNewWallet();
-      if (!seed.startsWith('Error')) {
-        this.setState({seedPhrase: seed, screen: 2});
-      } else {
-        Alert.alert('Error creating Wallet', seed);
-      }
-    };
-
-    const getSeedPhraseToRestore = async () => {
-      this.setState({seedPhrase: '', birthday: '0', screen: 3});
-    };
-
-    const doRestore = async () => {
-      // Don't call with null values
-      if (!seedPhrase) {
-        Alert.alert('Invalid Seed Phrase', 'The seed phrase was invalid');
-        return;
-      }
-
-      const error = await RPCModule.restoreWallet(seedPhrase, birthday || '0');
-      if (!error.startsWith('Error')) {
-        this.navigateToLoaded();
-      } else {
-        Alert.alert('Error reading Wallet', error);
-      }
-    };
-
-    const loadWallet = () => {
-      this.navigateToLoaded();
-    };
 
     return (
       <View
@@ -126,44 +128,18 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
                 justifyContent: 'center',
               },
             ]}>
-            <PrimaryButton title="Create New Wallet" onPress={createNewWallet} />
+            <PrimaryButton title="Create New Wallet" onPress={this.createNewWallet} />
             <View style={[cstyles.margintop]}>
-              <PrimaryButton title="Restore seed" onPress={getSeedPhraseToRestore} />
+              <PrimaryButton title="Restore seed" onPress={this.getSeedPhraseToRestore} />
             </View>
           </View>
         )}
         {screen === 2 && seedPhrase && (
-          <View
-            style={[
-              {
-                flex: 1,
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-              },
-            ]}>
-            <BoldText style={cstyles.center}>
-              This is your seed phrase. Please write it down carefully. It is the only way to restore your wallet.
-            </BoldText>
-            <TouchableOpacity
-              style={[cstyles.margintop, {padding: 10, backgroundColor: '#212124'}]}
-              onPress={() => {
-                const seed = JSON.parse(seedPhrase).seed;
-                if (seed) {
-                  Clipboard.setString(seed);
-                  Toast.show('Copied Seed to Clipboard', Toast.LONG);
-                }
-              }}>
-              <RegText style={{textAlign: 'center'}}>{JSON.parse(seedPhrase).seed}</RegText>
-            </TouchableOpacity>
-            <View style={[cstyles.margintop]}>
-              <RegText style="">Birthday: </RegText>
-            </View>
-            <RegText style="">{JSON.parse(seedPhrase).birthday}</RegText>
-            <View style={[cstyles.margintop]}>
-              <PrimaryButton title="I have saved the seed" onPress={loadWallet} />
-            </View>
-          </View>
+          <SeedComponent
+            seed={JSON.parse(seedPhrase)?.seed}
+            birthday={JSON.parse(seedPhrase)?.birthday}
+            nextScreen={this.loadWallet}
+          />
         )}
         {screen === 3 && (
           <ScrollView
@@ -210,7 +186,7 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
               onChangeText={(text: string) => this.setState({birthday: text})}
             />
             <View style={cstyles.margintop}>
-              <PrimaryButton title="Restore Wallet" onPress={doRestore} />
+              <PrimaryButton title="Restore Wallet" onPress={this.doRestore} />
             </View>
           </ScrollView>
         )}

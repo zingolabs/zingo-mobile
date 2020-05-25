@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {Component} from 'react';
-import {ScrollView, StyleSheet, Dimensions} from 'react-native';
+import {ScrollView, StyleSheet, Dimensions, Image, Modal} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faList, faUpload, faDownload, faCog} from '@fortawesome/free-solid-svg-icons';
@@ -23,6 +23,8 @@ import Utils from './utils';
 import TransactionsScreen from '../components/TransactionsScreen';
 import SendScreen from '../components/SendScreen';
 import ReceiveScreen from '../components/ReceiveScreen';
+import AboutModal from '../components/About';
+import SeedComponent from '../components/SeedComponent';
 
 const window = Dimensions.get('window');
 const styles = StyleSheet.create({
@@ -43,12 +45,14 @@ const styles = StyleSheet.create({
 
 function Menu({onItemSelected}: any) {
   return (
-    <ScrollView scrollsToTop={false} style={styles.menu}>
-      <RegText onPress={() => onItemSelected('Contacts')} style={styles.item}>
+    <ScrollView scrollsToTop={false} style={styles.menu} contentContainerStyle={{display: 'flex'}}>
+      <Image source={require('../assets/img/logobig.png')} style={{width: 100, height: 100, resizeMode: 'contain'}} />
+
+      <RegText onPress={() => onItemSelected('Wallet Seed')} style={styles.item}>
         Wallet Seed
       </RegText>
 
-      <RegText onPress={() => onItemSelected('About')} style={styles.item}>
+      <RegText onPress={() => onItemSelected('About Zecwallet Lite')} style={styles.item}>
         About
       </RegText>
     </ScrollView>
@@ -78,8 +82,11 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
       info: null,
       rescanning: false,
       errorModalData: new ErrorModalData(),
+      walletSeed: null,
       isMenuDrawerOpen: false,
-      selectedMenuDrawerItem: 'About',
+      selectedMenuDrawerItem: '',
+      aboutModalVisible: false,
+      seedModalVisible: false,
     };
 
     this.rpc = new RPC(
@@ -354,10 +361,29 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
       isMenuDrawerOpen: false,
       selectedMenuDrawerItem: item,
     });
+
+    // Depending on the menu item, open the appropriate modal
+    if (item === 'About') {
+      this.setState({aboutModalVisible: true});
+    } else if (item === 'Wallet Seed') {
+      (async () => {
+        const walletSeed = await RPC.fetchSeed();
+        this.setState({walletSeed, seedModalVisible: true});
+      })();
+    }
   };
 
   render() {
-    const {totalBalance, transactions, addresses, info, sendPageState} = this.state;
+    const {
+      totalBalance,
+      transactions,
+      addresses,
+      info,
+      sendPageState,
+      aboutModalVisible,
+      seedModalVisible,
+      walletSeed,
+    } = this.state;
 
     const standardProps = {
       openErrorModal: this.openErrorModal,
@@ -371,6 +397,26 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
 
     return (
       <SideMenu menu={menu} isOpen={this.state.isMenuDrawerOpen} onChange={(isOpen) => this.updateMenuState(isOpen)}>
+        <Modal
+          animationType="slide"
+          transparent={false}
+          visible={aboutModalVisible}
+          onRequestClose={() => this.setState({aboutModalVisible: false})}>
+          <AboutModal closeModal={() => this.setState({aboutModalVisible: false})} />
+        </Modal>
+
+        <Modal
+          animationType="slide"
+          transparent={false}
+          visible={seedModalVisible}
+          onRequestClose={() => this.setState({seedModalVisible: false})}>
+          <SeedComponent
+            seed={walletSeed?.seed}
+            birthday={walletSeed?.birthday}
+            nextScreen={() => this.setState({seedModalVisible: false})}
+          />
+        </Modal>
+
         <Tab.Navigator
           initialRouteName="Transactions"
           screenOptions={({route}) => ({

@@ -1,4 +1,4 @@
-import {TotalBalance, AddressBalance, Transaction, TxDetail, Info, SendJsonToType} from './AppState';
+import {TotalBalance, AddressBalance, Transaction, TxDetail, Info, SendJsonToType, WalletSeed} from './AppState';
 import RPCModule from '../components/RPCModule';
 
 export default class RPC {
@@ -244,11 +244,12 @@ export default class RPC {
     return addrJSON[0];
   }
 
-  static async fetchSeed(): Promise<string> {
+  static async fetchSeed(): Promise<WalletSeed> {
     const seedStr = await RPCModule.execute('seed', '');
     const seedJSON = JSON.parse(seedStr);
 
-    return seedJSON.seed;
+    const seed: WalletSeed = {seed: seedJSON.seed, birthday: seedJSON.birthday};
+    return seed;
   }
 
   static async fetchWalletHeight(): Promise<number> {

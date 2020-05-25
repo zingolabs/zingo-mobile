@@ -162,6 +162,11 @@ export interface ConnectedCompanionApp {
   lastSeen: number;
 }
 
+export interface WalletSeed {
+  seed: string;
+  birthday: number;
+}
+
 export default interface AppState {
   // The total confirmed and unconfirmed balance in this wallet
   totalBalance: TotalBalance;
@@ -202,9 +207,14 @@ export default interface AppState {
   // Data for any error or info modal
   errorModalData: ErrorModalData;
 
+  walletSeed: WalletSeed | null;
+
   isMenuDrawerOpen: boolean;
 
   selectedMenuDrawerItem: string;
 
+  aboutModalVisible: boolean;
+
+  seedModalVisible: boolean;
   // eslint-disable-next-line semi
 }
