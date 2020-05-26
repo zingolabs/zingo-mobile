@@ -1,8 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import {View, ScrollView} from 'react-native';
+import {View, ScrollView, SafeAreaView} from 'react-native';
 import {PrimaryButton, BoldText, RegText} from './Components';
-import {getStatusBarHeight} from 'react-native-status-bar-height';
 import {useTheme} from '@react-navigation/native';
 
 type AboutModalProps = {
@@ -11,13 +10,12 @@ type AboutModalProps = {
 const AboutModal: React.FunctionComponent<AboutModalProps> = ({closeModal}) => {
   const {colors} = useTheme();
   return (
-    <View
+    <SafeAreaView
       style={{
         display: 'flex',
         justifyContent: 'flex-start',
         alignItems: 'stretch',
         height: '100%',
-        marginTop: getStatusBarHeight(),
         backgroundColor: colors.background,
       }}>
       <ScrollView
@@ -62,7 +60,7 @@ const AboutModal: React.FunctionComponent<AboutModalProps> = ({closeModal}) => {
       <View style={{flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
         <PrimaryButton title="Close" onPress={closeModal} />
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 

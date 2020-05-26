@@ -2,12 +2,11 @@
 import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import {RegText, ZecAmount, UsdAmount, PrimaryButton, FadeText} from '../components/Components';
-import {View, ScrollView, Image, Modal, TouchableOpacity} from 'react-native';
+import {View, ScrollView, Image, Modal, TouchableOpacity, SafeAreaView} from 'react-native';
 import {TotalBalance, Transaction, Info} from '../app/AppState';
 import Utils from '../app/utils';
 import Moment from 'react-moment';
 import {useTheme} from '@react-navigation/native';
-import {getStatusBarHeight} from 'react-native-status-bar-height';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faBars} from '@fortawesome/free-solid-svg-icons';
 
@@ -20,13 +19,12 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({tx, price, closeModal
   const {colors} = useTheme();
 
   return (
-    <View
+    <SafeAreaView
       style={{
         display: 'flex',
         justifyContent: 'flex-start',
         alignItems: 'stretch',
         height: '100%',
-        marginTop: getStatusBarHeight(),
         backgroundColor: colors.background,
       }}>
       <ScrollView
@@ -91,7 +89,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({tx, price, closeModal
       <View style={{flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
         <PrimaryButton title="Close" onPress={closeModal} />
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 

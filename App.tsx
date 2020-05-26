@@ -3,12 +3,11 @@
  * @format
  */
 import React, {Component} from 'react';
-import {View, ScrollView, Alert} from 'react-native';
+import {View, ScrollView, Alert, SafeAreaView, Image} from 'react-native';
 
 import {NavigationContainer, DarkTheme} from '@react-navigation/native';
 import {AppearanceProvider} from 'react-native-appearance';
 import {createStackNavigator} from '@react-navigation/stack';
-import {getStatusBarHeight} from 'react-native-status-bar-height';
 
 import cstyles from './components/CommonStyles';
 import {PrimaryButton, BoldText, RegText, RegTextInput} from './components/Components';
@@ -117,7 +116,6 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
             justifyContent: 'center',
           },
         ]}>
-        <BoldText>Zecwallet Lite Mobile</BoldText>
         {screen === 1 && (
           <View
             style={[
@@ -128,6 +126,14 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
                 justifyContent: 'center',
               },
             ]}>
+            <View style={{marginBottom: 50, display: 'flex', alignItems: 'center'}}>
+              <Image
+                source={require('./assets/img/logobig.png')}
+                style={{width: 100, height: 100, resizeMode: 'contain'}}
+              />
+              <BoldText>Zecwallet Lite Mobile</BoldText>
+            </View>
+
             <PrimaryButton title="Create New Wallet" onPress={this.createNewWallet} />
             <View style={[cstyles.margintop]}>
               <PrimaryButton title="Restore seed" onPress={this.getSeedPhraseToRestore} />
@@ -211,17 +217,16 @@ export default function App() {
   return (
     <AppearanceProvider>
       <NavigationContainer theme={ZecwalletTheme}>
-        <View
+        <SafeAreaView
           style={{
             flex: 1,
             justifyContent: 'center',
-            paddingTop: getStatusBarHeight(),
           }}>
           <Stack.Navigator headerMode="none">
             <Stack.Screen name="LoadingView" component={LoadingView} />
             <Stack.Screen name="LoadedApp" component={LoadedApp} />
           </Stack.Navigator>
-        </View>
+        </SafeAreaView>
       </NavigationContainer>
     </AppearanceProvider>
   );

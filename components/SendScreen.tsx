@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useState} from 'react';
 import QRCodeScanner from 'react-native-qrcode-scanner';
-import {View, ScrollView, Modal, Image, Alert} from 'react-native';
+import {View, ScrollView, Modal, Image, Alert, SafeAreaView} from 'react-native';
 import {
   FadeText,
   BoldText,
@@ -18,7 +18,6 @@ import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {useTheme} from '@react-navigation/native';
 import Utils from '../app/utils';
 import {TouchableOpacity} from 'react-native-gesture-handler';
-import {getStatusBarHeight} from 'react-native-status-bar-height';
 import Toast from 'react-native-simple-toast';
 
 type ScannerProps = {
@@ -76,18 +75,17 @@ const ComputingTxModalContent: React.FunctionComponent<any> = ({}) => {
   const {colors} = useTheme();
 
   return (
-    <View
+    <SafeAreaView
       style={{
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
         height: '100%',
-        marginTop: getStatusBarHeight(),
         backgroundColor: colors.background,
       }}>
       <RegText>Computing Transaction</RegText>
       <RegText>Please wait...</RegText>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -109,13 +107,12 @@ const ConfirmModalContent: React.FunctionComponent<ConfirmModalProps> = ({
     sendPageState.toaddrs.reduce((s, t) => s + parseFloat(t.amount || '0'), 0.0) + Utils.getDefaultFee();
 
   return (
-    <View
+    <SafeAreaView
       style={{
         display: 'flex',
         justifyContent: 'flex-start',
         alignItems: 'stretch',
         height: '100%',
-        marginTop: getStatusBarHeight(),
         backgroundColor: colors.background,
       }}>
       <ScrollView contentContainerStyle={{display: 'flex', justifyContent: 'flex-start'}}>
@@ -167,7 +164,7 @@ const ConfirmModalContent: React.FunctionComponent<ConfirmModalProps> = ({
         <PrimaryButton title={'Confirm'} onPress={confirmSend} />
         <PrimaryButton title={'Cancel'} onPress={closeModal} />
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
