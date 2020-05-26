@@ -174,6 +174,7 @@ type SendScreenProps = {
   sendPageState: SendPageState;
   setSendPageState: (sendPageState: SendPageState) => void;
   sendTransaction: () => void;
+  clearToAddrs: () => void;
 };
 
 const SendScreen: React.FunctionComponent<SendScreenProps> = ({
@@ -182,6 +183,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
   sendPageState,
   setSendPageState,
   sendTransaction,
+  clearToAddrs,
 }) => {
   const {colors} = useTheme();
   const [qrcodeModalVisble, setQrcodeModalVisible] = useState(false);
@@ -233,6 +235,9 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
       try {
         const txid = await sendTransaction();
         setComputingModalVisible(false);
+
+        // Clear the fields
+        clearToAddrs();
 
         Toast.show(`Successfully Broadcast Tx: ${txid}`, Toast.LONG);
       } catch (err) {
@@ -316,74 +321,75 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
         <ComputingTxModalContent />
       </Modal>
 
-      <View style={{display: 'flex', alignItems: 'center', height: 140, backgroundColor: colors.card}}>
-        <RegText style={{marginTop: 10, marginBottom: 5}}>Spendable</RegText>
-        <ZecAmount size={36} amtZec={spendable} />
-        <UsdAmount style={{marginTop: 5}} price={zecPrice} amtZec={spendable} />
-      </View>
-      <View style={{display: 'flex', alignItems: 'center', marginTop: -25}}>
-        <Image source={require('../assets/img/logobig.png')} style={{width: 50, height: 50, resizeMode: 'contain'}} />
-      </View>
-
       <ScrollView
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'flex-start',
-          padding: 10,
-          marginTop: 20,
         }}>
-        <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
-          <FadeText>To</FadeText>
-          {addressValidationState === 1 && <FontAwesomeIcon icon={faCheck} color="green" />}
-          {addressValidationState === -1 && <ErrorText>Invalid Address!</ErrorText>}
+        <View style={{display: 'flex', alignItems: 'center', height: 140, backgroundColor: colors.card}}>
+          <RegText style={{marginTop: 10, marginBottom: 5}}>Spendable</RegText>
+          <ZecAmount size={36} amtZec={spendable} />
+          <UsdAmount style={{marginTop: 5}} price={zecPrice} amtZec={spendable} />
         </View>
-        <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-start'}}>
-          <RegTextInput
-            placeholder="ZEC z-address or t-address"
-            style={{flexGrow: 1, maxWidth: '90%', borderBottomColor: '#ffffff', borderBottomWidth: 2}}
-            value={sendPageState.toaddrs[0].to}
-            onChangeText={(text: string) => updateToField(text, null, null)}
-          />
-          <TouchableOpacity onPress={() => setQrcodeModalVisible(true)}>
-            <FontAwesomeIcon style={{margin: 5}} size={24} icon={faQrcode} color={colors.text} />
-          </TouchableOpacity>
+        <View style={{display: 'flex', alignItems: 'center', marginTop: -25}}>
+          <Image source={require('../assets/img/logobig.png')} style={{width: 50, height: 50, resizeMode: 'contain'}} />
         </View>
 
-        <View style={{marginTop: 30, display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
-          <FadeText>Amount (ZEC)</FadeText>
-          {amountValidationState === 1 && <FontAwesomeIcon icon={faCheck} color="green" />}
-          {amountValidationState === -1 && <ErrorText>Invalid Amount!</ErrorText>}
-        </View>
-        <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-start'}}>
-          <RegTextInput
-            placeholder="0.0"
-            placeholderTextColor="#777777"
-            keyboardType="numeric"
-            style={{flexGrow: 1, borderBottomColor: '#ffffff', borderBottomWidth: 2}}
-            value={sendPageState.toaddrs[0].amount.toString()}
-            onChangeText={(text: string) => updateToField(null, text, null)}
-          />
-          <TouchableOpacity onPress={() => setMaxAmount()}>
-            <FontAwesomeIcon style={{margin: 5}} size={24} icon={faArrowAltCircleUp} color={colors.text} />
-          </TouchableOpacity>
-        </View>
-
-        <FadeText style={{marginTop: 30}}>Memo</FadeText>
-        <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-start'}}>
-          {memoEnabled && (
+        <View style={{padding: 10, marginTop: 20}}>
+          <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
+            <FadeText>To</FadeText>
+            {addressValidationState === 1 && <FontAwesomeIcon icon={faCheck} color="green" />}
+            {addressValidationState === -1 && <ErrorText>Invalid Address!</ErrorText>}
+          </View>
+          <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-start'}}>
             <RegTextInput
-              multiline
-              style={{flexGrow: 1, borderBottomColor: '#ffffff', borderBottomWidth: 2}}
-              value={sendPageState.toaddrs[0].memo}
-              onChangeText={(text: string) => updateToField(null, null, text)}
+              placeholder="ZEC z-address or t-address"
+              placeholderTextColor="#777777"
+              style={{flexGrow: 1, maxWidth: '90%', borderBottomColor: '#ffffff', borderBottomWidth: 2}}
+              value={sendPageState.toaddrs[0].to}
+              onChangeText={(text: string) => updateToField(text, null, null)}
             />
-          )}
-          {!memoEnabled && <RegText>(Memos only for sending to z-addresses)</RegText>}
+            <TouchableOpacity onPress={() => setQrcodeModalVisible(true)}>
+              <FontAwesomeIcon style={{margin: 5}} size={24} icon={faQrcode} color={colors.text} />
+            </TouchableOpacity>
+          </View>
+
+          <View style={{marginTop: 30, display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
+            <FadeText>Amount (ZEC)</FadeText>
+            {amountValidationState === 1 && <FontAwesomeIcon icon={faCheck} color="green" />}
+            {amountValidationState === -1 && <ErrorText>Invalid Amount!</ErrorText>}
+          </View>
+          <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-start'}}>
+            <RegTextInput
+              placeholder="0.0"
+              placeholderTextColor="#777777"
+              keyboardType="numeric"
+              style={{flexGrow: 1, borderBottomColor: '#ffffff', borderBottomWidth: 2}}
+              value={sendPageState.toaddrs[0].amount.toString()}
+              onChangeText={(text: string) => updateToField(null, text, null)}
+            />
+            <TouchableOpacity onPress={() => setMaxAmount()}>
+              <FontAwesomeIcon style={{margin: 5}} size={24} icon={faArrowAltCircleUp} color={colors.text} />
+            </TouchableOpacity>
+          </View>
+
+          <FadeText style={{marginTop: 30}}>Memo</FadeText>
+          <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-start'}}>
+            {memoEnabled && (
+              <RegTextInput
+                multiline
+                style={{flexGrow: 1, borderBottomColor: '#ffffff', borderBottomWidth: 2}}
+                value={sendPageState.toaddrs[0].memo}
+                onChangeText={(text: string) => updateToField(null, null, text)}
+              />
+            )}
+            {!memoEnabled && <RegText>(Memos only for sending to z-addresses)</RegText>}
+          </View>
         </View>
 
-        <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: 20}}>
+        <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', margin: 20}}>
           <PrimaryButton title="Send" disabled={!sendButtonEnabled} onPress={() => setConfirmModalVisible(true)} />
         </View>
       </ScrollView>

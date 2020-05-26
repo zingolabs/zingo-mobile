@@ -17,6 +17,7 @@ type TxDetailProps = {
 };
 const TxDetail: React.FunctionComponent<TxDetailProps> = ({tx, price, closeModal}) => {
   const {colors} = useTheme();
+  const spendColor = tx?.confirmations === 0 ? 'yellow' : (tx?.amount || 0) > 0 ? '#88ee88' : '#ff6666';
 
   return (
     <SafeAreaView
@@ -35,7 +36,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({tx, price, closeModal
           margin: 10,
         }}>
         <View style={{display: 'flex', alignItems: 'center'}}>
-          <RegText>{tx?.type}</RegText>
+          <RegText color={spendColor}>{tx?.type}</RegText>
           <ZecAmount amtZec={tx?.amount} />
           <UsdAmount amtZec={tx?.amount} price={price} />
         </View>

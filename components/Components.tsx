@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import {Button, Text, TextInput, View} from 'react-native';
+import {Button, Text, TextInput, View, Platform} from 'react-native';
 import {useTheme} from '@react-navigation/native';
 import Utils from '../app/utils';
 
@@ -49,12 +49,14 @@ export const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({color, style
     color = colors.text;
   }
 
+  const alignmentPadding = Platform.OS === 'android' ? 4 : 0;
+
   return (
     <View style={{...style, flexDirection: 'row', alignItems: 'baseline'}}>
       <Text style={{fontSize: size, color}}>
         {zecSymbol} {splits.bigPart}
       </Text>
-      <Text style={{fontSize: size / 2, color}}>{splits.smallPart}</Text>
+      <Text style={{fontSize: size / 2, color, paddingBottom: alignmentPadding}}>{splits.smallPart}</Text>
     </View>
   );
 };
@@ -89,7 +91,7 @@ export const ErrorText: React.FunctionComponent<any> = (props) => {
   return <Text style={{color: 'red', ...props.style}}>{props.children}</Text>;
 };
 
-export const RegText: React.FunctionComponent<any> = ({style, onPress, children}) => {
+export const RegText: React.FunctionComponent<any> = ({style, color, onPress, children}) => {
   const {colors} = useTheme();
 
   let arrayed = [];
@@ -99,7 +101,7 @@ export const RegText: React.FunctionComponent<any> = ({style, onPress, children}
   } else if (style) {
     arrayed.push(style);
   }
-  arrayed.push({color: colors.text, fontSize: 18, fontWeight: '600', opacity: 0.87});
+  arrayed.push({color: color || colors.text, fontSize: 18, fontWeight: '600', opacity: 0.87});
 
   return (
     <Text style={arrayed} onPress={onPress}>

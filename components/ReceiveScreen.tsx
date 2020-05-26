@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import {View, Dimensions, Clipboard} from 'react-native';
+import {View, Dimensions, Clipboard, Platform} from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import {TabView, TabBar} from 'react-native-tab-view';
 import Toast from 'react-native-simple-toast';
@@ -22,6 +22,7 @@ const SingleAddressDisplay: React.FunctionComponent<SingleAddress> = ({address})
   const {colors} = useTheme();
 
   const chunks = Utils.splitAddressIntoChunks(address, Utils.isSapling(address) ? 8 : 4);
+  const fixedWidthFont = Platform.OS === 'android' ? 'monospace' : 'Courier';
 
   return (
     <View style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
@@ -43,7 +44,7 @@ const SingleAddressDisplay: React.FunctionComponent<SingleAddress> = ({address})
               style={{
                 flexBasis: '40%',
                 textAlign: 'center',
-                fontFamily: 'Courier',
+                fontFamily: fixedWidthFont,
                 fontSize: 20,
                 color: colors.text,
                 opacity: 0.55,

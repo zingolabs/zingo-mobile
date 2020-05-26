@@ -451,6 +451,7 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
                 sendPageState={sendPageState}
                 setSendPageState={this.setSendPageState}
                 sendTransaction={this.sendTransaction}
+                clearToAddrs={this.clearToAddrs}
               />
             )}
           </Tab.Screen>
