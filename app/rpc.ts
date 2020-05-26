@@ -8,6 +8,7 @@ export default class RPC {
   fnSetTransactionsList: (txList: Transaction[]) => void;
   fnSetAllAddresses: (allAddresses: string[]) => void;
   fnSetZecPrice: (price: number | null) => void;
+  fnRefreshUpdates: (blk: number, total: number) => void;
   refreshTimerID: number | null;
   priceTimerID: number | null;
   lastBlockHeight: number;
@@ -21,6 +22,7 @@ export default class RPC {
     fnSetAllAddresses: (addresses: string[]) => void,
     fnSetInfo: (info: Info) => void,
     fnSetZecPrice: (price: number | null) => void,
+    fnRefreshUpdates: (blk: number, total: number) => void,
   ) {
     this.fnSetTotalBalance = fnSetTotalBalance;
     this.fnSetAddressesWithBalance = fnSetAddressesWithBalance;
@@ -28,6 +30,7 @@ export default class RPC {
     this.fnSetAllAddresses = fnSetAllAddresses;
     this.fnSetInfo = fnSetInfo;
     this.fnSetZecPrice = fnSetZecPrice;
+    this.fnRefreshUpdates = fnRefreshUpdates;
 
     this.refreshTimerID = null;
     this.priceTimerID = null;
@@ -94,15 +97,18 @@ export default class RPC {
       this.inRefresh = true;
       RPC.doSync();
 
+      // If the sync is longer than 1000 blocks, then just update the UI first as well
+      if (latestBlockHeight - this.lastBlockHeight > 1000) {
+        this.fetchTotalBalance();
+        this.fetchTandZTransactions(latestBlockHeight);
+      }
+
       // We need to wait for the sync to finish. The way we know the sync is done is
       // if the height matches the latestBlockHeight
-      let retryCount = 0;
       const pollerID = setInterval(async () => {
         const walletHeight = await RPC.fetchWalletHeight();
-        retryCount += 1;
 
-        // Wait a max of 30 retries (30 secs)
-        if (walletHeight >= latestBlockHeight || retryCount > 30) {
+        if (walletHeight >= latestBlockHeight) {
           // We are synced. Cancel the poll timer
           clearInterval(pollerID);
 
@@ -115,8 +121,21 @@ export default class RPC {
           // All done
           this.inRefresh = false;
           console.log(`Finished full refresh at ${latestBlockHeight}`);
+        } else {
+          // Post sync updates
+          this.fnRefreshUpdates(walletHeight, latestBlockHeight);
+
+          // Every 10,000 blocks, update the UI
+          if (walletHeight % 10000 === 0) {
+            this.fetchTotalBalance();
+            this.fetchTandZTransactions(walletHeight);
+
+            // And save the wallet so we don't loose sync status.
+            // The wallet has to be saved by the android/ios code
+            RPCModule.doSave();
+          }
         }
-      }, 1000);
+      }, 2000);
     } else {
       // Already at the latest block
       console.log('Already have latest block, waiting for next refresh');

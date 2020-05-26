@@ -17,6 +17,7 @@ import AppState, {
   ToAddr,
   ErrorModalData,
   SendJsonToType,
+  SyncStatus,
 } from './AppState';
 import {RegText} from '../components/Components';
 import Utils from './utils';
@@ -93,6 +94,7 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
       aboutModalVisible: false,
       infoModalVisible: false,
       seedModalVisible: false,
+      syncingStatus: null,
     };
 
     this.rpc = new RPC(
@@ -102,6 +104,7 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
       this.setAllAddresses,
       this.setInfo,
       this.setZecPrice,
+      this.refreshUpdates,
     );
 
     // Create the initial ToAddr box
@@ -203,6 +206,15 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
 
   setSendPageState = (sendPageState: SendPageState) => {
     this.setState({sendPageState});
+  };
+
+  refreshUpdates = (block: number, total: number) => {
+    const syncingStatus: SyncStatus = {
+      isSyncing: total - block > 1000,
+      walletHeight: block,
+      toalHeight: total,
+    };
+    this.setState({syncingStatus});
   };
 
   clearToAddrs = () => {
@@ -392,6 +404,7 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
       infoModalVisible,
       seedModalVisible,
       walletSeed,
+      syncingStatus,
     } = this.state;
 
     const standardProps = {
@@ -480,6 +493,7 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
                 transactions={transactions}
                 totalBalance={totalBalance}
                 doRefresh={this.doRefresh}
+                syncingStatus={syncingStatus}
               />
             )}
           </Tab.Screen>

@@ -141,6 +141,13 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
+    @ReactMethod
+    fun doSave(promise: Promise) {
+        saveWallet();
+
+        promise.resolve(true);
+    }
+
     fun saveWallet() {
         // Get the encoded wallet file
         val b64encoded = save()
