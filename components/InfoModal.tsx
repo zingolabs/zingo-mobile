@@ -58,7 +58,7 @@ const InfoModal: React.FunctionComponent<InfoModalProps> = ({info, closeModal}) 
         <DetailLine label="Server Version" value={info?.version} />
         <DetailLine label="Lightwallet Server URL" value={url} />
         <DetailLine label="Network" value={info?.testnet ? 'Testnet' : 'Mainnet'} />
-        <DetailLine label="Wallet Block Height" value={height} />
+        <DetailLine label="Server Block Height" value={height} />
       </ScrollView>
 
       <View style={{flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
