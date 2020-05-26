@@ -2,7 +2,7 @@
 import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import {RegText, ZecAmount, UsdAmount, PrimaryButton, FadeText} from '../components/Components';
-import {View, ScrollView, Image, Modal, TouchableOpacity, SafeAreaView} from 'react-native';
+import {View, ScrollView, Image, Modal, TouchableOpacity, SafeAreaView, RefreshControl} from 'react-native';
 import {TotalBalance, Transaction, Info} from '../app/AppState';
 import Utils from '../app/utils';
 import Moment from 'react-moment';
@@ -66,7 +66,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({tx, price, closeModal
               style={{display: 'flex', marginTop: 10, backgroundColor: colors.card, padding: 5, paddingBottom: 15}}>
               <View style={{marginTop: 10}}>
                 <FadeText>Address</FadeText>
-                <RegText>{Utils.trimToSmall(txd.address, 8)}</RegText>
+                <RegText>{txd.address}</RegText>
               </View>
 
               <View style={{marginTop: 10}}>
@@ -136,6 +136,7 @@ type TransactionsScreenViewProps = {
   totalBalance: TotalBalance;
   transactions: Transaction[] | null;
   toggleMenuDrawer: () => void;
+  doRefresh: () => void;
 };
 
 const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProps> = ({
@@ -143,6 +144,7 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
   totalBalance,
   transactions,
   toggleMenuDrawer,
+  doRefresh,
 }) => {
   const [isTxDetailModalShowing, setTxDetailModalShowing] = React.useState(false);
   const [txDetail, setTxDetail] = React.useState<Transaction | null>(null);
@@ -175,7 +177,9 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
       <View style={{display: 'flex', alignItems: 'center', marginTop: -25}}>
         <Image source={require('../assets/img/logobig.png')} style={{width: 50, height: 50, resizeMode: 'contain'}} />
       </View>
-      <ScrollView style={{flexGrow: 1, marginTop: 10, width: '100%'}}>
+      <ScrollView
+        refreshControl={<RefreshControl refreshing={false} onRefresh={doRefresh} />}
+        style={{flexGrow: 1, marginTop: 10, width: '100%', height: '100%'}}>
         {transactions?.map((t) => {
           return (
             <TxSummaryLine
