@@ -127,13 +127,14 @@ const ConfirmModalContent: React.FunctionComponent<ConfirmModalProps> = ({
         {sendPageState.toaddrs.map((to) => {
           return (
             <View key={to.id} style={{margin: 10}}>
-              <RegText>{Utils.trimToSmall(to.to, 10)}</RegText>
+              <RegText>{to.to}</RegText>
               <View
                 style={{
                   display: 'flex',
                   flexDirection: 'row',
                   justifyContent: 'space-between',
                   alignItems: 'baseline',
+                  marginTop: 5,
                 }}>
                 <ZecAmount amtZec={parseFloat(to.amount)} />
                 <UsdAmount amtZec={parseFloat(to.amount)} price={price} />

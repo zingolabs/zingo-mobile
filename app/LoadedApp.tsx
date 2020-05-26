@@ -462,6 +462,7 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
                 {...standardProps}
                 transactions={transactions}
                 totalBalance={totalBalance}
+                doRefresh={this.doRefresh}
               />
             )}
           </Tab.Screen>
