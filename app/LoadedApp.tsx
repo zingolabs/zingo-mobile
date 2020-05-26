@@ -52,8 +52,8 @@ function Menu({onItemSelected}: any) {
         Wallet Seed
       </RegText>
 
-      <RegText onPress={() => onItemSelected('About Zecwallet Lite')} style={styles.item}>
-        About
+      <RegText onPress={() => onItemSelected('About')} style={styles.item}>
+        About Zecwallet Lite
       </RegText>
     </ScrollView>
   );

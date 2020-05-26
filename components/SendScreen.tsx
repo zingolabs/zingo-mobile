@@ -2,9 +2,18 @@
 import React, {useState} from 'react';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import {View, ScrollView, Modal, Image, Alert} from 'react-native';
-import {FadeText, BoldText, RegTextInput, PrimaryButton, RegText, ZecAmount, UsdAmount} from '../components/Components';
+import {
+  FadeText,
+  BoldText,
+  ErrorText,
+  RegTextInput,
+  PrimaryButton,
+  RegText,
+  ZecAmount,
+  UsdAmount,
+} from '../components/Components';
 import {Info, SendPageState, TotalBalance} from '../app/AppState';
-import {faQrcode, faUpload} from '@fortawesome/free-solid-svg-icons';
+import {faQrcode, faCheck, faArrowAltCircleUp} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {useTheme} from '@react-navigation/native';
 import Utils from '../app/utils';
@@ -71,7 +80,7 @@ const ComputingTxModalContent: React.FunctionComponent<any> = ({}) => {
       style={{
         display: 'flex',
         justifyContent: 'center',
-        alignItems: 'stretch',
+        alignItems: 'center',
         height: '100%',
         marginTop: getStatusBarHeight(),
         backgroundColor: colors.background,
@@ -121,7 +130,7 @@ const ConfirmModalContent: React.FunctionComponent<ConfirmModalProps> = ({
         {sendPageState.toaddrs.map((to) => {
           return (
             <View key={to.id} style={{margin: 10}}>
-              <RegText>{to.to}</RegText>
+              <RegText>{Utils.trimToSmall(to.to, 10)}</RegText>
               <View
                 style={{
                   display: 'flex',
@@ -238,9 +247,39 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
     }, 100);
   };
 
+  const spendable = totalBalance.transparentBal + totalBalance.verifiedPrivate;
+
+  const setMaxAmount = () => {
+    updateToField(null, Utils.maxPrecisionTrimmed(spendable - Utils.getDefaultFee()), null);
+  };
+
   const memoEnabled = Utils.isSapling(sendPageState.toaddrs[0].to);
   const zecPrice = info ? info.zecPrice : null;
-  const spendable = totalBalance.transparentBal + totalBalance.verifiedPrivate;
+
+  var addressValidationState: number;
+  var toaddr = sendPageState.toaddrs[0];
+  if (toaddr.to !== '') {
+    if (Utils.isSapling(toaddr.to) || Utils.isTransparent(toaddr.to)) {
+      addressValidationState = 1;
+    } else {
+      addressValidationState = -1;
+    }
+  } else {
+    addressValidationState = 0;
+  }
+
+  var amountValidationState: number;
+  if (toaddr.amount !== '') {
+    if (parseFloat(toaddr.amount) > 0 && parseFloat(toaddr.amount) <= spendable + Utils.getDefaultFee()) {
+      amountValidationState = 1;
+    } else {
+      amountValidationState = -1;
+    }
+  } else {
+    amountValidationState = 0;
+  }
+
+  const sendButtonEnabled = addressValidationState === 1 && amountValidationState === 1;
 
   return (
     <View
@@ -298,7 +337,11 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
           padding: 10,
           marginTop: 20,
         }}>
-        <FadeText>To</FadeText>
+        <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
+          <FadeText>To</FadeText>
+          {addressValidationState === 1 && <FontAwesomeIcon icon={faCheck} color="green" />}
+          {addressValidationState === -1 && <ErrorText>Invalid Address!</ErrorText>}
+        </View>
         <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-start'}}>
           <RegTextInput
             placeholder="ZEC z-address or t-address"
@@ -311,7 +354,11 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
           </TouchableOpacity>
         </View>
 
-        <FadeText style={{marginTop: 30}}>Amount (ZEC)</FadeText>
+        <View style={{marginTop: 30, display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
+          <FadeText>Amount (ZEC)</FadeText>
+          {amountValidationState === 1 && <FontAwesomeIcon icon={faCheck} color="green" />}
+          {amountValidationState === -1 && <ErrorText>Invalid Amount!</ErrorText>}
+        </View>
         <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-start'}}>
           <RegTextInput
             placeholder="0.0"
@@ -321,7 +368,9 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
             value={sendPageState.toaddrs[0].amount.toString()}
             onChangeText={(text: string) => updateToField(null, text, null)}
           />
-          <FontAwesomeIcon style={{margin: 5}} size={24} icon={faUpload} color={colors.text} />
+          <TouchableOpacity onPress={() => setMaxAmount()}>
+            <FontAwesomeIcon style={{margin: 5}} size={24} icon={faArrowAltCircleUp} color={colors.text} />
+          </TouchableOpacity>
         </View>
 
         <FadeText style={{marginTop: 30}}>Memo</FadeText>
@@ -338,7 +387,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
         </View>
 
         <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: 20}}>
-          <PrimaryButton title="Send" onPress={() => setConfirmModalVisible(true)} />
+          <PrimaryButton title="Send" disabled={!sendButtonEnabled} onPress={() => setConfirmModalVisible(true)} />
         </View>
       </ScrollView>
     </View>

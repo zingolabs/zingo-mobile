@@ -117,11 +117,13 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun execute(cmd: String, args: String, promise: Promise) {
-        Log.w(TAG, "Executing ${cmd} with ${args}")
-        val resp = execute(cmd, args)
-        Log.w(TAG, "Response to ${cmd}: ${resp}")
+        thread {
+            Log.w(TAG, "Executing ${cmd} with ${args}")
+            val resp = execute(cmd, args)
+            Log.w(TAG, "Response to ${cmd}: ${resp}")
 
-        promise.resolve(resp)
+            promise.resolve(resp)
+        }
     }
 
     fun saveWallet() {

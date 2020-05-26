@@ -85,6 +85,10 @@ export const FadeText: React.FunctionComponent<any> = (props) => {
   return <Text style={{...props.style, opacity: 0.65, color: colors.text}}>{props.children}</Text>;
 };
 
+export const ErrorText: React.FunctionComponent<any> = (props) => {
+  return <Text style={{color: 'red', ...props.style}}>{props.children}</Text>;
+};
+
 export const RegText: React.FunctionComponent<any> = ({style, onPress, children}) => {
   const {colors} = useTheme();
 
