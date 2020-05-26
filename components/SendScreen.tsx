@@ -376,18 +376,19 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
             </TouchableOpacity>
           </View>
 
-          <FadeText style={{marginTop: 30}}>Memo</FadeText>
-          <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-start'}}>
-            {memoEnabled && (
-              <RegTextInput
-                multiline
-                style={{flexGrow: 1, borderBottomColor: '#ffffff', borderBottomWidth: 2}}
-                value={sendPageState.toaddrs[0].memo}
-                onChangeText={(text: string) => updateToField(null, null, text)}
-              />
-            )}
-            {!memoEnabled && <RegText>(Memos only for sending to z-addresses)</RegText>}
-          </View>
+          {memoEnabled && (
+            <>
+              <FadeText style={{marginTop: 30}}>Memo (Optional)</FadeText>
+              <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-start'}}>
+                <RegTextInput
+                  multiline
+                  style={{flexGrow: 1, borderBottomColor: '#ffffff', borderBottomWidth: 2}}
+                  value={sendPageState.toaddrs[0].memo}
+                  onChangeText={(text: string) => updateToField(null, null, text)}
+                />
+              </View>
+            </>
+          )}
         </View>
 
         <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', margin: 20}}>

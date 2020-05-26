@@ -25,6 +25,7 @@ import SendScreen from '../components/SendScreen';
 import ReceiveScreen from '../components/ReceiveScreen';
 import AboutModal from '../components/About';
 import SeedComponent from '../components/SeedComponent';
+import InfoModal from '../components/InfoModal';
 
 const window = Dimensions.get('window');
 const styles = StyleSheet.create({
@@ -50,6 +51,10 @@ function Menu({onItemSelected}: any) {
 
       <RegText onPress={() => onItemSelected('Wallet Seed')} style={styles.item}>
         Wallet Seed
+      </RegText>
+
+      <RegText onPress={() => onItemSelected('Info')} style={styles.item}>
+        Server Info
       </RegText>
 
       <RegText onPress={() => onItemSelected('About')} style={styles.item}>
@@ -86,6 +91,7 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
       isMenuDrawerOpen: false,
       selectedMenuDrawerItem: '',
       aboutModalVisible: false,
+      infoModalVisible: false,
       seedModalVisible: false,
     };
 
@@ -365,6 +371,8 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
     // Depending on the menu item, open the appropriate modal
     if (item === 'About') {
       this.setState({aboutModalVisible: true});
+    } else if (item === 'Info') {
+      this.setState({infoModalVisible: true});
     } else if (item === 'Wallet Seed') {
       (async () => {
         const walletSeed = await RPC.fetchSeed();
@@ -381,6 +389,7 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
       info,
       sendPageState,
       aboutModalVisible,
+      infoModalVisible,
       seedModalVisible,
       walletSeed,
     } = this.state;
@@ -403,6 +412,14 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
           visible={aboutModalVisible}
           onRequestClose={() => this.setState({aboutModalVisible: false})}>
           <AboutModal closeModal={() => this.setState({aboutModalVisible: false})} />
+        </Modal>
+
+        <Modal
+          animationType="slide"
+          transparent={false}
+          visible={infoModalVisible}
+          onRequestClose={() => this.setState({infoModalVisible: false})}>
+          <InfoModal closeModal={() => this.setState({infoModalVisible: false})} info={info} />
         </Modal>
 
         <Modal

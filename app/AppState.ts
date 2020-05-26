@@ -215,6 +215,8 @@ export default interface AppState {
 
   aboutModalVisible: boolean;
 
+  infoModalVisible: boolean;
+
   seedModalVisible: boolean;
   // eslint-disable-next-line semi
 }
