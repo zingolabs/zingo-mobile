@@ -24,14 +24,26 @@ pub unsafe extern fn Java_com_zecwalletmobile_RPCModule_initlogging(env: JNIEnv,
 }
 
 #[no_mangle]
-pub unsafe extern fn Java_com_zecwalletmobile_RPCModule_initnew(env: JNIEnv, _: JObject, j_serveruri: JString) -> jstring {
+pub unsafe extern fn Java_com_zecwalletmobile_RPCModule_initnew(env: JNIEnv, _: JObject, j_serveruri: JString, 
+        j_sapling_output: JString, j_sapling_spend: JString) -> jstring {
     let server_uri = CString::from(
         CStr::from_ptr(
             env.get_string(j_serveruri).unwrap().as_ptr()
         )
     ).into_string().unwrap();
 
-    let seed = rustlib::init_new(server_uri);
+    let sapling_output = CString::from(
+        CStr::from_ptr(
+            env.get_string(j_sapling_output).unwrap().as_ptr()
+        )
+    ).into_string().unwrap();
+    let sapling_spend = CString::from(
+        CStr::from_ptr(
+            env.get_string(j_sapling_spend).unwrap().as_ptr()
+        )
+    ).into_string().unwrap();
+
+    let seed = rustlib::init_new(server_uri, sapling_output, sapling_spend);
 
     let output = env.new_string(seed.as_str()).unwrap();
     output.into_inner()
@@ -39,7 +51,8 @@ pub unsafe extern fn Java_com_zecwalletmobile_RPCModule_initnew(env: JNIEnv, _: 
 
 
 #[no_mangle]
-pub unsafe extern fn Java_com_zecwalletmobile_RPCModule_initfromseed(env: JNIEnv, _: JObject, j_serveruri: JString, j_seed: JString, j_birthday: JString) -> jstring {
+pub unsafe extern fn Java_com_zecwalletmobile_RPCModule_initfromseed(env: JNIEnv, _: JObject, j_serveruri: JString, 
+        j_seed: JString, j_birthday: JString, j_sapling_output: JString, j_sapling_spend: JString) -> jstring {
     let server_uri = CString::from(
         CStr::from_ptr(
             env.get_string(j_serveruri).unwrap().as_ptr()
@@ -59,7 +72,18 @@ pub unsafe extern fn Java_com_zecwalletmobile_RPCModule_initfromseed(env: JNIEnv
         )
     ).into_string().unwrap().parse::<u64>().unwrap();
 
-    let seed = rustlib::init_from_seed(server_uri, seed, birthday);
+    let sapling_output = CString::from(
+        CStr::from_ptr(
+            env.get_string(j_sapling_output).unwrap().as_ptr()
+        )
+    ).into_string().unwrap();
+    let sapling_spend = CString::from(
+        CStr::from_ptr(
+            env.get_string(j_sapling_spend).unwrap().as_ptr()
+        )
+    ).into_string().unwrap();
+
+    let seed = rustlib::init_from_seed(server_uri, seed, birthday, sapling_output, sapling_spend);
 
     let output = env.new_string(seed.as_str()).unwrap();
     output.into_inner()
@@ -67,7 +91,8 @@ pub unsafe extern fn Java_com_zecwalletmobile_RPCModule_initfromseed(env: JNIEnv
 
 
 #[no_mangle]
-pub unsafe extern fn Java_com_zecwalletmobile_RPCModule_initfromb64(env: JNIEnv, _: JObject, j_serveruri: JString, j_base64: JString) -> jstring {
+pub unsafe extern fn Java_com_zecwalletmobile_RPCModule_initfromb64(env: JNIEnv, _: JObject, j_serveruri: JString, 
+        j_base64: JString, j_sapling_output: JString, j_sapling_spend: JString) -> jstring {
     let base64 = CString::from(
         CStr::from_ptr(
             env.get_string(j_base64).unwrap().as_ptr()
@@ -80,7 +105,18 @@ pub unsafe extern fn Java_com_zecwalletmobile_RPCModule_initfromb64(env: JNIEnv,
         )
     ).into_string().unwrap();
 
-    let seed = rustlib::init_from_b64(server_uri, base64);
+    let sapling_output = CString::from(
+        CStr::from_ptr(
+            env.get_string(j_sapling_output).unwrap().as_ptr()
+        )
+    ).into_string().unwrap();
+    let sapling_spend = CString::from(
+        CStr::from_ptr(
+            env.get_string(j_sapling_spend).unwrap().as_ptr()
+        )
+    ).into_string().unwrap();
+
+    let seed = rustlib::init_from_b64(server_uri, base64, sapling_output, sapling_spend);
 
     let output = env.new_string(seed.as_str()).unwrap();
     output.into_inner()

@@ -16,6 +16,8 @@
 		75D3FE7E84AA7F09C772750B /* libPods-ZecwalletMobile-ZecwalletMobileTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1554D066F46BC8CD65ABBE6C /* libPods-ZecwalletMobile-ZecwalletMobileTests.a */; };
 		DB39A3512472FBE700A9404D /* RPCModule.m in Sources */ = {isa = PBXBuildFile; fileRef = DB39A3502472FBE700A9404D /* RPCModule.m */; };
 		DB39A354247302D500A9404D /* librustios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DB39A353247302CB00A9404D /* librustios.a */; };
+		DB60ADD1247CCCA200E82FE6 /* saplingspend in Resources */ = {isa = PBXBuildFile; fileRef = DB60ADCF247CCCA200E82FE6 /* saplingspend */; };
+		DB60ADD2247CCCA200E82FE6 /* saplingoutput in Resources */ = {isa = PBXBuildFile; fileRef = DB60ADD0247CCCA200E82FE6 /* saplingoutput */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,6 +57,8 @@
 		DB39A3502472FBE700A9404D /* RPCModule.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RPCModule.m; sourceTree = "<group>"; };
 		DB39A3522473024600A9404D /* rust.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rust.h; sourceTree = "<group>"; };
 		DB39A353247302CB00A9404D /* librustios.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = librustios.a; sourceTree = "<group>"; };
+		DB60ADCF247CCCA200E82FE6 /* saplingspend */ = {isa = PBXFileReference; lastKnownFileType = file; name = saplingspend; path = ../android/app/src/main/res/raw/saplingspend; sourceTree = "<group>"; };
+		DB60ADD0247CCCA200E82FE6 /* saplingoutput */ = {isa = PBXFileReference; lastKnownFileType = file; name = saplingoutput; path = ../android/app/src/main/res/raw/saplingoutput; sourceTree = "<group>"; };
 		E21CDB7108A143B9A13BF9E5 /* Pods-ZecwalletMobile-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZecwalletMobile-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-ZecwalletMobile-tvOSTests/Pods-ZecwalletMobile-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		ED2971642150620600B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS12.0.sdk/System/Library/Frameworks/JavaScriptCore.framework; sourceTree = DEVELOPER_DIR; };
@@ -101,6 +105,8 @@
 		13B07FAE1A68108700A75B9A /* ZecwalletMobile */ = {
 			isa = PBXGroup;
 			children = (
+				DB60ADD0247CCCA200E82FE6 /* saplingoutput */,
+				DB60ADCF247CCCA200E82FE6 /* saplingspend */,
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
@@ -266,6 +272,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DB60ADD2247CCCA200E82FE6 /* saplingoutput in Resources */,
+				DB60ADD1247CCCA200E82FE6 /* saplingspend in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
 			);

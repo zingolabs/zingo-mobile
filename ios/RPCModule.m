@@ -103,17 +103,29 @@ RCT_REMAP_METHOD(deleteExistingWallet,
 RCT_REMAP_METHOD(createNewWallet,
                  createNewWalletWithResolver:(RCTPromiseResolveBlock)resolve
                  rejected:(RCTPromiseRejectBlock)reject) {
-  RCTLogInfo(@"createNewWallet called");
-  char* seed = init_new([URL UTF8String]);
-  NSString* seedStr = [NSString stringWithUTF8String:seed];
-  rust_free(seed);
-  
-  RCTLogInfo(@"Got seed: %@", seedStr);
-  
-  // Also save the wallet after create
-  [self saveWallet];
-  
-  resolve(seedStr);
+  @autoreleasepool {
+    RCTLogInfo(@"createNewWallet called");
+    
+    NSString* pathSaplingOutput = [[NSBundle mainBundle]
+                      pathForResource:@"saplingoutput" ofType:@""];
+    NSData* saplingOutput = [NSData dataWithContentsOfFile:pathSaplingOutput];
+    
+
+    NSString* pathSaplingSpend = [[NSBundle mainBundle]
+                      pathForResource:@"saplingspend" ofType:@""];
+    NSData* saplingSpend = [NSData dataWithContentsOfFile:pathSaplingSpend];
+    
+    char* seed = init_new([URL UTF8String], [[saplingOutput base64EncodedStringWithOptions:0] UTF8String], [[saplingSpend base64EncodedStringWithOptions:0] UTF8String]);
+    NSString* seedStr = [NSString stringWithUTF8String:seed];
+    rust_free(seed);
+    
+    RCTLogInfo(@"Got seed: %@", seedStr);
+    
+    // Also save the wallet after create
+    [self saveWallet];
+    
+    resolve(seedStr);
+  }
 }
 
 // restore a wallet from a given seed and birthday. This also saves the wallet
@@ -122,33 +134,55 @@ RCT_REMAP_METHOD(restoreWallet,
                  birthday:(NSString*)birthday
                  restoreWalletWithResolver:(RCTPromiseResolveBlock)resolve
                  rejected:(RCTPromiseRejectBlock)reject) {
-  RCTLogInfo(@"restoreWallet called with %@ %@", restoreSeed, birthday);
-  char* seed = initfromseed([URL UTF8String], [restoreSeed UTF8String], [birthday UTF8String]);
-  NSString* seedStr = [NSString stringWithUTF8String:seed];
-  rust_free(seed);
-  
-  RCTLogInfo(@"Seed: %@", seedStr);
-  
-  // Also save the wallet after restore
-  [self saveWallet];
-  
-  resolve(seedStr);
+  @autoreleasepool {
+    RCTLogInfo(@"restoreWallet called with %@ %@", restoreSeed, birthday);
+    
+    NSString* pathSaplingOutput = [[NSBundle mainBundle]
+                      pathForResource:@"saplingoutput" ofType:@""];
+    NSData* saplingOutput = [NSData dataWithContentsOfFile:pathSaplingOutput];
+    
+
+    NSString* pathSaplingSpend = [[NSBundle mainBundle]
+                      pathForResource:@"saplingspend" ofType:@""];
+    NSData* saplingSpend = [NSData dataWithContentsOfFile:pathSaplingSpend];
+    
+    char* seed = initfromseed([URL UTF8String], [restoreSeed UTF8String], [birthday UTF8String], [[saplingOutput base64EncodedStringWithOptions:0] UTF8String], [[saplingSpend base64EncodedStringWithOptions:0] UTF8String]);
+    NSString* seedStr = [NSString stringWithUTF8String:seed];
+    rust_free(seed);
+    
+    RCTLogInfo(@"Seed: %@", seedStr);
+    
+    // Also save the wallet after restore
+    [self saveWallet];
+    
+    resolve(seedStr);
+  }
 }
 
 // Load an existing wallet from the user's app documents
 RCT_REMAP_METHOD(loadExistingWallet,
                  loadExistingWalletWithResolver:(RCTPromiseResolveBlock)resolve
                  rejected:(RCTPromiseRejectBlock)reject) {
-  RCTLogInfo(@"loadExistingWallet called");
-  NSString* walletDataStr = [self readWallet];
-  
-  char* seed = initfromb64([URL UTF8String], [walletDataStr UTF8String]);
-  NSString* seedStr = [NSString stringWithUTF8String:seed];
-  rust_free(seed);
-  
-  RCTLogInfo(@"Seed: %@", seedStr);
-  
-  resolve(seedStr);
+  @autoreleasepool {
+    RCTLogInfo(@"loadExistingWallet called");
+    NSString* walletDataStr = [self readWallet];
+    
+    NSString* pathSaplingOutput = [[NSBundle mainBundle]
+                      pathForResource:@"saplingoutput" ofType:@""];
+    NSData* saplingOutput = [NSData dataWithContentsOfFile:pathSaplingOutput];
+    
+    NSString* pathSaplingSpend = [[NSBundle mainBundle]
+                      pathForResource:@"saplingspend" ofType:@""];
+    NSData* saplingSpend = [NSData dataWithContentsOfFile:pathSaplingSpend];
+    
+    char* seed = initfromb64([URL UTF8String], [walletDataStr UTF8String], [[saplingOutput base64EncodedStringWithOptions:0] UTF8String], [[saplingSpend base64EncodedStringWithOptions:0] UTF8String]);
+    NSString* seedStr = [NSString stringWithUTF8String:seed];
+    rust_free(seed);
+    
+    RCTLogInfo(@"Seed: %@", seedStr);
+    
+    resolve(seedStr);
+  }
 }
 
 RCT_REMAP_METHOD(doSave,

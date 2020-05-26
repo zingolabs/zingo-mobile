@@ -22,9 +22,9 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     private external fun initlogging(): String
     private external fun execute(cmd: String, args: String): String
-    private external fun initnew(serveruri: String): String
-    private external fun initfromseed(serveruri: String, seed: String, birthday: String): String
-    private external fun initfromb64(serveruri: String, b64: String): String
+    private external fun initnew(serveruri: String, saplingOutputb64: String, saplingSpendb64: String): String
+    private external fun initfromseed(serveruri: String, seed: String, birthday: String, saplingOutputb64: String, saplingSpendb64: String): String
+    private external fun initfromb64(serveruri: String, datab64: String, saplingOutputb64: String, saplingSpendb64: String): String
     private external fun save(): String
 
     override fun getName(): String {
@@ -47,8 +47,11 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun createNewWallet(promise: Promise) {
         Log.w("MAIN", "Creating new wallet")
 
+        val saplingOutput = MainApplication.getAppContext()?.resources?.openRawResource(R.raw.saplingoutput)?.readBytes()
+        val saplingSpend = MainApplication.getAppContext()?.resources?.openRawResource(R.raw.saplingspend)?.readBytes()
+
         // Create a seed
-        val seed = initnew(LIGHTWALLETD_URL)
+        val seed = initnew(LIGHTWALLETD_URL, Base64.getEncoder().encodeToString(saplingOutput), Base64.getEncoder().encodeToString((saplingSpend)))
         Log.w("MAIN-Seed", seed)
 
         if (!seed.startsWith("Error")) {
@@ -62,7 +65,12 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun restoreWallet(seed: String, birthday: Int, promise: Promise) {
         Log.w("MAIN", "Restoring wallet with seed $seed")
 
-        val rseed = initfromseed(LIGHTWALLETD_URL, seed, birthday.toString())
+        val saplingOutput = MainApplication.getAppContext()?.resources?.openRawResource(R.raw.saplingoutput)?.readBytes()
+        val saplingSpend = MainApplication.getAppContext()?.resources?.openRawResource(R.raw.saplingspend)?.readBytes()
+
+        val rseed = initfromseed(LIGHTWALLETD_URL, seed, birthday.toString(),
+                        Base64.getEncoder().encodeToString(saplingOutput),
+                        Base64.getEncoder().encodeToString((saplingSpend)))
         Log.w("MAIN", seed)
 
         saveWallet()
@@ -75,9 +83,16 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         // Read the file
         val fileBytes = MainApplication.getAppContext()!!.openFileInput("wallet.dat").readBytes()
         val fileb64 = Base64.getEncoder().encodeToString(fileBytes)
-        val seed = initfromb64(LIGHTWALLETD_URL, fileb64)
+
+        val saplingOutput = MainApplication.getAppContext()?.resources?.openRawResource(R.raw.saplingoutput)?.readBytes()
+        val saplingSpend = MainApplication.getAppContext()?.resources?.openRawResource(R.raw.saplingspend)?.readBytes()
+
+        val seed = initfromb64(LIGHTWALLETD_URL, fileb64,
+                    Base64.getEncoder().encodeToString(saplingOutput),
+                    Base64.getEncoder().encodeToString((saplingSpend)))
 
         Log.w("MAIN", seed)
+        initlogging()
 
         promise.resolve(seed)
     }
