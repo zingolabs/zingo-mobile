@@ -34,7 +34,8 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     @ReactMethod
     fun walletExists(promise: Promise) {
         // Check if a wallet already exists
-        if (File(MainApplication.getAppContext()?.filesDir, "wallet.dat").exists()) {
+        val file = File(MainApplication.getAppContext()?.filesDir, "wallet.dat")
+        if (file.exists()) {
             Log.w("MAIN", "Wallet exists")
             promise.resolve(true);
         } else {
@@ -47,8 +48,13 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun createNewWallet(promise: Promise) {
         Log.w("MAIN", "Creating new wallet")
 
-        val saplingOutput = MainApplication.getAppContext()?.resources?.openRawResource(R.raw.saplingoutput)?.readBytes()
-        val saplingSpend = MainApplication.getAppContext()?.resources?.openRawResource(R.raw.saplingspend)?.readBytes()
+        val saplingOutputFile = MainApplication.getAppContext()?.resources?.openRawResource(R.raw.saplingoutput)
+        val saplingOutput = saplingOutputFile?.readBytes()
+        saplingOutputFile?.close()
+
+        val saplingSpendFile = MainApplication.getAppContext()?.resources?.openRawResource(R.raw.saplingspend)
+        val saplingSpend = saplingSpendFile?.readBytes()
+        saplingSpendFile?.close()
 
         // Create a seed
         val seed = initnew(LIGHTWALLETD_URL, Base64.getEncoder().encodeToString(saplingOutput), Base64.getEncoder().encodeToString((saplingSpend)))
@@ -65,8 +71,13 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun restoreWallet(seed: String, birthday: Int, promise: Promise) {
         Log.w("MAIN", "Restoring wallet with seed $seed")
 
-        val saplingOutput = MainApplication.getAppContext()?.resources?.openRawResource(R.raw.saplingoutput)?.readBytes()
-        val saplingSpend = MainApplication.getAppContext()?.resources?.openRawResource(R.raw.saplingspend)?.readBytes()
+        val saplingOutputFile = MainApplication.getAppContext()?.resources?.openRawResource(R.raw.saplingoutput)
+        val saplingOutput = saplingOutputFile?.readBytes()
+        saplingOutputFile?.close()
+
+        val saplingSpendFile = MainApplication.getAppContext()?.resources?.openRawResource(R.raw.saplingspend)
+        val saplingSpend = saplingSpendFile?.readBytes()
+        saplingSpendFile?.close()
 
         val rseed = initfromseed(LIGHTWALLETD_URL, seed, birthday.toString(),
                         Base64.getEncoder().encodeToString(saplingOutput),
@@ -81,11 +92,17 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     @ReactMethod
     fun loadExistingWallet(promise: Promise) {
         // Read the file
-        val fileBytes = MainApplication.getAppContext()!!.openFileInput("wallet.dat").readBytes()
+        val file = MainApplication.getAppContext()!!.openFileInput("wallet.dat")
+        val fileBytes = file.readBytes()
         val fileb64 = Base64.getEncoder().encodeToString(fileBytes)
 
-        val saplingOutput = MainApplication.getAppContext()?.resources?.openRawResource(R.raw.saplingoutput)?.readBytes()
-        val saplingSpend = MainApplication.getAppContext()?.resources?.openRawResource(R.raw.saplingspend)?.readBytes()
+        val saplingOutputFile = MainApplication.getAppContext()?.resources?.openRawResource(R.raw.saplingoutput)
+        val saplingOutput = saplingOutputFile?.readBytes()
+        saplingOutputFile?.close()
+
+        val saplingSpendFile = MainApplication.getAppContext()?.resources?.openRawResource(R.raw.saplingspend)
+        val saplingSpend = saplingSpendFile?.readBytes()
+        saplingSpendFile?.close()
 
         val seed = initfromb64(LIGHTWALLETD_URL, fileb64,
                     Base64.getEncoder().encodeToString(saplingOutput),
@@ -93,6 +110,8 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
         Log.w("MAIN", seed)
         initlogging()
+
+        file.close()
 
         promise.resolve(seed)
     }
@@ -158,7 +177,9 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             Log.w("MAIN", "file size${fileBytes.size}")
 
             // Save file to disk
-            MainApplication.getAppContext()?.openFileOutput("wallet.dat", Context.MODE_PRIVATE).use { it?.write(fileBytes) }
+            val file = MainApplication.getAppContext()?.openFileOutput("wallet.dat", Context.MODE_PRIVATE)
+            file?.write(fileBytes)
+            file?.close()
         } catch (e: IllegalArgumentException) {
             Log.e("MAIN", "Couldn't save the wallet")
         }

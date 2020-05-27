@@ -87,7 +87,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({tx, price, closeModal
           );
         })}
       </ScrollView>
-      <View style={{flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+      <View style={{flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', margin: 10}}>
         <PrimaryButton title="Close" onPress={closeModal} />
       </View>
     </SafeAreaView>
