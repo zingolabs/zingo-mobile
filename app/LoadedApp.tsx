@@ -454,21 +454,21 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
               var iconName;
 
               if (route.name === 'Transactions') {
-                iconName = focused ? faList : faList;
+                iconName = faList;
               } else if (route.name === 'Send') {
-                iconName = focused ? faUpload : faUpload;
+                iconName = faUpload;
               } else if (route.name === 'Receive') {
-                iconName = focused ? faDownload : faDownload;
+                iconName = faDownload;
               } else {
-                iconName = focused ? faCog : faCog;
+                iconName = faCog;
               }
 
-              // You can return any component that you like here!
-              return <FontAwesomeIcon icon={iconName} color="rgb( 220, 220, 220)" />;
+              const iconColor = focused ? '#c3921f' : '#aaaaaa';
+              return <FontAwesomeIcon icon={iconName} color={iconColor} />;
             },
           })}
           tabBarOptions={{
-            activeTintColor: '#BB86FC',
+            activeTintColor: '#c3921f',
             inactiveTintColor: '#777777',
             labelStyle: {fontSize: 14},
           }}>

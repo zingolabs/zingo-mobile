@@ -65,9 +65,11 @@ export default class RPC {
     }
   }
 
-  static async doSync() {
+  static async doSync(): Promise<string> {
     const syncstr = await RPCModule.doSync();
     console.log(`Sync exec result: ${syncstr}`);
+
+    return syncstr;
   }
 
   static async doRescan() {
@@ -95,12 +97,21 @@ export default class RPC {
     if (fullRefresh || !this.lastBlockHeight || this.lastBlockHeight < latestBlockHeight) {
       // If the latest block height has changed, make sure to sync. This will happen in a new thread
       this.inRefresh = true;
-      RPC.doSync();
 
-      // If the sync is longer than 1000 blocks, then just update the UI first as well
-      if (latestBlockHeight - this.lastBlockHeight > 1000) {
+      // This is async, so when it is done, we finish the refresh.
+      RPC.doSync().finally(() => {
+        this.inRefresh = false;
+      });
+
+      const BLOCK_BATCH_SIZE = 10000;
+      var nextIntermittentRefresh = 0;
+
+      // If the sync is longer than 10000 blocks, then just update the UI first as well
+      if (latestBlockHeight - this.lastBlockHeight > BLOCK_BATCH_SIZE) {
         this.fetchTotalBalance();
         this.fetchTandZTransactions(latestBlockHeight);
+
+        nextIntermittentRefresh = this.lastBlockHeight + BLOCK_BATCH_SIZE;
       }
 
       // We need to wait for the sync to finish. The way we know the sync is done is
@@ -108,7 +119,9 @@ export default class RPC {
       const pollerID = setInterval(async () => {
         const walletHeight = await RPC.fetchWalletHeight();
 
-        if (walletHeight >= latestBlockHeight) {
+        // Close the poll timer if the sync finished(checked via promise above) or if
+        // the wallet height has exceeded the latest block height
+        if (!this.inRefresh || walletHeight >= latestBlockHeight) {
           // We are synced. Cancel the poll timer
           clearInterval(pollerID);
 
@@ -118,21 +131,21 @@ export default class RPC {
 
           this.lastBlockHeight = latestBlockHeight;
 
-          // All done
-          this.inRefresh = false;
           console.log(`Finished full refresh at ${latestBlockHeight}`);
         } else {
           // Post sync updates
           this.fnRefreshUpdates(walletHeight, latestBlockHeight);
 
-          // Every 10,000 blocks, update the UI
-          if (walletHeight % 10000 === 0) {
+          // If we're doing a long sync, every 10,000 blocks, update the UI
+          if (nextIntermittentRefresh && walletHeight > nextIntermittentRefresh) {
             this.fetchTotalBalance();
             this.fetchTandZTransactions(walletHeight);
 
-            // And save the wallet so we don't loose sync status.
+            // And save the wallet so we don't lose sync status.
             // The wallet has to be saved by the android/ios code
             RPCModule.doSave();
+
+            nextIntermittentRefresh = walletHeight + BLOCK_BATCH_SIZE;
           }
         }
       }, 2000);
