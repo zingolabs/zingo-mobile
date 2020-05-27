@@ -119,6 +119,9 @@ export default class RPC {
       const pollerID = setInterval(async () => {
         const walletHeight = await RPC.fetchWalletHeight();
 
+        // Post sync updates
+        this.fnRefreshUpdates(walletHeight, latestBlockHeight);
+
         // Close the poll timer if the sync finished(checked via promise above) or if
         // the wallet height has exceeded the latest block height
         if (!this.inRefresh || walletHeight >= latestBlockHeight) {
@@ -133,9 +136,6 @@ export default class RPC {
 
           console.log(`Finished full refresh at ${latestBlockHeight}`);
         } else {
-          // Post sync updates
-          this.fnRefreshUpdates(walletHeight, latestBlockHeight);
-
           // If we're doing a long sync, every 10,000 blocks, update the UI
           if (nextIntermittentRefresh && walletHeight > nextIntermittentRefresh) {
             this.fetchTotalBalance();

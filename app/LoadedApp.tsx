@@ -432,7 +432,11 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
           transparent={false}
           visible={infoModalVisible}
           onRequestClose={() => this.setState({infoModalVisible: false})}>
-          <InfoModal closeModal={() => this.setState({infoModalVisible: false})} info={info} />
+          <InfoModal
+            closeModal={() => this.setState({infoModalVisible: false})}
+            info={info}
+            walletHeight={syncingStatus?.walletHeight}
+          />
         </Modal>
 
         <Modal

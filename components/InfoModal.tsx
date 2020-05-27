@@ -23,9 +23,10 @@ const DetailLine: React.FunctionComponent<DetailLineProps> = ({label, value}) =>
 type InfoModalProps = {
   info: Info | null;
   closeModal: () => void;
+  walletHeight?: number;
 };
 
-const InfoModal: React.FunctionComponent<InfoModalProps> = ({info, closeModal}) => {
+const InfoModal: React.FunctionComponent<InfoModalProps> = ({info, walletHeight, closeModal}) => {
   const {colors} = useTheme();
   const url = 'https://lightwalletd.zecwallet.co:1443';
   const height = info?.latestBlock;
@@ -59,6 +60,7 @@ const InfoModal: React.FunctionComponent<InfoModalProps> = ({info, closeModal}) 
         <DetailLine label="Lightwallet Server URL" value={url} />
         <DetailLine label="Network" value={info?.testnet ? 'Testnet' : 'Mainnet'} />
         <DetailLine label="Server Block Height" value={height} />
+        <DetailLine label="Wallet Block Height" value={walletHeight} />
       </ScrollView>
 
       <View style={{flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
