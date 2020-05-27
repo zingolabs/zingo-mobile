@@ -167,6 +167,12 @@ export interface WalletSeed {
   birthday: number;
 }
 
+export interface SyncStatus {
+  isSyncing: boolean;
+  walletHeight: number;
+  toalHeight: number;
+}
+
 export default interface AppState {
   // The total confirmed and unconfirmed balance in this wallet
   totalBalance: TotalBalance;
@@ -203,6 +209,8 @@ export default interface AppState {
 
   // Callbacks for the password dialog box
   //passwordState: PasswordState;
+
+  syncingStatus: SyncStatus | null;
 
   // Data for any error or info modal
   errorModalData: ErrorModalData;

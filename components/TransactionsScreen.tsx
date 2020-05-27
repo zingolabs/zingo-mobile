@@ -3,7 +3,7 @@ import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import {RegText, ZecAmount, UsdAmount, PrimaryButton, FadeText} from '../components/Components';
 import {View, ScrollView, Image, Modal, TouchableOpacity, SafeAreaView, RefreshControl} from 'react-native';
-import {TotalBalance, Transaction, Info} from '../app/AppState';
+import {TotalBalance, Transaction, Info, SyncStatus} from '../app/AppState';
 import Utils from '../app/utils';
 import Moment from 'react-moment';
 import {useTheme} from '@react-navigation/native';
@@ -134,6 +134,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({tx, setTxDe
 type TransactionsScreenViewProps = {
   info: Info | null;
   totalBalance: TotalBalance;
+  syncingStatus: SyncStatus | null;
   transactions: Transaction[] | null;
   toggleMenuDrawer: () => void;
   doRefresh: () => void;
@@ -144,6 +145,7 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
   totalBalance,
   transactions,
   toggleMenuDrawer,
+  syncingStatus,
   doRefresh,
 }) => {
   const [isTxDetailModalShowing, setTxDetailModalShowing] = React.useState(false);
@@ -151,6 +153,10 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
 
   const {colors} = useTheme();
   const zecPrice = info ? info.zecPrice : null;
+
+  const syncStatusDisplay = syncingStatus?.isSyncing
+    ? `Syncing ${syncingStatus?.walletHeight}/${syncingStatus?.toalHeight}`
+    : 'Balance';
 
   return (
     <View style={{display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', marginBottom: 170}}>
@@ -163,7 +169,7 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
       </Modal>
 
       <View style={{display: 'flex', alignItems: 'center', height: 140, backgroundColor: colors.card, zIndex: -1}}>
-        <RegText style={{marginTop: 10, marginBottom: 5}}>Balance</RegText>
+        <RegText style={{marginTop: 10, marginBottom: 5}}>{syncStatusDisplay}</RegText>
         <ZecAmount size={36} amtZec={totalBalance.total} />
         <UsdAmount style={{marginTop: 5}} price={zecPrice} amtZec={totalBalance.total} />
       </View>
@@ -183,7 +189,7 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
         {transactions?.map((t) => {
           return (
             <TxSummaryLine
-              key={t.txid}
+              key={`${t.txid}-${t.type}`}
               tx={t}
               setTxDetail={setTxDetail}
               setTxDetailModalShowing={setTxDetailModalShowing}

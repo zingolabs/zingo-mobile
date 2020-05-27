@@ -90,7 +90,7 @@ RCT_REMAP_METHOD(deleteExistingWallet,
 
 
 // (Non react) Save the current wallet to disk
--(void) saveWallet {
+-(void) saveWalletInternal {
   // Then save the file
   char *walletDat = save();
   NSString* walletDataStr = [NSString stringWithUTF8String:walletDat];
@@ -122,7 +122,7 @@ RCT_REMAP_METHOD(createNewWallet,
     RCTLogInfo(@"Got seed: %@", seedStr);
     
     // Also save the wallet after create
-    [self saveWallet];
+    [self saveWalletInternal];
     
     resolve(seedStr);
   }
@@ -153,7 +153,7 @@ RCT_REMAP_METHOD(restoreWallet,
     RCTLogInfo(@"Seed: %@", seedStr);
     
     // Also save the wallet after restore
-    [self saveWallet];
+    [self saveWalletInternal];
     
     resolve(seedStr);
   }
@@ -188,7 +188,7 @@ RCT_REMAP_METHOD(loadExistingWallet,
 RCT_REMAP_METHOD(doSave,
                  doSaveWithResolver:(RCTPromiseResolveBlock)resolve
                  rejected:(RCTPromiseRejectBlock)reject) {
-  [self saveWallet];
+  [self saveWalletInternal];
   
   resolve(@"true");
 }
@@ -216,7 +216,7 @@ RCT_REMAP_METHOD(doSend,
     rust_free(resp);
     
     // Also save the wallet after sync
-    [self saveWallet];
+    [self saveWalletInternal];
     
     RCTLogInfo(@"Got sync response: %@", respStr);
     resolve(respStr);
