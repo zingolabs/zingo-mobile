@@ -221,6 +221,7 @@ export default function App() {
           style={{
             flex: 1,
             justifyContent: 'center',
+            backgroundColor: ZecwalletTheme.colors.card,
           }}>
           <Stack.Navigator headerMode="none">
             <Stack.Screen name="LoadingView" component={LoadingView} />
