@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import {View, ScrollView, Modal, Image, Alert, SafeAreaView} from 'react-native';
 import {
@@ -73,6 +73,15 @@ function ScanScreen({setToAddress}: ScannerProps) {
 
 const ComputingTxModalContent: React.FunctionComponent<any> = ({}) => {
   const {colors} = useTheme();
+  const [seconds, setSeconds] = useState(0);
+
+  useEffect(() => {
+    let timerID = setInterval(() => {
+      setSeconds(seconds + 1);
+    }, 1000);
+
+    return () => clearInterval(timerID);
+  }, [seconds]);
 
   return (
     <SafeAreaView
@@ -84,7 +93,7 @@ const ComputingTxModalContent: React.FunctionComponent<any> = ({}) => {
         backgroundColor: colors.background,
       }}>
       <RegText>Computing Transaction</RegText>
-      <RegText>Please wait...</RegText>
+      <RegText>Please wait...({seconds}s)</RegText>
       <RegText>(This can take upto a minute)</RegText>
     </SafeAreaView>
   );
