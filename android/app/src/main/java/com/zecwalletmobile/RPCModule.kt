@@ -2,6 +2,7 @@ package com.zecwalletmobile
 
 
 import android.content.Context
+import android.util.Base64
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
@@ -9,7 +10,6 @@ import com.facebook.react.bridge.Promise;
 
 import android.util.Log
 import java.io.File
-import java.util.*
 import kotlin.concurrent.thread
 
 
@@ -56,8 +56,12 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         val saplingSpend = saplingSpendFile?.readBytes()
         saplingSpendFile?.close()
 
+        initlogging()
+
         // Create a seed
-        val seed = initnew(LIGHTWALLETD_URL, Base64.getEncoder().encodeToString(saplingOutput), Base64.getEncoder().encodeToString((saplingSpend)))
+        val seed = initnew(LIGHTWALLETD_URL, 
+            Base64.encodeToString(saplingOutput, Base64.NO_WRAP), 
+            Base64.encodeToString(saplingSpend, Base64.NO_WRAP))
         Log.w("MAIN-Seed", seed)
 
         if (!seed.startsWith("Error")) {
@@ -80,8 +84,8 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         saplingSpendFile?.close()
 
         val rseed = initfromseed(LIGHTWALLETD_URL, seed, birthday.toString(),
-                        Base64.getEncoder().encodeToString(saplingOutput),
-                        Base64.getEncoder().encodeToString((saplingSpend)))
+            Base64.encodeToString(saplingOutput, Base64.NO_WRAP), 
+            Base64.encodeToString(saplingSpend, Base64.NO_WRAP))
         Log.w("MAIN", seed)
 
         saveWallet()
@@ -94,7 +98,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         // Read the file
         val file = MainApplication.getAppContext()!!.openFileInput("wallet.dat")
         val fileBytes = file.readBytes()
-        val fileb64 = Base64.getEncoder().encodeToString(fileBytes)
+        val fileb64 = Base64.encodeToString(fileBytes, Base64.NO_WRAP)
 
         val saplingOutputFile = MainApplication.getAppContext()?.resources?.openRawResource(R.raw.saplingoutput)
         val saplingOutput = saplingOutputFile?.readBytes()
@@ -105,8 +109,8 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         saplingSpendFile?.close()
 
         val seed = initfromb64(LIGHTWALLETD_URL, fileb64,
-                    Base64.getEncoder().encodeToString(saplingOutput),
-                    Base64.getEncoder().encodeToString((saplingSpend)))
+            Base64.encodeToString(saplingOutput, Base64.NO_WRAP), 
+            Base64.encodeToString(saplingSpend, Base64.NO_WRAP))
 
         Log.w("MAIN", seed)
         initlogging()
@@ -173,7 +177,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         Log.w("MAIN", b64encoded)
 
         try {
-            val fileBytes = Base64.getDecoder().decode(b64encoded)
+            val fileBytes = Base64.decode(b64encoded, Base64.NO_WRAP)
             Log.w("MAIN", "file size${fileBytes.size}")
 
             // Save file to disk
