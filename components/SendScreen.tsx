@@ -360,7 +360,9 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
 
           <View style={{marginTop: 30, display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
             <FadeText>Amount (ZEC)</FadeText>
-            {amountValidationState === 1 && <FontAwesomeIcon icon={faCheck} color="green" />}
+            {amountValidationState === 1 && (
+              <UsdAmount price={zecPrice} amtZec={parseFloat(sendPageState.toaddrs[0].amount)} />
+            )}
             {amountValidationState === -1 && <ErrorText>Invalid Amount!</ErrorText>}
           </View>
           <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-start'}}>
