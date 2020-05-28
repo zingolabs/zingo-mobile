@@ -12,6 +12,7 @@
       android:icon="@mipmap/zecwalletlite"
       android:roundIcon="@mipmap/zecwalletlite_round"
       android:allowBackup="false"
+      android:largeHeap="true"
       android:theme="@style/AppTheme">
       <activity
         android:name=".MainActivity"
