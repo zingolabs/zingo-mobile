@@ -26,7 +26,7 @@ const AboutModal: React.FunctionComponent<AboutModalProps> = ({closeModal}) => {
           justifyContent: 'flex-start',
           margin: 10,
         }}>
-        <BoldText>Zecwallet Lite v0.1-beta1</BoldText>
+        <BoldText>Zecwallet Lite v0.1-beta2</BoldText>
 
         <RegText>
           {'\n'}
