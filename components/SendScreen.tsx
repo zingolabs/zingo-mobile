@@ -93,7 +93,7 @@ const ComputingTxModalContent: React.FunctionComponent<any> = ({}) => {
         backgroundColor: colors.background,
       }}>
       <RegText>Computing Transaction</RegText>
-      <RegText>Please wait...({seconds}s)</RegText>
+      <RegText>Please wait...</RegText>
       <RegText>(This can take upto a minute)</RegText>
     </SafeAreaView>
   );
