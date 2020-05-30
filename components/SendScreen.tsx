@@ -21,14 +21,17 @@ import {TouchableOpacity} from 'react-native-gesture-handler';
 import Toast from 'react-native-simple-toast';
 
 type ScannerProps = {
-  setToAddress: (addr: string | null) => void;
+  updateToField: (address: string | null, amount: string | null, memo: string | null) => void;
+  closeModal: () => void;
 };
-function ScanScreen({setToAddress}: ScannerProps) {
+function ScanScreen({updateToField, closeModal}: ScannerProps) {
   const [error, setError] = useState<String | null>(null);
 
   const validateAddress = (scannedAddress: string) => {
     if (Utils.isSapling(scannedAddress) || Utils.isTransparent(scannedAddress)) {
-      setToAddress(scannedAddress);
+      updateToField(scannedAddress, null, null);
+
+      closeModal();
     } else {
       setError(`"${scannedAddress}" is not a valid Zcash Address`);
     }
@@ -42,7 +45,7 @@ function ScanScreen({setToAddress}: ScannerProps) {
   };
 
   const doCancel = () => {
-    setToAddress(null);
+    closeModal();
   };
 
   const {colors} = useTheme();
@@ -229,13 +232,6 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
     setSendPageState(newState);
   };
 
-  const setToAddress = (address: string | null) => {
-    if (address !== null) {
-      updateToField(address, null, null);
-    }
-    setQrcodeModalVisible(false);
-  };
-
   const confirmSend = async () => {
     // First, close the confirm modal and show the "computing" modal
     setConfirmModalVisible(false);
@@ -306,7 +302,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
         transparent={false}
         visible={qrcodeModalVisble}
         onRequestClose={() => setQrcodeModalVisible(false)}>
-        <ScanScreen setToAddress={setToAddress} />
+        <ScanScreen updateToField={updateToField} closeModal={() => setQrcodeModalVisible(false)} />
       </Modal>
 
       <Modal
