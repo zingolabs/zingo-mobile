@@ -71,7 +71,7 @@ export const BoldText: React.FunctionComponent<any> = ({style, children}) => {
   let arrayed = [];
 
   if (Array.isArray(style)) {
-    arrayed = style;
+    arrayed = style.slice(0);
   } else if (style) {
     arrayed.push(style);
   }
@@ -97,7 +97,7 @@ export const RegText: React.FunctionComponent<any> = ({style, color, onPress, ch
   let arrayed = [];
 
   if (Array.isArray(style)) {
-    arrayed = style;
+    arrayed = style.slice(0);
   } else if (style) {
     arrayed.push(style);
   }
@@ -123,7 +123,7 @@ export const RegTextInput: React.FunctionComponent<any> = (props) => {
   let arrayed = [];
 
   if (Array.isArray(props.style)) {
-    arrayed = props.style;
+    arrayed = props.style.slice(0);
   } else if (props.style) {
     arrayed.push(props.style);
   }
