@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useState, useEffect} from 'react';
 import QRCodeScanner from 'react-native-qrcode-scanner';
-import {View, ScrollView, Modal, Image, Alert, SafeAreaView} from 'react-native';
+import {View, ScrollView, Modal, Image, Alert, SafeAreaView, Keyboard} from 'react-native';
 import {
   FadeText,
   BoldText,
@@ -204,6 +204,22 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
   const [computingModalVisible, setComputingModalVisible] = useState(false);
 
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
+      setKeyboardVisible(true); // or some other action
+    });
+    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+      setKeyboardVisible(false); // or some other action
+    });
+
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
+
   const updateToField = (address: string | null, amount: string | null, memo: string | null) => {
     const newToAddrs = sendPageState.toaddrs.slice(0);
     // Find the correct toAddr
@@ -335,11 +351,14 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
           flexDirection: 'column',
           justifyContent: 'flex-start',
         }}>
-        <View style={{display: 'flex', alignItems: 'center', height: 140, backgroundColor: colors.card}}>
-          <RegText style={{marginTop: 10, marginBottom: 5}}>Spendable</RegText>
-          <ZecAmount size={36} amtZec={spendable} />
-          <UsdAmount style={{marginTop: 5}} price={zecPrice} amtZec={spendable} />
-        </View>
+        {isKeyboardVisible && <View style={{height: 25, backgroundColor: colors.card}} />}
+        {!isKeyboardVisible && (
+          <View style={{display: 'flex', alignItems: 'center', height: 140, backgroundColor: colors.card}}>
+            <RegText style={{marginTop: 10, marginBottom: 5}}>Spendable</RegText>
+            <ZecAmount size={36} amtZec={spendable} />
+            <UsdAmount style={{marginTop: 5}} price={zecPrice} amtZec={spendable} />
+          </View>
+        )}
         <View style={{display: 'flex', alignItems: 'center', marginTop: -25}}>
           <Image source={require('../assets/img/logobig.png')} style={{width: 50, height: 50, resizeMode: 'contain'}} />
         </View>
@@ -354,7 +373,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
             <RegTextInput
               placeholder="ZEC z-address or t-address"
               placeholderTextColor="#777777"
-              style={{flexGrow: 1, maxWidth: '90%', borderBottomColor: '#ffffff', borderBottomWidth: 2}}
+              style={{flexGrow: 1, borderBottomColor: '#ffffff', borderBottomWidth: 2}}
               value={sendPageState.toaddrs[0].to}
               onChangeText={(text: string) => updateToField(text, null, null)}
             />

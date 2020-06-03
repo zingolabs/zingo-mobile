@@ -136,7 +136,7 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
 
             <PrimaryButton title="Create New Wallet" onPress={this.createNewWallet} />
             <View style={[cstyles.margintop]}>
-              <PrimaryButton title="Restore seed" onPress={this.getSeedPhraseToRestore} />
+              <PrimaryButton title="Restore Seed" onPress={this.getSeedPhraseToRestore} />
             </View>
           </View>
         )}
