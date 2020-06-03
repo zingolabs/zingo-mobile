@@ -72,7 +72,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun restoreWallet(seed: String, birthday: Int, promise: Promise) {
+    fun restoreWallet(seed: String, birthday: String, promise: Promise) {
         Log.w("MAIN", "Restoring wallet with seed $seed")
 
         val saplingOutputFile = MainApplication.getAppContext()?.resources?.openRawResource(R.raw.saplingoutput)
@@ -83,7 +83,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         val saplingSpend = saplingSpendFile?.readBytes()
         saplingSpendFile?.close()
 
-        val rseed = initfromseed(LIGHTWALLETD_URL, seed, birthday.toString(),
+        val rseed = initfromseed(LIGHTWALLETD_URL, seed, birthday,
             Base64.encodeToString(saplingOutput, Base64.NO_WRAP), 
             Base64.encodeToString(saplingSpend, Base64.NO_WRAP))
         Log.w("MAIN", seed)

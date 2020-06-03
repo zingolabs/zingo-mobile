@@ -91,7 +91,7 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
       return;
     }
 
-    const error = await RPCModule.restoreWallet(seedPhrase, parseInt(birthday || '0', 10));
+    const error = await RPCModule.restoreWallet(seedPhrase, birthday || '0');
     if (!error.startsWith('Error')) {
       this.navigateToLoaded();
     } else {
@@ -154,18 +154,17 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
                 flex: 1,
                 flexDirection: 'column',
                 alignItems: 'center',
-                justifyContent: 'center',
+                justifyContent: 'flex-start',
               },
             ]}
             keyboardShouldPersistTaps="handled">
-            <RegText style={[cstyles.marginbottomsmall]}>Enter your seed phrase (24 words)</RegText>
+            <RegText style={{margin: 30}}>Enter your seed phrase (24 words)</RegText>
             <RegTextInput
               multiline
               style={[
                 {
-                  color: 'red',
-                  maxWidth: '100%',
-                  minWidth: '100%',
+                  maxWidth: '95%',
+                  minWidth: '95%',
                   borderColor: 'gray',
                   borderWidth: 1,
                 },
