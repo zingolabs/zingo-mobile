@@ -91,7 +91,7 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
       return;
     }
 
-    const error = await RPCModule.restoreWallet(seedPhrase, birthday || '0');
+    const error = await RPCModule.restoreWallet(seedPhrase.toLowerCase(), birthday || '0');
     if (!error.startsWith('Error')) {
       this.navigateToLoaded();
     } else {
