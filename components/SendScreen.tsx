@@ -363,7 +363,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
           <Image source={require('../assets/img/logobig.png')} style={{width: 50, height: 50, resizeMode: 'contain'}} />
         </View>
 
-        <View style={{padding: 10, marginTop: 20}}>
+        <View style={{display: 'flex', padding: 10, marginTop: 20}}>
           <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
             <FadeText>To</FadeText>
             {addressValidationState === 1 && <FontAwesomeIcon icon={faCheck} color="green" />}
@@ -373,7 +373,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
             <RegTextInput
               placeholder="ZEC z-address or t-address"
               placeholderTextColor="#777777"
-              style={{flexGrow: 1, borderBottomColor: '#ffffff', borderBottomWidth: 2}}
+              style={{flexGrow: 1, maxWidth: '90%', borderBottomColor: '#ffffff', borderBottomWidth: 2}}
               value={sendPageState.toaddrs[0].to}
               onChangeText={(text: string) => updateToField(text, null, null)}
             />
@@ -394,7 +394,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
               placeholder="0.0"
               placeholderTextColor="#777777"
               keyboardType="numeric"
-              style={{flexGrow: 1, borderBottomColor: '#ffffff', borderBottomWidth: 2}}
+              style={{flexGrow: 1, maxWidth: '90%', borderBottomColor: '#ffffff', borderBottomWidth: 2}}
               value={sendPageState.toaddrs[0].amount.toString()}
               onChangeText={(text: string) => updateToField(null, text, null)}
             />
