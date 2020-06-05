@@ -229,7 +229,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
     }
 
     if (address !== null) {
-      toAddr.to = address.replace(/ /g, ''); // Remove spaces
+      toAddr.to = address.replace(/[ \t\n\r]+/g, ''); // Remove spaces
     }
 
     if (amount !== null) {
