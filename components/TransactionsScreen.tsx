@@ -170,7 +170,7 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
 
       <View
         style={{display: 'flex', alignItems: 'center', paddingBottom: 25, backgroundColor: colors.card, zIndex: -1}}>
-        <RegText style={{marginTop: 10, marginBottom: 5}}>{syncStatusDisplay}</RegText>
+        <RegText style={{marginTop: 5, padding: 5}}>{syncStatusDisplay}</RegText>
         <ZecAmount size={36} amtZec={totalBalance.total} />
         <UsdAmount style={{marginTop: 5}} price={zecPrice} amtZec={totalBalance.total} />
       </View>
