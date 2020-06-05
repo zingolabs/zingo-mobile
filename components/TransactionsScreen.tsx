@@ -19,6 +19,11 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({tx, price, closeModal
   const {colors} = useTheme();
   const spendColor = tx?.confirmations === 0 ? 'yellow' : (tx?.amount || 0) > 0 ? '#88ee88' : '#ff6666';
 
+  const fee =
+    tx?.type === 'sent' &&
+    tx?.amount &&
+    Math.abs(tx?.amount) - Math.abs(tx?.detailedTxns?.reduce((s, d) => s + d.amount, 0));
+
   return (
     <SafeAreaView
       style={{
@@ -86,6 +91,13 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({tx, price, closeModal
             </View>
           );
         })}
+
+        {fee && (
+          <View style={{display: 'flex', marginTop: 10}}>
+            <FadeText>Tx Fee</FadeText>
+            <ZecAmount amtZec={fee} size={18} />
+          </View>
+        )}
       </ScrollView>
       <View style={{flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', margin: 10}}>
         <PrimaryButton title="Close" onPress={closeModal} />
