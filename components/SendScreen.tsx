@@ -16,6 +16,7 @@ import {Info, SendPageState, TotalBalance} from '../app/AppState';
 import {faQrcode, faCheck, faArrowAltCircleUp} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {useTheme} from '@react-navigation/native';
+import {NavigationScreenProp} from 'react-navigation';
 import Utils from '../app/utils';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import Toast from 'react-native-simple-toast';
@@ -189,6 +190,7 @@ type SendScreenProps = {
   setSendPageState: (sendPageState: SendPageState) => void;
   sendTransaction: () => void;
   clearToAddrs: () => void;
+  navigation: NavigationScreenProp<any>;
 };
 
 const SendScreen: React.FunctionComponent<SendScreenProps> = ({
@@ -198,6 +200,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
   setSendPageState,
   sendTransaction,
   clearToAddrs,
+  navigation,
 }) => {
   const {colors} = useTheme();
   const [qrcodeModalVisble, setQrcodeModalVisible] = useState(false);
@@ -262,6 +265,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
         // Clear the fields
         clearToAddrs();
 
+        navigation.navigate('Transactions');
         Toast.show(`Successfully Broadcast Tx: ${txid}`, Toast.LONG);
       } catch (err) {
         console.log('sendtx error', err);
