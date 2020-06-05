@@ -158,6 +158,8 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
     ? `Syncing ${syncingStatus?.walletHeight}/${syncingStatus?.toalHeight}`
     : 'Balance';
 
+  const balanceColor = transactions?.find((t) => t.confirmations === 0) ? 'yellow' : colors.text;
+
   return (
     <View style={{display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', marginBottom: 170}}>
       <Modal
@@ -171,7 +173,7 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
       <View
         style={{display: 'flex', alignItems: 'center', paddingBottom: 25, backgroundColor: colors.card, zIndex: -1}}>
         <RegText style={{marginTop: 5, padding: 5}}>{syncStatusDisplay}</RegText>
-        <ZecAmount size={36} amtZec={totalBalance.total} />
+        <ZecAmount color={balanceColor} size={36} amtZec={totalBalance.total} />
         <UsdAmount style={{marginTop: 5}} price={zecPrice} amtZec={totalBalance.total} />
       </View>
 
