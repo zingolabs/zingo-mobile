@@ -351,9 +351,9 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
           flexDirection: 'column',
           justifyContent: 'flex-start',
         }}>
-        {isKeyboardVisible && <View style={{height: 25, backgroundColor: colors.card}} />}
+        {isKeyboardVisible && <View style={{paddingBottom: 25, backgroundColor: colors.card}} />}
         {!isKeyboardVisible && (
-          <View style={{display: 'flex', alignItems: 'center', height: 140, backgroundColor: colors.card}}>
+          <View style={{display: 'flex', alignItems: 'center', paddingBottom: 25, backgroundColor: colors.card}}>
             <RegText style={{marginTop: 10, marginBottom: 5}}>Spendable</RegText>
             <ZecAmount size={36} amtZec={spendable} />
             <UsdAmount style={{marginTop: 5}} price={zecPrice} amtZec={spendable} />

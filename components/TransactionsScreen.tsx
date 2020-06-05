@@ -168,7 +168,8 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
         <TxDetail tx={txDetail} price={info?.zecPrice} closeModal={() => setTxDetailModalShowing(false)} />
       </Modal>
 
-      <View style={{display: 'flex', alignItems: 'center', height: 140, backgroundColor: colors.card, zIndex: -1}}>
+      <View
+        style={{display: 'flex', alignItems: 'center', paddingBottom: 25, backgroundColor: colors.card, zIndex: -1}}>
         <RegText style={{marginTop: 10, marginBottom: 5}}>{syncStatusDisplay}</RegText>
         <ZecAmount size={36} amtZec={totalBalance.total} />
         <UsdAmount style={{marginTop: 5}} price={zecPrice} amtZec={totalBalance.total} />
