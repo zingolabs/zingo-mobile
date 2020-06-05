@@ -185,7 +185,9 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
         <Image source={require('../assets/img/logobig.png')} style={{width: 50, height: 50, resizeMode: 'contain'}} />
       </View>
       <ScrollView
-        refreshControl={<RefreshControl refreshing={false} onRefresh={doRefresh} />}
+        refreshControl={
+          <RefreshControl refreshing={false} onRefresh={doRefresh} tintColor={colors.text} title="Refreshing" />
+        }
         style={{flexGrow: 1, marginTop: 10, width: '100%', height: '100%'}}>
         {transactions?.map((t) => {
           return (
