@@ -146,7 +146,9 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             Log.w(TAG, "Sync:$syncresult");
 
             // And save it
-            saveWallet()
+            if (!syncresult.startsWith("Error")) {
+                saveWallet()
+            }
 
             promise.resolve(syncresult)
         }

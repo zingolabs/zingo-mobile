@@ -215,10 +215,13 @@ RCT_REMAP_METHOD(doSend,
     NSString* respStr = [NSString stringWithUTF8String:resp];
     rust_free(resp);
     
-    // Also save the wallet after sync
-    [self saveWalletInternal];
-    
     RCTLogInfo(@"Got sync response: %@", respStr);
+    
+    if (![respStr hasPrefix:@"Error"]) {
+      // Also save the wallet after sync
+      [self saveWalletInternal];
+    }
+    
     resolve(respStr);
   }
 }

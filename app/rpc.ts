@@ -132,9 +132,9 @@ export default class RPC {
           this.fetchTotalBalance();
           this.fetchTandZTransactions(latestBlockHeight);
 
-          this.lastBlockHeight = latestBlockHeight;
+          this.lastBlockHeight = walletHeight;
 
-          console.log(`Finished full refresh at ${latestBlockHeight}`);
+          console.log(`Finished full refresh at ${walletHeight}`);
         } else {
           // If we're doing a long sync, every 10,000 blocks, update the UI
           if (nextIntermittentRefresh && walletHeight > nextIntermittentRefresh) {
