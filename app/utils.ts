@@ -153,7 +153,7 @@ export default class Utils {
     let currentLen = 0;
     const a = [...s];
     for (let i = 0; i < a.length; i++) {
-      // Each UTF-16 char will take upto 4 bytes when encoded
+      // Each UTF-16 char will take up to 4 bytes when encoded
       const utf8len = a[i].length > 1 ? 4 : 1;
 
       // Test if adding it will exceed the size

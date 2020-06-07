@@ -337,10 +337,10 @@ export default class RPC {
     });
 
     // If you send yourself transactions, the underlying SDK doesn't handle it very well, so
-    // we supress these in the UI to make things a bit clearer.
+    // we suppress these in the UI to make things a bit clearer.
     txlist = txlist.filter((tx: Transaction) => !(tx.type === 'sent' && tx.amount < 0 && tx.detailedTxns.length === 0));
 
-    // We need to group transactions that have the same (txid and send/recive), for multi-part memos
+    // We need to group transactions that have the same (txid and send/receive), for multi-part memos
     const m = new Map();
     txlist.forEach((tx: Transaction) => {
       const key = tx.txid + tx.type;
