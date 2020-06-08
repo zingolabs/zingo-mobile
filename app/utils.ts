@@ -1,4 +1,4 @@
-import { getNumberFormatSettings } from "react-native-localize";
+import {getNumberFormatSettings} from 'react-native-localize';
 
 export const NO_CONNECTION: string = 'Could not connect to zcashd';
 
@@ -176,16 +176,13 @@ export default class Utils {
     return ans;
   }
 
-
   static parseLocaleFloat(stringNumber: string): number {
-    //const { decimalSeparator, groupingSeparator } = getNumberFormatSettings();
-    const decimalSeparator = ',';
-    const groupingSeparator = '.';
+    const {decimalSeparator, groupingSeparator} = getNumberFormatSettings();
 
     return Number(
       stringNumber
-        .replace(new RegExp(`\\${groupingSeparator}`, "g"), "")
-        .replace(new RegExp(`\\${decimalSeparator}`), "."),
+        .replace(new RegExp(`\\${groupingSeparator}`, 'g'), '')
+        .replace(new RegExp(`\\${decimalSeparator}`), '.'),
     );
   }
 }
