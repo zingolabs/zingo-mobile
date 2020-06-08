@@ -122,9 +122,8 @@ export default class RPC {
         // Post sync updates
         this.fnRefreshUpdates(walletHeight, latestBlockHeight);
 
-        // Close the poll timer if the sync finished(checked via promise above) or if
-        // the wallet height has exceeded the latest block height
-        if (!this.inRefresh || walletHeight >= latestBlockHeight) {
+        // Close the poll timer if the sync finished(checked via promise above)
+        if (!this.inRefresh) {
           // We are synced. Cancel the poll timer
           clearInterval(pollerID);
 
