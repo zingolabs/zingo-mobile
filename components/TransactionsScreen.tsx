@@ -98,6 +98,9 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({tx, price, closeModal
             <ZecAmount amtZec={fee} size={18} />
           </View>
         )}
+
+        <View style={{padding: 25}} />
+
       </ScrollView>
       <View style={{flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', margin: 10}}>
         <PrimaryButton title="Close" onPress={closeModal} />
