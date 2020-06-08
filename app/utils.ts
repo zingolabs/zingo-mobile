@@ -1,3 +1,5 @@
+import { getNumberFormatSettings } from "react-native-localize";
+
 export const NO_CONNECTION: string = 'Could not connect to zcashd';
 
 type ZecAmountSplitType = {
@@ -172,5 +174,18 @@ export default class Utils {
     }
 
     return ans;
+  }
+
+
+  static parseLocaleFloat(stringNumber: string): number {
+    //const { decimalSeparator, groupingSeparator } = getNumberFormatSettings();
+    const decimalSeparator = ',';
+    const groupingSeparator = '.';
+
+    return Number(
+      stringNumber
+        .replace(new RegExp(`\\${groupingSeparator}`, "g"), "")
+        .replace(new RegExp(`\\${decimalSeparator}`), "."),
+    );
   }
 }

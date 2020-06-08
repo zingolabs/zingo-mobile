@@ -118,7 +118,7 @@ const ConfirmModalContent: React.FunctionComponent<ConfirmModalProps> = ({
   const {colors} = useTheme();
 
   const sendingTotal =
-    sendPageState.toaddrs.reduce((s, t) => s + parseFloat(t.amount || '0'), 0.0) + Utils.getDefaultFee();
+    sendPageState.toaddrs.reduce((s, t) => s + Utils.parseLocaleFloat(t.amount || '0'), 0.0) + Utils.getDefaultFee();
 
   return (
     <SafeAreaView
@@ -150,8 +150,8 @@ const ConfirmModalContent: React.FunctionComponent<ConfirmModalProps> = ({
                   alignItems: 'baseline',
                   marginTop: 5,
                 }}>
-                <ZecAmount amtZec={parseFloat(to.amount)} />
-                <UsdAmount amtZec={parseFloat(to.amount)} price={price} />
+                <ZecAmount amtZec={Utils.parseLocaleFloat(to.amount)} />
+                <UsdAmount amtZec={Utils.parseLocaleFloat(to.amount)} price={price} />
               </View>
               <RegText>{to.memo || ''}</RegText>
             </View>
@@ -299,7 +299,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
 
   var amountValidationState: number;
   if (toaddr.amount !== '') {
-    if (parseFloat(toaddr.amount) > 0 && parseFloat(toaddr.amount) <= spendable + Utils.getDefaultFee()) {
+    if (Utils.parseLocaleFloat(toaddr.amount) > 0 && Utils.parseLocaleFloat(toaddr.amount) <= spendable + Utils.getDefaultFee()) {
       amountValidationState = 1;
     } else {
       amountValidationState = -1;
@@ -389,7 +389,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
           <View style={{marginTop: 30, display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
             <FadeText>Amount (ZEC)</FadeText>
             {amountValidationState === 1 && (
-              <UsdAmount price={zecPrice} amtZec={parseFloat(sendPageState.toaddrs[0].amount)} />
+              <UsdAmount price={zecPrice} amtZec={Utils.parseLocaleFloat(sendPageState.toaddrs[0].amount)} />
             )}
             {amountValidationState === -1 && <ErrorText>Invalid Amount!</ErrorText>}
           </View>

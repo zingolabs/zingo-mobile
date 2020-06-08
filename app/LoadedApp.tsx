@@ -279,7 +279,7 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
     const {sendPageState} = this.state;
     const json = sendPageState.toaddrs.flatMap((to) => {
       const memo = to.memo || '';
-      const amount = parseInt((parseFloat(to.amount) * 10 ** 8).toFixed(0), 10);
+      const amount = parseInt((Utils.parseLocaleFloat(to.amount) * 10 ** 8).toFixed(0), 10);
 
       if (memo === '') {
         return {address: to.to, amount};
