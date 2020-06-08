@@ -49,8 +49,14 @@ export default class RPC {
       this.priceTimerID = setTimeout(() => this.getZecPrice(0), 1000);
     }
 
-    // Immediately call the refresh after configure to update the UI
-    this.refresh(true);
+    // Load the current wallet data
+    this.loadWalletData();
+
+    // Call the refresh after configure to update the UI. Do it in a timeout
+    // to allow the UI to render first
+    setTimeout(() => {
+      this.refresh(true);
+    }, 1000);
   }
 
   clearTimers() {
@@ -83,6 +89,15 @@ export default class RPC {
     return syncstr;
   }
 
+  async loadWalletData(walletHeight?: number) {
+    if (!walletHeight) {
+      walletHeight = await RPC.fetchWalletHeight();
+    }
+
+    this.fetchTotalBalance();
+    this.fetchTandZTransactions(walletHeight);
+  }
+
   async refresh(fullRefresh: boolean) {
     // If we're in refresh, we don't overlap
     if (this.inRefresh) {
@@ -108,8 +123,7 @@ export default class RPC {
 
       // If the sync is longer than 10000 blocks, then just update the UI first as well
       if (latestBlockHeight - this.lastBlockHeight > BLOCK_BATCH_SIZE) {
-        this.fetchTotalBalance();
-        this.fetchTandZTransactions(latestBlockHeight);
+        this.loadWalletData(latestBlockHeight);
 
         nextIntermittentRefresh = this.lastBlockHeight + BLOCK_BATCH_SIZE;
       }
@@ -128,8 +142,7 @@ export default class RPC {
           clearInterval(pollerID);
 
           // And fetch the rest of the data.
-          this.fetchTotalBalance();
-          this.fetchTandZTransactions(latestBlockHeight);
+          this.loadWalletData(latestBlockHeight);
 
           this.lastBlockHeight = walletHeight;
 
@@ -137,8 +150,7 @@ export default class RPC {
         } else {
           // If we're doing a long sync, every 10,000 blocks, update the UI
           if (nextIntermittentRefresh && walletHeight > nextIntermittentRefresh) {
-            this.fetchTotalBalance();
-            this.fetchTandZTransactions(walletHeight);
+            this.loadWalletData(walletHeight);
 
             // And save the wallet so we don't lose sync status.
             // The wallet has to be saved by the android/ios code
