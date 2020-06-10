@@ -24,6 +24,7 @@ type LoadingProps = {
 
 type LoadingState = {
   screen: number;
+  actionButtonsDisabled: boolean;
   walletExists: boolean;
   seedPhrase: string | null;
   birthday: string;
@@ -35,6 +36,7 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
 
     this.state = {
       screen: 0,
+      actionButtonsDisabled: false,
       walletExists: false,
       seedPhrase: null,
       birthday: '0',
@@ -69,13 +71,18 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
     });
   };
 
-  createNewWallet = async () => {
-    const seed = await RPCModule.createNewWallet();
-    if (!seed.startsWith('Error')) {
-      this.setState({seedPhrase: seed, screen: 2});
-    } else {
-      Alert.alert('Error creating Wallet', seed);
-    }
+  createNewWallet = () => {
+    this.setState({actionButtonsDisabled: true});
+
+    setTimeout(async () => {
+      const seed = await RPCModule.createNewWallet();
+      if (!seed.startsWith('Error')) {
+        this.setState({seedPhrase: seed, screen: 2});
+      } else {
+        this.setState({actionButtonsDisabled: false});
+        Alert.alert('Error creating Wallet', seed);
+      }
+    });
   };
 
   getSeedPhraseToRestore = async () => {
@@ -91,12 +98,16 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
       return;
     }
 
-    const error = await RPCModule.restoreWallet(seedPhrase.toLowerCase(), birthday || '0');
-    if (!error.startsWith('Error')) {
-      this.navigateToLoaded();
-    } else {
-      Alert.alert('Error reading Wallet', error);
-    }
+    this.setState({actionButtonsDisabled: true});
+    setTimeout(async () => {
+      const error = await RPCModule.restoreWallet(seedPhrase.toLowerCase(), birthday || '0');
+      if (!error.startsWith('Error')) {
+        this.navigateToLoaded();
+      } else {
+        this.setState({actionButtonsDisabled: false});
+        Alert.alert('Error reading Wallet', error);
+      }
+    });
   };
 
   loadWallet = () => {
@@ -104,7 +115,7 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
   };
 
   render() {
-    const {screen, birthday, seedPhrase} = this.state;
+    const {screen, birthday, seedPhrase, actionButtonsDisabled} = this.state;
 
     return (
       <View
@@ -134,7 +145,7 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
               <BoldText>Zecwallet Lite Mobile</BoldText>
             </View>
 
-            <PrimaryButton title="Create New Wallet" onPress={this.createNewWallet} />
+            <PrimaryButton title="Create New Wallet" disabled={actionButtonsDisabled} onPress={this.createNewWallet} />
             <View style={[cstyles.margintop]}>
               <PrimaryButton title="Restore Seed" onPress={this.getSeedPhraseToRestore} />
             </View>
@@ -191,7 +202,7 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
               onChangeText={(text: string) => this.setState({birthday: text})}
             />
             <View style={cstyles.margintop}>
-              <PrimaryButton title="Restore Wallet" onPress={this.doRestore} />
+              <PrimaryButton title="Restore Wallet" disabled={actionButtonsDisabled} onPress={this.doRestore} />
             </View>
           </ScrollView>
         )}

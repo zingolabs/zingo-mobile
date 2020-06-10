@@ -210,7 +210,7 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
 
   refreshUpdates = (block: number, total: number) => {
     const syncingStatus: SyncStatus = {
-      isSyncing: total - block > 1000,
+      isSyncing: total - block > 100,
       walletHeight: block,
       toalHeight: total,
     };

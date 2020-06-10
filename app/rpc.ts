@@ -128,8 +128,8 @@ export default class RPC {
         nextIntermittentRefresh = this.lastBlockHeight + BLOCK_BATCH_SIZE;
       }
 
-      // We need to wait for the sync to finish. The way we know the sync is done is
-      // if the height matches the latestBlockHeight
+      // We need to wait for the sync to finish. The sync is done when
+      // inRefresh is set to false in the doSync().finally()
       const pollerID = setInterval(async () => {
         const walletHeight = await RPC.fetchWalletHeight();
 
@@ -150,8 +150,6 @@ export default class RPC {
         } else {
           // If we're doing a long sync, every 10,000 blocks, update the UI
           if (nextIntermittentRefresh && walletHeight > nextIntermittentRefresh) {
-            this.loadWalletData(walletHeight);
-
             // And save the wallet so we don't lose sync status.
             // The wallet has to be saved by the android/ios code
             RPCModule.doSave();
