@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import {View, ScrollView, SafeAreaView} from 'react-native';
+import {View, ScrollView, SafeAreaView, Image} from 'react-native';
 import {PrimaryButton, BoldText, RegText} from './Components';
 import {useTheme} from '@react-navigation/native';
 
@@ -26,6 +26,13 @@ const AboutModal: React.FunctionComponent<AboutModalProps> = ({closeModal}) => {
           justifyContent: 'flex-start',
           margin: 10,
         }}>
+        <View style={{display: 'flex', alignItems: 'center'}}>
+          <Image
+            source={require('../assets/img/logobig.png')}
+            style={{width: 100, height: 100, resizeMode: 'contain'}}
+          />
+        </View>
+
         <BoldText>Zecwallet Lite v1.0.9</BoldText>
 
         <RegText>
