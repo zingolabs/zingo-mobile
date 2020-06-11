@@ -33,7 +33,7 @@ const AboutModal: React.FunctionComponent<AboutModalProps> = ({closeModal}) => {
           />
         </View>
 
-        <BoldText>Zecwallet Lite v1.0.9</BoldText>
+        <BoldText>Zecwallet Lite v1.0.12</BoldText>
 
         <RegText>
           {'\n'}
