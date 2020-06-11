@@ -18,7 +18,7 @@ type TxDetailProps = {
 };
 const TxDetail: React.FunctionComponent<TxDetailProps> = ({tx, price, closeModal}) => {
   const {colors} = useTheme();
-  const spendColor = tx?.confirmations === 0 ? 'yellow' : (tx?.amount || 0) > 0 ? '#88ee88' : '#ff6666';
+  const spendColor = tx?.confirmations === 0 ? colors.primary : (tx?.amount || 0) > 0 ? '#88ee88' : '#ff6666';
 
   const [expandAddress, setExpandAddress] = useState(false);
   const [expandTxid, setExpandTxid] = useState(false);
@@ -159,8 +159,8 @@ type TxSummaryLineProps = {
 const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({tx, setTxDetail, setTxDetailModalShowing}) => {
   const {colors} = useTheme();
 
-  const lineColor = tx.confirmations === 0 ? 'yellow' : tx.amount > 0 ? '#88ee88' : '#ff6666';
-  const amountColor = tx.confirmations === 0 ? 'yellow' : tx.amount > 0 ? '#88ee88' : colors.text;
+  const lineColor = tx.confirmations === 0 ? colors.primary : tx.amount > 0 ? '#88ee88' : '#ff6666';
+  const amountColor = tx.confirmations === 0 ? colors.primary : tx.amount > 0 ? '#88ee88' : colors.text;
 
   const displayAddress =
     tx.detailedTxns && tx.detailedTxns.length > 0 ? Utils.trimToSmall(tx.detailedTxns[0].address, 7) : 'Unknown';
@@ -235,7 +235,7 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
     ? `Syncing ${syncingStatus?.walletHeight}/${syncingStatus?.toalHeight}`
     : 'Balance';
 
-  const balanceColor = transactions?.find((t) => t.confirmations === 0) ? 'yellow' : colors.text;
+  const balanceColor = transactions?.find((t) => t.confirmations === 0) ? colors.primary : colors.text;
 
   return (
     <View style={{display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', marginBottom: 170}}>
