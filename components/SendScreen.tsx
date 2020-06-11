@@ -13,7 +13,7 @@ import {
   UsdAmount,
 } from '../components/Components';
 import {Info, SendPageState, TotalBalance} from '../app/AppState';
-import {faQrcode, faCheck, faArrowAltCircleUp} from '@fortawesome/free-solid-svg-icons';
+import {faQrcode, faCheck, faArrowAltCircleUp, faInfo} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {useTheme} from '@react-navigation/native';
 import {NavigationScreenProp} from 'react-navigation';
@@ -266,17 +266,22 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
         clearToAddrs();
 
         navigation.navigate('WALLET');
-        Toast.show(`Successfully Broadcast Tx: ${txid}`, Toast.LONG);
+        setTimeout(() => {
+          Toast.show(`Successfully Broadcast Tx: ${txid}`, Toast.LONG);
+        }, 1000);
       } catch (err) {
-        console.log('sendtx error', err);
-
-        setComputingModalVisible(false);
-        Alert.alert('Error sending Tx', `${err}`);
+        setTimeout(() => {
+          console.log('sendtx error', err);
+          Alert.alert('Error sending Tx', `${err}`, [{text: 'OK', onPress: () => setComputingModalVisible(false)}], {
+            cancelable: false,
+          });
+        }, 1000);
       }
-    }, 100);
+    });
   };
 
   const spendable = totalBalance.transparentBal + totalBalance.verifiedPrivate;
+  const stillConfirming = spendable !== totalBalance.total;
 
   const setMaxAmount = () => {
     updateToField(null, Utils.maxPrecisionTrimmed(spendable - Utils.getDefaultFee()), null);
@@ -301,7 +306,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
   if (toaddr.amount !== '') {
     if (
       Utils.parseLocaleFloat(toaddr.amount) > 0 &&
-      Utils.parseLocaleFloat(toaddr.amount) <= spendable + Utils.getDefaultFee()
+      Utils.parseLocaleFloat(toaddr.amount) <= spendable - Utils.getDefaultFee()
     ) {
       amountValidationState = 1;
     } else {
@@ -403,6 +408,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
             )}
             {amountValidationState === -1 && <ErrorText>Invalid Amount!</ErrorText>}
           </View>
+
           <View
             style={{
               display: 'flex',
@@ -423,6 +429,20 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
               <FontAwesomeIcon style={{margin: 5}} size={24} icon={faArrowAltCircleUp} color={colors.text} />
             </TouchableOpacity>
           </View>
+          {stillConfirming && (
+            <View
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                marginTop: 5,
+                backgroundColor: colors.card,
+                padding: 5,
+                borderRadius: 10,
+              }}>
+              <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
+              <FadeText>Some funds are still confirming</FadeText>
+            </View>
+          )}
 
           {memoEnabled && (
             <>
