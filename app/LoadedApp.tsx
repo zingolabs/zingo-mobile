@@ -452,16 +452,16 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
         </Modal>
 
         <Tab.Navigator
-          initialRouteName="Transactions"
+          initialRouteName="WALLET"
           screenOptions={({route}) => ({
             tabBarIcon: ({focused}) => {
               var iconName;
 
-              if (route.name === 'Transactions') {
+              if (route.name === 'WALLET') {
                 iconName = faList;
-              } else if (route.name === 'Send') {
+              } else if (route.name === 'SEND') {
                 iconName = faUpload;
-              } else if (route.name === 'Receive') {
+              } else if (route.name === 'RECEIVE') {
                 iconName = faDownload;
               } else {
                 iconName = faCog;
@@ -477,7 +477,7 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
             inactiveTintColor: '#777777',
             labelStyle: {fontSize: 14},
           }}>
-          <Tab.Screen name="Send">
+          <Tab.Screen name="SEND">
             {(props) => (
               <SendScreen
                 {...props}
@@ -490,7 +490,7 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
               />
             )}
           </Tab.Screen>
-          <Tab.Screen name="Transactions">
+          <Tab.Screen name="WALLET">
             {(props) => (
               <TransactionsScreen
                 {...props}
@@ -502,7 +502,7 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
               />
             )}
           </Tab.Screen>
-          <Tab.Screen name="Receive">
+          <Tab.Screen name="RECEIVE">
             {(props) => <ReceiveScreen {...props} {...standardProps} addresses={addresses} />}
           </Tab.Screen>
         </Tab.Navigator>

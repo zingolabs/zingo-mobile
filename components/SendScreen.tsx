@@ -265,7 +265,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
         // Clear the fields
         clearToAddrs();
 
-        navigation.navigate('Transactions');
+        navigation.navigate('WALLET');
         Toast.show(`Successfully Broadcast Tx: ${txid}`, Toast.LONG);
       } catch (err) {
         console.log('sendtx error', err);
@@ -299,7 +299,10 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
 
   var amountValidationState: number;
   if (toaddr.amount !== '') {
-    if (Utils.parseLocaleFloat(toaddr.amount) > 0 && Utils.parseLocaleFloat(toaddr.amount) <= spendable + Utils.getDefaultFee()) {
+    if (
+      Utils.parseLocaleFloat(toaddr.amount) > 0 &&
+      Utils.parseLocaleFloat(toaddr.amount) <= spendable + Utils.getDefaultFee()
+    ) {
       amountValidationState = 1;
     } else {
       amountValidationState = -1;

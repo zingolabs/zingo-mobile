@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useState, useEffect} from 'react';
-import {Button, Text, TextInput, View, Platform} from 'react-native';
+import {TouchableOpacity, Text, TextInput, View, Platform} from 'react-native';
 import {useTheme} from '@react-navigation/native';
 import Utils from '../app/utils';
 
@@ -61,9 +61,16 @@ export const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({color, style
   );
 };
 
-export const PrimaryButton: React.FunctionComponent<any> = (props) => {
+export const PrimaryButton: React.FunctionComponent<any> = ({title, onPress}) => {
   const {colors} = useTheme();
-  return <Button {...props} color={colors.primary} />;
+
+  return (
+    <TouchableOpacity
+      style={{backgroundColor: colors.primary, padding: 10, paddingLeft: 20, paddingRight: 20, borderRadius: 10}}
+      onPress={onPress}>
+      <Text style={{color: colors.background, textTransform: 'uppercase'}}>{title}</Text>
+    </TouchableOpacity>
+  );
 };
 
 export const BoldText: React.FunctionComponent<any> = ({style, children}) => {

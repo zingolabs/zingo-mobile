@@ -217,6 +217,7 @@ const ZecwalletTheme = {
     ...DarkTheme.colors,
     background: '#212124',
     card: '#353535',
+    border: '#454545',
     primary: '#c3921f',
     text: '#FFFFFF',
   },

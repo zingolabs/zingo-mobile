@@ -41,8 +41,10 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({tx, price, closeModal
           justifyContent: 'flex-start',
         }}>
         <View style={{display: 'flex', alignItems: 'center', padding: 10, backgroundColor: colors.card}}>
-          <RegText color={spendColor}>{tx?.type}</RegText>
-          <ZecAmount amtZec={tx?.amount} />
+          <RegText style={{textTransform: 'capitalize'}} color={spendColor}>
+            {tx?.type}
+          </RegText>
+          <ZecAmount size={36} amtZec={tx?.amount} />
           <UsdAmount amtZec={tx?.amount} price={price} />
         </View>
 
@@ -97,8 +99,8 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({tx, price, closeModal
                       }
                     }}>
                     <View style={{display: 'flex', flexDirection: 'row', flexWrap: 'wrap'}}>
-                      {Utils.splitAddressIntoChunks(txd.address, 9).map((c) => {
-                        return <RegText>{c} </RegText>;
+                      {Utils.splitAddressIntoChunks(txd.address, 9).map((c, idx) => {
+                        return <RegText key={idx}>{c} </RegText>;
                       })}
                     </View>
                   </TouchableOpacity>
@@ -166,7 +168,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({tx, setTxDe
           marginTop: 15,
           paddingBottom: 15,
           borderBottomWidth: 1,
-          borderBottomColor: colors.card,
+          borderBottomColor: colors.border,
         }}>
         <View
           style={{
