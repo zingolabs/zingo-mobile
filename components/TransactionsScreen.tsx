@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React from 'react';
+import React, {useState} from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import {RegText, ZecAmount, UsdAmount, PrimaryButton, FadeText} from '../components/Components';
 import {View, ScrollView, Image, Modal, TouchableOpacity, SafeAreaView, RefreshControl, Clipboard} from 'react-native';
@@ -19,6 +19,9 @@ type TxDetailProps = {
 const TxDetail: React.FunctionComponent<TxDetailProps> = ({tx, price, closeModal}) => {
   const {colors} = useTheme();
   const spendColor = tx?.confirmations === 0 ? 'yellow' : (tx?.amount || 0) > 0 ? '#88ee88' : '#ff6666';
+
+  const [expandAddress, setExpandAddress] = useState(false);
+  const [expandTxid, setExpandTxid] = useState(false);
 
   const fee =
     tx?.type === 'sent' &&
@@ -52,7 +55,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({tx, price, closeModal
           <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: 10}}>
             <View style={{display: 'flex'}}>
               <FadeText>Time</FadeText>
-              <Moment interval={0} format="D MMM h:mm a" element={RegText}>
+              <Moment interval={0} format="D MMM YYYY h:mm a" element={RegText}>
                 {(tx?.time || 0) * 1000}
               </Moment>
             </View>
@@ -69,9 +72,13 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({tx, price, closeModal
                 if (tx?.txid) {
                   Clipboard.setString(tx?.txid);
                   Toast.show('Copied TxID to Clipboard', Toast.LONG);
+                  setExpandTxid(true);
                 }
               }}>
-              <RegText>{Utils.trimToSmall(tx?.txid, 10)}</RegText>
+              <RegText>
+                {!expandTxid && Utils.trimToSmall(tx?.txid, 10)}
+                {expandTxid && tx?.txid}
+              </RegText>
             </TouchableOpacity>
           </View>
 
@@ -96,12 +103,15 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({tx, price, closeModal
                       if (txd.address) {
                         Clipboard.setString(txd.address);
                         Toast.show('Copied Address to Clipboard', Toast.LONG);
+                        setExpandAddress(true);
                       }
                     }}>
                     <View style={{display: 'flex', flexDirection: 'row', flexWrap: 'wrap'}}>
-                      {Utils.splitAddressIntoChunks(txd.address, 9).map((c, idx) => {
-                        return <RegText key={idx}>{c} </RegText>;
-                      })}
+                      {expandAddress &&
+                        Utils.splitAddressIntoChunks(txd.address, 9).map((c, idx) => {
+                          return <RegText key={idx}>{c} </RegText>;
+                        })}
+                      {!expandAddress && <RegText>{Utils.trimToSmall(txd.address, 10)}</RegText>}
                     </View>
                   </TouchableOpacity>
                 </View>
@@ -173,15 +183,15 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({tx, setTxDe
         <View
           style={{
             width: 2,
-            marginRight: 5,
+            marginRight: 15,
             backgroundColor: lineColor,
           }}
         />
         <View style={{display: 'flex'}}>
-          <RegText>
+          <FadeText style={{fontSize: 18}}>
             {tx.type === 'sent' ? 'Sent to ' : 'Received to '}
             {displayAddress}
-          </RegText>
+          </FadeText>
           <Moment interval={0} format="D MMM h:mm a" element={FadeText}>
             {(tx?.time || 0) * 1000}
           </Moment>
@@ -258,7 +268,7 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
           <RefreshControl refreshing={false} onRefresh={doRefresh} tintColor={colors.text} title="Refreshing" />
         }
         style={{flexGrow: 1, marginTop: 10, width: '100%', height: '100%'}}>
-        {transactions?.map((t) => {
+        {transactions?.flatMap((t) => {
           return (
             <TxSummaryLine
               key={`${t.txid}-${t.type}`}

@@ -476,6 +476,7 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
             activeBackgroundColor: '#c3921f',
             inactiveTintColor: '#777777',
             labelStyle: {fontSize: 14},
+            tabStyle: {borderRadius: 10},
           }}>
           <Tab.Screen name="SEND">
             {(props) => (

@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import {View, Dimensions, Clipboard, Platform} from 'react-native';
+import {View, Dimensions, Clipboard, Platform, Image} from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import {TabView, TabBar} from 'react-native-tab-view';
 import Toast from 'react-native-simple-toast';
@@ -27,7 +27,7 @@ const SingleAddressDisplay: React.FunctionComponent<SingleAddress> = ({address})
   return (
     <View style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
       <View style={{padding: 10, backgroundColor: 'rgb(255, 255, 255)', marginTop: 20}}>
-        <QRCode value={address} size={300} ecl="M" />
+        <QRCode value={address} size={250} ecl="M" />
       </View>
       <TouchableOpacity
         onPress={() => {
@@ -84,11 +84,19 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({addresses})
   };
 
   const renderTabBar: (props: any) => JSX.Element = (props) => (
-    <TabBar
-      {...props}
-      indicatorStyle={{backgroundColor: colors.primary}}
-      style={{backgroundColor: colors.background}}
-    />
+    <View>
+      <View style={{alignItems: 'center', backgroundColor: colors.card, paddingBottom: 25}}>
+        <RegText style={{marginTop: 5, padding: 5}}>Wallet Address</RegText>
+      </View>
+      <View style={{display: 'flex', alignItems: 'center', marginTop: -25}}>
+        <Image source={require('../assets/img/logobig.png')} style={{width: 50, height: 50, resizeMode: 'contain'}} />
+      </View>
+      <TabBar
+        {...props}
+        indicatorStyle={{backgroundColor: colors.primary}}
+        style={{backgroundColor: colors.background}}
+      />
+    </View>
   );
 
   return (
