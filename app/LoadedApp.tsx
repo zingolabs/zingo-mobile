@@ -467,12 +467,13 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
                 iconName = faCog;
               }
 
-              const iconColor = focused ? '#c3921f' : '#aaaaaa';
+              const iconColor = focused ? '#000000' : '#aaaaaa';
               return <FontAwesomeIcon icon={iconName} color={iconColor} />;
             },
           })}
           tabBarOptions={{
-            activeTintColor: '#c3921f',
+            activeTintColor: '#000000',
+            activeBackgroundColor: '#c3921f',
             inactiveTintColor: '#777777',
             labelStyle: {fontSize: 14},
           }}>
