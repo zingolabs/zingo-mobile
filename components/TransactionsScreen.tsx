@@ -2,7 +2,8 @@
 import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import {RegText, ZecAmount, UsdAmount, PrimaryButton, FadeText} from '../components/Components';
-import {View, ScrollView, Image, Modal, TouchableOpacity, SafeAreaView, RefreshControl} from 'react-native';
+import {View, ScrollView, Image, Modal, TouchableOpacity, SafeAreaView, RefreshControl, Clipboard} from 'react-native';
+import Toast from 'react-native-simple-toast';
 import {TotalBalance, Transaction, Info, SyncStatus} from '../app/AppState';
 import Utils from '../app/utils';
 import Moment from 'react-moment';
@@ -38,69 +39,98 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({tx, price, closeModal
           flexDirection: 'column',
           alignItems: 'stretch',
           justifyContent: 'flex-start',
-          margin: 10,
         }}>
-        <View style={{display: 'flex', alignItems: 'center'}}>
+        <View style={{display: 'flex', alignItems: 'center', padding: 10, backgroundColor: colors.card}}>
           <RegText color={spendColor}>{tx?.type}</RegText>
           <ZecAmount amtZec={tx?.amount} />
           <UsdAmount amtZec={tx?.amount} price={price} />
         </View>
 
-        <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: 10}}>
-          <View style={{display: 'flex'}}>
-            <FadeText>Time</FadeText>
-            <Moment interval={0} format="D MMM h:mm a" element={RegText}>
-              {(tx?.time || 0) * 1000}
-            </Moment>
-          </View>
-          <View style={{display: 'flex', alignItems: 'flex-end'}}>
-            <FadeText>Confirmations</FadeText>
-            <RegText>{tx?.confirmations}</RegText>
-          </View>
-        </View>
-
-        <View style={{display: 'flex', marginTop: 10}}>
-          <FadeText>TxID</FadeText>
-          <RegText>{Utils.trimToSmall(tx?.txid, 10)}</RegText>
-        </View>
-
-        {tx?.detailedTxns.map((txd) => {
-          return (
-            <View
-              key={txd.address}
-              style={{display: 'flex', marginTop: 10, backgroundColor: colors.card, padding: 5, paddingBottom: 15}}>
-              <View style={{marginTop: 10}}>
-                <FadeText>Address</FadeText>
-                <RegText>{txd.address}</RegText>
-              </View>
-
-              <View style={{marginTop: 10}}>
-                <FadeText>Amount</FadeText>
-                <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
-                  <ZecAmount amtZec={txd?.amount} size={18} />
-                  <UsdAmount style={{fontSize: 18}} amtZec={txd?.amount} price={price} />
-                </View>
-              </View>
-
-              {txd?.memo && (
-                <View style={{marginTop: 10}}>
-                  <FadeText>Memo</FadeText>
-                  <RegText>{txd?.memo}</RegText>
-                </View>
-              )}
+        <View style={{margin: 10}}>
+          <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: 10}}>
+            <View style={{display: 'flex'}}>
+              <FadeText>Time</FadeText>
+              <Moment interval={0} format="D MMM h:mm a" element={RegText}>
+                {(tx?.time || 0) * 1000}
+              </Moment>
             </View>
-          );
-        })}
-
-        {fee && (
-          <View style={{display: 'flex', marginTop: 10}}>
-            <FadeText>Tx Fee</FadeText>
-            <ZecAmount amtZec={fee} size={18} />
+            <View style={{display: 'flex', alignItems: 'flex-end'}}>
+              <FadeText>Confirmations</FadeText>
+              <RegText>{tx?.confirmations}</RegText>
+            </View>
           </View>
-        )}
 
-        <View style={{padding: 25}} />
+          <View style={{display: 'flex', marginTop: 10}}>
+            <FadeText>TxID</FadeText>
+            <TouchableOpacity
+              onPress={() => {
+                if (tx?.txid) {
+                  Clipboard.setString(tx?.txid);
+                  Toast.show('Copied TxID to Clipboard', Toast.LONG);
+                }
+              }}>
+              <RegText>{Utils.trimToSmall(tx?.txid, 10)}</RegText>
+            </TouchableOpacity>
+          </View>
 
+          {tx?.detailedTxns.map((txd) => {
+            return (
+              <View
+                key={txd.address}
+                style={{
+                  display: 'flex',
+                  marginTop: 10,
+                  paddingBottom: 15,
+                  borderTopColor: colors.card,
+                  borderTopWidth: 1,
+                  borderBottomColor: colors.card,
+                  borderBottomWidth: 1,
+                }}>
+                <View style={{marginTop: 10}}>
+                  <FadeText>Address</FadeText>
+
+                  <TouchableOpacity
+                    onPress={() => {
+                      if (txd.address) {
+                        Clipboard.setString(txd.address);
+                        Toast.show('Copied Address to Clipboard', Toast.LONG);
+                      }
+                    }}>
+                    <View style={{display: 'flex', flexDirection: 'row', flexWrap: 'wrap'}}>
+                      {Utils.splitAddressIntoChunks(txd.address, 9).map((c) => {
+                        return <RegText>{c} </RegText>;
+                      })}
+                    </View>
+                  </TouchableOpacity>
+                </View>
+
+                <View style={{marginTop: 10}}>
+                  <FadeText>Amount</FadeText>
+                  <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
+                    <ZecAmount amtZec={txd?.amount} size={18} />
+                    <UsdAmount style={{fontSize: 18}} amtZec={txd?.amount} price={price} />
+                  </View>
+                </View>
+
+                {txd?.memo && (
+                  <View style={{marginTop: 10}}>
+                    <FadeText>Memo</FadeText>
+                    <RegText>{txd?.memo}</RegText>
+                  </View>
+                )}
+              </View>
+            );
+          })}
+
+          {fee && (
+            <View style={{display: 'flex', marginTop: 10}}>
+              <FadeText>Tx Fee</FadeText>
+              <ZecAmount amtZec={fee} size={18} />
+            </View>
+          )}
+
+          <View style={{padding: 25}} />
+        </View>
       </ScrollView>
       <View style={{flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', margin: 10}}>
         <PrimaryButton title="Close" onPress={closeModal} />
@@ -115,30 +145,50 @@ type TxSummaryLineProps = {
   setTxDetailModalShowing: React.Dispatch<React.SetStateAction<boolean>>;
 };
 const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({tx, setTxDetail, setTxDetailModalShowing}) => {
-  const spendColor = tx.confirmations === 0 ? 'yellow' : tx.amount > 0 ? '#88ee88' : '#ff6666';
+  const {colors} = useTheme();
+
+  const lineColor = tx.confirmations === 0 ? 'yellow' : tx.amount > 0 ? '#88ee88' : '#ff6666';
+  const amountColor = tx.confirmations === 0 ? 'yellow' : tx.amount > 0 ? '#88ee88' : colors.text;
+
+  const displayAddress =
+    tx.detailedTxns && tx.detailedTxns.length > 0 ? Utils.trimToSmall(tx.detailedTxns[0].address, 7) : 'Unknown';
+
   return (
     <TouchableOpacity
       onPress={() => {
         setTxDetail(tx);
         setTxDetailModalShowing(true);
       }}>
-      <View style={{display: 'flex', flexDirection: 'row', marginTop: 5}}>
+      <View
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          marginTop: 15,
+          paddingBottom: 15,
+          borderBottomWidth: 1,
+          borderBottomColor: colors.card,
+        }}>
         <View
           style={{
             width: 2,
             marginRight: 5,
-            backgroundColor: spendColor,
+            backgroundColor: lineColor,
           }}
         />
-        <Moment fromNow ago interval={0} element={RegText}>
-          {tx.time * 1000}
-        </Moment>
-        <RegText> ago</RegText>
+        <View style={{display: 'flex'}}>
+          <RegText>
+            {tx.type === 'sent' ? 'Sent to ' : 'Received to '}
+            {displayAddress}
+          </RegText>
+          <Moment interval={0} format="D MMM h:mm a" element={FadeText}>
+            {(tx?.time || 0) * 1000}
+          </Moment>
+        </View>
         <ZecAmount
           style={{flexGrow: 1, alignSelf: 'baseline', justifyContent: 'flex-end', paddingRight: 5}}
           size={18}
           zecSymbol={'ᙇ'}
-          color={spendColor}
+          color={amountColor}
           amtZec={tx.amount}
         />
       </View>
