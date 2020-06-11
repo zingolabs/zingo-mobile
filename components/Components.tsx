@@ -68,7 +68,7 @@ export const PrimaryButton: React.FunctionComponent<any> = ({title, onPress}) =>
     <TouchableOpacity
       style={{backgroundColor: colors.primary, padding: 10, paddingLeft: 20, paddingRight: 20, borderRadius: 10}}
       onPress={onPress}>
-      <Text style={{color: colors.background, textTransform: 'uppercase'}}>{title}</Text>
+      <Text style={{color: colors.background, fontWeight: 'bold', textTransform: 'uppercase'}}>{title}</Text>
     </TouchableOpacity>
   );
 };
