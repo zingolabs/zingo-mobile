@@ -61,13 +61,19 @@ export const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({color, style
   );
 };
 
-export const PrimaryButton: React.FunctionComponent<any> = ({title, onPress}) => {
+export const PrimaryButton: React.FunctionComponent<any> = ({title, disabled, onPress}) => {
   const {colors} = useTheme();
 
   return (
     <TouchableOpacity
-      style={{backgroundColor: colors.primary, padding: 10, paddingLeft: 20, paddingRight: 20, borderRadius: 10}}
-      onPress={onPress}>
+      style={{
+        backgroundColor: disabled ? 'grey' : colors.primary,
+        padding: 10,
+        paddingLeft: 20,
+        paddingRight: 20,
+        borderRadius: 10,
+      }}
+      onPress={() => !disabled && onPress()}>
       <Text style={{color: colors.background, fontWeight: 'bold', textTransform: 'uppercase'}}>{title}</Text>
     </TouchableOpacity>
   );
@@ -91,7 +97,7 @@ export const BoldText: React.FunctionComponent<any> = ({style, children}) => {
 export const FadeText: React.FunctionComponent<any> = (props) => {
   const {colors} = useTheme();
 
-  return <Text style={{...props.style, opacity: 0.65, color: colors.text}}>{props.children}</Text>;
+  return <Text style={{opacity: 0.65, color: colors.text, ...props.style}}>{props.children}</Text>;
 };
 
 export const ErrorText: React.FunctionComponent<any> = (props) => {
