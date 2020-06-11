@@ -376,11 +376,18 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
             {addressValidationState === 1 && <FontAwesomeIcon icon={faCheck} color="green" />}
             {addressValidationState === -1 && <ErrorText>Invalid Address!</ErrorText>}
           </View>
-          <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-start'}}>
+          <View
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'flex-start',
+              borderBottomColor: '#ffffff',
+              borderBottomWidth: 2,
+            }}>
             <RegTextInput
-              placeholder="ZEC z-address or t-address"
+              placeholder="z-address or t-address"
               placeholderTextColor="#777777"
-              style={{flexGrow: 1, maxWidth: '90%', borderBottomColor: '#ffffff', borderBottomWidth: 2}}
+              style={{flexGrow: 1, maxWidth: '90%'}}
               value={sendPageState.toaddrs[0].to}
               onChangeText={(text: string) => updateToField(text, null, null)}
             />
@@ -396,12 +403,19 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
             )}
             {amountValidationState === -1 && <ErrorText>Invalid Amount!</ErrorText>}
           </View>
-          <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-start'}}>
+          <View
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'flex-start',
+              borderBottomColor: '#ffffff',
+              borderBottomWidth: 2,
+            }}>
             <RegTextInput
               placeholder="0.0"
               placeholderTextColor="#777777"
               keyboardType="numeric"
-              style={{flexGrow: 1, maxWidth: '90%', borderBottomColor: '#ffffff', borderBottomWidth: 2}}
+              style={{flexGrow: 1, maxWidth: '90%'}}
               value={sendPageState.toaddrs[0].amount.toString()}
               onChangeText={(text: string) => updateToField(null, text, null)}
             />

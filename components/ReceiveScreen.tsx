@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import {View, Dimensions, Clipboard, Platform, Image} from 'react-native';
+import {View, Dimensions, Clipboard, Platform, Image, Text} from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import {TabView, TabBar} from 'react-native-tab-view';
 import Toast from 'react-native-simple-toast';
@@ -86,7 +86,7 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({addresses})
   const renderTabBar: (props: any) => JSX.Element = (props) => (
     <View>
       <View style={{alignItems: 'center', backgroundColor: colors.card, paddingBottom: 25}}>
-        <RegText style={{marginTop: 5, padding: 5}}>Wallet Address</RegText>
+        <Text style={{marginTop: 5, padding: 5, color: colors.text, fontSize: 28}}>Wallet Address</Text>
       </View>
       <View style={{display: 'flex', alignItems: 'center', marginTop: -25}}>
         <Image source={require('../assets/img/logobig.png')} style={{width: 50, height: 50, resizeMode: 'contain'}} />
