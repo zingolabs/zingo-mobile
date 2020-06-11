@@ -20,6 +20,7 @@ import {NavigationScreenProp} from 'react-navigation';
 import Utils from '../app/utils';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import Toast from 'react-native-simple-toast';
+import {getNumberFormatSettings} from 'react-native-localize';
 
 type ScannerProps = {
   updateToField: (address: string | null, amount: string | null, memo: string | null) => void;
@@ -317,6 +318,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
   }
 
   const sendButtonEnabled = addressValidationState === 1 && amountValidationState === 1;
+  const {decimalSeparator} = getNumberFormatSettings();
 
   return (
     <View
@@ -418,7 +420,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
               borderBottomWidth: 2,
             }}>
             <RegTextInput
-              placeholder="0.0"
+              placeholder={`0${decimalSeparator}0`}
               placeholderTextColor="#777777"
               keyboardType="numeric"
               style={{flexGrow: 1, maxWidth: '90%'}}

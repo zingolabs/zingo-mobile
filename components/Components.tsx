@@ -23,7 +23,7 @@ export const UsdAmount: React.FunctionComponent<UsdAmountProps> = ({price, style
     }
   }
 
-  return <Text style={{color: colors.text, ...style}}>$ {usdString}</Text>;
+  return <Text style={{color: colors.text, ...style}}>$ {Utils.toLocaleFloat(usdString)}</Text>;
 };
 
 type ZecAmountProps = {
@@ -54,7 +54,7 @@ export const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({color, style
   return (
     <View style={{...style, flexDirection: 'row', alignItems: 'baseline'}}>
       <Text style={{fontSize: size, color}}>
-        {zecSymbol} {splits.bigPart}
+        {zecSymbol} {Utils.toLocaleFloat(splits.bigPart)}
       </Text>
       <Text style={{fontSize: size / 2, color, paddingBottom: alignmentPadding}}>{splits.smallPart}</Text>
     </View>

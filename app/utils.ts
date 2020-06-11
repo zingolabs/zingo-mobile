@@ -185,4 +185,13 @@ export default class Utils {
         .replace(new RegExp(`\\${decimalSeparator}`), '.'),
     );
   }
+
+  static toLocaleFloat(stringNumber: string): string {
+    const {decimalSeparator, groupingSeparator} = getNumberFormatSettings();
+
+    return stringNumber
+      .replace(new RegExp(',', 'g'), '_')
+      .replace(new RegExp('\\.'), decimalSeparator)
+      .replace(new RegExp('_', 'g'), groupingSeparator);
+  }
 }
