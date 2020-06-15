@@ -144,7 +144,7 @@ const ConfirmModalContent: React.FunctionComponent<ConfirmModalProps> = ({
             padding: 10,
             borderWidth: 1,
             borderRadius: 10,
-            borderColor: colors.text,
+            borderColor: colors.border,
           }}>
           <BoldText style={{textAlign: 'center'}}>Sending</BoldText>
 
@@ -154,7 +154,10 @@ const ConfirmModalContent: React.FunctionComponent<ConfirmModalProps> = ({
         {sendPageState.toaddrs.map((to) => {
           return (
             <View key={to.id} style={{margin: 10}}>
+              <FadeText>To</FadeText>
               <RegText>{Utils.splitAddressIntoChunks(to.to, 8).join(' ')}</RegText>
+
+              <FadeText style={{marginTop: 10}}>Amount</FadeText>
               <View
                 style={{
                   display: 'flex',
@@ -163,8 +166,8 @@ const ConfirmModalContent: React.FunctionComponent<ConfirmModalProps> = ({
                   alignItems: 'baseline',
                   marginTop: 5,
                 }}>
-                <ZecAmount amtZec={Utils.parseLocaleFloat(to.amount)} />
-                <UsdAmount amtZec={Utils.parseLocaleFloat(to.amount)} price={price} />
+                <ZecAmount size={18} amtZec={Utils.parseLocaleFloat(to.amount)} />
+                <UsdAmount style={{fontSize: 18}} amtZec={Utils.parseLocaleFloat(to.amount)} price={price} />
               </View>
               <RegText>{to.memo || ''}</RegText>
             </View>
@@ -175,8 +178,8 @@ const ConfirmModalContent: React.FunctionComponent<ConfirmModalProps> = ({
           <FadeText>Fee</FadeText>
           <View
             style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline'}}>
-            <ZecAmount amtZec={Utils.getDefaultFee()} />
-            <UsdAmount amtZec={Utils.getDefaultFee()} price={price} />
+            <ZecAmount size={18} amtZec={Utils.getDefaultFee()} />
+            <UsdAmount style={{fontSize: 18}} amtZec={Utils.getDefaultFee()} price={price} />
           </View>
         </View>
       </ScrollView>

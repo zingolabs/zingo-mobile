@@ -33,7 +33,7 @@ const SeedComponent: React.FunctionComponent<SeedComponentProps> = ({seed, birth
         </View>
       </View>
 
-      <FadeText style={{marginTop: 20, textAlign: 'center'}}>
+      <FadeText style={{marginTop: 20, padding: 10, textAlign: 'center'}}>
         This is your seed phrase. Please write it down carefully. It is the only way to restore your wallet.
       </FadeText>
       <TouchableOpacity
