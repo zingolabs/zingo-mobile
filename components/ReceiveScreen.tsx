@@ -4,7 +4,7 @@ import {View, Dimensions, Clipboard, Platform, Image, Text} from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import {TabView, TabBar} from 'react-native-tab-view';
 import Toast from 'react-native-simple-toast';
-import {RegText} from '../components/Components';
+import {FadeText} from '../components/Components';
 import {Info} from '../app/AppState';
 import Utils from '../app/utils';
 import {useTheme} from '@react-navigation/native';
@@ -39,18 +39,17 @@ const SingleAddressDisplay: React.FunctionComponent<SingleAddress> = ({address})
         <View
           style={{display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', marginTop: 20}}>
           {chunks.map((c) => (
-            <RegText
+            <FadeText
               key={c}
               style={{
                 flexBasis: '40%',
                 textAlign: 'center',
                 fontFamily: fixedWidthFont,
-                fontSize: 20,
+                fontSize: 18,
                 color: colors.text,
-                opacity: 0.55,
               }}>
               {c}
-            </RegText>
+            </FadeText>
           ))}
         </View>
       </TouchableOpacity>

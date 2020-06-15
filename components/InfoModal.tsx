@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import {View, ScrollView, SafeAreaView, Image} from 'react-native';
-import {PrimaryButton, RegText} from './Components';
+import {View, ScrollView, SafeAreaView, Image, Text} from 'react-native';
+import {SecondaryButton, RegText, FadeText} from './Components';
 import {useTheme} from '@react-navigation/native';
 import {Info} from 'app/AppState';
 
@@ -10,12 +10,10 @@ type DetailLineProps = {
   value?: string | number;
 };
 const DetailLine: React.FunctionComponent<DetailLineProps> = ({label, value}) => {
-  const {colors} = useTheme();
-
   return (
     <View style={{display: 'flex', marginTop: 20}}>
-      <RegText>{label}</RegText>
-      <RegText color={colors.primary}>{value}</RegText>
+      <FadeText>{label}</FadeText>
+      <RegText>{value}</RegText>
     </View>
   );
 };
@@ -46,25 +44,31 @@ const InfoModal: React.FunctionComponent<InfoModalProps> = ({info, walletHeight,
           flexDirection: 'column',
           alignItems: 'stretch',
           justifyContent: 'flex-start',
-          margin: 10,
         }}>
-        <View style={{display: 'flex', alignItems: 'center'}}>
-          <Image
-            source={require('../assets/img/logobig.png')}
-            style={{width: 100, height: 100, resizeMode: 'contain'}}
-          />
+        <View>
+          <View style={{alignItems: 'center', backgroundColor: colors.card, paddingBottom: 25}}>
+            <Text style={{marginTop: 5, padding: 5, color: colors.text, fontSize: 28}}>Server Info</Text>
+          </View>
+          <View style={{display: 'flex', alignItems: 'center', marginTop: -25}}>
+            <Image
+              source={require('../assets/img/logobig.png')}
+              style={{width: 50, height: 50, resizeMode: 'contain'}}
+            />
+          </View>
         </View>
 
-        <DetailLine label="Wallet Version" value="Zecwallet Lite v1.0.12" />
-        <DetailLine label="Server Version" value={info?.version} />
-        <DetailLine label="Lightwallet Server URL" value={url} />
-        <DetailLine label="Network" value={info?.testnet ? 'Testnet' : 'Mainnet'} />
-        <DetailLine label="Server Block Height" value={height} />
-        <DetailLine label="Wallet Block Height" value={walletHeight} />
+        <View style={{display: 'flex', margin: 10}}>
+          <DetailLine label="Wallet Version" value="Zecwallet Lite v1.0.12" />
+          <DetailLine label="Server Version" value={info?.version} />
+          <DetailLine label="Lightwallet Server URL" value={url} />
+          <DetailLine label="Network" value={info?.testnet ? 'Testnet' : 'Mainnet'} />
+          <DetailLine label="Server Block Height" value={height} />
+          <DetailLine label="Wallet Block Height" value={walletHeight} />
+        </View>
       </ScrollView>
 
       <View style={{flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-        <PrimaryButton title="Close" onPress={closeModal} />
+        <SecondaryButton title="Close" onPress={closeModal} />
       </View>
     </SafeAreaView>
   );

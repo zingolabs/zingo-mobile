@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useState} from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
-import {RegText, ZecAmount, UsdAmount, PrimaryButton, FadeText} from '../components/Components';
+import {RegText, ZecAmount, UsdAmount, SecondaryButton, FadeText} from '../components/Components';
 import {View, ScrollView, Image, Modal, TouchableOpacity, SafeAreaView, RefreshControl, Clipboard} from 'react-native';
 import Toast from 'react-native-simple-toast';
 import {TotalBalance, Transaction, Info, SyncStatus} from '../app/AppState';
@@ -145,7 +145,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({tx, price, closeModal
         </View>
       </ScrollView>
       <View style={{flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', margin: 10}}>
-        <PrimaryButton title="Close" onPress={closeModal} />
+        <SecondaryButton title="Close" onPress={closeModal} />
       </View>
     </SafeAreaView>
   );

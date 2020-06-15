@@ -1,8 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import {View, TouchableOpacity, Clipboard} from 'react-native';
-import {PrimaryButton, BoldText, RegText} from './Components';
-import cstyles from './CommonStyles';
+import {View, TouchableOpacity, Clipboard, Image, Text} from 'react-native';
+import {PrimaryButton, RegText, FadeText} from './Components';
 import {useTheme} from '@react-navigation/native';
 import Toast from 'react-native-simple-toast';
 
@@ -20,29 +19,41 @@ const SeedComponent: React.FunctionComponent<SeedComponentProps> = ({seed, birth
         {
           flex: 1,
           flexDirection: 'column',
-          alignItems: 'center',
+          alignItems: 'stretch',
           justifyContent: 'center',
           backgroundColor: colors.background,
         },
       ]}>
-      <BoldText style={cstyles.center}>
+      <View>
+        <View style={{alignItems: 'center', backgroundColor: colors.card, paddingBottom: 25, paddingTop: 25}}>
+          <Text style={{marginTop: 5, padding: 5, color: colors.text, fontSize: 28}}>Wallet Seed</Text>
+        </View>
+        <View style={{display: 'flex', alignItems: 'center', marginTop: -25}}>
+          <Image source={require('../assets/img/logobig.png')} style={{width: 50, height: 50, resizeMode: 'contain'}} />
+        </View>
+      </View>
+
+      <FadeText style={{marginTop: 20, textAlign: 'center'}}>
         This is your seed phrase. Please write it down carefully. It is the only way to restore your wallet.
-      </BoldText>
+      </FadeText>
       <TouchableOpacity
-        style={[cstyles.margintop, {padding: 10, backgroundColor: '#212124'}]}
+        style={{padding: 10, marginTop: 10, backgroundColor: '#212124'}}
         onPress={() => {
           if (seed) {
             Clipboard.setString(seed);
             Toast.show('Copied Seed to Clipboard', Toast.LONG);
           }
         }}>
-        <RegText style={{textAlign: 'center', backgroundColor: colors.card, padding: 10}}>{seed}</RegText>
+        <RegText style={{textAlign: 'center', borderWidth: 1, borderRadius: 10, borderColor: colors.text, padding: 10}}>
+          {seed}
+        </RegText>
       </TouchableOpacity>
-      <View style={[cstyles.margintop]}>
-        <BoldText style={{textAlign: 'center'}}>Wallet Birthday</BoldText>
+      <View style={{marginTop: 10}}>
+        <FadeText style={{textAlign: 'center'}}>Wallet Birthday</FadeText>
       </View>
       <RegText style={{textAlign: 'center'}}>{birthday}</RegText>
-      <View style={[cstyles.margintop]}>
+
+      <View style={{flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
         <PrimaryButton title="I have saved the seed" onPress={nextScreen} />
       </View>
     </View>

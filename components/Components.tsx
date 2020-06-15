@@ -72,9 +72,35 @@ export const PrimaryButton: React.FunctionComponent<any> = ({title, disabled, on
         paddingLeft: 20,
         paddingRight: 20,
         borderRadius: 10,
+        width: 250,
       }}
       onPress={() => !disabled && onPress()}>
-      <Text style={{color: colors.background, fontWeight: 'bold', textTransform: 'uppercase'}}>{title}</Text>
+      <Text style={{color: colors.background, fontWeight: 'bold', textTransform: 'uppercase', textAlign: 'center'}}>
+        {title}
+      </Text>
+    </TouchableOpacity>
+  );
+};
+
+export const SecondaryButton: React.FunctionComponent<any> = ({title, disabled, onPress, style}) => {
+  const {colors} = useTheme();
+
+  return (
+    <TouchableOpacity
+      style={{
+        ...style,
+        borderColor: colors.text,
+        borderWidth: 1,
+        padding: 10,
+        paddingLeft: 20,
+        paddingRight: 20,
+        borderRadius: 10,
+        width: 250,
+      }}
+      onPress={() => !disabled && onPress()}>
+      <Text style={{color: colors.text, fontWeight: 'bold', textTransform: 'uppercase', textAlign: 'center'}}>
+        {title}
+      </Text>
     </TouchableOpacity>
   );
 };

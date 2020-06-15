@@ -10,7 +10,7 @@ import {AppearanceProvider} from 'react-native-appearance';
 import {createStackNavigator} from '@react-navigation/stack';
 
 import cstyles from './components/CommonStyles';
-import {PrimaryButton, BoldText, RegText, RegTextInput} from './components/Components';
+import {PrimaryButton, SecondaryButton, BoldText, RegText, RegTextInput} from './components/Components';
 import RPCModule from './components/RPCModule';
 import LoadedApp from './app/LoadedApp';
 import SeedComponent from './components/SeedComponent';
@@ -147,7 +147,7 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
 
             <PrimaryButton title="Create New Wallet" disabled={actionButtonsDisabled} onPress={this.createNewWallet} />
             <View style={[cstyles.margintop]}>
-              <PrimaryButton title="Restore Seed" onPress={this.getSeedPhraseToRestore} />
+              <SecondaryButton title="Restore Seed" onPress={this.getSeedPhraseToRestore} />
             </View>
           </View>
         )}

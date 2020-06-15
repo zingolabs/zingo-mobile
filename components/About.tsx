@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import {View, ScrollView, SafeAreaView, Image} from 'react-native';
-import {PrimaryButton, BoldText, RegText} from './Components';
+import {View, ScrollView, SafeAreaView, Image, Text} from 'react-native';
+import {PrimaryButton, FadeText} from './Components';
 import {useTheme} from '@react-navigation/native';
 
 type AboutModalProps = {
@@ -18,24 +18,23 @@ const AboutModal: React.FunctionComponent<AboutModalProps> = ({closeModal}) => {
         height: '100%',
         backgroundColor: colors.background,
       }}>
+      <View>
+        <View style={{alignItems: 'center', backgroundColor: colors.card, paddingBottom: 25, paddingTop: 25}}>
+          <Text style={{marginTop: 5, padding: 5, color: colors.text, fontSize: 28}}>Zecwallet Lite v1.0.12</Text>
+        </View>
+        <View style={{display: 'flex', alignItems: 'center', marginTop: -25}}>
+          <Image source={require('../assets/img/logobig.png')} style={{width: 50, height: 50, resizeMode: 'contain'}} />
+        </View>
+      </View>
+
       <ScrollView
         style={{maxHeight: '85%'}}
         contentContainerStyle={{
           flexDirection: 'column',
-          alignItems: 'center',
+          alignItems: 'stretch',
           justifyContent: 'flex-start',
-          margin: 10,
         }}>
-        <View style={{display: 'flex', alignItems: 'center'}}>
-          <Image
-            source={require('../assets/img/logobig.png')}
-            style={{width: 100, height: 100, resizeMode: 'contain'}}
-          />
-        </View>
-
-        <BoldText>Zecwallet Lite v1.0.12</BoldText>
-
-        <RegText>
+        <FadeText>
           {'\n'}
           Copyright (c) 2018-2020, Aditya Kulkarni.
           {'\n'}
@@ -62,9 +61,9 @@ const AboutModal: React.FunctionComponent<AboutModalProps> = ({closeModal}) => {
           EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
           AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
           OR OTHER DEALINGS IN THE SOFTWARE.
-        </RegText>
+        </FadeText>
       </ScrollView>
-      <View style={{flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+      <View style={{flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', margin: 10}}>
         <PrimaryButton title="Close" onPress={closeModal} />
       </View>
     </SafeAreaView>

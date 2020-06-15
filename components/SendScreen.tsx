@@ -8,6 +8,7 @@ import {
   ErrorText,
   RegTextInput,
   PrimaryButton,
+  SecondaryButton,
   RegText,
   ZecAmount,
   UsdAmount,
@@ -131,9 +132,20 @@ const ConfirmModalContent: React.FunctionComponent<ConfirmModalProps> = ({
         backgroundColor: colors.background,
       }}>
       <ScrollView contentContainerStyle={{display: 'flex', justifyContent: 'flex-start'}}>
-        <BoldText style={{textAlign: 'center', margin: 10}}>Confirm Transaction</BoldText>
-
         <View style={{display: 'flex', alignItems: 'center', padding: 10, backgroundColor: colors.card}}>
+          <BoldText style={{textAlign: 'center', margin: 10}}>Confirm Transaction</BoldText>
+        </View>
+
+        <View
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            margin: 25,
+            padding: 10,
+            borderWidth: 1,
+            borderRadius: 10,
+            borderColor: colors.text,
+          }}>
           <BoldText style={{textAlign: 'center'}}>Sending</BoldText>
 
           <ZecAmount amtZec={sendingTotal} />
@@ -142,7 +154,7 @@ const ConfirmModalContent: React.FunctionComponent<ConfirmModalProps> = ({
         {sendPageState.toaddrs.map((to) => {
           return (
             <View key={to.id} style={{margin: 10}}>
-              <RegText>{to.to}</RegText>
+              <RegText>{Utils.splitAddressIntoChunks(to.to, 8).join(' ')}</RegText>
               <View
                 style={{
                   display: 'flex',
@@ -160,7 +172,7 @@ const ConfirmModalContent: React.FunctionComponent<ConfirmModalProps> = ({
         })}
 
         <View style={{margin: 10}}>
-          <RegText>Fee</RegText>
+          <FadeText>Fee</FadeText>
           <View
             style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline'}}>
             <ZecAmount amtZec={Utils.getDefaultFee()} />
@@ -173,12 +185,11 @@ const ConfirmModalContent: React.FunctionComponent<ConfirmModalProps> = ({
         style={{
           flexGrow: 1,
           display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'space-around',
           alignItems: 'center',
+          marginTop: 10,
         }}>
         <PrimaryButton title={'Confirm'} onPress={confirmSend} />
-        <PrimaryButton title={'Cancel'} onPress={closeModal} />
+        <SecondaryButton style={{marginTop: 20}} title={'Cancel'} onPress={closeModal} />
       </View>
     </SafeAreaView>
   );
