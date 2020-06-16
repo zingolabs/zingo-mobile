@@ -22,6 +22,7 @@ import Utils from '../app/utils';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import Toast from 'react-native-simple-toast';
 import {getNumberFormatSettings} from 'react-native-localize';
+import {faBars} from '@fortawesome/free-solid-svg-icons';
 
 type ScannerProps = {
   updateToField: (address: string | null, amount: string | null, memo: string | null) => void;
@@ -213,6 +214,7 @@ type SendScreenProps = {
   sendTransaction: () => void;
   clearToAddrs: () => void;
   navigation: NavigationScreenProp<any>;
+  toggleMenuDrawer: () => void;
 };
 
 const SendScreen: React.FunctionComponent<SendScreenProps> = ({
@@ -223,6 +225,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
   sendTransaction,
   clearToAddrs,
   navigation,
+  toggleMenuDrawer,
 }) => {
   const {colors} = useTheme();
   const [qrcodeModalVisble, setQrcodeModalVisible] = useState(false);
@@ -388,11 +391,26 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
         }}>
         {isKeyboardVisible && <View style={{paddingBottom: 25, backgroundColor: colors.card}} />}
         {!isKeyboardVisible && (
-          <View style={{display: 'flex', alignItems: 'center', paddingBottom: 25, backgroundColor: colors.card}}>
-            <RegText style={{marginTop: 5, padding: 5}}>Spendable</RegText>
-            <ZecAmount size={36} amtZec={spendable} />
-            <UsdAmount style={{marginTop: 5}} price={zecPrice} amtZec={spendable} />
-          </View>
+          <>
+            <View
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                paddingBottom: 25,
+                backgroundColor: colors.card,
+                zIndex: -1,
+              }}>
+              <RegText style={{marginTop: 5, padding: 5}}>Spendable</RegText>
+              <ZecAmount size={36} amtZec={spendable} />
+              <UsdAmount style={{marginTop: 5}} price={zecPrice} amtZec={spendable} />
+            </View>
+
+            <View style={{backgroundColor: '#353535', padding: 10, position: 'absolute'}}>
+              <TouchableOpacity onPress={toggleMenuDrawer}>
+                <FontAwesomeIcon icon={faBars} size={20} color={'#ffffff'} />
+              </TouchableOpacity>
+            </View>
+          </>
         )}
         <View style={{display: 'flex', alignItems: 'center', marginTop: -25}}>
           <Image source={require('../assets/img/logobig.png')} style={{width: 50, height: 50, resizeMode: 'contain'}} />
