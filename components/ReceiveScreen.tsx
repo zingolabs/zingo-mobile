@@ -9,6 +9,8 @@ import {Info} from '../app/AppState';
 import Utils from '../app/utils';
 import {useTheme} from '@react-navigation/native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
+import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
+import {faBars} from '@fortawesome/free-solid-svg-icons';
 
 type SingleAddress = {
   address: string | null;
@@ -60,9 +62,10 @@ const SingleAddressDisplay: React.FunctionComponent<SingleAddress> = ({address})
 type ReceiveScreenProps = {
   info: Info | null;
   addresses: string[];
+  toggleMenuDrawer: () => void;
 };
 
-const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({addresses}) => {
+const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({addresses, toggleMenuDrawer}) => {
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([
     {key: 'zaddr', title: 'Z Address'},
@@ -84,9 +87,16 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({addresses})
 
   const renderTabBar: (props: any) => JSX.Element = (props) => (
     <View>
-      <View style={{alignItems: 'center', backgroundColor: colors.card, paddingBottom: 25}}>
+      <View style={{alignItems: 'center', backgroundColor: colors.card, paddingBottom: 25, zIndex: -1}}>
         <Text style={{marginTop: 5, padding: 5, color: colors.text, fontSize: 28}}>Wallet Address</Text>
       </View>
+
+      <View style={{backgroundColor: '#353535', padding: 10, position: 'absolute'}}>
+        <TouchableOpacity onPress={toggleMenuDrawer}>
+          <FontAwesomeIcon icon={faBars} size={20} color={'#ffffff'} />
+        </TouchableOpacity>
+      </View>
+
       <View style={{display: 'flex', alignItems: 'center', marginTop: -25}}>
         <Image source={require('../assets/img/logobig.png')} style={{width: 50, height: 50, resizeMode: 'contain'}} />
       </View>

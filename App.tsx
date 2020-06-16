@@ -3,7 +3,7 @@
  * @format
  */
 import React, {Component} from 'react';
-import {View, ScrollView, Alert, SafeAreaView, Image} from 'react-native';
+import {View, ScrollView, Alert, SafeAreaView, Image, Text} from 'react-native';
 
 import {NavigationContainer, DarkTheme} from '@react-navigation/native';
 import {AppearanceProvider} from 'react-native-appearance';
@@ -44,23 +44,25 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
   }
 
   componentDidMount = async () => {
-    // First, check if a wallet exists
-    const exists = await RPCModule.walletExists();
-    console.log('Exists result', exists);
+    // First, check if a wallet exists. Do it async so the basic screen has time to render
+    setTimeout(async () => {
+      const exists = await RPCModule.walletExists();
+      console.log('Exists result', exists);
 
-    if (exists && exists !== 'false') {
-      this.setState({walletExists: true});
-      const error = await RPCModule.loadExistingWallet();
-      if (!error.startsWith('Error')) {
-        // Load the wallet and navigate to the transactions screen
-        this.navigateToLoaded();
+      if (exists && exists !== 'false') {
+        this.setState({walletExists: true});
+        const error = await RPCModule.loadExistingWallet();
+        if (!error.startsWith('Error')) {
+          // Load the wallet and navigate to the transactions screen
+          this.navigateToLoaded();
+        } else {
+          Alert.alert('Error Reading Wallet', error);
+        }
       } else {
-        Alert.alert('Error Reading Wallet', error);
+        console.log('Loading new wallet');
+        this.setState({screen: 1, walletExists: false});
       }
-    } else {
-      console.log('Loading new wallet');
-      this.setState({screen: 1, walletExists: false});
-    }
+    });
   };
 
   navigateToLoaded = () => {
@@ -127,6 +129,7 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
             justifyContent: 'center',
           },
         ]}>
+        {screen === 0 && <Text style={{color: '#FFFFFF', fontSize: 36, fontWeight: 'bold'}}>Zecwallet Lite</Text>}
         {screen === 1 && (
           <View
             style={[
@@ -142,7 +145,7 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
                 source={require('./assets/img/logobig.png')}
                 style={{width: 100, height: 100, resizeMode: 'contain'}}
               />
-              <BoldText>Zecwallet Lite Mobile</BoldText>
+              <BoldText>Zecwallet Lite</BoldText>
             </View>
 
             <PrimaryButton title="Create New Wallet" disabled={actionButtonsDisabled} onPress={this.createNewWallet} />
