@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {Component} from 'react';
-import {ScrollView, StyleSheet, Dimensions, Image, Modal} from 'react-native';
+import {ScrollView, StyleSheet, Dimensions, Modal, View} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faList, faUpload, faDownload, faCog} from '@fortawesome/free-solid-svg-icons';
@@ -19,7 +19,7 @@ import AppState, {
   SendJsonToType,
   SyncStatus,
 } from './AppState';
-import {RegText} from '../components/Components';
+import {RegText, FadeText} from '../components/Components';
 import Utils from './utils';
 import TransactionsScreen from '../components/TransactionsScreen';
 import SendScreen from '../components/SendScreen';
@@ -27,6 +27,7 @@ import ReceiveScreen from '../components/ReceiveScreen';
 import AboutModal from '../components/About';
 import SeedComponent from '../components/SeedComponent';
 import InfoModal from '../components/InfoModal';
+import {useTheme} from '@react-navigation/native';
 
 const window = Dimensions.get('window');
 const styles = StyleSheet.create({
@@ -35,7 +36,6 @@ const styles = StyleSheet.create({
     width: window.width,
     height: window.height,
     backgroundColor: '#000000',
-    padding: 20,
   },
   item: {
     fontSize: 14,
@@ -46,21 +46,26 @@ const styles = StyleSheet.create({
 });
 
 function Menu({onItemSelected}: any) {
+  const {colors} = useTheme();
+
   return (
     <ScrollView scrollsToTop={false} style={styles.menu} contentContainerStyle={{display: 'flex'}}>
-      <Image source={require('../assets/img/logobig.png')} style={{width: 100, height: 100, resizeMode: 'contain'}} />
+      <FadeText style={{margin: 20}}>Settings</FadeText>
+      <View style={{borderWidth: 1, borderColor: colors.border}} />
 
-      <RegText onPress={() => onItemSelected('Wallet Seed')} style={styles.item}>
-        Wallet Seed
-      </RegText>
+      <View style={{display: 'flex', marginLeft: 20}}>
+        <RegText onPress={() => onItemSelected('Wallet Seed')} style={styles.item}>
+          Wallet Seed
+        </RegText>
 
-      <RegText onPress={() => onItemSelected('Info')} style={styles.item}>
-        Server Info
-      </RegText>
+        <RegText onPress={() => onItemSelected('Info')} style={styles.item}>
+          Server Info
+        </RegText>
 
-      <RegText onPress={() => onItemSelected('About')} style={styles.item}>
-        About Zecwallet Lite
-      </RegText>
+        <RegText onPress={() => onItemSelected('About')} style={styles.item}>
+          About Zecwallet Lite
+        </RegText>
+      </View>
     </ScrollView>
   );
 }
