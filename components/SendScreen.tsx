@@ -33,10 +33,17 @@ function ScanScreen({updateToField, closeModal}: ScannerProps) {
   const validateAddress = (scannedAddress: string) => {
     if (Utils.isSapling(scannedAddress) || Utils.isTransparent(scannedAddress)) {
       updateToField(scannedAddress, null, null);
-
       closeModal();
     } else {
-      setError(`"${scannedAddress}" is not a valid Zcash Address`);
+      // Try to parse as a URI
+      const u = Utils.parseZcashURI(scannedAddress);
+
+      if (u) {
+        updateToField(u.address, u.amount ? Utils.maxPrecisionTrimmed(u.amount) : null, u.memo);
+        closeModal();
+      } else {
+        setError(`"${scannedAddress}" is not a valid Zcash Address`);
+      }
     }
   };
 
@@ -69,7 +76,7 @@ function ScanScreen({updateToField, closeModal}: ScannerProps) {
           }}>
           {error && <RegText style={{textAlign: 'center'}}>{error}</RegText>}
           <View style={{flexDirection: 'row', alignItems: 'stretch', justifyContent: 'space-evenly'}}>
-            <PrimaryButton style={{marginLeft: 50}} title="Cancel" onPress={doCancel} />
+            <SecondaryButton title="Cancel" onPress={doCancel} />
           </View>
         </View>
       }

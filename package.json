@@ -37,7 +37,8 @@
     "react-native-simple-toast": "^1.1.2",
     "react-native-status-bar-height": "^2.5.0",
     "react-native-svg": "^12.1.0",
-    "react-native-tab-view": "^2.14.1"
+    "react-native-tab-view": "^2.14.1",
+    "url-parse": "^1.4.7"
   },
   "devDependencies": {
     "@babel/core": "^7.6.2",
@@ -47,6 +48,7 @@
     "@types/react-native": "^0.62.0",
     "@types/react-navigation": "^3.4.0",
     "@types/react-test-renderer": "16.9.2",
+    "@types/url-parse": "^1.4.3",
     "@typescript-eslint/eslint-plugin": "^2.27.0",
     "@typescript-eslint/parser": "^2.27.0",
     "babel-jest": "^24.9.0",
