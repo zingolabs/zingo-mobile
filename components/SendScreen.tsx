@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import {View, ScrollView, Modal, Image, Alert, SafeAreaView, Keyboard} from 'react-native';
 import {
@@ -23,6 +23,7 @@ import {TouchableOpacity} from 'react-native-gesture-handler';
 import Toast from 'react-native-simple-toast';
 import {getNumberFormatSettings} from 'react-native-localize';
 import {faBars} from '@fortawesome/free-solid-svg-icons';
+import Animated, {Easing} from 'react-native-reanimated';
 
 type ScannerProps = {
   updateToField: (address: string | null, amount: string | null, memo: string | null) => void;
@@ -232,21 +233,22 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
   const [computingModalVisible, setComputingModalVisible] = useState(false);
 
-  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+  const [titleViewHeight, setTitleViewHeight] = useState(0);
+  const slideAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
-      setKeyboardVisible(true); // or some other action
+      Animated.timing(slideAnim, {toValue: 0 - titleViewHeight + 25, duration: 100, easing: Easing.linear}).start();
     });
     const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-      setKeyboardVisible(false); // or some other action
+      Animated.timing(slideAnim, {toValue: 0, duration: 100, easing: Easing.linear}).start();
     });
 
     return () => {
       keyboardDidHideListener.remove();
       keyboardDidShowListener.remove();
     };
-  }, []);
+  }, [slideAnim, titleViewHeight]);
 
   const updateToField = (address: string | null, amount: string | null, memo: string | null) => {
     const newToAddrs = sendPageState.toaddrs.slice(0);
@@ -389,29 +391,31 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
           flexDirection: 'column',
           justifyContent: 'flex-start',
         }}>
-        {isKeyboardVisible && <View style={{paddingBottom: 25, backgroundColor: colors.card}} />}
-        {!isKeyboardVisible && (
-          <>
-            <View
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                paddingBottom: 25,
-                backgroundColor: colors.card,
-                zIndex: -1,
-              }}>
-              <RegText style={{marginTop: 5, padding: 5}}>Spendable</RegText>
-              <ZecAmount size={36} amtZec={spendable} />
-              <UsdAmount style={{marginTop: 5}} price={zecPrice} amtZec={spendable} />
-            </View>
+        <Animated.View style={{marginTop: slideAnim}}>
+          <View
+            onLayout={(e) => {
+              const {height} = e.nativeEvent.layout;
+              setTitleViewHeight(height);
+            }}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              paddingBottom: 25,
+              backgroundColor: colors.card,
+              zIndex: -1,
+            }}>
+            <RegText style={{marginTop: 5, padding: 5}}>Spendable</RegText>
+            <ZecAmount size={36} amtZec={spendable} />
+            <UsdAmount style={{marginTop: 5}} price={zecPrice} amtZec={spendable} />
+          </View>
+        </Animated.View>
 
-            <View style={{backgroundColor: '#353535', padding: 10, position: 'absolute'}}>
-              <TouchableOpacity onPress={toggleMenuDrawer}>
-                <FontAwesomeIcon icon={faBars} size={20} color={'#ffffff'} />
-              </TouchableOpacity>
-            </View>
-          </>
-        )}
+        <Animated.View style={{backgroundColor: '#353535', padding: 10, position: 'absolute', marginTop: slideAnim}}>
+          <TouchableOpacity onPress={toggleMenuDrawer}>
+            <FontAwesomeIcon icon={faBars} size={20} color={'#ffffff'} />
+          </TouchableOpacity>
+        </Animated.View>
+
         <View style={{display: 'flex', alignItems: 'center', marginTop: -25}}>
           <Image source={require('../assets/img/logobig.png')} style={{width: 50, height: 50, resizeMode: 'contain'}} />
         </View>
