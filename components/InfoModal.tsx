@@ -58,7 +58,7 @@ const InfoModal: React.FunctionComponent<InfoModalProps> = ({info, walletHeight,
         </View>
 
         <View style={{display: 'flex', margin: 10}}>
-          <DetailLine label="Wallet Version" value="Zecwallet Lite v1.0.12" />
+          <DetailLine label="Wallet Version" value="Zecwallet Lite v1.0.14" />
           <DetailLine label="Server Version" value={info?.version} />
           <DetailLine label="Lightwallet Server URL" value={url} />
           <DetailLine label="Network" value={info?.testnet ? 'Testnet' : 'Mainnet'} />
