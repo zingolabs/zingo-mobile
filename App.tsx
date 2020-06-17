@@ -102,7 +102,15 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
 
     this.setState({actionButtonsDisabled: true});
     setTimeout(async () => {
-      const error = await RPCModule.restoreWallet(seedPhrase.toLowerCase(), birthday || '0');
+      let walletBirthday = birthday || '0';
+      if (parseInt(walletBirthday, 10) < 0) {
+        walletBirthday = '0';
+      }
+      if (isNaN(parseInt(walletBirthday, 10))) {
+        walletBirthday = '0';
+      }
+
+      const error = await RPCModule.restoreWallet(seedPhrase.toLowerCase(), walletBirthday || '0');
       if (!error.startsWith('Error')) {
         this.navigateToLoaded();
       } else {

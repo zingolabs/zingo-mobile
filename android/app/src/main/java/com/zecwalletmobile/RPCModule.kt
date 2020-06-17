@@ -88,7 +88,9 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             Base64.encodeToString(saplingSpend, Base64.NO_WRAP))
         Log.w("MAIN", seed)
 
-        saveWallet()
+        if (!rseed.startsWith("Error")) {
+            saveWallet()
+        }
 
         promise.resolve(rseed)
     }
