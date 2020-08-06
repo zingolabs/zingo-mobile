@@ -441,7 +441,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
               display: 'flex',
               flexDirection: 'row',
               justifyContent: 'flex-start',
-              borderBottomColor: '#ffffff',
+              borderBottomColor: colors.card,
               borderBottomWidth: 2,
             }}>
             <RegTextInput
@@ -469,7 +469,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
               display: 'flex',
               flexDirection: 'row',
               justifyContent: 'flex-start',
-              borderBottomColor: '#ffffff',
+              borderBottomColor: colors.card,
               borderBottomWidth: 2,
             }}>
             <RegTextInput
@@ -505,7 +505,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
               <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-start'}}>
                 <RegTextInput
                   multiline
-                  style={{flexGrow: 1, borderBottomColor: '#ffffff', borderBottomWidth: 2}}
+                  style={{flexGrow: 1, borderBottomColor: colors.card, borderBottomWidth: 2}}
                   value={sendPageState.toaddrs[0].memo}
                   onChangeText={(text: string) => updateToField(null, null, text)}
                 />
