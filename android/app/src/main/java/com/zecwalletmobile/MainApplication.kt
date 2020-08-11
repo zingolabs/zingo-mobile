@@ -39,8 +39,6 @@ class MainApplication : Application(), ReactApplication {
 
         SoLoader.init(this, false)
         // initializeFlipper(this, reactNativeHost.reactInstanceManager)
-
-        //RPCModule.initLogging()
     }
 
 
