@@ -234,28 +234,6 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
     this.setSendPageState(newState);
   };
 
-  setSendTo = (address: string, amount: string | null, memo: string | null) => {
-    // Clear the existing send page state and set up the new one
-    const {sendPageState} = this.state;
-
-    const newSendPageState = new SendPageState();
-    newSendPageState.fromaddr = sendPageState.fromaddr;
-
-    const to = new ToAddr(Utils.getNextToAddrID());
-    if (address) {
-      to.to = address;
-    }
-    if (amount) {
-      to.amount = amount;
-    }
-    if (memo) {
-      to.memo = memo;
-    }
-    newSendPageState.toaddrs = [to];
-
-    this.setState({sendPageState: newSendPageState});
-  };
-
   setZecPrice = (price: number | null) => {
     console.log(`Price = ${price}`);
     const {info} = this.state;
@@ -415,7 +393,6 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
     const standardProps = {
       openErrorModal: this.openErrorModal,
       closeErrorModal: this.closeErrorModal,
-      setSendTo: this.setSendTo,
       info,
       toggleMenuDrawer: this.toggleMenuDrawer,
     };

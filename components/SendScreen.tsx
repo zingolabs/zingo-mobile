@@ -13,7 +13,7 @@ import {
   ZecAmount,
   UsdAmount,
 } from '../components/Components';
-import {Info, SendPageState, TotalBalance} from '../app/AppState';
+import {Info, SendPageState, ToAddr, TotalBalance} from '../app/AppState';
 import {faQrcode, faCheck, faArrowAltCircleUp, faInfo} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {useTheme} from '@react-navigation/native';
@@ -24,25 +24,31 @@ import Toast from 'react-native-simple-toast';
 import {getNumberFormatSettings} from 'react-native-localize';
 import {faBars} from '@fortawesome/free-solid-svg-icons';
 import Animated, {Easing} from 'react-native-reanimated';
+import {parseZcashURI} from '../app/uris';
 
 type ScannerProps = {
-  updateToField: (address: string | null, amount: string | null, memo: string | null) => void;
+  idx: number;
+  updateToField: (idx: number, address: string | null, amount: string | null, memo: string | null) => void;
   closeModal: () => void;
 };
-function ScanScreen({updateToField, closeModal}: ScannerProps) {
+function ScanScreen({idx, updateToField, closeModal}: ScannerProps) {
   const [error, setError] = useState<String | null>(null);
 
   const validateAddress = (scannedAddress: string) => {
     if (Utils.isSapling(scannedAddress) || Utils.isTransparent(scannedAddress)) {
-      updateToField(scannedAddress, null, null);
+      updateToField(idx, scannedAddress, null, null);
       closeModal();
     } else {
       // Try to parse as a URI
-      const u = Utils.parseZcashURI(scannedAddress);
+      if (scannedAddress.startsWith('zcash:')) {
+        const targets = parseZcashURI(scannedAddress);
 
-      if (u) {
-        updateToField(u.address, u.amount ? Utils.maxPrecisionTrimmed(u.amount) : null, u.memo);
-        closeModal();
+        if (Array.isArray(targets)) {
+          updateToField(idx, scannedAddress, null, null);
+          closeModal();
+        } else {
+          setError(`URI Error: ${targets}`);
+        }
       } else {
         setError(`"${scannedAddress}" is not a valid Zcash Address`);
       }
@@ -230,6 +236,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
 }) => {
   const {colors} = useTheme();
   const [qrcodeModalVisble, setQrcodeModalVisible] = useState(false);
+  const [qrcodeModalIndex, setQrcodeModalIndex] = useState(0);
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
   const [computingModalVisible, setComputingModalVisible] = useState(false);
 
@@ -250,26 +257,49 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
     };
   }, [slideAnim, titleViewHeight]);
 
-  const updateToField = (address: string | null, amount: string | null, memo: string | null) => {
+  const updateToField = (idx: number, address: string | null, amount: string | null, memo: string | null) => {
+    // Create the new state object
+    const newState = new SendPageState();
+    newState.fromaddr = sendPageState.fromaddr;
+
     const newToAddrs = sendPageState.toaddrs.slice(0);
     // Find the correct toAddr
-    const toAddr = newToAddrs[0];
-    if (!toAddr) {
-      return;
-    }
+    const toAddr = newToAddrs[idx];
 
     if (address !== null) {
-      const u = Utils.parseZcashURI(address);
-      if (u) {
-        address = u.address;
-        if (u.amount) {
-          amount = Utils.maxPrecisionTrimmed(u.amount);
+      // Attempt to parse as URI if it starts with zcash
+      if (address.startsWith('zcash:')) {
+        const targets = parseZcashURI(address);
+        //console.log(targets);
+
+        if (Array.isArray(targets)) {
+          // redo the to addresses
+          const uriToAddrs: ToAddr[] = [];
+          targets.forEach((tgt) => {
+            const to = new ToAddr(Utils.getNextToAddrID());
+
+            to.to = tgt.address || '';
+            to.amount = Utils.maxPrecisionTrimmed(tgt.amount || 0);
+            to.memo = tgt.memoString || '';
+
+            uriToAddrs.push(to);
+          });
+
+          newState.toaddrs = uriToAddrs;
+
+          setSendPageState(newState);
+          return;
+        } else {
+          // Show the error message as a toast
+          Toast.show(targets);
+          return;
         }
-        if (u.memo) {
-          memo = u.memo;
+      } else {
+        if (!toAddr) {
+          return;
         }
+        toAddr.to = address.replace(/[ \t\n\r]+/g, ''); // Remove spaces
       }
-      toAddr.to = address.replace(/[ \t\n\r]+/g, ''); // Remove spaces
     }
 
     if (amount !== null) {
@@ -280,11 +310,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
       toAddr.memo = memo;
     }
 
-    // Create the new state object
-    const newState = new SendPageState();
-    newState.fromaddr = sendPageState.fromaddr;
     newState.toaddrs = newToAddrs;
-
     setSendPageState(newState);
   };
 
@@ -320,40 +346,49 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
   const spendable = totalBalance.transparentBal + totalBalance.verifiedPrivate;
   const stillConfirming = spendable !== totalBalance.total;
 
-  const setMaxAmount = () => {
-    updateToField(null, Utils.maxPrecisionTrimmed(spendable - Utils.getDefaultFee()), null);
+  const setMaxAmount = (idx: number) => {
+    let max = spendable - Utils.getDefaultFee();
+    if (max < 0) {
+      max = 0;
+    }
+    updateToField(idx, null, Utils.maxPrecisionTrimmed(max), null);
   };
 
   const memoEnabled = Utils.isSapling(sendPageState.toaddrs[0].to);
   const zecPrice = info ? info.zecPrice : null;
 
-  var addressValidationState: number;
-  var toaddr = sendPageState.toaddrs[0];
-  if (toaddr.to !== '') {
-    if (Utils.isSapling(toaddr.to) || Utils.isTransparent(toaddr.to)) {
-      addressValidationState = 1;
+  var addressValidationState: number[] = sendPageState.toaddrs.map((to) => {
+    if (to.to !== '') {
+      if (Utils.isSapling(to.to) || Utils.isTransparent(to.to)) {
+        return 1;
+      } else {
+        return -1;
+      }
     } else {
-      addressValidationState = -1;
+      return 0;
     }
-  } else {
-    addressValidationState = 0;
-  }
+  });
 
-  var amountValidationState: number;
-  if (toaddr.amount !== '') {
-    if (
-      Utils.parseLocaleFloat(toaddr.amount) > 0 &&
-      Utils.parseLocaleFloat(toaddr.amount) <= spendable - Utils.getDefaultFee()
-    ) {
-      amountValidationState = 1;
+  var amountValidationState: number[] = sendPageState.toaddrs.map((to) => {
+    if (to.amount !== '') {
+      if (
+        Utils.parseLocaleFloat(to.amount) > 0 &&
+        Utils.parseLocaleFloat(to.amount) <= parseFloat((spendable - Utils.getDefaultFee()).toFixed(8))
+      ) {
+        return 1;
+      } else {
+        return -1;
+      }
     } else {
-      amountValidationState = -1;
+      return 0;
     }
-  } else {
-    amountValidationState = 0;
-  }
+  });
 
-  const sendButtonEnabled = addressValidationState === 1 && amountValidationState === 1;
+  // Send button is enabled if all address and amount validation states are 1
+  const sendButtonEnabled =
+    addressValidationState.filter((n) => n === 1).length === addressValidationState.length &&
+    amountValidationState.filter((n) => n === 1).length === amountValidationState.length;
+
   const {decimalSeparator} = getNumberFormatSettings();
 
   return (
@@ -368,7 +403,11 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
         transparent={false}
         visible={qrcodeModalVisble}
         onRequestClose={() => setQrcodeModalVisible(false)}>
-        <ScanScreen updateToField={updateToField} closeModal={() => setQrcodeModalVisible(false)} />
+        <ScanScreen
+          idx={qrcodeModalIndex}
+          updateToField={updateToField}
+          closeModal={() => setQrcodeModalVisible(false)}
+        />
       </Modal>
 
       <Modal
@@ -430,92 +469,108 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
           <Image source={require('../assets/img/logobig.png')} style={{width: 50, height: 50, resizeMode: 'contain'}} />
         </View>
 
-        <View style={{display: 'flex', padding: 10, marginTop: 20}}>
-          <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
-            <FadeText>To</FadeText>
-            {addressValidationState === 1 && <FontAwesomeIcon icon={faCheck} color="green" />}
-            {addressValidationState === -1 && <ErrorText>Invalid Address!</ErrorText>}
-          </View>
-          <View
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'flex-start',
-              borderBottomColor: colors.card,
-              borderBottomWidth: 2,
-            }}>
-            <RegTextInput
-              placeholder="z-address or t-address"
-              placeholderTextColor="#777777"
-              style={{flexGrow: 1, maxWidth: '90%'}}
-              value={sendPageState.toaddrs[0].to}
-              onChangeText={(text: string) => updateToField(text, null, null)}
-            />
-            <TouchableOpacity onPress={() => setQrcodeModalVisible(true)}>
-              <FontAwesomeIcon style={{margin: 5}} size={24} icon={faQrcode} color={colors.text} />
-            </TouchableOpacity>
-          </View>
-
-          <View style={{marginTop: 30, display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
-            <FadeText>Amount (ZEC)</FadeText>
-            {amountValidationState === 1 && (
-              <UsdAmount price={zecPrice} amtZec={Utils.parseLocaleFloat(sendPageState.toaddrs[0].amount)} />
-            )}
-            {amountValidationState === -1 && <ErrorText>Invalid Amount!</ErrorText>}
-          </View>
-
-          <View
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'flex-start',
-              borderBottomColor: colors.card,
-              borderBottomWidth: 2,
-            }}>
-            <RegTextInput
-              placeholder={`0${decimalSeparator}0`}
-              placeholderTextColor="#777777"
-              keyboardType="numeric"
-              style={{flexGrow: 1, maxWidth: '90%'}}
-              value={sendPageState.toaddrs[0].amount.toString()}
-              onChangeText={(text: string) => updateToField(null, text, null)}
-            />
-            <TouchableOpacity onPress={() => setMaxAmount()}>
-              <FontAwesomeIcon style={{margin: 5}} size={24} icon={faArrowAltCircleUp} color={colors.text} />
-            </TouchableOpacity>
-          </View>
-          {stillConfirming && (
-            <View
-              style={{
-                display: 'flex',
-                flexDirection: 'row',
-                marginTop: 5,
-                backgroundColor: colors.card,
-                padding: 5,
-                borderRadius: 10,
-              }}>
-              <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
-              <FadeText>Some funds are still confirming</FadeText>
-            </View>
-          )}
-
-          {memoEnabled && (
-            <>
-              <FadeText style={{marginTop: 30}}>Memo (Optional)</FadeText>
-              <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-start'}}>
-                <RegTextInput
-                  multiline
-                  style={{flexGrow: 1, borderBottomColor: colors.card, borderBottomWidth: 2}}
-                  value={sendPageState.toaddrs[0].memo}
-                  onChangeText={(text: string) => updateToField(null, null, text)}
-                />
+        {sendPageState.toaddrs.map((ta, i) => {
+          return (
+            <View key={i} style={{display: 'flex', padding: 10, marginTop: 20}}>
+              <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
+                <FadeText>To</FadeText>
+                {addressValidationState[i] === 1 && <FontAwesomeIcon icon={faCheck} color="green" />}
+                {addressValidationState[i] === -1 && <ErrorText>Invalid Address!</ErrorText>}
               </View>
-            </>
-          )}
-        </View>
+              <View
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'flex-start',
+                  borderBottomColor: colors.card,
+                  borderBottomWidth: 2,
+                }}>
+                <RegTextInput
+                  placeholder="z-address or t-address"
+                  placeholderTextColor="#777777"
+                  style={{flexGrow: 1, maxWidth: '90%'}}
+                  value={ta.to}
+                  onChangeText={(text: string) => updateToField(i, text, null, null)}
+                />
+                <TouchableOpacity
+                  onPress={() => {
+                    setQrcodeModalIndex(i);
+                    setQrcodeModalVisible(true);
+                  }}>
+                  <FontAwesomeIcon style={{margin: 5}} size={24} icon={faQrcode} color={colors.text} />
+                </TouchableOpacity>
+              </View>
 
-        <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', margin: 20}}>
+              <View style={{marginTop: 30, display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
+                <FadeText>Amount (ZEC)</FadeText>
+                {amountValidationState[i] === 1 && (
+                  <UsdAmount price={zecPrice} amtZec={Utils.parseLocaleFloat(ta.amount)} />
+                )}
+                {amountValidationState[i] === -1 && <ErrorText>Invalid Amount!</ErrorText>}
+              </View>
+
+              <View
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'flex-start',
+                  borderBottomColor: colors.card,
+                  borderBottomWidth: 2,
+                }}>
+                <RegTextInput
+                  placeholder={`0${decimalSeparator}0`}
+                  placeholderTextColor="#777777"
+                  keyboardType="numeric"
+                  style={{flexGrow: 1, maxWidth: '90%'}}
+                  value={ta.amount.toString()}
+                  onChangeText={(text: string) => updateToField(i, null, text, null)}
+                />
+                <TouchableOpacity onPress={() => setMaxAmount(i)}>
+                  <FontAwesomeIcon style={{margin: 5}} size={24} icon={faArrowAltCircleUp} color={colors.text} />
+                </TouchableOpacity>
+              </View>
+              {stillConfirming && (
+                <View
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    marginTop: 5,
+                    backgroundColor: colors.card,
+                    padding: 5,
+                    borderRadius: 10,
+                  }}>
+                  <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
+                  <FadeText>Some funds are still confirming</FadeText>
+                </View>
+              )}
+
+              {memoEnabled && (
+                <>
+                  <FadeText style={{marginTop: 30}}>Memo (Optional)</FadeText>
+                  <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-start'}}>
+                    <RegTextInput
+                      multiline
+                      style={{flexGrow: 1, borderBottomColor: colors.card, borderBottomWidth: 2}}
+                      value={ta.memo}
+                      onChangeText={(text: string) => updateToField(i, null, null, text)}
+                    />
+                  </View>
+                </>
+              )}
+            </View>
+          );
+        })}
+
+        <View
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            margin: 20,
+          }}>
           <PrimaryButton title="Send" disabled={!sendButtonEnabled} onPress={() => setConfirmModalVisible(true)} />
+          <SecondaryButton style={{marginTop: 10}} title="Clear" onPress={() => clearToAddrs()} />
         </View>
       </ScrollView>
     </View>

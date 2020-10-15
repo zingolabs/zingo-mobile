@@ -1,17 +1,10 @@
 import {getNumberFormatSettings} from 'react-native-localize';
-import Url from 'url-parse';
 
 export const NO_CONNECTION: string = 'Could not connect to zcashd';
 
 type ZecAmountSplitType = {
   bigPart: string;
   smallPart: string;
-};
-
-type ZcashUriComponents = {
-  address: string;
-  amount: number | null;
-  memo: string | null;
 };
 
 export default class Utils {
@@ -181,26 +174,6 @@ export default class Utils {
     }
 
     return ans;
-  }
-
-  static parseZcashURI(url: string): ZcashUriComponents | null {
-    const u = new Url(url, true);
-    console.log(u);
-
-    if (u.protocol !== 'zcash:') {
-      return null;
-    }
-
-    const address = u.pathname;
-    if (!Utils.isSapling(address) && !Utils.isTransparent(address)) {
-      return null;
-    }
-
-    let qamount = u.query.amount || u.query.amt;
-    const amount = qamount ? Utils.parseLocaleFloat(qamount) : null;
-    const memo = u.query.memo || null;
-
-    return {address, amount, memo};
   }
 
   static parseLocaleFloat(stringNumber: string): number {
