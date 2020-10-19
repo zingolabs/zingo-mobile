@@ -1,9 +1,10 @@
 FROM lakoo/android-ndk:latest
 
 RUN curl https://sh.rustup.rs -sSf | \
-    sh -s -- --default-toolchain stable -y
-
+    sh -s -- --default-toolchain none -y
 ENV PATH=/root/.cargo/bin:/opt/android-ndk-linux/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH
+
+RUN rustup toolchain install 1.46.0
 
 RUN rustup target add i686-linux-android
 RUN rustup target add armv7-linux-androideabi
