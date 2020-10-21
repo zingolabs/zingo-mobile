@@ -5569,6 +5569,11 @@ react-native-camera@^3.26.0:
   dependencies:
     prop-types "^15.6.2"
 
+react-native-fix-image@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/react-native-fix-image/-/react-native-fix-image-2.0.1.tgz#6a06ada37e2e409f436a11902a347ff147341d7c"
+  integrity sha512-vACqL9cDEnQCPw976RpOwy7GPaMDCjy+0wV1UbDY43jrRniZDeOygWf86HQnjY60Uf13NsnvT71LrOeTdCyr4Q==
+
 react-native-gesture-handler@^1.6.1:
   version "1.6.1"
   resolved "https://registry.yarnpkg.com/react-native-gesture-handler/-/react-native-gesture-handler-1.6.1.tgz#678e2dce250ed66e93af409759be22cd6375dd17"
