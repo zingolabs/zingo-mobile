@@ -10,7 +10,7 @@ import Moment from 'react-moment';
 import moment from 'moment';
 import {useTheme} from '@react-navigation/native';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {faArrowDown, faArrowUp, faBars} from '@fortawesome/free-solid-svg-icons';
+import {faArrowDown, faArrowUp, faBars, faChevronLeft} from '@fortawesome/free-solid-svg-icons';
 
 type TxDetailProps = {
   tx: Transaction | null;
@@ -44,6 +44,12 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({tx, price, closeModal
           alignItems: 'stretch',
           justifyContent: 'flex-start',
         }}>
+        <TouchableOpacity onPress={closeModal}>
+          <View style={{display: 'flex', flexDirection: 'row', backgroundColor: colors.card}}>
+            <FontAwesomeIcon style={{marginTop: 3}} icon={faChevronLeft} color={colors.text} size={20} />
+            <RegText> Back</RegText>
+          </View>
+        </TouchableOpacity>
         <View style={{display: 'flex', alignItems: 'center', padding: 10, backgroundColor: colors.card}}>
           <RegText style={{textTransform: 'capitalize'}} color={spendColor}>
             {tx?.type}
