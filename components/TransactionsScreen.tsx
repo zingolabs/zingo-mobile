@@ -7,9 +7,10 @@ import Toast from 'react-native-simple-toast';
 import {TotalBalance, Transaction, Info, SyncStatus} from '../app/AppState';
 import Utils from '../app/utils';
 import Moment from 'react-moment';
+import moment from 'moment';
 import {useTheme} from '@react-navigation/native';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {faBars} from '@fortawesome/free-solid-svg-icons';
+import {faArrowDown, faArrowUp, faBars} from '@fortawesome/free-solid-svg-icons';
 
 type TxDetailProps = {
   tx: Transaction | null;
@@ -152,59 +153,80 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({tx, price, closeModal
 };
 
 type TxSummaryLineProps = {
+  month: string;
   tx: Transaction;
   setTxDetail: React.Dispatch<React.SetStateAction<Transaction | null>>;
   setTxDetailModalShowing: React.Dispatch<React.SetStateAction<boolean>>;
 };
-const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({tx, setTxDetail, setTxDetailModalShowing}) => {
+const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
+  tx,
+  month,
+  setTxDetail,
+  setTxDetailModalShowing,
+}) => {
   const {colors} = useTheme();
 
-  const lineColor = tx.confirmations === 0 ? colors.primary : tx.amount > 0 ? '#88ee88' : '#ff6666';
   const amountColor = tx.confirmations === 0 ? colors.primary : tx.amount > 0 ? '#88ee88' : colors.text;
+  const txIcon = tx.amount > 0 ? faArrowDown : faArrowUp;
 
   const displayAddress =
     tx.detailedTxns && tx.detailedTxns.length > 0 ? Utils.trimToSmall(tx.detailedTxns[0].address, 7) : 'Unknown';
 
   return (
-    <TouchableOpacity
-      onPress={() => {
-        setTxDetail(tx);
-        setTxDetailModalShowing(true);
-      }}>
-      <View
-        style={{
-          display: 'flex',
-          flexDirection: 'row',
-          marginTop: 15,
-          paddingBottom: 15,
-          borderBottomWidth: 1,
-          borderBottomColor: colors.border,
+    <View style={{display: 'flex', flexDirection: 'column'}}>
+      {month !== '' && (
+        <View
+          style={{
+            paddingLeft: 15,
+            paddingTop: 5,
+            paddingBottom: 5,
+            borderTopWidth: 1,
+            borderBottomWidth: 1,
+            borderColor: colors.card,
+            backgroundColor: '#272727',
+          }}>
+          <FadeText>{month}</FadeText>
+        </View>
+      )}
+      <TouchableOpacity
+        onPress={() => {
+          setTxDetail(tx);
+          setTxDetailModalShowing(true);
         }}>
         <View
           style={{
-            width: 2,
-            marginRight: 15,
-            backgroundColor: lineColor,
-          }}
-        />
-        <View style={{display: 'flex'}}>
-          <FadeText style={{fontSize: 18}}>
-            {tx.type === 'sent' ? 'Sent to ' : 'Received to '}
-            {displayAddress}
-          </FadeText>
-          <Moment interval={0} format="D MMM h:mm a" element={FadeText}>
-            {(tx?.time || 0) * 1000}
-          </Moment>
+            display: 'flex',
+            flexDirection: 'row',
+            marginTop: 15,
+            paddingBottom: 15,
+            borderBottomWidth: 1,
+            borderBottomColor: colors.border,
+          }}>
+          <FontAwesomeIcon
+            style={{marginLeft: 15, marginRight: 15, marginTop: 5}}
+            size={24}
+            icon={txIcon}
+            color={amountColor}
+          />
+          <View style={{display: 'flex'}}>
+            <FadeText style={{fontSize: 18}}>{displayAddress}</FadeText>
+            <View style={{display: 'flex', flexDirection: 'row'}}>
+              <FadeText>{tx.type === 'sent' ? 'Sent ' : 'Received '}</FadeText>
+              <Moment interval={0} format="h:mm a D MMM" element={FadeText}>
+                {(tx?.time || 0) * 1000}
+              </Moment>
+            </View>
+          </View>
+          <ZecAmount
+            style={{flexGrow: 1, alignSelf: 'baseline', justifyContent: 'flex-end', paddingRight: 5}}
+            size={18}
+            zecSymbol={'ᙇ'}
+            color={amountColor}
+            amtZec={tx.amount}
+          />
         </View>
-        <ZecAmount
-          style={{flexGrow: 1, alignSelf: 'baseline', justifyContent: 'flex-end', paddingRight: 5}}
-          size={18}
-          zecSymbol={'ᙇ'}
-          color={amountColor}
-          amtZec={tx.amount}
-        />
-      </View>
-    </TouchableOpacity>
+      </TouchableOpacity>
+    </View>
   );
 };
 
@@ -236,6 +258,7 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
     : 'Balance';
 
   const balanceColor = transactions?.find((t) => t.confirmations === 0) ? colors.primary : colors.text;
+  var lastMonth = '';
 
   return (
     <View style={{display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', marginBottom: 170}}>
@@ -269,10 +292,19 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
         }
         style={{flexGrow: 1, marginTop: 10, width: '100%', height: '100%'}}>
         {transactions?.flatMap((t) => {
+          let txmonth = moment(t.time * 1000).format('MMM YYYY');
+
+          var month = '';
+          if (txmonth !== lastMonth) {
+            month = txmonth;
+            lastMonth = txmonth;
+          }
+
           return (
             <TxSummaryLine
               key={`${t.txid}-${t.type}`}
               tx={t}
+              month={month}
               setTxDetail={setTxDetail}
               setTxDetailModalShowing={setTxDetailModalShowing}
             />
