@@ -120,7 +120,7 @@ export default class Utils {
     return Utils.nextToAddrID++;
   }
 
-  static getDefaultFee(): number {
+  static getFallbackDefaultFee(): number {
     return 0.0001;
   }
 

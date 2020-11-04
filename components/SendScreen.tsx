@@ -122,6 +122,7 @@ const ComputingTxModalContent: React.FunctionComponent<any> = ({}) => {
 
 type ConfirmModalProps = {
   sendPageState: SendPageState;
+  defaultFee: number;
   price?: number | null;
   closeModal: () => void;
   confirmSend: () => void;
@@ -131,11 +132,12 @@ const ConfirmModalContent: React.FunctionComponent<ConfirmModalProps> = ({
   confirmSend,
   sendPageState,
   price,
+  defaultFee,
 }) => {
   const {colors} = useTheme();
 
   const sendingTotal =
-    sendPageState.toaddrs.reduce((s, t) => s + Utils.parseLocaleFloat(t.amount || '0'), 0.0) + Utils.getDefaultFee();
+    sendPageState.toaddrs.reduce((s, t) => s + Utils.parseLocaleFloat(t.amount || '0'), 0.0) + defaultFee;
 
   return (
     <SafeAreaView
@@ -193,8 +195,8 @@ const ConfirmModalContent: React.FunctionComponent<ConfirmModalProps> = ({
           <FadeText>Fee</FadeText>
           <View
             style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline'}}>
-            <ZecAmount size={18} amtZec={Utils.getDefaultFee()} />
-            <UsdAmount style={{fontSize: 18}} amtZec={Utils.getDefaultFee()} price={price} />
+            <ZecAmount size={18} amtZec={defaultFee} />
+            <UsdAmount style={{fontSize: 18}} amtZec={defaultFee} price={price} />
           </View>
         </View>
       </ScrollView>
@@ -242,6 +244,8 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
 
   const [titleViewHeight, setTitleViewHeight] = useState(0);
   const slideAnim = useRef(new Animated.Value(0)).current;
+
+  const defaultFee = info?.defaultFee || Utils.getFallbackDefaultFee();
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
@@ -347,7 +351,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
   const stillConfirming = spendable !== totalBalance.total;
 
   const setMaxAmount = (idx: number) => {
-    let max = spendable - Utils.getDefaultFee();
+    let max = spendable - defaultFee;
     if (max < 0) {
       max = 0;
     }
@@ -373,7 +377,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
     if (to.amount !== '') {
       if (
         Utils.parseLocaleFloat(to.amount) > 0 &&
-        Utils.parseLocaleFloat(to.amount) <= parseFloat((spendable - Utils.getDefaultFee()).toFixed(8))
+        Utils.parseLocaleFloat(to.amount) <= parseFloat((spendable - defaultFee).toFixed(8))
       ) {
         return 1;
       } else {
@@ -417,6 +421,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
         onRequestClose={() => setConfirmModalVisible(false)}>
         <ConfirmModalContent
           sendPageState={sendPageState}
+          defaultFee={defaultFee}
           price={info?.zecPrice}
           closeModal={() => {
             setConfirmModalVisible(false);

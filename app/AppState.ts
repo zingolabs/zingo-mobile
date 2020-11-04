@@ -116,6 +116,7 @@ export interface Info {
   currencyName: string;
   solps: number;
   zecPrice: number | null;
+  defaultFee: number;
   encrypted: boolean;
   locked: boolean;
 }

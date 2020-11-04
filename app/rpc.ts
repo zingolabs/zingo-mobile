@@ -1,5 +1,6 @@
 import {TotalBalance, AddressBalance, Transaction, TxDetail, Info, SendJsonToType, WalletSeed} from './AppState';
 import RPCModule from '../components/RPCModule';
+import Utils from './utils';
 
 export default class RPC {
   fnSetInfo: (info: Info) => void;
@@ -173,6 +174,9 @@ export default class RPC {
       const encStatus = await RPCModule.execute('encryptionstatus', '');
       const encJSON = JSON.parse(encStatus);
 
+      const defaultFee = await RPCModule.execute('defaultfee', '');
+      const defaultFeeJSON = JSON.parse(defaultFee);
+
       const info: Info = {
         testnet: infoJSON.chain_name === 'test',
         latestBlock: infoJSON.latest_block_height,
@@ -184,6 +188,7 @@ export default class RPC {
         encrypted: encJSON.encrypted,
         locked: encJSON.locked,
         zecPrice: null,
+        defaultFee: defaultFeeJSON?.defaultFee / 10 ** 8 || Utils.getFallbackDefaultFee(),
       };
 
       return info;
