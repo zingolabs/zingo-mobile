@@ -20,7 +20,7 @@ const AboutModal: React.FunctionComponent<AboutModalProps> = ({closeModal}) => {
       }}>
       <View>
         <View style={{alignItems: 'center', backgroundColor: colors.card, paddingBottom: 25, paddingTop: 25}}>
-          <Text style={{marginTop: 5, padding: 5, color: colors.text, fontSize: 28}}>Zecwallet Lite v1.1.0</Text>
+          <Text style={{marginTop: 5, padding: 5, color: colors.text, fontSize: 28}}>Zecwallet Lite v1.1.2</Text>
         </View>
         <View style={{display: 'flex', alignItems: 'center', marginTop: -25}}>
           <Image source={require('../assets/img/logobig.png')} style={{width: 50, height: 50, resizeMode: 'contain'}} />
