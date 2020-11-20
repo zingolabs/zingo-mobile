@@ -28,6 +28,7 @@ import AboutModal from '../components/About';
 import SeedComponent from '../components/SeedComponent';
 import InfoModal from '../components/InfoModal';
 import {useTheme} from '@react-navigation/native';
+import RescanModal from '../components/RescanModal';
 
 const window = Dimensions.get('window');
 const styles = StyleSheet.create({
@@ -56,6 +57,10 @@ function Menu({onItemSelected}: any) {
       <View style={{display: 'flex', marginLeft: 20}}>
         <RegText onPress={() => onItemSelected('Wallet Seed')} style={styles.item}>
           Wallet Seed
+        </RegText>
+
+        <RegText onPress={() => onItemSelected('Rescan')} style={styles.item}>
+          Rescan Wallet
         </RegText>
 
         <RegText onPress={() => onItemSelected('Info')} style={styles.item}>
@@ -97,6 +102,7 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
       isMenuDrawerOpen: false,
       selectedMenuDrawerItem: '',
       aboutModalVisible: false,
+      rescanModalVisible: false,
       infoModalVisible: false,
       seedModalVisible: false,
       syncingStatus: null,
@@ -121,6 +127,10 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
 
     // Configure the RPC to start doing refreshes
     this.rpc.configure();
+  };
+
+  componentWillUnmount = () => {
+    this.rpc.clearTimers();
   };
 
   getFullState = (): AppState => {
@@ -357,7 +367,17 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
     this.setState({isMenuDrawerOpen});
   };
 
-  onMenuItemSelected = (item: string) => {
+  fetchWalletSeed = async () => {
+    const walletSeed = await RPC.fetchSeed();
+    this.setState({walletSeed});
+  };
+
+  startRescan = () => {
+    this.rpc.rescan();
+    this.setRescanning(true);
+  };
+
+  onMenuItemSelected = async (item: string) => {
     this.setState({
       isMenuDrawerOpen: false,
       selectedMenuDrawerItem: item,
@@ -366,13 +386,15 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
     // Depending on the menu item, open the appropriate modal
     if (item === 'About') {
       this.setState({aboutModalVisible: true});
+    } else if (item === 'Rescan') {
+      // Fetch the wallet seed to show the birthday in the UI
+      await this.fetchWalletSeed();
+      this.setState({rescanModalVisible: true});
     } else if (item === 'Info') {
       this.setState({infoModalVisible: true});
     } else if (item === 'Wallet Seed') {
-      (async () => {
-        const walletSeed = await RPC.fetchSeed();
-        this.setState({walletSeed, seedModalVisible: true});
-      })();
+      await this.fetchWalletSeed();
+      this.setState({seedModalVisible: true});
     }
   };
 
@@ -385,6 +407,7 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
       sendPageState,
       aboutModalVisible,
       infoModalVisible,
+      rescanModalVisible,
       seedModalVisible,
       walletSeed,
       syncingStatus,
@@ -418,6 +441,18 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
             closeModal={() => this.setState({infoModalVisible: false})}
             info={info}
             walletHeight={syncingStatus?.walletHeight}
+          />
+        </Modal>
+
+        <Modal
+          animationType="slide"
+          transparent={false}
+          visible={rescanModalVisible}
+          onRequestClose={() => this.setState({rescanModalVisible: false})}>
+          <RescanModal
+            closeModal={() => this.setState({rescanModalVisible: false})}
+            birthday={walletSeed?.birthday}
+            startRescan={this.startRescan}
           />
         </Modal>
 

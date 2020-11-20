@@ -99,7 +99,16 @@ export default class RPC {
     this.fetchTandZTransactions(walletHeight);
   }
 
-  async refresh(fullRefresh: boolean) {
+  async rescan() {
+    console.log('RPC Rescan triggered');
+
+    // Empty out the transactions list to start with.
+    this.fnSetTransactionsList([]);
+
+    this.refresh(false, true);
+  }
+
+  async refresh(fullRefresh: boolean, fullRescan?: boolean) {
     // If we're in refresh, we don't overlap
     if (this.inRefresh) {
       return;
@@ -110,14 +119,20 @@ export default class RPC {
       return;
     }
 
-    if (fullRefresh || !this.lastBlockHeight || this.lastBlockHeight < latestBlockHeight) {
+    if (fullRefresh || fullRescan || !this.lastBlockHeight || this.lastBlockHeight < latestBlockHeight) {
       // If the latest block height has changed, make sure to sync. This will happen in a new thread
       this.inRefresh = true;
 
       // This is async, so when it is done, we finish the refresh.
-      RPC.doSync().finally(() => {
-        this.inRefresh = false;
-      });
+      if (fullRescan) {
+        RPC.doRescan().finally(() => {
+          this.inRefresh = false;
+        });
+      } else {
+        RPC.doSync().finally(() => {
+          this.inRefresh = false;
+        });
+      }
 
       const BLOCK_BATCH_SIZE = 10000;
       var nextIntermittentRefresh = 0;
