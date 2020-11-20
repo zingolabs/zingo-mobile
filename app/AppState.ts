@@ -109,6 +109,7 @@ export class ReceivePageState {
 
 export interface Info {
   testnet: boolean;
+  serverUri: string;
   latestBlock: number;
   connections: number;
   version: number;

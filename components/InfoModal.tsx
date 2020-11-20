@@ -26,7 +26,6 @@ type InfoModalProps = {
 
 const InfoModal: React.FunctionComponent<InfoModalProps> = ({info, walletHeight, closeModal}) => {
   const {colors} = useTheme();
-  const url = 'https://lightwalletd.zecwallet.co:1443';
   const height = info?.latestBlock;
 
   return (
@@ -60,7 +59,7 @@ const InfoModal: React.FunctionComponent<InfoModalProps> = ({info, walletHeight,
         <View style={{display: 'flex', margin: 10}}>
           <DetailLine label="Wallet Version" value="Zecwallet Lite v1.1.2" />
           <DetailLine label="Server Version" value={info?.version} />
-          <DetailLine label="Lightwallet Server URL" value={url} />
+          <DetailLine label="Lightwallet Server URL" value={info?.serverUri} />
           <DetailLine label="Network" value={info?.testnet ? 'Testnet' : 'Mainnet'} />
           <DetailLine label="Server Block Height" value={height} />
           <DetailLine label="Wallet Block Height" value={walletHeight} />

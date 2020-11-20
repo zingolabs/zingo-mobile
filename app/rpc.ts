@@ -180,6 +180,7 @@ export default class RPC {
       const info: Info = {
         testnet: infoJSON.chain_name === 'test',
         latestBlock: infoJSON.latest_block_height,
+        serverUri: infoJSON.server_uri || '<none>',
         connections: 1,
         version: infoJSON.version,
         verificationProgress: 1,
