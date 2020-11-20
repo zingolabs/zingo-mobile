@@ -141,28 +141,16 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun doSync(promise: Promise) {
-        // We run the sync on a different thread, so that we don't block the UI for syncing
-        thread {
-            val syncresult = execute("sync", "")
-            Log.w(TAG, "Sync:$syncresult");
-
-            // And save it
-            if (!syncresult.startsWith("Error")) {
-                saveWallet()
-            }
-
-            promise.resolve(syncresult)
-        }
-    }
-
-
-    @ReactMethod
     fun execute(cmd: String, args: String, promise: Promise) {
         thread {
             Log.w(TAG, "Executing ${cmd} with ${args}")
             val resp = execute(cmd, args)
             Log.w(TAG, "Response to ${cmd}: ${resp}")
+
+            // And save it if it was a sync
+            if (cmd.startsWith("sync") && !resp.startsWith("Error")) {
+                saveWallet()
+            }
 
             promise.resolve(resp)
         }

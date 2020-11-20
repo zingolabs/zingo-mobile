@@ -73,7 +73,7 @@ export default class RPC {
   }
 
   static async doSync(): Promise<string> {
-    const syncstr = await RPCModule.doSync();
+    const syncstr = await RPCModule.execute('sync', '');
     console.log(`Sync exec result: ${syncstr}`);
 
     return syncstr;
@@ -228,6 +228,8 @@ export default class RPC {
   async fetchTotalBalance() {
     const balanceStr = await RPCModule.execute('balance', '');
     const balanceJSON = JSON.parse(balanceStr);
+
+    console.log(`Num of z addrs ${balanceJSON.z_addresses.length} and t addrs ${balanceJSON.t_addresses.length}`);
 
     const privateBal = balanceJSON.zbalance / 10 ** 8;
     const transparentBal = balanceJSON.tbalance / 10 ** 8;
