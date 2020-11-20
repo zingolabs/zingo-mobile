@@ -237,20 +237,33 @@ RCT_REMAP_METHOD(doSync,
   [NSThread detachNewThreadSelector:@selector(doSyncOnThread:) toTarget:self withObject:resolve];
 }
 
+-(void) doExecuteOnThread:(NSDictionary *)dict {
+  @autoreleasepool {
+    NSString* method = dict[@"method"];
+    NSString* args = dict[@"args"];
+    RCTPromiseResolveBlock resolve = dict[@"resolve"];
+    
+    RCTLogInfo(@"execute called with %@", method);
+    
+    char *resp = execute([method UTF8String], [args UTF8String]);
+    NSString* respStr = [NSString stringWithUTF8String:resp];
+    rust_free(resp);
+    
+    RCTLogInfo(@"Got resp for execute (%@): %@", method, respStr);
+    resolve(respStr);
+  }
+}
+
 // Generic Execute the command.
 RCT_REMAP_METHOD(execute,
                  method:(NSString *)method
                  args:(NSString *)args
                  executeWithResolver:(RCTPromiseResolveBlock)resolve
                  rejected:(RCTPromiseRejectBlock)reject) {
-  RCTLogInfo(@"execute called with %@", method);
   
-  char *resp = execute([method UTF8String], [args UTF8String]);
-  NSString* respStr = [NSString stringWithUTF8String:resp];
-  rust_free(resp);
+  NSDictionary* dict = [NSDictionary dictionaryWithObjectsAndKeys:method, @"method", args, @"args", resolve, @"resolve", nil];
   
-  RCTLogInfo(@"Got resp for execute (%@): %@", method, respStr);
-  resolve(respStr);
+  [NSThread detachNewThreadSelector:@selector(doExecuteOnThread:) toTarget:self withObject:dict];
 }
 
 @end
