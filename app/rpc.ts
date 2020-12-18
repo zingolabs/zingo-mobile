@@ -204,7 +204,7 @@ export default class RPC {
         encrypted: encJSON.encrypted,
         locked: encJSON.locked,
         zecPrice: null,
-        defaultFee: defaultFeeJSON?.defaultFee / 10 ** 8 || Utils.getFallbackDefaultFee(),
+        defaultFee: defaultFeeJSON?.defaultfee / 10 ** 8 || Utils.getFallbackDefaultFee(),
       };
 
       return info;
