@@ -134,7 +134,15 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({tx, price, closeModal
                 {txd?.memo && (
                   <View style={{marginTop: 10}}>
                     <FadeText>Memo</FadeText>
-                    <RegText>{txd?.memo}</RegText>
+                    <TouchableOpacity
+                      onPress={() => {
+                        if (txd?.memo) {
+                          Clipboard.setString(txd?.memo);
+                          Toast.show('Copied Memo to Clipboard', Toast.LONG);
+                        }
+                      }}>
+                      <RegText>{txd?.memo}</RegText>
+                    </TouchableOpacity>
                   </View>
                 )}
               </View>
