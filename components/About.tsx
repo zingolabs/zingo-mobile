@@ -20,7 +20,7 @@ const AboutModal: React.FunctionComponent<AboutModalProps> = ({closeModal}) => {
       }}>
       <View>
         <View style={{alignItems: 'center', backgroundColor: colors.card, paddingBottom: 25, paddingTop: 25}}>
-          <Text style={{marginTop: 5, padding: 5, color: colors.text, fontSize: 28}}>Zecwallet Lite v1.2.1</Text>
+          <Text style={{marginTop: 5, padding: 5, color: colors.text, fontSize: 28}}>Zecwallet Lite v1.4.2</Text>
         </View>
         <View style={{display: 'flex', alignItems: 'center', marginTop: -25}}>
           <Image source={require('../assets/img/logobig.png')} style={{width: 50, height: 50, resizeMode: 'contain'}} />
@@ -36,13 +36,13 @@ const AboutModal: React.FunctionComponent<AboutModalProps> = ({closeModal}) => {
         }}>
         <FadeText>
           {'\n'}
-          Copyright (c) 2018-2020, Aditya Kulkarni.
+          Copyright (c) 2018-2021, Aditya Kulkarni.
           {'\n'}
           {'\n'}
           Built with React Native.
           {'\n'}
           {'\n'}
-          The MIT License (MIT) Copyright (c) 2018-2020 Zecwallet
+          The MIT License (MIT) Copyright (c) 2018-2021 Zecwallet
           {'\n'}
           {'\n'}
           Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
