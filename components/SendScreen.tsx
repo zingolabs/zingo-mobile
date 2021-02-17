@@ -459,8 +459,12 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
               zIndex: -1,
             }}>
             <RegText style={{marginTop: 5, padding: 5}}>Spendable</RegText>
-            <ZecAmount size={36} amtZec={spendable} />
-            <UsdAmount style={{marginTop: 5}} price={zecPrice} amtZec={spendable} />
+            <TouchableOpacity onPress={() => setMaxAmount(0)}>
+              <View style={{display: 'flex', alignItems: 'center'}}>
+                <ZecAmount size={36} amtZec={spendable} />
+                <UsdAmount style={{marginTop: 5}} price={zecPrice} amtZec={spendable} />
+              </View>
+            </TouchableOpacity>
           </View>
         </Animated.View>
 
@@ -530,9 +534,9 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
                   value={ta.amount.toString()}
                   onChangeText={(text: string) => updateToField(i, null, text, null)}
                 />
-                <TouchableOpacity onPress={() => setMaxAmount(i)}>
+                {/* <TouchableOpacity onPress={() => setMaxAmount(i)}>
                   <FontAwesomeIcon style={{margin: 5}} size={24} icon={faArrowAltCircleUp} color={colors.text} />
-                </TouchableOpacity>
+                </TouchableOpacity> */}
               </View>
               {stillConfirming && (
                 <View
