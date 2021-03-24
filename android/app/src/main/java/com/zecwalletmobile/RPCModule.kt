@@ -18,7 +18,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         const val TAG = "RPCModule"
     }
 
-    private val LIGHTWALLETD_URL = "https://lightwalletd.zecwallet.co:1443";
+    private val LIGHTWALLETD_URL = "https://lwdv2.zecwallet.co:1443";
 
     private external fun initlogging(): String
     private external fun execute(cmd: String, args: String): String

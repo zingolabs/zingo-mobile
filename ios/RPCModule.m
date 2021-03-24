@@ -12,7 +12,7 @@
 
 @implementation RPCModule
 
-NSString* const URL = @"https://lightwalletd.zecwallet.co:1443";
+NSString* const URL = @"https://lwdv2.zecwallet.co:1443";
 
 // To make it accessible in React
 RCT_EXPORT_MODULE();
