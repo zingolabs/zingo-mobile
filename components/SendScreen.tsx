@@ -14,7 +14,7 @@ import {
   UsdAmount,
 } from '../components/Components';
 import {Info, SendPageState, ToAddr, TotalBalance} from '../app/AppState';
-import {faQrcode, faCheck, faArrowAltCircleUp, faInfo} from '@fortawesome/free-solid-svg-icons';
+import {faQrcode, faCheck, faInfo} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {useTheme} from '@react-navigation/native';
 import {NavigationScreenProp} from 'react-navigation';
