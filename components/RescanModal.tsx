@@ -48,7 +48,7 @@ const RescanModal: React.FunctionComponent<RescanModalProps> = ({birthday, start
 
         <View style={{display: 'flex', margin: 10}}>
           <RegText>
-            This will re-fetch all transcations and rebuild your shileded wallet, starting from block height {birthday}.
+            This will re-fetch all transactions and rebuild your shielded wallet, starting from block height {birthday}.
             It might take several minutes.
           </RegText>
         </View>
