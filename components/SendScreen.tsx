@@ -13,7 +13,7 @@ import {
   ZecAmount,
   UsdAmount,
 } from '../components/Components';
-import {Info, SendPageState, ToAddr, TotalBalance} from '../app/AppState';
+import {Info, SendPageState, SendProgress, ToAddr, TotalBalance} from '../app/AppState';
 import {faQrcode, faCheck, faInfo} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {useTheme} from '@react-navigation/native';
@@ -92,7 +92,10 @@ function ScanScreen({idx, updateToField, closeModal}: ScannerProps) {
   );
 }
 
-const ComputingTxModalContent: React.FunctionComponent<any> = ({}) => {
+type ComputingModalProps = {
+  progress: SendProgress;
+};
+const ComputingTxModalContent: React.FunctionComponent<ComputingModalProps> = ({progress}) => {
   const {colors} = useTheme();
   const [seconds, setSeconds] = useState(0);
 
@@ -115,7 +118,12 @@ const ComputingTxModalContent: React.FunctionComponent<any> = ({}) => {
       }}>
       <RegText>Computing Transaction</RegText>
       <RegText>Please wait...</RegText>
-      <RegText>(This can take up to a minute)</RegText>
+      {progress && progress.sendInProgress && (
+        <>
+          <RegText>{`Building...${progress.progress} of ${progress.total}`}</RegText>
+          <RegText>{`ETA ${progress.etaSeconds}s`}</RegText>
+        </>
+      )}
     </SafeAreaView>
   );
 };
@@ -220,7 +228,7 @@ type SendScreenProps = {
   totalBalance: TotalBalance;
   sendPageState: SendPageState;
   setSendPageState: (sendPageState: SendPageState) => void;
-  sendTransaction: () => void;
+  sendTransaction: (setSendProgress: (arg0: SendProgress | null) => void) => void;
   clearToAddrs: () => void;
   navigation: NavigationScreenProp<any>;
   toggleMenuDrawer: () => void;
@@ -241,6 +249,8 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
   const [qrcodeModalIndex, setQrcodeModalIndex] = useState(0);
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
   const [computingModalVisible, setComputingModalVisible] = useState(false);
+
+  const [txBuildProgress, setTxBuildProgress] = useState(new SendProgress());
 
   const [titleViewHeight, setTitleViewHeight] = useState(0);
   const slideAnim = useRef(new Animated.Value(0)).current;
@@ -323,10 +333,18 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
     setConfirmModalVisible(false);
     setComputingModalVisible(true);
 
+    const setSendProgress = (progress: SendProgress | null) => {
+      if (progress && progress.sendInProgress) {
+        setTxBuildProgress(progress);
+      } else {
+        setTxBuildProgress(new SendProgress());
+      }
+    };
+
     // call the sendTransaction method in a timeout, allowing the modals to show properly
     setTimeout(async () => {
       try {
-        const txid = await sendTransaction();
+        const txid = await sendTransaction(setSendProgress);
         setComputingModalVisible(false);
 
         // Clear the fields
@@ -435,7 +453,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
         transparent={false}
         visible={computingModalVisible}
         onRequestClose={() => setComputingModalVisible(false)}>
-        <ComputingTxModalContent />
+        <ComputingTxModalContent progress={txBuildProgress} />
       </Modal>
 
       <ScrollView

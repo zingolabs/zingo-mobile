@@ -1,4 +1,13 @@
-import {TotalBalance, AddressBalance, Transaction, TxDetail, Info, SendJsonToType, WalletSeed} from './AppState';
+import {
+  TotalBalance,
+  AddressBalance,
+  Transaction,
+  TxDetail,
+  Info,
+  SendJsonToType,
+  WalletSeed,
+  SendProgress,
+} from './AppState';
 import RPCModule from '../components/RPCModule';
 import Utils from './utils';
 
@@ -450,34 +459,80 @@ export default class RPC {
   }
 
   // Send a transaction using the already constructed sendJson structure
-  async sendTransaction(sendJson: Array<SendJsonToType>): Promise<string> {
-    let sendStr;
+  async sendTransaction(
+    sendJson: Array<SendJsonToType>,
+    setSendProgress: (arg0: SendProgress | null) => void,
+  ): Promise<string> {
+    // First, get the previous send progress id, so we know which ID to track
+    const prevProgress = JSON.parse(await RPCModule.execute('sendprogress', ''));
+    const prevSendId = prevProgress.id;
+
     try {
-      sendStr = await RPCModule.doSend(JSON.stringify(sendJson));
+      // This is async, so fire and forget
+      RPCModule.doSend(JSON.stringify(sendJson));
     } catch (err) {
       // TODO Show a modal with the error
       console.log(`Error sending Tx: ${err}`);
       throw err;
     }
 
-    if (sendStr.startsWith('Error')) {
-      // Throw the proper error
-      throw sendStr.split(/[\r\n]+/)[0];
-    }
+    const startTimeSeconds = new Date().getTime() / 1000;
 
-    console.log(`Send response: ${sendStr}`);
-    const sendJSON = JSON.parse(sendStr);
-    const {txid, error} = sendJSON;
+    // The send command is async, so we need to poll to get the status
+    const sendTxPromise = new Promise<string>((resolve, reject) => {
+      const intervalID = setInterval(async () => {
+        const progress = JSON.parse(await RPCModule.execute('sendprogress', ''));
+        console.log(progress);
 
-    if (error) {
-      console.log(`Error sending Tx: ${error}`);
-      throw error;
-    } else {
-      // And refresh data (full refresh)
-      this.refresh(true);
+        const updatedProgress = new SendProgress();
+        if (progress.id === prevSendId) {
+          // Still not started, so wait for more time
+          setSendProgress(updatedProgress);
+          return;
+        }
 
-      return txid;
-    }
+        // Calculate ETA.
+        let secondsPerComputation = 3; // defalt
+        if (progress.progress > 0) {
+          const currentTimeSeconds = new Date().getTime() / 1000;
+          secondsPerComputation = (currentTimeSeconds - startTimeSeconds) / progress.progress;
+        }
+        // console.log(`Seconds Per compute = ${secondsPerComputation}`);
+
+        let eta = Math.round((progress.total - progress.progress) * secondsPerComputation);
+        if (eta <= 0) {
+          eta = 1;
+        }
+
+        updatedProgress.progress = progress.progress;
+        updatedProgress.total = Math.max(progress.total, progress.progress); // sometimes, due to change, the total can be off by 1
+        updatedProgress.sendInProgress = true;
+        updatedProgress.etaSeconds = eta;
+
+        if (!progress.txid && !progress.error) {
+          // Still processing
+          setSendProgress(updatedProgress);
+          return;
+        }
+
+        // Finished processing
+        clearInterval(intervalID);
+        setSendProgress(null);
+
+        if (progress.txid) {
+          // And refresh data (full refresh)
+          this.refresh(true);
+
+          resolve(progress.txid);
+        }
+
+        if (progress.error) {
+          reject(progress.error);
+        }
+      }, 2 * 1000); // Every 2 seconds
+    });
+
+    return sendTxPromise;
   }
 
   async encryptWallet(password: string): Promise<boolean> {

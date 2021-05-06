@@ -18,6 +18,7 @@ import AppState, {
   ErrorModalData,
   SendJsonToType,
   SyncStatus,
+  SendProgress,
 } from './AppState';
 import {RegText, FadeText} from '../components/Components';
 import Utils from './utils';
@@ -302,11 +303,11 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
     return json;
   };
 
-  sendTransaction = async (): Promise<String> => {
+  sendTransaction = async (setSendProgress: (arg0: SendProgress | null) => void): Promise<String> => {
     try {
       // Construct a sendJson from the sendPage state
       const sendJson = this.getSendManyJSON();
-      const txid = await this.rpc.sendTransaction(sendJson);
+      const txid = await this.rpc.sendTransaction(sendJson, setSendProgress);
 
       return txid;
     } catch (err) {

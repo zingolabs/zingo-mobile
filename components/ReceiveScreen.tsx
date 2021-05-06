@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import {View, Dimensions, Clipboard, Platform, Image, Text, Button} from 'react-native';
+import {View, Dimensions, Clipboard, Platform, Image, Text} from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import {TabView, TabBar} from 'react-native-tab-view';
 import Toast from 'react-native-simple-toast';
