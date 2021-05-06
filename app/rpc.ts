@@ -197,7 +197,7 @@ export default class RPC {
         latestBlock: infoJSON.latest_block_height,
         serverUri: infoJSON.server_uri || '<none>',
         connections: 1,
-        version: infoJSON.version,
+        version: `${infoJSON.vendor}/${infoJSON.git_commit.substring(0, 6)}/${infoJSON.version}`,
         verificationProgress: 1,
         currencyName: infoJSON.chain_name === 'test' ? 'TAZ' : 'ZEC',
         solps: 0,

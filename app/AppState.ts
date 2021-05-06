@@ -112,7 +112,7 @@ export interface Info {
   serverUri: string;
   latestBlock: number;
   connections: number;
-  version: number;
+  version: string;
   verificationProgress: number;
   currencyName: string;
   solps: number;
