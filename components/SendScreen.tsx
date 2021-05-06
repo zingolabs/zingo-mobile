@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useState, useEffect, useRef} from 'react';
 import QRCodeScanner from 'react-native-qrcode-scanner';
+import * as Progress from 'react-native-progress';
 import {View, ScrollView, Modal, Image, Alert, SafeAreaView, Keyboard} from 'react-native';
 import {
   FadeText,
@@ -117,11 +118,17 @@ const ComputingTxModalContent: React.FunctionComponent<ComputingModalProps> = ({
         backgroundColor: colors.background,
       }}>
       <RegText>Computing Transaction</RegText>
-      <RegText>Please wait...</RegText>
+      {!(progress && progress.sendInProgress) && <RegText>Please wait...</RegText>}
       {progress && progress.sendInProgress && (
         <>
-          <RegText>{`Building...${progress.progress} of ${progress.total}`}</RegText>
+          <RegText>{`Completed step ${progress.progress} of ${progress.total}`}</RegText>
           <RegText>{`ETA ${progress.etaSeconds}s`}</RegText>
+          <Progress.Circle
+            showsText={true}
+            progress={progress.progress / progress.total}
+            indeterminate={!progress.progress}
+            size={100}
+          />
         </>
       )}
     </SafeAreaView>
