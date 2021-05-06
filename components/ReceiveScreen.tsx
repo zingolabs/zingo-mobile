@@ -1,10 +1,10 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import {View, Dimensions, Clipboard, Platform, Image, Text} from 'react-native';
+import {View, Dimensions, Clipboard, Platform, Image, Text, Button} from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import {TabView, TabBar} from 'react-native-tab-view';
 import Toast from 'react-native-simple-toast';
-import {FadeText} from '../components/Components';
+import {FadeText, SecondaryButton} from '../components/Components';
 import {Info} from '../app/AppState';
 import Utils from '../app/utils';
 import {useTheme} from '@react-navigation/native';
@@ -23,28 +23,29 @@ const SingleAddressDisplay: React.FunctionComponent<SingleAddress> = ({address})
 
   const {colors} = useTheme();
 
-  const chunks = Utils.splitAddressIntoChunks(address, Utils.isSapling(address) ? 8 : 4);
+  const chunks = Utils.splitAddressIntoChunks(address, Utils.isSapling(address) ? 4 : 2);
   const fixedWidthFont = Platform.OS === 'android' ? 'monospace' : 'Courier';
+
+  const doCopy = () => {
+    if (address) {
+      Clipboard.setString(address);
+      Toast.show('Copied Address to Clipboard', Toast.LONG);
+    }
+  };
 
   return (
     <View style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
       <View style={{padding: 10, backgroundColor: 'rgb(255, 255, 255)', marginTop: 20}}>
         <QRCode value={address} size={250} ecl="M" />
       </View>
-      <TouchableOpacity
-        onPress={() => {
-          if (address) {
-            Clipboard.setString(address);
-            Toast.show('Copied Address to Clipboard', Toast.LONG);
-          }
-        }}>
+      <TouchableOpacity onPress={doCopy}>
         <View
           style={{display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', marginTop: 20}}>
           {chunks.map((c) => (
             <FadeText
               key={c}
               style={{
-                flexBasis: '40%',
+                flexBasis: '100%',
                 textAlign: 'center',
                 fontFamily: fixedWidthFont,
                 fontSize: 18,
@@ -55,6 +56,7 @@ const SingleAddressDisplay: React.FunctionComponent<SingleAddress> = ({address})
           ))}
         </View>
       </TouchableOpacity>
+      <SecondaryButton title="Copy to Clipboard" onPress={doCopy} />
     </View>
   );
 };
