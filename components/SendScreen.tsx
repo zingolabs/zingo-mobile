@@ -121,8 +121,8 @@ const ComputingTxModalContent: React.FunctionComponent<ComputingModalProps> = ({
       {!(progress && progress.sendInProgress) && <RegText>Please wait...</RegText>}
       {progress && progress.sendInProgress && (
         <>
-          <RegText>{`Completed step ${progress.progress} of ${progress.total}`}</RegText>
-          <RegText>{`ETA ${progress.etaSeconds}s`}</RegText>
+          <RegText>{`Step ${progress.progress} of ${progress.total}`}</RegText>
+          <RegText style={{marginBottom: 20}}>{`ETA ${progress.etaSeconds}s`}</RegText>
           <Progress.Circle
             showsText={true}
             progress={progress.progress / progress.total}
