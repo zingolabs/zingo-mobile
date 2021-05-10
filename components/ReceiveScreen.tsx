@@ -39,8 +39,7 @@ const SingleAddressDisplay: React.FunctionComponent<SingleAddress> = ({address})
         <QRCode value={address} size={250} ecl="M" />
       </View>
       <TouchableOpacity onPress={doCopy}>
-        <View
-          style={{display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', marginTop: 20}}>
+        <View style={{display: 'flex', flexDirection: 'row', flexWrap: 'wrap', marginTop: 10}}>
           {chunks.map((c) => (
             <FadeText
               key={c}
@@ -56,7 +55,7 @@ const SingleAddressDisplay: React.FunctionComponent<SingleAddress> = ({address})
           ))}
         </View>
       </TouchableOpacity>
-      <SecondaryButton title="Copy to Clipboard" onPress={doCopy} />
+      <SecondaryButton style={{marginTop: 10}} title="Copy to Clipboard" onPress={doCopy} />
     </View>
   );
 };
