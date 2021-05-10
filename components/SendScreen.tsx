@@ -98,15 +98,6 @@ type ComputingModalProps = {
 };
 const ComputingTxModalContent: React.FunctionComponent<ComputingModalProps> = ({progress}) => {
   const {colors} = useTheme();
-  const [seconds, setSeconds] = useState(0);
-
-  useEffect(() => {
-    let timerID = setInterval(() => {
-      setSeconds(seconds + 1);
-    }, 1000);
-
-    return () => clearInterval(timerID);
-  }, [seconds]);
 
   return (
     <SafeAreaView

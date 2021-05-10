@@ -198,17 +198,13 @@ RCT_REMAP_METHOD(doSave,
 
 // Send a Tx. React needs to construct the sendJSON and pass it in as a string
 RCT_REMAP_METHOD(doSend,
-                 sendJSON:(NSString *)sendJSON
+                 args:(NSString *)args
                  doSendWithResolver:(RCTPromiseResolveBlock)resolve
                  rejected:(RCTPromiseRejectBlock)reject) {
-  RCTLogInfo(@"doSend called with %@", sendJSON);
+  RCTLogInfo(@"doSend called with %@", args);
     
-  char *resp = execute("send", [sendJSON UTF8String]);
-  NSString* respStr = [NSString stringWithUTF8String:resp];
-  rust_free(resp);
-  
-  RCTLogInfo(@"Got resp: %@", respStr);
-  resolve(respStr);
+  NSDictionary* dict = [NSDictionary dictionaryWithObjectsAndKeys:@"send", @"method", args, @"args", resolve, @"resolve", nil];
+  [NSThread detachNewThreadSelector:@selector(doExecuteOnThread:) toTarget:self withObject:dict];
 }
 
 -(void) doExecuteOnThread:(NSDictionary *)dict {
