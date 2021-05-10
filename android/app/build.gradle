@@ -134,7 +134,7 @@ android {
         applicationId "com.zecwalletmobile"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 31
+        versionCode 32
         versionName "1.6.1"
 
         missingDimensionStrategy 'react-native-camera', 'general'
