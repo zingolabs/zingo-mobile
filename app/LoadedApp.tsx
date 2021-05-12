@@ -188,7 +188,7 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
     if (!sendPageState.fromaddr) {
       // Find a z-address with the highest balance
       const defaultAB = addressesWithBalance
-        .filter((ab) => Utils.isSapling(ab.address))
+        .filter(ab => Utils.isSapling(ab.address))
         .reduce((prev: AddressBalance | null, ab: AddressBalance) => {
           // We'll start with a sapling address
           if (prev == null) {
@@ -271,7 +271,7 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
 
   getSendManyJSON = (): Array<SendJsonToType> => {
     const {sendPageState} = this.state;
-    const json = sendPageState.toaddrs.flatMap((to) => {
+    const json = sendPageState.toaddrs.flatMap(to => {
       const memo = to.memo || '';
       const amount = parseInt((Utils.parseLocaleFloat(to.amount) * 10 ** 8).toFixed(0), 10);
 
@@ -424,7 +424,7 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
     const menu = <Menu onItemSelected={this.onMenuItemSelected} />;
 
     return (
-      <SideMenu menu={menu} isOpen={this.state.isMenuDrawerOpen} onChange={(isOpen) => this.updateMenuState(isOpen)}>
+      <SideMenu menu={menu} isOpen={this.state.isMenuDrawerOpen} onChange={isOpen => this.updateMenuState(isOpen)}>
         <Modal
           animationType="slide"
           transparent={false}
@@ -497,7 +497,7 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
             tabStyle: {borderRadius: 0},
           }}>
           <Tab.Screen name="SEND">
-            {(props) => (
+            {props => (
               <SendScreen
                 {...props}
                 {...standardProps}
@@ -510,7 +510,7 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
             )}
           </Tab.Screen>
           <Tab.Screen name="WALLET">
-            {(props) => (
+            {props => (
               <TransactionsScreen
                 {...props}
                 {...standardProps}
@@ -522,7 +522,7 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
             )}
           </Tab.Screen>
           <Tab.Screen name="RECEIVE">
-            {(props) => <ReceiveScreen {...props} {...standardProps} addresses={addresses} />}
+            {props => <ReceiveScreen {...props} {...standardProps} addresses={addresses} />}
           </Tab.Screen>
         </Tab.Navigator>
       </SideMenu>

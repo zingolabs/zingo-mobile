@@ -3,21 +3,21 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		00E356F31AD99517003FC87E /* ZecwalletMobileTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* ZecwalletMobileTests.m */; };
-		010B9BDC42D945B72ACEE3AE /* libPods-ZecwalletMobile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9DC47C706A52A74264CE781B /* libPods-ZecwalletMobile.a */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
-		13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB11A68108700A75B9A /* LaunchScreen.xib */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		75D3FE7E84AA7F09C772750B /* libPods-ZecwalletMobile-ZecwalletMobileTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1554D066F46BC8CD65ABBE6C /* libPods-ZecwalletMobile-ZecwalletMobileTests.a */; };
-		DB39A3512472FBE700A9404D /* RPCModule.m in Sources */ = {isa = PBXBuildFile; fileRef = DB39A3502472FBE700A9404D /* RPCModule.m */; };
-		DB39A354247302D500A9404D /* librustios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DB39A353247302CB00A9404D /* librustios.a */; };
-		DB60ADD1247CCCA200E82FE6 /* saplingspend in Resources */ = {isa = PBXBuildFile; fileRef = DB60ADCF247CCCA200E82FE6 /* saplingspend */; };
-		DB60ADD2247CCCA200E82FE6 /* saplingoutput in Resources */ = {isa = PBXBuildFile; fileRef = DB60ADD0247CCCA200E82FE6 /* saplingoutput */; };
+		5F9FEE8650525C4AF43859AB /* libPods-ZecwalletMobile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1794449599A63970811D5CF0 /* libPods-ZecwalletMobile.a */; };
+		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		BEE8CE82BFAC39CF1118356C /* libPods-ZecwalletMobile-ZecwalletMobileTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 57C30AB6DAB41A2ED2699835 /* libPods-ZecwalletMobile-ZecwalletMobileTests.a */; };
+		DB4DE514264B0EDF0084F17D /* librustios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DB4DE513264B0EBA0084F17D /* librustios.a */; };
+		DB4DE518264B103E0084F17D /* RPCModule.m in Sources */ = {isa = PBXBuildFile; fileRef = DB4DE517264B103E0084F17D /* RPCModule.m */; };
+		DB4DE51B264B10D40084F17D /* saplingspend in Resources */ = {isa = PBXBuildFile; fileRef = DB4DE519264B10D40084F17D /* saplingspend */; };
+		DB4DE51C264B10D40084F17D /* saplingoutput in Resources */ = {isa = PBXBuildFile; fileRef = DB4DE51A264B10D40084F17D /* saplingoutput */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -31,37 +31,29 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		008F07F21AC5B25A0029DE68 /* main.jsbundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = main.jsbundle; sourceTree = "<group>"; };
+		00C6628EA1AABD9135EC0B2D /* Pods-ZecwalletMobile.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZecwalletMobile.release.xcconfig"; path = "Target Support Files/Pods-ZecwalletMobile/Pods-ZecwalletMobile.release.xcconfig"; sourceTree = "<group>"; };
 		00E356EE1AD99517003FC87E /* ZecwalletMobileTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ZecwalletMobileTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* ZecwalletMobileTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZecwalletMobileTests.m; sourceTree = "<group>"; };
-		10BAD64066065D25BC4A510A /* libPods-ZecwalletMobile-tvOSTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ZecwalletMobile-tvOSTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		139FC776D22970EDA9C040D6 /* Pods-ZecwalletMobile.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZecwalletMobile.debug.xcconfig"; path = "Target Support Files/Pods-ZecwalletMobile/Pods-ZecwalletMobile.debug.xcconfig"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* Zecwallet Lite.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Zecwallet Lite.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = ZecwalletMobile/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = ZecwalletMobile/AppDelegate.m; sourceTree = "<group>"; };
-		13B07FB21A68108700A75B9A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = ZecwalletMobile/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = ZecwalletMobile/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = ZecwalletMobile/main.m; sourceTree = "<group>"; };
-		1554D066F46BC8CD65ABBE6C /* libPods-ZecwalletMobile-ZecwalletMobileTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ZecwalletMobile-ZecwalletMobileTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		18790C77C5C8371AA6729489 /* libPods-ZecwalletMobile-tvOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ZecwalletMobile-tvOS.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		3F34A2A9D3267FE9BE000EA1 /* Pods-ZecwalletMobile-tvOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZecwalletMobile-tvOSTests.debug.xcconfig"; path = "Target Support Files/Pods-ZecwalletMobile-tvOSTests/Pods-ZecwalletMobile-tvOSTests.debug.xcconfig"; sourceTree = "<group>"; };
-		76447A3DA1506E4B445A8213 /* Pods-ZecwalletMobile-ZecwalletMobileTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZecwalletMobile-ZecwalletMobileTests.debug.xcconfig"; path = "Target Support Files/Pods-ZecwalletMobile-ZecwalletMobileTests/Pods-ZecwalletMobile-ZecwalletMobileTests.debug.xcconfig"; sourceTree = "<group>"; };
-		7A508024CEDBE066346DC2D7 /* Pods-ZecwalletMobile-tvOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZecwalletMobile-tvOS.release.xcconfig"; path = "Target Support Files/Pods-ZecwalletMobile-tvOS/Pods-ZecwalletMobile-tvOS.release.xcconfig"; sourceTree = "<group>"; };
-		7B27AA00FC06FE4B8DDD3339 /* Pods-ZecwalletMobile.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZecwalletMobile.release.xcconfig"; path = "Target Support Files/Pods-ZecwalletMobile/Pods-ZecwalletMobile.release.xcconfig"; sourceTree = "<group>"; };
-		9DC47C706A52A74264CE781B /* libPods-ZecwalletMobile.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ZecwalletMobile.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		A76D3D204E939CA06ECE69FA /* Pods-ZecwalletMobile-tvOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZecwalletMobile-tvOS.debug.xcconfig"; path = "Target Support Files/Pods-ZecwalletMobile-tvOS/Pods-ZecwalletMobile-tvOS.debug.xcconfig"; sourceTree = "<group>"; };
-		AA53430C598FBAAC30CBDC6B /* Pods-ZecwalletMobile-ZecwalletMobileTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZecwalletMobile-ZecwalletMobileTests.release.xcconfig"; path = "Target Support Files/Pods-ZecwalletMobile-ZecwalletMobileTests/Pods-ZecwalletMobile-ZecwalletMobileTests.release.xcconfig"; sourceTree = "<group>"; };
-		B16AD3DC7DC87DE09769063B /* Pods-ZecwalletMobile.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZecwalletMobile.debug.xcconfig"; path = "Target Support Files/Pods-ZecwalletMobile/Pods-ZecwalletMobile.debug.xcconfig"; sourceTree = "<group>"; };
-		DB39A34F2472FBBB00A9404D /* RPCModule.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RPCModule.h; sourceTree = "<group>"; };
-		DB39A3502472FBE700A9404D /* RPCModule.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RPCModule.m; sourceTree = "<group>"; };
-		DB39A3522473024600A9404D /* rust.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rust.h; sourceTree = "<group>"; };
-		DB39A353247302CB00A9404D /* librustios.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = librustios.a; sourceTree = "<group>"; };
-		DB60ADCF247CCCA200E82FE6 /* saplingspend */ = {isa = PBXFileReference; lastKnownFileType = file; name = saplingspend; path = ../android/app/src/main/res/raw/saplingspend; sourceTree = "<group>"; };
-		DB60ADD0247CCCA200E82FE6 /* saplingoutput */ = {isa = PBXFileReference; lastKnownFileType = file; name = saplingoutput; path = ../android/app/src/main/res/raw/saplingoutput; sourceTree = "<group>"; };
-		E21CDB7108A143B9A13BF9E5 /* Pods-ZecwalletMobile-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZecwalletMobile-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-ZecwalletMobile-tvOSTests/Pods-ZecwalletMobile-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
+		1794449599A63970811D5CF0 /* libPods-ZecwalletMobile.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ZecwalletMobile.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		57C30AB6DAB41A2ED2699835 /* libPods-ZecwalletMobile-ZecwalletMobileTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ZecwalletMobile-ZecwalletMobileTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		65B24C2E2D48C83D6B5DDF6E /* Pods-ZecwalletMobile-ZecwalletMobileTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZecwalletMobile-ZecwalletMobileTests.debug.xcconfig"; path = "Target Support Files/Pods-ZecwalletMobile-ZecwalletMobileTests/Pods-ZecwalletMobile-ZecwalletMobileTests.debug.xcconfig"; sourceTree = "<group>"; };
+		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = ZecwalletMobile/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		85DB7315AECC5EFD25F9B82E /* Pods-ZecwalletMobile-ZecwalletMobileTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZecwalletMobile-ZecwalletMobileTests.release.xcconfig"; path = "Target Support Files/Pods-ZecwalletMobile-ZecwalletMobileTests/Pods-ZecwalletMobile-ZecwalletMobileTests.release.xcconfig"; sourceTree = "<group>"; };
+		DB4DE513264B0EBA0084F17D /* librustios.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = librustios.a; sourceTree = "<group>"; };
+		DB4DE515264B0FE30084F17D /* rust.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rust.h; sourceTree = "<group>"; };
+		DB4DE516264B103E0084F17D /* RPCModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RPCModule.h; sourceTree = "<group>"; };
+		DB4DE517264B103E0084F17D /* RPCModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RPCModule.m; sourceTree = "<group>"; };
+		DB4DE519264B10D40084F17D /* saplingspend */ = {isa = PBXFileReference; lastKnownFileType = file; name = saplingspend; path = ../android/app/src/main/res/raw/saplingspend; sourceTree = "<group>"; };
+		DB4DE51A264B10D40084F17D /* saplingoutput */ = {isa = PBXFileReference; lastKnownFileType = file; name = saplingoutput; path = ../android/app/src/main/res/raw/saplingoutput; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
-		ED2971642150620600B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS12.0.sdk/System/Library/Frameworks/JavaScriptCore.framework; sourceTree = DEVELOPER_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -69,7 +61,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				75D3FE7E84AA7F09C772750B /* libPods-ZecwalletMobile-ZecwalletMobileTests.a in Frameworks */,
+				BEE8CE82BFAC39CF1118356C /* libPods-ZecwalletMobile-ZecwalletMobileTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -77,8 +69,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				010B9BDC42D945B72ACEE3AE /* libPods-ZecwalletMobile.a in Frameworks */,
-				DB39A354247302D500A9404D /* librustios.a in Frameworks */,
+				5F9FEE8650525C4AF43859AB /* libPods-ZecwalletMobile.a in Frameworks */,
+				DB4DE514264B0EDF0084F17D /* librustios.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -105,17 +97,16 @@
 		13B07FAE1A68108700A75B9A /* ZecwalletMobile */ = {
 			isa = PBXGroup;
 			children = (
-				DB60ADD0247CCCA200E82FE6 /* saplingoutput */,
-				DB60ADCF247CCCA200E82FE6 /* saplingspend */,
-				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
+				DB4DE51A264B10D40084F17D /* saplingoutput */,
+				DB4DE519264B10D40084F17D /* saplingspend */,
+				DB4DE516264B103E0084F17D /* RPCModule.h */,
+				DB4DE517264B103E0084F17D /* RPCModule.m */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
-				13B07FB11A68108700A75B9A /* LaunchScreen.xib */,
+				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB71A68108700A75B9A /* main.m */,
-				DB39A34F2472FBBB00A9404D /* RPCModule.h */,
-				DB39A3502472FBE700A9404D /* RPCModule.m */,
 			);
 			name = ZecwalletMobile;
 			sourceTree = "<group>";
@@ -123,13 +114,10 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				DB39A353247302CB00A9404D /* librustios.a */,
+				DB4DE513264B0EBA0084F17D /* librustios.a */,
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				ED2971642150620600B7C4FE /* JavaScriptCore.framework */,
-				9DC47C706A52A74264CE781B /* libPods-ZecwalletMobile.a */,
-				1554D066F46BC8CD65ABBE6C /* libPods-ZecwalletMobile-ZecwalletMobileTests.a */,
-				18790C77C5C8371AA6729489 /* libPods-ZecwalletMobile-tvOS.a */,
-				10BAD64066065D25BC4A510A /* libPods-ZecwalletMobile-tvOSTests.a */,
+				1794449599A63970811D5CF0 /* libPods-ZecwalletMobile.a */,
+				57C30AB6DAB41A2ED2699835 /* libPods-ZecwalletMobile-ZecwalletMobileTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -144,13 +132,13 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
-				DB39A3522473024600A9404D /* rust.h */,
+				DB4DE515264B0FE30084F17D /* rust.h */,
 				13B07FAE1A68108700A75B9A /* ZecwalletMobile */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* ZecwalletMobileTests */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
-				DA2904DF7C3C33499E208784 /* Pods */,
+				8BB7EBE9935B479E64CBB9A8 /* Pods */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -166,17 +154,13 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		DA2904DF7C3C33499E208784 /* Pods */ = {
+		8BB7EBE9935B479E64CBB9A8 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				B16AD3DC7DC87DE09769063B /* Pods-ZecwalletMobile.debug.xcconfig */,
-				7B27AA00FC06FE4B8DDD3339 /* Pods-ZecwalletMobile.release.xcconfig */,
-				76447A3DA1506E4B445A8213 /* Pods-ZecwalletMobile-ZecwalletMobileTests.debug.xcconfig */,
-				AA53430C598FBAAC30CBDC6B /* Pods-ZecwalletMobile-ZecwalletMobileTests.release.xcconfig */,
-				A76D3D204E939CA06ECE69FA /* Pods-ZecwalletMobile-tvOS.debug.xcconfig */,
-				7A508024CEDBE066346DC2D7 /* Pods-ZecwalletMobile-tvOS.release.xcconfig */,
-				3F34A2A9D3267FE9BE000EA1 /* Pods-ZecwalletMobile-tvOSTests.debug.xcconfig */,
-				E21CDB7108A143B9A13BF9E5 /* Pods-ZecwalletMobile-tvOSTests.release.xcconfig */,
+				139FC776D22970EDA9C040D6 /* Pods-ZecwalletMobile.debug.xcconfig */,
+				00C6628EA1AABD9135EC0B2D /* Pods-ZecwalletMobile.release.xcconfig */,
+				65B24C2E2D48C83D6B5DDF6E /* Pods-ZecwalletMobile-ZecwalletMobileTests.debug.xcconfig */,
+				85DB7315AECC5EFD25F9B82E /* Pods-ZecwalletMobile-ZecwalletMobileTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -188,10 +172,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "ZecwalletMobileTests" */;
 			buildPhases = (
-				F16110D4DFF63D79C8C98667 /* [CP] Check Pods Manifest.lock */,
+				79CA5B081E192A5501CD6F98 /* [CP] Check Pods Manifest.lock */,
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
+				D71B45E3AF6B2B6705D3DE3C /* [CP] Embed Pods Frameworks */,
+				0D3D17FAF0DEFCD154030675 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -207,12 +193,14 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "ZecwalletMobile" */;
 			buildPhases = (
-				6F3F45011942883964161870 /* [CP] Check Pods Manifest.lock */,
+				2C17B0B3DDB4B24705C85EF5 /* [CP] Check Pods Manifest.lock */,
 				FD10A7F022414F080027D42C /* Start Packager */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
+				8E7E7D23F3C8D36BE8E8947B /* [CP] Embed Pods Frameworks */,
+				AD8490F36A95467C39CED80F /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -229,20 +217,19 @@
 		83CBB9F71A601CBA00E9B192 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1200;
+				LastUpgradeCheck = 1210;
 				TargetAttributes = {
 					00E356ED1AD99517003FC87E = {
 						CreatedOnToolsVersion = 6.2;
 						TestTargetID = 13B07F861A680F5B00A75B9A;
 					};
 					13B07F861A680F5B00A75B9A = {
-						DevelopmentTeam = 5N76B7JDDT;
 						LastSwiftMigration = 1120;
 					};
 				};
 			};
 			buildConfigurationList = 83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "ZecwalletMobile" */;
-			compatibilityVersion = "Xcode 3.2";
+			compatibilityVersion = "Xcode 12.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -272,10 +259,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DB60ADD2247CCCA200E82FE6 /* saplingoutput in Resources */,
-				DB60ADD1247CCCA200E82FE6 /* saplingspend in Resources */,
+				DB4DE51C264B10D40084F17D /* saplingoutput in Resources */,
+				DB4DE51B264B10D40084F17D /* saplingspend in Resources */,
+				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
-				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -294,9 +281,26 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh\n";
+			shellScript = "set -e\n\nexport NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh\n";
 		};
-		6F3F45011942883964161870 /* [CP] Check Pods Manifest.lock */ = {
+		0D3D17FAF0DEFCD154030675 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-ZecwalletMobile-ZecwalletMobileTests/Pods-ZecwalletMobile-ZecwalletMobileTests-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-ZecwalletMobile-ZecwalletMobileTests/Pods-ZecwalletMobile-ZecwalletMobileTests-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ZecwalletMobile-ZecwalletMobileTests/Pods-ZecwalletMobile-ZecwalletMobileTests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		2C17B0B3DDB4B24705C85EF5 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -318,7 +322,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		F16110D4DFF63D79C8C98667 /* [CP] Check Pods Manifest.lock */ = {
+		79CA5B081E192A5501CD6F98 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -338,6 +342,57 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		8E7E7D23F3C8D36BE8E8947B /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-ZecwalletMobile/Pods-ZecwalletMobile-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-ZecwalletMobile/Pods-ZecwalletMobile-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ZecwalletMobile/Pods-ZecwalletMobile-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		AD8490F36A95467C39CED80F /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-ZecwalletMobile/Pods-ZecwalletMobile-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-ZecwalletMobile/Pods-ZecwalletMobile-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ZecwalletMobile/Pods-ZecwalletMobile-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		D71B45E3AF6B2B6705D3DE3C /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-ZecwalletMobile-ZecwalletMobileTests/Pods-ZecwalletMobile-ZecwalletMobileTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-ZecwalletMobile-ZecwalletMobileTests/Pods-ZecwalletMobile-ZecwalletMobileTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ZecwalletMobile-ZecwalletMobileTests/Pods-ZecwalletMobile-ZecwalletMobileTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		FD10A7F022414F080027D42C /* Start Packager */ = {
@@ -375,7 +430,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
-				DB39A3512472FBE700A9404D /* RPCModule.m in Sources */,
+				DB4DE518264B103E0084F17D /* RPCModule.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -390,32 +445,23 @@
 		};
 /* End PBXTargetDependency section */
 
-/* Begin PBXVariantGroup section */
-		13B07FB11A68108700A75B9A /* LaunchScreen.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				13B07FB21A68108700A75B9A /* Base */,
-			);
-			name = LaunchScreen.xib;
-			path = ZecwalletMobile;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
-
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 76447A3DA1506E4B445A8213 /* Pods-ZecwalletMobile-ZecwalletMobileTests.debug.xcconfig */;
+			baseConfigurationReference = 65B24C2E2D48C83D6B5DDF6E /* Pods-ZecwalletMobile-ZecwalletMobileTests.debug.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = ZecwalletMobileTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"-lc++",
@@ -429,15 +475,17 @@
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = AA53430C598FBAAC30CBDC6B /* Pods-ZecwalletMobile-ZecwalletMobileTests.release.xcconfig */;
+			baseConfigurationReference = 85DB7315AECC5EFD25F9B82E /* Pods-ZecwalletMobile-ZecwalletMobileTests.release.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
-				DEVELOPMENT_TEAM = 5N76B7JDDT;
 				INFOPLIST_FILE = ZecwalletMobileTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"-lc++",
@@ -451,52 +499,18 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = B16AD3DC7DC87DE09769063B /* Pods-ZecwalletMobile.debug.xcconfig */;
+			baseConfigurationReference = 139FC776D22970EDA9C040D6 /* Pods-ZecwalletMobile.debug.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 32;
 				DEVELOPMENT_TEAM = 5N76B7JDDT;
 				ENABLE_BITCODE = NO;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"$(inherited)",
-					"FB_SONARKIT_ENABLED=1",
-				);
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"${PODS_ROOT}/Headers/Public\"",
-					"\"${PODS_ROOT}/Headers/Public/CocoaAsyncSocket\"",
-					"\"${PODS_ROOT}/Headers/Public/CocoaLibEvent\"",
-					"\"${PODS_ROOT}/Headers/Public/DoubleConversion\"",
-					"\"${PODS_ROOT}/Headers/Public/FBLazyVector\"",
-					"\"${PODS_ROOT}/Headers/Public/FBReactNativeSpec\"",
-					"\"${PODS_ROOT}/Headers/Public/Flipper\"",
-					"\"${PODS_ROOT}/Headers/Public/Flipper-DoubleConversion\"",
-					"\"${PODS_ROOT}/Headers/Public/Flipper-Folly\"",
-					"\"${PODS_ROOT}/Headers/Public/Flipper-Glog\"",
-					"\"${PODS_ROOT}/Headers/Public/Flipper-PeerTalk\"",
-					"\"${PODS_ROOT}/Headers/Public/Flipper-RSocket\"",
-					"\"${PODS_ROOT}/Headers/Public/FlipperKit\"",
-					"\"${PODS_ROOT}/Headers/Public/OpenSSL-Universal\"",
-					"\"${PODS_ROOT}/Headers/Public/RCTRequired\"",
-					"\"${PODS_ROOT}/Headers/Public/RCTTypeSafety\"",
-					"\"${PODS_ROOT}/Headers/Public/React-Core\"",
-					"\"${PODS_ROOT}/Headers/Public/React-RCTText\"",
-					"\"${PODS_ROOT}/Headers/Public/React-cxxreact\"",
-					"\"${PODS_ROOT}/Headers/Public/React-jsi\"",
-					"\"${PODS_ROOT}/Headers/Public/React-jsiexecutor\"",
-					"\"${PODS_ROOT}/Headers/Public/React-jsinspector\"",
-					"\"${PODS_ROOT}/Headers/Public/ReactCommon\"",
-					"\"${PODS_ROOT}/Headers/Public/Yoga\"",
-					"\"${PODS_ROOT}/Headers/Public/YogaKit\"",
-					"\"${PODS_ROOT}/Headers/Public/glog\"",
-					"\"$(PODS_ROOT)/Headers/Private/React-Core\"",
-					"${PROJECT_DIR}/",
-				);
 				INFOPLIST_FILE = ZecwalletMobile/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -511,54 +525,23 @@
 				PRODUCT_NAME = "Zecwallet Lite";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7B27AA00FC06FE4B8DDD3339 /* Pods-ZecwalletMobile.release.xcconfig */;
+			baseConfigurationReference = 00C6628EA1AABD9135EC0B2D /* Pods-ZecwalletMobile.release.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 32;
 				DEVELOPMENT_TEAM = 5N76B7JDDT;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"${PODS_ROOT}/Headers/Public\"",
-					"\"${PODS_ROOT}/Headers/Public/CocoaAsyncSocket\"",
-					"\"${PODS_ROOT}/Headers/Public/CocoaLibEvent\"",
-					"\"${PODS_ROOT}/Headers/Public/DoubleConversion\"",
-					"\"${PODS_ROOT}/Headers/Public/FBLazyVector\"",
-					"\"${PODS_ROOT}/Headers/Public/FBReactNativeSpec\"",
-					"\"${PODS_ROOT}/Headers/Public/Flipper\"",
-					"\"${PODS_ROOT}/Headers/Public/Flipper-DoubleConversion\"",
-					"\"${PODS_ROOT}/Headers/Public/Flipper-Folly\"",
-					"\"${PODS_ROOT}/Headers/Public/Flipper-Glog\"",
-					"\"${PODS_ROOT}/Headers/Public/Flipper-PeerTalk\"",
-					"\"${PODS_ROOT}/Headers/Public/Flipper-RSocket\"",
-					"\"${PODS_ROOT}/Headers/Public/FlipperKit\"",
-					"\"${PODS_ROOT}/Headers/Public/OpenSSL-Universal\"",
-					"\"${PODS_ROOT}/Headers/Public/RCTRequired\"",
-					"\"${PODS_ROOT}/Headers/Public/RCTTypeSafety\"",
-					"\"${PODS_ROOT}/Headers/Public/React-Core\"",
-					"\"${PODS_ROOT}/Headers/Public/React-RCTText\"",
-					"\"${PODS_ROOT}/Headers/Public/React-cxxreact\"",
-					"\"${PODS_ROOT}/Headers/Public/React-jsi\"",
-					"\"${PODS_ROOT}/Headers/Public/React-jsiexecutor\"",
-					"\"${PODS_ROOT}/Headers/Public/React-jsinspector\"",
-					"\"${PODS_ROOT}/Headers/Public/ReactCommon\"",
-					"\"${PODS_ROOT}/Headers/Public/Yoga\"",
-					"\"${PODS_ROOT}/Headers/Public/YogaKit\"",
-					"\"${PODS_ROOT}/Headers/Public/glog\"",
-					"\"$(PODS_ROOT)/Headers/Private/React-Core\"",
-					"${PROJECT_DIR}/",
-				);
 				INFOPLIST_FILE = ZecwalletMobile/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -572,7 +555,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = co.zecwallet.lite.ios;
 				PRODUCT_NAME = "Zecwallet Lite";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
@@ -581,7 +563,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
@@ -609,9 +590,9 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
-				ENABLE_BITCODE = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "arm64 ";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -627,8 +608,11 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
-				LD_RUNPATH_SEARCH_PATHS = "/usr/lib/swift $(inherited)";
+				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					/usr/lib/swift,
+					"$(inherited)",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"\"$(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)\"",
 					"\"$(TOOLCHAIN_DIR)/usr/lib/swift-5.0/$(PLATFORM_NAME)\"",
@@ -637,7 +621,6 @@
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
-				VALID_ARCHS = "arm64 arm64e";
 			};
 			name = Debug;
 		};
@@ -645,7 +628,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
@@ -673,9 +655,9 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
-				ENABLE_BITCODE = NO;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "arm64 ";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -684,8 +666,11 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
-				LD_RUNPATH_SEARCH_PATHS = "/usr/lib/swift $(inherited)";
+				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					/usr/lib/swift,
+					"$(inherited)",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"\"$(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)\"",
 					"\"$(TOOLCHAIN_DIR)/usr/lib/swift-5.0/$(PLATFORM_NAME)\"",
@@ -694,7 +679,6 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
-				VALID_ARCHS = "arm64 arm64e";
 			};
 			name = Release;
 		};

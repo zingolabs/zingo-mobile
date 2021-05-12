@@ -89,7 +89,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({tx, price, closeModal
             </TouchableOpacity>
           </View>
 
-          {tx?.detailedTxns.map((txd) => {
+          {tx?.detailedTxns.map(txd => {
             return (
               <View
                 key={txd.address}
@@ -271,7 +271,7 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
     ? `Syncing ${syncingStatus?.walletHeight}/${syncingStatus?.toalHeight}`
     : 'Balance';
 
-  const balanceColor = transactions?.find((t) => t.confirmations === 0) ? colors.primary : colors.text;
+  const balanceColor = transactions?.find(t => t.confirmations === 0) ? colors.primary : colors.text;
   var lastMonth = '';
 
   return (
@@ -305,7 +305,7 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
           <RefreshControl refreshing={false} onRefresh={doRefresh} tintColor={colors.text} title="Refreshing" />
         }
         style={{flexGrow: 1, marginTop: 10, width: '100%', height: '100%'}}>
-        {transactions?.flatMap((t) => {
+        {transactions?.flatMap(t => {
           let txmonth = moment(t.time * 1000).format('MMM YYYY');
 
           var month = '';
@@ -331,12 +331,10 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
 
 const Stack = createStackNavigator();
 
-const TransactionsScreen: React.FunctionComponent<TransactionsScreenViewProps> = (iprops) => {
+const TransactionsScreen: React.FunctionComponent<TransactionsScreenViewProps> = iprops => {
   return (
     <Stack.Navigator headerMode="none">
-      <Stack.Screen name="TransactionsView">
-        {(props) => <TransactionsScreenView {...props} {...iprops} />}
-      </Stack.Screen>
+      <Stack.Screen name="TransactionsView">{props => <TransactionsScreenView {...props} {...iprops} />}</Stack.Screen>
     </Stack.Navigator>
   );
 };

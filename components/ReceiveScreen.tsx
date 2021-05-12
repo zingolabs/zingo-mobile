@@ -40,7 +40,7 @@ const SingleAddressDisplay: React.FunctionComponent<SingleAddress> = ({address})
       </View>
       <TouchableOpacity onPress={doCopy}>
         <View style={{display: 'flex', flexDirection: 'row', flexWrap: 'wrap', marginTop: 10}}>
-          {chunks.map((c) => (
+          {chunks.map(c => (
             <FadeText
               key={c}
               style={{
@@ -74,8 +74,8 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({addresses, 
   ]);
   const {colors} = useTheme();
 
-  const zaddr = addresses.find((a) => Utils.isSapling(a)) || null;
-  const taddr = addresses.find((a) => Utils.isTransparent(a)) || null;
+  const zaddr = addresses.find(a => Utils.isSapling(a)) || null;
+  const taddr = addresses.find(a => Utils.isTransparent(a)) || null;
 
   const renderScene: (routes: any) => JSX.Element | undefined = ({route}) => {
     switch (route.key) {
@@ -86,7 +86,7 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({addresses, 
     }
   };
 
-  const renderTabBar: (props: any) => JSX.Element = (props) => (
+  const renderTabBar: (props: any) => JSX.Element = props => (
     <View>
       <View style={{alignItems: 'center', backgroundColor: colors.card, paddingBottom: 25, zIndex: -1}}>
         <Text style={{marginTop: 5, padding: 5, color: colors.text, fontSize: 28}}>Wallet Address</Text>

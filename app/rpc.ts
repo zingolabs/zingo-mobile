@@ -19,8 +19,8 @@ export default class RPC {
   fnSetAllAddresses: (allAddresses: string[]) => void;
   fnSetZecPrice: (price: number | null) => void;
   fnRefreshUpdates: (blk: number, total: number) => void;
-  refreshTimerID: number | null;
-  priceTimerID: number | null;
+  refreshTimerID: NodeJS.Timeout | null;
+  priceTimerID: NodeJS.Timeout | null;
   lastBlockHeight: number;
 
   inRefresh: boolean;
@@ -400,7 +400,7 @@ export default class RPC {
 
       // Clone the first tx into a new one
       const combinedTx = Object.assign({}, txns[0]);
-      combinedTx.detailedTxns = RPC.combineTxDetails(txns.flatMap((tx) => tx.detailedTxns));
+      combinedTx.detailedTxns = RPC.combineTxDetails(txns.flatMap(tx => tx.detailedTxns));
 
       combinedTxList.push(combinedTx);
     });
@@ -417,7 +417,7 @@ export default class RPC {
   static combineTxDetails(txdetails: TxDetail[]): TxDetail[] {
     // First, group by outgoing address.
     const m = new Map<string, TxDetail[]>();
-    txdetails.forEach((i) => {
+    txdetails.forEach(i => {
       const coll = m.get(i.address);
       if (!coll) {
         m.set(i.address, [i]);
@@ -432,8 +432,8 @@ export default class RPC {
       const totalAmount = txns.reduce((sum, i) => sum + i.amount, 0);
 
       const memos = txns
-        .filter((i) => i.memo)
-        .map((i) => {
+        .filter(i => i.memo)
+        .map(i => {
           const rex = /\((\d+)\/(\d+)\)((.|[\r\n])*)/;
           const tags = i.memo ? i.memo.match(rex) : null;
           if (tags && tags.length >= 4) {
@@ -444,7 +444,7 @@ export default class RPC {
           return {num: 0, memo: i.memo};
         })
         .sort((a, b) => a.num - b.num)
-        .map((a) => a.memo);
+        .map(a => a.memo);
 
       const detail: TxDetail = {
         address: toaddr,

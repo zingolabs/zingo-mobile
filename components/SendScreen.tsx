@@ -24,7 +24,7 @@ import {TouchableOpacity} from 'react-native-gesture-handler';
 import Toast from 'react-native-simple-toast';
 import {getNumberFormatSettings} from 'react-native-localize';
 import {faBars} from '@fortawesome/free-solid-svg-icons';
-import Animated, {Easing} from 'react-native-reanimated';
+import Animated, {EasingNode} from 'react-native-reanimated';
 import {parseZcashURI} from '../app/uris';
 
 type ScannerProps = {
@@ -174,7 +174,7 @@ const ConfirmModalContent: React.FunctionComponent<ConfirmModalProps> = ({
           <ZecAmount amtZec={sendingTotal} />
           <UsdAmount amtZec={sendingTotal} price={price} />
         </View>
-        {sendPageState.toaddrs.map((to) => {
+        {sendPageState.toaddrs.map(to => {
           return (
             <View key={to.id} style={{margin: 10}}>
               <FadeText>To</FadeText>
@@ -257,10 +257,10 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
-      Animated.timing(slideAnim, {toValue: 0 - titleViewHeight + 25, duration: 100, easing: Easing.linear}).start();
+      Animated.timing(slideAnim, {toValue: 0 - titleViewHeight + 25, duration: 100, easing: EasingNode.linear}).start();
     });
     const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-      Animated.timing(slideAnim, {toValue: 0, duration: 100, easing: Easing.linear}).start();
+      Animated.timing(slideAnim, {toValue: 0, duration: 100, easing: EasingNode.linear}).start();
     });
 
     return () => {
@@ -287,7 +287,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
         if (Array.isArray(targets)) {
           // redo the to addresses
           const uriToAddrs: ToAddr[] = [];
-          targets.forEach((tgt) => {
+          targets.forEach(tgt => {
             const to = new ToAddr(Utils.getNextToAddrID());
 
             to.to = tgt.address || '';
@@ -377,7 +377,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
   const memoEnabled = Utils.isSapling(sendPageState.toaddrs[0].to);
   const zecPrice = info ? info.zecPrice : null;
 
-  var addressValidationState: number[] = sendPageState.toaddrs.map((to) => {
+  var addressValidationState: number[] = sendPageState.toaddrs.map(to => {
     if (to.to !== '') {
       if (Utils.isSapling(to.to) || Utils.isTransparent(to.to)) {
         return 1;
@@ -389,7 +389,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
     }
   });
 
-  var amountValidationState: number[] = sendPageState.toaddrs.map((to) => {
+  var amountValidationState: number[] = sendPageState.toaddrs.map(to => {
     if (to.amount !== '') {
       if (
         Utils.parseLocaleFloat(to.amount) > 0 &&
@@ -406,8 +406,8 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
 
   // Send button is enabled if all address and amount validation states are 1
   const sendButtonEnabled =
-    addressValidationState.filter((n) => n === 1).length === addressValidationState.length &&
-    amountValidationState.filter((n) => n === 1).length === amountValidationState.length;
+    addressValidationState.filter(n => n === 1).length === addressValidationState.length &&
+    amountValidationState.filter(n => n === 1).length === amountValidationState.length;
 
   const {decimalSeparator} = getNumberFormatSettings();
 
@@ -463,7 +463,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
         }}>
         <Animated.View style={{marginTop: slideAnim}}>
           <View
-            onLayout={(e) => {
+            onLayout={e => {
               const {height} = e.nativeEvent.layout;
               setTitleViewHeight(height);
             }}

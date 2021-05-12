@@ -120,13 +120,13 @@ export const BoldText: React.FunctionComponent<any> = ({style, children}) => {
   return <Text style={arrayed}>{children}</Text>;
 };
 
-export const FadeText: React.FunctionComponent<any> = (props) => {
+export const FadeText: React.FunctionComponent<any> = props => {
   const {colors} = useTheme();
 
   return <Text style={{opacity: 0.65, color: colors.text, ...props.style}}>{props.children}</Text>;
 };
 
-export const ErrorText: React.FunctionComponent<any> = (props) => {
+export const ErrorText: React.FunctionComponent<any> = props => {
   return <Text style={{color: 'red', ...props.style}}>{props.children}</Text>;
 };
 
@@ -149,7 +149,7 @@ export const RegText: React.FunctionComponent<any> = ({style, color, onPress, ch
   );
 };
 
-export const RegTextInput: React.FunctionComponent<any> = (props) => {
+export const RegTextInput: React.FunctionComponent<any> = props => {
   const {colors} = useTheme();
 
   // There's a real idiot bug in react native that prevents paste unless editable is set.

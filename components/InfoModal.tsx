@@ -3,7 +3,7 @@ import React from 'react';
 import {View, ScrollView, SafeAreaView, Image, Text} from 'react-native';
 import {SecondaryButton, RegText, FadeText} from './Components';
 import {useTheme} from '@react-navigation/native';
-import {Info} from 'app/AppState';
+import {Info} from '../app/AppState';
 
 type DetailLineProps = {
   label: string;
