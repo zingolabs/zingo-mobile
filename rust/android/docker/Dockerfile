@@ -4,7 +4,7 @@ RUN curl https://sh.rustup.rs -sSf | \
     sh -s -- --default-toolchain none -y
 ENV PATH=/root/.cargo/bin:/opt/android-ndk-linux/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH
 
-RUN rustup toolchain install 1.46.0
+RUN rustup toolchain install 1.50.0
 
 RUN rustup target add i686-linux-android
 RUN rustup target add armv7-linux-androideabi
@@ -46,5 +46,7 @@ RUN cd /opt/openssl-1.1.1e && \
     ./Configure --prefix=/opt/openssl-1.1.1e/x86  android-x86 -D__ANDROID_API__=24 && \
     make -j$(nproc) && make -j$(nproc) install && \
     make clean && make distclean
+
+RUN cd /opt && git clone --depth=1 https://github.com/zecwalletco/zecwallet-mobile zecwalletmobile && cd zecwalletmobile/rust/android && cargo fetch && cargo build --release && rm -rf /opt/zecwalletmobile
 
 ENV OPENSSL_STATIC=yes
