@@ -54,9 +54,9 @@ const RescanModal: React.FunctionComponent<RescanModalProps> = ({birthday, start
         </View>
       </ScrollView>
 
-      <View style={{flexGrow: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', margin: 20}}>
+      <View style={{flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', margin: 20}}>
         <PrimaryButton title="Rescan" onPress={doRescanAndClose} />
-        <SecondaryButton title="Close" style={{marginTop: 10}} onPress={closeModal} />
+        <SecondaryButton title="Close" style={{marginLeft: 10}} onPress={closeModal} />
       </View>
     </SafeAreaView>
   );

@@ -26,6 +26,17 @@ export const UsdAmount: React.FunctionComponent<UsdAmountProps> = ({price, style
   return <Text style={{color: colors.text, ...style}}>$ {Utils.toLocaleFloat(usdString)}</Text>;
 };
 
+type ZecPriceProps = {
+  price?: number | null;
+};
+export const ZecPrice: React.FunctionComponent<ZecPriceProps> = ({price}) => {
+  var priceString = '';
+  if (price && price > 0) {
+    priceString = `$ ${price.toFixed(2)} per ZEC`;
+  }
+  return <FadeText>{priceString}</FadeText>;
+};
+
 type ZecAmountProps = {
   color?: string;
   size?: number;
@@ -72,7 +83,7 @@ export const PrimaryButton: React.FunctionComponent<any> = ({title, disabled, on
         paddingLeft: 20,
         paddingRight: 20,
         borderRadius: 10,
-        width: 250,
+        width: '40%',
       }}
       onPress={() => !disabled && onPress()}>
       <Text style={{color: colors.background, fontWeight: 'bold', textTransform: 'uppercase', textAlign: 'center'}}>
@@ -95,7 +106,7 @@ export const SecondaryButton: React.FunctionComponent<any> = ({title, disabled, 
         paddingLeft: 20,
         paddingRight: 20,
         borderRadius: 10,
-        width: 250,
+        width: '40%',
       }}
       onPress={() => !disabled && onPress()}>
       <Text style={{color: colors.text, fontWeight: 'bold', textTransform: 'uppercase', textAlign: 'center'}}>
@@ -124,6 +135,17 @@ export const FadeText: React.FunctionComponent<any> = props => {
   const {colors} = useTheme();
 
   return <Text style={{opacity: 0.65, color: colors.text, ...props.style}}>{props.children}</Text>;
+};
+
+export const ClickableText: React.FunctionComponent<any> = props => {
+  const {colors} = useTheme();
+  const onPress = props.onPress || null;
+
+  return (
+    <TouchableOpacity onPress={onPress}>
+      <Text style={{color: colors.text, textDecorationLine: 'underline', ...props.style}}>{props.children}</Text>
+    </TouchableOpacity>
+  );
 };
 
 export const ErrorText: React.FunctionComponent<any> = props => {

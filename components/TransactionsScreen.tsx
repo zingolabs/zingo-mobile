@@ -1,8 +1,26 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useState} from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
-import {RegText, ZecAmount, UsdAmount, SecondaryButton, FadeText} from '../components/Components';
-import {View, ScrollView, Image, Modal, TouchableOpacity, SafeAreaView, RefreshControl, Clipboard} from 'react-native';
+import {
+  RegText,
+  ZecAmount,
+  UsdAmount,
+  SecondaryButton,
+  FadeText,
+  ZecPrice,
+  ClickableText,
+} from '../components/Components';
+import {
+  View,
+  ScrollView,
+  Image,
+  Modal,
+  TouchableOpacity,
+  SafeAreaView,
+  RefreshControl,
+  Clipboard,
+  Linking,
+} from 'react-native';
 import Toast from 'react-native-simple-toast';
 import {TotalBalance, Transaction, Info, SyncStatus} from '../app/AppState';
 import Utils from '../app/utils';
@@ -14,10 +32,9 @@ import {faArrowDown, faArrowUp, faBars, faChevronLeft} from '@fortawesome/free-s
 
 type TxDetailProps = {
   tx: Transaction | null;
-  price?: number | null;
   closeModal: () => void;
 };
-const TxDetail: React.FunctionComponent<TxDetailProps> = ({tx, price, closeModal}) => {
+const TxDetail: React.FunctionComponent<TxDetailProps> = ({tx, closeModal}) => {
   const {colors} = useTheme();
   const spendColor = tx?.confirmations === 0 ? colors.primary : (tx?.amount || 0) > 0 ? '#88ee88' : '#ff6666';
 
@@ -28,6 +45,21 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({tx, price, closeModal
     tx?.type === 'sent' &&
     tx?.amount &&
     Math.abs(tx?.amount) - Math.abs(tx?.detailedTxns?.reduce((s, d) => s + d.amount, 0));
+
+  const handleTxIDClick = (txid?: string) => {
+    if (!txid) {
+      return;
+    }
+
+    const url = Utils.getBlockExplorerTxIDURL(txid);
+    Linking.canOpenURL(url).then(supported => {
+      if (supported) {
+        Linking.openURL(url);
+      } else {
+        console.log("Don't know how to open URI: " + url);
+      }
+    });
+  };
 
   return (
     <SafeAreaView
@@ -55,14 +87,14 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({tx, price, closeModal
             {tx?.type}
           </RegText>
           <ZecAmount size={36} amtZec={tx?.amount} />
-          <UsdAmount amtZec={tx?.amount} price={price} />
+          <UsdAmount amtZec={tx?.amount} price={tx?.zec_price} />
         </View>
 
         <View style={{margin: 10}}>
           <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: 10}}>
             <View style={{display: 'flex'}}>
               <FadeText>Time</FadeText>
-              <Moment interval={0} format="D MMM YYYY h:mm a" element={RegText}>
+              <Moment interval={0} format="YYYY MMM D h:mm a" element={RegText}>
                 {(tx?.time || 0) * 1000}
               </Moment>
             </View>
@@ -72,7 +104,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({tx, price, closeModal
             </View>
           </View>
 
-          <View style={{display: 'flex', marginTop: 10}}>
+          <View style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: 10}}>
             <FadeText>TxID</FadeText>
             <TouchableOpacity
               onPress={() => {
@@ -82,10 +114,13 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({tx, price, closeModal
                   setExpandTxid(true);
                 }
               }}>
-              <RegText>
-                {!expandTxid && Utils.trimToSmall(tx?.txid, 10)}
-                {expandTxid && tx?.txid}
-              </RegText>
+              {!expandTxid && <RegText>{Utils.trimToSmall(tx?.txid, 10)}</RegText>}
+              {expandTxid && (
+                <>
+                  <RegText>{tx?.txid}</RegText>
+                  <ClickableText onPress={() => handleTxIDClick(tx?.txid)}>View on block explorer</ClickableText>
+                </>
+              )}
             </TouchableOpacity>
           </View>
 
@@ -126,8 +161,11 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({tx, price, closeModal
                 <View style={{marginTop: 10}}>
                   <FadeText>Amount</FadeText>
                   <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
-                    <ZecAmount amtZec={txd?.amount} size={18} />
-                    <UsdAmount style={{fontSize: 18}} amtZec={txd?.amount} price={price} />
+                    <ZecAmount amtZec={txd?.amount} size={18} zecSymbol={'ᙇ'} />
+                    <UsdAmount style={{fontSize: 18}} amtZec={txd?.amount} price={tx?.zec_price} />
+                  </View>
+                  <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end'}}>
+                    <ZecPrice price={tx?.zec_price} />
                   </View>
                 </View>
 
@@ -152,7 +190,10 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({tx, price, closeModal
           {fee && (
             <View style={{display: 'flex', marginTop: 10}}>
               <FadeText>Tx Fee</FadeText>
-              <ZecAmount amtZec={fee} size={18} />
+              <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
+                <ZecAmount amtZec={fee} size={18} zecSymbol={'ᙇ'} />
+                <UsdAmount style={{fontSize: 18}} amtZec={fee} price={tx?.zec_price} />
+              </View>
             </View>
           )}
 
@@ -226,7 +267,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
             <FadeText style={{fontSize: 18}}>{displayAddress}</FadeText>
             <View style={{display: 'flex', flexDirection: 'row'}}>
               <FadeText>{tx.type === 'sent' ? 'Sent ' : 'Received '}</FadeText>
-              <Moment interval={0} format="h:mm a D MMM" element={FadeText}>
+              <Moment interval={0} format="MMM D, h:mm a" element={FadeText}>
                 {(tx?.time || 0) * 1000}
               </Moment>
             </View>
@@ -281,7 +322,7 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
         transparent={false}
         visible={isTxDetailModalShowing}
         onRequestClose={() => setTxDetailModalShowing(false)}>
-        <TxDetail tx={txDetail} price={info?.zecPrice} closeModal={() => setTxDetailModalShowing(false)} />
+        <TxDetail tx={txDetail} closeModal={() => setTxDetailModalShowing(false)} />
       </Modal>
 
       <View

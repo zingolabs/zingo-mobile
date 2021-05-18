@@ -4,7 +4,7 @@ import {View, Dimensions, Clipboard, Platform, Image, Text} from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import {TabView, TabBar} from 'react-native-tab-view';
 import Toast from 'react-native-simple-toast';
-import {FadeText, SecondaryButton} from '../components/Components';
+import {ClickableText, FadeText} from '../components/Components';
 import {Info} from '../app/AppState';
 import Utils from '../app/utils';
 import {useTheme} from '@react-navigation/native';
@@ -55,7 +55,9 @@ const SingleAddressDisplay: React.FunctionComponent<SingleAddress> = ({address})
           ))}
         </View>
       </TouchableOpacity>
-      <SecondaryButton style={{marginTop: 10}} title="Copy to Clipboard" onPress={doCopy} />
+      <ClickableText style={{marginTop: 10}} onPress={doCopy}>
+        Tap To Copy
+      </ClickableText>
     </View>
   );
 };

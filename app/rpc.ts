@@ -20,7 +20,6 @@ export default class RPC {
   fnSetZecPrice: (price: number | null) => void;
   fnRefreshUpdates: (blk: number, total: number) => void;
   refreshTimerID: NodeJS.Timeout | null;
-  priceTimerID: NodeJS.Timeout | null;
   lastBlockHeight: number;
 
   inRefresh: boolean;
@@ -43,7 +42,6 @@ export default class RPC {
     this.fnRefreshUpdates = fnRefreshUpdates;
 
     this.refreshTimerID = null;
-    this.priceTimerID = null;
 
     this.lastBlockHeight = 0;
 
@@ -53,10 +51,6 @@ export default class RPC {
   async configure() {
     if (!this.refreshTimerID) {
       this.refreshTimerID = setInterval(() => this.refresh(false), 60 * 1000);
-    }
-
-    if (!this.priceTimerID) {
-      this.priceTimerID = setTimeout(() => this.getZecPrice(0), 1000);
     }
 
     // Load the current wallet data
@@ -73,11 +67,6 @@ export default class RPC {
     if (this.refreshTimerID) {
       clearInterval(this.refreshTimerID);
       this.refreshTimerID = null;
-    }
-
-    if (this.priceTimerID) {
-      clearTimeout(this.priceTimerID);
-      this.priceTimerID = null;
     }
   }
 
@@ -106,6 +95,7 @@ export default class RPC {
 
     this.fetchTotalBalance();
     this.fetchTandZTransactions(walletHeight);
+    this.getZecPrice();
   }
 
   async rescan() {
@@ -369,6 +359,7 @@ export default class RPC {
         amount: tx.amount / 10 ** 8,
         confirmations: tx.unconfirmed ? 0 : latestBlockHeight - tx.block_height + 1,
         txid: tx.txid,
+        zec_price: tx.zec_price,
         time: tx.datetime,
         position: tx.position,
         detailedTxns: txdetail,
@@ -581,39 +572,16 @@ export default class RPC {
     return resultJSON.result === 'success';
   }
 
-  setupNextZecPriceRefresh(retryCount: number, timeout: number) {
-    // Every hour
-    this.priceTimerID = setTimeout(() => this.getZecPrice(retryCount), timeout);
-  }
-
-  async getZecPrice(retryCount: number) {
-    if (!retryCount) {
-      retryCount = 0;
+  async getZecPrice() {
+    const resultStr: string = await RPCModule.execute('zecprice', '');
+    if (resultStr.toLowerCase().startsWith('error')) {
+      console.log(`Error fetching price ${resultStr}`);
+      return;
     }
 
-    try {
-      const response = await fetch('https://api.coincap.io/v2/rates/zcash');
-      const zecData = (await response.json()).data;
-
-      if (zecData) {
-        this.fnSetZecPrice(zecData.rateUsd);
-        this.setupNextZecPriceRefresh(0, 1000 * 60 * 60); // Every hour
-      } else {
-        this.fnSetZecPrice(null);
-        let timeout = 1000 * 60; // 1 minute
-        if (retryCount > 5) {
-          timeout = 1000 * 60 * 60; // an hour later
-        }
-        this.setupNextZecPriceRefresh(retryCount + 1, timeout);
-      }
-    } catch (err) {
-      console.log(err);
-      this.fnSetZecPrice(null);
-      let timeout = 1000 * 60; // 1 minute
-      if (retryCount > 5) {
-        timeout = 1000 * 60 * 60; // an hour later
-      }
-      this.setupNextZecPriceRefresh(retryCount + 1, timeout);
+    const resultJSON = JSON.parse(resultStr);
+    if (resultJSON.zec_price) {
+      this.fnSetZecPrice(resultJSON.zec_price);
     }
   }
 }

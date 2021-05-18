@@ -194,4 +194,8 @@ export default class Utils {
       .replace(new RegExp('\\.'), decimalSeparator)
       .replace(new RegExp('_', 'g'), groupingSeparator);
   }
+
+  static getBlockExplorerTxIDURL(txid: string): string {
+    return `https://blockchair.com/zcash/transaction/${txid}`;
+  }
 }
