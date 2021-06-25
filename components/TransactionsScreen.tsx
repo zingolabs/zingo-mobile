@@ -308,8 +308,8 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
   const {colors} = useTheme();
   const zecPrice = info ? info.zecPrice : null;
 
-  const syncStatusDisplay = syncingStatus?.isSyncing
-    ? `Syncing ${syncingStatus?.walletHeight}/${syncingStatus?.toalHeight}`
+  const syncStatusDisplay = syncingStatus?.inProgress
+    ? `Syncing ${((syncingStatus?.progress * 100) / syncingStatus?.total).toFixed(2)}%`
     : 'Balance';
 
   const balanceColor = transactions?.find(t => t.confirmations === 0) ? colors.primary : colors.text;

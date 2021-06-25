@@ -21,10 +21,9 @@ const DetailLine: React.FunctionComponent<DetailLineProps> = ({label, value}) =>
 type InfoModalProps = {
   info: Info | null;
   closeModal: () => void;
-  walletHeight?: number;
 };
 
-const InfoModal: React.FunctionComponent<InfoModalProps> = ({info, walletHeight, closeModal}) => {
+const InfoModal: React.FunctionComponent<InfoModalProps> = ({info, closeModal}) => {
   const {colors} = useTheme();
   const height = info?.latestBlock;
   const price = info?.zecPrice ? `$ ${info?.zecPrice?.toFixed(2)}` : '-';
@@ -63,7 +62,7 @@ const InfoModal: React.FunctionComponent<InfoModalProps> = ({info, walletHeight,
           <DetailLine label="Lightwallet Server URL" value={info?.serverUri} />
           <DetailLine label="Network" value={info?.testnet ? 'Testnet' : 'Mainnet'} />
           <DetailLine label="Server Block Height" value={height} />
-          <DetailLine label="Wallet Block Height" value={walletHeight} />
+          {/* <DetailLine label="Wallet Block Height" value={walletHeight} /> */}
           <DetailLine label="ZEC Price" value={price} />
         </View>
       </ScrollView>

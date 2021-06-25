@@ -187,9 +187,9 @@ export interface WalletSeed {
 }
 
 export interface SyncStatus {
-  isSyncing: boolean;
-  walletHeight: number;
-  toalHeight: number;
+  inProgress: boolean;
+  progress: number;
+  total: number;
 }
 
 export default interface AppState {

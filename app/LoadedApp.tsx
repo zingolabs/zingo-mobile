@@ -224,11 +224,11 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
     this.setState({sendPageState});
   };
 
-  refreshUpdates = (block: number, total: number) => {
+  refreshUpdates = (inProgress: boolean, progress: number, total: number) => {
     const syncingStatus: SyncStatus = {
-      isSyncing: total - block > 100,
-      walletHeight: block,
-      toalHeight: total,
+      inProgress,
+      progress,
+      total,
     };
     this.setState({syncingStatus});
   };
@@ -438,11 +438,7 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
           transparent={false}
           visible={infoModalVisible}
           onRequestClose={() => this.setState({infoModalVisible: false})}>
-          <InfoModal
-            closeModal={() => this.setState({infoModalVisible: false})}
-            info={info}
-            walletHeight={syncingStatus?.walletHeight}
-          />
+          <InfoModal closeModal={() => this.setState({infoModalVisible: false})} info={info} />
         </Modal>
 
         <Modal
