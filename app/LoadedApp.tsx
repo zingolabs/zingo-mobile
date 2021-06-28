@@ -224,11 +224,10 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
     this.setState({sendPageState});
   };
 
-  refreshUpdates = (inProgress: boolean, progress: number, total: number) => {
+  refreshUpdates = (inProgress: boolean, progress: number) => {
     const syncingStatus: SyncStatus = {
       inProgress,
       progress,
-      total,
     };
     this.setState({syncingStatus});
   };

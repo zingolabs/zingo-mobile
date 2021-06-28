@@ -59,7 +59,7 @@ PODS:
   - glog (0.3.5)
   - libevent (2.1.12)
   - OpenSSL-Universal (1.1.180)
-  - Permission-Camera (3.0.3):
+  - Permission-Camera (3.0.4):
     - RNPermissions
   - RCT-Folly (2020.01.13.00):
     - boost-for-react-native
@@ -256,15 +256,15 @@ PODS:
   - React-jsinspector (0.64.1)
   - react-native-appearance (0.3.4):
     - React
-  - react-native-camera (3.43.6):
+  - react-native-camera (3.44.1):
     - React-Core
-    - react-native-camera/RCT (= 3.43.6)
-    - react-native-camera/RN (= 3.43.6)
-  - react-native-camera/RCT (3.43.6):
+    - react-native-camera/RCT (= 3.44.1)
+    - react-native-camera/RN (= 3.44.1)
+  - react-native-camera/RCT (3.44.1):
     - React-Core
-  - react-native-camera/RN (3.43.6):
+  - react-native-camera/RN (3.44.1):
     - React-Core
-  - react-native-pager-view (5.1.7):
+  - react-native-pager-view (5.2.1):
     - React-Core
   - react-native-safe-area-context (3.2.0):
     - React-Core
@@ -339,11 +339,11 @@ PODS:
     - React
   - RNGestureHandler (1.10.3):
     - React-Core
-  - RNLocalize (2.0.3):
+  - RNLocalize (2.1.1):
     - React-Core
-  - RNPermissions (3.0.3):
+  - RNPermissions (3.0.4):
     - React-Core
-  - RNReanimated (2.1.0):
+  - RNReanimated (2.2.0):
     - DoubleConversion
     - FBLazyVector
     - FBReactNativeSpec
@@ -372,8 +372,9 @@ PODS:
     - React-RCTVibration
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNScreens (3.2.0):
+  - RNScreens (3.4.0):
     - React-Core
+    - React-RCTImage
   - RNSVG (12.1.1):
     - React
   - Toast (4.0.0)
@@ -561,7 +562,7 @@ SPEC CHECKSUMS:
   glog: 73c2498ac6884b13ede40eda8228cb1eee9d9d62
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
   OpenSSL-Universal: 1aa4f6a6ee7256b83db99ec1ccdaa80d10f9af9b
-  Permission-Camera: 6abdb054620b2f6b3bf9e0b3842db246424d4d48
+  Permission-Camera: 74dc395c37a06ebe915069c5dca954c7a2a5a2e3
   RCT-Folly: ec7a233ccc97cc556cf7237f0db1ff65b986f27c
   RCTRequired: ec2ebc96b7bfba3ca5c32740f5a0c6a014a274d2
   RCTTypeSafety: 22567f31e67c3e088c7ac23ea46ab6d4779c0ea5
@@ -574,8 +575,8 @@ SPEC CHECKSUMS:
   React-jsiexecutor: 124e8f99992490d0d13e0649d950d3e1aae06fe9
   React-jsinspector: 500a59626037be5b3b3d89c5151bc3baa9abf1a9
   react-native-appearance: 0f0e5fc2fcef70e03d48c8fe6b00b9158c2ba8aa
-  react-native-camera: 9e55a09596b8c4e41eb7d4cce7c39826990c3cac
-  react-native-pager-view: c60a26be051a4b88427f2475e173b5c112e98d17
+  react-native-camera: 7bf59f2728ffb019fa25e60a225d2c57e1a8f0f6
+  react-native-pager-view: 2864530d861ab2970beb2cd0b4cf2292cd30cd84
   react-native-safe-area-context: f0906bf8bc9835ac9a9d3f97e8bde2a997d8da79
   react-native-simple-toast: bf002828cf816775a6809f7a9ec3907509bce11f
   React-perflogger: aad6d4b4a267936b3667260d1f649b6f6069a675
@@ -592,10 +593,10 @@ SPEC CHECKSUMS:
   ReactCommon: bedc99ed4dae329c4fcf128d0c31b9115e5365ca
   ReactNativeART: 78edc68dd4a1e675338cd0cd113319cf3a65f2ab
   RNGestureHandler: a479ebd5ed4221a810967000735517df0d2db211
-  RNLocalize: 99e59cad311ca1b6872b1764514009416ccba03d
-  RNPermissions: 034db8a73d562766f990c89abbdeaa5d6e204c67
-  RNReanimated: b8c8004b43446e3c2709fe64b2b41072f87428ad
-  RNScreens: c277bfc4b5bb7c2fe977d19635df6f974f95dfd6
+  RNLocalize: 82a569022724d35461e2dc5b5d015a13c3ca995b
+  RNPermissions: c46788f4cd402287425983e04a4c9bb4356036eb
+  RNReanimated: 9c13c86454bfd54dab7505c1a054470bfecd2563
+  RNScreens: 21b73c94c9117e1110a79ee0ee80c93ccefed8ce
   RNSVG: 551acb6562324b1d52a4e0758f7ca0ec234e278f
   Toast: 91b396c56ee72a5790816f40d3a94dd357abc196
   Yoga: a7de31c64fe738607e7a3803e3f591a4b1df7393

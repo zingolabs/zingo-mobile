@@ -189,7 +189,6 @@ export interface WalletSeed {
 export interface SyncStatus {
   inProgress: boolean;
   progress: number;
-  total: number;
 }
 
 export default interface AppState {
