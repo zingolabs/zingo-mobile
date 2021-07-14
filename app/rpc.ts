@@ -20,7 +20,12 @@ export default class RPC {
   fnSetZecPrice: (price: number | null) => void;
   fnRefreshUpdates: (inProgress: boolean, progress: number) => void;
   refreshTimerID: NodeJS.Timeout | null;
+  updateTimerId?: NodeJS.Timeout;
+
+  updateDataLock: boolean;
+
   lastBlockHeight: number;
+  lastTxId?: string;
 
   inRefresh: boolean;
 
@@ -42,7 +47,9 @@ export default class RPC {
     this.fnRefreshUpdates = fnRefreshUpdates;
 
     this.refreshTimerID = null;
+    this.updateTimerId = undefined;
 
+    this.updateDataLock = false;
     this.lastBlockHeight = 0;
 
     this.inRefresh = false;
@@ -51,6 +58,10 @@ export default class RPC {
   async configure() {
     if (!this.refreshTimerID) {
       this.refreshTimerID = setInterval(() => this.refresh(false), 60 * 1000);
+    }
+
+    if (!this.updateTimerId) {
+      this.updateTimerId = setInterval(() => this.updateData(), 3 * 1000); // 3 secs
     }
 
     // Load the current wallet data
@@ -67,6 +78,11 @@ export default class RPC {
     if (this.refreshTimerID) {
       clearInterval(this.refreshTimerID);
       this.refreshTimerID = null;
+    }
+
+    if (this.updateTimerId) {
+      clearInterval(this.updateTimerId);
+      this.updateTimerId = undefined;
     }
   }
 
@@ -107,6 +123,34 @@ export default class RPC {
     this.refresh(false, true);
   }
 
+  async updateData() {
+    //console.log("Update data triggered");
+    if (this.updateDataLock) {
+      //console.log("Update lock, returning");
+      return;
+    }
+
+    this.updateDataLock = true;
+    const latest_txid = await RPC.getLastTxid();
+
+    if (this.lastTxId !== latest_txid) {
+      console.log(`Latest: ${latest_txid}, prev = ${this.lastTxId}`);
+
+      const walletHeight = await RPC.fetchWalletHeight();
+      this.lastBlockHeight = walletHeight;
+
+      this.lastTxId = latest_txid;
+
+      //console.log("Update data fetching new txns");
+
+      // And fetch the rest of the data.
+      this.loadWalletData(this.lastBlockHeight);
+
+      //console.log(`Finished update data at ${latestBlockHeight}`);
+    }
+    this.updateDataLock = false;
+  }
+
   async refresh(fullRefresh: boolean, fullRescan?: boolean) {
     // If we're in refresh, we don't overlap
     if (this.inRefresh) {
@@ -131,16 +175,6 @@ export default class RPC {
         RPC.doSync().finally(() => {
           this.inRefresh = false;
         });
-      }
-
-      const BLOCK_BATCH_SIZE = 10000;
-      //var nextIntermittentRefresh = 0;
-
-      // If the sync is longer than 10000 blocks, then just update the UI first as well
-      if (latestBlockHeight - this.lastBlockHeight > BLOCK_BATCH_SIZE) {
-        this.loadWalletData(latestBlockHeight);
-
-        //nextIntermittentRefresh = this.lastBlockHeight + BLOCK_BATCH_SIZE;
       }
 
       // We need to wait for the sync to finish. The sync is done when
@@ -325,6 +359,13 @@ export default class RPC {
 
     const seed: WalletSeed = {seed: seedJSON.seed, birthday: seedJSON.birthday};
     return seed;
+  }
+
+  static async getLastTxid(): Promise<string> {
+    const lastTxIdStr = await RPCModule.execute('lasttxid', '');
+    const lastTxidJSON = JSON.parse(lastTxIdStr);
+
+    return lastTxidJSON.last_txid;
   }
 
   static async fetchWalletHeight(): Promise<number> {
