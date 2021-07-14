@@ -23,6 +23,7 @@ export default class RPC {
   updateTimerId?: NodeJS.Timeout;
 
   updateDataLock: boolean;
+  updateDataCtr: number;
 
   lastBlockHeight: number;
   lastTxId?: string;
@@ -50,6 +51,7 @@ export default class RPC {
     this.updateTimerId = undefined;
 
     this.updateDataLock = false;
+    this.updateDataCtr = 0;
     this.lastBlockHeight = 0;
 
     this.inRefresh = false;
@@ -127,6 +129,12 @@ export default class RPC {
     //console.log("Update data triggered");
     if (this.updateDataLock) {
       //console.log("Update lock, returning");
+      return;
+    }
+
+    this.updateDataCtr += 1;
+    if (this.inRefresh && this.updateDataCtr % 5 !== 0) {
+      // We're refreshing, in which case update every 5th time
       return;
     }
 
