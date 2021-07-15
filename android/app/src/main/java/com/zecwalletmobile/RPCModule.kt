@@ -148,7 +148,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             Log.w(TAG, "Response to ${cmd}: ${resp}")
 
             // And save it if it was a sync
-            if (cmd.startsWith("sync") && !resp.startsWith("Error")) {
+            if (cmd == "sync" && !resp.startsWith("Error")) {
                 saveWallet()
             }
 

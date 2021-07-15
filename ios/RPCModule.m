@@ -221,7 +221,7 @@ RCT_REMAP_METHOD(doSend,
     
     RCTLogInfo(@"Got resp for execute (%@): %@", method, respStr);
 
-    if ([method hasPrefix:@"sync"] && ![respStr hasPrefix:@"Error"]) {
+    if ([method isEqual:@"sync"] && ![respStr hasPrefix:@"Error"]) {
       // Also save the wallet after sync
       [self saveWalletInternal];
     }

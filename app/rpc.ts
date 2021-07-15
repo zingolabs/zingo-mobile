@@ -185,11 +185,12 @@ export default class RPC {
         });
       }
 
+      let prevBatchNum = -1;
+
       // We need to wait for the sync to finish. The sync is done when
       // inRefresh is set to false in the doSync().finally()
       const pollerID = setInterval(async () => {
         const ss = JSON.parse(await RPC.doSyncStatus());
-        let prevBatchNum = -1;
 
         // Post sync updates
         const progress_blocks =
@@ -218,10 +219,12 @@ export default class RPC {
           const walletHeight = await RPC.fetchWalletHeight();
           this.lastBlockHeight = walletHeight;
 
-          console.log(`Finished full refresh at ${walletHeight}`);
+          await RPCModule.doSave();
+          console.log(`Finished refresh at ${walletHeight}`);
         } else {
           // If we're doing a long sync, every time the batch_num changes, save the wallet
           if (prevBatchNum !== ss.batch_num) {
+            console.log(`Saving because batch num changed ${prevBatchNum} - ${ss.batch_num}`);
             await RPCModule.doSave();
             prevBatchNum = ss.batch_num;
           }
