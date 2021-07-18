@@ -115,7 +115,11 @@ RCT_REMAP_METHOD(createNewWallet,
                       pathForResource:@"saplingspend" ofType:@""];
     NSData* saplingSpend = [NSData dataWithContentsOfFile:pathSaplingSpend];
     
-    char* seed = init_new([URL UTF8String], [[saplingOutput base64EncodedStringWithOptions:0] UTF8String], [[saplingSpend base64EncodedStringWithOptions:0] UTF8String]);
+    NSArray *paths = NSSearchPathForDirectoriesInDomains
+                    (NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    
+    char* seed = init_new([URL UTF8String], [[saplingOutput base64EncodedStringWithOptions:0] UTF8String], [[saplingSpend base64EncodedStringWithOptions:0] UTF8String], [documentsDirectory UTF8String]);
     NSString* seedStr = [NSString stringWithUTF8String:seed];
     rust_free(seed);
     
@@ -146,7 +150,11 @@ RCT_REMAP_METHOD(restoreWallet,
                       pathForResource:@"saplingspend" ofType:@""];
     NSData* saplingSpend = [NSData dataWithContentsOfFile:pathSaplingSpend];
     
-    char* seed = initfromseed([URL UTF8String], [restoreSeed UTF8String], [birthday UTF8String], [[saplingOutput base64EncodedStringWithOptions:0] UTF8String], [[saplingSpend base64EncodedStringWithOptions:0] UTF8String]);
+    NSArray *paths = NSSearchPathForDirectoriesInDomains
+                    (NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    
+    char* seed = initfromseed([URL UTF8String], [restoreSeed UTF8String], [birthday UTF8String], [[saplingOutput base64EncodedStringWithOptions:0] UTF8String], [[saplingSpend base64EncodedStringWithOptions:0] UTF8String], [documentsDirectory UTF8String]);
     NSString* seedStr = [NSString stringWithUTF8String:seed];
     rust_free(seed);
     
@@ -177,7 +185,10 @@ RCT_REMAP_METHOD(loadExistingWallet,
                       pathForResource:@"saplingspend" ofType:@""];
     NSData* saplingSpend = [NSData dataWithContentsOfFile:pathSaplingSpend];
     
-    char* seed = initfromb64([URL UTF8String], [walletDataStr UTF8String], [[saplingOutput base64EncodedStringWithOptions:0] UTF8String], [[saplingSpend base64EncodedStringWithOptions:0] UTF8String]);
+    NSArray *paths = NSSearchPathForDirectoriesInDomains
+                    (NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    char* seed = initfromb64([URL UTF8String], [walletDataStr UTF8String], [[saplingOutput base64EncodedStringWithOptions:0] UTF8String], [[saplingSpend base64EncodedStringWithOptions:0] UTF8String], [documentsDirectory UTF8String]);
     NSString* seedStr = [NSString stringWithUTF8String:seed];
     rust_free(seed);
     

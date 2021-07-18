@@ -22,9 +22,9 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     private external fun initlogging(): String
     private external fun execute(cmd: String, args: String): String
-    private external fun initnew(serveruri: String, saplingOutputb64: String, saplingSpendb64: String): String
-    private external fun initfromseed(serveruri: String, seed: String, birthday: String, saplingOutputb64: String, saplingSpendb64: String): String
-    private external fun initfromb64(serveruri: String, datab64: String, saplingOutputb64: String, saplingSpendb64: String): String
+    private external fun initnew(serveruri: String, saplingOutputb64: String, saplingSpendb64: String, datadir: String): String
+    private external fun initfromseed(serveruri: String, seed: String, birthday: String, saplingOutputb64: String, saplingSpendb64: String, datadir: String): String
+    private external fun initfromb64(serveruri: String, datab64: String, saplingOutputb64: String, saplingSpendb64: String, datadir: String): String
     private external fun save(): String
 
     override fun getName(): String {
@@ -61,7 +61,8 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         // Create a seed
         val seed = initnew(LIGHTWALLETD_URL, 
             Base64.encodeToString(saplingOutput, Base64.NO_WRAP), 
-            Base64.encodeToString(saplingSpend, Base64.NO_WRAP))
+            Base64.encodeToString(saplingSpend, Base64.NO_WRAP),
+            reactContext.applicationContext.filesDir.absolutePath)
         Log.w("MAIN-Seed", seed)
 
         if (!seed.startsWith("Error")) {
@@ -85,7 +86,8 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
         val rseed = initfromseed(LIGHTWALLETD_URL, seed, birthday,
             Base64.encodeToString(saplingOutput, Base64.NO_WRAP), 
-            Base64.encodeToString(saplingSpend, Base64.NO_WRAP))
+            Base64.encodeToString(saplingSpend, Base64.NO_WRAP),
+            reactContext.applicationContext.filesDir.absolutePath)
         Log.w("MAIN", seed)
 
         if (!rseed.startsWith("Error")) {
@@ -112,7 +114,8 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
         val seed = initfromb64(LIGHTWALLETD_URL, fileb64,
             Base64.encodeToString(saplingOutput, Base64.NO_WRAP), 
-            Base64.encodeToString(saplingSpend, Base64.NO_WRAP))
+            Base64.encodeToString(saplingSpend, Base64.NO_WRAP),
+            reactContext.applicationContext.filesDir.absolutePath)
 
         Log.w("MAIN", seed)
         initlogging()
