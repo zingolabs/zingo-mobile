@@ -193,8 +193,7 @@ export default class RPC {
         const ss = JSON.parse(await RPC.doSyncStatus());
 
         // Post sync updates
-        const progress_blocks =
-          (ss.witness_blocks + ss.synced_blocks + ss.trial_decryptions_blocks + ss.txn_scan_blocks) / 4;
+        const progress_blocks = (ss.synced_blocks + ss.trial_decryptions_blocks + ss.txn_scan_blocks) / 3;
         let progress = progress_blocks;
         if (ss.total_blocks) {
           progress = (progress_blocks * 100) / ss.total_blocks;
