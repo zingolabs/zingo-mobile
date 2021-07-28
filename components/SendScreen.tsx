@@ -392,7 +392,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
     });
   };
 
-  const spendable = totalBalance.transparentBal + totalBalance.verifiedPrivate;
+  const spendable = totalBalance.transparentBal + totalBalance.spendablePrivate;
   const stillConfirming = spendable !== totalBalance.total;
 
   const setMaxAmount = (idx: number) => {

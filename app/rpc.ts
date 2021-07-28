@@ -284,7 +284,7 @@ export default class RPC {
     const balanceStr = await RPCModule.execute('balance', '');
     const balanceJSON = JSON.parse(balanceStr);
 
-    console.log(`Num of z addrs ${balanceJSON.z_addresses.length} and t addrs ${balanceJSON.t_addresses.length}`);
+    console.log(balanceJSON);
 
     const privateBal = balanceJSON.zbalance / 10 ** 8;
     const transparentBal = balanceJSON.tbalance / 10 ** 8;
@@ -293,7 +293,7 @@ export default class RPC {
     const balance: TotalBalance = {
       privateBal,
       transparentBal,
-      verifiedPrivate: balanceJSON.verified_zbalance / 10 ** 8,
+      spendablePrivate: balanceJSON.spendable_zbalance / 10 ** 8,
       total: privateBal + transparentBal,
     };
     this.fnSetTotalBalance(balance);

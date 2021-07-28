@@ -6,7 +6,7 @@ export class TotalBalance {
   privateBal: number;
 
   // Total private, confirmed funds that are spendable
-  verifiedPrivate: number;
+  spendablePrivate: number;
 
   // Total unconfirmed + spendable
   total: number;
@@ -14,7 +14,7 @@ export class TotalBalance {
   constructor() {
     this.transparentBal = 0;
     this.privateBal = 0;
-    this.verifiedPrivate = 0;
+    this.spendablePrivate = 0;
     this.total = 0;
   }
 }
