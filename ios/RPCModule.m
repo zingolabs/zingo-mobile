@@ -224,13 +224,13 @@ RCT_REMAP_METHOD(doSend,
     NSString* args = dict[@"args"];
     RCTPromiseResolveBlock resolve = dict[@"resolve"];
     
-    RCTLogInfo(@"execute called with %@", method);
+    // RCTLogInfo(@"execute called with %@", method);
     
     char *resp = execute([method UTF8String], [args UTF8String]);
     NSString* respStr = [NSString stringWithUTF8String:resp];
     rust_free(resp);
     
-    RCTLogInfo(@"Got resp for execute (%@): %@", method, respStr);
+    // RCTLogInfo(@"Got resp for execute (%@): %@", method, respStr);
 
     if ([method isEqual:@"sync"] && ![respStr hasPrefix:@"Error"]) {
       // Also save the wallet after sync
