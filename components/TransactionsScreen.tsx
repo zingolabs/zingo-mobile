@@ -305,6 +305,13 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
   const [isTxDetailModalShowing, setTxDetailModalShowing] = React.useState(false);
   const [txDetail, setTxDetail] = React.useState<Transaction | null>(null);
 
+  const [numTx, setNumTx] = React.useState<number>(100);
+  const loadMoreButton = numTx < (transactions?.length || 0);
+
+  const loadMoreClicked = () => {
+    setNumTx(numTx + 100);
+  };
+
   const {colors} = useTheme();
   const zecPrice = info ? info.zecPrice : null;
 
@@ -344,7 +351,7 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
           <RefreshControl refreshing={false} onRefresh={doRefresh} tintColor={colors.text} title="Refreshing" />
         }
         style={{flexGrow: 1, marginTop: 10, width: '100%', height: '100%'}}>
-        {transactions?.flatMap(t => {
+        {transactions?.slice(0, numTx).flatMap(t => {
           let txmonth = moment(t.time * 1000).format('MMM YYYY');
 
           var month = '';
@@ -363,6 +370,12 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
             />
           );
         })}
+
+        {loadMoreButton && (
+          <View style={{flexDirection: 'row', justifyContent: 'center', margin: 30}}>
+            <SecondaryButton title="Load More" onPress={loadMoreClicked} />
+          </View>
+        )}
       </ScrollView>
     </View>
   );
