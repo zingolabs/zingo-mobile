@@ -25,7 +25,9 @@ export default class RPC {
   updateDataLock: boolean;
   updateDataCtr: number;
 
-  lastBlockHeight: number;
+  lastWalletBlockHeight: number;
+  serverHeight: number;
+
   lastTxId?: string;
 
   inRefresh: boolean;
@@ -52,7 +54,8 @@ export default class RPC {
 
     this.updateDataLock = false;
     this.updateDataCtr = 0;
-    this.lastBlockHeight = 0;
+    this.lastWalletBlockHeight = 0;
+    this.serverHeight = 0;
 
     this.inRefresh = false;
   }
@@ -106,13 +109,9 @@ export default class RPC {
     return syncstr;
   }
 
-  async loadWalletData(walletHeight?: number) {
-    if (!walletHeight) {
-      walletHeight = await RPC.fetchWalletHeight();
-    }
-
+  async loadWalletData() {
     this.fetchTotalBalance();
-    this.fetchTandZTransactions(walletHeight);
+    this.fetchTandZTransactions();
     this.getZecPrice();
   }
 
@@ -145,14 +144,14 @@ export default class RPC {
       console.log(`Latest: ${latest_txid}, prev = ${this.lastTxId}`);
 
       const walletHeight = await RPC.fetchWalletHeight();
-      this.lastBlockHeight = walletHeight;
+      this.lastWalletBlockHeight = walletHeight;
 
       this.lastTxId = latest_txid;
 
       //console.log("Update data fetching new txns");
 
       // And fetch the rest of the data.
-      this.loadWalletData(this.lastBlockHeight);
+      this.loadWalletData();
 
       //console.log(`Finished update data at ${latestBlockHeight}`);
     }
@@ -170,7 +169,7 @@ export default class RPC {
       return;
     }
 
-    if (fullRefresh || fullRescan || !this.lastBlockHeight || this.lastBlockHeight < latestBlockHeight) {
+    if (fullRefresh || fullRescan || !this.lastWalletBlockHeight || this.lastWalletBlockHeight < latestBlockHeight) {
       // If the latest block height has changed, make sure to sync. This will happen in a new thread
       this.inRefresh = true;
 
@@ -213,10 +212,10 @@ export default class RPC {
           clearInterval(pollerID);
 
           // And fetch the rest of the data.
-          this.loadWalletData(latestBlockHeight);
+          this.loadWalletData();
 
           const walletHeight = await RPC.fetchWalletHeight();
-          this.lastBlockHeight = walletHeight;
+          this.lastWalletBlockHeight = walletHeight;
 
           await RPCModule.doSave();
           console.log(`Finished refresh at ${walletHeight}`);
@@ -273,6 +272,7 @@ export default class RPC {
     const info = await RPC.getInfoObject();
     if (info) {
       this.fnSetInfo(info);
+      this.serverHeight = info.latestBlock;
       return info.latestBlock;
     }
 
@@ -386,7 +386,7 @@ export default class RPC {
   }
 
   // Fetch all T and Z transactions
-  async fetchTandZTransactions(latestBlockHeight: number) {
+  async fetchTandZTransactions() {
     const listStr = await RPCModule.execute('list', '');
     const listJSON = JSON.parse(listStr);
 
@@ -420,7 +420,7 @@ export default class RPC {
         address:
           type === 'sent' ? (tx.outgoing_metadata.length > 0 ? tx.outgoing_metadata[0].address : '') : tx.address,
         amount: tx.amount / 10 ** 8,
-        confirmations: tx.unconfirmed ? 0 : latestBlockHeight - tx.block_height + 1,
+        confirmations: tx.unconfirmed ? 0 : this.serverHeight - tx.block_height + 1,
         txid: tx.txid,
         zec_price: tx.zec_price,
         time: tx.datetime,
