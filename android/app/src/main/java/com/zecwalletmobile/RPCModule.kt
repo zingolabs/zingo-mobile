@@ -36,17 +36,17 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         // Check if a wallet already exists
         val file = File(MainApplication.getAppContext()?.filesDir, "wallet.dat")
         if (file.exists()) {
-            Log.w("MAIN", "Wallet exists")
+            // Log.w("MAIN", "Wallet exists")
             promise.resolve(true);
         } else {
-            Log.w("MAIN", "Wallet DOES NOT exist")
+            // Log.w("MAIN", "Wallet DOES NOT exist")
             promise.resolve(false);
         }
     }
 
     @ReactMethod
     fun createNewWallet(promise: Promise) {
-        Log.w("MAIN", "Creating new wallet")
+        // Log.w("MAIN", "Creating new wallet")
 
         val saplingOutputFile = MainApplication.getAppContext()?.resources?.openRawResource(R.raw.saplingoutput)
         val saplingOutput = saplingOutputFile?.readBytes()
@@ -63,7 +63,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             Base64.encodeToString(saplingOutput, Base64.NO_WRAP), 
             Base64.encodeToString(saplingSpend, Base64.NO_WRAP),
             reactContext.applicationContext.filesDir.absolutePath)
-        Log.w("MAIN-Seed", seed)
+        // Log.w("MAIN-Seed", seed)
 
         if (!seed.startsWith("Error")) {
             saveWallet()
@@ -74,7 +74,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun restoreWallet(seed: String, birthday: String, promise: Promise) {
-        Log.w("MAIN", "Restoring wallet with seed $seed")
+        // Log.w("MAIN", "Restoring wallet with seed $seed")
 
         val saplingOutputFile = MainApplication.getAppContext()?.resources?.openRawResource(R.raw.saplingoutput)
         val saplingOutput = saplingOutputFile?.readBytes()
@@ -88,7 +88,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             Base64.encodeToString(saplingOutput, Base64.NO_WRAP), 
             Base64.encodeToString(saplingSpend, Base64.NO_WRAP),
             reactContext.applicationContext.filesDir.absolutePath)
-        Log.w("MAIN", seed)
+        // Log.w("MAIN", seed)
 
         if (!rseed.startsWith("Error")) {
             saveWallet()
@@ -117,7 +117,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             Base64.encodeToString(saplingSpend, Base64.NO_WRAP),
             reactContext.applicationContext.filesDir.absolutePath)
 
-        Log.w("MAIN", seed)
+        // Log.w("MAIN", seed)
         initlogging()
 
         file.close()
@@ -135,9 +135,9 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun doSend(sendJSON: String, promise: Promise) {
         // Run on a new thread so as to not block the UI
         thread {
-            Log.w(TAG, "Trying to send $sendJSON")
+            // Log.w(TAG, "Trying to send $sendJSON")
             val result = execute("send", sendJSON)
-            Log.w(TAG,"Send Result: $result")
+            // Log.w(TAG,"Send Result: $result")
 
             promise.resolve(result)
         }
@@ -146,9 +146,9 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     @ReactMethod
     fun execute(cmd: String, args: String, promise: Promise) {
         thread {
-            Log.w(TAG, "Executing ${cmd} with ${args}")
+            // Log.w(TAG, "Executing ${cmd} with ${args}")
             val resp = execute(cmd, args)
-            Log.w(TAG, "Response to ${cmd}: ${resp}")
+            // Log.w(TAG, "Response to ${cmd}: ${resp}")
 
             // And save it if it was a sync
             if (cmd == "sync" && !resp.startsWith("Error")) {
@@ -169,18 +169,18 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun saveWallet() {
         // Get the encoded wallet file
         val b64encoded = save()
-        Log.w("MAIN", b64encoded)
+        // Log.w("MAIN", b64encoded)
 
         try {
             val fileBytes = Base64.decode(b64encoded, Base64.NO_WRAP)
-            Log.w("MAIN", "file size${fileBytes.size}")
+            // Log.w("MAIN", "file size${fileBytes.size}")
 
             // Save file to disk
             val file = MainApplication.getAppContext()?.openFileOutput("wallet.dat", Context.MODE_PRIVATE)
             file?.write(fileBytes)
             file?.close()
         } catch (e: IllegalArgumentException) {
-            Log.e("MAIN", "Couldn't save the wallet")
+            // Log.e("MAIN", "Couldn't save the wallet")
         }
     }
 
