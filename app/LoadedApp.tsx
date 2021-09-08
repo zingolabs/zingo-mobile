@@ -245,7 +245,7 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
   };
 
   setZecPrice = (price: number | null) => {
-    console.log(`Price = ${price}`);
+    //console.log(`Price = ${price}`);
     const {info} = this.state;
 
     const newInfo = Object.assign({}, info);
@@ -296,8 +296,8 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
       }
     });
 
-    console.log('Sending:');
-    console.log(json);
+    // console.log('Sending:');
+    // console.log(json);
 
     return json;
   };
@@ -310,7 +310,7 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
 
       return txid;
     } catch (err) {
-      console.log('route sendtx error', err);
+      // console.log('route sendtx error', err);
       throw err;
     }
   };
@@ -334,7 +334,7 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
   createNewAddress = async (zaddress: boolean) => {
     // Create a new address
     const newaddress = await RPC.createNewAddress(zaddress);
-    console.log(`Created new Address ${newaddress}`);
+    // console.log(`Created new Address ${newaddress}`);
 
     // And then fetch the list of addresses again to refresh (totalBalance gets all addresses)
     this.rpc.fetchTotalBalance();

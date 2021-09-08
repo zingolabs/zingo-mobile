@@ -47,7 +47,7 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
     // First, check if a wallet exists. Do it async so the basic screen has time to render
     setTimeout(async () => {
       const exists = await RPCModule.walletExists();
-      console.log('Exists result', exists);
+      // console.log('Exists result', exists);
 
       if (exists && exists !== 'false') {
         this.setState({walletExists: true});
@@ -59,7 +59,7 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
           Alert.alert('Error Reading Wallet', error);
         }
       } else {
-        console.log('Loading new wallet');
+        // console.log('Loading new wallet');
         this.setState({screen: 1, walletExists: false});
       }
     });

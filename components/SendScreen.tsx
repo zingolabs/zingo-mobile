@@ -383,7 +383,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
         }, 1000);
       } catch (err) {
         setTimeout(() => {
-          console.log('sendtx error', err);
+          //console.log('sendtx error', err);
           Alert.alert('Error sending Tx', `${err}`, [{text: 'OK', onPress: () => setComputingModalVisible(false)}], {
             cancelable: false,
           });

@@ -93,19 +93,19 @@ export default class RPC {
 
   static async doSync(): Promise<string> {
     const syncstr = await RPCModule.execute('sync', '');
-    console.log(`Sync exec result: ${syncstr}`);
+    // console.log(`Sync exec result: ${syncstr}`);
 
     return syncstr;
   }
 
   static async doRescan() {
     const syncstr = await RPCModule.execute('rescan', '');
-    console.log(`rescan exec result: ${syncstr}`);
+    // console.log(`rescan exec result: ${syncstr}`);
   }
 
   static async doSyncStatus(): Promise<string> {
     const syncstr = await RPCModule.execute('syncstatus', '');
-    console.log(`syncstatus: ${syncstr}`);
+    // console.log(`syncstatus: ${syncstr}`);
     return syncstr;
   }
 
@@ -116,7 +116,7 @@ export default class RPC {
   }
 
   async rescan() {
-    console.log('RPC Rescan triggered');
+    // console.log('RPC Rescan triggered');
 
     // Empty out the transactions list to start with.
     this.fnSetTransactionsList([]);
@@ -141,7 +141,7 @@ export default class RPC {
     const latest_txid = await RPC.getLastTxid();
 
     if (this.lastTxId !== latest_txid) {
-      console.log(`Latest: ${latest_txid}, prev = ${this.lastTxId}`);
+      // console.log(`Latest: ${latest_txid}, prev = ${this.lastTxId}`);
 
       const walletHeight = await RPC.fetchWalletHeight();
       this.lastWalletBlockHeight = walletHeight;
@@ -218,11 +218,11 @@ export default class RPC {
           this.lastWalletBlockHeight = walletHeight;
 
           await RPCModule.doSave();
-          console.log(`Finished refresh at ${walletHeight}`);
+          // console.log(`Finished refresh at ${walletHeight}`);
         } else {
           // If we're doing a long sync, every time the batch_num changes, save the wallet
           if (prevBatchNum !== ss.batch_num) {
-            console.log(`Saving because batch num changed ${prevBatchNum} - ${ss.batch_num}`);
+            // console.log(`Saving because batch num changed ${prevBatchNum} - ${ss.batch_num}`);
             await RPCModule.doSave();
             prevBatchNum = ss.batch_num;
           }
@@ -230,7 +230,7 @@ export default class RPC {
       }, 2000);
     } else {
       // Already at the latest block
-      console.log('Already have latest block, waiting for next refresh');
+      // console.log('Already have latest block, waiting for next refresh');
     }
   }
 
@@ -263,7 +263,7 @@ export default class RPC {
 
       return info;
     } catch (err) {
-      console.log('Failed to parse info', err);
+      //console.log('Failed to parse info', err);
       return null;
     }
   }
@@ -284,7 +284,7 @@ export default class RPC {
     const balanceStr = await RPCModule.execute('balance', '');
     const balanceJSON = JSON.parse(balanceStr);
 
-    console.log(balanceJSON);
+    //console.log(balanceJSON);
 
     const privateBal = balanceJSON.zbalance / 10 ** 8;
     const transparentBal = balanceJSON.tbalance / 10 ** 8;
@@ -527,7 +527,7 @@ export default class RPC {
       RPCModule.doSend(JSON.stringify(sendJson));
     } catch (err) {
       // TODO Show a modal with the error
-      console.log(`Error sending Tx: ${err}`);
+      //console.log(`Error sending Tx: ${err}`);
       throw err;
     }
 
@@ -537,7 +537,7 @@ export default class RPC {
     const sendTxPromise = new Promise<string>((resolve, reject) => {
       const intervalID = setInterval(async () => {
         const progress = JSON.parse(await RPCModule.execute('sendprogress', ''));
-        console.log(progress);
+        //console.log(progress);
 
         const updatedProgress = new SendProgress();
         if (progress.id === prevSendId) {
@@ -639,7 +639,7 @@ export default class RPC {
   async getZecPrice() {
     const resultStr: string = await RPCModule.execute('zecprice', '');
     if (resultStr.toLowerCase().startsWith('error')) {
-      console.log(`Error fetching price ${resultStr}`);
+      //console.log(`Error fetching price ${resultStr}`);
       return;
     }
 
