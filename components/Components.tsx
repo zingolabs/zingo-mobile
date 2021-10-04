@@ -99,7 +99,6 @@ export const SecondaryButton: React.FunctionComponent<any> = ({title, disabled, 
   return (
     <TouchableOpacity
       style={{
-        ...style,
         borderColor: colors.text,
         borderWidth: 1,
         padding: 10,
@@ -107,8 +106,9 @@ export const SecondaryButton: React.FunctionComponent<any> = ({title, disabled, 
         paddingRight: 20,
         borderRadius: 10,
         width: '40%',
+        ...style,
       }}
-      onPress={() => !disabled && onPress()}>
+      onPress={() => !disabled && onPress && onPress()}>
       <Text style={{color: colors.text, fontWeight: 'bold', textTransform: 'uppercase', textAlign: 'center'}}>
         {title}
       </Text>

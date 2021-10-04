@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import {View, TouchableOpacity, Clipboard, Image, Text} from 'react-native';
-import {PrimaryButton, RegText, FadeText} from './Components';
+import {View, Clipboard, Image, Text} from 'react-native';
+import {PrimaryButton, RegText, FadeText, ClickableText} from './Components';
 import {useTheme} from '@react-navigation/native';
 import Toast from 'react-native-simple-toast';
 
@@ -36,18 +36,25 @@ const SeedComponent: React.FunctionComponent<SeedComponentProps> = ({seed, birth
       <FadeText style={{marginTop: 20, padding: 10, textAlign: 'center'}}>
         This is your seed phrase. Please write it down carefully. It is the only way to restore your wallet.
       </FadeText>
-      <TouchableOpacity
-        style={{padding: 10, marginTop: 10, backgroundColor: '#212124'}}
-        onPress={() => {
-          if (seed) {
-            Clipboard.setString(seed);
-            Toast.show('Copied Seed to Clipboard', Toast.LONG);
-          }
-        }}>
-        <RegText style={{textAlign: 'center', borderWidth: 1, borderRadius: 10, borderColor: colors.text, padding: 10}}>
+      <View style={{marginTop: 10, padding: 10, borderWidth: 1, borderRadius: 10, borderColor: colors.text}}>
+        <RegText
+          style={{
+            textAlign: 'center',
+          }}>
           {seed}
         </RegText>
-      </TouchableOpacity>
+        <ClickableText
+          style={{padding: 10, marginTop: 10, textAlign: 'center'}}
+          onPress={() => {
+            if (seed) {
+              Clipboard.setString(seed);
+              Toast.show('Copied Seed to Clipboard', Toast.LONG);
+            }
+          }}>
+          Tap to copy
+        </ClickableText>
+      </View>
+
       <View style={{marginTop: 10}}>
         <FadeText style={{textAlign: 'center'}}>Wallet Birthday</FadeText>
       </View>

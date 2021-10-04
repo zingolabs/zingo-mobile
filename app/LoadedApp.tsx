@@ -19,6 +19,7 @@ import AppState, {
   SendJsonToType,
   SyncStatus,
   SendProgress,
+  WalletSettings,
 } from './AppState';
 import {RegText, FadeText} from '../components/Components';
 import Utils from './utils';
@@ -30,6 +31,7 @@ import SeedComponent from '../components/SeedComponent';
 import InfoModal from '../components/InfoModal';
 import {useTheme} from '@react-navigation/native';
 import RescanModal from '../components/RescanModal';
+import SettingsModal from '../components/SettingsModal';
 
 const window = Dimensions.get('window');
 const styles = StyleSheet.create({
@@ -62,6 +64,10 @@ function Menu({onItemSelected}: any) {
 
         <RegText onPress={() => onItemSelected('Rescan')} style={styles.item}>
           Rescan Wallet
+        </RegText>
+
+        <RegText onPress={() => onItemSelected('Settings')} style={styles.item}>
+          Settings
         </RegText>
 
         <RegText onPress={() => onItemSelected('Info')} style={styles.item}>
@@ -100,11 +106,13 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
       rescanning: false,
       errorModalData: new ErrorModalData(),
       walletSeed: null,
+      wallet_settings: new WalletSettings(),
       isMenuDrawerOpen: false,
       selectedMenuDrawerItem: '',
       aboutModalVisible: false,
       rescanModalVisible: false,
       infoModalVisible: false,
+      settingsModalVisible: false,
       seedModalVisible: false,
       syncingStatus: null,
     };
@@ -114,6 +122,7 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
       this.setAddressesWithBalances,
       this.setTransactionList,
       this.setAllAddresses,
+      this.setWalletSettings,
       this.setInfo,
       this.setZecPrice,
       this.refreshUpdates,
@@ -218,6 +227,10 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
 
   setAllAddresses = (addresses: string[]) => {
     this.setState({addresses});
+  };
+
+  setWalletSettings = (wallet_settings: WalletSettings) => {
+    this.setState({wallet_settings});
   };
 
   setSendPageState = (sendPageState: SendPageState) => {
@@ -349,8 +362,12 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
     this.setState({receivePageState: newReceivePageState});
   };
 
-  doRefresh = () => {
-    this.rpc.refresh(false);
+  doRefresh = async () => {
+    await this.rpc.refresh(false);
+  };
+
+  fetchTotalBalance = async () => {
+    await this.rpc.fetchTotalBalance();
   };
 
   clearTimers = () => {
@@ -390,12 +407,21 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
       // Fetch the wallet seed to show the birthday in the UI
       await this.fetchWalletSeed();
       this.setState({rescanModalVisible: true});
+    } else if (item === 'Settings') {
+      this.setState({settingsModalVisible: true});
     } else if (item === 'Info') {
       this.setState({infoModalVisible: true});
     } else if (item === 'Wallet Seed') {
       await this.fetchWalletSeed();
       this.setState({seedModalVisible: true});
     }
+  };
+
+  set_wallet_option = async (name: string, value: string) => {
+    await RPC.setWalletSettingOption(name, value);
+
+    // Refetch the settings to update
+    this.rpc.fetchWalletSettings();
   };
 
   render() {
@@ -405,8 +431,10 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
       addresses,
       info,
       sendPageState,
+      wallet_settings,
       aboutModalVisible,
       infoModalVisible,
+      settingsModalVisible,
       rescanModalVisible,
       seedModalVisible,
       walletSeed,
@@ -418,6 +446,7 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
       closeErrorModal: this.closeErrorModal,
       info,
       toggleMenuDrawer: this.toggleMenuDrawer,
+      fetchTotalBalance: this.fetchTotalBalance,
     };
 
     const menu = <Menu onItemSelected={this.onMenuItemSelected} />;
@@ -452,6 +481,17 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
           />
         </Modal>
 
+        <Modal
+          animationType="slide"
+          transparent={false}
+          visible={settingsModalVisible}
+          onRequestClose={() => this.setState({settingsModalVisible: false})}>
+          <SettingsModal
+            closeModal={() => this.setState({settingsModalVisible: false})}
+            wallet_settings={wallet_settings}
+            set_wallet_option={this.set_wallet_option}
+          />
+        </Modal>
         <Modal
           animationType="slide"
           transparent={false}
@@ -517,7 +557,9 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
             )}
           </Tab.Screen>
           <Tab.Screen name="RECEIVE">
-            {props => <ReceiveScreen {...props} {...standardProps} addresses={addresses} />}
+            {props => (
+              <ReceiveScreen {...props} {...standardProps} addresses={addresses} startRescan={this.startRescan} />
+            )}
           </Tab.Screen>
         </Tab.Navigator>
       </SideMenu>

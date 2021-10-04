@@ -191,6 +191,14 @@ export interface SyncStatus {
   progress: number;
 }
 
+export class WalletSettings {
+  download_memos: string;
+
+  constructor() {
+    this.download_memos = 'wallet';
+  }
+}
+
 export default interface AppState {
   // The total confirmed and unconfirmed balance in this wallet
   totalBalance: TotalBalance;
@@ -228,6 +236,8 @@ export default interface AppState {
   // Callbacks for the password dialog box
   //passwordState: PasswordState;
 
+  wallet_settings: WalletSettings;
+
   syncingStatus: SyncStatus | null;
 
   // Data for any error or info modal
@@ -240,6 +250,8 @@ export default interface AppState {
   selectedMenuDrawerItem: string;
 
   aboutModalVisible: boolean;
+
+  settingsModalVisible: boolean;
 
   infoModalVisible: boolean;
 

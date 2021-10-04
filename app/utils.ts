@@ -95,8 +95,8 @@ export default class Utils {
     return {bigPart, smallPart};
   }
 
-  static splitAddressIntoChunks(s: string, numChunks: number): string[] {
-    if (numChunks > s.length) {
+  static splitStringIntoChunks(s: string, numChunks: number): string[] {
+    if (!s || numChunks > s.length) {
       return [s];
     }
     if (s.length < 16) {

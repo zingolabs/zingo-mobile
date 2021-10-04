@@ -10,7 +10,7 @@ import {AppearanceProvider} from 'react-native-appearance';
 import {createStackNavigator} from '@react-navigation/stack';
 
 import cstyles from './components/CommonStyles';
-import {PrimaryButton, SecondaryButton, BoldText, RegText, RegTextInput} from './components/Components';
+import {PrimaryButton, SecondaryButton, BoldText, RegText, RegTextInput, FadeText} from './components/Components';
 import RPCModule from './components/RPCModule';
 import LoadedApp from './app/LoadedApp';
 import SeedComponent from './components/SeedComponent';
@@ -189,15 +189,15 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
                   minWidth: '95%',
                   borderColor: 'gray',
                   borderWidth: 1,
+                  minHeight: 100,
                 },
                 cstyles.innerpaddingsmall,
               ]}
               value={seedPhrase}
               onChangeText={(text: string) => this.setState({seedPhrase: text})}
             />
-            <RegText style={[cstyles.margintop, cstyles.center, cstyles.marginbottomsmall]}>
-              Wallet Birthday (Block height of first transaction). (OK to leave blank)
-            </RegText>
+            <RegText style={[cstyles.margintop, cstyles.center]}>Wallet Birthday</RegText>
+            <FadeText>Block height of first transaction. (OK to leave blank)</FadeText>
             <RegTextInput
               style={[
                 {

@@ -185,7 +185,7 @@ const ConfirmModalContent: React.FunctionComponent<ConfirmModalProps> = ({
           return (
             <View key={to.id} style={{margin: 10}}>
               <FadeText>To</FadeText>
-              <RegText>{Utils.splitAddressIntoChunks(to.to, 8).join(' ')}</RegText>
+              <RegText>{Utils.splitStringIntoChunks(to.to, 8).join(' ')}</RegText>
 
               <FadeText style={{marginTop: 10}}>Amount</FadeText>
               <View

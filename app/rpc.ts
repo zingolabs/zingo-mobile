@@ -7,6 +7,7 @@ import {
   SendJsonToType,
   WalletSeed,
   SendProgress,
+  WalletSettings,
 } from './AppState';
 import RPCModule from '../components/RPCModule';
 import Utils from './utils';
@@ -19,6 +20,7 @@ export default class RPC {
   fnSetAllAddresses: (allAddresses: string[]) => void;
   fnSetZecPrice: (price: number | null) => void;
   fnRefreshUpdates: (inProgress: boolean, progress: number) => void;
+  fnSetWalletSettings: (settings: WalletSettings) => void;
   refreshTimerID: NodeJS.Timeout | null;
   updateTimerId?: NodeJS.Timeout;
 
@@ -37,6 +39,7 @@ export default class RPC {
     fnSetAddressesWithBalance: (ab: AddressBalance[]) => void,
     fnSetTransactionsList: (txlist: Transaction[]) => void,
     fnSetAllAddresses: (addresses: string[]) => void,
+    fnSetWalletSettings: (settings: WalletSettings) => void,
     fnSetInfo: (info: Info) => void,
     fnSetZecPrice: (price: number | null) => void,
     fnRefreshUpdates: (inProgress: boolean, progress: number) => void,
@@ -45,6 +48,7 @@ export default class RPC {
     this.fnSetAddressesWithBalance = fnSetAddressesWithBalance;
     this.fnSetTransactionsList = fnSetTransactionsList;
     this.fnSetAllAddresses = fnSetAllAddresses;
+    this.fnSetWalletSettings = fnSetWalletSettings;
     this.fnSetInfo = fnSetInfo;
     this.fnSetZecPrice = fnSetZecPrice;
     this.fnRefreshUpdates = fnRefreshUpdates;
@@ -99,6 +103,7 @@ export default class RPC {
   }
 
   static async doRescan() {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const syncstr = await RPCModule.execute('rescan', '');
     // console.log(`rescan exec result: ${syncstr}`);
   }
@@ -113,6 +118,7 @@ export default class RPC {
     this.fetchTotalBalance();
     this.fetchTandZTransactions();
     this.getZecPrice();
+    this.fetchWalletSettings();
   }
 
   async rescan() {
@@ -234,6 +240,25 @@ export default class RPC {
     }
   }
 
+  async fetchWalletSettings() {
+    const download_memos_str = await RPCModule.execute('getoption', 'download_memos');
+    const download_memos = JSON.parse(download_memos_str).download_memos;
+
+    // console.log(download_memos);
+
+    const wallet_settings = new WalletSettings();
+    wallet_settings.download_memos = download_memos;
+
+    this.fnSetWalletSettings(wallet_settings);
+  }
+
+  static async setWalletSettingOption(name: string, value: string): Promise<string> {
+    const r = await RPCModule.execute('setoption', `${name}=${value}`);
+
+    // console.log(r);
+    return r;
+  }
+
   // Special method to get the Info object. This is used both internally and by the Loading screen
   static async getInfoObject(): Promise<Info | null> {
     try {
@@ -346,6 +371,8 @@ export default class RPC {
     const allTAddresses = balanceJSON.t_addresses.map((o: any) => o.address);
     const allAddresses = allZAddresses.concat(allTAddresses);
 
+    // console.log(`All addresses: ${allAddresses}`);
+
     this.fnSetAllAddresses(allAddresses);
   }
 
@@ -356,11 +383,31 @@ export default class RPC {
     return privKeyJSON[0].private_key;
   }
 
-  static async createNewAddress(zaddress: boolean) {
+  static async getViewKeyAsString(address: string): Promise<string> {
+    const privKeyStr = await RPCModule.execute('export', address);
+    const privKeyJSON = JSON.parse(privKeyStr);
+
+    return privKeyJSON[0].viewing_key;
+  }
+
+  static async createNewAddress(zaddress: boolean): Promise<string> {
     const addrStr = await RPCModule.execute('new', zaddress ? 'z' : 't');
     const addrJSON = JSON.parse(addrStr);
 
+    console.log(addrJSON);
+
     return addrJSON[0];
+  }
+
+  static async doImportPrivKey(key: string, birthday: string): Promise<string | string[]> {
+    if (isNaN(parseInt(birthday, 10))) {
+      return `Error: Couldn't parse ${birthday} as a number`;
+    }
+
+    const args = {key, birthday: parseInt(birthday, 10), norescan: true};
+    const address = await RPCModule.execute('import', JSON.stringify(args));
+
+    return address;
   }
 
   static async fetchSeed(): Promise<WalletSeed> {
