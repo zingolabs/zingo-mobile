@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useState} from 'react';
-import {View, Dimensions, Clipboard, Platform, Image, Text, Modal} from 'react-native';
+import {View, Dimensions, Clipboard, Platform, Image, Text, Modal, ScrollView} from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import {TabView, TabBar} from 'react-native-tab-view';
 import Toast from 'react-native-simple-toast';
@@ -31,7 +31,7 @@ const SingleAddressDisplay: React.FunctionComponent<SingleAddress> = ({address, 
 
   const multi = total > 1;
 
-  const chunks = Utils.splitStringIntoChunks(address, Utils.isSapling(address) ? 4 : 2);
+  const chunks = Utils.splitStringIntoChunks(address, Utils.isSapling(address) ? 3 : 2);
   const fixedWidthFont = Platform.OS === 'android' ? 'monospace' : 'Courier';
 
   const doCopy = () => {
@@ -49,14 +49,23 @@ const SingleAddressDisplay: React.FunctionComponent<SingleAddress> = ({address, 
   // }
 
   return (
-    <View style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+    <ScrollView
+      contentContainerStyle={[
+        {
+          flex: 1,
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'flex-start',
+        },
+      ]}
+      keyboardShouldPersistTaps="handled">
       {multi && (
         <FadeText style={{marginTop: 10}}>
           Address: {index + 1} of {total}
         </FadeText>
       )}
       <View style={{marginTop: 10, padding: 10, backgroundColor: 'rgb(255, 255, 255)'}}>
-        <QRCode value={address} size={225} ecl="L" />
+        <QRCode value={address} size={200} ecl="L" />
       </View>
       <View style={{display: 'flex', flexDirection: 'row', flexWrap: 'wrap', marginTop: 10, justifyContent: 'center'}}>
         {chunks.map(c => (
@@ -78,12 +87,12 @@ const SingleAddressDisplay: React.FunctionComponent<SingleAddress> = ({address, 
       </ClickableText>
 
       {multi && (
-        <View style={{display: 'flex', flexDirection: 'row', marginTop: 10, alignItems: 'center'}}>
+        <View style={{display: 'flex', flexDirection: 'row', marginTop: 10, alignItems: 'center', marginBottom: 100}}>
           <SecondaryButton title={'Prev'} style={{width: '25%', margin: 10}} onPress={prev} />
           <SecondaryButton title={'Next'} style={{width: '25%', margin: 10}} onPress={next} />
         </View>
       )}
-    </View>
+    </ScrollView>
   );
 };
 

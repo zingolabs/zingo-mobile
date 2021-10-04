@@ -103,7 +103,8 @@ const ImportKeyModal: React.FunctionComponent<ImportKeyModalProps> = ({closeModa
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'flex-start',
-        }}>
+        }}
+        keyboardShouldPersistTaps="handled">
         <RegText style={{margin: 20}}>Private or Viewing key</RegText>
 
         <RegTextInput
