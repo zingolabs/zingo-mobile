@@ -396,6 +396,9 @@ export default class RPC {
 
     console.log(addrJSON);
 
+    // Save
+    await RPCModule.doSave();
+
     return addrJSON[0];
   }
 
