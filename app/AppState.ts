@@ -243,6 +243,9 @@ export default interface AppState {
   // Data for any error or info modal
   errorModalData: ErrorModalData;
 
+  // Build progress from Tx
+  txBuildProgress: SendProgress;
+
   walletSeed: WalletSeed | null;
 
   isMenuDrawerOpen: boolean;
@@ -250,6 +253,8 @@ export default interface AppState {
   selectedMenuDrawerItem: string;
 
   aboutModalVisible: boolean;
+
+  computingModalVisible: boolean;
 
   settingsModalVisible: boolean;
 

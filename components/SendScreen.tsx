@@ -1,7 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useState, useEffect, useRef} from 'react';
 import QRCodeScanner from 'react-native-qrcode-scanner';
-import * as Progress from 'react-native-progress';
 import {View, ScrollView, Modal, Image, Alert, SafeAreaView, Keyboard, Platform} from 'react-native';
 import {
   FadeText,
@@ -99,39 +98,6 @@ function ScanScreen({idx, updateToField, closeModal}: ScannerProps) {
     />
   );
 }
-
-type ComputingModalProps = {
-  progress: SendProgress;
-};
-const ComputingTxModalContent: React.FunctionComponent<ComputingModalProps> = ({progress}) => {
-  const {colors} = useTheme();
-
-  return (
-    <SafeAreaView
-      style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '100%',
-        backgroundColor: colors.background,
-      }}>
-      <RegText>Computing Transaction</RegText>
-      {!(progress && progress.sendInProgress) && <RegText>Please wait...</RegText>}
-      {progress && progress.sendInProgress && (
-        <>
-          <RegText>{`Step ${progress.progress} of ${progress.total}`}</RegText>
-          <RegText style={{marginBottom: 20}}>{`ETA ${progress.etaSeconds}s`}</RegText>
-          <Progress.Circle
-            showsText={true}
-            progress={progress.progress / progress.total}
-            indeterminate={!progress.progress}
-            size={100}
-          />
-        </>
-      )}
-    </SafeAreaView>
-  );
-};
 
 type ConfirmModalProps = {
   sendPageState: SendPageState;
@@ -239,6 +205,8 @@ type SendScreenProps = {
   clearToAddrs: () => void;
   navigation: NavigationScreenProp<any>;
   toggleMenuDrawer: () => void;
+  setComputingModalVisible: (visible: boolean) => void;
+  setTxBuildProgress: (progress: SendProgress) => void;
 };
 
 const SendScreen: React.FunctionComponent<SendScreenProps> = ({
@@ -250,14 +218,13 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
   clearToAddrs,
   navigation,
   toggleMenuDrawer,
+  setComputingModalVisible,
+  setTxBuildProgress,
 }) => {
   const {colors} = useTheme();
   const [qrcodeModalVisble, setQrcodeModalVisible] = useState(false);
   const [qrcodeModalIndex, setQrcodeModalIndex] = useState(0);
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
-  const [computingModalVisible, setComputingModalVisible] = useState(false);
-
-  const [txBuildProgress, setTxBuildProgress] = useState(new SendProgress());
 
   const [titleViewHeight, setTitleViewHeight] = useState(0);
   const slideAnim = useRef(new Animated.Value(0)).current;
@@ -481,14 +448,6 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
           }}
           confirmSend={confirmSend}
         />
-      </Modal>
-
-      <Modal
-        animationType="slide"
-        transparent={false}
-        visible={computingModalVisible}
-        onRequestClose={() => setComputingModalVisible(false)}>
-        <ComputingTxModalContent progress={txBuildProgress} />
       </Modal>
 
       <ScrollView

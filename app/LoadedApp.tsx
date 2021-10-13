@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {Component} from 'react';
-import {ScrollView, StyleSheet, Dimensions, Modal, View} from 'react-native';
+import {ScrollView, StyleSheet, Dimensions, Modal, View, SafeAreaView} from 'react-native';
+import * as Progress from 'react-native-progress';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faList, faUpload, faDownload, faCog} from '@fortawesome/free-solid-svg-icons';
@@ -82,6 +83,39 @@ function Menu({onItemSelected}: any) {
   );
 }
 
+type ComputingModalProps = {
+  progress: SendProgress;
+};
+const ComputingTxModalContent: React.FunctionComponent<ComputingModalProps> = ({progress}) => {
+  const {colors} = useTheme();
+
+  return (
+    <SafeAreaView
+      style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100%',
+        backgroundColor: colors.background,
+      }}>
+      <RegText>Computing Transaction</RegText>
+      {!(progress && progress.sendInProgress) && <RegText>Please wait...</RegText>}
+      {progress && progress.sendInProgress && (
+        <>
+          <RegText>{`Step ${progress.progress} of ${progress.total}`}</RegText>
+          <RegText style={{marginBottom: 20}}>{`ETA ${progress.etaSeconds}s`}</RegText>
+          <Progress.Circle
+            showsText={true}
+            progress={progress.progress / progress.total}
+            indeterminate={!progress.progress}
+            size={100}
+          />
+        </>
+      )}
+    </SafeAreaView>
+  );
+};
+
 const Tab = createBottomTabNavigator();
 
 type LoadedAppProps = {
@@ -105,12 +139,14 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
       info: null,
       rescanning: false,
       errorModalData: new ErrorModalData(),
+      txBuildProgress: new SendProgress(),
       walletSeed: null,
       wallet_settings: new WalletSettings(),
       isMenuDrawerOpen: false,
       selectedMenuDrawerItem: '',
       aboutModalVisible: false,
       rescanModalVisible: false,
+      computingModalVisible: false,
       infoModalVisible: false,
       settingsModalVisible: false,
       seedModalVisible: false,
@@ -269,6 +305,14 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
 
   setRescanning = (rescanning: boolean) => {
     this.setState({rescanning});
+  };
+
+  setComputingModalVisible = (visible: boolean) => {
+    this.setState({computingModalVisible: visible});
+  };
+
+  setTxBuildProgress = (progress: SendProgress) => {
+    this.setState({txBuildProgress: progress});
   };
 
   setInfo = (newInfo: Info) => {
@@ -435,10 +479,12 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
       aboutModalVisible,
       infoModalVisible,
       settingsModalVisible,
+      computingModalVisible,
       rescanModalVisible,
       seedModalVisible,
       walletSeed,
       syncingStatus,
+      txBuildProgress,
     } = this.state;
 
     const standardProps = {
@@ -492,6 +538,7 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
             set_wallet_option={this.set_wallet_option}
           />
         </Modal>
+
         <Modal
           animationType="slide"
           transparent={false}
@@ -502,6 +549,14 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
             birthday={walletSeed?.birthday}
             nextScreen={() => this.setState({seedModalVisible: false})}
           />
+        </Modal>
+
+        <Modal
+          animationType="slide"
+          transparent={false}
+          visible={computingModalVisible}
+          onRequestClose={() => this.setState({computingModalVisible: false})}>
+          <ComputingTxModalContent progress={txBuildProgress} />
         </Modal>
 
         <Tab.Navigator
@@ -541,6 +596,8 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
                 setSendPageState={this.setSendPageState}
                 sendTransaction={this.sendTransaction}
                 clearToAddrs={this.clearToAddrs}
+                setComputingModalVisible={this.setComputingModalVisible}
+                setTxBuildProgress={this.setTxBuildProgress}
               />
             )}
           </Tab.Screen>
@@ -553,6 +610,7 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
                 totalBalance={totalBalance}
                 doRefresh={this.doRefresh}
                 syncingStatus={syncingStatus}
+                setComputingModalVisible={this.setComputingModalVisible}
               />
             )}
           </Tab.Screen>

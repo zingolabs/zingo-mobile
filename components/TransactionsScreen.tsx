@@ -294,6 +294,7 @@ type TransactionsScreenViewProps = {
   transactions: Transaction[] | null;
   toggleMenuDrawer: () => void;
   doRefresh: () => void;
+  setComputingModalVisible: (visible: boolean) => void;
 };
 
 const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProps> = ({
@@ -303,6 +304,7 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
   toggleMenuDrawer,
   syncingStatus,
   doRefresh,
+  setComputingModalVisible,
 }) => {
   const [isTxDetailModalShowing, setTxDetailModalShowing] = React.useState(false);
   const [txDetail, setTxDetail] = React.useState<Transaction | null>(null);
@@ -316,14 +318,20 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
 
   const showShieldButton = totalBalance && totalBalance.transparentBal > 0;
   const shieldFunds = async () => {
-    const shieldStr = await RPC.shieldTransparent();
-    const shieldJSON = JSON.parse(shieldStr);
+    setComputingModalVisible(true);
 
-    if (shieldJSON.error) {
-      Toast.show(`Error: ${shieldJSON.error}`, Toast.LONG);
-    } else {
-      Toast.show(`Sent ${shieldJSON.txid}`);
-    }
+    const shieldStr = await RPC.shieldTransparent();
+
+    setComputingModalVisible(false);
+    setTimeout(() => {
+      const shieldJSON = JSON.parse(shieldStr);
+
+      if (shieldJSON.error) {
+        Toast.show(`Error: ${shieldJSON.error}`, Toast.LONG);
+      } else {
+        Toast.show(`Shielded in Tx: ${shieldJSON.txid}`);
+      }
+    }, 1000);
   };
 
   const {colors} = useTheme();
