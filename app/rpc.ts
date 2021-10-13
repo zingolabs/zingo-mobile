@@ -255,6 +255,7 @@ export default class RPC {
   static async setWalletSettingOption(name: string, value: string): Promise<string> {
     const r = await RPCModule.execute('setoption', `${name}=${value}`);
 
+    await RPCModule.doSave();
     // console.log(r);
     return r;
   }
@@ -411,6 +412,13 @@ export default class RPC {
     const address = await RPCModule.execute('import', JSON.stringify(args));
 
     return address;
+  }
+
+  static async shieldTransparent(): Promise<string> {
+    const shieldStr = await RPCModule.execute('shield', '');
+
+    console.log(shieldStr);
+    return shieldStr;
   }
 
   static async fetchSeed(): Promise<WalletSeed> {

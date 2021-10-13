@@ -9,6 +9,7 @@ import {
   FadeText,
   ZecPrice,
   ClickableText,
+  PrimaryButton,
 } from '../components/Components';
 import {
   View,
@@ -29,6 +30,7 @@ import moment from 'moment';
 import {useTheme} from '@react-navigation/native';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faArrowDown, faArrowUp, faBars, faChevronLeft} from '@fortawesome/free-solid-svg-icons';
+import RPC from '../app/rpc';
 
 type TxDetailProps = {
   tx: Transaction | null;
@@ -312,6 +314,18 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
     setNumTx(numTx + 100);
   };
 
+  const showShieldButton = totalBalance && totalBalance.transparentBal > 0;
+  const shieldFunds = async () => {
+    const shieldStr = await RPC.shieldTransparent();
+    const shieldJSON = JSON.parse(shieldStr);
+
+    if (shieldJSON.error) {
+      Toast.show(`Error: ${shieldJSON.error}`, Toast.LONG);
+    } else {
+      Toast.show(`Sent ${shieldJSON.txid}`);
+    }
+  };
+
   const {colors} = useTheme();
   const zecPrice = info ? info.zecPrice : null;
 
@@ -335,6 +349,12 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
         <RegText style={{marginTop: 5, padding: 5}}>{syncStatusDisplay}</RegText>
         <ZecAmount color={balanceColor} size={36} amtZec={totalBalance.total} />
         <UsdAmount style={{marginTop: 5}} price={zecPrice} amtZec={totalBalance.total} />
+
+        {showShieldButton && (
+          <View style={{margin: 5}}>
+            <PrimaryButton title="Shield funds" onPress={shieldFunds} />
+          </View>
+        )}
       </View>
 
       <View style={{backgroundColor: '#353535', padding: 10, position: 'absolute'}}>
