@@ -293,15 +293,14 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
       return;
     }
 
-    let address = '';
-    if (addressList && addressList.length > 0) {
-      address = addressList[0];
+    if (addressList && typeof addressList === 'string' && addressList.length > 0) {
+      const address = JSON.parse(addressList)[0];
+      // Show the toast in settimeout, because it sometimes gets lost.
+      setTimeout(() => {
+        Toast.show(`Importing ${Utils.trimToSmall(address)}`, Toast.LONG);
+      }, 1000);
     }
 
-    // Show the toast in settimeout, because it sometimes gets lost.
-    setTimeout(() => {
-      Toast.show(`Importing ${Utils.trimToSmall(address)}`, Toast.LONG);
-    }, 1000);
     startRescan();
   };
 
