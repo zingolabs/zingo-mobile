@@ -59,11 +59,6 @@ const SingleAddressDisplay: React.FunctionComponent<SingleAddress> = ({address, 
         },
       ]}
       keyboardShouldPersistTaps="handled">
-      {multi && (
-        <FadeText style={{marginTop: 10}}>
-          Address: {index + 1} of {total}
-        </FadeText>
-      )}
       <View style={{marginTop: 10, padding: 10, backgroundColor: 'rgb(255, 255, 255)'}}>
         <QRCode value={address} size={200} ecl="L" />
       </View>
@@ -82,13 +77,16 @@ const SingleAddressDisplay: React.FunctionComponent<SingleAddress> = ({address, 
           </FadeText>
         ))}
       </View>
-      <ClickableText style={{marginTop: 10}} onPress={doCopy}>
+      <ClickableText style={{marginTop: 5}} onPress={doCopy}>
         Tap To Copy
       </ClickableText>
 
       {multi && (
         <View style={{display: 'flex', flexDirection: 'row', marginTop: 10, alignItems: 'center', marginBottom: 100}}>
           <SecondaryButton title={'Prev'} style={{width: '25%', margin: 10}} onPress={prev} />
+          <FadeText>
+            {index + 1} of {total}
+          </FadeText>
           <SecondaryButton title={'Next'} style={{width: '25%', margin: 10}} onPress={next} />
         </View>
       )}
