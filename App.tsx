@@ -138,7 +138,7 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
             justifyContent: 'center',
           },
         ]}>
-        {screen === 0 && <Text style={{color: '#FFFFFF', fontSize: 36, fontWeight: 'bold'}}>Zecwallet Lite</Text>}
+        {screen === 0 && <Text style={{color: '#FFFFFF', fontSize: 36, fontWeight: 'bold'}}>zecwallet DAO</Text>}
         {screen === 1 && (
           <View
             style={[
@@ -154,7 +154,7 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
                 source={require('./assets/img/logobig.png')}
                 style={{width: 100, height: 100, resizeMode: 'contain'}}
               />
-              <BoldText>Zecwallet Lite</BoldText>
+              <BoldText>zecwallet DAO</BoldText>
             </View>
 
             <Button type="Primary" title="Create New Wallet" disabled={actionButtonsDisabled} onPress={this.createNewWallet} />

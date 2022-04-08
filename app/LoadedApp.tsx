@@ -76,7 +76,7 @@ function Menu({onItemSelected}: any) {
         </RegText>
 
         <RegText onPress={() => onItemSelected('About')} style={styles.item}>
-          About Zecwallet Lite
+          About zecwallet DAO
         </RegText>
       </View>
     </ScrollView>
