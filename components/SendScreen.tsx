@@ -233,10 +233,10 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
-      Animated.timing(slideAnim, {toValue: 0 - titleViewHeight + 25, duration: 100, easing: EasingNode.linear}).start();
+      Animated.timing(slideAnim, {toValue: 0 - titleViewHeight + 25, duration: 100, easing: EasingNode.linear, useNativeDriver: true}).start();
     });
     const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-      Animated.timing(slideAnim, {toValue: 0, duration: 100, easing: EasingNode.linear}).start();
+      Animated.timing(slideAnim, {toValue: 0, duration: 100, easing: EasingNode.linear, useNativeDriver: true}).start();
     });
 
     return () => {
