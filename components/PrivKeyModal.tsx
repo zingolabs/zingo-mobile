@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useState} from 'react';
-import {View, ScrollView, SafeAreaView, Image, Text, Platform, Clipboard, TouchableOpacity} from 'react-native';
+import {View, ScrollView, SafeAreaView, Image, Text, Platform, TouchableOpacity} from 'react-native';
+import Clipboard from '@react-native-community/clipboard';
 import {ClickableText, FadeText, SecondaryButton} from './Components';
 import {useTheme} from '@react-navigation/native';
 import Utils from '../app/utils';

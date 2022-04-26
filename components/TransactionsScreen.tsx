@@ -19,9 +19,9 @@ import {
   TouchableOpacity,
   SafeAreaView,
   RefreshControl,
-  Clipboard,
   Linking,
 } from 'react-native';
+import Clipboard from '@react-native-community/clipboard';
 import Toast from 'react-native-simple-toast';
 import {TotalBalance, Transaction, Info, SyncStatus} from '../app/AppState';
 import Utils from '../app/utils';
