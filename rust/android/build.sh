@@ -1,5 +1,5 @@
 #!/bin/bash
-# docker build --tag stunnar/rustndk:latest rustNDKDocker
+docker build --tag stunnar/rustndk:latest rustNDKDocker
 docker build --tag zecwalletmobile/android:latest docker
 
 docker run --rm -v $(pwd)/..:/opt/zecwalletmobile -v $(pwd)/target/registry:/root/.cargo/registry zecwalletmobile/android:latest bash -c "
@@ -19,4 +19,3 @@ mkdir -p ../../android/app/src/main/jniLibs/x86
 cp ../target/i686-linux-android/release/librust.so   ../../android/app/src/main/jniLibs/x86/
 cp ../target/armv7-linux-androideabi/release/librust.so  ../../android/app/src/main/jniLibs/armeabi-v7a/
 cp ../target/aarch64-linux-android/release/librust.so ../../android/app/src/main/jniLibs/arm64-v8a/
-
