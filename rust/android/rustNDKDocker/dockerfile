@@ -1,0 +1,56 @@
+ARG rust_ver=1.56
+FROM rust:${rust_ver}-slim-bullseye
+
+ARG android_ndk_ver=r23b
+ARG cargo_ndk_ver=2.5.0
+ARG build_rev=0
+
+# get latest stable toolchain
+RUN rustup toolchain install stable
+
+# Install Rust targets for Android platforms
+RUN rustup target add aarch64-linux-android \
+                      armv7-linux-androideabi \
+                      i686-linux-android \
+                      x86_64-linux-android
+
+
+# Install Android NDK
+RUN apt-get update \
+ && apt-get upgrade -y \
+ && apt-get install -y --no-install-recommends --no-install-suggests \
+            ca-certificates \
+            make \
+ && update-ca-certificates \
+    \
+ # Install installation tools
+ && toolDeps="curl unzip" \
+ && apt-get install -y --no-install-recommends --no-install-suggests \
+            $toolDeps \
+    \
+ # Install NDK itself
+ && curl -fL -o /tmp/android-ndk.zip \
+         https://dl.google.com/android/repository/android-ndk-${android_ndk_ver}-linux.zip \
+ && unzip /tmp/android-ndk.zip -d /usr/local/ \
+    \
+ # Cleanup unnecessary stuff
+ && apt-get purge -y --auto-remove \
+                  -o APT::AutoRemove::RecommendsImportant=false \
+            $toolDeps \
+ && rm -rf /var/lib/apt/lists/* \
+           /tmp/*
+
+# Path to the Android NDK for cargo-ndk Cargo plugin
+ENV ANDROID_NDK_HOME=/usr/local/android-ndk-${android_ndk_ver} \
+    NDK_HOME=/usr/local/android-ndk-${android_ndk_ver} \
+    ANDROID_NDK_ROOT=/usr/local/android-ndk-${android_ndk_ver}
+
+ENV PATH=/root/.cargo/bin:/usr/local/android-ndk-${android_ndk_ver}/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH
+
+
+# Install cargo-ndk Cargo plugin
+RUN cargo install cargo-ndk \
+    \
+  # Cleanup unnecessary stuff
+  && rm -rf /usr/local/cargo/registry/ \
+            /tmp/*
