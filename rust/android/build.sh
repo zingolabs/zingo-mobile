@@ -1,21 +1,47 @@
-#!/bin/bash
-docker build --tag stunnar/rustndk:latest rustNDKDocker
-docker build --tag zecwalletmobile/android:latest docker
+#! /usr/bin/env bash
 
-docker run --rm -v $(pwd)/..:/opt/zecwalletmobile -v $(pwd)/target/registry:/root/.cargo/registry zecwalletmobile/android:latest bash -c "
-    cd /opt/zecwalletmobile/android && \
-    AR=llvm-ar LD=ld RANLIB=llvm-ranlib CC=i686-linux-android29-clang OPENSSL_DIR=/opt/openssl-3.0.1/x86 cargo +nightly build -Z build-std --target i686-linux-android --release && llvm-strip ../target/i686-linux-android/release/librust.so && \
-    AR=llvm-ar LD=ld RANLIB=llvm-ranlib CC=armv7a-linux-androideabi29-clang OPENSSL_DIR=/opt/openssl-3.0.1/armv7 cargo +nightly build  -Z build-std --target armv7-linux-androideabi --release && llvm-strip ../target/armv7-linux-androideabi/release/librust.so && \
-    AR=llvm-ar LD=ld RANLIB=llvm-ranlib CC=aarch64-linux-android29-clang OPENSSL_DIR=/opt/openssl-3.0.1/aarch64 cargo  +nightly build   -Z build-std --target aarch64-linux-android --release && llvm-strip ../target/aarch64-linux-android/release/librust.so"
+PHASES=("constructdockerimages" "runcargobuilds" "exportbuiltartifacts");
+DOCPHASES="";
+for phase in "${PHASES[@]}"
+do
+  DOCPHASES+="\t$phase\n";
+done
+USAGE="Usage: pass a single argument to run a specific phase\n  valid phases: \n"$DOCPHASES;
+if [ "$#" -gt 1 ] || [ "$1" == "help" ] || [ "$1" == "-h" ] || [ "$1" == "--help" ];
+then
+  tabs 4
+  echo -e $USAGE; 
+  echo
+  echo "This script manages three phases of the NDK pipeline.  It expects 1 or 0 args."
+  echo "Invocation without args is the backwards compatible default that runs everything."
+  echo "If there's a single arg it must either specify a phase, or request help."
+  echo "No other arguments are valid."
+  
+  if [ "$#" -gt 1 ];
+  then
+    exit -1;
+  fi
+  exit 0;
+fi
 
-# docker run --rm -v $(pwd)/..:/opt/zecwalletmobile -v $(pwd)/target/registry:/root/.cargo/registry -v $(pwd):/app -w /app zecwalletmobile/android:latest bash -c "
-#      CC=i686-linux-android24-clang OPENSSL_DIR=/opt/openssl-3.0.1/x86 cargo ndk -t x86 -o ./jniLibs build
-#      "
-
-mkdir -p ../../android/app/src/main/jniLibs/arm64-v8a
-mkdir -p ../../android/app/src/main/jniLibs/armeabi-v7a
-mkdir -p ../../android/app/src/main/jniLibs/x86
-
-cp ../target/i686-linux-android/release/librust.so   ../../android/app/src/main/jniLibs/x86/
-cp ../target/armv7-linux-androideabi/release/librust.so  ../../android/app/src/main/jniLibs/armeabi-v7a/
-cp ../target/aarch64-linux-android/release/librust.so ../../android/app/src/main/jniLibs/arm64-v8a/
+# Default behavior, this is backwards compatible with the original workflow and 
+# consistent with the project README.
+if [ "$#" -eq 0 ];
+then
+  for phase in "${PHASES[@]}"
+  do
+    ./buildphases/$phase.sh;
+  done
+  exit 0;
+else 
+  for phase in "${PHASES[@]}" # This loops contains the logic for running a single phase
+  do
+    if [ "$1" == "$phase" ];
+    then
+      ./buildphases/$1.sh;
+      exit 0;
+    fi
+  done
+  echo Error:  $1 is not a phase;
+  exit -1
+fi
