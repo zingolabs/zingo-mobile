@@ -1,10 +1,10 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import {View, ScrollView, SafeAreaView, Image, Text} from 'react-native';
+import {View, ScrollView, SafeAreaView, Image, Text, TouchableOpacity} from 'react-native';
 import {SecondaryButton, RegText, FadeText, BoldText} from './Components';
 import {useTheme} from '@react-navigation/native';
 import {WalletSettings} from '../app/AppState';
-import {TouchableOpacity} from 'react-native-gesture-handler';
+//import {TouchableOpacity} from 'react-native-gesture-handler';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faDotCircle} from '@fortawesome/free-solid-svg-icons';
 import {faCircle as farCircle} from '@fortawesome/free-regular-svg-icons';
