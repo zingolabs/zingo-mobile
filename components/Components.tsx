@@ -78,14 +78,14 @@ export const PrimaryButton: React.FunctionComponent<any> = ({title, disabled, on
   return (
     <TouchableOpacity
       style={{
-        backgroundColor: disabled ? 'grey' : colors.primary,
+        backgroundColor: disabled ? 'gray' : colors.primary,
         padding: 10,
         paddingLeft: 20,
         paddingRight: 20,
         borderRadius: 10,
         width: '40%',
       }}
-      onPress={() => !disabled && onPress()}>
+      onPress={() => !disabled && onPress && onPress()}>
       <Text style={{color: colors.background, fontWeight: 'bold', textTransform: 'uppercase', textAlign: 'center'}}>
         {title}
       </Text>

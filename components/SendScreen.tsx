@@ -7,13 +7,12 @@ import {
   BoldText,
   ErrorText,
   RegTextInput,
-  PrimaryButton,
-  SecondaryButton,
   RegText,
   ZecAmount,
   UsdAmount,
   ClickableText,
 } from '../components/Components';
+import Button from './Button';
 import {Info, SendPageState, SendProgress, ToAddr, TotalBalance} from '../app/AppState';
 import {faQrcode, faCheck, faInfo} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
@@ -91,7 +90,7 @@ function ScanScreen({idx, updateToField, closeModal}: ScannerProps) {
           }}>
           {error && <RegText style={{textAlign: 'center'}}>{error}</RegText>}
           <View style={{flexDirection: 'row', alignItems: 'stretch', justifyContent: 'space-evenly'}}>
-            <SecondaryButton title="Cancel" onPress={doCancel} />
+            <Button type="Secondary" title="Cancel" onPress={doCancel} />
           </View>
         </View>
       }
@@ -188,8 +187,8 @@ const ConfirmModalContent: React.FunctionComponent<ConfirmModalProps> = ({
           marginTop: 10,
         }}>
         <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
-          <PrimaryButton title={'Confirm'} onPress={confirmSend} />
-          <SecondaryButton style={{marginLeft: 20}} title={'Cancel'} onPress={closeModal} />
+          <Button type="Primary" title={'Confirm'} onPress={confirmSend} />
+          <Button type="Secondary" style={{marginLeft: 20}} title={'Cancel'} onPress={closeModal} />
         </View>
       </View>
     </SafeAreaView>
@@ -620,8 +619,8 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
             alignItems: 'center',
             margin: 20,
           }}>
-          <PrimaryButton title="Send" disabled={!sendButtonEnabled} onPress={() => setConfirmModalVisible(true)} />
-          <SecondaryButton style={{marginLeft: 10}} title="Clear" onPress={() => clearToAddrs()} />
+          <Button type="Primary" title="Send" disabled={!sendButtonEnabled} onPress={() => setConfirmModalVisible(true)} />
+          <Button type="Secondary" style={{marginLeft: 10}} title="Clear" onPress={() => clearToAddrs()} />
         </View>
       </ScrollView>
     </View>

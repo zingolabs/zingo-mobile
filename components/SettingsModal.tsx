@@ -1,7 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import {View, ScrollView, SafeAreaView, Image, Text} from 'react-native';
-import {SecondaryButton, RegText, FadeText, BoldText} from './Components';
+import {RegText, FadeText, BoldText} from './Components';
+import Button from './Button';
 import {useTheme} from '@react-navigation/native';
 import {WalletSettings} from '../app/AppState';
 import {TouchableOpacity} from 'react-native-gesture-handler';
@@ -99,7 +100,7 @@ const SettingsModal: React.FunctionComponent<SettingsModalProps> = ({
       </ScrollView>
 
       <View style={{flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', margin: 20}}>
-        <SecondaryButton title="Close" style={{marginLeft: 10}} onPress={closeModal} />
+        <Button type="Secondary" title="Close" style={{marginLeft: 10}} onPress={closeModal} />
       </View>
     </SafeAreaView>
   );
