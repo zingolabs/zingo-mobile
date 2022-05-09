@@ -1,7 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useState} from 'react';
 import {View, ScrollView, SafeAreaView, Image, Text, TouchableOpacity, Modal} from 'react-native';
-import {FadeText, PrimaryButton, RegText, RegTextInput, SecondaryButton} from './Components';
+import {FadeText, RegText, RegTextInput} from './Components';
+import Button from './Button';
 import {useTheme} from '@react-navigation/native';
 import cstyles from './CommonStyles';
 import QRCodeScanner from 'react-native-qrcode-scanner';
@@ -47,7 +48,7 @@ function ScanScreen({setPrivKeyText, closeModal}: ScannerProps) {
           }}>
           {error && <RegText style={{textAlign: 'center'}}>{error}</RegText>}
           <View style={{flexDirection: 'row', alignItems: 'stretch', justifyContent: 'space-evenly'}}>
-            <SecondaryButton title="Cancel" onPress={doCancel} />
+            <Button type='Secondary' title="Cancel" onPress={doCancel} />
           </View>
         </View>
       }
@@ -157,8 +158,8 @@ const ImportKeyModal: React.FunctionComponent<ImportKeyModalProps> = ({closeModa
       </ScrollView>
       <View
         style={{flexGrow: 1, flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', margin: 10}}>
-        <PrimaryButton title={'Import'} onPress={okButton} />
-        <SecondaryButton title="Close" onPress={closeModal} />
+        <Button type="Primary" title={'Import'} onPress={okButton} />
+        <Button type="Secondary" title="Close" onPress={closeModal} />
       </View>
     </SafeAreaView>
   );

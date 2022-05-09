@@ -10,7 +10,8 @@ import {AppearanceProvider} from 'react-native-appearance';
 import {createStackNavigator} from '@react-navigation/stack';
 
 import cstyles from './components/CommonStyles';
-import {PrimaryButton, SecondaryButton, BoldText, RegText, RegTextInput, FadeText} from './components/Components';
+import {BoldText, RegText, RegTextInput, FadeText} from './components/Components';
+import Button from './components/Button';
 import RPCModule from './components/RPCModule';
 import LoadedApp from './app/LoadedApp';
 import SeedComponent from './components/SeedComponent';
@@ -156,9 +157,9 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
               <BoldText>Zecwallet Lite</BoldText>
             </View>
 
-            <PrimaryButton title="Create New Wallet" disabled={actionButtonsDisabled} onPress={this.createNewWallet} />
+            <Button type="Primary" title="Create New Wallet" disabled={actionButtonsDisabled} onPress={this.createNewWallet} />
             <View style={[cstyles.margintop]}>
-              <SecondaryButton title="Restore Seed" onPress={this.getSeedPhraseToRestore} />
+              <Button type="Secondary" title="Restore Seed" onPress={this.getSeedPhraseToRestore} />
             </View>
           </View>
         )}
@@ -213,7 +214,7 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
               onChangeText={(text: string) => this.setState({birthday: text})}
             />
             <View style={cstyles.margintop}>
-              <PrimaryButton title="Restore Wallet" disabled={actionButtonsDisabled} onPress={this.doRestore} />
+              <Button type="Primary" title="Restore Wallet" disabled={actionButtonsDisabled} onPress={this.doRestore} />
             </View>
           </ScrollView>
         )}
