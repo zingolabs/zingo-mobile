@@ -60,6 +60,7 @@ const SettingsModal: React.FunctionComponent<SettingsModalProps> = ({
 
         <View style={{display: 'flex', marginLeft: 20}}>
           <TouchableOpacity
+            id="jesttestnone"
             style={{marginRight: 10, marginBottom: 10}}
             onPress={() => set_wallet_option('download_memos', 'none')}>
             <View style={{display: 'flex', flexDirection: 'row', marginTop: 20}}>
@@ -70,6 +71,7 @@ const SettingsModal: React.FunctionComponent<SettingsModalProps> = ({
           <FadeText>Don't download any memos. Server will not learn what transactions belong to you.</FadeText>
 
           <TouchableOpacity
+            id="jesttestwallet"
             style={{marginRight: 10, marginBottom: 10}}
             onPress={() => set_wallet_option('download_memos', 'wallet')}>
             <View style={{display: 'flex', flexDirection: 'row', marginTop: 20}}>
@@ -84,6 +86,7 @@ const SettingsModal: React.FunctionComponent<SettingsModalProps> = ({
           </FadeText>
 
           <TouchableOpacity
+            id="jesttestall"
             style={{marginRight: 10, marginBottom: 10}}
             onPress={() => set_wallet_option('download_memos', 'all')}>
             <View style={{display: 'flex', flexDirection: 'row', marginTop: 20}}>
