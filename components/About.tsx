@@ -1,7 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import {View, ScrollView, SafeAreaView, Image, Text} from 'react-native';
-import {FadeText, SecondaryButton} from './Components';
+import {FadeText} from './Components';
+import Button from './Button';
 import {useTheme} from '@react-navigation/native';
 
 type AboutModalProps = {
@@ -64,7 +65,7 @@ const AboutModal: React.FunctionComponent<AboutModalProps> = ({closeModal}) => {
         </FadeText>
       </ScrollView>
       <View style={{flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', margin: 10}}>
-        <SecondaryButton title="Close" onPress={closeModal} />
+        <Button type="Secondary" title="Close" onPress={closeModal} />
       </View>
     </SafeAreaView>
   );

@@ -6,7 +6,7 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faList, faUpload, faDownload, faCog} from '@fortawesome/free-solid-svg-icons';
 
-import SideMenu from 'react-native-side-menu';
+import SideMenu from 'react-native-side-menu-updated';
 import RPC from './rpc';
 import AppState, {
   TotalBalance,

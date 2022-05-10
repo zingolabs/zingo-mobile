@@ -1,7 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import {View, ScrollView, SafeAreaView, Image, Text} from 'react-native';
-import {SecondaryButton, RegText, FadeText} from './Components';
+import {RegText, FadeText} from './Components';
+import Button from './Button';
 import {useTheme} from '@react-navigation/native';
 import {Info} from '../app/AppState';
 
@@ -68,7 +69,7 @@ const InfoModal: React.FunctionComponent<InfoModalProps> = ({info, closeModal}) 
       </ScrollView>
 
       <View style={{flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-        <SecondaryButton title="Close" onPress={closeModal} />
+        <Button type="Secondary" title="Close" onPress={closeModal} />
       </View>
     </SafeAreaView>
   );

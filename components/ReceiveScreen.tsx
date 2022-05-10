@@ -5,7 +5,8 @@ import Clipboard from '@react-native-community/clipboard';
 import QRCode from 'react-native-qrcode-svg';
 import {TabView, TabBar} from 'react-native-tab-view';
 import Toast from 'react-native-simple-toast';
-import {ClickableText, FadeText, SecondaryButton} from '../components/Components';
+import {ClickableText, FadeText} from '../components/Components';
+import Button from './Button';
 import {Info} from '../app/AppState';
 import Utils from '../app/utils';
 import {useTheme} from '@react-navigation/native';
@@ -84,11 +85,11 @@ const SingleAddressDisplay: React.FunctionComponent<SingleAddress> = ({address, 
 
       {multi && (
         <View style={{display: 'flex', flexDirection: 'row', marginTop: 10, alignItems: 'center', marginBottom: 100}}>
-          <SecondaryButton title={'Prev'} style={{width: '25%', margin: 10}} onPress={prev} />
+          <Button type="Secondary" title={'Prev'} style={{width: '25%', margin: 10}} onPress={prev} />
           <FadeText>
             {index + 1} of {total}
           </FadeText>
-          <SecondaryButton title={'Next'} style={{width: '25%', margin: 10}} onPress={next} />
+          <Button type="Secondary" title={'Next'} style={{width: '25%', margin: 10}} onPress={next} />
         </View>
       )}
     </ScrollView>

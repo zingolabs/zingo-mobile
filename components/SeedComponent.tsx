@@ -2,7 +2,8 @@
 import React from 'react';
 import {View, Image, Text} from 'react-native';
 import Clipboard from '@react-native-community/clipboard';
-import {PrimaryButton, RegText, FadeText, ClickableText} from './Components';
+import {RegText, FadeText, ClickableText} from './Components';
+import Button from './Button';
 import {useTheme} from '@react-navigation/native';
 import Toast from 'react-native-simple-toast';
 
@@ -62,7 +63,7 @@ const SeedComponent: React.FunctionComponent<SeedComponentProps> = ({seed, birth
       <RegText style={{textAlign: 'center'}}>{birthday}</RegText>
 
       <View style={{flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-        <PrimaryButton title="I have saved the seed" onPress={nextScreen} />
+        <Button type="Primary" title="I have saved the seed" onPress={nextScreen} />
       </View>
     </View>
   );
