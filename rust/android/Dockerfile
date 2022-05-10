@@ -1,7 +1,52 @@
-FROM stunnar/rustndk:latest
+FROM rust:1.60-slim-bullseye as apt_upgrade_rustndk_image
 
-RUN apt-get update 
-RUN apt-get install -y curl wget gcc make automake build-essential
+ARG android_ndk_ver=r23b
+
+# Install Android NDK
+RUN apt-get update \
+ && apt-get upgrade -y \
+ && apt-get install -y --no-install-recommends --no-install-suggests \
+            ca-certificates \
+            make \
+            curl \
+            wget \
+            gcc \
+            make \
+            automake \
+            build-essential \
+            unzip \
+            git \
+            g++-aarch64-linux-gnu \
+            libc6-dev-arm64-cross \
+ && update-ca-certificates \
+ # Install NDK itself
+ && curl -fL -o /tmp/android-ndk.zip \
+         https://dl.google.com/android/repository/android-ndk-${android_ndk_ver}-linux.zip \
+ && unzip /tmp/android-ndk.zip -d /usr/local/
+
+
+# get latest stable toolchain
+RUN rustup toolchain install stable
+
+# Install Rust targets for Android platforms
+RUN rustup target add aarch64-linux-android \
+                      armv7-linux-androideabi \
+                      i686-linux-android \
+                      x86_64-linux-android
+
+
+# Path to the Android NDK for cargo-ndk Cargo plugin
+ENV ANDROID_NDK_HOME=/usr/local/android-ndk-${android_ndk_ver} \
+    NDK_HOME=/usr/local/android-ndk-${android_ndk_ver} \
+    ANDROID_NDK_ROOT=/usr/local/android-ndk-${android_ndk_ver}
+
+ENV PATH=/root/.cargo/bin:/usr/local/android-ndk-${android_ndk_ver}/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH
+
+
+# Install cargo-ndk Cargo plugin
+RUN cargo install cargo-ndk
+
+FROM apt_upgrade_rustndk_image as rustndk_openssl_installed_image
 
 # RUN curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain none -y
 # ENV PATH=/root/.cargo/bin:/opt/android-ndk-linux/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH
@@ -33,13 +78,7 @@ RUN cd /opt/openssl-3.0.1 && \
 
 RUN rustup component add rustfmt
 
-RUN apt-get install -y git
-
 RUN cd /opt && git clone --depth=1 https://github.com/zecwalletco/zecwallet-mobile zecwalletmobile && cd zecwalletmobile/rust/android && cargo fetch && cargo build --release && rm -rf /opt/zecwalletmobile
-
-RUN apt-get install --assume-yes --no-install-recommends \
-    g++-aarch64-linux-gnu \
-    libc6-dev-arm64-cross
 
 RUN rustup target install aarch64-linux-android
 RUN echo "[target.aarch64-linux-android]" >> /usr/local/cargo/config
