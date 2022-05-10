@@ -1,11 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import {View, ScrollView, SafeAreaView, Image, Text} from 'react-native';
+import {View, ScrollView, SafeAreaView, Image, Text, TouchableOpacity} from 'react-native';
 import {RegText, FadeText, BoldText} from './Components';
 import Button from './Button';
 import {useTheme} from '@react-navigation/native';
 import {WalletSettings} from '../app/AppState';
-import {TouchableOpacity} from 'react-native-gesture-handler';
+//import {TouchableOpacity} from 'react-native-gesture-handler';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faDotCircle} from '@fortawesome/free-solid-svg-icons';
 import {faCircle as farCircle} from '@fortawesome/free-regular-svg-icons';
@@ -61,6 +61,7 @@ const SettingsModal: React.FunctionComponent<SettingsModalProps> = ({
 
         <View style={{display: 'flex', marginLeft: 20}}>
           <TouchableOpacity
+            id="jesttestnone"
             style={{marginRight: 10, marginBottom: 10}}
             onPress={() => set_wallet_option('download_memos', 'none')}>
             <View style={{display: 'flex', flexDirection: 'row', marginTop: 20}}>
@@ -71,6 +72,7 @@ const SettingsModal: React.FunctionComponent<SettingsModalProps> = ({
           <FadeText>Don't download any memos. Server will not learn what transactions belong to you.</FadeText>
 
           <TouchableOpacity
+            id="jesttestwallet"
             style={{marginRight: 10, marginBottom: 10}}
             onPress={() => set_wallet_option('download_memos', 'wallet')}>
             <View style={{display: 'flex', flexDirection: 'row', marginTop: 20}}>
@@ -85,6 +87,7 @@ const SettingsModal: React.FunctionComponent<SettingsModalProps> = ({
           </FadeText>
 
           <TouchableOpacity
+            id="jesttestall"
             style={{marginRight: 10, marginBottom: 10}}
             onPress={() => set_wallet_option('download_memos', 'all')}>
             <View style={{display: 'flex', flexDirection: 'row', marginTop: 20}}>
