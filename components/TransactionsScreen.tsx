@@ -5,12 +5,11 @@ import {
   RegText,
   ZecAmount,
   UsdAmount,
-  SecondaryButton,
   FadeText,
   ZecPrice,
   ClickableText,
-  PrimaryButton,
 } from '../components/Components';
+import Button from './Button';
 import {
   View,
   ScrollView,
@@ -19,9 +18,9 @@ import {
   TouchableOpacity,
   SafeAreaView,
   RefreshControl,
-  Clipboard,
   Linking,
 } from 'react-native';
+import Clipboard from '@react-native-community/clipboard';
 import Toast from 'react-native-simple-toast';
 import {TotalBalance, Transaction, Info, SyncStatus} from '../app/AppState';
 import Utils from '../app/utils';
@@ -203,7 +202,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({tx, closeModal}) => {
         </View>
       </ScrollView>
       <View style={{flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', margin: 10}}>
-        <SecondaryButton title="Close" onPress={closeModal} />
+        <Button type="Secondary" title="Close" onPress={closeModal} />
       </View>
     </SafeAreaView>
   );
@@ -360,7 +359,7 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
 
         {showShieldButton && (
           <View style={{margin: 5}}>
-            <PrimaryButton title="Shield funds" onPress={shieldFunds} />
+            <Button type="Primary" title="Shield funds" onPress={shieldFunds} />
           </View>
         )}
       </View>
@@ -401,7 +400,7 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
 
         {loadMoreButton && (
           <View style={{flexDirection: 'row', justifyContent: 'center', margin: 30}}>
-            <SecondaryButton title="Load More" onPress={loadMoreClicked} />
+            <Button type="Secondary" title="Load More" onPress={loadMoreClicked} />
           </View>
         )}
       </ScrollView>

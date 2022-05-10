@@ -72,50 +72,6 @@ export const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({color, style
   );
 };
 
-export const PrimaryButton: React.FunctionComponent<any> = ({title, disabled, onPress}) => {
-  const {colors} = useTheme();
-
-  return (
-    <TouchableOpacity
-      style={{
-        backgroundColor: disabled ? 'grey' : colors.primary,
-        padding: 10,
-        paddingLeft: 20,
-        paddingRight: 20,
-        borderRadius: 10,
-        width: '40%',
-      }}
-      onPress={() => !disabled && onPress()}>
-      <Text style={{color: colors.background, fontWeight: 'bold', textTransform: 'uppercase', textAlign: 'center'}}>
-        {title}
-      </Text>
-    </TouchableOpacity>
-  );
-};
-
-export const SecondaryButton: React.FunctionComponent<any> = ({title, disabled, onPress, style}) => {
-  const {colors} = useTheme();
-
-  return (
-    <TouchableOpacity
-      style={{
-        borderColor: colors.text,
-        borderWidth: 1,
-        padding: 10,
-        paddingLeft: 20,
-        paddingRight: 20,
-        borderRadius: 10,
-        width: '40%',
-        ...style,
-      }}
-      onPress={() => !disabled && onPress && onPress()}>
-      <Text style={{color: colors.text, fontWeight: 'bold', textTransform: 'uppercase', textAlign: 'center'}}>
-        {title}
-      </Text>
-    </TouchableOpacity>
-  );
-};
-
 export const BoldText: React.FunctionComponent<any> = ({style, children}) => {
   const {colors} = useTheme();
   let arrayed = [];

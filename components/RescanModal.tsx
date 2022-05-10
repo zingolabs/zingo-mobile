@@ -1,7 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import {View, ScrollView, SafeAreaView, Image, Text} from 'react-native';
-import {SecondaryButton, PrimaryButton, RegText} from './Components';
+import {RegText} from './Components';
+import Button from './Button';
 import {useTheme} from '@react-navigation/native';
 
 type RescanModalProps = {
@@ -55,8 +56,8 @@ const RescanModal: React.FunctionComponent<RescanModalProps> = ({birthday, start
       </ScrollView>
 
       <View style={{flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', margin: 20}}>
-        <PrimaryButton title="Rescan" onPress={doRescanAndClose} />
-        <SecondaryButton title="Close" style={{marginLeft: 10}} onPress={closeModal} />
+        <Button type="Primary" title="Rescan" onPress={doRescanAndClose} />
+        <Button type="Secondary" title="Close" style={{marginLeft: 10}} onPress={closeModal} />
       </View>
     </SafeAreaView>
   );

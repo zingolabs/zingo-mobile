@@ -1,7 +1,9 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useState} from 'react';
-import {View, ScrollView, SafeAreaView, Image, Text, Platform, Clipboard, TouchableOpacity} from 'react-native';
-import {ClickableText, FadeText, SecondaryButton} from './Components';
+import {View, ScrollView, SafeAreaView, Image, Text, Platform, TouchableOpacity} from 'react-native';
+import Clipboard from '@react-native-community/clipboard';
+import {ClickableText, FadeText} from './Components';
+import Button from './Button';
 import {useTheme} from '@react-navigation/native';
 import Utils from '../app/utils';
 import Toast from 'react-native-simple-toast';
@@ -90,7 +92,7 @@ const PrivKeyModal: React.FunctionComponent<PrivKeyModalProps> = ({address, keyT
         </View>
       </ScrollView>
       <View style={{flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', margin: 10}}>
-        <SecondaryButton title="Close" onPress={closeModal} />
+        <Button type="Secondary" title="Close" onPress={closeModal} />
       </View>
     </SafeAreaView>
   );
