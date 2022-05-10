@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import {View, Clipboard, Image, Text} from 'react-native';
+import {View, Image, Text} from 'react-native';
+import Clipboard from '@react-native-community/clipboard';
 import {RegText, FadeText, ClickableText} from './Components';
 import Button from './Button';
 import {useTheme} from '@react-navigation/native';

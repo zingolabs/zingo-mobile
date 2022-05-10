@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useState} from 'react';
-import {View, Dimensions, Clipboard, Platform, Image, Text, Modal, ScrollView} from 'react-native';
+import {View, Dimensions, Platform, Image, Text, Modal, ScrollView} from 'react-native';
+import Clipboard from '@react-native-community/clipboard';
 import QRCode from 'react-native-qrcode-svg';
 import {TabView, TabBar} from 'react-native-tab-view';
 import Toast from 'react-native-simple-toast';
