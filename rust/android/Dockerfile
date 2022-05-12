@@ -20,8 +20,14 @@ RUN apt-get update \
 
 
 # Install NDK itself
-FROM apt_upgrade_rustndk_image as rustndk_openssl_installed_image
+FROM apt_upgrade_rustndk_image as add_builder_user
+RUN  addgroup --gid $GUID builderuser \
+     && useradd -ms `which bash` --gid $GUID --uid $UID builderuser
+
+
+FROM add_builder_user as rustndk_openssl_installed_image
 ARG  android_ndk_ver=r23b
+USER builderuser
 RUN  curl -fL -o /tmp/android-ndk.zip \
          https://dl.google.com/android/repository/android-ndk-${android_ndk_ver}-linux.zip \
       && unzip /tmp/android-ndk.zip -d /usr/local/
@@ -77,7 +83,12 @@ RUN cd /opt/openssl-3.0.1 && \
 
 RUN rustup component add rustfmt
 
-RUN cd /opt && git clone --depth=1 https://github.com/zecwalletco/zecwallet-mobile zecwalletmobile && cd zecwalletmobile/rust/android && cargo fetch && cargo build --release && rm -rf /opt/zecwalletmobile
+RUN cd /opt \
+    && git clone --depth=1 https://github.com/zecwalletco/zecwallet-mobile zecwalletmobile \
+    && cd zecwalletmobile/rust/android \
+    && cargo fetch \
+    && cargo build --release \
+    && rm -rf /opt/zecwalletmobile
 
 RUN rustup target install aarch64-linux-android
 RUN echo "[target.aarch64-linux-android]" >> /usr/local/cargo/config
