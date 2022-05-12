@@ -21,6 +21,8 @@ RUN apt-get update \
 
 # Install NDK itself
 FROM apt_upgrade_rustndk_image as add_builder_user
+ARG  UID=$UID
+ARG  GUID=$GUID
 RUN  addgroup --gid $GUID builderuser \
      && useradd -ms `which bash` --gid $GUID --uid $UID builderuser
 
