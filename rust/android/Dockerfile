@@ -30,10 +30,12 @@ RUN  addgroup --gid $GUID builderuser \
 FROM add_builder_user as rustndk_openssl_installed_image
 ARG  android_ndk_ver=r23b
 USER builderuser
-RUN  curl -fL -o /tmp/android-ndk.zip \
-         https://dl.google.com/android/repository/android-ndk-${android_ndk_ver}-linux.zip \
-      && unzip /tmp/android-ndk.zip -d /usr/local/
+ENV  HOME=/home/builderuser
 
+RUN  mkdir $HOME/tmp $HOME/usr \
+      && curl -fL -o $HOME/tmp/android-ndk.zip \
+         https://dl.google.com/android/repository/android-ndk-${android_ndk_ver}-linux.zip \
+      && unzip $HOME/tmp/android-ndk.zip -d $HOME/usr/local/
 
 # get latest stable toolchain
 RUN rustup toolchain install stable
