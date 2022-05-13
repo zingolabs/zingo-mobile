@@ -5,6 +5,7 @@ import {RegText, FadeText} from './Components';
 import Button from './Button';
 import {useTheme} from '@react-navigation/native';
 import {Info} from '../app/AppState';
+import Utils from '../app/utils';
 
 type DetailLineProps = {
   label: string;
@@ -27,7 +28,7 @@ type InfoModalProps = {
 const InfoModal: React.FunctionComponent<InfoModalProps> = ({info, closeModal}) => {
   const {colors} = useTheme();
   const height = info?.latestBlock;
-  const price = info?.zecPrice ? `$ ${info?.zecPrice?.toFixed(2)}` : '-';
+  const price = info?.zecPrice ? `$ ${Utils.toLocaleFloat(info?.zecPrice?.toFixed(2))}` : '-';
 
   return (
     <SafeAreaView

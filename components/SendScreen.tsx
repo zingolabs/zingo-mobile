@@ -295,19 +295,25 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
       }
     }
 
+    const {decimalSeparator} = getNumberFormatSettings();
+
     if (amount !== null) {
-      toAddr.amount = amount;
-      if (toAddr.amount && info?.zecPrice) {
-        toAddr.amountUSD = (parseFloat(toAddr.amount) * (info?.zecPrice || 0)).toFixed(2);
+      toAddr.amount = amount.replace(decimalSeparator, '.');
+      if (isNaN(toAddr.amount)) {
+        toAddr.amountUSD = '';
+      } else if (toAddr.amount && info?.zecPrice) {
+        toAddr.amountUSD = Utils.toLocaleFloat((parseFloat(toAddr.amount) * (info?.zecPrice || 0)).toFixed(2));
       } else {
         toAddr.amountUSD = '';
       }
     }
 
     if (amountUSD !== null) {
-      toAddr.amountUSD = amountUSD;
-      if (toAddr.amountUSD && info?.zecPrice) {
-        toAddr.amount = Utils.maxPrecisionTrimmed(parseFloat(amountUSD) / info?.zecPrice);
+      toAddr.amountUSD = amountUSD.replace(decimalSeparator, '.');
+      if (isNaN(toAddr.amountUSD)) {
+        toAddr.amount = '';
+      } else if (toAddr.amountUSD && info?.zecPrice) {
+        toAddr.amount = Utils.toLocaleFloat(Utils.maxPrecisionTrimmed(parseFloat(amountUSD) / info?.zecPrice));
       } else {
         toAddr.amount = '';
       }
@@ -393,6 +399,11 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
   });
 
   var amountValidationState: number[] = sendPageState.toaddrs.map(to => {
+    if (to.amountUSD !== '') {
+      if (isNaN(to.amountUSD)) {
+        return -1;
+      }
+    }
     if (to.amount !== '') {
       if (
         Utils.parseLocaleFloat(to.amount) > 0 &&
