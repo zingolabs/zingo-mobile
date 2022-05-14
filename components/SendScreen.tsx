@@ -573,11 +573,6 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
               <View style={{display: 'flex', flexDirection: 'column'}}>
                 <View style={{display: 'flex', flexDirection: 'row', marginTop: 10}}>
                   <FadeText>Spendable: ᙇ {Utils.maxPrecisionTrimmed(getMaxAmount())} </FadeText>
-                  {/* <ClickableText
-                    style={{marginLeft: 5, marginTop: Platform.OS === 'ios' ? 2 : 0}}
-                    onPress={() => setMaxAmount(i)}>
-                    Send All
-                  </ClickableText> */}
                 </View>
                 {stillConfirming && (
                   <View
