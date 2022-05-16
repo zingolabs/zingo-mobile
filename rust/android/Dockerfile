@@ -7,11 +7,8 @@ RUN apt-get update \
  && apt-get upgrade -y \
  && apt-get install -y --no-install-recommends --no-install-suggests \
             ca-certificates \
-            make \
             curl \
             wget \
-            gcc \
-            make \
             automake \
             build-essential \
             unzip \
