@@ -1,0 +1,180 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Component Components - test BoldText - snapshot 1`] = `
+<Text
+  style={
+    Array [
+      Object {},
+      Object {
+        "color": "rgb(28, 28, 30)",
+      },
+      Object {
+        "fontSize": 18,
+      },
+      Object {
+        "fontWeight": "bold",
+      },
+      Object {
+        "opacity": 0.87,
+      },
+    ]
+  }
+>
+  
+</Text>
+`;
+
+exports[`Component Components - test ClickableText - snapshot 1`] = `
+<View
+  accessible={true}
+  focusable={true}
+  onClick={[Function]}
+  onResponderGrant={[Function]}
+  onResponderMove={[Function]}
+  onResponderRelease={[Function]}
+  onResponderTerminate={[Function]}
+  onResponderTerminationRequest={[Function]}
+  onStartShouldSetResponder={[Function]}
+  style={
+    Object {
+      "opacity": 1,
+    }
+  }
+>
+  <Text
+    style={
+      Object {
+        "color": "rgb(28, 28, 30)",
+        "textDecorationLine": "underline",
+      }
+    }
+  >
+    
+  </Text>
+</View>
+`;
+
+exports[`Component Components - test ErrorText - snapshot 1`] = `
+<Text
+  style={
+    Object {
+      "color": "red",
+    }
+  }
+>
+  
+</Text>
+`;
+
+exports[`Component Components - test FadeText - snapshot 1`] = `
+<Text
+  style={
+    Object {
+      "color": "rgb(28, 28, 30)",
+      "opacity": 0.65,
+    }
+  }
+>
+  
+</Text>
+`;
+
+exports[`Component Components - test RegText - snapshot 1`] = `
+<Text
+  onPress={[Function]}
+  style={
+    Array [
+      Object {},
+      Object {
+        "color": "rgb(28, 28, 30)",
+        "fontSize": 18,
+        "fontWeight": "600",
+        "opacity": 0.87,
+      },
+    ]
+  }
+>
+  
+</Text>
+`;
+
+exports[`Component Components - test RegTextInput - snapshot 1`] = `
+<TextInput
+  allowFontScaling={true}
+  editable={false}
+  rejectResponderTermination={true}
+  style={
+    Array [
+      Object {},
+      Object {
+        "color": "rgb(28, 28, 30)",
+      },
+      Object {
+        "fontWeight": "600",
+      },
+    ]
+  }
+  underlineColorAndroid="transparent"
+/>
+`;
+
+exports[`Component Components - test UsdAmount - snapshot 1`] = `
+<Text
+  style={
+    Object {
+      "color": "rgb(28, 28, 30)",
+    }
+  }
+>
+  $ 
+  --
+</Text>
+`;
+
+exports[`Component Components - test ZecAmount - snapshot 1`] = `
+<View
+  style={
+    Object {
+      "alignItems": "baseline",
+      "flexDirection": "row",
+    }
+  }
+>
+  <Text
+    style={
+      Object {
+        "color": "rgb(28, 28, 30)",
+        "fontSize": 24,
+      }
+    }
+  >
+    ZEC
+     
+    0.0000
+  </Text>
+  <Text
+    style={
+      Object {
+        "color": "rgb(28, 28, 30)",
+        "fontSize": 12,
+        "paddingBottom": 0,
+      }
+    }
+  >
+    0000
+  </Text>
+</View>
+`;
+
+exports[`Component Components - test ZecPrice - snapshot 1`] = `
+<Text
+  style={
+    Object {
+      "color": "rgb(28, 28, 30)",
+      "opacity": 0.65,
+    }
+  }
+>
+  
+</Text>
+`;
