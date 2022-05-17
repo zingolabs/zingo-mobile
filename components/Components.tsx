@@ -32,7 +32,7 @@ type ZecPriceProps = {
 export const ZecPrice: React.FunctionComponent<ZecPriceProps> = ({price}) => {
   var priceString = '';
   if (price && price > 0) {
-    priceString = `$ ${price.toFixed(2)} per ZEC`;
+    priceString = `$ ${Utils.toLocaleFloat(price.toFixed(2))} per ZEC`;
   }
   return <FadeText>{priceString}</FadeText>;
 };
