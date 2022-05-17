@@ -256,6 +256,8 @@ PODS:
   - React-jsinspector (0.64.1)
   - react-native-appearance (0.3.4):
     - React
+  - react-native-biometrics (2.1.4):
+    - React
   - react-native-camera (3.44.1):
     - React-Core
     - react-native-camera/RCT (= 3.44.1)
@@ -421,6 +423,7 @@ DEPENDENCIES:
   - React-jsiexecutor (from `../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - react-native-appearance (from `../node_modules/react-native-appearance`)
+  - react-native-biometrics (from `../node_modules/react-native-biometrics`)
   - react-native-camera (from `../node_modules/react-native-camera`)
   - react-native-pager-view (from `../node_modules/react-native-pager-view`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
@@ -497,6 +500,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/jsinspector"
   react-native-appearance:
     :path: "../node_modules/react-native-appearance"
+  react-native-biometrics:
+    :path: "../node_modules/react-native-biometrics"
   react-native-camera:
     :path: "../node_modules/react-native-camera"
   react-native-pager-view:
@@ -551,7 +556,7 @@ SPEC CHECKSUMS:
   CocoaAsyncSocket: 065fd1e645c7abab64f7a6a2007a48038fdc6a99
   DoubleConversion: cf9b38bf0b2d048436d9a82ad2abe1404f11e7de
   FBLazyVector: 7b423f9e248eae65987838148c36eec1dbfe0b53
-  FBReactNativeSpec: 364b6771de32b25d979b5b2e76065e9ec01703af
+  FBReactNativeSpec: 69275c078f660322f2df6b27d5d863a482765199
   Flipper: d3da1aa199aad94455ae725e9f3aa43f3ec17021
   Flipper-DoubleConversion: 38631e41ef4f9b12861c67d17cb5518d06badc41
   Flipper-Folly: 755929a4f851b2fb2c347d533a23f191b008554c
@@ -575,6 +580,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: 124e8f99992490d0d13e0649d950d3e1aae06fe9
   React-jsinspector: 500a59626037be5b3b3d89c5151bc3baa9abf1a9
   react-native-appearance: 0f0e5fc2fcef70e03d48c8fe6b00b9158c2ba8aa
+  react-native-biometrics: 9d3306e5d29c3bc4e6a3c912d759a94e76a2f683
   react-native-camera: 7bf59f2728ffb019fa25e60a225d2c57e1a8f0f6
   react-native-pager-view: 2864530d861ab2970beb2cd0b4cf2292cd30cd84
   react-native-safe-area-context: f0906bf8bc9835ac9a9d3f97e8bde2a997d8da79
@@ -604,4 +610,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 16d9b8743d81976fd242188201758f6cfce4466a
 
-COCOAPODS: 1.10.1
+COCOAPODS: 1.11.2
