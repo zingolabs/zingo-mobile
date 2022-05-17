@@ -22,8 +22,8 @@ RUN apt-get update \
  && unzip /tmp/android-ndk.zip -d /usr/local/
 
 
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs -o ./rustup.sh \
- && chmod +x ./rustup.sh && ./rustup.sh -y
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs -o ./rustup.sh
+RUN chmod +x ./rustup.sh && ./rustup.sh -y
 ENV HOME=/root
 ENV CARGO_HOME=$HOME/.cargo
 ENV PATH=$PATH:/root/.cargo/bin
