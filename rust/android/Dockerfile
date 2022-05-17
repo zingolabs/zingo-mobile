@@ -8,9 +8,7 @@ RUN apt-get update \
  && apt-get install -y --no-install-recommends --no-install-suggests \
             ca-certificates \
             curl \
-            wget \
             automake \
-            build-essential \
             unzip \
             git \
             g++-aarch64-linux-gnu \
@@ -59,7 +57,7 @@ FROM apt_upgrade_rustndk_image as rustndk_openssl_installed_image
 
 # change this if the ndk updates
 
-RUN cd /opt && wget https://www.openssl.org/source/openssl-3.0.1.tar.gz && \
+RUN cd /opt && curl --proto '=https' --tlsv1.2 https://www.openssl.org/source/openssl-3.0.1.tar.gz -o openssl-3.0.1.tar.gz && \
     tar xvf openssl-3.0.1.tar.gz && cd openssl-3.0.1 && \
     mkdir x86 && mkdir aarch64 && mkdir armv7
 
