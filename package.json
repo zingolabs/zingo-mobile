@@ -7,7 +7,8 @@
     "ios": "react-native run-ios",
     "start": "react-native start",
     "test": "jest",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "coverage": "jest --coverage"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.35",
@@ -19,10 +20,13 @@
     "@react-navigation/native": "^5.9.4",
     "@react-navigation/stack": "^5.14.5",
     "@types/react": "^17",
+    "@wojtekmaj/enzyme-adapter-react-17": "^0.6.7",
+    "enzyme": "^3.11.0",
     "js-base64": "^3.6.0",
     "moment": "^2.29.1",
     "prop-types": "^15.7.2",
     "react": "17.0.1",
+    "react-dom": "^18.1.0",
     "react-moment": "^1.1.1",
     "react-native": "0.64.1",
     "react-native-appearance": "^0.3.4",
