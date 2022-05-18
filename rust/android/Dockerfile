@@ -1,4 +1,4 @@
-FROM rust:1.60-slim-bullseye as apt_upgrade_rustndk_image
+FROM debian:bullseye-slim as apt_upgrade_rustndk_image
 
 ARG android_ndk_ver=r23b
 
@@ -7,13 +7,8 @@ RUN apt-get update \
  && apt-get upgrade -y \
  && apt-get install -y --no-install-recommends --no-install-suggests \
             ca-certificates \
-            make \
             curl \
-            wget \
-            gcc \
-            make \
             automake \
-            build-essential \
             unzip \
             git \
             g++-aarch64-linux-gnu \
@@ -25,6 +20,11 @@ RUN apt-get update \
  && unzip /tmp/android-ndk.zip -d /usr/local/
 
 
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs -o ./rustup.sh
+RUN chmod +x ./rustup.sh && ./rustup.sh -y
+ENV HOME=/root
+ENV CARGO_HOME=$HOME/.cargo
+ENV PATH=$PATH:/root/.cargo/bin
 # get latest stable toolchain
 RUN rustup toolchain install stable
 
@@ -40,7 +40,7 @@ ENV ANDROID_NDK_HOME=/usr/local/android-ndk-${android_ndk_ver} \
     NDK_HOME=/usr/local/android-ndk-${android_ndk_ver} \
     ANDROID_NDK_ROOT=/usr/local/android-ndk-${android_ndk_ver}
 
-ENV PATH=/root/.cargo/bin:/usr/local/android-ndk-${android_ndk_ver}/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH
+ENV PATH=/usr/local/android-ndk-${android_ndk_ver}/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH
 
 
 # Install cargo-ndk Cargo plugin
@@ -57,7 +57,7 @@ FROM apt_upgrade_rustndk_image as rustndk_openssl_installed_image
 
 # change this if the ndk updates
 
-RUN cd /opt && wget https://www.openssl.org/source/openssl-3.0.1.tar.gz && \
+RUN cd /opt && curl --proto '=https' --tlsv1.2 https://www.openssl.org/source/openssl-3.0.1.tar.gz -o openssl-3.0.1.tar.gz && \
     tar xvf openssl-3.0.1.tar.gz && cd openssl-3.0.1 && \
     mkdir x86 && mkdir aarch64 && mkdir armv7
 
@@ -81,22 +81,22 @@ RUN rustup component add rustfmt
 RUN cd /opt && git clone --depth=1 https://github.com/zecwalletco/zecwallet-mobile zecwalletmobile && cd zecwalletmobile/rust/android && cargo fetch && cargo build --release && rm -rf /opt/zecwalletmobile
 
 RUN rustup target install aarch64-linux-android
-RUN echo "[target.aarch64-linux-android]" >> /usr/local/cargo/config
-RUN echo "ar = \"llvm-ar\"" >> /usr/local/cargo/config
-RUN echo "linker = \"aarch64-linux-android29-clang\"" >> /usr/local/cargo/config
-RUN echo "" >> /usr/local/cargo/config
+RUN echo "[target.aarch64-linux-android]" >> $CARGO_HOME/config.toml
+RUN echo "ar = \"llvm-ar\"" >> $CARGO_HOME/config.toml
+RUN echo "linker = \"aarch64-linux-android29-clang\"" >> $CARGO_HOME/config.toml
+RUN echo "" >> $CARGO_HOME/config.toml
 
 RUN rustup target install armv7-linux-androideabi
-RUN echo "[target.armv7-linux-androideabi]" >> /usr/local/cargo/config
-RUN echo "ar = \"llvm-ar\"" >> /usr/local/cargo/config
-RUN echo "linker = \"armv7a-linux-androideabi29-clang\"" >> /usr/local/cargo/config
-RUN echo "" >> /usr/local/cargo/config
+RUN echo "[target.armv7-linux-androideabi]" >> $CARGO_HOME/config.toml
+RUN echo "ar = \"llvm-ar\"" >> $CARGO_HOME/config.toml
+RUN echo "linker = \"armv7a-linux-androideabi29-clang\"" >> $CARGO_HOME/config.toml
+RUN echo "" >> $CARGO_HOME/config.toml
 
 RUN rustup target install i686-linux-android
-RUN echo "[target.i686-linux-android]" >> /usr/local/cargo/config
-RUN echo "ar = \"llvm-ar\"" >> /usr/local/cargo/config
-RUN echo "linker = \"i686-linux-android29-clang\"" >> /usr/local/cargo/config
-RUN echo "" >> /usr/local/cargo/config
+RUN echo "[target.i686-linux-android]" >> $CARGO_HOME/config.toml
+RUN echo "ar = \"llvm-ar\"" >> $CARGO_HOME/config.toml
+RUN echo "linker = \"i686-linux-android29-clang\"" >> $CARGO_HOME/config.toml
+RUN echo "" >> $CARGO_HOME/config.toml
 
 ENV OPENSSL_STATIC=yes
 
