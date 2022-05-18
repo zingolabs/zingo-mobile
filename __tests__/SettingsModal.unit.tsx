@@ -23,21 +23,7 @@ describe("Component SettingsModal - test", () => {
     const onPress = jest.fn();
     const settingsModal = shallow(<SettingsModal closeModal={() => {}} wallet_settings={{}} set_wallet_option={onPress} />);
 
-    settingsModal
-      .find('#jesttestnone')
-      .first()
-      .props()
-      .onPress();
-    settingsModal
-      .find('#jesttestwallet')
-      .first()
-      .props()
-      .onPress();
-    settingsModal
-      .find('#jesttestall')
-      .first()
-      .props()
-      .onPress();
+    settingsModal.find("ForwardRef").forEach((ref) => {ref.props().onPress();});
 
     expect(onPress).toHaveBeenCalledTimes(3);
   });
