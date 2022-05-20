@@ -7,7 +7,9 @@ RUN apt-get update \
  && apt-get upgrade -y \
  && apt-get install -y --no-install-recommends --no-install-suggests \
             ca-certificates \
-            build-essential \
+            gcc \
+            libc6-dev \
+            make \
             curl \
             automake \
             unzip \
