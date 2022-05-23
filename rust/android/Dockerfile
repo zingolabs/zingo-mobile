@@ -1,7 +1,5 @@
 FROM debian:bullseye-slim as apt_upgrade_rustndk_image
 
-ARG android_ndk_ver=r23b
-
 # Install Android NDK
 RUN apt-get update \
  && apt-get upgrade -y \
@@ -16,12 +14,21 @@ RUN apt-get update \
             git \
             g++-aarch64-linux-gnu \
             libc6-dev-arm64-cross \
- && update-ca-certificates \
- # Install NDK itself
- && curl -fL -o /tmp/android-ndk.zip \
+ && update-ca-certificates
+
+# Add group
+FROM apt_upgrade_rustndk_image as add_builder_user
+ARG android_ndk_ver=r23b
+ARG UID=$UID
+ARG GUID=$GUID
+RUN addgroup --gid $GUID builderuser
+# Add user
+RUN useradd -ms `which bash` --gid $GUID --uid $UID builderuser
+# Install NDK itself
+
+RUN curl -vfL -o /tmp/android-ndk.zip \
          https://dl.google.com/android/repository/android-ndk-${android_ndk_ver}-linux.zip \
  && unzip /tmp/android-ndk.zip -d /usr/local/
-
 
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs -o ./rustup.sh
 RUN chmod +x ./rustup.sh && ./rustup.sh -y
@@ -37,7 +44,6 @@ RUN rustup target add aarch64-linux-android \
                       i686-linux-android \
                       x86_64-linux-android
 
-
 # Path to the Android NDK for cargo-ndk Cargo plugin
 ENV ANDROID_NDK_HOME=/usr/local/android-ndk-${android_ndk_ver} \
     NDK_HOME=/usr/local/android-ndk-${android_ndk_ver} \
@@ -45,11 +51,10 @@ ENV ANDROID_NDK_HOME=/usr/local/android-ndk-${android_ndk_ver} \
 
 ENV PATH=/usr/local/android-ndk-${android_ndk_ver}/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH
 
-
 # Install cargo-ndk Cargo plugin
 RUN cargo install cargo-ndk
 
-FROM apt_upgrade_rustndk_image as rustndk_openssl_installed_image
+FROM add_builder_user as rustndk_openssl_installed_image
 
 # RUN curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain none -y
 # ENV PATH=/root/.cargo/bin:/opt/android-ndk-linux/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH
