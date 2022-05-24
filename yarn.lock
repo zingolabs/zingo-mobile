@@ -6243,10 +6243,10 @@ react-native-option-menu@^1.1.3:
   resolved "https://registry.yarnpkg.com/react-native-option-menu/-/react-native-option-menu-1.1.3.tgz#ef01e6b9b72b22998e74b66059423d242cec30fe"
   integrity sha512-veA/F9m57oI554yyAk3k9p2rvE1UbmAEY2hpeNmxAhk/GsiUoQeEe29cYjR1wz4FVzHipC+mQB7zNEfjEm3pfw==
 
-react-native-pager-view@^5.1.7:
-  version "5.2.1"
-  resolved "https://registry.yarnpkg.com/react-native-pager-view/-/react-native-pager-view-5.2.1.tgz#ad69a6035edd998771daf302830f73602e5204a9"
-  integrity sha512-6aqsVr6Z4MjYP57lMwNEurlOPah0Lw34L6x+/nI6SxY+wyqZI+uaEB7sWS5EIcgQ9cGKMo925LnVWd6Xilu33A==
+react-native-pager-view@^5.4.22:
+  version "5.4.22"
+  resolved "https://registry.yarnpkg.com/react-native-pager-view/-/react-native-pager-view-5.4.22.tgz#6a987274761f75fa018254756744004e20326d83"
+  integrity sha512-9+LjgK+iOiWJJt3Zj7i8Vwarkg9dvVCm8LxrWZFzOzwjtCcQ6K4YrlbPZ5EOb5aFDcMH+eKAty0OQoUIM9n2vA==
 
 react-native-permissions@^2.0.2:
   version "2.2.2"
