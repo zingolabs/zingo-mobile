@@ -18,7 +18,7 @@
     "@react-native-community/art": "^1.2.0",
     "@react-native-community/clipboard": "^1.5.1",
     "@react-navigation/bottom-tabs": "^5.11.10",
-    "@react-navigation/native": "^5.9.4",
+    "@react-navigation/native": "^5.9.8",
     "@react-navigation/stack": "^5.14.5",
     "@types/react": "^17",
     "@wojtekmaj/enzyme-adapter-react-17": "^0.6.7",
