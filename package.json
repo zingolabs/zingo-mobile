@@ -56,7 +56,7 @@
     "@react-native-community/eslint-config": "^2.0.0",
     "@types/jest": "^26.0.20",
     "@types/react-native": "^0.64.0",
-    "@types/react-native-side-menu": "^1.1.0",
+    "@types/react-native-side-menu": "^1.1.2",
     "@types/react-navigation": "^3.4.0",
     "@types/react-test-renderer": "^16.9.2",
     "@types/url-parse": "^1.4.3",

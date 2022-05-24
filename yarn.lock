@@ -1403,10 +1403,10 @@
   resolved "https://registry.yarnpkg.com/@types/prop-types/-/prop-types-15.7.3.tgz#2ab0d5da2e5815f94b0b9d4b95d1e5f243ab2ca7"
   integrity sha512-KfRL3PuHmqQLOG+2tGpRO26Ctg+Cq1E01D2DMriKEATHgWLfeNDmq9e29Q9WIky0dQ3NPkd1mzYH8Lm936Z9qw==
 
-"@types/react-native-side-menu@^1.1.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@types/react-native-side-menu/-/react-native-side-menu-1.1.0.tgz#23b0cca63d6ef6bb708cede5514d7237367d09f3"
-  integrity sha512-o0K0Qs3l1cwo85mvGGDBldOOq4KjI4i9/qN32zZCbZ15f26RTpFZsQaQhMbgw0txFgAomIN3kfigvAmIlkBcaQ==
+"@types/react-native-side-menu@^1.1.2":
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/@types/react-native-side-menu/-/react-native-side-menu-1.1.2.tgz#3f31ad3af492b10f98e2085730fdf3b57f7e26df"
+  integrity sha512-Q7KaWi/BeW6ZpfQkKhFA60vNSmmQDqBVCgNig60w6tSBFkOVk9nyeqdKcUFKKHrylpziHQfZfq297xty1aF/zA==
   dependencies:
     "@types/react" "*"
     "@types/react-native" "*"
