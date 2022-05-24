@@ -17,7 +17,7 @@
     "@fortawesome/react-native-fontawesome": "^0.2.6",
     "@react-native-community/art": "^1.2.0",
     "@react-native-community/clipboard": "^1.5.1",
-    "@react-navigation/bottom-tabs": "^5.11.10",
+    "@react-navigation/bottom-tabs": "^5.11.15",
     "@react-navigation/native": "^5.9.4",
     "@react-navigation/stack": "^5.14.5",
     "@types/react": "^17",
