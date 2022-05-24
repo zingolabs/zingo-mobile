@@ -2,7 +2,7 @@ version: 2
 updates:
   # `npm` is used for `yarn`
   - package-ecosystem: "npm"
-      directory: "/"
+    directory: "/"
     schedule:
       interval: "daily"
     open-pull-requests-limit: 100
