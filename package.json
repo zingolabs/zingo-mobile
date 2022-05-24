@@ -14,7 +14,7 @@
     "@fortawesome/fontawesome-svg-core": "^1.2.35",
     "@fortawesome/free-regular-svg-icons": "^5.15.4",
     "@fortawesome/free-solid-svg-icons": "^5.15.3",
-    "@fortawesome/react-native-fontawesome": "^0.2.6",
+    "@fortawesome/react-native-fontawesome": "^0.2.7",
     "@react-native-community/art": "^1.2.0",
     "@react-native-community/clipboard": "^1.5.1",
     "@react-navigation/bottom-tabs": "^5.11.10",
