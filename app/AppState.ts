@@ -195,7 +195,7 @@ export class WalletSettings {
   download_memos: string;
 
   constructor() {
-    this.download_memos = 'wallet';
+    this.download_memos = 'none';
   }
 }
 
