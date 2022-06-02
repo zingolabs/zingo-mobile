@@ -14,6 +14,7 @@ RUN apt-get update \
             git \
             g++-aarch64-linux-gnu \
             libc6-dev-arm64-cross \
+            cmake \
  && update-ca-certificates
 
 # Add group
