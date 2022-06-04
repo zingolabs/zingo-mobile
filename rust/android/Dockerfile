@@ -86,7 +86,6 @@ RUN cd /opt/openssl-3.0.1 && \
     make clean && make distclean
 
 RUN cd /opt && git clone --depth=1 --branch="dev_working" https://github.com/dannasessha/zecwallet-mobile zecwalletmobile
-RUN cat /root/.cargo/config.toml
 RUN cd /opt/zecwalletmobile && git status
 RUN printf '[net] \ngit-fetch-with-cli = true\n' > /root/.cargo/config.toml
 RUN cargo fetch --manifest-path /opt/zecwalletmobile/rust/android/Cargo.toml
