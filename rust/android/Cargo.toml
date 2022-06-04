@@ -14,8 +14,8 @@ rustlib = { path = "../lib" }
 
 # bellman = { version = "0.13.0", default-features = false, features = ["groth16"] }
 
+# [target.'cfg(target_arch = "i686")'.dependencies]
 [patch.crates-io]
-[target.'cfg(target_arch = "i686")'.dependencies]
 bellman = { git = 'https://github.com/dannasessha/bellman', branch = 'update_rayon_dep' }
 
 [lib]
