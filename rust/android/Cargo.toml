@@ -12,8 +12,8 @@ android_logger = "0.11"
 log = "0.4"
 rustlib = { path = "../lib" }
 
-[target.'cfg(target_arch = "i686")'.dependencies]
-bellman = { version = "0.13.0", default-features = false, features = ["groth16"] }
+# [target.'cfg(target_arch = "i686")'.dependencies]
+# bellman = { version = "1.13.0", default-features = false, features = ["groth16"] }
 
 [lib]
 crate-type = ["cdylib"]
