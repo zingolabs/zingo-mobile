@@ -10,9 +10,5 @@ android_logger = "0.11"
 log = "0.4"
 rustlib = { path = "../lib" }
 
-[dependencies.bellman]
-default-features = false
-features = ["groth16"]
-
 [lib]
 crate-type = ["cdylib"]
