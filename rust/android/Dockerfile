@@ -14,6 +14,7 @@ RUN apt-get update \
             git \
             g++-aarch64-linux-gnu \
             libc6-dev-arm64-cross \
+            protobuf-compiler \
  && update-ca-certificates
 
 # Add group
@@ -84,9 +85,11 @@ RUN cd /opt/openssl-3.0.1 && \
     make -j$(nproc) && make -j$(nproc) install && \
     make clean && make distclean
 
-RUN rustup component add rustfmt
-
-RUN cd /opt && git clone --depth=1 https://github.com/zingolabs/zecwallet-mobile zecwalletmobile && cd zecwalletmobile/rust/android && cargo fetch && cargo build --release && rm -rf /opt/zecwalletmobile
+RUN cd /opt && git clone --depth=1 --branch="dev_working" https://github.com/dannasessha/zecwallet-mobile zecwalletmobile
+RUN printf '[net] \ngit-fetch-with-cli = true\n' > /root/.cargo/config.toml
+RUN cargo fetch --manifest-path /opt/zecwalletmobile/rust/android/Cargo.toml
+RUN cargo build --release --manifest-path /opt/zecwalletmobile/rust/android/Cargo.toml
+RUN rm -rf /opt/zecwalletmobile
 
 RUN rustup target install aarch64-linux-android
 RUN echo "[target.aarch64-linux-android]" >> $CARGO_HOME/config.toml
@@ -111,4 +114,3 @@ ENV OPENSSL_STATIC=yes
 # including nightly build to be able to compile -lgcc library
 RUN rustup install nightly-x86_64-unknown-linux-gnu
 RUN rustup component add rust-src --toolchain nightly-x86_64-unknown-linux-gnu
-RUN rustup component add rustfmt --toolchain nightly-x86_64-unknown-linux-gnu
