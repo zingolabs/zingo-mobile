@@ -13,7 +13,7 @@ Do not use these apps unless you specifically know what you are doing.
 
 ### Building 
 0. Start docker daemon
-1. In the `zecwallet-mobile/rust/android` directory, run `./build.sh`. This step will take a long time
+1. AS A NONROOT USER: In the `zecwallet-mobile/rust/android` directory, run `./build.sh`. This step will take a long time
 2. From the root of the project, run `yarn install`
 3. Run `npx react-native start` to start the dev server
 4. Run `npx react-native run-android` to compile and install the app on an emulator/connected device. You can also open the `android` directory in Android Studio as a project and hit the run button
