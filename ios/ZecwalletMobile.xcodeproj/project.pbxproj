@@ -505,7 +505,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CURRENT_PROJECT_VERSION = 48;
+				CURRENT_PROJECT_VERSION = 01;
 				DEVELOPMENT_TEAM = Z89CFRJ62L;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = ZecwalletMobile/Info.plist;
@@ -517,14 +517,14 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 				);
-				MARKETING_VERSION = 1.7.8;
+				MARKETING_VERSION = 0.0.1;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = app.zecwalletdao.zecwalletdao;
-				PRODUCT_NAME = "zecwallet DAO";
+				PRODUCT_NAME = "Zingo";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -538,7 +538,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CURRENT_PROJECT_VERSION = 48;
+				CURRENT_PROJECT_VERSION = 01;
 				DEVELOPMENT_TEAM = Z89CFRJ62L;
 				INFOPLIST_FILE = ZecwalletMobile/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -549,14 +549,14 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 				);
-				MARKETING_VERSION = 1.7.8;
+				MARKETING_VERSION = 0.0.1;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = app.zecwalletdao.zecwalletdao;
-				PRODUCT_NAME = "zecwallet DAO";
+				PRODUCT_NAME = "Zingo";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
