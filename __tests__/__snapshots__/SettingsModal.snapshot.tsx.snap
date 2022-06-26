@@ -63,7 +63,7 @@ exports[`Component SettingsModal - test SettingsModal - snapshot 1`] = `
           <Image
             source={
               Object {
-                "testUri": "../../../assets/img/logobig.png",
+                "testUri": "../../../assets/img/logobig-zingo.png",
               }
             }
             style={
