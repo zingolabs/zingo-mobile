@@ -31,7 +31,7 @@ const SeedComponent: React.FunctionComponent<SeedComponentProps> = ({seed, birth
           <Text style={{marginTop: 5, padding: 5, color: colors.text, fontSize: 28}}>Wallet Seed</Text>
         </View>
         <View style={{display: 'flex', alignItems: 'center', marginTop: -25}}>
-          <Image source={require('../assets/img/logobig.png')} style={{width: 50, height: 50, resizeMode: 'contain'}} />
+          <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 50, height: 50, resizeMode: 'contain'}} />
         </View>
       </View>
 

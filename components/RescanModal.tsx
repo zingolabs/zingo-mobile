@@ -41,7 +41,7 @@ const RescanModal: React.FunctionComponent<RescanModalProps> = ({birthday, start
           </View>
           <View style={{display: 'flex', alignItems: 'center', marginTop: -25}}>
             <Image
-              source={require('../assets/img/logobig.png')}
+              source={require('../assets/img/logobig-zingo.png')}
               style={{width: 50, height: 50, resizeMode: 'contain'}}
             />
           </View>

@@ -19,7 +19,7 @@ RUN apt-get update \
 
 # Add group
 FROM apt_upgrade_rustndk_image as add_builder_user
-ARG android_ndk_ver=r23b
+ARG android_ndk_ver=r24
 ARG UID=$UID
 ARG GUID=$GUID
 RUN addgroup --gid $GUID builderuser
@@ -63,25 +63,31 @@ FROM add_builder_user as rustndk_openssl_installed_image
 # RUN rustup target add i686-linux-android
 # RUN rustup target add armv7-linux-androideabi
 # RUN rustup target add aarch64-linux-android
+# RUN rustup target add x86_64-linux-android
 
 # change this if the ndk updates
 
 RUN cd /opt && curl --proto '=https' --tlsv1.2 https://www.openssl.org/source/openssl-3.0.1.tar.gz -o openssl-3.0.1.tar.gz && \
     tar xvf openssl-3.0.1.tar.gz && cd openssl-3.0.1 && \
-    mkdir x86 && mkdir aarch64 && mkdir armv7
+    mkdir x86 && mkdir aarch64 && mkdir armv7 && mkdir x86_64
 
 RUN cd /opt/openssl-3.0.1 && \
-    ./Configure --prefix=/opt/openssl-3.0.1/aarch64  android-arm64 -D__ANDROID_API__=29 && \
+    ./Configure --prefix=/opt/openssl-3.0.1/aarch64  android-arm64 -D__ANDROID_API__=30 && \
     make -j$(nproc) && make -j$(nproc) install && \
     make clean && make distclean
 
 RUN cd /opt/openssl-3.0.1 && \
-    ./Configure --prefix=/opt/openssl-3.0.1/armv7  android-arm -D__ANDROID_API__=29 && \
+    ./Configure --prefix=/opt/openssl-3.0.1/armv7  android-arm -D__ANDROID_API__=30 && \
     make -j$(nproc) && make -j$(nproc) install && \
     make clean && make distclean
 
 RUN cd /opt/openssl-3.0.1 && \
-    ./Configure --prefix=/opt/openssl-3.0.1/x86  android-x86 -D__ANDROID_API__=29 && \
+    ./Configure --prefix=/opt/openssl-3.0.1/x86  android-x86 -D__ANDROID_API__=30 && \
+    make -j$(nproc) && make -j$(nproc) install && \
+    make clean && make distclean
+
+RUN cd /opt/openssl-3.0.1 && \
+    ./Configure --prefix=/opt/openssl-3.0.1/x86_64  android-x86_64 -D__ANDROID_API__=30 && \
     make -j$(nproc) && make -j$(nproc) install && \
     make clean && make distclean
 
@@ -94,19 +100,25 @@ RUN rm -rf /opt/zecwalletmobile
 RUN rustup target install aarch64-linux-android
 RUN echo "[target.aarch64-linux-android]" >> $CARGO_HOME/config.toml
 RUN echo "ar = \"llvm-ar\"" >> $CARGO_HOME/config.toml
-RUN echo "linker = \"aarch64-linux-android29-clang\"" >> $CARGO_HOME/config.toml
+RUN echo "linker = \"aarch64-linux-android30-clang\"" >> $CARGO_HOME/config.toml
 RUN echo "" >> $CARGO_HOME/config.toml
 
 RUN rustup target install armv7-linux-androideabi
 RUN echo "[target.armv7-linux-androideabi]" >> $CARGO_HOME/config.toml
 RUN echo "ar = \"llvm-ar\"" >> $CARGO_HOME/config.toml
-RUN echo "linker = \"armv7a-linux-androideabi29-clang\"" >> $CARGO_HOME/config.toml
+RUN echo "linker = \"armv7a-linux-androideabi30-clang\"" >> $CARGO_HOME/config.toml
 RUN echo "" >> $CARGO_HOME/config.toml
 
 RUN rustup target install i686-linux-android
 RUN echo "[target.i686-linux-android]" >> $CARGO_HOME/config.toml
 RUN echo "ar = \"llvm-ar\"" >> $CARGO_HOME/config.toml
-RUN echo "linker = \"i686-linux-android29-clang\"" >> $CARGO_HOME/config.toml
+RUN echo "linker = \"i686-linux-android30-clang\"" >> $CARGO_HOME/config.toml
+RUN echo "" >> $CARGO_HOME/config.toml
+
+RUN rustup target install x86_64-linux-android
+RUN echo "[target.x86_64-linux-android]" >> $CARGO_HOME/config.toml
+RUN echo "ar = \"llvm-ar\"" >> $CARGO_HOME/config.toml
+RUN echo "linker = \"x86_64-linux-android30-clang\"" >> $CARGO_HOME/config.toml
 RUN echo "" >> $CARGO_HOME/config.toml
 
 ENV OPENSSL_STATIC=yes
