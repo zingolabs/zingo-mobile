@@ -21,10 +21,10 @@ const AboutModal: React.FunctionComponent<AboutModalProps> = ({closeModal}) => {
       }}>
       <View>
         <View style={{alignItems: 'center', backgroundColor: colors.card, paddingBottom: 25, paddingTop: 25}}>
-          <Text style={{marginTop: 5, padding: 5, color: colors.text, fontSize: 28}}>zecwallet DAO v1.7.8</Text>
+          <Text style={{marginTop: 5, padding: 5, color: colors.text, fontSize: 28}}>Zingo v0.0.1</Text>
         </View>
         <View style={{display: 'flex', alignItems: 'center', marginTop: -25}}>
-          <Image source={require('../assets/img/logobig.png')} style={{width: 50, height: 50, resizeMode: 'contain'}} />
+          <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 50, height: 50, resizeMode: 'contain'}} />
         </View>
       </View>
 
@@ -37,13 +37,13 @@ const AboutModal: React.FunctionComponent<AboutModalProps> = ({closeModal}) => {
         }}>
         <FadeText>
           {'\n'}
-          Copyright (c) 2018-2021, Aditya Kulkarni.
+          Copyright (c) 2022, ZingoLabs.
           {'\n'}
           {'\n'}
           Built with React Native.
           {'\n'}
           {'\n'}
-          The MIT License (MIT) Copyright (c) 2018-2021 Zecwallet
+          The MIT License (MIT) Copyright (c) 2022 Zingo
           {'\n'}
           {'\n'}
           Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated

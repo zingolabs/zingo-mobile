@@ -365,7 +365,7 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
         </View>
 
         <View style={{display: 'flex', alignItems: 'center', marginTop: -25}}>
-          <Image source={require('../assets/img/logobig.png')} style={{width: 50, height: 50, resizeMode: 'contain'}} />
+          <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 50, height: 50, resizeMode: 'contain'}} />
         </View>
         <TabBar
           {...props}

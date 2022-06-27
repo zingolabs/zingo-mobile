@@ -15,6 +15,7 @@ import Button from './components/Button';
 import RPCModule from './components/RPCModule';
 import LoadedApp from './app/LoadedApp';
 import SeedComponent from './components/SeedComponent';
+import RPC from './app/rpc';
 
 // -----------------
 // Loading View
@@ -80,6 +81,7 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
     setTimeout(async () => {
       const seed = await RPCModule.createNewWallet();
       if (!seed.startsWith('Error')) {
+        this.set_wallet_option('download_memos', 'none');
         this.setState({seedPhrase: seed, screen: 2});
       } else {
         this.setState({actionButtonsDisabled: false});
@@ -125,6 +127,13 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
     this.navigateToLoaded();
   };
 
+  set_wallet_option = async (name: string, value: string) => {
+    await RPC.setWalletSettingOption(name, value);
+
+    // Refetch the settings to update
+    //this.rpc.fetchWalletSettings();
+  };
+
   render() {
     const {screen, birthday, seedPhrase, actionButtonsDisabled} = this.state;
 
@@ -138,7 +147,7 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
             justifyContent: 'center',
           },
         ]}>
-        {screen === 0 && <Text style={{color: '#FFFFFF', fontSize: 36, fontWeight: 'bold'}}>zecwallet DAO</Text>}
+        {screen === 0 && <Text style={{color: '#FFFFFF', fontSize: 36, fontWeight: 'bold'}}>Zingo</Text>}
         {screen === 1 && (
           <View
             style={[
@@ -151,10 +160,10 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
             ]}>
             <View style={{marginBottom: 50, display: 'flex', alignItems: 'center'}}>
               <Image
-                source={require('./assets/img/logobig.png')}
+                source={require('./assets/img/logobig-zingo.png')}
                 style={{width: 100, height: 100, resizeMode: 'contain'}}
               />
-              <BoldText>zecwallet DAO</BoldText>
+              <BoldText>Zingo</BoldText>
             </View>
 
             <Button type="Primary" title="Create New Wallet" disabled={actionButtonsDisabled} onPress={this.createNewWallet} />

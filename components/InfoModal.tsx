@@ -52,14 +52,14 @@ const InfoModal: React.FunctionComponent<InfoModalProps> = ({info, closeModal}) 
           </View>
           <View style={{display: 'flex', alignItems: 'center', marginTop: -25}}>
             <Image
-              source={require('../assets/img/logobig.png')}
+              source={require('../assets/img/logobig-zingo.png')}
               style={{width: 50, height: 50, resizeMode: 'contain'}}
             />
           </View>
         </View>
 
         <View style={{display: 'flex', margin: 10}}>
-          <DetailLine label="Wallet Version" value="zecwallet DAO v1.7.8" />
+          <DetailLine label="Version" value="Zingo v0.0.1" />
           <DetailLine label="Server Version" value={info?.version} />
           <DetailLine label="Lightwallet Server URL" value={info?.serverUri} />
           <DetailLine label="Network" value={info?.testnet ? 'Testnet' : 'Mainnet'} />
