@@ -8,12 +8,13 @@ Do not use these apps unless you specifically know what you are doing.
 
 ### Prerequisites
 1. docker (for building the rust library)
-2. `yarn` 
-3. `nodejs` v12
+2. `yarn`
+3. `nodejs`
 
-### Building 
+### Building
 0. Start docker daemon
-1. AS A NONROOT USER: In the `zecwallet-mobile/rust/android` directory, run `./build.sh`. This step will take a long time
+1. AS A NONROOT USER: In the `rust/android` directory, run `./build.sh`.
+   This step will take a long time.
 2. From the root of the project, run `yarn install`
 3. Run `npx react-native start` to start the dev server
 4. Run `npx react-native run-android` to compile and install the app on an emulator/connected device. You can also open the `android` directory in Android Studio as a project and hit the run button
@@ -32,4 +33,4 @@ Do not use these apps unless you specifically know what you are doing.
 2. In the `zecwallet-mobile/ios` directory, run `pod install`
 3. From the root of the project, run `yarn install`
 4. Run `npx react-native start` to start the dev server
-5. Run `npx react-native run-ios` to compile and install the app on an emulator/connected device. You can also open the `.xcworkspace` project in XCode and run the app from XCode. 
+5. Run `npx react-native run-ios` to compile and install the app on an emulator/connected device. You can also open the `.xcworkspace` project in XCode and run the app from XCode.
