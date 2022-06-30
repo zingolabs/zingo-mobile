@@ -19,6 +19,10 @@ exports[`Component ReceiveScreen - test ReceiveScreen - snapshot 1`] = `
           "key": "taddr",
           "title": "T Address",
         },
+        Object {
+          "key": "oaddr",
+          "title": "O Address",
+        },
       ],
     }
   }
