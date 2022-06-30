@@ -272,7 +272,7 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
   };
 
   const addZ = async () => {
-    console.log('New Z');
+    //console.log('New Z');
     const newAddress = await RPC.createNewAddress('z');
     await fetchTotalBalance();
     setIndex(0);
@@ -280,7 +280,7 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
   };
 
   const addT = async () => {
-    console.log('New T');
+    //console.log('New T');
     const newAddress = await RPC.createNewAddress('t');
     await fetchTotalBalance();
     setIndex(1);
@@ -288,10 +288,9 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
   };
 
   const addO = async () => {
-    console.log('New O');
+    //console.log('New O');
     const newAddress = await RPC.createNewAddress('o');
     await fetchTotalBalance();
-    console.log('addO', newAddress);
     setIndex(2);
     setDisplayAddress(newAddress);
   };
