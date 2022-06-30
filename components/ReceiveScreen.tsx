@@ -33,7 +33,9 @@ const SingleAddressDisplay: React.FunctionComponent<SingleAddress> = ({address, 
 
   const multi = total > 1;
 
-  const chunks = Utils.splitStringIntoChunks(address, Utils.isSapling(address) ? 3 : 2);
+  // 30 characters per line
+  const numLines = Utils.isTransparent(address) ? 2 : (address.length / 30);
+  const chunks = Utils.splitStringIntoChunks(address, numLines.toFixed(0));
   const fixedWidthFont = Platform.OS === 'android' ? 'monospace' : 'Courier';
 
   const doCopy = () => {
@@ -64,6 +66,10 @@ const SingleAddressDisplay: React.FunctionComponent<SingleAddress> = ({address, 
       <View style={{marginTop: 10, padding: 10, backgroundColor: 'rgb(255, 255, 255)'}}>
         <QRCode value={address} size={200} ecl="L" />
       </View>
+      <ClickableText style={{marginTop: 15}} onPress={doCopy}>
+        Tap To Copy
+      </ClickableText>
+
       <View style={{display: 'flex', flexDirection: 'row', flexWrap: 'wrap', marginTop: 10, justifyContent: 'center'}}>
         {chunks.map(c => (
           <FadeText
@@ -79,9 +85,6 @@ const SingleAddressDisplay: React.FunctionComponent<SingleAddress> = ({address, 
           </FadeText>
         ))}
       </View>
-      <ClickableText style={{marginTop: 5}} onPress={doCopy}>
-        Tap To Copy
-      </ClickableText>
 
       {multi && (
         <View style={{display: 'flex', flexDirection: 'row', marginTop: 10, alignItems: 'center', marginBottom: 100}}>
@@ -114,16 +117,19 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
   const [routes] = React.useState([
     {key: 'zaddr', title: 'Z Address'},
     {key: 'taddr', title: 'T Address'},
+    {key: 'oaddr', title: 'O Address'},
   ]);
 
   const [displayAddress, setDisplayAddress] = useState('');
   const [zindex, setZIndex] = useState(0);
   const [tindex, setTIndex] = useState(0);
+  const [oindex, setOIndex] = useState(0);
 
   const {colors} = useTheme();
 
   const zaddrs = addresses.filter(a => Utils.isSapling(a)) || [];
   const taddrs = addresses.filter(a => Utils.isTransparent(a)) || [];
+  const oaddrs = addresses.filter(a => Utils.isOrchard(a)) || [];
 
   if (displayAddress) {
     let displayAddressIndex = zaddrs?.findIndex(a => a === displayAddress);
@@ -136,6 +142,12 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
 
     if (tindex !== displayAddressIndex && displayAddressIndex >= 0) {
       setTIndex(displayAddressIndex);
+    }
+
+    displayAddressIndex = oaddrs?.findIndex(a => a === displayAddress);
+
+    if (oindex !== displayAddressIndex && displayAddressIndex >= 0) {
+      setOIndex(displayAddressIndex);
     }
   }
 
@@ -151,7 +163,7 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
         newIndex = zaddrs.length - 1;
       }
       setZIndex(newIndex);
-    } else {
+    } else  if (type === 't') {
       if (taddrs.length === 0) {
         return;
       }
@@ -160,6 +172,15 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
         newIndex = taddrs.length - 1;
       }
       setTIndex(newIndex);
+    } else { // 'o'
+      if (oaddrs.length === 0) {
+        return;
+      }
+      let newIndex = oindex - 1;
+      if (newIndex < 0) {
+        newIndex = oaddrs.length - 1;
+      }
+      setOIndex(newIndex);
     }
   };
 
@@ -171,12 +192,18 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
       }
       const newIndex = (zindex + 1) % zaddrs?.length;
       setZIndex(newIndex);
-    } else {
+    } else if (type === 't') {
       if (taddrs.length === 0) {
         return;
       }
       const newIndex = (tindex + 1) % taddrs?.length;
       setTIndex(newIndex);
+    } else { // 'o'
+      if (oaddrs.length === 0) {
+        return;
+      }
+      const newIndex = (oindex + 1) % oaddrs?.length;
+      setOIndex(newIndex);
     }
   };
 
@@ -221,12 +248,32 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
           />
         );
       }
+      case 'oaddr': {
+        let oaddr = 'No Address';
+        if (oaddrs.length > 0) {
+          oaddr = oaddrs[oindex];
+        }
+
+        return (
+          <SingleAddressDisplay
+            address={oaddr}
+            index={oindex}
+            total={oaddrs.length}
+            prev={() => {
+              prev('o');
+            }}
+            next={() => {
+              next('o');
+            }}
+          />
+        );
+      }
     }
   };
 
   const addZ = async () => {
     console.log('New Z');
-    const newAddress = await RPC.createNewAddress(true);
+    const newAddress = await RPC.createNewAddress('z');
     await fetchTotalBalance();
     setIndex(0);
     setDisplayAddress(newAddress);
@@ -234,9 +281,18 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
 
   const addT = async () => {
     console.log('New T');
-    const newAddress = await RPC.createNewAddress(false);
+    const newAddress = await RPC.createNewAddress('t');
     await fetchTotalBalance();
     setIndex(1);
+    setDisplayAddress(newAddress);
+  };
+
+  const addO = async () => {
+    console.log('New O');
+    const newAddress = await RPC.createNewAddress('o');
+    await fetchTotalBalance();
+    console.log('addO', newAddress);
+    setIndex(2);
     setDisplayAddress(newAddress);
   };
 
@@ -245,11 +301,11 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
   const [privKey, setPrivKey] = useState('');
 
   const viewPrivKey = async () => {
-    if (zaddrs.length === 0 || taddrs.length === 0) {
+    if (zaddrs.length === 0 || taddrs.length === 0 || oaddrs.length === 0) {
       return;
     }
 
-    const address = index === 0 ? zaddrs[zindex] : taddrs[tindex];
+    const address = index === 0 ? zaddrs[zindex] : index === 1 ? taddrs[tindex] : oaddrs[oindex];
     const k = await RPC.getPrivKeyAsString(address);
 
     setKeyType(0);
@@ -264,11 +320,11 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
       return;
     }
 
-    if (zaddrs.length === 0 || taddrs.length === 0) {
+    if (zaddrs.length === 0 || taddrs.length === 0 || oaddrs.length === 0) {
       return;
     }
 
-    const address = index === 0 ? zaddrs[zindex] : taddrs[tindex];
+    const address = index === 0 ? zaddrs[zindex] : index === 1 ? taddrs[tindex] : oaddrs[oindex];
     const k = await RPC.getViewKeyAsString(address);
 
     setKeyType(1);
@@ -307,10 +363,12 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
   const renderTabBar: (props: any) => JSX.Element = props => {
     let address = '';
 
-    if (index === 0 && zaddrs.length > 0) {
+    if        (index === 0 && zaddrs.length > 0) {
       address = zaddrs[zindex];
     } else if (index === 1 && taddrs.length > 0) {
       address = taddrs[tindex];
+    } else if (index === 2 && oaddrs.length > 0) {
+      address = oaddrs[oindex];
     }
 
     return (
@@ -347,12 +405,13 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
           <TouchableOpacity onPress={toggleMenuDrawer}>
             <FontAwesomeIcon icon={faBars} size={20} color={'#ffffff'} />
           </TouchableOpacity>
-          <Text style={{paddingBottom: 25, color: colors.text, fontSize: 28}}>Wallet Address</Text>
+          <Text style={{paddingBottom: 25, color: colors.text, fontSize: 28}}>Wallet Addresses</Text>
           <OptionsMenu
             customButton={<FontAwesomeIcon icon={faEllipsisV} color={'#ffffff'} size={20} />}
             buttonStyle={{width: 32, height: 32, margin: 7.5, resizeMode: 'contain'}}
             destructiveIndex={5}
             options={[
+              'New O Address',
               'New Z Address',
               'New T Address',
               'Export Private Key',
@@ -360,7 +419,7 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
               'Import...',
               'Cancel',
             ]}
-            actions={[addZ, addT, viewPrivKey, viewViewingKey, importKey]}
+            actions={[addO, addZ, addT, viewPrivKey, viewViewingKey, importKey]}
           />
         </View>
 

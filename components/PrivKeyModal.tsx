@@ -20,7 +20,10 @@ const PrivKeyModal: React.FunctionComponent<PrivKeyModalProps> = ({address, keyT
   const fixedWidthFont = Platform.OS === 'android' ? 'monospace' : 'Courier';
 
   const keyTypeString = keyType === 0 ? 'Private' : 'Viewing';
-  const keyChunks = Utils.splitStringIntoChunks(privKey, Utils.isSapling(address) ? 10 : 2);
+  
+  // 30 characters per line
+  const numLines = (privKey.length / 30);
+  const keyChunks = Utils.splitStringIntoChunks(privKey, numLines.toFixed(0));
 
   const [expandAddress, setExpandAddress] = useState(false);
 
@@ -72,6 +75,9 @@ const PrivKeyModal: React.FunctionComponent<PrivKeyModalProps> = ({address, keyT
           <View style={{padding: 10, backgroundColor: 'rgb(255, 255, 255)', marginTop: 15, marginBottom: 20}}>
             <QRCode value={privKey} size={225} ecl="L" />
           </View>
+          <ClickableText style={{marginBottom: 5}} onPress={doCopy}>
+            Tap To Copy
+          </ClickableText>
 
           {keyChunks.map(c => (
             <FadeText
@@ -86,9 +92,6 @@ const PrivKeyModal: React.FunctionComponent<PrivKeyModalProps> = ({address, keyT
               {c}
             </FadeText>
           ))}
-          <ClickableText style={{marginTop: 10}} onPress={doCopy}>
-            Tap To Copy
-          </ClickableText>
         </View>
       </ScrollView>
       <View style={{flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', margin: 10}}>

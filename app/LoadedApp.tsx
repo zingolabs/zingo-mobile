@@ -388,9 +388,9 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
     this.setState({addressPrivateKeys});
   };
 
-  createNewAddress = async (zaddress: boolean) => {
+  createNewAddress = async (addressType: 'z' | 't' | 'o') => {
     // Create a new address
-    const newaddress = await RPC.createNewAddress(zaddress);
+    const newaddress = await RPC.createNewAddress(addressType);
     // console.log(`Created new Address ${newaddress}`);
 
     // And then fetch the list of addresses again to refresh (totalBalance gets all addresses)

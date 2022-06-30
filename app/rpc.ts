@@ -367,10 +367,15 @@ export default class RPC {
 
     this.fnSetAddressesWithBalance(addresses);
 
+    // addresses out of the balance.
+    const a = await RPCModule.execute('addresses', '');
+    const aJSON = JSON.parse(a);
+
     // Also set all addresses
+    const allOAddresses =       aJSON.o_addresses.map((o: any) => o);
     const allZAddresses = balanceJSON.z_addresses.map((o: any) => o.address);
     const allTAddresses = balanceJSON.t_addresses.map((o: any) => o.address);
-    const allAddresses = allZAddresses.concat(allTAddresses);
+    const allAddresses = allZAddresses.concat(allTAddresses.concat(allOAddresses));
 
     // console.log(`All addresses: ${allAddresses}`);
 
@@ -381,18 +386,25 @@ export default class RPC {
     const privKeyStr = await RPCModule.execute('export', address);
     const privKeyJSON = JSON.parse(privKeyStr);
 
-    return privKeyJSON[0].private_key;
+    // 'o' - spending_key
+    // 'z' and 't' - private_key
+    return privKeyJSON[0].spending_key || privKeyJSON[0].private_key;
   }
 
   static async getViewKeyAsString(address: string): Promise<string> {
-    const privKeyStr = await RPCModule.execute('export', address);
-    const privKeyJSON = JSON.parse(privKeyStr);
+    const viewKeyStr = await RPCModule.execute('export', address);
+    const viewKeyJSON = JSON.parse(viewKeyStr);
 
-    return privKeyJSON[0].viewing_key;
+    console.log('vk', viewKeyJSON);
+
+    // 'o' - full_viewing_key
+    // 'z' and 't' - viewing_key
+    return viewKeyJSON[0].full_viewing_key || viewKeyJSON[0].viewing_key;
   }
 
-  static async createNewAddress(zaddress: boolean): Promise<string> {
-    const addrStr = await RPCModule.execute('new', zaddress ? 'z' : 't');
+  static async createNewAddress(addressType: 'z' | 't' | 'o'): Promise<string> {
+    // 'z' 't' or 'o'
+    const addrStr = await RPCModule.execute('new', addressType);
     const addrJSON = JSON.parse(addrStr);
 
     console.log(addrJSON);
