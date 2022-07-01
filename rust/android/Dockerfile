@@ -22,7 +22,6 @@ FROM apt_upgrade_rustndk_image as add_builder_user
 ARG android_ndk_ver=r24
 ARG UID=$UID
 ARG GUID=$GUID
-RUN addgroup --gid $GUID builderuser
 # Add user
 RUN useradd -ms `which bash` --gid $GUID --uid $UID builderuser
 # Install NDK itself
