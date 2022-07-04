@@ -46,4 +46,4 @@ with the chip on your system and start the emulated device.
    You can also open the `.xcworkspace` project in XCode and run it there.
 
 For notes on known issues and problems,
-see the [trouble-shooting note](./TROUBLESHOOTING.md).
+see the [trouble-shooting notes](./TROUBLESHOOTING.md).
