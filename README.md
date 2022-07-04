@@ -45,18 +45,5 @@ with the chip on your system and start the emulated device.
 5. Run `npm run ios` to install the app on an emulator/connected device.
    You can also open the `.xcworkspace` project in XCode and run it there.
 
-### Trouble-shooting
-
-```
-** BUILD FAILED **
-
-The following build commands failed:
-	PhaseScriptExecution [CP-User]\ Generate\ Specs /Users/skyl/Library/Developer/Xcode/DerivedData/ZingoMobile-csgvotxsdtutswboneqanoqzmeam/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/FBReactNativeSpec.build/Script-81152550C92182B003B23A679F9D8F2E.sh (in target 'FBReactNativeSpec' from project 'Pods')
-(1 failure)
-```
-
-https://github.com/facebook/react-native/issues/32951
-
-->
-
-`nvm unalias default`
+For notes on known issues and problems,
+see the [trouble-shooting note](./TROUBLESHOOTING.md).
