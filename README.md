@@ -23,8 +23,7 @@ with the chip on your system and start the emulated device.
 1. AS A NONROOT USER: In the `rust/android` directory, run `./build.sh`.
    This step will take a long time.
 2. From the root of the project, run `yarn install`
-3. Run `npx react-native start` to start the dev server
-4. Run `npm run android` to compile and install the app on an
+3. Run `npm run android` to compile and install the app on an
    emulator or connected device. You can also open the `android` directory
    in Android Studio as a project and hit the run button
 
