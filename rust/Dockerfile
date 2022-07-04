@@ -18,15 +18,10 @@ RUN apt-get update \
     && update-ca-certificates
 
 # Add group
-FROM apt_upgrade_rustndk_image as add_builder_user
+FROM apt_upgrade_rustndk_image as add_android_ndk
 ARG android_ndk_ver=r24
-ARG UID=$UID
-ARG GUID=$GUID
-# Add user
-RUN addgroup --gid $GUID builderuser || true
-RUN useradd -ms `which bash` --gid $GUID --uid $UID builderuser
-# Install NDK itself
 
+# Install NDK itself
 RUN curl -vfL -o /tmp/android-ndk.zip \
     https://dl.google.com/android/repository/android-ndk-${android_ndk_ver}-linux.zip \
     && unzip /tmp/android-ndk.zip -d /usr/local/
@@ -51,11 +46,10 @@ ENV ANDROID_NDK_HOME=/usr/local/android-ndk-${android_ndk_ver} \
     ANDROID_NDK_ROOT=/usr/local/android-ndk-${android_ndk_ver}
 
 ENV PATH=/usr/local/android-ndk-${android_ndk_ver}/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH
-
 # Install cargo-ndk Cargo plugin
 RUN cargo install cargo-ndk
 
-FROM add_builder_user as rustndk_openssl_installed_image
+FROM add_android_ndk as rustndk_openssl_installed_image
 
 # RUN curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain none -y
 # ENV PATH=/root/.cargo/bin:/opt/android-ndk-linux/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH
