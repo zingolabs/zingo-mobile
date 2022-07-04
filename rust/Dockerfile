@@ -91,7 +91,7 @@ RUN cd /opt/openssl-3.0.1 && \
     make -j$(nproc) && make -j$(nproc) install && \
     make clean && make distclean
 
-# # TODO: why do we want to dev branch here instead of the local changes?
+# add the local rust code into the container
 COPY android/ /opt/zingo/rust/android/
 COPY lib/ /opt/zingo/rust/lib/
 COPY Cargo.lock /opt/zingo/rust/Cargo.lock
