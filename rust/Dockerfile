@@ -91,17 +91,20 @@ RUN cd /opt/openssl-3.0.1 && \
     make clean && make distclean
 
 # # TODO: why do we want to dev branch here instead of the local changes?
-# COPY . /opt/zingo/rust/android/
-# # COPY lib/ /opt/zingo/rust/lib/
-# RUN cargo fetch --manifest-path /opt/zingo/rust/android/Cargo.toml
-# RUN cargo build --release --manifest-path /opt/zingo/rust/android/Cargo.toml
-# RUN rm -rf /opt/zingo
-
-RUN cd /opt && git clone --depth=1 --branch="dev" https://github.com/zingolabs/zingo-mobile zingo
-RUN printf '[net] \ngit-fetch-with-cli = true\n' > /root/.cargo/config.toml
+COPY android/ /opt/zingo/rust/android/
+COPY lib/ /opt/zingo/rust/lib/
+COPY Cargo.lock /opt/zingo/rust/Cargo.lock
+COPY Cargo.toml /opt/zingo/rust/Cargo.toml
+COPY ios/ /opt/zingo/rust/ios/
 RUN cargo fetch --manifest-path /opt/zingo/rust/android/Cargo.toml
 RUN cargo build --release --manifest-path /opt/zingo/rust/android/Cargo.toml
 RUN rm -rf /opt/zingo
+
+# RUN cd /opt && git clone --depth=1 --branch="dev" https://github.com/zingolabs/zingo-mobile zingo
+# RUN printf '[net] \ngit-fetch-with-cli = true\n' > /root/.cargo/config.toml
+# RUN cargo fetch --manifest-path /opt/zingo/rust/android/Cargo.toml
+# RUN cargo build --release --manifest-path /opt/zingo/rust/android/Cargo.toml
+# RUN rm -rf /opt/zingo
 
 RUN rustup target install aarch64-linux-android
 RUN echo "[target.aarch64-linux-android]" >> $CARGO_HOME/config.toml
