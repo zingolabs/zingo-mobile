@@ -23,6 +23,7 @@ ARG android_ndk_ver=r24
 ARG UID=$UID
 ARG GUID=$GUID
 # Add user
+RUN addgroup --gid $GUID builderuser || true
 RUN useradd -ms `which bash` --gid $GUID --uid $UID builderuser
 # Install NDK itself
 
