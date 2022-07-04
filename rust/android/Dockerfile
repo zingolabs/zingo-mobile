@@ -90,12 +90,15 @@ RUN cd /opt/openssl-3.0.1 && \
     make -j$(nproc) && make -j$(nproc) install && \
     make clean && make distclean
 
-# TODO: why do we want to dev branch here instead of the local changes?
-# RUN cd /opt && git clone --depth=1 --branch="dev" https://github.com/zingolabs/zingo-mobile zecwalletmobile
+# # TODO: why do we want to dev branch here instead of the local changes?
+# COPY . /opt/zingo/rust/android/
+# # COPY lib/ /opt/zingo/rust/lib/
+# RUN cargo fetch --manifest-path /opt/zingo/rust/android/Cargo.toml
+# RUN cargo build --release --manifest-path /opt/zingo/rust/android/Cargo.toml
+# RUN rm -rf /opt/zingo
+
+RUN cd /opt && git clone --depth=1 --branch="dev" https://github.com/zingolabs/zingo-mobile zingo
 RUN printf '[net] \ngit-fetch-with-cli = true\n' > /root/.cargo/config.toml
-# Use local files!
-COPY android/ /opt/zingo/rust/android/
-COPY lib/ /opt/zingo/rust/lib/
 RUN cargo fetch --manifest-path /opt/zingo/rust/android/Cargo.toml
 RUN cargo build --release --manifest-path /opt/zingo/rust/android/Cargo.toml
 RUN rm -rf /opt/zingo

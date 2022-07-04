@@ -20,7 +20,7 @@ with the chip on your system and start the emulated device.
 
 ### Building
 0. Start docker daemon
-1. AS A NONROOT USER: In the `rust/` directory, run `./build.sh`.
+1. AS A NONROOT USER: In the `rust/android/` directory, run `./build.sh`.
    This step will take a long time.
 2. From the root of the project, run `yarn install`
 3. Run `npm run android` to compile and install the app on an
