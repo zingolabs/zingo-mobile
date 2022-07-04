@@ -3,8 +3,8 @@ require_relative '../node_modules/@react-native-community/cli-platform-ios/nativ
 
 platform :ios, '10.0'
 
-target 'ZecwalletMobile' do
-  # Pods for ZecwalletMobile
+target 'ZingoMobile' do
+  # Pods for ZingoMobile
   permissions_path = '../node_modules/react-native-permissions/ios'
 
   pod 'Permission-Camera', :path => "#{permissions_path}/Camera"
@@ -17,7 +17,7 @@ target 'ZecwalletMobile' do
     :hermes_enabled => false
   )
 
-  target 'ZecwalletMobileTests' do
+  target 'ZingoMobileTests' do
     inherit! :complete
     # Pods for testing
   end

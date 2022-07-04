@@ -37,9 +37,9 @@ with the chip on your system and start the emulated device.
 5. `sudo gem install cocoapods` to install cocoapods
 
 ### Building
-1. In the `rust/ios` directory, run `./build.sh`.
+1. In the `./rust/ios` directory, run `./build.sh`.
    This step will take a long time.
-2. In the `ios` directory, run `pod install`
+2. In the `./ios` directory, run `pod install`
 3. From the root of the project, run `yarn install`
 4. Run `npx react-native start` to start the dev server
 5. Run `npx react-native run-ios` to compile and install the app on an emulator/connected device. You can also open the `.xcworkspace` project in XCode and run the app from XCode.

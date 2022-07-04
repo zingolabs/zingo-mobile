@@ -1,6 +1,6 @@
 //
 //  RPCModule.h
-//  ZecwalletMobile
+//  ZingoMobile
 //
 //  Created by Aditya Kulkarni on 5/18/20.
 //
