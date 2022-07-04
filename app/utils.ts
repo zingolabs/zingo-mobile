@@ -1,4 +1,4 @@
-import {getNumberFormatSettings} from 'react-native-localize';
+import { getNumberFormatSettings } from 'react-native-localize';
 
 export const NO_CONNECTION: string = 'Could not connect to zcashd';
 
@@ -69,7 +69,7 @@ export default class Utils {
 
   static splitZecAmountIntoBigSmall(zecValue?: number): ZecAmountSplitType {
     if (typeof zecValue === 'undefined') {
-      return {bigPart: '--', smallPart: ''};
+      return { bigPart: '--', smallPart: '' };
     }
 
     let bigPart = Utils.maxPrecision(zecValue);
@@ -92,7 +92,7 @@ export default class Utils {
     //   smallPart = '';
     // }
 
-    return {bigPart, smallPart};
+    return { bigPart, smallPart };
   }
 
   static splitStringIntoChunks(s: string, numChunks: number): string[] {
@@ -137,7 +137,7 @@ export default class Utils {
   }
 
   static getDefaultDonationMemo(): string {
-    return 'Thanks for supporting Zecwallet!';
+    return 'Thanks for supporting Zingo!';
   }
 
   static getZecToUsdString(price: number | null, zecValue: number | null): string {
@@ -177,7 +177,7 @@ export default class Utils {
   }
 
   static parseLocaleFloat(stringNumber: string): number {
-    const {decimalSeparator, groupingSeparator} = getNumberFormatSettings();
+    const { decimalSeparator, groupingSeparator } = getNumberFormatSettings();
 
     return Number(
       stringNumber
@@ -187,7 +187,7 @@ export default class Utils {
   }
 
   static toLocaleFloat(stringNumber: string): string {
-    const {decimalSeparator, groupingSeparator} = getNumberFormatSettings();
+    const { decimalSeparator, groupingSeparator } = getNumberFormatSettings();
 
     return stringNumber
       .replace(new RegExp(',', 'g'), '_')

@@ -2,15 +2,15 @@
 /**
  * @format
  */
-import React, {Component} from 'react';
-import {View, ScrollView, Alert, SafeAreaView, Image, Text} from 'react-native';
+import React, { Component } from 'react';
+import { View, ScrollView, Alert, SafeAreaView, Image, Text } from 'react-native';
 
-import {NavigationContainer, DarkTheme} from '@react-navigation/native';
-import {AppearanceProvider} from 'react-native-appearance';
-import {createStackNavigator} from '@react-navigation/stack';
+import { NavigationContainer, DarkTheme } from '@react-navigation/native';
+import { AppearanceProvider } from 'react-native-appearance';
+import { createStackNavigator } from '@react-navigation/stack';
 
 import cstyles from './components/CommonStyles';
-import {BoldText, RegText, RegTextInput, FadeText} from './components/Components';
+import { BoldText, RegText, RegTextInput, FadeText } from './components/Components';
 import Button from './components/Button';
 import RPCModule from './components/RPCModule';
 import LoadedApp from './app/LoadedApp';
@@ -52,7 +52,7 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
       // console.log('Exists result', exists);
 
       if (exists && exists !== 'false') {
-        this.setState({walletExists: true});
+        this.setState({ walletExists: true });
         const error = await RPCModule.loadExistingWallet();
         if (!error.startsWith('Error')) {
           // Load the wallet and navigate to the transactions screen
@@ -62,48 +62,48 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
         }
       } else {
         // console.log('Loading new wallet');
-        this.setState({screen: 1, walletExists: false});
+        this.setState({ screen: 1, walletExists: false });
       }
     });
   };
 
   navigateToLoaded = () => {
-    const {navigation} = this.props;
+    const { navigation } = this.props;
     navigation.reset({
       index: 0,
-      routes: [{name: 'LoadedApp'}],
+      routes: [{ name: 'LoadedApp' }],
     });
   };
 
   createNewWallet = () => {
-    this.setState({actionButtonsDisabled: true});
+    this.setState({ actionButtonsDisabled: true });
 
     setTimeout(async () => {
       const seed = await RPCModule.createNewWallet();
       if (!seed.startsWith('Error')) {
         this.set_wallet_option('download_memos', 'none');
-        this.setState({seedPhrase: seed, screen: 2});
+        this.setState({ seedPhrase: seed, screen: 2 });
       } else {
-        this.setState({actionButtonsDisabled: false});
+        this.setState({ actionButtonsDisabled: false });
         Alert.alert('Error creating Wallet', seed);
       }
     });
   };
 
   getSeedPhraseToRestore = async () => {
-    this.setState({seedPhrase: '', birthday: '0', screen: 3});
+    this.setState({ seedPhrase: '', birthday: '0', screen: 3 });
   };
 
   doRestore = async () => {
     // Don't call with null values
-    const {birthday, seedPhrase} = this.state;
+    const { birthday, seedPhrase } = this.state;
 
     if (!seedPhrase) {
       Alert.alert('Invalid Seed Phrase', 'The seed phrase was invalid');
       return;
     }
 
-    this.setState({actionButtonsDisabled: true});
+    this.setState({ actionButtonsDisabled: true });
     setTimeout(async () => {
       let walletBirthday = birthday || '0';
       if (parseInt(walletBirthday, 10) < 0) {
@@ -117,7 +117,7 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
       if (!error.startsWith('Error')) {
         this.navigateToLoaded();
       } else {
-        this.setState({actionButtonsDisabled: false});
+        this.setState({ actionButtonsDisabled: false });
         Alert.alert('Error reading Wallet', error);
       }
     });
@@ -135,7 +135,7 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
   };
 
   render() {
-    const {screen, birthday, seedPhrase, actionButtonsDisabled} = this.state;
+    const { screen, birthday, seedPhrase, actionButtonsDisabled } = this.state;
 
     return (
       <View
@@ -147,7 +147,7 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
             justifyContent: 'center',
           },
         ]}>
-        {screen === 0 && <Text style={{color: '#FFFFFF', fontSize: 36, fontWeight: 'bold'}}>Zingo</Text>}
+        {screen === 0 && <Text style={{ color: '#FFFFFF', fontSize: 36, fontWeight: 'bold' }}>Zingo</Text>}
         {screen === 1 && (
           <View
             style={[
@@ -158,10 +158,10 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
                 justifyContent: 'center',
               },
             ]}>
-            <View style={{marginBottom: 50, display: 'flex', alignItems: 'center'}}>
+            <View style={{ marginBottom: 50, display: 'flex', alignItems: 'center' }}>
               <Image
                 source={require('./assets/img/logobig-zingo.png')}
-                style={{width: 100, height: 100, resizeMode: 'contain'}}
+                style={{ width: 100, height: 100, resizeMode: 'contain' }}
               />
               <BoldText>Zingo</BoldText>
             </View>
@@ -190,7 +190,7 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
               },
             ]}
             keyboardShouldPersistTaps="handled">
-            <RegText style={{margin: 30}}>Enter your seed phrase (24 words)</RegText>
+            <RegText style={{ margin: 30 }}>Enter your seed phrase (24 words)</RegText>
             <RegTextInput
               multiline
               style={[
@@ -204,7 +204,7 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
                 cstyles.innerpaddingsmall,
               ]}
               value={seedPhrase}
-              onChangeText={(text: string) => this.setState({seedPhrase: text})}
+              onChangeText={(text: string) => this.setState({ seedPhrase: text })}
             />
             <RegText style={[cstyles.margintop, cstyles.center]}>Wallet Birthday</RegText>
             <FadeText>Block height of first transaction. (OK to leave blank)</FadeText>
@@ -220,7 +220,7 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
               ]}
               value={birthday}
               keyboardType="numeric"
-              onChangeText={(text: string) => this.setState({birthday: text})}
+              onChangeText={(text: string) => this.setState({ birthday: text })}
             />
             <View style={cstyles.margintop}>
               <Button type="Primary" title="Restore Wallet" disabled={actionButtonsDisabled} onPress={this.doRestore} />
@@ -232,7 +232,7 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
   }
 }
 
-const ZecwalletTheme = {
+const Theme = {
   ...DarkTheme,
   colors: {
     ...DarkTheme.colors,
@@ -248,12 +248,12 @@ const Stack = createStackNavigator();
 export default function App() {
   return (
     <AppearanceProvider>
-      <NavigationContainer theme={ZecwalletTheme}>
+      <NavigationContainer theme={Theme}>
         <SafeAreaView
           style={{
             flex: 1,
             justifyContent: 'center',
-            backgroundColor: ZecwalletTheme.colors.card,
+            backgroundColor: Theme.colors.card,
           }}>
           <Stack.Navigator headerMode="none">
             <Stack.Screen name="LoadingView" component={LoadingView} />
