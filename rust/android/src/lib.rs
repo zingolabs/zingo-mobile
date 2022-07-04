@@ -12,7 +12,7 @@ use jni::JNIEnv;
 use std::ffi::{CStr, CString};
 
 #[no_mangle]
-pub unsafe extern "C" fn Java_com_zecwalletmobile_RPCModule_initlogging(
+pub unsafe extern "C" fn Java_com_zingo_RPCModule_initlogging(
     env: JNIEnv,
     _: JObject,
 ) -> jstring {
@@ -24,7 +24,7 @@ pub unsafe extern "C" fn Java_com_zecwalletmobile_RPCModule_initlogging(
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn Java_com_zecwalletmobile_RPCModule_initnew(
+pub unsafe extern "C" fn Java_com_zingo_RPCModule_initnew(
     env: JNIEnv,
     _: JObject,
     j_serveruri: JString,
@@ -60,7 +60,7 @@ pub unsafe extern "C" fn Java_com_zecwalletmobile_RPCModule_initnew(
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn Java_com_zecwalletmobile_RPCModule_initfromseed(
+pub unsafe extern "C" fn Java_com_zingo_RPCModule_initfromseed(
     env: JNIEnv,
     _: JObject,
     j_serveruri: JString,
@@ -116,7 +116,7 @@ pub unsafe extern "C" fn Java_com_zecwalletmobile_RPCModule_initfromseed(
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn Java_com_zecwalletmobile_RPCModule_initfromb64(
+pub unsafe extern "C" fn Java_com_zingo_RPCModule_initfromb64(
     env: JNIEnv,
     _: JObject,
     j_serveruri: JString,
@@ -157,7 +157,7 @@ pub unsafe extern "C" fn Java_com_zecwalletmobile_RPCModule_initfromb64(
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn Java_com_zecwalletmobile_RPCModule_save(
+pub unsafe extern "C" fn Java_com_zingo_RPCModule_save(
     env: JNIEnv,
     _: JObject,
 ) -> jstring {
@@ -167,7 +167,7 @@ pub unsafe extern "C" fn Java_com_zecwalletmobile_RPCModule_save(
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn Java_com_zecwalletmobile_RPCModule_execute(
+pub unsafe extern "C" fn Java_com_zingo_RPCModule_execute(
     env: JNIEnv,
     _: JObject,
     j_command: JString,

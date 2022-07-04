@@ -2,20 +2,20 @@ FROM debian:bullseye-slim as apt_upgrade_rustndk_image
 
 # Install Android NDK
 RUN apt-get update \
- && apt-get upgrade -y \
- && apt-get install -y --no-install-recommends --no-install-suggests \
-            ca-certificates \
-            gcc \
-            libc6-dev \
-            make \
-            curl \
-            automake \
-            unzip \
-            git \
-            g++-aarch64-linux-gnu \
-            libc6-dev-arm64-cross \
-            protobuf-compiler \
- && update-ca-certificates
+    && apt-get upgrade -y \
+    && apt-get install -y --no-install-recommends --no-install-suggests \
+    ca-certificates \
+    gcc \
+    libc6-dev \
+    make \
+    curl \
+    automake \
+    unzip \
+    git \
+    g++-aarch64-linux-gnu \
+    libc6-dev-arm64-cross \
+    protobuf-compiler \
+    && update-ca-certificates
 
 # Add group
 FROM apt_upgrade_rustndk_image as add_builder_user
@@ -27,8 +27,8 @@ RUN useradd -ms `which bash` --gid $GUID --uid $UID builderuser
 # Install NDK itself
 
 RUN curl -vfL -o /tmp/android-ndk.zip \
-         https://dl.google.com/android/repository/android-ndk-${android_ndk_ver}-linux.zip \
- && unzip /tmp/android-ndk.zip -d /usr/local/
+    https://dl.google.com/android/repository/android-ndk-${android_ndk_ver}-linux.zip \
+    && unzip /tmp/android-ndk.zip -d /usr/local/
 
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs -o ./rustup.sh
 RUN chmod +x ./rustup.sh && ./rustup.sh -y
@@ -40,9 +40,9 @@ RUN rustup toolchain install stable
 
 # Install Rust targets for Android platforms
 RUN rustup target add aarch64-linux-android \
-                      armv7-linux-androideabi \
-                      i686-linux-android \
-                      x86_64-linux-android
+    armv7-linux-androideabi \
+    i686-linux-android \
+    x86_64-linux-android
 
 # Path to the Android NDK for cargo-ndk Cargo plugin
 ENV ANDROID_NDK_HOME=/usr/local/android-ndk-${android_ndk_ver} \
@@ -90,11 +90,11 @@ RUN cd /opt/openssl-3.0.1 && \
     make -j$(nproc) && make -j$(nproc) install && \
     make clean && make distclean
 
-RUN cd /opt && git clone --depth=1 --branch="dev" https://github.com/zingolabs/zingo-mobile zecwalletmobile
+COPY Cargo.toml /opt/Cargo.toml
 RUN printf '[net] \ngit-fetch-with-cli = true\n' > /root/.cargo/config.toml
-RUN cargo fetch --manifest-path /opt/zecwalletmobile/rust/android/Cargo.toml
-RUN cargo build --release --manifest-path /opt/zecwalletmobile/rust/android/Cargo.toml
-RUN rm -rf /opt/zecwalletmobile
+RUN cargo fetch --manifest-path /opt/Cargo.toml
+RUN cargo build --release --manifest-path /opt/Cargo.toml
+RUN rm -rf /opt/Cargo.toml
 
 RUN rustup target install aarch64-linux-android
 RUN echo "[target.aarch64-linux-android]" >> $CARGO_HOME/config.toml
