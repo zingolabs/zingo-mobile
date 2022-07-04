@@ -98,13 +98,6 @@ COPY Cargo.toml /opt/zingo/rust/Cargo.toml
 COPY ios/ /opt/zingo/rust/ios/
 RUN cargo fetch --manifest-path /opt/zingo/rust/android/Cargo.toml
 RUN cargo build --release --manifest-path /opt/zingo/rust/android/Cargo.toml
-RUN rm -rf /opt/zingo
-
-# RUN cd /opt && git clone --depth=1 --branch="dev" https://github.com/zingolabs/zingo-mobile zingo
-# RUN printf '[net] \ngit-fetch-with-cli = true\n' > /root/.cargo/config.toml
-# RUN cargo fetch --manifest-path /opt/zingo/rust/android/Cargo.toml
-# RUN cargo build --release --manifest-path /opt/zingo/rust/android/Cargo.toml
-# RUN rm -rf /opt/zingo
 
 RUN rustup target install aarch64-linux-android
 RUN echo "[target.aarch64-linux-android]" >> $CARGO_HOME/config.toml
@@ -135,3 +128,23 @@ ENV OPENSSL_STATIC=yes
 # including nightly build to be able to compile -lgcc library
 RUN rustup install nightly-x86_64-unknown-linux-gnu
 RUN rustup component add rust-src --toolchain nightly-x86_64-unknown-linux-gnu
+
+WORKDIR /opt/zingo/rust/android/
+# RUN rustup toolchain install nightly
+# RUN rustup target add x86_64-linux-android
+RUN AR=llvm-ar LD=ld RANLIB=llvm-ranlib CC=x86_64-linux-android30-clang \
+    OPENSSL_DIR=/opt/openssl-3.0.1/x86_64 cargo +nightly build -Z build-std \
+    --target x86_64-linux-android --release
+RUN llvm-strip ../target/x86_64-linux-android/release/librust.so
+RUN AR=llvm-ar LD=ld RANLIB=llvm-ranlib CC=i686-linux-android30-clang \
+    OPENSSL_DIR=/opt/openssl-3.0.1/x86 cargo +nightly build -Z build-std \
+    --target i686-linux-android --release
+RUN llvm-strip ../target/i686-linux-android/release/librust.so
+RUN AR=llvm-ar LD=ld RANLIB=llvm-ranlib CC=armv7a-linux-androideabi30-clang \
+    OPENSSL_DIR=/opt/openssl-3.0.1/armv7 cargo +nightly build -Z build-std \
+    --target armv7-linux-androideabi --release
+RUN llvm-strip ../target/armv7-linux-androideabi/release/librust.so
+RUN AR=llvm-ar LD=ld RANLIB=llvm-ranlib CC=aarch64-linux-android30-clang \
+    OPENSSL_DIR=/opt/openssl-3.0.1/aarch64 cargo +nightly build -Z build-std \
+    --target aarch64-linux-android --release
+RUN llvm-strip ../target/aarch64-linux-android/release/librust.so
