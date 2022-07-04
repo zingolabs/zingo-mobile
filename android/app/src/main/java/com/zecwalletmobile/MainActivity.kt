@@ -1,4 +1,4 @@
-package com.zecwalletmobile
+package com.zingo
 
 import com.facebook.react.ReactActivity
 

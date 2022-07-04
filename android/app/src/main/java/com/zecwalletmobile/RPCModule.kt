@@ -1,4 +1,4 @@
-package com.zecwalletmobile
+package com.zingo
 
 
 import android.content.Context
@@ -59,8 +59,8 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         initlogging()
 
         // Create a seed
-        val seed = initnew(LIGHTWALLETD_URL, 
-            Base64.encodeToString(saplingOutput, Base64.NO_WRAP), 
+        val seed = initnew(LIGHTWALLETD_URL,
+            Base64.encodeToString(saplingOutput, Base64.NO_WRAP),
             Base64.encodeToString(saplingSpend, Base64.NO_WRAP),
             reactContext.applicationContext.filesDir.absolutePath)
         // Log.w("MAIN-Seed", seed)
@@ -85,7 +85,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         saplingSpendFile?.close()
 
         val rseed = initfromseed(LIGHTWALLETD_URL, seed, birthday,
-            Base64.encodeToString(saplingOutput, Base64.NO_WRAP), 
+            Base64.encodeToString(saplingOutput, Base64.NO_WRAP),
             Base64.encodeToString(saplingSpend, Base64.NO_WRAP),
             reactContext.applicationContext.filesDir.absolutePath)
         // Log.w("MAIN", seed)
@@ -113,7 +113,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         saplingSpendFile?.close()
 
         val seed = initfromb64(LIGHTWALLETD_URL, fileb64,
-            Base64.encodeToString(saplingOutput, Base64.NO_WRAP), 
+            Base64.encodeToString(saplingOutput, Base64.NO_WRAP),
             Base64.encodeToString(saplingSpend, Base64.NO_WRAP),
             reactContext.applicationContext.filesDir.absolutePath)
 

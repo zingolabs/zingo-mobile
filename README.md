@@ -14,13 +14,19 @@ Do not use these apps unless you specifically know what you are doing.
 Carefully follow the instructions to [setup Android Studio for your
 operating system](https://reactnative.dev/docs/environment-setup).
 
+If you do not have a physical device, you can create and start
+a new Android 11, API 30 emulator device compatible
+with the chip on your system and start the emulated device.
+
 ### Building
 0. Start docker daemon
 1. AS A NONROOT USER: In the `rust/android` directory, run `./build.sh`.
    This step will take a long time.
 2. From the root of the project, run `yarn install`
 3. Run `npx react-native start` to start the dev server
-4. Run `npx react-native run-android` to compile and install the app on an emulator/connected device. You can also open the `android` directory in Android Studio as a project and hit the run button
+4. Run `npm run android` to compile and install the app on an
+   emulator or connected device. You can also open the `android` directory
+   in Android Studio as a project and hit the run button
 
 ## iOS build instructions
 

@@ -35,12 +35,12 @@ android_library(
 
 android_build_config(
     name = "build_config",
-    package = "com.zecwalletmobile",
+    package = "com.zingo",
 )
 
 android_resource(
     name = "res",
-    package = "com.zecwalletmobile",
+    package = "com.zingo",
     res = "src/main/res",
 )
 
