@@ -2,34 +2,33 @@ FROM debian:bullseye-slim as apt_upgrade_rustndk_image
 
 # Install Android NDK
 RUN apt-get update \
- && apt-get upgrade -y \
- && apt-get install -y --no-install-recommends --no-install-suggests \
-            ca-certificates \
-            gcc \
-            libc6-dev \
-            make \
-            curl \
-            automake \
-            unzip \
-            git \
-            g++-aarch64-linux-gnu \
-            libc6-dev-arm64-cross \
-            protobuf-compiler \
- && update-ca-certificates
+    && apt-get upgrade -y \
+    && apt-get install -y --no-install-recommends --no-install-suggests \
+    ca-certificates \
+    gcc \
+    libc6-dev \
+    make \
+    curl \
+    automake \
+    unzip \
+    git \
+    g++-aarch64-linux-gnu \
+    libc6-dev-arm64-cross \
+    protobuf-compiler \
+    && update-ca-certificates
 
 # Add group
 FROM apt_upgrade_rustndk_image as add_builder_user
 ARG android_ndk_ver=r24
 ARG UID=$UID
 ARG GUID=$GUID
-RUN addgroup --gid $GUID builderuser
 # Add user
 RUN useradd -ms `which bash` --gid $GUID --uid $UID builderuser
 # Install NDK itself
 
 RUN curl -vfL -o /tmp/android-ndk.zip \
-         https://dl.google.com/android/repository/android-ndk-${android_ndk_ver}-linux.zip \
- && unzip /tmp/android-ndk.zip -d /usr/local/
+    https://dl.google.com/android/repository/android-ndk-${android_ndk_ver}-linux.zip \
+    && unzip /tmp/android-ndk.zip -d /usr/local/
 
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs -o ./rustup.sh
 RUN chmod +x ./rustup.sh && ./rustup.sh -y
@@ -41,9 +40,9 @@ RUN rustup toolchain install stable
 
 # Install Rust targets for Android platforms
 RUN rustup target add aarch64-linux-android \
-                      armv7-linux-androideabi \
-                      i686-linux-android \
-                      x86_64-linux-android
+    armv7-linux-androideabi \
+    i686-linux-android \
+    x86_64-linux-android
 
 # Path to the Android NDK for cargo-ndk Cargo plugin
 ENV ANDROID_NDK_HOME=/usr/local/android-ndk-${android_ndk_ver} \
@@ -91,11 +90,14 @@ RUN cd /opt/openssl-3.0.1 && \
     make -j$(nproc) && make -j$(nproc) install && \
     make clean && make distclean
 
-RUN cd /opt && git clone --depth=1 --branch="dev" https://github.com/zingolabs/zingo-mobile zecwalletmobile
-RUN printf '[net] \ngit-fetch-with-cli = true\n' > /root/.cargo/config.toml
-RUN cargo fetch --manifest-path /opt/zecwalletmobile/rust/android/Cargo.toml
-RUN cargo build --release --manifest-path /opt/zecwalletmobile/rust/android/Cargo.toml
-RUN rm -rf /opt/zecwalletmobile
+# # TODO: why do we want to dev branch here instead of the local changes?
+COPY android/ /opt/zingo/rust/android/
+COPY lib/ /opt/zingo/rust/lib/
+COPY Cargo.lock /opt/zingo/rust/Cargo.lock
+COPY Cargo.toml /opt/zingo/rust/Cargo.toml
+COPY ios/ /opt/zingo/rust/ios/
+RUN cargo fetch --manifest-path /opt/zingo/rust/android/Cargo.toml
+RUN cargo build --release --manifest-path /opt/zingo/rust/android/Cargo.toml
 
 RUN rustup target install aarch64-linux-android
 RUN echo "[target.aarch64-linux-android]" >> $CARGO_HOME/config.toml
@@ -126,3 +128,23 @@ ENV OPENSSL_STATIC=yes
 # including nightly build to be able to compile -lgcc library
 RUN rustup install nightly-x86_64-unknown-linux-gnu
 RUN rustup component add rust-src --toolchain nightly-x86_64-unknown-linux-gnu
+
+WORKDIR /opt/zingo/rust/android/
+# RUN rustup toolchain install nightly
+# RUN rustup target add x86_64-linux-android
+RUN AR=llvm-ar LD=ld RANLIB=llvm-ranlib CC=x86_64-linux-android30-clang \
+    OPENSSL_DIR=/opt/openssl-3.0.1/x86_64 cargo +nightly build -Z build-std \
+    --target x86_64-linux-android --release
+RUN llvm-strip ../target/x86_64-linux-android/release/librust.so
+RUN AR=llvm-ar LD=ld RANLIB=llvm-ranlib CC=i686-linux-android30-clang \
+    OPENSSL_DIR=/opt/openssl-3.0.1/x86 cargo +nightly build -Z build-std \
+    --target i686-linux-android --release
+RUN llvm-strip ../target/i686-linux-android/release/librust.so
+RUN AR=llvm-ar LD=ld RANLIB=llvm-ranlib CC=armv7a-linux-androideabi30-clang \
+    OPENSSL_DIR=/opt/openssl-3.0.1/armv7 cargo +nightly build -Z build-std \
+    --target armv7-linux-androideabi --release
+RUN llvm-strip ../target/armv7-linux-androideabi/release/librust.so
+RUN AR=llvm-ar LD=ld RANLIB=llvm-ranlib CC=aarch64-linux-android30-clang \
+    OPENSSL_DIR=/opt/openssl-3.0.1/aarch64 cargo +nightly build -Z build-std \
+    --target aarch64-linux-android --release
+RUN llvm-strip ../target/aarch64-linux-android/release/librust.so

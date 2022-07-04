@@ -133,7 +133,7 @@ android {
     }
 
     defaultConfig {
-        applicationId 'com.ZingoMobile'
+        applicationId 'com.zingo'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 05

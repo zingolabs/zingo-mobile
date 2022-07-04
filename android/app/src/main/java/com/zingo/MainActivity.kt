@@ -1,4 +1,4 @@
-package com.zecwalletmobile
+package com.zingo
 
 import com.facebook.react.ReactActivity
 
@@ -8,6 +8,6 @@ class MainActivity : ReactActivity() {
      * rendering of the component.
      */
     override fun getMainComponentName(): String? {
-        return "ZecwalletMobile"
+        return "ZingoMobile"
     }
 }

@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "2D02E47A1E0B4A5D006451C7"
-               BuildableName = "ZecwalletMobile-tvOS.app"
-               BlueprintName = "ZecwalletMobile-tvOS"
-               ReferencedContainer = "container:ZecwalletMobile.xcodeproj">
+               BuildableName = "ZingoMobile-tvOS.app"
+               BlueprintName = "ZingoMobile-tvOS"
+               ReferencedContainer = "container:ZingoMobile.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "2D02E48F1E0B4A5D006451C7"
-               BuildableName = "ZecwalletMobile-tvOSTests.xctest"
-               BlueprintName = "ZecwalletMobile-tvOSTests"
-               ReferencedContainer = "container:ZecwalletMobile.xcodeproj">
+               BuildableName = "ZingoMobile-tvOSTests.xctest"
+               BlueprintName = "ZingoMobile-tvOSTests"
+               ReferencedContainer = "container:ZingoMobile.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "2D02E47A1E0B4A5D006451C7"
-            BuildableName = "ZecwalletMobile-tvOS.app"
-            BlueprintName = "ZecwalletMobile-tvOS"
-            ReferencedContainer = "container:ZecwalletMobile.xcodeproj">
+            BuildableName = "ZingoMobile-tvOS.app"
+            BlueprintName = "ZingoMobile-tvOS"
+            ReferencedContainer = "container:ZingoMobile.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "2D02E47A1E0B4A5D006451C7"
-            BuildableName = "ZecwalletMobile-tvOS.app"
-            BlueprintName = "ZecwalletMobile-tvOS"
-            ReferencedContainer = "container:ZecwalletMobile.xcodeproj">
+            BuildableName = "ZingoMobile-tvOS.app"
+            BlueprintName = "ZingoMobile-tvOS"
+            ReferencedContainer = "container:ZingoMobile.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

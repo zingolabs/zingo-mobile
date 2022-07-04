@@ -1,4 +1,4 @@
-# Zecwallet Android and iOS apps
+# Zingo Android and iOS apps
 
 **WARNING! These apps are currently experimental!**
 Do not use these apps in production.
@@ -8,15 +8,24 @@ Do not use these apps unless you specifically know what you are doing.
 
 ### Prerequisites
 1. docker (for building the rust library)
-2. `yarn` 
-3. `nodejs` v12
+2. `yarn`
+3. `nodejs`
 
-### Building 
+Carefully follow the instructions to [setup Android Studio for your
+operating system](https://reactnative.dev/docs/environment-setup).
+
+If you do not have a physical device, you can create and start
+a new Android 11, API 30 emulator device compatible
+with the chip on your system and start the emulated device.
+
+### Building
 0. Start docker daemon
-1. AS A NONROOT USER: In the `zecwallet-mobile/rust/android` directory, run `./build.sh`. This step will take a long time
+1. AS A NONROOT USER: In the `rust/android/` directory, run `./build.sh`.
+   This step will take a long time.
 2. From the root of the project, run `yarn install`
-3. Run `npx react-native start` to start the dev server
-4. Run `npx react-native run-android` to compile and install the app on an emulator/connected device. You can also open the `android` directory in Android Studio as a project and hit the run button
+3. Run `npm run android` to compile and install the app on an
+   emulator or connected device. You can also open the `android` directory
+   in Android Studio as a project and hit the run button
 
 ## iOS build instructions
 
@@ -28,8 +37,26 @@ Do not use these apps unless you specifically know what you are doing.
 5. `sudo gem install cocoapods` to install cocoapods
 
 ### Building
-1. In the `zecwallet-mobile/rust/ios` directory, run `./build.sh`. This step will take a long time.
-2. In the `zecwallet-mobile/ios` directory, run `pod install`
+1. In the `./rust/ios` directory, run `./build.sh`.
+   This step will take a long time.
+2. In the `./ios` directory, run `pod install`
 3. From the root of the project, run `yarn install`
 4. Run `npx react-native start` to start the dev server
-5. Run `npx react-native run-ios` to compile and install the app on an emulator/connected device. You can also open the `.xcworkspace` project in XCode and run the app from XCode. 
+5. Run `npm run ios` to install the app on an emulator/connected device.
+   You can also open the `.xcworkspace` project in XCode and run it there.
+
+### Trouble-shooting
+
+```
+** BUILD FAILED **
+
+The following build commands failed:
+	PhaseScriptExecution [CP-User]\ Generate\ Specs /Users/skyl/Library/Developer/Xcode/DerivedData/ZingoMobile-csgvotxsdtutswboneqanoqzmeam/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/FBReactNativeSpec.build/Script-81152550C92182B003B23A679F9D8F2E.sh (in target 'FBReactNativeSpec' from project 'Pods')
+(1 failure)
+```
+
+https://github.com/facebook/react-native/issues/32951
+
+->
+
+`nvm unalias default`

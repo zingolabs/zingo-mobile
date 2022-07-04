@@ -7,13 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		00E356F31AD99517003FC87E /* ZecwalletMobileTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* ZecwalletMobileTests.m */; };
+		00E356F31AD99517003FC87E /* ZingoMobileTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* ZingoMobileTests.m */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		5F9FEE8650525C4AF43859AB /* libPods-ZecwalletMobile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1794449599A63970811D5CF0 /* libPods-ZecwalletMobile.a */; };
+		5F9FEE8650525C4AF43859AB /* libPods-ZingoMobile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1794449599A63970811D5CF0 /* libPods-ZingoMobile.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
-		BEE8CE82BFAC39CF1118356C /* libPods-ZecwalletMobile-ZecwalletMobileTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 57C30AB6DAB41A2ED2699835 /* libPods-ZecwalletMobile-ZecwalletMobileTests.a */; };
+		BEE8CE82BFAC39CF1118356C /* libPods-ZingoMobile-ZingoMobileTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 57C30AB6DAB41A2ED2699835 /* libPods-ZingoMobile-ZingoMobileTests.a */; };
 		DB4DE514264B0EDF0084F17D /* librustios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DB4DE513264B0EBA0084F17D /* librustios.a */; };
 		DB4DE518264B103E0084F17D /* RPCModule.m in Sources */ = {isa = PBXBuildFile; fileRef = DB4DE517264B103E0084F17D /* RPCModule.m */; };
 		DB4DE51B264B10D40084F17D /* saplingspend in Resources */ = {isa = PBXBuildFile; fileRef = DB4DE519264B10D40084F17D /* saplingspend */; };
@@ -26,27 +26,27 @@
 			containerPortal = 83CBB9F71A601CBA00E9B192 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 13B07F861A680F5B00A75B9A;
-			remoteInfo = ZecwalletMobile;
+			remoteInfo = ZingoMobile;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		00C6628EA1AABD9135EC0B2D /* Pods-ZecwalletMobile.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZecwalletMobile.release.xcconfig"; path = "Target Support Files/Pods-ZecwalletMobile/Pods-ZecwalletMobile.release.xcconfig"; sourceTree = "<group>"; };
-		00E356EE1AD99517003FC87E /* ZecwalletMobileTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ZecwalletMobileTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		00C6628EA1AABD9135EC0B2D /* Pods-ZingoMobile.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZingoMobile.release.xcconfig"; path = "Target Support Files/Pods-ZingoMobile/Pods-ZingoMobile.release.xcconfig"; sourceTree = "<group>"; };
+		00E356EE1AD99517003FC87E /* ZingoMobileTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ZingoMobileTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		00E356F21AD99517003FC87E /* ZecwalletMobileTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZecwalletMobileTests.m; sourceTree = "<group>"; };
-		139FC776D22970EDA9C040D6 /* Pods-ZecwalletMobile.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZecwalletMobile.debug.xcconfig"; path = "Target Support Files/Pods-ZecwalletMobile/Pods-ZecwalletMobile.debug.xcconfig"; sourceTree = "<group>"; };
+		00E356F21AD99517003FC87E /* ZingoMobileTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZingoMobileTests.m; sourceTree = "<group>"; };
+		139FC776D22970EDA9C040D6 /* Pods-ZingoMobile.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZingoMobile.debug.xcconfig"; path = "Target Support Files/Pods-ZingoMobile/Pods-ZingoMobile.debug.xcconfig"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* zecwallet DAO.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "zecwallet DAO.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = ZecwalletMobile/AppDelegate.h; sourceTree = "<group>"; };
-		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = ZecwalletMobile/AppDelegate.m; sourceTree = "<group>"; };
-		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = ZecwalletMobile/Images.xcassets; sourceTree = "<group>"; };
-		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = ZecwalletMobile/Info.plist; sourceTree = "<group>"; };
-		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = ZecwalletMobile/main.m; sourceTree = "<group>"; };
-		1794449599A63970811D5CF0 /* libPods-ZecwalletMobile.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ZecwalletMobile.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		57C30AB6DAB41A2ED2699835 /* libPods-ZecwalletMobile-ZecwalletMobileTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ZecwalletMobile-ZecwalletMobileTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		65B24C2E2D48C83D6B5DDF6E /* Pods-ZecwalletMobile-ZecwalletMobileTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZecwalletMobile-ZecwalletMobileTests.debug.xcconfig"; path = "Target Support Files/Pods-ZecwalletMobile-ZecwalletMobileTests/Pods-ZecwalletMobile-ZecwalletMobileTests.debug.xcconfig"; sourceTree = "<group>"; };
-		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = ZecwalletMobile/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		85DB7315AECC5EFD25F9B82E /* Pods-ZecwalletMobile-ZecwalletMobileTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZecwalletMobile-ZecwalletMobileTests.release.xcconfig"; path = "Target Support Files/Pods-ZecwalletMobile-ZecwalletMobileTests/Pods-ZecwalletMobile-ZecwalletMobileTests.release.xcconfig"; sourceTree = "<group>"; };
+		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = ZingoMobile/AppDelegate.h; sourceTree = "<group>"; };
+		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = ZingoMobile/AppDelegate.m; sourceTree = "<group>"; };
+		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = ZingoMobile/Images.xcassets; sourceTree = "<group>"; };
+		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = ZingoMobile/Info.plist; sourceTree = "<group>"; };
+		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = ZingoMobile/main.m; sourceTree = "<group>"; };
+		1794449599A63970811D5CF0 /* libPods-ZingoMobile.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ZingoMobile.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		57C30AB6DAB41A2ED2699835 /* libPods-ZingoMobile-ZingoMobileTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ZingoMobile-ZingoMobileTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		65B24C2E2D48C83D6B5DDF6E /* Pods-ZingoMobile-ZingoMobileTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZingoMobile-ZingoMobileTests.debug.xcconfig"; path = "Target Support Files/Pods-ZingoMobile-ZingoMobileTests/Pods-ZingoMobile-ZingoMobileTests.debug.xcconfig"; sourceTree = "<group>"; };
+		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = ZingoMobile/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		85DB7315AECC5EFD25F9B82E /* Pods-ZingoMobile-ZingoMobileTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZingoMobile-ZingoMobileTests.release.xcconfig"; path = "Target Support Files/Pods-ZingoMobile-ZingoMobileTests/Pods-ZingoMobile-ZingoMobileTests.release.xcconfig"; sourceTree = "<group>"; };
 		DB4DE513264B0EBA0084F17D /* librustios.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = librustios.a; sourceTree = "<group>"; };
 		DB4DE515264B0FE30084F17D /* rust.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rust.h; sourceTree = "<group>"; };
 		DB4DE516264B103E0084F17D /* RPCModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RPCModule.h; sourceTree = "<group>"; };
@@ -61,7 +61,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BEE8CE82BFAC39CF1118356C /* libPods-ZecwalletMobile-ZecwalletMobileTests.a in Frameworks */,
+				BEE8CE82BFAC39CF1118356C /* libPods-ZingoMobile-ZingoMobileTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -69,7 +69,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5F9FEE8650525C4AF43859AB /* libPods-ZecwalletMobile.a in Frameworks */,
+				5F9FEE8650525C4AF43859AB /* libPods-ZingoMobile.a in Frameworks */,
 				DB4DE514264B0EDF0084F17D /* librustios.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -77,13 +77,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		00E356EF1AD99517003FC87E /* ZecwalletMobileTests */ = {
+		00E356EF1AD99517003FC87E /* ZingoMobileTests */ = {
 			isa = PBXGroup;
 			children = (
-				00E356F21AD99517003FC87E /* ZecwalletMobileTests.m */,
+				00E356F21AD99517003FC87E /* ZingoMobileTests.m */,
 				00E356F01AD99517003FC87E /* Supporting Files */,
 			);
-			path = ZecwalletMobileTests;
+			path = ZingoMobileTests;
 			sourceTree = "<group>";
 		};
 		00E356F01AD99517003FC87E /* Supporting Files */ = {
@@ -94,7 +94,7 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		13B07FAE1A68108700A75B9A /* ZecwalletMobile */ = {
+		13B07FAE1A68108700A75B9A /* ZingoMobile */ = {
 			isa = PBXGroup;
 			children = (
 				DB4DE51A264B10D40084F17D /* saplingoutput */,
@@ -108,7 +108,7 @@
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB71A68108700A75B9A /* main.m */,
 			);
-			name = ZecwalletMobile;
+			name = ZingoMobile;
 			sourceTree = "<group>";
 		};
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
@@ -116,8 +116,8 @@
 			children = (
 				DB4DE513264B0EBA0084F17D /* librustios.a */,
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				1794449599A63970811D5CF0 /* libPods-ZecwalletMobile.a */,
-				57C30AB6DAB41A2ED2699835 /* libPods-ZecwalletMobile-ZecwalletMobileTests.a */,
+				1794449599A63970811D5CF0 /* libPods-ZingoMobile.a */,
+				57C30AB6DAB41A2ED2699835 /* libPods-ZingoMobile-ZingoMobileTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -133,9 +133,9 @@
 			isa = PBXGroup;
 			children = (
 				DB4DE515264B0FE30084F17D /* rust.h */,
-				13B07FAE1A68108700A75B9A /* ZecwalletMobile */,
+				13B07FAE1A68108700A75B9A /* ZingoMobile */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
-				00E356EF1AD99517003FC87E /* ZecwalletMobileTests */,
+				00E356EF1AD99517003FC87E /* ZingoMobileTests */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				8BB7EBE9935B479E64CBB9A8 /* Pods */,
@@ -149,7 +149,7 @@
 			isa = PBXGroup;
 			children = (
 				13B07F961A680F5B00A75B9A /* zecwallet DAO.app */,
-				00E356EE1AD99517003FC87E /* ZecwalletMobileTests.xctest */,
+				00E356EE1AD99517003FC87E /* ZingoMobileTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -157,10 +157,10 @@
 		8BB7EBE9935B479E64CBB9A8 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				139FC776D22970EDA9C040D6 /* Pods-ZecwalletMobile.debug.xcconfig */,
-				00C6628EA1AABD9135EC0B2D /* Pods-ZecwalletMobile.release.xcconfig */,
-				65B24C2E2D48C83D6B5DDF6E /* Pods-ZecwalletMobile-ZecwalletMobileTests.debug.xcconfig */,
-				85DB7315AECC5EFD25F9B82E /* Pods-ZecwalletMobile-ZecwalletMobileTests.release.xcconfig */,
+				139FC776D22970EDA9C040D6 /* Pods-ZingoMobile.debug.xcconfig */,
+				00C6628EA1AABD9135EC0B2D /* Pods-ZingoMobile.release.xcconfig */,
+				65B24C2E2D48C83D6B5DDF6E /* Pods-ZingoMobile-ZingoMobileTests.debug.xcconfig */,
+				85DB7315AECC5EFD25F9B82E /* Pods-ZingoMobile-ZingoMobileTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -168,9 +168,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		00E356ED1AD99517003FC87E /* ZecwalletMobileTests */ = {
+		00E356ED1AD99517003FC87E /* ZingoMobileTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "ZecwalletMobileTests" */;
+			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "ZingoMobileTests" */;
 			buildPhases = (
 				79CA5B081E192A5501CD6F98 /* [CP] Check Pods Manifest.lock */,
 				00E356EA1AD99517003FC87E /* Sources */,
@@ -184,14 +184,14 @@
 			dependencies = (
 				00E356F51AD99517003FC87E /* PBXTargetDependency */,
 			);
-			name = ZecwalletMobileTests;
-			productName = ZecwalletMobileTests;
-			productReference = 00E356EE1AD99517003FC87E /* ZecwalletMobileTests.xctest */;
+			name = ZingoMobileTests;
+			productName = ZingoMobileTests;
+			productReference = 00E356EE1AD99517003FC87E /* ZingoMobileTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		13B07F861A680F5B00A75B9A /* ZecwalletMobile */ = {
+		13B07F861A680F5B00A75B9A /* ZingoMobile */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "ZecwalletMobile" */;
+			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "ZingoMobile" */;
 			buildPhases = (
 				2C17B0B3DDB4B24705C85EF5 /* [CP] Check Pods Manifest.lock */,
 				FD10A7F022414F080027D42C /* Start Packager */,
@@ -206,8 +206,8 @@
 			);
 			dependencies = (
 			);
-			name = ZecwalletMobile;
-			productName = ZecwalletMobile;
+			name = ZingoMobile;
+			productName = ZingoMobile;
 			productReference = 13B07F961A680F5B00A75B9A /* zecwallet DAO.app */;
 			productType = "com.apple.product-type.application";
 		};
@@ -228,7 +228,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "ZecwalletMobile" */;
+			buildConfigurationList = 83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "ZingoMobile" */;
 			compatibilityVersion = "Xcode 12.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -241,8 +241,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				13B07F861A680F5B00A75B9A /* ZecwalletMobile */,
-				00E356ED1AD99517003FC87E /* ZecwalletMobileTests */,
+				13B07F861A680F5B00A75B9A /* ZingoMobile */,
+				00E356ED1AD99517003FC87E /* ZingoMobileTests */,
 			);
 		};
 /* End PBXProject section */
@@ -289,15 +289,15 @@
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ZecwalletMobile-ZecwalletMobileTests/Pods-ZecwalletMobile-ZecwalletMobileTests-resources-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-ZingoMobile-ZingoMobileTests/Pods-ZingoMobile-ZingoMobileTests-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ZecwalletMobile-ZecwalletMobileTests/Pods-ZecwalletMobile-ZecwalletMobileTests-resources-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-ZingoMobile-ZingoMobileTests/Pods-ZingoMobile-ZingoMobileTests-resources-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ZecwalletMobile-ZecwalletMobileTests/Pods-ZecwalletMobile-ZecwalletMobileTests-resources.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ZingoMobile-ZingoMobileTests/Pods-ZingoMobile-ZingoMobileTests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		2C17B0B3DDB4B24705C85EF5 /* [CP] Check Pods Manifest.lock */ = {
@@ -315,7 +315,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-ZecwalletMobile-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-ZingoMobile-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -337,7 +337,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-ZecwalletMobile-ZecwalletMobileTests-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-ZingoMobile-ZingoMobileTests-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -350,15 +350,15 @@
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ZecwalletMobile/Pods-ZecwalletMobile-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-ZingoMobile/Pods-ZingoMobile-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ZecwalletMobile/Pods-ZecwalletMobile-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-ZingoMobile/Pods-ZingoMobile-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ZecwalletMobile/Pods-ZecwalletMobile-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ZingoMobile/Pods-ZingoMobile-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		AD8490F36A95467C39CED80F /* [CP] Copy Pods Resources */ = {
@@ -367,15 +367,15 @@
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ZecwalletMobile/Pods-ZecwalletMobile-resources-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-ZingoMobile/Pods-ZingoMobile-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ZecwalletMobile/Pods-ZecwalletMobile-resources-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-ZingoMobile/Pods-ZingoMobile-resources-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ZecwalletMobile/Pods-ZecwalletMobile-resources.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ZingoMobile/Pods-ZingoMobile-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		D71B45E3AF6B2B6705D3DE3C /* [CP] Embed Pods Frameworks */ = {
@@ -384,15 +384,15 @@
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ZecwalletMobile-ZecwalletMobileTests/Pods-ZecwalletMobile-ZecwalletMobileTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-ZingoMobile-ZingoMobileTests/Pods-ZingoMobile-ZingoMobileTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ZecwalletMobile-ZecwalletMobileTests/Pods-ZecwalletMobile-ZecwalletMobileTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-ZingoMobile-ZingoMobileTests/Pods-ZingoMobile-ZingoMobileTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ZecwalletMobile-ZecwalletMobileTests/Pods-ZecwalletMobile-ZecwalletMobileTests-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ZingoMobile-ZingoMobileTests/Pods-ZingoMobile-ZingoMobileTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		FD10A7F022414F080027D42C /* Start Packager */ = {
@@ -421,7 +421,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				00E356F31AD99517003FC87E /* ZecwalletMobileTests.m in Sources */,
+				00E356F31AD99517003FC87E /* ZingoMobileTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -440,7 +440,7 @@
 /* Begin PBXTargetDependency section */
 		00E356F51AD99517003FC87E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 13B07F861A680F5B00A75B9A /* ZecwalletMobile */;
+			target = 13B07F861A680F5B00A75B9A /* ZingoMobile */;
 			targetProxy = 00E356F41AD99517003FC87E /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -448,7 +448,7 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 65B24C2E2D48C83D6B5DDF6E /* Pods-ZecwalletMobile-ZecwalletMobileTests.debug.xcconfig */;
+			baseConfigurationReference = 65B24C2E2D48C83D6B5DDF6E /* Pods-ZingoMobile-ZingoMobileTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				DEVELOPMENT_TEAM = Z89CFRJ62L;
@@ -456,7 +456,7 @@
 					"DEBUG=1",
 					"$(inherited)",
 				);
-				INFOPLIST_FILE = ZecwalletMobileTests/Info.plist;
+				INFOPLIST_FILE = ZingoMobileTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -470,18 +470,18 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ZecwalletMobile.app/ZecwalletMobile";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ZingoMobile.app/ZingoMobile";
 			};
 			name = Debug;
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 85DB7315AECC5EFD25F9B82E /* Pods-ZecwalletMobile-ZecwalletMobileTests.release.xcconfig */;
+			baseConfigurationReference = 85DB7315AECC5EFD25F9B82E /* Pods-ZingoMobile-ZingoMobileTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
 				DEVELOPMENT_TEAM = Z89CFRJ62L;
-				INFOPLIST_FILE = ZecwalletMobileTests/Info.plist;
+				INFOPLIST_FILE = ZingoMobileTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -495,20 +495,20 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ZecwalletMobile.app/ZecwalletMobile";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ZingoMobile.app/ZingoMobile";
 			};
 			name = Release;
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 139FC776D22970EDA9C040D6 /* Pods-ZecwalletMobile.debug.xcconfig */;
+			baseConfigurationReference = 139FC776D22970EDA9C040D6 /* Pods-ZingoMobile.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 01;
 				DEVELOPMENT_TEAM = Z89CFRJ62L;
 				ENABLE_BITCODE = NO;
-				INFOPLIST_FILE = ZecwalletMobile/Info.plist;
+				INFOPLIST_FILE = ZingoMobile/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -524,7 +524,7 @@
 					"-lc++",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = app.zecwalletdao.zecwalletdao;
-				PRODUCT_NAME = "Zingo";
+				PRODUCT_NAME = Zingo;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -534,13 +534,13 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 00C6628EA1AABD9135EC0B2D /* Pods-ZecwalletMobile.release.xcconfig */;
+			baseConfigurationReference = 00C6628EA1AABD9135EC0B2D /* Pods-ZingoMobile.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 01;
 				DEVELOPMENT_TEAM = Z89CFRJ62L;
-				INFOPLIST_FILE = ZecwalletMobile/Info.plist;
+				INFOPLIST_FILE = ZingoMobile/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -556,7 +556,7 @@
 					"-lc++",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = app.zecwalletdao.zecwalletdao;
-				PRODUCT_NAME = "Zingo";
+				PRODUCT_NAME = Zingo;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
@@ -689,7 +689,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "ZecwalletMobileTests" */ = {
+		00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "ZingoMobileTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				00E356F61AD99517003FC87E /* Debug */,
@@ -698,7 +698,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "ZecwalletMobile" */ = {
+		13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "ZingoMobile" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				13B07F941A680F5B00A75B9A /* Debug */,
@@ -707,7 +707,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "ZecwalletMobile" */ = {
+		83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "ZingoMobile" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				83CBBA201A601CBA00E9B192 /* Debug */,
