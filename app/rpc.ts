@@ -375,7 +375,7 @@ export default class RPC {
     const allOAddresses =       aJSON.o_addresses.map((o: any) => o);
     const allZAddresses = balanceJSON.z_addresses.map((o: any) => o.address);
     const allTAddresses = balanceJSON.t_addresses.map((o: any) => o.address);
-    const allAddresses = allZAddresses.concat(allTAddresses.concat(allOAddresses));
+    const allAddresses = [...allZAddresses, ...allTAddresses, ...allOAddresses];
 
     // console.log(`All addresses: ${allAddresses}`);
 
