@@ -36,6 +36,13 @@ export default class Utils {
     return new RegExp('^t[a-zA-Z0-9]{34}$').test(addr);
   }
 
+  static isOrchard(addr: string): boolean {
+    if (!addr) {
+      return false;
+    }
+    return new RegExp('^u[a-z0-9]{105}$').test(addr) || new RegExp('^utest[a-z0-9]{105}$').test(addr) ;
+  }
+
   static trimToSmall(addr?: string, numChars?: number): string | undefined {
     const trimSize = numChars || 5;
     if (!addr) {

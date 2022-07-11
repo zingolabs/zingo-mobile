@@ -130,20 +130,6 @@ exports[`Component PrivKeyModal - test PrivKeyModal - snapshot 1`] = `
         >
           <mockQRCode />
         </View>
-        <Text
-          style={
-            Object {
-              "color": "rgb(28, 28, 30)",
-              "flexBasis": "100%",
-              "fontFamily": "Courier",
-              "fontSize": 18,
-              "opacity": 0.65,
-              "textAlign": "center",
-            }
-          }
-        >
-          
-        </Text>
         <View
           accessible={true}
           focusable={true}
@@ -164,7 +150,7 @@ exports[`Component PrivKeyModal - test PrivKeyModal - snapshot 1`] = `
             style={
               Object {
                 "color": "rgb(28, 28, 30)",
-                "marginTop": 10,
+                "marginBottom": 5,
                 "textDecorationLine": "underline",
               }
             }
@@ -172,6 +158,20 @@ exports[`Component PrivKeyModal - test PrivKeyModal - snapshot 1`] = `
             Tap To Copy
           </Text>
         </View>
+        <Text
+          style={
+            Object {
+              "color": "rgb(28, 28, 30)",
+              "flexBasis": "100%",
+              "fontFamily": "Courier",
+              "fontSize": 18,
+              "opacity": 0.65,
+              "textAlign": "center",
+            }
+          }
+        >
+          
+        </Text>
       </View>
     </View>
   </RCTScrollView>
