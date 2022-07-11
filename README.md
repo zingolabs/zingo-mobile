@@ -23,7 +23,7 @@ with the chip on your system and start the emulated device.
 1. AS A NONROOT USER: In the `rust/` directory, run `./build.sh`.
    This step will take a long time.
 2. From the root of the project, run `yarn install`
-3. Run `npm run android` to compile and install the app on an
+3. Run `yarn run android` to compile and install the app on an
    emulator or connected device. You can also open the `android` directory
    in Android Studio as a project and hit the run button
 
@@ -41,8 +41,8 @@ with the chip on your system and start the emulated device.
    This step will take a long time.
 2. In the `./ios` directory, run `pod install`
 3. From the root of the project, run `yarn install`
-4. Run `npx react-native start` to start the dev server
-5. Run `npm run ios` to install the app on an emulator/connected device.
+4. Run `yarn react-native start` to start the dev server
+5. Run `yarn run ios` to install the app on an emulator/connected device.
    You can also open the `.xcworkspace` project in XCode and run it there.
 
 For notes on known issues and problems,
