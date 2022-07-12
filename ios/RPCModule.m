@@ -28,7 +28,7 @@ RCT_REMAP_METHOD(walletExists,
   NSString *documentsDirectory = [paths objectAtIndex:0];
 
   // Write to user's documents app directory
-  NSString *fileName = [NSString stringWithFormat:@"%@/zecwallet-lite.dat.txt",
+  NSString *fileName = [NSString stringWithFormat:@"%@/zingo-wallet.dat.txt",
                                                 documentsDirectory];
   BOOL fileExists = [[NSFileManager defaultManager] fileExistsAtPath:fileName];
   RCTLogInfo(@"Wallet exists: %d", (int)fileExists);
@@ -47,7 +47,7 @@ RCT_REMAP_METHOD(walletExists,
   NSString *documentsDirectory = [paths objectAtIndex:0];
 
   // Write to user's documents app directory
-  NSString *fileName = [NSString stringWithFormat:@"%@/zecwallet-lite.dat.txt",
+  NSString *fileName = [NSString stringWithFormat:@"%@/zingo-wallet.dat.txt",
                                                 documentsDirectory];
   [data writeToFile:fileName atomically:YES encoding:NSUTF8StringEncoding error:nil];
 
@@ -61,7 +61,7 @@ RCT_REMAP_METHOD(walletExists,
   NSString *documentsDirectory = [paths objectAtIndex:0];
 
   //make a file name to write the data to using the documents directory:
-  NSString *fileName = [NSString stringWithFormat:@"%@/zecwallet-lite.dat.txt",
+  NSString *fileName = [NSString stringWithFormat:@"%@/zingo-wallet.dat.txt",
                                                 documentsDirectory];
   NSString *content = [[NSString alloc] initWithContentsOfFile:fileName
                                                 usedEncoding:nil
@@ -82,7 +82,7 @@ RCT_REMAP_METHOD(deleteExistingWallet,
   NSString *documentsDirectory = [paths objectAtIndex:0];
 
   //make a file name to write the data to using the documents directory:
-  NSString *fileName = [NSString stringWithFormat:@"%@/zecwallet-lite.dat.txt",
+  NSString *fileName = [NSString stringWithFormat:@"%@/zingo-wallet.dat.txt",
                                                 documentsDirectory];
   // Delete the file
   [[NSFileManager defaultManager] removeItemAtPath:fileName error:nil];
