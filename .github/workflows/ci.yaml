@@ -1,3 +1,22 @@
+name: build
+
+on:
+  pull_request:
+    branches:
+      - dev
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-22.04]
+
+    steps:
+      - name:                   Checkout repository
+        uses:                   actions/checkout@v2
+
 name: yarn
 
 on: [pull_request]
