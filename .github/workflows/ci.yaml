@@ -1,4 +1,4 @@
-name: build
+name: buildndk
 
 on:
   pull_request:
@@ -14,8 +14,9 @@ jobs:
         os: [ubuntu-latest]
 
     steps:
-      - name:                   Checkout repository
-        uses:                   actions/checkout@v2
+      - name: build ndk
+        uses: actions/checkout@v3
+      - run:  cd rust && ./build.sh
 
   yarn_tests:
     runs-on: ubuntu-latest
