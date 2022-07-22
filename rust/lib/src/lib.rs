@@ -23,16 +23,20 @@ pub fn init_new(
     data_dir: String,
 ) -> String {
     let server = ZingoConfig::get_server_or_default(Some(server_uri));
-    let (mut config, latest_block_height) = match zingolib::create_on_data_dir(server, None) {
-        Ok((c, h)) => (c, h),
-        Err(e) => {
-            return format!("Error: {}", e);
-        }
-    };
+    let (mut config, latest_block_height) =
+        match zingolib::create_on_data_dir(server, None) {
+            Ok((c, h)) => (c, h),
+            Err(e) => {
+                return format!("Error: {}", e);
+            }
+        };
 
     config.set_data_dir(data_dir);
 
-    let lightclient = match LightClient::new(&config, latest_block_height.saturating_sub(100)) {
+    let lightclient = match LightClient::new(
+        &config,
+        latest_block_height.saturating_sub(100),
+    ) {
         Ok(mut l) => {
             match l.set_sapling_params(
                 &decode(&sapling_output_b64).unwrap(),
@@ -71,29 +75,31 @@ pub fn init_from_seed(
     data_dir: String,
 ) -> String {
     let server = ZingoConfig::get_server_or_default(Some(server_uri));
-    let (mut config, _latest_block_height) = match zingolib::create_on_data_dir(server, None) {
-        Ok((c, h)) => (c, h),
-        Err(e) => {
-            return format!("Error: {}", e);
-        }
-    };
+    let (mut config, _latest_block_height) =
+        match zingolib::create_on_data_dir(server, None) {
+            Ok((c, h)) => (c, h),
+            Err(e) => {
+                return format!("Error: {}", e);
+            }
+        };
 
     config.set_data_dir(data_dir);
 
-    let lightclient = match LightClient::new_from_phrase(seed, &config, birthday, false) {
-        Ok(mut l) => {
-            match l.set_sapling_params(
-                &decode(&sapling_output_b64).unwrap(),
-                &decode(&sapling_spend_b64).unwrap(),
-            ) {
-                Ok(_) => l,
-                Err(e) => return format!("Error: {}", e),
+    let lightclient =
+        match LightClient::new_from_phrase(seed, &config, birthday, false) {
+            Ok(mut l) => {
+                match l.set_sapling_params(
+                    &decode(&sapling_output_b64).unwrap(),
+                    &decode(&sapling_spend_b64).unwrap(),
+                ) {
+                    Ok(_) => l,
+                    Err(e) => return format!("Error: {}", e),
+                }
             }
-        }
-        Err(e) => {
-            return format!("Error: {}", e);
-        }
-    };
+            Err(e) => {
+                return format!("Error: {}", e);
+            }
+        };
 
     let seed = match lightclient.do_seed_phrase_sync() {
         Ok(s) => s.dump(),
@@ -118,12 +124,13 @@ pub fn init_from_b64(
     data_dir: String,
 ) -> String {
     let server = ZingoConfig::get_server_or_default(Some(server_uri));
-    let (mut config, _latest_block_height) = match zingolib::create_on_data_dir(server, None) {
-        Ok((c, h)) => (c, h),
-        Err(e) => {
-            return format!("Error: {}", e);
-        }
-    };
+    let (mut config, _latest_block_height) =
+        match zingolib::create_on_data_dir(server, None) {
+            Ok((c, h)) => (c, h),
+            Err(e) => {
+                return format!("Error: {}", e);
+            }
+        };
 
     config.set_data_dir(data_dir);
 
@@ -134,20 +141,21 @@ pub fn init_from_b64(
         }
     };
 
-    let lightclient = match LightClient::read_from_buffer(&config, &decoded_bytes[..]) {
-        Ok(mut l) => {
-            match l.set_sapling_params(
-                &decode(&sapling_output_b64).unwrap(),
-                &decode(&sapling_spend_b64).unwrap(),
-            ) {
-                Ok(_) => l,
-                Err(e) => return format!("Error: {}", e),
+    let lightclient =
+        match LightClient::read_from_buffer(&config, &decoded_bytes[..]) {
+            Ok(mut l) => {
+                match l.set_sapling_params(
+                    &decode(&sapling_output_b64).unwrap(),
+                    &decode(&sapling_spend_b64).unwrap(),
+                ) {
+                    Ok(_) => l,
+                    Err(e) => return format!("Error: {}", e),
+                }
             }
-        }
-        Err(e) => {
-            return format!("Error: {}", e);
-        }
-    };
+            Err(e) => {
+                return format!("Error: {}", e);
+            }
+        };
 
     let seed = match lightclient.do_seed_phrase_sync() {
         Ok(s) => s.dump(),
@@ -185,8 +193,29 @@ pub fn save_to_b64() -> String {
     }
 }
 
+fn set_server(server: String) -> String {
+    if let Some(server) = server.try_into().ok() {
+        if let Ok(mut lc) = LIGHTCLIENT.lock() {
+            if let Some(lc) = &mut lc.get_mut() {
+                Arc::get_mut(lc).unwrap().set_server(server);
+                "server set"
+            } else {
+                "can't get arc"
+            }
+        } else {
+            "can't get mutex"
+        }
+    } else {
+        "bad server uri"
+    }
+    .to_string()
+}
+
 pub fn execute(cmd: String, args_list: String) -> String {
     let resp: String;
+    if cmd == String::from("changeserver") {
+        return set_server(args_list);
+    }
     {
         let lightclient: Arc<LightClient>;
         {
@@ -204,7 +233,8 @@ pub fn execute(cmd: String, args_list: String) -> String {
         } else {
             vec![args_list.as_ref()]
         };
-        resp = commands::do_user_command(&cmd, &args, lightclient.as_ref()).clone();
+        resp = commands::do_user_command(&cmd, &args, lightclient.as_ref())
+            .clone();
     };
 
     resp
