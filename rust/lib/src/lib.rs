@@ -197,26 +197,31 @@ fn set_server(server: String) -> String {
     if let Some(server) = server.try_into().ok() {
         if let Ok(mut lc) = LIGHTCLIENT.lock() {
             if let Some(lc) = &mut lc.get_mut() {
-                Arc::get_mut(lc).unwrap().set_server(server);
-                "server set"
+                if let Some(lc) = Arc::get_mut(lc) {
+                    lc.set_server(server);
+                    "server set".to_string()
+                } else {
+                    format!(
+                        "Can't mutate inside arc, strong-count is {}",
+                        Arc::strong_count(lc)
+                    )
+                }
             } else {
-                "can't get arc"
+                "can't get arc".to_string()
             }
         } else {
-            "can't get mutex"
+            "can't get mutex".to_string()
         }
     } else {
-        "bad server uri"
+        "bad server uri".to_string()
     }
-    .to_string()
 }
 
 pub fn execute(cmd: String, args_list: String) -> String {
     let resp: String;
     if cmd == String::from("changeserver") {
         return set_server(args_list);
-    }
-    {
+    } else {
         let lightclient: Arc<LightClient>;
         {
             let lc = LIGHTCLIENT.lock().unwrap();
