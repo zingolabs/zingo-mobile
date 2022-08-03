@@ -707,15 +707,14 @@ export default class RPC {
   }
 
   async getZecPrice() {
-    const resultStr: string = await RPCModule.execute('zecprice', '');
+    const resultStr: string = await RPCModule.execute('updatecurrentprice', '');
     if (resultStr.toLowerCase().startsWith('error')) {
       //console.log(`Error fetching price ${resultStr}`);
       return;
     }
 
-    const resultJSON = JSON.parse(resultStr);
-    if (resultJSON.zec_price) {
-      this.fnSetZecPrice(resultJSON.zec_price);
+    if (resultStr) {
+      this.fnSetZecPrice(parseFloat(resultStr));
     }
   }
 }
