@@ -1,11 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import {View, ScrollView, SafeAreaView, Image, Text} from 'react-native';
-import {RegText, FadeText} from './Components';
+import {RegText, FadeText, ZecAmount, UsdAmount, zecPrice} from './Components';
 import Button from './Button';
 import {useTheme} from '@react-navigation/native';
 import {Info} from '../app/AppState';
 import Utils from '../app/utils';
+import RPC from '../app/rpc'
 
 type DetailLineProps = {
   label: string;
@@ -15,7 +16,7 @@ const DetailLine: React.FunctionComponent<DetailLineProps> = ({label, value}) =>
   return (
     <View style={{display: 'flex', marginTop: 20}}>
       <FadeText>{label}</FadeText>
-      <RegText>{value}</RegText>
+      <RegText color="#777777">{value}</RegText>
     </View>
   );
 };
@@ -25,10 +26,21 @@ type InfoModalProps = {
   closeModal: () => void;
 };
 
-const InfoModal: React.FunctionComponent<InfoModalProps> = ({info, closeModal}) => {
+const InfoModal: React.FunctionComponent<InfoModalProps> = ({info, closeModal, totalBalance}) => {
   const {colors} = useTheme();
-  const height = info?.latestBlock;
-  const price = info?.zecPrice ? `$ ${Utils.toLocaleFloat(info?.zecPrice?.toFixed(2))}` : '-';
+  const [infoState, setInfoState] = React.useState({});
+
+  React.useEffect(() => {
+    (async () => {
+      const infoNew = await RPC.getInfoObject();
+
+      //console.log('info', infoNew);
+
+      if (infoNew) {
+        setInfoState(infoNew);
+      }
+    })();
+  }, [info])
 
   return (
     <SafeAreaView
@@ -46,26 +58,26 @@ const InfoModal: React.FunctionComponent<InfoModalProps> = ({info, closeModal}) 
           alignItems: 'stretch',
           justifyContent: 'flex-start',
         }}>
+        <View
+          style={{display: 'flex', alignItems: 'center', paddingBottom: 25, backgroundColor: colors.card, zIndex: -1}}>
+          <RegText color={'#ffffff'} style={{marginTop: 5, padding: 5}}>Server Info</RegText>
+          <ZecAmount size={36} amtZec={totalBalance.total} style={{opacity: 0.2}} />
+        </View>
         <View>
-          <View style={{alignItems: 'center', backgroundColor: colors.card, paddingBottom: 25}}>
-            <Text style={{marginTop: 5, padding: 5, color: colors.text, fontSize: 28}}>Server Info</Text>
-          </View>
-          <View style={{display: 'flex', alignItems: 'center', marginTop: -25}}>
-            <Image
-              source={require('../assets/img/logobig-zingo.png')}
-              style={{width: 50, height: 50, resizeMode: 'contain'}}
-            />
+          <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: -30}}>
+            <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 50, height: 50, resizeMode: 'contain'}} />
+            <Text style={{ color: '#777777', fontSize: 40, fontWeight: 'bold' }}> ZingoZcash</Text>
           </View>
         </View>
 
-        <View style={{display: 'flex', margin: 10}}>
-          <DetailLine label="Version" value="Zingo v0.0.1" />
-          <DetailLine label="Server Version" value={info?.version} />
-          <DetailLine label="Lightwallet Server URL" value={info?.serverUri} />
-          <DetailLine label="Network" value={info?.testnet ? 'Testnet' : 'Mainnet'} />
-          <DetailLine label="Server Block Height" value={height} />
+        <View style={{display: 'flex', margin: 20}}>
+          <DetailLine label="Version" value="ZingoZcash v0.0.1" />
+          <DetailLine label="Server Version" value={infoState.version ? infoState.version : '...loading...'} />
+          <DetailLine label="Lightwallet Server URL" value={infoState.serverUri ? infoState.serverUri : '...loading...'} />
+          <DetailLine label="Network" value={infoState.testnet === undefined ? '...loading...' : infoState.testnet ? 'Testnet' : 'Mainnet'} />
+          <DetailLine label="Server Block Height" value={info?.latestBlock} />
           {/* <DetailLine label="Wallet Block Height" value={walletHeight} /> */}
-          <DetailLine label="ZEC Price" value={price} />
+          <DetailLine label="ZEC Price" value={info?.zecPrice ? `$ ${Utils.toLocaleFloat(info?.zecPrice?.toFixed(2))}` : '-'} />
         </View>
       </ScrollView>
 

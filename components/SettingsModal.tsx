@@ -1,7 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import {View, ScrollView, SafeAreaView, Image, Text, TouchableOpacity} from 'react-native';
-import {RegText, FadeText, BoldText} from './Components';
+import {RegText, FadeText, BoldText, RegTextInput, ZecAmount, UsdAmount, zecPrice} from './Components';
+import { parseServerURI, SERVER_URI, MEMOS } from '../app/uris';
 import Button from './Button';
 import {useTheme} from '@react-navigation/native';
 import {WalletSettings} from '../app/AppState';
@@ -19,13 +20,51 @@ type SettingsModalProps = {
 const SettingsModal: React.FunctionComponent<SettingsModalProps> = ({
   wallet_settings,
   set_wallet_option,
+  set_server_option,
   closeModal,
+  totalBalance,
 }) => {
   const {colors} = useTheme();
 
-  const noneIcon = wallet_settings.download_memos === 'none' ? faDotCircle : farCircle;
-  const walletIcon = wallet_settings.download_memos === 'wallet' ? faDotCircle : farCircle;
-  const allIcon = wallet_settings.download_memos === 'all' ? faDotCircle : farCircle;
+  const [memos, setMemos] = React.useState(wallet_settings.download_memos);
+  const [server, setServer] = React.useState(wallet_settings.server);
+  const [error, setError] = React.useState(null);
+
+  const [customIcon, setCustomIcon] = React.useState(null);
+
+  React.useEffect(() => {
+    setCustomIcon((SERVER_URI.find(s => s === server)) ? farCircle : faDotCircle);
+  }, [wallet_settings, memos, server]);
+
+  const saveSettings = async () => {
+    if (!memos) {
+      setError('You need to choose the download memos option to save.');
+      setTimeout(() => {
+        setError(null);
+      }, 5000);
+      return;
+    }
+    if (!server) {
+      setError('You need to choose one Server of the list or fill out a valid Server URI.');
+      setTimeout(() => {
+        setError(null);
+      }, 5000);
+      return;
+    }
+    const result = parseServerURI(server);
+    if (result.toLowerCase().startsWith('error')) {
+      setError('You need to fill out a valid Server URI.');
+      setTimeout(() => {
+        setError(null);
+      }, 5000);
+      return;
+    }
+
+    set_wallet_option('download_memos', memos);
+    set_server_option(server);
+
+    closeModal();
+  }
 
   return (
     <SafeAreaView
@@ -43,64 +82,97 @@ const SettingsModal: React.FunctionComponent<SettingsModalProps> = ({
           alignItems: 'stretch',
           justifyContent: 'flex-start',
         }}>
+        <View
+          style={{display: 'flex', alignItems: 'center', paddingBottom: 25, backgroundColor: colors.card, zIndex: -1}}>
+          <RegText color={'#ffffff'} style={{marginTop: 5, padding: 5}}>Settings</RegText>
+          <ZecAmount size={36} amtZec={totalBalance.total} style={{opacity: 0.2}} />
+        </View>
         <View>
-          <View style={{alignItems: 'center', backgroundColor: colors.card, paddingBottom: 25}}>
-            <Text style={{marginTop: 5, padding: 5, color: colors.text, fontSize: 28}}>Wallet Settings</Text>
+          <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: -30}}>
+            <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 50, height: 50, resizeMode: 'contain'}} />
+            <Text style={{ color: '#777777', fontSize: 40, fontWeight: 'bold' }}> ZingoZcash</Text>
           </View>
-          <View style={{display: 'flex', alignItems: 'center', marginTop: -25}}>
-            <Image
-              source={require('../assets/img/logobig-zingo.png')}
-              style={{width: 50, height: 50, resizeMode: 'contain'}}
+        </View>
+
+        <View style={{display: 'flex', margin: 10}}>
+          <BoldText>SERVER</BoldText>
+        </View>
+
+        <View style={{display: 'flex', marginLeft: 25}}>
+          {SERVER_URI.map((uri) => (
+            <TouchableOpacity
+              key={'touch-' + uri}
+              style={{marginRight: 10, marginBottom: 5}}
+              onPress={() => setServer(uri)}>
+              <View key={'view-' + uri} style={{display: 'flex', flexDirection: 'row', marginTop: 10}}>
+                <FontAwesomeIcon key={'icon-' + uri} icon={uri === server ? faDotCircle : farCircle} size={20} color={'#777777'} />
+                <RegText key={'tex-' + uri} style={{marginLeft: 10}}>{uri}</RegText>
+              </View>
+            </TouchableOpacity>
+          ))}
+
+          <View style={{display: 'flex', flexDirection: 'row'}}>
+            <TouchableOpacity
+              style={{marginRight: 10, marginBottom: 5}}
+              onPress={() => setServer(null)}>
+              <View style={{display: 'flex', flexDirection: 'row', marginTop: 10}}>
+                {customIcon && (<FontAwesomeIcon icon={customIcon} size={20} color={'#777777'} />)}
+                <RegText style={{marginLeft: 10}}>custom</RegText>
+              </View>
+            </TouchableOpacity>
+
+            <RegTextInput
+              placeholder={'... http------.---:--- ...'}
+              placeholderTextColor="#777777"
+              style={{
+                //flexGrow: 1,
+                fontSize: 18,
+                width: '60%',
+                borderBottomColor: colors.card,
+                borderBottomWidth: 2,
+                marginLeft: 5,
+                marginTop: Platform.OS === 'ios' ? 15 : 3,
+                display: customIcon === faDotCircle ? 'flex' : 'none',
+              }}
+              value={server}
+              onChangeText={(text: string) => setServer(text)}
             />
           </View>
         </View>
 
-        <View style={{display: 'flex', margin: 20}}>
+        <View style={{display: 'flex', margin: 10}}>
           <BoldText>MEMO DOWNLOAD</BoldText>
         </View>
 
-        <View style={{display: 'flex', marginLeft: 20}}>
-          <TouchableOpacity
-            style={{marginRight: 10, marginBottom: 10}}
-            onPress={() => set_wallet_option('download_memos', 'none')}>
-            <View style={{display: 'flex', flexDirection: 'row', marginTop: 20}}>
-              <FontAwesomeIcon icon={noneIcon} size={20} color={'#ffffff'} />
-              <RegText style={{marginLeft: 10}}>None</RegText>
-            </View>
-          </TouchableOpacity>
-          <FadeText>Don't download any memos. Server will not learn what transactions belong to you.</FadeText>
+        <View style={{display: 'flex', marginLeft: 25}}>
 
-          <TouchableOpacity
-            style={{marginRight: 10, marginBottom: 10}}
-            onPress={() => set_wallet_option('download_memos', 'wallet')}>
-            <View style={{display: 'flex', flexDirection: 'row', marginTop: 20}}>
-              <FontAwesomeIcon icon={walletIcon} size={20} color={'#ffffff'} />
-              <RegText style={{marginLeft: 10}}>Wallet</RegText>
-            </View>
-          </TouchableOpacity>
+          {MEMOS.map((memo) => (
+            <>
+              <TouchableOpacity
+                key={'touch-' + memo.value}
+                style={{marginRight: 10, marginBottom: 5}}
+                onPress={() => setMemos(memo.value)}>
+                <View key={'view-' + memo.value} style={{display: 'flex', flexDirection: 'row', marginTop: 10}}>
+                  <FontAwesomeIcon key={'icon-' + memo.value} icon={memo.value === memos ? faDotCircle : farCircle} size={20} color={'#777777'} />
+                  <RegText key={'text-' + memo.value} style={{marginLeft: 10}}>{memo.value}</RegText>
+                </View>
+              </TouchableOpacity>
+              <FadeText key={'fade-' + memo.value}>{memo.text}</FadeText>
+            </>
+          ))}
 
-          <FadeText>
-            Download only my memos. Server will learn what TxIDs belong to you, but can't see the addresses, amounts or
-            memos
-          </FadeText>
-
-          <TouchableOpacity
-            style={{marginRight: 10, marginBottom: 10}}
-            onPress={() => set_wallet_option('download_memos', 'all')}>
-            <View style={{display: 'flex', flexDirection: 'row', marginTop: 20}}>
-              <FontAwesomeIcon icon={allIcon} size={20} color={'#ffffff'} />
-              <RegText style={{marginLeft: 10}}>All</RegText>
-            </View>
-          </TouchableOpacity>
-          <FadeText>
-            Download all memos in the blockchain. Server will not learn what TxIDs belong to you. This consumes A LOT of
-            bandwidth.
-          </FadeText>
         </View>
+
       </ScrollView>
 
-      <View style={{flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', margin: 20}}>
-        <Button type="Secondary" title="Close" style={{marginLeft: 10}} onPress={closeModal} />
+      <View style={{flexGrow: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', margin: 20}}>
+        {error && (
+          <FadeText style={{ color: colors.primary }}>{error}</FadeText>
+        )}
+        <View style={{flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 5}}>
+          <Button type="Primary" title="Save" style={{marginLeft: 10}} onPress={saveSettings} />
+          <Button type="Secondary" title="Close" style={{marginLeft: 10}} onPress={closeModal} />
+        </View>
       </View>
     </SafeAreaView>
   );

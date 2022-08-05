@@ -8,6 +8,7 @@ import {faList, faUpload, faDownload, faCog} from '@fortawesome/free-solid-svg-i
 
 import SideMenu from 'react-native-side-menu-updated';
 import RPC from './rpc';
+import RPCModule from '../components/RPCModule'
 import AppState, {
   TotalBalance,
   SendPageState,
@@ -33,6 +34,7 @@ import InfoModal from '../components/InfoModal';
 import {useTheme} from '@react-navigation/native';
 import RescanModal from '../components/RescanModal';
 import SettingsModal from '../components/SettingsModal';
+import SettingsFileImpl from '../components/SettingsFileImpl';
 
 const window = Dimensions.get('window');
 const styles = StyleSheet.create({
@@ -55,7 +57,7 @@ function Menu({onItemSelected}: any) {
 
   return (
     <ScrollView scrollsToTop={false} style={styles.menu} contentContainerStyle={{display: 'flex'}}>
-      <FadeText style={{margin: 20}}>Settings</FadeText>
+      <FadeText style={{margin: 20}}>Options</FadeText>
       <View style={{borderWidth: 1, borderColor: colors.border}} />
 
       <View style={{display: 'flex', marginLeft: 20}}>
@@ -76,7 +78,7 @@ function Menu({onItemSelected}: any) {
         </RegText>
 
         <RegText onPress={() => onItemSelected('About')} style={styles.item}>
-          About Zingo
+          About ZingoZcash
         </RegText>
       </View>
     </ScrollView>
@@ -151,6 +153,7 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
       settingsModalVisible: false,
       seedModalVisible: false,
       syncingStatus: null,
+      error: null,
     };
 
     this.rpc = new RPC(
@@ -468,6 +471,61 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
     this.rpc.fetchWalletSettings();
   };
 
+  set_server_option = async (value: string) => {
+    const resultStr: string = await RPCModule.execute('changeserver', value);
+    if (resultStr.toLowerCase().startsWith('error')) {
+      console.log(`Error change server ${value} - ${resultStr}`);
+      this.setState({
+        error: `Error trying to change the server to the new one: ${value}`,
+      });
+      setTimeout(() => {
+        this.setState({
+          error: null,
+        });
+      }, 5000);
+      return;
+    } else {
+      console.log(`change server ok ${value}`);
+    }
+
+    const error = await RPCModule.loadExistingWallet(value);
+    if (!error.toLowerCase().startsWith('error')) {
+      // Load the wallet and navigate to the transactions screen
+      console.log(`wallet loaded ok ${value}`);
+      const settings = { server: value };
+      await SettingsFileImpl.writeSettings(settings);
+    } else {
+      console.log(`Error Reading Wallet ${value} - ${error}`);
+      this.setState({
+        error: `Error trying to read the wallet with the new server: ${value}`,
+      });
+      setTimeout(() => {
+        this.setState({
+          error: null,
+        });
+      }, 5000);
+      const old_settings = await SettingsFileImpl.readSettings();
+      const resultStr: string = await RPCModule.execute('changeserver', old_settings.server);
+      if (resultStr.toLowerCase().startsWith('error')) {
+        console.log(`Error change server ${old_settings.server} - ${resultStr}`);
+        this.setState({
+          error: `Error trying to change the server to the old one: ${old_settings.server}`,
+        });
+        setTimeout(() => {
+          this.setState({
+            error: null,
+          });
+        }, 5000);
+        return;
+      } else {
+        console.log(`change server ok ${old_settings.server} - ${resultStr}`);
+      }
+    }
+
+    // Refetch the settings to update
+    this.rpc.fetchWalletSettings();
+  };
+
   render() {
     const {
       totalBalance,
@@ -485,6 +543,7 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
       walletSeed,
       syncingStatus,
       txBuildProgress,
+      error,
     } = this.state;
 
     const standardProps = {
@@ -504,7 +563,10 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
           transparent={false}
           visible={aboutModalVisible}
           onRequestClose={() => this.setState({aboutModalVisible: false})}>
-          <AboutModal closeModal={() => this.setState({aboutModalVisible: false})} />
+          <AboutModal
+            closeModal={() => this.setState({aboutModalVisible: false})}
+            totalBalance={totalBalance}
+          />
         </Modal>
 
         <Modal
@@ -512,7 +574,10 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
           transparent={false}
           visible={infoModalVisible}
           onRequestClose={() => this.setState({infoModalVisible: false})}>
-          <InfoModal closeModal={() => this.setState({infoModalVisible: false})} info={info} />
+          <InfoModal
+            closeModal={() => this.setState({infoModalVisible: false})} info={info}
+            totalBalance={totalBalance}
+          />
         </Modal>
 
         <Modal
@@ -524,6 +589,7 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
             closeModal={() => this.setState({rescanModalVisible: false})}
             birthday={walletSeed?.birthday}
             startRescan={this.startRescan}
+            totalBalance={totalBalance}
           />
         </Modal>
 
@@ -536,6 +602,8 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
             closeModal={() => this.setState({settingsModalVisible: false})}
             wallet_settings={wallet_settings}
             set_wallet_option={this.set_wallet_option}
+            set_server_option={this.set_server_option}
+            totalBalance={totalBalance}
           />
         </Modal>
 
@@ -548,6 +616,7 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
             seed={walletSeed?.seed}
             birthday={walletSeed?.birthday}
             nextScreen={() => this.setState({seedModalVisible: false})}
+            totalBalance={totalBalance}
           />
         </Modal>
 
@@ -575,48 +644,63 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
                 iconName = faCog;
               }
 
-              const iconColor = focused ? '#000000' : '#aaaaaa';
+              const iconColor = focused ? '#000000' : '#c08863';
               return <FontAwesomeIcon icon={iconName} color={iconColor} />;
             },
           })}
           tabBarOptions={{
             activeTintColor: '#000000',
-            activeBackgroundColor: '#c3921f',
-            inactiveTintColor: '#777777',
+            activeBackgroundColor: '#df4100',
+            inactiveTintColor: '#c08863',
             labelStyle: {fontSize: 14},
             tabStyle: {borderRadius: 0},
           }}>
           <Tab.Screen name="SEND">
             {props => (
-              <SendScreen
-                {...props}
-                {...standardProps}
-                totalBalance={totalBalance}
-                sendPageState={sendPageState}
-                setSendPageState={this.setSendPageState}
-                sendTransaction={this.sendTransaction}
-                clearToAddrs={this.clearToAddrs}
-                setComputingModalVisible={this.setComputingModalVisible}
-                setTxBuildProgress={this.setTxBuildProgress}
-              />
+              <>
+                <SendScreen
+                  {...props}
+                  {...standardProps}
+                  totalBalance={totalBalance}
+                  sendPageState={sendPageState}
+                  setSendPageState={this.setSendPageState}
+                  sendTransaction={this.sendTransaction}
+                  clearToAddrs={this.clearToAddrs}
+                  setComputingModalVisible={this.setComputingModalVisible}
+                  setTxBuildProgress={this.setTxBuildProgress}
+                />
+                {error && (
+                  <FadeText style={{ color: '#df4100', textAlign: 'center', width:'100%' }}>{error}</FadeText>
+                )}
+              </>
             )}
           </Tab.Screen>
           <Tab.Screen name="WALLET">
             {props => (
-              <TransactionsScreen
-                {...props}
-                {...standardProps}
-                transactions={transactions}
-                totalBalance={totalBalance}
-                doRefresh={this.doRefresh}
-                syncingStatus={syncingStatus}
-                setComputingModalVisible={this.setComputingModalVisible}
-              />
+              <>
+                <TransactionsScreen
+                  {...props}
+                  {...standardProps}
+                  transactions={transactions}
+                  totalBalance={totalBalance}
+                  doRefresh={this.doRefresh}
+                  syncingStatus={syncingStatus}
+                  setComputingModalVisible={this.setComputingModalVisible}
+                />
+                {error && (
+                  <FadeText style={{ color: '#df4100', textAlign: 'center', width:'100%' }}>{error}</FadeText>
+                )}
+              </>
             )}
           </Tab.Screen>
           <Tab.Screen name="RECEIVE">
             {props => (
-              <ReceiveScreen {...props} {...standardProps} addresses={addresses} startRescan={this.startRescan} />
+              <>
+                <ReceiveScreen {...props} {...standardProps} addresses={addresses} startRescan={this.startRescan} totalBalance={totalBalance} info={info} />
+                {error && (
+                  <FadeText style={{ color: '#df4100', textAlign: 'center', width:'100%' }}>{error}</FadeText>
+                )}
+              </>
             )}
           </Tab.Screen>
         </Tab.Navigator>

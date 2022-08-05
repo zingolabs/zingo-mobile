@@ -23,7 +23,13 @@ export const UsdAmount: React.FunctionComponent<UsdAmountProps> = ({price, style
     }
   }
 
-  return <Text style={{color: colors.text, ...style}}>$ {Utils.toLocaleFloat(usdString)}</Text>;
+  return (
+    <View style={{flexDirection: 'row', alignItems: 'baseline'}}>
+      <Text style={{color: colors.text, fontSize: 20, ...style}}>$</Text>
+      <Text style={{color: colors.text, fontSize: 20, fontWeight: '700', ...style}}>{' ' + Utils.toLocaleFloat(usdString)}</Text>
+      <Text style={{color: colors.text, fontSize: 20, ...style}}>{' USD'}</Text>
+    </View>
+  );
 };
 
 type ZecPriceProps = {
@@ -65,26 +71,30 @@ export const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({color, style
   return (
     <View style={{...style, flexDirection: 'row', alignItems: 'baseline'}}>
       <Text style={{fontSize: size, color}}>
-        {zecSymbol} {Utils.toLocaleFloat(splits.bigPart)}
+        {'\u1647'}
+      </Text>
+      <Text style={{fontSize: size, fontWeight: '700', color}}>
+        {' ' + Utils.toLocaleFloat(splits.bigPart)}
       </Text>
       <Text style={{fontSize: size / 2, color, paddingBottom: alignmentPadding}}>{splits.smallPart}</Text>
+      <Text style={{fontSize: size, color}}>
+        {' ' + zecSymbol}
+      </Text>
     </View>
   );
 };
 
 export const BoldText: React.FunctionComponent<any> = ({style, children}) => {
   const {colors} = useTheme();
-  let arrayed = [];
+  const totalStyle = {
+    color: colors.text,
+    fontSize: 18,
+    fontWeight: 'bold',
+    opacity: 0.87,
+    ...style
+  };
 
-  if (Array.isArray(style)) {
-    arrayed = style.slice(0);
-  } else if (style) {
-    arrayed.push(style);
-  }
-
-  arrayed.push({color: colors.text}, {fontSize: 18}, {fontWeight: 'bold'}, {opacity: 0.87});
-
-  return <Text style={arrayed}>{children}</Text>;
+  return <Text style={totalStyle}>{children}</Text>;
 };
 
 export const FadeText: React.FunctionComponent<any> = props => {
@@ -144,7 +154,7 @@ export const RegTextInput: React.FunctionComponent<any> = props => {
   } else if (props.style) {
     arrayed.push(props.style);
   }
-  arrayed.push({color: colors.text}, {fontWeight: '600'});
+  arrayed.push({color: props.style.color || colors.text}, {fontWeight: '600'});
 
   return <TextInput {...props} style={arrayed} editable={editable} />;
 };

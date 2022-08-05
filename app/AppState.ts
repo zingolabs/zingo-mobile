@@ -42,6 +42,14 @@ export class AddressBookEntry {
   }
 }
 
+export class SettingsFileEntry {
+  server: string;
+
+  constructor(server: string) {
+    this.server = server;
+  }
+}
+
 export interface TxDetail {
   address: string;
   amount: number;

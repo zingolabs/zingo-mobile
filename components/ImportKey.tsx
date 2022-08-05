@@ -1,10 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useState} from 'react';
 import {View, ScrollView, SafeAreaView, Image, Text, TouchableOpacity, Modal} from 'react-native';
-import {FadeText, RegText, RegTextInput} from './Components';
+import {FadeText, RegText, RegTextInput, ZecAmount, UsdAmount, zecPrice} from './Components';
 import Button from './Button';
 import {useTheme} from '@react-navigation/native';
 import cstyles from './CommonStyles';
+import {faQrcode, faCheck, faInfo} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 
 type ScannerProps = {
@@ -60,7 +62,7 @@ type ImportKeyModalProps = {
   closeModal: () => void;
   doImport: (keyText: string, birthday: string) => void;
 };
-const ImportKeyModal: React.FunctionComponent<ImportKeyModalProps> = ({closeModal, doImport}) => {
+const ImportKeyModal: React.FunctionComponent<ImportKeyModalProps> = ({closeModal, doImport, totalBalance}) => {
   const {colors} = useTheme();
 
   const [privKeyText, setPrivKeyText] = useState('');
@@ -81,12 +83,15 @@ const ImportKeyModal: React.FunctionComponent<ImportKeyModalProps> = ({closeModa
         height: '100%',
         backgroundColor: colors.background,
       }}>
+      <View
+        style={{display: 'flex', alignItems: 'center', paddingBottom: 25, backgroundColor: colors.card, zIndex: -1}}>
+        <RegText color={'#ffffff'} style={{marginTop: 5, padding: 5}}>Import Key</RegText>
+        <ZecAmount size={36} amtZec={totalBalance.total} style={{opacity: 0.2}} />
+      </View>
       <View>
-        <View style={{alignItems: 'center', backgroundColor: colors.card, paddingBottom: 25, paddingTop: 25}}>
-          <Text style={{marginTop: 5, padding: 5, color: colors.text, fontSize: 28}}>Import Key</Text>
-        </View>
-        <View style={{display: 'flex', alignItems: 'center', marginTop: -25}}>
+        <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: -30}}>
           <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 50, height: 50, resizeMode: 'contain'}} />
+          <Text style={{ color: '#777777', fontSize: 40, fontWeight: 'bold' }}> ZingoZcash</Text>
         </View>
       </View>
 
@@ -106,20 +111,21 @@ const ImportKeyModal: React.FunctionComponent<ImportKeyModalProps> = ({closeModa
           justifyContent: 'flex-start',
         }}
         keyboardShouldPersistTaps="handled">
-        <RegText style={{margin: 20}}>Private or Viewing key</RegText>
+        <RegText style={{margin: 10}}>Private or Viewing key</RegText>
 
         <RegTextInput
           multiline
-          style={[
-            {
-              maxWidth: '95%',
-              minWidth: '95%',
-              borderColor: 'gray',
-              borderWidth: 1,
-              minHeight: 100,
-            },
-            cstyles.innerpaddingsmall,
-          ]}
+          style={{
+            ...cstyles.innerpaddingsmall,
+            maxWidth: '95%',
+            minWidth: '95%',
+            borderColor: 'gray',
+            borderWidth: 1,
+            borderRadius: 10,
+            borderColor: colors.text,
+            minHeight: 100,
+            color: '#777777'
+          }}
           value={privKeyText}
           onChangeText={setPrivKeyText}
         />
@@ -128,38 +134,40 @@ const ImportKeyModal: React.FunctionComponent<ImportKeyModalProps> = ({closeModa
           onPress={() => {
             setQrcodeModalVisible(true);
           }}>
-          <Image
+          <FontAwesomeIcon style={{margin: 5}} size={50} icon={faQrcode} color={'#777777'} />
+          {/*<Image
             source={require('../assets/img/qr-code-scan.png')}
             style={{width: 50, height: 50, marginTop: 15, resizeMode: 'contain'}}
-          />
+          />*/}
         </TouchableOpacity>
 
         <RegText style={[cstyles.margintop, cstyles.center]}>Key Birthday</RegText>
         <FadeText>Block height of first transaction. (OK to leave blank)</FadeText>
         <RegTextInput
-          style={[
-            {
-              maxWidth: '50%',
-              minWidth: '50%',
-              borderColor: 'gray',
-              borderWidth: 1,
-            },
-            cstyles.innerpaddingsmall,
-          ]}
+          style={{
+            ...cstyles.innerpaddingsmall,
+            maxWidth: '50%',
+            minWidth: '50%',
+            borderWidth: 1,
+            borderRadius: 5,
+            borderColor: colors.text,
+            margin: 10,
+            color: '#777777'
+          }}
           value={birthday}
           keyboardType="numeric"
           onChangeText={setBirthday}
         />
 
-        <FadeText style={{margin: 20}}>
+        <RegText style={{margin: 20}}>
           Importing a key requires a rescan, and make take a long time to complete. Your balances will update
           automatically.
-        </FadeText>
+        </RegText>
       </ScrollView>
       <View
-        style={{flexGrow: 1, flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', margin: 10}}>
-        <Button type="Primary" title={'Import'} onPress={okButton} />
-        <Button type="Secondary" title="Close" onPress={closeModal} />
+        style={{flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', margin: 20}}>
+        <Button type="Primary" title='Import' onPress={okButton} />
+        <Button type="Secondary" title="Close" style={{marginLeft: 10}} onPress={closeModal} />
       </View>
     </SafeAreaView>
   );

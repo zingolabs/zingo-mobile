@@ -18,8 +18,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         const val TAG = "RPCModule"
     }
 
-    private val LIGHTWALLETD_URL = "https://lwdv3.zecwallet.co";
-
     private external fun initlogging(): String
     private external fun execute(cmd: String, args: String): String
     private external fun initnew(serveruri: String, saplingOutputb64: String, saplingSpendb64: String, datadir: String): String
@@ -45,7 +43,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun createNewWallet(promise: Promise) {
+    fun createNewWallet(server: String, promise: Promise) {
         // Log.w("MAIN", "Creating new wallet")
 
         val saplingOutputFile = MainApplication.getAppContext()?.resources?.openRawResource(R.raw.saplingoutput)
@@ -59,7 +57,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         initlogging()
 
         // Create a seed
-        val seed = initnew(LIGHTWALLETD_URL,
+        val seed = initnew(server,
             Base64.encodeToString(saplingOutput, Base64.NO_WRAP),
             Base64.encodeToString(saplingSpend, Base64.NO_WRAP),
             reactContext.applicationContext.filesDir.absolutePath)
@@ -73,7 +71,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun restoreWallet(seed: String, birthday: String, promise: Promise) {
+    fun restoreWallet(seed: String, birthday: String, server: String, promise: Promise) {
         // Log.w("MAIN", "Restoring wallet with seed $seed")
 
         val saplingOutputFile = MainApplication.getAppContext()?.resources?.openRawResource(R.raw.saplingoutput)
@@ -84,7 +82,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         val saplingSpend = saplingSpendFile?.readBytes()
         saplingSpendFile?.close()
 
-        val rseed = initfromseed(LIGHTWALLETD_URL, seed, birthday,
+        val rseed = initfromseed(server, seed, birthday,
             Base64.encodeToString(saplingOutput, Base64.NO_WRAP),
             Base64.encodeToString(saplingSpend, Base64.NO_WRAP),
             reactContext.applicationContext.filesDir.absolutePath)
@@ -98,7 +96,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun loadExistingWallet(promise: Promise) {
+    fun loadExistingWallet(server: String, promise: Promise) {
         // Read the file
         val file = MainApplication.getAppContext()!!.openFileInput("wallet.dat")
         val fileBytes = file.readBytes()
@@ -112,7 +110,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         val saplingSpend = saplingSpendFile?.readBytes()
         saplingSpendFile?.close()
 
-        val seed = initfromb64(LIGHTWALLETD_URL, fileb64,
+        val seed = initfromb64(server, fileb64,
             Base64.encodeToString(saplingOutput, Base64.NO_WRAP),
             Base64.encodeToString(saplingSpend, Base64.NO_WRAP),
             reactContext.applicationContext.filesDir.absolutePath)
@@ -124,6 +122,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
         promise.resolve(seed)
     }
+
     @ReactMethod
     fun deleteExistingWallet(promise: Promise) {
         MainApplication.getAppContext()!!.deleteFile("wallet.dat")

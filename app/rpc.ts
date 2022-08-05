@@ -11,6 +11,7 @@ import {
 } from './AppState';
 import RPCModule from '../components/RPCModule';
 import Utils from './utils';
+import SettingsFileImpl from '../components/SettingsFileImpl';
 
 export default class RPC {
   fnSetInfo: (info: Info) => void;
@@ -244,10 +245,14 @@ export default class RPC {
     const download_memos_str = await RPCModule.execute('getoption', 'download_memos');
     const download_memos = JSON.parse(download_memos_str).download_memos;
 
+    const settings = await SettingsFileImpl.readSettings();
+    const server = settings.server;
+
     // console.log(download_memos);
 
     const wallet_settings = new WalletSettings();
     wallet_settings.download_memos = download_memos;
+    wallet_settings.server = server;
 
     this.fnSetWalletSettings(wallet_settings);
   }

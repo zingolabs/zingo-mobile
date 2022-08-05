@@ -133,9 +133,9 @@ export default class Utils {
 
   static getDonationAddress(testnet: boolean): string {
     if (testnet) {
-      return 'ztestsapling1wn6889vznyu42wzmkakl2effhllhpe4azhu696edg2x6me4kfsnmqwpglaxzs7tmqsq7kudemp5';
+      return 'ztestsapling...';
     } else {
-      return 'zs1gv64eu0v2wx7raxqxlmj354y9ycznwaau9kduljzczxztvs4qcl00kn2sjxtejvrxnkucw5xx9u';
+      return 'z...';
     }
   }
 
@@ -144,7 +144,7 @@ export default class Utils {
   }
 
   static getDefaultDonationMemo(): string {
-    return 'Thanks for supporting Zingo!';
+    return 'Thanks for supporting ZingoZcash!';
   }
 
   static getZecToUsdString(price: number | null, zecValue: number | null): string {

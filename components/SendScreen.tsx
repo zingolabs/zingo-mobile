@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useState, useEffect, useRef} from 'react';
 import QRCodeScanner from 'react-native-qrcode-scanner';
-import {View, ScrollView, Modal, Image, Alert, SafeAreaView, Keyboard, Platform} from 'react-native';
+import {View, ScrollView, Modal, Image, Alert, SafeAreaView, Keyboard, Platform, Text} from 'react-native';
 import {
   FadeText,
   BoldText,
@@ -480,31 +480,32 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
               backgroundColor: colors.card,
               zIndex: -1,
             }}>
-            <RegText style={{marginTop: 5, padding: 5}}>Spendable</RegText>
+            <RegText color={'#ffffff'} style={{marginTop: 5, padding: 5}}>Send</RegText>
             <TouchableOpacity onPress={() => setMaxAmount(0)}>
               <View style={{display: 'flex', alignItems: 'center'}}>
                 <ZecAmount size={36} amtZec={getMaxAmount()} />
-                <UsdAmount style={{marginTop: 5}} price={zecPrice} amtZec={getMaxAmount()} />
+                <UsdAmount style={{marginTop: 0, marginBottom: 5}} price={zecPrice} amtZec={getMaxAmount()} />
               </View>
             </TouchableOpacity>
           </View>
         </Animated.View>
 
-        <Animated.View style={{backgroundColor: '#353535', padding: 10, position: 'absolute', marginTop: slideAnim}}>
+        <Animated.View style={{backgroundColor: colors.card, padding: 10, position: 'absolute', marginTop: slideAnim}}>
           <TouchableOpacity onPress={toggleMenuDrawer}>
             <FontAwesomeIcon icon={faBars} size={20} color={'#ffffff'} />
           </TouchableOpacity>
         </Animated.View>
 
-        <View style={{display: 'flex', alignItems: 'center', marginTop: -25}}>
+        <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: -30}}>
           <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 50, height: 50, resizeMode: 'contain'}} />
+          <Text style={{ color: '#777777', fontSize: 40, fontWeight: 'bold' }}> ZingoZcash</Text>
         </View>
 
         {sendPageState.toaddrs.map((ta, i) => {
           return (
-            <View key={i} style={{display: 'flex', padding: 10, marginTop: 20}}>
+            <View key={i} style={{display: 'flex', padding: 10, marginTop: 10}}>
               <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
-                <FadeText>To</FadeText>
+                <RegText>To Address</RegText>
                 {addressValidationState[i] === 1 && <FontAwesomeIcon icon={faCheck} color="green" />}
                 {addressValidationState[i] === -1 && <ErrorText>Invalid Address!</ErrorText>}
               </View>
@@ -513,12 +514,15 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
                   display: 'flex',
                   flexDirection: 'row',
                   justifyContent: 'flex-start',
-                  borderBottomColor: colors.card,
-                  borderBottomWidth: 2,
+                  alignItems: 'center',
+                  borderWidth: 1,
+                  borderRadius: 5,
+                  borderColor: colors.text,
+                  marginTop: 5,
                 }}>
                 <RegTextInput
-                  placeholder="z-address or t-address"
-                  placeholderTextColor="#777777"
+                  placeholder="Z or T or O or UA-address"
+                  placeholderTextColor="#333333"
                   style={{flexGrow: 1, maxWidth: '90%'}}
                   value={ta.to}
                   onChangeText={(text: string) => updateToField(i, text, null, null, null)}
@@ -528,11 +532,11 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
                     setQrcodeModalIndex(i);
                     setQrcodeModalVisible(true);
                   }}>
-                  <FontAwesomeIcon style={{margin: 5}} size={24} icon={faQrcode} color={colors.text} />
+                  <FontAwesomeIcon style={{margin: 5}} size={24} icon={faQrcode} color={'#777777'} />
                 </TouchableOpacity>
               </View>
 
-              <View style={{marginTop: 30, display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
+              <View style={{marginTop: 10, display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
                 <FadeText>Amount</FadeText>
                 {amountValidationState[i] === -1 && <ErrorText>Invalid Amount!</ErrorText>}
               </View>
@@ -543,46 +547,55 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
                   flexDirection: 'row',
                   justifyContent: 'flex-start',
                 }}>
-                <RegText style={{marginTop: 15}}>ZEC</RegText>
+                <RegText style={{marginTop: 20, marginRight: 5, fontSize: 20}}>{'\u1647'}</RegText>
                 <RegTextInput
                   placeholder={`0${decimalSeparator}0`}
-                  placeholderTextColor="#777777"
+                  placeholderTextColor="#333333"
                   keyboardType="numeric"
                   style={{
-                    //flexGrow: 1,
+                    display: 'flex',
+                    flexDirection: 'row',
+                    justifyContent: 'flex-start',
+                    alignItems: 'center',
+                    borderWidth: 1,
+                    borderRadius: 5,
+                    borderColor: colors.text,
+                    marginTop: 5,
                     fontSize: 18,
-                    width: '35%',
-                    borderBottomColor: colors.card,
-                    borderBottomWidth: 2,
-                    marginLeft: 20,
-                    marginTop: Platform.OS === 'ios' ? 15 : 3,
+                    width: '42%',
                   }}
                   value={ta.amount.toString()}
                   onChangeText={(text: string) => updateToField(i, null, text, null, null)}
                 />
+                <RegText style={{marginTop: 15, marginRight: 10, marginLeft: 5}}>ZEC</RegText>
 
-                <RegText style={{marginTop: 15, marginLeft: 20}}>USD</RegText>
+                <RegText style={{marginTop: 15, marginLeft: 10, marginRight: 5}}>$</RegText>
                 <RegTextInput
                   placeholder={`0${decimalSeparator}0`}
-                  placeholderTextColor="#777777"
+                  placeholderTextColor="#333333"
                   keyboardType="numeric"
                   style={{
-                    //flexGrow: 1,
+                    display: 'flex',
+                    flexDirection: 'row',
+                    justifyContent: 'flex-start',
+                    alignItems: 'center',
+                    borderWidth: 1,
+                    borderRadius: 5,
+                    borderColor: colors.text,
+                    marginTop: 5,
                     fontSize: 18,
-                    width: '35%',
-                    borderBottomColor: colors.card,
-                    borderBottomWidth: 2,
-                    marginLeft: 20,
-                    marginTop: Platform.OS === 'ios' ? 15 : 3,
+                    width: '25%',
                   }}
                   value={ta.amountUSD.toString()}
                   onChangeText={(text: string) => updateToField(i, null, null, text, null)}
                 />
+                <RegText style={{marginTop: 15, marginLeft: 5}}>USD</RegText>
               </View>
 
               <View style={{display: 'flex', flexDirection: 'column'}}>
-                <View style={{display: 'flex', flexDirection: 'row', marginTop: 10}}>
-                  <FadeText>Spendable: ᙇ {Utils.maxPrecisionTrimmed(getMaxAmount())} </FadeText>
+                <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', marginTop: 10}}>
+                  <RegText>Spendable: </RegText>
+                  <ZecAmount color={'#777777'} size={18} amtZec={getMaxAmount()} />
                 </View>
                 {stillConfirming && (
                   <View
@@ -606,7 +619,12 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
                   <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-start'}}>
                     <RegTextInput
                       multiline
-                      style={{flexGrow: 1, borderBottomColor: colors.card, borderBottomWidth: 2}}
+                      style={{
+                        flexGrow: 1,
+                        borderBottomColor:
+                        colors.card,
+                        borderBottomWidth: 2
+                      }}
                       value={ta.memo}
                       onChangeText={(text: string) => updateToField(i, null, null, null, text)}
                     />

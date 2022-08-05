@@ -7,7 +7,7 @@ buildscript {
         minSdkVersion = 21
         compileSdkVersion = 30
         targetSdkVersion = 30
-        ndkVersion = "24.0.8215888"
+        ndkVersion = "25.0.8775105"
     }
     repositories {
         google()

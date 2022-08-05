@@ -23,6 +23,30 @@ export class ZcashURITarget {
   }
 }
 
+export const SERVER_URI = [
+  'https://zuul.free2z.cash:9067',
+  'https://mainnet.lightwalletd.com:9067',
+];
+
+export const MEMOS = [
+  {value: 'none', text: "Don't download any memos. Server will not learn what transactions belong to you."},
+  {value: 'wallet', text: "Download only my memos. Server will learn what TxIDs belong to you, but can't see the addresses, amounts or memos."},
+  {value: 'all', text: "Download all memos in the blockchain. Server will not learn what TxIDs belong to you. This consumes A LOT of bandwidth."},
+];
+
+export const parseServerURI = (uri: string): string => {
+  if (!uri || uri === '') {
+    return 'Error: Bad URI';
+  }
+
+  const parsedUri = new Url(uri, true);
+  if (!parsedUri || !parsedUri.hostname || !parsedUri.protocol || (parsedUri.protocol !== 'http:' && parsedUri.protocol !== 'https:')) {
+    return 'Error: Bad URI';
+  }
+
+  return 'URI is OK';
+};
+
 export const parseZcashURI = (uri: string): ZcashURITarget[] | string => {
   if (!uri || uri === '') {
     return 'Bad URI';

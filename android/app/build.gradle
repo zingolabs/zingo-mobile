@@ -133,10 +133,10 @@ android {
     }
 
     defaultConfig {
-        applicationId 'com.zingo'
+        applicationId 'com.ZingoMobile'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 06
+        versionCode 10
         versionName "0.0.1"
         missingDimensionStrategy 'react-native-camera', 'general'
     }

@@ -5,9 +5,9 @@ import Clipboard from '@react-native-community/clipboard';
 import QRCode from 'react-native-qrcode-svg';
 import {TabView, TabBar} from 'react-native-tab-view';
 import Toast from 'react-native-simple-toast';
-import {ClickableText, FadeText} from '../components/Components';
+import {ClickableText, FadeText, ZecAmount, UsdAmount, zecPrice, RegText} from '../components/Components';
 import Button from './Button';
-import {Info} from '../app/AppState';
+import {Info, TotalBalance} from '../app/AppState';
 import Utils from '../app/utils';
 import {useTheme} from '@react-navigation/native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
@@ -63,8 +63,8 @@ const SingleAddressDisplay: React.FunctionComponent<SingleAddress> = ({address, 
         },
       ]}
       keyboardShouldPersistTaps="handled">
-      <View style={{marginTop: 10, padding: 10, backgroundColor: 'rgb(255, 255, 255)'}}>
-        <QRCode value={address} size={200} ecl="L" />
+      <View style={{marginTop: 20, padding: 10, backgroundColor: '#777777'}}>
+        <QRCode value={address} size={200} ecl="L" backgroundColor='#777777' />
       </View>
       <ClickableText style={{marginTop: 15}} onPress={doCopy}>
         Tap To Copy
@@ -112,12 +112,14 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
   toggleMenuDrawer,
   fetchTotalBalance,
   startRescan,
+  totalBalance,
+  info,
 }) => {
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([
-    {key: 'zaddr', title: 'Z Address'},
-    {key: 'taddr', title: 'T Address'},
-    {key: 'oaddr', title: 'O Address'},
+    {key: 'zaddr', title: 'Z-Sapling'},
+    {key: 'taddr', title: 'T-Transp'},
+    {key: 'oaddr', title: 'O-Orchard'},
   ]);
 
   const [displayAddress, setDisplayAddress] = useState('');
@@ -126,6 +128,7 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
   const [oindex, setOIndex] = useState(0);
 
   const {colors} = useTheme();
+  const zecPrice = info ? info.zecPrice : null;
 
   const zaddrs = addresses.filter(a => Utils.isSapling(a)) || [];
   const taddrs = addresses.filter(a => Utils.isTransparent(a)) || [];
@@ -300,7 +303,16 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
   const [privKey, setPrivKey] = useState('');
 
   const viewPrivKey = async () => {
-    if (zaddrs.length === 0 || taddrs.length === 0 || oaddrs.length === 0) {
+    if (index === 0 && zaddrs.length === 0) {
+      Toast.show('No Z address to import the Spending key', Toast.LONG);
+      return;
+    }
+    if (index === 1 && taddrs.length === 0) {
+      Toast.show('No T address to import the Spending key', Toast.LONG);
+      return;
+    }
+    if (index === 2 && oaddrs.length === 0) {
+      Toast.show('No O address to import the Spending key', Toast.LONG);
       return;
     }
 
@@ -318,8 +330,12 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
       Toast.show('T addresses do not have viewing keys', Toast.LONG);
       return;
     }
-
-    if (zaddrs.length === 0 || taddrs.length === 0 || oaddrs.length === 0) {
+    if (index === 0 && zaddrs.length === 0) {
+      Toast.show('No Z address to import the viewing key', Toast.LONG);
+      return;
+    }
+    if (index === 2 && oaddrs.length === 0) {
+      Toast.show('No O address to import the viewing key', Toast.LONG);
       return;
     }
 
@@ -382,6 +398,7 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
             keyType={keyType}
             privKey={privKey}
             closeModal={() => setPrivKeyModalVisible(false)}
+            totalBalance={totalBalance}
           />
         </Modal>
 
@@ -390,7 +407,11 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
           transparent={false}
           visible={importKeyModalVisible}
           onRequestClose={() => setImportKeyModalVisible(false)}>
-          <ImportKeyModal doImport={doImport} closeModal={() => setImportKeyModalVisible(false)} />
+          <ImportKeyModal
+            doImport={doImport}
+            closeModal={() => setImportKeyModalVisible(false)}
+            totalBalance={totalBalance}
+          />
         </Modal>
 
         <View
@@ -399,12 +420,17 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
             flexDirection: 'row',
             justifyContent: 'space-between',
             backgroundColor: colors.card,
-            padding: 15,
+            padding: 10,
+            paddingBottom: 0
           }}>
           <TouchableOpacity onPress={toggleMenuDrawer}>
             <FontAwesomeIcon icon={faBars} size={20} color={'#ffffff'} />
           </TouchableOpacity>
-          <Text style={{paddingBottom: 25, color: colors.text, fontSize: 28}}>Wallet Addresses</Text>
+          <View
+            style={{display: 'flex', alignItems: 'center', paddingBottom: 25, backgroundColor: colors.card, zIndex: -1}}>
+            <RegText color={'#ffffff'} style={{paddingBottom: 5}}>Addresses</RegText>
+            <ZecAmount size={36} amtZec={totalBalance.total} style={{opacity: 0.2}} />
+          </View>
           <OptionsMenu
             customButton={<FontAwesomeIcon icon={faEllipsisV} color={'#ffffff'} size={20} />}
             buttonStyle={{width: 32, height: 32, margin: 7.5, resizeMode: 'contain'}}
@@ -413,7 +439,7 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
               'New O Address',
               'New Z Address',
               'New T Address',
-              'Export Private Key',
+              'Export Spending Key',
               'Export Viewing Key',
               'Import...',
               'Cancel',
@@ -422,8 +448,10 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
           />
         </View>
 
-        <View style={{display: 'flex', alignItems: 'center', marginTop: -25}}>
+
+        <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: -30}}>
           <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 50, height: 50, resizeMode: 'contain'}} />
+          <Text style={{ color: '#777777', fontSize: 40, fontWeight: 'bold' }}> ZingoZcash</Text>
         </View>
         <TabBar
           {...props}

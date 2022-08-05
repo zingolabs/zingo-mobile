@@ -12,8 +12,6 @@
 
 @implementation RPCModule
 
-NSString* const URL = @"https://lwdv3.zecwallet.co";
-
 // To make it accessible in React
 RCT_EXPORT_MODULE();
 
@@ -101,6 +99,7 @@ RCT_REMAP_METHOD(deleteExistingWallet,
 
 // Create a new wallet, automatically saving it.
 RCT_REMAP_METHOD(createNewWallet,
+                 server:(NSString*)server
                  createNewWalletWithResolver:(RCTPromiseResolveBlock)resolve
                  rejected:(RCTPromiseRejectBlock)reject) {
   @autoreleasepool {
@@ -119,7 +118,7 @@ RCT_REMAP_METHOD(createNewWallet,
                     (NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
 
-    char* seed = init_new([URL UTF8String], [[saplingOutput base64EncodedStringWithOptions:0] UTF8String], [[saplingSpend base64EncodedStringWithOptions:0] UTF8String], [documentsDirectory UTF8String]);
+    char* seed = init_new([server UTF8String], [[saplingOutput base64EncodedStringWithOptions:0] UTF8String], [[saplingSpend base64EncodedStringWithOptions:0] UTF8String], [documentsDirectory UTF8String]);
     NSString* seedStr = [NSString stringWithUTF8String:seed];
     rust_free(seed);
 
@@ -136,6 +135,7 @@ RCT_REMAP_METHOD(createNewWallet,
 RCT_REMAP_METHOD(restoreWallet,
                  restoreSeed:(NSString*)restoreSeed
                  birthday:(NSString*)birthday
+                 server:(NSString*)server
                  restoreWalletWithResolver:(RCTPromiseResolveBlock)resolve
                  rejected:(RCTPromiseRejectBlock)reject) {
   @autoreleasepool {
@@ -154,7 +154,7 @@ RCT_REMAP_METHOD(restoreWallet,
                     (NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
 
-    char* seed = initfromseed([URL UTF8String], [restoreSeed UTF8String], [birthday UTF8String], [[saplingOutput base64EncodedStringWithOptions:0] UTF8String], [[saplingSpend base64EncodedStringWithOptions:0] UTF8String], [documentsDirectory UTF8String]);
+    char* seed = initfromseed([server UTF8String], [restoreSeed UTF8String], [birthday UTF8String], [[saplingOutput base64EncodedStringWithOptions:0] UTF8String], [[saplingSpend base64EncodedStringWithOptions:0] UTF8String], [documentsDirectory UTF8String]);
     NSString* seedStr = [NSString stringWithUTF8String:seed];
     rust_free(seed);
 
@@ -171,6 +171,7 @@ RCT_REMAP_METHOD(restoreWallet,
 
 // Load an existing wallet from the user's app documents
 RCT_REMAP_METHOD(loadExistingWallet,
+                 server:(NSString*)server
                  loadExistingWalletWithResolver:(RCTPromiseResolveBlock)resolve
                  rejected:(RCTPromiseRejectBlock)reject) {
   @autoreleasepool {
@@ -188,7 +189,7 @@ RCT_REMAP_METHOD(loadExistingWallet,
     NSArray *paths = NSSearchPathForDirectoriesInDomains
                     (NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
-    char* seed = initfromb64([URL UTF8String], [walletDataStr UTF8String], [[saplingOutput base64EncodedStringWithOptions:0] UTF8String], [[saplingSpend base64EncodedStringWithOptions:0] UTF8String], [documentsDirectory UTF8String]);
+    char* seed = initfromb64([server UTF8String], [walletDataStr UTF8String], [[saplingOutput base64EncodedStringWithOptions:0] UTF8String], [[saplingSpend base64EncodedStringWithOptions:0] UTF8String], [documentsDirectory UTF8String]);
     NSString* seedStr = [NSString stringWithUTF8String:seed];
     rust_free(seed);
 

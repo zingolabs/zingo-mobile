@@ -1,14 +1,14 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import {View, ScrollView, SafeAreaView, Image, Text} from 'react-native';
-import {FadeText} from './Components';
+import {FadeText, ZecAmount, UsdAmount, zecPrice, RegText} from './Components';
 import Button from './Button';
 import {useTheme} from '@react-navigation/native';
 
 type AboutModalProps = {
   closeModal: () => void;
 };
-const AboutModal: React.FunctionComponent<AboutModalProps> = ({closeModal}) => {
+const AboutModal: React.FunctionComponent<AboutModalProps> = ({closeModal, totalBalance}) => {
   const {colors} = useTheme();
   return (
     <SafeAreaView
@@ -19,12 +19,15 @@ const AboutModal: React.FunctionComponent<AboutModalProps> = ({closeModal}) => {
         height: '100%',
         backgroundColor: colors.background,
       }}>
+      <View
+        style={{display: 'flex', alignItems: 'center', paddingBottom: 25, backgroundColor: colors.card, zIndex: -1}}>
+        <RegText color={'#ffffff'} style={{marginTop: 5, padding: 5}}>ZingoZcash v0.0.1</RegText>
+        <ZecAmount size={36} amtZec={totalBalance.total} style={{opacity: 0.2}} />
+      </View>
       <View>
-        <View style={{alignItems: 'center', backgroundColor: colors.card, paddingBottom: 25, paddingTop: 25}}>
-          <Text style={{marginTop: 5, padding: 5, color: colors.text, fontSize: 28}}>Zingo v0.0.1</Text>
-        </View>
-        <View style={{display: 'flex', alignItems: 'center', marginTop: -25}}>
+        <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: -30}}>
           <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 50, height: 50, resizeMode: 'contain'}} />
+          <Text style={{ color: '#777777', fontSize: 40, fontWeight: 'bold' }}> ZingoZcash</Text>
         </View>
       </View>
 
@@ -34,16 +37,16 @@ const AboutModal: React.FunctionComponent<AboutModalProps> = ({closeModal}) => {
           flexDirection: 'column',
           alignItems: 'stretch',
           justifyContent: 'flex-start',
+          padding: 20,
         }}>
         <FadeText>
-          {'\n'}
           Copyright (c) 2022, ZingoLabs.
           {'\n'}
           {'\n'}
           Built with React Native.
           {'\n'}
           {'\n'}
-          The MIT License (MIT) Copyright (c) 2022 Zingo
+          The MIT License (MIT) Copyright (c) 2022 ZingoZcash
           {'\n'}
           {'\n'}
           Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated

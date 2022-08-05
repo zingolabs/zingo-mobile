@@ -19,6 +19,7 @@ import {
   SafeAreaView,
   RefreshControl,
   Linking,
+  Text,
 } from 'react-native';
 import Clipboard from '@react-native-community/clipboard';
 import Toast from 'react-native-simple-toast';
@@ -353,9 +354,9 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
 
       <View
         style={{display: 'flex', alignItems: 'center', paddingBottom: 25, backgroundColor: colors.card, zIndex: -1}}>
-        <RegText style={{marginTop: 5, padding: 5}}>{syncStatusDisplay}</RegText>
+        <RegText color={'#ffffff'} style={{marginTop: 5, padding: 5}}>{syncStatusDisplay}</RegText>
         <ZecAmount color={balanceColor} size={36} amtZec={totalBalance.total} />
-        <UsdAmount style={{marginTop: 5}} price={zecPrice} amtZec={totalBalance.total} />
+        <UsdAmount style={{marginTop: 0, marginBottom: 5}} price={zecPrice} amtZec={totalBalance.total} />
 
         {showShieldButton && (
           <View style={{margin: 5}}>
@@ -364,14 +365,15 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
         )}
       </View>
 
-      <View style={{backgroundColor: '#353535', padding: 10, position: 'absolute'}}>
+      <View style={{backgroundColor: colors.card, padding: 10, position: 'absolute'}}>
         <TouchableOpacity onPress={toggleMenuDrawer}>
           <FontAwesomeIcon icon={faBars} size={20} color={'#ffffff'} />
         </TouchableOpacity>
       </View>
 
-      <View style={{display: 'flex', alignItems: 'center', marginTop: -25}}>
+      <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: -30}}>
         <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 50, height: 50, resizeMode: 'contain'}} />
+        <Text style={{ color: '#777777', fontSize: 40, fontWeight: 'bold' }}> ZingoZcash</Text>
       </View>
       <ScrollView
         refreshControl={

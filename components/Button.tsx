@@ -8,10 +8,10 @@ const Button: React.FunctionComponent<any> = ({type, title, disabled, onPress, s
   // type: 'Primary' or 'Secondary'
   const styleButton =
     type === 'Primary' ? {
-      backgroundColor: disabled ? 'gray' : colors.primary,
+      backgroundColor: disabled ? '#351515' : colors.primary,
     } : type === 'Secondary' ? {
-      borderColor: colors.text,
-      borderWidth: 1,
+      borderColor: colors.primary || colors.text,
+      borderWidth: 2,
     } : {
       // error
       backgroundColor: 'red',
@@ -21,7 +21,7 @@ const Button: React.FunctionComponent<any> = ({type, title, disabled, onPress, s
     paddingLeft: 20,
     paddingRight: 20,
     borderRadius: 10,
-    width: '40%',
+    width: '50%',
   };
 
   return (
@@ -32,7 +32,7 @@ const Button: React.FunctionComponent<any> = ({type, title, disabled, onPress, s
         ...style,
       }}
       onPress={() => !disabled && onPress && onPress()}>
-      <Text style={{color: type === 'Primary' ? colors.background : colors.text, fontWeight: 'bold', textTransform: 'uppercase', textAlign: 'center'}}>
+      <Text style={{color: type === 'Primary' ? colors.background :  colors.primary || colors.text, fontWeight: 'bold', textTransform: 'uppercase', textAlign: 'center'}}>
         {title}
       </Text>
     </TouchableOpacity>
