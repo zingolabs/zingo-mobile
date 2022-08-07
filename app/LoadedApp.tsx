@@ -37,47 +37,48 @@ import SettingsModal from '../components/SettingsModal';
 import SettingsFileImpl from '../components/SettingsFileImpl';
 
 const window = Dimensions.get('window');
-const styles = StyleSheet.create({
-  menu: {
-    flex: 1,
-    width: window.width,
-    height: window.height,
-    backgroundColor: '#000000',
-  },
-  item: {
-    fontSize: 14,
-    fontWeight: '300',
-    paddingTop: 15,
-    color: '#ffffff',
-  },
-});
 
 function Menu({onItemSelected}: any) {
   const {colors} = useTheme();
+  const item = {
+    fontSize: 14,
+    fontWeight: '300',
+    paddingTop: 15,
+    color: colors.text,
+  };
 
   return (
-    <ScrollView scrollsToTop={false} style={styles.menu} contentContainerStyle={{display: 'flex'}}>
+    <ScrollView
+      scrollsToTop={false}
+      style={{
+        flex: 1,
+        width: window.width,
+        height: window.height,
+        backgroundColor: '#010101',
+      }}
+      contentContainerStyle={{display: 'flex'}}
+    >
       <FadeText style={{margin: 20}}>Options</FadeText>
-      <View style={{borderWidth: 1, borderColor: colors.border}} />
+      <View style={{height: 1, backgroundColor: colors.primary}} />
 
       <View style={{display: 'flex', marginLeft: 20}}>
-        <RegText onPress={() => onItemSelected('Wallet Seed')} style={styles.item}>
+        <RegText onPress={() => onItemSelected('Wallet Seed')} style={item}>
           Wallet Seed
         </RegText>
 
-        <RegText onPress={() => onItemSelected('Rescan')} style={styles.item}>
+        <RegText onPress={() => onItemSelected('Rescan')} style={item}>
           Rescan Wallet
         </RegText>
 
-        <RegText onPress={() => onItemSelected('Settings')} style={styles.item}>
+        <RegText onPress={() => onItemSelected('Settings')} style={item}>
           Settings
         </RegText>
 
-        <RegText onPress={() => onItemSelected('Info')} style={styles.item}>
+        <RegText onPress={() => onItemSelected('Info')} style={item}>
           Server Info
         </RegText>
 
-        <RegText onPress={() => onItemSelected('About')} style={styles.item}>
+        <RegText onPress={() => onItemSelected('About')} style={item}>
           About ZingoZcash
         </RegText>
       </View>
@@ -88,6 +89,7 @@ function Menu({onItemSelected}: any) {
 type ComputingModalProps = {
   progress: SendProgress;
 };
+
 const ComputingTxModalContent: React.FunctionComponent<ComputingModalProps> = ({progress}) => {
   const {colors} = useTheme();
 
@@ -120,10 +122,17 @@ const ComputingTxModalContent: React.FunctionComponent<ComputingModalProps> = ({
 
 const Tab = createBottomTabNavigator();
 
-type LoadedAppProps = {
+export default function(props) {
+  const theme = useTheme();
+
+  return <LoadedAppClass {...props} theme={theme} />;
+}
+
+type LoadedAppClassProps = {
   navigation: any;
+  theme: any;
 };
-export default class LoadedApp extends Component<LoadedAppProps, AppState> {
+class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
   rpc: RPC;
 
   constructor(props: any) {
@@ -545,6 +554,7 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
       txBuildProgress,
       error,
     } = this.state;
+    const { colors } = this.props.theme;
 
     const standardProps = {
       openErrorModal: this.openErrorModal,
@@ -644,14 +654,14 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
                 iconName = faCog;
               }
 
-              const iconColor = focused ? '#000000' : '#c08863';
+              const iconColor = focused ? colors.background : colors.money;
               return <FontAwesomeIcon icon={iconName} color={iconColor} />;
             },
           })}
           tabBarOptions={{
-            activeTintColor: '#000000',
-            activeBackgroundColor: '#df4100',
-            inactiveTintColor: '#c08863',
+            activeTintColor: colors.background,
+            activeBackgroundColor: colors.primary,
+            inactiveTintColor: colors.money,
             labelStyle: {fontSize: 14},
             tabStyle: {borderRadius: 0},
           }}>
@@ -670,7 +680,7 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
                   setTxBuildProgress={this.setTxBuildProgress}
                 />
                 {error && (
-                  <FadeText style={{ color: '#df4100', textAlign: 'center', width:'100%' }}>{error}</FadeText>
+                  <FadeText style={{ color: colors.primary, textAlign: 'center', width:'100%' }}>{error}</FadeText>
                 )}
               </>
             )}
@@ -688,7 +698,7 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
                   setComputingModalVisible={this.setComputingModalVisible}
                 />
                 {error && (
-                  <FadeText style={{ color: '#df4100', textAlign: 'center', width:'100%' }}>{error}</FadeText>
+                  <FadeText style={{ color: colors.primary, textAlign: 'center', width:'100%' }}>{error}</FadeText>
                 )}
               </>
             )}
@@ -696,9 +706,16 @@ export default class LoadedApp extends Component<LoadedAppProps, AppState> {
           <Tab.Screen name="RECEIVE">
             {props => (
               <>
-                <ReceiveScreen {...props} {...standardProps} addresses={addresses} startRescan={this.startRescan} totalBalance={totalBalance} info={info} />
+                <ReceiveScreen
+                  {...props}
+                  {...standardProps}
+                  addresses={addresses}
+                  startRescan={this.startRescan}
+                  totalBalance={totalBalance}
+                  info={info}
+                />
                 {error && (
-                  <FadeText style={{ color: '#df4100', textAlign: 'center', width:'100%' }}>{error}</FadeText>
+                  <FadeText style={{ color: colors.primary, textAlign: 'center', width:'100%' }}>{error}</FadeText>
                 )}
               </>
             )}

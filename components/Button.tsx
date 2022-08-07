@@ -8,13 +8,13 @@ const Button: React.FunctionComponent<any> = ({type, title, disabled, onPress, s
   // type: 'Primary' or 'Secondary'
   const styleButton =
     type === 'Primary' ? {
-      backgroundColor: disabled ? '#351515' : colors.primary,
+      backgroundColor: disabled ? colors.primaryDisabled : colors.primary,
     } : type === 'Secondary' ? {
       borderColor: colors.primary || colors.text,
       borderWidth: 2,
     } : {
       // error
-      backgroundColor: 'red',
+      backgroundColor: colors.primary,
     };
   const styleCommon = {
     padding: 10,

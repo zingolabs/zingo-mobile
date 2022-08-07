@@ -63,8 +63,8 @@ const SingleAddressDisplay: React.FunctionComponent<SingleAddress> = ({address, 
         },
       ]}
       keyboardShouldPersistTaps="handled">
-      <View style={{marginTop: 20, padding: 10, backgroundColor: '#777777'}}>
-        <QRCode value={address} size={200} ecl="L" backgroundColor='#777777' />
+      <View style={{marginTop: 20, padding: 10, backgroundColor: colors.border}}>
+        <QRCode value={address} size={200} ecl="L" backgroundColor={colors.border} />
       </View>
       <ClickableText style={{marginTop: 15}} onPress={doCopy}>
         Tap To Copy
@@ -421,18 +421,20 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
             justifyContent: 'space-between',
             backgroundColor: colors.card,
             padding: 10,
-            paddingBottom: 0
+            paddingBottom: 0,
+            margin: 0,
           }}>
           <TouchableOpacity onPress={toggleMenuDrawer}>
-            <FontAwesomeIcon icon={faBars} size={20} color={'#ffffff'} />
+            <FontAwesomeIcon icon={faBars} size={20} color={colors.border} />
           </TouchableOpacity>
           <View
-            style={{display: 'flex', alignItems: 'center', paddingBottom: 25, backgroundColor: colors.card, zIndex: -1}}>
-            <RegText color={'#ffffff'} style={{paddingBottom: 5}}>Addresses</RegText>
-            <ZecAmount size={36} amtZec={totalBalance.total} style={{opacity: 0.2}} />
+            style={{display: 'flex', alignItems: 'center', paddingBottom: 0, backgroundColor: colors.card, zIndex: -1, paddingTop: 0}}>
+            <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 80, height: 80, resizeMode: 'contain'}} />
+            <ZecAmount size={36} amtZec={totalBalance.total} style={{opacity: 0.4}} />
+            <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>Receive</RegText>
           </View>
           <OptionsMenu
-            customButton={<FontAwesomeIcon icon={faEllipsisV} color={'#ffffff'} size={20} />}
+            customButton={<FontAwesomeIcon icon={faEllipsisV} color={colors.border} size={20} />}
             buttonStyle={{width: 32, height: 32, margin: 7.5, resizeMode: 'contain'}}
             destructiveIndex={5}
             options={[
@@ -448,11 +450,8 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
           />
         </View>
 
+        <View style={{ width: '100%', height: 1, backgroundColor: colors.primary}}></View>
 
-        <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: -30}}>
-          <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 50, height: 50, resizeMode: 'contain'}} />
-          <Text style={{ color: '#777777', fontSize: 40, fontWeight: 'bold' }}> ZingoZcash</Text>
-        </View>
         <TabBar
           {...props}
           indicatorStyle={{backgroundColor: colors.primary}}

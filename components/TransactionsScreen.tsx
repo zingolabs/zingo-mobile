@@ -38,7 +38,7 @@ type TxDetailProps = {
 };
 const TxDetail: React.FunctionComponent<TxDetailProps> = ({tx, closeModal}) => {
   const {colors} = useTheme();
-  const spendColor = tx?.confirmations === 0 ? colors.primary : (tx?.amount || 0) > 0 ? '#88ee88' : '#ff6666';
+  const spendColor = tx?.confirmations === 0 ? colors.primaryDisabled : (tx?.amount || 0) > 0 ? colors.primary : colors.text;
 
   const [expandAddress, setExpandAddress] = useState(false);
   const [expandTxid, setExpandTxid] = useState(false);
@@ -223,7 +223,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
 }) => {
   const {colors} = useTheme();
 
-  const amountColor = tx.confirmations === 0 ? colors.primary : tx.amount > 0 ? '#88ee88' : colors.text;
+  const amountColor = tx.confirmations === 0 ? colors.primaryDisabled : tx.amount > 0 ? colors.primary : colors.text;
   const txIcon = tx.amount > 0 ? faArrowDown : faArrowUp;
 
   const displayAddress =
@@ -240,7 +240,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
             borderTopWidth: 1,
             borderBottomWidth: 1,
             borderColor: colors.card,
-            backgroundColor: '#272727',
+            backgroundColor: colors.background,
           }}>
           <FadeText>{month}</FadeText>
         </View>
@@ -343,7 +343,7 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
   var lastMonth = '';
 
   return (
-    <View style={{display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', marginBottom: 170}}>
+    <View style={{display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', marginBottom: 170, width: '100%'}}>
       <Modal
         animationType="slide"
         transparent={false}
@@ -353,8 +353,8 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
       </Modal>
 
       <View
-        style={{display: 'flex', alignItems: 'center', paddingBottom: 25, backgroundColor: colors.card, zIndex: -1}}>
-        <RegText color={'#ffffff'} style={{marginTop: 5, padding: 5}}>{syncStatusDisplay}</RegText>
+        style={{display: 'flex', alignItems: 'center', paddingBottom: 0, backgroundColor: colors.card, zIndex: -1, paddingTop: 10}}>
+        <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 80, height: 80, resizeMode: 'contain'}} />
         <ZecAmount color={balanceColor} size={36} amtZec={totalBalance.total} />
         <UsdAmount style={{marginTop: 0, marginBottom: 5}} price={zecPrice} amtZec={totalBalance.total} />
 
@@ -363,18 +363,17 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
             <Button type="Primary" title="Shield funds" onPress={shieldFunds} />
           </View>
         )}
+        <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>{syncStatusDisplay}</RegText>
       </View>
 
       <View style={{backgroundColor: colors.card, padding: 10, position: 'absolute'}}>
         <TouchableOpacity onPress={toggleMenuDrawer}>
-          <FontAwesomeIcon icon={faBars} size={20} color={'#ffffff'} />
+          <FontAwesomeIcon icon={faBars} size={20} color={colors.border} />
         </TouchableOpacity>
       </View>
 
-      <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: -30}}>
-        <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 50, height: 50, resizeMode: 'contain'}} />
-        <Text style={{ color: '#777777', fontSize: 40, fontWeight: 'bold' }}> ZingoZcash</Text>
-      </View>
+      <View style={{ width: '100%', height: 1, backgroundColor: colors.primary}}></View>
+
       <ScrollView
         refreshControl={
           <RefreshControl refreshing={false} onRefresh={doRefresh} tintColor={colors.text} title="Refreshing" />

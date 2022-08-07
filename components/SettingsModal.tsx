@@ -73,27 +73,24 @@ const SettingsModal: React.FunctionComponent<SettingsModalProps> = ({
         justifyContent: 'flex-start',
         alignItems: 'stretch',
         height: '100%',
-        backgroundColor: colors.background,
+        backgroundColor: colors.background
       }}>
+      <View
+        style={{display: 'flex', alignItems: 'center', paddingBottom: 10, backgroundColor: colors.card, zIndex: -1, paddingTop: 10}}>
+        <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 80, height: 80, resizeMode: 'contain'}} />
+        <ZecAmount size={36} amtZec={totalBalance.total} style={{opacity: 0.4}} />
+        <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>Settings</RegText>
+        <View style={{ width: '100%', height: 1, backgroundColor: colors.primary}}></View>
+      </View>
+
       <ScrollView
         style={{maxHeight: '85%'}}
         contentContainerStyle={{
           flexDirection: 'column',
           alignItems: 'stretch',
           justifyContent: 'flex-start',
+          backgroundColor: colors.background,
         }}>
-        <View
-          style={{display: 'flex', alignItems: 'center', paddingBottom: 25, backgroundColor: colors.card, zIndex: -1}}>
-          <RegText color={'#ffffff'} style={{marginTop: 5, padding: 5}}>Settings</RegText>
-          <ZecAmount size={36} amtZec={totalBalance.total} style={{opacity: 0.2}} />
-        </View>
-        <View>
-          <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: -30}}>
-            <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 50, height: 50, resizeMode: 'contain'}} />
-            <Text style={{ color: '#777777', fontSize: 40, fontWeight: 'bold' }}> ZingoZcash</Text>
-          </View>
-        </View>
-
         <View style={{display: 'flex', margin: 10}}>
           <BoldText>SERVER</BoldText>
         </View>
@@ -105,7 +102,7 @@ const SettingsModal: React.FunctionComponent<SettingsModalProps> = ({
               style={{marginRight: 10, marginBottom: 5}}
               onPress={() => setServer(uri)}>
               <View key={'view-' + uri} style={{display: 'flex', flexDirection: 'row', marginTop: 10}}>
-                <FontAwesomeIcon key={'icon-' + uri} icon={uri === server ? faDotCircle : farCircle} size={20} color={'#777777'} />
+                <FontAwesomeIcon key={'icon-' + uri} icon={uri === server ? faDotCircle : farCircle} size={20} color={colors.border} />
                 <RegText key={'tex-' + uri} style={{marginLeft: 10}}>{uri}</RegText>
               </View>
             </TouchableOpacity>
@@ -116,21 +113,24 @@ const SettingsModal: React.FunctionComponent<SettingsModalProps> = ({
               style={{marginRight: 10, marginBottom: 5}}
               onPress={() => setServer(null)}>
               <View style={{display: 'flex', flexDirection: 'row', marginTop: 10}}>
-                {customIcon && (<FontAwesomeIcon icon={customIcon} size={20} color={'#777777'} />)}
+                {customIcon && (<FontAwesomeIcon icon={customIcon} size={20} color={colors.border} />)}
                 <RegText style={{marginLeft: 10}}>custom</RegText>
               </View>
             </TouchableOpacity>
 
             <RegTextInput
               placeholder={'... http------.---:--- ...'}
-              placeholderTextColor="#777777"
+              placeholderTextColor={colors.placeholder}
               style={{
                 //flexGrow: 1,
                 fontSize: 18,
                 width: '60%',
-                borderBottomColor: colors.card,
-                borderBottomWidth: 2,
+                borderColor: colors.border,
+                borderWidth: 1,
                 marginLeft: 5,
+                padding: 5,
+                paddingTop: 10,
+                paddingBottom: 10,
                 marginTop: Platform.OS === 'ios' ? 15 : 3,
                 display: customIcon === faDotCircle ? 'flex' : 'none',
               }}
@@ -153,7 +153,7 @@ const SettingsModal: React.FunctionComponent<SettingsModalProps> = ({
                 style={{marginRight: 10, marginBottom: 5}}
                 onPress={() => setMemos(memo.value)}>
                 <View key={'view-' + memo.value} style={{display: 'flex', flexDirection: 'row', marginTop: 10}}>
-                  <FontAwesomeIcon key={'icon-' + memo.value} icon={memo.value === memos ? faDotCircle : farCircle} size={20} color={'#777777'} />
+                  <FontAwesomeIcon key={'icon-' + memo.value} icon={memo.value === memos ? faDotCircle : farCircle} size={20} color={colors.border} />
                   <RegText key={'text-' + memo.value} style={{marginLeft: 10}}>{memo.value}</RegText>
                 </View>
               </TouchableOpacity>

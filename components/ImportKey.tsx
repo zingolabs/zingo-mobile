@@ -84,15 +84,11 @@ const ImportKeyModal: React.FunctionComponent<ImportKeyModalProps> = ({closeModa
         backgroundColor: colors.background,
       }}>
       <View
-        style={{display: 'flex', alignItems: 'center', paddingBottom: 25, backgroundColor: colors.card, zIndex: -1}}>
-        <RegText color={'#ffffff'} style={{marginTop: 5, padding: 5}}>Import Key</RegText>
-        <ZecAmount size={36} amtZec={totalBalance.total} style={{opacity: 0.2}} />
-      </View>
-      <View>
-        <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: -30}}>
-          <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 50, height: 50, resizeMode: 'contain'}} />
-          <Text style={{ color: '#777777', fontSize: 40, fontWeight: 'bold' }}> ZingoZcash</Text>
-        </View>
+        style={{display: 'flex', alignItems: 'center', paddingBottom: 10, backgroundColor: colors.card, zIndex: -1, paddingTop: 10}}>
+        <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 80, height: 80, resizeMode: 'contain'}} />
+        <ZecAmount size={36} amtZec={totalBalance.total} style={{opacity: 0.4}} />
+        <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>Import Key</RegText>
+        <View style={{ width: '100%', height: 1, backgroundColor: colors.primary}}></View>
       </View>
 
       <Modal
@@ -119,12 +115,11 @@ const ImportKeyModal: React.FunctionComponent<ImportKeyModalProps> = ({closeModa
             ...cstyles.innerpaddingsmall,
             maxWidth: '95%',
             minWidth: '95%',
-            borderColor: 'gray',
             borderWidth: 1,
             borderRadius: 10,
-            borderColor: colors.text,
+            borderColor: colors.border,
             minHeight: 100,
-            color: '#777777'
+            color: colors.text
           }}
           value={privKeyText}
           onChangeText={setPrivKeyText}
@@ -134,7 +129,7 @@ const ImportKeyModal: React.FunctionComponent<ImportKeyModalProps> = ({closeModa
           onPress={() => {
             setQrcodeModalVisible(true);
           }}>
-          <FontAwesomeIcon style={{margin: 5}} size={50} icon={faQrcode} color={'#777777'} />
+          <FontAwesomeIcon style={{margin: 5}} size={50} icon={faQrcode} color={colors.border} />
           {/*<Image
             source={require('../assets/img/qr-code-scan.png')}
             style={{width: 50, height: 50, marginTop: 15, resizeMode: 'contain'}}
@@ -150,9 +145,9 @@ const ImportKeyModal: React.FunctionComponent<ImportKeyModalProps> = ({closeModa
             minWidth: '50%',
             borderWidth: 1,
             borderRadius: 5,
-            borderColor: colors.text,
+            borderColor: colors.border,
             margin: 10,
-            color: '#777777'
+            color: colors.text
           }}
           value={birthday}
           keyboardType="numeric"

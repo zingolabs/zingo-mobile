@@ -48,15 +48,11 @@ const PrivKeyModal: React.FunctionComponent<PrivKeyModalProps> = ({address, keyT
         backgroundColor: colors.background,
       }}>
       <View
-        style={{display: 'flex', alignItems: 'center', paddingBottom: 25, backgroundColor: colors.card, zIndex: -1}}>
-        <RegText color={'#ffffff'} style={{marginTop: 5, padding: 5}}>{keyTypeString} Key</RegText>
-        <ZecAmount size={36} amtZec={totalBalance.total} style={{opacity: 0.2}} />
-      </View>
-      <View>
-        <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: -30}}>
-          <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 50, height: 50, resizeMode: 'contain'}} />
-          <Text style={{ color: '#777777', fontSize: 40, fontWeight: 'bold' }}> ZingoZcash</Text>
-        </View>
+        style={{display: 'flex', alignItems: 'center', paddingBottom: 10, backgroundColor: colors.card, zIndex: -1, paddingTop: 10}}>
+        <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 80, height: 80, resizeMode: 'contain'}} />
+        <ZecAmount size={36} amtZec={totalBalance.total} style={{opacity: 0.4}} />
+        <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>{keyTypeString} Key</RegText>
+        <View style={{ width: '100%', height: 1, backgroundColor: colors.primary}}></View>
       </View>
 
       <ScrollView
@@ -69,7 +65,7 @@ const PrivKeyModal: React.FunctionComponent<PrivKeyModalProps> = ({address, keyT
         <View style={{display: 'flex', flexDirection: 'column', marginTop: 0, alignItems: 'center'}}>
 
           <View style={{alignItems: 'center', paddingBottom: 0, paddingTop: 10}}>
-            <FadeText style={{color: '#777777', textAlign: 'center', marginLeft: 10, marginRight: 10}}>
+            <FadeText style={{color: colors.text, textAlign: 'center', marginLeft: 10, marginRight: 10}}>
               Address
             </FadeText>
             <TouchableOpacity
@@ -82,8 +78,8 @@ const PrivKeyModal: React.FunctionComponent<PrivKeyModalProps> = ({address, keyT
             </TouchableOpacity>
           </View>
 
-          <View style={{padding: 10, backgroundColor: '#777777', marginTop: 15, marginBottom: 20}}>
-            <QRCode value={privKey} size={225} ecl="L" backgroundColor='#777777' />
+          <View style={{padding: 10, backgroundColor: colors.border, marginTop: 15, marginBottom: 20}}>
+            <QRCode value={privKey} size={225} ecl="L" backgroundColor={colors.border} />
           </View>
           <ClickableText style={{marginBottom: 5}} onPress={doCopy}>
             Tap To Copy

@@ -8,12 +8,15 @@ import { View, ScrollView, Alert, SafeAreaView, Image, Text } from 'react-native
 import { NavigationContainer, DarkTheme } from '@react-navigation/native';
 import { AppearanceProvider } from 'react-native-appearance';
 import { createStackNavigator } from '@react-navigation/stack';
+import {useTheme} from '@react-navigation/native';
+import Toast from 'react-native-simple-toast';
 
 import cstyles from './components/CommonStyles';
-import { BoldText, RegText, RegTextInput, FadeText } from './components/Components';
+import { BoldText, RegText, RegTextInput, FadeText, ZecAmount, UsdAmount, zecPrice } from './components/Components';
 import Button from './components/Button';
 import RPCModule from './components/RPCModule';
 import LoadedApp from './app/LoadedApp';
+import { TotalBalance } from './app/AppState';
 import { SERVER_URI } from './app/uris';
 import SeedComponent from './components/SeedComponent';
 import SettingsFileImpl from './components/SettingsFileImpl';
@@ -22,11 +25,18 @@ import RPC from './app/rpc';
 // -----------------
 // Loading View
 // -----------------
-type LoadingProps = {
+
+const LoadingView = (props) => {
+  const theme = useTheme();
+
+  return <LoadingViewClass {...props} theme={theme} />;
+}
+
+type LoadingViewClassProps = {
   navigation: any;
 };
 
-type LoadingState = {
+type LoadingViewClassState = {
   screen: number;
   actionButtonsDisabled: boolean;
   walletExists: boolean;
@@ -36,7 +46,7 @@ type LoadingState = {
 
 const SERVER_DEFAULT = SERVER_URI[0];
 
-class LoadingView extends Component<LoadingProps, LoadingState> {
+class LoadingViewClass extends Component<LoadingViewClassProps, LoadingViewClassState> {
   constructor(props: Readonly<LoadingProps>) {
     super(props);
 
@@ -47,6 +57,7 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
       seedPhrase: null,
       birthday: '0',
       server: null,
+      totalBalance: new TotalBalance,
     };
   }
 
@@ -120,15 +131,17 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
 
   getViewingKeyToRestore = async () => {
     //this.setState({ viewingKey: '', birthday: '0', screen: 3 });
+    Toast.show('We are working on it, comming soon.', Toast.LONG);
   };
 
   getSpendableKeyToRestore = async () => {
     //this.setState({ spendableKey: '', birthday: '0', screen: 3 });
+    Toast.show('We are working on it, comming soon.', Toast.LONG);
   };
 
   doRestore = async () => {
     // Don't call with null values
-    const { birthday, seedPhrase } = this.state;
+    const { birthday, seedPhrase, server } = this.state;
 
     if (!seedPhrase) {
       Alert.alert('Invalid Seed Phrase', 'The seed phrase was invalid');
@@ -145,7 +158,7 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
         walletBirthday = '0';
       }
 
-      const error = await RPCModule.restoreWallet(seedPhrase.toLowerCase(), walletBirthday || '0');
+      const error = await RPCModule.restoreWallet(seedPhrase.toLowerCase(), walletBirthday || '0', server);
       if (!error.startsWith('Error')) {
         this.navigateToLoaded();
       } else {
@@ -167,7 +180,8 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
   };
 
   render() {
-    const { screen, birthday, seedPhrase, actionButtonsDisabled, walletExists, server } = this.state;
+    const { screen, birthday, seedPhrase, actionButtonsDisabled, walletExists, server, totalBalance } = this.state;
+    const { colors } = this.props.theme;
 
     return (
       <View
@@ -179,7 +193,7 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
             justifyContent: 'center',
           },
         ]}>
-        {screen === 0 && <Text style={{ color: '#777777', fontSize: 40, fontWeight: 'bold' }}> ZingoZcash</Text>}
+        {screen === 0 && <Text style={{ color: colors.zingozcash, fontSize: 40, fontWeight: 'bold' }}> ZingoZcash</Text>}
         {screen === 1 && (
           <View
             style={[
@@ -191,10 +205,10 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
               },
             ]}>
             <View style={{ marginBottom: 50, display: 'flex', alignItems: 'center' }}>
-              <Text style={{ color: '#777777', fontSize: 40, fontWeight: 'bold' }}> ZingoZcash</Text>
+              <Text style={{ color: colors.zingozcash, fontSize: 40, fontWeight: 'bold' }}> ZingoZcash</Text>
               <Image
                 source={require('./assets/img/logobig-zingo.png')}
-                style={{ width: 100, height: 100, resizeMode: 'contain' }}
+                style={{ width: 100, height: 100, resizeMode: 'contain', marginTop: 10 }}
               />
             </View>
 
@@ -220,6 +234,7 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
             seed={JSON.parse(seedPhrase)?.seed}
             birthday={JSON.parse(seedPhrase)?.birthday}
             nextScreen={this.loadWallet}
+            totalBalance={totalBalance}
           />
         )}
         {screen === 3 && (
@@ -229,35 +244,49 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
                 flex: 1,
                 flexDirection: 'column',
                 alignItems: 'center',
-                justifyContent: 'flex-start',
+                justifyContent: 'center',
               },
             ]}
-            keyboardShouldPersistTaps="handled">
-            <RegText style={{ margin: 30 }}>Enter your seed phrase (24 words)</RegText>
+            keyboardShouldPersistTaps="handled"
+          >
+            <View
+              style={{display: 'flex', alignItems: 'center', paddingBottom: 10, backgroundColor: colors.card, zIndex: -1, paddingTop: 10, width: '100%'}}>
+              <Image source={require('./assets/img/logobig-zingo.png')} style={{width: 80, height: 80, resizeMode: 'contain'}} />
+              <ZecAmount size={36} amtZec={totalBalance.total} style={{opacity: 0.4}} />
+              <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>Restore Wallet</RegText>
+              <View style={{ width: '100%', height: 1, backgroundColor: colors.primary}}></View>
+            </View>
+
+            <FadeText style={{marginTop: 20, textAlign: 'center'}}>Enter your seed phrase (24 words)</FadeText>
             <RegTextInput
               multiline
-              style={[
-                {
-                  maxWidth: '95%',
-                  minWidth: '95%',
-                  borderColor: '#351515',
-                  borderWidth: 1,
-                  minHeight: 100,
-                },
-                cstyles.innerpaddingsmall,
-              ]}
+              style={{
+                margin: 10,
+                padding: 10,
+                borderWidth: 1,
+                borderRadius: 10,
+                borderColor: colors.text,
+                width:'90%',
+                height: '20%',
+                color: colors.text,
+              }}
               value={seedPhrase}
               onChangeText={(text: string) => this.setState({ seedPhrase: text })}
             />
-            <RegText style={[cstyles.margintop, cstyles.center]}>Wallet Birthday</RegText>
+            <View style={{marginTop: 10}}>
+              <FadeText style={{textAlign: 'center'}}>Wallet Birthday</FadeText>
+            </View>
             <FadeText>Block height of first transaction. (OK to leave blank)</FadeText>
             <RegTextInput
               style={[
                 {
-                  maxWidth: '50%',
-                  minWidth: '50%',
-                  borderColor: '#351515',
+                  margin: 10,
+                  padding: 10,
                   borderWidth: 1,
+                  borderRadius: 10,
+                  borderColor: colors.text,
+                  width:'40%',
+                  color: colors.text
                 },
                 cstyles.innerpaddingsmall,
               ]}
@@ -265,8 +294,9 @@ class LoadingView extends Component<LoadingProps, LoadingState> {
               keyboardType="numeric"
               onChangeText={(text: string) => this.setState({ birthday: text })}
             />
-            <View style={cstyles.margintop}>
+            <View style={{flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', margin: 20}}>
               <Button type="Primary" title="Restore Wallet" disabled={actionButtonsDisabled} onPress={this.doRestore} />
+              <Button type="Secondary" title="Cancel" style={{marginLeft: 10}} onPress={() => this.setState({ screen: 1 })} />
             </View>
           </ScrollView>
         )}
@@ -279,11 +309,15 @@ const Theme = {
   ...DarkTheme,
   colors: {
     ...DarkTheme.colors,
-    background: '#010101',
-    card: '#401717',
-    border: '#803434',
-    primary: '#df4100',
-    text: '#c08863',
+    background: '#011401', //'#010101',
+    card: '#011401', //'#401717',
+    border: '#ffffff',
+    primary: '#18bd18', //'#df4100',
+    primaryDisabled: 'rgba(24, 189, 24, 0.3)',
+    text: '#c3c3c3',
+    zingozcash: '#777777',
+    placeholder: '#333333',
+    money: '#ffffff'
   },
 };
 

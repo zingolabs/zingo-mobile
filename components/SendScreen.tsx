@@ -476,37 +476,34 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
             style={{
               display: 'flex',
               alignItems: 'center',
-              paddingBottom: 25,
+              paddingBottom: 0,
               backgroundColor: colors.card,
               zIndex: -1,
             }}>
-            <RegText color={'#ffffff'} style={{marginTop: 5, padding: 5}}>Send</RegText>
-            <TouchableOpacity onPress={() => setMaxAmount(0)}>
-              <View style={{display: 'flex', alignItems: 'center'}}>
-                <ZecAmount size={36} amtZec={getMaxAmount()} />
-                <UsdAmount style={{marginTop: 0, marginBottom: 5}} price={zecPrice} amtZec={getMaxAmount()} />
-              </View>
-            </TouchableOpacity>
+            <View
+              style={{display: 'flex', alignItems: 'center', paddingBottom: 0, backgroundColor: colors.card, zIndex: -1, paddingTop: 10}}>
+              <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 80, height: 80, resizeMode: 'contain'}} />
+              <ZecAmount size={36} amtZec={totalBalance.total} />
+              <UsdAmount style={{marginTop: 0, marginBottom: 5}} price={zecPrice} amtZec={totalBalance.total} />
+              <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>Send</RegText>
+            </View>
           </View>
         </Animated.View>
 
         <Animated.View style={{backgroundColor: colors.card, padding: 10, position: 'absolute', marginTop: slideAnim}}>
           <TouchableOpacity onPress={toggleMenuDrawer}>
-            <FontAwesomeIcon icon={faBars} size={20} color={'#ffffff'} />
+            <FontAwesomeIcon icon={faBars} size={20} color={colors.border} />
           </TouchableOpacity>
         </Animated.View>
 
-        <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: -30}}>
-          <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 50, height: 50, resizeMode: 'contain'}} />
-          <Text style={{ color: '#777777', fontSize: 40, fontWeight: 'bold' }}> ZingoZcash</Text>
-        </View>
+        <View style={{ width: '100%', height: 1, backgroundColor: colors.primary}}></View>
 
         {sendPageState.toaddrs.map((ta, i) => {
           return (
             <View key={i} style={{display: 'flex', padding: 10, marginTop: 10}}>
               <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
                 <RegText>To Address</RegText>
-                {addressValidationState[i] === 1 && <FontAwesomeIcon icon={faCheck} color="green" />}
+                {addressValidationState[i] === 1 && <FontAwesomeIcon icon={faCheck} color={colors.primary} />}
                 {addressValidationState[i] === -1 && <ErrorText>Invalid Address!</ErrorText>}
               </View>
               <View
@@ -522,7 +519,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
                 }}>
                 <RegTextInput
                   placeholder="Z or T or O or UA-address"
-                  placeholderTextColor="#333333"
+                  placeholderTextColor={colors.placeholder}
                   style={{flexGrow: 1, maxWidth: '90%'}}
                   value={ta.to}
                   onChangeText={(text: string) => updateToField(i, text, null, null, null)}
@@ -532,7 +529,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
                     setQrcodeModalIndex(i);
                     setQrcodeModalVisible(true);
                   }}>
-                  <FontAwesomeIcon style={{margin: 5}} size={24} icon={faQrcode} color={'#777777'} />
+                  <FontAwesomeIcon style={{margin: 5}} size={24} icon={faQrcode} color={colors.border} />
                 </TouchableOpacity>
               </View>
 
@@ -550,7 +547,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
                 <RegText style={{marginTop: 20, marginRight: 5, fontSize: 20}}>{'\u1647'}</RegText>
                 <RegTextInput
                   placeholder={`0${decimalSeparator}0`}
-                  placeholderTextColor="#333333"
+                  placeholderTextColor={colors.placeholder}
                   keyboardType="numeric"
                   style={{
                     display: 'flex',
@@ -572,7 +569,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
                 <RegText style={{marginTop: 15, marginLeft: 10, marginRight: 5}}>$</RegText>
                 <RegTextInput
                   placeholder={`0${decimalSeparator}0`}
-                  placeholderTextColor="#333333"
+                  placeholderTextColor={colors.placeholder}
                   keyboardType="numeric"
                   style={{
                     display: 'flex',
@@ -595,7 +592,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
               <View style={{display: 'flex', flexDirection: 'column'}}>
                 <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', marginTop: 10}}>
                   <RegText>Spendable: </RegText>
-                  <ZecAmount color={'#777777'} size={18} amtZec={getMaxAmount()} />
+                  <ZecAmount color={colors.money} size={18} amtZec={getMaxAmount()} />
                 </View>
                 {stillConfirming && (
                   <View

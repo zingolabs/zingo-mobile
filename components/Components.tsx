@@ -25,9 +25,9 @@ export const UsdAmount: React.FunctionComponent<UsdAmountProps> = ({price, style
 
   return (
     <View style={{flexDirection: 'row', alignItems: 'baseline'}}>
-      <Text style={{color: colors.text, fontSize: 20, ...style}}>$</Text>
-      <Text style={{color: colors.text, fontSize: 20, fontWeight: '700', ...style}}>{' ' + Utils.toLocaleFloat(usdString)}</Text>
-      <Text style={{color: colors.text, fontSize: 20, ...style}}>{' USD'}</Text>
+      <Text style={{color: colors.money, fontSize: 20, ...style}}>$</Text>
+      <Text style={{color: colors.money, fontSize: 20, fontWeight: '700', ...style}}>{' ' + Utils.toLocaleFloat(usdString)}</Text>
+      <Text style={{color: colors.money, fontSize: 20, ...style}}>{' USD'}</Text>
     </View>
   );
 };
@@ -63,7 +63,7 @@ export const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({color, style
   }
 
   if (!color) {
-    color = colors.text;
+    color = colors.money;
   }
 
   const alignmentPadding = Platform.OS === 'android' ? 4 : 0;
@@ -115,7 +115,9 @@ export const ClickableText: React.FunctionComponent<any> = props => {
 };
 
 export const ErrorText: React.FunctionComponent<any> = props => {
-  return <Text style={{color: 'red', ...props.style}}>{props.children}</Text>;
+  const {colors} = useTheme();
+
+  return <Text style={{color: colors.primary, ...props.style}}>{props.children}</Text>;
 };
 
 export const RegText: React.FunctionComponent<any> = ({style, color, onPress, children}) => {

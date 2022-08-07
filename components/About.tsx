@@ -20,15 +20,11 @@ const AboutModal: React.FunctionComponent<AboutModalProps> = ({closeModal, total
         backgroundColor: colors.background,
       }}>
       <View
-        style={{display: 'flex', alignItems: 'center', paddingBottom: 25, backgroundColor: colors.card, zIndex: -1}}>
-        <RegText color={'#ffffff'} style={{marginTop: 5, padding: 5}}>ZingoZcash v0.0.1</RegText>
-        <ZecAmount size={36} amtZec={totalBalance.total} style={{opacity: 0.2}} />
-      </View>
-      <View>
-        <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: -30}}>
-          <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 50, height: 50, resizeMode: 'contain'}} />
-          <Text style={{ color: '#777777', fontSize: 40, fontWeight: 'bold' }}> ZingoZcash</Text>
-        </View>
+        style={{display: 'flex', alignItems: 'center', paddingBottom: 10, backgroundColor: colors.card, zIndex: -1, paddingTop: 10}}>
+        <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 80, height: 80, resizeMode: 'contain'}} />
+        <ZecAmount size={36} amtZec={totalBalance.total} style={{opacity: 0.4}} />
+        <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>ZingoZcash v0.0.1</RegText>
+        <View style={{ width: '100%', height: 1, backgroundColor: colors.primary}}></View>
       </View>
 
       <ScrollView

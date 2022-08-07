@@ -13,10 +13,11 @@ type DetailLineProps = {
   value?: string | number;
 };
 const DetailLine: React.FunctionComponent<DetailLineProps> = ({label, value}) => {
+  const colors = useTheme();
   return (
     <View style={{display: 'flex', marginTop: 20}}>
       <FadeText>{label}</FadeText>
-      <RegText color="#777777">{value}</RegText>
+      <RegText color={colors.text}>{value}</RegText>
     </View>
   );
 };
@@ -59,15 +60,11 @@ const InfoModal: React.FunctionComponent<InfoModalProps> = ({info, closeModal, t
           justifyContent: 'flex-start',
         }}>
         <View
-          style={{display: 'flex', alignItems: 'center', paddingBottom: 25, backgroundColor: colors.card, zIndex: -1}}>
-          <RegText color={'#ffffff'} style={{marginTop: 5, padding: 5}}>Server Info</RegText>
-          <ZecAmount size={36} amtZec={totalBalance.total} style={{opacity: 0.2}} />
-        </View>
-        <View>
-          <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: -30}}>
-            <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 50, height: 50, resizeMode: 'contain'}} />
-            <Text style={{ color: '#777777', fontSize: 40, fontWeight: 'bold' }}> ZingoZcash</Text>
-          </View>
+          style={{display: 'flex', alignItems: 'center', paddingBottom: 10, backgroundColor: colors.card, zIndex: -1, paddingTop: 10}}>
+          <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 80, height: 80, resizeMode: 'contain'}} />
+          <ZecAmount size={36} amtZec={totalBalance.total} style={{opacity: 0.4}} />
+          <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>Server Info</RegText>
+          <View style={{ width: '100%', height: 1, backgroundColor: colors.primary}}></View>
         </View>
 
         <View style={{display: 'flex', margin: 20}}>

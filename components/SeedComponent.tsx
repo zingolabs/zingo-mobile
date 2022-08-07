@@ -28,23 +28,26 @@ const SeedComponent: React.FunctionComponent<SeedComponentProps> = ({seed, birth
         },
       ]}>
       <View
-        style={{display: 'flex', alignItems: 'center', paddingBottom: 25, backgroundColor: colors.card, zIndex: -1}}>
-        <RegText color={'#ffffff'} style={{marginTop: 5, padding: 5}}>Seed</RegText>
-        <ZecAmount size={36} amtZec={totalBalance.total} style={{opacity: 0.2}} />
-      </View>
-      <View>
-        <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: -30}}>
-          <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 50, height: 50, resizeMode: 'contain'}} />
-          <Text style={{ color: '#777777', fontSize: 40, fontWeight: 'bold' }}> ZingoZcash</Text>
-        </View>
+        style={{display: 'flex', alignItems: 'center', paddingBottom: 10, backgroundColor: colors.card, zIndex: -1, paddingTop: 10}}>
+        <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 80, height: 80, resizeMode: 'contain'}} />
+        <ZecAmount size={36} amtZec={totalBalance.total} style={{opacity: 0.4}} />
+        <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>Seed</RegText>
+        <View style={{ width: '100%', height: 1, backgroundColor: colors.primary}}></View>
       </View>
 
       <FadeText style={{marginTop: 20, padding: 20, textAlign: 'center'}}>
         This is your seed phrase. Please write it down carefully. It is the only way to restore your wallet.
       </FadeText>
-      <View style={{margin: 10, padding: 10, borderWidth: 1, borderRadius: 10, borderColor: colors.text}}>
+      <View
+        style={{
+          margin: 10,
+          padding: 10,
+          borderWidth: 1,
+          borderRadius: 10,
+          borderColor: colors.text
+        }}>
         <RegText
-          color="#777777"
+          color={colors.text}
           style={{
             textAlign: 'center',
           }}>
@@ -65,7 +68,7 @@ const SeedComponent: React.FunctionComponent<SeedComponentProps> = ({seed, birth
       <View style={{marginTop: 10}}>
         <FadeText style={{textAlign: 'center'}}>Wallet Birthday</FadeText>
       </View>
-      <RegText color="#777777" style={{textAlign: 'center'}}>{birthday}</RegText>
+      <RegText color={colors.text} style={{textAlign: 'center'}}>{birthday}</RegText>
 
       <View style={{flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
         <Button type="Primary" title={"I have saved \n the seed"} onPress={nextScreen} />
