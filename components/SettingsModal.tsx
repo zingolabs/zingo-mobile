@@ -37,6 +37,13 @@ const SettingsModal: React.FunctionComponent<SettingsModalProps> = ({
   }, [wallet_settings, memos, server]);
 
   const saveSettings = async () => {
+    if (wallet_settings.download_memos === memos && wallet_settings.server === server) {
+      setError('No changes registred.');
+      setTimeout(() => {
+        setError(null);
+      }, 5000);
+      return;
+    }
     if (!memos) {
       setError('You need to choose the download memos option to save.');
       setTimeout(() => {
@@ -60,8 +67,12 @@ const SettingsModal: React.FunctionComponent<SettingsModalProps> = ({
       return;
     }
 
-    set_wallet_option('download_memos', memos);
-    set_server_option(server);
+    if (wallet_settings.download_memos !== memos) {
+      set_wallet_option('download_memos', memos);
+    }
+    if (wallet_settings.server !== server) {
+      set_server_option(server);
+    }
 
     closeModal();
   }
@@ -118,25 +129,27 @@ const SettingsModal: React.FunctionComponent<SettingsModalProps> = ({
               </View>
             </TouchableOpacity>
 
-            <RegTextInput
-              placeholder={'... http------.---:--- ...'}
-              placeholderTextColor={colors.placeholder}
-              style={{
-                //flexGrow: 1,
-                fontSize: 18,
-                width: '60%',
-                borderColor: colors.border,
-                borderWidth: 1,
-                marginLeft: 5,
-                padding: 5,
-                paddingTop: 10,
-                paddingBottom: 10,
-                marginTop: Platform.OS === 'ios' ? 15 : 3,
-                display: customIcon === faDotCircle ? 'flex' : 'none',
-              }}
-              value={server}
-              onChangeText={(text: string) => setServer(text)}
-            />
+            {customIcon === faDotCircle && (
+              <RegTextInput
+                placeholder={'... http------.---:--- ...'}
+                placeholderTextColor={colors.placeholder}
+                style={{
+                  //flexGrow: 1,
+                  fontSize: 18,
+                  width: '60%',
+                  borderColor: colors.border,
+                  borderWidth: 1,
+                  marginLeft: 5,
+                  padding: 5,
+                  paddingTop: 10,
+                  paddingBottom: 10,
+                  marginTop: Platform.OS === 'ios' ? 15 : 3,
+                }}
+                value={server}
+                onChangeText={(text: string) => setServer(text)}
+              />
+            )}
+
           </View>
         </View>
 
