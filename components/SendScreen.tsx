@@ -206,6 +206,7 @@ type SendScreenProps = {
   toggleMenuDrawer: () => void;
   setComputingModalVisible: (visible: boolean) => void;
   setTxBuildProgress: (progress: SendProgress) => void;
+  syncingStatus: SyncStatus | null;
 };
 
 const SendScreen: React.FunctionComponent<SendScreenProps> = ({
@@ -219,6 +220,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
   toggleMenuDrawer,
   setComputingModalVisible,
   setTxBuildProgress,
+  syncingStatus,
 }) => {
   const {colors} = useTheme();
   const [qrcodeModalVisble, setQrcodeModalVisible] = useState(false);
@@ -425,6 +427,8 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
 
   const {decimalSeparator} = getNumberFormatSettings();
 
+  const syncStatusDisplay = syncingStatus?.inProgress ? `Syncing ${syncingStatus?.progress.toFixed(2)}%` : '';
+
   return (
     <View
       style={{
@@ -485,7 +489,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
               <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 80, height: 80, resizeMode: 'contain'}} />
               <ZecAmount size={36} amtZec={totalBalance.total} />
               <UsdAmount style={{marginTop: 0, marginBottom: 5}} price={zecPrice} amtZec={totalBalance.total} />
-              <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>Send</RegText>
+              <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>{syncStatusDisplay ? ('Send - ' + syncStatusDisplay) : 'Send'}</RegText>
             </View>
           </View>
         </Animated.View>

@@ -678,6 +678,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
                   clearToAddrs={this.clearToAddrs}
                   setComputingModalVisible={this.setComputingModalVisible}
                   setTxBuildProgress={this.setTxBuildProgress}
+                  syncingStatus={syncingStatus}
                 />
                 {error && (
                   <FadeText style={{ color: colors.primary, textAlign: 'center', width:'100%' }}>{error}</FadeText>
@@ -713,6 +714,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
                   startRescan={this.startRescan}
                   totalBalance={totalBalance}
                   info={info}
+                  syncingStatus={syncingStatus}
                 />
                 {error && (
                   <FadeText style={{ color: colors.primary, textAlign: 'center', width:'100%' }}>{error}</FadeText>

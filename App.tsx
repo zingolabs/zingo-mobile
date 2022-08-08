@@ -266,8 +266,9 @@ class LoadingViewClass extends Component<LoadingViewClassProps, LoadingViewClass
                 borderWidth: 1,
                 borderRadius: 10,
                 borderColor: colors.text,
-                width:'90%',
-                height: '20%',
+                maxWidth: '95%',
+                minWidth: '95%',
+                minheight: '20%',
                 color: colors.text,
               }}
               value={seedPhrase}

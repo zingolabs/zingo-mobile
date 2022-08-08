@@ -114,6 +114,7 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
   startRescan,
   totalBalance,
   info,
+  syncingStatus,
 }) => {
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([
@@ -386,6 +387,8 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
       address = oaddrs[oindex];
     }
 
+    const syncStatusDisplay = syncingStatus?.inProgress ? `Syncing ${syncingStatus?.progress.toFixed(2)}%` : '';
+
     return (
       <View>
         <Modal
@@ -431,7 +434,8 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
             style={{display: 'flex', alignItems: 'center', paddingBottom: 0, backgroundColor: colors.card, zIndex: -1, paddingTop: 0}}>
             <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 80, height: 80, resizeMode: 'contain'}} />
             <ZecAmount size={36} amtZec={totalBalance.total} style={{opacity: 0.4}} />
-            <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>Receive</RegText>
+            <UsdAmount style={{marginTop: 0, marginBottom: 5, opacity: 0.4}} price={zecPrice} amtZec={totalBalance.total} />
+            <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>{syncStatusDisplay ? ('Receive - ' + syncStatusDisplay) : 'Receive'}</RegText>
           </View>
           <OptionsMenu
             customButton={<FontAwesomeIcon icon={faEllipsisV} color={colors.border} size={20} />}

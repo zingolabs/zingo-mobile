@@ -337,7 +337,7 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
   const {colors} = useTheme();
   const zecPrice = info ? info.zecPrice : null;
 
-  const syncStatusDisplay = syncingStatus?.inProgress ? `Syncing ${syncingStatus?.progress.toFixed(2)}%` : 'Balance';
+  const syncStatusDisplay = syncingStatus?.inProgress ? `Syncing ${syncingStatus?.progress.toFixed(2)}%` : '';
 
   const balanceColor = transactions?.find(t => t.confirmations === 0) ? colors.primary : colors.text;
   var lastMonth = '';
@@ -363,7 +363,7 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
             <Button type="Primary" title="Shield funds" onPress={shieldFunds} />
           </View>
         )}
-        <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>{syncStatusDisplay}</RegText>
+        <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>{syncStatusDisplay ? ('Wallet - ' + syncStatusDisplay) : 'Wallet'}</RegText>
       </View>
 
       <View style={{backgroundColor: colors.card, padding: 10, position: 'absolute'}}>
