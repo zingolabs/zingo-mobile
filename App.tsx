@@ -42,6 +42,7 @@ type LoadingViewClassState = {
   walletExists: boolean;
   seedPhrase: string | null;
   birthday: string;
+  totalBalance: TotalBalance;
 };
 
 const SERVER_DEFAULT = SERVER_URI[0];
@@ -174,9 +175,6 @@ class LoadingViewClass extends Component<LoadingViewClassProps, LoadingViewClass
 
   set_wallet_option = async (name: string, value: string) => {
     await RPC.setWalletSettingOption(name, value);
-
-    // Refetch the settings to update
-    //this.rpc.fetchWalletSettings();
   };
 
   render() {
@@ -277,7 +275,7 @@ class LoadingViewClass extends Component<LoadingViewClassProps, LoadingViewClass
             <View style={{marginTop: 10}}>
               <FadeText style={{textAlign: 'center'}}>Wallet Birthday</FadeText>
             </View>
-            <FadeText>Block height of first transaction. (OK to leave blank)</FadeText>
+            <FadeText>Block height of first transaction. (OK, if you don't know)</FadeText>
             <RegTextInput
               style={[
                 {
