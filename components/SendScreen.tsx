@@ -538,7 +538,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
               </View>
 
               <View style={{marginTop: 10, display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
-                <FadeText>Amount</FadeText>
+                <FadeText>{'   Amount'}</FadeText>
                 {amountValidationState[i] === -1 && <ErrorText>Invalid Amount!</ErrorText>}
               </View>
 
@@ -546,51 +546,67 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
                 style={{
                   display: 'flex',
                   flexDirection: 'row',
-                  justifyContent: 'flex-start',
+                  justifyContent: 'space-between',
                 }}>
-                <RegText style={{marginTop: 20, marginRight: 5, fontSize: 20}}>{'\u1647'}</RegText>
-                <RegTextInput
-                  placeholder={`0${decimalSeparator}0`}
-                  placeholderTextColor={colors.placeholder}
-                  keyboardType="numeric"
+                <View
                   style={{
                     display: 'flex',
                     flexDirection: 'row',
                     justifyContent: 'flex-start',
-                    alignItems: 'center',
-                    borderWidth: 1,
-                    borderRadius: 5,
-                    borderColor: colors.text,
-                    marginTop: 5,
-                    fontSize: 18,
-                    width: '42%',
-                  }}
-                  value={ta.amount.toString()}
-                  onChangeText={(text: string) => updateToField(i, null, text, null, null)}
-                />
-                <RegText style={{marginTop: 15, marginRight: 10, marginLeft: 5}}>ZEC</RegText>
+                    width: '60%',
+                  }}>
+                  <RegText style={{marginTop: 20, marginRight: 5, fontSize: 20}}>{'\u1647'}</RegText>
+                  <RegTextInput
+                    placeholder={`0${decimalSeparator}0`}
+                    placeholderTextColor={colors.placeholder}
+                    keyboardType="numeric"
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      justifyContent: 'flex-start',
+                      alignItems: 'center',
+                      borderWidth: 1,
+                      borderRadius: 5,
+                      borderColor: colors.text,
+                      marginTop: 5,
+                      fontSize: 18,
+                      width: '75%',
+                    }}
+                    value={ta.amount.toString()}
+                    onChangeText={(text: string) => updateToField(i, null, text, null, null)}
+                  />
+                  <RegText style={{marginTop: 15, marginRight: 10, marginLeft: 5}}>ZEC</RegText>
+                </View>
 
-                <RegText style={{marginTop: 15, marginLeft: 10, marginRight: 5}}>$</RegText>
-                <RegTextInput
-                  placeholder={`0${decimalSeparator}0`}
-                  placeholderTextColor={colors.placeholder}
-                  keyboardType="numeric"
+                <View
                   style={{
                     display: 'flex',
                     flexDirection: 'row',
                     justifyContent: 'flex-start',
-                    alignItems: 'center',
-                    borderWidth: 1,
-                    borderRadius: 5,
-                    borderColor: colors.text,
-                    marginTop: 5,
-                    fontSize: 18,
-                    width: '25%',
-                  }}
-                  value={ta.amountUSD.toString()}
-                  onChangeText={(text: string) => updateToField(i, null, null, text, null)}
-                />
-                <RegText style={{marginTop: 15, marginLeft: 5}}>USD</RegText>
+                    width: '35%',
+                  }}>
+                <RegText style={{marginTop: 15, marginRight: 5}}>$</RegText>
+                  <RegTextInput
+                    placeholder={`0${decimalSeparator}0`}
+                    placeholderTextColor={colors.placeholder}
+                    keyboardType="numeric"
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      justifyContent: 'flex-start',
+                      alignItems: 'center',
+                      borderWidth: 1,
+                      borderRadius: 5,
+                      borderColor: colors.text,
+                      marginTop: 5,
+                      fontSize: 18,
+                      width: '55%',
+                    }}
+                    value={ta.amountUSD.toString()}
+                    onChangeText={(text: string) => updateToField(i, null, null, text, null)}
+                  />
+                  <RegText style={{marginTop: 15, marginLeft: 5}}>USD</RegText>
+                </View>
               </View>
 
               <View style={{display: 'flex', flexDirection: 'column'}}>
