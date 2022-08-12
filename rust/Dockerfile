@@ -68,22 +68,22 @@ RUN cd /opt && curl --proto '=https' --tlsv1.2 https://www.openssl.org/source/op
     mkdir x86 && mkdir aarch64 && mkdir armv7 && mkdir x86_64
 
 RUN cd /opt/openssl-3.0.5 && \
-    ./Configure --prefix=/opt/openssl-3.0.5/aarch64  android-arm64 -D__ANDROID_API__=30 && \
+    ./Configure --prefix=/opt/openssl-3.0.5/aarch64  android-arm64 -U__ANDROID_API__ -D__ANDROID_API__=30 && \
     make -j$(nproc) && make -j$(nproc) install && \
     make clean && make distclean
 
 RUN cd /opt/openssl-3.0.5 && \
-    ./Configure --prefix=/opt/openssl-3.0.5/armv7  android-arm -D__ANDROID_API__=30 && \
+    ./Configure --prefix=/opt/openssl-3.0.5/armv7  android-arm -U__ANDROID_API__ -D__ANDROID_API__=30 && \
     make -j$(nproc) && make -j$(nproc) install && \
     make clean && make distclean
 
 RUN cd /opt/openssl-3.0.5 && \
-    ./Configure --prefix=/opt/openssl-3.0.5/x86  android-x86 -D__ANDROID_API__=30 && \
+    ./Configure --prefix=/opt/openssl-3.0.5/x86  android-x86 -U__ANDROID_API__ -D__ANDROID_API__=30 && \
     make -j$(nproc) && make -j$(nproc) install && \
     make clean && make distclean
 
 RUN cd /opt/openssl-3.0.5 && \
-    ./Configure --prefix=/opt/openssl-3.0.5/x86_64  android-x86_64 -D__ANDROID_API__=30 && \
+    ./Configure --prefix=/opt/openssl-3.0.5/x86_64 -U__ANDROID_API__  android-x86_64 -D__ANDROID_API__=30 && \
     make -j$(nproc) && make -j$(nproc) install && \
     make clean && make distclean
 
