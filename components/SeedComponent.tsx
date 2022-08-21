@@ -33,7 +33,7 @@ const SeedComponent: React.FunctionComponent<SeedComponentProps> = ({seed, birth
       "I have saved \n the seed"
     ],
     restore: [
-      "Restore Wallet \n from seed"
+      "Restore Wallet"
     ],
     backup: [
       "",
@@ -170,7 +170,7 @@ const SeedComponent: React.FunctionComponent<SeedComponentProps> = ({seed, birth
             }
           }}
         />
-        {times > 0 && (
+        {(times > 0 || action === "restore") && (
           <Button type="Secondary" title="Cancel" style={{marginLeft: 10}} onPress={onClickCancel} />
         )}
       </View>

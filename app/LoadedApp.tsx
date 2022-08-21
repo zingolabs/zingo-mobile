@@ -82,11 +82,11 @@ function Menu({onItemSelected}: any) {
           Rescan Wallet
         </RegText>
 
-        <RegText onPress={() => onItemSelected('Change Wallet')} style={item}>
+        <RegText onPress={() => onItemSelected('Change Wallet')} style={item} color={colors.primary}>
           Change to another Wallet
         </RegText>
 
-        <RegText onPress={() => onItemSelected('Restore Wallet Backup')} style={item}>
+        <RegText onPress={() => onItemSelected('Restore Wallet Backup')} style={item} color={colors.primary}>
           Restore Last Wallet Backup
         </RegText>
       </View>

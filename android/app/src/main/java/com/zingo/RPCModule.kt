@@ -148,18 +148,18 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
         try {
             // Save file to disk wallet (with the backup)
-            val fileWallet = MainApplication.getAppContext()?.openFileOutput("wallet.dat", Context.MODE_PRIVATE)
-            fileWallet?.write(fileBytesBackup)
-            fileWallet?.close()
+            val fileWallet2 = MainApplication.getAppContext()?.openFileOutput("wallet.dat", Context.MODE_PRIVATE)
+            fileWallet2?.write(fileBytesBackup)
+            fileWallet2?.close()
         } catch (e: IllegalArgumentException) {
             // Log.e("MAIN", "Couldn't save the wallet with the backup")
         }
 
         try {
             // Save file to disk backup (with the wallet)
-            val fileBackup = MainApplication.getAppContext()?.openFileOutput("wallet.backup.dat", Context.MODE_PRIVATE)
-            fileBackup?.write(fileBytesWallet)
-            fileBackup?.close()
+            val fileBackup2 = MainApplication.getAppContext()?.openFileOutput("wallet.backup.dat", Context.MODE_PRIVATE)
+            fileBackup2?.write(fileBytesWallet)
+            fileBackup2?.close()
         } catch (e: IllegalArgumentException) {
             // Log.e("MAIN", "Couldn't save the backup with the wallet")
         }
