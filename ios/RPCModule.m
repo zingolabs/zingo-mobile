@@ -299,7 +299,7 @@ RCT_REMAP_METHOD(doSave,
 }
 
 RCT_REMAP_METHOD(doSaveBackup,
-                 doSaveWithResolver:(RCTPromiseResolveBlock)resolve
+                 doSaveBackupWithResolver:(RCTPromiseResolveBlock)resolve
                  rejected:(RCTPromiseRejectBlock)reject) {
   [self saveWalletBackupInternal];
 
