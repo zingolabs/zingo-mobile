@@ -400,7 +400,7 @@ export default class RPC {
     const viewKeyStr = await RPCModule.execute('export', address);
     const viewKeyJSON = JSON.parse(viewKeyStr);
 
-    console.log('vk', viewKeyJSON);
+    // console.log('vk', viewKeyJSON);
 
     // 'o' - full_viewing_key
     // 'z' and 't' - viewing_key
@@ -412,7 +412,7 @@ export default class RPC {
     const addrStr = await RPCModule.execute('new', addressType);
     const addrJSON = JSON.parse(addrStr);
 
-    console.log(addrJSON);
+    // console.log(addrJSON);
 
     // Save
     await RPCModule.doSave();
@@ -434,7 +434,7 @@ export default class RPC {
   static async shieldTransparent(): Promise<string> {
     const shieldStr = await RPCModule.execute('shield', '');
 
-    console.log(shieldStr);
+    // console.log(shieldStr);
     return shieldStr;
   }
 

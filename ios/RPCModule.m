@@ -19,7 +19,7 @@ RCT_EXPORT_MODULE();
 RCT_REMAP_METHOD(walletExists,
                  walletExistsWithResolver:(RCTPromiseResolveBlock)resolve
                  rejected:(RCTPromiseRejectBlock)reject) {
-  RCTLogInfo(@"walletExists called");
+  // RCTLogInfo(@"walletExists called");
 
   NSArray *paths = NSSearchPathForDirectoriesInDomains
       (NSDocumentDirectory, NSUserDomainMask, YES);
@@ -29,7 +29,7 @@ RCT_REMAP_METHOD(walletExists,
   NSString *fileName = [NSString stringWithFormat:@"%@/wallet.dat.txt",
                                                 documentsDirectory];
   BOOL fileExists = [[NSFileManager defaultManager] fileExistsAtPath:fileName];
-  RCTLogInfo(@"Wallet exists: %d", (int)fileExists);
+  // RCTLogInfo(@"Wallet exists: %d", (int)fileExists);
 
   if (fileExists) {
     resolve(@"true");
@@ -41,7 +41,7 @@ RCT_REMAP_METHOD(walletExists,
 RCT_REMAP_METHOD(walletBackupExists,
                  walletBackupExistsWithResolver:(RCTPromiseResolveBlock)resolve
                  rejected:(RCTPromiseRejectBlock)reject) {
-  RCTLogInfo(@"walletExists backup called");
+  // RCTLogInfo(@"walletExists backup called");
 
   NSArray *paths = NSSearchPathForDirectoriesInDomains
       (NSDocumentDirectory, NSUserDomainMask, YES);
@@ -51,7 +51,7 @@ RCT_REMAP_METHOD(walletBackupExists,
   NSString *fileName = [NSString stringWithFormat:@"%@/wallet.backup.dat.txt",
                                                 documentsDirectory];
   BOOL fileExists = [[NSFileManager defaultManager] fileExistsAtPath:fileName];
-  RCTLogInfo(@"Wallet backup exists: %d", (int)fileExists);
+  // RCTLogInfo(@"Wallet backup exists: %d", (int)fileExists);
 
   if (fileExists) {
     resolve(@"true");
@@ -71,7 +71,7 @@ RCT_REMAP_METHOD(walletBackupExists,
                                                 documentsDirectory];
   [data writeToFile:fileName atomically:YES encoding:NSUTF8StringEncoding error:nil];
 
-  RCTLogInfo(@"Saved file");
+  // RCTLogInfo(@"Saved file");
 }
 
 -(void) saveWalletBackupFile:(NSString *)data {
@@ -84,7 +84,7 @@ RCT_REMAP_METHOD(walletBackupExists,
                                                 documentsDirectory];
   [data writeToFile:fileName atomically:YES encoding:NSUTF8StringEncoding error:nil];
 
-  RCTLogInfo(@"Saved backup file");
+  // RCTLogInfo(@"Saved backup file");
 }
 
 // Read base64 encoded wallet data to a NSString, which is auto translated into a React String when returned
@@ -100,7 +100,7 @@ RCT_REMAP_METHOD(walletBackupExists,
                                                 usedEncoding:nil
                                                        error:nil];
 
-  RCTLogInfo(@"Read file");
+  // RCTLogInfo(@"Read file");
   return content;
 }
 
@@ -116,7 +116,7 @@ RCT_REMAP_METHOD(walletBackupExists,
                                                 usedEncoding:nil
                                                        error:nil];
 
-  RCTLogInfo(@"Read file");
+  // RCTLogInfo(@"Read file");
   return content;
 }
 
@@ -124,7 +124,7 @@ RCT_REMAP_METHOD(walletBackupExists,
 RCT_REMAP_METHOD(deleteExistingWallet,
                  deleteExistingWalletWithResolver:(RCTPromiseResolveBlock)resolve
                  rejected:(RCTPromiseRejectBlock)reject) {
-  RCTLogInfo(@"deleteExistingWallet called");
+  // RCTLogInfo(@"deleteExistingWallet called");
   NSArray *paths = NSSearchPathForDirectoriesInDomains
                   (NSDocumentDirectory, NSUserDomainMask, YES);
   NSString *documentsDirectory = [paths objectAtIndex:0];
@@ -139,7 +139,7 @@ RCT_REMAP_METHOD(deleteExistingWallet,
 RCT_REMAP_METHOD(deleteExistingWalletBackup,
                  deleteExistingWalletBackupWithResolver:(RCTPromiseResolveBlock)resolve
                  rejected:(RCTPromiseRejectBlock)reject) {
-  RCTLogInfo(@"deleteExistingWallet backup called");
+  // RCTLogInfo(@"deleteExistingWallet backup called");
   NSArray *paths = NSSearchPathForDirectoriesInDomains
                   (NSDocumentDirectory, NSUserDomainMask, YES);
   NSString *documentsDirectory = [paths objectAtIndex:0];
@@ -177,7 +177,7 @@ RCT_REMAP_METHOD(createNewWallet,
                  createNewWalletWithResolver:(RCTPromiseResolveBlock)resolve
                  rejected:(RCTPromiseRejectBlock)reject) {
   @autoreleasepool {
-    RCTLogInfo(@"createNewWallet called");
+    // RCTLogInfo(@"createNewWallet called");
 
     NSString* pathSaplingOutput = [[NSBundle mainBundle]
                       pathForResource:@"saplingoutput" ofType:@""];
@@ -196,7 +196,7 @@ RCT_REMAP_METHOD(createNewWallet,
     NSString* seedStr = [NSString stringWithUTF8String:seed];
     rust_free(seed);
 
-    RCTLogInfo(@"Got seed: %@", seedStr);
+    // RCTLogInfo(@"Got seed: %@", seedStr);
 
     // Also save the wallet after create
     [self saveWalletInternal];
@@ -213,7 +213,7 @@ RCT_REMAP_METHOD(restoreWallet,
                  restoreWalletWithResolver:(RCTPromiseResolveBlock)resolve
                  rejected:(RCTPromiseRejectBlock)reject) {
   @autoreleasepool {
-    RCTLogInfo(@"restoreWallet called with %@ %@", restoreSeed, birthday);
+    // RCTLogInfo(@"restoreWallet called with %@ %@", restoreSeed, birthday);
 
     NSString* pathSaplingOutput = [[NSBundle mainBundle]
                       pathForResource:@"saplingoutput" ofType:@""];
@@ -232,7 +232,7 @@ RCT_REMAP_METHOD(restoreWallet,
     NSString* seedStr = [NSString stringWithUTF8String:seed];
     rust_free(seed);
 
-    RCTLogInfo(@"Seed: %@", seedStr);
+    // RCTLogInfo(@"Seed: %@", seedStr);
 
     if (![seedStr hasPrefix:@"Error"]) {
       // Also save the wallet after restore
@@ -249,7 +249,7 @@ RCT_REMAP_METHOD(loadExistingWallet,
                  loadExistingWalletWithResolver:(RCTPromiseResolveBlock)resolve
                  rejected:(RCTPromiseRejectBlock)reject) {
   @autoreleasepool {
-    RCTLogInfo(@"loadExistingWallet called");
+    // RCTLogInfo(@"loadExistingWallet called");
     NSString* walletDataStr = [self readWallet];
 
     NSString* pathSaplingOutput = [[NSBundle mainBundle]
@@ -267,7 +267,7 @@ RCT_REMAP_METHOD(loadExistingWallet,
     NSString* seedStr = [NSString stringWithUTF8String:seed];
     rust_free(seed);
 
-    RCTLogInfo(@"Seed: %@", seedStr);
+    // RCTLogInfo(@"Seed: %@", seedStr);
 
     resolve(seedStr);
   }
@@ -277,7 +277,7 @@ RCT_REMAP_METHOD(RestoreExistingWalletBackup,
                  RestoreExistingWalletBackupWithResolver:(RCTPromiseResolveBlock)resolve
                  rejected:(RCTPromiseRejectBlock)reject) {
   @autoreleasepool {
-    RCTLogInfo(@"rstoreExistingWallet backup called");
+    // RCTLogInfo(@"rstoreExistingWallet backup called");
     NSString* backupDataStr = [self readWalletBackup];
 
     NSString* walletDataStr = [self readWallet];
@@ -311,7 +311,7 @@ RCT_REMAP_METHOD(doSend,
                  args:(NSString *)args
                  doSendWithResolver:(RCTPromiseResolveBlock)resolve
                  rejected:(RCTPromiseRejectBlock)reject) {
-  RCTLogInfo(@"doSend called with %@", args);
+  // RCTLogInfo(@"doSend called with %@", args);
 
   NSDictionary* dict = [NSDictionary dictionaryWithObjectsAndKeys:@"send", @"method", args, @"args", resolve, @"resolve", nil];
   [NSThread detachNewThreadSelector:@selector(doExecuteOnThread:) toTarget:self withObject:dict];

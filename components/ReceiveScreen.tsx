@@ -355,7 +355,7 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
 
   const doImport = async (key: string, birthday: string) => {
     const addressList = await RPC.doImportPrivKey(key, birthday);
-    console.log(addressList);
+    // console.log(addressList);
 
     if (typeof addressList === 'string' && addressList.startsWith('Error')) {
       // Show the toast in settimeout, because it sometimes gets lost.

@@ -499,7 +499,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
   set_server_option = async (value: string) => {
     const resultStr: string = await RPCModule.execute('changeserver', value);
     if (resultStr.toLowerCase().startsWith('error')) {
-      console.log(`Error change server ${value} - ${resultStr}`);
+      // console.log(`Error change server ${value} - ${resultStr}`);
       this.setState({
         error: `Error trying to change the server to the new one: ${value}`,
       });
@@ -510,17 +510,17 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
       }, 5000);
       return;
     } else {
-      console.log(`change server ok ${value}`);
+      // console.log(`change server ok ${value}`);
     }
 
     const error = await RPCModule.loadExistingWallet(value);
     if (!error.toLowerCase().startsWith('error')) {
       // Load the wallet and navigate to the transactions screen
-      console.log(`wallet loaded ok ${value}`);
+      // console.log(`wallet loaded ok ${value}`);
       const settings = { server: value };
       await SettingsFileImpl.writeSettings(settings);
     } else {
-      console.log(`Error Reading Wallet ${value} - ${error}`);
+      // console.log(`Error Reading Wallet ${value} - ${error}`);
       this.setState({
         error: `Error trying to read the wallet with the new server: ${value}`,
       });
@@ -532,7 +532,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
       const old_settings = await SettingsFileImpl.readSettings();
       const resultStr: string = await RPCModule.execute('changeserver', old_settings.server);
       if (resultStr.toLowerCase().startsWith('error')) {
-        console.log(`Error change server ${old_settings.server} - ${resultStr}`);
+        // console.log(`Error change server ${old_settings.server} - ${resultStr}`);
         this.setState({
           error: `Error trying to change the server to the old one: ${old_settings.server}`,
         });
@@ -543,7 +543,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
         }, 5000);
         return;
       } else {
-        console.log(`change server ok ${old_settings.server} - ${resultStr}`);
+        // console.log(`change server ok ${old_settings.server} - ${resultStr}`);
       }
     }
 
@@ -563,7 +563,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
   onClickOKChangeWallet = async () => {
     const resultStr = await this.rpc.changeWallet();
     if (resultStr.toLowerCase().startsWith('error')) {
-      console.log(`Error change wallet. ${resultStr}`);
+      // console.log(`Error change wallet. ${resultStr}`);
       this.setState({
         error: `${resultStr}`,
       });
@@ -582,7 +582,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
   onClickOKRestoreBackup = async () => {
     const resultStr = await this.rpc.restoreBackup();
     if (resultStr.toLowerCase().startsWith('error')) {
-      console.log(`Error restore backup wallet. ${resultStr}`);
+      // console.log(`Error restore backup wallet. ${resultStr}`);
       this.setState({
         error: `${resultStr}`,
       });

@@ -12,8 +12,12 @@ export default class SettingsFileImpl {
     const fileName = await this.getFileName();
 
     RNFS.writeFile(fileName, JSON.stringify(ss), 'utf8')
-      .then(() => console.log('FILE WRITTEN!'))
-      .catch((err) => console.log(err.message));
+      .then(() => {
+        // console.log('FILE WRITTEN!')
+      })
+      .catch((err) => {
+        // console.log(err.message)
+      });
   }
 
   // Read the address book
@@ -24,7 +28,7 @@ export default class SettingsFileImpl {
       return JSON.parse((await RNFS.readFile(fileName, 'utf8')).toString());
     } catch (err) {
       // File probably doesn't exist, so return nothing
-      console.log(err);
+      // console.log(err);
       return {};
     }
   }
