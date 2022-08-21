@@ -43,6 +43,19 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
+    fun walletBackupExists(promise: Promise) {
+        // Check if a wallet backup already exists
+        val file = File(MainApplication.getAppContext()?.filesDir, "wallet.backup.dat")
+        if (file.exists()) {
+            // Log.w("MAIN", "Wallet backup exists")
+            promise.resolve(true);
+        } else {
+            // Log.w("MAIN", "Wallet backup DOES NOT exist")
+            promise.resolve(false);
+        }
+    }
+
+    @ReactMethod
     fun createNewWallet(server: String, promise: Promise) {
         // Log.w("MAIN", "Creating new wallet")
 
@@ -124,8 +137,45 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
+    fun RestoreExistingWalletBackup(promise: Promise) {
+        // Read the file backup
+        val fileBackup = MainApplication.getAppContext()!!.openFileInput("wallet.backup.dat")
+        val fileBytesBackup = fileBackup.readBytes()
+
+        // Read the file wallet
+        val fileWallet = MainApplication.getAppContext()!!.openFileInput("wallet.dat")
+        val fileBytesWallet = fileWallet.readBytes()
+
+        try {
+            // Save file to disk wallet (with the backup)
+            val fileWallet = MainApplication.getAppContext()?.openFileOutput("wallet.dat", Context.MODE_PRIVATE)
+            fileWallet?.write(fileBytesBackup)
+            fileWallet?.close()
+        } catch (e: IllegalArgumentException) {
+            // Log.e("MAIN", "Couldn't save the wallet with the backup")
+        }
+
+        try {
+            // Save file to disk backup (with the wallet)
+            val fileBackup = MainApplication.getAppContext()?.openFileOutput("wallet.backup.dat", Context.MODE_PRIVATE)
+            fileBackup?.write(fileBytesWallet)
+            fileBackup?.close()
+        } catch (e: IllegalArgumentException) {
+            // Log.e("MAIN", "Couldn't save the backup with the wallet")
+        }
+
+        promise.resolve(true)
+    }
+
+    @ReactMethod
     fun deleteExistingWallet(promise: Promise) {
         MainApplication.getAppContext()!!.deleteFile("wallet.dat")
+        promise.resolve(true)
+    }
+
+    @ReactMethod
+    fun deleteExistingWalletBackup(promise: Promise) {
+        MainApplication.getAppContext()!!.deleteFile("wallet.backup.dat")
         promise.resolve(true)
     }
 
@@ -165,6 +215,13 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         promise.resolve(true);
     }
 
+    @ReactMethod
+    fun doSaveBackup(promise: Promise) {
+        saveWalletBackup();
+
+        promise.resolve(true);
+    }
+
     fun saveWallet() {
         // Get the encoded wallet file
         val b64encoded = save()
@@ -180,6 +237,28 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             file?.close()
         } catch (e: IllegalArgumentException) {
             // Log.e("MAIN", "Couldn't save the wallet")
+        }
+    }
+
+    fun saveWalletBackup() {
+        // Get the encoded wallet file
+        // val b64encoded = save()
+        // Read the file
+        val fileRead = MainApplication.getAppContext()!!.openFileInput("wallet.dat")
+        val fileBytes = fileRead.readBytes()
+        // val fileb64 = Base64.encodeToString(fileBytes, Base64.NO_WRAP)
+        // Log.w("MAIN", b64encoded)
+
+        try {
+            // val fileBytes = Base64.decode(b64encoded, Base64.NO_WRAP)
+            // Log.w("MAIN", "file size${fileBytes.size}")
+
+            // Save file to disk
+            val file = MainApplication.getAppContext()?.openFileOutput("wallet.backup.dat", Context.MODE_PRIVATE)
+            file?.write(fileBytes)
+            file?.close()
+        } catch (e: IllegalArgumentException) {
+            // Log.e("MAIN", "Couldn't save the wallet backup")
         }
     }
 

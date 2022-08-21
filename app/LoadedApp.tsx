@@ -62,6 +62,18 @@ function Menu({onItemSelected}: any) {
       <View style={{height: 1, backgroundColor: colors.primary}} />
 
       <View style={{display: 'flex', marginLeft: 20}}>
+        <RegText onPress={() => onItemSelected('About')} style={item}>
+          About ZingoZcash
+        </RegText>
+
+        <RegText onPress={() => onItemSelected('Info')} style={item}>
+          Server Info
+        </RegText>
+
+        <RegText onPress={() => onItemSelected('Settings')} style={item}>
+          Settings
+        </RegText>
+
         <RegText onPress={() => onItemSelected('Wallet Seed')} style={item}>
           Wallet Seed
         </RegText>
@@ -70,16 +82,12 @@ function Menu({onItemSelected}: any) {
           Rescan Wallet
         </RegText>
 
-        <RegText onPress={() => onItemSelected('Settings')} style={item}>
-          Settings
+        <RegText onPress={() => onItemSelected('Change Wallet')} style={item}>
+          Change to another Wallet
         </RegText>
 
-        <RegText onPress={() => onItemSelected('Info')} style={item}>
-          Server Info
-        </RegText>
-
-        <RegText onPress={() => onItemSelected('About')} style={item}>
-          About ZingoZcash
+        <RegText onPress={() => onItemSelected('Restore Wallet Backup')} style={item}>
+          Restore Last Wallet Backup
         </RegText>
       </View>
     </ScrollView>
@@ -122,7 +130,7 @@ const ComputingTxModalContent: React.FunctionComponent<ComputingModalProps> = ({
 
 const Tab = createBottomTabNavigator();
 
-export default function(props) {
+export default function LoadedApp(props) {
   const theme = useTheme();
 
   return <LoadedAppClass {...props} theme={theme} />;
@@ -130,8 +138,8 @@ export default function(props) {
 
 type LoadedAppClassProps = {
   navigation: any;
-  theme: any;
 };
+
 class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
   rpc: RPC;
 
@@ -160,7 +168,9 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
       computingModalVisible: false,
       infoModalVisible: false,
       settingsModalVisible: false,
-      seedModalVisible: false,
+      seedViewModalVisible: false,
+      seedChangeModalVisible: false,
+      seedBackupModalVisible: false,
       syncingStatus: null,
       error: null,
     };
@@ -469,7 +479,13 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
       this.setState({infoModalVisible: true});
     } else if (item === 'Wallet Seed') {
       await this.fetchWalletSeed();
-      this.setState({seedModalVisible: true});
+      this.setState({seedViewModalVisible: true});
+    } else if (item === 'Change Wallet') {
+      await this.fetchWalletSeed();
+      this.setState({seedChangeModalVisible: true});
+    } else if (item === 'Restore Wallet Backup') {
+      await this.fetchWalletSeed();
+      this.setState({seedBackupModalVisible: true});
     }
   };
 
@@ -535,6 +551,53 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
     this.rpc.fetchWalletSettings();
   };
 
+  navigateToLoading = () => {
+    const { navigation } = this.props;
+
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'LoadingApp' }],
+    });
+  };
+
+  onClickOKChangeWallet = async () => {
+    const resultStr = await this.rpc.changeWallet();
+    if (resultStr.toLowerCase().startsWith('error')) {
+      console.log(`Error change wallet. ${resultStr}`);
+      this.setState({
+        error: `${resultStr}`,
+      });
+      setTimeout(() => {
+        this.setState({
+          error: null,
+        });
+      }, 5000);
+      return;
+    }
+
+    this.setState({seedChangeModalVisible: false});
+    this.navigateToLoading();
+  };
+
+  onClickOKRestoreBackup = async () => {
+    const resultStr = await this.rpc.restoreBackup();
+    if (resultStr.toLowerCase().startsWith('error')) {
+      console.log(`Error restore backup wallet. ${resultStr}`);
+      this.setState({
+        error: `${resultStr}`,
+      });
+      setTimeout(() => {
+        this.setState({
+          error: null,
+        });
+      }, 5000);
+      return;
+    }
+
+    this.setState({seedBackupModalVisible: false});
+    this.navigateToLoading();
+  };
+
   render() {
     const {
       totalBalance,
@@ -548,7 +611,9 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
       settingsModalVisible,
       computingModalVisible,
       rescanModalVisible,
-      seedModalVisible,
+      seedViewModalVisible,
+      seedChangeModalVisible,
+      seedBackupModalVisible,
       walletSeed,
       syncingStatus,
       txBuildProgress,
@@ -620,13 +685,44 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
         <Modal
           animationType="slide"
           transparent={false}
-          visible={seedModalVisible}
-          onRequestClose={() => this.setState({seedModalVisible: false})}>
+          visible={seedViewModalVisible}
+          onRequestClose={() => this.setState({seedViewModalVisible: false})}>
           <SeedComponent
             seed={walletSeed?.seed}
             birthday={walletSeed?.birthday}
-            nextScreen={() => this.setState({seedModalVisible: false})}
+            onClickOK={() => this.setState({seedViewModalVisible: false})}
             totalBalance={totalBalance}
+            action={"view"}
+          />
+        </Modal>
+
+        <Modal
+          animationType="slide"
+          transparent={false}
+          visible={seedChangeModalVisible}
+          onRequestClose={() => this.setState({seedChangeModalVisible: false})}>
+          <SeedComponent
+            seed={walletSeed?.seed}
+            birthday={walletSeed?.birthday}
+            onClickOK={this.onClickOKChangeWallet}
+            onClickCancel={() => this.setState({seedChangeModalVisible: false})}
+            totalBalance={totalBalance}
+            action={"change"}
+          />
+        </Modal>
+
+        <Modal
+          animationType="slide"
+          transparent={false}
+          visible={seedBackupModalVisible}
+          onRequestClose={() => this.setState({seedBackupModalVisible: false})}>
+          <SeedComponent
+            seed={walletSeed?.seed}
+            birthday={walletSeed?.birthday}
+            onClickOK={this.onClickOKRestoreBackup}
+            onClickCancel={() => this.setState({seedBackupModalVisible: false})}
+            totalBalance={totalBalance}
+            action={"backup"}
           />
         </Modal>
 

@@ -26,10 +26,32 @@ RCT_REMAP_METHOD(walletExists,
   NSString *documentsDirectory = [paths objectAtIndex:0];
 
   // Write to user's documents app directory
-  NSString *fileName = [NSString stringWithFormat:@"%@/zingo-wallet.dat.txt",
+  NSString *fileName = [NSString stringWithFormat:@"%@/wallet.dat.txt",
                                                 documentsDirectory];
   BOOL fileExists = [[NSFileManager defaultManager] fileExistsAtPath:fileName];
   RCTLogInfo(@"Wallet exists: %d", (int)fileExists);
+
+  if (fileExists) {
+    resolve(@"true");
+  } else {
+    resolve(@"false");
+  }
+}
+
+RCT_REMAP_METHOD(walletBackupExists,
+                 walletBackupExistsWithResolver:(RCTPromiseResolveBlock)resolve
+                 rejected:(RCTPromiseRejectBlock)reject) {
+  RCTLogInfo(@"walletExists backup called");
+
+  NSArray *paths = NSSearchPathForDirectoriesInDomains
+      (NSDocumentDirectory, NSUserDomainMask, YES);
+  NSString *documentsDirectory = [paths objectAtIndex:0];
+
+  // Write to user's documents app directory
+  NSString *fileName = [NSString stringWithFormat:@"%@/wallet.backup.dat.txt",
+                                                documentsDirectory];
+  BOOL fileExists = [[NSFileManager defaultManager] fileExistsAtPath:fileName];
+  RCTLogInfo(@"Wallet backup exists: %d", (int)fileExists);
 
   if (fileExists) {
     resolve(@"true");
@@ -45,11 +67,24 @@ RCT_REMAP_METHOD(walletExists,
   NSString *documentsDirectory = [paths objectAtIndex:0];
 
   // Write to user's documents app directory
-  NSString *fileName = [NSString stringWithFormat:@"%@/zingo-wallet.dat.txt",
+  NSString *fileName = [NSString stringWithFormat:@"%@/wallet.dat.txt",
                                                 documentsDirectory];
   [data writeToFile:fileName atomically:YES encoding:NSUTF8StringEncoding error:nil];
 
   RCTLogInfo(@"Saved file");
+}
+
+-(void) saveWalletBackupFile:(NSString *)data {
+  NSArray *paths = NSSearchPathForDirectoriesInDomains
+      (NSDocumentDirectory, NSUserDomainMask, YES);
+  NSString *documentsDirectory = [paths objectAtIndex:0];
+
+  // Write to user's documents app directory
+  NSString *fileName = [NSString stringWithFormat:@"%@/wallet.backup.dat.txt",
+                                                documentsDirectory];
+  [data writeToFile:fileName atomically:YES encoding:NSUTF8StringEncoding error:nil];
+
+  RCTLogInfo(@"Saved backup file");
 }
 
 // Read base64 encoded wallet data to a NSString, which is auto translated into a React String when returned
@@ -59,7 +94,7 @@ RCT_REMAP_METHOD(walletExists,
   NSString *documentsDirectory = [paths objectAtIndex:0];
 
   //make a file name to write the data to using the documents directory:
-  NSString *fileName = [NSString stringWithFormat:@"%@/zingo-wallet.dat.txt",
+  NSString *fileName = [NSString stringWithFormat:@"%@/wallet.dat.txt",
                                                 documentsDirectory];
   NSString *content = [[NSString alloc] initWithContentsOfFile:fileName
                                                 usedEncoding:nil
@@ -69,6 +104,21 @@ RCT_REMAP_METHOD(walletExists,
   return content;
 }
 
+-(NSString *) readWalletBackup {
+  NSArray *paths = NSSearchPathForDirectoriesInDomains
+                  (NSDocumentDirectory, NSUserDomainMask, YES);
+  NSString *documentsDirectory = [paths objectAtIndex:0];
+
+  //make a file name to write the data to using the documents directory:
+  NSString *fileName = [NSString stringWithFormat:@"%@/wallet.backup.dat.txt",
+                                                documentsDirectory];
+  NSString *content = [[NSString alloc] initWithContentsOfFile:fileName
+                                                usedEncoding:nil
+                                                       error:nil];
+
+  RCTLogInfo(@"Read file");
+  return content;
+}
 
 // Delete an existing wallet file
 RCT_REMAP_METHOD(deleteExistingWallet,
@@ -80,12 +130,26 @@ RCT_REMAP_METHOD(deleteExistingWallet,
   NSString *documentsDirectory = [paths objectAtIndex:0];
 
   //make a file name to write the data to using the documents directory:
-  NSString *fileName = [NSString stringWithFormat:@"%@/zingo-wallet.dat.txt",
+  NSString *fileName = [NSString stringWithFormat:@"%@/wallet.dat.txt",
                                                 documentsDirectory];
   // Delete the file
   [[NSFileManager defaultManager] removeItemAtPath:fileName error:nil];
 }
 
+RCT_REMAP_METHOD(deleteExistingWalletBackup,
+                 deleteExistingWalletBackupWithResolver:(RCTPromiseResolveBlock)resolve
+                 rejected:(RCTPromiseRejectBlock)reject) {
+  RCTLogInfo(@"deleteExistingWallet backup called");
+  NSArray *paths = NSSearchPathForDirectoriesInDomains
+                  (NSDocumentDirectory, NSUserDomainMask, YES);
+  NSString *documentsDirectory = [paths objectAtIndex:0];
+
+  //make a file name to write the data to using the documents directory:
+  NSString *fileName = [NSString stringWithFormat:@"%@/wallet.backup.dat.txt",
+                                                documentsDirectory];
+  // Delete the file
+  [[NSFileManager defaultManager] removeItemAtPath:fileName error:nil];
+}
 
 // (Non react) Save the current wallet to disk
 -(void) saveWalletInternal {
@@ -95,6 +159,16 @@ RCT_REMAP_METHOD(deleteExistingWallet,
   rust_free(walletDat);
 
   [self saveWalletFile:walletDataStr];
+}
+
+-(void) saveWalletBackupInternal {
+  // Then save the file
+  //char *walletDat = save();
+  //NSString* walletDataStr = [NSString stringWithUTF8String:walletDat];
+  //rust_free(walletDat);
+  NSString* walletDataStr = [self readWallet];
+
+  [self saveWalletBackupFile:walletDataStr];
 }
 
 // Create a new wallet, automatically saving it.
@@ -199,6 +273,23 @@ RCT_REMAP_METHOD(loadExistingWallet,
   }
 }
 
+RCT_REMAP_METHOD(RestoreExistingWalletBackup,
+                 RestoreExistingWalletBackupWithResolver:(RCTPromiseResolveBlock)resolve
+                 rejected:(RCTPromiseRejectBlock)reject) {
+  @autoreleasepool {
+    RCTLogInfo(@"rstoreExistingWallet backup called");
+    NSString* backupDataStr = [self readWalletBackup];
+
+    NSString* walletDataStr = [self readWallet];
+
+    [self saveWalletFile:backupDataStr];
+
+    [self saveWalletBackupFile:walletDataStr];
+
+    resolve(@"true");
+  }
+}
+
 RCT_REMAP_METHOD(doSave,
                  doSaveWithResolver:(RCTPromiseResolveBlock)resolve
                  rejected:(RCTPromiseRejectBlock)reject) {
@@ -207,6 +298,13 @@ RCT_REMAP_METHOD(doSave,
   resolve(@"true");
 }
 
+RCT_REMAP_METHOD(doSaveBackup,
+                 doSaveWithResolver:(RCTPromiseResolveBlock)resolve
+                 rejected:(RCTPromiseRejectBlock)reject) {
+  [self saveWalletBackupInternal];
+
+  resolve(@"true");
+}
 
 // Send a Tx. React needs to construct the sendJSON and pass it in as a string
 RCT_REMAP_METHOD(doSend,

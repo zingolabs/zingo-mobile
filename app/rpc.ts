@@ -722,4 +722,30 @@ export default class RPC {
       this.fnSetZecPrice(parseFloat(resultStr));
     }
   }
+
+  async changeWallet() {
+    const exists = RPCModule.walletExists();
+    if (!exists) {
+      return `Error: Couldn't find any wallet.`;
+    } else {
+      await RPCModule.doSaveBackup();
+      await RPCModule.deleteExistingWallet();
+    }
+    return "";
+  }
+
+  async restoreBackup() {
+    const existsBackup = RPCModule.walletBackupExists();
+    if (!existsBackup) {
+      return `Error: Couldn't find any backup of any wallet.`;
+    } else {
+      const existsWallet = RPCModule.walletExists();
+      if (!existsWallet) {
+        return `Error: Couldn't find any wallet.`;
+      } else {
+        await RPCModule.RestoreExistingWalletBackup();
+      }
+    }
+    return "";
+  }
 }
