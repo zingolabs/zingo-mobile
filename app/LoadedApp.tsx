@@ -581,6 +581,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
 
   onClickOKRestoreBackup = async () => {
     const resultStr = await this.rpc.restoreBackup();
+    console.log(resultStr);
     if (resultStr.toLowerCase().startsWith('error')) {
       // console.log(`Error restore backup wallet. ${resultStr}`);
       this.setState({
