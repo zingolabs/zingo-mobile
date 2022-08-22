@@ -725,6 +725,7 @@ export default class RPC {
 
   async changeWallet() {
     const exists = await RPCModule.walletExists();
+    
     if (exists && exists !== 'false') {
       await RPCModule.doSaveBackup();
       await RPCModule.deleteExistingWallet();
@@ -739,6 +740,7 @@ export default class RPC {
 
     if (existsBackup && existsBackup !== 'false') {
       const existsWallet = await RPCModule.walletExists();
+
       if (existsWallet && existsWallet !== 'false') {
         await RPCModule.RestoreExistingWalletBackup();
       } else {
