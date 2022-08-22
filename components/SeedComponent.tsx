@@ -16,8 +16,9 @@ type SeedComponentProps = {
   onClickCancel: () => void;
   totalBalance: TotalBalance;
   action: "new" | "change" | "view" | "restore" | "backup";
+  error?: string;
 };
-const SeedComponent: React.FunctionComponent<SeedComponentProps> = ({seed, birthday, onClickOK, onClickCancel, totalBalance, action}) => {
+const SeedComponent: React.FunctionComponent<SeedComponentProps> = ({seed, birthday, onClickOK, onClickCancel, totalBalance, action, error}) => {
   const {colors} = useTheme();
   const texts = {
     new: [
@@ -155,6 +156,10 @@ const SeedComponent: React.FunctionComponent<SeedComponentProps> = ({seed, birth
           "YOU WILL HAVE NO LONGER ACCESS TO THIS WALLET, AND YOU ARE GOING TO ACCESS TO YOUR BACKUP WALLET"
         )}
       </FadeText>
+
+      {error && (
+        <FadeText style={{ color: colors.primary, textAlign: 'center', width:'100%' }}>{error}</FadeText>
+      )}
 
       <View style={{flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', margin: 20}}>
         <Button

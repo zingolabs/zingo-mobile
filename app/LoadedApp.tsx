@@ -694,6 +694,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
             onClickOK={() => this.setState({seedViewModalVisible: false})}
             totalBalance={totalBalance}
             action={"view"}
+            error={error}
           />
         </Modal>
 
@@ -709,6 +710,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
             onClickCancel={() => this.setState({seedChangeModalVisible: false})}
             totalBalance={totalBalance}
             action={"change"}
+            error={error}
           />
         </Modal>
 
@@ -724,6 +726,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
             onClickCancel={() => this.setState({seedBackupModalVisible: false})}
             totalBalance={totalBalance}
             action={"backup"}
+            error={error}
           />
         </Modal>
 
