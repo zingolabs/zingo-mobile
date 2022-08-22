@@ -725,7 +725,8 @@ export default class RPC {
 
   async changeWallet() {
     const exists = await RPCModule.walletExists();
-    
+
+    console.log('jc change wallet', exists);
     if (exists && exists !== 'false') {
       await RPCModule.doSaveBackup();
       await RPCModule.deleteExistingWallet();
@@ -738,9 +739,11 @@ export default class RPC {
   async restoreBackup() {
     const existsBackup = await RPCModule.walletBackupExists();
 
+    console.log('jc restore backup', existsBackup);
     if (existsBackup && existsBackup !== 'false') {
       const existsWallet = await RPCModule.walletExists();
 
+      console.log('jc restore wallet', existsWallet);
       if (existsWallet && existsWallet !== 'false') {
         await RPCModule.RestoreExistingWalletBackup();
       } else {

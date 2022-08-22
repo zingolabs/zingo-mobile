@@ -563,6 +563,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
   onClickOKChangeWallet = async () => {
     const resultStr = await this.rpc.changeWallet();
 
+    console.log("jc change", resultStr);
     if (resultStr.toLowerCase().startsWith('error')) {
       // console.log(`Error change wallet. ${resultStr}`);
       this.setState({
@@ -583,7 +584,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
   onClickOKRestoreBackup = async () => {
     const resultStr = await this.rpc.restoreBackup();
 
-    console.log("jc", resultStr);
+    console.log("jc restore", resultStr);
     if (resultStr.toLowerCase().startsWith('error')) {
       // console.log(`Error restore backup wallet. ${resultStr}`);
       this.setState({
