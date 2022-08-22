@@ -725,7 +725,7 @@ export default class RPC {
 
   async changeWallet() {
     const exists = await RPCModule.walletExists();
-    if (!exists) {
+    if (exists && exists !== 'false') {
       return `Error: Couldn't find any wallet.`;
     } else {
       await RPCModule.doSaveBackup();
@@ -736,12 +736,12 @@ export default class RPC {
 
   async restoreBackup() {
     const existsBackup = await RPCModule.walletBackupExists();
-    console.log(existsBackup);
-    if (!existsBackup) {
+
+    if (existsBackup && existsBackup !== 'false') {
       return `Error: Couldn't find any backup of any wallet.`;
     } else {
       const existsWallet = await RPCModule.walletExists();
-      if (!existsWallet) {
+      if (existsWallet && existsWallet !== 'false') {
         return `Error: Couldn't find any wallet.`;
       } else {
         await RPCModule.RestoreExistingWalletBackup();
