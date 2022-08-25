@@ -1,0 +1,5 @@
+windows:
+for /F %i in ('docker images -a -q') do docker rmi -f %i
+
+Ubuntu:
+docker system prune -a --volumes

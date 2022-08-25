@@ -5,7 +5,8 @@ RUN apt-get update \
     && apt-get upgrade -y \
     && apt-get install -y --no-install-recommends --no-install-suggests \
     ca-certificates \
-    gcc \
+    build-essential \
+    gcc-10 \
     libc6-dev \
     make \
     curl \
@@ -21,7 +22,7 @@ RUN apt-get update \
 
 # Add group
 FROM apt_upgrade_rustndk_image as add_android_ndk
-ARG android_ndk_ver=r25
+ARG android_ndk_ver=r25b
 
 # Install NDK itself
 RUN curl -vfL -o /tmp/android-ndk.zip \
@@ -34,7 +35,8 @@ ENV HOME=/root
 ENV CARGO_HOME=$HOME/.cargo
 ENV PATH=$PATH:/root/.cargo/bin
 # get latest stable toolchain
-RUN rustup toolchain install stable
+# RUN rustup toolchain install stable
+RUN rustup toolchain install nightly
 
 # Install Rust targets for Android platforms
 RUN rustup target add aarch64-linux-android \
