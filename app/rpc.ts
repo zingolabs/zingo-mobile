@@ -117,9 +117,13 @@ export default class RPC {
 
   async loadWalletData() {
     this.fetchTotalBalance();
+    console.log("despues de fetchTotalBalance");
     this.fetchTandZTransactions();
+    console.log("despues de fetchTandZTransactions");
     this.getZecPrice();
+    console.log("despues de getZecPrice");
     this.fetchWalletSettings();
+    console.log("despues de fetchWalletSettings");
   }
 
   async rescan() {

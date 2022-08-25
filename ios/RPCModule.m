@@ -211,7 +211,7 @@ RCT_REMAP_METHOD(restoreWallet,
                  birthday:(NSString*)birthday
                  server:(NSString*)server
                  restoreWalletWithResolver:(RCTPromiseResolveBlock)resolve
-                 rejected:(RCTPromiseRejectBlock)reject) {
+                 restoreWalletWithRejecter:(RCTPromiseRejectBlock)reject) {
   @autoreleasepool {
     // RCTLogInfo(@"restoreWallet called with %@ %@", restoreSeed, birthday);
 
