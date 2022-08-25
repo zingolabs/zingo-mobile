@@ -18,7 +18,7 @@ RCT_EXPORT_MODULE();
 // Test if wallet exists
 RCT_REMAP_METHOD(walletExists,
                  walletExistsWithResolver:(RCTPromiseResolveBlock)resolve
-                 rejected:(RCTPromiseRejectBlock)reject) {
+                 walletExistsWithRejecter:(RCTPromiseRejectBlock)reject) {
   // RCTLogInfo(@"walletExists called");
 
   NSArray *paths = NSSearchPathForDirectoriesInDomains
@@ -40,7 +40,7 @@ RCT_REMAP_METHOD(walletExists,
 
 RCT_REMAP_METHOD(walletBackupExists,
                  walletBackupExistsWithResolver:(RCTPromiseResolveBlock)resolve
-                 rejected:(RCTPromiseRejectBlock)reject) {
+                 walletBackupExistsWithRejecter:(RCTPromiseRejectBlock)reject) {
   // RCTLogInfo(@"walletExists backup called");
 
   NSArray *paths = NSSearchPathForDirectoriesInDomains
@@ -123,7 +123,7 @@ RCT_REMAP_METHOD(walletBackupExists,
 // Delete an existing wallet file
 RCT_REMAP_METHOD(deleteExistingWallet,
                  deleteExistingWalletWithResolver:(RCTPromiseResolveBlock)resolve
-                 rejected:(RCTPromiseRejectBlock)reject) {
+                 deleteExistingWalletWithRejecter:(RCTPromiseRejectBlock)reject) {
   // RCTLogInfo(@"deleteExistingWallet called");
   NSArray *paths = NSSearchPathForDirectoriesInDomains
                   (NSDocumentDirectory, NSUserDomainMask, YES);
@@ -138,7 +138,7 @@ RCT_REMAP_METHOD(deleteExistingWallet,
 
 RCT_REMAP_METHOD(deleteExistingWalletBackup,
                  deleteExistingWalletBackupWithResolver:(RCTPromiseResolveBlock)resolve
-                 rejected:(RCTPromiseRejectBlock)reject) {
+                 deleteExistingWalletBackupWithRejecter:(RCTPromiseRejectBlock)reject) {
   // RCTLogInfo(@"deleteExistingWallet backup called");
   NSArray *paths = NSSearchPathForDirectoriesInDomains
                   (NSDocumentDirectory, NSUserDomainMask, YES);
@@ -247,7 +247,7 @@ RCT_REMAP_METHOD(restoreWallet,
 RCT_REMAP_METHOD(loadExistingWallet,
                  server:(NSString*)server
                  loadExistingWalletWithResolver:(RCTPromiseResolveBlock)resolve
-                 rejected:(RCTPromiseRejectBlock)reject) {
+                 loadExistingWalletWithRejecter:(RCTPromiseRejectBlock)reject) {
   @autoreleasepool {
     // RCTLogInfo(@"loadExistingWallet called");
     NSString* walletDataStr = [self readWallet];
@@ -275,7 +275,7 @@ RCT_REMAP_METHOD(loadExistingWallet,
 
 RCT_REMAP_METHOD(RestoreExistingWalletBackup,
                  RestoreExistingWalletBackupWithResolver:(RCTPromiseResolveBlock)resolve
-                 rejected:(RCTPromiseRejectBlock)reject) {
+                 RestoreExistingWalletBackupWithRejecter:(RCTPromiseRejectBlock)reject) {
   @autoreleasepool {
     // RCTLogInfo(@"rstoreExistingWallet backup called");
     NSString* backupDataStr = [self readWalletBackup];
@@ -292,7 +292,7 @@ RCT_REMAP_METHOD(RestoreExistingWalletBackup,
 
 RCT_REMAP_METHOD(doSave,
                  doSaveWithResolver:(RCTPromiseResolveBlock)resolve
-                 rejected:(RCTPromiseRejectBlock)reject) {
+                 doSaveWithRejecter:(RCTPromiseRejectBlock)reject) {
   [self saveWalletInternal];
 
   resolve(@"true");
@@ -300,7 +300,7 @@ RCT_REMAP_METHOD(doSave,
 
 RCT_REMAP_METHOD(doSaveBackup,
                  doSaveBackupWithResolver:(RCTPromiseResolveBlock)resolve
-                 rejected:(RCTPromiseRejectBlock)reject) {
+                 doSaveBackupWithRejecter:(RCTPromiseRejectBlock)reject) {
   [self saveWalletBackupInternal];
 
   resolve(@"true");
@@ -310,7 +310,7 @@ RCT_REMAP_METHOD(doSaveBackup,
 RCT_REMAP_METHOD(doSend,
                  args:(NSString *)args
                  doSendWithResolver:(RCTPromiseResolveBlock)resolve
-                 rejected:(RCTPromiseRejectBlock)reject) {
+                 doSendWithRejecter:(RCTPromiseRejectBlock)reject) {
   // RCTLogInfo(@"doSend called with %@", args);
 
   NSDictionary* dict = [NSDictionary dictionaryWithObjectsAndKeys:@"send", @"method", args, @"args", resolve, @"resolve", nil];
@@ -345,7 +345,7 @@ RCT_REMAP_METHOD(execute,
                  method:(NSString *)method
                  args:(NSString *)args
                  executeWithResolver:(RCTPromiseResolveBlock)resolve
-                 rejected:(RCTPromiseRejectBlock)reject) {
+                 executeWithRejecter:(RCTPromiseRejectBlock)reject) {
 
   NSDictionary* dict = [NSDictionary dictionaryWithObjectsAndKeys:method, @"method", args, @"args", resolve, @"resolve", nil];
 

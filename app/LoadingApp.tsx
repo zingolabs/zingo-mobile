@@ -76,11 +76,12 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
       }
 
       const exists = await RPCModule.walletExists();
-      // console.log('Exists result', exists);
+      console.log('Wallet Exists result', exists);
 
       if (exists && exists !== 'false') {
         this.setState({ walletExists: true });
         const error = await RPCModule.loadExistingWallet(settings.server || this.state.server);
+        console.log('Load Wallet Exists result', error);
         if (!error.startsWith('Error')) {
           // Load the wallet and navigate to the transactions screen
           this.navigateToLoaded();
