@@ -10,4 +10,4 @@ rustlib = { path = "../lib" }
 
 [lib]
 name = "rustios"
-crate-type = ["staticlib"]
+crate-type = ["staticlib", "cdylib"]
