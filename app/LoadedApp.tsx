@@ -63,7 +63,7 @@ function Menu({onItemSelected}: any) {
 
       <View style={{display: 'flex', marginLeft: 20}}>
         <RegText onPress={() => onItemSelected('About')} style={item}>
-          About ZingoZcash
+          About Zingo!
         </RegText>
 
         <RegText onPress={() => onItemSelected('Info')} style={item}>

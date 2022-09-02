@@ -144,7 +144,7 @@ export default class Utils {
   }
 
   static getDefaultDonationMemo(): string {
-    return 'Thanks for supporting ZingoZcash!';
+    return 'Thanks for supporting Zingo!';
   }
 
   static getZecToUsdString(price: number | null, zecValue: number | null): string {

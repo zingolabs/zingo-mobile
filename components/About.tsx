@@ -23,7 +23,7 @@ const AboutModal: React.FunctionComponent<AboutModalProps> = ({closeModal, total
         style={{display: 'flex', alignItems: 'center', paddingBottom: 10, backgroundColor: colors.card, zIndex: -1, paddingTop: 10}}>
         <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 80, height: 80, resizeMode: 'contain'}} />
         <ZecAmount size={36} amtZec={totalBalance.total} style={{opacity: 0.4}} />
-        <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>ZingoZcash v0.0.1</RegText>
+        <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>Zingo! v0.0.1</RegText>
         <View style={{ width: '100%', height: 1, backgroundColor: colors.primary}}></View>
       </View>
 
@@ -42,7 +42,7 @@ const AboutModal: React.FunctionComponent<AboutModalProps> = ({closeModal, total
           Built with React Native.
           {'\n'}
           {'\n'}
-          The MIT License (MIT) Copyright (c) 2022 ZingoZcash
+          The MIT License (MIT) Copyright (c) 2022 Zingo!
           {'\n'}
           {'\n'}
           Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated

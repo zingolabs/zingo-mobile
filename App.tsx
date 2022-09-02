@@ -22,7 +22,7 @@ const Theme = {
     primary: '#18bd18', //'#df4100',
     primaryDisabled: 'rgba(24, 189, 24, 0.3)',
     text: '#c3c3c3',
-    zingozcash: '#777777',
+    zingo: '#777777',
     placeholder: '#333333',
     money: '#ffffff'
   },
