@@ -223,7 +223,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
 
   unlockWallet = async (password: string): Promise<boolean> => {
     const success = await this.rpc.unlockWallet(password);
-
     return success;
   };
 
@@ -253,9 +252,9 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
 
     // If there is no 'from' address, we'll set a default one
     if (!sendPageState.fromaddr) {
-      // Find a z-address with the highest balance
+      // Find a z-address or o-address with the highest balance
       const defaultAB = addressesWithBalance
-        .filter(ab => Utils.isSapling(ab.address))
+        .filter(ab => Utils.isSapling(ab.address) || Utils.isOrchard(ab.address))
         .reduce((prev: AddressBalance | null, ab: AddressBalance) => {
           // We'll start with a sapling address
           if (prev == null) {
@@ -340,7 +339,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
   setInfo = (newInfo: Info) => {
     // If the price is not set in this object, copy it over from the current object
     const {info} = this.state;
-    if (info && !newInfo.zecPrice) {
+    if (info && info.zecPrice && !newInfo.zecPrice) {
       newInfo.zecPrice = info.zecPrice;
     }
 
@@ -563,7 +562,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
   onClickOKChangeWallet = async () => {
     const resultStr = await this.rpc.changeWallet();
 
-    console.log("jc change", resultStr);
+    //console.log("jc change", resultStr);
     if (resultStr.toLowerCase().startsWith('error')) {
       // console.log(`Error change wallet. ${resultStr}`);
       this.setState({
@@ -584,7 +583,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
   onClickOKRestoreBackup = async () => {
     const resultStr = await this.rpc.restoreBackup();
 
-    console.log("jc restore", resultStr);
+    //console.log("jc restore", resultStr);
     if (resultStr.toLowerCase().startsWith('error')) {
       // console.log(`Error restore backup wallet. ${resultStr}`);
       this.setState({

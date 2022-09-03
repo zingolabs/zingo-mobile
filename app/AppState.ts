@@ -5,8 +5,14 @@ export class TotalBalance {
   // Total private, confirmed + unconfirmed
   privateBal: number;
 
+  // Total orchard, confirmed + unconfirmed
+  orchardBal: number;
+
   // Total private, confirmed funds that are spendable
   spendablePrivate: number;
+
+  // Total orchard, confirmed funds that are spendable
+  spendableOrchard: number;
 
   // Total unconfirmed + spendable
   total: number;
@@ -15,6 +21,8 @@ export class TotalBalance {
     this.transparentBal = 0;
     this.privateBal = 0;
     this.spendablePrivate = 0;
+    this.orchardBal = 0;
+    this.spendableOrchard = 0;
     this.total = 0;
   }
 }
@@ -211,7 +219,7 @@ export default interface AppState {
   // The total confirmed and unconfirmed balance in this wallet
   totalBalance: TotalBalance;
 
-  // The list of all t and z addresses that have a current balance. That is, the list of
+  // The list of all t and z and o addresses that have a current balance. That is, the list of
   // addresses that have a (confirmed or unconfirmed) UTXO or note pending.
   addressesWithBalance: AddressBalance[];
 
@@ -226,7 +234,7 @@ export default interface AppState {
   // List of Address / Label pairs
   addressBook: AddressBookEntry[];
 
-  // List of all T and Z transactions
+  // List of all T and Z and O transactions
   transactions: Transaction[] | null;
 
   // The state of the send page, as the user constructs a transaction

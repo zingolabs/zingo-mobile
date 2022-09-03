@@ -67,7 +67,7 @@ export default class RPC {
 
   async configure() {
     if (!this.refreshTimerID) {
-      this.refreshTimerID = setInterval(() => this.refresh(false), 60 * 1000);
+      this.refreshTimerID = setInterval(() => this.refresh(false), 60 * 1000); // 1 min
     }
 
     if (!this.updateTimerId) {
@@ -99,14 +99,13 @@ export default class RPC {
   static async doSync(): Promise<string> {
     const syncstr = await RPCModule.execute('sync', '');
     // console.log(`Sync exec result: ${syncstr}`);
-
     return syncstr;
   }
 
   static async doRescan() {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const syncstr = await RPCModule.execute('rescan', '');
     // console.log(`rescan exec result: ${syncstr}`);
+    return syncstr;
   }
 
   static async doSyncStatus(): Promise<string> {
@@ -117,18 +116,13 @@ export default class RPC {
 
   async loadWalletData() {
     this.fetchTotalBalance();
-    console.log("despues de fetchTotalBalance");
-    this.fetchTandZTransactions();
-    console.log("despues de fetchTandZTransactions");
+    this.fetchTandZandOTransactions();
     this.getZecPrice();
-    console.log("despues de getZecPrice");
     this.fetchWalletSettings();
-    console.log("despues de fetchWalletSettings");
   }
 
   async rescan() {
     // console.log('RPC Rescan triggered');
-
     // Empty out the transactions list to start with.
     this.fnSetTransactionsList([]);
 
@@ -175,7 +169,7 @@ export default class RPC {
       return;
     }
 
-    const latestBlockHeight = await this.fetchInfo();
+    const latestBlockHeight = await this.fetchInfoLatestBlockHeight();
     if (!latestBlockHeight) {
       return;
     }
@@ -183,6 +177,7 @@ export default class RPC {
     if (fullRefresh || fullRescan || !this.lastWalletBlockHeight || this.lastWalletBlockHeight < latestBlockHeight) {
       // If the latest block height has changed, make sure to sync. This will happen in a new thread
       this.inRefresh = true;
+      this.prevProgress = 0;
 
       // This is async, so when it is done, we finish the refresh.
       if (fullRescan) {
@@ -202,20 +197,45 @@ export default class RPC {
       const pollerID = setInterval(async () => {
         const ss = JSON.parse(await RPC.doSyncStatus());
 
+        console.log('sync ststus', ss);
+
         // Post sync updates
-        const progress_blocks = (ss.synced_blocks + ss.trial_decryptions_blocks + ss.txn_scan_blocks) / 3;
+        const synced_blocks = ss.synced_blocks || 0;
+        const trial_decryptions_blocks = ss.trial_decryptions_blocks|| 0;
+        const txn_scan_blocks = ss.txn_scan_blocks || 0;
+        const total_blocks = ss.total_blocks || 0;
+
+        const progress_blocks = (synced_blocks + trial_decryptions_blocks + txn_scan_blocks) / 3;
         let progress = progress_blocks;
-        if (ss.total_blocks) {
-          progress = (progress_blocks * 100) / ss.total_blocks;
+        if (!!total_blocks) {
+          progress = (progress_blocks * 100) / total_blocks;
         }
 
-        let base = 0;
-        if (ss.batch_total) {
-          base = (ss.batch_num * 100) / ss.batch_total;
-          progress = base + progress / ss.batch_total;
+        const batch_total = ss.batch_total || 0;
+        const batch_num = ss.batch_num || 0;
+
+        if (!!batch_total) {
+          const base = (batch_num * 100) / batch_total;
+          progress = base + progress / batch_total;
         }
+
+        console.log(progress, this.prevProgress);
+
+        if (this.prevProgress <= progress) {
+          progress += 0.065;
+        } else {
+          if (this.prevProgress <= 90) {
+            progress = this.prevProgress + 0.065;
+          } else {
+            progress = this.prevProgress + 0.005;
+          }
+        }
+
+        if (progress > 100) progress = 100;
 
         this.fnRefreshUpdates(ss.in_progress, progress);
+
+        this.prevProgress = progress;
 
         // Close the poll timer if the sync finished(checked via promise above)
         if (!this.inRefresh) {
@@ -308,6 +328,12 @@ export default class RPC {
     if (info) {
       this.fnSetInfo(info);
       this.serverHeight = info.latestBlock;
+    }
+  }
+
+  async fetchInfoLatestBlockHeight(): Promise<number | null> {
+    const info = await RPC.getInfoObject();
+    if (info) {
       return info.latestBlock;
     }
 
@@ -321,21 +347,26 @@ export default class RPC {
 
     //console.log(balanceJSON);
 
-    const privateBal = balanceJSON.zbalance / 10 ** 8;
-    const transparentBal = balanceJSON.tbalance / 10 ** 8;
+    const orchardBal = (balanceJSON.orchard_balance || 0) / 10 ** 8;
+    const privateBal = (balanceJSON.sapling_balance || 0) / 10 ** 8;
+    const transparentBal = (balanceJSON.transparent_balance || 0) / 10 ** 8;
 
     // Total Balance
     const balance: TotalBalance = {
+      orchardBal,
       privateBal,
       transparentBal,
-      spendablePrivate: balanceJSON.spendable_zbalance / 10 ** 8,
-      total: privateBal + transparentBal,
+      spendableOrchard: (balanceJSON.spendable_orchard_balance || 0) / 10 ** 8,
+      spendablePrivate: (balanceJSON.spendable_sapling_balance || 0) / 10 ** 8,
+      total: orchardBal + privateBal + transparentBal,
     };
     this.fnSetTotalBalance(balance);
 
     // Fetch pending notes and UTXOs
     const pendingNotes = await RPCModule.execute('notes', '');
     const pendingJSON = JSON.parse(pendingNotes);
+
+    //console.log(pendingNotes);
 
     const pendingAddressBalances = new Map();
 
@@ -350,10 +381,10 @@ export default class RPC {
     });
 
     // Addresses with Balance. The lite client reports balances in zatoshi, so divide by 10^8;
-    const zaddresses = balanceJSON.z_addresses
+    const oaddresses = balanceJSON.orchard_addresses
       .map((o: any) => {
         // If this has any unconfirmed txns, show that in the UI
-        const ab = new AddressBalance(o.address, o.zbalance / 10 ** 8);
+        const ab = new AddressBalance(o.address, (o.orchard_balance || 0) / 10 ** 8);
         if (pendingAddressBalances.has(ab.address)) {
           ab.containsPending = true;
         }
@@ -361,10 +392,10 @@ export default class RPC {
       })
       .filter((ab: AddressBalance) => ab.balance > 0);
 
-    const taddresses = balanceJSON.t_addresses
-      .map((o: any) => {
+    const zaddresses = balanceJSON.sapling_addresses
+      .map((z: any) => {
         // If this has any unconfirmed txns, show that in the UI
-        const ab = new AddressBalance(o.address, o.balance / 10 ** 8);
+        const ab = new AddressBalance(z.address, (z.sapling_balance || 0) / 10 ** 8);
         if (pendingAddressBalances.has(ab.address)) {
           ab.containsPending = true;
         }
@@ -372,18 +403,25 @@ export default class RPC {
       })
       .filter((ab: AddressBalance) => ab.balance > 0);
 
-    const addresses = zaddresses.concat(taddresses);
+    const taddresses = balanceJSON.transparent_addresses
+      .map((t: any) => {
+        // If this has any unconfirmed txns, show that in the UI
+        const ab = new AddressBalance(t.address, (t.balance || 0) / 10 ** 8);
+        if (pendingAddressBalances.has(ab.address)) {
+          ab.containsPending = true;
+        }
+        return ab;
+      })
+      .filter((ab: AddressBalance) => ab.balance > 0);
+
+    const addresses = [...oaddresses, ...zaddresses, ...taddresses];
 
     this.fnSetAddressesWithBalance(addresses);
 
-    // addresses out of the balance.
-    const a = await RPCModule.execute('addresses', '');
-    const aJSON = JSON.parse(a);
-
     // Also set all addresses
-    const allOAddresses =       aJSON.o_addresses.map((o: any) => o);
-    const allZAddresses = balanceJSON.z_addresses.map((o: any) => o.address);
-    const allTAddresses = balanceJSON.t_addresses.map((o: any) => o.address);
+    const allOAddresses = balanceJSON.orchard_addresses.map((o: any) => o.address);
+    const allZAddresses = balanceJSON.sapling_addresses.map((o: any) => o.address);
+    const allTAddresses = balanceJSON.transparent_addresses.map((o: any) => o.address);
     const allAddresses = [...allZAddresses, ...allTAddresses, ...allOAddresses];
 
     // console.log(`All addresses: ${allAddresses}`);
@@ -395,6 +433,8 @@ export default class RPC {
     const privKeyStr = await RPCModule.execute('export', address);
     const privKeyJSON = JSON.parse(privKeyStr);
 
+    //console.log('sk', privKeyJSON);
+
     // 'o' - spending_key
     // 'z' and 't' - private_key
     return privKeyJSON[0].spending_key || privKeyJSON[0].private_key;
@@ -404,7 +444,7 @@ export default class RPC {
     const viewKeyStr = await RPCModule.execute('export', address);
     const viewKeyJSON = JSON.parse(viewKeyStr);
 
-    // console.log('vk', viewKeyJSON);
+    //console.log('vk', viewKeyJSON);
 
     // 'o' - full_viewing_key
     // 'z' and 't' - viewing_key
@@ -464,11 +504,13 @@ export default class RPC {
     return heightJSON.height;
   }
 
-  // Fetch all T and Z transactions
-  async fetchTandZTransactions() {
+  // Fetch all T and Z and O transactions
+  async fetchTandZandOTransactions() {
     const listStr = await RPCModule.execute('list', '');
     const listJSON = JSON.parse(listStr);
     const serverHeight = this.serverHeight || 0;
+
+    console.log(listJSON);
 
     let txlist = listJSON.map((tx: any) => {
       const type = tx.outgoing_metadata ? 'sent' : 'receive';
@@ -606,7 +648,7 @@ export default class RPC {
       RPCModule.doSend(JSON.stringify(sendJson));
     } catch (err) {
       // TODO Show a modal with the error
-      //console.log(`Error sending Tx: ${err}`);
+      console.log(`Error sending Tx: ${err}`);
       throw err;
     }
 
@@ -616,17 +658,18 @@ export default class RPC {
     const sendTxPromise = new Promise<string>((resolve, reject) => {
       const intervalID = setInterval(async () => {
         const progress = JSON.parse(await RPCModule.execute('sendprogress', ''));
+        const sendId = progress.id;
         //console.log(progress);
 
         const updatedProgress = new SendProgress();
-        if (progress.id === prevSendId) {
+        if (sendId === prevSendId) {
           // Still not started, so wait for more time
           setSendProgress(updatedProgress);
           return;
         }
 
         // Calculate ETA.
-        let secondsPerComputation = 3; // defalt
+        let secondsPerComputation = 3; // default
         if (progress.progress > 0) {
           const currentTimeSeconds = new Date().getTime() / 1000;
           secondsPerComputation = (currentTimeSeconds - startTimeSeconds) / progress.progress;
@@ -730,7 +773,7 @@ export default class RPC {
   async changeWallet() {
     const exists = await RPCModule.walletExists();
 
-    console.log('jc change wallet', exists);
+    //console.log('jc change wallet', exists);
     if (exists && exists !== 'false') {
       await RPCModule.doSaveBackup();
       await RPCModule.deleteExistingWallet();
@@ -743,11 +786,11 @@ export default class RPC {
   async restoreBackup() {
     const existsBackup = await RPCModule.walletBackupExists();
 
-    console.log('jc restore backup', existsBackup);
+    //console.log('jc restore backup', existsBackup);
     if (existsBackup && existsBackup !== 'false') {
       const existsWallet = await RPCModule.walletExists();
 
-      console.log('jc restore wallet', existsWallet);
+      //console.log('jc restore wallet', existsWallet);
       if (existsWallet && existsWallet !== 'false') {
         await RPCModule.RestoreExistingWalletBackup();
       } else {
