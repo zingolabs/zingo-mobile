@@ -334,6 +334,8 @@ export default class RPC {
   async fetchInfoLatestBlockHeight(): Promise<number | null> {
     const info = await RPC.getInfoObject();
     if (info) {
+      this.fnSetInfo(info);
+      this.serverHeight = info.latestBlock;
       return info.latestBlock;
     }
 
