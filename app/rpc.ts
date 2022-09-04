@@ -197,7 +197,7 @@ export default class RPC {
       const pollerID = setInterval(async () => {
         const ss = JSON.parse(await RPC.doSyncStatus());
 
-        //console.log('sync ststus', ss);
+        console.log('sync ststus', ss);
 
         // Post sync updates
         const synced_blocks = ss.synced_blocks || 0;
@@ -219,7 +219,7 @@ export default class RPC {
           progress = base + progress / batch_total;
         }
 
-        //console.log(progress, this.prevProgress);
+        console.log(progress, this.prevProgress);
 
         if (this.prevProgress <= progress) {
           progress += 0.065;
@@ -231,7 +231,7 @@ export default class RPC {
           }
         }
 
-        if (progress > 100) progress = 100;
+        if (progress >= 100) progress = 99.99;
 
         this.fnRefreshUpdates(ss.in_progress, progress);
 

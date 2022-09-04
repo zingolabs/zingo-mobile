@@ -134,6 +134,8 @@ RCT_REMAP_METHOD(deleteExistingWallet,
                                                 documentsDirectory];
   // Delete the file
   [[NSFileManager defaultManager] removeItemAtPath:fileName error:nil];
+
+  resolve(@"true");
 }
 
 RCT_REMAP_METHOD(deleteExistingWalletBackup,
@@ -149,6 +151,8 @@ RCT_REMAP_METHOD(deleteExistingWalletBackup,
                                                 documentsDirectory];
   // Delete the file
   [[NSFileManager defaultManager] removeItemAtPath:fileName error:nil];
+
+  resolve(@"true");
 }
 
 // (Non react) Save the current wallet to disk
@@ -314,6 +318,7 @@ RCT_REMAP_METHOD(doSend,
   // RCTLogInfo(@"doSend called with %@", args);
 
   NSDictionary* dict = [NSDictionary dictionaryWithObjectsAndKeys:@"send", @"method", args, @"args", resolve, @"resolve", nil];
+
   [NSThread detachNewThreadSelector:@selector(doExecuteOnThread:) toTarget:self withObject:dict];
 }
 
