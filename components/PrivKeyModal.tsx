@@ -19,7 +19,7 @@ const PrivKeyModal: React.FunctionComponent<PrivKeyModalProps> = ({address, keyT
   const {colors} = useTheme();
   const fixedWidthFont = Platform.OS === 'android' ? 'monospace' : 'Courier';
 
-  const keyTypeString = keyType === 0 ? 'Private' : 'Viewing';
+  const keyTypeString = keyType === 0 ? 'Spending/Private' : 'Full Viewing/Viewing';
 
   // 30 characters per line
   const numLines = (privKey.length / 30);

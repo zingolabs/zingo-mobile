@@ -38,7 +38,7 @@ function ScanScreen({setPrivKeyText, closeModal}: ScannerProps) {
       onRead={onRead}
       reactivate={true}
       containerStyle={{backgroundColor: colors.background}}
-      topContent={<RegText>Scan a Private or Viewing Key</RegText>}
+      topContent={<RegText>Scan a Private/Spending or Full Viewing/Viewing Key</RegText>}
       bottomContent={
         <View
           style={{
@@ -107,7 +107,7 @@ const ImportKeyModal: React.FunctionComponent<ImportKeyModalProps> = ({closeModa
           justifyContent: 'flex-start',
         }}
         keyboardShouldPersistTaps="handled">
-        <RegText style={{margin: 10}}>Private or Viewing key</RegText>
+        <RegText style={{margin: 10}}>Private/Spending or Full Viewing/Viewing key</RegText>
 
         <RegTextInput
           multiline

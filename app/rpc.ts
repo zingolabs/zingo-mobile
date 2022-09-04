@@ -197,7 +197,7 @@ export default class RPC {
       const pollerID = setInterval(async () => {
         const ss = JSON.parse(await RPC.doSyncStatus());
 
-        console.log('sync ststus', ss);
+        //console.log('sync ststus', ss);
 
         // Post sync updates
         const synced_blocks = ss.synced_blocks || 0;
@@ -219,7 +219,7 @@ export default class RPC {
           progress = base + progress / batch_total;
         }
 
-        console.log(progress, this.prevProgress);
+        //console.log(progress, this.prevProgress);
 
         if (this.prevProgress <= progress) {
           progress += 0.065;
@@ -510,7 +510,7 @@ export default class RPC {
     const listJSON = JSON.parse(listStr);
     const serverHeight = this.serverHeight || 0;
 
-    console.log(listJSON);
+    //console.log(listJSON);
 
     let txlist = listJSON.map((tx: any) => {
       const type = tx.outgoing_metadata ? 'sent' : 'receive';
@@ -648,7 +648,7 @@ export default class RPC {
       RPCModule.doSend(JSON.stringify(sendJson));
     } catch (err) {
       // TODO Show a modal with the error
-      console.log(`Error sending Tx: ${err}`);
+      //console.log(`Error sending Tx: ${err}`);
       throw err;
     }
 

@@ -305,15 +305,15 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
 
   const viewPrivKey = async () => {
     if (index === 0 && zaddrs.length === 0) {
-      Toast.show('No Z address to import the Spending key', Toast.LONG);
+      Toast.show('No Z address to import the Private Key', Toast.LONG);
       return;
     }
     if (index === 1 && taddrs.length === 0) {
-      Toast.show('No T address to import the Spending key', Toast.LONG);
+      Toast.show('No T address to import the Private Key', Toast.LONG);
       return;
     }
     if (index === 2 && oaddrs.length === 0) {
-      Toast.show('No O address to import the Spending key', Toast.LONG);
+      Toast.show('No O address to import the Spending Key', Toast.LONG);
       return;
     }
 
@@ -328,15 +328,15 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
   const viewViewingKey = async () => {
     if (index === 1) {
       // No viewing key for T address
-      Toast.show('T addresses do not have viewing keys', Toast.LONG);
+      Toast.show('T addresses do not have Viewing Keys', Toast.LONG);
       return;
     }
     if (index === 0 && zaddrs.length === 0) {
-      Toast.show('No Z address to import the viewing key', Toast.LONG);
+      Toast.show('No Z address to import the Viewing Key', Toast.LONG);
       return;
     }
     if (index === 2 && oaddrs.length === 0) {
-      Toast.show('No O address to import the viewing key', Toast.LONG);
+      Toast.show('No O address to import the Full Viewing Key', Toast.LONG);
       return;
     }
 
@@ -445,8 +445,8 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
               'New O Address',
               'New Z Address',
               'New T Address',
-              'Export Spending Key',
-              'Export Viewing Key',
+              'Export Private/Spending Key',
+              'Export Full Viewing/Viewing Key',
               'Import...',
               'Cancel',
             ]}

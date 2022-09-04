@@ -41,7 +41,7 @@ function ScanScreen({idx, updateToField, closeModal}: ScannerProps) {
   const [error, setError] = useState<String | null>(null);
 
   const validateAddress = (scannedAddress: string) => {
-    if (Utils.isSapling(scannedAddress) || Utils.isTransparent(scannedAddress)) {
+    if (Utils.isSapling(scannedAddress) || Utils.isTransparent(scannedAddress) || Utils.isOrchard(scannedAddress)) {
       updateToField(idx, scannedAddress, null, null, null);
       closeModal();
     } else {
@@ -366,7 +366,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
     });
   };
 
-  const spendable = totalBalance.transparentBal + totalBalance.spendablePrivate;
+  const spendable = totalBalance.transparentBal + totalBalance.spendablePrivate + totalBalance.spendableOrchard;
   const stillConfirming = spendable !== totalBalance.total;
 
   const setMaxAmount = (idx: number) => {
@@ -385,12 +385,12 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
     return max;
   };
 
-  const memoEnabled = Utils.isSapling(sendPageState.toaddrs[0].to);
+  const memoEnabled = Utils.isSapling(sendPageState.toaddrs[0].to) || Utils.isOrchard(sendPageState.toaddrs[0].to);
   const zecPrice = info ? info.zecPrice : null;
 
   var addressValidationState: number[] = sendPageState.toaddrs.map(to => {
     if (to.to !== '') {
-      if (Utils.isSapling(to.to) || Utils.isTransparent(to.to)) {
+      if (Utils.isSapling(to.to) || Utils.isTransparent(to.to) || Utils.isOrchard(to.to)) {
         return 1;
       } else {
         return -1;
