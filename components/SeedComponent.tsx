@@ -102,6 +102,7 @@ const SeedComponent: React.FunctionComponent<SeedComponentProps> = ({seed, birth
               maxWidth: '95%',
               minWidth: '95%',
               minHeight: '20%',
+              maxHeight: '40%',
               color: colors.text,
             }}
             value={seedPhrase}
