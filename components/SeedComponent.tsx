@@ -55,7 +55,7 @@ const SeedComponent: React.FunctionComponent<SeedComponentProps> = ({seed, birth
           flex: 1,
           flexDirection: 'column',
           alignItems: 'stretch',
-          justifyContent: 'center',
+          justifyContent: 'flex-start',
           backgroundColor: colors.background,
         },
       ]}>
@@ -80,7 +80,8 @@ const SeedComponent: React.FunctionComponent<SeedComponentProps> = ({seed, birth
           padding: 10,
           borderWidth: 1,
           borderRadius: 10,
-          borderColor: colors.text
+          borderColor: colors.text,
+          maxHeight: '25%'
         }}>
         {readOnly ? (
           <RegText
@@ -110,7 +111,7 @@ const SeedComponent: React.FunctionComponent<SeedComponentProps> = ({seed, birth
           />
         )}
         <ClickableText
-          style={{padding: 10, marginTop: 10, textAlign: 'center'}}
+          style={{padding: 10, marginTop: 0, textAlign: 'center'}}
           onPress={() => {
             if (seedPhrase) {
               Clipboard.setString(seedPhrase);
@@ -162,7 +163,7 @@ const SeedComponent: React.FunctionComponent<SeedComponentProps> = ({seed, birth
         <FadeText style={{ color: colors.primary, textAlign: 'center', width:'100%' }}>{error}</FadeText>
       )}
 
-      <View style={{flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', margin: 20}}>
+      <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center', margin: 20}}>
         <Button
           type="Primary"
           style={{ backgroundColor: times === 3 ? 'red' : colors.primary, color: times === 3 ? 'white' : colors.primary }}
