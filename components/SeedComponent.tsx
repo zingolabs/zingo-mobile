@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState } from 'react';
-import {View, Image, Text} from 'react-native';
+import {View, Image, Text, SafeAreaView} from 'react-native';
 import Clipboard from '@react-native-community/clipboard';
 import {RegText, RegTextInput, FadeText, ClickableText, ZecAmount, UsdAmount, zecPrice} from './Components';
 import {TotalBalance, Transaction, Info, SyncStatus} from '../app/AppState';
@@ -49,14 +49,15 @@ const SeedComponent: React.FunctionComponent<SeedComponentProps> = ({seed, birth
   const [times, setTimes] = useState(action === "change" || action === "backup" ? 1 : 0);
 
   return (
-    <View
+    <SafeAreaView
       style={[
         {
-          flex: 1,
+          display: 'flex',
           flexDirection: 'column',
           alignItems: 'stretch',
           justifyContent: 'flex-start',
           backgroundColor: colors.background,
+          height: '100%'
         },
       ]}>
       <View
@@ -67,7 +68,7 @@ const SeedComponent: React.FunctionComponent<SeedComponentProps> = ({seed, birth
         <View style={{ width: '100%', height: 1, backgroundColor: colors.primary}}></View>
       </View>
 
-      <FadeText style={{marginTop: 20, padding: 20, textAlign: 'center'}}>
+      <FadeText style={{marginTop: 0, padding: 20, textAlign: 'center'}}>
         {readOnly ? (
           "This is your seed phrase. Please write it down carefully. It is the only way to restore your actual wallet."
         ) : (
@@ -95,15 +96,15 @@ const SeedComponent: React.FunctionComponent<SeedComponentProps> = ({seed, birth
           <RegTextInput
             multiline
             style={{
-              margin: 10,
+              margin: 0,
               padding: 10,
               borderWidth: 1,
               borderRadius: 10,
               borderColor: colors.text,
-              maxWidth: '95%',
+              maxWidth: '100%',
               minWidth: '95%',
-              minHeight: '20%',
-              maxHeight: '40%',
+              minHeight: '40%',
+              maxHeight: '60%',
               color: colors.text,
             }}
             value={seedPhrase}
@@ -181,7 +182,7 @@ const SeedComponent: React.FunctionComponent<SeedComponentProps> = ({seed, birth
           <Button type="Secondary" title="Cancel" style={{marginLeft: 10}} onPress={onClickCancel} />
         )}
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 

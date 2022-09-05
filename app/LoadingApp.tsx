@@ -3,7 +3,7 @@
  * @format
  */
 import React, { Component } from 'react';
-import { View, ScrollView, Alert, SafeAreaView, Image, Text } from 'react-native';
+import { View, ScrollView, Alert, SafeAreaView, Image, Text, Modal } from 'react-native';
 
 import Toast from 'react-native-simple-toast';
 import {useTheme} from '@react-navigation/native';
@@ -227,16 +227,26 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
           </View>
         )}
         {screen === 2 && seedPhrase && (
-          <SeedComponent
-            seed={JSON.parse(seedPhrase)?.seed}
-            birthday={JSON.parse(seedPhrase)?.birthday}
-            onClickOK={this.loadWallet}
-            totalBalance={totalBalance}
-            action={"new"}
-          />
+          <Modal
+            animationType="slide"
+            transparent={false}
+            visible={screen === 2}
+            onRequestClose={this.loadWallet}>
+            <SeedComponent
+              seed={JSON.parse(seedPhrase)?.seed}
+              birthday={JSON.parse(seedPhrase)?.birthday}
+              onClickOK={this.loadWallet}
+              totalBalance={totalBalance}
+              action={"new"}
+            />
+          </Modal>
         )}
         {screen === 3 && (
-          <>
+          <Modal
+            animationType="slide"
+            transparent={false}
+            visible={screen === 3}
+            onRequestClose={() => this.setState({ screen: 1 })}>
             <SeedComponent
               onClickOK={(s, b) => {
                 this.doRestore(s, b);
@@ -245,7 +255,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
               totalBalance={totalBalance}
               action={"restore"}
             />
-          </>
+          </Modal>
         )}
       </View>
     );
