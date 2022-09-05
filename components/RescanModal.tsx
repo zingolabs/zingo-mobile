@@ -28,6 +28,14 @@ const RescanModal: React.FunctionComponent<RescanModalProps> = ({birthday, start
         height: '100%',
         backgroundColor: colors.background,
       }}>
+      <View
+        style={{display: 'flex', alignItems: 'center', paddingBottom: 10, backgroundColor: colors.card, zIndex: -1, paddingTop: 10}}>
+        <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 80, height: 80, resizeMode: 'contain'}} />
+        <ZecAmount size={36} amtZec={totalBalance.total} style={{opacity: 0.4}} />
+        <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>Rescan</RegText>
+        <View style={{ width: '100%', height: 1, backgroundColor: colors.primary}}></View>
+      </View>
+
       <ScrollView
         style={{maxHeight: '85%'}}
         contentContainerStyle={{
@@ -35,13 +43,6 @@ const RescanModal: React.FunctionComponent<RescanModalProps> = ({birthday, start
           alignItems: 'stretch',
           justifyContent: 'flex-start',
         }}>
-        <View
-          style={{display: 'flex', alignItems: 'center', paddingBottom: 10, backgroundColor: colors.card, zIndex: -1, paddingTop: 10}}>
-          <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 80, height: 80, resizeMode: 'contain'}} />
-          <ZecAmount size={36} amtZec={totalBalance.total} style={{opacity: 0.4}} />
-          <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>Rescan</RegText>
-          <View style={{ width: '100%', height: 1, backgroundColor: colors.primary}}></View>
-        </View>
 
         <View style={{display: 'flex', margin: 20}}>
           <RegText>

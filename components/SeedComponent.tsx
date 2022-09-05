@@ -88,7 +88,7 @@ const SeedComponent: React.FunctionComponent<SeedComponentProps> = ({seed, birth
             borderWidth: 1,
             borderRadius: 10,
             borderColor: colors.text,
-            maxHeight: '25%'
+            maxHeight: '40%'
           }}>
           {readOnly ? (
             <RegText
@@ -109,8 +109,8 @@ const SeedComponent: React.FunctionComponent<SeedComponentProps> = ({seed, birth
                 borderColor: colors.text,
                 maxWidth: '100%',
                 minWidth: '95%',
-                minHeight: '40%',
-                maxHeight: '60%',
+                minHeight: '50%',
+                maxHeight: '70%',
                 color: colors.text,
               }}
               value={seedPhrase}

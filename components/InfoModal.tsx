@@ -52,6 +52,14 @@ const InfoModal: React.FunctionComponent<InfoModalProps> = ({info, closeModal, t
         height: '100%',
         backgroundColor: colors.background,
       }}>
+      <View
+        style={{display: 'flex', alignItems: 'center', paddingBottom: 10, backgroundColor: colors.card, zIndex: -1, paddingTop: 10}}>
+        <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 80, height: 80, resizeMode: 'contain'}} />
+        <ZecAmount size={36} amtZec={totalBalance.total} style={{opacity: 0.4}} />
+        <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>Server Info</RegText>
+        <View style={{ width: '100%', height: 1, backgroundColor: colors.primary}}></View>
+      </View>
+
       <ScrollView
         style={{maxHeight: '85%'}}
         contentContainerStyle={{
@@ -59,16 +67,8 @@ const InfoModal: React.FunctionComponent<InfoModalProps> = ({info, closeModal, t
           alignItems: 'stretch',
           justifyContent: 'flex-start',
         }}>
-        <View
-          style={{display: 'flex', alignItems: 'center', paddingBottom: 10, backgroundColor: colors.card, zIndex: -1, paddingTop: 10}}>
-          <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 80, height: 80, resizeMode: 'contain'}} />
-          <ZecAmount size={36} amtZec={totalBalance.total} style={{opacity: 0.4}} />
-          <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>Server Info</RegText>
-          <View style={{ width: '100%', height: 1, backgroundColor: colors.primary}}></View>
-        </View>
-
         <View style={{display: 'flex', margin: 20}}>
-          <DetailLine label="Version" value="Zingo! v0.0.1_16" />
+          <DetailLine label="Version" value="Zingo! v0.0.1_17" />
           <DetailLine label="Server Version" value={infoState.version ? infoState.version : '...loading...'} />
           <DetailLine label="Lightwallet Server URL" value={infoState.serverUri ? infoState.serverUri : '...loading...'} />
           <DetailLine label="Network" value={infoState.testnet === undefined ? '...loading...' : infoState.testnet ? 'Testnet' : 'Mainnet'} />

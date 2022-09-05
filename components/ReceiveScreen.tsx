@@ -390,7 +390,12 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
     const syncStatusDisplay = syncingStatus?.inProgress ? `Syncing ${syncingStatus?.progress.toFixed(2)}%` : '';
 
     return (
-      <View>
+      <View
+        style={{
+          display: 'flex',
+          justifyContent: 'flex-start',
+          alignItems: 'stretch',
+        }}>
         <Modal
           animationType="slide"
           transparent={false}
