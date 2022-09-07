@@ -18,7 +18,6 @@ import OptionsMenu from 'react-native-option-menu';
 import RPC from '../app/rpc';
 import PrivKeyModal from './PrivKeyModal';
 import ImportKeyModal from './ImportKey';
-import ReceiversScreen from './ReceiversScreen';
 
 type SingleAddress = {
   address: string;
@@ -42,7 +41,7 @@ const SingleAddressDisplay: React.FunctionComponent<SingleAddress> = ({address, 
   const doCopy = () => {
     if (address) {
       Clipboard.setString(address);
-      Toast.show('Copied Unified Address to Clipboard', Toast.LONG);
+      Toast.show('Copied Address to Clipboard', Toast.LONG);
     }
   };
 
@@ -54,6 +53,7 @@ const SingleAddressDisplay: React.FunctionComponent<SingleAddress> = ({address, 
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'flex-start',
+          backgroundColor: colors.background,
         },
       ]}
       keyboardShouldPersistTaps="handled">
@@ -112,69 +112,112 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
 }) => {
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([
-    {key: 'oaddr', title: 'UNIFIED ADRESSES'},
+    {key: 'zaddr', title: 'Z-Sapling'},
+    {key: 'taddr', title: 'T-Transp'},
   ]);
 
   const [displayAddress, setDisplayAddress] = useState('');
-  const [oindex, setOIndex] = useState(0);
+  const [zindex, setZIndex] = useState(0);
+  const [tindex, setTIndex] = useState(0);
 
   const {colors} = useTheme();
   const zecPrice = info ? info.zecPrice : null;
 
-  const oaddrs = addresses.filter(a => Utils.isOrchard(a)) || [];
+  const zaddrs = addresses.filter(a => Utils.isSapling(a)) || [];
+  const taddrs = addresses.filter(a => Utils.isTransparent(a)) || [];
 
   if (displayAddress) {
-    displayAddressIndex = oaddrs?.findIndex(a => a === displayAddress);
+    let displayAddressIndex = zaddrs?.findIndex(a => a === displayAddress);
 
-    if (oindex !== displayAddressIndex && displayAddressIndex >= 0) {
-      setOIndex(displayAddressIndex);
+    if (zindex !== displayAddressIndex && displayAddressIndex >= 0) {
+      setZIndex(displayAddressIndex);
+    }
+
+    displayAddressIndex = taddrs?.findIndex(a => a === displayAddress);
+
+    if (tindex !== displayAddressIndex && displayAddressIndex >= 0) {
+      setTIndex(displayAddressIndex);
     }
   }
 
   const prev = (type: string) => {
     setDisplayAddress('');
 
-    if (type === 'o') {
-      if (oaddrs.length === 0) {
+    if (type === 'z') {
+      if (zaddrs.length === 0) {
         return;
       }
-      let newIndex = oindex - 1;
+      let newIndex = zindex - 1;
       if (newIndex < 0) {
-        newIndex = oaddrs.length - 1;
+        newIndex = zaddrs.length - 1;
       }
-      setOIndex(newIndex);
+      setZIndex(newIndex);
+    } else  if (type === 't') {
+      if (taddrs.length === 0) {
+        return;
+      }
+      let newIndex = tindex - 1;
+      if (newIndex < 0) {
+        newIndex = taddrs.length - 1;
+      }
+      setTIndex(newIndex);
     }
   };
 
   const next = (type: string) => {
     setDisplayAddress('');
-    if (type === 'o') {
-      if (oaddrs.length === 0) {
+    if (type === 'z') {
+      if (zaddrs.length === 0) {
         return;
       }
-      const newIndex = (oindex + 1) % oaddrs?.length;
-      setOIndex(newIndex);
+      const newIndex = (zindex + 1) % zaddrs?.length;
+      setZIndex(newIndex);
+    } else if (type === 't') {
+      if (taddrs.length === 0) {
+        return;
+      }
+      const newIndex = (tindex + 1) % taddrs?.length;
+      setTIndex(newIndex);
     }
   };
 
   const renderScene: (routes: any) => JSX.Element | undefined = ({route}) => {
     switch (route.key) {
-      case 'oaddr': {
-        let oaddr = 'No Unified Address';
-        if (oaddrs.length > 0) {
-          oaddr = oaddrs[oindex];
+      case 'zaddr': {
+        let zaddr = 'No Address';
+        if (zaddrs.length > 0) {
+          zaddr = zaddrs[zindex];
+        }
+        return (
+          <SingleAddressDisplay
+            address={zaddr}
+            index={zindex}
+            total={zaddrs.length}
+            prev={() => {
+              prev('z');
+            }}
+            next={() => {
+              next('z');
+            }}
+          />
+        );
+      }
+      case 'taddr': {
+        let taddr = 'No Address';
+        if (taddrs.length > 0) {
+          taddr = taddrs[tindex];
         }
 
         return (
           <SingleAddressDisplay
-            address={oaddr}
-            index={oindex}
-            total={oaddrs.length}
+            address={taddr}
+            index={tindex}
+            total={taddrs.length}
             prev={() => {
-              prev('o');
+              prev('t');
             }}
             next={() => {
-              next('o');
+              next('t');
             }}
           />
         );
@@ -182,11 +225,19 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
     }
   };
 
-  const addO = async () => {
-    //console.log('New O');
-    const newAddress = await RPC.createNewAddress('o');
+  const addZ = async () => {
+    //console.log('New Z');
+    const newAddress = await RPC.createNewAddress('z');
     await fetchTotalBalance();
-    setIndex(2);
+    setIndex(0);
+    setDisplayAddress(newAddress);
+  };
+
+  const addT = async () => {
+    //console.log('New T');
+    const newAddress = await RPC.createNewAddress('t');
+    await fetchTotalBalance();
+    setIndex(1);
     setDisplayAddress(newAddress);
   };
 
@@ -195,12 +246,16 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
   const [privKey, setPrivKey] = useState('');
 
   const viewPrivKey = async () => {
-    if (oaddrs.length === 0) {
-      Toast.show('No Unified address to import the Spending Key', Toast.LONG);
+    if (index === 0 && zaddrs.length === 0) {
+      Toast.show('No Z address to import the Private Key', Toast.LONG);
+      return;
+    }
+    if (index === 1 && taddrs.length === 0) {
+      Toast.show('No T address to import the Private Key', Toast.LONG);
       return;
     }
 
-    const address = oaddrs[oindex];
+    const address = index === 0 ? zaddrs[zindex] : taddrs[tindex];
     const k = await RPC.getPrivKeyAsString(address);
 
     setKeyType(0);
@@ -209,12 +264,17 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
   };
 
   const viewViewingKey = async () => {
-    if (oaddrs.length === 0) {
-      Toast.show('No Unified address to import the Full Viewing Key', Toast.LONG);
+    if (index === 1) {
+      // No viewing key for T address
+      Toast.show('T addresses do not have Viewing Keys', Toast.LONG);
+      return;
+    }
+    if (index === 0 && zaddrs.length === 0) {
+      Toast.show('No Z address to import the Viewing Key', Toast.LONG);
       return;
     }
 
-    const address = oaddrs[oindex];
+    const address = index === 0 ? zaddrs[zindex] : taddrs[tindex];
     const k = await RPC.getViewKeyAsString(address);
 
     setKeyType(1);
@@ -223,14 +283,8 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
   };
 
   const [importKeyModalVisible, setImportKeyModalVisible] = useState(false);
-  const [legacyAddresseModalVisible, setLegacyAddressesModalVisible] = useState(false);
-
   const importKey = async () => {
     setImportKeyModalVisible(true);
-  };
-
-  const legacyAddresses = async () => {
-    setLegacyAddressesModalVisible(true);
   };
 
   const doImport = async (key: string, birthday: string) => {
@@ -259,8 +313,10 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
   const renderTabBar: (props: any) => JSX.Element = props => {
     let address = '';
 
-    if (oaddrs.length > 0) {
-      address = oaddrs[oindex];
+    if        (index === 0 && zaddrs.length > 0) {
+      address = zaddrs[zindex];
+    } else if (index === 1 && taddrs.length > 0) {
+      address = taddrs[tindex];
     }
 
     const syncStatusDisplay = syncingStatus?.inProgress ? `Syncing ${syncingStatus?.progress.toFixed(2)}%` : '';
@@ -271,6 +327,7 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
           display: 'flex',
           justifyContent: 'flex-start',
           alignItems: 'stretch',
+          backgroundColor: colors.background,
         }}>
         <Modal
           animationType="slide"
@@ -298,21 +355,6 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
           />
         </Modal>
 
-        <Modal
-          animationType="slide"
-          transparent={false}
-          visible={legacyAddresseModalVisible}
-          onRequestClose={() => setLegacyAddressesModalVisible(false)}>
-          <ReceiversScreen
-            {...props}
-            addresses={addresses}
-            startRescan={this.startRescan}
-            totalBalance={totalBalance}
-            info={info}
-            syncingStatus={syncingStatus}
-          />
-        </Modal>
-
         <View
           style={{
             display: 'flex',
@@ -331,21 +373,20 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
             <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 80, height: 80, resizeMode: 'contain'}} />
             <ZecAmount size={36} amtZec={totalBalance.total} style={{opacity: 0.4}} />
             <UsdAmount style={{marginTop: 0, marginBottom: 5, opacity: 0.4}} price={zecPrice} amtZec={totalBalance.total} />
-            <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>{syncStatusDisplay ? ('Receive - ' + syncStatusDisplay) : 'Receive'}</RegText>
+            <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>{'Legacy Addresses - Receivers'}</RegText>
           </View>
           <OptionsMenu
             customButton={<FontAwesomeIcon icon={faEllipsisV} color={colors.border} size={20} />}
             buttonStyle={{width: 32, height: 32, margin: 7.5, resizeMode: 'contain'}}
-            destructiveIndex={5}
+            destructiveIndex={4}
             options={[
-              'New Unified Address',
-              'Export UA Spending Key',
-              'Export UA Full Viewing Key',
-              'Import Key...',
-              'Legacy Adresses',
+              'New Z Address',
+              'New T Address',
+              'Export Private Key',
+              'Export Viewing Key',
               'Cancel',
             ]}
-            actions={[addO, viewPrivKey, viewViewingKey, importKey, legacyAddresses]}
+            actions={[addZ, addT, viewPrivKey, viewViewingKey]}
           />
         </View>
 
