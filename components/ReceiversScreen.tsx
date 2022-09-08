@@ -373,7 +373,7 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
             <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 80, height: 80, resizeMode: 'contain'}} />
             <ZecAmount size={36} amtZec={totalBalance.total} style={{opacity: 0.4}} />
             <UsdAmount style={{marginTop: 0, marginBottom: 5, opacity: 0.4}} price={zecPrice} amtZec={totalBalance.total} />
-            <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>{'Legacy Addresses - Receivers'}</RegText>
+            <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>{'Legacy Address Types'}</RegText>
           </View>
           <OptionsMenu
             customButton={<FontAwesomeIcon icon={faEllipsisV} color={colors.border} size={20} />}

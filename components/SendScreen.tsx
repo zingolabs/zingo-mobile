@@ -522,7 +522,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
                   marginTop: 5,
                 }}>
                 <RegTextInput
-                  placeholder="Z or T or O or UA-address"
+                  placeholder="Z-Sapling or T-Transparent or Unified address"
                   placeholderTextColor={colors.placeholder}
                   style={{flexGrow: 1, maxWidth: '90%'}}
                   value={ta.to}

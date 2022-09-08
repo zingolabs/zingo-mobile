@@ -342,7 +342,7 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
               'Export UA Spending Key',
               'Export UA Full Viewing Key',
               'Import Key...',
-              'Legacy Adresses',
+              'Legacy Adress Types',
               'Cancel',
             ]}
             actions={[addO, viewPrivKey, viewViewingKey, importKey, legacyAddresses]}
