@@ -223,14 +223,9 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
   };
 
   const [importKeyModalVisible, setImportKeyModalVisible] = useState(false);
-  const [legacyAddresseModalVisible, setLegacyAddressesModalVisible] = useState(false);
 
   const importKey = async () => {
     setImportKeyModalVisible(true);
-  };
-
-  const legacyAddresses = async () => {
-    setLegacyAddressesModalVisible(true);
   };
 
   const doImport = async (key: string, birthday: string) => {
@@ -298,21 +293,6 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
           />
         </Modal>
 
-        <Modal
-          animationType="slide"
-          transparent={false}
-          visible={legacyAddresseModalVisible}
-          onRequestClose={() => setLegacyAddressesModalVisible(false)}>
-          <ReceiversScreen
-            {...props}
-            addresses={addresses}
-            startRescan={this.startRescan}
-            totalBalance={totalBalance}
-            info={info}
-            syncingStatus={syncingStatus}
-          />
-        </Modal>
-
         <View
           style={{
             display: 'flex',
@@ -336,16 +316,15 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
           <OptionsMenu
             customButton={<FontAwesomeIcon icon={faEllipsisV} color={colors.border} size={20} />}
             buttonStyle={{width: 32, height: 32, margin: 7.5, resizeMode: 'contain'}}
-            destructiveIndex={5}
+            destructiveIndex={4}
             options={[
-              'New Unified Address',
-              'Export UA Spending Key',
-              'Export UA Full Viewing Key',
+              'New Address',
+              'Export Spending Key',
+              'Export Full Viewing Key',
               'Import Key...',
-              'Legacy Adress Types',
               'Cancel',
             ]}
-            actions={[addO, viewPrivKey, viewViewingKey, importKey, legacyAddresses]}
+            actions={[addO, viewPrivKey, viewViewingKey, importKey]}
           />
         </View>
 

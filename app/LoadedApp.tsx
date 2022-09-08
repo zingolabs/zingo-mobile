@@ -4,7 +4,7 @@ import {ScrollView, StyleSheet, Dimensions, Modal, View, SafeAreaView} from 'rea
 import * as Progress from 'react-native-progress';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {faList, faUpload, faDownload, faCog} from '@fortawesome/free-solid-svg-icons';
+import {faList, faUpload, faDownload, faCog, faAddressBook} from '@fortawesome/free-solid-svg-icons';
 
 import SideMenu from 'react-native-side-menu-updated';
 import RPC from './rpc';
@@ -28,6 +28,7 @@ import Utils from './utils';
 import TransactionsScreen from '../components/TransactionsScreen';
 import SendScreen from '../components/SendScreen';
 import ReceiveScreen from '../components/ReceiveScreen';
+import ReceiversScreen from '../components/ReceiversScreen';
 import AboutModal from '../components/About';
 import SeedComponent from '../components/SeedComponent';
 import InfoModal from '../components/InfoModal';
@@ -750,8 +751,10 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
                 iconName = faList;
               } else if (route.name === 'SEND') {
                 iconName = faUpload;
-              } else if (route.name === 'RECEIVE') {
+              } else if (route.name === "UA's") {
                 iconName = faDownload;
+              } else if (route.name === 'LEGACY') {
+                iconName = faAddressBook;
               } else {
                 iconName = faCog;
               }
@@ -806,10 +809,27 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
               </>
             )}
           </Tab.Screen>
-          <Tab.Screen name="RECEIVE">
+          <Tab.Screen name="UA's">
             {props => (
               <>
                 <ReceiveScreen
+                  {...props}
+                  {...standardProps}
+                  addresses={addresses}
+                  startRescan={this.startRescan}
+                  totalBalance={totalBalance}
+                  info={info}
+                  syncingStatus={syncingStatus}
+                />
+                {error && (
+                  <FadeText style={{ color: colors.primary, textAlign: 'center', width:'100%' }}>{error}</FadeText>
+                )}
+              </>
+            )}
+          </Tab.Screen><Tab.Screen name="LEGACY">
+            {props => (
+              <>
+                <ReceiversScreen
                   {...props}
                   {...standardProps}
                   addresses={addresses}

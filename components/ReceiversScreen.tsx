@@ -113,7 +113,7 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([
     {key: 'zaddr', title: 'Z-Sapling'},
-    {key: 'taddr', title: 'T-Transp'},
+    {key: 'taddr', title: 'T-Transparent'},
   ]);
 
   const [displayAddress, setDisplayAddress] = useState('');
