@@ -35,8 +35,7 @@ ENV HOME=/root
 ENV CARGO_HOME=$HOME/.cargo
 ENV PATH=$PATH:/root/.cargo/bin
 # get latest stable toolchain
-# RUN rustup toolchain install stable
-RUN rustup toolchain install nightly
+RUN rustup toolchain install stable
 
 # Install Rust targets for Android platforms
 RUN rustup target add aarch64-linux-android \

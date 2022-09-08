@@ -68,7 +68,7 @@ const InfoModal: React.FunctionComponent<InfoModalProps> = ({info, closeModal, t
           justifyContent: 'flex-start',
         }}>
         <View style={{display: 'flex', margin: 20}}>
-          <DetailLine label="Version" value="Zingo! v0.0.1_18" />
+          <DetailLine label="Version" value="Zingo! v0.0.1_20" />
           <DetailLine label="Server Version" value={infoState.version ? infoState.version : '...loading...'} />
           <DetailLine label="Lightwallet Server URL" value={infoState.serverUri ? infoState.serverUri : '...loading...'} />
           <DetailLine label="Network" value={infoState.testnet === undefined ? '...loading...' : infoState.testnet ? 'Testnet' : 'Mainnet'} />
