@@ -194,7 +194,7 @@ export default class RPC {
 
       // We need to wait for the sync to finish. The sync is done when
       // inRefresh is set to false in the doSync().finally()
-      const pollerID = setInterval(async () => {
+      let pollerID = setInterval(async () => {
         const ss = JSON.parse(await RPC.doSyncStatus());
 
         console.log('sync ststus', ss);
@@ -241,6 +241,7 @@ export default class RPC {
         if (!this.inRefresh) {
           // We are synced. Cancel the poll timer
           clearInterval(pollerID);
+          pollerID = undefined;
 
           // And fetch the rest of the data.
           this.loadWalletData();
@@ -802,5 +803,9 @@ export default class RPC {
       return `Error: Couldn't find any backup of any wallet.`;
     }
     return "";
+  }
+
+  async setInRefresh(value) {
+    this.inRefresh = value;
   }
 }

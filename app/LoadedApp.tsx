@@ -513,6 +513,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
       // console.log(`change server ok ${value}`);
     }
 
+    await this.rpc.setInRefresh(false);
     const error = await RPCModule.loadExistingWallet(value);
     if (!error.toLowerCase().startsWith('error')) {
       // Load the wallet and navigate to the transactions screen
@@ -577,6 +578,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
       return;
     }
 
+    await this.rpc.setInRefresh(false);
     this.setState({seedChangeModalVisible: false});
     this.navigateToLoading();
   };
@@ -598,6 +600,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
       return;
     }
 
+    await this.rpc.setInRefresh(false);
     this.setState({seedBackupModalVisible: false});
     this.navigateToLoading();
   };
