@@ -69,22 +69,22 @@ RUN cd /opt && curl --proto '=https' --tlsv1.2 https://www.openssl.org/source/op
     mkdir x86 && mkdir aarch64 && mkdir armv7 && mkdir x86_64
 
 RUN cd /opt/openssl-3.0.5 && \
-    ./Configure --prefix=/opt/openssl-3.0.5/aarch64  android-arm64 -U__ANDROID_API__ -D__ANDROID_API__=30 && \
+    ./Configure --prefix=/opt/openssl-3.0.5/aarch64  android-arm64 -U__ANDROID_API__ -D__ANDROID_API__=23 && \
     make -j$(nproc) && make -j$(nproc) install && \
     make clean && make distclean
 
 RUN cd /opt/openssl-3.0.5 && \
-    ./Configure --prefix=/opt/openssl-3.0.5/armv7  android-arm -U__ANDROID_API__ -D__ANDROID_API__=30 && \
+    ./Configure --prefix=/opt/openssl-3.0.5/armv7  android-arm -U__ANDROID_API__ -D__ANDROID_API__=23 && \
     make -j$(nproc) && make -j$(nproc) install && \
     make clean && make distclean
 
 RUN cd /opt/openssl-3.0.5 && \
-    ./Configure --prefix=/opt/openssl-3.0.5/x86  android-x86 -U__ANDROID_API__ -D__ANDROID_API__=30 && \
+    ./Configure --prefix=/opt/openssl-3.0.5/x86  android-x86 -U__ANDROID_API__ -D__ANDROID_API__=23 && \
     make -j$(nproc) && make -j$(nproc) install && \
     make clean && make distclean
 
 RUN cd /opt/openssl-3.0.5 && \
-    ./Configure --prefix=/opt/openssl-3.0.5/x86_64 -U__ANDROID_API__  android-x86_64 -D__ANDROID_API__=30 && \
+    ./Configure --prefix=/opt/openssl-3.0.5/x86_64 -U__ANDROID_API__  android-x86_64 -D__ANDROID_API__=23 && \
     make -j$(nproc) && make -j$(nproc) install && \
     make clean && make distclean
 
@@ -100,25 +100,25 @@ RUN cargo build --release --manifest-path /opt/zingo/rust/android/Cargo.toml
 RUN rustup target install aarch64-linux-android
 RUN echo "[target.aarch64-linux-android]" >> $CARGO_HOME/config.toml
 RUN echo "ar = \"llvm-ar\"" >> $CARGO_HOME/config.toml
-RUN echo "linker = \"aarch64-linux-android30-clang\"" >> $CARGO_HOME/config.toml
+RUN echo "linker = \"aarch64-linux-android23-clang\"" >> $CARGO_HOME/config.toml
 RUN echo "" >> $CARGO_HOME/config.toml
 
 RUN rustup target install armv7-linux-androideabi
 RUN echo "[target.armv7-linux-androideabi]" >> $CARGO_HOME/config.toml
 RUN echo "ar = \"llvm-ar\"" >> $CARGO_HOME/config.toml
-RUN echo "linker = \"armv7a-linux-androideabi30-clang\"" >> $CARGO_HOME/config.toml
+RUN echo "linker = \"armv7a-linux-androideabi23-clang\"" >> $CARGO_HOME/config.toml
 RUN echo "" >> $CARGO_HOME/config.toml
 
 RUN rustup target install i686-linux-android
 RUN echo "[target.i686-linux-android]" >> $CARGO_HOME/config.toml
 RUN echo "ar = \"llvm-ar\"" >> $CARGO_HOME/config.toml
-RUN echo "linker = \"i686-linux-android30-clang\"" >> $CARGO_HOME/config.toml
+RUN echo "linker = \"i686-linux-android23-clang\"" >> $CARGO_HOME/config.toml
 RUN echo "" >> $CARGO_HOME/config.toml
 
 RUN rustup target install x86_64-linux-android
 RUN echo "[target.x86_64-linux-android]" >> $CARGO_HOME/config.toml
 RUN echo "ar = \"llvm-ar\"" >> $CARGO_HOME/config.toml
-RUN echo "linker = \"x86_64-linux-android30-clang\"" >> $CARGO_HOME/config.toml
+RUN echo "linker = \"x86_64-linux-android23-clang\"" >> $CARGO_HOME/config.toml
 RUN echo "" >> $CARGO_HOME/config.toml
 
 ENV OPENSSL_STATIC=yes
@@ -130,19 +130,19 @@ RUN rustup component add rust-src --toolchain nightly-x86_64-unknown-linux-gnu
 WORKDIR /opt/zingo/rust/android/
 # RUN rustup toolchain install nightly
 # RUN rustup target add x86_64-linux-android
-RUN AR=llvm-ar LD=ld RANLIB=llvm-ranlib CC=x86_64-linux-android30-clang \
+RUN AR=llvm-ar LD=ld RANLIB=llvm-ranlib CC=x86_64-linux-android23-clang \
     OPENSSL_DIR=/opt/openssl-3.0.5/x86_64 cargo +nightly build -Z build-std \
     --target x86_64-linux-android --release
 RUN llvm-strip ../target/x86_64-linux-android/release/librust.so
-RUN AR=llvm-ar LD=ld RANLIB=llvm-ranlib CC=i686-linux-android30-clang \
+RUN AR=llvm-ar LD=ld RANLIB=llvm-ranlib CC=i686-linux-android23-clang \
     OPENSSL_DIR=/opt/openssl-3.0.5/x86 cargo +nightly build -Z build-std \
     --target i686-linux-android --release
 RUN llvm-strip ../target/i686-linux-android/release/librust.so
-RUN AR=llvm-ar LD=ld RANLIB=llvm-ranlib CC=armv7a-linux-androideabi30-clang \
+RUN AR=llvm-ar LD=ld RANLIB=llvm-ranlib CC=armv7a-linux-androideabi23-clang \
     OPENSSL_DIR=/opt/openssl-3.0.5/armv7 cargo +nightly build -Z build-std \
     --target armv7-linux-androideabi --release
 RUN llvm-strip ../target/armv7-linux-androideabi/release/librust.so
-RUN AR=llvm-ar LD=ld RANLIB=llvm-ranlib CC=aarch64-linux-android30-clang \
+RUN AR=llvm-ar LD=ld RANLIB=llvm-ranlib CC=aarch64-linux-android23-clang \
     OPENSSL_DIR=/opt/openssl-3.0.5/aarch64 cargo +nightly build -Z build-std \
     --target aarch64-linux-android --release
 RUN llvm-strip ../target/aarch64-linux-android/release/librust.so
