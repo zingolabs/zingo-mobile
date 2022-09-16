@@ -5,7 +5,7 @@ import Clipboard from '@react-native-community/clipboard';
 import QRCode from 'react-native-qrcode-svg';
 import {TabView, TabBar} from 'react-native-tab-view';
 import Toast from 'react-native-simple-toast';
-import {ClickableText, FadeText, ZecAmount, UsdAmount, zecPrice, RegText} from '../components/Components';
+import {ClickableText, FadeText, ZecAmount, UsdAmount, RegText} from '../components/Components';
 import Button from './Button';
 import {Info, TotalBalance} from '../app/AppState';
 import Utils from '../app/utils';
@@ -120,6 +120,7 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
 
   const {colors} = useTheme();
   const zecPrice = info ? info.zecPrice : null;
+  const currencyName = info ? info.currencyName : null;
 
   const oaddrs = addresses.filter(a => Utils.isOrchard(a)) || [];
 
@@ -278,6 +279,7 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
             privKey={privKey}
             closeModal={() => setPrivKeyModalVisible(false)}
             totalBalance={totalBalance}
+            currencyName={currencyName}
           />
         </Modal>
 
@@ -290,6 +292,7 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
             doImport={doImport}
             closeModal={() => setImportKeyModalVisible(false)}
             totalBalance={totalBalance}
+            currencyName={currencyName}
           />
         </Modal>
 
@@ -309,7 +312,7 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
           <View
             style={{display: 'flex', alignItems: 'center', paddingBottom: 0, backgroundColor: colors.card, zIndex: -1, paddingTop: 0}}>
             <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 80, height: 80, resizeMode: 'contain'}} />
-            <ZecAmount size={36} amtZec={totalBalance.total} style={{opacity: 0.4}} />
+            <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{opacity: 0.4}} />
             <UsdAmount style={{marginTop: 0, marginBottom: 5, opacity: 0.4}} price={zecPrice} amtZec={totalBalance.total} />
             <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>{syncStatusDisplay ? ('Receive - ' + syncStatusDisplay) : 'Receive'}</RegText>
           </View>

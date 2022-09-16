@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import {View, ScrollView, SafeAreaView, Image, Text, TouchableOpacity} from 'react-native';
-import {RegText, FadeText, BoldText, RegTextInput, ZecAmount, UsdAmount, zecPrice} from './Components';
+import {RegText, FadeText, BoldText, RegTextInput, ZecAmount, UsdAmount} from './Components';
 import { parseServerURI, SERVER_URI, MEMOS } from '../app/uris';
 import Button from './Button';
 import {useTheme} from '@react-navigation/native';
@@ -15,6 +15,9 @@ type SettingsModalProps = {
   closeModal: () => void;
   wallet_settings: WalletSettings;
   set_wallet_option: (name: string, value: string) => void;
+  set_server_option: (server: string) => void;
+  totalBalance: object;
+  currencyName: string;
 };
 
 const SettingsModal: React.FunctionComponent<SettingsModalProps> = ({
@@ -23,10 +26,12 @@ const SettingsModal: React.FunctionComponent<SettingsModalProps> = ({
   set_server_option,
   closeModal,
   totalBalance,
+  currencyName,
 }) => {
   const {colors} = useTheme();
 
   const [memos, setMemos] = React.useState(wallet_settings.download_memos);
+  const [filter, setFilter] = React.useState(wallet_settings.transaction_filter_threshold);
   const [server, setServer] = React.useState(wallet_settings.server);
   const [error, setError] = React.useState(null);
 
@@ -37,7 +42,9 @@ const SettingsModal: React.FunctionComponent<SettingsModalProps> = ({
   }, [wallet_settings, memos, server]);
 
   const saveSettings = async () => {
-    if (wallet_settings.download_memos === memos && wallet_settings.server === server) {
+    if (wallet_settings.download_memos === memos &&
+        wallet_settings.server === server &&
+        wallet_settings.transaction_filter_threshold === filter) {
       setError('No changes registred.');
       setTimeout(() => {
         setError(null);
@@ -46,6 +53,13 @@ const SettingsModal: React.FunctionComponent<SettingsModalProps> = ({
     }
     if (!memos) {
       setError('You need to choose the download memos option to save.');
+      setTimeout(() => {
+        setError(null);
+      }, 5000);
+      return;
+    }
+    if (!filter) {
+      setError('You need to choose the transaction filter threshold option to save.');
       setTimeout(() => {
         setError(null);
       }, 5000);
@@ -70,6 +84,9 @@ const SettingsModal: React.FunctionComponent<SettingsModalProps> = ({
     if (wallet_settings.download_memos !== memos) {
       set_wallet_option('download_memos', memos);
     }
+    if (wallet_settings.transaction_filter_threshold !== filter) {
+      set_wallet_option('transaction_filter_threshold', filter);
+    }
     if (wallet_settings.server !== server) {
       set_server_option(server);
     }
@@ -89,7 +106,7 @@ const SettingsModal: React.FunctionComponent<SettingsModalProps> = ({
       <View
         style={{display: 'flex', alignItems: 'center', paddingBottom: 10, backgroundColor: colors.card, zIndex: -1, paddingTop: 10}}>
         <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 80, height: 80, resizeMode: 'contain'}} />
-        <ZecAmount size={36} amtZec={totalBalance.total} style={{opacity: 0.4}} />
+        <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{opacity: 0.4}} />
         <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>Settings</RegText>
         <View style={{ width: '100%', height: 1, backgroundColor: colors.primary}}></View>
       </View>
@@ -151,6 +168,34 @@ const SettingsModal: React.FunctionComponent<SettingsModalProps> = ({
             )}
 
           </View>
+        </View>
+
+        <View style={{display: 'flex', margin: 10}}>
+          <BoldText>TRANSACTION FILTER THRESHOLD</BoldText>
+        </View>
+
+        <View style={{display: 'flex', marginLeft: 25}}>
+
+          <RegTextInput
+            placeholder={'Number...'}
+            placeholderTextColor={colors.placeholder}
+            keyboardType="numeric"
+            style={{
+              //flexGrow: 1,
+              fontSize: 18,
+              width: '60%',
+              borderColor: colors.border,
+              borderWidth: 1,
+              marginLeft: 5,
+              padding: 5,
+              paddingTop: 10,
+              paddingBottom: 10,
+              marginTop: Platform.OS === 'ios' ? 15 : 3,
+            }}
+            value={filter}
+            onChangeText={(text: string) => setFilter(text)}
+          />
+
         </View>
 
         <View style={{display: 'flex', margin: 10}}>

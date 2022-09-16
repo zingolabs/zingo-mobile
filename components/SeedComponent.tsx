@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import {View, Image, Text, SafeAreaView, ScrollView} from 'react-native';
 import Clipboard from '@react-native-community/clipboard';
-import {RegText, RegTextInput, FadeText, ClickableText, ZecAmount, UsdAmount, zecPrice} from './Components';
+import {RegText, RegTextInput, FadeText, ClickableText, ZecAmount, UsdAmount} from './Components';
 import {TotalBalance, Transaction, Info, SyncStatus} from '../app/AppState';
 import Button from './Button';
 import {useTheme} from '@react-navigation/native';
@@ -17,8 +17,9 @@ type SeedComponentProps = {
   totalBalance: TotalBalance;
   action: "new" | "change" | "view" | "restore" | "backup";
   error?: string;
+  currencyName: string;
 };
-const SeedComponent: React.FunctionComponent<SeedComponentProps> = ({seed, birthday, onClickOK, onClickCancel, totalBalance, action, error}) => {
+const SeedComponent: React.FunctionComponent<SeedComponentProps> = ({seed, birthday, onClickOK, onClickCancel, totalBalance, action, error, currencyName}) => {
   const {colors} = useTheme();
   const texts = {
     new: [
@@ -60,7 +61,7 @@ const SeedComponent: React.FunctionComponent<SeedComponentProps> = ({seed, birth
       <View
         style={{display: 'flex', alignItems: 'center', paddingBottom: 10, backgroundColor: colors.card, zIndex: -1, paddingTop: 10}}>
         <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 80, height: 80, resizeMode: 'contain'}} />
-        <ZecAmount size={36} amtZec={totalBalance.total} style={{opacity: 0.4}} />
+        <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{opacity: 0.4}} />
         <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>Seed ({action})</RegText>
         <View style={{ width: '100%', height: 1, backgroundColor: colors.primary}}></View>
       </View>

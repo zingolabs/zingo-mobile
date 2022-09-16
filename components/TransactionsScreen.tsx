@@ -35,8 +35,9 @@ import RPC from '../app/rpc';
 type TxDetailProps = {
   tx: Transaction | null;
   closeModal: () => void;
+  currencyName: string;
 };
-const TxDetail: React.FunctionComponent<TxDetailProps> = ({tx, closeModal}) => {
+const TxDetail: React.FunctionComponent<TxDetailProps> = ({tx, closeModal, currencyName}) => {
   const {colors} = useTheme();
   const spendColor = tx?.confirmations === 0 ? colors.primaryDisabled : (tx?.amount || 0) > 0 ? colors.primary : colors.text;
 
@@ -88,7 +89,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({tx, closeModal}) => {
           <RegText style={{textTransform: 'capitalize'}} color={spendColor}>
             {tx?.type}
           </RegText>
-          <ZecAmount size={36} amtZec={tx?.amount} />
+          <ZecAmount currencyName={currencyName} size={36} amtZec={tx?.amount} />
           <UsdAmount amtZec={tx?.amount} price={tx?.zec_price} />
         </View>
 
@@ -163,11 +164,11 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({tx, closeModal}) => {
                 <View style={{marginTop: 10}}>
                   <FadeText>Amount</FadeText>
                   <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
-                    <ZecAmount amtZec={txd?.amount} size={18} zecSymbol={'ᙇ'} />
+                    <ZecAmount amtZec={txd?.amount} size={18} currencyName={'ᙇ'} />
                     <UsdAmount style={{fontSize: 18}} amtZec={txd?.amount} price={tx?.zec_price} />
                   </View>
                   <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end'}}>
-                    <ZecPrice price={tx?.zec_price} />
+                    <ZecPrice price={tx?.zec_price} currencyName={currencyName} />
                   </View>
                 </View>
 
@@ -193,7 +194,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({tx, closeModal}) => {
             <View style={{display: 'flex', marginTop: 10}}>
               <FadeText>Tx Fee</FadeText>
               <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
-                <ZecAmount amtZec={fee} size={18} zecSymbol={'ᙇ'} />
+                <ZecAmount amtZec={fee} size={18} currencyName={'ᙇ'} />
                 <UsdAmount style={{fontSize: 18}} amtZec={fee} price={tx?.zec_price} />
               </View>
             </View>
@@ -277,7 +278,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
           <ZecAmount
             style={{flexGrow: 1, alignSelf: 'baseline', justifyContent: 'flex-end', paddingRight: 5}}
             size={18}
-            zecSymbol={'ᙇ'}
+            currencyName={'ᙇ'}
             color={amountColor}
             amtZec={tx.amount}
           />
@@ -336,6 +337,7 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
 
   const {colors} = useTheme();
   const zecPrice = info ? info.zecPrice : null;
+  const currencyName = info ? info.currencyName : null;
 
   const syncStatusDisplay = syncingStatus?.inProgress ? `Syncing ${syncingStatus?.progress.toFixed(2)}%` : '';
 
@@ -349,13 +351,13 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
         transparent={false}
         visible={isTxDetailModalShowing}
         onRequestClose={() => setTxDetailModalShowing(false)}>
-        <TxDetail tx={txDetail} closeModal={() => setTxDetailModalShowing(false)} />
+        <TxDetail currencyName={currencyName} tx={txDetail} closeModal={() => setTxDetailModalShowing(false)} />
       </Modal>
 
       <View
         style={{display: 'flex', alignItems: 'center', paddingBottom: 0, backgroundColor: colors.card, zIndex: -1, paddingTop: 10}}>
         <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 80, height: 80, resizeMode: 'contain'}} />
-        <ZecAmount color={balanceColor} size={36} amtZec={totalBalance.total} />
+        <ZecAmount currencyName={currencyName} color={balanceColor} size={36} amtZec={totalBalance.total} />
         <UsdAmount style={{marginTop: 0, marginBottom: 5}} price={zecPrice} amtZec={totalBalance.total} />
 
         {showShieldButton && (

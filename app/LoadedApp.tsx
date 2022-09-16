@@ -637,6 +637,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
     };
 
     const menu = <Menu onItemSelected={this.onMenuItemSelected} />;
+    const currencyName = info && info.currencyName || null;
 
     return (
       <SideMenu menu={menu} isOpen={this.state.isMenuDrawerOpen} onChange={isOpen => this.updateMenuState(isOpen)}>
@@ -648,6 +649,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
           <AboutModal
             closeModal={() => this.setState({aboutModalVisible: false})}
             totalBalance={totalBalance}
+            currencyName={currencyName}
           />
         </Modal>
 
@@ -659,6 +661,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
           <InfoModal
             closeModal={() => this.setState({infoModalVisible: false})} info={info}
             totalBalance={totalBalance}
+            currencyName={currencyName}
           />
         </Modal>
 
@@ -672,6 +675,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
             birthday={walletSeed?.birthday}
             startRescan={this.startRescan}
             totalBalance={totalBalance}
+            currencyName={currencyName}
           />
         </Modal>
 
@@ -686,6 +690,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
             set_wallet_option={this.set_wallet_option}
             set_server_option={this.set_server_option}
             totalBalance={totalBalance}
+            currencyName={currencyName}
           />
         </Modal>
 
@@ -701,6 +706,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
             totalBalance={totalBalance}
             action={"view"}
             error={error}
+            currencyName={currencyName}
           />
         </Modal>
 
@@ -717,6 +723,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
             totalBalance={totalBalance}
             action={"change"}
             error={error}
+            currencyName={currencyName}
           />
         </Modal>
 
@@ -733,6 +740,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
             totalBalance={totalBalance}
             action={"backup"}
             error={error}
+            currencyName={currencyName}
           />
         </Modal>
 

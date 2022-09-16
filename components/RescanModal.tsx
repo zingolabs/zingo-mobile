@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import {View, ScrollView, SafeAreaView, Image, Text} from 'react-native';
-import {RegText, ZecAmount, UsdAmount, zecPrice} from './Components';
+import {RegText, ZecAmount, UsdAmount} from './Components';
 import Button from './Button';
 import {useTheme} from '@react-navigation/native';
 
@@ -9,9 +9,11 @@ type RescanModalProps = {
   closeModal: () => void;
   birthday?: number;
   startRescan: () => void;
+  totalBalance: object;
+  currencyName: string;
 };
 
-const RescanModal: React.FunctionComponent<RescanModalProps> = ({birthday, startRescan, closeModal, totalBalance}) => {
+const RescanModal: React.FunctionComponent<RescanModalProps> = ({birthday, startRescan, closeModal, totalBalance, currencyName}) => {
   const {colors} = useTheme();
 
   const doRescanAndClose = () => {
@@ -31,7 +33,7 @@ const RescanModal: React.FunctionComponent<RescanModalProps> = ({birthday, start
       <View
         style={{display: 'flex', alignItems: 'center', paddingBottom: 10, backgroundColor: colors.card, zIndex: -1, paddingTop: 10}}>
         <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 80, height: 80, resizeMode: 'contain'}} />
-        <ZecAmount size={36} amtZec={totalBalance.total} style={{opacity: 0.4}} />
+        <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{opacity: 0.4}} />
         <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>Rescan</RegText>
         <View style={{ width: '100%', height: 1, backgroundColor: colors.primary}}></View>
       </View>

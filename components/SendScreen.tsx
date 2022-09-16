@@ -104,6 +104,7 @@ type ConfirmModalProps = {
   price?: number | null;
   closeModal: () => void;
   confirmSend: () => void;
+  currencyName: string;
 };
 const ConfirmModalContent: React.FunctionComponent<ConfirmModalProps> = ({
   closeModal,
@@ -111,6 +112,7 @@ const ConfirmModalContent: React.FunctionComponent<ConfirmModalProps> = ({
   sendPageState,
   price,
   defaultFee,
+  currencyName,
 }) => {
   const {colors} = useTheme();
 
@@ -143,7 +145,7 @@ const ConfirmModalContent: React.FunctionComponent<ConfirmModalProps> = ({
           }}>
           <BoldText style={{textAlign: 'center'}}>Sending</BoldText>
 
-          <ZecAmount amtZec={sendingTotal} />
+          <ZecAmount currencyName={currencyName} amtZec={sendingTotal} />
           <UsdAmount amtZec={sendingTotal} price={price} />
         </View>
         {sendPageState.toaddrs.map(to => {
@@ -161,7 +163,7 @@ const ConfirmModalContent: React.FunctionComponent<ConfirmModalProps> = ({
                   alignItems: 'baseline',
                   marginTop: 5,
                 }}>
-                <ZecAmount size={18} amtZec={Utils.parseLocaleFloat(to.amount)} />
+                <ZecAmount currencyName={currencyName} size={18} amtZec={Utils.parseLocaleFloat(to.amount)} />
                 <UsdAmount style={{fontSize: 18}} amtZec={Utils.parseLocaleFloat(to.amount)} price={price} />
               </View>
               <RegText>{to.memo || ''}</RegText>
@@ -173,7 +175,7 @@ const ConfirmModalContent: React.FunctionComponent<ConfirmModalProps> = ({
           <FadeText>Fee</FadeText>
           <View
             style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline'}}>
-            <ZecAmount size={18} amtZec={defaultFee} />
+            <ZecAmount currencyName={currencyName} size={18} amtZec={defaultFee} />
             <UsdAmount style={{fontSize: 18}} amtZec={defaultFee} price={price} />
           </View>
         </View>
@@ -387,6 +389,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
 
   const memoEnabled = Utils.isSapling(sendPageState.toaddrs[0].to) || Utils.isOrchard(sendPageState.toaddrs[0].to);
   const zecPrice = info ? info.zecPrice : null;
+  const currencyName = info ? info.currencyName : null;
 
   var addressValidationState: number[] = sendPageState.toaddrs.map(to => {
     if (to.to !== '') {
@@ -461,6 +464,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
             setConfirmModalVisible(false);
           }}
           confirmSend={confirmSend}
+          currencyName={currencyName}
         />
       </Modal>
 
@@ -487,7 +491,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
             <View
               style={{display: 'flex', alignItems: 'center', paddingBottom: 0, backgroundColor: colors.card, zIndex: -1, paddingTop: 10}}>
               <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 80, height: 80, resizeMode: 'contain'}} />
-              <ZecAmount size={36} amtZec={totalBalance.total} />
+              <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} />
               <UsdAmount style={{marginTop: 0, marginBottom: 5}} price={zecPrice} amtZec={totalBalance.total} />
               <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>{syncStatusDisplay ? ('Send - ' + syncStatusDisplay) : 'Send'}</RegText>
             </View>
@@ -612,7 +616,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
               <View style={{display: 'flex', flexDirection: 'column'}}>
                 <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', marginTop: 10}}>
                   <RegText>Spendable: </RegText>
-                  <ZecAmount color={colors.money} size={18} amtZec={getMaxAmount()} />
+                  <ZecAmount currencyName={currencyName} color={colors.money} size={18} amtZec={getMaxAmount()} />
                 </View>
                 {stillConfirming && (
                   <View

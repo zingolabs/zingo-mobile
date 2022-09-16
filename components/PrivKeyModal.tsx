@@ -2,7 +2,7 @@
 import React, {useState} from 'react';
 import {View, ScrollView, SafeAreaView, Image, Text, Platform, TouchableOpacity} from 'react-native';
 import Clipboard from '@react-native-community/clipboard';
-import {ClickableText, FadeText, RegText, ZecAmount, UsdAmount, zecPrice} from './Components';
+import {ClickableText, FadeText, RegText, ZecAmount, UsdAmount} from './Components';
 import Button from './Button';
 import {useTheme} from '@react-navigation/native';
 import Utils from '../app/utils';
@@ -14,8 +14,10 @@ type PrivKeyModalProps = {
   address: string;
   keyType: number;
   privKey: string;
+  totalBalance: object;
+  currencyName: string;
 };
-const PrivKeyModal: React.FunctionComponent<PrivKeyModalProps> = ({address, keyType, privKey, closeModal, totalBalance}) => {
+const PrivKeyModal: React.FunctionComponent<PrivKeyModalProps> = ({address, keyType, privKey, closeModal, totalBalance, currencyName}) => {
   const {colors} = useTheme();
   const fixedWidthFont = Platform.OS === 'android' ? 'monospace' : 'Courier';
 
@@ -50,7 +52,7 @@ const PrivKeyModal: React.FunctionComponent<PrivKeyModalProps> = ({address, keyT
       <View
         style={{display: 'flex', alignItems: 'center', paddingBottom: 10, backgroundColor: colors.card, zIndex: -1, paddingTop: 10}}>
         <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 80, height: 80, resizeMode: 'contain'}} />
-        <ZecAmount size={36} amtZec={totalBalance.total} style={{opacity: 0.4}} />
+        <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{opacity: 0.4}} />
         <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>{keyTypeString} Key</RegText>
         <View style={{ width: '100%', height: 1, backgroundColor: colors.primary}}></View>
       </View>

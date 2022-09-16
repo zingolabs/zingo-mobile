@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useState} from 'react';
 import {View, ScrollView, SafeAreaView, Image, Text, TouchableOpacity, Modal} from 'react-native';
-import {FadeText, RegText, RegTextInput, ZecAmount, UsdAmount, zecPrice} from './Components';
+import {FadeText, RegText, RegTextInput, ZecAmount, UsdAmount} from './Components';
 import Button from './Button';
 import {useTheme} from '@react-navigation/native';
 import cstyles from './CommonStyles';
@@ -61,8 +61,10 @@ function ScanScreen({setPrivKeyText, closeModal}: ScannerProps) {
 type ImportKeyModalProps = {
   closeModal: () => void;
   doImport: (keyText: string, birthday: string) => void;
+  totalBalance: object;
+  currencyName: string;
 };
-const ImportKeyModal: React.FunctionComponent<ImportKeyModalProps> = ({closeModal, doImport, totalBalance}) => {
+const ImportKeyModal: React.FunctionComponent<ImportKeyModalProps> = ({closeModal, doImport, totalBalance, currencyName}) => {
   const {colors} = useTheme();
 
   const [privKeyText, setPrivKeyText] = useState('');
@@ -86,7 +88,7 @@ const ImportKeyModal: React.FunctionComponent<ImportKeyModalProps> = ({closeModa
       <View
         style={{display: 'flex', alignItems: 'center', paddingBottom: 10, backgroundColor: colors.card, zIndex: -1, paddingTop: 10}}>
         <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 80, height: 80, resizeMode: 'contain'}} />
-        <ZecAmount size={36} amtZec={totalBalance.total} style={{opacity: 0.4}} />
+        <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{opacity: 0.4}} />
         <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>Import Key</RegText>
         <View style={{ width: '100%', height: 1, backgroundColor: colors.primary}}></View>
       </View>

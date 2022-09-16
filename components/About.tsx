@@ -1,14 +1,15 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import {View, ScrollView, SafeAreaView, Image, Text} from 'react-native';
-import {FadeText, ZecAmount, UsdAmount, zecPrice, RegText} from './Components';
+import {FadeText, ZecAmount, UsdAmount, RegText} from './Components';
 import Button from './Button';
 import {useTheme} from '@react-navigation/native';
 
 type AboutModalProps = {
   closeModal: () => void;
+  totalBalance: object
 };
-const AboutModal: React.FunctionComponent<AboutModalProps> = ({closeModal, totalBalance}) => {
+const AboutModal: React.FunctionComponent<AboutModalProps> = ({closeModal, totalBalance, currencyName}) => {
   const {colors} = useTheme();
   return (
     <SafeAreaView
@@ -22,7 +23,7 @@ const AboutModal: React.FunctionComponent<AboutModalProps> = ({closeModal, total
       <View
         style={{display: 'flex', alignItems: 'center', paddingBottom: 10, backgroundColor: colors.card, zIndex: -1, paddingTop: 10}}>
         <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 80, height: 80, resizeMode: 'contain'}} />
-        <ZecAmount size={36} amtZec={totalBalance.total} style={{opacity: 0.4}} />
+        <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{opacity: 0.4}} />
         <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>Zingo! v0.0.1_25</RegText>
         <View style={{ width: '100%', height: 1, backgroundColor: colors.primary}}></View>
       </View>

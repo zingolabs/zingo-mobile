@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import {View, ScrollView, SafeAreaView, Image, Text} from 'react-native';
-import {RegText, FadeText, ZecAmount, UsdAmount, zecPrice} from './Components';
+import {RegText, FadeText, ZecAmount, UsdAmount} from './Components';
 import Button from './Button';
 import {useTheme} from '@react-navigation/native';
 import {Info} from '../app/AppState';
@@ -25,9 +25,11 @@ const DetailLine: React.FunctionComponent<DetailLineProps> = ({label, value}) =>
 type InfoModalProps = {
   info: Info | null;
   closeModal: () => void;
+  totalBalance: object;
+  currencyName: string;
 };
 
-const InfoModal: React.FunctionComponent<InfoModalProps> = ({info, closeModal, totalBalance}) => {
+const InfoModal: React.FunctionComponent<InfoModalProps> = ({info, closeModal, totalBalance, currencyName}) => {
   const {colors} = useTheme();
   const [infoState, setInfoState] = React.useState({});
 
@@ -55,7 +57,7 @@ const InfoModal: React.FunctionComponent<InfoModalProps> = ({info, closeModal, t
       <View
         style={{display: 'flex', alignItems: 'center', paddingBottom: 10, backgroundColor: colors.card, zIndex: -1, paddingTop: 10}}>
         <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 80, height: 80, resizeMode: 'contain'}} />
-        <ZecAmount size={36} amtZec={totalBalance.total} style={{opacity: 0.4}} />
+        <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{opacity: 0.4}} />
         <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>Server Info</RegText>
         <View style={{ width: '100%', height: 1, backgroundColor: colors.primary}}></View>
       </View>

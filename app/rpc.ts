@@ -270,13 +270,17 @@ export default class RPC {
     const download_memos_str = await RPCModule.execute('getoption', 'download_memos');
     const download_memos = JSON.parse(download_memos_str).download_memos;
 
+    const transaction_filter_threshold_str = await RPCModule.execute('getoption', 'transaction_filter_threshold');
+    const transaction_filter_threshold = JSON.parse(transaction_filter_threshold_str).transaction_filter_threshold;
+
     const settings = await SettingsFileImpl.readSettings();
     const server = settings.server;
 
-    // console.log(download_memos);
+    // console.log(transaction_filter_threshold_str);
 
     const wallet_settings = new WalletSettings();
     wallet_settings.download_memos = download_memos;
+    wallet_settings.transaction_filter_threshold = transaction_filter_threshold;
     wallet_settings.server = server;
 
     this.fnSetWalletSettings(wallet_settings);
@@ -645,6 +649,8 @@ export default class RPC {
     // First, get the previous send progress id, so we know which ID to track
     const prevProgress = JSON.parse(await RPCModule.execute('sendprogress', ''));
     const prevSendId = prevProgress.id;
+
+    //console.log(sendJson);
 
     try {
       // This is async, so fire and forget

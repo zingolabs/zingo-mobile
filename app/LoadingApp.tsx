@@ -9,7 +9,7 @@ import Toast from 'react-native-simple-toast';
 import {useTheme} from '@react-navigation/native';
 
 import cstyles from '../components/CommonStyles';
-import { BoldText, RegText, RegTextInput, FadeText, ZecAmount, UsdAmount, zecPrice } from '../components/Components';
+import { BoldText, RegText, RegTextInput, FadeText, UsdAmount } from '../components/Components';
 import Button from '../components/Button';
 import RPCModule from '../components/RPCModule';
 import LoadedApp from './LoadedApp';
@@ -116,6 +116,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
       const seed = await RPCModule.createNewWallet(this.state.server);
       if (!seed.startsWith('Error')) {
         this.set_wallet_option('download_memos', 'none');
+        //this.set_wallet_option('transaction_filter_threshold', '500');
         this.setState({ seedPhrase: seed, screen: 2, actionButtonsDisabled: false });
       } else {
         this.setState({ actionButtonsDisabled: false });

@@ -34,11 +34,17 @@ export const UsdAmount: React.FunctionComponent<UsdAmountProps> = ({price, style
 
 type ZecPriceProps = {
   price?: number | null;
+  currencyName?: string;
 };
-export const ZecPrice: React.FunctionComponent<ZecPriceProps> = ({price}) => {
+export const ZecPrice: React.FunctionComponent<ZecPriceProps> = ({price, currencyName}) => {
   var priceString = '';
+
+  if (!currencyName) {
+    currencyName = '---';
+  }
+
   if (price && price > 0) {
-    priceString = `$ ${Utils.toLocaleFloat(price.toFixed(2))} per ZEC`;
+    priceString = `$ ${Utils.toLocaleFloat(price.toFixed(2))} per ${currencyName}`;
   }
   return <FadeText>{priceString}</FadeText>;
 };
@@ -48,9 +54,9 @@ type ZecAmountProps = {
   size?: number;
   amtZec?: number;
   style?: any;
-  zecSymbol?: string;
+  currencyName?: string;
 };
-export const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({color, style, size, zecSymbol, amtZec}) => {
+export const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({color, style, size, currencyName, amtZec}) => {
   const splits = Utils.splitZecAmountIntoBigSmall(amtZec);
   const {colors} = useTheme();
 
@@ -58,8 +64,8 @@ export const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({color, style
     size = 24;
   }
 
-  if (!zecSymbol) {
-    zecSymbol = 'ZEC';
+  if (!currencyName) {
+    currencyName = '---';
   }
 
   if (!color) {
@@ -78,7 +84,7 @@ export const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({color, style
       </Text>
       <Text style={{fontSize: size / 2, color, paddingBottom: alignmentPadding}}>{splits.smallPart}</Text>
       <Text style={{fontSize: size, color}}>
-        {' ' + zecSymbol}
+        {' ' + currencyName}
       </Text>
     </View>
   );

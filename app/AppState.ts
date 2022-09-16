@@ -209,9 +209,11 @@ export interface SyncStatus {
 
 export class WalletSettings {
   download_memos: string;
+  transaction_filter_threshold: string;
 
   constructor() {
     this.download_memos = 'none';
+    this.transaction_filter_threshold = '500';
   }
 }
 
