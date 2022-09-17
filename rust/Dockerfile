@@ -124,12 +124,11 @@ RUN echo "" >> $CARGO_HOME/config.toml
 ENV OPENSSL_STATIC=yes
 
 # including nightly build to be able to compile -lgcc library
-RUN rustup install nightly-x86_64-unknown-linux-gnu
-RUN rustup component add rust-src --toolchain nightly-x86_64-unknown-linux-gnu
+RUN rustup toolchain install nightly
+RUN rustup component add rust-src --toolchain nightly
 
 WORKDIR /opt/zingo/rust/android/
-# RUN rustup toolchain install nightly
-# RUN rustup target add x86_64-linux-android
+
 RUN AR=llvm-ar LD=ld RANLIB=llvm-ranlib CC=x86_64-linux-android23-clang \
     OPENSSL_DIR=/opt/openssl-3.0.5/x86_64 cargo +nightly build -Z build-std \
     --target x86_64-linux-android --release
