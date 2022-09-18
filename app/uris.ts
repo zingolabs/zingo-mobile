@@ -62,8 +62,8 @@ export const parseZcashURI = (uri: string): ZcashURITarget[] | string => {
 
   // The first address is special, it can be the "host" part of the URI
   const address = parsedUri.pathname;
-  if (address && !(Utils.isTransparent(address) || Utils.isZaddr(address))) {
-    return `"${address || ''}" was not a valid zcash address`;
+  if (address && !(Utils.isTransparent(address) || Utils.isZaddr(address) || Utils.isOrchard(address))) {
+    return `"${address || ''}" was not a valid zcash address (UA, Z or T)`;
   }
 
   // Has to have at least 1 element
@@ -103,7 +103,7 @@ export const parseZcashURI = (uri: string): ZcashURITarget[] | string => {
           return `Duplicate parameter "${qName}"`;
         }
 
-        if (!(Utils.isTransparent(value) || Utils.isZaddr(value))) {
+        if (!(Utils.isTransparent(value) || Utils.isZaddr(value) || Utils.isOrchard(value))) {
           return `"${value}" was not a recognized zcash address`;
         }
         target.address = value;

@@ -35,7 +35,7 @@ const SingleAddressDisplay: React.FunctionComponent<SingleAddress> = ({address, 
   const multi = total > 1;
 
   // 30 characters per line
-  const numLines = Utils.isTransparent(address) ? 2 : (address.length / 30);
+  const numLines = (address.length / 30);
   const chunks = Utils.splitStringIntoChunks(address, numLines.toFixed(0));
   const fixedWidthFont = Platform.OS === 'android' ? 'monospace' : 'Courier';
 
