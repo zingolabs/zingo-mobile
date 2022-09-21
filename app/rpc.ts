@@ -199,38 +199,35 @@ export default class RPC {
       let pollerID = setInterval(async () => {
         const ss = JSON.parse(await RPC.doSyncStatus());
 
-        console.log('sync ststus', ss);
+        console.log('sync status', ss);
 
         // Post sync updates
         const synced_blocks = ss.synced_blocks || 0;
         const trial_decryptions_blocks = ss.trial_decryptions_blocks|| 0;
         const txn_scan_blocks = ss.txn_scan_blocks || 0;
-        const total_blocks = ss.total_blocks || 0;
 
-        const progress_blocks = (synced_blocks + trial_decryptions_blocks + txn_scan_blocks) / 3;
-        let progress = progress_blocks;
-        if (!!total_blocks) {
-          progress = (progress_blocks * 100) / total_blocks;
-        }
+        const total_blocks = ss.total_blocks || 0;
 
         const batch_total = ss.batch_total || 0;
         const batch_num = ss.batch_num || 0;
 
-        if (!!batch_total) {
-          const base = (batch_num * 100) / batch_total;
-          progress = base + progress / batch_total;
-        }
+        const total_general_blocks = batch_total === 1 ? total_blocks : (1000 * (batch_total - 1)) + total_blocks;
 
-        console.log(progress, this.prevProgress);
+        const progress_blocks = (synced_blocks + trial_decryptions_blocks + txn_scan_blocks) / 3;
+
+        const total_progress_blocks = batch_total === 1 ? progress_blocks : (1000 * batch_num) + progress_blocks;
+
+        let progress = (total_progress_blocks * 100) / total_general_blocks;
+
+        // guessing 100 seconds for batch
+        const increment = 100 / ((total_general_blocks  * 100) / 1000);
+
+        console.log('prev', this.prevProgress, 'act', progress, 'incr', increment);
 
         if (this.prevProgress <= progress) {
-          progress += 0.065;
-        } else {
-          if (this.prevProgress <= 90) {
-            progress = this.prevProgress + 0.065;
-          } else {
-            progress = this.prevProgress + 0.005;
-          }
+          progress += increment;
+        } else if (this.prevProgress > progress) {
+          progress = this.prevProgress + increment;
         }
 
         if (progress >= 100) progress = 99.99;
