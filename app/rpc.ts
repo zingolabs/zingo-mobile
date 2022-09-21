@@ -191,6 +191,8 @@ export default class RPC {
       }
 
       let prevBatchNum = -1;
+      let prev_sync_id = -1;
+      let seconds_batch = 0;
 
       // We need to wait for the sync to finish. The sync is done when
       // inRefresh is set to false in the doSync().finally()
@@ -237,6 +239,19 @@ export default class RPC {
 
         this.prevProgress = progress;
 
+        seconds_batch += 2;
+
+        // if the sync_id change then reset the %
+        if (prev_sync_id !== ss.sync_id) {
+          if (prevBatchNum !== -1) {
+            console.log(`new sync process id: ${ss.sync_id} and save the wallet, just in case.`);
+            await RPCModule.doSave();
+            this.prevProgress = 0;
+            progress = 0;
+          }
+          prev_sync_id = ss.sync_id;
+        }
+
         // Close the poll timer if the sync finished(checked via promise above)
         if (!this.inRefresh) {
           // We are synced. Cancel the poll timer
@@ -250,13 +265,16 @@ export default class RPC {
           this.lastWalletBlockHeight = walletHeight;
 
           await RPCModule.doSave();
-          // console.log(`Finished refresh at ${walletHeight}`);
+          console.log(`Finished refresh at ${walletHeight} id: ${ss.sync_id}`);
         } else {
           // If we're doing a long sync, every time the batch_num changes, save the wallet
           if (prevBatchNum !== ss.batch_num) {
-            // console.log(`Saving because batch num changed ${prevBatchNum} - ${ss.batch_num}`);
-            await RPCModule.doSave();
+            if (prevBatchNum !== -1) {
+              console.log(`Saving because batch num changed ${prevBatchNum} - ${ss.batch_num}. seconds: ${seconds_batch}`);
+              await RPCModule.doSave();
+            }
             prevBatchNum = ss.batch_num;
+            seconds_batch = 0;
           }
         }
       }, 2000);
