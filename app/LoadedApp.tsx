@@ -172,6 +172,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
       seedViewModalVisible: false,
       seedChangeModalVisible: false,
       seedBackupModalVisible: false,
+      seedServerModalVisible: false,
+      newServer: null,
       syncingStatus: null,
       error: null,
     };
@@ -484,6 +486,17 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
       await this.fetchWalletSeed();
       this.setState({seedChangeModalVisible: true});
     } else if (item === 'Restore Wallet Backup') {
+      if (this.state.info.currencyName !== "ZEC") {
+        this.setState({
+          error: `This option is only available for mainnet servers.`,
+        });
+        setTimeout(() => {
+          this.setState({
+            error: null,
+          });
+        }, 5000);
+        return;
+      }
       await this.fetchWalletSeed();
       this.setState({seedBackupModalVisible: true});
     }
@@ -530,6 +543,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
           error: null,
         });
       }, 5000);
+
       const old_settings = await SettingsFileImpl.readSettings();
       const resultStr: string = await RPCModule.execute('changeserver', old_settings.server);
       if (resultStr.toLowerCase().startsWith('error')) {
@@ -546,10 +560,17 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
       } else {
         // console.log(`change server ok ${old_settings.server} - ${resultStr}`);
       }
+
+      // go to the seed screen for changing the wallet for another in the new server
+      await this.fetchWalletSeed();
+      this.setState({
+        seedServerModalVisible: true,
+        newServer: value,
+      });
     }
 
     // Refetch the settings to update
-    this.rpc.fetchWalletSettings();
+    //this.rpc.fetchWalletSettings();
   };
 
   navigateToLoading = () => {
@@ -562,7 +583,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
   };
 
   onClickOKChangeWallet = async () => {
-    const resultStr = await this.rpc.changeWallet();
+    const resultStr = this.state.info.currencyName !== 'ZEC' ? await this.rpc.changeWalletNoBackup() : await this.rpc.changeWallet();
 
     //console.log("jc change", resultStr);
     if (resultStr.toLowerCase().startsWith('error')) {
@@ -605,6 +626,46 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
     this.navigateToLoading();
   };
 
+  onClickOKServerWallet = async () => {
+    const resultStr: string = await RPCModule.execute('changeserver', this.state.newServer);
+    if (resultStr.toLowerCase().startsWith('error')) {
+      // console.log(`Error change server ${value} - ${resultStr}`);
+      this.setState({
+        error: `Error trying to change the server to the new one: ${this.state.newServer}`,
+      });
+      setTimeout(() => {
+        this.setState({
+          error: null,
+        });
+      }, 5000);
+      return;
+    } else {
+      // console.log(`change server ok ${value}`);
+    }
+
+    const settings = { server: this.state.newServer };
+    await SettingsFileImpl.writeSettings(settings);
+
+    const resultStr2 = this.state.info.currencyName !== 'ZEC' ? await this.rpc.changeWalletNoBackup() : await this.rpc.changeWallet();
+    //console.log("jc change", resultStr);
+    if (resultStr2.toLowerCase().startsWith('error')) {
+      // console.log(`Error change wallet. ${resultStr}`);
+      this.setState({
+        error: `${resultStr2}`,
+      });
+      setTimeout(() => {
+        this.setState({
+          error: null,
+        });
+      }, 5000);
+      return;
+    }
+
+    await this.rpc.setInRefresh(false);
+    this.setState({seedServerModalVisible: false});
+    this.navigateToLoading();
+  };
+
   render() {
     const {
       totalBalance,
@@ -621,6 +682,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
       seedViewModalVisible,
       seedChangeModalVisible,
       seedBackupModalVisible,
+      seedServerModalVisible,
       walletSeed,
       syncingStatus,
       txBuildProgress,
@@ -747,6 +809,23 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
         <Modal
           animationType="slide"
           transparent={false}
+          visible={seedServerModalVisible}
+          onRequestClose={() => this.setState({seedServerModalVisible: false})}>
+          <SeedComponent
+            seed={walletSeed?.seed}
+            birthday={walletSeed?.birthday}
+            onClickOK={this.onClickOKServerWallet}
+            onClickCancel={() => this.setState({seedServerModalVisible: false})}
+            totalBalance={totalBalance}
+            action={"server"}
+            error={error}
+            currencyName={currencyName}
+          />
+        </Modal>
+
+        <Modal
+          animationType="slide"
+          transparent={false}
           visible={computingModalVisible}
           onRequestClose={() => this.setState({computingModalVisible: false})}>
           <ComputingTxModalContent progress={txBuildProgress} />
@@ -797,7 +876,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
                   syncingStatus={syncingStatus}
                 />
                 {error && (
-                  <FadeText style={{ color: colors.primary, textAlign: 'center', width:'100%' }}>{error}</FadeText>
+                  <FadeText style={{ color: colors.primary, textAlign: 'center', width:'100%', marginBottom: 5 }}>{error}</FadeText>
                 )}
               </>
             )}
@@ -815,7 +894,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
                   setComputingModalVisible={this.setComputingModalVisible}
                 />
                 {error && (
-                  <FadeText style={{ color: colors.primary, textAlign: 'center', width:'100%' }}>{error}</FadeText>
+                  <FadeText style={{ color: colors.primary, textAlign: 'center', width:'100%', marginBottom: 5 }}>{error}</FadeText>
                 )}
               </>
             )}
@@ -833,7 +912,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
                   syncingStatus={syncingStatus}
                 />
                 {error && (
-                  <FadeText style={{ color: colors.primary, textAlign: 'center', width:'100%' }}>{error}</FadeText>
+                  <FadeText style={{ color: colors.primary, textAlign: 'center', width:'100%', marginBottom: 5 }}>{error}</FadeText>
                 )}
               </>
             )}
@@ -850,7 +929,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
                   syncingStatus={syncingStatus}
                 />
                 {error && (
-                  <FadeText style={{ color: colors.primary, textAlign: 'center', width:'100%' }}>{error}</FadeText>
+                  <FadeText style={{ color: colors.primary, textAlign: 'center', width:'100%', marginBottom: 5 }}>{error}</FadeText>
                 )}
               </>
             )}

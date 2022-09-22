@@ -15,7 +15,7 @@ type SeedComponentProps = {
   onClickOK: () => void;
   onClickCancel: () => void;
   totalBalance: TotalBalance;
-  action: "new" | "change" | "view" | "restore" | "backup";
+  action: "new" | "change" | "view" | "restore" | "backup" | "server";
   error?: string;
   currencyName: string;
 };
@@ -31,6 +31,12 @@ const SeedComponent: React.FunctionComponent<SeedComponentProps> = ({seed, birth
       "You really want \n to change your \n actual wallet",
       "Are you sure \n 100% or more"
     ],
+    server: [
+      "",
+      "I have saved \n the seed",
+      "You really want \n to change your \n actual server",
+      "Are you sure \n 100% or more"
+    ],
     view: [
       "I have saved \n the seed"
     ],
@@ -44,10 +50,10 @@ const SeedComponent: React.FunctionComponent<SeedComponentProps> = ({seed, birth
       "Are you sure \n 100% or more"
     ]
   };
-  const readOnly = action === "new" || action === "view" || action === "change" || action === "backup";
+  const readOnly = action === "new" || action === "view" || action === "change" || action === "backup" || action === "server";
   const [seedPhrase, setSeedPhrase] = useState(seed);
   const [birthdayNumber, setBirthdayNumber] = useState(birthday);
-  const [times, setTimes] = useState(action === "change" || action === "backup" ? 1 : 0);
+  const [times, setTimes] = useState(action === "change" || action === "backup" || action === "server" ? 1 : 0);
 
   return (
     <SafeAreaView
@@ -165,7 +171,16 @@ const SeedComponent: React.FunctionComponent<SeedComponentProps> = ({seed, birth
           {times === 3 && action === "backup" && (
             "YOU WILL HAVE NO LONGER ACCESS TO THIS WALLET, AND YOU ARE GOING TO ACCESS TO YOUR BACKUP WALLET"
           )}
+          {times === 3 && action === "server" && (
+            "YOU WILL HAVE NO LONGER ACCESS TO THIS WALLET, AND YOU ARE GOING TO CHANGE TO ANOTHER SERVER IN WHICH YOUR ACTUAL WALLET DOESN'T EXIST"
+          )}
         </FadeText>
+
+        {currencyName !== 'ZEC' && times === 3 && (action === "change" || action === "server") && (
+          <FadeText style={{ color: colors.primary, textAlign: 'center', width:'100%' }}>
+            NO BACKUP OF THIS WALLET. ONLY IN MAINNET.
+          </FadeText>
+        )}
 
         {error && (
           <FadeText style={{ color: colors.primary, textAlign: 'center', width:'100%' }}>{error}</FadeText>

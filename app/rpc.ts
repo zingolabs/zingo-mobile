@@ -807,6 +807,18 @@ export default class RPC {
     return "";
   }
 
+  async changeWalletNoBackup() {
+    const exists = await RPCModule.walletExists();
+
+    //console.log('jc change wallet', exists);
+    if (exists && exists !== 'false') {
+      await RPCModule.deleteExistingWallet();
+    } else {
+      return `Error: Couldn't find any wallet.`;
+    }
+    return "";
+  }
+
   async restoreBackup() {
     const existsBackup = await RPCModule.walletBackupExists();
 

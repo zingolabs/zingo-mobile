@@ -38,8 +38,8 @@ const SettingsModal: React.FunctionComponent<SettingsModalProps> = ({
   const [customIcon, setCustomIcon] = React.useState(null);
 
   React.useEffect(() => {
-    setCustomIcon((SERVER_URI.find(s => s === server)) ? farCircle : faDotCircle);
-  }, [wallet_settings, memos, server]);
+    setCustomIcon(!!SERVER_URI.find(s => s === server) ? farCircle : faDotCircle);
+  }, [wallet_settings, server]);
 
   const saveSettings = async () => {
     if (wallet_settings.download_memos === memos &&
