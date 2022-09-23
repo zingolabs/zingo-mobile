@@ -262,11 +262,13 @@ export default class RPC {
           this.lastWalletBlockHeight = walletHeight;
 
           await RPCModule.doSave();
+          this.prevProgress = 0;
+          progress = 0;
           console.log(`Finished refresh at ${walletHeight} id: ${ss.sync_id}`);
         } else {
           // If we're doing a long sync, every time the batch_num changes, save the wallet
           if (prevBatchNum !== ss.batch_num) {
-            if (prevBatchNum !== -1) {
+            if (prevBatchNum !== -1 && seconds_batch > 10) {
               console.log(`Saving because batch num changed ${prevBatchNum} - ${ss.batch_num}. seconds: ${seconds_batch}`);
               await RPCModule.doSave();
             }
@@ -315,20 +317,26 @@ export default class RPC {
       const infostr = await RPCModule.execute('info', '');
       const infoJSON = JSON.parse(infostr);
 
+      console.log(infoJSON);
+
       const encStatus = await RPCModule.execute('encryptionstatus', '');
       const encJSON = JSON.parse(encStatus);
+
+      console.log(encJSON);
 
       const defaultFee = await RPCModule.execute('defaultfee', '');
       const defaultFeeJSON = JSON.parse(defaultFee);
 
+      console.log(defaultFeeJSON);
+
       const info: Info = {
-        testnet: infoJSON.chain_name === 'test',
+        chain_name: infoJSON.chain_name,
         latestBlock: infoJSON.latest_block_height,
         serverUri: infoJSON.server_uri || '<none>',
         connections: 1,
         version: `${infoJSON.vendor}/${infoJSON.git_commit.substring(0, 6)}/${infoJSON.version}`,
         verificationProgress: 1,
-        currencyName: infoJSON.chain_name === 'test' ? 'TAZ' : 'ZEC',
+        currencyName: infoJSON.chain_name === 'main' ? 'ZEC' : 'TAZ',
         solps: 0,
         encrypted: encJSON.encrypted,
         locked: encJSON.locked,

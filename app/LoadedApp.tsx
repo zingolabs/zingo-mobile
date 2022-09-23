@@ -32,10 +32,11 @@ import ReceiversScreen from '../components/ReceiversScreen';
 import AboutModal from '../components/About';
 import SeedComponent from '../components/SeedComponent';
 import InfoModal from '../components/InfoModal';
-import {useTheme} from '@react-navigation/native';
 import RescanModal from '../components/RescanModal';
 import SettingsModal from '../components/SettingsModal';
 import SettingsFileImpl from '../components/SettingsFileImpl';
+
+import {useTheme} from '@react-navigation/native';
 
 const window = Dimensions.get('window');
 
@@ -259,11 +260,11 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
       const defaultAB = addressesWithBalance
         .filter(ab => Utils.isSapling(ab.address) || Utils.isOrchard(ab.address))
         .reduce((prev: AddressBalance | null, ab: AddressBalance) => {
-          // We'll start with a sapling address
+          // We'll start with a sapling or orchard address
           if (prev == null) {
             return ab;
           }
-          // Find the sapling address with the highest balance
+          // Find the sapling or orchard address with the highest balance
           if (prev.balance < ab.balance) {
             return ab;
           }
@@ -342,7 +343,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
   setInfo = (newInfo: Info) => {
     // If the price is not set in this object, copy it over from the current object
     const {info} = this.state;
-    if (info && info.zecPrice && !newInfo.zecPrice) {
+    if (!!info && !!info.zecPrice && !newInfo.zecPrice) {
       newInfo.zecPrice = info.zecPrice;
     }
 
@@ -418,7 +419,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
     // console.log(`Created new Address ${newaddress}`);
 
     // And then fetch the list of addresses again to refresh (totalBalance gets all addresses)
-    this.rpc.fetchTotalBalance();
+    this.fetchTotalBalance();
 
     const {receivePageState} = this.state;
     const newRerenderKey = receivePageState.rerenderKey + 1;
@@ -488,7 +489,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
     } else if (item === 'Restore Wallet Backup') {
       if (this.state.info.currencyName !== "ZEC") {
         this.setState({
-          error: `This option is only available for mainnet servers.`,
+          error: `This option is only available for Mainnet servers.`,
         });
         setTimeout(() => {
           this.setState({
@@ -531,8 +532,10 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
     if (!error.toLowerCase().startsWith('error')) {
       // Load the wallet and navigate to the transactions screen
       // console.log(`wallet loaded ok ${value}`);
-      const settings = { server: value };
-      await SettingsFileImpl.writeSettings(settings);
+      await SettingsFileImpl.writeSettings({ server: value });
+      // Refetch the settings to update
+      this.rpc.fetchWalletSettings();
+      return;
     } else {
       // console.log(`Error Reading Wallet ${value} - ${error}`);
       this.setState({
@@ -556,7 +559,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
             error: null,
           });
         }, 5000);
-        return;
+        //return;
       } else {
         // console.log(`change server ok ${old_settings.server} - ${resultStr}`);
       }
@@ -569,8 +572,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
       });
     }
 
-    // Refetch the settings to update
-    //this.rpc.fetchWalletSettings();
   };
 
   navigateToLoading = () => {
@@ -583,7 +584,9 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
   };
 
   onClickOKChangeWallet = async () => {
-    const resultStr = this.state.info.currencyName !== 'ZEC' ? await this.rpc.changeWalletNoBackup() : await this.rpc.changeWallet();
+    const resultStr = this.state.info.currencyName !== 'ZEC'
+      ? await this.rpc.changeWalletNoBackup()
+      : await this.rpc.changeWallet();
 
     //console.log("jc change", resultStr);
     if (resultStr.toLowerCase().startsWith('error')) {
@@ -643,10 +646,11 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
       // console.log(`change server ok ${value}`);
     }
 
-    const settings = { server: this.state.newServer };
-    await SettingsFileImpl.writeSettings(settings);
+    await SettingsFileImpl.writeSettings({ server: this.state.newServer });
 
-    const resultStr2 = this.state.info.currencyName !== 'ZEC' ? await this.rpc.changeWalletNoBackup() : await this.rpc.changeWallet();
+    const resultStr2 = this.state.info.currencyName !== 'ZEC'
+      ? await this.rpc.changeWalletNoBackup()
+      : await this.rpc.changeWallet();
     //console.log("jc change", resultStr);
     if (resultStr2.toLowerCase().startsWith('error')) {
       // console.log(`Error change wallet. ${resultStr}`);
@@ -658,7 +662,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
           error: null,
         });
       }, 5000);
-      return;
+      //return;
     }
 
     await this.rpc.setInRefresh(false);

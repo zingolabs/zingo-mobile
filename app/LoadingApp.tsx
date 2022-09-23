@@ -66,7 +66,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
       let settings = {};
       if (!this.state.server) {
         settings = await SettingsFileImpl.readSettings();
-        if (settings && settings.server) {
+        if (!!settings && !!settings.server) {
           this.setState({ server: settings.server });
         } else {
           settings.server = SERVER_DEFAULT;
@@ -80,14 +80,14 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
 
       if (exists && exists !== 'false') {
         this.setState({ walletExists: true });
-        const error = await RPCModule.loadExistingWallet(settings.server || this.state.server);
+        const error = await RPCModule.loadExistingWallet(settings.server || this.state.server || SERVER_DEFAULT);
         //console.log('Load Wallet Exists result', error);
         if (!error.startsWith('Error')) {
           // Load the wallet and navigate to the transactions screen
           this.navigateToLoaded();
         } else {
-          Alert.alert('Error Reading Wallet', error);
           this.setState({ screen: 1 });
+          Alert.alert('Error Reading Wallet', error);
         }
       } else {
         // console.log('Loading new wallet');
@@ -97,8 +97,10 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
   };
 
   useDefaultServer = async () => {
+    this.setState({ actionButtonsDisabled: true });
     this.setState({ server: SERVER_DEFAULT });
     await SettingsFileImpl.writeSettings({ server: SERVER_DEFAULT });
+    this.setState({ actionButtonsDisabled: false });
   };
 
   navigateToLoaded = () => {
@@ -111,22 +113,23 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
 
   createNewWallet = () => {
     this.setState({ actionButtonsDisabled: true });
-
     setTimeout(async () => {
       const seed = await RPCModule.createNewWallet(this.state.server);
+
       if (!seed.startsWith('Error')) {
+        // default values for wallet options
         this.set_wallet_option('download_memos', 'none');
-        //this.set_wallet_option('transaction_filter_threshold', '500');
-        this.setState({ seedPhrase: seed, screen: 2, actionButtonsDisabled: false });
+        this.set_wallet_option('transaction_filter_threshold', '500');
+        this.setState({ seedPhrase: seed, screen: 2, actionButtonsDisabled: false, walletExists: true });
       } else {
-        this.setState({ actionButtonsDisabled: false });
+        this.setState({ walletExists: false, actionButtonsDisabled: false });
         Alert.alert('Error creating Wallet', seed);
       }
     });
   };
 
   getSeedPhraseToRestore = async () => {
-    this.setState({ seedPhrase: '', birthday: '0', screen: 3 });
+    this.setState({ seedPhrase: '', birthday: '0', screen: 3, walletExists: false });
   };
 
   getViewingKeyToRestore = async () => {
@@ -141,7 +144,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
 
   doRestore = async (seedPhrase, birthday) => {
     // Don't call with null values
-    const { server } = this.state;
+    const { server } = this.state || SERVER_DEFAULT;
 
     if (!seedPhrase) {
       Alert.alert('Invalid Seed Phrase', 'The seed phrase was invalid');
@@ -169,10 +172,6 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
     });
   };
 
-  loadWallet = () => {
-    this.navigateToLoaded();
-  };
-
   set_wallet_option = async (name: string, value: string) => {
     await RPC.setWalletSettingOption(name, value);
   };
@@ -182,26 +181,23 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
     const { colors } = this.props.theme;
 
     return (
-      <View
-        style={[
-          {
-            flexDirection: 'column',
-            flex: 1,
-            alignItems: 'center',
-            justifyContent: 'center',
-          },
-        ]}>
+      <SafeAreaView
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100%',
+          backgroundColor: colors.background,
+      }}>
         {screen === 0 && <Text style={{ color: colors.zingo, fontSize: 40, fontWeight: 'bold' }}> Zingo!</Text>}
         {screen === 1 && (
           <View
-            style={[
-              {
+            style={{
                 flex: 1,
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-              },
-            ]}>
+          }}>
             <View style={{ marginBottom: 50, display: 'flex', alignItems: 'center' }}>
               <Text style={{ color: colors.zingo, fontSize: 40, fontWeight: 'bold' }}> Zingo!</Text>
               <Image
@@ -214,16 +210,14 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
             {walletExists && (
               <Button type="Primary" title="Open Current wallet" disabled={actionButtonsDisabled} onPress={this.componentDidMount} style={{ marginBottom: 10 }} />
             )}
+            <BoldText style={{ fontSize: 12, marginBottom: 3 }}>(Actual server: {server})</BoldText>
             {server !== SERVER_DEFAULT && (
-              <>
-                <BoldText style={{ fontSize: 12, marginBottom: 3 }}>(server: {server})</BoldText>
-                <Button type="Primary" title="Use Default Server" disabled={actionButtonsDisabled} onPress={this.useDefaultServer} style={{ marginBottom: 10 }} />
-              </>
+              <Button type="Primary" title="Use Default Server" disabled={actionButtonsDisabled} onPress={this.useDefaultServer} style={{ marginBottom: 10 }} />
             )}
             <View style={[cstyles.margintop, { display: 'flex', alignItems: 'center' }]}>
-              <Button type="Secondary" title="Restore wallet from Seed" onPress={this.getSeedPhraseToRestore} style={{ margin: 10 }} />
-              <Button type="Secondary" title="Restore wallet from viewing key" onPress={this.getViewingKeyToRestore} style={{ margin: 10 }} />
-              <Button type="Secondary" title="Restore wallet from spendable key" onPress={this.getSpendableKeyToRestore} style={{ margin: 10 }} />
+              <Button type="Secondary" title="Restore wallet from Seed" disabled={actionButtonsDisabled} onPress={this.getSeedPhraseToRestore} style={{ margin: 10 }} />
+              <Button type="Secondary" title="Restore wallet from viewing key" disabled={actionButtonsDisabled} onPress={this.getViewingKeyToRestore} style={{ margin: 10 }} />
+              <Button type="Secondary" title="Restore wallet from spendable key" disabled={actionButtonsDisabled} onPress={this.getSpendableKeyToRestore} style={{ margin: 10 }} />
             </View>
           </View>
         )}
@@ -232,11 +226,11 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
             animationType="slide"
             transparent={false}
             visible={screen === 2}
-            onRequestClose={this.loadWallet}>
+            onRequestClose={this.navigateToLoaded()}>
             <SeedComponent
               seed={JSON.parse(seedPhrase)?.seed}
               birthday={JSON.parse(seedPhrase)?.birthday}
-              onClickOK={this.loadWallet}
+              onClickOK={this.navigateToLoaded()}
               totalBalance={totalBalance}
               action={"new"}
             />
@@ -249,16 +243,14 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
             visible={screen === 3}
             onRequestClose={() => this.setState({ screen: 1 })}>
             <SeedComponent
-              onClickOK={(s, b) => {
-                this.doRestore(s, b);
-              }}
+              onClickOK={(s, b) => this.doRestore(s, b)}
               onClickCancel={() => this.setState({ screen: 1 })}
               totalBalance={totalBalance}
               action={"restore"}
             />
           </Modal>
         )}
-      </View>
+      </SafeAreaView>
     );
   }
 }

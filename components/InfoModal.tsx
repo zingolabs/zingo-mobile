@@ -73,7 +73,17 @@ const InfoModal: React.FunctionComponent<InfoModalProps> = ({info, closeModal, t
           <DetailLine label="Version" value="Zingo! v0.0.1_28" />
           <DetailLine label="Server Version" value={infoState.version ? infoState.version : '...loading...'} />
           <DetailLine label="Lightwallet Server URL" value={infoState.serverUri ? infoState.serverUri : '...loading...'} />
-          <DetailLine label="Network" value={infoState.testnet === undefined ? '...loading...' : infoState.testnet ? 'Testnet' : 'Mainnet'} />
+          <DetailLine
+            label="Network"
+            value={
+              infoState.chain_name === undefined
+                ? '...loading...'
+                : infoState.chain_name === 'main'
+                  ? 'Mainnet'
+                  : infoState.chain_name === 'test'
+                    ? 'Testnet'
+                    : infoState.chain_name} 
+          />
           <DetailLine label="Server Block Height" value={info?.latestBlock} />
           {/* <DetailLine label="Wallet Block Height" value={walletHeight} /> */}
           <DetailLine label="ZEC Price" value={info?.zecPrice ? `$ ${Utils.toLocaleFloat(info?.zecPrice?.toFixed(2))}` : '-'} />

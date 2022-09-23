@@ -127,7 +127,7 @@ export class ReceivePageState {
 }
 
 export interface Info {
-  testnet: boolean;
+  chain_name: boolean;
   serverUri: string;
   latestBlock: number;
   connections: number;

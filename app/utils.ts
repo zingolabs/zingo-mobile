@@ -131,8 +131,8 @@ export default class Utils {
     return 0.0001;
   }
 
-  static getDonationAddress(testnet: boolean): string {
-    if (testnet) {
+  static getDonationAddress(chain_name: boolean): string {
+    if (chain_name !== "main") {
       return 'ztestsapling...';
     } else {
       return 'z...';

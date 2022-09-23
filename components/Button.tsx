@@ -21,7 +21,8 @@ const Button: React.FunctionComponent<any> = ({type, title, disabled, onPress, s
     paddingLeft: 20,
     paddingRight: 20,
     borderRadius: 10,
-    width: '50%',
+    maxWidth: '90%',
+    minWidth: '30%',
   };
 
   return (
