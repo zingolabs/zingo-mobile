@@ -24,7 +24,7 @@ const AboutModal: React.FunctionComponent<AboutModalProps> = ({closeModal, total
         style={{display: 'flex', alignItems: 'center', paddingBottom: 10, backgroundColor: colors.card, zIndex: -1, paddingTop: 10}}>
         <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 80, height: 80, resizeMode: 'contain'}} />
         <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{opacity: 0.4}} />
-        <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>Zingo! v0.0.1_28</RegText>
+        <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>Zingo! v0.0.1_29</RegText>
         <View style={{ width: '100%', height: 1, backgroundColor: colors.primary}}></View>
       </View>
 
