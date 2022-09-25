@@ -205,6 +205,7 @@ export interface WalletSeed {
 export interface SyncStatus {
   inProgress: boolean;
   progress: number;
+  blocks: number;
 }
 
 export class WalletSettings {

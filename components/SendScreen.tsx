@@ -430,7 +430,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
 
   const {decimalSeparator} = getNumberFormatSettings();
 
-  const syncStatusDisplay = syncingStatus?.inProgress ? `Syncing ${syncingStatus?.progress.toFixed(2)}%` : '';
+  const syncStatusDisplay = syncingStatus?.inProgress ? `Syncing ${syncingStatus?.progress.toFixed(2)}% (${syncingStatus?.blocks} blocks)` : '';
 
   return (
     <View

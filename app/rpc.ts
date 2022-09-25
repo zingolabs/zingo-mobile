@@ -193,6 +193,7 @@ export default class RPC {
       let prevBatchNum = -1;
       let prev_sync_id = -1;
       let seconds_batch = 0;
+      let batches = 0;
 
       // We need to wait for the sync to finish. The sync is done when
       // inRefresh is set to false in the doSync().finally()
@@ -219,7 +220,7 @@ export default class RPC {
 
         let progress = (total_progress_blocks * 100) / total_general_blocks;
 
-        // guessing 100 seconds for batch
+        // guessing 100 seconds for batch - Fake increment
         const increment = 100 / ((total_general_blocks  * 100) / 1000);
 
         console.log('prev', this.prevProgress, 'act', progress, 'incr', increment);
@@ -232,7 +233,7 @@ export default class RPC {
 
         if (progress >= 100) progress = 99.99;
 
-        this.fnRefreshUpdates(ss.in_progress, progress);
+        this.fnRefreshUpdates(ss.in_progress, progress, (ss.start_block - ss.end_block));
 
         this.prevProgress = progress;
 
@@ -268,12 +269,14 @@ export default class RPC {
         } else {
           // If we're doing a long sync, every time the batch_num changes, save the wallet
           if (prevBatchNum !== ss.batch_num) {
-            if (prevBatchNum !== -1 && seconds_batch > 10) {
+            if ((prevBatchNum !== -1 && seconds_batch > 10) || batches > 5) {
               console.log(`Saving because batch num changed ${prevBatchNum} - ${ss.batch_num}. seconds: ${seconds_batch}`);
               await RPCModule.doSave();
+              batches = 0;
             }
             prevBatchNum = ss.batch_num;
             seconds_batch = 0;
+            batches += 1;
           }
         }
       }, 2000);
@@ -317,17 +320,17 @@ export default class RPC {
       const infostr = await RPCModule.execute('info', '');
       const infoJSON = JSON.parse(infostr);
 
-      console.log(infoJSON);
+      // console.log(infoJSON);
 
       const encStatus = await RPCModule.execute('encryptionstatus', '');
       const encJSON = JSON.parse(encStatus);
 
-      console.log(encJSON);
+      // console.log(encJSON);
 
       const defaultFee = await RPCModule.execute('defaultfee', '');
       const defaultFeeJSON = JSON.parse(defaultFee);
 
-      console.log(defaultFeeJSON);
+      // console.log(defaultFeeJSON);
 
       const info: Info = {
         chain_name: infoJSON.chain_name,

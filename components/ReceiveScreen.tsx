@@ -259,7 +259,7 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
       address = oaddrs[oindex];
     }
 
-    const syncStatusDisplay = syncingStatus?.inProgress ? `Syncing ${syncingStatus?.progress.toFixed(2)}%` : '';
+    const syncStatusDisplay = syncingStatus?.inProgress ? `Syncing ${syncingStatus?.progress.toFixed(2)}% (${syncingStatus?.blocks} blocks)` : '';
 
     return (
       <View
