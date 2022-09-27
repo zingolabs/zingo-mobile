@@ -339,7 +339,7 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
   const zecPrice = info ? info.zecPrice : null;
   const currencyName = info ? info.currencyName : null;
 
-  const syncStatusDisplay = syncingStatus?.inProgress ? `Syncing ${syncingStatus?.progress.toFixed(2)}% (${syncingStatus?.blocks} blocks)` : '';
+  const syncStatusDisplay = syncingStatus?.inProgress ? `Syncing ${syncingStatus?.progress.toFixed(2)}% (${syncingStatus?.blocks})` : '';
 
   const balanceColor = transactions?.find(t => t.confirmations === 0) ? colors.primary : colors.text;
   var lastMonth = '';

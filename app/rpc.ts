@@ -20,7 +20,7 @@ export default class RPC {
   fnSetTransactionsList: (txList: Transaction[]) => void;
   fnSetAllAddresses: (allAddresses: string[]) => void;
   fnSetZecPrice: (price: number | null) => void;
-  fnRefreshUpdates: (inProgress: boolean, progress: number) => void;
+  fnRefreshUpdates: (inProgress: boolean, progress: number, blocks: string) => void;
   fnSetWalletSettings: (settings: WalletSettings) => void;
   refreshTimerID: NodeJS.Timeout | null;
   updateTimerId?: NodeJS.Timeout;
@@ -43,7 +43,7 @@ export default class RPC {
     fnSetWalletSettings: (settings: WalletSettings) => void,
     fnSetInfo: (info: Info) => void,
     fnSetZecPrice: (price: number | null) => void,
-    fnRefreshUpdates: (inProgress: boolean, progress: number) => void,
+    fnRefreshUpdates: (inProgress: boolean, progress: number, blocks: string) => void,
   ) {
     this.fnSetTotalBalance = fnSetTotalBalance;
     this.fnSetAddressesWithBalance = fnSetAddressesWithBalance;
@@ -233,7 +233,7 @@ export default class RPC {
 
         if (progress >= 100) progress = 99.99;
 
-        this.fnRefreshUpdates(ss.in_progress, progress, (ss.start_block - ss.end_block));
+        this.fnRefreshUpdates(ss.in_progress, progress, (ss.start_block + progress_blocks).toFixed(0).toString() + ' of ' + latestBlockHeight.toString());
 
         this.prevProgress = progress;
 

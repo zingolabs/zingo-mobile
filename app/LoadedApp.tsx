@@ -298,7 +298,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
     this.setState({sendPageState});
   };
 
-  refreshUpdates = (inProgress: boolean, progress: number, blocks: number) => {
+  refreshUpdates = (inProgress: boolean, progress: number, blocks: string) => {
     const syncingStatus: SyncStatus = {
       inProgress,
       progress,
