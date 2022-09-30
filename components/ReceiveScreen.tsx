@@ -12,7 +12,7 @@ import Utils from '../app/utils';
 import {useTheme} from '@react-navigation/native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {faBars, faEllipsisV} from '@fortawesome/free-solid-svg-icons';
+import {faBars, faEllipsisV, faInfo} from '@fortawesome/free-solid-svg-icons';
 // @ts-ignore
 import OptionsMenu from 'react-native-option-menu';
 import RPC from '../app/rpc';
@@ -109,6 +109,7 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
   totalBalance,
   info,
   syncingStatus,
+  syncingStatusMoreInfoOnClick,
 }) => {
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([
@@ -117,6 +118,7 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
 
   const [displayAddress, setDisplayAddress] = useState('');
   const [oindex, setOIndex] = useState(0);
+  const [syncingStatusMoreInfo, setSyncingStatusMoreInfo] = useState(false);
 
   const {colors} = useTheme();
   const zecPrice = info ? info.zecPrice : null;
@@ -259,7 +261,8 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
       address = oaddrs[oindex];
     }
 
-    const syncStatusDisplay = syncingStatus?.inProgress ? `Syncing ${syncingStatus?.progress.toFixed(2)}% (${syncingStatus?.blocks})` : '';
+    const syncStatusDisplayFirstLine = syncingStatus?.inProgress ? `Syncing ${syncingStatus?.progress.toFixed(2)}% ` : '';
+    const syncStatusDisplaySecondLine = syncingStatus?.inProgress ? `(${syncingStatus?.blocks}) ` : '';
 
     return (
       <View
@@ -314,7 +317,63 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
             <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 80, height: 80, resizeMode: 'contain'}} />
             <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{opacity: 0.4}} />
             <UsdAmount style={{marginTop: 0, marginBottom: 5, opacity: 0.4}} price={zecPrice} amtZec={totalBalance.total} />
-            <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>{syncStatusDisplay ? ('Receive - ' + syncStatusDisplay) : 'Receive'}</RegText>
+
+            <View
+              style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}
+            >
+              <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>
+                {!!syncStatusDisplayFirstLine ? ('Receive - ' + syncStatusDisplayFirstLine) : 'Receive'}
+              </RegText>
+              {!!syncStatusDisplayFirstLine && !syncingStatusMoreInfo && (
+                <TouchableOpacity
+                  onPress={() => setSyncingStatusMoreInfo(true)}
+                >
+                  <View
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      marginTop: 5,
+                      backgroundColor: colors.card,
+                      padding: 5,
+                      borderRadius: 10,
+                    }}>
+                    <FadeText style={{ color: colors.primary }}>more...</FadeText>
+                    <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
+                  </View>
+                </TouchableOpacity>
+              )}
+            </View>
+
+            <View
+              style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}
+            >
+              {!!syncStatusDisplaySecondLine && syncingStatusMoreInfo && (
+                <>
+                  <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>
+                    {syncStatusDisplaySecondLine}
+                  </RegText>
+                  <TouchableOpacity
+                    onPress={() => syncingStatusMoreInfoOnClick()}
+                  >
+                    <View
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        marginTop: 5,
+                        backgroundColor: colors.card,
+                        padding: 5,
+                        borderRadius: 10,
+                      }}>
+                      <FadeText style={{ color: colors.primary }}>more...</FadeText>
+                      <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
+                    </View>
+                  </TouchableOpacity>
+                </>
+              )}
+            </View>
+
           </View>
           <OptionsMenu
             customButton={<FontAwesomeIcon icon={faEllipsisV} color={colors.border} size={20} />}

@@ -10,6 +10,7 @@ import SideMenu from 'react-native-side-menu-updated';
 import RPC from './rpc';
 import RPCModule from '../components/RPCModule'
 import AppState, {
+  SyncStatusReport,
   TotalBalance,
   SendPageState,
   ReceivePageState,
@@ -32,6 +33,7 @@ import ReceiversScreen from '../components/ReceiversScreen';
 import AboutModal from '../components/About';
 import SeedComponent from '../components/SeedComponent';
 import InfoModal from '../components/InfoModal';
+import SyncReportModal from '../components/SyncReportModal';
 import RescanModal from '../components/RescanModal';
 import SettingsModal from '../components/SettingsModal';
 import SettingsFileImpl from '../components/SettingsFileImpl';
@@ -82,6 +84,10 @@ function Menu({onItemSelected}: any) {
 
         <RegText onPress={() => onItemSelected('Rescan')} style={item}>
           Rescan Wallet
+        </RegText>
+
+        <RegText onPress={() => onItemSelected('Sync Report')} style={item}>
+          Sync / Rescan Report
         </RegText>
 
         <RegText onPress={() => onItemSelected('Change Wallet')} style={item} color={colors.primary}>
@@ -149,6 +155,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
     super(props);
 
     this.state = {
+      syncStatusReport: new SyncStatusReport(),
       totalBalance: new TotalBalance(),
       addressesWithBalance: [],
       addressPrivateKeys: new Map(),
@@ -169,6 +176,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
       rescanModalVisible: false,
       computingModalVisible: false,
       infoModalVisible: false,
+      syncReportModalVisible: false,
       settingsModalVisible: false,
       seedViewModalVisible: false,
       seedChangeModalVisible: false,
@@ -180,6 +188,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
     };
 
     this.rpc = new RPC(
+      this.setSyncStatusReport,
       this.setTotalBalance,
       this.setAddressesWithBalances,
       this.setTransactionList,
@@ -247,6 +256,10 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
 
   setTotalBalance = (totalBalance: TotalBalance) => {
     this.setState({totalBalance});
+  };
+
+  setSyncStatusReport = (syncStatusReport: SyncStatusReport) => {
+    this.setState({syncStatusReport});
   };
 
   setAddressesWithBalances = (addressesWithBalance: AddressBalance[]) => {
@@ -481,6 +494,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
       this.setState({settingsModalVisible: true});
     } else if (item === 'Info') {
       this.setState({infoModalVisible: true});
+    } else if (item === 'Sync Report') {
+      this.setState({syncReportModalVisible: true});
     } else if (item === 'Wallet Seed') {
       await this.fetchWalletSeed();
       this.setState({seedViewModalVisible: true});
@@ -673,6 +688,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
 
   render() {
     const {
+      syncStatusReport,
       totalBalance,
       transactions,
       addresses,
@@ -681,6 +697,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
       wallet_settings,
       aboutModalVisible,
       infoModalVisible,
+      syncReportModalVisible,
       settingsModalVisible,
       computingModalVisible,
       rescanModalVisible,
@@ -726,9 +743,23 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
           visible={infoModalVisible}
           onRequestClose={() => this.setState({infoModalVisible: false})}>
           <InfoModal
-            closeModal={() => this.setState({infoModalVisible: false})} info={info}
+            closeModal={() => this.setState({infoModalVisible: false})}
+            info={info}
             totalBalance={totalBalance}
             currencyName={currencyName}
+          />
+        </Modal>
+
+        <Modal
+          animationType="slide"
+          transparent={false}
+          visible={syncReportModalVisible}
+          onRequestClose={() => this.setState({syncReportModalVisible: false})}>
+          <SyncReportModal
+            closeModal={() => this.setState({syncReportModalVisible: false})}
+            totalBalance={totalBalance}
+            currencyName={currencyName}
+            syncStatusReport={syncStatusReport}
           />
         </Modal>
 
@@ -879,6 +910,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
                   setComputingModalVisible={this.setComputingModalVisible}
                   setTxBuildProgress={this.setTxBuildProgress}
                   syncingStatus={syncingStatus}
+                  syncingStatusMoreInfoOnClick={() => this.setState({syncReportModalVisible: true})}
                 />
                 {error && (
                   <FadeText style={{ color: colors.primary, textAlign: 'center', width:'100%', marginBottom: 5 }}>{error}</FadeText>
@@ -897,6 +929,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
                   doRefresh={this.doRefresh}
                   syncingStatus={syncingStatus}
                   setComputingModalVisible={this.setComputingModalVisible}
+                  syncingStatusMoreInfoOnClick={() => this.setState({syncReportModalVisible: true})}
                 />
                 {error && (
                   <FadeText style={{ color: colors.primary, textAlign: 'center', width:'100%', marginBottom: 5 }}>{error}</FadeText>
@@ -915,6 +948,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
                   totalBalance={totalBalance}
                   info={info}
                   syncingStatus={syncingStatus}
+                  syncingStatusMoreInfoOnClick={() => this.setState({syncReportModalVisible: true})}
                 />
                 {error && (
                   <FadeText style={{ color: colors.primary, textAlign: 'center', width:'100%', marginBottom: 5 }}>{error}</FadeText>
@@ -931,7 +965,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
                   startRescan={this.startRescan}
                   totalBalance={totalBalance}
                   info={info}
-                  syncingStatus={syncingStatus}
                 />
                 {error && (
                   <FadeText style={{ color: colors.primary, textAlign: 'center', width:'100%', marginBottom: 5 }}>{error}</FadeText>

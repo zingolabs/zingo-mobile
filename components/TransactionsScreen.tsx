@@ -29,7 +29,7 @@ import Moment from 'react-moment';
 import moment from 'moment';
 import {useTheme} from '@react-navigation/native';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {faArrowDown, faArrowUp, faBars, faChevronLeft} from '@fortawesome/free-solid-svg-icons';
+import {faArrowDown, faArrowUp, faBars, faChevronLeft, faInfo} from '@fortawesome/free-solid-svg-icons';
 import RPC from '../app/rpc';
 
 type TxDetailProps = {
@@ -306,9 +306,11 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
   syncingStatus,
   doRefresh,
   setComputingModalVisible,
+  syncingStatusMoreInfoOnClick,
 }) => {
   const [isTxDetailModalShowing, setTxDetailModalShowing] = React.useState(false);
   const [txDetail, setTxDetail] = React.useState<Transaction | null>(null);
+  const [syncingStatusMoreInfo, setSyncingStatusMoreInfo] = useState(false);
 
   const [numTx, setNumTx] = React.useState<number>(100);
   const loadMoreButton = numTx < (transactions?.length || 0);
@@ -339,7 +341,8 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
   const zecPrice = info ? info.zecPrice : null;
   const currencyName = info ? info.currencyName : null;
 
-  const syncStatusDisplay = syncingStatus?.inProgress ? `Syncing ${syncingStatus?.progress.toFixed(2)}% (${syncingStatus?.blocks})` : '';
+  const syncStatusDisplayFirstLine = syncingStatus?.inProgress ? `Syncing ${syncingStatus?.progress.toFixed(2)}% ` : '';
+  const syncStatusDisplaySecondLine = syncingStatus?.inProgress ? `(${syncingStatus?.blocks}) ` : '';
 
   const balanceColor = transactions?.find(t => t.confirmations === 0) ? colors.primary : colors.text;
   var lastMonth = '';
@@ -365,7 +368,63 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
             <Button type="Primary" title="Shield funds" onPress={shieldFunds} />
           </View>
         )}
-        <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>{syncStatusDisplay ? ('Wallet - ' + syncStatusDisplay) : 'Wallet'}</RegText>
+
+        <View
+          style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}
+        >
+          <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>
+            {!!syncStatusDisplayFirstLine ? ('Wallet - ' + syncStatusDisplayFirstLine) : 'Wallet'}
+          </RegText>
+          {!!syncStatusDisplayFirstLine && !syncingStatusMoreInfo && (
+            <TouchableOpacity
+              onPress={() => setSyncingStatusMoreInfo(true)}
+            >
+              <View
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  marginTop: 5,
+                  backgroundColor: colors.card,
+                  padding: 5,
+                  borderRadius: 10,
+                }}>
+                <FadeText style={{ color: colors.primary }}>more...</FadeText>
+                <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
+              </View>
+            </TouchableOpacity>
+          )}
+        </View>
+
+        <View
+          style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}
+        >
+          {!!syncStatusDisplaySecondLine && syncingStatusMoreInfo && (
+            <>
+              <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>
+                {syncStatusDisplaySecondLine}
+              </RegText>
+              <TouchableOpacity
+                onPress={() => syncingStatusMoreInfoOnClick()}
+              >
+                <View
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    marginTop: 5,
+                    backgroundColor: colors.card,
+                    padding: 5,
+                    borderRadius: 10,
+                  }}>
+                  <FadeText style={{ color: colors.primary }}>more...</FadeText>
+                  <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
+                </View>
+              </TouchableOpacity>
+            </>
+          )}
+        </View>
+
       </View>
 
       <View style={{backgroundColor: colors.card, padding: 10, position: 'absolute'}}>
