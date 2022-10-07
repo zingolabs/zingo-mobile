@@ -118,7 +118,6 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
 
   const [displayAddress, setDisplayAddress] = useState('');
   const [oindex, setOIndex] = useState(0);
-  const [syncingStatusMoreInfo, setSyncingStatusMoreInfo] = useState(false);
 
   const {colors} = useTheme();
   const zecPrice = info ? info.zecPrice : null;
@@ -261,8 +260,7 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
       address = oaddrs[oindex];
     }
 
-    const syncStatusDisplayFirstLine = syncingStatus?.inProgress ? `Syncing ${syncingStatus?.progress.toFixed(2)}% ` : '';
-    const syncStatusDisplaySecondLine = syncingStatus?.inProgress ? `(${syncingStatus?.blocks}) ` : '';
+    const syncStatusDisplayLine = syncingStatus?.inProgress ? `(${syncingStatus?.blocks})` : '';
 
     return (
       <View
@@ -303,15 +301,12 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
           style={{
             display: 'flex',
             flexDirection: 'row',
-            justifyContent: 'space-between',
+            justifyContent: 'center',
             backgroundColor: colors.card,
             padding: 10,
             paddingBottom: 0,
             margin: 0,
           }}>
-          <TouchableOpacity onPress={toggleMenuDrawer}>
-            <FontAwesomeIcon icon={faBars} size={20} color={colors.border} />
-          </TouchableOpacity>
           <View
             style={{display: 'flex', alignItems: 'center', paddingBottom: 0, backgroundColor: colors.card, zIndex: -1, paddingTop: 0}}>
             <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 80, height: 80, resizeMode: 'contain'}} />
@@ -319,14 +314,17 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
             <UsdAmount style={{marginTop: 0, marginBottom: 5, opacity: 0.4}} price={zecPrice} amtZec={totalBalance.total} />
 
             <View
-              style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}
+              style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}
             >
               <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>
-                {!!syncStatusDisplayFirstLine ? ('Receive - ' + syncStatusDisplayFirstLine) : 'Receive'}
+                {!!syncStatusDisplayLine ? 'Receive - Syncing' : 'Receive'}
               </RegText>
-              {!!syncStatusDisplayFirstLine && !syncingStatusMoreInfo && (
+              <FadeText style={{marginTop: 5, padding: 0}}>
+                {!!syncStatusDisplayLine ? syncStatusDisplayLine : ''}
+              </FadeText>
+              {!!syncStatusDisplayLine && (
                 <TouchableOpacity
-                  onPress={() => setSyncingStatusMoreInfo(true)}
+                  onPress={() => syncingStatusMoreInfoOnClick()}
                 >
                   <View
                     style={{
@@ -345,36 +343,16 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
               )}
             </View>
 
-            <View
-              style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}
-            >
-              {!!syncStatusDisplaySecondLine && syncingStatusMoreInfo && (
-                <>
-                  <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>
-                    {syncStatusDisplaySecondLine}
-                  </RegText>
-                  <TouchableOpacity
-                    onPress={() => syncingStatusMoreInfoOnClick()}
-                  >
-                    <View
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        marginTop: 5,
-                        backgroundColor: colors.card,
-                        padding: 5,
-                        borderRadius: 10,
-                      }}>
-                      <FadeText style={{ color: colors.primary }}>more...</FadeText>
-                      <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
-                    </View>
-                  </TouchableOpacity>
-                </>
-              )}
-            </View>
-
           </View>
+        </View>
+
+        <View style={{backgroundColor: colors.card, padding: 10, position: 'absolute'}}>
+          <TouchableOpacity onPress={toggleMenuDrawer}>
+            <FontAwesomeIcon icon={faBars} size={20} color={colors.border} />
+          </TouchableOpacity>
+        </View>
+
+        <View style={{backgroundColor: colors.card, padding: 10, position: 'absolute', right: 0}}>
           <OptionsMenu
             customButton={<FontAwesomeIcon icon={faEllipsisV} color={colors.border} size={20} />}
             buttonStyle={{width: 32, height: 32, margin: 7.5, resizeMode: 'contain'}}

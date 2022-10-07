@@ -43,6 +43,7 @@ type LoadingAppClassState = {
 };
 
 const SERVER_DEFAULT = SERVER_URI[0];
+const SERVER_DEFAULT_2 = SERVER_URI[1];
 
 class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassState> {
   constructor(props: Readonly<LoadingProps>) {
@@ -100,6 +101,13 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
     this.setState({ actionButtonsDisabled: true });
     this.setState({ server: SERVER_DEFAULT });
     await SettingsFileImpl.writeSettings({ server: SERVER_DEFAULT });
+    this.setState({ actionButtonsDisabled: false });
+  };
+
+  useDefaultServer_2 = async () => {
+    this.setState({ actionButtonsDisabled: true });
+    this.setState({ server: SERVER_DEFAULT_2 });
+    await SettingsFileImpl.writeSettings({ server: SERVER_DEFAULT_2 });
     this.setState({ actionButtonsDisabled: false });
   };
 
@@ -212,7 +220,10 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
             )}
             <BoldText style={{ fontSize: 12, marginBottom: 3 }}>(Actual server: {server})</BoldText>
             {server !== SERVER_DEFAULT && (
-              <Button type="Primary" title="Use Default Server" disabled={actionButtonsDisabled} onPress={this.useDefaultServer} style={{ marginBottom: 10 }} />
+              <Button type="Primary" title={`Use : ${SERVER_DEFAULT}`} disabled={actionButtonsDisabled} onPress={this.useDefaultServer} style={{ marginBottom: 10 }} />
+            )}
+            {server !== SERVER_DEFAULT_2 && (
+              <Button type="Primary" title={`Use : ${SERVER_DEFAULT_2}`} disabled={actionButtonsDisabled} onPress={this.useDefaultServer_2} style={{ marginBottom: 10 }} />
             )}
             <View style={[cstyles.margintop, { display: 'flex', alignItems: 'center' }]}>
               <Button type="Secondary" title="Restore wallet from Seed" disabled={actionButtonsDisabled} onPress={this.getSeedPhraseToRestore} style={{ margin: 10 }} />

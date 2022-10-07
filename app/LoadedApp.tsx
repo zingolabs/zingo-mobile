@@ -495,6 +495,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
     } else if (item === 'Info') {
       this.setState({infoModalVisible: true});
     } else if (item === 'Sync Report') {
+      await this.fetchWalletSeed();
       this.setState({syncReportModalVisible: true});
     } else if (item === 'Wallet Seed') {
       await this.fetchWalletSeed();
@@ -760,6 +761,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
             totalBalance={totalBalance}
             currencyName={currencyName}
             syncStatusReport={syncStatusReport}
+            birthday={walletSeed?.birthday}
+            info={info}
           />
         </Modal>
 
@@ -910,7 +913,10 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
                   setComputingModalVisible={this.setComputingModalVisible}
                   setTxBuildProgress={this.setTxBuildProgress}
                   syncingStatus={syncingStatus}
-                  syncingStatusMoreInfoOnClick={() => this.setState({syncReportModalVisible: true})}
+                  syncingStatusMoreInfoOnClick={async () => {
+                    await this.fetchWalletSeed();
+                    this.setState({syncReportModalVisible: true});
+                  }}
                 />
                 {error && (
                   <FadeText style={{ color: colors.primary, textAlign: 'center', width:'100%', marginBottom: 5 }}>{error}</FadeText>
@@ -929,7 +935,10 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
                   doRefresh={this.doRefresh}
                   syncingStatus={syncingStatus}
                   setComputingModalVisible={this.setComputingModalVisible}
-                  syncingStatusMoreInfoOnClick={() => this.setState({syncReportModalVisible: true})}
+                  syncingStatusMoreInfoOnClick={async () => {
+                    await this.fetchWalletSeed();
+                    this.setState({syncReportModalVisible: true});
+                  }}
                 />
                 {error && (
                   <FadeText style={{ color: colors.primary, textAlign: 'center', width:'100%', marginBottom: 5 }}>{error}</FadeText>
@@ -948,7 +957,10 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
                   totalBalance={totalBalance}
                   info={info}
                   syncingStatus={syncingStatus}
-                  syncingStatusMoreInfoOnClick={() => this.setState({syncReportModalVisible: true})}
+                  syncingStatusMoreInfoOnClick={async () => {
+                    await this.fetchWalletSeed();
+                    this.setState({syncReportModalVisible: true});
+                  }}
                 />
                 {error && (
                   <FadeText style={{ color: colors.primary, textAlign: 'center', width:'100%', marginBottom: 5 }}>{error}</FadeText>

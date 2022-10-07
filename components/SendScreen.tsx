@@ -229,7 +229,6 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
   const [qrcodeModalVisble, setQrcodeModalVisible] = useState(false);
   const [qrcodeModalIndex, setQrcodeModalIndex] = useState(0);
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
-  const [syncingStatusMoreInfo, setSyncingStatusMoreInfo] = useState(false);
 
   const [titleViewHeight, setTitleViewHeight] = useState(0);
   const slideAnim = useRef(new Animated.Value(0)).current;
@@ -432,8 +431,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
 
   const {decimalSeparator} = getNumberFormatSettings();
 
-  const syncStatusDisplayFirstLine = syncingStatus?.inProgress ? `Syncing ${syncingStatus?.progress.toFixed(2)}% ` : '';
-  const syncStatusDisplaySecondLine = syncingStatus?.inProgress ? `(${syncingStatus?.blocks}) ` : '';
+  const syncStatusDisplayLine = syncingStatus?.inProgress ? `(${syncingStatus?.blocks})` : '';
 
   return (
     <View
@@ -501,11 +499,14 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
                 style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}
               >
                 <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>
-                  {!!syncStatusDisplayFirstLine ? ('Send - ' + syncStatusDisplayFirstLine) : 'Send'}
+                  {!!syncStatusDisplayLine ? 'Send - Syncing' : 'Send'}
                 </RegText>
-                {!!syncStatusDisplayFirstLine && !syncingStatusMoreInfo && (
+                <FadeText style={{marginTop: 5, padding: 0}}>
+                  {!!syncStatusDisplayLine ? syncStatusDisplayLine : ''}
+                </FadeText>
+                {!!syncStatusDisplayLine && (
                   <TouchableOpacity
-                    onPress={() => setSyncingStatusMoreInfo(true)}
+                    onPress={() => syncingStatusMoreInfoOnClick()}
                   >
                     <View
                       style={{
@@ -521,35 +522,6 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
                       <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
                     </View>
                   </TouchableOpacity>
-                )}
-              </View>
-
-              <View
-                style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}
-              >
-                {!!syncStatusDisplaySecondLine && syncingStatusMoreInfo && (
-                  <>
-                    <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>
-                      {syncStatusDisplaySecondLine}
-                    </RegText>
-                    <TouchableOpacity
-                      onPress={() => syncingStatusMoreInfoOnClick()}
-                    >
-                      <View
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          marginTop: 5,
-                          backgroundColor: colors.card,
-                          padding: 5,
-                          borderRadius: 10,
-                        }}>
-                        <FadeText style={{ color: colors.primary }}>more...</FadeText>
-                        <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
-                      </View>
-                    </TouchableOpacity>
-                  </>
                 )}
               </View>
 

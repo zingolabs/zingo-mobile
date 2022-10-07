@@ -310,7 +310,6 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
 }) => {
   const [isTxDetailModalShowing, setTxDetailModalShowing] = React.useState(false);
   const [txDetail, setTxDetail] = React.useState<Transaction | null>(null);
-  const [syncingStatusMoreInfo, setSyncingStatusMoreInfo] = useState(false);
 
   const [numTx, setNumTx] = React.useState<number>(100);
   const loadMoreButton = numTx < (transactions?.length || 0);
@@ -341,14 +340,18 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
   const zecPrice = info ? info.zecPrice : null;
   const currencyName = info ? info.currencyName : null;
 
-  const syncStatusDisplayFirstLine = syncingStatus?.inProgress ? `Syncing ${syncingStatus?.progress.toFixed(2)}% ` : '';
-  const syncStatusDisplaySecondLine = syncingStatus?.inProgress ? `(${syncingStatus?.blocks}) ` : '';
+  const syncStatusDisplayLine = syncingStatus?.inProgress ? `(${syncingStatus?.blocks})` : '';
 
   const balanceColor = transactions?.find(t => t.confirmations === 0) ? colors.primary : colors.text;
   var lastMonth = '';
 
   return (
-    <View style={{display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', marginBottom: 170, width: '100%'}}>
+    <View style={{
+      display: 'flex',
+      justifyContent: 'flex-start',
+      marginBottom: 170,
+      width: '100%'
+    }}>
       <Modal
         animationType="slide"
         transparent={false}
@@ -370,14 +373,21 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
         )}
 
         <View
-          style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center'
+          }}
         >
           <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>
-            {!!syncStatusDisplayFirstLine ? ('Wallet - ' + syncStatusDisplayFirstLine) : 'Wallet'}
+            {!!syncStatusDisplayLine ? 'Wallet - Syncing' : 'Wallet'}
           </RegText>
-          {!!syncStatusDisplayFirstLine && !syncingStatusMoreInfo && (
+          <FadeText style={{marginTop: 5, padding: 0}}>
+            {!!syncStatusDisplayLine ? syncStatusDisplayLine : ''}
+          </FadeText>
+          {!!syncStatusDisplayLine && (
             <TouchableOpacity
-              onPress={() => setSyncingStatusMoreInfo(true)}
+              onPress={() => syncingStatusMoreInfoOnClick()}
             >
               <View
                 style={{
@@ -393,35 +403,6 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
                 <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
               </View>
             </TouchableOpacity>
-          )}
-        </View>
-
-        <View
-          style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}
-        >
-          {!!syncStatusDisplaySecondLine && syncingStatusMoreInfo && (
-            <>
-              <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>
-                {syncStatusDisplaySecondLine}
-              </RegText>
-              <TouchableOpacity
-                onPress={() => syncingStatusMoreInfoOnClick()}
-              >
-                <View
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    marginTop: 5,
-                    backgroundColor: colors.card,
-                    padding: 5,
-                    borderRadius: 10,
-                  }}>
-                  <FadeText style={{ color: colors.primary }}>more...</FadeText>
-                  <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
-                </View>
-              </TouchableOpacity>
-            </>
           )}
         </View>
 
