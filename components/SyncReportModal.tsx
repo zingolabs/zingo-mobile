@@ -70,7 +70,7 @@ const SyncReportModal: React.FunctionComponent<SyncReportModalProps> = ({closeMo
     : 0;
   const server_server: number = info.latestBlock || 0;
   const server_wallet: number = info.latestBlock && birthday
-    ? (info.latestBlock - birthday - 1) || 0
+    ? (info.latestBlock - birthday) || 0
     : 0;
   const server_sync: number = info.latestBlock && syncStatusReport.process_end_block
     ? (info.latestBlock - syncStatusReport.process_end_block) || 0
@@ -89,13 +89,16 @@ const SyncReportModal: React.FunctionComponent<SyncReportModalProps> = ({closeMo
   const wallet_3: number = info.latestBlock && birthday
     ? ((info.latestBlock - birthday) - wallet_1 - wallet_21) || 0
     : 0;
-  const wallet_old_synced: number = wallet_1 - 1;
+  const wallet_old_synced: number = wallet_1;
   const wallet_new_synced: number = wallet_21;
   const wallet_for_synced: number = wallet_3;
 
   const wallet_old_synced_percent: number = (wallet_old_synced * 100) / server_wallet;
   const wallet_new_synced_percent: number = (wallet_new_synced * 100) / server_wallet;
-  const wallet_for_synced_percent: number = (wallet_for_synced * 100) / server_wallet;
+  if (wallet_new_synced_percent < 0.01) {
+    wallet_new_synced_percent = 0.01;
+  }
+  const wallet_for_synced_percent: number = 100 - wallet_old_synced_percent - wallet_new_synced_percent;
 
   console.log('server', server_1, server_2, server_3, server_4);
   console.log('leyends', server_server, server_wallet, server_sync);
@@ -245,7 +248,7 @@ const SyncReportModal: React.FunctionComponent<SyncReportModalProps> = ({closeMo
               )}
               {wallet_for_synced > 0 && (
                 <View style={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'flex-start', alignItems: 'center', marginTop: 5 }}>
-                  <Text style={{ color: colors.primary }}>{'No Synced yet : '}</Text>
+                  <Text style={{ color: colors.primary }}>{'Not Yet Synced : '}</Text>
                   <View style={{ display: 'flex', flexDirection: 'row', width: 10, height: 10, justifyContent: 'flex-start', backgroundColor: '#331100', margin: 5 }}></View>
                   <Text style={{ color: colors.text }}>{wallet_for_synced + ' blocks. ' + wallet_for_synced_percent.toFixed(2) +'%'}</Text>
                 </View>
@@ -263,7 +266,7 @@ const SyncReportModal: React.FunctionComponent<SyncReportModalProps> = ({closeMo
               />
             </>
           )*/}
-          {syncStatusReport.currentBatch > 0 && (
+          {syncStatusReport.inProgress && syncStatusReport.currentBatch > 0 && (
             <>
               <DetailLine
                 label="BATCHES"
@@ -279,7 +282,7 @@ const SyncReportModal: React.FunctionComponent<SyncReportModalProps> = ({closeMo
               />
             </>
           )}
-          {syncStatusReport.currentBlock > 0 && !!info.latestBlock && (
+          {syncStatusReport.inProgress && syncStatusReport.currentBlock > 0 && !!info.latestBlock && (
             <>
               <View style={{ height: 2, width: '100%', backgroundColor: colors.primary, marginTop: 10 }}></View>
               <DetailLine

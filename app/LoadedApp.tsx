@@ -86,7 +86,7 @@ function Menu({onItemSelected}: any) {
           Rescan Wallet
         </RegText>
 
-        <RegText onPress={() => onItemSelected('Sync Report')} style={item}>
+        <RegText onPress={() => onItemSelected('Sync Report')} style={item}  color={colors.primary}>
           Sync / Rescan Report
         </RegText>
 
