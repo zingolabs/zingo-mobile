@@ -136,7 +136,7 @@ android {
         applicationId 'com.ZingoMobile'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 35
+        versionCode 36
         versionName "0.0.1"
         missingDimensionStrategy 'react-native-camera', 'general'
     }
