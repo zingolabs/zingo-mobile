@@ -94,7 +94,7 @@ const SyncReportModal: React.FunctionComponent<SyncReportModalProps> = ({closeMo
   const wallet_for_synced: number = wallet_3;
 
   const wallet_old_synced_percent: number = (wallet_old_synced * 100) / server_wallet;
-  const wallet_new_synced_percent: number = (wallet_new_synced * 100) / server_wallet;
+  let wallet_new_synced_percent: number = (wallet_new_synced * 100) / server_wallet;
   if (wallet_new_synced_percent < 0.01) {
     wallet_new_synced_percent = 0.01;
   }
