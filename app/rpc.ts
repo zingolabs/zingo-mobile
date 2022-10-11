@@ -13,6 +13,7 @@ import {
 import RPCModule from '../components/RPCModule';
 import Utils from './utils';
 import SettingsFileImpl from '../components/SettingsFileImpl';
+import BackgroundFetch from "react-native-background-fetch";
 
 export default class RPC {
   fnSetSyncStatusReport: (syncStatusReport: SyncStatusReport) => void;
@@ -183,15 +184,44 @@ export default class RPC {
       this.inRefresh = true;
       this.prevProgress = 0;
 
-      // This is async, so when it is done, we finish the refresh.
-      if (fullRescan) {
+      const onEventRescan = async (taskId) => {
+        console.log('Rescan background START task:', taskId);
         RPC.doRescan().finally(() => {
           this.inRefresh = false;
+          BackgroundFetch.finish(taskId);
+          console.log('Rescan background END task:', taskId);
         });
-      } else {
+      }
+      const onEventSync = async (taskId) => {
+        console.log('Sync background START task:', taskId);
         RPC.doSync().finally(() => {
           this.inRefresh = false;
+          BackgroundFetch.finish(taskId);
+          console.log('Sync background END task:', taskId);
         });
+      }
+      const onTimeoutRescan = async (taskId) => {
+        BackgroundFetch.finish(taskId);
+        console.log('Rescan background TIMEOUT task:', taskId);
+      }
+      const onTimeoutSync = async (taskId) => {
+        BackgroundFetch.finish(taskId);
+        console.log('Sync background TIMEOUT task:', taskId);
+      }
+
+      // This is async, so when it is done, we finish the refresh.
+      if (fullRescan) {
+        const status = await BackgroundFetch.configure({minimumFetchInterval: 15}, onEventRescan, onTimeoutRescan);
+        console.log('Rescan background STATUS:', status);
+        /*RPC.doRescan().finally(() => {
+          this.inRefresh = false;
+        });*/
+      } else {
+        const status = await BackgroundFetch.configure({minimumFetchInterval: 15}, onEventSync, onTimeoutSync);
+        console.log('Sync background STATUS:', status);
+        /*RPC.doSync().finally(() => {
+          this.inRefresh = false;
+        });*/
       }
 
       // if it's a rescan we need to save first th wallet

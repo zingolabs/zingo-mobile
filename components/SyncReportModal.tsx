@@ -195,13 +195,13 @@ const SyncReportModal: React.FunctionComponent<SyncReportModalProps> = ({closeMo
                   <Text style={{ color: colors.text }}>{server_wallet + ' blocks'}</Text>
                 </View>
               )}
-              {server_sync > 0 && (
+              {/*server_sync > 0 && (
                 <View style={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'flex-start', alignItems: 'center', marginTop: 5 }}>
                   <Text style={{ color: colors.primary }}>{'Sync Process : '}</Text>
                   <View style={{ display: 'flex', flexDirection: 'row', width: 10, height: 10, justifyContent: 'flex-start', backgroundColor: 'green', margin: 5 }}></View>
                   <Text style={{ color: colors.text }}>{server_sync + ' blocks'}</Text>
                 </View>
-              )}
+              )*/}
             </>
           )}
 
@@ -289,10 +289,10 @@ const SyncReportModal: React.FunctionComponent<SyncReportModalProps> = ({closeMo
                 label="BLOCKS"
                 value={'Processing block: ' + syncStatusReport.currentBlock + ' of a TOTAL of blocks: ' + info.latestBlock}
               />
-              <DetailLine
+              {/*<DetailLine
                 label="Blocks to Process / Sync"
                 value={info.latestBlock - syncStatusReport.currentBlock}
-              />
+              />*/}
             </>
           )}
           {/*
