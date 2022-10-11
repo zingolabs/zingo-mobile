@@ -505,21 +505,26 @@ export default class RPC {
 
     // Fetch pending notes and UTXOs
     const pendingNotes = await RPCModule.execute('notes', '');
-    const pendingJSON = JSON.parse(pendingNotes);
+    const pendingNotesJSON = JSON.parse(pendingNotes);
 
     //console.log(pendingNotes);
 
     const pendingAddressBalances = new Map();
 
     // Process sapling notes
-    pendingJSON.pending_notes.forEach((s: any) => {
-      pendingAddressBalances.set(s.address, s.value);
-    });
+    if (!!pendingNotesJSON.pending_notes) {
+      pendingNotesJSON.pending_notes.forEach((s: any) => {
+        pendingAddressBalances.set(s.address, s.value);
+      });
+    }
 
     // Process UTXOs
-    pendingJSON.pending_utxos.forEach((s: any) => {
-      pendingAddressBalances.set(s.address, s.value);
-    });
+    if (!!pendingNotesJSON.pending_utxos) {
+      pendingNotesJSON.pending_utxos.forEach((s: any) => {
+        pendingAddressBalances.set(s.address, s.value);
+      });
+
+    }
 
     // Addresses with Balance. The lite client reports balances in zatoshi, so divide by 10^8;
     const oaddresses = balanceJSON.orchard_addresses
