@@ -4,7 +4,7 @@ import {View, ScrollView, SafeAreaView, Image, Text} from 'react-native';
 import {RegText, FadeText, ZecAmount, UsdAmount} from './Components';
 import Button from './Button';
 import {useTheme} from '@react-navigation/native';
-import {TotalBalance, SyncStatusReport, Info} from '../app/AppState';
+import {TotalBalance, SyncStatusReport} from '../app/AppState';
 import Utils from '../app/utils';
 import RPC from '../app/rpc'
 
@@ -28,10 +28,9 @@ type SyncReportModalProps = {
   currencyName: string;
   syncStatusReport: SyncStatusReport;
   birthday?: number;
-  info: Info | null;
 };
 
-const SyncReportModal: React.FunctionComponent<SyncReportModalProps> = ({closeModal, totalBalance, currencyName, syncStatusReport, birthday, info}) => {
+const SyncReportModal: React.FunctionComponent<SyncReportModalProps> = ({closeModal, totalBalance, currencyName, syncStatusReport, birthday}) => {
   const {colors} = useTheme();
   const [maxBlocks, setMaxBlocks] = useState(null);
   const [points, setPoints] = useState([]);
@@ -43,7 +42,7 @@ const SyncReportModal: React.FunctionComponent<SyncReportModalProps> = ({closeMo
 
       const a = [0, 500000, 1000000, 1500000, 2000000, 2500000, 3000000, 3500000, 4000000, 4500000, 5000000];
       for (let i = 0; i < a.length; i++) {
-        if (info.latestBlock < a[i]) {
+        if (syncStatusReport.lastBlockServer < a[i]) {
           setMaxBlocks(a[i]);
           setPoints(a.slice(0, i + 1));
           setIndex(i);
@@ -52,7 +51,7 @@ const SyncReportModal: React.FunctionComponent<SyncReportModalProps> = ({closeMo
       }
 
     })();
-  }, [info.latestBlock])
+  }, [syncStatusReport.lastBlockServer])
 
   const server_1: number = birthday || 0;
   const server_2: number = syncStatusReport.process_end_block && birthday
@@ -60,20 +59,20 @@ const SyncReportModal: React.FunctionComponent<SyncReportModalProps> = ({closeMo
     : syncStatusReport.lastBlockWallet && birthday
       ? (syncStatusReport.lastBlockWallet - birthday) || 0
       : 0;
-  const server_3: number = info.latestBlock && syncStatusReport.process_end_block
-    ? (info.latestBlock - syncStatusReport.process_end_block) || 0
-    : info.latestBlock && syncStatusReport.lastBlockWallet
-      ? (info.latestBlock - syncStatusReport.lastBlockWallet) || 0
+  const server_3: number = syncStatusReport.lastBlockServer && syncStatusReport.process_end_block
+    ? (syncStatusReport.lastBlockServer - syncStatusReport.process_end_block) || 0
+    : syncStatusReport.lastBlockServer && syncStatusReport.lastBlockWallet
+      ? (syncStatusReport.lastBlockServer - syncStatusReport.lastBlockWallet) || 0
       : 0;
   const server_4: number = maxBlocks
     ? (maxBlocks - server_1 - server_2 - server_3) || 0
     : 0;
-  const server_server: number = info.latestBlock || 0;
-  const server_wallet: number = info.latestBlock && birthday
-    ? (info.latestBlock - birthday) || 0
+  const server_server: number = syncStatusReport.lastBlockServer || 0;
+  const server_wallet: number = syncStatusReport.lastBlockServer && birthday
+    ? (syncStatusReport.lastBlockServer - birthday) || 0
     : 0;
-  const server_sync: number = info.latestBlock && syncStatusReport.process_end_block
-    ? (info.latestBlock - syncStatusReport.process_end_block) || 0
+  const server_sync: number = syncStatusReport.lastBlockServer && syncStatusReport.process_end_block
+    ? (syncStatusReport.lastBlockServer - syncStatusReport.process_end_block) || 0
     : 0;
 
   const wallet_1: number = syncStatusReport.process_end_block && birthday
@@ -86,8 +85,8 @@ const SyncReportModal: React.FunctionComponent<SyncReportModalProps> = ({closeMo
     : syncStatusReport.currentBlock && syncStatusReport.lastBlockWallet
       ? (syncStatusReport.currentBlock - syncStatusReport.lastBlockWallet) || 0
       : 0;
-  const wallet_3: number = info.latestBlock && birthday
-    ? ((info.latestBlock - birthday) - wallet_1 - wallet_21) || 0
+  const wallet_3: number = syncStatusReport.lastBlockServer && birthday
+    ? ((syncStatusReport.lastBlockServer - birthday) - wallet_1 - wallet_21) || 0
     : 0;
   const wallet_old_synced: number = wallet_1;
   const wallet_new_synced: number = wallet_21;
@@ -213,7 +212,7 @@ const SyncReportModal: React.FunctionComponent<SyncReportModalProps> = ({closeMo
               <View style={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-between', marginTop: 10 }}>
                 <>
                   <Text style={{ color: colors.primary }}>{birthday}</Text>
-                  <Text style={{ color: colors.primary }}>{info.latestBlock}</Text>
+                  <Text style={{ color: colors.primary }}>{syncStatusReport.lastBlockServer}</Text>
                 </>
               </View>
               <View style={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-between' }}>
@@ -224,13 +223,13 @@ const SyncReportModal: React.FunctionComponent<SyncReportModalProps> = ({closeMo
               </View>
               <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', width: '100%', borderBottomColor: colors.primary, borderBottomWidth: 2, marginBottom: 0 }}>
                 {wallet_1 > 0 && (
-                  <View style={{ height: 10, width: ((wallet_1 * 100) / (info.latestBlock - birthday)).toString() + '%', backgroundColor: 'yellow', borderLeftColor: colors.primary, borderLeftWidth: 1 }}></View>
+                  <View style={{ height: 10, width: ((wallet_1 * 100) / (syncStatusReport.lastBlockServer - birthday)).toString() + '%', backgroundColor: 'yellow', borderLeftColor: colors.primary, borderLeftWidth: 1 }}></View>
                 )}
                 {wallet_21 > 0 && (
-                  <View style={{ height: 10, width: ((wallet_21 * 100) / (info.latestBlock - birthday)).toString() + '%', backgroundColor: 'orange' }}></View>
+                  <View style={{ height: 10, width: ((wallet_21 * 100) / (syncStatusReport.lastBlockServer - birthday)).toString() + '%', backgroundColor: 'orange' }}></View>
                 )}
                 {wallet_3 > 0 && (
-                  <View style={{ height: 10, backgroundColor: '#331100', borderRightColor: colors.primary, borderRightWidth: 1, width: ((wallet_3 * 100) / (info.latestBlock - birthday)).toString() + '%' }}></View>
+                  <View style={{ height: 10, backgroundColor: '#331100', borderRightColor: colors.primary, borderRightWidth: 1, width: ((wallet_3 * 100) / (syncStatusReport.lastBlockServer - birthday)).toString() + '%' }}></View>
                 )}
               </View>
               {wallet_old_synced > 0 && (
@@ -283,16 +282,16 @@ const SyncReportModal: React.FunctionComponent<SyncReportModalProps> = ({closeMo
               />
             </>
           )}
-          {syncStatusReport.inProgress && syncStatusReport.currentBlock > 0 && !!info.latestBlock && (
+          {syncStatusReport.inProgress && syncStatusReport.currentBlock > 0 && !!syncStatusReport.lastBlockServer && (
             <>
               <View style={{ height: 2, width: '100%', backgroundColor: colors.primary, marginTop: 10 }}></View>
               <DetailLine
                 label="BLOCKS"
-                value={'Processing block: ' + syncStatusReport.currentBlock + ' of a TOTAL of blocks: ' + info.latestBlock}
+                value={'Processing block: ' + syncStatusReport.currentBlock + ' of a TOTAL of blocks: ' + syncStatusReport.lastBlockServer}
               />
               {/*<DetailLine
                 label="Blocks to Process / Sync"
-                value={info.latestBlock - syncStatusReport.currentBlock}
+                value={syncStatusReport.lastBlockServer - syncStatusReport.currentBlock}
               />*/}
             </>
           )}
@@ -308,7 +307,7 @@ const SyncReportModal: React.FunctionComponent<SyncReportModalProps> = ({closeMo
           />
           <DetailLine
             label="Server - LAST BLOCK"
-            value={info.latestBlock ? info.latestBlock : '...loading...'}
+            value={syncStatusReport.lastBlockServer ? syncStatusReport.lastBlockServer : '...loading...'}
           />
           */}
         </View>

@@ -30,6 +30,8 @@ export class SyncStatusReport {
 
   process_end_block: number;
 
+  lastBlockServer: number;
+
   constructor() {
     this.syncID = 0;
     this.totalBatches = 0;
@@ -43,6 +45,7 @@ export class SyncStatusReport {
     this.percent = 0;
     this.message = '';
     this.process_end_block = 0;
+    this.lastBlockServer = 0;
   }
 
 }

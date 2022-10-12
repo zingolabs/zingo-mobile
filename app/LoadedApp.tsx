@@ -129,6 +129,7 @@ const ComputingTxModalContent: React.FunctionComponent<ComputingModalProps> = ({
             progress={progress.progress / progress.total}
             indeterminate={!progress.progress}
             size={100}
+            color={colors.primary}
           />
         </>
       )}
