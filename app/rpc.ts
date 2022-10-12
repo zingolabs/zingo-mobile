@@ -186,19 +186,17 @@ export default class RPC {
 
       const onEventRescan = async (taskId) => {
         console.log('Rescan background START task:', taskId);
-        RPC.doRescan().finally(() => {
-          this.inRefresh = false;
-          BackgroundFetch.finish(taskId);
-          console.log('Rescan background END task:', taskId);
-        });
+        await RPC.doRescan();
+        this.inRefresh = false;
+        BackgroundFetch.finish(taskId);
+        console.log('Rescan background END task:', taskId);
       }
       const onEventSync = async (taskId) => {
         console.log('Sync background START task:', taskId);
-        RPC.doSync().finally(() => {
-          this.inRefresh = false;
-          BackgroundFetch.finish(taskId);
-          console.log('Sync background END task:', taskId);
-        });
+        await RPC.doSync();
+        this.inRefresh = false;
+        BackgroundFetch.finish(taskId);
+        console.log('Sync background END task:', taskId);
       }
       const onTimeoutRescan = async (taskId) => {
         BackgroundFetch.finish(taskId);
@@ -224,7 +222,7 @@ export default class RPC {
         });*/
       }
 
-      // if it's a rescan we need to save first th wallet
+      // if it's a rescan we need to save first the wallet
       if (fullRescan) {
         const walletHeight = await RPC.fetchWalletHeight();
         this.lastWalletBlockHeight = walletHeight;
