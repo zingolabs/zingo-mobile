@@ -804,7 +804,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
           <SeedComponent
             seed={walletSeed?.seed}
             birthday={walletSeed?.birthday}
-            onClickOK={() => this.setState({seedViewModalVisible: false})}
+            onClickOK={(s, b) => this.setState({seedViewModalVisible: false})}
+            onClickCancel={() => this.setState({seedViewModalVisible: false})}
             totalBalance={totalBalance}
             action={"view"}
             error={error}
@@ -820,7 +821,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
           <SeedComponent
             seed={walletSeed?.seed}
             birthday={walletSeed?.birthday}
-            onClickOK={this.onClickOKChangeWallet}
+            onClickOK={(s, b) => this.onClickOKChangeWallet()}
             onClickCancel={() => this.setState({seedChangeModalVisible: false})}
             totalBalance={totalBalance}
             action={"change"}
@@ -837,7 +838,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
           <SeedComponent
             seed={walletSeed?.seed}
             birthday={walletSeed?.birthday}
-            onClickOK={this.onClickOKRestoreBackup}
+            onClickOK={(s, b) => this.onClickOKRestoreBackup()}
             onClickCancel={() => this.setState({seedBackupModalVisible: false})}
             totalBalance={totalBalance}
             action={"backup"}
@@ -854,7 +855,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
           <SeedComponent
             seed={walletSeed?.seed}
             birthday={walletSeed?.birthday}
-            onClickOK={this.onClickOKServerWallet}
+            onClickOK={(s, b) => this.onClickOKServerWallet()}
             onClickCancel={() => this.setState({seedServerModalVisible: false})}
             totalBalance={totalBalance}
             action={"server"}

@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {View, Image, Text, SafeAreaView, ScrollView} from 'react-native';
 import Clipboard from '@react-native-community/clipboard';
 import {RegText, RegTextInput, FadeText, ClickableText, ZecAmount, UsdAmount} from './Components';
@@ -17,43 +17,53 @@ type SeedComponentProps = {
   totalBalance: TotalBalance;
   action: "new" | "change" | "view" | "restore" | "backup" | "server";
   error?: string;
-  currencyName: string;
+  currencyName?: string;
 };
 const SeedComponent: React.FunctionComponent<SeedComponentProps> = ({seed, birthday, onClickOK, onClickCancel, totalBalance, action, error, currencyName}) => {
   const {colors} = useTheme();
-  const texts = {
-    new: [
-      "I have saved \n the seed"
-    ],
-    change: [
-      "",
-      "I have saved \n the seed",
-      "You really want \n to change your \n actual wallet",
-      "Are you sure \n 100% or more"
-    ],
-    server: [
-      "",
-      "I have saved \n the seed",
-      "You really want \n to change your \n actual server",
-      "Are you sure \n 100% or more"
-    ],
-    view: [
-      "I have saved \n the seed"
-    ],
-    restore: [
-      "Restore Wallet"
-    ],
-    backup: [
-      "",
-      "I have saved \n the seed",
-      "You really want \n to restore your \n backup wallet",
-      "Are you sure \n 100% or more"
-    ]
-  };
-  const readOnly = action === "new" || action === "view" || action === "change" || action === "backup" || action === "server";
-  const [seedPhrase, setSeedPhrase] = useState(seed);
-  const [birthdayNumber, setBirthdayNumber] = useState(birthday);
-  const [times, setTimes] = useState(action === "change" || action === "backup" || action === "server" ? 1 : 0);
+  const [seedPhrase, setSeedPhrase] = useState(null);
+  const [birthdayNumber, setBirthdayNumber] = useState(null);
+  const [times, setTimes] = useState(0);
+  const [texts, setTexts] = useState({});
+  const [readOnly, setReadOnly] = useState(true);
+
+  useEffect(() => {
+    setTexts({
+      new: [
+        "I have saved \n the seed"
+      ],
+      change: [
+        "",
+        "I have saved \n the seed",
+        "You really want \n to change your \n actual wallet",
+        "Are you sure \n 100% or more"
+      ],
+      server: [
+        "",
+        "I have saved \n the seed",
+        "You really want \n to change your \n actual server",
+        "Are you sure \n 100% or more"
+      ],
+      view: [
+        "I have saved \n the seed"
+      ],
+      restore: [
+        "Restore Wallet"
+      ],
+      backup: [
+        "",
+        "I have saved \n the seed",
+        "You really want \n to restore your \n backup wallet",
+        "Are you sure \n 100% or more"
+      ]
+    });
+    setReadOnly(action === "new" || action === "view" || action === "change" || action === "backup" || action === "server");
+    setTimes(action === "change" || action === "backup" || action === "server" ? 1 : 0);
+    setSeedPhrase(seed);
+    setBirthdayNumber(birthday);
+  }, [action, seed, birthday]);
+
+  console.log(seed, birthday, onClickOK, onClickCancel, totalBalance, action, error, currencyName);
 
   return (
     <SafeAreaView
@@ -67,7 +77,7 @@ const SeedComponent: React.FunctionComponent<SeedComponentProps> = ({seed, birth
       <View
         style={{display: 'flex', alignItems: 'center', paddingBottom: 10, backgroundColor: colors.card, zIndex: -1, paddingTop: 10}}>
         <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 80, height: 80, resizeMode: 'contain'}} />
-        <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{opacity: 0.4}} />
+        <ZecAmount currencyName={!!currencyName ? currencyName : ""} size={36} amtZec={totalBalance.total} style={{opacity: 0.4}} />
         <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>Seed ({action})</RegText>
         <View style={{ width: '100%', height: 1, backgroundColor: colors.primary}}></View>
       </View>
@@ -182,7 +192,7 @@ const SeedComponent: React.FunctionComponent<SeedComponentProps> = ({seed, birth
           </FadeText>
         )}
 
-        {error && (
+        {!!error && (
           <FadeText style={{ color: colors.primary, textAlign: 'center', width:'100%' }}>{error}</FadeText>
         )}
 
@@ -190,7 +200,7 @@ const SeedComponent: React.FunctionComponent<SeedComponentProps> = ({seed, birth
           <Button
             type="Primary"
             style={{ backgroundColor: times === 3 ? 'red' : colors.primary, color: times === 3 ? 'white' : colors.primary }}
-            title={texts[action][times]}
+            title={!!texts && texts[action] !! ? texts[action][times] : ''}
             onPress={() => {
               if (!seedPhrase) return;
               if(times === 0 || times === 3) {

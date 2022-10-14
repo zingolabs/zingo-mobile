@@ -42,8 +42,8 @@ type LoadingAppClassState = {
   totalBalance: TotalBalance;
 };
 
-const SERVER_DEFAULT = SERVER_URI[0];
-const SERVER_DEFAULT_2 = SERVER_URI[1];
+const SERVER_DEFAULT_0 = SERVER_URI[0];
+const SERVER_DEFAULT_1 = SERVER_URI[1];
 
 class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassState> {
   constructor(props: Readonly<LoadingProps>) {
@@ -70,9 +70,9 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
         if (!!settings && !!settings.server) {
           this.setState({ server: settings.server });
         } else {
-          settings.server = SERVER_DEFAULT;
-          this.setState({ server: SERVER_DEFAULT });
-          await SettingsFileImpl.writeSettings({ server: SERVER_DEFAULT });
+          settings.server = SERVER_DEFAULT_0;
+          this.setState({ server: SERVER_DEFAULT_0 });
+          await SettingsFileImpl.writeSettings({ server: SERVER_DEFAULT_0 });
         }
       }
 
@@ -81,7 +81,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
 
       if (exists && exists !== 'false') {
         this.setState({ walletExists: true });
-        const error = await RPCModule.loadExistingWallet(settings.server || this.state.server || SERVER_DEFAULT);
+        const error = await RPCModule.loadExistingWallet(settings.server || this.state.server || SERVER_DEFAULT_0);
         //console.log('Load Wallet Exists result', error);
         if (!error.startsWith('Error')) {
           // Load the wallet and navigate to the transactions screen
@@ -97,18 +97,16 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
     });
   };
 
-  useDefaultServer = async () => {
+  useDefaultServer_0 = async () => {
     this.setState({ actionButtonsDisabled: true });
-    this.setState({ server: SERVER_DEFAULT });
-    await SettingsFileImpl.writeSettings({ server: SERVER_DEFAULT });
-    this.setState({ actionButtonsDisabled: false });
+    await SettingsFileImpl.writeSettings({ server: SERVER_DEFAULT_0 });
+    this.setState({ server: SERVER_DEFAULT_0, actionButtonsDisabled: false });
   };
 
-  useDefaultServer_2 = async () => {
+  useDefaultServer_1 = async () => {
     this.setState({ actionButtonsDisabled: true });
-    this.setState({ server: SERVER_DEFAULT_2 });
-    await SettingsFileImpl.writeSettings({ server: SERVER_DEFAULT_2 });
-    this.setState({ actionButtonsDisabled: false });
+    await SettingsFileImpl.writeSettings({ server: SERVER_DEFAULT_1 });
+    this.setState({ server: SERVER_DEFAULT_1, actionButtonsDisabled: false });
   };
 
   navigateToLoaded = () => {
@@ -125,10 +123,10 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
       const seed = await RPCModule.createNewWallet(this.state.server);
 
       if (!seed.startsWith('Error')) {
-        // default values for wallet options
-        this.set_wallet_option('download_memos', 'none');
-        this.set_wallet_option('transaction_filter_threshold', '500');
         this.setState({ seedPhrase: seed, screen: 2, actionButtonsDisabled: false, walletExists: true });
+        // default values for wallet options
+        await this.set_wallet_option('download_memos', 'none');
+        await this.set_wallet_option('transaction_filter_threshold', '500');
       } else {
         this.setState({ walletExists: false, actionButtonsDisabled: false });
         Alert.alert('Error creating Wallet', seed);
@@ -152,7 +150,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
 
   doRestore = async (seedPhrase, birthday) => {
     // Don't call with null values
-    const { server } = this.state || SERVER_DEFAULT;
+    const { server } = this.state;
 
     if (!seedPhrase) {
       Alert.alert('Invalid Seed Phrase', 'The seed phrase was invalid');
@@ -214,17 +212,24 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
               />
             </View>
 
-            <Button type="Primary" title="Create New Wallet (new seed)" disabled={actionButtonsDisabled} onPress={this.createNewWallet} style={{ marginBottom: 10 }} />
+            <BoldText style={{ fontSize: 15, marginBottom: 3 }}>Actual server:</BoldText>
+            <BoldText style={{ fontSize: 15, marginBottom: 10 }}>{server})</BoldText>
+
+            {server === SERVER_DEFAULT_1 && (
+              <Button type="Primary" title={`CHANGE SERVER`} disabled={actionButtonsDisabled} onPress={this.useDefaultServer_0} style={{ marginBottom: 10 }} />
+            )}
+            {server === SERVER_DEFAULT_0 && (
+              <Button type="Primary" title={`CHANGE SERVER`} disabled={actionButtonsDisabled} onPress={this.useDefaultServer_1} style={{ marginBottom: 10 }} />
+            )}
+            {(server !== SERVER_DEFAULT_0 && server !== SERVER_DEFAULT_1) && (
+              <Button type="Primary" title={`CHANGE SERVER`} disabled={actionButtonsDisabled} onPress={this.useDefaultServer_0} style={{ marginBottom: 10 }} />
+            )}
+
+            <Button type="Primary" title="Create New Wallet (new seed)" disabled={actionButtonsDisabled} onPress={this.createNewWallet} style={{ marginBottom: 10, marginTop: 10 }} />
             {walletExists && (
               <Button type="Primary" title="Open Current wallet" disabled={actionButtonsDisabled} onPress={this.componentDidMount} style={{ marginBottom: 10 }} />
             )}
-            <BoldText style={{ fontSize: 12, marginBottom: 3 }}>(Actual server: {server})</BoldText>
-            {server !== SERVER_DEFAULT && (
-              <Button type="Primary" title={`Use : ${SERVER_DEFAULT}`} disabled={actionButtonsDisabled} onPress={this.useDefaultServer} style={{ marginBottom: 10 }} />
-            )}
-            {server !== SERVER_DEFAULT_2 && (
-              <Button type="Primary" title={`Use : ${SERVER_DEFAULT_2}`} disabled={actionButtonsDisabled} onPress={this.useDefaultServer_2} style={{ marginBottom: 10 }} />
-            )}
+
             <View style={[cstyles.margintop, { display: 'flex', alignItems: 'center' }]}>
               <Button type="Secondary" title="Restore wallet from Seed" disabled={actionButtonsDisabled} onPress={this.getSeedPhraseToRestore} style={{ margin: 10 }} />
               <Button type="Secondary" title="Restore wallet from viewing key" disabled={actionButtonsDisabled} onPress={this.getViewingKeyToRestore} style={{ margin: 10 }} />
@@ -237,11 +242,12 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
             animationType="slide"
             transparent={false}
             visible={screen === 2}
-            onRequestClose={this.navigateToLoaded()}>
+            onRequestClose={() => this.navigateToLoaded()}>
             <SeedComponent
               seed={JSON.parse(seedPhrase)?.seed}
               birthday={JSON.parse(seedPhrase)?.birthday}
-              onClickOK={this.navigateToLoaded()}
+              onClickOK={(s, b) => this.navigateToLoaded()}
+              onClickCancel={() => this.navigateToLoaded()}
               totalBalance={totalBalance}
               action={"new"}
             />

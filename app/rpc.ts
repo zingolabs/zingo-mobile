@@ -671,9 +671,9 @@ export default class RPC {
   async fetchTandZandOTransactions() {
     const listStr = await RPCModule.execute('list', '');
     const listJSON = JSON.parse(listStr);
-    const serverHeight = this.serverHeight || 0;
+    const serverHeight = await this.fetchInfoLatestBlockHeight();
 
-    console.log('trans: ', listJSON);
+    //console.log('trans: ', listJSON);
 
     let txlist = listJSON.map((tx: any) => {
       const type = tx.outgoing_metadata ? 'sent' : 'receive';
@@ -705,7 +705,11 @@ export default class RPC {
         address:
           type === 'sent' ? (tx.outgoing_metadata.length > 0 ? tx.outgoing_metadata[0].address : '') : tx.address,
         amount: tx.amount / 10 ** 8,
-        confirmations: tx.unconfirmed ? 0 : serverHeight - tx.block_height + 1,
+        confirmations: tx.unconfirmed
+          ? 0
+          : !!serverHeight
+            ? serverHeight - tx.block_height + 1
+            : '--',
         txid: tx.txid,
         zec_price: tx.zec_price,
         time: tx.datetime,
@@ -716,7 +720,7 @@ export default class RPC {
       return transaction;
     });
 
-    console.log(txlist);
+    //console.log(txlist);
 
     // If you send yourself transactions, the underlying SDK doesn't handle it very well, so
     // we suppress these in the UI to make things a bit clearer.
