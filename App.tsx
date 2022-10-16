@@ -3,12 +3,10 @@
  * @format
  */
 import React, { Component } from 'react';
-import { SafeAreaView } from 'react-native';
+import { SafeAreaView, Appearance } from 'react-native';
 
 import { NavigationContainer, DarkTheme } from '@react-navigation/native';
-import { AppearanceProvider } from 'react-native-appearance';
 import { createStackNavigator } from '@react-navigation/stack';
-import {useTheme} from '@react-navigation/native';
 import LoadedApp from './app/LoadedApp';
 import LoadingApp from './app/LoadingApp';
 
@@ -32,20 +30,18 @@ const Stack = createStackNavigator();
 
 export default function App() {
   return (
-    <AppearanceProvider>
-      <NavigationContainer theme={Theme}>
-        <SafeAreaView
-          style={{
-            flex: 1,
-            justifyContent: 'center',
-            backgroundColor: Theme.colors.card,
-          }}>
-          <Stack.Navigator headerMode="none">
-            <Stack.Screen name="LoadingApp" component={LoadingApp} />
-            <Stack.Screen name="LoadedApp" component={LoadedApp} />
-          </Stack.Navigator>
-        </SafeAreaView>
-      </NavigationContainer>
-    </AppearanceProvider>
+    <NavigationContainer theme={Theme}>
+      <SafeAreaView
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          backgroundColor: Theme.colors.card,
+        }}>
+        <Stack.Navigator headerMode="none">
+          <Stack.Screen name="LoadingApp" component={LoadingApp} />
+          <Stack.Screen name="LoadedApp" component={LoadedApp} />
+        </Stack.Navigator>
+      </SafeAreaView>
+    </NavigationContainer>
   );
 }

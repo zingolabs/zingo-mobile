@@ -13,7 +13,6 @@ import {
 import RPCModule from '../components/RPCModule';
 import Utils from './utils';
 import SettingsFileImpl from '../components/SettingsFileImpl';
-import BackgroundFetch from "react-native-background-fetch";
 
 export default class RPC {
   fnSetSyncStatusReport: (syncStatusReport: SyncStatusReport) => void;
@@ -185,7 +184,14 @@ export default class RPC {
     if (fullRefresh || fullRescan || !this.lastWalletBlockHeight || this.lastWalletBlockHeight < latestBlockHeight) {
       // If the latest block height has changed, make sure to sync. This will happen in a new thread
       this.inRefresh = true;
+
       this.prevProgress = 0;
+      this.prevBatchNum = -1;
+      this.prev_sync_id = -1;
+      this.seconds_batch = 0;
+      this.batches = 0;
+      this.message = 'Sync process started';
+      this.process_end_block = -1;
 
       const onEventRescan = async (taskId) => {
         console.log('Rescan background START task:', taskId);
@@ -235,13 +241,6 @@ export default class RPC {
         await RPCModule.doSave();
       }
 
-      let prevBatchNum = -1;
-      let prev_sync_id = -1;
-      let seconds_batch = 0;
-      let batches = 0;
-      let message = 'Sync process started';
-      let process_end_block = -1;
-
       // We need to wait for the sync to finish. The sync is done when
       // inRefresh is set to false in the doSync().finally()
       let pollerID = setInterval(async () => {
@@ -249,6 +248,20 @@ export default class RPC {
         const ss = await JSON.parse(s);
 
         console.log('sync status', ss);
+
+        // if the sync_id change then reset the %
+        if (this.prev_sync_id !== ss.sync_id) {
+          if (this.prev_sync_id !== -1) {
+            console.log(`new sync process id: ${ss.sync_id}.`);
+            this.prevProgress = 0;
+            this.prevBatchNum = -1;
+            this.seconds_batch = 0;
+            this.batches = 0;
+            this.message = 'Sync process started';
+            this.process_end_block = -1;
+          }
+          this.prev_sync_id = ss.sync_id;
+        }
 
         // Post sync updates
         const synced_blocks: number = ss.synced_blocks || 0;
@@ -262,8 +275,8 @@ export default class RPC {
 
         const end_block: number = ss.end_block || 0; // lower
 
-        if (batch_num === 0 && process_end_block === -1) {
-          process_end_block = end_block; // this is the first block to sync
+        if (batch_num === 0 && this.process_end_block === -1) {
+          this.process_end_block = end_block; // this is the first block to sync
         }
 
         const latestBlockHeight_New = await this.fetchInfoLatestBlockHeight();
@@ -271,7 +284,7 @@ export default class RPC {
         this.lastWalletBlockHeight = walletHeight_New;
 
         //const total_general_blocks: number = batch_total === 1 ? total_blocks : (1000 * (batch_total - 1)) + total_blocks;
-        const total_general_blocks: number = latestBlockHeight_New - process_end_block;
+        const total_general_blocks: number = latestBlockHeight_New - this.process_end_block;
 
         const progress_blocks: number = (synced_blocks + trial_decryptions_blocks + txn_scan_blocks) / 3;
 
@@ -305,27 +318,17 @@ export default class RPC {
           inProgress: ss.in_progress,
           lastError: ss.last_error,
           blocksPerBatch: 1000,
-          secondsPerBatch: seconds_batch,
+          secondsPerBatch: this.seconds_batch,
           percent: progress,
-          message: message,
-          process_end_block: process_end_block,
+          message: this.message,
+          process_end_block: this.process_end_block,
           lastBlockServer: latestBlockHeight_New,
         };
         this.fnSetSyncStatusReport(status);
 
         this.prevProgress = progress;
 
-        seconds_batch += 2;
-
-        // if the sync_id change then reset the %
-        if (prev_sync_id !== ss.sync_id) {
-          if (prevBatchNum !== -1) {
-            console.log(`new sync process id: ${ss.sync_id}.`);
-            this.prevProgress = 0;
-            progress = 0;
-          }
-          prev_sync_id = ss.sync_id;
-        }
+        this.seconds_batch += 2;
 
         // Close the poll timer if the sync finished(checked via promise above)
         if (!this.inRefresh) {
@@ -343,7 +346,7 @@ export default class RPC {
           await RPCModule.doSave();
           this.prevProgress = 0;
           progress = 0;
-          message = 'The sync process finished successfully.';
+          this.message = 'The sync process finished successfully.';
 
           // store SyncStatusReport object for a new screen
           const status: SyncStatusReport = {
@@ -355,10 +358,10 @@ export default class RPC {
             inProgress: ss.in_progress,
             lastError: ss.last_error,
             blocksPerBatch: 1000,
-            secondsPerBatch: seconds_batch,
+            secondsPerBatch: this.seconds_batch,
             percent: progress,
-            message: message,
-            process_end_block: process_end_block,
+            message: this.message,
+            process_end_block: this.process_end_block,
             lastBlockServer: latestBlockHeight_New_New,
           };
           this.fnSetSyncStatusReport(status);
@@ -366,8 +369,8 @@ export default class RPC {
           console.log(`Finished refresh at ${this.lastWalletBlockHeight} id: ${ss.sync_id}`);
         } else {
           // If we're doing a long sync, every time the batch_num changes, save the wallet
-          if (prevBatchNum !== batch_num) {
-            if (prevBatchNum !== -1) {
+          if (this.prevBatchNum !== batch_num) {
+            if (this.prevBatchNum !== -1) {
               // And fetch the rest of the data.
               await this.loadWalletData();
 
@@ -376,8 +379,8 @@ export default class RPC {
               this.lastWalletBlockHeight = walletHeight_New_New;
 
               await RPCModule.doSave();
-              batches = 0;
-              message = `Stored the wallet because batch: ${batch_num} is finished.`;
+              this.batches = 0;
+              this.message = `Stored the wallet because batch: ${batch_num} is finished.`;
 
               // store SyncStatusReport object for a new screen
               const status: SyncStatusReport = {
@@ -389,19 +392,19 @@ export default class RPC {
                 inProgress: ss.in_progress,
                 lastError: ss.last_error,
                 blocksPerBatch: 1000,
-                secondsPerBatch: seconds_batch,
+                secondsPerBatch: this.seconds_batch,
                 percent: progress,
-                message: message,
-                process_end_block: process_end_block,
+                message: this.message,
+                process_end_block: this.process_end_block,
                 lastBlockServer: latestBlockHeight_New_New,
               };
               this.fnSetSyncStatusReport(status);
 
-              console.log(`Saving because batch num changed ${prevBatchNum} - ${batch_num}. seconds: ${seconds_batch}`);
+              console.log(`Saving because batch num changed ${this.prevBatchNum} - ${batch_num}. seconds: ${this.seconds_batch}`);
             }
-            prevBatchNum = batch_num;
-            seconds_batch = 0;
-            batches += 1;
+            this.prevBatchNum = batch_num;
+            this.seconds_batch = 0;
+            this.batches += 1;
           }
         }
       }, 2000);
