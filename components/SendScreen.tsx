@@ -244,8 +244,8 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
     });
 
     return () => {
-      keyboardDidHideListener.remove();
-      keyboardDidShowListener.remove();
+      keyboardDidHideListener?.remove();
+      keyboardDidShowListener?.remove();
     };
   }, [slideAnim, titleViewHeight]);
 
