@@ -129,8 +129,8 @@ const SettingsModal: React.FunctionComponent<SettingsModalProps> = ({
               key={'touch-' + uri}
               style={{marginRight: 10, marginBottom: 5}}
               onPress={() => setServer(uri)}>
-              <View key={'view-' + uri} style={{display: 'flex', flexDirection: 'row', marginTop: 10}}>
-                <FontAwesomeIcon key={'icon-' + uri} icon={uri === server ? faDotCircle : farCircle} size={20} color={colors.border} />
+              <View style={{display: 'flex', flexDirection: 'row', marginTop: 10}}>
+                <FontAwesomeIcon icon={uri === server ? faDotCircle : farCircle} size={20} color={colors.border} />
                 <RegText key={'tex-' + uri} style={{marginLeft: 10}}>{uri}</RegText>
               </View>
             </TouchableOpacity>
@@ -205,18 +205,17 @@ const SettingsModal: React.FunctionComponent<SettingsModalProps> = ({
         <View style={{display: 'flex', marginLeft: 25}}>
 
           {MEMOS.map((memo) => (
-            <>
+            <View key={'view-' + memo.value}>
               <TouchableOpacity
-                key={'touch-' + memo.value}
                 style={{marginRight: 10, marginBottom: 5}}
                 onPress={() => setMemos(memo.value)}>
-                <View key={'view-' + memo.value} style={{display: 'flex', flexDirection: 'row', marginTop: 10}}>
-                  <FontAwesomeIcon key={'icon-' + memo.value} icon={memo.value === memos ? faDotCircle : farCircle} size={20} color={colors.border} />
+                <View style={{display: 'flex', flexDirection: 'row', marginTop: 10}}>
+                  <FontAwesomeIcon icon={memo.value === memos ? faDotCircle : farCircle} size={20} color={colors.border} />
                   <RegText key={'text-' + memo.value} style={{marginLeft: 10}}>{memo.value}</RegText>
                 </View>
               </TouchableOpacity>
               <FadeText key={'fade-' + memo.value}>{memo.text}</FadeText>
-            </>
+            </View>
           ))}
 
         </View>

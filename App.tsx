@@ -2,8 +2,8 @@
 /**
  * @format
  */
-import React, { Component } from 'react';
-import { SafeAreaView, Appearance } from 'react-native';
+import React from 'react';
+import { SafeAreaView } from 'react-native';
 
 import { NavigationContainer, DarkTheme } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';

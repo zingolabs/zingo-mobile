@@ -193,42 +193,15 @@ export default class RPC {
       this.message = 'Sync process started';
       this.process_end_block = -1;
 
-      const onEventRescan = async (taskId) => {
-        console.log('Rescan background START task:', taskId);
-        await RPC.doRescan();
-        this.inRefresh = false;
-        BackgroundFetch.finish(taskId);
-        console.log('Rescan background END task:', taskId);
-      }
-      const onEventSync = async (taskId) => {
-        console.log('Sync background START task:', taskId);
-        await RPC.doSync();
-        this.inRefresh = false;
-        BackgroundFetch.finish(taskId);
-        console.log('Sync background END task:', taskId);
-      }
-      const onTimeoutRescan = async (taskId) => {
-        BackgroundFetch.finish(taskId);
-        console.log('Rescan background TIMEOUT task:', taskId);
-      }
-      const onTimeoutSync = async (taskId) => {
-        BackgroundFetch.finish(taskId);
-        console.log('Sync background TIMEOUT task:', taskId);
-      }
-
       // This is async, so when it is done, we finish the refresh.
       if (fullRescan) {
-        const status = await BackgroundFetch.configure({minimumFetchInterval: 15}, onEventRescan, onTimeoutRescan);
-        console.log('Rescan background STATUS:', status);
-        /*RPC.doRescan().finally(() => {
+        RPC.doRescan().finally(() => {
           this.inRefresh = false;
-        });*/
+        });
       } else {
-        const status = await BackgroundFetch.configure({minimumFetchInterval: 15}, onEventSync, onTimeoutSync);
-        console.log('Sync background STATUS:', status);
-        /*RPC.doSync().finally(() => {
+        RPC.doSync().finally(() => {
           this.inRefresh = false;
-        });*/
+        });
       }
 
       // if it's a rescan we need to save first the wallet
@@ -405,6 +378,38 @@ export default class RPC {
             this.prevBatchNum = batch_num;
             this.seconds_batch = 0;
             this.batches += 1;
+          }
+          // save wallet every minute
+          if (this.seconds_batch % 60 === 0) {
+            // And fetch the rest of the data.
+            await this.loadWalletData();
+
+            const latestBlockHeight_New_New = await this.fetchInfoLatestBlockHeight();
+            const walletHeight_New_New = await RPC.fetchWalletHeight();
+            this.lastWalletBlockHeight = walletHeight_New_New;
+
+            await RPCModule.doSave();
+            this.message = `Stored the wallet. ${this.seconds_batch} seconds.`;
+
+            // store SyncStatusReport object for a new screen
+            const status: SyncStatusReport = {
+              syncID: ss.sync_id,
+              totalBatches: batch_total,
+              currentBatch: ss.in_progress ? batch_num + 1 : 0,
+              lastBlockWallet: this.lastWalletBlockHeight,
+              currentBlock: parseInt((end_block + progress_blocks).toFixed(0)),
+              inProgress: ss.in_progress,
+              lastError: ss.last_error,
+              blocksPerBatch: 1000,
+              secondsPerBatch: this.seconds_batch,
+              percent: progress,
+              message: this.message,
+              process_end_block: this.process_end_block,
+              lastBlockServer: latestBlockHeight_New_New,
+            };
+            this.fnSetSyncStatusReport(status);
+
+            console.log(`Saving wallet. seconds: ${this.seconds_batch}`);
           }
         }
       }, 2000);
