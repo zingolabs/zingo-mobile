@@ -172,7 +172,7 @@ const SyncReportModal: React.FunctionComponent<SyncReportModalProps> = ({closeMo
                   <View style={{ height: 10, backgroundColor: 'blue', borderLeftColor: colors.primary, borderLeftWidth: 1, width: ((server_1 * 100) / maxBlocks).toString() + '%' }}></View>
                 )}
                 {server_2 > 0 && (
-                  <View style={{ height: 10, width: ((server_2 * 100) / maxBlocks).toString() + '%', backgroundColor: 'yellow' }}></View>
+                  <View style={{ height: 10, width: (((server_2 + server_3) * 100) / maxBlocks).toString() + '%', backgroundColor: 'yellow' }}></View>
                 )}
                 {/*server_3 > 0 && (
                   <View style={{ height: 10, width: ((server_3 * 100) / maxBlocks).toString() + '%', backgroundColor: 'green' }}></View>

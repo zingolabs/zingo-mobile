@@ -102,13 +102,13 @@ export default class RPC {
 
   static async doSync(): Promise<string> {
     const syncstr = await RPCModule.execute('sync', '');
-    // console.log(`Sync exec result: ${syncstr}`);
+    console.log(`Sync exec result: ${syncstr}`);
     return syncstr;
   }
 
   static async doRescan() {
     const syncstr = await RPCModule.execute('rescan', '');
-    // console.log(`rescan exec result: ${syncstr}`);
+    console.log(`rescan exec result: ${syncstr}`);
     return syncstr;
   }
 

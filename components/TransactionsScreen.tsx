@@ -455,7 +455,7 @@ const Stack = createStackNavigator();
 
 const TransactionsScreen: React.FunctionComponent<TransactionsScreenViewProps> = iprops => {
   return (
-    <Stack.Navigator headerMode="none">
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="TransactionsView">{props => <TransactionsScreenView {...props} {...iprops} />}</Stack.Screen>
     </Stack.Navigator>
   );

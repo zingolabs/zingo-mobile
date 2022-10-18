@@ -893,14 +893,14 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
               const iconColor = focused ? colors.background : colors.money;
               return <FontAwesomeIcon icon={iconName} color={iconColor} />;
             },
+            tabBarActiveTintColor: colors.background,
+            tabBarActiveBackgroundColor: colors.primary,
+            tabBarInactiveTintColor: colors.money,
+            tabBarLabelStyle: {fontSize: 14},
+            tabBarStyle: {borderRadius: 0},
+            headerShown: false,
           })}
-          tabBarOptions={{
-            activeTintColor: colors.background,
-            activeBackgroundColor: colors.primary,
-            inactiveTintColor: colors.money,
-            labelStyle: {fontSize: 14},
-            tabStyle: {borderRadius: 0},
-          }}>
+        >
           <Tab.Screen name="SEND">
             {props => (
               <>
@@ -969,7 +969,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
                 )}
               </>
             )}
-          </Tab.Screen><Tab.Screen name="LEGACY">
+          </Tab.Screen>
+          <Tab.Screen name="LEGACY">
             {props => (
               <>
                 <ReceiversScreen
