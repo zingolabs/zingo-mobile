@@ -35,7 +35,7 @@ const InfoModal: React.FunctionComponent<InfoModalProps> = ({info, closeModal, t
 
   React.useEffect(() => {
     (async () => {
-      const infoNew = await RPC.getInfoObject();
+      const infoNew = await RPC.rpc_getInfoObject();
 
       //console.log('info', infoNew);
 
@@ -70,7 +70,7 @@ const InfoModal: React.FunctionComponent<InfoModalProps> = ({info, closeModal, t
           justifyContent: 'flex-start',
         }}>
         <View style={{display: 'flex', margin: 20}}>
-          <DetailLine label="Version" value="Zingo! v0.0.1_46" />
+          <DetailLine label="Version" value="Zingo! v0.0.1_47" />
           <DetailLine label="Server Version" value={infoState.version ? infoState.version : '...loading...'} />
           <DetailLine label="Lightwalletd URL" value={infoState.serverUri ? infoState.serverUri : '...loading...'} />
           <DetailLine

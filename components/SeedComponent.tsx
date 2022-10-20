@@ -63,7 +63,7 @@ const SeedComponent: React.FunctionComponent<SeedComponentProps> = ({seed, birth
     setBirthdayNumber(birthday);
   }, [action, seed, birthday]);
 
-  console.log(seed, birthday, onClickOK, onClickCancel, totalBalance, action, error, currencyName);
+  //console.log(seed, birthday, onClickOK, onClickCancel, totalBalance, action, error, currencyName);
 
   return (
     <SafeAreaView

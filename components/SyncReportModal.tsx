@@ -27,7 +27,7 @@ type SyncReportModalProps = {
   totalBalance: object;
   currencyName: string;
   syncStatusReport: SyncStatusReport;
-  birthday?: number;
+  birthday_plus_1?: number;
 };
 
 const SyncReportModal: React.FunctionComponent<SyncReportModalProps> = ({closeModal, totalBalance, currencyName, syncStatusReport, birthday}) => {
@@ -35,6 +35,7 @@ const SyncReportModal: React.FunctionComponent<SyncReportModalProps> = ({closeMo
   const [maxBlocks, setMaxBlocks] = useState(null);
   const [points, setPoints] = useState([]);
   const [index, setIndex] = useState(null);
+  const [birthday_plus_1, setBirthday_plus_1] = useState((birthday || 0) + 1);
   const labels = ['0', '500K', '1M', '1.5M', '2M', '2.5M', '3M', '3.5M', '4M', '4.5M', '5M'];
 
   React.useEffect(() => {
@@ -53,11 +54,11 @@ const SyncReportModal: React.FunctionComponent<SyncReportModalProps> = ({closeMo
     })();
   }, [syncStatusReport.lastBlockServer])
 
-  const server_1: number = birthday || 0;
-  const server_2: number = syncStatusReport.process_end_block && birthday
-    ? (syncStatusReport.process_end_block - birthday) || 0
-    : syncStatusReport.lastBlockWallet && birthday
-      ? (syncStatusReport.lastBlockWallet - birthday) || 0
+  const server_1: number = birthday_plus_1 || 0;
+  const server_2: number = syncStatusReport.process_end_block && birthday_plus_1
+    ? (syncStatusReport.process_end_block - birthday_plus_1) || 0
+    : syncStatusReport.lastBlockWallet && birthday_plus_1
+      ? (syncStatusReport.lastBlockWallet - birthday_plus_1) || 0
       : 0;
   const server_3: number = syncStatusReport.lastBlockServer && syncStatusReport.process_end_block
     ? (syncStatusReport.lastBlockServer - syncStatusReport.process_end_block) || 0
@@ -68,29 +69,34 @@ const SyncReportModal: React.FunctionComponent<SyncReportModalProps> = ({closeMo
     ? (maxBlocks - server_1 - server_2 - server_3) || 0
     : 0;
   const server_server: number = syncStatusReport.lastBlockServer || 0;
-  const server_wallet: number = syncStatusReport.lastBlockServer && birthday
-    ? (syncStatusReport.lastBlockServer - birthday) || 0
+  const server_wallet: number = syncStatusReport.lastBlockServer && birthday_plus_1
+    ? (syncStatusReport.lastBlockServer - birthday_plus_1) || 0
     : 0;
   const server_sync: number = syncStatusReport.lastBlockServer && syncStatusReport.process_end_block
     ? (syncStatusReport.lastBlockServer - syncStatusReport.process_end_block) || 0
     : 0;
 
-  const wallet_1: number = syncStatusReport.process_end_block && birthday
-    ? (syncStatusReport.process_end_block - birthday) || 0
-    : syncStatusReport.lastBlockWallet && birthday
-      ? (syncStatusReport.lastBlockWallet - birthday) || 0
+  const wallet_1: number = syncStatusReport.process_end_block && birthday_plus_1
+    ? (syncStatusReport.process_end_block - birthday_plus_1) || 0
+    : syncStatusReport.lastBlockWallet && birthday_plus_1
+      ? (syncStatusReport.lastBlockWallet - birthday_plus_1) || 0
       : 0;
   const wallet_21: number = syncStatusReport.currentBlock && syncStatusReport.process_end_block
     ? (syncStatusReport.currentBlock - syncStatusReport.process_end_block) || 0
     : syncStatusReport.currentBlock && syncStatusReport.lastBlockWallet
       ? (syncStatusReport.currentBlock - syncStatusReport.lastBlockWallet) || 0
       : 0;
-  const wallet_3: number = syncStatusReport.lastBlockServer && birthday
-    ? ((syncStatusReport.lastBlockServer - birthday) - wallet_1 - wallet_21) || 0
+  const wallet_3: number = syncStatusReport.lastBlockServer && birthday_plus_1
+    ? ((syncStatusReport.lastBlockServer - birthday_plus_1) - wallet_1 - wallet_21) || 0
     : 0;
-  const wallet_old_synced: number = wallet_1;
-  const wallet_new_synced: number = wallet_21;
-  const wallet_for_synced: number = wallet_3;
+  let wallet_old_synced: number = wallet_1;
+  let wallet_new_synced: number = wallet_21;
+  let wallet_for_synced: number = wallet_3;
+
+  // It is really weird, Don't want any negative values in the UI.
+  if (wallet_old_synced < 0) {
+    wallet_old_synced = 0;
+  }
 
   const wallet_old_synced_percent: number = (wallet_old_synced * 100) / server_wallet;
   let wallet_new_synced_percent: number = (wallet_new_synced * 100) / server_wallet;
@@ -99,11 +105,11 @@ const SyncReportModal: React.FunctionComponent<SyncReportModalProps> = ({closeMo
   }
   const wallet_for_synced_percent: number = 100 - wallet_old_synced_percent - wallet_new_synced_percent;
 
+  //console.log(syncStatusReport);
   //console.log('server', server_1, server_2, server_3, server_4);
   //console.log('leyends', server_server, server_wallet, server_sync);
   //console.log('wallet', wallet_old_synced, wallet_new_synced, wallet_for_synced);
   //console.log('wallet %', wallet_old_synced_percent, wallet_new_synced_percent, wallet_for_synced_percent);
-  //console.log(syncStatusReport);
 
   return (
     <SafeAreaView
@@ -211,7 +217,7 @@ const SyncReportModal: React.FunctionComponent<SyncReportModalProps> = ({closeMo
             <>
               <View style={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-between', marginTop: 10 }}>
                 <>
-                  <Text style={{ color: colors.primary }}>{birthday}</Text>
+                  <Text style={{ color: colors.primary }}>{birthday_plus_1}</Text>
                   <Text style={{ color: colors.primary }}>{syncStatusReport.lastBlockServer}</Text>
                 </>
               </View>
@@ -223,13 +229,13 @@ const SyncReportModal: React.FunctionComponent<SyncReportModalProps> = ({closeMo
               </View>
               <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', width: '100%', borderBottomColor: colors.primary, borderBottomWidth: 2, marginBottom: 0 }}>
                 {wallet_1 > 0 && (
-                  <View style={{ height: 10, width: ((wallet_1 * 100) / (syncStatusReport.lastBlockServer - birthday)).toString() + '%', backgroundColor: 'yellow', borderLeftColor: colors.primary, borderLeftWidth: 1 }}></View>
+                  <View style={{ height: 10, width: ((wallet_1 * 100) / (syncStatusReport.lastBlockServer - birthday_plus_1)).toString() + '%', backgroundColor: 'yellow', borderLeftColor: colors.primary, borderLeftWidth: 1 }}></View>
                 )}
                 {wallet_21 > 0 && (
-                  <View style={{ height: 10, width: ((wallet_21 * 100) / (syncStatusReport.lastBlockServer - birthday)).toString() + '%', backgroundColor: 'orange' }}></View>
+                  <View style={{ height: 10, width: ((wallet_21 * 100) / (syncStatusReport.lastBlockServer - birthday_plus_1)).toString() + '%', backgroundColor: 'orange' }}></View>
                 )}
                 {wallet_3 > 0 && (
-                  <View style={{ height: 10, backgroundColor: '#331100', borderRightColor: colors.primary, borderRightWidth: 1, width: ((wallet_3 * 100) / (syncStatusReport.lastBlockServer - birthday)).toString() + '%' }}></View>
+                  <View style={{ height: 10, backgroundColor: '#331100', borderRightColor: colors.primary, borderRightWidth: 1, width: ((wallet_3 * 100) / (syncStatusReport.lastBlockServer - birthday_plus_1)).toString() + '%' }}></View>
                 )}
               </View>
               {wallet_old_synced > 0 && (
@@ -300,9 +306,9 @@ const SyncReportModal: React.FunctionComponent<SyncReportModalProps> = ({closeMo
           <DetailLine
             label="Wallet - LAST BLOCK - Sync & Stored"
             value={syncStatusReport.lastBlockWallet
-              ? syncStatusReport.lastBlockWallet > birthday
+              ? syncStatusReport.lastBlockWallet > birthday_plus_1
                 ? syncStatusReport.lastBlockWallet
-                : birthday
+                : birthday_plus_1
               : '...loading...'}
           />
           <DetailLine

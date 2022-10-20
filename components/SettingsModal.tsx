@@ -94,6 +94,8 @@ const SettingsModal: React.FunctionComponent<SettingsModalProps> = ({
     closeModal();
   }
 
+  //console.log(wallet_settings);
+
   return (
     <SafeAreaView
       style={{

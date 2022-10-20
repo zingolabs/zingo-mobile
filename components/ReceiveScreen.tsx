@@ -186,7 +186,7 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
 
   const addO = async () => {
     //console.log('New O');
-    const newAddress = await RPC.createNewAddress('o');
+    const newAddress = await RPC.rpc_createNewAddress('o');
     await fetchTotalBalance();
     setIndex(2);
     setDisplayAddress(newAddress);
@@ -203,7 +203,7 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
     }
 
     const address = oaddrs[oindex];
-    const k = await RPC.getPrivKeyAsString(address);
+    const k = await RPC.rpc_getPrivKeyAsString(address);
 
     setKeyType(0);
     setPrivKeyModalVisible(true);
@@ -217,7 +217,7 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
     }
 
     const address = oaddrs[oindex];
-    const k = await RPC.getViewKeyAsString(address);
+    const k = await RPC.rpc_getViewKeyAsString(address);
 
     setKeyType(1);
     setPrivKeyModalVisible(true);
@@ -231,7 +231,7 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
   };
 
   const doImport = async (key: string, birthday: string) => {
-    const addressList = await RPC.doImportPrivKey(key, birthday);
+    const addressList = await RPC.rpc_fetchSeedoImportPrivKey(key, birthday);
     // console.log(addressList);
 
     if (typeof addressList === 'string' && addressList.startsWith('Error')) {

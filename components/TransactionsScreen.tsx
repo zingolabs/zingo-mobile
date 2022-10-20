@@ -322,7 +322,7 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
   const shieldFunds = async () => {
     setComputingModalVisible(true);
 
-    const shieldStr = await RPC.shieldTransparent();
+    const shieldStr = await RPC.rpc_shieldTransparent();
 
     setComputingModalVisible(false);
     setTimeout(() => {

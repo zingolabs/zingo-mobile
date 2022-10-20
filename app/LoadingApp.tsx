@@ -179,7 +179,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
   };
 
   set_wallet_option = async (name: string, value: string) => {
-    await RPC.setWalletSettingOption(name, value);
+    await RPC.rpc_setWalletSettingOption(name, value);
   };
 
   render() {

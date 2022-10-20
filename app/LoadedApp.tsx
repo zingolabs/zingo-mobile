@@ -415,13 +415,13 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
   // Get a single private key for this address, and return it as a string.
   // Wallet needs to be unlocked
   getPrivKeyAsString = async (address: string): Promise<string> => {
-    const pk = await RPC.getPrivKeyAsString(address);
+    const pk = await RPC.rpc_getPrivKeyAsString(address);
     return pk;
   };
 
   // Getter methods, which are called by the components to update the state
   fetchAndSetSinglePrivKey = async (address: string) => {
-    const key = await RPC.getPrivKeyAsString(address);
+    const key = await RPC.rpc_getPrivKeyAsString(address);
     const addressPrivateKeys = new Map<string, string>();
     addressPrivateKeys.set(address, key);
 
@@ -430,7 +430,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
 
   createNewAddress = async (addressType: 'z' | 't' | 'o') => {
     // Create a new address
-    const newaddress = await RPC.createNewAddress(addressType);
+    const newaddress = await RPC.rpc_createNewAddress(addressType);
     // console.log(`Created new Address ${newaddress}`);
 
     // And then fetch the list of addresses again to refresh (totalBalance gets all addresses)
@@ -454,8 +454,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
     await this.rpc.fetchTotalBalance();
   };
 
-  clearTimers = () => {
-    this.rpc.clearTimers();
+  clearTimers = async () => {
+    await this.rpc.clearTimers();
   };
 
   toggleMenuDrawer = () => {
@@ -469,7 +469,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
   };
 
   fetchWalletSeed = async () => {
-    const walletSeed = await RPC.fetchSeed();
+    const walletSeed = await RPC.rpc_fetchSeed();
     this.setState({walletSeed});
   };
 
@@ -522,7 +522,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
   };
 
   set_wallet_option = async (name: string, value: string) => {
-    await RPC.setWalletSettingOption(name, value);
+    await RPC.rpc_setWalletSettingOption(name, value);
 
     // Refetch the settings to update
     this.rpc.fetchWalletSettings();
@@ -592,9 +592,10 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
 
   };
 
-  navigateToLoading = () => {
+  navigateToLoading = async () => {
     const { navigation } = this.props;
 
+    await this.rpc.clearTimers();
     navigation.reset({
       index: 0,
       routes: [{ name: 'LoadingApp' }],
