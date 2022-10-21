@@ -569,6 +569,8 @@ export default class RPC {
           progress = 0;
           this.message = 'The sync process finished successfully.';
 
+          await this.fnSetRefreshUpdates(ss.inRefresh, '', this.lastWalletBlockHeight.toString() + ' of ' + this.lastServerBlockHeight.toString());
+
           // store SyncStatusReport object for a new screen
           const status: SyncStatusReport = {
             syncID: ss.sync_id,
