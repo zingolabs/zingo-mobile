@@ -105,7 +105,7 @@ const SyncReportModal: React.FunctionComponent<SyncReportModalProps> = ({closeMo
   }
   const wallet_for_synced_percent: number = 100 - wallet_old_synced_percent - wallet_new_synced_percent;
 
-  //console.log(syncStatusReport);
+  //console.log(syncStatusReport, birthday, birthday_plus_1);
   //console.log('server', server_1, server_2, server_3, server_4);
   //console.log('leyends', server_server, server_wallet, server_sync);
   //console.log('wallet', wallet_old_synced, wallet_new_synced, wallet_for_synced);

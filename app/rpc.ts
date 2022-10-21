@@ -427,7 +427,7 @@ export default class RPC {
       this.seconds_batch = 0;
       this.batches = 0;
       this.message = 'Sync process started';
-      this.process_end_block = -1;
+      this.process_end_block = this.lastWalletBlockHeight;
 
       // This is async, so when it is done, we finish the refresh.
       if (fullRescan) {
@@ -472,21 +472,37 @@ export default class RPC {
         // if the sync_id change then reset the %
         if (this.prev_sync_id !== ss.sync_id) {
           if (this.prev_sync_id !== -1) {
+            // And fetch the rest of the data.
+            await this.loadWalletData();
+
+            await this.fetchWalletHeight();
+            await this.fetchServerHeight();
+
+            await RPCModule.doSave();
+
             console.log(`new sync process id: ${ss.sync_id}.`);
             this.prevProgress = 0;
             this.prevBatchNum = -1;
             this.seconds_batch = 0;
             this.batches = 0;
             this.message = 'Sync process started';
-            this.process_end_block = -1;
+            this.process_end_block = this.lastWalletBlockHeight;
           }
           this.prev_sync_id = ss.sync_id;
         }
 
         // Post sync updates
-        const synced_blocks: number = ss.synced_blocks || 0;
-        const trial_decryptions_blocks: number = ss.trial_decryptions_blocks|| 0;
-        const txn_scan_blocks: number = ss.txn_scan_blocks || 0;
+        let synced_blocks: number = ss.synced_blocks || 0;
+        let trial_decryptions_blocks: number = ss.trial_decryptions_blocks|| 0;
+        let txn_scan_blocks: number = ss.txn_scan_blocks || 0;
+
+        // just in case
+        if (synced_blocks < 0) synced_blocks = 0;
+        if (synced_blocks > 1000) synced_blocks = 1000;
+        if (trial_decryptions_blocks < 0) trial_decryptions_blocks = 0;
+        if (trial_decryptions_blocks > 1000) trial_decryptions_blocks = 1000;
+        if (txn_scan_blocks < 0) txn_scan_blocks = 0;
+        if (txn_scan_blocks > 1000) txn_scan_blocks = 1000;
 
         const total_blocks: number = ss.total_blocks || 0;
 
@@ -494,10 +510,6 @@ export default class RPC {
         const batch_num: number = ss.batch_num || 0;
 
         const end_block: number = ss.end_block || 0; // lower
-
-        if (batch_num === 0 && this.process_end_block === -1) {
-          this.process_end_block = end_block; // this is the first block to sync
-        }
 
         const total_general_blocks: number = this.lastServerBlockHeight - this.process_end_block;
 
@@ -569,7 +581,8 @@ export default class RPC {
           progress = 0;
           this.message = 'The sync process finished successfully.';
 
-          await this.fnSetRefreshUpdates(ss.inRefresh, '', this.lastWalletBlockHeight.toString() + ' of ' + this.lastServerBlockHeight.toString());
+          // I know it's finished.
+          await this.fnSetRefreshUpdates(false, '', '');
 
           // store SyncStatusReport object for a new screen
           const status: SyncStatusReport = {
@@ -578,7 +591,7 @@ export default class RPC {
             currentBatch: 0,
             lastBlockWallet: this.lastWalletBlockHeight,
             currentBlock: this.lastWalletBlockHeight,
-            inProgress: this.inRefresh,
+            inProgress: false,
             lastError: ss.last_error,
             blocksPerBatch: 1000,
             secondsPerBatch: 0,
@@ -593,7 +606,8 @@ export default class RPC {
         } else {
           // If we're doing a long sync, every time the batch_num changes, save the wallet
           if (this.prevBatchNum !== batch_num) {
-            if (this.prevBatchNum !== -1) {
+            // if finished batches really fast, the App have to save the wallet delayed.
+            if (this.prevBatchNum !== -1 && (this.batches > 10 || this.seconds_batch > 10)) {
               // And fetch the rest of the data.
               await this.loadWalletData();
 
