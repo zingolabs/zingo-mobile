@@ -27,7 +27,7 @@ type SyncReportModalProps = {
   totalBalance: object;
   currencyName: string;
   syncStatusReport: SyncStatusReport;
-  birthday_plus_1?: number;
+  birthday?: number;
 };
 
 const SyncReportModal: React.FunctionComponent<SyncReportModalProps> = ({closeModal, totalBalance, currencyName, syncStatusReport, birthday}) => {

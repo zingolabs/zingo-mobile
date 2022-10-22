@@ -242,7 +242,7 @@ export default class RPC {
   // We combine detailed transactions if they are sent to the same outgoing address in the same txid. This
   // is usually done to split long memos.
   // Remember to add up both amounts and combine memos
-  combineTxDetails(txdetails: TxDetail[]): TxDetail[] {
+  static rpc_combineTxDetails(txdetails: TxDetail[]): TxDetail[] {
     // First, group by outgoing address.
     const m = new Map<string, TxDetail[]>();
     txdetails.forEach(i => {
@@ -835,8 +835,12 @@ export default class RPC {
 
     //console.log('trans: ', listJSON);
 
-    let txlist = listJSON.map(async (tx: any) => {
+    let txlist = listJSON.map((tx: any) => {
       const type = tx.outgoing_metadata ? 'sent' : 'receive';
+
+      //console.log('tran: ', tx);
+      //console.log('meta: ', tx.outgoing_metadata);
+      //console.log('--------------------------------------------------');
 
       var txdetail: TxDetail[] = [];
       if (tx.outgoing_metadata) {
@@ -850,7 +854,7 @@ export default class RPC {
           return detail;
         });
 
-        txdetail = await this.combineTxDetails(dts);
+        txdetail = RPC.rpc_combineTxDetails(dts);
       } else {
         const detail: TxDetail = {
           address: tx.address || "",
@@ -884,7 +888,7 @@ export default class RPC {
 
     // If you send yourself transactions, the underlying SDK doesn't handle it very well, so
     // we suppress these in the UI to make things a bit clearer.
-    txlist = txlist.filter((tx: Transaction) => !(tx.type === 'sent' && tx.amount < 0 && tx.detailedTxns.length === 0));
+    //txlist = txlist.filter((tx: Transaction) => !(tx.type === 'sent' && tx.amount < 0 && tx.detailedTxns.length === 0));
 
     // We need to group transactions that have the same (txid and send/receive), for multi-part memos
     const m = new Map();
@@ -900,12 +904,12 @@ export default class RPC {
 
     // Now, combine the amounts and memos
     const combinedTxList: Transaction[] = [];
-    m.forEach(async (txns: Transaction[]) => {
+    m.forEach((txns: Transaction[]) => {
       // Get all the txdetails and merge them
 
       // Clone the first tx into a new one
       const combinedTx = Object.assign({}, txns[0]);
-      combinedTx.detailedTxns = await this.combineTxDetails(txns.flatMap(tx => tx.detailedTxns));
+      combinedTx.detailedTxns = RPC.rpc_combineTxDetails(txns.flatMap(tx => tx.detailedTxns));
 
       combinedTxList.push(combinedTx);
     });
@@ -922,18 +926,17 @@ export default class RPC {
     setSendProgress: (arg0: SendProgress | null) => void,
   ): Promise<string> {
     // First, get the previous send progress id, so we know which ID to track
-    const prevProg = await RPCModule.execute('sendprogress', '');
-    const prevProgress = await JSON.parse(prevProg);
+    const prevProgress = await JSON.parse(await RPCModule.execute('sendprogress', ''));
     const prevSendId = prevProgress.id;
 
-    //console.log(sendJson);
+    console.log(sendJson);
 
     try {
       // This is async, so fire and forget
       RPCModule.doSend(JSON.stringify(sendJson));
     } catch (err) {
       // TODO Show a modal with the error
-      //console.log(`Error sending Tx: ${err}`);
+      console.log(`Error sending Tx: ${err}`);
       throw err;
     }
 
@@ -942,15 +945,14 @@ export default class RPC {
     // The send command is async, so we need to poll to get the status
     const sendTxPromise = new Promise<string>((resolve, reject) => {
       const intervalID = setInterval(async () => {
-        const prog = await RPCModule.execute('sendprogress', '');
-        const progress = await JSON.parse(prog);
+        const progress = await JSON.parse(await RPCModule.execute('sendprogress', ''));
         const sendId = progress.id;
         //console.log(progress);
 
         const updatedProgress = new SendProgress();
         if (sendId === prevSendId) {
           // Still not started, so wait for more time
-          await setSendProgress(updatedProgress);
+          setSendProgress(updatedProgress);
           return;
         }
 
@@ -974,17 +976,17 @@ export default class RPC {
 
         if (!progress.txid && !progress.error) {
           // Still processing
-          await setSendProgress(updatedProgress);
+          setSendProgress(updatedProgress);
           return;
         }
 
         // Finished processing
         clearInterval(intervalID);
-        await setSendProgress(null);
+        setSendProgress(null);
 
         if (progress.txid) {
           // And refresh data (full refresh)
-          await this.refresh(true);
+          this.refresh(true);
 
           resolve(progress.txid);
         }

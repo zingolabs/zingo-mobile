@@ -440,6 +440,9 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
             />
           );
         })}
+        <View style={{ height: 100, display: "flex", alignItems: "center", justifyContent: "flex-start" }}>
+          <FadeText style={{ color: colors.primary }}>END</FadeText>
+        </View>
 
         {loadMoreButton && (
           <View style={{flexDirection: 'row', justifyContent: 'center', margin: 30}}>
