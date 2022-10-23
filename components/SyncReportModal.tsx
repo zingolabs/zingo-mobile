@@ -76,16 +76,23 @@ const SyncReportModal: React.FunctionComponent<SyncReportModalProps> = ({closeMo
     ? (syncStatusReport.lastBlockServer - syncStatusReport.process_end_block) || 0
     : 0;
 
-  const wallet_1: number = syncStatusReport.process_end_block && birthday_plus_1
+  let wallet_1: number = syncStatusReport.process_end_block && birthday_plus_1
     ? (syncStatusReport.process_end_block - birthday_plus_1) || 0
     : syncStatusReport.lastBlockWallet && birthday_plus_1
       ? (syncStatusReport.lastBlockWallet - birthday_plus_1) || 0
       : 0;
-  const wallet_21: number = syncStatusReport.currentBlock && syncStatusReport.process_end_block
+  let wallet_21: number = syncStatusReport.currentBlock && syncStatusReport.process_end_block
     ? (syncStatusReport.currentBlock - syncStatusReport.process_end_block) || 0
     : syncStatusReport.currentBlock && syncStatusReport.lastBlockWallet
       ? (syncStatusReport.currentBlock - syncStatusReport.lastBlockWallet) || 0
       : 0;
+  // It is really weird, but don't want any negative values in the UI.
+  if (wallet_1 < 0) {
+    wallet_1 = 0;
+  }
+  if (wallet_21 < 0) {
+    wallet_21 = 0;
+  }
   const wallet_3: number = syncStatusReport.lastBlockServer && birthday_plus_1
     ? ((syncStatusReport.lastBlockServer - birthday_plus_1) - wallet_1 - wallet_21) || 0
     : 0;
@@ -93,19 +100,20 @@ const SyncReportModal: React.FunctionComponent<SyncReportModalProps> = ({closeMo
   let wallet_new_synced: number = wallet_21;
   let wallet_for_synced: number = wallet_3;
 
-  // It is really weird, Don't want any negative values in the UI.
-  if (wallet_old_synced < 0) {
-    wallet_old_synced = 0;
-  }
-
-  const wallet_old_synced_percent: number = (wallet_old_synced * 100) / server_wallet;
+  let wallet_old_synced_percent: number = (wallet_old_synced * 100) / server_wallet;
   let wallet_new_synced_percent: number = (wallet_new_synced * 100) / server_wallet;
   if (wallet_new_synced_percent < 0.01 && wallet_new_synced_percent > 0) {
     wallet_new_synced_percent = 0.01;
   }
+  if (wallet_old_synced_percent > 100) {
+    wallet_old_synced_percent = 100;
+  }
+  if (wallet_new_synced_percent > 100) {
+    wallet_new_synced_percent = 100;
+  }
   const wallet_for_synced_percent: number = 100 - wallet_old_synced_percent - wallet_new_synced_percent;
 
-  //console.log(syncStatusReport, birthday, birthday_plus_1);
+  //console.log(syncStatusReport, birthday, birthday_plus_1, syncStatusReport.lastBlockServer - birthday_plus_1);
   //console.log('server', server_1, server_2, server_3, server_4);
   //console.log('leyends', server_server, server_wallet, server_sync);
   //console.log('wallet', wallet_old_synced, wallet_new_synced, wallet_for_synced);

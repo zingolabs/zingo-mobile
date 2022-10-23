@@ -420,7 +420,8 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
         refreshControl={
           <RefreshControl refreshing={false} onRefresh={doRefresh} tintColor={colors.text} title="Refreshing" />
         }
-        style={{flexGrow: 1, marginTop: 10, width: '100%', height: '100%'}}>
+        style={{flexGrow: 1, marginTop: 10, width: '100%', height: '100%'}}
+      >
         {transactions?.slice(0, numTx).flatMap(t => {
           let txmonth = moment(t.time * 1000).format('MMM YYYY');
 
@@ -440,9 +441,11 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
             />
           );
         })}
-        <View style={{ height: 100, display: "flex", alignItems: "center", justifyContent: "flex-start" }}>
-          <FadeText style={{ color: colors.primary }}>END</FadeText>
-        </View>
+        {!!transactions && !!transactions.length && (
+          <View style={{ height: 100, display: "flex", alignItems: "center", justifyContent: "flex-start" }}>
+            <FadeText style={{ color: colors.primary }}>END</FadeText>
+          </View>
+        )}
 
         {loadMoreButton && (
           <View style={{flexDirection: 'row', justifyContent: 'center', margin: 30}}>

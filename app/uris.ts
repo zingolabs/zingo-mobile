@@ -24,8 +24,8 @@ export class ZcashURITarget {
 }
 
 export const SERVER_URI = [
-  'https://zuul.free2z.cash:9067',
   'https://mainnet.lightwalletd.com:9067',
+  'https://zuul.free2z.cash:9067',
 ];
 
 export const MEMOS = [

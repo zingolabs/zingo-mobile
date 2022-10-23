@@ -522,7 +522,7 @@ export default class RPC {
         // not using a fake increment. But could be a good idea.
         const increment: number = 0;
 
-        console.log('prev', this.prevProgress, 'act', progress);
+        //console.log('prev', this.prevProgress, 'act', progress);
 
         if (this.prevProgress <= progress) {
           progress += increment;
@@ -540,7 +540,12 @@ export default class RPC {
         await this.fetchWalletHeight();
         await this.fetchServerHeight();
 
-        await this.fnSetRefreshUpdates(ss.in_progress, '', (end_block + progress_blocks).toFixed(0).toString() + ' of ' + this.lastServerBlockHeight.toString());
+        let current_block = end_block + progress_blocks;
+        if (current_block > this.lastServerBlockHeight) {
+          current_block = this.lastServerBlockHeight;
+        }
+
+        await this.fnSetRefreshUpdates(ss.in_progress, '', (current_block).toFixed(0).toString() + ' of ' + this.lastServerBlockHeight.toString());
 
         // store SyncStatusReport object for a new screen
         const status: SyncStatusReport = {
@@ -548,7 +553,7 @@ export default class RPC {
           totalBatches: batch_total,
           currentBatch: ss.in_progress ? batch_num + 1 : 0,
           lastBlockWallet: this.lastWalletBlockHeight,
-          currentBlock: parseInt((end_block + progress_blocks).toFixed(0)),
+          currentBlock: parseInt((current_block).toFixed(0)),
           inProgress: ss.in_progress,
           lastError: ss.last_error,
           blocksPerBatch: 1000,
@@ -590,14 +595,14 @@ export default class RPC {
             totalBatches: 0,
             currentBatch: 0,
             lastBlockWallet: this.lastWalletBlockHeight,
-            currentBlock: this.lastWalletBlockHeight,
+            currentBlock: parseInt((current_block).toFixed(0)),
             inProgress: false,
             lastError: ss.last_error,
             blocksPerBatch: 1000,
             secondsPerBatch: 0,
             percent: 0,
             message: this.message,
-            process_end_block: this.process_end_block,
+            process_end_block: this.lastWalletBlockHeight,
             lastBlockServer: this.lastServerBlockHeight,
           };
           await this.fnSetSyncStatusReport(status);
@@ -624,7 +629,7 @@ export default class RPC {
                 totalBatches: batch_total,
                 currentBatch: ss.in_progress ? batch_num + 1 : 0,
                 lastBlockWallet: this.lastWalletBlockHeight,
-                currentBlock: parseInt((end_block + progress_blocks).toFixed(0)),
+                currentBlock: parseInt((current_block).toFixed(0)),
                 inProgress: ss.in_progress,
                 lastError: ss.last_error,
                 blocksPerBatch: 1000,
@@ -659,7 +664,7 @@ export default class RPC {
               totalBatches: batch_total,
               currentBatch: ss.in_progress ? batch_num + 1 : 0,
               lastBlockWallet: this.lastWalletBlockHeight,
-              currentBlock: parseInt((end_block + progress_blocks).toFixed(0)),
+              currentBlock: parseInt((current_block).toFixed(0)),
               inProgress: ss.in_progress,
               lastError: ss.last_error,
               blocksPerBatch: 1000,
@@ -833,14 +838,16 @@ export default class RPC {
 
     await this.fetchServerHeight();
 
-    //console.log('trans: ', listJSON);
+    console.log('trans: ', listJSON);
 
     let txlist = listJSON.map((tx: any) => {
       const type = tx.outgoing_metadata ? 'sent' : 'receive';
 
-      //console.log('tran: ', tx);
-      //console.log('meta: ', tx.outgoing_metadata);
-      //console.log('--------------------------------------------------');
+      //if (tx.txid === '55d6efcb987e8c6b8842a4c78d4adc80d8ca4761e3ff670a730e4840d8659ead') {
+        console.log('tran: ', tx);
+        //console.log('meta: ', tx.outgoing_metadata);
+        console.log('--------------------------------------------------');
+      //}
 
       var txdetail: TxDetail[] = [];
       if (tx.outgoing_metadata) {

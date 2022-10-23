@@ -67,12 +67,15 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         val saplingSpend = saplingSpendFile?.readBytes()
         saplingSpendFile?.close()
 
+        val saplingOutputEncoded = Base64.encodeToString(saplingOutput, Base64.NO_WRAP)
+        val saplingSpendEncoded = Base64.encodeToString(saplingSpend, Base64.NO_WRAP)
+
         initlogging()
 
         // Create a seed
         val seed = initnew(server,
-            Base64.encodeToString(saplingOutput, Base64.NO_WRAP),
-            Base64.encodeToString(saplingSpend, Base64.NO_WRAP),
+            saplingOutputEncoded,
+            saplingSpendEncoded,
             reactContext.applicationContext.filesDir.absolutePath)
         // Log.w("MAIN-Seed", seed)
 
@@ -95,9 +98,12 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         val saplingSpend = saplingSpendFile?.readBytes()
         saplingSpendFile?.close()
 
+        val saplingOutputEncoded = Base64.encodeToString(saplingOutput, Base64.NO_WRAP)
+        val saplingSpendEncoded = Base64.encodeToString(saplingSpend, Base64.NO_WRAP)
+
         val rseed = initfromseed(server, seed, birthday,
-            Base64.encodeToString(saplingOutput, Base64.NO_WRAP),
-            Base64.encodeToString(saplingSpend, Base64.NO_WRAP),
+            saplingOutputEncoded,
+            saplingSpendEncoded,
             reactContext.applicationContext.filesDir.absolutePath)
         // Log.w("MAIN", seed)
 
@@ -123,9 +129,12 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         val saplingSpend = saplingSpendFile?.readBytes()
         saplingSpendFile?.close()
 
+        val saplingOutputEncoded = Base64.encodeToString(saplingOutput, Base64.NO_WRAP)
+        val saplingSpendEncoded = Base64.encodeToString(saplingSpend, Base64.NO_WRAP)
+
         val seed = initfromb64(server, fileb64,
-            Base64.encodeToString(saplingOutput, Base64.NO_WRAP),
-            Base64.encodeToString(saplingSpend, Base64.NO_WRAP),
+            saplingOutputEncoded,
+            saplingSpendEncoded,
             reactContext.applicationContext.filesDir.absolutePath)
 
         // Log.w("MAIN", seed)
@@ -184,9 +193,9 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun doSend(sendJSON: String, promise: Promise) {
         // Run on a new thread so as to not block the UI
         thread {
-            // Log.w(TAG, "Trying to send $sendJSON")
+            Log.w(TAG, "Trying to send $sendJSON")
             val result = execute("send", sendJSON)
-            // Log.w(TAG,"Send Result: $result")
+            Log.w(TAG, "Send Result: $result")
 
             promise.resolve(result)
         }
@@ -195,9 +204,9 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     @ReactMethod
     fun execute(cmd: String, args: String, promise: Promise) {
         thread {
-            // Log.w(TAG, "Executing ${cmd} with ${args}")
+            Log.w(TAG, "Executing ${cmd} with ${args}")
             val resp = execute(cmd, args)
-            // Log.w(TAG, "Response to ${cmd}: ${resp}")
+            Log.w(TAG, "Response to ${cmd}: ${resp}")
 
             // And save it if it was a sync
             if (cmd == "sync" && !resp.startsWith("Error")) {
