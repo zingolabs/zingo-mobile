@@ -69,10 +69,11 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
         val saplingOutputEncoded = Base64.encodeToString(saplingOutput, Base64.NO_WRAP)
 
-        val middle: Int? = saplingOutput?.size?.div(2)
-        val first = Base64.encodeToString(saplingOutput?.sliceArray(IntRange(0, middle!!)), Base64.NO_WRAP)
-        val second = Base64.encodeToString(saplingOutput?.sliceArray(IntRange(middle!! + 1, saplingOutput.size - 1)), Base64.NO_WRAP)
-        val saplingSpendEncoded = first + second
+        val len: Int = saplingSpend?.size!!
+        val middle: Int = 24000000 // 24_000_000
+        val first = Base64.encodeToString(saplingSpend, 0, middle, Base64.NO_WRAP)
+        val second = Base64.encodeToString(saplingSpend, middle, len - middle, Base64.NO_WRAP)
+        val saplingSpendEncoded = "$first$second"
 
         initlogging()
 
@@ -104,10 +105,11 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
         val saplingOutputEncoded = Base64.encodeToString(saplingOutput, Base64.NO_WRAP)
 
-        val middle: Int? = saplingOutput?.size?.div(2)
-        val first = Base64.encodeToString(saplingOutput?.sliceArray(IntRange(0, middle!!)), Base64.NO_WRAP)
-        val second = Base64.encodeToString(saplingOutput?.sliceArray(IntRange(middle!! + 1, saplingOutput.size - 1)), Base64.NO_WRAP)
-        val saplingSpendEncoded = first + second
+        val len: Int = saplingSpend?.size!!
+        val middle: Int = 24000000 // 24_000_000
+        val first = Base64.encodeToString(saplingSpend, 0, middle, Base64.NO_WRAP)
+        val second = Base64.encodeToString(saplingSpend, middle, len - middle, Base64.NO_WRAP)
+        val saplingSpendEncoded = "$first$second"
 
         val rseed = initfromseed(server, seed, birthday,
             saplingOutputEncoded,
@@ -138,11 +140,12 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         saplingSpendFile?.close()
 
         val saplingOutputEncoded = Base64.encodeToString(saplingOutput, Base64.NO_WRAP)
-        
-        val middle: Int? = saplingOutput?.size?.div(2)
-        val first = Base64.encodeToString(saplingOutput?.sliceArray(IntRange(0, middle!!)), Base64.NO_WRAP)
-        val second = Base64.encodeToString(saplingOutput?.sliceArray(IntRange(middle!! + 1, saplingOutput.size - 1)), Base64.NO_WRAP)
-        val saplingSpendEncoded = first + second
+
+        val len: Int = saplingSpend?.size!!
+        val middle: Int = 24000000 // 24_000_000
+        val first = Base64.encodeToString(saplingSpend, 0, middle, Base64.NO_WRAP)
+        val second = Base64.encodeToString(saplingSpend, middle, len - middle, Base64.NO_WRAP)
+        val saplingSpendEncoded = "$first$second"
 
         val seed = initfromb64(server, fileb64,
             saplingOutputEncoded,
