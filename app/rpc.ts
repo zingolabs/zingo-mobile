@@ -758,11 +758,22 @@ export default class RPC {
 
     const pendingAddressBalances = new Map();
 
-    // Process sapling notes
-    if (!!pendingNotesJSON.pending_notes) {
-      pendingNotesJSON.pending_notes.forEach((s: any) => {
+    // Process orchard notes
+    if (!!pendingNotesJSON.pending_orchard_notes) {
+      pendingNotesJSON.pending_orchard_notes.forEach((s: any) => {
         pendingAddressBalances.set(s.address, s.value);
       });
+    } else {
+      console.log('ERROR: notes.pending_orchard_notes no exists')
+    }
+
+    // Process sapling notes
+    if (!!pendingNotesJSON.pending_sapling_notes) {
+      pendingNotesJSON.pending_sapling_notes.forEach((s: any) => {
+        pendingAddressBalances.set(s.address, s.value);
+      });
+    } else {
+      console.log('ERROR: notes.pending_sapling_notes no exists')
     }
 
     // Process UTXOs
@@ -770,7 +781,8 @@ export default class RPC {
       pendingNotesJSON.pending_utxos.forEach((s: any) => {
         pendingAddressBalances.set(s.address, s.value);
       });
-
+    } else {
+      console.log('ERROR: notes.pending_utxos no exists')
     }
 
     // Addresses with Balance. The lite client reports balances in zatoshi, so divide by 10^8;
@@ -838,15 +850,15 @@ export default class RPC {
 
     await this.fetchServerHeight();
 
-    console.log('trans: ', listJSON);
+    //console.log('trans: ', listJSON);
 
     let txlist = listJSON.map((tx: any) => {
       const type = tx.outgoing_metadata ? 'sent' : 'receive';
 
       //if (tx.txid === '55d6efcb987e8c6b8842a4c78d4adc80d8ca4761e3ff670a730e4840d8659ead') {
-        console.log('tran: ', tx);
+        //console.log('tran: ', tx);
         //console.log('meta: ', tx.outgoing_metadata);
-        console.log('--------------------------------------------------');
+        //console.log('--------------------------------------------------');
       //}
 
       var txdetail: TxDetail[] = [];
@@ -952,9 +964,10 @@ export default class RPC {
     // The send command is async, so we need to poll to get the status
     const sendTxPromise = new Promise<string>((resolve, reject) => {
       const intervalID = setInterval(async () => {
-        const progress = await JSON.parse(await RPCModule.execute('sendprogress', ''));
+        const pro = await RPCModule.execute('sendprogress', '');
+        const progress = await JSON.parse(pro);
         const sendId = progress.id;
-        //console.log(progress);
+        //console.log('progress', progress);
 
         const updatedProgress = new SendProgress();
         if (sendId === prevSendId) {
@@ -1124,7 +1137,7 @@ export default class RPC {
 
       //console.log('jc restore wallet', existsWallet);
       if (existsWallet && existsWallet !== 'false') {
-        await RPCModule.RestoreExistingWalletBackup();
+        await RPCModule.restoreExistingWalletBackup();
       } else {
         return `Error: Couldn't find any wallet.`;
       }

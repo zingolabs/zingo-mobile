@@ -6,7 +6,7 @@ import android.util.Base64
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
-import com.facebook.react.bridge.Promise;
+import com.facebook.react.bridge.Promise
 
 import android.util.Log
 import java.io.File
@@ -35,10 +35,10 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         val file = File(MainApplication.getAppContext()?.filesDir, "wallet.dat")
         if (file.exists()) {
             // Log.w("MAIN", "Wallet exists")
-            promise.resolve(true);
+            promise.resolve(true)
         } else {
             // Log.w("MAIN", "Wallet DOES NOT exist")
-            promise.resolve(false);
+            promise.resolve(false)
         }
     }
 
@@ -48,10 +48,10 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         val file = File(MainApplication.getAppContext()?.filesDir, "wallet.backup.dat")
         if (file.exists()) {
             // Log.w("MAIN", "Wallet backup exists")
-            promise.resolve(true);
+            promise.resolve(true)
         } else {
             // Log.w("MAIN", "Wallet backup DOES NOT exist")
-            promise.resolve(false);
+            promise.resolve(false)
         }
     }
 
@@ -68,7 +68,11 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         saplingSpendFile?.close()
 
         val saplingOutputEncoded = Base64.encodeToString(saplingOutput, Base64.NO_WRAP)
-        val saplingSpendEncoded = Base64.encodeToString(saplingSpend, Base64.NO_WRAP)
+
+        val middle: Int? = saplingOutput?.size?.div(2)
+        val first = Base64.encodeToString(saplingOutput?.sliceArray(IntRange(0, middle!!)), Base64.NO_WRAP)
+        val second = Base64.encodeToString(saplingOutput?.sliceArray(IntRange(middle!! + 1, saplingOutput.size - 1)), Base64.NO_WRAP)
+        val saplingSpendEncoded = first + second
 
         initlogging()
 
@@ -83,7 +87,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             saveWallet()
         }
 
-        promise.resolve(seed);
+        promise.resolve(seed)
     }
 
     @ReactMethod
@@ -99,7 +103,11 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         saplingSpendFile?.close()
 
         val saplingOutputEncoded = Base64.encodeToString(saplingOutput, Base64.NO_WRAP)
-        val saplingSpendEncoded = Base64.encodeToString(saplingSpend, Base64.NO_WRAP)
+
+        val middle: Int? = saplingOutput?.size?.div(2)
+        val first = Base64.encodeToString(saplingOutput?.sliceArray(IntRange(0, middle!!)), Base64.NO_WRAP)
+        val second = Base64.encodeToString(saplingOutput?.sliceArray(IntRange(middle!! + 1, saplingOutput.size - 1)), Base64.NO_WRAP)
+        val saplingSpendEncoded = first + second
 
         val rseed = initfromseed(server, seed, birthday,
             saplingOutputEncoded,
@@ -130,7 +138,11 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         saplingSpendFile?.close()
 
         val saplingOutputEncoded = Base64.encodeToString(saplingOutput, Base64.NO_WRAP)
-        val saplingSpendEncoded = Base64.encodeToString(saplingSpend, Base64.NO_WRAP)
+        
+        val middle: Int? = saplingOutput?.size?.div(2)
+        val first = Base64.encodeToString(saplingOutput?.sliceArray(IntRange(0, middle!!)), Base64.NO_WRAP)
+        val second = Base64.encodeToString(saplingOutput?.sliceArray(IntRange(middle!! + 1, saplingOutput.size - 1)), Base64.NO_WRAP)
+        val saplingSpendEncoded = first + second
 
         val seed = initfromb64(server, fileb64,
             saplingOutputEncoded,
@@ -146,7 +158,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun RestoreExistingWalletBackup(promise: Promise) {
+    fun restoreExistingWalletBackup(promise: Promise) {
         // Read the file backup
         val fileBackup = MainApplication.getAppContext()!!.openFileInput("wallet.backup.dat")
         val fileBytesBackup = fileBackup.readBytes()
@@ -204,9 +216,9 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     @ReactMethod
     fun execute(cmd: String, args: String, promise: Promise) {
         thread {
-            Log.w(TAG, "Executing ${cmd} with ${args}")
+            Log.w(TAG, "Executing $cmd with $args")
             val resp = execute(cmd, args)
-            Log.w(TAG, "Response to ${cmd}: ${resp}")
+            Log.w(TAG, "Response to $cmd : $resp")
 
             // And save it if it was a sync
             if (cmd == "sync" && !resp.startsWith("Error")) {
@@ -219,19 +231,19 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun doSave(promise: Promise) {
-        saveWallet();
+        saveWallet()
 
-        promise.resolve(true);
+        promise.resolve(true)
     }
 
     @ReactMethod
     fun doSaveBackup(promise: Promise) {
-        saveWalletBackup();
+        saveWalletBackup()
 
-        promise.resolve(true);
+        promise.resolve(true)
     }
 
-    fun saveWallet() {
+    private fun saveWallet() {
         // Get the encoded wallet file
         val b64encoded = save()
         // Log.w("MAIN", b64encoded)
@@ -249,7 +261,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
-    fun saveWalletBackup() {
+    private fun saveWalletBackup() {
         // Get the encoded wallet file
         // val b64encoded = save()
         // Read the file

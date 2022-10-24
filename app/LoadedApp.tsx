@@ -124,7 +124,7 @@ const ComputingTxModalContent: React.FunctionComponent<ComputingModalProps> = ({
         <>
           <RegText>{`Step ${progress.progress} of ${progress.total}`}</RegText>
           <RegText style={{marginBottom: 20}}>{`ETA ${progress.etaSeconds}s`}</RegText>
-          <Progress.Circle
+          <Progress.CircleSnail
             showsText={true}
             progress={progress.progress / progress.total}
             indeterminate={!progress.progress}

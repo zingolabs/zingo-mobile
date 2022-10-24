@@ -673,9 +673,9 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
                       multiline
                       style={{
                         flexGrow: 1,
-                        borderBottomColor:
-                        colors.card,
-                        borderBottomWidth: 2
+                        borderWidth: 1,
+                        borderRadius: 5,
+                        borderColor: colors.text,
                       }}
                       value={ta.memo}
                       onChangeText={(text: string) => updateToField(i, null, null, null, text)}
