@@ -141,11 +141,24 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
         val saplingOutputEncoded = Base64.encodeToString(saplingOutput, Base64.NO_WRAP)
 
-        val len: Int = saplingSpend?.size!!
-        val middle: Int = 24000000 // 24_000_000
-        val first = Base64.encodeToString(saplingSpend, 0, middle, Base64.NO_WRAP)
-        val second = Base64.encodeToString(saplingSpend, middle, len - middle, Base64.NO_WRAP)
-        val saplingSpendEncoded = "$first$second"
+        val middle0: Int =        0
+        val middle1: Int =  6000000 // 6_000_000 - 8 pieces
+        val middle2: Int = 12000000
+        val middle3: Int = 18000000
+        val middle4: Int = 24000000
+        val middle5: Int = 30000000
+        val middle6: Int = 36000000
+        val middle7: Int = 42000000
+        val middle8: Int = saplingSpend?.size!!
+        val part_1 = Base64.encodeToString(saplingSpend, middle0, middle1 - middle0, Base64.NO_WRAP)
+        val part_2 = Base64.encodeToString(saplingSpend, middle1, middle2 - middle1, Base64.NO_WRAP)
+        val part_3 = Base64.encodeToString(saplingSpend, middle2, middle3 - middle2, Base64.NO_WRAP)
+        val part_4 = Base64.encodeToString(saplingSpend, middle3, middle4 - middle3, Base64.NO_WRAP)
+        val part_5 = Base64.encodeToString(saplingSpend, middle4, middle5 - middle4, Base64.NO_WRAP)
+        val part_6 = Base64.encodeToString(saplingSpend, middle5, middle6 - middle5, Base64.NO_WRAP)
+        val part_7 = Base64.encodeToString(saplingSpend, middle6, middle7 - middle6, Base64.NO_WRAP)
+        val part_8 = Base64.encodeToString(saplingSpend, middle7, middle8 - middle7, Base64.NO_WRAP)
+        val saplingSpendEncoded = "$part_1$part_2$part_3$part_4$part_5$part_6$part_7$part_8"
 
         val seed = initfromb64(server, fileb64,
             saplingOutputEncoded,
