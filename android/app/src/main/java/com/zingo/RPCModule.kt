@@ -8,15 +8,15 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.Promise
 
-import android.util.Log
+//import android.util.Log
 import java.io.File
 import kotlin.concurrent.thread
 
 
 class RPCModule internal constructor(private val reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
-    companion object {
-        const val TAG = "RPCModule"
-    }
+    //companion object {
+    //    const val TAG = "RPCModule"
+    //}
 
     private external fun initlogging(): String
     private external fun execute(cmd: String, args: String): String
@@ -70,10 +70,14 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         val saplingOutputEncoded = Base64.encodeToString(saplingOutput, Base64.NO_WRAP)
 
         val len: Int = saplingSpend?.size!!
-        val middle: Int = 24000000 // 24_000_000
-        val first = Base64.encodeToString(saplingSpend, 0, middle, Base64.NO_WRAP)
-        val second = Base64.encodeToString(saplingSpend, middle, len - middle, Base64.NO_WRAP)
-        val saplingSpendEncoded = "$first$second"
+        val middle = 24000000 // 24_000_000
+        var saplingSpendEncoded = Base64.encodeToString(saplingSpend, 0, middle, Base64.NO_WRAP)
+        saplingSpendEncoded += Base64.encodeToString(
+            saplingSpend,
+            middle,
+            len - middle,
+            Base64.NO_WRAP
+        )
 
         initlogging()
 
@@ -106,10 +110,14 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         val saplingOutputEncoded = Base64.encodeToString(saplingOutput, Base64.NO_WRAP)
 
         val len: Int = saplingSpend?.size!!
-        val middle: Int = 24000000 // 24_000_000
-        val first = Base64.encodeToString(saplingSpend, 0, middle, Base64.NO_WRAP)
-        val second = Base64.encodeToString(saplingSpend, middle, len - middle, Base64.NO_WRAP)
-        val saplingSpendEncoded = "$first$second"
+        val middle = 24000000 // 24_000_000
+        var saplingSpendEncoded = Base64.encodeToString(saplingSpend, 0, middle, Base64.NO_WRAP)
+        saplingSpendEncoded += Base64.encodeToString(
+            saplingSpend,
+            middle,
+            len - middle,
+            Base64.NO_WRAP
+        )
 
         val rseed = initfromseed(server, seed, birthday,
             saplingOutputEncoded,
@@ -126,39 +134,79 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun loadExistingWallet(server: String, promise: Promise) {
-        // Read the file
-        val file = MainApplication.getAppContext()!!.openFileInput("wallet.dat")
-        val fileBytes = file.readBytes()
-        val fileb64 = Base64.encodeToString(fileBytes, Base64.NO_WRAP)
+        val saplingSpendFile = MainApplication.getAppContext()?.resources?.openRawResource(R.raw.saplingspend)
+        val saplingSpend = saplingSpendFile?.readBytes()!!
+        saplingSpendFile.close()
+
+        val middle0 =        0
+        val middle1 =  6000000 // 6_000_000 - 8 pieces
+        val middle2 = 12000000
+        val middle3 = 18000000
+        val middle4 = 24000000
+        val middle5 = 30000000
+        val middle6 = 36000000
+        val middle7 = 42000000
+        val middle8: Int = saplingSpend.size
+        var saplingSpendEncoded = Base64.encodeToString(saplingSpend, middle0, middle1 - middle0, Base64.NO_WRAP)
+        saplingSpendEncoded += Base64.encodeToString(
+            saplingSpend,
+            middle1,
+            middle2 - middle1,
+            Base64.NO_WRAP
+        )
+        saplingSpendEncoded += Base64.encodeToString(
+            saplingSpend,
+            middle2,
+            middle3 - middle2,
+            Base64.NO_WRAP
+        )
+        saplingSpendEncoded += Base64.encodeToString(
+            saplingSpend,
+            middle3,
+            middle4 - middle3,
+            Base64.NO_WRAP
+        )
+        saplingSpendEncoded += Base64.encodeToString(
+            saplingSpend,
+            middle4,
+            middle5 - middle4,
+            Base64.NO_WRAP
+        )
+        saplingSpendEncoded += Base64.encodeToString(
+            saplingSpend,
+            middle5,
+            middle6 - middle5,
+            Base64.NO_WRAP
+        )
+        saplingSpendEncoded += Base64.encodeToString(
+            saplingSpend,
+            middle6,
+            middle7 - middle6,
+            Base64.NO_WRAP
+        )
+        saplingSpendEncoded += Base64.encodeToString(
+            saplingSpend,
+            middle7,
+            middle8 - middle7,
+            Base64.NO_WRAP
+        )
 
         val saplingOutputFile = MainApplication.getAppContext()?.resources?.openRawResource(R.raw.saplingoutput)
         val saplingOutput = saplingOutputFile?.readBytes()
         saplingOutputFile?.close()
 
-        val saplingSpendFile = MainApplication.getAppContext()?.resources?.openRawResource(R.raw.saplingspend)
-        val saplingSpend = saplingSpendFile?.readBytes()
-        saplingSpendFile?.close()
-
         val saplingOutputEncoded = Base64.encodeToString(saplingOutput, Base64.NO_WRAP)
 
-        val middle0: Int =        0
-        val middle1: Int =  6000000 // 6_000_000 - 8 pieces
-        val middle2: Int = 12000000
-        val middle3: Int = 18000000
-        val middle4: Int = 24000000
-        val middle5: Int = 30000000
-        val middle6: Int = 36000000
-        val middle7: Int = 42000000
-        val middle8: Int = saplingSpend?.size!!
-        val part_1 = Base64.encodeToString(saplingSpend, middle0, middle1 - middle0, Base64.NO_WRAP)
-        val part_2 = Base64.encodeToString(saplingSpend, middle1, middle2 - middle1, Base64.NO_WRAP)
-        val part_3 = Base64.encodeToString(saplingSpend, middle2, middle3 - middle2, Base64.NO_WRAP)
-        val part_4 = Base64.encodeToString(saplingSpend, middle3, middle4 - middle3, Base64.NO_WRAP)
-        val part_5 = Base64.encodeToString(saplingSpend, middle4, middle5 - middle4, Base64.NO_WRAP)
-        val part_6 = Base64.encodeToString(saplingSpend, middle5, middle6 - middle5, Base64.NO_WRAP)
-        val part_7 = Base64.encodeToString(saplingSpend, middle6, middle7 - middle6, Base64.NO_WRAP)
-        val part_8 = Base64.encodeToString(saplingSpend, middle7, middle8 - middle7, Base64.NO_WRAP)
-        val saplingSpendEncoded = "$part_1$part_2$part_3$part_4$part_5$part_6$part_7$part_8"
+        // Read the file
+        val file = MainApplication.getAppContext()?.openFileInput("wallet.dat")
+        val fileBytes = file?.readBytes()!!
+        file.close()
+
+        val middle0w =        0
+        val middle1w =  3000000 // 3_000_000 - 2 pieces
+        val middle2w: Int = fileBytes.size
+        var fileb64 = Base64.encodeToString(fileBytes, middle0w, middle1w - middle0w, Base64.NO_WRAP)
+        fileb64 += Base64.encodeToString(fileBytes, middle1w, middle2w - middle1w, Base64.NO_WRAP)
 
         val seed = initfromb64(server, fileb64,
             saplingOutputEncoded,
@@ -167,8 +215,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
         // Log.w("MAIN", seed)
         initlogging()
-
-        file.close()
 
         promise.resolve(seed)
     }
@@ -221,9 +267,9 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun doSend(sendJSON: String, promise: Promise) {
         // Run on a new thread so as to not block the UI
         thread {
-            Log.w(TAG, "Trying to send $sendJSON")
+            //Log.w(TAG, "Trying to send $sendJSON")
             val result = execute("send", sendJSON)
-            Log.w(TAG, "Send Result: $result")
+            //Log.w(TAG, "Send Result: $result")
 
             promise.resolve(result)
         }
@@ -232,9 +278,9 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     @ReactMethod
     fun execute(cmd: String, args: String, promise: Promise) {
         thread {
-            Log.w(TAG, "Executing $cmd with $args")
+            //Log.w(TAG, "Executing $cmd with $args")
             val resp = execute(cmd, args)
-            Log.w(TAG, "Response to $cmd : $resp")
+            //Log.w(TAG, "Response to $cmd : $resp")
 
             // And save it if it was a sync
             if (cmd == "sync" && !resp.startsWith("Error")) {

@@ -411,6 +411,9 @@ export default class RPC {
       return;
     }
 
+    // And fetch the rest of the data.
+    await this.loadWalletData();
+
     await this.fetchWalletHeight();
     await this.fetchServerHeight();
     if (!this.lastServerBlockHeight) {
@@ -446,28 +449,15 @@ export default class RPC {
           });
       }
 
-      // if it's a rescan we need to save first the wallet
-      if (fullRescan) {
-        // And fetch the rest of the data.
-        await this.loadWalletData();
-
-        await this.fetchWalletHeight();
-        await this.fetchServerHeight();
-
-        await RPCModule.doSave();
-      }
-
       // We need to wait for the sync to finish. The sync is done when
       let pollerID = setInterval(async () => {
         const s = await this.doSyncStatus();
         const ss = await JSON.parse(s);
 
-        console.log('sync status', ss);
+        //console.log('sync status', ss);
 
-        // if in_progress is false change the value in the class
-        if (!ss.in_progress) {
-          this.inRefresh = false;
-        }
+        // syncronize status
+        this.inRefresh = ss.in_progress;
 
         // if the sync_id change then reset the %
         if (this.prev_sync_id !== ss.sync_id) {
@@ -480,7 +470,8 @@ export default class RPC {
 
             await RPCModule.doSave();
 
-            console.log(`new sync process id: ${ss.sync_id}.`);
+            console.log('sync status', ss);
+            console.log(`new sync process id: ${ss.sync_id}. Save the wallet.`);
             this.prevProgress = 0;
             this.prevBatchNum = -1;
             this.seconds_batch = 0;
@@ -522,8 +513,6 @@ export default class RPC {
         // not using a fake increment. But could be a good idea.
         const increment: number = 0;
 
-        //console.log('prev', this.prevProgress, 'act', progress);
-
         if (this.prevProgress <= progress) {
           progress += increment;
         } else if (this.prevProgress > progress) {
@@ -535,17 +524,17 @@ export default class RPC {
         if (progress < 0) progress = 0;
 
         // And fetch the rest of the data.
-        await this.loadWalletData();
+        //await this.loadWalletData();
 
-        await this.fetchWalletHeight();
-        await this.fetchServerHeight();
+        //await this.fetchWalletHeight();
+        //await this.fetchServerHeight();
 
         let current_block = end_block + progress_blocks;
         if (current_block > this.lastServerBlockHeight) {
           current_block = this.lastServerBlockHeight;
         }
 
-        await this.fnSetRefreshUpdates(ss.in_progress, '', (current_block).toFixed(0).toString() + ' of ' + this.lastServerBlockHeight.toString());
+        this.fnSetRefreshUpdates(ss.in_progress, '', (current_block).toFixed(0).toString() + ' of ' + this.lastServerBlockHeight.toString());
 
         // store SyncStatusReport object for a new screen
         const status: SyncStatusReport = {
@@ -563,7 +552,7 @@ export default class RPC {
           process_end_block: this.process_end_block,
           lastBlockServer: this.lastServerBlockHeight,
         };
-        await this.fnSetSyncStatusReport(status);
+        this.fnSetSyncStatusReport(status);
 
         this.prevProgress = progress;
 
@@ -587,7 +576,7 @@ export default class RPC {
           this.message = 'The sync process finished successfully.';
 
           // I know it's finished.
-          await this.fnSetRefreshUpdates(false, '', '');
+          this.fnSetRefreshUpdates(false, '', '');
 
           // store SyncStatusReport object for a new screen
           const status: SyncStatusReport = {
@@ -605,14 +594,15 @@ export default class RPC {
             process_end_block: this.lastWalletBlockHeight,
             lastBlockServer: this.lastServerBlockHeight,
           };
-          await this.fnSetSyncStatusReport(status);
+          this.fnSetSyncStatusReport(status);
 
+          console.log('sync status', ss);
           console.log(`Finished refresh at ${this.lastWalletBlockHeight} id: ${ss.sync_id}`);
         } else {
           // If we're doing a long sync, every time the batch_num changes, save the wallet
           if (this.prevBatchNum !== batch_num) {
             // if finished batches really fast, the App have to save the wallet delayed.
-            if (this.prevBatchNum !== -1 && (this.batches > 10 || this.seconds_batch > 10)) {
+            if (this.prevBatchNum !== -1 && this.batches > 10) {
               // And fetch the rest of the data.
               await this.loadWalletData();
 
@@ -639,9 +629,10 @@ export default class RPC {
                 process_end_block: this.process_end_block,
                 lastBlockServer: this.lastServerBlockHeight,
               };
-              await this.fnSetSyncStatusReport(status);
+              this.fnSetSyncStatusReport(status);
 
-              console.log(`Saving because batch num changed ${this.prevBatchNum + 1} - ${batch_num + 1}. seconds: ${this.seconds_batch}`);
+              console.log('sync status', ss);
+              console.log(`Saving because batch num changed ${this.prevBatchNum} - ${batch_num}. seconds: ${this.seconds_batch}`);
             }
             this.prevBatchNum = batch_num;
             this.seconds_batch = 0;
@@ -674,8 +665,9 @@ export default class RPC {
               process_end_block: this.process_end_block,
               lastBlockServer: this.lastServerBlockHeight,
             };
-            await this.fnSetSyncStatusReport(status);
+            this.fnSetSyncStatusReport(status);
 
+            console.log('sync status', ss);
             console.log(`Saving wallet. seconds: ${this.seconds_batch}`);
           }
         }
