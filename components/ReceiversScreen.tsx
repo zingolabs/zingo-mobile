@@ -21,20 +21,28 @@ import ImportKeyModal from './ImportKey';
 
 type SingleAddress = {
   address: string;
+  addressKind: string;
   index: number;
   total: number;
   prev: () => void;
   next: () => void;
 };
 
-const SingleAddressDisplay: React.FunctionComponent<SingleAddress> = ({ address, index, total, prev, next }) => {
+const SingleAddressDisplay: React.FunctionComponent<SingleAddress> = ({
+  address,
+  addressKind,
+  index,
+  total,
+  prev,
+  next,
+}) => {
   // console.log(`Addresses ${addresses}: ${multipleAddresses}`);
   const { colors } = useTheme();
 
   const multi = total > 1;
 
   // 30 characters per line
-  const numLines = Utils.isTransparent(address) ? 2 : address.length / 30;
+  const numLines = addressKind === 't' ? 2 : address.length / 30;
   const chunks = Utils.splitStringIntoChunks(address, numLines.toFixed(0));
   const fixedWidthFont = Platform.OS === 'android' ? 'monospace' : 'Courier';
 
@@ -186,12 +194,15 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
     switch (route.key) {
       case 'zaddr': {
         let zaddr = 'No Address';
+        let zaddrKind = '';
         if (zaddrs.length > 0) {
           zaddr = zaddrs[zindex].address;
+          zaddrKind = zaddrs[zindex].addressKind;
         }
         return (
           <SingleAddressDisplay
             address={zaddr}
+            addressKind={zaddrKind}
             index={zindex}
             total={zaddrs.length}
             prev={() => {
@@ -205,13 +216,15 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
       }
       case 'taddr': {
         let taddr = 'No Address';
+        let taddrKind = '';
         if (taddrs.length > 0) {
           taddr = taddrs[tindex].address;
+          taddrKind = zaddrs[zindex].addressKind;
         }
-
         return (
           <SingleAddressDisplay
             address={taddr}
+            addressKind={taddrKind}
             index={tindex}
             total={taddrs.length}
             prev={() => {

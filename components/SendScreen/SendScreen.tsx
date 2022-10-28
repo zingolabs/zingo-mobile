@@ -1,200 +1,24 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useRef } from 'react';
-import QRCodeScanner from 'react-native-qrcode-scanner';
-import { View, ScrollView, Modal, Image, Alert, SafeAreaView, Keyboard } from 'react-native';
-import { FadeText, BoldText, ErrorText, RegTextInput, RegText, ZecAmount, UsdAmount } from '../components/Components';
-import Button from './Button';
-import { Info, SendPageState, SendProgress, ToAddr, TotalBalance } from '../app/AppState';
+import { View, ScrollView, Modal, Image, Alert, Keyboard } from 'react-native';
+import { FadeText, ErrorText, RegTextInput, RegText, ZecAmount, UsdAmount } from '../Components';
+import Button from '../Button';
+import { Info, SendPageState, SendProgress, ToAddr, TotalBalance } from '../../app/AppState';
 import { faQrcode, faCheck, faInfo } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme } from '@react-navigation/native';
 import { NavigationScreenProp } from 'react-navigation';
-import Utils from '../app/utils';
+import Utils from '../../app/utils';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import Toast from 'react-native-simple-toast';
 import { getNumberFormatSettings } from 'react-native-localize';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
 import Animated, { EasingNode } from 'react-native-reanimated';
-import { parseZcashURI } from '../app/uris';
-import RPCModule from '../components/RPCModule';
+import { parseZcashURI } from '../../app/uris';
+import RPCModule from '../RPCModule';
 
-type ScannerProps = {
-  idx: number;
-  updateToField: (
-    idx: number,
-    address: string | null,
-    amount: string | null,
-    amountUSD: string | null,
-    memo: string | null,
-  ) => void;
-  closeModal: () => void;
-};
-function ScanScreen({ idx, updateToField, closeModal }: ScannerProps) {
-  const [error, setError] = useState<String | null>(null);
-
-  const validateAddress = async (scannedAddress: string) => {
-    const result = await RPCModule.execute('parse', scannedAddress);
-    const resultJSON = await JSON.parse(result);
-
-    //console.log('parse-1', scannedAddress, resultJSON);
-
-    const valid = resultJSON?.status === 'success';
-
-    if (valid) {
-      updateToField(idx, scannedAddress, null, null, null);
-      closeModal();
-    } else {
-      // Try to parse as a URI
-      if (scannedAddress.startsWith('zcash:')) {
-        const targets = parseZcashURI(scannedAddress);
-
-        if (Array.isArray(targets)) {
-          updateToField(idx, scannedAddress, null, null, null);
-          closeModal();
-        } else {
-          setError(`URI Error: ${targets}`);
-        }
-      } else {
-        setError(`"${scannedAddress}" is not a valid Zcash Address`);
-      }
-    }
-  };
-
-  const onRead = (e: any) => {
-    const scandata = e.data.trim();
-    let scannedAddress = scandata;
-
-    validateAddress(scannedAddress);
-  };
-
-  const doCancel = () => {
-    closeModal();
-  };
-
-  const { colors } = useTheme();
-  return (
-    <QRCodeScanner
-      onRead={onRead}
-      reactivate={true}
-      containerStyle={{ backgroundColor: colors.background }}
-      topContent={<RegText>Scan a Zcash Address</RegText>}
-      bottomContent={
-        <View
-          style={{
-            flex: 1,
-            flexDirection: 'column',
-            alignItems: 'stretch',
-            justifyContent: 'center',
-            width: '100%',
-          }}>
-          {error && <RegText style={{ textAlign: 'center' }}>{error}</RegText>}
-          <View style={{ flexDirection: 'row', alignItems: 'stretch', justifyContent: 'space-evenly' }}>
-            <Button type="Secondary" title="Cancel" onPress={doCancel} />
-          </View>
-        </View>
-      }
-    />
-  );
-}
-
-type ConfirmModalProps = {
-  sendPageState: SendPageState;
-  defaultFee: number;
-  price?: number | null;
-  closeModal: () => void;
-  confirmSend: () => void;
-  currencyName: string;
-};
-const ConfirmModalContent: React.FunctionComponent<ConfirmModalProps> = ({
-  closeModal,
-  confirmSend,
-  sendPageState,
-  price,
-  defaultFee,
-  currencyName,
-}) => {
-  const { colors } = useTheme();
-
-  const sendingTotal =
-    sendPageState.toaddrs.reduce((s, t) => s + Utils.parseLocaleFloat(t.amount || '0'), 0.0) + defaultFee;
-
-  return (
-    <SafeAreaView
-      style={{
-        display: 'flex',
-        justifyContent: 'flex-start',
-        alignItems: 'stretch',
-        height: '100%',
-        backgroundColor: colors.background,
-      }}>
-      <ScrollView contentContainerStyle={{ display: 'flex', justifyContent: 'flex-start' }}>
-        <View style={{ display: 'flex', alignItems: 'center', padding: 10, backgroundColor: colors.card }}>
-          <BoldText style={{ textAlign: 'center', margin: 10 }}>Confirm Transaction</BoldText>
-        </View>
-
-        <View
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            margin: 25,
-            padding: 10,
-            borderWidth: 1,
-            borderRadius: 10,
-            borderColor: colors.border,
-          }}>
-          <BoldText style={{ textAlign: 'center' }}>Sending</BoldText>
-
-          <ZecAmount currencyName={currencyName} amtZec={sendingTotal} />
-          <UsdAmount amtZec={sendingTotal} price={price} />
-        </View>
-        {sendPageState.toaddrs.map(to => {
-          return (
-            <View key={to.id} style={{ margin: 10 }}>
-              <FadeText>To</FadeText>
-              <RegText>{Utils.splitStringIntoChunks(to.to, 8).join(' ')}</RegText>
-
-              <FadeText style={{ marginTop: 10 }}>Amount</FadeText>
-              <View
-                style={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'baseline',
-                  marginTop: 5,
-                }}>
-                <ZecAmount currencyName={currencyName} size={18} amtZec={Utils.parseLocaleFloat(to.amount)} />
-                <UsdAmount style={{ fontSize: 18 }} amtZec={Utils.parseLocaleFloat(to.amount)} price={price} />
-              </View>
-              <RegText>{to.memo || ''}</RegText>
-            </View>
-          );
-        })}
-
-        <View style={{ margin: 10 }}>
-          <FadeText>Fee</FadeText>
-          <View
-            style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
-            <ZecAmount currencyName={currencyName} size={18} amtZec={defaultFee} />
-            <UsdAmount style={{ fontSize: 18 }} amtZec={defaultFee} price={price} />
-          </View>
-        </View>
-      </ScrollView>
-
-      <View
-        style={{
-          flexGrow: 1,
-          display: 'flex',
-          alignItems: 'center',
-          marginTop: 10,
-        }}>
-        <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
-          <Button type="Primary" title={'Confirm'} onPress={confirmSend} />
-          <Button type="Secondary" style={{ marginLeft: 20 }} title={'Cancel'} onPress={closeModal} />
-        </View>
-      </View>
-    </SafeAreaView>
-  );
-};
+import ScannerScreen from './components/ScannerScreen';
+import ConfirmModal from './components/ConfirmModal';
 
 type SendScreenProps = {
   info: Info | null;
@@ -472,7 +296,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
         transparent={false}
         visible={qrcodeModalVisble}
         onRequestClose={() => setQrcodeModalVisible(false)}>
-        <ScanScreen
+        <ScannerScreen
           idx={qrcodeModalIndex}
           updateToField={updateToField}
           closeModal={() => setQrcodeModalVisible(false)}
@@ -484,7 +308,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
         transparent={false}
         visible={confirmModalVisible}
         onRequestClose={() => setConfirmModalVisible(false)}>
-        <ConfirmModalContent
+        <ConfirmModal
           sendPageState={sendPageState}
           defaultFee={defaultFee}
           price={info?.zecPrice}
@@ -526,7 +350,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
                 paddingTop: 10,
               }}>
               <Image
-                source={require('../assets/img/logobig-zingo.png')}
+                source={require('../../assets/img/logobig-zingo.png')}
                 style={{ width: 80, height: 80, resizeMode: 'contain' }}
               />
               <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} />
