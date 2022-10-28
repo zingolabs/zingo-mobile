@@ -1,19 +1,19 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useState} from 'react';
-import {View, ScrollView, SafeAreaView, Image, Text, TouchableOpacity, Modal} from 'react-native';
-import {FadeText, RegText, RegTextInput, ZecAmount, UsdAmount} from './Components';
+import React, { useState } from 'react';
+import { View, ScrollView, SafeAreaView, Image, TouchableOpacity, Modal } from 'react-native';
+import { FadeText, RegText, RegTextInput, ZecAmount } from './Components';
 import Button from './Button';
-import {useTheme} from '@react-navigation/native';
+import { useTheme } from '@react-navigation/native';
 import cstyles from './CommonStyles';
-import {faQrcode, faCheck, faInfo} from '@fortawesome/free-solid-svg-icons';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
+import { faQrcode } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 
 type ScannerProps = {
   setPrivKeyText: (k: string) => void;
   closeModal: () => void;
 };
-function ScanScreen({setPrivKeyText, closeModal}: ScannerProps) {
+function ScanScreen({ setPrivKeyText, closeModal }: ScannerProps) {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [error, setError] = useState<String | null>(null);
 
@@ -32,12 +32,12 @@ function ScanScreen({setPrivKeyText, closeModal}: ScannerProps) {
     closeModal();
   };
 
-  const {colors} = useTheme();
+  const { colors } = useTheme();
   return (
     <QRCodeScanner
       onRead={onRead}
       reactivate={true}
-      containerStyle={{backgroundColor: colors.background}}
+      containerStyle={{ backgroundColor: colors.background }}
       topContent={<RegText>Scan a Private/Spending or Full Viewing/Viewing Key</RegText>}
       bottomContent={
         <View
@@ -48,9 +48,9 @@ function ScanScreen({setPrivKeyText, closeModal}: ScannerProps) {
             justifyContent: 'center',
             width: '100%',
           }}>
-          {error && <RegText style={{textAlign: 'center'}}>{error}</RegText>}
-          <View style={{flexDirection: 'row', alignItems: 'stretch', justifyContent: 'space-evenly'}}>
-            <Button type='Secondary' title="Cancel" onPress={doCancel} />
+          {error && <RegText style={{ textAlign: 'center' }}>{error}</RegText>}
+          <View style={{ flexDirection: 'row', alignItems: 'stretch', justifyContent: 'space-evenly' }}>
+            <Button type="Secondary" title="Cancel" onPress={doCancel} />
           </View>
         </View>
       }
@@ -64,8 +64,13 @@ type ImportKeyModalProps = {
   totalBalance: object;
   currencyName: string;
 };
-const ImportKeyModal: React.FunctionComponent<ImportKeyModalProps> = ({closeModal, doImport, totalBalance, currencyName}) => {
-  const {colors} = useTheme();
+const ImportKeyModal: React.FunctionComponent<ImportKeyModalProps> = ({
+  closeModal,
+  doImport,
+  totalBalance,
+  currencyName,
+}) => {
+  const { colors } = useTheme();
 
   const [privKeyText, setPrivKeyText] = useState('');
   const [birthday, setBirthday] = useState('0');
@@ -86,11 +91,23 @@ const ImportKeyModal: React.FunctionComponent<ImportKeyModalProps> = ({closeModa
         backgroundColor: colors.background,
       }}>
       <View
-        style={{display: 'flex', alignItems: 'center', paddingBottom: 10, backgroundColor: colors.card, zIndex: -1, paddingTop: 10}}>
-        <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 80, height: 80, resizeMode: 'contain'}} />
-        <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{opacity: 0.4}} />
-        <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>Import Key</RegText>
-        <View style={{ width: '100%', height: 1, backgroundColor: colors.primary}}></View>
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          paddingBottom: 10,
+          backgroundColor: colors.card,
+          zIndex: -1,
+          paddingTop: 10,
+        }}>
+        <Image
+          source={require('../assets/img/logobig-zingo.png')}
+          style={{ width: 80, height: 80, resizeMode: 'contain' }}
+        />
+        <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{ opacity: 0.4 }} />
+        <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
+          Import Key
+        </RegText>
+        <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
       </View>
 
       <Modal
@@ -102,14 +119,14 @@ const ImportKeyModal: React.FunctionComponent<ImportKeyModalProps> = ({closeModa
       </Modal>
 
       <ScrollView
-        style={{maxHeight: '85%'}}
+        style={{ maxHeight: '85%' }}
         contentContainerStyle={{
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'flex-start',
         }}
         keyboardShouldPersistTaps="handled">
-        <RegText style={{margin: 10}}>Private/Spending or Full Viewing/Viewing key</RegText>
+        <RegText style={{ margin: 10 }}>Private/Spending or Full Viewing/Viewing key</RegText>
 
         <RegTextInput
           multiline
@@ -121,7 +138,7 @@ const ImportKeyModal: React.FunctionComponent<ImportKeyModalProps> = ({closeModa
             borderRadius: 10,
             borderColor: colors.border,
             minHeight: 100,
-            color: colors.text
+            color: colors.text,
           }}
           value={privKeyText}
           onChangeText={setPrivKeyText}
@@ -131,7 +148,7 @@ const ImportKeyModal: React.FunctionComponent<ImportKeyModalProps> = ({closeModa
           onPress={() => {
             setQrcodeModalVisible(true);
           }}>
-          <FontAwesomeIcon style={{margin: 5}} size={50} icon={faQrcode} color={colors.border} />
+          <FontAwesomeIcon style={{ margin: 5 }} size={50} icon={faQrcode} color={colors.border} />
           {/*<Image
             source={require('../assets/img/qr-code-scan.png')}
             style={{width: 50, height: 50, marginTop: 15, resizeMode: 'contain'}}
@@ -149,22 +166,21 @@ const ImportKeyModal: React.FunctionComponent<ImportKeyModalProps> = ({closeModa
             borderRadius: 5,
             borderColor: colors.border,
             margin: 10,
-            color: colors.text
+            color: colors.text,
           }}
           value={birthday}
           keyboardType="numeric"
           onChangeText={setBirthday}
         />
 
-        <RegText style={{margin: 20}}>
+        <RegText style={{ margin: 20 }}>
           Importing a key requires a rescan, and make take a long time to complete. Your balances will update
           automatically.
         </RegText>
       </ScrollView>
-      <View
-        style={{flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', margin: 20}}>
-        <Button type="Primary" title='Import' onPress={okButton} />
-        <Button type="Secondary" title="Close" style={{marginLeft: 10}} onPress={closeModal} />
+      <View style={{ flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', margin: 20 }}>
+        <Button type="Primary" title="Import" onPress={okButton} />
+        <Button type="Secondary" title="Close" style={{ marginLeft: 10 }} onPress={closeModal} />
       </View>
     </SafeAreaView>
   );

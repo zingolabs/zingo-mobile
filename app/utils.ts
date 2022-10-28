@@ -8,41 +8,6 @@ type ZecAmountSplitType = {
 };
 
 export default class Utils {
-  static isSapling(addr: string): boolean {
-    if (!addr) {
-      return false;
-    }
-    return new RegExp('^z[a-z0-9]{77}$').test(addr) || new RegExp('^ztestsapling[a-z0-9]{76}$').test(addr);
-  }
-
-  static isSprout(addr: string): boolean {
-    if (!addr) {
-      return false;
-    }
-    return new RegExp('^z[a-zA-Z0-9]{94}$').test(addr);
-  }
-
-  static isZaddr(addr: string): boolean {
-    if (!addr) {
-      return false;
-    }
-    return Utils.isSapling(addr) || Utils.isSprout(addr);
-  }
-
-  static isTransparent(addr: string): boolean {
-    if (!addr) {
-      return false;
-    }
-    return new RegExp('^t[a-zA-Z0-9]{34}$').test(addr);
-  }
-
-  static isOrchard(addr: string): boolean {
-    if (!addr) {
-      return false;
-    }
-    return new RegExp('^u[a-z0-9]{105}$').test(addr) || new RegExp('^utest[a-z0-9]{105}$').test(addr) ;
-  }
-
   static trimToSmall(addr?: string, numChars?: number): string | undefined {
     const trimSize = numChars || 5;
     if (!addr) {
@@ -132,7 +97,7 @@ export default class Utils {
   }
 
   static getDonationAddress(chain_name: boolean): string {
-    if (chain_name !== "main") {
+    if (chain_name !== 'main') {
       return 'ztestsapling...';
     } else {
       return 'z...';

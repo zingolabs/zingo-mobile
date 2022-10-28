@@ -12,20 +12,23 @@ import SettingsModal from '../components/SettingsModal';
 configure({ adapter: new Adapter() });
 
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
-    FontAwesomeIcon: ''
+  FontAwesomeIcon: '',
 }));
-jest.useFakeTimers()
+jest.useFakeTimers();
 
 // test suite
-describe("Component SettingsModal - test", () => {
+describe('Component SettingsModal - test', () => {
   //unit test
-  test("SettingsModal - Toggle onPress is working", () => {
+  test('SettingsModal - Toggle onPress is working', () => {
     const onPress = jest.fn();
-    const settingsModal = shallow(<SettingsModal closeModal={() => {}} wallet_settings={{}} set_wallet_option={onPress} />);
+    const settingsModal = shallow(
+      <SettingsModal closeModal={() => {}} wallet_settings={{}} set_wallet_option={onPress} />,
+    );
 
-    settingsModal.find("ForwardRef").forEach((ref) => {ref.props().onPress();});
+    settingsModal.find('ForwardRef').forEach(ref => {
+      ref.props().onPress();
+    });
 
     expect(onPress).toHaveBeenCalledTimes(3);
   });
-
 });

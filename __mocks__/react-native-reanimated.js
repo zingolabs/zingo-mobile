@@ -2,11 +2,11 @@ export const mockAnimated = jest.fn();
 const mock = jest.fn().mockImplementation(() => {
   return {
     Animated: {
-      Value: mockAnimated
+      Value: mockAnimated,
     },
     EasingNode: {
-      linear: ''
-    }
+      linear: '',
+    },
   };
 });
 

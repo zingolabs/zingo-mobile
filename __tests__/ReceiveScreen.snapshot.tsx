@@ -9,20 +9,27 @@ import { create } from 'react-test-renderer';
 import ReceiveScreen from '../components/ReceiveScreen';
 
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
-    FontAwesomeIcon: ''
-}))
+  FontAwesomeIcon: '',
+}));
 jest.mock('react-native-tab-view', () => ({
-    TabView: '',
-    TabBar: ''
-}))
+  TabView: '',
+  TabBar: '',
+}));
 jest.useFakeTimers();
 
 // test suite
-describe("Component ReceiveScreen - test", () => {
+describe('Component ReceiveScreen - test', () => {
   //snapshot test
-  test("ReceiveScreen - snapshot", () => {
-    const receiveScreen = create(<ReceiveScreen info={null} addresses={[]} toggleMenuDrawer={() => {}} fetchTotalBalance={() => {}} startRescan={() => {}} />);
+  test('ReceiveScreen - snapshot', () => {
+    const receiveScreen = create(
+      <ReceiveScreen
+        info={null}
+        addresses={[]}
+        toggleMenuDrawer={() => {}}
+        fetchTotalBalance={() => {}}
+        startRescan={() => {}}
+      />,
+    );
     expect(receiveScreen.toJSON()).toMatchSnapshot();
   });
-
 });

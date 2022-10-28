@@ -12,21 +12,21 @@ jest.mock('react-native-localize', () => ({
   getNumberFormatSettings: () => {
     return {
       decimalSeparator: ',', // es
-      groupingSeparator: '.' // es
+      groupingSeparator: '.', // es
     };
   },
 }));
-jest.useFakeTimers()
+jest.useFakeTimers();
 
 // test suite
-describe("Component InfoModal - test", () => {
+describe('Component InfoModal - test', () => {
   //unit test
   const info = {
     testnet: false,
-    serverUri: "serverUri",
+    serverUri: 'serverUri',
     latestBlock: 0,
     connections: 0,
-    version: "0",
+    version: '0',
     verificationProgress: 0,
     currencyName: 'ZEC',
     solps: 0,
@@ -35,10 +35,9 @@ describe("Component InfoModal - test", () => {
     encrypted: false,
     locked: false,
   };
-  test("InfoModal - price with es (,) decimal point", () => {
+  test('InfoModal - price with es (,) decimal point', () => {
     const text = create(<InfoModal info={info} closeModal={() => {}} />).toJSON();
     expect(text.type).toBe('RCTSafeAreaView');
     expect(text.children[0].children[0].children[1].children[5].children[1].children[0]).toBe('$ 33,33');
   });
-
 });

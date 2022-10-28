@@ -1,11 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect } from 'react';
-import {View, Image, Text, SafeAreaView, ScrollView} from 'react-native';
+import { View, Image, SafeAreaView, ScrollView } from 'react-native';
 import Clipboard from '@react-native-community/clipboard';
-import {RegText, RegTextInput, FadeText, ClickableText, ZecAmount, UsdAmount} from './Components';
-import {TotalBalance, Transaction, Info, SyncStatus} from '../app/AppState';
+import { RegText, RegTextInput, FadeText, ClickableText, ZecAmount } from './Components';
+import { TotalBalance } from '../app/AppState';
 import Button from './Button';
-import {useTheme} from '@react-navigation/native';
+import { useTheme } from '@react-navigation/native';
 import Toast from 'react-native-simple-toast';
 import cstyles from './CommonStyles';
 
@@ -15,12 +15,21 @@ type SeedComponentProps = {
   onClickOK: () => void;
   onClickCancel: () => void;
   totalBalance: TotalBalance;
-  action: "new" | "change" | "view" | "restore" | "backup" | "server";
+  action: 'new' | 'change' | 'view' | 'restore' | 'backup' | 'server';
   error?: string;
   currencyName?: string;
 };
-const SeedComponent: React.FunctionComponent<SeedComponentProps> = ({seed, birthday, onClickOK, onClickCancel, totalBalance, action, error, currencyName}) => {
-  const {colors} = useTheme();
+const SeedComponent: React.FunctionComponent<SeedComponentProps> = ({
+  seed,
+  birthday,
+  onClickOK,
+  onClickCancel,
+  totalBalance,
+  action,
+  error,
+  currencyName,
+}) => {
+  const { colors } = useTheme();
   const [seedPhrase, setSeedPhrase] = useState(null);
   const [birthdayNumber, setBirthdayNumber] = useState(null);
   const [times, setTimes] = useState(0);
@@ -29,36 +38,32 @@ const SeedComponent: React.FunctionComponent<SeedComponentProps> = ({seed, birth
 
   useEffect(() => {
     setTexts({
-      new: [
-        "I have saved \n the seed"
-      ],
+      new: ['I have saved \n the seed'],
       change: [
-        "",
-        "I have saved \n the seed",
-        "You really want \n to change your \n actual wallet",
-        "Are you sure \n 100% or more"
+        '',
+        'I have saved \n the seed',
+        'You really want \n to change your \n actual wallet',
+        'Are you sure \n 100% or more',
       ],
       server: [
-        "",
-        "I have saved \n the seed",
-        "You really want \n to change your \n actual server",
-        "Are you sure \n 100% or more"
+        '',
+        'I have saved \n the seed',
+        'You really want \n to change your \n actual server',
+        'Are you sure \n 100% or more',
       ],
-      view: [
-        "I have saved \n the seed"
-      ],
-      restore: [
-        "Restore Wallet"
-      ],
+      view: ['I have saved \n the seed'],
+      restore: ['Restore Wallet'],
       backup: [
-        "",
-        "I have saved \n the seed",
-        "You really want \n to restore your \n backup wallet",
-        "Are you sure \n 100% or more"
-      ]
+        '',
+        'I have saved \n the seed',
+        'You really want \n to restore your \n backup wallet',
+        'Are you sure \n 100% or more',
+      ],
     });
-    setReadOnly(action === "new" || action === "view" || action === "change" || action === "backup" || action === "server");
-    setTimes(action === "change" || action === "backup" || action === "server" ? 1 : 0);
+    setReadOnly(
+      action === 'new' || action === 'view' || action === 'change' || action === 'backup' || action === 'server',
+    );
+    setTimes(action === 'change' || action === 'backup' || action === 'server' ? 1 : 0);
     setSeedPhrase(seed);
     setBirthdayNumber(birthday);
   }, [action, seed, birthday]);
@@ -68,35 +73,49 @@ const SeedComponent: React.FunctionComponent<SeedComponentProps> = ({seed, birth
   return (
     <SafeAreaView
       style={{
-          display: 'flex',
-          alignItems: 'stretch',
-          justifyContent: 'flex-start',
-          backgroundColor: colors.background,
-          height: '100%'
-        }}>
+        display: 'flex',
+        alignItems: 'stretch',
+        justifyContent: 'flex-start',
+        backgroundColor: colors.background,
+        height: '100%',
+      }}>
       <View
-        style={{display: 'flex', alignItems: 'center', paddingBottom: 10, backgroundColor: colors.card, zIndex: -1, paddingTop: 10}}>
-        <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 80, height: 80, resizeMode: 'contain'}} />
-        <ZecAmount currencyName={!!currencyName ? currencyName : ""} size={36} amtZec={totalBalance.total} style={{opacity: 0.4}} />
-        <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>Seed ({action})</RegText>
-        <View style={{ width: '100%', height: 1, backgroundColor: colors.primary}}></View>
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          paddingBottom: 10,
+          backgroundColor: colors.card,
+          zIndex: -1,
+          paddingTop: 10,
+        }}>
+        <Image
+          source={require('../assets/img/logobig-zingo.png')}
+          style={{ width: 80, height: 80, resizeMode: 'contain' }}
+        />
+        <ZecAmount
+          currencyName={currencyName ? currencyName : ''}
+          size={36}
+          amtZec={totalBalance.total}
+          style={{ opacity: 0.4 }}
+        />
+        <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
+          Seed ({action})
+        </RegText>
+        <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
       </View>
 
       <ScrollView
-        style={{maxHeight: '85%'}}
+        style={{ maxHeight: '85%' }}
         contentContainerStyle={{
           flexDirection: 'column',
           alignItems: 'stretch',
           justifyContent: 'flex-start',
           backgroundColor: colors.background,
         }}>
-
-        <FadeText style={{marginTop: 0, padding: 20, textAlign: 'center'}}>
-          {readOnly ? (
-            "This is your seed phrase. Please write it down carefully. It is the only way to restore your actual wallet."
-          ) : (
-            "Enter your seed phrase (24 words)"
-          )}
+        <FadeText style={{ marginTop: 0, padding: 20, textAlign: 'center' }}>
+          {readOnly
+            ? 'This is your seed phrase. Please write it down carefully. It is the only way to restore your actual wallet.'
+            : 'Enter your seed phrase (24 words)'}
         </FadeText>
         <View
           style={{
@@ -105,7 +124,7 @@ const SeedComponent: React.FunctionComponent<SeedComponentProps> = ({seed, birth
             borderWidth: 1,
             borderRadius: 10,
             borderColor: colors.text,
-            maxHeight: '40%'
+            maxHeight: '40%',
           }}>
           {readOnly ? (
             <RegText
@@ -135,7 +154,7 @@ const SeedComponent: React.FunctionComponent<SeedComponentProps> = ({seed, birth
             />
           )}
           <ClickableText
-            style={{padding: 10, marginTop: 0, textAlign: 'center'}}
+            style={{ padding: 10, marginTop: 0, textAlign: 'center' }}
             onPress={() => {
               if (seedPhrase) {
                 Clipboard.setString(seedPhrase);
@@ -146,13 +165,17 @@ const SeedComponent: React.FunctionComponent<SeedComponentProps> = ({seed, birth
           </ClickableText>
         </View>
 
-        <View style={{marginTop: 10, alignItems: 'center'}}>
-          <FadeText style={{textAlign: 'center'}}>Wallet Birthday</FadeText>
+        <View style={{ marginTop: 10, alignItems: 'center' }}>
+          <FadeText style={{ textAlign: 'center' }}>Wallet Birthday</FadeText>
           {readOnly ? (
-            <RegText color={colors.text} style={{textAlign: 'center'}}>{birthdayNumber}</RegText>
+            <RegText color={colors.text} style={{ textAlign: 'center' }}>
+              {birthdayNumber}
+            </RegText>
           ) : (
             <>
-              <FadeText style={{textAlign: 'center'}}>Block height of first transaction. (It's OK, if you don't know)</FadeText>
+              <FadeText style={{ textAlign: 'center' }}>
+                Block height of first transaction. (It's OK, if you don't know)
+              </FadeText>
               <RegTextInput
                 style={[
                   {
@@ -161,8 +184,8 @@ const SeedComponent: React.FunctionComponent<SeedComponentProps> = ({seed, birth
                     borderWidth: 1,
                     borderRadius: 10,
                     borderColor: colors.text,
-                    width:'40%',
-                    color: colors.text
+                    width: '40%',
+                    color: colors.text,
                   },
                   cstyles.innerpaddingsmall,
                 ]}
@@ -174,44 +197,47 @@ const SeedComponent: React.FunctionComponent<SeedComponentProps> = ({seed, birth
           )}
         </View>
 
-        <FadeText style={{marginTop: 20, padding: 20, textAlign: 'center', color: 'white'}}>
-          {times === 3 && action === "change" && (
-            "YOU WILL HAVE NO LONGER ACCESS TO THIS WALLET, AND YOU ARE GOING TO ACCESS TO ANOTHER DIFFERENT WALLET"
-          )}
-          {times === 3 && action === "backup" && (
-            "YOU WILL HAVE NO LONGER ACCESS TO THIS WALLET, AND YOU ARE GOING TO ACCESS TO YOUR BACKUP WALLET"
-          )}
-          {times === 3 && action === "server" && (
-            "YOU WILL HAVE NO LONGER ACCESS TO THIS WALLET, AND YOU ARE GOING TO CHANGE TO ANOTHER SERVER IN WHICH YOUR ACTUAL WALLET DOESN'T EXIST"
-          )}
+        <FadeText style={{ marginTop: 20, padding: 20, textAlign: 'center', color: 'white' }}>
+          {times === 3 &&
+            action === 'change' &&
+            'YOU WILL HAVE NO LONGER ACCESS TO THIS WALLET, AND YOU ARE GOING TO ACCESS TO ANOTHER DIFFERENT WALLET'}
+          {times === 3 &&
+            action === 'backup' &&
+            'YOU WILL HAVE NO LONGER ACCESS TO THIS WALLET, AND YOU ARE GOING TO ACCESS TO YOUR BACKUP WALLET'}
+          {times === 3 &&
+            action === 'server' &&
+            "YOU WILL HAVE NO LONGER ACCESS TO THIS WALLET, AND YOU ARE GOING TO CHANGE TO ANOTHER SERVER IN WHICH YOUR ACTUAL WALLET DOESN'T EXIST"}
         </FadeText>
 
-        {currencyName !== 'ZEC' && times === 3 && (action === "change" || action === "server") && (
-          <FadeText style={{ color: colors.primary, textAlign: 'center', width:'100%' }}>
+        {currencyName !== 'ZEC' && times === 3 && (action === 'change' || action === 'server') && (
+          <FadeText style={{ color: colors.primary, textAlign: 'center', width: '100%' }}>
             NO BACKUP OF THIS WALLET. ONLY IN MAINNET.
           </FadeText>
         )}
 
-        {!!error && (
-          <FadeText style={{ color: colors.primary, textAlign: 'center', width:'100%' }}>{error}</FadeText>
-        )}
+        {!!error && <FadeText style={{ color: colors.primary, textAlign: 'center', width: '100%' }}>{error}</FadeText>}
 
-        <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center', margin: 20}}>
+        <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', margin: 20 }}>
           <Button
             type="Primary"
-            style={{ backgroundColor: times === 3 ? 'red' : colors.primary, color: times === 3 ? 'white' : colors.primary }}
-            title={!!texts && texts[action] !! ? texts[action][times] : ''}
+            style={{
+              backgroundColor: times === 3 ? 'red' : colors.primary,
+              color: times === 3 ? 'white' : colors.primary,
+            }}
+            title={!!texts && texts[action]!! ? texts[action][times] : ''}
             onPress={() => {
-              if (!seedPhrase) return;
-              if(times === 0 || times === 3) {
+              if (!seedPhrase) {
+                return;
+              }
+              if (times === 0 || times === 3) {
                 onClickOK(seedPhrase, birthdayNumber);
-              } else if(times === 1 || times === 2) {
+              } else if (times === 1 || times === 2) {
                 setTimes(times + 1);
               }
             }}
           />
-          {(times > 0 || action === "restore") && (
-            <Button type="Secondary" title="Cancel" style={{marginLeft: 10}} onPress={onClickCancel} />
+          {(times > 0 || action === 'restore') && (
+            <Button type="Secondary" title="Cancel" style={{ marginLeft: 10 }} onPress={onClickCancel} />
           )}
         </View>
       </ScrollView>

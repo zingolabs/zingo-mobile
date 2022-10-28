@@ -1,16 +1,16 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import {View, ScrollView, SafeAreaView, Image, Text} from 'react-native';
-import {FadeText, ZecAmount, UsdAmount, RegText} from './Components';
+import { View, ScrollView, SafeAreaView, Image } from 'react-native';
+import { FadeText, ZecAmount, RegText } from './Components';
 import Button from './Button';
-import {useTheme} from '@react-navigation/native';
+import { useTheme } from '@react-navigation/native';
 
 type AboutModalProps = {
   closeModal: () => void;
-  totalBalance: object
+  totalBalance: object;
 };
-const AboutModal: React.FunctionComponent<AboutModalProps> = ({closeModal, totalBalance, currencyName}) => {
-  const {colors} = useTheme();
+const AboutModal: React.FunctionComponent<AboutModalProps> = ({ closeModal, totalBalance, currencyName }) => {
+  const { colors } = useTheme();
   return (
     <SafeAreaView
       style={{
@@ -21,15 +21,27 @@ const AboutModal: React.FunctionComponent<AboutModalProps> = ({closeModal, total
         backgroundColor: colors.background,
       }}>
       <View
-        style={{display: 'flex', alignItems: 'center', paddingBottom: 10, backgroundColor: colors.card, zIndex: -1, paddingTop: 10}}>
-        <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 80, height: 80, resizeMode: 'contain'}} />
-        <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{opacity: 0.4}} />
-        <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>Zingo! v0.0.55</RegText>
-        <View style={{ width: '100%', height: 1, backgroundColor: colors.primary}}></View>
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          paddingBottom: 10,
+          backgroundColor: colors.card,
+          zIndex: -1,
+          paddingTop: 10,
+        }}>
+        <Image
+          source={require('../assets/img/logobig-zingo.png')}
+          style={{ width: 80, height: 80, resizeMode: 'contain' }}
+        />
+        <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{ opacity: 0.4 }} />
+        <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
+          Zingo! v0.0.55
+        </RegText>
+        <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
       </View>
 
       <ScrollView
-        style={{maxHeight: '85%'}}
+        style={{ maxHeight: '85%' }}
         contentContainerStyle={{
           flexDirection: 'column',
           alignItems: 'stretch',
@@ -64,7 +76,7 @@ const AboutModal: React.FunctionComponent<AboutModalProps> = ({closeModal, total
           OR OTHER DEALINGS IN THE SOFTWARE.
         </FadeText>
       </ScrollView>
-      <View style={{flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', margin: 10}}>
+      <View style={{ flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', margin: 10 }}>
         <Button type="Secondary" title="Close" onPress={closeModal} />
       </View>
     </SafeAreaView>

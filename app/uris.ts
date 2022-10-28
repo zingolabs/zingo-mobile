@@ -1,6 +1,6 @@
-import {Base64} from 'js-base64';
+import { Base64 } from 'js-base64';
 import Url from 'url-parse';
-import Utils from './utils';
+import RPCModule from '../components/RPCModule';
 
 export class ZcashURITarget {
   address?: string;
@@ -23,15 +23,18 @@ export class ZcashURITarget {
   }
 }
 
-export const SERVER_URI = [
-  'https://mainnet.lightwalletd.com:9067',
-  'https://zuul.free2z.cash:9067',
-];
+export const SERVER_URI = ['https://mainnet.lightwalletd.com:9067', 'https://zuul.free2z.cash:9067'];
 
 export const MEMOS = [
-  {value: 'none', text: "Don't download any memos. Server will not learn what transactions belong to you."},
-  {value: 'wallet', text: "Download only my memos. Server will learn what TxIDs belong to you, but can't see the addresses, amounts or memos."},
-  {value: 'all', text: "Download all memos in the blockchain. Server will not learn what TxIDs belong to you. This consumes A LOT of bandwidth."},
+  { value: 'none', text: "Don't download any memos. Server will not learn what transactions belong to you." },
+  {
+    value: 'wallet',
+    text: "Download only my memos. Server will learn what TxIDs belong to you, but can't see the addresses, amounts or memos.",
+  },
+  {
+    value: 'all',
+    text: 'Download all memos in the blockchain. Server will not learn what TxIDs belong to you. This consumes A LOT of bandwidth.',
+  },
 ];
 
 export const parseServerURI = (uri: string): string => {
@@ -40,14 +43,19 @@ export const parseServerURI = (uri: string): string => {
   }
 
   const parsedUri = new Url(uri, true);
-  if (!parsedUri || !parsedUri.hostname || !parsedUri.protocol || (parsedUri.protocol !== 'http:' && parsedUri.protocol !== 'https:')) {
+  if (
+    !parsedUri ||
+    !parsedUri.hostname ||
+    !parsedUri.protocol ||
+    (parsedUri.protocol !== 'http:' && parsedUri.protocol !== 'https:')
+  ) {
     return 'Error: Bad URI';
   }
 
   return 'URI is OK';
 };
 
-export const parseZcashURI = (uri: string): ZcashURITarget[] | string => {
+export const parseZcashURI = async (uri: string): ZcashURITarget[] | string => {
   if (!uri || uri === '') {
     return 'Bad URI';
   }
@@ -62,8 +70,16 @@ export const parseZcashURI = (uri: string): ZcashURITarget[] | string => {
 
   // The first address is special, it can be the "host" part of the URI
   const address = parsedUri.pathname;
-  if (address && !(Utils.isTransparent(address) || Utils.isZaddr(address) || Utils.isOrchard(address))) {
-    return `"${address || ''}" was not a valid zcash address (UA, Z or T)`;
+
+  const resultParse = await RPCModule.execute('parse', address);
+  const resultParseJSON = await JSON.parse(resultParse);
+
+  console.log('parse', resultParseJSON);
+
+  const validParse = resultParseJSON.status === 'success';
+
+  if (address && !validParse) {
+    return `"${address || ''}" was not a valid zcash address (UA, Orchard, Z or T)`;
   }
 
   // Has to have at least 1 element
@@ -102,8 +118,14 @@ export const parseZcashURI = (uri: string): ZcashURITarget[] | string => {
         if (typeof target.address !== 'undefined') {
           return `Duplicate parameter "${qName}"`;
         }
+        const result = await RPCModule.execute('parse', value);
+        const resultJSON = await JSON.parse(result);
 
-        if (!(Utils.isTransparent(value) || Utils.isZaddr(value) || Utils.isOrchard(value))) {
+        console.log('parse', resultJSON);
+
+        const valid = resultJSON.status === 'success';
+
+        if (!valid) {
           return `"${value}" was not a recognized zcash address`;
         }
         target.address = value;

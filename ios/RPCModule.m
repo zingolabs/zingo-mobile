@@ -277,9 +277,9 @@ RCT_REMAP_METHOD(loadExistingWallet,
   }
 }
 
-RCT_REMAP_METHOD(RestoreExistingWalletBackup,
-                 RestoreExistingWalletBackupWithResolver:(RCTPromiseResolveBlock)resolve
-                 RestoreExistingWalletBackupWithRejecter:(RCTPromiseRejectBlock)reject) {
+RCT_REMAP_METHOD(restoreExistingWalletBackup,
+                 restoreExistingWalletBackupWithResolver:(RCTPromiseResolveBlock)resolve
+                 restoreExistingWalletBackupWithRejecter:(RCTPromiseRejectBlock)reject) {
   @autoreleasepool {
     // RCTLogInfo(@"rstoreExistingWallet backup called");
     NSString* backupDataStr = [self readWalletBackup];

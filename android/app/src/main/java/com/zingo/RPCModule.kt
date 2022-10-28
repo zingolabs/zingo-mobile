@@ -192,8 +192,8 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         )
 
         val saplingOutputFile = MainApplication.getAppContext()?.resources?.openRawResource(R.raw.saplingoutput)
-        val saplingOutput = saplingOutputFile?.readBytes()
-        saplingOutputFile?.close()
+        val saplingOutput = saplingOutputFile?.readBytes()!!
+        saplingOutputFile.close()
 
         val saplingOutputEncoded = Base64.encodeToString(saplingOutput, Base64.NO_WRAP)
 
@@ -205,8 +205,13 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         val middle0w =        0
         val middle1w =  3000000 // 3_000_000 - 2 pieces
         val middle2w: Int = fileBytes.size
-        var fileb64 = Base64.encodeToString(fileBytes, middle0w, middle1w - middle0w, Base64.NO_WRAP)
-        fileb64 += Base64.encodeToString(fileBytes, middle1w, middle2w - middle1w, Base64.NO_WRAP)
+        var fileb64:String
+        if (fileBytes.size <= middle1w) {
+          fileb64 = Base64.encodeToString(fileBytes, Base64.NO_WRAP)
+        } else {
+          fileb64 = Base64.encodeToString(fileBytes, middle0w, middle1w - middle0w, Base64.NO_WRAP)
+          fileb64 += Base64.encodeToString(fileBytes, middle1w, middle2w - middle1w, Base64.NO_WRAP)
+        }
 
         val seed = initfromb64(server, fileb64,
             saplingOutputEncoded,

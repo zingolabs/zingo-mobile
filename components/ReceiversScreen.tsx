@@ -1,18 +1,18 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useState} from 'react';
-import {View, Dimensions, Platform, Image, Text, Modal, ScrollView} from 'react-native';
+import React, { useState } from 'react';
+import { View, Dimensions, Platform, Image, Modal, ScrollView } from 'react-native';
 import Clipboard from '@react-native-community/clipboard';
 import QRCode from 'react-native-qrcode-svg';
-import {TabView, TabBar} from 'react-native-tab-view';
+import { TabView, TabBar } from 'react-native-tab-view';
 import Toast from 'react-native-simple-toast';
-import {ClickableText, FadeText, ZecAmount, UsdAmount, RegText} from '../components/Components';
+import { ClickableText, FadeText, ZecAmount, UsdAmount, RegText } from '../components/Components';
 import Button from './Button';
-import {Info, TotalBalance} from '../app/AppState';
+import { Info, Address } from '../app/AppState';
 import Utils from '../app/utils';
-import {useTheme} from '@react-navigation/native';
-import {TouchableOpacity} from 'react-native-gesture-handler';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {faBars, faEllipsisV} from '@fortawesome/free-solid-svg-icons';
+import { useTheme } from '@react-navigation/native';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faBars, faEllipsisV } from '@fortawesome/free-solid-svg-icons';
 // @ts-ignore
 import OptionsMenu from 'react-native-option-menu';
 import RPC from '../app/rpc';
@@ -27,14 +27,14 @@ type SingleAddress = {
   next: () => void;
 };
 
-const SingleAddressDisplay: React.FunctionComponent<SingleAddress> = ({address, index, total, prev, next}) => {
+const SingleAddressDisplay: React.FunctionComponent<SingleAddress> = ({ address, index, total, prev, next }) => {
   // console.log(`Addresses ${addresses}: ${multipleAddresses}`);
-  const {colors} = useTheme();
+  const { colors } = useTheme();
 
   const multi = total > 1;
 
   // 30 characters per line
-  const numLines = Utils.isTransparent(address) ? 2 : (address.length / 30);
+  const numLines = Utils.isTransparent(address) ? 2 : address.length / 30;
   const chunks = Utils.splitStringIntoChunks(address, numLines.toFixed(0));
   const fixedWidthFont = Platform.OS === 'android' ? 'monospace' : 'Courier';
 
@@ -57,14 +57,15 @@ const SingleAddressDisplay: React.FunctionComponent<SingleAddress> = ({address, 
         },
       ]}
       keyboardShouldPersistTaps="handled">
-      <View style={{marginTop: 20, padding: 10, backgroundColor: colors.border}}>
+      <View style={{ marginTop: 20, padding: 10, backgroundColor: colors.border }}>
         <QRCode value={address} size={200} ecl="L" backgroundColor={colors.border} />
       </View>
-      <ClickableText style={{marginTop: 15}} onPress={doCopy}>
+      <ClickableText style={{ marginTop: 15 }} onPress={doCopy}>
         Tap To Copy
       </ClickableText>
 
-      <View style={{display: 'flex', flexDirection: 'row', flexWrap: 'wrap', marginTop: 10, justifyContent: 'center'}}>
+      <View
+        style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', marginTop: 10, justifyContent: 'center' }}>
         {chunks.map(c => (
           <FadeText
             key={c}
@@ -81,12 +82,12 @@ const SingleAddressDisplay: React.FunctionComponent<SingleAddress> = ({address, 
       </View>
 
       {multi && (
-        <View style={{display: 'flex', flexDirection: 'row', marginTop: 10, alignItems: 'center', marginBottom: 100}}>
-          <Button type="Secondary" title={'Prev'} style={{width: '25%', margin: 10}} onPress={prev} />
+        <View style={{ display: 'flex', flexDirection: 'row', marginTop: 10, alignItems: 'center', marginBottom: 100 }}>
+          <Button type="Secondary" title={'Prev'} style={{ width: '25%', margin: 10 }} onPress={prev} />
           <FadeText>
             {index + 1} of {total}
           </FadeText>
-          <Button type="Secondary" title={'Next'} style={{width: '25%', margin: 10}} onPress={next} />
+          <Button type="Secondary" title={'Next'} style={{ width: '25%', margin: 10 }} onPress={next} />
         </View>
       )}
     </ScrollView>
@@ -95,7 +96,7 @@ const SingleAddressDisplay: React.FunctionComponent<SingleAddress> = ({address, 
 
 type ReceiveScreenProps = {
   info: Info | null;
-  addresses: string[];
+  addresses: Address[];
   toggleMenuDrawer: () => void;
   fetchTotalBalance: () => Promise<void>;
   startRescan: () => void;
@@ -108,33 +109,32 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
   startRescan,
   totalBalance,
   info,
-  syncingStatus,
 }) => {
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([
-    {key: 'zaddr', title: 'Z-Sapling'},
-    {key: 'taddr', title: 'T-Transparent'},
+    { key: 'zaddr', title: 'Z-Sapling' },
+    { key: 'taddr', title: 'T-Transparent' },
   ]);
 
   const [displayAddress, setDisplayAddress] = useState('');
   const [zindex, setZIndex] = useState(0);
   const [tindex, setTIndex] = useState(0);
 
-  const {colors} = useTheme();
+  const { colors } = useTheme();
   const zecPrice = info ? info.zecPrice : null;
   const currencyName = info ? info.currencyName : null;
 
-  const zaddrs = addresses.filter(a => Utils.isSapling(a)) || [];
-  const taddrs = addresses.filter(a => Utils.isTransparent(a)) || [];
+  const zaddrs = addresses.filter(a => a.addressKind === 'z') || [];
+  const taddrs = addresses.filter(a => a.addressKind === 't') || [];
 
   if (displayAddress) {
-    let displayAddressIndex = zaddrs?.findIndex(a => a === displayAddress);
+    let displayAddressIndex = zaddrs?.findIndex(a => a.address === displayAddress);
 
     if (zindex !== displayAddressIndex && displayAddressIndex >= 0) {
       setZIndex(displayAddressIndex);
     }
 
-    displayAddressIndex = taddrs?.findIndex(a => a === displayAddress);
+    displayAddressIndex = taddrs?.findIndex(a => a.address === displayAddress);
 
     if (tindex !== displayAddressIndex && displayAddressIndex >= 0) {
       setTIndex(displayAddressIndex);
@@ -153,7 +153,7 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
         newIndex = zaddrs.length - 1;
       }
       setZIndex(newIndex);
-    } else  if (type === 't') {
+    } else if (type === 't') {
       if (taddrs.length === 0) {
         return;
       }
@@ -182,12 +182,12 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
     }
   };
 
-  const renderScene: (routes: any) => JSX.Element | undefined = ({route}) => {
+  const renderScene: (routes: any) => JSX.Element | undefined = ({ route }) => {
     switch (route.key) {
       case 'zaddr': {
         let zaddr = 'No Address';
         if (zaddrs.length > 0) {
-          zaddr = zaddrs[zindex];
+          zaddr = zaddrs[zindex].address;
         }
         return (
           <SingleAddressDisplay
@@ -206,7 +206,7 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
       case 'taddr': {
         let taddr = 'No Address';
         if (taddrs.length > 0) {
-          taddr = taddrs[tindex];
+          taddr = taddrs[tindex].address;
         }
 
         return (
@@ -256,7 +256,7 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
       return;
     }
 
-    const address = index === 0 ? zaddrs[zindex] : taddrs[tindex];
+    const address = index === 0 ? zaddrs[zindex].address : taddrs[tindex].address;
     const k = await RPC.rpc_getPrivKeyAsString(address);
 
     setKeyType(0);
@@ -275,7 +275,7 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
       return;
     }
 
-    const address = index === 0 ? zaddrs[zindex] : taddrs[tindex];
+    const address = index === 0 ? zaddrs[zindex].address : taddrs[tindex].address;
     const k = await RPC.rpc_getViewKeyAsString(address);
 
     setKeyType(1);
@@ -284,9 +284,6 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
   };
 
   const [importKeyModalVisible, setImportKeyModalVisible] = useState(false);
-  const importKey = async () => {
-    setImportKeyModalVisible(true);
-  };
 
   const doImport = async (key: string, birthday: string) => {
     const addressList = await RPC.rpc_doImportPrivKey(key, birthday);
@@ -314,10 +311,10 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
   const renderTabBar: (props: any) => JSX.Element = props => {
     let address = '';
 
-    if        (index === 0 && zaddrs.length > 0) {
-      address = zaddrs[zindex];
+    if (index === 0 && zaddrs.length > 0) {
+      address = zaddrs[zindex].address;
     } else if (index === 1 && taddrs.length > 0) {
-      address = taddrs[tindex];
+      address = taddrs[tindex].address;
     }
 
     return (
@@ -366,42 +363,52 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
             margin: 0,
           }}>
           <View
-            style={{display: 'flex', alignItems: 'center', paddingBottom: 0, backgroundColor: colors.card, zIndex: -1, paddingTop: 0}}>
-            <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 80, height: 80, resizeMode: 'contain'}} />
-            <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{opacity: 0.4}} />
-            <UsdAmount style={{marginTop: 0, marginBottom: 5, opacity: 0.4}} price={zecPrice} amtZec={totalBalance.total} />
-            <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>{'Legacy Address Types'}</RegText>
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              paddingBottom: 0,
+              backgroundColor: colors.card,
+              zIndex: -1,
+              paddingTop: 0,
+            }}>
+            <Image
+              source={require('../assets/img/logobig-zingo.png')}
+              style={{ width: 80, height: 80, resizeMode: 'contain' }}
+            />
+            <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{ opacity: 0.4 }} />
+            <UsdAmount
+              style={{ marginTop: 0, marginBottom: 5, opacity: 0.4 }}
+              price={zecPrice}
+              amtZec={totalBalance.total}
+            />
+            <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
+              {'Legacy Address Types'}
+            </RegText>
           </View>
         </View>
 
-        <View style={{backgroundColor: colors.card, padding: 10, position: 'absolute'}}>
+        <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute' }}>
           <TouchableOpacity onPress={toggleMenuDrawer}>
             <FontAwesomeIcon icon={faBars} size={20} color={colors.border} />
           </TouchableOpacity>
         </View>
 
-        <View style={{backgroundColor: colors.card, padding: 10, position: 'absolute', right: 0}}>
+        <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', right: 0 }}>
           <OptionsMenu
             customButton={<FontAwesomeIcon icon={faEllipsisV} color={colors.border} size={20} />}
-            buttonStyle={{width: 32, height: 32, margin: 7.5, resizeMode: 'contain'}}
+            buttonStyle={{ width: 32, height: 32, margin: 7.5, resizeMode: 'contain' }}
             destructiveIndex={4}
-            options={[
-              'New Z Address',
-              'New T Address',
-              'Export Private Key',
-              'Export Viewing Key',
-              'Cancel',
-            ]}
+            options={['New Z Address', 'New T Address', 'Export Private Key', 'Export Viewing Key', 'Cancel']}
             actions={[addZ, addT, viewPrivKey, viewViewingKey]}
           />
         </View>
 
-        <View style={{ width: '100%', height: 1, backgroundColor: colors.primary}}></View>
+        <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
 
         <TabBar
           {...props}
-          indicatorStyle={{backgroundColor: colors.primary}}
-          style={{backgroundColor: colors.background}}
+          indicatorStyle={{ backgroundColor: colors.primary }}
+          style={{ backgroundColor: colors.background }}
         />
       </View>
     );
@@ -409,11 +416,11 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
 
   return (
     <TabView
-      navigationState={{index, routes}}
+      navigationState={{ index, routes }}
       renderScene={renderScene}
       renderTabBar={renderTabBar}
       onIndexChange={setIndex}
-      initialLayout={{width: Dimensions.get('window').width}}
+      initialLayout={{ width: Dimensions.get('window').width }}
     />
   );
 };

@@ -1,35 +1,18 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useState} from 'react';
-import {createStackNavigator} from '@react-navigation/stack';
-import {
-  RegText,
-  ZecAmount,
-  UsdAmount,
-  FadeText,
-  ZecPrice,
-  ClickableText,
-} from '../components/Components';
+import React, { useState } from 'react';
+import { createStackNavigator } from '@react-navigation/stack';
+import { RegText, ZecAmount, UsdAmount, FadeText, ZecPrice, ClickableText } from '../components/Components';
 import Button from './Button';
-import {
-  View,
-  ScrollView,
-  Image,
-  Modal,
-  TouchableOpacity,
-  SafeAreaView,
-  RefreshControl,
-  Linking,
-  Text,
-} from 'react-native';
+import { View, ScrollView, Image, Modal, TouchableOpacity, SafeAreaView, RefreshControl, Linking } from 'react-native';
 import Clipboard from '@react-native-community/clipboard';
 import Toast from 'react-native-simple-toast';
-import {TotalBalance, Transaction, Info, SyncStatus} from '../app/AppState';
+import { TotalBalance, Transaction, Info, SyncStatus } from '../app/AppState';
 import Utils from '../app/utils';
 import Moment from 'react-moment';
 import moment from 'moment';
-import {useTheme} from '@react-navigation/native';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {faArrowDown, faArrowUp, faBars, faChevronLeft, faInfo} from '@fortawesome/free-solid-svg-icons';
+import { useTheme } from '@react-navigation/native';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faArrowDown, faArrowUp, faBars, faChevronLeft, faInfo } from '@fortawesome/free-solid-svg-icons';
 import RPC from '../app/rpc';
 
 type TxDetailProps = {
@@ -37,9 +20,10 @@ type TxDetailProps = {
   closeModal: () => void;
   currencyName: string;
 };
-const TxDetail: React.FunctionComponent<TxDetailProps> = ({tx, closeModal, currencyName}) => {
-  const {colors} = useTheme();
-  const spendColor = tx?.confirmations === 0 ? colors.primaryDisabled : (tx?.amount || 0) > 0 ? colors.primary : colors.text;
+const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, currencyName }) => {
+  const { colors } = useTheme();
+  const spendColor =
+    tx?.confirmations === 0 ? colors.primaryDisabled : (tx?.amount || 0) > 0 ? colors.primary : colors.text;
 
   const [expandAddress, setExpandAddress] = useState(false);
   const [expandTxid, setExpandTxid] = useState(false);
@@ -80,34 +64,34 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({tx, closeModal, curre
           justifyContent: 'flex-start',
         }}>
         <TouchableOpacity onPress={closeModal}>
-          <View style={{display: 'flex', flexDirection: 'row', backgroundColor: colors.card}}>
-            <FontAwesomeIcon style={{marginTop: 3}} icon={faChevronLeft} color={colors.text} size={20} />
+          <View style={{ display: 'flex', flexDirection: 'row', backgroundColor: colors.card }}>
+            <FontAwesomeIcon style={{ marginTop: 3 }} icon={faChevronLeft} color={colors.text} size={20} />
             <RegText> Back</RegText>
           </View>
         </TouchableOpacity>
-        <View style={{display: 'flex', alignItems: 'center', padding: 10, backgroundColor: colors.card}}>
-          <RegText style={{textTransform: 'capitalize'}} color={spendColor}>
+        <View style={{ display: 'flex', alignItems: 'center', padding: 10, backgroundColor: colors.card }}>
+          <RegText style={{ textTransform: 'capitalize' }} color={spendColor}>
             {tx?.type}
           </RegText>
           <ZecAmount currencyName={currencyName} size={36} amtZec={tx?.amount} />
           <UsdAmount amtZec={tx?.amount} price={tx?.zec_price} />
         </View>
 
-        <View style={{margin: 10}}>
-          <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: 10}}>
-            <View style={{display: 'flex'}}>
+        <View style={{ margin: 10 }}>
+          <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
+            <View style={{ display: 'flex' }}>
               <FadeText>Time</FadeText>
               <Moment interval={0} format="YYYY MMM D h:mm a" element={RegText}>
                 {(tx?.time || 0) * 1000}
               </Moment>
             </View>
-            <View style={{display: 'flex', alignItems: 'flex-end'}}>
+            <View style={{ display: 'flex', alignItems: 'flex-end' }}>
               <FadeText>Confirmations</FadeText>
               <RegText>{tx?.confirmations}</RegText>
             </View>
           </View>
 
-          <View style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: 10}}>
+          <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: 10 }}>
             <FadeText>TxID</FadeText>
             <TouchableOpacity
               onPress={() => {
@@ -140,7 +124,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({tx, closeModal, curre
                   borderBottomColor: colors.card,
                   borderBottomWidth: 1,
                 }}>
-                <View style={{marginTop: 10}}>
+                <View style={{ marginTop: 10 }}>
                   <FadeText>Address</FadeText>
 
                   <TouchableOpacity
@@ -151,7 +135,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({tx, closeModal, curre
                         setExpandAddress(true);
                       }
                     }}>
-                    <View style={{display: 'flex', flexDirection: 'row', flexWrap: 'wrap'}}>
+                    <View style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}>
                       {expandAddress &&
                         Utils.splitStringIntoChunks(txd.address, 9).map((c, idx) => {
                           return <RegText key={idx}>{c} </RegText>;
@@ -161,19 +145,19 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({tx, closeModal, curre
                   </TouchableOpacity>
                 </View>
 
-                <View style={{marginTop: 10}}>
+                <View style={{ marginTop: 10 }}>
                   <FadeText>Amount</FadeText>
-                  <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
+                  <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                     <ZecAmount amtZec={txd?.amount} size={18} currencyName={'ᙇ'} />
-                    <UsdAmount style={{fontSize: 18}} amtZec={txd?.amount} price={tx?.zec_price} />
+                    <UsdAmount style={{ fontSize: 18 }} amtZec={txd?.amount} price={tx?.zec_price} />
                   </View>
-                  <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end'}}>
+                  <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
                     <ZecPrice price={tx?.zec_price} currencyName={currencyName} />
                   </View>
                 </View>
 
                 {txd?.memo && (
-                  <View style={{marginTop: 10}}>
+                  <View style={{ marginTop: 10 }}>
                     <FadeText>Memo</FadeText>
                     <TouchableOpacity
                       onPress={() => {
@@ -191,19 +175,19 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({tx, closeModal, curre
           })}
 
           {fee && (
-            <View style={{display: 'flex', marginTop: 10}}>
+            <View style={{ display: 'flex', marginTop: 10 }}>
               <FadeText>Tx Fee</FadeText>
-              <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
+              <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                 <ZecAmount amtZec={fee} size={18} currencyName={'ᙇ'} />
-                <UsdAmount style={{fontSize: 18}} amtZec={fee} price={tx?.zec_price} />
+                <UsdAmount style={{ fontSize: 18 }} amtZec={fee} price={tx?.zec_price} />
               </View>
             </View>
           )}
 
-          <View style={{padding: 25}} />
+          <View style={{ padding: 25 }} />
         </View>
       </ScrollView>
-      <View style={{flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', margin: 10}}>
+      <View style={{ flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', margin: 10 }}>
         <Button type="Secondary" title="Close" onPress={closeModal} />
       </View>
     </SafeAreaView>
@@ -222,7 +206,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
   setTxDetail,
   setTxDetailModalShowing,
 }) => {
-  const {colors} = useTheme();
+  const { colors } = useTheme();
 
   const amountColor = tx.confirmations === 0 ? colors.primaryDisabled : tx.amount > 0 ? colors.primary : colors.text;
   const txIcon = tx.amount > 0 ? faArrowDown : faArrowUp;
@@ -231,7 +215,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
     tx.detailedTxns && tx.detailedTxns.length > 0 ? Utils.trimToSmall(tx.detailedTxns[0].address, 7) : 'Unknown';
 
   return (
-    <View style={{display: 'flex', flexDirection: 'column'}}>
+    <View style={{ display: 'flex', flexDirection: 'column' }}>
       {month !== '' && (
         <View
           style={{
@@ -261,14 +245,14 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
             borderBottomColor: colors.border,
           }}>
           <FontAwesomeIcon
-            style={{marginLeft: 15, marginRight: 15, marginTop: 5}}
+            style={{ marginLeft: 15, marginRight: 15, marginTop: 5 }}
             size={24}
             icon={txIcon}
             color={amountColor}
           />
-          <View style={{display: 'flex'}}>
-            <FadeText style={{fontSize: 18}}>{displayAddress}</FadeText>
-            <View style={{display: 'flex', flexDirection: 'row'}}>
+          <View style={{ display: 'flex' }}>
+            <FadeText style={{ fontSize: 18 }}>{displayAddress}</FadeText>
+            <View style={{ display: 'flex', flexDirection: 'row' }}>
               <FadeText>{tx.type === 'sent' ? 'Sent ' : 'Received '}</FadeText>
               <Moment interval={0} format="MMM D, h:mm a" element={FadeText}>
                 {(tx?.time || 0) * 1000}
@@ -276,7 +260,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
             </View>
           </View>
           <ZecAmount
-            style={{flexGrow: 1, alignSelf: 'baseline', justifyContent: 'flex-end', paddingRight: 5}}
+            style={{ flexGrow: 1, alignSelf: 'baseline', justifyContent: 'flex-end', paddingRight: 5 }}
             size={18}
             currencyName={'ᙇ'}
             color={amountColor}
@@ -336,7 +320,7 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
     }, 1000);
   };
 
-  const {colors} = useTheme();
+  const { colors } = useTheme();
   const zecPrice = info ? info.zecPrice : null;
   const currencyName = info ? info.currencyName : null;
 
@@ -346,12 +330,13 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
   var lastMonth = '';
 
   return (
-    <View style={{
-      display: 'flex',
-      justifyContent: 'flex-start',
-      marginBottom: 170,
-      width: '100%'
-    }}>
+    <View
+      style={{
+        display: 'flex',
+        justifyContent: 'flex-start',
+        marginBottom: 170,
+        width: '100%',
+      }}>
       <Modal
         animationType="slide"
         transparent={false}
@@ -361,13 +346,23 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
       </Modal>
 
       <View
-        style={{display: 'flex', alignItems: 'center', paddingBottom: 0, backgroundColor: colors.card, zIndex: -1, paddingTop: 10}}>
-        <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 80, height: 80, resizeMode: 'contain'}} />
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          paddingBottom: 0,
+          backgroundColor: colors.card,
+          zIndex: -1,
+          paddingTop: 10,
+        }}>
+        <Image
+          source={require('../assets/img/logobig-zingo.png')}
+          style={{ width: 80, height: 80, resizeMode: 'contain' }}
+        />
         <ZecAmount currencyName={currencyName} color={balanceColor} size={36} amtZec={totalBalance.total} />
-        <UsdAmount style={{marginTop: 0, marginBottom: 5}} price={zecPrice} amtZec={totalBalance.total} />
+        <UsdAmount style={{ marginTop: 0, marginBottom: 5 }} price={zecPrice} amtZec={totalBalance.total} />
 
         {showShieldButton && (
-          <View style={{margin: 5}}>
+          <View style={{ margin: 5 }}>
             <Button type="Primary" title="Shield funds" onPress={shieldFunds} />
           </View>
         )}
@@ -376,19 +371,14 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
           style={{
             display: 'flex',
             flexDirection: 'row',
-            alignItems: 'center'
-          }}
-        >
-          <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>
-            {!!syncStatusDisplayLine ? 'Wallet - Syncing' : 'Wallet'}
+            alignItems: 'center',
+          }}>
+          <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
+            {syncStatusDisplayLine ? 'Wallet - Syncing' : 'Wallet'}
           </RegText>
-          <FadeText style={{marginTop: 5, padding: 0}}>
-            {!!syncStatusDisplayLine ? syncStatusDisplayLine : ''}
-          </FadeText>
+          <FadeText style={{ marginTop: 5, padding: 0 }}>{syncStatusDisplayLine ? syncStatusDisplayLine : ''}</FadeText>
           {!!syncStatusDisplayLine && (
-            <TouchableOpacity
-              onPress={() => syncingStatusMoreInfoOnClick()}
-            >
+            <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
               <View
                 style={{
                   display: 'flex',
@@ -405,23 +395,21 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
             </TouchableOpacity>
           )}
         </View>
-
       </View>
 
-      <View style={{backgroundColor: colors.card, padding: 10, position: 'absolute'}}>
+      <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute' }}>
         <TouchableOpacity onPress={toggleMenuDrawer}>
           <FontAwesomeIcon icon={faBars} size={20} color={colors.border} />
         </TouchableOpacity>
       </View>
 
-      <View style={{ width: '100%', height: 1, backgroundColor: colors.primary}}></View>
+      <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
 
       <ScrollView
         refreshControl={
           <RefreshControl refreshing={false} onRefresh={doRefresh} tintColor={colors.text} title="Refreshing" />
         }
-        style={{flexGrow: 1, marginTop: 10, width: '100%', height: '100%'}}
-      >
+        style={{ flexGrow: 1, marginTop: 10, width: '100%', height: '100%' }}>
         {transactions?.slice(0, numTx).flatMap(t => {
           let txmonth = moment(t.time * 1000).format('MMM YYYY');
 
@@ -442,13 +430,13 @@ const TransactionsScreenView: React.FunctionComponent<TransactionsScreenViewProp
           );
         })}
         {!!transactions && !!transactions.length && (
-          <View style={{ height: 100, display: "flex", alignItems: "center", justifyContent: "flex-start" }}>
+          <View style={{ height: 100, display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
             <FadeText style={{ color: colors.primary }}>END</FadeText>
           </View>
         )}
 
         {loadMoreButton && (
-          <View style={{flexDirection: 'row', justifyContent: 'center', margin: 30}}>
+          <View style={{ flexDirection: 'row', justifyContent: 'center', margin: 30 }}>
             <Button type="Secondary" title="Load More" onPress={loadMoreClicked} />
           </View>
         )}

@@ -1,10 +1,10 @@
 import * as RNFS from 'react-native-fs';
 
-import { SettingsFileEntry } from "../components/AppState";
+import { SettingsFileEntry } from '../components/AppState';
 
 export default class SettingsFileImpl {
   static async getFileName() {
-    return RNFS.DocumentDirectoryPath + "/settings.json";
+    return RNFS.DocumentDirectoryPath + '/settings.json';
   }
 
   // Write the server setting
@@ -15,7 +15,7 @@ export default class SettingsFileImpl {
       .then(() => {
         // console.log('FILE WRITTEN!')
       })
-      .catch((err) => {
+      .catch(() => {
         // console.log(err.message)
       });
   }

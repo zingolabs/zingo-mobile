@@ -47,7 +47,6 @@ export class SyncStatusReport {
     this.process_end_block = 0;
     this.lastBlockServer = 0;
   }
-
 }
 
 export class TotalBalance {
@@ -79,14 +78,14 @@ export class TotalBalance {
   }
 }
 
-export class AddressBalance {
+export class Address {
   address: string;
-  balance: number;
+  addressKind: 'u' | 'o' | 'z' | 't';
   containsPending: boolean;
 
-  constructor(address: string, balance: number) {
+  constructor(address: string, addressKind: string) {
     this.address = address;
-    this.balance = balance;
+    this.addressKind = addressKind;
     this.containsPending = false;
   }
 }
@@ -154,12 +153,9 @@ export class ToAddr {
 }
 
 export class SendPageState {
-  fromaddr: string;
-
   toaddrs: ToAddr[];
 
   constructor() {
-    this.fromaddr = '';
     this.toaddrs = [];
   }
 }
@@ -277,17 +273,13 @@ export default interface AppState {
   // The total confirmed and unconfirmed balance in this wallet
   totalBalance: TotalBalance;
 
-  // The list of all t and z and o addresses that have a current balance. That is, the list of
-  // addresses that have a (confirmed or unconfirmed) UTXO or note pending.
-  addressesWithBalance: AddressBalance[];
-
   // A map type that contains address -> privatekey mapping, for display on the receive page
   // This mapping is ephemeral, and will disappear when the user navigates away.
   addressPrivateKeys: Map<string, string>;
 
   // List of all addresses in the wallet, including change addresses and addresses
   // that don't have any balance or are unused
-  addresses: string[];
+  addresses: Address[];
 
   // List of Address / Label pairs
   addressBook: AddressBookEntry[];

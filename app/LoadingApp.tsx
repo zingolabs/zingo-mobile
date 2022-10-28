@@ -3,16 +3,15 @@
  * @format
  */
 import React, { Component } from 'react';
-import { View, ScrollView, Alert, SafeAreaView, Image, Text, Modal } from 'react-native';
+import { View, Alert, SafeAreaView, Image, Text, Modal } from 'react-native';
 
 import Toast from 'react-native-simple-toast';
-import {useTheme} from '@react-navigation/native';
+import { useTheme } from '@react-navigation/native';
 
 import cstyles from '../components/CommonStyles';
-import { BoldText, RegText, RegTextInput, FadeText, UsdAmount } from '../components/Components';
+import { BoldText } from '../components/Components';
 import Button from '../components/Button';
 import RPCModule from '../components/RPCModule';
-import LoadedApp from './LoadedApp';
 import { TotalBalance } from './AppState';
 import { SERVER_URI } from './uris';
 import SeedComponent from '../components/SeedComponent';
@@ -56,7 +55,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
       seedPhrase: null,
       birthday: '0',
       server: null,
-      totalBalance: new TotalBalance,
+      totalBalance: new TotalBalance(),
     };
   }
 
@@ -183,7 +182,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
   };
 
   render() {
-    const { screen, birthday, seedPhrase, actionButtonsDisabled, walletExists, server, totalBalance } = this.state;
+    const { screen, seedPhrase, actionButtonsDisabled, walletExists, server, totalBalance } = this.state;
     const { colors } = this.props.theme;
 
     return (
@@ -194,16 +193,16 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
           alignItems: 'center',
           height: '100%',
           backgroundColor: colors.background,
-      }}>
+        }}>
         {screen === 0 && <Text style={{ color: colors.zingo, fontSize: 40, fontWeight: 'bold' }}> Zingo!</Text>}
         {screen === 1 && (
           <View
             style={{
-                flex: 1,
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-          }}>
+              flex: 1,
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
             <View style={{ marginBottom: 50, display: 'flex', alignItems: 'center' }}>
               <Text style={{ color: colors.zingo, fontSize: 40, fontWeight: 'bold' }}> Zingo!</Text>
               <Image
@@ -216,24 +215,72 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
             <BoldText style={{ fontSize: 15, marginBottom: 10 }}>{server})</BoldText>
 
             {server === SERVER_DEFAULT_1 && (
-              <Button type="Primary" title={`CHANGE SERVER`} disabled={actionButtonsDisabled} onPress={this.useDefaultServer_0} style={{ marginBottom: 10 }} />
+              <Button
+                type="Primary"
+                title={'CHANGE SERVER'}
+                disabled={actionButtonsDisabled}
+                onPress={this.useDefaultServer_0}
+                style={{ marginBottom: 10 }}
+              />
             )}
             {server === SERVER_DEFAULT_0 && (
-              <Button type="Primary" title={`CHANGE SERVER`} disabled={actionButtonsDisabled} onPress={this.useDefaultServer_1} style={{ marginBottom: 10 }} />
+              <Button
+                type="Primary"
+                title={'CHANGE SERVER'}
+                disabled={actionButtonsDisabled}
+                onPress={this.useDefaultServer_1}
+                style={{ marginBottom: 10 }}
+              />
             )}
-            {(server !== SERVER_DEFAULT_0 && server !== SERVER_DEFAULT_1) && (
-              <Button type="Primary" title={`CHANGE SERVER`} disabled={actionButtonsDisabled} onPress={this.useDefaultServer_0} style={{ marginBottom: 10 }} />
+            {server !== SERVER_DEFAULT_0 && server !== SERVER_DEFAULT_1 && (
+              <Button
+                type="Primary"
+                title={'CHANGE SERVER'}
+                disabled={actionButtonsDisabled}
+                onPress={this.useDefaultServer_0}
+                style={{ marginBottom: 10 }}
+              />
             )}
 
-            <Button type="Primary" title="Create New Wallet (new seed)" disabled={actionButtonsDisabled} onPress={this.createNewWallet} style={{ marginBottom: 10, marginTop: 10 }} />
+            <Button
+              type="Primary"
+              title="Create New Wallet (new seed)"
+              disabled={actionButtonsDisabled}
+              onPress={this.createNewWallet}
+              style={{ marginBottom: 10, marginTop: 10 }}
+            />
             {walletExists && (
-              <Button type="Primary" title="Open Current wallet" disabled={actionButtonsDisabled} onPress={this.componentDidMount} style={{ marginBottom: 10 }} />
+              <Button
+                type="Primary"
+                title="Open Current wallet"
+                disabled={actionButtonsDisabled}
+                onPress={this.componentDidMount}
+                style={{ marginBottom: 10 }}
+              />
             )}
 
             <View style={[cstyles.margintop, { display: 'flex', alignItems: 'center' }]}>
-              <Button type="Secondary" title="Restore wallet from Seed" disabled={actionButtonsDisabled} onPress={this.getSeedPhraseToRestore} style={{ margin: 10 }} />
-              <Button type="Secondary" title="Restore wallet from viewing key" disabled={actionButtonsDisabled} onPress={this.getViewingKeyToRestore} style={{ margin: 10 }} />
-              <Button type="Secondary" title="Restore wallet from spendable key" disabled={actionButtonsDisabled} onPress={this.getSpendableKeyToRestore} style={{ margin: 10 }} />
+              <Button
+                type="Secondary"
+                title="Restore wallet from Seed"
+                disabled={actionButtonsDisabled}
+                onPress={this.getSeedPhraseToRestore}
+                style={{ margin: 10 }}
+              />
+              <Button
+                type="Secondary"
+                title="Restore wallet from viewing key"
+                disabled={actionButtonsDisabled}
+                onPress={this.getViewingKeyToRestore}
+                style={{ margin: 10 }}
+              />
+              <Button
+                type="Secondary"
+                title="Restore wallet from spendable key"
+                disabled={actionButtonsDisabled}
+                onPress={this.getSpendableKeyToRestore}
+                style={{ margin: 10 }}
+              />
             </View>
           </View>
         )}
@@ -246,10 +293,10 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
             <SeedComponent
               seed={JSON.parse(seedPhrase)?.seed}
               birthday={JSON.parse(seedPhrase)?.birthday}
-              onClickOK={(s, b) => this.navigateToLoaded()}
+              onClickOK={() => this.navigateToLoaded()}
               onClickCancel={() => this.navigateToLoaded()}
               totalBalance={totalBalance}
-              action={"new"}
+              action={'new'}
             />
           </Modal>
         )}
@@ -263,7 +310,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
               onClickOK={(s, b) => this.doRestore(s, b)}
               onClickCancel={() => this.setState({ screen: 1 })}
               totalBalance={totalBalance}
-              action={"restore"}
+              action={'restore'}
             />
           </Modal>
         )}

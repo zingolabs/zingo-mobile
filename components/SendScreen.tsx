@@ -1,30 +1,22 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useState, useEffect, useRef} from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import QRCodeScanner from 'react-native-qrcode-scanner';
-import {View, ScrollView, Modal, Image, Alert, SafeAreaView, Keyboard, Platform, Text} from 'react-native';
-import {
-  FadeText,
-  BoldText,
-  ErrorText,
-  RegTextInput,
-  RegText,
-  ZecAmount,
-  UsdAmount,
-  ClickableText,
-} from '../components/Components';
+import { View, ScrollView, Modal, Image, Alert, SafeAreaView, Keyboard } from 'react-native';
+import { FadeText, BoldText, ErrorText, RegTextInput, RegText, ZecAmount, UsdAmount } from '../components/Components';
 import Button from './Button';
-import {Info, SendPageState, SendProgress, ToAddr, TotalBalance} from '../app/AppState';
-import {faQrcode, faCheck, faInfo} from '@fortawesome/free-solid-svg-icons';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {useTheme} from '@react-navigation/native';
-import {NavigationScreenProp} from 'react-navigation';
+import { Info, SendPageState, SendProgress, ToAddr, TotalBalance } from '../app/AppState';
+import { faQrcode, faCheck, faInfo } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { useTheme } from '@react-navigation/native';
+import { NavigationScreenProp } from 'react-navigation';
 import Utils from '../app/utils';
-import {TouchableOpacity} from 'react-native-gesture-handler';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 import Toast from 'react-native-simple-toast';
-import {getNumberFormatSettings} from 'react-native-localize';
-import {faBars} from '@fortawesome/free-solid-svg-icons';
-import Animated, {EasingNode} from 'react-native-reanimated';
-import {parseZcashURI} from '../app/uris';
+import { getNumberFormatSettings } from 'react-native-localize';
+import { faBars } from '@fortawesome/free-solid-svg-icons';
+import Animated, { EasingNode } from 'react-native-reanimated';
+import { parseZcashURI } from '../app/uris';
+import RPCModule from '../components/RPCModule';
 
 type ScannerProps = {
   idx: number;
@@ -37,11 +29,18 @@ type ScannerProps = {
   ) => void;
   closeModal: () => void;
 };
-function ScanScreen({idx, updateToField, closeModal}: ScannerProps) {
+function ScanScreen({ idx, updateToField, closeModal }: ScannerProps) {
   const [error, setError] = useState<String | null>(null);
 
-  const validateAddress = (scannedAddress: string) => {
-    if (Utils.isSapling(scannedAddress) || Utils.isTransparent(scannedAddress) || Utils.isOrchard(scannedAddress)) {
+  const validateAddress = async (scannedAddress: string) => {
+    const result = await RPCModule.execute('parse', scannedAddress);
+    const resultJSON = await JSON.parse(result);
+
+    //console.log('parse-1', scannedAddress, resultJSON);
+
+    const valid = resultJSON?.status === 'success';
+
+    if (valid) {
       updateToField(idx, scannedAddress, null, null, null);
       closeModal();
     } else {
@@ -72,12 +71,12 @@ function ScanScreen({idx, updateToField, closeModal}: ScannerProps) {
     closeModal();
   };
 
-  const {colors} = useTheme();
+  const { colors } = useTheme();
   return (
     <QRCodeScanner
       onRead={onRead}
       reactivate={true}
-      containerStyle={{backgroundColor: colors.background}}
+      containerStyle={{ backgroundColor: colors.background }}
       topContent={<RegText>Scan a Zcash Address</RegText>}
       bottomContent={
         <View
@@ -88,8 +87,8 @@ function ScanScreen({idx, updateToField, closeModal}: ScannerProps) {
             justifyContent: 'center',
             width: '100%',
           }}>
-          {error && <RegText style={{textAlign: 'center'}}>{error}</RegText>}
-          <View style={{flexDirection: 'row', alignItems: 'stretch', justifyContent: 'space-evenly'}}>
+          {error && <RegText style={{ textAlign: 'center' }}>{error}</RegText>}
+          <View style={{ flexDirection: 'row', alignItems: 'stretch', justifyContent: 'space-evenly' }}>
             <Button type="Secondary" title="Cancel" onPress={doCancel} />
           </View>
         </View>
@@ -114,7 +113,7 @@ const ConfirmModalContent: React.FunctionComponent<ConfirmModalProps> = ({
   defaultFee,
   currencyName,
 }) => {
-  const {colors} = useTheme();
+  const { colors } = useTheme();
 
   const sendingTotal =
     sendPageState.toaddrs.reduce((s, t) => s + Utils.parseLocaleFloat(t.amount || '0'), 0.0) + defaultFee;
@@ -128,9 +127,9 @@ const ConfirmModalContent: React.FunctionComponent<ConfirmModalProps> = ({
         height: '100%',
         backgroundColor: colors.background,
       }}>
-      <ScrollView contentContainerStyle={{display: 'flex', justifyContent: 'flex-start'}}>
-        <View style={{display: 'flex', alignItems: 'center', padding: 10, backgroundColor: colors.card}}>
-          <BoldText style={{textAlign: 'center', margin: 10}}>Confirm Transaction</BoldText>
+      <ScrollView contentContainerStyle={{ display: 'flex', justifyContent: 'flex-start' }}>
+        <View style={{ display: 'flex', alignItems: 'center', padding: 10, backgroundColor: colors.card }}>
+          <BoldText style={{ textAlign: 'center', margin: 10 }}>Confirm Transaction</BoldText>
         </View>
 
         <View
@@ -143,18 +142,18 @@ const ConfirmModalContent: React.FunctionComponent<ConfirmModalProps> = ({
             borderRadius: 10,
             borderColor: colors.border,
           }}>
-          <BoldText style={{textAlign: 'center'}}>Sending</BoldText>
+          <BoldText style={{ textAlign: 'center' }}>Sending</BoldText>
 
           <ZecAmount currencyName={currencyName} amtZec={sendingTotal} />
           <UsdAmount amtZec={sendingTotal} price={price} />
         </View>
         {sendPageState.toaddrs.map(to => {
           return (
-            <View key={to.id} style={{margin: 10}}>
+            <View key={to.id} style={{ margin: 10 }}>
               <FadeText>To</FadeText>
               <RegText>{Utils.splitStringIntoChunks(to.to, 8).join(' ')}</RegText>
 
-              <FadeText style={{marginTop: 10}}>Amount</FadeText>
+              <FadeText style={{ marginTop: 10 }}>Amount</FadeText>
               <View
                 style={{
                   display: 'flex',
@@ -164,19 +163,19 @@ const ConfirmModalContent: React.FunctionComponent<ConfirmModalProps> = ({
                   marginTop: 5,
                 }}>
                 <ZecAmount currencyName={currencyName} size={18} amtZec={Utils.parseLocaleFloat(to.amount)} />
-                <UsdAmount style={{fontSize: 18}} amtZec={Utils.parseLocaleFloat(to.amount)} price={price} />
+                <UsdAmount style={{ fontSize: 18 }} amtZec={Utils.parseLocaleFloat(to.amount)} price={price} />
               </View>
               <RegText>{to.memo || ''}</RegText>
             </View>
           );
         })}
 
-        <View style={{margin: 10}}>
+        <View style={{ margin: 10 }}>
           <FadeText>Fee</FadeText>
           <View
-            style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline'}}>
+            style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
             <ZecAmount currencyName={currencyName} size={18} amtZec={defaultFee} />
-            <UsdAmount style={{fontSize: 18}} amtZec={defaultFee} price={price} />
+            <UsdAmount style={{ fontSize: 18 }} amtZec={defaultFee} price={price} />
           </View>
         </View>
       </ScrollView>
@@ -188,9 +187,9 @@ const ConfirmModalContent: React.FunctionComponent<ConfirmModalProps> = ({
           alignItems: 'center',
           marginTop: 10,
         }}>
-        <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
+        <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
           <Button type="Primary" title={'Confirm'} onPress={confirmSend} />
-          <Button type="Secondary" style={{marginLeft: 20}} title={'Cancel'} onPress={closeModal} />
+          <Button type="Secondary" style={{ marginLeft: 20 }} title={'Cancel'} onPress={closeModal} />
         </View>
       </View>
     </SafeAreaView>
@@ -225,7 +224,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
   syncingStatus,
   syncingStatusMoreInfoOnClick,
 }) => {
-  const {colors} = useTheme();
+  const { colors } = useTheme();
   const [qrcodeModalVisble, setQrcodeModalVisible] = useState(false);
   const [qrcodeModalIndex, setQrcodeModalIndex] = useState(0);
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
@@ -237,10 +236,20 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
-      Animated.timing(slideAnim, {toValue: 0 - titleViewHeight + 25, duration: 100, easing: EasingNode.linear, useNativeDriver: true}).start();
+      Animated.timing(slideAnim, {
+        toValue: 0 - titleViewHeight + 25,
+        duration: 100,
+        easing: EasingNode.linear,
+        useNativeDriver: true,
+      }).start();
     });
     const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-      Animated.timing(slideAnim, {toValue: 0, duration: 100, easing: EasingNode.linear, useNativeDriver: true}).start();
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 100,
+        easing: EasingNode.linear,
+        useNativeDriver: true,
+      }).start();
     });
 
     return () => {
@@ -258,7 +267,6 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
   ) => {
     // Create the new state object
     const newState = new SendPageState();
-    newState.fromaddr = sendPageState.fromaddr;
 
     const newToAddrs = sendPageState.toaddrs.slice(0);
     // Find the correct toAddr
@@ -300,7 +308,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
       }
     }
 
-    const {decimalSeparator} = getNumberFormatSettings();
+    const { decimalSeparator } = getNumberFormatSettings();
 
     if (amount !== null) {
       toAddr.amount = amount.replace(decimalSeparator, '.');
@@ -361,7 +369,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
       } catch (err) {
         setTimeout(() => {
           //console.log('sendtx error', err);
-          Alert.alert('Error sending Tx', `${err}`, [{text: 'OK', onPress: () => setComputingModalVisible(false)}], {
+          Alert.alert('Error sending Tx', `${err}`, [{ text: 'OK', onPress: () => setComputingModalVisible(false) }], {
             cancelable: false,
           });
         }, 1000);
@@ -372,14 +380,6 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
   const spendable = totalBalance.transparentBal + totalBalance.spendablePrivate + totalBalance.spendableOrchard;
   const stillConfirming = spendable !== totalBalance.total;
 
-  const setMaxAmount = (idx: number) => {
-    let max = spendable - defaultFee;
-    if (max < 0) {
-      max = 0;
-    }
-    updateToField(idx, null, Utils.maxPrecisionTrimmed(max), null, null);
-  };
-
   const getMaxAmount = (): number => {
     let max = spendable - defaultFee;
     if (max < 0) {
@@ -388,13 +388,40 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
     return max;
   };
 
-  const memoEnabled = Utils.isSapling(sendPageState.toaddrs[0].to) || Utils.isOrchard(sendPageState.toaddrs[0].to);
+  const getMemoEnabled = async (address): boolean => {
+    if (address) {
+      const result = await RPCModule.execute('parse', address);
+      console.log(result);
+      const resultJSON = await JSON.parse(result);
+
+      console.log('parse-2', sendPageState.toaddrs[0].to, resultJSON);
+
+      return (
+        resultJSON.status === 'success' &&
+        (resultJSON.address_kind === 'unified' ||
+          resultJSON.address_kind === 'orchard' ||
+          resultJSON.address_kind === 'sapling')
+      );
+    } else {
+      return false;
+    }
+  };
+
+  const memoEnabled = getMemoEnabled(sendPageState.toaddrs[0].to);
   const zecPrice = info ? info.zecPrice : null;
   const currencyName = info ? info.currencyName : null;
 
-  var addressValidationState: number[] = sendPageState.toaddrs.map(to => {
-    if (to.to !== '') {
-      if (Utils.isSapling(to.to) || Utils.isTransparent(to.to) || Utils.isOrchard(to.to)) {
+  var addressValidationState: number[] = sendPageState.toaddrs.map(async to => {
+    if (!!to && !!to.to) {
+      const result = await RPCModule.execute('parse', to.to);
+      console.log(result);
+      const resultJSON = await JSON.parse(result);
+
+      console.log('parse-3', to.to, resultJSON);
+
+      const valid = resultJSON.status === 'success';
+
+      if (valid) {
         return 1;
       } else {
         return -1;
@@ -429,7 +456,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
     addressValidationState.filter(n => n === 1).length === addressValidationState.length &&
     amountValidationState.filter(n => n === 1).length === amountValidationState.length;
 
-  const {decimalSeparator} = getNumberFormatSettings();
+  const { decimalSeparator } = getNumberFormatSettings();
 
   const syncStatusDisplayLine = syncingStatus?.inProgress ? `(${syncingStatus?.blocks})` : '';
 
@@ -476,10 +503,10 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
           flexDirection: 'column',
           justifyContent: 'flex-start',
         }}>
-        <Animated.View style={{marginTop: slideAnim}}>
+        <Animated.View style={{ marginTop: slideAnim }}>
           <View
             onLayout={e => {
-              const {height} = e.nativeEvent.layout;
+              const { height } = e.nativeEvent.layout;
               setTitleViewHeight(height);
             }}
             style={{
@@ -490,24 +517,30 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
               zIndex: -1,
             }}>
             <View
-              style={{display: 'flex', alignItems: 'center', paddingBottom: 0, backgroundColor: colors.card, zIndex: -1, paddingTop: 10}}>
-              <Image source={require('../assets/img/logobig-zingo.png')} style={{width: 80, height: 80, resizeMode: 'contain'}} />
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                paddingBottom: 0,
+                backgroundColor: colors.card,
+                zIndex: -1,
+                paddingTop: 10,
+              }}>
+              <Image
+                source={require('../assets/img/logobig-zingo.png')}
+                style={{ width: 80, height: 80, resizeMode: 'contain' }}
+              />
               <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} />
-              <UsdAmount style={{marginTop: 0, marginBottom: 5}} price={zecPrice} amtZec={totalBalance.total} />
+              <UsdAmount style={{ marginTop: 0, marginBottom: 5 }} price={zecPrice} amtZec={totalBalance.total} />
 
-              <View
-                style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}
-              >
-                <RegText color={colors.money} style={{marginTop: 5, padding: 5}}>
-                  {!!syncStatusDisplayLine ? 'Send - Syncing' : 'Send'}
+              <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
+                  {syncStatusDisplayLine ? 'Send - Syncing' : 'Send'}
                 </RegText>
-                <FadeText style={{marginTop: 5, padding: 0}}>
-                  {!!syncStatusDisplayLine ? syncStatusDisplayLine : ''}
+                <FadeText style={{ marginTop: 5, padding: 0 }}>
+                  {syncStatusDisplayLine ? syncStatusDisplayLine : ''}
                 </FadeText>
                 {!!syncStatusDisplayLine && (
-                  <TouchableOpacity
-                    onPress={() => syncingStatusMoreInfoOnClick()}
-                  >
+                  <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
                     <View
                       style={{
                         display: 'flex',
@@ -524,23 +557,23 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
                   </TouchableOpacity>
                 )}
               </View>
-
             </View>
           </View>
         </Animated.View>
 
-        <Animated.View style={{backgroundColor: colors.card, padding: 10, position: 'absolute', marginTop: slideAnim}}>
+        <Animated.View
+          style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', marginTop: slideAnim }}>
           <TouchableOpacity onPress={toggleMenuDrawer}>
             <FontAwesomeIcon icon={faBars} size={20} color={colors.border} />
           </TouchableOpacity>
         </Animated.View>
 
-        <View style={{ width: '100%', height: 1, backgroundColor: colors.primary}}></View>
+        <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
 
         {sendPageState.toaddrs.map((ta, i) => {
           return (
-            <View key={i} style={{display: 'flex', padding: 10, marginTop: 10}}>
-              <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
+            <View key={i} style={{ display: 'flex', padding: 10, marginTop: 10 }}>
+              <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                 <RegText>To Address</RegText>
                 {addressValidationState[i] === 1 && <FontAwesomeIcon icon={faCheck} color={colors.primary} />}
                 {addressValidationState[i] === -1 && <ErrorText>Invalid Address!</ErrorText>}
@@ -559,7 +592,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
                 <RegTextInput
                   placeholder="Z-Sapling or T-Transparent or Unified address"
                   placeholderTextColor={colors.placeholder}
-                  style={{flexGrow: 1, maxWidth: '90%'}}
+                  style={{ flexGrow: 1, maxWidth: '90%' }}
                   value={ta.to}
                   onChangeText={(text: string) => updateToField(i, text, null, null, null)}
                 />
@@ -568,11 +601,11 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
                     setQrcodeModalIndex(i);
                     setQrcodeModalVisible(true);
                   }}>
-                  <FontAwesomeIcon style={{margin: 5}} size={24} icon={faQrcode} color={colors.border} />
+                  <FontAwesomeIcon style={{ margin: 5 }} size={24} icon={faQrcode} color={colors.border} />
                 </TouchableOpacity>
               </View>
 
-              <View style={{marginTop: 10, display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
+              <View style={{ marginTop: 10, display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                 <FadeText>{'   Amount'}</FadeText>
                 {amountValidationState[i] === -1 && <ErrorText>Invalid Amount!</ErrorText>}
               </View>
@@ -590,7 +623,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
                     justifyContent: 'flex-start',
                     width: '60%',
                   }}>
-                  <RegText style={{marginTop: 20, marginRight: 5, fontSize: 20}}>{'\u1647'}</RegText>
+                  <RegText style={{ marginTop: 20, marginRight: 5, fontSize: 20 }}>{'\u1647'}</RegText>
                   <RegTextInput
                     placeholder={`0${decimalSeparator}0`}
                     placeholderTextColor={colors.placeholder}
@@ -610,7 +643,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
                     value={ta.amount.toString()}
                     onChangeText={(text: string) => updateToField(i, null, text, null, null)}
                   />
-                  <RegText style={{marginTop: 15, marginRight: 10, marginLeft: 5}}>ZEC</RegText>
+                  <RegText style={{ marginTop: 15, marginRight: 10, marginLeft: 5 }}>ZEC</RegText>
                 </View>
 
                 <View
@@ -620,7 +653,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
                     justifyContent: 'flex-start',
                     width: '35%',
                   }}>
-                <RegText style={{marginTop: 15, marginRight: 5}}>$</RegText>
+                  <RegText style={{ marginTop: 15, marginRight: 5 }}>$</RegText>
                   <RegTextInput
                     placeholder={`0${decimalSeparator}0`}
                     placeholderTextColor={colors.placeholder}
@@ -640,12 +673,19 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
                     value={ta.amountUSD.toString()}
                     onChangeText={(text: string) => updateToField(i, null, null, text, null)}
                   />
-                  <RegText style={{marginTop: 15, marginLeft: 5}}>USD</RegText>
+                  <RegText style={{ marginTop: 15, marginLeft: 5 }}>USD</RegText>
                 </View>
               </View>
 
-              <View style={{display: 'flex', flexDirection: 'column'}}>
-                <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', marginTop: 10}}>
+              <View style={{ display: 'flex', flexDirection: 'column' }}>
+                <View
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    justifyContent: 'flex-start',
+                    alignItems: 'center',
+                    marginTop: 10,
+                  }}>
                   <RegText>Spendable: </RegText>
                   <ZecAmount currencyName={currencyName} color={colors.money} size={18} amtZec={getMaxAmount()} />
                 </View>
@@ -667,8 +707,8 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
 
               {memoEnabled && (
                 <>
-                  <FadeText style={{marginTop: 30}}>Memo (Optional)</FadeText>
-                  <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-start'}}>
+                  <FadeText style={{ marginTop: 30 }}>Memo (Optional)</FadeText>
+                  <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start' }}>
                     <RegTextInput
                       multiline
                       style={{
@@ -695,8 +735,13 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
             alignItems: 'center',
             margin: 20,
           }}>
-          <Button type="Primary" title="Send" disabled={!sendButtonEnabled} onPress={() => setConfirmModalVisible(true)} />
-          <Button type="Secondary" style={{marginLeft: 10}} title="Clear" onPress={() => clearToAddrs()} />
+          <Button
+            type="Primary"
+            title="Send"
+            disabled={!sendButtonEnabled}
+            onPress={() => setConfirmModalVisible(true)}
+          />
+          <Button type="Secondary" style={{ marginLeft: 10 }} title="Clear" onPress={() => clearToAddrs()} />
         </View>
       </ScrollView>
     </View>

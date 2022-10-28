@@ -22,7 +22,7 @@ const Theme = {
     text: '#c3c3c3',
     zingo: '#777777',
     placeholder: '#333333',
-    money: '#ffffff'
+    money: '#ffffff',
   },
 };
 

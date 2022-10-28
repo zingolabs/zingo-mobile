@@ -1,7 +1,7 @@
 import {
   SyncStatusReport,
   TotalBalance,
-  AddressBalance,
+  Address,
   Transaction,
   TxDetail,
   Info,
@@ -18,7 +18,6 @@ export default class RPC {
   fnSetSyncStatusReport: (syncStatusReport: SyncStatusReport) => void;
   fnSetInfo: (info: Info) => void;
   fnSetTotalBalance: (totalBalance: TotalBalance) => void;
-  fnSetAddressesWithBalance: (addressBalances: AddressBalance[]) => void;
   fnSetTransactionsList: (txList: Transaction[]) => void;
   fnSetAllAddresses: (allAddresses: string[]) => void;
   fnSetZecPrice: (price: number | null) => void;
@@ -41,7 +40,6 @@ export default class RPC {
   constructor(
     fnSetSyncStatusReport: (syncStatusReport: SyncStatusReport) => void,
     fnSetTotalBalance: (totalBalance: TotalBalance) => void,
-    fnSetAddressesWithBalance: (ab: AddressBalance[]) => void,
     fnSetTransactionsList: (txlist: Transaction[]) => void,
     fnSetAllAddresses: (addresses: string[]) => void,
     fnSetWalletSettings: (settings: WalletSettings) => void,
@@ -51,7 +49,6 @@ export default class RPC {
   ) {
     this.fnSetSyncStatusReport = fnSetSyncStatusReport;
     this.fnSetTotalBalance = fnSetTotalBalance;
-    this.fnSetAddressesWithBalance = fnSetAddressesWithBalance;
     this.fnSetTransactionsList = fnSetTransactionsList;
     this.fnSetAllAddresses = fnSetAllAddresses;
     this.fnSetWalletSettings = fnSetWalletSettings;
@@ -194,7 +191,7 @@ export default class RPC {
       return `Error: Couldn't parse ${birthday} as a number`;
     }
 
-    const args = {key, birthday: parseInt(birthday, 10), norescan: true};
+    const args = { key, birthday: parseInt(birthday, 10), norescan: true };
     const address = await RPCModule.execute('import', JSON.stringify(args));
 
     if (address) {
@@ -221,7 +218,7 @@ export default class RPC {
     const seedJSON = await JSON.parse(seedStr);
 
     if (seedJSON) {
-      const seed: WalletSeed = {seed: seedJSON.seed, birthday: seedJSON.birthday};
+      const seed: WalletSeed = { seed: seedJSON.seed, birthday: seedJSON.birthday };
       return seed;
     }
 
@@ -265,11 +262,11 @@ export default class RPC {
           const rex = /\((\d+)\/(\d+)\)((.|[\r\n])*)/;
           const tags = i.memo ? i.memo.match(rex) : null;
           if (tags && tags.length >= 4) {
-            return {num: parseInt(tags[1], 10), memo: tags[3]};
+            return { num: parseInt(tags[1], 10), memo: tags[3] };
           }
 
           // Just return as is
-          return {num: 0, memo: i.memo};
+          return { num: 0, memo: i.memo };
         })
         .sort((a, b) => a.num - b.num)
         .map(a => a.memo);
@@ -420,7 +417,12 @@ export default class RPC {
       return;
     }
 
-    if (fullRefresh || fullRescan || !this.lastWalletBlockHeight || this.lastWalletBlockHeight < this.lastServerBlockHeight) {
+    if (
+      fullRefresh ||
+      fullRescan ||
+      !this.lastWalletBlockHeight ||
+      this.lastWalletBlockHeight < this.lastServerBlockHeight
+    ) {
       // If the latest block height has changed, make sure to sync. This will happen in a new thread
       this.inRefresh = true;
 
@@ -435,15 +437,15 @@ export default class RPC {
       // This is async, so when it is done, we finish the refresh.
       if (fullRescan) {
         this.doRescan()
-          .then((r) => console.log('End Rescan OK: ' + r))
-          .catch((e) => console.log('End Rescan ERROR: ' + e))
+          .then(r => console.log('End Rescan OK: ' + r))
+          .catch(e => console.log('End Rescan ERROR: ' + e))
           .finally(() => {
             this.inRefresh = false;
           });
       } else {
         this.doSync()
-          .then((r) => console.log('End Sync OK: ' + r))
-          .catch((e) => console.log('End Sync ERROR: ' + e))
+          .then(r => console.log('End Sync OK: ' + r))
+          .catch(e => console.log('End Sync ERROR: ' + e))
           .finally(() => {
             this.inRefresh = false;
           });
@@ -484,18 +486,28 @@ export default class RPC {
 
         // Post sync updates
         let synced_blocks: number = ss.synced_blocks || 0;
-        let trial_decryptions_blocks: number = ss.trial_decryptions_blocks|| 0;
+        let trial_decryptions_blocks: number = ss.trial_decryptions_blocks || 0;
         let txn_scan_blocks: number = ss.txn_scan_blocks || 0;
 
         // just in case
-        if (synced_blocks < 0) synced_blocks = 0;
-        if (synced_blocks > 1000) synced_blocks = 1000;
-        if (trial_decryptions_blocks < 0) trial_decryptions_blocks = 0;
-        if (trial_decryptions_blocks > 1000) trial_decryptions_blocks = 1000;
-        if (txn_scan_blocks < 0) txn_scan_blocks = 0;
-        if (txn_scan_blocks > 1000) txn_scan_blocks = 1000;
-
-        const total_blocks: number = ss.total_blocks || 0;
+        if (synced_blocks < 0) {
+          synced_blocks = 0;
+        }
+        if (synced_blocks > 1000) {
+          synced_blocks = 1000;
+        }
+        if (trial_decryptions_blocks < 0) {
+          trial_decryptions_blocks = 0;
+        }
+        if (trial_decryptions_blocks > 1000) {
+          trial_decryptions_blocks = 1000;
+        }
+        if (txn_scan_blocks < 0) {
+          txn_scan_blocks = 0;
+        }
+        if (txn_scan_blocks > 1000) {
+          txn_scan_blocks = 1000;
+        }
 
         const batch_total: number = ss.batch_total || 0;
         const batch_num: number = ss.batch_num || 0;
@@ -504,9 +516,10 @@ export default class RPC {
 
         const total_general_blocks: number = this.lastServerBlockHeight - this.process_end_block;
 
-        const progress_blocks: number = (synced_blocks + trial_decryptions_blocks + txn_scan_blocks) / 3;
+        //const progress_blocks: number = (synced_blocks + trial_decryptions_blocks + txn_scan_blocks) / 3;
+        const progress_blocks: number = (synced_blocks + trial_decryptions_blocks) / 2;
 
-        const total_progress_blocks: number = batch_total === 1 ? progress_blocks : (1000 * batch_num) + progress_blocks;
+        const total_progress_blocks: number = batch_total === 1 ? progress_blocks : 1000 * batch_num + progress_blocks;
 
         let progress: number = (total_progress_blocks * 100) / total_general_blocks;
 
@@ -520,8 +533,12 @@ export default class RPC {
         }
 
         // just in case.
-        if (progress > 100) progress = 100;
-        if (progress < 0) progress = 0;
+        if (progress > 100) {
+          progress = 100;
+        }
+        if (progress < 0) {
+          progress = 0;
+        }
 
         // And fetch the rest of the data.
         //await this.loadWalletData();
@@ -534,15 +551,19 @@ export default class RPC {
           current_block = this.lastServerBlockHeight;
         }
 
-        this.fnSetRefreshUpdates(ss.in_progress, '', (current_block).toFixed(0).toString() + ' of ' + this.lastServerBlockHeight.toString());
+        this.fnSetRefreshUpdates(
+          ss.in_progress,
+          '',
+          current_block.toFixed(0).toString() + ' of ' + this.lastServerBlockHeight.toString(),
+        );
 
         // store SyncStatusReport object for a new screen
-        const status: SyncStatusReport = {
+        const statusGeneral: SyncStatusReport = {
           syncID: ss.sync_id,
           totalBatches: batch_total,
           currentBatch: ss.in_progress ? batch_num + 1 : 0,
           lastBlockWallet: this.lastWalletBlockHeight,
-          currentBlock: parseInt((current_block).toFixed(0)),
+          currentBlock: parseInt(current_block.toFixed(0), 10),
           inProgress: ss.in_progress,
           lastError: ss.last_error,
           blocksPerBatch: 1000,
@@ -552,7 +573,7 @@ export default class RPC {
           process_end_block: this.process_end_block,
           lastBlockServer: this.lastServerBlockHeight,
         };
-        this.fnSetSyncStatusReport(status);
+        this.fnSetSyncStatusReport(statusGeneral);
 
         this.prevProgress = progress;
 
@@ -579,12 +600,12 @@ export default class RPC {
           this.fnSetRefreshUpdates(false, '', '');
 
           // store SyncStatusReport object for a new screen
-          const status: SyncStatusReport = {
+          const statusFinished: SyncStatusReport = {
             syncID: ss.sync_id,
             totalBatches: 0,
             currentBatch: 0,
             lastBlockWallet: this.lastWalletBlockHeight,
-            currentBlock: parseInt((current_block).toFixed(0)),
+            currentBlock: parseInt(current_block.toFixed(0), 10),
             inProgress: false,
             lastError: ss.last_error,
             blocksPerBatch: 1000,
@@ -594,7 +615,7 @@ export default class RPC {
             process_end_block: this.lastWalletBlockHeight,
             lastBlockServer: this.lastServerBlockHeight,
           };
-          this.fnSetSyncStatusReport(status);
+          this.fnSetSyncStatusReport(statusFinished);
 
           console.log('sync status', ss);
           console.log(`Finished refresh at ${this.lastWalletBlockHeight} id: ${ss.sync_id}`);
@@ -614,12 +635,12 @@ export default class RPC {
               this.message = `Stored the wallet because batch: ${batch_num + 1} is finished.`;
 
               // store SyncStatusReport object for a new screen
-              const status: SyncStatusReport = {
+              const statusBatch: SyncStatusReport = {
                 syncID: ss.sync_id,
                 totalBatches: batch_total,
                 currentBatch: ss.in_progress ? batch_num + 1 : 0,
                 lastBlockWallet: this.lastWalletBlockHeight,
-                currentBlock: parseInt((current_block).toFixed(0)),
+                currentBlock: parseInt(current_block.toFixed(0), 10),
                 inProgress: ss.in_progress,
                 lastError: ss.last_error,
                 blocksPerBatch: 1000,
@@ -629,10 +650,12 @@ export default class RPC {
                 process_end_block: this.process_end_block,
                 lastBlockServer: this.lastServerBlockHeight,
               };
-              this.fnSetSyncStatusReport(status);
+              this.fnSetSyncStatusReport(statusBatch);
 
               console.log('sync status', ss);
-              console.log(`Saving because batch num changed ${this.prevBatchNum} - ${batch_num}. seconds: ${this.seconds_batch}`);
+              console.log(
+                `Saving because batch num changed ${this.prevBatchNum} - ${batch_num}. seconds: ${this.seconds_batch}`,
+              );
             }
             this.prevBatchNum = batch_num;
             this.seconds_batch = 0;
@@ -650,12 +673,12 @@ export default class RPC {
             this.message = `Stored the wallet. ${this.seconds_batch} seconds.`;
 
             // store SyncStatusReport object for a new screen
-            const status: SyncStatusReport = {
+            const statusSeconds: SyncStatusReport = {
               syncID: ss.sync_id,
               totalBatches: batch_total,
               currentBatch: ss.in_progress ? batch_num + 1 : 0,
               lastBlockWallet: this.lastWalletBlockHeight,
-              currentBlock: parseInt((current_block).toFixed(0)),
+              currentBlock: parseInt(current_block.toFixed(0), 10),
               inProgress: ss.in_progress,
               lastError: ss.last_error,
               blocksPerBatch: 1000,
@@ -665,7 +688,7 @@ export default class RPC {
               process_end_block: this.process_end_block,
               lastBlockServer: this.lastServerBlockHeight,
             };
-            this.fnSetSyncStatusReport(status);
+            this.fnSetSyncStatusReport(statusSeconds);
 
             console.log('sync status', ss);
             console.log(`Saving wallet. seconds: ${this.seconds_batch}`);
@@ -722,10 +745,18 @@ export default class RPC {
 
   // This method will get the total balances
   async fetchTotalBalance() {
+    const addressesStr = await RPCModule.execute('addresses', '');
+    let addressesJSON = await JSON.parse(addressesStr);
+
+    // for now only we use the first element of this array
+    addressesJSON = [addressesJSON[0]];
+
+    console.log('addr:', addressesJSON);
+
     const balanceStr = await RPCModule.execute('balance', '');
     const balanceJSON = await JSON.parse(balanceStr);
 
-    //console.log(balanceJSON);
+    console.log('balan:', balanceJSON);
 
     const orchardBal = (balanceJSON.orchard_balance || 0) / 10 ** 8;
     const privateBal = (balanceJSON.sapling_balance || 0) / 10 ** 8;
@@ -748,82 +779,66 @@ export default class RPC {
 
     //console.log(pendingNotes);
 
-    const pendingAddressBalances = new Map();
+    const pendingAddress = new Map();
 
     // Process orchard notes
-    if (!!pendingNotesJSON.pending_orchard_notes) {
+    if (pendingNotesJSON.pending_orchard_notes) {
       pendingNotesJSON.pending_orchard_notes.forEach((s: any) => {
-        pendingAddressBalances.set(s.address, s.value);
+        pendingAddress.set(s.address, s.value);
       });
     } else {
-      console.log('ERROR: notes.pending_orchard_notes no exists')
+      console.log('ERROR: notes.pending_orchard_notes no exists');
     }
 
     // Process sapling notes
-    if (!!pendingNotesJSON.pending_sapling_notes) {
+    if (pendingNotesJSON.pending_sapling_notes) {
       pendingNotesJSON.pending_sapling_notes.forEach((s: any) => {
-        pendingAddressBalances.set(s.address, s.value);
+        pendingAddress.set(s.address, s.value);
       });
     } else {
-      console.log('ERROR: notes.pending_sapling_notes no exists')
+      console.log('ERROR: notes.pending_sapling_notes no exists');
     }
 
     // Process UTXOs
-    if (!!pendingNotesJSON.pending_utxos) {
+    if (pendingNotesJSON.pending_utxos) {
       pendingNotesJSON.pending_utxos.forEach((s: any) => {
-        pendingAddressBalances.set(s.address, s.value);
+        pendingAddress.set(s.address, s.value);
       });
     } else {
-      console.log('ERROR: notes.pending_utxos no exists')
+      console.log('ERROR: notes.pending_utxos no exists');
     }
 
     // Addresses with Balance. The lite client reports balances in zatoshi, so divide by 10^8;
-    const oaddresses = balanceJSON.orchard_addresses
-      .map((o: any) => {
-        // If this has any unconfirmed txns, show that in the UI
-        const ab = new AddressBalance(o.address, (o.orchard_balance || 0) / 10 ** 8);
-        if (pendingAddressBalances.has(ab.address)) {
-          ab.containsPending = true;
-        }
-        return ab;
-      })
-      .filter((ab: AddressBalance) => ab.balance > 0);
+    const oaddresses = addressesJSON.map((u: any) => {
+      // If this has any unconfirmed txns, show that in the UI
+      const ab = new Address(u.address, 'u');
+      if (pendingAddress.has(ab.address)) {
+        ab.containsPending = true;
+      }
+      return ab;
+    });
 
-    const zaddresses = balanceJSON.sapling_addresses
-      .map((z: any) => {
-        // If this has any unconfirmed txns, show that in the UI
-        const ab = new AddressBalance(z.address, (z.sapling_balance || 0) / 10 ** 8);
-        if (pendingAddressBalances.has(ab.address)) {
-          ab.containsPending = true;
-        }
-        return ab;
-      })
-      .filter((ab: AddressBalance) => ab.balance > 0);
+    const zaddresses = addressesJSON.map((z: any) => {
+      // If this has any unconfirmed txns, show that in the UI
+      const ab = new Address(z.receivers.sapling, 'z');
+      if (pendingAddress.has(ab.address)) {
+        ab.containsPending = true;
+      }
+      return ab;
+    });
 
-    const taddresses = balanceJSON.transparent_addresses
-      .map((t: any) => {
-        // If this has any unconfirmed txns, show that in the UI
-        const ab = new AddressBalance(t.address, (t.balance || 0) / 10 ** 8);
-        if (pendingAddressBalances.has(ab.address)) {
-          ab.containsPending = true;
-        }
-        return ab;
-      })
-      .filter((ab: AddressBalance) => ab.balance > 0);
+    const taddresses = addressesJSON.map((t: any) => {
+      // If this has any unconfirmed txns, show that in the UI
+      const ab = new Address(t.receivers.transparent, 't');
+      if (pendingAddress.has(ab.address)) {
+        ab.containsPending = true;
+      }
+      return ab;
+    });
 
     const addresses = [...oaddresses, ...zaddresses, ...taddresses];
 
-    await this.fnSetAddressesWithBalance(addresses);
-
-    // Also set all addresses
-    const allOAddresses = balanceJSON.orchard_addresses.map((o: any) => o.address);
-    const allZAddresses = balanceJSON.sapling_addresses.map((o: any) => o.address);
-    const allTAddresses = balanceJSON.transparent_addresses.map((o: any) => o.address);
-    const allAddresses = [...allOAddresses, ...allZAddresses, ...allTAddresses];
-
-    // console.log(`All addresses: ${allAddresses}`);
-
-    await this.fnSetAllAddresses(allAddresses);
+    await this.fnSetAllAddresses(addresses);
   }
 
   async fetchWalletHeight(): Promise<number> {
@@ -842,22 +857,22 @@ export default class RPC {
 
     await this.fetchServerHeight();
 
-    //console.log('trans: ', listJSON);
+    console.log('trans: ', listJSON);
 
     let txlist = listJSON.map((tx: any) => {
       const type = tx.outgoing_metadata ? 'sent' : 'receive';
 
       //if (tx.txid === '55d6efcb987e8c6b8842a4c78d4adc80d8ca4761e3ff670a730e4840d8659ead') {
-        //console.log('tran: ', tx);
-        //console.log('meta: ', tx.outgoing_metadata);
-        //console.log('--------------------------------------------------');
+      //console.log('tran: ', tx);
+      //console.log('meta: ', tx.outgoing_metadata);
+      //console.log('--------------------------------------------------');
       //}
 
       var txdetail: TxDetail[] = [];
       if (tx.outgoing_metadata) {
         const dts = tx.outgoing_metadata.map((o: any) => {
           const detail: TxDetail = {
-            address: o.address || "",
+            address: o.address || '',
             amount: (o.value || 0) / 10 ** 8,
             memo: o.memo || null,
           };
@@ -868,7 +883,7 @@ export default class RPC {
         txdetail = RPC.rpc_combineTxDetails(dts);
       } else {
         const detail: TxDetail = {
-          address: tx.address || "",
+          address: tx.address || '',
           amount: (tx.amount || 0) / 10 ** 8,
           memo: tx.memo || null,
         };
@@ -882,9 +897,9 @@ export default class RPC {
         amount: tx.amount / 10 ** 8,
         confirmations: tx.unconfirmed
           ? 0
-          : !!this.lastServerBlockHeight
-            ? this.lastServerBlockHeight - tx.block_height + 1
-            : '--',
+          : this.lastServerBlockHeight
+          ? this.lastServerBlockHeight - tx.block_height + 1
+          : '--',
         txid: tx.txid,
         zec_price: tx.zec_price,
         time: tx.datetime,
@@ -1103,9 +1118,9 @@ export default class RPC {
       await RPCModule.doSaveBackup();
       await RPCModule.deleteExistingWallet();
     } else {
-      return `Error: Couldn't find any wallet.`;
+      return "Error: Couldn't find any wallet.";
     }
-    return "";
+    return '';
   }
 
   async changeWalletNoBackup() {
@@ -1115,9 +1130,9 @@ export default class RPC {
     if (exists && exists !== 'false') {
       await RPCModule.deleteExistingWallet();
     } else {
-      return `Error: Couldn't find any wallet.`;
+      return "Error: Couldn't find any wallet.";
     }
-    return "";
+    return '';
   }
 
   async restoreBackup() {
@@ -1131,12 +1146,12 @@ export default class RPC {
       if (existsWallet && existsWallet !== 'false') {
         await RPCModule.restoreExistingWalletBackup();
       } else {
-        return `Error: Couldn't find any wallet.`;
+        return "Error: Couldn't find any wallet.";
       }
     } else {
-      return `Error: Couldn't find any backup of any wallet.`;
+      return "Error: Couldn't find any backup of any wallet.";
     }
-    return "";
+    return '';
   }
 
   async setInRefresh(value) {
