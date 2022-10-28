@@ -7,7 +7,6 @@ import { TotalBalance } from '../app/AppState';
 import Button from './Button';
 import { useTheme } from '@react-navigation/native';
 import Toast from 'react-native-simple-toast';
-import cstyles from './CommonStyles';
 
 type SeedComponentProps = {
   seed?: string;
@@ -177,18 +176,15 @@ const SeedComponent: React.FunctionComponent<SeedComponentProps> = ({
                 Block height of first transaction. (It's OK, if you don't know)
               </FadeText>
               <RegTextInput
-                style={[
-                  {
-                    margin: 10,
-                    padding: 10,
-                    borderWidth: 1,
-                    borderRadius: 10,
-                    borderColor: colors.text,
-                    width: '40%',
-                    color: colors.text,
-                  },
-                  cstyles.innerpaddingsmall,
-                ]}
+                style={{
+                  margin: 10,
+                  padding: 10,
+                  borderWidth: 1,
+                  borderRadius: 10,
+                  borderColor: colors.text,
+                  width: '40%',
+                  color: colors.text,
+                }}
                 value={birthdayNumber}
                 keyboardType="numeric"
                 onChangeText={(text: string) => setBirthdayNumber(text)}

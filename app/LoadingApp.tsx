@@ -8,7 +8,6 @@ import { View, Alert, SafeAreaView, Image, Text, Modal } from 'react-native';
 import Toast from 'react-native-simple-toast';
 import { useTheme } from '@react-navigation/native';
 
-import cstyles from '../components/CommonStyles';
 import { BoldText } from '../components/Components';
 import Button from '../components/Button';
 import RPCModule from '../components/RPCModule';
@@ -259,7 +258,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
               />
             )}
 
-            <View style={[cstyles.margintop, { display: 'flex', alignItems: 'center' }]}>
+            <View style={{ marginTop: 50, display: 'flex', alignItems: 'center' }}>
               <Button
                 type="Secondary"
                 title="Restore wallet from Seed"

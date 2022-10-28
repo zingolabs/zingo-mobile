@@ -4,7 +4,6 @@ import { View, ScrollView, SafeAreaView, Image, TouchableOpacity, Modal } from '
 import { FadeText, RegText, RegTextInput, ZecAmount } from './Components';
 import Button from './Button';
 import { useTheme } from '@react-navigation/native';
-import cstyles from './CommonStyles';
 import { faQrcode } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import QRCodeScanner from 'react-native-qrcode-scanner';
@@ -131,7 +130,7 @@ const ImportKeyModal: React.FunctionComponent<ImportKeyModalProps> = ({
         <RegTextInput
           multiline
           style={{
-            ...cstyles.innerpaddingsmall,
+            padding: 10,
             maxWidth: '95%',
             minWidth: '95%',
             borderWidth: 1,
@@ -155,11 +154,17 @@ const ImportKeyModal: React.FunctionComponent<ImportKeyModalProps> = ({
           />*/}
         </TouchableOpacity>
 
-        <RegText style={[cstyles.margintop, cstyles.center]}>Key Birthday</RegText>
+        <RegText
+          style={{
+            marginTop: 50,
+            textAlign: 'center',
+          }}>
+          Key Birthday
+        </RegText>
         <FadeText>Block height of first transaction. (OK to leave blank)</FadeText>
         <RegTextInput
           style={{
-            ...cstyles.innerpaddingsmall,
+            padding: 10,
             maxWidth: '50%',
             minWidth: '50%',
             borderWidth: 1,
