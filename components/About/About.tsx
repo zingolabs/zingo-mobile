@@ -1,8 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import { View, ScrollView, SafeAreaView, Image } from 'react-native';
-import { FadeText, ZecAmount, RegText } from './Components';
-import Button from './Button';
+import { FadeText, ZecAmount, RegText } from '../Components';
+import Button from '../Button';
 import { useTheme } from '@react-navigation/native';
 
 type AboutModalProps = {
