@@ -2,7 +2,11 @@
 import React, { useState, useEffect } from 'react';
 import { View, Image, SafeAreaView, ScrollView } from 'react-native';
 import Clipboard from '@react-native-community/clipboard';
-import { RegText, RegTextInput, FadeText, ClickableText, ZecAmount } from './Components';
+import RegText from './Components/RegText';
+import RegTextInput from './Components/RegTextInput';
+import FadeText from './Components/FadeText';
+import ClickableText from './Components/ClickableText';
+import ZecAmount from './Components/ZecAmount';
 import { TotalBalance } from '../app/AppState';
 import Button from './Button';
 import { useTheme } from '@react-navigation/native';

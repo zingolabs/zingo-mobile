@@ -1,7 +1,10 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState } from 'react';
 import { View, ScrollView, SafeAreaView, Image, TouchableOpacity, Modal } from 'react-native';
-import { FadeText, RegText, RegTextInput, ZecAmount } from './Components';
+import FadeText from './Components/FadeText';
+import RegText from './Components/RegText';
+import RegTextInput from './Components/RegTextInput';
+import ZecAmount from './Components/ZecAmount';
 import Button from './Button';
 import { useTheme } from '@react-navigation/native';
 import { faQrcode } from '@fortawesome/free-solid-svg-icons';

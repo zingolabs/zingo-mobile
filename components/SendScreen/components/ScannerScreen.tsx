@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import { View } from 'react-native';
-import { RegText } from '../../Components';
+import RegText from '../../Components/RegText';
 import Button from '../../Button';
 import { useTheme } from '@react-navigation/native';
 import { parseZcashURI } from '../../../app/uris';

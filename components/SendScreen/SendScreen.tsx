@@ -1,7 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useRef } from 'react';
 import { View, ScrollView, Modal, Image, Alert, Keyboard } from 'react-native';
-import { FadeText, ErrorText, RegTextInput, RegText, ZecAmount, UsdAmount } from '../Components';
+import FadeText from '../Components/FadeText';
+import ErrorText from '../Components/ErrorText';
+import RegTextInput from '../Components/RegTextInput';
+import RegText from '../Components/RegText';
+import ZecAmount from '../Components/ZecAmount';
+import UsdAmount from '../Components/UsdAmount';
 import Button from '../Button';
 import { Info, SendPageState, SendProgress, ToAddr, TotalBalance } from '../../app/AppState';
 import { faQrcode, faCheck, faInfo } from '@fortawesome/free-solid-svg-icons';

@@ -1,7 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import { View, ScrollView, SafeAreaView, Image, TouchableOpacity } from 'react-native';
-import { RegText, FadeText, BoldText, RegTextInput, ZecAmount } from './Components';
+import RegText from './Components/RegText';
+import FadeText from './Components/FadeText';
+import BoldText from './Components/BoldText';
+import RegTextInput from './Components/RegTextInput';
+import ZecAmount from './Components/ZecAmount';
 import { parseServerURI, SERVER_URI, MEMOS } from '../app/uris';
 import Button from './Button';
 import { useTheme } from '@react-navigation/native';

@@ -1,7 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import { View, ScrollView, SafeAreaView } from 'react-native';
-import { FadeText, BoldText, RegText, ZecAmount, UsdAmount } from '../../Components';
+import FadeText from '../../Components/FadeText';
+import BoldText from '../../Components/BoldText';
+import RegText from '../../Components/RegText';
+import ZecAmount from '../../Components/ZecAmount';
+import UsdAmount from '../../Components/UsdAmount';
 import Button from '../../Button';
 import { SendPageState } from '../../../app/AppState';
 import { useTheme } from '@react-navigation/native';

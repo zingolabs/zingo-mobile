@@ -8,7 +8,7 @@ import { View, Alert, SafeAreaView, Image, Text, Modal } from 'react-native';
 import Toast from 'react-native-simple-toast';
 import { useTheme } from '@react-navigation/native';
 
-import { BoldText } from '../components/Components';
+import BoldText from '../components/Components/BoldText';
 import Button from '../components/Button';
 import RPCModule from '../components/RPCModule';
 import { TotalBalance } from './AppState';

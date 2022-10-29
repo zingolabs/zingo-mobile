@@ -2,7 +2,10 @@
 import React, { useState } from 'react';
 import { View, ScrollView, SafeAreaView, Image, Platform, TouchableOpacity } from 'react-native';
 import Clipboard from '@react-native-community/clipboard';
-import { ClickableText, FadeText, RegText, ZecAmount } from './Components';
+import ClickableText from './Components/ClickableText';
+import FadeText from './Components/FadeText';
+import RegText from './Components/RegText';
+import ZecAmount from './Components/ZecAmount';
 import Button from './Button';
 import { useTheme } from '@react-navigation/native';
 import Utils from '../app/utils';

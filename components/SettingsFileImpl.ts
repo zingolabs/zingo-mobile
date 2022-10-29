@@ -1,6 +1,6 @@
 import * as RNFS from 'react-native-fs';
 
-import { SettingsFileEntry } from '../components/AppState';
+import { SettingsFileEntry } from '../app/AppState';
 
 export default class SettingsFileImpl {
   static async getFileName() {

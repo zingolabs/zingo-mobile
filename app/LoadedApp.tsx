@@ -23,7 +23,8 @@ import AppState, {
   SendProgress,
   WalletSettings,
 } from './AppState';
-import { RegText, FadeText } from '../components/Components';
+import RegText from '../components/Components/RegText';
+import FadeText from '../components/Components/FadeText';
 import Utils from './utils';
 import TransactionsScreen from '../components/TransactionsScreen';
 import SendScreen from '../components/SendScreen';

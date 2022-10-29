@@ -1,7 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-import { RegText, ZecAmount, UsdAmount, FadeText, ZecPrice, ClickableText } from '../components/Components';
+import RegText from './Components/RegText';
+import ZecAmount from './Components/ZecAmount';
+import UsdAmount from './Components/UsdAmount';
+import FadeText from './Components/FadeText';
+import ZecPrice from './Components/ZecPrice';
+import ClickableText from './Components/ClickableText';
 import Button from './Button';
 import { View, ScrollView, Image, Modal, TouchableOpacity, SafeAreaView, RefreshControl, Linking } from 'react-native';
 import Clipboard from '@react-native-community/clipboard';

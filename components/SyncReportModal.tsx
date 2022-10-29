@@ -1,7 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState } from 'react';
 import { View, ScrollView, SafeAreaView, Image, Text } from 'react-native';
-import { RegText, FadeText } from './Components';
+import RegText from './Components/RegText';
+import FadeText from './Components/FadeText';
 import Button from './Button';
 import { useTheme } from '@react-navigation/native';
 import { SyncStatusReport } from '../app/AppState';
