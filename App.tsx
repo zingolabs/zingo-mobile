@@ -5,15 +5,14 @@
 import React from 'react';
 import { SafeAreaView } from 'react-native';
 
-import { NavigationContainer, DarkTheme } from '@react-navigation/native';
+import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import LoadedApp from './app/LoadedApp';
 import LoadingApp from './app/LoadingApp';
+import { ThemeType } from '.app/types';
 
-const Theme = {
-  ...DarkTheme,
+const Theme: ThemeType = {
   colors: {
-    ...DarkTheme.colors,
     background: '#011401', //'#010101',
     card: '#011401', //'#401717',
     border: '#ffffff',

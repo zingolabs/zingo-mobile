@@ -12,7 +12,7 @@ import Button from './Button';
 import { useTheme } from '@react-navigation/native';
 import Toast from 'react-native-simple-toast';
 
-type SeedComponentProps = {
+type SeedProps = {
   seed?: string;
   birthday?: number;
   onClickOK: () => void;
@@ -22,7 +22,7 @@ type SeedComponentProps = {
   error?: string;
   currencyName?: string;
 };
-const SeedComponent: React.FunctionComponent<SeedComponentProps> = ({
+const Seed: React.FunctionComponent<SeedProps> = ({
   seed,
   birthday,
   onClickOK,
@@ -245,4 +245,4 @@ const SeedComponent: React.FunctionComponent<SeedComponentProps> = ({
   );
 };
 
-export default SeedComponent;
+export default Seed;

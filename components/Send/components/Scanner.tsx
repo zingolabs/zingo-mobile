@@ -8,7 +8,7 @@ import { useTheme } from '@react-navigation/native';
 import { parseZcashURI } from '../../../app/uris';
 import RPCModule from '../../RPCModule';
 
-type ScannerScreenProps = {
+type ScannerProps = {
   idx: number;
   updateToField: (
     idx: number,
@@ -20,7 +20,7 @@ type ScannerScreenProps = {
   closeModal: () => void;
 };
 
-function ScannerScreen({ idx, updateToField, closeModal }: ScannerScreenProps) {
+function Scanner({ idx, updateToField, closeModal }: ScannerProps) {
   const [error, setError] = useState<String | null>(null);
 
   const validateAddress = async (scannedAddress: string) => {
@@ -88,4 +88,4 @@ function ScannerScreen({ idx, updateToField, closeModal }: ScannerScreenProps) {
   );
 }
 
-export default ScannerScreen;
+export default Scanner;

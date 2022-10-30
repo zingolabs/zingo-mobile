@@ -6,7 +6,7 @@ import ZecAmount from './Components/ZecAmount';
 import Button from './Button';
 import { useTheme } from '@react-navigation/native';
 
-type RescanModalProps = {
+type RescanProps = {
   closeModal: () => void;
   birthday?: number;
   startRescan: () => void;
@@ -14,7 +14,7 @@ type RescanModalProps = {
   currencyName: string;
 };
 
-const RescanModal: React.FunctionComponent<RescanModalProps> = ({
+const Rescan: React.FunctionComponent<RescanProps> = ({
   birthday,
   startRescan,
   closeModal,
@@ -80,4 +80,4 @@ const RescanModal: React.FunctionComponent<RescanModalProps> = ({
   );
 };
 
-export default RescanModal;
+export default Rescan;

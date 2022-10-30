@@ -15,7 +15,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faDotCircle } from '@fortawesome/free-solid-svg-icons';
 import { faCircle as farCircle } from '@fortawesome/free-regular-svg-icons';
 
-type SettingsModalProps = {
+type SettingsProps = {
   closeModal: () => void;
   wallet_settings: WalletSettings;
   set_wallet_option: (name: string, value: string) => void;
@@ -24,7 +24,7 @@ type SettingsModalProps = {
   currencyName: string;
 };
 
-const SettingsModal: React.FunctionComponent<SettingsModalProps> = ({
+const Settings: React.FunctionComponent<SettingsProps> = ({
   wallet_settings,
   set_wallet_option,
   set_server_option,
@@ -253,4 +253,4 @@ const SettingsModal: React.FunctionComponent<SettingsModalProps> = ({
   );
 };
 
-export default SettingsModal;
+export default Settings;

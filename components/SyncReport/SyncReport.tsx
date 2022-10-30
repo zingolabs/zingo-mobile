@@ -21,7 +21,7 @@ const DetailLine: React.FunctionComponent<DetailLineProps> = ({ label, value }) 
   );
 };
 
-type SyncReportModalProps = {
+type SyncReportProps = {
   closeModal: () => void;
   totalBalance: object;
   currencyName: string;
@@ -29,7 +29,7 @@ type SyncReportModalProps = {
   birthday?: number;
 };
 
-const SyncReportModal: React.FunctionComponent<SyncReportModalProps> = ({ closeModal, syncStatusReport, birthday }) => {
+const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal, syncStatusReport, birthday }) => {
   const { colors } = useTheme();
   const [maxBlocks, setMaxBlocks] = useState(null);
   const [points, setPoints] = useState([]);
@@ -521,4 +521,4 @@ const SyncReportModal: React.FunctionComponent<SyncReportModalProps> = ({ closeM
   );
 };
 
-export default SyncReportModal;
+export default SyncReport;

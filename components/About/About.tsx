@@ -7,11 +7,11 @@ import RegText from '../Components/RegText';
 import Button from '../Button';
 import { useTheme } from '@react-navigation/native';
 
-type AboutModalProps = {
+type AboutProps = {
   closeModal: () => void;
   totalBalance: object;
 };
-const AboutModal: React.FunctionComponent<AboutModalProps> = ({ closeModal, totalBalance, currencyName }) => {
+const About: React.FunctionComponent<AboutProps> = ({ closeModal, totalBalance, currencyName }) => {
   const { colors } = useTheme();
   return (
     <SafeAreaView
@@ -85,4 +85,4 @@ const AboutModal: React.FunctionComponent<AboutModalProps> = ({ closeModal, tota
   );
 };
 
-export default AboutModal;
+export default About;

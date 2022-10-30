@@ -11,7 +11,7 @@ import { SendPageState } from '../../../app/AppState';
 import { useTheme } from '@react-navigation/native';
 import Utils from '../../../app/utils';
 
-type ConfirmModalProps = {
+type ConfirmProps = {
   sendPageState: SendPageState;
   defaultFee: number;
   price?: number | null;
@@ -19,7 +19,7 @@ type ConfirmModalProps = {
   confirmSend: () => void;
   currencyName: string;
 };
-const ConfirmModal: React.FunctionComponent<ConfirmModalProps> = ({
+const Confirm: React.FunctionComponent<ConfirmProps> = ({
   closeModal,
   confirmSend,
   sendPageState,
@@ -110,4 +110,4 @@ const ConfirmModal: React.FunctionComponent<ConfirmModalProps> = ({
   );
 };
 
-export default ConfirmModal;
+export default Confirm;

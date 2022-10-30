@@ -26,17 +26,17 @@ import AppState, {
 import RegText from '../components/Components/RegText';
 import FadeText from '../components/Components/FadeText';
 import Utils from './utils';
-import TransactionsScreen from '../components/TransactionsScreen';
-import SendScreen from '../components/SendScreen';
-import ReceiveScreen from '../components/ReceiveScreen';
-import ReceiversScreen from '../components/ReceiversScreen';
-import AboutModal from '../components/About';
-import SeedComponent from '../components/SeedComponent';
-import InfoModal from '../components/InfoModal';
-import SyncReportModal from '../components/SyncReportModal';
-import RescanModal from '../components/RescanModal';
-import SettingsModal from '../components/SettingsModal';
-import SettingsFileImpl from '../components/SettingsFileImpl';
+import Transactions from '../components/Transactions';
+import Send from '../components/Send';
+import Receive from '../components/Receive';
+import Legacy from '../components/Legacy';
+import About from '../components/About';
+import Seed from '../components/Seed';
+import Info from '../components/Info';
+import SyncReport from '../components/SyncReport';
+import Rescan from '../components/Rescan';
+import Settings from '../components/Settings';
+import SettingsFileImpl from '../components/Settings/SettingsFileImpl';
 
 import { useTheme } from '@react-navigation/native';
 
@@ -711,7 +711,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
           transparent={false}
           visible={aboutModalVisible}
           onRequestClose={() => this.setState({ aboutModalVisible: false })}>
-          <AboutModal
+          <About
             closeModal={() => this.setState({ aboutModalVisible: false })}
             totalBalance={totalBalance}
             currencyName={currencyName}
@@ -723,7 +723,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
           transparent={false}
           visible={infoModalVisible}
           onRequestClose={() => this.setState({ infoModalVisible: false })}>
-          <InfoModal
+          <Info
             closeModal={() => this.setState({ infoModalVisible: false })}
             info={info}
             totalBalance={totalBalance}
@@ -736,7 +736,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
           transparent={false}
           visible={syncReportModalVisible}
           onRequestClose={() => this.setState({ syncReportModalVisible: false })}>
-          <SyncReportModal
+          <SyncReport
             closeModal={() => this.setState({ syncReportModalVisible: false })}
             totalBalance={totalBalance}
             currencyName={currencyName}
@@ -751,7 +751,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
           transparent={false}
           visible={rescanModalVisible}
           onRequestClose={() => this.setState({ rescanModalVisible: false })}>
-          <RescanModal
+          <Rescan
             closeModal={() => this.setState({ rescanModalVisible: false })}
             birthday={walletSeed?.birthday}
             startRescan={this.startRescan}
@@ -765,7 +765,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
           transparent={false}
           visible={settingsModalVisible}
           onRequestClose={() => this.setState({ settingsModalVisible: false })}>
-          <SettingsModal
+          <Settings
             closeModal={() => this.setState({ settingsModalVisible: false })}
             wallet_settings={wallet_settings}
             set_wallet_option={this.set_wallet_option}
@@ -780,7 +780,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
           transparent={false}
           visible={seedViewModalVisible}
           onRequestClose={() => this.setState({ seedViewModalVisible: false })}>
-          <SeedComponent
+          <Seed
             seed={walletSeed?.seed}
             birthday={walletSeed?.birthday}
             onClickOK={() => this.setState({ seedViewModalVisible: false })}
@@ -797,7 +797,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
           transparent={false}
           visible={seedChangeModalVisible}
           onRequestClose={() => this.setState({ seedChangeModalVisible: false })}>
-          <SeedComponent
+          <Seed
             seed={walletSeed?.seed}
             birthday={walletSeed?.birthday}
             onClickOK={() => this.onClickOKChangeWallet()}
@@ -814,7 +814,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
           transparent={false}
           visible={seedBackupModalVisible}
           onRequestClose={() => this.setState({ seedBackupModalVisible: false })}>
-          <SeedComponent
+          <Seed
             seed={walletSeed?.seed}
             birthday={walletSeed?.birthday}
             onClickOK={() => this.onClickOKRestoreBackup()}
@@ -831,7 +831,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
           transparent={false}
           visible={seedServerModalVisible}
           onRequestClose={() => this.setState({ seedServerModalVisible: false })}>
-          <SeedComponent
+          <Seed
             seed={walletSeed?.seed}
             birthday={walletSeed?.birthday}
             onClickOK={() => this.onClickOKServerWallet()}
@@ -865,7 +865,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
           <Tab.Screen name="SEND">
             {props => (
               <>
-                <SendScreen
+                <Send
                   {...props}
                   {...standardProps}
                   totalBalance={totalBalance}
@@ -892,7 +892,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
           <Tab.Screen name="WALLET">
             {props => (
               <>
-                <TransactionsScreen
+                <Transactions
                   {...props}
                   {...standardProps}
                   transactions={transactions}
@@ -916,7 +916,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
           <Tab.Screen name="UA's">
             {props => (
               <>
-                <ReceiveScreen
+                <Receive
                   {...props}
                   {...standardProps}
                   addresses={addresses}
@@ -940,7 +940,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
           <Tab.Screen name="LEGACY">
             {props => (
               <>
-                <ReceiversScreen
+                <Legacy
                   {...props}
                   {...standardProps}
                   addresses={addresses}

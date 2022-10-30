@@ -1,7 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import { View, ScrollView, SafeAreaView, Image } from 'react-native';
-import FadeText from './Components/FadeText';
 import RegText from './Components/RegText';
 import ZecAmount from './Components/ZecAmount';
 import Button from './Button';
@@ -10,28 +9,16 @@ import { Info } from '../app/AppState';
 import Utils from '../app/utils';
 import RPC from '../app/rpc';
 
-type DetailLineProps = {
-  label: string;
-  value?: string | number;
-};
-const DetailLine: React.FunctionComponent<DetailLineProps> = ({ label, value }) => {
-  const colors = useTheme();
-  return (
-    <View style={{ display: 'flex', marginTop: 20 }}>
-      <FadeText>{label}</FadeText>
-      <RegText color={colors.text}>{value}</RegText>
-    </View>
-  );
-};
+import DetailLine from './components/DetailLine';
 
-type InfoModalProps = {
+type InfoProps = {
   info: Info | null;
   closeModal: () => void;
   totalBalance: object;
   currencyName: string;
 };
 
-const InfoModal: React.FunctionComponent<InfoModalProps> = ({ info, closeModal, totalBalance, currencyName }) => {
+const Info: React.FunctionComponent<InfoProps> = ({ info, closeModal, totalBalance, currencyName }) => {
   const { colors } = useTheme();
   const [infoState, setInfoState] = React.useState({});
 
@@ -115,4 +102,4 @@ const InfoModal: React.FunctionComponent<InfoModalProps> = ({ info, closeModal, 
   );
 };
 
-export default InfoModal;
+export default Info;

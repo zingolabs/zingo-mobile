@@ -9,69 +9,16 @@ import Button from './Button';
 import { useTheme } from '@react-navigation/native';
 import { faQrcode } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import QRCodeScanner from 'react-native-qrcode-scanner';
 
-type ScannerProps = {
-  setPrivKeyText: (k: string) => void;
-  closeModal: () => void;
-};
-function ScanScreen({ setPrivKeyText, closeModal }: ScannerProps) {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [error, setError] = useState<String | null>(null);
+import Scanner from './components/Scanner';
 
-  const validateKey = (scannedKey: string) => {
-    setPrivKeyText(scannedKey);
-    closeModal();
-  };
-
-  const onRead = (e: any) => {
-    const scandata = e.data.trim();
-
-    validateKey(scandata);
-  };
-
-  const doCancel = () => {
-    closeModal();
-  };
-
-  const { colors } = useTheme();
-  return (
-    <QRCodeScanner
-      onRead={onRead}
-      reactivate={true}
-      containerStyle={{ backgroundColor: colors.background }}
-      topContent={<RegText>Scan a Private/Spending or Full Viewing/Viewing Key</RegText>}
-      bottomContent={
-        <View
-          style={{
-            flex: 1,
-            flexDirection: 'column',
-            alignItems: 'stretch',
-            justifyContent: 'center',
-            width: '100%',
-          }}>
-          {error && <RegText style={{ textAlign: 'center' }}>{error}</RegText>}
-          <View style={{ flexDirection: 'row', alignItems: 'stretch', justifyContent: 'space-evenly' }}>
-            <Button type="Secondary" title="Cancel" onPress={doCancel} />
-          </View>
-        </View>
-      }
-    />
-  );
-}
-
-type ImportKeyModalProps = {
+type ImportKeyProps = {
   closeModal: () => void;
   doImport: (keyText: string, birthday: string) => void;
   totalBalance: object;
   currencyName: string;
 };
-const ImportKeyModal: React.FunctionComponent<ImportKeyModalProps> = ({
-  closeModal,
-  doImport,
-  totalBalance,
-  currencyName,
-}) => {
+const ImportKey: React.FunctionComponent<ImportKeyProps> = ({ closeModal, doImport, totalBalance, currencyName }) => {
   const { colors } = useTheme();
 
   const [privKeyText, setPrivKeyText] = useState('');
@@ -117,7 +64,7 @@ const ImportKeyModal: React.FunctionComponent<ImportKeyModalProps> = ({
         transparent={false}
         visible={qrcodeModalVisible}
         onRequestClose={() => setQrcodeModalVisible(false)}>
-        <ScanScreen setPrivKeyText={setPrivKeyText} closeModal={() => setQrcodeModalVisible(false)} />
+        <Scanner setPrivKeyText={setPrivKeyText} closeModal={() => setQrcodeModalVisible(false)} />
       </Modal>
 
       <ScrollView
@@ -194,4 +141,4 @@ const ImportKeyModal: React.FunctionComponent<ImportKeyModalProps> = ({
   );
 };
 
-export default ImportKeyModal;
+export default ImportKey;

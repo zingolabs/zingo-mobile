@@ -12,7 +12,7 @@ import Utils from '../app/utils';
 import Toast from 'react-native-simple-toast';
 import QRCode from 'react-native-qrcode-svg';
 
-type PrivKeyModalProps = {
+type PrivKeyProps = {
   closeModal: () => void;
   address: string;
   keyType: number;
@@ -20,7 +20,7 @@ type PrivKeyModalProps = {
   totalBalance: object;
   currencyName: string;
 };
-const PrivKeyModal: React.FunctionComponent<PrivKeyModalProps> = ({
+const PrivKey: React.FunctionComponent<PrivKeyProps> = ({
   address,
   keyType,
   privKey,
@@ -130,4 +130,4 @@ const PrivKeyModal: React.FunctionComponent<PrivKeyModalProps> = ({
   );
 };
 
-export default PrivKeyModal;
+export default PrivKey;

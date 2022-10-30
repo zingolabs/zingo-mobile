@@ -1,16 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState } from 'react';
-import { View, Dimensions, Platform, Image, Modal, ScrollView } from 'react-native';
-import Clipboard from '@react-native-community/clipboard';
-import QRCode from 'react-native-qrcode-svg';
+import { View, Dimensions, Image, Modal } from 'react-native';
 import { TabView, TabBar } from 'react-native-tab-view';
 import Toast from 'react-native-simple-toast';
-import ClickableText from './Components/ClickableText';
 import FadeText from './Components/FadeText';
 import ZecAmount from './Components/ZecAmount';
 import UsdAmount from './Components/UsdAmount';
 import RegText from './Components/RegText';
-import Button from './Button';
 import { Info, Address } from '../app/AppState';
 import Utils from '../app/utils';
 import { useTheme } from '@react-navigation/native';
@@ -20,84 +16,12 @@ import { faBars, faEllipsisV, faInfo } from '@fortawesome/free-solid-svg-icons';
 // @ts-ignore
 import OptionsMenu from 'react-native-option-menu';
 import RPC from '../app/rpc';
-import PrivKeyModal from './PrivKeyModal';
-import ImportKeyModal from './ImportKey';
+import PrivKey from './PrivKey';
+import ImportKey from './ImportKey';
 
-type SingleAddress = {
-  address: string;
-  index: number;
-  total: number;
-  prev: () => void;
-  next: () => void;
-};
+import SingleAddress from './components/SingleAddress';
 
-const SingleAddressDisplay: React.FunctionComponent<SingleAddress> = ({ address, index, total, prev, next }) => {
-  // console.log(`Addresses ${addresses}: ${multipleAddresses}`);
-  const { colors } = useTheme();
-
-  const multi = total > 1;
-
-  // 30 characters per line
-  const numLines = address.length / 30;
-  const chunks = Utils.splitStringIntoChunks(address, numLines.toFixed(0));
-  const fixedWidthFont = Platform.OS === 'android' ? 'monospace' : 'Courier';
-
-  const doCopy = () => {
-    if (address) {
-      Clipboard.setString(address);
-      Toast.show('Copied Unified Address to Clipboard', Toast.LONG);
-    }
-  };
-
-  return (
-    <ScrollView
-      contentContainerStyle={[
-        {
-          flex: 1,
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'flex-start',
-        },
-      ]}
-      keyboardShouldPersistTaps="handled">
-      <View style={{ marginTop: 20, padding: 10, backgroundColor: colors.border }}>
-        <QRCode value={address} size={200} ecl="L" backgroundColor={colors.border} />
-      </View>
-      <ClickableText style={{ marginTop: 15 }} onPress={doCopy}>
-        Tap To Copy
-      </ClickableText>
-
-      <View
-        style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', marginTop: 10, justifyContent: 'center' }}>
-        {chunks.map(c => (
-          <FadeText
-            key={c}
-            style={{
-              flexBasis: '100%',
-              textAlign: 'center',
-              fontFamily: fixedWidthFont,
-              fontSize: 18,
-              color: colors.text,
-            }}>
-            {c}
-          </FadeText>
-        ))}
-      </View>
-
-      {multi && (
-        <View style={{ display: 'flex', flexDirection: 'row', marginTop: 10, alignItems: 'center', marginBottom: 100 }}>
-          <Button type="Secondary" title={'Prev'} style={{ width: '25%', margin: 10 }} onPress={prev} />
-          <FadeText>
-            {index + 1} of {total}
-          </FadeText>
-          <Button type="Secondary" title={'Next'} style={{ width: '25%', margin: 10 }} onPress={next} />
-        </View>
-      )}
-    </ScrollView>
-  );
-};
-
-type ReceiveScreenProps = {
+type ReceiveProps = {
   info: Info | null;
   addresses: Address[];
   toggleMenuDrawer: () => void;
@@ -105,7 +29,7 @@ type ReceiveScreenProps = {
   startRescan: () => void;
 };
 
-const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
+const Receive: React.FunctionComponent<ReceiveProps> = ({
   addresses,
   toggleMenuDrawer,
   fetchTotalBalance,
@@ -170,7 +94,7 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
         }
 
         return (
-          <SingleAddressDisplay
+          <SingleAddress
             address={uaddr}
             index={oindex}
             total={uaddrs.length}
@@ -276,7 +200,7 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
           transparent={false}
           visible={privKeyModalVisible}
           onRequestClose={() => setPrivKeyModalVisible(false)}>
-          <PrivKeyModal
+          <PrivKey
             address={address}
             keyType={keyType}
             privKey={privKey}
@@ -291,7 +215,7 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
           transparent={false}
           visible={importKeyModalVisible}
           onRequestClose={() => setImportKeyModalVisible(false)}>
-          <ImportKeyModal
+          <ImportKey
             doImport={doImport}
             closeModal={() => setImportKeyModalVisible(false)}
             totalBalance={totalBalance}
@@ -395,4 +319,4 @@ const ReceiveScreen: React.FunctionComponent<ReceiveScreenProps> = ({
   );
 };
 
-export default ReceiveScreen;
+export default Receive;

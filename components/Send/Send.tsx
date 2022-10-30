@@ -22,10 +22,10 @@ import Animated, { EasingNode } from 'react-native-reanimated';
 import { parseZcashURI } from '../../app/uris';
 import RPCModule from '../RPCModule';
 
-import ScannerScreen from './components/ScannerScreen';
-import ConfirmModal from './components/ConfirmModal';
+import Scanner from './components/Scanner';
+import Confirm from './components/Confirm';
 
-type SendScreenProps = {
+type SendProps = {
   info: Info | null;
   totalBalance: TotalBalance;
   sendPageState: SendPageState;
@@ -39,7 +39,7 @@ type SendScreenProps = {
   syncingStatus: SyncStatus | null;
 };
 
-const SendScreen: React.FunctionComponent<SendScreenProps> = ({
+const Send: React.FunctionComponent<SendProps> = ({
   info,
   totalBalance,
   sendPageState,
@@ -301,11 +301,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
         transparent={false}
         visible={qrcodeModalVisble}
         onRequestClose={() => setQrcodeModalVisible(false)}>
-        <ScannerScreen
-          idx={qrcodeModalIndex}
-          updateToField={updateToField}
-          closeModal={() => setQrcodeModalVisible(false)}
-        />
+        <Scanner idx={qrcodeModalIndex} updateToField={updateToField} closeModal={() => setQrcodeModalVisible(false)} />
       </Modal>
 
       <Modal
@@ -313,7 +309,7 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
         transparent={false}
         visible={confirmModalVisible}
         onRequestClose={() => setConfirmModalVisible(false)}>
-        <ConfirmModal
+        <Confirm
           sendPageState={sendPageState}
           defaultFee={defaultFee}
           price={info?.zecPrice}
@@ -577,4 +573,4 @@ const SendScreen: React.FunctionComponent<SendScreenProps> = ({
   );
 };
 
-export default SendScreen;
+export default Send;
