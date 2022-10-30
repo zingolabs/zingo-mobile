@@ -1,7 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { Component } from 'react';
-import { ScrollView, Dimensions, Modal, View, SafeAreaView } from 'react-native';
-import * as Progress from 'react-native-progress';
+import { Modal } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faList, faUpload, faDownload, faCog, faAddressBook } from '@fortawesome/free-solid-svg-icons';
@@ -23,7 +22,6 @@ import AppState, {
   SendProgress,
   WalletSettings,
 } from './AppState';
-import RegText from '../components/Components/RegText';
 import FadeText from '../components/Components/FadeText';
 import Utils from './utils';
 import Transactions from '../components/Transactions';
@@ -39,102 +37,8 @@ import Settings from '../components/Settings';
 import SettingsFileImpl from '../components/Settings/SettingsFileImpl';
 
 import { useTheme } from '@react-navigation/native';
-
-const window = Dimensions.get('window');
-
-function Menu({ onItemSelected }: any) {
-  const { colors } = useTheme();
-  const item = {
-    fontSize: 14,
-    fontWeight: '300',
-    paddingTop: 15,
-    color: colors.text,
-  };
-
-  return (
-    <ScrollView
-      scrollsToTop={false}
-      style={{
-        flex: 1,
-        width: window.width,
-        height: window.height,
-        backgroundColor: '#010101',
-      }}
-      contentContainerStyle={{ display: 'flex' }}>
-      <FadeText style={{ margin: 20 }}>Options</FadeText>
-      <View style={{ height: 1, backgroundColor: colors.primary }} />
-
-      <View style={{ display: 'flex', marginLeft: 20 }}>
-        <RegText onPress={() => onItemSelected('About')} style={item}>
-          About Zingo!
-        </RegText>
-
-        <RegText onPress={() => onItemSelected('Info')} style={item}>
-          Server Info
-        </RegText>
-
-        <RegText onPress={() => onItemSelected('Settings')} style={item}>
-          Settings
-        </RegText>
-
-        <RegText onPress={() => onItemSelected('Wallet Seed')} style={item}>
-          Wallet Seed
-        </RegText>
-
-        <RegText onPress={() => onItemSelected('Rescan')} style={item}>
-          Rescan Wallet
-        </RegText>
-
-        <RegText onPress={() => onItemSelected('Sync Report')} style={item} color={colors.primary}>
-          Sync / Rescan Report
-        </RegText>
-
-        <RegText onPress={() => onItemSelected('Change Wallet')} style={item} color={colors.primary}>
-          Change to another Wallet
-        </RegText>
-
-        <RegText onPress={() => onItemSelected('Restore Wallet Backup')} style={item} color={colors.primary}>
-          Restore Last Wallet Backup
-        </RegText>
-      </View>
-    </ScrollView>
-  );
-}
-
-type ComputingModalProps = {
-  progress: SendProgress;
-};
-
-const ComputingTxModalContent: React.FunctionComponent<ComputingModalProps> = ({ progress }) => {
-  const { colors } = useTheme();
-
-  return (
-    <SafeAreaView
-      style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '100%',
-        backgroundColor: colors.background,
-      }}>
-      <RegText>Computing Transaction</RegText>
-      {!(progress && progress.sendInProgress) && <RegText>Please wait...</RegText>}
-      {progress && progress.sendInProgress && (
-        <>
-          <RegText>{`Step ${progress.progress} of ${progress.total}`}</RegText>
-          <RegText style={{ marginBottom: 20 }}>{`ETA ${progress.etaSeconds}s`}</RegText>
-          <Progress.CircleSnail
-            showsText={true}
-            progress={progress.progress / progress.total}
-            indeterminate={!progress.progress}
-            size={100}
-            color={colors.primary}
-          />
-        </>
-      )}
-    </SafeAreaView>
-  );
-};
+import Menu from './components/Menu';
+import ComputingTxContent from './components/ComputingTxContent';
 
 const Tab = createBottomTabNavigator();
 
@@ -848,7 +752,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
           transparent={false}
           visible={computingModalVisible}
           onRequestClose={() => this.setState({ computingModalVisible: false })}>
-          <ComputingTxModalContent progress={txBuildProgress} />
+          <ComputingTxContent progress={txBuildProgress} />
         </Modal>
 
         <Tab.Navigator
