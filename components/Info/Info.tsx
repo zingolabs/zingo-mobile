@@ -6,14 +6,14 @@ import { useTheme } from '@react-navigation/native';
 import RegText from '../Components/RegText';
 import ZecAmount from '../Components/ZecAmount';
 import Button from '../Button';
-import { Info, TotalBalance } from '../../app/AppState';
+import { InfoType, TotalBalance } from '../../app/AppState';
 import Utils from '../../app/utils';
 import RPC from '../../app/rpc';
 import DetailLine from './components/DetailLine';
 import { ThemeType } from '../../app/types';
 
 type InfoProps = {
-  info: Info | null;
+  info: InfoType | null;
   closeModal: () => void;
   totalBalance: TotalBalance;
   currencyName?: string;
@@ -21,7 +21,7 @@ type InfoProps = {
 
 const Info: React.FunctionComponent<InfoProps> = ({ info, closeModal, totalBalance, currencyName }) => {
   const { colors } = useTheme() as unknown as ThemeType;
-  const [infoState, setInfoState] = React.useState({} as Info);
+  const [infoState, setInfoState] = React.useState({} as InfoType);
 
   React.useEffect(() => {
     (async () => {
@@ -54,7 +54,7 @@ const Info: React.FunctionComponent<InfoProps> = ({ info, closeModal, totalBalan
           paddingTop: 10,
         }}>
         <Image
-          source={require('../assets/img/logobig-zingo.png')}
+          source={require('../../assets/img/logobig-zingo.png')}
           style={{ width: 80, height: 80, resizeMode: 'contain' }}
         />
         <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{ opacity: 0.4 }} />

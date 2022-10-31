@@ -8,7 +8,7 @@ import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 
-import { Transaction, TxDetail } from '../../../app/AppState';
+import { Transaction, TxDetailType } from '../../../app/AppState';
 import Utils from '../../../app/utils';
 import RegText from '../../Components/RegText';
 import ZecAmount from '../../Components/ZecAmount';
@@ -36,7 +36,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, curr
   const fee =
     tx?.type === 'sent' &&
     tx?.amount &&
-    Math.abs(tx?.amount) - Math.abs(tx?.detailedTxns?.reduce((s: number, d: TxDetail) => s + d.amount, 0));
+    Math.abs(tx?.amount) - Math.abs(tx?.detailedTxns?.reduce((s: number, d: TxDetailType) => s + d.amount, 0));
 
   const handleTxIDClick = (txid?: string) => {
     if (!txid) {
@@ -116,7 +116,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, curr
             </TouchableOpacity>
           </View>
 
-          {tx?.detailedTxns.map((txd: TxDetail) => {
+          {tx?.detailedTxns.map((txd: TxDetailType) => {
             return (
               <View
                 key={txd.address}

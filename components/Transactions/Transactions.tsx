@@ -1,13 +1,13 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
-import { TotalBalance, Transaction, Info, SyncStatus } from '../../app/AppState';
+import { TotalBalance, Transaction, InfoType, SyncStatus } from '../../app/AppState';
 import TransactionsView from './components/TransactionsView';
 
 const Stack = createStackNavigator();
 
 type TransactionsViewProps = {
-  info: Info | null;
+  info: InfoType | null;
   totalBalance: TotalBalance;
   syncingStatus: SyncStatus | null;
   transactions: Transaction[] | null;

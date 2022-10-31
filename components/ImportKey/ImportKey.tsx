@@ -51,7 +51,7 @@ const ImportKey: React.FunctionComponent<ImportKeyProps> = ({ closeModal, doImpo
           paddingTop: 10,
         }}>
         <Image
-          source={require('../assets/img/logobig-zingo.png')}
+          source={require('../../assets/img/logobig-zingo.png')}
           style={{ width: 80, height: 80, resizeMode: 'contain' }}
         />
         <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{ opacity: 0.4 }} />
@@ -101,7 +101,7 @@ const ImportKey: React.FunctionComponent<ImportKeyProps> = ({ closeModal, doImpo
           }}>
           <FontAwesomeIcon style={{ margin: 5 }} size={50} icon={faQrcode} color={colors.border} />
           {/*<Image
-            source={require('../assets/img/qr-code-scan.png')}
+            source={require('../../assets/img/qr-code-scan.png')}
             style={{width: 50, height: 50, marginTop: 15, resizeMode: 'contain'}}
           />*/}
         </TouchableOpacity>

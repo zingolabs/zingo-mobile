@@ -3,8 +3,8 @@ import {
   TotalBalance,
   Address,
   Transaction,
-  TxDetail,
-  Info,
+  TxDetailType,
+  InfoType,
   SendJsonToType,
   WalletSeed,
   SendProgress,
@@ -16,7 +16,7 @@ import SettingsFileImpl from '../components/Settings/SettingsFileImpl';
 
 export default class RPC {
   fnSetSyncStatusReport: (syncStatusReport: SyncStatusReport) => void;
-  fnSetInfo: (info: Info) => void;
+  fnSetInfo: (info: InfoType) => void;
   fnSetTotalBalance: (totalBalance: TotalBalance) => void;
   fnSetTransactionsList: (txList: Transaction[]) => void;
   fnSetAllAddresses: (allAddresses: Address[]) => void;
@@ -51,7 +51,7 @@ export default class RPC {
     fnSetTransactionsList: (txlist: Transaction[]) => void,
     fnSetAllAddresses: (addresses: Address[]) => void,
     fnSetWalletSettings: (settings: WalletSettings) => void,
-    fnSetInfo: (info: Info) => void,
+    fnSetInfo: (info: InfoType) => void,
     fnSetZecPrice: (price: number | null) => void,
     fnSetRefreshUpdates: (inProgress: boolean, progress: number, blocks: string) => void,
   ) {
@@ -95,7 +95,7 @@ export default class RPC {
   }
 
   // Special method to get the Info object. This is used both internally and by the Loading screen
-  static async rpc_getInfoObject(): Promise<Info | null> {
+  static async rpc_getInfoObject(): Promise<InfoType | null> {
     try {
       const infostr = await RPCModule.execute('info', '');
       const infoJSON = await JSON.parse(infostr);
@@ -112,7 +112,7 @@ export default class RPC {
 
       // console.log(defaultFeeJSON);
 
-      const info: Info = {
+      const info: InfoType = {
         chain_name: infoJSON.chain_name,
         latestBlock: infoJSON.latest_block_height,
         serverUri: infoJSON.server_uri || '<none>',
@@ -255,9 +255,9 @@ export default class RPC {
   // We combine detailed transactions if they are sent to the same outgoing address in the same txid. This
   // is usually done to split long memos.
   // Remember to add up both amounts and combine memos
-  static rpc_combineTxDetails(txdetails: TxDetail[]): TxDetail[] {
+  static rpc_combineTxDetails(txdetails: TxDetailType[]): TxDetailType[] {
     // First, group by outgoing address.
-    const m = new Map<string, TxDetail[]>();
+    const m = new Map<string, TxDetailType[]>();
     txdetails.forEach(i => {
       const coll = m.get(i.address);
       if (!coll) {
@@ -268,7 +268,7 @@ export default class RPC {
     });
 
     // Reduce the groups to a single TxDetail, combining memos and summing amounts
-    const reducedDetailedTxns: TxDetail[] = [];
+    const reducedDetailedTxns: TxDetailType[] = [];
     m.forEach((txns, toaddr) => {
       const totalAmount = txns.reduce((sum, i) => sum + i.amount, 0);
 
@@ -287,7 +287,7 @@ export default class RPC {
         .sort((a, b) => a.num - b.num)
         .map(a => a.memo);
 
-      const detail: TxDetail = {
+      const detail: TxDetailType = {
         address: toaddr,
         amount: totalAmount,
         memo: memos.length > 0 ? memos.join('') : null,
@@ -887,10 +887,10 @@ export default class RPC {
       //console.log('--------------------------------------------------');
       //}
 
-      var txdetail: TxDetail[] = [];
+      var txdetail: TxDetailType[] = [];
       if (tx.outgoing_metadata) {
         const dts = tx.outgoing_metadata.map((o: any) => {
-          const detail: TxDetail = {
+          const detail: TxDetailType = {
             address: o.address || '',
             amount: (o.value || 0) / 10 ** 8,
             memo: o.memo || null,
@@ -901,7 +901,7 @@ export default class RPC {
 
         txdetail = RPC.rpc_combineTxDetails(dts);
       } else {
-        const detail: TxDetail = {
+        const detail: TxDetailType = {
           address: tx.address || '',
           amount: (tx.amount || 0) / 10 ** 8,
           memo: tx.memo || null,

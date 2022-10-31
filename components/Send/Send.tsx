@@ -18,7 +18,7 @@ import RegText from '../Components/RegText';
 import ZecAmount from '../Components/ZecAmount';
 import UsdAmount from '../Components/UsdAmount';
 import Button from '../Button';
-import { Info, SendPageState, SendProgress, ToAddr, TotalBalance, SyncStatus } from '../../app/AppState';
+import { InfoType, SendPageState, SendProgress, ToAddr, TotalBalance, SyncStatus } from '../../app/AppState';
 import { parseZcashURI } from '../../app/uris';
 import RPCModule from '../RPCModule';
 import Utils from '../../app/utils';
@@ -27,7 +27,7 @@ import Confirm from './components/Confirm';
 import { ThemeType } from '../../app/types';
 
 type SendProps = {
-  info: Info | null;
+  info: InfoType | null;
   totalBalance: TotalBalance;
   sendPageState: SendPageState;
   setSendPageState: (sendPageState: SendPageState) => void;

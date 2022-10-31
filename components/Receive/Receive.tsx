@@ -13,7 +13,7 @@ import FadeText from '../Components/FadeText';
 import ZecAmount from '../Components/ZecAmount';
 import UsdAmount from '../Components/UsdAmount';
 import RegText from '../Components/RegText';
-import { Info, Address, TotalBalance, SyncStatus } from '../../app/AppState';
+import { InfoType, Address, TotalBalance, SyncStatus } from '../../app/AppState';
 import Utils from '../../app/utils';
 import RPC from '../../app/rpc';
 import PrivKey from '../PrivKey';
@@ -22,7 +22,7 @@ import SingleAddress from './components/SingleAddress';
 import { ThemeType } from '../../app/types';
 
 type ReceiveProps = {
-  info: Info | null;
+  info: InfoType | null;
   addresses: Address[];
   toggleMenuDrawer: () => void;
   fetchTotalBalance: () => Promise<void>;
@@ -255,7 +255,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
               paddingTop: 0,
             }}>
             <Image
-              source={require('../assets/img/logobig-zingo.png')}
+              source={require('../../assets/img/logobig-zingo.png')}
               style={{ width: 80, height: 80, resizeMode: 'contain' }}
             />
             <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{ opacity: 0.4 }} />

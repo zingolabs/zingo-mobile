@@ -103,7 +103,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
           paddingTop: 10,
         }}>
         <Image
-          source={require('../assets/img/logobig-zingo.png')}
+          source={require('../../assets/img/logobig-zingo.png')}
           style={{ width: 80, height: 80, resizeMode: 'contain' }}
         />
         <ZecAmount

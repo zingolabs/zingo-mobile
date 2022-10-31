@@ -211,7 +211,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
             <View style={{ marginBottom: 50, display: 'flex', alignItems: 'center' }}>
               <Text style={{ color: colors.zingo, fontSize: 40, fontWeight: 'bold' }}> Zingo!</Text>
               <Image
-                source={require('../assets/img/logobig-zingo.png')}
+                source={require('../../assets/img/logobig-zingo.png')}
                 style={{ width: 100, height: 100, resizeMode: 'contain', marginTop: 10 }}
               />
             </View>

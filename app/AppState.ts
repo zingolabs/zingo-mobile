@@ -109,7 +109,7 @@ export class SettingsFileEntry {
   }
 }
 
-export interface TxDetail {
+export interface TxDetailType {
   address: string;
   amount: number;
   memo: string | null;
@@ -125,7 +125,7 @@ export interface Transaction {
   txid: string;
   time: number;
   zec_price: number | null;
-  detailedTxns: TxDetail[];
+  detailedTxns: TxDetailType[];
 }
 
 // This is the type that the RPC interface expects for sending
@@ -174,7 +174,7 @@ export class ReceivePageState {
   }
 }
 
-export interface Info {
+export interface InfoType {
   chain_name: string;
   serverUri: string;
   latestBlock: number;
@@ -295,7 +295,7 @@ export default interface AppState {
   receivePageState: ReceivePageState;
 
   // getinfo and getblockchaininfo result
-  info: Info | null;
+  info: InfoType | null;
 
   // Is the app rescanning?
   rescanning: boolean;

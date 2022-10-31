@@ -12,7 +12,7 @@ import OptionsMenu from 'react-native-option-menu';
 import ZecAmount from '../Components/ZecAmount';
 import UsdAmount from '../Components/UsdAmount';
 import RegText from '../Components/RegText';
-import { Info, Address, TotalBalance } from '../../app/AppState';
+import { InfoType, Address, TotalBalance } from '../../app/AppState';
 import Utils from '../../app/utils';
 import RPC from '../../app/rpc';
 import PrivKey from '../PrivKey';
@@ -21,7 +21,7 @@ import SingleAddress from './components/SingleAddress';
 import { ThemeType } from '../../app/types';
 
 type LegacyProps = {
-  info: Info | null;
+  info: InfoType | null;
   addresses: Address[];
   toggleMenuDrawer: () => void;
   fetchTotalBalance: () => Promise<void>;
@@ -312,7 +312,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({
               paddingTop: 0,
             }}>
             <Image
-              source={require('../assets/img/logobig-zingo.png')}
+              source={require('../../assets/img/logobig-zingo.png')}
               style={{ width: 80, height: 80, resizeMode: 'contain' }}
             />
             <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{ opacity: 0.4 }} />

@@ -14,7 +14,7 @@ import AppState, {
   TotalBalance,
   SendPageState,
   ReceivePageState,
-  Info as InfoType,
+  InfoType,
   Transaction,
   ToAddr,
   ErrorModalData,

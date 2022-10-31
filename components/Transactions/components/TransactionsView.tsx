@@ -8,7 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faBars, faInfo } from '@fortawesome/free-solid-svg-icons';
 
 import RPC from '../../../app/rpc';
-import { TotalBalance, Transaction, Info, SyncStatus } from '../../../app/AppState';
+import { TotalBalance, Transaction, InfoType, SyncStatus } from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
 import RegText from '../../Components/RegText';
 import ZecAmount from '../../Components/ZecAmount';
@@ -19,7 +19,7 @@ import TxDetail from './TxDetail';
 import TxSummaryLine from './TxSummaryLine';
 
 type TransactionsViewProps = {
-  info: Info | null;
+  info: InfoType | null;
   totalBalance: TotalBalance;
   syncingStatus: SyncStatus | null;
   transactions: Transaction[] | null;
@@ -104,7 +104,7 @@ const TransactionsView: React.FunctionComponent<TransactionsViewProps> = ({
           paddingTop: 10,
         }}>
         <Image
-          source={require('../assets/img/logobig-zingo.png')}
+          source={require('../../../assets/img/logobig-zingo.png')}
           style={{ width: 80, height: 80, resizeMode: 'contain' }}
         />
         <ZecAmount currencyName={currencyName} color={balanceColor} size={36} amtZec={totalBalance.total} />

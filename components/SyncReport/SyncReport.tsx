@@ -121,7 +121,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal, sync
           paddingTop: 10,
         }}>
         <Image
-          source={require('../assets/img/logobig-zingo.png')}
+          source={require('../../assets/img/logobig-zingo.png')}
           style={{ width: 80, height: 80, resizeMode: 'contain' }}
         />
         <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
