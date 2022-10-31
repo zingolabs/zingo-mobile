@@ -1,6 +1,7 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
+import { TotalBalance, Transaction, Info, SyncStatus } from '../../app/AppState';
 import TransactionsView from './components/TransactionsView';
 
 const Stack = createStackNavigator();
@@ -13,6 +14,7 @@ type TransactionsViewProps = {
   toggleMenuDrawer: () => void;
   doRefresh: () => void;
   setComputingModalVisible: (visible: boolean) => void;
+  syncingStatusMoreInfoOnClick: () => void;
 };
 
 const Transactions: React.FunctionComponent<TransactionsViewProps> = iprops => {

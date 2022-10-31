@@ -9,9 +9,10 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import LoadedApp from './app/LoadedApp';
 import LoadingApp from './app/LoadingApp';
-import { ThemeType } from '.app/types';
+import { ThemeType } from './app/types';
 
 const Theme: ThemeType = {
+  dark: true,
   colors: {
     background: '#011401', //'#010101',
     card: '#011401', //'#401717',
@@ -22,6 +23,7 @@ const Theme: ThemeType = {
     zingo: '#777777',
     placeholder: '#333333',
     money: '#ffffff',
+    notification: '',
   },
 };
 

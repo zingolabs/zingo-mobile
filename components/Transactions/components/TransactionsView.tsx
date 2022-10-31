@@ -1,21 +1,22 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import RegText from './Components/RegText';
-import ZecAmount from './Components/ZecAmount';
-import UsdAmount from './Components/UsdAmount';
-import FadeText from './Components/FadeText';
-import Button from './Button';
 import { View, ScrollView, Image, Modal, TouchableOpacity, RefreshControl } from 'react-native';
 import Toast from 'react-native-simple-toast';
-import { TotalBalance, Transaction, Info, SyncStatus } from '../app/AppState';
 import moment from 'moment';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faBars, faInfo } from '@fortawesome/free-solid-svg-icons';
-import RPC from '../app/rpc';
 
-import TxDetail from './components/TxDetail';
-import TxSummaryLine from './components/TxSummaryLine';
+import RPC from '../../../app/rpc';
+import { TotalBalance, Transaction, Info, SyncStatus } from '../../../app/AppState';
+import { ThemeType } from '../../../app/types';
+import RegText from '../../Components/RegText';
+import ZecAmount from '../../Components/ZecAmount';
+import UsdAmount from '../../Components/UsdAmount';
+import FadeText from '../../Components/FadeText';
+import Button from '../../Button';
+import TxDetail from './TxDetail';
+import TxSummaryLine from './TxSummaryLine';
 
 type TransactionsViewProps = {
   info: Info | null;
@@ -25,6 +26,7 @@ type TransactionsViewProps = {
   toggleMenuDrawer: () => void;
   doRefresh: () => void;
   setComputingModalVisible: (visible: boolean) => void;
+  syncingStatusMoreInfoOnClick: () => void;
 };
 
 const TransactionsView: React.FunctionComponent<TransactionsViewProps> = ({
@@ -37,6 +39,7 @@ const TransactionsView: React.FunctionComponent<TransactionsViewProps> = ({
   setComputingModalVisible,
   syncingStatusMoreInfoOnClick,
 }) => {
+  const { colors } = useTheme() as unknown as ThemeType;
   const [isTxDetailModalShowing, setTxDetailModalShowing] = React.useState(false);
   const [txDetail, setTxDetail] = React.useState<Transaction | null>(null);
 
@@ -54,20 +57,21 @@ const TransactionsView: React.FunctionComponent<TransactionsViewProps> = ({
     const shieldStr = await RPC.rpc_shieldTransparent();
 
     setComputingModalVisible(false);
-    setTimeout(() => {
-      const shieldJSON = JSON.parse(shieldStr);
+    if (shieldStr) {
+      setTimeout(() => {
+        const shieldJSON = JSON.parse(shieldStr);
 
-      if (shieldJSON.error) {
-        Toast.show(`Error: ${shieldJSON.error}`, Toast.LONG);
-      } else {
-        Toast.show(`Shielded in Tx: ${shieldJSON.txid}`);
-      }
-    }, 1000);
+        if (shieldJSON.error) {
+          Toast.show(`Error: ${shieldJSON.error}`, Toast.LONG);
+        } else {
+          Toast.show(`Shielded in Tx: ${shieldJSON.txid}`);
+        }
+      }, 1000);
+    }
   };
 
-  const { colors } = useTheme();
   const zecPrice = info ? info.zecPrice : null;
-  const currencyName = info ? info.currencyName : null;
+  const currencyName = info ? info.currencyName : undefined;
 
   const syncStatusDisplayLine = syncingStatus?.inProgress ? `(${syncingStatus?.blocks})` : '';
 

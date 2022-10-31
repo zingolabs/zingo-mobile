@@ -1,14 +1,16 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import ZecAmount from './Components/ZecAmount';
-import FadeText from './Components/FadeText';
 import { View, TouchableOpacity } from 'react-native';
-import { Transaction } from '../app/AppState';
-import Utils from '../app/utils';
 import Moment from 'react-moment';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons';
+
+import ZecAmount from '../../Components/ZecAmount';
+import FadeText from '../../Components/FadeText';
+import { Transaction } from '../../../app/AppState';
+import Utils from '../../../app/utils';
+import { ThemeType } from '../../../app/types';
 
 type TxSummaryLineProps = {
   month: string;
@@ -22,7 +24,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
   setTxDetail,
   setTxDetailModalShowing,
 }) => {
-  const { colors } = useTheme();
+  const { colors } = useTheme() as unknown as ThemeType;
 
   const amountColor = tx.confirmations === 0 ? colors.primaryDisabled : tx.amount > 0 ? colors.primary : colors.text;
   const txIcon = tx.amount > 0 ? faArrowDown : faArrowUp;

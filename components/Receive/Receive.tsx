@@ -3,23 +3,23 @@ import React, { useState } from 'react';
 import { View, Dimensions, Image, Modal } from 'react-native';
 import { TabView, TabBar } from 'react-native-tab-view';
 import Toast from 'react-native-simple-toast';
-import FadeText from './Components/FadeText';
-import ZecAmount from './Components/ZecAmount';
-import UsdAmount from './Components/UsdAmount';
-import RegText from './Components/RegText';
-import { Info, Address } from '../app/AppState';
-import Utils from '../app/utils';
 import { useTheme } from '@react-navigation/native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faBars, faEllipsisV, faInfo } from '@fortawesome/free-solid-svg-icons';
-// @ts-ignore
 import OptionsMenu from 'react-native-option-menu';
-import RPC from '../app/rpc';
-import PrivKey from './PrivKey';
-import ImportKey from './ImportKey';
 
+import FadeText from '../Components/FadeText';
+import ZecAmount from '../Components/ZecAmount';
+import UsdAmount from '../Components/UsdAmount';
+import RegText from '../Components/RegText';
+import { Info, Address, TotalBalance, SyncStatus } from '../../app/AppState';
+import Utils from '../../app/utils';
+import RPC from '../../app/rpc';
+import PrivKey from '../PrivKey';
+import ImportKey from '../ImportKey';
 import SingleAddress from './components/SingleAddress';
+import { ThemeType } from '../../app/types';
 
 type ReceiveProps = {
   info: Info | null;
@@ -27,32 +27,35 @@ type ReceiveProps = {
   toggleMenuDrawer: () => void;
   fetchTotalBalance: () => Promise<void>;
   startRescan: () => void;
+  totalBalance: TotalBalance;
+  syncingStatus: SyncStatus | null;
+  syncingStatusMoreInfoOnClick: () => void;
 };
 
 const Receive: React.FunctionComponent<ReceiveProps> = ({
+  info,
   addresses,
   toggleMenuDrawer,
   fetchTotalBalance,
   startRescan,
   totalBalance,
-  info,
   syncingStatus,
   syncingStatusMoreInfoOnClick,
 }) => {
+  const { colors } = useTheme() as unknown as ThemeType;
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([{ key: 'uaddr', title: 'UNIFIED ADRESSES' }]);
 
   const [displayAddress, setDisplayAddress] = useState('');
   const [oindex, setOIndex] = useState(0);
 
-  const { colors } = useTheme();
   const zecPrice = info ? info.zecPrice : null;
-  const currencyName = info ? info.currencyName : null;
+  const currencyName = info ? info.currencyName : undefined;
 
   const uaddrs = addresses.filter(a => a.addressKind === 'u') || [];
 
   if (displayAddress) {
-    displayAddressIndex = uaddrs?.findIndex(a => a.address === displayAddress);
+    const displayAddressIndex = uaddrs?.findIndex(a => a.address === displayAddress);
 
     if (oindex !== displayAddressIndex && displayAddressIndex >= 0) {
       setOIndex(displayAddressIndex);
@@ -89,13 +92,16 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     switch (route.key) {
       case 'uaddr': {
         let uaddr = 'No Unified Address';
+        let uaddrKind = '';
         if (uaddrs.length > 0) {
           uaddr = uaddrs[oindex].address;
+          uaddrKind = uaddrs[oindex].addressKind;
         }
 
         return (
           <SingleAddress
             address={uaddr}
+            addressKind={uaddrKind}
             index={oindex}
             total={uaddrs.length}
             prev={() => {
@@ -115,7 +121,9 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     const newAddress = await RPC.rpc_createNewAddress('u');
     await fetchTotalBalance();
     setIndex(2);
-    setDisplayAddress(newAddress);
+    if (newAddress) {
+      setDisplayAddress(newAddress);
+    }
   };
 
   const [privKeyModalVisible, setPrivKeyModalVisible] = useState(false);
@@ -133,7 +141,9 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
 
     setKeyType(0);
     setPrivKeyModalVisible(true);
-    setPrivKey(k);
+    if (k) {
+      setPrivKey(k);
+    }
   };
 
   const viewViewingKey = async () => {
@@ -147,7 +157,9 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
 
     setKeyType(1);
     setPrivKeyModalVisible(true);
-    setPrivKey(k);
+    if (k) {
+      setPrivKey(k);
+    }
   };
 
   const [importKeyModalVisible, setImportKeyModalVisible] = useState(false);
@@ -157,7 +169,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   };
 
   const doImport = async (key: string, birthday: string) => {
-    const addressList = await RPC.rpc_fetchSeedoImportPrivKey(key, birthday);
+    const addressList = await RPC.rpc_doImportPrivKey(key, birthday);
     // console.log(addressList);
 
     if (typeof addressList === 'string' && addressList.startsWith('Error')) {

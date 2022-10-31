@@ -2,8 +2,8 @@
 import React from 'react';
 import { ScrollView, Dimensions, View } from 'react-native';
 
-import RegText from '../components/Components/RegText';
-import FadeText from '../components/Components/FadeText';
+import RegText from '../../../components/Components/RegText';
+import FadeText from '../../../components/Components/FadeText';
 
 import { useTheme } from '@react-navigation/native';
 

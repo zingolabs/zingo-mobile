@@ -3,8 +3,10 @@ import React from 'react';
 import { TouchableOpacity, Text } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
+import { ThemeType } from '../../app/types';
+
 const Button: React.FunctionComponent<any> = ({ type, title, disabled, onPress, style }) => {
-  const { colors } = useTheme();
+  const { colors } = useTheme() as unknown as ThemeType;
   // type: 'Primary' or 'Secondary'
   const styleButton =
     type === 'Primary'

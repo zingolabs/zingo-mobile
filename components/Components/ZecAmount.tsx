@@ -2,7 +2,9 @@
 import React from 'react';
 import { Text, View, Platform } from 'react-native';
 import { useTheme } from '@react-navigation/native';
+
 import Utils from '../../app/utils';
+import { ThemeType } from '../../app/types';
 
 type ZecAmountProps = {
   color?: string;
@@ -14,7 +16,7 @@ type ZecAmountProps = {
 
 const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({ color, style, size, currencyName, amtZec }) => {
   const splits = Utils.splitZecAmountIntoBigSmall(amtZec);
-  const { colors } = useTheme();
+  const { colors } = useTheme() as unknown as ThemeType;
 
   if (!size) {
     size = 24;

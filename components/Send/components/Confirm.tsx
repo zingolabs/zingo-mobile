@@ -17,7 +17,7 @@ type ConfirmProps = {
   price?: number | null;
   closeModal: () => void;
   confirmSend: () => void;
-  currencyName: string;
+  currencyName?: string;
 };
 const Confirm: React.FunctionComponent<ConfirmProps> = ({
   closeModal,

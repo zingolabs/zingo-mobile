@@ -4,31 +4,36 @@
  */
 import React, { Component } from 'react';
 import { View, Alert, SafeAreaView, Image, Text, Modal } from 'react-native';
-
 import Toast from 'react-native-simple-toast';
 import { useTheme } from '@react-navigation/native';
 
-import BoldText from '../components/Components/BoldText';
-import Button from '../components/Button';
-import RPCModule from '../components/RPCModule';
-import { TotalBalance } from './AppState';
-import { SERVER_URI } from './uris';
-import SeedComponent from '../components/SeedComponent';
-import SettingsFileImpl from '../components/SettingsFileImpl';
-import RPC from './rpc';
+import BoldText from '../../components/Components/BoldText';
+import Button from '../../components/Button';
+import RPCModule from '../../components/RPCModule';
+import { TotalBalance, SettingsFileEntry } from '../AppState';
+import { SERVER_URI } from '../uris';
+import SeedComponent from '../../components/Seed';
+import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
+import RPC from '../rpc';
+import { ThemeType } from '../types';
 
 // -----------------
 // Loading View
 // -----------------
 
-export default function LoadingApp(props) {
-  const theme = useTheme();
+type LoadingAppProps = {
+  navigation: any;
+};
+
+export default function LoadingApp(props: LoadingAppProps) {
+  const theme = useTheme() as unknown as ThemeType;
 
   return <LoadingAppClass {...props} theme={theme} />;
 }
 
 type LoadingAppClassProps = {
   navigation: any;
+  theme: ThemeType;
 };
 
 type LoadingAppClassState = {
@@ -37,6 +42,7 @@ type LoadingAppClassState = {
   walletExists: boolean;
   seedPhrase: string | null;
   birthday: string;
+  server: string;
   totalBalance: TotalBalance;
 };
 
@@ -44,7 +50,7 @@ const SERVER_DEFAULT_0 = SERVER_URI[0];
 const SERVER_DEFAULT_1 = SERVER_URI[1];
 
 class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassState> {
-  constructor(props: Readonly<LoadingProps>) {
+  constructor(props: Readonly<LoadingAppClassProps>) {
     super(props);
 
     this.state = {
@@ -53,7 +59,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
       walletExists: false,
       seedPhrase: null,
       birthday: '0',
-      server: null,
+      server: '',
       totalBalance: new TotalBalance(),
     };
   }
@@ -62,7 +68,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
     // First, check if a wallet exists. Do it async so the basic screen has time to render
     setTimeout(async () => {
       // read settings file
-      let settings = {};
+      let settings: SettingsFileEntry = {};
       if (!this.state.server) {
         settings = await SettingsFileImpl.readSettings();
         if (!!settings && !!settings.server) {
@@ -70,7 +76,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
         } else {
           settings.server = SERVER_DEFAULT_0;
           this.setState({ server: SERVER_DEFAULT_0 });
-          await SettingsFileImpl.writeSettings({ server: SERVER_DEFAULT_0 });
+          await SettingsFileImpl.writeSettings(new SettingsFileEntry(SERVER_DEFAULT_0));
         }
       }
 
@@ -97,13 +103,13 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
 
   useDefaultServer_0 = async () => {
     this.setState({ actionButtonsDisabled: true });
-    await SettingsFileImpl.writeSettings({ server: SERVER_DEFAULT_0 });
+    await SettingsFileImpl.writeSettings(new SettingsFileEntry(SERVER_DEFAULT_0));
     this.setState({ server: SERVER_DEFAULT_0, actionButtonsDisabled: false });
   };
 
   useDefaultServer_1 = async () => {
     this.setState({ actionButtonsDisabled: true });
-    await SettingsFileImpl.writeSettings({ server: SERVER_DEFAULT_1 });
+    await SettingsFileImpl.writeSettings(new SettingsFileEntry(SERVER_DEFAULT_0));
     this.setState({ server: SERVER_DEFAULT_1, actionButtonsDisabled: false });
   };
 
@@ -146,7 +152,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
     Toast.show('We are working on it, comming soon.', Toast.LONG);
   };
 
-  doRestore = async (seedPhrase, birthday) => {
+  doRestore = async (seedPhrase: string, birthday: number) => {
     // Don't call with null values
     const { server } = this.state;
 
@@ -157,7 +163,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
 
     this.setState({ actionButtonsDisabled: true });
     setTimeout(async () => {
-      let walletBirthday = birthday || '0';
+      let walletBirthday = birthday.toString() || '0';
       if (parseInt(walletBirthday, 10) < 0) {
         walletBirthday = '0';
       }
@@ -306,7 +312,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
             visible={screen === 3}
             onRequestClose={() => this.setState({ screen: 1 })}>
             <SeedComponent
-              onClickOK={(s, b) => this.doRestore(s, b)}
+              onClickOK={(s: string, b: number) => this.doRestore(s, b)}
               onClickCancel={() => this.setState({ screen: 1 })}
               totalBalance={totalBalance}
               action={'restore'}

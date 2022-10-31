@@ -1,40 +1,26 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState } from 'react';
 import { View, ScrollView, SafeAreaView, Image, Text } from 'react-native';
-import RegText from './Components/RegText';
-import FadeText from './Components/FadeText';
-import Button from './Button';
 import { useTheme } from '@react-navigation/native';
-import { SyncStatusReport } from '../app/AppState';
 
-type DetailLineProps = {
-  label: string;
-  value?: string | number;
-};
-const DetailLine: React.FunctionComponent<DetailLineProps> = ({ label, value }) => {
-  const colors = useTheme();
-  return (
-    <View style={{ display: 'flex', marginTop: 20 }}>
-      <FadeText>{label}</FadeText>
-      <RegText color={colors.text}>{value}</RegText>
-    </View>
-  );
-};
+import { ThemeType } from '../../app/types';
+import RegText from '../Components/RegText';
+import Button from '../Button';
+import { SyncStatusReport } from '../../app/AppState';
+import DetailLine from './components/DetailLine';
 
 type SyncReportProps = {
   closeModal: () => void;
-  totalBalance: object;
-  currencyName: string;
   syncStatusReport: SyncStatusReport;
   birthday?: number;
 };
 
 const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal, syncStatusReport, birthday }) => {
-  const { colors } = useTheme();
-  const [maxBlocks, setMaxBlocks] = useState(null);
-  const [points, setPoints] = useState([]);
-  const [labels, setLabels] = useState([]);
-  const [birthday_plus_1, setBirthday_plus_1] = useState(null);
+  const { colors } = useTheme() as unknown as ThemeType;
+  const [maxBlocks, setMaxBlocks] = useState(0);
+  const [points, setPoints] = useState([] as number[]);
+  const [labels, setLabels] = useState([] as string[]);
+  const [birthday_plus_1, setBirthday_plus_1] = useState(0);
 
   React.useEffect(() => {
     (async () => {
@@ -189,14 +175,14 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal, sync
                   justifyContent: 'space-between',
                   marginTop: 10,
                 }}>
-                {labels.map(label => (
+                {labels.map((label: string) => (
                   <Text key={label} style={{ color: colors.primary }}>
                     {label}
                   </Text>
                 ))}
               </View>
               <View style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
-                {points.map(point => (
+                {points.map((point: number) => (
                   <View
                     key={point}
                     style={{

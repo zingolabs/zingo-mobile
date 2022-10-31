@@ -3,8 +3,8 @@ import React from 'react';
 import { SafeAreaView } from 'react-native';
 import * as Progress from 'react-native-progress';
 
-import { SendProgress } from './AppState';
-import RegText from '../components/Components/RegText';
+import { SendProgress } from '../../AppState';
+import RegText from '../../../components/Components/RegText';
 
 import { useTheme } from '@react-navigation/native';
 
@@ -31,7 +31,6 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({ 
           <RegText>{`Step ${progress.progress} of ${progress.total}`}</RegText>
           <RegText style={{ marginBottom: 20 }}>{`ETA ${progress.etaSeconds}s`}</RegText>
           <Progress.CircleSnail
-            showsText={true}
             progress={progress.progress / progress.total}
             indeterminate={!progress.progress}
             size={100}

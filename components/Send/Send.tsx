@@ -1,6 +1,16 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useRef } from 'react';
 import { View, ScrollView, Modal, Image, Alert, Keyboard } from 'react-native';
+import { faQrcode, faCheck, faInfo } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { useTheme } from '@react-navigation/native';
+import { NavigationScreenProp } from 'react-navigation';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import Toast from 'react-native-simple-toast';
+import { getNumberFormatSettings } from 'react-native-localize';
+import { faBars } from '@fortawesome/free-solid-svg-icons';
+import Animated, { EasingNode } from 'react-native-reanimated';
+
 import FadeText from '../Components/FadeText';
 import ErrorText from '../Components/ErrorText';
 import RegTextInput from '../Components/RegTextInput';
@@ -8,22 +18,13 @@ import RegText from '../Components/RegText';
 import ZecAmount from '../Components/ZecAmount';
 import UsdAmount from '../Components/UsdAmount';
 import Button from '../Button';
-import { Info, SendPageState, SendProgress, ToAddr, TotalBalance } from '../../app/AppState';
-import { faQrcode, faCheck, faInfo } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { useTheme } from '@react-navigation/native';
-import { NavigationScreenProp } from 'react-navigation';
-import Utils from '../../app/utils';
-import { TouchableOpacity } from 'react-native-gesture-handler';
-import Toast from 'react-native-simple-toast';
-import { getNumberFormatSettings } from 'react-native-localize';
-import { faBars } from '@fortawesome/free-solid-svg-icons';
-import Animated, { EasingNode } from 'react-native-reanimated';
+import { Info, SendPageState, SendProgress, ToAddr, TotalBalance, SyncStatus } from '../../app/AppState';
 import { parseZcashURI } from '../../app/uris';
 import RPCModule from '../RPCModule';
-
+import Utils from '../../app/utils';
 import Scanner from './components/Scanner';
 import Confirm from './components/Confirm';
+import { ThemeType } from '../../app/types';
 
 type SendProps = {
   info: Info | null;
@@ -37,6 +38,7 @@ type SendProps = {
   setComputingModalVisible: (visible: boolean) => void;
   setTxBuildProgress: (progress: SendProgress) => void;
   syncingStatus: SyncStatus | null;
+  syncingStatusMoreInfoOnClick: () => void;
 };
 
 const Send: React.FunctionComponent<SendProps> = ({
@@ -53,7 +55,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   syncingStatus,
   syncingStatusMoreInfoOnClick,
 }) => {
-  const { colors } = useTheme();
+  const { colors } = useTheme() as unknown as ThemeType;
   const [qrcodeModalVisble, setQrcodeModalVisible] = useState(false);
   const [qrcodeModalIndex, setQrcodeModalIndex] = useState(0);
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
@@ -69,7 +71,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         toValue: 0 - titleViewHeight + 25,
         duration: 100,
         easing: EasingNode.linear,
-        useNativeDriver: true,
+        //useNativeDriver: true,
       }).start();
     });
     const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
@@ -77,7 +79,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         toValue: 0,
         duration: 100,
         easing: EasingNode.linear,
-        useNativeDriver: true,
+        //useNativeDriver: true,
       }).start();
     });
 
@@ -141,7 +143,7 @@ const Send: React.FunctionComponent<SendProps> = ({
 
     if (amount !== null) {
       toAddr.amount = amount.replace(decimalSeparator, '.');
-      if (isNaN(toAddr.amount)) {
+      if (isNaN(Number(toAddr.amount))) {
         toAddr.amountUSD = '';
       } else if (toAddr.amount && info?.zecPrice) {
         toAddr.amountUSD = Utils.toLocaleFloat((parseFloat(toAddr.amount) * (info?.zecPrice || 0)).toFixed(2));
@@ -152,7 +154,7 @@ const Send: React.FunctionComponent<SendProps> = ({
 
     if (amountUSD !== null) {
       toAddr.amountUSD = amountUSD.replace(decimalSeparator, '.');
-      if (isNaN(toAddr.amountUSD)) {
+      if (isNaN(Number(toAddr.amountUSD))) {
         toAddr.amount = '';
       } else if (toAddr.amountUSD && info?.zecPrice) {
         toAddr.amount = Utils.toLocaleFloat(Utils.maxPrecisionTrimmed(parseFloat(amountUSD) / info?.zecPrice));
@@ -217,11 +219,11 @@ const Send: React.FunctionComponent<SendProps> = ({
     return max;
   };
 
-  const getMemoEnabled = async (address): boolean => {
+  const getMemoEnabled = (address: string): boolean => {
     if (address) {
-      const result = await RPCModule.execute('parse', address);
+      const result = RPCModule.execute('parse', address);
       console.log(result);
-      const resultJSON = await JSON.parse(result);
+      const resultJSON = JSON.parse(result);
 
       console.log('parse-2', sendPageState.toaddrs[0].to, resultJSON);
 
@@ -238,13 +240,13 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   const memoEnabled = getMemoEnabled(sendPageState.toaddrs[0].to);
   const zecPrice = info ? info.zecPrice : null;
-  const currencyName = info ? info.currencyName : null;
+  const currencyName = info ? info.currencyName : undefined;
 
-  var addressValidationState: number[] = sendPageState.toaddrs.map(async to => {
+  var addressValidationState: number[] = sendPageState.toaddrs.map(to => {
     if (!!to && !!to.to) {
-      const result = await RPCModule.execute('parse', to.to);
+      const result = RPCModule.execute('parse', to.to);
       console.log(result);
-      const resultJSON = await JSON.parse(result);
+      const resultJSON = JSON.parse(result);
 
       console.log('parse-3', to.to, resultJSON);
 
@@ -262,7 +264,7 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   var amountValidationState: number[] = sendPageState.toaddrs.map(to => {
     if (to.amountUSD !== '') {
-      if (isNaN(to.amountUSD)) {
+      if (isNaN(Number(to.amountUSD))) {
         return -1;
       }
     }

@@ -1,10 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState } from 'react';
 import { View } from 'react-native';
-import RegText from './Components/RegText';
-import Button from './Button';
 import { useTheme } from '@react-navigation/native';
 import QRCodeScanner from 'react-native-qrcode-scanner';
+
+import RegText from '../../Components/RegText';
+import Button from '../../Button';
 
 type ScannerProps = {
   setPrivKeyText: (k: string) => void;

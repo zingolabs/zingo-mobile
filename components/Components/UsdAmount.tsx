@@ -2,7 +2,9 @@
 import React from 'react';
 import { Text, View } from 'react-native';
 import { useTheme } from '@react-navigation/native';
+
 import Utils from '../../app/utils';
+import { ThemeType } from '../../app/types';
 
 type UsdAmountProps = {
   price?: number | null;
@@ -11,7 +13,7 @@ type UsdAmountProps = {
 };
 
 const UsdAmount: React.FunctionComponent<UsdAmountProps> = ({ price, style, amtZec }) => {
-  const { colors } = useTheme();
+  const { colors } = useTheme() as unknown as ThemeType;
   var usdString;
 
   if (!price || typeof amtZec === 'undefined') {

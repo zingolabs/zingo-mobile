@@ -1,21 +1,32 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect } from 'react';
 import { View, Image, SafeAreaView, ScrollView } from 'react-native';
-import Clipboard from '@react-native-community/clipboard';
-import RegText from './Components/RegText';
-import RegTextInput from './Components/RegTextInput';
-import FadeText from './Components/FadeText';
-import ClickableText from './Components/ClickableText';
-import ZecAmount from './Components/ZecAmount';
-import { TotalBalance } from '../app/AppState';
-import Button from './Button';
 import { useTheme } from '@react-navigation/native';
 import Toast from 'react-native-simple-toast';
+import Clipboard from '@react-native-community/clipboard';
+
+import RegText from '../Components/RegText';
+import RegTextInput from '../Components/RegTextInput';
+import FadeText from '../Components/FadeText';
+import ClickableText from '../Components/ClickableText';
+import ZecAmount from '../Components/ZecAmount';
+import { TotalBalance } from '../../app/AppState';
+import Button from '../Button';
+import { ThemeType } from '../../app/types';
+
+type TextsType = {
+  new: string[];
+  change: string[];
+  server: string[];
+  view: string[];
+  restore: string[];
+  backup: string[];
+};
 
 type SeedProps = {
   seed?: string;
   birthday?: number;
-  onClickOK: () => void;
+  onClickOK: (seedPhrase: string, birthdayNumber: number) => void;
   onClickCancel: () => void;
   totalBalance: TotalBalance;
   action: 'new' | 'change' | 'view' | 'restore' | 'backup' | 'server';
@@ -32,11 +43,11 @@ const Seed: React.FunctionComponent<SeedProps> = ({
   error,
   currencyName,
 }) => {
-  const { colors } = useTheme();
-  const [seedPhrase, setSeedPhrase] = useState(null);
-  const [birthdayNumber, setBirthdayNumber] = useState(null);
+  const { colors } = useTheme() as unknown as ThemeType;
+  const [seedPhrase, setSeedPhrase] = useState('');
+  const [birthdayNumber, setBirthdayNumber] = useState(0);
   const [times, setTimes] = useState(0);
-  const [texts, setTexts] = useState({});
+  const [texts, setTexts] = useState({} as TextsType);
   const [readOnly, setReadOnly] = useState(true);
 
   useEffect(() => {
@@ -67,8 +78,8 @@ const Seed: React.FunctionComponent<SeedProps> = ({
       action === 'new' || action === 'view' || action === 'change' || action === 'backup' || action === 'server',
     );
     setTimes(action === 'change' || action === 'backup' || action === 'server' ? 1 : 0);
-    setSeedPhrase(seed);
-    setBirthdayNumber(birthday);
+    setSeedPhrase(seed || '');
+    setBirthdayNumber(birthday || 0);
   }, [action, seed, birthday]);
 
   //console.log(seed, birthday, onClickOK, onClickCancel, totalBalance, action, error, currencyName);
@@ -191,7 +202,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                 }}
                 value={birthdayNumber}
                 keyboardType="numeric"
-                onChangeText={(text: string) => setBirthdayNumber(text)}
+                onChangeText={(text: string) => setBirthdayNumber(Number(text))}
               />
             </>
           )}
@@ -224,7 +235,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
               backgroundColor: times === 3 ? 'red' : colors.primary,
               color: times === 3 ? 'white' : colors.primary,
             }}
-            title={!!texts && texts[action]!! ? texts[action][times] : ''}
+            title={!!texts && !!texts[action] ? texts[action][times] : ''}
             onPress={() => {
               if (!seedPhrase) {
                 return;

@@ -80,7 +80,7 @@ export class TotalBalance {
 
 export class Address {
   address: string;
-  addressKind: 'u' | 'o' | 'z' | 't';
+  addressKind: string;
   containsPending: boolean;
 
   constructor(address: string, addressKind: string) {
@@ -102,7 +102,7 @@ export class AddressBookEntry {
 }
 
 export class SettingsFileEntry {
-  server: string;
+  server?: string;
 
   constructor(server: string) {
     this.server = server;
@@ -175,7 +175,7 @@ export class ReceivePageState {
 }
 
 export interface Info {
-  chain_name: boolean;
+  chain_name: string;
   serverUri: string;
   latestBlock: number;
   connections: number;
@@ -259,6 +259,7 @@ export interface SyncStatus {
 export class WalletSettings {
   download_memos: string;
   transaction_filter_threshold: string;
+  server?: string;
 
   constructor() {
     this.download_memos = 'none';
@@ -328,6 +329,15 @@ export default interface AppState {
 
   rescanModalVisible: boolean;
 
-  seedModalVisible: boolean;
+  seedViewModalVisible: boolean;
+  seedChangeModalVisible: boolean;
+  seedBackupModalVisible: boolean;
+  seedServerModalVisible: boolean;
+
+  syncReportModalVisible: boolean;
+
+  newServer: string | null;
+
+  error: string | null;
   // eslint-disable-next-line semi
 }

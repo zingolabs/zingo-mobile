@@ -1,31 +1,32 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState } from 'react';
-import RegText from './Components/RegText';
-import ZecAmount from './Components/ZecAmount';
-import UsdAmount from './Components/UsdAmount';
-import FadeText from './Components/FadeText';
-import ZecPrice from './Components/ZecPrice';
-import ClickableText from './Components/ClickableText';
-import Button from './Button';
 import { View, ScrollView, TouchableOpacity, SafeAreaView, Linking } from 'react-native';
 import Clipboard from '@react-native-community/clipboard';
 import Toast from 'react-native-simple-toast';
-import { Transaction } from '../app/AppState';
-import Utils from '../app/utils';
 import Moment from 'react-moment';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
-import { ThemeType } from '../app/types';
+
+import { Transaction, TxDetail } from '../../../app/AppState';
+import Utils from '../../../app/utils';
+import RegText from '../../Components/RegText';
+import ZecAmount from '../../Components/ZecAmount';
+import UsdAmount from '../../Components/UsdAmount';
+import FadeText from '../../Components/FadeText';
+import ZecPrice from '../../Components/ZecPrice';
+import ClickableText from '../../Components/ClickableText';
+import Button from '../../Button';
+import { ThemeType } from '../../../app/types';
 
 type TxDetailProps = {
   tx: Transaction | null;
   closeModal: () => void;
-  currencyName: string;
+  currencyName?: string;
 };
 
 const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, currencyName }) => {
-  const { colors } = useTheme() as ThemeType;
+  const { colors } = useTheme() as unknown as ThemeType;
   const spendColor =
     tx?.confirmations === 0 ? colors.primaryDisabled : (tx?.amount || 0) > 0 ? colors.primary : colors.text;
 
@@ -35,7 +36,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, curr
   const fee =
     tx?.type === 'sent' &&
     tx?.amount &&
-    Math.abs(tx?.amount) - Math.abs(tx?.detailedTxns?.reduce((s, d) => s + d.amount, 0));
+    Math.abs(tx?.amount) - Math.abs(tx?.detailedTxns?.reduce((s: number, d: TxDetail) => s + d.amount, 0));
 
   const handleTxIDClick = (txid?: string) => {
     if (!txid) {
@@ -115,7 +116,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, curr
             </TouchableOpacity>
           </View>
 
-          {tx?.detailedTxns.map(txd => {
+          {tx?.detailedTxns.map((txd: TxDetail) => {
             return (
               <View
                 key={txd.address}
@@ -141,7 +142,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, curr
                     }}>
                     <View style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}>
                       {expandAddress &&
-                        Utils.splitStringIntoChunks(txd.address, 9).map((c, idx) => {
+                        Utils.splitStringIntoChunks(txd.address, 9).map((c: string, idx: number) => {
                           return <RegText key={idx}>{c} </RegText>;
                         })}
                       {!expandAddress && <RegText>{Utils.trimToSmall(txd.address, 10)}</RegText>}

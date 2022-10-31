@@ -1,17 +1,20 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import { View, ScrollView, SafeAreaView, Image } from 'react-native';
-import RegText from './Components/RegText';
-import ZecAmount from './Components/ZecAmount';
-import Button from './Button';
 import { useTheme } from '@react-navigation/native';
+
+import RegText from '../Components/RegText';
+import ZecAmount from '../Components/ZecAmount';
+import Button from '../Button';
+import { ThemeType } from '../../app/types';
+import { TotalBalance } from '../../app/AppState';
 
 type RescanProps = {
   closeModal: () => void;
   birthday?: number;
   startRescan: () => void;
-  totalBalance: object;
-  currencyName: string;
+  totalBalance: TotalBalance;
+  currencyName?: string;
 };
 
 const Rescan: React.FunctionComponent<RescanProps> = ({
@@ -21,7 +24,7 @@ const Rescan: React.FunctionComponent<RescanProps> = ({
   totalBalance,
   currencyName,
 }) => {
-  const { colors } = useTheme();
+  const { colors } = useTheme() as unknown as ThemeType;
 
   const doRescanAndClose = () => {
     startRescan();

@@ -4,11 +4,13 @@ import { View, Platform, ScrollView } from 'react-native';
 import Clipboard from '@react-native-community/clipboard';
 import QRCode from 'react-native-qrcode-svg';
 import Toast from 'react-native-simple-toast';
-import ClickableText from './Components/ClickableText';
-import FadeText from './Components/FadeText';
-import Button from './Button';
-import Utils from '../app/utils';
 import { useTheme } from '@react-navigation/native';
+
+import ClickableText from '../../Components/ClickableText';
+import FadeText from '../../Components/FadeText';
+import Button from '../../Button';
+import Utils from '../../../app/utils';
+import { ThemeType } from '../../../app/types';
 
 type SingleAddressProps = {
   address: string;
@@ -28,13 +30,13 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   next,
 }) => {
   // console.log(`Addresses ${addresses}: ${multipleAddresses}`);
-  const { colors } = useTheme();
+  const { colors } = useTheme() as unknown as ThemeType;
 
   const multi = total > 1;
 
   // 30 characters per line
   const numLines = addressKind === 't' ? 2 : address.length / 30;
-  const chunks = Utils.splitStringIntoChunks(address, numLines.toFixed(0));
+  const chunks = Utils.splitStringIntoChunks(address, Number(numLines.toFixed(0)));
   const fixedWidthFont = Platform.OS === 'android' ? 'monospace' : 'Courier';
 
   const doCopy = () => {

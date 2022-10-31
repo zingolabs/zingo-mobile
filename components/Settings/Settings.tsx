@@ -1,27 +1,28 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import { View, ScrollView, SafeAreaView, Image, TouchableOpacity } from 'react-native';
-import RegText from './Components/RegText';
-import FadeText from './Components/FadeText';
-import BoldText from './Components/BoldText';
-import RegTextInput from './Components/RegTextInput';
-import ZecAmount from './Components/ZecAmount';
-import { parseServerURI, SERVER_URI, MEMOS } from '../app/uris';
-import Button from './Button';
+import { View, ScrollView, SafeAreaView, Image, TouchableOpacity, Platform } from 'react-native';
 import { useTheme } from '@react-navigation/native';
-import { WalletSettings } from '../app/AppState';
-//import {TouchableOpacity} from 'react-native-gesture-handler';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faDotCircle } from '@fortawesome/free-solid-svg-icons';
 import { faCircle as farCircle } from '@fortawesome/free-regular-svg-icons';
+
+import RegText from '../Components/RegText';
+import FadeText from '../Components/FadeText';
+import BoldText from '../Components/BoldText';
+import RegTextInput from '../Components/RegTextInput';
+import ZecAmount from '../Components/ZecAmount';
+import { parseServerURI, SERVER_URI, MEMOS } from '../../app/uris';
+import Button from '../Button';
+import { WalletSettings, TotalBalance } from '../../app/AppState';
+import { ThemeType } from '../../app/types';
 
 type SettingsProps = {
   closeModal: () => void;
   wallet_settings: WalletSettings;
   set_wallet_option: (name: string, value: string) => void;
   set_server_option: (server: string) => void;
-  totalBalance: object;
-  currencyName: string;
+  totalBalance: TotalBalance;
+  currencyName?: string;
 };
 
 const Settings: React.FunctionComponent<SettingsProps> = ({
@@ -32,18 +33,17 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   totalBalance,
   currencyName,
 }) => {
-  const { colors } = useTheme();
+  const { colors } = useTheme() as unknown as ThemeType;
 
   const [memos, setMemos] = React.useState(wallet_settings.download_memos);
   const [filter, setFilter] = React.useState(wallet_settings.transaction_filter_threshold);
   const [server, setServer] = React.useState(wallet_settings.server);
-  const [error, setError] = React.useState(null);
-
-  const [customIcon, setCustomIcon] = React.useState(null);
+  const [error, setError] = React.useState('');
+  const [customIcon, setCustomIcon] = React.useState(farCircle);
 
   React.useEffect(() => {
-    setCustomIcon(SERVER_URI.find(s => s === server) ? farCircle : faDotCircle);
-  }, [wallet_settings, server]);
+    setCustomIcon(SERVER_URI.find((s: string) => s === server) ? farCircle : faDotCircle);
+  }, [server]);
 
   const saveSettings = async () => {
     if (
@@ -53,28 +53,28 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     ) {
       setError('No changes registred.');
       setTimeout(() => {
-        setError(null);
+        setError('');
       }, 5000);
       return;
     }
     if (!memos) {
       setError('You need to choose the download memos option to save.');
       setTimeout(() => {
-        setError(null);
+        setError('');
       }, 5000);
       return;
     }
     if (!filter) {
       setError('You need to choose the transaction filter threshold option to save.');
       setTimeout(() => {
-        setError(null);
+        setError('');
       }, 5000);
       return;
     }
     if (!server) {
       setError('You need to choose one Server of the list or fill out a valid Server URI.');
       setTimeout(() => {
-        setError(null);
+        setError('');
       }, 5000);
       return;
     }
@@ -82,7 +82,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     if (result.toLowerCase().startsWith('error')) {
       setError('You need to fill out a valid Server URI.');
       setTimeout(() => {
-        setError(null);
+        setError('');
       }, 5000);
       return;
     }
@@ -159,7 +159,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           ))}
 
           <View style={{ display: 'flex', flexDirection: 'row' }}>
-            <TouchableOpacity style={{ marginRight: 10, marginBottom: 5 }} onPress={() => setServer(null)}>
+            <TouchableOpacity style={{ marginRight: 10, marginBottom: 5 }} onPress={() => setServer(undefined)}>
               <View style={{ display: 'flex', flexDirection: 'row', marginTop: 10 }}>
                 {customIcon && <FontAwesomeIcon icon={customIcon} size={20} color={colors.border} />}
                 <RegText style={{ marginLeft: 10 }}>custom</RegText>

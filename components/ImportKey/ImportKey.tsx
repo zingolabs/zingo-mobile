@@ -1,25 +1,27 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState } from 'react';
 import { View, ScrollView, SafeAreaView, Image, TouchableOpacity, Modal } from 'react-native';
-import FadeText from './Components/FadeText';
-import RegText from './Components/RegText';
-import RegTextInput from './Components/RegTextInput';
-import ZecAmount from './Components/ZecAmount';
-import Button from './Button';
 import { useTheme } from '@react-navigation/native';
 import { faQrcode } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
+import FadeText from '../Components/FadeText';
+import RegText from '../Components/RegText';
+import RegTextInput from '../Components/RegTextInput';
+import ZecAmount from '../Components/ZecAmount';
+import Button from '../Button';
+import { TotalBalance } from '../../app/AppState';
 import Scanner from './components/Scanner';
+import { ThemeType } from '../../app/types';
 
 type ImportKeyProps = {
   closeModal: () => void;
   doImport: (keyText: string, birthday: string) => void;
-  totalBalance: object;
-  currencyName: string;
+  totalBalance: TotalBalance;
+  currencyName?: string;
 };
 const ImportKey: React.FunctionComponent<ImportKeyProps> = ({ closeModal, doImport, totalBalance, currencyName }) => {
-  const { colors } = useTheme();
+  const { colors } = useTheme() as unknown as ThemeType;
 
   const [privKeyText, setPrivKeyText] = useState('');
   const [birthday, setBirthday] = useState('0');

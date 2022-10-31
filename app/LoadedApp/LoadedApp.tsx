@@ -4,16 +4,17 @@ import { Modal } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faList, faUpload, faDownload, faCog, faAddressBook } from '@fortawesome/free-solid-svg-icons';
-
+import { useTheme } from '@react-navigation/native';
 import SideMenu from 'react-native-side-menu-updated';
-import RPC from './rpc';
-import RPCModule from '../components/RPCModule';
+
+import RPC from '../rpc';
+import RPCModule from '../../components/RPCModule';
 import AppState, {
   SyncStatusReport,
   TotalBalance,
   SendPageState,
   ReceivePageState,
-  Info,
+  Info as InfoType,
   Transaction,
   ToAddr,
   ErrorModalData,
@@ -21,35 +22,41 @@ import AppState, {
   SyncStatus,
   SendProgress,
   WalletSettings,
-} from './AppState';
-import FadeText from '../components/Components/FadeText';
-import Utils from './utils';
-import Transactions from '../components/Transactions';
-import Send from '../components/Send';
-import Receive from '../components/Receive';
-import Legacy from '../components/Legacy';
-import About from '../components/About';
-import Seed from '../components/Seed';
-import Info from '../components/Info';
-import SyncReport from '../components/SyncReport';
-import Rescan from '../components/Rescan';
-import Settings from '../components/Settings';
-import SettingsFileImpl from '../components/Settings/SettingsFileImpl';
-
-import { useTheme } from '@react-navigation/native';
+  SettingsFileEntry,
+  Address,
+} from '../AppState';
+import FadeText from '../../components/Components/FadeText';
+import Utils from '../utils';
+import Transactions from '../../components/Transactions';
+import Send from '../../components/Send';
+import Receive from '../../components/Receive';
+import Legacy from '../../components/Legacy';
+import About from '../../components/About';
+import Seed from '../../components/Seed';
+import Info from '../../components/Info';
+import SyncReport from '../../components/SyncReport';
+import Rescan from '../../components/Rescan';
+import Settings from '../../components/Settings';
+import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import Menu from './components/Menu';
 import ComputingTxContent from './components/ComputingTxContent';
+import { ThemeType } from '../types';
 
 const Tab = createBottomTabNavigator();
 
-export default function LoadedApp(props) {
-  const theme = useTheme();
+type LoadedAppProps = {
+  navigation: any;
+};
+
+export default function LoadedApp(props: LoadedAppProps) {
+  const theme = useTheme() as unknown as ThemeType;
 
   return <LoadedAppClass {...props} theme={theme} />;
 }
 
 type LoadedAppClassProps = {
   navigation: any;
+  theme: ThemeType;
 };
 
 class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
@@ -69,24 +76,24 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
       receivePageState: new ReceivePageState(),
       info: null,
       rescanning: false,
+      wallet_settings: new WalletSettings(),
+      syncingStatus: null,
       errorModalData: new ErrorModalData(),
       txBuildProgress: new SendProgress(),
       walletSeed: null,
-      wallet_settings: new WalletSettings(),
       isMenuDrawerOpen: false,
       selectedMenuDrawerItem: '',
       aboutModalVisible: false,
-      rescanModalVisible: false,
       computingModalVisible: false,
-      infoModalVisible: false,
-      syncReportModalVisible: false,
       settingsModalVisible: false,
+      infoModalVisible: false,
+      rescanModalVisible: false,
       seedViewModalVisible: false,
       seedChangeModalVisible: false,
       seedBackupModalVisible: false,
       seedServerModalVisible: false,
+      syncReportModalVisible: false,
       newServer: null,
-      syncingStatus: null,
       error: null,
     };
 
@@ -168,7 +175,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
     this.setState({ transactions });
   };
 
-  setAllAddresses = (addresses: string[]) => {
+  setAllAddresses = (addresses: Address[]) => {
     this.setState({ addresses });
   };
 
@@ -221,7 +228,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
     this.setState({ txBuildProgress: progress });
   };
 
-  setInfo = (newInfo: Info) => {
+  setInfo = (newInfo: InfoType) => {
     // If the price is not set in this object, copy it over from the current object
     const { info } = this.state;
     if (!!info && !!info.zecPrice && !newInfo.zecPrice) {
@@ -280,21 +287,25 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
 
   // Get a single private key for this address, and return it as a string.
   // Wallet needs to be unlocked
-  getPrivKeyAsString = async (address: string): Promise<string> => {
+  getPrivKeyAsString = async (address: string): Promise<string | null> => {
     const pk = await RPC.rpc_getPrivKeyAsString(address);
-    return pk;
+    if (pk) {
+      return pk;
+    }
+    return null;
   };
 
   // Getter methods, which are called by the components to update the state
   fetchAndSetSinglePrivKey = async (address: string) => {
     const key = await RPC.rpc_getPrivKeyAsString(address);
     const addressPrivateKeys = new Map<string, string>();
-    addressPrivateKeys.set(address, key);
-
-    this.setState({ addressPrivateKeys });
+    if (key) {
+      addressPrivateKeys.set(address, key);
+      this.setState({ addressPrivateKeys });
+    }
   };
 
-  createNewAddress = async (addressType: 'z' | 't' | 'o') => {
+  createNewAddress = async (addressType: 'z' | 't' | 'u') => {
     // Create a new address
     const newaddress = await RPC.rpc_createNewAddress(addressType);
     // console.log(`Created new Address ${newaddress}`);
@@ -306,7 +317,9 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
     const newRerenderKey = receivePageState.rerenderKey + 1;
 
     const newReceivePageState = new ReceivePageState();
-    newReceivePageState.newAddress = newaddress;
+    if (newaddress) {
+      newReceivePageState.newAddress = newaddress;
+    }
     newReceivePageState.rerenderKey = newRerenderKey;
 
     this.setState({ receivePageState: newReceivePageState });
@@ -345,6 +358,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
   };
 
   onMenuItemSelected = async (item: string) => {
+    const { info } = this.state;
     this.setState({
       isMenuDrawerOpen: false,
       selectedMenuDrawerItem: item,
@@ -371,7 +385,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
       await this.fetchWalletSeed();
       this.setState({ seedChangeModalVisible: true });
     } else if (item === 'Restore Wallet Backup') {
-      if (this.state.info.currencyName !== 'ZEC') {
+      if (info && info.currencyName !== 'ZEC') {
         this.setState({
           error: 'This option is only available for Mainnet servers.',
         });
@@ -416,7 +430,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
     if (!error.toLowerCase().startsWith('error')) {
       // Load the wallet and navigate to the transactions screen
       // console.log(`wallet loaded ok ${value}`);
-      await SettingsFileImpl.writeSettings({ server: value });
+      await SettingsFileImpl.writeSettings(new SettingsFileEntry(value));
       // Refetch the settings to update
       this.rpc.fetchWalletSettings();
       return;
@@ -468,8 +482,9 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
   };
 
   onClickOKChangeWallet = async () => {
+    const { info } = this.state;
     const resultStr =
-      this.state.info.currencyName !== 'ZEC' ? await this.rpc.changeWalletNoBackup() : await this.rpc.changeWallet();
+      info && info.currencyName !== 'ZEC' ? await this.rpc.changeWalletNoBackup() : await this.rpc.changeWallet();
 
     //console.log("jc change", resultStr);
     if (resultStr.toLowerCase().startsWith('error')) {
@@ -529,10 +544,14 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
       // console.log(`change server ok ${value}`);
     }
 
-    await SettingsFileImpl.writeSettings({ server: this.state.newServer });
+    if (this.state.newServer) {
+      await SettingsFileImpl.writeSettings(new SettingsFileEntry(this.state.newServer));
+    }
+
+    const { info } = this.state;
 
     const resultStr2 =
-      this.state.info.currencyName !== 'ZEC' ? await this.rpc.changeWalletNoBackup() : await this.rpc.changeWallet();
+      info && info.currencyName !== 'ZEC' ? await this.rpc.changeWalletNoBackup() : await this.rpc.changeWallet();
     //console.log("jc change", resultStr);
     if (resultStr2.toLowerCase().startsWith('error')) {
       // console.log(`Error change wallet. ${resultStr}`);
@@ -587,9 +606,9 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
     };
 
     const menu = <Menu onItemSelected={this.onMenuItemSelected} />;
-    const currencyName = (info && info.currencyName) || null;
+    const currencyName = info ? info.currencyName : undefined;
 
-    const fnTabBarIcon = (route, focused) => {
+    const fnTabBarIcon = (route: any, focused: boolean) => {
       var iconName;
 
       if (route.name === 'WALLET') {
@@ -609,7 +628,10 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
     };
 
     return (
-      <SideMenu menu={menu} isOpen={this.state.isMenuDrawerOpen} onChange={isOpen => this.updateMenuState(isOpen)}>
+      <SideMenu
+        menu={menu}
+        isOpen={this.state.isMenuDrawerOpen}
+        onChange={(isOpen: boolean) => this.updateMenuState(isOpen)}>
         <Modal
           animationType="slide"
           transparent={false}
@@ -618,7 +640,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
           <About
             closeModal={() => this.setState({ aboutModalVisible: false })}
             totalBalance={totalBalance}
-            currencyName={currencyName}
+            currencyName={currencyName || undefined}
           />
         </Modal>
 
@@ -631,7 +653,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
             closeModal={() => this.setState({ infoModalVisible: false })}
             info={info}
             totalBalance={totalBalance}
-            currencyName={currencyName}
+            currencyName={currencyName || undefined}
           />
         </Modal>
 
@@ -642,11 +664,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
           onRequestClose={() => this.setState({ syncReportModalVisible: false })}>
           <SyncReport
             closeModal={() => this.setState({ syncReportModalVisible: false })}
-            totalBalance={totalBalance}
-            currencyName={currencyName}
             syncStatusReport={syncStatusReport}
             birthday={walletSeed?.birthday}
-            info={info}
           />
         </Modal>
 
@@ -660,7 +679,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
             birthday={walletSeed?.birthday}
             startRescan={this.startRescan}
             totalBalance={totalBalance}
-            currencyName={currencyName}
+            currencyName={currencyName || undefined}
           />
         </Modal>
 
@@ -675,7 +694,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
             set_wallet_option={this.set_wallet_option}
             set_server_option={this.set_server_option}
             totalBalance={totalBalance}
-            currencyName={currencyName}
+            currencyName={currencyName || undefined}
           />
         </Modal>
 
@@ -691,8 +710,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
             onClickCancel={() => this.setState({ seedViewModalVisible: false })}
             totalBalance={totalBalance}
             action={'view'}
-            error={error}
-            currencyName={currencyName}
+            error={error || undefined}
+            currencyName={currencyName || undefined}
           />
         </Modal>
 
@@ -708,8 +727,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
             onClickCancel={() => this.setState({ seedChangeModalVisible: false })}
             totalBalance={totalBalance}
             action={'change'}
-            error={error}
-            currencyName={currencyName}
+            error={error || undefined}
+            currencyName={currencyName || undefined}
           />
         </Modal>
 
@@ -725,8 +744,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
             onClickCancel={() => this.setState({ seedBackupModalVisible: false })}
             totalBalance={totalBalance}
             action={'backup'}
-            error={error}
-            currencyName={currencyName}
+            error={error || undefined}
+            currencyName={currencyName || undefined}
           />
         </Modal>
 
@@ -742,8 +761,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
             onClickCancel={() => this.setState({ seedServerModalVisible: false })}
             totalBalance={totalBalance}
             action={'server'}
-            error={error}
-            currencyName={currencyName}
+            error={error || undefined}
+            currencyName={currencyName || undefined}
           />
         </Modal>
 
@@ -758,7 +777,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
         <Tab.Navigator
           initialRouteName="WALLET"
           screenOptions={({ route }) => ({
-            tabBarIcon: focused => fnTabBarIcon(route, focused),
+            tabBarIcon: ({ focused }) => fnTabBarIcon(route, focused),
             tabBarActiveTintColor: colors.background,
             tabBarActiveBackgroundColor: colors.primary,
             tabBarInactiveTintColor: colors.money,

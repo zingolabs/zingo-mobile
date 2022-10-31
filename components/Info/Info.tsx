@@ -1,26 +1,27 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import { View, ScrollView, SafeAreaView, Image } from 'react-native';
-import RegText from './Components/RegText';
-import ZecAmount from './Components/ZecAmount';
-import Button from './Button';
 import { useTheme } from '@react-navigation/native';
-import { Info } from '../app/AppState';
-import Utils from '../app/utils';
-import RPC from '../app/rpc';
 
+import RegText from '../Components/RegText';
+import ZecAmount from '../Components/ZecAmount';
+import Button from '../Button';
+import { Info, TotalBalance } from '../../app/AppState';
+import Utils from '../../app/utils';
+import RPC from '../../app/rpc';
 import DetailLine from './components/DetailLine';
+import { ThemeType } from '../../app/types';
 
 type InfoProps = {
   info: Info | null;
   closeModal: () => void;
-  totalBalance: object;
-  currencyName: string;
+  totalBalance: TotalBalance;
+  currencyName?: string;
 };
 
 const Info: React.FunctionComponent<InfoProps> = ({ info, closeModal, totalBalance, currencyName }) => {
-  const { colors } = useTheme();
-  const [infoState, setInfoState] = React.useState({});
+  const { colors } = useTheme() as unknown as ThemeType;
+  const [infoState, setInfoState] = React.useState({} as Info);
 
   React.useEffect(() => {
     (async () => {

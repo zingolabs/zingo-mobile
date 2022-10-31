@@ -3,21 +3,22 @@ import React, { useState } from 'react';
 import { View, Dimensions, Image, Modal } from 'react-native';
 import { TabView, TabBar } from 'react-native-tab-view';
 import Toast from 'react-native-simple-toast';
-import ZecAmount from './Components/ZecAmount';
-import UsdAmount from './Components/UsdAmount';
-import RegText from './Components/RegText';
-import { Info, Address } from '../app/AppState';
-import Utils from '../app/utils';
 import { useTheme } from '@react-navigation/native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faBars, faEllipsisV } from '@fortawesome/free-solid-svg-icons';
 import OptionsMenu from 'react-native-option-menu';
-import RPC from '../app/rpc';
-import PrivKey from './PrivKey';
-import ImportKey from './ImportKey';
 
+import ZecAmount from '../Components/ZecAmount';
+import UsdAmount from '../Components/UsdAmount';
+import RegText from '../Components/RegText';
+import { Info, Address, TotalBalance } from '../../app/AppState';
+import Utils from '../../app/utils';
+import RPC from '../../app/rpc';
+import PrivKey from '../PrivKey';
+import ImportKey from '../ImportKey';
 import SingleAddress from './components/SingleAddress';
+import { ThemeType } from '../../app/types';
 
 type LegacyProps = {
   info: Info | null;
@@ -25,16 +26,18 @@ type LegacyProps = {
   toggleMenuDrawer: () => void;
   fetchTotalBalance: () => Promise<void>;
   startRescan: () => void;
+  totalBalance: TotalBalance;
 };
 
 const Legacy: React.FunctionComponent<LegacyProps> = ({
+  info,
   addresses,
   toggleMenuDrawer,
   fetchTotalBalance,
   startRescan,
   totalBalance,
-  info,
 }) => {
+  const { colors } = useTheme() as unknown as ThemeType;
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([
     { key: 'zaddr', title: 'Z-Sapling' },
@@ -45,9 +48,8 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({
   const [zindex, setZIndex] = useState(0);
   const [tindex, setTIndex] = useState(0);
 
-  const { colors } = useTheme();
   const zecPrice = info ? info.zecPrice : null;
-  const currencyName = info ? info.currencyName : null;
+  const currencyName = info ? info.currencyName : undefined;
 
   const zaddrs = addresses.filter(a => a.addressKind === 'z') || [];
   const taddrs = addresses.filter(a => a.addressKind === 't') || [];
@@ -161,7 +163,9 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({
     const newAddress = await RPC.rpc_createNewAddress('z');
     await fetchTotalBalance();
     setIndex(0);
-    setDisplayAddress(newAddress);
+    if (newAddress) {
+      setDisplayAddress(newAddress);
+    }
   };
 
   const addT = async () => {
@@ -169,7 +173,9 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({
     const newAddress = await RPC.rpc_createNewAddress('t');
     await fetchTotalBalance();
     setIndex(1);
-    setDisplayAddress(newAddress);
+    if (newAddress) {
+      setDisplayAddress(newAddress);
+    }
   };
 
   const [privKeyModalVisible, setPrivKeyModalVisible] = useState(false);
@@ -191,7 +197,9 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({
 
     setKeyType(0);
     setPrivKeyModalVisible(true);
-    setPrivKey(k);
+    if (k) {
+      setPrivKey(k);
+    }
   };
 
   const viewViewingKey = async () => {
@@ -210,7 +218,9 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({
 
     setKeyType(1);
     setPrivKeyModalVisible(true);
-    setPrivKey(k);
+    if (k) {
+      setPrivKey(k);
+    }
   };
 
   const [importKeyModalVisible, setImportKeyModalVisible] = useState(false);

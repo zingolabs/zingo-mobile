@@ -12,20 +12,20 @@ import {
 } from './AppState';
 import RPCModule from '../components/RPCModule';
 import Utils from './utils';
-import SettingsFileImpl from '../components/SettingsFileImpl';
+import SettingsFileImpl from '../components/Settings/SettingsFileImpl';
 
 export default class RPC {
   fnSetSyncStatusReport: (syncStatusReport: SyncStatusReport) => void;
   fnSetInfo: (info: Info) => void;
   fnSetTotalBalance: (totalBalance: TotalBalance) => void;
   fnSetTransactionsList: (txList: Transaction[]) => void;
-  fnSetAllAddresses: (allAddresses: string[]) => void;
+  fnSetAllAddresses: (allAddresses: Address[]) => void;
   fnSetZecPrice: (price: number | null) => void;
   fnSetRefreshUpdates: (inProgress: boolean, progress: number, blocks: string) => void;
   fnSetWalletSettings: (settings: WalletSettings) => void;
 
-  refreshTimerID: NodeJS.Timeout | null;
-  updateTimerID?: NodeJS.Timeout;
+  refreshTimerID: number | null;
+  updateTimerID?: number;
 
   updateDataLock: boolean;
   updateDataCtr: number;
@@ -37,11 +37,19 @@ export default class RPC {
 
   inRefresh: boolean;
 
+  prevProgress: number;
+  prevBatchNum: number;
+  prev_sync_id: number;
+  seconds_batch: number;
+  batches: number;
+  message: string;
+  process_end_block: number;
+
   constructor(
     fnSetSyncStatusReport: (syncStatusReport: SyncStatusReport) => void,
     fnSetTotalBalance: (totalBalance: TotalBalance) => void,
     fnSetTransactionsList: (txlist: Transaction[]) => void,
-    fnSetAllAddresses: (addresses: string[]) => void,
+    fnSetAllAddresses: (addresses: Address[]) => void,
     fnSetWalletSettings: (settings: WalletSettings) => void,
     fnSetInfo: (info: Info) => void,
     fnSetZecPrice: (price: number | null) => void,
@@ -68,6 +76,14 @@ export default class RPC {
     this.lastTxId = undefined;
 
     this.inRefresh = false;
+
+    this.prevProgress = 0;
+    this.prevBatchNum = -1;
+    this.prev_sync_id = -1;
+    this.seconds_batch = 0;
+    this.batches = 0;
+    this.message = '';
+    this.process_end_block = -1;
   }
 
   static async rpc_setWalletSettingOption(name: string, value: string): Promise<string> {
@@ -128,7 +144,7 @@ export default class RPC {
     return null;
   }
 
-  static async rpc_fetchWalletHeight(): Promise<number> {
+  static async rpc_fetchWalletHeight(): Promise<number | null> {
     const heightStr = await RPCModule.execute('height', '');
     const heightJSON = await JSON.parse(heightStr);
 
@@ -139,7 +155,7 @@ export default class RPC {
     return null;
   }
 
-  static async rpc_getPrivKeyAsString(address: string): Promise<string> {
+  static async rpc_getPrivKeyAsString(address: string): Promise<string | null> {
     const privKeyStr = await RPCModule.execute('export', address);
     const privKeyJSON = await JSON.parse(privKeyStr);
 
@@ -154,7 +170,7 @@ export default class RPC {
     return null;
   }
 
-  static async rpc_getViewKeyAsString(address: string): Promise<string> {
+  static async rpc_getViewKeyAsString(address: string): Promise<string | null> {
     const viewKeyStr = await RPCModule.execute('export', address);
     const viewKeyJSON = await JSON.parse(viewKeyStr);
 
@@ -169,8 +185,8 @@ export default class RPC {
     return null;
   }
 
-  static async rpc_createNewAddress(addressType: 'z' | 't' | 'o'): Promise<string> {
-    // 'z' 't' or 'o'
+  static async rpc_createNewAddress(addressType: 'z' | 't' | 'u'): Promise<string | null> {
+    // 'z' 't' or 'u'
     const addrStr = await RPCModule.execute('new', addressType);
     const addrJSON = await JSON.parse(addrStr);
 
@@ -186,7 +202,7 @@ export default class RPC {
     return null;
   }
 
-  static async rpc_doImportPrivKey(key: string, birthday: string): Promise<string | string[]> {
+  static async rpc_doImportPrivKey(key: string, birthday: string): Promise<string | string[] | null> {
     if (isNaN(parseInt(birthday, 10))) {
       return `Error: Couldn't parse ${birthday} as a number`;
     }
@@ -201,7 +217,7 @@ export default class RPC {
     return null;
   }
 
-  static async rpc_shieldTransparent(): Promise<string> {
+  static async rpc_shieldTransparent(): Promise<string | null> {
     const shieldStr = await RPCModule.execute('shield', '');
 
     // console.log(shieldStr);
@@ -213,7 +229,7 @@ export default class RPC {
     return null;
   }
 
-  static async rpc_fetchSeed(): Promise<WalletSeed> {
+  static async rpc_fetchSeed(): Promise<WalletSeed | null> {
     const seedStr = await RPCModule.execute('seed', '');
     const seedJSON = await JSON.parse(seedStr);
 
@@ -225,7 +241,7 @@ export default class RPC {
     return null;
   }
 
-  static async rpc_getLastTxid(): Promise<string> {
+  static async rpc_getLastTxid(): Promise<string | null> {
     const lastTxIdStr = await RPCModule.execute('lasttxid', '');
     const lastTxidJSON = await JSON.parse(lastTxIdStr);
 
@@ -317,7 +333,7 @@ export default class RPC {
     }
   }
 
-  async doSync(): Promise<string> {
+  async doSync(): Promise<string | null> {
     const syncstr = await RPCModule.execute('sync', '');
 
     //console.log(`Sync exec result: ${syncstr}`);
@@ -329,7 +345,7 @@ export default class RPC {
     return null;
   }
 
-  async doRescan() {
+  async doRescan(): Promise<string | null> {
     const syncstr = await RPCModule.execute('rescan', '');
 
     //console.log(`rescan exec result: ${syncstr}`);
@@ -341,7 +357,7 @@ export default class RPC {
     return null;
   }
 
-  async doSyncStatus(): Promise<string> {
+  async doSyncStatus(): Promise<string | null> {
     const syncstr = await RPCModule.execute('syncstatus', '');
 
     // console.log(`syncstatus: ${syncstr}`);
@@ -384,7 +400,7 @@ export default class RPC {
     this.updateDataLock = true;
     const latest_txid = await RPC.rpc_getLastTxid();
 
-    if (this.lastTxId !== latest_txid) {
+    if (!!latest_txid && this.lastTxId !== latest_txid) {
       // console.log(`Latest: ${latest_txid}, prev = ${this.lastTxId}`);
 
       await this.fetchWalletHeight();
@@ -454,6 +470,9 @@ export default class RPC {
       // We need to wait for the sync to finish. The sync is done when
       let pollerID = setInterval(async () => {
         const s = await this.doSyncStatus();
+        if (!s) {
+          return;
+        }
         const ss = await JSON.parse(s);
 
         //console.log('sync status', ss);
@@ -553,7 +572,7 @@ export default class RPC {
 
         this.fnSetRefreshUpdates(
           ss.in_progress,
-          '',
+          0,
           current_block.toFixed(0).toString() + ' of ' + this.lastServerBlockHeight.toString(),
         );
 
@@ -583,7 +602,7 @@ export default class RPC {
         if (!this.inRefresh) {
           // We are synced. Cancel the poll timer
           clearInterval(pollerID);
-          pollerID = undefined;
+          pollerID = 0;
 
           // And fetch the rest of the data.
           await this.loadWalletData();
@@ -597,7 +616,7 @@ export default class RPC {
           this.message = 'The sync process finished successfully.';
 
           // I know it's finished.
-          this.fnSetRefreshUpdates(false, '', '');
+          this.fnSetRefreshUpdates(false, 0, '');
 
           // store SyncStatusReport object for a new screen
           const statusFinished: SyncStatusReport = {
@@ -725,7 +744,7 @@ export default class RPC {
     await this.fnSetWalletSettings(wallet_settings);
   }
 
-  async fetchInfo(): Promise<number | null> {
+  async fetchInfo(): Promise<void> {
     const info = await RPC.rpc_getInfoObject();
 
     if (info) {
@@ -734,7 +753,7 @@ export default class RPC {
     }
   }
 
-  async fetchServerHeight(): Promise<number | null> {
+  async fetchServerHeight(): Promise<void> {
     const info = await RPC.rpc_getInfoObject();
 
     if (info) {
@@ -841,7 +860,7 @@ export default class RPC {
     await this.fnSetAllAddresses(addresses);
   }
 
-  async fetchWalletHeight(): Promise<number> {
+  async fetchWalletHeight(): Promise<void> {
     const heightStr = await RPCModule.execute('height', '');
     const heightJSON = await JSON.parse(heightStr);
 
@@ -899,7 +918,7 @@ export default class RPC {
           ? 0
           : this.lastServerBlockHeight
           ? this.lastServerBlockHeight - tx.block_height + 1
-          : '--',
+          : 0,
         txid: tx.txid,
         zec_price: tx.zec_price,
         time: tx.datetime,
@@ -1154,7 +1173,7 @@ export default class RPC {
     return '';
   }
 
-  async setInRefresh(value) {
+  async setInRefresh(value: boolean) {
     this.inRefresh = value;
   }
 }

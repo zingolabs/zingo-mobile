@@ -1,18 +1,22 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import { View, ScrollView, SafeAreaView, Image } from 'react-native';
+import { useTheme } from '@react-navigation/native';
+
 import FadeText from '../Components/FadeText';
 import ZecAmount from '../Components/ZecAmount';
 import RegText from '../Components/RegText';
 import Button from '../Button';
-import { useTheme } from '@react-navigation/native';
+import { ThemeType } from '../../app/types';
+import { TotalBalance } from '../../app/AppState';
 
 type AboutProps = {
   closeModal: () => void;
-  totalBalance: object;
+  totalBalance: TotalBalance;
+  currencyName?: string;
 };
 const About: React.FunctionComponent<AboutProps> = ({ closeModal, totalBalance, currencyName }) => {
-  const { colors } = useTheme();
+  const { colors } = useTheme() as unknown as ThemeType;
   return (
     <SafeAreaView
       style={{

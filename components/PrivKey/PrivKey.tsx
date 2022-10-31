@@ -1,24 +1,27 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState } from 'react';
 import { View, ScrollView, SafeAreaView, Image, Platform, TouchableOpacity } from 'react-native';
-import Clipboard from '@react-native-community/clipboard';
-import ClickableText from './Components/ClickableText';
-import FadeText from './Components/FadeText';
-import RegText from './Components/RegText';
-import ZecAmount from './Components/ZecAmount';
-import Button from './Button';
 import { useTheme } from '@react-navigation/native';
-import Utils from '../app/utils';
+import Clipboard from '@react-native-community/clipboard';
 import Toast from 'react-native-simple-toast';
 import QRCode from 'react-native-qrcode-svg';
+
+import ClickableText from '../Components/ClickableText';
+import FadeText from '../Components/FadeText';
+import RegText from '../Components/RegText';
+import ZecAmount from '../Components/ZecAmount';
+import Button from '../Button';
+import Utils from '../../app/utils';
+import { TotalBalance } from '../../app/AppState';
+import { ThemeType } from '../../app/types';
 
 type PrivKeyProps = {
   closeModal: () => void;
   address: string;
   keyType: number;
   privKey: string;
-  totalBalance: object;
-  currencyName: string;
+  totalBalance: TotalBalance;
+  currencyName?: string;
 };
 const PrivKey: React.FunctionComponent<PrivKeyProps> = ({
   address,
@@ -28,14 +31,14 @@ const PrivKey: React.FunctionComponent<PrivKeyProps> = ({
   totalBalance,
   currencyName,
 }) => {
-  const { colors } = useTheme();
+  const { colors } = useTheme() as unknown as ThemeType;
   const fixedWidthFont = Platform.OS === 'android' ? 'monospace' : 'Courier';
 
   const keyTypeString = keyType === 0 ? 'Spending/Private' : 'Full Viewing/Viewing';
 
   // 30 characters per line
   const numLines = privKey.length / 30;
-  const keyChunks = Utils.splitStringIntoChunks(privKey, numLines.toFixed(0));
+  const keyChunks = Utils.splitStringIntoChunks(privKey, Number(numLines.toFixed(0)));
 
   const [expandAddress, setExpandAddress] = useState(false);
 
