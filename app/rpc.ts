@@ -767,10 +767,10 @@ export default class RPC {
     const addressesStr = await RPCModule.execute('addresses', '');
     let addressesJSON = await JSON.parse(addressesStr);
 
+    console.log('addrs:', addressesJSON.length, addressesJSON);
+
     // for now only we use the first element of this array
     addressesJSON = [addressesJSON[0]];
-
-    console.log('addr:', addressesJSON);
 
     const balanceStr = await RPCModule.execute('balance', '');
     const balanceJSON = await JSON.parse(balanceStr);
