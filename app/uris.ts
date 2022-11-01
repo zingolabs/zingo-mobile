@@ -55,7 +55,7 @@ export const parseServerURI = (uri: string): string => {
   return 'URI is OK';
 };
 
-export const parseZcashURI = (uri: string): ZcashURITarget[] | string => {
+export const parseZcashURI = async (uri: string): ZcashURITarget[] | string => {
   if (!uri || uri === '') {
     return 'Bad URI';
   }
@@ -71,10 +71,9 @@ export const parseZcashURI = (uri: string): ZcashURITarget[] | string => {
   // The first address is special, it can be the "host" part of the URI
   const address = parsedUri.pathname;
 
-  const resultParse = RPCModule.execute('parse', address);
-  const resultParseJSON = JSON.parse(resultParse);
-
-  console.log('parse', resultParseJSON);
+  const resultParse = await RPCModule.execute('parse', address);
+  console.log('parse', resultParse);
+  const resultParseJSON = await JSON.parse(resultParse);
 
   const validParse = resultParseJSON.status === 'success';
 
@@ -118,10 +117,9 @@ export const parseZcashURI = (uri: string): ZcashURITarget[] | string => {
         if (typeof target.address !== 'undefined') {
           return `Duplicate parameter "${qName}"`;
         }
-        const result = RPCModule.execute('parse', value);
-        const resultJSON = JSON.parse(result);
-
-        console.log('parse', resultJSON);
+        const result = await RPCModule.execute('parse', value);
+        console.log('parse', result);
+        const resultJSON = await JSON.parse(result);
 
         const valid = resultJSON.status === 'success';
 

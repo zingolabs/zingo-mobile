@@ -219,11 +219,11 @@ const Send: React.FunctionComponent<SendProps> = ({
     return max;
   };
 
-  const getMemoEnabled = (address: string): boolean => {
+  const getMemoEnabled = async (address: string): boolean => {
     if (address) {
-      const result = RPCModule.execute('parse', address);
+      const result = await RPCModule.execute('parse', address);
       console.log(result);
-      const resultJSON = JSON.parse(result);
+      const resultJSON = await JSON.parse(result);
 
       console.log('parse-2', sendPageState.toaddrs[0].to, resultJSON);
 
@@ -242,11 +242,11 @@ const Send: React.FunctionComponent<SendProps> = ({
   const zecPrice = info ? info.zecPrice : null;
   const currencyName = info ? info.currencyName : undefined;
 
-  var addressValidationState: number[] = sendPageState.toaddrs.map(to => {
+  var addressValidationState: number[] = sendPageState.toaddrs.map(async to => {
     if (!!to && !!to.to) {
-      const result = RPCModule.execute('parse', to.to);
+      const result = await RPCModule.execute('parse', to.to);
       console.log(result);
-      const resultJSON = JSON.parse(result);
+      const resultJSON = await JSON.parse(result);
 
       console.log('parse-3', to.to, resultJSON);
 
