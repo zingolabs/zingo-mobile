@@ -67,24 +67,24 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         val saplingSpend = saplingSpendFile?.readBytes()
         saplingSpendFile?.close()
 
-        val saplingOutputEncoded = Base64.encodeToString(saplingOutput, Base64.NO_WRAP)
+        val saplingOutputEncoded = StringBuilder(Base64.encodeToString(saplingOutput, Base64.NO_WRAP))
 
         val len: Int = saplingSpend?.size!!
         val middle = 24000000 // 24_000_000
-        var saplingSpendEncoded = Base64.encodeToString(saplingSpend, 0, middle, Base64.NO_WRAP)
-        saplingSpendEncoded += Base64.encodeToString(
+        var saplingSpendEncoded = StringBuilder(Base64.encodeToString(saplingSpend, 0, middle, Base64.NO_WRAP))
+        saplingSpendEncoded = saplingSpendEncoded.append(Base64.encodeToString(
             saplingSpend,
             middle,
             len - middle,
             Base64.NO_WRAP
-        )
+        ))
 
         initlogging()
 
         // Create a seed
         val seed = initnew(server,
-            saplingOutputEncoded,
-            saplingSpendEncoded,
+            saplingOutputEncoded.toString(),
+            saplingSpendEncoded.toString(),
             reactContext.applicationContext.filesDir.absolutePath)
         // Log.w("MAIN-Seed", seed)
 
@@ -107,21 +107,23 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         val saplingSpend = saplingSpendFile?.readBytes()
         saplingSpendFile?.close()
 
-        val saplingOutputEncoded = Base64.encodeToString(saplingOutput, Base64.NO_WRAP)
+        val saplingOutputEncoded = StringBuilder(Base64.encodeToString(saplingOutput, Base64.NO_WRAP))
 
         val len: Int = saplingSpend?.size!!
         val middle = 24000000 // 24_000_000
-        var saplingSpendEncoded = Base64.encodeToString(saplingSpend, 0, middle, Base64.NO_WRAP)
-        saplingSpendEncoded += Base64.encodeToString(
+        var saplingSpendEncoded = StringBuilder(Base64.encodeToString(saplingSpend, 0, middle, Base64.NO_WRAP))
+        saplingSpendEncoded = saplingSpendEncoded.append(Base64.encodeToString(
             saplingSpend,
             middle,
             len - middle,
             Base64.NO_WRAP
-        )
+        ))
+
+        initlogging()
 
         val rseed = initfromseed(server, seed, birthday,
-            saplingOutputEncoded,
-            saplingSpendEncoded,
+            saplingOutputEncoded.toString(),
+            saplingSpendEncoded.toString(),
             reactContext.applicationContext.filesDir.absolutePath)
         // Log.w("MAIN", seed)
 
@@ -138,6 +140,15 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         val saplingSpend = saplingSpendFile?.readBytes()!!
         saplingSpendFile.close()
 
+        val saplingOutputFile = MainApplication.getAppContext()?.resources?.openRawResource(R.raw.saplingoutput)
+        val saplingOutput = saplingOutputFile?.readBytes()!!
+        saplingOutputFile.close()
+
+        // Read the file
+        val file = MainApplication.getAppContext()?.openFileInput("wallet.dat")
+        val fileBytes = file?.readBytes()!!
+        file.close()
+
         val middle0 =        0
         val middle1 =  6000000 // 6_000_000 - 8 pieces
         val middle2 = 12000000
@@ -147,81 +158,73 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         val middle6 = 36000000
         val middle7 = 42000000
         val middle8: Int = saplingSpend.size
-        var saplingSpendEncoded = Base64.encodeToString(saplingSpend, middle0, middle1 - middle0, Base64.NO_WRAP)
-        saplingSpendEncoded += Base64.encodeToString(
+        var saplingSpendEncoded = StringBuilder(Base64.encodeToString(saplingSpend, middle0, middle1 - middle0, Base64.NO_WRAP))
+        saplingSpendEncoded = saplingSpendEncoded.append(Base64.encodeToString(
             saplingSpend,
             middle1,
             middle2 - middle1,
             Base64.NO_WRAP
-        )
-        saplingSpendEncoded += Base64.encodeToString(
+        ))
+        saplingSpendEncoded = saplingSpendEncoded.append(Base64.encodeToString(
             saplingSpend,
             middle2,
             middle3 - middle2,
             Base64.NO_WRAP
-        )
-        saplingSpendEncoded += Base64.encodeToString(
+        ))
+        saplingSpendEncoded = saplingSpendEncoded.append(Base64.encodeToString(
             saplingSpend,
             middle3,
             middle4 - middle3,
             Base64.NO_WRAP
-        )
-        saplingSpendEncoded += Base64.encodeToString(
+        ))
+        saplingSpendEncoded = saplingSpendEncoded.append(Base64.encodeToString(
             saplingSpend,
             middle4,
             middle5 - middle4,
             Base64.NO_WRAP
-        )
-        saplingSpendEncoded += Base64.encodeToString(
+        ))
+        saplingSpendEncoded = saplingSpendEncoded.append(Base64.encodeToString(
             saplingSpend,
             middle5,
             middle6 - middle5,
             Base64.NO_WRAP
-        )
-        saplingSpendEncoded += Base64.encodeToString(
+        ))
+        saplingSpendEncoded = saplingSpendEncoded.append(Base64.encodeToString(
             saplingSpend,
             middle6,
             middle7 - middle6,
             Base64.NO_WRAP
-        )
-        saplingSpendEncoded += Base64.encodeToString(
+        ))
+        saplingSpendEncoded = saplingSpendEncoded.append(Base64.encodeToString(
             saplingSpend,
             middle7,
             middle8 - middle7,
             Base64.NO_WRAP
-        )
+        ))
 
-        val saplingOutputFile = MainApplication.getAppContext()?.resources?.openRawResource(R.raw.saplingoutput)
-        val saplingOutput = saplingOutputFile?.readBytes()!!
-        saplingOutputFile.close()
-
-        val saplingOutputEncoded = Base64.encodeToString(saplingOutput, Base64.NO_WRAP)
-
-        // Read the file
-        val file = MainApplication.getAppContext()?.openFileInput("wallet.dat")
-        val fileBytes = file?.readBytes()!!
-        file.close()
+        val saplingOutputEncoded = StringBuilder(Base64.encodeToString(saplingOutput, Base64.NO_WRAP))
 
         val middle0w =        0
         val middle1w =  3000000 // 3_000_000 - 2 pieces
         val middle2w: Int = fileBytes.size
-        var fileb64:String
+        var fileb64 = StringBuilder("")
         if (fileBytes.size <= middle1w) {
-          fileb64 = Base64.encodeToString(fileBytes, Base64.NO_WRAP)
+          fileb64 = fileb64.append(Base64.encodeToString(fileBytes, Base64.NO_WRAP))
         } else {
-          fileb64 = Base64.encodeToString(fileBytes, middle0w, middle1w - middle0w, Base64.NO_WRAP)
-          fileb64 += Base64.encodeToString(fileBytes, middle1w, middle2w - middle1w, Base64.NO_WRAP)
+          fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle0w, middle1w - middle0w, Base64.NO_WRAP))
+          fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle1w, middle2w - middle1w, Base64.NO_WRAP))
         }
 
-        val seed = initfromb64(server, fileb64,
-            saplingOutputEncoded,
-            saplingSpendEncoded,
-            reactContext.applicationContext.filesDir.absolutePath)
-
-        // Log.w("MAIN", seed)
         initlogging()
 
-        promise.resolve(seed)
+        val wseed = initfromb64(server,
+            fileb64.toString(),
+            saplingOutputEncoded.toString(),
+            saplingSpendEncoded.toString(),
+            reactContext.applicationContext.filesDir.absolutePath)
+        // Log.w("MAIN", seed)
+
+        promise.resolve(wseed)
     }
 
     @ReactMethod

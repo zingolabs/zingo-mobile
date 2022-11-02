@@ -1,19 +1,19 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import { SafeAreaView } from 'react-native';
-import * as Progress from 'react-native-progress';
+import { useTheme } from '@react-navigation/native';
 
 import { SendProgress } from '../../AppState';
 import RegText from '../../../components/Components/RegText';
-
-import { useTheme } from '@react-navigation/native';
+import { ThemeType } from '../../types';
+import CircularProgress from '../../../components/CircularProgress';
 
 type ComputingTxContentProps = {
   progress: SendProgress;
 };
 
 const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({ progress }) => {
-  const { colors } = useTheme();
+  const { colors } = useTheme() as unknown as ThemeType;
 
   return (
     <SafeAreaView
@@ -30,12 +30,12 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({ 
         <>
           <RegText>{`Step ${progress.progress} of ${progress.total}`}</RegText>
           <RegText style={{ marginBottom: 20 }}>{`ETA ${progress.etaSeconds}s`}</RegText>
-          {/*<Progress.CircleSnail
-            progress={progress.progress / progress.total}
-            indeterminate={!progress.progress}
+          <CircularProgress
             size={100}
-            color={colors.primary}
-          />*/}
+            strokeWidth={10}
+            text={''}
+            progressPercent={((progress.progress + 1) * 100) / 4}
+          />
         </>
       )}
     </SafeAreaView>
