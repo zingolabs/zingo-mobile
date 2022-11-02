@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { View, ScrollView, Modal, Image, Alert, Keyboard } from 'react-native';
 import { faQrcode, faCheck, faInfo } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -59,11 +59,99 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [qrcodeModalVisble, setQrcodeModalVisible] = useState(false);
   const [qrcodeModalIndex, setQrcodeModalIndex] = useState(0);
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
-
   const [titleViewHeight, setTitleViewHeight] = useState(0);
-  const slideAnim = useRef(new Animated.Value(0)).current;
+  const [memoEnabled, setMemoEnabled] = useState(false);
+  const [validAddress, setValidAddress] = useState(0); // 1 - OK, 0 - Empty, -1 - KO
+  const [validAmount, setValidAmount] = useState(0); // 1 - OK, 0 - Empty, -1 - KO
+  const [sendButtonEnabled, setSendButtonEnabled] = useState(false);
 
+  const slideAnim = useRef(new Animated.Value(0)).current;
   const defaultFee = info?.defaultFee || Utils.getFallbackDefaultFee();
+  const { decimalSeparator } = getNumberFormatSettings();
+  const syncStatusDisplayLine = syncingStatus?.inProgress ? `(${syncingStatus?.blocks})` : '';
+  const spendable = totalBalance.transparentBal + totalBalance.spendablePrivate + totalBalance.spendableOrchard;
+  const stillConfirming = spendable !== totalBalance.total;
+  const zecPrice = info ? info.zecPrice : null;
+  const currencyName = info ? info.currencyName : undefined;
+
+  const getMaxAmount = useCallback((): number => {
+    let max = spendable - defaultFee;
+    if (max < 0) {
+      return 0;
+    }
+    return max;
+  }, [spendable, defaultFee]);
+
+  useEffect(() => {
+    const getMemoEnabled = async (address: string): Promise<boolean> => {
+      const result = await RPCModule.execute('parse', address);
+      const resultJSON = await JSON.parse(result);
+
+      console.log('parse-memo', address, resultJSON);
+
+      return (
+        resultJSON.status === 'success' &&
+        (resultJSON.address_kind === 'unified' ||
+          resultJSON.address_kind === 'orchard' ||
+          resultJSON.address_kind === 'sapling')
+      );
+    };
+
+    const address = sendPageState.toaddrs[0].to;
+
+    if (address) {
+      getMemoEnabled(address).then(r => {
+        setMemoEnabled(r);
+      });
+    } else {
+      setMemoEnabled(false);
+    }
+  }, [sendPageState.toaddrs]);
+
+  useEffect(() => {
+    const parseAdressJSON = async (address: string): Promise<boolean> => {
+      const result = await RPCModule.execute('parse', address);
+      const resultJSON = await JSON.parse(result);
+
+      console.log('parse-address', address, resultJSON.status === 'success');
+
+      return resultJSON.status === 'success';
+    };
+
+    const address = sendPageState.toaddrs[0].to;
+
+    if (address) {
+      parseAdressJSON(address).then(r => {
+        setValidAddress(r ? 1 : -1);
+      });
+    } else {
+      setValidAddress(0);
+    }
+
+    var to = sendPageState.toaddrs[0];
+
+    if (to.amountUSD !== '') {
+      if (isNaN(Number(to.amountUSD))) {
+        setValidAmount(-1);
+      }
+    }
+    if (to.amount !== '') {
+      if (
+        Utils.parseLocaleFloat(to.amount) > 0 &&
+        Utils.parseLocaleFloat(to.amount) <= parseFloat(getMaxAmount().toFixed(8))
+      ) {
+        setValidAmount(1);
+      } else {
+        setValidAmount(-1);
+      }
+    } else {
+      setValidAmount(0);
+    }
+  }, [sendPageState.toaddrs, getMaxAmount]);
+
+  useEffect(() => {
+    setSendButtonEnabled(validAddress === 1 && validAmount === 1);
+  }, [validAddress, validAmount]);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
@@ -89,7 +177,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     };
   }, [slideAnim, titleViewHeight]);
 
-  const updateToField = (
+  const updateToField = async (
     idx: number,
     address: string | null,
     amount: string | null,
@@ -106,7 +194,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     if (address !== null) {
       // Attempt to parse as URI if it starts with zcash
       if (address.startsWith('zcash:')) {
-        const targets = parseZcashURI(address);
+        const targets = await parseZcashURI(address);
         //console.log(targets);
 
         if (Array.isArray(targets)) {
@@ -138,8 +226,6 @@ const Send: React.FunctionComponent<SendProps> = ({
         toAddr.to = address.replace(/[ \t\n\r]+/g, ''); // Remove spaces
       }
     }
-
-    const { decimalSeparator } = getNumberFormatSettings();
 
     if (amount !== null) {
       toAddr.amount = amount.replace(decimalSeparator, '.');
@@ -207,89 +293,6 @@ const Send: React.FunctionComponent<SendProps> = ({
       }
     });
   };
-
-  const spendable = totalBalance.transparentBal + totalBalance.spendablePrivate + totalBalance.spendableOrchard;
-  const stillConfirming = spendable !== totalBalance.total;
-
-  const getMaxAmount = (): number => {
-    let max = spendable - defaultFee;
-    if (max < 0) {
-      return 0;
-    }
-    return max;
-  };
-
-  const getMemoEnabled = async (address: string): boolean => {
-    if (address) {
-      const result = await RPCModule.execute('parse', address);
-      console.log(result);
-      const resultJSON = await JSON.parse(result);
-
-      console.log('parse-2', sendPageState.toaddrs[0].to, resultJSON);
-
-      return (
-        resultJSON.status === 'success' &&
-        (resultJSON.address_kind === 'unified' ||
-          resultJSON.address_kind === 'orchard' ||
-          resultJSON.address_kind === 'sapling')
-      );
-    } else {
-      return false;
-    }
-  };
-
-  const memoEnabled = getMemoEnabled(sendPageState.toaddrs[0].to);
-  const zecPrice = info ? info.zecPrice : null;
-  const currencyName = info ? info.currencyName : undefined;
-
-  var addressValidationState: number[] = sendPageState.toaddrs.map(async to => {
-    if (!!to && !!to.to) {
-      const result = await RPCModule.execute('parse', to.to);
-      console.log(result);
-      const resultJSON = await JSON.parse(result);
-
-      console.log('parse-3', to.to, resultJSON);
-
-      const valid = resultJSON.status === 'success';
-
-      if (valid) {
-        return 1;
-      } else {
-        return -1;
-      }
-    } else {
-      return 0;
-    }
-  });
-
-  var amountValidationState: number[] = sendPageState.toaddrs.map(to => {
-    if (to.amountUSD !== '') {
-      if (isNaN(Number(to.amountUSD))) {
-        return -1;
-      }
-    }
-    if (to.amount !== '') {
-      if (
-        Utils.parseLocaleFloat(to.amount) > 0 &&
-        Utils.parseLocaleFloat(to.amount) <= parseFloat(getMaxAmount().toFixed(8))
-      ) {
-        return 1;
-      } else {
-        return -1;
-      }
-    } else {
-      return 0;
-    }
-  });
-
-  // Send button is enabled if all address and amount validation states are 1
-  const sendButtonEnabled =
-    addressValidationState.filter(n => n === 1).length === addressValidationState.length &&
-    amountValidationState.filter(n => n === 1).length === amountValidationState.length;
-
-  const { decimalSeparator } = getNumberFormatSettings();
-
-  const syncStatusDisplayLine = syncingStatus?.inProgress ? `(${syncingStatus?.blocks})` : '';
 
   return (
     <View
@@ -402,8 +405,8 @@ const Send: React.FunctionComponent<SendProps> = ({
             <View key={i} style={{ display: 'flex', padding: 10, marginTop: 10 }}>
               <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                 <RegText>To Address</RegText>
-                {addressValidationState[i] === 1 && <FontAwesomeIcon icon={faCheck} color={colors.primary} />}
-                {addressValidationState[i] === -1 && <ErrorText>Invalid Address!</ErrorText>}
+                {validAddress === 1 && <FontAwesomeIcon icon={faCheck} color={colors.primary} />}
+                {validAddress === -1 && <ErrorText>Invalid Address!</ErrorText>}
               </View>
               <View
                 style={{
@@ -434,7 +437,7 @@ const Send: React.FunctionComponent<SendProps> = ({
 
               <View style={{ marginTop: 10, display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                 <FadeText>{'   Amount'}</FadeText>
-                {amountValidationState[i] === -1 && <ErrorText>Invalid Amount!</ErrorText>}
+                {validAmount === -1 && <ErrorText>Invalid Amount!</ErrorText>}
               </View>
 
               <View
@@ -532,7 +535,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                 )}
               </View>
 
-              {memoEnabled && (
+              {memoEnabled === true && (
                 <>
                   <FadeText style={{ marginTop: 30 }}>Memo (Optional)</FadeText>
                   <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start' }}>

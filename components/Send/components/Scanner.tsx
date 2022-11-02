@@ -37,7 +37,7 @@ function Scanner({ idx, updateToField, closeModal }: ScannerProps) {
     } else {
       // Try to parse as a URI
       if (scannedAddress.startsWith('zcash:')) {
-        const targets = parseZcashURI(scannedAddress);
+        const targets = await parseZcashURI(scannedAddress);
 
         if (Array.isArray(targets)) {
           updateToField(idx, scannedAddress, null, null, null);

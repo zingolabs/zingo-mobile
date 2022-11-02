@@ -55,7 +55,7 @@ export const parseServerURI = (uri: string): string => {
   return 'URI is OK';
 };
 
-export const parseZcashURI = async (uri: string): ZcashURITarget[] | string => {
+export const parseZcashURI = async (uri: string): Promise<string | ZcashURITarget[]> => {
   if (!uri || uri === '') {
     return 'Bad URI';
   }
