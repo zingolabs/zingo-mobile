@@ -30,12 +30,12 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({ 
         <>
           <RegText>{`Step ${progress.progress} of ${progress.total}`}</RegText>
           <RegText style={{ marginBottom: 20 }}>{`ETA ${progress.etaSeconds}s`}</RegText>
-          <Progress.CircleSnail
+          {/*<Progress.CircleSnail
             progress={progress.progress / progress.total}
             indeterminate={!progress.progress}
             size={100}
             color={colors.primary}
-          />
+          />*/}
         </>
       )}
     </SafeAreaView>
