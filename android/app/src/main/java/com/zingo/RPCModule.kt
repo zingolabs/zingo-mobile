@@ -303,10 +303,52 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         file.close()
 
         val middle0w =        0
-        val middle1w: Int = fileBytes.size / 2
-        val middle2w: Int = fileBytes.size
-        var fileb64 = StringBuilder(Base64.encodeToString(fileBytes, middle0w, middle1w - middle0w, Base64.NO_WRAP))
-        fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle1w, middle2w - middle1w, Base64.NO_WRAP))
+        val middle1w =  6000000 // 6_000_000 - 8 pieces
+        val middle2w = 12000000
+        val middle3w = 18000000
+        val middle4w = 24000000
+        val middle5w = 30000000
+        val middle6w = 36000000
+        val middle7w = 42000000
+        val middle8w: Int = fileBytes.size
+
+        var fileb64 = StringBuilder("")
+        if (middle8w <= middle1w) {
+            fileb64 = fileb64.append(StringBuilder(Base64.encodeToString(fileBytes, middle0w, middle8w, Base64.NO_WRAP)))
+        } else {
+            fileb64 = fileb64.append(StringBuilder(Base64.encodeToString(fileBytes, middle0w, middle1w - middle0w, Base64.NO_WRAP)))
+            if (middle8w <= middle2w) {
+                fileb64 = fileb64.append(StringBuilder(Base64.encodeToString(fileBytes, middle1w, middle8w, Base64.NO_WRAP)))
+            } else {
+                fileb64 = fileb64.append(StringBuilder(Base64.encodeToString(fileBytes, middle1w, middle2w - middle1w, Base64.NO_WRAP)))
+                if (middle8w <= middle3w) {
+                    fileb64 = fileb64.append(StringBuilder(Base64.encodeToString(fileBytes, middle2w, middle8w, Base64.NO_WRAP)))
+                } else {
+                    fileb64 = fileb64.append(StringBuilder(Base64.encodeToString(fileBytes, middle2w, middle3w - middle2w, Base64.NO_WRAP)))
+                    if (middle8w <= middle4w) {
+                        fileb64 = fileb64.append(StringBuilder(Base64.encodeToString(fileBytes, middle3w, middle8w, Base64.NO_WRAP)))
+                    } else {
+                        fileb64 = fileb64.append(StringBuilder(Base64.encodeToString(fileBytes, middle3w, middle4w - middle3w, Base64.NO_WRAP)))
+                        if (middle8w <= middle5w) {
+                            fileb64 = fileb64.append(StringBuilder(Base64.encodeToString(fileBytes, middle4w, middle8w, Base64.NO_WRAP)))
+                        } else {
+                            fileb64 = fileb64.append(StringBuilder(Base64.encodeToString(fileBytes, middle4w, middle5w - middle4w, Base64.NO_WRAP)))
+                            if (middle8w <= middle6w) {
+                                fileb64 = fileb64.append(StringBuilder(Base64.encodeToString(fileBytes, middle5w, middle8w, Base64.NO_WRAP)))
+                            } else {
+                                fileb64 = fileb64.append(StringBuilder(Base64.encodeToString(fileBytes, middle5w, middle6w - middle5w, Base64.NO_WRAP)))
+                                if (middle8w <= middle7w) {
+                                    fileb64 = fileb64.append(StringBuilder(Base64.encodeToString(fileBytes, middle6w, middle8w, Base64.NO_WRAP)))
+                                } else {
+                                    fileb64 = fileb64.append(StringBuilder(Base64.encodeToString(fileBytes, middle6w, middle7w - middle6w, Base64.NO_WRAP)))
+                                    fileb64 = fileb64.append(StringBuilder(Base64.encodeToString(fileBytes, middle7w, middle8w - middle7w, Base64.NO_WRAP)))
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         fileBytes = ByteArray(0)
 
