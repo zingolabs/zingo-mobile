@@ -32,8 +32,9 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({ 
           <RegText style={{ marginBottom: 20 }}>{`ETA ${progress.etaSeconds}s`}</RegText>
           <CircularProgress
             size={100}
-            strokeWidth={10}
-            text={''}
+            strokeWidth={5}
+            textSize={20}
+            text={(((progress.progress + 1) * 100) / 4).toFixed(0).toString() + '%'}
             progressPercent={((progress.progress + 1) * 100) / 4}
           />
         </>

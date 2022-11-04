@@ -60,10 +60,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun createNewWallet(server: String, promise: Promise) {
         // Log.w("MAIN", "Creating new wallet")
 
-        val saplingOutputFile: InputStream = MainApplication.getAppContext()?.resources?.openRawResource(R.raw.saplingoutput)!!
-        var saplingOutput = saplingOutputFile.readBytes()
-        saplingOutputFile.close()
-
         val saplingSpendFile: InputStream = MainApplication.getAppContext()?.resources?.openRawResource(R.raw.saplingspend)!!
         var saplingSpend = saplingSpendFile.readBytes()
         saplingSpendFile.close()
@@ -121,6 +117,10 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             Base64.NO_WRAP
         ))
         saplingSpend = ByteArray(0)
+
+        val saplingOutputFile: InputStream = MainApplication.getAppContext()?.resources?.openRawResource(R.raw.saplingoutput)!!
+        var saplingOutput = saplingOutputFile.readBytes()
+        saplingOutputFile.close()
 
         val saplingOutputEncoded = StringBuilder(Base64.encodeToString(saplingOutput, Base64.NO_WRAP))
 
@@ -146,10 +146,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun restoreWallet(seed: String, birthday: String, server: String, promise: Promise) {
         // Log.w("MAIN", "Restoring wallet with seed $seed")
 
-        val saplingOutputFile: InputStream = MainApplication.getAppContext()?.resources?.openRawResource(R.raw.saplingoutput)!!
-        var saplingOutput = saplingOutputFile.readBytes()
-        saplingOutputFile.close()
-
         val saplingSpendFile: InputStream = MainApplication.getAppContext()?.resources?.openRawResource(R.raw.saplingspend)!!
         var saplingSpend = saplingSpendFile.readBytes()
         saplingSpendFile.close()
@@ -208,6 +204,10 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         ))
 
         saplingSpend = ByteArray(0)
+
+        val saplingOutputFile: InputStream = MainApplication.getAppContext()?.resources?.openRawResource(R.raw.saplingoutput)!!
+        var saplingOutput = saplingOutputFile.readBytes()
+        saplingOutputFile.close()
 
         val saplingOutputEncoded = StringBuilder(Base64.encodeToString(saplingOutput, Base64.NO_WRAP))
 
@@ -234,15 +234,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         var saplingSpend = saplingSpendFile.readBytes()
         saplingSpendFile.close()
 
-        val saplingOutputFile: InputStream = MainApplication.getAppContext()?.resources?.openRawResource(R.raw.saplingoutput)!!
-        var saplingOutput = saplingOutputFile.readBytes()
-        saplingOutputFile.close()
-
-        // Read the file
-        val file: InputStream = MainApplication.getAppContext()?.openFileInput("wallet.dat")!!
-        var fileBytes = file.readBytes()
-        file.close()
-
         val middle0 =        0
         val middle1 =  6000000 // 6_000_000 - 8 pieces
         val middle2 = 12000000
@@ -298,20 +289,24 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
         saplingSpend = ByteArray(0)
 
+        val saplingOutputFile: InputStream = MainApplication.getAppContext()?.resources?.openRawResource(R.raw.saplingoutput)!!
+        var saplingOutput = saplingOutputFile.readBytes()
+        saplingOutputFile.close()
+
         val saplingOutputEncoded = StringBuilder(Base64.encodeToString(saplingOutput, Base64.NO_WRAP))
 
         saplingOutput = ByteArray(0)
 
+        // Read the file
+        val file: InputStream = MainApplication.getAppContext()?.openFileInput("wallet.dat")!!
+        var fileBytes = file.readBytes()
+        file.close()
+
         val middle0w =        0
-        val middle1w =  6000000 // 6_000_000 - 2 pieces
+        val middle1w: Int = fileBytes.size / 2
         val middle2w: Int = fileBytes.size
-        var fileb64 = StringBuilder("")
-        if (fileBytes.size <= middle1w) {
-          fileb64 = fileb64.append(Base64.encodeToString(fileBytes, Base64.NO_WRAP))
-        } else {
-          fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle0w, middle1w - middle0w, Base64.NO_WRAP))
-          fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle1w, middle2w - middle1w, Base64.NO_WRAP))
-        }
+        var fileb64 = StringBuilder(Base64.encodeToString(fileBytes, middle0w, middle1w - middle0w, Base64.NO_WRAP))
+        fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle1w, middle2w - middle1w, Base64.NO_WRAP))
 
         fileBytes = ByteArray(0)
 

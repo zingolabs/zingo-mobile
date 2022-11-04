@@ -87,7 +87,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       const result = await RPCModule.execute('parse', address);
       const resultJSON = await JSON.parse(result);
 
-      console.log('parse-memo', address, resultJSON);
+      //console.log('parse-memo', address, resultJSON);
 
       return (
         resultJSON.status === 'success' &&
@@ -113,7 +113,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       const result = await RPCModule.execute('parse', address);
       const resultJSON = await JSON.parse(result);
 
-      console.log('parse-address', address, resultJSON.status === 'success');
+      //console.log('parse-address', address, resultJSON.status === 'success');
 
       return resultJSON.status === 'success';
     };
@@ -129,6 +129,8 @@ const Send: React.FunctionComponent<SendProps> = ({
     }
 
     var to = sendPageState.toaddrs[0];
+    to.amount = to.amount.replace(decimalSeparator, '.');
+    to.amountUSD = to.amountUSD.replace(decimalSeparator, '.');
 
     if (to.amountUSD !== '') {
       if (isNaN(Number(to.amountUSD))) {
@@ -136,18 +138,23 @@ const Send: React.FunctionComponent<SendProps> = ({
       }
     }
     if (to.amount !== '') {
-      if (
-        Utils.parseLocaleFloat(to.amount) > 0 &&
-        Utils.parseLocaleFloat(to.amount) <= parseFloat(getMaxAmount().toFixed(8))
-      ) {
-        setValidAmount(1);
-      } else {
+      if (isNaN(Number(to.amount))) {
         setValidAmount(-1);
+      } else {
+        if (
+          Utils.parseLocaleFloat(Number(to.amount).toFixed(8).toString()) > 0 &&
+          Utils.parseLocaleFloat(Number(to.amount).toFixed(8).toString()) <=
+            Utils.parseLocaleFloat(getMaxAmount().toFixed(8))
+        ) {
+          setValidAmount(1);
+        } else {
+          setValidAmount(-1);
+        }
       }
     } else {
       setValidAmount(0);
     }
-  }, [sendPageState.toaddrs, getMaxAmount]);
+  }, [sendPageState.toaddrs, getMaxAmount, decimalSeparator]);
 
   useEffect(() => {
     setSendButtonEnabled(validAddress === 1 && validAmount === 1);
@@ -236,6 +243,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       } else {
         toAddr.amountUSD = '';
       }
+      toAddr.amount = toAddr.amount.replace('.', decimalSeparator);
     }
 
     if (amountUSD !== null) {
@@ -247,6 +255,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       } else {
         toAddr.amount = '';
       }
+      toAddr.amountUSD = toAddr.amountUSD.replace('.', decimalSeparator);
     }
 
     if (memo !== null) {
