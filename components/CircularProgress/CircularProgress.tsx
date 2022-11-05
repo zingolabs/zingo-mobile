@@ -4,7 +4,7 @@ import { View } from 'react-native';
 import { Svg, Circle, Text as SVGText } from 'react-native-svg';
 import { useTheme } from '@react-navigation/native';
 
-import { ThemeType } from '../../types';
+import { ThemeType } from '../../app/types';
 
 type circularProgressProps = {
   bgColor?: string;

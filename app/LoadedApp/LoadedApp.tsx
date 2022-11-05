@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { Component } from 'react';
-import { Modal } from 'react-native';
+import React, { Component, Suspense } from 'react';
+import { Modal, View, Text } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faList, faUpload, faDownload, faCog, faAddressBook } from '@fortawesome/free-solid-svg-icons';
@@ -27,20 +27,22 @@ import AppState, {
 } from '../AppState';
 import FadeText from '../../components/Components/FadeText';
 import Utils from '../utils';
-import Transactions from '../../components/Transactions';
-import Send from '../../components/Send';
-import Receive from '../../components/Receive';
-import Legacy from '../../components/Legacy';
-import About from '../../components/About';
-import Seed from '../../components/Seed';
-import Info from '../../components/Info';
-import SyncReport from '../../components/SyncReport';
-import Rescan from '../../components/Rescan';
-import Settings from '../../components/Settings';
-import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
-import Menu from './components/Menu';
-import ComputingTxContent from './components/ComputingTxContent';
 import { ThemeType } from '../types';
+import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
+
+const Transactions = React.lazy(() => import('../../components/Transactions'));
+const Send = React.lazy(() => import('../../components/Send'));
+const Receive = React.lazy(() => import('../../components/Receive'));
+const Legacy = React.lazy(() => import('../../components/Legacy'));
+const About = React.lazy(() => import('../../components/About'));
+const Seed = React.lazy(() => import('../../components/Seed'));
+const Info = React.lazy(() => import('../../components/Info'));
+const SyncReport = React.lazy(() => import('../../components/SyncReport'));
+const Rescan = React.lazy(() => import('../../components/Rescan'));
+const Settings = React.lazy(() => import('../../components/Settings'));
+
+const Menu = React.lazy(() => import('./components/Menu'));
+const ComputingTxContent = React.lazy(() => import('./components/ComputingTxContent'));
 
 const Tab = createBottomTabNavigator();
 
@@ -605,7 +607,16 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
       fetchTotalBalance: this.fetchTotalBalance,
     };
 
-    const menu = <Menu onItemSelected={this.onMenuItemSelected} />;
+    const menu = (
+      <Suspense
+        fallback={
+          <View>
+            <Text>Loading...</Text>
+          </View>
+        }>
+        <Menu onItemSelected={this.onMenuItemSelected} />
+      </Suspense>
+    );
     const currencyName = info ? info.currencyName : undefined;
 
     const fnTabBarIcon = (route: any, focused: boolean) => {
@@ -637,11 +648,18 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
           transparent={false}
           visible={aboutModalVisible}
           onRequestClose={() => this.setState({ aboutModalVisible: false })}>
-          <About
-            closeModal={() => this.setState({ aboutModalVisible: false })}
-            totalBalance={totalBalance}
-            currencyName={currencyName || undefined}
-          />
+          <Suspense
+            fallback={
+              <View>
+                <Text>Loading...</Text>
+              </View>
+            }>
+            <About
+              closeModal={() => this.setState({ aboutModalVisible: false })}
+              totalBalance={totalBalance}
+              currencyName={currencyName || undefined}
+            />
+          </Suspense>
         </Modal>
 
         <Modal
@@ -649,12 +667,19 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
           transparent={false}
           visible={infoModalVisible}
           onRequestClose={() => this.setState({ infoModalVisible: false })}>
-          <Info
-            closeModal={() => this.setState({ infoModalVisible: false })}
-            info={info}
-            totalBalance={totalBalance}
-            currencyName={currencyName || undefined}
-          />
+          <Suspense
+            fallback={
+              <View>
+                <Text>Loading...</Text>
+              </View>
+            }>
+            <Info
+              closeModal={() => this.setState({ infoModalVisible: false })}
+              info={info}
+              totalBalance={totalBalance}
+              currencyName={currencyName || undefined}
+            />
+          </Suspense>
         </Modal>
 
         <Modal
@@ -662,11 +687,18 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
           transparent={false}
           visible={syncReportModalVisible}
           onRequestClose={() => this.setState({ syncReportModalVisible: false })}>
-          <SyncReport
-            closeModal={() => this.setState({ syncReportModalVisible: false })}
-            syncStatusReport={syncStatusReport}
-            birthday={walletSeed?.birthday}
-          />
+          <Suspense
+            fallback={
+              <View>
+                <Text>Loading...</Text>
+              </View>
+            }>
+            <SyncReport
+              closeModal={() => this.setState({ syncReportModalVisible: false })}
+              syncStatusReport={syncStatusReport}
+              birthday={walletSeed?.birthday}
+            />
+          </Suspense>
         </Modal>
 
         <Modal
@@ -674,13 +706,20 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
           transparent={false}
           visible={rescanModalVisible}
           onRequestClose={() => this.setState({ rescanModalVisible: false })}>
-          <Rescan
-            closeModal={() => this.setState({ rescanModalVisible: false })}
-            birthday={walletSeed?.birthday}
-            startRescan={this.startRescan}
-            totalBalance={totalBalance}
-            currencyName={currencyName || undefined}
-          />
+          <Suspense
+            fallback={
+              <View>
+                <Text>Loading...</Text>
+              </View>
+            }>
+            <Rescan
+              closeModal={() => this.setState({ rescanModalVisible: false })}
+              birthday={walletSeed?.birthday}
+              startRescan={this.startRescan}
+              totalBalance={totalBalance}
+              currencyName={currencyName || undefined}
+            />
+          </Suspense>
         </Modal>
 
         <Modal
@@ -688,14 +727,21 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
           transparent={false}
           visible={settingsModalVisible}
           onRequestClose={() => this.setState({ settingsModalVisible: false })}>
-          <Settings
-            closeModal={() => this.setState({ settingsModalVisible: false })}
-            wallet_settings={wallet_settings}
-            set_wallet_option={this.set_wallet_option}
-            set_server_option={this.set_server_option}
-            totalBalance={totalBalance}
-            currencyName={currencyName || undefined}
-          />
+          <Suspense
+            fallback={
+              <View>
+                <Text>Loading...</Text>
+              </View>
+            }>
+            <Settings
+              closeModal={() => this.setState({ settingsModalVisible: false })}
+              wallet_settings={wallet_settings}
+              set_wallet_option={this.set_wallet_option}
+              set_server_option={this.set_server_option}
+              totalBalance={totalBalance}
+              currencyName={currencyName || undefined}
+            />
+          </Suspense>
         </Modal>
 
         <Modal
@@ -703,16 +749,23 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
           transparent={false}
           visible={seedViewModalVisible}
           onRequestClose={() => this.setState({ seedViewModalVisible: false })}>
-          <Seed
-            seed={walletSeed?.seed}
-            birthday={walletSeed?.birthday}
-            onClickOK={() => this.setState({ seedViewModalVisible: false })}
-            onClickCancel={() => this.setState({ seedViewModalVisible: false })}
-            totalBalance={totalBalance}
-            action={'view'}
-            error={error || undefined}
-            currencyName={currencyName || undefined}
-          />
+          <Suspense
+            fallback={
+              <View>
+                <Text>Loading...</Text>
+              </View>
+            }>
+            <Seed
+              seed={walletSeed?.seed}
+              birthday={walletSeed?.birthday}
+              onClickOK={() => this.setState({ seedViewModalVisible: false })}
+              onClickCancel={() => this.setState({ seedViewModalVisible: false })}
+              totalBalance={totalBalance}
+              action={'view'}
+              error={error || undefined}
+              currencyName={currencyName || undefined}
+            />
+          </Suspense>
         </Modal>
 
         <Modal
@@ -720,16 +773,23 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
           transparent={false}
           visible={seedChangeModalVisible}
           onRequestClose={() => this.setState({ seedChangeModalVisible: false })}>
-          <Seed
-            seed={walletSeed?.seed}
-            birthday={walletSeed?.birthday}
-            onClickOK={() => this.onClickOKChangeWallet()}
-            onClickCancel={() => this.setState({ seedChangeModalVisible: false })}
-            totalBalance={totalBalance}
-            action={'change'}
-            error={error || undefined}
-            currencyName={currencyName || undefined}
-          />
+          <Suspense
+            fallback={
+              <View>
+                <Text>Loading...</Text>
+              </View>
+            }>
+            <Seed
+              seed={walletSeed?.seed}
+              birthday={walletSeed?.birthday}
+              onClickOK={() => this.onClickOKChangeWallet()}
+              onClickCancel={() => this.setState({ seedChangeModalVisible: false })}
+              totalBalance={totalBalance}
+              action={'change'}
+              error={error || undefined}
+              currencyName={currencyName || undefined}
+            />
+          </Suspense>
         </Modal>
 
         <Modal
@@ -737,16 +797,23 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
           transparent={false}
           visible={seedBackupModalVisible}
           onRequestClose={() => this.setState({ seedBackupModalVisible: false })}>
-          <Seed
-            seed={walletSeed?.seed}
-            birthday={walletSeed?.birthday}
-            onClickOK={() => this.onClickOKRestoreBackup()}
-            onClickCancel={() => this.setState({ seedBackupModalVisible: false })}
-            totalBalance={totalBalance}
-            action={'backup'}
-            error={error || undefined}
-            currencyName={currencyName || undefined}
-          />
+          <Suspense
+            fallback={
+              <View>
+                <Text>Loading...</Text>
+              </View>
+            }>
+            <Seed
+              seed={walletSeed?.seed}
+              birthday={walletSeed?.birthday}
+              onClickOK={() => this.onClickOKRestoreBackup()}
+              onClickCancel={() => this.setState({ seedBackupModalVisible: false })}
+              totalBalance={totalBalance}
+              action={'backup'}
+              error={error || undefined}
+              currencyName={currencyName || undefined}
+            />
+          </Suspense>
         </Modal>
 
         <Modal
@@ -754,16 +821,23 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
           transparent={false}
           visible={seedServerModalVisible}
           onRequestClose={() => this.setState({ seedServerModalVisible: false })}>
-          <Seed
-            seed={walletSeed?.seed}
-            birthday={walletSeed?.birthday}
-            onClickOK={() => this.onClickOKServerWallet()}
-            onClickCancel={() => this.setState({ seedServerModalVisible: false })}
-            totalBalance={totalBalance}
-            action={'server'}
-            error={error || undefined}
-            currencyName={currencyName || undefined}
-          />
+          <Suspense
+            fallback={
+              <View>
+                <Text>Loading...</Text>
+              </View>
+            }>
+            <Seed
+              seed={walletSeed?.seed}
+              birthday={walletSeed?.birthday}
+              onClickOK={() => this.onClickOKServerWallet()}
+              onClickCancel={() => this.setState({ seedServerModalVisible: false })}
+              totalBalance={totalBalance}
+              action={'server'}
+              error={error || undefined}
+              currencyName={currencyName || undefined}
+            />
+          </Suspense>
         </Modal>
 
         <Modal
@@ -771,7 +845,14 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
           transparent={false}
           visible={computingModalVisible}
           onRequestClose={() => this.setState({ computingModalVisible: false })}>
-          <ComputingTxContent progress={txBuildProgress} />
+          <Suspense
+            fallback={
+              <View>
+                <Text>Loading...</Text>
+              </View>
+            }>
+            <ComputingTxContent progress={txBuildProgress} />
+          </Suspense>
         </Modal>
 
         <Tab.Navigator
@@ -788,22 +869,29 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
           <Tab.Screen name="SEND">
             {props => (
               <>
-                <Send
-                  {...props}
-                  {...standardProps}
-                  totalBalance={totalBalance}
-                  sendPageState={sendPageState}
-                  setSendPageState={this.setSendPageState}
-                  sendTransaction={this.sendTransaction}
-                  clearToAddrs={this.clearToAddrs}
-                  setComputingModalVisible={this.setComputingModalVisible}
-                  setTxBuildProgress={this.setTxBuildProgress}
-                  syncingStatus={syncingStatus}
-                  syncingStatusMoreInfoOnClick={async () => {
-                    await this.fetchWalletSeed();
-                    this.setState({ syncReportModalVisible: true });
-                  }}
-                />
+                <Suspense
+                  fallback={
+                    <View>
+                      <Text>Loading...</Text>
+                    </View>
+                  }>
+                  <Send
+                    {...props}
+                    {...standardProps}
+                    totalBalance={totalBalance}
+                    sendPageState={sendPageState}
+                    setSendPageState={this.setSendPageState}
+                    sendTransaction={this.sendTransaction}
+                    clearToAddrs={this.clearToAddrs}
+                    setComputingModalVisible={this.setComputingModalVisible}
+                    setTxBuildProgress={this.setTxBuildProgress}
+                    syncingStatus={syncingStatus}
+                    syncingStatusMoreInfoOnClick={async () => {
+                      await this.fetchWalletSeed();
+                      this.setState({ syncReportModalVisible: true });
+                    }}
+                  />
+                </Suspense>
                 {error && (
                   <FadeText style={{ color: colors.primary, textAlign: 'center', width: '100%', marginBottom: 5 }}>
                     {error}
@@ -815,19 +903,26 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
           <Tab.Screen name="WALLET">
             {props => (
               <>
-                <Transactions
-                  {...props}
-                  {...standardProps}
-                  transactions={transactions}
-                  totalBalance={totalBalance}
-                  doRefresh={this.doRefresh}
-                  syncingStatus={syncingStatus}
-                  setComputingModalVisible={this.setComputingModalVisible}
-                  syncingStatusMoreInfoOnClick={async () => {
-                    await this.fetchWalletSeed();
-                    this.setState({ syncReportModalVisible: true });
-                  }}
-                />
+                <Suspense
+                  fallback={
+                    <View>
+                      <Text>Loading...</Text>
+                    </View>
+                  }>
+                  <Transactions
+                    {...props}
+                    {...standardProps}
+                    transactions={transactions}
+                    totalBalance={totalBalance}
+                    doRefresh={this.doRefresh}
+                    syncingStatus={syncingStatus}
+                    setComputingModalVisible={this.setComputingModalVisible}
+                    syncingStatusMoreInfoOnClick={async () => {
+                      await this.fetchWalletSeed();
+                      this.setState({ syncReportModalVisible: true });
+                    }}
+                  />
+                </Suspense>
                 {error && (
                   <FadeText style={{ color: colors.primary, textAlign: 'center', width: '100%', marginBottom: 5 }}>
                     {error}
@@ -839,19 +934,26 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
           <Tab.Screen name="UA's">
             {props => (
               <>
-                <Receive
-                  {...props}
-                  {...standardProps}
-                  addresses={addresses}
-                  startRescan={this.startRescan}
-                  totalBalance={totalBalance}
-                  info={info}
-                  syncingStatus={syncingStatus}
-                  syncingStatusMoreInfoOnClick={async () => {
-                    await this.fetchWalletSeed();
-                    this.setState({ syncReportModalVisible: true });
-                  }}
-                />
+                <Suspense
+                  fallback={
+                    <View>
+                      <Text>Loading...</Text>
+                    </View>
+                  }>
+                  <Receive
+                    {...props}
+                    {...standardProps}
+                    addresses={addresses}
+                    startRescan={this.startRescan}
+                    totalBalance={totalBalance}
+                    info={info}
+                    syncingStatus={syncingStatus}
+                    syncingStatusMoreInfoOnClick={async () => {
+                      await this.fetchWalletSeed();
+                      this.setState({ syncReportModalVisible: true });
+                    }}
+                  />
+                </Suspense>
                 {error && (
                   <FadeText style={{ color: colors.primary, textAlign: 'center', width: '100%', marginBottom: 5 }}>
                     {error}
@@ -863,14 +965,21 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
           <Tab.Screen name="LEGACY">
             {props => (
               <>
-                <Legacy
-                  {...props}
-                  {...standardProps}
-                  addresses={addresses}
-                  startRescan={this.startRescan}
-                  totalBalance={totalBalance}
-                  info={info}
-                />
+                <Suspense
+                  fallback={
+                    <View>
+                      <Text>Loading...</Text>
+                    </View>
+                  }>
+                  <Legacy
+                    {...props}
+                    {...standardProps}
+                    addresses={addresses}
+                    startRescan={this.startRescan}
+                    totalBalance={totalBalance}
+                    info={info}
+                  />
+                </Suspense>
                 {error && (
                   <FadeText style={{ color: colors.primary, textAlign: 'center', width: '100%', marginBottom: 5 }}>
                     {error}

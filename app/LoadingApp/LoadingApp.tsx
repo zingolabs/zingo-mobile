@@ -2,7 +2,7 @@
 /**
  * @format
  */
-import React, { Component } from 'react';
+import React, { Component, Suspense } from 'react';
 import { View, Alert, SafeAreaView, Image, Text, Modal } from 'react-native';
 import Toast from 'react-native-simple-toast';
 import { useTheme } from '@react-navigation/native';
@@ -12,10 +12,11 @@ import Button from '../../components/Button';
 import RPCModule from '../../components/RPCModule';
 import { TotalBalance, SettingsFileEntry } from '../AppState';
 import { SERVER_URI } from '../uris';
-import SeedComponent from '../../components/Seed';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import RPC from '../rpc';
 import { ThemeType } from '../types';
+
+const Seed = React.lazy(() => import('../../components/Seed'));
 
 // -----------------
 // Loading View
@@ -295,14 +296,21 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
             transparent={false}
             visible={screen === 2}
             onRequestClose={() => this.navigateToLoaded()}>
-            <SeedComponent
-              seed={JSON.parse(seedPhrase)?.seed}
-              birthday={JSON.parse(seedPhrase)?.birthday}
-              onClickOK={() => this.navigateToLoaded()}
-              onClickCancel={() => this.navigateToLoaded()}
-              totalBalance={totalBalance}
-              action={'new'}
-            />
+            <Suspense
+              fallback={
+                <View>
+                  <Text>Loading...</Text>
+                </View>
+              }>
+              <Seed
+                seed={JSON.parse(seedPhrase)?.seed}
+                birthday={JSON.parse(seedPhrase)?.birthday}
+                onClickOK={() => this.navigateToLoaded()}
+                onClickCancel={() => this.navigateToLoaded()}
+                totalBalance={totalBalance}
+                action={'new'}
+              />
+            </Suspense>
           </Modal>
         )}
         {screen === 3 && (
@@ -311,12 +319,19 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
             transparent={false}
             visible={screen === 3}
             onRequestClose={() => this.setState({ screen: 1 })}>
-            <SeedComponent
-              onClickOK={(s: string, b: number) => this.doRestore(s, b)}
-              onClickCancel={() => this.setState({ screen: 1 })}
-              totalBalance={totalBalance}
-              action={'restore'}
-            />
+            <Suspense
+              fallback={
+                <View>
+                  <Text>Loading...</Text>
+                </View>
+              }>
+              <Seed
+                onClickOK={(s: string, b: number) => this.doRestore(s, b)}
+                onClickCancel={() => this.setState({ screen: 1 })}
+                totalBalance={totalBalance}
+                action={'restore'}
+              />
+            </Suspense>
           </Modal>
         )}
       </SafeAreaView>
