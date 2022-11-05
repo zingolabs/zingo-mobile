@@ -9,7 +9,10 @@ import { useTheme } from '@react-navigation/native';
 
 const window = Dimensions.get('window');
 
-function Menu({ onItemSelected }: any) {
+type MenuProps = {
+  onItemSelected: (item: string) => Promise<void>;
+};
+const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected }) => {
   const { colors } = useTheme();
   const item = {
     fontSize: 14,
@@ -66,6 +69,6 @@ function Menu({ onItemSelected }: any) {
       </View>
     </ScrollView>
   );
-}
+};
 
 export default Menu;

@@ -11,7 +11,7 @@ type ScannerProps = {
   setPrivKeyText: (k: string) => void;
   closeModal: () => void;
 };
-function Scanner({ setPrivKeyText, closeModal }: ScannerProps) {
+const Scanner: React.FunctionComponent<ScannerProps> = ({ setPrivKeyText, closeModal }) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [error, setError] = useState<String | null>(null);
 
@@ -54,6 +54,6 @@ function Scanner({ setPrivKeyText, closeModal }: ScannerProps) {
       }
     />
   );
-}
+};
 
 export default Scanner;

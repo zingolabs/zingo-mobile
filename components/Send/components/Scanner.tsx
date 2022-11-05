@@ -20,7 +20,7 @@ type ScannerProps = {
   closeModal: () => void;
 };
 
-function Scanner({ idx, updateToField, closeModal }: ScannerProps) {
+const Scanner: React.FunctionComponent<ScannerProps> = ({ idx, updateToField, closeModal }) => {
   const [error, setError] = useState<String | null>(null);
 
   const validateAddress = async (scannedAddress: string) => {
@@ -86,6 +86,6 @@ function Scanner({ idx, updateToField, closeModal }: ScannerProps) {
       }
     />
   );
-}
+};
 
 export default Scanner;
