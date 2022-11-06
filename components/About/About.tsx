@@ -41,7 +41,7 @@ const About: React.FunctionComponent<AboutProps> = ({ closeModal, totalBalance, 
         />
         <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{ opacity: 0.4 }} />
         <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
-          Zingo! v0.0.60
+          Zingo! v0.0.61
         </RegText>
         <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
       </View>
