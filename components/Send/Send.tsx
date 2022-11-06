@@ -91,9 +91,13 @@ const Send: React.FunctionComponent<SendProps> = ({
 
       return (
         resultJSON.status === 'success' &&
-        (resultJSON.address_kind === 'unified' ||
-          resultJSON.address_kind === 'orchard' ||
-          resultJSON.address_kind === 'sapling')
+        resultJSON.address_kind !== 'transparent' &&
+        ((currencyName === 'ZEC' &&
+          (resultJSON.network.toLowerCase() === 'main' || resultJSON.network.toLowerCase() === 'mainnet')) ||
+          (currencyName !== 'ZEC' &&
+            (resultJSON.network.toLowerCase() === 'test' ||
+              resultJSON.network.toLowerCase() === 'testnet' ||
+              resultJSON.network.toLowerCase() === 'regtest')))
       );
     };
 
@@ -106,7 +110,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     } else {
       setMemoEnabled(false);
     }
-  }, [sendPageState.toaddrs]);
+  }, [sendPageState.toaddrs, currencyName]);
 
   useEffect(() => {
     const parseAdressJSON = async (address: string): Promise<boolean> => {
@@ -115,7 +119,15 @@ const Send: React.FunctionComponent<SendProps> = ({
 
       //console.log('parse-address', address, resultJSON.status === 'success');
 
-      return resultJSON.status === 'success';
+      return (
+        resultJSON.status === 'success' &&
+        ((currencyName === 'ZEC' &&
+          (resultJSON.network.toLowerCase() === 'main' || resultJSON.network.toLowerCase() === 'mainnet')) ||
+          (currencyName !== 'ZEC' &&
+            (resultJSON.network.toLowerCase() === 'test' ||
+              resultJSON.network.toLowerCase() === 'testnet' ||
+              resultJSON.network.toLowerCase() === 'regtest')))
+      );
     };
 
     const address = sendPageState.toaddrs[0].to;
@@ -154,7 +166,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     } else {
       setValidAmount(0);
     }
-  }, [sendPageState.toaddrs, getMaxAmount, decimalSeparator]);
+  }, [sendPageState.toaddrs, getMaxAmount, decimalSeparator, currencyName]);
 
   useEffect(() => {
     setSendButtonEnabled(validAddress === 1 && validAmount === 1);
