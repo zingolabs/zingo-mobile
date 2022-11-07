@@ -72,7 +72,7 @@ export const parseZcashURI = async (uri: string): Promise<string | ZcashURITarge
   const address = parsedUri.pathname;
 
   const resultParse = await RPCModule.execute('parse', address);
-  console.log('parse', resultParse);
+  //console.log('parse', resultParse);
   const resultParseJSON = await JSON.parse(resultParse);
 
   const validParse = resultParseJSON.status === 'success';
@@ -118,7 +118,7 @@ export const parseZcashURI = async (uri: string): Promise<string | ZcashURITarge
           return `Duplicate parameter "${qName}"`;
         }
         const result = await RPCModule.execute('parse', value);
-        console.log('parse', result);
+        //console.log('parse', result);
         const resultJSON = await JSON.parse(result);
 
         const valid = resultJSON.status === 'success';

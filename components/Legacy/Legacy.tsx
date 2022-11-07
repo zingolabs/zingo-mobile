@@ -161,20 +161,30 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({
   const addZ = async () => {
     //console.log('New Z');
     const newAddress = await RPC.rpc_createNewAddress('z');
-    await fetchTotalBalance();
-    setIndex(0);
-    if (newAddress) {
-      setDisplayAddress(newAddress);
+    if (!newAddress.startsWith('Error')) {
+      await fetchTotalBalance();
+      setIndex(0);
+      if (newAddress) {
+        setDisplayAddress(newAddress);
+      }
+    } else {
+      Toast.show(newAddress, Toast.LONG);
+      return;
     }
   };
 
   const addT = async () => {
     //console.log('New T');
     const newAddress = await RPC.rpc_createNewAddress('t');
-    await fetchTotalBalance();
-    setIndex(1);
-    if (newAddress) {
-      setDisplayAddress(newAddress);
+    if (!newAddress.startsWith('Error')) {
+      await fetchTotalBalance();
+      setIndex(1);
+      if (newAddress) {
+        setDisplayAddress(newAddress);
+      }
+    } else {
+      Toast.show(newAddress, Toast.LONG);
+      return;
     }
   };
 

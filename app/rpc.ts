@@ -201,6 +201,13 @@ export default class RPC {
 
   static async rpc_createNewAddress(addressType: 'z' | 't' | 'u'): Promise<string | null> {
     // 'z' 't' or 'u'
+    if (addressType) {
+      return 'Error: We are working on it, comming soon.';
+    } else {
+      return null;
+    }
+
+    /*
     const addrStr = await RPCModule.execute('new', addressType);
     const addrJSON = await JSON.parse(addrStr);
 
@@ -214,6 +221,7 @@ export default class RPC {
     }
 
     return null;
+    */
   }
 
   static async rpc_doImportPrivKey(key: string, birthday: string): Promise<string | string[] | null> {
@@ -505,8 +513,8 @@ export default class RPC {
 
             await RPCModule.doSave();
 
-            console.log('sync status', ss);
-            console.log(`new sync process id: ${ss.sync_id}. Save the wallet.`);
+            //console.log('sync status', ss);
+            //console.log(`new sync process id: ${ss.sync_id}. Save the wallet.`);
             this.prevProgress = 0;
             this.prevBatchNum = -1;
             this.seconds_batch = 0;
@@ -650,8 +658,8 @@ export default class RPC {
           };
           this.fnSetSyncStatusReport(statusFinished);
 
-          console.log('sync status', ss);
-          console.log(`Finished refresh at ${this.lastWalletBlockHeight} id: ${ss.sync_id}`);
+          //console.log('sync status', ss);
+          //console.log(`Finished refresh at ${this.lastWalletBlockHeight} id: ${ss.sync_id}`);
         } else {
           // If we're doing a long sync, every time the batch_num changes, save the wallet
           if (this.prevBatchNum !== batch_num) {
@@ -685,10 +693,10 @@ export default class RPC {
               };
               this.fnSetSyncStatusReport(statusBatch);
 
-              console.log('sync status', ss);
-              console.log(
-                `Saving because batch num changed ${this.prevBatchNum} - ${batch_num}. seconds: ${this.seconds_batch}`,
-              );
+              //console.log('sync status', ss);
+              //console.log(
+              //  `Saving because batch num changed ${this.prevBatchNum} - ${batch_num}. seconds: ${this.seconds_batch}`,
+              //);
             }
             this.prevBatchNum = batch_num;
             this.seconds_batch = 0;
@@ -723,14 +731,14 @@ export default class RPC {
             };
             this.fnSetSyncStatusReport(statusSeconds);
 
-            console.log('sync status', ss);
-            console.log(`Saving wallet. seconds: ${this.seconds_batch}`);
+            //console.log('sync status', ss);
+            //console.log(`Saving wallet. seconds: ${this.seconds_batch}`);
           }
         }
       }, 2000);
     } else {
       // Already at the latest block
-      console.log('Already have latest block, waiting for next refresh');
+      //console.log('Already have latest block, waiting for next refresh');
     }
   }
 
@@ -781,7 +789,7 @@ export default class RPC {
     const addressesStr = await RPCModule.execute('addresses', '');
     let addressesJSON = await JSON.parse(addressesStr);
 
-    console.log('addrs:', addressesJSON.length, addressesJSON);
+    //console.log('addrs:', addressesJSON.length, addressesJSON);
 
     // for now only we use the first element of this array
     addressesJSON = [addressesJSON[0]];
@@ -789,7 +797,7 @@ export default class RPC {
     const balanceStr = await RPCModule.execute('balance', '');
     const balanceJSON = await JSON.parse(balanceStr);
 
-    console.log('balan:', balanceJSON);
+    //console.log('balan:', balanceJSON);
 
     const orchardBal = (balanceJSON.orchard_balance || 0) / 10 ** 8;
     const privateBal = (balanceJSON.sapling_balance || 0) / 10 ** 8;
@@ -890,7 +898,7 @@ export default class RPC {
 
     await this.fetchServerHeight();
 
-    console.log('trans: ', listJSON);
+    //console.log('trans: ', listJSON);
 
     let txlist = listJSON.map((tx: any) => {
       const type = tx.outgoing_metadata ? 'sent' : 'receive';
@@ -988,7 +996,7 @@ export default class RPC {
     const prevProgress = await JSON.parse(await RPCModule.execute('sendprogress', ''));
     const prevSendId = prevProgress.id;
 
-    console.log(sendJson);
+    //console.log(sendJson);
 
     try {
       // This is async, so fire and forget

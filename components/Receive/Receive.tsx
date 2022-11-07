@@ -119,10 +119,15 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   const addO = async () => {
     //console.log('New O');
     const newAddress = await RPC.rpc_createNewAddress('u');
-    await fetchTotalBalance();
-    setIndex(2);
-    if (newAddress) {
-      setDisplayAddress(newAddress);
+    if (!newAddress.startsWith('Error')) {
+      await fetchTotalBalance();
+      setIndex(2);
+      if (newAddress) {
+        setDisplayAddress(newAddress);
+      }
+    } else {
+      Toast.show(newAddress, Toast.LONG);
+      return;
     }
   };
 
@@ -175,7 +180,8 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   const [importKeyModalVisible, setImportKeyModalVisible] = useState(false);
 
   const importKey = async () => {
-    setImportKeyModalVisible(true);
+    Toast.show('Error: We are working on it, comming soon.', Toast.LONG);
+    //setImportKeyModalVisible(true);
   };
 
   const doImport = async (key: string, birthday: string) => {
