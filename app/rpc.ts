@@ -996,7 +996,7 @@ export default class RPC {
     const prevProgress = await JSON.parse(await RPCModule.execute('sendprogress', ''));
     const prevSendId = prevProgress.id;
 
-    //console.log(sendJson);
+    console.log('prev progress', prevProgress);
 
     try {
       // This is async, so fire and forget
@@ -1015,7 +1015,7 @@ export default class RPC {
         const pro = await RPCModule.execute('sendprogress', '');
         const progress = await JSON.parse(pro);
         const sendId = progress.id;
-        //console.log('progress', progress);
+        console.log('progress', progress);
 
         const updatedProgress = new SendProgress();
         if (sendId === prevSendId) {
@@ -1030,12 +1030,15 @@ export default class RPC {
           const currentTimeSeconds = new Date().getTime() / 1000;
           secondsPerComputation = (currentTimeSeconds - startTimeSeconds) / progress.progress;
         }
-        // console.log(`Seconds Per compute = ${secondsPerComputation}`);
+        console.log(`Seconds Per compute = ${secondsPerComputation}`);
 
         let eta = Math.round((progress.total - progress.progress) * secondsPerComputation);
+        console.log(`ETA = ${eta}`);
         if (eta <= 0) {
           eta = 1;
         }
+
+        console.log(`ETA calculated = ${eta}`);
 
         updatedProgress.progress = progress.progress;
         updatedProgress.total = Math.max(progress.total, progress.progress); // sometimes, due to change, the total can be off by 1
