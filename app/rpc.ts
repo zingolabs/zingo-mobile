@@ -157,7 +157,14 @@ export default class RPC {
 
   static async rpc_getPrivKeyAsString(address: string): Promise<string | null> {
     const privKeyStr = await RPCModule.execute('export', address);
-    const privKeyJSON = await JSON.parse(privKeyStr);
+    //console.log(privKeyStr);
+
+    let privKeyJSON = null;
+    try {
+      privKeyJSON = await JSON.parse(privKeyStr);
+    } catch (e) {
+      privKeyJSON = null;
+    }
 
     //console.log('sk', privKeyJSON);
 
@@ -167,12 +174,19 @@ export default class RPC {
       return privKeyJSON[0].spending_key || privKeyJSON[0].private_key;
     }
 
-    return null;
+    return 'Error: ' + privKeyStr;
   }
 
   static async rpc_getViewKeyAsString(address: string): Promise<string | null> {
     const viewKeyStr = await RPCModule.execute('export', address);
-    const viewKeyJSON = await JSON.parse(viewKeyStr);
+    //console.log(viewKeyStr);
+
+    let viewKeyJSON = null;
+    try {
+      viewKeyJSON = await JSON.parse(viewKeyStr);
+    } catch (e) {
+      viewKeyJSON = null;
+    }
 
     //console.log('vk', viewKeyJSON);
 
@@ -182,7 +196,7 @@ export default class RPC {
       return viewKeyJSON[0].full_viewing_key || viewKeyJSON[0].viewing_key;
     }
 
-    return null;
+    return 'Error: ' + viewKeyStr;
   }
 
   static async rpc_createNewAddress(addressType: 'z' | 't' | 'u'): Promise<string | null> {
@@ -190,7 +204,7 @@ export default class RPC {
     const addrStr = await RPCModule.execute('new', addressType);
     const addrJSON = await JSON.parse(addrStr);
 
-    // console.log(addrJSON);
+    console.log(addrJSON);
 
     if (addrJSON) {
       // Save

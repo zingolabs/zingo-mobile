@@ -139,10 +139,15 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     const address = uaddrs[oindex].address;
     const k = await RPC.rpc_getPrivKeyAsString(address);
 
-    setKeyType(0);
-    setPrivKeyModalVisible(true);
-    if (k) {
-      setPrivKey(k);
+    if (!k.startsWith('Error')) {
+      setKeyType(0);
+      setPrivKeyModalVisible(true);
+      if (k) {
+        setPrivKey(k);
+      }
+    } else {
+      Toast.show(k, Toast.LONG);
+      return;
     }
   };
 
@@ -155,10 +160,15 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     const address = uaddrs[oindex].address;
     const k = await RPC.rpc_getViewKeyAsString(address);
 
-    setKeyType(1);
-    setPrivKeyModalVisible(true);
-    if (k) {
-      setPrivKey(k);
+    if (!k.startsWith('Error')) {
+      setKeyType(1);
+      setPrivKeyModalVisible(true);
+      if (k) {
+        setPrivKey(k);
+      }
+    } else {
+      Toast.show(k, Toast.LONG);
+      return;
     }
   };
 

@@ -195,10 +195,15 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({
     const address = index === 0 ? zaddrs[zindex].address : taddrs[tindex].address;
     const k = await RPC.rpc_getPrivKeyAsString(address);
 
-    setKeyType(0);
-    setPrivKeyModalVisible(true);
-    if (k) {
-      setPrivKey(k);
+    if (!k.startsWith('Error')) {
+      setKeyType(0);
+      setPrivKeyModalVisible(true);
+      if (k) {
+        setPrivKey(k);
+      }
+    } else {
+      Toast.show(k, Toast.LONG);
+      return;
     }
   };
 
@@ -216,10 +221,15 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({
     const address = index === 0 ? zaddrs[zindex].address : taddrs[tindex].address;
     const k = await RPC.rpc_getViewKeyAsString(address);
 
-    setKeyType(1);
-    setPrivKeyModalVisible(true);
-    if (k) {
-      setPrivKey(k);
+    if (!k.startsWith('Error')) {
+      setKeyType(1);
+      setPrivKeyModalVisible(true);
+      if (k) {
+        setPrivKey(k);
+      }
+    } else {
+      Toast.show(k, Toast.LONG);
+      return;
     }
   };
 
