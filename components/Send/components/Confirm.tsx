@@ -30,7 +30,8 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   const { colors } = useTheme();
 
   const sendingTotal =
-    sendPageState.toaddrs.reduce((s, t) => s + Utils.parseLocaleFloat(t.amount || '0'), 0.0) + defaultFee;
+    sendPageState.toaddrs.reduce((s, t) => s + Utils.parseLocaleFloat(Number(t.amount).toFixed(8).toString()), 0.0) +
+    defaultFee;
 
   return (
     <SafeAreaView
@@ -77,7 +78,11 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                   marginTop: 5,
                 }}>
                 <ZecAmount currencyName={currencyName} size={18} amtZec={Utils.parseLocaleFloat(to.amount)} />
-                <UsdAmount style={{ fontSize: 18 }} amtZec={Utils.parseLocaleFloat(to.amount)} price={price} />
+                <UsdAmount
+                  style={{ fontSize: 18 }}
+                  amtZec={Utils.parseLocaleFloat(Number(to.amount).toFixed(8).toString())}
+                  price={price}
+                />
               </View>
               <RegText>{to.memo || ''}</RegText>
             </View>

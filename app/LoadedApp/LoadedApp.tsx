@@ -288,7 +288,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
   };
 
   // Get a single private key for this address, and return it as a string.
-  // Wallet needs to be unlocked
   getPrivKeyAsString = async (address: string): Promise<string | null> => {
     const pk = await RPC.rpc_getPrivKeyAsString(address);
     if (pk) {

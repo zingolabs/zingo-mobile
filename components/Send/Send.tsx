@@ -93,11 +93,11 @@ const Send: React.FunctionComponent<SendProps> = ({
         resultJSON.status === 'success' &&
         resultJSON.address_kind !== 'transparent' &&
         ((currencyName === 'ZEC' &&
-          (resultJSON.network.toLowerCase() === 'main' || resultJSON.network.toLowerCase() === 'mainnet')) ||
+          (resultJSON.chain_name.toLowerCase() === 'main' || resultJSON.chain_name.toLowerCase() === 'mainnet')) ||
           (currencyName !== 'ZEC' &&
-            (resultJSON.network.toLowerCase() === 'test' ||
-              resultJSON.network.toLowerCase() === 'testnet' ||
-              resultJSON.network.toLowerCase() === 'regtest')))
+            (resultJSON.chain_name.toLowerCase() === 'test' ||
+              resultJSON.chain_name.toLowerCase() === 'testnet' ||
+              resultJSON.chain_name.toLowerCase() === 'regtest')))
       );
     };
 
@@ -122,11 +122,11 @@ const Send: React.FunctionComponent<SendProps> = ({
       return (
         resultJSON.status === 'success' &&
         ((currencyName === 'ZEC' &&
-          (resultJSON.network.toLowerCase() === 'main' || resultJSON.network.toLowerCase() === 'mainnet')) ||
+          (resultJSON.chain_name.toLowerCase() === 'main' || resultJSON.chain_name.toLowerCase() === 'mainnet')) ||
           (currencyName !== 'ZEC' &&
-            (resultJSON.network.toLowerCase() === 'test' ||
-              resultJSON.network.toLowerCase() === 'testnet' ||
-              resultJSON.network.toLowerCase() === 'regtest')))
+            (resultJSON.chain_name.toLowerCase() === 'test' ||
+              resultJSON.chain_name.toLowerCase() === 'testnet' ||
+              resultJSON.chain_name.toLowerCase() === 'regtest')))
       );
     };
 

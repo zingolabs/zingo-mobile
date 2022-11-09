@@ -33,8 +33,6 @@ export default class RPC {
   lastWalletBlockHeight: number;
   lastServerBlockHeight: number;
 
-  lastTxId?: string;
-
   inRefresh: boolean;
 
   prevProgress: number;
@@ -73,8 +71,6 @@ export default class RPC {
     this.lastWalletBlockHeight = 0;
     this.lastServerBlockHeight = 0;
 
-    this.lastTxId = undefined;
-
     this.inRefresh = false;
 
     this.prevProgress = 0;
@@ -98,16 +94,13 @@ export default class RPC {
   static async rpc_getInfoObject(): Promise<InfoType | null> {
     try {
       const infostr = await RPCModule.execute('info', '');
+      //console.log(infostr);
       const infoJSON = await JSON.parse(infostr);
 
       // console.log(infoJSON);
 
-      const encStatus = await RPCModule.execute('encryptionstatus', '');
-      const encJSON = await JSON.parse(encStatus);
-
-      // console.log(encJSON);
-
       const defaultFee = await RPCModule.execute('defaultfee', '');
+      //console.log(defaultFee);
       const defaultFeeJSON = await JSON.parse(defaultFee);
 
       // console.log(defaultFeeJSON);
@@ -121,8 +114,6 @@ export default class RPC {
         verificationProgress: 1,
         currencyName: infoJSON.chain_name === 'main' ? 'ZEC' : 'TAZ',
         solps: 0,
-        encrypted: encJSON.encrypted,
-        locked: encJSON.locked,
         zecPrice: null,
         defaultFee: defaultFeeJSON?.defaultfee / 10 ** 8 || Utils.getFallbackDefaultFee(),
       };
@@ -258,17 +249,6 @@ export default class RPC {
     if (seedJSON) {
       const seed: WalletSeed = { seed: seedJSON.seed, birthday: seedJSON.birthday };
       return seed;
-    }
-
-    return null;
-  }
-
-  static async rpc_getLastTxid(): Promise<string | null> {
-    const lastTxIdStr = await RPCModule.execute('lasttxid', '');
-    const lastTxidJSON = await JSON.parse(lastTxIdStr);
-
-    if (lastTxidJSON) {
-      return lastTxidJSON.last_txid;
     }
 
     return null;
@@ -420,23 +400,14 @@ export default class RPC {
     }
 
     this.updateDataLock = true;
-    const latest_txid = await RPC.rpc_getLastTxid();
 
-    if (!!latest_txid && this.lastTxId !== latest_txid) {
-      // console.log(`Latest: ${latest_txid}, prev = ${this.lastTxId}`);
+    await this.fetchWalletHeight();
+    await this.fetchServerHeight();
 
-      await this.fetchWalletHeight();
-      await this.fetchServerHeight();
+    // And fetch the rest of the data.
+    await this.loadWalletData();
 
-      this.lastTxId = latest_txid;
-
-      //console.log("Update data fetching new txns");
-
-      // And fetch the rest of the data.
-      await this.loadWalletData();
-
-      //console.log(`Finished update data at ${lastServerBlockHeight}`);
-    }
+    //console.log(`Finished update data at ${lastServerBlockHeight}`);
     this.updateDataLock = false;
   }
 
@@ -795,6 +766,7 @@ export default class RPC {
     addressesJSON = [addressesJSON[0]];
 
     const balanceStr = await RPCModule.execute('balance', '');
+    //console.log(balanceStr);
     const balanceJSON = await JSON.parse(balanceStr);
 
     //console.log('balan:', balanceJSON);
@@ -816,6 +788,7 @@ export default class RPC {
 
     // Fetch pending notes and UTXOs
     const pendingNotes = await RPCModule.execute('notes', '');
+    //console.log(pendingNotes);
     const pendingNotesJSON = await JSON.parse(pendingNotes);
 
     //console.log(pendingNotes);
@@ -894,6 +867,7 @@ export default class RPC {
   // Fetch all T and Z and O transactions
   async fetchTandZandOTransactions() {
     const listStr = await RPCModule.execute('list', '');
+    //console.log(listStr);
     const listJSON = await JSON.parse(listStr);
 
     await this.fetchServerHeight();
@@ -1069,74 +1043,6 @@ export default class RPC {
     });
 
     return sendTxPromise;
-  }
-
-  async encryptWallet(password: string): Promise<boolean> {
-    const resultStr = await RPCModule.execute('encrypt', password);
-    const resultJSON = await JSON.parse(resultStr);
-
-    if (resultJSON) {
-      // To update the wallet encryption status
-      await this.fetchInfo();
-
-      // And save the wallet
-      await RPCModule.doSave();
-
-      return resultJSON.result === 'success';
-    }
-
-    return false;
-  }
-
-  async decryptWallet(password: string): Promise<boolean> {
-    const resultStr = await RPCModule.execute('decrypt', password);
-    const resultJSON = await JSON.parse(resultStr);
-
-    if (resultJSON) {
-      // To update the wallet encryption status
-      await this.fetchInfo();
-
-      // And save the wallet
-      await RPCModule.doSave();
-
-      return resultJSON.result === 'success';
-    }
-
-    return false;
-  }
-
-  async lockWallet(): Promise<boolean> {
-    const resultStr = await RPCModule.execute('lock', '');
-    const resultJSON = await JSON.parse(resultStr);
-
-    if (resultJSON) {
-      // To update the wallet encryption status
-      await this.fetchInfo();
-
-      // And save the wallet
-      await RPCModule.doSave();
-
-      return resultJSON.result === 'success';
-    }
-
-    return false;
-  }
-
-  async unlockWallet(password: string): Promise<boolean> {
-    const resultStr = await RPCModule.execute('unlock', password);
-    const resultJSON = await JSON.parse(resultStr);
-
-    if (resultJSON) {
-      // To update the wallet encryption status
-      await this.fetchInfo();
-
-      // And save the wallet
-      await RPCModule.doSave();
-
-      return resultJSON.result === 'success';
-    }
-
-    return false;
   }
 
   async getZecPrice() {

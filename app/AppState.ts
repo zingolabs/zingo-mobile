@@ -185,8 +185,6 @@ export interface InfoType {
   solps: number;
   zecPrice: number | null;
   defaultFee: number;
-  encrypted: boolean;
-  locked: boolean;
 }
 
 export class SendProgress {
