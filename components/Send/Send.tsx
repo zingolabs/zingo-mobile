@@ -553,7 +553,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       borderRadius: 10,
                     }}>
                     <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
-                    <FadeText>Some funds still confirming</FadeText>
+                    <FadeText>Some funds still confirming or syncing</FadeText>
                   </View>
                 )}
               </View>
