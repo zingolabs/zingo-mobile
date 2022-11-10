@@ -171,8 +171,8 @@ const Send: React.FunctionComponent<SendProps> = ({
   }, [sendPageState.toaddrs, getMaxAmount, decimalSeparator, currencyName]);
 
   useEffect(() => {
-    setSendButtonEnabled(validAddress === 1 && validAmount === 1);
-  }, [validAddress, validAmount]);
+    setSendButtonEnabled(validAddress === 1 && validAmount === 1 && !inRefresh);
+  }, [validAddress, validAmount, inRefresh]);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
