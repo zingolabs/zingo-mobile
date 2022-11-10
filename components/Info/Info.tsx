@@ -72,7 +72,7 @@ const Info: React.FunctionComponent<InfoProps> = ({ info, closeModal, totalBalan
           justifyContent: 'flex-start',
         }}>
         <View style={{ display: 'flex', margin: 20 }}>
-          <DetailLine label="Version" value="Zingo! v0.0.65" />
+          <DetailLine label="Version" value="Zingo! v0.0.66" />
           <DetailLine label="Server Version" value={infoState.version ? infoState.version : '...loading...'} />
           <DetailLine label="Lightwalletd URL" value={infoState.serverUri ? infoState.serverUri : '...loading...'} />
           <DetailLine

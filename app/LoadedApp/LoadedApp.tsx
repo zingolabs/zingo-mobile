@@ -869,6 +869,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
                       await this.fetchWalletSeed();
                       this.setState({ syncReportModalVisible: true });
                     }}
+                    inRefresh={this.rpc.inRefresh}
                   />
                 </Suspense>
                 {error && (

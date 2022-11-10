@@ -39,6 +39,7 @@ type SendProps = {
   setTxBuildProgress: (progress: SendProgress) => void;
   syncingStatus: SyncStatus | null;
   syncingStatusMoreInfoOnClick: () => void;
+  inRefresh: boolean;
 };
 
 const Send: React.FunctionComponent<SendProps> = ({
@@ -54,6 +55,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   setTxBuildProgress,
   syncingStatus,
   syncingStatusMoreInfoOnClick,
+  inRefresh,
 }) => {
   const { colors } = useTheme() as unknown as ThemeType;
   const [qrcodeModalVisble, setQrcodeModalVisible] = useState(false);
@@ -70,7 +72,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   const { decimalSeparator } = getNumberFormatSettings();
   const syncStatusDisplayLine = syncingStatus?.inProgress ? `(${syncingStatus?.blocks})` : '';
   const spendable = totalBalance.transparentBal + totalBalance.spendablePrivate + totalBalance.spendableOrchard;
-  const stillConfirming = spendable !== totalBalance.total;
+  const stillConfirming = spendable !== totalBalance.total || inRefresh;
   const zecPrice = info ? info.zecPrice : null;
   const currencyName = info ? info.currencyName : undefined;
 
