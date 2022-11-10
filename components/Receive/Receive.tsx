@@ -119,16 +119,19 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   const addO = async () => {
     //console.log('New O');
     const newAddress = await RPC.rpc_createNewAddress('u');
-    if (!newAddress.startsWith('Error')) {
+    if (newAddress && !newAddress.startsWith('Error')) {
       await fetchTotalBalance();
       setIndex(2);
       if (newAddress) {
         setDisplayAddress(newAddress);
       }
     } else {
-      Toast.show(newAddress, Toast.LONG);
-      return;
+      if (newAddress) {
+        Toast.show(newAddress, Toast.LONG);
+        return;
+      }
     }
+    return;
   };
 
   const [privKeyModalVisible, setPrivKeyModalVisible] = useState(false);
@@ -144,16 +147,19 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     const address = uaddrs[oindex].address;
     const k = await RPC.rpc_getPrivKeyAsString(address);
 
-    if (!k.startsWith('Error')) {
+    if (k && !k.startsWith('Error')) {
       setKeyType(0);
       setPrivKeyModalVisible(true);
       if (k) {
         setPrivKey(k);
       }
     } else {
-      Toast.show(k, Toast.LONG);
-      return;
+      if (k) {
+        Toast.show(k, Toast.LONG);
+        return;
+      }
     }
+    return;
   };
 
   const viewViewingKey = async () => {
@@ -165,16 +171,19 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     const address = uaddrs[oindex].address;
     const k = await RPC.rpc_getViewKeyAsString(address);
 
-    if (!k.startsWith('Error')) {
+    if (k && !k.startsWith('Error')) {
       setKeyType(1);
       setPrivKeyModalVisible(true);
       if (k) {
         setPrivKey(k);
       }
     } else {
-      Toast.show(k, Toast.LONG);
-      return;
+      if (k) {
+        Toast.show(k, Toast.LONG);
+        return;
+      }
     }
+    return;
   };
 
   const [importKeyModalVisible, setImportKeyModalVisible] = useState(false);

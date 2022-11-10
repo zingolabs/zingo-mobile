@@ -335,10 +335,10 @@ export default class RPC {
     }
   }
 
-  async doSync(): Promise<string | null> {
-    const syncstr = await RPCModule.execute('sync', '');
+  async doRescan(): Promise<string | null> {
+    const syncstr = await RPCModule.execute('rescan', '');
 
-    //console.log(`Sync exec result: ${syncstr}`);
+    //console.log(`rescan exec result: ${syncstr}`);
 
     if (syncstr) {
       return syncstr;
@@ -347,10 +347,10 @@ export default class RPC {
     return null;
   }
 
-  async doRescan(): Promise<string | null> {
-    const syncstr = await RPCModule.execute('rescan', '');
+  async doSync(): Promise<string | null> {
+    const syncstr = await RPCModule.execute('sync', '');
 
-    //console.log(`rescan exec result: ${syncstr}`);
+    //console.log(`Sync exec result: ${syncstr}`);
 
     if (syncstr) {
       return syncstr;
@@ -366,6 +366,30 @@ export default class RPC {
 
     if (syncstr) {
       return syncstr;
+    }
+
+    return null;
+  }
+
+  async doSend(sendJSON: string): Promise<string | null> {
+    const sendstr = await RPCModule.execute('send', sendJSON);
+
+    //console.log(`Send exec result: ${sendstr}`);
+
+    if (sendstr) {
+      return sendstr;
+    }
+
+    return null;
+  }
+
+  async doSendProgress(): Promise<string | null> {
+    const sendstr = await RPCModule.execute('sendprogress', '');
+
+    // console.log(`sendprogress: ${sendstr}`);
+
+    if (sendstr) {
+      return sendstr;
     }
 
     return null;
@@ -967,26 +991,29 @@ export default class RPC {
     setSendProgress: (arg0: SendProgress | null) => void,
   ): Promise<string> {
     // First, get the previous send progress id, so we know which ID to track
-    const prevProgress = await JSON.parse(await RPCModule.execute('sendprogress', ''));
-    const prevSendId = prevProgress.id;
+    const prev = await this.doSendProgress();
+    let prevProgress = { id: -1 };
+    if (prev) {
+      prevProgress = await JSON.parse(prev);
+    }
 
+    const prevSendId = prevProgress.id;
     console.log('prev progress', prevProgress);
 
-    try {
-      // This is async, so fire and forget
-      RPCModule.doSend(JSON.stringify(sendJson));
-    } catch (err) {
-      // TODO Show a modal with the error
-      console.log(`Error sending Tx: ${err}`);
-      throw err;
-    }
+    // This is async, so fire and forget
+    this.doSend(JSON.stringify(sendJson))
+      .then(r => console.log('End Send OK: ' + r))
+      .catch(e => console.log('End Send ERROR: ' + e));
 
     const startTimeSeconds = new Date().getTime() / 1000;
 
     // The send command is async, so we need to poll to get the status
     const sendTxPromise = new Promise<string>((resolve, reject) => {
       const intervalID = setInterval(async () => {
-        const pro = await RPCModule.execute('sendprogress', '');
+        const pro = await this.doSendProgress();
+        if (!pro) {
+          return;
+        }
         const progress = await JSON.parse(pro);
         const sendId = progress.id;
         console.log('progress', progress);

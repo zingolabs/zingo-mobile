@@ -161,31 +161,37 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({
   const addZ = async () => {
     //console.log('New Z');
     const newAddress = await RPC.rpc_createNewAddress('z');
-    if (!newAddress.startsWith('Error')) {
+    if (newAddress && !newAddress.startsWith('Error')) {
       await fetchTotalBalance();
       setIndex(0);
       if (newAddress) {
         setDisplayAddress(newAddress);
       }
     } else {
-      Toast.show(newAddress, Toast.LONG);
-      return;
+      if (newAddress) {
+        Toast.show(newAddress, Toast.LONG);
+        return;
+      }
     }
+    return;
   };
 
   const addT = async () => {
     //console.log('New T');
     const newAddress = await RPC.rpc_createNewAddress('t');
-    if (!newAddress.startsWith('Error')) {
+    if (newAddress && !newAddress.startsWith('Error')) {
       await fetchTotalBalance();
       setIndex(1);
       if (newAddress) {
         setDisplayAddress(newAddress);
       }
     } else {
-      Toast.show(newAddress, Toast.LONG);
-      return;
+      if (newAddress) {
+        Toast.show(newAddress, Toast.LONG);
+        return;
+      }
     }
+    return;
   };
 
   const [privKeyModalVisible, setPrivKeyModalVisible] = useState(false);
@@ -205,16 +211,19 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({
     const address = index === 0 ? zaddrs[zindex].address : taddrs[tindex].address;
     const k = await RPC.rpc_getPrivKeyAsString(address);
 
-    if (!k.startsWith('Error')) {
+    if (k && !k.startsWith('Error')) {
       setKeyType(0);
       setPrivKeyModalVisible(true);
       if (k) {
         setPrivKey(k);
       }
     } else {
-      Toast.show(k, Toast.LONG);
-      return;
+      if (k) {
+        Toast.show(k, Toast.LONG);
+        return;
+      }
     }
+    return;
   };
 
   const viewViewingKey = async () => {
@@ -231,16 +240,19 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({
     const address = index === 0 ? zaddrs[zindex].address : taddrs[tindex].address;
     const k = await RPC.rpc_getViewKeyAsString(address);
 
-    if (!k.startsWith('Error')) {
+    if (k && !k.startsWith('Error')) {
       setKeyType(1);
       setPrivKeyModalVisible(true);
       if (k) {
         setPrivKey(k);
       }
     } else {
-      Toast.show(k, Toast.LONG);
-      return;
+      if (k) {
+        Toast.show(k, Toast.LONG);
+        return;
+      }
     }
+    return;
   };
 
   const [importKeyModalVisible, setImportKeyModalVisible] = useState(false);

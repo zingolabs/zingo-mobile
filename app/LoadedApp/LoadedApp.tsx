@@ -145,26 +145,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
     this.setState({ errorModalData });
   };
 
-  unlockWallet = async (password: string): Promise<boolean> => {
-    const success = await this.rpc.unlockWallet(password);
-    return success;
-  };
-
-  lockWallet = async (): Promise<boolean> => {
-    const success = await this.rpc.lockWallet();
-    return success;
-  };
-
-  encryptWallet = async (password: string): Promise<boolean> => {
-    const success = await this.rpc.encryptWallet(password);
-    return success;
-  };
-
-  decryptWallet = async (password: string): Promise<boolean> => {
-    const success = await this.rpc.decryptWallet(password);
-    return success;
-  };
-
   setTotalBalance = (totalBalance: TotalBalance) => {
     this.setState({ totalBalance });
   };

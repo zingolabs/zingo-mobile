@@ -6,7 +6,7 @@ import { useTheme } from '@react-navigation/native';
 import { SendProgress } from '../../AppState';
 import RegText from '../../../components/Components/RegText';
 import { ThemeType } from '../../types';
-//import CircularProgress from '../../../components/CircularProgress';
+import CircularProgress from '../../../components/CircularProgress';
 
 type ComputingTxContentProps = {
   progress: SendProgress;
@@ -30,13 +30,13 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({ 
         <>
           <RegText>{`Step ${progress.progress} of ${progress.total}`}</RegText>
           <RegText style={{ marginBottom: 20 }}>{`ETA ${progress.etaSeconds}s`}</RegText>
-          {/*<CircularProgress
+          <CircularProgress
             size={100}
             strokeWidth={5}
             textSize={20}
             text={(((progress.progress + 1) * 100) / 4).toFixed(0).toString() + '%'}
             progressPercent={((progress.progress + 1) * 100) / 4}
-          />*/}
+          />
         </>
       )}
     </SafeAreaView>

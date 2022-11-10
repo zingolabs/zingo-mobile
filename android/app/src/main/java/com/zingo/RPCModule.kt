@@ -412,6 +412,9 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun doSend(sendJSON: String, promise: Promise) {
         // Run on a new thread so as to not block the UI
         thread {
+
+            initlogging()
+
             //Log.w(TAG, "Trying to send $sendJSON")
             val result = execute("send", sendJSON)
             //Log.w(TAG, "Send Result: $result")
@@ -423,6 +426,9 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     @ReactMethod
     fun execute(cmd: String, args: String, promise: Promise) {
         thread {
+
+            initlogging()
+
             //Log.w(TAG, "Executing $cmd with $args")
             val resp = execute(cmd, args)
             //Log.w(TAG, "Response to $cmd : $resp")
