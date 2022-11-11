@@ -159,25 +159,28 @@ const TransactionsView: React.FunctionComponent<TransactionsViewProps> = ({
           <RefreshControl refreshing={false} onRefresh={doRefresh} tintColor={colors.text} title="Refreshing" />
         }
         style={{ flexGrow: 1, marginTop: 10, width: '100%', height: '100%' }}>
-        {transactions?.slice(0, numTx).flatMap(t => {
-          let txmonth = moment(t.time * 1000).format('MMM YYYY');
+        {transactions
+          ?.slice(0, numTx)
+          .sort((a, b) => b.time - a.time)
+          .flatMap(t => {
+            let txmonth = moment(t.time * 1000).format('MMM YYYY');
 
-          var month = '';
-          if (txmonth !== lastMonth) {
-            month = txmonth;
-            lastMonth = txmonth;
-          }
+            var month = '';
+            if (txmonth !== lastMonth) {
+              month = txmonth;
+              lastMonth = txmonth;
+            }
 
-          return (
-            <TxSummaryLine
-              key={`${t.txid}-${t.type}`}
-              tx={t}
-              month={month}
-              setTxDetail={setTxDetail}
-              setTxDetailModalShowing={setTxDetailModalShowing}
-            />
-          );
-        })}
+            return (
+              <TxSummaryLine
+                key={`${t.txid}-${t.type}`}
+                tx={t}
+                month={month}
+                setTxDetail={setTxDetail}
+                setTxDetailModalShowing={setTxDetailModalShowing}
+              />
+            );
+          })}
         {!!transactions && !!transactions.length && (
           <View style={{ height: 100, display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
             <FadeText style={{ color: colors.primary }}>END</FadeText>
