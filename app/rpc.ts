@@ -1021,7 +1021,7 @@ export default class RPC {
         const updatedProgress = new SendProgress();
         if (sendId === prevSendId) {
           // Still not started, so wait for more time
-          setSendProgress(updatedProgress);
+          //setSendProgress(updatedProgress);
           return;
         }
 
@@ -1033,7 +1033,8 @@ export default class RPC {
         }
         console.log(`Seconds Per compute = ${secondsPerComputation}`);
 
-        let eta = Math.round((progress.total - progress.progress) * secondsPerComputation);
+        //let eta = Math.round((progress.total - progress.progress) * secondsPerComputation);
+        let eta = Math.round((4 - progress.progress) * secondsPerComputation);
         console.log(`ETA = ${eta}`);
         if (eta <= 0) {
           eta = 1;
@@ -1042,9 +1043,10 @@ export default class RPC {
         console.log(`ETA calculated = ${eta}`);
 
         updatedProgress.progress = progress.progress;
-        updatedProgress.total = Math.max(progress.total, progress.progress); // sometimes, due to change, the total can be off by 1
-        updatedProgress.sendInProgress = true;
-        updatedProgress.etaSeconds = eta;
+        //updatedProgress.total = Math.max(progress.total, progress.progress); // sometimes, due to change, the total can be off by 1
+        updatedProgress.total = 3; // until sendprogress give me a good value... 3 is better.
+        updatedProgress.sendInProgress = progress.sending;
+        updatedProgress.etaSeconds = progress.progress === 0 ? '...' : eta;
 
         if (!progress.txid && !progress.error) {
           // Still processing

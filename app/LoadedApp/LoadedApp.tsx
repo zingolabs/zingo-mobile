@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faList, faUpload, faDownload, faCog, faAddressBook } from '@fortawesome/free-solid-svg-icons';
 import { useTheme } from '@react-navigation/native';
 import SideMenu from 'react-native-side-menu-updated';
+import { isEqual } from 'lodash';
 
 import RPC from '../rpc';
 import RPCModule from '../../components/RPCModule';
@@ -146,7 +147,10 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
   };
 
   setTotalBalance = (totalBalance: TotalBalance) => {
-    this.setState({ totalBalance });
+    if (!isEqual(this.state.totalBalance, totalBalance)) {
+      console.log('total balance');
+      this.setState({ totalBalance });
+    }
   };
 
   setSyncStatusReport = (syncStatusReport: SyncStatusReport) => {
@@ -154,11 +158,17 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
   };
 
   setTransactionList = (transactions: Transaction[]) => {
-    this.setState({ transactions });
+    if (!isEqual(this.state.transactions, transactions)) {
+      console.log('transactions');
+      this.setState({ transactions });
+    }
   };
 
   setAllAddresses = (addresses: Address[]) => {
-    this.setState({ addresses });
+    if (!isEqual(this.state.addresses, addresses)) {
+      console.log('addresses');
+      this.setState({ addresses });
+    }
   };
 
   setWalletSettings = (wallet_settings: WalletSettings) => {
@@ -175,7 +185,9 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
       progress,
       blocks,
     };
-    this.setState({ syncingStatus });
+    if (!isEqual(this.state.syncingStatus, syncingStatus)) {
+      this.setState({ syncingStatus });
+    }
   };
 
   clearToAddrs = () => {
@@ -195,7 +207,9 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
     const newInfo = Object.assign({}, info);
     newInfo.zecPrice = price;
 
-    this.setState({ info: newInfo });
+    if (!isEqual(this.state.info, newInfo)) {
+      this.setState({ info: newInfo });
+    }
   };
 
   setRescanning = (rescanning: boolean) => {
@@ -217,7 +231,9 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
       newInfo.zecPrice = info.zecPrice;
     }
 
-    this.setState({ info: newInfo });
+    if (!isEqual(this.state.info, newInfo)) {
+      this.setState({ info: newInfo });
+    }
   };
 
   getSendManyJSON = (): Array<SendJsonToType> => {
@@ -616,6 +632,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
       const iconColor = focused ? colors.background : colors.money;
       return <FontAwesomeIcon icon={iconName} color={iconColor} />;
     };
+
+    console.log('render LoadedApp');
 
     return (
       <SideMenu

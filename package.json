@@ -24,6 +24,7 @@
     "deprecated-react-native-prop-types": "^2.3.0",
     "enzyme": "^3.11.0",
     "js-base64": "^3.7.2",
+    "lodash": "^4.17.21",
     "moment": "^2.29.4",
     "prettier": "^2.7.1",
     "prop-types": "^15.8.1",

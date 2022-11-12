@@ -260,7 +260,7 @@ export class WalletSettings {
   server?: string;
 
   constructor() {
-    this.download_memos = 'none';
+    this.download_memos = 'wallet';
     this.transaction_filter_threshold = '500';
   }
 }

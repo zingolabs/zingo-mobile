@@ -130,7 +130,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
       if (!seed.startsWith('Error')) {
         this.setState({ seedPhrase: seed, screen: 2, actionButtonsDisabled: false, walletExists: true });
         // default values for wallet options
-        this.set_wallet_option('download_memos', 'none');
+        this.set_wallet_option('download_memos', 'wallet');
         //await this.set_wallet_option('transaction_filter_threshold', '500');
       } else {
         this.setState({ walletExists: false, actionButtonsDisabled: false });
