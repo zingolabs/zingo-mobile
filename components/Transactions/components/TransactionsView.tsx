@@ -65,9 +65,9 @@ const TransactionsView: React.FunctionComponent<TransactionsViewProps> = ({
         const shieldJSON = JSON.parse(shieldStr);
 
         if (shieldJSON.error) {
-          Toast.show(`Error: ${shieldJSON.error}`, Toast.LONG);
+          Toast.show(`${translate('transactions.shield-error')} ${shieldJSON.error}`, Toast.LONG);
         } else {
-          Toast.show(`Shielded in Tx: ${shieldJSON.txid}`);
+          Toast.show(`${translate('transactions.shield-message')} ${shieldJSON.txid}`);
         }
       }, 1000);
     }
@@ -96,7 +96,12 @@ const TransactionsView: React.FunctionComponent<TransactionsViewProps> = ({
         transparent={false}
         visible={isTxDetailModalShowing}
         onRequestClose={() => setTxDetailModalShowing(false)}>
-        <TxDetail currencyName={currencyName} tx={txDetail} closeModal={() => setTxDetailModalShowing(false)} />
+        <TxDetail
+          currencyName={currencyName}
+          tx={txDetail}
+          closeModal={() => setTxDetailModalShowing(false)}
+          translate={translate}
+        />
       </Modal>
 
       <View
@@ -117,7 +122,7 @@ const TransactionsView: React.FunctionComponent<TransactionsViewProps> = ({
 
         {showShieldButton && (
           <View style={{ margin: 5 }}>
-            <Button type="Primary" title="Shield funds" onPress={shieldFunds} />
+            <Button type="Primary" title={translate('transactions.shieldfunds')} onPress={shieldFunds} />
           </View>
         )}
 
@@ -128,7 +133,7 @@ const TransactionsView: React.FunctionComponent<TransactionsViewProps> = ({
             alignItems: 'center',
           }}>
           <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
-            {syncStatusDisplayLine ? 'Wallet - Syncing' : 'Wallet'}
+            {syncStatusDisplayLine ? translate('transactions.title-syncing') : translate('transactions.title')}
           </RegText>
           <FadeText style={{ marginTop: 5, padding: 0 }}>{syncStatusDisplayLine ? syncStatusDisplayLine : ''}</FadeText>
           {!!syncStatusDisplayLine && (
@@ -143,7 +148,7 @@ const TransactionsView: React.FunctionComponent<TransactionsViewProps> = ({
                   padding: 5,
                   borderRadius: 10,
                 }}>
-                <FadeText style={{ color: colors.primary }}>more...</FadeText>
+                <FadeText style={{ color: colors.primary }}>{translate('transactions.more')}</FadeText>
                 <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
               </View>
             </TouchableOpacity>
@@ -161,7 +166,12 @@ const TransactionsView: React.FunctionComponent<TransactionsViewProps> = ({
 
       <ScrollView
         refreshControl={
-          <RefreshControl refreshing={false} onRefresh={doRefresh} tintColor={colors.text} title="Refreshing" />
+          <RefreshControl
+            refreshing={false}
+            onRefresh={doRefresh}
+            tintColor={colors.text}
+            title={translate('transactions.refreshing')}
+          />
         }
         style={{ flexGrow: 1, marginTop: 10, width: '100%', height: '100%' }}>
         {transactions
@@ -188,13 +198,13 @@ const TransactionsView: React.FunctionComponent<TransactionsViewProps> = ({
           })}
         {!!transactions && !!transactions.length && (
           <View style={{ height: 100, display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
-            <FadeText style={{ color: colors.primary }}>END</FadeText>
+            <FadeText style={{ color: colors.primary }}>{translate('transactions.end')}</FadeText>
           </View>
         )}
 
         {loadMoreButton && (
           <View style={{ flexDirection: 'row', justifyContent: 'center', margin: 30 }}>
-            <Button type="Secondary" title="Load More" onPress={loadMoreClicked} />
+            <Button type="Secondary" title={translate('transactions.loadmore')} onPress={loadMoreClicked} />
           </View>
         )}
       </ScrollView>

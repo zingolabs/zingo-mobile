@@ -43,8 +43,8 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({
   const { colors } = useTheme() as unknown as ThemeType;
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([
-    { key: 'zaddr', title: 'Z-Sapling' },
-    { key: 'taddr', title: 'T-Transparent' },
+    { key: 'zaddr', title: translate('legacy.z-title') },
+    { key: 'taddr', title: translate('legacy.t-title') },
   ]);
 
   const [displayAddress, setDisplayAddress] = useState('');
@@ -115,7 +115,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({
   const renderScene: (routes: any) => JSX.Element | undefined = ({ route }) => {
     switch (route.key) {
       case 'zaddr': {
-        let zaddr = 'No Address';
+        let zaddr = translate('legacy.noaddress');
         let zaddrKind = '';
         if (zaddrs.length > 0) {
           zaddr = zaddrs[zindex].address;
@@ -137,7 +137,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({
         );
       }
       case 'taddr': {
-        let taddr = 'No Address';
+        let taddr = translate('legacy.noaddress');
         let taddrKind = '';
         if (taddrs.length > 0) {
           taddr = taddrs[tindex].address;
@@ -203,11 +203,11 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({
 
   const viewPrivKey = async () => {
     if (index === 0 && zaddrs.length === 0) {
-      Toast.show('No Z address to import the Private Key', Toast.LONG);
+      Toast.show(translate('legacy.znoprivkey-error'), Toast.LONG);
       return;
     }
     if (index === 1 && taddrs.length === 0) {
-      Toast.show('No T address to import the Private Key', Toast.LONG);
+      Toast.show(translate('legacy.tnoprivkey-error'), Toast.LONG);
       return;
     }
 
@@ -232,11 +232,11 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({
   const viewViewingKey = async () => {
     if (index === 1) {
       // No viewing key for T address
-      Toast.show('T addresses do not have Viewing Keys', Toast.LONG);
+      Toast.show(translate('legacy.tnohaveviewkey'), Toast.LONG);
       return;
     }
     if (index === 0 && zaddrs.length === 0) {
-      Toast.show('No Z address to import the Viewing Key', Toast.LONG);
+      Toast.show(translate('legacy.znoviewkey'), Toast.LONG);
       return;
     }
 
@@ -365,7 +365,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({
               amtZec={totalBalance.total}
             />
             <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
-              {'Legacy Address Types'}
+              {translate('legacy.title')}
             </RegText>
           </View>
         </View>
@@ -381,7 +381,13 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({
             customButton={<FontAwesomeIcon icon={faEllipsisV} color={colors.border} size={20} />}
             buttonStyle={{ width: 32, height: 32, margin: 7.5, resizeMode: 'contain' }}
             destructiveIndex={4}
-            options={['New Z Address', 'New T Address', 'Export Private Key', 'Export Viewing Key', 'Cancel']}
+            options={[
+              translate('legacy.newz-option'),
+              translate('legacy.newt-option'),
+              translate('legacy.privkey-option'),
+              translate('legacy.viewkey-option'),
+              translate('legacy.cancel-option'),
+            ]}
             actions={[addZ, addT, viewPrivKey, viewViewingKey]}
           />
         </View>

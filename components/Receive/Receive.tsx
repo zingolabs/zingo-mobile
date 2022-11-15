@@ -47,7 +47,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
 }) => {
   const { colors } = useTheme() as unknown as ThemeType;
   const [index, setIndex] = React.useState(0);
-  const [routes] = React.useState([{ key: 'uaddr', title: 'UNIFIED ADRESSES' }]);
+  const [routes] = React.useState([{ key: 'uaddr', title: translate('receive.u-title') }]);
 
   const [displayAddress, setDisplayAddress] = useState('');
   const [oindex, setOIndex] = useState(0);
@@ -94,7 +94,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   const renderScene: (routes: any) => JSX.Element | undefined = ({ route }) => {
     switch (route.key) {
       case 'uaddr': {
-        let uaddr = 'No Unified Address';
+        let uaddr = translate('receive.noaddress');
         let uaddrKind = '';
         if (uaddrs.length > 0) {
           uaddr = uaddrs[oindex].address;
@@ -143,7 +143,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
 
   const viewPrivKey = async () => {
     if (uaddrs.length === 0) {
-      Toast.show('No Unified address to import the Spending Key', Toast.LONG);
+      Toast.show(translate('receive.unoprivkey'), Toast.LONG);
       return;
     }
 
@@ -167,7 +167,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
 
   const viewViewingKey = async () => {
     if (uaddrs.length === 0) {
-      Toast.show('No Unified address to import the Full Viewing Key', Toast.LONG);
+      Toast.show(translate('receive.unoviewkey'), Toast.LONG);
       return;
     }
 
@@ -192,7 +192,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   const [importKeyModalVisible, setImportKeyModalVisible] = useState(false);
 
   const importKey = async () => {
-    Toast.show('Error: We are working on it, comming soon.', Toast.LONG);
+    Toast.show(translate('workingonit'), Toast.LONG);
     //setImportKeyModalVisible(true);
   };
 
@@ -303,7 +303,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
 
             <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
               <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
-                {syncStatusDisplayLine ? 'Receive - Syncing' : 'Receive'}
+                {syncStatusDisplayLine ? translate('receive.title-syncing') : translate('receive.title')}
               </RegText>
               <FadeText style={{ marginTop: 5, padding: 0 }}>
                 {syncStatusDisplayLine ? syncStatusDisplayLine : ''}
@@ -320,7 +320,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                       padding: 5,
                       borderRadius: 10,
                     }}>
-                    <FadeText style={{ color: colors.primary }}>more...</FadeText>
+                    <FadeText style={{ color: colors.primary }}>{translate('receive.more')}</FadeText>
                     <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
                   </View>
                 </TouchableOpacity>
@@ -340,7 +340,13 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
             customButton={<FontAwesomeIcon icon={faEllipsisV} color={colors.border} size={20} />}
             buttonStyle={{ width: 32, height: 32, margin: 7.5, resizeMode: 'contain' }}
             destructiveIndex={4}
-            options={['New Address', 'Export Spending Key', 'Export Full Viewing Key', 'Import Key...', 'Cancel']}
+            options={[
+              translate('receive.newu-option'),
+              translate('receive.privkey-option'),
+              translate('receive.viewkey-option'),
+              translate('receive.import-option'),
+              translate('receive.cancel'),
+            ]}
             actions={[addO, viewPrivKey, viewViewingKey, importKey]}
           />
         </View>
