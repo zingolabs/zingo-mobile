@@ -4,6 +4,7 @@ import { View, Image, SafeAreaView, ScrollView } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import Toast from 'react-native-simple-toast';
 import Clipboard from '@react-native-community/clipboard';
+import { TranslateOptions } from 'i18n-js';
 
 import RegText from '../Components/RegText';
 import RegTextInput from '../Components/RegTextInput';
@@ -30,8 +31,8 @@ type SeedProps = {
   onClickCancel: () => void;
   totalBalance: TotalBalance;
   action: 'new' | 'change' | 'view' | 'restore' | 'backup' | 'server';
-  error?: string;
   currencyName?: string;
+  translate: (key: string, config?: TranslateOptions) => any;
 };
 const Seed: React.FunctionComponent<SeedProps> = ({
   seed,
@@ -40,8 +41,8 @@ const Seed: React.FunctionComponent<SeedProps> = ({
   onClickCancel,
   totalBalance,
   action,
-  error,
   currencyName,
+  translate,
 }) => {
   const { colors } = useTheme() as unknown as ThemeType;
   const [seedPhrase, setSeedPhrase] = useState('');
@@ -51,36 +52,14 @@ const Seed: React.FunctionComponent<SeedProps> = ({
   const [readOnly, setReadOnly] = useState(true);
 
   useEffect(() => {
-    setTexts({
-      new: ['I have saved \n the seed'],
-      change: [
-        '',
-        'I have saved \n the seed',
-        'You really want \n to change your \n actual wallet',
-        'Are you sure \n 100% or more',
-      ],
-      server: [
-        '',
-        'I have saved \n the seed',
-        'You really want \n to change your \n actual server',
-        'Are you sure \n 100% or more',
-      ],
-      view: ['I have saved \n the seed'],
-      restore: ['Restore Wallet'],
-      backup: [
-        '',
-        'I have saved \n the seed',
-        'You really want \n to restore your \n backup wallet',
-        'Are you sure \n 100% or more',
-      ],
-    });
+    setTexts(translate('seed.buttontexts'));
     setReadOnly(
       action === 'new' || action === 'view' || action === 'change' || action === 'backup' || action === 'server',
     );
     setTimes(action === 'change' || action === 'backup' || action === 'server' ? 1 : 0);
     setSeedPhrase(seed || '');
     setBirthdayNumber(birthday || 0);
-  }, [action, seed, birthday]);
+  }, [action, seed, birthday, translate]);
 
   //console.log(seed, birthday, onClickOK, onClickCancel, totalBalance, action, error, currencyName);
 
@@ -113,7 +92,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
           style={{ opacity: 0.4 }}
         />
         <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
-          Seed ({action})
+          {translate('seed.title')} ({translate(`seed.${action}`)})
         </RegText>
         <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
       </View>
@@ -127,9 +106,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
           backgroundColor: colors.background,
         }}>
         <FadeText style={{ marginTop: 0, padding: 20, textAlign: 'center' }}>
-          {readOnly
-            ? 'This is your seed phrase. Please write it down carefully. It is the only way to restore your actual wallet.'
-            : 'Enter your seed phrase (24 words)'}
+          {readOnly ? translate('seed.text-readonly') : translate('seed.text-no-readonly')}
         </FadeText>
         <View
           style={{
@@ -172,24 +149,22 @@ const Seed: React.FunctionComponent<SeedProps> = ({
             onPress={() => {
               if (seedPhrase) {
                 Clipboard.setString(seedPhrase);
-                Toast.show('Copied Seed to Clipboard', Toast.LONG);
+                Toast.show(translate('seed.tapcopy-message'), Toast.LONG);
               }
             }}>
-            Tap to copy
+            {translate('seed.tapcopy')}
           </ClickableText>
         </View>
 
         <View style={{ marginTop: 10, alignItems: 'center' }}>
-          <FadeText style={{ textAlign: 'center' }}>Wallet Birthday</FadeText>
+          <FadeText style={{ textAlign: 'center' }}>{translate('seed.birthday-readonly')}</FadeText>
           {readOnly ? (
             <RegText color={colors.text} style={{ textAlign: 'center' }}>
               {birthdayNumber}
             </RegText>
           ) : (
             <>
-              <FadeText style={{ textAlign: 'center' }}>
-                Block height of first transaction. (It's OK, if you don't know)
-              </FadeText>
+              <FadeText style={{ textAlign: 'center' }}>{translate('seed.birthday-no-readonly')}</FadeText>
               <RegTextInput
                 style={{
                   margin: 10,
@@ -209,24 +184,16 @@ const Seed: React.FunctionComponent<SeedProps> = ({
         </View>
 
         <FadeText style={{ marginTop: 20, padding: 20, textAlign: 'center', color: 'white' }}>
-          {times === 3 &&
-            action === 'change' &&
-            'YOU WILL HAVE NO LONGER ACCESS TO THIS WALLET, AND YOU ARE GOING TO ACCESS TO ANOTHER DIFFERENT WALLET'}
-          {times === 3 &&
-            action === 'backup' &&
-            'YOU WILL HAVE NO LONGER ACCESS TO THIS WALLET, AND YOU ARE GOING TO ACCESS TO YOUR BACKUP WALLET'}
-          {times === 3 &&
-            action === 'server' &&
-            "YOU WILL HAVE NO LONGER ACCESS TO THIS WALLET, AND YOU ARE GOING TO CHANGE TO ANOTHER SERVER IN WHICH YOUR ACTUAL WALLET DOESN'T EXIST"}
+          {times === 3 && action === 'change' && translate('seed.change-warning')}
+          {times === 3 && action === 'backup' && translate('seed.backup-warning')}
+          {times === 3 && action === 'server' && translate('seed.server-warning')}
         </FadeText>
 
         {currencyName !== 'ZEC' && times === 3 && (action === 'change' || action === 'server') && (
           <FadeText style={{ color: colors.primary, textAlign: 'center', width: '100%' }}>
-            NO BACKUP OF THIS WALLET. ONLY IN MAINNET.
+            {translate('seed.mainnet-warning')}
           </FadeText>
         )}
-
-        {!!error && <FadeText style={{ color: colors.primary, textAlign: 'center', width: '100%' }}>{error}</FadeText>}
 
         <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', margin: 20 }}>
           <Button
@@ -248,7 +215,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
             }}
           />
           {(times > 0 || action === 'restore') && (
-            <Button type="Secondary" title="Cancel" style={{ marginLeft: 10 }} onPress={onClickCancel} />
+            <Button type="Secondary" title={translate('cancel')} style={{ marginLeft: 10 }} onPress={onClickCancel} />
           )}
         </View>
       </ScrollView>

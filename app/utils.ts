@@ -1,7 +1,5 @@
 import { getNumberFormatSettings } from 'react-native-localize';
 
-export const NO_CONNECTION: string = 'Could not connect to zcashd';
-
 type ZecAmountSplitType = {
   bigPart: string;
   smallPart: string;

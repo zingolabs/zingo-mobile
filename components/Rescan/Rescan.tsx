@@ -2,6 +2,7 @@
 import React from 'react';
 import { View, ScrollView, SafeAreaView, Image } from 'react-native';
 import { useTheme } from '@react-navigation/native';
+import { TranslateOptions } from 'i18n-js';
 
 import RegText from '../Components/RegText';
 import ZecAmount from '../Components/ZecAmount';
@@ -15,6 +16,7 @@ type RescanProps = {
   startRescan: () => void;
   totalBalance: TotalBalance;
   currencyName?: string;
+  translate: (key: string, config?: TranslateOptions) => any;
 };
 
 const Rescan: React.FunctionComponent<RescanProps> = ({
@@ -23,6 +25,7 @@ const Rescan: React.FunctionComponent<RescanProps> = ({
   closeModal,
   totalBalance,
   currencyName,
+  translate,
 }) => {
   const { colors } = useTheme() as unknown as ThemeType;
 
@@ -55,7 +58,7 @@ const Rescan: React.FunctionComponent<RescanProps> = ({
         />
         <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{ opacity: 0.4 }} />
         <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
-          Rescan
+          {translate('rescan.title')}
         </RegText>
         <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
       </View>
@@ -68,16 +71,13 @@ const Rescan: React.FunctionComponent<RescanProps> = ({
           justifyContent: 'flex-start',
         }}>
         <View style={{ display: 'flex', margin: 20 }}>
-          <RegText>
-            This will re-fetch all transactions and rebuild your shielded wallet, starting from block height {birthday}.
-            It might take several minutes.
-          </RegText>
+          <RegText>{translate('rescan.text-1') + birthday + translate('rescan.text-2')}</RegText>
         </View>
       </ScrollView>
 
       <View style={{ flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', margin: 20 }}>
-        <Button type="Primary" title="Rescan" onPress={doRescanAndClose} />
-        <Button type="Secondary" title="Close" style={{ marginLeft: 10 }} onPress={closeModal} />
+        <Button type="Primary" title={translate('rescan.button')} onPress={doRescanAndClose} />
+        <Button type="Secondary" title={translate('close')} style={{ marginLeft: 10 }} onPress={closeModal} />
       </View>
     </SafeAreaView>
   );

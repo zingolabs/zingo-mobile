@@ -2,6 +2,7 @@
 import React from 'react';
 import { View, ScrollView, SafeAreaView, Image } from 'react-native';
 import { useTheme } from '@react-navigation/native';
+import { TranslateOptions } from 'i18n-js';
 
 import FadeText from '../Components/FadeText';
 import ZecAmount from '../Components/ZecAmount';
@@ -14,8 +15,9 @@ type AboutProps = {
   closeModal: () => void;
   totalBalance: TotalBalance;
   currencyName?: string;
+  translate: (key: string, config?: TranslateOptions) => any;
 };
-const About: React.FunctionComponent<AboutProps> = ({ closeModal, totalBalance, currencyName }) => {
+const About: React.FunctionComponent<AboutProps> = ({ closeModal, totalBalance, currencyName, translate }) => {
   const { colors } = useTheme() as unknown as ThemeType;
   return (
     <SafeAreaView
@@ -41,7 +43,7 @@ const About: React.FunctionComponent<AboutProps> = ({ closeModal, totalBalance, 
         />
         <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{ opacity: 0.4 }} />
         <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
-          Zingo! v0.0.67
+          {translate('zingo') + ' ' + translate('version')}
         </RegText>
         <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
       </View>
@@ -83,7 +85,7 @@ const About: React.FunctionComponent<AboutProps> = ({ closeModal, totalBalance, 
         </FadeText>
       </ScrollView>
       <View style={{ flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', margin: 10 }}>
-        <Button type="Secondary" title="Close" onPress={closeModal} />
+        <Button type="Secondary" title={translate('close')} onPress={closeModal} />
       </View>
     </SafeAreaView>
   );

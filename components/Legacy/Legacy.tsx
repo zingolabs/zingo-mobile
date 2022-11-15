@@ -8,6 +8,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faBars, faEllipsisV } from '@fortawesome/free-solid-svg-icons';
 import OptionsMenu from 'react-native-option-menu';
+import { TranslateOptions } from 'i18n-js';
 
 import ZecAmount from '../Components/ZecAmount';
 import UsdAmount from '../Components/UsdAmount';
@@ -27,6 +28,7 @@ type LegacyProps = {
   fetchTotalBalance: () => Promise<void>;
   startRescan: () => void;
   totalBalance: TotalBalance;
+  translate: (key: string, config?: TranslateOptions) => any;
 };
 
 const Legacy: React.FunctionComponent<LegacyProps> = ({
@@ -36,6 +38,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({
   fetchTotalBalance,
   startRescan,
   totalBalance,
+  translate,
 }) => {
   const { colors } = useTheme() as unknown as ThemeType;
   const [index, setIndex] = React.useState(0);
@@ -169,7 +172,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({
       }
     } else {
       if (newAddress) {
-        Toast.show(newAddress, Toast.LONG);
+        Toast.show(newAddress + translate('workingonit'), Toast.LONG);
         return;
       }
     }
@@ -187,7 +190,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({
       }
     } else {
       if (newAddress) {
-        Toast.show(newAddress, Toast.LONG);
+        Toast.show(newAddress + translate('workingonit'), Toast.LONG);
         return;
       }
     }
@@ -258,6 +261,12 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({
   const [importKeyModalVisible, setImportKeyModalVisible] = useState(false);
 
   const doImport = async (key: string, birthday: string) => {
+    if (isNaN(parseInt(birthday, 10))) {
+      setTimeout(() => {
+        Toast.show(`${translate('rpc.parsebirthday-error')} ${birthday}`, Toast.LONG);
+      }, 1000);
+      return;
+    }
     const addressList = await RPC.rpc_doImportPrivKey(key, birthday);
     // console.log(addressList);
 
@@ -308,6 +317,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({
             closeModal={() => setPrivKeyModalVisible(false)}
             totalBalance={totalBalance}
             currencyName={currencyName}
+            translate={translate}
           />
         </Modal>
 
@@ -321,6 +331,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({
             closeModal={() => setImportKeyModalVisible(false)}
             totalBalance={totalBalance}
             currencyName={currencyName}
+            translate={translate}
           />
         </Modal>
 
@@ -385,6 +396,8 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({
       </View>
     );
   };
+
+  console.log('render legacy');
 
   return (
     <TabView

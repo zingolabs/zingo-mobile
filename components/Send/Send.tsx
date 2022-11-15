@@ -10,6 +10,7 @@ import Toast from 'react-native-simple-toast';
 import { getNumberFormatSettings } from 'react-native-localize';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
 import Animated, { EasingNode } from 'react-native-reanimated';
+import { TranslateOptions } from 'i18n-js';
 
 import FadeText from '../Components/FadeText';
 import ErrorText from '../Components/ErrorText';
@@ -40,6 +41,7 @@ type SendProps = {
   syncingStatus: SyncStatus | null;
   syncingStatusMoreInfoOnClick: () => void;
   inRefresh: boolean;
+  translate: (key: string, config?: TranslateOptions) => any;
 };
 
 const Send: React.FunctionComponent<SendProps> = ({
@@ -56,6 +58,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   syncingStatus,
   syncingStatusMoreInfoOnClick,
   inRefresh,
+  translate,
 }) => {
   const { colors } = useTheme() as unknown as ThemeType;
   const [qrcodeModalVisble, setQrcodeModalVisible] = useState(false);
@@ -156,7 +159,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         setValidAmount(-1);
       } else {
         if (
-          Utils.parseLocaleFloat(Number(to.amount).toFixed(8).toString()) > 0 &&
+          Utils.parseLocaleFloat(Number(to.amount).toFixed(8).toString()) >= 0 &&
           Utils.parseLocaleFloat(Number(to.amount).toFixed(8).toString()) <=
             Utils.parseLocaleFloat(getMaxAmount().toFixed(8))
         ) {
@@ -304,18 +307,25 @@ const Send: React.FunctionComponent<SendProps> = ({
 
         navigation.navigate('WALLET');
         setTimeout(() => {
-          Toast.show(`Successfully Broadcast Tx: ${txid}`, Toast.LONG);
+          Toast.show(`${translate('send.Broadcast')} ${txid}`, Toast.LONG);
         }, 1000);
       } catch (err) {
         setTimeout(() => {
           //console.log('sendtx error', err);
-          Alert.alert('Error sending Tx', `${err}`, [{ text: 'OK', onPress: () => setComputingModalVisible(false) }], {
-            cancelable: false,
-          });
+          Alert.alert(
+            translate('send.sending-error'),
+            `${err}`,
+            [{ text: 'OK', onPress: () => setComputingModalVisible(false) }],
+            {
+              cancelable: false,
+            },
+          );
         }, 1000);
       }
     });
   };
+
+  console.log('render send');
 
   return (
     <View
@@ -387,7 +397,7 @@ const Send: React.FunctionComponent<SendProps> = ({
 
               <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                 <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
-                  {syncStatusDisplayLine ? 'Send - Syncing' : 'Send'}
+                  {syncStatusDisplayLine ? translate('send.title-syncing') : translate('send.title')}
                 </RegText>
                 <FadeText style={{ marginTop: 5, padding: 0 }}>
                   {syncStatusDisplayLine ? syncStatusDisplayLine : ''}
@@ -404,7 +414,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         padding: 5,
                         borderRadius: 10,
                       }}>
-                      <FadeText style={{ color: colors.primary }}>more...</FadeText>
+                      <FadeText style={{ color: colors.primary }}>{translate('send.more')}</FadeText>
                       <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
                     </View>
                   </TouchableOpacity>
@@ -427,9 +437,9 @@ const Send: React.FunctionComponent<SendProps> = ({
           return (
             <View key={i} style={{ display: 'flex', padding: 10, marginTop: 10 }}>
               <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                <RegText>To Address</RegText>
+                <RegText>{translate('send.toaddress')}</RegText>
                 {validAddress === 1 && <FontAwesomeIcon icon={faCheck} color={colors.primary} />}
-                {validAddress === -1 && <ErrorText>Invalid Address!</ErrorText>}
+                {validAddress === -1 && <ErrorText>{translate('send.invalidaddress')}</ErrorText>}
               </View>
               <View
                 style={{
@@ -443,7 +453,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                   marginTop: 5,
                 }}>
                 <RegTextInput
-                  placeholder="Z-Sapling or T-Transparent or Unified address"
+                  placeholder={translate('send.addressplaceholder')}
                   placeholderTextColor={colors.placeholder}
                   style={{ flexGrow: 1, maxWidth: '90%' }}
                   value={ta.to}
@@ -460,7 +470,7 @@ const Send: React.FunctionComponent<SendProps> = ({
 
               <View style={{ marginTop: 10, display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                 <FadeText>{'   Amount'}</FadeText>
-                {validAmount === -1 && <ErrorText>Invalid Amount!</ErrorText>}
+                {validAmount === -1 && <ErrorText>{translate('send.invalidamount')}</ErrorText>}
               </View>
 
               <View
@@ -539,7 +549,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                     alignItems: 'center',
                     marginTop: 10,
                   }}>
-                  <RegText>Spendable: </RegText>
+                  <RegText>{translate('send.spendable')}</RegText>
                   <ZecAmount currencyName={currencyName} color={colors.money} size={18} amtZec={getMaxAmount()} />
                 </View>
                 {stillConfirming && (
@@ -553,14 +563,14 @@ const Send: React.FunctionComponent<SendProps> = ({
                       borderRadius: 10,
                     }}>
                     <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
-                    <FadeText>Some funds still confirming or syncing</FadeText>
+                    <FadeText>{translate('send.somefunds')}</FadeText>
                   </View>
                 )}
               </View>
 
               {memoEnabled === true && (
                 <>
-                  <FadeText style={{ marginTop: 30 }}>Memo (Optional)</FadeText>
+                  <FadeText style={{ marginTop: 30 }}>{translate('send.memo')}</FadeText>
                   <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start' }}>
                     <RegTextInput
                       multiline
@@ -590,11 +600,16 @@ const Send: React.FunctionComponent<SendProps> = ({
           }}>
           <Button
             type="Primary"
-            title="Send"
+            title={translate('send.button')}
             disabled={!sendButtonEnabled}
             onPress={() => setConfirmModalVisible(true)}
           />
-          <Button type="Secondary" style={{ marginLeft: 10 }} title="Clear" onPress={() => clearToAddrs()} />
+          <Button
+            type="Secondary"
+            style={{ marginLeft: 10 }}
+            title={translate('send.clear')}
+            onPress={() => clearToAddrs()}
+          />
         </View>
       </ScrollView>
     </View>

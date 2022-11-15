@@ -191,7 +191,7 @@ export class SendProgress {
   sendInProgress: boolean;
   progress: number;
   total: number;
-  etaSeconds: number;
+  etaSeconds: number | string;
 
   constructor() {
     this.sendInProgress = false;
@@ -336,6 +336,5 @@ export default interface AppState {
 
   newServer: string | null;
 
-  error: string | null;
   // eslint-disable-next-line semi
 }

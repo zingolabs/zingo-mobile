@@ -1,16 +1,14 @@
 /* eslint-disable react-native/no-inline-styles */
-/**
- * @format
- */
 import React, { Component, Suspense } from 'react';
 import { View, Alert, SafeAreaView, Image, Text, Modal } from 'react-native';
 import Toast from 'react-native-simple-toast';
 import { useTheme } from '@react-navigation/native';
+import { TranslateOptions } from 'i18n-js';
 
 import BoldText from '../../components/Components/BoldText';
 import Button from '../../components/Button';
 import RPCModule from '../../components/RPCModule';
-import { TotalBalance, SettingsFileEntry } from '../AppState';
+import { TotalBalance, SettingsFileEntry, InfoType } from '../AppState';
 import { SERVER_URI } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import RPC from '../rpc';
@@ -24,6 +22,8 @@ const Seed = React.lazy(() => import('../../components/Seed'));
 
 type LoadingAppProps = {
   navigation: any;
+  route: any;
+  translate: (key: string, config?: TranslateOptions) => any;
 };
 
 export default function LoadingApp(props: LoadingAppProps) {
@@ -34,6 +34,8 @@ export default function LoadingApp(props: LoadingAppProps) {
 
 type LoadingAppClassProps = {
   navigation: any;
+  route: any;
+  translate: (key: string, config?: TranslateOptions) => any;
   theme: ThemeType;
 };
 
@@ -45,6 +47,7 @@ type LoadingAppClassState = {
   birthday: string;
   server: string;
   totalBalance: TotalBalance;
+  info: InfoType | null;
 };
 
 const SERVER_DEFAULT_0 = SERVER_URI[0];
@@ -62,12 +65,16 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
       birthday: '0',
       server: '',
       totalBalance: new TotalBalance(),
+      info: null,
     };
   }
 
   componentDidMount = async () => {
     // First, check if a wallet exists. Do it async so the basic screen has time to render
     setTimeout(async () => {
+      // reading Info
+      const info = await RPC.rpc_getInfoObject();
+      this.setState({ info });
       // read settings file
       let settings: SettingsFileEntry = {};
       if (!this.state.server) {
@@ -93,7 +100,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
           this.navigateToLoaded();
         } else {
           this.setState({ screen: 1 });
-          Alert.alert('Error Reading Wallet', error);
+          Alert.alert(this.props.translate('loadingapp.readingwallet-label'), error);
         }
       } else {
         // console.log('Loading new wallet');
@@ -134,7 +141,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
         //await this.set_wallet_option('transaction_filter_threshold', '500');
       } else {
         this.setState({ walletExists: false, actionButtonsDisabled: false });
-        Alert.alert('Error creating Wallet', seed);
+        Alert.alert(this.props.translate('loadingapp.creatingwallet-label'), seed);
       }
     });
   };
@@ -145,12 +152,12 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
 
   getViewingKeyToRestore = async () => {
     //this.setState({ viewingKey: '', birthday: '0', screen: 3 });
-    Toast.show('We are working on it, comming soon.', Toast.LONG);
+    Toast.show(this.props.translate('workingonit'), Toast.LONG);
   };
 
   getSpendableKeyToRestore = async () => {
     //this.setState({ spendableKey: '', birthday: '0', screen: 3 });
-    Toast.show('We are working on it, comming soon.', Toast.LONG);
+    Toast.show(this.props.translate('workingonit'), Toast.LONG);
   };
 
   doRestore = async (seedPhrase: string, birthday: number) => {
@@ -158,7 +165,10 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
     const { server } = this.state;
 
     if (!seedPhrase) {
-      Alert.alert('Invalid Seed Phrase', 'The seed phrase was invalid');
+      Alert.alert(
+        this.props.translate('loadingapp.invalidseed-label'),
+        this.props.translate('loadingapp.invalidseed-error'),
+      );
       return;
     }
 
@@ -178,7 +188,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
         this.navigateToLoaded();
       } else {
         this.setState({ actionButtonsDisabled: false });
-        Alert.alert('Error reading Wallet', error);
+        Alert.alert(this.props.translate('loadingapp.readingwallet-label'), error);
       }
     });
   };
@@ -188,8 +198,11 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
   };
 
   render() {
-    const { screen, seedPhrase, actionButtonsDisabled, walletExists, server, totalBalance } = this.state;
+    const { screen, seedPhrase, actionButtonsDisabled, walletExists, server, totalBalance, info } = this.state;
     const { colors } = this.props.theme;
+    const { translate } = this.props;
+
+    const currencyName = info ? info.currencyName : undefined;
 
     return (
       <SafeAreaView
@@ -200,7 +213,9 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
           height: '100%',
           backgroundColor: colors.background,
         }}>
-        {screen === 0 && <Text style={{ color: colors.zingo, fontSize: 40, fontWeight: 'bold' }}> Zingo!</Text>}
+        {screen === 0 && (
+          <Text style={{ color: colors.zingo, fontSize: 40, fontWeight: 'bold' }}>{translate('zingo')}</Text>
+        )}
         {screen === 1 && (
           <View
             style={{
@@ -210,20 +225,20 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
               justifyContent: 'center',
             }}>
             <View style={{ marginBottom: 50, display: 'flex', alignItems: 'center' }}>
-              <Text style={{ color: colors.zingo, fontSize: 40, fontWeight: 'bold' }}> Zingo!</Text>
+              <Text style={{ color: colors.zingo, fontSize: 40, fontWeight: 'bold' }}>{translate('zingo')}</Text>
               <Image
                 source={require('../../assets/img/logobig-zingo.png')}
                 style={{ width: 100, height: 100, resizeMode: 'contain', marginTop: 10 }}
               />
             </View>
 
-            <BoldText style={{ fontSize: 15, marginBottom: 3 }}>Actual server:</BoldText>
+            <BoldText style={{ fontSize: 15, marginBottom: 3 }}>{translate('loadingapp.actualserver')}</BoldText>
             <BoldText style={{ fontSize: 15, marginBottom: 10 }}>{server})</BoldText>
 
             {server === SERVER_DEFAULT_1 && (
               <Button
                 type="Primary"
-                title={'CHANGE SERVER'}
+                title={translate('loadingapp.changeserver')}
                 disabled={actionButtonsDisabled}
                 onPress={this.useDefaultServer_0}
                 style={{ marginBottom: 10 }}
@@ -232,7 +247,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
             {server === SERVER_DEFAULT_0 && (
               <Button
                 type="Primary"
-                title={'CHANGE SERVER'}
+                title={translate('loadingapp.changeserver')}
                 disabled={actionButtonsDisabled}
                 onPress={this.useDefaultServer_1}
                 style={{ marginBottom: 10 }}
@@ -241,7 +256,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
             {server !== SERVER_DEFAULT_0 && server !== SERVER_DEFAULT_1 && (
               <Button
                 type="Primary"
-                title={'CHANGE SERVER'}
+                title={translate('loadingapp.changeserver')}
                 disabled={actionButtonsDisabled}
                 onPress={this.useDefaultServer_0}
                 style={{ marginBottom: 10 }}
@@ -250,7 +265,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
 
             <Button
               type="Primary"
-              title="Create New Wallet (new seed)"
+              title={translate('loadingapp.createnewwallet')}
               disabled={actionButtonsDisabled}
               onPress={this.createNewWallet}
               style={{ marginBottom: 10, marginTop: 10 }}
@@ -258,7 +273,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
             {walletExists && (
               <Button
                 type="Primary"
-                title="Open Current wallet"
+                title={translate('loadingapp.opencurrentwallet')}
                 disabled={actionButtonsDisabled}
                 onPress={this.componentDidMount}
                 style={{ marginBottom: 10 }}
@@ -268,21 +283,21 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
             <View style={{ marginTop: 50, display: 'flex', alignItems: 'center' }}>
               <Button
                 type="Secondary"
-                title="Restore wallet from Seed"
+                title={translate('loadingapp.restorewalletseed')}
                 disabled={actionButtonsDisabled}
                 onPress={this.getSeedPhraseToRestore}
                 style={{ margin: 10 }}
               />
               <Button
                 type="Secondary"
-                title="Restore wallet from viewing key"
+                title={translate('loadingapp.restorewalletviewing')}
                 disabled={actionButtonsDisabled}
                 onPress={this.getViewingKeyToRestore}
                 style={{ margin: 10 }}
               />
               <Button
                 type="Secondary"
-                title="Restore wallet from spendable key"
+                title={translate('loadingapp.restorewalletspendable')}
                 disabled={actionButtonsDisabled}
                 onPress={this.getSpendableKeyToRestore}
                 style={{ margin: 10 }}
@@ -299,7 +314,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
             <Suspense
               fallback={
                 <View>
-                  <Text>Loading...</Text>
+                  <Text>{translate('loading')}</Text>
                 </View>
               }>
               <Seed
@@ -309,6 +324,8 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
                 onClickCancel={() => this.navigateToLoaded()}
                 totalBalance={totalBalance}
                 action={'new'}
+                currencyName={currencyName || undefined}
+                translate={translate}
               />
             </Suspense>
           </Modal>
@@ -322,7 +339,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
             <Suspense
               fallback={
                 <View>
-                  <Text>Loading...</Text>
+                  <Text>{translate('loading')}</Text>
                 </View>
               }>
               <Seed
@@ -330,6 +347,8 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
                 onClickCancel={() => this.setState({ screen: 1 })}
                 totalBalance={totalBalance}
                 action={'restore'}
+                currencyName={currencyName || undefined}
+                translate={translate}
               />
             </Suspense>
           </Modal>

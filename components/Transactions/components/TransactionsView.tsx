@@ -6,6 +6,7 @@ import moment from 'moment';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faBars, faInfo } from '@fortawesome/free-solid-svg-icons';
+import { TranslateOptions } from 'i18n-js';
 
 import RPC from '../../../app/rpc';
 import { TotalBalance, Transaction, InfoType, SyncStatus } from '../../../app/AppState';
@@ -27,6 +28,7 @@ type TransactionsViewProps = {
   doRefresh: () => void;
   setComputingModalVisible: (visible: boolean) => void;
   syncingStatusMoreInfoOnClick: () => void;
+  translate: (key: string, config?: TranslateOptions) => any;
 };
 
 const TransactionsView: React.FunctionComponent<TransactionsViewProps> = ({
@@ -38,6 +40,7 @@ const TransactionsView: React.FunctionComponent<TransactionsViewProps> = ({
   doRefresh,
   setComputingModalVisible,
   syncingStatusMoreInfoOnClick,
+  translate,
 }) => {
   const { colors } = useTheme() as unknown as ThemeType;
   const [isTxDetailModalShowing, setTxDetailModalShowing] = React.useState(false);
@@ -77,6 +80,8 @@ const TransactionsView: React.FunctionComponent<TransactionsViewProps> = ({
 
   const balanceColor = transactions?.find(t => t.confirmations === 0) ? colors.primary : colors.text;
   var lastMonth = '';
+
+  console.log('render transaction view');
 
   return (
     <View

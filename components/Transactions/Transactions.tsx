@@ -1,5 +1,6 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
+import { TranslateOptions } from 'i18n-js';
 
 import { TotalBalance, Transaction, InfoType, SyncStatus } from '../../app/AppState';
 import TransactionsView from './components/TransactionsView';
@@ -15,6 +16,7 @@ type TransactionsViewProps = {
   doRefresh: () => void;
   setComputingModalVisible: (visible: boolean) => void;
   syncingStatusMoreInfoOnClick: () => void;
+  translate: (key: string, config?: TranslateOptions) => any;
 };
 
 const Transactions: React.FunctionComponent<TransactionsViewProps> = iprops => {

@@ -2,6 +2,7 @@
 import React from 'react';
 import { View, ScrollView, SafeAreaView, Image } from 'react-native';
 import { useTheme } from '@react-navigation/native';
+import { TranslateOptions } from 'i18n-js';
 
 import RegText from '../Components/RegText';
 import ZecAmount from '../Components/ZecAmount';
@@ -17,9 +18,10 @@ type InfoProps = {
   closeModal: () => void;
   totalBalance: TotalBalance;
   currencyName?: string;
+  translate: (key: string, config?: TranslateOptions) => any;
 };
 
-const Info: React.FunctionComponent<InfoProps> = ({ info, closeModal, totalBalance, currencyName }) => {
+const Info: React.FunctionComponent<InfoProps> = ({ info, closeModal, totalBalance, currencyName, translate }) => {
   const { colors } = useTheme() as unknown as ThemeType;
   const [infoState, setInfoState] = React.useState({} as InfoType);
 
@@ -72,14 +74,20 @@ const Info: React.FunctionComponent<InfoProps> = ({ info, closeModal, totalBalan
           justifyContent: 'flex-start',
         }}>
         <View style={{ display: 'flex', margin: 20 }}>
-          <DetailLine label="Version" value="Zingo! v0.0.67" />
-          <DetailLine label="Server Version" value={infoState.version ? infoState.version : '...loading...'} />
-          <DetailLine label="Lightwalletd URL" value={infoState.serverUri ? infoState.serverUri : '...loading...'} />
+          <DetailLine label={translate('info.version')} value={translate('zingo') + ' ' + translate('version')} />
           <DetailLine
-            label="Network"
+            label={translate('info.serverversion')}
+            value={infoState.version ? infoState.version : translate('loading')}
+          />
+          <DetailLine
+            label={translate('info.lightwalletd')}
+            value={infoState.serverUri ? infoState.serverUri : translate('loading')}
+          />
+          <DetailLine
+            label={translate('info.network')}
             value={
               infoState.chain_name === undefined
-                ? '...loading...'
+                ? translate('loading')
                 : infoState.chain_name === 'main'
                 ? 'Mainnet'
                 : infoState.chain_name === 'test'
@@ -87,17 +95,17 @@ const Info: React.FunctionComponent<InfoProps> = ({ info, closeModal, totalBalan
                 : infoState.chain_name
             }
           />
-          <DetailLine label="Server Block Height" value={info?.latestBlock} />
+          <DetailLine label={translate('info.serverblock')} value={info?.latestBlock} />
           {/* <DetailLine label="Wallet Block Height" value={walletHeight} /> */}
           <DetailLine
-            label="ZEC Price"
+            label={translate('info.zecprice')}
             value={info?.zecPrice ? `$ ${Utils.toLocaleFloat(info?.zecPrice?.toFixed(2))}` : '-'}
           />
         </View>
       </ScrollView>
 
       <View style={{ flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-        <Button type="Secondary" title="Close" onPress={closeModal} />
+        <Button type="Secondary" title={translate('close')} onPress={closeModal} />
       </View>
     </SafeAreaView>
   );

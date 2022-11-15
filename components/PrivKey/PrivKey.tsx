@@ -5,6 +5,7 @@ import { useTheme } from '@react-navigation/native';
 import Clipboard from '@react-native-community/clipboard';
 import Toast from 'react-native-simple-toast';
 import QRCode from 'react-native-qrcode-svg';
+import { TranslateOptions } from 'i18n-js';
 
 import ClickableText from '../Components/ClickableText';
 import FadeText from '../Components/FadeText';
@@ -22,6 +23,7 @@ type PrivKeyProps = {
   privKey: string;
   totalBalance: TotalBalance;
   currencyName?: string;
+  translate: (key: string, config?: TranslateOptions) => any;
 };
 const PrivKey: React.FunctionComponent<PrivKeyProps> = ({
   address,
@@ -30,6 +32,7 @@ const PrivKey: React.FunctionComponent<PrivKeyProps> = ({
   closeModal,
   totalBalance,
   currencyName,
+  translate,
 }) => {
   const { colors } = useTheme() as unknown as ThemeType;
   const fixedWidthFont = Platform.OS === 'android' ? 'monospace' : 'Courier';

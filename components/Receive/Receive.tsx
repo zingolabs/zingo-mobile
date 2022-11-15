@@ -8,6 +8,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faBars, faEllipsisV, faInfo } from '@fortawesome/free-solid-svg-icons';
 import OptionsMenu from 'react-native-option-menu';
+import { TranslateOptions } from 'i18n-js';
 
 import FadeText from '../Components/FadeText';
 import ZecAmount from '../Components/ZecAmount';
@@ -30,6 +31,7 @@ type ReceiveProps = {
   totalBalance: TotalBalance;
   syncingStatus: SyncStatus | null;
   syncingStatusMoreInfoOnClick: () => void;
+  translate: (key: string, config?: TranslateOptions) => any;
 };
 
 const Receive: React.FunctionComponent<ReceiveProps> = ({
@@ -41,6 +43,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   totalBalance,
   syncingStatus,
   syncingStatusMoreInfoOnClick,
+  translate,
 }) => {
   const { colors } = useTheme() as unknown as ThemeType;
   const [index, setIndex] = React.useState(0);
@@ -127,7 +130,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
       }
     } else {
       if (newAddress) {
-        Toast.show(newAddress, Toast.LONG);
+        Toast.show(newAddress + translate('workingonit'), Toast.LONG);
         return;
       }
     }
@@ -194,6 +197,12 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   };
 
   const doImport = async (key: string, birthday: string) => {
+    if (isNaN(parseInt(birthday, 10))) {
+      setTimeout(() => {
+        Toast.show(`${translate('rpc.parsebirthday-error')} ${birthday}`, Toast.LONG);
+      }, 1000);
+      return;
+    }
     const addressList = await RPC.rpc_doImportPrivKey(key, birthday);
     // console.log(addressList);
 
@@ -244,6 +253,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
             closeModal={() => setPrivKeyModalVisible(false)}
             totalBalance={totalBalance}
             currencyName={currencyName}
+            translate={translate}
           />
         </Modal>
 
@@ -257,6 +267,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
             closeModal={() => setImportKeyModalVisible(false)}
             totalBalance={totalBalance}
             currencyName={currencyName}
+            translate={translate}
           />
         </Modal>
 
@@ -344,6 +355,8 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
       </View>
     );
   };
+
+  console.log('render receive');
 
   return (
     <TabView

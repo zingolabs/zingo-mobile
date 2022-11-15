@@ -1,12 +1,13 @@
-/* eslint-disable react-native/no-inline-styles */
 import React, { Component, Suspense } from 'react';
-import { Modal, View, Text } from 'react-native';
+import { Modal, View, Text, Alert } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faList, faUpload, faDownload, faCog, faAddressBook } from '@fortawesome/free-solid-svg-icons';
 import { useTheme } from '@react-navigation/native';
 import SideMenu from 'react-native-side-menu-updated';
 import { isEqual } from 'lodash';
+import Toast from 'react-native-simple-toast';
+import { TranslateOptions } from 'i18n-js';
 
 import RPC from '../rpc';
 import RPCModule from '../../components/RPCModule';
@@ -26,7 +27,6 @@ import AppState, {
   SettingsFileEntry,
   Address,
 } from '../AppState';
-import FadeText from '../../components/Components/FadeText';
 import Utils from '../utils';
 import { ThemeType } from '../types';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
@@ -49,6 +49,8 @@ const Tab = createBottomTabNavigator();
 
 type LoadedAppProps = {
   navigation: any;
+  route: any;
+  translate: (key: string, config?: TranslateOptions) => any;
 };
 
 export default function LoadedApp(props: LoadedAppProps) {
@@ -59,6 +61,8 @@ export default function LoadedApp(props: LoadedAppProps) {
 
 type LoadedAppClassProps = {
   navigation: any;
+  route: any;
+  translate: (key: string, config?: TranslateOptions) => any;
   theme: ThemeType;
 };
 
@@ -97,7 +101,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
       seedServerModalVisible: false,
       syncReportModalVisible: false,
       newServer: null,
-      error: null,
     };
 
     this.rpc = new RPC(
@@ -109,6 +112,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
       this.setInfo,
       this.setZecPrice,
       this.refreshUpdates,
+      this.props.translate,
     );
 
     // Create the initial ToAddr box
@@ -383,14 +387,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
       this.setState({ seedChangeModalVisible: true });
     } else if (item === 'Restore Wallet Backup') {
       if (info && info.currencyName !== 'ZEC') {
-        this.setState({
-          error: 'This option is only available for Mainnet servers.',
-        });
-        setTimeout(() => {
-          this.setState({
-            error: null,
-          });
-        }, 5000);
+        Toast.show(this.props.translate('loadedapp.restoremainnet-error'), Toast.LONG);
         return;
       }
       await this.fetchWalletSeed();
@@ -409,14 +406,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
     const resultStrServer: string = await RPCModule.execute('changeserver', value);
     if (resultStrServer.toLowerCase().startsWith('error')) {
       // console.log(`Error change server ${value} - ${resultStrServer}`);
-      this.setState({
-        error: `Error trying to change the server to the new one: ${value}`,
-      });
-      setTimeout(() => {
-        this.setState({
-          error: null,
-        });
-      }, 5000);
+      Toast.show(`${this.props.translate('loadedapp.changeservernew-error')} ${value}`, Toast.LONG);
       return;
     } else {
       // console.log(`change server ok ${value}`);
@@ -433,27 +423,13 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
       return;
     } else {
       // console.log(`Error Reading Wallet ${value} - ${error}`);
-      this.setState({
-        error: `Error trying to read the wallet with the new server: ${value}`,
-      });
-      setTimeout(() => {
-        this.setState({
-          error: null,
-        });
-      }, 5000);
+      Toast.show(`${this.props.translate('loadedapp.readingwallet-error')} ${value}`, Toast.LONG);
 
       const old_settings = await SettingsFileImpl.readSettings();
       const resultStr: string = await RPCModule.execute('changeserver', old_settings.server);
       if (resultStr.toLowerCase().startsWith('error')) {
         // console.log(`Error change server ${old_settings.server} - ${resultStr}`);
-        this.setState({
-          error: `Error trying to change the server to the old one: ${old_settings.server}`,
-        });
-        setTimeout(() => {
-          this.setState({
-            error: null,
-          });
-        }, 5000);
+        Toast.show(`${this.props.translate('loadedapp.changeserverold-error')} ${value}`, Toast.LONG);
         //return;
       } else {
         // console.log(`change server ok ${old_settings.server} - ${resultStr}`);
@@ -486,14 +462,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
     //console.log("jc change", resultStr);
     if (resultStr.toLowerCase().startsWith('error')) {
       // console.log(`Error change wallet. ${resultStr}`);
-      this.setState({
-        error: `${resultStr}`,
-      });
-      setTimeout(() => {
-        this.setState({
-          error: null,
-        });
-      }, 5000);
+      Alert.alert(this.props.translate('loadedapp.changingwallet-label'), resultStr);
       return;
     }
 
@@ -508,14 +477,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
     //console.log("jc restore", resultStr);
     if (resultStr.toLowerCase().startsWith('error')) {
       // console.log(`Error restore backup wallet. ${resultStr}`);
-      this.setState({
-        error: `${resultStr}`,
-      });
-      setTimeout(() => {
-        this.setState({
-          error: null,
-        });
-      }, 5000);
+      Alert.alert(this.props.translate('loadedapp.restoringwallet-label'), resultStr);
       return;
     }
 
@@ -528,14 +490,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
     const resultStr: string = await RPCModule.execute('changeserver', this.state.newServer);
     if (resultStr.toLowerCase().startsWith('error')) {
       // console.log(`Error change server ${value} - ${resultStr}`);
-      this.setState({
-        error: `Error trying to change the server to the new one: ${this.state.newServer}`,
-      });
-      setTimeout(() => {
-        this.setState({
-          error: null,
-        });
-      }, 5000);
+      Toast.show(`${this.props.translate('loadedapp.changeservernew-error')} ${resultStr}`, Toast.LONG);
       return;
     } else {
       // console.log(`change server ok ${value}`);
@@ -552,14 +507,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
     //console.log("jc change", resultStr);
     if (resultStr2.toLowerCase().startsWith('error')) {
       // console.log(`Error change wallet. ${resultStr}`);
-      this.setState({
-        error: `${resultStr2}`,
-      });
-      setTimeout(() => {
-        this.setState({
-          error: null,
-        });
-      }, 5000);
+      Alert.alert(this.props.translate('loadedapp.changingwallet-label'), resultStr2);
       //return;
     }
 
@@ -590,9 +538,9 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
       walletSeed,
       syncingStatus,
       txBuildProgress,
-      error,
     } = this.state;
     const { colors } = this.props.theme;
+    const { translate } = this.props;
 
     const standardProps = {
       openErrorModal: this.openErrorModal,
@@ -600,6 +548,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
       info,
       toggleMenuDrawer: this.toggleMenuDrawer,
       fetchTotalBalance: this.fetchTotalBalance,
+      translate: translate,
     };
 
     const menu = (
@@ -609,7 +558,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
             <Text>Loading...</Text>
           </View>
         }>
-        <Menu onItemSelected={this.onMenuItemSelected} />
+        <Menu onItemSelected={this.onMenuItemSelected} translate={this.props.translate} />
       </Suspense>
     );
     const currencyName = info ? info.currencyName : undefined;
@@ -634,6 +583,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
     };
 
     console.log('render LoadedApp');
+    //const res = async () => await RPCModule.execute('testbip', '');
+    //res().then(r => console.log(r));
 
     return (
       <SideMenu
@@ -648,13 +599,14 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
           <Suspense
             fallback={
               <View>
-                <Text>Loading...</Text>
+                <Text>{this.props.translate('loading')}</Text>
               </View>
             }>
             <About
               closeModal={() => this.setState({ aboutModalVisible: false })}
               totalBalance={totalBalance}
               currencyName={currencyName || undefined}
+              translate={translate}
             />
           </Suspense>
         </Modal>
@@ -667,7 +619,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
           <Suspense
             fallback={
               <View>
-                <Text>Loading...</Text>
+                <Text>{this.props.translate('loading')}</Text>
               </View>
             }>
             <Info
@@ -675,6 +627,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
               info={info}
               totalBalance={totalBalance}
               currencyName={currencyName || undefined}
+              translate={translate}
             />
           </Suspense>
         </Modal>
@@ -687,13 +640,14 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
           <Suspense
             fallback={
               <View>
-                <Text>Loading...</Text>
+                <Text>{this.props.translate('loading')}</Text>
               </View>
             }>
             <SyncReport
               closeModal={() => this.setState({ syncReportModalVisible: false })}
               syncStatusReport={syncStatusReport}
               birthday={walletSeed?.birthday}
+              translate={translate}
             />
           </Suspense>
         </Modal>
@@ -706,7 +660,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
           <Suspense
             fallback={
               <View>
-                <Text>Loading...</Text>
+                <Text>{this.props.translate('loading')}</Text>
               </View>
             }>
             <Rescan
@@ -715,6 +669,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
               startRescan={this.startRescan}
               totalBalance={totalBalance}
               currencyName={currencyName || undefined}
+              translate={translate}
             />
           </Suspense>
         </Modal>
@@ -727,7 +682,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
           <Suspense
             fallback={
               <View>
-                <Text>Loading...</Text>
+                <Text>{this.props.translate('loading')}</Text>
               </View>
             }>
             <Settings
@@ -737,6 +692,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
               set_server_option={this.set_server_option}
               totalBalance={totalBalance}
               currencyName={currencyName || undefined}
+              translate={translate}
             />
           </Suspense>
         </Modal>
@@ -749,7 +705,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
           <Suspense
             fallback={
               <View>
-                <Text>Loading...</Text>
+                <Text>{this.props.translate('loading')}</Text>
               </View>
             }>
             <Seed
@@ -759,8 +715,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
               onClickCancel={() => this.setState({ seedViewModalVisible: false })}
               totalBalance={totalBalance}
               action={'view'}
-              error={error || undefined}
               currencyName={currencyName || undefined}
+              translate={translate}
             />
           </Suspense>
         </Modal>
@@ -773,7 +729,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
           <Suspense
             fallback={
               <View>
-                <Text>Loading...</Text>
+                <Text>{this.props.translate('loading')}</Text>
               </View>
             }>
             <Seed
@@ -783,8 +739,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
               onClickCancel={() => this.setState({ seedChangeModalVisible: false })}
               totalBalance={totalBalance}
               action={'change'}
-              error={error || undefined}
               currencyName={currencyName || undefined}
+              translate={translate}
             />
           </Suspense>
         </Modal>
@@ -797,7 +753,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
           <Suspense
             fallback={
               <View>
-                <Text>Loading...</Text>
+                <Text>{this.props.translate('loading')}</Text>
               </View>
             }>
             <Seed
@@ -807,8 +763,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
               onClickCancel={() => this.setState({ seedBackupModalVisible: false })}
               totalBalance={totalBalance}
               action={'backup'}
-              error={error || undefined}
               currencyName={currencyName || undefined}
+              translate={translate}
             />
           </Suspense>
         </Modal>
@@ -821,7 +777,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
           <Suspense
             fallback={
               <View>
-                <Text>Loading...</Text>
+                <Text>{this.props.translate('loading')}</Text>
               </View>
             }>
             <Seed
@@ -831,8 +787,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
               onClickCancel={() => this.setState({ seedServerModalVisible: false })}
               totalBalance={totalBalance}
               action={'server'}
-              error={error || undefined}
               currencyName={currencyName || undefined}
+              translate={translate}
             />
           </Suspense>
         </Modal>
@@ -845,10 +801,10 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
           <Suspense
             fallback={
               <View>
-                <Text>Loading...</Text>
+                <Text>{this.props.translate('loading')}</Text>
               </View>
             }>
-            <ComputingTxContent progress={txBuildProgress} />
+            <ComputingTxContent progress={txBuildProgress} translate={translate} />
           </Suspense>
         </Modal>
 
@@ -869,7 +825,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
                 <Suspense
                   fallback={
                     <View>
-                      <Text>Loading...</Text>
+                      <Text>{this.props.translate('loading')}</Text>
                     </View>
                   }>
                   <Send
@@ -890,11 +846,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
                     inRefresh={this.rpc.inRefresh}
                   />
                 </Suspense>
-                {error && (
-                  <FadeText style={{ color: colors.primary, textAlign: 'center', width: '100%', marginBottom: 5 }}>
-                    {error}
-                  </FadeText>
-                )}
               </>
             )}
           </Tab.Screen>
@@ -904,7 +855,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
                 <Suspense
                   fallback={
                     <View>
-                      <Text>Loading...</Text>
+                      <Text>{this.props.translate('loading')}</Text>
                     </View>
                   }>
                   <Transactions
@@ -921,11 +872,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
                     }}
                   />
                 </Suspense>
-                {error && (
-                  <FadeText style={{ color: colors.primary, textAlign: 'center', width: '100%', marginBottom: 5 }}>
-                    {error}
-                  </FadeText>
-                )}
               </>
             )}
           </Tab.Screen>
@@ -935,7 +881,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
                 <Suspense
                   fallback={
                     <View>
-                      <Text>Loading...</Text>
+                      <Text>{this.props.translate('loading')}</Text>
                     </View>
                   }>
                   <Receive
@@ -952,11 +898,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
                     }}
                   />
                 </Suspense>
-                {error && (
-                  <FadeText style={{ color: colors.primary, textAlign: 'center', width: '100%', marginBottom: 5 }}>
-                    {error}
-                  </FadeText>
-                )}
               </>
             )}
           </Tab.Screen>
@@ -966,7 +907,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
                 <Suspense
                   fallback={
                     <View>
-                      <Text>Loading...</Text>
+                      <Text>{this.props.translate('loading')}</Text>
                     </View>
                   }>
                   <Legacy
@@ -978,11 +919,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
                     info={info}
                   />
                 </Suspense>
-                {error && (
-                  <FadeText style={{ color: colors.primary, textAlign: 'center', width: '100%', marginBottom: 5 }}>
-                    {error}
-                  </FadeText>
-                )}
               </>
             )}
           </Tab.Screen>

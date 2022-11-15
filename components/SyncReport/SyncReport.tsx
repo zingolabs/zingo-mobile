@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { View, ScrollView, SafeAreaView, Image, Text } from 'react-native';
 import { useTheme } from '@react-navigation/native';
+import { TranslateOptions } from 'i18n-js';
 
 import { ThemeType } from '../../app/types';
 import RegText from '../Components/RegText';
@@ -13,9 +14,15 @@ type SyncReportProps = {
   closeModal: () => void;
   syncStatusReport: SyncStatusReport;
   birthday?: number;
+  translate: (key: string, config?: TranslateOptions) => any;
 };
 
-const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal, syncStatusReport, birthday }) => {
+const SyncReport: React.FunctionComponent<SyncReportProps> = ({
+  closeModal,
+  syncStatusReport,
+  birthday,
+  translate,
+}) => {
   const { colors } = useTheme() as unknown as ThemeType;
   const [maxBlocks, setMaxBlocks] = useState(0);
   const [points, setPoints] = useState([] as number[]);

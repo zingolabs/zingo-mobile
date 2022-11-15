@@ -4,6 +4,7 @@ import { View, ScrollView, SafeAreaView, Image, TouchableOpacity, Modal } from '
 import { useTheme } from '@react-navigation/native';
 import { faQrcode } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { TranslateOptions } from 'i18n-js';
 
 import FadeText from '../Components/FadeText';
 import RegText from '../Components/RegText';
@@ -19,8 +20,15 @@ type ImportKeyProps = {
   doImport: (keyText: string, birthday: string) => void;
   totalBalance: TotalBalance;
   currencyName?: string;
+  translate: (key: string, config?: TranslateOptions) => any;
 };
-const ImportKey: React.FunctionComponent<ImportKeyProps> = ({ closeModal, doImport, totalBalance, currencyName }) => {
+const ImportKey: React.FunctionComponent<ImportKeyProps> = ({
+  closeModal,
+  doImport,
+  totalBalance,
+  currencyName,
+  translate,
+}) => {
   const { colors } = useTheme() as unknown as ThemeType;
 
   const [privKeyText, setPrivKeyText] = useState('');

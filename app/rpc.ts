@@ -1,3 +1,5 @@
+import { TranslateOptions } from 'i18n-js';
+
 import {
   SyncStatusReport,
   TotalBalance,
@@ -23,6 +25,7 @@ export default class RPC {
   fnSetZecPrice: (price: number | null) => void;
   fnSetRefreshUpdates: (inProgress: boolean, progress: number, blocks: string) => void;
   fnSetWalletSettings: (settings: WalletSettings) => void;
+  translate: (key: string, config?: TranslateOptions) => any;
 
   refreshTimerID: number | null;
   updateTimerID?: number;
@@ -52,6 +55,7 @@ export default class RPC {
     fnSetInfo: (info: InfoType) => void,
     fnSetZecPrice: (price: number | null) => void,
     fnSetRefreshUpdates: (inProgress: boolean, progress: number, blocks: string) => void,
+    translate: (key: string, config?: TranslateOptions) => string,
   ) {
     this.fnSetSyncStatusReport = fnSetSyncStatusReport;
     this.fnSetTotalBalance = fnSetTotalBalance;
@@ -61,6 +65,7 @@ export default class RPC {
     this.fnSetInfo = fnSetInfo;
     this.fnSetZecPrice = fnSetZecPrice;
     this.fnSetRefreshUpdates = fnSetRefreshUpdates;
+    this.translate = translate;
 
     this.refreshTimerID = null;
     this.updateTimerID = undefined;
@@ -193,7 +198,7 @@ export default class RPC {
   static async rpc_createNewAddress(addressType: 'z' | 't' | 'u'): Promise<string | null> {
     // 'z' 't' or 'u'
     if (addressType) {
-      return 'Error: We are working on it, comming soon.';
+      return 'Error: ';
     } else {
       return null;
     }
@@ -216,10 +221,6 @@ export default class RPC {
   }
 
   static async rpc_doImportPrivKey(key: string, birthday: string): Promise<string | string[] | null> {
-    if (isNaN(parseInt(birthday, 10))) {
-      return `Error: Couldn't parse ${birthday} as a number`;
-    }
-
     const args = { key, birthday: parseInt(birthday, 10), norescan: true };
     const address = await RPCModule.execute('import', JSON.stringify(args));
 
@@ -464,7 +465,7 @@ export default class RPC {
       this.prev_sync_id = -1;
       this.seconds_batch = 0;
       this.batches = 0;
-      this.message = 'Sync process started';
+      this.message = this.translate('rpc.syncstart-message');
       this.process_end_block = this.lastWalletBlockHeight;
 
       // This is async, so when it is done, we finish the refresh.
@@ -514,7 +515,7 @@ export default class RPC {
             this.prevBatchNum = -1;
             this.seconds_batch = 0;
             this.batches = 0;
-            this.message = 'Sync process started';
+            this.message = this.translate('rpc.syncstart-message');
             this.process_end_block = this.lastWalletBlockHeight;
           }
           this.prev_sync_id = ss.sync_id;
@@ -590,7 +591,7 @@ export default class RPC {
         this.fnSetRefreshUpdates(
           ss.in_progress,
           0,
-          current_block.toFixed(0).toString() + ' of ' + this.lastServerBlockHeight.toString(),
+          current_block.toFixed(0).toString() + ` ${this.translate('rpc.of')} ` + this.lastServerBlockHeight.toString(),
         );
 
         // store SyncStatusReport object for a new screen
@@ -630,7 +631,7 @@ export default class RPC {
           await RPCModule.doSave();
           this.prevProgress = 0;
           progress = 0;
-          this.message = 'The sync process finished successfully.';
+          this.message = this.translate('rpc.syncend-message');
 
           // I know it's finished.
           this.fnSetRefreshUpdates(false, 0, '');
@@ -668,7 +669,7 @@ export default class RPC {
 
               await RPCModule.doSave();
               this.batches = 0;
-              this.message = `Stored the wallet because batch: ${batch_num + 1} is finished.`;
+              this.message = this.translate('rpc.walletstored-message') + ` ${batch_num + 1}`;
 
               // store SyncStatusReport object for a new screen
               const statusBatch: SyncStatusReport = {
@@ -706,7 +707,7 @@ export default class RPC {
             await this.fetchServerHeight();
 
             await RPCModule.doSave();
-            this.message = `Stored the wallet. ${this.seconds_batch} seconds.`;
+            this.message = this.translate('rpc.sixtyseconds-message') + ` ${batch_num + 1}`;
 
             // store SyncStatusReport object for a new screen
             const statusSeconds: SyncStatusReport = {
@@ -1097,7 +1098,7 @@ export default class RPC {
       await RPCModule.doSaveBackup();
       await RPCModule.deleteExistingWallet();
     } else {
-      return "Error: Couldn't find any wallet.";
+      return this.translate('rpc.walletnotfound-error');
     }
     return '';
   }
@@ -1109,7 +1110,7 @@ export default class RPC {
     if (exists && exists !== 'false') {
       await RPCModule.deleteExistingWallet();
     } else {
-      return "Error: Couldn't find any wallet.";
+      return this.translate('rpc.walletnotfound-error');
     }
     return '';
   }
@@ -1125,10 +1126,10 @@ export default class RPC {
       if (existsWallet && existsWallet !== 'false') {
         await RPCModule.restoreExistingWalletBackup();
       } else {
-        return "Error: Couldn't find any wallet.";
+        return this.translate('rpc.walletnotfound-error');
       }
     } else {
-      return "Error: Couldn't find any backup of any wallet.";
+      return this.translate('rpc.backupnotfound-error');
     }
     return '';
   }

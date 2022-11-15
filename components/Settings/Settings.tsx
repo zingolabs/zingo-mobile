@@ -5,13 +5,14 @@ import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faDotCircle } from '@fortawesome/free-solid-svg-icons';
 import { faCircle as farCircle } from '@fortawesome/free-regular-svg-icons';
+import { TranslateOptions } from 'i18n-js';
 
 import RegText from '../Components/RegText';
 import FadeText from '../Components/FadeText';
 import BoldText from '../Components/BoldText';
 import RegTextInput from '../Components/RegTextInput';
 import ZecAmount from '../Components/ZecAmount';
-import { parseServerURI, SERVER_URI, MEMOS } from '../../app/uris';
+import { parseServerURI, SERVER_URI } from '../../app/uris';
 import Button from '../Button';
 import { WalletSettings, TotalBalance } from '../../app/AppState';
 import { ThemeType } from '../../app/types';
@@ -23,6 +24,12 @@ type SettingsProps = {
   set_server_option: (server: string) => void;
   totalBalance: TotalBalance;
   currencyName?: string;
+  translate: (key: string, config?: TranslateOptions) => any;
+};
+
+type Memos = {
+  value: string;
+  text: string;
 };
 
 const Settings: React.FunctionComponent<SettingsProps> = ({
@@ -32,7 +39,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   closeModal,
   totalBalance,
   currencyName,
+  translate,
 }) => {
+  const MEMOS: Memos[] = translate('settings.memos');
   const { colors } = useTheme() as unknown as ThemeType;
 
   const [memos, setMemos] = React.useState(wallet_settings.download_memos);
