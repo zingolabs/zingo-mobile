@@ -205,7 +205,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
       return;
     }
     const addressList = await RPC.rpc_doImportPrivKey(key, birthday);
-    // console.log(addressList);
+    //console.log(addressList);
 
     if (typeof addressList === 'string' && addressList.startsWith('Error')) {
       // Show the toast in settimeout, because it sometimes gets lost.
@@ -363,7 +363,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     );
   };
 
-  console.log('render receive');
+  //console.log('render receive');
 
   return (
     <TabView

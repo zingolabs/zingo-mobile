@@ -81,7 +81,7 @@ const TransactionsView: React.FunctionComponent<TransactionsViewProps> = ({
   const balanceColor = transactions?.find(t => t.confirmations === 0) ? colors.primary : colors.text;
   var lastMonth = '';
 
-  console.log('render transaction view');
+  //console.log('render transaction view');
 
   return (
     <View

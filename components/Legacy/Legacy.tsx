@@ -270,7 +270,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({
       return;
     }
     const addressList = await RPC.rpc_doImportPrivKey(key, birthday);
-    // console.log(addressList);
+    //console.log(addressList);
 
     if (typeof addressList === 'string' && addressList.startsWith('Error')) {
       // Show the toast in settimeout, because it sometimes gets lost.
@@ -405,7 +405,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({
     );
   };
 
-  console.log('render legacy');
+  //console.log('render legacy');
 
   return (
     <TabView

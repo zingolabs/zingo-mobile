@@ -103,7 +103,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
           Alert.alert(this.props.translate('loadingapp.readingwallet-label'), error);
         }
       } else {
-        // console.log('Loading new wallet');
+        //console.log('Loading new wallet');
         this.setState({ screen: 1, walletExists: false });
       }
     });

@@ -325,7 +325,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     });
   };
 
-  console.log('render send');
+  //console.log('render send');
 
   return (
     <View

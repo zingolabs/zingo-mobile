@@ -91,7 +91,7 @@ export default class RPC {
     const r = await RPCModule.execute('setoption', `${name}=${value}`);
 
     await RPCModule.doSave();
-    // console.log(r);
+    //console.log(r);
     return r;
   }
 
@@ -102,13 +102,13 @@ export default class RPC {
       //console.log(infostr);
       const infoJSON = await JSON.parse(infostr);
 
-      // console.log(infoJSON);
+      //console.log(infoJSON);
 
       const defaultFee = await RPCModule.execute('defaultfee', '');
       //console.log(defaultFee);
       const defaultFeeJSON = await JSON.parse(defaultFee);
 
-      // console.log(defaultFeeJSON);
+      //console.log(defaultFeeJSON);
 
       const info: InfoType = {
         chain_name: infoJSON.chain_name,
@@ -234,7 +234,7 @@ export default class RPC {
   static async rpc_shieldTransparent(): Promise<string | null> {
     const shieldStr = await RPCModule.execute('shield', '');
 
-    // console.log(shieldStr);
+    //console.log(shieldStr);
 
     if (shieldStr) {
       return shieldStr;
@@ -363,7 +363,7 @@ export default class RPC {
   async doSyncStatus(): Promise<string | null> {
     const syncstr = await RPCModule.execute('syncstatus', '');
 
-    // console.log(`syncstatus: ${syncstr}`);
+    //console.log(`syncstatus: ${syncstr}`);
 
     if (syncstr) {
       return syncstr;
@@ -387,7 +387,7 @@ export default class RPC {
   async doSendProgress(): Promise<string | null> {
     const sendstr = await RPCModule.execute('sendprogress', '');
 
-    // console.log(`sendprogress: ${sendstr}`);
+    //console.log(`sendprogress: ${sendstr}`);
 
     if (sendstr) {
       return sendstr;
@@ -404,7 +404,7 @@ export default class RPC {
   }
 
   async rescan() {
-    // console.log('RPC Rescan triggered');
+    //console.log('RPC Rescan triggered');
     // Empty out the transactions list to start with.
     await this.fnSetTransactionsList([]);
 
@@ -999,7 +999,7 @@ export default class RPC {
     }
 
     const prevSendId = prevProgress.id;
-    console.log('prev progress', prevProgress);
+    //console.log('prev progress', prevProgress);
 
     // This is async, so fire and forget
     this.doSend(JSON.stringify(sendJson))
@@ -1017,7 +1017,7 @@ export default class RPC {
         }
         const progress = await JSON.parse(pro);
         const sendId = progress.id;
-        console.log('progress', progress);
+        //console.log('progress', progress);
 
         const updatedProgress = new SendProgress();
         if (sendId === prevSendId) {
@@ -1032,16 +1032,16 @@ export default class RPC {
           const currentTimeSeconds = new Date().getTime() / 1000;
           secondsPerComputation = (currentTimeSeconds - startTimeSeconds) / progress.progress;
         }
-        console.log(`Seconds Per compute = ${secondsPerComputation}`);
+        //console.log(`Seconds Per compute = ${secondsPerComputation}`);
 
         //let eta = Math.round((progress.total - progress.progress) * secondsPerComputation);
         let eta = Math.round((4 - progress.progress) * secondsPerComputation);
-        console.log(`ETA = ${eta}`);
+        //console.log(`ETA = ${eta}`);
         if (eta <= 0) {
           eta = 1;
         }
 
-        console.log(`ETA calculated = ${eta}`);
+        //console.log(`ETA calculated = ${eta}`);
 
         updatedProgress.progress = progress.progress;
         //updatedProgress.total = Math.max(progress.total, progress.progress); // sometimes, due to change, the total can be off by 1

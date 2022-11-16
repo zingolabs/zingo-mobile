@@ -35,7 +35,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
 
   const sendingTotal = Number(sendPageState.toaddrs[0].amount) + defaultFee;
 
-  console.log(sendPageState, price, defaultFee);
+  //console.log(sendPageState, price, defaultFee);
 
   return (
     <SafeAreaView

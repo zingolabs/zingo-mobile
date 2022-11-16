@@ -32,7 +32,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   next,
   translate,
 }) => {
-  // console.log(`Addresses ${addresses}: ${multipleAddresses}`);
+  //console.log(`Addresses ${addresses}: ${multipleAddresses}`);
   const { colors } = useTheme() as unknown as ThemeType;
 
   const multi = total > 1;

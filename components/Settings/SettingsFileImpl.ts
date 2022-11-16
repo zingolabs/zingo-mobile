@@ -13,10 +13,10 @@ export default class SettingsFileImpl {
 
     RNFS.writeFile(fileName, JSON.stringify(ss), 'utf8')
       .then(() => {
-        // console.log('FILE WRITTEN!')
+        //console.log('FILE WRITTEN!')
       })
       .catch(() => {
-        // console.log(err.message)
+        //console.log(err.message)
       });
   }
 
@@ -28,7 +28,7 @@ export default class SettingsFileImpl {
       return JSON.parse((await RNFS.readFile(fileName, 'utf8')).toString());
     } catch (err) {
       // File probably doesn't exist, so return nothing
-      // console.log(err);
+      //console.log(err);
       return {};
     }
   }

@@ -152,7 +152,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
 
   setTotalBalance = (totalBalance: TotalBalance) => {
     if (!isEqual(this.state.totalBalance, totalBalance)) {
-      console.log('total balance');
+      //console.log('total balance');
       this.setState({ totalBalance });
     }
   };
@@ -163,14 +163,14 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
 
   setTransactionList = (transactions: Transaction[]) => {
     if (!isEqual(this.state.transactions, transactions)) {
-      console.log('transactions');
+      //console.log('transactions');
       this.setState({ transactions });
     }
   };
 
   setAllAddresses = (addresses: Address[]) => {
     if (!isEqual(this.state.addresses, addresses)) {
-      console.log('addresses');
+      //console.log('addresses');
       this.setState({ addresses });
     }
   };
@@ -268,8 +268,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
       }
     });
 
-    // console.log('Sending:');
-    // console.log(json);
+    //console.log('Sending:');
+    //console.log(json);
 
     return json;
   };
@@ -282,7 +282,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
 
       return txid;
     } catch (err) {
-      // console.log('route sendtx error', err);
+      //console.log('route sendtx error', err);
       throw err;
     }
   };
@@ -309,7 +309,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
   createNewAddress = async (addressType: 'z' | 't' | 'u') => {
     // Create a new address
     const newaddress = await RPC.rpc_createNewAddress(addressType);
-    // console.log(`Created new Address ${newaddress}`);
+    //console.log(`Created new Address ${newaddress}`);
 
     // And then fetch the list of addresses again to refresh (totalBalance gets all addresses)
     this.fetchTotalBalance();
@@ -405,34 +405,34 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
   set_server_option = async (value: string) => {
     const resultStrServer: string = await RPCModule.execute('changeserver', value);
     if (resultStrServer.toLowerCase().startsWith('error')) {
-      // console.log(`Error change server ${value} - ${resultStrServer}`);
+      //console.log(`Error change server ${value} - ${resultStrServer}`);
       Toast.show(`${this.props.translate('loadedapp.changeservernew-error')} ${value}`, Toast.LONG);
       return;
     } else {
-      // console.log(`change server ok ${value}`);
+      //console.log(`change server ok ${value}`);
     }
 
     await this.rpc.setInRefresh(false);
     const error = await RPCModule.loadExistingWallet(value);
     if (!error.toLowerCase().startsWith('error')) {
       // Load the wallet and navigate to the transactions screen
-      // console.log(`wallet loaded ok ${value}`);
+      //console.log(`wallet loaded ok ${value}`);
       await SettingsFileImpl.writeSettings(new SettingsFileEntry(value));
       // Refetch the settings to update
       this.rpc.fetchWalletSettings();
       return;
     } else {
-      // console.log(`Error Reading Wallet ${value} - ${error}`);
+      //console.log(`Error Reading Wallet ${value} - ${error}`);
       Toast.show(`${this.props.translate('loadedapp.readingwallet-error')} ${value}`, Toast.LONG);
 
       const old_settings = await SettingsFileImpl.readSettings();
       const resultStr: string = await RPCModule.execute('changeserver', old_settings.server);
       if (resultStr.toLowerCase().startsWith('error')) {
-        // console.log(`Error change server ${old_settings.server} - ${resultStr}`);
+        //console.log(`Error change server ${old_settings.server} - ${resultStr}`);
         Toast.show(`${this.props.translate('loadedapp.changeserverold-error')} ${value}`, Toast.LONG);
         //return;
       } else {
-        // console.log(`change server ok ${old_settings.server} - ${resultStr}`);
+        //console.log(`change server ok ${old_settings.server} - ${resultStr}`);
       }
 
       // go to the seed screen for changing the wallet for another in the new server
@@ -461,7 +461,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
 
     //console.log("jc change", resultStr);
     if (resultStr.toLowerCase().startsWith('error')) {
-      // console.log(`Error change wallet. ${resultStr}`);
+      //console.log(`Error change wallet. ${resultStr}`);
       Alert.alert(this.props.translate('loadedapp.changingwallet-label'), resultStr);
       return;
     }
@@ -476,7 +476,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
 
     //console.log("jc restore", resultStr);
     if (resultStr.toLowerCase().startsWith('error')) {
-      // console.log(`Error restore backup wallet. ${resultStr}`);
+      //console.log(`Error restore backup wallet. ${resultStr}`);
       Alert.alert(this.props.translate('loadedapp.restoringwallet-label'), resultStr);
       return;
     }
@@ -489,11 +489,11 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
   onClickOKServerWallet = async () => {
     const resultStr: string = await RPCModule.execute('changeserver', this.state.newServer);
     if (resultStr.toLowerCase().startsWith('error')) {
-      // console.log(`Error change server ${value} - ${resultStr}`);
+      //console.log(`Error change server ${value} - ${resultStr}`);
       Toast.show(`${this.props.translate('loadedapp.changeservernew-error')} ${resultStr}`, Toast.LONG);
       return;
     } else {
-      // console.log(`change server ok ${value}`);
+      //console.log(`change server ok ${value}`);
     }
 
     if (this.state.newServer) {
@@ -506,7 +506,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
       info && info.currencyName !== 'ZEC' ? await this.rpc.changeWalletNoBackup() : await this.rpc.changeWallet();
     //console.log("jc change", resultStr);
     if (resultStr2.toLowerCase().startsWith('error')) {
-      // console.log(`Error change wallet. ${resultStr}`);
+      //console.log(`Error change wallet. ${resultStr}`);
       Alert.alert(this.props.translate('loadedapp.changingwallet-label'), resultStr2);
       //return;
     }
@@ -582,7 +582,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
       return <FontAwesomeIcon icon={iconName} color={iconColor} />;
     };
 
-    console.log('render LoadedApp');
+    //console.log('render LoadedApp');
     //const res = async () => await RPCModule.execute('testbip', '');
     //res().then(r => console.log(r));
 
