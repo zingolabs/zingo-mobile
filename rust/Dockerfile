@@ -43,6 +43,29 @@ RUN rustup target add aarch64-linux-android \
     i686-linux-android \
     x86_64-linux-android
 
+RUN rustup target install aarch64-linux-android
+RUN echo "[target.aarch64-linux-android]" >> $CARGO_HOME/config.toml
+RUN echo "ar = \"llvm-ar\"" >> $CARGO_HOME/config.toml
+RUN echo "linker = \"aarch64-linux-android23-clang\"" >> $CARGO_HOME/config.toml
+RUN echo "" >> $CARGO_HOME/config.toml
+
+RUN rustup target install armv7-linux-androideabi
+RUN echo "[target.armv7-linux-androideabi]" >> $CARGO_HOME/config.toml
+RUN echo "ar = \"llvm-ar\"" >> $CARGO_HOME/config.toml
+RUN echo "linker = \"armv7a-linux-androideabi23-clang\"" >> $CARGO_HOME/config.toml
+RUN echo "" >> $CARGO_HOME/config.toml
+
+RUN rustup target install i686-linux-android
+RUN echo "[target.i686-linux-android]" >> $CARGO_HOME/config.toml
+RUN echo "ar = \"llvm-ar\"" >> $CARGO_HOME/config.toml
+RUN echo "linker = \"i686-linux-android23-clang\"" >> $CARGO_HOME/config.toml
+RUN echo "" >> $CARGO_HOME/config.toml
+
+RUN rustup target install x86_64-linux-android
+RUN echo "[target.x86_64-linux-android]" >> $CARGO_HOME/config.toml
+RUN echo "ar = \"llvm-ar\"" >> $CARGO_HOME/config.toml
+RUN echo "linker = \"x86_64-linux-android23-clang\"" >> $CARGO_HOME/config.toml
+RUN echo "" >> $CARGO_HOME/config.toml
 # Path to the Android NDK for cargo-ndk Cargo plugin
 ENV ANDROID_NDK_HOME=/usr/local/android-ndk-${android_ndk_ver} \
     NDK_HOME=/usr/local/android-ndk-${android_ndk_ver} \
@@ -94,32 +117,6 @@ COPY lib/ /opt/zingo/rust/lib/
 COPY Cargo.lock /opt/zingo/rust/Cargo.lock
 COPY Cargo.toml /opt/zingo/rust/Cargo.toml
 COPY ios/ /opt/zingo/rust/ios/
-RUN cargo fetch --manifest-path /opt/zingo/rust/android/Cargo.toml
-RUN cargo build --release --manifest-path /opt/zingo/rust/android/Cargo.toml
-
-RUN rustup target install aarch64-linux-android
-RUN echo "[target.aarch64-linux-android]" >> $CARGO_HOME/config.toml
-RUN echo "ar = \"llvm-ar\"" >> $CARGO_HOME/config.toml
-RUN echo "linker = \"aarch64-linux-android23-clang\"" >> $CARGO_HOME/config.toml
-RUN echo "" >> $CARGO_HOME/config.toml
-
-RUN rustup target install armv7-linux-androideabi
-RUN echo "[target.armv7-linux-androideabi]" >> $CARGO_HOME/config.toml
-RUN echo "ar = \"llvm-ar\"" >> $CARGO_HOME/config.toml
-RUN echo "linker = \"armv7a-linux-androideabi23-clang\"" >> $CARGO_HOME/config.toml
-RUN echo "" >> $CARGO_HOME/config.toml
-
-RUN rustup target install i686-linux-android
-RUN echo "[target.i686-linux-android]" >> $CARGO_HOME/config.toml
-RUN echo "ar = \"llvm-ar\"" >> $CARGO_HOME/config.toml
-RUN echo "linker = \"i686-linux-android23-clang\"" >> $CARGO_HOME/config.toml
-RUN echo "" >> $CARGO_HOME/config.toml
-
-RUN rustup target install x86_64-linux-android
-RUN echo "[target.x86_64-linux-android]" >> $CARGO_HOME/config.toml
-RUN echo "ar = \"llvm-ar\"" >> $CARGO_HOME/config.toml
-RUN echo "linker = \"x86_64-linux-android23-clang\"" >> $CARGO_HOME/config.toml
-RUN echo "" >> $CARGO_HOME/config.toml
 
 ENV OPENSSL_STATIC=yes
 
@@ -129,6 +126,8 @@ RUN rustup component add rust-src --toolchain nightly
 
 WORKDIR /opt/zingo/rust/android/
 
+RUN cargo fetch
+RUN cargo build --release
 RUN AR=llvm-ar LD=ld RANLIB=llvm-ranlib CC=aarch64-linux-android23-clang \
     OPENSSL_DIR=/opt/openssl-3.0.5/aarch64 cargo +nightly build -Z build-std \
     --target aarch64-linux-android --release
