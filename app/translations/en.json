@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo!",
-  "version": "v0.0.67",
+  "version": "v0.0.70",
   "loading": "loading...",
   "wait": "Please wait...",
   "workingonit": "We are working on this feature.",
@@ -38,6 +38,10 @@
     "of": "of",
     "eta": "ETA",
     "sec": "sec",
+    "wallet-menu": "WALLET",
+    "send-menu": "SEND",
+    "uas-menu": "UA's",
+    "legacy-menu": "LEGACY",
   },
   "rpc": {
     "parsebirthday-error": "Error: Couldn't parse as a number:",
@@ -70,6 +74,7 @@
     "network": "Network",
     "serverblock": "Server Block Height",
     "zecprice": "ZEC Price",
+    "unknown": "Unknown"
   },
   "rescan": {
     "title": "Rescan",
@@ -134,6 +139,12 @@
     "memo": "Memo (Optional)",
     "button": "Send",
     "clear": "Clear",
+    "confirm-title": "Confirm Transaction",
+    "sending-title": "Sending",
+    "amount": "Amount",
+    "fee": "Fee",
+    "confirm-button": "Confirm",
+    "amount": "   Amount",
   },
   "legacy": {
     "o-title": "U-Orchard",
@@ -150,6 +161,9 @@
     "privkey-option": "Export Private Key",
     "viewkey-option": "Export Viewing Key",
     "cancel-option": "Cancel",
+    "of": " of ",
+    "prev": "Prev",
+    "next": "Next",
   },
   "receive": {
     "u-title": "UNIFIED ADRESSES",
@@ -189,7 +203,60 @@
     "memo": "Memo",
     "memocopied": "Copied Memo to Clipboard",
     "txfee": "Transaction Fee",
-  }
+  },
+  "report": {
+    "title": "Sync / Rescan Report",
+    "running": "Running",
+    "finished": "Finished",
+    "server-title": "SERVER: ",
+    "blocks": " Blocks. ",
+    "wallet": "Wallet: ",
+    "syncedbefore": "Synced before: ",
+    "syncednow": "Synced now: ",
+    "notyetsynced": "Not yet Synced: ",
+    "batches": "BATCHES",
+    "processingbatch": "Processing Batch: ",
+    "totalbatches": " of a TOTAL of Batches: ",
+    "blocksperbatch": "Blocks per Batch",
+    "secondsperbatch": "Time Processing the Current Batch (seconds)",
+    "blocks-title": "BLOCKS: ",
+    "processingblock": "Processing Block: ",
+    "totalblocks": " of a TOTAL of Blocks: ",
+  },
+  "import": {
+    "title": "Import Key",
+    "key-label": "Spending/Private or Full Viewing/Viewing key",
+    "birthday": "Key Birthday",
+    "text": "Importing a key requires a rescan, and make take a long time to complete. Your balances will update automatically.",
+    "button": "Import",
+  },
+  "about": {
+    "copyright": `
+    Copyright (c) 2022, ZingoLabs.
 
+    Built with React Native.
 
+    The MIT License (MIT) Copyright (c) 2022 Zingo!
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the 'Software'), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+    `
+  },
+  "scanner": {
+    "text" : "Scan a Spending/Private or Full Viewing/Viewing Key",
+    "uri-error": "URI Error:",
+    "nozcash-error": "is not a valid Zcash Address",
+    "scanadress": "Scan a Zcash Address",
+  },
+  "privkey": {
+    "privkey": " Spending/Private ",
+    "viewkey": " Full Viewing/Viewing ",
+    "nokey": "No Key",
+    "tapcopy-message": "Copied Key to Clipboard",
+    "title": "Key",
+    "address": "Address",
+  },
 }

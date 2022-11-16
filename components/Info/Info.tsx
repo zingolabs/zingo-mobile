@@ -88,11 +88,13 @@ const Info: React.FunctionComponent<InfoProps> = ({ info, closeModal, totalBalan
             value={
               infoState.chain_name === undefined
                 ? translate('loading')
-                : infoState.chain_name === 'main'
+                : infoState.chain_name.toLowerCase() === 'main' || infoState.chain_name.toLowerCase() === 'mainnet'
                 ? 'Mainnet'
-                : infoState.chain_name === 'test'
+                : infoState.chain_name.toLowerCase() === 'test' || infoState.chain_name.toLowerCase() === 'testnet'
                 ? 'Testnet'
-                : infoState.chain_name
+                : infoState.chain_name.toLowerCase() === 'regtest'
+                ? 'Regtest'
+                : translate('info.unknown') + ' (' + infoState.chain_name + ')'
             }
           />
           <DetailLine label={translate('info.serverblock')} value={info?.latestBlock} />

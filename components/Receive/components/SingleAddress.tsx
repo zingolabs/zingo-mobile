@@ -5,6 +5,7 @@ import Clipboard from '@react-native-community/clipboard';
 import QRCode from 'react-native-qrcode-svg';
 import Toast from 'react-native-simple-toast';
 import { useTheme } from '@react-navigation/native';
+import { TranslateOptions } from 'i18n-js';
 
 import ClickableText from '../../Components/ClickableText';
 import FadeText from '../../Components/FadeText';
@@ -19,6 +20,7 @@ type SingleAddressProps = {
   total: number;
   prev: () => void;
   next: () => void;
+  translate: (key: string, config?: TranslateOptions) => any;
 };
 
 const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
@@ -28,6 +30,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   total,
   prev,
   next,
+  translate,
 }) => {
   // console.log(`Addresses ${addresses}: ${multipleAddresses}`);
   const { colors } = useTheme() as unknown as ThemeType;
@@ -42,7 +45,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   const doCopy = () => {
     if (address) {
       Clipboard.setString(address);
-      Toast.show('Copied Address to Clipboard', Toast.LONG);
+      Toast.show(translate('transactions.addresscopied'), Toast.LONG);
     }
   };
 
@@ -62,7 +65,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
         <QRCode value={address} size={200} ecl="L" backgroundColor={colors.border} />
       </View>
       <ClickableText style={{ marginTop: 15 }} onPress={doCopy}>
-        Tap To Copy
+        {translate('seed.tapcopy')}
       </ClickableText>
 
       <View
@@ -84,11 +87,23 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
 
       {multi && (
         <View style={{ display: 'flex', flexDirection: 'row', marginTop: 10, alignItems: 'center', marginBottom: 100 }}>
-          <Button type="Secondary" title={'Prev'} style={{ width: '25%', margin: 10 }} onPress={prev} />
+          <Button
+            type="Secondary"
+            title={translate('legacy.prev')}
+            style={{ width: '25%', margin: 10 }}
+            onPress={prev}
+          />
           <FadeText>
-            {index + 1} of {total}
+            {index + 1}
+            {translate('legacy.of')}
+            {total}
           </FadeText>
-          <Button type="Secondary" title={'Next'} style={{ width: '25%', margin: 10 }} onPress={next} />
+          <Button
+            type="Secondary"
+            title={translate('legacy.next')}
+            style={{ width: '25%', margin: 10 }}
+            onPress={next}
+          />
         </View>
       )}
     </ScrollView>

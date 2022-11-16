@@ -566,13 +566,13 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
     const fnTabBarIcon = (route: any, focused: boolean) => {
       var iconName;
 
-      if (route.name === 'WALLET') {
+      if (route.name === translate('loadedapp.wallet-menu')) {
         iconName = faList;
-      } else if (route.name === 'SEND') {
+      } else if (route.name === translate('loadedapp.send-menu')) {
         iconName = faUpload;
-      } else if (route.name === "UA's") {
+      } else if (route.name === translate('loadedapp.uas-menu')) {
         iconName = faDownload;
-      } else if (route.name === 'LEGACY') {
+      } else if (route.name === translate('loadedapp.legacy-menu')) {
         iconName = faAddressBook;
       } else {
         iconName = faCog;
@@ -809,7 +809,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
         </Modal>
 
         <Tab.Navigator
-          initialRouteName="WALLET"
+          initialRouteName={translate('loadedapp.wallet-menu')}
           screenOptions={({ route }) => ({
             tabBarIcon: ({ focused }) => fnTabBarIcon(route, focused),
             tabBarActiveTintColor: colors.background,
@@ -819,7 +819,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
             tabBarStyle: { borderRadius: 0 },
             headerShown: false,
           })}>
-          <Tab.Screen name="SEND">
+          <Tab.Screen name={translate('loadedapp.send-menu')}>
             {props => (
               <>
                 <Suspense
@@ -849,7 +849,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
               </>
             )}
           </Tab.Screen>
-          <Tab.Screen name="WALLET">
+          <Tab.Screen name={translate('loadedapp.wallet-menu')}>
             {props => (
               <>
                 <Suspense
@@ -875,7 +875,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
               </>
             )}
           </Tab.Screen>
-          <Tab.Screen name="UA's">
+          <Tab.Screen name={translate('loadedapp.uas-menu')}>
             {props => (
               <>
                 <Suspense
@@ -901,7 +901,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
               </>
             )}
           </Tab.Screen>
-          <Tab.Screen name="LEGACY">
+          <Tab.Screen name={translate('loadedapp.legacy-menu')}>
             {props => (
               <>
                 <Suspense

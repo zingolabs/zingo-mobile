@@ -113,6 +113,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
             next={() => {
               next('u');
             }}
+            translate={translate}
           />
         );
       }
@@ -192,7 +193,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   const [importKeyModalVisible, setImportKeyModalVisible] = useState(false);
 
   const importKey = async () => {
-    Toast.show(translate('workingonit'), Toast.LONG);
+    Toast.show('Error: ' + translate('workingonit'), Toast.LONG);
     //setImportKeyModalVisible(true);
   };
 
@@ -345,7 +346,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
               translate('receive.privkey-option'),
               translate('receive.viewkey-option'),
               translate('receive.import-option'),
-              translate('receive.cancel'),
+              translate('receive.cancel-option'),
             ]}
             actions={[addO, viewPrivKey, viewViewingKey, importKey]}
           />

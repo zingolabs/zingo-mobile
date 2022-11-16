@@ -1,7 +1,10 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useState } from 'react';
+import React from 'react';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import { View } from 'react-native';
+import { TranslateOptions } from 'i18n-js';
+import Toast from 'react-native-simple-toast';
+
 import RegText from '../../Components/RegText';
 import Button from '../../Button';
 import { useTheme } from '@react-navigation/native';
@@ -18,11 +21,10 @@ type ScannerProps = {
     memo: string | null,
   ) => void;
   closeModal: () => void;
+  translate: (key: string, config?: TranslateOptions) => any;
 };
 
-const Scanner: React.FunctionComponent<ScannerProps> = ({ idx, updateToField, closeModal }) => {
-  const [error, setError] = useState<String | null>(null);
-
+const Scanner: React.FunctionComponent<ScannerProps> = ({ idx, updateToField, closeModal, translate }) => {
   const validateAddress = async (scannedAddress: string) => {
     const result = await RPCModule.execute('parse', scannedAddress);
     const resultJSON = await JSON.parse(result);
@@ -43,10 +45,12 @@ const Scanner: React.FunctionComponent<ScannerProps> = ({ idx, updateToField, cl
           updateToField(idx, scannedAddress, null, null, null);
           closeModal();
         } else {
-          setError(`URI Error: ${targets}`);
+          Toast.show(`${translate('scanner.uri-error')} ${targets}`, Toast.LONG);
+          return;
         }
       } else {
-        setError(`"${scannedAddress}" is not a valid Zcash Address`);
+        Toast.show(`"${scannedAddress}" ${translate('scanner.nozcash-error')}`, Toast.LONG);
+        return;
       }
     }
   };
@@ -68,7 +72,7 @@ const Scanner: React.FunctionComponent<ScannerProps> = ({ idx, updateToField, cl
       onRead={onRead}
       reactivate={true}
       containerStyle={{ backgroundColor: colors.background }}
-      topContent={<RegText>Scan a Zcash Address</RegText>}
+      topContent={<RegText>{translate('scanadress')}</RegText>}
       bottomContent={
         <View
           style={{
@@ -78,9 +82,8 @@ const Scanner: React.FunctionComponent<ScannerProps> = ({ idx, updateToField, cl
             justifyContent: 'center',
             width: '100%',
           }}>
-          {error && <RegText style={{ textAlign: 'center' }}>{error}</RegText>}
           <View style={{ flexDirection: 'row', alignItems: 'stretch', justifyContent: 'space-evenly' }}>
-            <Button type="Secondary" title="Cancel" onPress={doCancel} />
+            <Button type="Secondary" title={translate('cancel')} onPress={doCancel} />
           </View>
         </View>
       }

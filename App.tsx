@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useEffect, useCallback, useMemo } from 'react';
+import React, { useEffect, useCallback, useMemo, useState } from 'react';
 import { SafeAreaView, I18nManager } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -32,7 +32,16 @@ const Theme: ThemeType = {
 
 const Stack = createStackNavigator();
 
+const useForceUpdate = () => {
+  const [value, setValue] = useState(0);
+  return () => {
+    const newValue = value + 1;
+    return setValue(newValue);
+  };
+};
+
 export default function App() {
+  const forceUpdate = useForceUpdate();
   const file = useMemo(
     () => ({
       en: en,
@@ -72,7 +81,8 @@ export default function App() {
 
   const handleLocalizationChange = useCallback(() => {
     setI18nConfig();
-  }, [setI18nConfig]);
+    forceUpdate();
+  }, [setI18nConfig, forceUpdate]);
 
   useEffect(() => {
     RNLocalize.addEventListener('change', handleLocalizationChange);

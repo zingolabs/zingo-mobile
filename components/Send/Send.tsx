@@ -339,7 +339,12 @@ const Send: React.FunctionComponent<SendProps> = ({
         transparent={false}
         visible={qrcodeModalVisble}
         onRequestClose={() => setQrcodeModalVisible(false)}>
-        <Scanner idx={qrcodeModalIndex} updateToField={updateToField} closeModal={() => setQrcodeModalVisible(false)} />
+        <Scanner
+          idx={qrcodeModalIndex}
+          updateToField={updateToField}
+          closeModal={() => setQrcodeModalVisible(false)}
+          translate={translate}
+        />
       </Modal>
 
       <Modal
@@ -356,6 +361,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           }}
           confirmSend={confirmSend}
           currencyName={currencyName}
+          translate={translate}
         />
       </Modal>
 
@@ -469,7 +475,7 @@ const Send: React.FunctionComponent<SendProps> = ({
               </View>
 
               <View style={{ marginTop: 10, display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                <FadeText>{'   Amount'}</FadeText>
+                <FadeText>{translate('send.amount')}</FadeText>
                 {validAmount === -1 && <ErrorText>{translate('send.invalidamount')}</ErrorText>}
               </View>
 

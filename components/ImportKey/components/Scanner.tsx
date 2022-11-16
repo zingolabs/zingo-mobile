@@ -1,8 +1,9 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useState } from 'react';
+import React from 'react';
 import { View } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import QRCodeScanner from 'react-native-qrcode-scanner';
+import { TranslateOptions } from 'i18n-js';
 
 import RegText from '../../Components/RegText';
 import Button from '../../Button';
@@ -10,11 +11,9 @@ import Button from '../../Button';
 type ScannerProps = {
   setPrivKeyText: (k: string) => void;
   closeModal: () => void;
+  translate: (key: string, config?: TranslateOptions) => any;
 };
-const Scanner: React.FunctionComponent<ScannerProps> = ({ setPrivKeyText, closeModal }) => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [error, setError] = useState<String | null>(null);
-
+const Scanner: React.FunctionComponent<ScannerProps> = ({ setPrivKeyText, closeModal, translate }) => {
   const validateKey = (scannedKey: string) => {
     setPrivKeyText(scannedKey);
     closeModal();
@@ -36,7 +35,7 @@ const Scanner: React.FunctionComponent<ScannerProps> = ({ setPrivKeyText, closeM
       onRead={onRead}
       reactivate={true}
       containerStyle={{ backgroundColor: colors.background }}
-      topContent={<RegText>Scan a Private/Spending or Full Viewing/Viewing Key</RegText>}
+      topContent={<RegText>{translate('scanner.text')}</RegText>}
       bottomContent={
         <View
           style={{
@@ -46,9 +45,8 @@ const Scanner: React.FunctionComponent<ScannerProps> = ({ setPrivKeyText, closeM
             justifyContent: 'center',
             width: '100%',
           }}>
-          {error && <RegText style={{ textAlign: 'center' }}>{error}</RegText>}
           <View style={{ flexDirection: 'row', alignItems: 'stretch', justifyContent: 'space-evenly' }}>
-            <Button type="Secondary" title="Cancel" onPress={doCancel} />
+            <Button type="Secondary" title={translate('cancel')} onPress={doCancel} />
           </View>
         </View>
       }

@@ -64,7 +64,7 @@ const ImportKey: React.FunctionComponent<ImportKeyProps> = ({
         />
         <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{ opacity: 0.4 }} />
         <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
-          Import Key
+          {translate('import.title')}
         </RegText>
         <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
       </View>
@@ -74,7 +74,11 @@ const ImportKey: React.FunctionComponent<ImportKeyProps> = ({
         transparent={false}
         visible={qrcodeModalVisible}
         onRequestClose={() => setQrcodeModalVisible(false)}>
-        <Scanner setPrivKeyText={setPrivKeyText} closeModal={() => setQrcodeModalVisible(false)} />
+        <Scanner
+          setPrivKeyText={setPrivKeyText}
+          closeModal={() => setQrcodeModalVisible(false)}
+          translate={translate}
+        />
       </Modal>
 
       <ScrollView
@@ -85,7 +89,7 @@ const ImportKey: React.FunctionComponent<ImportKeyProps> = ({
           justifyContent: 'flex-start',
         }}
         keyboardShouldPersistTaps="handled">
-        <RegText style={{ margin: 10 }}>Private/Spending or Full Viewing/Viewing key</RegText>
+        <RegText style={{ margin: 10 }}>{translate('import.key-label')}</RegText>
 
         <RegTextInput
           multiline
@@ -119,9 +123,9 @@ const ImportKey: React.FunctionComponent<ImportKeyProps> = ({
             marginTop: 50,
             textAlign: 'center',
           }}>
-          Key Birthday
+          {translate('import.birthday')}
         </RegText>
-        <FadeText>Block height of first transaction. (OK to leave blank)</FadeText>
+        <FadeText>{translate('seed.birthday-no-readonly')}</FadeText>
         <RegTextInput
           style={{
             padding: 10,
@@ -138,14 +142,11 @@ const ImportKey: React.FunctionComponent<ImportKeyProps> = ({
           onChangeText={setBirthday}
         />
 
-        <RegText style={{ margin: 20 }}>
-          Importing a key requires a rescan, and make take a long time to complete. Your balances will update
-          automatically.
-        </RegText>
+        <RegText style={{ margin: 20 }}>{translate('import.text')}</RegText>
       </ScrollView>
       <View style={{ flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', margin: 20 }}>
-        <Button type="Primary" title="Import" onPress={okButton} />
-        <Button type="Secondary" title="Close" style={{ marginLeft: 10 }} onPress={closeModal} />
+        <Button type="Primary" title={translate('import.button')} onPress={okButton} />
+        <Button type="Secondary" title={translate('cancel')} style={{ marginLeft: 10 }} onPress={closeModal} />
       </View>
     </SafeAreaView>
   );

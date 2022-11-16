@@ -133,6 +133,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({
             next={() => {
               next('z');
             }}
+            translate={translate}
           />
         );
       }
@@ -155,6 +156,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({
             next={() => {
               next('t');
             }}
+            translate={translate}
           />
         );
       }

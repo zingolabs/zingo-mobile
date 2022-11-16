@@ -132,7 +132,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
           style={{ width: 80, height: 80, resizeMode: 'contain' }}
         />
         <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
-          Sync / Rescan Report
+          {translate('report.title')}
         </RegText>
         <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
       </View>
@@ -149,8 +149,11 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
             label="Sync ID"
             value={
               syncStatusReport.syncID !== undefined && syncStatusReport.syncID !== null && syncStatusReport.syncID >= 0
-                ? syncStatusReport.syncID + ' - (' + (syncStatusReport.inProgress ? 'Running' : 'Finished') + ')'
-                : '...loading...'
+                ? syncStatusReport.syncID +
+                  ' - (' +
+                  (syncStatusReport.inProgress ? translate('report.running') : translate('report.finished')) +
+                  ')'
+                : translate('loading')
             }
           />
           {!!syncStatusReport.lastError && (
@@ -261,7 +264,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                     alignItems: 'center',
                     marginTop: 5,
                   }}>
-                  <Text style={{ color: colors.primary }}>{'SERVER : '}</Text>
+                  <Text style={{ color: colors.primary }}>{translate('report.server-title')}</Text>
                   <View
                     style={{
                       display: 'flex',
@@ -273,7 +276,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                       margin: 5,
                     }}
                   />
-                  <Text style={{ color: colors.text }}>{server_server + ' blocks'}</Text>
+                  <Text style={{ color: colors.text }}>{server_server + translate('report.blocks')}</Text>
                 </View>
               )}
               {server_wallet > 0 && (
@@ -286,7 +289,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                     alignItems: 'center',
                     marginTop: 5,
                   }}>
-                  <Text style={{ color: colors.primary }}>{'Wallet : '}</Text>
+                  <Text style={{ color: colors.primary }}>{translate('report.wallet')}</Text>
                   <View
                     style={{
                       display: 'flex',
@@ -298,7 +301,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                       margin: 5,
                     }}
                   />
-                  <Text style={{ color: colors.text }}>{server_wallet + ' blocks'}</Text>
+                  <Text style={{ color: colors.text }}>{server_wallet + translate('report.blocks')}</Text>
                 </View>
               )}
             </>
@@ -396,7 +399,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                     alignItems: 'center',
                     marginTop: 5,
                   }}>
-                  <Text style={{ color: colors.primary }}>{'Synced before : '}</Text>
+                  <Text style={{ color: colors.primary }}>{translate('report.syncedbefore')}</Text>
                   <View
                     style={{
                       display: 'flex',
@@ -409,7 +412,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                     }}
                   />
                   <Text style={{ color: colors.text }}>
-                    {wallet_old_synced + ' blocks. ' + wallet_old_synced_percent.toFixed(2) + '%'}
+                    {wallet_old_synced + translate('report.blocks') + wallet_old_synced_percent.toFixed(2) + '%'}
                   </Text>
                 </View>
               )}
@@ -423,7 +426,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                     alignItems: 'center',
                     marginTop: 5,
                   }}>
-                  <Text style={{ color: colors.primary }}>{'Synced now : '}</Text>
+                  <Text style={{ color: colors.primary }}>{translate('report.syncednow')}</Text>
                   <View
                     style={{
                       display: 'flex',
@@ -436,7 +439,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                     }}
                   />
                   <Text style={{ color: colors.text }}>
-                    {wallet_new_synced + ' blocks. ' + wallet_new_synced_percent.toFixed(2) + '%'}
+                    {wallet_new_synced + translate('report.blocks') + wallet_new_synced_percent.toFixed(2) + '%'}
                   </Text>
                 </View>
               )}
@@ -450,7 +453,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                     alignItems: 'center',
                     marginTop: 5,
                   }}>
-                  <Text style={{ color: colors.primary }}>{'Not Yet Synced : '}</Text>
+                  <Text style={{ color: colors.primary }}>{translate('report.notyetsynced')}</Text>
                   <View
                     style={{
                       display: 'flex',
@@ -463,7 +466,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                     }}
                   />
                   <Text style={{ color: colors.text }}>
-                    {wallet_for_synced + ' blocks. ' + wallet_for_synced_percent.toFixed(2) + '%'}
+                    {wallet_for_synced + translate('report.blocks') + wallet_for_synced_percent.toFixed(2) + '%'}
                   </Text>
                 </View>
               )}
@@ -475,30 +478,27 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
           {syncStatusReport.inProgress && syncStatusReport.currentBatch > 0 && (
             <>
               <DetailLine
-                label="BATCHES"
+                label={translate('report.batches')}
                 value={
-                  'Processing batch: ' +
+                  translate('report.processingbatch') +
                   syncStatusReport.currentBatch +
-                  ' of a TOTAL of batches: ' +
+                  translate('report.totalbatches') +
                   syncStatusReport.totalBatches
                 }
               />
-              <DetailLine label="Blocks per Batch" value={syncStatusReport.blocksPerBatch} />
-              <DetailLine
-                label="Time Processing the Current Batch (seconds)"
-                value={syncStatusReport.secondsPerBatch}
-              />
+              <DetailLine label={translate('report.blocksperbatch')} value={syncStatusReport.blocksPerBatch} />
+              <DetailLine label={translate('report.secondsperbatch')} value={syncStatusReport.secondsPerBatch} />
             </>
           )}
           {syncStatusReport.inProgress && syncStatusReport.currentBlock > 0 && !!syncStatusReport.lastBlockServer && (
             <>
               <View style={{ height: 2, width: '100%', backgroundColor: colors.primary, marginTop: 10 }} />
               <DetailLine
-                label="BLOCKS"
+                label={translate('report.blocks-title')}
                 value={
-                  'Processing block: ' +
+                  translate('report.processingblock') +
                   syncStatusReport.currentBlock +
-                  ' of a TOTAL of blocks: ' +
+                  translate('report.totalblocks') +
                   syncStatusReport.lastBlockServer
                 }
               />
@@ -508,7 +508,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
       </ScrollView>
 
       <View style={{ flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-        <Button type="Secondary" title="Close" onPress={closeModal} />
+        <Button type="Secondary" title={translate('close')} onPress={closeModal} />
       </View>
     </SafeAreaView>
   );

@@ -1,6 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import { View, ScrollView, SafeAreaView } from 'react-native';
+import { TranslateOptions } from 'i18n-js';
+
 import FadeText from '../../Components/FadeText';
 import BoldText from '../../Components/BoldText';
 import RegText from '../../Components/RegText';
@@ -18,6 +20,7 @@ type ConfirmProps = {
   closeModal: () => void;
   confirmSend: () => void;
   currencyName?: string;
+  translate: (key: string, config?: TranslateOptions) => any;
 };
 const Confirm: React.FunctionComponent<ConfirmProps> = ({
   closeModal,
@@ -26,12 +29,13 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   price,
   defaultFee,
   currencyName,
+  translate,
 }) => {
   const { colors } = useTheme();
 
-  const sendingTotal =
-    sendPageState.toaddrs.reduce((s, t) => s + Utils.parseLocaleFloat(Number(t.amount).toFixed(8).toString()), 0.0) +
-    defaultFee;
+  const sendingTotal = Number(sendPageState.toaddrs[0].amount) + defaultFee;
+
+  console.log(sendPageState, price, defaultFee);
 
   return (
     <SafeAreaView
@@ -44,7 +48,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
       }}>
       <ScrollView contentContainerStyle={{ display: 'flex', justifyContent: 'flex-start' }}>
         <View style={{ display: 'flex', alignItems: 'center', padding: 10, backgroundColor: colors.card }}>
-          <BoldText style={{ textAlign: 'center', margin: 10 }}>Confirm Transaction</BoldText>
+          <BoldText style={{ textAlign: 'center', margin: 10 }}>{translate('send.confirm-title')}</BoldText>
         </View>
 
         <View
@@ -57,18 +61,18 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
             borderRadius: 10,
             borderColor: colors.border,
           }}>
-          <BoldText style={{ textAlign: 'center' }}>Sending</BoldText>
+          <BoldText style={{ textAlign: 'center' }}>{translate('send.sending-title')}</BoldText>
 
           <ZecAmount currencyName={currencyName} amtZec={sendingTotal} />
           <UsdAmount amtZec={sendingTotal} price={price} />
         </View>
-        {sendPageState.toaddrs.map(to => {
+        {[sendPageState.toaddrs[0]].map(to => {
           return (
             <View key={to.id} style={{ margin: 10 }}>
               <FadeText>To</FadeText>
               <RegText>{Utils.splitStringIntoChunks(to.to, 8).join(' ')}</RegText>
 
-              <FadeText style={{ marginTop: 10 }}>Amount</FadeText>
+              <FadeText style={{ marginTop: 10 }}>{translate('send.amount')}</FadeText>
               <View
                 style={{
                   display: 'flex',
@@ -77,12 +81,8 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                   alignItems: 'baseline',
                   marginTop: 5,
                 }}>
-                <ZecAmount currencyName={currencyName} size={18} amtZec={Utils.parseLocaleFloat(to.amount)} />
-                <UsdAmount
-                  style={{ fontSize: 18 }}
-                  amtZec={Utils.parseLocaleFloat(Number(to.amount).toFixed(8).toString())}
-                  price={price}
-                />
+                <ZecAmount currencyName={currencyName} size={18} amtZec={Number(to.amount)} />
+                <UsdAmount style={{ fontSize: 18 }} amtZec={Number(to.amount)} price={price} />
               </View>
               <RegText>{to.memo || ''}</RegText>
             </View>
@@ -90,7 +90,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
         })}
 
         <View style={{ margin: 10 }}>
-          <FadeText>Fee</FadeText>
+          <FadeText>{translate('send.fee')}</FadeText>
           <View
             style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
             <ZecAmount currencyName={currencyName} size={18} amtZec={defaultFee} />
@@ -107,8 +107,8 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
           marginTop: 10,
         }}>
         <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
-          <Button type="Primary" title={'Confirm'} onPress={confirmSend} />
-          <Button type="Secondary" style={{ marginLeft: 20 }} title={'Cancel'} onPress={closeModal} />
+          <Button type="Primary" title={translate('send.confirm-button')} onPress={confirmSend} />
+          <Button type="Secondary" style={{ marginLeft: 20 }} title={translate('cancel')} onPress={closeModal} />
         </View>
       </View>
     </SafeAreaView>
