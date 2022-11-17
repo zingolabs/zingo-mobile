@@ -77,7 +77,7 @@ const Rescan: React.FunctionComponent<RescanProps> = ({
 
       <View style={{ flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', margin: 20 }}>
         <Button type="Primary" title={translate('rescan.button')} onPress={doRescanAndClose} />
-        <Button type="Secondary" title={translate('close')} style={{ marginLeft: 10 }} onPress={closeModal} />
+        <Button type="Secondary" title={translate('cancel')} style={{ marginLeft: 10 }} onPress={closeModal} />
       </View>
     </SafeAreaView>
   );

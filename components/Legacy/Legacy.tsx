@@ -388,7 +388,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({
               translate('legacy.newt-option'),
               translate('legacy.privkey-option'),
               translate('legacy.viewkey-option'),
-              translate('legacy.cancel-option'),
+              translate('cancel'),
             ]}
             actions={[addZ, addT, viewPrivKey, viewViewingKey]}
           />

@@ -346,7 +346,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
               translate('receive.privkey-option'),
               translate('receive.viewkey-option'),
               translate('receive.import-option'),
-              translate('receive.cancel-option'),
+              translate('cancel'),
             ]}
             actions={[addO, viewPrivKey, viewViewingKey, importKey]}
           />

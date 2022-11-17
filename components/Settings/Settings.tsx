@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faDotCircle } from '@fortawesome/free-solid-svg-icons';
 import { faCircle as farCircle } from '@fortawesome/free-regular-svg-icons';
 import { TranslateOptions } from 'i18n-js';
+import Toast from 'react-native-simple-toast';
 
 import RegText from '../Components/RegText';
 import FadeText from '../Components/FadeText';
@@ -47,7 +48,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [memos, setMemos] = React.useState(wallet_settings.download_memos);
   const [filter, setFilter] = React.useState(wallet_settings.transaction_filter_threshold);
   const [server, setServer] = React.useState(wallet_settings.server);
-  const [error, setError] = React.useState('');
   const [customIcon, setCustomIcon] = React.useState(farCircle);
 
   React.useEffect(() => {
@@ -60,39 +60,24 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       wallet_settings.server === server &&
       wallet_settings.transaction_filter_threshold === filter
     ) {
-      setError('No changes registred.');
-      setTimeout(() => {
-        setError('');
-      }, 5000);
+      Toast.show(this.props.translate('settings.nochanges'), Toast.LONG);
       return;
     }
     if (!memos) {
-      setError('You need to choose the download memos option to save.');
-      setTimeout(() => {
-        setError('');
-      }, 5000);
+      Toast.show(this.props.translate('settings.ismemo'), Toast.LONG);
       return;
     }
     if (!filter) {
-      setError('You need to choose the transaction filter threshold option to save.');
-      setTimeout(() => {
-        setError('');
-      }, 5000);
+      Toast.show(this.props.translate('settings.isthreshold'), Toast.LONG);
       return;
     }
     if (!server) {
-      setError('You need to choose one Server of the list or fill out a valid Server URI.');
-      setTimeout(() => {
-        setError('');
-      }, 5000);
+      Toast.show(this.props.translate('settings.isserver'), Toast.LONG);
       return;
     }
     const result = parseServerURI(server);
     if (result.toLowerCase().startsWith('error')) {
-      setError('You need to fill out a valid Server URI.');
-      setTimeout(() => {
-        setError('');
-      }, 5000);
+      Toast.show(this.props.translate('settings.isuri'), Toast.LONG);
       return;
     }
 
@@ -135,7 +120,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         />
         <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{ opacity: 0.4 }} />
         <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
-          Settings
+          {translate('settings.title')}
         </RegText>
         <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
       </View>
@@ -149,7 +134,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           backgroundColor: colors.background,
         }}>
         <View style={{ display: 'flex', margin: 10 }}>
-          <BoldText>SERVER</BoldText>
+          <BoldText>{translate('settings.server-title')}</BoldText>
         </View>
 
         <View style={{ display: 'flex', marginLeft: 25 }}>
@@ -171,7 +156,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             <TouchableOpacity style={{ marginRight: 10, marginBottom: 5 }} onPress={() => setServer(undefined)}>
               <View style={{ display: 'flex', flexDirection: 'row', marginTop: 10 }}>
                 {customIcon && <FontAwesomeIcon icon={customIcon} size={20} color={colors.border} />}
-                <RegText style={{ marginLeft: 10 }}>custom</RegText>
+                <RegText style={{ marginLeft: 10 }}>{translate('settings.custom')}</RegText>
               </View>
             </TouchableOpacity>
 
@@ -199,12 +184,12 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         </View>
 
         <View style={{ display: 'flex', margin: 10 }}>
-          <BoldText>TRANSACTION FILTER THRESHOLD</BoldText>
+          <BoldText>{translate('settings.threshold-title')}</BoldText>
         </View>
 
         <View style={{ display: 'flex', marginLeft: 25 }}>
           <RegTextInput
-            placeholder={'Number...'}
+            placeholder={translate('settings.number')}
             placeholderTextColor={colors.placeholder}
             keyboardType="numeric"
             style={{
@@ -225,7 +210,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         </View>
 
         <View style={{ display: 'flex', margin: 10 }}>
-          <BoldText>MEMO DOWNLOAD</BoldText>
+          <BoldText>{translate('settings.memo-title')}</BoldText>
         </View>
 
         <View style={{ display: 'flex', marginLeft: 25 }}>
@@ -251,11 +236,10 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
       <View
         style={{ flexGrow: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', margin: 20 }}>
-        {error && <FadeText style={{ color: colors.primary }}>{error}</FadeText>}
         <View
           style={{ flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 5 }}>
-          <Button type="Primary" title="Save" style={{ marginLeft: 10 }} onPress={saveSettings} />
-          <Button type="Secondary" title="Close" style={{ marginLeft: 10 }} onPress={closeModal} />
+          <Button type="Primary" title={translate('settings.save')} style={{ marginLeft: 10 }} onPress={saveSettings} />
+          <Button type="Secondary" title={translate('cancel')} style={{ marginLeft: 10 }} onPress={closeModal} />
         </View>
       </View>
     </SafeAreaView>
