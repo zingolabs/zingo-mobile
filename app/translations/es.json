@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo!",
-  "version": "v0.0.71",
+  "version": "v0.0.72",
   "loading": "cargando...",
   "wait": "Por favor espere...",
   "workingonit": "Estamos trabajando en esta funcionalidad",
@@ -22,6 +22,7 @@
   "loadedapp": {
     "about": "Sobre Zingo!",
     "info": "Información del Servidor",
+    "options": "Opciones",
     "settings": "Parámetros",
     "walletseed": "Semilla de la Billetera",
     "rescanwallet": "Re-Escanear la Billetera",
@@ -261,7 +262,7 @@
     "text" : "Escanea una Clave Gastar/Privada o una de Visualizacion Total/Visualización",
     "uri-error": "URI Error:",
     "nozcash-error": "no es una dirección Zcash válida",
-    "scanadress": "Escanea una dirección Zcash",
+    "scanaddress": "Escanea una dirección Zcash",
   },
   "privkey": {
     "privkey": " Gastar/Privada ",

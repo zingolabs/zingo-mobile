@@ -72,15 +72,30 @@ const Scanner: React.FunctionComponent<ScannerProps> = ({ idx, updateToField, cl
       onRead={onRead}
       reactivate={true}
       containerStyle={{ backgroundColor: colors.background }}
-      topContent={<RegText>{translate('scanadress')}</RegText>}
+      topContent={
+        <View
+          style={{
+            flex: 1,
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'flex-start',
+            width: '100%',
+            marginTop: 15,
+          }}>
+          <View style={{ flexDirection: 'row', alignItems: 'stretch', justifyContent: 'space-evenly' }}>
+            <RegText>{translate('scanner.scanaddress')}</RegText>
+          </View>
+        </View>
+      }
       bottomContent={
         <View
           style={{
             flex: 1,
             flexDirection: 'column',
-            alignItems: 'stretch',
-            justifyContent: 'center',
+            alignItems: 'center',
+            justifyContent: 'flex-end',
             width: '100%',
+            marginBottom: 10,
           }}>
           <View style={{ flexDirection: 'row', alignItems: 'stretch', justifyContent: 'space-evenly' }}>
             <Button type="Secondary" title={translate('cancel')} onPress={doCancel} />

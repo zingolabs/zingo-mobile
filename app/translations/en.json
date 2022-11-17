@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo!",
-  "version": "v0.0.71",
+  "version": "v0.0.72",
   "loading": "loading...",
   "wait": "Please wait...",
   "workingonit": "We are working on this feature.",
@@ -22,6 +22,7 @@
   "loadedapp": {
     "about": "About Zingo!",
     "info": "Server Info",
+    "options": "Options",
     "settings": "Settings",
     "walletseed": "Wallet Seed",
     "rescanwallet": "Rescan Wallet",
@@ -261,7 +262,7 @@
     "text" : "Scan a Spending/Private or Full Viewing/Viewing Key",
     "uri-error": "URI Error:",
     "nozcash-error": "is not a valid Zcash Address",
-    "scanadress": "Scan a Zcash Address",
+    "scanaddress": "Scan a Zcash Address",
   },
   "privkey": {
     "privkey": " Spending/Private ",

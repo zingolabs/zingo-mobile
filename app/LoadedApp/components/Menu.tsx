@@ -33,7 +33,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, translate })
         backgroundColor: '#010101',
       }}
       contentContainerStyle={{ display: 'flex' }}>
-      <FadeText style={{ margin: 20 }}>Options</FadeText>
+      <FadeText style={{ margin: 20 }}>{translate('loadedapp.options')}</FadeText>
       <View style={{ height: 1, backgroundColor: colors.primary }} />
 
       <View style={{ display: 'flex', marginLeft: 20 }}>
