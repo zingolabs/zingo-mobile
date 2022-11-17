@@ -154,10 +154,11 @@
     "clear": "Clear",
     "confirm-title": "Confirm Transaction",
     "sending-title": "Sending",
-    "amount": "Amount",
+    "confirm-amount": "Amount",
     "fee": "Fee",
     "confirm-button": "Confirm",
     "amount": "   Amount",
+    "to": "To",
   },
   "legacy": {
     "o-title": "U-Orchard",

@@ -69,10 +69,10 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
         {[sendPageState.toaddrs[0]].map(to => {
           return (
             <View key={to.id} style={{ margin: 10 }}>
-              <FadeText>To</FadeText>
+              <FadeText>{translate('send.to')}</FadeText>
               <RegText>{Utils.splitStringIntoChunks(to.to, 8).join(' ')}</RegText>
 
-              <FadeText style={{ marginTop: 10 }}>{translate('send.amount')}</FadeText>
+              <FadeText style={{ marginTop: 10 }}>{translate('send.confirm-amount')}</FadeText>
               <View
                 style={{
                   display: 'flex',

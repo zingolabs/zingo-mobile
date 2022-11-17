@@ -305,7 +305,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         // Clear the fields
         clearToAddrs();
 
-        navigation.navigate('WALLET');
+        navigation.navigate(translate('loadedapp.wallet-menu'));
         setTimeout(() => {
           Toast.show(`${translate('send.Broadcast')} ${txid}`, Toast.LONG);
         }, 1000);

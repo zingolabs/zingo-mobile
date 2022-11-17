@@ -30,7 +30,7 @@ export default class Utils {
       s = s.substr(0, s.length - 1);
     }
 
-    if (s.substr(s.length - 1) === '.') {
+    if (s.substr(s.length - 1, 1) === '.') {
       s = s.substr(0, s.length - 1);
     }
 

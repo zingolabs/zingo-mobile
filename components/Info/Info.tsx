@@ -101,7 +101,7 @@ const Info: React.FunctionComponent<InfoProps> = ({ info, closeModal, totalBalan
           {/* <DetailLine label="Wallet Block Height" value={walletHeight} /> */}
           <DetailLine
             label={translate('info.zecprice')}
-            value={info?.zecPrice ? `$ ${Utils.toLocaleFloat(info?.zecPrice?.toFixed(2))}` : '-'}
+            value={info?.zecPrice ? `$ ${Utils.toLocaleFloat(info?.zecPrice?.toFixed(2))}` : '--'}
           />
         </View>
       </ScrollView>

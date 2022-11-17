@@ -244,7 +244,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
     const { sendPageState } = this.state;
     const json = sendPageState.toaddrs.flatMap(to => {
       const memo = to.memo || '';
-      const amount = parseInt((Utils.parseLocaleFloat(to.amount) * 10 ** 8).toFixed(0), 10);
+      const amount = parseInt((Number(to.amount) * 10 ** 8).toFixed(0), 10);
 
       if (memo === '') {
         return { address: to.to, amount };
