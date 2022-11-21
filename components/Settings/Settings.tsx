@@ -60,24 +60,24 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       wallet_settings.server === server &&
       wallet_settings.transaction_filter_threshold === filter
     ) {
-      Toast.show(this.props.translate('settings.nochanges'), Toast.LONG);
+      Toast.show(translate('settings.nochanges'), Toast.LONG);
       return;
     }
     if (!memos) {
-      Toast.show(this.props.translate('settings.ismemo'), Toast.LONG);
+      Toast.show(translate('settings.ismemo'), Toast.LONG);
       return;
     }
     if (!filter) {
-      Toast.show(this.props.translate('settings.isthreshold'), Toast.LONG);
+      Toast.show(translate('settings.isthreshold'), Toast.LONG);
       return;
     }
     if (!server) {
-      Toast.show(this.props.translate('settings.isserver'), Toast.LONG);
+      Toast.show(translate('settings.isserver'), Toast.LONG);
       return;
     }
     const result = parseServerURI(server);
     if (result.toLowerCase().startsWith('error')) {
-      Toast.show(this.props.translate('settings.isuri'), Toast.LONG);
+      Toast.show(translate('settings.isuri'), Toast.LONG);
       return;
     }
 
