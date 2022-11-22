@@ -1,3 +1,54 @@
+// new class with all the information about the sync process
+export class SyncStatusReport {
+  // sync ID
+  syncID: number;
+
+  // total of batches to process (usually 1000 blocks per batch)
+  totalBatches: number;
+
+  // batch that is processing now
+  currentBatch: number;
+
+  // total blocks per batch
+  blocksPerBatch: number;
+
+  // last block of the wallet
+  lastBlockWallet: number;
+
+  // block that is processing
+  currentBlock: number;
+
+  inProgress: boolean;
+
+  lastError: string;
+
+  secondsPerBatch: number;
+
+  percent: number;
+
+  message: string;
+
+  process_end_block: number;
+
+  lastBlockServer: number;
+
+  constructor() {
+    this.syncID = 0;
+    this.totalBatches = 0;
+    this.currentBatch = 0;
+    this.blocksPerBatch = 1000; // this is set in zingolib
+    this.lastBlockWallet = 0;
+    this.currentBlock = 0;
+    this.inProgress = false;
+    this.lastError = '';
+    this.secondsPerBatch = 0;
+    this.percent = 0;
+    this.message = '';
+    this.process_end_block = 0;
+    this.lastBlockServer = 0;
+  }
+}
+
 export class TotalBalance {
   // Total t address, confirmed and spendable
   transparentBal: number;
@@ -5,8 +56,14 @@ export class TotalBalance {
   // Total private, confirmed + unconfirmed
   privateBal: number;
 
+  // Total orchard, confirmed + unconfirmed
+  orchardBal: number;
+
   // Total private, confirmed funds that are spendable
   spendablePrivate: number;
+
+  // Total orchard, confirmed funds that are spendable
+  spendableOrchard: number;
 
   // Total unconfirmed + spendable
   total: number;
@@ -15,18 +72,22 @@ export class TotalBalance {
     this.transparentBal = 0;
     this.privateBal = 0;
     this.spendablePrivate = 0;
+    this.orchardBal = 0;
+    this.spendableOrchard = 0;
     this.total = 0;
   }
 }
 
-export class AddressBalance {
+export class Address {
+  uaAddress: string;
   address: string;
-  balance: number;
+  addressKind: string;
   containsPending: boolean;
 
-  constructor(address: string, balance: number) {
+  constructor(uaAddress: string, address: string, addressKind: string) {
+    this.uaAddress = uaAddress;
     this.address = address;
-    this.balance = balance;
+    this.addressKind = addressKind;
     this.containsPending = false;
   }
 }
@@ -42,7 +103,15 @@ export class AddressBookEntry {
   }
 }
 
-export interface TxDetail {
+export class SettingsFileEntry {
+  server?: string;
+
+  constructor(server: string) {
+    this.server = server;
+  }
+}
+
+export interface TxDetailType {
   address: string;
   amount: number;
   memo: string | null;
@@ -58,7 +127,7 @@ export interface Transaction {
   txid: string;
   time: number;
   zec_price: number | null;
-  detailedTxns: TxDetail[];
+  detailedTxns: TxDetailType[];
 }
 
 // This is the type that the RPC interface expects for sending
@@ -86,12 +155,9 @@ export class ToAddr {
 }
 
 export class SendPageState {
-  fromaddr: string;
-
   toaddrs: ToAddr[];
 
   constructor() {
-    this.fromaddr = '';
     this.toaddrs = [];
   }
 }
@@ -110,8 +176,8 @@ export class ReceivePageState {
   }
 }
 
-export interface Info {
-  testnet: boolean;
+export interface InfoType {
+  chain_name: string;
   serverUri: string;
   latestBlock: number;
   connections: number;
@@ -121,15 +187,13 @@ export interface Info {
   solps: number;
   zecPrice: number | null;
   defaultFee: number;
-  encrypted: boolean;
-  locked: boolean;
 }
 
 export class SendProgress {
   sendInProgress: boolean;
   progress: number;
   total: number;
-  etaSeconds: number;
+  etaSeconds: number | string;
 
   constructor() {
     this.sendInProgress = false;
@@ -189,23 +253,26 @@ export interface WalletSeed {
 export interface SyncStatus {
   inProgress: boolean;
   progress: number;
+  blocks: string;
 }
 
 export class WalletSettings {
   download_memos: string;
+  transaction_filter_threshold: string;
+  server?: string;
 
   constructor() {
-    this.download_memos = 'none';
+    this.download_memos = 'wallet';
+    this.transaction_filter_threshold = '500';
   }
 }
 
 export default interface AppState {
+  // Info about the current sync process
+  syncStatusReport: SyncStatusReport;
+
   // The total confirmed and unconfirmed balance in this wallet
   totalBalance: TotalBalance;
-
-  // The list of all t and z addresses that have a current balance. That is, the list of
-  // addresses that have a (confirmed or unconfirmed) UTXO or note pending.
-  addressesWithBalance: AddressBalance[];
 
   // A map type that contains address -> privatekey mapping, for display on the receive page
   // This mapping is ephemeral, and will disappear when the user navigates away.
@@ -213,12 +280,12 @@ export default interface AppState {
 
   // List of all addresses in the wallet, including change addresses and addresses
   // that don't have any balance or are unused
-  addresses: string[];
+  addresses: Address[];
 
   // List of Address / Label pairs
   addressBook: AddressBookEntry[];
 
-  // List of all T and Z transactions
+  // List of all T and Z and O transactions
   transactions: Transaction[] | null;
 
   // The state of the send page, as the user constructs a transaction
@@ -228,7 +295,7 @@ export default interface AppState {
   receivePageState: ReceivePageState;
 
   // getinfo and getblockchaininfo result
-  info: Info | null;
+  info: InfoType | null;
 
   // Is the app rescanning?
   rescanning: boolean;
@@ -262,6 +329,16 @@ export default interface AppState {
 
   rescanModalVisible: boolean;
 
-  seedModalVisible: boolean;
+  seedViewModalVisible: boolean;
+  seedChangeModalVisible: boolean;
+  seedBackupModalVisible: boolean;
+  seedServerModalVisible: boolean;
+
+  syncReportModalVisible: boolean;
+
+  newServer: string | null;
+
+  uaAddress: string | null;
+
   // eslint-disable-next-line semi
 }

@@ -1,0 +1,30 @@
+import React from 'react';
+import { createStackNavigator } from '@react-navigation/stack';
+import { TranslateOptions } from 'i18n-js';
+
+import { TotalBalance, Transaction, InfoType, SyncStatus } from '../../app/AppState';
+import TransactionsView from './components/TransactionsView';
+
+const Stack = createStackNavigator();
+
+type TransactionsViewProps = {
+  info: InfoType | null;
+  totalBalance: TotalBalance;
+  syncingStatus: SyncStatus | null;
+  transactions: Transaction[] | null;
+  toggleMenuDrawer: () => void;
+  doRefresh: () => void;
+  setComputingModalVisible: (visible: boolean) => void;
+  syncingStatusMoreInfoOnClick: () => void;
+  translate: (key: string, config?: TranslateOptions) => any;
+};
+
+const Transactions: React.FunctionComponent<TransactionsViewProps> = iprops => {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="TransactionsView">{props => <TransactionsView {...props} {...iprops} />}</Stack.Screen>
+    </Stack.Navigator>
+  );
+};
+
+export default Transactions;

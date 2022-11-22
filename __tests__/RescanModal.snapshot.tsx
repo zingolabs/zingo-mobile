@@ -8,14 +8,13 @@ import React from 'react';
 import { create } from 'react-test-renderer';
 import RescanModal from '../components/RescanModal';
 
-jest.useFakeTimers()
+jest.useFakeTimers();
 
 // test suite
-describe("Component RescanModal - test", () => {
+describe('Component RescanModal - test', () => {
   //snapshot test
-  test("RescanModal - snapshot", () => {
+  test('RescanModal - snapshot', () => {
     const rescanModal = create(<RescanModal closeModal={() => {}} birthday={0} startRescan={() => {}} />);
     expect(rescanModal.toJSON()).toMatchSnapshot();
   });
-
 });

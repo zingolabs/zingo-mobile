@@ -1,48 +1,11 @@
 import { getNumberFormatSettings } from 'react-native-localize';
 
-export const NO_CONNECTION: string = 'Could not connect to zcashd';
-
 type ZecAmountSplitType = {
   bigPart: string;
   smallPart: string;
 };
 
 export default class Utils {
-  static isSapling(addr: string): boolean {
-    if (!addr) {
-      return false;
-    }
-    return new RegExp('^z[a-z0-9]{77}$').test(addr) || new RegExp('^ztestsapling[a-z0-9]{76}$').test(addr);
-  }
-
-  static isSprout(addr: string): boolean {
-    if (!addr) {
-      return false;
-    }
-    return new RegExp('^z[a-zA-Z0-9]{94}$').test(addr);
-  }
-
-  static isZaddr(addr: string): boolean {
-    if (!addr) {
-      return false;
-    }
-    return Utils.isSapling(addr) || Utils.isSprout(addr);
-  }
-
-  static isTransparent(addr: string): boolean {
-    if (!addr) {
-      return false;
-    }
-    return new RegExp('^t[a-zA-Z0-9]{34}$').test(addr);
-  }
-
-  static isOrchard(addr: string): boolean {
-    if (!addr) {
-      return false;
-    }
-    return new RegExp('^u[a-z0-9]{105}$').test(addr) || new RegExp('^utest[a-z0-9]{105}$').test(addr) ;
-  }
-
   static trimToSmall(addr?: string, numChars?: number): string | undefined {
     const trimSize = numChars || 5;
     if (!addr) {
@@ -67,7 +30,7 @@ export default class Utils {
       s = s.substr(0, s.length - 1);
     }
 
-    if (s.substr(s.length - 1) === '.') {
+    if (s.substr(s.length - 1, 1) === '.') {
       s = s.substr(0, s.length - 1);
     }
 
@@ -131,11 +94,11 @@ export default class Utils {
     return 0.0001;
   }
 
-  static getDonationAddress(testnet: boolean): string {
-    if (testnet) {
-      return 'ztestsapling1wn6889vznyu42wzmkakl2effhllhpe4azhu696edg2x6me4kfsnmqwpglaxzs7tmqsq7kudemp5';
+  static getDonationAddress(chain_name: string): string {
+    if (chain_name !== 'main') {
+      return 'ztestsapling...';
     } else {
-      return 'zs1gv64eu0v2wx7raxqxlmj354y9ycznwaau9kduljzczxztvs4qcl00kn2sjxtejvrxnkucw5xx9u';
+      return 'z...';
     }
   }
 

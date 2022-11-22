@@ -1,266 +1,107 @@
 /* eslint-disable react-native/no-inline-styles */
-/**
- * @format
- */
-import React, { Component } from 'react';
-import { View, ScrollView, Alert, SafeAreaView, Image, Text } from 'react-native';
-
-import { NavigationContainer, DarkTheme } from '@react-navigation/native';
-import { AppearanceProvider } from 'react-native-appearance';
+import React, { useEffect, useCallback, useMemo, useState } from 'react';
+import { SafeAreaView, I18nManager } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import * as RNLocalize from 'react-native-localize';
+import { I18n, TranslateOptions } from 'i18n-js';
+import { memoize } from 'lodash';
 
-import cstyles from './components/CommonStyles';
-import { BoldText, RegText, RegTextInput, FadeText } from './components/Components';
-import Button from './components/Button';
-import RPCModule from './components/RPCModule';
 import LoadedApp from './app/LoadedApp';
-import SeedComponent from './components/SeedComponent';
-import RPC from './app/rpc';
+import LoadingApp from './app/LoadingApp';
+import { ThemeType } from './app/types';
 
-// -----------------
-// Loading View
-// -----------------
-type LoadingProps = {
-  navigation: any;
-};
+const en = require('./app/translations/en.json');
+const es = require('./app/translations/es.json');
 
-type LoadingState = {
-  screen: number;
-  actionButtonsDisabled: boolean;
-  walletExists: boolean;
-  seedPhrase: string | null;
-  birthday: string;
-};
-
-class LoadingView extends Component<LoadingProps, LoadingState> {
-  constructor(props: Readonly<LoadingProps>) {
-    super(props);
-
-    this.state = {
-      screen: 0,
-      actionButtonsDisabled: false,
-      walletExists: false,
-      seedPhrase: null,
-      birthday: '0',
-    };
-  }
-
-  componentDidMount = async () => {
-    // First, check if a wallet exists. Do it async so the basic screen has time to render
-    setTimeout(async () => {
-      const exists = await RPCModule.walletExists();
-      // console.log('Exists result', exists);
-
-      if (exists && exists !== 'false') {
-        this.setState({ walletExists: true });
-        const error = await RPCModule.loadExistingWallet();
-        if (!error.startsWith('Error')) {
-          // Load the wallet and navigate to the transactions screen
-          this.navigateToLoaded();
-        } else {
-          Alert.alert('Error Reading Wallet', error);
-        }
-      } else {
-        // console.log('Loading new wallet');
-        this.setState({ screen: 1, walletExists: false });
-      }
-    });
-  };
-
-  navigateToLoaded = () => {
-    const { navigation } = this.props;
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'LoadedApp' }],
-    });
-  };
-
-  createNewWallet = () => {
-    this.setState({ actionButtonsDisabled: true });
-
-    setTimeout(async () => {
-      const seed = await RPCModule.createNewWallet();
-      if (!seed.startsWith('Error')) {
-        this.set_wallet_option('download_memos', 'none');
-        this.setState({ seedPhrase: seed, screen: 2 });
-      } else {
-        this.setState({ actionButtonsDisabled: false });
-        Alert.alert('Error creating Wallet', seed);
-      }
-    });
-  };
-
-  getSeedPhraseToRestore = async () => {
-    this.setState({ seedPhrase: '', birthday: '0', screen: 3 });
-  };
-
-  doRestore = async () => {
-    // Don't call with null values
-    const { birthday, seedPhrase } = this.state;
-
-    if (!seedPhrase) {
-      Alert.alert('Invalid Seed Phrase', 'The seed phrase was invalid');
-      return;
-    }
-
-    this.setState({ actionButtonsDisabled: true });
-    setTimeout(async () => {
-      let walletBirthday = birthday || '0';
-      if (parseInt(walletBirthday, 10) < 0) {
-        walletBirthday = '0';
-      }
-      if (isNaN(parseInt(walletBirthday, 10))) {
-        walletBirthday = '0';
-      }
-
-      const error = await RPCModule.restoreWallet(seedPhrase.toLowerCase(), walletBirthday || '0');
-      if (!error.startsWith('Error')) {
-        this.navigateToLoaded();
-      } else {
-        this.setState({ actionButtonsDisabled: false });
-        Alert.alert('Error reading Wallet', error);
-      }
-    });
-  };
-
-  loadWallet = () => {
-    this.navigateToLoaded();
-  };
-
-  set_wallet_option = async (name: string, value: string) => {
-    await RPC.setWalletSettingOption(name, value);
-
-    // Refetch the settings to update
-    //this.rpc.fetchWalletSettings();
-  };
-
-  render() {
-    const { screen, birthday, seedPhrase, actionButtonsDisabled } = this.state;
-
-    return (
-      <View
-        style={[
-          {
-            flexDirection: 'column',
-            flex: 1,
-            alignItems: 'center',
-            justifyContent: 'center',
-          },
-        ]}>
-        {screen === 0 && <Text style={{ color: '#FFFFFF', fontSize: 36, fontWeight: 'bold' }}>Zingo</Text>}
-        {screen === 1 && (
-          <View
-            style={[
-              {
-                flex: 1,
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-              },
-            ]}>
-            <View style={{ marginBottom: 50, display: 'flex', alignItems: 'center' }}>
-              <Image
-                source={require('./assets/img/logobig-zingo.png')}
-                style={{ width: 100, height: 100, resizeMode: 'contain' }}
-              />
-              <BoldText>Zingo</BoldText>
-            </View>
-
-            <Button type="Primary" title="Create New Wallet" disabled={actionButtonsDisabled} onPress={this.createNewWallet} />
-            <View style={[cstyles.margintop]}>
-              <Button type="Secondary" title="Restore Seed" onPress={this.getSeedPhraseToRestore} />
-            </View>
-          </View>
-        )}
-        {screen === 2 && seedPhrase && (
-          <SeedComponent
-            seed={JSON.parse(seedPhrase)?.seed}
-            birthday={JSON.parse(seedPhrase)?.birthday}
-            nextScreen={this.loadWallet}
-          />
-        )}
-        {screen === 3 && (
-          <ScrollView
-            contentContainerStyle={[
-              {
-                flex: 1,
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'flex-start',
-              },
-            ]}
-            keyboardShouldPersistTaps="handled">
-            <RegText style={{ margin: 30 }}>Enter your seed phrase (24 words)</RegText>
-            <RegTextInput
-              multiline
-              style={[
-                {
-                  maxWidth: '95%',
-                  minWidth: '95%',
-                  borderColor: 'gray',
-                  borderWidth: 1,
-                  minHeight: 100,
-                },
-                cstyles.innerpaddingsmall,
-              ]}
-              value={seedPhrase}
-              onChangeText={(text: string) => this.setState({ seedPhrase: text })}
-            />
-            <RegText style={[cstyles.margintop, cstyles.center]}>Wallet Birthday</RegText>
-            <FadeText>Block height of first transaction. (OK to leave blank)</FadeText>
-            <RegTextInput
-              style={[
-                {
-                  maxWidth: '50%',
-                  minWidth: '50%',
-                  borderColor: 'gray',
-                  borderWidth: 1,
-                },
-                cstyles.innerpaddingsmall,
-              ]}
-              value={birthday}
-              keyboardType="numeric"
-              onChangeText={(text: string) => this.setState({ birthday: text })}
-            />
-            <View style={cstyles.margintop}>
-              <Button type="Primary" title="Restore Wallet" disabled={actionButtonsDisabled} onPress={this.doRestore} />
-            </View>
-          </ScrollView>
-        )}
-      </View>
-    );
-  }
-}
-
-const Theme = {
-  ...DarkTheme,
+const Theme: ThemeType = {
+  dark: true,
   colors: {
-    ...DarkTheme.colors,
-    background: '#212124',
-    card: '#353535',
-    border: '#454545',
-    primary: '#c3921f',
-    text: '#FFFFFF',
+    background: '#011401', //'#010101',
+    card: '#011401', //'#401717',
+    border: '#ffffff',
+    primary: '#18bd18', //'#df4100',
+    primaryDisabled: 'rgba(24, 189, 24, 0.3)',
+    text: '#c3c3c3',
+    zingo: '#777777',
+    placeholder: '#333333',
+    money: '#ffffff',
+    notification: '',
   },
 };
 
 const Stack = createStackNavigator();
+
+const useForceUpdate = () => {
+  const [value, setValue] = useState(0);
+  return () => {
+    const newValue = value + 1;
+    return setValue(newValue);
+  };
+};
+
 export default function App() {
+  const forceUpdate = useForceUpdate();
+  const file = useMemo(
+    () => ({
+      en: en,
+      es: es,
+    }),
+    [],
+  );
+  const i18n = useMemo(() => new I18n(file), [file]);
+
+  const translate = memoize(
+    (key: string, config?: TranslateOptions) => i18n.t(key, config),
+    (key: string, config?: TranslateOptions) => (config ? key + JSON.stringify(config) : key),
+  );
+
+  const setI18nConfig = useCallback(() => {
+    // fallback if no available language fits
+    const fallback = { languageTag: 'en', isRTL: false };
+
+    //console.log(RNLocalize.findBestAvailableLanguage(Object.keys(file)));
+    //console.log(RNLocalize.getLocales());
+
+    const { languageTag, isRTL } = RNLocalize.findBestAvailableLanguage(Object.keys(file)) || fallback;
+
+    // clear translation cache
+    if (translate && translate.cache) {
+      translate?.cache?.clear?.();
+    }
+    // update layout direction
+    I18nManager.forceRTL(isRTL);
+
+    i18n.locale = languageTag;
+  }, [file, i18n, translate]);
+
+  useEffect(() => {
+    setI18nConfig();
+  }, [setI18nConfig]);
+
+  const handleLocalizationChange = useCallback(() => {
+    setI18nConfig();
+    forceUpdate();
+  }, [setI18nConfig, forceUpdate]);
+
+  useEffect(() => {
+    RNLocalize.addEventListener('change', handleLocalizationChange);
+    return () => RNLocalize.removeEventListener('change', handleLocalizationChange);
+  }, [handleLocalizationChange]);
+
   return (
-    <AppearanceProvider>
-      <NavigationContainer theme={Theme}>
-        <SafeAreaView
-          style={{
-            flex: 1,
-            justifyContent: 'center',
-            backgroundColor: Theme.colors.card,
-          }}>
-          <Stack.Navigator headerMode="none">
-            <Stack.Screen name="LoadingView" component={LoadingView} />
-            <Stack.Screen name="LoadedApp" component={LoadedApp} />
-          </Stack.Navigator>
-        </SafeAreaView>
-      </NavigationContainer>
-    </AppearanceProvider>
+    <NavigationContainer theme={Theme}>
+      <SafeAreaView
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          backgroundColor: Theme.colors.card,
+        }}>
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="LoadingApp">{props => <LoadingApp {...props} translate={translate} />}</Stack.Screen>
+          <Stack.Screen name="LoadedApp">{props => <LoadedApp {...props} translate={translate} />}</Stack.Screen>
+        </Stack.Navigator>
+      </SafeAreaView>
+    </NavigationContainer>
   );
 }

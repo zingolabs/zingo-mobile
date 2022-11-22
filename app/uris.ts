@@ -1,6 +1,6 @@
-import {Base64} from 'js-base64';
+import { Base64 } from 'js-base64';
 import Url from 'url-parse';
-import Utils from './utils';
+import RPCModule from '../components/RPCModule';
 
 export class ZcashURITarget {
   address?: string;
@@ -23,7 +23,27 @@ export class ZcashURITarget {
   }
 }
 
-export const parseZcashURI = (uri: string): ZcashURITarget[] | string => {
+export const SERVER_URI = ['https://mainnet.lightwalletd.com:9067', 'https://zuul.free2z.cash:9067'];
+
+export const parseServerURI = (uri: string): string => {
+  if (!uri || uri === '') {
+    return 'Error: Bad URI';
+  }
+
+  const parsedUri = new Url(uri, true);
+  if (
+    !parsedUri ||
+    !parsedUri.hostname ||
+    !parsedUri.protocol ||
+    (parsedUri.protocol !== 'http:' && parsedUri.protocol !== 'https:')
+  ) {
+    return 'Error: Bad URI';
+  }
+
+  return 'URI is OK';
+};
+
+export const parseZcashURI = async (uri: string): Promise<string | ZcashURITarget[]> => {
   if (!uri || uri === '') {
     return 'Bad URI';
   }
@@ -38,8 +58,15 @@ export const parseZcashURI = (uri: string): ZcashURITarget[] | string => {
 
   // The first address is special, it can be the "host" part of the URI
   const address = parsedUri.pathname;
-  if (address && !(Utils.isTransparent(address) || Utils.isZaddr(address))) {
-    return `"${address || ''}" was not a valid zcash address`;
+
+  const resultParse = await RPCModule.execute('parse', address);
+  //console.log('parse', resultParse);
+  const resultParseJSON = await JSON.parse(resultParse);
+
+  const validParse = resultParseJSON.status === 'success';
+
+  if (address && !validParse) {
+    return `"${address || ''}" was not a valid zcash address (UA, Orchard, Z or T)`;
   }
 
   // Has to have at least 1 element
@@ -78,8 +105,13 @@ export const parseZcashURI = (uri: string): ZcashURITarget[] | string => {
         if (typeof target.address !== 'undefined') {
           return `Duplicate parameter "${qName}"`;
         }
+        const result = await RPCModule.execute('parse', value);
+        //console.log('parse', result);
+        const resultJSON = await JSON.parse(result);
 
-        if (!(Utils.isTransparent(value) || Utils.isZaddr(value))) {
+        const valid = resultJSON.status === 'success';
+
+        if (!valid) {
           return `"${value}" was not a recognized zcash address`;
         }
         target.address = value;

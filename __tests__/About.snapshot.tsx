@@ -8,14 +8,13 @@ import React from 'react';
 import { create } from 'react-test-renderer';
 import AboutModal from '../components/About';
 
-jest.useFakeTimers()
+jest.useFakeTimers();
 
 // test suite
-describe("Component AboutModal - test", () => {
+describe('Component AboutModal - test', () => {
   //snapshot test
-  test("AboutModal - snapshot", () => {
+  test('AboutModal - snapshot', () => {
     const aboutModal = create(<AboutModal closeModal={() => {}} />);
     expect(aboutModal.toJSON()).toMatchSnapshot();
   });
-
 });

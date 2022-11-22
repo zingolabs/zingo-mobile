@@ -15,23 +15,23 @@ import {
   ClickableText,
   ErrorText,
   RegText,
-  RegTextInput
+  RegTextInput,
 } from '../components/Components';
 
 jest.mock('react-native-localize', () => ({
   getNumberFormatSettings: () => {
     return {
       decimalSeparator: '.',
-      groupingSeparator: ','
+      groupingSeparator: ',',
     };
   },
-}))
-jest.useFakeTimers()
+}));
+jest.useFakeTimers();
 
 // test suite
-describe("Component Components - test", () => {
+describe('Component Components - test', () => {
   //unit test
-  test("UsdAmount - price null result $ --", () => {
+  test('UsdAmount - price null result $ --', () => {
     const text = create(<UsdAmount price={null} amtZec={1} style={{}} />).toJSON();
     expect(text.type).toBe('Text');
     expect(text.props.style.color).toBe('rgb(28, 28, 30)');
@@ -39,7 +39,7 @@ describe("Component Components - test", () => {
     expect(text.children[1]).toBe('--');
   });
 
-  test("UsdAmount - price 0 result $ --", () => {
+  test('UsdAmount - price 0 result $ --', () => {
     const text = create(<UsdAmount price={0} amtZec={1} style={{}} />).toJSON();
     expect(text.type).toBe('Text');
     expect(text.props.style.color).toBe('rgb(28, 28, 30)');
@@ -47,7 +47,7 @@ describe("Component Components - test", () => {
     expect(text.children[1]).toBe('--');
   });
 
-  test("UsdAmount - amtZec undefined result $ --", () => {
+  test('UsdAmount - amtZec undefined result $ --', () => {
     const text = create(<UsdAmount price={1} amtZec={undefined} style={{}} />).toJSON();
     expect(text.type).toBe('Text');
     expect(text.props.style.color).toBe('rgb(28, 28, 30)');
@@ -55,7 +55,7 @@ describe("Component Components - test", () => {
     expect(text.children[1]).toBe('--');
   });
 
-  test("UsdAmount - price * amtZec really tiny result starts $ < 0.01 ", () => {
+  test('UsdAmount - price * amtZec really tiny result starts $ < 0.01 ', () => {
     const text = create(<UsdAmount price={0.001} amtZec={1} style={{}} />).toJSON();
     expect(text.type).toBe('Text');
     expect(text.props.style.color).toBe('rgb(28, 28, 30)');
@@ -63,7 +63,7 @@ describe("Component Components - test", () => {
     expect(text.children[1]).toBe('< 0.01');
   });
 
-  test("UsdAmount - price=2.9826 and amtZec=1.00098 result $ 2.99", () => {
+  test('UsdAmount - price=2.9826 and amtZec=1.00098 result $ 2.99', () => {
     const text = create(<UsdAmount price={2.9826} amtZec={1.00098} style={{}} />).toJSON();
     expect(text.type).toBe('Text');
     expect(text.props.style.color).toBe('rgb(28, 28, 30)');
@@ -96,7 +96,7 @@ describe("Component Components - test", () => {
     expect(text.children[0]).toBe('');
   });
 
-  test("ZecPrice - number 1.02999 rounded up result $ 1.03 per ZEC", () => {
+  test('ZecPrice - number 1.02999 rounded up result $ 1.03 per ZEC', () => {
     const text = create(<ZecPrice price={1.02999} />).toJSON();
     expect(text.type).toBe('Text');
     expect(text.children[0]).toBe('$ 1.03 per ZEC');
@@ -108,7 +108,7 @@ describe("Component Components - test", () => {
     expect(text.children[0]).toBe('$ 1.02 per ZEC');
   });
 
-  test("ZecAmount - All props missing result ZEC --", () => {
+  test('ZecAmount - All props missing result ZEC --', () => {
     const text = create(<ZecAmount />).toJSON();
     expect(text.type).toBe('View');
     expect(text.children[0].type).toBe('Text');
@@ -123,7 +123,7 @@ describe("Component Components - test", () => {
     expect(text.children[1].children[0]).toBe('');
   });
 
-  test("ZecAmount - amtZec 0 result ZEC 0.0000 0000", () => {
+  test('ZecAmount - amtZec 0 result ZEC 0.0000 0000', () => {
     const text = create(<ZecAmount amtZec={0} />).toJSON();
     expect(text.type).toBe('View');
     expect(text.children[0].type).toBe('Text');
@@ -138,7 +138,7 @@ describe("Component Components - test", () => {
     expect(text.children[1].children[0]).toBe('0000');
   });
 
-  test("ZecAmount - amtZec -1.123456789 rounded up result ZEC -1.1234 5679", () => {
+  test('ZecAmount - amtZec -1.123456789 rounded up result ZEC -1.1234 5679', () => {
     const text = create(<ZecAmount amtZec={-1.123456789} />).toJSON();
     expect(text.type).toBe('View');
     expect(text.children[0].type).toBe('Text');
@@ -153,7 +153,7 @@ describe("Component Components - test", () => {
     expect(text.children[1].children[0]).toBe('5679');
   });
 
-  test("ZecAmount - amtZec 1.123456781 rounded down result ZEC 1.1234 5678", () => {
+  test('ZecAmount - amtZec 1.123456781 rounded down result ZEC 1.1234 5678', () => {
     const text = create(<ZecAmount amtZec={1.123456781} />).toJSON();
     expect(text.type).toBe('View');
     expect(text.children[0].type).toBe('Text');
@@ -181,7 +181,7 @@ describe("Component Components - test", () => {
     expect(text.children[1].children[0]).toBe('');
   });
 
-  test("ZecAmount - size 11 result same and same / 2", () => {
+  test('ZecAmount - size 11 result same and same / 2', () => {
     const text = create(<ZecAmount size={11} />).toJSON();
     expect(text.type).toBe('View');
     expect(text.children[0].type).toBe('Text');
@@ -296,5 +296,4 @@ describe("Component Components - test", () => {
     expect(text.type).toBe('TextInput');
     expect(text.props.style[0].backgroundColor).toBe('red');
   });
-
 });

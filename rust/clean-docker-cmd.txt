@@ -1,0 +1,9 @@
+windows:
+for /F %i in ('docker images -a -q') do docker rmi -f %i
+
+Ubuntu:
+docker system prune -a --volumes
+
+Stop service windows:
+net stop com.docker.service
+net start com.docker.service

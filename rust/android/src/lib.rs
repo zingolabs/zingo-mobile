@@ -3,7 +3,7 @@
 extern crate android_logger;
 extern crate log;
 
-use android_logger::Config;
+use android_logger::{Config, FilterBuilder};
 use log::Level;
 
 use jni::objects::{JObject, JString};
@@ -12,15 +12,15 @@ use jni::JNIEnv;
 use std::ffi::{CStr, CString};
 
 #[no_mangle]
-pub unsafe extern "C" fn Java_com_zingo_RPCModule_initlogging(
-    env: JNIEnv,
-    _: JObject,
-) -> jstring {
-    android_logger::init_once(Config::default().with_min_level(Level::Trace));
-
-    let ok = format!("OK");
-    let output = env.new_string(ok.as_str()).unwrap();
-    return output.into_inner();
+pub unsafe extern "C" fn Java_com_zingo_RPCModule_initlogging(env: JNIEnv, _: JObject) -> jstring {
+    android_logger::init_once(
+        Config::default().with_min_level(Level::Trace).with_filter(
+            FilterBuilder::new()
+                .parse("debug,hello::crate=zingolib")
+                .build(),
+        ),
+    );
+    env.new_string("OK").unwrap().into_inner()
 }
 
 #[no_mangle]
@@ -157,10 +157,7 @@ pub unsafe extern "C" fn Java_com_zingo_RPCModule_initfromb64(
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn Java_com_zingo_RPCModule_save(
-    env: JNIEnv,
-    _: JObject,
-) -> jstring {
+pub unsafe extern "C" fn Java_com_zingo_RPCModule_save(env: JNIEnv, _: JObject) -> jstring {
     let encoded = rustlib::save_to_b64();
     let output = env.new_string(encoded.as_str()).unwrap();
     output.into_inner()
