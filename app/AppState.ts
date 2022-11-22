@@ -79,11 +79,13 @@ export class TotalBalance {
 }
 
 export class Address {
+  uaAddress: string;
   address: string;
   addressKind: string;
   containsPending: boolean;
 
-  constructor(address: string, addressKind: string) {
+  constructor(uaAddress: string, address: string, addressKind: string) {
+    this.uaAddress = uaAddress;
     this.address = address;
     this.addressKind = addressKind;
     this.containsPending = false;
@@ -335,6 +337,8 @@ export default interface AppState {
   syncReportModalVisible: boolean;
 
   newServer: string | null;
+
+  uaAddress: string | null;
 
   // eslint-disable-next-line semi
 }
