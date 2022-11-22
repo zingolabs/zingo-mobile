@@ -101,6 +101,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
       seedServerModalVisible: false,
       syncReportModalVisible: false,
       newServer: null,
+      uaAddress: null,
     };
 
     this.rpc = new RPC(
@@ -169,9 +170,14 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
   };
 
   setAllAddresses = (addresses: Address[]) => {
-    if (!isEqual(this.state.addresses, addresses)) {
+    const { uaAddress } = this.state;
+    if (!isEqual(this.state.addresses, addresses) || uaAddress === null) {
       //console.log('addresses');
-      this.setState({ addresses });
+      if (uaAddress === null) {
+        this.setState({ addresses, uaAddress: addresses[0].uaAddress });
+      } else {
+        this.setState({ addresses });
+      }
     }
   };
 
@@ -516,6 +522,10 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
     this.navigateToLoading();
   };
 
+  setUaAddress = uaAddress => {
+    this.setState({ uaAddress: uaAddress });
+  };
+
   render() {
     const {
       syncStatusReport,
@@ -538,6 +548,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
       walletSeed,
       syncingStatus,
       txBuildProgress,
+      uaAddress,
+      setUaAddress,
     } = this.state;
     const { colors } = this.props.theme;
     const { translate } = this.props;
@@ -896,6 +908,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
                       await this.fetchWalletSeed();
                       this.setState({ syncReportModalVisible: true });
                     }}
+                    uaAddress={uaAddress}
+                    setUaAddress={setUaAddress}
                   />
                 </Suspense>
               </>
@@ -917,6 +931,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
                     startRescan={this.startRescan}
                     totalBalance={totalBalance}
                     info={info}
+                    uaAddress={uaAddress}
                   />
                 </Suspense>
               </>

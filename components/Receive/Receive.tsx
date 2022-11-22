@@ -32,6 +32,8 @@ type ReceiveProps = {
   syncingStatus: SyncStatus | null;
   syncingStatusMoreInfoOnClick: () => void;
   translate: (key: string, config?: TranslateOptions) => any;
+  uaAddress: string | null;
+  setUaAddress: (uaAddress) => void;
 };
 
 const Receive: React.FunctionComponent<ReceiveProps> = ({
@@ -44,6 +46,8 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   syncingStatus,
   syncingStatusMoreInfoOnClick,
   translate,
+  uaAddress,
+  setUaAddress,
 }) => {
   const { colors } = useTheme() as unknown as ThemeType;
   const [index, setIndex] = React.useState(0);
@@ -55,13 +59,14 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   const zecPrice = info ? info.zecPrice : null;
   const currencyName = info ? info.currencyName : undefined;
 
-  const uaddrs = addresses.filter(a => a.addressKind === 'u') || [];
+  const uaddrs = addresses.filter(a => a.uaAddress === uaAddress && a.addressKind === 'u') || [];
 
   if (displayAddress) {
     const displayAddressIndex = uaddrs?.findIndex(a => a.address === displayAddress);
 
     if (oindex !== displayAddressIndex && displayAddressIndex >= 0) {
       setOIndex(displayAddressIndex);
+      setUaAddress(displayAddress);
     }
   }
 

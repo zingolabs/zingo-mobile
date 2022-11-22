@@ -29,6 +29,7 @@ type LegacyProps = {
   startRescan: () => void;
   totalBalance: TotalBalance;
   translate: (key: string, config?: TranslateOptions) => any;
+  uaAddress: string | null;
 };
 
 const Legacy: React.FunctionComponent<LegacyProps> = ({
@@ -39,6 +40,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({
   startRescan,
   totalBalance,
   translate,
+  uaAddress,
 }) => {
   const { colors } = useTheme() as unknown as ThemeType;
   const [index, setIndex] = React.useState(0);
@@ -54,8 +56,8 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({
   const zecPrice = info ? info.zecPrice : null;
   const currencyName = info ? info.currencyName : undefined;
 
-  const zaddrs = addresses.filter(a => a.addressKind === 'z') || [];
-  const taddrs = addresses.filter(a => a.addressKind === 't') || [];
+  const zaddrs = addresses.filter(a => a.uaAddress === uaAddress && a.addressKind === 'z') || [];
+  const taddrs = addresses.filter(a => a.uaAddress === uaAddress && a.addressKind === 't') || [];
 
   if (displayAddress) {
     let displayAddressIndex = zaddrs?.findIndex(a => a.address === displayAddress);

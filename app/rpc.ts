@@ -787,8 +787,8 @@ export default class RPC {
 
     //console.log('addrs:', addressesJSON.length, addressesJSON);
 
-    // for now only we use the first element of this array
-    addressesJSON = [addressesJSON[0]];
+    // if this array have more than one elemnts I can handle them.
+    //addressesJSON = [addressesJSON[0]];
 
     const balanceStr = await RPCModule.execute('balance', '');
     //console.log(balanceStr);
@@ -847,37 +847,30 @@ export default class RPC {
       console.log('ERROR: notes.pending_utxos no exists');
     }
 
-    // Addresses with Balance. The lite client reports balances in zatoshi, so divide by 10^8;
-    const oaddresses = addressesJSON.map((u: any) => {
+    let allAddresses = [];
+
+    addressesJSON.forEach((u: any) => {
       // If this has any unconfirmed txns, show that in the UI
-      const ab = new Address(u.address, 'u');
-      if (pendingAddress.has(ab.address)) {
-        ab.containsPending = true;
+      const abu = new Address(u.address, u.address, 'u');
+      if (pendingAddress.has(abu.address)) {
+        abu.containsPending = true;
       }
-      return ab;
+      allAddresses.push(abu);
+      const abz = new Address(u.address, u.receivers.sapling, 'z');
+      if (pendingAddress.has(abz.address)) {
+        abz.containsPending = true;
+      }
+      allAddresses.push(abz);
+      const abt = new Address(u.address, u.receivers.transparent, 't');
+      if (pendingAddress.has(abt.address)) {
+        abt.containsPending = true;
+      }
+      allAddresses.push(abt);
     });
 
-    const zaddresses = addressesJSON.map((z: any) => {
-      // If this has any unconfirmed txns, show that in the UI
-      const ab = new Address(z.receivers.sapling, 'z');
-      if (pendingAddress.has(ab.address)) {
-        ab.containsPending = true;
-      }
-      return ab;
-    });
+    //console.log(allAddresses);
 
-    const taddresses = addressesJSON.map((t: any) => {
-      // If this has any unconfirmed txns, show that in the UI
-      const ab = new Address(t.receivers.transparent, 't');
-      if (pendingAddress.has(ab.address)) {
-        ab.containsPending = true;
-      }
-      return ab;
-    });
-
-    const addresses = [...oaddresses, ...zaddresses, ...taddresses];
-
-    await this.fnSetAllAddresses(addresses);
+    await this.fnSetAllAddresses(allAddresses);
   }
 
   async fetchWalletHeight(): Promise<void> {
