@@ -493,7 +493,7 @@ export default class RPC {
         }
         const ss = await JSON.parse(s);
 
-        //console.log('sync status', ss);
+        console.log('sync status', ss);
 
         // syncronize status
         this.inRefresh = ss.in_progress;
@@ -992,7 +992,7 @@ export default class RPC {
     }
 
     const prevSendId = prevProgress.id;
-    //console.log('prev progress', prevProgress);
+    console.log('prev progress', prevProgress);
 
     // This is async, so fire and forget
     this.doSend(JSON.stringify(sendJson))
@@ -1010,7 +1010,7 @@ export default class RPC {
         }
         const progress = await JSON.parse(pro);
         const sendId = progress.id;
-        //console.log('progress', progress);
+        console.log('progress', progress);
 
         const updatedProgress = new SendProgress();
         if (sendId === prevSendId) {
