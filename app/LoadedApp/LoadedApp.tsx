@@ -522,7 +522,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
     this.navigateToLoading();
   };
 
-  setUaAddress = uaAddress => {
+  setUaAddress = (uaAddress: string) => {
     this.setState({ uaAddress: uaAddress });
   };
 
@@ -549,7 +549,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
       syncingStatus,
       txBuildProgress,
       uaAddress,
-      setUaAddress,
     } = this.state;
     const { colors } = this.props.theme;
     const { translate } = this.props;
@@ -855,7 +854,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
                       await this.fetchWalletSeed();
                       this.setState({ syncReportModalVisible: true });
                     }}
-                    inRefresh={this.rpc.inRefresh}
                   />
                 </Suspense>
               </>
@@ -909,7 +907,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
                       this.setState({ syncReportModalVisible: true });
                     }}
                     uaAddress={uaAddress}
-                    setUaAddress={setUaAddress}
+                    setUaAddress={this.setUaAddress}
                   />
                 </Suspense>
               </>

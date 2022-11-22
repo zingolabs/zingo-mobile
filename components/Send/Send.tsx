@@ -40,7 +40,6 @@ type SendProps = {
   setTxBuildProgress: (progress: SendProgress) => void;
   syncingStatus: SyncStatus | null;
   syncingStatusMoreInfoOnClick: () => void;
-  inRefresh: boolean;
   translate: (key: string, config?: TranslateOptions) => any;
 };
 
@@ -57,7 +56,6 @@ const Send: React.FunctionComponent<SendProps> = ({
   setTxBuildProgress,
   syncingStatus,
   syncingStatusMoreInfoOnClick,
-  inRefresh,
   translate,
 }) => {
   const { colors } = useTheme() as unknown as ThemeType;
@@ -75,7 +73,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   const { decimalSeparator } = getNumberFormatSettings();
   const syncStatusDisplayLine = syncingStatus?.inProgress ? `(${syncingStatus?.blocks})` : '';
   const spendable = totalBalance.transparentBal + totalBalance.spendablePrivate + totalBalance.spendableOrchard;
-  const stillConfirming = spendable !== totalBalance.total || inRefresh;
+  const stillConfirming = spendable !== totalBalance.total;
   const zecPrice = info ? info.zecPrice : null;
   const currencyName = info ? info.currencyName : undefined;
 
@@ -174,8 +172,8 @@ const Send: React.FunctionComponent<SendProps> = ({
   }, [sendPageState.toaddrs, getMaxAmount, decimalSeparator, currencyName]);
 
   useEffect(() => {
-    setSendButtonEnabled(validAddress === 1 && validAmount === 1 && !inRefresh);
-  }, [validAddress, validAmount, inRefresh]);
+    setSendButtonEnabled(validAddress === 1 && validAmount === 1);
+  }, [validAddress, validAmount]);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {

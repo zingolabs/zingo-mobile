@@ -847,7 +847,7 @@ export default class RPC {
       console.log('ERROR: notes.pending_utxos no exists');
     }
 
-    let allAddresses = [];
+    let allAddresses: Address[] = [];
 
     addressesJSON.forEach((u: any) => {
       // If this has any unconfirmed txns, show that in the UI

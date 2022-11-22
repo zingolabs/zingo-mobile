@@ -33,7 +33,7 @@ type ReceiveProps = {
   syncingStatusMoreInfoOnClick: () => void;
   translate: (key: string, config?: TranslateOptions) => any;
   uaAddress: string | null;
-  setUaAddress: (uaAddress) => void;
+  setUaAddress: (uaAddress: string) => void;
 };
 
 const Receive: React.FunctionComponent<ReceiveProps> = ({
