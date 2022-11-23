@@ -131,11 +131,14 @@ const TransactionsView: React.FunctionComponent<TransactionsViewProps> = ({
             display: 'flex',
             flexDirection: 'row',
             alignItems: 'center',
+            justifyContent: 'center',
+            flexWrap: 'wrap',
+            marginVertical: 5,
           }}>
-          <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
+          <RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
             {syncStatusDisplayLine ? translate('transactions.title-syncing') : translate('transactions.title')}
           </RegText>
-          <FadeText style={{ marginTop: 5, padding: 0 }}>{syncStatusDisplayLine ? syncStatusDisplayLine : ''}</FadeText>
+          <FadeText style={{ margin: 0, padding: 0 }}>{syncStatusDisplayLine ? syncStatusDisplayLine : ''}</FadeText>
           {!!syncStatusDisplayLine && (
             <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
               <View
@@ -143,10 +146,10 @@ const TransactionsView: React.FunctionComponent<TransactionsViewProps> = ({
                   display: 'flex',
                   flexDirection: 'row',
                   alignItems: 'center',
-                  marginTop: 5,
                   backgroundColor: colors.card,
-                  padding: 5,
                   borderRadius: 10,
+                  margin: 0,
+                  padding: 0,
                 }}>
                 <FadeText style={{ color: colors.primary }}>{translate('transactions.more')}</FadeText>
                 <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />

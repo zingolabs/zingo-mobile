@@ -75,7 +75,7 @@ const Rescan: React.FunctionComponent<RescanProps> = ({
         </View>
       </ScrollView>
 
-      <View style={{ flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', margin: 20 }}>
+      <View style={{ flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginVertical: 5 }}>
         <Button type="Primary" title={translate('rescan.button')} onPress={doRescanAndClose} />
         <Button type="Secondary" title={translate('cancel')} style={{ marginLeft: 10 }} onPress={closeModal} />
       </View>

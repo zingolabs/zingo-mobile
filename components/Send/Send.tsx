@@ -330,7 +330,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       style={{
         display: 'flex',
         justifyContent: 'flex-start',
-        alignItems: 'stretch',
+        width: '100%',
       }}>
       <Modal
         animationType="slide"
@@ -363,6 +363,82 @@ const Send: React.FunctionComponent<SendProps> = ({
         />
       </Modal>
 
+      
+      <Animated.View style={{ marginTop: slideAnim }}>
+        <View
+          onLayout={e => {
+            const { height } = e.nativeEvent.layout;
+            setTitleViewHeight(height);
+          }}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            paddingBottom: 0,
+            backgroundColor: colors.card,
+            zIndex: -1,
+          }}>
+          <View
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              paddingBottom: 0,
+              backgroundColor: colors.card,
+              zIndex: -1,
+              paddingTop: 10,
+            }}>
+            <Image
+              source={require('../../assets/img/logobig-zingo.png')}
+              style={{ width: 80, height: 80, resizeMode: 'contain' }}
+            />
+            <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} />
+            <UsdAmount style={{ marginTop: 0, marginBottom: 5 }} price={zecPrice} amtZec={totalBalance.total} />
+
+            <View 
+              style={{ 
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexWrap: 'wrap',
+                marginVertical: 5, 
+              }}>
+              <RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
+                {syncStatusDisplayLine ? translate('send.title-syncing') : translate('send.title')}
+              </RegText>
+              <FadeText style={{ margin: 0, padding: 0 }}>
+                {syncStatusDisplayLine ? syncStatusDisplayLine : ''}
+              </FadeText>
+              {!!syncStatusDisplayLine && (
+                <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
+                  <View
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      backgroundColor: colors.card,
+                      borderRadius: 10,
+                      margin: 0,
+                      padding: 0,
+                    }}>
+                    <FadeText style={{ color: colors.primary }}>{translate('send.more')}</FadeText>
+                    <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
+                  </View>
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
+        </View>
+      </Animated.View>
+
+      <Animated.View
+        style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', marginTop: slideAnim }}>
+        <TouchableOpacity onPress={toggleMenuDrawer}>
+          <FontAwesomeIcon icon={faBars} size={20} color={colors.border} />
+        </TouchableOpacity>
+      </Animated.View>
+
+      <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
+
       <ScrollView
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{
@@ -370,73 +446,6 @@ const Send: React.FunctionComponent<SendProps> = ({
           flexDirection: 'column',
           justifyContent: 'flex-start',
         }}>
-        <Animated.View style={{ marginTop: slideAnim }}>
-          <View
-            onLayout={e => {
-              const { height } = e.nativeEvent.layout;
-              setTitleViewHeight(height);
-            }}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              paddingBottom: 0,
-              backgroundColor: colors.card,
-              zIndex: -1,
-            }}>
-            <View
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                paddingBottom: 0,
-                backgroundColor: colors.card,
-                zIndex: -1,
-                paddingTop: 10,
-              }}>
-              <Image
-                source={require('../../assets/img/logobig-zingo.png')}
-                style={{ width: 80, height: 80, resizeMode: 'contain' }}
-              />
-              <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} />
-              <UsdAmount style={{ marginTop: 0, marginBottom: 5 }} price={zecPrice} amtZec={totalBalance.total} />
-
-              <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
-                  {syncStatusDisplayLine ? translate('send.title-syncing') : translate('send.title')}
-                </RegText>
-                <FadeText style={{ marginTop: 5, padding: 0 }}>
-                  {syncStatusDisplayLine ? syncStatusDisplayLine : ''}
-                </FadeText>
-                {!!syncStatusDisplayLine && (
-                  <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
-                    <View
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        marginTop: 5,
-                        backgroundColor: colors.card,
-                        padding: 5,
-                        borderRadius: 10,
-                      }}>
-                      <FadeText style={{ color: colors.primary }}>{translate('send.more')}</FadeText>
-                      <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
-                    </View>
-                  </TouchableOpacity>
-                )}
-              </View>
-            </View>
-          </View>
-        </Animated.View>
-
-        <Animated.View
-          style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', marginTop: slideAnim }}>
-          <TouchableOpacity onPress={toggleMenuDrawer}>
-            <FontAwesomeIcon icon={faBars} size={20} color={colors.border} />
-          </TouchableOpacity>
-        </Animated.View>
-
-        <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
-
         {sendPageState.toaddrs.map((ta, i) => {
           return (
             <View key={i} style={{ display: 'flex', padding: 10, marginTop: 10 }}>
@@ -593,29 +602,29 @@ const Send: React.FunctionComponent<SendProps> = ({
             </View>
           );
         })}
-
-        <View
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            margin: 20,
-          }}>
-          <Button
-            type="Primary"
-            title={translate('send.button')}
-            disabled={!sendButtonEnabled}
-            onPress={() => setConfirmModalVisible(true)}
-          />
-          <Button
-            type="Secondary"
-            style={{ marginLeft: 10 }}
-            title={translate('send.clear')}
-            onPress={() => clearToAddrs()}
-          />
-        </View>
       </ScrollView>
+
+      <View
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'center',
+          alignItems: 'center',
+          marginVertical: 5,
+        }}>
+        <Button
+          type="Primary"
+          title={translate('send.button')}
+          disabled={!sendButtonEnabled}
+          onPress={() => setConfirmModalVisible(true)}
+        />
+        <Button
+          type="Secondary"
+          style={{ marginLeft: 10 }}
+          title={translate('send.clear')}
+          onPress={() => clearToAddrs()}
+        />
+      </View>
     </View>
   );
 };

@@ -507,7 +507,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
         </View>
       </ScrollView>
 
-      <View style={{ flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+      <View style={{ flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginVertical: 5 }}>
         <Button type="Secondary" title={translate('close')} onPress={closeModal} />
       </View>
     </SafeAreaView>
