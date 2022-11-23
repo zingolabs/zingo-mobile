@@ -9,8 +9,8 @@
   "loadingapp" : {
     "actualserver": "Servidor Activo:",
     "changeserver": "CAMBIAR SERVIDOR",
-    "createnewwallet": "Crear Monedero Nueva (nueva semilla)",
-    "opencurrentwallet": "Abrir Monedero Activa",
+    "createnewwallet": "Crear Monedero Nuevo (nueva semilla)",
+    "opencurrentwallet": "Abrir Monedero Activo",
     "restorewalletseed": "Restaurar Monedero con la Semilla",
     "restorewalletviewing": "Restaurar Monedero con la Clave de Lectura",
     "restorewalletspendable": "Restaurar Monedero con la Clave para Gastar",

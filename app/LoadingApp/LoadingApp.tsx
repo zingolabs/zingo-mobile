@@ -213,18 +213,18 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
           height: '100%',
           backgroundColor: colors.background,
         }}>
-        <ScrollView
-          style={{ maxHeight: '100%' }}
-          contentContainerStyle={{
-            flexDirection: 'column',
-            alignItems: 'stretch',
-            justifyContent: 'flex-start',
-            padding: 20,
-          }}>
           {screen === 0 && (
             <Text style={{ color: colors.zingo, fontSize: 40, fontWeight: 'bold' }}>{translate('zingo')}</Text>
           )}
           {screen === 1 && (
+            <ScrollView
+            style={{ maxHeight: '100%' }}
+            contentContainerStyle={{
+              flexDirection: 'column',
+              alignItems: 'stretch',
+              justifyContent: 'flex-start',
+              padding: 20,
+            }}>
             <View
               style={{
                 flex: 1,
@@ -312,6 +312,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
                 />
               </View>
             </View>
+            </ScrollView>
           )}
           {screen === 2 && seedPhrase && (
             <Modal
@@ -361,7 +362,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
               </Suspense>
             </Modal>
           )}
-        </ScrollView>
+        
       </SafeAreaView>
     );
   }
