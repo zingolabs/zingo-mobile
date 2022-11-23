@@ -332,7 +332,8 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                       backgroundColor: colors.card,
                       borderRadius: 10,
                       margin: 0,
-                      padding:0,
+                      padding: 0,
+                      marginLeft: 5,
                     }}>
                     <FadeText style={{ color: colors.primary }}>{translate('receive.more')}</FadeText>
                     <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />

@@ -363,7 +363,6 @@ const Send: React.FunctionComponent<SendProps> = ({
         />
       </Modal>
 
-      
       <Animated.View style={{ marginTop: slideAnim }}>
         <View
           onLayout={e => {
@@ -393,14 +392,14 @@ const Send: React.FunctionComponent<SendProps> = ({
             <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} />
             <UsdAmount style={{ marginTop: 0, marginBottom: 5 }} price={zecPrice} amtZec={totalBalance.total} />
 
-            <View 
-              style={{ 
+            <View
+              style={{
                 display: 'flex',
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexWrap: 'wrap',
-                marginVertical: 5, 
+                marginVertical: 5,
               }}>
               <RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
                 {syncStatusDisplayLine ? translate('send.title-syncing') : translate('send.title')}
@@ -419,6 +418,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       borderRadius: 10,
                       margin: 0,
                       padding: 0,
+                      marginLeft: 5,
                     }}>
                     <FadeText style={{ color: colors.primary }}>{translate('send.more')}</FadeText>
                     <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
@@ -430,8 +430,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         </View>
       </Animated.View>
 
-      <Animated.View
-        style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', marginTop: slideAnim }}>
+      <Animated.View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', marginTop: slideAnim }}>
         <TouchableOpacity onPress={toggleMenuDrawer}>
           <FontAwesomeIcon icon={faBars} size={20} color={colors.border} />
         </TouchableOpacity>
