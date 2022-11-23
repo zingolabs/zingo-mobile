@@ -131,7 +131,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           flexDirection: 'column',
           alignItems: 'stretch',
           justifyContent: 'flex-start',
-          backgroundColor: colors.background,
         }}>
         <View style={{ display: 'flex', margin: 10 }}>
           <BoldText>{translate('settings.server-title')}</BoldText>
@@ -234,13 +233,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         </View>
       </ScrollView>
 
-      <View
-        style={{ flexGrow: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', margin: 20 }}>
-        <View
-          style={{ flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 5 }}>
-          <Button type="Primary" title={translate('settings.save')} style={{ marginLeft: 10 }} onPress={saveSettings} />
-          <Button type="Secondary" title={translate('cancel')} style={{ marginLeft: 10 }} onPress={closeModal} />
-        </View>
+      <View style={{ flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+        <Button type="Primary" title={translate('settings.save')} onPress={saveSettings} />
+        <Button type="Secondary" title={translate('cancel')} style={{ marginLeft: 10 }} onPress={closeModal} />
       </View>
     </SafeAreaView>
   );
