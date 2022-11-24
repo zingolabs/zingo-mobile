@@ -213,11 +213,11 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
           height: '100%',
           backgroundColor: colors.background,
         }}>
-          {screen === 0 && (
-            <Text style={{ color: colors.zingo, fontSize: 40, fontWeight: 'bold' }}>{translate('zingo')}</Text>
-          )}
-          {screen === 1 && (
-            <ScrollView
+        {screen === 0 && (
+          <Text style={{ color: colors.zingo, fontSize: 40, fontWeight: 'bold' }}>{translate('zingo')}</Text>
+        )}
+        {screen === 1 && (
+          <ScrollView
             style={{ maxHeight: '100%' }}
             contentContainerStyle={{
               flexDirection: 'column',
@@ -312,57 +312,56 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
                 />
               </View>
             </View>
-            </ScrollView>
-          )}
-          {screen === 2 && seedPhrase && (
-            <Modal
-              animationType="slide"
-              transparent={false}
-              visible={screen === 2}
-              onRequestClose={() => this.navigateToLoaded()}>
-              <Suspense
-                fallback={
-                  <View>
-                    <Text>{translate('loading')}</Text>
-                  </View>
-                }>
-                <Seed
-                  seed={JSON.parse(seedPhrase)?.seed}
-                  birthday={JSON.parse(seedPhrase)?.birthday}
-                  onClickOK={() => this.navigateToLoaded()}
-                  onClickCancel={() => this.navigateToLoaded()}
-                  totalBalance={totalBalance}
-                  action={'new'}
-                  currencyName={currencyName || undefined}
-                  translate={translate}
-                />
-              </Suspense>
-            </Modal>
-          )}
-          {screen === 3 && (
-            <Modal
-              animationType="slide"
-              transparent={false}
-              visible={screen === 3}
-              onRequestClose={() => this.setState({ screen: 1 })}>
-              <Suspense
-                fallback={
-                  <View>
-                    <Text>{translate('loading')}</Text>
-                  </View>
-                }>
-                <Seed
-                  onClickOK={(s: string, b: number) => this.doRestore(s, b)}
-                  onClickCancel={() => this.setState({ screen: 1 })}
-                  totalBalance={totalBalance}
-                  action={'restore'}
-                  currencyName={currencyName || undefined}
-                  translate={translate}
-                />
-              </Suspense>
-            </Modal>
-          )}
-        
+          </ScrollView>
+        )}
+        {screen === 2 && seedPhrase && (
+          <Modal
+            animationType="slide"
+            transparent={false}
+            visible={screen === 2}
+            onRequestClose={() => this.navigateToLoaded()}>
+            <Suspense
+              fallback={
+                <View>
+                  <Text>{translate('loading')}</Text>
+                </View>
+              }>
+              <Seed
+                seed={JSON.parse(seedPhrase)?.seed}
+                birthday={JSON.parse(seedPhrase)?.birthday}
+                onClickOK={() => this.navigateToLoaded()}
+                onClickCancel={() => this.navigateToLoaded()}
+                totalBalance={totalBalance}
+                action={'new'}
+                currencyName={currencyName || undefined}
+                translate={translate}
+              />
+            </Suspense>
+          </Modal>
+        )}
+        {screen === 3 && (
+          <Modal
+            animationType="slide"
+            transparent={false}
+            visible={screen === 3}
+            onRequestClose={() => this.setState({ screen: 1 })}>
+            <Suspense
+              fallback={
+                <View>
+                  <Text>{translate('loading')}</Text>
+                </View>
+              }>
+              <Seed
+                onClickOK={(s: string, b: number) => this.doRestore(s, b)}
+                onClickCancel={() => this.setState({ screen: 1 })}
+                totalBalance={totalBalance}
+                action={'restore'}
+                currencyName={currencyName || undefined}
+                translate={translate}
+              />
+            </Suspense>
+          </Modal>
+        )}
       </SafeAreaView>
     );
   }

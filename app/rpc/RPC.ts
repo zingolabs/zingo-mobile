@@ -11,10 +11,10 @@ import {
   WalletSeed,
   SendProgress,
   WalletSettings,
-} from './AppState';
-import RPCModule from '../components/RPCModule';
-import Utils from './utils';
-import SettingsFileImpl from '../components/Settings/SettingsFileImpl';
+} from '../AppState';
+import RPCModule from '../../components/RPCModule';
+import Utils from '../utils';
+import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 
 export default class RPC {
   fnSetSyncStatusReport: (syncStatusReport: SyncStatusReport) => void;

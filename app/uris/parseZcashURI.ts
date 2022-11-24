@@ -1,49 +1,9 @@
 import { Base64 } from 'js-base64';
 import Url from 'url-parse';
-import RPCModule from '../components/RPCModule';
+import RPCModule from '../../components/RPCModule';
+import { ZcashURITarget } from './ZcashURITarget';
 
-export class ZcashURITarget {
-  address?: string;
-
-  amount?: number;
-
-  label?: string;
-
-  message?: string;
-
-  memoBase64?: string;
-
-  memoString?: string;
-
-  // A default constructor that creates a basic Target
-  constructor(address?: string, amount?: number, memo?: string) {
-    this.address = address;
-    this.amount = amount;
-    this.memoString = memo;
-  }
-}
-
-export const SERVER_URI = ['https://mainnet.lightwalletd.com:9067', 'https://zuul.free2z.cash:9067'];
-
-export const parseServerURI = (uri: string): string => {
-  if (!uri || uri === '') {
-    return 'Error: Bad URI';
-  }
-
-  const parsedUri = new Url(uri, true);
-  if (
-    !parsedUri ||
-    !parsedUri.hostname ||
-    !parsedUri.protocol ||
-    (parsedUri.protocol !== 'http:' && parsedUri.protocol !== 'https:')
-  ) {
-    return 'Error: Bad URI';
-  }
-
-  return 'URI is OK';
-};
-
-export const parseZcashURI = async (uri: string): Promise<string | ZcashURITarget[]> => {
+export const parseZcashURI = async (uri: string): Promise<string | ZcashURITarget> => {
   if (!uri || uri === '') {
     return 'Bad URI';
   }
@@ -192,5 +152,6 @@ export const parseZcashURI = async (uri: string): Promise<string | ZcashURITarge
     return 'Some indexes were missing';
   }
 
-  return ans;
+  // if the URI have several addresses I get only the first one.
+  return ans[0];
 };

@@ -20,7 +20,7 @@ import ZecAmount from '../Components/ZecAmount';
 import UsdAmount from '../Components/UsdAmount';
 import Button from '../Button';
 import { InfoType, SendPageState, SendProgress, ToAddr, TotalBalance, SyncStatus } from '../../app/AppState';
-import { parseZcashURI } from '../../app/uris';
+import { parseZcashURI, ZcashURITarget } from '../../app/uris';
 import RPCModule from '../RPCModule';
 import Utils from '../../app/utils';
 import Scanner from './components/Scanner';
@@ -33,7 +33,7 @@ type SendProps = {
   sendPageState: SendPageState;
   setSendPageState: (sendPageState: SendPageState) => void;
   sendTransaction: (setSendProgress: (arg0: SendProgress | null) => void) => void;
-  clearToAddrs: () => void;
+  clearToAddr: () => void;
   navigation: NavigationScreenProp<any>;
   toggleMenuDrawer: () => void;
   setComputingModalVisible: (visible: boolean) => void;
@@ -49,7 +49,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   sendPageState,
   setSendPageState,
   sendTransaction,
-  clearToAddrs,
+  clearToAddr,
   navigation,
   toggleMenuDrawer,
   setComputingModalVisible,
@@ -60,7 +60,6 @@ const Send: React.FunctionComponent<SendProps> = ({
 }) => {
   const { colors } = useTheme() as unknown as ThemeType;
   const [qrcodeModalVisble, setQrcodeModalVisible] = useState(false);
-  const [qrcodeModalIndex, setQrcodeModalIndex] = useState(0);
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
   const [titleViewHeight, setTitleViewHeight] = useState(0);
   const [memoEnabled, setMemoEnabled] = useState(false);
@@ -104,7 +103,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       );
     };
 
-    const address = sendPageState.toaddrs[0].to;
+    const address = sendPageState.toaddr.to;
 
     if (address) {
       getMemoEnabled(address).then(r => {
@@ -113,7 +112,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     } else {
       setMemoEnabled(false);
     }
-  }, [sendPageState.toaddrs, currencyName]);
+  }, [sendPageState.toaddr, currencyName]);
 
   useEffect(() => {
     const parseAdressJSON = async (address: string): Promise<boolean> => {
@@ -133,7 +132,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       );
     };
 
-    const address = sendPageState.toaddrs[0].to;
+    const address = sendPageState.toaddr.to;
 
     if (address) {
       parseAdressJSON(address).then(r => {
@@ -143,7 +142,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       setValidAddress(0);
     }
 
-    var to = sendPageState.toaddrs[0];
+    var to = sendPageState.toaddr;
     to.amount = to.amount.replace(decimalSeparator, '.');
     to.amountUSD = to.amountUSD.replace(decimalSeparator, '.');
 
@@ -169,7 +168,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     } else {
       setValidAmount(0);
     }
-  }, [sendPageState.toaddrs, getMaxAmount, decimalSeparator, currencyName]);
+  }, [sendPageState.toaddr, getMaxAmount, decimalSeparator, currencyName]);
 
   useEffect(() => {
     setSendButtonEnabled(validAddress === 1 && validAmount === 1);
@@ -200,45 +199,44 @@ const Send: React.FunctionComponent<SendProps> = ({
   }, [slideAnim, titleViewHeight]);
 
   const updateToField = async (
-    idx: number,
     address: string | null,
     amount: string | null,
     amountUSD: string | null,
     memo: string | null,
   ) => {
     // Create the new state object
-    const newState = new SendPageState();
+    const newState = new SendPageState(new ToAddr(0));
 
-    const newToAddrs = sendPageState.toaddrs.slice(0);
+    const newToAddr = sendPageState.toaddr;
     // Find the correct toAddr
-    const toAddr = newToAddrs[idx];
+    const toAddr = newToAddr;
 
     if (address !== null) {
       // Attempt to parse as URI if it starts with zcash
       if (address.startsWith('zcash:')) {
-        const targets = await parseZcashURI(address);
+        const target: string | ZcashURITarget = await parseZcashURI(address);
         //console.log(targets);
 
-        if (Array.isArray(targets)) {
+        if (typeof target !== 'string') {
           // redo the to addresses
-          const uriToAddrs: ToAddr[] = [];
-          targets.forEach(tgt => {
+          let uriToAddr: ToAddr = new ToAddr(0);
+          [target].forEach(tgt => {
             const to = new ToAddr(Utils.getNextToAddrID());
 
             to.to = tgt.address || '';
             to.amount = Utils.maxPrecisionTrimmed(tgt.amount || 0);
             to.memo = tgt.memoString || '';
 
-            uriToAddrs.push(to);
+            uriToAddr = to;
           });
 
-          newState.toaddrs = uriToAddrs;
+          newState.toaddr = uriToAddr;
 
           setSendPageState(newState);
           return;
         } else {
           // Show the error message as a toast
-          Toast.show(targets);
+          Toast.show(target);
           return;
         }
       } else {
@@ -277,7 +275,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       toAddr.memo = memo;
     }
 
-    newState.toaddrs = newToAddrs;
+    newState.toaddr = newToAddr;
     setSendPageState(newState);
   };
 
@@ -301,7 +299,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         setComputingModalVisible(false);
 
         // Clear the fields
-        clearToAddrs();
+        clearToAddr();
 
         navigation.navigate(translate('loadedapp.wallet-menu'));
         setTimeout(() => {
@@ -337,12 +335,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         transparent={false}
         visible={qrcodeModalVisble}
         onRequestClose={() => setQrcodeModalVisible(false)}>
-        <Scanner
-          idx={qrcodeModalIndex}
-          updateToField={updateToField}
-          closeModal={() => setQrcodeModalVisible(false)}
-          translate={translate}
-        />
+        <Scanner updateToField={updateToField} closeModal={() => setQrcodeModalVisible(false)} translate={translate} />
       </Modal>
 
       <Modal
@@ -445,7 +438,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           flexDirection: 'column',
           justifyContent: 'flex-start',
         }}>
-        {sendPageState.toaddrs.map((ta, i) => {
+        {[sendPageState.toaddr].map((ta, i) => {
           return (
             <View key={i} style={{ display: 'flex', padding: 10, marginTop: 10 }}>
               <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -469,11 +462,10 @@ const Send: React.FunctionComponent<SendProps> = ({
                   placeholderTextColor={colors.placeholder}
                   style={{ flexGrow: 1, maxWidth: '90%' }}
                   value={ta.to}
-                  onChangeText={(text: string) => updateToField(i, text, null, null, null)}
+                  onChangeText={(text: string) => updateToField(text, null, null, null)}
                 />
                 <TouchableOpacity
                   onPress={() => {
-                    setQrcodeModalIndex(i);
                     setQrcodeModalVisible(true);
                   }}>
                   <FontAwesomeIcon style={{ margin: 5 }} size={24} icon={faQrcode} color={colors.border} />
@@ -516,7 +508,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       width: '75%',
                     }}
                     value={ta.amount.toString()}
-                    onChangeText={(text: string) => updateToField(i, null, text, null, null)}
+                    onChangeText={(text: string) => updateToField(null, text, null, null)}
                   />
                   <RegText style={{ marginTop: 15, marginRight: 10, marginLeft: 5 }}>ZEC</RegText>
                 </View>
@@ -546,7 +538,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       width: '55%',
                     }}
                     value={ta.amountUSD.toString()}
-                    onChangeText={(text: string) => updateToField(i, null, null, text, null)}
+                    onChangeText={(text: string) => updateToField(null, null, text, null)}
                   />
                   <RegText style={{ marginTop: 15, marginLeft: 5 }}>USD</RegText>
                 </View>
@@ -593,7 +585,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         borderColor: colors.text,
                       }}
                       value={ta.memo}
-                      onChangeText={(text: string) => updateToField(i, null, null, null, text)}
+                      onChangeText={(text: string) => updateToField(null, null, null, text)}
                     />
                   </View>
                 </>
@@ -621,7 +613,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           type="Secondary"
           style={{ marginLeft: 10 }}
           title={translate('send.clear')}
-          onPress={() => clearToAddrs()}
+          onPress={() => clearToAddr()}
         />
       </View>
     </View>

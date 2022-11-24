@@ -137,7 +137,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         </View>
 
         <View style={{ display: 'flex', marginLeft: 25 }}>
-          {SERVER_URI.map(uri => (
+          {SERVER_URI.map((uri: string) => (
             <TouchableOpacity
               key={'touch-' + uri}
               style={{ marginRight: 10, marginBottom: 5 }}

@@ -12,19 +12,12 @@ import { parseZcashURI } from '../../../app/uris';
 import RPCModule from '../../RPCModule';
 
 type ScannerProps = {
-  idx: number;
-  updateToField: (
-    idx: number,
-    address: string | null,
-    amount: string | null,
-    amountUSD: string | null,
-    memo: string | null,
-  ) => void;
+  updateToField: (address: string | null, amount: string | null, amountUSD: string | null, memo: string | null) => void;
   closeModal: () => void;
   translate: (key: string, config?: TranslateOptions) => any;
 };
 
-const Scanner: React.FunctionComponent<ScannerProps> = ({ idx, updateToField, closeModal, translate }) => {
+const Scanner: React.FunctionComponent<ScannerProps> = ({ updateToField, closeModal, translate }) => {
   const validateAddress = async (scannedAddress: string) => {
     const result = await RPCModule.execute('parse', scannedAddress);
     const resultJSON = await JSON.parse(result);
@@ -34,18 +27,18 @@ const Scanner: React.FunctionComponent<ScannerProps> = ({ idx, updateToField, cl
     const valid = resultJSON?.status === 'success';
 
     if (valid) {
-      updateToField(idx, scannedAddress, null, null, null);
+      updateToField(scannedAddress, null, null, null);
       closeModal();
     } else {
       // Try to parse as a URI
       if (scannedAddress.startsWith('zcash:')) {
-        const targets = await parseZcashURI(scannedAddress);
+        const target = await parseZcashURI(scannedAddress);
 
-        if (Array.isArray(targets)) {
-          updateToField(idx, scannedAddress, null, null, null);
+        if (typeof target !== 'string') {
+          updateToField(scannedAddress, null, null, null);
           closeModal();
         } else {
-          Toast.show(`${translate('scanner.uri-error')} ${targets}`, Toast.LONG);
+          Toast.show(`${translate('scanner.uri-error')} ${target}`, Toast.LONG);
           return;
         }
       } else {

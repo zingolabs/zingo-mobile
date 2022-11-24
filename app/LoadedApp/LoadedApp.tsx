@@ -11,7 +11,8 @@ import { TranslateOptions } from 'i18n-js';
 
 import RPC from '../rpc';
 import RPCModule from '../../components/RPCModule';
-import AppState, {
+import {
+  AppState,
   SyncStatusReport,
   TotalBalance,
   SendPageState,
@@ -79,7 +80,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
       addresses: [],
       addressBook: [],
       transactions: null,
-      sendPageState: new SendPageState(),
+      sendPageState: new SendPageState(new ToAddr(0)),
       receivePageState: new ReceivePageState(),
       info: null,
       rescanning: false,
@@ -117,11 +118,11 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
     );
 
     // Create the initial ToAddr box
-    this.state.sendPageState.toaddrs = [new ToAddr(Utils.getNextToAddrID())];
+    this.state.sendPageState.toaddr = new ToAddr(Utils.getNextToAddrID());
   }
 
   componentDidMount = () => {
-    this.clearToAddrs();
+    this.clearToAddr();
 
     // Configure the RPC to start doing refreshes
     this.rpc.configure();
@@ -200,12 +201,12 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
     }
   };
 
-  clearToAddrs = () => {
-    const newToAddrs = [new ToAddr(Utils.getNextToAddrID())];
+  clearToAddr = () => {
+    const newToAddr = new ToAddr(Utils.getNextToAddrID());
 
     // Create the new state object
-    const newState = new SendPageState();
-    newState.toaddrs = newToAddrs;
+    const newState = new SendPageState(new ToAddr(0));
+    newState.toaddr = newToAddr;
 
     this.setSendPageState(newState);
   };
@@ -248,7 +249,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
 
   getSendManyJSON = (): Array<SendJsonToType> => {
     const { sendPageState } = this.state;
-    const json = sendPageState.toaddrs.flatMap(to => {
+    const json = [sendPageState.toaddr].flatMap((to: ToAddr) => {
       const memo = to.memo || '';
       const amount = parseInt((Number(to.amount) * 10 ** 8).toFixed(0), 10);
 
@@ -846,7 +847,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
                     sendPageState={sendPageState}
                     setSendPageState={this.setSendPageState}
                     sendTransaction={this.sendTransaction}
-                    clearToAddrs={this.clearToAddrs}
+                    clearToAddr={this.clearToAddr}
                     setComputingModalVisible={this.setComputingModalVisible}
                     setTxBuildProgress={this.setTxBuildProgress}
                     syncingStatus={syncingStatus}

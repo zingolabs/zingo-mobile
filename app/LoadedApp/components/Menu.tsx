@@ -14,6 +14,7 @@ type MenuProps = {
   onItemSelected: (item: string) => Promise<void>;
   translate: (key: string, config?: TranslateOptions) => any;
 };
+
 const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, translate }) => {
   const { colors } = useTheme();
   const item = {
