@@ -194,8 +194,14 @@ const Seed: React.FunctionComponent<SeedProps> = ({
           </FadeText>
         )}
       </ScrollView>
-
-      <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginVertical: 5}}>
+      <View
+        style={{
+          flexGrow: 1,
+          flexDirection: 'row',
+          justifyContent: 'center',
+          alignItems: 'center',
+          marginVertical: 5,
+        }}>
         <Button
           type="Primary"
           style={{

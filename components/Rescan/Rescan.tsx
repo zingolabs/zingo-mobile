@@ -74,8 +74,14 @@ const Rescan: React.FunctionComponent<RescanProps> = ({
           <RegText>{translate('rescan.text-1') + birthday + translate('rescan.text-2')}</RegText>
         </View>
       </ScrollView>
-
-      <View style={{ flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginVertical: 5 }}>
+      <View
+        style={{
+          flexGrow: 1,
+          flexDirection: 'row',
+          justifyContent: 'center',
+          alignItems: 'center',
+          marginVertical: 5,
+        }}>
         <Button type="Primary" title={translate('rescan.button')} onPress={doRescanAndClose} />
         <Button type="Secondary" title={translate('cancel')} style={{ marginLeft: 10 }} onPress={closeModal} />
       </View>

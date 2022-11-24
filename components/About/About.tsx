@@ -58,7 +58,14 @@ const About: React.FunctionComponent<AboutProps> = ({ closeModal, totalBalance, 
         }}>
         <FadeText>{translate('about.copyright')}</FadeText>
       </ScrollView>
-      <View style={{ flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginVertical: 5 }}>
+      <View
+        style={{
+          flexGrow: 1,
+          flexDirection: 'row',
+          justifyContent: 'center',
+          alignItems: 'center',
+          marginVertical: 5,
+        }}>
         <Button type="Secondary" title={translate('close')} onPress={closeModal} />
       </View>
     </SafeAreaView>

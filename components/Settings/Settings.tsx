@@ -232,8 +232,14 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           ))}
         </View>
       </ScrollView>
-
-      <View style={{ flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginVertical: 5 }}>
+      <View
+        style={{
+          flexGrow: 1,
+          flexDirection: 'row',
+          justifyContent: 'center',
+          alignItems: 'center',
+          marginVertical: 5,
+        }}>
         <Button type="Primary" title={translate('settings.save')} onPress={saveSettings} />
         <Button type="Secondary" title={translate('cancel')} style={{ marginLeft: 10 }} onPress={closeModal} />
       </View>
