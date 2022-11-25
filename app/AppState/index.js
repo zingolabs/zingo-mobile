@@ -12,7 +12,7 @@ import SendProgress from './SendProgress';
 import ServerSelectState from './ServerSelectState';
 import SettingsFileEntry from './SettingsFileEntry';
 import SyncStatus from './SyncStatus';
-import SyncStatusReport from 'SyncStatusReport';
+import SyncStatusReport from './SyncStatusReport';
 import ToAddr from './ToAddr';
 import TotalBalance from './TotalBalance';
 import Transaction from './Transaction';
