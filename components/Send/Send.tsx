@@ -432,7 +432,7 @@ const Send: React.FunctionComponent<SendProps> = ({
 
       <Animated.View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', marginTop: slideAnim }}>
         <TouchableOpacity onPress={toggleMenuDrawer}>
-          <FontAwesomeIcon icon={faBars} size={20} color={colors.border} />
+          <FontAwesomeIcon icon={faBars} size={40} color={colors.border} />
         </TouchableOpacity>
       </Animated.View>
 
@@ -475,7 +475,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                   onPress={() => {
                     setQrcodeModalVisible(true);
                   }}>
-                  <FontAwesomeIcon style={{ margin: 5 }} size={24} icon={faQrcode} color={colors.border} />
+                  <FontAwesomeIcon style={{ margin: 5 }} size={40} icon={faQrcode} color={colors.border} />
                 </TouchableOpacity>
               </View>
 

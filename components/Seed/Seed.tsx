@@ -61,7 +61,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
     setBirthdayNumber(birthday || 0);
   }, [action, seed, birthday, translate]);
 
-  //console.log(seed, birthday, onClickOK, onClickCancel, totalBalance, action, error, currencyName);
+  console.log(seed, birthday, onClickOK, onClickCancel, totalBalance, action, currencyName);
 
   return (
     <SafeAreaView
@@ -143,16 +143,24 @@ const Seed: React.FunctionComponent<SeedProps> = ({
               onChangeText={(text: string) => setSeedPhrase(text)}
             />
           )}
-          <ClickableText
-            style={{ padding: 10, marginTop: 0, textAlign: 'center' }}
-            onPress={() => {
-              if (seedPhrase) {
-                Clipboard.setString(seedPhrase);
-                Toast.show(translate('seed.tapcopy-message'), Toast.LONG);
-              }
-            }}>
-            {translate('seed.tapcopy')}
-          </ClickableText>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+            <View />
+            <ClickableText
+              style={{
+                padding: 10,
+                marginTop: 0,
+                textAlign: 'center',
+              }}
+              onPress={() => {
+                if (seedPhrase) {
+                  Clipboard.setString(seedPhrase);
+                  Toast.show(translate('seed.tapcopy-message'), Toast.LONG);
+                }
+              }}>
+              {translate('seed.tapcopy')}
+            </ClickableText>
+            <View />
+          </View>
         </View>
 
         <View style={{ marginTop: 10, alignItems: 'center' }}>

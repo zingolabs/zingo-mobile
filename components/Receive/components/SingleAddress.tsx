@@ -64,12 +64,11 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
       <View style={{ marginTop: 20, padding: 10, backgroundColor: colors.border }}>
         <QRCode value={address} size={200} ecl="L" backgroundColor={colors.border} />
       </View>
-      <ClickableText style={{ marginTop: 15 }} onPress={doCopy}>
+      <ClickableText style={{ margin: 15 }} onPress={doCopy}>
         {translate('seed.tapcopy')}
       </ClickableText>
 
-      <View
-        style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', marginTop: 10, justifyContent: 'center' }}>
+      <View style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
         {chunks.map(c => (
           <FadeText
             key={c}

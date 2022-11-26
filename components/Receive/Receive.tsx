@@ -346,13 +346,13 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
 
         <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute' }}>
           <TouchableOpacity onPress={toggleMenuDrawer}>
-            <FontAwesomeIcon icon={faBars} size={20} color={colors.border} />
+            <FontAwesomeIcon icon={faBars} size={40} color={colors.border} />
           </TouchableOpacity>
         </View>
 
         <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', right: 0 }}>
           <OptionsMenu
-            customButton={<FontAwesomeIcon icon={faEllipsisV} color={colors.border} size={20} />}
+            customButton={<FontAwesomeIcon icon={faEllipsisV} color={colors.border} size={40} />}
             buttonStyle={{ width: 32, height: 32, margin: 7.5, resizeMode: 'contain' }}
             destructiveIndex={4}
             options={[
