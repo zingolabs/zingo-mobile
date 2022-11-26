@@ -44,6 +44,7 @@
     "send-menu": "ENVIAR",
     "uas-menu": "DU's",
     "legacy-menu": "HEREDADAS",
+    "syncing": "Pausando la Sincronización para poder Enviar.",
   },
   "rpc": {
     "parsebirthday-error": "Error: No es posible convertirlo en un número:",

@@ -27,6 +27,7 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({ 
         backgroundColor: colors.background,
       }}>
       <RegText>{translate('loadedapp.computingtx')}</RegText>
+      {!(progress && progress.sendInProgress) && <RegText>{translate('loadedapp.syncing')}</RegText>}
       {!(progress && progress.sendInProgress) && <RegText>{translate('wait')}</RegText>}
       {progress && progress.sendInProgress && (
         <>

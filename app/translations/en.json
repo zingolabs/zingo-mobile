@@ -44,6 +44,7 @@
     "send-menu": "SEND",
     "uas-menu": "UA's",
     "legacy-menu": "LEGACY",
+    "syncing": "Pausing the Syncronization to be able to Send.",
   },
   "rpc": {
     "parsebirthday-error": "Error: Couldn't parse as a number:",
