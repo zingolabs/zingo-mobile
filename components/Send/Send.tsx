@@ -112,7 +112,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     } else {
       setMemoEnabled(false);
     }
-  }, [sendPageState.toaddr, currencyName]);
+  }, [sendPageState.toaddr, sendPageState.toaddr.to, currencyName]);
 
   useEffect(() => {
     const parseAdressJSON = async (address: string): Promise<boolean> => {
@@ -132,17 +132,16 @@ const Send: React.FunctionComponent<SendProps> = ({
       );
     };
 
-    const address = sendPageState.toaddr.to;
+    var to = sendPageState.toaddr;
 
-    if (address) {
-      parseAdressJSON(address).then(r => {
+    if (to.to) {
+      parseAdressJSON(to.to).then(r => {
         setValidAddress(r ? 1 : -1);
       });
     } else {
       setValidAddress(0);
     }
 
-    var to = sendPageState.toaddr;
     to.amount = to.amount.replace(decimalSeparator, '.');
     to.amountUSD = to.amountUSD.replace(decimalSeparator, '.');
 
@@ -168,7 +167,15 @@ const Send: React.FunctionComponent<SendProps> = ({
     } else {
       setValidAmount(0);
     }
-  }, [sendPageState.toaddr, getMaxAmount, decimalSeparator, currencyName]);
+  }, [
+    sendPageState.toaddr,
+    sendPageState.toaddr.to,
+    sendPageState.toaddr.amount,
+    sendPageState.toaddr.amountUSD,
+    getMaxAmount,
+    decimalSeparator,
+    currencyName,
+  ]);
 
   useEffect(() => {
     setSendButtonEnabled(validAddress === 1 && validAmount === 1);
