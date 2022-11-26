@@ -532,6 +532,7 @@ export default class RPC {
         let synced_blocks: number = ss.synced_blocks || 0;
         let trial_decryptions_blocks: number = ss.trial_decryptions_blocks || 0;
         let txn_scan_blocks: number = ss.txn_scan_blocks || 0;
+        let witnesses_updated: number = ss.witnesses_updated || 0;
 
         // just in case
         if (synced_blocks < 0) {
@@ -552,6 +553,12 @@ export default class RPC {
         if (txn_scan_blocks > 1000) {
           txn_scan_blocks = 1000;
         }
+        if (witnesses_updated < 0) {
+          witnesses_updated = 0;
+        }
+        if (witnesses_updated > 1000) {
+          witnesses_updated = 1000;
+        }
 
         const batch_total: number = ss.batch_total || 0;
         const batch_num: number = ss.batch_num || 0;
@@ -561,7 +568,7 @@ export default class RPC {
         const total_general_blocks: number = this.lastServerBlockHeight - this.process_end_block;
 
         //const progress_blocks: number = (synced_blocks + trial_decryptions_blocks + txn_scan_blocks) / 3;
-        const progress_blocks: number = (synced_blocks + trial_decryptions_blocks) / 2;
+        const progress_blocks: number = (synced_blocks + trial_decryptions_blocks + witnesses_updated) / 3;
 
         const total_progress_blocks: number = batch_total === 1 ? progress_blocks : 1000 * batch_num + progress_blocks;
 

@@ -1,6 +1,6 @@
-import { ToAddr } from './ToAddr';
+import ToAddr from './ToAddr';
 
-export class SendPageState {
+export default class SendPageState {
   toaddr: ToAddr;
 
   constructor(toaddr: ToAddr) {

@@ -1,4 +1,4 @@
-export interface ConnectedCompanionApp {
+export default interface ConnectedCompanionApp {
   name: string;
   lastSeen: number;
 }

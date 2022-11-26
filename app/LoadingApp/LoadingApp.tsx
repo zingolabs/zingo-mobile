@@ -9,7 +9,7 @@ import BoldText from '../../components/Components/BoldText';
 import Button from '../../components/Button';
 import RPCModule from '../../components/RPCModule';
 import { TotalBalance, SettingsFileEntry, InfoType } from '../AppState';
-import { SERVER_URI } from '../uris';
+import { serverUris } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import RPC from '../rpc';
 import { ThemeType } from '../types';
@@ -50,8 +50,8 @@ type LoadingAppClassState = {
   info: InfoType | null;
 };
 
-const SERVER_DEFAULT_0 = SERVER_URI[0];
-const SERVER_DEFAULT_1 = SERVER_URI[1];
+const SERVER_DEFAULT_0 = serverUris()[0];
+const SERVER_DEFAULT_1 = serverUris()[1];
 
 class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassState> {
   constructor(props: Readonly<LoadingAppClassProps>) {

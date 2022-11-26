@@ -1,6 +1,6 @@
 import Url from 'url-parse';
 
-export const parseServerURI = (uri: string): string => {
+const parseServerURI = (uri: string): string => {
   if (!uri || uri === '') {
     return 'Error: Bad URI';
   }
@@ -17,3 +17,5 @@ export const parseServerURI = (uri: string): string => {
 
   return 'URI is OK';
 };
+
+export default parseServerURI;

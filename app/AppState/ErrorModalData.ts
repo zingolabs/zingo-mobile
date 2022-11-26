@@ -1,4 +1,4 @@
-export class ErrorModalData {
+export default class ErrorModalData {
   title: string;
   body: string;
 

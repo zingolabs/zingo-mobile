@@ -1,4 +1,4 @@
-export interface InfoType {
+export default interface InfoType {
   chain_name: string;
   serverUri: string;
   latestBlock: number;

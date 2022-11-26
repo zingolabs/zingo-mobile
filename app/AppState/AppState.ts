@@ -1,18 +1,18 @@
-import { SyncStatusReport } from './SyncStatusReport';
-import { TotalBalance } from './TotalBalance';
-import { Address } from './Address';
-import { AddressBookEntry } from './AddressBookEntry';
-import { ErrorModalData } from './ErrorModalData';
-import { Transaction } from './Transaction';
-import { SendPageState } from './SendPageState';
-import { SendProgress } from './SendProgress';
-import { ReceivePageState } from './ReceivePageState';
-import { InfoType } from './InfoType';
-import { WalletSeed } from './WalletSeed';
-import { WalletSettings } from './WalletSettings';
-import { SyncStatus } from './SyncStatus';
+import SyncStatusReport from './SyncStatusReport';
+import TotalBalance from './TotalBalance';
+import Address from './Address';
+import AddressBookEntry from './AddressBookEntry';
+import ErrorModalData from './ErrorModalData';
+import Transaction from './Transaction';
+import SendPageState from './SendPageState';
+import SendProgress from './SendProgress';
+import ReceivePageState from './ReceivePageState';
+import InfoType from './InfoType';
+import WalletSeed from './WalletSeed';
+import WalletSettings from './WalletSettings';
+import SyncStatus from './SyncStatus';
 
-export interface AppState {
+export default interface AppState {
   // Info about the current sync process
   syncStatusReport: SyncStatusReport;
 

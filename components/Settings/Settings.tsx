@@ -13,7 +13,7 @@ import FadeText from '../Components/FadeText';
 import BoldText from '../Components/BoldText';
 import RegTextInput from '../Components/RegTextInput';
 import ZecAmount from '../Components/ZecAmount';
-import { parseServerURI, SERVER_URI } from '../../app/uris';
+import { parseServerURI, serverUris } from '../../app/uris';
 import Button from '../Button';
 import { WalletSettings, TotalBalance } from '../../app/AppState';
 import { ThemeType } from '../../app/types';
@@ -51,7 +51,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [customIcon, setCustomIcon] = React.useState(farCircle);
 
   React.useEffect(() => {
-    setCustomIcon(SERVER_URI.find((s: string) => s === server) ? farCircle : faDotCircle);
+    setCustomIcon(serverUris().find((s: string) => s === server) ? farCircle : faDotCircle);
   }, [server]);
 
   const saveSettings = async () => {
@@ -137,7 +137,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         </View>
 
         <View style={{ display: 'flex', marginLeft: 25 }}>
-          {SERVER_URI.map((uri: string) => (
+          {serverUris().map((uri: string) => (
             <TouchableOpacity
               key={'touch-' + uri}
               style={{ marginRight: 10, marginBottom: 5 }}

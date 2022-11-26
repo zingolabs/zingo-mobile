@@ -1,4 +1,4 @@
-export class SettingsFileEntry {
+export default class SettingsFileEntry {
   server?: string;
   language?: string;
   currency?: string;

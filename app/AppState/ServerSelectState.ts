@@ -1,3 +1,3 @@
-export interface ServerSelectState {
+export default interface ServerSelectState {
   modalIsOpen: boolean;
 }

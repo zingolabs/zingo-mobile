@@ -17,13 +17,14 @@ import ToAddr from './ToAddr';
 import TotalBalance from './TotalBalance';
 import Transaction from './Transaction';
 import TxDetailType from './TxDetailType';
-import WalletSeed from './walletSeed';
+import WalletSeed from './WalletSeed';
 import WalletSettings from './WalletSettings';
+
+export default AppState;
 
 export {
   Address,
   AddressBookEntry,
-  AppState,
   ConnectedCompanionApp,
   ErrorModalData,
   InfoType,

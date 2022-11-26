@@ -1,4 +1,4 @@
-export class PasswordState {
+export default class PasswordState {
   showPassword: boolean;
 
   confirmNeeded: boolean;

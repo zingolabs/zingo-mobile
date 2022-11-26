@@ -1,4 +1,4 @@
-export class AddressBookEntry {
+export default class AddressBookEntry {
   label: string;
   address: string;
 

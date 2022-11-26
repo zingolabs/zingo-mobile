@@ -1,9 +1,9 @@
 import { Base64 } from 'js-base64';
 import Url from 'url-parse';
 import RPCModule from '../../components/RPCModule';
-import { ZcashURITarget } from './ZcashURITarget';
+import ZcashURITarget from './ZcashURITarget';
 
-export const parseZcashURI = async (uri: string): Promise<string | ZcashURITarget> => {
+const parseZcashURI = async (uri: string): Promise<string | ZcashURITarget> => {
   if (!uri || uri === '') {
     return 'Bad URI';
   }
@@ -155,3 +155,5 @@ export const parseZcashURI = async (uri: string): Promise<string | ZcashURITarge
   // if the URI have several addresses I get only the first one.
   return ans[0];
 };
+
+export default parseZcashURI;

@@ -1,4 +1,4 @@
-export class WalletSettings {
+export default class WalletSettings {
   download_memos: string;
   transaction_filter_threshold: string;
   server?: string;

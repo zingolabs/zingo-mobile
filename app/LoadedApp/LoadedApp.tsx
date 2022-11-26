@@ -11,8 +11,7 @@ import { TranslateOptions } from 'i18n-js';
 
 import RPC from '../rpc';
 import RPCModule from '../../components/RPCModule';
-import {
-  AppState,
+import AppState, {
   SyncStatusReport,
   TotalBalance,
   SendPageState,

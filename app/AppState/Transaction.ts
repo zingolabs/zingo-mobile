@@ -1,6 +1,6 @@
-import { TxDetailType } from './TxDetailType';
+import TxDetailType from './TxDetailType';
 
-export interface Transaction {
+export default interface Transaction {
   type: string;
   address: string;
   amount: number;
