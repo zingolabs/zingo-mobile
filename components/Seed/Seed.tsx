@@ -67,10 +67,10 @@ const Seed: React.FunctionComponent<SeedProps> = ({
     <SafeAreaView
       style={{
         display: 'flex',
-        alignItems: 'stretch',
         justifyContent: 'flex-start',
-        backgroundColor: colors.background,
+        alignItems: 'stretch',
         height: '100%',
+        backgroundColor: colors.background,
       }}>
       <View
         style={{
@@ -103,7 +103,6 @@ const Seed: React.FunctionComponent<SeedProps> = ({
           flexDirection: 'column',
           alignItems: 'stretch',
           justifyContent: 'flex-start',
-          backgroundColor: colors.background,
         }}>
         <FadeText style={{ marginTop: 0, padding: 20, textAlign: 'center' }}>
           {readOnly ? translate('seed.text-readonly') : translate('seed.text-no-readonly')}
@@ -194,31 +193,37 @@ const Seed: React.FunctionComponent<SeedProps> = ({
             {translate('seed.mainnet-warning')}
           </FadeText>
         )}
-
-        <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', margin: 20 }}>
-          <Button
-            type="Primary"
-            style={{
-              backgroundColor: times === 3 ? 'red' : colors.primary,
-              color: times === 3 ? 'white' : colors.primary,
-            }}
-            title={!!texts && !!texts[action] ? texts[action][times] : ''}
-            onPress={() => {
-              if (!seedPhrase) {
-                return;
-              }
-              if (times === 0 || times === 3) {
-                onClickOK(seedPhrase, birthdayNumber);
-              } else if (times === 1 || times === 2) {
-                setTimes(times + 1);
-              }
-            }}
-          />
-          {(times > 0 || action === 'restore') && (
-            <Button type="Secondary" title={translate('cancel')} style={{ marginLeft: 10 }} onPress={onClickCancel} />
-          )}
-        </View>
       </ScrollView>
+      <View
+        style={{
+          flexGrow: 1,
+          flexDirection: 'row',
+          justifyContent: 'center',
+          alignItems: 'center',
+          marginVertical: 5,
+        }}>
+        <Button
+          type="Primary"
+          style={{
+            backgroundColor: times === 3 ? 'red' : colors.primary,
+            color: times === 3 ? 'white' : colors.primary,
+          }}
+          title={!!texts && !!texts[action] ? texts[action][times] : ''}
+          onPress={() => {
+            if (!seedPhrase) {
+              return;
+            }
+            if (times === 0 || times === 3) {
+              onClickOK(seedPhrase, birthdayNumber);
+            } else if (times === 1 || times === 2) {
+              setTimes(times + 1);
+            }
+          }}
+        />
+        {(times > 0 || action === 'restore') && (
+          <Button type="Secondary" title={translate('cancel')} style={{ marginLeft: 10 }} onPress={onClickCancel} />
+        )}
+      </View>
     </SafeAreaView>
   );
 };

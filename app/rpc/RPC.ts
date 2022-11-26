@@ -11,10 +11,10 @@ import {
   WalletSeed,
   SendProgress,
   WalletSettings,
-} from './AppState';
-import RPCModule from '../components/RPCModule';
-import Utils from './utils';
-import SettingsFileImpl from '../components/Settings/SettingsFileImpl';
+} from '../AppState';
+import RPCModule from '../../components/RPCModule';
+import Utils from '../utils';
+import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 
 export default class RPC {
   fnSetSyncStatusReport: (syncStatusReport: SyncStatusReport) => void;
@@ -37,6 +37,7 @@ export default class RPC {
   lastServerBlockHeight: number;
 
   inRefresh: boolean;
+  inSend: boolean;
 
   prevProgress: number;
   prevBatchNum: number;
@@ -77,6 +78,7 @@ export default class RPC {
     this.lastServerBlockHeight = 0;
 
     this.inRefresh = false;
+    this.inSend = false;
 
     this.prevProgress = 0;
     this.prevBatchNum = -1;
@@ -419,8 +421,8 @@ export default class RPC {
     }
 
     this.updateDataCtr += 1;
-    if (this.inRefresh && this.updateDataCtr % 5 !== 0) {
-      // We're refreshing, in which case update every 5th time
+    if ((this.inRefresh || this.inSend) && this.updateDataCtr % 5 !== 0) {
+      // We're refreshing or sending, in which case update every 5th time
       return;
     }
 
@@ -451,11 +453,14 @@ export default class RPC {
       return;
     }
 
+    console.log('in send', this.inSend);
+    // if it's sending now, don't fire the sync process.
     if (
-      fullRefresh ||
-      fullRescan ||
-      !this.lastWalletBlockHeight ||
-      this.lastWalletBlockHeight < this.lastServerBlockHeight
+      (fullRefresh ||
+        fullRescan ||
+        !this.lastWalletBlockHeight ||
+        this.lastWalletBlockHeight < this.lastServerBlockHeight) &&
+      !this.inSend
     ) {
       // If the latest block height has changed, make sure to sync. This will happen in a new thread
       this.inRefresh = true;
@@ -477,10 +482,12 @@ export default class RPC {
             this.inRefresh = false;
           });
       } else {
+        console.log('Starting New Sync');
         this.doSync()
           .then(r => console.log('End Sync OK: ' + r))
           .catch(e => console.log('End Sync ERROR: ' + e))
           .finally(() => {
+            console.log('in refresh: false');
             this.inRefresh = false;
           });
       }
@@ -493,7 +500,7 @@ export default class RPC {
         }
         const ss = await JSON.parse(s);
 
-        //console.log('sync status', ss);
+        console.log('sync status', ss);
 
         // syncronize status
         this.inRefresh = ss.in_progress;
@@ -525,6 +532,7 @@ export default class RPC {
         let synced_blocks: number = ss.synced_blocks || 0;
         let trial_decryptions_blocks: number = ss.trial_decryptions_blocks || 0;
         let txn_scan_blocks: number = ss.txn_scan_blocks || 0;
+        let witnesses_updated: number = ss.witnesses_updated || 0;
 
         // just in case
         if (synced_blocks < 0) {
@@ -545,6 +553,12 @@ export default class RPC {
         if (txn_scan_blocks > 1000) {
           txn_scan_blocks = 1000;
         }
+        if (witnesses_updated < 0) {
+          witnesses_updated = 0;
+        }
+        if (witnesses_updated > 1000) {
+          witnesses_updated = 1000;
+        }
 
         const batch_total: number = ss.batch_total || 0;
         const batch_num: number = ss.batch_num || 0;
@@ -554,7 +568,7 @@ export default class RPC {
         const total_general_blocks: number = this.lastServerBlockHeight - this.process_end_block;
 
         //const progress_blocks: number = (synced_blocks + trial_decryptions_blocks + txn_scan_blocks) / 3;
-        const progress_blocks: number = (synced_blocks + trial_decryptions_blocks) / 2;
+        const progress_blocks: number = (synced_blocks + trial_decryptions_blocks + witnesses_updated) / 3;
 
         const total_progress_blocks: number = batch_total === 1 ? progress_blocks : 1000 * batch_num + progress_blocks;
 
@@ -847,7 +861,7 @@ export default class RPC {
       console.log('ERROR: notes.pending_utxos no exists');
     }
 
-    let allAddresses = [];
+    let allAddresses: Address[] = [];
 
     addressesJSON.forEach((u: any) => {
       // If this has any unconfirmed txns, show that in the UI
@@ -992,12 +1006,14 @@ export default class RPC {
     }
 
     const prevSendId = prevProgress.id;
-    //console.log('prev progress', prevProgress);
+    console.log('prev progress id', prevSendId);
 
     // This is async, so fire and forget
     this.doSend(JSON.stringify(sendJson))
       .then(r => console.log('End Send OK: ' + r))
       .catch(e => console.log('End Send ERROR: ' + e));
+    // activate the send flag right now.
+    this.inSend = true;
 
     const startTimeSeconds = new Date().getTime() / 1000;
 
@@ -1010,14 +1026,16 @@ export default class RPC {
         }
         const progress = await JSON.parse(pro);
         const sendId = progress.id;
-        //console.log('progress', progress);
 
         const updatedProgress = new SendProgress();
         if (sendId === prevSendId) {
+          console.log('progress id', sendId);
           // Still not started, so wait for more time
           //setSendProgress(updatedProgress);
           return;
         }
+
+        console.log('progress', progress);
 
         // Calculate ETA.
         let secondsPerComputation = 3; // default
@@ -1053,6 +1071,8 @@ export default class RPC {
         setSendProgress(null);
 
         if (progress.txid) {
+          this.inSend = false;
+
           // And refresh data (full refresh)
           this.refresh(true);
 
@@ -1060,6 +1080,7 @@ export default class RPC {
         }
 
         if (progress.error) {
+          this.inSend = false;
           reject(progress.error);
         }
       }, 2000); // Every 2 seconds

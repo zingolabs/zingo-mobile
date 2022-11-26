@@ -144,7 +144,14 @@ const ImportKey: React.FunctionComponent<ImportKeyProps> = ({
 
         <RegText style={{ margin: 20 }}>{translate('import.text')}</RegText>
       </ScrollView>
-      <View style={{ flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', margin: 20 }}>
+      <View
+        style={{
+          flexGrow: 1,
+          flexDirection: 'row',
+          justifyContent: 'center',
+          alignItems: 'center',
+          marginVertical: 5,
+        }}>
         <Button type="Primary" title={translate('import.button')} onPress={okButton} />
         <Button type="Secondary" title={translate('cancel')} style={{ marginLeft: 10 }} onPress={closeModal} />
       </View>

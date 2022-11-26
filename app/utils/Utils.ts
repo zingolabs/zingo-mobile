@@ -1,9 +1,5 @@
 import { getNumberFormatSettings } from 'react-native-localize';
-
-type ZecAmountSplitType = {
-  bigPart: string;
-  smallPart: string;
-};
+import { ZecAmountSplitType } from './ZecAmountSplitType';
 
 export default class Utils {
   static trimToSmall(addr?: string, numChars?: number): string | undefined {

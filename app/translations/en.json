@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo!",
-  "version": "v0.0.74",
+  "version": "v0.0.75",
   "loading": "loading...",
   "wait": "Please wait...",
   "workingonit": "We are working on this feature.",
@@ -88,7 +88,8 @@
     "network": "Network",
     "serverblock": "Server Block Height",
     "zecprice": "ZEC Price",
-    "unknown": "Unknown"
+    "unknown": "Unknown",
+    "title": "Server Info",
   },
   "rescan": {
     "title": "Rescan",

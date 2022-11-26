@@ -33,7 +33,7 @@ type ReceiveProps = {
   syncingStatusMoreInfoOnClick: () => void;
   translate: (key: string, config?: TranslateOptions) => any;
   uaAddress: string | null;
-  setUaAddress: (uaAddress) => void;
+  setUaAddress: (uaAddress: string) => void;
 };
 
 const Receive: React.FunctionComponent<ReceiveProps> = ({
@@ -245,7 +245,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
         style={{
           display: 'flex',
           justifyContent: 'flex-start',
-          alignItems: 'stretch',
+          width: '100%',
         }}>
         <Modal
           animationType="slide"
@@ -307,11 +307,19 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
               amtZec={totalBalance.total}
             />
 
-            <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-              <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
+            <View
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexWrap: 'wrap',
+                marginVertical: 5,
+              }}>
+              <RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
                 {syncStatusDisplayLine ? translate('receive.title-syncing') : translate('receive.title')}
               </RegText>
-              <FadeText style={{ marginTop: 5, padding: 0 }}>
+              <FadeText style={{ margin: 0, padding: 0 }}>
                 {syncStatusDisplayLine ? syncStatusDisplayLine : ''}
               </FadeText>
               {!!syncStatusDisplayLine && (
@@ -321,10 +329,11 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                       display: 'flex',
                       flexDirection: 'row',
                       alignItems: 'center',
-                      marginTop: 5,
                       backgroundColor: colors.card,
-                      padding: 5,
                       borderRadius: 10,
+                      margin: 0,
+                      padding: 0,
+                      marginLeft: 5,
                     }}>
                     <FadeText style={{ color: colors.primary }}>{translate('receive.more')}</FadeText>
                     <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />

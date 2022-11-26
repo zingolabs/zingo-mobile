@@ -33,7 +33,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
 }) => {
   const { colors } = useTheme();
 
-  const sendingTotal = Number(sendPageState.toaddrs[0].amount) + defaultFee;
+  const sendingTotal = Number(sendPageState.toaddr.amount) + defaultFee;
 
   //console.log(sendPageState, price, defaultFee);
 
@@ -66,7 +66,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
           <ZecAmount currencyName={currencyName} amtZec={sendingTotal} />
           <UsdAmount amtZec={sendingTotal} price={price} />
         </View>
-        {[sendPageState.toaddrs[0]].map(to => {
+        {[sendPageState.toaddr].map(to => {
           return (
             <View key={to.id} style={{ margin: 10 }}>
               <FadeText>{translate('send.to')}</FadeText>

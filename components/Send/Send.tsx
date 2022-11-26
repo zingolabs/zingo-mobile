@@ -20,7 +20,7 @@ import ZecAmount from '../Components/ZecAmount';
 import UsdAmount from '../Components/UsdAmount';
 import Button from '../Button';
 import { InfoType, SendPageState, SendProgress, ToAddr, TotalBalance, SyncStatus } from '../../app/AppState';
-import { parseZcashURI } from '../../app/uris';
+import { parseZcashURI, ZcashURITarget } from '../../app/uris';
 import RPCModule from '../RPCModule';
 import Utils from '../../app/utils';
 import Scanner from './components/Scanner';
@@ -33,14 +33,13 @@ type SendProps = {
   sendPageState: SendPageState;
   setSendPageState: (sendPageState: SendPageState) => void;
   sendTransaction: (setSendProgress: (arg0: SendProgress | null) => void) => void;
-  clearToAddrs: () => void;
+  clearToAddr: () => void;
   navigation: NavigationScreenProp<any>;
   toggleMenuDrawer: () => void;
   setComputingModalVisible: (visible: boolean) => void;
   setTxBuildProgress: (progress: SendProgress) => void;
   syncingStatus: SyncStatus | null;
   syncingStatusMoreInfoOnClick: () => void;
-  inRefresh: boolean;
   translate: (key: string, config?: TranslateOptions) => any;
 };
 
@@ -50,19 +49,17 @@ const Send: React.FunctionComponent<SendProps> = ({
   sendPageState,
   setSendPageState,
   sendTransaction,
-  clearToAddrs,
+  clearToAddr,
   navigation,
   toggleMenuDrawer,
   setComputingModalVisible,
   setTxBuildProgress,
   syncingStatus,
   syncingStatusMoreInfoOnClick,
-  inRefresh,
   translate,
 }) => {
   const { colors } = useTheme() as unknown as ThemeType;
   const [qrcodeModalVisble, setQrcodeModalVisible] = useState(false);
-  const [qrcodeModalIndex, setQrcodeModalIndex] = useState(0);
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
   const [titleViewHeight, setTitleViewHeight] = useState(0);
   const [memoEnabled, setMemoEnabled] = useState(false);
@@ -75,7 +72,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   const { decimalSeparator } = getNumberFormatSettings();
   const syncStatusDisplayLine = syncingStatus?.inProgress ? `(${syncingStatus?.blocks})` : '';
   const spendable = totalBalance.transparentBal + totalBalance.spendablePrivate + totalBalance.spendableOrchard;
-  const stillConfirming = spendable !== totalBalance.total || inRefresh;
+  const stillConfirming = spendable !== totalBalance.total;
   const zecPrice = info ? info.zecPrice : null;
   const currencyName = info ? info.currencyName : undefined;
 
@@ -106,7 +103,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       );
     };
 
-    const address = sendPageState.toaddrs[0].to;
+    const address = sendPageState.toaddr.to;
 
     if (address) {
       getMemoEnabled(address).then(r => {
@@ -115,7 +112,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     } else {
       setMemoEnabled(false);
     }
-  }, [sendPageState.toaddrs, currencyName]);
+  }, [sendPageState.toaddr, currencyName]);
 
   useEffect(() => {
     const parseAdressJSON = async (address: string): Promise<boolean> => {
@@ -135,7 +132,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       );
     };
 
-    const address = sendPageState.toaddrs[0].to;
+    const address = sendPageState.toaddr.to;
 
     if (address) {
       parseAdressJSON(address).then(r => {
@@ -145,7 +142,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       setValidAddress(0);
     }
 
-    var to = sendPageState.toaddrs[0];
+    var to = sendPageState.toaddr;
     to.amount = to.amount.replace(decimalSeparator, '.');
     to.amountUSD = to.amountUSD.replace(decimalSeparator, '.');
 
@@ -171,11 +168,11 @@ const Send: React.FunctionComponent<SendProps> = ({
     } else {
       setValidAmount(0);
     }
-  }, [sendPageState.toaddrs, getMaxAmount, decimalSeparator, currencyName]);
+  }, [sendPageState.toaddr, getMaxAmount, decimalSeparator, currencyName]);
 
   useEffect(() => {
-    setSendButtonEnabled(validAddress === 1 && validAmount === 1 && !inRefresh);
-  }, [validAddress, validAmount, inRefresh]);
+    setSendButtonEnabled(validAddress === 1 && validAmount === 1);
+  }, [validAddress, validAmount]);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
@@ -202,45 +199,44 @@ const Send: React.FunctionComponent<SendProps> = ({
   }, [slideAnim, titleViewHeight]);
 
   const updateToField = async (
-    idx: number,
     address: string | null,
     amount: string | null,
     amountUSD: string | null,
     memo: string | null,
   ) => {
     // Create the new state object
-    const newState = new SendPageState();
+    const newState = new SendPageState(new ToAddr(0));
 
-    const newToAddrs = sendPageState.toaddrs.slice(0);
+    const newToAddr = sendPageState.toaddr;
     // Find the correct toAddr
-    const toAddr = newToAddrs[idx];
+    const toAddr = newToAddr;
 
     if (address !== null) {
       // Attempt to parse as URI if it starts with zcash
       if (address.startsWith('zcash:')) {
-        const targets = await parseZcashURI(address);
+        const target: string | ZcashURITarget = await parseZcashURI(address);
         //console.log(targets);
 
-        if (Array.isArray(targets)) {
+        if (typeof target !== 'string') {
           // redo the to addresses
-          const uriToAddrs: ToAddr[] = [];
-          targets.forEach(tgt => {
+          let uriToAddr: ToAddr = new ToAddr(0);
+          [target].forEach(tgt => {
             const to = new ToAddr(Utils.getNextToAddrID());
 
             to.to = tgt.address || '';
             to.amount = Utils.maxPrecisionTrimmed(tgt.amount || 0);
             to.memo = tgt.memoString || '';
 
-            uriToAddrs.push(to);
+            uriToAddr = to;
           });
 
-          newState.toaddrs = uriToAddrs;
+          newState.toaddr = uriToAddr;
 
           setSendPageState(newState);
           return;
         } else {
           // Show the error message as a toast
-          Toast.show(targets);
+          Toast.show(target);
           return;
         }
       } else {
@@ -279,7 +275,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       toAddr.memo = memo;
     }
 
-    newState.toaddrs = newToAddrs;
+    newState.toaddr = newToAddr;
     setSendPageState(newState);
   };
 
@@ -303,7 +299,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         setComputingModalVisible(false);
 
         // Clear the fields
-        clearToAddrs();
+        clearToAddr();
 
         navigation.navigate(translate('loadedapp.wallet-menu'));
         setTimeout(() => {
@@ -332,19 +328,14 @@ const Send: React.FunctionComponent<SendProps> = ({
       style={{
         display: 'flex',
         justifyContent: 'flex-start',
-        alignItems: 'stretch',
+        width: '100%',
       }}>
       <Modal
         animationType="slide"
         transparent={false}
         visible={qrcodeModalVisble}
         onRequestClose={() => setQrcodeModalVisible(false)}>
-        <Scanner
-          idx={qrcodeModalIndex}
-          updateToField={updateToField}
-          closeModal={() => setQrcodeModalVisible(false)}
-          translate={translate}
-        />
+        <Scanner updateToField={updateToField} closeModal={() => setQrcodeModalVisible(false)} translate={translate} />
       </Modal>
 
       <Modal
@@ -365,6 +356,81 @@ const Send: React.FunctionComponent<SendProps> = ({
         />
       </Modal>
 
+      <Animated.View style={{ marginTop: slideAnim }}>
+        <View
+          onLayout={e => {
+            const { height } = e.nativeEvent.layout;
+            setTitleViewHeight(height);
+          }}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            paddingBottom: 0,
+            backgroundColor: colors.card,
+            zIndex: -1,
+          }}>
+          <View
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              paddingBottom: 0,
+              backgroundColor: colors.card,
+              zIndex: -1,
+              paddingTop: 10,
+            }}>
+            <Image
+              source={require('../../assets/img/logobig-zingo.png')}
+              style={{ width: 80, height: 80, resizeMode: 'contain' }}
+            />
+            <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} />
+            <UsdAmount style={{ marginTop: 0, marginBottom: 5 }} price={zecPrice} amtZec={totalBalance.total} />
+
+            <View
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexWrap: 'wrap',
+                marginVertical: 5,
+              }}>
+              <RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
+                {syncStatusDisplayLine ? translate('send.title-syncing') : translate('send.title')}
+              </RegText>
+              <FadeText style={{ margin: 0, padding: 0 }}>
+                {syncStatusDisplayLine ? syncStatusDisplayLine : ''}
+              </FadeText>
+              {!!syncStatusDisplayLine && (
+                <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
+                  <View
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      backgroundColor: colors.card,
+                      borderRadius: 10,
+                      margin: 0,
+                      padding: 0,
+                      marginLeft: 5,
+                    }}>
+                    <FadeText style={{ color: colors.primary }}>{translate('send.more')}</FadeText>
+                    <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
+                  </View>
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
+        </View>
+      </Animated.View>
+
+      <Animated.View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', marginTop: slideAnim }}>
+        <TouchableOpacity onPress={toggleMenuDrawer}>
+          <FontAwesomeIcon icon={faBars} size={20} color={colors.border} />
+        </TouchableOpacity>
+      </Animated.View>
+
+      <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
+
       <ScrollView
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{
@@ -372,74 +438,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           flexDirection: 'column',
           justifyContent: 'flex-start',
         }}>
-        <Animated.View style={{ marginTop: slideAnim }}>
-          <View
-            onLayout={e => {
-              const { height } = e.nativeEvent.layout;
-              setTitleViewHeight(height);
-            }}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              paddingBottom: 0,
-              backgroundColor: colors.card,
-              zIndex: -1,
-            }}>
-            <View
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                paddingBottom: 0,
-                backgroundColor: colors.card,
-                zIndex: -1,
-                paddingTop: 10,
-              }}>
-              <Image
-                source={require('../../assets/img/logobig-zingo.png')}
-                style={{ width: 80, height: 80, resizeMode: 'contain' }}
-              />
-              <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} />
-              <UsdAmount style={{ marginTop: 0, marginBottom: 5 }} price={zecPrice} amtZec={totalBalance.total} />
-
-              <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
-                  {syncStatusDisplayLine ? translate('send.title-syncing') : translate('send.title')}
-                </RegText>
-                <FadeText style={{ marginTop: 5, padding: 0 }}>
-                  {syncStatusDisplayLine ? syncStatusDisplayLine : ''}
-                </FadeText>
-                {!!syncStatusDisplayLine && (
-                  <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
-                    <View
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        marginTop: 5,
-                        backgroundColor: colors.card,
-                        padding: 5,
-                        borderRadius: 10,
-                      }}>
-                      <FadeText style={{ color: colors.primary }}>{translate('send.more')}</FadeText>
-                      <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
-                    </View>
-                  </TouchableOpacity>
-                )}
-              </View>
-            </View>
-          </View>
-        </Animated.View>
-
-        <Animated.View
-          style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', marginTop: slideAnim }}>
-          <TouchableOpacity onPress={toggleMenuDrawer}>
-            <FontAwesomeIcon icon={faBars} size={20} color={colors.border} />
-          </TouchableOpacity>
-        </Animated.View>
-
-        <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
-
-        {sendPageState.toaddrs.map((ta, i) => {
+        {[sendPageState.toaddr].map((ta, i) => {
           return (
             <View key={i} style={{ display: 'flex', padding: 10, marginTop: 10 }}>
               <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -463,11 +462,10 @@ const Send: React.FunctionComponent<SendProps> = ({
                   placeholderTextColor={colors.placeholder}
                   style={{ flexGrow: 1, maxWidth: '90%' }}
                   value={ta.to}
-                  onChangeText={(text: string) => updateToField(i, text, null, null, null)}
+                  onChangeText={(text: string) => updateToField(text, null, null, null)}
                 />
                 <TouchableOpacity
                   onPress={() => {
-                    setQrcodeModalIndex(i);
                     setQrcodeModalVisible(true);
                   }}>
                   <FontAwesomeIcon style={{ margin: 5 }} size={24} icon={faQrcode} color={colors.border} />
@@ -510,7 +508,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       width: '75%',
                     }}
                     value={ta.amount.toString()}
-                    onChangeText={(text: string) => updateToField(i, null, text, null, null)}
+                    onChangeText={(text: string) => updateToField(null, text, null, null)}
                   />
                   <RegText style={{ marginTop: 15, marginRight: 10, marginLeft: 5 }}>ZEC</RegText>
                 </View>
@@ -540,7 +538,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       width: '55%',
                     }}
                     value={ta.amountUSD.toString()}
-                    onChangeText={(text: string) => updateToField(i, null, null, text, null)}
+                    onChangeText={(text: string) => updateToField(null, null, text, null)}
                   />
                   <RegText style={{ marginTop: 15, marginLeft: 5 }}>USD</RegText>
                 </View>
@@ -587,7 +585,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         borderColor: colors.text,
                       }}
                       value={ta.memo}
-                      onChangeText={(text: string) => updateToField(i, null, null, null, text)}
+                      onChangeText={(text: string) => updateToField(null, null, null, text)}
                     />
                   </View>
                 </>
@@ -595,29 +593,29 @@ const Send: React.FunctionComponent<SendProps> = ({
             </View>
           );
         })}
-
-        <View
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            margin: 20,
-          }}>
-          <Button
-            type="Primary"
-            title={translate('send.button')}
-            disabled={!sendButtonEnabled}
-            onPress={() => setConfirmModalVisible(true)}
-          />
-          <Button
-            type="Secondary"
-            style={{ marginLeft: 10 }}
-            title={translate('send.clear')}
-            onPress={() => clearToAddrs()}
-          />
-        </View>
       </ScrollView>
+
+      <View
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'center',
+          alignItems: 'center',
+          marginVertical: 5,
+        }}>
+        <Button
+          type="Primary"
+          title={translate('send.button')}
+          disabled={!sendButtonEnabled}
+          onPress={() => setConfirmModalVisible(true)}
+        />
+        <Button
+          type="Secondary"
+          style={{ marginLeft: 10 }}
+          title={translate('send.clear')}
+          onPress={() => clearToAddr()}
+        />
+      </View>
     </View>
   );
 };

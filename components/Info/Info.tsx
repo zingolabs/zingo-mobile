@@ -61,7 +61,7 @@ const Info: React.FunctionComponent<InfoProps> = ({ info, closeModal, totalBalan
         />
         <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{ opacity: 0.4 }} />
         <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
-          Server Info
+          {translate('info.title')}
         </RegText>
         <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
       </View>
@@ -106,7 +106,14 @@ const Info: React.FunctionComponent<InfoProps> = ({ info, closeModal, totalBalan
         </View>
       </ScrollView>
 
-      <View style={{ flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+      <View
+        style={{
+          flexGrow: 1,
+          flexDirection: 'row',
+          justifyContent: 'center',
+          alignItems: 'center',
+          marginVertical: 5,
+        }}>
         <Button type="Secondary" title={translate('close')} onPress={closeModal} />
       </View>
     </SafeAreaView>

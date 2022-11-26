@@ -79,7 +79,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
       addresses: [],
       addressBook: [],
       transactions: null,
-      sendPageState: new SendPageState(),
+      sendPageState: new SendPageState(new ToAddr(0)),
       receivePageState: new ReceivePageState(),
       info: null,
       rescanning: false,
@@ -117,11 +117,11 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
     );
 
     // Create the initial ToAddr box
-    this.state.sendPageState.toaddrs = [new ToAddr(Utils.getNextToAddrID())];
+    this.state.sendPageState.toaddr = new ToAddr(Utils.getNextToAddrID());
   }
 
   componentDidMount = () => {
-    this.clearToAddrs();
+    this.clearToAddr();
 
     // Configure the RPC to start doing refreshes
     this.rpc.configure();
@@ -200,12 +200,12 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
     }
   };
 
-  clearToAddrs = () => {
-    const newToAddrs = [new ToAddr(Utils.getNextToAddrID())];
+  clearToAddr = () => {
+    const newToAddr = new ToAddr(Utils.getNextToAddrID());
 
     // Create the new state object
-    const newState = new SendPageState();
-    newState.toaddrs = newToAddrs;
+    const newState = new SendPageState(new ToAddr(0));
+    newState.toaddr = newToAddr;
 
     this.setSendPageState(newState);
   };
@@ -248,7 +248,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
 
   getSendManyJSON = (): Array<SendJsonToType> => {
     const { sendPageState } = this.state;
-    const json = sendPageState.toaddrs.flatMap(to => {
+    const json = [sendPageState.toaddr].flatMap((to: ToAddr) => {
       const memo = to.memo || '';
       const amount = parseInt((Number(to.amount) * 10 ** 8).toFixed(0), 10);
 
@@ -522,7 +522,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
     this.navigateToLoading();
   };
 
-  setUaAddress = uaAddress => {
+  setUaAddress = (uaAddress: string) => {
     this.setState({ uaAddress: uaAddress });
   };
 
@@ -549,7 +549,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
       syncingStatus,
       txBuildProgress,
       uaAddress,
-      setUaAddress,
     } = this.state;
     const { colors } = this.props.theme;
     const { translate } = this.props;
@@ -847,7 +846,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
                     sendPageState={sendPageState}
                     setSendPageState={this.setSendPageState}
                     sendTransaction={this.sendTransaction}
-                    clearToAddrs={this.clearToAddrs}
+                    clearToAddr={this.clearToAddr}
                     setComputingModalVisible={this.setComputingModalVisible}
                     setTxBuildProgress={this.setTxBuildProgress}
                     syncingStatus={syncingStatus}
@@ -855,7 +854,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
                       await this.fetchWalletSeed();
                       this.setState({ syncReportModalVisible: true });
                     }}
-                    inRefresh={this.rpc.inRefresh}
                   />
                 </Suspense>
               </>
@@ -909,7 +907,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
                       this.setState({ syncReportModalVisible: true });
                     }}
                     uaAddress={uaAddress}
-                    setUaAddress={setUaAddress}
+                    setUaAddress={this.setUaAddress}
                   />
                 </Suspense>
               </>

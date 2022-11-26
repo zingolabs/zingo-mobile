@@ -13,7 +13,7 @@ import FadeText from '../Components/FadeText';
 import BoldText from '../Components/BoldText';
 import RegTextInput from '../Components/RegTextInput';
 import ZecAmount from '../Components/ZecAmount';
-import { parseServerURI, SERVER_URI } from '../../app/uris';
+import { parseServerURI, serverUris } from '../../app/uris';
 import Button from '../Button';
 import { WalletSettings, TotalBalance } from '../../app/AppState';
 import { ThemeType } from '../../app/types';
@@ -51,7 +51,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [customIcon, setCustomIcon] = React.useState(farCircle);
 
   React.useEffect(() => {
-    setCustomIcon(SERVER_URI.find((s: string) => s === server) ? farCircle : faDotCircle);
+    setCustomIcon(serverUris().find((s: string) => s === server) ? farCircle : faDotCircle);
   }, [server]);
 
   const saveSettings = async () => {
@@ -131,14 +131,13 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           flexDirection: 'column',
           alignItems: 'stretch',
           justifyContent: 'flex-start',
-          backgroundColor: colors.background,
         }}>
         <View style={{ display: 'flex', margin: 10 }}>
           <BoldText>{translate('settings.server-title')}</BoldText>
         </View>
 
         <View style={{ display: 'flex', marginLeft: 25 }}>
-          {SERVER_URI.map(uri => (
+          {serverUris().map((uri: string) => (
             <TouchableOpacity
               key={'touch-' + uri}
               style={{ marginRight: 10, marginBottom: 5 }}
@@ -233,14 +232,16 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           ))}
         </View>
       </ScrollView>
-
       <View
-        style={{ flexGrow: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', margin: 20 }}>
-        <View
-          style={{ flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 5 }}>
-          <Button type="Primary" title={translate('settings.save')} style={{ marginLeft: 10 }} onPress={saveSettings} />
-          <Button type="Secondary" title={translate('cancel')} style={{ marginLeft: 10 }} onPress={closeModal} />
-        </View>
+        style={{
+          flexGrow: 1,
+          flexDirection: 'row',
+          justifyContent: 'center',
+          alignItems: 'center',
+          marginVertical: 5,
+        }}>
+        <Button type="Primary" title={translate('settings.save')} onPress={saveSettings} />
+        <Button type="Secondary" title={translate('cancel')} style={{ marginLeft: 10 }} onPress={closeModal} />
       </View>
     </SafeAreaView>
   );
