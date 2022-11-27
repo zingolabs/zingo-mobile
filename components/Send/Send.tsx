@@ -431,7 +431,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       </Animated.View>
 
       <Animated.View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', marginTop: slideAnim }}>
-        <TouchableOpacity onPress={toggleMenuDrawer}>
+        <TouchableOpacity accessible={true} accesibilityLabel={'Open Menu Drawer'} onPress={toggleMenuDrawer}>
           <FontAwesomeIcon icon={faBars} size={40} color={colors.border} />
         </TouchableOpacity>
       </Animated.View>
@@ -472,6 +472,8 @@ const Send: React.FunctionComponent<SendProps> = ({
                   onChangeText={(text: string) => updateToField(text, null, null, null)}
                 />
                 <TouchableOpacity
+                  accessible={true}
+                  accesibilityLabel={'Scanner an address'}
                   onPress={() => {
                     setQrcodeModalVisible(true);
                   }}>

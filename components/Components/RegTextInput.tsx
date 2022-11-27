@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { TextInput, View } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
-const RegTextInput: React.FunctionComponent<any> = props => {
+const RegTextInput: React.FunctionComponent<any> = ({ style, ...props }) => {
   const { colors } = useTheme();
 
   // There's a real idiot bug in react native that prevents paste unless editable is set.
@@ -14,16 +14,16 @@ const RegTextInput: React.FunctionComponent<any> = props => {
   }, []);
   let arrayed = [];
 
-  if (Array.isArray(props.style)) {
-    arrayed = props.style.slice(0);
-  } else if (props.style) {
-    arrayed.push(props.style);
+  if (Array.isArray(style)) {
+    arrayed = style.slice(0);
+  } else if (style) {
+    arrayed.push(style);
   }
-  arrayed.push({ color: props.style.color || colors.text }, { fontWeight: '600' });
+  arrayed.push({ color: style.color || colors.text }, { fontWeight: '600' });
 
   return (
-    <View accessible={true} accessibilityLabel={'Introduce a value!'}>
-      <TextInput {...props} style={arrayed} editable={editable} />
+    <View accessible={true} accessibilityLabel={'Introduce a value!'} style={arrayed}>
+      <TextInput {...props} editable={editable} />
     </View>
   );
 };

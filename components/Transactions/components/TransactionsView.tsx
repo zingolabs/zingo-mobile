@@ -161,7 +161,7 @@ const TransactionsView: React.FunctionComponent<TransactionsViewProps> = ({
       </View>
 
       <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute' }}>
-        <TouchableOpacity onPress={toggleMenuDrawer}>
+        <TouchableOpacity accessible={true} accesibilityLabel={'Open Menu Drawer'} onPress={toggleMenuDrawer}>
           <FontAwesomeIcon icon={faBars} size={40} color={colors.border} />
         </TouchableOpacity>
       </View>
@@ -169,6 +169,8 @@ const TransactionsView: React.FunctionComponent<TransactionsViewProps> = ({
       <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
 
       <ScrollView
+        accessible={true}
+        accessibilityLabel={'List of transactions'}
         refreshControl={
           <RefreshControl
             refreshing={false}
