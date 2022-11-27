@@ -85,6 +85,8 @@ const TransactionsView: React.FunctionComponent<TransactionsViewProps> = ({
 
   return (
     <View
+      accessible={true}
+      accessibilityLabel={'Wallet Screen'}
       style={{
         display: 'flex',
         justifyContent: 'flex-start',
@@ -161,8 +163,8 @@ const TransactionsView: React.FunctionComponent<TransactionsViewProps> = ({
       </View>
 
       <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute' }}>
-        <TouchableOpacity accessible={true} accesibilityLabel={'Open Menu Drawer'} onPress={toggleMenuDrawer}>
-          <FontAwesomeIcon icon={faBars} size={40} color={colors.border} />
+        <TouchableOpacity accessible={true} accessibilityLabel={'Open Menu Drawer'} onPress={toggleMenuDrawer}>
+          <FontAwesomeIcon icon={faBars} size={48} color={colors.border} />
         </TouchableOpacity>
       </View>
 

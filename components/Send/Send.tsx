@@ -332,6 +332,8 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   return (
     <View
+      accessible={true}
+      accessibilityLabel={'Send Screen'}
       style={{
         display: 'flex',
         justifyContent: 'flex-start',
@@ -431,8 +433,8 @@ const Send: React.FunctionComponent<SendProps> = ({
       </Animated.View>
 
       <Animated.View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', marginTop: slideAnim }}>
-        <TouchableOpacity accessible={true} accesibilityLabel={'Open Menu Drawer'} onPress={toggleMenuDrawer}>
-          <FontAwesomeIcon icon={faBars} size={40} color={colors.border} />
+        <TouchableOpacity accessible={true} accessibilityLabel={'Open Menu Drawer'} onPress={toggleMenuDrawer}>
+          <FontAwesomeIcon icon={faBars} size={48} color={colors.border} />
         </TouchableOpacity>
       </Animated.View>
 
@@ -473,11 +475,11 @@ const Send: React.FunctionComponent<SendProps> = ({
                 />
                 <TouchableOpacity
                   accessible={true}
-                  accesibilityLabel={'Scanner an address'}
+                  accessibilityLabel={'Scanner an address'}
                   onPress={() => {
                     setQrcodeModalVisible(true);
                   }}>
-                  <FontAwesomeIcon style={{ margin: 5 }} size={40} icon={faQrcode} color={colors.border} />
+                  <FontAwesomeIcon style={{ margin: 5 }} size={48} icon={faQrcode} color={colors.border} />
                 </TouchableOpacity>
               </View>
 
@@ -533,6 +535,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                   <RegTextInput
                     placeholder={`0${decimalSeparator}0`}
                     placeholderTextColor={colors.placeholder}
+                    placeholderStyle={{ minWidth: 50 }}
                     keyboardType="numeric"
                     style={{
                       display: 'flex',

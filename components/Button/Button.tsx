@@ -29,6 +29,7 @@ const Button: React.FunctionComponent<any> = ({ type, title, disabled, onPress, 
     borderRadius: 10,
     maxWidth: '90%',
     minWidth: '30%',
+    minHeight: 48,
   };
 
   return (

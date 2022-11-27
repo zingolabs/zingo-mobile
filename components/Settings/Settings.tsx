@@ -118,7 +118,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           source={require('../../assets/img/logobig-zingo.png')}
           style={{ width: 80, height: 80, resizeMode: 'contain' }}
         />
-        <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{ opacity: 0.4 }} />
+        <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{ opacity: 0.5 }} />
         <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
           {translate('settings.title')}
         </RegText>
@@ -140,7 +140,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           {serverUris().map((uri: string) => (
             <TouchableOpacity
               key={'touch-' + uri}
-              style={{ marginRight: 10, marginBottom: 5 }}
+              style={{ marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
               onPress={() => setServer(uri)}>
               <View style={{ display: 'flex', flexDirection: 'row', marginTop: 10 }}>
                 <FontAwesomeIcon icon={uri === server ? faDotCircle : farCircle} size={20} color={colors.border} />
@@ -152,7 +152,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           ))}
 
           <View style={{ display: 'flex', flexDirection: 'row' }}>
-            <TouchableOpacity style={{ marginRight: 10, marginBottom: 5 }} onPress={() => setServer(undefined)}>
+            <TouchableOpacity
+              style={{ marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
+              onPress={() => setServer(undefined)}>
               <View style={{ display: 'flex', flexDirection: 'row', marginTop: 10 }}>
                 {customIcon && <FontAwesomeIcon icon={customIcon} size={20} color={colors.border} />}
                 <RegText style={{ marginLeft: 10 }}>{translate('settings.custom')}</RegText>
@@ -177,6 +179,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 }}
                 value={server}
                 onChangeText={(text: string) => setServer(text)}
+                accessible={true}
+                accessibilityLabel={'Introduce a valid Server URI'}
               />
             )}
           </View>
@@ -205,6 +209,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             }}
             value={filter}
             onChangeText={(text: string) => setFilter(text)}
+            accessible={true}
+            accessibilityLabel={'Introduce a valid number'}
           />
         </View>
 
@@ -215,7 +221,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         <View style={{ display: 'flex', marginLeft: 25 }}>
           {MEMOS.map(memo => (
             <View key={'view-' + memo.value}>
-              <TouchableOpacity style={{ marginRight: 10, marginBottom: 5 }} onPress={() => setMemos(memo.value)}>
+              <TouchableOpacity
+                style={{ marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
+                onPress={() => setMemos(memo.value)}>
                 <View style={{ display: 'flex', flexDirection: 'row', marginTop: 10 }}>
                   <FontAwesomeIcon
                     icon={memo.value === memos ? faDotCircle : farCircle}

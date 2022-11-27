@@ -62,7 +62,7 @@ const ImportKey: React.FunctionComponent<ImportKeyProps> = ({
           source={require('../../assets/img/logobig-zingo.png')}
           style={{ width: 80, height: 80, resizeMode: 'contain' }}
         />
-        <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{ opacity: 0.4 }} />
+        <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{ opacity: 0.5 }} />
         <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
           {translate('import.title')}
         </RegText>

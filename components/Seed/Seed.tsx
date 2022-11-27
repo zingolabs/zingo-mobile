@@ -89,7 +89,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
           currencyName={currencyName ? currencyName : ''}
           size={36}
           amtZec={totalBalance.total}
-          style={{ opacity: 0.4 }}
+          style={{ opacity: 0.5 }}
         />
         <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
           {translate('seed.title')} ({translate(`seed.${action}`)})
@@ -150,6 +150,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                 padding: 10,
                 marginTop: 0,
                 textAlign: 'center',
+                minHeight: 48,
               }}
               onPress={() => {
                 if (seedPhrase) {

@@ -304,6 +304,8 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({
 
     return (
       <View
+        accessible={true}
+        accessibilityLabel={'Legacy Screen'}
         style={{
           display: 'flex',
           justifyContent: 'flex-start',
@@ -362,9 +364,9 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({
               source={require('../../assets/img/logobig-zingo.png')}
               style={{ width: 80, height: 80, resizeMode: 'contain' }}
             />
-            <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{ opacity: 0.4 }} />
+            <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{ opacity: 0.5 }} />
             <UsdAmount
-              style={{ marginTop: 0, marginBottom: 5, opacity: 0.4 }}
+              style={{ marginTop: 0, marginBottom: 5, opacity: 0.5 }}
               price={zecPrice}
               amtZec={totalBalance.total}
             />
@@ -375,16 +377,16 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({
         </View>
 
         <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute' }}>
-          <TouchableOpacity accessible={true} accesibilityLabel={'Open Menu Drawer'} onPress={toggleMenuDrawer}>
-            <FontAwesomeIcon icon={faBars} size={40} color={colors.border} />
+          <TouchableOpacity accessible={true} accessibilityLabel={'Open Menu Drawer'} onPress={toggleMenuDrawer}>
+            <FontAwesomeIcon icon={faBars} size={48} color={colors.border} />
           </TouchableOpacity>
         </View>
 
         <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', right: 0 }}>
           <OptionsMenu
             customButton={
-              <View accessible={true} accesibilityLabel={'Open Menu'}>
-                <FontAwesomeIcon icon={faEllipsisV} color={colors.border} size={40} />
+              <View accessible={true} accessibilityLabel={'Open Menu'}>
+                <FontAwesomeIcon icon={faEllipsisV} color={colors.border} size={48} />
               </View>
             }
             buttonStyle={{ width: 32, height: 32, margin: 7.5, resizeMode: 'contain' }}
