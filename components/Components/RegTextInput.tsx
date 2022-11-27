@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TextInput } from 'react-native';
+import { TextInput, View } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
 const RegTextInput: React.FunctionComponent<any> = props => {
@@ -21,7 +21,11 @@ const RegTextInput: React.FunctionComponent<any> = props => {
   }
   arrayed.push({ color: props.style.color || colors.text }, { fontWeight: '600' });
 
-  return <TextInput {...props} style={arrayed} editable={editable} />;
+  return (
+    <View accessible={true} accessibilityLabel={'Introduce a value!'}>
+      <TextInput {...props} style={arrayed} editable={editable} />
+    </View>
+  );
 };
 
 export default RegTextInput;

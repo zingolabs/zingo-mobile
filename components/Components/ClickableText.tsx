@@ -8,7 +8,7 @@ const ClickableText: React.FunctionComponent<any> = props => {
   const onPress = props.onPress || null;
 
   return (
-    <TouchableOpacity onPress={onPress}>
+    <TouchableOpacity accessible={true} accessibilityLabel={'Tap me!'} onPress={onPress}>
       <Text style={{ color: colors.text, textDecorationLine: 'underline', ...props.style }}>{props.children}</Text>
     </TouchableOpacity>
   );
