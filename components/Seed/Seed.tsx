@@ -125,7 +125,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
           ) : (
             <View
               accessible={true}
-              accessibilityLabel={'Field Seed Phrase'}
+              accessibilityLabel={translate('seed.seed-acc')}
               style={{
                 margin: 0,
                 padding: 10,
@@ -189,7 +189,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
               <FadeText style={{ textAlign: 'center' }}>{translate('seed.birthday-no-readonly')}</FadeText>
               <View
                 accessible={true}
-                accessibilityLabel={'Field Birthday'}
+                accessibilityLabel={translate('seed.birthday-acc')}
                 style={{
                   margin: 10,
                   padding: 10,

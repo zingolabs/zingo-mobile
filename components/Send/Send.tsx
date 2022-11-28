@@ -332,7 +332,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   return (
     <View
       accessible={true}
-      accessibilityLabel={'Send Screen'}
+      accessibilityLabel={translate('send.title-acc')}
       style={{
         display: 'flex',
         justifyContent: 'flex-start',
@@ -434,7 +434,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       </Animated.View>
 
       <Animated.View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', marginTop: slideAnim }}>
-        <TouchableOpacity accessible={true} accessibilityLabel={'Open Menu Drawer'} onPress={toggleMenuDrawer}>
+        <TouchableOpacity accessible={true} accessibilityLabel={translate('menudrawer-acc')} onPress={toggleMenuDrawer}>
           <FontAwesomeIcon icon={faBars} size={48} color={colors.border} />
         </TouchableOpacity>
       </Animated.View>
@@ -469,7 +469,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                 }}>
                 <View
                   accessible={true}
-                  accessibilityLabel={'Field Address'}
+                  accessibilityLabel={translate('send.address-acc')}
                   style={{
                     flexGrow: 1,
                     maxWidth: '90%',
@@ -492,7 +492,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                 </View>
                 <TouchableOpacity
                   accessible={true}
-                  accessibilityLabel={'Scanner an address'}
+                  accessibilityLabel={translate('send.scan-acc')}
                   onPress={() => {
                     setQrcodeModalVisible(true);
                   }}>
@@ -521,7 +521,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                   <RegText style={{ marginTop: 20, marginRight: 5, fontSize: 20 }}>{'\u1647'}</RegText>
                   <View
                     accessible={true}
-                    accessibilityLabel={'Field ZEC amount'}
+                    accessibilityLabel={translate('send.zec-acc')}
                     style={{
                       display: 'flex',
                       flexDirection: 'row',
@@ -564,7 +564,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                   <RegText style={{ marginTop: 15, marginRight: 5 }}>$</RegText>
                   <View
                     accessible={true}
-                    accessibilityLabel={'Field USD amount'}
+                    accessibilityLabel={translate('send.usd-acc')}
                     style={{
                       display: 'flex',
                       flexDirection: 'row',
@@ -632,7 +632,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                   <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start' }}>
                     <View
                       accessible={true}
-                      accessibilityLabel={'Field Memo'}
+                      accessibilityLabel={translate('send.memo-acc')}
                       style={{
                         flexGrow: 1,
                         borderWidth: 1,

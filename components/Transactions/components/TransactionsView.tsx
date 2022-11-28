@@ -86,7 +86,7 @@ const TransactionsView: React.FunctionComponent<TransactionsViewProps> = ({
   return (
     <View
       accessible={true}
-      accessibilityLabel={'Wallet Screen'}
+      accessibilityLabel={translate('transactions.title-acc')}
       style={{
         display: 'flex',
         justifyContent: 'flex-start',
@@ -165,7 +165,7 @@ const TransactionsView: React.FunctionComponent<TransactionsViewProps> = ({
       </View>
 
       <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute' }}>
-        <TouchableOpacity accessible={true} accessibilityLabel={'Open Menu Drawer'} onPress={toggleMenuDrawer}>
+        <TouchableOpacity accessible={true} accessibilityLabel={translate('menudrawer-acc')} onPress={toggleMenuDrawer}>
           <FontAwesomeIcon icon={faBars} size={48} color={colors.border} />
         </TouchableOpacity>
       </View>
@@ -174,7 +174,7 @@ const TransactionsView: React.FunctionComponent<TransactionsViewProps> = ({
 
       <ScrollView
         accessible={true}
-        accessibilityLabel={'List of transactions'}
+        accessibilityLabel={translate('transactions.list-acc')}
         refreshControl={
           <RefreshControl
             refreshing={false}

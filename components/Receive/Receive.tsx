@@ -243,7 +243,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     return (
       <View
         accessible={true}
-        accessibilityLabel={'UAs Screen'}
+        accessibilityLabel={translate('receive.title-acc')}
         style={{
           display: 'flex',
           justifyContent: 'flex-start',
@@ -349,7 +349,10 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
         </View>
 
         <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute' }}>
-          <TouchableOpacity accessible={true} accessibilityLabel={'Open Menu Drawer'} onPress={toggleMenuDrawer}>
+          <TouchableOpacity
+            accessible={true}
+            accessibilityLabel={translate('menudrawer-acc')}
+            onPress={toggleMenuDrawer}>
             <FontAwesomeIcon icon={faBars} size={48} color={colors.border} />
           </TouchableOpacity>
         </View>
@@ -357,7 +360,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
         <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', right: 0 }}>
           <OptionsMenu
             customButton={
-              <View accessible={true} accessibilityLabel={'Open Menu'}>
+              <View accessible={true} accessibilityLabel={translate('menu-acc')}>
                 <FontAwesomeIcon icon={faEllipsisV} color={colors.border} size={48} />
               </View>
             }

@@ -163,7 +163,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             {customIcon === faDotCircle && (
               <View
                 accessible={true}
-                accessibilityLabel={'Field Server URI'}
+                accessibilityLabel={translate('settings.server-acc')}
                 style={{
                   width: '60%',
                   borderColor: colors.border,
@@ -201,7 +201,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         <View style={{ display: 'flex', marginLeft: 25 }}>
           <View
             accessible={true}
-            accessibilityLabel={'Field Threshold'}
+            accessibilityLabel={translate('settings.threshold-acc')}
             style={{
               width: '60%',
               borderColor: colors.border,

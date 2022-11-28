@@ -92,7 +92,7 @@ const ImportKey: React.FunctionComponent<ImportKeyProps> = ({
 
         <View
           accessible={true}
-          accessibilityLabel={'Field Key'}
+          accessibilityLabel={translate('import.key-acc')}
           style={{
             padding: 10,
             maxWidth: '95%',
@@ -138,7 +138,7 @@ const ImportKey: React.FunctionComponent<ImportKeyProps> = ({
 
         <View
           accessible={true}
-          accessibilityLabel={'Field Bithday'}
+          accessibilityLabel={translate('import.birthday-acc')}
           style={{
             padding: 10,
             maxWidth: '50%',
