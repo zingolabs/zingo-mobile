@@ -316,7 +316,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexWrap: 'wrap',
-                marginVertical: 5,
+                marginVertical: syncStatusDisplayLine ? 0 : 5,
               }}>
               <RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
                 {syncStatusDisplayLine ? translate('receive.title-syncing') : translate('receive.title')}
@@ -339,7 +339,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                       minWidth: 48,
                       minHeight: 48,
                     }}>
-                    <RegText style={{ color: colors.primary }}>{translate('receive.more')}</RegText>
+                    <RegText color={colors.primary}>{translate('receive.more')}</RegText>
                     <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
                   </View>
                 </TouchableOpacity>

@@ -400,7 +400,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexWrap: 'wrap',
-                marginVertical: 5,
+                marginVertical: syncStatusDisplayLine ? 0 : 5,
               }}>
               <RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
                 {syncStatusDisplayLine ? translate('send.title-syncing') : translate('send.title')}
@@ -423,7 +423,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       minWidth: 48,
                       minHeight: 48,
                     }}>
-                    <RegText style={{ color: colors.primary }}>{translate('send.more')}</RegText>
+                    <RegText color={colors.primary}>{translate('send.more')}</RegText>
                     <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
                   </View>
                 </TouchableOpacity>

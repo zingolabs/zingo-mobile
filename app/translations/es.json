@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo!",
-  "version": "v0.0.79",
+  "version": "v0.0.80",
   "loading": "cargando...",
   "wait": "Por favor espere...",
   "workingonit": "Estamos trabajando en esta funcionalidad",
@@ -139,6 +139,7 @@
     "backup-warning": "YA NO TENDRÁS ACCESO A ESTE MONEDERO, Y VAS A ABRIR LA COPIA DE SEGURIDAD DEL ÚLTIMO MONEDERO USADO ANTERIOR",
     "server-warning": "YA NO TENDRÁS ACCESO A ESTE MONEDERO, Y VAS A CAMBIAR A OTRO SERVIDOR EN EL CUAL TU MONEDERO ACTIVO NO EXISTE",
     "mainnet-warning": "NO SE VA A HACER COPIA DE SEGURIDAD DE ESTE MONEDERO. SOLO DISPONIBLE EN LA RED: 'MAINNET'.",
+    "seedplaceholder": "Semilla (24 palabras)",
   },
   "send": {
     "Broadcast": "Transmitida con éxito Tx:",

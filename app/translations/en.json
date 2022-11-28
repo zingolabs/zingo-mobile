@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo!",
-  "version": "v0.0.79",
+  "version": "v0.0.80",
   "loading": "loading...",
   "wait": "Please wait...",
   "workingonit": "We are working on this feature.",
@@ -139,6 +139,7 @@
     "backup-warning": "YOU WILL HAVE NO LONGER ACCESS TO THIS WALLET, AND YOU ARE GOING TO ACCESS TO YOUR BACKUP WALLET",
     "server-warning": "YOU WILL HAVE NO LONGER ACCESS TO THIS WALLET, AND YOU ARE GOING TO CHANGE TO ANOTHER SERVER IN WHICH YOUR ACTUAL WALLET DOESN'T EXIST",
     "mainnet-warning": "NO BACKUP OF THIS WALLET. ONLY IN MAINNET.",
+    "seedplaceholder": "Seed (24 words)",
   },
   "send": {
     "Broadcast": "Successfully Broadcast Tx:",

@@ -135,7 +135,7 @@ const TransactionsView: React.FunctionComponent<TransactionsViewProps> = ({
             alignItems: 'center',
             justifyContent: 'center',
             flexWrap: 'wrap',
-            marginVertical: 5,
+            marginVertical: syncStatusDisplayLine ? 0 : 5,
           }}>
           <RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
             {syncStatusDisplayLine ? translate('transactions.title-syncing') : translate('transactions.title')}
@@ -156,7 +156,7 @@ const TransactionsView: React.FunctionComponent<TransactionsViewProps> = ({
                   minWidth: 48,
                   minHeight: 48,
                 }}>
-                <RegText style={{ color: colors.primary }}>{translate('transactions.more')}</RegText>
+                <RegText color={colors.primary}>{translate('transactions.more')}</RegText>
                 <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
               </View>
             </TouchableOpacity>

@@ -138,6 +138,8 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                 minHeight: 48,
               }}>
               <TextInput
+                placeholder={translate('seed.seedplaceholder')}
+                placeholderTextColor={colors.placeholder}
                 multiline
                 style={{
                   color: colors.text,
@@ -187,7 +189,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
               <FadeText style={{ textAlign: 'center' }}>{translate('seed.birthday-no-readonly')}</FadeText>
               <View
                 accessible={true}
-                accessibilityLabel={'Field Bithday'}
+                accessibilityLabel={'Field Birthday'}
                 style={{
                   margin: 10,
                   padding: 10,
