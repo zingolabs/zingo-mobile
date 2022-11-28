@@ -1,13 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState } from 'react';
-import { View, ScrollView, SafeAreaView, Image, Platform, TouchableOpacity } from 'react-native';
+import { View, ScrollView, SafeAreaView, Image, Platform, TouchableOpacity, Text } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import Clipboard from '@react-native-community/clipboard';
 import Toast from 'react-native-simple-toast';
 import QRCode from 'react-native-qrcode-svg';
 import { TranslateOptions } from 'i18n-js';
 
-import ClickableText from '../Components/ClickableText';
 import FadeText from '../Components/FadeText';
 import RegText from '../Components/RegText';
 import ZecAmount from '../Components/ZecAmount';
@@ -110,9 +109,11 @@ const PrivKey: React.FunctionComponent<PrivKeyProps> = ({
           <View style={{ padding: 10, backgroundColor: colors.border, marginTop: 15, marginBottom: 20 }}>
             <QRCode value={privKey} size={225} ecl="L" backgroundColor={colors.border} />
           </View>
-          <ClickableText style={{ marginBottom: 5 }} onPress={doCopy}>
-            {translate('seed.tapcopy')}
-          </ClickableText>
+          <TouchableOpacity onPress={doCopy}>
+            <Text style={{ color: colors.text, textDecorationLine: 'underline', marginBottom: 5, minHeight: 48 }}>
+              {translate('seed.tapcopy')}
+            </Text>
+          </TouchableOpacity>
 
           {keyChunks.map(c => (
             <FadeText

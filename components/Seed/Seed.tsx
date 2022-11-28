@@ -1,15 +1,13 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect } from 'react';
-import { View, Image, SafeAreaView, ScrollView } from 'react-native';
+import { View, Image, SafeAreaView, ScrollView, TouchableOpacity, Text, TextInput } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import Toast from 'react-native-simple-toast';
 import Clipboard from '@react-native-community/clipboard';
 import { TranslateOptions } from 'i18n-js';
 
 import RegText from '../Components/RegText';
-import RegTextInput from '../Components/RegTextInput';
 import FadeText from '../Components/FadeText';
-import ClickableText from '../Components/ClickableText';
 import ZecAmount from '../Components/ZecAmount';
 import { TotalBalance } from '../../app/AppState';
 import Button from '../Button';
@@ -125,8 +123,9 @@ const Seed: React.FunctionComponent<SeedProps> = ({
               {seedPhrase}
             </RegText>
           ) : (
-            <RegTextInput
-              multiline
+            <View
+              accessible={true}
+              accessibilityLabel={'Field Seed Phrase'}
               style={{
                 margin: 0,
                 padding: 10,
@@ -134,32 +133,45 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                 borderRadius: 10,
                 borderColor: colors.text,
                 maxWidth: '100%',
-                minWidth: '95%',
-                minHeight: '50%',
                 maxHeight: '70%',
-                color: colors.text,
-              }}
-              value={seedPhrase}
-              onChangeText={(text: string) => setSeedPhrase(text)}
-            />
+                minWidth: '95%',
+                minHeight: 48,
+              }}>
+              <TextInput
+                multiline
+                style={{
+                  color: colors.text,
+                  fontWeight: '600',
+                  minWidth: '95%',
+                  minHeight: 48,
+                }}
+                value={seedPhrase}
+                onChangeText={(text: string) => setSeedPhrase(text)}
+                editable={true}
+              />
+            </View>
           )}
           <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
             <View />
-            <ClickableText
-              style={{
-                padding: 10,
-                marginTop: 0,
-                textAlign: 'center',
-                minHeight: 48,
-              }}
+            <TouchableOpacity
               onPress={() => {
                 if (seedPhrase) {
                   Clipboard.setString(seedPhrase);
                   Toast.show(translate('seed.tapcopy-message'), Toast.LONG);
                 }
               }}>
-              {translate('seed.tapcopy')}
-            </ClickableText>
+              <Text
+                style={{
+                  color: colors.text,
+                  textDecorationLine: 'underline',
+                  padding: 10,
+                  marginTop: 0,
+                  textAlign: 'center',
+                  minHeight: 48,
+                }}>
+                {translate('seed.tapcopy')}
+              </Text>
+            </TouchableOpacity>
             <View />
           </View>
         </View>
@@ -173,7 +185,9 @@ const Seed: React.FunctionComponent<SeedProps> = ({
           ) : (
             <>
               <FadeText style={{ textAlign: 'center' }}>{translate('seed.birthday-no-readonly')}</FadeText>
-              <RegTextInput
+              <View
+                accessible={true}
+                accessibilityLabel={'Field Bithday'}
                 style={{
                   margin: 10,
                   padding: 10,
@@ -181,12 +195,22 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                   borderRadius: 10,
                   borderColor: colors.text,
                   width: '40%',
-                  color: colors.text,
-                }}
-                value={birthdayNumber}
-                keyboardType="numeric"
-                onChangeText={(text: string) => setBirthdayNumber(Number(text))}
-              />
+                  minWidth: '40%',
+                  minHeight: 48,
+                }}>
+                <TextInput
+                  style={{
+                    color: colors.text,
+                    fontWeight: '600',
+                    minWidth: '40%',
+                    minHeight: 48,
+                  }}
+                  value={birthdayNumber.toString()}
+                  onChangeText={(text: string) => setBirthdayNumber(Number(text))}
+                  editable={true}
+                  keyboardType="numeric"
+                />
+              </View>
             </>
           )}
         </View>

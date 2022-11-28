@@ -23,7 +23,7 @@ const Theme: ThemeType = {
     primary: '#18bd18', //'#df4100',
     primaryDisabled: 'rgba(90, 140, 90, 1)',
     text: '#c3c3c3',
-    zingo: '#777777',
+    zingo: '#888888',
     placeholder: '#888888',
     money: '#ffffff',
     notification: '',

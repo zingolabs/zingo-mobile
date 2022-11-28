@@ -5,7 +5,15 @@ import { useTheme } from '@react-navigation/native';
 
 import { ThemeType } from '../../app/types';
 
-const Button: React.FunctionComponent<any> = ({ type, title, disabled, onPress, style }) => {
+const Button: React.FunctionComponent<any> = ({
+  type,
+  title,
+  disabled,
+  onPress,
+  style,
+  accessible,
+  accessibilityLabel,
+}) => {
   const { colors } = useTheme() as unknown as ThemeType;
   // type: 'Primary' or 'Secondary'
   const styleButton =
@@ -34,6 +42,8 @@ const Button: React.FunctionComponent<any> = ({ type, title, disabled, onPress, 
 
   return (
     <TouchableOpacity
+      accessible={accessible}
+      accessibilityLabel={accessibilityLabel}
       style={{
         ...styleButton,
         ...styleCommon,

@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import { View, ScrollView, SafeAreaView, Image, TouchableOpacity, Platform } from 'react-native';
+import { View, ScrollView, SafeAreaView, Image, TouchableOpacity, TextInput } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faDotCircle } from '@fortawesome/free-solid-svg-icons';
@@ -11,7 +11,6 @@ import Toast from 'react-native-simple-toast';
 import RegText from '../Components/RegText';
 import FadeText from '../Components/FadeText';
 import BoldText from '../Components/BoldText';
-import RegTextInput from '../Components/RegTextInput';
 import ZecAmount from '../Components/ZecAmount';
 import { parseServerURI, serverUris } from '../../app/uris';
 import Button from '../Button';
@@ -162,12 +161,10 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             </TouchableOpacity>
 
             {customIcon === faDotCircle && (
-              <RegTextInput
-                placeholder={'... http------.---:--- ...'}
-                placeholderTextColor={colors.placeholder}
+              <View
+                accessible={true}
+                accessibilityLabel={'Field Server URI'}
                 style={{
-                  //flexGrow: 1,
-                  fontSize: 18,
                   width: '60%',
                   borderColor: colors.border,
                   borderWidth: 1,
@@ -175,13 +172,24 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                   padding: 5,
                   paddingTop: 10,
                   paddingBottom: 10,
-                  marginTop: Platform.OS === 'ios' ? 15 : 3,
-                }}
-                value={server}
-                onChangeText={(text: string) => setServer(text)}
-                accessible={true}
-                accessibilityLabel={'Introduce a valid Server URI'}
-              />
+                  minWidth: '60%',
+                  minHeight: 48,
+                }}>
+                <TextInput
+                  placeholder={'... http------.---:--- ...'}
+                  placeholderTextColor={colors.placeholder}
+                  style={{
+                    color: colors.text,
+                    fontWeight: '600',
+                    fontSize: 18,
+                    minWidth: '60%',
+                    minHeight: 48,
+                  }}
+                  value={server}
+                  onChangeText={(text: string) => setServer(text)}
+                  editable={true}
+                />
+              </View>
             )}
           </View>
         </View>
@@ -191,13 +199,10 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         </View>
 
         <View style={{ display: 'flex', marginLeft: 25 }}>
-          <RegTextInput
-            placeholder={translate('settings.number')}
-            placeholderTextColor={colors.placeholder}
-            keyboardType="numeric"
+          <View
+            accessible={true}
+            accessibilityLabel={'Field Threshold'}
             style={{
-              //flexGrow: 1,
-              fontSize: 18,
               width: '60%',
               borderColor: colors.border,
               borderWidth: 1,
@@ -205,13 +210,25 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
               padding: 5,
               paddingTop: 10,
               paddingBottom: 10,
-              marginTop: Platform.OS === 'ios' ? 15 : 3,
-            }}
-            value={filter}
-            onChangeText={(text: string) => setFilter(text)}
-            accessible={true}
-            accessibilityLabel={'Introduce a valid number'}
-          />
+              minWidth: '60%',
+              minHeight: 48,
+            }}>
+            <TextInput
+              placeholder={translate('settings.number')}
+              placeholderTextColor={colors.placeholder}
+              keyboardType="numeric"
+              style={{
+                color: colors.text,
+                fontWeight: '600',
+                fontSize: 18,
+                minWidth: '60%',
+                minHeight: 48,
+              }}
+              value={filter}
+              onChangeText={(text: string) => setFilter(text)}
+              editable={true}
+            />
+          </View>
         </View>
 
         <View style={{ display: 'flex', margin: 10 }}>
