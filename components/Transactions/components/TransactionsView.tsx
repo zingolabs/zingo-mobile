@@ -153,8 +153,10 @@ const TransactionsView: React.FunctionComponent<TransactionsViewProps> = ({
                   margin: 0,
                   padding: 0,
                   marginLeft: 5,
+                  minWidth: 48,
+                  minHeight: 48,
                 }}>
-                <FadeText style={{ color: colors.primary }}>{translate('transactions.more')}</FadeText>
+                <RegText style={{ color: colors.primary }}>{translate('transactions.more')}</RegText>
                 <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
               </View>
             </TouchableOpacity>

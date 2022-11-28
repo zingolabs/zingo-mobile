@@ -420,8 +420,10 @@ const Send: React.FunctionComponent<SendProps> = ({
                       margin: 0,
                       padding: 0,
                       marginLeft: 5,
+                      minWidth: 48,
+                      minHeight: 48,
                     }}>
-                    <FadeText style={{ color: colors.primary }}>{translate('send.more')}</FadeText>
+                    <RegText style={{ color: colors.primary }}>{translate('send.more')}</RegText>
                     <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
                   </View>
                 </TouchableOpacity>
