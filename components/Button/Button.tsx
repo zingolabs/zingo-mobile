@@ -61,7 +61,6 @@ const Button: React.FunctionComponent<any> = ({
           textTransform: 'uppercase',
           textAlign: 'center',
           alignSelf: 'center',
-          justifySelf: 'center',
         }}>
         {title}
       </Text>
