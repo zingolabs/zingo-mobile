@@ -402,12 +402,21 @@ const Send: React.FunctionComponent<SendProps> = ({
                 flexWrap: 'wrap',
                 marginVertical: syncStatusDisplayLine ? 0 : 5,
               }}>
-              <RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
-                {syncStatusDisplayLine ? translate('send.title-syncing') : translate('send.title')}
-              </RegText>
-              <FadeText style={{ margin: 0, padding: 0 }}>
-                {syncStatusDisplayLine ? syncStatusDisplayLine : ''}
-              </FadeText>
+              <View
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexWrap: 'wrap',
+                }}>
+                <RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
+                  {syncStatusDisplayLine ? translate('send.title-syncing') : translate('send.title')}
+                </RegText>
+                <FadeText style={{ margin: 0, padding: 0 }}>
+                  {syncStatusDisplayLine ? syncStatusDisplayLine : ''}
+                </FadeText>
+              </View>
               {!!syncStatusDisplayLine && (
                 <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
                   <View
@@ -415,6 +424,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       display: 'flex',
                       flexDirection: 'row',
                       alignItems: 'center',
+                      justifyContent: 'center',
                       backgroundColor: colors.card,
                       borderRadius: 10,
                       margin: 0,
@@ -575,7 +585,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       borderColor: colors.text,
                       marginTop: 5,
                       width: '55%',
-                      minWidth: '55%',
+                      minWidth: 48,
                       minHeight: 48,
                     }}>
                     <TextInput
@@ -586,7 +596,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         color: colors.text,
                         fontWeight: '600',
                         fontSize: 18,
-                        minWidth: '55%',
+                        minWidth: 48,
                         minHeight: 48,
                       }}
                       value={ta.amountUSD.toString()}

@@ -318,12 +318,21 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                 flexWrap: 'wrap',
                 marginVertical: syncStatusDisplayLine ? 0 : 5,
               }}>
-              <RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
-                {syncStatusDisplayLine ? translate('receive.title-syncing') : translate('receive.title')}
-              </RegText>
-              <FadeText style={{ margin: 0, padding: 0 }}>
-                {syncStatusDisplayLine ? syncStatusDisplayLine : ''}
-              </FadeText>
+              <View
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexWrap: 'wrap',
+                }}>
+                <RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
+                  {syncStatusDisplayLine ? translate('receive.title-syncing') : translate('receive.title')}
+                </RegText>
+                <FadeText style={{ margin: 0, padding: 0 }}>
+                  {syncStatusDisplayLine ? syncStatusDisplayLine : ''}
+                </FadeText>
+              </View>
               {!!syncStatusDisplayLine && (
                 <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
                   <View
@@ -331,6 +340,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                       display: 'flex',
                       flexDirection: 'row',
                       alignItems: 'center',
+                      justifyContent: 'center',
                       backgroundColor: colors.card,
                       borderRadius: 10,
                       margin: 0,

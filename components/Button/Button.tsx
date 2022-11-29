@@ -20,10 +20,12 @@ const Button: React.FunctionComponent<any> = ({
     type === 'Primary'
       ? {
           backgroundColor: disabled ? colors.primaryDisabled : colors.primary,
+          borderColor: colors.primary,
+          borderWidth: 2,
         }
       : type === 'Secondary'
       ? {
-          borderColor: colors.primary || colors.text,
+          borderColor: colors.primary,
           borderWidth: 2,
         }
       : {
@@ -38,6 +40,8 @@ const Button: React.FunctionComponent<any> = ({
     maxWidth: '90%',
     minWidth: '30%',
     minHeight: 48,
+    alignItems: 'center',
+    juatifyContent: 'center',
   };
 
   return (
@@ -52,10 +56,12 @@ const Button: React.FunctionComponent<any> = ({
       onPress={() => !disabled && onPress && onPress()}>
       <Text
         style={{
-          color: type === 'Primary' ? colors.background : colors.primary || colors.text,
+          color: type === 'Primary' ? colors.background : colors.primary,
           fontWeight: 'bold',
           textTransform: 'uppercase',
           textAlign: 'center',
+          alignSelf: 'center',
+          justifySelf: 'center',
         }}>
         {title}
       </Text>
