@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import { TouchableOpacity, Text } from 'react-native';
+import { TouchableOpacity, Text, View } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
 import { ThemeType } from '../../app/types';
@@ -33,7 +33,7 @@ const Button: React.FunctionComponent<any> = ({
           backgroundColor: colors.primary,
         };
   const styleCommon = {
-    padding: 10,
+    padding: 0,
     paddingLeft: 20,
     paddingRight: 20,
     borderRadius: 10,
@@ -54,16 +54,27 @@ const Button: React.FunctionComponent<any> = ({
         ...style,
       }}
       onPress={() => !disabled && onPress && onPress()}>
-      <Text
+      <View
         style={{
-          color: type === 'Primary' ? colors.background : colors.primary,
-          fontWeight: 'bold',
-          textTransform: 'uppercase',
-          textAlign: 'center',
-          alignSelf: 'center',
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'center',
+          margin: 0,
+          padding: 0,
+          minWidth: 48,
+          minHeight: 48,
         }}>
-        {title}
-      </Text>
+        <Text
+          style={{
+            color: type === 'Primary' ? colors.background : colors.primary,
+            fontWeight: 'bold',
+            textTransform: 'uppercase',
+            fontSize: 16,
+          }}>
+          {title}
+        </Text>
+      </View>
     </TouchableOpacity>
   );
 };
