@@ -9,4 +9,5 @@ export default interface InfoType {
   solps: number;
   zecPrice: number | null;
   defaultFee: number;
+  // eslint-disable-next-line semi
 }

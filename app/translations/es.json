@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo!",
-  "version": "v0.0.80",
+  "version": "v0.0.82",
   "loading": "cargando...",
   "wait": "Por favor espere...",
   "workingonit": "Estamos trabajando en esta funcionalidad",
@@ -19,7 +19,7 @@
     "creatingwallet-label": "Error Creando el Monedero",
     "readingwallet-label": "Error Leyendo el Monedero",
     "invalidseed-label": "Semilla incorrecta",
-    "invalidseed-error": "La semilla proporcionada no es correcta. Revisa cada una de las palabras.",
+    "invalidseed-error": "La semilla proporcionada no es correcta. Revisa cada una de las palabras."
   },
   "loadedapp": {
     "about": "Sobre Zingo!",
@@ -46,7 +46,7 @@
     "send-menu": "ENVIAR",
     "uas-menu": "DU's",
     "legacy-menu": "HEREDADAS",
-    "syncing": "Pausando la Sincronización para poder Enviar.",
+    "syncing": "Pausando la Sincronización para poder Enviar."
   },
   "rpc": {
     "parsebirthday-error": "Error: No es posible convertirlo en un número:",
@@ -56,7 +56,7 @@
     "sixtyseconds-message": "Monedero almacenado cada 60 segundos, lote:",
     "walletnotfound-error": "Error: No se encuentra ningún monedero.",
     "backupnotfound-error": "Error: No se encuentra ninguna copia de seguridad de ningún monedero.",
-    "of": "de",
+    "of": "de"
   },
   "settings": {
     "memos": [
@@ -64,12 +64,12 @@
         "text": "No se baja ningún Memo. El Servidor no aprenderá qué transacciones te pertenecen." },
       {
         "value": "wallet",
-        "text": "Solamente se bajan tus Memos. El Servidor aprenderá que transacciones te pertenecen, pero no podrá ver las direcciones, ni las cantidades ni los Memos.",
+        "text": "Solamente se bajan tus Memos. El Servidor aprenderá que transacciones te pertenecen, pero no podrá ver las direcciones, ni las cantidades ni los Memos."
       },
       {
         "value": "all",
-        "text": "Se bajan absolutamente todos los Memos. El Servidor no aprenderá qué transacciones te pertenecen. Esta opción consume GRAN cantidad de ancho de banda.",
-      },
+        "text": "Se bajan absolutamente todos los Memos. El Servidor no aprenderá qué transacciones te pertenecen. Esta opción consume GRAN cantidad de ancho de banda."
+      }
     ],
     "nochanges": "No se haan registrado cambios.",
     "ismemo": "Necesitas escoger una opción de Memorándum para poder grabar.",
@@ -84,7 +84,7 @@
     "memo-title": "BAJAR MEMORÁNDUMS",
     "save": "Grabar",
     "server-acc": "Campo de la URI del Servidor",
-    "threshold-acc": "Campo del Umbral del Filtro de Transacciones",
+    "threshold-acc": "Campo del Umbral del Filtro de Transacciones"
   },
   "info": {
     "version": "Versión",
@@ -94,13 +94,13 @@
     "serverblock": "Altura de Bloque del Servidor",
     "zecprice": "Precio ZEC",
     "unknown": "Desconocido",
-    "title": "Información del Servidor",
+    "title": "Información del Servidor"
   },
   "rescan": {
     "title": "Re-Escanear",
     "text-1": "Este proceso recuperará de nuevo todas las transacciones y reconstruirá tu monedero blindado, empezando por la altura de bloque ",
     "text-2": " Esto puede tardar varios minutos.",
-    "button": "Re-Escanear",
+    "button": "Re-Escanear"
   },
   "seed": {
     "buttontexts": {
@@ -109,13 +109,13 @@
         "",
         "Ya he guardado \n la semilla",
         "Realmente quieres \n cambiar tu \n monedero activo",
-        "Estás seguro \n al 100%",
+        "Estás seguro \n al 100%"
       ],
       "server": [
         "",
         "Ya he guardado \n la semilla",
         "Realmente quieres \n cambiar el \n servidor activo",
-        "Estás seguro \n al 100%",
+        "Estás seguro \n al 100%"
       ],
       "view": ["Ya he guardado \n la semilla"],
       "restore": ["Restaurar Monedero"],
@@ -123,8 +123,8 @@
         "",
         "Ya he guardado \n la semilla",
         "Realmente quieres \n restaurar tu \n copia de seguridad",
-        "Estás seguro \n al 100%",
-      ],
+        "Estás seguro \n al 100%"
+      ]
     },
     "title": "Semilla",
     "new": "Nueva",
@@ -145,7 +145,7 @@
     "mainnet-warning": "NO SE VA A HACER COPIA DE SEGURIDAD DE ESTE MONEDERO. SOLO DISPONIBLE EN LA RED: 'MAINNET'.",
     "seedplaceholder": "Semilla (24 palabras)",
     "seed-acc": "Campo Frase Semilla",
-    "birthday-acc": "Campo Cumpleaños",
+    "birthday-acc": "Campo Cumpleaños"
   },
   "send": {
     "Broadcast": "Transmitida con éxito Tx:",
@@ -174,7 +174,7 @@
     "scan-acc": "Escanear una Dirección",
     "zec-acc": "Campo de Cantidad en Zcash",
     "usd-acc": "Campo de Cantidad en Dólares",
-    "memo-acc": "Campo del Memorándum",
+    "memo-acc": "Campo del Memorándum"
   },
   "legacy": {
     "o-title": "U-Orchard",
@@ -193,7 +193,7 @@
     "of": " de ",
     "prev": "Anterior",
     "next": "Siguiente",
-    "title-acc": "Pantalla de Direcciones Anteriores Heredadas",
+    "title-acc": "Pantalla de Direcciones Anteriores Heredadas"
   },
   "receive": {
     "u-title": "DIRECCIONES UNIFICADAS",
@@ -207,7 +207,7 @@
     "privkey-option": "Exportar la Clave para Gastar",
     "viewkey-option": "Exportar la Clave de Visualizacion Total",
     "import-option": "Importar una Clave...",
-    "title-acc": "Pantalla de Recibir",
+    "title-acc": "Pantalla de Recibir"
   },
   "transactions": {
     "shieldfunds": "Blindar fondos",
@@ -235,6 +235,7 @@
     "txfee": "Comisión por Transacción",
     "title-acc": "Pantalla del Monedero",
     "list-acc": "Lista de Transacciones",
+    "pools": "grupos..."
   },
   "report": {
     "title": "Informe de Sincronización",
@@ -253,7 +254,7 @@
     "secondsperbatch": "Tiempo procesando el Lote Actual (segundos)",
     "blocks-title": "BLOQUES: ",
     "processingblock": "Procesando Bloque: ",
-    "totalblocks": " de un TOTAL de Bloques: ",
+    "totalblocks": " de un TOTAL de Bloques: "
   },
   "import": {
     "title": "Importar Clave",
@@ -262,28 +263,23 @@
     "text": "Importar una Clave implica un Re-escaneo completo, y puede tomar mucho tiempo completarlo. Tus Balances se actualizarán automáticamente.",
     "button": "Importar",
     "key-acc": "Campo Clave",
-    "birthday-acc": "Campo Cumpleaños",
+    "birthday-acc": "Campo Cumpleaños"
   },
   "about": {
-    "copyright": `
-    Copyright (c) 2022, ZingoLabs.
-
-    Construida con React Native.
-
-    La Licencia MIT (MIT) Copyright (c) 2022 Zingo!
-
-    Por la presente se otorga permiso, sin cargo, a cualquier persona que obtenga una copia de este software y los archivos de documentación asociados (el 'Software'), para operar con el Software sin restricciones, incluidos, entre otros, los derechos de uso, copia, modificación, fusión , publicar, distribuir, otorgar sublicencias y/o vender copias del Software, y permitir que las personas a las que se les proporcione el Software lo hagan, sujeto a las siguientes condiciones:
-
-    El aviso de derechos de autor anterior y este aviso de permiso se incluirán en todas las copias o partes sustanciales del Software.
-
-    EL SOFTWARE SE PROPORCIONA 'TAL CUAL', SIN GARANTÍA DE NINGÚN TIPO, EXPRESA O IMPLÍCITA, INCLUYENDO, ENTRE OTRAS, LAS GARANTÍAS DE COMERCIABILIDAD, IDONEIDAD PARA UN FIN DETERMINADO Y NO VIOLACIÓN. EN NINGÚN CASO LOS AUTORES O LOS TITULARES DE LOS DERECHOS DE AUTOR SERÁN RESPONSABLES DE CUALQUIER RECLAMACIÓN, DAÑOS U OTRA RESPONSABILIDAD, YA SEA EN UNA ACCIÓN DE CONTRATO, AGRAVIO O DE CUALQUIER OTRO TIPO, QUE SURJA DE, FUERA DE O EN RELACIÓN CON EL SOFTWARE O EL USO U OTROS TRATOS EN EL SOFTWARE.
-    `
+    "copyright": [
+      "Copyright (c) 2022, ZingoLabs.",
+      "Construida con React Native.",
+      "La Licencia MIT (MIT) Copyright (c) 2022 Zingo!",
+      "Por la presente se otorga permiso, sin cargo, a cualquier persona que obtenga una copia de este software y los archivos de documentación asociados (el 'Software'), para operar con el Software sin restricciones, incluidos, entre otros, los derechos de uso, copia, modificación, fusión , publicar, distribuir, otorgar sublicencias y/o vender copias del Software, y permitir que las personas a las que se les proporcione el Software lo hagan, sujeto a las siguientes condiciones:",
+      "El aviso de derechos de autor anterior y este aviso de permiso se incluirán en todas las copias o partes sustanciales del Software.",
+      "EL SOFTWARE SE PROPORCIONA 'TAL CUAL', SIN GARANTÍA DE NINGÚN TIPO, EXPRESA O IMPLÍCITA, INCLUYENDO, ENTRE OTRAS, LAS GARANTÍAS DE COMERCIABILIDAD, IDONEIDAD PARA UN FIN DETERMINADO Y NO VIOLACIÓN. EN NINGÚN CASO LOS AUTORES O LOS TITULARES DE LOS DERECHOS DE AUTOR SERÁN RESPONSABLES DE CUALQUIER RECLAMACIÓN, DAÑOS U OTRA RESPONSABILIDAD, YA SEA EN UNA ACCIÓN DE CONTRATO, AGRAVIO O DE CUALQUIER OTRO TIPO, QUE SURJA DE, FUERA DE O EN RELACIÓN CON EL SOFTWARE O EL USO U OTROS TRATOS EN EL SOFTWARE."
+    ]
   },
   "scanner": {
     "text" : "Escanea una Clave Gastar/Privada o una de Visualizacion Total/Visualización",
     "uri-error": "URI Error:",
     "nozcash-error": "no es una dirección Zcash válida",
-    "scanaddress": "Escanea una dirección Zcash",
+    "scanaddress": "Escanea una dirección Zcash"
   },
   "privkey": {
     "privkey": " Gastar/Privada ",
@@ -291,6 +287,17 @@
     "nokey": "Sin Claves",
     "tapcopy-message": "Clave copiada al portapapeles",
     "title": "Clave",
-    "address": "Dirección",
+    "address": "Dirección"
   },
+  "pools": {
+    "title": "Agrupaciones de Fondos",
+    "orchard-title": "ORCHARD (UA)",
+    "orchard-balance": "Cantidad Total",
+    "orchard-spendable-balance": "Cantidad para Gastar",
+    "sapling-title": "SAPLING (Privada)",
+    "sapling-balance": "Cantidad Total",
+    "sapling-spendable-balance": "Cantidad para Gastar",
+    "transparent-title": "TRANSPARENTE",
+    "transparent-balance": "Cantidad Total"
+  }
 }

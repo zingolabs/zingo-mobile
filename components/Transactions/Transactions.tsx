@@ -17,6 +17,7 @@ type TransactionsViewProps = {
   setComputingModalVisible: (visible: boolean) => void;
   syncingStatusMoreInfoOnClick: () => void;
   translate: (key: string, config?: TranslateOptions) => any;
+  poolsMoreInfoOnClick: () => void;
 };
 
 const Transactions: React.FunctionComponent<TransactionsViewProps> = iprops => {
