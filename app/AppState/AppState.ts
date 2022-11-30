@@ -80,6 +80,7 @@ export default interface AppState {
   seedServerModalVisible: boolean;
 
   syncReportModalVisible: boolean;
+  poolsModalVisible: boolean,
 
   newServer: string | null;
 

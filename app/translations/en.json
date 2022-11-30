@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo!",
-  "version": "v0.0.80",
+  "version": "v0.0.81",
   "loading": "loading...",
   "wait": "Please wait...",
   "workingonit": "We are working on this feature.",
@@ -19,7 +19,7 @@
     "creatingwallet-label": "Error creating Wallet",
     "readingwallet-label": "Error reading Wallet",
     "invalidseed-label": "Invalid Seed Phrase",
-    "invalidseed-error": "The seed phrase was invalid. Review every single word of the seed.",
+    "invalidseed-error": "The seed phrase was invalid. Review every single word of the seed."
   },
   "loadedapp": {
     "about": "About Zingo!",
@@ -46,7 +46,7 @@
     "send-menu": "SEND",
     "uas-menu": "UA's",
     "legacy-menu": "LEGACY",
-    "syncing": "Pausing the Syncronization to be able to Send.",
+    "syncing": "Pausing the Syncronization to be able to Send."
   },
   "rpc": {
     "parsebirthday-error": "Error: Couldn't parse as a number:",
@@ -56,7 +56,7 @@
     "sixtyseconds-message": "Stored the wallet every 60 seconds, batch:",
     "walletnotfound-error": "Error: Couldn't find any wallet.",
     "backupnotfound-error": "Error: Couldn't find any backup of any wallet.",
-    "of": "of",
+    "of": "of"
   },
   "settings": {
     "memos": [
@@ -64,12 +64,12 @@
         "text": "Don't download any memos. Server will not learn what transactions belong to you." },
       {
         "value": "wallet",
-        "text": "Download only my memos. Server will learn what TxIDs belong to you, but can't see the addresses, amounts or memos.",
+        "text": "Download only my memos. Server will learn what TxIDs belong to you, but can't see the addresses, amounts or memos."
       },
       {
         "value": "all",
-        "text": "Download all memos in the blockchain. Server will not learn what TxIDs belong to you. This consumes A LOT of bandwidth.",
-      },
+        "text": "Download all memos in the blockchain. Server will not learn what TxIDs belong to you. This consumes A LOT of bandwidth."
+      }
     ],
     "nochanges": "No changes registred.",
     "ismemo": "You need to choose the download memos option to save.",
@@ -84,7 +84,7 @@
     "memo-title": "MEMO DOWNLOAD",
     "save": "Save",
     "server-acc": "Server URI Field",
-    "threshold-acc": "Threshold Field",
+    "threshold-acc": "Threshold Field"
   },
   "info": {
     "version": "Version",
@@ -94,13 +94,13 @@
     "serverblock": "Server Block Height",
     "zecprice": "ZEC Price",
     "unknown": "Unknown",
-    "title": "Server Info",
+    "title": "Server Info"
   },
   "rescan": {
     "title": "Rescan",
     "text-1": "This will re-fetch all transactions and rebuild your shielded wallet, starting from block height ",
     "text-2": " It might take several minutes.",
-    "button": "Rescan",
+    "button": "Rescan"
   },
   "seed": {
     "buttontexts": {
@@ -109,13 +109,13 @@
         "",
         "I have saved \n the seed",
         "You really want \n to change your \n actual wallet",
-        "Are you sure \n 100% or more",
+        "Are you sure \n 100% or more"
       ],
       "server": [
         "",
         "I have saved \n the seed",
         "You really want \n to change your \n actual server",
-        "Are you sure \n 100% or more",
+        "Are you sure \n 100% or more"
       ],
       "view": ["I have saved \n the seed"],
       "restore": ["Restore Wallet"],
@@ -123,8 +123,8 @@
         "",
         "I have saved \n the seed",
         "You really want \n to restore your \n backup wallet",
-        "Are you sure \n 100% or more",
-      ],
+        "Are you sure \n 100% or more"
+      ]
     },
     "title": "Seed",
     "new": "New",
@@ -145,7 +145,7 @@
     "mainnet-warning": "NO BACKUP OF THIS WALLET. ONLY IN MAINNET.",
     "seedplaceholder": "Seed (24 words)",
     "seed-acc": "Seed Phrase Field",
-    "birthday-acc": "Birthday Field",
+    "birthday-acc": "Birthday Field"
   },
   "send": {
     "Broadcast": "Successfully Broadcast Tx:",
@@ -174,7 +174,7 @@
     "scan-acc": "Scan an address",
     "zec-acc": "ZEC Amount Field",
     "usd-acc": "USD Amount Field",
-    "memo-acc": "Memo Field",
+    "memo-acc": "Memo Field"
   },
   "legacy": {
     "o-title": "U-Orchard",
@@ -193,7 +193,7 @@
     "of": " of ",
     "prev": "Prev",
     "next": "Next",
-    "title-acc": "Legacy Address Types Screen",
+    "title-acc": "Legacy Address Types Screen"
   },
   "receive": {
     "u-title": "UNIFIED ADRESSES",
@@ -207,7 +207,7 @@
     "privkey-option": "Export Spending Key",
     "viewkey-option": "Export Full Viewing Key",
     "import-option": "Import Key...",
-    "title-acc": "Receive Screen",
+    "title-acc": "Receive Screen"
   },
   "transactions": {
     "shieldfunds": "Shield funds",
@@ -235,6 +235,7 @@
     "txfee": "Transaction Fee",
     "title-acc": "Wallet Screen",
     "list-acc": "Transactions' List",
+    "pools": "pools..."
   },
   "report": {
     "title": "Sync / Rescan Report",
@@ -253,7 +254,7 @@
     "secondsperbatch": "Time Processing the Current Batch (seconds)",
     "blocks-title": "BLOCKS: ",
     "processingblock": "Processing Block: ",
-    "totalblocks": " of a TOTAL of Blocks: ",
+    "totalblocks": " of a TOTAL of Blocks: "
   },
   "import": {
     "title": "Import Key",
@@ -262,28 +263,23 @@
     "text": "Importing a key requires a rescan, and make take a long time to complete. Your balances will update automatically.",
     "button": "Import",
     "key-acc": "Key Field",
-    "birthday-acc": "Birthday Field",
+    "birthday-acc": "Birthday Field"
   },
   "about": {
-    "copyright": `
-    Copyright (c) 2022, ZingoLabs.
-
-    Built with React Native.
-
-    The MIT License (MIT) Copyright (c) 2022 Zingo!
-
-    Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the 'Software'), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-    The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-    THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-    `
+    "copyright": [
+      "Copyright (c) 2022, ZingoLabs.",
+      "Built with React Native.",
+      "The MIT License (MIT) Copyright (c) 2022 Zingo!",
+      "Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the 'Software'), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:",
+      "The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.",
+      "THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE."
+    ]
   },
   "scanner": {
     "text" : "Scan a Spending/Private or Full Viewing/Viewing Key",
     "uri-error": "URI Error:",
     "nozcash-error": "is not a valid Zcash Address",
-    "scanaddress": "Scan a Zcash Address",
+    "scanaddress": "Scan a Zcash Address"
   },
   "privkey": {
     "privkey": " Spending/Private ",
@@ -291,6 +287,17 @@
     "nokey": "No Key",
     "tapcopy-message": "Copied Key to Clipboard",
     "title": "Key",
-    "address": "Address",
+    "address": "Address"
   },
+  "pools": {
+    "title": "Fund Pools",
+    "orchard-title": "ORCHARD",
+    "orchard-balance": "Total Balance",
+    "orchard-spendable-balance": "Spendable Balance",
+    "sapling-title": "SAPLING",
+    "sapling-balance": "Total Balance",
+    "sapling-spendable-balance": "Spendable Balance",
+    "transparent-title": "TRANSPARENT",
+    "transparent-balance": "Total Balance"
+  }
 }

@@ -41,6 +41,7 @@ const Info = React.lazy(() => import('../../components/Info'));
 const SyncReport = React.lazy(() => import('../../components/SyncReport'));
 const Rescan = React.lazy(() => import('../../components/Rescan'));
 const Settings = React.lazy(() => import('../../components/Settings'));
+const Pools = React.lazy(() => import('../../components/Pools'));
 
 const Menu = React.lazy(() => import('./components/Menu'));
 const ComputingTxContent = React.lazy(() => import('./components/ComputingTxContent'));
@@ -100,6 +101,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
       seedBackupModalVisible: false,
       seedServerModalVisible: false,
       syncReportModalVisible: false,
+      poolsModalVisible: false,
       newServer: null,
       uaAddress: null,
     };
@@ -538,6 +540,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
       aboutModalVisible,
       infoModalVisible,
       syncReportModalVisible,
+      poolsModalVisible,
       settingsModalVisible,
       computingModalVisible,
       rescanModalVisible,
@@ -658,6 +661,26 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
               closeModal={() => this.setState({ syncReportModalVisible: false })}
               syncStatusReport={syncStatusReport}
               birthday={walletSeed?.birthday}
+              translate={translate}
+            />
+          </Suspense>
+        </Modal>
+
+        <Modal
+          animationType="slide"
+          transparent={false}
+          visible={poolsModalVisible}
+          onRequestClose={() => this.setState({ poolsModalVisible: false })}>
+          <Suspense
+            fallback={
+              <View>
+                <Text>{this.props.translate('loading')}</Text>
+              </View>
+            }>
+            <Pools
+              closeModal={() => this.setState({ poolsModalVisible: false })}
+              totalBalance={totalBalance}
+              currencyName={currencyName || undefined}
               translate={translate}
             />
           </Suspense>
@@ -854,6 +877,9 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
                       await this.fetchWalletSeed();
                       this.setState({ syncReportModalVisible: true });
                     }}
+                    poolsMoreInfoOnClick={async () => {
+                      this.setState({ poolsModalVisible: true });
+                    }}
                   />
                 </Suspense>
               </>
@@ -879,6 +905,9 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
                     syncingStatusMoreInfoOnClick={async () => {
                       await this.fetchWalletSeed();
                       this.setState({ syncReportModalVisible: true });
+                    }}
+                    poolsMoreInfoOnClick={async () => {
+                      this.setState({ poolsModalVisible: true });
                     }}
                   />
                 </Suspense>
@@ -908,6 +937,9 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
                     }}
                     uaAddress={uaAddress}
                     setUaAddress={this.setUaAddress}
+                    poolsMoreInfoOnClick={async () => {
+                      this.setState({ poolsModalVisible: true });
+                    }}
                   />
                 </Suspense>
               </>

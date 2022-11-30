@@ -40,6 +40,7 @@ type SendProps = {
   syncingStatus: SyncStatus | null;
   syncingStatusMoreInfoOnClick: () => void;
   translate: (key: string, config?: TranslateOptions) => any;
+  poolsMoreInfoOnClick: () => void;
 };
 
 const Send: React.FunctionComponent<SendProps> = ({
@@ -56,6 +57,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   syncingStatus,
   syncingStatusMoreInfoOnClick,
   translate,
+  poolsMoreInfoOnClick,
 }) => {
   const { colors } = useTheme() as unknown as ThemeType;
   const [qrcodeModalVisble, setQrcodeModalVisible] = useState(false);
@@ -390,7 +392,30 @@ const Send: React.FunctionComponent<SendProps> = ({
               source={require('../../assets/img/logobig-zingo.png')}
               style={{ width: 80, height: 80, resizeMode: 'contain' }}
             />
-            <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} />
+            <View style={{ flexDirection: 'row' }}>
+              <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} />
+              {totalBalance.total > 0 && (
+                <TouchableOpacity onPress={() => poolsMoreInfoOnClick()}>
+                  <View
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backgroundColor: colors.card,
+                      borderRadius: 10,
+                      margin: 0,
+                      padding: 0,
+                      marginLeft: 5,
+                      minWidth: 48,
+                      minHeight: 48,
+                    }}>
+                    <RegText color={colors.primary}>{translate('transactions.pools')}</RegText>
+                    <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
+                  </View>
+                </TouchableOpacity>
+              )}
+            </View>
             <UsdAmount style={{ marginTop: 0, marginBottom: 5 }} price={zecPrice} amtZec={totalBalance.total} />
 
             <View
