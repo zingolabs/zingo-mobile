@@ -1,11 +1,13 @@
 {
   "zingo": "Zingo!",
-  "version": "v0.0.75",
+  "version": "v0.0.80",
   "loading": "loading...",
   "wait": "Please wait...",
   "workingonit": "We are working on this feature.",
   "close": "Close",
   "cancel": "Cancel",
+  "menudrawer-acc": "Open Menu Drawer",
+  "menu-acc": "Open Menu",
   "loadingapp": {
     "actualserver": "Actual server:",
     "changeserver": "CHANGE SERVER",
@@ -44,6 +46,7 @@
     "send-menu": "SEND",
     "uas-menu": "UA's",
     "legacy-menu": "LEGACY",
+    "syncing": "Pausing the Syncronization to be able to Send.",
   },
   "rpc": {
     "parsebirthday-error": "Error: Couldn't parse as a number:",
@@ -80,6 +83,8 @@
     "number": "Number...",
     "memo-title": "MEMO DOWNLOAD",
     "save": "Save",
+    "server-acc": "Server URI Field",
+    "threshold-acc": "Threshold Field",
   },
   "info": {
     "version": "Version",
@@ -138,6 +143,9 @@
     "backup-warning": "YOU WILL HAVE NO LONGER ACCESS TO THIS WALLET, AND YOU ARE GOING TO ACCESS TO YOUR BACKUP WALLET",
     "server-warning": "YOU WILL HAVE NO LONGER ACCESS TO THIS WALLET, AND YOU ARE GOING TO CHANGE TO ANOTHER SERVER IN WHICH YOUR ACTUAL WALLET DOESN'T EXIST",
     "mainnet-warning": "NO BACKUP OF THIS WALLET. ONLY IN MAINNET.",
+    "seedplaceholder": "Seed (24 words)",
+    "seed-acc": "Seed Phrase Field",
+    "birthday-acc": "Birthday Field",
   },
   "send": {
     "Broadcast": "Successfully Broadcast Tx:",
@@ -161,6 +169,12 @@
     "confirm-button": "Confirm",
     "amount": "   Amount",
     "to": "To",
+    "title-acc": "Send Screen",
+    "address-acc": "Address Field",
+    "scan-acc": "Scan an address",
+    "zec-acc": "ZEC Amount Field",
+    "usd-acc": "USD Amount Field",
+    "memo-acc": "Memo Field",
   },
   "legacy": {
     "o-title": "U-Orchard",
@@ -179,6 +193,7 @@
     "of": " of ",
     "prev": "Prev",
     "next": "Next",
+    "title-acc": "Legacy Address Types Screen",
   },
   "receive": {
     "u-title": "UNIFIED ADRESSES",
@@ -192,6 +207,7 @@
     "privkey-option": "Export Spending Key",
     "viewkey-option": "Export Full Viewing Key",
     "import-option": "Import Key...",
+    "title-acc": "Receive Screen",
   },
   "transactions": {
     "shieldfunds": "Shield funds",
@@ -217,6 +233,8 @@
     "memo": "Memo",
     "memocopied": "Copied Memo to Clipboard",
     "txfee": "Transaction Fee",
+    "title-acc": "Wallet Screen",
+    "list-acc": "Transactions' List",
   },
   "report": {
     "title": "Sync / Rescan Report",
@@ -243,6 +261,8 @@
     "birthday": "Key Birthday",
     "text": "Importing a key requires a rescan, and make take a long time to complete. Your balances will update automatically.",
     "button": "Import",
+    "key-acc": "Key Field",
+    "birthday-acc": "Birthday Field",
   },
   "about": {
     "copyright": `

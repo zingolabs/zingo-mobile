@@ -1,15 +1,13 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect } from 'react';
-import { View, Image, SafeAreaView, ScrollView } from 'react-native';
+import { View, Image, SafeAreaView, ScrollView, TouchableOpacity, Text, TextInput } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import Toast from 'react-native-simple-toast';
 import Clipboard from '@react-native-community/clipboard';
 import { TranslateOptions } from 'i18n-js';
 
 import RegText from '../Components/RegText';
-import RegTextInput from '../Components/RegTextInput';
 import FadeText from '../Components/FadeText';
-import ClickableText from '../Components/ClickableText';
 import ZecAmount from '../Components/ZecAmount';
 import { TotalBalance } from '../../app/AppState';
 import Button from '../Button';
@@ -61,7 +59,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
     setBirthdayNumber(birthday || 0);
   }, [action, seed, birthday, translate]);
 
-  //console.log(seed, birthday, onClickOK, onClickCancel, totalBalance, action, error, currencyName);
+  //console.log(seed, birthday, onClickOK, onClickCancel, totalBalance, action, currencyName);
 
   return (
     <SafeAreaView
@@ -89,7 +87,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
           currencyName={currencyName ? currencyName : ''}
           size={36}
           amtZec={totalBalance.total}
-          style={{ opacity: 0.4 }}
+          style={{ opacity: 0.5 }}
         />
         <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
           {translate('seed.title')} ({translate(`seed.${action}`)})
@@ -125,8 +123,9 @@ const Seed: React.FunctionComponent<SeedProps> = ({
               {seedPhrase}
             </RegText>
           ) : (
-            <RegTextInput
-              multiline
+            <View
+              accessible={true}
+              accessibilityLabel={translate('seed.seed-acc')}
               style={{
                 margin: 0,
                 padding: 10,
@@ -134,25 +133,49 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                 borderRadius: 10,
                 borderColor: colors.text,
                 maxWidth: '100%',
-                minWidth: '95%',
-                minHeight: '50%',
                 maxHeight: '70%',
-                color: colors.text,
-              }}
-              value={seedPhrase}
-              onChangeText={(text: string) => setSeedPhrase(text)}
-            />
+                minWidth: '95%',
+                minHeight: 48,
+              }}>
+              <TextInput
+                placeholder={translate('seed.seedplaceholder')}
+                placeholderTextColor={colors.placeholder}
+                multiline
+                style={{
+                  color: colors.text,
+                  fontWeight: '600',
+                  minWidth: '95%',
+                  minHeight: 48,
+                }}
+                value={seedPhrase}
+                onChangeText={(text: string) => setSeedPhrase(text)}
+                editable={true}
+              />
+            </View>
           )}
-          <ClickableText
-            style={{ padding: 10, marginTop: 0, textAlign: 'center' }}
-            onPress={() => {
-              if (seedPhrase) {
-                Clipboard.setString(seedPhrase);
-                Toast.show(translate('seed.tapcopy-message'), Toast.LONG);
-              }
-            }}>
-            {translate('seed.tapcopy')}
-          </ClickableText>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+            <View />
+            <TouchableOpacity
+              onPress={() => {
+                if (seedPhrase) {
+                  Clipboard.setString(seedPhrase);
+                  Toast.show(translate('seed.tapcopy-message'), Toast.LONG);
+                }
+              }}>
+              <Text
+                style={{
+                  color: colors.text,
+                  textDecorationLine: 'underline',
+                  padding: 10,
+                  marginTop: 0,
+                  textAlign: 'center',
+                  minHeight: 48,
+                }}>
+                {translate('seed.tapcopy')}
+              </Text>
+            </TouchableOpacity>
+            <View />
+          </View>
         </View>
 
         <View style={{ marginTop: 10, alignItems: 'center' }}>
@@ -164,7 +187,9 @@ const Seed: React.FunctionComponent<SeedProps> = ({
           ) : (
             <>
               <FadeText style={{ textAlign: 'center' }}>{translate('seed.birthday-no-readonly')}</FadeText>
-              <RegTextInput
+              <View
+                accessible={true}
+                accessibilityLabel={translate('seed.birthday-acc')}
                 style={{
                   margin: 10,
                   padding: 10,
@@ -172,12 +197,22 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                   borderRadius: 10,
                   borderColor: colors.text,
                   width: '40%',
-                  color: colors.text,
-                }}
-                value={birthdayNumber}
-                keyboardType="numeric"
-                onChangeText={(text: string) => setBirthdayNumber(Number(text))}
-              />
+                  minWidth: '40%',
+                  minHeight: 48,
+                }}>
+                <TextInput
+                  style={{
+                    color: colors.text,
+                    fontWeight: '600',
+                    minWidth: '40%',
+                    minHeight: 48,
+                  }}
+                  value={birthdayNumber.toString()}
+                  onChangeText={(text: string) => setBirthdayNumber(Number(text))}
+                  editable={true}
+                  keyboardType="numeric"
+                />
+              </View>
             </>
           )}
         </View>

@@ -242,6 +242,8 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
 
     return (
       <View
+        accessible={true}
+        accessibilityLabel={translate('receive.title-acc')}
         style={{
           display: 'flex',
           justifyContent: 'flex-start',
@@ -300,9 +302,9 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
               source={require('../../assets/img/logobig-zingo.png')}
               style={{ width: 80, height: 80, resizeMode: 'contain' }}
             />
-            <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{ opacity: 0.4 }} />
+            <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{ opacity: 0.5 }} />
             <UsdAmount
-              style={{ marginTop: 0, marginBottom: 5, opacity: 0.4 }}
+              style={{ marginTop: 0, marginBottom: 5, opacity: 0.5 }}
               price={zecPrice}
               amtZec={totalBalance.total}
             />
@@ -314,14 +316,23 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexWrap: 'wrap',
-                marginVertical: 5,
+                marginVertical: syncStatusDisplayLine ? 0 : 5,
               }}>
-              <RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
-                {syncStatusDisplayLine ? translate('receive.title-syncing') : translate('receive.title')}
-              </RegText>
-              <FadeText style={{ margin: 0, padding: 0 }}>
-                {syncStatusDisplayLine ? syncStatusDisplayLine : ''}
-              </FadeText>
+              <View
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexWrap: 'wrap',
+                }}>
+                <RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
+                  {syncStatusDisplayLine ? translate('receive.title-syncing') : translate('receive.title')}
+                </RegText>
+                <FadeText style={{ margin: 0, padding: 0 }}>
+                  {syncStatusDisplayLine ? syncStatusDisplayLine : ''}
+                </FadeText>
+              </View>
               {!!syncStatusDisplayLine && (
                 <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
                   <View
@@ -329,13 +340,16 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                       display: 'flex',
                       flexDirection: 'row',
                       alignItems: 'center',
+                      justifyContent: 'center',
                       backgroundColor: colors.card,
                       borderRadius: 10,
                       margin: 0,
                       padding: 0,
                       marginLeft: 5,
+                      minWidth: 48,
+                      minHeight: 48,
                     }}>
-                    <FadeText style={{ color: colors.primary }}>{translate('receive.more')}</FadeText>
+                    <RegText color={colors.primary}>{translate('receive.more')}</RegText>
                     <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
                   </View>
                 </TouchableOpacity>
@@ -345,14 +359,21 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
         </View>
 
         <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute' }}>
-          <TouchableOpacity onPress={toggleMenuDrawer}>
-            <FontAwesomeIcon icon={faBars} size={20} color={colors.border} />
+          <TouchableOpacity
+            accessible={true}
+            accessibilityLabel={translate('menudrawer-acc')}
+            onPress={toggleMenuDrawer}>
+            <FontAwesomeIcon icon={faBars} size={48} color={colors.border} />
           </TouchableOpacity>
         </View>
 
         <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', right: 0 }}>
           <OptionsMenu
-            customButton={<FontAwesomeIcon icon={faEllipsisV} color={colors.border} size={20} />}
+            customButton={
+              <View accessible={true} accessibilityLabel={translate('menu-acc')}>
+                <FontAwesomeIcon icon={faEllipsisV} color={colors.border} size={48} />
+              </View>
+            }
             buttonStyle={{ width: 32, height: 32, margin: 7.5, resizeMode: 'contain' }}
             destructiveIndex={4}
             options={[

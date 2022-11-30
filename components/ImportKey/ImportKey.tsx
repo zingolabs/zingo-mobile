@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState } from 'react';
-import { View, ScrollView, SafeAreaView, Image, TouchableOpacity, Modal } from 'react-native';
+import { View, ScrollView, SafeAreaView, Image, TouchableOpacity, Modal, TextInput } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { faQrcode } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -8,7 +8,6 @@ import { TranslateOptions } from 'i18n-js';
 
 import FadeText from '../Components/FadeText';
 import RegText from '../Components/RegText';
-import RegTextInput from '../Components/RegTextInput';
 import ZecAmount from '../Components/ZecAmount';
 import Button from '../Button';
 import { TotalBalance } from '../../app/AppState';
@@ -62,7 +61,7 @@ const ImportKey: React.FunctionComponent<ImportKeyProps> = ({
           source={require('../../assets/img/logobig-zingo.png')}
           style={{ width: 80, height: 80, resizeMode: 'contain' }}
         />
-        <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{ opacity: 0.4 }} />
+        <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{ opacity: 0.5 }} />
         <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
           {translate('import.title')}
         </RegText>
@@ -91,21 +90,31 @@ const ImportKey: React.FunctionComponent<ImportKeyProps> = ({
         keyboardShouldPersistTaps="handled">
         <RegText style={{ margin: 10 }}>{translate('import.key-label')}</RegText>
 
-        <RegTextInput
-          multiline
+        <View
+          accessible={true}
+          accessibilityLabel={translate('import.key-acc')}
           style={{
             padding: 10,
             maxWidth: '95%',
-            minWidth: '95%',
             borderWidth: 1,
             borderRadius: 10,
             borderColor: colors.border,
+            minWidth: '95%',
             minHeight: 100,
-            color: colors.text,
-          }}
-          value={privKeyText}
-          onChangeText={setPrivKeyText}
-        />
+          }}>
+          <TextInput
+            multiline
+            style={{
+              color: colors.text,
+              fontWeight: '600',
+              minWidth: '95%',
+              minHeight: 100,
+            }}
+            value={privKeyText}
+            onChangeText={setPrivKeyText}
+            editable={true}
+          />
+        </View>
 
         <TouchableOpacity
           onPress={() => {
@@ -126,21 +135,33 @@ const ImportKey: React.FunctionComponent<ImportKeyProps> = ({
           {translate('import.birthday')}
         </RegText>
         <FadeText>{translate('seed.birthday-no-readonly')}</FadeText>
-        <RegTextInput
+
+        <View
+          accessible={true}
+          accessibilityLabel={translate('import.birthday-acc')}
           style={{
             padding: 10,
             maxWidth: '50%',
-            minWidth: '50%',
             borderWidth: 1,
             borderRadius: 5,
             borderColor: colors.border,
             margin: 10,
-            color: colors.text,
-          }}
-          value={birthday}
-          keyboardType="numeric"
-          onChangeText={setBirthday}
-        />
+            minWidth: '50%',
+            minHeight: 48,
+          }}>
+          <TextInput
+            style={{
+              color: colors.text,
+              fontWeight: '600',
+              minWidth: '50%',
+              minHeight: 48,
+            }}
+            value={birthday}
+            onChangeText={setBirthday}
+            editable={true}
+            keyboardType="numeric"
+          />
+        </View>
 
         <RegText style={{ margin: 20 }}>{translate('import.text')}</RegText>
       </ScrollView>

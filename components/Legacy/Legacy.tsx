@@ -304,6 +304,8 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({
 
     return (
       <View
+        accessible={true}
+        accessibilityLabel={translate('legacy.title-acc')}
         style={{
           display: 'flex',
           justifyContent: 'flex-start',
@@ -362,9 +364,9 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({
               source={require('../../assets/img/logobig-zingo.png')}
               style={{ width: 80, height: 80, resizeMode: 'contain' }}
             />
-            <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{ opacity: 0.4 }} />
+            <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{ opacity: 0.5 }} />
             <UsdAmount
-              style={{ marginTop: 0, marginBottom: 5, opacity: 0.4 }}
+              style={{ marginTop: 0, marginBottom: 5, opacity: 0.5 }}
               price={zecPrice}
               amtZec={totalBalance.total}
             />
@@ -375,14 +377,21 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({
         </View>
 
         <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute' }}>
-          <TouchableOpacity onPress={toggleMenuDrawer}>
-            <FontAwesomeIcon icon={faBars} size={20} color={colors.border} />
+          <TouchableOpacity
+            accessible={true}
+            accessibilityLabel={translate('menudrawer-acc')}
+            onPress={toggleMenuDrawer}>
+            <FontAwesomeIcon icon={faBars} size={48} color={colors.border} />
           </TouchableOpacity>
         </View>
 
         <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', right: 0 }}>
           <OptionsMenu
-            customButton={<FontAwesomeIcon icon={faEllipsisV} color={colors.border} size={20} />}
+            customButton={
+              <View accessible={true} accessibilityLabel={translate('menu-acc')}>
+                <FontAwesomeIcon icon={faEllipsisV} color={colors.border} size={48} />
+              </View>
+            }
             buttonStyle={{ width: 32, height: 32, margin: 7.5, resizeMode: 'contain' }}
             destructiveIndex={4}
             options={[

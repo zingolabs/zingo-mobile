@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { View, ScrollView, Modal, Image, Alert, Keyboard } from 'react-native';
+import { View, ScrollView, Modal, Image, Alert, Keyboard, TextInput } from 'react-native';
 import { faQrcode, faCheck, faInfo } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme } from '@react-navigation/native';
@@ -14,7 +14,6 @@ import { TranslateOptions } from 'i18n-js';
 
 import FadeText from '../Components/FadeText';
 import ErrorText from '../Components/ErrorText';
-import RegTextInput from '../Components/RegTextInput';
 import RegText from '../Components/RegText';
 import ZecAmount from '../Components/ZecAmount';
 import UsdAmount from '../Components/UsdAmount';
@@ -112,7 +111,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     } else {
       setMemoEnabled(false);
     }
-  }, [sendPageState.toaddr, currencyName]);
+  }, [sendPageState.toaddr, sendPageState.toaddr.to, currencyName]);
 
   useEffect(() => {
     const parseAdressJSON = async (address: string): Promise<boolean> => {
@@ -132,17 +131,16 @@ const Send: React.FunctionComponent<SendProps> = ({
       );
     };
 
-    const address = sendPageState.toaddr.to;
+    var to = sendPageState.toaddr;
 
-    if (address) {
-      parseAdressJSON(address).then(r => {
+    if (to.to) {
+      parseAdressJSON(to.to).then(r => {
         setValidAddress(r ? 1 : -1);
       });
     } else {
       setValidAddress(0);
     }
 
-    var to = sendPageState.toaddr;
     to.amount = to.amount.replace(decimalSeparator, '.');
     to.amountUSD = to.amountUSD.replace(decimalSeparator, '.');
 
@@ -168,7 +166,15 @@ const Send: React.FunctionComponent<SendProps> = ({
     } else {
       setValidAmount(0);
     }
-  }, [sendPageState.toaddr, getMaxAmount, decimalSeparator, currencyName]);
+  }, [
+    sendPageState.toaddr,
+    sendPageState.toaddr.to,
+    sendPageState.toaddr.amount,
+    sendPageState.toaddr.amountUSD,
+    getMaxAmount,
+    decimalSeparator,
+    currencyName,
+  ]);
 
   useEffect(() => {
     setSendButtonEnabled(validAddress === 1 && validAmount === 1);
@@ -325,6 +331,8 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   return (
     <View
+      accessible={true}
+      accessibilityLabel={translate('send.title-acc')}
       style={{
         display: 'flex',
         justifyContent: 'flex-start',
@@ -392,14 +400,23 @@ const Send: React.FunctionComponent<SendProps> = ({
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexWrap: 'wrap',
-                marginVertical: 5,
+                marginVertical: syncStatusDisplayLine ? 0 : 5,
               }}>
-              <RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
-                {syncStatusDisplayLine ? translate('send.title-syncing') : translate('send.title')}
-              </RegText>
-              <FadeText style={{ margin: 0, padding: 0 }}>
-                {syncStatusDisplayLine ? syncStatusDisplayLine : ''}
-              </FadeText>
+              <View
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexWrap: 'wrap',
+                }}>
+                <RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
+                  {syncStatusDisplayLine ? translate('send.title-syncing') : translate('send.title')}
+                </RegText>
+                <FadeText style={{ margin: 0, padding: 0 }}>
+                  {syncStatusDisplayLine ? syncStatusDisplayLine : ''}
+                </FadeText>
+              </View>
               {!!syncStatusDisplayLine && (
                 <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
                   <View
@@ -407,13 +424,16 @@ const Send: React.FunctionComponent<SendProps> = ({
                       display: 'flex',
                       flexDirection: 'row',
                       alignItems: 'center',
+                      justifyContent: 'center',
                       backgroundColor: colors.card,
                       borderRadius: 10,
                       margin: 0,
                       padding: 0,
                       marginLeft: 5,
+                      minWidth: 48,
+                      minHeight: 48,
                     }}>
-                    <FadeText style={{ color: colors.primary }}>{translate('send.more')}</FadeText>
+                    <RegText color={colors.primary}>{translate('send.more')}</RegText>
                     <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
                   </View>
                 </TouchableOpacity>
@@ -424,8 +444,8 @@ const Send: React.FunctionComponent<SendProps> = ({
       </Animated.View>
 
       <Animated.View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', marginTop: slideAnim }}>
-        <TouchableOpacity onPress={toggleMenuDrawer}>
-          <FontAwesomeIcon icon={faBars} size={20} color={colors.border} />
+        <TouchableOpacity accessible={true} accessibilityLabel={translate('menudrawer-acc')} onPress={toggleMenuDrawer}>
+          <FontAwesomeIcon icon={faBars} size={48} color={colors.border} />
         </TouchableOpacity>
       </Animated.View>
 
@@ -457,18 +477,36 @@ const Send: React.FunctionComponent<SendProps> = ({
                   borderColor: colors.text,
                   marginTop: 5,
                 }}>
-                <RegTextInput
-                  placeholder={translate('send.addressplaceholder')}
-                  placeholderTextColor={colors.placeholder}
-                  style={{ flexGrow: 1, maxWidth: '90%' }}
-                  value={ta.to}
-                  onChangeText={(text: string) => updateToField(text, null, null, null)}
-                />
+                <View
+                  accessible={true}
+                  accessibilityLabel={translate('send.address-acc')}
+                  style={{
+                    flexGrow: 1,
+                    maxWidth: '90%',
+                    minWidth: 48,
+                    minHeight: 48,
+                  }}>
+                  <TextInput
+                    placeholder={translate('send.addressplaceholder')}
+                    placeholderTextColor={colors.placeholder}
+                    style={{
+                      color: colors.text,
+                      fontWeight: '600',
+                      minWidth: 48,
+                      minHeight: 48,
+                    }}
+                    value={ta.to}
+                    onChangeText={(text: string) => updateToField(text, null, null, null)}
+                    editable={true}
+                  />
+                </View>
                 <TouchableOpacity
+                  accessible={true}
+                  accessibilityLabel={translate('send.scan-acc')}
                   onPress={() => {
                     setQrcodeModalVisible(true);
                   }}>
-                  <FontAwesomeIcon style={{ margin: 5 }} size={24} icon={faQrcode} color={colors.border} />
+                  <FontAwesomeIcon style={{ margin: 5 }} size={48} icon={faQrcode} color={colors.border} />
                 </TouchableOpacity>
               </View>
 
@@ -491,10 +529,9 @@ const Send: React.FunctionComponent<SendProps> = ({
                     width: '60%',
                   }}>
                   <RegText style={{ marginTop: 20, marginRight: 5, fontSize: 20 }}>{'\u1647'}</RegText>
-                  <RegTextInput
-                    placeholder={`0${decimalSeparator}0`}
-                    placeholderTextColor={colors.placeholder}
-                    keyboardType="numeric"
+                  <View
+                    accessible={true}
+                    accessibilityLabel={translate('send.zec-acc')}
                     style={{
                       display: 'flex',
                       flexDirection: 'row',
@@ -504,12 +541,26 @@ const Send: React.FunctionComponent<SendProps> = ({
                       borderRadius: 5,
                       borderColor: colors.text,
                       marginTop: 5,
-                      fontSize: 18,
                       width: '75%',
-                    }}
-                    value={ta.amount.toString()}
-                    onChangeText={(text: string) => updateToField(null, text, null, null)}
-                  />
+                      minWidth: 48,
+                      minHeight: 48,
+                    }}>
+                    <TextInput
+                      placeholder={`0${decimalSeparator}0`}
+                      placeholderTextColor={colors.placeholder}
+                      keyboardType="numeric"
+                      style={{
+                        color: colors.text,
+                        fontWeight: '600',
+                        fontSize: 18,
+                        minWidth: 48,
+                        minHeight: 48,
+                      }}
+                      value={ta.amount.toString()}
+                      onChangeText={(text: string) => updateToField(null, text, null, null)}
+                      editable={true}
+                    />
+                  </View>
                   <RegText style={{ marginTop: 15, marginRight: 10, marginLeft: 5 }}>ZEC</RegText>
                 </View>
 
@@ -521,10 +572,9 @@ const Send: React.FunctionComponent<SendProps> = ({
                     width: '35%',
                   }}>
                   <RegText style={{ marginTop: 15, marginRight: 5 }}>$</RegText>
-                  <RegTextInput
-                    placeholder={`0${decimalSeparator}0`}
-                    placeholderTextColor={colors.placeholder}
-                    keyboardType="numeric"
+                  <View
+                    accessible={true}
+                    accessibilityLabel={translate('send.usd-acc')}
                     style={{
                       display: 'flex',
                       flexDirection: 'row',
@@ -534,12 +584,26 @@ const Send: React.FunctionComponent<SendProps> = ({
                       borderRadius: 5,
                       borderColor: colors.text,
                       marginTop: 5,
-                      fontSize: 18,
                       width: '55%',
-                    }}
-                    value={ta.amountUSD.toString()}
-                    onChangeText={(text: string) => updateToField(null, null, text, null)}
-                  />
+                      minWidth: 48,
+                      minHeight: 48,
+                    }}>
+                    <TextInput
+                      placeholder={`0${decimalSeparator}0`}
+                      placeholderTextColor={colors.placeholder}
+                      keyboardType="numeric"
+                      style={{
+                        color: colors.text,
+                        fontWeight: '600',
+                        fontSize: 18,
+                        minWidth: 48,
+                        minHeight: 48,
+                      }}
+                      value={ta.amountUSD.toString()}
+                      onChangeText={(text: string) => updateToField(null, null, text, null)}
+                      editable={true}
+                    />
+                  </View>
                   <RegText style={{ marginTop: 15, marginLeft: 5 }}>USD</RegText>
                 </View>
               </View>
@@ -576,17 +640,30 @@ const Send: React.FunctionComponent<SendProps> = ({
                 <>
                   <FadeText style={{ marginTop: 30 }}>{translate('send.memo')}</FadeText>
                   <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start' }}>
-                    <RegTextInput
-                      multiline
+                    <View
+                      accessible={true}
+                      accessibilityLabel={translate('send.memo-acc')}
                       style={{
                         flexGrow: 1,
                         borderWidth: 1,
                         borderRadius: 5,
                         borderColor: colors.text,
-                      }}
-                      value={ta.memo}
-                      onChangeText={(text: string) => updateToField(null, null, null, text)}
-                    />
+                        minWidth: 48,
+                        minHeight: 48,
+                      }}>
+                      <TextInput
+                        multiline
+                        style={{
+                          color: colors.text,
+                          fontWeight: '600',
+                          minWidth: 48,
+                          minHeight: 48,
+                        }}
+                        value={ta.memo}
+                        onChangeText={(text: string) => updateToField(null, null, null, text)}
+                        editable={true}
+                      />
+                    </View>
                   </View>
                 </>
               )}
@@ -604,6 +681,8 @@ const Send: React.FunctionComponent<SendProps> = ({
           marginVertical: 5,
         }}>
         <Button
+          accessible={true}
+          accessibilityLabel={'title ' + translate('send.button')}
           type="Primary"
           title={translate('send.button')}
           disabled={!sendButtonEnabled}

@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState } from 'react';
-import { View, ScrollView, TouchableOpacity, SafeAreaView, Linking } from 'react-native';
+import { View, ScrollView, TouchableOpacity, SafeAreaView, Linking, Text } from 'react-native';
 import Clipboard from '@react-native-community/clipboard';
 import Toast from 'react-native-simple-toast';
 import Moment from 'react-moment';
@@ -16,7 +16,6 @@ import ZecAmount from '../../Components/ZecAmount';
 import UsdAmount from '../../Components/UsdAmount';
 import FadeText from '../../Components/FadeText';
 import ZecPrice from '../../Components/ZecPrice';
-import ClickableText from '../../Components/ClickableText';
 import Button from '../../Button';
 import { ThemeType } from '../../../app/types';
 
@@ -112,9 +111,11 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, curr
               {expandTxid && (
                 <>
                   <RegText>{tx?.txid}</RegText>
-                  <ClickableText onPress={() => handleTxIDClick(tx?.txid)}>
-                    {translate('transactions.viewexplorer')}
-                  </ClickableText>
+                  <TouchableOpacity onPress={() => handleTxIDClick(tx?.txid)}>
+                    <Text style={{ color: colors.text, textDecorationLine: 'underline', margin: 15 }}>
+                      {translate('transactions.viewexplorer')}
+                    </Text>
+                  </TouchableOpacity>
                 </>
               )}
             </TouchableOpacity>

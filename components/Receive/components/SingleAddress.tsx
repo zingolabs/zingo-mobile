@@ -1,13 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import { View, Platform, ScrollView } from 'react-native';
+import { View, Platform, ScrollView, TouchableOpacity, Text } from 'react-native';
 import Clipboard from '@react-native-community/clipboard';
 import QRCode from 'react-native-qrcode-svg';
 import Toast from 'react-native-simple-toast';
 import { useTheme } from '@react-navigation/native';
 import { TranslateOptions } from 'i18n-js';
 
-import ClickableText from '../../Components/ClickableText';
 import FadeText from '../../Components/FadeText';
 import Button from '../../Button';
 import Utils from '../../../app/utils';
@@ -64,12 +63,13 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
       <View style={{ marginTop: 20, padding: 10, backgroundColor: colors.border }}>
         <QRCode value={address} size={200} ecl="L" backgroundColor={colors.border} />
       </View>
-      <ClickableText style={{ marginTop: 15 }} onPress={doCopy}>
-        {translate('seed.tapcopy')}
-      </ClickableText>
+      <TouchableOpacity onPress={doCopy}>
+        <Text style={{ color: colors.text, textDecorationLine: 'underline', margin: 15, minHeight: 48 }}>
+          {translate('seed.tapcopy')}
+        </Text>
+      </TouchableOpacity>
 
-      <View
-        style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', marginTop: 10, justifyContent: 'center' }}>
+      <View style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
         {chunks.map(c => (
           <FadeText
             key={c}

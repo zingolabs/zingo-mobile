@@ -85,6 +85,8 @@ const TransactionsView: React.FunctionComponent<TransactionsViewProps> = ({
 
   return (
     <View
+      accessible={true}
+      accessibilityLabel={translate('transactions.title-acc')}
       style={{
         display: 'flex',
         justifyContent: 'flex-start',
@@ -133,12 +135,21 @@ const TransactionsView: React.FunctionComponent<TransactionsViewProps> = ({
             alignItems: 'center',
             justifyContent: 'center',
             flexWrap: 'wrap',
-            marginVertical: 5,
+            marginVertical: syncStatusDisplayLine ? 0 : 5,
           }}>
-          <RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
-            {syncStatusDisplayLine ? translate('transactions.title-syncing') : translate('transactions.title')}
-          </RegText>
-          <FadeText style={{ margin: 0, padding: 0 }}>{syncStatusDisplayLine ? syncStatusDisplayLine : ''}</FadeText>
+          <View
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexWrap: 'wrap',
+            }}>
+            <RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
+              {syncStatusDisplayLine ? translate('transactions.title-syncing') : translate('transactions.title')}
+            </RegText>
+            <FadeText style={{ margin: 0, padding: 0 }}>{syncStatusDisplayLine ? syncStatusDisplayLine : ''}</FadeText>
+          </View>
           {!!syncStatusDisplayLine && (
             <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
               <View
@@ -146,13 +157,16 @@ const TransactionsView: React.FunctionComponent<TransactionsViewProps> = ({
                   display: 'flex',
                   flexDirection: 'row',
                   alignItems: 'center',
+                  justifyContent: 'center',
                   backgroundColor: colors.card,
                   borderRadius: 10,
                   margin: 0,
                   padding: 0,
                   marginLeft: 5,
+                  minWidth: 48,
+                  minHeight: 48,
                 }}>
-                <FadeText style={{ color: colors.primary }}>{translate('transactions.more')}</FadeText>
+                <RegText color={colors.primary}>{translate('transactions.more')}</RegText>
                 <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
               </View>
             </TouchableOpacity>
@@ -161,14 +175,16 @@ const TransactionsView: React.FunctionComponent<TransactionsViewProps> = ({
       </View>
 
       <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute' }}>
-        <TouchableOpacity onPress={toggleMenuDrawer}>
-          <FontAwesomeIcon icon={faBars} size={20} color={colors.border} />
+        <TouchableOpacity accessible={true} accessibilityLabel={translate('menudrawer-acc')} onPress={toggleMenuDrawer}>
+          <FontAwesomeIcon icon={faBars} size={48} color={colors.border} />
         </TouchableOpacity>
       </View>
 
       <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
 
       <ScrollView
+        accessible={true}
+        accessibilityLabel={translate('transactions.list-acc')}
         refreshControl={
           <RefreshControl
             refreshing={false}

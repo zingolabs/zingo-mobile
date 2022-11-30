@@ -1,11 +1,13 @@
 {
   "zingo": "Zingo!",
-  "version": "v0.0.75",
+  "version": "v0.0.80",
   "loading": "cargando...",
   "wait": "Por favor espere...",
   "workingonit": "Estamos trabajando en esta funcionalidad",
   "close": "Cerrar",
   "cancel": "Cancelar",
+  "menudrawer-acc": "Abrir Menu Lateral",
+  "menu-acc": "Abrir Menu",
   "loadingapp" : {
     "actualserver": "Servidor Activo:",
     "changeserver": "CAMBIAR SERVIDOR",
@@ -44,6 +46,7 @@
     "send-menu": "ENVIAR",
     "uas-menu": "DU's",
     "legacy-menu": "HEREDADAS",
+    "syncing": "Pausando la Sincronización para poder Enviar.",
   },
   "rpc": {
     "parsebirthday-error": "Error: No es posible convertirlo en un número:",
@@ -80,6 +83,8 @@
     "number": "Número...",
     "memo-title": "BAJAR MEMORÁNDUMS",
     "save": "Grabar",
+    "server-acc": "Campo de la URI del Servidor",
+    "threshold-acc": "Campo del Umbral del Filtro de Transacciones",
   },
   "info": {
     "version": "Versión",
@@ -138,6 +143,9 @@
     "backup-warning": "YA NO TENDRÁS ACCESO A ESTE MONEDERO, Y VAS A ABRIR LA COPIA DE SEGURIDAD DEL ÚLTIMO MONEDERO USADO ANTERIOR",
     "server-warning": "YA NO TENDRÁS ACCESO A ESTE MONEDERO, Y VAS A CAMBIAR A OTRO SERVIDOR EN EL CUAL TU MONEDERO ACTIVO NO EXISTE",
     "mainnet-warning": "NO SE VA A HACER COPIA DE SEGURIDAD DE ESTE MONEDERO. SOLO DISPONIBLE EN LA RED: 'MAINNET'.",
+    "seedplaceholder": "Semilla (24 palabras)",
+    "seed-acc": "Campo Frase Semilla",
+    "birthday-acc": "Campo Cumpleaños",
   },
   "send": {
     "Broadcast": "Transmitida con éxito Tx:",
@@ -161,6 +169,12 @@
     "confirm-button": "Confirmar",
     "amount": "   Cantidad",
     "to": "A",
+    "title-acc": "Pantalla de Enviar",
+    "address-acc": "Campo Dirección",
+    "scan-acc": "Escanear una Dirección",
+    "zec-acc": "Campo de Cantidad en Zcash",
+    "usd-acc": "Campo de Cantidad en Dólares",
+    "memo-acc": "Campo del Memorándum",
   },
   "legacy": {
     "o-title": "U-Orchard",
@@ -179,6 +193,7 @@
     "of": " de ",
     "prev": "Anterior",
     "next": "Siguiente",
+    "title-acc": "Pantalla de Direcciones Anteriores Heredadas",
   },
   "receive": {
     "u-title": "DIRECCIONES UNIFICADAS",
@@ -192,6 +207,7 @@
     "privkey-option": "Exportar la Clave para Gastar",
     "viewkey-option": "Exportar la Clave de Visualizacion Total",
     "import-option": "Importar una Clave...",
+    "title-acc": "Pantalla de Recibir",
   },
   "transactions": {
     "shieldfunds": "Blindar fondos",
@@ -217,6 +233,8 @@
     "memo": "Memorándum",
     "memocopied": "Memorándum copiado al portapapeles",
     "txfee": "Comisión por Transacción",
+    "title-acc": "Pantalla del Monedero",
+    "list-acc": "Lista de Transacciones",
   },
   "report": {
     "title": "Informe de Sincronización",
@@ -243,6 +261,8 @@
     "birthday": "Cumpleaños de la Clave",
     "text": "Importar una Clave implica un Re-escaneo completo, y puede tomar mucho tiempo completarlo. Tus Balances se actualizarán automáticamente.",
     "button": "Importar",
+    "key-acc": "Campo Clave",
+    "birthday-acc": "Campo Cumpleaños",
   },
   "about": {
     "copyright": `

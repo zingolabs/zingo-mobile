@@ -12,7 +12,7 @@ const RegText: React.FunctionComponent<any> = ({ style, color, onPress, children
   } else if (style) {
     arrayed.push(style);
   }
-  arrayed.push({ color: color || colors.text, fontSize: 18, fontWeight: '600', opacity: 0.87 });
+  arrayed.push({ color: color || colors.text, fontSize: 18, fontWeight: '600', opacity: 1 });
 
   return (
     <Text style={arrayed} onPress={onPress}>

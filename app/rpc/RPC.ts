@@ -205,21 +205,19 @@ export default class RPC {
       return null;
     }
 
-    /*
-    const addrStr = await RPCModule.execute('new', addressType);
-    const addrJSON = await JSON.parse(addrStr);
+    //const addrStr = await RPCModule.execute('new', addressType);
+    //const addrJSON = await JSON.parse(addrStr);
 
-    console.log(addrJSON);
+    //console.log(addrJSON);
 
-    if (addrJSON) {
-      // Save
-      await RPCModule.doSave();
+    //if (addrJSON) {
+    // Save
+    //await RPCModule.doSave();
 
-      return addrJSON[0];
-    }
+    //return addrJSON[0];
+    //}
 
-    return null;
-    */
+    //return null;
   }
 
   static async rpc_doImportPrivKey(key: string, birthday: string): Promise<string | string[] | null> {
@@ -453,7 +451,7 @@ export default class RPC {
       return;
     }
 
-    console.log('in send', this.inSend);
+    //console.log('in send', this.inSend);
     // if it's sending now, don't fire the sync process.
     if (
       (fullRefresh ||
@@ -482,12 +480,12 @@ export default class RPC {
             this.inRefresh = false;
           });
       } else {
-        console.log('Starting New Sync');
+        //console.log('Starting New Sync');
         this.doSync()
           .then(r => console.log('End Sync OK: ' + r))
           .catch(e => console.log('End Sync ERROR: ' + e))
           .finally(() => {
-            console.log('in refresh: false');
+            //console.log('in refresh: false');
             this.inRefresh = false;
           });
       }
@@ -500,7 +498,7 @@ export default class RPC {
         }
         const ss = await JSON.parse(s);
 
-        console.log('sync status', ss);
+        //console.log('sync status', ss);
 
         // syncronize status
         this.inRefresh = ss.in_progress;
@@ -1006,7 +1004,7 @@ export default class RPC {
     }
 
     const prevSendId = prevProgress.id;
-    console.log('prev progress id', prevSendId);
+    //console.log('prev progress id', prevSendId);
 
     // This is async, so fire and forget
     this.doSend(JSON.stringify(sendJson))
@@ -1029,13 +1027,13 @@ export default class RPC {
 
         const updatedProgress = new SendProgress();
         if (sendId === prevSendId) {
-          console.log('progress id', sendId);
+          //console.log('progress id', sendId);
           // Still not started, so wait for more time
           //setSendProgress(updatedProgress);
           return;
         }
 
-        console.log('progress', progress);
+        //console.log('progress', progress);
 
         // Calculate ETA.
         let secondsPerComputation = 3; // default

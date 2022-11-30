@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import { View, ScrollView, SafeAreaView, Image, TouchableOpacity, Platform } from 'react-native';
+import { View, ScrollView, SafeAreaView, Image, TouchableOpacity, TextInput } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faDotCircle } from '@fortawesome/free-solid-svg-icons';
@@ -11,7 +11,6 @@ import Toast from 'react-native-simple-toast';
 import RegText from '../Components/RegText';
 import FadeText from '../Components/FadeText';
 import BoldText from '../Components/BoldText';
-import RegTextInput from '../Components/RegTextInput';
 import ZecAmount from '../Components/ZecAmount';
 import { parseServerURI, serverUris } from '../../app/uris';
 import Button from '../Button';
@@ -118,7 +117,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           source={require('../../assets/img/logobig-zingo.png')}
           style={{ width: 80, height: 80, resizeMode: 'contain' }}
         />
-        <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{ opacity: 0.4 }} />
+        <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{ opacity: 0.5 }} />
         <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
           {translate('settings.title')}
         </RegText>
@@ -140,7 +139,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           {serverUris().map((uri: string) => (
             <TouchableOpacity
               key={'touch-' + uri}
-              style={{ marginRight: 10, marginBottom: 5 }}
+              style={{ marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
               onPress={() => setServer(uri)}>
               <View style={{ display: 'flex', flexDirection: 'row', marginTop: 10 }}>
                 <FontAwesomeIcon icon={uri === server ? faDotCircle : farCircle} size={20} color={colors.border} />
@@ -152,7 +151,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           ))}
 
           <View style={{ display: 'flex', flexDirection: 'row' }}>
-            <TouchableOpacity style={{ marginRight: 10, marginBottom: 5 }} onPress={() => setServer(undefined)}>
+            <TouchableOpacity
+              style={{ marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
+              onPress={() => setServer(undefined)}>
               <View style={{ display: 'flex', flexDirection: 'row', marginTop: 10 }}>
                 {customIcon && <FontAwesomeIcon icon={customIcon} size={20} color={colors.border} />}
                 <RegText style={{ marginLeft: 10 }}>{translate('settings.custom')}</RegText>
@@ -160,12 +161,10 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             </TouchableOpacity>
 
             {customIcon === faDotCircle && (
-              <RegTextInput
-                placeholder={'... http------.---:--- ...'}
-                placeholderTextColor={colors.placeholder}
+              <View
+                accessible={true}
+                accessibilityLabel={translate('settings.server-acc')}
                 style={{
-                  //flexGrow: 1,
-                  fontSize: 18,
                   width: '60%',
                   borderColor: colors.border,
                   borderWidth: 1,
@@ -173,11 +172,24 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                   padding: 5,
                   paddingTop: 10,
                   paddingBottom: 10,
-                  marginTop: Platform.OS === 'ios' ? 15 : 3,
-                }}
-                value={server}
-                onChangeText={(text: string) => setServer(text)}
-              />
+                  minWidth: '60%',
+                  minHeight: 48,
+                }}>
+                <TextInput
+                  placeholder={'... http------.---:--- ...'}
+                  placeholderTextColor={colors.placeholder}
+                  style={{
+                    color: colors.text,
+                    fontWeight: '600',
+                    fontSize: 18,
+                    minWidth: '60%',
+                    minHeight: 48,
+                  }}
+                  value={server}
+                  onChangeText={(text: string) => setServer(text)}
+                  editable={true}
+                />
+              </View>
             )}
           </View>
         </View>
@@ -187,13 +199,10 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         </View>
 
         <View style={{ display: 'flex', marginLeft: 25 }}>
-          <RegTextInput
-            placeholder={translate('settings.number')}
-            placeholderTextColor={colors.placeholder}
-            keyboardType="numeric"
+          <View
+            accessible={true}
+            accessibilityLabel={translate('settings.threshold-acc')}
             style={{
-              //flexGrow: 1,
-              fontSize: 18,
               width: '60%',
               borderColor: colors.border,
               borderWidth: 1,
@@ -201,11 +210,25 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
               padding: 5,
               paddingTop: 10,
               paddingBottom: 10,
-              marginTop: Platform.OS === 'ios' ? 15 : 3,
-            }}
-            value={filter}
-            onChangeText={(text: string) => setFilter(text)}
-          />
+              minWidth: '60%',
+              minHeight: 48,
+            }}>
+            <TextInput
+              placeholder={translate('settings.number')}
+              placeholderTextColor={colors.placeholder}
+              keyboardType="numeric"
+              style={{
+                color: colors.text,
+                fontWeight: '600',
+                fontSize: 18,
+                minWidth: '60%',
+                minHeight: 48,
+              }}
+              value={filter}
+              onChangeText={(text: string) => setFilter(text)}
+              editable={true}
+            />
+          </View>
         </View>
 
         <View style={{ display: 'flex', margin: 10 }}>
@@ -215,7 +238,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         <View style={{ display: 'flex', marginLeft: 25 }}>
           {MEMOS.map(memo => (
             <View key={'view-' + memo.value}>
-              <TouchableOpacity style={{ marginRight: 10, marginBottom: 5 }} onPress={() => setMemos(memo.value)}>
+              <TouchableOpacity
+                style={{ marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
+                onPress={() => setMemos(memo.value)}>
                 <View style={{ display: 'flex', flexDirection: 'row', marginTop: 10 }}>
                   <FontAwesomeIcon
                     icon={memo.value === memos ? faDotCircle : farCircle}
