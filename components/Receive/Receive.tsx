@@ -306,7 +306,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
             />
             <View style={{ flexDirection: 'row' }}>
               <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{ opacity: 0.5 }} />
-              {totalBalance.total > 0 && (
+              {(totalBalance.total > 0 && (totalBalance.privateBal > 0 || totalBalance.transparentBal)) && (
                 <TouchableOpacity onPress={() => poolsMoreInfoOnClick()}>
                   <View
                     style={{

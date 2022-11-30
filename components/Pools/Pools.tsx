@@ -65,10 +65,10 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, totalBalance, 
 
           <View style={{ display: 'flex', marginLeft: 25 }}>
             <DetailLine label={translate('pools.orchard-balance')}>
-              <ZecAmount amtZec={totalBalance.orchardBal} size={18} currencyName={'ᙇ'} />
+              <ZecAmount amtZec={totalBalance.orchardBal} size={18} currencyName={currencyName} />
             </DetailLine>
             <DetailLine label={translate('pools.orchard-spendable-balance')}>
-              <ZecAmount amtZec={totalBalance.spendableOrchard} size={18} currencyName={'ᙇ'} />
+              <ZecAmount amtZec={totalBalance.spendableOrchard} size={18} currencyName={currencyName} />
             </DetailLine>
           </View>
 
@@ -78,10 +78,10 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, totalBalance, 
 
           <View style={{ display: 'flex', marginLeft: 25 }}>
             <DetailLine label={translate('pools.sapling-balance')}>
-              <ZecAmount amtZec={totalBalance.privateBal} size={18} currencyName={'ᙇ'} />
+              <ZecAmount amtZec={totalBalance.privateBal} size={18} currencyName={currencyName} />
             </DetailLine>
             <DetailLine label={translate('pools.sapling-spendable-balance')}>
-              <ZecAmount amtZec={totalBalance.spendablePrivate} size={18} currencyName={'ᙇ'} />
+              <ZecAmount amtZec={totalBalance.spendablePrivate} size={18} currencyName={currencyName} />
             </DetailLine>
           </View>
 
@@ -91,7 +91,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, totalBalance, 
 
           <View style={{ display: 'flex', marginLeft: 25 }}>
             <DetailLine label={translate('pools.transparent-balance')}>
-              <ZecAmount amtZec={totalBalance.transparentBal} size={18} currencyName={'ᙇ'} />
+              <ZecAmount amtZec={totalBalance.transparentBal} size={18} currencyName={currencyName} />
             </DetailLine>
           </View>
         </View>

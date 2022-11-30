@@ -394,7 +394,7 @@ const Send: React.FunctionComponent<SendProps> = ({
             />
             <View style={{ flexDirection: 'row' }}>
               <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} />
-              {totalBalance.total > 0 && (
+              {(totalBalance.total > 0 && (totalBalance.privateBal > 0 || totalBalance.transparentBal)) && (
                 <TouchableOpacity onPress={() => poolsMoreInfoOnClick()}>
                   <View
                     style={{

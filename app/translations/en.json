@@ -291,10 +291,10 @@
   },
   "pools": {
     "title": "Fund Pools",
-    "orchard-title": "ORCHARD",
+    "orchard-title": "ORCHARD (UA)",
     "orchard-balance": "Total Balance",
     "orchard-spendable-balance": "Spendable Balance",
-    "sapling-title": "SAPLING",
+    "sapling-title": "SAPLING (Private)",
     "sapling-balance": "Total Balance",
     "sapling-spendable-balance": "Spendable Balance",
     "transparent-title": "TRANSPARENT",

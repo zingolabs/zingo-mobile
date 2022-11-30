@@ -123,7 +123,7 @@ const TransactionsView: React.FunctionComponent<TransactionsViewProps> = ({
         />
         <View style={{ flexDirection: 'row' }}>
           <ZecAmount currencyName={currencyName} color={balanceColor} size={36} amtZec={totalBalance.total} />
-          {totalBalance.total > 0 && (
+          {(totalBalance.total > 0 && (totalBalance.privateBal > 0 || totalBalance.transparentBal)) && (
             <TouchableOpacity onPress={() => poolsMoreInfoOnClick()}>
               <View
                 style={{
