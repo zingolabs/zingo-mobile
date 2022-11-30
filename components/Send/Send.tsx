@@ -394,7 +394,7 @@ const Send: React.FunctionComponent<SendProps> = ({
             />
             <View style={{ flexDirection: 'row' }}>
               <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} />
-              {(totalBalance.total > 0 && (totalBalance.privateBal > 0 || totalBalance.transparentBal)) && (
+              {totalBalance.total > 0 && (totalBalance.privateBal > 0 || totalBalance.transparentBal > 0) && (
                 <TouchableOpacity onPress={() => poolsMoreInfoOnClick()}>
                   <View
                     style={{
@@ -430,7 +430,7 @@ const Send: React.FunctionComponent<SendProps> = ({
               <View
                 style={{
                   display: 'flex',
-                  flexDirection: 'row',
+                  flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
                   flexWrap: 'wrap',
@@ -438,9 +438,9 @@ const Send: React.FunctionComponent<SendProps> = ({
                 <RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
                   {syncStatusDisplayLine ? translate('send.title-syncing') : translate('send.title')}
                 </RegText>
-                <FadeText style={{ margin: 0, padding: 0 }}>
-                  {syncStatusDisplayLine ? syncStatusDisplayLine : ''}
-                </FadeText>
+                {!!syncStatusDisplayLine && (
+                  <FadeText style={{ margin: 0, padding: 0 }}>{syncStatusDisplayLine}</FadeText>
+                )}
               </View>
               {!!syncStatusDisplayLine && (
                 <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>

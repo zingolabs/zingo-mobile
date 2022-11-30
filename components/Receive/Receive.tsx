@@ -306,7 +306,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
             />
             <View style={{ flexDirection: 'row' }}>
               <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{ opacity: 0.5 }} />
-              {(totalBalance.total > 0 && (totalBalance.privateBal > 0 || totalBalance.transparentBal)) && (
+              {totalBalance.total > 0 && (totalBalance.privateBal > 0 || totalBalance.transparentBal > 0) && (
                 <TouchableOpacity onPress={() => poolsMoreInfoOnClick()}>
                   <View
                     style={{
@@ -346,7 +346,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
               <View
                 style={{
                   display: 'flex',
-                  flexDirection: 'row',
+                  flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
                   flexWrap: 'wrap',
@@ -354,9 +354,9 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                 <RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
                   {syncStatusDisplayLine ? translate('receive.title-syncing') : translate('receive.title')}
                 </RegText>
-                <FadeText style={{ margin: 0, padding: 0 }}>
-                  {syncStatusDisplayLine ? syncStatusDisplayLine : ''}
-                </FadeText>
+                {!!syncStatusDisplayLine && (
+                  <FadeText style={{ margin: 0, padding: 0 }}>{syncStatusDisplayLine}</FadeText>
+                )}
               </View>
               {!!syncStatusDisplayLine && (
                 <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>

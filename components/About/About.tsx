@@ -56,7 +56,11 @@ const About: React.FunctionComponent<AboutProps> = ({ closeModal, totalBalance, 
           justifyContent: 'flex-start',
           padding: 20,
         }}>
-        {translate('about.copyright').map((txt: string) => <FadeText style={{ marginBottom: 10 }} key={txt.substring(0, 10)}>{txt}</FadeText>)}
+        {translate('about.copyright').map((txt: string) => (
+          <FadeText style={{ marginBottom: 10 }} key={txt.substring(0, 10)}>
+            {txt}
+          </FadeText>
+        ))}
       </ScrollView>
       <View
         style={{

@@ -123,7 +123,7 @@ const TransactionsView: React.FunctionComponent<TransactionsViewProps> = ({
         />
         <View style={{ flexDirection: 'row' }}>
           <ZecAmount currencyName={currencyName} color={balanceColor} size={36} amtZec={totalBalance.total} />
-          {(totalBalance.total > 0 && (totalBalance.privateBal > 0 || totalBalance.transparentBal)) && (
+          {totalBalance.total > 0 && (totalBalance.privateBal > 0 || totalBalance.transparentBal > 0) && (
             <TouchableOpacity onPress={() => poolsMoreInfoOnClick()}>
               <View
                 style={{
@@ -165,7 +165,7 @@ const TransactionsView: React.FunctionComponent<TransactionsViewProps> = ({
           <View
             style={{
               display: 'flex',
-              flexDirection: 'row',
+              flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
               flexWrap: 'wrap',
@@ -173,7 +173,7 @@ const TransactionsView: React.FunctionComponent<TransactionsViewProps> = ({
             <RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
               {syncStatusDisplayLine ? translate('transactions.title-syncing') : translate('transactions.title')}
             </RegText>
-            <FadeText style={{ margin: 0, padding: 0 }}>{syncStatusDisplayLine ? syncStatusDisplayLine : ''}</FadeText>
+            {!!syncStatusDisplayLine && <FadeText style={{ margin: 0, padding: 0 }}>{syncStatusDisplayLine}</FadeText>}
           </View>
           {!!syncStatusDisplayLine && (
             <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>

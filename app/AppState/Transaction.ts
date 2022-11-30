@@ -10,4 +10,5 @@ export default interface Transaction {
   time: number;
   zec_price: number | null;
   detailedTxns: TxDetailType[];
+  // eslint-disable-next-line semi
 }
