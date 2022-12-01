@@ -1,23 +1,21 @@
 /* eslint-disable react-native/no-inline-styles */
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, ScrollView, SafeAreaView, Image } from 'react-native';
 import { useTheme } from '@react-navigation/native';
-import { TranslateOptions } from 'i18n-js';
 
 import FadeText from '../Components/FadeText';
 import ZecAmount from '../Components/ZecAmount';
 import RegText from '../Components/RegText';
 import Button from '../Button';
 import { ThemeType } from '../../app/types';
-import { TotalBalance } from '../../app/AppState';
+import { ContextLoaded } from '../../app/context';
 
 type AboutProps = {
   closeModal: () => void;
-  totalBalance: TotalBalance;
-  currencyName?: string;
-  translate: (key: string, config?: TranslateOptions) => any;
 };
-const About: React.FunctionComponent<AboutProps> = ({ closeModal, totalBalance, currencyName, translate }) => {
+const About: React.FunctionComponent<AboutProps> = ({ closeModal }) => {
+  const context = useContext(ContextLoaded);
+  const { totalBalance, info, translate } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   return (
     <SafeAreaView
@@ -41,7 +39,12 @@ const About: React.FunctionComponent<AboutProps> = ({ closeModal, totalBalance, 
           source={require('../../assets/img/logobig-zingo.png')}
           style={{ width: 80, height: 80, resizeMode: 'contain' }}
         />
-        <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{ opacity: 0.5 }} />
+        <ZecAmount
+          currencyName={info?.currencyName ? info.currencyName : ''}
+          size={36}
+          amtZec={totalBalance.total}
+          style={{ opacity: 0.5 }}
+        />
         <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
           {translate('zingo') + ' ' + translate('version')}
         </RegText>

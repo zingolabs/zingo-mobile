@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo!",
-  "version": "v0.0.82",
+  "version": "v0.0.83",
   "loading": "loading...",
   "wait": "Please wait...",
   "workingonit": "We are working on this feature.",
@@ -31,6 +31,7 @@
     "report": "Sync / Rescan Report",
     "changewallet": "Change to another Wallet",
     "restorebackupwallet": "Restore Last Wallet Backup",
+    "fundpools": "Fund Pools",
     "restoremainnet-error": "This option is only available for 'Mainnet' servers.",
     "changeservernew-error": "Error trying to change the server to the new one:",
     "readingwallet-error": "Error trying to read the wallet with the new server:",

@@ -119,7 +119,7 @@ export default class RPC {
         connections: 1,
         version: `${infoJSON.vendor}/${infoJSON.git_commit.substring(0, 6)}/${infoJSON.version}`,
         verificationProgress: 1,
-        currencyName: infoJSON.chain_name === 'main' ? 'ZEC' : 'TAZ',
+        currencyName: infoJSON.chain_name === 'main' || infoJSON.chain_name === 'mainnet' ? 'ZEC' : 'TAZ',
         solps: 0,
         zecPrice: null,
         defaultFee: defaultFeeJSON?.defaultfee / 10 ** 8 || Utils.getFallbackDefaultFee(),

@@ -1,38 +1,28 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { View, ScrollView, SafeAreaView, Image, Platform, TouchableOpacity, Text } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import Clipboard from '@react-native-community/clipboard';
 import Toast from 'react-native-simple-toast';
 import QRCode from 'react-native-qrcode-svg';
-import { TranslateOptions } from 'i18n-js';
 
 import FadeText from '../Components/FadeText';
 import RegText from '../Components/RegText';
 import ZecAmount from '../Components/ZecAmount';
 import Button from '../Button';
 import Utils from '../../app/utils';
-import { TotalBalance } from '../../app/AppState';
 import { ThemeType } from '../../app/types';
+import { ContextLoaded } from '../../app/context';
 
 type PrivKeyProps = {
   closeModal: () => void;
   address: string;
   keyType: number;
   privKey: string;
-  totalBalance: TotalBalance;
-  currencyName?: string;
-  translate: (key: string, config?: TranslateOptions) => any;
 };
-const PrivKey: React.FunctionComponent<PrivKeyProps> = ({
-  address,
-  keyType,
-  privKey,
-  closeModal,
-  totalBalance,
-  currencyName,
-  translate,
-}) => {
+const PrivKey: React.FunctionComponent<PrivKeyProps> = ({ address, keyType, privKey, closeModal }) => {
+  const context = useContext(ContextLoaded);
+  const { totalBalance, info, translate } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const fixedWidthFont = Platform.OS === 'android' ? 'monospace' : 'Courier';
 
@@ -77,7 +67,12 @@ const PrivKey: React.FunctionComponent<PrivKeyProps> = ({
           source={require('../../assets/img/logobig-zingo.png')}
           style={{ width: 80, height: 80, resizeMode: 'contain' }}
         />
-        <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{ opacity: 0.5 }} />
+        <ZecAmount
+          currencyName={info?.currencyName ? info.currencyName : ''}
+          size={36}
+          amtZec={totalBalance.total}
+          style={{ opacity: 0.5 }}
+        />
         <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
           {keyTypeString} {translate('privkey.title')}
         </RegText>

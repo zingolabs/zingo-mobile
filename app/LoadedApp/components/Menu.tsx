@@ -1,21 +1,22 @@
 /* eslint-disable react-native/no-inline-styles */
-import React from 'react';
+import React, { useContext } from 'react';
 import { ScrollView, Dimensions, View } from 'react-native';
-import { TranslateOptions } from 'i18n-js';
 
 import RegText from '../../../components/Components/RegText';
 import FadeText from '../../../components/Components/FadeText';
 
 import { useTheme } from '@react-navigation/native';
+import { ContextLoaded } from '../../context';
 
 const window = Dimensions.get('window');
 
 type MenuProps = {
   onItemSelected: (item: string) => Promise<void>;
-  translate: (key: string, config?: TranslateOptions) => any;
 };
 
-const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, translate }) => {
+const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected }) => {
+  const context = useContext(ContextLoaded);
+  const { translate } = context;
   const { colors } = useTheme();
   const item = {
     fontSize: 14,
@@ -58,15 +59,19 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, translate })
           {translate('loadedapp.rescanwallet')}
         </RegText>
 
-        <RegText onPress={() => onItemSelected('Sync Report')} style={item} color={colors.primary}>
+        <RegText onPress={() => onItemSelected('Sync Report')} style={item}>
           {translate('loadedapp.report')}
         </RegText>
 
-        <RegText onPress={() => onItemSelected('Change Wallet')} style={item} color={colors.primary}>
+        <RegText onPress={() => onItemSelected('Fund Pools')} style={item} color={colors.primary}>
+          {translate('loadedapp.fundpools')}
+        </RegText>
+
+        <RegText onPress={() => onItemSelected('Change Wallet')} style={item}>
           {translate('loadedapp.changewallet')}
         </RegText>
 
-        <RegText onPress={() => onItemSelected('Restore Wallet Backup')} style={item} color={colors.primary}>
+        <RegText onPress={() => onItemSelected('Restore Wallet Backup')} style={item}>
           {translate('loadedapp.restorebackupwallet')}
         </RegText>
       </View>

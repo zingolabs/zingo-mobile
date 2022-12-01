@@ -1,7 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, ScrollView, SafeAreaView } from 'react-native';
-import { TranslateOptions } from 'i18n-js';
 
 import FadeText from '../../Components/FadeText';
 import BoldText from '../../Components/BoldText';
@@ -9,28 +8,18 @@ import RegText from '../../Components/RegText';
 import ZecAmount from '../../Components/ZecAmount';
 import UsdAmount from '../../Components/UsdAmount';
 import Button from '../../Button';
-import { SendPageState } from '../../../app/AppState';
 import { useTheme } from '@react-navigation/native';
 import Utils from '../../../app/utils';
+import { ContextLoaded } from '../../../app/context';
 
 type ConfirmProps = {
-  sendPageState: SendPageState;
   defaultFee: number;
-  price?: number | null;
   closeModal: () => void;
   confirmSend: () => void;
-  currencyName?: string;
-  translate: (key: string, config?: TranslateOptions) => any;
 };
-const Confirm: React.FunctionComponent<ConfirmProps> = ({
-  closeModal,
-  confirmSend,
-  sendPageState,
-  price,
-  defaultFee,
-  currencyName,
-  translate,
-}) => {
+const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSend, defaultFee }) => {
+  const context = useContext(ContextLoaded);
+  const { sendPageState, info, translate } = context;
   const { colors } = useTheme();
 
   const sendingTotal = Number(sendPageState.toaddr.amount) + defaultFee;
@@ -63,8 +52,8 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
           }}>
           <BoldText style={{ textAlign: 'center' }}>{translate('send.sending-title')}</BoldText>
 
-          <ZecAmount currencyName={currencyName} amtZec={sendingTotal} />
-          <UsdAmount amtZec={sendingTotal} price={price} />
+          <ZecAmount currencyName={info?.currencyName ? info.currencyName : ''} amtZec={sendingTotal} />
+          <UsdAmount amtZec={sendingTotal} price={info?.zecPrice ? info.zecPrice : 0} />
         </View>
         {[sendPageState.toaddr].map(to => {
           return (
@@ -81,8 +70,16 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                   alignItems: 'baseline',
                   marginTop: 5,
                 }}>
-                <ZecAmount currencyName={currencyName} size={18} amtZec={Number(to.amount)} />
-                <UsdAmount style={{ fontSize: 18 }} amtZec={Number(to.amount)} price={price} />
+                <ZecAmount
+                  currencyName={info?.currencyName ? info.currencyName : ''}
+                  size={18}
+                  amtZec={Number(to.amount)}
+                />
+                <UsdAmount
+                  style={{ fontSize: 18 }}
+                  amtZec={Number(to.amount)}
+                  price={info?.zecPrice ? info.zecPrice : 0}
+                />
               </View>
               <RegText>{to.memo || ''}</RegText>
             </View>
@@ -93,8 +90,8 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
           <FadeText>{translate('send.fee')}</FadeText>
           <View
             style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
-            <ZecAmount currencyName={currencyName} size={18} amtZec={defaultFee} />
-            <UsdAmount style={{ fontSize: 18 }} amtZec={defaultFee} price={price} />
+            <ZecAmount currencyName={info?.currencyName ? info.currencyName : ''} size={18} amtZec={defaultFee} />
+            <UsdAmount style={{ fontSize: 18 }} amtZec={defaultFee} price={info?.zecPrice ? info.zecPrice : 0} />
           </View>
         </View>
       </ScrollView>

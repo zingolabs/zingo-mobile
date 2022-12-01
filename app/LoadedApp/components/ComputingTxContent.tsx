@@ -1,20 +1,16 @@
 /* eslint-disable react-native/no-inline-styles */
-import React from 'react';
+import React, { useContext } from 'react';
 import { SafeAreaView } from 'react-native';
 import { useTheme } from '@react-navigation/native';
-import { TranslateOptions } from 'i18n-js';
 
-import { SendProgress } from '../../AppState';
 import RegText from '../../../components/Components/RegText';
 import { ThemeType } from '../../types';
 import CircularProgress from '../../../components/CircularProgress';
+import { ContextLoaded } from '../../context';
 
-type ComputingTxContentProps = {
-  progress: SendProgress;
-  translate: (key: string, config?: TranslateOptions) => any;
-};
-
-const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({ progress, translate }) => {
+const ComputingTxContent: React.FunctionComponent = () => {
+  const context = useContext(ContextLoaded);
+  const { txBuildProgress: progress, translate } = context;
   const { colors } = useTheme() as unknown as ThemeType;
 
   return (

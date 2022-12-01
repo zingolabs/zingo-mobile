@@ -11,7 +11,8 @@ import { TranslateOptions } from 'i18n-js';
 
 import RPC from '../rpc';
 import RPCModule from '../../components/RPCModule';
-import AppState, {
+import {
+  AppStateLoaded,
   SyncStatusReport,
   TotalBalance,
   SendPageState,
@@ -30,6 +31,7 @@ import AppState, {
 import Utils from '../utils';
 import { ThemeType } from '../types';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
+import { ContextLoadedProvider } from '../context';
 
 const Transactions = React.lazy(() => import('../../components/Transactions'));
 const Send = React.lazy(() => import('../../components/Send'));
@@ -67,20 +69,23 @@ type LoadedAppClassProps = {
   theme: ThemeType;
 };
 
-class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
+class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   rpc: RPC;
 
   constructor(props: any) {
     super(props);
 
     this.state = {
+      navigation: props.navigation,
+      route: props.route,
+
       syncStatusReport: new SyncStatusReport(),
       totalBalance: new TotalBalance(),
       addressPrivateKeys: new Map(),
       addresses: [],
       addressBook: [],
       transactions: null,
-      sendPageState: new SendPageState(new ToAddr(0)),
+      sendPageState: new SendPageState(new ToAddr(Utils.getNextToAddrID())),
       receivePageState: new ReceivePageState(),
       info: null,
       rescanning: false,
@@ -104,6 +109,22 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
       poolsModalVisible: false,
       newServer: null,
       uaAddress: null,
+      translate: props.translate,
+
+      openErrorModal: this.openErrorModal,
+      closeErrorModal: this.closeErrorModal,
+      toggleMenuDrawer: this.toggleMenuDrawer,
+      fetchTotalBalance: this.fetchTotalBalance,
+      setSendPageState: this.setSendPageState,
+      sendTransaction: this.sendTransaction,
+      clearToAddr: this.clearToAddr,
+      setComputingModalVisible: this.setComputingModalVisible,
+      setTxBuildProgress: this.setTxBuildProgress,
+      syncingStatusMoreInfoOnClick: this.syncingStatusMoreInfoOnClick,
+      poolsMoreInfoOnClick: this.poolsMoreInfoOnClick,
+      doRefresh: this.doRefresh,
+      startRescan: this.startRescan,
+      setUaAddress: this.setUaAddress,
     };
 
     this.rpc = new RPC(
@@ -115,11 +136,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
       this.setInfo,
       this.setZecPrice,
       this.refreshUpdates,
-      this.props.translate,
+      props.translate,
     );
-
-    // Create the initial ToAddr box
-    this.state.sendPageState.toaddr = new ToAddr(Utils.getNextToAddrID());
   }
 
   componentDidMount = () => {
@@ -133,7 +151,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
     this.rpc.clearTimers();
   };
 
-  getFullState = (): AppState => {
+  getFullState = (): AppStateLoaded => {
     return this.state;
   };
 
@@ -385,8 +403,9 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
     } else if (item === 'Info') {
       this.setState({ infoModalVisible: true });
     } else if (item === 'Sync Report') {
-      await this.fetchWalletSeed();
       this.setState({ syncReportModalVisible: true });
+    } else if (item === 'Fund Pools') {
+      this.setState({ poolsModalVisible: true });
     } else if (item === 'Wallet Seed') {
       await this.fetchWalletSeed();
       this.setState({ seedViewModalVisible: true });
@@ -395,7 +414,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
       this.setState({ seedChangeModalVisible: true });
     } else if (item === 'Restore Wallet Backup') {
       if (info && info.currencyName !== 'ZEC') {
-        Toast.show(this.props.translate('loadedapp.restoremainnet-error'), Toast.LONG);
+        Toast.show(this.state.translate('loadedapp.restoremainnet-error'), Toast.LONG);
         return;
       }
       await this.fetchWalletSeed();
@@ -414,7 +433,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
     const resultStrServer: string = await RPCModule.execute('changeserver', value);
     if (resultStrServer.toLowerCase().startsWith('error')) {
       //console.log(`Error change server ${value} - ${resultStrServer}`);
-      Toast.show(`${this.props.translate('loadedapp.changeservernew-error')} ${value}`, Toast.LONG);
+      Toast.show(`${this.state.translate('loadedapp.changeservernew-error')} ${value}`, Toast.LONG);
       return;
     } else {
       //console.log(`change server ok ${value}`);
@@ -431,13 +450,13 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
       return;
     } else {
       //console.log(`Error Reading Wallet ${value} - ${error}`);
-      Toast.show(`${this.props.translate('loadedapp.readingwallet-error')} ${value}`, Toast.LONG);
+      Toast.show(`${this.state.translate('loadedapp.readingwallet-error')} ${value}`, Toast.LONG);
 
       const old_settings = await SettingsFileImpl.readSettings();
       const resultStr: string = await RPCModule.execute('changeserver', old_settings.server);
       if (resultStr.toLowerCase().startsWith('error')) {
         //console.log(`Error change server ${old_settings.server} - ${resultStr}`);
-        Toast.show(`${this.props.translate('loadedapp.changeserverold-error')} ${value}`, Toast.LONG);
+        Toast.show(`${this.state.translate('loadedapp.changeserverold-error')} ${value}`, Toast.LONG);
         //return;
       } else {
         //console.log(`change server ok ${old_settings.server} - ${resultStr}`);
@@ -470,7 +489,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
     //console.log("jc change", resultStr);
     if (resultStr.toLowerCase().startsWith('error')) {
       //console.log(`Error change wallet. ${resultStr}`);
-      Alert.alert(this.props.translate('loadedapp.changingwallet-label'), resultStr);
+      Alert.alert(this.state.translate('loadedapp.changingwallet-label'), resultStr);
       return;
     }
 
@@ -485,7 +504,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
     //console.log("jc restore", resultStr);
     if (resultStr.toLowerCase().startsWith('error')) {
       //console.log(`Error restore backup wallet. ${resultStr}`);
-      Alert.alert(this.props.translate('loadedapp.restoringwallet-label'), resultStr);
+      Alert.alert(this.state.translate('loadedapp.restoringwallet-label'), resultStr);
       return;
     }
 
@@ -498,7 +517,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
     const resultStr: string = await RPCModule.execute('changeserver', this.state.newServer);
     if (resultStr.toLowerCase().startsWith('error')) {
       //console.log(`Error change server ${value} - ${resultStr}`);
-      Toast.show(`${this.props.translate('loadedapp.changeservernew-error')} ${resultStr}`, Toast.LONG);
+      Toast.show(`${this.state.translate('loadedapp.changeservernew-error')} ${resultStr}`, Toast.LONG);
       return;
     } else {
       //console.log(`change server ok ${value}`);
@@ -515,7 +534,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
     //console.log("jc change", resultStr);
     if (resultStr2.toLowerCase().startsWith('error')) {
       //console.log(`Error change wallet. ${resultStr}`);
-      Alert.alert(this.props.translate('loadedapp.changingwallet-label'), resultStr2);
+      Alert.alert(this.state.translate('loadedapp.changingwallet-label'), resultStr2);
       //return;
     }
 
@@ -528,15 +547,17 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
     this.setState({ uaAddress: uaAddress });
   };
 
+  syncingStatusMoreInfoOnClick = async () => {
+    await this.fetchWalletSeed();
+    this.setState({ syncReportModalVisible: true });
+  };
+
+  poolsMoreInfoOnClick = async () => {
+    this.setState({ poolsModalVisible: true });
+  };
+
   render() {
     const {
-      syncStatusReport,
-      totalBalance,
-      transactions,
-      addresses,
-      info,
-      sendPageState,
-      wallet_settings,
       aboutModalVisible,
       infoModalVisible,
       syncReportModalVisible,
@@ -548,22 +569,9 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
       seedChangeModalVisible,
       seedBackupModalVisible,
       seedServerModalVisible,
-      walletSeed,
-      syncingStatus,
-      txBuildProgress,
-      uaAddress,
+      translate,
     } = this.state;
     const { colors } = this.props.theme;
-    const { translate } = this.props;
-
-    const standardProps = {
-      openErrorModal: this.openErrorModal,
-      closeErrorModal: this.closeErrorModal,
-      info,
-      toggleMenuDrawer: this.toggleMenuDrawer,
-      fetchTotalBalance: this.fetchTotalBalance,
-      translate: translate,
-    };
 
     const menu = (
       <Suspense
@@ -572,10 +580,9 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
             <Text>Loading...</Text>
           </View>
         }>
-        <Menu onItemSelected={this.onMenuItemSelected} translate={this.props.translate} />
+        <Menu onItemSelected={this.onMenuItemSelected} />
       </Suspense>
     );
-    const currencyName = info ? info.currencyName : undefined;
 
     const fnTabBarIcon = (route: any, focused: boolean) => {
       var iconName;
@@ -596,379 +603,272 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppState> {
       return <FontAwesomeIcon icon={iconName} color={iconColor} />;
     };
 
-    //console.log('render LoadedApp');
+    //console.log('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
+    //console.log('render LoadedApp', this.state.info);
     //const res = async () => await RPCModule.execute('testbip', '');
     //res().then(r => console.log(r));
 
     return (
-      <SideMenu
-        menu={menu}
-        isOpen={this.state.isMenuDrawerOpen}
-        onChange={(isOpen: boolean) => this.updateMenuState(isOpen)}>
-        <Modal
-          animationType="slide"
-          transparent={false}
-          visible={aboutModalVisible}
-          onRequestClose={() => this.setState({ aboutModalVisible: false })}>
-          <Suspense
-            fallback={
-              <View>
-                <Text>{this.props.translate('loading')}</Text>
-              </View>
-            }>
-            <About
-              closeModal={() => this.setState({ aboutModalVisible: false })}
-              totalBalance={totalBalance}
-              currencyName={currencyName || undefined}
-              translate={translate}
-            />
-          </Suspense>
-        </Modal>
+      <ContextLoadedProvider value={this.state}>
+        <SideMenu
+          menu={menu}
+          isOpen={this.state.isMenuDrawerOpen}
+          onChange={(isOpen: boolean) => this.updateMenuState(isOpen)}>
+          <Modal
+            animationType="slide"
+            transparent={false}
+            visible={aboutModalVisible}
+            onRequestClose={() => this.setState({ aboutModalVisible: false })}>
+            <Suspense
+              fallback={
+                <View>
+                  <Text>{translate('loading')}</Text>
+                </View>
+              }>
+              <About closeModal={() => this.setState({ aboutModalVisible: false })} />
+            </Suspense>
+          </Modal>
 
-        <Modal
-          animationType="slide"
-          transparent={false}
-          visible={infoModalVisible}
-          onRequestClose={() => this.setState({ infoModalVisible: false })}>
-          <Suspense
-            fallback={
-              <View>
-                <Text>{this.props.translate('loading')}</Text>
-              </View>
-            }>
-            <Info
-              closeModal={() => this.setState({ infoModalVisible: false })}
-              info={info}
-              totalBalance={totalBalance}
-              currencyName={currencyName || undefined}
-              translate={translate}
-            />
-          </Suspense>
-        </Modal>
+          <Modal
+            animationType="slide"
+            transparent={false}
+            visible={infoModalVisible}
+            onRequestClose={() => this.setState({ infoModalVisible: false })}>
+            <Suspense
+              fallback={
+                <View>
+                  <Text>{translate('loading')}</Text>
+                </View>
+              }>
+              <Info closeModal={() => this.setState({ infoModalVisible: false })} />
+            </Suspense>
+          </Modal>
 
-        <Modal
-          animationType="slide"
-          transparent={false}
-          visible={syncReportModalVisible}
-          onRequestClose={() => this.setState({ syncReportModalVisible: false })}>
-          <Suspense
-            fallback={
-              <View>
-                <Text>{this.props.translate('loading')}</Text>
-              </View>
-            }>
-            <SyncReport
-              closeModal={() => this.setState({ syncReportModalVisible: false })}
-              syncStatusReport={syncStatusReport}
-              birthday={walletSeed?.birthday}
-              translate={translate}
-            />
-          </Suspense>
-        </Modal>
+          <Modal
+            animationType="slide"
+            transparent={false}
+            visible={syncReportModalVisible}
+            onRequestClose={() => this.setState({ syncReportModalVisible: false })}>
+            <Suspense
+              fallback={
+                <View>
+                  <Text>{translate('loading')}</Text>
+                </View>
+              }>
+              <SyncReport closeModal={() => this.setState({ syncReportModalVisible: false })} />
+            </Suspense>
+          </Modal>
 
-        <Modal
-          animationType="slide"
-          transparent={false}
-          visible={poolsModalVisible}
-          onRequestClose={() => this.setState({ poolsModalVisible: false })}>
-          <Suspense
-            fallback={
-              <View>
-                <Text>{this.props.translate('loading')}</Text>
-              </View>
-            }>
-            <Pools
-              closeModal={() => this.setState({ poolsModalVisible: false })}
-              totalBalance={totalBalance}
-              currencyName={currencyName || undefined}
-              translate={translate}
-            />
-          </Suspense>
-        </Modal>
+          <Modal
+            animationType="slide"
+            transparent={false}
+            visible={poolsModalVisible}
+            onRequestClose={() => this.setState({ poolsModalVisible: false })}>
+            <Suspense
+              fallback={
+                <View>
+                  <Text>{translate('loading')}</Text>
+                </View>
+              }>
+              <Pools closeModal={() => this.setState({ poolsModalVisible: false })} />
+            </Suspense>
+          </Modal>
 
-        <Modal
-          animationType="slide"
-          transparent={false}
-          visible={rescanModalVisible}
-          onRequestClose={() => this.setState({ rescanModalVisible: false })}>
-          <Suspense
-            fallback={
-              <View>
-                <Text>{this.props.translate('loading')}</Text>
-              </View>
-            }>
-            <Rescan
-              closeModal={() => this.setState({ rescanModalVisible: false })}
-              birthday={walletSeed?.birthday}
-              startRescan={this.startRescan}
-              totalBalance={totalBalance}
-              currencyName={currencyName || undefined}
-              translate={translate}
-            />
-          </Suspense>
-        </Modal>
+          <Modal
+            animationType="slide"
+            transparent={false}
+            visible={rescanModalVisible}
+            onRequestClose={() => this.setState({ rescanModalVisible: false })}>
+            <Suspense
+              fallback={
+                <View>
+                  <Text>{translate('loading')}</Text>
+                </View>
+              }>
+              <Rescan closeModal={() => this.setState({ rescanModalVisible: false })} />
+            </Suspense>
+          </Modal>
 
-        <Modal
-          animationType="slide"
-          transparent={false}
-          visible={settingsModalVisible}
-          onRequestClose={() => this.setState({ settingsModalVisible: false })}>
-          <Suspense
-            fallback={
-              <View>
-                <Text>{this.props.translate('loading')}</Text>
-              </View>
-            }>
-            <Settings
-              closeModal={() => this.setState({ settingsModalVisible: false })}
-              wallet_settings={wallet_settings}
-              set_wallet_option={this.set_wallet_option}
-              set_server_option={this.set_server_option}
-              totalBalance={totalBalance}
-              currencyName={currencyName || undefined}
-              translate={translate}
-            />
-          </Suspense>
-        </Modal>
+          <Modal
+            animationType="slide"
+            transparent={false}
+            visible={settingsModalVisible}
+            onRequestClose={() => this.setState({ settingsModalVisible: false })}>
+            <Suspense
+              fallback={
+                <View>
+                  <Text>{translate('loading')}</Text>
+                </View>
+              }>
+              <Settings
+                closeModal={() => this.setState({ settingsModalVisible: false })}
+                set_wallet_option={this.set_wallet_option}
+                set_server_option={this.set_server_option}
+              />
+            </Suspense>
+          </Modal>
 
-        <Modal
-          animationType="slide"
-          transparent={false}
-          visible={seedViewModalVisible}
-          onRequestClose={() => this.setState({ seedViewModalVisible: false })}>
-          <Suspense
-            fallback={
-              <View>
-                <Text>{this.props.translate('loading')}</Text>
-              </View>
-            }>
-            <Seed
-              seed={walletSeed?.seed}
-              birthday={walletSeed?.birthday}
-              onClickOK={() => this.setState({ seedViewModalVisible: false })}
-              onClickCancel={() => this.setState({ seedViewModalVisible: false })}
-              totalBalance={totalBalance}
-              action={'view'}
-              currencyName={currencyName || undefined}
-              translate={translate}
-            />
-          </Suspense>
-        </Modal>
+          <Modal
+            animationType="slide"
+            transparent={false}
+            visible={seedViewModalVisible}
+            onRequestClose={() => this.setState({ seedViewModalVisible: false })}>
+            <Suspense
+              fallback={
+                <View>
+                  <Text>{translate('loading')}</Text>
+                </View>
+              }>
+              <Seed
+                onClickOK={() => this.setState({ seedViewModalVisible: false })}
+                onClickCancel={() => this.setState({ seedViewModalVisible: false })}
+                action={'view'}
+              />
+            </Suspense>
+          </Modal>
 
-        <Modal
-          animationType="slide"
-          transparent={false}
-          visible={seedChangeModalVisible}
-          onRequestClose={() => this.setState({ seedChangeModalVisible: false })}>
-          <Suspense
-            fallback={
-              <View>
-                <Text>{this.props.translate('loading')}</Text>
-              </View>
-            }>
-            <Seed
-              seed={walletSeed?.seed}
-              birthday={walletSeed?.birthday}
-              onClickOK={() => this.onClickOKChangeWallet()}
-              onClickCancel={() => this.setState({ seedChangeModalVisible: false })}
-              totalBalance={totalBalance}
-              action={'change'}
-              currencyName={currencyName || undefined}
-              translate={translate}
-            />
-          </Suspense>
-        </Modal>
+          <Modal
+            animationType="slide"
+            transparent={false}
+            visible={seedChangeModalVisible}
+            onRequestClose={() => this.setState({ seedChangeModalVisible: false })}>
+            <Suspense
+              fallback={
+                <View>
+                  <Text>{translate('loading')}</Text>
+                </View>
+              }>
+              <Seed
+                onClickOK={() => this.onClickOKChangeWallet()}
+                onClickCancel={() => this.setState({ seedChangeModalVisible: false })}
+                action={'change'}
+              />
+            </Suspense>
+          </Modal>
 
-        <Modal
-          animationType="slide"
-          transparent={false}
-          visible={seedBackupModalVisible}
-          onRequestClose={() => this.setState({ seedBackupModalVisible: false })}>
-          <Suspense
-            fallback={
-              <View>
-                <Text>{this.props.translate('loading')}</Text>
-              </View>
-            }>
-            <Seed
-              seed={walletSeed?.seed}
-              birthday={walletSeed?.birthday}
-              onClickOK={() => this.onClickOKRestoreBackup()}
-              onClickCancel={() => this.setState({ seedBackupModalVisible: false })}
-              totalBalance={totalBalance}
-              action={'backup'}
-              currencyName={currencyName || undefined}
-              translate={translate}
-            />
-          </Suspense>
-        </Modal>
+          <Modal
+            animationType="slide"
+            transparent={false}
+            visible={seedBackupModalVisible}
+            onRequestClose={() => this.setState({ seedBackupModalVisible: false })}>
+            <Suspense
+              fallback={
+                <View>
+                  <Text>{translate('loading')}</Text>
+                </View>
+              }>
+              <Seed
+                onClickOK={() => this.onClickOKRestoreBackup()}
+                onClickCancel={() => this.setState({ seedBackupModalVisible: false })}
+                action={'backup'}
+              />
+            </Suspense>
+          </Modal>
 
-        <Modal
-          animationType="slide"
-          transparent={false}
-          visible={seedServerModalVisible}
-          onRequestClose={() => this.setState({ seedServerModalVisible: false })}>
-          <Suspense
-            fallback={
-              <View>
-                <Text>{this.props.translate('loading')}</Text>
-              </View>
-            }>
-            <Seed
-              seed={walletSeed?.seed}
-              birthday={walletSeed?.birthday}
-              onClickOK={() => this.onClickOKServerWallet()}
-              onClickCancel={() => this.setState({ seedServerModalVisible: false })}
-              totalBalance={totalBalance}
-              action={'server'}
-              currencyName={currencyName || undefined}
-              translate={translate}
-            />
-          </Suspense>
-        </Modal>
+          <Modal
+            animationType="slide"
+            transparent={false}
+            visible={seedServerModalVisible}
+            onRequestClose={() => this.setState({ seedServerModalVisible: false })}>
+            <Suspense
+              fallback={
+                <View>
+                  <Text>{translate('loading')}</Text>
+                </View>
+              }>
+              <Seed
+                onClickOK={() => this.onClickOKServerWallet()}
+                onClickCancel={() => this.setState({ seedServerModalVisible: false })}
+                action={'server'}
+              />
+            </Suspense>
+          </Modal>
 
-        <Modal
-          animationType="slide"
-          transparent={false}
-          visible={computingModalVisible}
-          onRequestClose={() => this.setState({ computingModalVisible: false })}>
-          <Suspense
-            fallback={
-              <View>
-                <Text>{this.props.translate('loading')}</Text>
-              </View>
-            }>
-            <ComputingTxContent progress={txBuildProgress} translate={translate} />
-          </Suspense>
-        </Modal>
+          <Modal
+            animationType="slide"
+            transparent={false}
+            visible={computingModalVisible}
+            onRequestClose={() => this.setState({ computingModalVisible: false })}>
+            <Suspense
+              fallback={
+                <View>
+                  <Text>{translate('loading')}</Text>
+                </View>
+              }>
+              <ComputingTxContent />
+            </Suspense>
+          </Modal>
 
-        <Tab.Navigator
-          initialRouteName={translate('loadedapp.wallet-menu')}
-          screenOptions={({ route }) => ({
-            tabBarIcon: ({ focused }) => fnTabBarIcon(route, focused),
-            tabBarActiveTintColor: colors.background,
-            tabBarActiveBackgroundColor: colors.primary,
-            tabBarInactiveTintColor: colors.money,
-            tabBarLabelStyle: { fontSize: 14 },
-            tabBarStyle: { borderRadius: 0 },
-            headerShown: false,
-          })}>
-          <Tab.Screen name={translate('loadedapp.send-menu')}>
-            {props => (
-              <>
-                <Suspense
-                  fallback={
-                    <View>
-                      <Text>{this.props.translate('loading')}</Text>
-                    </View>
-                  }>
-                  <Send
-                    {...props}
-                    {...standardProps}
-                    totalBalance={totalBalance}
-                    sendPageState={sendPageState}
-                    setSendPageState={this.setSendPageState}
-                    sendTransaction={this.sendTransaction}
-                    clearToAddr={this.clearToAddr}
-                    setComputingModalVisible={this.setComputingModalVisible}
-                    setTxBuildProgress={this.setTxBuildProgress}
-                    syncingStatus={syncingStatus}
-                    syncingStatusMoreInfoOnClick={async () => {
-                      await this.fetchWalletSeed();
-                      this.setState({ syncReportModalVisible: true });
-                    }}
-                    poolsMoreInfoOnClick={async () => {
-                      this.setState({ poolsModalVisible: true });
-                    }}
-                  />
-                </Suspense>
-              </>
-            )}
-          </Tab.Screen>
-          <Tab.Screen name={translate('loadedapp.wallet-menu')}>
-            {props => (
-              <>
-                <Suspense
-                  fallback={
-                    <View>
-                      <Text>{this.props.translate('loading')}</Text>
-                    </View>
-                  }>
-                  <Transactions
-                    {...props}
-                    {...standardProps}
-                    transactions={transactions}
-                    totalBalance={totalBalance}
-                    doRefresh={this.doRefresh}
-                    syncingStatus={syncingStatus}
-                    setComputingModalVisible={this.setComputingModalVisible}
-                    syncingStatusMoreInfoOnClick={async () => {
-                      await this.fetchWalletSeed();
-                      this.setState({ syncReportModalVisible: true });
-                    }}
-                    poolsMoreInfoOnClick={async () => {
-                      this.setState({ poolsModalVisible: true });
-                    }}
-                  />
-                </Suspense>
-              </>
-            )}
-          </Tab.Screen>
-          <Tab.Screen name={translate('loadedapp.uas-menu')}>
-            {props => (
-              <>
-                <Suspense
-                  fallback={
-                    <View>
-                      <Text>{this.props.translate('loading')}</Text>
-                    </View>
-                  }>
-                  <Receive
-                    {...props}
-                    {...standardProps}
-                    addresses={addresses}
-                    startRescan={this.startRescan}
-                    totalBalance={totalBalance}
-                    info={info}
-                    syncingStatus={syncingStatus}
-                    syncingStatusMoreInfoOnClick={async () => {
-                      await this.fetchWalletSeed();
-                      this.setState({ syncReportModalVisible: true });
-                    }}
-                    uaAddress={uaAddress}
-                    setUaAddress={this.setUaAddress}
-                    poolsMoreInfoOnClick={async () => {
-                      this.setState({ poolsModalVisible: true });
-                    }}
-                  />
-                </Suspense>
-              </>
-            )}
-          </Tab.Screen>
-          <Tab.Screen name={translate('loadedapp.legacy-menu')}>
-            {props => (
-              <>
-                <Suspense
-                  fallback={
-                    <View>
-                      <Text>{this.props.translate('loading')}</Text>
-                    </View>
-                  }>
-                  <Legacy
-                    {...props}
-                    {...standardProps}
-                    addresses={addresses}
-                    startRescan={this.startRescan}
-                    totalBalance={totalBalance}
-                    info={info}
-                    uaAddress={uaAddress}
-                  />
-                </Suspense>
-              </>
-            )}
-          </Tab.Screen>
-        </Tab.Navigator>
-      </SideMenu>
+          <Tab.Navigator
+            initialRouteName={translate('loadedapp.wallet-menu')}
+            screenOptions={({ route }) => ({
+              tabBarIcon: ({ focused }) => fnTabBarIcon(route, focused),
+              tabBarActiveTintColor: colors.background,
+              tabBarActiveBackgroundColor: colors.primary,
+              tabBarInactiveTintColor: colors.money,
+              tabBarLabelStyle: { fontSize: 14 },
+              tabBarStyle: { borderRadius: 0 },
+              headerShown: false,
+            })}>
+            <Tab.Screen name={translate('loadedapp.send-menu')}>
+              {() => (
+                <>
+                  <Suspense
+                    fallback={
+                      <View>
+                        <Text>{translate('loading')}</Text>
+                      </View>
+                    }>
+                    <Send />
+                  </Suspense>
+                </>
+              )}
+            </Tab.Screen>
+            <Tab.Screen name={translate('loadedapp.wallet-menu')}>
+              {() => (
+                <>
+                  <Suspense
+                    fallback={
+                      <View>
+                        <Text>{translate('loading')}</Text>
+                      </View>
+                    }>
+                    <Transactions />
+                  </Suspense>
+                </>
+              )}
+            </Tab.Screen>
+            <Tab.Screen name={translate('loadedapp.uas-menu')}>
+              {() => (
+                <>
+                  <Suspense
+                    fallback={
+                      <View>
+                        <Text>{translate('loading')}</Text>
+                      </View>
+                    }>
+                    <Receive />
+                  </Suspense>
+                </>
+              )}
+            </Tab.Screen>
+            <Tab.Screen name={translate('loadedapp.legacy-menu')}>
+              {() => (
+                <>
+                  <Suspense
+                    fallback={
+                      <View>
+                        <Text>{translate('loading')}</Text>
+                      </View>
+                    }>
+                    <Legacy />
+                  </Suspense>
+                </>
+              )}
+            </Tab.Screen>
+          </Tab.Navigator>
+        </SideMenu>
+      </ContextLoadedProvider>
     );
   }
 }

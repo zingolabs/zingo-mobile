@@ -1,33 +1,25 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { View, ScrollView, SafeAreaView, Image, TouchableOpacity, Modal, TextInput } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { faQrcode } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { TranslateOptions } from 'i18n-js';
 
 import FadeText from '../Components/FadeText';
 import RegText from '../Components/RegText';
 import ZecAmount from '../Components/ZecAmount';
 import Button from '../Button';
-import { TotalBalance } from '../../app/AppState';
 import Scanner from './components/Scanner';
 import { ThemeType } from '../../app/types';
+import { ContextLoaded } from '../../app/context';
 
 type ImportKeyProps = {
   closeModal: () => void;
   doImport: (keyText: string, birthday: string) => void;
-  totalBalance: TotalBalance;
-  currencyName?: string;
-  translate: (key: string, config?: TranslateOptions) => any;
 };
-const ImportKey: React.FunctionComponent<ImportKeyProps> = ({
-  closeModal,
-  doImport,
-  totalBalance,
-  currencyName,
-  translate,
-}) => {
+const ImportKey: React.FunctionComponent<ImportKeyProps> = ({ closeModal, doImport }) => {
+  const context = useContext(ContextLoaded);
+  const { totalBalance, info, translate } = context;
   const { colors } = useTheme() as unknown as ThemeType;
 
   const [privKeyText, setPrivKeyText] = useState('');
@@ -61,7 +53,12 @@ const ImportKey: React.FunctionComponent<ImportKeyProps> = ({
           source={require('../../assets/img/logobig-zingo.png')}
           style={{ width: 80, height: 80, resizeMode: 'contain' }}
         />
-        <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{ opacity: 0.5 }} />
+        <ZecAmount
+          currencyName={info?.currencyName ? info.currencyName : ''}
+          size={36}
+          amtZec={totalBalance.total}
+          style={{ opacity: 0.5 }}
+        />
         <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
           {translate('import.title')}
         </RegText>

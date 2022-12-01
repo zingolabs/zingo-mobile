@@ -1,16 +1,14 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useContext } from 'react';
 import { View, ScrollView, Modal, Image, Alert, Keyboard, TextInput } from 'react-native';
 import { faQrcode, faCheck, faInfo } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme } from '@react-navigation/native';
-import { NavigationScreenProp } from 'react-navigation';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import Toast from 'react-native-simple-toast';
 import { getNumberFormatSettings } from 'react-native-localize';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
 import Animated, { EasingNode } from 'react-native-reanimated';
-import { TranslateOptions } from 'i18n-js';
 
 import FadeText from '../Components/FadeText';
 import ErrorText from '../Components/ErrorText';
@@ -18,47 +16,33 @@ import RegText from '../Components/RegText';
 import ZecAmount from '../Components/ZecAmount';
 import UsdAmount from '../Components/UsdAmount';
 import Button from '../Button';
-import { InfoType, SendPageState, SendProgress, ToAddr, TotalBalance, SyncStatus } from '../../app/AppState';
+import { SendPageState, SendProgress, ToAddr } from '../../app/AppState';
 import { parseZcashURI, ZcashURITarget } from '../../app/uris';
 import RPCModule from '../RPCModule';
 import Utils from '../../app/utils';
 import Scanner from './components/Scanner';
 import Confirm from './components/Confirm';
 import { ThemeType } from '../../app/types';
+import { ContextLoaded } from '../../app/context';
 
-type SendProps = {
-  info: InfoType | null;
-  totalBalance: TotalBalance;
-  sendPageState: SendPageState;
-  setSendPageState: (sendPageState: SendPageState) => void;
-  sendTransaction: (setSendProgress: (arg0: SendProgress | null) => void) => void;
-  clearToAddr: () => void;
-  navigation: NavigationScreenProp<any>;
-  toggleMenuDrawer: () => void;
-  setComputingModalVisible: (visible: boolean) => void;
-  setTxBuildProgress: (progress: SendProgress) => void;
-  syncingStatus: SyncStatus | null;
-  syncingStatusMoreInfoOnClick: () => void;
-  translate: (key: string, config?: TranslateOptions) => any;
-  poolsMoreInfoOnClick: () => void;
-};
-
-const Send: React.FunctionComponent<SendProps> = ({
-  info,
-  totalBalance,
-  sendPageState,
-  setSendPageState,
-  sendTransaction,
-  clearToAddr,
-  navigation,
-  toggleMenuDrawer,
-  setComputingModalVisible,
-  setTxBuildProgress,
-  syncingStatus,
-  syncingStatusMoreInfoOnClick,
-  translate,
-  poolsMoreInfoOnClick,
-}) => {
+const Send: React.FunctionComponent = () => {
+  const context = useContext(ContextLoaded);
+  const {
+    translate,
+    toggleMenuDrawer,
+    info,
+    totalBalance,
+    sendPageState,
+    setSendPageState,
+    sendTransaction,
+    clearToAddr,
+    setComputingModalVisible,
+    setTxBuildProgress,
+    syncingStatus,
+    navigation,
+    syncingStatusMoreInfoOnClick,
+    poolsMoreInfoOnClick,
+  } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [qrcodeModalVisble, setQrcodeModalVisible] = useState(false);
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
@@ -309,10 +293,12 @@ const Send: React.FunctionComponent<SendProps> = ({
         // Clear the fields
         clearToAddr();
 
-        navigation.navigate(translate('loadedapp.wallet-menu'));
-        setTimeout(() => {
-          Toast.show(`${translate('send.Broadcast')} ${txid}`, Toast.LONG);
-        }, 1000);
+        if (navigation) {
+          navigation.navigate(translate('loadedapp.wallet-menu'));
+          setTimeout(() => {
+            Toast.show(`${translate('send.Broadcast')} ${txid}`, Toast.LONG);
+          }, 1000);
+        }
       } catch (err) {
         setTimeout(() => {
           //console.log('sendtx error', err);
@@ -354,15 +340,11 @@ const Send: React.FunctionComponent<SendProps> = ({
         visible={confirmModalVisible}
         onRequestClose={() => setConfirmModalVisible(false)}>
         <Confirm
-          sendPageState={sendPageState}
           defaultFee={defaultFee}
-          price={info?.zecPrice}
           closeModal={() => {
             setConfirmModalVisible(false);
           }}
           confirmSend={confirmSend}
-          currencyName={currencyName}
-          translate={translate}
         />
       </Modal>
 
@@ -393,7 +375,11 @@ const Send: React.FunctionComponent<SendProps> = ({
               style={{ width: 80, height: 80, resizeMode: 'contain' }}
             />
             <View style={{ flexDirection: 'row' }}>
-              <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} />
+              <ZecAmount
+                currencyName={info?.currencyName ? info.currencyName : ''}
+                size={36}
+                amtZec={totalBalance.total}
+              />
               {totalBalance.total > 0 && (totalBalance.privateBal > 0 || totalBalance.transparentBal > 0) && (
                 <TouchableOpacity onPress={() => poolsMoreInfoOnClick()}>
                   <View
@@ -643,7 +629,12 @@ const Send: React.FunctionComponent<SendProps> = ({
                     marginTop: 10,
                   }}>
                   <RegText>{translate('send.spendable')}</RegText>
-                  <ZecAmount currencyName={currencyName} color={colors.money} size={18} amtZec={getMaxAmount()} />
+                  <ZecAmount
+                    currencyName={info?.currencyName ? info.currencyName : ''}
+                    color={colors.money}
+                    size={18}
+                    amtZec={getMaxAmount()}
+                  />
                 </View>
                 {stillConfirming && (
                   <View

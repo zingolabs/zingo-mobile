@@ -1,3 +1,7 @@
+import { TranslateOptions } from 'i18n-js';
+import { NavigationScreenProp } from 'react-navigation';
+import { RouteProp } from '@react-navigation/native';
+
 import SyncStatusReport from './SyncStatusReport';
 import TotalBalance from './TotalBalance';
 import Address from './Address';
@@ -12,7 +16,10 @@ import WalletSeed from './WalletSeed';
 import WalletSettings from './WalletSettings';
 import SyncStatus from './SyncStatus';
 
-export default interface AppState {
+export default interface AppStateLoaded {
+  navigation: NavigationScreenProp<any> | null;
+  route: RouteProp<any> | null;
+
   // Info about the current sync process
   syncStatusReport: SyncStatusReport;
 
@@ -85,5 +92,22 @@ export default interface AppState {
   newServer: string | null;
 
   uaAddress: string | null;
+
+  translate: (key: string, config?: TranslateOptions) => any;
+  openErrorModal: (title: string, body: string) => void;
+  closeErrorModal: () => void;
+  toggleMenuDrawer: () => void;
+  fetchTotalBalance: () => Promise<void>;
+  setSendPageState: (sendPageState: SendPageState) => void;
+  sendTransaction: (setSendProgress: (arg0: SendProgress | null) => void) => Promise<String>;
+  clearToAddr: () => void;
+  setComputingModalVisible: (visible: boolean) => void;
+  setTxBuildProgress: (progress: SendProgress) => void;
+  syncingStatusMoreInfoOnClick: () => void;
+  poolsMoreInfoOnClick: () => void;
+  doRefresh: () => void;
+  startRescan: () => void;
+  setUaAddress: (uaAddress: string) => void;
+
   // eslint-disable-next-line semi
 }
