@@ -177,6 +177,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ set_wallet_option, s
                     fontSize: 18,
                     minWidth: '50%',
                     minHeight: 48,
+                    marginLeft: 5,
                   }}
                   value={server}
                   onChangeText={(text: string) => setServer(text)}
@@ -216,6 +217,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ set_wallet_option, s
                 fontSize: 18,
                 minWidth: '30%',
                 minHeight: 48,
+                marginLeft: 5,
               }}
               value={filter}
               onChangeText={(text: string) => setFilter(text)}

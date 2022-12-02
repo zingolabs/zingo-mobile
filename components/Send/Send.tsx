@@ -479,48 +479,47 @@ const Send: React.FunctionComponent = () => {
               </View>
               <View
                 style={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
+                  flex: 1,
                   borderWidth: 1,
                   borderRadius: 5,
                   borderColor: colors.text,
                   marginTop: 5,
                 }}>
-                <View
-                  accessible={true}
-                  accessibilityLabel={translate('send.address-acc')}
-                  style={{
-                    flexGrow: 1,
-                    maxWidth: 'auto',
-                    maxHeight: 48,
-                    minWidth: 48,
-                    minHeight: 48,
-                  }}>
-                  <TextInput
-                    placeholder={translate('send.addressplaceholder')}
-                    placeholderTextColor={colors.placeholder}
+                <View style={{ flexDirection: 'row' }}>
+                  <View
+                    accessible={true}
+                    accessibilityLabel={translate('send.address-acc')}
                     style={{
-                      color: colors.text,
-                      fontWeight: '600',
-                      fontSize: 16,
-                      minWidth: 48,
-                      minHeight: 48,
-                    }}
-                    value={ta.to}
-                    onChangeText={(text: string) => updateToField(text, null, null, null)}
-                    editable={true}
-                  />
+                      flex: 1,
+                      justifyContent: 'center',
+                    }}>
+                    <TextInput
+                      placeholder={translate('send.addressplaceholder')}
+                      placeholderTextColor={colors.placeholder}
+                      style={{
+                        color: colors.text,
+                        fontWeight: '600',
+                        fontSize: 16,
+                        marginLeft: 5,
+                      }}
+                      value={ta.to}
+                      onChangeText={(text: string) => updateToField(text, null, null, null)}
+                      editable={true}
+                    />
+                  </View>
+                  <View style={{
+                      width: 58,
+                    }}>
+                    <TouchableOpacity
+                      accessible={true}
+                      accessibilityLabel={translate('send.scan-acc')}
+                      onPress={() => {
+                        setQrcodeModalVisible(true);
+                      }}>
+                      <FontAwesomeIcon style={{ margin: 5 }} size={48} icon={faQrcode} color={colors.border} />
+                    </TouchableOpacity>
+                  </View>
                 </View>
-                <TouchableOpacity
-                  accessible={true}
-                  accessibilityLabel={translate('send.scan-acc')}
-                  onPress={() => {
-                    setQrcodeModalVisible(true);
-                  }}>
-                  <FontAwesomeIcon style={{ margin: 5 }} size={48} icon={faQrcode} color={colors.border} />
-                </TouchableOpacity>
               </View>
 
               <View style={{ marginTop: 10, display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -565,6 +564,7 @@ const Send: React.FunctionComponent = () => {
                         fontSize: 18,
                         minWidth: 48,
                         minHeight: 48,
+                        marginLeft: 5,
                       }}
                       value={ta.amount.toString()}
                       onChangeText={(text: string) => updateToField(null, text.substring(0, 10), null, null)}
@@ -606,6 +606,7 @@ const Send: React.FunctionComponent = () => {
                         fontSize: 18,
                         minWidth: 48,
                         minHeight: 48,
+                        marginLeft: 5,
                       }}
                       value={ta.amountUSD.toString()}
                       onChangeText={(text: string) => updateToField(null, null, text.substring(0, 4), null)}
@@ -673,6 +674,7 @@ const Send: React.FunctionComponent = () => {
                           fontSize: 18,
                           minWidth: 48,
                           minHeight: 48,
+                          marginLeft: 5,
                         }}
                         value={ta.memo}
                         onChangeText={(text: string) => updateToField(null, null, null, text)}

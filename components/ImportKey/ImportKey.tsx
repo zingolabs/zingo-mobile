@@ -106,6 +106,7 @@ const ImportKey: React.FunctionComponent<ImportKeyProps> = ({ closeModal, doImpo
               fontWeight: '600',
               minWidth: '95%',
               minHeight: 100,
+              marginLeft: 5,
             }}
             value={privKeyText}
             onChangeText={setPrivKeyText}
@@ -152,6 +153,7 @@ const ImportKey: React.FunctionComponent<ImportKeyProps> = ({ closeModal, doImpo
               fontWeight: '600',
               minWidth: '50%',
               minHeight: 48,
+              marginLeft: 5,
             }}
             value={birthday}
             onChangeText={setBirthday}
