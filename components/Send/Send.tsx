@@ -325,6 +325,7 @@ const Send: React.FunctionComponent = () => {
         display: 'flex',
         justifyContent: 'flex-start',
         width: '100%',
+        marginBottom: 200,
       }}>
       <Modal
         animationType="slide"
@@ -465,9 +466,6 @@ const Send: React.FunctionComponent = () => {
       <ScrollView
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'flex-start',
         }}>
         {[sendPageState.toaddr].map((ta, i) => {
           return (
@@ -555,7 +553,7 @@ const Send: React.FunctionComponent = () => {
                       minHeight: 48,
                     }}>
                     <TextInput
-                      placeholder={`0${decimalSeparator}00000000`}
+                      placeholder={`#${decimalSeparator}########`}
                       placeholderTextColor={colors.placeholder}
                       keyboardType="numeric"
                       style={{
@@ -597,7 +595,7 @@ const Send: React.FunctionComponent = () => {
                       minHeight: 48,
                     }}>
                     <TextInput
-                      placeholder={`0${decimalSeparator}00`}
+                      placeholder={`#${decimalSeparator}##`}
                       placeholderTextColor={colors.placeholder}
                       keyboardType="numeric"
                       style={{
@@ -653,7 +651,7 @@ const Send: React.FunctionComponent = () => {
 
               {memoEnabled === true && (
                 <>
-                  <FadeText style={{ marginTop: 30 }}>{translate('send.memo')}</FadeText>
+                  <FadeText style={{ marginTop: 10 }}>{translate('send.memo')}</FadeText>
                   <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start' }}>
                     <View
                       accessible={true}
@@ -665,6 +663,7 @@ const Send: React.FunctionComponent = () => {
                         borderColor: colors.text,
                         minWidth: 48,
                         minHeight: 48,
+                        maxHeight: 150,
                       }}>
                       <TextInput
                         multiline
@@ -679,6 +678,7 @@ const Send: React.FunctionComponent = () => {
                         value={ta.memo}
                         onChangeText={(text: string) => updateToField(null, null, null, text)}
                         editable={true}
+
                       />
                     </View>
                   </View>
@@ -687,31 +687,31 @@ const Send: React.FunctionComponent = () => {
             </View>
           );
         })}
+         <View
+          style={{
+            flexGrow: 1,
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginVertical: 5,
+          }}>
+          <Button
+            accessible={true}
+            accessibilityLabel={'title ' + translate('send.button')}
+            type="Primary"
+            title={translate('send.button')}
+            disabled={!sendButtonEnabled}
+            onPress={() => setConfirmModalVisible(true)}
+          />
+          <Button
+            type="Secondary"
+            style={{ marginLeft: 10 }}
+            title={translate('send.clear')}
+            onPress={() => clearToAddr()}
+          />
+        </View>
       </ScrollView>
 
-      <View
-        style={{
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'center',
-          marginVertical: 5,
-        }}>
-        <Button
-          accessible={true}
-          accessibilityLabel={'title ' + translate('send.button')}
-          type="Primary"
-          title={translate('send.button')}
-          disabled={!sendButtonEnabled}
-          onPress={() => setConfirmModalVisible(true)}
-        />
-        <Button
-          type="Secondary"
-          style={{ marginLeft: 10 }}
-          title={translate('send.clear')}
-          onPress={() => clearToAddr()}
-        />
-      </View>
     </View>
   );
 };

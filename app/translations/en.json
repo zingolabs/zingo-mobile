@@ -175,7 +175,8 @@
     "scan-acc": "Scan an address",
     "zec-acc": "ZEC Amount Field",
     "usd-acc": "USD Amount Field",
-    "memo-acc": "Memo Field"
+    "memo-acc": "Memo Field",
+    "amountplaceholder": "number"
   },
   "legacy": {
     "o-title": "U-Orchard",

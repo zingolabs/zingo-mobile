@@ -175,7 +175,8 @@
     "scan-acc": "Escanear una Dirección",
     "zec-acc": "Campo de Cantidad en Zcash",
     "usd-acc": "Campo de Cantidad en Dólares",
-    "memo-acc": "Campo del Memorándum"
+    "memo-acc": "Campo del Memorándum",
+    "amountplaceholder": "numero"
   },
   "legacy": {
     "o-title": "U-Orchard",

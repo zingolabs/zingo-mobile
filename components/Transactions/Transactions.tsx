@@ -80,7 +80,7 @@ const Transactions: React.FunctionComponent = () => {
       style={{
         display: 'flex',
         justifyContent: 'flex-start',
-        marginBottom: 170,
+        marginBottom: 140,
         width: '100%',
       }}>
       <Modal

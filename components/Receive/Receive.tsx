@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState } from 'react';
-import { View, Dimensions, Image, Modal } from 'react-native';
+import { View, Image, Modal } from 'react-native';
 import { TabView, TabBar } from 'react-native-tab-view';
 import Toast from 'react-native-simple-toast';
 import { useTheme } from '@react-navigation/native';
@@ -412,7 +412,6 @@ const Receive: React.FunctionComponent = () => {
       renderScene={renderScene}
       renderTabBar={renderTabBar}
       onIndexChange={setIndex}
-      initialLayout={{ width: Dimensions.get('window').width }}
     />
   );
 };
