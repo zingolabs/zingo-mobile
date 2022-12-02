@@ -9,7 +9,7 @@ const defaultAppState: AppStateLoading = {
   screen: 0,
   actionButtonsDisabled: false,
   walletExists: false,
-  seedPhrase: null,
+  walletSeed: null,
   birthday: null,
   server: null,
   totalBalance: new TotalBalance(),

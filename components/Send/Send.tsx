@@ -240,7 +240,7 @@ const Send: React.FunctionComponent = () => {
     }
 
     if (amount !== null) {
-      toAddr.amount = amount.replace(decimalSeparator, '.');
+      toAddr.amount = amount.replace(decimalSeparator, '.').substring(0, 10);
       if (isNaN(Number(toAddr.amount))) {
         toAddr.amountUSD = '';
       } else if (toAddr.amount && info?.zecPrice) {
@@ -252,7 +252,7 @@ const Send: React.FunctionComponent = () => {
     }
 
     if (amountUSD !== null) {
-      toAddr.amountUSD = amountUSD.replace(decimalSeparator, '.');
+      toAddr.amountUSD = amountUSD.replace(decimalSeparator, '.').substring(0, 4);
       if (isNaN(Number(toAddr.amountUSD))) {
         toAddr.amount = '';
       } else if (toAddr.amountUSD && info?.zecPrice) {
@@ -481,7 +481,7 @@ const Send: React.FunctionComponent = () => {
                 style={{
                   display: 'flex',
                   flexDirection: 'row',
-                  justifyContent: 'flex-start',
+                  justifyContent: 'space-between',
                   alignItems: 'center',
                   borderWidth: 1,
                   borderRadius: 5,
@@ -493,7 +493,8 @@ const Send: React.FunctionComponent = () => {
                   accessibilityLabel={translate('send.address-acc')}
                   style={{
                     flexGrow: 1,
-                    maxWidth: '90%',
+                    maxWidth: 'auto',
+                    maxHeight: 48,
                     minWidth: 48,
                     minHeight: 48,
                   }}>
@@ -503,6 +504,7 @@ const Send: React.FunctionComponent = () => {
                     style={{
                       color: colors.text,
                       fontWeight: '600',
+                      fontSize: 16,
                       minWidth: 48,
                       minHeight: 48,
                     }}
@@ -544,10 +546,7 @@ const Send: React.FunctionComponent = () => {
                     accessible={true}
                     accessibilityLabel={translate('send.zec-acc')}
                     style={{
-                      display: 'flex',
-                      flexDirection: 'row',
-                      justifyContent: 'flex-start',
-                      alignItems: 'center',
+                      flexGrow: 1,
                       borderWidth: 1,
                       borderRadius: 5,
                       borderColor: colors.text,
@@ -557,7 +556,7 @@ const Send: React.FunctionComponent = () => {
                       minHeight: 48,
                     }}>
                     <TextInput
-                      placeholder={`0${decimalSeparator}0`}
+                      placeholder={`0${decimalSeparator}00000000`}
                       placeholderTextColor={colors.placeholder}
                       keyboardType="numeric"
                       style={{
@@ -568,8 +567,9 @@ const Send: React.FunctionComponent = () => {
                         minHeight: 48,
                       }}
                       value={ta.amount.toString()}
-                      onChangeText={(text: string) => updateToField(null, text, null, null)}
+                      onChangeText={(text: string) => updateToField(null, text.substring(0, 10), null, null)}
                       editable={true}
+                      maxLength={10}
                     />
                   </View>
                   <RegText style={{ marginTop: 15, marginRight: 10, marginLeft: 5 }}>ZEC</RegText>
@@ -587,10 +587,7 @@ const Send: React.FunctionComponent = () => {
                     accessible={true}
                     accessibilityLabel={translate('send.usd-acc')}
                     style={{
-                      display: 'flex',
-                      flexDirection: 'row',
-                      justifyContent: 'flex-start',
-                      alignItems: 'center',
+                      flexGrow: 1,
                       borderWidth: 1,
                       borderRadius: 5,
                       borderColor: colors.text,
@@ -600,7 +597,7 @@ const Send: React.FunctionComponent = () => {
                       minHeight: 48,
                     }}>
                     <TextInput
-                      placeholder={`0${decimalSeparator}0`}
+                      placeholder={`0${decimalSeparator}00`}
                       placeholderTextColor={colors.placeholder}
                       keyboardType="numeric"
                       style={{
@@ -611,8 +608,9 @@ const Send: React.FunctionComponent = () => {
                         minHeight: 48,
                       }}
                       value={ta.amountUSD.toString()}
-                      onChangeText={(text: string) => updateToField(null, null, text, null)}
+                      onChangeText={(text: string) => updateToField(null, null, text.substring(0, 4), null)}
                       editable={true}
+                      maxLength={4}
                     />
                   </View>
                   <RegText style={{ marginTop: 15, marginLeft: 5 }}>USD</RegText>
@@ -672,6 +670,7 @@ const Send: React.FunctionComponent = () => {
                         style={{
                           color: colors.text,
                           fontWeight: '600',
+                          fontSize: 18,
                           minWidth: 48,
                           minHeight: 48,
                         }}

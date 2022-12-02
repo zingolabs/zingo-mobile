@@ -4,6 +4,7 @@ import { RouteProp } from '@react-navigation/native';
 
 import TotalBalance from './TotalBalance';
 import InfoType from './InfoType';
+import WalletSeed from './WalletSeed';
 
 export default interface AppStateLoading {
   navigation: NavigationScreenProp<any> | null;
@@ -12,7 +13,7 @@ export default interface AppStateLoading {
   screen: number;
   actionButtonsDisabled: boolean;
   walletExists: boolean;
-  seedPhrase: string | null;
+  walletSeed: WalletSeed | null;
   birthday: number | null;
   server: string | null;
   totalBalance: TotalBalance;

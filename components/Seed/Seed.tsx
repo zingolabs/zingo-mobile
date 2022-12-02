@@ -33,7 +33,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
   const contextLoading = useContext(ContextLoading);
   let walletSeed: WalletSeed | null, totalBalance, translate: (key: string, config?: TranslateOptions) => any, info;
   if (action === 'new' || action === 'restore') {
-    walletSeed = { seed: contextLoading.seedPhrase, birthday: contextLoading.birthday };
+    walletSeed = contextLoading.walletSeed;
     totalBalance = contextLoading.totalBalance;
     translate = contextLoading.translate;
     info = contextLoading.info;
@@ -59,9 +59,11 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
     setTimes(action === 'change' || action === 'backup' || action === 'server' ? 1 : 0);
     setSeedPhrase(walletSeed?.seed || '');
     setBirthdayNumber(walletSeed?.birthday || 0);
-  }, [action, walletSeed?.seed, walletSeed?.birthday, translate, walletSeed]);
+  }, [action, walletSeed?.seed, walletSeed?.birthday, walletSeed, translate]);
 
-  //console.log(seed, birthday, onClickOK, onClickCancel, totalBalance, action, currencyName);
+  console.log('=================================');
+  console.log(walletSeed?.seed, walletSeed?.birthday);
+  console.log(seedPhrase, birthdayNumber);
 
   return (
     <SafeAreaView
@@ -130,14 +132,13 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
               accessibilityLabel={translate('seed.seed-acc')}
               style={{
                 margin: 0,
-                padding: 10,
                 borderWidth: 1,
                 borderRadius: 10,
                 borderColor: colors.text,
                 maxWidth: '100%',
                 maxHeight: '70%',
                 minWidth: '95%',
-                minHeight: 48,
+                minHeight: 100,
               }}>
               <TextInput
                 placeholder={translate('seed.seedplaceholder')}
@@ -146,8 +147,9 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
                 style={{
                   color: colors.text,
                   fontWeight: '600',
+                  fontSize: 16,
                   minWidth: '95%',
-                  minHeight: 48,
+                  minHeight: 100,
                 }}
                 value={seedPhrase}
                 onChangeText={(text: string) => setSeedPhrase(text)}
@@ -194,19 +196,21 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
                 accessibilityLabel={translate('seed.birthday-acc')}
                 style={{
                   margin: 10,
-                  padding: 10,
                   borderWidth: 1,
                   borderRadius: 10,
                   borderColor: colors.text,
-                  width: '40%',
-                  minWidth: '40%',
+                  width: '30%',
+                  maxWidth: '40%',
+                  maxHeight: 48,
+                  minWidth: '20%',
                   minHeight: 48,
                 }}>
                 <TextInput
                   style={{
                     color: colors.text,
                     fontWeight: '600',
-                    minWidth: '40%',
+                    fontSize: 18,
+                    minWidth: '20%',
                     minHeight: 48,
                   }}
                   value={birthdayNumber.toString()}

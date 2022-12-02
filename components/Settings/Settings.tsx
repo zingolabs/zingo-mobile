@@ -159,14 +159,13 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ set_wallet_option, s
                 accessible={true}
                 accessibilityLabel={translate('settings.server-acc')}
                 style={{
-                  width: '60%',
                   borderColor: colors.border,
                   borderWidth: 1,
                   marginLeft: 5,
-                  padding: 5,
-                  paddingTop: 10,
-                  paddingBottom: 10,
-                  minWidth: '60%',
+                  width: 'auto',
+                  maxWidth: '80%',
+                  maxHeight: 48,
+                  minWidth: '50%',
                   minHeight: 48,
                 }}>
                 <TextInput
@@ -176,12 +175,13 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ set_wallet_option, s
                     color: colors.text,
                     fontWeight: '600',
                     fontSize: 18,
-                    minWidth: '60%',
+                    minWidth: '50%',
                     minHeight: 48,
                   }}
                   value={server}
                   onChangeText={(text: string) => setServer(text)}
                   editable={true}
+                  maxLength={100}
                 />
               </View>
             )}
@@ -197,14 +197,13 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ set_wallet_option, s
             accessible={true}
             accessibilityLabel={translate('settings.threshold-acc')}
             style={{
-              width: '60%',
               borderColor: colors.border,
               borderWidth: 1,
               marginLeft: 5,
-              padding: 5,
-              paddingTop: 10,
-              paddingBottom: 10,
-              minWidth: '60%',
+              width: 'auto',
+              maxWidth: '60%',
+              maxHeight: 48,
+              minWidth: '30%',
               minHeight: 48,
             }}>
             <TextInput
@@ -215,12 +214,13 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ set_wallet_option, s
                 color: colors.text,
                 fontWeight: '600',
                 fontSize: 18,
-                minWidth: '60%',
+                minWidth: '30%',
                 minHeight: 48,
               }}
               value={filter}
               onChangeText={(text: string) => setFilter(text)}
               editable={true}
+              maxLength={6}
             />
           </View>
         </View>

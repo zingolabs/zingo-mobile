@@ -54,7 +54,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
       screen: 0,
       actionButtonsDisabled: false,
       walletExists: false,
-      seedPhrase: null,
+      walletSeed: null,
       birthday: null,
       server: '',
       totalBalance: new TotalBalance(),
@@ -129,7 +129,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
       const seed = await RPCModule.createNewWallet(this.state.server);
 
       if (!seed.startsWith('Error')) {
-        this.setState({ seedPhrase: seed, screen: 2, actionButtonsDisabled: false, walletExists: true });
+        this.setState({ walletSeed: JSON.parse(seed), screen: 2, actionButtonsDisabled: false, walletExists: true });
         // default values for wallet options
         this.set_wallet_option('download_memos', 'wallet');
         //await this.set_wallet_option('transaction_filter_threshold', '500');
@@ -140,8 +140,8 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
     });
   };
 
-  getSeedPhraseToRestore = async () => {
-    this.setState({ seedPhrase: null, birthday: null, screen: 3, walletExists: false });
+  getwalletSeedToRestore = async () => {
+    this.setState({ walletSeed: null, birthday: null, screen: 3, walletExists: false });
   };
 
   getViewingKeyToRestore = async () => {
@@ -154,11 +154,11 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
     Toast.show(this.state.translate('workingonit'), Toast.LONG);
   };
 
-  doRestore = async (seedPhrase: string, birthday: number) => {
+  doRestore = async (seed: string, birthday: number) => {
     // Don't call with null values
     const { server } = this.state;
 
-    if (!seedPhrase) {
+    if (!seed) {
       Alert.alert(
         this.state.translate('loadingapp.invalidseed-label'),
         this.state.translate('loadingapp.invalidseed-error'),
@@ -176,7 +176,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
         walletBirthday = '0';
       }
 
-      const error = await RPCModule.restoreWallet(seedPhrase.toLowerCase(), walletBirthday || '0', server);
+      const error = await RPCModule.restoreWallet(seed.toLowerCase(), walletBirthday || '0', server);
       if (!error.startsWith('Error')) {
         this.setState({ actionButtonsDisabled: false });
         this.navigateToLoaded();
@@ -192,7 +192,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
   };
 
   render() {
-    const { screen, seedPhrase, actionButtonsDisabled, walletExists, server } = this.state;
+    const { screen, walletSeed, actionButtonsDisabled, walletExists, server } = this.state;
     const { colors } = this.props.theme;
     const { translate } = this.props;
 
@@ -286,7 +286,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                     type="Secondary"
                     title={translate('loadingapp.restorewalletseed')}
                     disabled={actionButtonsDisabled}
-                    onPress={this.getSeedPhraseToRestore}
+                    onPress={this.getwalletSeedToRestore}
                     style={{ margin: 10 }}
                   />
                   <Button
@@ -307,7 +307,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
               </View>
             </ScrollView>
           )}
-          {screen === 2 && seedPhrase && (
+          {screen === 2 && walletSeed && (
             <Modal
               animationType="slide"
               transparent={false}
