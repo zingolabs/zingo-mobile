@@ -807,9 +807,14 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
               tabBarActiveBackgroundColor: colors.primary,
               tabBarInactiveTintColor: colors.money,
               tabBarLabelStyle: { fontSize: 14 },
-              tabBarStyle: { borderRadius: 0 },
+              tabBarStyle: { 
+                borderRadius: 0, 
+                borderTopColor:colors.primary, 
+                borderTopWidth: 2,
+              },
               headerShown: false,
-            })}>
+            }
+            )}>
             <Tab.Screen name={translate('loadedapp.send-menu')}>
               {() => (
                 <>
