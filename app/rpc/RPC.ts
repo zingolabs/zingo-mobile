@@ -1,4 +1,5 @@
 import { TranslateOptions } from 'i18n-js';
+import BackgroundFetch from 'react-native-background-fetch';
 
 import {
   SyncStatusReport,
@@ -472,23 +473,30 @@ export default class RPC {
       this.process_end_block = this.lastWalletBlockHeight;
 
       // This is async, so when it is done, we finish the refresh.
+      const onEventRescan = async (taskId: string) => {
+        await this.doSync();
+        this.inRefresh = false;
+        BackgroundFetch.finish(taskId);
+      };
+
+      const onEventSync = async (taskId: string) => {
+        await this.doSync();
+        this.inRefresh = false;
+        BackgroundFetch.finish(taskId);
+      };
+
+      const onTimeout = async (taskId: string) => {
+        BackgroundFetch.finish(taskId);
+      };
+
+      let status;
       if (fullRescan) {
-        this.doRescan()
-          .then(r => console.log('End Rescan OK: ' + r))
-          .catch(e => console.log('End Rescan ERROR: ' + e))
-          .finally(() => {
-            this.inRefresh = false;
-          });
+        status = await BackgroundFetch.configure({ minimumFetchInterval: 15 }, onEventRescan, onTimeout);
       } else {
-        //console.log('Starting New Sync');
-        this.doSync()
-          .then(r => console.log('End Sync OK: ' + r))
-          .catch(e => console.log('End Sync ERROR: ' + e))
-          .finally(() => {
-            //console.log('in refresh: false');
-            this.inRefresh = false;
-          });
+        status = await BackgroundFetch.configure({ minimumFetchInterval: 15 }, onEventSync, onTimeout);
       }
+
+      console.log('background status', status);
 
       // We need to wait for the sync to finish. The sync is done when
       let pollerID = setInterval(async () => {
