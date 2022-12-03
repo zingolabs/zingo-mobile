@@ -52,10 +52,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
     <ScrollView
       contentContainerStyle={[
         {
-          flex: 1,
-          flexDirection: 'column',
           alignItems: 'center',
-          justifyContent: 'flex-start',
           backgroundColor: colors.background,
         },
       ]}
@@ -64,7 +61,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
         <QRCode value={address} size={200} ecl="L" backgroundColor={colors.border} />
       </View>
       <TouchableOpacity onPress={doCopy}>
-        <Text style={{ color: colors.text, textDecorationLine: 'underline', margin: 15, minHeight: 48 }}>
+        <Text style={{ color: colors.text, textDecorationLine: 'underline', marginTop: 15, minHeight: 48 }}>
           {translate('seed.tapcopy')}
         </Text>
       </TouchableOpacity>
@@ -106,6 +103,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
           />
         </View>
       )}
+      <View style={{ height: 20 }} />
     </ScrollView>
   );
 };

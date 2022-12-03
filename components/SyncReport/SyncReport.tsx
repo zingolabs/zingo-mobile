@@ -1,28 +1,21 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { View, ScrollView, SafeAreaView, Image, Text } from 'react-native';
 import { useTheme } from '@react-navigation/native';
-import { TranslateOptions } from 'i18n-js';
 
 import { ThemeType } from '../../app/types';
 import RegText from '../Components/RegText';
 import Button from '../Button';
-import { SyncStatusReport } from '../../app/AppState';
 import DetailLine from './components/DetailLine';
+import { ContextLoaded } from '../../app/context';
 
 type SyncReportProps = {
   closeModal: () => void;
-  syncStatusReport: SyncStatusReport;
-  birthday?: number;
-  translate: (key: string, config?: TranslateOptions) => any;
 };
 
-const SyncReport: React.FunctionComponent<SyncReportProps> = ({
-  closeModal,
-  syncStatusReport,
-  birthday,
-  translate,
-}) => {
+const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) => {
+  const context = useContext(ContextLoaded);
+  const { syncStatusReport, walletSeed, translate } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [maxBlocks, setMaxBlocks] = useState(0);
   const [points, setPoints] = useState([] as number[]);
@@ -41,9 +34,9 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
           break;
         }
       }
-      setBirthday_plus_1((birthday || 0) + 1);
+      setBirthday_plus_1((walletSeed?.birthday || 0) + 1);
     })();
-  }, [syncStatusReport.lastBlockServer, birthday]);
+  }, [syncStatusReport.lastBlockServer, walletSeed?.birthday, walletSeed]);
 
   const server_1: number = birthday_plus_1 || 0;
   const server_2: number =

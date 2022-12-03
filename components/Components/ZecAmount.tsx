@@ -11,7 +11,7 @@ type ZecAmountProps = {
   size?: number;
   amtZec?: number;
   style?: any;
-  currencyName?: string;
+  currencyName: string;
 };
 
 const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({ color, style, size, currencyName, amtZec }) => {

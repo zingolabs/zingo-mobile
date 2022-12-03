@@ -1,16 +1,14 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useContext } from 'react';
 import { View, ScrollView, Modal, Image, Alert, Keyboard, TextInput } from 'react-native';
 import { faQrcode, faCheck, faInfo } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme } from '@react-navigation/native';
-import { NavigationScreenProp } from 'react-navigation';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import Toast from 'react-native-simple-toast';
 import { getNumberFormatSettings } from 'react-native-localize';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
 import Animated, { EasingNode } from 'react-native-reanimated';
-import { TranslateOptions } from 'i18n-js';
 
 import FadeText from '../Components/FadeText';
 import ErrorText from '../Components/ErrorText';
@@ -18,47 +16,33 @@ import RegText from '../Components/RegText';
 import ZecAmount from '../Components/ZecAmount';
 import UsdAmount from '../Components/UsdAmount';
 import Button from '../Button';
-import { InfoType, SendPageState, SendProgress, ToAddr, TotalBalance, SyncStatus } from '../../app/AppState';
+import { SendPageState, SendProgress, ToAddr } from '../../app/AppState';
 import { parseZcashURI, ZcashURITarget } from '../../app/uris';
 import RPCModule from '../RPCModule';
 import Utils from '../../app/utils';
 import Scanner from './components/Scanner';
 import Confirm from './components/Confirm';
 import { ThemeType } from '../../app/types';
+import { ContextLoaded } from '../../app/context';
 
-type SendProps = {
-  info: InfoType | null;
-  totalBalance: TotalBalance;
-  sendPageState: SendPageState;
-  setSendPageState: (sendPageState: SendPageState) => void;
-  sendTransaction: (setSendProgress: (arg0: SendProgress | null) => void) => void;
-  clearToAddr: () => void;
-  navigation: NavigationScreenProp<any>;
-  toggleMenuDrawer: () => void;
-  setComputingModalVisible: (visible: boolean) => void;
-  setTxBuildProgress: (progress: SendProgress) => void;
-  syncingStatus: SyncStatus | null;
-  syncingStatusMoreInfoOnClick: () => void;
-  translate: (key: string, config?: TranslateOptions) => any;
-  poolsMoreInfoOnClick: () => void;
-};
-
-const Send: React.FunctionComponent<SendProps> = ({
-  info,
-  totalBalance,
-  sendPageState,
-  setSendPageState,
-  sendTransaction,
-  clearToAddr,
-  navigation,
-  toggleMenuDrawer,
-  setComputingModalVisible,
-  setTxBuildProgress,
-  syncingStatus,
-  syncingStatusMoreInfoOnClick,
-  translate,
-  poolsMoreInfoOnClick,
-}) => {
+const Send: React.FunctionComponent = () => {
+  const context = useContext(ContextLoaded);
+  const {
+    translate,
+    toggleMenuDrawer,
+    info,
+    totalBalance,
+    sendPageState,
+    setSendPageState,
+    sendTransaction,
+    clearToAddr,
+    setComputingModalVisible,
+    setTxBuildProgress,
+    syncingStatus,
+    navigation,
+    syncingStatusMoreInfoOnClick,
+    poolsMoreInfoOnClick,
+  } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [qrcodeModalVisble, setQrcodeModalVisible] = useState(false);
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
@@ -256,7 +240,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     }
 
     if (amount !== null) {
-      toAddr.amount = amount.replace(decimalSeparator, '.');
+      toAddr.amount = amount.replace(decimalSeparator, '.').substring(0, 10);
       if (isNaN(Number(toAddr.amount))) {
         toAddr.amountUSD = '';
       } else if (toAddr.amount && info?.zecPrice) {
@@ -268,7 +252,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     }
 
     if (amountUSD !== null) {
-      toAddr.amountUSD = amountUSD.replace(decimalSeparator, '.');
+      toAddr.amountUSD = amountUSD.replace(decimalSeparator, '.').substring(0, 4);
       if (isNaN(Number(toAddr.amountUSD))) {
         toAddr.amount = '';
       } else if (toAddr.amountUSD && info?.zecPrice) {
@@ -309,10 +293,12 @@ const Send: React.FunctionComponent<SendProps> = ({
         // Clear the fields
         clearToAddr();
 
-        navigation.navigate(translate('loadedapp.wallet-menu'));
-        setTimeout(() => {
-          Toast.show(`${translate('send.Broadcast')} ${txid}`, Toast.LONG);
-        }, 1000);
+        if (navigation) {
+          navigation.navigate(translate('loadedapp.wallet-menu'));
+          setTimeout(() => {
+            Toast.show(`${translate('send.Broadcast')} ${txid}`, Toast.LONG);
+          }, 1000);
+        }
       } catch (err) {
         setTimeout(() => {
           //console.log('sendtx error', err);
@@ -339,6 +325,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         display: 'flex',
         justifyContent: 'flex-start',
         width: '100%',
+        marginBottom: 200,
       }}>
       <Modal
         animationType="slide"
@@ -354,15 +341,11 @@ const Send: React.FunctionComponent<SendProps> = ({
         visible={confirmModalVisible}
         onRequestClose={() => setConfirmModalVisible(false)}>
         <Confirm
-          sendPageState={sendPageState}
           defaultFee={defaultFee}
-          price={info?.zecPrice}
           closeModal={() => {
             setConfirmModalVisible(false);
           }}
           confirmSend={confirmSend}
-          currencyName={currencyName}
-          translate={translate}
         />
       </Modal>
 
@@ -393,7 +376,11 @@ const Send: React.FunctionComponent<SendProps> = ({
               style={{ width: 80, height: 80, resizeMode: 'contain' }}
             />
             <View style={{ flexDirection: 'row' }}>
-              <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} />
+              <ZecAmount
+                currencyName={info?.currencyName ? info.currencyName : ''}
+                size={36}
+                amtZec={totalBalance.total}
+              />
               {totalBalance.total > 0 && (totalBalance.privateBal > 0 || totalBalance.transparentBal > 0) && (
                 <TouchableOpacity onPress={() => poolsMoreInfoOnClick()}>
                   <View
@@ -479,9 +466,6 @@ const Send: React.FunctionComponent<SendProps> = ({
       <ScrollView
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'flex-start',
         }}>
         {[sendPageState.toaddr].map((ta, i) => {
           return (
@@ -493,46 +477,47 @@ const Send: React.FunctionComponent<SendProps> = ({
               </View>
               <View
                 style={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  justifyContent: 'flex-start',
-                  alignItems: 'center',
+                  flex: 1,
                   borderWidth: 1,
                   borderRadius: 5,
                   borderColor: colors.text,
                   marginTop: 5,
                 }}>
-                <View
-                  accessible={true}
-                  accessibilityLabel={translate('send.address-acc')}
-                  style={{
-                    flexGrow: 1,
-                    maxWidth: '90%',
-                    minWidth: 48,
-                    minHeight: 48,
-                  }}>
-                  <TextInput
-                    placeholder={translate('send.addressplaceholder')}
-                    placeholderTextColor={colors.placeholder}
+                <View style={{ flexDirection: 'row' }}>
+                  <View
+                    accessible={true}
+                    accessibilityLabel={translate('send.address-acc')}
                     style={{
-                      color: colors.text,
-                      fontWeight: '600',
-                      minWidth: 48,
-                      minHeight: 48,
-                    }}
-                    value={ta.to}
-                    onChangeText={(text: string) => updateToField(text, null, null, null)}
-                    editable={true}
-                  />
+                      flex: 1,
+                      justifyContent: 'center',
+                    }}>
+                    <TextInput
+                      placeholder={translate('send.addressplaceholder')}
+                      placeholderTextColor={colors.placeholder}
+                      style={{
+                        color: colors.text,
+                        fontWeight: '600',
+                        fontSize: 16,
+                        marginLeft: 5,
+                      }}
+                      value={ta.to}
+                      onChangeText={(text: string) => updateToField(text, null, null, null)}
+                      editable={true}
+                    />
+                  </View>
+                  <View style={{
+                      width: 58,
+                    }}>
+                    <TouchableOpacity
+                      accessible={true}
+                      accessibilityLabel={translate('send.scan-acc')}
+                      onPress={() => {
+                        setQrcodeModalVisible(true);
+                      }}>
+                      <FontAwesomeIcon style={{ margin: 5 }} size={48} icon={faQrcode} color={colors.border} />
+                    </TouchableOpacity>
+                  </View>
                 </View>
-                <TouchableOpacity
-                  accessible={true}
-                  accessibilityLabel={translate('send.scan-acc')}
-                  onPress={() => {
-                    setQrcodeModalVisible(true);
-                  }}>
-                  <FontAwesomeIcon style={{ margin: 5 }} size={48} icon={faQrcode} color={colors.border} />
-                </TouchableOpacity>
               </View>
 
               <View style={{ marginTop: 10, display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -558,10 +543,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                     accessible={true}
                     accessibilityLabel={translate('send.zec-acc')}
                     style={{
-                      display: 'flex',
-                      flexDirection: 'row',
-                      justifyContent: 'flex-start',
-                      alignItems: 'center',
+                      flexGrow: 1,
                       borderWidth: 1,
                       borderRadius: 5,
                       borderColor: colors.text,
@@ -571,7 +553,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       minHeight: 48,
                     }}>
                     <TextInput
-                      placeholder={`0${decimalSeparator}0`}
+                      placeholder={`#${decimalSeparator}########`}
                       placeholderTextColor={colors.placeholder}
                       keyboardType="numeric"
                       style={{
@@ -580,10 +562,12 @@ const Send: React.FunctionComponent<SendProps> = ({
                         fontSize: 18,
                         minWidth: 48,
                         minHeight: 48,
+                        marginLeft: 5,
                       }}
                       value={ta.amount.toString()}
-                      onChangeText={(text: string) => updateToField(null, text, null, null)}
+                      onChangeText={(text: string) => updateToField(null, text.substring(0, 10), null, null)}
                       editable={true}
+                      maxLength={10}
                     />
                   </View>
                   <RegText style={{ marginTop: 15, marginRight: 10, marginLeft: 5 }}>ZEC</RegText>
@@ -601,10 +585,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                     accessible={true}
                     accessibilityLabel={translate('send.usd-acc')}
                     style={{
-                      display: 'flex',
-                      flexDirection: 'row',
-                      justifyContent: 'flex-start',
-                      alignItems: 'center',
+                      flexGrow: 1,
                       borderWidth: 1,
                       borderRadius: 5,
                       borderColor: colors.text,
@@ -614,7 +595,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       minHeight: 48,
                     }}>
                     <TextInput
-                      placeholder={`0${decimalSeparator}0`}
+                      placeholder={`#${decimalSeparator}##`}
                       placeholderTextColor={colors.placeholder}
                       keyboardType="numeric"
                       style={{
@@ -623,10 +604,12 @@ const Send: React.FunctionComponent<SendProps> = ({
                         fontSize: 18,
                         minWidth: 48,
                         minHeight: 48,
+                        marginLeft: 5,
                       }}
                       value={ta.amountUSD.toString()}
-                      onChangeText={(text: string) => updateToField(null, null, text, null)}
+                      onChangeText={(text: string) => updateToField(null, null, text.substring(0, 4), null)}
                       editable={true}
+                      maxLength={4}
                     />
                   </View>
                   <RegText style={{ marginTop: 15, marginLeft: 5 }}>USD</RegText>
@@ -643,7 +626,12 @@ const Send: React.FunctionComponent<SendProps> = ({
                     marginTop: 10,
                   }}>
                   <RegText>{translate('send.spendable')}</RegText>
-                  <ZecAmount currencyName={currencyName} color={colors.money} size={18} amtZec={getMaxAmount()} />
+                  <ZecAmount
+                    currencyName={info?.currencyName ? info.currencyName : ''}
+                    color={colors.money}
+                    size={18}
+                    amtZec={getMaxAmount()}
+                  />
                 </View>
                 {stillConfirming && (
                   <View
@@ -663,7 +651,7 @@ const Send: React.FunctionComponent<SendProps> = ({
 
               {memoEnabled === true && (
                 <>
-                  <FadeText style={{ marginTop: 30 }}>{translate('send.memo')}</FadeText>
+                  <FadeText style={{ marginTop: 10 }}>{translate('send.memo')}</FadeText>
                   <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start' }}>
                     <View
                       accessible={true}
@@ -675,18 +663,22 @@ const Send: React.FunctionComponent<SendProps> = ({
                         borderColor: colors.text,
                         minWidth: 48,
                         minHeight: 48,
+                        maxHeight: 150,
                       }}>
                       <TextInput
                         multiline
                         style={{
                           color: colors.text,
                           fontWeight: '600',
+                          fontSize: 18,
                           minWidth: 48,
                           minHeight: 48,
+                          marginLeft: 5,
                         }}
                         value={ta.memo}
                         onChangeText={(text: string) => updateToField(null, null, null, text)}
                         editable={true}
+
                       />
                     </View>
                   </View>
@@ -695,31 +687,31 @@ const Send: React.FunctionComponent<SendProps> = ({
             </View>
           );
         })}
+         <View
+          style={{
+            flexGrow: 1,
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginVertical: 5,
+          }}>
+          <Button
+            accessible={true}
+            accessibilityLabel={'title ' + translate('send.button')}
+            type="Primary"
+            title={translate('send.button')}
+            disabled={!sendButtonEnabled}
+            onPress={() => setConfirmModalVisible(true)}
+          />
+          <Button
+            type="Secondary"
+            style={{ marginLeft: 10 }}
+            title={translate('send.clear')}
+            onPress={() => clearToAddr()}
+          />
+        </View>
       </ScrollView>
 
-      <View
-        style={{
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'center',
-          marginVertical: 5,
-        }}>
-        <Button
-          accessible={true}
-          accessibilityLabel={'title ' + translate('send.button')}
-          type="Primary"
-          title={translate('send.button')}
-          disabled={!sendButtonEnabled}
-          onPress={() => setConfirmModalVisible(true)}
-        />
-        <Button
-          type="Secondary"
-          style={{ marginLeft: 10 }}
-          title={translate('send.clear')}
-          onPress={() => clearToAddr()}
-        />
-      </View>
     </View>
   );
 };

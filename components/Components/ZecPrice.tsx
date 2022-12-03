@@ -3,8 +3,8 @@ import FadeText from './FadeText';
 import Utils from '../../app/utils';
 
 type ZecPriceProps = {
-  price?: number | null;
-  currencyName?: string;
+  price: number;
+  currencyName: string;
 };
 
 const ZecPrice: React.FunctionComponent<ZecPriceProps> = ({ price, currencyName }) => {

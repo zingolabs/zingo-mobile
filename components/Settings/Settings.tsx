@@ -1,11 +1,10 @@
 /* eslint-disable react-native/no-inline-styles */
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, ScrollView, SafeAreaView, Image, TouchableOpacity, TextInput } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faDotCircle } from '@fortawesome/free-solid-svg-icons';
 import { faCircle as farCircle } from '@fortawesome/free-regular-svg-icons';
-import { TranslateOptions } from 'i18n-js';
 import Toast from 'react-native-simple-toast';
 
 import RegText from '../Components/RegText';
@@ -14,17 +13,13 @@ import BoldText from '../Components/BoldText';
 import ZecAmount from '../Components/ZecAmount';
 import { parseServerURI, serverUris } from '../../app/uris';
 import Button from '../Button';
-import { WalletSettings, TotalBalance } from '../../app/AppState';
 import { ThemeType } from '../../app/types';
+import { ContextLoaded } from '../../app/context';
 
 type SettingsProps = {
   closeModal: () => void;
-  wallet_settings: WalletSettings;
   set_wallet_option: (name: string, value: string) => void;
   set_server_option: (server: string) => void;
-  totalBalance: TotalBalance;
-  currencyName?: string;
-  translate: (key: string, config?: TranslateOptions) => any;
 };
 
 type Memos = {
@@ -32,15 +27,9 @@ type Memos = {
   text: string;
 };
 
-const Settings: React.FunctionComponent<SettingsProps> = ({
-  wallet_settings,
-  set_wallet_option,
-  set_server_option,
-  closeModal,
-  totalBalance,
-  currencyName,
-  translate,
-}) => {
+const Settings: React.FunctionComponent<SettingsProps> = ({ set_wallet_option, set_server_option, closeModal }) => {
+  const context = useContext(ContextLoaded);
+  const { wallet_settings, totalBalance, info, translate } = context;
   const MEMOS: Memos[] = translate('settings.memos');
   const { colors } = useTheme() as unknown as ThemeType;
 
@@ -117,7 +106,12 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           source={require('../../assets/img/logobig-zingo.png')}
           style={{ width: 80, height: 80, resizeMode: 'contain' }}
         />
-        <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{ opacity: 0.5 }} />
+        <ZecAmount
+          currencyName={info?.currencyName ? info.currencyName : ''}
+          size={36}
+          amtZec={totalBalance.total}
+          style={{ opacity: 0.5 }}
+        />
         <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
           {translate('settings.title')}
         </RegText>
@@ -165,14 +159,13 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 accessible={true}
                 accessibilityLabel={translate('settings.server-acc')}
                 style={{
-                  width: '60%',
                   borderColor: colors.border,
                   borderWidth: 1,
                   marginLeft: 5,
-                  padding: 5,
-                  paddingTop: 10,
-                  paddingBottom: 10,
-                  minWidth: '60%',
+                  width: 'auto',
+                  maxWidth: '80%',
+                  maxHeight: 48,
+                  minWidth: '50%',
                   minHeight: 48,
                 }}>
                 <TextInput
@@ -182,12 +175,14 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                     color: colors.text,
                     fontWeight: '600',
                     fontSize: 18,
-                    minWidth: '60%',
+                    minWidth: '50%',
                     minHeight: 48,
+                    marginLeft: 5,
                   }}
                   value={server}
                   onChangeText={(text: string) => setServer(text)}
                   editable={true}
+                  maxLength={100}
                 />
               </View>
             )}
@@ -203,14 +198,13 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             accessible={true}
             accessibilityLabel={translate('settings.threshold-acc')}
             style={{
-              width: '60%',
               borderColor: colors.border,
               borderWidth: 1,
               marginLeft: 5,
-              padding: 5,
-              paddingTop: 10,
-              paddingBottom: 10,
-              minWidth: '60%',
+              width: 'auto',
+              maxWidth: '60%',
+              maxHeight: 48,
+              minWidth: '30%',
               minHeight: 48,
             }}>
             <TextInput
@@ -221,12 +215,14 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 color: colors.text,
                 fontWeight: '600',
                 fontSize: 18,
-                minWidth: '60%',
+                minWidth: '30%',
                 minHeight: 48,
+                marginLeft: 5,
               }}
               value={filter}
               onChangeText={(text: string) => setFilter(text)}
               editable={true}
+              maxLength={6}
             />
           </View>
         </View>

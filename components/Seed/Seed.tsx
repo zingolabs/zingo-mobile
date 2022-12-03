@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Image, SafeAreaView, ScrollView, TouchableOpacity, Text, TextInput } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import Toast from 'react-native-simple-toast';
@@ -9,9 +9,10 @@ import { TranslateOptions } from 'i18n-js';
 import RegText from '../Components/RegText';
 import FadeText from '../Components/FadeText';
 import ZecAmount from '../Components/ZecAmount';
-import { TotalBalance } from '../../app/AppState';
 import Button from '../Button';
 import { ThemeType } from '../../app/types';
+import { ContextLoaded, ContextLoading } from '../../app/context';
+import { WalletSeed } from '../../app/AppState';
 
 type TextsType = {
   new: string[];
@@ -23,25 +24,26 @@ type TextsType = {
 };
 
 type SeedProps = {
-  seed?: string;
-  birthday?: number;
   onClickOK: (seedPhrase: string, birthdayNumber: number) => void;
   onClickCancel: () => void;
-  totalBalance: TotalBalance;
   action: 'new' | 'change' | 'view' | 'restore' | 'backup' | 'server';
-  currencyName?: string;
-  translate: (key: string, config?: TranslateOptions) => any;
 };
-const Seed: React.FunctionComponent<SeedProps> = ({
-  seed,
-  birthday,
-  onClickOK,
-  onClickCancel,
-  totalBalance,
-  action,
-  currencyName,
-  translate,
-}) => {
+const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, action }) => {
+  const contextLoaded = useContext(ContextLoaded);
+  const contextLoading = useContext(ContextLoading);
+  let walletSeed: WalletSeed | null, totalBalance, translate: (key: string, config?: TranslateOptions) => any, info;
+  if (action === 'new' || action === 'restore') {
+    walletSeed = contextLoading.walletSeed;
+    totalBalance = contextLoading.totalBalance;
+    translate = contextLoading.translate;
+    info = contextLoading.info;
+  } else {
+    walletSeed = contextLoaded.walletSeed;
+    totalBalance = contextLoaded.totalBalance;
+    translate = contextLoaded.translate;
+    info = contextLoaded.info;
+  }
+
   const { colors } = useTheme() as unknown as ThemeType;
   const [seedPhrase, setSeedPhrase] = useState('');
   const [birthdayNumber, setBirthdayNumber] = useState(0);
@@ -55,11 +57,13 @@ const Seed: React.FunctionComponent<SeedProps> = ({
       action === 'new' || action === 'view' || action === 'change' || action === 'backup' || action === 'server',
     );
     setTimes(action === 'change' || action === 'backup' || action === 'server' ? 1 : 0);
-    setSeedPhrase(seed || '');
-    setBirthdayNumber(birthday || 0);
-  }, [action, seed, birthday, translate]);
+    setSeedPhrase(walletSeed?.seed || '');
+    setBirthdayNumber(walletSeed?.birthday || 0);
+  }, [action, walletSeed?.seed, walletSeed?.birthday, walletSeed, translate]);
 
-  //console.log(seed, birthday, onClickOK, onClickCancel, totalBalance, action, currencyName);
+  console.log('=================================');
+  console.log(walletSeed?.seed, walletSeed?.birthday);
+  console.log(seedPhrase, birthdayNumber);
 
   return (
     <SafeAreaView
@@ -84,7 +88,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
           style={{ width: 80, height: 80, resizeMode: 'contain' }}
         />
         <ZecAmount
-          currencyName={currencyName ? currencyName : ''}
+          currencyName={info?.currencyName ? info.currencyName : ''}
           size={36}
           amtZec={totalBalance.total}
           style={{ opacity: 0.5 }}
@@ -128,14 +132,13 @@ const Seed: React.FunctionComponent<SeedProps> = ({
               accessibilityLabel={translate('seed.seed-acc')}
               style={{
                 margin: 0,
-                padding: 10,
                 borderWidth: 1,
                 borderRadius: 10,
                 borderColor: colors.text,
                 maxWidth: '100%',
                 maxHeight: '70%',
                 minWidth: '95%',
-                minHeight: 48,
+                minHeight: 100,
               }}>
               <TextInput
                 placeholder={translate('seed.seedplaceholder')}
@@ -144,8 +147,10 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                 style={{
                   color: colors.text,
                   fontWeight: '600',
+                  fontSize: 16,
                   minWidth: '95%',
-                  minHeight: 48,
+                  minHeight: 100,
+                  marginLeft: 5,
                 }}
                 value={seedPhrase}
                 onChangeText={(text: string) => setSeedPhrase(text)}
@@ -192,20 +197,23 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                 accessibilityLabel={translate('seed.birthday-acc')}
                 style={{
                   margin: 10,
-                  padding: 10,
                   borderWidth: 1,
                   borderRadius: 10,
                   borderColor: colors.text,
-                  width: '40%',
-                  minWidth: '40%',
+                  width: '30%',
+                  maxWidth: '40%',
+                  maxHeight: 48,
+                  minWidth: '20%',
                   minHeight: 48,
                 }}>
                 <TextInput
                   style={{
                     color: colors.text,
                     fontWeight: '600',
-                    minWidth: '40%',
+                    fontSize: 18,
+                    minWidth: '20%',
                     minHeight: 48,
+                    marginLeft: 5,
                   }}
                   value={birthdayNumber.toString()}
                   onChangeText={(text: string) => setBirthdayNumber(Number(text))}
@@ -223,7 +231,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
           {times === 3 && action === 'server' && translate('seed.server-warning')}
         </FadeText>
 
-        {currencyName !== 'ZEC' && times === 3 && (action === 'change' || action === 'server') && (
+        {info?.currencyName !== 'ZEC' && times === 3 && (action === 'change' || action === 'server') && (
           <FadeText style={{ color: colors.primary, textAlign: 'center', width: '100%' }}>
             {translate('seed.mainnet-warning')}
           </FadeText>

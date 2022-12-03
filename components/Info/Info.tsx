@@ -1,27 +1,25 @@
 /* eslint-disable react-native/no-inline-styles */
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, ScrollView, SafeAreaView, Image } from 'react-native';
 import { useTheme } from '@react-navigation/native';
-import { TranslateOptions } from 'i18n-js';
 
 import RegText from '../Components/RegText';
 import ZecAmount from '../Components/ZecAmount';
 import Button from '../Button';
-import { InfoType, TotalBalance } from '../../app/AppState';
+import { InfoType } from '../../app/AppState';
 import Utils from '../../app/utils';
 import RPC from '../../app/rpc';
 import DetailLine from './components/DetailLine';
 import { ThemeType } from '../../app/types';
+import { ContextLoaded } from '../../app/context';
 
 type InfoProps = {
-  info: InfoType | null;
   closeModal: () => void;
-  totalBalance: TotalBalance;
-  currencyName?: string;
-  translate: (key: string, config?: TranslateOptions) => any;
 };
 
-const Info: React.FunctionComponent<InfoProps> = ({ info, closeModal, totalBalance, currencyName, translate }) => {
+const Info: React.FunctionComponent<InfoProps> = ({ closeModal }) => {
+  const context = useContext(ContextLoaded);
+  const { info, totalBalance, translate } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [infoState, setInfoState] = React.useState({} as InfoType);
 
@@ -59,7 +57,12 @@ const Info: React.FunctionComponent<InfoProps> = ({ info, closeModal, totalBalan
           source={require('../../assets/img/logobig-zingo.png')}
           style={{ width: 80, height: 80, resizeMode: 'contain' }}
         />
-        <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{ opacity: 0.5 }} />
+        <ZecAmount
+          currencyName={info?.currencyName ? info.currencyName : ''}
+          size={36}
+          amtZec={totalBalance.total}
+          style={{ opacity: 0.5 }}
+        />
         <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
           {translate('info.title')}
         </RegText>

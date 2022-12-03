@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useState } from 'react';
-import { View, Dimensions, Image, Modal } from 'react-native';
+import React, { useState, useContext } from 'react';
+import { View, Image, Modal } from 'react-native';
 import { TabView, TabBar } from 'react-native-tab-view';
 import Toast from 'react-native-simple-toast';
 import { useTheme } from '@react-navigation/native';
@@ -8,40 +8,22 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faBars, faEllipsisV } from '@fortawesome/free-solid-svg-icons';
 import OptionsMenu from 'react-native-option-menu';
-import { TranslateOptions } from 'i18n-js';
 
 import ZecAmount from '../Components/ZecAmount';
 import UsdAmount from '../Components/UsdAmount';
 import RegText from '../Components/RegText';
-import { InfoType, Address, TotalBalance } from '../../app/AppState';
 import Utils from '../../app/utils';
 import RPC from '../../app/rpc';
 import PrivKey from '../PrivKey';
 import ImportKey from '../ImportKey';
 import SingleAddress from './components/SingleAddress';
 import { ThemeType } from '../../app/types';
+import { ContextLoaded } from '../../app/context';
 
-type LegacyProps = {
-  info: InfoType | null;
-  addresses: Address[];
-  toggleMenuDrawer: () => void;
-  fetchTotalBalance: () => Promise<void>;
-  startRescan: () => void;
-  totalBalance: TotalBalance;
-  translate: (key: string, config?: TranslateOptions) => any;
-  uaAddress: string | null;
-};
-
-const Legacy: React.FunctionComponent<LegacyProps> = ({
-  info,
-  addresses,
-  toggleMenuDrawer,
-  fetchTotalBalance,
-  startRescan,
-  totalBalance,
-  translate,
-  uaAddress,
-}) => {
+const Legacy: React.FunctionComponent = () => {
+  const context = useContext(ContextLoaded);
+  const { translate, toggleMenuDrawer, fetchTotalBalance, info, addresses, startRescan, totalBalance, uaAddress } =
+    context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([
@@ -54,7 +36,6 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({
   const [tindex, setTIndex] = useState(0);
 
   const zecPrice = info ? info.zecPrice : null;
-  const currencyName = info ? info.currencyName : undefined;
 
   const zaddrs = addresses.filter(a => a.uaAddress === uaAddress && a.addressKind === 'z') || [];
   const taddrs = addresses.filter(a => a.uaAddress === uaAddress && a.addressKind === 't') || [];
@@ -321,9 +302,6 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({
             keyType={keyType}
             privKey={privKey}
             closeModal={() => setPrivKeyModalVisible(false)}
-            totalBalance={totalBalance}
-            currencyName={currencyName}
-            translate={translate}
           />
         </Modal>
 
@@ -332,13 +310,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({
           transparent={false}
           visible={importKeyModalVisible}
           onRequestClose={() => setImportKeyModalVisible(false)}>
-          <ImportKey
-            doImport={doImport}
-            closeModal={() => setImportKeyModalVisible(false)}
-            totalBalance={totalBalance}
-            currencyName={currencyName}
-            translate={translate}
-          />
+          <ImportKey doImport={doImport} closeModal={() => setImportKeyModalVisible(false)} />
         </Modal>
 
         <View
@@ -364,7 +336,12 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({
               source={require('../../assets/img/logobig-zingo.png')}
               style={{ width: 80, height: 80, resizeMode: 'contain' }}
             />
-            <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{ opacity: 0.5 }} />
+            <ZecAmount
+              currencyName={info?.currencyName ? info.currencyName : ''}
+              size={36}
+              amtZec={totalBalance.total}
+              style={{ opacity: 0.5 }}
+            />
             <UsdAmount
               style={{ marginTop: 0, marginBottom: 5, opacity: 0.5 }}
               price={zecPrice}
@@ -424,7 +401,6 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({
       renderScene={renderScene}
       renderTabBar={renderTabBar}
       onIndexChange={setIndex}
-      initialLayout={{ width: Dimensions.get('window').width }}
     />
   );
 };

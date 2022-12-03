@@ -8,11 +8,12 @@ import { TranslateOptions } from 'i18n-js';
 import BoldText from '../../components/Components/BoldText';
 import Button from '../../components/Button';
 import RPCModule from '../../components/RPCModule';
-import { TotalBalance, SettingsFileEntry, InfoType } from '../AppState';
+import { TotalBalance, SettingsFileEntry, AppStateLoading } from '../AppState';
 import { serverUris } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import RPC from '../rpc';
 import { ThemeType } from '../types';
+import { ContextLoadingProvider } from '../context';
 
 const Seed = React.lazy(() => import('../../components/Seed'));
 
@@ -39,33 +40,26 @@ type LoadingAppClassProps = {
   theme: ThemeType;
 };
 
-type LoadingAppClassState = {
-  screen: number;
-  actionButtonsDisabled: boolean;
-  walletExists: boolean;
-  seedPhrase: string | null;
-  birthday: string;
-  server: string;
-  totalBalance: TotalBalance;
-  info: InfoType | null;
-};
-
 const SERVER_DEFAULT_0 = serverUris()[0];
 const SERVER_DEFAULT_1 = serverUris()[1];
 
-class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassState> {
+class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
   constructor(props: Readonly<LoadingAppClassProps>) {
     super(props);
 
     this.state = {
+      navigation: props.navigation,
+      route: props.route,
+
       screen: 0,
       actionButtonsDisabled: false,
       walletExists: false,
-      seedPhrase: null,
-      birthday: '0',
+      walletSeed: null,
+      birthday: null,
       server: '',
       totalBalance: new TotalBalance(),
       info: null,
+      translate: props.translate,
     };
   }
 
@@ -100,7 +94,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
           this.navigateToLoaded();
         } else {
           this.setState({ screen: 1 });
-          Alert.alert(this.props.translate('loadingapp.readingwallet-label'), error);
+          Alert.alert(this.state.translate('loadingapp.readingwallet-label'), error);
         }
       } else {
         //console.log('Loading new wallet');
@@ -135,39 +129,39 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
       const seed = await RPCModule.createNewWallet(this.state.server);
 
       if (!seed.startsWith('Error')) {
-        this.setState({ seedPhrase: seed, screen: 2, actionButtonsDisabled: false, walletExists: true });
+        this.setState({ walletSeed: JSON.parse(seed), screen: 2, actionButtonsDisabled: false, walletExists: true });
         // default values for wallet options
         this.set_wallet_option('download_memos', 'wallet');
         //await this.set_wallet_option('transaction_filter_threshold', '500');
       } else {
         this.setState({ walletExists: false, actionButtonsDisabled: false });
-        Alert.alert(this.props.translate('loadingapp.creatingwallet-label'), seed);
+        Alert.alert(this.state.translate('loadingapp.creatingwallet-label'), seed);
       }
     });
   };
 
-  getSeedPhraseToRestore = async () => {
-    this.setState({ seedPhrase: '', birthday: '0', screen: 3, walletExists: false });
+  getwalletSeedToRestore = async () => {
+    this.setState({ walletSeed: null, birthday: null, screen: 3, walletExists: false });
   };
 
   getViewingKeyToRestore = async () => {
     //this.setState({ viewingKey: '', birthday: '0', screen: 3 });
-    Toast.show(this.props.translate('workingonit'), Toast.LONG);
+    Toast.show(this.state.translate('workingonit'), Toast.LONG);
   };
 
   getSpendableKeyToRestore = async () => {
     //this.setState({ spendableKey: '', birthday: '0', screen: 3 });
-    Toast.show(this.props.translate('workingonit'), Toast.LONG);
+    Toast.show(this.state.translate('workingonit'), Toast.LONG);
   };
 
-  doRestore = async (seedPhrase: string, birthday: number) => {
+  doRestore = async (seed: string, birthday: number) => {
     // Don't call with null values
     const { server } = this.state;
 
-    if (!seedPhrase) {
+    if (!seed) {
       Alert.alert(
-        this.props.translate('loadingapp.invalidseed-label'),
-        this.props.translate('loadingapp.invalidseed-error'),
+        this.state.translate('loadingapp.invalidseed-label'),
+        this.state.translate('loadingapp.invalidseed-error'),
       );
       return;
     }
@@ -182,13 +176,13 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
         walletBirthday = '0';
       }
 
-      const error = await RPCModule.restoreWallet(seedPhrase.toLowerCase(), walletBirthday || '0', server);
+      const error = await RPCModule.restoreWallet(seed.toLowerCase(), walletBirthday || '0', server);
       if (!error.startsWith('Error')) {
         this.setState({ actionButtonsDisabled: false });
         this.navigateToLoaded();
       } else {
         this.setState({ actionButtonsDisabled: false });
-        Alert.alert(this.props.translate('loadingapp.readingwallet-label'), error);
+        Alert.alert(this.state.translate('loadingapp.readingwallet-label'), error);
       }
     });
   };
@@ -198,171 +192,163 @@ class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppClassSta
   };
 
   render() {
-    const { screen, seedPhrase, actionButtonsDisabled, walletExists, server, totalBalance, info } = this.state;
+    const { screen, walletSeed, actionButtonsDisabled, walletExists, server } = this.state;
     const { colors } = this.props.theme;
     const { translate } = this.props;
 
-    const currencyName = info ? info.currencyName : undefined;
-
     return (
-      <SafeAreaView
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100%',
-          backgroundColor: colors.background,
-        }}>
-        {screen === 0 && (
-          <Text style={{ color: colors.zingo, fontSize: 40, fontWeight: 'bold' }}>{translate('zingo')}</Text>
-        )}
-        {screen === 1 && (
-          <ScrollView
-            style={{ maxHeight: '100%' }}
-            contentContainerStyle={{
-              flexDirection: 'column',
-              alignItems: 'stretch',
-              justifyContent: 'flex-start',
-              padding: 20,
-            }}>
-            <View
-              style={{
-                flex: 1,
+      <ContextLoadingProvider value={this.state}>
+        <SafeAreaView
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '100%',
+            backgroundColor: colors.background,
+          }}>
+          {screen === 0 && (
+            <Text style={{ color: colors.zingo, fontSize: 40, fontWeight: 'bold' }}>{translate('zingo')}</Text>
+          )}
+          {screen === 1 && (
+            <ScrollView
+              style={{ maxHeight: '100%' }}
+              contentContainerStyle={{
                 flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
+                alignItems: 'stretch',
+                justifyContent: 'flex-start',
+                padding: 20,
               }}>
-              <View style={{ marginBottom: 50, display: 'flex', alignItems: 'center' }}>
-                <Text style={{ color: colors.zingo, fontSize: 40, fontWeight: 'bold' }}>{translate('zingo')}</Text>
-                <Image
-                  source={require('../../assets/img/logobig-zingo.png')}
-                  style={{ width: 100, height: 100, resizeMode: 'contain', marginTop: 10 }}
-                />
-              </View>
-
-              <BoldText style={{ fontSize: 15, marginBottom: 3 }}>{translate('loadingapp.actualserver')}</BoldText>
-              <BoldText style={{ fontSize: 15, marginBottom: 10 }}>{server})</BoldText>
-
-              {server === SERVER_DEFAULT_1 && (
-                <Button
-                  type="Primary"
-                  title={translate('loadingapp.changeserver')}
-                  disabled={actionButtonsDisabled}
-                  onPress={this.useDefaultServer_0}
-                  style={{ marginBottom: 10 }}
-                />
-              )}
-              {server === SERVER_DEFAULT_0 && (
-                <Button
-                  type="Primary"
-                  title={translate('loadingapp.changeserver')}
-                  disabled={actionButtonsDisabled}
-                  onPress={this.useDefaultServer_1}
-                  style={{ marginBottom: 10 }}
-                />
-              )}
-              {server !== SERVER_DEFAULT_0 && server !== SERVER_DEFAULT_1 && (
-                <Button
-                  type="Primary"
-                  title={translate('loadingapp.changeserver')}
-                  disabled={actionButtonsDisabled}
-                  onPress={this.useDefaultServer_0}
-                  style={{ marginBottom: 10 }}
-                />
-              )}
-
-              <Button
-                type="Primary"
-                title={translate('loadingapp.createnewwallet')}
-                disabled={actionButtonsDisabled}
-                onPress={this.createNewWallet}
-                style={{ marginBottom: 10, marginTop: 10 }}
-              />
-              {walletExists && (
-                <Button
-                  type="Primary"
-                  title={translate('loadingapp.opencurrentwallet')}
-                  disabled={actionButtonsDisabled}
-                  onPress={this.componentDidMount}
-                  style={{ marginBottom: 10 }}
-                />
-              )}
-
-              <View style={{ marginTop: 50, display: 'flex', alignItems: 'center' }}>
-                <Button
-                  type="Secondary"
-                  title={translate('loadingapp.restorewalletseed')}
-                  disabled={actionButtonsDisabled}
-                  onPress={this.getSeedPhraseToRestore}
-                  style={{ margin: 10 }}
-                />
-                <Button
-                  type="Secondary"
-                  title={translate('loadingapp.restorewalletviewing')}
-                  disabled={actionButtonsDisabled}
-                  onPress={this.getViewingKeyToRestore}
-                  style={{ margin: 10 }}
-                />
-                <Button
-                  type="Secondary"
-                  title={translate('loadingapp.restorewalletspendable')}
-                  disabled={actionButtonsDisabled}
-                  onPress={this.getSpendableKeyToRestore}
-                  style={{ margin: 10 }}
-                />
-              </View>
-            </View>
-          </ScrollView>
-        )}
-        {screen === 2 && seedPhrase && (
-          <Modal
-            animationType="slide"
-            transparent={false}
-            visible={screen === 2}
-            onRequestClose={() => this.navigateToLoaded()}>
-            <Suspense
-              fallback={
-                <View>
-                  <Text>{translate('loading')}</Text>
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                <View style={{ marginBottom: 50, display: 'flex', alignItems: 'center' }}>
+                  <Text style={{ color: colors.zingo, fontSize: 40, fontWeight: 'bold' }}>{translate('zingo')}</Text>
+                  <Image
+                    source={require('../../assets/img/logobig-zingo.png')}
+                    style={{ width: 100, height: 100, resizeMode: 'contain', marginTop: 10 }}
+                  />
                 </View>
-              }>
-              <Seed
-                seed={JSON.parse(seedPhrase)?.seed}
-                birthday={JSON.parse(seedPhrase)?.birthday}
-                onClickOK={() => this.navigateToLoaded()}
-                onClickCancel={() => this.navigateToLoaded()}
-                totalBalance={totalBalance}
-                action={'new'}
-                currencyName={currencyName || undefined}
-                translate={translate}
-              />
-            </Suspense>
-          </Modal>
-        )}
-        {screen === 3 && (
-          <Modal
-            animationType="slide"
-            transparent={false}
-            visible={screen === 3}
-            onRequestClose={() => this.setState({ screen: 1 })}>
-            <Suspense
-              fallback={
-                <View>
-                  <Text>{translate('loading')}</Text>
+
+                <BoldText style={{ fontSize: 15, marginBottom: 3 }}>{translate('loadingapp.actualserver')}</BoldText>
+                <BoldText style={{ fontSize: 15, marginBottom: 10 }}>{server})</BoldText>
+
+                {server === SERVER_DEFAULT_1 && (
+                  <Button
+                    type="Primary"
+                    title={translate('loadingapp.changeserver')}
+                    disabled={actionButtonsDisabled}
+                    onPress={this.useDefaultServer_0}
+                    style={{ marginBottom: 10 }}
+                  />
+                )}
+                {server === SERVER_DEFAULT_0 && (
+                  <Button
+                    type="Primary"
+                    title={translate('loadingapp.changeserver')}
+                    disabled={actionButtonsDisabled}
+                    onPress={this.useDefaultServer_1}
+                    style={{ marginBottom: 10 }}
+                  />
+                )}
+                {server !== SERVER_DEFAULT_0 && server !== SERVER_DEFAULT_1 && (
+                  <Button
+                    type="Primary"
+                    title={translate('loadingapp.changeserver')}
+                    disabled={actionButtonsDisabled}
+                    onPress={this.useDefaultServer_0}
+                    style={{ marginBottom: 10 }}
+                  />
+                )}
+
+                <Button
+                  type="Primary"
+                  title={translate('loadingapp.createnewwallet')}
+                  disabled={actionButtonsDisabled}
+                  onPress={this.createNewWallet}
+                  style={{ marginBottom: 10, marginTop: 10 }}
+                />
+                {walletExists && (
+                  <Button
+                    type="Primary"
+                    title={translate('loadingapp.opencurrentwallet')}
+                    disabled={actionButtonsDisabled}
+                    onPress={this.componentDidMount}
+                    style={{ marginBottom: 10 }}
+                  />
+                )}
+
+                <View style={{ marginTop: 50, display: 'flex', alignItems: 'center' }}>
+                  <Button
+                    type="Secondary"
+                    title={translate('loadingapp.restorewalletseed')}
+                    disabled={actionButtonsDisabled}
+                    onPress={this.getwalletSeedToRestore}
+                    style={{ margin: 10 }}
+                  />
+                  <Button
+                    type="Secondary"
+                    title={translate('loadingapp.restorewalletviewing')}
+                    disabled={actionButtonsDisabled}
+                    onPress={this.getViewingKeyToRestore}
+                    style={{ margin: 10 }}
+                  />
+                  <Button
+                    type="Secondary"
+                    title={translate('loadingapp.restorewalletspendable')}
+                    disabled={actionButtonsDisabled}
+                    onPress={this.getSpendableKeyToRestore}
+                    style={{ margin: 10 }}
+                  />
                 </View>
-              }>
-              <Seed
-                onClickOK={(s: string, b: number) => this.doRestore(s, b)}
-                onClickCancel={() => this.setState({ screen: 1 })}
-                totalBalance={totalBalance}
-                action={'restore'}
-                currencyName={currencyName || undefined}
-                translate={translate}
-              />
-            </Suspense>
-          </Modal>
-        )}
-      </SafeAreaView>
+              </View>
+            </ScrollView>
+          )}
+          {screen === 2 && walletSeed && (
+            <Modal
+              animationType="slide"
+              transparent={false}
+              visible={screen === 2}
+              onRequestClose={() => this.navigateToLoaded()}>
+              <Suspense
+                fallback={
+                  <View>
+                    <Text>{translate('loading')}</Text>
+                  </View>
+                }>
+                <Seed
+                  onClickOK={() => this.navigateToLoaded()}
+                  onClickCancel={() => this.navigateToLoaded()}
+                  action={'new'}
+                />
+              </Suspense>
+            </Modal>
+          )}
+          {screen === 3 && (
+            <Modal
+              animationType="slide"
+              transparent={false}
+              visible={screen === 3}
+              onRequestClose={() => this.setState({ screen: 1 })}>
+              <Suspense
+                fallback={
+                  <View>
+                    <Text>{translate('loading')}</Text>
+                  </View>
+                }>
+                <Seed
+                  onClickOK={(s: string, b: number) => this.doRestore(s, b)}
+                  onClickCancel={() => this.setState({ screen: 1 })}
+                  action={'restore'}
+                />
+              </Suspense>
+            </Modal>
+          )}
+        </SafeAreaView>
+      </ContextLoadingProvider>
     );
   }
 }

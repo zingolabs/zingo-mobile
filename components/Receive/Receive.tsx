@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useState } from 'react';
-import { View, Dimensions, Image, Modal } from 'react-native';
+import React, { useContext, useState } from 'react';
+import { View, Image, Modal } from 'react-native';
 import { TabView, TabBar } from 'react-native-tab-view';
 import Toast from 'react-native-simple-toast';
 import { useTheme } from '@react-navigation/native';
@@ -8,49 +8,35 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faBars, faEllipsisV, faInfo } from '@fortawesome/free-solid-svg-icons';
 import OptionsMenu from 'react-native-option-menu';
-import { TranslateOptions } from 'i18n-js';
 
 import FadeText from '../Components/FadeText';
 import ZecAmount from '../Components/ZecAmount';
 import UsdAmount from '../Components/UsdAmount';
 import RegText from '../Components/RegText';
-import { InfoType, Address, TotalBalance, SyncStatus } from '../../app/AppState';
 import Utils from '../../app/utils';
 import RPC from '../../app/rpc';
 import PrivKey from '../PrivKey';
 import ImportKey from '../ImportKey';
 import SingleAddress from './components/SingleAddress';
 import { ThemeType } from '../../app/types';
+import { ContextLoaded } from '../../app/context';
 
-type ReceiveProps = {
-  info: InfoType | null;
-  addresses: Address[];
-  toggleMenuDrawer: () => void;
-  fetchTotalBalance: () => Promise<void>;
-  startRescan: () => void;
-  totalBalance: TotalBalance;
-  syncingStatus: SyncStatus | null;
-  syncingStatusMoreInfoOnClick: () => void;
-  translate: (key: string, config?: TranslateOptions) => any;
-  uaAddress: string | null;
-  setUaAddress: (uaAddress: string) => void;
-  poolsMoreInfoOnClick: () => void;
-};
-
-const Receive: React.FunctionComponent<ReceiveProps> = ({
-  info,
-  addresses,
-  toggleMenuDrawer,
-  fetchTotalBalance,
-  startRescan,
-  totalBalance,
-  syncingStatus,
-  syncingStatusMoreInfoOnClick,
-  translate,
-  uaAddress,
-  setUaAddress,
-  poolsMoreInfoOnClick,
-}) => {
+const Receive: React.FunctionComponent = () => {
+  const context = useContext(ContextLoaded);
+  const {
+    translate,
+    toggleMenuDrawer,
+    fetchTotalBalance,
+    info,
+    addresses,
+    startRescan,
+    totalBalance,
+    syncingStatus,
+    syncingStatusMoreInfoOnClick,
+    uaAddress,
+    setUaAddress,
+    poolsMoreInfoOnClick,
+  } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([{ key: 'uaddr', title: translate('receive.u-title') }]);
@@ -59,7 +45,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   const [oindex, setOIndex] = useState(0);
 
   const zecPrice = info ? info.zecPrice : null;
-  const currencyName = info ? info.currencyName : undefined;
 
   const uaddrs = addresses.filter(a => a.uaAddress === uaAddress && a.addressKind === 'u') || [];
 
@@ -261,9 +246,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
             keyType={keyType}
             privKey={privKey}
             closeModal={() => setPrivKeyModalVisible(false)}
-            totalBalance={totalBalance}
-            currencyName={currencyName}
-            translate={translate}
           />
         </Modal>
 
@@ -272,13 +254,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
           transparent={false}
           visible={importKeyModalVisible}
           onRequestClose={() => setImportKeyModalVisible(false)}>
-          <ImportKey
-            doImport={doImport}
-            closeModal={() => setImportKeyModalVisible(false)}
-            totalBalance={totalBalance}
-            currencyName={currencyName}
-            translate={translate}
-          />
+          <ImportKey doImport={doImport} closeModal={() => setImportKeyModalVisible(false)} />
         </Modal>
 
         <View
@@ -305,7 +281,12 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
               style={{ width: 80, height: 80, resizeMode: 'contain' }}
             />
             <View style={{ flexDirection: 'row' }}>
-              <ZecAmount currencyName={currencyName} size={36} amtZec={totalBalance.total} style={{ opacity: 0.5 }} />
+              <ZecAmount
+                currencyName={info?.currencyName ? info.currencyName : ''}
+                size={36}
+                amtZec={totalBalance.total}
+                style={{ opacity: 0.5 }}
+              />
               {totalBalance.total > 0 && (totalBalance.privateBal > 0 || totalBalance.transparentBal > 0) && (
                 <TouchableOpacity onPress={() => poolsMoreInfoOnClick()}>
                   <View
@@ -431,7 +412,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
       renderScene={renderScene}
       renderTabBar={renderTabBar}
       onIndexChange={setIndex}
-      initialLayout={{ width: Dimensions.get('window').width }}
     />
   );
 };

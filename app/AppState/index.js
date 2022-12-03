@@ -1,6 +1,7 @@
 import Address from './Address';
 import AddressBookEntry from './AddressBookEntry';
-import AppState from './AppState';
+import AppStateLoaded from './AppStateLoaded';
+import AppStateLoading from './AppStateLoading';
 import ConnectedCompanionApp from './ConnectedCompanionApp';
 import ErrorModalData from './ErrorModalData';
 import InfoType from './InfoType';
@@ -20,9 +21,9 @@ import TxDetailType from './TxDetailType';
 import WalletSeed from './WalletSeed';
 import WalletSettings from './WalletSettings';
 
-export default AppState;
-
 export {
+  AppStateLoaded,
+  AppStateLoading,
   Address,
   AddressBookEntry,
   ConnectedCompanionApp,
