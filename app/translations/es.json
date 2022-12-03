@@ -85,7 +85,10 @@
     "memo-title": "BAJAR MEMORÁNDUMS",
     "save": "Grabar",
     "server-acc": "Campo de la URI del Servidor",
-    "threshold-acc": "Campo del Umbral del Filtro de Transacciones"
+    "threshold-acc": "Campo del Umbral del Filtro de Transacciones",
+    "value-none": "ninguno",
+    "value-wallet": "billetera",
+    "value-all": "todos"
   },
   "info": {
     "version": "Versión",

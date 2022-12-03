@@ -85,7 +85,10 @@
     "memo-title": "MEMO DOWNLOAD",
     "save": "Save",
     "server-acc": "Server URI Field",
-    "threshold-acc": "Threshold Field"
+    "threshold-acc": "Threshold Field",
+    "value-none": "none",
+    "value-wallet": "wallet",
+    "value-all": "all"
   },
   "info": {
     "version": "Version",
