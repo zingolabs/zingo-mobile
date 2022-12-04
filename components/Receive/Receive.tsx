@@ -29,6 +29,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ fetchTotalBalance, set
   const context = useContext(ContextLoaded);
   const {
     translate,
+    dimensions,
     toggleMenuDrawer,
     info,
     addresses,
@@ -83,37 +84,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ fetchTotalBalance, set
       const newIndex = (oindex + 1) % uaddrs?.length;
       setOIndex(newIndex);
       setUaAddress(uaddrs[newIndex].address);
-    }
-  };
-
-  const renderScene: (routes: any) => JSX.Element | undefined = ({ route }) => {
-    switch (route.key) {
-      case 'uaddr': {
-        let uaddr = translate('receive.noaddress');
-        let uaddrKind = '';
-        //let receivers = '';
-        if (uaddrs.length > 0) {
-          uaddr = uaddrs[oindex].address;
-          uaddrKind = uaddrs[oindex].addressKind;
-          //receivers = uaddrs[oindex].receivers;
-        }
-
-        return (
-          <SingleAddress
-            address={uaddr}
-            addressKind={uaddrKind}
-            index={oindex}
-            total={uaddrs.length}
-            prev={() => {
-              prev('u');
-            }}
-            next={() => {
-              next('u');
-            }}
-            translate={translate}
-          />
-        );
-      }
     }
   };
 
@@ -223,7 +193,255 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ fetchTotalBalance, set
     startRescan();
   };
 
-  const renderTabBar: (props: any) => JSX.Element = props => {
+  const renderScenePortrait: (routes: any) => JSX.Element | undefined = ({ route }) => {
+    switch (route.key) {
+      case 'uaddr': {
+        let uaddr = translate('receive.noaddress');
+        let uaddrKind = '';
+        //let receivers = '';
+        if (uaddrs.length > 0) {
+          uaddr = uaddrs[oindex].address;
+          uaddrKind = uaddrs[oindex].addressKind;
+          //receivers = uaddrs[oindex].receivers;
+        }
+
+        return (
+          <SingleAddress
+            address={uaddr}
+            addressKind={uaddrKind}
+            index={oindex}
+            total={uaddrs.length}
+            prev={() => {
+              prev('u');
+            }}
+            next={() => {
+              next('u');
+            }}
+            translate={translate}
+          />
+        );
+      }
+    }
+  };
+
+  const renderTabBarPortrait: (props: any) => JSX.Element = props => {
+    let address = '';
+
+    if (uaddrs.length > 0) {
+      address = uaddrs[oindex].address;
+    }
+
+    const syncStatusDisplayLine = syncingStatus?.inProgress ? `(${syncingStatus?.blocks})` : '';
+
+    return (
+      <View
+        accessible={true}
+        accessibilityLabel={translate('receive.title-acc')}
+        style={{
+          display: 'flex',
+          justifyContent: 'flex-start',
+          width: '100%',
+        }}>
+        <Modal
+          animationType="slide"
+          transparent={false}
+          visible={privKeyModalVisible}
+          onRequestClose={() => setPrivKeyModalVisible(false)}>
+          <PrivKey
+            address={address}
+            keyType={keyType}
+            privKey={privKey}
+            closeModal={() => setPrivKeyModalVisible(false)}
+          />
+        </Modal>
+
+        <Modal
+          animationType="slide"
+          transparent={false}
+          visible={importKeyModalVisible}
+          onRequestClose={() => setImportKeyModalVisible(false)}>
+          <ImportKey doImport={doImport} closeModal={() => setImportKeyModalVisible(false)} />
+        </Modal>
+
+        <View
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'center',
+            backgroundColor: colors.card,
+            padding: 10,
+            paddingBottom: 0,
+            margin: 0,
+          }}>
+          <View
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              paddingBottom: 0,
+              backgroundColor: colors.card,
+              zIndex: -1,
+              paddingTop: 0,
+            }}>
+            <Image
+              source={require('../../assets/img/logobig-zingo.png')}
+              style={{ width: 80, height: 80, resizeMode: 'contain' }}
+            />
+            <View style={{ flexDirection: 'row' }}>
+              <ZecAmount
+                currencyName={info?.currencyName ? info.currencyName : ''}
+                size={36}
+                amtZec={totalBalance.total}
+                style={{ opacity: 0.5 }}
+              />
+              {totalBalance.total > 0 && (totalBalance.privateBal > 0 || totalBalance.transparentBal > 0) && (
+                <TouchableOpacity onPress={() => poolsMoreInfoOnClick()}>
+                  <View
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backgroundColor: colors.card,
+                      borderRadius: 10,
+                      margin: 0,
+                      padding: 0,
+                      marginLeft: 5,
+                      minWidth: 48,
+                      minHeight: 48,
+                    }}>
+                    <RegText color={colors.primary}>{translate('transactions.pools')}</RegText>
+                    <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
+                  </View>
+                </TouchableOpacity>
+              )}
+            </View>
+            <UsdAmount
+              style={{ marginTop: 0, marginBottom: 5, opacity: 0.5 }}
+              price={zecPrice}
+              amtZec={totalBalance.total}
+            />
+
+            <View
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexWrap: 'wrap',
+                marginVertical: syncStatusDisplayLine ? 0 : 5,
+              }}>
+              <View
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexWrap: 'wrap',
+                }}>
+                <RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
+                  {syncStatusDisplayLine ? translate('receive.title-syncing') : translate('receive.title')}
+                </RegText>
+                {!!syncStatusDisplayLine && (
+                  <FadeText style={{ margin: 0, padding: 0 }}>{syncStatusDisplayLine}</FadeText>
+                )}
+              </View>
+              {!!syncStatusDisplayLine && (
+                <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
+                  <View
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backgroundColor: colors.card,
+                      borderRadius: 10,
+                      margin: 0,
+                      padding: 0,
+                      marginLeft: 5,
+                      minWidth: 48,
+                      minHeight: 48,
+                    }}>
+                    <RegText color={colors.primary}>{translate('receive.more')}</RegText>
+                    <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
+                  </View>
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
+        </View>
+
+        <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute' }}>
+          <TouchableOpacity
+            accessible={true}
+            accessibilityLabel={translate('menudrawer-acc')}
+            onPress={toggleMenuDrawer}>
+            <FontAwesomeIcon icon={faBars} size={48} color={colors.border} />
+          </TouchableOpacity>
+        </View>
+
+        <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', right: 0 }}>
+          <OptionsMenu
+            customButton={
+              <View accessible={true} accessibilityLabel={translate('menu-acc')}>
+                <FontAwesomeIcon icon={faEllipsisV} color={colors.border} size={48} />
+              </View>
+            }
+            buttonStyle={{ width: 32, height: 32, margin: 7.5, resizeMode: 'contain' }}
+            destructiveIndex={4}
+            options={[
+              translate('receive.newu-option'),
+              translate('receive.privkey-option'),
+              translate('receive.viewkey-option'),
+              translate('receive.import-option'),
+              translate('cancel'),
+            ]}
+            actions={[addO, viewPrivKey, viewViewingKey, importKey]}
+          />
+        </View>
+
+        <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
+
+        <TabBar
+          {...props}
+          indicatorStyle={{ backgroundColor: colors.primary }}
+          style={{ backgroundColor: colors.background }}
+        />
+      </View>
+    );
+  };
+
+  const renderSceneLandscape: (routes: any) => JSX.Element | undefined = ({ route }) => {
+    switch (route.key) {
+      case 'uaddr': {
+        let uaddr = translate('receive.noaddress');
+        let uaddrKind = '';
+        //let receivers = '';
+        if (uaddrs.length > 0) {
+          uaddr = uaddrs[oindex].address;
+          uaddrKind = uaddrs[oindex].addressKind;
+          //receivers = uaddrs[oindex].receivers;
+        }
+
+        return (
+          <SingleAddress
+            address={uaddr}
+            addressKind={uaddrKind}
+            index={oindex}
+            total={uaddrs.length}
+            prev={() => {
+              prev('u');
+            }}
+            next={() => {
+              next('u');
+            }}
+            translate={translate}
+          />
+        );
+      }
+    }
+  };
+
+  const renderTabBarLandscape: (props: any) => JSX.Element = props => {
     let address = '';
 
     if (uaddrs.length > 0) {
@@ -411,14 +629,29 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ fetchTotalBalance, set
 
   //console.log('render receive');
 
-  return (
+  const returnPortrait = (
     <TabView
       navigationState={{ index, routes }}
-      renderScene={renderScene}
-      renderTabBar={renderTabBar}
+      renderScene={renderScenePortrait}
+      renderTabBar={renderTabBarPortrait}
       onIndexChange={setIndex}
     />
   );
+
+  const returnLandscape = (
+    <TabView
+      navigationState={{ index, routes }}
+      renderScene={renderSceneLandscape}
+      renderTabBar={renderTabBarLandscape}
+      onIndexChange={setIndex}
+    />
+  );
+
+  if (dimensions.width > dimensions.height && dimensions.scale > 1.8) {
+    return returnLandscape;
+  } else {
+    return returnPortrait;
+  }
 };
 
 export default Receive;
