@@ -373,6 +373,8 @@ PODS:
     - React-perflogger (= 0.70.4)
   - ReactNativeART (1.2.0):
     - React
+  - RNBackgroundFetch (4.1.5):
+    - React-Core
   - RNCClipboard (1.5.1):
     - React-Core
   - RNFS (2.20.0):
@@ -482,6 +484,7 @@ DEPENDENCIES:
   - React-runtimeexecutor (from `../node_modules/react-native/ReactCommon/runtimeexecutor`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - "ReactNativeART (from `../node_modules/@react-native-community/art`)"
+  - RNBackgroundFetch (from `../node_modules/react-native-background-fetch`)
   - "RNCClipboard (from `../node_modules/@react-native-community/clipboard`)"
   - RNFS (from `../node_modules/react-native-fs`)
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
@@ -586,6 +589,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   ReactNativeART:
     :path: "../node_modules/@react-native-community/art"
+  RNBackgroundFetch:
+    :path: "../node_modules/react-native-background-fetch"
   RNCClipboard:
     :path: "../node_modules/@react-native-community/clipboard"
   RNFS:
@@ -656,6 +661,7 @@ SPEC CHECKSUMS:
   React-runtimeexecutor: 5407e26b5aaafa9b01a08e33653255f8247e7c31
   ReactCommon: abf3605a56f98b91671d0d1327addc4ffb87af77
   ReactNativeART: 78edc68dd4a1e675338cd0cd113319cf3a65f2ab
+  RNBackgroundFetch: 0d378f04faa1244f6eb3787f51f7d99520c1fe5e
   RNCClipboard: 41d8d918092ae8e676f18adada19104fa3e68495
   RNFS: 4ac0f0ea233904cb798630b3c077808c06931688
   RNGestureHandler: b7a872907ee289ada902127f2554fa1d2c076122
