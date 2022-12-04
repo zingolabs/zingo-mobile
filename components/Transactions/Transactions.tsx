@@ -19,7 +19,11 @@ import TxDetail from './components/TxDetail';
 import TxSummaryLine from './components/TxSummaryLine';
 import { ContextLoaded } from '../../app/context';
 
-const Transactions: React.FunctionComponent = () => {
+type TransactionsProps = {
+  doRefresh: () => void;
+};
+
+const Transactions: React.FunctionComponent<TransactionsProps> = ({ doRefresh }) => {
   const context = useContext(ContextLoaded);
   const {
     translate,
@@ -31,7 +35,6 @@ const Transactions: React.FunctionComponent = () => {
     syncingStatus,
     poolsMoreInfoOnClick,
     syncingStatusMoreInfoOnClick,
-    doRefresh,
   } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [isTxDetailModalShowing, setTxDetailModalShowing] = React.useState(false);

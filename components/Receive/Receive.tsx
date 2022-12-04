@@ -20,13 +20,16 @@ import ImportKey from '../ImportKey';
 import SingleAddress from './components/SingleAddress';
 import { ThemeType } from '../../app/types';
 import { ContextLoaded } from '../../app/context';
+type ReceiveProps = {
+  fetchTotalBalance: () => void;
+  setUaAddress: (uaAddress: string) => void;
+};
 
-const Receive: React.FunctionComponent = () => {
+const Receive: React.FunctionComponent<ReceiveProps> = ({ fetchTotalBalance, setUaAddress }) => {
   const context = useContext(ContextLoaded);
   const {
     translate,
     toggleMenuDrawer,
-    fetchTotalBalance,
     info,
     addresses,
     startRescan,
@@ -34,7 +37,6 @@ const Receive: React.FunctionComponent = () => {
     syncingStatus,
     syncingStatusMoreInfoOnClick,
     uaAddress,
-    setUaAddress,
     poolsMoreInfoOnClick,
   } = context;
   const { colors } = useTheme() as unknown as ThemeType;

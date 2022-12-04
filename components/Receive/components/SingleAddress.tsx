@@ -73,7 +73,14 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
             ')'}
         </Text>
       </View>*/}
-      <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 15 }}>
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          marginVertical: 15,
+          width: '100%',
+          justifyContent: 'space-evenly',
+        }}>
         {multi && (
           <View
             style={{
@@ -93,11 +100,13 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
               {translate('seed.tapcopy')}
             </Text>
           </TouchableOpacity>
-          <Text style={{ color: colors.primary, marginTop: -25 }}>
-            {index + 1}
-            {translate('legacy.of')}
-            {total}
-          </Text>
+          {multi && (
+            <Text style={{ color: colors.primary, marginTop: -25 }}>
+              {index + 1}
+              {translate('legacy.of')}
+              {total}
+            </Text>
+          )}
         </View>
         {multi && (
           <View

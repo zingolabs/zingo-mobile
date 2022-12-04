@@ -114,17 +114,10 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       openErrorModal: this.openErrorModal,
       closeErrorModal: this.closeErrorModal,
       toggleMenuDrawer: this.toggleMenuDrawer,
-      fetchTotalBalance: this.fetchTotalBalance,
-      setSendPageState: this.setSendPageState,
-      sendTransaction: this.sendTransaction,
-      clearToAddr: this.clearToAddr,
       setComputingModalVisible: this.setComputingModalVisible,
-      setTxBuildProgress: this.setTxBuildProgress,
       syncingStatusMoreInfoOnClick: this.syncingStatusMoreInfoOnClick,
       poolsMoreInfoOnClick: this.poolsMoreInfoOnClick,
-      doRefresh: this.doRefresh,
       startRescan: this.startRescan,
-      setUaAddress: this.setUaAddress,
     };
 
     this.rpc = new RPC(
@@ -823,7 +816,12 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                         <Text>{translate('loading')}</Text>
                       </View>
                     }>
-                    <Send />
+                    <Send
+                      setSendPageState={this.setSendPageState}
+                      sendTransaction={this.sendTransaction}
+                      clearToAddr={this.clearToAddr}
+                      setTxBuildProgress={this.setTxBuildProgress}
+                    />
                   </Suspense>
                 </>
               )}
@@ -837,7 +835,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                         <Text>{translate('loading')}</Text>
                       </View>
                     }>
-                    <Transactions />
+                    <Transactions doRefresh={this.doRefresh} />
                   </Suspense>
                 </>
               )}
@@ -851,7 +849,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                         <Text>{translate('loading')}</Text>
                       </View>
                     }>
-                    <Receive />
+                    <Receive fetchTotalBalance={this.fetchTotalBalance} setUaAddress={this.setUaAddress} />
                   </Suspense>
                 </>
               )}
@@ -865,7 +863,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                         <Text>{translate('loading')}</Text>
                       </View>
                     }>
-                    <Legacy />
+                    <Legacy fetchTotalBalance={this.fetchTotalBalance} />
                   </Suspense>
                 </>
               )}

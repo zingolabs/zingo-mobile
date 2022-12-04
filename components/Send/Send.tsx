@@ -25,7 +25,19 @@ import Confirm from './components/Confirm';
 import { ThemeType } from '../../app/types';
 import { ContextLoaded } from '../../app/context';
 
-const Send: React.FunctionComponent = () => {
+type SendProps = {
+  setSendPageState: (sendPageState: SendPageState) => void;
+  sendTransaction: (setSendProgress: (arg0: SendProgress | null) => void) => Promise<String>;
+  clearToAddr: () => void;
+  setTxBuildProgress: (progress: SendProgress) => void;
+};
+
+const Send: React.FunctionComponent<SendProps> = ({
+  setSendPageState,
+  sendTransaction,
+  clearToAddr,
+  setTxBuildProgress,
+}) => {
   const context = useContext(ContextLoaded);
   const {
     translate,
@@ -33,11 +45,7 @@ const Send: React.FunctionComponent = () => {
     info,
     totalBalance,
     sendPageState,
-    setSendPageState,
-    sendTransaction,
-    clearToAddr,
     setComputingModalVisible,
-    setTxBuildProgress,
     syncingStatus,
     navigation,
     syncingStatusMoreInfoOnClick,

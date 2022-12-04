@@ -20,7 +20,11 @@ import SingleAddress from './components/SingleAddress';
 import { ThemeType } from '../../app/types';
 import { ContextLoaded } from '../../app/context';
 
-const Legacy: React.FunctionComponent = () => {
+type LegacyProps = {
+  fetchTotalBalance: () => void;
+};
+
+const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance }) => {
   const context = useContext(ContextLoaded);
   const { translate, toggleMenuDrawer, info, addresses, startRescan, totalBalance, uaAddress } = context;
   const { colors } = useTheme() as unknown as ThemeType;
@@ -149,7 +153,7 @@ const Legacy: React.FunctionComponent = () => {
     //console.log('New Z');
     //const newAddress = await RPC.rpc_createNewAddress('z');
     //if (newAddress && !newAddress.startsWith('Error')) {
-    //  await fetchTotalBalance();
+    await fetchTotalBalance();
     //  setIndex(0);
     //  if (newAddress) {
     //    setDisplayAddress(newAddress);

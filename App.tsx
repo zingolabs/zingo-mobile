@@ -6,6 +6,8 @@ import { createStackNavigator } from '@react-navigation/stack';
 import * as RNLocalize from 'react-native-localize';
 import { I18n, TranslateOptions } from 'i18n-js';
 import { memoize } from 'lodash';
+//import { useDimensions } from '@react-native-community/hooks';
+import { useResponsiveHeight, useResponsiveWidth, useDimensionsChange } from 'react-native-responsive-dimensions';
 
 import LoadedApp from './app/LoadedApp';
 import LoadingApp from './app/LoadingApp';
@@ -50,6 +52,10 @@ export default function App() {
     [],
   );
   const i18n = useMemo(() => new I18n(file), [file]);
+  const w = useResponsiveWidth(100);
+  const h = useResponsiveHeight(100);
+
+  useDimensionsChange(({ window }) => console.log(window));
 
   const translate = memoize(
     (key: string, config?: TranslateOptions) => i18n.t(key, config),
@@ -88,6 +94,8 @@ export default function App() {
     RNLocalize.addEventListener('change', handleLocalizationChange);
     return () => RNLocalize.removeEventListener('change', handleLocalizationChange);
   }, [handleLocalizationChange]);
+
+  console.log(w, h);
 
   return (
     <NavigationContainer theme={Theme}>
