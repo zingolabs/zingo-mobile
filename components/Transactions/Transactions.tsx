@@ -280,25 +280,25 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({ doRefresh })
           />
           <View style={{ flexDirection: 'column', alignItems: 'center' }}>
             {totalBalance.total > 0 && (totalBalance.privateBal > 0 || totalBalance.transparentBal > 0) && (
-                <TouchableOpacity onPress={() => poolsMoreInfoOnClick()}>
-                  <View
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'row',
-                      alignItems: 'flex-end',
-                      justifyContent: 'center',
-                      backgroundColor: colors.card,
-                      borderRadius: 10,
-                      margin: 0,
-                      padding: 0,
-                      minWidth: 48,
-                      minHeight: 48,
-                    }}>
-                    <RegText color={colors.primary}>{translate('transactions.pools')}</RegText>
-                    <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
-                  </View>
-                </TouchableOpacity>
-              )}
+              <TouchableOpacity onPress={() => poolsMoreInfoOnClick()}>
+                <View
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'flex-end',
+                    justifyContent: 'center',
+                    backgroundColor: colors.card,
+                    borderRadius: 10,
+                    margin: 0,
+                    padding: 0,
+                    minWidth: 48,
+                    minHeight: 48,
+                  }}>
+                  <RegText color={colors.primary}>{translate('transactions.pools')}</RegText>
+                  <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
+                </View>
+              </TouchableOpacity>
+            )}
             <ZecAmount
               currencyName={info?.currencyName ? info.currencyName : ''}
               color={balanceColor}
@@ -336,7 +336,9 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({ doRefresh })
               <RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
                 {syncStatusDisplayLine ? translate('transactions.title-syncing') : translate('transactions.title')}
               </RegText>
-              {!!syncStatusDisplayLine && <FadeText style={{ margin: 0, padding: 0 }}>{syncStatusDisplayLine}</FadeText>}
+              {!!syncStatusDisplayLine && (
+                <FadeText style={{ margin: 0, padding: 0 }}>{syncStatusDisplayLine}</FadeText>
+              )}
             </View>
             {!!syncStatusDisplayLine && (
               <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
@@ -362,69 +364,70 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({ doRefresh })
           </View>
 
           <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
-
         </View>
 
         <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute' }}>
-          <TouchableOpacity accessible={true} accessibilityLabel={translate('menudrawer-acc')} onPress={toggleMenuDrawer}>
+          <TouchableOpacity
+            accessible={true}
+            accessibilityLabel={translate('menudrawer-acc')}
+            onPress={toggleMenuDrawer}>
             <FontAwesomeIcon icon={faBars} size={48} color={colors.border} />
           </TouchableOpacity>
         </View>
-
       </View>
       <View style={{ borderLeftColor: colors.border, borderLeftWidth: 1, alignItems: 'center', padding: 10 }}>
         <RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
           {translate('transactions.transactions')}
         </RegText>
         <View style={{ width: '100%', height: 1, backgroundColor: colors.primary, marginTop: 5 }} />
-      <ScrollView
-      accessible={true}
-      accessibilityLabel={translate('transactions.list-acc')}
-      refreshControl={
-        <RefreshControl
-          refreshing={false}
-          onRefresh={doRefresh}
-          tintColor={colors.text}
-          title={translate('transactions.refreshing')}
-        />
-      }
-      style={{ flexGrow: 1, marginTop: 0, height: '100%' }}>
-      {transactions
-        ?.slice(0, numTx)
-        .sort((a, b) => b.time - a.time)
-        .flatMap(t => {
-          let txmonth = moment(t.time * 1000).format('MMM YYYY');
-
-          var month = '';
-          if (txmonth !== lastMonth) {
-            month = txmonth;
-            lastMonth = txmonth;
-          }
-
-          return (
-            <TxSummaryLine
-              key={`${t.txid}-${t.type}`}
-              tx={t}
-              month={month}
-              setTxDetail={setTxDetail}
-              setTxDetailModalShowing={setTxDetailModalShowing}
+        <ScrollView
+          accessible={true}
+          accessibilityLabel={translate('transactions.list-acc')}
+          refreshControl={
+            <RefreshControl
+              refreshing={false}
+              onRefresh={doRefresh}
+              tintColor={colors.text}
+              title={translate('transactions.refreshing')}
             />
-          );
-        })}
-      {!!transactions && !!transactions.length && (
-        <View style={{ height: 100, display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
-          <FadeText style={{ color: colors.primary }}>{translate('transactions.end')}</FadeText>
-        </View>
-      )}
+          }
+          style={{ flexGrow: 1, marginTop: 0, height: '100%' }}>
+          {transactions
+            ?.slice(0, numTx)
+            .sort((a, b) => b.time - a.time)
+            .flatMap(t => {
+              let txmonth = moment(t.time * 1000).format('MMM YYYY');
 
-      {loadMoreButton && (
-        <View style={{ flexDirection: 'row', justifyContent: 'center', margin: 30 }}>
-          <Button type="Secondary" title={translate('transactions.loadmore')} onPress={loadMoreClicked} />
-        </View>
-      )}
-    </ScrollView>
+              var month = '';
+              if (txmonth !== lastMonth) {
+                month = txmonth;
+                lastMonth = txmonth;
+              }
+
+              return (
+                <TxSummaryLine
+                  key={`${t.txid}-${t.type}`}
+                  tx={t}
+                  month={month}
+                  setTxDetail={setTxDetail}
+                  setTxDetailModalShowing={setTxDetailModalShowing}
+                />
+              );
+            })}
+          {!!transactions && !!transactions.length && (
+            <View style={{ height: 100, display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
+              <FadeText style={{ color: colors.primary }}>{translate('transactions.end')}</FadeText>
+            </View>
+          )}
+
+          {loadMoreButton && (
+            <View style={{ flexDirection: 'row', justifyContent: 'center', margin: 30 }}>
+              <Button type="Secondary" title={translate('transactions.loadmore')} onPress={loadMoreClicked} />
+            </View>
+          )}
+        </ScrollView>
+      </View>
     </View>
-  </View>
   );
 
   console.log(dimensions);

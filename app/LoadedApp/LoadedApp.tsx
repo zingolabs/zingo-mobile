@@ -55,9 +55,9 @@ type LoadedAppProps = {
   route: any;
   translate: (key: string, config?: TranslateOptions) => any;
   dimensions: {
-    width: number,
-    height: number,
-    scale: number,
+    width: number;
+    height: number;
+    scale: number;
   };
 };
 
@@ -73,9 +73,9 @@ type LoadedAppClassProps = {
   translate: (key: string, config?: TranslateOptions) => any;
   theme: ThemeType;
   dimensions: {
-    width: number,
-    height: number,
-    scale: number,
+    width: number;
+    height: number;
+    scale: number;
   };
 };
 

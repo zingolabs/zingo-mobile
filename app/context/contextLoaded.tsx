@@ -15,6 +15,7 @@ import {
 const defaultAppState: AppStateLoaded = {
   navigation: null,
   route: null,
+  dimensions: {} as { width: number; height: number; scale: number },
 
   syncStatusReport: new SyncStatusReport(),
   totalBalance: new TotalBalance(),

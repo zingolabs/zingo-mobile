@@ -51,7 +51,7 @@ export default function App() {
     [],
   );
   const i18n = useMemo(() => new I18n(file), [file]);
-  const [widthDimensions, setWidthDimensions] = useState(useResponsiveWidth(100))
+  const [widthDimensions, setWidthDimensions] = useState(useResponsiveWidth(100));
   const [heightDimensions, setHeightDimensions] = useState(useResponsiveHeight(100));
   const [scaleDimensions, setScaleDimensions] = useState(0);
 
@@ -61,7 +61,7 @@ export default function App() {
       setWidthDimensions(window.width);
       setHeightDimensions(window.height);
       setScaleDimensions(window.scale);
-    }, [])
+    }, []),
   );
 
   const translate = memoize(
@@ -113,8 +113,24 @@ export default function App() {
           backgroundColor: Theme.colors.card,
         }}>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="LoadingApp">{props => <LoadingApp {...props} translate={translate} dimensions={{ width: widthDimensions, height: heightDimensions, scale: scaleDimensions }} />}</Stack.Screen>
-          <Stack.Screen name="LoadedApp">{props => <LoadedApp {...props} translate={translate} dimensions={{ width: widthDimensions, height: heightDimensions, scale: scaleDimensions }} />}</Stack.Screen>
+          <Stack.Screen name="LoadingApp">
+            {props => (
+              <LoadingApp
+                {...props}
+                translate={translate}
+                dimensions={{ width: widthDimensions, height: heightDimensions, scale: scaleDimensions }}
+              />
+            )}
+          </Stack.Screen>
+          <Stack.Screen name="LoadedApp">
+            {props => (
+              <LoadedApp
+                {...props}
+                translate={translate}
+                dimensions={{ width: widthDimensions, height: heightDimensions, scale: scaleDimensions }}
+              />
+            )}
+          </Stack.Screen>
         </Stack.Navigator>
       </SafeAreaView>
     </NavigationContainer>

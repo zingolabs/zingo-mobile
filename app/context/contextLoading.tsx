@@ -5,6 +5,7 @@ import { AppStateLoading, TotalBalance } from '../AppState';
 const defaultAppState: AppStateLoading = {
   navigation: null,
   route: null,
+  dimensions: {} as { width: number; height: number; scale: number },
 
   screen: 0,
   actionButtonsDisabled: false,

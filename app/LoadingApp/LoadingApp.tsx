@@ -26,9 +26,9 @@ type LoadingAppProps = {
   route: any;
   translate: (key: string, config?: TranslateOptions) => any;
   dimensions: {
-    width: number,
-    height: number,
-    scale: number,
+    width: number;
+    height: number;
+    scale: number;
   };
 };
 
@@ -44,9 +44,9 @@ type LoadingAppClassProps = {
   translate: (key: string, config?: TranslateOptions) => any;
   theme: ThemeType;
   dimensions: {
-    width: number,
-    height: number,
-    scale: number,
+    width: number;
+    height: number;
+    scale: number;
   };
 };
 
