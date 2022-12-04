@@ -240,7 +240,8 @@
     "txfee": "Comisión por Transacción",
     "title-acc": "Pantalla del Monedero",
     "list-acc": "Lista de Transacciones",
-    "pools": "grupos..."
+    "pools": "grupos...",
+    "transactions": "Transacciones"
   },
   "report": {
     "title": "Informe de Sincronización",

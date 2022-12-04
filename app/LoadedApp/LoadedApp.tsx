@@ -54,6 +54,11 @@ type LoadedAppProps = {
   navigation: any;
   route: any;
   translate: (key: string, config?: TranslateOptions) => any;
+  dimensions: {
+    width: number,
+    height: number,
+    scale: number,
+  };
 };
 
 export default function LoadedApp(props: LoadedAppProps) {
@@ -67,6 +72,11 @@ type LoadedAppClassProps = {
   route: any;
   translate: (key: string, config?: TranslateOptions) => any;
   theme: ThemeType;
+  dimensions: {
+    width: number,
+    height: number,
+    scale: number,
+  };
 };
 
 class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
@@ -78,6 +88,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     this.state = {
       navigation: props.navigation,
       route: props.route,
+      dimensions: props.dimensions,
 
       syncStatusReport: new SyncStatusReport(),
       totalBalance: new TotalBalance(),

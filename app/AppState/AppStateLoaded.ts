@@ -19,6 +19,11 @@ import SyncStatus from './SyncStatus';
 export default interface AppStateLoaded {
   navigation: NavigationScreenProp<any> | null;
   route: RouteProp<any> | null;
+  dimensions: {
+    width: number,
+    height: number,
+    scale: number,
+  };
 
   // Info about the current sync process
   syncStatusReport: SyncStatusReport;

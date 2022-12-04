@@ -240,7 +240,8 @@
     "txfee": "Transaction Fee",
     "title-acc": "Wallet Screen",
     "list-acc": "Transactions' List",
-    "pools": "pools..."
+    "pools": "pools...",
+    "transactions": "Transactions"
   },
   "report": {
     "title": "Sync / Rescan Report",

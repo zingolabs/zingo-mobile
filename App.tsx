@@ -1,12 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useCallback, useMemo, useState } from 'react';
-import { SafeAreaView, I18nManager } from 'react-native';
+import { SafeAreaView, I18nManager, LayoutAnimation } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import * as RNLocalize from 'react-native-localize';
 import { I18n, TranslateOptions } from 'i18n-js';
 import { memoize } from 'lodash';
-//import { useDimensions } from '@react-native-community/hooks';
 import { useResponsiveHeight, useResponsiveWidth, useDimensionsChange } from 'react-native-responsive-dimensions';
 
 import LoadedApp from './app/LoadedApp';
@@ -52,10 +51,18 @@ export default function App() {
     [],
   );
   const i18n = useMemo(() => new I18n(file), [file]);
-  const w = useResponsiveWidth(100);
-  const h = useResponsiveHeight(100);
+  const [widthDimensions, setWidthDimensions] = useState(useResponsiveWidth(100))
+  const [heightDimensions, setHeightDimensions] = useState(useResponsiveHeight(100));
+  const [scaleDimensions, setScaleDimensions] = useState(0);
 
-  useDimensionsChange(({ window }) => console.log(window));
+  useDimensionsChange(
+    useCallback(({ window }) => {
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      setWidthDimensions(window.width);
+      setHeightDimensions(window.height);
+      setScaleDimensions(window.scale);
+    }, [])
+  );
 
   const translate = memoize(
     (key: string, config?: TranslateOptions) => i18n.t(key, config),
@@ -95,7 +102,7 @@ export default function App() {
     return () => RNLocalize.removeEventListener('change', handleLocalizationChange);
   }, [handleLocalizationChange]);
 
-  console.log(w, h);
+  //console.log('w', widthDimensions, 'h', heightDimensions, 's', scaleDimensions);
 
   return (
     <NavigationContainer theme={Theme}>
@@ -106,8 +113,8 @@ export default function App() {
           backgroundColor: Theme.colors.card,
         }}>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="LoadingApp">{props => <LoadingApp {...props} translate={translate} />}</Stack.Screen>
-          <Stack.Screen name="LoadedApp">{props => <LoadedApp {...props} translate={translate} />}</Stack.Screen>
+          <Stack.Screen name="LoadingApp">{props => <LoadingApp {...props} translate={translate} dimensions={{ width: widthDimensions, height: heightDimensions, scale: scaleDimensions }} />}</Stack.Screen>
+          <Stack.Screen name="LoadedApp">{props => <LoadedApp {...props} translate={translate} dimensions={{ width: widthDimensions, height: heightDimensions, scale: scaleDimensions }} />}</Stack.Screen>
         </Stack.Navigator>
       </SafeAreaView>
     </NavigationContainer>

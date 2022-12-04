@@ -25,6 +25,11 @@ type LoadingAppProps = {
   navigation: any;
   route: any;
   translate: (key: string, config?: TranslateOptions) => any;
+  dimensions: {
+    width: number,
+    height: number,
+    scale: number,
+  };
 };
 
 export default function LoadingApp(props: LoadingAppProps) {
@@ -38,6 +43,11 @@ type LoadingAppClassProps = {
   route: any;
   translate: (key: string, config?: TranslateOptions) => any;
   theme: ThemeType;
+  dimensions: {
+    width: number,
+    height: number,
+    scale: number,
+  };
 };
 
 const SERVER_DEFAULT_0 = serverUris()[0];
@@ -50,6 +60,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
     this.state = {
       navigation: props.navigation,
       route: props.route,
+      dimensions: props.dimensions,
 
       screen: 0,
       actionButtonsDisabled: false,
