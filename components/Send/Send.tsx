@@ -463,10 +463,7 @@ const Send: React.FunctionComponent = () => {
 
       <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
 
-      <ScrollView
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={{
-        }}>
+      <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{}}>
         {[sendPageState.toaddr].map((ta, i) => {
           return (
             <View key={i} style={{ display: 'flex', padding: 10, marginTop: 10 }}>
@@ -505,7 +502,8 @@ const Send: React.FunctionComponent = () => {
                       editable={true}
                     />
                   </View>
-                  <View style={{
+                  <View
+                    style={{
                       width: 58,
                     }}>
                     <TouchableOpacity
@@ -678,7 +676,6 @@ const Send: React.FunctionComponent = () => {
                         value={ta.memo}
                         onChangeText={(text: string) => updateToField(null, null, null, text)}
                         editable={true}
-
                       />
                     </View>
                   </View>
@@ -687,7 +684,7 @@ const Send: React.FunctionComponent = () => {
             </View>
           );
         })}
-         <View
+        <View
           style={{
             flexGrow: 1,
             flexDirection: 'row',
@@ -711,7 +708,6 @@ const Send: React.FunctionComponent = () => {
           />
         </View>
       </ScrollView>
-
     </View>
   );
 };

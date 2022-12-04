@@ -22,8 +22,7 @@ import { ContextLoaded } from '../../app/context';
 
 const Legacy: React.FunctionComponent = () => {
   const context = useContext(ContextLoaded);
-  const { translate, toggleMenuDrawer, fetchTotalBalance, info, addresses, startRescan, totalBalance, uaAddress } =
-    context;
+  const { translate, toggleMenuDrawer, info, addresses, startRescan, totalBalance, uaAddress } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([
@@ -148,22 +147,22 @@ const Legacy: React.FunctionComponent = () => {
 
   const addZ = async () => {
     //console.log('New Z');
-    const newAddress = await RPC.rpc_createNewAddress('z');
-    if (newAddress && !newAddress.startsWith('Error')) {
-      await fetchTotalBalance();
-      setIndex(0);
-      if (newAddress) {
-        setDisplayAddress(newAddress);
-      }
-    } else {
-      if (newAddress) {
-        Toast.show(newAddress + translate('workingonit'), Toast.LONG);
-        return;
-      }
-    }
+    //const newAddress = await RPC.rpc_createNewAddress('z');
+    //if (newAddress && !newAddress.startsWith('Error')) {
+    //  await fetchTotalBalance();
+    //  setIndex(0);
+    //  if (newAddress) {
+    //    setDisplayAddress(newAddress);
+    //  }
+    //} else {
+    //  if (newAddress) {
+    Toast.show('Error: ' + translate('workingonit'), Toast.LONG);
     return;
+    //  }
+    //}
+    //return;
   };
-
+  /*
   const addT = async () => {
     //console.log('New T');
     const newAddress = await RPC.rpc_createNewAddress('t');
@@ -181,7 +180,7 @@ const Legacy: React.FunctionComponent = () => {
     }
     return;
   };
-
+  */
   const [privKeyModalVisible, setPrivKeyModalVisible] = useState(false);
   const [keyType, setKeyType] = useState(0);
   const [privKey, setPrivKey] = useState('');
@@ -373,12 +372,13 @@ const Legacy: React.FunctionComponent = () => {
             destructiveIndex={4}
             options={[
               translate('legacy.newz-option'),
-              translate('legacy.newt-option'),
+              //translate('legacy.newt-option'),
               translate('legacy.privkey-option'),
               translate('legacy.viewkey-option'),
               translate('cancel'),
             ]}
-            actions={[addZ, addT, viewPrivKey, viewViewingKey]}
+            //addT
+            actions={[addZ, viewPrivKey, viewViewingKey]}
           />
         </View>
 

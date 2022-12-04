@@ -332,7 +332,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     }
   };
 
-  createNewAddress = async (addressType: 'z' | 't' | 'u') => {
+  createNewAddress = async (addressType: 'tzo') => {
     // Create a new address
     const newaddress = await RPC.rpc_createNewAddress(addressType);
     //console.log(`Created new Address ${newaddress}`);
@@ -807,14 +807,13 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
               tabBarActiveBackgroundColor: colors.primary,
               tabBarInactiveTintColor: colors.money,
               tabBarLabelStyle: { fontSize: 14 },
-              tabBarStyle: { 
-                borderRadius: 0, 
-                borderTopColor:colors.primary, 
-                borderTopWidth: 2,
+              tabBarStyle: {
+                borderRadius: 0,
+                borderTopColor: colors.primary,
+                borderTopWidth: 1,
               },
               headerShown: false,
-            }
-            )}>
+            })}>
             <Tab.Screen name={translate('loadedapp.send-menu')}>
               {() => (
                 <>

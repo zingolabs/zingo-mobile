@@ -41,12 +41,12 @@ const Receive: React.FunctionComponent = () => {
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([{ key: 'uaddr', title: translate('receive.u-title') }]);
 
-  const [displayAddress, setDisplayAddress] = useState('');
+  const [displayAddress, setDisplayAddress] = useState(uaAddress);
   const [oindex, setOIndex] = useState(0);
 
   const zecPrice = info ? info.zecPrice : null;
 
-  const uaddrs = addresses.filter(a => a.uaAddress === uaAddress && a.addressKind === 'u') || [];
+  const uaddrs = addresses.filter(a => a.addressKind === 'u') || [];
 
   if (displayAddress) {
     const displayAddressIndex = uaddrs?.findIndex(a => a.address === displayAddress);
@@ -59,7 +59,6 @@ const Receive: React.FunctionComponent = () => {
 
   const prev = (type: string) => {
     setDisplayAddress('');
-
     if (type === 'u') {
       if (uaddrs.length === 0) {
         return;
@@ -69,6 +68,7 @@ const Receive: React.FunctionComponent = () => {
         newIndex = uaddrs.length - 1;
       }
       setOIndex(newIndex);
+      setUaAddress(uaddrs[newIndex].address);
     }
   };
 
@@ -80,6 +80,7 @@ const Receive: React.FunctionComponent = () => {
       }
       const newIndex = (oindex + 1) % uaddrs?.length;
       setOIndex(newIndex);
+      setUaAddress(uaddrs[newIndex].address);
     }
   };
 
@@ -88,9 +89,11 @@ const Receive: React.FunctionComponent = () => {
       case 'uaddr': {
         let uaddr = translate('receive.noaddress');
         let uaddrKind = '';
+        //let receivers = '';
         if (uaddrs.length > 0) {
           uaddr = uaddrs[oindex].address;
           uaddrKind = uaddrs[oindex].addressKind;
+          //receivers = uaddrs[oindex].receivers;
         }
 
         return (
@@ -114,7 +117,7 @@ const Receive: React.FunctionComponent = () => {
 
   const addO = async () => {
     //console.log('New O');
-    const newAddress = await RPC.rpc_createNewAddress('u');
+    const newAddress = await RPC.rpc_createNewAddress('tzo');
     if (newAddress && !newAddress.startsWith('Error')) {
       await fetchTotalBalance();
       setIndex(2);

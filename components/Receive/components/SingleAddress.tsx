@@ -6,9 +6,11 @@ import QRCode from 'react-native-qrcode-svg';
 import Toast from 'react-native-simple-toast';
 import { useTheme } from '@react-navigation/native';
 import { TranslateOptions } from 'i18n-js';
+import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
 import FadeText from '../../Components/FadeText';
-import Button from '../../Button';
+//import Button from '../../Button';
 import Utils from '../../../app/utils';
 import { ThemeType } from '../../../app/types';
 
@@ -17,6 +19,7 @@ type SingleAddressProps = {
   addressKind: string;
   index: number;
   total: number;
+  //receivers: string;
   prev: () => void;
   next: () => void;
   translate: (key: string, config?: TranslateOptions) => any;
@@ -27,6 +30,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   addressKind,
   index,
   total,
+  //receivers,
   prev,
   next,
   translate,
@@ -56,15 +60,59 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
           backgroundColor: colors.background,
         },
       ]}>
-      <View style={{ marginTop: 20, padding: 10, backgroundColor: colors.border }}>
+      <View style={{ marginTop: 20, marginHorizontal: 20, padding: 10, backgroundColor: colors.border }}>
         <QRCode value={address} size={200} ecl="L" backgroundColor={colors.border} />
       </View>
-      <TouchableOpacity onPress={doCopy}>
-        <Text style={{ color: colors.text, textDecorationLine: 'underline', marginTop: 15, minHeight: 48 }}>
-          {translate('seed.tapcopy')}
+      {/*<View style={{ marginTop: 5 }}>
+        <Text style={{ color: colors.primary }}>{'receivers'}</Text>
+        <Text style={{ color: colors.primary }}>
+          {'(' +
+            (receivers.indexOf('o') > -1 ? ' orchard ' : '') +
+            (receivers.indexOf('z') > -1 ? ' sapling ' : '') +
+            (receivers.indexOf('t') > -1 ? ' transparent ' : '') +
+            ')'}
         </Text>
-      </TouchableOpacity>
-
+      </View>*/}
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 15 }}>
+        {multi && (
+          <View
+            style={{
+              width: 58,
+              borderColor: colors.primary,
+              borderWidth: 2,
+              borderRadius: 10,
+            }}>
+            <TouchableOpacity accessible={true} accessibilityLabel={translate('send.scan-acc')} onPress={prev}>
+              <FontAwesomeIcon style={{ margin: 5 }} size={48} icon={faChevronLeft} color={colors.primary} />
+            </TouchableOpacity>
+          </View>
+        )}
+        <View style={{ width: 240, justifyContent: 'center', alignItems: 'center' }}>
+          <TouchableOpacity onPress={doCopy}>
+            <Text style={{ color: colors.text, textDecorationLine: 'underline', marginTop: 15, minHeight: 48 }}>
+              {translate('seed.tapcopy')}
+            </Text>
+          </TouchableOpacity>
+          <Text style={{ color: colors.primary, marginTop: -25 }}>
+            {index + 1}
+            {translate('legacy.of')}
+            {total}
+          </Text>
+        </View>
+        {multi && (
+          <View
+            style={{
+              width: 58,
+              borderColor: colors.primary,
+              borderWidth: 2,
+              borderRadius: 10,
+            }}>
+            <TouchableOpacity accessible={true} accessibilityLabel={translate('send.scan-acc')} onPress={next}>
+              <FontAwesomeIcon style={{ margin: 5 }} size={48} icon={faChevronRight} color={colors.primary} />
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
       <View style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
         {chunks.map(c => (
           <FadeText
@@ -81,7 +129,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
         ))}
       </View>
 
-      {multi && (
+      {/*multi && (
         <View style={{ display: 'flex', flexDirection: 'row', marginTop: 10, alignItems: 'center', marginBottom: 100 }}>
           <Button
             type="Secondary"
@@ -101,7 +149,8 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
             onPress={next}
           />
         </View>
-      )}
+      )*/}
+
       <View style={{ height: 20 }} />
     </ScrollView>
   );
