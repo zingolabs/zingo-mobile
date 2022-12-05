@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState } from 'react';
-import { View, Image, Modal, Text } from 'react-native';
+import { View, Image, Modal } from 'react-native';
 import { TabView, TabBar } from 'react-native-tab-view';
 import Toast from 'react-native-simple-toast';
 import { useTheme } from '@react-navigation/native';
@@ -415,7 +415,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ fetchTotalBalance, set
       <TabBar
         {...props}
         indicatorStyle={{ backgroundColor: colors.primary }}
-        style={{ backgroundColor: colors.background, width: (dimensions.width / 2) - 20 }}
+        style={{ backgroundColor: colors.background, width: dimensions.width / 2 - 20 }}
       />
     );
   };
@@ -437,7 +437,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ fetchTotalBalance, set
         style={{
           display: 'flex',
           justifyContent: 'flex-start',
-          width: (dimensions.width / 2)
+          width: dimensions.width / 2,
         }}>
         <Modal
           animationType="slide"
@@ -596,16 +596,16 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ fetchTotalBalance, set
             actions={[addO, viewPrivKey, viewViewingKey, importKey]}
           />
         </View>
-        
       </View>
-      <View style={{ 
-        borderLeftColor: colors.border, 
-        borderLeftWidth: 1, 
-        alignItems: 'center', 
-        padding: 10, 
-        height: '100%',
-        width: (dimensions.width / 2)
-      }}>
+      <View
+        style={{
+          borderLeftColor: colors.border,
+          borderLeftWidth: 1,
+          alignItems: 'center',
+          padding: 10,
+          height: '100%',
+          width: dimensions.width / 2,
+        }}>
         <TabView
           navigationState={{ index, routes }}
           renderScene={renderScene}

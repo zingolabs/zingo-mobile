@@ -256,7 +256,7 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({ doRefresh })
         style={{
           display: 'flex',
           justifyContent: 'flex-start',
-          width: (dimensions.width / 2)
+          width: dimensions.width / 2,
         }}>
         <Modal
           animationType="slide"
@@ -375,14 +375,15 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({ doRefresh })
           </TouchableOpacity>
         </View>
       </View>
-      <View style={{ 
-        borderLeftColor: colors.border, 
-        borderLeftWidth: 1, 
-        alignItems: 'center', 
-        padding: 10, 
-        height: '100%',
-        width: (dimensions.width / 2),
-      }}>
+      <View
+        style={{
+          borderLeftColor: colors.border,
+          borderLeftWidth: 1,
+          alignItems: 'center',
+          padding: 10,
+          height: '100%',
+          width: dimensions.width / 2,
+        }}>
         <RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
           {translate('transactions.transactions')}
         </RegText>
