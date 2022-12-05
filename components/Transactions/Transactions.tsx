@@ -374,7 +374,6 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({ doRefresh })
             <FontAwesomeIcon icon={faBars} size={48} color={colors.border} />
           </TouchableOpacity>
         </View>
-        
       </View>
       <View
         style={{

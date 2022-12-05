@@ -720,8 +720,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     </View>
   );
 
-
-
   const returnLandscape = (
     <View style={{ flexDirection: 'row', height: '100%' }}>
       <View
@@ -737,7 +735,11 @@ const Send: React.FunctionComponent<SendProps> = ({
           transparent={false}
           visible={qrcodeModalVisble}
           onRequestClose={() => setQrcodeModalVisible(false)}>
-          <Scanner updateToField={updateToField} closeModal={() => setQrcodeModalVisible(false)} translate={translate} />
+          <Scanner
+            updateToField={updateToField}
+            closeModal={() => setQrcodeModalVisible(false)}
+            translate={translate}
+          />
         </Modal>
 
         <Modal
@@ -808,7 +810,7 @@ const Send: React.FunctionComponent<SendProps> = ({
               </View>
 
               <View style={{ width: '100%', height: 1, backgroundColor: colors.primary, marginTop: 5 }} />
-              
+
               <View
                 style={{
                   display: 'flex',
@@ -861,12 +863,15 @@ const Send: React.FunctionComponent<SendProps> = ({
           </View>
         </Animated.View>
 
-        <Animated.View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', marginTop: slideAnim }}>
-          <TouchableOpacity accessible={true} accessibilityLabel={translate('menudrawer-acc')} onPress={toggleMenuDrawer}>
+        <Animated.View
+          style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', marginTop: slideAnim }}>
+          <TouchableOpacity
+            accessible={true}
+            accessibilityLabel={translate('menudrawer-acc')}
+            onPress={toggleMenuDrawer}>
             <FontAwesomeIcon icon={faBars} size={48} color={colors.border} />
           </TouchableOpacity>
         </Animated.View>
-
       </View>
       <View
         style={{
@@ -1133,8 +1138,6 @@ const Send: React.FunctionComponent<SendProps> = ({
   } else {
     return returnPortrait;
   }
-
 };
-
 
 export default Send;
