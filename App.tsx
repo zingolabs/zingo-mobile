@@ -60,11 +60,7 @@ export default function App() {
       LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
       setWidthDimensions(window.width);
       setHeightDimensions(window.height);
-      if (window.scale > 0) {
-        setScaleDimensions(window.scale);
-      } else {
-        setScaleDimensions(Number((window.width / window.height).toFixed(2)));
-      }
+      setScaleDimensions(Number((window.width / window.height).toFixed(2)));
     }, []),
   );
 
