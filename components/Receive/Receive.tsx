@@ -499,7 +499,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ fetchTotalBalance, set
                       minHeight: 48,
                     }}>
                     <RegText color={colors.primary}>{translate('transactions.pools')}</RegText>
-                    <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
+                    <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} style={{ marginBottom: 5 }} />
                   </View>
                 </TouchableOpacity>
               )}

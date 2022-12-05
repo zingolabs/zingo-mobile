@@ -63,7 +63,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
             borderBottomColor: colors.border,
           }}>
           <FontAwesomeIcon
-            style={{ marginLeft: 15, marginRight: 15, marginTop: 5 }}
+            style={{ marginLeft: 5, marginRight: 5, marginTop: 5 }}
             size={24}
             icon={txIcon}
             color={amountColor}

@@ -75,7 +75,7 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({ doRefresh })
   const balanceColor = transactions?.find(t => t.confirmations === 0) ? colors.primary : colors.text;
   var lastMonth = '';
 
-  //console.log('render transaction view');
+  //console.log('render transaction');
 
   const returnPortrait = (
     <View
@@ -295,7 +295,7 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({ doRefresh })
                     minHeight: 48,
                   }}>
                   <RegText color={colors.primary}>{translate('transactions.pools')}</RegText>
-                  <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
+                  <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} style={{ marginBottom: 5 }} />
                 </View>
               </TouchableOpacity>
             )}
@@ -374,6 +374,7 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({ doRefresh })
             <FontAwesomeIcon icon={faBars} size={48} color={colors.border} />
           </TouchableOpacity>
         </View>
+        
       </View>
       <View
         style={{

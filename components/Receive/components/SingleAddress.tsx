@@ -19,7 +19,6 @@ type SingleAddressProps = {
   addressKind: string;
   index: number;
   total: number;
-  //receivers: string;
   prev: () => void;
   next: () => void;
   translate: (key: string, config?: TranslateOptions) => any;
@@ -30,7 +29,6 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   addressKind,
   index,
   total,
-  //receivers,
   prev,
   next,
   translate,
@@ -64,16 +62,6 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
         <View style={{ marginTop: 20, marginHorizontal: 20, padding: 10, backgroundColor: colors.border }}>
           <QRCode value={address} size={200} ecl="L" backgroundColor={colors.border} />
         </View>
-        {/*<View style={{ marginTop: 5 }}>
-          <Text style={{ color: colors.primary }}>{'receivers'}</Text>
-          <Text style={{ color: colors.primary }}>
-            {'(' +
-              (receivers.indexOf('o') > -1 ? ' orchard ' : '') +
-              (receivers.indexOf('z') > -1 ? ' sapling ' : '') +
-              (receivers.indexOf('t') > -1 ? ' transparent ' : '') +
-              ')'}
-          </Text>
-        </View>*/}
         <View
           style={{
             flexDirection: 'row',
