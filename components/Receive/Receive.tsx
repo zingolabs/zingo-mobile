@@ -20,6 +20,7 @@ import ImportKey from '../ImportKey';
 import SingleAddress from './components/SingleAddress';
 import { ThemeType } from '../../app/types';
 import { ContextLoaded } from '../../app/context';
+
 type ReceiveProps = {
   fetchTotalBalance: () => void;
   setUaAddress: (uaAddress: string) => void;

@@ -26,7 +26,7 @@ type LegacyProps = {
 
 const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance }) => {
   const context = useContext(ContextLoaded);
-  const { translate, toggleMenuDrawer, info, addresses, startRescan, totalBalance, uaAddress } = context;
+  const { translate, dimensions, toggleMenuDrawer, info, addresses, startRescan, totalBalance, uaAddress } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([
@@ -95,57 +95,6 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance }) => 
       }
       const newIndex = (tindex + 1) % taddrs?.length;
       setTIndex(newIndex);
-    }
-  };
-
-  const renderScene: (routes: any) => JSX.Element | undefined = ({ route }) => {
-    switch (route.key) {
-      case 'zaddr': {
-        let zaddr = translate('legacy.noaddress');
-        let zaddrKind = '';
-        if (zaddrs.length > 0) {
-          zaddr = zaddrs[zindex].address;
-          zaddrKind = zaddrs[zindex].addressKind;
-        }
-        return (
-          <SingleAddress
-            address={zaddr}
-            addressKind={zaddrKind}
-            index={zindex}
-            total={zaddrs.length}
-            prev={() => {
-              prev('z');
-            }}
-            next={() => {
-              next('z');
-            }}
-            translate={translate}
-          />
-        );
-      }
-      case 'taddr': {
-        let taddr = translate('legacy.noaddress');
-        let taddrKind = '';
-        if (taddrs.length > 0) {
-          taddr = taddrs[tindex].address;
-          taddrKind = zaddrs[zindex].addressKind;
-        }
-        return (
-          <SingleAddress
-            address={taddr}
-            addressKind={taddrKind}
-            index={tindex}
-            total={taddrs.length}
-            prev={() => {
-              prev('t');
-            }}
-            next={() => {
-              next('t');
-            }}
-            translate={translate}
-          />
-        );
-      }
     }
   };
 
@@ -277,15 +226,68 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance }) => 
     startRescan();
   };
 
-  const renderTabBar: (props: any) => JSX.Element = props => {
-    let address = '';
+  let address = '';
 
-    if (index === 0 && zaddrs.length > 0) {
-      address = zaddrs[zindex].address;
-    } else if (index === 1 && taddrs.length > 0) {
-      address = taddrs[tindex].address;
+  if (index === 0 && zaddrs.length > 0) {
+    address = zaddrs[zindex].address;
+  } else if (index === 1 && taddrs.length > 0) {
+    address = taddrs[tindex].address;
+  }
+
+  const renderScene: (routes: any) => JSX.Element | undefined = ({ route }) => {
+    switch (route.key) {
+      case 'zaddr': {
+        let zaddr = translate('legacy.noaddress');
+        let zaddrKind = '';
+        if (zaddrs.length > 0) {
+          zaddr = zaddrs[zindex].address;
+          zaddrKind = zaddrs[zindex].addressKind;
+        }
+
+        return (
+          <SingleAddress
+            address={zaddr}
+            addressKind={zaddrKind}
+            index={zindex}
+            total={zaddrs.length}
+            prev={() => {
+              prev('z');
+            }}
+            next={() => {
+              next('z');
+            }}
+            translate={translate}
+          />
+        );
+      }
+      case 'taddr': {
+        let taddr = translate('legacy.noaddress');
+        let taddrKind = '';
+        if (taddrs.length > 0) {
+          taddr = taddrs[tindex].address;
+          taddrKind = zaddrs[zindex].addressKind;
+        }
+
+        return (
+          <SingleAddress
+            address={taddr}
+            addressKind={taddrKind}
+            index={tindex}
+            total={taddrs.length}
+            prev={() => {
+              prev('t');
+            }}
+            next={() => {
+              next('t');
+            }}
+            translate={translate}
+          />
+        );
+      }
     }
+  };
 
+  const renderTabBarPortrait: (props: any) => JSX.Element = props => {
     return (
       <View
         accessible={true}
@@ -397,16 +399,153 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance }) => 
     );
   };
 
-  //console.log('render legacy');
+  const renderTabBarLandscape: (props: any) => JSX.Element = props => {
+    console.log(props);
+    return (
+      <TabBar
+        {...props}
+        indicatorStyle={{ backgroundColor: colors.primary }}
+        style={{ backgroundColor: colors.background, width: dimensions.width / 2 - 20 }}
+      />
+    );
+  };
 
-  return (
+  const returnPortrait = (
     <TabView
       navigationState={{ index, routes }}
       renderScene={renderScene}
-      renderTabBar={renderTabBar}
+      renderTabBar={renderTabBarPortrait}
       onIndexChange={setIndex}
     />
   );
+
+  const returnLandscape = (
+    <View style={{ flexDirection: 'row', height: '100%' }}>
+      <View
+        accessible={true}
+        accessibilityLabel={translate('receive.title-acc')}
+        style={{
+          display: 'flex',
+          justifyContent: 'flex-start',
+          width: dimensions.width / 2,
+        }}>
+        <Modal
+          animationType="slide"
+          transparent={false}
+          visible={privKeyModalVisible}
+          onRequestClose={() => setPrivKeyModalVisible(false)}>
+          <PrivKey
+            address={address}
+            keyType={keyType}
+            privKey={privKey}
+            closeModal={() => setPrivKeyModalVisible(false)}
+          />
+        </Modal>
+
+        <Modal
+          animationType="slide"
+          transparent={false}
+          visible={importKeyModalVisible}
+          onRequestClose={() => setImportKeyModalVisible(false)}>
+          <ImportKey doImport={doImport} closeModal={() => setImportKeyModalVisible(false)} />
+        </Modal>
+
+        <View
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'center',
+            backgroundColor: colors.card,
+            padding: 0,
+            margin: 0,
+          }}>
+          <View
+            style={{
+              alignItems: 'center',
+              backgroundColor: colors.card,
+              zIndex: -1,
+              padding: 10,
+              width: '100%',
+            }}>
+            <Image
+              source={require('../../assets/img/logobig-zingo.png')}
+              style={{ width: 80, height: 80, resizeMode: 'contain' }}
+            />
+            <ZecAmount
+              currencyName={info?.currencyName ? info.currencyName : ''}
+              size={36}
+              amtZec={totalBalance.total}
+              style={{ opacity: 0.5 }}
+            />
+            <UsdAmount
+              style={{ marginTop: 0, marginBottom: 5, opacity: 0.5 }}
+              price={zecPrice}
+              amtZec={totalBalance.total}
+            />
+            <View style={{ width: '100%', height: 1, backgroundColor: colors.primary, marginTop: 5 }} />
+            <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
+              {translate('legacy.title')}
+            </RegText>
+            <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
+          </View>
+        </View>
+
+        <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute' }}>
+          <TouchableOpacity
+            accessible={true}
+            accessibilityLabel={translate('menudrawer-acc')}
+            onPress={toggleMenuDrawer}>
+            <FontAwesomeIcon icon={faBars} size={48} color={colors.border} />
+          </TouchableOpacity>
+        </View>
+
+        <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', right: 0 }}>
+          <OptionsMenu
+            customButton={
+              <View accessible={true} accessibilityLabel={translate('menu-acc')}>
+                <FontAwesomeIcon icon={faEllipsisV} color={colors.border} size={48} />
+              </View>
+            }
+            buttonStyle={{ width: 32, height: 32, margin: 7.5, resizeMode: 'contain' }}
+            destructiveIndex={4}
+            options={[
+              translate('legacy.newz-option'),
+              //translate('legacy.newt-option'),
+              translate('legacy.privkey-option'),
+              translate('legacy.viewkey-option'),
+              translate('cancel'),
+            ]}
+            //addT
+            actions={[addZ, viewPrivKey, viewViewingKey]}
+          />
+        </View>
+      </View>
+      <View
+        style={{
+          borderLeftColor: colors.border,
+          borderLeftWidth: 1,
+          alignItems: 'center',
+          padding: 10,
+          height: '100%',
+          width: dimensions.width / 2,
+        }}>
+        <TabView
+          navigationState={{ index, routes }}
+          renderScene={renderScene}
+          renderTabBar={renderTabBarLandscape}
+          onIndexChange={setIndex}
+        />
+      </View>
+    </View>
+  );
+
+  console.log('render legacy', index, routes);
+
+  if (dimensions.width > dimensions.height && dimensions.scale > 1.8) {
+    return returnLandscape;
+  } else {
+    return returnPortrait;
+  }
 };
 
 export default Legacy;
