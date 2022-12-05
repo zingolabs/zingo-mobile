@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState } from 'react';
-import { View, Image, Modal } from 'react-native';
+import { View, Image, Modal, Text } from 'react-native';
 import { TabView, TabBar } from 'react-native-tab-view';
 import Toast from 'react-native-simple-toast';
 import { useTheme } from '@react-navigation/native';
@@ -92,7 +92,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ fetchTotalBalance, set
     const newAddress = await RPC.rpc_createNewAddress('tzo');
     if (newAddress && !newAddress.startsWith('Error')) {
       await fetchTotalBalance();
-      setIndex(2);
       if (newAddress) {
         setDisplayAddress(newAddress);
       }
@@ -193,7 +192,15 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ fetchTotalBalance, set
     startRescan();
   };
 
-  const renderScenePortrait: (routes: any) => JSX.Element | undefined = ({ route }) => {
+  let address = '';
+
+  if (uaddrs.length > 0) {
+    address = uaddrs[oindex].address;
+  }
+
+  const syncStatusDisplayLine = syncingStatus?.inProgress ? `(${syncingStatus?.blocks})` : '';
+
+  const renderScene: (routes: any) => JSX.Element | undefined = ({ route }) => {
     switch (route.key) {
       case 'uaddr': {
         let uaddr = translate('receive.noaddress');
@@ -225,14 +232,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ fetchTotalBalance, set
   };
 
   const renderTabBarPortrait: (props: any) => JSX.Element = props => {
-    let address = '';
-
-    if (uaddrs.length > 0) {
-      address = uaddrs[oindex].address;
-    }
-
-    const syncStatusDisplayLine = syncingStatus?.inProgress ? `(${syncingStatus?.blocks})` : '';
-
     return (
       <View
         accessible={true}
@@ -408,244 +407,216 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ fetchTotalBalance, set
         />
       </View>
     );
-  };
-
-  const renderSceneLandscape: (routes: any) => JSX.Element | undefined = ({ route }) => {
-    switch (route.key) {
-      case 'uaddr': {
-        let uaddr = translate('receive.noaddress');
-        let uaddrKind = '';
-        //let receivers = '';
-        if (uaddrs.length > 0) {
-          uaddr = uaddrs[oindex].address;
-          uaddrKind = uaddrs[oindex].addressKind;
-          //receivers = uaddrs[oindex].receivers;
-        }
-
-        return (
-          <SingleAddress
-            address={uaddr}
-            addressKind={uaddrKind}
-            index={oindex}
-            total={uaddrs.length}
-            prev={() => {
-              prev('u');
-            }}
-            next={() => {
-              next('u');
-            }}
-            translate={translate}
-          />
-        );
-      }
-    }
   };
 
   const renderTabBarLandscape: (props: any) => JSX.Element = props => {
-    let address = '';
-
-    if (uaddrs.length > 0) {
-      address = uaddrs[oindex].address;
-    }
-
-    const syncStatusDisplayLine = syncingStatus?.inProgress ? `(${syncingStatus?.blocks})` : '';
-
+    console.log(props);
     return (
-      <View
-        accessible={true}
-        accessibilityLabel={translate('receive.title-acc')}
-        style={{
-          display: 'flex',
-          justifyContent: 'flex-start',
-          width: '100%',
-        }}>
-        <Modal
-          animationType="slide"
-          transparent={false}
-          visible={privKeyModalVisible}
-          onRequestClose={() => setPrivKeyModalVisible(false)}>
-          <PrivKey
-            address={address}
-            keyType={keyType}
-            privKey={privKey}
-            closeModal={() => setPrivKeyModalVisible(false)}
-          />
-        </Modal>
-
-        <Modal
-          animationType="slide"
-          transparent={false}
-          visible={importKeyModalVisible}
-          onRequestClose={() => setImportKeyModalVisible(false)}>
-          <ImportKey doImport={doImport} closeModal={() => setImportKeyModalVisible(false)} />
-        </Modal>
-
-        <View
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'center',
-            backgroundColor: colors.card,
-            padding: 10,
-            paddingBottom: 0,
-            margin: 0,
-          }}>
-          <View
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              paddingBottom: 0,
-              backgroundColor: colors.card,
-              zIndex: -1,
-              paddingTop: 0,
-            }}>
-            <Image
-              source={require('../../assets/img/logobig-zingo.png')}
-              style={{ width: 80, height: 80, resizeMode: 'contain' }}
-            />
-            <View style={{ flexDirection: 'row' }}>
-              <ZecAmount
-                currencyName={info?.currencyName ? info.currencyName : ''}
-                size={36}
-                amtZec={totalBalance.total}
-                style={{ opacity: 0.5 }}
-              />
-              {totalBalance.total > 0 && (totalBalance.privateBal > 0 || totalBalance.transparentBal > 0) && (
-                <TouchableOpacity onPress={() => poolsMoreInfoOnClick()}>
-                  <View
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      backgroundColor: colors.card,
-                      borderRadius: 10,
-                      margin: 0,
-                      padding: 0,
-                      marginLeft: 5,
-                      minWidth: 48,
-                      minHeight: 48,
-                    }}>
-                    <RegText color={colors.primary}>{translate('transactions.pools')}</RegText>
-                    <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
-                  </View>
-                </TouchableOpacity>
-              )}
-            </View>
-            <UsdAmount
-              style={{ marginTop: 0, marginBottom: 5, opacity: 0.5 }}
-              price={zecPrice}
-              amtZec={totalBalance.total}
-            />
-
-            <View
-              style={{
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexWrap: 'wrap',
-                marginVertical: syncStatusDisplayLine ? 0 : 5,
-              }}>
-              <View
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexWrap: 'wrap',
-                }}>
-                <RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
-                  {syncStatusDisplayLine ? translate('receive.title-syncing') : translate('receive.title')}
-                </RegText>
-                {!!syncStatusDisplayLine && (
-                  <FadeText style={{ margin: 0, padding: 0 }}>{syncStatusDisplayLine}</FadeText>
-                )}
-              </View>
-              {!!syncStatusDisplayLine && (
-                <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
-                  <View
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      backgroundColor: colors.card,
-                      borderRadius: 10,
-                      margin: 0,
-                      padding: 0,
-                      marginLeft: 5,
-                      minWidth: 48,
-                      minHeight: 48,
-                    }}>
-                    <RegText color={colors.primary}>{translate('receive.more')}</RegText>
-                    <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
-                  </View>
-                </TouchableOpacity>
-              )}
-            </View>
-          </View>
-        </View>
-
-        <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute' }}>
-          <TouchableOpacity
-            accessible={true}
-            accessibilityLabel={translate('menudrawer-acc')}
-            onPress={toggleMenuDrawer}>
-            <FontAwesomeIcon icon={faBars} size={48} color={colors.border} />
-          </TouchableOpacity>
-        </View>
-
-        <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', right: 0 }}>
-          <OptionsMenu
-            customButton={
-              <View accessible={true} accessibilityLabel={translate('menu-acc')}>
-                <FontAwesomeIcon icon={faEllipsisV} color={colors.border} size={48} />
-              </View>
-            }
-            buttonStyle={{ width: 32, height: 32, margin: 7.5, resizeMode: 'contain' }}
-            destructiveIndex={4}
-            options={[
-              translate('receive.newu-option'),
-              translate('receive.privkey-option'),
-              translate('receive.viewkey-option'),
-              translate('receive.import-option'),
-              translate('cancel'),
-            ]}
-            actions={[addO, viewPrivKey, viewViewingKey, importKey]}
-          />
-        </View>
-
-        <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
-
-        <TabBar
-          {...props}
-          indicatorStyle={{ backgroundColor: colors.primary }}
-          style={{ backgroundColor: colors.background }}
-        />
-      </View>
+      <TabBar
+        {...props}
+        indicatorStyle={{ backgroundColor: colors.primary }}
+        style={{ backgroundColor: colors.background, width: (dimensions.width / 2) - 20 }}
+      />
     );
   };
-
-  //console.log('render receive');
 
   const returnPortrait = (
     <TabView
       navigationState={{ index, routes }}
-      renderScene={renderScenePortrait}
+      renderScene={renderScene}
       renderTabBar={renderTabBarPortrait}
       onIndexChange={setIndex}
     />
   );
 
   const returnLandscape = (
-    <TabView
-      navigationState={{ index, routes }}
-      renderScene={renderSceneLandscape}
-      renderTabBar={renderTabBarLandscape}
-      onIndexChange={setIndex}
-    />
+    <View style={{ flexDirection: 'row', height: '100%' }}>
+      <View
+        accessible={true}
+        accessibilityLabel={translate('receive.title-acc')}
+        style={{
+          display: 'flex',
+          justifyContent: 'flex-start',
+          width: (dimensions.width / 2)
+        }}>
+        <Modal
+          animationType="slide"
+          transparent={false}
+          visible={privKeyModalVisible}
+          onRequestClose={() => setPrivKeyModalVisible(false)}>
+          <PrivKey
+            address={address}
+            keyType={keyType}
+            privKey={privKey}
+            closeModal={() => setPrivKeyModalVisible(false)}
+          />
+        </Modal>
+
+        <Modal
+          animationType="slide"
+          transparent={false}
+          visible={importKeyModalVisible}
+          onRequestClose={() => setImportKeyModalVisible(false)}>
+          <ImportKey doImport={doImport} closeModal={() => setImportKeyModalVisible(false)} />
+        </Modal>
+
+        <View
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'center',
+            backgroundColor: colors.card,
+            padding: 0,
+            margin: 0,
+          }}>
+          <View
+            style={{
+              alignItems: 'center',
+              backgroundColor: colors.card,
+              zIndex: -1,
+              padding: 10,
+              width: '100%',
+            }}>
+            <Image
+              source={require('../../assets/img/logobig-zingo.png')}
+              style={{ width: 80, height: 80, resizeMode: 'contain' }}
+            />
+            <View style={{ flexDirection: 'column', alignItems: 'center' }}>
+              {totalBalance.total > 0 && (totalBalance.privateBal > 0 || totalBalance.transparentBal > 0) && (
+                <TouchableOpacity onPress={() => poolsMoreInfoOnClick()}>
+                  <View
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      alignItems: 'flex-end',
+                      justifyContent: 'center',
+                      backgroundColor: colors.card,
+                      borderRadius: 10,
+                      margin: 0,
+                      padding: 0,
+                      minWidth: 48,
+                      minHeight: 48,
+                    }}>
+                    <RegText color={colors.primary}>{translate('transactions.pools')}</RegText>
+                    <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
+                  </View>
+                </TouchableOpacity>
+              )}
+              <ZecAmount
+                currencyName={info?.currencyName ? info.currencyName : ''}
+                size={36}
+                amtZec={totalBalance.total}
+                style={{ opacity: 0.5 }}
+              />
+              <UsdAmount
+                style={{ marginTop: 0, marginBottom: 5, opacity: 0.5 }}
+                price={zecPrice}
+                amtZec={totalBalance.total}
+              />
+            </View>
+
+            <View style={{ width: '100%', height: 1, backgroundColor: colors.primary, marginTop: 5 }} />
+
+            <View
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexWrap: 'wrap',
+                marginVertical: syncStatusDisplayLine ? 0 : 5,
+              }}>
+              <View
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexWrap: 'wrap',
+                }}>
+                <RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
+                  {syncStatusDisplayLine ? translate('receive.title-syncing') : translate('receive.title')}
+                </RegText>
+                {!!syncStatusDisplayLine && (
+                  <FadeText style={{ margin: 0, padding: 0 }}>{syncStatusDisplayLine}</FadeText>
+                )}
+              </View>
+              {!!syncStatusDisplayLine && (
+                <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
+                  <View
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backgroundColor: colors.card,
+                      borderRadius: 10,
+                      margin: 0,
+                      padding: 0,
+                      marginLeft: 5,
+                      minWidth: 48,
+                      minHeight: 48,
+                    }}>
+                    <RegText color={colors.primary}>{translate('receive.more')}</RegText>
+                    <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
+                  </View>
+                </TouchableOpacity>
+              )}
+            </View>
+
+            <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
+          </View>
+        </View>
+
+        <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute' }}>
+          <TouchableOpacity
+            accessible={true}
+            accessibilityLabel={translate('menudrawer-acc')}
+            onPress={toggleMenuDrawer}>
+            <FontAwesomeIcon icon={faBars} size={48} color={colors.border} />
+          </TouchableOpacity>
+        </View>
+
+        <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', right: 0 }}>
+          <OptionsMenu
+            customButton={
+              <View accessible={true} accessibilityLabel={translate('menu-acc')}>
+                <FontAwesomeIcon icon={faEllipsisV} color={colors.border} size={48} />
+              </View>
+            }
+            buttonStyle={{ width: 32, height: 32, margin: 7.5, resizeMode: 'contain' }}
+            destructiveIndex={4}
+            options={[
+              translate('receive.newu-option'),
+              translate('receive.privkey-option'),
+              translate('receive.viewkey-option'),
+              translate('receive.import-option'),
+              translate('cancel'),
+            ]}
+            actions={[addO, viewPrivKey, viewViewingKey, importKey]}
+          />
+        </View>
+        
+      </View>
+      <View style={{ 
+        borderLeftColor: colors.border, 
+        borderLeftWidth: 1, 
+        alignItems: 'center', 
+        padding: 10, 
+        height: '100%',
+        width: (dimensions.width / 2)
+      }}>
+        <TabView
+          navigationState={{ index, routes }}
+          renderScene={renderScene}
+          renderTabBar={renderTabBarLandscape}
+          onIndexChange={setIndex}
+        />
+      </View>
+    </View>
   );
+
+  console.log('render receive', index, routes);
 
   if (dimensions.width > dimensions.height && dimensions.scale > 1.8) {
     return returnLandscape;

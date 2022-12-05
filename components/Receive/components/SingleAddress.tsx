@@ -53,115 +53,117 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   };
 
   return (
-    <ScrollView
-      contentContainerStyle={[
-        {
-          alignItems: 'center',
-          backgroundColor: colors.background,
-        },
-      ]}>
-      <View style={{ marginTop: 20, marginHorizontal: 20, padding: 10, backgroundColor: colors.border }}>
-        <QRCode value={address} size={200} ecl="L" backgroundColor={colors.border} />
-      </View>
-      {/*<View style={{ marginTop: 5 }}>
-        <Text style={{ color: colors.primary }}>{'receivers'}</Text>
-        <Text style={{ color: colors.primary }}>
-          {'(' +
-            (receivers.indexOf('o') > -1 ? ' orchard ' : '') +
-            (receivers.indexOf('z') > -1 ? ' sapling ' : '') +
-            (receivers.indexOf('t') > -1 ? ' transparent ' : '') +
-            ')'}
-        </Text>
-      </View>*/}
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          marginVertical: 15,
-          width: '100%',
-          justifyContent: 'space-evenly',
-        }}>
-        {multi && (
-          <View
-            style={{
-              width: 58,
-              borderColor: colors.primary,
-              borderWidth: 2,
-              borderRadius: 10,
-            }}>
-            <TouchableOpacity accessible={true} accessibilityLabel={translate('send.scan-acc')} onPress={prev}>
-              <FontAwesomeIcon style={{ margin: 5 }} size={48} icon={faChevronLeft} color={colors.primary} />
-            </TouchableOpacity>
-          </View>
-        )}
-        <View style={{ width: 240, justifyContent: 'center', alignItems: 'center' }}>
-          <TouchableOpacity onPress={doCopy}>
-            <Text style={{ color: colors.text, textDecorationLine: 'underline', marginTop: 15, minHeight: 48 }}>
-              {translate('seed.tapcopy')}
-            </Text>
-          </TouchableOpacity>
+    <View style={{ flexDirection: 'column' }}>
+      <ScrollView
+        contentContainerStyle={[
+          {
+            alignItems: 'center',
+            backgroundColor: colors.background,
+          },
+        ]}>
+        <View style={{ marginTop: 20, marginHorizontal: 20, padding: 10, backgroundColor: colors.border }}>
+          <QRCode value={address} size={200} ecl="L" backgroundColor={colors.border} />
+        </View>
+        {/*<View style={{ marginTop: 5 }}>
+          <Text style={{ color: colors.primary }}>{'receivers'}</Text>
+          <Text style={{ color: colors.primary }}>
+            {'(' +
+              (receivers.indexOf('o') > -1 ? ' orchard ' : '') +
+              (receivers.indexOf('z') > -1 ? ' sapling ' : '') +
+              (receivers.indexOf('t') > -1 ? ' transparent ' : '') +
+              ')'}
+          </Text>
+        </View>*/}
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginVertical: 15,
+            width: '100%',
+            justifyContent: 'space-evenly',
+          }}>
           {multi && (
-            <Text style={{ color: colors.primary, marginTop: -25 }}>
+            <View
+              style={{
+                width: 58,
+                borderColor: colors.primary,
+                borderWidth: 2,
+                borderRadius: 10,
+              }}>
+              <TouchableOpacity accessible={true} accessibilityLabel={translate('send.scan-acc')} onPress={prev}>
+                <FontAwesomeIcon style={{ margin: 5 }} size={48} icon={faChevronLeft} color={colors.primary} />
+              </TouchableOpacity>
+            </View>
+          )}
+          <View style={{ width: 150, justifyContent: 'center', alignItems: 'center' }}>
+            <TouchableOpacity onPress={doCopy}>
+              <Text style={{ color: colors.text, textDecorationLine: 'underline', marginTop: 15, minHeight: 48 }}>
+                {translate('seed.tapcopy')}
+              </Text>
+            </TouchableOpacity>
+            {multi && (
+              <Text style={{ color: colors.primary, marginTop: -25 }}>
+                {index + 1}
+                {translate('legacy.of')}
+                {total}
+              </Text>
+            )}
+          </View>
+          {multi && (
+            <View
+              style={{
+                width: 58,
+                borderColor: colors.primary,
+                borderWidth: 2,
+                borderRadius: 10,
+              }}>
+              <TouchableOpacity accessible={true} accessibilityLabel={translate('send.scan-acc')} onPress={next}>
+                <FontAwesomeIcon style={{ margin: 5 }} size={48} icon={faChevronRight} color={colors.primary} />
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
+        <View style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
+          {chunks.map(c => (
+            <FadeText
+              key={c}
+              style={{
+                flexBasis: '100%',
+                textAlign: 'center',
+                fontFamily: fixedWidthFont,
+                fontSize: 16,
+                color: colors.text,
+              }}>
+              {c}
+            </FadeText>
+          ))}
+        </View>
+
+        {/*multi && (
+          <View style={{ display: 'flex', flexDirection: 'row', marginTop: 10, alignItems: 'center', marginBottom: 100 }}>
+            <Button
+              type="Secondary"
+              title={translate('legacy.prev')}
+              style={{ width: '25%', margin: 10 }}
+              onPress={prev}
+            />
+            <FadeText>
               {index + 1}
               {translate('legacy.of')}
               {total}
-            </Text>
-          )}
-        </View>
-        {multi && (
-          <View
-            style={{
-              width: 58,
-              borderColor: colors.primary,
-              borderWidth: 2,
-              borderRadius: 10,
-            }}>
-            <TouchableOpacity accessible={true} accessibilityLabel={translate('send.scan-acc')} onPress={next}>
-              <FontAwesomeIcon style={{ margin: 5 }} size={48} icon={faChevronRight} color={colors.primary} />
-            </TouchableOpacity>
+            </FadeText>
+            <Button
+              type="Secondary"
+              title={translate('legacy.next')}
+              style={{ width: '25%', margin: 10 }}
+              onPress={next}
+            />
           </View>
-        )}
-      </View>
-      <View style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
-        {chunks.map(c => (
-          <FadeText
-            key={c}
-            style={{
-              flexBasis: '100%',
-              textAlign: 'center',
-              fontFamily: fixedWidthFont,
-              fontSize: 18,
-              color: colors.text,
-            }}>
-            {c}
-          </FadeText>
-        ))}
-      </View>
+        )*/}
 
-      {/*multi && (
-        <View style={{ display: 'flex', flexDirection: 'row', marginTop: 10, alignItems: 'center', marginBottom: 100 }}>
-          <Button
-            type="Secondary"
-            title={translate('legacy.prev')}
-            style={{ width: '25%', margin: 10 }}
-            onPress={prev}
-          />
-          <FadeText>
-            {index + 1}
-            {translate('legacy.of')}
-            {total}
-          </FadeText>
-          <Button
-            type="Secondary"
-            title={translate('legacy.next')}
-            style={{ width: '25%', margin: 10 }}
-            onPress={next}
-          />
-        </View>
-      )*/}
-
-      <View style={{ height: 20 }} />
-    </ScrollView>
+        <View style={{ height: 20 }} />
+      </ScrollView>
+    </View>
   );
 };
 

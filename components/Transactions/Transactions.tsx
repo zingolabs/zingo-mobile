@@ -249,13 +249,14 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({ doRefresh })
   );
 
   const returnLandscape = (
-    <View style={{ flexDirection: 'row' }}>
+    <View style={{ flexDirection: 'row', height: '100%' }}>
       <View
         accessible={true}
         accessibilityLabel={translate('transactions.title-acc')}
         style={{
           display: 'flex',
           justifyContent: 'flex-start',
+          width: (dimensions.width / 2)
         }}>
         <Modal
           animationType="slide"
@@ -269,7 +270,6 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({ doRefresh })
           style={{
             display: 'flex',
             alignItems: 'center',
-            paddingBottom: 0,
             backgroundColor: colors.card,
             zIndex: -1,
             padding: 10,
@@ -375,7 +375,14 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({ doRefresh })
           </TouchableOpacity>
         </View>
       </View>
-      <View style={{ borderLeftColor: colors.border, borderLeftWidth: 1, alignItems: 'center', padding: 10 }}>
+      <View style={{ 
+        borderLeftColor: colors.border, 
+        borderLeftWidth: 1, 
+        alignItems: 'center', 
+        padding: 10, 
+        height: '100%',
+        width: (dimensions.width / 2),
+      }}>
         <RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
           {translate('transactions.transactions')}
         </RegText>
