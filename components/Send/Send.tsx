@@ -479,422 +479,10 @@ const Send: React.FunctionComponent<SendProps> = ({
       <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
 
       <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{}}>
-        {[sendPageState.toaddr].map((ta, i) => {
-          return (
-            <View key={i} style={{ display: 'flex', padding: 10, marginTop: 10 }}>
-              <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                <RegText>{translate('send.toaddress')}</RegText>
-                {validAddress === 1 && <FontAwesomeIcon icon={faCheck} color={colors.primary} />}
-                {validAddress === -1 && <ErrorText>{translate('send.invalidaddress')}</ErrorText>}
-              </View>
-              <View
-                style={{
-                  flex: 1,
-                  borderWidth: 1,
-                  borderRadius: 5,
-                  borderColor: colors.text,
-                  marginTop: 5,
-                }}>
-                <View style={{ flexDirection: 'row' }}>
-                  <View
-                    accessible={true}
-                    accessibilityLabel={translate('send.address-acc')}
-                    style={{
-                      flex: 1,
-                      justifyContent: 'center',
-                    }}>
-                    <TextInput
-                      placeholder={translate('send.addressplaceholder')}
-                      placeholderTextColor={colors.placeholder}
-                      style={{
-                        color: colors.text,
-                        fontWeight: '600',
-                        fontSize: 16,
-                        marginLeft: 5,
-                      }}
-                      value={ta.to}
-                      onChangeText={(text: string) => updateToField(text, null, null, null)}
-                      editable={true}
-                    />
-                  </View>
-                  <View
-                    style={{
-                      width: 58,
-                    }}>
-                    <TouchableOpacity
-                      accessible={true}
-                      accessibilityLabel={translate('send.scan-acc')}
-                      onPress={() => {
-                        setQrcodeModalVisible(true);
-                      }}>
-                      <FontAwesomeIcon style={{ margin: 5 }} size={48} icon={faQrcode} color={colors.border} />
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </View>
-
-              <View style={{ marginTop: 10, display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                <FadeText>{translate('send.amount')}</FadeText>
-                {validAmount === -1 && <ErrorText>{translate('send.invalidamount')}</ErrorText>}
-              </View>
-
-              <View
-                style={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                }}>
-                <View
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    justifyContent: 'flex-start',
-                    width: '60%',
-                  }}>
-                  <RegText style={{ marginTop: 20, marginRight: 5, fontSize: 20 }}>{'\u1647'}</RegText>
-                  <View
-                    accessible={true}
-                    accessibilityLabel={translate('send.zec-acc')}
-                    style={{
-                      flexGrow: 1,
-                      borderWidth: 1,
-                      borderRadius: 5,
-                      borderColor: colors.text,
-                      marginTop: 5,
-                      width: '75%',
-                      minWidth: 48,
-                      minHeight: 48,
-                    }}>
-                    <TextInput
-                      placeholder={`#${decimalSeparator}########`}
-                      placeholderTextColor={colors.placeholder}
-                      keyboardType="numeric"
-                      style={{
-                        color: colors.text,
-                        fontWeight: '600',
-                        fontSize: 18,
-                        minWidth: 48,
-                        minHeight: 48,
-                        marginLeft: 5,
-                      }}
-                      value={ta.amount.toString()}
-                      onChangeText={(text: string) => updateToField(null, text.substring(0, 10), null, null)}
-                      editable={true}
-                      maxLength={10}
-                    />
-                  </View>
-                  <RegText style={{ marginTop: 15, marginRight: 10, marginLeft: 5 }}>ZEC</RegText>
-                </View>
-
-                <View
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    justifyContent: 'flex-start',
-                    width: '35%',
-                  }}>
-                  <RegText style={{ marginTop: 15, marginRight: 5 }}>$</RegText>
-                  <View
-                    accessible={true}
-                    accessibilityLabel={translate('send.usd-acc')}
-                    style={{
-                      flexGrow: 1,
-                      borderWidth: 1,
-                      borderRadius: 5,
-                      borderColor: colors.text,
-                      marginTop: 5,
-                      width: '55%',
-                      minWidth: 48,
-                      minHeight: 48,
-                    }}>
-                    <TextInput
-                      placeholder={`#${decimalSeparator}##`}
-                      placeholderTextColor={colors.placeholder}
-                      keyboardType="numeric"
-                      style={{
-                        color: colors.text,
-                        fontWeight: '600',
-                        fontSize: 18,
-                        minWidth: 48,
-                        minHeight: 48,
-                        marginLeft: 5,
-                      }}
-                      value={ta.amountUSD.toString()}
-                      onChangeText={(text: string) => updateToField(null, null, text.substring(0, 4), null)}
-                      editable={true}
-                      maxLength={4}
-                    />
-                  </View>
-                  <RegText style={{ marginTop: 15, marginLeft: 5 }}>USD</RegText>
-                </View>
-              </View>
-
-              <View style={{ display: 'flex', flexDirection: 'column' }}>
-                <View
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    justifyContent: 'flex-start',
-                    alignItems: 'center',
-                    marginTop: 10,
-                  }}>
-                  <RegText>{translate('send.spendable')}</RegText>
-                  <ZecAmount
-                    currencyName={info?.currencyName ? info.currencyName : ''}
-                    color={colors.money}
-                    size={18}
-                    amtZec={getMaxAmount()}
-                  />
-                </View>
-                {stillConfirming && (
-                  <View
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'row',
-                      marginTop: 5,
-                      backgroundColor: colors.card,
-                      padding: 5,
-                      borderRadius: 10,
-                    }}>
-                    <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
-                    <FadeText>{translate('send.somefunds')}</FadeText>
-                  </View>
-                )}
-              </View>
-
-              {memoEnabled === true && (
-                <>
-                  <FadeText style={{ marginTop: 10 }}>{translate('send.memo')}</FadeText>
-                  <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start' }}>
-                    <View
-                      accessible={true}
-                      accessibilityLabel={translate('send.memo-acc')}
-                      style={{
-                        flexGrow: 1,
-                        borderWidth: 1,
-                        borderRadius: 5,
-                        borderColor: colors.text,
-                        minWidth: 48,
-                        minHeight: 48,
-                        maxHeight: 150,
-                      }}>
-                      <TextInput
-                        multiline
-                        style={{
-                          color: colors.text,
-                          fontWeight: '600',
-                          fontSize: 18,
-                          minWidth: 48,
-                          minHeight: 48,
-                          marginLeft: 5,
-                        }}
-                        value={ta.memo}
-                        onChangeText={(text: string) => updateToField(null, null, null, text)}
-                        editable={true}
-                      />
-                    </View>
-                  </View>
-                </>
-              )}
-            </View>
-          );
-        })}
-        <View
-          style={{
-            flexGrow: 1,
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginVertical: 5,
-          }}>
-          <Button
-            accessible={true}
-            accessibilityLabel={'title ' + translate('send.button')}
-            type="Primary"
-            title={translate('send.button')}
-            disabled={!sendButtonEnabled}
-            onPress={() => setConfirmModalVisible(true)}
-          />
-          <Button
-            type="Secondary"
-            style={{ marginLeft: 10 }}
-            title={translate('send.clear')}
-            onPress={() => clearToAddr()}
-          />
-        </View>
-      </ScrollView>
-    </View>
-  );
-
-  const returnLandscape = (
-    <View style={{ flexDirection: 'row', height: '100%' }}>
-      <View
-        accessible={true}
-        accessibilityLabel={translate('send.title-acc')}
-        style={{
-          display: 'flex',
-          justifyContent: 'flex-start',
-          width: dimensions.width / 2,
-        }}>
-        <Modal
-          animationType="slide"
-          transparent={false}
-          visible={qrcodeModalVisble}
-          onRequestClose={() => setQrcodeModalVisible(false)}>
-          <Scanner
-            updateToField={updateToField}
-            closeModal={() => setQrcodeModalVisible(false)}
-            translate={translate}
-            width={dimensions.width / 2}
-            height={dimensions.height * 0.7}
-          />
-        </Modal>
-
-        <Modal
-          animationType="slide"
-          transparent={false}
-          visible={confirmModalVisible}
-          onRequestClose={() => setConfirmModalVisible(false)}>
-          <Confirm
-            defaultFee={defaultFee}
-            closeModal={() => {
-              setConfirmModalVisible(false);
-            }}
-            confirmSend={confirmSend}
-          />
-        </Modal>
-
-        <Animated.View style={{ marginTop: slideAnim }}>
-          <View
-            onLayout={e => {
-              const { height } = e.nativeEvent.layout;
-              setTitleViewHeight(height);
-            }}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              backgroundColor: colors.card,
-              zIndex: -1,
-            }}>
-            <View
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                backgroundColor: colors.card,
-                zIndex: -1,
-                padding: 10,
-                width: '100%',
-              }}>
-              <Image
-                source={require('../../assets/img/logobig-zingo.png')}
-                style={{ width: 80, height: 80, resizeMode: 'contain' }}
-              />
-              <View style={{ flexDirection: 'column', alignItems: 'center' }}>
-                {totalBalance.total > 0 && (totalBalance.privateBal > 0 || totalBalance.transparentBal > 0) && (
-                  <TouchableOpacity onPress={() => poolsMoreInfoOnClick()}>
-                    <View
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        alignItems: 'flex-end',
-                        justifyContent: 'center',
-                        backgroundColor: colors.card,
-                        borderRadius: 10,
-                        margin: 0,
-                        padding: 0,
-                        minWidth: 48,
-                        minHeight: 48,
-                      }}>
-                      <RegText color={colors.primary}>{translate('transactions.pools')}</RegText>
-                      <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} style={{ marginBottom: 5 }} />
-                    </View>
-                  </TouchableOpacity>
-                )}
-                <ZecAmount
-                  currencyName={info?.currencyName ? info.currencyName : ''}
-                  size={36}
-                  amtZec={totalBalance.total}
-                />
-                <UsdAmount style={{ marginTop: 0, marginBottom: 5 }} price={zecPrice} amtZec={totalBalance.total} />
-              </View>
-
-              <View style={{ width: '100%', height: 1, backgroundColor: colors.primary, marginTop: 5 }} />
-
-              <View
-                style={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexWrap: 'wrap',
-                  marginVertical: syncStatusDisplayLine ? 0 : 5,
-                }}>
-                <View
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexWrap: 'wrap',
-                  }}>
-                  <RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
-                    {syncStatusDisplayLine ? translate('send.title-syncing') : translate('send.title')}
-                  </RegText>
-                  {!!syncStatusDisplayLine && (
-                    <FadeText style={{ margin: 0, padding: 0 }}>{syncStatusDisplayLine}</FadeText>
-                  )}
-                </View>
-                {!!syncStatusDisplayLine && (
-                  <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
-                    <View
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        backgroundColor: colors.card,
-                        borderRadius: 10,
-                        margin: 0,
-                        padding: 0,
-                        marginLeft: 5,
-                        minWidth: 48,
-                        minHeight: 48,
-                      }}>
-                      <RegText color={colors.primary}>{translate('send.more')}</RegText>
-                      <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
-                    </View>
-                  </TouchableOpacity>
-                )}
-              </View>
-
-              <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
-            </View>
-          </View>
-        </Animated.View>
-
-        <Animated.View
-          style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', marginTop: slideAnim }}>
-          <TouchableOpacity
-            accessible={true}
-            accessibilityLabel={translate('menudrawer-acc')}
-            onPress={toggleMenuDrawer}>
-            <FontAwesomeIcon icon={faBars} size={48} color={colors.border} />
-          </TouchableOpacity>
-        </Animated.View>
-      </View>
-      <View
-        style={{
-          borderLeftColor: colors.border,
-          borderLeftWidth: 1,
-          alignItems: 'center',
-          padding: 0,
-          height: '100%',
-          width: dimensions.width / 2,
-        }}>
-        <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{}}>
+        <View style={{ marginBottom: 30 }}>
           {[sendPageState.toaddr].map((ta, i) => {
             return (
-              <View key={i} style={{ display: 'flex', padding: 5, marginTop: 10 }}>
+              <View key={i} style={{ display: 'flex', padding: 10, marginTop: 10 }}>
                 <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                   <RegText>{translate('send.toaddress')}</RegText>
                   {validAddress === 1 && <FontAwesomeIcon icon={faCheck} color={colors.primary} />}
@@ -1134,6 +722,422 @@ const Send: React.FunctionComponent<SendProps> = ({
               title={translate('send.clear')}
               onPress={() => clearToAddr()}
             />
+          </View>
+        </View>
+      </ScrollView>
+    </View>
+  );
+
+  const returnLandscape = (
+    <View style={{ flexDirection: 'row', height: '100%' }}>
+      <View
+        accessible={true}
+        accessibilityLabel={translate('send.title-acc')}
+        style={{
+          display: 'flex',
+          justifyContent: 'flex-start',
+          width: dimensions.width / 2,
+        }}>
+        <Modal
+          animationType="slide"
+          transparent={false}
+          visible={qrcodeModalVisble}
+          onRequestClose={() => setQrcodeModalVisible(false)}>
+          <Scanner
+            updateToField={updateToField}
+            closeModal={() => setQrcodeModalVisible(false)}
+            translate={translate}
+            width={dimensions.width / 2}
+            height={dimensions.height * 0.7}
+          />
+        </Modal>
+
+        <Modal
+          animationType="slide"
+          transparent={false}
+          visible={confirmModalVisible}
+          onRequestClose={() => setConfirmModalVisible(false)}>
+          <Confirm
+            defaultFee={defaultFee}
+            closeModal={() => {
+              setConfirmModalVisible(false);
+            }}
+            confirmSend={confirmSend}
+          />
+        </Modal>
+
+        <View style={{ }}>
+          <View
+            onLayout={e => {
+              const { height } = e.nativeEvent.layout;
+              setTitleViewHeight(height);
+            }}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              backgroundColor: colors.card,
+              zIndex: -1,
+            }}>
+            <View
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                backgroundColor: colors.card,
+                zIndex: -1,
+                padding: 10,
+                width: '100%',
+              }}>
+              <Image
+                source={require('../../assets/img/logobig-zingo.png')}
+                style={{ width: 80, height: 80, resizeMode: 'contain' }}
+              />
+              <View style={{ flexDirection: 'column', alignItems: 'center' }}>
+                {totalBalance.total > 0 && (totalBalance.privateBal > 0 || totalBalance.transparentBal > 0) && (
+                  <TouchableOpacity onPress={() => poolsMoreInfoOnClick()}>
+                    <View
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'flex-end',
+                        justifyContent: 'center',
+                        backgroundColor: colors.card,
+                        borderRadius: 10,
+                        margin: 0,
+                        padding: 0,
+                        minWidth: 48,
+                        minHeight: 48,
+                      }}>
+                      <RegText color={colors.primary}>{translate('transactions.pools')}</RegText>
+                      <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} style={{ marginBottom: 5 }} />
+                    </View>
+                  </TouchableOpacity>
+                )}
+                <ZecAmount
+                  currencyName={info?.currencyName ? info.currencyName : ''}
+                  size={36}
+                  amtZec={totalBalance.total}
+                />
+                <UsdAmount style={{ marginTop: 0, marginBottom: 5 }} price={zecPrice} amtZec={totalBalance.total} />
+              </View>
+
+              <View style={{ width: '100%', height: 1, backgroundColor: colors.primary, marginTop: 5 }} />
+
+              <View
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexWrap: 'wrap',
+                  marginVertical: syncStatusDisplayLine ? 0 : 5,
+                }}>
+                <View
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexWrap: 'wrap',
+                  }}>
+                  <RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
+                    {syncStatusDisplayLine ? translate('send.title-syncing') : translate('send.title')}
+                  </RegText>
+                  {!!syncStatusDisplayLine && (
+                    <FadeText style={{ margin: 0, padding: 0 }}>{syncStatusDisplayLine}</FadeText>
+                  )}
+                </View>
+                {!!syncStatusDisplayLine && (
+                  <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
+                    <View
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        backgroundColor: colors.card,
+                        borderRadius: 10,
+                        margin: 0,
+                        padding: 0,
+                        marginLeft: 5,
+                        minWidth: 48,
+                        minHeight: 48,
+                      }}>
+                      <RegText color={colors.primary}>{translate('send.more')}</RegText>
+                      <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
+                    </View>
+                  </TouchableOpacity>
+                )}
+              </View>
+
+              <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
+            </View>
+          </View>
+        </View>
+
+        <View
+          style={{ backgroundColor: colors.card, padding: 10, position: 'absolute'}}>
+          <TouchableOpacity
+            accessible={true}
+            accessibilityLabel={translate('menudrawer-acc')}
+            onPress={toggleMenuDrawer}>
+            <FontAwesomeIcon icon={faBars} size={48} color={colors.border} />
+          </TouchableOpacity>
+        </View>
+      </View>
+      <View
+        style={{
+          borderLeftColor: colors.border,
+          borderLeftWidth: 1,
+          alignItems: 'center',
+          padding: 0,
+          height: '100%',
+          width: dimensions.width / 2,
+        }}>
+        <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ }} style={{  }}>
+          <View style={{ marginBottom: 150 }}>
+            {[sendPageState.toaddr].map((ta, i) => {
+              return (
+                <View key={i} style={{ display: 'flex', padding: 5, marginTop: 10 }}>
+                  <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <RegText>{translate('send.toaddress')}</RegText>
+                    {validAddress === 1 && <FontAwesomeIcon icon={faCheck} color={colors.primary} />}
+                    {validAddress === -1 && <ErrorText>{translate('send.invalidaddress')}</ErrorText>}
+                  </View>
+                  <View
+                    style={{
+                      flex: 1,
+                      borderWidth: 1,
+                      borderRadius: 5,
+                      borderColor: colors.text,
+                      marginTop: 5,
+                    }}>
+                    <View style={{ flexDirection: 'row' }}>
+                      <View
+                        accessible={true}
+                        accessibilityLabel={translate('send.address-acc')}
+                        style={{
+                          flex: 1,
+                          justifyContent: 'center',
+                        }}>
+                        <TextInput
+                          placeholder={translate('send.addressplaceholder')}
+                          placeholderTextColor={colors.placeholder}
+                          style={{
+                            color: colors.text,
+                            fontWeight: '600',
+                            fontSize: 16,
+                            marginLeft: 5,
+                          }}
+                          value={ta.to}
+                          onChangeText={(text: string) => updateToField(text, null, null, null)}
+                          editable={true}
+                        />
+                      </View>
+                      <View
+                        style={{
+                          width: 58,
+                        }}>
+                        <TouchableOpacity
+                          accessible={true}
+                          accessibilityLabel={translate('send.scan-acc')}
+                          onPress={() => {
+                            setQrcodeModalVisible(true);
+                          }}>
+                          <FontAwesomeIcon style={{ margin: 5 }} size={48} icon={faQrcode} color={colors.border} />
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  </View>
+
+                  <View style={{ marginTop: 10, display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <FadeText>{translate('send.amount')}</FadeText>
+                    {validAmount === -1 && <ErrorText>{translate('send.invalidamount')}</ErrorText>}
+                  </View>
+
+                  <View
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                    }}>
+                    <View
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        justifyContent: 'flex-start',
+                        width: '60%',
+                      }}>
+                      <RegText style={{ marginTop: 20, marginRight: 5, fontSize: 20 }}>{'\u1647'}</RegText>
+                      <View
+                        accessible={true}
+                        accessibilityLabel={translate('send.zec-acc')}
+                        style={{
+                          flexGrow: 1,
+                          borderWidth: 1,
+                          borderRadius: 5,
+                          borderColor: colors.text,
+                          marginTop: 5,
+                          width: '75%',
+                          minWidth: 48,
+                          minHeight: 48,
+                        }}>
+                        <TextInput
+                          placeholder={`#${decimalSeparator}########`}
+                          placeholderTextColor={colors.placeholder}
+                          keyboardType="numeric"
+                          style={{
+                            color: colors.text,
+                            fontWeight: '600',
+                            fontSize: 18,
+                            minWidth: 48,
+                            minHeight: 48,
+                            marginLeft: 5,
+                          }}
+                          value={ta.amount.toString()}
+                          onChangeText={(text: string) => updateToField(null, text.substring(0, 10), null, null)}
+                          editable={true}
+                          maxLength={10}
+                        />
+                      </View>
+                      <RegText style={{ marginTop: 15, marginRight: 10, marginLeft: 5 }}>ZEC</RegText>
+                    </View>
+
+                    <View
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        justifyContent: 'flex-start',
+                        width: '35%',
+                      }}>
+                      <RegText style={{ marginTop: 15, marginRight: 5 }}>$</RegText>
+                      <View
+                        accessible={true}
+                        accessibilityLabel={translate('send.usd-acc')}
+                        style={{
+                          flexGrow: 1,
+                          borderWidth: 1,
+                          borderRadius: 5,
+                          borderColor: colors.text,
+                          marginTop: 5,
+                          width: '55%',
+                          minWidth: 48,
+                          minHeight: 48,
+                        }}>
+                        <TextInput
+                          placeholder={`#${decimalSeparator}##`}
+                          placeholderTextColor={colors.placeholder}
+                          keyboardType="numeric"
+                          style={{
+                            color: colors.text,
+                            fontWeight: '600',
+                            fontSize: 18,
+                            minWidth: 48,
+                            minHeight: 48,
+                            marginLeft: 5,
+                          }}
+                          value={ta.amountUSD.toString()}
+                          onChangeText={(text: string) => updateToField(null, null, text.substring(0, 4), null)}
+                          editable={true}
+                          maxLength={4}
+                        />
+                      </View>
+                      <RegText style={{ marginTop: 15, marginLeft: 5 }}>USD</RegText>
+                    </View>
+                  </View>
+
+                  <View style={{ display: 'flex', flexDirection: 'column' }}>
+                    <View
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        justifyContent: 'flex-start',
+                        alignItems: 'center',
+                        marginTop: 10,
+                      }}>
+                      <RegText>{translate('send.spendable')}</RegText>
+                      <ZecAmount
+                        currencyName={info?.currencyName ? info.currencyName : ''}
+                        color={colors.money}
+                        size={18}
+                        amtZec={getMaxAmount()}
+                      />
+                    </View>
+                    {stillConfirming && (
+                      <View
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          marginTop: 5,
+                          backgroundColor: colors.card,
+                          padding: 5,
+                          borderRadius: 10,
+                        }}>
+                        <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
+                        <FadeText>{translate('send.somefunds')}</FadeText>
+                      </View>
+                    )}
+                  </View>
+
+                  {memoEnabled === true && (
+                    <>
+                      <FadeText style={{ marginTop: 10 }}>{translate('send.memo')}</FadeText>
+                      <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start' }}>
+                        <View
+                          accessible={true}
+                          accessibilityLabel={translate('send.memo-acc')}
+                          style={{
+                            flexGrow: 1,
+                            borderWidth: 1,
+                            borderRadius: 5,
+                            borderColor: colors.text,
+                            minWidth: 48,
+                            minHeight: 48,
+                            maxHeight: 150,
+                          }}>
+                          <TextInput
+                            multiline
+                            style={{
+                              color: colors.text,
+                              fontWeight: '600',
+                              fontSize: 18,
+                              minWidth: 48,
+                              minHeight: 48,
+                              marginLeft: 5,
+                            }}
+                            value={ta.memo}
+                            onChangeText={(text: string) => updateToField(null, null, null, text)}
+                            editable={true}
+                          />
+                        </View>
+                      </View>
+                    </>
+                  )}
+                </View>
+              );
+            })}
+            <View
+              style={{
+                flexGrow: 1,
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginVertical: 5,
+              }}>
+              <Button
+                accessible={true}
+                accessibilityLabel={'title ' + translate('send.button')}
+                type="Primary"
+                title={translate('send.button')}
+                disabled={!sendButtonEnabled}
+                onPress={() => setConfirmModalVisible(true)}
+              />
+              <Button
+                type="Secondary"
+                style={{ marginLeft: 10 }}
+                title={translate('send.clear')}
+                onPress={() => clearToAddr()}
+              />
+            </View>
           </View>
         </ScrollView>
       </View>
