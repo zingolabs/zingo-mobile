@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import QRCodeScanner from 'react-native-qrcode-scanner';
-import { View } from 'react-native';
+import { View, Platform } from 'react-native';
 import { TranslateOptions } from 'i18n-js';
 import Toast from 'react-native-simple-toast';
 
@@ -68,13 +68,18 @@ const Scanner: React.FunctionComponent<ScannerProps> = ({ updateToField, closeMo
         onRead={onRead}
         reactivate={true}
         containerStyle={{ backgroundColor: colors.background }}
-        cameraContainerStyle={{ borderColor: colors.primary, borderWidth: 1, padding: 10, margin: 10 }}
-        cameraStyle={{ width: width, height: height }}
+        cameraContainerStyle={{
+          borderColor: Platform.OS === 'ios' ? colors.primary : colors.background,
+          borderWidth: Platform.OS === 'ios' ? 1 : 0,
+          padding: 10,
+          margin: 10,
+        }}
+        cameraStyle={{ width: width, height: Platform.OS === 'ios' ? height : height * 1.1 }}
         topContent={
           <View
             style={{
               width: '100%',
-              padding: 20
+              padding: 20,
             }}>
             <View style={{ width: width, alignItems: 'center' }}>
               <RegText>{translate('scanner.scanaddress')}</RegText>
@@ -85,7 +90,7 @@ const Scanner: React.FunctionComponent<ScannerProps> = ({ updateToField, closeMo
           <View
             style={{
               width: '100%',
-              padding: 20
+              padding: 20,
             }}>
             <View style={{ width: width, alignItems: 'center' }}>
               <Button type="Secondary" title={translate('cancel')} onPress={doCancel} />

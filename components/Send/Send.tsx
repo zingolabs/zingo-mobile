@@ -341,8 +341,13 @@ const Send: React.FunctionComponent<SendProps> = ({
         transparent={false}
         visible={qrcodeModalVisble}
         onRequestClose={() => setQrcodeModalVisible(false)}>
-        <Scanner updateToField={updateToField} closeModal={() => setQrcodeModalVisible(false)} translate={translate} 
-        width={dimensions.width - 42} height={dimensions.height * 0.7} />
+        <Scanner
+          updateToField={updateToField}
+          closeModal={() => setQrcodeModalVisible(false)}
+          translate={translate}
+          width={dimensions.width - 42}
+          height={dimensions.height * 0.7}
+        />
       </Modal>
 
       <Modal
@@ -813,7 +818,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                 <UsdAmount style={{ marginTop: 0, marginBottom: 5 }} price={zecPrice} amtZec={totalBalance.total} />
               </View>
 
-              <View style={{ width: '100%', height: 1, backgroundColor: colors.primary, marginTop: 5, }} />
+              <View style={{ width: '100%', height: 1, backgroundColor: colors.primary, marginTop: 5 }} />
 
               <View
                 style={{
