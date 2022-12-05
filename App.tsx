@@ -53,14 +53,18 @@ export default function App() {
   const i18n = useMemo(() => new I18n(file), [file]);
   const [widthDimensions, setWidthDimensions] = useState(useResponsiveWidth(100));
   const [heightDimensions, setHeightDimensions] = useState(useResponsiveHeight(100));
-  const [scaleDimensions, setScaleDimensions] = useState(0);
+  const [scaleDimensions, setScaleDimensions] = useState(Number((widthDimensions / heightDimensions).toFixed(2)));
 
   useDimensionsChange(
     useCallback(({ window }) => {
       LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
       setWidthDimensions(window.width);
       setHeightDimensions(window.height);
-      setScaleDimensions(window.scale);
+      if (window.scale > 0) {
+        setScaleDimensions(window.scale);
+      } else {
+        setScaleDimensions(Number((window.width / window.height).toFixed(2)));
+      }
     }, []),
   );
 

@@ -766,7 +766,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           />
         </Modal>
 
-        <View style={{ }}>
+        <View style={{}}>
           <View
             onLayout={e => {
               const { height } = e.nativeEvent.layout;
@@ -874,8 +874,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           </View>
         </View>
 
-        <View
-          style={{ backgroundColor: colors.card, padding: 10, position: 'absolute'}}>
+        <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute' }}>
           <TouchableOpacity
             accessible={true}
             accessibilityLabel={translate('menudrawer-acc')}
@@ -893,7 +892,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           height: '100%',
           width: dimensions.width / 2,
         }}>
-        <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ }} style={{  }}>
+        <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{}} style={{}}>
           <View style={{ marginBottom: 150 }}>
             {[sendPageState.toaddr].map((ta, i) => {
               return (
@@ -949,7 +948,8 @@ const Send: React.FunctionComponent<SendProps> = ({
                     </View>
                   </View>
 
-                  <View style={{ marginTop: 10, display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                  <View
+                    style={{ marginTop: 10, display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                     <FadeText>{translate('send.amount')}</FadeText>
                     {validAmount === -1 && <ErrorText>{translate('send.invalidamount')}</ErrorText>}
                   </View>
@@ -1146,7 +1146,7 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   //console.log(dimensions);
 
-  if (dimensions.width > dimensions.height && dimensions.scale > 1.8) {
+  if (dimensions.width > dimensions.height && dimensions.scale > 1.5) {
     return returnLandscape;
   } else {
     return returnPortrait;

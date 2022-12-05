@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo!",
-  "version": "v0.0.88",
+  "version": "v0.0.89",
   "loading": "cargando...",
   "wait": "Por favor espere...",
   "workingonit": "Estamos trabajando en esta funcionalidad",
@@ -98,7 +98,10 @@
     "serverblock": "Altura de Bloque del Servidor",
     "zecprice": "Precio ZEC",
     "unknown": "Desconocido",
-    "title": "Información del Servidor"
+    "title": "Información del Servidor",
+    "resolution": "Pantalla",
+    "portrait": "Orientación Vertical",
+    "landscape": "Orientación Horizontal"
   },
   "rescan": {
     "title": "Re-Escanear",

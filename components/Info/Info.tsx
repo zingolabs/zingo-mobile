@@ -19,7 +19,7 @@ type InfoProps = {
 
 const Info: React.FunctionComponent<InfoProps> = ({ closeModal }) => {
   const context = useContext(ContextLoaded);
-  const { info, totalBalance, translate } = context;
+  const { info, totalBalance, translate, dimensions } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [infoState, setInfoState] = React.useState({} as InfoType);
 
@@ -78,6 +78,19 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal }) => {
         }}>
         <View style={{ display: 'flex', margin: 20 }}>
           <DetailLine label={translate('info.version')} value={translate('zingo') + ' ' + translate('version')} />
+          <DetailLine
+            label={translate('info.resolution')}
+            value={
+              '(' +
+              dimensions.width +
+              'x' +
+              dimensions.height +
+              ') ' +
+              dimensions.scale +
+              ' - ' +
+              (dimensions.width > dimensions.height ? translate('info.landscape') : translate('info.portrait'))
+            }
+          />
           <DetailLine
             label={translate('info.serverversion')}
             value={infoState.version ? infoState.version : translate('loading')}
