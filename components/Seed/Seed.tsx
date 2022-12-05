@@ -61,9 +61,9 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
     setBirthdayNumber(walletSeed?.birthday || 0);
   }, [action, walletSeed?.seed, walletSeed?.birthday, walletSeed, translate]);
 
-  console.log('=================================');
-  console.log(walletSeed?.seed, walletSeed?.birthday);
-  console.log(seedPhrase, birthdayNumber);
+  //console.log('=================================');
+  //console.log(walletSeed?.seed, walletSeed?.birthday);
+  //console.log(seedPhrase, birthdayNumber);
 
   return (
     <SafeAreaView

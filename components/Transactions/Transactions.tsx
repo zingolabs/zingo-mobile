@@ -438,7 +438,7 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({ doRefresh })
     </View>
   );
 
-  console.log(dimensions);
+  //console.log(dimensions);
 
   if (dimensions.width > dimensions.height && dimensions.scale > 1.8) {
     return returnLandscape;

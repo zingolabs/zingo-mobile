@@ -324,7 +324,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     });
   };
 
-  //console.log('render send');
+  //console.log('render send', 'w', dimensions.width, 'h', dimensions.height);
 
   const returnPortrait = (
     <View
@@ -341,7 +341,8 @@ const Send: React.FunctionComponent<SendProps> = ({
         transparent={false}
         visible={qrcodeModalVisble}
         onRequestClose={() => setQrcodeModalVisible(false)}>
-        <Scanner updateToField={updateToField} closeModal={() => setQrcodeModalVisible(false)} translate={translate} />
+        <Scanner updateToField={updateToField} closeModal={() => setQrcodeModalVisible(false)} translate={translate} 
+        width={dimensions.width - 42} height={dimensions.height * 0.7} />
       </Modal>
 
       <Modal
@@ -739,6 +740,8 @@ const Send: React.FunctionComponent<SendProps> = ({
             updateToField={updateToField}
             closeModal={() => setQrcodeModalVisible(false)}
             translate={translate}
+            width={dimensions.width / 2}
+            height={dimensions.height * 0.7}
           />
         </Modal>
 
@@ -774,7 +777,8 @@ const Send: React.FunctionComponent<SendProps> = ({
                 alignItems: 'center',
                 backgroundColor: colors.card,
                 zIndex: -1,
-                paddingTop: 10,
+                padding: 10,
+                width: '100%',
               }}>
               <Image
                 source={require('../../assets/img/logobig-zingo.png')}
@@ -809,7 +813,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                 <UsdAmount style={{ marginTop: 0, marginBottom: 5 }} price={zecPrice} amtZec={totalBalance.total} />
               </View>
 
-              <View style={{ width: '100%', height: 1, backgroundColor: colors.primary, marginTop: 5 }} />
+              <View style={{ width: '100%', height: 1, backgroundColor: colors.primary, marginTop: 5, }} />
 
               <View
                 style={{
@@ -1131,7 +1135,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     </View>
   );
 
-  console.log(dimensions);
+  //console.log(dimensions);
 
   if (dimensions.width > dimensions.height && dimensions.scale > 1.8) {
     return returnLandscape;

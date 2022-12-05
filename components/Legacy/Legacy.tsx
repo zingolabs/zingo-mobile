@@ -400,7 +400,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance }) => 
   };
 
   const renderTabBarLandscape: (props: any) => JSX.Element = props => {
-    console.log(props);
+    //console.log(props);
     return (
       <TabBar
         {...props}
@@ -539,7 +539,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance }) => 
     </View>
   );
 
-  console.log('render legacy', index, routes);
+  //console.log('render legacy', index, routes);
 
   if (dimensions.width > dimensions.height && dimensions.scale > 1.8) {
     return returnLandscape;

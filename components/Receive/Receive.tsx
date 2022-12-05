@@ -411,7 +411,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ fetchTotalBalance, set
   };
 
   const renderTabBarLandscape: (props: any) => JSX.Element = props => {
-    console.log(props);
+    //console.log(props);
     return (
       <TabBar
         {...props}
@@ -617,7 +617,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ fetchTotalBalance, set
     </View>
   );
 
-  console.log('render receive', index, routes);
+  //console.log('render receive', index, routes);
 
   if (dimensions.width > dimensions.height && dimensions.scale > 1.8) {
     return returnLandscape;
