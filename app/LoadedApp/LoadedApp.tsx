@@ -887,6 +887,20 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
               },
               headerShown: false,
             })}>
+            <Tab.Screen name={translate('loadedapp.wallet-menu')}>
+              {() => (
+                <>
+                  <Suspense
+                    fallback={
+                      <View>
+                        <Text>{translate('loading')}</Text>
+                      </View>
+                    }>
+                    <Transactions doRefresh={this.doRefresh} />
+                  </Suspense>
+                </>
+              )}
+            </Tab.Screen>
             <Tab.Screen name={translate('loadedapp.send-menu')}>
               {() => (
                 <>
@@ -902,20 +916,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                       clearToAddr={this.clearToAddr}
                       setTxBuildProgress={this.setTxBuildProgress}
                     />
-                  </Suspense>
-                </>
-              )}
-            </Tab.Screen>
-            <Tab.Screen name={translate('loadedapp.wallet-menu')}>
-              {() => (
-                <>
-                  <Suspense
-                    fallback={
-                      <View>
-                        <Text>{translate('loading')}</Text>
-                      </View>
-                    }>
-                    <Transactions doRefresh={this.doRefresh} />
                   </Suspense>
                 </>
               )}

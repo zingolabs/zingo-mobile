@@ -101,7 +101,9 @@
     "title": "Información del Servidor",
     "resolution": "Pantalla",
     "portrait": "Orientación Vertical",
-    "landscape": "Orientación Horizontal"
+    "landscape": "Orientación Horizontal",
+    "tablet": "Tableta",
+    "phone": "Teléfono"
   },
   "rescan": {
     "title": "Re-Escanear",

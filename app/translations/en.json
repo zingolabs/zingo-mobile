@@ -101,7 +101,9 @@
     "title": "Server Info",
     "resolution": "Device Screen",
     "portrait": "Portrait Orientation",
-    "landscape": "Landscape Orientation"
+    "landscape": "Landscape Orientation",
+    "tablet": "Tablet",
+    "phone": "Phone"
   },
   "rescan": {
     "title": "Rescan",
