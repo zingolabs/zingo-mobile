@@ -189,7 +189,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
           scale: screen.scale,
         },
       });
-      console.log('++++++++++++++++++++++++++++++++++ change dims', Dimensions.get('screen'));
+      //console.log('++++++++++++++++++++++++++++++++++ change dims', Dimensions.get('screen'));
     });
   };
 

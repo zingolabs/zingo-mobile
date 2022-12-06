@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { View, ScrollView, Image, Modal, TouchableOpacity, RefreshControl } from 'react-native';
+import { View, ScrollView, Image, Modal, TouchableOpacity, RefreshControl, Text } from 'react-native';
 import Toast from 'react-native-simple-toast';
 import moment from 'moment';
 import { useTheme } from '@react-navigation/native';
@@ -197,6 +197,22 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({ doRefresh })
         </TouchableOpacity>
       </View>
 
+      <View style={{ padding: 10, position: 'absolute', right: 0, alignItems: 'flex-end' }}>
+        <Text style={{ fontSize: 8, color: colors.border }}>{'(' +
+            dimensions.width +
+            'x' +
+            dimensions.height +
+            ')-' +
+            dimensions.scale}
+        </Text>
+        <Text style={{ fontSize: 8, color: colors.border }}>{
+            (dimensions.deviceType === 'tablet' ? translate('info.tablet') : translate('info.phone'))}
+        </Text>
+        <Text style={{ fontSize: 7, color: colors.border }}>{
+            (dimensions.orientation === 'landscape' ? translate('info.landscape') : translate('info.portrait'))}
+        </Text>
+      </View>
+
       <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
 
       <ScrollView
@@ -380,6 +396,22 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({ doRefresh })
             onPress={toggleMenuDrawer}>
             <FontAwesomeIcon icon={faBars} size={48} color={colors.border} />
           </TouchableOpacity>
+        </View>
+
+        <View style={{ padding: 10, position: 'absolute', right: 0, alignItems: 'flex-end' }}>
+          <Text style={{ fontSize: 8, color: colors.border }}>{'(' +
+              dimensions.width +
+              'x' +
+              dimensions.height +
+              ')-' +
+              dimensions.scale}
+          </Text>
+          <Text style={{ fontSize: 8, color: colors.border }}>{
+              (dimensions.deviceType === 'tablet' ? translate('info.tablet') : translate('info.phone'))}
+          </Text>
+          <Text style={{ fontSize: 7, color: colors.border }}>{
+              (dimensions.orientation === 'landscape' ? translate('info.landscape') : translate('info.portrait'))}
+          </Text>
         </View>
       </View>
       <View
