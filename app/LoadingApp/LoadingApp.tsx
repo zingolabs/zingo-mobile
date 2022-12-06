@@ -28,7 +28,8 @@ type LoadingAppProps = {
   dimensions: {
     width: number;
     height: number;
-    scale: number;
+    orientation: 'portrait' | 'landscape';
+    deviceType: 'tablet' | 'phone';
   };
 };
 
@@ -46,7 +47,8 @@ type LoadingAppClassProps = {
   dimensions: {
     width: number;
     height: number;
-    scale: number;
+    orientation: 'portrait' | 'landscape';
+    deviceType: 'tablet' | 'phone';
   };
 };
 

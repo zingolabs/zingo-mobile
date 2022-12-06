@@ -15,7 +15,12 @@ import {
 const defaultAppState: AppStateLoaded = {
   navigation: null,
   route: null,
-  dimensions: {} as { width: number; height: number; scale: number },
+  dimensions: {} as {
+    width: number;
+    height: number;
+    orientation: 'portrait' | 'landscape';
+    deviceType: 'tablet' | 'phone';
+  },
 
   syncStatusReport: new SyncStatusReport(),
   totalBalance: new TotalBalance(),

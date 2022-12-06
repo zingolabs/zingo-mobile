@@ -12,7 +12,8 @@ export default interface AppStateLoading {
   dimensions: {
     width: number;
     height: number;
-    scale: number;
+    orientation: 'portrait' | 'landscape';
+    deviceType: 'tablet' | 'phone';
   };
 
   screen: number;

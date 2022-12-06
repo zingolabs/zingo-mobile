@@ -440,7 +440,7 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({ doRefresh })
 
   //console.log(dimensions);
 
-  if (dimensions.width > dimensions.height && dimensions.scale > 1.5) {
+  if (dimensions.orientation === 'landscape') {
     return returnLandscape;
   } else {
     return returnPortrait;

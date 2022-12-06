@@ -22,7 +22,8 @@ export default interface AppStateLoaded {
   dimensions: {
     width: number;
     height: number;
-    scale: number;
+    orientation: 'portrait' | 'landscape';
+    deviceType: 'tablet' | 'phone';
   };
 
   // Info about the current sync process

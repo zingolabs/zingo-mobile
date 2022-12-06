@@ -1,16 +1,16 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useCallback, useMemo, useState } from 'react';
-import { SafeAreaView, I18nManager, LayoutAnimation } from 'react-native';
+import { SafeAreaView, I18nManager, Dimensions } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import * as RNLocalize from 'react-native-localize';
 import { I18n, TranslateOptions } from 'i18n-js';
 import { memoize } from 'lodash';
-import { useResponsiveHeight, useResponsiveWidth, useDimensionsChange } from 'react-native-responsive-dimensions';
 
 import LoadedApp from './app/LoadedApp';
 import LoadingApp from './app/LoadingApp';
 import { ThemeType } from './app/types';
+import platform from './app/platform/platform';
 
 const en = require('./app/translations/en.json');
 const es = require('./app/translations/es.json');
@@ -51,18 +51,12 @@ export default function App() {
     [],
   );
   const i18n = useMemo(() => new I18n(file), [file]);
-  const [widthDimensions, setWidthDimensions] = useState(useResponsiveWidth(100));
-  const [heightDimensions, setHeightDimensions] = useState(useResponsiveHeight(100));
-  const [scaleDimensions, setScaleDimensions] = useState(Number((widthDimensions / heightDimensions).toFixed(2)));
-
-  useDimensionsChange(
-    useCallback(({ window }) => {
-      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-      setWidthDimensions(window.width);
-      setHeightDimensions(window.height);
-      setScaleDimensions(Number((window.width / window.height).toFixed(2)));
-    }, []),
+  const [widthDimensions, setWidthDimensions] = useState(Dimensions.get('screen').width);
+  const [heightDimensions, setHeightDimensions] = useState(Dimensions.get('screen').height);
+  const [orientation, setOrientation] = useState<'portrait' | 'landscape'>(
+    platform.isPortrait() ? 'portrait' : 'landscape',
   );
+  const [deviceType, setDeviceType] = useState<'tablet' | 'phone'>(platform.isTablet() ? 'tablet' : 'phone');
 
   const translate = memoize(
     (key: string, config?: TranslateOptions) => i18n.t(key, config),
@@ -87,6 +81,17 @@ export default function App() {
 
     i18n.locale = languageTag;
   }, [file, i18n, translate]);
+
+  useEffect(() => {
+    const dim = Dimensions.addEventListener('change', () => {
+      setWidthDimensions(Dimensions.get('screen').width);
+      setHeightDimensions(Dimensions.get('screen').height);
+      setOrientation(platform.isPortrait() ? 'portrait' : 'landscape');
+      setDeviceType(platform.isTablet() ? 'tablet' : 'phone');
+    });
+
+    return () => dim.remove();
+  }, []);
 
   useEffect(() => {
     setI18nConfig();
@@ -118,7 +123,12 @@ export default function App() {
               <LoadingApp
                 {...props}
                 translate={translate}
-                dimensions={{ width: widthDimensions, height: heightDimensions, scale: scaleDimensions }}
+                dimensions={{
+                  width: widthDimensions,
+                  height: heightDimensions,
+                  orientation: orientation,
+                  deviceType: deviceType,
+                }}
               />
             )}
           </Stack.Screen>
@@ -127,7 +137,12 @@ export default function App() {
               <LoadedApp
                 {...props}
                 translate={translate}
-                dimensions={{ width: widthDimensions, height: heightDimensions, scale: scaleDimensions }}
+                dimensions={{
+                  width: widthDimensions,
+                  height: heightDimensions,
+                  orientation: orientation,
+                  deviceType: deviceType,
+                }}
               />
             )}
           </Stack.Screen>

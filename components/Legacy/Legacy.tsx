@@ -541,7 +541,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance }) => 
 
   //console.log('render legacy', index, routes);
 
-  if (dimensions.width > dimensions.height && dimensions.scale > 1.5) {
+  if (dimensions.orientation === 'landscape') {
     return returnLandscape;
   } else {
     return returnPortrait;

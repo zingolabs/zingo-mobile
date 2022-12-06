@@ -1146,7 +1146,7 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   //console.log(dimensions);
 
-  if (dimensions.width > dimensions.height && dimensions.scale > 1.5) {
+  if (dimensions.orientation === 'landscape') {
     return returnLandscape;
   } else {
     return returnPortrait;
