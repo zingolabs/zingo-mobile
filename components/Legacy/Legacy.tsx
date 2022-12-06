@@ -541,7 +541,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance }) => 
 
   //console.log('render legacy', index, routes);
 
-  if (dimensions.orientation === 'landscape') {
+  if (dimensions.orientation === 'landscape' && dimensions.deviceType === 'phone') {
     return returnLandscape;
   } else {
     return returnPortrait;

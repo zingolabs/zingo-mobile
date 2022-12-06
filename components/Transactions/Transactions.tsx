@@ -440,7 +440,7 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({ doRefresh })
 
   //console.log(dimensions);
 
-  if (dimensions.orientation === 'landscape') {
+  if (dimensions.orientation === 'landscape' && dimensions.deviceType === 'phone') {
     return returnLandscape;
   } else {
     return returnPortrait;

@@ -619,7 +619,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ fetchTotalBalance, set
 
   //console.log('render receive', index, routes);
 
-  if (dimensions.orientation === 'landscape') {
+  if (dimensions.orientation === 'landscape' && dimensions.deviceType === 'phone') {
     return returnLandscape;
   } else {
     return returnPortrait;
