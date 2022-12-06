@@ -1,6 +1,17 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { Component, Suspense, useState, useMemo, useCallback, useEffect } from 'react';
-import { View, Alert, SafeAreaView, Image, Text, Modal, ScrollView, I18nManager, Dimensions } from 'react-native';
+import {
+  View,
+  Alert,
+  SafeAreaView,
+  Image,
+  Text,
+  Modal,
+  ScrollView,
+  I18nManager,
+  Dimensions,
+  EmitterSubscription,
+} from 'react-native';
 import Toast from 'react-native-simple-toast';
 import { useTheme } from '@react-navigation/native';
 import { I18n, TranslateOptions } from 'i18n-js';
@@ -47,12 +58,6 @@ export default function LoadingApp(props: LoadingAppProps) {
     [],
   );
   const i18n = useMemo(() => new I18n(file), [file]);
-  const [widthDimensions, setWidthDimensions] = useState(Dimensions.get('screen').width);
-  const [heightDimensions, setHeightDimensions] = useState(Dimensions.get('screen').height);
-  const [orientation, setOrientation] = useState<'portrait' | 'landscape'>(
-    platform.isPortrait() ? 'portrait' : 'landscape',
-  );
-  const [deviceType, setDeviceType] = useState<'tablet' | 'phone'>(platform.isTablet() ? 'tablet' : 'phone');
 
   const translate = memoize(
     (key: string, config?: TranslateOptions) => i18n.t(key, config),
@@ -92,31 +97,7 @@ export default function LoadingApp(props: LoadingAppProps) {
     return () => RNLocalize.removeEventListener('change', handleLocalizationChange);
   }, [handleLocalizationChange]);
 
-  useEffect(() => {
-    const dim = Dimensions.addEventListener('change', () => {
-      setWidthDimensions(Dimensions.get('screen').width);
-      setHeightDimensions(Dimensions.get('screen').height);
-      setOrientation(platform.isPortrait() ? 'portrait' : 'landscape');
-      setDeviceType(platform.isTablet() ? 'tablet' : 'phone');
-      console.log('++++++++++++++++++++++++++++++++++ change dims', Dimensions.get('screen'));
-    });
-
-    return () => dim.remove();
-  }, []);
-
-  return (
-    <LoadingAppClass
-      {...props}
-      theme={theme}
-      translate={translate}
-      dimensions={{
-        width: widthDimensions,
-        height: heightDimensions,
-        orientation: orientation,
-        deviceType: deviceType,
-      }}
-    />
-  );
+  return <LoadingAppClass {...props} theme={theme} translate={translate} />;
 }
 
 type LoadingAppClassProps = {
@@ -124,25 +105,25 @@ type LoadingAppClassProps = {
   route: any;
   translate: (key: string, config?: TranslateOptions) => any;
   theme: ThemeType;
-  dimensions: {
-    width: number;
-    height: number;
-    orientation: 'portrait' | 'landscape';
-    deviceType: 'tablet' | 'phone';
-  };
 };
 
 const SERVER_DEFAULT_0 = serverUris()[0];
 const SERVER_DEFAULT_1 = serverUris()[1];
 
 class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
+  dim: EmitterSubscription | null;
   constructor(props: Readonly<LoadingAppClassProps>) {
     super(props);
 
     this.state = {
       navigation: props.navigation,
       route: props.route,
-      dimensions: props.dimensions,
+      dimensions: {
+        width: Dimensions.get('screen').width,
+        height: Dimensions.get('screen').height,
+        orientation: platform.isPortrait(Dimensions.get('screen')) ? 'portrait' : 'landscape',
+        deviceType: platform.isTablet(Dimensions.get('screen')) ? 'tablet' : 'phone',
+      },
 
       screen: 0,
       actionButtonsDisabled: false,
@@ -154,6 +135,8 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
       info: null,
       translate: props.translate,
     };
+
+    this.dim = null;
   }
 
   componentDidMount = async () => {
@@ -194,6 +177,22 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
         this.setState({ screen: 1, walletExists: false });
       }
     });
+
+    this.dim = Dimensions.addEventListener('change', ({ screen }) => {
+      this.setState({
+        dimensions: {
+          width: screen.width,
+          height: screen.height,
+          orientation: platform.isPortrait(screen) ? 'portrait' : 'landscape',
+          deviceType: platform.isTablet(screen) ? 'tablet' : 'phone',
+        },
+      });
+      console.log('++++++++++++++++++++++++++++++++++ change dims', Dimensions.get('screen'));
+    });
+  };
+
+  componentWillUnmount = () => {
+    this.dim?.remove();
   };
 
   useDefaultServer_0 = async () => {

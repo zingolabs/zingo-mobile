@@ -1,5 +1,5 @@
 import React, { Component, Suspense, useState, useMemo, useCallback, useEffect } from 'react';
-import { Modal, View, Text, Alert, I18nManager, Dimensions } from 'react-native';
+import { Modal, View, Text, Alert, I18nManager, Dimensions, EmitterSubscription } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faList, faUpload, faDownload, faCog, faAddressBook } from '@fortawesome/free-solid-svg-icons';
@@ -79,12 +79,6 @@ export default function LoadedApp(props: LoadedAppProps) {
     [],
   );
   const i18n = useMemo(() => new I18n(file), [file]);
-  const [widthDimensions, setWidthDimensions] = useState(Dimensions.get('screen').width);
-  const [heightDimensions, setHeightDimensions] = useState(Dimensions.get('screen').height);
-  const [orientation, setOrientation] = useState<'portrait' | 'landscape'>(
-    platform.isPortrait() ? 'portrait' : 'landscape',
-  );
-  const [deviceType, setDeviceType] = useState<'tablet' | 'phone'>(platform.isTablet() ? 'tablet' : 'phone');
 
   const translate = memoize(
     (key: string, config?: TranslateOptions) => i18n.t(key, config),
@@ -124,31 +118,7 @@ export default function LoadedApp(props: LoadedAppProps) {
     return () => RNLocalize.removeEventListener('change', handleLocalizationChange);
   }, [handleLocalizationChange]);
 
-  useEffect(() => {
-    const dim = Dimensions.addEventListener('change', () => {
-      setWidthDimensions(Dimensions.get('screen').width);
-      setHeightDimensions(Dimensions.get('screen').height);
-      setOrientation(platform.isPortrait() ? 'portrait' : 'landscape');
-      setDeviceType(platform.isTablet() ? 'tablet' : 'phone');
-      console.log('++++++++++++++++++++++++++++++++++ change dims', Dimensions.get('screen'));
-    });
-
-    return () => dim.remove();
-  }, []);
-
-  return (
-    <LoadedAppClass
-      {...props}
-      theme={theme}
-      translate={translate}
-      dimensions={{
-        width: widthDimensions,
-        height: heightDimensions,
-        orientation: orientation,
-        deviceType: deviceType,
-      }}
-    />
-  );
+  return <LoadedAppClass {...props} theme={theme} translate={translate} />;
 }
 
 type LoadedAppClassProps = {
@@ -156,16 +126,11 @@ type LoadedAppClassProps = {
   route: any;
   translate: (key: string, config?: TranslateOptions) => any;
   theme: ThemeType;
-  dimensions: {
-    width: number;
-    height: number;
-    orientation: 'portrait' | 'landscape';
-    deviceType: 'tablet' | 'phone';
-  };
 };
 
 class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   rpc: RPC;
+  dim: EmitterSubscription | null;
 
   constructor(props: any) {
     super(props);
@@ -173,7 +138,12 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     this.state = {
       navigation: props.navigation,
       route: props.route,
-      dimensions: props.dimensions,
+      dimensions: {
+        width: Dimensions.get('screen').width,
+        height: Dimensions.get('screen').height,
+        orientation: platform.isPortrait(Dimensions.get('screen')) ? 'portrait' : 'landscape',
+        deviceType: platform.isTablet(Dimensions.get('screen')) ? 'tablet' : 'phone',
+      },
 
       syncStatusReport: new SyncStatusReport(),
       totalBalance: new TotalBalance(),
@@ -227,6 +197,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       this.refreshUpdates,
       props.translate,
     );
+    this.dim = null;
   }
 
   componentDidMount = () => {
@@ -234,10 +205,23 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
     // Configure the RPC to start doing refreshes
     this.rpc.configure();
+
+    this.dim = Dimensions.addEventListener('change', ({ screen }) => {
+      this.setState({
+        dimensions: {
+          width: screen.width,
+          height: screen.height,
+          orientation: platform.isPortrait(screen) ? 'portrait' : 'landscape',
+          deviceType: platform.isTablet(screen) ? 'tablet' : 'phone',
+        },
+      });
+      console.log('++++++++++++++++++++++++++++++++++ change dims', Dimensions.get('screen'));
+    });
   };
 
   componentWillUnmount = () => {
     this.rpc.clearTimers();
+    this.dim?.remove();
   };
 
   getFullState = (): AppStateLoaded => {

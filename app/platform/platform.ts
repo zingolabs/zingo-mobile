@@ -1,4 +1,4 @@
-import { Dimensions } from 'react-native';
+import { ScaledSize } from 'react-native';
 
 /**
  *
@@ -12,32 +12,29 @@ const msp = (dim: any, limit: any) => {
 /**
  * Returns true if the screen is in portrait mode
  */
-const isPortrait = () => {
-  const dim = Dimensions.get('screen');
+const isPortrait = (dim: ScaledSize) => {
   return dim.height >= dim.width;
 };
 
 /**
  * Returns true of the screen is in landscape mode
  */
-const isLandscape = () => {
-  const dim = Dimensions.get('screen');
+const isLandscape = (dim: ScaledSize) => {
   return dim.width >= dim.height;
 };
 
 /**
  * Returns true if the device is a tablet
  */
-const isTablet = () => {
-  const dim = Dimensions.get('screen');
+const isTablet = (dim: ScaledSize) => {
   return (dim.scale < 2 && msp(dim, 1000)) || (dim.scale >= 2 && msp(dim, 1900));
 };
 
 /**
  * Returns true if the device is a phone
  */
-const isPhone = () => {
-  return !isTablet();
+const isPhone = (dim: ScaledSize) => {
+  return !isTablet(dim);
 };
 
 export default {
