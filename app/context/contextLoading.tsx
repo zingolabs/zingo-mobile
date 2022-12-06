@@ -10,6 +10,7 @@ const defaultAppState: AppStateLoading = {
     height: number;
     orientation: 'portrait' | 'landscape';
     deviceType: 'tablet' | 'phone';
+    scale: number;
   },
 
   screen: 0,

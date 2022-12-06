@@ -20,6 +20,7 @@ const defaultAppState: AppStateLoaded = {
     height: number;
     orientation: 'portrait' | 'landscape';
     deviceType: 'tablet' | 'phone';
+    scale: number;
   },
 
   syncStatusReport: new SyncStatusReport(),

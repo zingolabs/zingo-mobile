@@ -85,7 +85,9 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal }) => {
               dimensions.width +
               'x' +
               dimensions.height +
-              ') ' +
+              ')-' +
+              dimensions.scale +
+              ' - ' +
               (dimensions.deviceType === 'tablet' ? translate('info.tablet') : translate('info.phone')) +
               ' - ' +
               (dimensions.orientation === 'landscape' ? translate('info.landscape') : translate('info.portrait'))

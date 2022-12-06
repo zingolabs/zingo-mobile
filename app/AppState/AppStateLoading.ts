@@ -14,6 +14,7 @@ export default interface AppStateLoading {
     height: number;
     orientation: 'portrait' | 'landscape';
     deviceType: 'tablet' | 'phone';
+    scale: number;
   };
 
   screen: number;

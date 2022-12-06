@@ -123,6 +123,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
         height: Dimensions.get('screen').height,
         orientation: platform.isPortrait(Dimensions.get('screen')) ? 'portrait' : 'landscape',
         deviceType: platform.isTablet(Dimensions.get('screen')) ? 'tablet' : 'phone',
+        scale: Dimensions.get('screen').scale,
       },
 
       screen: 0,
@@ -185,6 +186,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
           height: screen.height,
           orientation: platform.isPortrait(screen) ? 'portrait' : 'landscape',
           deviceType: platform.isTablet(screen) ? 'tablet' : 'phone',
+          scale: screen.scale,
         },
       });
       console.log('++++++++++++++++++++++++++++++++++ change dims', Dimensions.get('screen'));
