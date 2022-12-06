@@ -236,6 +236,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
             {translate('seed.mainnet-warning')}
           </FadeText>
         )}
+        <View style={{ marginBottom: 30 }} />
       </ScrollView>
       <View
         style={{

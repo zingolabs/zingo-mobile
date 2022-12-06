@@ -111,7 +111,14 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
             </View>
           )}
         </View>
-        <View style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
+        <View
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+            marginBottom: 30,
+          }}>
           {chunks.map(c => (
             <FadeText
               key={c}
@@ -148,8 +155,6 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
             />
           </View>
         )*/}
-
-        <View style={{ height: 20 }} />
       </ScrollView>
     </View>
   );

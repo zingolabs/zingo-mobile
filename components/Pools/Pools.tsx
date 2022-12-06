@@ -63,7 +63,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal }) => {
           alignItems: 'stretch',
           justifyContent: 'flex-start',
         }}>
-        <View style={{ display: 'flex', margin: 20 }}>
+        <View style={{ display: 'flex', margin: 20, marginBottom: 30 }}>
           <BoldText>{translate('pools.orchard-title')}</BoldText>
 
           <View style={{ display: 'flex', marginLeft: 25 }}>

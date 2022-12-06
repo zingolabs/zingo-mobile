@@ -231,7 +231,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ set_wallet_option, s
           <BoldText>{translate('settings.memo-title')}</BoldText>
         </View>
 
-        <View style={{ display: 'flex', marginLeft: 25 }}>
+        <View style={{ display: 'flex', marginLeft: 25, marginBottom: 30 }}>
           {MEMOS.map(memo => (
             <View key={'view-' + memo.value}>
               <TouchableOpacity

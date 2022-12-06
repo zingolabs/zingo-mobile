@@ -64,7 +64,7 @@ const Rescan: React.FunctionComponent<RescanProps> = ({ closeModal }) => {
           alignItems: 'stretch',
           justifyContent: 'flex-start',
         }}>
-        <View style={{ display: 'flex', margin: 20 }}>
+        <View style={{ display: 'flex', margin: 20, marginBottom: 30 }}>
           <RegText>{translate('rescan.text-1') + walletSeed?.birthday + translate('rescan.text-2')}</RegText>
         </View>
       </ScrollView>

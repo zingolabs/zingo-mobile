@@ -76,7 +76,7 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal }) => {
           alignItems: 'stretch',
           justifyContent: 'flex-start',
         }}>
-        <View style={{ display: 'flex', margin: 20 }}>
+        <View style={{ display: 'flex', margin: 20, marginBottom: 30 }}>
           <DetailLine label={translate('info.version')} value={translate('zingo') + ' ' + translate('version')} />
           <DetailLine
             label={translate('info.resolution')}

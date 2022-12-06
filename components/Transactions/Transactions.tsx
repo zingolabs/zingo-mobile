@@ -234,7 +234,14 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({ doRefresh })
             );
           })}
         {!!transactions && !!transactions.length && (
-          <View style={{ height: 100, display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
+          <View
+            style={{
+              height: 100,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'flex-start',
+              marginBottom: 30,
+            }}>
             <FadeText style={{ color: colors.primary }}>{translate('transactions.end')}</FadeText>
           </View>
         )}
@@ -423,7 +430,14 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({ doRefresh })
               );
             })}
           {!!transactions && !!transactions.length && (
-            <View style={{ height: 100, display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
+            <View
+              style={{
+                height: 100,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'flex-start',
+                marginBottom: 30,
+              }}>
               <FadeText style={{ color: colors.primary }}>{translate('transactions.end')}</FadeText>
             </View>
           )}

@@ -60,7 +60,7 @@ const About: React.FunctionComponent<AboutProps> = ({ closeModal }) => {
           padding: 20,
         }}>
         {translate('about.copyright').map((txt: string) => (
-          <FadeText style={{ marginBottom: 10 }} key={txt.substring(0, 10)}>
+          <FadeText style={{ marginBottom: 30 }} key={txt.substring(0, 10)}>
             {txt}
           </FadeText>
         ))}

@@ -86,7 +86,8 @@ const PrivKey: React.FunctionComponent<PrivKeyProps> = ({ address, keyType, priv
           alignItems: 'stretch',
           justifyContent: 'flex-start',
         }}>
-        <View style={{ display: 'flex', flexDirection: 'column', marginTop: 0, alignItems: 'center' }}>
+        <View
+          style={{ display: 'flex', flexDirection: 'column', marginTop: 0, alignItems: 'center', marginBottom: 30 }}>
           <View style={{ alignItems: 'center', paddingBottom: 0, paddingTop: 10 }}>
             <FadeText style={{ color: colors.text, textAlign: 'center', marginLeft: 10, marginRight: 10 }}>
               {translate('privkey.address')}
