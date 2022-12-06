@@ -1,9 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { Component, Suspense } from 'react';
-import { View, Alert, SafeAreaView, Image, Text, Modal, ScrollView } from 'react-native';
+import React, { Component, Suspense, useState, useMemo, useCallback, useEffect } from 'react';
+import { View, Alert, SafeAreaView, Image, Text, Modal, ScrollView, I18nManager, Dimensions } from 'react-native';
 import Toast from 'react-native-simple-toast';
 import { useTheme } from '@react-navigation/native';
-import { TranslateOptions } from 'i18n-js';
+import { I18n, TranslateOptions } from 'i18n-js';
+import * as RNLocalize from 'react-native-localize';
+import { memoize } from 'lodash';
 
 import BoldText from '../../components/Components/BoldText';
 import Button from '../../components/Button';
@@ -14,29 +16,107 @@ import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import RPC from '../rpc';
 import { ThemeType } from '../types';
 import { ContextLoadingProvider } from '../context';
+import platform from '../platform/platform';
 
 const Seed = React.lazy(() => import('../../components/Seed'));
 
-// -----------------
-// Loading View
-// -----------------
+const en = require('../translations/en.json');
+const es = require('../translations/es.json');
+
+const useForceUpdate = () => {
+  const [value, setValue] = useState(0);
+  return () => {
+    const newValue = value + 1;
+    return setValue(newValue);
+  };
+};
 
 type LoadingAppProps = {
   navigation: any;
   route: any;
-  translate: (key: string, config?: TranslateOptions) => any;
-  dimensions: {
-    width: number;
-    height: number;
-    orientation: 'portrait' | 'landscape';
-    deviceType: 'tablet' | 'phone';
-  };
 };
 
 export default function LoadingApp(props: LoadingAppProps) {
   const theme = useTheme() as unknown as ThemeType;
+  const forceUpdate = useForceUpdate();
+  const file = useMemo(
+    () => ({
+      en: en,
+      es: es,
+    }),
+    [],
+  );
+  const i18n = useMemo(() => new I18n(file), [file]);
+  const [widthDimensions, setWidthDimensions] = useState(Dimensions.get('screen').width);
+  const [heightDimensions, setHeightDimensions] = useState(Dimensions.get('screen').height);
+  const [orientation, setOrientation] = useState<'portrait' | 'landscape'>(
+    platform.isPortrait() ? 'portrait' : 'landscape',
+  );
+  const [deviceType, setDeviceType] = useState<'tablet' | 'phone'>(platform.isTablet() ? 'tablet' : 'phone');
 
-  return <LoadingAppClass {...props} theme={theme} />;
+  const translate = memoize(
+    (key: string, config?: TranslateOptions) => i18n.t(key, config),
+    (key: string, config?: TranslateOptions) => (config ? key + JSON.stringify(config) : key),
+  );
+
+  const setI18nConfig = useCallback(() => {
+    // fallback if no available language fits
+    const fallback = { languageTag: 'en', isRTL: false };
+
+    //console.log(RNLocalize.findBestAvailableLanguage(Object.keys(file)));
+    //console.log(RNLocalize.getLocales());
+
+    const { languageTag, isRTL } = RNLocalize.findBestAvailableLanguage(Object.keys(file)) || fallback;
+
+    // clear translation cache
+    if (translate && translate.cache) {
+      translate?.cache?.clear?.();
+    }
+    // update layout direction
+    I18nManager.forceRTL(isRTL);
+
+    i18n.locale = languageTag;
+  }, [file, i18n, translate]);
+
+  useEffect(() => {
+    setI18nConfig();
+  }, [setI18nConfig]);
+
+  const handleLocalizationChange = useCallback(() => {
+    setI18nConfig();
+    forceUpdate();
+  }, [setI18nConfig, forceUpdate]);
+
+  useEffect(() => {
+    RNLocalize.addEventListener('change', handleLocalizationChange);
+    return () => RNLocalize.removeEventListener('change', handleLocalizationChange);
+  }, [handleLocalizationChange]);
+
+  useEffect(() => {
+    const dim = Dimensions.addEventListener('change', () => {
+      setWidthDimensions(Dimensions.get('screen').width);
+      setHeightDimensions(Dimensions.get('screen').height);
+      setOrientation(platform.isPortrait() ? 'portrait' : 'landscape');
+      setDeviceType(platform.isTablet() ? 'tablet' : 'phone');
+      console.log('++++++++++++++++++++++++++++++++++ change dims', Dimensions.get('screen'));
+    });
+
+    return () => dim.remove();
+  }, []);
+
+  return (
+    <LoadingAppClass
+      {...props}
+      theme={theme}
+      translate={translate}
+      dimensions={{
+        width: widthDimensions,
+        height: heightDimensions,
+        orientation: orientation,
+        deviceType: deviceType,
+      }}
+    />
+  );
 }
 
 type LoadingAppClassProps = {
