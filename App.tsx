@@ -83,17 +83,6 @@ export default function App() {
   }, [file, i18n, translate]);
 
   useEffect(() => {
-    const dim = Dimensions.addEventListener('change', () => {
-      setWidthDimensions(Dimensions.get('screen').width);
-      setHeightDimensions(Dimensions.get('screen').height);
-      setOrientation(platform.isPortrait() ? 'portrait' : 'landscape');
-      setDeviceType(platform.isTablet() ? 'tablet' : 'phone');
-    });
-
-    return () => dim.remove();
-  }, []);
-
-  useEffect(() => {
     setI18nConfig();
   }, [setI18nConfig]);
 
@@ -106,6 +95,18 @@ export default function App() {
     RNLocalize.addEventListener('change', handleLocalizationChange);
     return () => RNLocalize.removeEventListener('change', handleLocalizationChange);
   }, [handleLocalizationChange]);
+
+  useEffect(() => {
+    const dim = Dimensions.addEventListener('change', () => {
+      setWidthDimensions(Dimensions.get('screen').width);
+      setHeightDimensions(Dimensions.get('screen').height);
+      setOrientation(platform.isPortrait() ? 'portrait' : 'landscape');
+      setDeviceType(platform.isTablet() ? 'tablet' : 'phone');
+      console.log('++++++++++++++++++++++++++++++++++ change dims', Dimensions.get('screen'));
+    });
+
+    return () => dim.remove();
+  }, []);
 
   //console.log('w', widthDimensions, 'h', heightDimensions, 's', scaleDimensions);
 
