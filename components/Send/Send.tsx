@@ -1146,7 +1146,7 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   //console.log(dimensions);
 
-  if (dimensions.orientation === 'landscape' && dimensions.deviceType === 'phone') {
+  if (dimensions.orientation === 'landscape') {
     return returnLandscape;
   } else {
     return returnPortrait;

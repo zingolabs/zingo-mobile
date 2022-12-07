@@ -301,7 +301,16 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
             backgroundColor: colors.background,
           }}>
           {screen === 0 && (
-            <Text style={{ color: colors.zingo, fontSize: 40, fontWeight: 'bold' }}>{translate('zingo')}</Text>
+            <View
+              style={{
+                flex: 1,
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+              <Text style={{ color: colors.zingo, fontSize: 40, fontWeight: 'bold' }}>{translate('zingo')}</Text>
+              <Text style={{ color: colors.zingo, fontSize: 15 }}>{translate('version')}</Text>
+            </View>
           )}
           {screen === 1 && (
             <ScrollView
@@ -321,6 +330,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                 }}>
                 <View style={{ marginBottom: 50, display: 'flex', alignItems: 'center' }}>
                   <Text style={{ color: colors.zingo, fontSize: 40, fontWeight: 'bold' }}>{translate('zingo')}</Text>
+                  <Text style={{ color: colors.zingo, fontSize: 15 }}>{translate('version')}</Text>
                   <Image
                     source={require('../../assets/img/logobig-zingo.png')}
                     style={{ width: 100, height: 100, resizeMode: 'contain', marginTop: 10 }}

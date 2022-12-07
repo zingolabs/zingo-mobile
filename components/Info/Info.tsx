@@ -19,7 +19,7 @@ type InfoProps = {
 
 const Info: React.FunctionComponent<InfoProps> = ({ closeModal }) => {
   const context = useContext(ContextLoaded);
-  const { info, totalBalance, translate, dimensions } = context;
+  const { info, totalBalance, translate } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [infoState, setInfoState] = React.useState({} as InfoType);
 
