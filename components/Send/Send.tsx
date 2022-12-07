@@ -642,24 +642,26 @@ const Send: React.FunctionComponent<SendProps> = ({
                     <RegText>{translate('send.spendable')}</RegText>
                     <ZecAmount
                       currencyName={info?.currencyName ? info.currencyName : ''}
-                      color={colors.money}
+                      color={stillConfirming ? 'red' : colors.money}
                       size={18}
                       amtZec={getMaxAmount()}
                     />
                   </View>
                   {stillConfirming && (
-                    <View
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        marginTop: 5,
-                        backgroundColor: colors.card,
-                        padding: 5,
-                        borderRadius: 10,
-                      }}>
-                      <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
-                      <FadeText>{translate('send.somefunds')}</FadeText>
-                    </View>
+                    <TouchableOpacity onPress={() => poolsMoreInfoOnClick()}>
+                      <View
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          marginTop: 5,
+                          backgroundColor: colors.card,
+                          padding: 5,
+                          borderRadius: 10,
+                        }}>
+                        <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
+                        <FadeText>{translate('send.somefunds')}</FadeText>
+                      </View>
+                    </TouchableOpacity>
                   )}
                 </View>
 

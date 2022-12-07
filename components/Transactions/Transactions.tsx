@@ -72,7 +72,8 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({ doRefresh })
 
   const syncStatusDisplayLine = syncingStatus?.inProgress ? `(${syncingStatus?.blocks})` : '';
 
-  const balanceColor = transactions?.find(t => t.confirmations === 0) ? colors.primary : colors.text;
+  //const balanceColor = transactions?.find(t => t.confirmations === 0) ? colors.primary : colors.text;
+  const balanceColor = colors.text;
   var lastMonth = '';
 
   //console.log('render transaction');
@@ -394,9 +395,6 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({ doRefresh })
         <View style={{ padding: 10, position: 'absolute', right: 0, alignItems: 'flex-end' }}>
           <Text style={{ fontSize: 8, color: colors.border }}>
             {'(' + dimensions.width + 'x' + dimensions.height + ')-' + dimensions.scale}
-          </Text>
-          <Text style={{ fontSize: 8, color: colors.border }}>
-            {dimensions.deviceType === 'tablet' ? translate('info.tablet') : translate('info.phone')}
           </Text>
           <Text style={{ fontSize: 7, color: colors.border }}>
             {dimensions.orientation === 'landscape' ? translate('info.landscape') : translate('info.portrait')}
