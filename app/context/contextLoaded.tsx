@@ -15,6 +15,13 @@ import {
 const defaultAppState: AppStateLoaded = {
   navigation: null,
   route: null,
+  dimensions: {} as {
+    width: number;
+    height: number;
+    orientation: 'portrait' | 'landscape';
+    deviceType: 'tablet' | 'phone';
+    scale: number;
+  },
 
   syncStatusReport: new SyncStatusReport(),
   totalBalance: new TotalBalance(),
@@ -51,17 +58,10 @@ const defaultAppState: AppStateLoaded = {
   openErrorModal: () => {},
   closeErrorModal: () => {},
   toggleMenuDrawer: () => {},
-  fetchTotalBalance: async () => {},
-  setSendPageState: () => {},
-  sendTransaction: async () => '',
-  clearToAddr: () => {},
   setComputingModalVisible: () => {},
-  setTxBuildProgress: () => {},
   syncingStatusMoreInfoOnClick: async () => {},
   poolsMoreInfoOnClick: async () => {},
-  doRefresh: () => {},
   startRescan: () => {},
-  setUaAddress: () => {},
 };
 
 export const ContextLoaded = React.createContext(defaultAppState);

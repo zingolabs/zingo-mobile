@@ -27,7 +27,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
   const { colors } = useTheme() as unknown as ThemeType;
 
   const amountColor = tx.confirmations === 0 ? colors.primaryDisabled : tx.amount > 0 ? colors.primary : colors.text;
-  const txIcon = tx.amount > 0 ? faArrowDown : faArrowUp;
+  const txIcon = tx.amount >= 0 ? faArrowDown : faArrowUp;
 
   const displayAddress =
     tx.detailedTxns && tx.detailedTxns.length > 0 ? Utils.trimToSmall(tx.detailedTxns[0].address, 7) : 'Unknown';
@@ -63,7 +63,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
             borderBottomColor: colors.border,
           }}>
           <FontAwesomeIcon
-            style={{ marginLeft: 15, marginRight: 15, marginTop: 5 }}
+            style={{ marginLeft: 5, marginRight: 5, marginTop: 5 }}
             size={24}
             icon={txIcon}
             color={amountColor}

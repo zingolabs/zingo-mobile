@@ -1,4 +1,5 @@
 import { TranslateOptions } from 'i18n-js';
+import BackgroundFetch from 'react-native-background-fetch';
 
 import {
   SyncStatusReport,
@@ -197,27 +198,20 @@ export default class RPC {
     return 'Error: ' + viewKeyStr;
   }
 
-  static async rpc_createNewAddress(addressType: 'z' | 't' | 'u'): Promise<string | null> {
-    // 'z' 't' or 'u'
-    if (addressType) {
-      return 'Error: ';
-    } else {
-      return null;
-    }
-
-    //const addrStr = await RPCModule.execute('new', addressType);
-    //const addrJSON = await JSON.parse(addrStr);
+  static async rpc_createNewAddress(addressType: 'tzo'): Promise<string | null> {
+    const addrStr = await RPCModule.execute('new', addressType);
+    const addrJSON = await JSON.parse(addrStr);
 
     //console.log(addrJSON);
 
-    //if (addrJSON) {
-    // Save
-    //await RPCModule.doSave();
+    if (addrJSON) {
+      // Save
+      await RPCModule.doSave();
 
-    //return addrJSON[0];
-    //}
+      return addrJSON[0];
+    }
 
-    //return null;
+    return null;
   }
 
   static async rpc_doImportPrivKey(key: string, birthday: string): Promise<string | string[] | null> {
@@ -472,23 +466,32 @@ export default class RPC {
       this.process_end_block = this.lastWalletBlockHeight;
 
       // This is async, so when it is done, we finish the refresh.
+      const onEventRescan = async (taskId: string) => {
+        await this.doSync();
+        this.inRefresh = false;
+        BackgroundFetch.finish(taskId);
+      };
+
+      const onEventSync = async (taskId: string) => {
+        await this.doSync();
+        this.inRefresh = false;
+        BackgroundFetch.finish(taskId);
+      };
+
+      const onTimeout = async (taskId: string) => {
+        BackgroundFetch.finish(taskId);
+      };
+
+      //let status;
       if (fullRescan) {
-        this.doRescan()
-          .then(r => console.log('End Rescan OK: ' + r))
-          .catch(e => console.log('End Rescan ERROR: ' + e))
-          .finally(() => {
-            this.inRefresh = false;
-          });
+        //status =
+        await BackgroundFetch.configure({ minimumFetchInterval: 15 }, onEventRescan, onTimeout);
       } else {
-        //console.log('Starting New Sync');
-        this.doSync()
-          .then(r => console.log('End Sync OK: ' + r))
-          .catch(e => console.log('End Sync ERROR: ' + e))
-          .finally(() => {
-            //console.log('in refresh: false');
-            this.inRefresh = false;
-          });
+        //status =
+        await BackgroundFetch.configure({ minimumFetchInterval: 15 }, onEventSync, onTimeout);
       }
+
+      //console.log('background status', status);
 
       // We need to wait for the sync to finish. The sync is done when
       let pollerID = setInterval(async () => {
@@ -863,21 +866,31 @@ export default class RPC {
 
     addressesJSON.forEach((u: any) => {
       // If this has any unconfirmed txns, show that in the UI
-      const abu = new Address(u.address, u.address, 'u');
-      if (pendingAddress.has(abu.address)) {
-        abu.containsPending = true;
+      const receivers =
+        (u.receivers.orchard_exists ? 'o' : '') +
+        (u.receivers.sapling ? 'z' : '') +
+        (u.receivers.transparent ? 't' : '');
+      if (u.address) {
+        const abu = new Address(u.address, u.address, 'u', receivers);
+        if (pendingAddress.has(abu.address)) {
+          abu.containsPending = true;
+        }
+        allAddresses.push(abu);
       }
-      allAddresses.push(abu);
-      const abz = new Address(u.address, u.receivers.sapling, 'z');
-      if (pendingAddress.has(abz.address)) {
-        abz.containsPending = true;
+      if (u.receivers.sapling) {
+        const abz = new Address(u.address, u.receivers.sapling, 'z', receivers);
+        if (pendingAddress.has(abz.address)) {
+          abz.containsPending = true;
+        }
+        allAddresses.push(abz);
       }
-      allAddresses.push(abz);
-      const abt = new Address(u.address, u.receivers.transparent, 't');
-      if (pendingAddress.has(abt.address)) {
-        abt.containsPending = true;
+      if (u.receivers.transparent) {
+        const abt = new Address(u.address, u.receivers.transparent, 't', receivers);
+        if (pendingAddress.has(abt.address)) {
+          abt.containsPending = true;
+        }
+        allAddresses.push(abt);
       }
-      allAddresses.push(abt);
     });
 
     //console.log(allAddresses);

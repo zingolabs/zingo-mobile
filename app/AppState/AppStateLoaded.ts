@@ -19,6 +19,13 @@ import SyncStatus from './SyncStatus';
 export default interface AppStateLoaded {
   navigation: NavigationScreenProp<any> | null;
   route: RouteProp<any> | null;
+  dimensions: {
+    width: number;
+    height: number;
+    orientation: 'portrait' | 'landscape';
+    deviceType: 'tablet' | 'phone';
+    scale: number;
+  };
 
   // Info about the current sync process
   syncStatusReport: SyncStatusReport;
@@ -97,17 +104,10 @@ export default interface AppStateLoaded {
   openErrorModal: (title: string, body: string) => void;
   closeErrorModal: () => void;
   toggleMenuDrawer: () => void;
-  fetchTotalBalance: () => Promise<void>;
-  setSendPageState: (sendPageState: SendPageState) => void;
-  sendTransaction: (setSendProgress: (arg0: SendProgress | null) => void) => Promise<String>;
-  clearToAddr: () => void;
   setComputingModalVisible: (visible: boolean) => void;
-  setTxBuildProgress: (progress: SendProgress) => void;
   syncingStatusMoreInfoOnClick: () => void;
   poolsMoreInfoOnClick: () => void;
-  doRefresh: () => void;
   startRescan: () => void;
-  setUaAddress: (uaAddress: string) => void;
 
   // eslint-disable-next-line semi
 }

@@ -162,7 +162,7 @@ const ImportKey: React.FunctionComponent<ImportKeyProps> = ({ closeModal, doImpo
           />
         </View>
 
-        <RegText style={{ margin: 20 }}>{translate('import.text')}</RegText>
+        <RegText style={{ margin: 20, marginBottom: 30 }}>{translate('import.text')}</RegText>
       </ScrollView>
       <View
         style={{

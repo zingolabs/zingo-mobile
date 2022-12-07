@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo!",
-  "version": "v0.0.84",
+  "version": "v0.0.94",
   "loading": "cargando...",
   "wait": "Por favor espere...",
   "workingonit": "Estamos trabajando en esta funcionalidad",
@@ -85,7 +85,10 @@
     "memo-title": "BAJAR MEMORÁNDUMS",
     "save": "Grabar",
     "server-acc": "Campo de la URI del Servidor",
-    "threshold-acc": "Campo del Umbral del Filtro de Transacciones"
+    "threshold-acc": "Campo del Umbral del Filtro de Transacciones",
+    "value-none": "ninguno",
+    "value-wallet": "billetera",
+    "value-all": "todos"
   },
   "info": {
     "version": "Versión",
@@ -95,7 +98,12 @@
     "serverblock": "Altura de Bloque del Servidor",
     "zecprice": "Precio ZEC",
     "unknown": "Desconocido",
-    "title": "Información del Servidor"
+    "title": "Información del Servidor",
+    "resolution": "Pantalla",
+    "portrait": "Orientación Vertical",
+    "landscape": "Orientación Horizontal",
+    "tablet": "Tableta",
+    "phone": "Teléfono"
   },
   "rescan": {
     "title": "Re-Escanear",
@@ -205,7 +213,7 @@
     "title": "Recibir",
     "title-syncing": "Recibir - Sincronizando",
     "more": "ver más...",
-    "newu-option": "Nueva Dirección Unificada",
+    "newu-option": "Nueva Dirección Unificada Diversificada",
     "privkey-option": "Exportar la Clave para Gastar",
     "viewkey-option": "Exportar la Clave de Visualizacion Total",
     "import-option": "Importar una Clave...",
@@ -237,7 +245,8 @@
     "txfee": "Comisión por Transacción",
     "title-acc": "Pantalla del Monedero",
     "list-acc": "Lista de Transacciones",
-    "pools": "grupos..."
+    "pools": "grupos...",
+    "transactions": "Transacciones"
   },
   "report": {
     "title": "Informe de Sincronización",

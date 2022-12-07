@@ -9,6 +9,13 @@ import WalletSeed from './WalletSeed';
 export default interface AppStateLoading {
   navigation: NavigationScreenProp<any> | null;
   route: RouteProp<any> | null;
+  dimensions: {
+    width: number;
+    height: number;
+    orientation: 'portrait' | 'landscape';
+    deviceType: 'tablet' | 'phone';
+    scale: number;
+  };
 
   screen: number;
   actionButtonsDisabled: boolean;

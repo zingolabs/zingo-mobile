@@ -86,7 +86,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSen
           );
         })}
 
-        <View style={{ margin: 10 }}>
+        <View style={{ margin: 10, marginBottom: 30 }}>
           <FadeText>{translate('send.fee')}</FadeText>
           <View
             style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>

@@ -231,20 +231,20 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ set_wallet_option, s
           <BoldText>{translate('settings.memo-title')}</BoldText>
         </View>
 
-        <View style={{ display: 'flex', marginLeft: 25 }}>
+        <View style={{ display: 'flex', marginLeft: 25, marginBottom: 30 }}>
           {MEMOS.map(memo => (
             <View key={'view-' + memo.value}>
               <TouchableOpacity
                 style={{ marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
                 onPress={() => setMemos(memo.value)}>
-                <View style={{ display: 'flex', flexDirection: 'row', marginTop: 10 }}>
+                <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
                   <FontAwesomeIcon
                     icon={memo.value === memos ? faDotCircle : farCircle}
                     size={20}
                     color={colors.border}
                   />
                   <RegText key={'text-' + memo.value} style={{ marginLeft: 10 }}>
-                    {memo.value}
+                    {translate(`settings.value-${memo.value}`)}
                   </RegText>
                 </View>
               </TouchableOpacity>

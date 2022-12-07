@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo!",
-  "version": "v0.0.84",
+  "version": "v0.0.94",
   "loading": "loading...",
   "wait": "Please wait...",
   "workingonit": "We are working on this feature.",
@@ -85,7 +85,10 @@
     "memo-title": "MEMO DOWNLOAD",
     "save": "Save",
     "server-acc": "Server URI Field",
-    "threshold-acc": "Threshold Field"
+    "threshold-acc": "Threshold Field",
+    "value-none": "none",
+    "value-wallet": "wallet",
+    "value-all": "all"
   },
   "info": {
     "version": "Version",
@@ -95,7 +98,12 @@
     "serverblock": "Server Block Height",
     "zecprice": "ZEC Price",
     "unknown": "Unknown",
-    "title": "Server Info"
+    "title": "Server Info",
+    "resolution": "Device Screen",
+    "portrait": "Portrait Orientation",
+    "landscape": "Landscape Orientation",
+    "tablet": "Tablet",
+    "phone": "Phone"
   },
   "rescan": {
     "title": "Rescan",
@@ -205,7 +213,7 @@
     "title": "Receive",
     "title-syncing": "Receive - Syncing",
     "more": "more...",
-    "newu-option": "New Address",
+    "newu-option": "New Diversified Unified Address",
     "privkey-option": "Export Spending Key",
     "viewkey-option": "Export Full Viewing Key",
     "import-option": "Import Key...",
@@ -237,7 +245,8 @@
     "txfee": "Transaction Fee",
     "title-acc": "Wallet Screen",
     "list-acc": "Transactions' List",
-    "pools": "pools..."
+    "pools": "pools...",
+    "transactions": "Transactions"
   },
   "report": {
     "title": "Sync / Rescan Report",
