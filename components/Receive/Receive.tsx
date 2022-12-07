@@ -90,19 +90,19 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ fetchTotalBalance, set
 
   const addO = async () => {
     //console.log('New O');
-    const newAddress = await RPC.rpc_createNewAddress('tzo');
-    if (newAddress && !newAddress.startsWith('Error')) {
-      await fetchTotalBalance();
-      if (newAddress) {
-        setDisplayAddress(newAddress);
-      }
-    } else {
-      if (newAddress) {
-        Toast.show(newAddress + translate('workingonit'), Toast.LONG);
-        return;
-      }
-    }
+    //const newAddress = await RPC.rpc_createNewAddress('tzo');
+    //if (newAddress && !newAddress.startsWith('Error')) {
+    await fetchTotalBalance();
+    //  if (newAddress) {
+    //    setDisplayAddress(newAddress);
+    //  }
+    //} else {
+    //  if (newAddress) {
+    Toast.show('Error: ' + translate('workingonit'), Toast.LONG);
     return;
+    //  }
+    //}
+    //return;
   };
 
   const [privKeyModalVisible, setPrivKeyModalVisible] = useState(false);
