@@ -201,9 +201,6 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({ doRefresh })
         <Text style={{ fontSize: 8, color: colors.border }}>
           {'(' + dimensions.width + 'x' + dimensions.height + ')-' + dimensions.scale}
         </Text>
-        <Text style={{ fontSize: 8, color: colors.border }}>
-          {dimensions.deviceType === 'tablet' ? translate('info.tablet') : translate('info.phone')}
-        </Text>
         <Text style={{ fontSize: 7, color: colors.border }}>
           {dimensions.orientation === 'landscape' ? translate('info.landscape') : translate('info.portrait')}
         </Text>
@@ -478,7 +475,7 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({ doRefresh })
 
   //console.log(dimensions);
 
-  if (dimensions.orientation === 'landscape' && dimensions.deviceType === 'phone') {
+  if (dimensions.orientation === 'landscape') {
     return returnLandscape;
   } else {
     return returnPortrait;

@@ -78,21 +78,6 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal }) => {
         }}>
         <View style={{ display: 'flex', margin: 20, marginBottom: 30 }}>
           <DetailLine label={translate('info.version')} value={translate('zingo') + ' ' + translate('version')} />
-          {/*<DetailLine
-            label={translate('info.resolution')}
-            value={
-              '(' +
-              dimensions.width +
-              'x' +
-              dimensions.height +
-              ')-' +
-              dimensions.scale +
-              ' - ' +
-              (dimensions.deviceType === 'tablet' ? translate('info.tablet') : translate('info.phone')) +
-              ' - ' +
-              (dimensions.orientation === 'landscape' ? translate('info.landscape') : translate('info.portrait'))
-            }
-          />*/}
           <DetailLine
             label={translate('info.serverversion')}
             value={infoState.version ? infoState.version : translate('loading')}
