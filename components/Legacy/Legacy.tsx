@@ -22,11 +22,13 @@ import { ContextLoaded } from '../../app/context';
 
 type LegacyProps = {
   fetchTotalBalance: () => void;
+  toggleMenuDrawer: () => void;
+  startRescan: () => void;
 };
 
-const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance }) => {
+const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance, toggleMenuDrawer, startRescan }) => {
   const context = useContext(ContextLoaded);
-  const { translate, dimensions, toggleMenuDrawer, info, addresses, startRescan, totalBalance, uaAddress } = context;
+  const { translate, dimensions, info, addresses, totalBalance, uaAddress } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([

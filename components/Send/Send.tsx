@@ -30,6 +30,10 @@ type SendProps = {
   sendTransaction: (setSendProgress: (arg0: SendProgress | null) => void) => Promise<String>;
   clearToAddr: () => void;
   setTxBuildProgress: (progress: SendProgress) => void;
+  toggleMenuDrawer: () => void;
+  setComputingModalVisible: (visible: boolean) => void;
+  syncingStatusMoreInfoOnClick: () => void;
+  poolsMoreInfoOnClick: () => void;
 };
 
 const Send: React.FunctionComponent<SendProps> = ({
@@ -37,21 +41,13 @@ const Send: React.FunctionComponent<SendProps> = ({
   sendTransaction,
   clearToAddr,
   setTxBuildProgress,
+  toggleMenuDrawer,
+  setComputingModalVisible,
+  syncingStatusMoreInfoOnClick,
+  poolsMoreInfoOnClick,
 }) => {
   const context = useContext(ContextLoaded);
-  const {
-    translate,
-    dimensions,
-    toggleMenuDrawer,
-    info,
-    totalBalance,
-    sendPageState,
-    setComputingModalVisible,
-    syncingStatus,
-    navigation,
-    syncingStatusMoreInfoOnClick,
-    poolsMoreInfoOnClick,
-  } = context;
+  const { translate, dimensions, info, totalBalance, sendPageState, syncingStatus, navigation } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [qrcodeModalVisble, setQrcodeModalVisible] = useState(false);
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);

@@ -38,7 +38,6 @@ export default class RPC {
   lastServerBlockHeight: number;
 
   inRefresh: boolean;
-  inSend: boolean;
 
   prevProgress: number;
   prevBatchNum: number;
@@ -79,7 +78,6 @@ export default class RPC {
     this.lastServerBlockHeight = 0;
 
     this.inRefresh = false;
-    this.inSend = false;
 
     this.prevProgress = 0;
     this.prevBatchNum = -1;
@@ -237,7 +235,7 @@ export default class RPC {
     return null;
   }
 
-  static async rpc_fetchSeed(): Promise<WalletSeed | null> {
+  static async rpc_fetchSeedAndBirthday(): Promise<WalletSeed | null> {
     const seedStr = await RPCModule.execute('seed', '');
     const seedJSON = await JSON.parse(seedStr);
 
@@ -331,9 +329,10 @@ export default class RPC {
   }
 
   async doRescan(): Promise<string | null> {
+    console.log('rescan exec START');
     const syncstr = await RPCModule.execute('rescan', '');
 
-    //console.log(`rescan exec result: ${syncstr}`);
+    console.log(`rescan exec result: ${syncstr}`);
 
     if (syncstr) {
       return syncstr;
@@ -395,12 +394,14 @@ export default class RPC {
     await this.fetchTandZandOTransactions();
     await this.getZecPrice();
     await this.fetchWalletSettings();
+    await RPC.rpc_fetchSeedAndBirthday();
+    await this.fetchInfo();
   }
 
   async rescan() {
-    //console.log('RPC Rescan triggered');
+    console.log('RPC Rescan triggered');
     // Empty out the transactions list to start with.
-    await this.fnSetTransactionsList([]);
+    this.fnSetTransactionsList([]);
 
     await this.refresh(false, true);
   }
@@ -413,7 +414,7 @@ export default class RPC {
     }
 
     this.updateDataCtr += 1;
-    if ((this.inRefresh || this.inSend) && this.updateDataCtr % 5 !== 0) {
+    if (this.inRefresh && this.updateDataCtr % 5 !== 0) {
       // We're refreshing or sending, in which case update every 5th time
       return;
     }
@@ -445,14 +446,14 @@ export default class RPC {
       return;
     }
 
-    //console.log('in send', this.inSend);
+    console.log(fullRefresh, fullRescan, this.lastWalletBlockHeight, this.lastServerBlockHeight, this.inRefresh);
+
     // if it's sending now, don't fire the sync process.
     if (
-      (fullRefresh ||
-        fullRescan ||
-        !this.lastWalletBlockHeight ||
-        this.lastWalletBlockHeight < this.lastServerBlockHeight) &&
-      !this.inSend
+      fullRefresh ||
+      fullRescan ||
+      !this.lastWalletBlockHeight ||
+      this.lastWalletBlockHeight < this.lastServerBlockHeight
     ) {
       // If the latest block height has changed, make sure to sync. This will happen in a new thread
       this.inRefresh = true;
@@ -467,13 +468,17 @@ export default class RPC {
 
       // This is async, so when it is done, we finish the refresh.
       const onEventRescan = async (taskId: string) => {
-        await this.doSync();
+        console.log('rescan START');
+        const r = await this.doRescan();
+        console.log('rescan END', r);
         this.inRefresh = false;
         BackgroundFetch.finish(taskId);
       };
 
       const onEventSync = async (taskId: string) => {
-        await this.doSync();
+        console.log('sync START');
+        const r = await this.doSync();
+        console.log('sync END', r);
         this.inRefresh = false;
         BackgroundFetch.finish(taskId);
       };
@@ -482,16 +487,16 @@ export default class RPC {
         BackgroundFetch.finish(taskId);
       };
 
-      //let status;
+      let status;
       if (fullRescan) {
-        //status =
-        await BackgroundFetch.configure({ minimumFetchInterval: 15 }, onEventRescan, onTimeout);
+        console.log('background rescan start');
+        status = await BackgroundFetch.configure({ minimumFetchInterval: 15 }, onEventRescan, onTimeout);
+        console.log('background rescan end');
       } else {
-        //status =
-        await BackgroundFetch.configure({ minimumFetchInterval: 15 }, onEventSync, onTimeout);
+        status = await BackgroundFetch.configure({ minimumFetchInterval: 15 }, onEventSync, onTimeout);
       }
 
-      //console.log('background status', status);
+      console.log('background status', status);
 
       // We need to wait for the sync to finish. The sync is done when
       let pollerID = setInterval(async () => {
@@ -501,7 +506,7 @@ export default class RPC {
         }
         const ss = await JSON.parse(s);
 
-        //console.log('sync status', ss);
+        console.log('sync status', ss);
 
         // syncronize status
         this.inRefresh = ss.in_progress;
@@ -514,6 +519,7 @@ export default class RPC {
 
             await this.fetchWalletHeight();
             await this.fetchServerHeight();
+            await RPC.rpc_fetchSeedAndBirthday();
 
             await RPCModule.doSave();
 
@@ -642,6 +648,7 @@ export default class RPC {
 
           await this.fetchWalletHeight();
           await this.fetchServerHeight();
+          await RPC.rpc_fetchSeedAndBirthday();
 
           await RPCModule.doSave();
           this.prevProgress = 0;
@@ -681,6 +688,7 @@ export default class RPC {
 
               await this.fetchWalletHeight();
               await this.fetchServerHeight();
+              await RPC.rpc_fetchSeedAndBirthday();
 
               await RPCModule.doSave();
               this.batches = 0;
@@ -720,6 +728,7 @@ export default class RPC {
 
             await this.fetchWalletHeight();
             await this.fetchServerHeight();
+            await RPC.rpc_fetchSeedAndBirthday();
 
             await RPCModule.doSave();
             this.message = this.translate('rpc.sixtyseconds-message') + ` ${batch_num + 1}`;
@@ -1023,8 +1032,6 @@ export default class RPC {
     this.doSend(JSON.stringify(sendJson))
       .then(r => console.log('End Send OK: ' + r))
       .catch(e => console.log('End Send ERROR: ' + e));
-    // activate the send flag right now.
-    this.inSend = true;
 
     const startTimeSeconds = new Date().getTime() / 1000;
 
@@ -1082,8 +1089,6 @@ export default class RPC {
         setSendProgress(null);
 
         if (progress.txid) {
-          this.inSend = false;
-
           // And refresh data (full refresh)
           this.refresh(true);
 
@@ -1091,7 +1096,6 @@ export default class RPC {
         }
 
         if (progress.error) {
-          this.inSend = false;
           reject(progress.error);
         }
       }, 2000); // Every 2 seconds

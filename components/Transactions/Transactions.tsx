@@ -21,22 +21,21 @@ import { ContextLoaded } from '../../app/context';
 
 type TransactionsProps = {
   doRefresh: () => void;
+  toggleMenuDrawer: () => void;
+  setComputingModalVisible: (visible: boolean) => void;
+  poolsMoreInfoOnClick: () => void;
+  syncingStatusMoreInfoOnClick: () => void;
 };
 
-const Transactions: React.FunctionComponent<TransactionsProps> = ({ doRefresh }) => {
+const Transactions: React.FunctionComponent<TransactionsProps> = ({
+  doRefresh,
+  toggleMenuDrawer,
+  setComputingModalVisible,
+  poolsMoreInfoOnClick,
+  syncingStatusMoreInfoOnClick,
+}) => {
   const context = useContext(ContextLoaded);
-  const {
-    translate,
-    dimensions,
-    toggleMenuDrawer,
-    transactions,
-    totalBalance,
-    setComputingModalVisible,
-    info,
-    syncingStatus,
-    poolsMoreInfoOnClick,
-    syncingStatusMoreInfoOnClick,
-  } = context;
+  const { translate, dimensions, transactions, totalBalance, info, syncingStatus } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [isTxDetailModalShowing, setTxDetailModalShowing] = React.useState(false);
   const [txDetail, setTxDetail] = React.useState<Transaction | null>(null);

@@ -21,10 +21,10 @@ export default interface AppStateLoading {
   actionButtonsDisabled: boolean;
   walletExists: boolean;
   walletSeed: WalletSeed | null;
-  birthday: number | null;
   server: string | null;
   totalBalance: TotalBalance;
   info: InfoType | null;
+
   translate: (key: string, config?: TranslateOptions) => any;
 
   // eslint-disable-next-line semi

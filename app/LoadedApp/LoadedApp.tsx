@@ -176,15 +176,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       poolsModalVisible: false,
       newServer: null,
       uaAddress: null,
-      translate: props.translate,
 
-      openErrorModal: this.openErrorModal,
-      closeErrorModal: this.closeErrorModal,
-      toggleMenuDrawer: this.toggleMenuDrawer,
-      setComputingModalVisible: this.setComputingModalVisible,
-      syncingStatusMoreInfoOnClick: this.syncingStatusMoreInfoOnClick,
-      poolsMoreInfoOnClick: this.poolsMoreInfoOnClick,
-      startRescan: this.startRescan,
+      translate: props.translate,
     };
 
     this.rpc = new RPC(
@@ -449,14 +442,14 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     this.setState({ isMenuDrawerOpen });
   };
 
-  fetchWalletSeed = async () => {
-    const walletSeed = await RPC.rpc_fetchSeed();
+  fetchWalletSeedAndBirthday = async () => {
+    const walletSeed = await RPC.rpc_fetchSeedAndBirthday();
     this.setState({ walletSeed });
   };
 
   startRescan = () => {
-    this.rpc.rescan();
     this.setRescanning(true);
+    this.rpc.rescan();
   };
 
   onMenuItemSelected = async (item: string) => {
@@ -466,12 +459,12 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       selectedMenuDrawerItem: item,
     });
 
+    await this.fetchWalletSeedAndBirthday();
+
     // Depending on the menu item, open the appropriate modal
     if (item === 'About') {
       this.setState({ aboutModalVisible: true });
     } else if (item === 'Rescan') {
-      // Fetch the wallet seed to show the birthday in the UI
-      await this.fetchWalletSeed();
       this.setState({ rescanModalVisible: true });
     } else if (item === 'Settings') {
       this.setState({ settingsModalVisible: true });
@@ -482,17 +475,14 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     } else if (item === 'Fund Pools') {
       this.setState({ poolsModalVisible: true });
     } else if (item === 'Wallet Seed') {
-      await this.fetchWalletSeed();
       this.setState({ seedViewModalVisible: true });
     } else if (item === 'Change Wallet') {
-      await this.fetchWalletSeed();
       this.setState({ seedChangeModalVisible: true });
     } else if (item === 'Restore Wallet Backup') {
       if (info && info.currencyName !== 'ZEC') {
         Toast.show(this.state.translate('loadedapp.restoremainnet-error'), Toast.LONG);
         return;
       }
-      await this.fetchWalletSeed();
       this.setState({ seedBackupModalVisible: true });
     }
   };
@@ -538,7 +528,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       }
 
       // go to the seed screen for changing the wallet for another in the new server
-      await this.fetchWalletSeed();
+      await this.fetchWalletSeedAndBirthday();
       this.setState({
         seedServerModalVisible: true,
         newServer: value,
@@ -623,7 +613,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   };
 
   syncingStatusMoreInfoOnClick = async () => {
-    await this.fetchWalletSeed();
+    await this.fetchWalletSeedAndBirthday();
     this.setState({ syncReportModalVisible: true });
   };
 
@@ -760,7 +750,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                   <Text>{translate('loading')}</Text>
                 </View>
               }>
-              <Rescan closeModal={() => this.setState({ rescanModalVisible: false })} />
+              <Rescan closeModal={() => this.setState({ rescanModalVisible: false })} startRescan={this.startRescan} />
             </Suspense>
           </Modal>
 
@@ -898,7 +888,13 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                         <Text>{translate('loading')}</Text>
                       </View>
                     }>
-                    <Transactions doRefresh={this.doRefresh} />
+                    <Transactions
+                      doRefresh={this.doRefresh}
+                      toggleMenuDrawer={this.toggleMenuDrawer}
+                      setComputingModalVisible={this.setComputingModalVisible}
+                      syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
+                      poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
+                    />
                   </Suspense>
                 </>
               )}
@@ -917,6 +913,10 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                       sendTransaction={this.sendTransaction}
                       clearToAddr={this.clearToAddr}
                       setTxBuildProgress={this.setTxBuildProgress}
+                      toggleMenuDrawer={this.toggleMenuDrawer}
+                      setComputingModalVisible={this.setComputingModalVisible}
+                      syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
+                      poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
                     />
                   </Suspense>
                 </>
@@ -931,7 +931,14 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                         <Text>{translate('loading')}</Text>
                       </View>
                     }>
-                    <Receive fetchTotalBalance={this.fetchTotalBalance} setUaAddress={this.setUaAddress} />
+                    <Receive
+                      fetchTotalBalance={this.fetchTotalBalance}
+                      setUaAddress={this.setUaAddress}
+                      toggleMenuDrawer={this.toggleMenuDrawer}
+                      syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
+                      poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
+                      startRescan={this.startRescan}
+                    />
                   </Suspense>
                 </>
               )}
@@ -945,7 +952,11 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                         <Text>{translate('loading')}</Text>
                       </View>
                     }>
-                    <Legacy fetchTotalBalance={this.fetchTotalBalance} />
+                    <Legacy
+                      fetchTotalBalance={this.fetchTotalBalance}
+                      toggleMenuDrawer={this.toggleMenuDrawer}
+                      startRescan={this.startRescan}
+                    />
                   </Suspense>
                 </>
               )}
