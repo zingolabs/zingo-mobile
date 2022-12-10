@@ -1,5 +1,5 @@
 import { TranslateOptions } from 'i18n-js';
-import BackgroundFetch from 'react-native-background-fetch';
+//import BackgroundFetch from 'react-native-background-fetch';
 
 import {
   SyncStatusReport,
@@ -36,6 +36,7 @@ export default class RPC {
 
   lastWalletBlockHeight: number;
   lastServerBlockHeight: number;
+  walletBirthday: number;
 
   inRefresh: boolean;
 
@@ -76,6 +77,7 @@ export default class RPC {
 
     this.lastWalletBlockHeight = 0;
     this.lastServerBlockHeight = 0;
+    this.walletBirthday = 0;
 
     this.inRefresh = false;
 
@@ -329,10 +331,9 @@ export default class RPC {
   }
 
   async doRescan(): Promise<string | null> {
-    console.log('rescan exec START');
     const syncstr = await RPCModule.execute('rescan', '');
 
-    console.log(`rescan exec result: ${syncstr}`);
+    //console.log(`rescan exec result: ${syncstr}`);
 
     if (syncstr) {
       return syncstr;
@@ -394,12 +395,11 @@ export default class RPC {
     await this.fetchTandZandOTransactions();
     await this.getZecPrice();
     await this.fetchWalletSettings();
-    await RPC.rpc_fetchSeedAndBirthday();
     await this.fetchInfo();
   }
 
   async rescan() {
-    console.log('RPC Rescan triggered');
+    //console.log('RPC Rescan triggered');
     // Empty out the transactions list to start with.
     this.fnSetTransactionsList([]);
 
@@ -422,6 +422,7 @@ export default class RPC {
     this.updateDataLock = true;
 
     await this.fetchWalletHeight();
+    await this.fetchWalletBirthday();
     await this.fetchServerHeight();
 
     // And fetch the rest of the data.
@@ -441,12 +442,13 @@ export default class RPC {
     await this.loadWalletData();
 
     await this.fetchWalletHeight();
+    await this.fetchWalletBirthday();
     await this.fetchServerHeight();
     if (!this.lastServerBlockHeight) {
       return;
     }
 
-    console.log(fullRefresh, fullRescan, this.lastWalletBlockHeight, this.lastServerBlockHeight, this.inRefresh);
+    //console.log(fullRefresh, fullRescan, this.lastWalletBlockHeight, this.lastServerBlockHeight, this.inRefresh);
 
     // if it's sending now, don't fire the sync process.
     if (
@@ -464,39 +466,18 @@ export default class RPC {
       this.seconds_batch = 0;
       this.batches = 0;
       this.message = this.translate('rpc.syncstart-message');
-      this.process_end_block = this.lastWalletBlockHeight;
+      this.process_end_block = fullRescan ? this.walletBirthday : this.lastWalletBlockHeight;
 
       // This is async, so when it is done, we finish the refresh.
-      const onEventRescan = async (taskId: string) => {
-        console.log('rescan START');
-        const r = await this.doRescan();
-        console.log('rescan END', r);
-        this.inRefresh = false;
-        BackgroundFetch.finish(taskId);
-      };
-
-      const onEventSync = async (taskId: string) => {
-        console.log('sync START');
-        const r = await this.doSync();
-        console.log('sync END', r);
-        this.inRefresh = false;
-        BackgroundFetch.finish(taskId);
-      };
-
-      const onTimeout = async (taskId: string) => {
-        BackgroundFetch.finish(taskId);
-      };
-
-      let status;
       if (fullRescan) {
-        console.log('background rescan start');
-        status = await BackgroundFetch.configure({ minimumFetchInterval: 15 }, onEventRescan, onTimeout);
-        console.log('background rescan end');
+        this.doRescan().finally(() => {
+          this.inRefresh = false;
+        });
       } else {
-        status = await BackgroundFetch.configure({ minimumFetchInterval: 15 }, onEventSync, onTimeout);
+        this.doSync().finally(() => {
+          this.inRefresh = false;
+        });
       }
-
-      console.log('background status', status);
 
       // We need to wait for the sync to finish. The sync is done when
       let pollerID = setInterval(async () => {
@@ -506,7 +487,7 @@ export default class RPC {
         }
         const ss = await JSON.parse(s);
 
-        console.log('sync status', ss);
+        //console.log('sync status', ss);
 
         // syncronize status
         this.inRefresh = ss.in_progress;
@@ -518,8 +499,8 @@ export default class RPC {
             await this.loadWalletData();
 
             await this.fetchWalletHeight();
+            await this.fetchWalletBirthday();
             await this.fetchServerHeight();
-            await RPC.rpc_fetchSeedAndBirthday();
 
             await RPCModule.doSave();
 
@@ -602,6 +583,7 @@ export default class RPC {
         //await this.loadWalletData();
 
         //await this.fetchWalletHeight();
+        //await this.fetchWalletBirthday();
         //await this.fetchServerHeight();
 
         let current_block = end_block + progress_blocks;
@@ -647,8 +629,8 @@ export default class RPC {
           await this.loadWalletData();
 
           await this.fetchWalletHeight();
+          await this.fetchWalletBirthday();
           await this.fetchServerHeight();
-          await RPC.rpc_fetchSeedAndBirthday();
 
           await RPCModule.doSave();
           this.prevProgress = 0;
@@ -687,8 +669,8 @@ export default class RPC {
               await this.loadWalletData();
 
               await this.fetchWalletHeight();
+              await this.fetchWalletBirthday();
               await this.fetchServerHeight();
-              await RPC.rpc_fetchSeedAndBirthday();
 
               await RPCModule.doSave();
               this.batches = 0;
@@ -727,8 +709,8 @@ export default class RPC {
             await this.loadWalletData();
 
             await this.fetchWalletHeight();
+            await this.fetchWalletBirthday();
             await this.fetchServerHeight();
-            await RPC.rpc_fetchSeedAndBirthday();
 
             await RPCModule.doSave();
             this.message = this.translate('rpc.sixtyseconds-message') + ` ${batch_num + 1}`;
@@ -913,6 +895,14 @@ export default class RPC {
 
     if (heightJSON) {
       this.lastWalletBlockHeight = heightJSON.height;
+    }
+  }
+
+  async fetchWalletBirthday(): Promise<void> {
+    const walletSeed = await RPC.rpc_fetchSeedAndBirthday();
+
+    if (walletSeed?.birthday) {
+      this.walletBirthday = walletSeed.birthday;
     }
   }
 
