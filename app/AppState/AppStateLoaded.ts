@@ -101,13 +101,6 @@ export default interface AppStateLoaded {
   uaAddress: string | null;
 
   translate: (key: string, config?: TranslateOptions) => any;
-  openErrorModal: (title: string, body: string) => void;
-  closeErrorModal: () => void;
-  toggleMenuDrawer: () => void;
-  setComputingModalVisible: (visible: boolean) => void;
-  syncingStatusMoreInfoOnClick: () => void;
-  poolsMoreInfoOnClick: () => void;
-  startRescan: () => void;
 
   // eslint-disable-next-line semi
 }

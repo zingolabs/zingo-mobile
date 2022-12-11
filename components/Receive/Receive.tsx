@@ -24,23 +24,22 @@ import { ContextLoaded } from '../../app/context';
 type ReceiveProps = {
   fetchTotalBalance: () => void;
   setUaAddress: (uaAddress: string) => void;
+  toggleMenuDrawer: () => void;
+  startRescan: () => void;
+  syncingStatusMoreInfoOnClick: () => void;
+  poolsMoreInfoOnClick: () => void;
 };
 
-const Receive: React.FunctionComponent<ReceiveProps> = ({ fetchTotalBalance, setUaAddress }) => {
+const Receive: React.FunctionComponent<ReceiveProps> = ({
+  fetchTotalBalance,
+  setUaAddress,
+  toggleMenuDrawer,
+  startRescan,
+  syncingStatusMoreInfoOnClick,
+  poolsMoreInfoOnClick,
+}) => {
   const context = useContext(ContextLoaded);
-  const {
-    translate,
-    dimensions,
-    toggleMenuDrawer,
-    info,
-    addresses,
-    startRescan,
-    totalBalance,
-    syncingStatus,
-    syncingStatusMoreInfoOnClick,
-    uaAddress,
-    poolsMoreInfoOnClick,
-  } = context;
+  const { translate, dimensions, info, addresses, totalBalance, syncingStatus, uaAddress } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([{ key: 'uaddr', title: translate('receive.u-title') }]);

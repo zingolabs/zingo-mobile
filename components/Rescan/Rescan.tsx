@@ -11,11 +11,12 @@ import { ContextLoaded } from '../../app/context';
 
 type RescanProps = {
   closeModal: () => void;
+  startRescan: () => void;
 };
 
-const Rescan: React.FunctionComponent<RescanProps> = ({ closeModal }) => {
+const Rescan: React.FunctionComponent<RescanProps> = ({ closeModal, startRescan }) => {
   const context = useContext(ContextLoaded);
-  const { walletSeed, startRescan, totalBalance, info, translate } = context;
+  const { walletSeed, totalBalance, info, translate } = context;
   const { colors } = useTheme() as unknown as ThemeType;
 
   const doRescanAndClose = () => {

@@ -17,10 +17,10 @@ const defaultAppState: AppStateLoading = {
   actionButtonsDisabled: false,
   walletExists: false,
   walletSeed: null,
-  birthday: null,
   server: null,
   totalBalance: new TotalBalance(),
   info: null,
+
   translate: () => {},
 };
 

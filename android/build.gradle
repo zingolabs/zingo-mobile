@@ -41,11 +41,11 @@ allprojects {
             url("$rootDir/../node_modules/jsc-android/dist")
         }
         maven {
-            url 'https://www.jitpack.io'
-        }
-        maven {
            // react-native-background-fetch
            url("${project(':react-native-background-fetch').projectDir}/libs")
        }
+       maven {
+            url 'https://www.jitpack.io'
+        }
     }
 }

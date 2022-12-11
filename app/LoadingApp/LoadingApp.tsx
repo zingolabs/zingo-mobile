@@ -130,7 +130,6 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
       actionButtonsDisabled: false,
       walletExists: false,
       walletSeed: null,
-      birthday: null,
       server: '',
       totalBalance: new TotalBalance(),
       info: null,
@@ -235,16 +234,16 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
   };
 
   getwalletSeedToRestore = async () => {
-    this.setState({ walletSeed: null, birthday: null, screen: 3, walletExists: false });
+    this.setState({ walletSeed: null, screen: 3, walletExists: false });
   };
 
   getViewingKeyToRestore = async () => {
-    //this.setState({ viewingKey: '', birthday: '0', screen: 3 });
+    //this.setState({ viewingKey: '', screen: 3 });
     Toast.show(this.state.translate('workingonit'), Toast.LONG);
   };
 
   getSpendableKeyToRestore = async () => {
-    //this.setState({ spendableKey: '', birthday: '0', screen: 3 });
+    //this.setState({ spendableKey: '', screen: 3 });
     Toast.show(this.state.translate('workingonit'), Toast.LONG);
   };
 

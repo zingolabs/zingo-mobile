@@ -55,13 +55,6 @@ const defaultAppState: AppStateLoaded = {
   uaAddress: null,
 
   translate: () => {},
-  openErrorModal: () => {},
-  closeErrorModal: () => {},
-  toggleMenuDrawer: () => {},
-  setComputingModalVisible: () => {},
-  syncingStatusMoreInfoOnClick: async () => {},
-  poolsMoreInfoOnClick: async () => {},
-  startRescan: () => {},
 };
 
 export const ContextLoaded = React.createContext(defaultAppState);

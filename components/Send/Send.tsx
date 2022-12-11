@@ -30,6 +30,10 @@ type SendProps = {
   sendTransaction: (setSendProgress: (arg0: SendProgress | null) => void) => Promise<String>;
   clearToAddr: () => void;
   setTxBuildProgress: (progress: SendProgress) => void;
+  toggleMenuDrawer: () => void;
+  setComputingModalVisible: (visible: boolean) => void;
+  syncingStatusMoreInfoOnClick: () => void;
+  poolsMoreInfoOnClick: () => void;
 };
 
 const Send: React.FunctionComponent<SendProps> = ({
@@ -37,21 +41,13 @@ const Send: React.FunctionComponent<SendProps> = ({
   sendTransaction,
   clearToAddr,
   setTxBuildProgress,
+  toggleMenuDrawer,
+  setComputingModalVisible,
+  syncingStatusMoreInfoOnClick,
+  poolsMoreInfoOnClick,
 }) => {
   const context = useContext(ContextLoaded);
-  const {
-    translate,
-    dimensions,
-    toggleMenuDrawer,
-    info,
-    totalBalance,
-    sendPageState,
-    setComputingModalVisible,
-    syncingStatus,
-    navigation,
-    syncingStatusMoreInfoOnClick,
-    poolsMoreInfoOnClick,
-  } = context;
+  const { translate, dimensions, info, totalBalance, sendPageState, syncingStatus, navigation } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [qrcodeModalVisble, setQrcodeModalVisible] = useState(false);
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
@@ -642,24 +638,26 @@ const Send: React.FunctionComponent<SendProps> = ({
                     <RegText>{translate('send.spendable')}</RegText>
                     <ZecAmount
                       currencyName={info?.currencyName ? info.currencyName : ''}
-                      color={colors.money}
+                      color={stillConfirming ? 'red' : colors.money}
                       size={18}
                       amtZec={getMaxAmount()}
                     />
                   </View>
                   {stillConfirming && (
-                    <View
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        marginTop: 5,
-                        backgroundColor: colors.card,
-                        padding: 5,
-                        borderRadius: 10,
-                      }}>
-                      <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
-                      <FadeText>{translate('send.somefunds')}</FadeText>
-                    </View>
+                    <TouchableOpacity onPress={() => poolsMoreInfoOnClick()}>
+                      <View
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          marginTop: 5,
+                          backgroundColor: colors.card,
+                          padding: 5,
+                          borderRadius: 10,
+                        }}>
+                        <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
+                        <FadeText>{translate('send.somefunds')}</FadeText>
+                      </View>
+                    </TouchableOpacity>
                   )}
                 </View>
 
