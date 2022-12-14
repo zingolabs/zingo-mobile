@@ -23,11 +23,12 @@ describe('Component ReceiveScreen - test', () => {
   test('ReceiveScreen - snapshot', () => {
     const receiveScreen = create(
       <Receive
-        info={null}
-        addresses={[]}
-        toggleMenuDrawer={() => {}}
         fetchTotalBalance={() => {}}
+        setUaAddress={() => {}}
+        toggleMenuDrawer={() => {}}
         startRescan={() => {}}
+        syncingStatusMoreInfoOnClick={() => {}}
+        poolsMoreInfoOnClick={() => {}}
       />,
     );
     expect(receiveScreen.toJSON()).toMatchSnapshot();

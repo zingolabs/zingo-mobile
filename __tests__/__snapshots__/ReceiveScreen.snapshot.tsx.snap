@@ -2,26 +2,13 @@
 
 exports[`Component ReceiveScreen - test ReceiveScreen - snapshot 1`] = `
 <
-  initialLayout={
-    Object {
-      "width": 750,
-    }
-  }
   navigationState={
-    Object {
+    {
       "index": 0,
-      "routes": Array [
-        Object {
-          "key": "zaddr",
-          "title": "Z Address",
-        },
-        Object {
-          "key": "taddr",
-          "title": "T Address",
-        },
-        Object {
-          "key": "oaddr",
-          "title": "O Address",
+      "routes": [
+        {
+          "key": "uaddr",
+          "title": undefined,
         },
       ],
     }
