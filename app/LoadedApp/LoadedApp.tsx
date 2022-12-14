@@ -139,11 +139,11 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       navigation: props.navigation,
       route: props.route,
       dimensions: {
-        width: Dimensions.get('screen').width,
-        height: Dimensions.get('screen').height,
+        width: Number(Dimensions.get('screen').width.toFixed(0)),
+        height: Number(Dimensions.get('screen').height.toFixed(0)),
         orientation: platform.isPortrait(Dimensions.get('screen')) ? 'portrait' : 'landscape',
         deviceType: platform.isTablet(Dimensions.get('screen')) ? 'tablet' : 'phone',
-        scale: Dimensions.get('screen').scale,
+        scale: Number(Dimensions.get('screen').scale.toFixed(2)),
       },
 
       syncStatusReport: new SyncStatusReport(),
@@ -203,11 +203,11 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     this.dim = Dimensions.addEventListener('change', ({ screen }) => {
       this.setState({
         dimensions: {
-          width: screen.width,
-          height: screen.height,
+          width: Number(screen.width.toFixed(0)),
+          height: Number(screen.height.toFixed(0)),
           orientation: platform.isPortrait(screen) ? 'portrait' : 'landscape',
           deviceType: platform.isTablet(screen) ? 'tablet' : 'phone',
-          scale: screen.scale,
+          scale: Number(screen.scale.toFixed(2)),
         },
       });
       //console.log('++++++++++++++++++++++++++++++++++ change dims', Dimensions.get('screen'));
