@@ -6,7 +6,7 @@ import 'react-native';
 import React from 'react';
 
 import { create } from 'react-test-renderer';
-import ReceiveScreen from '../components/ReceiveScreen';
+import Receive from '../components/Receive';
 
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
   FontAwesomeIcon: '',
@@ -22,7 +22,7 @@ describe('Component ReceiveScreen - test', () => {
   //snapshot test
   test('ReceiveScreen - snapshot', () => {
     const receiveScreen = create(
-      <ReceiveScreen
+      <Receive
         info={null}
         addresses={[]}
         toggleMenuDrawer={() => {}}
