@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Component PrivKeyModal - test PrivKeyModal - snapshot 1`] = `
+exports[`Component PrivKey - test PrivKey - snapshot 1`] = `
 <RCTSafeAreaView
   style={
     {

@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Component About - test About - snapshot 1`] = `
+exports[`Component Seed - test Seed - snapshot 1`] = `
 <RCTSafeAreaView
   style={
     {
@@ -106,7 +106,10 @@ exports[`Component About - test About - snapshot 1`] = `
         ]
       }
     >
-      1 text translated line 1,2 text translated line 2,3 text translated line 3,4 text translated line 4,5 text translated line 5 1 text translated line 1,2 text translated line 2,3 text translated line 3,4 text translated line 4,5 text translated line 5
+      text translated
+       (
+      text translated
+      )
     </Text>
     <View
       style={
@@ -124,7 +127,6 @@ exports[`Component About - test About - snapshot 1`] = `
         "alignItems": "stretch",
         "flexDirection": "column",
         "justifyContent": "flex-start",
-        "padding": 20,
       }
     }
     style={
@@ -138,57 +140,141 @@ exports[`Component About - test About - snapshot 1`] = `
         style={
           {
             "color": "rgb(28, 28, 30)",
-            "marginBottom": 30,
+            "marginTop": 0,
             "opacity": 0.65,
+            "padding": 20,
+            "textAlign": "center",
           }
         }
       >
-        1 text translated line 1
+        text translated
       </Text>
+      <View
+        style={
+          {
+            "borderColor": "rgb(28, 28, 30)",
+            "borderRadius": 10,
+            "borderWidth": 1,
+            "margin": 10,
+            "maxHeight": "40%",
+            "padding": 10,
+          }
+        }
+      >
+        <Text
+          style={
+            [
+              {
+                "textAlign": "center",
+              },
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 18,
+                "fontWeight": "600",
+                "opacity": 1,
+              },
+            ]
+          }
+        />
+        <View
+          style={
+            {
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+            }
+          }
+        >
+          <View />
+          <View
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              {
+                "opacity": 1,
+              }
+            }
+          >
+            <Text
+              style={
+                {
+                  "color": "rgb(28, 28, 30)",
+                  "marginTop": 0,
+                  "minHeight": 48,
+                  "padding": 10,
+                  "textAlign": "center",
+                  "textDecorationLine": "underline",
+                }
+              }
+            >
+              text translated
+            </Text>
+          </View>
+          <View />
+        </View>
+      </View>
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "marginTop": 10,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "rgb(28, 28, 30)",
+              "opacity": 0.65,
+              "textAlign": "center",
+            }
+          }
+        >
+          text translated
+        </Text>
+        <Text
+          style={
+            [
+              {
+                "textAlign": "center",
+              },
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 18,
+                "fontWeight": "600",
+                "opacity": 1,
+              },
+            ]
+          }
+        >
+          0
+        </Text>
+      </View>
       <Text
         style={
           {
-            "color": "rgb(28, 28, 30)",
-            "marginBottom": 30,
+            "color": "white",
+            "marginTop": 20,
             "opacity": 0.65,
+            "padding": 20,
+            "textAlign": "center",
           }
         }
-      >
-        2 text translated line 2
-      </Text>
-      <Text
+      />
+      <View
         style={
           {
-            "color": "rgb(28, 28, 30)",
             "marginBottom": 30,
-            "opacity": 0.65,
           }
         }
-      >
-        3 text translated line 3
-      </Text>
-      <Text
-        style={
-          {
-            "color": "rgb(28, 28, 30)",
-            "marginBottom": 30,
-            "opacity": 0.65,
-          }
-        }
-      >
-        4 text translated line 4
-      </Text>
-      <Text
-        style={
-          {
-            "color": "rgb(28, 28, 30)",
-            "marginBottom": 30,
-            "opacity": 0.65,
-          }
-        }
-      >
-        5 text translated line 5
-      </Text>
+      />
     </View>
   </RCTScrollView>
   <View
@@ -216,9 +302,11 @@ exports[`Component About - test About - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
+          "backgroundColor": "rgb(0, 122, 255)",
           "borderColor": "rgb(0, 122, 255)",
           "borderRadius": 10,
           "borderWidth": 2,
+          "color": "rgb(0, 122, 255)",
           "juatifyContent": "center",
           "maxWidth": "90%",
           "minHeight": 48,
@@ -247,19 +335,13 @@ exports[`Component About - test About - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(0, 122, 255)",
+              "color": "rgb(242, 242, 242)",
               "fontSize": 16,
               "fontWeight": "bold",
               "textTransform": "uppercase",
             }
           }
-        >
-          1 text translated line 1
-          2 text translated line 2
-          3 text translated line 3
-          4 text translated line 4
-          5 text translated line 5
-        </Text>
+        />
       </View>
     </View>
   </View>

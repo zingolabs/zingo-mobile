@@ -6,7 +6,7 @@ import 'react-native';
 import React from 'react';
 
 import { create } from 'react-test-renderer';
-import Info from '../components/Info';
+import Seed from '../components/Seed';
 import { ContextLoadedProvider } from '../app/context';
 
 import {
@@ -20,22 +20,19 @@ import {
   WalletSettings,
 } from '../app/AppState';
 
-jest.mock('@fortawesome/react-native-fontawesome', () => ({
-  FontAwesomeIcon: '',
-}));
 jest.mock('react-native-localize', () => ({
   getNumberFormatSettings: () => {
     return {
-      decimalSeparator: ',', // es
-      groupingSeparator: '.', // es
+      decimalSeparator: '.',
+      groupingSeparator: ',',
     };
   },
 }));
 jest.useFakeTimers();
 
 // test suite
-describe('Component Info - test', () => {
-  //unit test
+describe('Component Seed - test', () => {
+  //snapshot test
   const state = {
     navigation: null,
     route: null,
@@ -54,12 +51,12 @@ describe('Component Info - test', () => {
     transactions: null,
     sendPageState: new SendPageState(new ToAddr(0)),
     receivePageState: new ReceivePageState(),
+    info: null,
     rescanning: false,
     wallet_settings: new WalletSettings(),
     syncingStatus: null,
     errorModalData: new ErrorModalData(),
     txBuildProgress: new SendProgress(),
-    walletSeed: null,
     isMenuDrawerOpen: false,
     selectedMenuDrawerItem: '',
     aboutModalVisible: false,
@@ -75,31 +72,32 @@ describe('Component Info - test', () => {
     poolsModalVisible: false,
     newServer: null,
     uaAddress: null,
-    info: {
-      testnet: false,
-      serverUri: 'serverUri',
-      latestBlock: 0,
-      connections: 0,
-      version: '0',
-      verificationProgress: 0,
-      currencyName: 'ZEC',
-      solps: 0,
-      zecPrice: 33.33,
-      defaultFee: 0,
-      encrypted: false,
-      locked: false,
-      chain_name: '',
+    translate: (p: string) => {
+      if (p === 'seed.buttontexts') {
+        return {
+          new: [''],
+          change: [''],
+          server: [''],
+          view: [''],
+          restore: [''],
+          backup: [''],
+        };
+      } else {
+        return 'text translated';
+      }
     },
-    translate: () => 'translated text',
     totalBalance: new TotalBalance(),
+    walletSeed: {
+      seed: 'pepe lolo',
+      birthday: 0,
+    },
   };
-  test('Info - price with es (,) decimal point', () => {
-    const text: any = create(
+  test('Seed - snapshot', () => {
+    const seed = create(
       <ContextLoadedProvider value={state}>
-        <Info closeModal={() => {}} />
+        <Seed onClickOK={() => {}} onClickCancel={() => {}} action={'view'} />
       </ContextLoadedProvider>,
-    ).toJSON();
-    expect(text.type).toBe('RCTSafeAreaView');
-    expect(text.children[1].children[0].children[0].children[5].children[1].children[0]).toBe('$ 33,33');
+    );
+    expect(seed.toJSON()).toMatchSnapshot();
   });
 });

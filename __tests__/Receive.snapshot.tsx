@@ -9,6 +9,17 @@ import { create } from 'react-test-renderer';
 import Receive from '../components/Receive';
 import { ContextLoadedProvider } from '../app/context';
 
+import {
+  ErrorModalData,
+  ReceivePageState,
+  SendPageState,
+  SendProgress,
+  SyncStatusReport,
+  ToAddr,
+  TotalBalance,
+  WalletSettings,
+} from '../app/AppState';
+
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
   FontAwesomeIcon: '',
 }));
@@ -24,6 +35,36 @@ describe('Component Receive - test', () => {
   //snapshot test
   test('Receive - snapshot', () => {
     const state = {
+      navigation: null,
+      route: null,
+
+      syncStatusReport: new SyncStatusReport(),
+      addressPrivateKeys: new Map(),
+      addressBook: [],
+      transactions: null,
+      sendPageState: new SendPageState(new ToAddr(0)),
+      receivePageState: new ReceivePageState(),
+      info: null,
+      rescanning: false,
+      wallet_settings: new WalletSettings(),
+      syncingStatus: null,
+      errorModalData: new ErrorModalData(),
+      txBuildProgress: new SendProgress(),
+      walletSeed: null,
+      isMenuDrawerOpen: false,
+      selectedMenuDrawerItem: '',
+      aboutModalVisible: false,
+      computingModalVisible: false,
+      settingsModalVisible: false,
+      infoModalVisible: false,
+      rescanModalVisible: false,
+      seedViewModalVisible: false,
+      seedChangeModalVisible: false,
+      seedBackupModalVisible: false,
+      seedServerModalVisible: false,
+      syncReportModalVisible: false,
+      poolsModalVisible: false,
+      newServer: null,
       uaAddress: 'UA',
       addresses: [
         {
@@ -38,10 +79,17 @@ describe('Component Receive - test', () => {
       dimensions: {
         width: 200,
         height: 200,
+        orientation: 'portrait',
+        deviceType: 'tablet',
+        scale: 1.5,
+      } as {
+        width: number;
+        height: number;
+        orientation: 'portrait' | 'landscape';
+        deviceType: 'tablet' | 'phone';
+        scale: number;
       },
-      totalBalance: {
-        total: 0,
-      },
+      totalBalance: new TotalBalance(),
     };
     const receive = create(
       <ContextLoadedProvider value={state}>
@@ -58,4 +106,3 @@ describe('Component Receive - test', () => {
     expect(receive.toJSON()).toMatchSnapshot();
   });
 });
-

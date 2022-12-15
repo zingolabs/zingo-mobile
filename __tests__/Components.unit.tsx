@@ -75,12 +75,6 @@ describe('Component Components - test', () => {
     expect(text.children[2].props.style.backgroundColor).toBe('red');
   });
 
-  test("ZecPrice - number null result ''", () => {
-    const text: any = create(<ZecPrice price={null} currencyName={'ZEC'} />).toJSON();
-    expect(text.type).toBe('Text');
-    expect(text.children).toBe(null);
-  });
-
   test("ZecPrice - number 0 result ''", () => {
     const text: any = create(<ZecPrice price={0} currencyName={'ZEC'} />).toJSON();
     expect(text.type).toBe('Text');
