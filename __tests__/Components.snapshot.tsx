@@ -6,17 +6,13 @@ import 'react-native';
 import React from 'react';
 
 import { create } from 'react-test-renderer';
-import {
-  UsdAmount,
-  ZecPrice,
-  ZecAmount,
-  BoldText,
-  FadeText,
-  ClickableText,
-  ErrorText,
-  RegText,
-  RegTextInput,
-} from '../components/Components';
+import UsdAmount from '../components/Components/UsdAmount';
+import ZecPrice from '../components/Components/ZecPrice';
+import ZecAmount from '../components/Components/ZecAmount';
+import BoldText from '../components/Components/BoldText';
+import FadeText from '../components/Components/FadeText';
+import ErrorText from '../components/Components/ErrorText';
+import RegText from '../components/Components/RegText';
 
 jest.mock('react-native-localize', () => ({
   getNumberFormatSettings: () => {
@@ -37,12 +33,12 @@ describe('Component Components - test', () => {
   });
 
   test('ZecPrice - snapshot', () => {
-    const zecPrice = create(<ZecPrice price={null} />);
+    const zecPrice = create(<ZecPrice price={0} currencyName={'ZEC'} />);
     expect(zecPrice.toJSON()).toMatchSnapshot();
   });
 
   test('ZecAmount - snapshot', () => {
-    const zecAmount = create(<ZecAmount color={''} size={0} amtZec={0} style={{}} zecSymbol={''} />);
+    const zecAmount = create(<ZecAmount color={''} size={0} amtZec={0} style={{}} currencyName={'ZEC'} />);
     expect(zecAmount.toJSON()).toMatchSnapshot();
   });
 
@@ -56,11 +52,6 @@ describe('Component Components - test', () => {
     expect(fadeText.toJSON()).toMatchSnapshot();
   });
 
-  test('ClickableText - snapshot', () => {
-    const clickableText = create(<ClickableText style={{}} children={''} />);
-    expect(clickableText.toJSON()).toMatchSnapshot();
-  });
-
   test('ErrorText - snapshot', () => {
     const errorText = create(<ErrorText style={{}} children={''} />);
     expect(errorText.toJSON()).toMatchSnapshot();
@@ -69,10 +60,5 @@ describe('Component Components - test', () => {
   test('RegText - snapshot', () => {
     const regText = create(<RegText style={{}} color={''} onPress={() => {}} children={''} />);
     expect(regText.toJSON()).toMatchSnapshot();
-  });
-
-  test('RegTextInput - snapshot', () => {
-    const regTextInput = create(<RegTextInput style={{}} />);
-    expect(regTextInput.toJSON()).toMatchSnapshot();
   });
 });
