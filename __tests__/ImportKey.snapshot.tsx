@@ -32,11 +32,11 @@ describe('Component ImportKeyModal - test', () => {
         total: 0,
       },
     };
-    const importKeyModal = create(
+    const importKey = create(
       <ContextLoadedProvider value={state}>
         <ImportKeyModal closeModal={() => {}} doImport={() => {}} />
       </ContextLoadedProvider>,
     );
-    expect(importKeyModal.toJSON()).toMatchSnapshot();
+    expect(importKey.toJSON()).toMatchSnapshot();
   });
 });

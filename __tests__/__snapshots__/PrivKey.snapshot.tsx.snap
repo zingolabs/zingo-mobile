@@ -1,0 +1,327 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Component PrivKeyModal - test PrivKeyModal - snapshot 1`] = `
+<RCTSafeAreaView
+  style={
+    {
+      "alignItems": "stretch",
+      "backgroundColor": "rgb(242, 242, 242)",
+      "display": "flex",
+      "height": "100%",
+      "justifyContent": "flex-start",
+    }
+  }
+>
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "display": "flex",
+        "paddingBottom": 10,
+        "paddingTop": 10,
+        "zIndex": -1,
+      }
+    }
+  >
+    <Image
+      source={
+        {
+          "testUri": "../../../assets/img/logobig-zingo.png",
+        }
+      }
+      style={
+        {
+          "height": 80,
+          "resizeMode": "contain",
+          "width": 80,
+        }
+      }
+    />
+    <View
+      style={
+        {
+          "alignItems": "baseline",
+          "flexDirection": "row",
+          "opacity": 0.5,
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": undefined,
+            "fontSize": 36,
+          }
+        }
+      >
+        ᙇ
+      </Text>
+      <Text
+        style={
+          {
+            "color": undefined,
+            "fontSize": 36,
+            "fontWeight": "700",
+          }
+        }
+      >
+         0.0000
+      </Text>
+      <Text
+        style={
+          {
+            "color": undefined,
+            "fontSize": 18,
+            "paddingBottom": 0,
+          }
+        }
+      >
+        0000
+      </Text>
+      <Text
+        style={
+          {
+            "color": undefined,
+            "fontSize": 36,
+          }
+        }
+      >
+         ---
+      </Text>
+    </View>
+    <Text
+      style={
+        [
+          {
+            "marginTop": 5,
+            "padding": 5,
+          },
+          {
+            "color": "rgb(28, 28, 30)",
+            "fontSize": 18,
+            "fontWeight": "600",
+            "opacity": 1,
+          },
+        ]
+      }
+    >
+      text translated
+       
+      text translated
+    </Text>
+    <View
+      style={
+        {
+          "backgroundColor": "rgb(0, 122, 255)",
+          "height": 1,
+          "width": "100%",
+        }
+      }
+    />
+  </View>
+  <RCTScrollView
+    contentContainerStyle={
+      {
+        "alignItems": "stretch",
+        "flexDirection": "column",
+        "justifyContent": "flex-start",
+      }
+    }
+    style={
+      {
+        "maxHeight": "85%",
+      }
+    }
+  >
+    <View>
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "display": "flex",
+            "flexDirection": "column",
+            "marginBottom": 30,
+            "marginTop": 0,
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "paddingBottom": 0,
+              "paddingTop": 10,
+            }
+          }
+        >
+          <Text
+            style={
+              {
+                "color": "rgb(28, 28, 30)",
+                "marginLeft": 10,
+                "marginRight": 10,
+                "opacity": 0.65,
+                "textAlign": "center",
+              }
+            }
+          >
+            text translated
+          </Text>
+          <View
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              {
+                "opacity": 1,
+              }
+            }
+          >
+            <Text
+              style={
+                {
+                  "color": "rgb(28, 28, 30)",
+                  "marginLeft": 10,
+                  "marginRight": 10,
+                  "opacity": 0.65,
+                  "textAlign": "center",
+                }
+              }
+            />
+          </View>
+        </View>
+        <View
+          style={
+            {
+              "backgroundColor": "rgb(216, 216, 216)",
+              "marginBottom": 20,
+              "marginTop": 15,
+              "padding": 10,
+            }
+          }
+        >
+          <mockQRCode />
+        </View>
+        <View
+          accessible={true}
+          collapsable={false}
+          focusable={true}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            {
+              "opacity": 1,
+            }
+          }
+        >
+          <Text
+            style={
+              {
+                "color": "rgb(28, 28, 30)",
+                "marginBottom": 5,
+                "minHeight": 48,
+                "textDecorationLine": "underline",
+              }
+            }
+          >
+            text translated
+          </Text>
+        </View>
+        <Text
+          style={
+            {
+              "color": "rgb(28, 28, 30)",
+              "flexBasis": "100%",
+              "fontFamily": "Courier",
+              "fontSize": 18,
+              "opacity": 0.65,
+              "textAlign": "center",
+            }
+          }
+        />
+      </View>
+    </View>
+  </RCTScrollView>
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flexDirection": "row",
+        "flexGrow": 1,
+        "justifyContent": "center",
+        "marginVertical": 5,
+      }
+    }
+  >
+    <View
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        {
+          "alignItems": "center",
+          "borderColor": "rgb(0, 122, 255)",
+          "borderRadius": 10,
+          "borderWidth": 2,
+          "juatifyContent": "center",
+          "maxWidth": "90%",
+          "minHeight": 48,
+          "minWidth": "30%",
+          "opacity": 1,
+          "padding": 0,
+          "paddingLeft": 20,
+          "paddingRight": 20,
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "display": "flex",
+            "flexDirection": "row",
+            "justifyContent": "center",
+            "margin": 0,
+            "minHeight": 48,
+            "minWidth": 48,
+            "padding": 0,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "rgb(0, 122, 255)",
+              "fontSize": 16,
+              "fontWeight": "bold",
+              "textTransform": "uppercase",
+            }
+          }
+        >
+          text translated
+        </Text>
+      </View>
+    </View>
+  </View>
+</RCTSafeAreaView>
+`;
