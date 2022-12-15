@@ -7,15 +7,36 @@ import React from 'react';
 
 import { create } from 'react-test-renderer';
 import ImportKeyModal from '../components/ImportKey';
+import { ContextLoadedProvider } from '../app/context';
 
+jest.mock('@fortawesome/react-native-fontawesome', () => ({
+  FontAwesomeIcon: '',
+}));
+jest.mock('react-native-localize', () => ({
+  getNumberFormatSettings: () => {
+    return {
+      decimalSeparator: '.',
+      groupingSeparator: ',',
+    };
+  },
+}));
 jest.useFakeTimers();
 
 // test suite
 describe('Component ImportKeyModal - test', () => {
   //snapshot test
   test('Matches the snapshot ImportKeyModal', () => {
-    const d = { keyText: '', birthday: '' };
-    const importKeyModal = create(<ImportKeyModal closeModal={() => {}} doImport={d} />);
+    const state = {
+      translate: () => 'text translated',
+      totalBalance: {
+        total: 0,
+      },
+    };
+    const importKeyModal = create(
+      <ContextLoadedProvider value={state}>
+        <ImportKeyModal closeModal={() => {}} doImport={() => {}} />
+      </ContextLoadedProvider>,
+    );
     expect(importKeyModal.toJSON()).toMatchSnapshot();
   });
 });
