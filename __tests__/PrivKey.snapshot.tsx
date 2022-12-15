@@ -20,7 +20,7 @@ jest.mock('react-native-localize', () => ({
 jest.useFakeTimers();
 
 // test suite
-describe('Component PrivKeyModal - test', () => {
+describe('Component PrivKey - test', () => {
   //snapshot test
   const state = {
     translate: () => 'text translated',

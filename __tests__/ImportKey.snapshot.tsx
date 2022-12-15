@@ -23,9 +23,9 @@ jest.mock('react-native-localize', () => ({
 jest.useFakeTimers();
 
 // test suite
-describe('Component ImportKeyModal - test', () => {
+describe('Component ImportKey - test', () => {
   //snapshot test
-  test('Matches the snapshot ImportKeyModal', () => {
+  test('Matches the snapshot ImportKey', () => {
     const state = {
       translate: () => 'text translated',
       totalBalance: {

@@ -20,9 +20,9 @@ jest.mock('react-native-localize', () => ({
 jest.useFakeTimers();
 
 // test suite
-describe('Component AboutModal - test', () => {
+describe('Component About - test', () => {
   //snapshot test
-  test('AboutModal - snapshot', () => {
+  test('About - snapshot', () => {
     const state = {
       translate: () => [
         '1 text translated line 1',

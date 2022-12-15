@@ -20,9 +20,9 @@ jest.mock('react-native-option-menu', () => '');
 jest.useFakeTimers();
 
 // test suite
-describe('Component ReceiveScreen - test', () => {
+describe('Component Receive - test', () => {
   //snapshot test
-  test('ReceiveScreen - snapshot', () => {
+  test('Receive - snapshot', () => {
     const state = {
       uaAddress: 'UA',
       addresses: [
@@ -43,7 +43,7 @@ describe('Component ReceiveScreen - test', () => {
         total: 0,
       },
     };
-    const receiveScreen = create(
+    const receive = create(
       <ContextLoadedProvider value={state}>
         <Receive
           fetchTotalBalance={() => {}}
@@ -55,7 +55,7 @@ describe('Component ReceiveScreen - test', () => {
         />
       </ContextLoadedProvider>,
     );
-    expect(receiveScreen.toJSON()).toMatchSnapshot();
+    expect(receive.toJSON()).toMatchSnapshot();
   });
 });
 

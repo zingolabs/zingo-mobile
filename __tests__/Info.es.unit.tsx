@@ -23,7 +23,7 @@ jest.mock('react-native-localize', () => ({
 jest.useFakeTimers();
 
 // test suite
-describe('Component InfoModal - test', () => {
+describe('Component Info - test', () => {
   //unit test
   const state = {
     info: {
@@ -45,7 +45,7 @@ describe('Component InfoModal - test', () => {
       total: 0,
     },
   };
-  test('InfoModal - price with es (,) decimal point', () => {
+  test('Info - price with es (,) decimal point', () => {
     const text: any = create(
       <ContextLoadedProvider value={state}>
         <Info closeModal={() => {}} />

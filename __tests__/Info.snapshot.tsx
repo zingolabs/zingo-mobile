@@ -23,7 +23,7 @@ jest.mock('react-native-localize', () => ({
 jest.useFakeTimers();
 
 // test suite
-describe('Component InfoModal - test', () => {
+describe('Component Info - test', () => {
   //snapshot test
   const state = {
     info: {
@@ -45,7 +45,7 @@ describe('Component InfoModal - test', () => {
       total: 0,
     },
   };
-  test('Matches the snapshot InfoModal', () => {
+  test('Matches the snapshot Info', () => {
     const info: any = create(
       <ContextLoadedProvider value={state}>
         <Info closeModal={() => {}} />

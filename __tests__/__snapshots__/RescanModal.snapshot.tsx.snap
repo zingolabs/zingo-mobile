@@ -1,10 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Component RescanModal - test RescanModal - snapshot 1`] = `
+exports[`Component Rescan - test Rescan - snapshot 1`] = `
 <RCTSafeAreaView
-  emulateUnlessSupported={true}
   style={
-    Object {
+    {
       "alignItems": "stretch",
       "backgroundColor": "rgb(242, 242, 242)",
       "display": "flex",
@@ -13,109 +12,167 @@ exports[`Component RescanModal - test RescanModal - snapshot 1`] = `
     }
   }
 >
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "display": "flex",
+        "paddingBottom": 10,
+        "paddingTop": 10,
+        "zIndex": -1,
+      }
+    }
+  >
+    <Image
+      source={
+        {
+          "testUri": "../../../assets/img/logobig-zingo.png",
+        }
+      }
+      style={
+        {
+          "height": 80,
+          "resizeMode": "contain",
+          "width": 80,
+        }
+      }
+    />
+    <View
+      style={
+        {
+          "alignItems": "baseline",
+          "flexDirection": "row",
+          "opacity": 0.5,
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": undefined,
+            "fontSize": 36,
+          }
+        }
+      >
+        ᙇ
+      </Text>
+      <Text
+        style={
+          {
+            "color": undefined,
+            "fontSize": 36,
+            "fontWeight": "700",
+          }
+        }
+      >
+         0.0000
+      </Text>
+      <Text
+        style={
+          {
+            "color": undefined,
+            "fontSize": 18,
+            "paddingBottom": 0,
+          }
+        }
+      >
+        0000
+      </Text>
+      <Text
+        style={
+          {
+            "color": undefined,
+            "fontSize": 36,
+          }
+        }
+      >
+         ---
+      </Text>
+    </View>
+    <Text
+      style={
+        [
+          {
+            "marginTop": 5,
+            "padding": 5,
+          },
+          {
+            "color": "rgb(28, 28, 30)",
+            "fontSize": 18,
+            "fontWeight": "600",
+            "opacity": 1,
+          },
+        ]
+      }
+    >
+      text translated
+    </Text>
+    <View
+      style={
+        {
+          "backgroundColor": "rgb(0, 122, 255)",
+          "height": 1,
+          "width": "100%",
+        }
+      }
+    />
+  </View>
   <RCTScrollView
     contentContainerStyle={
-      Object {
+      {
         "alignItems": "stretch",
         "flexDirection": "column",
         "justifyContent": "flex-start",
       }
     }
     style={
-      Object {
+      {
         "maxHeight": "85%",
       }
     }
   >
     <View>
-      <View>
-        <View
-          style={
-            Object {
-              "alignItems": "center",
-              "backgroundColor": "rgb(255, 255, 255)",
-              "paddingBottom": 25,
-            }
-          }
-        >
-          <Text
-            style={
-              Object {
-                "color": "rgb(28, 28, 30)",
-                "fontSize": 28,
-                "marginTop": 5,
-                "padding": 5,
-              }
-            }
-          >
-            Rescan Wallet
-          </Text>
-        </View>
-        <View
-          style={
-            Object {
-              "alignItems": "center",
-              "display": "flex",
-              "marginTop": -25,
-            }
-          }
-        >
-          <Image
-            source={
-              Object {
-                "testUri": "../../../assets/img/logobig-zingo.png",
-              }
-            }
-            style={
-              Object {
-                "height": 50,
-                "resizeMode": "contain",
-                "width": 50,
-              }
-            }
-          />
-        </View>
-      </View>
       <View
         style={
-          Object {
+          {
             "display": "flex",
-            "margin": 10,
+            "margin": 20,
+            "marginBottom": 30,
           }
         }
       >
         <Text
           style={
-            Array [
-              Object {
+            [
+              {
                 "color": "rgb(28, 28, 30)",
                 "fontSize": 18,
                 "fontWeight": "600",
-                "opacity": 0.87,
+                "opacity": 1,
               },
             ]
           }
         >
-          This will re-fetch all transactions and rebuild your shielded wallet, starting from block height 
-          0
-          . It might take several minutes.
+          text translatedundefinedtext translated
         </Text>
       </View>
     </View>
   </RCTScrollView>
   <View
     style={
-      Object {
+      {
         "alignItems": "center",
         "flexDirection": "row",
         "flexGrow": 1,
         "justifyContent": "center",
-        "margin": 20,
+        "marginVertical": 5,
       }
     }
   >
     <View
       accessible={true}
+      collapsable={false}
       focusable={true}
       onClick={[Function]}
       onResponderGrant={[Function]}
@@ -125,32 +182,54 @@ exports[`Component RescanModal - test RescanModal - snapshot 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        Object {
+        {
+          "alignItems": "center",
           "backgroundColor": "rgb(0, 122, 255)",
+          "borderColor": "rgb(0, 122, 255)",
           "borderRadius": 10,
+          "borderWidth": 2,
+          "juatifyContent": "center",
+          "maxWidth": "90%",
+          "minHeight": 48,
+          "minWidth": "30%",
           "opacity": 1,
-          "padding": 10,
+          "padding": 0,
           "paddingLeft": 20,
           "paddingRight": 20,
-          "width": "40%",
         }
       }
     >
-      <Text
+      <View
         style={
-          Object {
-            "color": "rgb(242, 242, 242)",
-            "fontWeight": "bold",
-            "textAlign": "center",
-            "textTransform": "uppercase",
+          {
+            "alignItems": "center",
+            "display": "flex",
+            "flexDirection": "row",
+            "justifyContent": "center",
+            "margin": 0,
+            "minHeight": 48,
+            "minWidth": 48,
+            "padding": 0,
           }
         }
       >
-        Rescan
-      </Text>
+        <Text
+          style={
+            {
+              "color": "rgb(242, 242, 242)",
+              "fontSize": 16,
+              "fontWeight": "bold",
+              "textTransform": "uppercase",
+            }
+          }
+        >
+          text translated
+        </Text>
+      </View>
     </View>
     <View
       accessible={true}
+      collapsable={false}
       focusable={true}
       onClick={[Function]}
       onResponderGrant={[Function]}
@@ -160,31 +239,50 @@ exports[`Component RescanModal - test RescanModal - snapshot 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        Object {
-          "borderColor": "rgb(28, 28, 30)",
+        {
+          "alignItems": "center",
+          "borderColor": "rgb(0, 122, 255)",
           "borderRadius": 10,
-          "borderWidth": 1,
+          "borderWidth": 2,
+          "juatifyContent": "center",
           "marginLeft": 10,
+          "maxWidth": "90%",
+          "minHeight": 48,
+          "minWidth": "30%",
           "opacity": 1,
-          "padding": 10,
+          "padding": 0,
           "paddingLeft": 20,
           "paddingRight": 20,
-          "width": "40%",
         }
       }
     >
-      <Text
+      <View
         style={
-          Object {
-            "color": "rgb(28, 28, 30)",
-            "fontWeight": "bold",
-            "textAlign": "center",
-            "textTransform": "uppercase",
+          {
+            "alignItems": "center",
+            "display": "flex",
+            "flexDirection": "row",
+            "justifyContent": "center",
+            "margin": 0,
+            "minHeight": 48,
+            "minWidth": 48,
+            "padding": 0,
           }
         }
       >
-        Close
-      </Text>
+        <Text
+          style={
+            {
+              "color": "rgb(0, 122, 255)",
+              "fontSize": 16,
+              "fontWeight": "bold",
+              "textTransform": "uppercase",
+            }
+          }
+        >
+          text translated
+        </Text>
+      </View>
     </View>
   </View>
 </RCTSafeAreaView>
