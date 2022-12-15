@@ -19,6 +19,9 @@ import {
   WalletSettings,
 } from '../app/AppState';
 
+jest.mock('@fortawesome/react-native-fontawesome', () => ({
+  FontAwesomeIcon: '',
+}));
 jest.mock('react-native-localize', () => ({
   getNumberFormatSettings: () => {
     return {

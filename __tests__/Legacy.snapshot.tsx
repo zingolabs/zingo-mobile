@@ -6,7 +6,7 @@ import 'react-native';
 import React from 'react';
 
 import { create } from 'react-test-renderer';
-import Receive from '../components/Receive';
+import Legacy from '../components/Legacy';
 import { ContextLoadedProvider } from '../app/context';
 
 import {
@@ -77,10 +77,17 @@ describe('Component Receive - test', () => {
       addresses: [
         {
           uaAddress: 'UA',
-          address: 'UA',
-          addressKind: 'u',
+          address: 'sapling',
+          addressKind: 'z',
           containsPending: false,
-          receivers: 'ozt',
+          receivers: 'z',
+        },
+        {
+          uaAddress: 'UA',
+          address: 'transparent',
+          addressKind: 't',
+          containsPending: false,
+          receivers: 't',
         },
       ],
       translate: () => 'text translated',
@@ -101,14 +108,7 @@ describe('Component Receive - test', () => {
     };
     const receive = create(
       <ContextLoadedProvider value={state}>
-        <Receive
-          fetchTotalBalance={() => {}}
-          setUaAddress={() => {}}
-          toggleMenuDrawer={() => {}}
-          startRescan={() => {}}
-          syncingStatusMoreInfoOnClick={() => {}}
-          poolsMoreInfoOnClick={() => {}}
-        />
+        <Legacy fetchTotalBalance={() => {}} toggleMenuDrawer={() => {}} startRescan={() => {}} />
       </ContextLoadedProvider>,
     );
     expect(receive.toJSON()).toMatchSnapshot();

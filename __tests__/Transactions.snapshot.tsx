@@ -6,7 +6,7 @@ import 'react-native';
 import React from 'react';
 
 import { create } from 'react-test-renderer';
-import Receive from '../components/Receive';
+import Transactions from '../components/Transactions';
 import { ContextLoadedProvider } from '../app/context';
 
 import {
@@ -26,16 +26,11 @@ jest.mock('@fortawesome/react-native-fontawesome', () => ({
 jest.mock('react-native-localize', () => ({
   getNumberFormatSettings: () => {
     return {
-      decimalSeparator: '.',
-      groupingSeparator: ',',
+      decimalSeparator: '.', // us
+      groupingSeparator: ',', // us
     };
   },
 }));
-jest.mock('react-native-tab-view', () => ({
-  TabView: '',
-  TabBar: '',
-}));
-jest.mock('react-native-option-menu', () => '');
 jest.useFakeTimers();
 
 // test suite
@@ -101,13 +96,12 @@ describe('Component Receive - test', () => {
     };
     const receive = create(
       <ContextLoadedProvider value={state}>
-        <Receive
-          fetchTotalBalance={() => {}}
-          setUaAddress={() => {}}
+        <Transactions
+          doRefresh={() => {}}
           toggleMenuDrawer={() => {}}
-          startRescan={() => {}}
-          syncingStatusMoreInfoOnClick={() => {}}
+          setComputingModalVisible={() => {}}
           poolsMoreInfoOnClick={() => {}}
+          syncingStatusMoreInfoOnClick={() => {}}
         />
       </ContextLoadedProvider>,
     );
