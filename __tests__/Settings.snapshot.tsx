@@ -11,6 +11,7 @@ import { ContextLoadedProvider } from '../app/context';
 
 import {
   ErrorModalData,
+  InfoType,
   ReceivePageState,
   SendPageState,
   SendProgress,
@@ -55,7 +56,7 @@ describe('Component Settings - test', () => {
     transactions: null,
     sendPageState: new SendPageState(new ToAddr(0)),
     receivePageState: new ReceivePageState(),
-    info: null,
+    info: {} as InfoType,
     rescanning: false,
     syncingStatus: null,
     errorModalData: new ErrorModalData(),
@@ -80,8 +81,16 @@ describe('Component Settings - test', () => {
       if (p === 'settings.memos') {
         return [
           {
-            value: '',
-            text: '',
+            value: 'none',
+            text: 'text none',
+          },
+          {
+            value: 'wallet',
+            text: 'text wallet',
+          },
+          {
+            value: 'all',
+            text: 'text all',
           },
         ];
       } else {
@@ -91,10 +100,15 @@ describe('Component Settings - test', () => {
     totalBalance: new TotalBalance(),
     wallet_settings: new WalletSettings(),
   };
+  state.info.currencyName = 'ZEC';
+  state.totalBalance.total = 1.12345678;
+  state.wallet_settings.server = 'https://zcash.es';
+  const onClose = jest.fn();
+  const onSetOption = jest.fn();
   test('Settings - snapshot', () => {
     const settings = render(
       <ContextLoadedProvider value={state}>
-        <Settings closeModal={() => {}} set_wallet_option={() => {}} set_server_option={() => {}} />
+        <Settings closeModal={onClose} set_wallet_option={onSetOption} set_server_option={onSetOption} />
       </ContextLoadedProvider>,
     );
     expect(settings.toJSON()).toMatchSnapshot();
