@@ -11,6 +11,7 @@ import { ContextLoadedProvider } from '../app/context';
 
 import {
   ErrorModalData,
+  InfoType,
   ReceivePageState,
   SendPageState,
   SendProgress,
@@ -40,9 +41,9 @@ jest.mock('react-native-option-menu', () => '');
 jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
 
 // test suite
-describe('Component Receive - test', () => {
+describe('Component Legacy - test', () => {
   //snapshot test
-  test('Receive - snapshot', () => {
+  test('Legacy Portrait - snapshot', () => {
     const state = {
       navigation: null,
       route: null,
@@ -53,7 +54,7 @@ describe('Component Receive - test', () => {
       transactions: null,
       sendPageState: new SendPageState(new ToAddr(0)),
       receivePageState: new ReceivePageState(),
-      info: null,
+      info: {} as InfoType,
       rescanning: false,
       wallet_settings: new WalletSettings(),
       syncingStatus: null,
@@ -74,18 +75,25 @@ describe('Component Receive - test', () => {
       syncReportModalVisible: false,
       poolsModalVisible: false,
       newServer: null,
-      uaAddress: 'UA',
+      uaAddress: 'UA-12345678901234567890',
       addresses: [
         {
-          uaAddress: 'UA',
-          address: 'sapling',
+          uaAddress: 'UA-12345678901234567890',
+          address: 'UA-12345678901234567890',
+          addressKind: 'u',
+          containsPending: false,
+          receivers: 'ozt',
+        },
+        {
+          uaAddress: 'UA-12345678901234567890',
+          address: 'sapling-12345678901234567890',
           addressKind: 'z',
           containsPending: false,
           receivers: 'z',
         },
         {
-          uaAddress: 'UA',
-          address: 'transparent',
+          uaAddress: 'UA-12345678901234567890',
+          address: 'transparent-12345678901234567890',
           addressKind: 't',
           containsPending: false,
           receivers: 't',
@@ -94,7 +102,7 @@ describe('Component Receive - test', () => {
       translate: () => 'text translated',
       dimensions: {
         width: 200,
-        height: 200,
+        height: 400,
         orientation: 'portrait',
         deviceType: 'tablet',
         scale: 1.5,
@@ -107,11 +115,15 @@ describe('Component Receive - test', () => {
       },
       totalBalance: new TotalBalance(),
     };
-    const receive = render(
+    state.info.currencyName = 'ZEC';
+    state.info.zecPrice = 33.33;
+    state.totalBalance.total = 1.12345678;
+    const onFunction = jest.fn();
+    const legacy = render(
       <ContextLoadedProvider value={state}>
-        <Legacy fetchTotalBalance={() => {}} toggleMenuDrawer={() => {}} startRescan={() => {}} />
+        <Legacy fetchTotalBalance={onFunction} toggleMenuDrawer={onFunction} startRescan={onFunction} />
       </ContextLoadedProvider>,
     );
-    expect(receive.toJSON()).toMatchSnapshot();
+    expect(legacy.toJSON()).toMatchSnapshot();
   });
 });
