@@ -21,7 +21,6 @@ import {
   WalletSeed,
   WalletSettings,
 } from '../app/AppState';
-import { once } from 'lodash';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
