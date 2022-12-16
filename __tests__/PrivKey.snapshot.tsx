@@ -5,7 +5,7 @@
 import 'react-native';
 import React from 'react';
 
-import { create } from 'react-test-renderer';
+import { render } from '@testing-library/react-native';
 import PrivKey from '../components/PrivKey';
 import { ContextLoadedProvider } from '../app/context';
 
@@ -20,6 +20,7 @@ import {
   WalletSettings,
 } from '../app/AppState';
 
+jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
   FontAwesomeIcon: '',
 }));
@@ -31,7 +32,7 @@ jest.mock('react-native-localize', () => ({
     };
   },
 }));
-jest.useFakeTimers();
+jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
 
 // test suite
 describe('Component PrivKey - test', () => {
@@ -80,7 +81,7 @@ describe('Component PrivKey - test', () => {
     totalBalance: new TotalBalance(),
   };
   test('PrivKey - snapshot', () => {
-    const privKey = create(
+    const privKey = render(
       <ContextLoadedProvider value={state}>
         <PrivKey address={''} keyType={0} privKey={''} closeModal={() => {}} />
       </ContextLoadedProvider>,

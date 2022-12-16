@@ -5,16 +5,14 @@
 import 'react-native';
 import React from 'react';
 
-import { create } from 'react-test-renderer';
+import { render } from '@testing-library/react-native';
 import CircularProgress from '../components/CircularProgress';
-
-jest.useFakeTimers();
 
 // test suite
 describe('Component About - test', () => {
   //snapshot test
   test('About - snapshot', () => {
-    const about = create(
+    const about = render(
       <CircularProgress
         size={100}
         strokeWidth={5}

@@ -175,7 +175,9 @@ exports[`Component Seed - test Seed - snapshot 1`] = `
               },
             ]
           }
-        />
+        >
+          pepe lolo
+        </Text>
         <View
           style={
             {

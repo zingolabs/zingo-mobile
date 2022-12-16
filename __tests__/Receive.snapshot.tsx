@@ -5,7 +5,7 @@
 import 'react-native';
 import React from 'react';
 
-import { create } from 'react-test-renderer';
+import { render } from '@testing-library/react-native';
 import Receive from '../components/Receive';
 import { ContextLoadedProvider } from '../app/context';
 
@@ -20,6 +20,7 @@ import {
   WalletSettings,
 } from '../app/AppState';
 
+jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
   FontAwesomeIcon: '',
 }));
@@ -36,7 +37,7 @@ jest.mock('react-native-tab-view', () => ({
   TabBar: '',
 }));
 jest.mock('react-native-option-menu', () => '');
-jest.useFakeTimers();
+jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
 
 // test suite
 describe('Component Receive - test', () => {
@@ -99,7 +100,7 @@ describe('Component Receive - test', () => {
       },
       totalBalance: new TotalBalance(),
     };
-    const receive = create(
+    const receive = render(
       <ContextLoadedProvider value={state}>
         <Receive
           fetchTotalBalance={() => {}}

@@ -5,7 +5,7 @@
 import 'react-native';
 import React from 'react';
 
-import { create } from 'react-test-renderer';
+import { render } from '@testing-library/react-native';
 import Pools from '../components/Pools';
 import { ContextLoadedProvider } from '../app/context';
 
@@ -20,6 +20,7 @@ import {
   WalletSettings,
 } from '../app/AppState';
 
+jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
   FontAwesomeIcon: '',
 }));
@@ -31,7 +32,7 @@ jest.mock('react-native-localize', () => ({
     };
   },
 }));
-jest.useFakeTimers();
+jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
 
 // test suite
 describe('Component Info - test', () => {
@@ -94,7 +95,7 @@ describe('Component Info - test', () => {
     totalBalance: new TotalBalance(),
   };
   test('Matches the snapshot Info', () => {
-    const info: any = create(
+    const info: any = render(
       <ContextLoadedProvider value={state}>
         <Pools closeModal={() => {}} />
       </ContextLoadedProvider>,

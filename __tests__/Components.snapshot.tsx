@@ -5,7 +5,7 @@
 import 'react-native';
 import React from 'react';
 
-import { create } from 'react-test-renderer';
+import { render } from '@testing-library/react-native';
 import UsdAmount from '../components/Components/UsdAmount';
 import ZecPrice from '../components/Components/ZecPrice';
 import ZecAmount from '../components/Components/ZecAmount';
@@ -22,43 +22,42 @@ jest.mock('react-native-localize', () => ({
     };
   },
 }));
-jest.useFakeTimers();
 
 // test suite
 describe('Component Components - test', () => {
   //snapshot test
   test('UsdAmount - snapshot', () => {
-    const usdAmount = create(<UsdAmount price={null} amtZec={0} style={{}} />);
+    const usdAmount = render(<UsdAmount price={null} amtZec={0} style={{}} />);
     expect(usdAmount.toJSON()).toMatchSnapshot();
   });
 
   test('ZecPrice - snapshot', () => {
-    const zecPrice = create(<ZecPrice price={0} currencyName={'ZEC'} />);
+    const zecPrice = render(<ZecPrice price={0} currencyName={'ZEC'} />);
     expect(zecPrice.toJSON()).toMatchSnapshot();
   });
 
   test('ZecAmount - snapshot', () => {
-    const zecAmount = create(<ZecAmount color={''} size={0} amtZec={0} style={{}} currencyName={'ZEC'} />);
+    const zecAmount = render(<ZecAmount color={''} size={0} amtZec={0} style={{}} currencyName={'ZEC'} />);
     expect(zecAmount.toJSON()).toMatchSnapshot();
   });
 
   test('BoldText - snapshot', () => {
-    const boldText = create(<BoldText style={{}} children={''} />);
+    const boldText = render(<BoldText style={{}} children={''} />);
     expect(boldText.toJSON()).toMatchSnapshot();
   });
 
   test('FadeText - snapshot', () => {
-    const fadeText = create(<FadeText style={{}} children={''} />);
+    const fadeText = render(<FadeText style={{}} children={''} />);
     expect(fadeText.toJSON()).toMatchSnapshot();
   });
 
   test('ErrorText - snapshot', () => {
-    const errorText = create(<ErrorText style={{}} children={''} />);
+    const errorText = render(<ErrorText style={{}} children={''} />);
     expect(errorText.toJSON()).toMatchSnapshot();
   });
 
   test('RegText - snapshot', () => {
-    const regText = create(<RegText style={{}} color={''} onPress={() => {}} children={''} />);
+    const regText = render(<RegText style={{}} color={''} onPress={() => {}} children={''} />);
     expect(regText.toJSON()).toMatchSnapshot();
   });
 });

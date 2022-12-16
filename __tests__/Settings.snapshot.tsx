@@ -5,7 +5,7 @@
 import 'react-native';
 import React from 'react';
 
-import { create } from 'react-test-renderer';
+import { render } from '@testing-library/react-native';
 import Settings from '../components/Settings';
 import { ContextLoadedProvider } from '../app/context';
 
@@ -31,6 +31,7 @@ jest.mock('react-native-localize', () => ({
     };
   },
 }));
+jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
 jest.useFakeTimers();
 
 // test suite
@@ -91,7 +92,7 @@ describe('Component Settings - test', () => {
     wallet_settings: new WalletSettings(),
   };
   test('Settings - snapshot', () => {
-    const settings = create(
+    const settings = render(
       <ContextLoadedProvider value={state}>
         <Settings closeModal={() => {}} set_wallet_option={() => {}} set_server_option={() => {}} />
       </ContextLoadedProvider>,

@@ -5,7 +5,7 @@
 import 'react-native';
 import React from 'react';
 
-import { create } from 'react-test-renderer';
+import { render } from '@testing-library/react-native';
 import About from '../components/About';
 import { ContextLoadedProvider } from '../app/context';
 import {
@@ -19,6 +19,7 @@ import {
   WalletSettings,
 } from '../app/AppState';
 
+jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
   FontAwesomeIcon: '',
 }));
@@ -30,7 +31,7 @@ jest.mock('react-native-localize', () => ({
     };
   },
 }));
-jest.useFakeTimers();
+jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
 
 // test suite
 describe('Component About - test', () => {
@@ -85,7 +86,7 @@ describe('Component About - test', () => {
       ],
       totalBalance: new TotalBalance(),
     };
-    const about = create(
+    const about = render(
       <ContextLoadedProvider value={state}>
         <About closeModal={() => {}} />
       </ContextLoadedProvider>,
