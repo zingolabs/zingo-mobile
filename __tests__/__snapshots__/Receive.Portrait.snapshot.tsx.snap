@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Component Receive - test Receive - snapshot 1`] = `
+exports[`Component Receive - test Receive Portrait - snapshot 1`] = `
 <
   navigationState={
     {
