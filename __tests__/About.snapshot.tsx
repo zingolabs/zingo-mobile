@@ -17,6 +17,7 @@ import {
   ToAddr,
   TotalBalance,
   WalletSettings,
+  InfoType,
 } from '../app/AppState';
 
 jest.useFakeTimers();
@@ -55,7 +56,7 @@ describe('Component About - test', () => {
       transactions: null,
       sendPageState: new SendPageState(new ToAddr(0)),
       receivePageState: new ReceivePageState(),
-      info: null,
+      info: {} as InfoType,
       rescanning: false,
       wallet_settings: new WalletSettings(),
       syncingStatus: null,
@@ -77,18 +78,27 @@ describe('Component About - test', () => {
       poolsModalVisible: false,
       newServer: null,
       uaAddress: null,
-      translate: () => [
-        '1 text translated line 1',
-        '2 text translated line 2',
-        '3 text translated line 3',
-        '4 text translated line 4',
-        '5 text translated line 5',
-      ],
+      translate: (p: string) => {
+        if (p === 'about.copyright') {
+          return [
+            '1 text translated line 1',
+            '2 text translated line 2',
+            '3 text translated line 3',
+            '4 text translated line 4',
+            '5 text translated line 5',
+          ];
+        } else {
+          return 'text translated';
+        }
+      },
       totalBalance: new TotalBalance(),
     };
+    state.info.currencyName = 'ZEC';
+    state.totalBalance.total = 1.25691111;
+    const onClose = jest.fn();
     const about = render(
       <ContextLoadedProvider value={state}>
-        <About closeModal={() => {}} />
+        <About closeModal={onClose} />
       </ContextLoadedProvider>,
     );
     expect(about.toJSON()).toMatchSnapshot();

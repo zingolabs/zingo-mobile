@@ -66,7 +66,7 @@ exports[`Component About - test About - snapshot 1`] = `
           }
         }
       >
-         0.0000
+         1.2569
       </Text>
       <Text
         style={
@@ -77,7 +77,7 @@ exports[`Component About - test About - snapshot 1`] = `
           }
         }
       >
-        0000
+        1111
       </Text>
       <Text
         style={
@@ -87,7 +87,7 @@ exports[`Component About - test About - snapshot 1`] = `
           }
         }
       >
-         ---
+         ZEC
       </Text>
     </View>
     <Text
@@ -106,7 +106,7 @@ exports[`Component About - test About - snapshot 1`] = `
         ]
       }
     >
-      1 text translated line 1,2 text translated line 2,3 text translated line 3,4 text translated line 4,5 text translated line 5 1 text translated line 1,2 text translated line 2,3 text translated line 3,4 text translated line 4,5 text translated line 5
+      text translated text translated
     </Text>
     <View
       style={
@@ -254,11 +254,7 @@ exports[`Component About - test About - snapshot 1`] = `
             }
           }
         >
-          1 text translated line 1
-          2 text translated line 2
-          3 text translated line 3
-          4 text translated line 4
-          5 text translated line 5
+          text translated
         </Text>
       </View>
     </View>
