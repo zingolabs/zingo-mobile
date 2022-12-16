@@ -43,14 +43,14 @@ describe('Component Components - test', () => {
   });
 
   test('UsdAmount - amtZec undefined result $ -- USD', () => {
-    const text: any = render(<UsdAmount price={1} amtZec={undefined} style={{}} />).toJSON();
+    const text: any = render(<UsdAmount price={1} style={{}} />).toJSON();
     expect(text.type).toBe('View');
     expect(text.children[0].children[0]).toBe('$');
     expect(text.children[1].children[0]).toBe(' --');
     expect(text.children[2].children[0]).toBe(' USD');
   });
 
-  test('UsdAmount - price * amtZec really tiny result starts $ < 0.01 USD', () => {
+  test('UsdAmount - price * amtZec really tiny result $ < 0.01 USD', () => {
     const text: any = render(<UsdAmount price={0.001} amtZec={1} style={{}} />).toJSON();
     expect(text.type).toBe('View');
     expect(text.children[0].children[0]).toBe('$');
@@ -74,31 +74,31 @@ describe('Component Components - test', () => {
     expect(text.children[2].props.style.backgroundColor).toBe('red');
   });
 
-  test("ZecPrice - number 0 result ''", () => {
+  test('ZecPrice - price 0 result null', () => {
     const text: any = render(<ZecPrice price={0} currencyName={'ZEC'} />).toJSON();
     expect(text.type).toBe('Text');
     expect(text.children).toBe(null);
   });
 
-  test("ZecPrice - number -1 result ''", () => {
+  test('ZecPrice - price -1 result null', () => {
     const text: any = render(<ZecPrice price={-1} currencyName={'ZEC'} />).toJSON();
     expect(text.type).toBe('Text');
     expect(text.children).toBe(null);
   });
 
-  test('ZecPrice - number 1.02999 rounded up result $ 1.03 per ZEC', () => {
+  test('ZecPrice - price 1.02999 rounded up result $ 1.03 per ZEC', () => {
     const text: any = render(<ZecPrice price={1.02999} currencyName={'ZEC'} />).toJSON();
     expect(text.type).toBe('Text');
     expect(text.children[0]).toBe('$ 1.03 per ZEC');
   });
 
-  test("ZecPrice - number 1.02333 rounded down result '$ 1.02 per ZEC", () => {
+  test("ZecPrice - price 1.02333 rounded down result '$ 1.02 per ZEC", () => {
     const text: any = render(<ZecPrice price={1.02333} currencyName={'ZEC'} />).toJSON();
     expect(text.type).toBe('Text');
     expect(text.children[0]).toBe('$ 1.02 per ZEC');
   });
 
-  test('ZecAmount - All props missing result ZEC --', () => {
+  test('ZecAmount - All props missing result -- ZEC', () => {
     const text: any = render(<ZecAmount currencyName={'ZEC'} />).toJSON();
     expect(text.type).toBe('View');
     expect(text.children[0].type).toBe('Text');
@@ -111,7 +111,7 @@ describe('Component Components - test', () => {
     expect(text.children[3].children[0]).toBe(' ZEC');
   });
 
-  test('ZecAmount - amtZec 0 result ZEC 0.0000 0000', () => {
+  test('ZecAmount - amtZec 0 result 0.00000000 ZEC', () => {
     const text: any = render(<ZecAmount amtZec={0} currencyName={'ZEC'} />).toJSON();
     expect(text.type).toBe('View');
     expect(text.children[0].type).toBe('Text');
@@ -124,7 +124,7 @@ describe('Component Components - test', () => {
     expect(text.children[3].children[0]).toBe(' ZEC');
   });
 
-  test('ZecAmount - amtZec -1.123456789 rounded up result ZEC -1.1234 5679', () => {
+  test('ZecAmount - amtZec -1.123456789 rounded up result -1.12345679 ZEC', () => {
     const text: any = render(<ZecAmount amtZec={-1.123456789} currencyName={'ZEC'} />).toJSON();
     expect(text.type).toBe('View');
     expect(text.children[0].type).toBe('Text');
@@ -137,7 +137,7 @@ describe('Component Components - test', () => {
     expect(text.children[3].children[0]).toBe(' ZEC');
   });
 
-  test('ZecAmount - amtZec 1.123456781 rounded down result ZEC 1.1234 5678', () => {
+  test('ZecAmount - amtZec 1.123456781 rounded down result 1.12345678 ZEC', () => {
     const text: any = render(<ZecAmount amtZec={1.123456781} currencyName={'ZEC'} />).toJSON();
     expect(text.type).toBe('View');
     expect(text.children[0].type).toBe('Text');
@@ -209,10 +209,10 @@ describe('Component Components - test', () => {
     expect(text.children[3].children[0]).toBe(' ZzZ');
   });
 
-  test("BoldText - children 'children' result same", () => {
-    const text: any = render(<BoldText children={'children'} />).toJSON();
+  test("BoldText - children 'bold text' result same", () => {
+    const text: any = render(<BoldText children={'bold text'} />).toJSON();
     expect(text.type).toBe('Text');
-    expect(text.children[0]).toBe('children');
+    expect(text.children[0]).toBe('bold text');
   });
 
   test("BoldText - View style backgroundColor 'red' result same", () => {
@@ -221,10 +221,10 @@ describe('Component Components - test', () => {
     expect(text.props.style.backgroundColor).toBe('red');
   });
 
-  test("FadeText - children 'children' result same", () => {
-    const text: any = render(<FadeText children={'children'} />).toJSON();
+  test("FadeText - children 'fade text' result same", () => {
+    const text: any = render(<FadeText children={'fade text'} />).toJSON();
     expect(text.type).toBe('Text');
-    expect(text.children[0]).toBe('children');
+    expect(text.children[0]).toBe('fade text');
   });
 
   test("FadeText - View style backgroundColor 'red' result same", () => {
@@ -233,10 +233,10 @@ describe('Component Components - test', () => {
     expect(text.props.style.backgroundColor).toBe('red');
   });
 
-  test("ErrorText - children 'children' result same", () => {
-    const text: any = render(<ErrorText children={'children'} />).toJSON();
+  test("ErrorText - children 'error text' result same", () => {
+    const text: any = render(<ErrorText children={'error text'} />).toJSON();
     expect(text.type).toBe('Text');
-    expect(text.children[0]).toBe('children');
+    expect(text.children[0]).toBe('error text');
   });
 
   test("ErrorText - View style backgroundColor 'red' result same", () => {
@@ -245,10 +245,10 @@ describe('Component Components - test', () => {
     expect(text.props.style.backgroundColor).toBe('red');
   });
 
-  test("RegText - children 'children' result same", () => {
-    const text: any = render(<RegText children={'children'} />).toJSON();
+  test("RegText - children 'reg text' result same", () => {
+    const text: any = render(<RegText children={'reg text'} />).toJSON();
     expect(text.type).toBe('Text');
-    expect(text.children[0]).toBe('children');
+    expect(text.children[0]).toBe('reg text');
   });
 
   test("RegText - View style backgroundColor 'red' result same", () => {
