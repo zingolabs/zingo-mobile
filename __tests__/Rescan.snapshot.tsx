@@ -11,14 +11,17 @@ import { ContextLoadedProvider } from '../app/context';
 
 import {
   ErrorModalData,
+  InfoType,
   ReceivePageState,
   SendPageState,
   SendProgress,
   SyncStatusReport,
   ToAddr,
   TotalBalance,
+  WalletSeed,
   WalletSettings,
 } from '../app/AppState';
+import { once } from 'lodash';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -55,13 +58,13 @@ describe('Component Rescan - test', () => {
     transactions: null,
     sendPageState: new SendPageState(new ToAddr(0)),
     receivePageState: new ReceivePageState(),
-    info: null,
+    info: {} as InfoType,
     rescanning: false,
     wallet_settings: new WalletSettings(),
     syncingStatus: null,
     errorModalData: new ErrorModalData(),
     txBuildProgress: new SendProgress(),
-    walletSeed: null,
+    walletSeed: {} as WalletSeed,
     isMenuDrawerOpen: false,
     selectedMenuDrawerItem: '',
     aboutModalVisible: false,
@@ -80,10 +83,15 @@ describe('Component Rescan - test', () => {
     translate: () => 'text translated',
     totalBalance: new TotalBalance(),
   };
+  state.info.currencyName = 'ZEC';
+  state.totalBalance.total = 1.12345678;
+  state.walletSeed.birthday = 1900100;
+  const onClose = jest.fn();
+  const onRescan = jest.fn();
   test('Rescan - snapshot', () => {
     const rescan = render(
       <ContextLoadedProvider value={state}>
-        <Rescan closeModal={() => {}} startRescan={() => {}} />
+        <Rescan closeModal={onClose} startRescan={onRescan} />
       </ContextLoadedProvider>,
     );
     expect(rescan.toJSON()).toMatchSnapshot();
