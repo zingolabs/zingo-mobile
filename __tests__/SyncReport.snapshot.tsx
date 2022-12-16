@@ -7,12 +7,14 @@ import React from 'react';
 
 import {
   ErrorModalData,
+  InfoType,
   ReceivePageState,
   SendPageState,
   SendProgress,
   SyncStatusReport,
   ToAddr,
   TotalBalance,
+  WalletSeed,
   WalletSettings,
 } from '../app/AppState';
 import { render } from '@testing-library/react-native';
@@ -34,7 +36,7 @@ jest.mock('react-native-localize', () => ({
 jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
 
 // test suite
-describe('Component Info - test', () => {
+describe('Component SyncReport - test', () => {
   //snapshot test
   const state = {
     navigation: null,
@@ -59,7 +61,7 @@ describe('Component Info - test', () => {
     syncingStatus: null,
     errorModalData: new ErrorModalData(),
     txBuildProgress: new SendProgress(),
-    walletSeed: null,
+    walletSeed: {} as WalletSeed,
     isMenuDrawerOpen: false,
     selectedMenuDrawerItem: '',
     aboutModalVisible: false,
@@ -75,14 +77,27 @@ describe('Component Info - test', () => {
     poolsModalVisible: false,
     newServer: null,
     uaAddress: null,
-    info: null,
+    info: {} as InfoType,
     translate: () => 'translated text',
     totalBalance: new TotalBalance(),
   };
-  test('Matches the snapshot Info', () => {
+  state.info.currencyName = 'ZEC';
+  state.totalBalance.total = 1.12345678;
+  state.walletSeed.birthday = 1500100;
+  state.syncStatusReport.syncID = 1;
+  state.syncStatusReport.inProgress = true;
+  state.syncStatusReport.currentBatch = 5;
+  state.syncStatusReport.totalBatches = 50;
+  state.syncStatusReport.currentBlock = 1800100;
+  state.syncStatusReport.lastBlockWallet = 1800000;
+  state.syncStatusReport.lastBlockServer = 1900100;
+  state.syncStatusReport.secondsPerBatch = 122;
+  state.syncStatusReport.process_end_block = 1600100;
+  const onClose = jest.fn();
+  test('Matches the snapshot SyncReport', () => {
     const info: any = render(
       <ContextLoadedProvider value={state}>
-        <SyncReport closeModal={() => {}} />
+        <SyncReport closeModal={onClose} />
       </ContextLoadedProvider>,
     );
     expect(info.toJSON()).toMatchSnapshot();
