@@ -1,0 +1,727 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Component Transactions - test Transactions Landscape - snapshot 1`] = `
+<View
+  style={
+    {
+      "flexDirection": "row",
+      "height": "100%",
+    }
+  }
+>
+  <View
+    accessibilityLabel="text translated"
+    accessible={true}
+    style={
+      {
+        "display": "flex",
+        "justifyContent": "flex-start",
+        "width": 300,
+      }
+    }
+  >
+    <Modal
+      animationType="slide"
+      hardwareAccelerated={false}
+      onRequestClose={[Function]}
+      transparent={false}
+      visible={false}
+    />
+    <View
+      style={
+        {
+          "alignItems": "center",
+          "backgroundColor": "rgb(255, 255, 255)",
+          "display": "flex",
+          "padding": 10,
+          "zIndex": -1,
+        }
+      }
+    >
+      <Image
+        source={
+          {
+            "testUri": "../../../assets/img/logobig-zingo.png",
+          }
+        }
+        style={
+          {
+            "height": 80,
+            "resizeMode": "contain",
+            "width": 80,
+          }
+        }
+      />
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "flexDirection": "column",
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "alignItems": "baseline",
+              "flexDirection": "row",
+            }
+          }
+        >
+          <Text
+            style={
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 36,
+              }
+            }
+          >
+            ᙇ
+          </Text>
+          <Text
+            style={
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 36,
+                "fontWeight": "700",
+              }
+            }
+          >
+             1.1234
+          </Text>
+          <Text
+            style={
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 18,
+                "paddingBottom": 0,
+              }
+            }
+          >
+            5678
+          </Text>
+          <Text
+            style={
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 36,
+              }
+            }
+          >
+             ZEC
+          </Text>
+        </View>
+        <View
+          style={
+            {
+              "alignItems": "baseline",
+              "flexDirection": "row",
+            }
+          }
+        >
+          <Text
+            style={
+              {
+                "color": undefined,
+                "fontSize": 20,
+                "marginBottom": 5,
+                "marginTop": 0,
+              }
+            }
+          >
+            $
+          </Text>
+          <Text
+            style={
+              {
+                "color": undefined,
+                "fontSize": 20,
+                "fontWeight": "700",
+                "marginBottom": 5,
+                "marginTop": 0,
+              }
+            }
+          >
+             --
+          </Text>
+          <Text
+            style={
+              {
+                "color": undefined,
+                "fontSize": 20,
+                "marginBottom": 5,
+                "marginTop": 0,
+              }
+            }
+          >
+             USD
+          </Text>
+        </View>
+      </View>
+      <View
+        style={
+          {
+            "backgroundColor": "rgb(0, 122, 255)",
+            "height": 1,
+            "marginTop": 5,
+            "width": "100%",
+          }
+        }
+      />
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "display": "flex",
+            "flexDirection": "row",
+            "flexWrap": "wrap",
+            "justifyContent": "center",
+            "marginVertical": 5,
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "display": "flex",
+              "flexDirection": "column",
+              "flexWrap": "wrap",
+              "justifyContent": "center",
+            }
+          }
+        >
+          <Text
+            style={
+              [
+                {
+                  "paddingHorizontal": 5,
+                },
+                {
+                  "color": "rgb(28, 28, 30)",
+                  "fontSize": 18,
+                  "fontWeight": "600",
+                  "opacity": 1,
+                },
+              ]
+            }
+          >
+            text translated
+          </Text>
+        </View>
+      </View>
+      <View
+        style={
+          {
+            "backgroundColor": "rgb(0, 122, 255)",
+            "height": 1,
+            "width": "100%",
+          }
+        }
+      />
+    </View>
+    <View
+      style={
+        {
+          "backgroundColor": "rgb(255, 255, 255)",
+          "padding": 10,
+          "position": "absolute",
+        }
+      }
+    >
+      <View
+        accessibilityLabel="text translated"
+        accessible={true}
+        collapsable={false}
+        focusable={true}
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          {
+            "opacity": 1,
+          }
+        }
+      >
+        <
+          color="rgb(216, 216, 216)"
+          icon={
+            {
+              "icon": [
+                448,
+                512,
+                [
+                  "navicon",
+                ],
+                "f0c9",
+                "M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z",
+              ],
+              "iconName": "bars",
+              "prefix": "fas",
+            }
+          }
+          size={48}
+        />
+      </View>
+    </View>
+    <View
+      style={
+        {
+          "alignItems": "flex-end",
+          "padding": 10,
+          "position": "absolute",
+          "right": 0,
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": "rgb(216, 216, 216)",
+            "fontSize": 8,
+          }
+        }
+      >
+        (600x300)-2.5
+      </Text>
+      <Text
+        style={
+          {
+            "color": "rgb(216, 216, 216)",
+            "fontSize": 7,
+          }
+        }
+      >
+        text translated
+      </Text>
+    </View>
+  </View>
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "borderLeftColor": "rgb(216, 216, 216)",
+        "borderLeftWidth": 1,
+        "height": "100%",
+        "padding": 10,
+        "width": 300,
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "paddingHorizontal": 5,
+          },
+          {
+            "color": "rgb(28, 28, 30)",
+            "fontSize": 18,
+            "fontWeight": "600",
+            "opacity": 1,
+          },
+        ]
+      }
+    >
+      text translated
+    </Text>
+    <View
+      style={
+        {
+          "backgroundColor": "rgb(0, 122, 255)",
+          "height": 1,
+          "marginTop": 5,
+          "width": "100%",
+        }
+      }
+    />
+    <RCTScrollView
+      accessibilityLabel="text translated"
+      accessible={true}
+      refreshControl={
+        <RefreshControlMock
+          onRefresh={[MockFunction]}
+          refreshing={false}
+          tintColor="rgb(28, 28, 30)"
+          title="text translated"
+        />
+      }
+      style={
+        {
+          "flexGrow": 1,
+          "height": "100%",
+          "marginTop": 0,
+        }
+      }
+    >
+      <RCTRefreshControl />
+      <View>
+        <View
+          style={
+            {
+              "display": "flex",
+              "flexDirection": "column",
+            }
+          }
+        >
+          <View
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              {
+                "opacity": 1,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "borderBottomColor": "rgb(216, 216, 216)",
+                  "borderBottomWidth": 1,
+                  "display": "flex",
+                  "flexDirection": "row",
+                  "marginTop": 15,
+                  "paddingBottom": 15,
+                }
+              }
+            >
+              <
+                color="rgb(0, 122, 255)"
+                icon={
+                  {
+                    "icon": [
+                      384,
+                      512,
+                      [
+                        8595,
+                      ],
+                      "f063",
+                      "M169.4 470.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 370.8 224 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 306.7L54.6 265.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z",
+                    ],
+                    "iconName": "arrow-down",
+                    "prefix": "fas",
+                  }
+                }
+                size={24}
+                style={
+                  {
+                    "marginLeft": 5,
+                    "marginRight": 5,
+                    "marginTop": 5,
+                  }
+                }
+              />
+              <View
+                style={
+                  {
+                    "display": "flex",
+                  }
+                }
+              >
+                <Text
+                  style={
+                    {
+                      "color": "rgb(28, 28, 30)",
+                      "fontSize": 18,
+                      "opacity": 0.65,
+                    }
+                  }
+                >
+                  Unknown
+                </Text>
+                <View
+                  style={
+                    {
+                      "display": "flex",
+                      "flexDirection": "row",
+                    }
+                  }
+                >
+                  <Text
+                    style={
+                      {
+                        "color": "rgb(28, 28, 30)",
+                        "opacity": 0.65,
+                      }
+                    }
+                  >
+                    Received 
+                  </Text>
+                  <Text
+                    style={
+                      {
+                        "color": "rgb(28, 28, 30)",
+                        "opacity": 0.65,
+                      }
+                    }
+                  >
+                    Jan 3, 12:36 am
+                  </Text>
+                </View>
+              </View>
+              <View
+                style={
+                  {
+                    "alignItems": "baseline",
+                    "alignSelf": "baseline",
+                    "flexDirection": "row",
+                    "flexGrow": 1,
+                    "justifyContent": "flex-end",
+                    "paddingRight": 5,
+                  }
+                }
+              >
+                <Text
+                  style={
+                    {
+                      "color": "rgb(0, 122, 255)",
+                      "fontSize": 18,
+                    }
+                  }
+                >
+                  ᙇ
+                </Text>
+                <Text
+                  style={
+                    {
+                      "color": "rgb(0, 122, 255)",
+                      "fontSize": 18,
+                      "fontWeight": "700",
+                    }
+                  }
+                >
+                   0.8765
+                </Text>
+                <Text
+                  style={
+                    {
+                      "color": "rgb(0, 122, 255)",
+                      "fontSize": 9,
+                      "paddingBottom": 0,
+                    }
+                  }
+                >
+                  4321
+                </Text>
+                <Text
+                  style={
+                    {
+                      "color": "rgb(0, 122, 255)",
+                      "fontSize": 18,
+                    }
+                  }
+                >
+                   ᙇ
+                </Text>
+              </View>
+            </View>
+          </View>
+        </View>
+        <View
+          style={
+            {
+              "display": "flex",
+              "flexDirection": "column",
+            }
+          }
+        >
+          <View
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              {
+                "opacity": 1,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "borderBottomColor": "rgb(216, 216, 216)",
+                  "borderBottomWidth": 1,
+                  "display": "flex",
+                  "flexDirection": "row",
+                  "marginTop": 15,
+                  "paddingBottom": 15,
+                }
+              }
+            >
+              <
+                color="rgb(0, 122, 255)"
+                icon={
+                  {
+                    "icon": [
+                      384,
+                      512,
+                      [
+                        8595,
+                      ],
+                      "f063",
+                      "M169.4 470.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 370.8 224 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 306.7L54.6 265.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z",
+                    ],
+                    "iconName": "arrow-down",
+                    "prefix": "fas",
+                  }
+                }
+                size={24}
+                style={
+                  {
+                    "marginLeft": 5,
+                    "marginRight": 5,
+                    "marginTop": 5,
+                  }
+                }
+              />
+              <View
+                style={
+                  {
+                    "display": "flex",
+                  }
+                }
+              >
+                <Text
+                  style={
+                    {
+                      "color": "rgb(28, 28, 30)",
+                      "fontSize": 18,
+                      "opacity": 0.65,
+                    }
+                  }
+                >
+                  Unknown
+                </Text>
+                <View
+                  style={
+                    {
+                      "display": "flex",
+                      "flexDirection": "row",
+                    }
+                  }
+                >
+                  <Text
+                    style={
+                      {
+                        "color": "rgb(28, 28, 30)",
+                        "opacity": 0.65,
+                      }
+                    }
+                  >
+                    Sent 
+                  </Text>
+                  <Text
+                    style={
+                      {
+                        "color": "rgb(28, 28, 30)",
+                        "opacity": 0.65,
+                      }
+                    }
+                  >
+                    Jan 1, 8:48 pm
+                  </Text>
+                </View>
+              </View>
+              <View
+                style={
+                  {
+                    "alignItems": "baseline",
+                    "alignSelf": "baseline",
+                    "flexDirection": "row",
+                    "flexGrow": 1,
+                    "justifyContent": "flex-end",
+                    "paddingRight": 5,
+                  }
+                }
+              >
+                <Text
+                  style={
+                    {
+                      "color": "rgb(0, 122, 255)",
+                      "fontSize": 18,
+                    }
+                  }
+                >
+                  ᙇ
+                </Text>
+                <Text
+                  style={
+                    {
+                      "color": "rgb(0, 122, 255)",
+                      "fontSize": 18,
+                      "fontWeight": "700",
+                    }
+                  }
+                >
+                   0.1234
+                </Text>
+                <Text
+                  style={
+                    {
+                      "color": "rgb(0, 122, 255)",
+                      "fontSize": 9,
+                      "paddingBottom": 0,
+                    }
+                  }
+                >
+                  5678
+                </Text>
+                <Text
+                  style={
+                    {
+                      "color": "rgb(0, 122, 255)",
+                      "fontSize": 18,
+                    }
+                  }
+                >
+                   ᙇ
+                </Text>
+              </View>
+            </View>
+          </View>
+        </View>
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "display": "flex",
+              "height": 100,
+              "justifyContent": "flex-start",
+              "marginBottom": 30,
+            }
+          }
+        >
+          <Text
+            style={
+              {
+                "color": "rgb(0, 122, 255)",
+                "opacity": 0.65,
+              }
+            }
+          >
+            text translated
+          </Text>
+        </View>
+      </View>
+    </RCTScrollView>
+  </View>
+</View>
+`;
