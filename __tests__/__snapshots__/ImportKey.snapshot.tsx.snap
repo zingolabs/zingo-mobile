@@ -66,7 +66,7 @@ exports[`Component ImportKey - test Matches the snapshot ImportKey 1`] = `
           }
         }
       >
-         0.0000
+         1.1234
       </Text>
       <Text
         style={
@@ -77,7 +77,7 @@ exports[`Component ImportKey - test Matches the snapshot ImportKey 1`] = `
           }
         }
       >
-        0000
+        5678
       </Text>
       <Text
         style={
@@ -87,7 +87,7 @@ exports[`Component ImportKey - test Matches the snapshot ImportKey 1`] = `
           }
         }
       >
-         ---
+         ZEC
       </Text>
     </View>
     <Text

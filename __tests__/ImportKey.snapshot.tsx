@@ -11,6 +11,7 @@ import { ContextLoadedProvider } from '../app/context';
 
 import {
   ErrorModalData,
+  InfoType,
   ReceivePageState,
   SendPageState,
   SendProgress,
@@ -56,7 +57,7 @@ describe('Component ImportKey - test', () => {
       transactions: null,
       sendPageState: new SendPageState(new ToAddr(0)),
       receivePageState: new ReceivePageState(),
-      info: null,
+      info: {} as InfoType,
       rescanning: false,
       wallet_settings: new WalletSettings(),
       syncingStatus: null,
@@ -81,9 +82,13 @@ describe('Component ImportKey - test', () => {
       translate: () => 'text translated',
       totalBalance: new TotalBalance(),
     };
+    state.info.currencyName = 'ZEC';
+    state.totalBalance.total = 1.12345678;
+    const onClose = jest.fn();
+    const onImport = jest.fn();
     const importKey = render(
       <ContextLoadedProvider value={state}>
-        <ImportKeyModal closeModal={() => {}} doImport={() => {}} />
+        <ImportKeyModal closeModal={onClose} doImport={onImport} />
       </ContextLoadedProvider>,
     );
     expect(importKey.toJSON()).toMatchSnapshot();
