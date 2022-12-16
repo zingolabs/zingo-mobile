@@ -11,6 +11,7 @@ import { ContextLoadedProvider } from '../app/context';
 
 import {
   ErrorModalData,
+  InfoType,
   ReceivePageState,
   SendPageState,
   SendProgress,
@@ -55,7 +56,7 @@ describe('Component PrivKey - test', () => {
     transactions: null,
     sendPageState: new SendPageState(new ToAddr(0)),
     receivePageState: new ReceivePageState(),
-    info: null,
+    info: {} as InfoType,
     rescanning: false,
     wallet_settings: new WalletSettings(),
     syncingStatus: null,
@@ -80,10 +81,31 @@ describe('Component PrivKey - test', () => {
     translate: () => 'text translated',
     totalBalance: new TotalBalance(),
   };
-  test('PrivKey - snapshot', () => {
+  state.info.currencyName = 'ZEC';
+  state.totalBalance.total = 1.12345678;
+  const onClose = jest.fn();
+  test('PrivKey Private - snapshot', () => {
     const privKey = render(
       <ContextLoadedProvider value={state}>
-        <PrivKey address={''} keyType={0} privKey={''} closeModal={() => {}} />
+        <PrivKey
+          address={'UA-12345678901234567890'}
+          keyType={0}
+          privKey={'priv-key-12345678901234567890'}
+          closeModal={onClose}
+        />
+      </ContextLoadedProvider>,
+    );
+    expect(privKey.toJSON()).toMatchSnapshot();
+  });
+  test('PrivKey View - snapshot', () => {
+    const privKey = render(
+      <ContextLoadedProvider value={state}>
+        <PrivKey
+          address={'UA-12345678901234567890'}
+          keyType={1}
+          privKey={'view-key-12345678901234567890'}
+          closeModal={onClose}
+        />
       </ContextLoadedProvider>,
     );
     expect(privKey.toJSON()).toMatchSnapshot();
