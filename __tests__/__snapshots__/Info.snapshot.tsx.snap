@@ -66,7 +66,7 @@ exports[`Component Info - test Matches the snapshot Info 1`] = `
           }
         }
       >
-         0.0000
+         1.1234
       </Text>
       <Text
         style={
@@ -77,7 +77,7 @@ exports[`Component Info - test Matches the snapshot Info 1`] = `
           }
         }
       >
-        0000
+        5678
       </Text>
       <Text
         style={
@@ -304,7 +304,7 @@ exports[`Component Info - test Matches the snapshot Info 1`] = `
               ]
             }
           >
-            0
+            2000100
           </Text>
         </View>
         <View
