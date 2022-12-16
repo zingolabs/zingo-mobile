@@ -4,51 +4,64 @@ exports[`Component Components - test BoldText - snapshot 1`] = `
 <Text
   style={
     {
+      "backgroundColor": "red",
       "color": "rgb(28, 28, 30)",
       "fontSize": 18,
       "fontWeight": "bold",
       "opacity": 0.87,
     }
   }
-/>
+>
+  bold text
+</Text>
 `;
 
 exports[`Component Components - test ErrorText - snapshot 1`] = `
 <Text
   style={
     {
+      "backgroundColor": "white",
       "color": "rgb(0, 122, 255)",
     }
   }
-/>
+>
+  error text
+</Text>
 `;
 
 exports[`Component Components - test FadeText - snapshot 1`] = `
 <Text
   style={
     {
+      "backgroundColor": "red",
       "color": "rgb(28, 28, 30)",
       "opacity": 0.65,
     }
   }
-/>
+>
+  fade text
+</Text>
 `;
 
 exports[`Component Components - test RegText - snapshot 1`] = `
 <Text
-  onPress={[Function]}
+  onPress={[MockFunction]}
   style={
     [
-      {},
       {
-        "color": "rgb(28, 28, 30)",
+        "backgroundColor": "white",
+      },
+      {
+        "color": "red",
         "fontSize": 18,
         "fontWeight": "600",
         "opacity": 1,
       },
     ]
   }
-/>
+>
+  reg text
+</Text>
 `;
 
 exports[`Component Components - test UsdAmount - snapshot 1`] = `
@@ -63,6 +76,7 @@ exports[`Component Components - test UsdAmount - snapshot 1`] = `
   <Text
     style={
       {
+        "backgroundColor": "red",
         "color": undefined,
         "fontSize": 20,
       }
@@ -73,17 +87,19 @@ exports[`Component Components - test UsdAmount - snapshot 1`] = `
   <Text
     style={
       {
+        "backgroundColor": "red",
         "color": undefined,
         "fontSize": 20,
         "fontWeight": "700",
       }
     }
   >
-     --
+     44.93
   </Text>
   <Text
     style={
       {
+        "backgroundColor": "red",
         "color": undefined,
         "fontSize": 20,
       }
@@ -99,6 +115,7 @@ exports[`Component Components - test ZecAmount - snapshot 1`] = `
   style={
     {
       "alignItems": "baseline",
+      "backgroundColor": "red",
       "flexDirection": "row",
     }
   }
@@ -106,8 +123,8 @@ exports[`Component Components - test ZecAmount - snapshot 1`] = `
   <Text
     style={
       {
-        "color": undefined,
-        "fontSize": 24,
+        "color": "red",
+        "fontSize": 20,
       }
     }
   >
@@ -116,30 +133,30 @@ exports[`Component Components - test ZecAmount - snapshot 1`] = `
   <Text
     style={
       {
-        "color": undefined,
-        "fontSize": 24,
+        "color": "red",
+        "fontSize": 20,
         "fontWeight": "700",
       }
     }
   >
-     0.0000
+     1.1234
   </Text>
   <Text
     style={
       {
-        "color": undefined,
-        "fontSize": 12,
+        "color": "red",
+        "fontSize": 10,
         "paddingBottom": 0,
       }
     }
   >
-    0000
+    5678
   </Text>
   <Text
     style={
       {
-        "color": undefined,
-        "fontSize": 24,
+        "color": "red",
+        "fontSize": 20,
       }
     }
   >
@@ -156,5 +173,7 @@ exports[`Component Components - test ZecPrice - snapshot 1`] = `
       "opacity": 0.65,
     }
   }
-/>
+>
+  $ 39.99 per ZEC
+</Text>
 `;

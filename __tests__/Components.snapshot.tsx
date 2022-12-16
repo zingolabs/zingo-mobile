@@ -27,37 +27,42 @@ jest.mock('react-native-localize', () => ({
 describe('Component Components - test', () => {
   //snapshot test
   test('UsdAmount - snapshot', () => {
-    const usdAmount = render(<UsdAmount price={null} amtZec={0} style={{}} />);
+    const usdAmount = render(<UsdAmount price={1.12345678} amtZec={39.99} style={{ backgroundColor: 'red' }} />);
     expect(usdAmount.toJSON()).toMatchSnapshot();
   });
 
   test('ZecPrice - snapshot', () => {
-    const zecPrice = render(<ZecPrice price={0} currencyName={'ZEC'} />);
+    const zecPrice = render(<ZecPrice price={39.99} currencyName={'ZEC'} />);
     expect(zecPrice.toJSON()).toMatchSnapshot();
   });
 
   test('ZecAmount - snapshot', () => {
-    const zecAmount = render(<ZecAmount color={''} size={0} amtZec={0} style={{}} currencyName={'ZEC'} />);
+    const zecAmount = render(
+      <ZecAmount color={'red'} size={20} amtZec={1.12345678} style={{ backgroundColor: 'red' }} currencyName={'ZEC'} />,
+    );
     expect(zecAmount.toJSON()).toMatchSnapshot();
   });
 
   test('BoldText - snapshot', () => {
-    const boldText = render(<BoldText style={{}} children={''} />);
+    const boldText = render(<BoldText style={{ backgroundColor: 'red' }} children={'bold text'} />);
     expect(boldText.toJSON()).toMatchSnapshot();
   });
 
   test('FadeText - snapshot', () => {
-    const fadeText = render(<FadeText style={{}} children={''} />);
+    const fadeText = render(<FadeText style={{ backgroundColor: 'red' }} children={'fade text'} />);
     expect(fadeText.toJSON()).toMatchSnapshot();
   });
 
   test('ErrorText - snapshot', () => {
-    const errorText = render(<ErrorText style={{}} children={''} />);
+    const errorText = render(<ErrorText style={{ backgroundColor: 'white' }} children={'error text'} />);
     expect(errorText.toJSON()).toMatchSnapshot();
   });
 
   test('RegText - snapshot', () => {
-    const regText = render(<RegText style={{}} color={''} onPress={() => {}} children={''} />);
+    const onPress = jest.fn();
+    const regText = render(
+      <RegText style={{ backgroundColor: 'white' }} color={'red'} onPress={onPress} children={'reg text'} />,
+    );
     expect(regText.toJSON()).toMatchSnapshot();
   });
 });
