@@ -11,14 +11,15 @@ import Button from '../components/Button';
 // test suite
 describe('Component Button - test', () => {
   //snapshot test
+  const onPress = jest.fn();
   test('Button Primary - snapshot', () => {
-    const button = render(<Button type={'Primary'} title={'Primary'} disabled={false} onPress={() => {}} style={{}} />);
+    const button = render(<Button type={'Primary'} title={'Primary'} disabled={false} onPress={onPress} style={{}} />);
     expect(button.toJSON()).toMatchSnapshot();
   });
 
   test('Button Secondary - snapshot', () => {
     const button = render(
-      <Button type={'Secondary'} title={'Secondary'} disabled={false} onPress={() => {}} style={{}} />,
+      <Button type={'Secondary'} title={'Secondary'} disabled={false} onPress={onPress} style={{}} />,
     );
     expect(button.toJSON()).toMatchSnapshot();
   });
