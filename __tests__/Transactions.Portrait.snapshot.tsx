@@ -36,6 +36,17 @@ jest.mock('react-native-localize', () => ({
   },
 }));
 jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
+jest.mock('moment', () => () => ({
+  format: (p: string) => {
+    if (p === 'MMM YYYY') {
+      return 'Dec 2022';
+    } else if (p === 'YYYY MMM D h:mm a') {
+      return '2022 Dec 13 8:00 am';
+    } else if (p === 'MMM D, h:mm a') {
+      return 'Dec 13, 8:00 am';
+    }
+  },
+}));
 
 // test suite
 describe('Component Transactions - test', () => {
@@ -56,7 +67,7 @@ describe('Component Transactions - test', () => {
           position: '',
           confirmations: 22,
           txid: 'sent-txid-1234567890',
-          time: 1668712802,
+          time: Date.now(),
           zec_price: 33.33,
           detailedTxns: [],
         },
@@ -67,7 +78,7 @@ describe('Component Transactions - test', () => {
           position: '',
           confirmations: 133,
           txid: 'receive-txid-1234567890',
-          time: 1669755896,
+          time: Date.now(),
           zec_price: 66.66,
           detailedTxns: [],
         },

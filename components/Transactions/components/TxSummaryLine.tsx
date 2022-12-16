@@ -1,7 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import { View, TouchableOpacity } from 'react-native';
-import Moment from 'react-moment';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons';
@@ -11,6 +10,7 @@ import FadeText from '../../Components/FadeText';
 import { Transaction } from '../../../app/AppState';
 import Utils from '../../../app/utils';
 import { ThemeType } from '../../../app/types';
+import moment from 'moment';
 
 type TxSummaryLineProps = {
   month: string;
@@ -72,9 +72,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
             <FadeText style={{ fontSize: 18 }}>{displayAddress}</FadeText>
             <View style={{ display: 'flex', flexDirection: 'row' }}>
               <FadeText>{tx.type === 'sent' ? 'Sent ' : 'Received '}</FadeText>
-              <Moment interval={0} format="MMM D, h:mm a" element={FadeText}>
-                {(tx?.time || 0) * 1000}
-              </Moment>
+              <FadeText>{moment((tx?.time || 0) * 1000).format('MMM D, h:mm a')}</FadeText>
             </View>
           </View>
           <ZecAmount

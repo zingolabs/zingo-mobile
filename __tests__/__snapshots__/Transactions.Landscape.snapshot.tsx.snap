@@ -457,7 +457,7 @@ exports[`Component Transactions - test Transactions Landscape - snapshot 1`] = `
                       }
                     }
                   >
-                    Received 
+                    Sent 
                   </Text>
                   <Text
                     style={
@@ -467,7 +467,7 @@ exports[`Component Transactions - test Transactions Landscape - snapshot 1`] = `
                       }
                     }
                   >
-                    Nov 29, 2:04 pm
+                    Dec 13, 8:00 am
                   </Text>
                 </View>
               </View>
@@ -502,7 +502,7 @@ exports[`Component Transactions - test Transactions Landscape - snapshot 1`] = `
                     }
                   }
                 >
-                   0.8765
+                   0.1234
                 </Text>
                 <Text
                   style={
@@ -513,7 +513,7 @@ exports[`Component Transactions - test Transactions Landscape - snapshot 1`] = `
                     }
                   }
                 >
-                  4321
+                  5678
                 </Text>
                 <Text
                   style={
@@ -626,7 +626,7 @@ exports[`Component Transactions - test Transactions Landscape - snapshot 1`] = `
                       }
                     }
                   >
-                    Sent 
+                    Received 
                   </Text>
                   <Text
                     style={
@@ -636,7 +636,7 @@ exports[`Component Transactions - test Transactions Landscape - snapshot 1`] = `
                       }
                     }
                   >
-                    Nov 17, 12:20 pm
+                    Dec 13, 8:00 am
                   </Text>
                 </View>
               </View>
@@ -671,7 +671,7 @@ exports[`Component Transactions - test Transactions Landscape - snapshot 1`] = `
                     }
                   }
                 >
-                   0.1234
+                   0.8765
                 </Text>
                 <Text
                   style={
@@ -682,7 +682,7 @@ exports[`Component Transactions - test Transactions Landscape - snapshot 1`] = `
                     }
                   }
                 >
-                  5678
+                  4321
                 </Text>
                 <Text
                   style={
