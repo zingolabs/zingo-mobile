@@ -207,6 +207,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
                   minHeight: 48,
                 }}>
                 <TextInput
+                  placeholder="#"
                   style={{
                     color: colors.text,
                     fontWeight: '600',

@@ -148,6 +148,7 @@ const ImportKey: React.FunctionComponent<ImportKeyProps> = ({ closeModal, doImpo
             minHeight: 48,
           }}>
           <TextInput
+            placeholder="#"
             style={{
               color: colors.text,
               fontWeight: '600',

@@ -245,7 +245,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     }
 
     if (amount !== null) {
-      toAddr.amount = amount.replace(decimalSeparator, '.').substring(0, 10);
+      toAddr.amount = amount.replace(decimalSeparator, '.').substring(0, 20);
       if (isNaN(Number(toAddr.amount))) {
         toAddr.amountUSD = '';
       } else if (toAddr.amount && info?.zecPrice) {
@@ -257,7 +257,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     }
 
     if (amountUSD !== null) {
-      toAddr.amountUSD = amountUSD.replace(decimalSeparator, '.').substring(0, 4);
+      toAddr.amountUSD = amountUSD.replace(decimalSeparator, '.').substring(0, 15);
       if (isNaN(Number(toAddr.amountUSD))) {
         toAddr.amount = '';
       } else if (toAddr.amountUSD && info?.zecPrice) {
@@ -575,9 +575,12 @@ const Send: React.FunctionComponent<SendProps> = ({
                           marginLeft: 5,
                         }}
                         value={ta.amount.toString()}
-                        onChangeText={(text: string) => updateToField(null, text.substring(0, 10), null, null)}
+                        onChangeText={(text: string) => updateToField(null, text.substring(0, 20), null, null)}
+                        onEndEditing={(e: any) =>
+                          updateToField(null, Number(e.nativeEvent.text.substring(0, 20)).toFixed(8), null, null)
+                        }
                         editable={true}
-                        maxLength={10}
+                        maxLength={20}
                       />
                     </View>
                     <RegText style={{ marginTop: 15, marginRight: 10, marginLeft: 5 }}>ZEC</RegText>
@@ -617,9 +620,12 @@ const Send: React.FunctionComponent<SendProps> = ({
                           marginLeft: 5,
                         }}
                         value={ta.amountUSD.toString()}
-                        onChangeText={(text: string) => updateToField(null, null, text.substring(0, 4), null)}
+                        onChangeText={(text: string) => updateToField(null, null, text.substring(0, 15), null)}
+                        onEndEditing={(e: any) =>
+                          updateToField(null, null, Number(e.nativeEvent.text.substring(0, 15)).toFixed(2), null)
+                        }
                         editable={true}
-                        maxLength={4}
+                        maxLength={15}
                       />
                     </View>
                     <RegText style={{ marginTop: 15, marginLeft: 5 }}>USD</RegText>
