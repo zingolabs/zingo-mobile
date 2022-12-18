@@ -164,7 +164,7 @@
     "more": "more...",
     "toaddress": "To Address",
     "invalidaddress": "Invalid Address!",
-    "addressplaceholder": "Z-Sapling or T-Transparent or Unified address",
+    "addressplaceholder": "Unified Address or Z-Sapling or T-Transparent",
     "invalidamount": "Invalid Amount!",
     "spendable": "Spendable: ",
     "somefunds": "Some funds still confirming or syncing",
