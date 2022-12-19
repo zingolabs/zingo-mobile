@@ -34,10 +34,19 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
   const [expandAddress, setExpandAddress] = useState(false);
   const [expandTxid, setExpandTxid] = useState(false);
 
-  const fee =
-    tx?.type === 'sent' &&
-    tx?.amount &&
-    Math.abs(tx?.amount) - Math.abs(tx?.detailedTxns?.reduce((s: number, d: TxDetailType) => s + d.amount, 0));
+  const sum =
+    (tx?.detailedTxns && tx?.detailedTxns?.reduce((s: number, d: TxDetailType) => s + (d.amount ? d.amount : 0), 0)) ||
+    0;
+  let fee = 0;
+  // normal case: spend 1600 fee 1000 sent 600
+  if (tx?.type === 'sent' && tx?.amount && Math.abs(tx?.amount) > Math.abs(sum)) {
+    fee = Math.abs(tx?.amount) - Math.abs(sum);
+  }
+  // self-send case: spend 1000 fee 1000 sent 0
+  // this is temporary until we have a new field in 'list' object, called: fee.
+  if (tx?.type === 'sent' && tx?.amount && Math.abs(tx?.amount) <= Math.abs(sum)) {
+    fee = Math.abs(tx?.amount);
+  }
 
   const handleTxIDClick = (txid?: string) => {
     if (!txid) {
@@ -185,7 +194,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
             );
           })}
 
-          {fee && (
+          {fee > 0 && (
             <View style={{ display: 'flex', marginTop: 10 }}>
               <FadeText>{translate('transactions.txfee')}</FadeText>
               <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
