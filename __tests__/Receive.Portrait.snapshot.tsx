@@ -6,7 +6,7 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
-import ImportKeyModal from '../components/ImportKey';
+import Receive from '../components/Receive';
 import { ContextLoadedProvider } from '../app/context';
 
 import {
@@ -33,26 +33,23 @@ jest.mock('react-native-localize', () => ({
     };
   },
 }));
+jest.mock('react-native-tab-view', () => ({
+  TabView: '',
+  TabBar: '',
+}));
+jest.mock('react-native-option-menu', () => '');
 jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
 
 // test suite
-describe('Component ImportKey - test', () => {
+describe('Component Receive - test', () => {
   //snapshot test
-  test('Matches the snapshot ImportKey', () => {
+  test('Receive Portrait - snapshot', () => {
     const state = {
       navigation: null,
       route: null,
-      dimensions: {} as {
-        width: number;
-        height: number;
-        orientation: 'portrait' | 'landscape';
-        deviceType: 'tablet' | 'phone';
-        scale: number;
-      },
 
       syncStatusReport: new SyncStatusReport(),
       addressPrivateKeys: new Map(),
-      addresses: [],
       addressBook: [],
       transactions: null,
       sendPageState: new SendPageState(new ToAddr(0)),
@@ -78,19 +75,61 @@ describe('Component ImportKey - test', () => {
       syncReportModalVisible: false,
       poolsModalVisible: false,
       newServer: null,
-      uaAddress: null,
+      uaAddress: 'UA-12345678901234567890',
+      addresses: [
+        {
+          uaAddress: 'UA-12345678901234567890',
+          address: 'UA-12345678901234567890',
+          addressKind: 'u',
+          containsPending: false,
+          receivers: 'ozt',
+        },
+        {
+          uaAddress: 'UA-12345678901234567890',
+          address: 'sapling-12345678901234567890',
+          addressKind: 'z',
+          containsPending: false,
+          receivers: 'z',
+        },
+        {
+          uaAddress: 'UA-12345678901234567890',
+          address: 'transparent-12345678901234567890',
+          addressKind: 't',
+          containsPending: false,
+          receivers: 't',
+        },
+      ],
       translate: () => 'text translated',
+      dimensions: {
+        width: 200,
+        height: 400,
+        orientation: 'portrait',
+        deviceType: 'tablet',
+        scale: 1.5,
+      } as {
+        width: number;
+        height: number;
+        orientation: 'portrait' | 'landscape';
+        deviceType: 'tablet' | 'phone';
+        scale: number;
+      },
       totalBalance: new TotalBalance(),
     };
     state.info.currencyName = 'ZEC';
     state.totalBalance.total = 1.12345678;
-    const onClose = jest.fn();
-    const onImport = jest.fn();
-    const importKey = render(
+    const onFunction = jest.fn();
+    const receive = render(
       <ContextLoadedProvider value={state}>
-        <ImportKeyModal closeModal={onClose} doImport={onImport} />
+        <Receive
+          fetchTotalBalance={onFunction}
+          setUaAddress={onFunction}
+          toggleMenuDrawer={onFunction}
+          startRescan={onFunction}
+          syncingStatusMoreInfoOnClick={onFunction}
+          poolsMoreInfoOnClick={onFunction}
+        />
       </ContextLoadedProvider>,
     );
-    expect(importKey.toJSON()).toMatchSnapshot();
+    expect(receive.toJSON()).toMatchSnapshot();
   });
 });

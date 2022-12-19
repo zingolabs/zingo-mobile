@@ -6,7 +6,7 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
-import ImportKeyModal from '../components/ImportKey';
+import Legacy from '../components/Legacy';
 import { ContextLoadedProvider } from '../app/context';
 
 import {
@@ -33,26 +33,23 @@ jest.mock('react-native-localize', () => ({
     };
   },
 }));
+jest.mock('react-native-tab-view', () => ({
+  TabView: '',
+  TabBar: '',
+}));
+jest.mock('react-native-option-menu', () => '');
 jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
 
 // test suite
-describe('Component ImportKey - test', () => {
+describe('Component Legacy - test', () => {
   //snapshot test
-  test('Matches the snapshot ImportKey', () => {
+  test('Legacy Landscape - snapshot', () => {
     const state = {
       navigation: null,
       route: null,
-      dimensions: {} as {
-        width: number;
-        height: number;
-        orientation: 'portrait' | 'landscape';
-        deviceType: 'tablet' | 'phone';
-        scale: number;
-      },
 
       syncStatusReport: new SyncStatusReport(),
       addressPrivateKeys: new Map(),
-      addresses: [],
       addressBook: [],
       transactions: null,
       sendPageState: new SendPageState(new ToAddr(0)),
@@ -78,19 +75,55 @@ describe('Component ImportKey - test', () => {
       syncReportModalVisible: false,
       poolsModalVisible: false,
       newServer: null,
-      uaAddress: null,
+      uaAddress: 'UA-12345678901234567890',
+      addresses: [
+        {
+          uaAddress: 'UA-12345678901234567890',
+          address: 'UA-12345678901234567890',
+          addressKind: 'u',
+          containsPending: false,
+          receivers: 'ozt',
+        },
+        {
+          uaAddress: 'UA-12345678901234567890',
+          address: 'sapling-12345678901234567890',
+          addressKind: 'z',
+          containsPending: false,
+          receivers: 'z',
+        },
+        {
+          uaAddress: 'UA-12345678901234567890',
+          address: 'transparent-12345678901234567890',
+          addressKind: 't',
+          containsPending: false,
+          receivers: 't',
+        },
+      ],
       translate: () => 'text translated',
+      dimensions: {
+        width: 600,
+        height: 300,
+        orientation: 'landscape',
+        deviceType: 'phone',
+        scale: 2.5,
+      } as {
+        width: number;
+        height: number;
+        orientation: 'portrait' | 'landscape';
+        deviceType: 'tablet' | 'phone';
+        scale: number;
+      },
       totalBalance: new TotalBalance(),
     };
     state.info.currencyName = 'ZEC';
+    state.info.zecPrice = 33.33;
     state.totalBalance.total = 1.12345678;
-    const onClose = jest.fn();
-    const onImport = jest.fn();
-    const importKey = render(
+    const onFunction = jest.fn();
+    const legacy = render(
       <ContextLoadedProvider value={state}>
-        <ImportKeyModal closeModal={onClose} doImport={onImport} />
+        <Legacy fetchTotalBalance={onFunction} toggleMenuDrawer={onFunction} startRescan={onFunction} />
       </ContextLoadedProvider>,
     );
-    expect(importKey.toJSON()).toMatchSnapshot();
+    expect(legacy.toJSON()).toMatchSnapshot();
   });
 });

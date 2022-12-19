@@ -1,0 +1,2374 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Component Seed - test Seed Backup - snapshot 1`] = `
+<RCTSafeAreaView
+  style={
+    {
+      "alignItems": "stretch",
+      "backgroundColor": "rgb(242, 242, 242)",
+      "display": "flex",
+      "height": "100%",
+      "justifyContent": "flex-start",
+    }
+  }
+>
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "display": "flex",
+        "paddingBottom": 10,
+        "paddingTop": 10,
+        "zIndex": -1,
+      }
+    }
+  >
+    <Image
+      source={
+        {
+          "testUri": "../../../assets/img/logobig-zingo.png",
+        }
+      }
+      style={
+        {
+          "height": 80,
+          "resizeMode": "contain",
+          "width": 80,
+        }
+      }
+    />
+    <View
+      style={
+        {
+          "alignItems": "baseline",
+          "flexDirection": "row",
+          "opacity": 0.5,
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": undefined,
+            "fontSize": 36,
+          }
+        }
+      >
+        ᙇ
+      </Text>
+      <Text
+        style={
+          {
+            "color": undefined,
+            "fontSize": 36,
+            "fontWeight": "700",
+          }
+        }
+      >
+         1.1234
+      </Text>
+      <Text
+        style={
+          {
+            "color": undefined,
+            "fontSize": 18,
+            "paddingBottom": 0,
+          }
+        }
+      >
+        5678
+      </Text>
+      <Text
+        style={
+          {
+            "color": undefined,
+            "fontSize": 36,
+          }
+        }
+      >
+         ZEC
+      </Text>
+    </View>
+    <Text
+      style={
+        [
+          {
+            "marginTop": 5,
+            "padding": 5,
+          },
+          {
+            "color": "rgb(28, 28, 30)",
+            "fontSize": 18,
+            "fontWeight": "600",
+            "opacity": 1,
+          },
+        ]
+      }
+    >
+      text translated
+       (
+      text translated
+      )
+    </Text>
+    <View
+      style={
+        {
+          "backgroundColor": "rgb(0, 122, 255)",
+          "height": 1,
+          "width": "100%",
+        }
+      }
+    />
+  </View>
+  <RCTScrollView
+    contentContainerStyle={
+      {
+        "alignItems": "stretch",
+        "flexDirection": "column",
+        "justifyContent": "flex-start",
+      }
+    }
+    style={
+      {
+        "maxHeight": "85%",
+      }
+    }
+  >
+    <View>
+      <Text
+        style={
+          {
+            "color": "rgb(28, 28, 30)",
+            "marginTop": 0,
+            "opacity": 0.65,
+            "padding": 20,
+            "textAlign": "center",
+          }
+        }
+      >
+        text translated
+      </Text>
+      <View
+        style={
+          {
+            "borderColor": "rgb(28, 28, 30)",
+            "borderRadius": 10,
+            "borderWidth": 1,
+            "margin": 10,
+            "maxHeight": "40%",
+            "padding": 10,
+          }
+        }
+      >
+        <Text
+          style={
+            [
+              {
+                "textAlign": "center",
+              },
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 18,
+                "fontWeight": "600",
+                "opacity": 1,
+              },
+            ]
+          }
+        >
+          pepe lolo titi
+        </Text>
+        <View
+          style={
+            {
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+            }
+          }
+        >
+          <View />
+          <View
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              {
+                "opacity": 1,
+              }
+            }
+          >
+            <Text
+              style={
+                {
+                  "color": "rgb(28, 28, 30)",
+                  "marginTop": 0,
+                  "minHeight": 48,
+                  "padding": 10,
+                  "textAlign": "center",
+                  "textDecorationLine": "underline",
+                }
+              }
+            >
+              text translated
+            </Text>
+          </View>
+          <View />
+        </View>
+      </View>
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "marginTop": 10,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "rgb(28, 28, 30)",
+              "opacity": 0.65,
+              "textAlign": "center",
+            }
+          }
+        >
+          text translated
+        </Text>
+        <Text
+          style={
+            [
+              {
+                "textAlign": "center",
+              },
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 18,
+                "fontWeight": "600",
+                "opacity": 1,
+              },
+            ]
+          }
+        >
+          1500100
+        </Text>
+      </View>
+      <Text
+        style={
+          {
+            "color": "white",
+            "marginTop": 20,
+            "opacity": 0.65,
+            "padding": 20,
+            "textAlign": "center",
+          }
+        }
+      />
+      <View
+        style={
+          {
+            "marginBottom": 30,
+          }
+        }
+      />
+    </View>
+  </RCTScrollView>
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flexDirection": "row",
+        "flexGrow": 1,
+        "justifyContent": "center",
+        "marginVertical": 5,
+      }
+    }
+  >
+    <View
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        {
+          "alignItems": "center",
+          "backgroundColor": "rgb(0, 122, 255)",
+          "borderColor": "rgb(0, 122, 255)",
+          "borderRadius": 10,
+          "borderWidth": 2,
+          "color": "rgb(0, 122, 255)",
+          "juatifyContent": "center",
+          "maxWidth": "90%",
+          "minHeight": 48,
+          "minWidth": "30%",
+          "opacity": 1,
+          "padding": 0,
+          "paddingLeft": 20,
+          "paddingRight": 20,
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "display": "flex",
+            "flexDirection": "row",
+            "justifyContent": "center",
+            "margin": 0,
+            "minHeight": 48,
+            "minWidth": 48,
+            "padding": 0,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "rgb(242, 242, 242)",
+              "fontSize": 16,
+              "fontWeight": "bold",
+              "textTransform": "uppercase",
+            }
+          }
+        />
+      </View>
+    </View>
+    <View
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        {
+          "alignItems": "center",
+          "borderColor": "rgb(0, 122, 255)",
+          "borderRadius": 10,
+          "borderWidth": 2,
+          "juatifyContent": "center",
+          "marginLeft": 10,
+          "maxWidth": "90%",
+          "minHeight": 48,
+          "minWidth": "30%",
+          "opacity": 1,
+          "padding": 0,
+          "paddingLeft": 20,
+          "paddingRight": 20,
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "display": "flex",
+            "flexDirection": "row",
+            "justifyContent": "center",
+            "margin": 0,
+            "minHeight": 48,
+            "minWidth": 48,
+            "padding": 0,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "rgb(0, 122, 255)",
+              "fontSize": 16,
+              "fontWeight": "bold",
+              "textTransform": "uppercase",
+            }
+          }
+        >
+          text translated
+        </Text>
+      </View>
+    </View>
+  </View>
+</RCTSafeAreaView>
+`;
+
+exports[`Component Seed - test Seed Change - snapshot 1`] = `
+<RCTSafeAreaView
+  style={
+    {
+      "alignItems": "stretch",
+      "backgroundColor": "rgb(242, 242, 242)",
+      "display": "flex",
+      "height": "100%",
+      "justifyContent": "flex-start",
+    }
+  }
+>
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "display": "flex",
+        "paddingBottom": 10,
+        "paddingTop": 10,
+        "zIndex": -1,
+      }
+    }
+  >
+    <Image
+      source={
+        {
+          "testUri": "../../../assets/img/logobig-zingo.png",
+        }
+      }
+      style={
+        {
+          "height": 80,
+          "resizeMode": "contain",
+          "width": 80,
+        }
+      }
+    />
+    <View
+      style={
+        {
+          "alignItems": "baseline",
+          "flexDirection": "row",
+          "opacity": 0.5,
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": undefined,
+            "fontSize": 36,
+          }
+        }
+      >
+        ᙇ
+      </Text>
+      <Text
+        style={
+          {
+            "color": undefined,
+            "fontSize": 36,
+            "fontWeight": "700",
+          }
+        }
+      >
+         1.1234
+      </Text>
+      <Text
+        style={
+          {
+            "color": undefined,
+            "fontSize": 18,
+            "paddingBottom": 0,
+          }
+        }
+      >
+        5678
+      </Text>
+      <Text
+        style={
+          {
+            "color": undefined,
+            "fontSize": 36,
+          }
+        }
+      >
+         ZEC
+      </Text>
+    </View>
+    <Text
+      style={
+        [
+          {
+            "marginTop": 5,
+            "padding": 5,
+          },
+          {
+            "color": "rgb(28, 28, 30)",
+            "fontSize": 18,
+            "fontWeight": "600",
+            "opacity": 1,
+          },
+        ]
+      }
+    >
+      text translated
+       (
+      text translated
+      )
+    </Text>
+    <View
+      style={
+        {
+          "backgroundColor": "rgb(0, 122, 255)",
+          "height": 1,
+          "width": "100%",
+        }
+      }
+    />
+  </View>
+  <RCTScrollView
+    contentContainerStyle={
+      {
+        "alignItems": "stretch",
+        "flexDirection": "column",
+        "justifyContent": "flex-start",
+      }
+    }
+    style={
+      {
+        "maxHeight": "85%",
+      }
+    }
+  >
+    <View>
+      <Text
+        style={
+          {
+            "color": "rgb(28, 28, 30)",
+            "marginTop": 0,
+            "opacity": 0.65,
+            "padding": 20,
+            "textAlign": "center",
+          }
+        }
+      >
+        text translated
+      </Text>
+      <View
+        style={
+          {
+            "borderColor": "rgb(28, 28, 30)",
+            "borderRadius": 10,
+            "borderWidth": 1,
+            "margin": 10,
+            "maxHeight": "40%",
+            "padding": 10,
+          }
+        }
+      >
+        <Text
+          style={
+            [
+              {
+                "textAlign": "center",
+              },
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 18,
+                "fontWeight": "600",
+                "opacity": 1,
+              },
+            ]
+          }
+        >
+          pepe lolo titi
+        </Text>
+        <View
+          style={
+            {
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+            }
+          }
+        >
+          <View />
+          <View
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              {
+                "opacity": 1,
+              }
+            }
+          >
+            <Text
+              style={
+                {
+                  "color": "rgb(28, 28, 30)",
+                  "marginTop": 0,
+                  "minHeight": 48,
+                  "padding": 10,
+                  "textAlign": "center",
+                  "textDecorationLine": "underline",
+                }
+              }
+            >
+              text translated
+            </Text>
+          </View>
+          <View />
+        </View>
+      </View>
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "marginTop": 10,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "rgb(28, 28, 30)",
+              "opacity": 0.65,
+              "textAlign": "center",
+            }
+          }
+        >
+          text translated
+        </Text>
+        <Text
+          style={
+            [
+              {
+                "textAlign": "center",
+              },
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 18,
+                "fontWeight": "600",
+                "opacity": 1,
+              },
+            ]
+          }
+        >
+          1500100
+        </Text>
+      </View>
+      <Text
+        style={
+          {
+            "color": "white",
+            "marginTop": 20,
+            "opacity": 0.65,
+            "padding": 20,
+            "textAlign": "center",
+          }
+        }
+      />
+      <View
+        style={
+          {
+            "marginBottom": 30,
+          }
+        }
+      />
+    </View>
+  </RCTScrollView>
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flexDirection": "row",
+        "flexGrow": 1,
+        "justifyContent": "center",
+        "marginVertical": 5,
+      }
+    }
+  >
+    <View
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        {
+          "alignItems": "center",
+          "backgroundColor": "rgb(0, 122, 255)",
+          "borderColor": "rgb(0, 122, 255)",
+          "borderRadius": 10,
+          "borderWidth": 2,
+          "color": "rgb(0, 122, 255)",
+          "juatifyContent": "center",
+          "maxWidth": "90%",
+          "minHeight": 48,
+          "minWidth": "30%",
+          "opacity": 1,
+          "padding": 0,
+          "paddingLeft": 20,
+          "paddingRight": 20,
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "display": "flex",
+            "flexDirection": "row",
+            "justifyContent": "center",
+            "margin": 0,
+            "minHeight": 48,
+            "minWidth": 48,
+            "padding": 0,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "rgb(242, 242, 242)",
+              "fontSize": 16,
+              "fontWeight": "bold",
+              "textTransform": "uppercase",
+            }
+          }
+        />
+      </View>
+    </View>
+    <View
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        {
+          "alignItems": "center",
+          "borderColor": "rgb(0, 122, 255)",
+          "borderRadius": 10,
+          "borderWidth": 2,
+          "juatifyContent": "center",
+          "marginLeft": 10,
+          "maxWidth": "90%",
+          "minHeight": 48,
+          "minWidth": "30%",
+          "opacity": 1,
+          "padding": 0,
+          "paddingLeft": 20,
+          "paddingRight": 20,
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "display": "flex",
+            "flexDirection": "row",
+            "justifyContent": "center",
+            "margin": 0,
+            "minHeight": 48,
+            "minWidth": 48,
+            "padding": 0,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "rgb(0, 122, 255)",
+              "fontSize": 16,
+              "fontWeight": "bold",
+              "textTransform": "uppercase",
+            }
+          }
+        >
+          text translated
+        </Text>
+      </View>
+    </View>
+  </View>
+</RCTSafeAreaView>
+`;
+
+exports[`Component Seed - test Seed New - snapshot 1`] = `
+<RCTSafeAreaView
+  style={
+    {
+      "alignItems": "stretch",
+      "backgroundColor": "rgb(242, 242, 242)",
+      "display": "flex",
+      "height": "100%",
+      "justifyContent": "flex-start",
+    }
+  }
+>
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "display": "flex",
+        "paddingBottom": 10,
+        "paddingTop": 10,
+        "zIndex": -1,
+      }
+    }
+  >
+    <Image
+      source={
+        {
+          "testUri": "../../../assets/img/logobig-zingo.png",
+        }
+      }
+      style={
+        {
+          "height": 80,
+          "resizeMode": "contain",
+          "width": 80,
+        }
+      }
+    />
+    <View
+      style={
+        {
+          "alignItems": "baseline",
+          "flexDirection": "row",
+          "opacity": 0.5,
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": undefined,
+            "fontSize": 36,
+          }
+        }
+      >
+        ᙇ
+      </Text>
+      <Text
+        style={
+          {
+            "color": undefined,
+            "fontSize": 36,
+            "fontWeight": "700",
+          }
+        }
+      >
+         1.1234
+      </Text>
+      <Text
+        style={
+          {
+            "color": undefined,
+            "fontSize": 18,
+            "paddingBottom": 0,
+          }
+        }
+      >
+        5678
+      </Text>
+      <Text
+        style={
+          {
+            "color": undefined,
+            "fontSize": 36,
+          }
+        }
+      >
+         ---
+      </Text>
+    </View>
+    <Text
+      style={
+        [
+          {
+            "marginTop": 5,
+            "padding": 5,
+          },
+          {
+            "color": "rgb(28, 28, 30)",
+            "fontSize": 18,
+            "fontWeight": "600",
+            "opacity": 1,
+          },
+        ]
+      }
+    >
+      text translated
+       (
+      text translated
+      )
+    </Text>
+    <View
+      style={
+        {
+          "backgroundColor": "rgb(0, 122, 255)",
+          "height": 1,
+          "width": "100%",
+        }
+      }
+    />
+  </View>
+  <RCTScrollView
+    contentContainerStyle={
+      {
+        "alignItems": "stretch",
+        "flexDirection": "column",
+        "justifyContent": "flex-start",
+      }
+    }
+    style={
+      {
+        "maxHeight": "85%",
+      }
+    }
+  >
+    <View>
+      <Text
+        style={
+          {
+            "color": "rgb(28, 28, 30)",
+            "marginTop": 0,
+            "opacity": 0.65,
+            "padding": 20,
+            "textAlign": "center",
+          }
+        }
+      >
+        text translated
+      </Text>
+      <View
+        style={
+          {
+            "borderColor": "rgb(28, 28, 30)",
+            "borderRadius": 10,
+            "borderWidth": 1,
+            "margin": 10,
+            "maxHeight": "40%",
+            "padding": 10,
+          }
+        }
+      >
+        <Text
+          style={
+            [
+              {
+                "textAlign": "center",
+              },
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 18,
+                "fontWeight": "600",
+                "opacity": 1,
+              },
+            ]
+          }
+        >
+          pepe lolo titi
+        </Text>
+        <View
+          style={
+            {
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+            }
+          }
+        >
+          <View />
+          <View
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              {
+                "opacity": 1,
+              }
+            }
+          >
+            <Text
+              style={
+                {
+                  "color": "rgb(28, 28, 30)",
+                  "marginTop": 0,
+                  "minHeight": 48,
+                  "padding": 10,
+                  "textAlign": "center",
+                  "textDecorationLine": "underline",
+                }
+              }
+            >
+              text translated
+            </Text>
+          </View>
+          <View />
+        </View>
+      </View>
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "marginTop": 10,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "rgb(28, 28, 30)",
+              "opacity": 0.65,
+              "textAlign": "center",
+            }
+          }
+        >
+          text translated
+        </Text>
+        <Text
+          style={
+            [
+              {
+                "textAlign": "center",
+              },
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 18,
+                "fontWeight": "600",
+                "opacity": 1,
+              },
+            ]
+          }
+        >
+          1500100
+        </Text>
+      </View>
+      <Text
+        style={
+          {
+            "color": "white",
+            "marginTop": 20,
+            "opacity": 0.65,
+            "padding": 20,
+            "textAlign": "center",
+          }
+        }
+      />
+      <View
+        style={
+          {
+            "marginBottom": 30,
+          }
+        }
+      />
+    </View>
+  </RCTScrollView>
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flexDirection": "row",
+        "flexGrow": 1,
+        "justifyContent": "center",
+        "marginVertical": 5,
+      }
+    }
+  >
+    <View
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        {
+          "alignItems": "center",
+          "backgroundColor": "rgb(0, 122, 255)",
+          "borderColor": "rgb(0, 122, 255)",
+          "borderRadius": 10,
+          "borderWidth": 2,
+          "color": "rgb(0, 122, 255)",
+          "juatifyContent": "center",
+          "maxWidth": "90%",
+          "minHeight": 48,
+          "minWidth": "30%",
+          "opacity": 1,
+          "padding": 0,
+          "paddingLeft": 20,
+          "paddingRight": 20,
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "display": "flex",
+            "flexDirection": "row",
+            "justifyContent": "center",
+            "margin": 0,
+            "minHeight": 48,
+            "minWidth": 48,
+            "padding": 0,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "rgb(242, 242, 242)",
+              "fontSize": 16,
+              "fontWeight": "bold",
+              "textTransform": "uppercase",
+            }
+          }
+        />
+      </View>
+    </View>
+  </View>
+</RCTSafeAreaView>
+`;
+
+exports[`Component Seed - test Seed Restore - snapshot 1`] = `
+<RCTSafeAreaView
+  style={
+    {
+      "alignItems": "stretch",
+      "backgroundColor": "rgb(242, 242, 242)",
+      "display": "flex",
+      "height": "100%",
+      "justifyContent": "flex-start",
+    }
+  }
+>
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "display": "flex",
+        "paddingBottom": 10,
+        "paddingTop": 10,
+        "zIndex": -1,
+      }
+    }
+  >
+    <Image
+      source={
+        {
+          "testUri": "../../../assets/img/logobig-zingo.png",
+        }
+      }
+      style={
+        {
+          "height": 80,
+          "resizeMode": "contain",
+          "width": 80,
+        }
+      }
+    />
+    <View
+      style={
+        {
+          "alignItems": "baseline",
+          "flexDirection": "row",
+          "opacity": 0.5,
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": undefined,
+            "fontSize": 36,
+          }
+        }
+      >
+        ᙇ
+      </Text>
+      <Text
+        style={
+          {
+            "color": undefined,
+            "fontSize": 36,
+            "fontWeight": "700",
+          }
+        }
+      >
+         1.1234
+      </Text>
+      <Text
+        style={
+          {
+            "color": undefined,
+            "fontSize": 18,
+            "paddingBottom": 0,
+          }
+        }
+      >
+        5678
+      </Text>
+      <Text
+        style={
+          {
+            "color": undefined,
+            "fontSize": 36,
+          }
+        }
+      >
+         ---
+      </Text>
+    </View>
+    <Text
+      style={
+        [
+          {
+            "marginTop": 5,
+            "padding": 5,
+          },
+          {
+            "color": "rgb(28, 28, 30)",
+            "fontSize": 18,
+            "fontWeight": "600",
+            "opacity": 1,
+          },
+        ]
+      }
+    >
+      text translated
+       (
+      text translated
+      )
+    </Text>
+    <View
+      style={
+        {
+          "backgroundColor": "rgb(0, 122, 255)",
+          "height": 1,
+          "width": "100%",
+        }
+      }
+    />
+  </View>
+  <RCTScrollView
+    contentContainerStyle={
+      {
+        "alignItems": "stretch",
+        "flexDirection": "column",
+        "justifyContent": "flex-start",
+      }
+    }
+    style={
+      {
+        "maxHeight": "85%",
+      }
+    }
+  >
+    <View>
+      <Text
+        style={
+          {
+            "color": "rgb(28, 28, 30)",
+            "marginTop": 0,
+            "opacity": 0.65,
+            "padding": 20,
+            "textAlign": "center",
+          }
+        }
+      >
+        text translated
+      </Text>
+      <View
+        style={
+          {
+            "borderColor": "rgb(28, 28, 30)",
+            "borderRadius": 10,
+            "borderWidth": 1,
+            "margin": 10,
+            "maxHeight": "40%",
+            "padding": 10,
+          }
+        }
+      >
+        <View
+          accessibilityLabel="text translated"
+          accessible={true}
+          style={
+            {
+              "borderColor": "rgb(28, 28, 30)",
+              "borderRadius": 10,
+              "borderWidth": 1,
+              "margin": 0,
+              "maxHeight": "70%",
+              "maxWidth": "100%",
+              "minHeight": 100,
+              "minWidth": "95%",
+            }
+          }
+        >
+          <TextInput
+            editable={true}
+            multiline={true}
+            onChangeText={[Function]}
+            placeholder="text translated"
+            style={
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 16,
+                "fontWeight": "600",
+                "marginLeft": 5,
+                "minHeight": 100,
+                "minWidth": "95%",
+              }
+            }
+            value="pepe lolo titi"
+          />
+        </View>
+        <View
+          style={
+            {
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+            }
+          }
+        >
+          <View />
+          <View
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              {
+                "opacity": 1,
+              }
+            }
+          >
+            <Text
+              style={
+                {
+                  "color": "rgb(28, 28, 30)",
+                  "marginTop": 0,
+                  "minHeight": 48,
+                  "padding": 10,
+                  "textAlign": "center",
+                  "textDecorationLine": "underline",
+                }
+              }
+            >
+              text translated
+            </Text>
+          </View>
+          <View />
+        </View>
+      </View>
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "marginTop": 10,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "rgb(28, 28, 30)",
+              "opacity": 0.65,
+              "textAlign": "center",
+            }
+          }
+        >
+          text translated
+        </Text>
+        <Text
+          style={
+            {
+              "color": "rgb(28, 28, 30)",
+              "opacity": 0.65,
+              "textAlign": "center",
+            }
+          }
+        >
+          text translated
+        </Text>
+        <View
+          accessibilityLabel="text translated"
+          accessible={true}
+          style={
+            {
+              "borderColor": "rgb(28, 28, 30)",
+              "borderRadius": 10,
+              "borderWidth": 1,
+              "margin": 10,
+              "maxHeight": 48,
+              "maxWidth": "40%",
+              "minHeight": 48,
+              "minWidth": "20%",
+              "width": "30%",
+            }
+          }
+        >
+          <TextInput
+            editable={true}
+            keyboardType="numeric"
+            onChangeText={[Function]}
+            style={
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 18,
+                "fontWeight": "600",
+                "marginLeft": 5,
+                "minHeight": 48,
+                "minWidth": "20%",
+              }
+            }
+            value="1500100"
+          />
+        </View>
+      </View>
+      <Text
+        style={
+          {
+            "color": "white",
+            "marginTop": 20,
+            "opacity": 0.65,
+            "padding": 20,
+            "textAlign": "center",
+          }
+        }
+      />
+      <View
+        style={
+          {
+            "marginBottom": 30,
+          }
+        }
+      />
+    </View>
+  </RCTScrollView>
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flexDirection": "row",
+        "flexGrow": 1,
+        "justifyContent": "center",
+        "marginVertical": 5,
+      }
+    }
+  >
+    <View
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        {
+          "alignItems": "center",
+          "backgroundColor": "rgb(0, 122, 255)",
+          "borderColor": "rgb(0, 122, 255)",
+          "borderRadius": 10,
+          "borderWidth": 2,
+          "color": "rgb(0, 122, 255)",
+          "juatifyContent": "center",
+          "maxWidth": "90%",
+          "minHeight": 48,
+          "minWidth": "30%",
+          "opacity": 1,
+          "padding": 0,
+          "paddingLeft": 20,
+          "paddingRight": 20,
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "display": "flex",
+            "flexDirection": "row",
+            "justifyContent": "center",
+            "margin": 0,
+            "minHeight": 48,
+            "minWidth": 48,
+            "padding": 0,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "rgb(242, 242, 242)",
+              "fontSize": 16,
+              "fontWeight": "bold",
+              "textTransform": "uppercase",
+            }
+          }
+        />
+      </View>
+    </View>
+    <View
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        {
+          "alignItems": "center",
+          "borderColor": "rgb(0, 122, 255)",
+          "borderRadius": 10,
+          "borderWidth": 2,
+          "juatifyContent": "center",
+          "marginLeft": 10,
+          "maxWidth": "90%",
+          "minHeight": 48,
+          "minWidth": "30%",
+          "opacity": 1,
+          "padding": 0,
+          "paddingLeft": 20,
+          "paddingRight": 20,
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "display": "flex",
+            "flexDirection": "row",
+            "justifyContent": "center",
+            "margin": 0,
+            "minHeight": 48,
+            "minWidth": 48,
+            "padding": 0,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "rgb(0, 122, 255)",
+              "fontSize": 16,
+              "fontWeight": "bold",
+              "textTransform": "uppercase",
+            }
+          }
+        >
+          text translated
+        </Text>
+      </View>
+    </View>
+  </View>
+</RCTSafeAreaView>
+`;
+
+exports[`Component Seed - test Seed Server - snapshot 1`] = `
+<RCTSafeAreaView
+  style={
+    {
+      "alignItems": "stretch",
+      "backgroundColor": "rgb(242, 242, 242)",
+      "display": "flex",
+      "height": "100%",
+      "justifyContent": "flex-start",
+    }
+  }
+>
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "display": "flex",
+        "paddingBottom": 10,
+        "paddingTop": 10,
+        "zIndex": -1,
+      }
+    }
+  >
+    <Image
+      source={
+        {
+          "testUri": "../../../assets/img/logobig-zingo.png",
+        }
+      }
+      style={
+        {
+          "height": 80,
+          "resizeMode": "contain",
+          "width": 80,
+        }
+      }
+    />
+    <View
+      style={
+        {
+          "alignItems": "baseline",
+          "flexDirection": "row",
+          "opacity": 0.5,
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": undefined,
+            "fontSize": 36,
+          }
+        }
+      >
+        ᙇ
+      </Text>
+      <Text
+        style={
+          {
+            "color": undefined,
+            "fontSize": 36,
+            "fontWeight": "700",
+          }
+        }
+      >
+         1.1234
+      </Text>
+      <Text
+        style={
+          {
+            "color": undefined,
+            "fontSize": 18,
+            "paddingBottom": 0,
+          }
+        }
+      >
+        5678
+      </Text>
+      <Text
+        style={
+          {
+            "color": undefined,
+            "fontSize": 36,
+          }
+        }
+      >
+         ZEC
+      </Text>
+    </View>
+    <Text
+      style={
+        [
+          {
+            "marginTop": 5,
+            "padding": 5,
+          },
+          {
+            "color": "rgb(28, 28, 30)",
+            "fontSize": 18,
+            "fontWeight": "600",
+            "opacity": 1,
+          },
+        ]
+      }
+    >
+      text translated
+       (
+      text translated
+      )
+    </Text>
+    <View
+      style={
+        {
+          "backgroundColor": "rgb(0, 122, 255)",
+          "height": 1,
+          "width": "100%",
+        }
+      }
+    />
+  </View>
+  <RCTScrollView
+    contentContainerStyle={
+      {
+        "alignItems": "stretch",
+        "flexDirection": "column",
+        "justifyContent": "flex-start",
+      }
+    }
+    style={
+      {
+        "maxHeight": "85%",
+      }
+    }
+  >
+    <View>
+      <Text
+        style={
+          {
+            "color": "rgb(28, 28, 30)",
+            "marginTop": 0,
+            "opacity": 0.65,
+            "padding": 20,
+            "textAlign": "center",
+          }
+        }
+      >
+        text translated
+      </Text>
+      <View
+        style={
+          {
+            "borderColor": "rgb(28, 28, 30)",
+            "borderRadius": 10,
+            "borderWidth": 1,
+            "margin": 10,
+            "maxHeight": "40%",
+            "padding": 10,
+          }
+        }
+      >
+        <Text
+          style={
+            [
+              {
+                "textAlign": "center",
+              },
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 18,
+                "fontWeight": "600",
+                "opacity": 1,
+              },
+            ]
+          }
+        >
+          pepe lolo titi
+        </Text>
+        <View
+          style={
+            {
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+            }
+          }
+        >
+          <View />
+          <View
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              {
+                "opacity": 1,
+              }
+            }
+          >
+            <Text
+              style={
+                {
+                  "color": "rgb(28, 28, 30)",
+                  "marginTop": 0,
+                  "minHeight": 48,
+                  "padding": 10,
+                  "textAlign": "center",
+                  "textDecorationLine": "underline",
+                }
+              }
+            >
+              text translated
+            </Text>
+          </View>
+          <View />
+        </View>
+      </View>
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "marginTop": 10,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "rgb(28, 28, 30)",
+              "opacity": 0.65,
+              "textAlign": "center",
+            }
+          }
+        >
+          text translated
+        </Text>
+        <Text
+          style={
+            [
+              {
+                "textAlign": "center",
+              },
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 18,
+                "fontWeight": "600",
+                "opacity": 1,
+              },
+            ]
+          }
+        >
+          1500100
+        </Text>
+      </View>
+      <Text
+        style={
+          {
+            "color": "white",
+            "marginTop": 20,
+            "opacity": 0.65,
+            "padding": 20,
+            "textAlign": "center",
+          }
+        }
+      />
+      <View
+        style={
+          {
+            "marginBottom": 30,
+          }
+        }
+      />
+    </View>
+  </RCTScrollView>
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flexDirection": "row",
+        "flexGrow": 1,
+        "justifyContent": "center",
+        "marginVertical": 5,
+      }
+    }
+  >
+    <View
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        {
+          "alignItems": "center",
+          "backgroundColor": "rgb(0, 122, 255)",
+          "borderColor": "rgb(0, 122, 255)",
+          "borderRadius": 10,
+          "borderWidth": 2,
+          "color": "rgb(0, 122, 255)",
+          "juatifyContent": "center",
+          "maxWidth": "90%",
+          "minHeight": 48,
+          "minWidth": "30%",
+          "opacity": 1,
+          "padding": 0,
+          "paddingLeft": 20,
+          "paddingRight": 20,
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "display": "flex",
+            "flexDirection": "row",
+            "justifyContent": "center",
+            "margin": 0,
+            "minHeight": 48,
+            "minWidth": 48,
+            "padding": 0,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "rgb(242, 242, 242)",
+              "fontSize": 16,
+              "fontWeight": "bold",
+              "textTransform": "uppercase",
+            }
+          }
+        />
+      </View>
+    </View>
+    <View
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        {
+          "alignItems": "center",
+          "borderColor": "rgb(0, 122, 255)",
+          "borderRadius": 10,
+          "borderWidth": 2,
+          "juatifyContent": "center",
+          "marginLeft": 10,
+          "maxWidth": "90%",
+          "minHeight": 48,
+          "minWidth": "30%",
+          "opacity": 1,
+          "padding": 0,
+          "paddingLeft": 20,
+          "paddingRight": 20,
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "display": "flex",
+            "flexDirection": "row",
+            "justifyContent": "center",
+            "margin": 0,
+            "minHeight": 48,
+            "minWidth": 48,
+            "padding": 0,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "rgb(0, 122, 255)",
+              "fontSize": 16,
+              "fontWeight": "bold",
+              "textTransform": "uppercase",
+            }
+          }
+        >
+          text translated
+        </Text>
+      </View>
+    </View>
+  </View>
+</RCTSafeAreaView>
+`;
+
+exports[`Component Seed - test Seed View - snapshot 1`] = `
+<RCTSafeAreaView
+  style={
+    {
+      "alignItems": "stretch",
+      "backgroundColor": "rgb(242, 242, 242)",
+      "display": "flex",
+      "height": "100%",
+      "justifyContent": "flex-start",
+    }
+  }
+>
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "display": "flex",
+        "paddingBottom": 10,
+        "paddingTop": 10,
+        "zIndex": -1,
+      }
+    }
+  >
+    <Image
+      source={
+        {
+          "testUri": "../../../assets/img/logobig-zingo.png",
+        }
+      }
+      style={
+        {
+          "height": 80,
+          "resizeMode": "contain",
+          "width": 80,
+        }
+      }
+    />
+    <View
+      style={
+        {
+          "alignItems": "baseline",
+          "flexDirection": "row",
+          "opacity": 0.5,
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": undefined,
+            "fontSize": 36,
+          }
+        }
+      >
+        ᙇ
+      </Text>
+      <Text
+        style={
+          {
+            "color": undefined,
+            "fontSize": 36,
+            "fontWeight": "700",
+          }
+        }
+      >
+         1.1234
+      </Text>
+      <Text
+        style={
+          {
+            "color": undefined,
+            "fontSize": 18,
+            "paddingBottom": 0,
+          }
+        }
+      >
+        5678
+      </Text>
+      <Text
+        style={
+          {
+            "color": undefined,
+            "fontSize": 36,
+          }
+        }
+      >
+         ZEC
+      </Text>
+    </View>
+    <Text
+      style={
+        [
+          {
+            "marginTop": 5,
+            "padding": 5,
+          },
+          {
+            "color": "rgb(28, 28, 30)",
+            "fontSize": 18,
+            "fontWeight": "600",
+            "opacity": 1,
+          },
+        ]
+      }
+    >
+      text translated
+       (
+      text translated
+      )
+    </Text>
+    <View
+      style={
+        {
+          "backgroundColor": "rgb(0, 122, 255)",
+          "height": 1,
+          "width": "100%",
+        }
+      }
+    />
+  </View>
+  <RCTScrollView
+    contentContainerStyle={
+      {
+        "alignItems": "stretch",
+        "flexDirection": "column",
+        "justifyContent": "flex-start",
+      }
+    }
+    style={
+      {
+        "maxHeight": "85%",
+      }
+    }
+  >
+    <View>
+      <Text
+        style={
+          {
+            "color": "rgb(28, 28, 30)",
+            "marginTop": 0,
+            "opacity": 0.65,
+            "padding": 20,
+            "textAlign": "center",
+          }
+        }
+      >
+        text translated
+      </Text>
+      <View
+        style={
+          {
+            "borderColor": "rgb(28, 28, 30)",
+            "borderRadius": 10,
+            "borderWidth": 1,
+            "margin": 10,
+            "maxHeight": "40%",
+            "padding": 10,
+          }
+        }
+      >
+        <Text
+          style={
+            [
+              {
+                "textAlign": "center",
+              },
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 18,
+                "fontWeight": "600",
+                "opacity": 1,
+              },
+            ]
+          }
+        >
+          pepe lolo titi
+        </Text>
+        <View
+          style={
+            {
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+            }
+          }
+        >
+          <View />
+          <View
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              {
+                "opacity": 1,
+              }
+            }
+          >
+            <Text
+              style={
+                {
+                  "color": "rgb(28, 28, 30)",
+                  "marginTop": 0,
+                  "minHeight": 48,
+                  "padding": 10,
+                  "textAlign": "center",
+                  "textDecorationLine": "underline",
+                }
+              }
+            >
+              text translated
+            </Text>
+          </View>
+          <View />
+        </View>
+      </View>
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "marginTop": 10,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "rgb(28, 28, 30)",
+              "opacity": 0.65,
+              "textAlign": "center",
+            }
+          }
+        >
+          text translated
+        </Text>
+        <Text
+          style={
+            [
+              {
+                "textAlign": "center",
+              },
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 18,
+                "fontWeight": "600",
+                "opacity": 1,
+              },
+            ]
+          }
+        >
+          1500100
+        </Text>
+      </View>
+      <Text
+        style={
+          {
+            "color": "white",
+            "marginTop": 20,
+            "opacity": 0.65,
+            "padding": 20,
+            "textAlign": "center",
+          }
+        }
+      />
+      <View
+        style={
+          {
+            "marginBottom": 30,
+          }
+        }
+      />
+    </View>
+  </RCTScrollView>
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flexDirection": "row",
+        "flexGrow": 1,
+        "justifyContent": "center",
+        "marginVertical": 5,
+      }
+    }
+  >
+    <View
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        {
+          "alignItems": "center",
+          "backgroundColor": "rgb(0, 122, 255)",
+          "borderColor": "rgb(0, 122, 255)",
+          "borderRadius": 10,
+          "borderWidth": 2,
+          "color": "rgb(0, 122, 255)",
+          "juatifyContent": "center",
+          "maxWidth": "90%",
+          "minHeight": 48,
+          "minWidth": "30%",
+          "opacity": 1,
+          "padding": 0,
+          "paddingLeft": 20,
+          "paddingRight": 20,
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "display": "flex",
+            "flexDirection": "row",
+            "justifyContent": "center",
+            "margin": 0,
+            "minHeight": 48,
+            "minWidth": 48,
+            "padding": 0,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "rgb(242, 242, 242)",
+              "fontSize": 16,
+              "fontWeight": "bold",
+              "textTransform": "uppercase",
+            }
+          }
+        />
+      </View>
+    </View>
+  </View>
+</RCTSafeAreaView>
+`;

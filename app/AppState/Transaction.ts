@@ -1,7 +1,7 @@
 import TxDetailType from './TxDetailType';
 
 export default interface Transaction {
-  type: string;
+  type: 'sent' | 'receive';
   address: string;
   amount: number;
   position: string;

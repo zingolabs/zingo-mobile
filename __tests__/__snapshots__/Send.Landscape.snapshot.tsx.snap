@@ -1,0 +1,984 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Component Send - test Send Landscape - snapshot 1`] = `
+<View
+  style={
+    {
+      "flexDirection": "row",
+      "height": "100%",
+    }
+  }
+>
+  <View
+    accessibilityLabel="text translated"
+    accessible={true}
+    style={
+      {
+        "display": "flex",
+        "justifyContent": "flex-start",
+        "width": 300,
+      }
+    }
+  >
+    <Modal
+      animationType="slide"
+      hardwareAccelerated={false}
+      onRequestClose={[Function]}
+      transparent={false}
+      visible={false}
+    />
+    <Modal
+      animationType="slide"
+      hardwareAccelerated={false}
+      onRequestClose={[Function]}
+      transparent={false}
+      visible={false}
+    />
+    <View
+      style={{}}
+    >
+      <View
+        onLayout={[Function]}
+        style={
+          {
+            "alignItems": "center",
+            "backgroundColor": "rgb(255, 255, 255)",
+            "display": "flex",
+            "zIndex": -1,
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "backgroundColor": "rgb(255, 255, 255)",
+              "display": "flex",
+              "padding": 10,
+              "width": "100%",
+              "zIndex": -1,
+            }
+          }
+        >
+          <Image
+            source={
+              {
+                "testUri": "../../../assets/img/logobig-zingo.png",
+              }
+            }
+            style={
+              {
+                "height": 80,
+                "resizeMode": "contain",
+                "width": 80,
+              }
+            }
+          />
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "column",
+              }
+            }
+          >
+            <View
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "opacity": 1,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "alignItems": "flex-end",
+                    "backgroundColor": "rgb(255, 255, 255)",
+                    "borderRadius": 10,
+                    "display": "flex",
+                    "flexDirection": "row",
+                    "justifyContent": "center",
+                    "margin": 0,
+                    "minHeight": 48,
+                    "minWidth": 48,
+                    "padding": 0,
+                  }
+                }
+              >
+                <Text
+                  style={
+                    [
+                      {
+                        "color": "rgb(0, 122, 255)",
+                        "fontSize": 18,
+                        "fontWeight": "600",
+                        "opacity": 1,
+                      },
+                    ]
+                  }
+                >
+                  text translated
+                </Text>
+                <
+                  color="rgb(0, 122, 255)"
+                  icon={
+                    {
+                      "icon": [
+                        192,
+                        512,
+                        [],
+                        "f129",
+                        "M144 80c0 26.5-21.5 48-48 48s-48-21.5-48-48s21.5-48 48-48s48 21.5 48 48zM0 224c0-17.7 14.3-32 32-32H96c17.7 0 32 14.3 32 32V448h32c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H64V256H32c-17.7 0-32-14.3-32-32z",
+                      ],
+                      "iconName": "info",
+                      "prefix": "fas",
+                    }
+                  }
+                  size={14}
+                  style={
+                    {
+                      "marginBottom": 5,
+                    }
+                  }
+                />
+              </View>
+            </View>
+            <View
+              style={
+                {
+                  "alignItems": "baseline",
+                  "flexDirection": "row",
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": undefined,
+                    "fontSize": 36,
+                  }
+                }
+              >
+                ᙇ
+              </Text>
+              <Text
+                style={
+                  {
+                    "color": undefined,
+                    "fontSize": 36,
+                    "fontWeight": "700",
+                  }
+                }
+              >
+                 1.1234
+              </Text>
+              <Text
+                style={
+                  {
+                    "color": undefined,
+                    "fontSize": 18,
+                    "paddingBottom": 0,
+                  }
+                }
+              >
+                5678
+              </Text>
+              <Text
+                style={
+                  {
+                    "color": undefined,
+                    "fontSize": 36,
+                  }
+                }
+              >
+                 ZEC
+              </Text>
+            </View>
+            <View
+              style={
+                {
+                  "alignItems": "baseline",
+                  "flexDirection": "row",
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": undefined,
+                    "fontSize": 20,
+                    "marginBottom": 5,
+                    "marginTop": 0,
+                  }
+                }
+              >
+                $
+              </Text>
+              <Text
+                style={
+                  {
+                    "color": undefined,
+                    "fontSize": 20,
+                    "fontWeight": "700",
+                    "marginBottom": 5,
+                    "marginTop": 0,
+                  }
+                }
+              >
+                 37.44
+              </Text>
+              <Text
+                style={
+                  {
+                    "color": undefined,
+                    "fontSize": 20,
+                    "marginBottom": 5,
+                    "marginTop": 0,
+                  }
+                }
+              >
+                 USD
+              </Text>
+            </View>
+          </View>
+          <View
+            style={
+              {
+                "backgroundColor": "rgb(0, 122, 255)",
+                "height": 1,
+                "marginTop": 5,
+                "width": "100%",
+              }
+            }
+          />
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "display": "flex",
+                "flexDirection": "row",
+                "flexWrap": "wrap",
+                "justifyContent": "center",
+                "marginVertical": 5,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "display": "flex",
+                  "flexDirection": "column",
+                  "flexWrap": "wrap",
+                  "justifyContent": "center",
+                }
+              }
+            >
+              <Text
+                style={
+                  [
+                    {
+                      "paddingHorizontal": 5,
+                    },
+                    {
+                      "color": "rgb(28, 28, 30)",
+                      "fontSize": 18,
+                      "fontWeight": "600",
+                      "opacity": 1,
+                    },
+                  ]
+                }
+              >
+                text translated
+              </Text>
+            </View>
+          </View>
+          <View
+            style={
+              {
+                "backgroundColor": "rgb(0, 122, 255)",
+                "height": 1,
+                "width": "100%",
+              }
+            }
+          />
+        </View>
+      </View>
+    </View>
+    <View
+      style={
+        {
+          "backgroundColor": "rgb(255, 255, 255)",
+          "padding": 10,
+          "position": "absolute",
+        }
+      }
+    >
+      <View
+        accessibilityLabel="text translated"
+        accessible={true}
+        collapsable={false}
+        focusable={true}
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          {
+            "opacity": 1,
+          }
+        }
+      >
+        <
+          color="rgb(216, 216, 216)"
+          icon={
+            {
+              "icon": [
+                448,
+                512,
+                [
+                  "navicon",
+                ],
+                "f0c9",
+                "M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z",
+              ],
+              "iconName": "bars",
+              "prefix": "fas",
+            }
+          }
+          size={48}
+        />
+      </View>
+    </View>
+  </View>
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "borderLeftColor": "rgb(216, 216, 216)",
+        "borderLeftWidth": 1,
+        "height": "100%",
+        "padding": 0,
+        "width": 300,
+      }
+    }
+  >
+    <RCTScrollView
+      contentContainerStyle={{}}
+      keyboardShouldPersistTaps="handled"
+      style={{}}
+    >
+      <View>
+        <View
+          style={
+            {
+              "marginBottom": 150,
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "display": "flex",
+                "marginTop": 10,
+                "padding": 5,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "display": "flex",
+                  "flexDirection": "row",
+                  "justifyContent": "space-between",
+                }
+              }
+            >
+              <Text
+                style={
+                  [
+                    {
+                      "color": "rgb(28, 28, 30)",
+                      "fontSize": 18,
+                      "fontWeight": "600",
+                      "opacity": 1,
+                    },
+                  ]
+                }
+              >
+                text translated
+              </Text>
+            </View>
+            <View
+              style={
+                {
+                  "borderColor": "rgb(28, 28, 30)",
+                  "borderRadius": 5,
+                  "borderWidth": 1,
+                  "flex": 1,
+                  "marginTop": 5,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "flexDirection": "row",
+                  }
+                }
+              >
+                <View
+                  accessibilityLabel="text translated"
+                  accessible={true}
+                  style={
+                    {
+                      "flex": 1,
+                      "justifyContent": "center",
+                    }
+                  }
+                >
+                  <TextInput
+                    editable={true}
+                    onChangeText={[Function]}
+                    placeholder="text translated"
+                    style={
+                      {
+                        "color": "rgb(28, 28, 30)",
+                        "fontSize": 16,
+                        "fontWeight": "600",
+                        "marginLeft": 5,
+                      }
+                    }
+                    value="UA-12345678901234567890"
+                  />
+                </View>
+                <View
+                  style={
+                    {
+                      "width": 58,
+                    }
+                  }
+                >
+                  <View
+                    accessibilityLabel="text translated"
+                    accessible={true}
+                    collapsable={false}
+                    focusable={true}
+                    onClick={[Function]}
+                    onResponderGrant={[Function]}
+                    onResponderMove={[Function]}
+                    onResponderRelease={[Function]}
+                    onResponderTerminate={[Function]}
+                    onResponderTerminationRequest={[Function]}
+                    onStartShouldSetResponder={[Function]}
+                    style={
+                      {
+                        "opacity": 1,
+                      }
+                    }
+                  >
+                    <
+                      color="rgb(216, 216, 216)"
+                      icon={
+                        {
+                          "icon": [
+                            448,
+                            512,
+                            [],
+                            "f029",
+                            "M48 32C21.5 32 0 53.5 0 80v96c0 26.5 21.5 48 48 48h96c26.5 0 48-21.5 48-48V80c0-26.5-21.5-48-48-48H48zm80 64v64H64V96h64zM48 288c-26.5 0-48 21.5-48 48v96c0 26.5 21.5 48 48 48h96c26.5 0 48-21.5 48-48V336c0-26.5-21.5-48-48-48H48zm80 64v64H64V352h64zM256 80v96c0 26.5 21.5 48 48 48h96c26.5 0 48-21.5 48-48V80c0-26.5-21.5-48-48-48H304c-26.5 0-48 21.5-48 48zm64 16h64v64H320V96zm32 352v32h32V448H352zm96 0H416v32h32V448zM416 288v32H352V288H256v96 96h64V384h32v32h96V352 320 288H416z",
+                          ],
+                          "iconName": "qrcode",
+                          "prefix": "fas",
+                        }
+                      }
+                      size={48}
+                      style={
+                        {
+                          "margin": 5,
+                        }
+                      }
+                    />
+                  </View>
+                </View>
+              </View>
+            </View>
+            <View
+              style={
+                {
+                  "display": "flex",
+                  "flexDirection": "row",
+                  "justifyContent": "space-between",
+                  "marginTop": 10,
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "rgb(28, 28, 30)",
+                    "opacity": 0.65,
+                  }
+                }
+              >
+                text translated
+              </Text>
+              <Text
+                style={
+                  {
+                    "color": "rgb(0, 122, 255)",
+                  }
+                }
+              >
+                text translated
+              </Text>
+            </View>
+            <View
+              style={
+                {
+                  "display": "flex",
+                  "flexDirection": "row",
+                  "justifyContent": "space-between",
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "display": "flex",
+                    "flexDirection": "row",
+                    "justifyContent": "flex-start",
+                    "width": "60%",
+                  }
+                }
+              >
+                <Text
+                  style={
+                    [
+                      {
+                        "fontSize": 20,
+                        "marginRight": 5,
+                        "marginTop": 20,
+                      },
+                      {
+                        "color": "rgb(28, 28, 30)",
+                        "fontSize": 18,
+                        "fontWeight": "600",
+                        "opacity": 1,
+                      },
+                    ]
+                  }
+                >
+                  ᙇ
+                </Text>
+                <View
+                  accessibilityLabel="text translated"
+                  accessible={true}
+                  style={
+                    {
+                      "borderColor": "rgb(28, 28, 30)",
+                      "borderRadius": 5,
+                      "borderWidth": 1,
+                      "flexGrow": 1,
+                      "marginTop": 5,
+                      "minHeight": 48,
+                      "minWidth": 48,
+                      "width": "75%",
+                    }
+                  }
+                >
+                  <TextInput
+                    editable={true}
+                    keyboardType="numeric"
+                    maxLength={10}
+                    onChangeText={[Function]}
+                    placeholder="#.########"
+                    style={
+                      {
+                        "color": "rgb(28, 28, 30)",
+                        "fontSize": 18,
+                        "fontWeight": "600",
+                        "marginLeft": 5,
+                        "minHeight": 48,
+                        "minWidth": 48,
+                      }
+                    }
+                    value="1.12345678"
+                  />
+                </View>
+                <Text
+                  style={
+                    [
+                      {
+                        "marginLeft": 5,
+                        "marginRight": 10,
+                        "marginTop": 15,
+                      },
+                      {
+                        "color": "rgb(28, 28, 30)",
+                        "fontSize": 18,
+                        "fontWeight": "600",
+                        "opacity": 1,
+                      },
+                    ]
+                  }
+                >
+                  ZEC
+                </Text>
+              </View>
+              <View
+                style={
+                  {
+                    "display": "flex",
+                    "flexDirection": "row",
+                    "justifyContent": "flex-start",
+                    "width": "35%",
+                  }
+                }
+              >
+                <Text
+                  style={
+                    [
+                      {
+                        "marginRight": 5,
+                        "marginTop": 15,
+                      },
+                      {
+                        "color": "rgb(28, 28, 30)",
+                        "fontSize": 18,
+                        "fontWeight": "600",
+                        "opacity": 1,
+                      },
+                    ]
+                  }
+                >
+                  $
+                </Text>
+                <View
+                  accessibilityLabel="text translated"
+                  accessible={true}
+                  style={
+                    {
+                      "borderColor": "rgb(28, 28, 30)",
+                      "borderRadius": 5,
+                      "borderWidth": 1,
+                      "flexGrow": 1,
+                      "marginTop": 5,
+                      "minHeight": 48,
+                      "minWidth": 48,
+                      "width": "55%",
+                    }
+                  }
+                >
+                  <TextInput
+                    editable={true}
+                    keyboardType="numeric"
+                    maxLength={4}
+                    onChangeText={[Function]}
+                    placeholder="#.##"
+                    style={
+                      {
+                        "color": "rgb(28, 28, 30)",
+                        "fontSize": 18,
+                        "fontWeight": "600",
+                        "marginLeft": 5,
+                        "minHeight": 48,
+                        "minWidth": 48,
+                      }
+                    }
+                    value="50.22"
+                  />
+                </View>
+                <Text
+                  style={
+                    [
+                      {
+                        "marginLeft": 5,
+                        "marginTop": 15,
+                      },
+                      {
+                        "color": "rgb(28, 28, 30)",
+                        "fontSize": 18,
+                        "fontWeight": "600",
+                        "opacity": 1,
+                      },
+                    ]
+                  }
+                >
+                  USD
+                </Text>
+              </View>
+            </View>
+            <View
+              style={
+                {
+                  "display": "flex",
+                  "flexDirection": "column",
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "display": "flex",
+                    "flexDirection": "row",
+                    "justifyContent": "flex-start",
+                    "marginTop": 10,
+                  }
+                }
+              >
+                <Text
+                  style={
+                    [
+                      {
+                        "color": "rgb(28, 28, 30)",
+                        "fontSize": 18,
+                        "fontWeight": "600",
+                        "opacity": 1,
+                      },
+                    ]
+                  }
+                >
+                  text translated
+                </Text>
+                <View
+                  style={
+                    {
+                      "alignItems": "baseline",
+                      "flexDirection": "row",
+                    }
+                  }
+                >
+                  <Text
+                    style={
+                      {
+                        "color": undefined,
+                        "fontSize": 18,
+                      }
+                    }
+                  >
+                    ᙇ
+                  </Text>
+                  <Text
+                    style={
+                      {
+                        "color": undefined,
+                        "fontSize": 18,
+                        "fontWeight": "700",
+                      }
+                    }
+                  >
+                     0.0000
+                  </Text>
+                  <Text
+                    style={
+                      {
+                        "color": undefined,
+                        "fontSize": 9,
+                        "paddingBottom": 0,
+                      }
+                    }
+                  >
+                    0000
+                  </Text>
+                  <Text
+                    style={
+                      {
+                        "color": undefined,
+                        "fontSize": 18,
+                      }
+                    }
+                  >
+                     ZEC
+                  </Text>
+                </View>
+              </View>
+              <View
+                style={
+                  {
+                    "backgroundColor": "rgb(255, 255, 255)",
+                    "borderRadius": 10,
+                    "display": "flex",
+                    "flexDirection": "row",
+                    "marginTop": 5,
+                    "padding": 5,
+                  }
+                }
+              >
+                <
+                  color="rgb(0, 122, 255)"
+                  icon={
+                    {
+                      "icon": [
+                        192,
+                        512,
+                        [],
+                        "f129",
+                        "M144 80c0 26.5-21.5 48-48 48s-48-21.5-48-48s21.5-48 48-48s48 21.5 48 48zM0 224c0-17.7 14.3-32 32-32H96c17.7 0 32 14.3 32 32V448h32c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H64V256H32c-17.7 0-32-14.3-32-32z",
+                      ],
+                      "iconName": "info",
+                      "prefix": "fas",
+                    }
+                  }
+                  size={14}
+                />
+                <Text
+                  style={
+                    {
+                      "color": "rgb(28, 28, 30)",
+                      "opacity": 0.65,
+                    }
+                  }
+                >
+                  text translated
+                </Text>
+              </View>
+            </View>
+          </View>
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "flexGrow": 1,
+                "justifyContent": "center",
+                "marginVertical": 5,
+              }
+            }
+          >
+            <View
+              accessibilityLabel="title text translated"
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "backgroundColor": undefined,
+                  "borderColor": "rgb(0, 122, 255)",
+                  "borderRadius": 10,
+                  "borderWidth": 2,
+                  "juatifyContent": "center",
+                  "maxWidth": "90%",
+                  "minHeight": 48,
+                  "minWidth": "30%",
+                  "opacity": 1,
+                  "padding": 0,
+                  "paddingLeft": 20,
+                  "paddingRight": 20,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "display": "flex",
+                    "flexDirection": "row",
+                    "justifyContent": "center",
+                    "margin": 0,
+                    "minHeight": 48,
+                    "minWidth": 48,
+                    "padding": 0,
+                  }
+                }
+              >
+                <Text
+                  style={
+                    {
+                      "color": "rgb(242, 242, 242)",
+                      "fontSize": 16,
+                      "fontWeight": "bold",
+                      "textTransform": "uppercase",
+                    }
+                  }
+                >
+                  text translated
+                </Text>
+              </View>
+            </View>
+            <View
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "borderColor": "rgb(0, 122, 255)",
+                  "borderRadius": 10,
+                  "borderWidth": 2,
+                  "juatifyContent": "center",
+                  "marginLeft": 10,
+                  "maxWidth": "90%",
+                  "minHeight": 48,
+                  "minWidth": "30%",
+                  "opacity": 1,
+                  "padding": 0,
+                  "paddingLeft": 20,
+                  "paddingRight": 20,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "display": "flex",
+                    "flexDirection": "row",
+                    "justifyContent": "center",
+                    "margin": 0,
+                    "minHeight": 48,
+                    "minWidth": 48,
+                    "padding": 0,
+                  }
+                }
+              >
+                <Text
+                  style={
+                    {
+                      "color": "rgb(0, 122, 255)",
+                      "fontSize": 16,
+                      "fontWeight": "bold",
+                      "textTransform": "uppercase",
+                    }
+                  }
+                >
+                  text translated
+                </Text>
+              </View>
+            </View>
+          </View>
+        </View>
+      </View>
+    </RCTScrollView>
+  </View>
+</View>
+`;

@@ -6,7 +6,7 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
-import ImportKeyModal from '../components/ImportKey';
+import Info from '../components/Info';
 import { ContextLoadedProvider } from '../app/context';
 
 import {
@@ -28,17 +28,17 @@ jest.mock('@fortawesome/react-native-fontawesome', () => ({
 jest.mock('react-native-localize', () => ({
   getNumberFormatSettings: () => {
     return {
-      decimalSeparator: '.',
-      groupingSeparator: ',',
+      decimalSeparator: '.', // us
+      groupingSeparator: ',', // us
     };
   },
 }));
 jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
 
 // test suite
-describe('Component ImportKey - test', () => {
-  //snapshot test
-  test('Matches the snapshot ImportKey', () => {
+describe('Component Info - test', () => {
+  //unit test
+  test('Info - price with us (.) decimal point', () => {
     const state = {
       navigation: null,
       route: null,
@@ -57,7 +57,6 @@ describe('Component ImportKey - test', () => {
       transactions: null,
       sendPageState: new SendPageState(new ToAddr(0)),
       receivePageState: new ReceivePageState(),
-      info: {} as InfoType,
       rescanning: false,
       wallet_settings: new WalletSettings(),
       syncingStatus: null,
@@ -79,18 +78,32 @@ describe('Component ImportKey - test', () => {
       poolsModalVisible: false,
       newServer: null,
       uaAddress: null,
-      translate: () => 'text translated',
+      info: {
+        testnet: false,
+        serverUri: 'https://zcash.es',
+        latestBlock: 2000100,
+        connections: 0,
+        version: '3.3.3.0',
+        verificationProgress: 0,
+        currencyName: 'ZEC',
+        solps: 0,
+        zecPrice: 33.33,
+        defaultFee: 1000,
+        encrypted: false,
+        locked: false,
+        chain_name: 'mainnet',
+      } as InfoType,
+      translate: () => 'translated text',
       totalBalance: new TotalBalance(),
     };
-    state.info.currencyName = 'ZEC';
     state.totalBalance.total = 1.12345678;
     const onClose = jest.fn();
-    const onImport = jest.fn();
-    const importKey = render(
+    const text: any = render(
       <ContextLoadedProvider value={state}>
-        <ImportKeyModal closeModal={onClose} doImport={onImport} />
+        <Info closeModal={onClose} />
       </ContextLoadedProvider>,
-    );
-    expect(importKey.toJSON()).toMatchSnapshot();
+    ).toJSON();
+    expect(text.type).toBe('RCTSafeAreaView');
+    expect(text.children[1].children[0].children[0].children[5].children[1].children[0]).toBe('$ 33.33');
   });
 });

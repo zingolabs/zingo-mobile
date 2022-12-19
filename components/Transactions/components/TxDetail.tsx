@@ -3,7 +3,7 @@ import React, { useContext, useState } from 'react';
 import { View, ScrollView, TouchableOpacity, SafeAreaView, Linking, Text } from 'react-native';
 import Clipboard from '@react-native-community/clipboard';
 import Toast from 'react-native-simple-toast';
-import Moment from 'react-moment';
+import moment from 'moment';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
@@ -87,9 +87,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
           <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
             <View style={{ display: 'flex' }}>
               <FadeText>{translate('transactions.time')}</FadeText>
-              <Moment interval={0} format="YYYY MMM D h:mm a" element={RegText}>
-                {(tx?.time || 0) * 1000}
-              </Moment>
+              <RegText>{moment((tx?.time || 0) * 1000).format('YYYY MMM D h:mm a')}</RegText>
             </View>
             <View style={{ display: 'flex', alignItems: 'flex-end' }}>
               <FadeText>{translate('transactions.confirmations')}</FadeText>

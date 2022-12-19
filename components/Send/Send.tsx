@@ -1,10 +1,9 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useRef, useCallback, useContext } from 'react';
-import { View, ScrollView, Modal, Image, Alert, Keyboard, TextInput } from 'react-native';
+import { View, ScrollView, Modal, Image, Alert, Keyboard, TextInput, TouchableOpacity } from 'react-native';
 import { faQrcode, faCheck, faInfo } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme } from '@react-navigation/native';
-import { TouchableOpacity } from 'react-native-gesture-handler';
 import Toast from 'react-native-simple-toast';
 import { getNumberFormatSettings } from 'react-native-localize';
 import { faBars } from '@fortawesome/free-solid-svg-icons';

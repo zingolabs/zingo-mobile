@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Component ImportKey - test Matches the snapshot ImportKey 1`] = `
+exports[`Component Rescan - test Rescan - snapshot 1`] = `
 <RCTSafeAreaView
   style={
     {
@@ -118,22 +118,14 @@ exports[`Component ImportKey - test Matches the snapshot ImportKey 1`] = `
       }
     />
   </View>
-  <Modal
-    animationType="slide"
-    hardwareAccelerated={false}
-    onRequestClose={[Function]}
-    transparent={false}
-    visible={false}
-  />
   <RCTScrollView
     contentContainerStyle={
       {
-        "alignItems": "center",
+        "alignItems": "stretch",
         "flexDirection": "column",
         "justifyContent": "flex-start",
       }
     }
-    keyboardShouldPersistTaps="handled"
     style={
       {
         "maxHeight": "85%",
@@ -141,172 +133,30 @@ exports[`Component ImportKey - test Matches the snapshot ImportKey 1`] = `
     }
   >
     <View>
-      <Text
-        style={
-          [
-            {
-              "margin": 10,
-            },
-            {
-              "color": "rgb(28, 28, 30)",
-              "fontSize": 18,
-              "fontWeight": "600",
-              "opacity": 1,
-            },
-          ]
-        }
-      >
-        text translated
-      </Text>
       <View
-        accessibilityLabel="text translated"
-        accessible={true}
         style={
           {
-            "borderColor": "rgb(216, 216, 216)",
-            "borderRadius": 10,
-            "borderWidth": 1,
-            "maxWidth": "95%",
-            "minHeight": 100,
-            "minWidth": "95%",
-            "padding": 10,
+            "display": "flex",
+            "margin": 20,
+            "marginBottom": 30,
           }
         }
       >
-        <TextInput
-          editable={true}
-          multiline={true}
-          onChangeText={[Function]}
+        <Text
           style={
-            {
-              "color": "rgb(28, 28, 30)",
-              "fontWeight": "600",
-              "marginLeft": 5,
-              "minHeight": 100,
-              "minWidth": "95%",
-            }
+            [
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 18,
+                "fontWeight": "600",
+                "opacity": 1,
+              },
+            ]
           }
-          value=""
-        />
+        >
+          text translated1900100text translated
+        </Text>
       </View>
-      <View
-        accessible={true}
-        collapsable={false}
-        focusable={true}
-        onClick={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
-        style={
-          {
-            "opacity": 1,
-          }
-        }
-      >
-        <
-          color="rgb(216, 216, 216)"
-          icon={
-            {
-              "icon": [
-                448,
-                512,
-                [],
-                "f029",
-                "M48 32C21.5 32 0 53.5 0 80v96c0 26.5 21.5 48 48 48h96c26.5 0 48-21.5 48-48V80c0-26.5-21.5-48-48-48H48zm80 64v64H64V96h64zM48 288c-26.5 0-48 21.5-48 48v96c0 26.5 21.5 48 48 48h96c26.5 0 48-21.5 48-48V336c0-26.5-21.5-48-48-48H48zm80 64v64H64V352h64zM256 80v96c0 26.5 21.5 48 48 48h96c26.5 0 48-21.5 48-48V80c0-26.5-21.5-48-48-48H304c-26.5 0-48 21.5-48 48zm64 16h64v64H320V96zm32 352v32h32V448H352zm96 0H416v32h32V448zM416 288v32H352V288H256v96 96h64V384h32v32h96V352 320 288H416z",
-              ],
-              "iconName": "qrcode",
-              "prefix": "fas",
-            }
-          }
-          size={50}
-          style={
-            {
-              "margin": 5,
-            }
-          }
-        />
-      </View>
-      <Text
-        style={
-          [
-            {
-              "marginTop": 50,
-              "textAlign": "center",
-            },
-            {
-              "color": "rgb(28, 28, 30)",
-              "fontSize": 18,
-              "fontWeight": "600",
-              "opacity": 1,
-            },
-          ]
-        }
-      >
-        text translated
-      </Text>
-      <Text
-        style={
-          {
-            "color": "rgb(28, 28, 30)",
-            "opacity": 0.65,
-          }
-        }
-      >
-        text translated
-      </Text>
-      <View
-        accessibilityLabel="text translated"
-        accessible={true}
-        style={
-          {
-            "borderColor": "rgb(216, 216, 216)",
-            "borderRadius": 5,
-            "borderWidth": 1,
-            "margin": 10,
-            "maxWidth": "50%",
-            "minHeight": 48,
-            "minWidth": "50%",
-            "padding": 10,
-          }
-        }
-      >
-        <TextInput
-          editable={true}
-          keyboardType="numeric"
-          onChangeText={[Function]}
-          style={
-            {
-              "color": "rgb(28, 28, 30)",
-              "fontWeight": "600",
-              "marginLeft": 5,
-              "minHeight": 48,
-              "minWidth": "50%",
-            }
-          }
-          value="0"
-        />
-      </View>
-      <Text
-        style={
-          [
-            {
-              "margin": 20,
-              "marginBottom": 30,
-            },
-            {
-              "color": "rgb(28, 28, 30)",
-              "fontSize": 18,
-              "fontWeight": "600",
-              "opacity": 1,
-            },
-          ]
-        }
-      >
-        text translated
-      </Text>
     </View>
   </RCTScrollView>
   <View
