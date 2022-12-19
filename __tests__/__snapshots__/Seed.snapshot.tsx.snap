@@ -1454,6 +1454,7 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
             editable={true}
             keyboardType="numeric"
             onChangeText={[Function]}
+            placeholder="#"
             style={
               {
                 "color": "rgb(28, 28, 30)",

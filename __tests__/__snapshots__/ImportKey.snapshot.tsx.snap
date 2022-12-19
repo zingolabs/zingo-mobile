@@ -277,6 +277,7 @@ exports[`Component ImportKey - test Matches the snapshot ImportKey 1`] = `
           editable={true}
           keyboardType="numeric"
           onChangeText={[Function]}
+          placeholder="#"
           style={
             {
               "color": "rgb(28, 28, 30)",

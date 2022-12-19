@@ -605,6 +605,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                     keyboardType="numeric"
                     maxLength={10}
                     onChangeText={[Function]}
+                    onEndEditing={[Function]}
                     placeholder="#.########"
                     style={
                       {
@@ -688,6 +689,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                     keyboardType="numeric"
                     maxLength={4}
                     onChangeText={[Function]}
+                    onEndEditing={[Function]}
                     placeholder="#.##"
                     style={
                       {
