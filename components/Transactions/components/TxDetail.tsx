@@ -194,7 +194,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
             );
           })}
 
-          {fee && (
+          {fee > 0 && (
             <View style={{ display: 'flex', marginTop: 10 }}>
               <FadeText>{translate('transactions.txfee')}</FadeText>
               <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
