@@ -262,8 +262,9 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                 <TextInput
                   editable={true}
                   keyboardType="numeric"
-                  maxLength={10}
+                  maxLength={20}
                   onChangeText={[Function]}
+                  onEndEditing={[Function]}
                   placeholder="#.########"
                   style={
                     {
@@ -345,8 +346,9 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                 <TextInput
                   editable={true}
                   keyboardType="numeric"
-                  maxLength={4}
+                  maxLength={15}
                   onChangeText={[Function]}
+                  onEndEditing={[Function]}
                   placeholder="#.##"
                   style={
                     {
