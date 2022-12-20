@@ -47,7 +47,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
 
   const { colors } = useTheme() as unknown as ThemeType;
   const [seedPhrase, setSeedPhrase] = useState('');
-  const [birthdayNumber, setBirthdayNumber] = useState(0);
+  const [birthdayNumber, setBirthdayNumber] = useState('');
   const [times, setTimes] = useState(0);
   const [texts, setTexts] = useState({} as TextsType);
   const [readOnly, setReadOnly] = useState(true);
@@ -62,7 +62,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
     );
     setTimes(action === 'change' || action === 'backup' || action === 'server' ? 1 : 0);
     setSeedPhrase(walletSeed?.seed || '');
-    setBirthdayNumber(walletSeed?.birthday || 0);
+    setBirthdayNumber(walletSeed?.birthday?.toString() || '');
   }, [action, walletSeed?.seed, walletSeed?.birthday, walletSeed, translate]);
 
   useEffect(() => {
@@ -243,6 +243,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
                 }}>
                 <TextInput
                   placeholder="#"
+                  placeholderTextColor={colors.placeholder}
                   style={{
                     color: colors.text,
                     fontWeight: '600',
@@ -252,7 +253,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
                     marginLeft: 5,
                   }}
                   value={birthdayNumber.toString()}
-                  onChangeText={(text: string) => setBirthdayNumber(Number(text))}
+                  onChangeText={(text: string) => setBirthdayNumber(text)}
                   editable={true}
                   keyboardType="numeric"
                 />
@@ -294,7 +295,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
               return;
             }
             if (times === 0 || times === 3) {
-              onClickOK(seedPhrase, birthdayNumber);
+              onClickOK(seedPhrase, Number(birthdayNumber));
             } else if (times === 1 || times === 2) {
               setTimes(times + 1);
             }
