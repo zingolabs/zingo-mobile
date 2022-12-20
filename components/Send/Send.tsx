@@ -1001,7 +1001,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                             updateToField(null, e.nativeEvent.text.substring(0, 20), null, null)
                           }
                           editable={true}
-                          maxLength={10}
+                          maxLength={20}
                         />
                       </View>
                       <RegText style={{ marginTop: 15, marginRight: 10, marginLeft: 5 }}>ZEC</RegText>
@@ -1046,7 +1046,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                             updateToField(null, null, e.nativeEvent.text.substring(0, 15), null)
                           }
                           editable={true}
-                          maxLength={4}
+                          maxLength={15}
                         />
                       </View>
                       <RegText style={{ marginTop: 15, marginLeft: 5 }}>USD</RegText>
