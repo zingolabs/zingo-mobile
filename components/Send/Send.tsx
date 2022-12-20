@@ -332,6 +332,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         display: 'flex',
         justifyContent: 'flex-start',
         width: '100%',
+        height: '100%',
         marginBottom: 200,
       }}>
       <Modal
