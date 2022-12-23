@@ -1,18 +1,12 @@
 import React, { ReactNode } from 'react';
 import { StackScreenProps } from '@react-navigation/stack';
 
-import { AppStateLoading, InfoType, TotalBalance, WalletSeed } from '../AppState';
+import { AppStateLoading, DimensionsType, InfoType, TotalBalance, WalletSeed } from '../AppState';
 
-const defaultAppState: AppStateLoading = {
+export const defaultAppStateLoading: AppStateLoading = {
   navigation: {} as StackScreenProps<any>['navigation'],
   route: {} as StackScreenProps<any>['route'],
-  dimensions: {} as {
-    width: number;
-    height: number;
-    orientation: 'portrait' | 'landscape';
-    deviceType: 'tablet' | 'phone';
-    scale: number;
-  },
+  dimensions: {} as DimensionsType,
 
   screen: 0,
   actionButtonsDisabled: false,
@@ -25,7 +19,7 @@ const defaultAppState: AppStateLoading = {
   translate: () => '',
 };
 
-export const ContextLoading = React.createContext(defaultAppState);
+export const ContextLoading = React.createContext(defaultAppStateLoading);
 
 type ContextProviderProps = {
   children: ReactNode;

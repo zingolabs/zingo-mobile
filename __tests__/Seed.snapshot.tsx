@@ -4,28 +4,15 @@
 
 import 'react-native';
 import React from 'react';
-import { StackScreenProps } from '@react-navigation/stack';
 
 import { render } from '@testing-library/react-native';
 import Seed from '../components/Seed';
-import { ContextLoadedProvider, ContextLoadingProvider } from '../app/context';
-
 import {
-  Address,
-  AddressBookEntry,
-  ErrorModalData,
-  InfoType,
-  ReceivePageState,
-  SendPageState,
-  SendProgress,
-  SyncStatus,
-  SyncStatusReport,
-  ToAddr,
-  TotalBalance,
-  Transaction,
-  WalletSeed,
-  WalletSettings,
-} from '../app/AppState';
+  defaultAppStateLoaded,
+  ContextLoadedProvider,
+  defaultAppStateLoading,
+  ContextLoadingProvider,
+} from '../app/context';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -44,64 +31,24 @@ jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
 // test suite
 describe('Component Seed - test', () => {
   //snapshot test
-  const stateLoaded = {
-    navigation: {} as StackScreenProps<any>['navigation'],
-    route: {} as StackScreenProps<any>['route'],
-    dimensions: {} as {
-      width: number;
-      height: number;
-      orientation: 'portrait' | 'landscape';
-      deviceType: 'tablet' | 'phone';
-      scale: number;
-    },
-
-    syncStatusReport: new SyncStatusReport(),
-    addressPrivateKeys: new Map(),
-    addresses: [] as Address[],
-    addressBook: [] as AddressBookEntry[],
-    transactions: [] as Transaction[],
-    sendPageState: new SendPageState(new ToAddr(0)),
-    receivePageState: new ReceivePageState(),
-    info: {} as InfoType,
-    rescanning: false,
-    wallet_settings: new WalletSettings(),
-    syncingStatus: {} as SyncStatus,
-    errorModalData: new ErrorModalData(),
-    sendProgress: new SendProgress(),
-    isMenuDrawerOpen: false,
-    selectedMenuDrawerItem: '' as string,
-    aboutModalVisible: false,
-    computingModalVisible: false,
-    settingsModalVisible: false,
-    infoModalVisible: false,
-    rescanModalVisible: false,
-    seedViewModalVisible: false,
-    seedChangeModalVisible: false,
-    seedBackupModalVisible: false,
-    seedServerModalVisible: false,
-    syncReportModalVisible: false,
-    poolsModalVisible: false,
-    newServer: '' as string,
-    uaAddress: '' as string,
-    translate: (p: string) => {
-      if (p === 'seed.buttontexts') {
-        return {
-          new: [''],
-          change: [''],
-          server: [''],
-          view: [''],
-          restore: [''],
-          backup: [''],
-        };
-      } else {
-        return 'text translated';
-      }
-    },
-    totalBalance: new TotalBalance(),
-    walletSeed: {
-      seed: 'pepe lolo titi',
-      birthday: 1500100,
-    } as WalletSeed,
+  const stateLoaded = defaultAppStateLoaded;
+  stateLoaded.translate = (p: string) => {
+    if (p === 'seed.buttontexts') {
+      return {
+        new: [''],
+        change: [''],
+        server: [''],
+        view: [''],
+        restore: [''],
+        backup: [''],
+      };
+    } else {
+      return 'text translated';
+    }
+  };
+  stateLoaded.walletSeed = {
+    seed: 'pepe lolo titi',
+    birthday: 1500100,
   };
   stateLoaded.info.currencyName = 'ZEC';
   stateLoaded.totalBalance.total = 1.12345678;
@@ -139,42 +86,24 @@ describe('Component Seed - test', () => {
     );
     expect(seed.toJSON()).toMatchSnapshot();
   });
-  const stateLoading = {
-    navigation: {} as StackScreenProps<any>['navigation'],
-    route: {} as StackScreenProps<any>['route'],
-    dimensions: {} as {
-      width: number;
-      height: number;
-      orientation: 'portrait' | 'landscape';
-      deviceType: 'tablet' | 'phone';
-      scale: number;
-    },
-
-    screen: 0,
-    actionButtonsDisabled: false,
-    walletExists: false,
-    server: '' as string,
-    info: {} as InfoType,
-
-    translate: (p: string) => {
-      if (p === 'seed.buttontexts') {
-        return {
-          new: [''],
-          change: [''],
-          server: [''],
-          view: [''],
-          restore: [''],
-          backup: [''],
-        };
-      } else {
-        return 'text translated';
-      }
-    },
-    totalBalance: new TotalBalance(),
-    walletSeed: {
-      seed: 'pepe lolo titi',
-      birthday: 1500100,
-    } as WalletSeed,
+  const stateLoading = defaultAppStateLoading;
+  stateLoading.translate = (p: string) => {
+    if (p === 'seed.buttontexts') {
+      return {
+        new: [''],
+        change: [''],
+        server: [''],
+        view: [''],
+        restore: [''],
+        backup: [''],
+      };
+    } else {
+      return 'text translated';
+    }
+  };
+  stateLoading.walletSeed = {
+    seed: 'pepe lolo titi',
+    birthday: 1500100,
   };
   stateLoading.totalBalance.total = 1.12345678;
   test('Seed New - snapshot', () => {

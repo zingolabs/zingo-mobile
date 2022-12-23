@@ -15,36 +15,33 @@ import {
   InfoType,
   SyncStatus,
   WalletSeed,
+  DimensionsType,
+  Address,
+  AddressBookEntry,
 } from '../AppState';
 
-const defaultAppState: AppStateLoaded = {
+export const defaultAppStateLoaded: AppStateLoaded = {
   navigation: {} as StackScreenProps<any>['navigation'],
   route: {} as StackScreenProps<any>['route'],
-  dimensions: {} as {
-    width: number;
-    height: number;
-    orientation: 'portrait' | 'landscape';
-    deviceType: 'tablet' | 'phone';
-    scale: number;
-  },
+  dimensions: {} as DimensionsType,
 
   syncStatusReport: new SyncStatusReport(),
   totalBalance: new TotalBalance(),
   addressPrivateKeys: new Map(),
-  addresses: [],
-  addressBook: [],
+  addresses: [] as Address[],
+  addressBook: [] as AddressBookEntry[],
   transactions: [] as Transaction[],
   sendPageState: new SendPageState(new ToAddr(0)),
-  receivePageState: new ReceivePageState(),
+  receivePageState: new ReceivePageState(''),
   info: {} as InfoType,
   rescanning: false,
   wallet_settings: new WalletSettings(),
   syncingStatus: {} as SyncStatus,
-  errorModalData: new ErrorModalData(),
-  sendProgress: new SendProgress(),
+  errorModalData: new ErrorModalData('', ''),
+  sendProgress: new SendProgress(0, 0, 0),
   walletSeed: {} as WalletSeed,
   isMenuDrawerOpen: false,
-  selectedMenuDrawerItem: '',
+  selectedMenuDrawerItem: '' as string,
   aboutModalVisible: false,
   computingModalVisible: false,
   settingsModalVisible: false,
@@ -62,7 +59,7 @@ const defaultAppState: AppStateLoaded = {
   translate: () => '',
 };
 
-export const ContextLoaded = React.createContext(defaultAppState);
+export const ContextLoaded = React.createContext(defaultAppStateLoaded);
 
 type ContextProviderProps = {
   children: ReactNode;

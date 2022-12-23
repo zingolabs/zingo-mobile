@@ -14,17 +14,12 @@ import InfoType from './InfoType';
 import WalletSeed from './WalletSeed';
 import WalletSettings from './WalletSettings';
 import SyncStatus from './SyncStatus';
+import DimensionsType from './DimensionsType';
 
 export default interface AppStateLoaded {
   navigation: StackScreenProps<any>['navigation'];
   route: StackScreenProps<any>['route'];
-  dimensions: {
-    width: number;
-    height: number;
-    orientation: 'portrait' | 'landscape';
-    deviceType: 'tablet' | 'phone';
-    scale: number;
-  };
+  dimensions: DimensionsType;
 
   // Info about the current sync process
   syncStatusReport: SyncStatusReport;

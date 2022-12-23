@@ -11,6 +11,7 @@ import {
   I18nManager,
   Dimensions,
   EmitterSubscription,
+  ScaledSize,
 } from 'react-native';
 import Toast from 'react-native-simple-toast';
 import { useTheme } from '@react-navigation/native';
@@ -22,12 +23,12 @@ import { StackScreenProps } from '@react-navigation/stack';
 import BoldText from '../../components/Components/BoldText';
 import Button from '../../components/Button';
 import RPCModule from '../../components/RPCModule';
-import { TotalBalance, SettingsFileEntry, AppStateLoading, WalletSeed, InfoType } from '../AppState';
+import { SettingsFileEntry, AppStateLoading, WalletSeed } from '../AppState';
 import { serverUris } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import RPC from '../rpc';
 import { ThemeType } from '../types';
-import { ContextLoadingProvider } from '../context';
+import { defaultAppStateLoading, ContextLoadingProvider } from '../context';
 import platform from '../platform/platform';
 
 const Seed = React.lazy(() => import('../../components/Seed'));
@@ -116,31 +117,18 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
   constructor(props: Readonly<LoadingAppClassProps>) {
     super(props);
 
-    this.state = {
-      navigation: props.navigation,
-      route: props.route,
-      dimensions: {
-        width: Number(Dimensions.get('screen').width.toFixed(0)),
-        height: Number(Dimensions.get('screen').height.toFixed(0)),
-        orientation: platform.isPortrait(Dimensions.get('screen')) ? 'portrait' : 'landscape',
-        deviceType: platform.isTablet(Dimensions.get('screen')) ? 'tablet' : 'phone',
-        scale: Number(Dimensions.get('screen').scale.toFixed(2)),
-      },
-
-      screen: 0,
-      actionButtonsDisabled: false,
-      walletExists: false,
-      walletSeed: {} as WalletSeed,
-      server: '',
-      totalBalance: new TotalBalance(),
-      info: {} as InfoType,
-      translate: props.translate,
-    };
+    this.state = defaultAppStateLoading;
 
     this.dim = {} as EmitterSubscription;
   }
 
   componentDidMount = async () => {
+    this.setDimensions(Dimensions.get('screen'));
+    this.setState({
+      navigation: this.props.navigation,
+      route: this.props.route,
+      translate: this.props.translate,
+    });
     // First, check if a wallet exists. Do it async so the basic screen has time to render
     setTimeout(async () => {
       // reading Info
@@ -149,15 +137,16 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
         this.setState({ info });
       }
       // read settings file
-      let settings: SettingsFileEntry = {};
+      let settings = {} as SettingsFileEntry;
       if (!this.state.server) {
         settings = await SettingsFileImpl.readSettings();
         if (!!settings && !!settings.server) {
           this.setState({ server: settings.server });
         } else {
           settings.server = SERVER_DEFAULT_0;
+          settings.language = '';
           this.setState({ server: SERVER_DEFAULT_0 });
-          await SettingsFileImpl.writeSettings(new SettingsFileEntry(SERVER_DEFAULT_0));
+          await SettingsFileImpl.writeSettings(settings);
         }
       }
 
@@ -182,15 +171,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
     });
 
     this.dim = Dimensions.addEventListener('change', ({ screen }) => {
-      this.setState({
-        dimensions: {
-          width: Number(screen.width.toFixed(0)),
-          height: Number(screen.height.toFixed(0)),
-          orientation: platform.isPortrait(screen) ? 'portrait' : 'landscape',
-          deviceType: platform.isTablet(screen) ? 'tablet' : 'phone',
-          scale: Number(screen.scale.toFixed(2)),
-        },
-      });
+      this.setDimensions(screen);
       //console.log('++++++++++++++++++++++++++++++++++ change dims', Dimensions.get('screen'));
     });
   };
@@ -199,15 +180,29 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
     this.dim?.remove();
   };
 
+  setDimensions = (screen: ScaledSize) => {
+    this.setState({
+      dimensions: {
+        width: Number(screen.width.toFixed(0)),
+        height: Number(screen.height.toFixed(0)),
+        orientation: platform.isPortrait(screen) ? 'portrait' : 'landscape',
+        deviceType: platform.isTablet(screen) ? 'tablet' : 'phone',
+        scale: Number(screen.scale.toFixed(2)),
+      },
+    });
+  };
+
   useDefaultServer_0 = async () => {
     this.setState({ actionButtonsDisabled: true });
-    await SettingsFileImpl.writeSettings(new SettingsFileEntry(SERVER_DEFAULT_0));
+    const language = '';
+    await SettingsFileImpl.writeSettings(new SettingsFileEntry(SERVER_DEFAULT_0, language));
     this.setState({ server: SERVER_DEFAULT_0, actionButtonsDisabled: false });
   };
 
   useDefaultServer_1 = async () => {
     this.setState({ actionButtonsDisabled: true });
-    await SettingsFileImpl.writeSettings(new SettingsFileEntry(SERVER_DEFAULT_0));
+    const language = '';
+    await SettingsFileImpl.writeSettings(new SettingsFileEntry(SERVER_DEFAULT_0, language));
     this.setState({ server: SERVER_DEFAULT_1, actionButtonsDisabled: false });
   };
 

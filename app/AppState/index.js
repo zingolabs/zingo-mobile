@@ -2,6 +2,7 @@ import Address from './Address';
 import AddressBookEntry from './AddressBookEntry';
 import AppStateLoaded from './AppStateLoaded';
 import AppStateLoading from './AppStateLoading';
+import DimensionsType from './DimensionsType';
 import ErrorModalData from './ErrorModalData';
 import InfoType from './InfoType';
 import ReceivePageState from './ReceivePageState';
@@ -24,6 +25,7 @@ export {
   AppStateLoading,
   Address,
   AddressBookEntry,
+  DimensionsType,
   ErrorModalData,
   InfoType,
   ReceivePageState,

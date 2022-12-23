@@ -147,7 +147,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ set_wallet_option, s
           <View style={{ display: 'flex', flexDirection: 'row' }}>
             <TouchableOpacity
               style={{ marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
-              onPress={() => setServer(undefined)}>
+              onPress={() => setServer('')}>
               <View style={{ display: 'flex', flexDirection: 'row', marginTop: 10 }}>
                 {customIcon && <FontAwesomeIcon icon={customIcon} size={20} color={colors.border} />}
                 <RegText style={{ marginLeft: 10 }}>{translate('settings.custom')}</RegText>

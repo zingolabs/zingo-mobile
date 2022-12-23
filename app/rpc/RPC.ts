@@ -1030,7 +1030,7 @@ export default class RPC {
         const progress = await JSON.parse(pro);
         const sendId = progress.id;
 
-        const updatedProgress = new SendProgress();
+        const updatedProgress = new SendProgress(0, 0, 0);
         if (sendId === prevSendId) {
           //console.log('progress id', sendId);
           // Still not started, so wait for more time

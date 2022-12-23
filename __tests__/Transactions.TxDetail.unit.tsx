@@ -4,29 +4,11 @@
 
 import 'react-native';
 import React from 'react';
-import { StackScreenProps } from '@react-navigation/stack';
 
 import { render } from '@testing-library/react-native';
 import TxDetail from '../components/Transactions/components/TxDetail';
-import { ContextLoadedProvider } from '../app/context';
-
-import {
-  Address,
-  AddressBookEntry,
-  ErrorModalData,
-  InfoType,
-  ReceivePageState,
-  SendPageState,
-  SendProgress,
-  SyncStatus,
-  SyncStatusReport,
-  ToAddr,
-  TotalBalance,
-  Transaction,
-  TxDetailType,
-  WalletSeed,
-  WalletSettings,
-} from '../app/AppState';
+import { defaultAppStateLoaded, ContextLoadedProvider } from '../app/context';
+import { Transaction, TxDetailType } from '../app/AppState';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -56,49 +38,8 @@ jest.mock('moment', () => () => ({
 // test suite
 describe('Component Transactions TxDetail - test', () => {
   //unit test
-  const state = {
-    navigation: {} as StackScreenProps<any>['navigation'],
-    route: {} as StackScreenProps<any>['route'],
-    dimensions: {} as {
-      width: number;
-      height: number;
-      orientation: 'portrait' | 'landscape';
-      deviceType: 'tablet' | 'phone';
-      scale: number;
-    },
-
-    syncStatusReport: new SyncStatusReport(),
-    addressPrivateKeys: new Map(),
-    addresses: [] as Address[],
-    addressBook: [] as AddressBookEntry[],
-    transactions: [] as Transaction[],
-    sendPageState: new SendPageState(new ToAddr(0)),
-    receivePageState: new ReceivePageState(),
-    rescanning: false,
-    wallet_settings: new WalletSettings(),
-    syncingStatus: {} as SyncStatus,
-    errorModalData: new ErrorModalData(),
-    sendProgress: new SendProgress(),
-    walletSeed: {} as WalletSeed,
-    isMenuDrawerOpen: false,
-    selectedMenuDrawerItem: '',
-    aboutModalVisible: false,
-    computingModalVisible: false,
-    settingsModalVisible: false,
-    infoModalVisible: false,
-    rescanModalVisible: false,
-    seedViewModalVisible: false,
-    seedChangeModalVisible: false,
-    seedBackupModalVisible: false,
-    seedServerModalVisible: false,
-    syncReportModalVisible: false,
-    poolsModalVisible: false,
-    newServer: '' as string,
-    uaAddress: '' as string,
-    info: {} as InfoType,
-    translate: () => 'translated text',
-    totalBalance: new TotalBalance(),
-  };
+  const state = defaultAppStateLoaded;
+  state.translate = () => 'translated text';
   const onClose = jest.fn();
   test('Transactions TxDetail - normal sent transaction', () => {
     state.info.currencyName = 'ZEC';

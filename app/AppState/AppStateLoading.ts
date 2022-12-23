@@ -4,17 +4,12 @@ import { StackScreenProps } from '@react-navigation/stack';
 import TotalBalance from './TotalBalance';
 import InfoType from './InfoType';
 import WalletSeed from './WalletSeed';
+import DimensionsType from './DimensionsType';
 
 export default interface AppStateLoading {
   navigation: StackScreenProps<any>['navigation'];
   route: StackScreenProps<any>['route'];
-  dimensions: {
-    width: number;
-    height: number;
-    orientation: 'portrait' | 'landscape';
-    deviceType: 'tablet' | 'phone';
-    scale: number;
-  };
+  dimensions: DimensionsType;
 
   screen: number;
   actionButtonsDisabled: boolean;

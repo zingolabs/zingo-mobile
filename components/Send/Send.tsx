@@ -284,7 +284,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       if (progress && progress.sendInProgress) {
         setSendProgress(progress);
       } else {
-        setSendProgress(new SendProgress());
+        setSendProgress(new SendProgress(0, 0, 0));
       }
     };
 
