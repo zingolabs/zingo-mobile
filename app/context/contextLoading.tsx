@@ -1,10 +1,11 @@
 import React, { ReactNode } from 'react';
+import { StackScreenProps } from '@react-navigation/stack';
 
-import { AppStateLoading, TotalBalance } from '../AppState';
+import { AppStateLoading, InfoType, TotalBalance, WalletSeed } from '../AppState';
 
 const defaultAppState: AppStateLoading = {
-  navigation: null,
-  route: null,
+  navigation: {} as StackScreenProps<any>['navigation'],
+  route: {} as StackScreenProps<any>['route'],
   dimensions: {} as {
     width: number;
     height: number;
@@ -16,12 +17,12 @@ const defaultAppState: AppStateLoading = {
   screen: 0,
   actionButtonsDisabled: false,
   walletExists: false,
-  walletSeed: null,
-  server: null,
+  walletSeed: {} as WalletSeed,
+  server: '' as string,
   totalBalance: new TotalBalance(),
-  info: null,
+  info: {} as InfoType,
 
-  translate: () => {},
+  translate: () => '',
 };
 
 export const ContextLoading = React.createContext(defaultAppState);

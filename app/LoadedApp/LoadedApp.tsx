@@ -9,6 +9,7 @@ import Toast from 'react-native-simple-toast';
 import { I18n, TranslateOptions } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
 import { memoize, isEqual } from 'lodash';
+import { StackScreenProps } from '@react-navigation/stack';
 
 import RPC from '../rpc';
 import RPCModule from '../../components/RPCModule';
@@ -28,6 +29,8 @@ import {
   WalletSettings,
   SettingsFileEntry,
   Address,
+  AddressBookEntry,
+  WalletSeed,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
@@ -64,8 +67,8 @@ const useForceUpdate = () => {
 };
 
 type LoadedAppProps = {
-  navigation: any;
-  route: any;
+  navigation: StackScreenProps<any>['navigation'];
+  route: StackScreenProps<any>['route'];
 };
 
 export default function LoadedApp(props: LoadedAppProps) {
@@ -122,15 +125,15 @@ export default function LoadedApp(props: LoadedAppProps) {
 }
 
 type LoadedAppClassProps = {
-  navigation: any;
-  route: any;
+  navigation: StackScreenProps<any>['navigation'];
+  route: StackScreenProps<any>['route'];
   translate: (key: string, config?: TranslateOptions) => any;
   theme: ThemeType;
 };
 
 class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   rpc: RPC;
-  dim: EmitterSubscription | null;
+  dim: EmitterSubscription;
 
   constructor(props: any) {
     super(props);
@@ -149,20 +152,20 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       syncStatusReport: new SyncStatusReport(),
       totalBalance: new TotalBalance(),
       addressPrivateKeys: new Map(),
-      addresses: [],
-      addressBook: [],
-      transactions: null,
+      addresses: [] as Address[],
+      addressBook: [] as AddressBookEntry[],
+      transactions: [] as Transaction[],
       sendPageState: new SendPageState(new ToAddr(Utils.getNextToAddrID())),
       receivePageState: new ReceivePageState(),
-      info: null,
+      info: {} as InfoType,
       rescanning: false,
       wallet_settings: new WalletSettings(),
-      syncingStatus: null,
+      syncingStatus: {} as SyncStatus,
       errorModalData: new ErrorModalData(),
-      txBuildProgress: new SendProgress(),
-      walletSeed: null,
+      sendProgress: new SendProgress(),
+      walletSeed: {} as WalletSeed,
       isMenuDrawerOpen: false,
-      selectedMenuDrawerItem: '',
+      selectedMenuDrawerItem: '' as string,
       aboutModalVisible: false,
       computingModalVisible: false,
       settingsModalVisible: false,
@@ -174,8 +177,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       seedServerModalVisible: false,
       syncReportModalVisible: false,
       poolsModalVisible: false,
-      newServer: null,
-      uaAddress: null,
+      newServer: '' as string,
+      uaAddress: '' as string,
 
       translate: props.translate,
     };
@@ -191,7 +194,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       this.refreshUpdates,
       props.translate,
     );
-    this.dim = null;
+    this.dim = {} as EmitterSubscription;
   }
 
   componentDidMount = () => {
@@ -259,9 +262,9 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
   setAllAddresses = (addresses: Address[]) => {
     const { uaAddress } = this.state;
-    if (!isEqual(this.state.addresses, addresses) || uaAddress === null) {
+    if (!isEqual(this.state.addresses, addresses) || uaAddress === '') {
       //console.log('addresses');
-      if (uaAddress === null) {
+      if (uaAddress === '') {
         this.setState({ addresses, uaAddress: addresses[0].uaAddress });
       } else {
         this.setState({ addresses });
@@ -298,7 +301,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     this.setSendPageState(newState);
   };
 
-  setZecPrice = (price: number | null) => {
+  setZecPrice = (price: number) => {
     //console.log(`Price = ${price}`);
     const { info } = this.state;
 
@@ -318,8 +321,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     this.setState({ computingModalVisible: visible });
   };
 
-  setTxBuildProgress = (progress: SendProgress) => {
-    this.setState({ txBuildProgress: progress });
+  setSendProgress = (progress: SendProgress) => {
+    this.setState({ sendProgress: progress });
   };
 
   setInfo = (newInfo: InfoType) => {
@@ -368,7 +371,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     return json;
   };
 
-  sendTransaction = async (setSendProgress: (arg0: SendProgress | null) => void): Promise<String> => {
+  sendTransaction = async (setSendProgress: (arg0: SendProgress) => void): Promise<String> => {
     try {
       // Construct a sendJson from the sendPage state
       const sendJson = this.getSendManyJSON();
@@ -382,12 +385,12 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   };
 
   // Get a single private key for this address, and return it as a string.
-  getPrivKeyAsString = async (address: string): Promise<string | null> => {
+  getPrivKeyAsString = async (address: string): Promise<string> => {
     const pk = await RPC.rpc_getPrivKeyAsString(address);
     if (pk) {
       return pk;
     }
-    return null;
+    return '';
   };
 
   // Getter methods, which are called by the components to update the state
@@ -444,7 +447,9 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
   fetchWalletSeedAndBirthday = async () => {
     const walletSeed = await RPC.rpc_fetchSeedAndBirthday();
-    this.setState({ walletSeed });
+    if (walletSeed) {
+      this.setState({ walletSeed });
+    }
   };
 
   startRescan = () => {
@@ -912,7 +917,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                       setSendPageState={this.setSendPageState}
                       sendTransaction={this.sendTransaction}
                       clearToAddr={this.clearToAddr}
-                      setTxBuildProgress={this.setTxBuildProgress}
+                      setSendProgress={this.setSendProgress}
                       toggleMenuDrawer={this.toggleMenuDrawer}
                       setComputingModalVisible={this.setComputingModalVisible}
                       syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}

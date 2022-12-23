@@ -2,10 +2,8 @@ import Address from './Address';
 import AddressBookEntry from './AddressBookEntry';
 import AppStateLoaded from './AppStateLoaded';
 import AppStateLoading from './AppStateLoading';
-import ConnectedCompanionApp from './ConnectedCompanionApp';
 import ErrorModalData from './ErrorModalData';
 import InfoType from './InfoType';
-import PasswordState from './PasswordState';
 import ReceivePageState from './ReceivePageState';
 import SendJsonToType from './SendJsonToType';
 import SendPageState from './SendPageState';
@@ -26,10 +24,8 @@ export {
   AppStateLoading,
   Address,
   AddressBookEntry,
-  ConnectedCompanionApp,
   ErrorModalData,
   InfoType,
-  PasswordState,
   ReceivePageState,
   SendJsonToType,
   SendPageState,

@@ -4,20 +4,25 @@
 
 import 'react-native';
 import React from 'react';
+import { StackScreenProps } from '@react-navigation/stack';
 
 import { render } from '@testing-library/react-native';
 import Receive from '../components/Receive';
 import { ContextLoadedProvider } from '../app/context';
 
 import {
+  AddressBookEntry,
   ErrorModalData,
   InfoType,
   ReceivePageState,
   SendPageState,
   SendProgress,
+  SyncStatus,
   SyncStatusReport,
   ToAddr,
   TotalBalance,
+  Transaction,
+  WalletSeed,
   WalletSettings,
 } from '../app/AppState';
 
@@ -45,24 +50,24 @@ describe('Component Receive - test', () => {
   //snapshot test
   test('Receive Portrait - snapshot', () => {
     const state = {
-      navigation: null,
-      route: null,
+      navigation: {} as StackScreenProps<any>['navigation'],
+      route: {} as StackScreenProps<any>['route'],
 
       syncStatusReport: new SyncStatusReport(),
       addressPrivateKeys: new Map(),
-      addressBook: [],
-      transactions: null,
+      addressBook: [] as AddressBookEntry[],
+      transactions: [] as Transaction[],
       sendPageState: new SendPageState(new ToAddr(0)),
       receivePageState: new ReceivePageState(),
       info: {} as InfoType,
       rescanning: false,
       wallet_settings: new WalletSettings(),
-      syncingStatus: null,
+      syncingStatus: {} as SyncStatus,
       errorModalData: new ErrorModalData(),
-      txBuildProgress: new SendProgress(),
-      walletSeed: null,
+      sendProgress: new SendProgress(),
+      walletSeed: {} as WalletSeed,
       isMenuDrawerOpen: false,
-      selectedMenuDrawerItem: '',
+      selectedMenuDrawerItem: '' as string,
       aboutModalVisible: false,
       computingModalVisible: false,
       settingsModalVisible: false,
@@ -74,7 +79,7 @@ describe('Component Receive - test', () => {
       seedServerModalVisible: false,
       syncReportModalVisible: false,
       poolsModalVisible: false,
-      newServer: null,
+      newServer: '' as string,
       uaAddress: 'UA-12345678901234567890',
       addresses: [
         {

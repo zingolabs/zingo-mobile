@@ -4,22 +4,27 @@
 
 import 'react-native';
 import React from 'react';
+import { StackScreenProps } from '@react-navigation/stack';
 
 import { render } from '@testing-library/react-native';
 import TxDetail from '../components/Transactions/components/TxDetail';
 import { ContextLoadedProvider } from '../app/context';
 
 import {
+  Address,
+  AddressBookEntry,
   ErrorModalData,
   InfoType,
   ReceivePageState,
   SendPageState,
   SendProgress,
+  SyncStatus,
   SyncStatusReport,
   ToAddr,
   TotalBalance,
   Transaction,
   TxDetailType,
+  WalletSeed,
   WalletSettings,
 } from '../app/AppState';
 
@@ -52,8 +57,8 @@ jest.mock('moment', () => () => ({
 describe('Component Transactions TxDetail - test', () => {
   //unit test
   const state = {
-    navigation: null,
-    route: null,
+    navigation: {} as StackScreenProps<any>['navigation'],
+    route: {} as StackScreenProps<any>['route'],
     dimensions: {} as {
       width: number;
       height: number;
@@ -64,17 +69,17 @@ describe('Component Transactions TxDetail - test', () => {
 
     syncStatusReport: new SyncStatusReport(),
     addressPrivateKeys: new Map(),
-    addresses: [],
-    addressBook: [],
-    transactions: null,
+    addresses: [] as Address[],
+    addressBook: [] as AddressBookEntry[],
+    transactions: [] as Transaction[],
     sendPageState: new SendPageState(new ToAddr(0)),
     receivePageState: new ReceivePageState(),
     rescanning: false,
     wallet_settings: new WalletSettings(),
-    syncingStatus: null,
+    syncingStatus: {} as SyncStatus,
     errorModalData: new ErrorModalData(),
-    txBuildProgress: new SendProgress(),
-    walletSeed: null,
+    sendProgress: new SendProgress(),
+    walletSeed: {} as WalletSeed,
     isMenuDrawerOpen: false,
     selectedMenuDrawerItem: '',
     aboutModalVisible: false,
@@ -88,8 +93,8 @@ describe('Component Transactions TxDetail - test', () => {
     seedServerModalVisible: false,
     syncReportModalVisible: false,
     poolsModalVisible: false,
-    newServer: null,
-    uaAddress: null,
+    newServer: '' as string,
+    uaAddress: '' as string,
     info: {} as InfoType,
     translate: () => 'translated text',
     totalBalance: new TotalBalance(),

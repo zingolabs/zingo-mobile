@@ -17,11 +17,12 @@ import { useTheme } from '@react-navigation/native';
 import { I18n, TranslateOptions } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
 import { memoize } from 'lodash';
+import { StackScreenProps } from '@react-navigation/stack';
 
 import BoldText from '../../components/Components/BoldText';
 import Button from '../../components/Button';
 import RPCModule from '../../components/RPCModule';
-import { TotalBalance, SettingsFileEntry, AppStateLoading } from '../AppState';
+import { TotalBalance, SettingsFileEntry, AppStateLoading, WalletSeed, InfoType } from '../AppState';
 import { serverUris } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import RPC from '../rpc';
@@ -43,8 +44,8 @@ const useForceUpdate = () => {
 };
 
 type LoadingAppProps = {
-  navigation: any;
-  route: any;
+  navigation: StackScreenProps<any>['navigation'];
+  route: StackScreenProps<any>['route'];
 };
 
 export default function LoadingApp(props: LoadingAppProps) {
@@ -101,8 +102,8 @@ export default function LoadingApp(props: LoadingAppProps) {
 }
 
 type LoadingAppClassProps = {
-  navigation: any;
-  route: any;
+  navigation: StackScreenProps<any>['navigation'];
+  route: StackScreenProps<any>['route'];
   translate: (key: string, config?: TranslateOptions) => any;
   theme: ThemeType;
 };
@@ -111,7 +112,7 @@ const SERVER_DEFAULT_0 = serverUris()[0];
 const SERVER_DEFAULT_1 = serverUris()[1];
 
 class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
-  dim: EmitterSubscription | null;
+  dim: EmitterSubscription;
   constructor(props: Readonly<LoadingAppClassProps>) {
     super(props);
 
@@ -129,14 +130,14 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
       screen: 0,
       actionButtonsDisabled: false,
       walletExists: false,
-      walletSeed: null,
+      walletSeed: {} as WalletSeed,
       server: '',
       totalBalance: new TotalBalance(),
-      info: null,
+      info: {} as InfoType,
       translate: props.translate,
     };
 
-    this.dim = null;
+    this.dim = {} as EmitterSubscription;
   }
 
   componentDidMount = async () => {
@@ -144,7 +145,9 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
     setTimeout(async () => {
       // reading Info
       const info = await RPC.rpc_getInfoObject();
-      this.setState({ info });
+      if (info) {
+        this.setState({ info });
+      }
       // read settings file
       let settings: SettingsFileEntry = {};
       if (!this.state.server) {
@@ -234,7 +237,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
   };
 
   getwalletSeedToRestore = async () => {
-    this.setState({ walletSeed: null, screen: 3, walletExists: false });
+    this.setState({ walletSeed: {} as WalletSeed, screen: 3, walletExists: false });
   };
 
   getViewingKeyToRestore = async () => {
@@ -248,7 +251,6 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
   };
 
   doRestore = async (seed: string, birthday: number) => {
-    // Don't call with null values
     const { server } = this.state;
 
     if (!seed) {

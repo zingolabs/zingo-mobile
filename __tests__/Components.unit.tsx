@@ -26,8 +26,8 @@ jest.mock('react-native-localize', () => ({
 // test suite
 describe('Component Components - test', () => {
   //unit test
-  test('UsdAmount - price null result $ -- USD', () => {
-    const text: any = render(<UsdAmount price={null} amtZec={1} style={{}} />).toJSON();
+  test('UsdAmount - price undefined result $ -- USD', () => {
+    const text: any = render(<UsdAmount amtZec={1} style={{}} />).toJSON();
     expect(text.type).toBe('View');
     expect(text.children[0].children[0]).toBe('$');
     expect(text.children[1].children[0]).toBe(' --');

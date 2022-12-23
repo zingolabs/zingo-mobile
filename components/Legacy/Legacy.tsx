@@ -39,7 +39,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance, toggl
   const [zindex, setZIndex] = useState(0);
   const [tindex, setTIndex] = useState(0);
 
-  const zecPrice = info ? info.zecPrice : null;
+  const zecPrice = info && info.zecPrice;
 
   const zaddrs = addresses.filter(a => a.uaAddress === uaAddress && a.addressKind === 'z') || [];
   const taddrs = addresses.filter(a => a.uaAddress === uaAddress && a.addressKind === 't') || [];

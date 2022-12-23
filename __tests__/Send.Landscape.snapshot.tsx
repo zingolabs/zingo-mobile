@@ -4,6 +4,7 @@
 
 import 'react-native';
 import React from 'react';
+import { StackScreenProps } from '@react-navigation/stack';
 
 import { render } from '@testing-library/react-native';
 import Send from '../components/Send';
@@ -11,15 +12,18 @@ import { ContextLoadedProvider } from '../app/context';
 
 import {
   Address,
+  AddressBookEntry,
   ErrorModalData,
   InfoType,
   ReceivePageState,
   SendPageState,
   SendProgress,
+  SyncStatus,
   SyncStatusReport,
   ToAddr,
   TotalBalance,
   Transaction,
+  WalletSeed,
   WalletSettings,
 } from '../app/AppState';
 
@@ -52,12 +56,12 @@ describe('Component Send - test', () => {
   //snapshot test
   test('Send Landscape - snapshot', () => {
     const state = {
-      navigation: null,
-      route: null,
+      navigation: {} as StackScreenProps<any>['navigation'],
+      route: {} as StackScreenProps<any>['route'],
 
       syncStatusReport: new SyncStatusReport(),
       addressPrivateKeys: new Map(),
-      addressBook: [],
+      addressBook: [] as AddressBookEntry[],
       transactions: [
         {
           type: 'sent',
@@ -87,12 +91,12 @@ describe('Component Send - test', () => {
       info: {} as InfoType,
       rescanning: false,
       wallet_settings: new WalletSettings(),
-      syncingStatus: null,
+      syncingStatus: {} as SyncStatus,
       errorModalData: new ErrorModalData(),
-      txBuildProgress: new SendProgress(),
-      walletSeed: null,
+      sendProgress: new SendProgress(),
+      walletSeed: {} as WalletSeed,
       isMenuDrawerOpen: false,
-      selectedMenuDrawerItem: '',
+      selectedMenuDrawerItem: '' as string,
       aboutModalVisible: false,
       computingModalVisible: false,
       settingsModalVisible: false,
@@ -104,7 +108,7 @@ describe('Component Send - test', () => {
       seedServerModalVisible: false,
       syncReportModalVisible: false,
       poolsModalVisible: false,
-      newServer: null,
+      newServer: '' as string,
       uaAddress: 'UA-12345678901234567890',
       addresses: [
         {
@@ -166,7 +170,7 @@ describe('Component Send - test', () => {
           setSendPageState={onFunction}
           sendTransaction={onFunction}
           clearToAddr={onFunction}
-          setTxBuildProgress={onFunction}
+          setSendProgress={onFunction}
           toggleMenuDrawer={onFunction}
           setComputingModalVisible={onFunction}
           poolsMoreInfoOnClick={onFunction}

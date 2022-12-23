@@ -31,7 +31,7 @@ type SeedProps = {
 const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, action }) => {
   const contextLoaded = useContext(ContextLoaded);
   const contextLoading = useContext(ContextLoading);
-  let walletSeed: WalletSeed | null, totalBalance, translate: (key: string, config?: TranslateOptions) => any, info;
+  let walletSeed: WalletSeed, totalBalance, translate: (key: string, config?: TranslateOptions) => any, info;
   if (action === 'new' || action === 'restore') {
     walletSeed = contextLoading.walletSeed;
     totalBalance = contextLoading.totalBalance;

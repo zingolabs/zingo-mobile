@@ -7,7 +7,7 @@ export default interface InfoType {
   verificationProgress: number;
   currencyName: string;
   solps: number;
-  zecPrice: number | null;
+  zecPrice: number;
   defaultFee: number;
   // eslint-disable-next-line semi
 }

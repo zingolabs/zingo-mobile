@@ -106,7 +106,7 @@ export default class Utils {
     return 'Thanks for supporting Zingo!';
   }
 
-  static getZecToUsdString(price: number | null, zecValue: number | null): string {
+  static getZecToUsdString(price: number, zecValue: number): string {
     if (!price || !zecValue) {
       return 'USD --';
     }

@@ -46,7 +46,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   const [displayAddress, setDisplayAddress] = useState(uaAddress);
   const [oindex, setOIndex] = useState(0);
 
-  const zecPrice = info ? info.zecPrice : null;
+  const zecPrice = info && info.zecPrice;
 
   const uaddrs = addresses.filter(a => a.addressKind === 'u') || [];
 

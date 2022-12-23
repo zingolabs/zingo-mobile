@@ -7,7 +7,7 @@ import Utils from '../../app/utils';
 import { ThemeType } from '../../app/types';
 
 type UsdAmountProps = {
-  price?: number | null;
+  price?: number;
   amtZec?: number;
   style?: any;
 };

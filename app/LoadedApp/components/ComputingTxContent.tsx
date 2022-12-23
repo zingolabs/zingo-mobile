@@ -10,7 +10,7 @@ import { ContextLoaded } from '../../context';
 
 const ComputingTxContent: React.FunctionComponent = () => {
   const context = useContext(ContextLoaded);
-  const { txBuildProgress: progress, translate } = context;
+  const { sendProgress: progress, translate } = context;
   const { colors } = useTheme() as unknown as ThemeType;
 
   return (

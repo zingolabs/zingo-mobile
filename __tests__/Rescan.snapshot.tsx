@@ -4,20 +4,25 @@
 
 import 'react-native';
 import React from 'react';
+import { StackScreenProps } from '@react-navigation/stack';
 
 import { render } from '@testing-library/react-native';
 import Rescan from '../components/Rescan';
 import { ContextLoadedProvider } from '../app/context';
 
 import {
+  Address,
+  AddressBookEntry,
   ErrorModalData,
   InfoType,
   ReceivePageState,
   SendPageState,
   SendProgress,
+  SyncStatus,
   SyncStatusReport,
   ToAddr,
   TotalBalance,
+  Transaction,
   WalletSeed,
   WalletSettings,
 } from '../app/AppState';
@@ -40,8 +45,8 @@ jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
 describe('Component Rescan - test', () => {
   //snapshot test
   const state = {
-    navigation: null,
-    route: null,
+    navigation: {} as StackScreenProps<any>['navigation'],
+    route: {} as StackScreenProps<any>['route'],
     dimensions: {} as {
       width: number;
       height: number;
@@ -52,20 +57,20 @@ describe('Component Rescan - test', () => {
 
     syncStatusReport: new SyncStatusReport(),
     addressPrivateKeys: new Map(),
-    addresses: [],
-    addressBook: [],
-    transactions: null,
+    addresses: [] as Address[],
+    addressBook: [] as AddressBookEntry[],
+    transactions: [] as Transaction[],
     sendPageState: new SendPageState(new ToAddr(0)),
     receivePageState: new ReceivePageState(),
     info: {} as InfoType,
     rescanning: false,
     wallet_settings: new WalletSettings(),
-    syncingStatus: null,
+    syncingStatus: {} as SyncStatus,
     errorModalData: new ErrorModalData(),
-    txBuildProgress: new SendProgress(),
+    sendProgress: new SendProgress(),
     walletSeed: {} as WalletSeed,
     isMenuDrawerOpen: false,
-    selectedMenuDrawerItem: '',
+    selectedMenuDrawerItem: '' as string,
     aboutModalVisible: false,
     computingModalVisible: false,
     settingsModalVisible: false,
@@ -77,8 +82,8 @@ describe('Component Rescan - test', () => {
     seedServerModalVisible: false,
     syncReportModalVisible: false,
     poolsModalVisible: false,
-    newServer: null,
-    uaAddress: null,
+    newServer: '' as string,
+    uaAddress: '' as string,
     translate: () => 'text translated',
     totalBalance: new TotalBalance(),
   };

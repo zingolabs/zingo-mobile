@@ -20,7 +20,7 @@ import { ThemeType } from '../../../app/types';
 import { ContextLoaded } from '../../../app/context';
 
 type TxDetailProps = {
-  tx: Transaction | null;
+  tx: Transaction;
   closeModal: () => void;
 };
 

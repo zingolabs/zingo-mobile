@@ -155,9 +155,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
               <DetailLine
                 label="Sync ID"
                 value={
-                  syncStatusReport.syncID !== undefined &&
-                  syncStatusReport.syncID !== null &&
-                  syncStatusReport.syncID >= 0
+                  syncStatusReport.syncID && syncStatusReport.syncID >= 0
                     ? syncStatusReport.syncID +
                       ' - (' +
                       (syncStatusReport.inProgress ? translate('report.running') : translate('report.finished')) +
