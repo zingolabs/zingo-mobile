@@ -29,20 +29,20 @@ describe('Component Settings - test', () => {
   const state = defaultAppStateLoaded;
   state.translate = (p: string) => {
     if (p === 'settings.memos') {
-      return String([
+      return `[
         {
-          value: 'none',
-          text: 'text none',
+          "value": "none",
+          "text": "text none"
         },
         {
-          value: 'wallet',
-          text: 'text wallet',
+          "value": "wallet",
+          "text": "text wallet"
         },
         {
-          value: 'all',
-          text: 'text all',
-        },
-      ]);
+          "value": "all",
+          "text": "text all"
+        }
+      ]`;
     } else {
       return 'text translated';
     }

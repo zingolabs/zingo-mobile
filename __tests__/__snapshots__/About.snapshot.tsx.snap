@@ -143,51 +143,7 @@ exports[`Component About - test About - snapshot 1`] = `
           }
         }
       >
-        1 text translated line 1
-      </Text>
-      <Text
-        style={
-          {
-            "color": "rgb(28, 28, 30)",
-            "marginBottom": 30,
-            "opacity": 0.65,
-          }
-        }
-      >
-        2 text translated line 2
-      </Text>
-      <Text
-        style={
-          {
-            "color": "rgb(28, 28, 30)",
-            "marginBottom": 30,
-            "opacity": 0.65,
-          }
-        }
-      >
-        3 text translated line 3
-      </Text>
-      <Text
-        style={
-          {
-            "color": "rgb(28, 28, 30)",
-            "marginBottom": 30,
-            "opacity": 0.65,
-          }
-        }
-      >
-        4 text translated line 4
-      </Text>
-      <Text
-        style={
-          {
-            "color": "rgb(28, 28, 30)",
-            "marginBottom": 30,
-            "opacity": 0.65,
-          }
-        }
-      >
-        5 text translated line 5
+        1 text translated line 1,2 text translated line 2,3 text translated line 3,4 text translated line 4,5 text translated line 5
       </Text>
     </View>
   </RCTScrollView>
@@ -219,7 +175,7 @@ exports[`Component About - test About - snapshot 1`] = `
           "borderColor": "rgb(0, 122, 255)",
           "borderRadius": 10,
           "borderWidth": 2,
-          "juatifyContent": "center",
+          "justifyContent": "center",
           "maxWidth": "90%",
           "minHeight": 48,
           "minWidth": "30%",

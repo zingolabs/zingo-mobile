@@ -224,7 +224,7 @@ describe('Component Components - test', () => {
   test("FadeText - children 'fade text' result same", () => {
     const text: any = render(<FadeText>Fade text</FadeText>).toJSON();
     expect(text.type).toBe('Text');
-    expect(text.children[0]).toBe('fade text');
+    expect(text.children[0]).toBe('Fade text');
   });
 
   test("FadeText - View style backgroundColor 'red' result same", () => {

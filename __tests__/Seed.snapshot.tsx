@@ -34,14 +34,14 @@ describe('Component Seed - test', () => {
   const stateLoaded = defaultAppStateLoaded;
   stateLoaded.translate = (p: string) => {
     if (p === 'seed.buttontexts') {
-      return String({
-        new: [''],
-        change: [''],
-        server: [''],
-        view: [''],
-        restore: [''],
-        backup: [''],
-      });
+      return `{
+        "new": ["new"],
+        "change": ["change"],
+        "server": ["server"],
+        "view": ["view"],
+        "restore": ["restore"],
+        "backup": ["backup"]
+      }`;
     } else {
       return 'text translated';
     }
@@ -89,14 +89,14 @@ describe('Component Seed - test', () => {
   const stateLoading = defaultAppStateLoading;
   stateLoading.translate = (p: string) => {
     if (p === 'seed.buttontexts') {
-      return String({
-        new: [''],
-        change: [''],
-        server: [''],
-        view: [''],
-        restore: [''],
-        backup: [''],
-      });
+      return `{
+        "new": ["new"],
+        "change": ["change"],
+        "server": ["server"],
+        "view": ["view"],
+        "restore": ["restore"],
+        "backup": ["backup"]
+      }`;
     } else {
       return 'text translated';
     }
