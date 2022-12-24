@@ -31,7 +31,7 @@ type SeedProps = {
 const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, action }) => {
   const contextLoaded = useContext(ContextLoaded);
   const contextLoading = useContext(ContextLoading);
-  let walletSeed: WalletSeed, totalBalance, translate: (key: string, config?: TranslateOptions) => any, info;
+  let walletSeed: WalletSeed, totalBalance, translate: (key: string, config?: TranslateOptions) => string, info;
   if (action === 'new' || action === 'restore') {
     walletSeed = contextLoading.walletSeed;
     totalBalance = contextLoading.totalBalance;
@@ -52,7 +52,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
   const [readOnly, setReadOnly] = useState(true);
 
   useEffect(() => {
-    setTexts(translate('seed.buttontexts'));
+    setTexts(JSON.parse(translate('seed.buttontexts')) as TextsType);
     setReadOnly(
       action === 'new' || action === 'view' || action === 'change' || action === 'backup' || action === 'server',
     );
@@ -226,11 +226,21 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
           )}
         </View>
 
-        <FadeText style={{ marginTop: 20, padding: 20, textAlign: 'center', color: 'white' }}>
-          {times === 3 && action === 'change' && translate('seed.change-warning')}
-          {times === 3 && action === 'backup' && translate('seed.backup-warning')}
-          {times === 3 && action === 'server' && translate('seed.server-warning')}
-        </FadeText>
+        {times === 3 && action === 'change' && (
+          <FadeText style={{ marginTop: 20, padding: 20, textAlign: 'center', color: 'white' }}>
+            {translate('seed.change-warning')}
+          </FadeText>
+        )}
+        {times === 3 && action === 'backup' && (
+          <FadeText style={{ marginTop: 20, padding: 20, textAlign: 'center', color: 'white' }}>
+            {translate('seed.backup-warning')}
+          </FadeText>
+        )}
+        {times === 3 && action === 'server' && (
+          <FadeText style={{ marginTop: 20, padding: 20, textAlign: 'center', color: 'white' }}>
+            {translate('seed.server-warning')}
+          </FadeText>
+        )}
 
         {info?.currencyName !== 'ZEC' && times === 3 && (action === 'change' || action === 'server') && (
           <FadeText style={{ color: colors.primary, textAlign: 'center', width: '100%' }}>

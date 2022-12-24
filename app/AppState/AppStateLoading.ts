@@ -19,7 +19,7 @@ export default interface AppStateLoading {
   totalBalance: TotalBalance;
   info: InfoType;
 
-  translate: (key: string, config?: TranslateOptions) => any;
+  translate: (key: string, config?: TranslateOptions) => string;
 
   // eslint-disable-next-line semi
 }

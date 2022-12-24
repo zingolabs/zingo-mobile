@@ -125,7 +125,7 @@ export default function LoadedApp(props: LoadedAppProps) {
 type LoadedAppClassProps = {
   navigation: StackScreenProps<any>['navigation'];
   route: StackScreenProps<any>['route'];
-  translate: (key: string, config?: TranslateOptions) => any;
+  translate: (key: string, config?: TranslateOptions) => string;
   theme: ThemeType;
 };
 

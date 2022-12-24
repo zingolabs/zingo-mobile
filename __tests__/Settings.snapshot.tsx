@@ -29,7 +29,7 @@ describe('Component Settings - test', () => {
   const state = defaultAppStateLoaded;
   state.translate = (p: string) => {
     if (p === 'settings.memos') {
-      return [
+      return String([
         {
           value: 'none',
           text: 'text none',
@@ -42,7 +42,7 @@ describe('Component Settings - test', () => {
           value: 'all',
           text: 'text all',
         },
-      ];
+      ]);
     } else {
       return 'text translated';
     }

@@ -34,7 +34,7 @@ export default class RPC {
   fnSetZecPrice: (price: number) => void;
   fnSetRefreshUpdates: (inProgress: boolean, progress: number, blocks: string) => void;
   fnSetWalletSettings: (settings: WalletSettings) => void;
-  translate: (key: string, config?: TranslateOptions) => any;
+  translate: (key: string, config?: TranslateOptions) => string;
 
   refreshTimerID: number;
   updateTimerID?: number;

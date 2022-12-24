@@ -30,7 +30,7 @@ type Memos = {
 const Settings: React.FunctionComponent<SettingsProps> = ({ set_wallet_option, set_server_option, closeModal }) => {
   const context = useContext(ContextLoaded);
   const { wallet_settings, totalBalance, info, translate } = context;
-  const MEMOS: Memos[] = translate('settings.memos');
+  const MEMOS: Memos[] = Array(JSON.parse(translate('settings.memos')));
   const { colors } = useTheme() as unknown as ThemeType;
 
   const [memos, setMemos] = React.useState(wallet_settings.download_memos);

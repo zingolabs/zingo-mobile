@@ -94,7 +94,7 @@ export default interface AppStateLoaded {
 
   uaAddress: string;
 
-  translate: (key: string, config?: TranslateOptions) => any;
+  translate: (key: string, config?: TranslateOptions) => string;
 
   // eslint-disable-next-line semi
 }
