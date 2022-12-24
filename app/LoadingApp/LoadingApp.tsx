@@ -114,7 +114,7 @@ const SERVER_DEFAULT_1 = serverUris()[1];
 
 class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
   dim: EmitterSubscription;
-  constructor(props: Readonly<LoadingAppClassProps>) {
+  constructor(props: LoadingAppClassProps) {
     super(props);
 
     this.state = defaultAppStateLoading;

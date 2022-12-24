@@ -89,7 +89,7 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal }) => {
           <DetailLine
             label={translate('info.network')}
             value={
-              infoState.chain_name === undefined
+              !infoState.chain_name
                 ? translate('loading')
                 : infoState.chain_name.toLowerCase() === 'main' || infoState.chain_name.toLowerCase() === 'mainnet'
                 ? 'Mainnet'
@@ -100,7 +100,7 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal }) => {
                 : translate('info.unknown') + ' (' + infoState.chain_name + ')'
             }
           />
-          <DetailLine label={translate('info.serverblock')} value={info?.latestBlock} />
+          <DetailLine label={translate('info.serverblock')} value={info?.latestBlock.toString()} />
           {/* <DetailLine label="Wallet Block Height" value={walletHeight} /> */}
           <DetailLine
             label={translate('info.zecprice')}

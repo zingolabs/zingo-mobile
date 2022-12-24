@@ -9,7 +9,7 @@ import { ThemeType } from '../../../app/types';
 
 type DetailLineProps = {
   label: string;
-  value?: string | number;
+  value: string;
 };
 
 const DetailLine: React.FunctionComponent<DetailLineProps> = ({ label, value }) => {

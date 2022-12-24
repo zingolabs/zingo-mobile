@@ -496,8 +496,14 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
                       syncStatusReport.totalBatches
                     }
                   />
-                  <DetailLine label={translate('report.blocksperbatch')} value={syncStatusReport.blocksPerBatch} />
-                  <DetailLine label={translate('report.secondsperbatch')} value={syncStatusReport.secondsPerBatch} />
+                  <DetailLine
+                    label={translate('report.blocksperbatch')}
+                    value={syncStatusReport.blocksPerBatch.toString()}
+                  />
+                  <DetailLine
+                    label={translate('report.secondsperbatch')}
+                    value={syncStatusReport.secondsPerBatch.toString()}
+                  />
                 </>
               )}
               {syncStatusReport.inProgress && syncStatusReport.currentBlock > 0 && !!syncStatusReport.lastBlockServer && (

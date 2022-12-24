@@ -187,7 +187,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
           <FadeText style={{ textAlign: 'center' }}>{translate('seed.birthday-readonly')}</FadeText>
           {readOnly ? (
             <RegText color={colors.text} style={{ textAlign: 'center' }}>
-              {birthdayNumber}
+              {birthdayNumber.toString()}
             </RegText>
           ) : (
             <>

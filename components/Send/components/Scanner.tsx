@@ -1,8 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
-import React from 'react';
+import React, { useContext } from 'react';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import { View, Platform } from 'react-native';
-import { TranslateOptions } from 'i18n-js';
 import Toast from 'react-native-simple-toast';
 
 import RegText from '../../Components/RegText';
@@ -10,16 +9,19 @@ import Button from '../../Button';
 import { useTheme } from '@react-navigation/native';
 import { parseZcashURI } from '../../../app/uris';
 import RPCModule from '../../RPCModule';
+import { ContextLoaded } from '../../../app/context';
+import { BarCodeReadEvent } from 'react-native-camera';
 
 type ScannerProps = {
   updateToField: (address: string | null, amount: string | null, amountUSD: string | null, memo: string | null) => void;
   closeModal: () => void;
-  translate: (key: string, config?: TranslateOptions) => any;
   width: number;
   height: number;
 };
 
-const Scanner: React.FunctionComponent<ScannerProps> = ({ updateToField, closeModal, translate, width, height }) => {
+const Scanner: React.FunctionComponent<ScannerProps> = ({ updateToField, closeModal, width, height }) => {
+  const context = useContext(ContextLoaded);
+  const { translate } = context;
   const validateAddress = async (scannedAddress: string) => {
     const result = await RPCModule.execute('parse', scannedAddress);
     const resultJSON = await JSON.parse(result);
@@ -50,7 +52,7 @@ const Scanner: React.FunctionComponent<ScannerProps> = ({ updateToField, closeMo
     }
   };
 
-  const onRead = (e: any) => {
+  const onRead = (e: BarCodeReadEvent) => {
     const scandata = e.data.trim();
     let scannedAddress = scandata;
 

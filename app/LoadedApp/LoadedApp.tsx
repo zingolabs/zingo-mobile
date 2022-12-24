@@ -133,7 +133,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   rpc: RPC;
   dim: EmitterSubscription;
 
-  constructor(props: any) {
+  constructor(props: LoadedAppClassProps) {
     super(props);
 
     this.state = defaultAppStateLoaded;
@@ -622,7 +622,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       </Suspense>
     );
 
-    const fnTabBarIcon = (route: any, focused: boolean) => {
+    const fnTabBarIcon = (route: StackScreenProps<any>['route'], focused: boolean) => {
       var iconName;
 
       if (route.name === translate('loadedapp.wallet-menu')) {

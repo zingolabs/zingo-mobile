@@ -16,6 +16,14 @@ import {
 import RPCModule from '../../components/RPCModule';
 import Utils from '../utils';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
+import { AddressType } from './types/AddressType';
+import { BalancesType } from './types/BalancesType';
+import { NotesType } from './types/NotesType';
+import { OrchardNoteType } from './types/OrchardNoteType';
+import { SaplingNoteType } from './types/SaplingNoteType';
+import { UtxoNoteType } from './types/UtxoNoteType';
+import { TransactionType } from './types/TransationType';
+import { OutgoingMetadataType } from './types/OutgoingMetadataType';
 
 export default class RPC {
   fnSetSyncStatusReport: (syncStatusReport: SyncStatusReport) => void;
@@ -282,7 +290,7 @@ export default class RPC {
       const detail: TxDetailType = {
         address: toaddr,
         amount: totalAmount,
-        memo: memos.length > 0 ? memos.join('') : undefined,
+        memo: memos && memos.length > 0 ? memos.join('') : undefined,
       };
 
       reducedDetailedTxns.push(detail);
@@ -783,23 +791,23 @@ export default class RPC {
 
   // This method will get the total balances
   async fetchTotalBalance() {
-    const addressesStr = await RPCModule.execute('addresses', '');
-    let addressesJSON = await JSON.parse(addressesStr);
+    const addressesStr: string = await RPCModule.execute('addresses', '');
+    let addressesJSON: AddressType[] = await JSON.parse(addressesStr);
 
     //console.log('addrs:', addressesJSON.length, addressesJSON);
 
     // if this array have more than one elemnts I can handle them.
     //addressesJSON = [addressesJSON[0]];
 
-    const balanceStr = await RPCModule.execute('balance', '');
+    const balanceStr: string = await RPCModule.execute('balance', '');
     //console.log(balanceStr);
-    const balanceJSON = await JSON.parse(balanceStr);
+    const balanceJSON: BalancesType = await JSON.parse(balanceStr);
 
     //console.log('balan:', balanceJSON);
 
-    const orchardBal = (balanceJSON.orchard_balance || 0) / 10 ** 8;
-    const privateBal = (balanceJSON.sapling_balance || 0) / 10 ** 8;
-    const transparentBal = (balanceJSON.transparent_balance || 0) / 10 ** 8;
+    const orchardBal: number = (balanceJSON.orchard_balance || 0) / 10 ** 8;
+    const privateBal: number = (balanceJSON.sapling_balance || 0) / 10 ** 8;
+    const transparentBal: number = (balanceJSON.transparent_balance || 0) / 10 ** 8;
 
     // Total Balance
     const balance: TotalBalance = {
@@ -813,9 +821,9 @@ export default class RPC {
     await this.fnSetTotalBalance(balance);
 
     // Fetch pending notes and UTXOs
-    const pendingNotes = await RPCModule.execute('notes', '');
+    const pendingNotes: string = await RPCModule.execute('notes', '');
     //console.log(pendingNotes);
-    const pendingNotesJSON = await JSON.parse(pendingNotes);
+    const pendingNotesJSON: NotesType = await JSON.parse(pendingNotes);
 
     //console.log(pendingNotes);
 
@@ -823,7 +831,7 @@ export default class RPC {
 
     // Process orchard notes
     if (pendingNotesJSON.pending_orchard_notes) {
-      pendingNotesJSON.pending_orchard_notes.forEach((s: any) => {
+      pendingNotesJSON.pending_orchard_notes.forEach((s: OrchardNoteType) => {
         pendingAddress.set(s.address, s.value);
       });
     } else {
@@ -832,7 +840,7 @@ export default class RPC {
 
     // Process sapling notes
     if (pendingNotesJSON.pending_sapling_notes) {
-      pendingNotesJSON.pending_sapling_notes.forEach((s: any) => {
+      pendingNotesJSON.pending_sapling_notes.forEach((s: SaplingNoteType) => {
         pendingAddress.set(s.address, s.value);
       });
     } else {
@@ -841,7 +849,7 @@ export default class RPC {
 
     // Process UTXOs
     if (pendingNotesJSON.pending_utxos) {
-      pendingNotesJSON.pending_utxos.forEach((s: any) => {
+      pendingNotesJSON.pending_utxos.forEach((s: UtxoNoteType) => {
         pendingAddress.set(s.address, s.value);
       });
     } else {
@@ -850,9 +858,9 @@ export default class RPC {
 
     let allAddresses: Address[] = [];
 
-    addressesJSON.forEach((u: any) => {
+    addressesJSON.forEach((u: AddressType) => {
       // If this has any unconfirmed txns, show that in the UI
-      const receivers =
+      const receivers: string =
         (u.receivers.orchard_exists ? 'o' : '') +
         (u.receivers.sapling ? 'z' : '') +
         (u.receivers.transparent ? 't' : '');
@@ -903,15 +911,15 @@ export default class RPC {
 
   // Fetch all T and Z and O transactions
   async fetchTandZandOTransactions() {
-    const listStr = await RPCModule.execute('list', '');
+    const listStr: string = await RPCModule.execute('list', '');
     //console.log(listStr);
-    const listJSON = await JSON.parse(listStr);
+    const listJSON: TransactionType[] = await JSON.parse(listStr);
 
     await this.fetchServerHeight();
 
     //console.log('trans: ', listJSON);
 
-    let txlist = listJSON.map((tx: any) => {
+    let txlist: Transaction[] = listJSON.map((tx: TransactionType) => {
       const type = tx.outgoing_metadata ? 'sent' : 'receive';
 
       //if (tx.txid === '55d6efcb987e8c6b8842a4c78d4adc80d8ca4761e3ff670a730e4840d8659ead') {
@@ -922,7 +930,7 @@ export default class RPC {
 
       var txdetail: TxDetailType[] = [];
       if (tx.outgoing_metadata) {
-        const dts = tx.outgoing_metadata.map((o: any) => {
+        const dts: TxDetailType[] = tx.outgoing_metadata.map((o: OutgoingMetadataType) => {
           const detail: TxDetailType = {
             address: o.address || '',
             amount: (o.value || 0) / 10 ** 8,
@@ -945,7 +953,11 @@ export default class RPC {
       const transaction: Transaction = {
         type,
         address:
-          type === 'sent' ? (tx.outgoing_metadata.length > 0 ? tx.outgoing_metadata[0].address : '') : tx.address,
+          type === 'sent'
+            ? tx.outgoing_metadata && tx.outgoing_metadata.length > 0
+              ? tx.outgoing_metadata[0].address
+              : ''
+            : tx.address,
         amount: tx.amount / 10 ** 8,
         confirmations: tx.unconfirmed
           ? 0

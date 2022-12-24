@@ -1,6 +1,17 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useRef, useCallback, useContext } from 'react';
-import { View, ScrollView, Modal, Image, Alert, Keyboard, TextInput, TouchableOpacity } from 'react-native';
+import {
+  View,
+  ScrollView,
+  Modal,
+  Image,
+  Alert,
+  Keyboard,
+  TextInput,
+  TouchableOpacity,
+  NativeSyntheticEvent,
+  TextInputEndEditingEventData,
+} from 'react-native';
 import { faQrcode, faCheck, faInfo } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme } from '@react-navigation/native';
@@ -339,7 +350,6 @@ const Send: React.FunctionComponent<SendProps> = ({
         <Scanner
           updateToField={updateToField}
           closeModal={() => setQrcodeModalVisible(false)}
-          translate={translate}
           width={dimensions.width - 42}
           height={dimensions.height * 0.7}
         />
@@ -575,7 +585,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         }}
                         value={ta.amount.toString()}
                         onChangeText={(text: string) => updateToField(null, text.substring(0, 20), null, null)}
-                        onEndEditing={(e: any) =>
+                        onEndEditing={(e: NativeSyntheticEvent<TextInputEndEditingEventData>) =>
                           updateToField(null, Number(e.nativeEvent.text.substring(0, 20)).toFixed(8), null, null)
                         }
                         editable={true}
@@ -620,7 +630,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         }}
                         value={ta.amountUSD.toString()}
                         onChangeText={(text: string) => updateToField(null, null, text.substring(0, 15), null)}
-                        onEndEditing={(e: any) =>
+                        onEndEditing={(e: NativeSyntheticEvent<TextInputEndEditingEventData>) =>
                           updateToField(null, null, Number(e.nativeEvent.text.substring(0, 15)).toFixed(2), null)
                         }
                         editable={true}
@@ -749,7 +759,6 @@ const Send: React.FunctionComponent<SendProps> = ({
           <Scanner
             updateToField={updateToField}
             closeModal={() => setQrcodeModalVisible(false)}
-            translate={translate}
             width={dimensions.width / 2}
             height={dimensions.height * 0.7}
           />
@@ -998,7 +1007,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           }}
                           value={ta.amount.toString()}
                           onChangeText={(text: string) => updateToField(null, text.substring(0, 20), null, null)}
-                          onEndEditing={(e: any) =>
+                          onEndEditing={(e: NativeSyntheticEvent<TextInputEndEditingEventData>) =>
                             updateToField(null, Number(e.nativeEvent.text.substring(0, 20)).toFixed(8), null, null)
                           }
                           editable={true}
@@ -1043,7 +1052,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           }}
                           value={ta.amountUSD.toString()}
                           onChangeText={(text: string) => updateToField(null, null, text.substring(0, 15), null)}
-                          onEndEditing={(e: any) =>
+                          onEndEditing={(e: NativeSyntheticEvent<TextInputEndEditingEventData>) =>
                             updateToField(null, null, Number(e.nativeEvent.text.substring(0, 15)).toFixed(2), null)
                           }
                           editable={true}

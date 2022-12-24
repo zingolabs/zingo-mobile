@@ -1,11 +1,10 @@
 /* eslint-disable react-native/no-inline-styles */
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, Platform, ScrollView, TouchableOpacity, Text } from 'react-native';
 import Clipboard from '@react-native-community/clipboard';
 import QRCode from 'react-native-qrcode-svg';
 import Toast from 'react-native-simple-toast';
 import { useTheme } from '@react-navigation/native';
-import { TranslateOptions } from 'i18n-js';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
@@ -13,6 +12,7 @@ import FadeText from '../../Components/FadeText';
 //import Button from '../../Button';
 import Utils from '../../../app/utils';
 import { ThemeType } from '../../../app/types';
+import { ContextLoaded } from '../../../app/context';
 
 type SingleAddressProps = {
   address: string;
@@ -21,7 +21,6 @@ type SingleAddressProps = {
   total: number;
   prev: () => void;
   next: () => void;
-  translate: (key: string, config?: TranslateOptions) => any;
 };
 
 const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
@@ -31,8 +30,9 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   total,
   prev,
   next,
-  translate,
 }) => {
+  const context = useContext(ContextLoaded);
+  const { translate } = context;
   //console.log(`Addresses ${addresses}: ${multipleAddresses}`);
   const { colors } = useTheme() as unknown as ThemeType;
 

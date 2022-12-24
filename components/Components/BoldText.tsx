@@ -1,10 +1,15 @@
 import React from 'react';
-import { Text } from 'react-native';
+import { Text, TextStyle } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
-const BoldText: React.FunctionComponent<any> = ({ style, children }) => {
+type BoldTextProps = {
+  style?: TextStyle;
+  children: string | string[];
+};
+
+const BoldText: React.FunctionComponent<BoldTextProps> = ({ style, children }) => {
   const { colors } = useTheme();
-  const totalStyle = {
+  const totalStyle: TextStyle = {
     color: colors.text,
     fontSize: 18,
     fontWeight: 'bold',

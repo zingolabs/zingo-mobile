@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import { Text, View } from 'react-native';
+import { Text, View, TextStyle } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
 import Utils from '../../app/utils';
@@ -9,7 +9,7 @@ import { ThemeType } from '../../app/types';
 type UsdAmountProps = {
   price?: number;
   amtZec?: number;
-  style?: any;
+  style?: TextStyle;
 };
 
 const UsdAmount: React.FunctionComponent<UsdAmountProps> = ({ price, style, amtZec }) => {

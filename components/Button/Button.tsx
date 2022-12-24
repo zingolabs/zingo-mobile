@@ -1,11 +1,21 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import { TouchableOpacity, Text, View } from 'react-native';
+import { TouchableOpacity, Text, View, TextStyle } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
 import { ThemeType } from '../../app/types';
 
-const Button: React.FunctionComponent<any> = ({
+type ButtonProps = {
+  type: string;
+  title: string;
+  disabled?: boolean;
+  onPress: () => void;
+  style?: TextStyle;
+  accessible?: boolean;
+  accessibilityLabel?: string;
+};
+
+const Button: React.FunctionComponent<ButtonProps> = ({
   type,
   title,
   disabled,
@@ -16,7 +26,7 @@ const Button: React.FunctionComponent<any> = ({
 }) => {
   const { colors } = useTheme() as unknown as ThemeType;
   // type: 'Primary' or 'Secondary'
-  const styleButton =
+  const styleButton: TextStyle =
     type === 'Primary'
       ? {
           backgroundColor: disabled ? colors.primaryDisabled : colors.primary,
@@ -32,7 +42,7 @@ const Button: React.FunctionComponent<any> = ({
           // error
           backgroundColor: colors.primary,
         };
-  const styleCommon = {
+  const styleCommon: TextStyle = {
     padding: 0,
     paddingLeft: 20,
     paddingRight: 20,
@@ -41,7 +51,7 @@ const Button: React.FunctionComponent<any> = ({
     minWidth: '30%',
     minHeight: 48,
     alignItems: 'center',
-    juatifyContent: 'center',
+    justifyContent: 'center',
   };
 
   return (

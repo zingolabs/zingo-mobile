@@ -216,19 +216,19 @@ describe('Component Components - test', () => {
   });
 
   test("BoldText - View style backgroundColor 'red' result same", () => {
-    const text: any = render(<BoldText style={{ backgroundColor: 'red' }} />).toJSON();
+    const text: any = render(<BoldText style={{ backgroundColor: 'red' }}>Bold Text</BoldText>).toJSON();
     expect(text.type).toBe('Text');
     expect(text.props.style.backgroundColor).toBe('red');
   });
 
   test("FadeText - children 'fade text' result same", () => {
-    const text: any = render(<FadeText children={'fade text'} />).toJSON();
+    const text: any = render(<FadeText>Fade text</FadeText>).toJSON();
     expect(text.type).toBe('Text');
     expect(text.children[0]).toBe('fade text');
   });
 
   test("FadeText - View style backgroundColor 'red' result same", () => {
-    const text: any = render(<FadeText style={{ backgroundColor: 'red' }} />).toJSON();
+    const text: any = render(<FadeText style={{ backgroundColor: 'red' }}>Fade Text</FadeText>).toJSON();
     expect(text.type).toBe('Text');
     expect(text.props.style.backgroundColor).toBe('red');
   });
@@ -240,7 +240,7 @@ describe('Component Components - test', () => {
   });
 
   test("ErrorText - View style backgroundColor 'red' result same", () => {
-    const text: any = render(<ErrorText style={{ backgroundColor: 'red' }} />).toJSON();
+    const text: any = render(<ErrorText style={{ backgroundColor: 'red' }}>Error Text</ErrorText>).toJSON();
     expect(text.type).toBe('Text');
     expect(text.props.style.backgroundColor).toBe('red');
   });
@@ -252,13 +252,13 @@ describe('Component Components - test', () => {
   });
 
   test("RegText - View style backgroundColor 'red' result same", () => {
-    const text: any = render(<RegText style={{ backgroundColor: 'red' }} />).toJSON();
+    const text: any = render(<RegText style={{ backgroundColor: 'red' }}>Reg Text</RegText>).toJSON();
     expect(text.type).toBe('Text');
     expect(text.props.style[0].backgroundColor).toBe('red');
   });
 
   test("RegText - View style color 'red' result same", () => {
-    const text: any = render(<RegText color={'red'} />).toJSON();
+    const text: any = render(<RegText color={'red'}>Reg Text</RegText>).toJSON();
     expect(text.type).toBe('Text');
     expect(text.props.style[0].color).toBe('red');
   });

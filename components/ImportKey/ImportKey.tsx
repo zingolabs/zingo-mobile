@@ -70,11 +70,7 @@ const ImportKey: React.FunctionComponent<ImportKeyProps> = ({ closeModal, doImpo
         transparent={false}
         visible={qrcodeModalVisible}
         onRequestClose={() => setQrcodeModalVisible(false)}>
-        <Scanner
-          setPrivKeyText={setPrivKeyText}
-          closeModal={() => setQrcodeModalVisible(false)}
-          translate={translate}
-        />
+        <Scanner setPrivKeyText={setPrivKeyText} closeModal={() => setQrcodeModalVisible(false)} />
       </Modal>
 
       <ScrollView
