@@ -136,7 +136,22 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   constructor(props: LoadedAppClassProps) {
     super(props);
 
-    this.state = defaultAppStateLoaded;
+    const screen = Dimensions.get('screen');
+
+    this.state = {
+      ...defaultAppStateLoaded,
+      navigation: this.props.navigation,
+      route: this.props.route,
+      sendPageState: new SendPageState(new ToAddr(Utils.getNextToAddrID())),
+      translate: this.props.translate,
+      dimensions: {
+        width: Number(screen.width.toFixed(0)),
+        height: Number(screen.height.toFixed(0)),
+        orientation: platform.isPortrait(screen) ? 'portrait' : 'landscape',
+        deviceType: platform.isTablet(screen) ? 'tablet' : 'phone',
+        scale: Number(screen.scale.toFixed(2)),
+      },
+    };
 
     this.rpc = new RPC(
       this.setSyncStatusReport,
@@ -154,13 +169,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   }
 
   componentDidMount = () => {
-    this.setDimensions(Dimensions.get('screen'));
-    this.setState({
-      navigation: this.props.navigation,
-      route: this.props.route,
-      sendPageState: new SendPageState(new ToAddr(Utils.getNextToAddrID())),
-      translate: this.props.translate,
-    });
     this.clearToAddr();
 
     // Configure the RPC to start doing refreshes

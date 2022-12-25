@@ -52,7 +52,12 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
   const [readOnly, setReadOnly] = useState(true);
 
   useEffect(() => {
-    setTexts(JSON.parse(translate('seed.buttontexts')) as TextsType);
+    const buttonTextsArray: string = translate('seed.buttontexts');
+    let buttonTexts = {} as TextsType;
+    if (typeof buttonTextsArray === 'object') {
+      buttonTexts = buttonTextsArray as TextsType;
+      setTexts(buttonTexts);
+    }
     setReadOnly(
       action === 'new' || action === 'view' || action === 'change' || action === 'backup' || action === 'server',
     );

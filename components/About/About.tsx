@@ -17,6 +17,13 @@ const About: React.FunctionComponent<AboutProps> = ({ closeModal }) => {
   const context = useContext(ContextLoaded);
   const { totalBalance, info, translate } = context;
   const { colors } = useTheme() as unknown as ThemeType;
+
+  const arrayTxtObject: string = translate('about.copyright');
+  let arrayTxt: string[] = [];
+  if (typeof arrayTxtObject === 'object') {
+    arrayTxt = arrayTxtObject as string[];
+  }
+
   return (
     <SafeAreaView
       style={{
@@ -59,7 +66,7 @@ const About: React.FunctionComponent<AboutProps> = ({ closeModal }) => {
           justifyContent: 'flex-start',
           padding: 20,
         }}>
-        {Array(translate('about.copyright')).map((txt: string) => (
+        {arrayTxt.map((txt: string) => (
           <FadeText style={{ marginBottom: 30 }} key={txt.substring(0, 10)}>
             {txt}
           </FadeText>

@@ -117,18 +117,26 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
   constructor(props: LoadingAppClassProps) {
     super(props);
 
-    this.state = defaultAppStateLoading;
+    const screen = Dimensions.get('screen');
+
+    this.state = {
+      ...defaultAppStateLoading,
+      navigation: this.props.navigation,
+      route: this.props.route,
+      translate: this.props.translate,
+      dimensions: {
+        width: Number(screen.width.toFixed(0)),
+        height: Number(screen.height.toFixed(0)),
+        orientation: platform.isPortrait(screen) ? 'portrait' : 'landscape',
+        deviceType: platform.isTablet(screen) ? 'tablet' : 'phone',
+        scale: Number(screen.scale.toFixed(2)),
+      },
+    };
 
     this.dim = {} as EmitterSubscription;
   }
 
   componentDidMount = async () => {
-    this.setDimensions(Dimensions.get('screen'));
-    this.setState({
-      navigation: this.props.navigation,
-      route: this.props.route,
-      translate: this.props.translate,
-    });
     // First, check if a wallet exists. Do it async so the basic screen has time to render
     setTimeout(async () => {
       // reading Info

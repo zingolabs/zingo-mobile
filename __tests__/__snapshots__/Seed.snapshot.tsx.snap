@@ -1124,9 +1124,7 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
               "textTransform": "uppercase",
             }
           }
-        >
-          new
-        </Text>
+        />
       </View>
     </View>
   </View>
@@ -1511,9 +1509,7 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
               "textTransform": "uppercase",
             }
           }
-        >
-          restore
-        </Text>
+        />
       </View>
     </View>
     <View
@@ -2305,9 +2301,7 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
               "textTransform": "uppercase",
             }
           }
-        >
-          view
-        </Text>
+        />
       </View>
     </View>
   </View>
