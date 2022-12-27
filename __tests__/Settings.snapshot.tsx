@@ -49,7 +49,7 @@ describe('Component Settings - test', () => {
   };
   state.info.currencyName = 'ZEC';
   state.totalBalance.total = 1.12345678;
-  state.wallet_settings.server = 'https://zcash.es';
+  state.walletSettings.server = 'https://zcash.es';
   const onClose = jest.fn();
   const onSetOption = jest.fn();
   test('Settings - snapshot', () => {

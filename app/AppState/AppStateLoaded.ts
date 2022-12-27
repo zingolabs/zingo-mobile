@@ -23,7 +23,7 @@ export default interface AppStateLoaded {
   dimensions: DimensionsType;
 
   // Info about the current sync process
-  syncStatusReport: SyncingStatusReportClass;
+  syncingStatusReport: SyncingStatusReportClass;
 
   // The total confirmed and unconfirmed balance in this wallet
   totalBalance: TotalBalanceClass;
@@ -57,7 +57,7 @@ export default interface AppStateLoaded {
   // Callbacks for the password dialog box
   //passwordState: PasswordState;
 
-  wallet_settings: WalletSettingsClass;
+  walletSettings: WalletSettingsClass;
 
   syncingStatus: SyncingStatusType;
 

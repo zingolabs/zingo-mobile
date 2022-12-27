@@ -25,7 +25,7 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   route: {} as StackScreenProps<any>['route'],
   dimensions: {} as DimensionsType,
 
-  syncStatusReport: new SyncingStatusReportClass(),
+  syncingStatusReport: new SyncingStatusReportClass(),
   totalBalance: new TotalBalanceClass(),
   addressPrivateKeys: new Map(),
   addresses: [] as AddressClass[],
@@ -35,7 +35,7 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   receivePageState: new ReceivePageStateClass(''),
   info: {} as InfoType,
   rescanning: false,
-  wallet_settings: new WalletSettingsClass(),
+  walletSettings: new WalletSettingsClass(),
   syncingStatus: {} as SyncingStatusType,
   errorModalData: new ErrorModalDataClass('', ''),
   sendProgress: new SendProgressClass(0, 0, 0),

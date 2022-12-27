@@ -26,7 +26,7 @@ import { RPCTransactionType } from './types/RPCTransationType';
 import { RPCOutgoingMetadataType } from './types/RPCOutgoingMetadataType';
 
 export default class RPC {
-  fnSetSyncStatusReport: (syncingStatusReport: SyncingStatusReportClass) => void;
+  fnSetSyncingStatusReport: (syncingStatusReport: SyncingStatusReportClass) => void;
   fnSetInfo: (info: InfoType) => void;
   fnSetTotalBalance: (totalBalance: TotalBalanceClass) => void;
   fnSetTransactionsList: (txList: TransactionType[]) => void;
@@ -57,7 +57,7 @@ export default class RPC {
   process_end_block: number;
 
   constructor(
-    fnSetSyncStatusReport: (syncingStatusReport: SyncingStatusReportClass) => void,
+    fnSetSyncingStatusReport: (syncingStatusReport: SyncingStatusReportClass) => void,
     fnSetTotalBalance: (totalBalance: TotalBalanceClass) => void,
     fnSetTransactionsList: (txlist: TransactionType[]) => void,
     fnSetAllAddresses: (addresses: AddressClass[]) => void,
@@ -67,7 +67,7 @@ export default class RPC {
     fnSetRefreshUpdates: (inProgress: boolean, progress: number, blocks: string) => void,
     translate: (key: string, config?: TranslateOptions) => string,
   ) {
-    this.fnSetSyncStatusReport = fnSetSyncStatusReport;
+    this.fnSetSyncingStatusReport = fnSetSyncingStatusReport;
     this.fnSetTotalBalance = fnSetTotalBalance;
     this.fnSetTransactionsList = fnSetTransactionsList;
     this.fnSetAllAddresses = fnSetAllAddresses;
@@ -616,7 +616,7 @@ export default class RPC {
           process_end_block: this.process_end_block,
           lastBlockServer: this.lastServerBlockHeight,
         };
-        this.fnSetSyncStatusReport(statusGeneral);
+        this.fnSetSyncingStatusReport(statusGeneral);
 
         this.prevProgress = progress;
 
@@ -659,7 +659,7 @@ export default class RPC {
             process_end_block: this.lastWalletBlockHeight,
             lastBlockServer: this.lastServerBlockHeight,
           };
-          this.fnSetSyncStatusReport(statusFinished);
+          this.fnSetSyncingStatusReport(statusFinished);
 
           //console.log('sync status', ss);
           //console.log(`Finished refresh at ${this.lastWalletBlockHeight} id: ${ss.sync_id}`);
@@ -695,7 +695,7 @@ export default class RPC {
                 process_end_block: this.process_end_block,
                 lastBlockServer: this.lastServerBlockHeight,
               };
-              this.fnSetSyncStatusReport(statusBatch);
+              this.fnSetSyncingStatusReport(statusBatch);
 
               //console.log('sync status', ss);
               //console.log(
@@ -734,7 +734,7 @@ export default class RPC {
               process_end_block: this.process_end_block,
               lastBlockServer: this.lastServerBlockHeight,
             };
-            this.fnSetSyncStatusReport(statusSeconds);
+            this.fnSetSyncingStatusReport(statusSeconds);
 
             //console.log('sync status', ss);
             //console.log(`Saving wallet. seconds: ${this.seconds_batch}`);
@@ -758,17 +758,17 @@ export default class RPC {
 
     //console.log(settings);
 
-    const wallet_settings = new WalletSettingsClass();
+    const walletSettings = new WalletSettingsClass();
     if (download_memos_json) {
-      wallet_settings.download_memos = download_memos_json.download_memos;
+      walletSettings.download_memos = download_memos_json.download_memos;
     }
     if (transaction_filter_threshold_json) {
-      wallet_settings.transaction_filter_threshold = transaction_filter_threshold_json.transaction_filter_threshold;
+      walletSettings.transaction_filter_threshold = transaction_filter_threshold_json.transaction_filter_threshold;
     }
     if (settings) {
-      wallet_settings.server = settings.server;
+      walletSettings.server = settings.server;
     }
-    await this.fnSetWalletSettings(wallet_settings);
+    await this.fnSetWalletSettings(walletSettings);
   }
 
   async fetchInfo(): Promise<void> {

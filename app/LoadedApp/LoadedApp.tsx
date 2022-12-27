@@ -222,8 +222,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     }
   };
 
-  setSyncStatusReport = (syncStatusReport: SyncingStatusReportClass) => {
-    this.setState({ syncStatusReport });
+  setSyncStatusReport = (syncingStatusReport: SyncingStatusReportClass) => {
+    this.setState({ syncingStatusReport });
   };
 
   setTransactionList = (transactions: TransactionType[]) => {
@@ -245,8 +245,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     }
   };
 
-  setWalletSettings = (wallet_settings: WalletSettingsClass) => {
-    this.setState({ wallet_settings });
+  setWalletSettings = (walletSettings: WalletSettingsClass) => {
+    this.setState({ walletSettings });
   };
 
   setSendPageState = (sendPageState: SendPageStateClass) => {

@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { View, ScrollView, SafeAreaView, Image } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
@@ -21,9 +21,9 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal }) => {
   const context = useContext(ContextLoaded);
   const { info, totalBalance, translate } = context;
   const { colors } = useTheme() as unknown as ThemeType;
-  const [infoState, setInfoState] = React.useState({} as InfoType);
+  const [infoState, setInfoState] = useState({} as InfoType);
 
-  React.useEffect(() => {
+  useEffect(() => {
     (async () => {
       const infoNew = await RPC.rpc_getInfoObject();
 

@@ -15,8 +15,8 @@ import moment from 'moment';
 type TxSummaryLineProps = {
   month: string;
   tx: TransactionType;
-  setTxDetail: React.Dispatch<React.SetStateAction<TransactionType>>;
-  setTxDetailModalShowing: React.Dispatch<React.SetStateAction<boolean>>;
+  setTxDetail: (t: TransactionType) => void;
+  setTxDetailModalShowing: (b: boolean) => void;
 };
 const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
   tx,

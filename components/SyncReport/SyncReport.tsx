@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { View, ScrollView, SafeAreaView, Image, Text } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
@@ -15,20 +15,20 @@ type SyncReportProps = {
 
 const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) => {
   const context = useContext(ContextLoaded);
-  const { syncStatusReport, walletSeed, translate } = context;
+  const { syncingStatusReport, walletSeed, translate } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [maxBlocks, setMaxBlocks] = useState(0);
   const [points, setPoints] = useState([] as number[]);
   const [labels, setLabels] = useState([] as string[]);
   const [birthday_plus_1, setBirthday_plus_1] = useState(0);
 
-  React.useEffect(() => {
-    if (syncStatusReport.lastBlockServer) {
+  useEffect(() => {
+    if (syncingStatusReport.lastBlockServer) {
       (async () => {
         const a = [0, 500000, 1000000, 1500000, 2000000, 2500000, 3000000, 3500000, 4000000, 4500000, 5000000];
         const l = ['0', '500K', '1M', '1.5M', '2M', '2.5M', '3M', '3.5M', '4M', '4.5M', '5M'];
         for (let i = 0; i < a.length; i++) {
-          if (syncStatusReport.lastBlockServer < a[i]) {
+          if (syncingStatusReport.lastBlockServer < a[i]) {
             setMaxBlocks(a[i]);
             setPoints(a.slice(0, i));
             setLabels(l.slice(0, i + 1));
@@ -37,41 +37,43 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
         }
       })();
     }
-  }, [syncStatusReport.lastBlockServer]);
+  }, [syncingStatusReport.lastBlockServer]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     setBirthday_plus_1((walletSeed?.birthday || 0) + 1);
   }, [walletSeed?.birthday]);
 
   const server_1: number = birthday_plus_1 || 0;
   const server_2: number =
-    syncStatusReport.process_end_block && birthday_plus_1
-      ? syncStatusReport.process_end_block - birthday_plus_1 || 0
-      : syncStatusReport.lastBlockWallet && birthday_plus_1
-      ? syncStatusReport.lastBlockWallet - birthday_plus_1 || 0
+    syncingStatusReport.process_end_block && birthday_plus_1
+      ? syncingStatusReport.process_end_block - birthday_plus_1 || 0
+      : syncingStatusReport.lastBlockWallet && birthday_plus_1
+      ? syncingStatusReport.lastBlockWallet - birthday_plus_1 || 0
       : 0;
   const server_3: number =
-    syncStatusReport.lastBlockServer && syncStatusReport.process_end_block
-      ? syncStatusReport.lastBlockServer - syncStatusReport.process_end_block || 0
-      : syncStatusReport.lastBlockServer && syncStatusReport.lastBlockWallet
-      ? syncStatusReport.lastBlockServer - syncStatusReport.lastBlockWallet || 0
+    syncingStatusReport.lastBlockServer && syncingStatusReport.process_end_block
+      ? syncingStatusReport.lastBlockServer - syncingStatusReport.process_end_block || 0
+      : syncingStatusReport.lastBlockServer && syncingStatusReport.lastBlockWallet
+      ? syncingStatusReport.lastBlockServer - syncingStatusReport.lastBlockWallet || 0
       : 0;
   const server_4: number = maxBlocks ? maxBlocks - server_1 - server_2 - server_3 || 0 : 0;
-  const server_server: number = syncStatusReport.lastBlockServer || 0;
+  const server_server: number = syncingStatusReport.lastBlockServer || 0;
   const server_wallet: number =
-    syncStatusReport.lastBlockServer && birthday_plus_1 ? syncStatusReport.lastBlockServer - birthday_plus_1 || 0 : 0;
+    syncingStatusReport.lastBlockServer && birthday_plus_1
+      ? syncingStatusReport.lastBlockServer - birthday_plus_1 || 0
+      : 0;
 
   let wallet_1: number =
-    syncStatusReport.process_end_block && birthday_plus_1
-      ? syncStatusReport.process_end_block - birthday_plus_1 || 0
-      : syncStatusReport.lastBlockWallet && birthday_plus_1
-      ? syncStatusReport.lastBlockWallet - birthday_plus_1 || 0
+    syncingStatusReport.process_end_block && birthday_plus_1
+      ? syncingStatusReport.process_end_block - birthday_plus_1 || 0
+      : syncingStatusReport.lastBlockWallet && birthday_plus_1
+      ? syncingStatusReport.lastBlockWallet - birthday_plus_1 || 0
       : 0;
   let wallet_21: number =
-    syncStatusReport.currentBlock && syncStatusReport.process_end_block
-      ? syncStatusReport.currentBlock - syncStatusReport.process_end_block || 0
-      : syncStatusReport.currentBlock && syncStatusReport.lastBlockWallet
-      ? syncStatusReport.currentBlock - syncStatusReport.lastBlockWallet || 0
+    syncingStatusReport.currentBlock && syncingStatusReport.process_end_block
+      ? syncingStatusReport.currentBlock - syncingStatusReport.process_end_block || 0
+      : syncingStatusReport.currentBlock && syncingStatusReport.lastBlockWallet
+      ? syncingStatusReport.currentBlock - syncingStatusReport.lastBlockWallet || 0
       : 0;
   // It is really weird, but don't want any negative values in the UI.
   if (wallet_1 < 0) {
@@ -81,8 +83,8 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
     wallet_21 = 0;
   }
   const wallet_3: number =
-    syncStatusReport.lastBlockServer && birthday_plus_1
-      ? syncStatusReport.lastBlockServer - birthday_plus_1 - wallet_1 - wallet_21 || 0
+    syncingStatusReport.lastBlockServer && birthday_plus_1
+      ? syncingStatusReport.lastBlockServer - birthday_plus_1 - wallet_1 - wallet_21 || 0
       : 0;
   let wallet_old_synced: number = wallet_1;
   let wallet_new_synced: number = wallet_21;
@@ -155,18 +157,18 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
               <DetailLine
                 label="Sync ID"
                 value={
-                  syncStatusReport.syncID && syncStatusReport.syncID >= 0
-                    ? syncStatusReport.syncID +
+                  syncingStatusReport.syncID && syncingStatusReport.syncID >= 0
+                    ? syncingStatusReport.syncID +
                       ' - (' +
-                      (syncStatusReport.inProgress ? translate('report.running') : translate('report.finished')) +
+                      (syncingStatusReport.inProgress ? translate('report.running') : translate('report.finished')) +
                       ')'
                     : translate('loading')
                 }
               />
-              {!!syncStatusReport.lastError && (
+              {!!syncingStatusReport.lastError && (
                 <>
                   <View style={{ height: 2, width: '100%', backgroundColor: 'red', marginTop: 10 }} />
-                  <DetailLine label="Last Error" value={syncStatusReport.lastError} />
+                  <DetailLine label="Last Error" value={syncingStatusReport.lastError} />
                   <View style={{ height: 2, width: '100%', backgroundColor: 'red', marginBottom: 10 }} />
                 </>
               )}
@@ -328,7 +330,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
                     }}>
                     <>
                       <Text style={{ color: colors.primary }}>{birthday_plus_1}</Text>
-                      <Text style={{ color: colors.primary }}>{syncStatusReport.lastBlockServer}</Text>
+                      <Text style={{ color: colors.primary }}>{syncingStatusReport.lastBlockServer}</Text>
                     </>
                   </View>
                   <View
@@ -365,7 +367,8 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
                         style={{
                           height: 10,
                           width:
-                            ((wallet_1 * 100) / (syncStatusReport.lastBlockServer - birthday_plus_1)).toString() + '%',
+                            ((wallet_1 * 100) / (syncingStatusReport.lastBlockServer - birthday_plus_1)).toString() +
+                            '%',
                           backgroundColor: 'lightyellow',
                           borderLeftColor: colors.primary,
                           borderLeftWidth: 1,
@@ -379,7 +382,8 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
                         style={{
                           height: 10,
                           width:
-                            ((wallet_21 * 100) / (syncStatusReport.lastBlockServer - birthday_plus_1)).toString() + '%',
+                            ((wallet_21 * 100) / (syncingStatusReport.lastBlockServer - birthday_plus_1)).toString() +
+                            '%',
                           backgroundColor: 'orange',
                           borderRightColor: 'orange',
                           borderRightWidth: wallet_21 > 0 ? 1 : 0,
@@ -394,7 +398,8 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
                           borderRightColor: colors.primary,
                           borderRightWidth: 1,
                           width:
-                            ((wallet_3 * 100) / (syncStatusReport.lastBlockServer - birthday_plus_1)).toString() + '%',
+                            ((wallet_3 * 100) / (syncingStatusReport.lastBlockServer - birthday_plus_1)).toString() +
+                            '%',
                         }}
                       />
                     )}
@@ -485,41 +490,43 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
 
               <View style={{ height: 2, width: '100%', backgroundColor: 'white', marginTop: 15 }} />
 
-              {syncStatusReport.inProgress && syncStatusReport.currentBatch > 0 && (
+              {syncingStatusReport.inProgress && syncingStatusReport.currentBatch > 0 && (
                 <>
                   <DetailLine
                     label={translate('report.batches')}
                     value={
                       translate('report.processingbatch') +
-                      syncStatusReport.currentBatch +
+                      syncingStatusReport.currentBatch +
                       translate('report.totalbatches') +
-                      syncStatusReport.totalBatches
+                      syncingStatusReport.totalBatches
                     }
                   />
                   <DetailLine
                     label={translate('report.blocksperbatch')}
-                    value={syncStatusReport.blocksPerBatch.toString()}
+                    value={syncingStatusReport.blocksPerBatch.toString()}
                   />
                   <DetailLine
                     label={translate('report.secondsperbatch')}
-                    value={syncStatusReport.secondsPerBatch.toString()}
+                    value={syncingStatusReport.secondsPerBatch.toString()}
                   />
                 </>
               )}
-              {syncStatusReport.inProgress && syncStatusReport.currentBlock > 0 && !!syncStatusReport.lastBlockServer && (
-                <>
-                  <View style={{ height: 2, width: '100%', backgroundColor: colors.primary, marginTop: 10 }} />
-                  <DetailLine
-                    label={translate('report.blocks-title')}
-                    value={
-                      translate('report.processingblock') +
-                      syncStatusReport.currentBlock +
-                      translate('report.totalblocks') +
-                      syncStatusReport.lastBlockServer
-                    }
-                  />
-                </>
-              )}
+              {syncingStatusReport.inProgress &&
+                syncingStatusReport.currentBlock > 0 &&
+                !!syncingStatusReport.lastBlockServer && (
+                  <>
+                    <View style={{ height: 2, width: '100%', backgroundColor: colors.primary, marginTop: 10 }} />
+                    <DetailLine
+                      label={translate('report.blocks-title')}
+                      value={
+                        translate('report.processingblock') +
+                        syncingStatusReport.currentBlock +
+                        translate('report.totalblocks') +
+                        syncingStatusReport.lastBlockServer
+                      }
+                    />
+                  </>
+                )}
             </View>
           </>
         ) : (
