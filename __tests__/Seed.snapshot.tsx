@@ -27,6 +27,16 @@ jest.mock('react-native-localize', () => ({
   },
 }));
 jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
+jest.mock('react-native-reanimated', () => {
+  return class Reanimated {
+    public static Value() {
+      return jest.fn(() => {});
+    }
+    public static View() {
+      return '';
+    }
+  };
+});
 
 // test suite
 describe('Component Seed - test', () => {
