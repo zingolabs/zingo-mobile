@@ -29,23 +29,22 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
   const { info, translate } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const spendColor =
-    tx?.confirmations === 0 ? colors.primaryDisabled : (tx?.amount || 0) > 0 ? colors.primary : colors.text;
+    tx.confirmations === 0 ? colors.primaryDisabled : (tx.amount || 0) > 0 ? colors.primary : colors.text;
 
   const [expandAddress, setExpandAddress] = useState(false);
   const [expandTxid, setExpandTxid] = useState(false);
 
   const sum =
-    (tx?.detailedTxns && tx?.detailedTxns?.reduce((s: number, d: TxDetailType) => s + (d.amount ? d.amount : 0), 0)) ||
-    0;
+    (tx.detailedTxns && tx.detailedTxns.reduce((s: number, d: TxDetailType) => s + (d.amount ? d.amount : 0), 0)) || 0;
   let fee = 0;
   // normal case: spend 1600 fee 1000 sent 600
-  if (tx?.type === 'sent' && tx?.amount && Math.abs(tx?.amount) > Math.abs(sum)) {
-    fee = Math.abs(tx?.amount) - Math.abs(sum);
+  if (tx.type === 'sent' && tx.amount && Math.abs(tx.amount) > Math.abs(sum)) {
+    fee = Math.abs(tx.amount) - Math.abs(sum);
   }
   // self-send case: spend 1000 fee 1000 sent 0
   // this is temporary until we have a new field in 'list' object, called: fee.
-  if (tx?.type === 'sent' && tx?.amount && Math.abs(tx?.amount) <= Math.abs(sum)) {
-    fee = Math.abs(tx?.amount);
+  if (tx.type === 'sent' && tx.amount && Math.abs(tx.amount) <= Math.abs(sum)) {
+    fee = Math.abs(tx.amount);
   }
 
   const handleTxIDClick = (txid?: string) => {
@@ -86,21 +85,21 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
         </TouchableOpacity>
         <View style={{ display: 'flex', alignItems: 'center', padding: 10, backgroundColor: colors.card }}>
           <RegText style={{ textTransform: 'capitalize' }} color={spendColor}>
-            {!!tx?.type && (tx.type === 'sent' ? translate('transactions.sent') : translate('transactions.receive'))}
+            {!!tx.type && (tx.type === 'sent' ? translate('transactions.sent') : translate('transactions.receive'))}
           </RegText>
-          <ZecAmount currencyName={info?.currencyName ? info.currencyName : ''} size={36} amtZec={tx?.amount} />
-          <UsdAmount amtZec={tx?.amount} price={tx?.zec_price} />
+          <ZecAmount currencyName={info.currencyName ? info.currencyName : ''} size={36} amtZec={tx.amount} />
+          <UsdAmount amtZec={tx.amount} price={tx.zec_price} />
         </View>
 
         <View style={{ margin: 10 }}>
           <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
             <View style={{ display: 'flex' }}>
               <FadeText>{translate('transactions.time')}</FadeText>
-              <RegText>{moment((tx?.time || 0) * 1000).format('YYYY MMM D h:mm a')}</RegText>
+              <RegText>{moment((tx.time || 0) * 1000).format('YYYY MMM D h:mm a')}</RegText>
             </View>
             <View style={{ display: 'flex', alignItems: 'flex-end' }}>
               <FadeText>{translate('transactions.confirmations')}</FadeText>
-              <RegText>{tx?.confirmations.toString()}</RegText>
+              <RegText>{tx.confirmations.toString()}</RegText>
             </View>
           </View>
 
@@ -108,17 +107,17 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
             <FadeText>{translate('transactions.txid')}</FadeText>
             <TouchableOpacity
               onPress={() => {
-                if (tx?.txid) {
-                  Clipboard.setString(tx?.txid);
+                if (tx.txid) {
+                  Clipboard.setString(tx.txid);
                   Toast.show(translate('transactions.txcopied'), Toast.LONG);
                   setExpandTxid(true);
                 }
               }}>
-              {!expandTxid && <RegText>{Utils.trimToSmall(tx?.txid, 10)}</RegText>}
+              {!expandTxid && <RegText>{Utils.trimToSmall(tx.txid, 10)}</RegText>}
               {expandTxid && (
                 <>
-                  <RegText>{tx?.txid}</RegText>
-                  <TouchableOpacity onPress={() => handleTxIDClick(tx?.txid)}>
+                  <RegText>{tx.txid}</RegText>
+                  <TouchableOpacity onPress={() => handleTxIDClick(tx.txid)}>
                     <Text style={{ color: colors.text, textDecorationLine: 'underline', margin: 15 }}>
                       {translate('transactions.viewexplorer')}
                     </Text>
@@ -128,7 +127,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
             </TouchableOpacity>
           </View>
 
-          {tx?.detailedTxns.map((txd: TxDetailType) => {
+          {tx.detailedTxns.map((txd: TxDetailType) => {
             return (
               <View
                 key={txd.address}
@@ -165,28 +164,28 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
                 <View style={{ marginTop: 10 }}>
                   <FadeText>{translate('transactions.amount')}</FadeText>
                   <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <ZecAmount amtZec={txd?.amount} size={18} currencyName={'ᙇ'} />
-                    <UsdAmount style={{ fontSize: 18 }} amtZec={txd?.amount} price={tx?.zec_price} />
+                    <ZecAmount amtZec={txd.amount} size={18} currencyName={'ᙇ'} />
+                    <UsdAmount style={{ fontSize: 18 }} amtZec={txd.amount} price={tx.zec_price} />
                   </View>
                   <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
                     <ZecPrice
-                      price={tx?.zec_price ? tx.zec_price : 0}
-                      currencyName={info?.currencyName ? info.currencyName : ''}
+                      price={tx.zec_price ? tx.zec_price : 0}
+                      currencyName={info.currencyName ? info.currencyName : ''}
                     />
                   </View>
                 </View>
 
-                {txd?.memo && (
+                {txd.memo && (
                   <View style={{ marginTop: 10 }}>
                     <FadeText>{translate('transactions.memo')}</FadeText>
                     <TouchableOpacity
                       onPress={() => {
-                        if (txd?.memo) {
-                          Clipboard.setString(txd?.memo);
+                        if (txd.memo) {
+                          Clipboard.setString(txd.memo);
                           Toast.show(translate('transactions.memocopied'), Toast.LONG);
                         }
                       }}>
-                      <RegText>{txd?.memo}</RegText>
+                      <RegText>{txd.memo}</RegText>
                     </TouchableOpacity>
                   </View>
                 )}
@@ -199,7 +198,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
               <FadeText>{translate('transactions.txfee')}</FadeText>
               <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                 <ZecAmount amtZec={fee} size={18} currencyName={'ᙇ'} />
-                <UsdAmount style={{ fontSize: 18 }} amtZec={fee} price={tx?.zec_price} />
+                <UsdAmount style={{ fontSize: 18 }} amtZec={fee} price={tx.zec_price} />
               </View>
             </View>
           )}

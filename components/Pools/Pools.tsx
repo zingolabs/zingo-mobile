@@ -45,7 +45,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal }) => {
           style={{ width: 80, height: 80, resizeMode: 'contain' }}
         />
         <ZecAmount
-          currencyName={info?.currencyName ? info.currencyName : ''}
+          currencyName={info.currencyName ? info.currencyName : ''}
           size={36}
           amtZec={totalBalance.total}
           style={{ opacity: 0.5 }}
@@ -71,7 +71,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal }) => {
               <ZecAmount
                 amtZec={totalBalance.orchardBal}
                 size={18}
-                currencyName={info?.currencyName ? info.currencyName : ''}
+                currencyName={info.currencyName ? info.currencyName : ''}
                 style={{
                   opacity:
                     totalBalance.spendableOrchard > 0 && totalBalance.spendableOrchard === totalBalance.orchardBal
@@ -84,7 +84,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal }) => {
               <ZecAmount
                 amtZec={totalBalance.spendableOrchard}
                 size={18}
-                currencyName={info?.currencyName ? info.currencyName : ''}
+                currencyName={info.currencyName ? info.currencyName : ''}
                 color={
                   totalBalance.spendableOrchard > 0 && totalBalance.spendableOrchard === totalBalance.orchardBal
                     ? colors.primary
@@ -103,7 +103,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal }) => {
               <ZecAmount
                 amtZec={totalBalance.privateBal}
                 size={18}
-                currencyName={info?.currencyName ? info.currencyName : ''}
+                currencyName={info.currencyName ? info.currencyName : ''}
                 style={{
                   opacity:
                     totalBalance.spendablePrivate > 0 && totalBalance.spendablePrivate === totalBalance.privateBal
@@ -116,7 +116,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal }) => {
               <ZecAmount
                 amtZec={totalBalance.spendablePrivate}
                 size={18}
-                currencyName={info?.currencyName ? info.currencyName : ''}
+                currencyName={info.currencyName ? info.currencyName : ''}
                 color={
                   totalBalance.spendablePrivate > 0 && totalBalance.spendablePrivate === totalBalance.privateBal
                     ? colors.primary
@@ -135,7 +135,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal }) => {
               <ZecAmount
                 amtZec={totalBalance.transparentBal}
                 size={18}
-                currencyName={info?.currencyName ? info.currencyName : ''}
+                currencyName={info.currencyName ? info.currencyName : ''}
               />
             </DetailLine>
           </View>

@@ -72,7 +72,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
             <FadeText style={{ fontSize: 18 }}>{displayAddress}</FadeText>
             <View style={{ display: 'flex', flexDirection: 'row' }}>
               <FadeText>{tx.type === 'sent' ? 'Sent ' : 'Received '}</FadeText>
-              <FadeText>{moment((tx?.time || 0) * 1000).format('MMM D, h:mm a')}</FadeText>
+              <FadeText>{moment((tx.time || 0) * 1000).format('MMM D, h:mm a')}</FadeText>
             </View>
           </View>
           <ZecAmount

@@ -52,8 +52,8 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSen
           }}>
           <BoldText style={{ textAlign: 'center' }}>{translate('send.sending-title')}</BoldText>
 
-          <ZecAmount currencyName={info?.currencyName ? info.currencyName : ''} amtZec={sendingTotal} />
-          <UsdAmount amtZec={sendingTotal} price={info?.zecPrice ? info.zecPrice : 0} />
+          <ZecAmount currencyName={info.currencyName ? info.currencyName : ''} amtZec={sendingTotal} />
+          <UsdAmount amtZec={sendingTotal} price={info.zecPrice ? info.zecPrice : 0} />
         </View>
         {[sendPageState.toaddr].map(to => {
           return (
@@ -71,14 +71,14 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSen
                   marginTop: 5,
                 }}>
                 <ZecAmount
-                  currencyName={info?.currencyName ? info.currencyName : ''}
+                  currencyName={info.currencyName ? info.currencyName : ''}
                   size={18}
                   amtZec={Number(to.amount)}
                 />
                 <UsdAmount
                   style={{ fontSize: 18 }}
                   amtZec={Number(to.amount)}
-                  price={info?.zecPrice ? info.zecPrice : 0}
+                  price={info.zecPrice ? info.zecPrice : 0}
                 />
               </View>
               <RegText>{to.memo || ''}</RegText>
@@ -90,8 +90,8 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSen
           <FadeText>{translate('send.fee')}</FadeText>
           <View
             style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
-            <ZecAmount currencyName={info?.currencyName ? info.currencyName : ''} size={18} amtZec={defaultFee} />
-            <UsdAmount style={{ fontSize: 18 }} amtZec={defaultFee} price={info?.zecPrice ? info.zecPrice : 0} />
+            <ZecAmount currencyName={info.currencyName ? info.currencyName : ''} size={18} amtZec={defaultFee} />
+            <UsdAmount style={{ fontSize: 18 }} amtZec={defaultFee} price={info.zecPrice ? info.zecPrice : 0} />
           </View>
         </View>
       </ScrollView>

@@ -40,8 +40,8 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
   }, [syncingStatusReport.lastBlockServer]);
 
   useEffect(() => {
-    setBirthday_plus_1((walletSeed?.birthday || 0) + 1);
-  }, [walletSeed?.birthday]);
+    setBirthday_plus_1((walletSeed.birthday || 0) + 1);
+  }, [walletSeed.birthday]);
 
   const server_1: number = birthday_plus_1 || 0;
   const server_2: number =

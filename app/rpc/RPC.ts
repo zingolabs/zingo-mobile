@@ -904,7 +904,7 @@ export default class RPC {
   async fetchWalletBirthday(): Promise<void> {
     const walletSeed = await RPC.rpc_fetchSeedAndBirthday();
 
-    if (walletSeed?.birthday) {
+    if (walletSeed.birthday) {
       this.walletBirthday = walletSeed.birthday;
     }
   }

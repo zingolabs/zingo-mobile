@@ -45,13 +45,13 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance, toggl
   const taddrs = addresses.filter(a => a.uaAddress === uaAddress && a.addressKind === 't') || [];
 
   if (displayAddress) {
-    let displayAddressIndex = zaddrs?.findIndex(a => a.address === displayAddress);
+    let displayAddressIndex = zaddrs.findIndex(a => a.address === displayAddress);
 
     if (zindex !== displayAddressIndex && displayAddressIndex >= 0) {
       setZIndex(displayAddressIndex);
     }
 
-    displayAddressIndex = taddrs?.findIndex(a => a.address === displayAddress);
+    displayAddressIndex = taddrs.findIndex(a => a.address === displayAddress);
 
     if (tindex !== displayAddressIndex && displayAddressIndex >= 0) {
       setTIndex(displayAddressIndex);
@@ -88,13 +88,13 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance, toggl
       if (zaddrs.length === 0) {
         return;
       }
-      const newIndex = (zindex + 1) % zaddrs?.length;
+      const newIndex = (zindex + 1) % zaddrs.length;
       setZIndex(newIndex);
     } else if (type === 't') {
       if (taddrs.length === 0) {
         return;
       }
-      const newIndex = (tindex + 1) % taddrs?.length;
+      const newIndex = (tindex + 1) % taddrs.length;
       setTIndex(newIndex);
     }
   };
@@ -349,7 +349,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance, toggl
               style={{ width: 80, height: 80, resizeMode: 'contain' }}
             />
             <ZecAmount
-              currencyName={info?.currencyName ? info.currencyName : ''}
+              currencyName={info.currencyName ? info.currencyName : ''}
               size={36}
               amtZec={totalBalance.total}
               style={{ opacity: 0.5 }}
@@ -483,7 +483,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance, toggl
               style={{ width: 80, height: 80, resizeMode: 'contain' }}
             />
             <ZecAmount
-              currencyName={info?.currencyName ? info.currencyName : ''}
+              currencyName={info.currencyName ? info.currencyName : ''}
               size={36}
               amtZec={totalBalance.total}
               style={{ opacity: 0.5 }}
