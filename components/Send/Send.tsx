@@ -26,7 +26,7 @@ import RegText from '../Components/RegText';
 import ZecAmount from '../Components/ZecAmount';
 import UsdAmount from '../Components/UsdAmount';
 import Button from '../Button';
-import { SendPageState, SendProgress, ToAddr } from '../../app/AppState';
+import { SendPageStateClass, SendProgressClass, ToAddrClass } from '../../app/AppState';
 import { parseZcashURI, ZcashURITarget } from '../../app/uris';
 import RPCModule from '../RPCModule';
 import Utils from '../../app/utils';
@@ -36,10 +36,10 @@ import { ThemeType } from '../../app/types';
 import { ContextLoaded } from '../../app/context';
 
 type SendProps = {
-  setSendPageState: (sendPageState: SendPageState) => void;
-  sendTransaction: (setSendProgress: (arg0: SendProgress) => void) => Promise<String>;
+  setSendPageState: (sendPageState: SendPageStateClass) => void;
+  sendTransaction: (setSendProgress: (arg0: SendProgressClass) => void) => Promise<String>;
   clearToAddr: () => void;
-  setSendProgress: (progress: SendProgress) => void;
+  setSendProgress: (progress: SendProgressClass) => void;
   toggleMenuDrawer: () => void;
   setComputingModalVisible: (visible: boolean) => void;
   syncingStatusMoreInfoOnClick: () => void;
@@ -212,7 +212,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     memo: string | null,
   ) => {
     // Create the new state object
-    const newState = new SendPageState(new ToAddr(0));
+    const newState = new SendPageStateClass(new ToAddrClass(0));
 
     const newToAddr = sendPageState.toaddr;
     // Find the correct toAddr
@@ -226,9 +226,9 @@ const Send: React.FunctionComponent<SendProps> = ({
 
         if (typeof target !== 'string') {
           // redo the to addresses
-          let uriToAddr: ToAddr = new ToAddr(0);
+          let uriToAddr: ToAddrClass = new ToAddrClass(0);
           [target].forEach(tgt => {
-            const to = new ToAddr(Utils.getNextToAddrID());
+            const to = new ToAddrClass(Utils.getNextToAddrID());
 
             to.to = tgt.address || '';
             to.amount = Utils.maxPrecisionTrimmed(tgt.amount || 0);
@@ -291,11 +291,11 @@ const Send: React.FunctionComponent<SendProps> = ({
     setConfirmModalVisible(false);
     setComputingModalVisible(true);
 
-    const setLocalSendProgress = (progress: SendProgress) => {
+    const setLocalSendProgress = (progress: SendProgressClass) => {
       if (progress && progress.sendInProgress) {
         setSendProgress(progress);
       } else {
-        setSendProgress(new SendProgress(0, 0, 0));
+        setSendProgress(new SendProgressClass(0, 0, 0));
       }
     };
 

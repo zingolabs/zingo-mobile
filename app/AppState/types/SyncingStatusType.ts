@@ -1,4 +1,4 @@
-export default interface SyncStatus {
+export default interface SyncingStatusType {
   inProgress: boolean;
   progress: number;
   blocks: string;

@@ -1,20 +1,21 @@
 import { TranslateOptions } from 'i18n-js';
 import { StackScreenProps } from '@react-navigation/stack';
 
-import SyncStatusReport from './SyncStatusReport';
-import TotalBalance from './TotalBalance';
-import Address from './Address';
-import AddressBookEntry from './AddressBookEntry';
-import ErrorModalData from './ErrorModalData';
-import Transaction from './Transaction';
-import SendPageState from './SendPageState';
-import SendProgress from './SendProgress';
-import ReceivePageState from './ReceivePageState';
-import InfoType from './InfoType';
-import WalletSeed from './WalletSeed';
-import WalletSettings from './WalletSettings';
-import SyncStatus from './SyncStatus';
-import DimensionsType from './DimensionsType';
+import SyncingStatusReportClass from './classes/SyncingStatusReportClass';
+import TotalBalanceClass from './classes/TotalBalanceClass';
+import AddressClass from './classes/AddressClass';
+import AddressBookClass from './classes/AddressBookClass';
+import ErrorModalDataClass from './classes/ErrorModalDataClass';
+import SendPageStateClass from './classes/SendPageStateClass';
+import SendProgressClass from './classes/SendProgressClass';
+import ReceivePageStateClass from './classes/ReceivePageStateClass';
+import WalletSettingsClass from './classes/WalletSettingsClass';
+
+import TransactionType from './types/TransactionType';
+import InfoType from './types/InfoType';
+import WalletSeedType from './types/WalletSeedType';
+import SyncingStatusType from './types/SyncingStatusType';
+import DimensionsType from './types/DimensionsType';
 
 export default interface AppStateLoaded {
   navigation: StackScreenProps<any>['navigation'];
@@ -22,10 +23,10 @@ export default interface AppStateLoaded {
   dimensions: DimensionsType;
 
   // Info about the current sync process
-  syncStatusReport: SyncStatusReport;
+  syncStatusReport: SyncingStatusReportClass;
 
   // The total confirmed and unconfirmed balance in this wallet
-  totalBalance: TotalBalance;
+  totalBalance: TotalBalanceClass;
 
   // A map type that contains address -> privatekey mapping, for display on the receive page
   // This mapping is ephemeral, and will disappear when the user navigates away.
@@ -33,19 +34,19 @@ export default interface AppStateLoaded {
 
   // List of all addresses in the wallet, including change addresses and addresses
   // that don't have any balance or are unused
-  addresses: Address[];
+  addresses: AddressClass[];
 
   // List of Address / Label pairs
-  addressBook: AddressBookEntry[];
+  addressBook: AddressBookClass[];
 
   // List of all T and Z and O transactions
-  transactions: Transaction[];
+  transactions: TransactionType[];
 
   // The state of the send page, as the user constructs a transaction
-  sendPageState: SendPageState;
+  sendPageState: SendPageStateClass;
 
   // Any state for the receive page
-  receivePageState: ReceivePageState;
+  receivePageState: ReceivePageStateClass;
 
   // getinfo and getblockchaininfo result
   info: InfoType;
@@ -56,17 +57,17 @@ export default interface AppStateLoaded {
   // Callbacks for the password dialog box
   //passwordState: PasswordState;
 
-  wallet_settings: WalletSettings;
+  wallet_settings: WalletSettingsClass;
 
-  syncingStatus: SyncStatus;
+  syncingStatus: SyncingStatusType;
 
   // Data for any error or info modal
-  errorModalData: ErrorModalData;
+  errorModalData: ErrorModalDataClass;
 
   // Build progress from Tx
-  sendProgress: SendProgress;
+  sendProgress: SendProgressClass;
 
-  walletSeed: WalletSeed;
+  walletSeed: WalletSeedType;
 
   isMenuDrawerOpen: boolean;
 

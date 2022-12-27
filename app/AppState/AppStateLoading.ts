@@ -1,10 +1,11 @@
 import { TranslateOptions } from 'i18n-js';
 import { StackScreenProps } from '@react-navigation/stack';
 
-import TotalBalance from './TotalBalance';
-import InfoType from './InfoType';
-import WalletSeed from './WalletSeed';
-import DimensionsType from './DimensionsType';
+import TotalBalanceClass from './classes/TotalBalanceClass';
+
+import InfoType from './types/InfoType';
+import WalletSeedType from './types/WalletSeedType';
+import DimensionsType from './types/DimensionsType';
 
 export default interface AppStateLoading {
   navigation: StackScreenProps<any>['navigation'];
@@ -14,9 +15,9 @@ export default interface AppStateLoading {
   screen: number;
   actionButtonsDisabled: boolean;
   walletExists: boolean;
-  walletSeed: WalletSeed;
+  walletSeed: WalletSeedType;
   server: string;
-  totalBalance: TotalBalance;
+  totalBalance: TotalBalanceClass;
   info: InfoType;
 
   translate: (key: string, config?: TranslateOptions) => string;

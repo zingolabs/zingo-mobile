@@ -1,4 +1,4 @@
-export type SaplingNoteType = {
+export type RPCOrchardNoteType = {
   created_in_block: number;
   datetime: number;
   created_in_txid: string;

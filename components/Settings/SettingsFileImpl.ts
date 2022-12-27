@@ -1,6 +1,6 @@
 import * as RNFS from 'react-native-fs';
 
-import { SettingsFileEntry } from '../../app/AppState';
+import { SettingsFileClass } from '../../app/AppState';
 
 export default class SettingsFileImpl {
   static async getFileName() {
@@ -8,7 +8,7 @@ export default class SettingsFileImpl {
   }
 
   // Write the server setting
-  static async writeSettings(ss: SettingsFileEntry) {
+  static async writeSettings(ss: SettingsFileClass) {
     const fileName = await this.getFileName();
 
     RNFS.writeFile(fileName, JSON.stringify(ss), 'utf8')
@@ -21,15 +21,15 @@ export default class SettingsFileImpl {
   }
 
   // Read the server setting
-  static async readSettings(): Promise<SettingsFileEntry> {
+  static async readSettings(): Promise<SettingsFileClass> {
     const fileName = await this.getFileName();
 
     try {
-      return JSON.parse((await RNFS.readFile(fileName, 'utf8')).toString()) as SettingsFileEntry;
+      return JSON.parse((await RNFS.readFile(fileName, 'utf8')).toString()) as SettingsFileClass;
     } catch (err) {
       // File probably doesn't exist, so return nothing
       //console.log(err);
-      return {} as SettingsFileEntry;
+      return {} as SettingsFileClass;
     }
   }
 }

@@ -23,7 +23,7 @@ import { StackScreenProps } from '@react-navigation/stack';
 import BoldText from '../../components/Components/BoldText';
 import Button from '../../components/Button';
 import RPCModule from '../../components/RPCModule';
-import { SettingsFileEntry, AppStateLoading, WalletSeed } from '../AppState';
+import { SettingsFileClass, AppStateLoading, WalletSeedType } from '../AppState';
 import { serverUris } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import RPC from '../rpc';
@@ -145,7 +145,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
         this.setState({ info });
       }
       // read settings file
-      let settings = {} as SettingsFileEntry;
+      let settings = {} as SettingsFileClass;
       if (!this.state.server) {
         settings = await SettingsFileImpl.readSettings();
         if (!!settings && !!settings.server) {
@@ -203,14 +203,14 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
   useDefaultServer_0 = async () => {
     this.setState({ actionButtonsDisabled: true });
     const language = '';
-    await SettingsFileImpl.writeSettings(new SettingsFileEntry(SERVER_DEFAULT_0, language));
+    await SettingsFileImpl.writeSettings(new SettingsFileClass(SERVER_DEFAULT_0, language));
     this.setState({ server: SERVER_DEFAULT_0, actionButtonsDisabled: false });
   };
 
   useDefaultServer_1 = async () => {
     this.setState({ actionButtonsDisabled: true });
     const language = '';
-    await SettingsFileImpl.writeSettings(new SettingsFileEntry(SERVER_DEFAULT_0, language));
+    await SettingsFileImpl.writeSettings(new SettingsFileClass(SERVER_DEFAULT_0, language));
     this.setState({ server: SERVER_DEFAULT_1, actionButtonsDisabled: false });
   };
 
@@ -240,7 +240,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
   };
 
   getwalletSeedToRestore = async () => {
-    this.setState({ walletSeed: {} as WalletSeed, screen: 3, walletExists: false });
+    this.setState({ walletSeed: {} as WalletSeedType, screen: 3, walletExists: false });
   };
 
   getViewingKeyToRestore = async () => {

@@ -1,4 +1,4 @@
-export default class SyncStatusReport {
+export default class SyncingStatusReportClass {
   // sync ID
   syncID: number;
 

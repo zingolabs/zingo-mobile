@@ -8,7 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faBars, faInfo } from '@fortawesome/free-solid-svg-icons';
 
 import RPC from '../../app/rpc';
-import { Transaction } from '../../app/AppState';
+import { TransactionType } from '../../app/AppState';
 import { ThemeType } from '../../app/types';
 import RegText from '../Components/RegText';
 import ZecAmount from '../Components/ZecAmount';
@@ -38,7 +38,7 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
   const { translate, dimensions, transactions, totalBalance, info, syncingStatus } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [isTxDetailModalShowing, setTxDetailModalShowing] = React.useState(false);
-  const [txDetail, setTxDetail] = React.useState<Transaction>({} as Transaction);
+  const [txDetail, setTxDetail] = React.useState<TransactionType>({} as TransactionType);
 
   const [numTx, setNumTx] = React.useState<number>(100);
   const loadMoreButton = numTx < (transactions?.length || 0);

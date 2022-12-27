@@ -7,15 +7,15 @@ import { faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons';
 
 import ZecAmount from '../../Components/ZecAmount';
 import FadeText from '../../Components/FadeText';
-import { Transaction } from '../../../app/AppState';
+import { TransactionType } from '../../../app/AppState';
 import Utils from '../../../app/utils';
 import { ThemeType } from '../../../app/types';
 import moment from 'moment';
 
 type TxSummaryLineProps = {
   month: string;
-  tx: Transaction;
-  setTxDetail: React.Dispatch<React.SetStateAction<Transaction>>;
+  tx: TransactionType;
+  setTxDetail: React.Dispatch<React.SetStateAction<TransactionType>>;
   setTxDetailModalShowing: React.Dispatch<React.SetStateAction<boolean>>;
 };
 const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({

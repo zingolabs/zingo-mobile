@@ -12,7 +12,7 @@ import ZecAmount from '../Components/ZecAmount';
 import Button from '../Button';
 import { ThemeType } from '../../app/types';
 import { ContextLoaded, ContextLoading } from '../../app/context';
-import { WalletSeed } from '../../app/AppState';
+import { WalletSeedType } from '../../app/AppState';
 
 type TextsType = {
   new: string[];
@@ -31,7 +31,7 @@ type SeedProps = {
 const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, action }) => {
   const contextLoaded = useContext(ContextLoaded);
   const contextLoading = useContext(ContextLoading);
-  let walletSeed: WalletSeed, totalBalance, translate: (key: string, config?: TranslateOptions) => string, info;
+  let walletSeed: WalletSeedType, totalBalance, translate: (key: string, config?: TranslateOptions) => string, info;
   if (action === 'new' || action === 'restore') {
     walletSeed = contextLoading.walletSeed;
     totalBalance = contextLoading.totalBalance;
