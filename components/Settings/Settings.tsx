@@ -30,7 +30,11 @@ type Memos = {
 const Settings: React.FunctionComponent<SettingsProps> = ({ set_wallet_option, set_server_option, closeModal }) => {
   const context = useContext(ContextLoaded);
   const { wallet_settings, totalBalance, info, translate } = context;
-  const MEMOS: Memos[] = translate('settings.memos');
+  const memosArray: string = translate('settings.memos');
+  let MEMOS: Memos[] = [];
+  if (typeof memosArray === 'object') {
+    MEMOS = memosArray as Memos[];
+  }
   const { colors } = useTheme() as unknown as ThemeType;
 
   const [memos, setMemos] = React.useState(wallet_settings.download_memos);
@@ -147,7 +151,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ set_wallet_option, s
           <View style={{ display: 'flex', flexDirection: 'row' }}>
             <TouchableOpacity
               style={{ marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
-              onPress={() => setServer(undefined)}>
+              onPress={() => setServer('')}>
               <View style={{ display: 'flex', flexDirection: 'row', marginTop: 10 }}>
                 {customIcon && <FontAwesomeIcon icon={customIcon} size={20} color={colors.border} />}
                 <RegText style={{ marginLeft: 10 }}>{translate('settings.custom')}</RegText>

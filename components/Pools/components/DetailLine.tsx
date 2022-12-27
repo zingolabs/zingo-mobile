@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { View } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
@@ -9,8 +9,8 @@ import { ThemeType } from '../../../app/types';
 
 type DetailLineProps = {
   label: string;
-  value?: string | number;
-  children?: any;
+  value?: string;
+  children?: ReactNode;
 };
 
 const DetailLine: React.FunctionComponent<DetailLineProps> = ({ label, value, children }) => {

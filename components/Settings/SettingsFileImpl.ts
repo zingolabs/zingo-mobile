@@ -25,11 +25,11 @@ export default class SettingsFileImpl {
     const fileName = await this.getFileName();
 
     try {
-      return JSON.parse((await RNFS.readFile(fileName, 'utf8')).toString());
+      return JSON.parse((await RNFS.readFile(fileName, 'utf8')).toString()) as SettingsFileEntry;
     } catch (err) {
       // File probably doesn't exist, so return nothing
       //console.log(err);
-      return {};
+      return {} as SettingsFileEntry;
     }
   }
 }

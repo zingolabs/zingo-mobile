@@ -2,11 +2,8 @@ import { getNumberFormatSettings } from 'react-native-localize';
 import { ZecAmountSplitType } from './ZecAmountSplitType';
 
 export default class Utils {
-  static trimToSmall(addr?: string, numChars?: number): string | undefined {
+  static trimToSmall(addr: string, numChars?: number): string {
     const trimSize = numChars || 5;
-    if (!addr) {
-      return addr;
-    }
 
     return `${addr.slice(0, trimSize)}...${addr.slice(addr.length - trimSize)}`;
   }
@@ -106,7 +103,7 @@ export default class Utils {
     return 'Thanks for supporting Zingo!';
   }
 
-  static getZecToUsdString(price: number | null, zecValue: number | null): string {
+  static getZecToUsdString(price: number, zecValue: number): string {
     if (!price || !zecValue) {
       return 'USD --';
     }

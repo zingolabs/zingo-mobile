@@ -1,11 +1,16 @@
 import React from 'react';
-import { Text } from 'react-native';
+import { Text, TextStyle } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
-const ErrorText: React.FunctionComponent<any> = props => {
+type ErrorTextProps = {
+  style?: TextStyle;
+  children: string;
+};
+
+const ErrorText: React.FunctionComponent<ErrorTextProps> = ({ style, children }) => {
   const { colors } = useTheme();
 
-  return <Text style={{ color: colors.primary, ...props.style }}>{props.children}</Text>;
+  return <Text style={{ color: colors.primary, ...style }}>{children}</Text>;
 };
 
 export default ErrorText;

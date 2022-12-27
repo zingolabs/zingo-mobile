@@ -4,10 +4,10 @@ export default class SendProgress {
   total: number;
   etaSeconds: number | string;
 
-  constructor() {
+  constructor(progress: number, total: number, etaSeconds: number | string) {
     this.sendInProgress = false;
-    this.progress = 0;
-    this.total = 0;
-    this.etaSeconds = 0;
+    this.progress = progress;
+    this.total = total;
+    this.etaSeconds = etaSeconds;
   }
 }

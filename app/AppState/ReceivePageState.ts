@@ -6,8 +6,8 @@ export default class ReceivePageState {
   // Increment to force re-render
   rerenderKey: number;
 
-  constructor() {
-    this.newAddress = '';
+  constructor(address: string) {
+    this.newAddress = address;
     this.rerenderKey = 0;
   }
 }

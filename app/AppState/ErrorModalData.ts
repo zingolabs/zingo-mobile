@@ -4,9 +4,9 @@ export default class ErrorModalData {
 
   modalIsOpen: boolean;
 
-  constructor() {
+  constructor(title: string, body: string) {
     this.modalIsOpen = false;
-    this.title = '';
-    this.body = '';
+    this.title = title;
+    this.body = body;
   }
 }

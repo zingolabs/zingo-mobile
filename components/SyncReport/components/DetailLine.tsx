@@ -9,7 +9,7 @@ import FadeText from '../../Components/FadeText';
 
 type DetailLineProps = {
   label: string;
-  value?: string | number;
+  value: string;
 };
 const DetailLine: React.FunctionComponent<DetailLineProps> = ({ label, value }) => {
   const { colors } = useTheme() as unknown as ThemeType;

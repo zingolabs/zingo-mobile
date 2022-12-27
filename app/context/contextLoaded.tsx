@@ -1,4 +1,5 @@
 import React, { ReactNode } from 'react';
+import { StackScreenProps } from '@react-navigation/stack';
 
 import {
   AppStateLoaded,
@@ -10,36 +11,37 @@ import {
   ErrorModalData,
   SendProgress,
   WalletSettings,
+  Transaction,
+  InfoType,
+  SyncStatus,
+  WalletSeed,
+  DimensionsType,
+  Address,
+  AddressBookEntry,
 } from '../AppState';
 
-const defaultAppState: AppStateLoaded = {
-  navigation: null,
-  route: null,
-  dimensions: {} as {
-    width: number;
-    height: number;
-    orientation: 'portrait' | 'landscape';
-    deviceType: 'tablet' | 'phone';
-    scale: number;
-  },
+export const defaultAppStateLoaded: AppStateLoaded = {
+  navigation: {} as StackScreenProps<any>['navigation'],
+  route: {} as StackScreenProps<any>['route'],
+  dimensions: {} as DimensionsType,
 
   syncStatusReport: new SyncStatusReport(),
   totalBalance: new TotalBalance(),
   addressPrivateKeys: new Map(),
-  addresses: [],
-  addressBook: [],
-  transactions: null,
+  addresses: [] as Address[],
+  addressBook: [] as AddressBookEntry[],
+  transactions: [] as Transaction[],
   sendPageState: new SendPageState(new ToAddr(0)),
-  receivePageState: new ReceivePageState(),
-  info: null,
+  receivePageState: new ReceivePageState(''),
+  info: {} as InfoType,
   rescanning: false,
   wallet_settings: new WalletSettings(),
-  syncingStatus: null,
-  errorModalData: new ErrorModalData(),
-  txBuildProgress: new SendProgress(),
-  walletSeed: null,
+  syncingStatus: {} as SyncStatus,
+  errorModalData: new ErrorModalData('', ''),
+  sendProgress: new SendProgress(0, 0, 0),
+  walletSeed: {} as WalletSeed,
   isMenuDrawerOpen: false,
-  selectedMenuDrawerItem: '',
+  selectedMenuDrawerItem: '' as string,
   aboutModalVisible: false,
   computingModalVisible: false,
   settingsModalVisible: false,
@@ -51,13 +53,13 @@ const defaultAppState: AppStateLoaded = {
   seedServerModalVisible: false,
   syncReportModalVisible: false,
   poolsModalVisible: false,
-  newServer: null,
-  uaAddress: null,
+  newServer: '' as string,
+  uaAddress: '' as string,
 
-  translate: () => {},
+  translate: () => '',
 };
 
-export const ContextLoaded = React.createContext(defaultAppState);
+export const ContextLoaded = React.createContext(defaultAppStateLoaded);
 
 type ContextProviderProps = {
   children: ReactNode;

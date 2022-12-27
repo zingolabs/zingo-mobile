@@ -1,5 +1,5 @@
 export default interface WalletSeed {
-  seed: string | null;
-  birthday: number | null;
+  seed: string;
+  birthday: number;
   // eslint-disable-next-line semi
 }

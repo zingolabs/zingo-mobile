@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState } from 'react';
 import { View, Image, Modal, TouchableOpacity } from 'react-native';
-import { TabView, TabBar } from 'react-native-tab-view';
+import { TabView, TabBar, SceneRendererProps, Route, NavigationState } from 'react-native-tab-view';
 import Toast from 'react-native-simple-toast';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -46,7 +46,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   const [displayAddress, setDisplayAddress] = useState(uaAddress);
   const [oindex, setOIndex] = useState(0);
 
-  const zecPrice = info ? info.zecPrice : null;
+  const zecPrice = info && info.zecPrice;
 
   const uaddrs = addresses.filter(a => a.addressKind === 'u') || [];
 
@@ -199,7 +199,11 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
 
   const syncStatusDisplayLine = syncingStatus?.inProgress ? `(${syncingStatus?.blocks})` : '';
 
-  const renderScene: (routes: any) => JSX.Element | undefined = ({ route }) => {
+  const renderScene: (
+    props: SceneRendererProps & {
+      route: Route;
+    },
+  ) => React.ReactNode = ({ route }) => {
     switch (route.key) {
       case 'uaddr': {
         let uaddr = translate('receive.noaddress');
@@ -223,14 +227,17 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
             next={() => {
               next('u');
             }}
-            translate={translate}
           />
         );
       }
     }
   };
 
-  const renderTabBarPortrait: (props: any) => JSX.Element = props => {
+  const renderTabBarPortrait: (
+    props: SceneRendererProps & {
+      navigationState: NavigationState<Route>;
+    },
+  ) => React.ReactNode = props => {
     return (
       <View
         accessible={true}
@@ -408,7 +415,11 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     );
   };
 
-  const renderTabBarLandscape: (props: any) => JSX.Element = props => {
+  const renderTabBarLandscape: (
+    props: SceneRendererProps & {
+      navigationState: NavigationState<Route>;
+    },
+  ) => React.ReactNode = props => {
     //console.log(props);
     return (
       <TabBar

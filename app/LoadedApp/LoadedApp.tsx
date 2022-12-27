@@ -1,5 +1,5 @@
 import React, { Component, Suspense, useState, useMemo, useCallback, useEffect } from 'react';
-import { Modal, View, Text, Alert, I18nManager, Dimensions, EmitterSubscription } from 'react-native';
+import { Modal, View, Text, Alert, I18nManager, Dimensions, EmitterSubscription, ScaledSize } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faList, faUpload, faDownload, faCog, faAddressBook } from '@fortawesome/free-solid-svg-icons';
@@ -9,6 +9,7 @@ import Toast from 'react-native-simple-toast';
 import { I18n, TranslateOptions } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
 import { memoize, isEqual } from 'lodash';
+import { StackScreenProps } from '@react-navigation/stack';
 
 import RPC from '../rpc';
 import RPCModule from '../../components/RPCModule';
@@ -32,7 +33,7 @@ import {
 import Utils from '../utils';
 import { ThemeType } from '../types';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
-import { ContextLoadedProvider } from '../context';
+import { ContextLoadedProvider, defaultAppStateLoaded } from '../context';
 import platform from '../platform/platform';
 
 const Transactions = React.lazy(() => import('../../components/Transactions'));
@@ -64,8 +65,8 @@ const useForceUpdate = () => {
 };
 
 type LoadedAppProps = {
-  navigation: any;
-  route: any;
+  navigation: StackScreenProps<any>['navigation'];
+  route: StackScreenProps<any>['route'];
 };
 
 export default function LoadedApp(props: LoadedAppProps) {
@@ -122,62 +123,34 @@ export default function LoadedApp(props: LoadedAppProps) {
 }
 
 type LoadedAppClassProps = {
-  navigation: any;
-  route: any;
-  translate: (key: string, config?: TranslateOptions) => any;
+  navigation: StackScreenProps<any>['navigation'];
+  route: StackScreenProps<any>['route'];
+  translate: (key: string, config?: TranslateOptions) => string;
   theme: ThemeType;
 };
 
 class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   rpc: RPC;
-  dim: EmitterSubscription | null;
+  dim: EmitterSubscription;
 
-  constructor(props: any) {
+  constructor(props: LoadedAppClassProps) {
     super(props);
 
+    const screen = Dimensions.get('screen');
+
     this.state = {
-      navigation: props.navigation,
-      route: props.route,
-      dimensions: {
-        width: Number(Dimensions.get('screen').width.toFixed(0)),
-        height: Number(Dimensions.get('screen').height.toFixed(0)),
-        orientation: platform.isPortrait(Dimensions.get('screen')) ? 'portrait' : 'landscape',
-        deviceType: platform.isTablet(Dimensions.get('screen')) ? 'tablet' : 'phone',
-        scale: Number(Dimensions.get('screen').scale.toFixed(2)),
-      },
-
-      syncStatusReport: new SyncStatusReport(),
-      totalBalance: new TotalBalance(),
-      addressPrivateKeys: new Map(),
-      addresses: [],
-      addressBook: [],
-      transactions: null,
+      ...defaultAppStateLoaded,
+      navigation: this.props.navigation,
+      route: this.props.route,
       sendPageState: new SendPageState(new ToAddr(Utils.getNextToAddrID())),
-      receivePageState: new ReceivePageState(),
-      info: null,
-      rescanning: false,
-      wallet_settings: new WalletSettings(),
-      syncingStatus: null,
-      errorModalData: new ErrorModalData(),
-      txBuildProgress: new SendProgress(),
-      walletSeed: null,
-      isMenuDrawerOpen: false,
-      selectedMenuDrawerItem: '',
-      aboutModalVisible: false,
-      computingModalVisible: false,
-      settingsModalVisible: false,
-      infoModalVisible: false,
-      rescanModalVisible: false,
-      seedViewModalVisible: false,
-      seedChangeModalVisible: false,
-      seedBackupModalVisible: false,
-      seedServerModalVisible: false,
-      syncReportModalVisible: false,
-      poolsModalVisible: false,
-      newServer: null,
-      uaAddress: null,
-
-      translate: props.translate,
+      translate: this.props.translate,
+      dimensions: {
+        width: Number(screen.width.toFixed(0)),
+        height: Number(screen.height.toFixed(0)),
+        orientation: platform.isPortrait(screen) ? 'portrait' : 'landscape',
+        deviceType: platform.isTablet(screen) ? 'tablet' : 'phone',
+        scale: Number(screen.scale.toFixed(2)),
+      },
     };
 
     this.rpc = new RPC(
@@ -191,7 +164,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       this.refreshUpdates,
       props.translate,
     );
-    this.dim = null;
+
+    this.dim = {} as EmitterSubscription;
   }
 
   componentDidMount = () => {
@@ -201,15 +175,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     this.rpc.configure();
 
     this.dim = Dimensions.addEventListener('change', ({ screen }) => {
-      this.setState({
-        dimensions: {
-          width: Number(screen.width.toFixed(0)),
-          height: Number(screen.height.toFixed(0)),
-          orientation: platform.isPortrait(screen) ? 'portrait' : 'landscape',
-          deviceType: platform.isTablet(screen) ? 'tablet' : 'phone',
-          scale: Number(screen.scale.toFixed(2)),
-        },
-      });
+      this.setDimensions(screen);
       //console.log('++++++++++++++++++++++++++++++++++ change dims', Dimensions.get('screen'));
     });
   };
@@ -219,21 +185,31 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     this.dim?.remove();
   };
 
+  setDimensions = (screen: ScaledSize) => {
+    this.setState({
+      dimensions: {
+        width: Number(screen.width.toFixed(0)),
+        height: Number(screen.height.toFixed(0)),
+        orientation: platform.isPortrait(screen) ? 'portrait' : 'landscape',
+        deviceType: platform.isTablet(screen) ? 'tablet' : 'phone',
+        scale: Number(screen.scale.toFixed(2)),
+      },
+    });
+  };
+
   getFullState = (): AppStateLoaded => {
     return this.state;
   };
 
   openErrorModal = (title: string, body: string) => {
-    const errorModalData = new ErrorModalData();
+    const errorModalData = new ErrorModalData(title, body);
     errorModalData.modalIsOpen = true;
-    errorModalData.title = title;
-    errorModalData.body = body;
 
     this.setState({ errorModalData });
   };
 
   closeErrorModal = () => {
-    const errorModalData = new ErrorModalData();
+    const errorModalData = new ErrorModalData('', '');
     errorModalData.modalIsOpen = false;
 
     this.setState({ errorModalData });
@@ -259,9 +235,9 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
   setAllAddresses = (addresses: Address[]) => {
     const { uaAddress } = this.state;
-    if (!isEqual(this.state.addresses, addresses) || uaAddress === null) {
+    if (!isEqual(this.state.addresses, addresses) || uaAddress === '') {
       //console.log('addresses');
-      if (uaAddress === null) {
+      if (uaAddress === '') {
         this.setState({ addresses, uaAddress: addresses[0].uaAddress });
       } else {
         this.setState({ addresses });
@@ -298,7 +274,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     this.setSendPageState(newState);
   };
 
-  setZecPrice = (price: number | null) => {
+  setZecPrice = (price: number) => {
     //console.log(`Price = ${price}`);
     const { info } = this.state;
 
@@ -318,8 +294,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     this.setState({ computingModalVisible: visible });
   };
 
-  setTxBuildProgress = (progress: SendProgress) => {
-    this.setState({ txBuildProgress: progress });
+  setSendProgress = (progress: SendProgress) => {
+    this.setState({ sendProgress: progress });
   };
 
   setInfo = (newInfo: InfoType) => {
@@ -368,7 +344,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     return json;
   };
 
-  sendTransaction = async (setSendProgress: (arg0: SendProgress | null) => void): Promise<String> => {
+  sendTransaction = async (setSendProgress: (arg0: SendProgress) => void): Promise<String> => {
     try {
       // Construct a sendJson from the sendPage state
       const sendJson = this.getSendManyJSON();
@@ -382,12 +358,12 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   };
 
   // Get a single private key for this address, and return it as a string.
-  getPrivKeyAsString = async (address: string): Promise<string | null> => {
+  getPrivKeyAsString = async (address: string): Promise<string> => {
     const pk = await RPC.rpc_getPrivKeyAsString(address);
     if (pk) {
       return pk;
     }
-    return null;
+    return '';
   };
 
   // Getter methods, which are called by the components to update the state
@@ -411,13 +387,14 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     const { receivePageState } = this.state;
     const newRerenderKey = receivePageState.rerenderKey + 1;
 
-    const newReceivePageState = new ReceivePageState();
+    let newReceivePageState;
     if (newaddress) {
-      newReceivePageState.newAddress = newaddress;
+      newReceivePageState = new ReceivePageState(newaddress);
     }
-    newReceivePageState.rerenderKey = newRerenderKey;
-
-    this.setState({ receivePageState: newReceivePageState });
+    if (newReceivePageState) {
+      newReceivePageState.rerenderKey = newRerenderKey;
+      this.setState({ receivePageState: newReceivePageState });
+    }
   };
 
   doRefresh = async () => {
@@ -444,7 +421,9 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
   fetchWalletSeedAndBirthday = async () => {
     const walletSeed = await RPC.rpc_fetchSeedAndBirthday();
-    this.setState({ walletSeed });
+    if (walletSeed) {
+      this.setState({ walletSeed });
+    }
   };
 
   startRescan = () => {
@@ -509,7 +488,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     if (!error.toLowerCase().startsWith('error')) {
       // Load the wallet and navigate to the transactions screen
       //console.log(`wallet loaded ok ${value}`);
-      await SettingsFileImpl.writeSettings(new SettingsFileEntry(value));
+      const language = '';
+      await SettingsFileImpl.writeSettings(new SettingsFileEntry(value, language));
       // Refetch the settings to update
       this.rpc.fetchWalletSettings();
       return;
@@ -589,7 +569,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     }
 
     if (this.state.newServer) {
-      await SettingsFileImpl.writeSettings(new SettingsFileEntry(this.state.newServer));
+      const language = '';
+      await SettingsFileImpl.writeSettings(new SettingsFileEntry(this.state.newServer, language));
     }
 
     const { info } = this.state;
@@ -649,7 +630,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       </Suspense>
     );
 
-    const fnTabBarIcon = (route: any, focused: boolean) => {
+    const fnTabBarIcon = (route: StackScreenProps<any>['route'], focused: boolean) => {
       var iconName;
 
       if (route.name === translate('loadedapp.wallet-menu')) {
@@ -912,7 +893,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                       setSendPageState={this.setSendPageState}
                       sendTransaction={this.sendTransaction}
                       clearToAddr={this.clearToAddr}
-                      setTxBuildProgress={this.setTxBuildProgress}
+                      setSendProgress={this.setSendProgress}
                       toggleMenuDrawer={this.toggleMenuDrawer}
                       setComputingModalVisible={this.setComputingModalVisible}
                       syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}

@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import { Text, View, Platform } from 'react-native';
+import { Text, View, Platform, TextStyle } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
 import Utils from '../../app/utils';
@@ -10,7 +10,7 @@ type ZecAmountProps = {
   color?: string;
   size?: number;
   amtZec?: number;
-  style?: any;
+  style?: TextStyle;
   currencyName: string;
 };
 

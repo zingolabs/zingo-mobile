@@ -1,30 +1,25 @@
 import React, { ReactNode } from 'react';
+import { StackScreenProps } from '@react-navigation/stack';
 
-import { AppStateLoading, TotalBalance } from '../AppState';
+import { AppStateLoading, DimensionsType, InfoType, TotalBalance, WalletSeed } from '../AppState';
 
-const defaultAppState: AppStateLoading = {
-  navigation: null,
-  route: null,
-  dimensions: {} as {
-    width: number;
-    height: number;
-    orientation: 'portrait' | 'landscape';
-    deviceType: 'tablet' | 'phone';
-    scale: number;
-  },
+export const defaultAppStateLoading: AppStateLoading = {
+  navigation: {} as StackScreenProps<any>['navigation'],
+  route: {} as StackScreenProps<any>['route'],
+  dimensions: {} as DimensionsType,
 
   screen: 0,
   actionButtonsDisabled: false,
   walletExists: false,
-  walletSeed: null,
-  server: null,
+  walletSeed: {} as WalletSeed,
+  server: '' as string,
   totalBalance: new TotalBalance(),
-  info: null,
+  info: {} as InfoType,
 
-  translate: () => {},
+  translate: () => '',
 };
 
-export const ContextLoading = React.createContext(defaultAppState);
+export const ContextLoading = React.createContext(defaultAppStateLoading);
 
 type ContextProviderProps = {
   children: ReactNode;

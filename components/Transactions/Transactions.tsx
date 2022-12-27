@@ -38,7 +38,7 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
   const { translate, dimensions, transactions, totalBalance, info, syncingStatus } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [isTxDetailModalShowing, setTxDetailModalShowing] = React.useState(false);
-  const [txDetail, setTxDetail] = React.useState<Transaction | null>(null);
+  const [txDetail, setTxDetail] = React.useState<Transaction>({} as Transaction);
 
   const [numTx, setNumTx] = React.useState<number>(100);
   const loadMoreButton = numTx < (transactions?.length || 0);
@@ -67,7 +67,7 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
     }
   };
 
-  const zecPrice = info ? info.zecPrice : null;
+  const zecPrice = info && info.zecPrice;
 
   const syncStatusDisplayLine = syncingStatus?.inProgress ? `(${syncingStatus?.blocks})` : '';
 

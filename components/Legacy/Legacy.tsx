@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useContext } from 'react';
 import { View, Image, Modal, TouchableOpacity } from 'react-native';
-import { TabView, TabBar } from 'react-native-tab-view';
+import { TabView, TabBar, SceneRendererProps, NavigationState, Route } from 'react-native-tab-view';
 import Toast from 'react-native-simple-toast';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -39,7 +39,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance, toggl
   const [zindex, setZIndex] = useState(0);
   const [tindex, setTIndex] = useState(0);
 
-  const zecPrice = info ? info.zecPrice : null;
+  const zecPrice = info && info.zecPrice;
 
   const zaddrs = addresses.filter(a => a.uaAddress === uaAddress && a.addressKind === 'z') || [];
   const taddrs = addresses.filter(a => a.uaAddress === uaAddress && a.addressKind === 't') || [];
@@ -235,7 +235,11 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance, toggl
     address = taddrs[tindex].address;
   }
 
-  const renderScene: (routes: any) => JSX.Element | undefined = ({ route }) => {
+  const renderScene: (
+    props: SceneRendererProps & {
+      route: Route;
+    },
+  ) => React.ReactNode = ({ route }) => {
     switch (route.key) {
       case 'zaddr': {
         let zaddr = translate('legacy.noaddress');
@@ -257,7 +261,6 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance, toggl
             next={() => {
               next('z');
             }}
-            translate={translate}
           />
         );
       }
@@ -281,14 +284,17 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance, toggl
             next={() => {
               next('t');
             }}
-            translate={translate}
           />
         );
       }
     }
   };
 
-  const renderTabBarPortrait: (props: any) => JSX.Element = props => {
+  const renderTabBarPortrait: (
+    props: SceneRendererProps & {
+      navigationState: NavigationState<Route>;
+    },
+  ) => React.ReactNode = props => {
     return (
       <View
         accessible={true}
@@ -400,7 +406,11 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance, toggl
     );
   };
 
-  const renderTabBarLandscape: (props: any) => JSX.Element = props => {
+  const renderTabBarLandscape: (
+    props: SceneRendererProps & {
+      navigationState: NavigationState<Route>;
+    },
+  ) => React.ReactNode = props => {
     //console.log(props);
     return (
       <TabBar

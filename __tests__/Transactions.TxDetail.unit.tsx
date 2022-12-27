@@ -7,21 +7,8 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import TxDetail from '../components/Transactions/components/TxDetail';
-import { ContextLoadedProvider } from '../app/context';
-
-import {
-  ErrorModalData,
-  InfoType,
-  ReceivePageState,
-  SendPageState,
-  SendProgress,
-  SyncStatusReport,
-  ToAddr,
-  TotalBalance,
-  Transaction,
-  TxDetailType,
-  WalletSettings,
-} from '../app/AppState';
+import { defaultAppStateLoaded, ContextLoadedProvider } from '../app/context';
+import { Transaction, TxDetailType } from '../app/AppState';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -51,49 +38,8 @@ jest.mock('moment', () => () => ({
 // test suite
 describe('Component Transactions TxDetail - test', () => {
   //unit test
-  const state = {
-    navigation: null,
-    route: null,
-    dimensions: {} as {
-      width: number;
-      height: number;
-      orientation: 'portrait' | 'landscape';
-      deviceType: 'tablet' | 'phone';
-      scale: number;
-    },
-
-    syncStatusReport: new SyncStatusReport(),
-    addressPrivateKeys: new Map(),
-    addresses: [],
-    addressBook: [],
-    transactions: null,
-    sendPageState: new SendPageState(new ToAddr(0)),
-    receivePageState: new ReceivePageState(),
-    rescanning: false,
-    wallet_settings: new WalletSettings(),
-    syncingStatus: null,
-    errorModalData: new ErrorModalData(),
-    txBuildProgress: new SendProgress(),
-    walletSeed: null,
-    isMenuDrawerOpen: false,
-    selectedMenuDrawerItem: '',
-    aboutModalVisible: false,
-    computingModalVisible: false,
-    settingsModalVisible: false,
-    infoModalVisible: false,
-    rescanModalVisible: false,
-    seedViewModalVisible: false,
-    seedChangeModalVisible: false,
-    seedBackupModalVisible: false,
-    seedServerModalVisible: false,
-    syncReportModalVisible: false,
-    poolsModalVisible: false,
-    newServer: null,
-    uaAddress: null,
-    info: {} as InfoType,
-    translate: () => 'translated text',
-    totalBalance: new TotalBalance(),
-  };
+  const state = defaultAppStateLoaded;
+  state.translate = () => 'translated text';
   const onClose = jest.fn();
   test('Transactions TxDetail - normal sent transaction', () => {
     state.info.currencyName = 'ZEC';

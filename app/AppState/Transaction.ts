@@ -8,7 +8,7 @@ export default interface Transaction {
   confirmations: number;
   txid: string;
   time: number;
-  zec_price: number | null;
+  zec_price: number;
   detailedTxns: TxDetailType[];
   // eslint-disable-next-line semi
 }

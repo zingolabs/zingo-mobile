@@ -11,22 +11,24 @@ import {
   I18nManager,
   Dimensions,
   EmitterSubscription,
+  ScaledSize,
 } from 'react-native';
 import Toast from 'react-native-simple-toast';
 import { useTheme } from '@react-navigation/native';
 import { I18n, TranslateOptions } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
 import { memoize } from 'lodash';
+import { StackScreenProps } from '@react-navigation/stack';
 
 import BoldText from '../../components/Components/BoldText';
 import Button from '../../components/Button';
 import RPCModule from '../../components/RPCModule';
-import { TotalBalance, SettingsFileEntry, AppStateLoading } from '../AppState';
+import { SettingsFileEntry, AppStateLoading, WalletSeed } from '../AppState';
 import { serverUris } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import RPC from '../rpc';
 import { ThemeType } from '../types';
-import { ContextLoadingProvider } from '../context';
+import { defaultAppStateLoading, ContextLoadingProvider } from '../context';
 import platform from '../platform/platform';
 
 const Seed = React.lazy(() => import('../../components/Seed'));
@@ -43,8 +45,8 @@ const useForceUpdate = () => {
 };
 
 type LoadingAppProps = {
-  navigation: any;
-  route: any;
+  navigation: StackScreenProps<any>['navigation'];
+  route: StackScreenProps<any>['route'];
 };
 
 export default function LoadingApp(props: LoadingAppProps) {
@@ -101,9 +103,9 @@ export default function LoadingApp(props: LoadingAppProps) {
 }
 
 type LoadingAppClassProps = {
-  navigation: any;
-  route: any;
-  translate: (key: string, config?: TranslateOptions) => any;
+  navigation: StackScreenProps<any>['navigation'];
+  route: StackScreenProps<any>['route'];
+  translate: (key: string, config?: TranslateOptions) => string;
   theme: ThemeType;
 };
 
@@ -111,32 +113,27 @@ const SERVER_DEFAULT_0 = serverUris()[0];
 const SERVER_DEFAULT_1 = serverUris()[1];
 
 class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
-  dim: EmitterSubscription | null;
-  constructor(props: Readonly<LoadingAppClassProps>) {
+  dim: EmitterSubscription;
+  constructor(props: LoadingAppClassProps) {
     super(props);
 
-    this.state = {
-      navigation: props.navigation,
-      route: props.route,
-      dimensions: {
-        width: Number(Dimensions.get('screen').width.toFixed(0)),
-        height: Number(Dimensions.get('screen').height.toFixed(0)),
-        orientation: platform.isPortrait(Dimensions.get('screen')) ? 'portrait' : 'landscape',
-        deviceType: platform.isTablet(Dimensions.get('screen')) ? 'tablet' : 'phone',
-        scale: Number(Dimensions.get('screen').scale.toFixed(2)),
-      },
+    const screen = Dimensions.get('screen');
 
-      screen: 0,
-      actionButtonsDisabled: false,
-      walletExists: false,
-      walletSeed: null,
-      server: '',
-      totalBalance: new TotalBalance(),
-      info: null,
-      translate: props.translate,
+    this.state = {
+      ...defaultAppStateLoading,
+      navigation: this.props.navigation,
+      route: this.props.route,
+      translate: this.props.translate,
+      dimensions: {
+        width: Number(screen.width.toFixed(0)),
+        height: Number(screen.height.toFixed(0)),
+        orientation: platform.isPortrait(screen) ? 'portrait' : 'landscape',
+        deviceType: platform.isTablet(screen) ? 'tablet' : 'phone',
+        scale: Number(screen.scale.toFixed(2)),
+      },
     };
 
-    this.dim = null;
+    this.dim = {} as EmitterSubscription;
   }
 
   componentDidMount = async () => {
@@ -144,17 +141,20 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
     setTimeout(async () => {
       // reading Info
       const info = await RPC.rpc_getInfoObject();
-      this.setState({ info });
+      if (info) {
+        this.setState({ info });
+      }
       // read settings file
-      let settings: SettingsFileEntry = {};
+      let settings = {} as SettingsFileEntry;
       if (!this.state.server) {
         settings = await SettingsFileImpl.readSettings();
         if (!!settings && !!settings.server) {
           this.setState({ server: settings.server });
         } else {
           settings.server = SERVER_DEFAULT_0;
+          settings.language = '';
           this.setState({ server: SERVER_DEFAULT_0 });
-          await SettingsFileImpl.writeSettings(new SettingsFileEntry(SERVER_DEFAULT_0));
+          await SettingsFileImpl.writeSettings(settings);
         }
       }
 
@@ -179,15 +179,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
     });
 
     this.dim = Dimensions.addEventListener('change', ({ screen }) => {
-      this.setState({
-        dimensions: {
-          width: Number(screen.width.toFixed(0)),
-          height: Number(screen.height.toFixed(0)),
-          orientation: platform.isPortrait(screen) ? 'portrait' : 'landscape',
-          deviceType: platform.isTablet(screen) ? 'tablet' : 'phone',
-          scale: Number(screen.scale.toFixed(2)),
-        },
-      });
+      this.setDimensions(screen);
       //console.log('++++++++++++++++++++++++++++++++++ change dims', Dimensions.get('screen'));
     });
   };
@@ -196,15 +188,29 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
     this.dim?.remove();
   };
 
+  setDimensions = (screen: ScaledSize) => {
+    this.setState({
+      dimensions: {
+        width: Number(screen.width.toFixed(0)),
+        height: Number(screen.height.toFixed(0)),
+        orientation: platform.isPortrait(screen) ? 'portrait' : 'landscape',
+        deviceType: platform.isTablet(screen) ? 'tablet' : 'phone',
+        scale: Number(screen.scale.toFixed(2)),
+      },
+    });
+  };
+
   useDefaultServer_0 = async () => {
     this.setState({ actionButtonsDisabled: true });
-    await SettingsFileImpl.writeSettings(new SettingsFileEntry(SERVER_DEFAULT_0));
+    const language = '';
+    await SettingsFileImpl.writeSettings(new SettingsFileEntry(SERVER_DEFAULT_0, language));
     this.setState({ server: SERVER_DEFAULT_0, actionButtonsDisabled: false });
   };
 
   useDefaultServer_1 = async () => {
     this.setState({ actionButtonsDisabled: true });
-    await SettingsFileImpl.writeSettings(new SettingsFileEntry(SERVER_DEFAULT_0));
+    const language = '';
+    await SettingsFileImpl.writeSettings(new SettingsFileEntry(SERVER_DEFAULT_0, language));
     this.setState({ server: SERVER_DEFAULT_1, actionButtonsDisabled: false });
   };
 
@@ -234,7 +240,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
   };
 
   getwalletSeedToRestore = async () => {
-    this.setState({ walletSeed: null, screen: 3, walletExists: false });
+    this.setState({ walletSeed: {} as WalletSeed, screen: 3, walletExists: false });
   };
 
   getViewingKeyToRestore = async () => {
@@ -248,7 +254,6 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
   };
 
   doRestore = async (seed: string, birthday: number) => {
-    // Don't call with null values
     const { server } = this.state;
 
     if (!seed) {

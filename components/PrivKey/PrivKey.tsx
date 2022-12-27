@@ -34,15 +34,15 @@ const PrivKey: React.FunctionComponent<PrivKeyProps> = ({ address, keyType, priv
 
   const [expandAddress, setExpandAddress] = useState(false);
 
-  if (!privKey) {
-    privKey = translate('privkey.nokey');
-  }
+  //if (!privKey) {
+  //  privKey = translate('privkey.nokey');
+  //}
 
   const doCopy = () => {
-    if (address) {
-      Clipboard.setString(privKey);
-      Toast.show(translate('privkey.tapcopy-message'), Toast.LONG);
-    }
+    //if (address) {
+    Clipboard.setString(privKey);
+    Toast.show(translate('privkey.tapcopy-message'), Toast.LONG);
+    //}
   };
 
   return (

@@ -1,6 +1,5 @@
 import { TranslateOptions } from 'i18n-js';
-import { NavigationScreenProp } from 'react-navigation';
-import { RouteProp } from '@react-navigation/native';
+import { StackScreenProps } from '@react-navigation/stack';
 
 import SyncStatusReport from './SyncStatusReport';
 import TotalBalance from './TotalBalance';
@@ -15,17 +14,12 @@ import InfoType from './InfoType';
 import WalletSeed from './WalletSeed';
 import WalletSettings from './WalletSettings';
 import SyncStatus from './SyncStatus';
+import DimensionsType from './DimensionsType';
 
 export default interface AppStateLoaded {
-  navigation: NavigationScreenProp<any> | null;
-  route: RouteProp<any> | null;
-  dimensions: {
-    width: number;
-    height: number;
-    orientation: 'portrait' | 'landscape';
-    deviceType: 'tablet' | 'phone';
-    scale: number;
-  };
+  navigation: StackScreenProps<any>['navigation'];
+  route: StackScreenProps<any>['route'];
+  dimensions: DimensionsType;
 
   // Info about the current sync process
   syncStatusReport: SyncStatusReport;
@@ -45,7 +39,7 @@ export default interface AppStateLoaded {
   addressBook: AddressBookEntry[];
 
   // List of all T and Z and O transactions
-  transactions: Transaction[] | null;
+  transactions: Transaction[];
 
   // The state of the send page, as the user constructs a transaction
   sendPageState: SendPageState;
@@ -54,7 +48,7 @@ export default interface AppStateLoaded {
   receivePageState: ReceivePageState;
 
   // getinfo and getblockchaininfo result
-  info: InfoType | null;
+  info: InfoType;
 
   // Is the app rescanning?
   rescanning: boolean;
@@ -64,15 +58,15 @@ export default interface AppStateLoaded {
 
   wallet_settings: WalletSettings;
 
-  syncingStatus: SyncStatus | null;
+  syncingStatus: SyncStatus;
 
   // Data for any error or info modal
   errorModalData: ErrorModalData;
 
   // Build progress from Tx
-  txBuildProgress: SendProgress;
+  sendProgress: SendProgress;
 
-  walletSeed: WalletSeed | null;
+  walletSeed: WalletSeed;
 
   isMenuDrawerOpen: boolean;
 
@@ -96,11 +90,11 @@ export default interface AppStateLoaded {
   syncReportModalVisible: boolean;
   poolsModalVisible: boolean;
 
-  newServer: string | null;
+  newServer: string;
 
-  uaAddress: string | null;
+  uaAddress: string;
 
-  translate: (key: string, config?: TranslateOptions) => any;
+  translate: (key: string, config?: TranslateOptions) => string;
 
   // eslint-disable-next-line semi
 }

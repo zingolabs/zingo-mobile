@@ -1,6 +1,17 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useRef, useCallback, useContext } from 'react';
-import { View, ScrollView, Modal, Image, Alert, Keyboard, TextInput, TouchableOpacity } from 'react-native';
+import {
+  View,
+  ScrollView,
+  Modal,
+  Image,
+  Alert,
+  Keyboard,
+  TextInput,
+  TouchableOpacity,
+  NativeSyntheticEvent,
+  TextInputEndEditingEventData,
+} from 'react-native';
 import { faQrcode, faCheck, faInfo } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme } from '@react-navigation/native';
@@ -26,9 +37,9 @@ import { ContextLoaded } from '../../app/context';
 
 type SendProps = {
   setSendPageState: (sendPageState: SendPageState) => void;
-  sendTransaction: (setSendProgress: (arg0: SendProgress | null) => void) => Promise<String>;
+  sendTransaction: (setSendProgress: (arg0: SendProgress) => void) => Promise<String>;
   clearToAddr: () => void;
-  setTxBuildProgress: (progress: SendProgress) => void;
+  setSendProgress: (progress: SendProgress) => void;
   toggleMenuDrawer: () => void;
   setComputingModalVisible: (visible: boolean) => void;
   syncingStatusMoreInfoOnClick: () => void;
@@ -39,7 +50,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   setSendPageState,
   sendTransaction,
   clearToAddr,
-  setTxBuildProgress,
+  setSendProgress,
   toggleMenuDrawer,
   setComputingModalVisible,
   syncingStatusMoreInfoOnClick,
@@ -62,8 +73,8 @@ const Send: React.FunctionComponent<SendProps> = ({
   const syncStatusDisplayLine = syncingStatus?.inProgress ? `(${syncingStatus?.blocks})` : '';
   const spendable = totalBalance.transparentBal + totalBalance.spendablePrivate + totalBalance.spendableOrchard;
   const stillConfirming = spendable !== totalBalance.total;
-  const zecPrice = info ? info.zecPrice : null;
-  const currencyName = info ? info.currencyName : undefined;
+  const zecPrice = info && info.zecPrice;
+  const currencyName = info && info.currencyName;
 
   const getMaxAmount = useCallback((): number => {
     let max = spendable - defaultFee;
@@ -283,18 +294,18 @@ const Send: React.FunctionComponent<SendProps> = ({
     setConfirmModalVisible(false);
     setComputingModalVisible(true);
 
-    const setSendProgress = (progress: SendProgress | null) => {
+    const setLocalSendProgress = (progress: SendProgress) => {
       if (progress && progress.sendInProgress) {
-        setTxBuildProgress(progress);
+        setSendProgress(progress);
       } else {
-        setTxBuildProgress(new SendProgress());
+        setSendProgress(new SendProgress(0, 0, 0));
       }
     };
 
     // call the sendTransaction method in a timeout, allowing the modals to show properly
     setTimeout(async () => {
       try {
-        const txid = await sendTransaction(setSendProgress);
+        const txid = await sendTransaction(setLocalSendProgress);
         setComputingModalVisible(false);
 
         // Clear the fields
@@ -343,7 +354,6 @@ const Send: React.FunctionComponent<SendProps> = ({
         <Scanner
           updateToField={updateToField}
           closeModal={() => setQrcodeModalVisible(false)}
-          translate={translate}
           width={dimensions.width - 42}
           height={dimensions.height * 0.7}
         />
@@ -749,7 +759,6 @@ const Send: React.FunctionComponent<SendProps> = ({
           <Scanner
             updateToField={updateToField}
             closeModal={() => setQrcodeModalVisible(false)}
-            translate={translate}
             width={dimensions.width / 2}
             height={dimensions.height * 0.7}
           />

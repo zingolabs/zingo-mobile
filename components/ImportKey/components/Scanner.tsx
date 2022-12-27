@@ -3,23 +3,26 @@ import React from 'react';
 import { View } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import QRCodeScanner from 'react-native-qrcode-scanner';
-import { TranslateOptions } from 'i18n-js';
 
 import RegText from '../../Components/RegText';
 import Button from '../../Button';
+import { useContext } from 'react';
+import { ContextLoaded } from '../../../app/context';
+import { BarCodeReadEvent } from 'react-native-camera';
 
 type ScannerProps = {
   setPrivKeyText: (k: string) => void;
   closeModal: () => void;
-  translate: (key: string, config?: TranslateOptions) => any;
 };
-const Scanner: React.FunctionComponent<ScannerProps> = ({ setPrivKeyText, closeModal, translate }) => {
+const Scanner: React.FunctionComponent<ScannerProps> = ({ setPrivKeyText, closeModal }) => {
+  const context = useContext(ContextLoaded);
+  const { translate } = context;
   const validateKey = (scannedKey: string) => {
     setPrivKeyText(scannedKey);
     closeModal();
   };
 
-  const onRead = (e: any) => {
+  const onRead = (e: BarCodeReadEvent) => {
     const scandata = e.data.trim();
 
     validateKey(scandata);

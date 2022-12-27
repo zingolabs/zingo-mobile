@@ -20,7 +20,6 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected }) => {
   const { colors } = useTheme();
   const item = {
     fontSize: 14,
-    fontWeight: '300',
     paddingTop: 15,
     color: colors.text,
   };

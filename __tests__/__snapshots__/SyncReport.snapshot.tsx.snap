@@ -822,7 +822,7 @@ exports[`Component SyncReport - test Matches the snapshot SyncReport 1`] = `
           "borderColor": "rgb(0, 122, 255)",
           "borderRadius": 10,
           "borderWidth": 2,
-          "juatifyContent": "center",
+          "justifyContent": "center",
           "maxWidth": "90%",
           "minHeight": 48,
           "minWidth": "30%",

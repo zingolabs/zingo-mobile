@@ -159,17 +159,6 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
           1500100
         </Text>
       </View>
-      <Text
-        style={
-          {
-            "color": "white",
-            "marginTop": 20,
-            "opacity": 0.65,
-            "padding": 20,
-            "textAlign": "center",
-          }
-        }
-      />
       <View
         style={
           {
@@ -209,7 +198,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
           "borderRadius": 10,
           "borderWidth": 2,
           "color": "rgb(0, 122, 255)",
-          "juatifyContent": "center",
+          "justifyContent": "center",
           "maxWidth": "90%",
           "minHeight": 48,
           "minWidth": "30%",
@@ -263,7 +252,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
           "borderColor": "rgb(0, 122, 255)",
           "borderRadius": 10,
           "borderWidth": 2,
-          "juatifyContent": "center",
+          "justifyContent": "center",
           "marginLeft": 10,
           "maxWidth": "90%",
           "minHeight": 48,
@@ -466,17 +455,6 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
           1500100
         </Text>
       </View>
-      <Text
-        style={
-          {
-            "color": "white",
-            "marginTop": 20,
-            "opacity": 0.65,
-            "padding": 20,
-            "textAlign": "center",
-          }
-        }
-      />
       <View
         style={
           {
@@ -516,7 +494,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
           "borderRadius": 10,
           "borderWidth": 2,
           "color": "rgb(0, 122, 255)",
-          "juatifyContent": "center",
+          "justifyContent": "center",
           "maxWidth": "90%",
           "minHeight": 48,
           "minWidth": "30%",
@@ -570,7 +548,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
           "borderColor": "rgb(0, 122, 255)",
           "borderRadius": 10,
           "borderWidth": 2,
-          "juatifyContent": "center",
+          "justifyContent": "center",
           "marginLeft": 10,
           "maxWidth": "90%",
           "minHeight": 48,
@@ -773,17 +751,6 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
           1500100
         </Text>
       </View>
-      <Text
-        style={
-          {
-            "color": "white",
-            "marginTop": 20,
-            "opacity": 0.65,
-            "padding": 20,
-            "textAlign": "center",
-          }
-        }
-      />
       <View
         style={
           {
@@ -823,7 +790,7 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
           "borderRadius": 10,
           "borderWidth": 2,
           "color": "rgb(0, 122, 255)",
-          "juatifyContent": "center",
+          "justifyContent": "center",
           "maxWidth": "90%",
           "minHeight": 48,
           "minWidth": "30%",
@@ -1069,17 +1036,6 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
           />
         </View>
       </View>
-      <Text
-        style={
-          {
-            "color": "white",
-            "marginTop": 20,
-            "opacity": 0.65,
-            "padding": 20,
-            "textAlign": "center",
-          }
-        }
-      />
       <View
         style={
           {
@@ -1119,7 +1075,7 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
           "borderRadius": 10,
           "borderWidth": 2,
           "color": "rgb(0, 122, 255)",
-          "juatifyContent": "center",
+          "justifyContent": "center",
           "maxWidth": "90%",
           "minHeight": 48,
           "minWidth": "30%",
@@ -1173,7 +1129,7 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
           "borderColor": "rgb(0, 122, 255)",
           "borderRadius": 10,
           "borderWidth": 2,
-          "juatifyContent": "center",
+          "justifyContent": "center",
           "marginLeft": 10,
           "maxWidth": "90%",
           "minHeight": 48,
@@ -1376,17 +1332,6 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
           1500100
         </Text>
       </View>
-      <Text
-        style={
-          {
-            "color": "white",
-            "marginTop": 20,
-            "opacity": 0.65,
-            "padding": 20,
-            "textAlign": "center",
-          }
-        }
-      />
       <View
         style={
           {
@@ -1426,7 +1371,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
           "borderRadius": 10,
           "borderWidth": 2,
           "color": "rgb(0, 122, 255)",
-          "juatifyContent": "center",
+          "justifyContent": "center",
           "maxWidth": "90%",
           "minHeight": 48,
           "minWidth": "30%",
@@ -1480,7 +1425,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
           "borderColor": "rgb(0, 122, 255)",
           "borderRadius": 10,
           "borderWidth": 2,
-          "juatifyContent": "center",
+          "justifyContent": "center",
           "marginLeft": 10,
           "maxWidth": "90%",
           "minHeight": 48,
@@ -1683,17 +1628,6 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
           1500100
         </Text>
       </View>
-      <Text
-        style={
-          {
-            "color": "white",
-            "marginTop": 20,
-            "opacity": 0.65,
-            "padding": 20,
-            "textAlign": "center",
-          }
-        }
-      />
       <View
         style={
           {
@@ -1733,7 +1667,7 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
           "borderRadius": 10,
           "borderWidth": 2,
           "color": "rgb(0, 122, 255)",
-          "juatifyContent": "center",
+          "justifyContent": "center",
           "maxWidth": "90%",
           "minHeight": 48,
           "minWidth": "30%",

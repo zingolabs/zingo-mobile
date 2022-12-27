@@ -1,11 +1,18 @@
 import React from 'react';
-import { Text } from 'react-native';
+import { Text, TextStyle } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
-const RegText: React.FunctionComponent<any> = ({ style, color, onPress, children }) => {
+type RegTextProps = {
+  style?: TextStyle;
+  color?: string;
+  onPress?: () => void;
+  children: string | string[];
+};
+
+const RegText: React.FunctionComponent<RegTextProps> = ({ style, color, onPress, children }) => {
   const { colors } = useTheme();
 
-  let arrayed = [];
+  let arrayed: TextStyle[] = [];
 
   if (Array.isArray(style)) {
     arrayed = style.slice(0);

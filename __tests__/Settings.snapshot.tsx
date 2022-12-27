@@ -7,19 +7,7 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import Settings from '../components/Settings';
-import { ContextLoadedProvider } from '../app/context';
-
-import {
-  ErrorModalData,
-  InfoType,
-  ReceivePageState,
-  SendPageState,
-  SendProgress,
-  SyncStatusReport,
-  ToAddr,
-  TotalBalance,
-  WalletSettings,
-} from '../app/AppState';
+import { defaultAppStateLoaded, ContextLoadedProvider } from '../app/context';
 
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
   FontAwesomeIcon: '',
@@ -38,67 +26,26 @@ jest.useFakeTimers();
 // test suite
 describe('Component Settings - test', () => {
   //snapshot test
-  const state = {
-    navigation: null,
-    route: null,
-    dimensions: {} as {
-      width: number;
-      height: number;
-      orientation: 'portrait' | 'landscape';
-      deviceType: 'tablet' | 'phone';
-      scale: number;
-    },
-
-    syncStatusReport: new SyncStatusReport(),
-    addressPrivateKeys: new Map(),
-    addresses: [],
-    addressBook: [],
-    transactions: null,
-    sendPageState: new SendPageState(new ToAddr(0)),
-    receivePageState: new ReceivePageState(),
-    info: {} as InfoType,
-    rescanning: false,
-    syncingStatus: null,
-    errorModalData: new ErrorModalData(),
-    txBuildProgress: new SendProgress(),
-    walletSeed: null,
-    isMenuDrawerOpen: false,
-    selectedMenuDrawerItem: '',
-    aboutModalVisible: false,
-    computingModalVisible: false,
-    settingsModalVisible: false,
-    infoModalVisible: false,
-    rescanModalVisible: false,
-    seedViewModalVisible: false,
-    seedChangeModalVisible: false,
-    seedBackupModalVisible: false,
-    seedServerModalVisible: false,
-    syncReportModalVisible: false,
-    poolsModalVisible: false,
-    newServer: null,
-    uaAddress: null,
-    translate: (p: string) => {
-      if (p === 'settings.memos') {
-        return [
-          {
-            value: 'none',
-            text: 'text none',
-          },
-          {
-            value: 'wallet',
-            text: 'text wallet',
-          },
-          {
-            value: 'all',
-            text: 'text all',
-          },
-        ];
-      } else {
-        return 'text translated';
-      }
-    },
-    totalBalance: new TotalBalance(),
-    wallet_settings: new WalletSettings(),
+  const state = defaultAppStateLoaded;
+  state.translate = (p: string) => {
+    if (p === 'settings.memos') {
+      return `[
+        {
+          "value": "none",
+          "text": "text none"
+        },
+        {
+          "value": "wallet",
+          "text": "text wallet"
+        },
+        {
+          "value": "all",
+          "text": "text all"
+        }
+      ]`;
+    } else {
+      return 'text translated';
+    }
   };
   state.info.currencyName = 'ZEC';
   state.totalBalance.total = 1.12345678;

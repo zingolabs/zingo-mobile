@@ -32,7 +32,7 @@ type SeedProps = {
 const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, action }) => {
   const contextLoaded = useContext(ContextLoaded);
   const contextLoading = useContext(ContextLoading);
-  let walletSeed: WalletSeed | null, totalBalance, translate: (key: string, config?: TranslateOptions) => any, info;
+  let walletSeed: WalletSeed, totalBalance, translate: (key: string, config?: TranslateOptions) => string, info;
   if (action === 'new' || action === 'restore') {
     walletSeed = contextLoading.walletSeed;
     totalBalance = contextLoading.totalBalance;
@@ -56,7 +56,12 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
   const slideAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    setTexts(translate('seed.buttontexts'));
+    const buttonTextsArray: string = translate('seed.buttontexts');
+    let buttonTexts = {} as TextsType;
+    if (typeof buttonTextsArray === 'object') {
+      buttonTexts = buttonTextsArray as TextsType;
+      setTexts(buttonTexts);
+    }
     setReadOnly(
       action === 'new' || action === 'view' || action === 'change' || action === 'backup' || action === 'server',
     );
@@ -222,7 +227,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
           <FadeText style={{ textAlign: 'center' }}>{translate('seed.birthday-readonly')}</FadeText>
           {readOnly ? (
             <RegText color={colors.text} style={{ textAlign: 'center' }}>
-              {birthdayNumber}
+              {birthdayNumber.toString()}
             </RegText>
           ) : (
             <>
@@ -262,11 +267,21 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
           )}
         </View>
 
-        <FadeText style={{ marginTop: 20, padding: 20, textAlign: 'center', color: 'white' }}>
-          {times === 3 && action === 'change' && translate('seed.change-warning')}
-          {times === 3 && action === 'backup' && translate('seed.backup-warning')}
-          {times === 3 && action === 'server' && translate('seed.server-warning')}
-        </FadeText>
+        {times === 3 && action === 'change' && (
+          <FadeText style={{ marginTop: 20, padding: 20, textAlign: 'center', color: 'white' }}>
+            {translate('seed.change-warning')}
+          </FadeText>
+        )}
+        {times === 3 && action === 'backup' && (
+          <FadeText style={{ marginTop: 20, padding: 20, textAlign: 'center', color: 'white' }}>
+            {translate('seed.backup-warning')}
+          </FadeText>
+        )}
+        {times === 3 && action === 'server' && (
+          <FadeText style={{ marginTop: 20, padding: 20, textAlign: 'center', color: 'white' }}>
+            {translate('seed.server-warning')}
+          </FadeText>
+        )}
 
         {info?.currencyName !== 'ZEC' && times === 3 && (action === 'change' || action === 'server') && (
           <FadeText style={{ color: colors.primary, textAlign: 'center', width: '100%' }}>

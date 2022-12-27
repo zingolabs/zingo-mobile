@@ -147,10 +147,10 @@ const parseZcashURI = async (uri: string): Promise<string | ZcashURITarget> => {
   });
 
   // Make sure no elements were skipped
-  const testAns: any = ans;
-  if (testAns.includes(undefined)) {
-    return 'Some indexes were missing';
-  }
+  //const testAns: ZcashURITarget[] = ans;
+  //if (testAns.includes(undefined)) {
+  //  return 'Some indexes were missing';
+  //}
 
   // if the URI have several addresses I get only the first one.
   return ans[0];

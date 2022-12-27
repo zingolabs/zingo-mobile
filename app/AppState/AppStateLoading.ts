@@ -1,31 +1,25 @@
 import { TranslateOptions } from 'i18n-js';
-import { NavigationScreenProp } from 'react-navigation';
-import { RouteProp } from '@react-navigation/native';
+import { StackScreenProps } from '@react-navigation/stack';
 
 import TotalBalance from './TotalBalance';
 import InfoType from './InfoType';
 import WalletSeed from './WalletSeed';
+import DimensionsType from './DimensionsType';
 
 export default interface AppStateLoading {
-  navigation: NavigationScreenProp<any> | null;
-  route: RouteProp<any> | null;
-  dimensions: {
-    width: number;
-    height: number;
-    orientation: 'portrait' | 'landscape';
-    deviceType: 'tablet' | 'phone';
-    scale: number;
-  };
+  navigation: StackScreenProps<any>['navigation'];
+  route: StackScreenProps<any>['route'];
+  dimensions: DimensionsType;
 
   screen: number;
   actionButtonsDisabled: boolean;
   walletExists: boolean;
-  walletSeed: WalletSeed | null;
-  server: string | null;
+  walletSeed: WalletSeed;
+  server: string;
   totalBalance: TotalBalance;
-  info: InfoType | null;
+  info: InfoType;
 
-  translate: (key: string, config?: TranslateOptions) => any;
+  translate: (key: string, config?: TranslateOptions) => string;
 
   // eslint-disable-next-line semi
 }
