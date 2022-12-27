@@ -1,4 +1,4 @@
-export default class TotalBalance {
+export default class TotalBalanceClass {
   // Total t address, confirmed and spendable
   transparentBal: number;
 

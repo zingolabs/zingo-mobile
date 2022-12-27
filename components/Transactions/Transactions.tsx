@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { View, ScrollView, Image, Modal, TouchableOpacity, RefreshControl, Text } from 'react-native';
 import Toast from 'react-native-simple-toast';
 import moment from 'moment';
@@ -8,7 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faBars, faInfo } from '@fortawesome/free-solid-svg-icons';
 
 import RPC from '../../app/rpc';
-import { Transaction } from '../../app/AppState';
+import { TransactionType } from '../../app/AppState';
 import { ThemeType } from '../../app/types';
 import RegText from '../Components/RegText';
 import ZecAmount from '../Components/ZecAmount';
@@ -37,10 +37,10 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
   const context = useContext(ContextLoaded);
   const { translate, dimensions, transactions, totalBalance, info, syncingStatus } = context;
   const { colors } = useTheme() as unknown as ThemeType;
-  const [isTxDetailModalShowing, setTxDetailModalShowing] = React.useState(false);
-  const [txDetail, setTxDetail] = React.useState<Transaction>({} as Transaction);
+  const [isTxDetailModalShowing, setTxDetailModalShowing] = useState(false);
+  const [txDetail, setTxDetail] = useState<TransactionType>({} as TransactionType);
 
-  const [numTx, setNumTx] = React.useState<number>(100);
+  const [numTx, setNumTx] = useState<number>(100);
   const loadMoreButton = numTx < (transactions?.length || 0);
 
   const loadMoreClicked = () => {
@@ -237,8 +237,8 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
                 key={`${t.txid}-${t.type}`}
                 tx={t}
                 month={month}
-                setTxDetail={setTxDetail}
-                setTxDetailModalShowing={setTxDetailModalShowing}
+                setTxDetail={(ttt: TransactionType) => setTxDetail(ttt)}
+                setTxDetailModalShowing={(bbb: boolean) => setTxDetailModalShowing(bbb)}
               />
             );
           })}
@@ -442,8 +442,8 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
                   key={`${t.txid}-${t.type}`}
                   tx={t}
                   month={month}
-                  setTxDetail={setTxDetail}
-                  setTxDetailModalShowing={setTxDetailModalShowing}
+                  setTxDetail={(ttt: TransactionType) => setTxDetail(ttt)}
+                  setTxDetailModalShowing={(bbb: boolean) => setTxDetailModalShowing(bbb)}
                 />
               );
             })}

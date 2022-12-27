@@ -1,4 +1,4 @@
-export type UtxoNoteType = {
+export type RPCUtxoNoteType = {
   created_in_block: number;
   datetime: number;
   created_in_txid: string;

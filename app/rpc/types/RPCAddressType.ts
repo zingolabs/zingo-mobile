@@ -1,4 +1,4 @@
-export type AddressType = {
+export type RPCAddressType = {
   address: string;
   receivers: {
     orchard_exists: boolean;

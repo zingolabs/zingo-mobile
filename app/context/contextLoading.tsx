@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react';
 import { StackScreenProps } from '@react-navigation/stack';
 
-import { AppStateLoading, DimensionsType, InfoType, TotalBalance, WalletSeed } from '../AppState';
+import { AppStateLoading, DimensionsType, InfoType, TotalBalanceClass, WalletSeedType } from '../AppState';
 
 export const defaultAppStateLoading: AppStateLoading = {
   navigation: {} as StackScreenProps<any>['navigation'],
@@ -11,9 +11,9 @@ export const defaultAppStateLoading: AppStateLoading = {
   screen: 0,
   actionButtonsDisabled: false,
   walletExists: false,
-  walletSeed: {} as WalletSeed,
+  walletSeed: {} as WalletSeedType,
   server: '' as string,
-  totalBalance: new TotalBalance(),
+  totalBalance: new TotalBalanceClass(),
   info: {} as InfoType,
 
   translate: () => '',

@@ -1,4 +1,4 @@
-export default class ReceivePageState {
+export default class ReceivePageStateClass {
   // A newly created address to show by default
   newAddress: string;
 

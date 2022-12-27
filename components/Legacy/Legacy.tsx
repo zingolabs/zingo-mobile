@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, ReactNode } from 'react';
 import { View, Image, Modal, TouchableOpacity } from 'react-native';
 import { TabView, TabBar, SceneRendererProps, NavigationState, Route } from 'react-native-tab-view';
 import Toast from 'react-native-simple-toast';
@@ -29,8 +29,8 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance, toggl
   const context = useContext(ContextLoaded);
   const { translate, dimensions, info, addresses, totalBalance, uaAddress } = context;
   const { colors } = useTheme() as unknown as ThemeType;
-  const [index, setIndex] = React.useState(0);
-  const [routes] = React.useState([
+  const [index, setIndex] = useState(0);
+  const [routes] = useState([
     { key: 'zaddr', title: translate('legacy.z-title') },
     { key: 'taddr', title: translate('legacy.t-title') },
   ]);
@@ -239,7 +239,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance, toggl
     props: SceneRendererProps & {
       route: Route;
     },
-  ) => React.ReactNode = ({ route }) => {
+  ) => ReactNode = ({ route }) => {
     switch (route.key) {
       case 'zaddr': {
         let zaddr = translate('legacy.noaddress');
@@ -294,7 +294,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance, toggl
     props: SceneRendererProps & {
       navigationState: NavigationState<Route>;
     },
-  ) => React.ReactNode = props => {
+  ) => ReactNode = props => {
     return (
       <View
         accessible={true}
@@ -410,7 +410,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance, toggl
     props: SceneRendererProps & {
       navigationState: NavigationState<Route>;
     },
-  ) => React.ReactNode = props => {
+  ) => ReactNode = props => {
     //console.log(props);
     return (
       <TabBar

@@ -15,20 +15,20 @@ import RPC from '../rpc';
 import RPCModule from '../../components/RPCModule';
 import {
   AppStateLoaded,
-  SyncStatusReport,
-  TotalBalance,
-  SendPageState,
-  ReceivePageState,
+  SyncingStatusReportClass,
+  TotalBalanceClass,
+  SendPageStateClass,
+  ReceivePageStateClass,
   InfoType,
-  Transaction,
-  ToAddr,
-  ErrorModalData,
-  SendJsonToType,
-  SyncStatus,
-  SendProgress,
-  WalletSettings,
-  SettingsFileEntry,
-  Address,
+  TransactionType,
+  ToAddrClass,
+  ErrorModalDataClass,
+  SendJsonToTypeType,
+  SyncingStatusType,
+  SendProgressClass,
+  WalletSettingsClass,
+  SettingsFileClass,
+  AddressClass,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
@@ -142,7 +142,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       ...defaultAppStateLoaded,
       navigation: this.props.navigation,
       route: this.props.route,
-      sendPageState: new SendPageState(new ToAddr(Utils.getNextToAddrID())),
+      sendPageState: new SendPageStateClass(new ToAddrClass(Utils.getNextToAddrID())),
       translate: this.props.translate,
       dimensions: {
         width: Number(screen.width.toFixed(0)),
@@ -202,38 +202,38 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   };
 
   openErrorModal = (title: string, body: string) => {
-    const errorModalData = new ErrorModalData(title, body);
+    const errorModalData = new ErrorModalDataClass(title, body);
     errorModalData.modalIsOpen = true;
 
     this.setState({ errorModalData });
   };
 
   closeErrorModal = () => {
-    const errorModalData = new ErrorModalData('', '');
+    const errorModalData = new ErrorModalDataClass('', '');
     errorModalData.modalIsOpen = false;
 
     this.setState({ errorModalData });
   };
 
-  setTotalBalance = (totalBalance: TotalBalance) => {
+  setTotalBalance = (totalBalance: TotalBalanceClass) => {
     if (!isEqual(this.state.totalBalance, totalBalance)) {
       //console.log('total balance');
       this.setState({ totalBalance });
     }
   };
 
-  setSyncStatusReport = (syncStatusReport: SyncStatusReport) => {
-    this.setState({ syncStatusReport });
+  setSyncStatusReport = (syncingStatusReport: SyncingStatusReportClass) => {
+    this.setState({ syncingStatusReport });
   };
 
-  setTransactionList = (transactions: Transaction[]) => {
+  setTransactionList = (transactions: TransactionType[]) => {
     if (!isEqual(this.state.transactions, transactions)) {
       //console.log('transactions');
       this.setState({ transactions });
     }
   };
 
-  setAllAddresses = (addresses: Address[]) => {
+  setAllAddresses = (addresses: AddressClass[]) => {
     const { uaAddress } = this.state;
     if (!isEqual(this.state.addresses, addresses) || uaAddress === '') {
       //console.log('addresses');
@@ -245,16 +245,16 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     }
   };
 
-  setWalletSettings = (wallet_settings: WalletSettings) => {
-    this.setState({ wallet_settings });
+  setWalletSettings = (walletSettings: WalletSettingsClass) => {
+    this.setState({ walletSettings });
   };
 
-  setSendPageState = (sendPageState: SendPageState) => {
+  setSendPageState = (sendPageState: SendPageStateClass) => {
     this.setState({ sendPageState });
   };
 
   refreshUpdates = (inProgress: boolean, progress: number, blocks: string) => {
-    const syncingStatus: SyncStatus = {
+    const syncingStatus: SyncingStatusType = {
       inProgress,
       progress,
       blocks,
@@ -265,10 +265,10 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   };
 
   clearToAddr = () => {
-    const newToAddr = new ToAddr(Utils.getNextToAddrID());
+    const newToAddr = new ToAddrClass(Utils.getNextToAddrID());
 
     // Create the new state object
-    const newState = new SendPageState(new ToAddr(0));
+    const newState = new SendPageStateClass(new ToAddrClass(0));
     newState.toaddr = newToAddr;
 
     this.setSendPageState(newState);
@@ -294,7 +294,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     this.setState({ computingModalVisible: visible });
   };
 
-  setSendProgress = (progress: SendProgress) => {
+  setSendProgress = (progress: SendProgressClass) => {
     this.setState({ sendProgress: progress });
   };
 
@@ -310,9 +310,9 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     }
   };
 
-  getSendManyJSON = (): Array<SendJsonToType> => {
+  getSendManyJSON = (): Array<SendJsonToTypeType> => {
     const { sendPageState } = this.state;
-    const json = [sendPageState.toaddr].flatMap((to: ToAddr) => {
+    const json = [sendPageState.toaddr].flatMap((to: ToAddrClass) => {
       const memo = to.memo || '';
       const amount = parseInt((Number(to.amount) * 10 ** 8).toFixed(0), 10);
 
@@ -344,7 +344,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     return json;
   };
 
-  sendTransaction = async (setSendProgress: (arg0: SendProgress) => void): Promise<String> => {
+  sendTransaction = async (setSendProgress: (arg0: SendProgressClass) => void): Promise<String> => {
     try {
       // Construct a sendJson from the sendPage state
       const sendJson = this.getSendManyJSON();
@@ -389,7 +389,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
     let newReceivePageState;
     if (newaddress) {
-      newReceivePageState = new ReceivePageState(newaddress);
+      newReceivePageState = new ReceivePageStateClass(newaddress);
     }
     if (newReceivePageState) {
       newReceivePageState.rerenderKey = newRerenderKey;
@@ -489,7 +489,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       // Load the wallet and navigate to the transactions screen
       //console.log(`wallet loaded ok ${value}`);
       const language = '';
-      await SettingsFileImpl.writeSettings(new SettingsFileEntry(value, language));
+      await SettingsFileImpl.writeSettings(new SettingsFileClass(value, language));
       // Refetch the settings to update
       this.rpc.fetchWalletSettings();
       return;
@@ -570,7 +570,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
     if (this.state.newServer) {
       const language = '';
-      await SettingsFileImpl.writeSettings(new SettingsFileEntry(this.state.newServer, language));
+      await SettingsFileImpl.writeSettings(new SettingsFileClass(this.state.newServer, language));
     }
 
     const { info } = this.state;

@@ -8,7 +8,7 @@ import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 
-import { Transaction, TxDetailType } from '../../../app/AppState';
+import { TransactionType, TxDetailType } from '../../../app/AppState';
 import Utils from '../../../app/utils';
 import RegText from '../../Components/RegText';
 import ZecAmount from '../../Components/ZecAmount';
@@ -20,7 +20,7 @@ import { ThemeType } from '../../../app/types';
 import { ContextLoaded } from '../../../app/context';
 
 type TxDetailProps = {
-  tx: Transaction;
+  tx: TransactionType;
   closeModal: () => void;
 };
 

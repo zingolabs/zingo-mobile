@@ -1,4 +1,4 @@
-export default class ToAddr {
+export default class ToAddrClass {
   id: number;
   to: string;
   amount: string;

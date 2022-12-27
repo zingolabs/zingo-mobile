@@ -8,7 +8,7 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import TxDetail from '../components/Transactions/components/TxDetail';
 import { defaultAppStateLoaded, ContextLoadedProvider } from '../app/context';
-import { Transaction, TxDetailType } from '../app/AppState';
+import { TransactionType, TxDetailType } from '../app/AppState';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -60,7 +60,7 @@ describe('Component Transactions TxDetail - test', () => {
           memo: 'memo-abcdefgh',
         },
       ] as TxDetailType[],
-    } as Transaction;
+    } as TransactionType;
     const text: any = render(
       <ContextLoadedProvider value={state}>
         <TxDetail tx={tx} closeModal={onClose} />
@@ -94,7 +94,7 @@ describe('Component Transactions TxDetail - test', () => {
           memo: 'memo-abcdefgh',
         },
       ] as TxDetailType[],
-    } as Transaction;
+    } as TransactionType;
     const textSelfSend: any = render(
       <ContextLoadedProvider value={state}>
         <TxDetail tx={txSelfSend} closeModal={onClose} />

@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, ReactNode } from 'react';
 import { View, Image, Modal, TouchableOpacity } from 'react-native';
 import { TabView, TabBar, SceneRendererProps, Route, NavigationState } from 'react-native-tab-view';
 import Toast from 'react-native-simple-toast';
@@ -40,8 +40,8 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   const context = useContext(ContextLoaded);
   const { translate, dimensions, info, addresses, totalBalance, syncingStatus, uaAddress } = context;
   const { colors } = useTheme() as unknown as ThemeType;
-  const [index, setIndex] = React.useState(0);
-  const [routes] = React.useState([{ key: 'uaddr', title: translate('receive.u-title') }]);
+  const [index, setIndex] = useState(0);
+  const [routes] = useState([{ key: 'uaddr', title: translate('receive.u-title') }]);
 
   const [displayAddress, setDisplayAddress] = useState(uaAddress);
   const [oindex, setOIndex] = useState(0);
@@ -203,7 +203,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     props: SceneRendererProps & {
       route: Route;
     },
-  ) => React.ReactNode = ({ route }) => {
+  ) => ReactNode = ({ route }) => {
     switch (route.key) {
       case 'uaddr': {
         let uaddr = translate('receive.noaddress');
@@ -237,7 +237,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     props: SceneRendererProps & {
       navigationState: NavigationState<Route>;
     },
-  ) => React.ReactNode = props => {
+  ) => ReactNode = props => {
     return (
       <View
         accessible={true}
@@ -419,7 +419,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     props: SceneRendererProps & {
       navigationState: NavigationState<Route>;
     },
-  ) => React.ReactNode = props => {
+  ) => ReactNode = props => {
     //console.log(props);
     return (
       <TabBar

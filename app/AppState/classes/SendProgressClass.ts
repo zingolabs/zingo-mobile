@@ -1,4 +1,4 @@
-export default class SendProgress {
+export default class SendProgressClass {
   sendInProgress: boolean;
   progress: number;
   total: number;

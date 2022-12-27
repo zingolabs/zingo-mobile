@@ -1,13 +1,13 @@
-import { OutgoingMetadataType } from './OutgoingMetadataType';
+import { RPCOutgoingMetadataType } from './RPCOutgoingMetadataType';
 
-export type TransactionType = {
+export type RPCTransactionType = {
   block_height: number;
   unconfirmed: boolean;
   datetime: number;
   txid: string;
   zec_price: number;
   amount: number;
-  outgoing_metadata?: OutgoingMetadataType[];
+  outgoing_metadata?: RPCOutgoingMetadataType[];
   address: string;
   memo?: string;
   memohex?: string;

@@ -2,38 +2,38 @@ import { TranslateOptions } from 'i18n-js';
 //import BackgroundFetch from 'react-native-background-fetch';
 
 import {
-  SyncStatusReport,
-  TotalBalance,
-  Address,
-  Transaction,
+  SyncingStatusReportClass,
+  TotalBalanceClass,
+  AddressClass,
+  TransactionType,
   TxDetailType,
   InfoType,
-  SendJsonToType,
-  WalletSeed,
-  SendProgress,
-  WalletSettings,
+  SendJsonToTypeType,
+  WalletSeedType,
+  SendProgressClass,
+  WalletSettingsClass,
 } from '../AppState';
 import RPCModule from '../../components/RPCModule';
 import Utils from '../utils';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
-import { AddressType } from './types/AddressType';
-import { BalancesType } from './types/BalancesType';
-import { NotesType } from './types/NotesType';
-import { OrchardNoteType } from './types/OrchardNoteType';
-import { SaplingNoteType } from './types/SaplingNoteType';
-import { UtxoNoteType } from './types/UtxoNoteType';
-import { TransactionType } from './types/TransationType';
-import { OutgoingMetadataType } from './types/OutgoingMetadataType';
+import { RPCAddressType } from './types/RPCAddressType';
+import { RPCBalancesType } from './types/RPCBalancesType';
+import { RPCNotesType } from './types/RPCNotesType';
+import { RPCOrchardNoteType } from './types/RPCOrchardNoteType';
+import { RPCSaplingNoteType } from './types/RPCSaplingNoteType';
+import { RPCUtxoNoteType } from './types/RPCUtxoNoteType';
+import { RPCTransactionType } from './types/RPCTransationType';
+import { RPCOutgoingMetadataType } from './types/RPCOutgoingMetadataType';
 
 export default class RPC {
-  fnSetSyncStatusReport: (syncStatusReport: SyncStatusReport) => void;
+  fnSetSyncingStatusReport: (syncingStatusReport: SyncingStatusReportClass) => void;
   fnSetInfo: (info: InfoType) => void;
-  fnSetTotalBalance: (totalBalance: TotalBalance) => void;
-  fnSetTransactionsList: (txList: Transaction[]) => void;
-  fnSetAllAddresses: (allAddresses: Address[]) => void;
+  fnSetTotalBalance: (totalBalance: TotalBalanceClass) => void;
+  fnSetTransactionsList: (txList: TransactionType[]) => void;
+  fnSetAllAddresses: (allAddresses: AddressClass[]) => void;
   fnSetZecPrice: (price: number) => void;
   fnSetRefreshUpdates: (inProgress: boolean, progress: number, blocks: string) => void;
-  fnSetWalletSettings: (settings: WalletSettings) => void;
+  fnSetWalletSettings: (settings: WalletSettingsClass) => void;
   translate: (key: string, config?: TranslateOptions) => string;
 
   refreshTimerID: number;
@@ -57,17 +57,17 @@ export default class RPC {
   process_end_block: number;
 
   constructor(
-    fnSetSyncStatusReport: (syncStatusReport: SyncStatusReport) => void,
-    fnSetTotalBalance: (totalBalance: TotalBalance) => void,
-    fnSetTransactionsList: (txlist: Transaction[]) => void,
-    fnSetAllAddresses: (addresses: Address[]) => void,
-    fnSetWalletSettings: (settings: WalletSettings) => void,
+    fnSetSyncingStatusReport: (syncingStatusReport: SyncingStatusReportClass) => void,
+    fnSetTotalBalance: (totalBalance: TotalBalanceClass) => void,
+    fnSetTransactionsList: (txlist: TransactionType[]) => void,
+    fnSetAllAddresses: (addresses: AddressClass[]) => void,
+    fnSetWalletSettings: (settings: WalletSettingsClass) => void,
     fnSetInfo: (info: InfoType) => void,
     fnSetZecPrice: (price: number) => void,
     fnSetRefreshUpdates: (inProgress: boolean, progress: number, blocks: string) => void,
     translate: (key: string, config?: TranslateOptions) => string,
   ) {
-    this.fnSetSyncStatusReport = fnSetSyncStatusReport;
+    this.fnSetSyncingStatusReport = fnSetSyncingStatusReport;
     this.fnSetTotalBalance = fnSetTotalBalance;
     this.fnSetTransactionsList = fnSetTransactionsList;
     this.fnSetAllAddresses = fnSetAllAddresses;
@@ -240,16 +240,16 @@ export default class RPC {
     return '';
   }
 
-  static async rpc_fetchSeedAndBirthday(): Promise<WalletSeed> {
+  static async rpc_fetchSeedAndBirthday(): Promise<WalletSeedType> {
     const seedStr = await RPCModule.execute('seed', '');
     const seedJSON = await JSON.parse(seedStr);
 
     if (seedJSON) {
-      const seed: WalletSeed = { seed: seedJSON.seed, birthday: seedJSON.birthday };
+      const seed: WalletSeedType = { seed: seedJSON.seed, birthday: seedJSON.birthday };
       return seed;
     }
 
-    return {} as WalletSeed;
+    return {} as WalletSeedType;
   }
 
   // We combine detailed transactions if they are sent to the same outgoing address in the same txid. This
@@ -601,7 +601,7 @@ export default class RPC {
         );
 
         // store SyncStatusReport object for a new screen
-        const statusGeneral: SyncStatusReport = {
+        const statusGeneral: SyncingStatusReportClass = {
           syncID: ss.sync_id,
           totalBatches: batch_total,
           currentBatch: ss.in_progress ? batch_num + 1 : 0,
@@ -616,7 +616,7 @@ export default class RPC {
           process_end_block: this.process_end_block,
           lastBlockServer: this.lastServerBlockHeight,
         };
-        this.fnSetSyncStatusReport(statusGeneral);
+        this.fnSetSyncingStatusReport(statusGeneral);
 
         this.prevProgress = progress;
 
@@ -644,7 +644,7 @@ export default class RPC {
           this.fnSetRefreshUpdates(false, 0, '');
 
           // store SyncStatusReport object for a new screen
-          const statusFinished: SyncStatusReport = {
+          const statusFinished: SyncingStatusReportClass = {
             syncID: ss.sync_id,
             totalBatches: 0,
             currentBatch: 0,
@@ -659,7 +659,7 @@ export default class RPC {
             process_end_block: this.lastWalletBlockHeight,
             lastBlockServer: this.lastServerBlockHeight,
           };
-          this.fnSetSyncStatusReport(statusFinished);
+          this.fnSetSyncingStatusReport(statusFinished);
 
           //console.log('sync status', ss);
           //console.log(`Finished refresh at ${this.lastWalletBlockHeight} id: ${ss.sync_id}`);
@@ -680,7 +680,7 @@ export default class RPC {
               this.message = this.translate('rpc.walletstored-message') + ` ${batch_num + 1}`;
 
               // store SyncStatusReport object for a new screen
-              const statusBatch: SyncStatusReport = {
+              const statusBatch: SyncingStatusReportClass = {
                 syncID: ss.sync_id,
                 totalBatches: batch_total,
                 currentBatch: ss.in_progress ? batch_num + 1 : 0,
@@ -695,7 +695,7 @@ export default class RPC {
                 process_end_block: this.process_end_block,
                 lastBlockServer: this.lastServerBlockHeight,
               };
-              this.fnSetSyncStatusReport(statusBatch);
+              this.fnSetSyncingStatusReport(statusBatch);
 
               //console.log('sync status', ss);
               //console.log(
@@ -719,7 +719,7 @@ export default class RPC {
             this.message = this.translate('rpc.sixtyseconds-message') + ` ${batch_num + 1}`;
 
             // store SyncStatusReport object for a new screen
-            const statusSeconds: SyncStatusReport = {
+            const statusSeconds: SyncingStatusReportClass = {
               syncID: ss.sync_id,
               totalBatches: batch_total,
               currentBatch: ss.in_progress ? batch_num + 1 : 0,
@@ -734,7 +734,7 @@ export default class RPC {
               process_end_block: this.process_end_block,
               lastBlockServer: this.lastServerBlockHeight,
             };
-            this.fnSetSyncStatusReport(statusSeconds);
+            this.fnSetSyncingStatusReport(statusSeconds);
 
             //console.log('sync status', ss);
             //console.log(`Saving wallet. seconds: ${this.seconds_batch}`);
@@ -758,17 +758,17 @@ export default class RPC {
 
     //console.log(settings);
 
-    const wallet_settings = new WalletSettings();
+    const walletSettings = new WalletSettingsClass();
     if (download_memos_json) {
-      wallet_settings.download_memos = download_memos_json.download_memos;
+      walletSettings.download_memos = download_memos_json.download_memos;
     }
     if (transaction_filter_threshold_json) {
-      wallet_settings.transaction_filter_threshold = transaction_filter_threshold_json.transaction_filter_threshold;
+      walletSettings.transaction_filter_threshold = transaction_filter_threshold_json.transaction_filter_threshold;
     }
     if (settings) {
-      wallet_settings.server = settings.server;
+      walletSettings.server = settings.server;
     }
-    await this.fnSetWalletSettings(wallet_settings);
+    await this.fnSetWalletSettings(walletSettings);
   }
 
   async fetchInfo(): Promise<void> {
@@ -792,7 +792,7 @@ export default class RPC {
   // This method will get the total balances
   async fetchTotalBalance() {
     const addressesStr: string = await RPCModule.execute('addresses', '');
-    let addressesJSON: AddressType[] = await JSON.parse(addressesStr);
+    let addressesJSON: RPCAddressType[] = await JSON.parse(addressesStr);
 
     //console.log('addrs:', addressesJSON.length, addressesJSON);
 
@@ -801,7 +801,7 @@ export default class RPC {
 
     const balanceStr: string = await RPCModule.execute('balance', '');
     //console.log(balanceStr);
-    const balanceJSON: BalancesType = await JSON.parse(balanceStr);
+    const balanceJSON: RPCBalancesType = await JSON.parse(balanceStr);
 
     //console.log('balan:', balanceJSON);
 
@@ -810,7 +810,7 @@ export default class RPC {
     const transparentBal: number = (balanceJSON.transparent_balance || 0) / 10 ** 8;
 
     // Total Balance
-    const balance: TotalBalance = {
+    const balance: TotalBalanceClass = {
       orchardBal,
       privateBal,
       transparentBal,
@@ -823,7 +823,7 @@ export default class RPC {
     // Fetch pending notes and UTXOs
     const pendingNotes: string = await RPCModule.execute('notes', '');
     //console.log(pendingNotes);
-    const pendingNotesJSON: NotesType = await JSON.parse(pendingNotes);
+    const pendingNotesJSON: RPCNotesType = await JSON.parse(pendingNotes);
 
     //console.log(pendingNotes);
 
@@ -831,7 +831,7 @@ export default class RPC {
 
     // Process orchard notes
     if (pendingNotesJSON.pending_orchard_notes) {
-      pendingNotesJSON.pending_orchard_notes.forEach((s: OrchardNoteType) => {
+      pendingNotesJSON.pending_orchard_notes.forEach((s: RPCOrchardNoteType) => {
         pendingAddress.set(s.address, s.value);
       });
     } else {
@@ -840,7 +840,7 @@ export default class RPC {
 
     // Process sapling notes
     if (pendingNotesJSON.pending_sapling_notes) {
-      pendingNotesJSON.pending_sapling_notes.forEach((s: SaplingNoteType) => {
+      pendingNotesJSON.pending_sapling_notes.forEach((s: RPCSaplingNoteType) => {
         pendingAddress.set(s.address, s.value);
       });
     } else {
@@ -849,37 +849,37 @@ export default class RPC {
 
     // Process UTXOs
     if (pendingNotesJSON.pending_utxos) {
-      pendingNotesJSON.pending_utxos.forEach((s: UtxoNoteType) => {
+      pendingNotesJSON.pending_utxos.forEach((s: RPCUtxoNoteType) => {
         pendingAddress.set(s.address, s.value);
       });
     } else {
       console.log('ERROR: notes.pending_utxos no exists');
     }
 
-    let allAddresses: Address[] = [];
+    let allAddresses: AddressClass[] = [];
 
-    addressesJSON.forEach((u: AddressType) => {
+    addressesJSON.forEach((u: RPCAddressType) => {
       // If this has any unconfirmed txns, show that in the UI
       const receivers: string =
         (u.receivers.orchard_exists ? 'o' : '') +
         (u.receivers.sapling ? 'z' : '') +
         (u.receivers.transparent ? 't' : '');
       if (u.address) {
-        const abu = new Address(u.address, u.address, 'u', receivers);
+        const abu = new AddressClass(u.address, u.address, 'u', receivers);
         if (pendingAddress.has(abu.address)) {
           abu.containsPending = true;
         }
         allAddresses.push(abu);
       }
       if (u.receivers.sapling) {
-        const abz = new Address(u.address, u.receivers.sapling, 'z', receivers);
+        const abz = new AddressClass(u.address, u.receivers.sapling, 'z', receivers);
         if (pendingAddress.has(abz.address)) {
           abz.containsPending = true;
         }
         allAddresses.push(abz);
       }
       if (u.receivers.transparent) {
-        const abt = new Address(u.address, u.receivers.transparent, 't', receivers);
+        const abt = new AddressClass(u.address, u.receivers.transparent, 't', receivers);
         if (pendingAddress.has(abt.address)) {
           abt.containsPending = true;
         }
@@ -913,13 +913,13 @@ export default class RPC {
   async fetchTandZandOTransactions() {
     const listStr: string = await RPCModule.execute('list', '');
     //console.log(listStr);
-    const listJSON: TransactionType[] = await JSON.parse(listStr);
+    const listJSON: RPCTransactionType[] = await JSON.parse(listStr);
 
     await this.fetchServerHeight();
 
     //console.log('trans: ', listJSON);
 
-    let txlist: Transaction[] = listJSON.map((tx: TransactionType) => {
+    let txlist: TransactionType[] = listJSON.map((tx: RPCTransactionType) => {
       const type = tx.outgoing_metadata ? 'sent' : 'receive';
 
       //if (tx.txid === '55d6efcb987e8c6b8842a4c78d4adc80d8ca4761e3ff670a730e4840d8659ead') {
@@ -930,7 +930,7 @@ export default class RPC {
 
       var txdetail: TxDetailType[] = [];
       if (tx.outgoing_metadata) {
-        const dts: TxDetailType[] = tx.outgoing_metadata.map((o: OutgoingMetadataType) => {
+        const dts: TxDetailType[] = tx.outgoing_metadata.map((o: RPCOutgoingMetadataType) => {
           const detail: TxDetailType = {
             address: o.address || '',
             amount: (o.value || 0) / 10 ** 8,
@@ -950,7 +950,7 @@ export default class RPC {
         txdetail = [detail];
       }
 
-      const transaction: Transaction = {
+      const transaction: TransactionType = {
         type,
         address:
           type === 'sent'
@@ -982,7 +982,7 @@ export default class RPC {
 
     // We need to group transactions that have the same (txid and send/receive), for multi-part memos
     const m = new Map();
-    txlist.forEach((tx: Transaction) => {
+    txlist.forEach((tx: TransactionType) => {
       const key = tx.txid + tx.type;
       const coll = m.get(key);
       if (!coll) {
@@ -993,8 +993,8 @@ export default class RPC {
     });
 
     // Now, combine the amounts and memos
-    const combinedTxList: Transaction[] = [];
-    m.forEach((txns: Transaction[]) => {
+    const combinedTxList: TransactionType[] = [];
+    m.forEach((txns: TransactionType[]) => {
       // Get all the txdetails and merge them
 
       // Clone the first tx into a new one
@@ -1012,8 +1012,8 @@ export default class RPC {
 
   // Send a transaction using the already constructed sendJson structure
   async sendTransaction(
-    sendJson: Array<SendJsonToType>,
-    setSendProgress: (arg0: SendProgress) => void,
+    sendJson: Array<SendJsonToTypeType>,
+    setSendProgress: (arg0: SendProgressClass) => void,
   ): Promise<string> {
     // First, get the previous send progress id, so we know which ID to track
     const prev = await this.doSendProgress();
@@ -1042,7 +1042,7 @@ export default class RPC {
         const progress = await JSON.parse(pro);
         const sendId = progress.id;
 
-        const updatedProgress = new SendProgress(0, 0, 0);
+        const updatedProgress = new SendProgressClass(0, 0, 0);
         if (sendId === prevSendId) {
           //console.log('progress id', sendId);
           // Still not started, so wait for more time
@@ -1083,7 +1083,7 @@ export default class RPC {
 
         // Finished processing
         clearInterval(intervalID);
-        setSendProgress({} as SendProgress);
+        setSendProgress({} as SendProgressClass);
 
         if (progress.txid) {
           // And refresh data (full refresh)

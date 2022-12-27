@@ -1,4 +1,4 @@
-export type BalancesType = {
+export type RPCBalancesType = {
   orchard_balance: number;
   sapling_balance: number;
   transparent_balance: number;

@@ -1,45 +1,45 @@
-import Address from './Address';
-import AddressBookEntry from './AddressBookEntry';
+import AddressClass from './classes/AddressClass';
+import AddressBookClass from './classes/AddressBookClass';
+import ErrorModalDataClass from './classes/ErrorModalDataClass';
+import ReceivePageStateClass from './classes/ReceivePageStateClass';
+import SendPageStateClass from './classes/SendPageStateClass';
+import SendProgressClass from './classes/SendProgressClass';
+import SettingsFileClass from './classes/SettingsFileClass';
+import SyncingStatusReportClass from './classes/SyncingStatusReportClass';
+import ToAddrClass from './classes/ToAddrClass';
+import TotalBalanceClass from './classes/TotalBalanceClass';
+import WalletSettingsClass from './classes/WalletSettingsClass';
+
+import DimensionsType from './types/DimensionsType';
+import InfoType from './types/InfoType';
+import SendJsonToTypeType from './types/SendJsonToTypeType';
+import TransactionType from './types/TransactionType';
+import SyncingStatusType from './types/SyncingStatusType';
+import TxDetailType from './types/TxDetailType';
+import WalletSeedType from './types/WalletSeedType';
+
 import AppStateLoaded from './AppStateLoaded';
 import AppStateLoading from './AppStateLoading';
-import DimensionsType from './DimensionsType';
-import ErrorModalData from './ErrorModalData';
-import InfoType from './InfoType';
-import ReceivePageState from './ReceivePageState';
-import SendJsonToType from './SendJsonToType';
-import SendPageState from './SendPageState';
-import SendProgress from './SendProgress';
-import ServerSelectState from './ServerSelectState';
-import SettingsFileEntry from './SettingsFileEntry';
-import SyncStatus from './SyncStatus';
-import SyncStatusReport from './SyncStatusReport';
-import ToAddr from './ToAddr';
-import TotalBalance from './TotalBalance';
-import Transaction from './Transaction';
-import TxDetailType from './TxDetailType';
-import WalletSeed from './WalletSeed';
-import WalletSettings from './WalletSettings';
 
 export {
   AppStateLoaded,
   AppStateLoading,
-  Address,
-  AddressBookEntry,
-  DimensionsType,
-  ErrorModalData,
-  InfoType,
-  ReceivePageState,
-  SendJsonToType,
-  SendPageState,
-  SendProgress,
-  ServerSelectState,
-  SettingsFileEntry,
-  SyncStatus,
-  SyncStatusReport,
-  ToAddr,
-  TotalBalance,
-  Transaction,
+  AddressClass,
+  AddressBookClass,
+  ErrorModalDataClass,
+  ReceivePageStateClass,
+  SendPageStateClass,
+  SendProgressClass,
+  SettingsFileClass,
+  SyncingStatusReportClass,
+  ToAddrClass,
+  TotalBalanceClass,
+  WalletSettingsClass,
+  TransactionType,
   TxDetailType,
-  WalletSeed,
-  WalletSettings,
+  WalletSeedType,
+  SyncingStatusType,
+  SendJsonToTypeType,
+  InfoType,
+  DimensionsType,
 };

@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { View, ScrollView, SafeAreaView, Image, TouchableOpacity, TextInput } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -29,7 +29,7 @@ type Memos = {
 
 const Settings: React.FunctionComponent<SettingsProps> = ({ set_wallet_option, set_server_option, closeModal }) => {
   const context = useContext(ContextLoaded);
-  const { wallet_settings, totalBalance, info, translate } = context;
+  const { walletSettings, totalBalance, info, translate } = context;
   const memosArray: string = translate('settings.memos');
   let MEMOS: Memos[] = [];
   if (typeof memosArray === 'object') {
@@ -37,20 +37,20 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ set_wallet_option, s
   }
   const { colors } = useTheme() as unknown as ThemeType;
 
-  const [memos, setMemos] = React.useState(wallet_settings.download_memos);
-  const [filter, setFilter] = React.useState(wallet_settings.transaction_filter_threshold);
-  const [server, setServer] = React.useState(wallet_settings.server);
-  const [customIcon, setCustomIcon] = React.useState(farCircle);
+  const [memos, setMemos] = useState(walletSettings.download_memos);
+  const [filter, setFilter] = useState(walletSettings.transaction_filter_threshold);
+  const [server, setServer] = useState(walletSettings.server);
+  const [customIcon, setCustomIcon] = useState(farCircle);
 
-  React.useEffect(() => {
+  useEffect(() => {
     setCustomIcon(serverUris().find((s: string) => s === server) ? farCircle : faDotCircle);
   }, [server]);
 
   const saveSettings = async () => {
     if (
-      wallet_settings.download_memos === memos &&
-      wallet_settings.server === server &&
-      wallet_settings.transaction_filter_threshold === filter
+      walletSettings.download_memos === memos &&
+      walletSettings.server === server &&
+      walletSettings.transaction_filter_threshold === filter
     ) {
       Toast.show(translate('settings.nochanges'), Toast.LONG);
       return;
@@ -73,20 +73,20 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ set_wallet_option, s
       return;
     }
 
-    if (wallet_settings.download_memos !== memos) {
+    if (walletSettings.download_memos !== memos) {
       set_wallet_option('download_memos', memos);
     }
-    if (wallet_settings.transaction_filter_threshold !== filter) {
+    if (walletSettings.transaction_filter_threshold !== filter) {
       set_wallet_option('transaction_filter_threshold', filter);
     }
-    if (wallet_settings.server !== server) {
+    if (walletSettings.server !== server) {
       set_server_option(server);
     }
 
     closeModal();
   };
 
-  //console.log(wallet_settings);
+  //console.log(walletSettings);
 
   return (
     <SafeAreaView

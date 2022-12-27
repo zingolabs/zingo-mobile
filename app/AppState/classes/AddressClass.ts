@@ -1,4 +1,4 @@
-export default class Address {
+export default class AddressClass {
   uaAddress: string;
   address: string;
   addressKind: string;
