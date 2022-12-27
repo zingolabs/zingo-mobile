@@ -15,112 +15,12 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
   <View
     style={
       {
-        "alignItems": "center",
-        "backgroundColor": "rgb(255, 255, 255)",
-        "display": "flex",
-        "paddingBottom": 10,
-        "paddingTop": 10,
-        "zIndex": -1,
+        "backgroundColor": "rgb(0, 122, 255)",
+        "height": 1,
+        "width": "100%",
       }
     }
-  >
-    <Image
-      source={
-        {
-          "testUri": "../../../assets/img/logobig-zingo.png",
-        }
-      }
-      style={
-        {
-          "height": 80,
-          "resizeMode": "contain",
-          "width": 80,
-        }
-      }
-    />
-    <View
-      style={
-        {
-          "alignItems": "baseline",
-          "flexDirection": "row",
-          "opacity": 0.5,
-        }
-      }
-    >
-      <Text
-        style={
-          {
-            "color": undefined,
-            "fontSize": 36,
-          }
-        }
-      >
-        ᙇ
-      </Text>
-      <Text
-        style={
-          {
-            "color": undefined,
-            "fontSize": 36,
-            "fontWeight": "700",
-          }
-        }
-      >
-         1.1234
-      </Text>
-      <Text
-        style={
-          {
-            "color": undefined,
-            "fontSize": 18,
-            "paddingBottom": 0,
-          }
-        }
-      >
-        5678
-      </Text>
-      <Text
-        style={
-          {
-            "color": undefined,
-            "fontSize": 36,
-          }
-        }
-      >
-         ZEC
-      </Text>
-    </View>
-    <Text
-      style={
-        [
-          {
-            "marginTop": 5,
-            "padding": 5,
-          },
-          {
-            "color": "rgb(28, 28, 30)",
-            "fontSize": 18,
-            "fontWeight": "600",
-            "opacity": 1,
-          },
-        ]
-      }
-    >
-      text translated
-       (
-      text translated
-      )
-    </Text>
-    <View
-      style={
-        {
-          "backgroundColor": "rgb(0, 122, 255)",
-          "height": 1,
-          "width": "100%",
-        }
-      }
-    />
-  </View>
+  />
   <RCTScrollView
     contentContainerStyle={
       {
@@ -422,112 +322,12 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
   <View
     style={
       {
-        "alignItems": "center",
-        "backgroundColor": "rgb(255, 255, 255)",
-        "display": "flex",
-        "paddingBottom": 10,
-        "paddingTop": 10,
-        "zIndex": -1,
+        "backgroundColor": "rgb(0, 122, 255)",
+        "height": 1,
+        "width": "100%",
       }
     }
-  >
-    <Image
-      source={
-        {
-          "testUri": "../../../assets/img/logobig-zingo.png",
-        }
-      }
-      style={
-        {
-          "height": 80,
-          "resizeMode": "contain",
-          "width": 80,
-        }
-      }
-    />
-    <View
-      style={
-        {
-          "alignItems": "baseline",
-          "flexDirection": "row",
-          "opacity": 0.5,
-        }
-      }
-    >
-      <Text
-        style={
-          {
-            "color": undefined,
-            "fontSize": 36,
-          }
-        }
-      >
-        ᙇ
-      </Text>
-      <Text
-        style={
-          {
-            "color": undefined,
-            "fontSize": 36,
-            "fontWeight": "700",
-          }
-        }
-      >
-         1.1234
-      </Text>
-      <Text
-        style={
-          {
-            "color": undefined,
-            "fontSize": 18,
-            "paddingBottom": 0,
-          }
-        }
-      >
-        5678
-      </Text>
-      <Text
-        style={
-          {
-            "color": undefined,
-            "fontSize": 36,
-          }
-        }
-      >
-         ZEC
-      </Text>
-    </View>
-    <Text
-      style={
-        [
-          {
-            "marginTop": 5,
-            "padding": 5,
-          },
-          {
-            "color": "rgb(28, 28, 30)",
-            "fontSize": 18,
-            "fontWeight": "600",
-            "opacity": 1,
-          },
-        ]
-      }
-    >
-      text translated
-       (
-      text translated
-      )
-    </Text>
-    <View
-      style={
-        {
-          "backgroundColor": "rgb(0, 122, 255)",
-          "height": 1,
-          "width": "100%",
-        }
-      }
-    />
-  </View>
+  />
   <RCTScrollView
     contentContainerStyle={
       {
@@ -829,112 +629,12 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
   <View
     style={
       {
-        "alignItems": "center",
-        "backgroundColor": "rgb(255, 255, 255)",
-        "display": "flex",
-        "paddingBottom": 10,
-        "paddingTop": 10,
-        "zIndex": -1,
+        "backgroundColor": "rgb(0, 122, 255)",
+        "height": 1,
+        "width": "100%",
       }
     }
-  >
-    <Image
-      source={
-        {
-          "testUri": "../../../assets/img/logobig-zingo.png",
-        }
-      }
-      style={
-        {
-          "height": 80,
-          "resizeMode": "contain",
-          "width": 80,
-        }
-      }
-    />
-    <View
-      style={
-        {
-          "alignItems": "baseline",
-          "flexDirection": "row",
-          "opacity": 0.5,
-        }
-      }
-    >
-      <Text
-        style={
-          {
-            "color": undefined,
-            "fontSize": 36,
-          }
-        }
-      >
-        ᙇ
-      </Text>
-      <Text
-        style={
-          {
-            "color": undefined,
-            "fontSize": 36,
-            "fontWeight": "700",
-          }
-        }
-      >
-         1.1234
-      </Text>
-      <Text
-        style={
-          {
-            "color": undefined,
-            "fontSize": 18,
-            "paddingBottom": 0,
-          }
-        }
-      >
-        5678
-      </Text>
-      <Text
-        style={
-          {
-            "color": undefined,
-            "fontSize": 36,
-          }
-        }
-      >
-         ---
-      </Text>
-    </View>
-    <Text
-      style={
-        [
-          {
-            "marginTop": 5,
-            "padding": 5,
-          },
-          {
-            "color": "rgb(28, 28, 30)",
-            "fontSize": 18,
-            "fontWeight": "600",
-            "opacity": 1,
-          },
-        ]
-      }
-    >
-      text translated
-       (
-      text translated
-      )
-    </Text>
-    <View
-      style={
-        {
-          "backgroundColor": "rgb(0, 122, 255)",
-          "height": 1,
-          "width": "100%",
-        }
-      }
-    />
-  </View>
+  />
   <RCTScrollView
     contentContainerStyle={
       {
@@ -1179,112 +879,12 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
   <View
     style={
       {
-        "alignItems": "center",
-        "backgroundColor": "rgb(255, 255, 255)",
-        "display": "flex",
-        "paddingBottom": 10,
-        "paddingTop": 10,
-        "zIndex": -1,
+        "backgroundColor": "rgb(0, 122, 255)",
+        "height": 1,
+        "width": "100%",
       }
     }
-  >
-    <Image
-      source={
-        {
-          "testUri": "../../../assets/img/logobig-zingo.png",
-        }
-      }
-      style={
-        {
-          "height": 80,
-          "resizeMode": "contain",
-          "width": 80,
-        }
-      }
-    />
-    <View
-      style={
-        {
-          "alignItems": "baseline",
-          "flexDirection": "row",
-          "opacity": 0.5,
-        }
-      }
-    >
-      <Text
-        style={
-          {
-            "color": undefined,
-            "fontSize": 36,
-          }
-        }
-      >
-        ᙇ
-      </Text>
-      <Text
-        style={
-          {
-            "color": undefined,
-            "fontSize": 36,
-            "fontWeight": "700",
-          }
-        }
-      >
-         1.1234
-      </Text>
-      <Text
-        style={
-          {
-            "color": undefined,
-            "fontSize": 18,
-            "paddingBottom": 0,
-          }
-        }
-      >
-        5678
-      </Text>
-      <Text
-        style={
-          {
-            "color": undefined,
-            "fontSize": 36,
-          }
-        }
-      >
-         ---
-      </Text>
-    </View>
-    <Text
-      style={
-        [
-          {
-            "marginTop": 5,
-            "padding": 5,
-          },
-          {
-            "color": "rgb(28, 28, 30)",
-            "fontSize": 18,
-            "fontWeight": "600",
-            "opacity": 1,
-          },
-        ]
-      }
-    >
-      text translated
-       (
-      text translated
-      )
-    </Text>
-    <View
-      style={
-        {
-          "backgroundColor": "rgb(0, 122, 255)",
-          "height": 1,
-          "width": "100%",
-        }
-      }
-    />
-  </View>
+  />
   <RCTScrollView
     contentContainerStyle={
       {
@@ -1632,112 +1232,12 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
   <View
     style={
       {
-        "alignItems": "center",
-        "backgroundColor": "rgb(255, 255, 255)",
-        "display": "flex",
-        "paddingBottom": 10,
-        "paddingTop": 10,
-        "zIndex": -1,
+        "backgroundColor": "rgb(0, 122, 255)",
+        "height": 1,
+        "width": "100%",
       }
     }
-  >
-    <Image
-      source={
-        {
-          "testUri": "../../../assets/img/logobig-zingo.png",
-        }
-      }
-      style={
-        {
-          "height": 80,
-          "resizeMode": "contain",
-          "width": 80,
-        }
-      }
-    />
-    <View
-      style={
-        {
-          "alignItems": "baseline",
-          "flexDirection": "row",
-          "opacity": 0.5,
-        }
-      }
-    >
-      <Text
-        style={
-          {
-            "color": undefined,
-            "fontSize": 36,
-          }
-        }
-      >
-        ᙇ
-      </Text>
-      <Text
-        style={
-          {
-            "color": undefined,
-            "fontSize": 36,
-            "fontWeight": "700",
-          }
-        }
-      >
-         1.1234
-      </Text>
-      <Text
-        style={
-          {
-            "color": undefined,
-            "fontSize": 18,
-            "paddingBottom": 0,
-          }
-        }
-      >
-        5678
-      </Text>
-      <Text
-        style={
-          {
-            "color": undefined,
-            "fontSize": 36,
-          }
-        }
-      >
-         ZEC
-      </Text>
-    </View>
-    <Text
-      style={
-        [
-          {
-            "marginTop": 5,
-            "padding": 5,
-          },
-          {
-            "color": "rgb(28, 28, 30)",
-            "fontSize": 18,
-            "fontWeight": "600",
-            "opacity": 1,
-          },
-        ]
-      }
-    >
-      text translated
-       (
-      text translated
-      )
-    </Text>
-    <View
-      style={
-        {
-          "backgroundColor": "rgb(0, 122, 255)",
-          "height": 1,
-          "width": "100%",
-        }
-      }
-    />
-  </View>
+  />
   <RCTScrollView
     contentContainerStyle={
       {
@@ -2039,112 +1539,12 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
   <View
     style={
       {
-        "alignItems": "center",
-        "backgroundColor": "rgb(255, 255, 255)",
-        "display": "flex",
-        "paddingBottom": 10,
-        "paddingTop": 10,
-        "zIndex": -1,
+        "backgroundColor": "rgb(0, 122, 255)",
+        "height": 1,
+        "width": "100%",
       }
     }
-  >
-    <Image
-      source={
-        {
-          "testUri": "../../../assets/img/logobig-zingo.png",
-        }
-      }
-      style={
-        {
-          "height": 80,
-          "resizeMode": "contain",
-          "width": 80,
-        }
-      }
-    />
-    <View
-      style={
-        {
-          "alignItems": "baseline",
-          "flexDirection": "row",
-          "opacity": 0.5,
-        }
-      }
-    >
-      <Text
-        style={
-          {
-            "color": undefined,
-            "fontSize": 36,
-          }
-        }
-      >
-        ᙇ
-      </Text>
-      <Text
-        style={
-          {
-            "color": undefined,
-            "fontSize": 36,
-            "fontWeight": "700",
-          }
-        }
-      >
-         1.1234
-      </Text>
-      <Text
-        style={
-          {
-            "color": undefined,
-            "fontSize": 18,
-            "paddingBottom": 0,
-          }
-        }
-      >
-        5678
-      </Text>
-      <Text
-        style={
-          {
-            "color": undefined,
-            "fontSize": 36,
-          }
-        }
-      >
-         ZEC
-      </Text>
-    </View>
-    <Text
-      style={
-        [
-          {
-            "marginTop": 5,
-            "padding": 5,
-          },
-          {
-            "color": "rgb(28, 28, 30)",
-            "fontSize": 18,
-            "fontWeight": "600",
-            "opacity": 1,
-          },
-        ]
-      }
-    >
-      text translated
-       (
-      text translated
-      )
-    </Text>
-    <View
-      style={
-        {
-          "backgroundColor": "rgb(0, 122, 255)",
-          "height": 1,
-          "width": "100%",
-        }
-      }
-    />
-  </View>
+  />
   <RCTScrollView
     contentContainerStyle={
       {

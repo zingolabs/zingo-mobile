@@ -7,6 +7,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
   style={
     {
       "display": "flex",
+      "height": "100%",
       "justifyContent": "flex-start",
       "marginBottom": 200,
       "width": "100%",

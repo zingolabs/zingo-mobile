@@ -1,10 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useState, useEffect, useContext } from 'react';
-import { View, Image, SafeAreaView, ScrollView, TouchableOpacity, Text, TextInput } from 'react-native';
+import React, { useState, useEffect, useContext, useRef } from 'react';
+import { View, Image, SafeAreaView, ScrollView, TouchableOpacity, Text, TextInput, Keyboard } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import Toast from 'react-native-simple-toast';
 import Clipboard from '@react-native-community/clipboard';
 import { TranslateOptions } from 'i18n-js';
+import Animated, { EasingNode } from 'react-native-reanimated';
 
 import RegText from '../Components/RegText';
 import FadeText from '../Components/FadeText';
@@ -46,10 +47,13 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
 
   const { colors } = useTheme() as unknown as ThemeType;
   const [seedPhrase, setSeedPhrase] = useState('');
-  const [birthdayNumber, setBirthdayNumber] = useState(0);
+  const [birthdayNumber, setBirthdayNumber] = useState('');
   const [times, setTimes] = useState(0);
   const [texts, setTexts] = useState({} as TextsType);
   const [readOnly, setReadOnly] = useState(true);
+  const [titleViewHeight, setTitleViewHeight] = useState(0);
+
+  const slideAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     setTexts(translate('seed.buttontexts'));
@@ -58,8 +62,32 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
     );
     setTimes(action === 'change' || action === 'backup' || action === 'server' ? 1 : 0);
     setSeedPhrase(walletSeed?.seed || '');
-    setBirthdayNumber(walletSeed?.birthday || 0);
+    setBirthdayNumber(walletSeed?.birthday?.toString() || '');
   }, [action, walletSeed?.seed, walletSeed?.birthday, walletSeed, translate]);
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
+      Animated.timing(slideAnim, {
+        toValue: 0 - titleViewHeight + 25,
+        duration: 100,
+        easing: EasingNode.linear,
+        //useNativeDriver: true,
+      }).start();
+    });
+    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 100,
+        easing: EasingNode.linear,
+        //useNativeDriver: true,
+      }).start();
+    });
+
+    return () => {
+      !!keyboardDidShowListener && keyboardDidShowListener.remove();
+      !!keyboardDidHideListener && keyboardDidHideListener.remove();
+    };
+  }, [slideAnim, titleViewHeight]);
 
   //console.log('=================================');
   //console.log(walletSeed?.seed, walletSeed?.birthday);
@@ -74,30 +102,37 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
         height: '100%',
         backgroundColor: colors.background,
       }}>
-      <View
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          paddingBottom: 10,
-          backgroundColor: colors.card,
-          zIndex: -1,
-          paddingTop: 10,
-        }}>
-        <Image
-          source={require('../../assets/img/logobig-zingo.png')}
-          style={{ width: 80, height: 80, resizeMode: 'contain' }}
-        />
-        <ZecAmount
-          currencyName={info?.currencyName ? info.currencyName : ''}
-          size={36}
-          amtZec={totalBalance.total}
-          style={{ opacity: 0.5 }}
-        />
-        <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
-          {translate('seed.title')} ({translate(`seed.${action}`)})
-        </RegText>
-        <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
-      </View>
+      <Animated.View style={{ marginTop: slideAnim }}>
+        <View
+          onLayout={e => {
+            const { height } = e.nativeEvent.layout;
+            setTitleViewHeight(height);
+          }}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            paddingBottom: 10,
+            backgroundColor: colors.card,
+            zIndex: -1,
+            paddingTop: 10,
+          }}>
+          <Image
+            source={require('../../assets/img/logobig-zingo.png')}
+            style={{ width: 80, height: 80, resizeMode: 'contain' }}
+          />
+          <ZecAmount
+            currencyName={info?.currencyName ? info.currencyName : ''}
+            size={36}
+            amtZec={totalBalance.total}
+            style={{ opacity: 0.5 }}
+          />
+          <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
+            {translate('seed.title')} ({translate(`seed.${action}`)})
+          </RegText>
+        </View>
+      </Animated.View>
+
+      <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
 
       <ScrollView
         style={{ maxHeight: '85%' }}
@@ -208,6 +243,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
                 }}>
                 <TextInput
                   placeholder="#"
+                  placeholderTextColor={colors.placeholder}
                   style={{
                     color: colors.text,
                     fontWeight: '600',
@@ -217,7 +253,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
                     marginLeft: 5,
                   }}
                   value={birthdayNumber.toString()}
-                  onChangeText={(text: string) => setBirthdayNumber(Number(text))}
+                  onChangeText={(text: string) => setBirthdayNumber(text)}
                   editable={true}
                   keyboardType="numeric"
                 />
@@ -259,7 +295,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
               return;
             }
             if (times === 0 || times === 3) {
-              onClickOK(seedPhrase, birthdayNumber);
+              onClickOK(seedPhrase, Number(birthdayNumber));
             } else if (times === 1 || times === 2) {
               setTimes(times + 1);
             }
