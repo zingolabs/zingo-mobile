@@ -225,7 +225,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
   createNewWallet = () => {
     this.setState({ actionButtonsDisabled: true });
     setTimeout(async () => {
-      const seed = await RPCModule.createNewWallet(this.state.server);
+      const seed: string = await RPCModule.createNewWallet(this.state.server);
 
       if (!seed.startsWith('Error')) {
         this.setState({ walletSeed: JSON.parse(seed), screen: 2, actionButtonsDisabled: false, walletExists: true });
