@@ -147,7 +147,7 @@
     "tapcopy": "Pulsar para copiar",
     "tapcopy-message": "Frase Semilla copiada al Portapapeles",
     "birthday-readonly": "Cumpleaños del Monedero",
-    "birthday-no-readonly": "Altura de bloque de la primera transacción. (Está bien si no la sabes o no te acuerdas)",
+    "birthday-no-readonly": "Altura de bloque de la primera transacción. (Está bien si no la sabes o no te acuerdas) Rango de valores entre",
     "change-warning": "YA NO TENDRÁS ACCESO A ESTE MONEDERO, Y VAS A ABRIR OTRO MONEDERO DIFERENTE",
     "backup-warning": "YA NO TENDRÁS ACCESO A ESTE MONEDERO, Y VAS A ABRIR LA COPIA DE SEGURIDAD DEL ÚLTIMO MONEDERO USADO ANTERIOR",
     "server-warning": "YA NO TENDRÁS ACCESO A ESTE MONEDERO, Y VAS A CAMBIAR A OTRO SERVIDOR EN EL CUAL TU MONEDERO ACTIVO NO EXISTE",

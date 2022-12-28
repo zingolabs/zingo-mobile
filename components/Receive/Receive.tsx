@@ -51,7 +51,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   const uaddrs = addresses.filter(a => a.addressKind === 'u') || [];
 
   if (displayAddress) {
-    const displayAddressIndex = uaddrs?.findIndex(a => a.address === displayAddress);
+    const displayAddressIndex = uaddrs.findIndex(a => a.address === displayAddress);
 
     if (oindex !== displayAddressIndex && displayAddressIndex >= 0) {
       setOIndex(displayAddressIndex);
@@ -80,7 +80,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
       if (uaddrs.length === 0) {
         return;
       }
-      const newIndex = (oindex + 1) % uaddrs?.length;
+      const newIndex = (oindex + 1) % uaddrs.length;
       setOIndex(newIndex);
       setUaAddress(uaddrs[newIndex].address);
     }
@@ -197,7 +197,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     address = uaddrs[oindex].address;
   }
 
-  const syncStatusDisplayLine = syncingStatus?.inProgress ? `(${syncingStatus?.blocks})` : '';
+  const syncStatusDisplayLine = syncingStatus.inProgress ? `(${syncingStatus.blocks})` : '';
 
   const renderScene: (
     props: SceneRendererProps & {
@@ -293,7 +293,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
             />
             <View style={{ flexDirection: 'row' }}>
               <ZecAmount
-                currencyName={info?.currencyName ? info.currencyName : ''}
+                currencyName={info.currencyName ? info.currencyName : ''}
                 size={36}
                 amtZec={totalBalance.total}
                 style={{ opacity: 0.5 }}
@@ -513,7 +513,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                 </TouchableOpacity>
               )}
               <ZecAmount
-                currencyName={info?.currencyName ? info.currencyName : ''}
+                currencyName={info.currencyName ? info.currencyName : ''}
                 size={36}
                 amtZec={totalBalance.total}
                 style={{ opacity: 0.5 }}

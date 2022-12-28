@@ -1,17 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useRef, useCallback, useContext } from 'react';
-import {
-  View,
-  ScrollView,
-  Modal,
-  Image,
-  Alert,
-  Keyboard,
-  TextInput,
-  TouchableOpacity,
-  NativeSyntheticEvent,
-  TextInputEndEditingEventData,
-} from 'react-native';
+import { View, ScrollView, Modal, Image, Alert, Keyboard, TextInput, TouchableOpacity } from 'react-native';
 import { faQrcode, faCheck, faInfo } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme } from '@react-navigation/native';
@@ -68,9 +57,9 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [sendButtonEnabled, setSendButtonEnabled] = useState(false);
 
   const slideAnim = useRef(new Animated.Value(0)).current;
-  const defaultFee = info?.defaultFee || Utils.getFallbackDefaultFee();
+  const defaultFee = info.defaultFee || Utils.getFallbackDefaultFee();
   const { decimalSeparator } = getNumberFormatSettings();
-  const syncStatusDisplayLine = syncingStatus?.inProgress ? `(${syncingStatus?.blocks})` : '';
+  const syncStatusDisplayLine = syncingStatus.inProgress ? `(${syncingStatus.blocks})` : '';
   const spendable = totalBalance.transparentBal + totalBalance.spendablePrivate + totalBalance.spendableOrchard;
   const stillConfirming = spendable !== totalBalance.total;
   const zecPrice = info && info.zecPrice;
@@ -261,8 +250,8 @@ const Send: React.FunctionComponent<SendProps> = ({
       toAddr.amount = amount.replace(decimalSeparator, '.').substring(0, 20);
       if (isNaN(Number(toAddr.amount))) {
         toAddr.amountUSD = '';
-      } else if (toAddr.amount && info?.zecPrice) {
-        toAddr.amountUSD = Utils.toLocaleFloat((parseFloat(toAddr.amount) * (info?.zecPrice || 0)).toFixed(2));
+      } else if (toAddr.amount && info.zecPrice) {
+        toAddr.amountUSD = Utils.toLocaleFloat((parseFloat(toAddr.amount) * (info.zecPrice || 0)).toFixed(2));
       } else {
         toAddr.amountUSD = '';
       }
@@ -273,8 +262,8 @@ const Send: React.FunctionComponent<SendProps> = ({
       toAddr.amountUSD = amountUSD.replace(decimalSeparator, '.').substring(0, 15);
       if (isNaN(Number(toAddr.amountUSD))) {
         toAddr.amount = '';
-      } else if (toAddr.amountUSD && info?.zecPrice) {
-        toAddr.amount = Utils.toLocaleFloat(Utils.maxPrecisionTrimmed(parseFloat(amountUSD) / info?.zecPrice));
+      } else if (toAddr.amountUSD && info.zecPrice) {
+        toAddr.amount = Utils.toLocaleFloat(Utils.maxPrecisionTrimmed(parseFloat(amountUSD) / info.zecPrice));
       } else {
         toAddr.amount = '';
       }
@@ -401,7 +390,7 @@ const Send: React.FunctionComponent<SendProps> = ({
             />
             <View style={{ flexDirection: 'row' }}>
               <ZecAmount
-                currencyName={info?.currencyName ? info.currencyName : ''}
+                currencyName={info.currencyName ? info.currencyName : ''}
                 size={36}
                 amtZec={totalBalance.total}
               />
@@ -652,7 +641,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                     }}>
                     <RegText>{translate('send.spendable')}</RegText>
                     <ZecAmount
-                      currencyName={info?.currencyName ? info.currencyName : ''}
+                      currencyName={info.currencyName ? info.currencyName : ''}
                       color={stillConfirming ? 'red' : colors.money}
                       size={18}
                       amtZec={getMaxAmount()}
@@ -825,7 +814,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                   </TouchableOpacity>
                 )}
                 <ZecAmount
-                  currencyName={info?.currencyName ? info.currencyName : ''}
+                  currencyName={info.currencyName ? info.currencyName : ''}
                   size={36}
                   amtZec={totalBalance.total}
                 />
@@ -1074,7 +1063,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       }}>
                       <RegText>{translate('send.spendable')}</RegText>
                       <ZecAmount
-                        currencyName={info?.currencyName ? info.currencyName : ''}
+                        currencyName={info.currencyName ? info.currencyName : ''}
                         color={colors.money}
                         size={18}
                         amtZec={getMaxAmount()}

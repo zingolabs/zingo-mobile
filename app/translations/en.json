@@ -147,7 +147,7 @@
     "tapcopy": "Tap to copy",
     "tapcopy-message": "Copied Seed to Clipboard",
     "birthday-readonly": "Wallet Birthday",
-    "birthday-no-readonly": "Block height of first transaction. (It's OK, if you don't know)",
+    "birthday-no-readonly": "Block height of first transaction. (It's OK, if you don't know) Value range between ",
     "change-warning": "YOU WILL HAVE NO LONGER ACCESS TO THIS WALLET, AND YOU ARE GOING TO ACCESS TO ANOTHER DIFFERENT WALLET",
     "backup-warning": "YOU WILL HAVE NO LONGER ACCESS TO THIS WALLET, AND YOU ARE GOING TO ACCESS TO YOUR BACKUP WALLET",
     "server-warning": "YOU WILL HAVE NO LONGER ACCESS TO THIS WALLET, AND YOU ARE GOING TO CHANGE TO ANOTHER SERVER IN WHICH YOUR ACTUAL WALLET DOESN'T EXIST",

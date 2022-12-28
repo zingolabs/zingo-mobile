@@ -66,9 +66,9 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
       action === 'new' || action === 'view' || action === 'change' || action === 'backup' || action === 'server',
     );
     setTimes(action === 'change' || action === 'backup' || action === 'server' ? 1 : 0);
-    setSeedPhrase(walletSeed?.seed || '');
-    setBirthdayNumber(walletSeed?.birthday?.toString() || '');
-  }, [action, walletSeed?.seed, walletSeed?.birthday, walletSeed, translate]);
+    setSeedPhrase(walletSeed.seed || '');
+    setBirthdayNumber(walletSeed.birthday.toString() || '');
+  }, [action, walletSeed.seed, walletSeed.birthday, walletSeed, translate]);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
@@ -95,7 +95,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
   }, [slideAnim, titleViewHeight]);
 
   //console.log('=================================');
-  //console.log(walletSeed?.seed, walletSeed?.birthday);
+  //console.log(walletSeed.seed, walletSeed.birthday);
   //console.log(seedPhrase, birthdayNumber);
 
   return (
@@ -126,7 +126,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
             style={{ width: 80, height: 80, resizeMode: 'contain' }}
           />
           <ZecAmount
-            currencyName={info?.currencyName ? info.currencyName : ''}
+            currencyName={info.currencyName ? info.currencyName : ''}
             size={36}
             amtZec={totalBalance.total}
             style={{ opacity: 0.5 }}
@@ -227,7 +227,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
           <FadeText style={{ textAlign: 'center' }}>{translate('seed.birthday-readonly')}</FadeText>
           {readOnly ? (
             <RegText color={colors.text} style={{ textAlign: 'center' }}>
-              {birthdayNumber.toString()}
+              {birthdayNumber}
             </RegText>
           ) : (
             <>
@@ -257,7 +257,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
                     minHeight: 48,
                     marginLeft: 5,
                   }}
-                  value={birthdayNumber.toString()}
+                  value={birthdayNumber}
                   onChangeText={(text: string) => setBirthdayNumber(text)}
                   editable={true}
                   keyboardType="numeric"
@@ -283,7 +283,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
           </FadeText>
         )}
 
-        {info?.currencyName !== 'ZEC' && times === 3 && (action === 'change' || action === 'server') && (
+        {info.currencyName !== 'ZEC' && times === 3 && (action === 'change' || action === 'server') && (
           <FadeText style={{ color: colors.primary, textAlign: 'center', width: '100%' }}>
             {translate('seed.mainnet-warning')}
           </FadeText>

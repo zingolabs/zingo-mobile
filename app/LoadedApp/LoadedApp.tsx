@@ -154,7 +154,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     };
 
     this.rpc = new RPC(
-      this.setSyncStatusReport,
+      this.setSyncingStatusReport,
       this.setTotalBalance,
       this.setTransactionList,
       this.setAllAddresses,
@@ -222,7 +222,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     }
   };
 
-  setSyncStatusReport = (syncingStatusReport: SyncingStatusReportClass) => {
+  setSyncingStatusReport = (syncingStatusReport: SyncingStatusReportClass) => {
     this.setState({ syncingStatusReport });
   };
 
@@ -312,14 +312,14 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
   getSendManyJSON = (): Array<SendJsonToTypeType> => {
     const { sendPageState } = this.state;
-    const json = [sendPageState.toaddr].flatMap((to: ToAddrClass) => {
+    const json: Array<SendJsonToTypeType> = [sendPageState.toaddr].flatMap((to: ToAddrClass) => {
       const memo = to.memo || '';
       const amount = parseInt((Number(to.amount) * 10 ** 8).toFixed(0), 10);
 
       if (memo === '') {
-        return { address: to.to, amount };
+        return [{ address: to.to, amount } as SendJsonToTypeType];
       } else if (memo.length <= 512) {
-        return { address: to.to, amount, memo };
+        return [{ address: to.to, amount, memo } as SendJsonToTypeType];
       } else {
         // If the memo is more than 512 bytes, then we split it into multiple transactions.
         // Each memo will be `(xx/yy)memo_part`. The prefix "(xx/yy)" is 7 bytes long, so
@@ -328,10 +328,14 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
         const tos = [];
 
         // The first one contains all the tx value
-        tos.push({ address: to.to, amount, memo: `(1/${splits.length})${splits[0]}` });
+        tos.push({ address: to.to, amount, memo: `(1/${splits.length})${splits[0]}` } as SendJsonToTypeType);
 
         for (let i = 1; i < splits.length; i++) {
-          tos.push({ address: to.to, amount: 0, memo: `(${i + 1}/${splits.length})${splits[i]}` });
+          tos.push({
+            address: to.to,
+            amount: 0,
+            memo: `(${i + 1}/${splits.length})${splits[i]}`,
+          } as SendJsonToTypeType);
         }
 
         return tos;
@@ -387,11 +391,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     const { receivePageState } = this.state;
     const newRerenderKey = receivePageState.rerenderKey + 1;
 
-    let newReceivePageState;
     if (newaddress) {
-      newReceivePageState = new ReceivePageStateClass(newaddress);
-    }
-    if (newReceivePageState) {
+      const newReceivePageState = new ReceivePageStateClass(newaddress);
       newReceivePageState.rerenderKey = newRerenderKey;
       this.setState({ receivePageState: newReceivePageState });
     }
@@ -405,8 +406,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     await this.rpc.fetchTotalBalance();
   };
 
-  clearTimers = async () => {
-    await this.rpc.clearTimers();
+  clearTimers = () => {
+    this.rpc.clearTimers();
   };
 
   toggleMenuDrawer = () => {
@@ -519,7 +520,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   navigateToLoading = async () => {
     const { navigation } = this.props;
 
-    await this.rpc.clearTimers();
+    this.rpc.clearTimers();
     navigation.reset({
       index: 0,
       routes: [{ name: 'LoadingApp' }],
@@ -590,7 +591,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   };
 
   setUaAddress = (uaAddress: string) => {
-    this.setState({ uaAddress: uaAddress });
+    this.setState({ uaAddress });
   };
 
   syncingStatusMoreInfoOnClick = async () => {
