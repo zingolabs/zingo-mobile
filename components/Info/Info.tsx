@@ -58,7 +58,7 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal }) => {
           style={{ width: 80, height: 80, resizeMode: 'contain' }}
         />
         <ZecAmount
-          currencyName={info?.currencyName ? info.currencyName : ''}
+          currencyName={info.currencyName ? info.currencyName : ''}
           size={36}
           amtZec={totalBalance.total}
           style={{ opacity: 0.5 }}
@@ -100,11 +100,11 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal }) => {
                 : translate('info.unknown') + ' (' + infoState.chain_name + ')'
             }
           />
-          <DetailLine label={translate('info.serverblock')} value={info?.latestBlock.toString()} />
+          <DetailLine label={translate('info.serverblock')} value={info.latestBlock.toString()} />
           {/* <DetailLine label="Wallet Block Height" value={walletHeight} /> */}
           <DetailLine
             label={translate('info.zecprice')}
-            value={info?.zecPrice ? `$ ${Utils.toLocaleFloat(info?.zecPrice?.toFixed(2))}` : '--'}
+            value={info.zecPrice ? `$ ${Utils.toLocaleFloat(info.zecPrice.toFixed(2))}` : '--'}
           />
         </View>
       </ScrollView>

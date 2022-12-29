@@ -54,7 +54,7 @@ const ImportKey: React.FunctionComponent<ImportKeyProps> = ({ closeModal, doImpo
           style={{ width: 80, height: 80, resizeMode: 'contain' }}
         />
         <ZecAmount
-          currencyName={info?.currencyName ? info.currencyName : ''}
+          currencyName={info.currencyName ? info.currencyName : ''}
           size={36}
           amtZec={totalBalance.total}
           style={{ opacity: 0.5 }}

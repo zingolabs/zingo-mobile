@@ -41,7 +41,7 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
   const [txDetail, setTxDetail] = useState<TransactionType>({} as TransactionType);
 
   const [numTx, setNumTx] = useState<number>(100);
-  const loadMoreButton = numTx < (transactions?.length || 0);
+  const loadMoreButton = numTx < (transactions.length || 0);
 
   const loadMoreClicked = () => {
     setNumTx(numTx + 100);
@@ -69,9 +69,9 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
 
   const zecPrice = info && info.zecPrice;
 
-  const syncStatusDisplayLine = syncingStatus?.inProgress ? `(${syncingStatus?.blocks})` : '';
+  const syncStatusDisplayLine = syncingStatus.inProgress ? `(${syncingStatus.blocks})` : '';
 
-  //const balanceColor = transactions?.find(t => t.confirmations === 0) ? colors.primary : colors.text;
+  //const balanceColor = transactions.find(t => t.confirmations === 0) ? colors.primary : colors.text;
   const balanceColor = colors.text;
   var lastMonth = '';
 
@@ -110,7 +110,7 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
         />
         <View style={{ flexDirection: 'row' }}>
           <ZecAmount
-            currencyName={info?.currencyName ? info.currencyName : ''}
+            currencyName={info.currencyName ? info.currencyName : ''}
             color={balanceColor}
             size={36}
             amtZec={totalBalance.total}
@@ -221,7 +221,7 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
         }
         style={{ flexGrow: 1, marginTop: 10, width: '100%', height: '100%' }}>
         {transactions
-          ?.slice(0, numTx)
+          .slice(0, numTx)
           .sort((a, b) => b.time - a.time)
           .flatMap(t => {
             let txmonth = moment(t.time * 1000).format('MMM YYYY');
@@ -316,7 +316,7 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
               </TouchableOpacity>
             )}
             <ZecAmount
-              currencyName={info?.currencyName ? info.currencyName : ''}
+              currencyName={info.currencyName ? info.currencyName : ''}
               color={balanceColor}
               size={36}
               amtZec={totalBalance.total}
@@ -426,7 +426,7 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
           }
           style={{ flexGrow: 1, marginTop: 0, height: '100%' }}>
           {transactions
-            ?.slice(0, numTx)
+            .slice(0, numTx)
             .sort((a, b) => b.time - a.time)
             .flatMap(t => {
               let txmonth = moment(t.time * 1000).format('MMM YYYY');

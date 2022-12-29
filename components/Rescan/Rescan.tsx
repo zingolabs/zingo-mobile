@@ -47,7 +47,7 @@ const Rescan: React.FunctionComponent<RescanProps> = ({ closeModal, startRescan 
           style={{ width: 80, height: 80, resizeMode: 'contain' }}
         />
         <ZecAmount
-          currencyName={info?.currencyName ? info.currencyName : ''}
+          currencyName={info.currencyName ? info.currencyName : ''}
           size={36}
           amtZec={totalBalance.total}
           style={{ opacity: 0.5 }}
@@ -66,7 +66,7 @@ const Rescan: React.FunctionComponent<RescanProps> = ({ closeModal, startRescan 
           justifyContent: 'flex-start',
         }}>
         <View style={{ display: 'flex', margin: 20, marginBottom: 30 }}>
-          <RegText>{translate('rescan.text-1') + walletSeed?.birthday + translate('rescan.text-2')}</RegText>
+          <RegText>{translate('rescan.text-1') + walletSeed.birthday + translate('rescan.text-2')}</RegText>
         </View>
       </ScrollView>
       <View
