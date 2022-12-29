@@ -81,9 +81,11 @@ const Send: React.FunctionComponent<SendProps> = ({
       return (
         resultJSON.status === 'success' &&
         resultJSON.address_kind !== 'transparent' &&
-        ((info.currencyName === 'ZEC' &&
+        ((!!info.currencyName &&
+          info.currencyName === 'ZEC' &&
           (resultJSON.chain_name.toLowerCase() === 'main' || resultJSON.chain_name.toLowerCase() === 'mainnet')) ||
-          (info.currencyName !== 'ZEC' &&
+          (!!info.currencyName &&
+            info.currencyName !== 'ZEC' &&
             (resultJSON.chain_name.toLowerCase() === 'test' ||
               resultJSON.chain_name.toLowerCase() === 'testnet' ||
               resultJSON.chain_name.toLowerCase() === 'regtest')))
@@ -110,9 +112,11 @@ const Send: React.FunctionComponent<SendProps> = ({
 
       return (
         resultJSON.status === 'success' &&
-        ((info.currencyName === 'ZEC' &&
+        ((!!info.currencyName &&
+          info.currencyName === 'ZEC' &&
           (resultJSON.chain_name.toLowerCase() === 'main' || resultJSON.chain_name.toLowerCase() === 'mainnet')) ||
-          (info.currencyName !== 'ZEC' &&
+          (!!info.currencyName &&
+            info.currencyName !== 'ZEC' &&
             (resultJSON.chain_name.toLowerCase() === 'test' ||
               resultJSON.chain_name.toLowerCase() === 'testnet' ||
               resultJSON.chain_name.toLowerCase() === 'regtest')))
@@ -249,7 +253,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       if (isNaN(Number(toAddr.amount))) {
         toAddr.amountUSD = '';
       } else if (toAddr.amount && info.zecPrice) {
-        toAddr.amountUSD = Utils.toLocaleFloat((parseFloat(toAddr.amount) * (info.zecPrice || 0)).toFixed(2));
+        toAddr.amountUSD = Utils.toLocaleFloat((parseFloat(toAddr.amount) * info.zecPrice).toFixed(2));
       } else {
         toAddr.amountUSD = '';
       }
@@ -1066,7 +1070,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       <RegText>{translate('send.spendable')}</RegText>
                       <ZecAmount
                         currencyName={info.currencyName ? info.currencyName : ''}
-                        color={colors.money}
+                        color={stillConfirming ? 'red' : colors.money}
                         size={18}
                         amtZec={getMaxAmount()}
                       />

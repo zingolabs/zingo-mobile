@@ -301,7 +301,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   setInfo = (newInfo: InfoType) => {
     // If the price is not set in this object, copy it over from the current object
     const { info } = this.state;
-    if (!!info && !!info.zecPrice && !newInfo.zecPrice) {
+    if (info.zecPrice && !newInfo.zecPrice) {
       newInfo.zecPrice = info.zecPrice;
     }
 
