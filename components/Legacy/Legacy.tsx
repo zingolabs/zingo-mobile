@@ -39,8 +39,6 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance, toggl
   const [zindex, setZIndex] = useState(0);
   const [tindex, setTIndex] = useState(0);
 
-  const zecPrice = info && info.zecPrice;
-
   const zaddrs = addresses.filter(a => a.uaAddress === uaAddress && a.addressKind === 'z') || [];
   const taddrs = addresses.filter(a => a.uaAddress === uaAddress && a.addressKind === 't') || [];
 
@@ -356,7 +354,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance, toggl
             />
             <UsdAmount
               style={{ marginTop: 0, marginBottom: 5, opacity: 0.5 }}
-              price={zecPrice}
+              price={info.zecPrice}
               amtZec={totalBalance.total}
             />
             <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
@@ -490,7 +488,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance, toggl
             />
             <UsdAmount
               style={{ marginTop: 0, marginBottom: 5, opacity: 0.5 }}
-              price={zecPrice}
+              price={info.zecPrice}
               amtZec={totalBalance.total}
             />
             <View style={{ width: '100%', height: 1, backgroundColor: colors.primary, marginTop: 5 }} />
