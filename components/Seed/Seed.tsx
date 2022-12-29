@@ -13,7 +13,7 @@ import ZecAmount from '../Components/ZecAmount';
 import Button from '../Button';
 import { ThemeType } from '../../app/types';
 import { ContextLoaded, ContextLoading } from '../../app/context';
-import { WalletSeedType } from '../../app/AppState';
+import { InfoType, TotalBalanceClass, WalletSeedType } from '../../app/AppState';
 
 type TextsType = {
   new: string[];
@@ -32,7 +32,10 @@ type SeedProps = {
 const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, action }) => {
   const contextLoaded = useContext(ContextLoaded);
   const contextLoading = useContext(ContextLoading);
-  let walletSeed: WalletSeedType, totalBalance, translate: (key: string, config?: TranslateOptions) => string, info;
+  let walletSeed: WalletSeedType,
+    totalBalance: TotalBalanceClass,
+    translate: (key: string, config?: TranslateOptions) => string,
+    info: InfoType;
   if (action === 'new' || action === 'restore') {
     walletSeed = contextLoading.walletSeed;
     totalBalance = contextLoading.totalBalance;
@@ -67,7 +70,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
     );
     setTimes(action === 'change' || action === 'backup' || action === 'server' ? 1 : 0);
     setSeedPhrase(walletSeed.seed || '');
-    setBirthdayNumber(walletSeed.birthday.toString() || '');
+    setBirthdayNumber((walletSeed.birthday && walletSeed.birthday.toString()) || '');
   }, [action, walletSeed.seed, walletSeed.birthday, walletSeed, translate]);
 
   useEffect(() => {
@@ -231,7 +234,9 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
             </RegText>
           ) : (
             <>
-              <FadeText style={{ textAlign: 'center' }}>{translate('seed.birthday-no-readonly')}</FadeText>
+              <FadeText style={{ textAlign: 'center' }}>
+                {translate('seed.birthday-no-readonly') + ' (1, ' + info.latestBlock + ')'}
+              </FadeText>
               <View
                 accessible={true}
                 accessibilityLabel={translate('seed.birthday-acc')}
@@ -247,7 +252,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
                   minHeight: 48,
                 }}>
                 <TextInput
-                  placeholder="#"
+                  placeholder={'#'}
                   placeholderTextColor={colors.placeholder}
                   style={{
                     color: colors.text,
@@ -258,7 +263,15 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
                     marginLeft: 5,
                   }}
                   value={birthdayNumber}
-                  onChangeText={(text: string) => setBirthdayNumber(text)}
+                  onChangeText={(text: string) => {
+                    if (isNaN(Number(text))) {
+                      setBirthdayNumber('');
+                    } else if (Number(text) <= 0 || Number(text) > info.latestBlock) {
+                      setBirthdayNumber('');
+                    } else {
+                      setBirthdayNumber(Number(text.replace('.', '').replace(',', '')).toFixed(0));
+                    }
+                  }}
                   editable={true}
                   keyboardType="numeric"
                 />

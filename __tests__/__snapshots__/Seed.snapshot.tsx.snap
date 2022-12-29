@@ -998,7 +998,7 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
             }
           }
         >
-          text translated
+          text translated (1, 1900100)
         </Text>
         <View
           accessibilityLabel="text translated"

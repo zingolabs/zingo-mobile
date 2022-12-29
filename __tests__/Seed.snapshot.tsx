@@ -115,6 +115,7 @@ describe('Component Seed - test', () => {
     seed: 'pepe lolo titi',
     birthday: 1500100,
   };
+  stateLoading.info.latestBlock = 1900100;
   stateLoading.totalBalance.total = 1.12345678;
   test('Seed New - snapshot', () => {
     const seed = render(
