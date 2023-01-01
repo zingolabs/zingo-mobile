@@ -4,6 +4,7 @@ import { View, ScrollView, TouchableOpacity, SafeAreaView, Linking, Text } from 
 import Clipboard from '@react-native-community/clipboard';
 import Toast from 'react-native-simple-toast';
 import moment from 'moment';
+import 'moment/locale/es';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
@@ -12,7 +13,7 @@ import { TransactionType, TxDetailType } from '../../../app/AppState';
 import Utils from '../../../app/utils';
 import RegText from '../../Components/RegText';
 import ZecAmount from '../../Components/ZecAmount';
-import UsdAmount from '../../Components/UsdAmount';
+import CurrencyAmount from '../../Components/CurrencyAmount';
 import FadeText from '../../Components/FadeText';
 import ZecPrice from '../../Components/ZecPrice';
 import Button from '../../Button';
@@ -26,13 +27,14 @@ type TxDetailProps = {
 
 const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) => {
   const context = useContext(ContextLoaded);
-  const { info, translate } = context;
+  const { info, translate, language, currency } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const spendColor =
     tx.confirmations === 0 ? colors.primaryDisabled : (tx.amount || 0) > 0 ? colors.primary : colors.text;
 
   const [expandAddress, setExpandAddress] = useState(false);
   const [expandTxid, setExpandTxid] = useState(false);
+  moment.locale(language);
 
   const sum =
     (tx.detailedTxns && tx.detailedTxns.reduce((s: number, d: TxDetailType) => s + (d.amount ? d.amount : 0), 0)) || 0;
@@ -88,7 +90,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
             {!!tx.type && (tx.type === 'sent' ? translate('transactions.sent') : translate('transactions.receive'))}
           </RegText>
           <ZecAmount currencyName={info.currencyName ? info.currencyName : ''} size={36} amtZec={tx.amount} />
-          <UsdAmount amtZec={tx.amount} price={tx.zec_price} />
+          <CurrencyAmount amtZec={tx.amount} price={tx.zec_price} currency={currency} />
         </View>
 
         <View style={{ margin: 10 }}>
@@ -165,12 +167,18 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
                   <FadeText>{translate('transactions.amount')}</FadeText>
                   <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                     <ZecAmount amtZec={txd.amount} size={18} currencyName={'ᙇ'} />
-                    <UsdAmount style={{ fontSize: 18 }} amtZec={txd.amount} price={tx.zec_price} />
+                    <CurrencyAmount
+                      style={{ fontSize: 18 }}
+                      amtZec={txd.amount}
+                      price={tx.zec_price}
+                      currency={currency}
+                    />
                   </View>
                   <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
                     <ZecPrice
                       price={tx.zec_price ? tx.zec_price : 0}
                       currencyName={info.currencyName ? info.currencyName : ''}
+                      currency={currency}
                     />
                   </View>
                 </View>
@@ -198,7 +206,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
               <FadeText>{translate('transactions.txfee')}</FadeText>
               <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                 <ZecAmount amtZec={fee} size={18} currencyName={'ᙇ'} />
-                <UsdAmount style={{ fontSize: 18 }} amtZec={fee} price={tx.zec_price} />
+                <CurrencyAmount style={{ fontSize: 18 }} amtZec={fee} price={tx.zec_price} currency={currency} />
               </View>
             </View>
           )}

@@ -88,7 +88,15 @@
     "threshold-acc": "Campo del Umbral del Filtro de Transacciones",
     "value-none": "ninguno",
     "value-wallet": "billetera",
-    "value-all": "todos"
+    "value-all": "todos",
+    "currency-title": "MONEDA",
+    "language-title": "IDIOMA",
+    "currency-": "Sin moneda",
+    "currency-USD": "US Dólares",
+    "language-en": "Inglés",
+    "language-es": "Español",
+    "iscurrency": "Necesitas escoger una Moneda para poder grabar.",
+    "islanguage": "Necesitas escoger un Idioma para poder grabar."
   },
   "info": {
     "version": "Versión",
@@ -230,8 +238,8 @@
     "end": "FIN",
     "loadmore": "Cargar más",
     "back": " Atrás",
-    "sent": "Enviado",
-    "receive": "Recibido",
+    "sent": "Enviado ",
+    "receive": "Recibido ",
     "time": "Hora",
     "confirmations": "Confirmaciones",
     "txid": "Transacción ID",

@@ -17,7 +17,7 @@ type InfoProps = {
 
 const Info: React.FunctionComponent<InfoProps> = ({ closeModal }) => {
   const context = useContext(ContextLoaded);
-  const { info, totalBalance, translate } = context;
+  const { info, totalBalance, translate, currency } = context;
   const { colors } = useTheme() as unknown as ThemeType;
 
   return (
@@ -89,11 +89,18 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal }) => {
             label={translate('info.serverblock')}
             value={info.latestBlock ? info.latestBlock.toString() : translate('loading')}
           />
-          {/* <DetailLine label="Wallet Block Height" value={walletHeight} /> */}
-          <DetailLine
-            label={translate('info.zecprice')}
-            value={info.zecPrice ? `$ ${Utils.toLocaleFloat(info.zecPrice.toFixed(2))}` : '--'}
-          />
+          {currency === 'USD' && (
+            <DetailLine
+              label={translate('info.zecprice')}
+              value={
+                info.zecPrice > 0
+                  ? `$ ${Utils.toLocaleFloat(info.zecPrice.toFixed(2))} ${currency} per ${
+                      info.currencyName ? info.currencyName : '---'
+                    }`
+                  : `$ -- ${currency} per ${info.currencyName ? info.currencyName : '---'}`
+              }
+            />
+          )}
         </View>
       </ScrollView>
 

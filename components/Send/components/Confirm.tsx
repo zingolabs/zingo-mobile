@@ -6,7 +6,7 @@ import FadeText from '../../Components/FadeText';
 import BoldText from '../../Components/BoldText';
 import RegText from '../../Components/RegText';
 import ZecAmount from '../../Components/ZecAmount';
-import UsdAmount from '../../Components/UsdAmount';
+import CurrencyAmount from '../../Components/CurrencyAmount';
 import Button from '../../Button';
 import { useTheme } from '@react-navigation/native';
 import Utils from '../../../app/utils';
@@ -19,7 +19,7 @@ type ConfirmProps = {
 };
 const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSend, defaultFee }) => {
   const context = useContext(ContextLoaded);
-  const { sendPageState, info, translate } = context;
+  const { sendPageState, info, translate, currency } = context;
   const { colors } = useTheme();
 
   const sendingTotal = Number(sendPageState.toaddr.amount) + defaultFee;
@@ -53,7 +53,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSen
           <BoldText style={{ textAlign: 'center' }}>{translate('send.sending-title')}</BoldText>
 
           <ZecAmount currencyName={info.currencyName ? info.currencyName : ''} amtZec={sendingTotal} />
-          <UsdAmount amtZec={sendingTotal} price={info.zecPrice} />
+          <CurrencyAmount amtZec={sendingTotal} price={info.zecPrice} currency={currency} />
         </View>
         {[sendPageState.toaddr].map(to => {
           return (
@@ -75,7 +75,12 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSen
                   size={18}
                   amtZec={Number(to.amount)}
                 />
-                <UsdAmount style={{ fontSize: 18 }} amtZec={Number(to.amount)} price={info.zecPrice} />
+                <CurrencyAmount
+                  style={{ fontSize: 18 }}
+                  amtZec={Number(to.amount)}
+                  price={info.zecPrice}
+                  currency={currency}
+                />
               </View>
               <RegText>{to.memo || ''}</RegText>
             </View>
@@ -87,7 +92,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSen
           <View
             style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
             <ZecAmount currencyName={info.currencyName ? info.currencyName : ''} size={18} amtZec={defaultFee} />
-            <UsdAmount style={{ fontSize: 18 }} amtZec={defaultFee} price={info.zecPrice} />
+            <CurrencyAmount style={{ fontSize: 18 }} amtZec={defaultFee} price={info.zecPrice} currency={currency} />
           </View>
         </View>
       </ScrollView>

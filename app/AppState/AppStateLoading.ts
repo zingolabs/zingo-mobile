@@ -17,6 +17,8 @@ export default interface AppStateLoading {
   walletExists: boolean;
   walletSeed: WalletSeedType;
   server: string;
+  currency: 'USD' | '';
+  language: 'en' | 'es';
   totalBalance: TotalBalanceClass;
   info: InfoType;
 

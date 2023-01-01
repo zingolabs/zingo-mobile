@@ -2,14 +2,14 @@ export default class ToAddrClass {
   id: number;
   to: string;
   amount: string;
-  amountUSD: string;
+  amountCurrency: string;
   memo: string;
 
   constructor(id: number) {
     this.id = id;
     this.to = '';
     this.amount = '';
-    this.amountUSD = '';
+    this.amountCurrency = '';
     this.memo = '';
   }
 }

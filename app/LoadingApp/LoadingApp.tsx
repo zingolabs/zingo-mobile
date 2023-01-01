@@ -17,7 +17,6 @@ import Toast from 'react-native-simple-toast';
 import { useTheme } from '@react-navigation/native';
 import { I18n, TranslateOptions } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
-import { memoize } from 'lodash';
 import { StackScreenProps } from '@react-navigation/stack';
 
 import BoldText from '../../components/Components/BoldText';
@@ -36,13 +35,13 @@ const Seed = React.lazy(() => import('../../components/Seed'));
 const en = require('../translations/en.json');
 const es = require('../translations/es.json');
 
-const useForceUpdate = () => {
-  const [value, setValue] = useState(0);
-  return () => {
-    const newValue = value + 1;
-    return setValue(newValue);
-  };
-};
+//const useForceUpdate = () => {
+//  const [value, setValue] = useState(0);
+//  return () => {
+//    const newValue = value + 1;
+//    return setValue(newValue);
+//  };
+//};
 
 type LoadingAppProps = {
   navigation: StackScreenProps<any>['navigation'];
@@ -51,7 +50,10 @@ type LoadingAppProps = {
 
 export default function LoadingApp(props: LoadingAppProps) {
   const theme = useTheme() as unknown as ThemeType;
-  const forceUpdate = useForceUpdate();
+  const [language, setLanguage] = useState('en' as 'en' | 'es');
+  const [currency, setCurrency] = useState('' as 'USD' | '');
+  const [loading, setLoading] = useState(true);
+  //const forceUpdate = useForceUpdate();
   const file = useMemo(
     () => ({
       en: en,
@@ -61,12 +63,9 @@ export default function LoadingApp(props: LoadingAppProps) {
   );
   const i18n = useMemo(() => new I18n(file), [file]);
 
-  const translate = memoize(
-    (key: string, config?: TranslateOptions) => i18n.t(key, config),
-    (key: string, config?: TranslateOptions) => (config ? key + JSON.stringify(config) : key),
-  );
+  const translate = (key: string, config?: TranslateOptions) => i18n.t(key, config);
 
-  const setI18nConfig = useCallback(() => {
+  const setI18nConfig = useCallback(async () => {
     // fallback if no available language fits
     const fallback = { languageTag: 'en', isRTL: false };
 
@@ -76,30 +75,53 @@ export default function LoadingApp(props: LoadingAppProps) {
     const { languageTag, isRTL } = RNLocalize.findBestAvailableLanguage(Object.keys(file)) || fallback;
 
     // clear translation cache
-    if (translate && translate.cache) {
-      translate?.cache?.clear?.();
-    }
+    //if (translate && translate.cache) {
+    //  translate?.cache?.clear?.();
+    //}
     // update layout direction
     I18nManager.forceRTL(isRTL);
 
-    i18n.locale = languageTag;
-  }, [file, i18n, translate]);
+    //I have to check what language is in the settings
+    const settings = await SettingsFileImpl.readSettings();
+    if (settings.language) {
+      setLanguage(settings.language);
+      i18n.locale = settings.language;
+      console.log('apploading settings', settings.language, settings.currency);
+    } else {
+      setLanguage(languageTag as 'en' | 'es');
+      i18n.locale = languageTag;
+      await SettingsFileImpl.writeSettings('language', languageTag);
+      console.log('apploading NO settings', languageTag);
+    }
+    if (settings.currency) {
+      setCurrency(settings.currency);
+    } else {
+      await SettingsFileImpl.writeSettings('currency', currency);
+    }
+  }, [currency, file, i18n]);
 
   useEffect(() => {
-    setI18nConfig();
+    (async () => {
+      await setI18nConfig();
+      setLoading(false);
+    })();
   }, [setI18nConfig]);
 
-  const handleLocalizationChange = useCallback(() => {
-    setI18nConfig();
-    forceUpdate();
-  }, [setI18nConfig, forceUpdate]);
+  //const handleLocalizationChange = useCallback(() => {
+  //  setI18nConfig();
+  //  forceUpdate();
+  //}, [setI18nConfig, forceUpdate]);
 
-  useEffect(() => {
-    RNLocalize.addEventListener('change', handleLocalizationChange);
-    return () => RNLocalize.removeEventListener('change', handleLocalizationChange);
-  }, [handleLocalizationChange]);
+  //useEffect(() => {
+  //  RNLocalize.addEventListener('change', handleLocalizationChange);
+  //  return () => RNLocalize.removeEventListener('change', handleLocalizationChange);
+  //}, [handleLocalizationChange]);
 
-  return <LoadingAppClass {...props} theme={theme} translate={translate} />;
+  if (loading) {
+    return null;
+  } else {
+    return <LoadingAppClass {...props} theme={theme} translate={translate} language={language} currency={currency} />;
+  }
 }
 
 type LoadingAppClassProps = {
@@ -107,6 +129,8 @@ type LoadingAppClassProps = {
   route: StackScreenProps<any>['route'];
   translate: (key: string, config?: TranslateOptions) => string;
   theme: ThemeType;
+  language: 'en' | 'es';
+  currency: 'USD' | '';
 };
 
 const SERVER_DEFAULT_0 = serverUris()[0];
@@ -121,9 +145,11 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
 
     this.state = {
       ...defaultAppStateLoading,
-      navigation: this.props.navigation,
-      route: this.props.route,
-      translate: this.props.translate,
+      navigation: props.navigation,
+      route: props.route,
+      translate: props.translate,
+      language: props.language,
+      currency: props.currency,
       dimensions: {
         width: Number(screen.width.toFixed(0)),
         height: Number(screen.height.toFixed(0)),
@@ -148,13 +174,12 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
       let settings = {} as SettingsFileClass;
       if (!this.state.server) {
         settings = await SettingsFileImpl.readSettings();
-        if (!!settings && !!settings.server) {
+        if (settings.server) {
           this.setState({ server: settings.server });
         } else {
           settings.server = SERVER_DEFAULT_0;
-          settings.language = '';
           this.setState({ server: SERVER_DEFAULT_0 });
-          await SettingsFileImpl.writeSettings(settings);
+          await SettingsFileImpl.writeSettings('server', SERVER_DEFAULT_0);
         }
       }
 
@@ -170,7 +195,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
           this.navigateToLoaded();
         } else {
           this.setState({ screen: 1 });
-          Alert.alert(this.state.translate('loadingapp.readingwallet-label'), error);
+          Alert.alert(this.props.translate('loadingapp.readingwallet-label'), error);
         }
       } else {
         //console.log('Loading new wallet');
@@ -202,15 +227,13 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
 
   useDefaultServer_0 = async () => {
     this.setState({ actionButtonsDisabled: true });
-    const language = '';
-    await SettingsFileImpl.writeSettings(new SettingsFileClass(SERVER_DEFAULT_0, language));
+    await SettingsFileImpl.writeSettings('server', SERVER_DEFAULT_0);
     this.setState({ server: SERVER_DEFAULT_0, actionButtonsDisabled: false });
   };
 
   useDefaultServer_1 = async () => {
     this.setState({ actionButtonsDisabled: true });
-    const language = '';
-    await SettingsFileImpl.writeSettings(new SettingsFileClass(SERVER_DEFAULT_0, language));
+    await SettingsFileImpl.writeSettings('server', SERVER_DEFAULT_1);
     this.setState({ server: SERVER_DEFAULT_1, actionButtonsDisabled: false });
   };
 
@@ -234,7 +257,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
         //await this.set_wallet_option('transaction_filter_threshold', '500');
       } else {
         this.setState({ walletExists: false, actionButtonsDisabled: false });
-        Alert.alert(this.state.translate('loadingapp.creatingwallet-label'), seed);
+        Alert.alert(this.props.translate('loadingapp.creatingwallet-label'), seed);
       }
     });
   };
@@ -245,12 +268,12 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
 
   getViewingKeyToRestore = async () => {
     //this.setState({ viewingKey: '', screen: 3 });
-    Toast.show(this.state.translate('workingonit'), Toast.LONG);
+    Toast.show(this.props.translate('workingonit'), Toast.LONG);
   };
 
   getSpendableKeyToRestore = async () => {
     //this.setState({ spendableKey: '', screen: 3 });
-    Toast.show(this.state.translate('workingonit'), Toast.LONG);
+    Toast.show(this.props.translate('workingonit'), Toast.LONG);
   };
 
   doRestore = async (seed: string, birthday: number) => {
@@ -258,8 +281,8 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
 
     if (!seed) {
       Alert.alert(
-        this.state.translate('loadingapp.invalidseed-label'),
-        this.state.translate('loadingapp.invalidseed-error'),
+        this.props.translate('loadingapp.invalidseed-label'),
+        this.props.translate('loadingapp.invalidseed-error'),
       );
       return;
     }
@@ -280,7 +303,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
         this.navigateToLoaded();
       } else {
         this.setState({ actionButtonsDisabled: false });
-        Alert.alert(this.state.translate('loadingapp.readingwallet-label'), error);
+        Alert.alert(this.props.translate('loadingapp.readingwallet-label'), error);
       }
     });
   };
@@ -291,8 +314,8 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
 
   render() {
     const { screen, walletSeed, actionButtonsDisabled, walletExists, server } = this.state;
-    const { colors } = this.props.theme;
     const { translate } = this.props;
+    const { colors } = this.props.theme;
 
     return (
       <ContextLoadingProvider value={this.state}>

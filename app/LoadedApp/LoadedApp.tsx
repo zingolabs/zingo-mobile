@@ -8,7 +8,7 @@ import SideMenu from 'react-native-side-menu-updated';
 import Toast from 'react-native-simple-toast';
 import { I18n, TranslateOptions } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
-import { memoize, isEqual } from 'lodash';
+import { isEqual } from 'lodash';
 import { StackScreenProps } from '@react-navigation/stack';
 
 import RPC from '../rpc';
@@ -27,7 +27,6 @@ import {
   SyncingStatusType,
   SendProgressClass,
   WalletSettingsClass,
-  SettingsFileClass,
   AddressClass,
 } from '../AppState';
 import Utils from '../utils';
@@ -56,13 +55,13 @@ const es = require('../translations/es.json');
 
 const Tab = createBottomTabNavigator();
 
-const useForceUpdate = () => {
-  const [value, setValue] = useState(0);
-  return () => {
-    const newValue = value + 1;
-    return setValue(newValue);
-  };
-};
+//const useForceUpdate = () => {
+//  const [value, setValue] = useState(0);
+//  return () => {
+//    const newValue = value + 1;
+//    return setValue(newValue);
+//  };
+//};
 
 type LoadedAppProps = {
   navigation: StackScreenProps<any>['navigation'];
@@ -71,7 +70,10 @@ type LoadedAppProps = {
 
 export default function LoadedApp(props: LoadedAppProps) {
   const theme = useTheme() as unknown as ThemeType;
-  const forceUpdate = useForceUpdate();
+  const [language, setLanguage] = useState('en' as 'en' | 'es');
+  const [currency, setCurrency] = useState('' as 'USD' | '');
+  const [loading, setLoading] = useState(true);
+  //const forceUpdate = useForceUpdate();
   const file = useMemo(
     () => ({
       en: en,
@@ -81,12 +83,9 @@ export default function LoadedApp(props: LoadedAppProps) {
   );
   const i18n = useMemo(() => new I18n(file), [file]);
 
-  const translate = memoize(
-    (key: string, config?: TranslateOptions) => i18n.t(key, config),
-    (key: string, config?: TranslateOptions) => (config ? key + JSON.stringify(config) : key),
-  );
+  const translate = (key: string, config?: TranslateOptions) => i18n.t(key, config);
 
-  const setI18nConfig = useCallback(() => {
+  const setI18nConfig = useCallback(async () => {
     // fallback if no available language fits
     const fallback = { languageTag: 'en', isRTL: false };
 
@@ -96,30 +95,53 @@ export default function LoadedApp(props: LoadedAppProps) {
     const { languageTag, isRTL } = RNLocalize.findBestAvailableLanguage(Object.keys(file)) || fallback;
 
     // clear translation cache
-    if (translate && translate.cache) {
-      translate?.cache?.clear?.();
-    }
+    //if (translate && translate.cache) {
+    //  translate?.cache?.clear?.();
+    //}
     // update layout direction
     I18nManager.forceRTL(isRTL);
 
-    i18n.locale = languageTag;
-  }, [file, i18n, translate]);
+    //I have to check what language is in the settings
+    const settings = await SettingsFileImpl.readSettings();
+    if (settings.language) {
+      setLanguage(settings.language);
+      i18n.locale = settings.language;
+      console.log('apploaded settings', settings.language, settings.currency);
+    } else {
+      setLanguage(languageTag as 'en' | 'es');
+      i18n.locale = languageTag;
+      await SettingsFileImpl.writeSettings('language', languageTag);
+      console.log('apploaded NO settings', languageTag);
+    }
+    if (settings.currency) {
+      setCurrency(settings.currency);
+    } else {
+      await SettingsFileImpl.writeSettings('currency', currency);
+    }
+  }, [currency, file, i18n]);
 
   useEffect(() => {
-    setI18nConfig();
+    (async () => {
+      await setI18nConfig();
+      setLoading(false);
+    })();
   }, [setI18nConfig]);
 
-  const handleLocalizationChange = useCallback(() => {
-    setI18nConfig();
-    forceUpdate();
-  }, [setI18nConfig, forceUpdate]);
+  //const handleLocalizationChange = useCallback(() => {
+  //  setI18nConfig();
+  //  forceUpdate();
+  //}, [setI18nConfig, forceUpdate]);
 
-  useEffect(() => {
-    RNLocalize.addEventListener('change', handleLocalizationChange);
-    return () => RNLocalize.removeEventListener('change', handleLocalizationChange);
-  }, [handleLocalizationChange]);
+  //useEffect(() => {
+  //  RNLocalize.addEventListener('change', handleLocalizationChange);
+  //  return () => RNLocalize.removeEventListener('change', handleLocalizationChange);
+  //}, [handleLocalizationChange]);
 
-  return <LoadedAppClass {...props} theme={theme} translate={translate} />;
+  if (loading) {
+    return null;
+  } else {
+    return <LoadedAppClass {...props} theme={theme} translate={translate} language={language} currency={currency} />;
+  }
 }
 
 type LoadedAppClassProps = {
@@ -127,6 +149,8 @@ type LoadedAppClassProps = {
   route: StackScreenProps<any>['route'];
   translate: (key: string, config?: TranslateOptions) => string;
   theme: ThemeType;
+  language: 'en' | 'es';
+  currency: 'USD' | '';
 };
 
 class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
@@ -140,10 +164,12 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
     this.state = {
       ...defaultAppStateLoaded,
-      navigation: this.props.navigation,
-      route: this.props.route,
+      navigation: props.navigation,
+      route: props.route,
       sendPageState: new SendPageStateClass(new ToAddrClass(Utils.getNextToAddrID())),
-      translate: this.props.translate,
+      translate: props.translate,
+      language: props.language,
+      currency: props.currency,
       dimensions: {
         width: Number(screen.width.toFixed(0)),
         height: Number(screen.height.toFixed(0)),
@@ -163,6 +189,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       this.setZecPrice,
       this.refreshUpdates,
       props.translate,
+      props.currency,
     );
 
     this.dim = {} as EmitterSubscription;
@@ -460,7 +487,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       this.setState({ seedChangeModalVisible: true });
     } else if (item === 'Restore Wallet Backup') {
       if (info.currencyName && info.currencyName !== 'ZEC') {
-        Toast.show(this.state.translate('loadedapp.restoremainnet-error'), Toast.LONG);
+        Toast.show(this.props.translate('loadedapp.restoremainnet-error'), Toast.LONG);
         return;
       }
       if (info.currencyName) {
@@ -476,11 +503,11 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     this.rpc.fetchWalletSettings();
   };
 
-  set_server_option = async (value: string) => {
+  set_server_option = async (name: 'server' | 'currency' | 'language', value: string) => {
     const resultStrServer: string = await RPCModule.execute('changeserver', value);
     if (resultStrServer.toLowerCase().startsWith('error')) {
       //console.log(`Error change server ${value} - ${resultStrServer}`);
-      Toast.show(`${this.state.translate('loadedapp.changeservernew-error')} ${value}`, Toast.LONG);
+      Toast.show(`${this.props.translate('loadedapp.changeservernew-error')} ${value}`, Toast.LONG);
       return;
     } else {
       //console.log(`change server ok ${value}`);
@@ -491,20 +518,19 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     if (!error.toLowerCase().startsWith('error')) {
       // Load the wallet and navigate to the transactions screen
       //console.log(`wallet loaded ok ${value}`);
-      const language = '';
-      await SettingsFileImpl.writeSettings(new SettingsFileClass(value, language));
+      await SettingsFileImpl.writeSettings(name, value);
       // Refetch the settings to update
       this.rpc.fetchWalletSettings();
       return;
     } else {
       //console.log(`Error Reading Wallet ${value} - ${error}`);
-      Toast.show(`${this.state.translate('loadedapp.readingwallet-error')} ${value}`, Toast.LONG);
+      Toast.show(`${this.props.translate('loadedapp.readingwallet-error')} ${value}`, Toast.LONG);
 
       const old_settings = await SettingsFileImpl.readSettings();
       const resultStr: string = await RPCModule.execute('changeserver', old_settings.server);
       if (resultStr.toLowerCase().startsWith('error')) {
         //console.log(`Error change server ${old_settings.server} - ${resultStr}`);
-        Toast.show(`${this.state.translate('loadedapp.changeserverold-error')} ${value}`, Toast.LONG);
+        Toast.show(`${this.props.translate('loadedapp.changeserverold-error')} ${value}`, Toast.LONG);
         //return;
       } else {
         //console.log(`change server ok ${old_settings.server} - ${resultStr}`);
@@ -519,7 +545,23 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     }
   };
 
-  navigateToLoading = async () => {
+  set_currency_option = async (name: 'server' | 'currency' | 'language', value: string) => {
+    await SettingsFileImpl.writeSettings(name, value);
+
+    // Refetch the settings to update
+    this.rpc.fetchWalletSettings();
+    this.navigateToLoading();
+  };
+
+  set_language_option = async (name: 'server' | 'currency' | 'language', value: string) => {
+    await SettingsFileImpl.writeSettings(name, value);
+
+    // Refetch the settings to update
+    this.rpc.fetchWalletSettings();
+    this.navigateToLoading();
+  };
+
+  navigateToLoading = () => {
     const { navigation } = this.props;
 
     this.rpc.clearTimers();
@@ -539,7 +581,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     //console.log("jc change", resultStr);
     if (resultStr.toLowerCase().startsWith('error')) {
       //console.log(`Error change wallet. ${resultStr}`);
-      Alert.alert(this.state.translate('loadedapp.changingwallet-label'), resultStr);
+      Alert.alert(this.props.translate('loadedapp.changingwallet-label'), resultStr);
       return;
     }
 
@@ -554,7 +596,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     //console.log("jc restore", resultStr);
     if (resultStr.toLowerCase().startsWith('error')) {
       //console.log(`Error restore backup wallet. ${resultStr}`);
-      Alert.alert(this.state.translate('loadedapp.restoringwallet-label'), resultStr);
+      Alert.alert(this.props.translate('loadedapp.restoringwallet-label'), resultStr);
       return;
     }
 
@@ -567,15 +609,14 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     const resultStr: string = await RPCModule.execute('changeserver', this.state.newServer);
     if (resultStr.toLowerCase().startsWith('error')) {
       //console.log(`Error change server ${value} - ${resultStr}`);
-      Toast.show(`${this.state.translate('loadedapp.changeservernew-error')} ${resultStr}`, Toast.LONG);
+      Toast.show(`${this.props.translate('loadedapp.changeservernew-error')} ${resultStr}`, Toast.LONG);
       return;
     } else {
       //console.log(`change server ok ${value}`);
     }
 
     if (this.state.newServer) {
-      const language = '';
-      await SettingsFileImpl.writeSettings(new SettingsFileClass(this.state.newServer, language));
+      await SettingsFileImpl.writeSettings('server', this.state.newServer);
     }
 
     const { info } = this.state;
@@ -587,7 +628,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     //console.log("jc change", resultStr);
     if (resultStr2.toLowerCase().startsWith('error')) {
       //console.log(`Error change wallet. ${resultStr}`);
-      Alert.alert(this.state.translate('loadedapp.changingwallet-label'), resultStr2);
+      Alert.alert(this.props.translate('loadedapp.changingwallet-label'), resultStr2);
       //return;
     }
 
@@ -622,8 +663,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       seedChangeModalVisible,
       seedBackupModalVisible,
       seedServerModalVisible,
-      translate,
     } = this.state;
+    const { translate } = this.props;
     const { colors } = this.props.theme;
 
     const menu = (
@@ -757,6 +798,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                 closeModal={() => this.setState({ settingsModalVisible: false })}
                 set_wallet_option={this.set_wallet_option}
                 set_server_option={this.set_server_option}
+                set_currency_option={this.set_currency_option}
+                set_language_option={this.set_language_option}
               />
             </Suspense>
           </Modal>

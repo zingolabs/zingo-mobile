@@ -13,6 +13,8 @@ export const defaultAppStateLoading: AppStateLoading = {
   walletExists: false,
   walletSeed: {} as WalletSeedType,
   server: '' as string,
+  currency: '',
+  language: 'en',
   totalBalance: new TotalBalanceClass(),
   info: {} as InfoType,
 

@@ -13,7 +13,7 @@ import FadeText from '../Components/FadeText';
 import ErrorText from '../Components/ErrorText';
 import RegText from '../Components/RegText';
 import ZecAmount from '../Components/ZecAmount';
-import UsdAmount from '../Components/UsdAmount';
+import CurrencyAmount from '../Components/CurrencyAmount';
 import Button from '../Button';
 import { SendPageStateClass, SendProgressClass, ToAddrClass } from '../../app/AppState';
 import { parseZcashURI, ZcashURITarget } from '../../app/uris';
@@ -46,7 +46,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   poolsMoreInfoOnClick,
 }) => {
   const context = useContext(ContextLoaded);
-  const { translate, dimensions, info, totalBalance, sendPageState, syncingStatus, navigation } = context;
+  const { translate, dimensions, info, totalBalance, sendPageState, syncingStatus, navigation, currency } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [qrcodeModalVisble, setQrcodeModalVisible] = useState(false);
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
@@ -134,11 +134,11 @@ const Send: React.FunctionComponent<SendProps> = ({
     }
 
     to.amount = to.amount.replace(decimalSeparator, '.');
-    to.amountUSD = to.amountUSD.replace(decimalSeparator, '.');
+    to.amountCurrency = to.amountCurrency.replace(decimalSeparator, '.');
 
     let invalid = false;
-    if (to.amountUSD !== '') {
-      if (isNaN(Number(to.amountUSD))) {
+    if (to.amountCurrency !== '') {
+      if (isNaN(Number(to.amountCurrency))) {
         setValidAmount(-1);
         invalid = true;
       }
@@ -165,7 +165,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     sendPageState.toaddr,
     sendPageState.toaddr.to,
     sendPageState.toaddr.amount,
-    sendPageState.toaddr.amountUSD,
+    sendPageState.toaddr.amountCurrency,
     getMaxAmount,
     decimalSeparator,
     info.currencyName,
@@ -202,7 +202,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   const updateToField = async (
     address: string | null,
     amount: string | null,
-    amountUSD: string | null,
+    amountCurrency: string | null,
     memo: string | null,
   ) => {
     // Create the new state object
@@ -251,25 +251,25 @@ const Send: React.FunctionComponent<SendProps> = ({
     if (amount !== null) {
       toAddr.amount = amount.replace(decimalSeparator, '.').substring(0, 20);
       if (isNaN(Number(toAddr.amount))) {
-        toAddr.amountUSD = '';
+        toAddr.amountCurrency = '';
       } else if (toAddr.amount && info.zecPrice) {
-        toAddr.amountUSD = Utils.toLocaleFloat((parseFloat(toAddr.amount) * info.zecPrice).toFixed(2));
+        toAddr.amountCurrency = Utils.toLocaleFloat((parseFloat(toAddr.amount) * info.zecPrice).toFixed(2));
       } else {
-        toAddr.amountUSD = '';
+        toAddr.amountCurrency = '';
       }
       toAddr.amount = toAddr.amount.replace('.', decimalSeparator);
     }
 
-    if (amountUSD !== null) {
-      toAddr.amountUSD = amountUSD.replace(decimalSeparator, '.').substring(0, 15);
-      if (isNaN(Number(toAddr.amountUSD))) {
+    if (amountCurrency !== null) {
+      toAddr.amountCurrency = amountCurrency.replace(decimalSeparator, '.').substring(0, 15);
+      if (isNaN(Number(toAddr.amountCurrency))) {
         toAddr.amount = '';
-      } else if (toAddr.amountUSD && info.zecPrice) {
-        toAddr.amount = Utils.toLocaleFloat(Utils.maxPrecisionTrimmed(parseFloat(amountUSD) / info.zecPrice));
+      } else if (toAddr.amountCurrency && info.zecPrice) {
+        toAddr.amount = Utils.toLocaleFloat(Utils.maxPrecisionTrimmed(parseFloat(amountCurrency) / info.zecPrice));
       } else {
         toAddr.amount = '';
       }
-      toAddr.amountUSD = toAddr.amountUSD.replace('.', decimalSeparator);
+      toAddr.amountCurrency = toAddr.amountCurrency.replace('.', decimalSeparator);
     }
 
     if (memo !== null) {
@@ -418,7 +418,12 @@ const Send: React.FunctionComponent<SendProps> = ({
                 </TouchableOpacity>
               )}
             </View>
-            <UsdAmount style={{ marginTop: 0, marginBottom: 5 }} price={info.zecPrice} amtZec={totalBalance.total} />
+            <CurrencyAmount
+              style={{ marginTop: 0, marginBottom: 5 }}
+              price={info.zecPrice}
+              amtZec={totalBalance.total}
+              currency={currency}
+            />
 
             <View
               style={{
@@ -621,14 +626,14 @@ const Send: React.FunctionComponent<SendProps> = ({
                           minHeight: 48,
                           marginLeft: 5,
                         }}
-                        value={ta.amountUSD.toString()}
+                        value={ta.amountCurrency.toString()}
                         onChangeText={(text: string) => updateToField(null, null, text.substring(0, 15), null)}
                         onEndEditing={(e: any) => updateToField(null, null, e.nativeEvent.text.substring(0, 15), null)}
                         editable={true}
                         maxLength={15}
                       />
                     </View>
-                    <RegText style={{ marginTop: 15, marginLeft: 5 }}>USD</RegText>
+                    <RegText style={{ marginTop: 15, marginLeft: 5 }}>{currency}</RegText>
                   </View>
                 </View>
 
@@ -820,10 +825,11 @@ const Send: React.FunctionComponent<SendProps> = ({
                   size={36}
                   amtZec={totalBalance.total}
                 />
-                <UsdAmount
+                <CurrencyAmount
                   style={{ marginTop: 0, marginBottom: 5 }}
                   price={info.zecPrice}
                   amtZec={totalBalance.total}
+                  currency={currency}
                 />
               </View>
 
@@ -1045,7 +1051,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                             minHeight: 48,
                             marginLeft: 5,
                           }}
-                          value={ta.amountUSD.toString()}
+                          value={ta.amountCurrency.toString()}
                           onChangeText={(text: string) => updateToField(null, null, text.substring(0, 15), null)}
                           onEndEditing={(e: any) =>
                             updateToField(null, null, e.nativeEvent.text.substring(0, 15), null)
@@ -1054,7 +1060,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           maxLength={15}
                         />
                       </View>
-                      <RegText style={{ marginTop: 15, marginLeft: 5 }}>USD</RegText>
+                      <RegText style={{ marginTop: 15, marginLeft: 5 }}>{currency}</RegText>
                     </View>
                   </View>
 

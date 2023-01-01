@@ -6,7 +6,7 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
-import UsdAmount from '../components/Components/UsdAmount';
+import CurrencyAmount from '../components/Components/CurrencyAmount';
 import ZecPrice from '../components/Components/ZecPrice';
 import ZecAmount from '../components/Components/ZecAmount';
 import BoldText from '../components/Components/BoldText';
@@ -27,7 +27,7 @@ jest.mock('react-native-localize', () => ({
 describe('Component Components - test', () => {
   //unit test
   test('UsdAmount - price undefined result $ -- USD', () => {
-    const text: any = render(<UsdAmount amtZec={1} style={{}} />).toJSON();
+    const text: any = render(<CurrencyAmount amtZec={1} style={{}} currency={'USD'} />).toJSON();
     expect(text.type).toBe('View');
     expect(text.children[0].children[0]).toBe('$');
     expect(text.children[1].children[0]).toBe(' --');
@@ -35,7 +35,7 @@ describe('Component Components - test', () => {
   });
 
   test('UsdAmount - price 0 result $ -- USD', () => {
-    const text: any = render(<UsdAmount price={0} amtZec={1} style={{}} />).toJSON();
+    const text: any = render(<CurrencyAmount price={0} amtZec={1} style={{}} currency={'USD'} />).toJSON();
     expect(text.type).toBe('View');
     expect(text.children[0].children[0]).toBe('$');
     expect(text.children[1].children[0]).toBe(' --');
@@ -43,7 +43,7 @@ describe('Component Components - test', () => {
   });
 
   test('UsdAmount - amtZec undefined result $ -- USD', () => {
-    const text: any = render(<UsdAmount price={1} style={{}} />).toJSON();
+    const text: any = render(<CurrencyAmount price={1} style={{}} currency={'USD'} />).toJSON();
     expect(text.type).toBe('View');
     expect(text.children[0].children[0]).toBe('$');
     expect(text.children[1].children[0]).toBe(' --');
@@ -51,7 +51,7 @@ describe('Component Components - test', () => {
   });
 
   test('UsdAmount - price * amtZec really tiny result $ < 0.01 USD', () => {
-    const text: any = render(<UsdAmount price={0.001} amtZec={1} style={{}} />).toJSON();
+    const text: any = render(<CurrencyAmount price={0.001} amtZec={1} style={{}} currency={'USD'} />).toJSON();
     expect(text.type).toBe('View');
     expect(text.children[0].children[0]).toBe('$');
     expect(text.children[1].children[0]).toBe(' < 0.01');
@@ -59,7 +59,7 @@ describe('Component Components - test', () => {
   });
 
   test('UsdAmount - price=2.9826 and amtZec=1.00098 result $ 2.99 USD', () => {
-    const text: any = render(<UsdAmount price={2.9826} amtZec={1.00098} style={{}} />).toJSON();
+    const text: any = render(<CurrencyAmount price={2.9826} amtZec={1.00098} style={{}} currency={'USD'} />).toJSON();
     expect(text.type).toBe('View');
     expect(text.children[0].children[0]).toBe('$');
     expect(text.children[1].children[0]).toBe(' 2.99');
@@ -67,7 +67,9 @@ describe('Component Components - test', () => {
   });
 
   test("UsdAmount - style={backgroundColor: 'red'} result same", () => {
-    const text: any = render(<UsdAmount price={2.9826} amtZec={1.00098} style={{ backgroundColor: 'red' }} />).toJSON();
+    const text: any = render(
+      <CurrencyAmount price={2.9826} amtZec={1.00098} style={{ backgroundColor: 'red' }} currency={'USD'} />,
+    ).toJSON();
     expect(text.type).toBe('View');
     expect(text.children[0].props.style.backgroundColor).toBe('red');
     expect(text.children[1].props.style.backgroundColor).toBe('red');
@@ -75,27 +77,27 @@ describe('Component Components - test', () => {
   });
 
   test('ZecPrice - price 0 result null', () => {
-    const text: any = render(<ZecPrice price={0} currencyName={'ZEC'} />).toJSON();
+    const text: any = render(<ZecPrice price={0} currencyName={'ZEC'} currency={'USD'} />).toJSON();
     expect(text.type).toBe('Text');
     expect(text.children).toBe(null);
   });
 
   test('ZecPrice - price -1 result null', () => {
-    const text: any = render(<ZecPrice price={-1} currencyName={'ZEC'} />).toJSON();
+    const text: any = render(<ZecPrice price={-1} currencyName={'ZEC'} currency={'USD'} />).toJSON();
     expect(text.type).toBe('Text');
     expect(text.children).toBe(null);
   });
 
   test('ZecPrice - price 1.02999 rounded up result $ 1.03 per ZEC', () => {
-    const text: any = render(<ZecPrice price={1.02999} currencyName={'ZEC'} />).toJSON();
+    const text: any = render(<ZecPrice price={1.02999} currencyName={'ZEC'} currency={'USD'} />).toJSON();
     expect(text.type).toBe('Text');
-    expect(text.children[0]).toBe('$ 1.03 per ZEC');
+    expect(text.children[0]).toBe('$ 1.03 USD per ZEC');
   });
 
   test("ZecPrice - price 1.02333 rounded down result '$ 1.02 per ZEC", () => {
-    const text: any = render(<ZecPrice price={1.02333} currencyName={'ZEC'} />).toJSON();
+    const text: any = render(<ZecPrice price={1.02333} currencyName={'ZEC'} currency={'USD'} />).toJSON();
     expect(text.type).toBe('Text');
-    expect(text.children[0]).toBe('$ 1.02 per ZEC');
+    expect(text.children[0]).toBe('$ 1.02 USD per ZEC');
   });
 
   test('ZecAmount - All props missing result -- ZEC', () => {

@@ -19,7 +19,9 @@ import { ContextLoaded } from '../../app/context';
 type SettingsProps = {
   closeModal: () => void;
   set_wallet_option: (name: string, value: string) => void;
-  set_server_option: (server: string) => void;
+  set_server_option: (name: 'server' | 'currency' | 'language', value: string) => void;
+  set_currency_option: (name: 'server' | 'currency' | 'language', value: string) => void;
+  set_language_option: (name: 'server' | 'currency' | 'language', value: string) => void;
 };
 
 type Memos = {
@@ -27,7 +29,13 @@ type Memos = {
   text: string;
 };
 
-const Settings: React.FunctionComponent<SettingsProps> = ({ set_wallet_option, set_server_option, closeModal }) => {
+const Settings: React.FunctionComponent<SettingsProps> = ({
+  set_wallet_option,
+  set_server_option,
+  set_currency_option,
+  set_language_option,
+  closeModal,
+}) => {
   const context = useContext(ContextLoaded);
   const { walletSettings, totalBalance, info, translate } = context;
   const memosArray: string = translate('settings.memos');
@@ -40,17 +48,29 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ set_wallet_option, s
   const [memos, setMemos] = useState(walletSettings.download_memos);
   const [filter, setFilter] = useState(walletSettings.transaction_filter_threshold);
   const [server, setServer] = useState(walletSettings.server);
+  const [currency, setCurrency] = useState(walletSettings.currency);
+  const [language, setLanguage] = useState(walletSettings.language);
   const [customIcon, setCustomIcon] = useState(farCircle);
 
   useEffect(() => {
     setCustomIcon(serverUris().find((s: string) => s === server) ? farCircle : faDotCircle);
   }, [server]);
 
+  const currencies = (): string[] => {
+    return ['', 'USD'];
+  };
+
+  const languages = (): string[] => {
+    return ['en', 'es'];
+  };
+
   const saveSettings = async () => {
     if (
       walletSettings.download_memos === memos &&
       walletSettings.server === server &&
-      walletSettings.transaction_filter_threshold === filter
+      walletSettings.transaction_filter_threshold === filter &&
+      walletSettings.currency === currency &&
+      walletSettings.language === language
     ) {
       Toast.show(translate('settings.nochanges'), Toast.LONG);
       return;
@@ -67,6 +87,14 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ set_wallet_option, s
       Toast.show(translate('settings.isserver'), Toast.LONG);
       return;
     }
+    //if (!currency) {
+    //  Toast.show(translate('settings.iscurrency'), Toast.LONG);
+    //  return;
+    //}
+    if (!language) {
+      Toast.show(translate('settings.islanguage'), Toast.LONG);
+      return;
+    }
     const result = parseServerURI(server);
     if (result.toLowerCase().startsWith('error')) {
       Toast.show(translate('settings.isuri'), Toast.LONG);
@@ -80,13 +108,19 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ set_wallet_option, s
       set_wallet_option('transaction_filter_threshold', filter);
     }
     if (walletSettings.server !== server) {
-      set_server_option(server);
+      set_server_option('server', server);
+    }
+    if (walletSettings.currency !== currency) {
+      set_currency_option('currency', currency);
+    }
+    if (walletSettings.language !== language) {
+      set_language_option('language', language);
     }
 
     closeModal();
   };
 
-  //console.log(walletSettings);
+  console.log(walletSettings);
 
   return (
     <SafeAreaView
@@ -129,6 +163,46 @@ const Settings: React.FunctionComponent<SettingsProps> = ({ set_wallet_option, s
           alignItems: 'stretch',
           justifyContent: 'flex-start',
         }}>
+        <View style={{ display: 'flex', margin: 10 }}>
+          <BoldText>{translate('settings.currency-title')}</BoldText>
+        </View>
+
+        <View style={{ display: 'flex', marginLeft: 25 }}>
+          {currencies().map((curr: string) => (
+            <TouchableOpacity
+              key={'touch-' + curr}
+              style={{ marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
+              onPress={() => setCurrency(curr as 'USD' | '')}>
+              <View style={{ display: 'flex', flexDirection: 'row', marginTop: 10 }}>
+                <FontAwesomeIcon icon={curr === currency ? faDotCircle : farCircle} size={20} color={colors.border} />
+                <RegText key={'tex-' + curr} style={{ marginLeft: 10 }}>
+                  {translate('settings.currency-' + curr)}
+                </RegText>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        <View style={{ display: 'flex', margin: 10 }}>
+          <BoldText>{translate('settings.language-title')}</BoldText>
+        </View>
+
+        <View style={{ display: 'flex', marginLeft: 25 }}>
+          {languages().map((lang: string) => (
+            <TouchableOpacity
+              key={'touch-' + lang}
+              style={{ marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
+              onPress={() => setLanguage(lang as 'en' | 'es')}>
+              <View style={{ display: 'flex', flexDirection: 'row', marginTop: 10 }}>
+                <FontAwesomeIcon icon={lang === language ? faDotCircle : farCircle} size={20} color={colors.border} />
+                <RegText key={'tex-' + lang} style={{ marginLeft: 10 }}>
+                  {translate('settings.language-' + lang)}
+                </RegText>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </View>
+
         <View style={{ display: 'flex', margin: 10 }}>
           <BoldText>{translate('settings.server-title')}</BoldText>
         </View>

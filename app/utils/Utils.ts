@@ -103,12 +103,12 @@ export default class Utils {
     return 'Thanks for supporting Zingo!';
   }
 
-  static getZecToUsdString(price: number, zecValue: number): string {
+  static getZecToCurrencyString(price: number, zecValue: number, currency: 'USD' | ''): string {
     if (!price || !zecValue) {
-      return 'USD --';
+      return `${currency} --`;
     }
 
-    return `USD ${(price * zecValue).toFixed(2)}`;
+    return `${currency} ${(price * zecValue).toFixed(2)}`;
   }
 
   static utf16Split(s: string, chunksize: number): string[] {

@@ -9,7 +9,7 @@ import { faBars, faEllipsisV } from '@fortawesome/free-solid-svg-icons';
 import OptionsMenu from 'react-native-option-menu';
 
 import ZecAmount from '../Components/ZecAmount';
-import UsdAmount from '../Components/UsdAmount';
+import CurrencyAmount from '../Components/CurrencyAmount';
 import RegText from '../Components/RegText';
 import Utils from '../../app/utils';
 import RPC from '../../app/rpc';
@@ -27,7 +27,7 @@ type LegacyProps = {
 
 const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance, toggleMenuDrawer, startRescan }) => {
   const context = useContext(ContextLoaded);
-  const { translate, dimensions, info, addresses, totalBalance, uaAddress } = context;
+  const { translate, dimensions, info, addresses, totalBalance, uaAddress, currency } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [index, setIndex] = useState(0);
   const [routes] = useState([
@@ -352,10 +352,11 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance, toggl
               amtZec={totalBalance.total}
               style={{ opacity: 0.5 }}
             />
-            <UsdAmount
+            <CurrencyAmount
               style={{ marginTop: 0, marginBottom: 5, opacity: 0.5 }}
               price={info.zecPrice}
               amtZec={totalBalance.total}
+              currency={currency}
             />
             <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
               {translate('legacy.title')}
@@ -486,10 +487,11 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance, toggl
               amtZec={totalBalance.total}
               style={{ opacity: 0.5 }}
             />
-            <UsdAmount
+            <CurrencyAmount
               style={{ marginTop: 0, marginBottom: 5, opacity: 0.5 }}
               price={info.zecPrice}
               amtZec={totalBalance.total}
+              currency={currency}
             />
             <View style={{ width: '100%', height: 1, backgroundColor: colors.primary, marginTop: 5 }} />
             <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
