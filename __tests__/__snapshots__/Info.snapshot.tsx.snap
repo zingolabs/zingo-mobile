@@ -205,7 +205,7 @@ exports[`Component Info - test Matches the snapshot Info 1`] = `
               ]
             }
           >
-            translated text
+            3.3.3.0
           </Text>
         </View>
         <View
@@ -238,7 +238,7 @@ exports[`Component Info - test Matches the snapshot Info 1`] = `
               ]
             }
           >
-            translated text
+            https://zcash.es
           </Text>
         </View>
         <View
@@ -271,7 +271,7 @@ exports[`Component Info - test Matches the snapshot Info 1`] = `
               ]
             }
           >
-            translated text
+            Mainnet
           </Text>
         </View>
         <View
