@@ -88,9 +88,13 @@ export default function LoadingApp(props: LoadingAppProps) {
       i18n.locale = settings.language;
       //console.log('apploading settings', settings.language, settings.currency);
     } else {
-      setLanguage(languageTag as 'en' | 'es');
-      i18n.locale = languageTag;
-      await SettingsFileImpl.writeSettings('language', languageTag);
+      const lang =
+        languageTag === 'en' || languageTag === 'es'
+          ? (languageTag as 'en' | 'es')
+          : (fallback.languageTag as 'en' | 'es');
+      setLanguage(lang);
+      i18n.locale = lang;
+      await SettingsFileImpl.writeSettings('language', lang);
       //console.log('apploading NO settings', languageTag);
     }
     if (settings.currency) {
