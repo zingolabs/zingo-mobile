@@ -46,8 +46,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   const [displayAddress, setDisplayAddress] = useState(uaAddress);
   const [oindex, setOIndex] = useState(0);
 
-  const zecPrice = info && info.zecPrice;
-
   const uaddrs = addresses.filter(a => a.addressKind === 'u') || [];
 
   if (displayAddress) {
@@ -322,7 +320,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
             </View>
             <UsdAmount
               style={{ marginTop: 0, marginBottom: 5, opacity: 0.5 }}
-              price={zecPrice}
+              price={info.zecPrice}
               amtZec={totalBalance.total}
             />
 
@@ -520,7 +518,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
               />
               <UsdAmount
                 style={{ marginTop: 0, marginBottom: 5, opacity: 0.5 }}
-                price={zecPrice}
+                price={info.zecPrice}
                 amtZec={totalBalance.total}
               />
             </View>

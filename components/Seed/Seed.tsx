@@ -235,7 +235,10 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
           ) : (
             <>
               <FadeText style={{ textAlign: 'center' }}>
-                {translate('seed.birthday-no-readonly') + ' (1, ' + info.latestBlock + ')'}
+                {translate('seed.birthday-no-readonly') +
+                  ' (1, ' +
+                  (info.latestBlock ? info.latestBlock.toString() : '--') +
+                  ')'}
               </FadeText>
               <View
                 accessible={true}
@@ -272,7 +275,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
                       setBirthdayNumber(Number(text.replace('.', '').replace(',', '')).toFixed(0));
                     }
                   }}
-                  editable={true}
+                  editable={info.latestBlock ? true : false}
                   keyboardType="numeric"
                 />
               </View>
@@ -296,11 +299,14 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
           </FadeText>
         )}
 
-        {info.currencyName !== 'ZEC' && times === 3 && (action === 'change' || action === 'server') && (
-          <FadeText style={{ color: colors.primary, textAlign: 'center', width: '100%' }}>
-            {translate('seed.mainnet-warning')}
-          </FadeText>
-        )}
+        {info.currencyName &&
+          info.currencyName !== 'ZEC' &&
+          times === 3 &&
+          (action === 'change' || action === 'server') && (
+            <FadeText style={{ color: colors.primary, textAlign: 'center', width: '100%' }}>
+              {translate('seed.mainnet-warning')}
+            </FadeText>
+          )}
         <View style={{ marginBottom: 30 }} />
       </ScrollView>
       <View

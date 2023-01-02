@@ -775,7 +775,7 @@ export default class RPC {
     const info = await RPC.rpc_getInfoObject();
 
     if (info) {
-      await this.fnSetInfo(info);
+      this.fnSetInfo(info);
       this.lastServerBlockHeight = info.latestBlock;
     }
   }
@@ -784,7 +784,7 @@ export default class RPC {
     const info = await RPC.rpc_getInfoObject();
 
     if (info) {
-      await this.fnSetInfo(info);
+      this.fnSetInfo(info);
       this.lastServerBlockHeight = info.latestBlock;
     }
   }

@@ -67,8 +67,6 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
     }
   };
 
-  const zecPrice = info && info.zecPrice;
-
   const syncStatusDisplayLine = syncingStatus.inProgress ? `(${syncingStatus.blocks})` : '';
 
   //const balanceColor = transactions.find(t => t.confirmations === 0) ? colors.primary : colors.text;
@@ -137,7 +135,7 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
             </TouchableOpacity>
           )}
         </View>
-        <UsdAmount style={{ marginTop: 0, marginBottom: 5 }} price={zecPrice} amtZec={totalBalance.total} />
+        <UsdAmount style={{ marginTop: 0, marginBottom: 5 }} price={info.zecPrice} amtZec={totalBalance.total} />
 
         {showShieldButton && (
           <View style={{ margin: 5 }}>
@@ -321,7 +319,7 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
               size={36}
               amtZec={totalBalance.total}
             />
-            <UsdAmount style={{ marginTop: 0, marginBottom: 5 }} price={zecPrice} amtZec={totalBalance.total} />
+            <UsdAmount style={{ marginTop: 0, marginBottom: 5 }} price={info.zecPrice} amtZec={totalBalance.total} />
           </View>
 
           {showShieldButton && (

@@ -768,7 +768,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                   <Text
                     style={
                       {
-                        "color": undefined,
+                        "color": "red",
                         "fontSize": 18,
                       }
                     }
@@ -778,7 +778,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                   <Text
                     style={
                       {
-                        "color": undefined,
+                        "color": "red",
                         "fontSize": 18,
                         "fontWeight": "700",
                       }
@@ -789,7 +789,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                   <Text
                     style={
                       {
-                        "color": undefined,
+                        "color": "red",
                         "fontSize": 9,
                         "paddingBottom": 0,
                       }
@@ -800,7 +800,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                   <Text
                     style={
                       {
-                        "color": undefined,
+                        "color": "red",
                         "fontSize": 18,
                       }
                     }

@@ -301,7 +301,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   setInfo = (newInfo: InfoType) => {
     // If the price is not set in this object, copy it over from the current object
     const { info } = this.state;
-    if (!!info && !!info.zecPrice && !newInfo.zecPrice) {
+    if (info.zecPrice && !newInfo.zecPrice) {
       newInfo.zecPrice = info.zecPrice;
     }
 
@@ -459,11 +459,13 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     } else if (item === 'Change Wallet') {
       this.setState({ seedChangeModalVisible: true });
     } else if (item === 'Restore Wallet Backup') {
-      if (info && info.currencyName !== 'ZEC') {
+      if (info.currencyName && info.currencyName !== 'ZEC') {
         Toast.show(this.state.translate('loadedapp.restoremainnet-error'), Toast.LONG);
         return;
       }
-      this.setState({ seedBackupModalVisible: true });
+      if (info.currencyName) {
+        this.setState({ seedBackupModalVisible: true });
+      }
     }
   };
 
@@ -530,7 +532,9 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   onClickOKChangeWallet = async () => {
     const { info } = this.state;
     const resultStr =
-      info && info.currencyName !== 'ZEC' ? await this.rpc.changeWalletNoBackup() : await this.rpc.changeWallet();
+      info.currencyName && info.currencyName !== 'ZEC'
+        ? await this.rpc.changeWalletNoBackup()
+        : await this.rpc.changeWallet();
 
     //console.log("jc change", resultStr);
     if (resultStr.toLowerCase().startsWith('error')) {
@@ -577,7 +581,9 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     const { info } = this.state;
 
     const resultStr2 =
-      info && info.currencyName !== 'ZEC' ? await this.rpc.changeWalletNoBackup() : await this.rpc.changeWallet();
+      info.currencyName && info.currencyName !== 'ZEC'
+        ? await this.rpc.changeWalletNoBackup()
+        : await this.rpc.changeWallet();
     //console.log("jc change", resultStr);
     if (resultStr2.toLowerCase().startsWith('error')) {
       //console.log(`Error change wallet. ${resultStr}`);
