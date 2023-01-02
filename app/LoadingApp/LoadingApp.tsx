@@ -86,12 +86,12 @@ export default function LoadingApp(props: LoadingAppProps) {
     if (settings.language) {
       setLanguage(settings.language);
       i18n.locale = settings.language;
-      console.log('apploading settings', settings.language, settings.currency);
+      //console.log('apploading settings', settings.language, settings.currency);
     } else {
       setLanguage(languageTag as 'en' | 'es');
       i18n.locale = languageTag;
       await SettingsFileImpl.writeSettings('language', languageTag);
-      console.log('apploading NO settings', languageTag);
+      //console.log('apploading NO settings', languageTag);
     }
     if (settings.currency) {
       setCurrency(settings.currency);

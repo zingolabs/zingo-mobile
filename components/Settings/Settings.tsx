@@ -120,7 +120,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     closeModal();
   };
 
-  console.log(walletSettings);
+  //console.log(walletSettings);
 
   return (
     <SafeAreaView

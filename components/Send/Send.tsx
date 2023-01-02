@@ -593,48 +593,52 @@ const Send: React.FunctionComponent<SendProps> = ({
                     <RegText style={{ marginTop: 15, marginRight: 10, marginLeft: 5 }}>ZEC</RegText>
                   </View>
 
-                  <View
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'row',
-                      justifyContent: 'flex-start',
-                      width: '35%',
-                    }}>
-                    <RegText style={{ marginTop: 15, marginRight: 5 }}>$</RegText>
+                  {currency === 'USD' && (
                     <View
-                      accessible={true}
-                      accessibilityLabel={translate('send.usd-acc')}
                       style={{
-                        flexGrow: 1,
-                        borderWidth: 1,
-                        borderRadius: 5,
-                        borderColor: colors.text,
-                        marginTop: 5,
-                        width: '55%',
-                        minWidth: 48,
-                        minHeight: 48,
+                        display: 'flex',
+                        flexDirection: 'row',
+                        justifyContent: 'flex-start',
+                        width: '35%',
                       }}>
-                      <TextInput
-                        placeholder={`#${decimalSeparator}##`}
-                        placeholderTextColor={colors.placeholder}
-                        keyboardType="numeric"
+                      <RegText style={{ marginTop: 15, marginRight: 5 }}>$</RegText>
+                      <View
+                        accessible={true}
+                        accessibilityLabel={translate('send.usd-acc')}
                         style={{
-                          color: colors.text,
-                          fontWeight: '600',
-                          fontSize: 18,
+                          flexGrow: 1,
+                          borderWidth: 1,
+                          borderRadius: 5,
+                          borderColor: colors.text,
+                          marginTop: 5,
+                          width: '55%',
                           minWidth: 48,
                           minHeight: 48,
-                          marginLeft: 5,
-                        }}
-                        value={ta.amountCurrency.toString()}
-                        onChangeText={(text: string) => updateToField(null, null, text.substring(0, 15), null)}
-                        onEndEditing={(e: any) => updateToField(null, null, e.nativeEvent.text.substring(0, 15), null)}
-                        editable={true}
-                        maxLength={15}
-                      />
+                        }}>
+                        <TextInput
+                          placeholder={`#${decimalSeparator}##`}
+                          placeholderTextColor={colors.placeholder}
+                          keyboardType="numeric"
+                          style={{
+                            color: colors.text,
+                            fontWeight: '600',
+                            fontSize: 18,
+                            minWidth: 48,
+                            minHeight: 48,
+                            marginLeft: 5,
+                          }}
+                          value={ta.amountCurrency.toString()}
+                          onChangeText={(text: string) => updateToField(null, null, text.substring(0, 15), null)}
+                          onEndEditing={(e: any) =>
+                            updateToField(null, null, e.nativeEvent.text.substring(0, 15), null)
+                          }
+                          editable={true}
+                          maxLength={15}
+                        />
+                      </View>
+                      <RegText style={{ marginTop: 15, marginLeft: 5 }}>{currency}</RegText>
                     </View>
-                    <RegText style={{ marginTop: 15, marginLeft: 5 }}>{currency}</RegText>
-                  </View>
+                  )}
                 </View>
 
                 <View style={{ display: 'flex', flexDirection: 'column' }}>
@@ -1018,50 +1022,52 @@ const Send: React.FunctionComponent<SendProps> = ({
                       <RegText style={{ marginTop: 15, marginRight: 10, marginLeft: 5 }}>ZEC</RegText>
                     </View>
 
-                    <View
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        justifyContent: 'flex-start',
-                        width: '35%',
-                      }}>
-                      <RegText style={{ marginTop: 15, marginRight: 5 }}>$</RegText>
+                    {currency === 'USD' && (
                       <View
-                        accessible={true}
-                        accessibilityLabel={translate('send.usd-acc')}
                         style={{
-                          flexGrow: 1,
-                          borderWidth: 1,
-                          borderRadius: 5,
-                          borderColor: colors.text,
-                          marginTop: 5,
-                          width: '55%',
-                          minWidth: 48,
-                          minHeight: 48,
+                          display: 'flex',
+                          flexDirection: 'row',
+                          justifyContent: 'flex-start',
+                          width: '35%',
                         }}>
-                        <TextInput
-                          placeholder={`#${decimalSeparator}##`}
-                          placeholderTextColor={colors.placeholder}
-                          keyboardType="numeric"
+                        <RegText style={{ marginTop: 15, marginRight: 5 }}>$</RegText>
+                        <View
+                          accessible={true}
+                          accessibilityLabel={translate('send.usd-acc')}
                           style={{
-                            color: colors.text,
-                            fontWeight: '600',
-                            fontSize: 18,
+                            flexGrow: 1,
+                            borderWidth: 1,
+                            borderRadius: 5,
+                            borderColor: colors.text,
+                            marginTop: 5,
+                            width: '55%',
                             minWidth: 48,
                             minHeight: 48,
-                            marginLeft: 5,
-                          }}
-                          value={ta.amountCurrency.toString()}
-                          onChangeText={(text: string) => updateToField(null, null, text.substring(0, 15), null)}
-                          onEndEditing={(e: any) =>
-                            updateToField(null, null, e.nativeEvent.text.substring(0, 15), null)
-                          }
-                          editable={true}
-                          maxLength={15}
-                        />
+                          }}>
+                          <TextInput
+                            placeholder={`#${decimalSeparator}##`}
+                            placeholderTextColor={colors.placeholder}
+                            keyboardType="numeric"
+                            style={{
+                              color: colors.text,
+                              fontWeight: '600',
+                              fontSize: 18,
+                              minWidth: 48,
+                              minHeight: 48,
+                              marginLeft: 5,
+                            }}
+                            value={ta.amountCurrency.toString()}
+                            onChangeText={(text: string) => updateToField(null, null, text.substring(0, 15), null)}
+                            onEndEditing={(e: any) =>
+                              updateToField(null, null, e.nativeEvent.text.substring(0, 15), null)
+                            }
+                            editable={true}
+                            maxLength={15}
+                          />
+                        </View>
+                        <RegText style={{ marginTop: 15, marginLeft: 5 }}>{currency}</RegText>
                       </View>
-                      <RegText style={{ marginTop: 15, marginLeft: 5 }}>{currency}</RegText>
-                    </View>
+                    )}
                   </View>
 
                   <View style={{ display: 'flex', flexDirection: 'column' }}>
