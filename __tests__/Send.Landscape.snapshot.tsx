@@ -94,6 +94,7 @@ describe('Component Send - test', () => {
       scale: 2.5,
     };
     state.translate = () => 'text translated';
+    state.currency = 'USD';
     state.info.currencyName = 'ZEC';
     state.info.zecPrice = 33.33;
     state.info.defaultFee = 1000;

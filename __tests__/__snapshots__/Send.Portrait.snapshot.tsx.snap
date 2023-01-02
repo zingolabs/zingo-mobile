@@ -379,7 +379,9 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                     },
                   ]
                 }
-              />
+              >
+                USD
+              </Text>
             </View>
           </View>
           <View
