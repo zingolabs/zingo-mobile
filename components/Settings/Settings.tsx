@@ -21,7 +21,7 @@ type SettingsProps = {
   set_wallet_option: (name: string, value: string) => void;
   set_server_option: (name: 'server' | 'currency' | 'language', value: string) => void;
   set_currency_option: (name: 'server' | 'currency' | 'language', value: string) => void;
-  set_language_option: (name: 'server' | 'currency' | 'language', value: string) => void;
+  set_language_option: (name: 'server' | 'currency' | 'language', value: string, reset: boolean) => void;
 };
 
 type Memos = {
@@ -107,14 +107,19 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     if (walletSettings.transaction_filter_threshold !== filter) {
       set_wallet_option('transaction_filter_threshold', filter);
     }
-    if (walletSettings.server !== server) {
-      set_server_option('server', server);
-    }
     if (walletSettings.currency !== currency) {
       set_currency_option('currency', currency);
     }
-    if (walletSettings.language !== language) {
-      set_language_option('language', language);
+    // the last one
+    if (walletSettings.server !== server) {
+      if (walletSettings.language !== language) {
+        set_language_option('language', language, false);
+      }
+      set_server_option('server', server);
+    } else {
+      if (walletSettings.language !== language) {
+        set_language_option('language', language, true);
+      }
     }
 
     closeModal();

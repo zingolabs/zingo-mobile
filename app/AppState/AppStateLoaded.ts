@@ -95,6 +95,7 @@ export default interface AppStateLoaded {
 
   uaAddress: string;
 
+  server: string;
   language: 'en' | 'es';
   currency: 'USD' | '';
 

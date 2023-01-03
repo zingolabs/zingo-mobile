@@ -34,6 +34,7 @@ import { ThemeType } from '../types';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import { ContextLoadedProvider, defaultAppStateLoaded } from '../context';
 import platform from '../platform/platform';
+import { serverUris } from '../uris';
 
 const Transactions = React.lazy(() => import('../../components/Transactions'));
 const Send = React.lazy(() => import('../../components/Send'));
@@ -68,10 +69,13 @@ type LoadedAppProps = {
   route: StackScreenProps<any>['route'];
 };
 
+const SERVER_DEFAULT_0 = serverUris()[0];
+
 export default function LoadedApp(props: LoadedAppProps) {
   const theme = useTheme() as unknown as ThemeType;
   const [language, setLanguage] = useState('en' as 'en' | 'es');
   const [currency, setCurrency] = useState('' as 'USD' | '');
+  const [server, setServer] = useState(SERVER_DEFAULT_0 as string);
   const [loading, setLoading] = useState(true);
   //const forceUpdate = useForceUpdate();
   const file = useMemo(
@@ -122,7 +126,12 @@ export default function LoadedApp(props: LoadedAppProps) {
     } else {
       await SettingsFileImpl.writeSettings('currency', currency);
     }
-  }, [currency, file, i18n]);
+    if (settings.server) {
+      setServer(settings.server);
+    } else {
+      await SettingsFileImpl.writeSettings('server', server);
+    }
+  }, [currency, file, i18n, server]);
 
   useEffect(() => {
     (async () => {
@@ -144,7 +153,16 @@ export default function LoadedApp(props: LoadedAppProps) {
   if (loading) {
     return null;
   } else {
-    return <LoadedAppClass {...props} theme={theme} translate={translate} language={language} currency={currency} />;
+    return (
+      <LoadedAppClass
+        {...props}
+        theme={theme}
+        translate={translate}
+        language={language}
+        currency={currency}
+        server={server}
+      />
+    );
   }
 }
 
@@ -155,6 +173,7 @@ type LoadedAppClassProps = {
   theme: ThemeType;
   language: 'en' | 'es';
   currency: 'USD' | '';
+  server: string;
 };
 
 class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
@@ -172,6 +191,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       route: props.route,
       sendPageState: new SendPageStateClass(new ToAddrClass(Utils.getNextToAddrID())),
       translate: props.translate,
+      server: props.server,
       language: props.language,
       currency: props.currency,
       dimensions: {
@@ -523,6 +543,9 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       // Load the wallet and navigate to the transactions screen
       //console.log(`wallet loaded ok ${value}`);
       await SettingsFileImpl.writeSettings(name, value);
+      this.setState({
+        server: value,
+      });
       // Refetch the settings to update
       this.rpc.fetchWalletSettings();
       return;
@@ -551,18 +574,26 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
   set_currency_option = async (name: 'server' | 'currency' | 'language', value: string) => {
     await SettingsFileImpl.writeSettings(name, value);
+    this.setState({
+      currency: value as 'USD' | '',
+    });
 
     // Refetch the settings to update
     this.rpc.fetchWalletSettings();
-    this.navigateToLoading();
+    //this.navigateToLoading();
   };
 
-  set_language_option = async (name: 'server' | 'currency' | 'language', value: string) => {
+  set_language_option = async (name: 'server' | 'currency' | 'language', value: string, reset: boolean) => {
     await SettingsFileImpl.writeSettings(name, value);
+    this.setState({
+      language: value as 'en' | 'es',
+    });
 
     // Refetch the settings to update
     this.rpc.fetchWalletSettings();
-    this.navigateToLoading();
+    if (reset) {
+      this.navigateToLoading();
+    }
   };
 
   navigateToLoading = () => {
@@ -621,6 +652,9 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
     if (this.state.newServer) {
       await SettingsFileImpl.writeSettings('server', this.state.newServer);
+      this.setState({
+        server: this.state.newServer,
+      });
     }
 
     const { info } = this.state;

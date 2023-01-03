@@ -55,6 +55,8 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   poolsModalVisible: false,
   newServer: '' as string,
   uaAddress: '' as string,
+
+  server: '' as string,
   currency: '',
   language: 'en',
 

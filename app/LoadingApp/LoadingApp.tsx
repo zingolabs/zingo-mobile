@@ -22,7 +22,7 @@ import { StackScreenProps } from '@react-navigation/stack';
 import BoldText from '../../components/Components/BoldText';
 import Button from '../../components/Button';
 import RPCModule from '../../components/RPCModule';
-import { SettingsFileClass, AppStateLoading, WalletSeedType } from '../AppState';
+import { AppStateLoading, WalletSeedType } from '../AppState';
 import { serverUris } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import RPC from '../rpc';
@@ -48,10 +48,14 @@ type LoadingAppProps = {
   route: StackScreenProps<any>['route'];
 };
 
+const SERVER_DEFAULT_0 = serverUris()[0];
+const SERVER_DEFAULT_1 = serverUris()[1];
+
 export default function LoadingApp(props: LoadingAppProps) {
   const theme = useTheme() as unknown as ThemeType;
   const [language, setLanguage] = useState('en' as 'en' | 'es');
   const [currency, setCurrency] = useState('' as 'USD' | '');
+  const [server, setServer] = useState(SERVER_DEFAULT_0 as string);
   const [loading, setLoading] = useState(true);
   //const forceUpdate = useForceUpdate();
   const file = useMemo(
@@ -102,7 +106,14 @@ export default function LoadingApp(props: LoadingAppProps) {
     } else {
       await SettingsFileImpl.writeSettings('currency', currency);
     }
-  }, [currency, file, i18n]);
+    if (settings.server) {
+      setServer(settings.server);
+      //console.log('settings', settings.server);
+    } else {
+      await SettingsFileImpl.writeSettings('server', server);
+      //console.log('NO settings', settings.server);
+    }
+  }, [currency, file, i18n, server]);
 
   useEffect(() => {
     (async () => {
@@ -124,7 +135,16 @@ export default function LoadingApp(props: LoadingAppProps) {
   if (loading) {
     return null;
   } else {
-    return <LoadingAppClass {...props} theme={theme} translate={translate} language={language} currency={currency} />;
+    return (
+      <LoadingAppClass
+        {...props}
+        theme={theme}
+        translate={translate}
+        language={language}
+        currency={currency}
+        server={server}
+      />
+    );
   }
 }
 
@@ -135,13 +155,12 @@ type LoadingAppClassProps = {
   theme: ThemeType;
   language: 'en' | 'es';
   currency: 'USD' | '';
+  server: string;
 };
-
-const SERVER_DEFAULT_0 = serverUris()[0];
-const SERVER_DEFAULT_1 = serverUris()[1];
 
 class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
   dim: EmitterSubscription;
+
   constructor(props: LoadingAppClassProps) {
     super(props);
 
@@ -152,6 +171,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
       navigation: props.navigation,
       route: props.route,
       translate: props.translate,
+      server: props.server,
       language: props.language,
       currency: props.currency,
       dimensions: {
@@ -174,25 +194,13 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
       if (info) {
         this.setState({ info });
       }
-      // read settings file
-      let settings = {} as SettingsFileClass;
-      if (!this.state.server) {
-        settings = await SettingsFileImpl.readSettings();
-        if (settings.server) {
-          this.setState({ server: settings.server });
-        } else {
-          settings.server = SERVER_DEFAULT_0;
-          this.setState({ server: SERVER_DEFAULT_0 });
-          await SettingsFileImpl.writeSettings('server', SERVER_DEFAULT_0);
-        }
-      }
 
       const exists = await RPCModule.walletExists();
       //console.log('Wallet Exists result', exists);
 
       if (exists && exists !== 'false') {
         this.setState({ walletExists: true });
-        const error = await RPCModule.loadExistingWallet(settings.server || this.state.server || SERVER_DEFAULT_0);
+        const error = await RPCModule.loadExistingWallet(this.state.server);
         //console.log('Load Wallet Exists result', error);
         if (!error.startsWith('Error')) {
           // Load the wallet and navigate to the transactions screen
