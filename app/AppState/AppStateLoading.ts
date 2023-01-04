@@ -16,9 +16,12 @@ export default interface AppStateLoading {
   actionButtonsDisabled: boolean;
   walletExists: boolean;
   walletSeed: WalletSeedType;
-  server: string;
   totalBalance: TotalBalanceClass;
   info: InfoType;
+
+  server: string;
+  currency: 'USD' | '';
+  language: 'en' | 'es';
 
   translate: (key: string, config?: TranslateOptions) => string;
 

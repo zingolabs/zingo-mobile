@@ -13,7 +13,12 @@ import { ContextLoaded } from '../../../app/context';
 import { BarCodeReadEvent } from 'react-native-camera';
 
 type ScannerProps = {
-  updateToField: (address: string | null, amount: string | null, amountUSD: string | null, memo: string | null) => void;
+  updateToField: (
+    address: string | null,
+    amount: string | null,
+    CurrencyAmount: string | null,
+    memo: string | null,
+  ) => void;
   closeModal: () => void;
   width: number;
   height: number;

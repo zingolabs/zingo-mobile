@@ -8,10 +8,12 @@ export default class SettingsFileImpl {
   }
 
   // Write the server setting
-  static async writeSettings(ss: SettingsFileClass) {
+  static async writeSettings(name: 'server' | 'currency' | 'language', value: string) {
     const fileName = await this.getFileName();
+    const settings = await this.readSettings();
+    const newSettings: SettingsFileClass = { ...settings, [name]: value };
 
-    RNFS.writeFile(fileName, JSON.stringify(ss), 'utf8')
+    RNFS.writeFile(fileName, JSON.stringify(newSettings), 'utf8')
       .then(() => {
         //console.log('FILE WRITTEN!')
       })

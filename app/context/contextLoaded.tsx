@@ -56,6 +56,10 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   newServer: '' as string,
   uaAddress: '' as string,
 
+  server: '' as string,
+  currency: '',
+  language: 'en',
+
   translate: () => '',
 };
 

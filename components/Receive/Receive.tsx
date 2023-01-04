@@ -10,7 +10,7 @@ import OptionsMenu from 'react-native-option-menu';
 
 import FadeText from '../Components/FadeText';
 import ZecAmount from '../Components/ZecAmount';
-import UsdAmount from '../Components/UsdAmount';
+import CurrencyAmount from '../Components/CurrencyAmount';
 import RegText from '../Components/RegText';
 import Utils from '../../app/utils';
 import RPC from '../../app/rpc';
@@ -38,7 +38,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   poolsMoreInfoOnClick,
 }) => {
   const context = useContext(ContextLoaded);
-  const { translate, dimensions, info, addresses, totalBalance, syncingStatus, uaAddress } = context;
+  const { translate, dimensions, info, addresses, totalBalance, syncingStatus, uaAddress, currency } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [index, setIndex] = useState(0);
   const [routes] = useState([{ key: 'uaddr', title: translate('receive.u-title') }]);
@@ -318,10 +318,11 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                 </TouchableOpacity>
               )}
             </View>
-            <UsdAmount
+            <CurrencyAmount
               style={{ marginTop: 0, marginBottom: 5, opacity: 0.5 }}
               price={info.zecPrice}
               amtZec={totalBalance.total}
+              currency={currency}
             />
 
             <View
@@ -516,10 +517,11 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                 amtZec={totalBalance.total}
                 style={{ opacity: 0.5 }}
               />
-              <UsdAmount
+              <CurrencyAmount
                 style={{ marginTop: 0, marginBottom: 5, opacity: 0.5 }}
                 price={info.zecPrice}
                 amtZec={totalBalance.total}
+                currency={currency}
               />
             </View>
 

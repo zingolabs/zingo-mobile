@@ -307,39 +307,6 @@ exports[`Component Info - test Matches the snapshot Info 1`] = `
             2000100
           </Text>
         </View>
-        <View
-          style={
-            {
-              "display": "flex",
-              "marginTop": 20,
-            }
-          }
-        >
-          <Text
-            style={
-              {
-                "color": "rgb(28, 28, 30)",
-                "opacity": 0.65,
-              }
-            }
-          >
-            translated text
-          </Text>
-          <Text
-            style={
-              [
-                {
-                  "color": "rgb(28, 28, 30)",
-                  "fontSize": 18,
-                  "fontWeight": "600",
-                  "opacity": 1,
-                },
-              ]
-            }
-          >
-            $ 33.33
-          </Text>
-        </View>
       </View>
     </View>
   </RCTScrollView>

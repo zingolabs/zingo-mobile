@@ -1,10 +1,11 @@
 export default class SettingsFileClass {
   server: string;
-  language: string;
-  currency?: string;
+  currency: 'USD' | '';
+  language: 'en' | 'es';
 
-  constructor(server: string, language: string) {
+  constructor(server: string, currency: 'USD' | '', language: 'en' | 'es') {
     this.server = server;
+    this.currency = currency;
     this.language = language;
   }
 }

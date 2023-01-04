@@ -94,6 +94,7 @@ describe('Component Send - test', () => {
       deviceType: 'tablet',
       scale: 2.5,
     };
+    state.currency = 'USD';
     state.info.currencyName = 'ZEC';
     state.info.zecPrice = 33.33;
     state.info.defaultFee = 1000;
@@ -106,7 +107,7 @@ describe('Component Send - test', () => {
     state.sendPageState.toaddr.id = 1234567890;
     state.sendPageState.toaddr.to = 'UA-12345678901234567890';
     state.sendPageState.toaddr.amount = '1.12345678';
-    state.sendPageState.toaddr.amountUSD = '50.22';
+    state.sendPageState.toaddr.amountCurrency = '50.22';
     state.sendPageState.toaddr.memo = 'memo';
     const onFunction = jest.fn();
     const send = render(

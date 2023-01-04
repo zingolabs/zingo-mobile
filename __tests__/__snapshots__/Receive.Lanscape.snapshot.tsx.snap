@@ -131,55 +131,6 @@ exports[`Component Receive - test Receive Landscape - snapshot 1`] = `
                ZEC
             </Text>
           </View>
-          <View
-            style={
-              {
-                "alignItems": "baseline",
-                "flexDirection": "row",
-              }
-            }
-          >
-            <Text
-              style={
-                {
-                  "color": undefined,
-                  "fontSize": 20,
-                  "marginBottom": 5,
-                  "marginTop": 0,
-                  "opacity": 0.5,
-                }
-              }
-            >
-              $
-            </Text>
-            <Text
-              style={
-                {
-                  "color": undefined,
-                  "fontSize": 20,
-                  "fontWeight": "700",
-                  "marginBottom": 5,
-                  "marginTop": 0,
-                  "opacity": 0.5,
-                }
-              }
-            >
-               --
-            </Text>
-            <Text
-              style={
-                {
-                  "color": undefined,
-                  "fontSize": 20,
-                  "marginBottom": 5,
-                  "marginTop": 0,
-                  "opacity": 0.5,
-                }
-              }
-            >
-               USD
-            </Text>
-          </View>
         </View>
         <View
           style={

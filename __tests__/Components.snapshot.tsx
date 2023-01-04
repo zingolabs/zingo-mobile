@@ -6,7 +6,7 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
-import UsdAmount from '../components/Components/UsdAmount';
+import CurrencyAmount from '../components/Components/CurrencyAmount';
 import ZecPrice from '../components/Components/ZecPrice';
 import ZecAmount from '../components/Components/ZecAmount';
 import BoldText from '../components/Components/BoldText';
@@ -27,12 +27,14 @@ jest.mock('react-native-localize', () => ({
 describe('Component Components - test', () => {
   //snapshot test
   test('UsdAmount - snapshot', () => {
-    const usdAmount = render(<UsdAmount price={1.12345678} amtZec={39.99} style={{ backgroundColor: 'red' }} />);
+    const usdAmount = render(
+      <CurrencyAmount price={1.12345678} amtZec={39.99} style={{ backgroundColor: 'red' }} currency={'USD'} />,
+    );
     expect(usdAmount.toJSON()).toMatchSnapshot();
   });
 
   test('ZecPrice - snapshot', () => {
-    const zecPrice = render(<ZecPrice price={39.99} currencyName={'ZEC'} />);
+    const zecPrice = render(<ZecPrice price={39.99} currencyName={'ZEC'} currency={'USD'} />);
     expect(zecPrice.toJSON()).toMatchSnapshot();
   });
 

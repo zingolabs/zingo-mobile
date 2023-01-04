@@ -3,6 +3,7 @@ import React, { useContext, useState } from 'react';
 import { View, ScrollView, Image, Modal, TouchableOpacity, RefreshControl, Text } from 'react-native';
 import Toast from 'react-native-simple-toast';
 import moment from 'moment';
+import 'moment/locale/es';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faBars, faInfo } from '@fortawesome/free-solid-svg-icons';
@@ -12,7 +13,7 @@ import { TransactionType } from '../../app/AppState';
 import { ThemeType } from '../../app/types';
 import RegText from '../Components/RegText';
 import ZecAmount from '../Components/ZecAmount';
-import UsdAmount from '../Components/UsdAmount';
+import CurrencyAmount from '../Components/CurrencyAmount';
 import FadeText from '../Components/FadeText';
 import Button from '../Button';
 import TxDetail from './components/TxDetail';
@@ -35,13 +36,14 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
   syncingStatusMoreInfoOnClick,
 }) => {
   const context = useContext(ContextLoaded);
-  const { translate, dimensions, transactions, totalBalance, info, syncingStatus } = context;
+  const { translate, dimensions, transactions, totalBalance, info, syncingStatus, language, currency } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [isTxDetailModalShowing, setTxDetailModalShowing] = useState(false);
   const [txDetail, setTxDetail] = useState<TransactionType>({} as TransactionType);
 
   const [numTx, setNumTx] = useState<number>(100);
   const loadMoreButton = numTx < (transactions.length || 0);
+  moment.locale(language);
 
   const loadMoreClicked = () => {
     setNumTx(numTx + 100);
@@ -135,7 +137,12 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
             </TouchableOpacity>
           )}
         </View>
-        <UsdAmount style={{ marginTop: 0, marginBottom: 5 }} price={info.zecPrice} amtZec={totalBalance.total} />
+        <CurrencyAmount
+          style={{ marginTop: 0, marginBottom: 5 }}
+          price={info.zecPrice}
+          amtZec={totalBalance.total}
+          currency={currency}
+        />
 
         {showShieldButton && (
           <View style={{ margin: 5 }}>
@@ -319,7 +326,12 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
               size={36}
               amtZec={totalBalance.total}
             />
-            <UsdAmount style={{ marginTop: 0, marginBottom: 5 }} price={info.zecPrice} amtZec={totalBalance.total} />
+            <CurrencyAmount
+              style={{ marginTop: 0, marginBottom: 5 }}
+              price={info.zecPrice}
+              amtZec={totalBalance.total}
+              currency={currency}
+            />
           </View>
 
           {showShieldButton && (

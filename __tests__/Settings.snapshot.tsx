@@ -55,7 +55,13 @@ describe('Component Settings - test', () => {
   test('Settings - snapshot', () => {
     const settings = render(
       <ContextLoadedProvider value={state}>
-        <Settings closeModal={onClose} set_wallet_option={onSetOption} set_server_option={onSetOption} />
+        <Settings
+          closeModal={onClose}
+          set_wallet_option={onSetOption}
+          set_server_option={onSetOption}
+          set_currency_option={onSetOption}
+          set_language_option={onSetOption}
+        />
       </ContextLoadedProvider>,
     );
     expect(settings.toJSON()).toMatchSnapshot();

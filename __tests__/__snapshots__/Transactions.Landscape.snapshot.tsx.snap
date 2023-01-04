@@ -111,52 +111,6 @@ exports[`Component Transactions - test Transactions Landscape - snapshot 1`] = `
              ZEC
           </Text>
         </View>
-        <View
-          style={
-            {
-              "alignItems": "baseline",
-              "flexDirection": "row",
-            }
-          }
-        >
-          <Text
-            style={
-              {
-                "color": undefined,
-                "fontSize": 20,
-                "marginBottom": 5,
-                "marginTop": 0,
-              }
-            }
-          >
-            $
-          </Text>
-          <Text
-            style={
-              {
-                "color": undefined,
-                "fontSize": 20,
-                "fontWeight": "700",
-                "marginBottom": 5,
-                "marginTop": 0,
-              }
-            }
-          >
-             --
-          </Text>
-          <Text
-            style={
-              {
-                "color": undefined,
-                "fontSize": 20,
-                "marginBottom": 5,
-                "marginTop": 0,
-              }
-            }
-          >
-             USD
-          </Text>
-        </View>
       </View>
       <View
         style={
@@ -457,7 +411,7 @@ exports[`Component Transactions - test Transactions Landscape - snapshot 1`] = `
                       }
                     }
                   >
-                    Sent 
+                    text translated
                   </Text>
                   <Text
                     style={
@@ -626,7 +580,7 @@ exports[`Component Transactions - test Transactions Landscape - snapshot 1`] = `
                       }
                     }
                   >
-                    Received 
+                    text translated
                   </Text>
                   <Text
                     style={

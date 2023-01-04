@@ -88,7 +88,15 @@
     "threshold-acc": "Threshold Field",
     "value-none": "none",
     "value-wallet": "wallet",
-    "value-all": "all"
+    "value-all": "all",
+    "currency-title": "CURRENCY",
+    "language-title": "LANGUAGE",
+    "currency-": "No currency",
+    "currency-USD": "US Dollar",
+    "language-en": "English",
+    "language-es": "Spanish",
+    "iscurrency": "You need to choose a currency to save.",
+    "islanguage": "You need to choose a language to save."
   },
   "info": {
     "version": "Version",
@@ -230,8 +238,8 @@
     "end": "END",
     "loadmore": "Load More",
     "back": " Back",
-    "sent": "Sent",
-    "receive": "Receive",
+    "sent": "Sent ",
+    "receive": "Receive ",
     "time": "Time",
     "confirmations": "Confirmations",
     "txid": "Transaction ID",

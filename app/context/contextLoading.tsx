@@ -12,9 +12,12 @@ export const defaultAppStateLoading: AppStateLoading = {
   actionButtonsDisabled: false,
   walletExists: false,
   walletSeed: {} as WalletSeedType,
-  server: '' as string,
   totalBalance: new TotalBalanceClass(),
   info: {} as InfoType,
+
+  server: '' as string,
+  currency: '',
+  language: 'en',
 
   translate: () => '',
 };

@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, TouchableOpacity } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -11,6 +11,8 @@ import { TransactionType } from '../../../app/AppState';
 import Utils from '../../../app/utils';
 import { ThemeType } from '../../../app/types';
 import moment from 'moment';
+import 'moment/locale/es';
+import { ContextLoaded } from '../../../app/context';
 
 type TxSummaryLineProps = {
   month: string;
@@ -24,10 +26,13 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
   setTxDetail,
   setTxDetailModalShowing,
 }) => {
+  const context = useContext(ContextLoaded);
+  const { translate, language } = context;
   const { colors } = useTheme() as unknown as ThemeType;
 
   const amountColor = tx.confirmations === 0 ? colors.primaryDisabled : tx.amount > 0 ? colors.primary : colors.text;
   const txIcon = tx.amount >= 0 ? faArrowDown : faArrowUp;
+  moment.locale(language);
 
   const displayAddress =
     tx.detailedTxns && tx.detailedTxns.length > 0 ? Utils.trimToSmall(tx.detailedTxns[0].address, 7) : 'Unknown';
@@ -71,7 +76,9 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
           <View style={{ display: 'flex' }}>
             <FadeText style={{ fontSize: 18 }}>{displayAddress}</FadeText>
             <View style={{ display: 'flex', flexDirection: 'row' }}>
-              <FadeText>{tx.type === 'sent' ? 'Sent ' : 'Received '}</FadeText>
+              <FadeText>
+                {tx.type === 'sent' ? translate('transactions.sent') : translate('transactions.receive')}
+              </FadeText>
               <FadeText>{moment((tx.time || 0) * 1000).format('MMM D, h:mm a')}</FadeText>
             </View>
           </View>
