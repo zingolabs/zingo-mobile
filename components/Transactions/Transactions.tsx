@@ -1,12 +1,13 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState } from 'react';
-import { View, ScrollView, Image, Modal, TouchableOpacity, RefreshControl, Text } from 'react-native';
+import { View, ScrollView, Image, Modal, RefreshControl, Text } from 'react-native';
 import Toast from 'react-native-simple-toast';
 import moment from 'moment';
 import 'moment/locale/es';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faBars, faInfo, faRefresh } from '@fortawesome/free-solid-svg-icons';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 import RPC from '../../app/rpc';
 import { TransactionType } from '../../app/AppState';

@@ -186,20 +186,7 @@ exports[`Component Transactions - test Transactions Landscape - snapshot 1`] = `
       <View
         accessibilityLabel="text translated"
         accessible={true}
-        collapsable={false}
-        focusable={true}
-        onClick={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
-        style={
-          {
-            "opacity": 1,
-          }
-        }
+        onPress={[MockFunction]}
       >
         <
           color="rgb(216, 216, 216)"
@@ -323,21 +310,7 @@ exports[`Component Transactions - test Transactions Landscape - snapshot 1`] = `
           }
         >
           <View
-            accessible={true}
-            collapsable={false}
-            focusable={true}
-            onClick={[Function]}
-            onResponderGrant={[Function]}
-            onResponderMove={[Function]}
-            onResponderRelease={[Function]}
-            onResponderTerminate={[Function]}
-            onResponderTerminationRequest={[Function]}
-            onStartShouldSetResponder={[Function]}
-            style={
-              {
-                "opacity": 1,
-              }
-            }
+            onPress={[Function]}
           >
             <View
               style={
@@ -492,21 +465,7 @@ exports[`Component Transactions - test Transactions Landscape - snapshot 1`] = `
           }
         >
           <View
-            accessible={true}
-            collapsable={false}
-            focusable={true}
-            onClick={[Function]}
-            onResponderGrant={[Function]}
-            onResponderMove={[Function]}
-            onResponderRelease={[Function]}
-            onResponderTerminate={[Function]}
-            onResponderTerminationRequest={[Function]}
-            onStartShouldSetResponder={[Function]}
-            style={
-              {
-                "opacity": 1,
-              }
-            }
+            onPress={[Function]}
           >
             <View
               style={
