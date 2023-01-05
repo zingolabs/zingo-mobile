@@ -77,6 +77,7 @@ describe('Component Receive - test', () => {
           startRescan={onFunction}
           syncingStatusMoreInfoOnClick={onFunction}
           poolsMoreInfoOnClick={onFunction}
+          setZecPrice={onFunction}
         />
       </ContextLoadedProvider>,
     );

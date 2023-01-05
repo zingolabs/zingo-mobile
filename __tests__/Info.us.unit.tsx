@@ -36,19 +36,22 @@ describe('Component Info - test', () => {
       verificationProgress: 0,
       currencyName: 'ZEC',
       solps: 0,
-      zecPrice: 33.33,
       defaultFee: 1000,
       chain_name: 'mainnet',
     };
+    state.zecPrice = 33.33;
     state.currency = 'USD';
     state.totalBalance.total = 1.12345678;
     const onClose = jest.fn();
+    const onSet = jest.fn();
     const text: any = render(
       <ContextLoadedProvider value={state}>
-        <Info closeModal={onClose} />
+        <Info closeModal={onClose} setZecPrice={onSet} />
       </ContextLoadedProvider>,
     ).toJSON();
     expect(text.type).toBe('RCTSafeAreaView');
-    expect(text.children[1].children[0].children[0].children[5].children[1].children[0]).toBe('$ 33.33 USD per ZEC');
+    expect(text.children[1].children[0].children[0].children[5].children[0].children[1].children[0]).toBe(
+      '$ 33.33 USD per ZEC',
+    );
   });
 });

@@ -6,7 +6,7 @@ import moment from 'moment';
 import 'moment/locale/es';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faBars, faInfo } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faInfo, faRefresh } from '@fortawesome/free-solid-svg-icons';
 
 import RPC from '../../app/rpc';
 import { TransactionType } from '../../app/AppState';
@@ -26,6 +26,7 @@ type TransactionsProps = {
   setComputingModalVisible: (visible: boolean) => void;
   poolsMoreInfoOnClick: () => void;
   syncingStatusMoreInfoOnClick: () => void;
+  setZecPrice: (p: number) => void;
 };
 
 const Transactions: React.FunctionComponent<TransactionsProps> = ({
@@ -34,12 +35,15 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
   setComputingModalVisible,
   poolsMoreInfoOnClick,
   syncingStatusMoreInfoOnClick,
+  setZecPrice,
 }) => {
   const context = useContext(ContextLoaded);
-  const { translate, dimensions, transactions, totalBalance, info, syncingStatus, language, currency } = context;
+  const { translate, dimensions, transactions, totalBalance, info, syncingStatus, language, currency, zecPrice } =
+    context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [isTxDetailModalShowing, setTxDetailModalShowing] = useState(false);
   const [txDetail, setTxDetail] = useState<TransactionType>({} as TransactionType);
+  const [refreshSure, setRefreshSure] = useState(false);
 
   const [numTx, setNumTx] = useState<number>(100);
   const loadMoreButton = numTx < (transactions.length || 0);
@@ -137,12 +141,64 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
             </TouchableOpacity>
           )}
         </View>
-        <CurrencyAmount
-          style={{ marginTop: 0, marginBottom: 5 }}
-          price={info.zecPrice}
-          amtZec={totalBalance.total}
-          currency={currency}
-        />
+
+        {currency === 'USD' && (
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <CurrencyAmount
+              style={{ marginTop: 0, marginBottom: 5 }}
+              price={zecPrice}
+              amtZec={totalBalance.total}
+              currency={currency}
+            />
+            {!refreshSure && (
+              <TouchableOpacity onPress={() => setRefreshSure(true)}>
+                <View
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: colors.card,
+                    borderRadius: 10,
+                    margin: 0,
+                    padding: 0,
+                    marginLeft: 0,
+                    minWidth: 48,
+                    minHeight: 48,
+                  }}>
+                  <FontAwesomeIcon icon={faRefresh} size={20} color={colors.primary} />
+                </View>
+              </TouchableOpacity>
+            )}
+            {refreshSure && (
+              <TouchableOpacity
+                onPress={async () => {
+                  setZecPrice(await RPC.rpc_getZecPrice());
+                  setRefreshSure(false);
+                }}>
+                <View
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: 'red',
+                    borderRadius: 10,
+                    margin: 0,
+                    padding: 5,
+                    marginLeft: 5,
+                    minWidth: 48,
+                    minHeight: 48,
+                    borderColor: colors.primary,
+                    borderWidth: 1,
+                  }}>
+                  <FontAwesomeIcon icon={faRefresh} size={20} color={colors.primary} style={{ marginRight: 5 }} />
+                  <RegText color={colors.primary}>{translate('transactions.sure')}</RegText>
+                </View>
+              </TouchableOpacity>
+            )}
+          </View>
+        )}
 
         {showShieldButton && (
           <View style={{ margin: 5 }}>
@@ -326,12 +382,63 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
               size={36}
               amtZec={totalBalance.total}
             />
-            <CurrencyAmount
-              style={{ marginTop: 0, marginBottom: 5 }}
-              price={info.zecPrice}
-              amtZec={totalBalance.total}
-              currency={currency}
-            />
+            {currency === 'USD' && (
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <CurrencyAmount
+                  style={{ marginTop: 0, marginBottom: 5 }}
+                  price={zecPrice}
+                  amtZec={totalBalance.total}
+                  currency={currency}
+                />
+                {!refreshSure && (
+                  <TouchableOpacity onPress={() => setRefreshSure(true)}>
+                    <View
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        backgroundColor: colors.card,
+                        borderRadius: 10,
+                        margin: 0,
+                        padding: 0,
+                        marginLeft: 0,
+                        minWidth: 48,
+                        minHeight: 48,
+                      }}>
+                      <FontAwesomeIcon icon={faRefresh} size={20} color={colors.primary} />
+                    </View>
+                  </TouchableOpacity>
+                )}
+                {refreshSure && (
+                  <TouchableOpacity
+                    onPress={async () => {
+                      setZecPrice(await RPC.rpc_getZecPrice());
+                      setRefreshSure(false);
+                    }}>
+                    <View
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        backgroundColor: 'red',
+                        borderRadius: 10,
+                        margin: 0,
+                        padding: 5,
+                        marginLeft: 5,
+                        minWidth: 48,
+                        minHeight: 48,
+                        borderColor: colors.primary,
+                        borderWidth: 1,
+                      }}>
+                      <FontAwesomeIcon icon={faRefresh} size={20} color={colors.primary} style={{ marginRight: 5 }} />
+                      <RegText color={colors.primary}>{translate('transactions.sure')}</RegText>
+                    </View>
+                  </TouchableOpacity>
+                )}
+              </View>
+            )}
           </View>
 
           {showShieldButton && (

@@ -254,7 +254,8 @@
     "title-acc": "Pantalla del Monedero",
     "list-acc": "Lista de Transacciones",
     "pools": "grupos...",
-    "transactions": "Transacciones"
+    "transactions": "Transacciones",
+    "sure": "¿Seguro? "
   },
   "report": {
     "title": "Informe de Sincronización",

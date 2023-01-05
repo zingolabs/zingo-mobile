@@ -99,6 +99,8 @@ export default interface AppStateLoaded {
   language: 'en' | 'es';
   currency: 'USD' | '';
 
+  zecPrice: number;
+
   translate: (key: string, config?: TranslateOptions) => string;
 
   // eslint-disable-next-line semi

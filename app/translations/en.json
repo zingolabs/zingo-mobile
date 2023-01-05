@@ -254,7 +254,8 @@
     "title-acc": "Wallet Screen",
     "list-acc": "Transactions' List",
     "pools": "pools...",
-    "transactions": "Transactions"
+    "transactions": "Transactions",
+    "sure": "Sure? "
   },
   "report": {
     "title": "Sync / Rescan Report",

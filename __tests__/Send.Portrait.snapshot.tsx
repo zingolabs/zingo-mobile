@@ -96,7 +96,7 @@ describe('Component Send - test', () => {
     };
     state.currency = 'USD';
     state.info.currencyName = 'ZEC';
-    state.info.zecPrice = 33.33;
+    state.zecPrice = 33.33;
     state.info.defaultFee = 1000;
     state.totalBalance.total = 1.12345678;
     state.totalBalance.orchardBal = 0.6;
@@ -121,6 +121,7 @@ describe('Component Send - test', () => {
           setComputingModalVisible={onFunction}
           poolsMoreInfoOnClick={onFunction}
           syncingStatusMoreInfoOnClick={onFunction}
+          setZecPrice={onFunction}
         />
       </ContextLoadedProvider>,
     );

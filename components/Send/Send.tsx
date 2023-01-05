@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useRef, useCallback, useContext } from 'react';
 import { View, ScrollView, Modal, Image, Alert, Keyboard, TextInput, TouchableOpacity } from 'react-native';
-import { faQrcode, faCheck, faInfo } from '@fortawesome/free-solid-svg-icons';
+import { faQrcode, faCheck, faInfo, faRefresh } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme } from '@react-navigation/native';
 import Toast from 'react-native-simple-toast';
@@ -9,6 +9,7 @@ import { getNumberFormatSettings } from 'react-native-localize';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
 import Animated, { EasingNode } from 'react-native-reanimated';
 
+import RPC from '../../app/rpc';
 import FadeText from '../Components/FadeText';
 import ErrorText from '../Components/ErrorText';
 import RegText from '../Components/RegText';
@@ -33,6 +34,7 @@ type SendProps = {
   setComputingModalVisible: (visible: boolean) => void;
   syncingStatusMoreInfoOnClick: () => void;
   poolsMoreInfoOnClick: () => void;
+  setZecPrice: (p: number) => void;
 };
 
 const Send: React.FunctionComponent<SendProps> = ({
@@ -44,9 +46,11 @@ const Send: React.FunctionComponent<SendProps> = ({
   setComputingModalVisible,
   syncingStatusMoreInfoOnClick,
   poolsMoreInfoOnClick,
+  setZecPrice,
 }) => {
   const context = useContext(ContextLoaded);
-  const { translate, dimensions, info, totalBalance, sendPageState, syncingStatus, navigation, currency } = context;
+  const { translate, dimensions, info, totalBalance, sendPageState, syncingStatus, navigation, currency, zecPrice } =
+    context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [qrcodeModalVisble, setQrcodeModalVisible] = useState(false);
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
@@ -55,6 +59,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [validAddress, setValidAddress] = useState(0); // 1 - OK, 0 - Empty, -1 - KO
   const [validAmount, setValidAmount] = useState(0); // 1 - OK, 0 - Empty, -1 - KO
   const [sendButtonEnabled, setSendButtonEnabled] = useState(false);
+  const [refreshSure, setRefreshSure] = useState(false);
 
   const slideAnim = useRef(new Animated.Value(0)).current;
   const defaultFee = info.defaultFee || Utils.getFallbackDefaultFee();
@@ -252,8 +257,8 @@ const Send: React.FunctionComponent<SendProps> = ({
       toAddr.amount = amount.replace(decimalSeparator, '.').substring(0, 20);
       if (isNaN(Number(toAddr.amount))) {
         toAddr.amountCurrency = '';
-      } else if (toAddr.amount && info.zecPrice) {
-        toAddr.amountCurrency = Utils.toLocaleFloat((parseFloat(toAddr.amount) * info.zecPrice).toFixed(2));
+      } else if (toAddr.amount && zecPrice) {
+        toAddr.amountCurrency = Utils.toLocaleFloat((parseFloat(toAddr.amount) * zecPrice).toFixed(2));
       } else {
         toAddr.amountCurrency = '';
       }
@@ -264,8 +269,8 @@ const Send: React.FunctionComponent<SendProps> = ({
       toAddr.amountCurrency = amountCurrency.replace(decimalSeparator, '.').substring(0, 15);
       if (isNaN(Number(toAddr.amountCurrency))) {
         toAddr.amount = '';
-      } else if (toAddr.amountCurrency && info.zecPrice) {
-        toAddr.amount = Utils.toLocaleFloat(Utils.maxPrecisionTrimmed(parseFloat(amountCurrency) / info.zecPrice));
+      } else if (toAddr.amountCurrency && zecPrice) {
+        toAddr.amount = Utils.toLocaleFloat(Utils.maxPrecisionTrimmed(parseFloat(amountCurrency) / zecPrice));
       } else {
         toAddr.amount = '';
       }
@@ -418,12 +423,63 @@ const Send: React.FunctionComponent<SendProps> = ({
                 </TouchableOpacity>
               )}
             </View>
-            <CurrencyAmount
-              style={{ marginTop: 0, marginBottom: 5 }}
-              price={info.zecPrice}
-              amtZec={totalBalance.total}
-              currency={currency}
-            />
+            {currency === 'USD' && (
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <CurrencyAmount
+                  style={{ marginTop: 0, marginBottom: 5 }}
+                  price={zecPrice}
+                  amtZec={totalBalance.total}
+                  currency={currency}
+                />
+                {!refreshSure && (
+                  <TouchableOpacity onPress={() => setRefreshSure(true)}>
+                    <View
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        backgroundColor: colors.card,
+                        borderRadius: 10,
+                        margin: 0,
+                        padding: 0,
+                        marginLeft: 0,
+                        minWidth: 48,
+                        minHeight: 48,
+                      }}>
+                      <FontAwesomeIcon icon={faRefresh} size={20} color={colors.primary} />
+                    </View>
+                  </TouchableOpacity>
+                )}
+                {refreshSure && (
+                  <TouchableOpacity
+                    onPress={async () => {
+                      setZecPrice(await RPC.rpc_getZecPrice());
+                      setRefreshSure(false);
+                    }}>
+                    <View
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        backgroundColor: 'red',
+                        borderRadius: 10,
+                        margin: 0,
+                        padding: 5,
+                        marginLeft: 5,
+                        minWidth: 48,
+                        minHeight: 48,
+                        borderColor: colors.primary,
+                        borderWidth: 1,
+                      }}>
+                      <FontAwesomeIcon icon={faRefresh} size={20} color={colors.primary} style={{ marginRight: 5 }} />
+                      <RegText color={colors.primary}>{translate('transactions.sure')}</RegText>
+                    </View>
+                  </TouchableOpacity>
+                )}
+              </View>
+            )}
 
             <View
               style={{
@@ -829,12 +885,68 @@ const Send: React.FunctionComponent<SendProps> = ({
                   size={36}
                   amtZec={totalBalance.total}
                 />
-                <CurrencyAmount
-                  style={{ marginTop: 0, marginBottom: 5 }}
-                  price={info.zecPrice}
-                  amtZec={totalBalance.total}
-                  currency={currency}
-                />
+                {currency === 'USD' && (
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <CurrencyAmount
+                      style={{ marginTop: 0, marginBottom: 5 }}
+                      price={zecPrice}
+                      amtZec={totalBalance.total}
+                      currency={currency}
+                    />
+                    {!refreshSure && (
+                      <TouchableOpacity onPress={() => setRefreshSure(true)}>
+                        <View
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            backgroundColor: colors.card,
+                            borderRadius: 10,
+                            margin: 0,
+                            padding: 0,
+                            marginLeft: 0,
+                            minWidth: 48,
+                            minHeight: 48,
+                          }}>
+                          <FontAwesomeIcon icon={faRefresh} size={20} color={colors.primary} />
+                        </View>
+                      </TouchableOpacity>
+                    )}
+                    {refreshSure && (
+                      <TouchableOpacity
+                        onPress={async () => {
+                          setZecPrice(await RPC.rpc_getZecPrice());
+                          setRefreshSure(false);
+                        }}>
+                        <View
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            backgroundColor: 'red',
+                            borderRadius: 10,
+                            margin: 0,
+                            padding: 5,
+                            marginLeft: 5,
+                            minWidth: 48,
+                            minHeight: 48,
+                            borderColor: colors.primary,
+                            borderWidth: 1,
+                          }}>
+                          <FontAwesomeIcon
+                            icon={faRefresh}
+                            size={20}
+                            color={colors.primary}
+                            style={{ marginRight: 5 }}
+                          />
+                          <RegText color={colors.primary}>{translate('transactions.sure')}</RegText>
+                        </View>
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                )}
               </View>
 
               <View style={{ width: '100%', height: 1, backgroundColor: colors.primary, marginTop: 5 }} />
