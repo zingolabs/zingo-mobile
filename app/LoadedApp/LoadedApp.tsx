@@ -324,7 +324,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   };
 
   setZecPrice = (newZecPrice: number) => {
-    console.log(this.state.zecPrice, newZecPrice);
+    //console.log(this.state.zecPrice, newZecPrice);
     if (!isEqual(this.state.zecPrice, newZecPrice)) {
       this.setState({ zecPrice: newZecPrice });
     }

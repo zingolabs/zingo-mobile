@@ -46,6 +46,12 @@ jest.mock('moment', () => {
 jest.mock('moment/locale/es', () => () => ({
   defineLocale: jest.fn(),
 }));
+jest.mock('react-native-gesture-handler', () => {
+  const View = require('react-native').View;
+  return {
+    TouchableOpacity: View,
+  };
+});
 
 // test suite
 describe('Component Transactions - test', () => {

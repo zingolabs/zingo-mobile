@@ -96,7 +96,7 @@ export default class RPC {
 
   static async rpc_getZecPrice(): Promise<number> {
     const resultStr: string = await RPCModule.execute('updatecurrentprice', '');
-    console.log(resultStr);
+    //console.log(resultStr);
 
     if (resultStr) {
       if (resultStr.toLowerCase().startsWith('error')) {
