@@ -66,7 +66,7 @@ describe('Component Legacy - test', () => {
       scale: 2.5,
     };
     state.info.currencyName = 'ZEC';
-    state.info.zecPrice = 33.33;
+    state.zecPrice = 33.33;
     state.totalBalance.total = 1.12345678;
     const onFunction = jest.fn();
     const legacy = render(

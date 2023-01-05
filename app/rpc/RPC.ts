@@ -31,12 +31,9 @@ export default class RPC {
   fnSetTotalBalance: (totalBalance: TotalBalanceClass) => void;
   fnSetTransactionsList: (txList: TransactionType[]) => void;
   fnSetAllAddresses: (allAddresses: AddressClass[]) => void;
-  fnSetZecPrice: (price: number) => void;
   fnSetRefreshUpdates: (inProgress: boolean, progress: number, blocks: string) => void;
   fnSetWalletSettings: (settings: WalletSettingsClass) => void;
   translate: (key: string, config?: TranslateOptions) => string;
-
-  currency: 'USD' | '';
 
   refreshTimerID: number;
   updateTimerID?: number;
@@ -65,10 +62,8 @@ export default class RPC {
     fnSetAllAddresses: (addresses: AddressClass[]) => void,
     fnSetWalletSettings: (settings: WalletSettingsClass) => void,
     fnSetInfo: (info: InfoType) => void,
-    fnSetZecPrice: (price: number) => void,
     fnSetRefreshUpdates: (inProgress: boolean, progress: number, blocks: string) => void,
     translate: (key: string, config?: TranslateOptions) => string,
-    currency: 'USD' | '',
   ) {
     this.fnSetSyncingStatusReport = fnSetSyncingStatusReport;
     this.fnSetTotalBalance = fnSetTotalBalance;
@@ -76,11 +71,8 @@ export default class RPC {
     this.fnSetAllAddresses = fnSetAllAddresses;
     this.fnSetWalletSettings = fnSetWalletSettings;
     this.fnSetInfo = fnSetInfo;
-    this.fnSetZecPrice = fnSetZecPrice;
     this.fnSetRefreshUpdates = fnSetRefreshUpdates;
     this.translate = translate;
-
-    this.currency = currency;
 
     this.refreshTimerID = 0;
 
@@ -100,6 +92,22 @@ export default class RPC {
     this.batches = 0;
     this.message = '';
     this.process_end_block = -1;
+  }
+
+  static async rpc_getZecPrice(): Promise<number> {
+    const resultStr: string = await RPCModule.execute('updatecurrentprice', '');
+    console.log(resultStr);
+
+    if (resultStr) {
+      if (resultStr.toLowerCase().startsWith('error')) {
+        //console.log(`Error fetching price ${resultStr}`);
+        return 0;
+      } else {
+        return parseFloat(resultStr);
+      }
+    }
+
+    return 0;
   }
 
   static async rpc_setWalletSettingOption(name: string, value: string): Promise<string> {
@@ -134,7 +142,6 @@ export default class RPC {
         verificationProgress: 1,
         currencyName: infoJSON.chain_name === 'main' || infoJSON.chain_name === 'mainnet' ? 'ZEC' : 'TAZ',
         solps: 0,
-        zecPrice: 0,
         defaultFee: defaultFeeJSON?.defaultfee / 10 ** 8 || Utils.getFallbackDefaultFee(),
       };
 
@@ -401,7 +408,6 @@ export default class RPC {
   async loadWalletData() {
     await this.fetchTotalBalance();
     await this.fetchTandZandOTransactions();
-    await this.getZecPrice();
     await this.fetchWalletSettings();
     await this.fetchInfo();
   }
@@ -1106,23 +1112,6 @@ export default class RPC {
     });
 
     return sendTxPromise;
-  }
-
-  async getZecPrice() {
-    if (this.currency === 'USD') {
-      const resultStr: string = await RPCModule.execute('updatecurrentprice', '');
-
-      if (resultStr) {
-        if (resultStr.toLowerCase().startsWith('error')) {
-          //console.log(`Error fetching price ${resultStr}`);
-          return;
-        }
-
-        this.fnSetZecPrice(parseFloat(resultStr));
-      }
-    }
-
-    return;
   }
 
   async changeWallet() {

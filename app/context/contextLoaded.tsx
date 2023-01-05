@@ -60,6 +60,8 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   currency: '',
   language: 'en',
 
+  zecPrice: 0,
+
   translate: () => '',
 };
 

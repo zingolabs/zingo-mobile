@@ -27,7 +27,7 @@ type TxDetailProps = {
 
 const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) => {
   const context = useContext(ContextLoaded);
-  const { info, translate, language, currency } = context;
+  const { info, translate, language } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const spendColor =
     tx.confirmations === 0 ? colors.primaryDisabled : (tx.amount || 0) > 0 ? colors.primary : colors.text;
@@ -90,7 +90,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
             {!!tx.type && (tx.type === 'sent' ? translate('transactions.sent') : translate('transactions.receive'))}
           </RegText>
           <ZecAmount currencyName={info.currencyName ? info.currencyName : ''} size={36} amtZec={tx.amount} />
-          <CurrencyAmount amtZec={tx.amount} price={tx.zec_price} currency={currency} />
+          <CurrencyAmount amtZec={tx.amount} price={tx.zec_price} currency={'USD'} />
         </View>
 
         <View style={{ margin: 10 }}>
@@ -171,14 +171,14 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
                       style={{ fontSize: 18 }}
                       amtZec={txd.amount}
                       price={tx.zec_price}
-                      currency={currency}
+                      currency={'USD'}
                     />
                   </View>
                   <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
                     <ZecPrice
-                      price={tx.zec_price ? tx.zec_price : 0}
+                      price={tx.zec_price}
                       currencyName={info.currencyName ? info.currencyName : ''}
-                      currency={currency}
+                      currency={'USD'}
                     />
                   </View>
                 </View>
@@ -206,7 +206,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
               <FadeText>{translate('transactions.txfee')}</FadeText>
               <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                 <ZecAmount amtZec={fee} size={18} currencyName={'ᙇ'} />
-                <CurrencyAmount style={{ fontSize: 18 }} amtZec={fee} price={tx.zec_price} currency={currency} />
+                <CurrencyAmount style={{ fontSize: 18 }} amtZec={fee} price={tx.zec_price} currency={'USD'} />
               </View>
             </View>
           )}

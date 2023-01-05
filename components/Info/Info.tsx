@@ -1,8 +1,9 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext } from 'react';
-import { View, ScrollView, SafeAreaView, Image } from 'react-native';
+import React, { useContext, useState } from 'react';
+import { View, ScrollView, SafeAreaView, Image, TouchableOpacity } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
+import RPC from '../../app/rpc';
 import RegText from '../Components/RegText';
 import ZecAmount from '../Components/ZecAmount';
 import Button from '../Button';
@@ -10,15 +11,19 @@ import Utils from '../../app/utils';
 import DetailLine from './components/DetailLine';
 import { ThemeType } from '../../app/types';
 import { ContextLoaded } from '../../app/context';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faRefresh } from '@fortawesome/free-solid-svg-icons';
 
 type InfoProps = {
   closeModal: () => void;
+  setZecPrice: (p: number) => void;
 };
 
-const Info: React.FunctionComponent<InfoProps> = ({ closeModal }) => {
+const Info: React.FunctionComponent<InfoProps> = ({ closeModal, setZecPrice }) => {
   const context = useContext(ContextLoaded);
-  const { info, totalBalance, translate, currency } = context;
+  const { info, totalBalance, translate, currency, zecPrice } = context;
   const { colors } = useTheme() as unknown as ThemeType;
+  const [refreshSure, setRefreshSure] = useState(false);
 
   return (
     <SafeAreaView
@@ -90,16 +95,65 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal }) => {
             value={info.latestBlock ? info.latestBlock.toString() : translate('loading')}
           />
           {currency === 'USD' && (
-            <DetailLine
-              label={translate('info.zecprice')}
-              value={
-                info.zecPrice > 0
-                  ? `$ ${Utils.toLocaleFloat(info.zecPrice.toFixed(2))} ${currency} per ${
-                      info.currencyName ? info.currencyName : '---'
-                    }`
-                  : `$ -- ${currency} per ${info.currencyName ? info.currencyName : '---'}`
-              }
-            />
+            <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
+              <DetailLine
+                label={translate('info.zecprice')}
+                value={
+                  zecPrice > 0
+                    ? `$ ${Utils.toLocaleFloat(zecPrice.toFixed(2))} ${currency} per ${
+                        info.currencyName ? info.currencyName : '---'
+                      }`
+                    : `$ -- ${currency} per ${info.currencyName ? info.currencyName : '---'}`
+                }
+              />
+              {!refreshSure && (
+                <TouchableOpacity onPress={() => setRefreshSure(true)}>
+                  <View
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backgroundColor: colors.card,
+                      borderRadius: 10,
+                      margin: 0,
+                      padding: 0,
+                      marginLeft: 0,
+                      minWidth: 48,
+                      minHeight: 48,
+                    }}>
+                    <FontAwesomeIcon icon={faRefresh} size={20} color={colors.primary} />
+                  </View>
+                </TouchableOpacity>
+              )}
+              {refreshSure && (
+                <TouchableOpacity
+                  onPress={async () => {
+                    setZecPrice(await RPC.rpc_getZecPrice());
+                    setRefreshSure(false);
+                  }}>
+                  <View
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backgroundColor: 'red',
+                      borderRadius: 10,
+                      margin: 0,
+                      padding: 5,
+                      marginLeft: 5,
+                      minWidth: 48,
+                      minHeight: 48,
+                      borderColor: colors.primary,
+                      borderWidth: 1,
+                    }}>
+                    <FontAwesomeIcon icon={faRefresh} size={20} color={colors.primary} style={{ marginRight: 5 }} />
+                    <RegText color={colors.primary}>{translate('transactions.sure')}</RegText>
+                  </View>
+                </TouchableOpacity>
+              )}
+            </View>
           )}
         </View>
       </ScrollView>

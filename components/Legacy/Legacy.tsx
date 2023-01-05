@@ -27,7 +27,7 @@ type LegacyProps = {
 
 const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance, toggleMenuDrawer, startRescan }) => {
   const context = useContext(ContextLoaded);
-  const { translate, dimensions, info, addresses, totalBalance, uaAddress, currency } = context;
+  const { translate, dimensions, info, addresses, totalBalance, uaAddress, currency, zecPrice } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [index, setIndex] = useState(0);
   const [routes] = useState([
@@ -354,7 +354,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance, toggl
             />
             <CurrencyAmount
               style={{ marginTop: 0, marginBottom: 5, opacity: 0.5 }}
-              price={info.zecPrice}
+              price={zecPrice}
               amtZec={totalBalance.total}
               currency={currency}
             />
@@ -489,7 +489,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance, toggl
             />
             <CurrencyAmount
               style={{ marginTop: 0, marginBottom: 5, opacity: 0.5 }}
-              price={info.zecPrice}
+              price={zecPrice}
               amtZec={totalBalance.total}
               currency={currency}
             />

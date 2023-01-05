@@ -210,10 +210,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       this.setAllAddresses,
       this.setWalletSettings,
       this.setInfo,
-      this.setZecPrice,
       this.refreshUpdates,
       props.translate,
-      props.currency,
     );
 
     this.dim = {} as EmitterSubscription;
@@ -325,15 +323,10 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     this.setSendPageState(newState);
   };
 
-  setZecPrice = (price: number) => {
-    //console.log(`Price = ${price}`);
-    const { info } = this.state;
-
-    const newInfo = Object.assign({}, info);
-    newInfo.zecPrice = price;
-
-    if (!isEqual(this.state.info, newInfo)) {
-      this.setState({ info: newInfo });
+  setZecPrice = (newZecPrice: number) => {
+    console.log(this.state.zecPrice, newZecPrice);
+    if (!isEqual(this.state.zecPrice, newZecPrice)) {
+      this.setState({ zecPrice: newZecPrice });
     }
   };
 
@@ -350,12 +343,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   };
 
   setInfo = (newInfo: InfoType) => {
-    // If the price is not set in this object, copy it over from the current object
-    const { info } = this.state;
-    if (info.zecPrice && !newInfo.zecPrice) {
-      newInfo.zecPrice = info.zecPrice;
-    }
-
     if (!isEqual(this.state.info, newInfo)) {
       this.setState({ info: newInfo });
     }
@@ -772,7 +759,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                   <Text>{translate('loading')}</Text>
                 </View>
               }>
-              <Info closeModal={() => this.setState({ infoModalVisible: false })} />
+              <Info closeModal={() => this.setState({ infoModalVisible: false })} setZecPrice={this.setZecPrice} />
             </Suspense>
           </Modal>
 
@@ -963,6 +950,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                       setComputingModalVisible={this.setComputingModalVisible}
                       syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
                       poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
+                      setZecPrice={this.setZecPrice}
                     />
                   </Suspense>
                 </>
@@ -986,6 +974,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                       setComputingModalVisible={this.setComputingModalVisible}
                       syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
                       poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
+                      setZecPrice={this.setZecPrice}
                     />
                   </Suspense>
                 </>
@@ -1007,6 +996,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                       syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
                       poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
                       startRescan={this.startRescan}
+                      setZecPrice={this.setZecPrice}
                     />
                   </Suspense>
                 </>

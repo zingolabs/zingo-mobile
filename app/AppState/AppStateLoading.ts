@@ -23,6 +23,8 @@ export default interface AppStateLoading {
   currency: 'USD' | '';
   language: 'en' | 'es';
 
+  zecPrice: number;
+
   translate: (key: string, config?: TranslateOptions) => string;
 
   // eslint-disable-next-line semi
