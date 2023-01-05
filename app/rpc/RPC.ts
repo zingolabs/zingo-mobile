@@ -534,26 +534,26 @@ export default class RPC {
         if (synced_blocks < 0) {
           synced_blocks = 0;
         }
-        if (synced_blocks > 1000) {
-          synced_blocks = 1000;
+        if (synced_blocks > 100) {
+          synced_blocks = 100;
         }
         if (trial_decryptions_blocks < 0) {
           trial_decryptions_blocks = 0;
         }
-        if (trial_decryptions_blocks > 1000) {
-          trial_decryptions_blocks = 1000;
+        if (trial_decryptions_blocks > 100) {
+          trial_decryptions_blocks = 100;
         }
         if (txn_scan_blocks < 0) {
           txn_scan_blocks = 0;
         }
-        if (txn_scan_blocks > 1000) {
-          txn_scan_blocks = 1000;
+        if (txn_scan_blocks > 100) {
+          txn_scan_blocks = 100;
         }
         if (witnesses_updated < 0) {
           witnesses_updated = 0;
         }
-        if (witnesses_updated > 1000) {
-          witnesses_updated = 1000;
+        if (witnesses_updated > 100) {
+          witnesses_updated = 100;
         }
 
         const batch_total: number = ss.batch_total || 0;
@@ -566,7 +566,7 @@ export default class RPC {
         //const progress_blocks: number = (synced_blocks + trial_decryptions_blocks + txn_scan_blocks) / 3;
         const progress_blocks: number = (synced_blocks + trial_decryptions_blocks + witnesses_updated) / 3;
 
-        const total_progress_blocks: number = batch_total === 1 ? progress_blocks : 1000 * batch_num + progress_blocks;
+        const total_progress_blocks: number = batch_total === 1 ? progress_blocks : 100 * batch_num + progress_blocks;
 
         let progress: number = (total_progress_blocks * 100) / total_general_blocks;
 
@@ -614,7 +614,7 @@ export default class RPC {
           currentBlock: parseInt(current_block.toFixed(0), 10),
           inProgress: ss.in_progress,
           lastError: ss.last_error,
-          blocksPerBatch: 1000,
+          blocksPerBatch: 100,
           secondsPerBatch: this.seconds_batch,
           percent: progress,
           message: this.message,
@@ -657,7 +657,7 @@ export default class RPC {
             currentBlock: parseInt(current_block.toFixed(0), 10),
             inProgress: false,
             lastError: ss.last_error,
-            blocksPerBatch: 1000,
+            blocksPerBatch: 100,
             secondsPerBatch: 0,
             percent: 0,
             message: this.message,
@@ -693,7 +693,7 @@ export default class RPC {
                 currentBlock: parseInt(current_block.toFixed(0), 10),
                 inProgress: ss.in_progress,
                 lastError: ss.last_error,
-                blocksPerBatch: 1000,
+                blocksPerBatch: 100,
                 secondsPerBatch: this.seconds_batch,
                 percent: progress,
                 message: this.message,
@@ -732,7 +732,7 @@ export default class RPC {
               currentBlock: parseInt(current_block.toFixed(0), 10),
               inProgress: ss.in_progress,
               lastError: ss.last_error,
-              blocksPerBatch: 1000,
+              blocksPerBatch: 100,
               secondsPerBatch: this.seconds_batch,
               percent: progress,
               message: this.message,

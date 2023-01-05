@@ -2,7 +2,7 @@ export default class SyncingStatusReportClass {
   // sync ID
   syncID: number;
 
-  // total of batches to process (usually 1000 blocks per batch)
+  // total of batches to process (usually 1000 or 100 blocks per batch)
   totalBatches: number;
 
   // batch that is processing now
@@ -35,7 +35,7 @@ export default class SyncingStatusReportClass {
     this.syncID = 0;
     this.totalBatches = 0;
     this.currentBatch = 0;
-    this.blocksPerBatch = 1000; // this is set in zingolib
+    this.blocksPerBatch = 100; // this is set in zingolib
     this.lastBlockWallet = 0;
     this.currentBlock = 0;
     this.inProgress = false;
