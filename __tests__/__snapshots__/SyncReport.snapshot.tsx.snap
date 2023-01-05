@@ -712,7 +712,7 @@ exports[`Component SyncReport - test Matches the snapshot SyncReport 1`] = `
               ]
             }
           >
-            1000
+            100
           </Text>
         </View>
         <View
