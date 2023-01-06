@@ -192,7 +192,8 @@
     "zec-acc": "Campo de Cantidad en Zcash",
     "usd-acc": "Campo de Cantidad en Dólares",
     "memo-acc": "Campo del Memorándum",
-    "amountplaceholder": "numero"
+    "amountplaceholder": "numero",
+    "nofetchprice": "Precio no consultado todavía"
   },
   "legacy": {
     "o-title": "U-Orchard",

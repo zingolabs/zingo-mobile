@@ -716,6 +716,27 @@ const Send: React.FunctionComponent<SendProps> = ({
                     </View>
                   </View>
 
+                  {currency === 'USD' && zecPrice.zecPrice <= 0 && (
+                    <View
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'flex-start',
+                        width: '35%',
+                      }}>
+                      <View
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          justifyContent: 'flex-start',
+                        }}>
+                        <RegText style={{ marginTop: 15, marginRight: 5, color: colors.primary }}>
+                          {translate('send.nofetchprice')}
+                        </RegText>
+                      </View>
+                    </View>
+                  )}
+
                   {currency === 'USD' && zecPrice.zecPrice > 0 && (
                     <View
                       style={{
@@ -1288,6 +1309,27 @@ const Send: React.FunctionComponent<SendProps> = ({
                         )}
                       </View>
                     </View>
+
+                    {currency === 'USD' && zecPrice.zecPrice <= 0 && (
+                      <View
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'flex-start',
+                          width: '35%',
+                        }}>
+                        <View
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            justifyContent: 'flex-start',
+                          }}>
+                          <RegText style={{ marginTop: 15, marginRight: 5, color: colors.primary }}>
+                            {translate('send.nofetchprice')}
+                          </RegText>
+                        </View>
+                      </View>
+                    )}
 
                     {currency === 'USD' && zecPrice.zecPrice > 0 && (
                       <View
