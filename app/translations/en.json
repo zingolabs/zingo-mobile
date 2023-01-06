@@ -193,7 +193,7 @@
     "usd-acc": "USD Amount Field",
     "memo-acc": "Memo Field",
     "amountplaceholder": "number",
-    "nofetchprice": "No fetched price already"
+    "nofetchprice": "No fetched price"
   },
   "legacy": {
     "o-title": "U-Orchard",
@@ -256,7 +256,8 @@
     "list-acc": "Transactions' List",
     "pools": "pools...",
     "transactions": "Transactions",
-    "sure": "Sure? "
+    "sure": "Sure? ",
+    "minago": "min. ago"
   },
   "report": {
     "title": "Sync / Rescan Report",

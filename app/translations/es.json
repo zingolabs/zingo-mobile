@@ -193,7 +193,7 @@
     "usd-acc": "Campo de Cantidad en Dólares",
     "memo-acc": "Campo del Memorándum",
     "amountplaceholder": "numero",
-    "nofetchprice": "Precio no consultado todavía"
+    "nofetchprice": "Precio no consultado"
   },
   "legacy": {
     "o-title": "U-Orchard",
@@ -256,7 +256,8 @@
     "list-acc": "Lista de Transacciones",
     "pools": "grupos...",
     "transactions": "Transacciones",
-    "sure": "¿Seguro? "
+    "sure": "¿Seguro? ",
+    "minago": "min. atrás"
   },
   "report": {
     "title": "Informe de Sincronización",
