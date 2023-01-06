@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useState, ReactNode } from 'react';
+import React, { useContext, useState, ReactNode, useEffect } from 'react';
 import { View, Image, Modal, TouchableOpacity } from 'react-native';
 import { TabView, TabBar, SceneRendererProps, Route, NavigationState } from 'react-native-tab-view';
 import Toast from 'react-native-simple-toast';
@@ -19,6 +19,7 @@ import ImportKey from '../ImportKey';
 import SingleAddress from './components/SingleAddress';
 import { ThemeType } from '../../app/types';
 import { ContextLoaded } from '../../app/context';
+import moment from 'moment';
 
 type ReceiveProps = {
   fetchTotalBalance: () => void;
@@ -27,7 +28,7 @@ type ReceiveProps = {
   startRescan: () => void;
   syncingStatusMoreInfoOnClick: () => void;
   poolsMoreInfoOnClick: () => void;
-  setZecPrice: (p: number) => void;
+  setZecPrice: (p: number, d: number) => void;
 };
 
 const Receive: React.FunctionComponent<ReceiveProps> = ({
@@ -46,6 +47,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   const [index, setIndex] = useState(0);
   const [routes] = useState([{ key: 'uaddr', title: translate('receive.u-title') }]);
   const [refreshSure, setRefreshSure] = useState(false);
+  const [refreshMinutes, setRefreshMinutes] = useState(0);
 
   const [displayAddress, setDisplayAddress] = useState(uaAddress);
   const [oindex, setOIndex] = useState(0);
@@ -201,6 +203,21 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
 
   const syncStatusDisplayLine = syncingStatus.inProgress ? `(${syncingStatus.blocks})` : '';
 
+  useEffect(() => {
+    const fn = () => {
+      if (zecPrice.date > 0) {
+        const date1 = moment();
+        const date2 = moment(zecPrice.date);
+        setRefreshMinutes(date1.diff(date2, 'minutes'));
+      }
+    };
+
+    fn();
+    const inter = setInterval(fn, 5000);
+
+    return () => clearInterval(inter);
+  }, [zecPrice.date]);
+
   const renderScene: (
     props: SceneRendererProps & {
       route: Route;
@@ -327,7 +344,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <CurrencyAmount
                   style={{ marginTop: 0, marginBottom: 5, opacity: 0.5 }}
-                  price={zecPrice}
+                  price={zecPrice.zecPrice}
                   amtZec={totalBalance.total}
                   currency={currency}
                 />
@@ -342,20 +359,26 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                         backgroundColor: colors.card,
                         borderRadius: 10,
                         margin: 0,
-                        padding: 0,
+                        padding: 5,
                         marginLeft: 0,
                         minWidth: 48,
                         minHeight: 48,
                       }}>
                       <FontAwesomeIcon icon={faRefresh} size={20} color={colors.primary} />
+                      {refreshMinutes > 0 && (
+                        <FadeText style={{ paddingLeft: 5 }}>
+                          {refreshMinutes.toString() + translate('transactions.minago')}
+                        </FadeText>
+                      )}
                     </View>
                   </TouchableOpacity>
                 )}
                 {refreshSure && (
                   <TouchableOpacity
                     onPress={async () => {
-                      setZecPrice(await RPC.rpc_getZecPrice());
+                      setZecPrice(await RPC.rpc_getZecPrice(), Date.now());
                       setRefreshSure(false);
+                      setRefreshMinutes(0);
                     }}>
                     <View
                       style={{
@@ -577,7 +600,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   <CurrencyAmount
                     style={{ marginTop: 0, marginBottom: 5 }}
-                    price={zecPrice}
+                    price={zecPrice.zecPrice}
                     amtZec={totalBalance.total}
                     currency={currency}
                   />
@@ -592,20 +615,26 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                           backgroundColor: colors.card,
                           borderRadius: 10,
                           margin: 0,
-                          padding: 0,
+                          padding: 5,
                           marginLeft: 0,
                           minWidth: 48,
                           minHeight: 48,
                         }}>
                         <FontAwesomeIcon icon={faRefresh} size={20} color={colors.primary} />
+                        {refreshMinutes > 0 && (
+                          <FadeText style={{ paddingLeft: 5 }}>
+                            {refreshMinutes.toString() + translate('transactions.minago')}
+                          </FadeText>
+                        )}
                       </View>
                     </TouchableOpacity>
                   )}
                   {refreshSure && (
                     <TouchableOpacity
                       onPress={async () => {
-                        setZecPrice(await RPC.rpc_getZecPrice());
+                        setZecPrice(await RPC.rpc_getZecPrice(), Date.now());
                         setRefreshSure(false);
+                        setRefreshMinutes(0);
                       }}>
                       <View
                         style={{

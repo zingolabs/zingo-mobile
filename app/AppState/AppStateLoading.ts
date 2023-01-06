@@ -6,6 +6,7 @@ import TotalBalanceClass from './classes/TotalBalanceClass';
 import InfoType from './types/InfoType';
 import WalletSeedType from './types/WalletSeedType';
 import DimensionsType from './types/DimensionsType';
+import zecPriceType from './types/zecPriceType';
 
 export default interface AppStateLoading {
   navigation: StackScreenProps<any>['navigation'];
@@ -23,7 +24,7 @@ export default interface AppStateLoading {
   currency: 'USD' | '';
   language: 'en' | 'es';
 
-  zecPrice: number;
+  zecPrice: zecPriceType;
 
   translate: (key: string, config?: TranslateOptions) => string;
 

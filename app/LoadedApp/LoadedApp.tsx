@@ -28,6 +28,7 @@ import {
   SendProgressClass,
   WalletSettingsClass,
   AddressClass,
+  zecPriceType,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
@@ -323,10 +324,14 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     this.setSendPageState(newState);
   };
 
-  setZecPrice = (newZecPrice: number) => {
+  setZecPrice = (newZecPrice: number, newDate: number) => {
     //console.log(this.state.zecPrice, newZecPrice);
+    const zecPrice = {
+      zecPrice: newZecPrice,
+      date: newDate,
+    } as zecPriceType;
     if (!isEqual(this.state.zecPrice, newZecPrice)) {
-      this.setState({ zecPrice: newZecPrice });
+      this.setState({ zecPrice });
     }
   };
 

@@ -96,7 +96,7 @@ describe('Component Send - test', () => {
     state.translate = () => 'text translated';
     state.currency = 'USD';
     state.info.currencyName = 'ZEC';
-    state.zecPrice = 33.33;
+    state.zecPrice.zecPrice = 33.33;
     state.info.defaultFee = 1000;
     state.totalBalance.total = 1.12345678;
     state.totalBalance.orchardBal = 0.6;

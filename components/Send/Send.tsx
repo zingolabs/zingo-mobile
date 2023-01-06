@@ -24,6 +24,7 @@ import Scanner from './components/Scanner';
 import Confirm from './components/Confirm';
 import { ThemeType } from '../../app/types';
 import { ContextLoaded } from '../../app/context';
+import moment from 'moment';
 
 type SendProps = {
   setSendPageState: (sendPageState: SendPageStateClass) => void;
@@ -34,7 +35,7 @@ type SendProps = {
   setComputingModalVisible: (visible: boolean) => void;
   syncingStatusMoreInfoOnClick: () => void;
   poolsMoreInfoOnClick: () => void;
-  setZecPrice: (p: number) => void;
+  setZecPrice: (p: number, d: number) => void;
 };
 
 const Send: React.FunctionComponent<SendProps> = ({
@@ -60,6 +61,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [validAmount, setValidAmount] = useState(0); // 1 - OK, 0 - Empty, -1 - KO
   const [sendButtonEnabled, setSendButtonEnabled] = useState(false);
   const [refreshSure, setRefreshSure] = useState(false);
+  const [refreshMinutes, setRefreshMinutes] = useState(0);
 
   const slideAnim = useRef(new Animated.Value(0)).current;
   const defaultFee = info.defaultFee || Utils.getFallbackDefaultFee();
@@ -258,7 +260,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       if (isNaN(Number(toAddr.amount))) {
         toAddr.amountCurrency = '';
       } else if (toAddr.amount && zecPrice) {
-        toAddr.amountCurrency = Utils.toLocaleFloat((parseFloat(toAddr.amount) * zecPrice).toFixed(2));
+        toAddr.amountCurrency = Utils.toLocaleFloat((parseFloat(toAddr.amount) * zecPrice.zecPrice).toFixed(2));
       } else {
         toAddr.amountCurrency = '';
       }
@@ -270,7 +272,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       if (isNaN(Number(toAddr.amountCurrency))) {
         toAddr.amount = '';
       } else if (toAddr.amountCurrency && zecPrice) {
-        toAddr.amount = Utils.toLocaleFloat(Utils.maxPrecisionTrimmed(parseFloat(amountCurrency) / zecPrice));
+        toAddr.amount = Utils.toLocaleFloat(Utils.maxPrecisionTrimmed(parseFloat(amountCurrency) / zecPrice.zecPrice));
       } else {
         toAddr.amount = '';
       }
@@ -328,6 +330,21 @@ const Send: React.FunctionComponent<SendProps> = ({
       }
     });
   };
+
+  useEffect(() => {
+    const fn = () => {
+      if (zecPrice.date > 0) {
+        const date1 = moment();
+        const date2 = moment(zecPrice.date);
+        setRefreshMinutes(date1.diff(date2, 'minutes'));
+      }
+    };
+
+    fn();
+    const inter = setInterval(fn, 5000);
+
+    return () => clearInterval(inter);
+  }, [zecPrice.date]);
 
   //console.log('render send', 'w', dimensions.width, 'h', dimensions.height);
 
@@ -427,7 +444,7 @@ const Send: React.FunctionComponent<SendProps> = ({
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <CurrencyAmount
                   style={{ marginTop: 0, marginBottom: 5 }}
-                  price={zecPrice}
+                  price={zecPrice.zecPrice}
                   amtZec={totalBalance.total}
                   currency={currency}
                 />
@@ -442,20 +459,26 @@ const Send: React.FunctionComponent<SendProps> = ({
                         backgroundColor: colors.card,
                         borderRadius: 10,
                         margin: 0,
-                        padding: 0,
+                        padding: 5,
                         marginLeft: 0,
                         minWidth: 48,
                         minHeight: 48,
                       }}>
                       <FontAwesomeIcon icon={faRefresh} size={20} color={colors.primary} />
+                      {refreshMinutes > 0 && (
+                        <FadeText style={{ paddingLeft: 5 }}>
+                          {refreshMinutes.toString() + translate('transactions.minago')}
+                        </FadeText>
+                      )}
                     </View>
                   </TouchableOpacity>
                 )}
                 {refreshSure && (
                   <TouchableOpacity
                     onPress={async () => {
-                      setZecPrice(await RPC.rpc_getZecPrice());
+                      setZecPrice(await RPC.rpc_getZecPrice(), Date.now());
                       setRefreshSure(false);
+                      setRefreshMinutes(0);
                     }}>
                     <View
                       style={{
@@ -609,70 +632,32 @@ const Send: React.FunctionComponent<SendProps> = ({
                   <View
                     style={{
                       display: 'flex',
-                      flexDirection: 'row',
+                      flexDirection: 'column',
                       justifyContent: 'flex-start',
                       width: '60%',
                     }}>
-                    <RegText style={{ marginTop: 20, marginRight: 5, fontSize: 20 }}>{'\u1647'}</RegText>
-                    <View
-                      accessible={true}
-                      accessibilityLabel={translate('send.zec-acc')}
-                      style={{
-                        flexGrow: 1,
-                        borderWidth: 1,
-                        borderRadius: 5,
-                        borderColor: colors.text,
-                        marginTop: 5,
-                        width: '75%',
-                        minWidth: 48,
-                        minHeight: 48,
-                      }}>
-                      <TextInput
-                        placeholder={`#${decimalSeparator}########`}
-                        placeholderTextColor={colors.placeholder}
-                        keyboardType="numeric"
-                        style={{
-                          color: colors.text,
-                          fontWeight: '600',
-                          fontSize: 18,
-                          minWidth: 48,
-                          minHeight: 48,
-                          marginLeft: 5,
-                        }}
-                        value={ta.amount.toString()}
-                        onChangeText={(text: string) => updateToField(null, text.substring(0, 20), null, null)}
-                        onEndEditing={(e: any) => updateToField(null, e.nativeEvent.text.substring(0, 20), null, null)}
-                        editable={true}
-                        maxLength={20}
-                      />
-                    </View>
-                    <RegText style={{ marginTop: 15, marginRight: 10, marginLeft: 5 }}>ZEC</RegText>
-                  </View>
-
-                  {currency === 'USD' && (
                     <View
                       style={{
                         display: 'flex',
                         flexDirection: 'row',
                         justifyContent: 'flex-start',
-                        width: '35%',
                       }}>
-                      <RegText style={{ marginTop: 15, marginRight: 5 }}>$</RegText>
+                      <RegText style={{ marginTop: 20, marginRight: 5, fontSize: 20 }}>{'\u1647'}</RegText>
                       <View
                         accessible={true}
-                        accessibilityLabel={translate('send.usd-acc')}
+                        accessibilityLabel={translate('send.zec-acc')}
                         style={{
                           flexGrow: 1,
                           borderWidth: 1,
                           borderRadius: 5,
                           borderColor: colors.text,
                           marginTop: 5,
-                          width: '55%',
+                          width: '75%',
                           minWidth: 48,
                           minHeight: 48,
                         }}>
                         <TextInput
-                          placeholder={`#${decimalSeparator}##`}
+                          placeholder={`#${decimalSeparator}########`}
                           placeholderTextColor={colors.placeholder}
                           keyboardType="numeric"
                           style={{
@@ -683,52 +668,195 @@ const Send: React.FunctionComponent<SendProps> = ({
                             minHeight: 48,
                             marginLeft: 5,
                           }}
-                          value={ta.amountCurrency.toString()}
-                          onChangeText={(text: string) => updateToField(null, null, text.substring(0, 15), null)}
+                          value={ta.amount.toString()}
+                          onChangeText={(text: string) => updateToField(null, text.substring(0, 20), null, null)}
                           onEndEditing={(e: any) =>
-                            updateToField(null, null, e.nativeEvent.text.substring(0, 15), null)
+                            updateToField(null, e.nativeEvent.text.substring(0, 20), null, null)
                           }
                           editable={true}
-                          maxLength={15}
+                          maxLength={20}
                         />
                       </View>
-                      <RegText style={{ marginTop: 15, marginLeft: 5 }}>{currency}</RegText>
+                      <RegText style={{ marginTop: 15, marginRight: 10, marginLeft: 5 }}>ZEC</RegText>
                     </View>
-                  )}
-                </View>
 
-                <View style={{ display: 'flex', flexDirection: 'column' }}>
-                  <View
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'row',
-                      justifyContent: 'flex-start',
-                      alignItems: 'center',
-                      marginTop: 10,
-                    }}>
-                    <RegText>{translate('send.spendable')}</RegText>
-                    <ZecAmount
-                      currencyName={info.currencyName ? info.currencyName : ''}
-                      color={stillConfirming ? 'red' : colors.money}
-                      size={18}
-                      amtZec={getMaxAmount()}
-                    />
-                  </View>
-                  {stillConfirming && (
-                    <TouchableOpacity onPress={() => poolsMoreInfoOnClick()}>
+                    <View style={{ display: 'flex', flexDirection: 'column' }}>
                       <View
                         style={{
                           display: 'flex',
                           flexDirection: 'row',
-                          marginTop: 5,
-                          backgroundColor: colors.card,
-                          padding: 5,
-                          borderRadius: 10,
+                          justifyContent: 'flex-start',
+                          alignItems: 'center',
+                          marginTop: 10,
                         }}>
-                        <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
-                        <FadeText>{translate('send.somefunds')}</FadeText>
+                        <RegText>{translate('send.spendable')}</RegText>
+                        <ZecAmount
+                          currencyName={info.currencyName ? info.currencyName : ''}
+                          color={stillConfirming ? 'red' : colors.money}
+                          size={18}
+                          amtZec={getMaxAmount()}
+                        />
                       </View>
-                    </TouchableOpacity>
+                      {stillConfirming && (
+                        <TouchableOpacity onPress={() => poolsMoreInfoOnClick()}>
+                          <View
+                            style={{
+                              display: 'flex',
+                              flexDirection: 'row',
+                              marginTop: 5,
+                              backgroundColor: colors.card,
+                              padding: 5,
+                              borderRadius: 10,
+                            }}>
+                            <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
+                            <FadeText>{translate('send.somefunds')}</FadeText>
+                          </View>
+                        </TouchableOpacity>
+                      )}
+                    </View>
+                  </View>
+
+                  {currency === 'USD' && zecPrice.zecPrice <= 0 && (
+                    <View
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'flex-start',
+                        width: '35%',
+                      }}>
+                      <View
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          justifyContent: 'flex-start',
+                        }}>
+                        <RegText style={{ marginTop: 15, marginRight: 5, color: colors.primary }}>
+                          {translate('send.nofetchprice')}
+                        </RegText>
+                      </View>
+                    </View>
+                  )}
+
+                  {currency === 'USD' && zecPrice.zecPrice > 0 && (
+                    <View
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'flex-start',
+                        width: '35%',
+                      }}>
+                      <View
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          justifyContent: 'flex-start',
+                        }}>
+                        <RegText style={{ marginTop: 15, marginRight: 5 }}>$</RegText>
+                        <View
+                          accessible={true}
+                          accessibilityLabel={translate('send.usd-acc')}
+                          style={{
+                            flexGrow: 1,
+                            borderWidth: 1,
+                            borderRadius: 5,
+                            borderColor: colors.text,
+                            marginTop: 5,
+                            width: '55%',
+                            minWidth: 48,
+                            minHeight: 48,
+                          }}>
+                          <TextInput
+                            placeholder={`#${decimalSeparator}##`}
+                            placeholderTextColor={colors.placeholder}
+                            keyboardType="numeric"
+                            style={{
+                              color: colors.text,
+                              fontWeight: '600',
+                              fontSize: 18,
+                              minWidth: 48,
+                              minHeight: 48,
+                              marginLeft: 5,
+                            }}
+                            value={ta.amountCurrency.toString()}
+                            onChangeText={(text: string) => updateToField(null, null, text.substring(0, 15), null)}
+                            onEndEditing={(e: any) =>
+                              updateToField(null, null, e.nativeEvent.text.substring(0, 15), null)
+                            }
+                            editable={true}
+                            maxLength={15}
+                          />
+                        </View>
+                        <RegText style={{ marginTop: 15, marginLeft: 5 }}>{currency}</RegText>
+                      </View>
+
+                      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        {/*<RegText style={{ marginBottom: 5 }}>{translate('send.price')}</RegText>*/}
+                        <CurrencyAmount
+                          style={{ marginTop: 0, marginBottom: 5, fontSize: 18 }}
+                          price={zecPrice.zecPrice}
+                          amtZec={totalBalance.total}
+                          currency={currency}
+                        />
+                        {!refreshSure && (
+                          <TouchableOpacity onPress={() => setRefreshSure(true)}>
+                            <View
+                              style={{
+                                display: 'flex',
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                backgroundColor: colors.card,
+                                borderRadius: 10,
+                                margin: 0,
+                                padding: 5,
+                                marginLeft: 0,
+                                minWidth: 48,
+                                minHeight: 48,
+                              }}>
+                              <FontAwesomeIcon icon={faRefresh} size={20} color={colors.primary} />
+                              {refreshMinutes > 0 && (
+                                <FadeText style={{ paddingLeft: 5 }}>
+                                  {refreshMinutes.toString() + translate('transactions.minago')}
+                                </FadeText>
+                              )}
+                            </View>
+                          </TouchableOpacity>
+                        )}
+                        {refreshSure && (
+                          <TouchableOpacity
+                            onPress={async () => {
+                              setZecPrice(await RPC.rpc_getZecPrice(), Date.now());
+                              setRefreshSure(false);
+                              setRefreshMinutes(0);
+                            }}>
+                            <View
+                              style={{
+                                display: 'flex',
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                backgroundColor: 'red',
+                                borderRadius: 10,
+                                margin: 0,
+                                padding: 5,
+                                marginLeft: 5,
+                                minWidth: 48,
+                                minHeight: 48,
+                                borderColor: colors.primary,
+                                borderWidth: 1,
+                              }}>
+                              <FontAwesomeIcon
+                                icon={faRefresh}
+                                size={20}
+                                color={colors.primary}
+                                style={{ marginRight: 5 }}
+                              />
+                              <RegText color={colors.primary}>{translate('transactions.sure')}</RegText>
+                            </View>
+                          </TouchableOpacity>
+                        )}
+                      </View>
+                    </View>
                   )}
                 </View>
 
@@ -889,7 +1017,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <CurrencyAmount
                       style={{ marginTop: 0, marginBottom: 5 }}
-                      price={zecPrice}
+                      price={zecPrice.zecPrice}
                       amtZec={totalBalance.total}
                       currency={currency}
                     />
@@ -904,20 +1032,26 @@ const Send: React.FunctionComponent<SendProps> = ({
                             backgroundColor: colors.card,
                             borderRadius: 10,
                             margin: 0,
-                            padding: 0,
+                            padding: 5,
                             marginLeft: 0,
                             minWidth: 48,
                             minHeight: 48,
                           }}>
                           <FontAwesomeIcon icon={faRefresh} size={20} color={colors.primary} />
+                          {refreshMinutes > 0 && (
+                            <FadeText style={{ paddingLeft: 5 }}>
+                              {refreshMinutes.toString() + translate('transactions.minago')}
+                            </FadeText>
+                          )}
                         </View>
                       </TouchableOpacity>
                     )}
                     {refreshSure && (
                       <TouchableOpacity
                         onPress={async () => {
-                          setZecPrice(await RPC.rpc_getZecPrice());
+                          setZecPrice(await RPC.rpc_getZecPrice(), Date.now());
                           setRefreshSure(false);
+                          setRefreshMinutes(0);
                         }}>
                         <View
                           style={{
@@ -1092,72 +1226,32 @@ const Send: React.FunctionComponent<SendProps> = ({
                     <View
                       style={{
                         display: 'flex',
-                        flexDirection: 'row',
+                        flexDirection: 'column',
                         justifyContent: 'flex-start',
                         width: '60%',
                       }}>
-                      <RegText style={{ marginTop: 20, marginRight: 5, fontSize: 20 }}>{'\u1647'}</RegText>
-                      <View
-                        accessible={true}
-                        accessibilityLabel={translate('send.zec-acc')}
-                        style={{
-                          flexGrow: 1,
-                          borderWidth: 1,
-                          borderRadius: 5,
-                          borderColor: colors.text,
-                          marginTop: 5,
-                          width: '75%',
-                          minWidth: 48,
-                          minHeight: 48,
-                        }}>
-                        <TextInput
-                          placeholder={`#${decimalSeparator}########`}
-                          placeholderTextColor={colors.placeholder}
-                          keyboardType="numeric"
-                          style={{
-                            color: colors.text,
-                            fontWeight: '600',
-                            fontSize: 18,
-                            minWidth: 48,
-                            minHeight: 48,
-                            marginLeft: 5,
-                          }}
-                          value={ta.amount.toString()}
-                          onChangeText={(text: string) => updateToField(null, text.substring(0, 20), null, null)}
-                          onEndEditing={(e: any) =>
-                            updateToField(null, e.nativeEvent.text.substring(0, 20), null, null)
-                          }
-                          editable={true}
-                          maxLength={20}
-                        />
-                      </View>
-                      <RegText style={{ marginTop: 15, marginRight: 10, marginLeft: 5 }}>ZEC</RegText>
-                    </View>
-
-                    {currency === 'USD' && (
                       <View
                         style={{
                           display: 'flex',
                           flexDirection: 'row',
                           justifyContent: 'flex-start',
-                          width: '35%',
                         }}>
-                        <RegText style={{ marginTop: 15, marginRight: 5 }}>$</RegText>
+                        <RegText style={{ marginTop: 20, marginRight: 5, fontSize: 20 }}>{'\u1647'}</RegText>
                         <View
                           accessible={true}
-                          accessibilityLabel={translate('send.usd-acc')}
+                          accessibilityLabel={translate('send.zec-acc')}
                           style={{
                             flexGrow: 1,
                             borderWidth: 1,
                             borderRadius: 5,
                             borderColor: colors.text,
                             marginTop: 5,
-                            width: '55%',
+                            width: '75%',
                             minWidth: 48,
                             minHeight: 48,
                           }}>
                           <TextInput
-                            placeholder={`#${decimalSeparator}##`}
+                            placeholder={`#${decimalSeparator}########`}
                             placeholderTextColor={colors.placeholder}
                             keyboardType="numeric"
                             style={{
@@ -1168,49 +1262,194 @@ const Send: React.FunctionComponent<SendProps> = ({
                               minHeight: 48,
                               marginLeft: 5,
                             }}
-                            value={ta.amountCurrency.toString()}
-                            onChangeText={(text: string) => updateToField(null, null, text.substring(0, 15), null)}
+                            value={ta.amount.toString()}
+                            onChangeText={(text: string) => updateToField(null, text.substring(0, 20), null, null)}
                             onEndEditing={(e: any) =>
-                              updateToField(null, null, e.nativeEvent.text.substring(0, 15), null)
+                              updateToField(null, e.nativeEvent.text.substring(0, 20), null, null)
                             }
                             editable={true}
-                            maxLength={15}
+                            maxLength={20}
                           />
                         </View>
-                        <RegText style={{ marginTop: 15, marginLeft: 5 }}>{currency}</RegText>
+                        <RegText style={{ marginTop: 15, marginRight: 10, marginLeft: 5 }}>ZEC</RegText>
                       </View>
-                    )}
-                  </View>
 
-                  <View style={{ display: 'flex', flexDirection: 'column' }}>
-                    <View
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        justifyContent: 'flex-start',
-                        alignItems: 'center',
-                        marginTop: 10,
-                      }}>
-                      <RegText>{translate('send.spendable')}</RegText>
-                      <ZecAmount
-                        currencyName={info.currencyName ? info.currencyName : ''}
-                        color={stillConfirming ? 'red' : colors.money}
-                        size={18}
-                        amtZec={getMaxAmount()}
-                      />
+                      <View style={{ display: 'flex', flexDirection: 'column' }}>
+                        <View
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            justifyContent: 'flex-start',
+                            alignItems: 'center',
+                            marginTop: 10,
+                          }}>
+                          <RegText>{translate('send.spendable')}</RegText>
+                          <ZecAmount
+                            currencyName={info.currencyName ? info.currencyName : ''}
+                            color={stillConfirming ? 'red' : colors.money}
+                            size={18}
+                            amtZec={getMaxAmount()}
+                          />
+                        </View>
+                        {stillConfirming && (
+                          <TouchableOpacity onPress={() => poolsMoreInfoOnClick()}>
+                            <View
+                              style={{
+                                display: 'flex',
+                                flexDirection: 'row',
+                                marginTop: 5,
+                                backgroundColor: colors.card,
+                                padding: 5,
+                                borderRadius: 10,
+                              }}>
+                              <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
+                              <FadeText>{translate('send.somefunds')}</FadeText>
+                            </View>
+                          </TouchableOpacity>
+                        )}
+                      </View>
                     </View>
-                    {stillConfirming && (
+
+                    {currency === 'USD' && zecPrice.zecPrice <= 0 && (
                       <View
                         style={{
                           display: 'flex',
-                          flexDirection: 'row',
-                          marginTop: 5,
-                          backgroundColor: colors.card,
-                          padding: 5,
-                          borderRadius: 10,
+                          flexDirection: 'column',
+                          justifyContent: 'flex-start',
+                          width: '35%',
                         }}>
-                        <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
-                        <FadeText>{translate('send.somefunds')}</FadeText>
+                        <View
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            justifyContent: 'flex-start',
+                          }}>
+                          <RegText style={{ marginTop: 15, marginRight: 5, color: colors.primary }}>
+                            {translate('send.nofetchprice')}
+                          </RegText>
+                        </View>
+                      </View>
+                    )}
+
+                    {currency === 'USD' && zecPrice.zecPrice > 0 && (
+                      <View
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'flex-start',
+                          width: '35%',
+                        }}>
+                        <View
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            justifyContent: 'flex-start',
+                          }}>
+                          <RegText style={{ marginTop: 15, marginRight: 5 }}>$</RegText>
+                          <View
+                            accessible={true}
+                            accessibilityLabel={translate('send.usd-acc')}
+                            style={{
+                              flexGrow: 1,
+                              borderWidth: 1,
+                              borderRadius: 5,
+                              borderColor: colors.text,
+                              marginTop: 5,
+                              width: '55%',
+                              minWidth: 48,
+                              minHeight: 48,
+                            }}>
+                            <TextInput
+                              placeholder={`#${decimalSeparator}##`}
+                              placeholderTextColor={colors.placeholder}
+                              keyboardType="numeric"
+                              style={{
+                                color: colors.text,
+                                fontWeight: '600',
+                                fontSize: 18,
+                                minWidth: 48,
+                                minHeight: 48,
+                                marginLeft: 5,
+                              }}
+                              value={ta.amountCurrency.toString()}
+                              onChangeText={(text: string) => updateToField(null, null, text.substring(0, 15), null)}
+                              onEndEditing={(e: any) =>
+                                updateToField(null, null, e.nativeEvent.text.substring(0, 15), null)
+                              }
+                              editable={true}
+                              maxLength={15}
+                            />
+                          </View>
+                          <RegText style={{ marginTop: 15, marginLeft: 5 }}>{currency}</RegText>
+                        </View>
+
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                          {/*<RegText style={{ marginBottom: 5 }}>{translate('send.price')}</RegText>*/}
+                          <CurrencyAmount
+                            style={{ marginTop: 0, marginBottom: 5, fontSize: 18 }}
+                            price={zecPrice.zecPrice}
+                            amtZec={totalBalance.total}
+                            currency={currency}
+                          />
+                          {!refreshSure && (
+                            <TouchableOpacity onPress={() => setRefreshSure(true)}>
+                              <View
+                                style={{
+                                  display: 'flex',
+                                  flexDirection: 'row',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  backgroundColor: colors.card,
+                                  borderRadius: 10,
+                                  margin: 0,
+                                  padding: 5,
+                                  marginLeft: 0,
+                                  minWidth: 48,
+                                  minHeight: 48,
+                                }}>
+                                <FontAwesomeIcon icon={faRefresh} size={20} color={colors.primary} />
+                                {refreshMinutes > 0 && (
+                                  <FadeText style={{ paddingLeft: 5 }}>
+                                    {refreshMinutes.toString() + translate('transactions.minago')}
+                                  </FadeText>
+                                )}
+                              </View>
+                            </TouchableOpacity>
+                          )}
+                          {refreshSure && (
+                            <TouchableOpacity
+                              onPress={async () => {
+                                setZecPrice(await RPC.rpc_getZecPrice(), Date.now());
+                                setRefreshSure(false);
+                                setRefreshMinutes(0);
+                              }}>
+                              <View
+                                style={{
+                                  display: 'flex',
+                                  flexDirection: 'row',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  backgroundColor: 'red',
+                                  borderRadius: 10,
+                                  margin: 0,
+                                  padding: 5,
+                                  marginLeft: 5,
+                                  minWidth: 48,
+                                  minHeight: 48,
+                                  borderColor: colors.primary,
+                                  borderWidth: 1,
+                                }}>
+                                <FontAwesomeIcon
+                                  icon={faRefresh}
+                                  size={20}
+                                  color={colors.primary}
+                                  style={{ marginRight: 5 }}
+                                />
+                                <RegText color={colors.primary}>{translate('transactions.sure')}</RegText>
+                              </View>
+                            </TouchableOpacity>
+                          )}
+                        </View>
                       </View>
                     )}
                   </View>

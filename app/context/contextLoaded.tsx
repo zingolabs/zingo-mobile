@@ -18,6 +18,7 @@ import {
   DimensionsType,
   AddressClass,
   AddressBookClass,
+  zecPriceType,
 } from '../AppState';
 
 export const defaultAppStateLoaded: AppStateLoaded = {
@@ -60,7 +61,10 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   currency: '',
   language: 'en',
 
-  zecPrice: 0,
+  zecPrice: {
+    zecPrice: 0,
+    date: 0,
+  } as zecPriceType,
 
   translate: () => '',
 };

@@ -192,7 +192,8 @@
     "zec-acc": "ZEC Amount Field",
     "usd-acc": "USD Amount Field",
     "memo-acc": "Memo Field",
-    "amountplaceholder": "number"
+    "amountplaceholder": "number",
+    "nofetchprice": "No fetched price already"
   },
   "legacy": {
     "o-title": "U-Orchard",

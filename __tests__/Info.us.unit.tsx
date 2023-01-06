@@ -39,7 +39,7 @@ describe('Component Info - test', () => {
       defaultFee: 1000,
       chain_name: 'mainnet',
     };
-    state.zecPrice = 33.33;
+    state.zecPrice.zecPrice = 33.33;
     state.currency = 'USD';
     state.totalBalance.total = 1.12345678;
     const onClose = jest.fn();
