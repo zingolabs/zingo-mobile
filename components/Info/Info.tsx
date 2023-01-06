@@ -16,7 +16,7 @@ import { faRefresh } from '@fortawesome/free-solid-svg-icons';
 
 type InfoProps = {
   closeModal: () => void;
-  setZecPrice: (p: number) => void;
+  setZecPrice: (p: number, d: number) => void;
 };
 
 const Info: React.FunctionComponent<InfoProps> = ({ closeModal, setZecPrice }) => {
@@ -99,8 +99,8 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal, setZecPrice }) =
               <DetailLine
                 label={translate('info.zecprice')}
                 value={
-                  zecPrice > 0
-                    ? `$ ${Utils.toLocaleFloat(zecPrice.toFixed(2))} ${currency} per ${
+                  zecPrice.zecPrice > 0
+                    ? `$ ${Utils.toLocaleFloat(zecPrice.zecPrice.toFixed(2))} ${currency} per ${
                         info.currencyName ? info.currencyName : '---'
                       }`
                     : `$ -- ${currency} per ${info.currencyName ? info.currencyName : '---'}`
@@ -129,7 +129,7 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal, setZecPrice }) =
               {refreshSure && (
                 <TouchableOpacity
                   onPress={async () => {
-                    setZecPrice(await RPC.rpc_getZecPrice());
+                    setZecPrice(await RPC.rpc_getZecPrice(), Date.now());
                     setRefreshSure(false);
                   }}>
                   <View

@@ -27,7 +27,7 @@ type TransactionsProps = {
   setComputingModalVisible: (visible: boolean) => void;
   poolsMoreInfoOnClick: () => void;
   syncingStatusMoreInfoOnClick: () => void;
-  setZecPrice: (p: number) => void;
+  setZecPrice: (p: number, d: number) => void;
 };
 
 const Transactions: React.FunctionComponent<TransactionsProps> = ({
@@ -147,7 +147,7 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <CurrencyAmount
               style={{ marginTop: 0, marginBottom: 5 }}
-              price={zecPrice}
+              price={zecPrice.zecPrice}
               amtZec={totalBalance.total}
               currency={currency}
             />
@@ -174,7 +174,7 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
             {refreshSure && (
               <TouchableOpacity
                 onPress={async () => {
-                  setZecPrice(await RPC.rpc_getZecPrice());
+                  setZecPrice(await RPC.rpc_getZecPrice(), Date.now());
                   setRefreshSure(false);
                 }}>
                 <View
@@ -387,7 +387,7 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <CurrencyAmount
                   style={{ marginTop: 0, marginBottom: 5 }}
-                  price={zecPrice}
+                  price={zecPrice.zecPrice}
                   amtZec={totalBalance.total}
                   currency={currency}
                 />
@@ -414,7 +414,7 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
                 {refreshSure && (
                   <TouchableOpacity
                     onPress={async () => {
-                      setZecPrice(await RPC.rpc_getZecPrice());
+                      setZecPrice(await RPC.rpc_getZecPrice(), Date.now());
                       setRefreshSure(false);
                     }}>
                     <View

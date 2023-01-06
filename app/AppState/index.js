@@ -17,6 +17,7 @@ import TransactionType from './types/TransactionType';
 import SyncingStatusType from './types/SyncingStatusType';
 import TxDetailType from './types/TxDetailType';
 import WalletSeedType from './types/WalletSeedType';
+import zecPriceType from './types/zecPriceType';
 
 import AppStateLoaded from './AppStateLoaded';
 import AppStateLoading from './AppStateLoading';
@@ -42,4 +43,5 @@ export {
   SendJsonToTypeType,
   InfoType,
   DimensionsType,
+  zecPriceType,
 };

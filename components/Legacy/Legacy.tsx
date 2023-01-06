@@ -354,7 +354,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance, toggl
             />
             <CurrencyAmount
               style={{ marginTop: 0, marginBottom: 5, opacity: 0.5 }}
-              price={zecPrice}
+              price={zecPrice.zecPrice}
               amtZec={totalBalance.total}
               currency={currency}
             />
@@ -489,7 +489,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance, toggl
             />
             <CurrencyAmount
               style={{ marginTop: 0, marginBottom: 5, opacity: 0.5 }}
-              price={zecPrice}
+              price={zecPrice.zecPrice}
               amtZec={totalBalance.total}
               currency={currency}
             />

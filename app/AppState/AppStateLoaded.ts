@@ -16,6 +16,7 @@ import InfoType from './types/InfoType';
 import WalletSeedType from './types/WalletSeedType';
 import SyncingStatusType from './types/SyncingStatusType';
 import DimensionsType from './types/DimensionsType';
+import zecPriceType from './types/zecPriceType';
 
 export default interface AppStateLoaded {
   navigation: StackScreenProps<any>['navigation'];
@@ -99,7 +100,7 @@ export default interface AppStateLoaded {
   language: 'en' | 'es';
   currency: 'USD' | '';
 
-  zecPrice: number;
+  zecPrice: zecPriceType;
 
   translate: (key: string, config?: TranslateOptions) => string;
 

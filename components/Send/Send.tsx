@@ -34,7 +34,7 @@ type SendProps = {
   setComputingModalVisible: (visible: boolean) => void;
   syncingStatusMoreInfoOnClick: () => void;
   poolsMoreInfoOnClick: () => void;
-  setZecPrice: (p: number) => void;
+  setZecPrice: (p: number, d: number) => void;
 };
 
 const Send: React.FunctionComponent<SendProps> = ({
@@ -258,7 +258,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       if (isNaN(Number(toAddr.amount))) {
         toAddr.amountCurrency = '';
       } else if (toAddr.amount && zecPrice) {
-        toAddr.amountCurrency = Utils.toLocaleFloat((parseFloat(toAddr.amount) * zecPrice).toFixed(2));
+        toAddr.amountCurrency = Utils.toLocaleFloat((parseFloat(toAddr.amount) * zecPrice.zecPrice).toFixed(2));
       } else {
         toAddr.amountCurrency = '';
       }
@@ -270,7 +270,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       if (isNaN(Number(toAddr.amountCurrency))) {
         toAddr.amount = '';
       } else if (toAddr.amountCurrency && zecPrice) {
-        toAddr.amount = Utils.toLocaleFloat(Utils.maxPrecisionTrimmed(parseFloat(amountCurrency) / zecPrice));
+        toAddr.amount = Utils.toLocaleFloat(Utils.maxPrecisionTrimmed(parseFloat(amountCurrency) / zecPrice.zecPrice));
       } else {
         toAddr.amount = '';
       }
@@ -427,7 +427,7 @@ const Send: React.FunctionComponent<SendProps> = ({
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <CurrencyAmount
                   style={{ marginTop: 0, marginBottom: 5 }}
-                  price={zecPrice}
+                  price={zecPrice.zecPrice}
                   amtZec={totalBalance.total}
                   currency={currency}
                 />
@@ -454,7 +454,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                 {refreshSure && (
                   <TouchableOpacity
                     onPress={async () => {
-                      setZecPrice(await RPC.rpc_getZecPrice());
+                      setZecPrice(await RPC.rpc_getZecPrice(), Date.now());
                       setRefreshSure(false);
                     }}>
                     <View
@@ -649,7 +649,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                     <RegText style={{ marginTop: 15, marginRight: 10, marginLeft: 5 }}>ZEC</RegText>
                   </View>
 
-                  {currency === 'USD' && (
+                  {currency === 'USD' && zecPrice.zecPrice > 0 && (
                     <View
                       style={{
                         display: 'flex',
@@ -889,7 +889,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <CurrencyAmount
                       style={{ marginTop: 0, marginBottom: 5 }}
-                      price={zecPrice}
+                      price={zecPrice.zecPrice}
                       amtZec={totalBalance.total}
                       currency={currency}
                     />
@@ -916,7 +916,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                     {refreshSure && (
                       <TouchableOpacity
                         onPress={async () => {
-                          setZecPrice(await RPC.rpc_getZecPrice());
+                          setZecPrice(await RPC.rpc_getZecPrice(), Date.now());
                           setRefreshSure(false);
                         }}>
                         <View

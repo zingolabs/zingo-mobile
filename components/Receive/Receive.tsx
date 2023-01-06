@@ -27,7 +27,7 @@ type ReceiveProps = {
   startRescan: () => void;
   syncingStatusMoreInfoOnClick: () => void;
   poolsMoreInfoOnClick: () => void;
-  setZecPrice: (p: number) => void;
+  setZecPrice: (p: number, d: number) => void;
 };
 
 const Receive: React.FunctionComponent<ReceiveProps> = ({
@@ -327,7 +327,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <CurrencyAmount
                   style={{ marginTop: 0, marginBottom: 5, opacity: 0.5 }}
-                  price={zecPrice}
+                  price={zecPrice.zecPrice}
                   amtZec={totalBalance.total}
                   currency={currency}
                 />
@@ -354,7 +354,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                 {refreshSure && (
                   <TouchableOpacity
                     onPress={async () => {
-                      setZecPrice(await RPC.rpc_getZecPrice());
+                      setZecPrice(await RPC.rpc_getZecPrice(), Date.now());
                       setRefreshSure(false);
                     }}>
                     <View
@@ -577,7 +577,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   <CurrencyAmount
                     style={{ marginTop: 0, marginBottom: 5 }}
-                    price={zecPrice}
+                    price={zecPrice.zecPrice}
                     amtZec={totalBalance.total}
                     currency={currency}
                   />
@@ -604,7 +604,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                   {refreshSure && (
                     <TouchableOpacity
                       onPress={async () => {
-                        setZecPrice(await RPC.rpc_getZecPrice());
+                        setZecPrice(await RPC.rpc_getZecPrice(), Date.now());
                         setRefreshSure(false);
                       }}>
                       <View

@@ -1,7 +1,14 @@
 import React, { ReactNode } from 'react';
 import { StackScreenProps } from '@react-navigation/stack';
 
-import { AppStateLoading, DimensionsType, InfoType, TotalBalanceClass, WalletSeedType } from '../AppState';
+import {
+  AppStateLoading,
+  DimensionsType,
+  InfoType,
+  TotalBalanceClass,
+  WalletSeedType,
+  zecPriceType,
+} from '../AppState';
 
 export const defaultAppStateLoading: AppStateLoading = {
   navigation: {} as StackScreenProps<any>['navigation'],
@@ -19,7 +26,10 @@ export const defaultAppStateLoading: AppStateLoading = {
   currency: '',
   language: 'en',
 
-  zecPrice: 0,
+  zecPrice: {
+    zecPrice: 0,
+    date: 0,
+  } as zecPriceType,
 
   translate: () => '',
 };
