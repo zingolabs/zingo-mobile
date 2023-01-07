@@ -69,14 +69,12 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
           >
             <Text
               style={
-                [
-                  {
-                    "color": "rgb(28, 28, 30)",
-                    "fontSize": 18,
-                    "fontWeight": "600",
-                    "opacity": 1,
-                  },
-                ]
+                {
+                  "color": "rgb(28, 28, 30)",
+                  "fontSize": 18,
+                  "fontWeight": "600",
+                  "opacity": 1,
+                }
               }
             >
               text translated
@@ -236,19 +234,14 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
               >
                 <Text
                   style={
-                    [
-                      {
-                        "fontSize": 20,
-                        "marginRight": 5,
-                        "marginTop": 20,
-                      },
-                      {
-                        "color": "rgb(28, 28, 30)",
-                        "fontSize": 18,
-                        "fontWeight": "600",
-                        "opacity": 1,
-                      },
-                    ]
+                    {
+                      "color": "rgb(28, 28, 30)",
+                      "fontSize": 20,
+                      "fontWeight": "600",
+                      "marginRight": 5,
+                      "marginTop": 20,
+                      "opacity": 1,
+                    }
                   }
                 >
                   ᙇ
@@ -291,19 +284,15 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                 </View>
                 <Text
                   style={
-                    [
-                      {
-                        "marginLeft": 5,
-                        "marginRight": 10,
-                        "marginTop": 15,
-                      },
-                      {
-                        "color": "rgb(28, 28, 30)",
-                        "fontSize": 18,
-                        "fontWeight": "600",
-                        "opacity": 1,
-                      },
-                    ]
+                    {
+                      "color": "rgb(28, 28, 30)",
+                      "fontSize": 18,
+                      "fontWeight": "600",
+                      "marginLeft": 5,
+                      "marginRight": 10,
+                      "marginTop": 15,
+                      "opacity": 1,
+                    }
                   }
                 >
                   ZEC
@@ -330,14 +319,12 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                 >
                   <Text
                     style={
-                      [
-                        {
-                          "color": "rgb(28, 28, 30)",
-                          "fontSize": 18,
-                          "fontWeight": "600",
-                          "opacity": 1,
-                        },
-                      ]
+                      {
+                        "color": "rgb(28, 28, 30)",
+                        "fontSize": 14,
+                        "fontWeight": "600",
+                        "opacity": 1,
+                      }
                     }
                   >
                     text translated
@@ -354,7 +341,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                       style={
                         {
                           "color": "red",
-                          "fontSize": 18,
+                          "fontSize": 15,
                         }
                       }
                     >
@@ -364,7 +351,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                       style={
                         {
                           "color": "red",
-                          "fontSize": 18,
+                          "fontSize": 15,
                           "fontWeight": "700",
                         }
                       }
@@ -375,7 +362,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                       style={
                         {
                           "color": "red",
-                          "fontSize": 9,
+                          "fontSize": 7.5,
                           "paddingBottom": 0,
                         }
                       }
@@ -386,7 +373,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                       style={
                         {
                           "color": "red",
-                          "fontSize": 18,
+                          "fontSize": 15,
                         }
                       }
                     >
@@ -475,18 +462,14 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
               >
                 <Text
                   style={
-                    [
-                      {
-                        "marginRight": 5,
-                        "marginTop": 15,
-                      },
-                      {
-                        "color": "rgb(28, 28, 30)",
-                        "fontSize": 18,
-                        "fontWeight": "600",
-                        "opacity": 1,
-                      },
-                    ]
+                    {
+                      "color": "rgb(28, 28, 30)",
+                      "fontSize": 18,
+                      "fontWeight": "600",
+                      "marginRight": 5,
+                      "marginTop": 15,
+                      "opacity": 1,
+                    }
                   }
                 >
                   $
@@ -529,18 +512,14 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                 </View>
                 <Text
                   style={
-                    [
-                      {
-                        "marginLeft": 5,
-                        "marginTop": 15,
-                      },
-                      {
-                        "color": "rgb(28, 28, 30)",
-                        "fontSize": 18,
-                        "fontWeight": "600",
-                        "opacity": 1,
-                      },
-                    ]
+                    {
+                      "color": "rgb(28, 28, 30)",
+                      "fontSize": 18,
+                      "fontWeight": "600",
+                      "marginLeft": 5,
+                      "marginTop": 15,
+                      "opacity": 1,
+                    }
                   }
                 >
                   USD
@@ -550,7 +529,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                 style={
                   {
                     "alignItems": "center",
-                    "flexDirection": "row",
+                    "flexDirection": "column",
                   }
                 }
               >
@@ -566,9 +545,8 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                     style={
                       {
                         "color": undefined,
-                        "fontSize": 18,
-                        "marginBottom": 5,
-                        "marginTop": 0,
+                        "fontSize": 13,
+                        "marginTop": 10,
                       }
                     }
                   >
@@ -578,10 +556,9 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                     style={
                       {
                         "color": undefined,
-                        "fontSize": 18,
+                        "fontSize": 13,
                         "fontWeight": "700",
-                        "marginBottom": 5,
-                        "marginTop": 0,
+                        "marginTop": 10,
                       }
                     }
                   >
@@ -591,9 +568,8 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                     style={
                       {
                         "color": undefined,
-                        "fontSize": 18,
-                        "marginBottom": 5,
-                        "marginTop": 0,
+                        "fontSize": 13,
+                        "marginTop": 10,
                       }
                     }
                   >
@@ -620,12 +596,9 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                   <View
                     style={
                       {
-                        "alignItems": "center",
                         "backgroundColor": "rgb(255, 255, 255)",
                         "borderRadius": 10,
-                        "display": "flex",
                         "flexDirection": "row",
-                        "justifyContent": "center",
                         "margin": 0,
                         "marginLeft": 0,
                         "minHeight": 48,
@@ -653,7 +626,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                           "prefix": "fas",
                         }
                       }
-                      size={20}
+                      size={15}
                     />
                   </View>
                 </View>

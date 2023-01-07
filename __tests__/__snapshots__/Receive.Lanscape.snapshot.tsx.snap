@@ -167,17 +167,13 @@ exports[`Component Receive - test Receive Landscape - snapshot 1`] = `
           >
             <Text
               style={
-                [
-                  {
-                    "paddingHorizontal": 5,
-                  },
-                  {
-                    "color": "rgb(28, 28, 30)",
-                    "fontSize": 18,
-                    "fontWeight": "600",
-                    "opacity": 1,
-                  },
-                ]
+                {
+                  "color": "rgb(28, 28, 30)",
+                  "fontSize": 18,
+                  "fontWeight": "600",
+                  "opacity": 1,
+                  "paddingHorizontal": 5,
+                }
               }
             >
               text translated

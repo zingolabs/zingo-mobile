@@ -92,18 +92,14 @@ exports[`Component ImportKey - test Matches the snapshot ImportKey 1`] = `
     </View>
     <Text
       style={
-        [
-          {
-            "marginTop": 5,
-            "padding": 5,
-          },
-          {
-            "color": "rgb(28, 28, 30)",
-            "fontSize": 18,
-            "fontWeight": "600",
-            "opacity": 1,
-          },
-        ]
+        {
+          "color": "rgb(28, 28, 30)",
+          "fontSize": 18,
+          "fontWeight": "600",
+          "marginTop": 5,
+          "opacity": 1,
+          "padding": 5,
+        }
       }
     >
       text translated
@@ -143,17 +139,13 @@ exports[`Component ImportKey - test Matches the snapshot ImportKey 1`] = `
     <View>
       <Text
         style={
-          [
-            {
-              "margin": 10,
-            },
-            {
-              "color": "rgb(28, 28, 30)",
-              "fontSize": 18,
-              "fontWeight": "600",
-              "opacity": 1,
-            },
-          ]
+          {
+            "color": "rgb(28, 28, 30)",
+            "fontSize": 18,
+            "fontWeight": "600",
+            "margin": 10,
+            "opacity": 1,
+          }
         }
       >
         text translated
@@ -231,18 +223,14 @@ exports[`Component ImportKey - test Matches the snapshot ImportKey 1`] = `
       </View>
       <Text
         style={
-          [
-            {
-              "marginTop": 50,
-              "textAlign": "center",
-            },
-            {
-              "color": "rgb(28, 28, 30)",
-              "fontSize": 18,
-              "fontWeight": "600",
-              "opacity": 1,
-            },
-          ]
+          {
+            "color": "rgb(28, 28, 30)",
+            "fontSize": 18,
+            "fontWeight": "600",
+            "marginTop": 50,
+            "opacity": 1,
+            "textAlign": "center",
+          }
         }
       >
         text translated
@@ -292,18 +280,14 @@ exports[`Component ImportKey - test Matches the snapshot ImportKey 1`] = `
       </View>
       <Text
         style={
-          [
-            {
-              "margin": 20,
-              "marginBottom": 30,
-            },
-            {
-              "color": "rgb(28, 28, 30)",
-              "fontSize": 18,
-              "fontWeight": "600",
-              "opacity": 1,
-            },
-          ]
+          {
+            "color": "rgb(28, 28, 30)",
+            "fontSize": 18,
+            "fontWeight": "600",
+            "margin": 20,
+            "marginBottom": 30,
+            "opacity": 1,
+          }
         }
       >
         text translated

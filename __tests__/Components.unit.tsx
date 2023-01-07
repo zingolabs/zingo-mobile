@@ -256,12 +256,12 @@ describe('Component Components - test', () => {
   test("RegText - View style backgroundColor 'red' result same", () => {
     const text: any = render(<RegText style={{ backgroundColor: 'red' }}>Reg Text</RegText>).toJSON();
     expect(text.type).toBe('Text');
-    expect(text.props.style[0].backgroundColor).toBe('red');
+    expect(text.props.style.backgroundColor).toBe('red');
   });
 
   test("RegText - View style color 'red' result same", () => {
     const text: any = render(<RegText color={'red'}>Reg Text</RegText>).toJSON();
     expect(text.type).toBe('Text');
-    expect(text.props.style[0].color).toBe('red');
+    expect(text.props.style.color).toBe('red');
   });
 });
