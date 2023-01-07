@@ -257,7 +257,7 @@
     "pools": "pools...",
     "transactions": "Transactions",
     "sure": "Sure? ",
-    "minago": " min. ago"
+    "minago": " min."
   },
   "report": {
     "title": "Sync / Rescan Report",
