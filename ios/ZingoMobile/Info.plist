@@ -5,6 +5,8 @@
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
 		<string>com.transistorsoft.fetch</string>
+		<string>Zingo_Refresh_Task_ID</string>
+		<string>Zingo_Processing_Task_ID</string>
 	</array>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
