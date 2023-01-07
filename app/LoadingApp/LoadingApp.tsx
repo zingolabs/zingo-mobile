@@ -189,6 +189,8 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
   componentDidMount = async () => {
     // First, check if a wallet exists. Do it async so the basic screen has time to render
     setTimeout(async () => {
+      await RPCModule.initLightClient(this.state.server);
+
       // reading Info
       const info = await RPC.rpc_getInfoObject();
       if (info) {

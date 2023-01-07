@@ -689,11 +689,11 @@ const Send: React.FunctionComponent<SendProps> = ({
                           alignItems: 'center',
                           marginTop: 10,
                         }}>
-                        <RegText>{translate('send.spendable')}</RegText>
+                        <RegText style={{ fontSize: 14 }}>{translate('send.spendable')}</RegText>
                         <ZecAmount
                           currencyName={info.currencyName ? info.currencyName : ''}
                           color={stillConfirming ? 'red' : colors.money}
-                          size={18}
+                          size={15}
                           amtZec={getMaxAmount()}
                         />
                       </View>
@@ -851,10 +851,10 @@ const Send: React.FunctionComponent<SendProps> = ({
                         <RegText style={{ marginTop: 15, marginLeft: 5 }}>{'USD'}</RegText>
                       </View>
 
-                      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                      <View style={{ flexDirection: 'column', alignItems: 'center' }}>
                         {/*<RegText style={{ marginBottom: 5 }}>{translate('send.price')}</RegText>*/}
                         <CurrencyAmount
-                          style={{ marginTop: 0, marginBottom: 5, fontSize: 18 }}
+                          style={{ marginTop: 10, fontSize: 13 }}
                           price={zecPrice.zecPrice}
                           amtZec={totalBalance.total}
                           currency={'USD'}
@@ -863,10 +863,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           <TouchableOpacity onPress={() => setRefreshSure(true)}>
                             <View
                               style={{
-                                display: 'flex',
                                 flexDirection: 'row',
-                                alignItems: 'center',
-                                justifyContent: 'center',
                                 backgroundColor: colors.card,
                                 borderRadius: 10,
                                 margin: 0,
@@ -875,7 +872,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                                 minWidth: 48,
                                 minHeight: 48,
                               }}>
-                              <FontAwesomeIcon icon={faRefresh} size={20} color={colors.primary} />
+                              <FontAwesomeIcon icon={faRefresh} size={15} color={colors.primary} />
                               {refreshMinutes > 0 && (
                                 <FadeText style={{ paddingLeft: 5 }}>
                                   {refreshMinutes.toString() + translate('transactions.minago')}
@@ -1345,11 +1342,11 @@ const Send: React.FunctionComponent<SendProps> = ({
                             alignItems: 'center',
                             marginTop: 10,
                           }}>
-                          <RegText>{translate('send.spendable')}</RegText>
+                          <RegText style={{ fontSize: 14 }}>{translate('send.spendable')}</RegText>
                           <ZecAmount
                             currencyName={info.currencyName ? info.currencyName : ''}
                             color={stillConfirming ? 'red' : colors.money}
-                            size={18}
+                            size={15}
                             amtZec={getMaxAmount()}
                           />
                         </View>
@@ -1507,10 +1504,10 @@ const Send: React.FunctionComponent<SendProps> = ({
                           <RegText style={{ marginTop: 15, marginLeft: 5 }}>{'USD'}</RegText>
                         </View>
 
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <View style={{ flexDirection: 'column', alignItems: 'center' }}>
                           {/*<RegText style={{ marginBottom: 5 }}>{translate('send.price')}</RegText>*/}
                           <CurrencyAmount
-                            style={{ marginTop: 0, marginBottom: 5, fontSize: 18 }}
+                            style={{ marginTop: 10, fontSize: 13 }}
                             price={zecPrice.zecPrice}
                             amtZec={totalBalance.total}
                             currency={'USD'}
@@ -1519,10 +1516,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                             <TouchableOpacity onPress={() => setRefreshSure(true)}>
                               <View
                                 style={{
-                                  display: 'flex',
                                   flexDirection: 'row',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
                                   backgroundColor: colors.card,
                                   borderRadius: 10,
                                   margin: 0,
@@ -1531,7 +1525,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                                   minWidth: 48,
                                   minHeight: 48,
                                 }}>
-                                <FontAwesomeIcon icon={faRefresh} size={20} color={colors.primary} />
+                                <FontAwesomeIcon icon={faRefresh} size={15} color={colors.primary} />
                                 {refreshMinutes > 0 && (
                                   <FadeText style={{ paddingLeft: 5 }}>
                                     {refreshMinutes.toString() + translate('transactions.minago')}

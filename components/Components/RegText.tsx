@@ -12,17 +12,10 @@ type RegTextProps = {
 const RegText: React.FunctionComponent<RegTextProps> = ({ style, color, onPress, children }) => {
   const { colors } = useTheme();
 
-  let arrayed: TextStyle[] = [];
-
-  if (Array.isArray(style)) {
-    arrayed = style.slice(0);
-  } else if (style) {
-    arrayed.push(style);
-  }
-  arrayed.push({ color: color || colors.text, fontSize: 18, fontWeight: '600', opacity: 1 });
+  const styleSum: TextStyle = { color: color || colors.text, fontSize: 18, fontWeight: '600', opacity: 1, ...style };
 
   return (
-    <Text style={arrayed} onPress={onPress}>
+    <Text style={styleSum} onPress={onPress}>
       {children}
     </Text>
   );

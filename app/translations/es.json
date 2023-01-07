@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo!",
-  "version": "v0.1.0 (104)",
+  "version": "v0.1.0 (107)",
   "loading": "cargando...",
   "wait": "Por favor espere...",
   "workingonit": "Estamos trabajando en esta funcionalidad",
@@ -257,7 +257,7 @@
     "pools": "grupos...",
     "transactions": "Transacciones",
     "sure": "¿Seguro? ",
-    "minago": "min. atrás"
+    "minago": " min. atrás"
   },
   "report": {
     "title": "Informe de Sincronización",

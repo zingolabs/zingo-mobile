@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo!",
-  "version": "v0.1.0 (104)",
+  "version": "v0.1.0 (107)",
   "loading": "loading...",
   "wait": "Please wait...",
   "workingonit": "We are working on this feature.",
@@ -257,7 +257,7 @@
     "pools": "pools...",
     "transactions": "Transactions",
     "sure": "Sure? ",
-    "minago": "min. ago"
+    "minago": " min. ago"
   },
   "report": {
     "title": "Sync / Rescan Report",
