@@ -84,11 +84,7 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
               minWidth: 48,
               minHeight: 48,
             }}>
-            {textBefore && (
-              <RegText style={{ marginRight: 5, color: colors.primary }}>
-                {textBefore}
-              </RegText>
-            )}
+            {textBefore && <RegText style={{ marginRight: 5, color: colors.primary }}>{textBefore}</RegText>}
             <FontAwesomeIcon icon={faRefresh} size={20} color={colors.primary} />
             {refreshMinutes > 0 && (
               <FadeText style={{ marginLeft: 5 }}>
@@ -120,14 +116,19 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
               borderColor: colors.primary,
               borderWidth: 1,
             }}>
-            <View 
-              style={{ 
+            <View
+              style={{
                 position: 'relative',
                 flexDirection: 'row',
                 minWidth: 25,
                 minHeight: 48,
               }}>
-              <FontAwesomeIcon icon={faRefresh} size={20} color={colors.primary} style={{ position: 'absolute', top: 15, left: 0 }} />
+              <FontAwesomeIcon
+                icon={faRefresh}
+                size={20}
+                color={colors.primary}
+                style={{ position: 'absolute', top: 15, left: 0 }}
+              />
               <RegText color={colors.card} style={{ position: 'absolute', top: 17, left: 6, fontSize: 13 }}>
                 {count.toString()}
               </RegText>
