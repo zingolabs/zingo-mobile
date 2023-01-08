@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
-import { TouchableOpacity, View } from 'react-native';
+import { Platform, TouchableOpacity, View } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faRefresh } from '@fortawesome/free-solid-svg-icons';
@@ -126,14 +126,16 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
               <FontAwesomeIcon
                 icon={faRefresh}
                 size={20}
-                color={colors.primary}
+                color={colors.background}
                 style={{ position: 'absolute', top: 15, left: 0 }}
               />
-              <RegText color={colors.card} style={{ position: 'absolute', top: 17, left: 6, fontSize: 13 }}>
+              <RegText
+                color={colors.text}
+                style={{ position: 'absolute', top: Platform.OS === 'ios' ? 17 : 14, left: 6, fontSize: 13 }}>
                 {count.toString()}
               </RegText>
             </View>
-            <RegText color={colors.primary}>{translate('transactions.sure')}</RegText>
+            <RegText color={colors.background}>{translate('transactions.sure')}</RegText>
           </View>
         </TouchableOpacity>
       )}
