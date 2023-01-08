@@ -103,7 +103,9 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal, setZecPrice }) =
                     : `$ -- ${currency} per ${info.currencyName ? info.currencyName : '---'}`
                 }
               />
-              <PriceFetcher setZecPrice={setZecPrice} />
+              <View style={{ marginLeft: 5 }}>
+                  <PriceFetcher setZecPrice={setZecPrice} />
+                </View>
             </View>
           )}
         </View>

@@ -430,7 +430,9 @@ const Send: React.FunctionComponent<SendProps> = ({
                   amtZec={totalBalance.total}
                   currency={currency}
                 />
-                <PriceFetcher setZecPrice={setZecPrice} />
+                <View style={{ marginLeft: 5 }}>
+                  <PriceFetcher setZecPrice={setZecPrice} />
+                </View>
               </View>
             )}
 
@@ -607,7 +609,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           maxLength={20}
                         />
                       </View>
-                      <RegText style={{ marginTop: 15, marginRight: 10, marginLeft: 5 }}>ZEC</RegText>
+                      <RegText style={{ marginTop: 19, marginRight: 10, marginLeft: 5 }}>ZEC</RegText>
                     </View>
 
                     <View style={{ display: 'flex', flexDirection: 'column' }}>
@@ -649,20 +651,10 @@ const Send: React.FunctionComponent<SendProps> = ({
                   {zecPrice.zecPrice <= 0 && (
                     <View
                       style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'flex-start',
                         width: '35%',
+                        marginTop: 5,
                       }}>
-                      <View
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                        }}>
-                        <PriceFetcher setZecPrice={setZecPrice} />
-                      </View>
+                      <PriceFetcher setZecPrice={setZecPrice} textBefore={translate('send.nofetchprice')} />
                     </View>
                   )}
 
@@ -726,7 +718,9 @@ const Send: React.FunctionComponent<SendProps> = ({
                           amtZec={totalBalance.total}
                           currency={'USD'}
                         />
-                        <PriceFetcher setZecPrice={setZecPrice} />
+                        <View style={{ marginLeft: 5 }}>
+                          <PriceFetcher setZecPrice={setZecPrice} />
+                        </View>
                       </View>
                     </View>
                   )}
@@ -893,7 +887,9 @@ const Send: React.FunctionComponent<SendProps> = ({
                       amtZec={totalBalance.total}
                       currency={currency}
                     />
-                    <PriceFetcher setZecPrice={setZecPrice} />
+                    <View style={{ marginLeft: 5 }}>
+                      <PriceFetcher setZecPrice={setZecPrice} />
+                    </View>
                   </View>
                 )}
               </View>
@@ -1086,7 +1082,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                             maxLength={20}
                           />
                         </View>
-                        <RegText style={{ marginTop: 15, marginRight: 10, marginLeft: 5 }}>ZEC</RegText>
+                        <RegText style={{ marginTop: 19, marginRight: 10, marginLeft: 5 }}>ZEC</RegText>
                       </View>
 
                       <View style={{ display: 'flex', flexDirection: 'column' }}>
@@ -1128,19 +1124,11 @@ const Send: React.FunctionComponent<SendProps> = ({
                     {zecPrice.zecPrice <= 0 && (
                       <View
                         style={{
-                          display: 'flex',
-                          flexDirection: 'column',
-                          justifyContent: 'flex-start',
                           width: '35%',
+                          marginTop: 5,
                         }}>
-                        <View
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                          }}>
-                          <PriceFetcher setZecPrice={setZecPrice} />
+                        <View>
+                          <PriceFetcher setZecPrice={setZecPrice} textBefore={translate('send.nofetchprice')} />
                         </View>
                       </View>
                     )}
@@ -1205,7 +1193,9 @@ const Send: React.FunctionComponent<SendProps> = ({
                             amtZec={totalBalance.total}
                             currency={'USD'}
                           />
-                          <PriceFetcher setZecPrice={setZecPrice} />
+                          <View style={{ marginLeft: 5 }}>
+                            <PriceFetcher setZecPrice={setZecPrice} />
+                          </View>
                         </View>
                       </View>
                     )}

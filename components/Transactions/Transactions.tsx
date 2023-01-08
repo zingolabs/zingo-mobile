@@ -151,7 +151,9 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
               amtZec={totalBalance.total}
               currency={currency}
             />
-            <PriceFetcher setZecPrice={setZecPrice} />
+            <View style={{ marginLeft: 5 }}>
+              <PriceFetcher setZecPrice={setZecPrice} />
+            </View>
           </View>
         )}
 
@@ -345,7 +347,9 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
                   amtZec={totalBalance.total}
                   currency={currency}
                 />
-                <PriceFetcher setZecPrice={setZecPrice} />
+                <View style={{ marginLeft: 5 }}>
+                  <PriceFetcher setZecPrice={setZecPrice} />
+                </View>
               </View>
             )}
           </View>

@@ -12,9 +12,10 @@ import RegText from './RegText';
 
 type PriceFetcherProps = {
   setZecPrice: (p: number, d: number) => void;
+  textBefore?: string;
 };
 
-const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice }) => {
+const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice, textBefore }) => {
   const context = useContext(ContextLoaded);
   const { translate, zecPrice } = context;
   const [refreshSure, setRefreshSure] = useState(false);
@@ -73,7 +74,6 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice 
         <TouchableOpacity onPress={() => setRefreshSure(true)}>
           <View
             style={{
-              display: 'flex',
               flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'center',
@@ -81,13 +81,17 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice 
               borderRadius: 10,
               margin: 0,
               padding: 5,
-              marginLeft: 0,
               minWidth: 48,
               minHeight: 48,
             }}>
+            {textBefore && (
+              <RegText style={{ marginRight: 5, color: colors.primary }}>
+                {textBefore}
+              </RegText>
+            )}
             <FontAwesomeIcon icon={faRefresh} size={20} color={colors.primary} />
             {refreshMinutes > 0 && (
-              <FadeText style={{ paddingLeft: 5 }}>
+              <FadeText style={{ marginLeft: 5 }}>
                 {formatMinutes(refreshMinutes) + translate('transactions.minago')}
               </FadeText>
             )}
@@ -104,7 +108,6 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice 
           }}>
           <View
             style={{
-              display: 'flex',
               flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'center',
@@ -112,17 +115,24 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice 
               borderRadius: 10,
               margin: 0,
               padding: 5,
-              marginLeft: 5,
               minWidth: 48,
               minHeight: 48,
               borderColor: colors.primary,
               borderWidth: 1,
             }}>
-            <FontAwesomeIcon icon={faRefresh} size={20} color={colors.primary} style={{ marginRight: 5 }} />
+            <View 
+              style={{ 
+                position: 'relative',
+                flexDirection: 'row',
+                minWidth: 25,
+                minHeight: 48,
+              }}>
+              <FontAwesomeIcon icon={faRefresh} size={20} color={colors.primary} style={{ position: 'absolute', top: 15, left: 0 }} />
+              <RegText color={colors.card} style={{ position: 'absolute', top: 17, left: 6, fontSize: 13 }}>
+                {count.toString()}
+              </RegText>
+            </View>
             <RegText color={colors.primary}>{translate('transactions.sure')}</RegText>
-            <RegText color={colors.card} style={{ fontSize: 15 }}>
-              {count.toString()}
-            </RegText>
           </View>
         </TouchableOpacity>
       )}

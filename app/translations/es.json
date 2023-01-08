@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo!",
-  "version": "v0.1.0 (107)",
+  "version": "v0.1.0 (108)",
   "loading": "cargando...",
   "wait": "Por favor espere...",
   "workingonit": "Estamos trabajando en esta funcionalidad",
@@ -193,7 +193,7 @@
     "usd-acc": "Campo de Cantidad en Dólares",
     "memo-acc": "Campo del Memorándum",
     "amountplaceholder": "numero",
-    "nofetchprice": "Precio no consultado"
+    "nofetchprice": "Sin precio"
   },
   "legacy": {
     "o-title": "U-Orchard",
