@@ -2,6 +2,9 @@ package com.zingo
 
 import android.app.Application
 import android.content.Context
+import android.util.Log
+import androidx.work.Worker
+import androidx.work.WorkerParameters
 import com.facebook.react.*
 import com.facebook.soloader.SoLoader
 import java.lang.reflect.InvocationTargetException
@@ -35,13 +38,11 @@ class MainApplication : Application(), ReactApplication {
 
     override fun onCreate() {
         super.onCreate()
-        MainApplication.context = getApplicationContext();
+        MainApplication.context = getApplicationContext()
 
         SoLoader.init(this, false)
         // initializeFlipper(this, reactNativeHost.reactInstanceManager)
     }
-
-
 
     companion object {
         /**
@@ -82,5 +83,16 @@ class MainApplication : Application(), ReactApplication {
         init {
             System.loadLibrary("rust")
         }
+    }
+}
+
+class UploadWorker(appContext: Context, workerParams: WorkerParameters): Worker(appContext, workerParams) {
+    override fun doWork(): Result {
+
+        // Do the work here--in this case, upload the images.
+        Log.w("BACKGROUND", "Background work running")
+
+        // Indicate whether the work finished successfully with the Result
+        return Result.success()
     }
 }
