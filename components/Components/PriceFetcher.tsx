@@ -134,7 +134,7 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
               />
               <RegText
                 color={colors.text}
-                style={{ position: 'absolute', top: Platform.OS === 'ios' ? 17 : 14, left: 6, fontSize: 13 }}>
+                style={{ position: 'absolute', top: Platform.OS === 'ios' ? 17 : 14, left: 6, fontSize: 13, fontWeight: 'bold' }}>
                 {count.toString()}
               </RegText>
             </View>
