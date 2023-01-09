@@ -1,12 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState } from 'react';
 import { View, ScrollView, Image, Modal, RefreshControl, Text } from 'react-native';
 import Toast from 'react-native-simple-toast';
 import moment from 'moment';
 import 'moment/locale/es';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faBars, faInfo, faRefresh } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faInfo } from '@fortawesome/free-solid-svg-icons';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
 import RPC from '../../app/rpc';
@@ -20,6 +20,7 @@ import Button from '../Button';
 import TxDetail from './components/TxDetail';
 import TxSummaryLine from './components/TxSummaryLine';
 import { ContextLoaded } from '../../app/context';
+import PriceFetcher from '../Components/PriceFetcher';
 
 type TransactionsProps = {
   doRefresh: () => void;
@@ -44,8 +45,6 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
   const { colors } = useTheme() as unknown as ThemeType;
   const [isTxDetailModalShowing, setTxDetailModalShowing] = useState(false);
   const [txDetail, setTxDetail] = useState<TransactionType>({} as TransactionType);
-  const [refreshSure, setRefreshSure] = useState(false);
-  const [refreshMinutes, setRefreshMinutes] = useState(0);
 
   const [numTx, setNumTx] = useState<number>(100);
   const loadMoreButton = numTx < (transactions.length || 0);
@@ -80,21 +79,6 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
   //const balanceColor = transactions.find(t => t.confirmations === 0) ? colors.primary : colors.text;
   const balanceColor = colors.text;
   var lastMonth = '';
-
-  useEffect(() => {
-    const fn = () => {
-      if (zecPrice.date > 0) {
-        const date1 = moment();
-        const date2 = moment(zecPrice.date);
-        setRefreshMinutes(date1.diff(date2, 'minutes'));
-      }
-    };
-
-    fn();
-    const inter = setInterval(fn, 5000);
-
-    return () => clearInterval(inter);
-  }, [zecPrice.date]);
 
   //console.log('render transaction');
 
@@ -167,59 +151,9 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
               amtZec={totalBalance.total}
               currency={currency}
             />
-            {!refreshSure && (
-              <TouchableOpacity onPress={() => setRefreshSure(true)}>
-                <View
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    backgroundColor: colors.card,
-                    borderRadius: 10,
-                    margin: 0,
-                    padding: 5,
-                    marginLeft: 0,
-                    minWidth: 48,
-                    minHeight: 48,
-                  }}>
-                  <FontAwesomeIcon icon={faRefresh} size={20} color={colors.primary} />
-                  {refreshMinutes > 0 && (
-                    <FadeText style={{ paddingLeft: 5 }}>
-                      {refreshMinutes.toString() + translate('transactions.minago')}
-                    </FadeText>
-                  )}
-                </View>
-              </TouchableOpacity>
-            )}
-            {refreshSure && (
-              <TouchableOpacity
-                onPress={async () => {
-                  setZecPrice(await RPC.rpc_getZecPrice(), Date.now());
-                  setRefreshSure(false);
-                  setRefreshMinutes(0);
-                }}>
-                <View
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    backgroundColor: 'red',
-                    borderRadius: 10,
-                    margin: 0,
-                    padding: 5,
-                    marginLeft: 5,
-                    minWidth: 48,
-                    minHeight: 48,
-                    borderColor: colors.primary,
-                    borderWidth: 1,
-                  }}>
-                  <FontAwesomeIcon icon={faRefresh} size={20} color={colors.primary} style={{ marginRight: 5 }} />
-                  <RegText color={colors.primary}>{translate('transactions.sure')}</RegText>
-                </View>
-              </TouchableOpacity>
-            )}
+            <View style={{ marginLeft: 5 }}>
+              <PriceFetcher setZecPrice={setZecPrice} />
+            </View>
           </View>
         )}
 
@@ -413,59 +347,9 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
                   amtZec={totalBalance.total}
                   currency={currency}
                 />
-                {!refreshSure && (
-                  <TouchableOpacity onPress={() => setRefreshSure(true)}>
-                    <View
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        backgroundColor: colors.card,
-                        borderRadius: 10,
-                        margin: 0,
-                        padding: 5,
-                        marginLeft: 0,
-                        minWidth: 48,
-                        minHeight: 48,
-                      }}>
-                      <FontAwesomeIcon icon={faRefresh} size={20} color={colors.primary} />
-                      {refreshMinutes > 0 && (
-                        <FadeText style={{ paddingLeft: 5 }}>
-                          {refreshMinutes.toString() + translate('transactions.minago')}
-                        </FadeText>
-                      )}
-                    </View>
-                  </TouchableOpacity>
-                )}
-                {refreshSure && (
-                  <TouchableOpacity
-                    onPress={async () => {
-                      setZecPrice(await RPC.rpc_getZecPrice(), Date.now());
-                      setRefreshSure(false);
-                      setRefreshMinutes(0);
-                    }}>
-                    <View
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        backgroundColor: 'red',
-                        borderRadius: 10,
-                        margin: 0,
-                        padding: 5,
-                        marginLeft: 5,
-                        minWidth: 48,
-                        minHeight: 48,
-                        borderColor: colors.primary,
-                        borderWidth: 1,
-                      }}>
-                      <FontAwesomeIcon icon={faRefresh} size={20} color={colors.primary} style={{ marginRight: 5 }} />
-                      <RegText color={colors.primary}>{translate('transactions.sure')}</RegText>
-                    </View>
-                  </TouchableOpacity>
-                )}
+                <View style={{ marginLeft: 5 }}>
+                  <PriceFetcher setZecPrice={setZecPrice} />
+                </View>
               </View>
             )}
           </View>

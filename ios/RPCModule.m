@@ -357,4 +357,33 @@ RCT_REMAP_METHOD(execute,
   [NSThread detachNewThreadSelector:@selector(doExecuteOnThread:) toTarget:self withObject:dict];
 }
 
+// initialize light client
+RCT_REMAP_METHOD(initLightClient,
+                 server:(NSString*)server
+                 initLightClientWithResolver:(RCTPromiseResolveBlock)resolve
+                 rejected:(RCTPromiseRejectBlock)reject) {
+  @autoreleasepool {
+    // RCTLogInfo(@"createNewWallet called");
+
+    NSString* pathSaplingOutput = [[NSBundle mainBundle]
+                      pathForResource:@"saplingoutput" ofType:@""];
+    NSData* saplingOutput = [NSData dataWithContentsOfFile:pathSaplingOutput];
+
+
+    NSString* pathSaplingSpend = [[NSBundle mainBundle]
+                      pathForResource:@"saplingspend" ofType:@""];
+    NSData* saplingSpend = [NSData dataWithContentsOfFile:pathSaplingSpend];
+
+    NSArray *paths = NSSearchPathForDirectoriesInDomains
+                    (NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+
+    char* resp = init_light_client([server UTF8String], [[saplingOutput base64EncodedStringWithOptions:0] UTF8String], [[saplingSpend base64EncodedStringWithOptions:0] UTF8String], [documentsDirectory UTF8String]);
+    NSString* respStr = [NSString stringWithUTF8String:resp];
+    rust_free(resp);
+
+    resolve(respStr);
+  }
+}
+
 @end

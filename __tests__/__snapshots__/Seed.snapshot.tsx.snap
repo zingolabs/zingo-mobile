@@ -63,17 +63,13 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
       >
         <Text
           style={
-            [
-              {
-                "textAlign": "center",
-              },
-              {
-                "color": "rgb(28, 28, 30)",
-                "fontSize": 18,
-                "fontWeight": "600",
-                "opacity": 1,
-              },
-            ]
+            {
+              "color": "rgb(28, 28, 30)",
+              "fontSize": 18,
+              "fontWeight": "600",
+              "opacity": 1,
+              "textAlign": "center",
+            }
           }
         >
           pepe lolo titi
@@ -143,17 +139,13 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
         </Text>
         <Text
           style={
-            [
-              {
-                "textAlign": "center",
-              },
-              {
-                "color": "rgb(28, 28, 30)",
-                "fontSize": 18,
-                "fontWeight": "600",
-                "opacity": 1,
-              },
-            ]
+            {
+              "color": "rgb(28, 28, 30)",
+              "fontSize": 18,
+              "fontWeight": "600",
+              "opacity": 1,
+              "textAlign": "center",
+            }
           }
         >
           1500100
@@ -359,17 +351,13 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
       >
         <Text
           style={
-            [
-              {
-                "textAlign": "center",
-              },
-              {
-                "color": "rgb(28, 28, 30)",
-                "fontSize": 18,
-                "fontWeight": "600",
-                "opacity": 1,
-              },
-            ]
+            {
+              "color": "rgb(28, 28, 30)",
+              "fontSize": 18,
+              "fontWeight": "600",
+              "opacity": 1,
+              "textAlign": "center",
+            }
           }
         >
           pepe lolo titi
@@ -439,17 +427,13 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
         </Text>
         <Text
           style={
-            [
-              {
-                "textAlign": "center",
-              },
-              {
-                "color": "rgb(28, 28, 30)",
-                "fontSize": 18,
-                "fontWeight": "600",
-                "opacity": 1,
-              },
-            ]
+            {
+              "color": "rgb(28, 28, 30)",
+              "fontSize": 18,
+              "fontWeight": "600",
+              "opacity": 1,
+              "textAlign": "center",
+            }
           }
         >
           1500100
@@ -655,17 +639,13 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
       >
         <Text
           style={
-            [
-              {
-                "textAlign": "center",
-              },
-              {
-                "color": "rgb(28, 28, 30)",
-                "fontSize": 18,
-                "fontWeight": "600",
-                "opacity": 1,
-              },
-            ]
+            {
+              "color": "rgb(28, 28, 30)",
+              "fontSize": 18,
+              "fontWeight": "600",
+              "opacity": 1,
+              "textAlign": "center",
+            }
           }
         >
           pepe lolo titi
@@ -735,17 +715,13 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
         </Text>
         <Text
           style={
-            [
-              {
-                "textAlign": "center",
-              },
-              {
-                "color": "rgb(28, 28, 30)",
-                "fontSize": 18,
-                "fontWeight": "600",
-                "opacity": 1,
-              },
-            ]
+            {
+              "color": "rgb(28, 28, 30)",
+              "fontSize": 18,
+              "fontWeight": "600",
+              "opacity": 1,
+              "textAlign": "center",
+            }
           }
         >
           1500100
@@ -1236,17 +1212,13 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
       >
         <Text
           style={
-            [
-              {
-                "textAlign": "center",
-              },
-              {
-                "color": "rgb(28, 28, 30)",
-                "fontSize": 18,
-                "fontWeight": "600",
-                "opacity": 1,
-              },
-            ]
+            {
+              "color": "rgb(28, 28, 30)",
+              "fontSize": 18,
+              "fontWeight": "600",
+              "opacity": 1,
+              "textAlign": "center",
+            }
           }
         >
           pepe lolo titi
@@ -1316,17 +1288,13 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
         </Text>
         <Text
           style={
-            [
-              {
-                "textAlign": "center",
-              },
-              {
-                "color": "rgb(28, 28, 30)",
-                "fontSize": 18,
-                "fontWeight": "600",
-                "opacity": 1,
-              },
-            ]
+            {
+              "color": "rgb(28, 28, 30)",
+              "fontSize": 18,
+              "fontWeight": "600",
+              "opacity": 1,
+              "textAlign": "center",
+            }
           }
         >
           1500100
@@ -1532,17 +1500,13 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
       >
         <Text
           style={
-            [
-              {
-                "textAlign": "center",
-              },
-              {
-                "color": "rgb(28, 28, 30)",
-                "fontSize": 18,
-                "fontWeight": "600",
-                "opacity": 1,
-              },
-            ]
+            {
+              "color": "rgb(28, 28, 30)",
+              "fontSize": 18,
+              "fontWeight": "600",
+              "opacity": 1,
+              "textAlign": "center",
+            }
           }
         >
           pepe lolo titi
@@ -1612,17 +1576,13 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
         </Text>
         <Text
           style={
-            [
-              {
-                "textAlign": "center",
-              },
-              {
-                "color": "rgb(28, 28, 30)",
-                "fontSize": 18,
-                "fontWeight": "600",
-                "opacity": 1,
-              },
-            ]
+            {
+              "color": "rgb(28, 28, 30)",
+              "fontSize": 18,
+              "fontWeight": "600",
+              "opacity": 1,
+              "textAlign": "center",
+            }
           }
         >
           1500100

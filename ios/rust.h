@@ -26,3 +26,8 @@ char *initfromb64(const char *server_uri,
 char *save(void);
 
 char *execute(const char *cmd, const char *args_list);
+
+char *init_light_client(const char *server_uri,
+                        const char *sapling_output,
+                        const char *sapling_spend,
+                        const char *data_dir);

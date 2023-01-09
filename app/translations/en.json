@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo!",
-  "version": "v0.1.0 (104)",
+  "version": "v0.1.0 (108)",
   "loading": "loading...",
   "wait": "Please wait...",
   "workingonit": "We are working on this feature.",
@@ -193,7 +193,7 @@
     "usd-acc": "USD Amount Field",
     "memo-acc": "Memo Field",
     "amountplaceholder": "number",
-    "nofetchprice": "No fetched price"
+    "nofetchprice": "No price"
   },
   "legacy": {
     "o-title": "U-Orchard",
@@ -257,7 +257,7 @@
     "pools": "pools...",
     "transactions": "Transactions",
     "sure": "Sure? ",
-    "minago": "min. ago"
+    "minago": " min."
   },
   "report": {
     "title": "Sync / Rescan Report",
