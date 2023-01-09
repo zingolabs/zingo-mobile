@@ -12,6 +12,9 @@
 #import <React/RCTBridgeModule.h>
 
 @interface RPCModule: NSObject <RCTBridgeModule>
+
+-(void) saveWalletInternal;
+
 @end
 
 

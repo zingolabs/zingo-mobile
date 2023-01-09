@@ -12,6 +12,10 @@
 #import <SKIOSNetworkPlugin/SKIOSNetworkAdapter.h>
 #import <FlipperKitReactPlugin/FlipperKitReactPlugin.h>
 
+#import <BackgroundTasks/BackgroundTasks.h>
+#import "RPCModule.h"
+#import "rust.h"
+
 static void InitializeFlipper(UIApplication *application) {
   FlipperClient *client = [FlipperClient sharedClient];
   SKDescriptorMapper *layoutDescriptorMapper = [[SKDescriptorMapper alloc] initWithDefaults];
@@ -24,6 +28,23 @@ static void InitializeFlipper(UIApplication *application) {
 #endif
 
 @implementation AppDelegate
+
+- (BOOL)application:(UIApplication *)application willFinishLaunchingWithOptions:(NSDictionary *)launchOptions
+{
+  if (@available(iOS 13.0, *)) {
+      NSLog(@"configureProcessingTask");
+      [self configureProcessingTask];
+  }
+  return YES;
+}
+
+- (void)applicationDidEnterBackground:(UIApplication *)application
+{
+  if (@available(iOS 13.0, *)) {
+      NSLog(@"scheduleProcessingTask");
+      [self scheduleProcessingTask];
+  }
+}
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
@@ -55,4 +76,86 @@ static void InitializeFlipper(UIApplication *application) {
 #endif
 }
 
+static NSString* syncTask = @"Zingo_Processing_Task_ID";
+
+-(void)configureProcessingTask {
+    if (@available(iOS 13.0, *)) {
+        [[BGTaskScheduler sharedScheduler] registerForTaskWithIdentifier:syncTask
+                                                              usingQueue:nil
+                                                           launchHandler:^(BGTask *task) {
+            [self scheduleLocalNotifications];
+            [self handleProcessingTask:task];
+        }];
+    } else {
+        // No fallback
+    }
+}
+
+-(void)scheduleLocalNotifications {
+    //do things
+}
+
+-(void)handleProcessingTask:(BGTask *)task API_AVAILABLE(ios(13.0)){
+  //do things with task
+  
+  NSArray *paths = NSSearchPathForDirectoriesInDomains
+                    (NSDocumentDirectory, NSUserDomainMask, YES);
+  NSString *documentsDirectory = [paths objectAtIndex:0];
+
+  //make a file name to write the data to using the documents directory:
+  NSString *fileName = [NSString stringWithFormat:@"%@/settings.json",
+                                                  documentsDirectory];
+  NSString *content = [[NSString alloc] initWithContentsOfFile:fileName
+                                                  usedEncoding:nil
+                                                         error:nil];
+  NSArray *jsonContent = [NSJSONSerialization JSONObjectWithData:[content dataUsingEncoding:<#(NSStringEncoding)#>:NSUTF8StringEncoding] options:0 error:NULL];
+  
+  NSString *server = [jsonContent valueForKey:@"server"];
+  
+  NSString* pathSaplingOutput = [[NSBundle mainBundle]
+                        pathForResource:@"saplingoutput" ofType:@""];
+  NSData* saplingOutput = [NSData dataWithContentsOfFile:pathSaplingOutput];
+
+
+  NSString* pathSaplingSpend = [[NSBundle mainBundle]
+                        pathForResource:@"saplingspend" ofType:@""];
+  NSData* saplingSpend = [NSData dataWithContentsOfFile:pathSaplingSpend];
+
+  char* resp = init_light_client([server UTF8String], [[saplingOutput base64EncodedStringWithOptions:0] UTF8String], [[saplingSpend base64EncodedStringWithOptions:0] UTF8String], [documentsDirectory UTF8String]);
+  NSString* respStr = [NSString stringWithUTF8String:resp];
+  rust_free(resp);
+  
+  char *resp2 = execute("sync", "");
+  NSString* respStr2 = [NSString stringWithUTF8String:resp2];
+  rust_free(resp2);
+
+  NSLog(@"handleProcessingTask");
+
+  if (![respStr2 hasPrefix:@"Error"]) {
+    // Also save the wallet after sync
+    RPCModule *rpcmodule = [RPCModule new];
+    [rpcmodule saveWalletInternal];
+  }
+}
+
+-(void)scheduleProcessingTask {
+    if (@available(iOS 13.0, *)) {
+        NSError *error = NULL;
+        // cancel existing task (if any)
+        [BGTaskScheduler.sharedScheduler cancelTaskRequestWithIdentifier:syncTask];
+        // new task
+        BGProcessingTaskRequest *request = [[BGProcessingTaskRequest alloc] initWithIdentifier:syncTask];
+        request.requiresNetworkConnectivity = YES;
+        request.earliestBeginDate = [NSDate dateWithTimeIntervalSinceNow:5];
+        BOOL success = [[BGTaskScheduler sharedScheduler] submitTaskRequest:request error:&error];
+        if (!success) {
+            // Errorcodes https://stackoverflow.com/a/58224050/872051
+            NSLog(@"Failed to submit request: %@", error);
+        } else {
+            NSLog(@"Success submit request %@", request);
+        }
+    } else {
+        // No fallback
+    }
+}
 @end
