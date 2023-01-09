@@ -1,13 +1,26 @@
-name: yarn
+name: CI
 
-on: [pull_request]
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - dev
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  Build:
+    runs-on:                 ubuntu-22.04
     steps:
-    - uses: actions/checkout@v3
-    - name: Yarn
-      uses: docker://node:latest
-    - run: yarn install
-    - run: yarn test
+      - name:                Checkout repository
+        uses:                actions/checkout@v3
+      - name:                Build NDK
+        run:                 cd rust && ./build.sh
+  
+  Test:
+    runs-on:                 ubuntu-22.04
+    steps:
+      - name:                Checkout repository
+        uses:                actions/checkout@v3
+      - run:                 yarn install
+      - name:                Run tests
+        run:                 yarn test
