@@ -97,7 +97,10 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
       {refreshSure && (
         <TouchableOpacity
           onPress={async () => {
-            setZecPrice(await RPC.rpc_getZecPrice(), Date.now());
+            const price = await RPC.rpc_getZecPrice();
+            if (price > 0) {
+              setZecPrice(price, Date.now());
+            }
             setRefreshSure(false);
             setRefreshMinutes(0);
             setCount(5);
