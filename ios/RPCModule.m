@@ -202,8 +202,10 @@ RCT_REMAP_METHOD(createNewWallet,
 
     // RCTLogInfo(@"Got seed: %@", seedStr);
 
-    // Also save the wallet after create
-    [self saveWalletInternal];
+    if (![seedStr hasPrefix:@"Error"]) {
+      // Also save the wallet after restore
+      [self saveWalletInternal];
+    }
 
     resolve(seedStr);
   }

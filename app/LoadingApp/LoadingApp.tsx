@@ -270,7 +270,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
         this.set_wallet_option('download_memos', 'wallet');
         //await this.set_wallet_option('transaction_filter_threshold', '500');
       } else {
-        this.setState({ walletExists: false, actionButtonsDisabled: false });
+        this.setState({ actionButtonsDisabled: false });
         Alert.alert(this.props.translate('loadingapp.creatingwallet-label'), seed);
       }
     });

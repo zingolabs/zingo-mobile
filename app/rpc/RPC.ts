@@ -46,6 +46,7 @@ export default class RPC {
   walletBirthday: number;
 
   inRefresh: boolean;
+  blocksPerBatch: number;
 
   prevProgress: number;
   prevBatchNum: number;
@@ -84,6 +85,7 @@ export default class RPC {
     this.walletBirthday = 0;
 
     this.inRefresh = false;
+    this.blocksPerBatch = 100;
 
     this.prevProgress = 0;
     this.prevBatchNum = -1;
@@ -540,26 +542,26 @@ export default class RPC {
         if (synced_blocks < 0) {
           synced_blocks = 0;
         }
-        if (synced_blocks > 100) {
-          synced_blocks = 100;
+        if (synced_blocks > this.blocksPerBatch) {
+          synced_blocks = this.blocksPerBatch;
         }
         if (trial_decryptions_blocks < 0) {
           trial_decryptions_blocks = 0;
         }
-        if (trial_decryptions_blocks > 100) {
-          trial_decryptions_blocks = 100;
+        if (trial_decryptions_blocks > this.blocksPerBatch) {
+          trial_decryptions_blocks = this.blocksPerBatch;
         }
         if (txn_scan_blocks < 0) {
           txn_scan_blocks = 0;
         }
-        if (txn_scan_blocks > 100) {
-          txn_scan_blocks = 100;
+        if (txn_scan_blocks > this.blocksPerBatch) {
+          txn_scan_blocks = this.blocksPerBatch;
         }
         if (witnesses_updated < 0) {
           witnesses_updated = 0;
         }
-        if (witnesses_updated > 100) {
-          witnesses_updated = 100;
+        if (witnesses_updated > this.blocksPerBatch) {
+          witnesses_updated = this.blocksPerBatch;
         }
 
         const batch_total: number = ss.batch_total || 0;
@@ -572,9 +574,10 @@ export default class RPC {
         //const progress_blocks: number = (synced_blocks + trial_decryptions_blocks + txn_scan_blocks) / 3;
         const progress_blocks: number = (synced_blocks + trial_decryptions_blocks + witnesses_updated) / 3;
 
-        const total_progress_blocks: number = batch_total === 1 ? progress_blocks : 100 * batch_num + progress_blocks;
+        const total_progress_blocks: number =
+          batch_total === 1 ? progress_blocks : this.blocksPerBatch * batch_num + progress_blocks;
 
-        let progress: number = (total_progress_blocks * 100) / total_general_blocks;
+        let progress: number = (total_progress_blocks * this.blocksPerBatch) / total_general_blocks;
 
         // not using a fake increment. But could be a good idea.
         const increment: number = 0;
@@ -585,7 +588,7 @@ export default class RPC {
           progress = this.prevProgress + increment;
         }
 
-        // just in case.
+        // just in case %
         if (progress > 100) {
           progress = 100;
         }
@@ -620,7 +623,7 @@ export default class RPC {
           currentBlock: parseInt(current_block.toFixed(0), 10),
           inProgress: ss.in_progress,
           lastError: ss.last_error,
-          blocksPerBatch: 100,
+          blocksPerBatch: this.blocksPerBatch,
           secondsPerBatch: this.seconds_batch,
           percent: progress,
           message: this.message,
@@ -663,7 +666,7 @@ export default class RPC {
             currentBlock: parseInt(current_block.toFixed(0), 10),
             inProgress: false,
             lastError: ss.last_error,
-            blocksPerBatch: 100,
+            blocksPerBatch: this.blocksPerBatch,
             secondsPerBatch: 0,
             percent: 0,
             message: this.message,
@@ -699,7 +702,7 @@ export default class RPC {
                 currentBlock: parseInt(current_block.toFixed(0), 10),
                 inProgress: ss.in_progress,
                 lastError: ss.last_error,
-                blocksPerBatch: 100,
+                blocksPerBatch: this.blocksPerBatch,
                 secondsPerBatch: this.seconds_batch,
                 percent: progress,
                 message: this.message,
@@ -738,7 +741,7 @@ export default class RPC {
               currentBlock: parseInt(current_block.toFixed(0), 10),
               inProgress: ss.in_progress,
               lastError: ss.last_error,
-              blocksPerBatch: 100,
+              blocksPerBatch: this.blocksPerBatch,
               secondsPerBatch: this.seconds_batch,
               percent: progress,
               message: this.message,
