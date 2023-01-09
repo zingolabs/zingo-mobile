@@ -2,6 +2,7 @@ package com.zingo
 
 
 import android.content.Context
+import android.util.Log
 import android.util.Base64
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
@@ -134,7 +135,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             saplingOutputEncoded.toString(),
             saplingSpendEncoded.toString(),
             reactContext.applicationContext.filesDir.absolutePath)
-        // Log.w("MAIN-Seed", seed)
+        Log.w("MAIN-Seed", seed)
 
         if (!seed.startsWith("Error")) {
             saveWallet()
@@ -220,7 +221,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             saplingOutputEncoded.toString(),
             saplingSpendEncoded.toString(),
             reactContext.applicationContext.filesDir.absolutePath)
-        // Log.w("MAIN", seed)
+        Log.w("MAIN", seed)
 
         if (!rseed.startsWith("Error")) {
             saveWallet()
@@ -360,7 +361,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             saplingOutputEncoded.toString(),
             saplingSpendEncoded.toString(),
             reactContext.applicationContext.filesDir.absolutePath)
-        // Log.w("MAIN", seed)
+        Log.w("MAIN", wseed)
 
         promise.resolve(wseed)
     }
@@ -416,9 +417,9 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
             initlogging()
 
-            //Log.w(TAG, "Trying to send $sendJSON")
+            Log.w("send", "Trying to send $sendJSON")
             val result = execute("send", sendJSON)
-            //Log.w(TAG, "Send Result: $result")
+            Log.w("send", "Send Result: $result")
 
             promise.resolve(result)
         }
@@ -430,9 +431,9 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
             initlogging()
 
-            //Log.w(TAG, "Executing $cmd with $args")
+            Log.w("execute", "Executing $cmd with $args")
             val resp = execute(cmd, args)
-            //Log.w(TAG, "Response to $cmd : $resp")
+            Log.w("execute", "Response to $cmd : $resp")
 
             // And save it if it was a sync
             if (cmd == "sync" && !resp.startsWith("Error")) {
