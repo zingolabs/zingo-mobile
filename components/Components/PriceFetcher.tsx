@@ -81,10 +81,10 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
               borderRadius: 10,
               margin: 0,
               padding: 5,
-              minWidth: 48,
-              minHeight: 48,
+              minWidth: 40,
+              minHeight: 40,
             }}>
-            {textBefore && <RegText style={{ marginRight: 5, color: colors.primary }}>{textBefore}</RegText>}
+            {textBefore && <RegText style={{ marginRight: 10, color: colors.text }}>{textBefore}</RegText>}
             <FontAwesomeIcon icon={faRefresh} size={20} color={colors.primary} />
             {refreshMinutes > 0 && (
               <FadeText style={{ marginLeft: 5 }}>
@@ -114,8 +114,8 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
               borderRadius: 10,
               margin: 0,
               padding: 5,
-              minWidth: 48,
-              minHeight: 48,
+              minWidth: 40,
+              minHeight: 40,
               borderColor: colors.primary,
               borderWidth: 1,
             }}>
@@ -124,17 +124,23 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
                 position: 'relative',
                 flexDirection: 'row',
                 minWidth: 25,
-                minHeight: 48,
+                minHeight: 40,
               }}>
               <FontAwesomeIcon
                 icon={faRefresh}
                 size={20}
                 color={colors.background}
-                style={{ position: 'absolute', top: 15, left: 0 }}
+                style={{ position: 'absolute', top: 11, left: 0 }}
               />
               <RegText
                 color={colors.text}
-                style={{ position: 'absolute', top: Platform.OS === 'ios' ? 17 : 14, left: 6, fontSize: 13, fontWeight: 'bold' }}>
+                style={{
+                  position: 'absolute',
+                  top: Platform.OS === 'ios' ? 12 : 10,
+                  left: 6,
+                  fontSize: 13,
+                  fontWeight: 'bold',
+                }}>
                 {count.toString()}
               </RegText>
             </View>
