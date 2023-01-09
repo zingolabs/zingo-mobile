@@ -136,7 +136,7 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
                 color={colors.text}
                 style={{
                   position: 'absolute',
-                  top: Platform.OS === 'ios' ? 12 : 10,
+                  top: Platform.OS === 'ios' ? 13 : 10,
                   left: 6,
                   fontSize: 13,
                   fontWeight: 'bold',
