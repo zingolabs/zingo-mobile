@@ -104,8 +104,8 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal, setZecPrice }) =
                 }
               />
               <View style={{ marginLeft: 5 }}>
-                  <PriceFetcher setZecPrice={setZecPrice} />
-                </View>
+                <PriceFetcher setZecPrice={setZecPrice} />
+              </View>
             </View>
           )}
         </View>
