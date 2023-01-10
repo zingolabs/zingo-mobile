@@ -29,23 +29,6 @@ static void InitializeFlipper(UIApplication *application) {
 
 @implementation AppDelegate
 
-- (BOOL)application:(UIApplication *)application willFinishLaunchingWithOptions:(NSDictionary *)launchOptions
-{
-  if (@available(iOS 13.0, *)) {
-      NSLog(@"configureProcessingTask");
-      [self configureProcessingTask];
-  }
-  return YES;
-}
-
-- (void)applicationDidEnterBackground:(UIApplication *)application
-{
-  if (@available(iOS 13.0, *)) {
-      NSLog(@"scheduleProcessingTask");
-      [self scheduleProcessingTask];
-  }
-}
-
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
 #ifdef FB_SONARKIT_ENABLED
@@ -76,6 +59,23 @@ static void InitializeFlipper(UIApplication *application) {
 #endif
 }
 
+- (BOOL)application:(UIApplication *)application willFinishLaunchingWithOptions:(NSDictionary *)launchOptions
+{
+  if (@available(iOS 13.0, *)) {
+      NSLog(@"configureProcessingTask");
+      [self configureProcessingTask];
+  }
+  return YES;
+}
+
+- (void)applicationDidEnterBackground:(UIApplication *)application
+{
+  if (@available(iOS 13.0, *)) {
+      NSLog(@"scheduleProcessingTask");
+      [self scheduleProcessingTask];
+  }
+}
+
 static NSString* syncTask = @"Zingo_Processing_Task_ID";
 
 -(void)configureProcessingTask {
@@ -83,6 +83,7 @@ static NSString* syncTask = @"Zingo_Processing_Task_ID";
         [[BGTaskScheduler sharedScheduler] registerForTaskWithIdentifier:syncTask
                                                               usingQueue:nil
                                                            launchHandler:^(BGTask *task) {
+            NSLog(@"configureProcessingTask2");
             [self scheduleLocalNotifications];
             [self handleProcessingTask:task];
         }];
@@ -93,10 +94,13 @@ static NSString* syncTask = @"Zingo_Processing_Task_ID";
 
 -(void)scheduleLocalNotifications {
     //do things
+    NSLog(@"NotificationsProcessingTask");
 }
 
 -(void)handleProcessingTask:(BGTask *)task API_AVAILABLE(ios(13.0)){
   //do things with task
+  NSLog(@"handleProcessingTask begin");
+  RPCModule *rpcmodule = [RPCModule new];
   
   NSArray *paths = NSSearchPathForDirectoriesInDomains
                     (NSDocumentDirectory, NSUserDomainMask, YES);
@@ -108,38 +112,30 @@ static NSString* syncTask = @"Zingo_Processing_Task_ID";
   NSString *content = [[NSString alloc] initWithContentsOfFile:fileName
                                                   usedEncoding:nil
                                                          error:nil];
-  NSArray *jsonContent = [NSJSONSerialization JSONObjectWithData:[content dataUsingEncoding:<#(NSStringEncoding)#>:NSUTF8StringEncoding] options:0 error:NULL];
+  NSData *data = [content dataUsingEncoding:NSUTF8StringEncoding];
+  id jsonContent = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
   
   NSString *server = [jsonContent valueForKey:@"server"];
+
+  NSLog(@"Server: %@", server);
   
-  NSString* pathSaplingOutput = [[NSBundle mainBundle]
-                        pathForResource:@"saplingoutput" ofType:@""];
-  NSData* saplingOutput = [NSData dataWithContentsOfFile:pathSaplingOutput];
-
-
-  NSString* pathSaplingSpend = [[NSBundle mainBundle]
-                        pathForResource:@"saplingspend" ofType:@""];
-  NSData* saplingSpend = [NSData dataWithContentsOfFile:pathSaplingSpend];
-
-  char* resp = init_light_client([server UTF8String], [[saplingOutput base64EncodedStringWithOptions:0] UTF8String], [[saplingSpend base64EncodedStringWithOptions:0] UTF8String], [documentsDirectory UTF8String]);
-  NSString* respStr = [NSString stringWithUTF8String:resp];
-  rust_free(resp);
+  [rpcmodule initLightClient:server];
   
   char *resp2 = execute("sync", "");
   NSString* respStr2 = [NSString stringWithUTF8String:resp2];
   rust_free(resp2);
 
-  NSLog(@"handleProcessingTask");
+  NSLog(@"handleProcessingTask end %@", resp2);
 
   if (![respStr2 hasPrefix:@"Error"]) {
     // Also save the wallet after sync
-    RPCModule *rpcmodule = [RPCModule new];
     [rpcmodule saveWalletInternal];
   }
 }
 
 -(void)scheduleProcessingTask {
     if (@available(iOS 13.0, *)) {
+        NSLog(@"schedulingProcessingTask");
         NSError *error = NULL;
         // cancel existing task (if any)
         [BGTaskScheduler.sharedScheduler cancelTaskRequestWithIdentifier:syncTask];

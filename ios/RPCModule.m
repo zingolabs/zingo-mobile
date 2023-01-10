@@ -363,7 +363,16 @@ RCT_REMAP_METHOD(initLightClient,
                  initLightClientWithResolver:(RCTPromiseResolveBlock)resolve
                  rejected:(RCTPromiseRejectBlock)reject) {
   @autoreleasepool {
-    // RCTLogInfo(@"createNewWallet called");
+    NSDictionary* dict = [NSDictionary dictionaryWithObjectsAndKeys:server, @"server", resolve, @"resolve", nil];
+
+    [NSThread detachNewThreadSelector:@selector(initLightClient:) toTarget:self withObject:dict];
+  }
+}
+
+-(void) initLightClient:(NSDictionary *)dict {
+  @autoreleasepool {
+    NSString* server = dict[@"server"];
+    RCTPromiseResolveBlock resolve = dict[@"resolve"];
 
     NSString* pathSaplingOutput = [[NSBundle mainBundle]
                       pathForResource:@"saplingoutput" ofType:@""];
