@@ -1,12 +1,17 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import { SafeAreaView } from 'react-native';
+import { SafeAreaView, AppRegistry } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
 import LoadedApp from './app/LoadedApp';
 import LoadingApp from './app/LoadingApp';
 import { ThemeType } from './app/types';
+
+const BackgroundSync = async () => {
+  console.log("I'm running in a background task")
+}
+AppRegistry.registerHeadlessTask('BackgroundSync', () => BackgroundSync);
 
 const Theme: ThemeType = {
   dark: true,
