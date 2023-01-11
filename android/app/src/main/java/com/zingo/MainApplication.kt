@@ -85,14 +85,3 @@ class MainApplication : Application(), ReactApplication {
         }
     }
 }
-
-class UploadWorker(appContext: Context, workerParams: WorkerParameters): Worker(appContext, workerParams) {
-    override fun doWork(): Result {
-
-        // Do the work here--in this case, upload the images.
-        Log.w("BACKGROUND", "Background work running")
-
-        // Indicate whether the work finished successfully with the Result
-        return Result.success()
-    }
-}
