@@ -98,34 +98,98 @@ static NSString* syncTask = @"Zingo_Processing_Task_ID";
 }
 
 -(void)handleProcessingTask:(BGTask *)task API_AVAILABLE(ios(13.0)){
+
   //do things with task
-  NSLog(@"handleProcessingTask begin");
+  [NSThread detachNewThreadSelector:@selector(syncingProcessBackgroundTask:) toTarget:self withObject:nil];
+  [NSThread sleepForTimeInterval: 2.000];
+  [NSThread detachNewThreadSelector:@selector(syncingStatusProcessBackgroundTask:) toTarget:self withObject:nil];
+
+}
+
+-(void)syncingStatusProcessBackgroundTask:(NSString *)noValue {
+  NSLog(@"handleProcessingTask sync status begin %i", _syncFinished);
+  RPCModule *rpcmodule = [RPCModule new];
+  NSInteger prevBatch = -1;
+
+  while(!_syncFinished) {
+    [NSThread sleepForTimeInterval: 2.0];
+    char *resp = execute("syncstatus", "");
+    NSString* respStr = [NSString stringWithUTF8String:resp];
+    //rust_free(resp);
+    NSLog(@"handleProcessingTask sync status response %@", respStr);
+
+    NSData *data = [respStr dataUsingEncoding:NSUTF8StringEncoding];
+    id jsonResp = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+    NSString *batchStr = [jsonResp valueForKey:@"batch_num"];
+    NSInteger batch = [batchStr integerValue];
+
+    NSLog(@"handleProcessingTask batch number %@", batchStr);
+
+    if (prevBatch != -1 && prevBatch != batch) {
+      // save the wallet
+      [rpcmodule saveWalletInternal];
+      NSLog(@"handleProcessingTask save wallet batch %@", batchStr);
+    }
+    prevBatch = batch;
+  }
+
+  [rpcmodule saveWalletInternal];
+  NSLog(@"handleProcessingTask sync status end %i", _syncFinished);
+}
+
+-(void)syncingProcessBackgroundTask:(NSString *)noValue {
+  //do things with task
+  
+  [self init__light__client];
+  
+  [self syncing__process];
+
+}
+
+-(void)init__light__client {
   RPCModule *rpcmodule = [RPCModule new];
   
-  NSArray *paths = NSSearchPathForDirectoriesInDomains
-                    (NSDocumentDirectory, NSUserDomainMask, YES);
-  NSString *documentsDirectory = [paths objectAtIndex:0];
-
-  //make a file name to write the data to using the documents directory:
-  NSString *fileName = [NSString stringWithFormat:@"%@/settings.json",
-                                                  documentsDirectory];
-  NSString *content = [[NSString alloc] initWithContentsOfFile:fileName
-                                                  usedEncoding:nil
-                                                         error:nil];
+  NSString *content = [rpcmodule readSettings];
   NSData *data = [content dataUsingEncoding:NSUTF8StringEncoding];
   id jsonContent = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
   
   NSString *server = [jsonContent valueForKey:@"server"];
 
-  NSLog(@"Server: %@", server);
-  
-  [rpcmodule initLightClient:server];
-  
+  NSLog(@"handleProcessingTask sync Server: %@", server);
+      
+  NSString* pathSaplingOutput = [[NSBundle mainBundle]
+                      pathForResource:@"saplingoutput" ofType:@""];
+  NSData* saplingOutput = [NSData dataWithContentsOfFile:pathSaplingOutput];
+
+
+  NSString* pathSaplingSpend = [[NSBundle mainBundle]
+                      pathForResource:@"saplingspend" ofType:@""];
+  NSData* saplingSpend = [NSData dataWithContentsOfFile:pathSaplingSpend];
+
+  NSArray *paths = NSSearchPathForDirectoriesInDomains
+                    (NSDocumentDirectory, NSUserDomainMask, YES);
+  NSString *documentsDirectory = [paths objectAtIndex:0];
+
+  char* resp = init_light_client([server UTF8String], [[saplingOutput base64EncodedStringWithOptions:0] UTF8String], [[saplingSpend base64EncodedStringWithOptions:0] UTF8String], [documentsDirectory UTF8String]);
+  NSString* respStr = [NSString stringWithUTF8String:resp];
+  rust_free(resp);
+
+  NSLog(@"handleProcessingTask sync Light Client: %@", respStr);
+}
+
+-(void)syncing__process {
+  RPCModule *rpcmodule = [RPCModule new];
+
+  NSLog(@"handleProcessingTask sync begin");
+  _syncFinished = false;
+
   char *resp2 = execute("sync", "");
   NSString* respStr2 = [NSString stringWithUTF8String:resp2];
   rust_free(resp2);
 
-  NSLog(@"handleProcessingTask end %@", resp2);
+  NSLog(@"handleProcessingTask sync end %@", respStr2);
+  
+  _syncFinished = true;
 
   if (![respStr2 hasPrefix:@"Error"]) {
     // Also save the wallet after sync

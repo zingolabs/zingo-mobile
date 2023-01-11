@@ -14,7 +14,7 @@
 @interface RPCModule: NSObject <RCTBridgeModule>
 
 -(void) saveWalletInternal;
--(void) initLightClient:(NSString *)server;
+-(NSString *) readSettings;
 
 @end
 

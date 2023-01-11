@@ -364,18 +364,17 @@ RCT_REMAP_METHOD(initLightClient,
                  server:(NSString*)server
                  initLightClientWithResolver:(RCTPromiseResolveBlock)resolve
                  rejected:(RCTPromiseRejectBlock)reject) {
-  @autoreleasepool {
-    NSDictionary* dict = [NSDictionary dictionaryWithObjectsAndKeys:server, @"server", resolve, @"resolve", nil];
 
-    [NSThread detachNewThreadSelector:@selector(initLightClient:) toTarget:self withObject:dict];
-  }
+  NSDictionary* dict = [NSDictionary dictionaryWithObjectsAndKeys:server, @"server", resolve, @"resolve", nil];
+
+  [NSThread detachNewThreadSelector:@selector(initLightClient:) toTarget:self withObject:dict];
 }
 
 -(void) initLightClient:(NSDictionary *)dict {
   @autoreleasepool {
     NSString* server = dict[@"server"];
     RCTPromiseResolveBlock resolve = dict[@"resolve"];
-
+    
     NSString* pathSaplingOutput = [[NSBundle mainBundle]
                       pathForResource:@"saplingoutput" ofType:@""];
     NSData* saplingOutput = [NSData dataWithContentsOfFile:pathSaplingOutput];
@@ -397,4 +396,43 @@ RCT_REMAP_METHOD(initLightClient,
   }
 }
 
+-(NSString *) readSettings {
+  NSArray *paths = NSSearchPathForDirectoriesInDomains
+                  (NSDocumentDirectory, NSUserDomainMask, YES);
+  NSString *documentsDirectory = [paths objectAtIndex:0];
+
+  //make a file name to write the data to using the documents directory:
+  NSString *fileName = [NSString stringWithFormat:@"%@/settings.json",
+                                                documentsDirectory];
+  NSString *content = [[NSString alloc] initWithContentsOfFile:fileName
+                                                usedEncoding:nil
+                                                       error:nil];
+
+  // RCTLogInfo(@"Read file");
+  return content;
+}
+/*
+// run syncing background task for testing in UI
+RCT_REMAP_METHOD(runBackgroundTask,
+                 runBackgroundTaskWithResolver:(RCTPromiseResolveBlock)resolve
+                 rejected:(RCTPromiseRejectBlock)reject) {
+
+  NSDictionary* dict = [NSDictionary dictionaryWithObjectsAndKeys:resolve, @"resolve", nil];
+
+  [NSThread detachNewThreadSelector:@selector(runBackgroundTask:) toTarget:self withObject:dict];
+}
+ 
+-(void) runBackgroundTask:(NSDictionary *)dict {
+  RCTPromiseResolveBlock resolve = dict[@"resolve"];
+  AppDelegate *appdelegate = [AppDelegate new];
+
+  [NSThread detachNewThreadSelector:@selector(syncingProcessBackgroundTask:) toTarget:appdelegate withObject:nil];
+  [NSThread sleepForTimeInterval: 2.000];
+  [NSThread detachNewThreadSelector:@selector(syncingStatusProcessBackgroundTask:) toTarget:appdelegate withObject:nil];
+
+  NSString* resp = @"OK";
+  
+  resolve(resp);
+}
+*/
 @end
