@@ -83,9 +83,15 @@ static NSString* syncTask = @"Zingo_Processing_Task_ID";
         [[BGTaskScheduler sharedScheduler] registerForTaskWithIdentifier:syncTask
                                                               usingQueue:nil
                                                            launchHandler:^(BGTask *task) {
-            NSLog(@"configureProcessingTask");
+            NSLog(@"configureProcessingTask run");
             //[self scheduleLocalNotifications];
-            [self handleProcessingTask:task];
+            //[self handleProcessingTask:task];
+            //[self syncingProcessBackgroundTask:nil];
+            //[self syncingStatusProcessBackgroundTask:nil];
+            [NSThread detachNewThreadSelector:@selector(syncingProcessBackgroundTask:) toTarget:self withObject:nil];
+            //[NSThread detachNewThreadSelector:@selector(syncingStatusProcessBackgroundTask:) toTarget:self withObject:nil];
+            [self syncingStatusProcessBackgroundTask:nil];
+
         }];
     } else {
         // No fallback
@@ -100,105 +106,163 @@ static NSString* syncTask = @"Zingo_Processing_Task_ID";
 -(void)handleProcessingTask:(BGTask *)task API_AVAILABLE(ios(13.0)){
 
   //do things with task
-  [NSThread detachNewThreadSelector:@selector(syncingProcessBackgroundTask:) toTarget:self withObject:nil];
-  [NSThread sleepForTimeInterval: 2.0];
-  [NSThread detachNewThreadSelector:@selector(syncingStatusProcessBackgroundTask:) toTarget:self withObject:nil];
+  [NSThread detachNewThreadSelector:@selector(syncingBothProcessBackgroundTask:) toTarget:self withObject:nil];
+
+  //[NSThread detachNewThreadSelector:@selector(syncingProcessBackgroundTask:) toTarget:self withObject:nil];
+  //[NSThread sleepForTimeInterval: 2.0];
+  //[NSThread detachNewThreadSelector:@selector(syncingStatusProcessBackgroundTask:) toTarget:self withObject:nil];
 
 }
 
 -(void)syncingProcessBackgroundTask:(NSString *)noValue {
   //do things with task
-  BOOL exists = [self wallet__exists];
+  @autoreleasepool {
 
-  if (exists) {
+    BOOL exists = [self wallet__exists];
 
-    NSLog(@"handleProcessingTask sync begin");
-    _syncFinished = false;
+    if (exists) {
 
-    char *resp2 = execute("sync", "");
-    NSString* respStr2 = [NSString stringWithUTF8String:resp2];
-    rust_free(resp2);
+      NSLog(@"handleProcessingTask sync begin");
+      _syncFinished = false;
 
-    NSLog(@"handleProcessingTask sync end %@", respStr2);
-    
-    _syncFinished = true;
+      char *resp2 = execute("sync", "");
+      NSString* respStr2 = [NSString stringWithUTF8String:resp2];
+      rust_free(resp2);
 
-    if (![respStr2 hasPrefix:@"Error"]) {
-      // Also save the wallet after sync
-      RPCModule *rpcmodule = [RPCModule new];
-      [rpcmodule saveWalletInternal];
-      NSLog(@"handleProcessingTask save wallet");
+      NSLog(@"handleProcessingTask sync end %@", respStr2);
+      
+      _syncFinished = true;
+
+      if (![respStr2 hasPrefix:@"Error"]) {
+        // Also save the wallet after sync
+        RPCModule *rpcmodule = [RPCModule new];
+        [rpcmodule saveWalletInternal];
+        NSLog(@"handleProcessingTask save wallet");
+      }
+
+    } else {
+
+      _syncFinished = true;
+      NSLog(@"handleProcessingTask No exists wallet");
+
     }
 
-  } else {
-
-    _syncFinished = true;
-    NSLog(@"handleProcessingTask No exists wallet");
-    
   }
 
 }
 
 -(void)syncingStatusProcessBackgroundTask:(NSString *)noValue {
+  @autoreleasepool {
+
+    NSLog(@"handleProcessingTask sync status begin %i", _syncFinished);
+    NSInteger prevBatch = -1;
+
+    while(!_syncFinished) {
+      [NSThread sleepForTimeInterval: 2.0];
+      char *resp = execute("syncstatus", "");
+      NSString* respStr = [NSString stringWithUTF8String:resp];
+      rust_free(resp);
+      NSLog(@"handleProcessingTask sync status response %@", respStr);
+
+      NSData *data = [respStr dataUsingEncoding:NSUTF8StringEncoding];
+      id jsonResp = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+      NSString *batchStr = [jsonResp valueForKey:@"batch_num"];
+      NSInteger batch = [batchStr integerValue];
+      BOOL progress = [jsonResp valueForKey:@"in_progress"];
+      _syncFinished = !progress;
+
+      NSLog(@"handleProcessingTask batch number %@", batchStr);
+
+      if (prevBatch != -1 && prevBatch != batch) {
+        // save the wallet
+        RPCModule *rpcmodule = [RPCModule new];
+        [rpcmodule saveWalletInternal];
+        NSLog(@"handleProcessingTask save wallet batch %@ %i", batchStr, progress);
+      }
+      prevBatch = batch;
+    }
+
+    RPCModule *rpcmodule = [RPCModule new];
+    [rpcmodule saveWalletInternal];
+    NSLog(@"handleProcessingTask sync status end %i", _syncFinished);
+
+  }
+}
+
+-(void)syncingBothProcessBackgroundTask:(NSString *)noValue {
+
+  //[NSThread detachNewThreadSelector:@selector(syncingProcessBackgroundTask:) toTarget:self withObject:nil];
+
   NSLog(@"handleProcessingTask sync status begin %i", _syncFinished);
   NSInteger prevBatch = -1;
 
   while(!_syncFinished) {
-    [NSThread sleepForTimeInterval: 2.0];
-    char *resp = execute("syncstatus", "");
-    NSString* respStr = [NSString stringWithUTF8String:resp];
-    rust_free(resp);
-    NSLog(@"handleProcessingTask sync status response %@", respStr);
+    @autoreleasepool {
 
-    NSData *data = [respStr dataUsingEncoding:NSUTF8StringEncoding];
-    id jsonResp = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-    NSString *batchStr = [jsonResp valueForKey:@"batch_num"];
-    NSInteger batch = [batchStr integerValue];
+      [NSThread sleepForTimeInterval: 2.0];
+      char *resp = execute("syncstatus", "");
+      NSString* respStr = [NSString stringWithUTF8String:resp];
+      rust_free(resp);
+      NSLog(@"handleProcessingTask sync status response %@", respStr);
 
-    NSLog(@"handleProcessingTask batch number %@", batchStr);
+      NSData *data = [respStr dataUsingEncoding:NSUTF8StringEncoding];
+      id jsonResp = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+      NSString *batchStr = [jsonResp valueForKey:@"batch_num"];
+      NSInteger batch = [batchStr integerValue];
+      BOOL progress = [jsonResp valueForKey:@"in_progress"];
+      _syncFinished = !progress;
 
-    if (prevBatch != -1 && prevBatch != batch) {
-      // save the wallet
-      RPCModule *rpcmodule = [RPCModule new];
-      [rpcmodule saveWalletInternal];
-      NSLog(@"handleProcessingTask save wallet batch %@", batchStr);
+      NSLog(@"handleProcessingTask batch number %@ %i", batchStr, progress);
+
+      if (prevBatch != -1 && prevBatch != batch) {
+        // save the wallet
+        RPCModule *rpcmodule = [RPCModule new];
+        [rpcmodule saveWalletInternal];
+        NSLog(@"handleProcessingTask save wallet batch %@", batchStr);
+      }
+      prevBatch = batch;
+
     }
-    prevBatch = batch;
   }
 
   RPCModule *rpcmodule = [RPCModule new];
   [rpcmodule saveWalletInternal];
   NSLog(@"handleProcessingTask sync status end %i", _syncFinished);
+
 }
 
 -(void)init__light__client {
-  NSLog(@"handleProcessingTask light client begin");
-  NSString *content = [self read__settings];
-  NSData *data = [content dataUsingEncoding:NSUTF8StringEncoding];
-  id jsonContent = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-  
-  NSString *server = [jsonContent valueForKey:@"server"];
+  @autoreleasepool {
 
-  NSLog(@"handleProcessingTask sync Server: %@", server);
-      
-  NSString* pathSaplingOutput = [[NSBundle mainBundle]
-                      pathForResource:@"saplingoutput" ofType:@""];
-  NSData* saplingOutput = [NSData dataWithContentsOfFile:pathSaplingOutput];
+    NSLog(@"handleProcessingTask light client begin");
+    NSString *content = [self read__settings];
+    NSData *data = [content dataUsingEncoding:NSUTF8StringEncoding];
+    id jsonContent = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+    
+    NSString *server = [jsonContent valueForKey:@"server"];
+
+    NSLog(@"handleProcessingTask sync Server: %@", server);
+        
+    NSString* pathSaplingOutput = [[NSBundle mainBundle]
+                        pathForResource:@"saplingoutput" ofType:@""];
+    NSData* saplingOutput = [NSData dataWithContentsOfFile:pathSaplingOutput];
 
 
-  NSString* pathSaplingSpend = [[NSBundle mainBundle]
-                      pathForResource:@"saplingspend" ofType:@""];
-  NSData* saplingSpend = [NSData dataWithContentsOfFile:pathSaplingSpend];
+    NSString* pathSaplingSpend = [[NSBundle mainBundle]
+                        pathForResource:@"saplingspend" ofType:@""];
+    NSData* saplingSpend = [NSData dataWithContentsOfFile:pathSaplingSpend];
 
-  NSArray *paths = NSSearchPathForDirectoriesInDomains
-                    (NSDocumentDirectory, NSUserDomainMask, YES);
-  NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSArray *paths = NSSearchPathForDirectoriesInDomains
+                      (NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
 
-  char* resp = init_light_client([server UTF8String], [[saplingOutput base64EncodedStringWithOptions:0] UTF8String], [[saplingSpend base64EncodedStringWithOptions:0] UTF8String], [documentsDirectory UTF8String]);
-  NSString* respStr = [NSString stringWithUTF8String:resp];
-  rust_free(resp);
+    char* resp = init_light_client([server UTF8String], [[saplingOutput base64EncodedStringWithOptions:0] UTF8String], [[saplingSpend base64EncodedStringWithOptions:0] UTF8String], [documentsDirectory UTF8String]);
+    NSString* respStr = [NSString stringWithUTF8String:resp];
+    rust_free(resp);
 
-  NSLog(@"handleProcessingTask Light Client end: %@", respStr);
+    NSLog(@"handleProcessingTask Light Client end: %@", respStr);
+
+  }
 }
 
 -(BOOL)wallet__exists {
@@ -220,34 +284,38 @@ static NSString* syncTask = @"Zingo_Processing_Task_ID";
 }
 
 -(void)load__existing__wallet {
+  @autoreleasepool {
+
   NSLog(@"handleProcessingTask load wallet begin");
 
-  NSString *content = [self read__settings];
-  NSData *data = [content dataUsingEncoding:NSUTF8StringEncoding];
-  id jsonContent = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-  
-  NSString *server = [jsonContent valueForKey:@"server"];
+    NSString *content = [self read__settings];
+    NSData *data = [content dataUsingEncoding:NSUTF8StringEncoding];
+    id jsonContent = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+    
+    NSString *server = [jsonContent valueForKey:@"server"];
 
-  NSLog(@"handleProcessingTask sync Server: %@", server);
+    NSLog(@"handleProcessingTask sync Server: %@", server);
 
-  NSString* walletDataStr = [self read__wallet];
+    NSString* walletDataStr = [self read__wallet];
 
-  NSString* pathSaplingOutput = [[NSBundle mainBundle]
-                      pathForResource:@"saplingoutput" ofType:@""];
-  NSData* saplingOutput = [NSData dataWithContentsOfFile:pathSaplingOutput];
+    NSString* pathSaplingOutput = [[NSBundle mainBundle]
+                        pathForResource:@"saplingoutput" ofType:@""];
+    NSData* saplingOutput = [NSData dataWithContentsOfFile:pathSaplingOutput];
 
-  NSString* pathSaplingSpend = [[NSBundle mainBundle]
-                      pathForResource:@"saplingspend" ofType:@""];
-  NSData* saplingSpend = [NSData dataWithContentsOfFile:pathSaplingSpend];
+    NSString* pathSaplingSpend = [[NSBundle mainBundle]
+                        pathForResource:@"saplingspend" ofType:@""];
+    NSData* saplingSpend = [NSData dataWithContentsOfFile:pathSaplingSpend];
 
-  NSArray *paths = NSSearchPathForDirectoriesInDomains
-                    (NSDocumentDirectory, NSUserDomainMask, YES);
-  NSString *documentsDirectory = [paths objectAtIndex:0];
-  char* seed = initfromb64([server UTF8String], [walletDataStr UTF8String], [[saplingOutput base64EncodedStringWithOptions:0] UTF8String], [[saplingSpend base64EncodedStringWithOptions:0] UTF8String], [documentsDirectory UTF8String]);
-  NSString* seedStr = [NSString stringWithUTF8String:seed];
-  rust_free(seed);
+    NSArray *paths = NSSearchPathForDirectoriesInDomains
+                      (NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    char* seed = initfromb64([server UTF8String], [walletDataStr UTF8String], [[saplingOutput base64EncodedStringWithOptions:0] UTF8String], [[saplingSpend base64EncodedStringWithOptions:0] UTF8String], [documentsDirectory UTF8String]);
+    NSString* seedStr = [NSString stringWithUTF8String:seed];
+    rust_free(seed);
 
-  NSLog(@"handleProcessingTask load wallet end %@", seedStr);
+    NSLog(@"handleProcessingTask load wallet end %@", seedStr);
+
+  }
 }
 
 -(NSString *)read__wallet {
