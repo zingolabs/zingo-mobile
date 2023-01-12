@@ -503,7 +503,8 @@ export default class RPC {
         }
         const ss = await JSON.parse(s);
 
-        //console.log('sync status', ss);
+        console.log('sync wallet birthday', this.walletBirthday);
+        console.log('sync status', ss);
 
         // syncronize status
         this.inRefresh = ss.in_progress;
@@ -611,7 +612,7 @@ export default class RPC {
         this.fnSetRefreshUpdates(
           ss.in_progress,
           0,
-          current_block.toFixed(0).toString() + ` ${this.translate('rpc.of')} ` + this.lastServerBlockHeight.toString(),
+          `${current_block ? current_block.toFixed(0).toString() : ''} ${this.translate('rpc.of')} ${this.lastServerBlockHeight ? this.lastServerBlockHeight.toString() : ''}`,
         );
 
         // store SyncStatusReport object for a new screen

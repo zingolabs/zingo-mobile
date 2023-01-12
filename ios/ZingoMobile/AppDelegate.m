@@ -83,8 +83,8 @@ static NSString* syncTask = @"Zingo_Processing_Task_ID";
         [[BGTaskScheduler sharedScheduler] registerForTaskWithIdentifier:syncTask
                                                               usingQueue:nil
                                                            launchHandler:^(BGTask *task) {
-            NSLog(@"configureProcessingTask2");
-            [self scheduleLocalNotifications];
+            NSLog(@"configureProcessingTask");
+            //[self scheduleLocalNotifications];
             [self handleProcessingTask:task];
         }];
     } else {
@@ -101,21 +101,53 @@ static NSString* syncTask = @"Zingo_Processing_Task_ID";
 
   //do things with task
   [NSThread detachNewThreadSelector:@selector(syncingProcessBackgroundTask:) toTarget:self withObject:nil];
-  [NSThread sleepForTimeInterval: 2.000];
+  [NSThread sleepForTimeInterval: 2.0];
   [NSThread detachNewThreadSelector:@selector(syncingStatusProcessBackgroundTask:) toTarget:self withObject:nil];
+
+}
+
+-(void)syncingProcessBackgroundTask:(NSString *)noValue {
+  //do things with task
+  BOOL exists = [self wallet__exists];
+
+  if (exists) {
+
+    NSLog(@"handleProcessingTask sync begin");
+    _syncFinished = false;
+
+    char *resp2 = execute("sync", "");
+    NSString* respStr2 = [NSString stringWithUTF8String:resp2];
+    rust_free(resp2);
+
+    NSLog(@"handleProcessingTask sync end %@", respStr2);
+    
+    _syncFinished = true;
+
+    if (![respStr2 hasPrefix:@"Error"]) {
+      // Also save the wallet after sync
+      RPCModule *rpcmodule = [RPCModule new];
+      [rpcmodule saveWalletInternal];
+      NSLog(@"handleProcessingTask save wallet");
+    }
+
+  } else {
+
+    _syncFinished = true;
+    NSLog(@"handleProcessingTask No exists wallet");
+    
+  }
 
 }
 
 -(void)syncingStatusProcessBackgroundTask:(NSString *)noValue {
   NSLog(@"handleProcessingTask sync status begin %i", _syncFinished);
-  RPCModule *rpcmodule = [RPCModule new];
   NSInteger prevBatch = -1;
 
   while(!_syncFinished) {
     [NSThread sleepForTimeInterval: 2.0];
     char *resp = execute("syncstatus", "");
     NSString* respStr = [NSString stringWithUTF8String:resp];
-    //rust_free(resp);
+    rust_free(resp);
     NSLog(@"handleProcessingTask sync status response %@", respStr);
 
     NSData *data = [respStr dataUsingEncoding:NSUTF8StringEncoding];
@@ -127,29 +159,21 @@ static NSString* syncTask = @"Zingo_Processing_Task_ID";
 
     if (prevBatch != -1 && prevBatch != batch) {
       // save the wallet
+      RPCModule *rpcmodule = [RPCModule new];
       [rpcmodule saveWalletInternal];
       NSLog(@"handleProcessingTask save wallet batch %@", batchStr);
     }
     prevBatch = batch;
   }
 
+  RPCModule *rpcmodule = [RPCModule new];
   [rpcmodule saveWalletInternal];
   NSLog(@"handleProcessingTask sync status end %i", _syncFinished);
 }
 
--(void)syncingProcessBackgroundTask:(NSString *)noValue {
-  //do things with task
-  
-  [self init__light__client];
-  
-  [self syncing__process];
-
-}
-
 -(void)init__light__client {
-  RPCModule *rpcmodule = [RPCModule new];
-  
-  NSString *content = [rpcmodule readSettings];
+  NSLog(@"handleProcessingTask light client begin");
+  NSString *content = [self read__settings];
   NSData *data = [content dataUsingEncoding:NSUTF8StringEncoding];
   id jsonContent = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
   
@@ -174,27 +198,88 @@ static NSString* syncTask = @"Zingo_Processing_Task_ID";
   NSString* respStr = [NSString stringWithUTF8String:resp];
   rust_free(resp);
 
-  NSLog(@"handleProcessingTask sync Light Client: %@", respStr);
+  NSLog(@"handleProcessingTask Light Client end: %@", respStr);
 }
 
--(void)syncing__process {
-  RPCModule *rpcmodule = [RPCModule new];
+-(BOOL)wallet__exists {
+  NSArray *paths = NSSearchPathForDirectoriesInDomains
+      (NSDocumentDirectory, NSUserDomainMask, YES);
+  NSString *documentsDirectory = [paths objectAtIndex:0];
 
-  NSLog(@"handleProcessingTask sync begin");
-  _syncFinished = false;
+  // Write to user's documents app directory
+  NSString *fileName = [NSString stringWithFormat:@"%@/wallet.dat.txt",
+                                                documentsDirectory];
+  BOOL fileExists = [[NSFileManager defaultManager] fileExistsAtPath:fileName];
+  // RCTLogInfo(@"Wallet exists: %d", (int)fileExists);
 
-  char *resp2 = execute("sync", "");
-  NSString* respStr2 = [NSString stringWithUTF8String:resp2];
-  rust_free(resp2);
-
-  NSLog(@"handleProcessingTask sync end %@", respStr2);
-  
-  _syncFinished = true;
-
-  if (![respStr2 hasPrefix:@"Error"]) {
-    // Also save the wallet after sync
-    [rpcmodule saveWalletInternal];
+  if (fileExists) {
+    return true;
+  } else {
+    return false;
   }
+}
+
+-(void)load__existing__wallet {
+  NSLog(@"handleProcessingTask load wallet begin");
+
+  NSString *content = [self read__settings];
+  NSData *data = [content dataUsingEncoding:NSUTF8StringEncoding];
+  id jsonContent = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+  
+  NSString *server = [jsonContent valueForKey:@"server"];
+
+  NSLog(@"handleProcessingTask sync Server: %@", server);
+
+  NSString* walletDataStr = [self read__wallet];
+
+  NSString* pathSaplingOutput = [[NSBundle mainBundle]
+                      pathForResource:@"saplingoutput" ofType:@""];
+  NSData* saplingOutput = [NSData dataWithContentsOfFile:pathSaplingOutput];
+
+  NSString* pathSaplingSpend = [[NSBundle mainBundle]
+                      pathForResource:@"saplingspend" ofType:@""];
+  NSData* saplingSpend = [NSData dataWithContentsOfFile:pathSaplingSpend];
+
+  NSArray *paths = NSSearchPathForDirectoriesInDomains
+                    (NSDocumentDirectory, NSUserDomainMask, YES);
+  NSString *documentsDirectory = [paths objectAtIndex:0];
+  char* seed = initfromb64([server UTF8String], [walletDataStr UTF8String], [[saplingOutput base64EncodedStringWithOptions:0] UTF8String], [[saplingSpend base64EncodedStringWithOptions:0] UTF8String], [documentsDirectory UTF8String]);
+  NSString* seedStr = [NSString stringWithUTF8String:seed];
+  rust_free(seed);
+
+  NSLog(@"handleProcessingTask load wallet end %@", seedStr);
+}
+
+-(NSString *)read__wallet {
+  NSArray *paths = NSSearchPathForDirectoriesInDomains
+                  (NSDocumentDirectory, NSUserDomainMask, YES);
+  NSString *documentsDirectory = [paths objectAtIndex:0];
+
+  //make a file name to write the data to using the documents directory:
+  NSString *fileName = [NSString stringWithFormat:@"%@/wallet.dat.txt",
+                                                documentsDirectory];
+  NSString *content = [[NSString alloc] initWithContentsOfFile:fileName
+                                                usedEncoding:nil
+                                                       error:nil];
+
+  // RCTLogInfo(@"Read file");
+  return content;
+}
+
+-(NSString *) read__settings {
+  NSArray *paths = NSSearchPathForDirectoriesInDomains
+                  (NSDocumentDirectory, NSUserDomainMask, YES);
+  NSString *documentsDirectory = [paths objectAtIndex:0];
+
+  //make a file name to write the data to using the documents directory:
+  NSString *fileName = [NSString stringWithFormat:@"%@/settings.json",
+                                                documentsDirectory];
+  NSString *content = [[NSString alloc] initWithContentsOfFile:fileName
+                                                usedEncoding:nil
+                                                       error:nil];
+
+  // RCTLogInfo(@"Read file");
+  return content;
 }
 
 -(void)scheduleProcessingTask {
@@ -206,7 +291,7 @@ static NSString* syncTask = @"Zingo_Processing_Task_ID";
         // new task
         BGProcessingTaskRequest *request = [[BGProcessingTaskRequest alloc] initWithIdentifier:syncTask];
         request.requiresNetworkConnectivity = YES;
-        request.earliestBeginDate = [NSDate dateWithTimeIntervalSinceNow:5];
+        request.earliestBeginDate = nil;
         BOOL success = [[BGTaskScheduler sharedScheduler] submitTaskRequest:request error:&error];
         if (!success) {
             // Errorcodes https://stackoverflow.com/a/58224050/872051

@@ -14,7 +14,6 @@
 @interface RPCModule: NSObject <RCTBridgeModule>
 
 -(void) saveWalletInternal;
--(NSString *) readSettings;
 
 @end
 

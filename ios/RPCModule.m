@@ -396,21 +396,6 @@ RCT_REMAP_METHOD(initLightClient,
   }
 }
 
--(NSString *) readSettings {
-  NSArray *paths = NSSearchPathForDirectoriesInDomains
-                  (NSDocumentDirectory, NSUserDomainMask, YES);
-  NSString *documentsDirectory = [paths objectAtIndex:0];
-
-  //make a file name to write the data to using the documents directory:
-  NSString *fileName = [NSString stringWithFormat:@"%@/settings.json",
-                                                documentsDirectory];
-  NSString *content = [[NSString alloc] initWithContentsOfFile:fileName
-                                                usedEncoding:nil
-                                                       error:nil];
-
-  // RCTLogInfo(@"Read file");
-  return content;
-}
 /*
 // run syncing background task for testing in UI
 RCT_REMAP_METHOD(runBackgroundTask,
