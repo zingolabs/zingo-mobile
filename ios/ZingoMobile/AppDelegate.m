@@ -68,6 +68,13 @@ static void InitializeFlipper(UIApplication *application) {
   return YES;
 }
 
+-(void)applicationWillEnterForeground:(UIApplication *)application
+{
+  // cancel existing task (if any)
+  NSLog(@"scheduleProcessingTask CANCEL - foreground");
+  [BGTaskScheduler.sharedScheduler cancelTaskRequestWithIdentifier:syncTask];
+}
+
 - (void)applicationDidEnterBackground:(UIApplication *)application
 {
   if (@available(iOS 13.0, *)) {

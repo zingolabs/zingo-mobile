@@ -37,6 +37,7 @@ export default class RPC {
 
   refreshTimerID: number;
   updateTimerID?: number;
+  syncStatusID?: number;
 
   updateDataLock: boolean;
   updateDataCtr: number;
@@ -345,6 +346,11 @@ export default class RPC {
       clearInterval(this.updateTimerID);
       this.updateTimerID = undefined;
     }
+
+    if (this.syncStatusID) {
+      clearInterval(this.syncStatusID);
+      this.syncStatusID = undefined;
+    }
   }
 
   async doRescan(): Promise<string> {
@@ -451,6 +457,7 @@ export default class RPC {
   async refresh(fullRefresh: boolean, fullRescan?: boolean) {
     // If we're in refresh, we don't overlap
     if (this.inRefresh) {
+      //console.log('in refresh is true');
       return;
     }
 
@@ -461,6 +468,7 @@ export default class RPC {
     await this.fetchWalletBirthday();
     await this.fetchServerHeight();
     if (!this.lastServerBlockHeight) {
+      //console.log('the last server block is zero');
       return;
     }
 
@@ -496,7 +504,7 @@ export default class RPC {
       }
 
       // We need to wait for the sync to finish. The sync is done when
-      let pollerID = setInterval(async () => {
+      this.syncStatusID = setInterval(async () => {
         const s = await this.doSyncStatus();
         if (!s) {
           return;
@@ -640,9 +648,11 @@ export default class RPC {
         // Close the poll timer if the sync finished(checked via promise above)
         if (!this.inRefresh) {
           // We are synced. Cancel the poll timer
-          clearInterval(pollerID);
-          pollerID = 0;
-
+          if (this.syncStatusID) {
+            clearInterval(this.syncStatusID);
+            this.syncStatusID = 0;  
+          }
+          
           // And fetch the rest of the data.
           await this.loadWalletData();
 

@@ -246,10 +246,15 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     this.sta = AppState.addEventListener('change', nextAppState => {
       if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
         console.log('App has come to the foreground!');
+        this.rpc.setInRefresh(false);
         this.rpc.configure();
       }
       if (nextAppState.match(/inactive|background/) && this.state.appState === 'active') {
         console.log('App is gone to the background!');
+        this.setState({
+          syncingStatusReport: new SyncingStatusReportClass(),
+          syncingStatus: {} as SyncingStatusType,
+        });
         this.rpc.clearTimers();
       }
       this.setState({ appState: nextAppState });
