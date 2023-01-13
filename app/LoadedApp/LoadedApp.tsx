@@ -1,5 +1,16 @@
 import React, { Component, Suspense, useState, useMemo, useCallback, useEffect } from 'react';
-import { Modal, View, Text, Alert, I18nManager, Dimensions, EmitterSubscription, ScaledSize } from 'react-native';
+import {
+  Modal,
+  View,
+  Text,
+  Alert,
+  I18nManager,
+  Dimensions,
+  EmitterSubscription,
+  ScaledSize,
+  AppState,
+  NativeEventSubscription,
+} from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faList, faUpload, faDownload, faCog, faAddressBook } from '@fortawesome/free-solid-svg-icons';
@@ -180,6 +191,7 @@ type LoadedAppClassProps = {
 class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   rpc: RPC;
   dim: EmitterSubscription;
+  sta: NativeEventSubscription;
 
   constructor(props: LoadedAppClassProps) {
     super(props);
@@ -202,6 +214,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
         deviceType: platform.isTablet(screen) ? 'tablet' : 'phone',
         scale: Number(screen.scale.toFixed(2)),
       },
+      appState: AppState.currentState,
     };
 
     this.rpc = new RPC(
@@ -216,6 +229,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     );
 
     this.dim = {} as EmitterSubscription;
+    this.sta = {} as NativeEventSubscription;
   }
 
   componentDidMount = () => {
@@ -228,11 +242,24 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       this.setDimensions(screen);
       //console.log('++++++++++++++++++++++++++++++++++ change dims', Dimensions.get('screen'));
     });
+
+    this.sta = AppState.addEventListener('change', nextAppState => {
+      if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
+        console.log('App has come to the foreground!');
+        this.rpc.configure();
+      }
+      if (nextAppState.match(/inactive|background/) && this.state.appState === 'active') {
+        console.log('App is gone to the background!');
+        this.rpc.clearTimers();
+      }
+      this.setState({ appState: nextAppState });
+    });
   };
 
   componentWillUnmount = () => {
     this.rpc.clearTimers();
-    this.dim?.remove();
+    this.dim.remove();
+    this.sta.remove();
   };
 
   setDimensions = (screen: ScaledSize) => {

@@ -25,6 +25,7 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   navigation: {} as StackScreenProps<any>['navigation'],
   route: {} as StackScreenProps<any>['route'],
   dimensions: {} as DimensionsType,
+  appState: '' as string,
 
   syncingStatusReport: new SyncingStatusReportClass(),
   totalBalance: new TotalBalanceClass(),

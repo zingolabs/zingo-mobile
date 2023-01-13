@@ -22,6 +22,7 @@ export default interface AppStateLoaded {
   navigation: StackScreenProps<any>['navigation'];
   route: StackScreenProps<any>['route'];
   dimensions: DimensionsType;
+  appState: string;
 
   // Info about the current sync process
   syncingStatusReport: SyncingStatusReportClass;
