@@ -28,7 +28,14 @@ exports[`Component About - test About - snapshot 1`] = `
     }
     width={100}
   >
-    <RNSVGGroup>
+    <RNSVGGroup
+      fill={
+        {
+          "payload": 4278190080,
+          "type": 0,
+        }
+      }
+    >
       <RNSVGCircle
         cx="50"
         cy="50"
@@ -127,6 +134,12 @@ exports[`Component About - test About - snapshot 1`] = `
           content="50%"
           dx={[]}
           dy={[]}
+          fill={
+            {
+              "payload": 4278190080,
+              "type": 0,
+            }
+          }
           font={{}}
           rotate={[]}
           x={[]}

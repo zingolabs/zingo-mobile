@@ -620,7 +620,9 @@ export default class RPC {
         this.fnSetRefreshUpdates(
           ss.in_progress,
           0,
-          `${current_block ? current_block.toFixed(0).toString() : ''} ${this.translate('rpc.of')} ${this.lastServerBlockHeight ? this.lastServerBlockHeight.toString() : ''}`,
+          `${current_block ? current_block.toFixed(0).toString() : ''} ${this.translate('rpc.of')} ${
+            this.lastServerBlockHeight ? this.lastServerBlockHeight.toString() : ''
+          }`,
         );
 
         // store SyncStatusReport object for a new screen
@@ -650,9 +652,9 @@ export default class RPC {
           // We are synced. Cancel the poll timer
           if (this.syncStatusID) {
             clearInterval(this.syncStatusID);
-            this.syncStatusID = 0;  
+            this.syncStatusID = 0;
           }
-          
+
           // And fetch the rest of the data.
           await this.loadWalletData();
 
@@ -692,7 +694,7 @@ export default class RPC {
           // If we're doing a long sync, every time the batch_num changes, save the wallet
           if (this.prevBatchNum !== batch_num) {
             // if finished batches really fast, the App have to save the wallet delayed.
-            if (this.prevBatchNum !== -1 && this.batches > 10) {
+            if (this.prevBatchNum !== -1 && this.batches >= 10) {
               // And fetch the rest of the data.
               await this.loadWalletData();
 
@@ -729,10 +731,10 @@ export default class RPC {
             }
             this.prevBatchNum = batch_num;
             this.seconds_batch = 0;
-            this.batches += 1;
+            this.batches += batch_num - this.prevBatchNum;
           }
-          // save wallet every minute
-          if (this.seconds_batch > 0 && this.seconds_batch % 60 === 0) {
+          // save wallet every 30 seconds in the same batch.
+          if (this.seconds_batch > 0 && this.seconds_batch % 30 === 0) {
             // And fetch the rest of the data.
             await this.loadWalletData();
 

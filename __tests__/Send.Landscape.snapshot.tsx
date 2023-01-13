@@ -32,6 +32,15 @@ jest.mock('react-native-reanimated', () => {
     }
   };
 });
+jest.mock('react-native', () => {
+  const RN = jest.requireActual('react-native');
+
+  RN.NativeModules.RPCModule = {
+    execute: jest.fn(() => '{}'),
+  };
+
+  return RN;
+});
 
 // test suite
 describe('Component Send - test', () => {
