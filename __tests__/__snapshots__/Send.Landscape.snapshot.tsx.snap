@@ -289,8 +289,8 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                         "flexDirection": "row",
                         "justifyContent": "center",
                         "margin": 0,
-                        "minHeight": 48,
-                        "minWidth": 48,
+                        "minHeight": 40,
+                        "minWidth": 40,
                         "padding": 5,
                       }
                     }
@@ -1015,8 +1015,8 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                             "flexDirection": "row",
                             "justifyContent": "center",
                             "margin": 0,
-                            "minHeight": 48,
-                            "minWidth": 48,
+                            "minHeight": 40,
+                            "minWidth": 40,
                             "padding": 5,
                           }
                         }
