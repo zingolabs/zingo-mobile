@@ -18,6 +18,7 @@ import SyncingStatusType from './types/SyncingStatusType';
 import TxDetailType from './types/TxDetailType';
 import WalletSeedType from './types/WalletSeedType';
 import zecPriceType from './types/zecPriceType';
+import backgroundType from './types/backgroundType';
 
 import AppStateLoaded from './AppStateLoaded';
 import AppStateLoading from './AppStateLoading';
@@ -44,4 +45,5 @@ export {
   InfoType,
   DimensionsType,
   zecPriceType,
+  backgroundType,
 };

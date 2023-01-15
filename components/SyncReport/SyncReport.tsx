@@ -8,6 +8,8 @@ import RegText from '../Components/RegText';
 import Button from '../Button';
 import DetailLine from './components/DetailLine';
 import { ContextLoaded } from '../../app/context';
+import moment from 'moment';
+import BoldText from '../Components/BoldText';
 
 type SyncReportProps = {
   closeModal: () => void;
@@ -15,7 +17,7 @@ type SyncReportProps = {
 
 const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) => {
   const context = useContext(ContextLoaded);
-  const { syncingStatusReport, walletSeed, translate } = context;
+  const { syncingStatusReport, walletSeed, translate, background } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [maxBlocks, setMaxBlocks] = useState(0);
   const [points, setPoints] = useState([] as number[]);
@@ -151,6 +153,13 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
           alignItems: 'stretch',
           justifyContent: 'flex-start',
         }}>
+        {background.batches > 0 && background.date > 0 && (
+          <View style={{ display: 'flex', margin: 10 }}>
+            <BoldText>
+              {background.batches.toString() + ' - ' + moment(background.date).format('YYYY MMM D h:mm a')}
+            </BoldText>
+          </View>
+        )}
         {maxBlocks ? (
           <>
             <View style={{ display: 'flex', margin: 20, marginBottom: 30 }}>

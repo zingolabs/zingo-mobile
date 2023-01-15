@@ -796,6 +796,7 @@ export default class RPC {
       walletSettings.server = settings.server;
       walletSettings.currency = settings.currency;
       walletSettings.language = settings.language;
+      walletSettings.sendAll = settings.sendAll;
     }
     this.fnSetWalletSettings(walletSettings);
   }

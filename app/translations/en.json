@@ -95,8 +95,10 @@
     "currency-USD": "US Dollar",
     "language-en": "English",
     "language-es": "Spanish",
-    "iscurrency": "You need to choose a currency to save.",
-    "islanguage": "You need to choose a language to save."
+    "islanguage": "You need to choose a language to save.",
+    "sendall-title": "Enable/Disable the option 'Send All Amount'",
+    "sendall-true": "Enable",
+    "sendall-false": "Disable"
   },
   "info": {
     "version": "Version",

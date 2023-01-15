@@ -61,6 +61,7 @@ describe('Component Settings - test', () => {
           set_server_option={onSetOption}
           set_currency_option={onSetOption}
           set_language_option={onSetOption}
+          set_sendAll_option={onSetOption}
         />
       </ContextLoadedProvider>,
     );

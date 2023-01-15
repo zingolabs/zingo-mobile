@@ -93,12 +93,7 @@ static NSString* syncTask = @"Zingo_Processing_Task_ID";
                                                               usingQueue:nil
                                                            launchHandler:^(BGTask *task) {
             NSLog(@"configureProcessingTask run");
-            //[self scheduleLocalNotifications];
-            //[self handleProcessingTask:task];
-            //[self syncingProcessBackgroundTask:nil];
-            //[self syncingStatusProcessBackgroundTask:nil];
             [NSThread detachNewThreadSelector:@selector(syncingProcessBackgroundTask:) toTarget:self withObject:nil];
-            //[NSThread detachNewThreadSelector:@selector(syncingStatusProcessBackgroundTask:) toTarget:self withObject:nil];
             [self syncingStatusProcessBackgroundTask:nil];
 
         }];
@@ -186,7 +181,16 @@ static NSString* syncTask = @"Zingo_Processing_Task_ID";
         // save the wallet
         RPCModule *rpcmodule = [RPCModule new];
         [rpcmodule saveWalletInternal];
-        NSLog(@"handleProcessingTask save wallet batch %@ %i", batchStr, progress);
+
+        // save info in background json
+        NSTimeInterval timeStamp = [[NSDate date] timeIntervalSince1970];
+        // NSTimeInterval is defined as double
+        NSNumber *timeStampObj = [NSNumber numberWithDouble: timeStamp];
+        NSString *timeStampStr = [NSNumber stringValue];
+        NSString *jsonBackgroud = @"[{\"batches\": \"" + batchStr + "\", \"date\": \"" + timeStampStr + "\" }]";
+        [rpcmodule saveBackgroundFile:jsonBackgroud];
+
+        NSLog(@"handleProcessingTask save wallet & background batch %@ %i %@", batchStr, progress, timeStampStr);
       }
       prevBatch = batch;
     }
@@ -196,48 +200,6 @@ static NSString* syncTask = @"Zingo_Processing_Task_ID";
     NSLog(@"handleProcessingTask sync status end %i", _syncFinished);
 
   }
-}
-
--(void)syncingBothProcessBackgroundTask:(NSString *)noValue {
-
-  //[NSThread detachNewThreadSelector:@selector(syncingProcessBackgroundTask:) toTarget:self withObject:nil];
-
-  NSLog(@"handleProcessingTask sync status begin %i", _syncFinished);
-  NSInteger prevBatch = -1;
-
-  while(!_syncFinished) {
-    @autoreleasepool {
-
-      [NSThread sleepForTimeInterval: 2.0];
-      char *resp = execute("syncstatus", "");
-      NSString* respStr = [NSString stringWithUTF8String:resp];
-      rust_free(resp);
-      NSLog(@"handleProcessingTask sync status response %@", respStr);
-
-      NSData *data = [respStr dataUsingEncoding:NSUTF8StringEncoding];
-      id jsonResp = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-      NSString *batchStr = [jsonResp valueForKey:@"batch_num"];
-      NSInteger batch = [batchStr integerValue];
-      BOOL progress = [jsonResp valueForKey:@"in_progress"];
-      _syncFinished = !progress;
-
-      NSLog(@"handleProcessingTask batch number %@ %i", batchStr, progress);
-
-      if (prevBatch != -1 && prevBatch != batch) {
-        // save the wallet
-        RPCModule *rpcmodule = [RPCModule new];
-        [rpcmodule saveWalletInternal];
-        NSLog(@"handleProcessingTask save wallet batch %@", batchStr);
-      }
-      prevBatch = batch;
-
-    }
-  }
-
-  RPCModule *rpcmodule = [RPCModule new];
-  [rpcmodule saveWalletInternal];
-  NSLog(@"handleProcessingTask sync status end %i", _syncFinished);
-
 }
 
 -(void)init__light__client {

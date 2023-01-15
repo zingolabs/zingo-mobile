@@ -95,8 +95,10 @@
     "currency-USD": "US Dólares",
     "language-en": "Inglés",
     "language-es": "Español",
-    "iscurrency": "Necesitas escoger una Moneda para poder grabar.",
-    "islanguage": "Necesitas escoger un Idioma para poder grabar."
+    "islanguage": "Necesitas escoger un Idioma para poder grabar.",
+    "sendall-title": "Activar/Desactivar la opción 'Enviar todo'",
+    "sendall-true": "Activar",
+    "sendall-false": "Desactivar"
   },
   "info": {
     "version": "Versión",

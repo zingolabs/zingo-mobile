@@ -15,17 +15,19 @@ buildscript {
     }
     dependencies {
         classpath('com.android.tools.build:gradle:7.2.2')
-	      classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+	    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
 }
 
+def REACT_NATIVE_VERSION = new File(['node', '--print',"JSON.parse(require('fs').readFileSync(require.resolve('react-native/package.json'), 'utf-8')).version"].execute(null, rootDir).text.trim())
+
 allprojects {
     configurations.all {
             resolutionStrategy {
-                force 'com.facebook.react:react-native:0.70.4'
+                force 'com.facebook.react:react-native:' + REACT_NATIVE_VERSION
             }
         }
     repositories {
@@ -40,10 +42,6 @@ allprojects {
             // Android JSC is installed from npm
             url("$rootDir/../node_modules/jsc-android/dist")
         }
-        maven {
-           // react-native-background-fetch
-           url("${project(':react-native-background-fetch').projectDir}/libs")
-       }
        maven {
             url 'https://www.jitpack.io'
         }

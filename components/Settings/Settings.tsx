@@ -15,13 +15,16 @@ import { parseServerURI, serverUris } from '../../app/uris';
 import Button from '../Button';
 import { ThemeType } from '../../app/types';
 import { ContextLoaded } from '../../app/context';
+import moment from 'moment';
+import 'moment/locale/es';
 
 type SettingsProps = {
   closeModal: () => void;
   set_wallet_option: (name: string, value: string) => void;
-  set_server_option: (name: 'server' | 'currency' | 'language', value: string) => void;
-  set_currency_option: (name: 'server' | 'currency' | 'language', value: string) => void;
-  set_language_option: (name: 'server' | 'currency' | 'language', value: string, reset: boolean) => void;
+  set_server_option: (name: 'server' | 'currency' | 'language' | 'sendAll', value: string) => void;
+  set_currency_option: (name: 'server' | 'currency' | 'language' | 'sendAll', value: string) => void;
+  set_language_option: (name: 'server' | 'currency' | 'language' | 'sendAll', value: string, reset: boolean) => void;
+  set_sendAll_option: (name: 'server' | 'currency' | 'language' | 'sendAll', value: boolean) => void;
 };
 
 type Memos = {
@@ -34,6 +37,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   set_server_option,
   set_currency_option,
   set_language_option,
+  set_sendAll_option,
   closeModal,
 }) => {
   const context = useContext(ContextLoaded);
@@ -50,7 +54,10 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [server, setServer] = useState(walletSettings.server);
   const [currency, setCurrency] = useState(walletSettings.currency);
   const [language, setLanguage] = useState(walletSettings.language);
+  const [sendAll, setSendAll] = useState(walletSettings.sendAll);
   const [customIcon, setCustomIcon] = useState(farCircle);
+
+  moment.locale(language);
 
   useEffect(() => {
     setCustomIcon(serverUris().find((s: string) => s === server) ? farCircle : faDotCircle);
@@ -62,6 +69,10 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
   const languages = (): string[] => {
     return ['en', 'es'];
+  };
+
+  const sendAlls = (): boolean[] => {
+    return [true, false];
   };
 
   const saveSettings = async () => {
@@ -87,10 +98,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       Toast.show(translate('settings.isserver'), Toast.LONG);
       return;
     }
-    //if (!currency) {
-    //  Toast.show(translate('settings.iscurrency'), Toast.LONG);
-    //  return;
-    //}
     if (!language) {
       Toast.show(translate('settings.islanguage'), Toast.LONG);
       return;
@@ -109,6 +116,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     }
     if (walletSettings.currency !== currency) {
       set_currency_option('currency', currency);
+    }
+    if (walletSettings.sendAll !== sendAll) {
+      set_sendAll_option('sendAll', sendAll);
     }
     // the last one
     if (walletSettings.server !== server) {
@@ -168,6 +178,26 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           alignItems: 'stretch',
           justifyContent: 'flex-start',
         }}>
+        <View style={{ display: 'flex', margin: 10 }}>
+          <BoldText>{translate('settings.sendall-title')}</BoldText>
+        </View>
+
+        <View style={{ display: 'flex', marginLeft: 25 }}>
+          {sendAlls().map((curr: boolean) => (
+            <TouchableOpacity
+              key={'touch-' + curr.toString()}
+              style={{ marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
+              onPress={() => setSendAll(curr as boolean)}>
+              <View style={{ display: 'flex', flexDirection: 'row', marginTop: 10 }}>
+                <FontAwesomeIcon icon={curr === sendAll ? faDotCircle : farCircle} size={20} color={colors.border} />
+                <RegText key={'tex-' + curr.toString()} style={{ marginLeft: 10 }}>
+                  {translate('settings.sendall-' + curr)}
+                </RegText>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </View>
+
         <View style={{ display: 'flex', margin: 10 }}>
           <BoldText>{translate('settings.currency-title')}</BoldText>
         </View>

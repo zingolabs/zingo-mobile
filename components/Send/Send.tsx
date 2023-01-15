@@ -313,11 +313,13 @@ const Send: React.FunctionComponent<SendProps> = ({
           }, 1000);
         }
       } catch (err) {
+        const error = err;
+
         setTimeout(() => {
-          //console.log('sendtx error', err);
+          console.log('sendtx error', error);
           Alert.alert(
             translate('send.sending-error'),
-            `${err}`,
+            `${error}`,
             [{ text: 'OK', onPress: () => setComputingModalVisible(false) }],
             {
               cancelable: false,

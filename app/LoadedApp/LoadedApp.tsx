@@ -40,6 +40,7 @@ import {
   WalletSettingsClass,
   AddressClass,
   zecPriceType,
+  backgroundType,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
@@ -47,6 +48,7 @@ import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import { ContextLoadedProvider, defaultAppStateLoaded } from '../context';
 import platform from '../platform/platform';
 import { serverUris } from '../uris';
+import BackgroundFileImpl from '../../components/Background/BackgroundFileImpl';
 
 const Transactions = React.lazy(() => import('../../components/Transactions'));
 const Send = React.lazy(() => import('../../components/Send'));
@@ -88,6 +90,8 @@ export default function LoadedApp(props: LoadedAppProps) {
   const [language, setLanguage] = useState('en' as 'en' | 'es');
   const [currency, setCurrency] = useState('' as 'USD' | '');
   const [server, setServer] = useState(SERVER_DEFAULT_0 as string);
+  const [sendAll, setSendAll] = useState(false);
+  const [background, setBackground] = useState({ batches: 0, date: 0 } as backgroundType);
   const [loading, setLoading] = useState(true);
   //const forceUpdate = useForceUpdate();
   const file = useMemo(
@@ -143,7 +147,18 @@ export default function LoadedApp(props: LoadedAppProps) {
     } else {
       await SettingsFileImpl.writeSettings('server', server);
     }
-  }, [currency, file, i18n, server]);
+    if (settings.sendAll) {
+      setSendAll(settings.sendAll);
+    } else {
+      await SettingsFileImpl.writeSettings('sendAll', sendAll);
+    }
+
+    // reading background task info
+    const backgroundJson = await BackgroundFileImpl.readSettings();
+    if (backgroundJson) {
+      setBackground(backgroundJson);
+    }
+  }, [currency, file, i18n, sendAll, server]);
 
   useEffect(() => {
     (async () => {
@@ -173,6 +188,8 @@ export default function LoadedApp(props: LoadedAppProps) {
         language={language}
         currency={currency}
         server={server}
+        sendAll={sendAll}
+        background={background}
       />
     );
   }
@@ -186,6 +203,8 @@ type LoadedAppClassProps = {
   language: 'en' | 'es';
   currency: 'USD' | '';
   server: string;
+  sendAll: boolean;
+  background: backgroundType;
 };
 
 class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
@@ -207,6 +226,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       server: props.server,
       language: props.language,
       currency: props.currency,
+      sendAll: props.sendAll,
+      background: props.background,
       dimensions: {
         width: Number(screen.width.toFixed(0)),
         height: Number(screen.height.toFixed(0)),
@@ -551,7 +572,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     this.rpc.fetchWalletSettings();
   };
 
-  set_server_option = async (name: 'server' | 'currency' | 'language', value: string) => {
+  set_server_option = async (name: 'server' | 'currency' | 'language' | 'sendAll', value: string) => {
     const resultStrServer: string = await RPCModule.execute('changeserver', value);
     if (resultStrServer.toLowerCase().startsWith('error')) {
       //console.log(`Error change server ${value} - ${resultStrServer}`);
@@ -596,7 +617,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     }
   };
 
-  set_currency_option = async (name: 'server' | 'currency' | 'language', value: string) => {
+  set_currency_option = async (name: 'server' | 'currency' | 'language' | 'sendAll', value: string) => {
     await SettingsFileImpl.writeSettings(name, value);
     this.setState({
       currency: value as 'USD' | '',
@@ -607,7 +628,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     //this.navigateToLoading();
   };
 
-  set_language_option = async (name: 'server' | 'currency' | 'language', value: string, reset: boolean) => {
+  set_language_option = async (name: 'server' | 'currency' | 'language' | 'sendAll', value: string, reset: boolean) => {
     await SettingsFileImpl.writeSettings(name, value);
     this.setState({
       language: value as 'en' | 'es',
@@ -618,6 +639,17 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     if (reset) {
       this.navigateToLoading();
     }
+  };
+
+  set_sendAll_option = async (name: 'server' | 'currency' | 'language' | 'sendAll', value: boolean) => {
+    await SettingsFileImpl.writeSettings(name, value);
+    this.setState({
+      sendAll: value as boolean,
+    });
+
+    // Refetch the settings to update
+    this.rpc.fetchWalletSettings();
+    //this.navigateToLoading();
   };
 
   navigateToLoading = () => {
@@ -862,6 +894,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                 set_server_option={this.set_server_option}
                 set_currency_option={this.set_currency_option}
                 set_language_option={this.set_language_option}
+                set_sendAll_option={this.set_sendAll_option}
               />
             </Suspense>
           </Modal>

@@ -87,6 +87,19 @@ RCT_REMAP_METHOD(walletBackupExists,
   // RCTLogInfo(@"Saved backup file");
 }
 
+-(void) saveBackgroundFile:(NSString *)data {
+  NSArray *paths = NSSearchPathForDirectoriesInDomains
+      (NSDocumentDirectory, NSUserDomainMask, YES);
+  NSString *documentsDirectory = [paths objectAtIndex:0];
+
+  // Write to user's documents app directory
+  NSString *fileName = [NSString stringWithFormat:@"%@/background.json",
+                                                documentsDirectory];
+  [data writeToFile:fileName atomically:YES encoding:NSUTF8StringEncoding error:nil];
+
+  // RCTLogInfo(@"Saved file");
+}
+
 // Read base64 encoded wallet data to a NSString, which is auto translated into a React String when returned
 -(NSString *) readWallet {
   NSArray *paths = NSSearchPathForDirectoriesInDomains

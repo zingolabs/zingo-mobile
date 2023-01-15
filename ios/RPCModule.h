@@ -14,6 +14,7 @@
 @interface RPCModule: NSObject <RCTBridgeModule>
 
 -(void) saveWalletInternal;
+-(void) saveBackgroundFile:(NSString *)data;
 
 @end
 

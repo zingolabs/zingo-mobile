@@ -19,6 +19,7 @@ import {
   AddressClass,
   AddressBookClass,
   zecPriceType,
+  backgroundType,
 } from '../AppState';
 
 export const defaultAppStateLoaded: AppStateLoaded = {
@@ -66,6 +67,11 @@ export const defaultAppStateLoaded: AppStateLoaded = {
     zecPrice: 0,
     date: 0,
   } as zecPriceType,
+  sendAll: false,
+  background: {
+    batches: 0,
+    date: 0,
+  } as backgroundType,
 
   translate: () => '',
 };
