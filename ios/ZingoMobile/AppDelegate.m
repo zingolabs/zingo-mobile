@@ -186,7 +186,7 @@ static NSString* syncTask = @"Zingo_Processing_Task_ID";
 
       NSLog(@"handleProcessingTask batch number %i %@", self.syncFinished, batchStr);
 
-      if (prevBatch != -1 && prevBatch != batch) {
+      if (prevBatch != -1 && batch > 0 && prevBatch != batch) {
         // save the wallet
         RPCModule *rpcmodule = [RPCModule new];
         [rpcmodule saveWalletInternal];
