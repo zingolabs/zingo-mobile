@@ -10,7 +10,6 @@ import DetailLine from './components/DetailLine';
 import { ContextLoaded } from '../../app/context';
 import moment from 'moment';
 import 'moment/locale/es';
-import BoldText from '../Components/BoldText';
 
 type SyncReportProps = {
   closeModal: () => void;
@@ -162,7 +161,11 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
               {background.batches > 0 && background.date > 0 && (
                 <DetailLine
                   label={translate('report.lastbackgroundsync')}
-                  value={background.batches.toString() + translate('report.batches-date') + moment(Number(Number(background.date).toFixed(0)) * 1000).format('YYYY MMM D h:mm a')}
+                  value={
+                    background.batches.toString() +
+                    translate('report.batches-date') +
+                    moment(Number(Number(background.date).toFixed(0)) * 1000).format('YYYY MMM D h:mm a')
+                  }
                 />
               )}
               <DetailLine

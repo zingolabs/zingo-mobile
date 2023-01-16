@@ -34,6 +34,7 @@ export default class RPC {
   fnSetRefreshUpdates: (inProgress: boolean, progress: number, blocks: string) => void;
   fnSetWalletSettings: (settings: WalletSettingsClass) => void;
   translate: (key: string, config?: TranslateOptions) => string;
+  fetchBackgroundSyncing: () => void;
 
   refreshTimerID: number;
   updateTimerID?: number;
@@ -66,6 +67,7 @@ export default class RPC {
     fnSetInfo: (info: InfoType) => void,
     fnSetRefreshUpdates: (inProgress: boolean, progress: number, blocks: string) => void,
     translate: (key: string, config?: TranslateOptions) => string,
+    fetchBackgroundSyncing: () => void,
   ) {
     this.fnSetSyncingStatusReport = fnSetSyncingStatusReport;
     this.fnSetTotalBalance = fnSetTotalBalance;
@@ -75,6 +77,7 @@ export default class RPC {
     this.fnSetInfo = fnSetInfo;
     this.fnSetRefreshUpdates = fnSetRefreshUpdates;
     this.translate = translate;
+    this.fetchBackgroundSyncing = fetchBackgroundSyncing;
 
     this.refreshTimerID = 0;
 
@@ -449,6 +452,8 @@ export default class RPC {
 
     // And fetch the rest of the data.
     await this.loadWalletData();
+
+    this.fetchBackgroundSyncing();
 
     //console.log(`Finished update data at ${lastServerBlockHeight}`);
     this.updateDataLock = false;

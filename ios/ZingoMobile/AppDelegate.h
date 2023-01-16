@@ -3,7 +3,7 @@
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate, RCTBridgeDelegate>
 
-@property BOOL syncFinished;
+@property (atomic) BOOL syncFinished;
 @property (nonatomic, strong) UIWindow *window;
 
 //-(void)syncingProcessBackgroundTask:(NSString *)noValue;

@@ -30,6 +30,15 @@ static void InitializeFlipper(UIApplication *application) {
 #endif
 
 @implementation AppDelegate
+static BOOL _syncFinished = true;
+
++ (BOOL)syncFinished {
+  return _syncFinished;
+}
+
++ (void)setSyncFinished:(BOOL)newSyncFinished {
+  _syncFinished = newSyncFinished;
+}
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
@@ -74,7 +83,7 @@ static void InitializeFlipper(UIApplication *application) {
 {
   // cancel existing task (if any)
   NSLog(@"scheduleProcessingTask CANCEL - foreground");
-  _syncFinished = true;
+  [self setSyncFinished:true];
   [BGTaskScheduler.sharedScheduler cancelTaskRequestWithIdentifier:syncTask];
 }
 
@@ -128,7 +137,7 @@ static NSString* syncTask = @"Zingo_Processing_Task_ID";
     if (exists) {
 
       NSLog(@"handleProcessingTask sync begin");
-      _syncFinished = false;
+      [self setSyncFinished:false];
 
       char *resp2 = execute("sync", "");
       NSString* respStr2 = [NSString stringWithUTF8String:resp2];
@@ -136,7 +145,7 @@ static NSString* syncTask = @"Zingo_Processing_Task_ID";
 
       NSLog(@"handleProcessingTask sync end %@", respStr2);
       
-      _syncFinished = true;
+      [self setSyncFinished:true];
 
       if (![respStr2 hasPrefix:@"Error"]) {
         // Also save the wallet after sync
@@ -147,7 +156,7 @@ static NSString* syncTask = @"Zingo_Processing_Task_ID";
 
     } else {
 
-      _syncFinished = true;
+      [self setSyncFinished:true];
       NSLog(@"handleProcessingTask No exists wallet");
 
     }
@@ -159,24 +168,23 @@ static NSString* syncTask = @"Zingo_Processing_Task_ID";
 -(void)syncingStatusProcessBackgroundTask:(NSString *)noValue {
   @autoreleasepool {
 
-    NSLog(@"handleProcessingTask sync status begin %i", _syncFinished);
+    NSLog(@"handleProcessingTask sync status begin %i", self.syncFinished);
     NSInteger prevBatch = -1;
 
-    while(!_syncFinished) {
+    while(!self.syncFinished) {
       [NSThread sleepForTimeInterval: 2.0];
       char *resp = execute("syncstatus", "");
       NSString* respStr = [NSString stringWithUTF8String:resp];
       rust_free(resp);
-      NSLog(@"handleProcessingTask sync status response %@", respStr);
+      NSLog(@"handleProcessingTask sync status response %i %@", self.syncFinished, respStr);
 
       NSData *data = [respStr dataUsingEncoding:NSUTF8StringEncoding];
       id jsonResp = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
       NSString *batchStr = [jsonResp valueForKey:@"batch_num"];
       NSInteger batch = [batchStr integerValue];
       BOOL progress = [jsonResp valueForKey:@"in_progress"];
-      _syncFinished = !progress;
 
-      NSLog(@"handleProcessingTask batch number %@", batchStr);
+      NSLog(@"handleProcessingTask batch number %i %@", self.syncFinished, batchStr);
 
       if (prevBatch != -1 && prevBatch != batch) {
         // save the wallet
@@ -191,14 +199,14 @@ static NSString* syncTask = @"Zingo_Processing_Task_ID";
         NSString *jsonBackgroud = [NSString stringWithFormat: @"%@%@%@%@%@", @"{\"batches\": \"", batchStr, @"\", \"date\": \"", timeStampStr, @"\"}"];
         [rpcmodule saveBackgroundFile:jsonBackgroud];
 
-        NSLog(@"handleProcessingTask save wallet & background batch %@ %i %@", batchStr, progress, timeStampStr);
+        NSLog(@"handleProcessingTask save wallet & background batch %i %@ %i %@", self.syncFinished, batchStr, progress, timeStampStr);
       }
       prevBatch = batch;
     }
 
     RPCModule *rpcmodule = [RPCModule new];
     [rpcmodule saveWalletInternal];
-    NSLog(@"handleProcessingTask sync status end %i", _syncFinished);
+    NSLog(@"handleProcessingTask sync status end %i", self.syncFinished);
 
   }
 }

@@ -248,6 +248,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       this.setInfo,
       this.refreshUpdates,
       props.translate,
+      this.fetchBackgroundSyncing,
     );
 
     this.dim = {} as EmitterSubscription;
@@ -269,12 +270,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
         console.log('App has come to the foreground!');
         // reading background task info
-        const backgroundJson = await BackgroundFileImpl.readBackground();
-        if (backgroundJson) {
-          this.setState({
-            background: backgroundJson,
-          });
-        }
+        this.fetchBackgroundSyncing();
         this.rpc.setInRefresh(false);
         this.rpc.configure();
       }
@@ -306,6 +302,15 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
         scale: Number(screen.scale.toFixed(2)),
       },
     });
+  };
+
+  fetchBackgroundSyncing = async () => {
+    const backgroundJson = await BackgroundFileImpl.readBackground();
+    if (backgroundJson) {
+      this.setState({
+        background: backgroundJson,
+      });
+    }
   };
 
   getFullState = (): AppStateLoaded => {
@@ -533,6 +538,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
   startRescan = () => {
     this.setRescanning(true);
+    this.setTransactionList([]);
     this.rpc.rescan();
   };
 
