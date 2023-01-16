@@ -278,7 +278,9 @@
     "secondsperbatch": "Time Processing the Current Batch (seconds)",
     "blocks-title": "BLOCKS: ",
     "processingblock": "Processing Block: ",
-    "totalblocks": " of a TOTAL of Blocks: "
+    "totalblocks": " of a TOTAL of Blocks: ",
+    "lastbackgroundsync": "LAST BACKGROUND SYNCING",
+    "batches-date": " Batches at: "
   },
   "import": {
     "title": "Import Key",

@@ -278,7 +278,9 @@
     "secondsperbatch": "Tiempo procesando el Lote Actual (segundos)",
     "blocks-title": "BLOQUES: ",
     "processingblock": "Procesando Bloque: ",
-    "totalblocks": " de un TOTAL de Bloques: "
+    "totalblocks": " de un TOTAL de Bloques: ",
+    "lastbackgroundsync": "ULTIMA SINCRONIZACION EN SEGUNDO PLANO",
+    "batches-date": " Lotes en: "
   },
   "import": {
     "title": "Importar Clave",

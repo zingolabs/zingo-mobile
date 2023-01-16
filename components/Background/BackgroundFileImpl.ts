@@ -7,7 +7,7 @@ export default class BackgroundFileImpl {
     return RNFS.DocumentDirectoryPath + '/background.json';
   }
 
-  // Write the server setting
+  // Write the server background
   static async reset() {
     const fileName = await this.getFileName();
     const newBackground: backgroundType = { batches: 0, date: 0 };
@@ -21,11 +21,16 @@ export default class BackgroundFileImpl {
       });
   }
 
-  // Read the server setting
-  static async readSettings(): Promise<backgroundType> {
+  // [{"batches": "622", "date": "1673817518.324613" }]
+
+  // Read the server background
+  static async readBackground(): Promise<backgroundType> {
     const fileName = await this.getFileName();
 
     try {
+      //const b = await RNFS.readFile(fileName, 'utf8');
+      //console.log('background file', b);
+      //console.log('background parse', JSON.parse((await RNFS.readFile(fileName, 'utf8')).toString()) as backgroundType);
       return JSON.parse((await RNFS.readFile(fileName, 'utf8')).toString()) as backgroundType;
     } catch (err) {
       // File probably doesn't exist, so return nothing

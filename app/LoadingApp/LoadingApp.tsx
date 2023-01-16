@@ -125,7 +125,7 @@ export default function LoadingApp(props: LoadingAppProps) {
     }
 
     // reading background task info
-    const backgroundJson = await BackgroundFileImpl.readSettings();
+    const backgroundJson = await BackgroundFileImpl.readBackground();
     if (backgroundJson) {
       setBackground(backgroundJson);
     }
@@ -247,9 +247,16 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
       //console.log('++++++++++++++++++++++++++++++++++ change dims', Dimensions.get('screen'));
     });
 
-    this.sta = AppState.addEventListener('change', nextAppState => {
+    this.sta = AppState.addEventListener('change', async nextAppState => {
       if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
         console.log('App has come to the foreground!');
+        // reading background task info
+        const backgroundJson = await BackgroundFileImpl.readBackground();
+        if (backgroundJson) {
+          this.setState({
+            background: backgroundJson,
+          });
+        }
       }
       if (nextAppState.match(/inactive|background/) && this.state.appState === 'active') {
         console.log('App is gone to the background!');

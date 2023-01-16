@@ -74,6 +74,7 @@ static void InitializeFlipper(UIApplication *application) {
 {
   // cancel existing task (if any)
   NSLog(@"scheduleProcessingTask CANCEL - foreground");
+  _syncFinished = true;
   [BGTaskScheduler.sharedScheduler cancelTaskRequestWithIdentifier:syncTask];
 }
 
@@ -110,7 +111,7 @@ static NSString* syncTask = @"Zingo_Processing_Task_ID";
 -(void)handleProcessingTask:(BGTask *)task API_AVAILABLE(ios(13.0)){
 
   //do things with task
-  [NSThread detachNewThreadSelector:@selector(syncingBothProcessBackgroundTask:) toTarget:self withObject:nil];
+  //[NSThread detachNewThreadSelector:@selector(syncingBothProcessBackgroundTask:) toTarget:self withObject:nil];
 
   //[NSThread detachNewThreadSelector:@selector(syncingProcessBackgroundTask:) toTarget:self withObject:nil];
   //[NSThread sleepForTimeInterval: 2.0];
@@ -186,8 +187,8 @@ static NSString* syncTask = @"Zingo_Processing_Task_ID";
         NSTimeInterval timeStamp = [[NSDate date] timeIntervalSince1970];
         // NSTimeInterval is defined as double
         NSNumber *timeStampObj = [NSNumber numberWithDouble: timeStamp];
-        NSString *timeStampStr = [NSNumber stringValue];
-        NSString *jsonBackgroud = @"[{\"batches\": \"" + batchStr + "\", \"date\": \"" + timeStampStr + "\" }]";
+        NSString *timeStampStr = [timeStampObj stringValue];
+        NSString *jsonBackgroud = [NSString stringWithFormat: @"%@%@%@%@%@", @"{\"batches\": \"", batchStr, @"\", \"date\": \"", timeStampStr, @"\"}"];
         [rpcmodule saveBackgroundFile:jsonBackgroud];
 
         NSLog(@"handleProcessingTask save wallet & background batch %@ %i %@", batchStr, progress, timeStampStr);

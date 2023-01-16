@@ -154,7 +154,8 @@ export default function LoadedApp(props: LoadedAppProps) {
     }
 
     // reading background task info
-    const backgroundJson = await BackgroundFileImpl.readSettings();
+    const backgroundJson = await BackgroundFileImpl.readBackground();
+    //console.log('background', backgroundJson);
     if (backgroundJson) {
       setBackground(backgroundJson);
     }
@@ -264,9 +265,16 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       //console.log('++++++++++++++++++++++++++++++++++ change dims', Dimensions.get('screen'));
     });
 
-    this.sta = AppState.addEventListener('change', nextAppState => {
+    this.sta = AppState.addEventListener('change', async nextAppState => {
       if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
         console.log('App has come to the foreground!');
+        // reading background task info
+        const backgroundJson = await BackgroundFileImpl.readBackground();
+        if (backgroundJson) {
+          this.setState({
+            background: backgroundJson,
+          });
+        }
         this.rpc.setInRefresh(false);
         this.rpc.configure();
       }
