@@ -4,6 +4,7 @@ package com.zingo
 import android.content.Context
 import android.util.Log
 import android.util.Base64
+import androidx.work.PeriodicWorkRequest
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
@@ -12,6 +13,7 @@ import com.facebook.react.bridge.Promise
 //import android.util.Log
 import java.io.File
 import java.io.InputStream
+import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
 
@@ -43,6 +45,11 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             // Log.w("MAIN", "Wallet DOES NOT exist")
             promise.resolve(false)
         }
+    }
+
+    @ReactMethod
+    fun startBackgroundSyncWorker() {
+        PeriodicWorkRequest.Builder(BackgroundWorker::class.java, 20, TimeUnit.MINUTES).build()
     }
 
     @ReactMethod

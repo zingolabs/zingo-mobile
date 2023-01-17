@@ -4,10 +4,13 @@ import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import android.view.View
 import androidx.work.*
 import com.facebook.react.*
 import com.facebook.react.bridge.*
 import com.facebook.react.jstasks.HeadlessJsTaskConfig
+import com.facebook.react.uimanager.ReactShadowNode
+import com.facebook.react.uimanager.ReactShadowNodeImpl
 import com.facebook.react.uimanager.ViewManager
 import com.facebook.soloader.SoLoader
 import java.lang.reflect.InvocationTargetException
@@ -31,6 +34,7 @@ class MainApplication : Application(), ReactApplication {
             val packages: MutableList<ReactPackage> = PackageList(this).packages
 
             packages.add(RPCPackage())
+            packages.add(BackgroundPackage())
             return packages
         }
 
@@ -49,7 +53,6 @@ class MainApplication : Application(), ReactApplication {
 
 
         SoLoader.init(this, false)
-        PeriodicWorkRequest.Builder(BackgroundWorker::class.java, 20, TimeUnit.MINUTES).build()
         // initializeFlipper(this, reactNativeHost.reactInstanceManager)
     }
 
@@ -158,7 +161,7 @@ class BackgroundPackage : ReactPackage {
     }
 
     @Nonnull
-    override fun createViewManagers(@Nonnull reactContext: ReactApplicationContext): List<ViewManager> {
+    override fun createViewManagers(@Nonnull reactContext: ReactApplicationContext): List<ViewManager<View, ReactShadowNodeImpl>> {
         return Collections.emptyList()
     }
 }
