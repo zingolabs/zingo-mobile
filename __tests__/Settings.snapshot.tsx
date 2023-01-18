@@ -29,27 +29,67 @@ describe('Component Settings - test', () => {
   const state = defaultAppStateLoaded;
   state.translate = (p: string) => {
     if (p === 'settings.memos') {
-      return `[
+      return [
         {
-          "value": "none",
-          "text": "text none"
+          value: 'none',
+          text: 'text none',
         },
         {
-          "value": "wallet",
-          "text": "text wallet"
+          value: 'wallet',
+          text: 'text wallet',
         },
         {
-          "value": "all",
-          "text": "text all"
-        }
-      ]`;
-    } else {
-      return 'text translated';
+          value: 'all',
+          text: 'text all',
+        },
+      ];
     }
+    if (p === 'settings.currencies') {
+      return [
+        {
+          value: '',
+          text: 'text no currency',
+        },
+        {
+          value: 'USD',
+          text: 'text USD',
+        },
+      ];
+    }
+    if (p === 'settings.languages') {
+      return [
+        {
+          value: 'en',
+          text: 'text en',
+        },
+        {
+          value: 'es',
+          text: 'text es',
+        },
+      ];
+    }
+    if (p === 'settings.sendalls') {
+      return [
+        {
+          value: true,
+          text: 'text true',
+        },
+        {
+          value: false,
+          text: 'text false',
+        },
+      ];
+    }
+    return 'text translated';
   };
   state.info.currencyName = 'ZEC';
   state.totalBalance.total = 1.12345678;
   state.walletSettings.server = 'https://zcash.es';
+  state.walletSettings.currency = 'USD';
+  state.walletSettings.language = 'en';
+  state.walletSettings.sendAll = false;
+  state.walletSettings.download_memos = 'wallet';
+  state.walletSettings.transaction_filter_threshold = '500';
   const onClose = jest.fn();
   const onSetOption = jest.fn();
   test('Settings - snapshot', () => {
