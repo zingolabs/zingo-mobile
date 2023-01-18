@@ -211,7 +211,7 @@ type LoadedAppClassProps = {
 class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   rpc: RPC;
   dim: EmitterSubscription;
-  sta: NativeEventSubscription;
+  state: NativeEventSubscription;
 
   constructor(props: LoadedAppClassProps) {
     super(props);
