@@ -49,8 +49,18 @@ const Send: React.FunctionComponent<SendProps> = ({
   setZecPrice,
 }) => {
   const context = useContext(ContextLoaded);
-  const { translate, dimensions, info, totalBalance, sendPageState, syncingStatus, navigation, currency, zecPrice } =
-    context;
+  const {
+    translate,
+    dimensions,
+    info,
+    totalBalance,
+    sendPageState,
+    syncingStatus,
+    navigation,
+    currency,
+    zecPrice,
+    sendAll,
+  } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [qrcodeModalVisble, setQrcodeModalVisible] = useState(false);
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
@@ -367,6 +377,7 @@ const Send: React.FunctionComponent<SendProps> = ({
             setConfirmModalVisible(false);
           }}
           confirmSend={confirmSend}
+          sendAllAmount={Number(sendPageState.toaddr.amount) === Utils.parseLocaleFloat(getMaxAmount().toFixed(8))}
         />
       </Modal>
 
@@ -553,7 +564,41 @@ const Send: React.FunctionComponent<SendProps> = ({
                 </View>
 
                 <View style={{ marginTop: 10, display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                  <FadeText>{translate('send.amount')}</FadeText>
+                  <View style={{ flexDirection: 'row', justifyContent: 'flex-end', minWidth: 48, minHeight: 48 }}>
+                    <View
+                      style={{
+                        alignItems: 'center',
+                        justifyContent: 'flex-end',
+                        borderRadius: 10,
+                        margin: 0,
+                        padding: 0,
+                        paddingBottom: 3,
+                        minWidth: 48,
+                        minHeight: 48,
+                      }}>
+                      <FadeText>{translate('send.amount')}</FadeText>
+                    </View>
+                    {sendAll && (
+                      <TouchableOpacity
+                        onPress={() =>
+                          updateToField(null, Utils.parseLocaleFloat(getMaxAmount().toFixed(8)).toString(), null, null)
+                        }>
+                        <View
+                          style={{
+                            alignItems: 'center',
+                            justifyContent: 'flex-end',
+                            borderRadius: 10,
+                            margin: 0,
+                            padding: 0,
+                            marginLeft: 10,
+                            minWidth: 48,
+                            minHeight: 48,
+                          }}>
+                          <RegText color={colors.primary}>{translate('send.sendall')}</RegText>
+                        </View>
+                      </TouchableOpacity>
+                    )}
+                  </View>
                   {validAmount === -1 && <ErrorText>{translate('send.invalidamount')}</ErrorText>}
                 </View>
 
@@ -717,7 +762,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         <CurrencyAmount
                           style={{ marginTop: 10, fontSize: 13 }}
                           price={zecPrice.zecPrice}
-                          amtZec={totalBalance.total}
+                          amtZec={getMaxAmount()}
                           currency={'USD'}
                         />
                         <View style={{ marginLeft: 5 }}>
@@ -777,9 +822,24 @@ const Send: React.FunctionComponent<SendProps> = ({
               accessible={true}
               accessibilityLabel={'title ' + translate('send.button')}
               type="Primary"
-              title={translate('send.button')}
+              title={
+                validAmount === 1 &&
+                sendPageState.toaddr.amount &&
+                Number(sendPageState.toaddr.amount) === Utils.parseLocaleFloat(getMaxAmount().toFixed(8))
+                  ? translate('send.button-all')
+                  : translate('send.button')
+              }
               disabled={!sendButtonEnabled}
-              onPress={() => setConfirmModalVisible(true)}
+              onPress={() => {
+                if (
+                  validAmount === 1 &&
+                  sendPageState.toaddr.amount &&
+                  Number(sendPageState.toaddr.amount) === Utils.parseLocaleFloat(getMaxAmount().toFixed(8))
+                ) {
+                  Toast.show(`${translate('send.sendall-message')}`, Toast.LONG);
+                }
+                setConfirmModalVisible(true);
+              }}
             />
             <Button
               type="Secondary"
@@ -827,6 +887,7 @@ const Send: React.FunctionComponent<SendProps> = ({
               setConfirmModalVisible(false);
             }}
             confirmSend={confirmSend}
+            sendAllAmount={Number(sendPageState.toaddr.amount) === Utils.parseLocaleFloat(getMaxAmount().toFixed(8))}
           />
         </Modal>
 
@@ -1026,7 +1087,46 @@ const Send: React.FunctionComponent<SendProps> = ({
 
                   <View
                     style={{ marginTop: 10, display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <FadeText>{translate('send.amount')}</FadeText>
+                    <View style={{ flexDirection: 'row', justifyContent: 'flex-end', minWidth: 48, minHeight: 48 }}>
+                      <View
+                        style={{
+                          alignItems: 'center',
+                          justifyContent: 'flex-end',
+                          borderRadius: 10,
+                          margin: 0,
+                          padding: 0,
+                          paddingBottom: 3,
+                          minWidth: 48,
+                          minHeight: 48,
+                        }}>
+                        <FadeText>{translate('send.amount')}</FadeText>
+                      </View>
+                      {sendAll && (
+                        <TouchableOpacity
+                          onPress={() =>
+                            updateToField(
+                              null,
+                              Utils.parseLocaleFloat(getMaxAmount().toFixed(8)).toString(),
+                              null,
+                              null,
+                            )
+                          }>
+                          <View
+                            style={{
+                              alignItems: 'center',
+                              justifyContent: 'flex-end',
+                              borderRadius: 10,
+                              margin: 0,
+                              padding: 0,
+                              marginLeft: 10,
+                              minWidth: 48,
+                              minHeight: 48,
+                            }}>
+                            <RegText color={colors.primary}>{translate('send.sendall')}</RegText>
+                          </View>
+                        </TouchableOpacity>
+                      )}
+                    </View>
                     {validAmount === -1 && <ErrorText>{translate('send.invalidamount')}</ErrorText>}
                   </View>
 
@@ -1192,7 +1292,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           <CurrencyAmount
                             style={{ marginTop: 10, fontSize: 13 }}
                             price={zecPrice.zecPrice}
-                            amtZec={totalBalance.total}
+                            amtZec={getMaxAmount()}
                             currency={'USD'}
                           />
                           <View style={{ marginLeft: 5 }}>
@@ -1252,9 +1352,24 @@ const Send: React.FunctionComponent<SendProps> = ({
                 accessible={true}
                 accessibilityLabel={'title ' + translate('send.button')}
                 type="Primary"
-                title={translate('send.button')}
+                title={
+                  validAmount === 1 &&
+                  sendPageState.toaddr.amount &&
+                  Number(sendPageState.toaddr.amount) === Utils.parseLocaleFloat(getMaxAmount().toFixed(8))
+                    ? translate('send.button-all')
+                    : translate('send.button')
+                }
                 disabled={!sendButtonEnabled}
-                onPress={() => setConfirmModalVisible(true)}
+                onPress={() => {
+                  if (
+                    validAmount === 1 &&
+                    sendPageState.toaddr.amount &&
+                    Number(sendPageState.toaddr.amount) === Utils.parseLocaleFloat(getMaxAmount().toFixed(8))
+                  ) {
+                    Toast.show(`${translate('send.sendall-message')}`, Toast.LONG);
+                  }
+                  setConfirmModalVisible(true);
+                }}
               />
               <Button
                 type="Secondary"
