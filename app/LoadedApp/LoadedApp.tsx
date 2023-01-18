@@ -289,7 +289,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   componentWillUnmount = () => {
     this.rpc.clearTimers();
     this.dim.remove();
-    this.sta.remove();
+    this.state.remove();
   };
 
   setDimensions = (screen: ScaledSize) => {
