@@ -432,20 +432,6 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                     onPress={this.getwalletSeedToRestore}
                     style={{ margin: 10 }}
                   />
-                  <Button
-                    type="Secondary"
-                    title={translate('loadingapp.restorewalletviewing')}
-                    disabled={actionButtonsDisabled}
-                    onPress={this.getViewingKeyToRestore}
-                    style={{ margin: 10 }}
-                  />
-                  <Button
-                    type="Secondary"
-                    title={translate('loadingapp.restorewalletspendable')}
-                    disabled={actionButtonsDisabled}
-                    onPress={this.getSpendableKeyToRestore}
-                    style={{ margin: 10 }}
-                  />
                 </View>
               </View>
             </ScrollView>

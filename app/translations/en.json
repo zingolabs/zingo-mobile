@@ -14,8 +14,6 @@
     "createnewwallet": "Create New Wallet (new seed)",
     "opencurrentwallet": "Open Current wallet",
     "restorewalletseed": "Restore wallet from Seed",
-    "restorewalletviewing": "Restore wallet from viewing key",
-    "restorewalletspendable": "Restore wallet from spendable key",
     "creatingwallet-label": "Error creating Wallet",
     "readingwallet-label": "Error reading Wallet",
     "invalidseed-label": "Invalid Seed Phrase",
