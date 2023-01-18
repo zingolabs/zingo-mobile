@@ -252,7 +252,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     );
 
     this.dim = {} as EmitterSubscription;
-    this.sta = {} as NativeEventSubscription;
+    this.state = {} as NativeEventSubscription;
   }
 
   componentDidMount = () => {
