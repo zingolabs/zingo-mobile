@@ -211,7 +211,7 @@ type LoadedAppClassProps = {
 class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   rpc: RPC;
   dim: EmitterSubscription;
-  sta: NativeEventSubscription;
+  appstate: NativeEventSubscription;
 
   constructor(props: LoadedAppClassProps) {
     super(props);
@@ -252,7 +252,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     );
 
     this.dim = {} as EmitterSubscription;
-    this.sta = {} as NativeEventSubscription;
+    this.appstate = {} as NativeEventSubscription;
   }
 
   componentDidMount = () => {
@@ -266,7 +266,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       //console.log('++++++++++++++++++++++++++++++++++ change dims', Dimensions.get('screen'));
     });
 
-    this.sta = AppState.addEventListener('change', async nextAppState => {
+    this.appstate = AppState.addEventListener('change', async nextAppState => {
       if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
         console.log('App has come to the foreground!');
         // reading background task info
@@ -289,7 +289,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   componentWillUnmount = () => {
     this.rpc.clearTimers();
     this.dim.remove();
-    this.sta.remove();
+    this.appstate.remove();
   };
 
   setDimensions = (screen: ScaledSize) => {
