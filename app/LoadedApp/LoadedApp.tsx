@@ -266,7 +266,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       //console.log('++++++++++++++++++++++++++++++++++ change dims', Dimensions.get('screen'));
     });
 
-    this.sta = AppState.addEventListener('change', async nextAppState => {
+    this.state = AppState.addEventListener('change', async nextAppState => {
       if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
         console.log('App has come to the foreground!');
         // reading background task info
