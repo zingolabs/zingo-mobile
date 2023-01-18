@@ -267,7 +267,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
 
   componentWillUnmount = () => {
     this.dim.remove();
-    this.sta.remove();
+    this.state.remove();
   };
 
   setDimensions = (screen: ScaledSize) => {
