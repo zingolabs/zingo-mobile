@@ -15,7 +15,6 @@ import {
 } from '../AppState';
 import RPCModule from '../../components/RPCModule';
 import Utils from '../utils';
-import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import { RPCAddressType } from './types/RPCAddressType';
 import { RPCBalancesType } from './types/RPCBalancesType';
 import { RPCNotesType } from './types/RPCNotesType';
@@ -786,10 +785,6 @@ export default class RPC {
     const transaction_filter_threshold_str = await RPCModule.execute('getoption', 'transaction_filter_threshold');
     const transaction_filter_threshold_json = await JSON.parse(transaction_filter_threshold_str);
 
-    const settings = await SettingsFileImpl.readSettings();
-
-    //console.log(settings);
-
     const walletSettings = new WalletSettingsClass();
     if (download_memos_json) {
       walletSettings.download_memos = download_memos_json.download_memos;
@@ -797,12 +792,7 @@ export default class RPC {
     if (transaction_filter_threshold_json) {
       walletSettings.transaction_filter_threshold = transaction_filter_threshold_json.transaction_filter_threshold;
     }
-    if (settings) {
-      walletSettings.server = settings.server;
-      walletSettings.currency = settings.currency;
-      walletSettings.language = settings.language;
-      walletSettings.sendAll = settings.sendAll;
-    }
+
     this.fnSetWalletSettings(walletSettings);
   }
 
