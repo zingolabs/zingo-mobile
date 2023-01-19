@@ -579,14 +579,14 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     }
   };
 
-  set_wallet_option = async (name: string, value: string) => {
+  set_wallet_option = async (name: string, value: string): Promise<void> => {
     await RPC.rpc_setWalletSettingOption(name, value);
 
     // Refetch the settings to update
     this.rpc.fetchWalletSettings();
   };
 
-  set_server_option = async (name: 'server' | 'currency' | 'language' | 'sendAll', value: string) => {
+  set_server_option = async (name: 'server' | 'currency' | 'language' | 'sendAll', value: string): Promise<void> => {
     const resultStrServer: string = await RPCModule.execute('changeserver', value);
     if (resultStrServer.toLowerCase().startsWith('error')) {
       //console.log(`Error change server ${value} - ${resultStrServer}`);
@@ -631,7 +631,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     }
   };
 
-  set_currency_option = async (name: 'server' | 'currency' | 'language' | 'sendAll', value: string) => {
+  set_currency_option = async (name: 'server' | 'currency' | 'language' | 'sendAll', value: string): Promise<void> => {
     await SettingsFileImpl.writeSettings(name, value);
     this.setState({
       currency: value as 'USD' | '',
@@ -642,7 +642,11 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     //this.navigateToLoading();
   };
 
-  set_language_option = async (name: 'server' | 'currency' | 'language' | 'sendAll', value: string, reset: boolean) => {
+  set_language_option = async (
+    name: 'server' | 'currency' | 'language' | 'sendAll',
+    value: string,
+    reset: boolean,
+  ): Promise<void> => {
     await SettingsFileImpl.writeSettings(name, value);
     this.setState({
       language: value as 'en' | 'es',
@@ -655,7 +659,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     }
   };
 
-  set_sendAll_option = async (name: 'server' | 'currency' | 'language' | 'sendAll', value: boolean) => {
+  set_sendAll_option = async (name: 'server' | 'currency' | 'language' | 'sendAll', value: boolean): Promise<void> => {
     await SettingsFileImpl.writeSettings(name, value);
     this.setState({
       sendAll: value as boolean,

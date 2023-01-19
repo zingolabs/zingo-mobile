@@ -84,10 +84,10 @@ describe('Component Settings - test', () => {
   };
   state.info.currencyName = 'ZEC';
   state.totalBalance.total = 1.12345678;
-  state.walletSettings.server = 'https://zcash.es';
-  state.walletSettings.currency = 'USD';
-  state.walletSettings.language = 'en';
-  state.walletSettings.sendAll = false;
+  state.server = 'https://zcash.es';
+  state.currency = 'USD';
+  state.language = 'en';
+  state.sendAll = false;
   state.walletSettings.download_memos = 'wallet';
   state.walletSettings.transaction_filter_threshold = '500';
   const onClose = jest.fn();

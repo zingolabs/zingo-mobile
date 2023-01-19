@@ -20,11 +20,15 @@ import 'moment/locale/es';
 
 type SettingsProps = {
   closeModal: () => void;
-  set_wallet_option: (name: string, value: string) => void;
-  set_server_option: (name: 'server' | 'currency' | 'language' | 'sendAll', value: string) => void;
-  set_currency_option: (name: 'server' | 'currency' | 'language' | 'sendAll', value: string) => void;
-  set_language_option: (name: 'server' | 'currency' | 'language' | 'sendAll', value: string, reset: boolean) => void;
-  set_sendAll_option: (name: 'server' | 'currency' | 'language' | 'sendAll', value: boolean) => void;
+  set_wallet_option: (name: string, value: string) => Promise<void>;
+  set_server_option: (name: 'server' | 'currency' | 'language' | 'sendAll', value: string) => Promise<void>;
+  set_currency_option: (name: 'server' | 'currency' | 'language' | 'sendAll', value: string) => Promise<void>;
+  set_language_option: (
+    name: 'server' | 'currency' | 'language' | 'sendAll',
+    value: string,
+    reset: boolean,
+  ) => Promise<void>;
+  set_sendAll_option: (name: 'server' | 'currency' | 'language' | 'sendAll', value: boolean) => Promise<void>;
 };
 
 type Options = {
@@ -41,7 +45,16 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   closeModal,
 }) => {
   const context = useContext(ContextLoaded);
-  const { walletSettings, totalBalance, info, translate } = context;
+  const {
+    walletSettings,
+    totalBalance,
+    info,
+    translate,
+    server: serverContext,
+    currency: currencyContext,
+    language: languageContext,
+    sendAll: sendAllContext,
+  } = context;
 
   const memosArray: string = translate('settings.memos');
   let MEMOS: Options[] = [];
@@ -71,10 +84,10 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
   const [memos, setMemos] = useState(walletSettings.download_memos);
   const [filter, setFilter] = useState(walletSettings.transaction_filter_threshold);
-  const [server, setServer] = useState(walletSettings.server);
-  const [currency, setCurrency] = useState(walletSettings.currency);
-  const [language, setLanguage] = useState(walletSettings.language);
-  const [sendAll, setSendAll] = useState(walletSettings.sendAll);
+  const [server, setServer] = useState(serverContext);
+  const [currency, setCurrency] = useState(currencyContext);
+  const [language, setLanguage] = useState(languageContext);
+  const [sendAll, setSendAll] = useState(sendAllContext);
   const [customIcon, setCustomIcon] = useState(farCircle);
 
   moment.locale(language);
@@ -86,11 +99,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const saveSettings = async () => {
     if (
       walletSettings.download_memos === memos &&
-      walletSettings.server === server &&
       walletSettings.transaction_filter_threshold === filter &&
-      walletSettings.currency === currency &&
-      walletSettings.language === language &&
-      walletSettings.sendAll === sendAll
+      serverContext === server &&
+      currencyContext === currency &&
+      languageContext === language &&
+      sendAllContext === sendAll
     ) {
       Toast.show(translate('settings.nochanges'), Toast.LONG);
       return;
@@ -118,26 +131,26 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     }
 
     if (walletSettings.download_memos !== memos) {
-      set_wallet_option('download_memos', memos);
+      await set_wallet_option('download_memos', memos);
     }
     if (walletSettings.transaction_filter_threshold !== filter) {
-      set_wallet_option('transaction_filter_threshold', filter);
+      await set_wallet_option('transaction_filter_threshold', filter);
     }
-    if (walletSettings.currency !== currency) {
-      set_currency_option('currency', currency);
+    if (currencyContext !== currency) {
+      await set_currency_option('currency', currency);
     }
-    if (walletSettings.sendAll !== sendAll) {
-      set_sendAll_option('sendAll', sendAll);
+    if (sendAllContext !== sendAll) {
+      await set_sendAll_option('sendAll', sendAll);
     }
     // the last one
-    if (walletSettings.server !== server) {
-      if (walletSettings.language !== language) {
-        set_language_option('language', language, false);
+    if (serverContext !== server) {
+      if (languageContext !== language) {
+        await set_language_option('language', language, false);
       }
       set_server_option('server', server);
     } else {
-      if (walletSettings.language !== language) {
-        set_language_option('language', language, true);
+      if (languageContext !== language) {
+        await set_language_option('language', language, true);
       }
     }
 
