@@ -4,6 +4,7 @@ export default class WalletSettingsClass {
   server: string;
   currency: 'USD' | '';
   language: 'en' | 'es';
+  sendAll: boolean;
 
   constructor() {
     this.download_memos = 'wallet';
@@ -11,5 +12,6 @@ export default class WalletSettingsClass {
     this.server = '';
     this.currency = '';
     this.language = 'en';
+    this.sendAll = false;
   }
 }

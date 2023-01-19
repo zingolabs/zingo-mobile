@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo!",
-  "version": "v0.1.0 (110)",
+  "version": "v0.1.0 (112)",
   "loading": "cargando...",
   "wait": "Por favor espere...",
   "workingonit": "Estamos trabajando en esta funcionalidad",
@@ -61,8 +61,10 @@
   },
   "settings": {
     "memos": [
-      { "value": "none",
-        "text": "No se baja ningún Memo. El Servidor no aprenderá qué transacciones te pertenecen." },
+      { 
+        "value": "none",
+        "text": "No se baja ningún Memo. El Servidor no aprenderá qué transacciones te pertenecen." 
+      },
       {
         "value": "wallet",
         "text": "Solamente se bajan tus Memos. El Servidor aprenderá que transacciones te pertenecen, pero no podrá ver las direcciones, ni las cantidades ni los Memos."
@@ -70,6 +72,36 @@
       {
         "value": "all",
         "text": "Se bajan absolutamente todos los Memos. El Servidor no aprenderá qué transacciones te pertenecen. Esta opción consume GRAN cantidad de ancho de banda."
+      }
+    ],
+    "currencies": [
+      {
+        "value": "",
+        "text": "No se consulta ningun precio de ninguna moneda, solo ZEC."
+      },
+      {
+        "value": "USD",
+        "text": "Puedes consultar el precio para US Dólares a parte de ZEC."
+      }
+    ],
+    "languages": [
+      {
+        "value": "en",
+        "text": "Toda la información estará en Inglés."
+      },
+      {
+        "value": "es",
+        "text": "Toda la información estará en Español"
+      }
+    ],
+    "sendalls": [
+      {
+        "value": true,
+        "text": "Activa la posibilidad de enviar toda la cantidad del monedero con un boton."
+      },
+      {
+        "value": false,
+        "text": "Desactiva el boton para enviar toda la cantidad porque puede ser un riesgo tenerlo activado."
       }
     ],
     "nochanges": "No se haan registrado cambios.",
@@ -91,12 +123,14 @@
     "value-all": "todos",
     "currency-title": "MONEDA",
     "language-title": "IDIOMA",
-    "currency-": "Sin moneda",
-    "currency-USD": "US Dólares",
-    "language-en": "Inglés",
-    "language-es": "Español",
-    "iscurrency": "Necesitas escoger una Moneda para poder grabar.",
-    "islanguage": "Necesitas escoger un Idioma para poder grabar."
+    "islanguage": "Necesitas escoger un Idioma para poder grabar.",
+    "sendall-title": "EL BOTON 'Enviar todo' (Cantidad)",
+    "value-": "Sin moneda",
+    "value-USD": "US Dólares",
+    "value-en": "Inglés",
+    "value-es": "Español",
+    "value-true": "Activar",
+    "value-false": "Desactivar"
   },
   "info": {
     "version": "Versión",
@@ -178,12 +212,14 @@
     "somefunds": "Algunos fondos todavía se están confirmando o sincronizando",
     "memo": "Memorándum (Opcional)",
     "button": "Enviar",
+    "button-all": "ENviar Todo",
     "clear": "Limpiar",
     "confirm-title": "Confirmar Transacción",
     "sending-title": "Enviando",
     "confirm-amount": "Cantidad",
     "fee": "Comisión por Transacción",
     "confirm-button": "Confirmar",
+    "confirm-button-all": "Confirmar Enviar Todo",
     "amount": "   Cantidad",
     "to": "A",
     "title-acc": "Pantalla de Enviar",
@@ -193,7 +229,9 @@
     "usd-acc": "Campo de Cantidad en Dólares",
     "memo-acc": "Campo del Memorándum",
     "amountplaceholder": "numero",
-    "nofetchprice": "Sin precio"
+    "nofetchprice": "Sin precio",
+    "sendall": "Enviar Todo",
+    "sendall-message": "Estas a punto de enviar toda la cantidad en tu monedero"
   },
   "legacy": {
     "o-title": "U-Orchard",
@@ -276,7 +314,9 @@
     "secondsperbatch": "Tiempo procesando el Lote Actual (segundos)",
     "blocks-title": "BLOQUES: ",
     "processingblock": "Procesando Bloque: ",
-    "totalblocks": " de un TOTAL de Bloques: "
+    "totalblocks": " de un TOTAL de Bloques: ",
+    "lastbackgroundsync": "ULTIMA SINCRONIZACION EN SEGUNDO PLANO",
+    "batches-date": " Lotes en: "
   },
   "import": {
     "title": "Importar Clave",

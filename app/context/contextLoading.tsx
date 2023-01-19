@@ -8,12 +8,14 @@ import {
   TotalBalanceClass,
   WalletSeedType,
   zecPriceType,
+  backgroundType,
 } from '../AppState';
 
 export const defaultAppStateLoading: AppStateLoading = {
   navigation: {} as StackScreenProps<any>['navigation'],
   route: {} as StackScreenProps<any>['route'],
   dimensions: {} as DimensionsType,
+  appState: '' as string,
 
   screen: 0,
   actionButtonsDisabled: false,
@@ -30,6 +32,11 @@ export const defaultAppStateLoading: AppStateLoading = {
     zecPrice: 0,
     date: 0,
   } as zecPriceType,
+  sendAll: false,
+  background: {
+    batches: 0,
+    date: 0,
+  } as backgroundType,
 
   translate: () => '',
 };

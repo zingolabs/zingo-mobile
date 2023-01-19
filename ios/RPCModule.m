@@ -87,6 +87,19 @@ RCT_REMAP_METHOD(walletBackupExists,
   // RCTLogInfo(@"Saved backup file");
 }
 
+-(void) saveBackgroundFile:(NSString *)data {
+  NSArray *paths = NSSearchPathForDirectoriesInDomains
+      (NSDocumentDirectory, NSUserDomainMask, YES);
+  NSString *documentsDirectory = [paths objectAtIndex:0];
+
+  // Write to user's documents app directory
+  NSString *fileName = [NSString stringWithFormat:@"%@/background.json",
+                                                documentsDirectory];
+  [data writeToFile:fileName atomically:YES encoding:NSUTF8StringEncoding error:nil];
+
+  // RCTLogInfo(@"Saved file");
+}
+
 // Read base64 encoded wallet data to a NSString, which is auto translated into a React String when returned
 -(NSString *) readWallet {
   NSArray *paths = NSSearchPathForDirectoriesInDomains
@@ -364,9 +377,17 @@ RCT_REMAP_METHOD(initLightClient,
                  server:(NSString*)server
                  initLightClientWithResolver:(RCTPromiseResolveBlock)resolve
                  rejected:(RCTPromiseRejectBlock)reject) {
-  @autoreleasepool {
-    // RCTLogInfo(@"createNewWallet called");
 
+  NSDictionary* dict = [NSDictionary dictionaryWithObjectsAndKeys:server, @"server", resolve, @"resolve", nil];
+
+  [NSThread detachNewThreadSelector:@selector(initLightClient:) toTarget:self withObject:dict];
+}
+
+-(void) initLightClient:(NSDictionary *)dict {
+  @autoreleasepool {
+    NSString* server = dict[@"server"];
+    RCTPromiseResolveBlock resolve = dict[@"resolve"];
+    
     NSString* pathSaplingOutput = [[NSBundle mainBundle]
                       pathForResource:@"saplingoutput" ofType:@""];
     NSData* saplingOutput = [NSData dataWithContentsOfFile:pathSaplingOutput];
@@ -388,4 +409,28 @@ RCT_REMAP_METHOD(initLightClient,
   }
 }
 
+/*
+// run syncing background task for testing in UI
+RCT_REMAP_METHOD(runBackgroundTask,
+                 runBackgroundTaskWithResolver:(RCTPromiseResolveBlock)resolve
+                 rejected:(RCTPromiseRejectBlock)reject) {
+
+  NSDictionary* dict = [NSDictionary dictionaryWithObjectsAndKeys:resolve, @"resolve", nil];
+
+  [NSThread detachNewThreadSelector:@selector(runBackgroundTask:) toTarget:self withObject:dict];
+}
+ 
+-(void) runBackgroundTask:(NSDictionary *)dict {
+  RCTPromiseResolveBlock resolve = dict[@"resolve"];
+  AppDelegate *appdelegate = [AppDelegate new];
+
+  [NSThread detachNewThreadSelector:@selector(syncingProcessBackgroundTask:) toTarget:appdelegate withObject:nil];
+  [NSThread sleepForTimeInterval: 2.000];
+  [NSThread detachNewThreadSelector:@selector(syncingStatusProcessBackgroundTask:) toTarget:appdelegate withObject:nil];
+
+  NSString* resp = @"OK";
+  
+  resolve(resp);
+}
+*/
 @end

@@ -15,16 +15,19 @@ import { parseServerURI, serverUris } from '../../app/uris';
 import Button from '../Button';
 import { ThemeType } from '../../app/types';
 import { ContextLoaded } from '../../app/context';
+import moment from 'moment';
+import 'moment/locale/es';
 
 type SettingsProps = {
   closeModal: () => void;
   set_wallet_option: (name: string, value: string) => void;
-  set_server_option: (name: 'server' | 'currency' | 'language', value: string) => void;
-  set_currency_option: (name: 'server' | 'currency' | 'language', value: string) => void;
-  set_language_option: (name: 'server' | 'currency' | 'language', value: string, reset: boolean) => void;
+  set_server_option: (name: 'server' | 'currency' | 'language' | 'sendAll', value: string) => void;
+  set_currency_option: (name: 'server' | 'currency' | 'language' | 'sendAll', value: string) => void;
+  set_language_option: (name: 'server' | 'currency' | 'language' | 'sendAll', value: string, reset: boolean) => void;
+  set_sendAll_option: (name: 'server' | 'currency' | 'language' | 'sendAll', value: boolean) => void;
 };
 
-type Memos = {
+type Options = {
   value: string;
   text: string;
 };
@@ -34,15 +37,36 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   set_server_option,
   set_currency_option,
   set_language_option,
+  set_sendAll_option,
   closeModal,
 }) => {
   const context = useContext(ContextLoaded);
   const { walletSettings, totalBalance, info, translate } = context;
+
   const memosArray: string = translate('settings.memos');
-  let MEMOS: Memos[] = [];
+  let MEMOS: Options[] = [];
   if (typeof memosArray === 'object') {
-    MEMOS = memosArray as Memos[];
+    MEMOS = memosArray as Options[];
   }
+
+  const currenciesArray: string = translate('settings.currencies');
+  let CURRENCIES: Options[] = [];
+  if (typeof currenciesArray === 'object') {
+    CURRENCIES = currenciesArray as Options[];
+  }
+
+  const languagesArray: string = translate('settings.languages');
+  let LANGUAGES: Options[] = [];
+  if (typeof languagesArray === 'object') {
+    LANGUAGES = languagesArray as Options[];
+  }
+
+  const sendAllsArray: string = translate('settings.sendalls');
+  let SENDALLS: Options[] = [];
+  if (typeof sendAllsArray === 'object') {
+    SENDALLS = sendAllsArray as Options[];
+  }
+
   const { colors } = useTheme() as unknown as ThemeType;
 
   const [memos, setMemos] = useState(walletSettings.download_memos);
@@ -50,19 +74,14 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [server, setServer] = useState(walletSettings.server);
   const [currency, setCurrency] = useState(walletSettings.currency);
   const [language, setLanguage] = useState(walletSettings.language);
+  const [sendAll, setSendAll] = useState(walletSettings.sendAll);
   const [customIcon, setCustomIcon] = useState(farCircle);
+
+  moment.locale(language);
 
   useEffect(() => {
     setCustomIcon(serverUris().find((s: string) => s === server) ? farCircle : faDotCircle);
   }, [server]);
-
-  const currencies = (): string[] => {
-    return ['', 'USD'];
-  };
-
-  const languages = (): string[] => {
-    return ['en', 'es'];
-  };
 
   const saveSettings = async () => {
     if (
@@ -70,7 +89,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       walletSettings.server === server &&
       walletSettings.transaction_filter_threshold === filter &&
       walletSettings.currency === currency &&
-      walletSettings.language === language
+      walletSettings.language === language &&
+      walletSettings.sendAll === sendAll
     ) {
       Toast.show(translate('settings.nochanges'), Toast.LONG);
       return;
@@ -87,10 +107,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       Toast.show(translate('settings.isserver'), Toast.LONG);
       return;
     }
-    //if (!currency) {
-    //  Toast.show(translate('settings.iscurrency'), Toast.LONG);
-    //  return;
-    //}
     if (!language) {
       Toast.show(translate('settings.islanguage'), Toast.LONG);
       return;
@@ -110,6 +126,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     if (walletSettings.currency !== currency) {
       set_currency_option('currency', currency);
     }
+    if (walletSettings.sendAll !== sendAll) {
+      set_sendAll_option('sendAll', sendAll);
+    }
     // the last one
     if (walletSettings.server !== server) {
       if (walletSettings.language !== language) {
@@ -123,6 +142,33 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     }
 
     closeModal();
+  };
+
+  const optionsRadio = (
+    DATA: Options[],
+    setOption: React.Dispatch<React.SetStateAction<string | boolean>>,
+    typeOption: StringConstructor | BooleanConstructor,
+    valueOption: string | boolean,
+  ) => {
+    return DATA.map(item => (
+      <View key={'view-' + item.value}>
+        <TouchableOpacity
+          style={{ marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
+          onPress={() => setOption(typeOption(item.value))}>
+          <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
+            <FontAwesomeIcon
+              icon={typeOption(item.value) === valueOption ? faDotCircle : farCircle}
+              size={20}
+              color={colors.border}
+            />
+            <RegText key={'text-' + item.value} style={{ marginLeft: 10 }}>
+              {translate(`settings.value-${item.value}`)}
+            </RegText>
+          </View>
+        </TouchableOpacity>
+        <FadeText key={'fade-' + item.value}>{item.text}</FadeText>
+      </View>
+    ));
   };
 
   //console.log(walletSettings);
@@ -169,23 +215,29 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           justifyContent: 'flex-start',
         }}>
         <View style={{ display: 'flex', margin: 10 }}>
+          <BoldText>{translate('settings.sendall-title')}</BoldText>
+        </View>
+
+        <View style={{ display: 'flex', marginLeft: 25 }}>
+          {optionsRadio(
+            SENDALLS,
+            setSendAll as React.Dispatch<React.SetStateAction<string | boolean>>,
+            Boolean,
+            sendAll,
+          )}
+        </View>
+
+        <View style={{ display: 'flex', margin: 10 }}>
           <BoldText>{translate('settings.currency-title')}</BoldText>
         </View>
 
         <View style={{ display: 'flex', marginLeft: 25 }}>
-          {currencies().map((curr: string) => (
-            <TouchableOpacity
-              key={'touch-' + curr}
-              style={{ marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
-              onPress={() => setCurrency(curr as 'USD' | '')}>
-              <View style={{ display: 'flex', flexDirection: 'row', marginTop: 10 }}>
-                <FontAwesomeIcon icon={curr === currency ? faDotCircle : farCircle} size={20} color={colors.border} />
-                <RegText key={'tex-' + curr} style={{ marginLeft: 10 }}>
-                  {translate('settings.currency-' + curr)}
-                </RegText>
-              </View>
-            </TouchableOpacity>
-          ))}
+          {optionsRadio(
+            CURRENCIES,
+            setCurrency as React.Dispatch<React.SetStateAction<string | boolean>>,
+            String,
+            currency,
+          )}
         </View>
 
         <View style={{ display: 'flex', margin: 10 }}>
@@ -193,19 +245,12 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         </View>
 
         <View style={{ display: 'flex', marginLeft: 25 }}>
-          {languages().map((lang: string) => (
-            <TouchableOpacity
-              key={'touch-' + lang}
-              style={{ marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
-              onPress={() => setLanguage(lang as 'en' | 'es')}>
-              <View style={{ display: 'flex', flexDirection: 'row', marginTop: 10 }}>
-                <FontAwesomeIcon icon={lang === language ? faDotCircle : farCircle} size={20} color={colors.border} />
-                <RegText key={'tex-' + lang} style={{ marginLeft: 10 }}>
-                  {translate('settings.language-' + lang)}
-                </RegText>
-              </View>
-            </TouchableOpacity>
-          ))}
+          {optionsRadio(
+            LANGUAGES,
+            setLanguage as React.Dispatch<React.SetStateAction<string | boolean>>,
+            String,
+            language,
+          )}
         </View>
 
         <View style={{ display: 'flex', margin: 10 }}>
@@ -315,25 +360,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         </View>
 
         <View style={{ display: 'flex', marginLeft: 25, marginBottom: 30 }}>
-          {MEMOS.map(memo => (
-            <View key={'view-' + memo.value}>
-              <TouchableOpacity
-                style={{ marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
-                onPress={() => setMemos(memo.value)}>
-                <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
-                  <FontAwesomeIcon
-                    icon={memo.value === memos ? faDotCircle : farCircle}
-                    size={20}
-                    color={colors.border}
-                  />
-                  <RegText key={'text-' + memo.value} style={{ marginLeft: 10 }}>
-                    {translate(`settings.value-${memo.value}`)}
-                  </RegText>
-                </View>
-              </TouchableOpacity>
-              <FadeText key={'fade-' + memo.value}>{memo.text}</FadeText>
-            </View>
-          ))}
+          {optionsRadio(MEMOS, setMemos as React.Dispatch<React.SetStateAction<string | boolean>>, String, memos)}
         </View>
       </ScrollView>
       <View

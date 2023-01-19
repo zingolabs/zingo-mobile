@@ -34,9 +34,11 @@ export default class RPC {
   fnSetRefreshUpdates: (inProgress: boolean, progress: number, blocks: string) => void;
   fnSetWalletSettings: (settings: WalletSettingsClass) => void;
   translate: (key: string, config?: TranslateOptions) => string;
+  fetchBackgroundSyncing: () => void;
 
   refreshTimerID: number;
   updateTimerID?: number;
+  syncStatusID?: number;
 
   updateDataLock: boolean;
   updateDataCtr: number;
@@ -65,6 +67,7 @@ export default class RPC {
     fnSetInfo: (info: InfoType) => void,
     fnSetRefreshUpdates: (inProgress: boolean, progress: number, blocks: string) => void,
     translate: (key: string, config?: TranslateOptions) => string,
+    fetchBackgroundSyncing: () => void,
   ) {
     this.fnSetSyncingStatusReport = fnSetSyncingStatusReport;
     this.fnSetTotalBalance = fnSetTotalBalance;
@@ -74,6 +77,7 @@ export default class RPC {
     this.fnSetInfo = fnSetInfo;
     this.fnSetRefreshUpdates = fnSetRefreshUpdates;
     this.translate = translate;
+    this.fetchBackgroundSyncing = fetchBackgroundSyncing;
 
     this.refreshTimerID = 0;
 
@@ -345,6 +349,11 @@ export default class RPC {
       clearInterval(this.updateTimerID);
       this.updateTimerID = undefined;
     }
+
+    if (this.syncStatusID) {
+      clearInterval(this.syncStatusID);
+      this.syncStatusID = undefined;
+    }
   }
 
   async doRescan(): Promise<string> {
@@ -444,6 +453,8 @@ export default class RPC {
     // And fetch the rest of the data.
     await this.loadWalletData();
 
+    this.fetchBackgroundSyncing();
+
     //console.log(`Finished update data at ${lastServerBlockHeight}`);
     this.updateDataLock = false;
   }
@@ -451,6 +462,7 @@ export default class RPC {
   async refresh(fullRefresh: boolean, fullRescan?: boolean) {
     // If we're in refresh, we don't overlap
     if (this.inRefresh) {
+      //console.log('in refresh is true');
       return;
     }
 
@@ -461,6 +473,7 @@ export default class RPC {
     await this.fetchWalletBirthday();
     await this.fetchServerHeight();
     if (!this.lastServerBlockHeight) {
+      //console.log('the last server block is zero');
       return;
     }
 
@@ -496,14 +509,15 @@ export default class RPC {
       }
 
       // We need to wait for the sync to finish. The sync is done when
-      let pollerID = setInterval(async () => {
+      this.syncStatusID = setInterval(async () => {
         const s = await this.doSyncStatus();
         if (!s) {
           return;
         }
         const ss = await JSON.parse(s);
 
-        //console.log('sync status', ss);
+        console.log('sync wallet birthday', this.walletBirthday);
+        console.log('sync status', ss);
 
         // syncronize status
         this.inRefresh = ss.in_progress;
@@ -611,7 +625,9 @@ export default class RPC {
         this.fnSetRefreshUpdates(
           ss.in_progress,
           0,
-          current_block.toFixed(0).toString() + ` ${this.translate('rpc.of')} ` + this.lastServerBlockHeight.toString(),
+          `${current_block ? current_block.toFixed(0).toString() : ''} ${this.translate('rpc.of')} ${
+            this.lastServerBlockHeight ? this.lastServerBlockHeight.toString() : ''
+          }`,
         );
 
         // store SyncStatusReport object for a new screen
@@ -639,8 +655,10 @@ export default class RPC {
         // Close the poll timer if the sync finished(checked via promise above)
         if (!this.inRefresh) {
           // We are synced. Cancel the poll timer
-          clearInterval(pollerID);
-          pollerID = 0;
+          if (this.syncStatusID) {
+            clearInterval(this.syncStatusID);
+            this.syncStatusID = 0;
+          }
 
           // And fetch the rest of the data.
           await this.loadWalletData();
@@ -681,7 +699,7 @@ export default class RPC {
           // If we're doing a long sync, every time the batch_num changes, save the wallet
           if (this.prevBatchNum !== batch_num) {
             // if finished batches really fast, the App have to save the wallet delayed.
-            if (this.prevBatchNum !== -1 && this.batches > 10) {
+            if (this.prevBatchNum !== -1 && this.batches >= 10) {
               // And fetch the rest of the data.
               await this.loadWalletData();
 
@@ -718,10 +736,10 @@ export default class RPC {
             }
             this.prevBatchNum = batch_num;
             this.seconds_batch = 0;
-            this.batches += 1;
+            this.batches += batch_num - this.prevBatchNum;
           }
-          // save wallet every minute
-          if (this.seconds_batch > 0 && this.seconds_batch % 60 === 0) {
+          // save wallet every 30 seconds in the same batch.
+          if (this.seconds_batch > 0 && this.seconds_batch % 30 === 0) {
             // And fetch the rest of the data.
             await this.loadWalletData();
 
@@ -783,6 +801,7 @@ export default class RPC {
       walletSettings.server = settings.server;
       walletSettings.currency = settings.currency;
       walletSettings.language = settings.language;
+      walletSettings.sendAll = settings.sendAll;
     }
     this.fnSetWalletSettings(walletSettings);
   }

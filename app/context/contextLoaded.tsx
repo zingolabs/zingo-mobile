@@ -19,12 +19,14 @@ import {
   AddressClass,
   AddressBookClass,
   zecPriceType,
+  backgroundType,
 } from '../AppState';
 
 export const defaultAppStateLoaded: AppStateLoaded = {
   navigation: {} as StackScreenProps<any>['navigation'],
   route: {} as StackScreenProps<any>['route'],
   dimensions: {} as DimensionsType,
+  appState: '' as string,
 
   syncingStatusReport: new SyncingStatusReportClass(),
   totalBalance: new TotalBalanceClass(),
@@ -65,6 +67,11 @@ export const defaultAppStateLoaded: AppStateLoaded = {
     zecPrice: 0,
     date: 0,
   } as zecPriceType,
+  sendAll: false,
+  background: {
+    batches: 0,
+    date: 0,
+  } as backgroundType,
 
   translate: () => '',
 };

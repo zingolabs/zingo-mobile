@@ -8,6 +8,8 @@ import RegText from '../Components/RegText';
 import Button from '../Button';
 import DetailLine from './components/DetailLine';
 import { ContextLoaded } from '../../app/context';
+import moment from 'moment';
+import 'moment/locale/es';
 
 type SyncReportProps = {
   closeModal: () => void;
@@ -15,12 +17,13 @@ type SyncReportProps = {
 
 const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) => {
   const context = useContext(ContextLoaded);
-  const { syncingStatusReport, walletSeed, translate } = context;
+  const { syncingStatusReport, walletSeed, translate, background, language } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [maxBlocks, setMaxBlocks] = useState(0);
   const [points, setPoints] = useState([] as number[]);
   const [labels, setLabels] = useState([] as string[]);
   const [birthday_plus_1, setBirthday_plus_1] = useState(0);
+  moment.locale(language);
 
   useEffect(() => {
     if (syncingStatusReport.lastBlockServer) {
@@ -115,6 +118,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
   //console.log('wallet', wallet_old_synced, wallet_new_synced, wallet_for_synced);
   //console.log('wallet %', wallet_old_synced_percent, wallet_new_synced_percent, wallet_for_synced_percent);
   //console.log(maxBlocks, labels, points);
+  //console.log('report', background.batches, background.date, Number(background.date).toFixed(0));
 
   return (
     <SafeAreaView
@@ -154,6 +158,16 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
         {maxBlocks ? (
           <>
             <View style={{ display: 'flex', margin: 20, marginBottom: 30 }}>
+              {background.batches > 0 && background.date > 0 && (
+                <DetailLine
+                  label={translate('report.lastbackgroundsync')}
+                  value={
+                    background.batches.toString() +
+                    translate('report.batches-date') +
+                    moment(Number(Number(background.date).toFixed(0)) * 1000).format('YYYY MMM D h:mm a')
+                  }
+                />
+              )}
               <DetailLine
                 label="Sync ID"
                 value={

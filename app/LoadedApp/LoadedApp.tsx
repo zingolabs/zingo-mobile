@@ -1,5 +1,16 @@
 import React, { Component, Suspense, useState, useMemo, useCallback, useEffect } from 'react';
-import { Modal, View, Text, Alert, I18nManager, Dimensions, EmitterSubscription, ScaledSize } from 'react-native';
+import {
+  Modal,
+  View,
+  Text,
+  Alert,
+  I18nManager,
+  Dimensions,
+  EmitterSubscription,
+  ScaledSize,
+  AppState,
+  NativeEventSubscription,
+} from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faList, faUpload, faDownload, faCog, faAddressBook } from '@fortawesome/free-solid-svg-icons';
@@ -29,6 +40,7 @@ import {
   WalletSettingsClass,
   AddressClass,
   zecPriceType,
+  backgroundType,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
@@ -36,6 +48,7 @@ import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import { ContextLoadedProvider, defaultAppStateLoaded } from '../context';
 import platform from '../platform/platform';
 import { serverUris } from '../uris';
+import BackgroundFileImpl from '../../components/Background/BackgroundFileImpl';
 
 const Transactions = React.lazy(() => import('../../components/Transactions'));
 const Send = React.lazy(() => import('../../components/Send'));
@@ -77,6 +90,8 @@ export default function LoadedApp(props: LoadedAppProps) {
   const [language, setLanguage] = useState('en' as 'en' | 'es');
   const [currency, setCurrency] = useState('' as 'USD' | '');
   const [server, setServer] = useState(SERVER_DEFAULT_0 as string);
+  const [sendAll, setSendAll] = useState(false);
+  const [background, setBackground] = useState({ batches: 0, date: 0 } as backgroundType);
   const [loading, setLoading] = useState(true);
   //const forceUpdate = useForceUpdate();
   const file = useMemo(
@@ -132,7 +147,19 @@ export default function LoadedApp(props: LoadedAppProps) {
     } else {
       await SettingsFileImpl.writeSettings('server', server);
     }
-  }, [currency, file, i18n, server]);
+    if (settings.sendAll) {
+      setSendAll(settings.sendAll);
+    } else {
+      await SettingsFileImpl.writeSettings('sendAll', sendAll);
+    }
+
+    // reading background task info
+    const backgroundJson = await BackgroundFileImpl.readBackground();
+    //console.log('background', backgroundJson);
+    if (backgroundJson) {
+      setBackground(backgroundJson);
+    }
+  }, [currency, file, i18n, sendAll, server]);
 
   useEffect(() => {
     (async () => {
@@ -162,6 +189,8 @@ export default function LoadedApp(props: LoadedAppProps) {
         language={language}
         currency={currency}
         server={server}
+        sendAll={sendAll}
+        background={background}
       />
     );
   }
@@ -175,11 +204,14 @@ type LoadedAppClassProps = {
   language: 'en' | 'es';
   currency: 'USD' | '';
   server: string;
+  sendAll: boolean;
+  background: backgroundType;
 };
 
 class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   rpc: RPC;
   dim: EmitterSubscription;
+  appstate: NativeEventSubscription;
 
   constructor(props: LoadedAppClassProps) {
     super(props);
@@ -195,6 +227,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       server: props.server,
       language: props.language,
       currency: props.currency,
+      sendAll: props.sendAll,
+      background: props.background,
       dimensions: {
         width: Number(screen.width.toFixed(0)),
         height: Number(screen.height.toFixed(0)),
@@ -202,6 +236,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
         deviceType: platform.isTablet(screen) ? 'tablet' : 'phone',
         scale: Number(screen.scale.toFixed(2)),
       },
+      appState: AppState.currentState,
     };
 
     this.rpc = new RPC(
@@ -213,9 +248,11 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       this.setInfo,
       this.refreshUpdates,
       props.translate,
+      this.fetchBackgroundSyncing,
     );
 
     this.dim = {} as EmitterSubscription;
+    this.appstate = {} as NativeEventSubscription;
   }
 
   componentDidMount = () => {
@@ -228,11 +265,31 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       this.setDimensions(screen);
       //console.log('++++++++++++++++++++++++++++++++++ change dims', Dimensions.get('screen'));
     });
+
+    this.appstate = AppState.addEventListener('change', async nextAppState => {
+      if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
+        console.log('App has come to the foreground!');
+        // reading background task info
+        this.fetchBackgroundSyncing();
+        this.rpc.setInRefresh(false);
+        this.rpc.configure();
+      }
+      if (nextAppState.match(/inactive|background/) && this.state.appState === 'active') {
+        console.log('App is gone to the background!');
+        this.setState({
+          syncingStatusReport: new SyncingStatusReportClass(),
+          syncingStatus: {} as SyncingStatusType,
+        });
+        this.rpc.clearTimers();
+      }
+      this.setState({ appState: nextAppState });
+    });
   };
 
   componentWillUnmount = () => {
     this.rpc.clearTimers();
-    this.dim?.remove();
+    this.dim.remove();
+    this.appstate.remove();
   };
 
   setDimensions = (screen: ScaledSize) => {
@@ -245,6 +302,15 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
         scale: Number(screen.scale.toFixed(2)),
       },
     });
+  };
+
+  fetchBackgroundSyncing = async () => {
+    const backgroundJson = await BackgroundFileImpl.readBackground();
+    if (backgroundJson) {
+      this.setState({
+        background: backgroundJson,
+      });
+    }
   };
 
   getFullState = (): AppStateLoaded => {
@@ -472,6 +538,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
   startRescan = () => {
     this.setRescanning(true);
+    this.setTransactionList([]);
     this.rpc.rescan();
   };
 
@@ -519,7 +586,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     this.rpc.fetchWalletSettings();
   };
 
-  set_server_option = async (name: 'server' | 'currency' | 'language', value: string) => {
+  set_server_option = async (name: 'server' | 'currency' | 'language' | 'sendAll', value: string) => {
     const resultStrServer: string = await RPCModule.execute('changeserver', value);
     if (resultStrServer.toLowerCase().startsWith('error')) {
       //console.log(`Error change server ${value} - ${resultStrServer}`);
@@ -564,7 +631,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     }
   };
 
-  set_currency_option = async (name: 'server' | 'currency' | 'language', value: string) => {
+  set_currency_option = async (name: 'server' | 'currency' | 'language' | 'sendAll', value: string) => {
     await SettingsFileImpl.writeSettings(name, value);
     this.setState({
       currency: value as 'USD' | '',
@@ -575,7 +642,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     //this.navigateToLoading();
   };
 
-  set_language_option = async (name: 'server' | 'currency' | 'language', value: string, reset: boolean) => {
+  set_language_option = async (name: 'server' | 'currency' | 'language' | 'sendAll', value: string, reset: boolean) => {
     await SettingsFileImpl.writeSettings(name, value);
     this.setState({
       language: value as 'en' | 'es',
@@ -586,6 +653,17 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     if (reset) {
       this.navigateToLoading();
     }
+  };
+
+  set_sendAll_option = async (name: 'server' | 'currency' | 'language' | 'sendAll', value: boolean) => {
+    await SettingsFileImpl.writeSettings(name, value);
+    this.setState({
+      sendAll: value as boolean,
+    });
+
+    // Refetch the settings to update
+    this.rpc.fetchWalletSettings();
+    //this.navigateToLoading();
   };
 
   navigateToLoading = () => {
@@ -830,6 +908,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                 set_server_option={this.set_server_option}
                 set_currency_option={this.set_currency_option}
                 set_language_option={this.set_language_option}
+                set_sendAll_option={this.set_sendAll_option}
               />
             </Suspense>
           </Modal>

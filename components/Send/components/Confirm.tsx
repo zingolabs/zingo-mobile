@@ -16,8 +16,9 @@ type ConfirmProps = {
   defaultFee: number;
   closeModal: () => void;
   confirmSend: () => void;
+  sendAllAmount: boolean;
 };
-const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSend, defaultFee }) => {
+const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSend, defaultFee, sendAllAmount }) => {
   const context = useContext(ContextLoaded);
   const { sendPageState, info, translate, currency, zecPrice } = context;
   const { colors } = useTheme();
@@ -110,7 +111,11 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSen
           marginTop: 10,
         }}>
         <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
-          <Button type="Primary" title={translate('send.confirm-button')} onPress={confirmSend} />
+          <Button
+            type="Primary"
+            title={sendAllAmount ? translate('send.confirm-button-all') : translate('send.confirm-button')}
+            onPress={confirmSend}
+          />
           <Button type="Secondary" style={{ marginLeft: 20 }} title={translate('cancel')} onPress={closeModal} />
         </View>
       </View>

@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo!",
-  "version": "v0.1.0 (110)",
+  "version": "v0.1.0 (112)",
   "loading": "loading...",
   "wait": "Please wait...",
   "workingonit": "We are working on this feature.",
@@ -72,6 +72,36 @@
         "text": "Download all memos in the blockchain. Server will not learn what TxIDs belong to you. This consumes A LOT of bandwidth."
       }
     ],
+    "currencies": [
+      {
+        "value": "",
+        "text": "No fetching any price for any currency, only ZEC."
+      },
+      {
+        "value": "USD",
+        "text": "You can fetch the price for US Dollars besides ZEC."
+      }
+    ],
+    "languages": [
+      {
+        "value": "en",
+        "text": "All the information will be in English."
+      },
+      {
+        "value": "es",
+        "text": "All the information will be in Spanish."
+      }
+    ],
+    "sendalls": [
+      {
+        "value": true,
+        "text": "Enable the possibility of sending all the wallet amount with a button."
+      },
+      {
+        "value": false,
+        "text": "Disable the sending all button because could be a risk to have it."
+      }
+    ],
     "nochanges": "No changes registred.",
     "ismemo": "You need to choose the download memos option to save.",
     "isthreshold": "You need to choose the transaction filter threshold option to save.",
@@ -91,12 +121,14 @@
     "value-all": "all",
     "currency-title": "CURRENCY",
     "language-title": "LANGUAGE",
-    "currency-": "No currency",
-    "currency-USD": "US Dollar",
-    "language-en": "English",
-    "language-es": "Spanish",
-    "iscurrency": "You need to choose a currency to save.",
-    "islanguage": "You need to choose a language to save."
+    "islanguage": "You need to choose a language to save.",
+    "sendall-title": "THE BUTTON 'Send All' (Amount)",
+    "value-": "No currency",
+    "value-USD": "US Dollar",
+    "value-en": "English",
+    "value-es": "Spanish",
+    "value-true": "Enable",
+    "value-false": "Disable"
   },
   "info": {
     "version": "Version",
@@ -178,12 +210,14 @@
     "somefunds": "Some funds still confirming or syncing",
     "memo": "Memo (Optional)",
     "button": "Send",
+    "button-all": "Send All",
     "clear": "Clear",
     "confirm-title": "Confirm Transaction",
     "sending-title": "Sending",
     "confirm-amount": "Amount",
     "fee": "Fee",
     "confirm-button": "Confirm",
+    "confirm-button-all": "Confirm Send All",
     "amount": "   Amount",
     "to": "To",
     "title-acc": "Send Screen",
@@ -193,7 +227,9 @@
     "usd-acc": "USD Amount Field",
     "memo-acc": "Memo Field",
     "amountplaceholder": "number",
-    "nofetchprice": "No price"
+    "nofetchprice": "No price",
+    "sendall": "Send All",
+    "sendall-message": "Your are about to send the entire amount in your wallet"
   },
   "legacy": {
     "o-title": "U-Orchard",
@@ -276,7 +312,9 @@
     "secondsperbatch": "Time Processing the Current Batch (seconds)",
     "blocks-title": "BLOCKS: ",
     "processingblock": "Processing Block: ",
-    "totalblocks": " of a TOTAL of Blocks: "
+    "totalblocks": " of a TOTAL of Blocks: ",
+    "lastbackgroundsync": "LAST BACKGROUND SYNCING",
+    "batches-date": " Batches at: "
   },
   "import": {
     "title": "Import Key",

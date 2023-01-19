@@ -590,16 +590,42 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                 }
               }
             >
-              <Text
+              <View
                 style={
                   {
-                    "color": "rgb(28, 28, 30)",
-                    "opacity": 0.65,
+                    "flexDirection": "row",
+                    "justifyContent": "flex-end",
+                    "minHeight": 48,
+                    "minWidth": 48,
                   }
                 }
               >
-                text translated
-              </Text>
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "borderRadius": 10,
+                      "justifyContent": "flex-end",
+                      "margin": 0,
+                      "minHeight": 48,
+                      "minWidth": 48,
+                      "padding": 0,
+                      "paddingBottom": 3,
+                    }
+                  }
+                >
+                  <Text
+                    style={
+                      {
+                        "color": "rgb(28, 28, 30)",
+                        "opacity": 0.65,
+                      }
+                    }
+                  >
+                    text translated
+                  </Text>
+                </View>
+              </View>
               <Text
                 style={
                   {
@@ -968,7 +994,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                         }
                       }
                     >
-                       37.44
+                       0.00
                     </Text>
                     <Text
                       style={

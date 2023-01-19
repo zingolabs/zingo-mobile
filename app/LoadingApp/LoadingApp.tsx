@@ -12,6 +12,8 @@ import {
   Dimensions,
   EmitterSubscription,
   ScaledSize,
+  AppState,
+  NativeEventSubscription,
 } from 'react-native';
 import Toast from 'react-native-simple-toast';
 import { useTheme } from '@react-navigation/native';
@@ -22,13 +24,14 @@ import { StackScreenProps } from '@react-navigation/stack';
 import BoldText from '../../components/Components/BoldText';
 import Button from '../../components/Button';
 import RPCModule from '../../components/RPCModule';
-import { AppStateLoading, WalletSeedType } from '../AppState';
+import { AppStateLoading, backgroundType, WalletSeedType } from '../AppState';
 import { serverUris } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import RPC from '../rpc';
 import { ThemeType } from '../types';
 import { defaultAppStateLoading, ContextLoadingProvider } from '../context';
 import platform from '../platform/platform';
+import BackgroundFileImpl from '../../components/Background/BackgroundFileImpl';
 
 const Seed = React.lazy(() => import('../../components/Seed'));
 
@@ -56,6 +59,8 @@ export default function LoadingApp(props: LoadingAppProps) {
   const [language, setLanguage] = useState('en' as 'en' | 'es');
   const [currency, setCurrency] = useState('' as 'USD' | '');
   const [server, setServer] = useState(SERVER_DEFAULT_0 as string);
+  const [sendAll, setSendAll] = useState(false);
+  const [background, setBackground] = useState({ batches: 0, date: 0 } as backgroundType);
   const [loading, setLoading] = useState(true);
   //const forceUpdate = useForceUpdate();
   const file = useMemo(
@@ -113,7 +118,18 @@ export default function LoadingApp(props: LoadingAppProps) {
       await SettingsFileImpl.writeSettings('server', server);
       //console.log('NO settings', settings.server);
     }
-  }, [currency, file, i18n, server]);
+    if (settings.sendAll) {
+      setSendAll(settings.sendAll);
+    } else {
+      await SettingsFileImpl.writeSettings('sendAll', sendAll);
+    }
+
+    // reading background task info
+    const backgroundJson = await BackgroundFileImpl.readBackground();
+    if (backgroundJson) {
+      setBackground(backgroundJson);
+    }
+  }, [currency, file, i18n, sendAll, server]);
 
   useEffect(() => {
     (async () => {
@@ -143,6 +159,8 @@ export default function LoadingApp(props: LoadingAppProps) {
         language={language}
         currency={currency}
         server={server}
+        sendAll={sendAll}
+        background={background}
       />
     );
   }
@@ -156,10 +174,13 @@ type LoadingAppClassProps = {
   language: 'en' | 'es';
   currency: 'USD' | '';
   server: string;
+  sendAll: boolean;
+  background: backgroundType;
 };
 
 class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
   dim: EmitterSubscription;
+  appstate: NativeEventSubscription;
 
   constructor(props: LoadingAppClassProps) {
     super(props);
@@ -174,6 +195,8 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
       server: props.server,
       language: props.language,
       currency: props.currency,
+      sendAll: props.sendAll,
+      background: props.background,
       dimensions: {
         width: Number(screen.width.toFixed(0)),
         height: Number(screen.height.toFixed(0)),
@@ -181,9 +204,11 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
         deviceType: platform.isTablet(screen) ? 'tablet' : 'phone',
         scale: Number(screen.scale.toFixed(2)),
       },
+      appState: AppState.currentState,
     };
 
     this.dim = {} as EmitterSubscription;
+    this.appstate = {} as NativeEventSubscription;
   }
 
   componentDidMount = async () => {
@@ -221,10 +246,28 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
       this.setDimensions(screen);
       //console.log('++++++++++++++++++++++++++++++++++ change dims', Dimensions.get('screen'));
     });
+
+    this.appstate = AppState.addEventListener('change', async nextAppState => {
+      if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
+        console.log('App has come to the foreground!');
+        // reading background task info
+        const backgroundJson = await BackgroundFileImpl.readBackground();
+        if (backgroundJson) {
+          this.setState({
+            background: backgroundJson,
+          });
+        }
+      }
+      if (nextAppState.match(/inactive|background/) && this.state.appState === 'active') {
+        console.log('App is gone to the background!');
+      }
+      this.setState({ appState: nextAppState });
+    });
   };
 
   componentWillUnmount = () => {
-    this.dim?.remove();
+    this.dim.remove();
+    this.appstate.remove();
   };
 
   setDimensions = (screen: ScaledSize) => {

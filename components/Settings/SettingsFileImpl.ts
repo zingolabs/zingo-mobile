@@ -8,7 +8,7 @@ export default class SettingsFileImpl {
   }
 
   // Write the server setting
-  static async writeSettings(name: 'server' | 'currency' | 'language', value: string) {
+  static async writeSettings(name: 'server' | 'currency' | 'language' | 'sendAll', value: string | boolean) {
     const fileName = await this.getFileName();
     const settings = await this.readSettings();
     const newSettings: SettingsFileClass = { ...settings, [name]: value };
@@ -27,6 +27,8 @@ export default class SettingsFileImpl {
     const fileName = await this.getFileName();
 
     try {
+      //const b = await RNFS.readFile(fileName, 'utf8');
+      //console.log('background file', b);
       return JSON.parse((await RNFS.readFile(fileName, 'utf8')).toString()) as SettingsFileClass;
     } catch (err) {
       // File probably doesn't exist, so return nothing
