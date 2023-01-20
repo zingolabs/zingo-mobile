@@ -16,8 +16,6 @@
 #import <SKIOSNetworkPlugin/SKIOSNetworkAdapter.h>
 #import <FlipperKitReactPlugin/FlipperKitReactPlugin.h>
 
-
-
 static void InitializeFlipper(UIApplication *application) {
   FlipperClient *client = [FlipperClient sharedClient];
   SKDescriptorMapper *layoutDescriptorMapper = [[SKDescriptorMapper alloc] initWithDefaults];
@@ -79,7 +77,7 @@ static BOOL _syncFinished = true;
   return YES;
 }
 
--(void)applicationWillEnterForeground:(UIApplication *)application
+- (void)applicationWillEnterForeground:(UIApplication *)application
 {
   // cancel existing task (if any)
   NSLog(@"scheduleProcessingTask CANCEL - foreground");
@@ -112,22 +110,6 @@ static NSString* syncTask = @"Zingo_Processing_Task_ID";
     }
 }
 
--(void)scheduleLocalNotifications {
-    //do things
-    NSLog(@"NotificationsProcessingTask");
-}
-
--(void)handleProcessingTask:(BGTask *)task API_AVAILABLE(ios(13.0)){
-
-  //do things with task
-  //[NSThread detachNewThreadSelector:@selector(syncingBothProcessBackgroundTask:) toTarget:self withObject:nil];
-
-  //[NSThread detachNewThreadSelector:@selector(syncingProcessBackgroundTask:) toTarget:self withObject:nil];
-  //[NSThread sleepForTimeInterval: 2.0];
-  //[NSThread detachNewThreadSelector:@selector(syncingStatusProcessBackgroundTask:) toTarget:self withObject:nil];
-
-}
-
 -(void)syncingProcessBackgroundTask:(NSString *)noValue {
   //do things with task
   @autoreleasepool {
@@ -147,12 +129,7 @@ static NSString* syncTask = @"Zingo_Processing_Task_ID";
       
       [self setSyncFinished:true];
 
-      if (![respStr2 hasPrefix:@"Error"]) {
-        // Also save the wallet after sync
-        RPCModule *rpcmodule = [RPCModule new];
-        [rpcmodule saveWalletInternal];
-        NSLog(@"handleProcessingTask save wallet");
-      }
+      // the execute `sync` already save the wallet when finished
 
     } else {
 
@@ -204,43 +181,10 @@ static NSString* syncTask = @"Zingo_Processing_Task_ID";
       prevBatch = batch;
     }
 
-    RPCModule *rpcmodule = [RPCModule new];
-    [rpcmodule saveWalletInternal];
-    NSLog(@"handleProcessingTask sync status end %i", self.syncFinished);
-
-  }
-}
-
--(void)init__light__client {
-  @autoreleasepool {
-
-    NSLog(@"handleProcessingTask light client begin");
-    NSString *content = [self read__settings];
-    NSData *data = [content dataUsingEncoding:NSUTF8StringEncoding];
-    id jsonContent = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-    
-    NSString *server = [jsonContent valueForKey:@"server"];
-
-    NSLog(@"handleProcessingTask sync Server: %@", server);
-        
-    NSString* pathSaplingOutput = [[NSBundle mainBundle]
-                        pathForResource:@"saplingoutput" ofType:@""];
-    NSData* saplingOutput = [NSData dataWithContentsOfFile:pathSaplingOutput];
-
-
-    NSString* pathSaplingSpend = [[NSBundle mainBundle]
-                        pathForResource:@"saplingspend" ofType:@""];
-    NSData* saplingSpend = [NSData dataWithContentsOfFile:pathSaplingSpend];
-
-    NSArray *paths = NSSearchPathForDirectoriesInDomains
-                      (NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectory = [paths objectAtIndex:0];
-
-    char* resp = init_light_client([server UTF8String], [[saplingOutput base64EncodedStringWithOptions:0] UTF8String], [[saplingSpend base64EncodedStringWithOptions:0] UTF8String], [documentsDirectory UTF8String]);
-    NSString* respStr = [NSString stringWithUTF8String:resp];
-    rust_free(resp);
-
-    NSLog(@"handleProcessingTask Light Client end: %@", respStr);
+    // we don't want to save if the sync is finished:
+    // 1. OS kill the task -> to save is dangerous.
+    // 2. When the App go to foreground -> same.
+    // 3. If sync is finished -> the wallet is already saved.
 
   }
 }
@@ -261,73 +205,6 @@ static NSString* syncTask = @"Zingo_Processing_Task_ID";
   } else {
     return false;
   }
-}
-
--(void)load__existing__wallet {
-  @autoreleasepool {
-
-  NSLog(@"handleProcessingTask load wallet begin");
-
-    NSString *content = [self read__settings];
-    NSData *data = [content dataUsingEncoding:NSUTF8StringEncoding];
-    id jsonContent = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-    
-    NSString *server = [jsonContent valueForKey:@"server"];
-
-    NSLog(@"handleProcessingTask sync Server: %@", server);
-
-    NSString* walletDataStr = [self read__wallet];
-
-    NSString* pathSaplingOutput = [[NSBundle mainBundle]
-                        pathForResource:@"saplingoutput" ofType:@""];
-    NSData* saplingOutput = [NSData dataWithContentsOfFile:pathSaplingOutput];
-
-    NSString* pathSaplingSpend = [[NSBundle mainBundle]
-                        pathForResource:@"saplingspend" ofType:@""];
-    NSData* saplingSpend = [NSData dataWithContentsOfFile:pathSaplingSpend];
-
-    NSArray *paths = NSSearchPathForDirectoriesInDomains
-                      (NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectory = [paths objectAtIndex:0];
-    char* seed = initfromb64([server UTF8String], [walletDataStr UTF8String], [[saplingOutput base64EncodedStringWithOptions:0] UTF8String], [[saplingSpend base64EncodedStringWithOptions:0] UTF8String], [documentsDirectory UTF8String]);
-    NSString* seedStr = [NSString stringWithUTF8String:seed];
-    rust_free(seed);
-
-    NSLog(@"handleProcessingTask load wallet end %@", seedStr);
-
-  }
-}
-
--(NSString *)read__wallet {
-  NSArray *paths = NSSearchPathForDirectoriesInDomains
-                  (NSDocumentDirectory, NSUserDomainMask, YES);
-  NSString *documentsDirectory = [paths objectAtIndex:0];
-
-  //make a file name to write the data to using the documents directory:
-  NSString *fileName = [NSString stringWithFormat:@"%@/wallet.dat.txt",
-                                                documentsDirectory];
-  NSString *content = [[NSString alloc] initWithContentsOfFile:fileName
-                                                usedEncoding:nil
-                                                       error:nil];
-
-  // RCTLogInfo(@"Read file");
-  return content;
-}
-
--(NSString *) read__settings {
-  NSArray *paths = NSSearchPathForDirectoriesInDomains
-                  (NSDocumentDirectory, NSUserDomainMask, YES);
-  NSString *documentsDirectory = [paths objectAtIndex:0];
-
-  //make a file name to write the data to using the documents directory:
-  NSString *fileName = [NSString stringWithFormat:@"%@/settings.json",
-                                                documentsDirectory];
-  NSString *content = [[NSString alloc] initWithContentsOfFile:fileName
-                                                usedEncoding:nil
-                                                       error:nil];
-
-  // RCTLogInfo(@"Read file");
-  return content;
 }
 
 -(void)scheduleProcessingTask {
