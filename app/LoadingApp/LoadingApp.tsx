@@ -15,7 +15,6 @@ import {
   AppState,
   NativeEventSubscription,
 } from 'react-native';
-import Toast from 'react-native-simple-toast';
 import { useTheme } from '@react-navigation/native';
 import { I18n, TranslateOptions } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
@@ -323,16 +322,6 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
     this.setState({ walletSeed: {} as WalletSeedType, screen: 3, walletExists: false });
   };
 
-  getViewingKeyToRestore = async () => {
-    //this.setState({ viewingKey: '', screen: 3 });
-    Toast.show(this.props.translate('workingonit'), Toast.LONG);
-  };
-
-  getSpendableKeyToRestore = async () => {
-    //this.setState({ spendableKey: '', screen: 3 });
-    Toast.show(this.props.translate('workingonit'), Toast.LONG);
-  };
-
   doRestore = async (seed: string, birthday: number) => {
     const { server } = this.state;
 
@@ -475,20 +464,6 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                     title={translate('loadingapp.restorewalletseed')}
                     disabled={actionButtonsDisabled}
                     onPress={this.getwalletSeedToRestore}
-                    style={{ margin: 10 }}
-                  />
-                  <Button
-                    type="Secondary"
-                    title={translate('loadingapp.restorewalletviewing')}
-                    disabled={actionButtonsDisabled}
-                    onPress={this.getViewingKeyToRestore}
-                    style={{ margin: 10 }}
-                  />
-                  <Button
-                    type="Secondary"
-                    title={translate('loadingapp.restorewalletspendable')}
-                    disabled={actionButtonsDisabled}
-                    onPress={this.getSpendableKeyToRestore}
                     style={{ margin: 10 }}
                   />
                 </View>
