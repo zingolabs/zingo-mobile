@@ -13,7 +13,6 @@ import {
   EmitterSubscription,
   ScaledSize,
 } from 'react-native';
-import Toast from 'react-native-simple-toast';
 import { useTheme } from '@react-navigation/native';
 import { I18n, TranslateOptions } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
@@ -276,16 +275,6 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
 
   getwalletSeedToRestore = async () => {
     this.setState({ walletSeed: {} as WalletSeedType, screen: 3, walletExists: false });
-  };
-
-  getViewingKeyToRestore = async () => {
-    //this.setState({ viewingKey: '', screen: 3 });
-    Toast.show(this.props.translate('workingonit'), Toast.LONG);
-  };
-
-  getSpendableKeyToRestore = async () => {
-    //this.setState({ spendableKey: '', screen: 3 });
-    Toast.show(this.props.translate('workingonit'), Toast.LONG);
   };
 
   doRestore = async (seed: string, birthday: number) => {
