@@ -38,6 +38,8 @@ static BOOL _syncFinished = true;
   _syncFinished = newSyncFinished;
 }
 
+static NSString* syncTask = @"Zingo_Processing_Task_ID";
+
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
 #ifdef FB_SONARKIT_ENABLED
@@ -92,8 +94,6 @@ static BOOL _syncFinished = true;
       [self scheduleProcessingTask];
   }
 }
-
-static NSString* syncTask = @"Zingo_Processing_Task_ID";
 
 -(void)configureProcessingTask {
     if (@available(iOS 13.0, *)) {
