@@ -14,7 +14,10 @@
 @interface RPCModule: NSObject <RCTBridgeModule>
 
 -(void) saveWalletInternal;
--(void) saveBackgroundFile:(NSString *)data;
+-(void) saveBackgroundFile:(NSString*)data;
+-(NSString*) createNewWallet:(NSString*)server;
+-(NSString*) loadExistingWallet:(NSString*)server;
+-(BOOL) deleteExistingWallet;
 
 @end
 
