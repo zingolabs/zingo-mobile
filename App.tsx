@@ -9,9 +9,10 @@ import LoadingApp from './app/LoadingApp';
 import { ThemeType } from './app/types';
 
 const BackgroundSync = async () => {
-  console.log("I'm running in a background task")
-}
+  console.log("I'm running in a background task");
+};
 AppRegistry.registerHeadlessTask('BackgroundSync', () => BackgroundSync);
+console.log("Registered headless task")
 
 const Theme: ThemeType = {
   dark: true,

@@ -13,6 +13,7 @@ import com.facebook.react.uimanager.ReactShadowNode
 import com.facebook.react.uimanager.ReactShadowNodeImpl
 import com.facebook.react.uimanager.ViewManager
 import com.facebook.soloader.SoLoader
+import com.th3rdwave.safeareacontext.getReactContext
 import java.lang.reflect.InvocationTargetException
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -107,7 +108,7 @@ class BackgroundSync : HeadlessJsTaskService() {
                     "BackgroundSync",
                     Arguments.fromBundle(it),
                     5000, // timeout for the task
-                    false // optional: defines whether or not the task is allowed in foreground.
+                    true // optional: defines whether or not the task is allowed in foreground.
                     // Default is false
             )
         }
@@ -119,6 +120,7 @@ class BackgroundWorker(private val context: Context, workerParams: WorkerParamet
 
         // background work will take place here
         Log.w("bg", "Worker do work")
+
         return Result.success()
     }
 }
@@ -129,7 +131,7 @@ class BackgroundModule internal constructor(@Nonnull reactContext: ReactApplicat
 
     init {
         mContext = reactContext
-        workRequest = PeriodicWorkRequest.Builder(BackgroundWorker::class.java, 20, TimeUnit.MINUTES).build()
+        workRequest = PeriodicWorkRequest.Builder(BackgroundWorker::class.java, 15, TimeUnit.MINUTES).build()
     }
 
     @ReactMethod

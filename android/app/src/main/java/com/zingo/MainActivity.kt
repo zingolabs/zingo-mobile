@@ -1,7 +1,9 @@
 package com.zingo
 
 import android.os.Bundle
+import android.util.Log
 import androidx.work.PeriodicWorkRequest
+import androidx.work.WorkManager
 import com.facebook.react.ReactActivity
 import java.util.concurrent.TimeUnit
 
@@ -14,11 +16,14 @@ class MainActivity : ReactActivity() {
         return "Zingo!"
     }
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.w("", "Starting main activity")
         super.onCreate(null)
     }
 
     override fun onPause() {
+        Log.w("", "Pausing main activity")
         super.onPause()
-        PeriodicWorkRequest.Builder(BackgroundWorker::class.java, 15, TimeUnit.MINUTES).build()
+        val backgroundRequest = PeriodicWorkRequest.Builder(BackgroundWorker::class.java, 15, TimeUnit.MINUTES).build()
+        WorkManager.getInstance(application).enqueue(backgroundRequest)
     }
 }
