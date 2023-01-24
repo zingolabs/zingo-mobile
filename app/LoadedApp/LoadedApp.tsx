@@ -10,6 +10,7 @@ import {
   ScaledSize,
   AppState,
   NativeEventSubscription,
+  AppRegistry,
 } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -84,6 +85,8 @@ type LoadedAppProps = {
 };
 
 const SERVER_DEFAULT_0 = serverUris()[0];
+
+AppRegistry.registerHeadlessTask('BackgroundSync', () => require('../BackgroundSync'));
 
 export default function LoadedApp(props: LoadedAppProps) {
   const theme = useTheme() as unknown as ThemeType;

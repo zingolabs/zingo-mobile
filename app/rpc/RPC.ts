@@ -367,10 +367,10 @@ export default class RPC {
     return '';
   }
 
-  async doSync(): Promise<string> {
+  static async doSync(): Promise<string> {
     const syncstr = await RPCModule.execute('sync', '');
 
-    //console.log(`Sync exec result: ${syncstr}`);
+    console.log(`Sync exec result: ${syncstr}`);
 
     if (syncstr) {
       return syncstr;
@@ -379,7 +379,7 @@ export default class RPC {
     return '';
   }
 
-  async doSyncStatus(): Promise<string> {
+  static async doSyncStatus(): Promise<string> {
     const syncstr = await RPCModule.execute('syncstatus', '');
 
     //console.log(`syncstatus: ${syncstr}`);
@@ -502,14 +502,14 @@ export default class RPC {
           this.inRefresh = false;
         });
       } else {
-        this.doSync().finally(() => {
+        RPC.doSync().finally(() => {
           this.inRefresh = false;
         });
       }
 
       // We need to wait for the sync to finish. The sync is done when
       this.syncStatusID = setInterval(async () => {
-        const s = await this.doSyncStatus();
+        const s = await RPC.doSyncStatus();
         if (!s) {
           return;
         }

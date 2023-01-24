@@ -3,22 +3,11 @@ package com.zingo
 import android.app.Application
 import android.content.Context
 import android.content.Intent
-import android.util.Log
-import android.view.View
-import androidx.work.*
 import com.facebook.react.*
 import com.facebook.react.bridge.*
 import com.facebook.react.jstasks.HeadlessJsTaskConfig
-import com.facebook.react.uimanager.ReactShadowNode
-import com.facebook.react.uimanager.ReactShadowNodeImpl
-import com.facebook.react.uimanager.ViewManager
 import com.facebook.soloader.SoLoader
-import com.th3rdwave.safeareacontext.getReactContext
 import java.lang.reflect.InvocationTargetException
-import java.util.*
-import java.util.concurrent.TimeUnit
-import javax.annotation.Nonnull
-import kotlin.collections.ArrayList
 
 
 class MainApplication : Application(), ReactApplication {
@@ -35,7 +24,6 @@ class MainApplication : Application(), ReactApplication {
             val packages: MutableList<ReactPackage> = PackageList(this).packages
 
             packages.add(RPCPackage())
-            packages.add(BackgroundPackage())
             return packages
         }
 
@@ -112,59 +100,6 @@ class BackgroundSync : HeadlessJsTaskService() {
                     // Default is false
             )
         }
-    }
-}
-
-class BackgroundWorker(private val context: Context, workerParams: WorkerParameters?) : Worker(context, workerParams!!) {
-    override fun doWork(): Result {
-
-        // background work will take place here
-        Log.w("bg", "Worker do work")
-
-        return Result.success()
-    }
-}
-
-class BackgroundModule internal constructor(@Nonnull reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
-    private val mContext: Context
-    private val workRequest: PeriodicWorkRequest
-
-    init {
-        mContext = reactContext
-        workRequest = PeriodicWorkRequest.Builder(BackgroundWorker::class.java, 15, TimeUnit.MINUTES).build()
-    }
-
-    @ReactMethod
-    fun startBackgroundWork() {
-        WorkManager.getInstance(mContext).enqueueUniquePeriodicWork("testWork", ExistingPeriodicWorkPolicy.KEEP, workRequest)
-    }
-
-    @ReactMethod
-    fun stopBackgroundWork() {
-        WorkManager.getInstance(mContext).cancelUniqueWork("testWork")
-    }
-
-    @Nonnull
-    override fun getName(): String {
-        return MODULE_NAME
-    }
-
-    companion object {
-        private const val MODULE_NAME = "BackgroundWorkManager"
-    }
-}
-
-class BackgroundPackage : ReactPackage {
-    @Nonnull
-    override fun createNativeModules(@Nonnull reactContext: ReactApplicationContext): List<NativeModule> {
-        val modules: MutableList<NativeModule> = ArrayList()
-        modules.add(BackgroundModule(reactContext))
-        return modules
-    }
-
-    @Nonnull
-    override fun createViewManagers(@Nonnull reactContext: ReactApplicationContext): List<ViewManager<View, ReactShadowNodeImpl>> {
-        return Collections.emptyList()
     }
 }
 

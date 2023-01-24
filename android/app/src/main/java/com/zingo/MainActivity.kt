@@ -23,7 +23,7 @@ class MainActivity : ReactActivity() {
     override fun onPause() {
         Log.w("", "Pausing main activity")
         super.onPause()
-        val backgroundRequest = PeriodicWorkRequest.Builder(BackgroundWorker::class.java, 15, TimeUnit.MINUTES).build()
-        WorkManager.getInstance(application).enqueue(backgroundRequest)
+        //val backgroundRequest = PeriodicWorkRequest.Builder(BackgroundWorker::class.java, 15, TimeUnit.MINUTES).build()
+        //WorkManager.getInstance(application).enqueue(backgroundRequest)
     }
 }
