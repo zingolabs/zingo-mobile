@@ -6,7 +6,7 @@ mkdir -p ../android/app/src/main/jniLibs/armeabi-v7a
 mkdir -p ../android/app/src/main/jniLibs/x86
 mkdir -p ../android/app/src/main/jniLibs/x86_64
 
-id=$(docker create devlocal/rustndk_openssl_installed_image)
+id=$(docker create devlocal/build_android)
 
 docker cp \
     $id:/opt/zingo/rust/target/x86_64-linux-android/release/librust.so \
