@@ -13,6 +13,7 @@ Do not use these apps unless you specifically know what you are doing.
 
 Carefully follow the instructions to [setup Android Studio for your
 operating system](https://reactnative.dev/docs/environment-setup).
+It is not neccessary to install watchman or the Android 12 system images.
 
 If you do not have a physical device, you can create and start
 a new Android 11, API 30 emulator device compatible
@@ -26,7 +27,8 @@ with the chip on your system and start the emulated device.
 3. Run `yarn react-native start` to start the dev server
 4. Run `yarn run android` to compile and install the app on an
    emulator or connected device. You can also open the `android` directory
-   in Android Studio as a project and hit the run button
+   in Android Studio as a project, select 'app' and the API 30 system image
+   in the upper toolbar and click the "Run 'app'" button.
 
 ## iOS build instructions
 
