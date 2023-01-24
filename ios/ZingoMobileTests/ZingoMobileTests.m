@@ -4,6 +4,9 @@
 #import <React/RCTLog.h>
 #import <React/RCTRootView.h>
 
+#import "RPCModule.h"
+#import "rust.h"
+
 #define TIMEOUT_SECONDS 600
 #define TEXT_TO_LOOK_FOR @"Welcome to React"
 
@@ -61,5 +64,66 @@
   XCTAssertTrue(foundElement, @"Couldn't find element with text '%@' in %d seconds", TEXT_TO_LOOK_FOR, TIMEOUT_SECONDS);
 }
 
+-(void) testCorruptWalletBug_ServerOKNewWallet {
+  RPCModule *rpcmodule = [RPCModule new];
+  
+  // delete the wallet file, clean scenario
+  BOOL delete = [rpcmodule deleteExistingWallet];
+  NSLog(@"Test Delete Wallet Cleaning %i", delete);
+  
+  // server OK
+  // ****************************************************
+  NSString *serverOK = @"https://mainnet.lightwalletd.com:9067";
+  // create a new wallet
+  NSString *newWalletOK = [rpcmodule createNewWallet:serverOK];
+  NSLog(@"Test create New Wallet OK %@", newWalletOK);
+  XCTAssertFalse([newWalletOK hasPrefix:@"Error"], @"Create New Wallet fails %@", newWalletOK);
+  
+  // save the wallet in internal storage
+  [rpcmodule saveWalletInternal];
+  
+  // load wallet from file
+  NSString *loadWalletOK = [rpcmodule loadExistingWallet:serverOK];
+  NSLog(@"Test Load Wallet OK %@", loadWalletOK);
+  XCTAssertFalse([loadWalletOK hasPrefix:@"Error"], @"Load Wallet from file fails %@", loadWalletOK);
+  
+  // delete the wallet file
+  BOOL deleteOK = [rpcmodule deleteExistingWallet];
+  NSLog(@"Test Delete Wallet OK %i", deleteOK);
+}
+
+-(void) testCorruptWalletBug_ServerKONewWallet {
+  RPCModule *rpcmodule = [RPCModule new];
+  
+  // delete the wallet file, clean scenario
+  BOOL delete = [rpcmodule deleteExistingWallet];
+  NSLog(@"Test Delete Wallet Cleaning %i", delete);
+  
+  // server KO
+  // ****************************************************
+  NSString *serverKO = @"https://zuul.free2z.cash:9067";
+  NSString *serverOK = @"https://mainnet.lightwalletd.com:9067";
+  // create a new wallet, expecting ERROR.
+  NSString *newWalletKO = [rpcmodule createNewWallet:serverKO];
+  NSLog(@"Test create New Wallet KO %@", newWalletKO);
+  XCTAssertTrue([newWalletKO hasPrefix:@"Error"], @"Create New Wallet NOT fails, and it have to %@", newWalletKO);
+  
+  // save wallet in internal storage
+  [rpcmodule saveWalletInternal];
+  
+  // load wallet from file, expecting ERROR.
+  NSString *loadWalletKO = [rpcmodule loadExistingWallet:serverKO];
+  NSLog(@"Test create Load Wallet KO %@", loadWalletKO);
+  XCTAssertTrue([newWalletKO hasPrefix:@"Error"], @"Load Wallet from file NOT fails, and it have to %@", newWalletKO);
+  
+  // load wallet from file, expecting CORRUPT WALLET BUG.
+  NSString *loadWalletOK = [rpcmodule loadExistingWallet:serverOK];
+  NSLog(@"Test create Load Wallet KO %@", loadWalletOK);
+  XCTAssertFalse([loadWalletOK hasPrefix:@"Error"], @"Load Wallet from file fails %@", loadWalletOK);
+  
+  // delete the wallet file
+  BOOL deleteKO = [rpcmodule deleteExistingWallet];
+  NSLog(@"Test Delete Wallet OK %i", deleteKO);
+}
 
 @end

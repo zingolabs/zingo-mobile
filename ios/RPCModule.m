@@ -133,10 +133,7 @@ RCT_REMAP_METHOD(walletBackupExists,
   return content;
 }
 
-// Delete an existing wallet file
-RCT_REMAP_METHOD(deleteExistingWallet,
-                 deleteExistingWalletWithResolver:(RCTPromiseResolveBlock)resolve
-                 deleteExistingWalletWithRejecter:(RCTPromiseRejectBlock)reject) {
+-(BOOL) deleteExistingWallet {
   // RCTLogInfo(@"deleteExistingWallet called");
   NSArray *paths = NSSearchPathForDirectoriesInDomains
                   (NSDocumentDirectory, NSUserDomainMask, YES);
@@ -147,6 +144,15 @@ RCT_REMAP_METHOD(deleteExistingWallet,
                                                 documentsDirectory];
   // Delete the file
   [[NSFileManager defaultManager] removeItemAtPath:fileName error:nil];
+
+  return true;
+}
+
+// Delete an existing wallet file
+RCT_REMAP_METHOD(deleteExistingWallet,
+                 deleteExistingWalletWithResolver:(RCTPromiseResolveBlock)resolve
+                 deleteExistingWalletWithRejecter:(RCTPromiseRejectBlock)reject) {
+  [self deleteExistingWallet];
 
   resolve(@"true");
 }
@@ -188,11 +194,7 @@ RCT_REMAP_METHOD(deleteExistingWalletBackup,
   [self saveWalletBackupFile:walletDataStr];
 }
 
-// Create a new wallet, automatically saving it.
-RCT_REMAP_METHOD(createNewWallet,
-                 server:(NSString*)server
-                 createNewWalletWithResolver:(RCTPromiseResolveBlock)resolve
-                 rejected:(RCTPromiseRejectBlock)reject) {
+-(NSString*) createNewWallet:(NSString* )server {
   @autoreleasepool {
     // RCTLogInfo(@"createNewWallet called");
 
@@ -219,6 +221,18 @@ RCT_REMAP_METHOD(createNewWallet,
       // Also save the wallet after restore
       [self saveWalletInternal];
     }
+
+    return seedStr;
+  }
+}
+
+// Create a new wallet, automatically saving it.
+RCT_REMAP_METHOD(createNewWallet,
+                 server:(NSString*)server
+                 createNewWalletWithResolver:(RCTPromiseResolveBlock)resolve
+                 rejected:(RCTPromiseRejectBlock)reject) {
+  @autoreleasepool {
+    NSString* seedStr = [self createNewWallet:server];
 
     resolve(seedStr);
   }
@@ -262,11 +276,7 @@ RCT_REMAP_METHOD(restoreWallet,
   }
 }
 
-// Load an existing wallet from the user's app documents
-RCT_REMAP_METHOD(loadExistingWallet,
-                 server:(NSString*)server
-                 loadExistingWalletWithResolver:(RCTPromiseResolveBlock)resolve
-                 loadExistingWalletWithRejecter:(RCTPromiseRejectBlock)reject) {
+-(NSString*) loadExistingWallet:(NSString*)server {
   @autoreleasepool {
     // RCTLogInfo(@"loadExistingWallet called");
     NSString* walletDataStr = [self readWallet];
@@ -287,6 +297,18 @@ RCT_REMAP_METHOD(loadExistingWallet,
     rust_free(seed);
 
     // RCTLogInfo(@"Seed: %@", seedStr);
+
+    return seedStr;
+  }
+}
+
+// Load an existing wallet from the user's app documents
+RCT_REMAP_METHOD(loadExistingWallet,
+                 server:(NSString*)server
+                 loadExistingWalletWithResolver:(RCTPromiseResolveBlock)resolve
+                 loadExistingWalletWithRejecter:(RCTPromiseRejectBlock)reject) {
+  @autoreleasepool {
+    NSString *seedStr = [self loadExistingWallet:server];
 
     resolve(seedStr);
   }
