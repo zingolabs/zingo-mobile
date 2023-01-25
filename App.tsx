@@ -8,7 +8,6 @@ import LoadedApp from './app/LoadedApp';
 import LoadingApp from './app/LoadingApp';
 import { ThemeType } from './app/types';
 
-
 const Theme: ThemeType = {
   dark: true,
   colors: {
