@@ -411,7 +411,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                 </View>
 
                 <BoldText style={{ fontSize: 15, marginBottom: 3 }}>{translate('loadingapp.actualserver')}</BoldText>
-                <BoldText style={{ fontSize: 15, marginBottom: 10 }}>{server})</BoldText>
+                <BoldText style={{ fontSize: 15, marginBottom: 10 }}>{server}</BoldText>
 
                 {server === SERVER_DEFAULT_1 && (
                   <Button
