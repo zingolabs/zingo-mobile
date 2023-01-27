@@ -89,17 +89,3 @@ class MainApplication : Application(), ReactApplication {
     }
 }
 
-class BackgroundSync : HeadlessJsTaskService() {
-    override fun getTaskConfig(intent: Intent): HeadlessJsTaskConfig? {
-        return intent.extras?.let {
-            HeadlessJsTaskConfig(
-                    "BackgroundSync",
-                    Arguments.fromBundle(it),
-                    5000, // timeout for the task
-                    true // optional: defines whether or not the task is allowed in foreground.
-                    // Default is false
-            )
-        }
-    }
-}
-

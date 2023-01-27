@@ -1,15 +1,8 @@
-import { Alert } from 'react-native';
 import RPCModule from '../components/RPCModule';
+import serverUris from './uris/serverUris';
 
-const BackgroundSync = async (task_data: Object) => {
-  Alert.alert('Alert Title', 'My Alert Msg', [
-    {
-      text: 'Cancel',
-      onPress: () => console.log('Cancel Pressed'),
-      style: 'cancel',
-    },
-    { text: 'OK', onPress: () => console.log('OK Pressed') },
-  ]);
+const BackgroundSync = async (task_data: any) => {
+  await RPCModule.initLightClient(serverUris()[0]);
 
   let sync_id = 0;
   console.log(task_data);
