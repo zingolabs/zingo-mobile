@@ -52,6 +52,12 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
     server = contextLoaded.server;
   }
 
+  if (!info.latestBlock) {
+    (async () => {
+      info.latestBlock = await RPCModule.GetLatestBlock(server);
+    })();
+  }
+
   const { colors } = useTheme() as unknown as ThemeType;
   const [seedPhrase, setSeedPhrase] = useState('');
   const [birthdayNumber, setBirthdayNumber] = useState('');

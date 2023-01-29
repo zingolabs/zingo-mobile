@@ -31,6 +31,7 @@ import { ThemeType } from '../types';
 import { defaultAppStateLoading, ContextLoadingProvider } from '../context';
 import platform from '../platform/platform';
 import BackgroundFileImpl from '../../components/Background/BackgroundFileImpl';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Seed = React.lazy(() => import('../../components/Seed'));
 
@@ -213,14 +214,6 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
   componentDidMount = async () => {
     // First, check if a wallet exists. Do it async so the basic screen has time to render
     setTimeout(async () => {
-      await RPCModule.initLightClient(this.state.server);
-
-      // reading Info
-      const info = await RPC.rpc_getInfoObject();
-      if (info) {
-        this.setState({ info });
-      }
-
       const exists = await RPCModule.walletExists();
       //console.log('Wallet Exists result', exists);
 
@@ -249,16 +242,20 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
     this.appstate = AppState.addEventListener('change', async nextAppState => {
       if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
         console.log('App has come to the foreground!');
-        // reading background task info
+        // reading background task info IOS
         const backgroundJson = await BackgroundFileImpl.readBackground();
         if (backgroundJson) {
           this.setState({
             background: backgroundJson,
           });
         }
+        // setting value for background task Android
+        await AsyncStorage.setItem('@background', 'no');
       }
       if (nextAppState.match(/inactive|background/) && this.state.appState === 'active') {
         console.log('App is gone to the background!');
+        // setting value for background task Android
+        await AsyncStorage.setItem('@background', 'yes');
       }
       this.setState({ appState: nextAppState });
     });

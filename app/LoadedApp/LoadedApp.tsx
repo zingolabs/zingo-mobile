@@ -49,6 +49,7 @@ import { ContextLoadedProvider, defaultAppStateLoaded } from '../context';
 import platform from '../platform/platform';
 import { serverUris } from '../uris';
 import BackgroundFileImpl from '../../components/Background/BackgroundFileImpl';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Transactions = React.lazy(() => import('../../components/Transactions'));
 const Send = React.lazy(() => import('../../components/Send'));
@@ -273,14 +274,18 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
         this.fetchBackgroundSyncing();
         this.rpc.setInRefresh(false);
         this.rpc.configure();
+        // setting value for background task Android
+        await AsyncStorage.setItem('@background', 'no');
       }
       if (nextAppState.match(/inactive|background/) && this.state.appState === 'active') {
         console.log('App is gone to the background!');
+        this.rpc.clearTimers();
         this.setState({
           syncingStatusReport: new SyncingStatusReportClass(),
           syncingStatus: {} as SyncingStatusType,
         });
-        this.rpc.clearTimers();
+        // setting value for background task Android
+        await AsyncStorage.setItem('@background', 'yes');
       }
       this.setState({ appState: nextAppState });
     });
