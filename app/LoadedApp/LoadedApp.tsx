@@ -268,6 +268,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     });
 
     this.appstate = AppState.addEventListener('change', async nextAppState => {
+      await AsyncStorage.setItem('@server', this.state.server);
       if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
         console.log('App has come to the foreground!');
         // reading background task info
