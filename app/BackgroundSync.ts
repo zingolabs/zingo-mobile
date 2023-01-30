@@ -1,13 +1,20 @@
 import RPCModule from '../components/RPCModule';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import serverUris from './uris/serverUris';
 
 const BackgroundSync = async (task_data: any) => {
   const exists = await RPCModule.walletExists();
 
   // only if exists the wallet file make sense to do the sync.
   if (exists && exists !== 'false') {
-    // the initial value from synstatus is 0
-    let sync_id = -1;
+
+    let wallet = await RPCModule.loadExistingWallet(serverUris()[0])
+    if (wallet.startsWith("Error")) {
+      // We don't return an error message yet, just log the error and return
+      console.error(wallet)
+      return 
+    }
+    let batch_num = -1;
     console.log('BS:', task_data);
 
     let saver = setInterval(async () => {
@@ -25,12 +32,12 @@ const BackgroundSync = async (task_data: any) => {
       }
       const ss = await JSON.parse(s);
       console.log('BS:', ss);
-      if (sync_id > -1 && sync_id !== ss.sync_id) {
+      if (ss.batch_num > -1 && batch_num !== ss.batch_num) {
         await RPCModule.doSave();
         console.log('BS: saving...');
-        // update sync_id with the new value, otherwise never change
-        sync_id = ss.sync_id;
-      }
+        // update batch_num with the new value, otherwise never change
+        batch_num = ss.batch_num;
+      } 
     }, 2000);
 
     await RPCModule.execute('sync', '');

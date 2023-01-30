@@ -16,6 +16,8 @@ class MainActivity : ReactActivity() {
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.w("", "Starting main activity")
+        val service = Intent(applicationContext, BackgroundSync::class.java)
+        applicationContext.stopService(service)
         super.onCreate(null)
     }
 
@@ -32,5 +34,11 @@ class MainActivity : ReactActivity() {
         super.onPause()
         //val backgroundRequest = PeriodicWorkRequest.Builder(BackgroundWorker::class.java, 15, TimeUnit.MINUTES).build()
         //WorkManager.getInstance(application).enqueue(backgroundRequest)
+    }
+
+    override fun onResume() {
+        val service = Intent(applicationContext, BackgroundSync::class.java)
+        applicationContext.stopService(service)
+        super.onResume()
     }
 }
