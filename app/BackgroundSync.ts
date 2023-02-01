@@ -24,8 +24,8 @@ const BackgroundSync = async (task_data: any) => {
 
     let saver = setInterval(async () => {
       const networkState = await NetInfo.fetch();
-        if (!networkState.isConnected || networkState.type === NetInfoStateType.cellular) {
-          console.log("BS: Interrupted (connected: " + networkState.isConnected + " type: " + networkState.type + ")");
+        if (!networkState.isConnected || networkState.type === NetInfoStateType.cellular || networkState.details?.isConnectionExpensive) {
+          console.log("BS: Interrupted (connected: " + networkState.isConnected, + ", type: " + networkState.type +  + ", expensive connection: " + networkState.details?.isConnectionExpensive + ")");
           clearInterval(saver);
           finishEarly.done();
         return;
