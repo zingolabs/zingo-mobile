@@ -1,6 +1,6 @@
 //
 //  RPCModule.h
-//  ZingoMobile
+//  Zingo!
 //
 //  Created by Aditya Kulkarni on 5/18/20.
 //
