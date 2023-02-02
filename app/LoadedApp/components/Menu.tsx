@@ -7,6 +7,7 @@ import FadeText from '../../../components/Components/FadeText';
 
 import { useTheme } from '@react-navigation/native';
 import { ContextLoaded } from '../../context';
+import RPC from '../../rpc';
 
 const window = Dimensions.get('window');
 
@@ -24,6 +25,12 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected }) => {
     color: colors.text,
   };
 
+  const onItemSelectedWrapper = (value: string) => {
+    // if the user click on a screen in the menu the sync is going to continue
+    (async () => await RPC.rpc_setInterruptSyncAfterBatch('false'))();
+    onItemSelected(value);
+  };
+
   return (
     <ScrollView
       scrollsToTop={false}
@@ -38,39 +45,39 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected }) => {
       <View style={{ height: 1, backgroundColor: colors.primary }} />
 
       <View style={{ display: 'flex', marginLeft: 20 }}>
-        <RegText onPress={() => onItemSelected('About')} style={item}>
+        <RegText onPress={() => onItemSelectedWrapper('About')} style={item}>
           {translate('loadedapp.about')}
         </RegText>
 
-        <RegText onPress={() => onItemSelected('Info')} style={item}>
+        <RegText onPress={() => onItemSelectedWrapper('Info')} style={item}>
           {translate('loadedapp.info')}
         </RegText>
 
-        <RegText onPress={() => onItemSelected('Settings')} style={item}>
+        <RegText onPress={() => onItemSelectedWrapper('Settings')} style={item}>
           {translate('loadedapp.settings')}
         </RegText>
 
-        <RegText onPress={() => onItemSelected('Wallet Seed')} style={item}>
+        <RegText onPress={() => onItemSelectedWrapper('Wallet Seed')} style={item}>
           {translate('loadedapp.walletseed')}
         </RegText>
 
-        <RegText onPress={() => onItemSelected('Rescan')} style={item}>
+        <RegText onPress={() => onItemSelectedWrapper('Rescan')} style={item}>
           {translate('loadedapp.rescanwallet')}
         </RegText>
 
-        <RegText onPress={() => onItemSelected('Sync Report')} style={item}>
+        <RegText onPress={() => onItemSelectedWrapper('Sync Report')} style={item}>
           {translate('loadedapp.report')}
         </RegText>
 
-        <RegText onPress={() => onItemSelected('Fund Pools')} style={item} color={colors.primary}>
+        <RegText onPress={() => onItemSelectedWrapper('Fund Pools')} style={item} color={colors.primary}>
           {translate('loadedapp.fundpools')}
         </RegText>
 
-        <RegText onPress={() => onItemSelected('Change Wallet')} style={item}>
+        <RegText onPress={() => onItemSelectedWrapper('Change Wallet')} style={item}>
           {translate('loadedapp.changewallet')}
         </RegText>
 
-        <RegText onPress={() => onItemSelected('Restore Wallet Backup')} style={item}>
+        <RegText onPress={() => onItemSelectedWrapper('Restore Wallet Backup')} style={item}>
           {translate('loadedapp.restorebackupwallet')}
         </RegText>
       </View>

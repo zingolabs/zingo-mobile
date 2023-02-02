@@ -6,7 +6,7 @@ import moment from 'moment';
 import 'moment/locale/es';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faBars, faInfo } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faInfo, faCheck, faPlay, faStop } from '@fortawesome/free-solid-svg-icons';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
 import RPC from '../../app/rpc';
@@ -170,7 +170,7 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
             alignItems: 'center',
             justifyContent: 'center',
             flexWrap: 'wrap',
-            marginVertical: syncStatusDisplayLine ? 0 : 5,
+            marginVertical: 5,
           }}>
           <View
             style={{
@@ -181,11 +181,42 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
               flexWrap: 'wrap',
             }}>
             <RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
+              {translate('transactions.title')}
+            </RegText>
+            {/*<RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
               {syncStatusDisplayLine ? translate('transactions.title-syncing') : translate('transactions.title')}
             </RegText>
-            {!!syncStatusDisplayLine && <FadeText style={{ margin: 0, padding: 0 }}>{syncStatusDisplayLine}</FadeText>}
+          {!!syncStatusDisplayLine && <FadeText style={{ margin: 0, padding: 0 }}>{syncStatusDisplayLine}</FadeText>}*/}
           </View>
-          {!!syncStatusDisplayLine && (
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: 0,
+              padding: 1,
+              borderColor: colors.primary,
+              borderWidth: 1,
+              borderRadius: 10,
+              minWidth: 20,
+              minHeight: 20,
+            }}>
+            {!syncStatusDisplayLine && syncingStatus.synced && (
+              <View style={{ margin: 0, padding: 0 }}>
+                <FontAwesomeIcon icon={faCheck} color={colors.primary} />
+              </View>
+            )}
+            {!syncStatusDisplayLine && !syncingStatus.synced && (
+              <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
+                <FontAwesomeIcon icon={faStop} color={colors.zingo} size={12} />
+              </TouchableOpacity>
+            )}
+            {syncStatusDisplayLine && (
+              <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
+                <FontAwesomeIcon icon={faPlay} color={colors.primary} size={10} />
+              </TouchableOpacity>
+            )}
+          </View>
+          {/*!!syncStatusDisplayLine && (
             <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
               <View
                 style={{
@@ -205,7 +236,7 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
                 <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
               </View>
             </TouchableOpacity>
-          )}
+            )*/}
         </View>
       </View>
 
@@ -369,7 +400,7 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
               alignItems: 'center',
               justifyContent: 'center',
               flexWrap: 'wrap',
-              marginVertical: syncStatusDisplayLine ? 0 : 5,
+              marginVertical: 5,
             }}>
             <View
               style={{
@@ -380,13 +411,44 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
                 flexWrap: 'wrap',
               }}>
               <RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
+                {translate('transactions.title')}
+              </RegText>
+              {/*<RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
                 {syncStatusDisplayLine ? translate('transactions.title-syncing') : translate('transactions.title')}
               </RegText>
               {!!syncStatusDisplayLine && (
                 <FadeText style={{ margin: 0, padding: 0 }}>{syncStatusDisplayLine}</FadeText>
+              )}*/}
+            </View>
+            <View
+              style={{
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: 0,
+                padding: 1,
+                borderColor: colors.primary,
+                borderWidth: 1,
+                borderRadius: 10,
+                minWidth: 20,
+                minHeight: 20,
+              }}>
+              {!syncStatusDisplayLine && syncingStatus.synced && (
+                <View style={{ margin: 0, padding: 0 }}>
+                  <FontAwesomeIcon icon={faCheck} color={colors.primary} />
+                </View>
+              )}
+              {!syncStatusDisplayLine && !syncingStatus.synced && (
+                <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
+                  <FontAwesomeIcon icon={faStop} color={colors.zingo} size={12} />
+                </TouchableOpacity>
+              )}
+              {syncStatusDisplayLine && (
+                <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
+                  <FontAwesomeIcon icon={faPlay} color={colors.primary} size={10} />
+                </TouchableOpacity>
               )}
             </View>
-            {!!syncStatusDisplayLine && (
+            {/*!!syncStatusDisplayLine && (
               <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
                 <View
                   style={{
@@ -406,7 +468,7 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
                   <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
                 </View>
               </TouchableOpacity>
-            )}
+              )*/}
           </View>
 
           <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
