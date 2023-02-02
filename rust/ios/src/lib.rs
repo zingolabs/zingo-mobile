@@ -259,11 +259,8 @@ pub extern "C" fn execute(cmd: *const c_char, args_list: *const c_char) -> *mut 
 }
 
 #[no_mangle]
-pub extern "C" fn init_light_client(
+pub extern "C" fn get_latest_block(
     server_uri: *const c_char,
-    sapling_output: *const c_char,
-    sapling_spend: *const c_char,
-    data_dir: *const c_char,
 ) -> *mut c_char {
     let c_str = unsafe { CStr::from_ptr(server_uri) };
     let server_uri = match c_str.to_str() {
@@ -276,40 +273,7 @@ pub extern "C" fn init_light_client(
     }
     .to_string();
 
-    let c_str = unsafe { CStr::from_ptr(sapling_output) };
-    let sapling_output = match c_str.to_str() {
-        Err(_) => {
-            return CString::new("Error parsing 'sapling_output' argument".to_owned())
-                .unwrap()
-                .into_raw()
-        }
-        Ok(string) => string,
-    }
-    .to_string();
-
-    let c_str = unsafe { CStr::from_ptr(sapling_spend) };
-    let sapling_spend = match c_str.to_str() {
-        Err(_) => {
-            return CString::new("Error parsing 'sapling_spend' argument".to_owned())
-                .unwrap()
-                .into_raw()
-        }
-        Ok(string) => string,
-    }
-    .to_string();
-
-    let c_str = unsafe { CStr::from_ptr(data_dir) };
-    let data_dir = match c_str.to_str() {
-        Err(_) => {
-            return CString::new("Error parsing 'data_dir' argument".to_owned())
-                .unwrap()
-                .into_raw()
-        }
-        Ok(string) => string,
-    }
-    .to_string();
-
-    let resp = rustlib::init_light_client(server_uri, sapling_output, sapling_spend, data_dir);
+    let resp = rustlib::get_latest_block(server_uri);
 
     return CString::new(resp).unwrap().into_raw();
 }

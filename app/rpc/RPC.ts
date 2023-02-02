@@ -375,7 +375,7 @@ export default class RPC {
   async doSync(): Promise<string> {
     const syncstr = await RPCModule.execute('sync', '');
 
-    //console.log(`Sync exec result: ${syncstr}`);
+    console.log(`Sync exec result: ${syncstr}`);
 
     if (syncstr) {
       return syncstr;
