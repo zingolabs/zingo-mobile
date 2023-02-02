@@ -14,6 +14,7 @@ import Button from '../Button';
 import { ThemeType } from '../../app/types';
 import { ContextLoaded, ContextLoading } from '../../app/context';
 import { InfoType, TotalBalanceClass, WalletSeedType } from '../../app/AppState';
+import RPCModule from '../RPCModule';
 
 type TextsType = {
   new: string[];
@@ -35,17 +36,20 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
   let walletSeed: WalletSeedType,
     totalBalance: TotalBalanceClass,
     translate: (key: string, config?: TranslateOptions) => string,
-    info: InfoType;
+    info: InfoType,
+    server: string;
   if (action === 'new' || action === 'restore') {
     walletSeed = contextLoading.walletSeed;
     totalBalance = contextLoading.totalBalance;
     translate = contextLoading.translate;
     info = contextLoading.info;
+    server = contextLoading.server;
   } else {
     walletSeed = contextLoaded.walletSeed;
     totalBalance = contextLoaded.totalBalance;
     translate = contextLoaded.translate;
     info = contextLoaded.info;
+    server = contextLoaded.server;
   }
 
   const { colors } = useTheme() as unknown as ThemeType;
@@ -55,6 +59,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
   const [texts, setTexts] = useState({} as TextsType);
   const [readOnly, setReadOnly] = useState(true);
   const [titleViewHeight, setTitleViewHeight] = useState(0);
+  const [latestBlock, setLatestBlock] = useState(0);
 
   const slideAnim = useRef(new Animated.Value(0)).current;
 
@@ -97,9 +102,27 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
     };
   }, [slideAnim, titleViewHeight]);
 
+  useEffect(() => {
+    if (info.latestBlock) {
+      setLatestBlock(info.latestBlock);
+    } else {
+      (async () => {
+        const resp: string = await RPCModule.getLatestBlock(server);
+        //console.log(resp);
+        if (!resp.toLowerCase().startsWith('error')) {
+          setLatestBlock(Number(resp));
+          console.log('/', latestBlock);
+        } else {
+          console.log('error latest block', resp);
+        }
+      })();
+    }
+  }, [info.latestBlock, latestBlock]);
+
   //console.log('=================================');
   //console.log(walletSeed.seed, walletSeed.birthday);
   //console.log(seedPhrase, birthdayNumber);
+  //console.log(latestBlock);
 
   return (
     <SafeAreaView
@@ -237,7 +260,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
               <FadeText style={{ textAlign: 'center' }}>
                 {translate('seed.birthday-no-readonly') +
                   ' (1, ' +
-                  (info.latestBlock ? info.latestBlock.toString() : '--') +
+                  (latestBlock ? latestBlock.toString() : '--') +
                   ')'}
               </FadeText>
               <View
@@ -269,13 +292,13 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
                   onChangeText={(text: string) => {
                     if (isNaN(Number(text))) {
                       setBirthdayNumber('');
-                    } else if (Number(text) <= 0 || Number(text) > info.latestBlock) {
+                    } else if (Number(text) <= 0 || Number(text) > latestBlock) {
                       setBirthdayNumber('');
                     } else {
                       setBirthdayNumber(Number(text.replace('.', '').replace(',', '')).toFixed(0));
                     }
                   }}
-                  editable={info.latestBlock ? true : false}
+                  editable={latestBlock ? true : false}
                   keyboardType="numeric"
                 />
               </View>

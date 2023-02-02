@@ -1,6 +1,6 @@
 //
 //  RPCModule.m
-//  ZingoMobile
+//  Zingo!
 //
 //  Created by Aditya Kulkarni on 5/18/20.
 //
@@ -395,35 +395,22 @@ RCT_REMAP_METHOD(execute,
 }
 
 // initialize light client
-RCT_REMAP_METHOD(initLightClient,
+RCT_REMAP_METHOD(getLatestBlock,
                  server:(NSString*)server
-                 initLightClientWithResolver:(RCTPromiseResolveBlock)resolve
+                 getLatestBlockWithResolver:(RCTPromiseResolveBlock)resolve
                  rejected:(RCTPromiseRejectBlock)reject) {
 
   NSDictionary* dict = [NSDictionary dictionaryWithObjectsAndKeys:server, @"server", resolve, @"resolve", nil];
 
-  [NSThread detachNewThreadSelector:@selector(initLightClient:) toTarget:self withObject:dict];
+  [NSThread detachNewThreadSelector:@selector(getLatestBlock:) toTarget:self withObject:dict];
 }
 
--(void) initLightClient:(NSDictionary *)dict {
+-(void) getLatestBlock:(NSDictionary *)dict {
   @autoreleasepool {
     NSString* server = dict[@"server"];
     RCTPromiseResolveBlock resolve = dict[@"resolve"];
     
-    NSString* pathSaplingOutput = [[NSBundle mainBundle]
-                      pathForResource:@"saplingoutput" ofType:@""];
-    NSData* saplingOutput = [NSData dataWithContentsOfFile:pathSaplingOutput];
-
-
-    NSString* pathSaplingSpend = [[NSBundle mainBundle]
-                      pathForResource:@"saplingspend" ofType:@""];
-    NSData* saplingSpend = [NSData dataWithContentsOfFile:pathSaplingSpend];
-
-    NSArray *paths = NSSearchPathForDirectoriesInDomains
-                    (NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectory = [paths objectAtIndex:0];
-
-    char* resp = init_light_client([server UTF8String], [[saplingOutput base64EncodedStringWithOptions:0] UTF8String], [[saplingSpend base64EncodedStringWithOptions:0] UTF8String], [documentsDirectory UTF8String]);
+    char* resp = get_latest_block([server UTF8String]);
     NSString* respStr = [NSString stringWithUTF8String:resp];
     rust_free(resp);
 
