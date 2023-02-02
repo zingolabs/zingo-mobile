@@ -8,6 +8,7 @@ buildscript {
         compileSdkVersion = 31
         targetSdkVersion = 31
         ndkVersion = "25.1.8937393"
+        kotlinVersion = '1.7.10'
     }
     repositories {
         google()
@@ -42,7 +43,10 @@ allprojects {
             // Android JSC is installed from npm
             url("$rootDir/../node_modules/jsc-android/dist")
         }
-       maven {
+        maven {
+            url("$rootDir/../node_modules/detox/Detox-android")
+        }
+        maven {
             url 'https://www.jitpack.io'
         }
     }
