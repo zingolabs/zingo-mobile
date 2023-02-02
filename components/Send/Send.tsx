@@ -1,9 +1,9 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useRef, useCallback, useContext } from 'react';
 import { View, ScrollView, Modal, Image, Alert, Keyboard, TextInput, TouchableOpacity } from 'react-native';
-import { faQrcode, faCheck, faInfo } from '@fortawesome/free-solid-svg-icons';
+import { faQrcode, faCheck, faInfo, faPlay, faStop } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { useTheme } from '@react-navigation/native';
+import { useTheme, useIsFocused } from '@react-navigation/native';
 import Toast from 'react-native-simple-toast';
 import { getNumberFormatSettings } from 'react-native-localize';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
@@ -24,6 +24,7 @@ import Confirm from './components/Confirm';
 import { ThemeType } from '../../app/types';
 import { ContextLoaded } from '../../app/context';
 import PriceFetcher from '../Components/PriceFetcher';
+import RPC from '../../app/rpc';
 
 type SendProps = {
   setSendPageState: (sendPageState: SendPageStateClass) => void;
@@ -69,6 +70,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [validAddress, setValidAddress] = useState(0); // 1 - OK, 0 - Empty, -1 - KO
   const [validAmount, setValidAmount] = useState(0); // 1 - OK, 0 - Empty, -1 - KO
   const [sendButtonEnabled, setSendButtonEnabled] = useState(false);
+  const isFocused = useIsFocused();
 
   const slideAnim = useRef(new Animated.Value(0)).current;
   const defaultFee = info.defaultFee || Utils.getFallbackDefaultFee();
@@ -340,6 +342,16 @@ const Send: React.FunctionComponent<SendProps> = ({
     });
   };
 
+  useEffect(() => {
+    (async () => {
+      if (isFocused) {
+        await RPC.rpc_setInterruptSyncAfterBatch('true');
+      } else {
+        await RPC.rpc_setInterruptSyncAfterBatch('false');
+      }
+    })();
+  }, [isFocused]);
+
   //console.log('render send', 'w', dimensions.width, 'h', dimensions.height);
 
   const returnPortrait = (
@@ -456,7 +468,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexWrap: 'wrap',
-                marginVertical: syncStatusDisplayLine ? 0 : 5,
+                marginVertical: 5,
               }}>
               <View
                 style={{
@@ -467,13 +479,44 @@ const Send: React.FunctionComponent<SendProps> = ({
                   flexWrap: 'wrap',
                 }}>
                 <RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
+                  {translate('send.title')}
+                </RegText>
+                {/*<RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
                   {syncStatusDisplayLine ? translate('send.title-syncing') : translate('send.title')}
                 </RegText>
                 {!!syncStatusDisplayLine && (
                   <FadeText style={{ margin: 0, padding: 0 }}>{syncStatusDisplayLine}</FadeText>
+                )}*/}
+              </View>
+              <View
+                style={{
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: 0,
+                  padding: 1,
+                  borderColor: colors.primary,
+                  borderWidth: 1,
+                  borderRadius: 10,
+                  minWidth: 20,
+                  minHeight: 20,
+                }}>
+                {!syncStatusDisplayLine && syncingStatus.synced && (
+                  <View style={{ margin: 0, padding: 0 }}>
+                    <FontAwesomeIcon icon={faCheck} color={colors.primary} />
+                  </View>
+                )}
+                {!syncStatusDisplayLine && !syncingStatus.synced && (
+                  <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
+                    <FontAwesomeIcon icon={faStop} color={colors.zingo} size={12} />
+                  </TouchableOpacity>
+                )}
+                {syncStatusDisplayLine && (
+                  <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
+                    <FontAwesomeIcon icon={faPlay} color={colors.primary} size={10} />
+                  </TouchableOpacity>
                 )}
               </View>
-              {!!syncStatusDisplayLine && (
+              {/*!!syncStatusDisplayLine && (
                 <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
                   <View
                     style={{
@@ -493,7 +536,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                     <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
                   </View>
                 </TouchableOpacity>
-              )}
+                )*/}
             </View>
           </View>
         </View>
@@ -966,7 +1009,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                   alignItems: 'center',
                   justifyContent: 'center',
                   flexWrap: 'wrap',
-                  marginVertical: syncStatusDisplayLine ? 0 : 5,
+                  marginVertical: 5,
                 }}>
                 <View
                   style={{
@@ -977,13 +1020,44 @@ const Send: React.FunctionComponent<SendProps> = ({
                     flexWrap: 'wrap',
                   }}>
                   <RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
+                    {translate('send.title')}
+                  </RegText>
+                  {/*<RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
                     {syncStatusDisplayLine ? translate('send.title-syncing') : translate('send.title')}
                   </RegText>
                   {!!syncStatusDisplayLine && (
                     <FadeText style={{ margin: 0, padding: 0 }}>{syncStatusDisplayLine}</FadeText>
+                  )}*/}
+                </View>
+                <View
+                  style={{
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: 0,
+                    padding: 1,
+                    borderColor: colors.primary,
+                    borderWidth: 1,
+                    borderRadius: 10,
+                    minWidth: 20,
+                    minHeight: 20,
+                  }}>
+                  {!syncStatusDisplayLine && syncingStatus.synced && (
+                    <View style={{ margin: 0, padding: 0 }}>
+                      <FontAwesomeIcon icon={faCheck} color={colors.primary} />
+                    </View>
+                  )}
+                  {!syncStatusDisplayLine && !syncingStatus.synced && (
+                    <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
+                      <FontAwesomeIcon icon={faStop} color={colors.zingo} size={12} />
+                    </TouchableOpacity>
+                  )}
+                  {syncStatusDisplayLine && (
+                    <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
+                      <FontAwesomeIcon icon={faPlay} color={colors.primary} size={10} />
+                    </TouchableOpacity>
                   )}
                 </View>
-                {!!syncStatusDisplayLine && (
+                {/*!!syncStatusDisplayLine && (
                   <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
                     <View
                       style={{
@@ -1003,7 +1077,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
                     </View>
                   </TouchableOpacity>
-                )}
+                  )*/}
               </View>
 
               <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />

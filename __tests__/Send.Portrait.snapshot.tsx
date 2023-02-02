@@ -8,6 +8,7 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import Send from '../components/Send';
 import { defaultAppStateLoaded, ContextLoadedProvider } from '../app/context';
+import { ThemeType } from '../app/types';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -41,6 +42,25 @@ jest.mock('react-native', () => {
 
   return RN;
 });
+const Theme: ThemeType = {
+  dark: true,
+  colors: {
+    background: '#011401', //'#010101',
+    card: '#011401', //'#401717',
+    border: '#ffffff',
+    primary: '#18bd18', //'#df4100',
+    primaryDisabled: 'rgba(90, 140, 90, 1)',
+    text: '#c3c3c3',
+    zingo: '#888888',
+    placeholder: '#888888',
+    money: '#ffffff',
+    notification: '',
+  },
+};
+jest.mock('@react-navigation/native', () => ({
+  useIsFocused: jest.fn(),
+  useTheme: () => Theme,
+}));
 
 // test suite
 describe('Component Send - test', () => {

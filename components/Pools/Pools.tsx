@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { View, ScrollView, SafeAreaView, Image } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
@@ -10,6 +10,7 @@ import Button from '../Button';
 import DetailLine from './components/DetailLine';
 import { ThemeType } from '../../app/types';
 import { ContextLoaded } from '../../app/context';
+import RPC from '../../app/rpc';
 
 type PoolsProps = {
   closeModal: () => void;
@@ -19,6 +20,10 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal }) => {
   const context = useContext(ContextLoaded);
   const { totalBalance, info, translate } = context;
   const { colors } = useTheme() as unknown as ThemeType;
+
+  useEffect(() => {
+    (async () => await RPC.rpc_setInterruptSyncAfterBatch('false'))();
+  }, []);
 
   //console.log(totalBalance);
 

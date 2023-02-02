@@ -14,6 +14,7 @@ import {
   ScaledSize,
   AppState,
   NativeEventSubscription,
+  Platform,
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { I18n, TranslateOptions } from 'i18n-js';
@@ -243,12 +244,15 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
       await AsyncStorage.setItem('@server', this.state.server);
       if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
         console.log('App has come to the foreground!');
-        // reading background task info IOS
-        const backgroundJson = await BackgroundFileImpl.readBackground();
-        if (backgroundJson) {
-          this.setState({
-            background: backgroundJson,
-          });
+        // reading background task info
+        if (Platform.OS === 'ios') {
+          // this file only exists in IOS BS.
+          const backgroundJson = await BackgroundFileImpl.readBackground();
+          if (backgroundJson) {
+            this.setState({
+              background: backgroundJson,
+            });
+          }
         }
         // setting value for background task Android
         await AsyncStorage.setItem('@background', 'no');

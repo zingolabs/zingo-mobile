@@ -10,6 +10,7 @@ import {
   ScaledSize,
   AppState,
   NativeEventSubscription,
+  Platform,
 } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -155,10 +156,13 @@ export default function LoadedApp(props: LoadedAppProps) {
     }
 
     // reading background task info
-    const backgroundJson = await BackgroundFileImpl.readBackground();
-    //console.log('background', backgroundJson);
-    if (backgroundJson) {
-      setBackground(backgroundJson);
+    if (Platform.OS === 'ios') {
+      // this file only exists in IOS BS.
+      const backgroundJson = await BackgroundFileImpl.readBackground();
+      //console.log('background', backgroundJson);
+      if (backgroundJson) {
+        setBackground(backgroundJson);
+      }
     }
   }, [currency, file, i18n, sendAll, server]);
 
@@ -272,7 +276,10 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
         console.log('App has come to the foreground!');
         // reading background task info
-        this.fetchBackgroundSyncing();
+        if (Platform.OS === 'ios') {
+          // this file only exists in IOS BS.
+          this.fetchBackgroundSyncing();
+        }
         this.rpc.setInRefresh(false);
         this.rpc.configure();
         // setting value for background task Android
@@ -281,6 +288,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       if (nextAppState.match(/inactive|background/) && this.state.appState === 'active') {
         console.log('App is gone to the background!');
         this.rpc.clearTimers();
+        // if the App go to the background, we don't want to stop the syncing, mostly in Android.
+        await RPC.rpc_setInterruptSyncAfterBatch('false');
         this.setState({
           syncingStatusReport: new SyncingStatusReportClass(),
           syncingStatus: {} as SyncingStatusType,
@@ -375,11 +384,12 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     this.setState({ sendPageState });
   };
 
-  refreshUpdates = (inProgress: boolean, progress: number, blocks: string) => {
+  refreshUpdates = (inProgress: boolean, progress: number, blocks: string, synced: boolean) => {
     const syncingStatus: SyncingStatusType = {
       inProgress,
       progress,
       blocks,
+      synced,
     };
     if (!isEqual(this.state.syncingStatus, syncingStatus)) {
       this.setState({ syncingStatus });

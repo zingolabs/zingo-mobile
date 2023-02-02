@@ -15,6 +15,7 @@ import { ThemeType } from '../../app/types';
 import { ContextLoaded, ContextLoading } from '../../app/context';
 import { InfoType, TotalBalanceClass, WalletSeedType } from '../../app/AppState';
 import RPCModule from '../RPCModule';
+import RPC from '../../app/rpc';
 
 type TextsType = {
   new: string[];
@@ -123,7 +124,11 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
         }
       })();
     }
-  }, [info.latestBlock, latestBlock]);
+  }, [info.latestBlock, latestBlock, server]);
+
+  useEffect(() => {
+    (async () => await RPC.rpc_setInterruptSyncAfterBatch('false'))();
+  }, []);
 
   //console.log('=================================');
   //console.log(walletSeed.seed, walletSeed.birthday);
@@ -264,10 +269,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
           ) : (
             <>
               <FadeText style={{ textAlign: 'center' }}>
-                {translate('seed.birthday-no-readonly') +
-                  ' (1, ' +
-                  (latestBlock ? latestBlock.toString() : '--') +
-                  ')'}
+                {translate('seed.birthday-no-readonly') + ' (1, ' + (latestBlock ? latestBlock.toString() : '--') + ')'}
               </FadeText>
               <View
                 accessible={true}
