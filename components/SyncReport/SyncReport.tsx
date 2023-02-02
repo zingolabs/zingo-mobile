@@ -10,6 +10,7 @@ import DetailLine from './components/DetailLine';
 import { ContextLoaded } from '../../app/context';
 import moment from 'moment';
 import 'moment/locale/es';
+import RPC from '../../app/rpc';
 
 type SyncReportProps = {
   closeModal: () => void;
@@ -45,6 +46,10 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
   useEffect(() => {
     setBirthday_plus_1((walletSeed.birthday || 0) + 1);
   }, [walletSeed.birthday]);
+
+  useEffect(() => {
+    (async () => await RPC.rpc_setInterruptSyncAfterBatch('false'))();
+  }, []);
 
   const server_1: number = birthday_plus_1 || 0;
   const server_2: number =
