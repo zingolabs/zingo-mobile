@@ -23,6 +23,7 @@ import { RPCSaplingNoteType } from './types/RPCSaplingNoteType';
 import { RPCUtxoNoteType } from './types/RPCUtxoNoteType';
 import { RPCTransactionType } from './types/RPCTransationType';
 import { RPCOutgoingMetadataType } from './types/RPCOutgoingMetadataType';
+import { Platform } from 'react-native';
 
 export default class RPC {
   fnSetSyncingStatusReport: (syncingStatusReport: SyncingStatusReportClass) => void;
@@ -457,7 +458,10 @@ export default class RPC {
     // And fetch the rest of the data.
     await this.loadWalletData();
 
-    this.fetchBackgroundSyncing();
+    if (Platform.OS === 'ios') {
+      // this file only exists in IOS BS.
+      this.fetchBackgroundSyncing();
+    }
 
     //console.log(`Finished update data at ${lastServerBlockHeight}`);
     this.updateDataLock = false;
