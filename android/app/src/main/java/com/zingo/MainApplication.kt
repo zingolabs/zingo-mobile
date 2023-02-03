@@ -2,7 +2,10 @@ package com.zingo
 
 import android.app.Application
 import android.content.Context
+import android.content.Intent
 import com.facebook.react.*
+import com.facebook.react.bridge.*
+import com.facebook.react.jstasks.HeadlessJsTaskConfig
 import com.facebook.soloader.SoLoader
 import java.lang.reflect.InvocationTargetException
 
@@ -35,7 +38,8 @@ class MainApplication : Application(), ReactApplication {
 
     override fun onCreate() {
         super.onCreate()
-        MainApplication.context = getApplicationContext();
+        MainApplication.context = getApplicationContext()
+
 
         SoLoader.init(this, false)
         // initializeFlipper(this, reactNativeHost.reactInstanceManager)
@@ -84,3 +88,4 @@ class MainApplication : Application(), ReactApplication {
         }
     }
 }
+

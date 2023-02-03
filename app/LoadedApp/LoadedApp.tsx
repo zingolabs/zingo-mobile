@@ -10,6 +10,7 @@ import {
   ScaledSize,
   AppState,
   NativeEventSubscription,
+  Platform,
 } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -49,6 +50,7 @@ import { ContextLoadedProvider, defaultAppStateLoaded } from '../context';
 import platform from '../platform/platform';
 import { serverUris } from '../uris';
 import BackgroundFileImpl from '../../components/Background/BackgroundFileImpl';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Transactions = React.lazy(() => import('../../components/Transactions'));
 const Send = React.lazy(() => import('../../components/Send'));
@@ -154,10 +156,13 @@ export default function LoadedApp(props: LoadedAppProps) {
     }
 
     // reading background task info
-    const backgroundJson = await BackgroundFileImpl.readBackground();
-    //console.log('background', backgroundJson);
-    if (backgroundJson) {
-      setBackground(backgroundJson);
+    if (Platform.OS === 'ios') {
+      // this file only exists in IOS BS.
+      const backgroundJson = await BackgroundFileImpl.readBackground();
+      //console.log('background', backgroundJson);
+      if (backgroundJson) {
+        setBackground(backgroundJson);
+      }
     }
   }, [currency, file, i18n, sendAll, server]);
 
@@ -267,20 +272,30 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     });
 
     this.appstate = AppState.addEventListener('change', async nextAppState => {
+      await AsyncStorage.setItem('@server', this.state.server);
       if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
         console.log('App has come to the foreground!');
         // reading background task info
-        this.fetchBackgroundSyncing();
+        if (Platform.OS === 'ios') {
+          // this file only exists in IOS BS.
+          this.fetchBackgroundSyncing();
+        }
         this.rpc.setInRefresh(false);
         this.rpc.configure();
+        // setting value for background task Android
+        await AsyncStorage.setItem('@background', 'no');
       }
       if (nextAppState.match(/inactive|background/) && this.state.appState === 'active') {
         console.log('App is gone to the background!');
+        this.rpc.clearTimers();
+        // if the App go to the background, we don't want to stop the syncing, mostly in Android.
+        await RPC.rpc_setInterruptSyncAfterBatch('false');
         this.setState({
           syncingStatusReport: new SyncingStatusReportClass(),
           syncingStatus: {} as SyncingStatusType,
         });
-        this.rpc.clearTimers();
+        // setting value for background task Android
+        await AsyncStorage.setItem('@background', 'yes');
       }
       this.setState({ appState: nextAppState });
     });
@@ -369,11 +384,12 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     this.setState({ sendPageState });
   };
 
-  refreshUpdates = (inProgress: boolean, progress: number, blocks: string) => {
+  refreshUpdates = (inProgress: boolean, progress: number, blocks: string, synced: boolean) => {
     const syncingStatus: SyncingStatusType = {
       inProgress,
       progress,
       blocks,
+      synced,
     };
     if (!isEqual(this.state.syncingStatus, syncingStatus)) {
       this.setState({ syncingStatus });

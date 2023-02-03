@@ -30,7 +30,7 @@ export default class RPC {
   fnSetTotalBalance: (totalBalance: TotalBalanceClass) => void;
   fnSetTransactionsList: (txList: TransactionType[]) => void;
   fnSetAllAddresses: (allAddresses: AddressClass[]) => void;
-  fnSetRefreshUpdates: (inProgress: boolean, progress: number, blocks: string) => void;
+  fnSetRefreshUpdates: (inProgress: boolean, progress: number, blocks: string, synced: boolean) => void;
   fnSetWalletSettings: (settings: WalletSettingsClass) => void;
   translate: (key: string, config?: TranslateOptions) => string;
   fetchBackgroundSyncing: () => void;
@@ -64,7 +64,7 @@ export default class RPC {
     fnSetAllAddresses: (addresses: AddressClass[]) => void,
     fnSetWalletSettings: (settings: WalletSettingsClass) => void,
     fnSetInfo: (info: InfoType) => void,
-    fnSetRefreshUpdates: (inProgress: boolean, progress: number, blocks: string) => void,
+    fnSetRefreshUpdates: (inProgress: boolean, progress: number, blocks: string, synced: boolean) => void,
     translate: (key: string, config?: TranslateOptions) => string,
     fetchBackgroundSyncing: () => void,
   ) {
@@ -97,6 +97,11 @@ export default class RPC {
     this.batches = 0;
     this.message = '';
     this.process_end_block = -1;
+  }
+
+  static async rpc_setInterruptSyncAfterBatch(value: string): Promise<void> {
+    const resp = await RPCModule.execute('interrupt_sync_after_batch', value);
+    console.log('interrupt sync', value, resp);
   }
 
   static async rpc_getZecPrice(): Promise<number> {
@@ -370,7 +375,7 @@ export default class RPC {
   async doSync(): Promise<string> {
     const syncstr = await RPCModule.execute('sync', '');
 
-    //console.log(`Sync exec result: ${syncstr}`);
+    console.log(`Sync exec result: ${syncstr}`);
 
     if (syncstr) {
       return syncstr;
@@ -627,6 +632,7 @@ export default class RPC {
           `${current_block ? current_block.toFixed(0).toString() : ''} ${this.translate('rpc.of')} ${
             this.lastServerBlockHeight ? this.lastServerBlockHeight.toString() : ''
           }`,
+          this.lastServerBlockHeight === this.lastWalletBlockHeight,
         );
 
         // store SyncStatusReport object for a new screen
@@ -672,7 +678,7 @@ export default class RPC {
           this.message = this.translate('rpc.syncend-message');
 
           // I know it's finished.
-          this.fnSetRefreshUpdates(false, 0, '');
+          this.fnSetRefreshUpdates(false, 0, '', this.lastServerBlockHeight === this.lastWalletBlockHeight);
 
           // store SyncStatusReport object for a new screen
           const statusFinished: SyncingStatusReportClass = {

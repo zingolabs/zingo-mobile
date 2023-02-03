@@ -42,7 +42,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "rgb(255, 255, 255)",
+            "backgroundColor": "#011401",
             "display": "flex",
             "zIndex": -1,
           }
@@ -52,7 +52,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
           style={
             {
               "alignItems": "center",
-              "backgroundColor": "rgb(255, 255, 255)",
+              "backgroundColor": "#011401",
               "display": "flex",
               "padding": 10,
               "width": "100%",
@@ -103,7 +103,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                 style={
                   {
                     "alignItems": "flex-end",
-                    "backgroundColor": "rgb(255, 255, 255)",
+                    "backgroundColor": "#011401",
                     "borderRadius": 10,
                     "display": "flex",
                     "flexDirection": "row",
@@ -118,7 +118,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                 <Text
                   style={
                     {
-                      "color": "rgb(0, 122, 255)",
+                      "color": "#18bd18",
                       "fontSize": 18,
                       "fontWeight": "600",
                       "opacity": 1,
@@ -128,7 +128,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                   text translated
                 </Text>
                 <
-                  color="rgb(0, 122, 255)"
+                  color="#18bd18"
                   icon={
                     {
                       "icon": [
@@ -162,7 +162,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
               <Text
                 style={
                   {
-                    "color": undefined,
+                    "color": "#ffffff",
                     "fontSize": 36,
                   }
                 }
@@ -172,7 +172,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
               <Text
                 style={
                   {
-                    "color": undefined,
+                    "color": "#ffffff",
                     "fontSize": 36,
                     "fontWeight": "700",
                   }
@@ -183,7 +183,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
               <Text
                 style={
                   {
-                    "color": undefined,
+                    "color": "#ffffff",
                     "fontSize": 18,
                     "paddingBottom": 0,
                   }
@@ -194,7 +194,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
               <Text
                 style={
                   {
-                    "color": undefined,
+                    "color": "#ffffff",
                     "fontSize": 36,
                   }
                 }
@@ -221,7 +221,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                 <Text
                   style={
                     {
-                      "color": undefined,
+                      "color": "#ffffff",
                       "fontSize": 20,
                       "marginBottom": 5,
                       "marginTop": 0,
@@ -233,7 +233,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                 <Text
                   style={
                     {
-                      "color": undefined,
+                      "color": "#ffffff",
                       "fontSize": 20,
                       "fontWeight": "700",
                       "marginBottom": 5,
@@ -246,7 +246,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                 <Text
                   style={
                     {
-                      "color": undefined,
+                      "color": "#ffffff",
                       "fontSize": 20,
                       "marginBottom": 5,
                       "marginTop": 0,
@@ -284,7 +284,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                     style={
                       {
                         "alignItems": "center",
-                        "backgroundColor": "rgb(255, 255, 255)",
+                        "backgroundColor": "#011401",
                         "borderRadius": 10,
                         "flexDirection": "row",
                         "justifyContent": "center",
@@ -296,7 +296,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                     }
                   >
                     <
-                      color="rgb(0, 122, 255)"
+                      color="#18bd18"
                       icon={
                         {
                           "icon": [
@@ -324,7 +324,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
           <View
             style={
               {
-                "backgroundColor": "rgb(0, 122, 255)",
+                "backgroundColor": "#18bd18",
                 "height": 1,
                 "marginTop": 5,
                 "width": "100%",
@@ -357,7 +357,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
               <Text
                 style={
                   {
-                    "color": "rgb(28, 28, 30)",
+                    "color": "#ffffff",
                     "fontSize": 18,
                     "fontWeight": "600",
                     "opacity": 1,
@@ -368,11 +368,64 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                 text translated
               </Text>
             </View>
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "borderColor": "#18bd18",
+                  "borderRadius": 10,
+                  "borderWidth": 1,
+                  "justifyContent": "center",
+                  "margin": 0,
+                  "minHeight": 20,
+                  "minWidth": 20,
+                  "padding": 1,
+                }
+              }
+            >
+              <View
+                accessible={true}
+                collapsable={false}
+                focusable={true}
+                onClick={[Function]}
+                onResponderGrant={[Function]}
+                onResponderMove={[Function]}
+                onResponderRelease={[Function]}
+                onResponderTerminate={[Function]}
+                onResponderTerminationRequest={[Function]}
+                onStartShouldSetResponder={[Function]}
+                style={
+                  {
+                    "opacity": 1,
+                  }
+                }
+              >
+                <
+                  color="#888888"
+                  icon={
+                    {
+                      "icon": [
+                        384,
+                        512,
+                        [
+                          9209,
+                        ],
+                        "f04d",
+                        "M0 128C0 92.7 28.7 64 64 64H320c35.3 0 64 28.7 64 64V384c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V128z",
+                      ],
+                      "iconName": "stop",
+                      "prefix": "fas",
+                    }
+                  }
+                  size={12}
+                />
+              </View>
+            </View>
           </View>
           <View
             style={
               {
-                "backgroundColor": "rgb(0, 122, 255)",
+                "backgroundColor": "#18bd18",
                 "height": 1,
                 "width": "100%",
               }
@@ -384,7 +437,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
     <View
       style={
         {
-          "backgroundColor": "rgb(255, 255, 255)",
+          "backgroundColor": "#011401",
           "padding": 10,
           "position": "absolute",
         }
@@ -409,7 +462,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
         }
       >
         <
-          color="rgb(216, 216, 216)"
+          color="#ffffff"
           icon={
             {
               "icon": [
@@ -434,7 +487,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
     style={
       {
         "alignItems": "center",
-        "borderLeftColor": "rgb(216, 216, 216)",
+        "borderLeftColor": "#ffffff",
         "borderLeftWidth": 1,
         "height": "100%",
         "padding": 0,
@@ -476,7 +529,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
               <Text
                 style={
                   {
-                    "color": "rgb(28, 28, 30)",
+                    "color": "#c3c3c3",
                     "fontSize": 18,
                     "fontWeight": "600",
                     "opacity": 1,
@@ -489,7 +542,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
             <View
               style={
                 {
-                  "borderColor": "rgb(28, 28, 30)",
+                  "borderColor": "#c3c3c3",
                   "borderRadius": 5,
                   "borderWidth": 1,
                   "flex": 1,
@@ -518,9 +571,10 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                     editable={true}
                     onChangeText={[Function]}
                     placeholder="text translated"
+                    placeholderTextColor="#888888"
                     style={
                       {
-                        "color": "rgb(28, 28, 30)",
+                        "color": "#c3c3c3",
                         "fontSize": 16,
                         "fontWeight": "600",
                         "marginLeft": 5,
@@ -555,7 +609,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                     }
                   >
                     <
-                      color="rgb(216, 216, 216)"
+                      color="#ffffff"
                       icon={
                         {
                           "icon": [
@@ -617,7 +671,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                   <Text
                     style={
                       {
-                        "color": "rgb(28, 28, 30)",
+                        "color": "#c3c3c3",
                         "opacity": 0.65,
                       }
                     }
@@ -629,7 +683,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
               <Text
                 style={
                   {
-                    "color": "rgb(0, 122, 255)",
+                    "color": "#18bd18",
                   }
                 }
               >
@@ -667,7 +721,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                   <Text
                     style={
                       {
-                        "color": "rgb(28, 28, 30)",
+                        "color": "#c3c3c3",
                         "fontSize": 20,
                         "fontWeight": "600",
                         "marginRight": 5,
@@ -683,7 +737,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                     accessible={true}
                     style={
                       {
-                        "borderColor": "rgb(28, 28, 30)",
+                        "borderColor": "#c3c3c3",
                         "borderRadius": 5,
                         "borderWidth": 1,
                         "flexGrow": 1,
@@ -701,9 +755,10 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                       onChangeText={[Function]}
                       onEndEditing={[Function]}
                       placeholder="#.########"
+                      placeholderTextColor="#888888"
                       style={
                         {
-                          "color": "rgb(28, 28, 30)",
+                          "color": "#c3c3c3",
                           "fontSize": 18,
                           "fontWeight": "600",
                           "marginLeft": 5,
@@ -717,7 +772,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                   <Text
                     style={
                       {
-                        "color": "rgb(28, 28, 30)",
+                        "color": "#c3c3c3",
                         "fontSize": 18,
                         "fontWeight": "600",
                         "marginLeft": 5,
@@ -752,7 +807,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                     <Text
                       style={
                         {
-                          "color": "rgb(28, 28, 30)",
+                          "color": "#c3c3c3",
                           "fontSize": 14,
                           "fontWeight": "600",
                           "opacity": 1,
@@ -833,7 +888,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                     <View
                       style={
                         {
-                          "backgroundColor": "rgb(255, 255, 255)",
+                          "backgroundColor": "#011401",
                           "borderRadius": 10,
                           "display": "flex",
                           "flexDirection": "row",
@@ -843,7 +898,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                       }
                     >
                       <
-                        color="rgb(0, 122, 255)"
+                        color="#18bd18"
                         icon={
                           {
                             "icon": [
@@ -862,7 +917,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                       <Text
                         style={
                           {
-                            "color": "rgb(28, 28, 30)",
+                            "color": "#c3c3c3",
                             "opacity": 0.65,
                           }
                         }
@@ -895,7 +950,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                   <Text
                     style={
                       {
-                        "color": "rgb(28, 28, 30)",
+                        "color": "#c3c3c3",
                         "fontSize": 18,
                         "fontWeight": "600",
                         "marginRight": 5,
@@ -911,7 +966,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                     accessible={true}
                     style={
                       {
-                        "borderColor": "rgb(28, 28, 30)",
+                        "borderColor": "#c3c3c3",
                         "borderRadius": 5,
                         "borderWidth": 1,
                         "flexGrow": 1,
@@ -929,9 +984,10 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                       onChangeText={[Function]}
                       onEndEditing={[Function]}
                       placeholder="#.##"
+                      placeholderTextColor="#888888"
                       style={
                         {
-                          "color": "rgb(28, 28, 30)",
+                          "color": "#c3c3c3",
                           "fontSize": 18,
                           "fontWeight": "600",
                           "marginLeft": 5,
@@ -945,7 +1001,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                   <Text
                     style={
                       {
-                        "color": "rgb(28, 28, 30)",
+                        "color": "#c3c3c3",
                         "fontSize": 18,
                         "fontWeight": "600",
                         "marginLeft": 5,
@@ -976,7 +1032,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                     <Text
                       style={
                         {
-                          "color": undefined,
+                          "color": "#ffffff",
                           "fontSize": 13,
                           "marginTop": 10,
                         }
@@ -987,7 +1043,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                     <Text
                       style={
                         {
-                          "color": undefined,
+                          "color": "#ffffff",
                           "fontSize": 13,
                           "fontWeight": "700",
                           "marginTop": 10,
@@ -999,7 +1055,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                     <Text
                       style={
                         {
-                          "color": undefined,
+                          "color": "#ffffff",
                           "fontSize": 13,
                           "marginTop": 10,
                         }
@@ -1036,7 +1092,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                         style={
                           {
                             "alignItems": "center",
-                            "backgroundColor": "rgb(255, 255, 255)",
+                            "backgroundColor": "#011401",
                             "borderRadius": 10,
                             "flexDirection": "row",
                             "justifyContent": "center",
@@ -1048,7 +1104,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                         }
                       >
                         <
-                          color="rgb(0, 122, 255)"
+                          color="#18bd18"
                           icon={
                             {
                               "icon": [
@@ -1101,8 +1157,8 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
               style={
                 {
                   "alignItems": "center",
-                  "backgroundColor": undefined,
-                  "borderColor": "rgb(0, 122, 255)",
+                  "backgroundColor": "rgba(90, 140, 90, 1)",
+                  "borderColor": "#18bd18",
                   "borderRadius": 10,
                   "borderWidth": 2,
                   "justifyContent": "center",
@@ -1133,7 +1189,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                 <Text
                   style={
                     {
-                      "color": "rgb(242, 242, 242)",
+                      "color": "#011401",
                       "fontSize": 16,
                       "fontWeight": "bold",
                       "textTransform": "uppercase",
@@ -1158,7 +1214,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
               style={
                 {
                   "alignItems": "center",
-                  "borderColor": "rgb(0, 122, 255)",
+                  "borderColor": "#18bd18",
                   "borderRadius": 10,
                   "borderWidth": 2,
                   "justifyContent": "center",
@@ -1190,7 +1246,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                 <Text
                   style={
                     {
-                      "color": "rgb(0, 122, 255)",
+                      "color": "#18bd18",
                       "fontSize": 16,
                       "fontWeight": "bold",
                       "textTransform": "uppercase",

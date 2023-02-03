@@ -185,13 +185,10 @@ pub unsafe extern "C" fn Java_com_zingo_RPCModule_execute(
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn Java_com_zingo_RPCModule_initlightclient(
+pub unsafe extern "C" fn Java_com_zingo_RPCModule_getlatestblock(
     env: JNIEnv,
     _: JObject,
     j_serveruri: JString,
-    j_sapling_output: JString,
-    j_sapling_spend: JString,
-    j_data_dir: JString,
 ) -> jstring {
     let server_uri = CString::from(CStr::from_ptr(
         env.get_string(j_serveruri).unwrap().as_ptr(),
@@ -199,22 +196,7 @@ pub unsafe extern "C" fn Java_com_zingo_RPCModule_initlightclient(
     .into_string()
     .unwrap();
 
-    let sapling_output = CString::from(CStr::from_ptr(
-        env.get_string(j_sapling_output).unwrap().as_ptr(),
-    ))
-    .into_string()
-    .unwrap();
-    let sapling_spend = CString::from(CStr::from_ptr(
-        env.get_string(j_sapling_spend).unwrap().as_ptr(),
-    ))
-    .into_string()
-    .unwrap();
-
-    let data_dir = CString::from(CStr::from_ptr(env.get_string(j_data_dir).unwrap().as_ptr()))
-        .into_string()
-        .unwrap();
-
-    let resp = rustlib::init_light_client(server_uri, sapling_output, sapling_spend, data_dir);
+    let resp = rustlib::get_latest_block(server_uri);
 
     let output = env.new_string(resp.as_str()).unwrap();
     output.into_inner()

@@ -5,10 +5,9 @@ import { TabView, TabBar, SceneRendererProps, Route, NavigationState } from 'rea
 import Toast from 'react-native-simple-toast';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faBars, faEllipsisV, faInfo } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faCheck, faPlay, faStop, faInfo, faEllipsisV } from '@fortawesome/free-solid-svg-icons';
 import OptionsMenu from 'react-native-option-menu';
 
-import FadeText from '../Components/FadeText';
 import ZecAmount from '../Components/ZecAmount';
 import CurrencyAmount from '../Components/CurrencyAmount';
 import RegText from '../Components/RegText';
@@ -344,7 +343,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexWrap: 'wrap',
-                marginVertical: syncStatusDisplayLine ? 0 : 5,
+                marginVertical: 5,
               }}>
               <View
                 style={{
@@ -355,13 +354,44 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                   flexWrap: 'wrap',
                 }}>
                 <RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
+                  {translate('receive.title')}
+                </RegText>
+                {/*<RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
                   {syncStatusDisplayLine ? translate('receive.title-syncing') : translate('receive.title')}
                 </RegText>
                 {!!syncStatusDisplayLine && (
                   <FadeText style={{ margin: 0, padding: 0 }}>{syncStatusDisplayLine}</FadeText>
+                )}*/}
+              </View>
+              <View
+                style={{
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: 0,
+                  padding: 1,
+                  borderColor: colors.primary,
+                  borderWidth: 1,
+                  borderRadius: 10,
+                  minWidth: 20,
+                  minHeight: 20,
+                }}>
+                {!syncStatusDisplayLine && syncingStatus.synced && (
+                  <View style={{ margin: 0, padding: 0 }}>
+                    <FontAwesomeIcon icon={faCheck} color={colors.primary} />
+                  </View>
+                )}
+                {!syncStatusDisplayLine && !syncingStatus.synced && (
+                  <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
+                    <FontAwesomeIcon icon={faStop} color={colors.zingo} size={12} />
+                  </TouchableOpacity>
+                )}
+                {syncStatusDisplayLine && (
+                  <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
+                    <FontAwesomeIcon icon={faPlay} color={colors.primary} size={10} />
+                  </TouchableOpacity>
                 )}
               </View>
-              {!!syncStatusDisplayLine && (
+              {/*!!syncStatusDisplayLine && (
                 <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
                   <View
                     style={{
@@ -381,7 +411,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                     <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
                   </View>
                 </TouchableOpacity>
-              )}
+                )*/}
             </View>
           </View>
         </View>
@@ -553,7 +583,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexWrap: 'wrap',
-                marginVertical: syncStatusDisplayLine ? 0 : 5,
+                marginVertical: 5,
               }}>
               <View
                 style={{
@@ -564,13 +594,44 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                   flexWrap: 'wrap',
                 }}>
                 <RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
+                  {translate('receive.title')}
+                </RegText>
+                {/*<RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
                   {syncStatusDisplayLine ? translate('receive.title-syncing') : translate('receive.title')}
                 </RegText>
                 {!!syncStatusDisplayLine && (
                   <FadeText style={{ margin: 0, padding: 0 }}>{syncStatusDisplayLine}</FadeText>
+                )}*/}
+              </View>
+              <View
+                style={{
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: 0,
+                  padding: 1,
+                  borderColor: colors.primary,
+                  borderWidth: 1,
+                  borderRadius: 10,
+                  minWidth: 20,
+                  minHeight: 20,
+                }}>
+                {!syncStatusDisplayLine && syncingStatus.synced && (
+                  <View style={{ margin: 0, padding: 0 }}>
+                    <FontAwesomeIcon icon={faCheck} color={colors.primary} />
+                  </View>
+                )}
+                {!syncStatusDisplayLine && !syncingStatus.synced && (
+                  <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
+                    <FontAwesomeIcon icon={faStop} color={colors.zingo} size={12} />
+                  </TouchableOpacity>
+                )}
+                {syncStatusDisplayLine && (
+                  <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
+                    <FontAwesomeIcon icon={faPlay} color={colors.primary} size={10} />
+                  </TouchableOpacity>
                 )}
               </View>
-              {!!syncStatusDisplayLine && (
+              {/*!!syncStatusDisplayLine && (
                 <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
                   <View
                     style={{
@@ -590,7 +651,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                     <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
                   </View>
                 </TouchableOpacity>
-              )}
+                )*/}
             </View>
 
             <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
