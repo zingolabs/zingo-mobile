@@ -321,7 +321,7 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
         style={{
           display: 'flex',
           justifyContent: 'flex-start',
-          width: "50%",
+          width: '50%',
         }}>
         <Modal
           animationType="slide"
@@ -499,7 +499,7 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
           alignItems: 'center',
           padding: 10,
           height: '100%',
-          width: "50%",
+          width: '50%',
         }}>
         <RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
           {translate('transactions.transactions')}

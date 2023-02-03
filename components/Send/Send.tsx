@@ -904,7 +904,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         style={{
           display: 'flex',
           justifyContent: 'flex-start',
-          width: "50%",
+          width: '50%',
         }}>
         <Modal
           animationType="slide"
@@ -1101,7 +1101,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           alignItems: 'center',
           padding: 0,
           height: '100%',
-          width: "50%",
+          width: '50%',
         }}>
         <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{}} style={{}}>
           <View style={{ marginBottom: 150 }}>

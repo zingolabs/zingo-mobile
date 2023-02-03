@@ -1,6 +1,6 @@
 import RPCModule from '../components/RPCModule';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import NetInfo, { NetInfoStateType } from "@react-native-community/netinfo";
+import NetInfo, { NetInfoStateType } from '@react-native-community/netinfo';
 
 const BackgroundSync = async (task_data: any) => {
   const exists = await RPCModule.walletExists();
@@ -24,18 +24,29 @@ const BackgroundSync = async (task_data: any) => {
 
     let saver = setInterval(async () => {
       const networkState = await NetInfo.fetch();
-        if (!networkState.isConnected || networkState.type === NetInfoStateType.cellular || (networkState.details !== null && networkState.details.isConnectionExpensive)) {
-          console.log("BS: Interrupted (connected: " + networkState.isConnected, + ", type: " + networkState.type +  + ", expensive connection: " + networkState.details?.isConnectionExpensive + ")");
-          clearInterval(saver);
-          finishEarly.done();
+      if (
+        !networkState.isConnected ||
+        networkState.type === NetInfoStateType.cellular ||
+        (networkState.details !== null && networkState.details.isConnectionExpensive)
+      ) {
+        console.log(
+          'BS: Interrupted (connected: ' + networkState.isConnected,
+          +', type: ' +
+            networkState.type +
+            +', expensive connection: ' +
+            networkState.details?.isConnectionExpensive +
+            ')',
+        );
+        clearInterval(saver);
+        finishEarly.done();
         return;
-      };
+      }
       // if the App goes to Foreground kill the interval
       const background = await AsyncStorage.getItem('@background');
       if (background === 'no') {
         clearInterval(saver);
         console.log('BS: FInished (foreground)');
-          finishEarly.done();
+        finishEarly.done();
         return;
       }
 
@@ -67,15 +78,17 @@ function manuallyResolve() {
   // the promise resolves with the value output by that function.
   // By passing the function out of the promise, we can call it later
   // in order to resolve the promise at will
-  const promise = new Promise(fun => {resolve = fun});
+  const promise = new Promise(fun => {
+    resolve = fun;
+  });
 
   function done() {
-    resolve()
+    resolve();
   }
 
   function wait() {
     return promise;
   }
 
-  return { wait, done }
+  return { wait, done };
 }

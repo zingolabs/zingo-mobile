@@ -16,7 +16,7 @@ exports[`Component Legacy - test Legacy Landscape - snapshot 1`] = `
       {
         "display": "flex",
         "justifyContent": "flex-start",
-        "width": 300,
+        "width": "50%",
       }
     }
   >
@@ -278,7 +278,7 @@ exports[`Component Legacy - test Legacy Landscape - snapshot 1`] = `
         "borderLeftWidth": 1,
         "height": "100%",
         "padding": 10,
-        "width": 300,
+        "width": "50%",
       }
     }
   >

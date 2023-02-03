@@ -466,7 +466,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
       <TabBar
         {...props}
         indicatorStyle={{ backgroundColor: colors.primary }}
-        style={{ backgroundColor: 'transparent', width: dimensions.width / 2 - ((dimensions.width * 60) / 812) }}
+        style={{ backgroundColor: 'transparent', width: dimensions.width / 2 - (dimensions.width * 60) / 812 }}
       />
     );
   };
@@ -488,7 +488,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
         style={{
           display: 'flex',
           justifyContent: 'flex-start',
-          width: "50%",
+          width: '50%',
         }}>
         <Modal
           animationType="slide"
@@ -694,7 +694,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
           alignItems: 'center',
           padding: 10,
           height: '100%',
-          width: "50%",
+          width: '50%',
         }}>
         <TabView
           navigationState={{ index, routes }}
