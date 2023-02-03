@@ -126,9 +126,12 @@ export default function LoadingApp(props: LoadingAppProps) {
     }
 
     // reading background task info
-    const backgroundJson = await BackgroundFileImpl.readBackground();
-    if (backgroundJson) {
-      setBackground(backgroundJson);
+    if (Platform.OS === 'ios') {
+      // this file only exists in IOS BS.
+      const backgroundJson = await BackgroundFileImpl.readBackground();
+      if (backgroundJson) {
+        setBackground(backgroundJson);
+      }
     }
   }, [currency, file, i18n, sendAll, server]);
 
