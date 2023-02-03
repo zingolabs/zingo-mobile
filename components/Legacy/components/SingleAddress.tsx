@@ -55,7 +55,6 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
       contentContainerStyle={[
         {
           alignItems: 'center',
-          backgroundColor: colors.background,
         },
       ]}>
       <View style={{ marginTop: 20, padding: 10, backgroundColor: colors.border }}>

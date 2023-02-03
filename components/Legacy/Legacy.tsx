@@ -267,7 +267,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance, toggl
         let taddrKind = '';
         if (taddrs.length > 0) {
           taddr = taddrs[tindex].address;
-          taddrKind = zaddrs[zindex].addressKind;
+          taddrKind = taddrs[tindex].addressKind;
         }
 
         return (
@@ -415,7 +415,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance, toggl
       <TabBar
         {...props}
         indicatorStyle={{ backgroundColor: colors.primary }}
-        style={{ backgroundColor: colors.background, width: dimensions.width / 2 - 20 }}
+        style={{ backgroundColor: 'transparent', width: dimensions.width / 2 - ((dimensions.width * 60) / 812) }}
       />
     );
   };
@@ -437,7 +437,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance, toggl
         style={{
           display: 'flex',
           justifyContent: 'flex-start',
-          width: dimensions.width / 2,
+          width: "50%",
         }}>
         <Modal
           animationType="slide"
@@ -538,7 +538,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance, toggl
           alignItems: 'center',
           padding: 10,
           height: '100%',
-          width: dimensions.width / 2,
+          width: "50%",
         }}>
         <TabView
           navigationState={{ index, routes }}

@@ -112,7 +112,6 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
         //console.log(resp);
         if (!resp.toLowerCase().startsWith('error')) {
           setLatestBlock(Number(resp));
-          console.log('/', latestBlock);
         } else {
           console.log('error latest block', resp);
         }
