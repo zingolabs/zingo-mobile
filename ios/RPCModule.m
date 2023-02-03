@@ -407,6 +407,8 @@ RCT_REMAP_METHOD(getLatestBlock,
 
 -(void) getLatestBlock:(NSDictionary *)dict {
   @autoreleasepool {
+    NSString* server = dict[@"server"];
+    RCTPromiseResolveBlock resolve = dict[@"resolve"];
     
     char* resp = get_latest_block([server UTF8String]);
     NSString* respStr = [NSString stringWithUTF8String:resp];
