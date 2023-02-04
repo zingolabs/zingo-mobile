@@ -1,6 +1,6 @@
 to run e2e tests:
 
->$ yarn start react-native start
+>$ yarn react-native start
 
 in another terminal:
 >$ yarn detox test --configuration android.emu.debug
