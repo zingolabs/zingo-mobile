@@ -1,8 +1,11 @@
-to run e2e tests:
+# to run e2e tests:
 
->$ yarn react-native start
+1. follow build 0-3 instructions in ../README.md
 
-in another terminal:
+>$ yarn start react-native start
+
+in another terminal:i
+>$ yarn detox build -c android.emu.duy
 >$ yarn detox test --configuration android.emu.debug
 
 instructions at https://wix.github.io/Detox/docs/introduction/project-setup/#1-command-line-tools-detox-cli
