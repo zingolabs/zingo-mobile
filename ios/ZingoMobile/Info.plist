@@ -32,6 +32,8 @@
 	<false/>
 	<key>LSMinimumSystemVersion</key>
 	<string>13.0.0</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<string>zcash</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>

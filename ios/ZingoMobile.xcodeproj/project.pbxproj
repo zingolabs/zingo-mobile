@@ -45,6 +45,7 @@
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = ZingoMobile/main.m; sourceTree = "<group>"; };
 		1794449599A63970811D5CF0 /* libPods-ZingoMobile.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ZingoMobile.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1F26E03C28C0E45B009737D7 /* librustios.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = librustios.a; path = "../rust/target/aarch64-apple-ios-sim/release/librustios.a"; sourceTree = "<group>"; };
+		1F70326429905E6A001D70A2 /* ZingoMobile.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = ZingoMobile.entitlements; path = ZingoMobile/ZingoMobile.entitlements; sourceTree = "<group>"; };
 		1F7638CA28BD7C3E0017F9B6 /* librustios.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = librustios.a; path = ../rust/target/universal/release/librustios.a; sourceTree = "<group>"; };
 		1FE8E9AB296B85FC004A256B /* BackgroundTasks.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = BackgroundTasks.framework; path = System/Library/Frameworks/BackgroundTasks.framework; sourceTree = SDKROOT; };
 		57C30AB6DAB41A2ED2699835 /* libPods-ZingoMobile-ZingoMobileTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ZingoMobile-ZingoMobileTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -102,6 +103,7 @@
 		13B07FAE1A68108700A75B9A /* ZingoMobile */ = {
 			isa = PBXGroup;
 			children = (
+				1F70326429905E6A001D70A2 /* ZingoMobile.entitlements */,
 				DB4DE51A264B10D40084F17D /* saplingoutput */,
 				DB4DE519264B10D40084F17D /* saplingspend */,
 				DB4DE516264B103E0084F17D /* RPCModule.h */,
@@ -526,6 +528,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = ZingoMobile/ZingoMobile.entitlements;
 				CURRENT_PROJECT_VERSION = 115;
 				DEVELOPMENT_TEAM = 788KRST4S8;
 				ENABLE_BITCODE = NO;
@@ -565,6 +568,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = ZingoMobile/ZingoMobile.entitlements;
 				CURRENT_PROJECT_VERSION = 115;
 				DEVELOPMENT_TEAM = 788KRST4S8;
 				ENABLE_BITCODE = NO;
