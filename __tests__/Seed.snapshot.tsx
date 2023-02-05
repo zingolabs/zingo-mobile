@@ -9,9 +9,9 @@ import { render } from '@testing-library/react-native';
 import Seed from '../components/Seed';
 import {
   defaultAppStateLoaded,
-  ContextLoadedProvider,
+  ContextAppLoadedProvider,
   defaultAppStateLoading,
-  ContextLoadingProvider,
+  ContextAppLoadingProvider,
 } from '../app/context';
 
 jest.useFakeTimers();
@@ -66,33 +66,33 @@ describe('Component Seed - test', () => {
   const onCancel = jest.fn();
   test('Seed View - snapshot', () => {
     const seed = render(
-      <ContextLoadedProvider value={stateLoaded}>
+      <ContextAppLoadedProvider value={stateLoaded}>
         <Seed onClickOK={onOk} onClickCancel={onCancel} action={'view'} />
-      </ContextLoadedProvider>,
+      </ContextAppLoadedProvider>,
     );
     expect(seed.toJSON()).toMatchSnapshot();
   });
   test('Seed Change - snapshot', () => {
     const seed = render(
-      <ContextLoadedProvider value={stateLoaded}>
+      <ContextAppLoadedProvider value={stateLoaded}>
         <Seed onClickOK={onOk} onClickCancel={onCancel} action={'change'} />
-      </ContextLoadedProvider>,
+      </ContextAppLoadedProvider>,
     );
     expect(seed.toJSON()).toMatchSnapshot();
   });
   test('Seed Server - snapshot', () => {
     const seed = render(
-      <ContextLoadedProvider value={stateLoaded}>
+      <ContextAppLoadedProvider value={stateLoaded}>
         <Seed onClickOK={onOk} onClickCancel={onCancel} action={'server'} />
-      </ContextLoadedProvider>,
+      </ContextAppLoadedProvider>,
     );
     expect(seed.toJSON()).toMatchSnapshot();
   });
   test('Seed Backup - snapshot', () => {
     const seed = render(
-      <ContextLoadedProvider value={stateLoaded}>
+      <ContextAppLoadedProvider value={stateLoaded}>
         <Seed onClickOK={onOk} onClickCancel={onCancel} action={'backup'} />
-      </ContextLoadedProvider>,
+      </ContextAppLoadedProvider>,
     );
     expect(seed.toJSON()).toMatchSnapshot();
   });
@@ -119,17 +119,17 @@ describe('Component Seed - test', () => {
   stateLoading.totalBalance.total = 1.12345678;
   test('Seed New - snapshot', () => {
     const seed = render(
-      <ContextLoadingProvider value={stateLoading}>
+      <ContextAppLoadingProvider value={stateLoading}>
         <Seed onClickOK={onOk} onClickCancel={onCancel} action={'new'} />
-      </ContextLoadingProvider>,
+      </ContextAppLoadingProvider>,
     );
     expect(seed.toJSON()).toMatchSnapshot();
   });
   test('Seed Restore - snapshot', () => {
     const seed = render(
-      <ContextLoadingProvider value={stateLoading}>
+      <ContextAppLoadingProvider value={stateLoading}>
         <Seed onClickOK={onOk} onClickCancel={onCancel} action={'restore'} />
-      </ContextLoadingProvider>,
+      </ContextAppLoadingProvider>,
     );
     expect(seed.toJSON()).toMatchSnapshot();
   });

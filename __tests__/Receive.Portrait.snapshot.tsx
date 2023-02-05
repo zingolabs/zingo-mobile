@@ -7,7 +7,7 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import Receive from '../components/Receive';
-import { ContextLoadedProvider, defaultAppStateLoaded } from '../app/context';
+import { ContextAppLoadedProvider, defaultAppStateLoaded } from '../app/context';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -69,7 +69,7 @@ describe('Component Receive - test', () => {
     state.totalBalance.total = 1.12345678;
     const onFunction = jest.fn();
     const receive = render(
-      <ContextLoadedProvider value={state}>
+      <ContextAppLoadedProvider value={state}>
         <Receive
           fetchTotalBalance={onFunction}
           setUaAddress={onFunction}
@@ -79,7 +79,7 @@ describe('Component Receive - test', () => {
           poolsMoreInfoOnClick={onFunction}
           setZecPrice={onFunction}
         />
-      </ContextLoadedProvider>,
+      </ContextAppLoadedProvider>,
     );
     expect(receive.toJSON()).toMatchSnapshot();
   });

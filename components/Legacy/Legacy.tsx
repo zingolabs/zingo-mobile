@@ -17,7 +17,7 @@ import PrivKey from '../PrivKey';
 import ImportKey from '../ImportKey';
 import SingleAddress from './components/SingleAddress';
 import { ThemeType } from '../../app/types';
-import { ContextLoaded } from '../../app/context';
+import { ContextAppLoaded } from '../../app/context';
 
 type LegacyProps = {
   fetchTotalBalance: () => void;
@@ -26,7 +26,7 @@ type LegacyProps = {
 };
 
 const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance, toggleMenuDrawer, startRescan }) => {
-  const context = useContext(ContextLoaded);
+  const context = useContext(ContextAppLoaded);
   const { translate, dimensions, info, addresses, totalBalance, uaAddress, currency, zecPrice } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [index, setIndex] = useState(0);

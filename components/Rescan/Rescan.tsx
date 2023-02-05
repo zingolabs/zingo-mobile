@@ -7,7 +7,7 @@ import RegText from '../Components/RegText';
 import ZecAmount from '../Components/ZecAmount';
 import Button from '../Button';
 import { ThemeType } from '../../app/types';
-import { ContextLoaded } from '../../app/context';
+import { ContextAppLoaded } from '../../app/context';
 
 type RescanProps = {
   closeModal: () => void;
@@ -15,7 +15,7 @@ type RescanProps = {
 };
 
 const Rescan: React.FunctionComponent<RescanProps> = ({ closeModal, startRescan }) => {
-  const context = useContext(ContextLoaded);
+  const context = useContext(ContextAppLoaded);
   const { walletSeed, totalBalance, info, translate } = context;
   const { colors } = useTheme() as unknown as ThemeType;
 

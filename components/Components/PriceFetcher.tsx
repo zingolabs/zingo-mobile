@@ -5,7 +5,7 @@ import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faRefresh } from '@fortawesome/free-solid-svg-icons';
 import FadeText from './FadeText';
-import { ContextLoaded } from '../../app/context';
+import { ContextAppLoaded } from '../../app/context';
 import moment from 'moment';
 import RPC from '../../app/rpc';
 import RegText from './RegText';
@@ -16,7 +16,7 @@ type PriceFetcherProps = {
 };
 
 const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice, textBefore }) => {
-  const context = useContext(ContextLoaded);
+  const context = useContext(ContextAppLoaded);
   const { translate, zecPrice } = context;
   const [refreshSure, setRefreshSure] = useState(false);
   const [refreshMinutes, setRefreshMinutes] = useState(0);

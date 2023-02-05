@@ -13,7 +13,7 @@ import Utils from '../../../app/utils';
 import { ThemeType } from '../../../app/types';
 import moment from 'moment';
 import 'moment/locale/es';
-import { ContextLoaded } from '../../../app/context';
+import { ContextAppLoaded } from '../../../app/context';
 
 type TxSummaryLineProps = {
   month: string;
@@ -27,7 +27,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
   setTxDetail,
   setTxDetailModalShowing,
 }) => {
-  const context = useContext(ContextLoaded);
+  const context = useContext(ContextAppLoaded);
   const { translate, language } = context;
   const { colors } = useTheme() as unknown as ThemeType;
 

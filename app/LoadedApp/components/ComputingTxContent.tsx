@@ -6,10 +6,10 @@ import { useTheme } from '@react-navigation/native';
 import RegText from '../../../components/Components/RegText';
 import { ThemeType } from '../../types';
 import CircularProgress from '../../../components/CircularProgress';
-import { ContextLoaded } from '../../context';
+import { ContextAppLoaded } from '../../context';
 
 const ComputingTxContent: React.FunctionComponent = () => {
-  const context = useContext(ContextLoaded);
+  const context = useContext(ContextAppLoaded);
   const { sendProgress: progress, translate } = context;
   const { colors } = useTheme() as unknown as ThemeType;
 

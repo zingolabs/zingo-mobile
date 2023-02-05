@@ -10,7 +10,7 @@ import CurrencyAmount from '../../Components/CurrencyAmount';
 import Button from '../../Button';
 import { useTheme } from '@react-navigation/native';
 import Utils from '../../../app/utils';
-import { ContextLoaded } from '../../../app/context';
+import { ContextAppLoaded } from '../../../app/context';
 
 type ConfirmProps = {
   defaultFee: number;
@@ -19,7 +19,7 @@ type ConfirmProps = {
   sendAllAmount: boolean;
 };
 const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSend, defaultFee, sendAllAmount }) => {
-  const context = useContext(ContextLoaded);
+  const context = useContext(ContextAppLoaded);
   const { sendPageState, info, translate, currency, zecPrice } = context;
   const { colors } = useTheme();
 

@@ -7,7 +7,7 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import Send from '../components/Send';
-import { defaultAppStateLoaded, ContextLoadedProvider } from '../app/context';
+import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
 import { ThemeType } from '../app/types';
 
 jest.useFakeTimers();
@@ -140,7 +140,7 @@ describe('Component Send - test', () => {
     state.sendPageState.toaddr.memo = 'memo';
     const onFunction = jest.fn();
     const send = render(
-      <ContextLoadedProvider value={state}>
+      <ContextAppLoadedProvider value={state}>
         <Send
           setSendPageState={onFunction}
           sendTransaction={onFunction}
@@ -152,7 +152,7 @@ describe('Component Send - test', () => {
           syncingStatusMoreInfoOnClick={onFunction}
           setZecPrice={onFunction}
         />
-      </ContextLoadedProvider>,
+      </ContextAppLoadedProvider>,
     );
     expect(send.toJSON()).toMatchSnapshot();
   });

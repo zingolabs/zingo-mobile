@@ -22,7 +22,7 @@ import Utils from '../../app/utils';
 import Scanner from './components/Scanner';
 import Confirm from './components/Confirm';
 import { ThemeType } from '../../app/types';
-import { ContextLoaded } from '../../app/context';
+import { ContextAppLoaded } from '../../app/context';
 import PriceFetcher from '../Components/PriceFetcher';
 import RPC from '../../app/rpc';
 
@@ -49,7 +49,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   poolsMoreInfoOnClick,
   setZecPrice,
 }) => {
-  const context = useContext(ContextLoaded);
+  const context = useContext(ContextAppLoaded);
   const {
     translate,
     dimensions,

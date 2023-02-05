@@ -29,7 +29,7 @@ import { serverUris } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import RPC from '../rpc';
 import { ThemeType } from '../types';
-import { defaultAppStateLoading, ContextLoadingProvider } from '../context';
+import { defaultAppStateLoading, ContextAppLoadingProvider } from '../context';
 import platform from '../platform/platform';
 import BackgroundFileImpl from '../../components/Background/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -185,6 +185,7 @@ type LoadingAppClassProps = {
 class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
   dim: EmitterSubscription;
   appstate: NativeEventSubscription;
+  linking: EmitterSubscription;
 
   constructor(props: LoadingAppClassProps) {
     super(props);
@@ -213,6 +214,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
 
     this.dim = {} as EmitterSubscription;
     this.appstate = {} as NativeEventSubscription;
+    this.linking = {} as EmitterSubscription;
   }
 
   componentDidMount = async () => {
@@ -369,7 +371,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
     const { colors } = this.props.theme;
 
     return (
-      <ContextLoadingProvider value={this.state}>
+      <ContextAppLoadingProvider value={this.state}>
         <SafeAreaView
           style={{
             display: 'flex',
@@ -516,7 +518,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
             </Modal>
           )}
         </SafeAreaView>
-      </ContextLoadingProvider>
+      </ContextAppLoadingProvider>
     );
   }
 }

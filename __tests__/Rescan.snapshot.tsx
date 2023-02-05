@@ -7,7 +7,7 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import Rescan from '../components/Rescan';
-import { defaultAppStateLoaded, ContextLoadedProvider } from '../app/context';
+import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -35,9 +35,9 @@ describe('Component Rescan - test', () => {
   const onRescan = jest.fn();
   test('Rescan - snapshot', () => {
     const rescan = render(
-      <ContextLoadedProvider value={state}>
+      <ContextAppLoadedProvider value={state}>
         <Rescan closeModal={onClose} startRescan={onRescan} />
-      </ContextLoadedProvider>,
+      </ContextAppLoadedProvider>,
     );
     expect(rescan.toJSON()).toMatchSnapshot();
   });

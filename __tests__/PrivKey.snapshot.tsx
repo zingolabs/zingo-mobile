@@ -7,7 +7,7 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import PrivKey from '../components/PrivKey';
-import { defaultAppStateLoaded, ContextLoadedProvider } from '../app/context';
+import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -33,27 +33,27 @@ describe('Component PrivKey - test', () => {
   const onClose = jest.fn();
   test('PrivKey Private - snapshot', () => {
     const privKey = render(
-      <ContextLoadedProvider value={state}>
+      <ContextAppLoadedProvider value={state}>
         <PrivKey
           address={'UA-12345678901234567890'}
           keyType={0}
           privKey={'priv-key-12345678901234567890'}
           closeModal={onClose}
         />
-      </ContextLoadedProvider>,
+      </ContextAppLoadedProvider>,
     );
     expect(privKey.toJSON()).toMatchSnapshot();
   });
   test('PrivKey View - snapshot', () => {
     const privKey = render(
-      <ContextLoadedProvider value={state}>
+      <ContextAppLoadedProvider value={state}>
         <PrivKey
           address={'UA-12345678901234567890'}
           keyType={1}
           privKey={'view-key-12345678901234567890'}
           closeModal={onClose}
         />
-      </ContextLoadedProvider>,
+      </ContextAppLoadedProvider>,
     );
     expect(privKey.toJSON()).toMatchSnapshot();
   });

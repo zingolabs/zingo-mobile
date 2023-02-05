@@ -7,7 +7,7 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import ImportKeyModal from '../components/ImportKey';
-import { ContextLoadedProvider, defaultAppStateLoaded } from '../app/context';
+import { ContextAppLoadedProvider, defaultAppStateLoaded } from '../app/context';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -34,9 +34,9 @@ describe('Component ImportKey - test', () => {
     const onClose = jest.fn();
     const onImport = jest.fn();
     const importKey = render(
-      <ContextLoadedProvider value={state}>
+      <ContextAppLoadedProvider value={state}>
         <ImportKeyModal closeModal={onClose} doImport={onImport} />
-      </ContextLoadedProvider>,
+      </ContextAppLoadedProvider>,
     );
     expect(importKey.toJSON()).toMatchSnapshot();
   });

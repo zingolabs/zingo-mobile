@@ -11,6 +11,7 @@ import {
   AppState,
   NativeEventSubscription,
   Platform,
+  Linking,
 } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -46,9 +47,9 @@ import {
 import Utils from '../utils';
 import { ThemeType } from '../types';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
-import { ContextLoadedProvider, defaultAppStateLoaded } from '../context';
+import { ContextAppLoadedProvider, defaultAppStateLoaded } from '../context';
 import platform from '../platform/platform';
-import { serverUris } from '../uris';
+import { parseZcashURI, serverUris, ZcashURITarget } from '../uris';
 import BackgroundFileImpl from '../../components/Background/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -217,6 +218,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   rpc: RPC;
   dim: EmitterSubscription;
   appstate: NativeEventSubscription;
+  linking: EmitterSubscription;
 
   constructor(props: LoadedAppClassProps) {
     super(props);
@@ -258,6 +260,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
     this.dim = {} as EmitterSubscription;
     this.appstate = {} as NativeEventSubscription;
+    this.linking = {} as EmitterSubscription;
   }
 
   componentDidMount = () => {
@@ -299,12 +302,89 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       }
       this.setState({ appState: nextAppState });
     });
+
+    (async () => {
+      const initialUrl = await Linking.getInitialURL();
+      if (initialUrl !== null) {
+        this.readUrl(initialUrl);
+      }
+    })();
+
+    this.linking = Linking.addEventListener('url', async ({ url }) => {
+      console.log(url);
+      const { to } = this.state.sendPageState.toaddr;
+      if (url !== null && to === '') {
+        this.readUrl(url);
+      } else {
+        this.closeAllModals();
+        this.state.navigation.navigate('LoadedApp', {
+          screen: this.state.translate('loadedapp.send-menu'),
+          initial: false,
+        });
+        Toast.show(this.state.translate('loadedapp.zcash-url'), Toast.LONG);
+      }
+    });
   };
 
   componentWillUnmount = () => {
     this.rpc.clearTimers();
     this.dim.remove();
     this.appstate.remove();
+    this.linking.remove();
+  };
+
+  readUrl = async (url: string) => {
+    console.log(url);
+    // Attempt to parse as URI if it starts with zcash
+    if (url.startsWith('zcash:')) {
+      const target: string | ZcashURITarget = await parseZcashURI(url);
+      //console.log(targets);
+
+      if (typeof target !== 'string') {
+        // redo the to addresses
+        const newSendPageState = new SendPageStateClass(new ToAddrClass(0));
+        let uriToAddr: ToAddrClass = new ToAddrClass(0);
+        [target].forEach(tgt => {
+          const to = new ToAddrClass(Utils.getNextToAddrID());
+
+          to.to = tgt.address || '';
+          to.amount = Utils.maxPrecisionTrimmed(tgt.amount || 0);
+          to.memo = tgt.memoString || '';
+
+          uriToAddr = to;
+        });
+
+        newSendPageState.toaddr = uriToAddr;
+
+        this.setSendPageState(newSendPageState);
+        this.closeAllModals();
+        this.state.navigation.navigate('LoadedApp', {
+          screen: this.state.translate('loadedapp.send-menu'),
+          initial: false,
+        });
+        return;
+      } else {
+        // Show the error message as a toast
+        Toast.show(target);
+        return;
+      }
+    }
+  };
+
+  closeAllModals = () => {
+    this.setState({
+      aboutModalVisible: false,
+      computingModalVisible: false,
+      settingsModalVisible: false,
+      infoModalVisible: false,
+      rescanModalVisible: false,
+      seedViewModalVisible: false,
+      seedChangeModalVisible: false,
+      seedBackupModalVisible: false,
+      seedServerModalVisible: false,
+      syncReportModalVisible: false,
+      poolsModalVisible: false,
+    });
   };
 
   setDimensions = (screen: ScaledSize) => {
@@ -831,7 +911,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     //res().then(r => console.log(r));
 
     return (
-      <ContextLoadedProvider value={this.state}>
+      <ContextAppLoadedProvider value={this.state}>
         <SideMenu
           menu={menu}
           isOpen={this.state.isMenuDrawerOpen}
@@ -1126,7 +1206,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
             </Tab.Screen>
           </Tab.Navigator>
         </SideMenu>
-      </ContextLoadedProvider>
+      </ContextAppLoadedProvider>
     );
   }
 }

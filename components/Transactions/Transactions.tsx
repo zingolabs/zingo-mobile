@@ -19,7 +19,7 @@ import FadeText from '../Components/FadeText';
 import Button from '../Button';
 import TxDetail from './components/TxDetail';
 import TxSummaryLine from './components/TxSummaryLine';
-import { ContextLoaded } from '../../app/context';
+import { ContextAppLoaded } from '../../app/context';
 import PriceFetcher from '../Components/PriceFetcher';
 
 type TransactionsProps = {
@@ -39,7 +39,7 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
   syncingStatusMoreInfoOnClick,
   setZecPrice,
 }) => {
-  const context = useContext(ContextLoaded);
+  const context = useContext(ContextAppLoaded);
   const { translate, dimensions, transactions, totalBalance, info, syncingStatus, language, currency, zecPrice } =
     context;
   const { colors } = useTheme() as unknown as ThemeType;

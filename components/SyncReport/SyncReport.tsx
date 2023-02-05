@@ -7,7 +7,7 @@ import { ThemeType } from '../../app/types';
 import RegText from '../Components/RegText';
 import Button from '../Button';
 import DetailLine from './components/DetailLine';
-import { ContextLoaded } from '../../app/context';
+import { ContextAppLoaded } from '../../app/context';
 import moment from 'moment';
 import 'moment/locale/es';
 import RPC from '../../app/rpc';
@@ -17,7 +17,7 @@ type SyncReportProps = {
 };
 
 const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) => {
-  const context = useContext(ContextLoaded);
+  const context = useContext(ContextAppLoaded);
   const { syncingStatusReport, walletSeed, translate, background, language } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [maxBlocks, setMaxBlocks] = useState(0);

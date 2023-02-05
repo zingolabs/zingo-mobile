@@ -17,7 +17,7 @@ import PrivKey from '../PrivKey';
 import ImportKey from '../ImportKey';
 import SingleAddress from './components/SingleAddress';
 import { ThemeType } from '../../app/types';
-import { ContextLoaded } from '../../app/context';
+import { ContextAppLoaded } from '../../app/context';
 import PriceFetcher from '../Components/PriceFetcher';
 
 type ReceiveProps = {
@@ -39,7 +39,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   poolsMoreInfoOnClick,
   setZecPrice,
 }) => {
-  const context = useContext(ContextLoaded);
+  const context = useContext(ContextAppLoaded);
   const { translate, dimensions, info, addresses, totalBalance, syncingStatus, uaAddress, currency, zecPrice } =
     context;
   const { colors } = useTheme() as unknown as ThemeType;

@@ -45,7 +45,8 @@
     "send-menu": "ENVIAR",
     "uas-menu": "DU's",
     "legacy-menu": "HEREDADAS",
-    "syncing": "Pausando la Sincronización para poder Enviar."
+    "syncing": "Pausando la Sincronización para poder Enviar.",
+    "zcash-url": "Tienes ya informada una dirección en la pantalla Enviar."
   },
   "rpc": {
     "parsebirthday-error": "Error: No es posible convertirlo en un número:",

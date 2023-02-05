@@ -41,13 +41,13 @@ export const defaultAppStateLoading: AppStateLoading = {
   translate: () => '',
 };
 
-export const ContextLoading = React.createContext(defaultAppStateLoading);
+export const ContextAppLoading = React.createContext(defaultAppStateLoading);
 
 type ContextProviderProps = {
   children: ReactNode;
   value: AppStateLoading;
 };
 
-export const ContextLoadingProvider = ({ children, value }: ContextProviderProps) => {
-  return <ContextLoading.Provider value={value}>{children}</ContextLoading.Provider>;
+export const ContextAppLoadingProvider = ({ children, value }: ContextProviderProps) => {
+  return <ContextAppLoading.Provider value={value}>{children}</ContextAppLoading.Provider>;
 };

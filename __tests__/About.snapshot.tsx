@@ -7,7 +7,7 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import About from '../components/About';
-import { defaultAppStateLoaded, ContextLoadedProvider } from '../app/context';
+import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -45,9 +45,9 @@ describe('Component About - test', () => {
     state.totalBalance.total = 1.25691111;
     const onClose = jest.fn();
     const about = render(
-      <ContextLoadedProvider value={state}>
+      <ContextAppLoadedProvider value={state}>
         <About closeModal={onClose} />
-      </ContextLoadedProvider>,
+      </ContextAppLoadedProvider>,
     );
     expect(about.toJSON()).toMatchSnapshot();
   });
