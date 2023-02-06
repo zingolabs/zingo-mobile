@@ -11,14 +11,14 @@ import ZecAmount from '../Components/ZecAmount';
 import Button from '../Button';
 import Scanner from './components/Scanner';
 import { ThemeType } from '../../app/types';
-import { ContextLoaded } from '../../app/context';
+import { ContextAppLoaded } from '../../app/context';
 
 type ImportKeyProps = {
   closeModal: () => void;
   doImport: (keyText: string, birthday: string) => void;
 };
 const ImportKey: React.FunctionComponent<ImportKeyProps> = ({ closeModal, doImport }) => {
-  const context = useContext(ContextLoaded);
+  const context = useContext(ContextAppLoaded);
   const { totalBalance, info, translate } = context;
   const { colors } = useTheme() as unknown as ThemeType;
 

@@ -7,7 +7,7 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import TxDetail from '../components/Transactions/components/TxDetail';
-import { defaultAppStateLoaded, ContextLoadedProvider } from '../app/context';
+import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
 import { TransactionType, TxDetailType } from '../app/AppState';
 
 jest.useFakeTimers();
@@ -81,9 +81,9 @@ describe('Component Transactions TxDetail - test', () => {
       ] as TxDetailType[],
     } as TransactionType;
     const text: any = render(
-      <ContextLoadedProvider value={state}>
+      <ContextAppLoadedProvider value={state}>
         <TxDetail tx={tx} closeModal={onClose} />
-      </ContextLoadedProvider>,
+      </ContextAppLoadedProvider>,
     ).toJSON();
     expect(text.type).toBe('RCTSafeAreaView');
     expect(text.children[0].children[0].children[2].children[3].children[1].children[0].children[1].children[0]).toBe(
@@ -115,9 +115,9 @@ describe('Component Transactions TxDetail - test', () => {
       ] as TxDetailType[],
     } as TransactionType;
     const textSelfSend: any = render(
-      <ContextLoadedProvider value={state}>
+      <ContextAppLoadedProvider value={state}>
         <TxDetail tx={txSelfSend} closeModal={onClose} />
-      </ContextLoadedProvider>,
+      </ContextAppLoadedProvider>,
     ).toJSON();
     expect(textSelfSend.type).toBe('RCTSafeAreaView');
     expect(

@@ -7,7 +7,7 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import Settings from '../components/Settings';
-import { defaultAppStateLoaded, ContextLoadedProvider } from '../app/context';
+import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
 
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
   FontAwesomeIcon: '',
@@ -94,7 +94,7 @@ describe('Component Settings - test', () => {
   const onSetOption = jest.fn();
   test('Settings - snapshot', () => {
     const settings = render(
-      <ContextLoadedProvider value={state}>
+      <ContextAppLoadedProvider value={state}>
         <Settings
           closeModal={onClose}
           set_wallet_option={onSetOption}
@@ -103,7 +103,7 @@ describe('Component Settings - test', () => {
           set_language_option={onSetOption}
           set_sendAll_option={onSetOption}
         />
-      </ContextLoadedProvider>,
+      </ContextAppLoadedProvider>,
     );
     expect(settings.toJSON()).toMatchSnapshot();
   });

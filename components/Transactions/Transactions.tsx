@@ -19,7 +19,7 @@ import FadeText from '../Components/FadeText';
 import Button from '../Button';
 import TxDetail from './components/TxDetail';
 import TxSummaryLine from './components/TxSummaryLine';
-import { ContextLoaded } from '../../app/context';
+import { ContextAppLoaded } from '../../app/context';
 import PriceFetcher from '../Components/PriceFetcher';
 
 type TransactionsProps = {
@@ -39,7 +39,7 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
   syncingStatusMoreInfoOnClick,
   setZecPrice,
 }) => {
-  const context = useContext(ContextLoaded);
+  const context = useContext(ContextAppLoaded);
   const { translate, dimensions, transactions, totalBalance, info, syncingStatus, language, currency, zecPrice } =
     context;
   const { colors } = useTheme() as unknown as ThemeType;
@@ -321,7 +321,7 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
         style={{
           display: 'flex',
           justifyContent: 'flex-start',
-          width: dimensions.width / 2,
+          width: '50%',
         }}>
         <Modal
           animationType="slide"
@@ -499,7 +499,7 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
           alignItems: 'center',
           padding: 10,
           height: '100%',
-          width: dimensions.width / 2,
+          width: '50%',
         }}>
         <RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
           {translate('transactions.transactions')}

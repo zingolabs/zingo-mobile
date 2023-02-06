@@ -12,7 +12,7 @@ import ZecAmount from '../Components/ZecAmount';
 import Button from '../Button';
 import Utils from '../../app/utils';
 import { ThemeType } from '../../app/types';
-import { ContextLoaded } from '../../app/context';
+import { ContextAppLoaded } from '../../app/context';
 
 type PrivKeyProps = {
   closeModal: () => void;
@@ -21,7 +21,7 @@ type PrivKeyProps = {
   privKey: string;
 };
 const PrivKey: React.FunctionComponent<PrivKeyProps> = ({ address, keyType, privKey, closeModal }) => {
-  const context = useContext(ContextLoaded);
+  const context = useContext(ContextAppLoaded);
   const { totalBalance, info, translate } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const fixedWidthFont = Platform.OS === 'android' ? 'monospace' : 'Courier';

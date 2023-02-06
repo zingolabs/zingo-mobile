@@ -7,7 +7,7 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import Legacy from '../components/Legacy';
-import { defaultAppStateLoaded, ContextLoadedProvider } from '../app/context';
+import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -70,9 +70,9 @@ describe('Component Legacy - test', () => {
     state.totalBalance.total = 1.12345678;
     const onFunction = jest.fn();
     const legacy = render(
-      <ContextLoadedProvider value={state}>
+      <ContextAppLoadedProvider value={state}>
         <Legacy fetchTotalBalance={onFunction} toggleMenuDrawer={onFunction} startRescan={onFunction} />
-      </ContextLoadedProvider>,
+      </ContextAppLoadedProvider>,
     );
     expect(legacy.toJSON()).toMatchSnapshot();
   });

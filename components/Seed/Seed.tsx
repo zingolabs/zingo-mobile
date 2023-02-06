@@ -12,7 +12,7 @@ import FadeText from '../Components/FadeText';
 import ZecAmount from '../Components/ZecAmount';
 import Button from '../Button';
 import { ThemeType } from '../../app/types';
-import { ContextLoaded, ContextLoading } from '../../app/context';
+import { ContextAppLoaded, ContextAppLoading } from '../../app/context';
 import { InfoType, TotalBalanceClass, WalletSeedType } from '../../app/AppState';
 import RPCModule from '../RPCModule';
 import RPC from '../../app/rpc';
@@ -32,8 +32,8 @@ type SeedProps = {
   action: 'new' | 'change' | 'view' | 'restore' | 'backup' | 'server';
 };
 const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, action }) => {
-  const contextLoaded = useContext(ContextLoaded);
-  const contextLoading = useContext(ContextLoading);
+  const contextLoaded = useContext(ContextAppLoaded);
+  const contextLoading = useContext(ContextAppLoading);
   let walletSeed: WalletSeedType,
     totalBalance: TotalBalanceClass,
     translate: (key: string, config?: TranslateOptions) => string,
@@ -104,25 +104,28 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
   }, [slideAnim, titleViewHeight]);
 
   useEffect(() => {
-    if (info.latestBlock) {
-      setLatestBlock(info.latestBlock);
-    } else {
-      (async () => {
-        const resp: string = await RPCModule.getLatestBlock(server);
-        //console.log(resp);
-        if (!resp.toLowerCase().startsWith('error')) {
-          setLatestBlock(Number(resp));
-          console.log('/', latestBlock);
-        } else {
-          console.log('error latest block', resp);
-        }
-      })();
+    if (action === 'restore') {
+      if (info.latestBlock) {
+        setLatestBlock(info.latestBlock);
+      } else {
+        (async () => {
+          const resp: string = await RPCModule.getLatestBlock(server);
+          //console.log(resp);
+          if (!resp.toLowerCase().startsWith('error')) {
+            setLatestBlock(Number(resp));
+          } else {
+            console.log('error latest block', resp);
+          }
+        })();
+      }
     }
-  }, [info.latestBlock, latestBlock, server]);
+  }, [action, info.latestBlock, latestBlock, server]);
 
   useEffect(() => {
-    (async () => await RPC.rpc_setInterruptSyncAfterBatch('false'))();
-  }, []);
+    if (action !== 'new' && action !== 'restore') {
+      (async () => await RPC.rpc_setInterruptSyncAfterBatch('false'))();
+    }
+  }, [action]);
 
   //console.log('=================================');
   //console.log(walletSeed.seed, walletSeed.birthday);

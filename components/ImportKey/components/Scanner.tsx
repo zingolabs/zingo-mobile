@@ -7,7 +7,7 @@ import QRCodeScanner from 'react-native-qrcode-scanner';
 import RegText from '../../Components/RegText';
 import Button from '../../Button';
 import { useContext } from 'react';
-import { ContextLoaded } from '../../../app/context';
+import { ContextAppLoaded } from '../../../app/context';
 import { BarCodeReadEvent } from 'react-native-camera';
 
 type ScannerProps = {
@@ -15,7 +15,7 @@ type ScannerProps = {
   closeModal: () => void;
 };
 const Scanner: React.FunctionComponent<ScannerProps> = ({ setPrivKeyText, closeModal }) => {
-  const context = useContext(ContextLoaded);
+  const context = useContext(ContextAppLoaded);
   const { translate } = context;
   const validateKey = (scannedKey: string) => {
     setPrivKeyText(scannedKey);

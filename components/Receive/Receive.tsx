@@ -17,7 +17,7 @@ import PrivKey from '../PrivKey';
 import ImportKey from '../ImportKey';
 import SingleAddress from './components/SingleAddress';
 import { ThemeType } from '../../app/types';
-import { ContextLoaded } from '../../app/context';
+import { ContextAppLoaded } from '../../app/context';
 import PriceFetcher from '../Components/PriceFetcher';
 
 type ReceiveProps = {
@@ -39,7 +39,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   poolsMoreInfoOnClick,
   setZecPrice,
 }) => {
-  const context = useContext(ContextLoaded);
+  const context = useContext(ContextAppLoaded);
   const { translate, dimensions, info, addresses, totalBalance, syncingStatus, uaAddress, currency, zecPrice } =
     context;
   const { colors } = useTheme() as unknown as ThemeType;
@@ -466,7 +466,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
       <TabBar
         {...props}
         indicatorStyle={{ backgroundColor: colors.primary }}
-        style={{ backgroundColor: colors.background, width: dimensions.width / 2 - 20 }}
+        style={{ backgroundColor: 'transparent', width: dimensions.width / 2 - (dimensions.width * 60) / 812 }}
       />
     );
   };
@@ -488,7 +488,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
         style={{
           display: 'flex',
           justifyContent: 'flex-start',
-          width: dimensions.width / 2,
+          width: '50%',
         }}>
         <Modal
           animationType="slide"
@@ -694,7 +694,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
           alignItems: 'center',
           padding: 10,
           height: '100%',
-          width: dimensions.width / 2,
+          width: '50%',
         }}>
         <TabView
           navigationState={{ index, routes }}

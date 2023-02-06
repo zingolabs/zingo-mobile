@@ -7,7 +7,7 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import Pools from '../components/Pools';
-import { defaultAppStateLoaded, ContextLoadedProvider } from '../app/context';
+import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -38,9 +38,9 @@ describe('Component Info - test', () => {
   const onClose = jest.fn();
   test('Matches the snapshot Info', () => {
     const info: any = render(
-      <ContextLoadedProvider value={state}>
+      <ContextAppLoadedProvider value={state}>
         <Pools closeModal={onClose} />
-      </ContextLoadedProvider>,
+      </ContextAppLoadedProvider>,
     );
     expect(info.toJSON()).toMatchSnapshot();
   });

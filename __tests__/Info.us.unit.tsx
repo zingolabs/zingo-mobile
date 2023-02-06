@@ -7,7 +7,7 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import Info from '../components/Info';
-import { defaultAppStateLoaded, ContextLoadedProvider } from '../app/context';
+import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -45,9 +45,9 @@ describe('Component Info - test', () => {
     const onClose = jest.fn();
     const onSet = jest.fn();
     const text: any = render(
-      <ContextLoadedProvider value={state}>
+      <ContextAppLoadedProvider value={state}>
         <Info closeModal={onClose} setZecPrice={onSet} />
-      </ContextLoadedProvider>,
+      </ContextAppLoadedProvider>,
     ).toJSON();
     expect(text.type).toBe('RCTSafeAreaView');
     expect(text.children[1].children[0].children[0].children[5].children[0].children[1].children[0]).toBe(

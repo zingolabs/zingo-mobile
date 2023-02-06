@@ -5,9 +5,7 @@ import {
   AppStateLoaded,
   SyncingStatusReportClass,
   TotalBalanceClass,
-  SendPageStateClass,
   ReceivePageStateClass,
-  ToAddrClass,
   ErrorModalDataClass,
   SendProgressClass,
   WalletSettingsClass,
@@ -20,6 +18,8 @@ import {
   AddressBookClass,
   zecPriceType,
   backgroundType,
+  SendPageStateClass,
+  ToAddrClass,
 } from '../AppState';
 
 export const defaultAppStateLoaded: AppStateLoaded = {
@@ -76,13 +76,13 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   translate: () => '',
 };
 
-export const ContextLoaded = React.createContext(defaultAppStateLoaded);
+export const ContextAppLoaded = React.createContext(defaultAppStateLoaded);
 
 type ContextProviderProps = {
   children: ReactNode;
   value: AppStateLoaded;
 };
 
-export const ContextLoadedProvider = ({ children, value }: ContextProviderProps) => {
-  return <ContextLoaded.Provider value={value}>{children}</ContextLoaded.Provider>;
+export const ContextAppLoadedProvider = ({ children, value }: ContextProviderProps) => {
+  return <ContextAppLoaded.Provider value={value}>{children}</ContextAppLoaded.Provider>;
 };

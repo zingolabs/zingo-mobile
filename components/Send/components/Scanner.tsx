@@ -9,7 +9,7 @@ import Button from '../../Button';
 import { useTheme } from '@react-navigation/native';
 import { parseZcashURI } from '../../../app/uris';
 import RPCModule from '../../RPCModule';
-import { ContextLoaded } from '../../../app/context';
+import { ContextAppLoaded } from '../../../app/context';
 import { BarCodeReadEvent } from 'react-native-camera';
 
 type ScannerProps = {
@@ -25,7 +25,7 @@ type ScannerProps = {
 };
 
 const Scanner: React.FunctionComponent<ScannerProps> = ({ updateToField, closeModal, width, height }) => {
-  const context = useContext(ContextLoaded);
+  const context = useContext(ContextAppLoaded);
   const { translate } = context;
   const validateAddress = async (scannedAddress: string) => {
     const result = await RPCModule.execute('parse', scannedAddress);

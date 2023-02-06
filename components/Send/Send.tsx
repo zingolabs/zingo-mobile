@@ -22,7 +22,7 @@ import Utils from '../../app/utils';
 import Scanner from './components/Scanner';
 import Confirm from './components/Confirm';
 import { ThemeType } from '../../app/types';
-import { ContextLoaded } from '../../app/context';
+import { ContextAppLoaded } from '../../app/context';
 import PriceFetcher from '../Components/PriceFetcher';
 import RPC from '../../app/rpc';
 
@@ -49,7 +49,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   poolsMoreInfoOnClick,
   setZecPrice,
 }) => {
-  const context = useContext(ContextLoaded);
+  const context = useContext(ContextAppLoaded);
   const {
     translate,
     dimensions,
@@ -904,7 +904,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         style={{
           display: 'flex',
           justifyContent: 'flex-start',
-          width: dimensions.width / 2,
+          width: '50%',
         }}>
         <Modal
           animationType="slide"
@@ -1101,7 +1101,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           alignItems: 'center',
           padding: 0,
           height: '100%',
-          width: dimensions.width / 2,
+          width: '50%',
         }}>
         <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{}} style={{}}>
           <View style={{ marginBottom: 150 }}>

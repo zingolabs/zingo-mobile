@@ -8,13 +8,13 @@ import ZecAmount from '../Components/ZecAmount';
 import RegText from '../Components/RegText';
 import Button from '../Button';
 import { ThemeType } from '../../app/types';
-import { ContextLoaded } from '../../app/context';
+import { ContextAppLoaded } from '../../app/context';
 
 type AboutProps = {
   closeModal: () => void;
 };
 const About: React.FunctionComponent<AboutProps> = ({ closeModal }) => {
-  const context = useContext(ContextLoaded);
+  const context = useContext(ContextAppLoaded);
   const { totalBalance, info, translate } = context;
   const { colors } = useTheme() as unknown as ThemeType;
 

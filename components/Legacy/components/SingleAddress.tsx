@@ -12,7 +12,7 @@ import FadeText from '../../Components/FadeText';
 //import Button from '../../Button';
 import Utils from '../../../app/utils';
 import { ThemeType } from '../../../app/types';
-import { ContextLoaded } from '../../../app/context';
+import { ContextAppLoaded } from '../../../app/context';
 
 type SingleAddressProps = {
   address: string;
@@ -31,7 +31,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   prev,
   next,
 }) => {
-  const context = useContext(ContextLoaded);
+  const context = useContext(ContextAppLoaded);
   const { translate } = context;
   //console.log(`Addresses ${addresses}: ${multipleAddresses}`);
   const { colors } = useTheme() as unknown as ThemeType;
@@ -55,7 +55,6 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
       contentContainerStyle={[
         {
           alignItems: 'center',
-          backgroundColor: colors.background,
         },
       ]}>
       <View style={{ marginTop: 20, padding: 10, backgroundColor: colors.border }}>

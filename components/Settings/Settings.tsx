@@ -14,7 +14,7 @@ import ZecAmount from '../Components/ZecAmount';
 import { parseServerURI, serverUris } from '../../app/uris';
 import Button from '../Button';
 import { ThemeType } from '../../app/types';
-import { ContextLoaded } from '../../app/context';
+import { ContextAppLoaded } from '../../app/context';
 import moment from 'moment';
 import 'moment/locale/es';
 
@@ -44,7 +44,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   set_sendAll_option,
   closeModal,
 }) => {
-  const context = useContext(ContextLoaded);
+  const context = useContext(ContextAppLoaded);
   const {
     walletSettings,
     totalBalance,

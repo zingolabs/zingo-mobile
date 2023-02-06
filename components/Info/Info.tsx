@@ -9,7 +9,7 @@ import Button from '../Button';
 import Utils from '../../app/utils';
 import DetailLine from './components/DetailLine';
 import { ThemeType } from '../../app/types';
-import { ContextLoaded } from '../../app/context';
+import { ContextAppLoaded } from '../../app/context';
 import PriceFetcher from '../Components/PriceFetcher';
 
 type InfoProps = {
@@ -18,7 +18,7 @@ type InfoProps = {
 };
 
 const Info: React.FunctionComponent<InfoProps> = ({ closeModal, setZecPrice }) => {
-  const context = useContext(ContextLoaded);
+  const context = useContext(ContextAppLoaded);
   const { info, totalBalance, translate, currency, zecPrice } = context;
   const { colors } = useTheme() as unknown as ThemeType;
 

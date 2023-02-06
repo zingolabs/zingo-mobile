@@ -6,7 +6,7 @@ import RegText from '../../../components/Components/RegText';
 import FadeText from '../../../components/Components/FadeText';
 
 import { useTheme } from '@react-navigation/native';
-import { ContextLoaded } from '../../context';
+import { ContextAppLoaded } from '../../context';
 import RPC from '../../rpc';
 
 const window = Dimensions.get('window');
@@ -16,7 +16,7 @@ type MenuProps = {
 };
 
 const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected }) => {
-  const context = useContext(ContextLoaded);
+  const context = useContext(ContextAppLoaded);
   const { translate } = context;
   const { colors } = useTheme();
   const item = {

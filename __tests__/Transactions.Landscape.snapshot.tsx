@@ -7,7 +7,7 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import Transactions from '../components/Transactions';
-import { defaultAppStateLoaded, ContextLoadedProvider } from '../app/context';
+import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -118,7 +118,7 @@ describe('Component Transactions - test', () => {
     state.totalBalance.total = 1.12345678;
     const onFunction = jest.fn();
     const transactions = render(
-      <ContextLoadedProvider value={state}>
+      <ContextAppLoadedProvider value={state}>
         <Transactions
           doRefresh={onFunction}
           toggleMenuDrawer={onFunction}
@@ -127,7 +127,7 @@ describe('Component Transactions - test', () => {
           syncingStatusMoreInfoOnClick={onFunction}
           setZecPrice={onFunction}
         />
-      </ContextLoadedProvider>,
+      </ContextAppLoadedProvider>,
     );
     expect(transactions.toJSON()).toMatchSnapshot();
   });

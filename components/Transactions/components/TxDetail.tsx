@@ -18,7 +18,7 @@ import FadeText from '../../Components/FadeText';
 //import ZecPrice from '../../Components/ZecPrice';
 import Button from '../../Button';
 import { ThemeType } from '../../../app/types';
-import { ContextLoaded } from '../../../app/context';
+import { ContextAppLoaded } from '../../../app/context';
 
 type TxDetailProps = {
   tx: TransactionType;
@@ -26,7 +26,7 @@ type TxDetailProps = {
 };
 
 const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) => {
-  const context = useContext(ContextLoaded);
+  const context = useContext(ContextAppLoaded);
   const { info, translate, language } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const spendColor =
