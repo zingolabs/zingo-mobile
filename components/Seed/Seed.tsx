@@ -122,8 +122,10 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
   }, [action, info.latestBlock, latestBlock, server]);
 
   useEffect(() => {
-    (async () => await RPC.rpc_setInterruptSyncAfterBatch('false'))();
-  }, []);
+    if (action !== 'new' && action !== 'restore') {
+      (async () => await RPC.rpc_setInterruptSyncAfterBatch('false'))();
+    }
+  }, [action]);
 
   //console.log('=================================');
   //console.log(walletSeed.seed, walletSeed.birthday);
