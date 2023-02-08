@@ -1,20 +1,22 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState, ReactNode } from 'react';
-import { View, Image, Modal, TouchableOpacity } from 'react-native';
+import { View, Image, TouchableOpacity } from 'react-native';
+//import { Modal } from 'react-native';
 import { TabView, TabBar, SceneRendererProps, Route, NavigationState } from 'react-native-tab-view';
-import Toast from 'react-native-simple-toast';
+//import Toast from 'react-native-simple-toast';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faBars, faCheck, faPlay, faStop, faInfo, faEllipsisV } from '@fortawesome/free-solid-svg-icons';
-import OptionsMenu from 'react-native-option-menu';
+import { faBars, faCheck, faPlay, faStop, faInfo } from '@fortawesome/free-solid-svg-icons';
+//import { faEllipsisV } from '@fortawesome/free-solid-svg-icons';
+//import OptionsMenu from 'react-native-option-menu';
 
 import ZecAmount from '../Components/ZecAmount';
 import CurrencyAmount from '../Components/CurrencyAmount';
 import RegText from '../Components/RegText';
-import Utils from '../../app/utils';
-import RPC from '../../app/rpc';
-import PrivKey from '../PrivKey';
-import ImportKey from '../ImportKey';
+//import Utils from '../../app/utils';
+//import RPC from '../../app/rpc';
+//import PrivKey from '../PrivKey';
+//import ImportKey from '../ImportKey';
 import SingleAddress from './components/SingleAddress';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
@@ -31,10 +33,8 @@ type ReceiveProps = {
 };
 
 const Receive: React.FunctionComponent<ReceiveProps> = ({
-  fetchTotalBalance,
   setUaAddress,
   toggleMenuDrawer,
-  startRescan,
   syncingStatusMoreInfoOnClick,
   poolsMoreInfoOnClick,
   setZecPrice,
@@ -86,7 +86,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
       setUaAddress(uaddrs[newIndex].address);
     }
   };
-
+  /*
   const addO = async () => {
     //console.log('New O');
     //const newAddress = await RPC.rpc_createNewAddress('tzo');
@@ -197,7 +197,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   if (uaddrs.length > 0) {
     address = uaddrs[oindex].address;
   }
-
+  */
   const syncStatusDisplayLine = syncingStatus.inProgress ? `(${syncingStatus.blocks})` : '';
 
   const renderScene: (
@@ -248,7 +248,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
           justifyContent: 'flex-start',
           width: '100%',
         }}>
-        <Modal
+        {/*<Modal
           animationType="slide"
           transparent={false}
           visible={privKeyModalVisible}
@@ -259,15 +259,15 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
             privKey={privKey}
             closeModal={() => setPrivKeyModalVisible(false)}
           />
-        </Modal>
+        </Modal>*/}
 
-        <Modal
+        {/*<Modal
           animationType="slide"
           transparent={false}
           visible={importKeyModalVisible}
           onRequestClose={() => setImportKeyModalVisible(false)}>
           <ImportKey doImport={doImport} closeModal={() => setImportKeyModalVisible(false)} />
-        </Modal>
+        </Modal>*/}
 
         <View
           style={{
@@ -426,7 +426,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
         </View>
 
         <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', right: 0 }}>
-          <OptionsMenu
+          {/*<OptionsMenu
             customButton={
               <View accessible={true} accessibilityLabel={translate('menu-acc')}>
                 <FontAwesomeIcon icon={faEllipsisV} color={colors.border} size={48} />
@@ -440,9 +440,9 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
               translate('receive.viewkey-option'),
               translate('receive.import-option'),
               translate('cancel'),
-            ]}
+            ]},
             actions={[addO, viewPrivKey, viewViewingKey, importKey]}
-          />
+          />*/}
         </View>
 
         <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
@@ -490,7 +490,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
           justifyContent: 'flex-start',
           width: '50%',
         }}>
-        <Modal
+        {/*<Modal
           animationType="slide"
           transparent={false}
           visible={privKeyModalVisible}
@@ -501,15 +501,15 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
             privKey={privKey}
             closeModal={() => setPrivKeyModalVisible(false)}
           />
-        </Modal>
+        </Modal>*/}
 
-        <Modal
+        {/*<Modal
           animationType="slide"
           transparent={false}
           visible={importKeyModalVisible}
           onRequestClose={() => setImportKeyModalVisible(false)}>
           <ImportKey doImport={doImport} closeModal={() => setImportKeyModalVisible(false)} />
-        </Modal>
+        </Modal>*/}
 
         <View
           style={{
@@ -668,7 +668,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
         </View>
 
         <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', right: 0 }}>
-          <OptionsMenu
+          {/*<OptionsMenu
             customButton={
               <View accessible={true} accessibilityLabel={translate('menu-acc')}>
                 <FontAwesomeIcon icon={faEllipsisV} color={colors.border} size={48} />
@@ -684,7 +684,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
               translate('cancel'),
             ]}
             actions={[addO, viewPrivKey, viewViewingKey, importKey]}
-          />
+          />*/}
         </View>
       </View>
       <View
