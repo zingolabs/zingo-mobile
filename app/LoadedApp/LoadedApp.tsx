@@ -55,6 +55,7 @@ import platform from '../platform/platform';
 import { parseZcashURI, serverUris, ZcashURITargetClass } from '../uris';
 import BackgroundFileImpl from '../../components/Background/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Insight from '../../components/Insight';
 import { createAlert } from '../createAlert';
 
 const History = React.lazy(() => import('../../components/History'));
@@ -452,6 +453,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       seedServerModalVisible: false,
       syncReportModalVisible: false,
       poolsModalVisible: false,
+      insightModalVisible: false,
     });
   };
 
@@ -740,6 +742,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       this.setState({ syncReportModalVisible: true });
     } else if (item === 'Fund Pools') {
       this.setState({ poolsModalVisible: true });
+    } else if (item === 'Insight') {
+      this.setState({ insightModalVisible: true });
     } else if (item === 'Wallet Seed') {
       this.setState({ seedViewModalVisible: true });
     } else if (item === 'Change Wallet') {
@@ -996,6 +1000,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       infoModalVisible,
       syncReportModalVisible,
       poolsModalVisible,
+      insightModalVisible,
       settingsModalVisible,
       computingModalVisible,
       rescanModalVisible,
@@ -1100,6 +1105,21 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                 </View>
               }>
               <Pools closeModal={() => this.setState({ poolsModalVisible: false })} />
+            </Suspense>
+          </Modal>
+
+          <Modal
+            animationType="slide"
+            transparent={false}
+            visible={insightModalVisible}
+            onRequestClose={() => this.setState({ insightModalVisible: false })}>
+            <Suspense
+              fallback={
+                <View>
+                  <Text>{translate('loading') as string}</Text>
+                </View>
+              }>
+              <Insight closeModal={() => this.setState({ insightModalVisible: false })} />
             </Suspense>
           </Modal>
 

@@ -58,6 +58,7 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   seedServerModalVisible: false,
   syncReportModalVisible: false,
   poolsModalVisible: false,
+  insightModalVisible: false,
   newServer: '' as string,
   uaAddress: '' as string,
 
