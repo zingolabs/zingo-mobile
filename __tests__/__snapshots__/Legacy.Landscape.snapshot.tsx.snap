@@ -20,20 +20,6 @@ exports[`Component Legacy - test Legacy Landscape - snapshot 1`] = `
       }
     }
   >
-    <Modal
-      animationType="slide"
-      hardwareAccelerated={false}
-      onRequestClose={[Function]}
-      transparent={false}
-      visible={false}
-    />
-    <Modal
-      animationType="slide"
-      hardwareAccelerated={false}
-      onRequestClose={[Function]}
-      transparent={false}
-      visible={false}
-    />
     <View
       style={
         {
@@ -215,60 +201,7 @@ exports[`Component Legacy - test Legacy Landscape - snapshot 1`] = `
           "right": 0,
         }
       }
-    >
-      <
-        actions={
-          [
-            [Function],
-            [Function],
-            [Function],
-          ]
-        }
-        buttonStyle={
-          {
-            "height": 32,
-            "margin": 7.5,
-            "resizeMode": "contain",
-            "width": 32,
-          }
-        }
-        customButton={
-          <View
-            accessibilityLabel="text translated"
-            accessible={true}
-          >
-            <
-              color="rgb(216, 216, 216)"
-              icon={
-                {
-                  "icon": [
-                    128,
-                    512,
-                    [
-                      "ellipsis-v",
-                    ],
-                    "f142",
-                    "M64 360c30.9 0 56 25.1 56 56s-25.1 56-56 56s-56-25.1-56-56s25.1-56 56-56zm0-160c30.9 0 56 25.1 56 56s-25.1 56-56 56s-56-25.1-56-56s25.1-56 56-56zM120 96c0 30.9-25.1 56-56 56S8 126.9 8 96S33.1 40 64 40s56 25.1 56 56z",
-                  ],
-                  "iconName": "ellipsis-vertical",
-                  "prefix": "fas",
-                }
-              }
-              size={48}
-            />
-          </View>
-        }
-        destructiveIndex={4}
-        options={
-          [
-            "text translated",
-            "text translated",
-            "text translated",
-            "text translated",
-          ]
-        }
-      />
-    </View>
+    />
   </View>
   <View
     style={
