@@ -1,4 +1,4 @@
-// const { log } = require('detox');
+ const { log } = require('detox');
 
 describe('Example', () => {
   beforeAll(async () => {
@@ -12,6 +12,22 @@ describe('Example', () => {
   it('should have a visible button', async () => {
     // log.error(device.appLaunchArgs.get())
     await expect(element(by.traits(['button'])).atIndex(1)).toBeVisible();
+  });
+
+  it("New wallet button works", async () => {
+    let newWalletButton = element(by.text("CREATE NEW WALLET (NEW SEED)"));
+    await newWalletButton.tap();
+    await element(by.text("I HAVE SAVED \n THE SEED")).tap();
+    // For some reason, the element that says 'ZEC', according to react, 
+    // has text of ' ---'
+    // let zecText = element(by.text(" ---")).atIndex(1);
+    let zecText = element(by.id('519'))
+    await zecText.getAttributes();
+    log.info(zecText);
+
+    await expect(zecText).toBeVisible();
+    
+    //expect(element(by.traits(['button'])).filter())
   });
   
   // my failing test
