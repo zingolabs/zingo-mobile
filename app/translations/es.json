@@ -10,6 +10,9 @@
   "menudrawer-acc": "Abrir Menu Lateral",
   "menu-acc": "Abrir Menu",
   "donation": "Gracias por apoyar Zingo!",
+  "insight": {
+    "title": "Visión Financiera"
+  },
   "loadingapp" : {
     "actualserver": "Servidor Activo:",
     "changeserver": "CAMBIAR SERVIDOR",
@@ -32,6 +35,7 @@
     "changewallet": "Abrir otro Monedero",
     "restorebackupwallet": "Restaurar la última copia de Seguridad",
     "fundpools": "Agrupaciones de Fondos",
+    "insight": "Visión Financiera",
     "restoremainnet-error": "Esta opción está solamente disponible para la Red: 'Mainnet'.",
     "changeservernew-error": "Error al intentar cambiar al Servidor nuevo: ",
     "readingwallet-error": "Error al intentar leer el monedero activo usando el Servidor nuevo:",
