@@ -173,6 +173,7 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
             marginVertical: 5,
           }}>
           <View
+            testID='transaction title'
             style={{
               display: 'flex',
               flexDirection: 'column',
@@ -180,7 +181,7 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
               justifyContent: 'center',
               flexWrap: 'wrap',
             }}>
-            <RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
+            <RegText testID="transaction text" color={colors.money} style={{ paddingHorizontal: 5 }}>
               {translate('transactions.title')}
             </RegText>
             {/*<RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
