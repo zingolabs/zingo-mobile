@@ -1,20 +1,22 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useContext, ReactNode } from 'react';
-import { View, Image, Modal, TouchableOpacity } from 'react-native';
+import { View, Image, TouchableOpacity } from 'react-native';
+//import { Modal } from 'react-native';
 import { TabView, TabBar, SceneRendererProps, NavigationState, Route } from 'react-native-tab-view';
-import Toast from 'react-native-simple-toast';
+//import Toast from 'react-native-simple-toast';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faBars, faEllipsisV } from '@fortawesome/free-solid-svg-icons';
-import OptionsMenu from 'react-native-option-menu';
+import { faBars } from '@fortawesome/free-solid-svg-icons';
+//import { faEllipsisV } from '@fortawesome/free-solid-svg-icons';
+//import OptionsMenu from 'react-native-option-menu';
 
 import ZecAmount from '../Components/ZecAmount';
 import CurrencyAmount from '../Components/CurrencyAmount';
 import RegText from '../Components/RegText';
-import Utils from '../../app/utils';
-import RPC from '../../app/rpc';
-import PrivKey from '../PrivKey';
-import ImportKey from '../ImportKey';
+//import Utils from '../../app/utils';
+//import RPC from '../../app/rpc';
+//import PrivKey from '../PrivKey';
+//import ImportKey from '../ImportKey';
 import SingleAddress from './components/SingleAddress';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
@@ -25,7 +27,7 @@ type LegacyProps = {
   startRescan: () => void;
 };
 
-const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance, toggleMenuDrawer, startRescan }) => {
+const Legacy: React.FunctionComponent<LegacyProps> = ({ toggleMenuDrawer }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, dimensions, info, addresses, totalBalance, uaAddress, currency, zecPrice } = context;
   const { colors } = useTheme() as unknown as ThemeType;
@@ -97,6 +99,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance, toggl
     }
   };
 
+  /*
   const addZ = async () => {
     //console.log('New Z');
     //const newAddress = await RPC.rpc_createNewAddress('z');
@@ -114,7 +117,6 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance, toggl
     //}
     //return;
   };
-  /*
   const addT = async () => {
     //console.log('New T');
     const newAddress = await RPC.rpc_createNewAddress('t');
@@ -133,10 +135,10 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance, toggl
     return;
   };
   */
-  const [privKeyModalVisible, setPrivKeyModalVisible] = useState(false);
-  const [keyType, setKeyType] = useState(0);
-  const [privKey, setPrivKey] = useState('');
-
+  //const [privKeyModalVisible, setPrivKeyModalVisible] = useState(false);
+  //const [keyType, setKeyType] = useState(0);
+  //const [privKey, setPrivKey] = useState('');
+  /*
   const viewPrivKey = async () => {
     if (index === 0 && zaddrs.length === 0) {
       Toast.show(translate('legacy.znoprivkey-error'), Toast.LONG);
@@ -224,14 +226,14 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance, toggl
 
     startRescan();
   };
+  */
+  //let address = '';
 
-  let address = '';
-
-  if (index === 0 && zaddrs.length > 0) {
-    address = zaddrs[zindex].address;
-  } else if (index === 1 && taddrs.length > 0) {
-    address = taddrs[tindex].address;
-  }
+  //if (index === 0 && zaddrs.length > 0) {
+  //  address = zaddrs[zindex].address;
+  //} else if (index === 1 && taddrs.length > 0) {
+  //  address = taddrs[tindex].address;
+  //}
 
   const renderScene: (
     props: SceneRendererProps & {
@@ -302,7 +304,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance, toggl
           justifyContent: 'flex-start',
           alignItems: 'stretch',
         }}>
-        <Modal
+        {/*<Modal
           animationType="slide"
           transparent={false}
           visible={privKeyModalVisible}
@@ -313,15 +315,15 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance, toggl
             privKey={privKey}
             closeModal={() => setPrivKeyModalVisible(false)}
           />
-        </Modal>
+        </Modal>*/}
 
-        <Modal
+        {/*<Modal
           animationType="slide"
           transparent={false}
           visible={importKeyModalVisible}
           onRequestClose={() => setImportKeyModalVisible(false)}>
           <ImportKey doImport={doImport} closeModal={() => setImportKeyModalVisible(false)} />
-        </Modal>
+        </Modal>*/}
 
         <View
           style={{
@@ -374,7 +376,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance, toggl
         </View>
 
         <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', right: 0 }}>
-          <OptionsMenu
+          {/*<OptionsMenu
             customButton={
               <View accessible={true} accessibilityLabel={translate('menu-acc')}>
                 <FontAwesomeIcon icon={faEllipsisV} color={colors.border} size={48} />
@@ -391,7 +393,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance, toggl
             ]}
             //addT
             actions={[addZ, viewPrivKey, viewViewingKey]}
-          />
+          />*/}
         </View>
 
         <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
@@ -439,7 +441,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance, toggl
           justifyContent: 'flex-start',
           width: '50%',
         }}>
-        <Modal
+        {/*<Modal
           animationType="slide"
           transparent={false}
           visible={privKeyModalVisible}
@@ -450,15 +452,15 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance, toggl
             privKey={privKey}
             closeModal={() => setPrivKeyModalVisible(false)}
           />
-        </Modal>
+        </Modal>*/}
 
-        <Modal
+        {/*<Modal
           animationType="slide"
           transparent={false}
           visible={importKeyModalVisible}
           onRequestClose={() => setImportKeyModalVisible(false)}>
           <ImportKey doImport={doImport} closeModal={() => setImportKeyModalVisible(false)} />
-        </Modal>
+        </Modal>*/}
 
         <View
           style={{
@@ -511,7 +513,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance, toggl
         </View>
 
         <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', right: 0 }}>
-          <OptionsMenu
+          {/*<OptionsMenu
             customButton={
               <View accessible={true} accessibilityLabel={translate('menu-acc')}>
                 <FontAwesomeIcon icon={faEllipsisV} color={colors.border} size={48} />
@@ -528,7 +530,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ fetchTotalBalance, toggl
             ]}
             //addT
             actions={[addZ, viewPrivKey, viewViewingKey]}
-          />
+          />*/}
         </View>
       </View>
       <View
