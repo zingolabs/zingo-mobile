@@ -21,6 +21,7 @@ type HeaderProps = {
   toggleMenuDrawer: () => void;
   setZecPrice: (p: number, d: number) => void;
   title: string;
+  noBalance?: boolean;
 };
 
 const Header: React.FunctionComponent<HeaderProps> = ({
@@ -30,6 +31,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   toggleMenuDrawer,
   setZecPrice,
   title,
+  noBalance,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, totalBalance, info, syncingStatus, currency, zecPrice, dimensions } = context;
@@ -75,35 +77,40 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           source={require('../../assets/img/logobig-zingo.png')}
           style={{ width: 80, height: 80, resizeMode: 'contain' }}
         />
-        <View style={{ flexDirection: 'row' }}>
-          <ZecAmount
-            currencyName={info.currencyName ? info.currencyName : ''}
-            color={balanceColor}
-            size={36}
-            amtZec={totalBalance.total}
-          />
-          {totalBalance.total > 0 && (totalBalance.privateBal > 0 || totalBalance.transparentBal > 0) && (
-            <TouchableOpacity onPress={() => poolsMoreInfoOnClick()}>
-              <View
-                style={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  backgroundColor: colors.card,
-                  borderRadius: 10,
-                  margin: 0,
-                  padding: 0,
-                  marginLeft: 5,
-                  minWidth: 48,
-                  minHeight: 48,
-                }}>
-                <RegText color={colors.primary}>{translate('transactions.pools')}</RegText>
-                <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
-              </View>
-            </TouchableOpacity>
-          )}
-        </View>
+        {noBalance && (
+          <View style={{ height: 20 }} />
+        )}
+        {!noBalance && (
+          <View style={{ flexDirection: dimensions.orientation === 'portrait' ? 'row' : "column-reverse", margin: dimensions.orientation === 'portrait' ? 0 : 10 }}>
+            <ZecAmount
+              currencyName={info.currencyName ? info.currencyName : ''}
+              color={balanceColor}
+              size={36}
+              amtZec={totalBalance.total}
+            />
+            {totalBalance.total > 0 && (totalBalance.privateBal > 0 || totalBalance.transparentBal > 0) && (
+              <TouchableOpacity onPress={() => poolsMoreInfoOnClick()}>
+                <View
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: colors.card,
+                    borderRadius: 10,
+                    margin: 0,
+                    padding: 0,
+                    marginLeft: dimensions.orientation === 'portrait' ? 5 : 0,
+                    minWidth: 48,
+                    minHeight: 48,
+                  }}>
+                  <RegText color={colors.primary}>{translate('transactions.pools')}</RegText>
+                  <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
+                </View>
+              </TouchableOpacity>
+            )}
+          </View>
+        )}
 
         {currency === 'USD' && (
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -123,6 +130,10 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           <View style={{ margin: 5 }}>
             <Button type="Primary" title={translate('transactions.shieldfunds')} onPress={shieldFunds} />
           </View>
+        )}
+
+        {dimensions.orientation === 'landscape' && (
+          <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
         )}
 
         <View
