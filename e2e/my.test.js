@@ -21,11 +21,17 @@ describe('Example', () => {
     // For some reason, the element that says 'ZEC', according to react, 
     // has text of ' ---'
     // let zecText = element(by.text(" ---")).atIndex(1);
-    let zecText = element(by.id('519'))
-    await zecText.getAttributes();
-    log.info(zecText);
+    let text = element(by.id('transaction text'))
+    let attributes = await text.getAttributes();
+    log.info(attributes);
+    log.info("Value:", attributes.value);
+    log.info("Text:", attributes.text);
+    log.info("Visibility:", attributes.visibility);
+    log.info("Width (pixels):", attributes.width);
+    log.info("AAAaaaaaaaahhhh")
 
-    await expect(zecText).toBeVisible();
+    await expect(text).toBeVisible();
+    await expect(text).toHaveText("Wallet");
     
     //expect(element(by.traits(['button'])).filter())
   });
