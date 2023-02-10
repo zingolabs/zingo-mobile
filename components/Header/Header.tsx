@@ -22,6 +22,7 @@ type HeaderProps = {
   setZecPrice: (p: number, d: number) => void;
   title: string;
   noBalance?: boolean;
+  noSyncingStatus?: boolean;
 };
 
 const Header: React.FunctionComponent<HeaderProps> = ({
@@ -32,6 +33,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   setZecPrice,
   title,
   noBalance,
+  noSyncingStatus,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, totalBalance, info, syncingStatus, currency, zecPrice, dimensions } = context;
@@ -77,11 +79,13 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           source={require('../../assets/img/logobig-zingo.png')}
           style={{ width: 80, height: 80, resizeMode: 'contain' }}
         />
-        {noBalance && (
-          <View style={{ height: 20 }} />
-        )}
+        {noBalance && <View style={{ height: 20 }} />}
         {!noBalance && (
-          <View style={{ flexDirection: dimensions.orientation === 'portrait' ? 'row' : "column-reverse", margin: dimensions.orientation === 'portrait' ? 0 : 10 }}>
+          <View
+            style={{
+              flexDirection: dimensions.orientation === 'portrait' ? 'row' : 'column-reverse',
+              margin: dimensions.orientation === 'portrait' ? 0 : 10,
+            }}>
             <ZecAmount
               currencyName={info.currencyName ? info.currencyName : ''}
               color={balanceColor}
@@ -112,7 +116,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           </View>
         )}
 
-        {currency === 'USD' && (
+        {currency === 'USD' && !noBalance && (
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <CurrencyAmount
               style={{ marginTop: 0, marginBottom: 5 }}
@@ -126,7 +130,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           </View>
         )}
 
-        {showShieldButton && (
+        {showShieldButton && !noBalance && (
           <View style={{ margin: 5 }}>
             <Button type="Primary" title={translate('transactions.shieldfunds')} onPress={shieldFunds} />
           </View>
@@ -157,34 +161,36 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               {title}
             </RegText>
           </View>
-          <View
-            style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              margin: 0,
-              padding: 1,
-              borderColor: colors.primary,
-              borderWidth: 1,
-              borderRadius: 10,
-              minWidth: 20,
-              minHeight: 20,
-            }}>
-            {!syncStatusDisplayLine && syncingStatus.synced && (
-              <View style={{ margin: 0, padding: 0 }}>
-                <FontAwesomeIcon icon={faCheck} color={colors.primary} />
-              </View>
-            )}
-            {!syncStatusDisplayLine && !syncingStatus.synced && (
-              <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
-                <FontAwesomeIcon icon={faStop} color={colors.zingo} size={12} />
-              </TouchableOpacity>
-            )}
-            {syncStatusDisplayLine && (
-              <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
-                <FontAwesomeIcon icon={faPlay} color={colors.primary} size={10} />
-              </TouchableOpacity>
-            )}
-          </View>
+          {!noSyncingStatus && (
+            <View
+              style={{
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: 0,
+                padding: 1,
+                borderColor: colors.primary,
+                borderWidth: 1,
+                borderRadius: 10,
+                minWidth: 20,
+                minHeight: 20,
+              }}>
+              {!syncStatusDisplayLine && syncingStatus.synced && (
+                <View style={{ margin: 0, padding: 0 }}>
+                  <FontAwesomeIcon icon={faCheck} color={colors.primary} />
+                </View>
+              )}
+              {!syncStatusDisplayLine && !syncingStatus.synced && (
+                <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
+                  <FontAwesomeIcon icon={faStop} color={colors.zingo} size={12} />
+                </TouchableOpacity>
+              )}
+              {syncStatusDisplayLine && (
+                <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
+                  <FontAwesomeIcon icon={faPlay} color={colors.primary} size={10} />
+                </TouchableOpacity>
+              )}
+            </View>
+          )}
         </View>
       </View>
 

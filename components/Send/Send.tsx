@@ -1,12 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useRef, useCallback, useContext } from 'react';
-import { View, ScrollView, Modal, Image, Alert, Keyboard, TextInput, TouchableOpacity } from 'react-native';
-import { faQrcode, faCheck, faInfo, faPlay, faStop } from '@fortawesome/free-solid-svg-icons';
+import { View, ScrollView, Modal, Alert, Keyboard, TextInput, TouchableOpacity } from 'react-native';
+import { faQrcode, faCheck, faInfo } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme, useIsFocused } from '@react-navigation/native';
 import Toast from 'react-native-simple-toast';
 import { getNumberFormatSettings } from 'react-native-localize';
-import { faBars } from '@fortawesome/free-solid-svg-icons';
 import Animated, { EasingNode } from 'react-native-reanimated';
 
 import FadeText from '../Components/FadeText';
@@ -51,18 +50,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   setZecPrice,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const {
-    translate,
-    dimensions,
-    info,
-    totalBalance,
-    sendPageState,
-    syncingStatus,
-    navigation,
-    currency,
-    zecPrice,
-    sendAll,
-  } = context;
+  const { translate, dimensions, info, totalBalance, sendPageState, navigation, zecPrice, sendAll } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [qrcodeModalVisble, setQrcodeModalVisible] = useState(false);
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
@@ -76,7 +64,6 @@ const Send: React.FunctionComponent<SendProps> = ({
   const slideAnim = useRef(new Animated.Value(0)).current;
   const defaultFee = info.defaultFee || Utils.getFallbackDefaultFee();
   const { decimalSeparator } = getNumberFormatSettings();
-  const syncStatusDisplayLine = syncingStatus.inProgress ? `(${syncingStatus.blocks})` : '';
   const spendable = totalBalance.transparentBal + totalBalance.spendablePrivate + totalBalance.spendableOrchard;
   const stillConfirming = spendable !== totalBalance.total;
 
@@ -399,8 +386,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           onLayout={e => {
             const { height } = e.nativeEvent.layout;
             setTitleViewHeight(height);
-          }}
-        >
+          }}>
           <Header
             poolsMoreInfoOnClick={poolsMoreInfoOnClick}
             syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
@@ -801,8 +787,7 @@ const Send: React.FunctionComponent<SendProps> = ({
             onLayout={e => {
               const { height } = e.nativeEvent.layout;
               setTitleViewHeight(height);
-            }}
-          >
+            }}>
             <Header
               poolsMoreInfoOnClick={poolsMoreInfoOnClick}
               syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}

@@ -1,18 +1,13 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState, ReactNode } from 'react';
-import { View, Image, TouchableOpacity } from 'react-native';
+import { View } from 'react-native';
 //import { Modal } from 'react-native';
 import { TabView, TabBar, SceneRendererProps, Route, NavigationState } from 'react-native-tab-view';
 //import Toast from 'react-native-simple-toast';
 import { useTheme } from '@react-navigation/native';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faBars, faCheck, faPlay, faStop, faInfo } from '@fortawesome/free-solid-svg-icons';
 //import { faEllipsisV } from '@fortawesome/free-solid-svg-icons';
 //import OptionsMenu from 'react-native-option-menu';
 
-import ZecAmount from '../Components/ZecAmount';
-import CurrencyAmount from '../Components/CurrencyAmount';
-import RegText from '../Components/RegText';
 //import Utils from '../../app/utils';
 //import RPC from '../../app/rpc';
 //import PrivKey from '../PrivKey';
@@ -20,29 +15,16 @@ import RegText from '../Components/RegText';
 import SingleAddress from './components/SingleAddress';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
-import PriceFetcher from '../Components/PriceFetcher';
 import Header from '../Header';
 
 type ReceiveProps = {
-  fetchTotalBalance: () => void;
   setUaAddress: (uaAddress: string) => void;
   toggleMenuDrawer: () => void;
-  startRescan: () => void;
-  syncingStatusMoreInfoOnClick: () => void;
-  poolsMoreInfoOnClick: () => void;
-  setZecPrice: (p: number, d: number) => void;
 };
 
-const Receive: React.FunctionComponent<ReceiveProps> = ({
-  setUaAddress,
-  toggleMenuDrawer,
-  syncingStatusMoreInfoOnClick,
-  poolsMoreInfoOnClick,
-  setZecPrice,
-}) => {
+const Receive: React.FunctionComponent<ReceiveProps> = ({ setUaAddress, toggleMenuDrawer }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, dimensions, info, addresses, totalBalance, syncingStatus, uaAddress, currency, zecPrice } =
-    context;
+  const { translate, dimensions, addresses, uaAddress } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [index, setIndex] = useState(0);
   const [routes] = useState([{ key: 'uaddr', title: translate('receive.u-title') }]);
@@ -199,7 +181,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     address = uaddrs[oindex].address;
   }
   */
-  const syncStatusDisplayLine = syncingStatus.inProgress ? `(${syncingStatus.blocks})` : '';
 
   const renderScene: (
     props: SceneRendererProps & {
@@ -271,23 +252,15 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
         </Modal>*/}
 
         <Header
-          poolsMoreInfoOnClick={poolsMoreInfoOnClick}
-          syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
+          poolsMoreInfoOnClick={() => {}}
+          syncingStatusMoreInfoOnClick={() => {}}
           setComputingModalVisible={() => {}}
           toggleMenuDrawer={toggleMenuDrawer}
-          setZecPrice={setZecPrice}
+          setZecPrice={() => {}}
           title={translate('receive.title')}
           noBalance={true}
+          noSyncingStatus={true}
         />
-
-        <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute' }}>
-          <TouchableOpacity
-            accessible={true}
-            accessibilityLabel={translate('menudrawer-acc')}
-            onPress={toggleMenuDrawer}>
-            <FontAwesomeIcon icon={faBars} size={48} color={colors.border} />
-          </TouchableOpacity>
-        </View>
 
         <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', right: 0 }}>
           {/*<OptionsMenu
@@ -376,23 +349,15 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
         </Modal>*/}
 
         <Header
-          poolsMoreInfoOnClick={poolsMoreInfoOnClick}
-          syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
+          poolsMoreInfoOnClick={() => {}}
+          syncingStatusMoreInfoOnClick={() => {}}
           setComputingModalVisible={() => {}}
           toggleMenuDrawer={toggleMenuDrawer}
-          setZecPrice={setZecPrice}
+          setZecPrice={() => {}}
           title={translate('receive.title')}
           noBalance={true}
+          noSyncingStatus={true}
         />
-
-        <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute' }}>
-          <TouchableOpacity
-            accessible={true}
-            accessibilityLabel={translate('menudrawer-acc')}
-            onPress={toggleMenuDrawer}>
-            <FontAwesomeIcon icon={faBars} size={48} color={colors.border} />
-          </TouchableOpacity>
-        </View>
 
         <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', right: 0 }}>
           {/*<OptionsMenu

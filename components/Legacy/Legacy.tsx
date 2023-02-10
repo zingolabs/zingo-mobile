@@ -1,18 +1,13 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useContext, ReactNode } from 'react';
-import { View, Image, TouchableOpacity } from 'react-native';
+import { View } from 'react-native';
 //import { Modal } from 'react-native';
 import { TabView, TabBar, SceneRendererProps, NavigationState, Route } from 'react-native-tab-view';
 //import Toast from 'react-native-simple-toast';
 import { useTheme } from '@react-navigation/native';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faBars } from '@fortawesome/free-solid-svg-icons';
 //import { faEllipsisV } from '@fortawesome/free-solid-svg-icons';
 //import OptionsMenu from 'react-native-option-menu';
 
-import ZecAmount from '../Components/ZecAmount';
-import CurrencyAmount from '../Components/CurrencyAmount';
-import RegText from '../Components/RegText';
 //import Utils from '../../app/utils';
 //import RPC from '../../app/rpc';
 //import PrivKey from '../PrivKey';
@@ -20,16 +15,15 @@ import RegText from '../Components/RegText';
 import SingleAddress from './components/SingleAddress';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
+import Header from '../Header';
 
 type LegacyProps = {
-  fetchTotalBalance: () => void;
   toggleMenuDrawer: () => void;
-  startRescan: () => void;
 };
 
 const Legacy: React.FunctionComponent<LegacyProps> = ({ toggleMenuDrawer }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, dimensions, info, addresses, totalBalance, uaAddress, currency, zecPrice } = context;
+  const { translate, dimensions, addresses, uaAddress } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [index, setIndex] = useState(0);
   const [routes] = useState([
@@ -325,55 +319,16 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ toggleMenuDrawer }) => {
           <ImportKey doImport={doImport} closeModal={() => setImportKeyModalVisible(false)} />
         </Modal>*/}
 
-        <View
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'center',
-            backgroundColor: colors.card,
-            padding: 10,
-            paddingBottom: 0,
-            margin: 0,
-          }}>
-          <View
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              paddingBottom: 0,
-              backgroundColor: colors.card,
-              zIndex: -1,
-              paddingTop: 0,
-            }}>
-            <Image
-              source={require('../../assets/img/logobig-zingo.png')}
-              style={{ width: 80, height: 80, resizeMode: 'contain' }}
-            />
-            <ZecAmount
-              currencyName={info.currencyName ? info.currencyName : ''}
-              size={36}
-              amtZec={totalBalance.total}
-              style={{ opacity: 0.5 }}
-            />
-            <CurrencyAmount
-              style={{ marginTop: 0, marginBottom: 5, opacity: 0.5 }}
-              price={zecPrice.zecPrice}
-              amtZec={totalBalance.total}
-              currency={currency}
-            />
-            <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
-              {translate('legacy.title')}
-            </RegText>
-          </View>
-        </View>
-
-        <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute' }}>
-          <TouchableOpacity
-            accessible={true}
-            accessibilityLabel={translate('menudrawer-acc')}
-            onPress={toggleMenuDrawer}>
-            <FontAwesomeIcon icon={faBars} size={48} color={colors.border} />
-          </TouchableOpacity>
-        </View>
+        <Header
+          poolsMoreInfoOnClick={() => {}}
+          syncingStatusMoreInfoOnClick={() => {}}
+          setComputingModalVisible={() => {}}
+          toggleMenuDrawer={toggleMenuDrawer}
+          setZecPrice={() => {}}
+          title={translate('legacy.title')}
+          noBalance={true}
+          noSyncingStatus={true}
+        />
 
         <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', right: 0 }}>
           {/*<OptionsMenu
@@ -462,55 +417,16 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ toggleMenuDrawer }) => {
           <ImportKey doImport={doImport} closeModal={() => setImportKeyModalVisible(false)} />
         </Modal>*/}
 
-        <View
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'center',
-            backgroundColor: colors.card,
-            padding: 0,
-            margin: 0,
-          }}>
-          <View
-            style={{
-              alignItems: 'center',
-              backgroundColor: colors.card,
-              zIndex: -1,
-              padding: 10,
-              width: '100%',
-            }}>
-            <Image
-              source={require('../../assets/img/logobig-zingo.png')}
-              style={{ width: 80, height: 80, resizeMode: 'contain' }}
-            />
-            <ZecAmount
-              currencyName={info.currencyName ? info.currencyName : ''}
-              size={36}
-              amtZec={totalBalance.total}
-              style={{ opacity: 0.5 }}
-            />
-            <CurrencyAmount
-              style={{ marginTop: 0, marginBottom: 5, opacity: 0.5 }}
-              price={zecPrice.zecPrice}
-              amtZec={totalBalance.total}
-              currency={currency}
-            />
-            <View style={{ width: '100%', height: 1, backgroundColor: colors.primary, marginTop: 5 }} />
-            <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
-              {translate('legacy.title')}
-            </RegText>
-            <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
-          </View>
-        </View>
-
-        <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute' }}>
-          <TouchableOpacity
-            accessible={true}
-            accessibilityLabel={translate('menudrawer-acc')}
-            onPress={toggleMenuDrawer}>
-            <FontAwesomeIcon icon={faBars} size={48} color={colors.border} />
-          </TouchableOpacity>
-        </View>
+        <Header
+          poolsMoreInfoOnClick={() => {}}
+          syncingStatusMoreInfoOnClick={() => {}}
+          setComputingModalVisible={() => {}}
+          toggleMenuDrawer={toggleMenuDrawer}
+          setZecPrice={() => {}}
+          title={translate('legacy.title')}
+          noBalance={true}
+          noSyncingStatus={true}
+        />
 
         <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', right: 0 }}>
           {/*<OptionsMenu
