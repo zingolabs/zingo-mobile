@@ -24,6 +24,7 @@ class MainActivity : ReactActivity() {
     override fun onPause() {
         Log.w("", "Pausing main activity")
         val service = Intent(applicationContext, BackgroundSync::class.java)
+        service.setAction(START)
         val bundle = Bundle()
 
         bundle.putString("foo", "bar")
@@ -38,6 +39,7 @@ class MainActivity : ReactActivity() {
 
     override fun onResume() {
         val service = Intent(applicationContext, BackgroundSync::class.java)
+        service.setAction(STOP)
         applicationContext.stopService(service)
         super.onResume()
     }
