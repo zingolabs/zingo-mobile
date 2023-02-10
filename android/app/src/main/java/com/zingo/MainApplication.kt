@@ -1,4 +1,4 @@
-package com.zingo
+package org.ZingoLabs.Zingo
 
 import android.app.Application
 import android.content.Context
@@ -62,7 +62,7 @@ class MainApplication : Application(), ReactApplication {
                          We use reflection here to pick up the class that initializes Flipper,
                          since Flipper library is not available in release mode
                       */
-                    val aClass = Class.forName("com.zingo.ReactNativeFlipper")
+                    val aClass = Class.forName("org.ZingoLabs.Zingo.ReactNativeFlipper")
                     aClass
                             .getMethod("initializeFlipper", Context::class.java, ReactInstanceManager::class.java)
                             .invoke(null, context, reactInstanceManager)
