@@ -31,7 +31,7 @@ describe('Example', () => {
     log.info("AAAaaaaaaaahhhh")
 
     await expect(text).toBeVisible();
-    await expect(text).toHaveText("Wallet");
+    await expect(text).toHaveText("Transactions");
     
     //expect(element(by.traits(['button'])).filter())
   });
