@@ -1,21 +1,20 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { View, ScrollView, SafeAreaView, Image } from 'react-native';
+import { View, ScrollView, SafeAreaView } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
 import FadeText from '../Components/FadeText';
-import ZecAmount from '../Components/ZecAmount';
-import RegText from '../Components/RegText';
 import Button from '../Button';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
+import Header from '../Header';
 
 type AboutProps = {
   closeModal: () => void;
 };
 const About: React.FunctionComponent<AboutProps> = ({ closeModal }) => {
   const context = useContext(ContextAppLoaded);
-  const { totalBalance, info, translate } = context;
+  const { translate } = context;
   const { colors } = useTheme() as unknown as ThemeType;
 
   const arrayTxtObject: string = translate('about.copyright');
@@ -33,30 +32,12 @@ const About: React.FunctionComponent<AboutProps> = ({ closeModal }) => {
         height: '100%',
         backgroundColor: colors.background,
       }}>
-      <View
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          paddingBottom: 10,
-          backgroundColor: colors.card,
-          zIndex: -1,
-          paddingTop: 10,
-        }}>
-        <Image
-          source={require('../../assets/img/logobig-zingo.png')}
-          style={{ width: 80, height: 80, resizeMode: 'contain' }}
-        />
-        <ZecAmount
-          currencyName={info.currencyName ? info.currencyName : ''}
-          size={36}
-          amtZec={totalBalance.total}
-          style={{ opacity: 0.5 }}
-        />
-        <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
-          {translate('zingo') + ' ' + translate('version')}
-        </RegText>
-        <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
-      </View>
+      <Header
+        title={translate('zingo') + ' ' + translate('version')}
+        noBalance={true}
+        noSyncingStatus={true}
+        noDrawMenu={true}
+      />
 
       <ScrollView
         style={{ maxHeight: '85%' }}

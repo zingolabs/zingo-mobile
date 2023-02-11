@@ -11,7 +11,7 @@ import RPC from '../../app/rpc';
 import RegText from './RegText';
 
 type PriceFetcherProps = {
-  setZecPrice: (p: number, d: number) => void;
+  setZecPrice?: (p: number, d: number) => void;
   textBefore?: string;
 };
 
@@ -97,13 +97,15 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
       {refreshSure && (
         <TouchableOpacity
           onPress={async () => {
-            const price = await RPC.rpc_getZecPrice();
-            if (price > 0) {
-              setZecPrice(price, Date.now());
+            if (setZecPrice) {
+              const price = await RPC.rpc_getZecPrice();
+              if (price > 0) {
+                setZecPrice(price, Date.now());
+              }
+              setRefreshSure(false);
+              setRefreshMinutes(0);
+              setCount(5);
             }
-            setRefreshSure(false);
-            setRefreshMinutes(0);
-            setCount(5);
           }}>
           <View
             style={{

@@ -1,16 +1,15 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { View, ScrollView, SafeAreaView, Image } from 'react-native';
+import { View, ScrollView, SafeAreaView } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
-import RegText from '../Components/RegText';
-import ZecAmount from '../Components/ZecAmount';
 import Button from '../Button';
 import Utils from '../../app/utils';
 import DetailLine from './components/DetailLine';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import PriceFetcher from '../Components/PriceFetcher';
+import Header from '../Header';
 
 type InfoProps = {
   closeModal: () => void;
@@ -19,7 +18,7 @@ type InfoProps = {
 
 const Info: React.FunctionComponent<InfoProps> = ({ closeModal, setZecPrice }) => {
   const context = useContext(ContextAppLoaded);
-  const { info, totalBalance, translate, currency, zecPrice } = context;
+  const { info, translate, currency, zecPrice } = context;
   const { colors } = useTheme() as unknown as ThemeType;
 
   return (
@@ -31,30 +30,7 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal, setZecPrice }) =
         height: '100%',
         backgroundColor: colors.background,
       }}>
-      <View
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          paddingBottom: 10,
-          backgroundColor: colors.card,
-          zIndex: -1,
-          paddingTop: 10,
-        }}>
-        <Image
-          source={require('../../assets/img/logobig-zingo.png')}
-          style={{ width: 80, height: 80, resizeMode: 'contain' }}
-        />
-        <ZecAmount
-          currencyName={info.currencyName ? info.currencyName : ''}
-          size={36}
-          amtZec={totalBalance.total}
-          style={{ opacity: 0.5 }}
-        />
-        <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
-          {translate('info.title')}
-        </RegText>
-        <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
-      </View>
+      <Header title={translate('info.title')} noBalance={true} noSyncingStatus={true} noDrawMenu={true} />
 
       <ScrollView
         style={{ maxHeight: '85%' }}

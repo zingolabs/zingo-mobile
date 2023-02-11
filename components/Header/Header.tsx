@@ -15,14 +15,15 @@ import RPC from '../../app/rpc';
 import Toast from 'react-native-simple-toast';
 
 type HeaderProps = {
-  poolsMoreInfoOnClick: () => void;
-  syncingStatusMoreInfoOnClick: () => void;
-  setComputingModalVisible: (visible: boolean) => void;
-  toggleMenuDrawer: () => void;
-  setZecPrice: (p: number, d: number) => void;
+  poolsMoreInfoOnClick?: () => void;
+  syncingStatusMoreInfoOnClick?: () => void;
+  setComputingModalVisible?: (visible: boolean) => void;
+  toggleMenuDrawer?: () => void;
+  setZecPrice?: (p: number, d: number) => void;
   title: string;
   noBalance?: boolean;
   noSyncingStatus?: boolean;
+  noDrawMenu?: boolean;
 };
 
 const Header: React.FunctionComponent<HeaderProps> = ({
@@ -34,6 +35,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   title,
   noBalance,
   noSyncingStatus,
+  noDrawMenu,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, totalBalance, info, syncingStatus, currency, zecPrice, dimensions } = context;
@@ -41,11 +43,11 @@ const Header: React.FunctionComponent<HeaderProps> = ({
 
   const showShieldButton = totalBalance && totalBalance.transparentBal > 0;
   const shieldFunds = async () => {
-    setComputingModalVisible(true);
+    setComputingModalVisible && setComputingModalVisible(true);
 
     const shieldStr = await RPC.rpc_shieldTransparent();
 
-    setComputingModalVisible(false);
+    setComputingModalVisible && setComputingModalVisible(false);
     if (shieldStr) {
       setTimeout(() => {
         const shieldJSON = JSON.parse(shieldStr);
@@ -93,7 +95,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               amtZec={totalBalance.total}
             />
             {totalBalance.total > 0 && (totalBalance.privateBal > 0 || totalBalance.transparentBal > 0) && (
-              <TouchableOpacity onPress={() => poolsMoreInfoOnClick()}>
+              <TouchableOpacity onPress={() => poolsMoreInfoOnClick && poolsMoreInfoOnClick()}>
                 <View
                   style={{
                     display: 'flex',
@@ -180,12 +182,12 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 </View>
               )}
               {!syncStatusDisplayLine && !syncingStatus.synced && (
-                <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
+                <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
                   <FontAwesomeIcon icon={faStop} color={colors.zingo} size={12} />
                 </TouchableOpacity>
               )}
               {syncStatusDisplayLine && (
-                <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
+                <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
                   <FontAwesomeIcon icon={faPlay} color={colors.primary} size={10} />
                 </TouchableOpacity>
               )}
@@ -194,11 +196,16 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         </View>
       </View>
 
-      <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute' }}>
-        <TouchableOpacity accessible={true} accessibilityLabel={translate('menudrawer-acc')} onPress={toggleMenuDrawer}>
-          <FontAwesomeIcon icon={faBars} size={48} color={colors.border} />
-        </TouchableOpacity>
-      </View>
+      {!noDrawMenu && (
+        <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute' }}>
+          <TouchableOpacity
+            accessible={true}
+            accessibilityLabel={translate('menudrawer-acc')}
+            onPress={toggleMenuDrawer}>
+            <FontAwesomeIcon icon={faBars} size={48} color={colors.border} />
+          </TouchableOpacity>
+        </View>
+      )}
 
       <View style={{ padding: 10, position: 'absolute', right: 0, alignItems: 'flex-end' }}>
         <Text style={{ fontSize: 8, color: colors.border }}>{translate('version')}</Text>

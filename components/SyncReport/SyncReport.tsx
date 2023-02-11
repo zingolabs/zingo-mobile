@@ -1,16 +1,16 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
-import { View, ScrollView, SafeAreaView, Image, Text } from 'react-native';
+import { View, ScrollView, SafeAreaView, Text } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
 import { ThemeType } from '../../app/types';
-import RegText from '../Components/RegText';
 import Button from '../Button';
 import DetailLine from './components/DetailLine';
 import { ContextAppLoaded } from '../../app/context';
 import moment from 'moment';
 import 'moment/locale/es';
 import RPC from '../../app/rpc';
+import Header from '../Header';
 
 type SyncReportProps = {
   closeModal: () => void;
@@ -134,24 +134,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
         height: '100%',
         backgroundColor: colors.background,
       }}>
-      <View
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          paddingBottom: 10,
-          backgroundColor: colors.card,
-          zIndex: -1,
-          paddingTop: 10,
-        }}>
-        <Image
-          source={require('../../assets/img/logobig-zingo.png')}
-          style={{ width: 80, height: 80, resizeMode: 'contain' }}
-        />
-        <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
-          {translate('report.title')}
-        </RegText>
-        <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
-      </View>
+      <Header title={translate('report.title')} noBalance={true} noSyncingStatus={true} noDrawMenu={true} />
 
       <ScrollView
         style={{ maxHeight: '85%' }}

@@ -285,6 +285,8 @@ const Send: React.FunctionComponent<SendProps> = ({
   };
 
   const confirmSend = async () => {
+    // very first interrupt syncing Just in case...
+    await RPC.rpc_setInterruptSyncAfterBatch('true');
     // First, close the confirm modal and show the "computing" modal
     setConfirmModalVisible(false);
     setComputingModalVisible(true);

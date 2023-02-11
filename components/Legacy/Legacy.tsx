@@ -320,11 +320,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ toggleMenuDrawer }) => {
         </Modal>*/}
 
         <Header
-          poolsMoreInfoOnClick={() => {}}
-          syncingStatusMoreInfoOnClick={() => {}}
-          setComputingModalVisible={() => {}}
           toggleMenuDrawer={toggleMenuDrawer}
-          setZecPrice={() => {}}
           title={translate('legacy.title')}
           noBalance={true}
           noSyncingStatus={true}
@@ -418,11 +414,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ toggleMenuDrawer }) => {
         </Modal>*/}
 
         <Header
-          poolsMoreInfoOnClick={() => {}}
-          syncingStatusMoreInfoOnClick={() => {}}
-          setComputingModalVisible={() => {}}
           toggleMenuDrawer={toggleMenuDrawer}
-          setZecPrice={() => {}}
           title={translate('legacy.title')}
           noBalance={true}
           noSyncingStatus={true}

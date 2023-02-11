@@ -252,11 +252,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ setUaAddress, toggleMe
         </Modal>*/}
 
         <Header
-          poolsMoreInfoOnClick={() => {}}
-          syncingStatusMoreInfoOnClick={() => {}}
-          setComputingModalVisible={() => {}}
           toggleMenuDrawer={toggleMenuDrawer}
-          setZecPrice={() => {}}
           title={translate('receive.title')}
           noBalance={true}
           noSyncingStatus={true}
@@ -349,11 +345,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ setUaAddress, toggleMe
         </Modal>*/}
 
         <Header
-          poolsMoreInfoOnClick={() => {}}
-          syncingStatusMoreInfoOnClick={() => {}}
-          setComputingModalVisible={() => {}}
           toggleMenuDrawer={toggleMenuDrawer}
-          setZecPrice={() => {}}
           title={translate('receive.title')}
           noBalance={true}
           noSyncingStatus={true}
