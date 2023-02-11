@@ -9,11 +9,13 @@ import org.junit.Test
 
 @SmallTest
 class ExportTest {
+    private external fun execute(cmd: String, args: String): String
+
     @Test
     fun callExport() {
-        val export = 1
+        val export = execute("export", "")
         
-        assertThat(export).isEqualTo(2)
+        assertThat(export).isEqualTo(1)
     }
 }
 
