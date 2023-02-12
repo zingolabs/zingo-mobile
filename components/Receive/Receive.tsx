@@ -21,6 +21,7 @@ import SingleAddress from './components/SingleAddress';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import PriceFetcher from '../Components/PriceFetcher';
+import ZingoHeader from '../ZingoHeader';
 
 type ReceiveProps = {
   fetchTotalBalance: () => void;
@@ -248,174 +249,91 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
           justifyContent: 'flex-start',
           width: '100%',
         }}>
-        {/*<Modal
-          animationType="slide"
-          transparent={false}
-          visible={privKeyModalVisible}
-          onRequestClose={() => setPrivKeyModalVisible(false)}>
-          <PrivKey
-            address={address}
-            keyType={keyType}
-            privKey={privKey}
-            closeModal={() => setPrivKeyModalVisible(false)}
-          />
-        </Modal>*/}
 
-        {/*<Modal
-          animationType="slide"
-          transparent={false}
-          visible={importKeyModalVisible}
-          onRequestClose={() => setImportKeyModalVisible(false)}>
-          <ImportKey doImport={doImport} closeModal={() => setImportKeyModalVisible(false)} />
-        </Modal>*/}
+        <ZingoHeader>
+          <View style={{ flexDirection: 'row' }}>
+            <ZecAmount
+              currencyName={info.currencyName ? info.currencyName : ''}
+              size={36}
+              amtZec={totalBalance.total}
+              style={{ opacity: 0.5 }}
+            />
+            {totalBalance.total > 0 && (totalBalance.privateBal > 0 || totalBalance.transparentBal > 0) && (
+              <TouchableOpacity onPress={() => poolsMoreInfoOnClick()}>
+                <View
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: colors.card,
+                    borderRadius: 10,
+                    margin: 0,
+                    padding: 0,
+                    marginLeft: 5,
+                    minWidth: 48,
+                    minHeight: 48,
+                  }}>
+                  <RegText color={colors.primary}>{translate('transactions.pools')}</RegText>
+                  <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
+                </View>
+              </TouchableOpacity>
+            )}
+          </View>
 
-        <View
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'center',
-            backgroundColor: colors.card,
-            padding: 10,
-            paddingBottom: 0,
-            margin: 0,
-          }}>
+          {currency === 'USD' && (
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <CurrencyAmount
+                style={{ marginTop: 0, marginBottom: 5, opacity: 0.5 }}
+                price={zecPrice.zecPrice}
+                amtZec={totalBalance.total}
+                currency={currency}
+              />
+              <View style={{ marginLeft: 5 }}>
+                <PriceFetcher setZecPrice={setZecPrice} />
+              </View>
+            </View>
+          )}
+
           <View
             style={{
               display: 'flex',
+              flexDirection: 'row',
               alignItems: 'center',
-              paddingBottom: 0,
-              backgroundColor: colors.card,
-              zIndex: -1,
-              paddingTop: 0,
+              justifyContent: 'center',
+              flexWrap: 'wrap',
+              marginVertical: 5,
             }}>
-            <Image
-              source={require('../../assets/img/logobig-zingo.png')}
-              style={{ width: 80, height: 80, resizeMode: 'contain' }}
-            />
-            <View style={{ flexDirection: 'row' }}>
-              <ZecAmount
-                currencyName={info.currencyName ? info.currencyName : ''}
-                size={36}
-                amtZec={totalBalance.total}
-                style={{ opacity: 0.5 }}
-              />
-              {totalBalance.total > 0 && (totalBalance.privateBal > 0 || totalBalance.transparentBal > 0) && (
-                <TouchableOpacity onPress={() => poolsMoreInfoOnClick()}>
-                  <View
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      backgroundColor: colors.card,
-                      borderRadius: 10,
-                      margin: 0,
-                      padding: 0,
-                      marginLeft: 5,
-                      minWidth: 48,
-                      minHeight: 48,
-                    }}>
-                    <RegText color={colors.primary}>{translate('transactions.pools')}</RegText>
-                    <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
-                  </View>
+            <View
+              style={{
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: 0,
+                padding: 1,
+                borderColor: colors.primary,
+                borderWidth: 1,
+                borderRadius: 10,
+                minWidth: 20,
+                minHeight: 20,
+              }}>
+              {!syncStatusDisplayLine && syncingStatus.synced && (
+                <View style={{ margin: 0, padding: 0 }}>
+                  <FontAwesomeIcon icon={faCheck} color={colors.primary} />
+                </View>
+              )}
+              {!syncStatusDisplayLine && !syncingStatus.synced && (
+                <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
+                  <FontAwesomeIcon icon={faStop} color={colors.zingo} size={12} />
+                </TouchableOpacity>
+              )}
+              {syncStatusDisplayLine && (
+                <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
+                  <FontAwesomeIcon icon={faPlay} color={colors.primary} size={10} />
                 </TouchableOpacity>
               )}
             </View>
-
-            {currency === 'USD' && (
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <CurrencyAmount
-                  style={{ marginTop: 0, marginBottom: 5, opacity: 0.5 }}
-                  price={zecPrice.zecPrice}
-                  amtZec={totalBalance.total}
-                  currency={currency}
-                />
-                <View style={{ marginLeft: 5 }}>
-                  <PriceFetcher setZecPrice={setZecPrice} />
-                </View>
-              </View>
-            )}
-
-            <View
-              style={{
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexWrap: 'wrap',
-                marginVertical: 5,
-              }}>
-              <View
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexWrap: 'wrap',
-                }}>
-                <RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
-                  {translate('receive.title')}
-                </RegText>
-                {/*<RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
-                  {syncStatusDisplayLine ? translate('receive.title-syncing') : translate('receive.title')}
-                </RegText>
-                {!!syncStatusDisplayLine && (
-                  <FadeText style={{ margin: 0, padding: 0 }}>{syncStatusDisplayLine}</FadeText>
-                )}*/}
-              </View>
-              <View
-                style={{
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  margin: 0,
-                  padding: 1,
-                  borderColor: colors.primary,
-                  borderWidth: 1,
-                  borderRadius: 10,
-                  minWidth: 20,
-                  minHeight: 20,
-                }}>
-                {!syncStatusDisplayLine && syncingStatus.synced && (
-                  <View style={{ margin: 0, padding: 0 }}>
-                    <FontAwesomeIcon icon={faCheck} color={colors.primary} />
-                  </View>
-                )}
-                {!syncStatusDisplayLine && !syncingStatus.synced && (
-                  <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
-                    <FontAwesomeIcon icon={faStop} color={colors.zingo} size={12} />
-                  </TouchableOpacity>
-                )}
-                {syncStatusDisplayLine && (
-                  <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
-                    <FontAwesomeIcon icon={faPlay} color={colors.primary} size={10} />
-                  </TouchableOpacity>
-                )}
-              </View>
-              {/*!!syncStatusDisplayLine && (
-                <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
-                  <View
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      backgroundColor: colors.card,
-                      borderRadius: 10,
-                      margin: 0,
-                      padding: 0,
-                      marginLeft: 5,
-                      minWidth: 48,
-                      minHeight: 48,
-                    }}>
-                    <RegText color={colors.primary}>{translate('receive.more')}</RegText>
-                    <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
-                  </View>
-                </TouchableOpacity>
-                )*/}
-            </View>
           </View>
-        </View>
-
+        </ZingoHeader>
         <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute' }}>
           <TouchableOpacity
             accessible={true}
@@ -424,28 +342,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
             <FontAwesomeIcon icon={faBars} size={48} color={colors.border} />
           </TouchableOpacity>
         </View>
-
-        <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', right: 0 }}>
-          {/*<OptionsMenu
-            customButton={
-              <View accessible={true} accessibilityLabel={translate('menu-acc')}>
-                <FontAwesomeIcon icon={faEllipsisV} color={colors.border} size={48} />
-              </View>
-            }
-            buttonStyle={{ width: 32, height: 32, margin: 7.5, resizeMode: 'contain' }}
-            destructiveIndex={4}
-            options={[
-              translate('receive.newu-option'),
-              translate('receive.privkey-option'),
-              translate('receive.viewkey-option'),
-              translate('receive.import-option'),
-              translate('cancel'),
-            ]},
-            actions={[addO, viewPrivKey, viewViewingKey, importKey]}
-          />*/}
-        </View>
-
-        <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
 
         <TabBar
           {...props}
@@ -520,18 +416,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
             padding: 0,
             margin: 0,
           }}>
-          <View
-            style={{
-              alignItems: 'center',
-              backgroundColor: colors.card,
-              zIndex: -1,
-              padding: 10,
-              width: '100%',
-            }}>
-            <Image
-              source={require('../../assets/img/logobig-zingo.png')}
-              style={{ width: 80, height: 80, resizeMode: 'contain' }}
-            />
+          <ZingoHeader>
             <View style={{ flexDirection: 'column', alignItems: 'center' }}>
               {totalBalance.total > 0 && (totalBalance.privateBal > 0 || totalBalance.transparentBal > 0) && (
                 <TouchableOpacity onPress={() => poolsMoreInfoOnClick()}>
@@ -653,9 +538,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                 </TouchableOpacity>
                 )*/}
             </View>
-
-            <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
-          </View>
+          </ZingoHeader>
         </View>
 
         <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute' }}>

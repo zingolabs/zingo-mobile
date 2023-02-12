@@ -11,6 +11,7 @@ import { ContextAppLoaded } from '../../app/context';
 import moment from 'moment';
 import 'moment/locale/es';
 import RPC from '../../app/rpc';
+import ZingoHeader from '../ZingoHeader';
 
 type SyncReportProps = {
   closeModal: () => void;
@@ -56,14 +57,14 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
     syncingStatusReport.process_end_block && birthday_plus_1
       ? syncingStatusReport.process_end_block - birthday_plus_1 || 0
       : syncingStatusReport.lastBlockWallet && birthday_plus_1
-      ? syncingStatusReport.lastBlockWallet - birthday_plus_1 || 0
-      : 0;
+        ? syncingStatusReport.lastBlockWallet - birthday_plus_1 || 0
+        : 0;
   const server_3: number =
     syncingStatusReport.lastBlockServer && syncingStatusReport.process_end_block
       ? syncingStatusReport.lastBlockServer - syncingStatusReport.process_end_block || 0
       : syncingStatusReport.lastBlockServer && syncingStatusReport.lastBlockWallet
-      ? syncingStatusReport.lastBlockServer - syncingStatusReport.lastBlockWallet || 0
-      : 0;
+        ? syncingStatusReport.lastBlockServer - syncingStatusReport.lastBlockWallet || 0
+        : 0;
   const server_4: number = maxBlocks ? maxBlocks - server_1 - server_2 - server_3 || 0 : 0;
   const server_server: number = syncingStatusReport.lastBlockServer || 0;
   const server_wallet: number =
@@ -75,14 +76,14 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
     syncingStatusReport.process_end_block && birthday_plus_1
       ? syncingStatusReport.process_end_block - birthday_plus_1 || 0
       : syncingStatusReport.lastBlockWallet && birthday_plus_1
-      ? syncingStatusReport.lastBlockWallet - birthday_plus_1 || 0
-      : 0;
+        ? syncingStatusReport.lastBlockWallet - birthday_plus_1 || 0
+        : 0;
   let wallet_21: number =
     syncingStatusReport.currentBlock && syncingStatusReport.process_end_block
       ? syncingStatusReport.currentBlock - syncingStatusReport.process_end_block || 0
       : syncingStatusReport.currentBlock && syncingStatusReport.lastBlockWallet
-      ? syncingStatusReport.currentBlock - syncingStatusReport.lastBlockWallet || 0
-      : 0;
+        ? syncingStatusReport.currentBlock - syncingStatusReport.lastBlockWallet || 0
+        : 0;
   // It is really weird, but don't want any negative values in the UI.
   if (wallet_1 < 0) {
     wallet_1 = 0;
@@ -134,24 +135,11 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
         height: '100%',
         backgroundColor: colors.background,
       }}>
-      <View
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          paddingBottom: 10,
-          backgroundColor: colors.card,
-          zIndex: -1,
-          paddingTop: 10,
-        }}>
-        <Image
-          source={require('../../assets/img/logobig-zingo.png')}
-          style={{ width: 80, height: 80, resizeMode: 'contain' }}
-        />
+      <ZingoHeader>
         <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
           {translate('report.title')}
         </RegText>
-        <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
-      </View>
+      </ZingoHeader>
 
       <ScrollView
         style={{ maxHeight: '85%' }}
@@ -178,9 +166,9 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
                 value={
                   syncingStatusReport.syncID && syncingStatusReport.syncID >= 0
                     ? syncingStatusReport.syncID +
-                      ' - (' +
-                      (syncingStatusReport.inProgress ? translate('report.running') : translate('report.finished')) +
-                      ')'
+                    ' - (' +
+                    (syncingStatusReport.inProgress ? translate('report.running') : translate('report.finished')) +
+                    ')'
                     : translate('loading')
                 }
               />

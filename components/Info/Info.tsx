@@ -11,6 +11,7 @@ import DetailLine from './components/DetailLine';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import PriceFetcher from '../Components/PriceFetcher';
+import ZingoHeader from '../ZingoHeader';
 
 type InfoProps = {
   closeModal: () => void;
@@ -31,19 +32,7 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal, setZecPrice }) =
         height: '100%',
         backgroundColor: colors.background,
       }}>
-      <View
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          paddingBottom: 10,
-          backgroundColor: colors.card,
-          zIndex: -1,
-          paddingTop: 10,
-        }}>
-        <Image
-          source={require('../../assets/img/logobig-zingo.png')}
-          style={{ width: 80, height: 80, resizeMode: 'contain' }}
-        />
+      <ZingoHeader>
         <ZecAmount
           currencyName={info.currencyName ? info.currencyName : ''}
           size={36}
@@ -53,8 +42,7 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal, setZecPrice }) =
         <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
           {translate('info.title')}
         </RegText>
-        <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
-      </View>
+      </ZingoHeader>
 
       <ScrollView
         style={{ maxHeight: '85%' }}
@@ -79,12 +67,12 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal, setZecPrice }) =
               !info.chain_name
                 ? translate('loading')
                 : info.chain_name.toLowerCase() === 'main' || info.chain_name.toLowerCase() === 'mainnet'
-                ? 'Mainnet'
-                : info.chain_name.toLowerCase() === 'test' || info.chain_name.toLowerCase() === 'testnet'
-                ? 'Testnet'
-                : info.chain_name.toLowerCase() === 'regtest'
-                ? 'Regtest'
-                : translate('info.unknown') + ' (' + info.chain_name + ')'
+                  ? 'Mainnet'
+                  : info.chain_name.toLowerCase() === 'test' || info.chain_name.toLowerCase() === 'testnet'
+                    ? 'Testnet'
+                    : info.chain_name.toLowerCase() === 'regtest'
+                      ? 'Regtest'
+                      : translate('info.unknown') + ' (' + info.chain_name + ')'
             }
           />
           <DetailLine
@@ -97,9 +85,8 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal, setZecPrice }) =
                 label={translate('info.zecprice')}
                 value={
                   zecPrice.zecPrice > 0
-                    ? `$ ${Utils.toLocaleFloat(zecPrice.zecPrice.toFixed(2))} ${currency} per ${
-                        info.currencyName ? info.currencyName : '---'
-                      }`
+                    ? `$ ${Utils.toLocaleFloat(zecPrice.zecPrice.toFixed(2))} ${currency} per ${info.currencyName ? info.currencyName : '---'
+                    }`
                     : `$ -- ${currency} per ${info.currencyName ? info.currencyName : '---'}`
                 }
               />

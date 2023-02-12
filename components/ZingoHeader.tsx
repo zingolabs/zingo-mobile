@@ -9,22 +9,19 @@ type HeaderProps = {
 }
 
 
-const Header: React.FunctionComponent<HeaderProps> = (props) => {
+const ZingoHeader: React.FunctionComponent<HeaderProps> = (props) => {
     // TODO: why?
     const { colors } = useTheme() as unknown as ThemeType
-    console.log(colors)
-
-    console.log("THEME", useTheme())
+    // console.log(colors)
+    // console.log("THEME", useTheme())
 
     return (
         <View
             style={{
                 display: 'flex',
                 alignItems: 'center',
-                // paddingBottom: 10,
-                // backgroundColor: colors.card ||,
-                // zIndex: -1,
-                // paddingTop: 10,
+                padding: 10,
+                backgroundColor: colors.card,
             }}>
             <ZingoLogoImage />
             {props.children}
@@ -33,4 +30,4 @@ const Header: React.FunctionComponent<HeaderProps> = (props) => {
     )
 }
 
-export default Header
+export default ZingoHeader

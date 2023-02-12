@@ -22,7 +22,7 @@ import TxSummaryLine from './components/TxSummaryLine';
 import { ContextAppLoaded } from '../../app/context';
 import PriceFetcher from '../Components/PriceFetcher';
 import ZingoLogoImage from '../ZingoLogoImage';
-import Header from '../Header';
+import ZingoHeader from '../ZingoHeader';
 
 type TransactionsProps = {
   doRefresh: () => void;
@@ -339,7 +339,7 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
           <TxDetail tx={txDetail} closeModal={() => setTxDetailModalShowing(false)} />
         </Modal>
 
-        <Header>
+        <ZingoHeader>
           <View style={{ flexDirection: 'column', alignItems: 'center' }}>
             {totalBalance.total > 0 && (totalBalance.privateBal > 0 || totalBalance.transparentBal > 0) && (
               <TouchableOpacity onPress={() => poolsMoreInfoOnClick()}>
@@ -467,8 +467,7 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
               </TouchableOpacity>
               )*/}
           </View>
-
-        </Header>
+        </ZingoHeader>
 
         <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute' }}>
           <TouchableOpacity

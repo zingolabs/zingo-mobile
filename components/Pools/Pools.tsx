@@ -11,6 +11,7 @@ import DetailLine from './components/DetailLine';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import RPC from '../../app/rpc';
+import ZingoHeader from '../ZingoHeader';
 
 type PoolsProps = {
   closeModal: () => void;
@@ -36,19 +37,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal }) => {
         height: '100%',
         backgroundColor: colors.background,
       }}>
-      <View
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          paddingBottom: 10,
-          backgroundColor: colors.card,
-          zIndex: -1,
-          paddingTop: 10,
-        }}>
-        <Image
-          source={require('../../assets/img/logobig-zingo.png')}
-          style={{ width: 80, height: 80, resizeMode: 'contain' }}
-        />
+      <ZingoHeader>
         <ZecAmount
           currencyName={info.currencyName ? info.currencyName : ''}
           size={36}
@@ -58,8 +47,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal }) => {
         <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
           {translate('pools.title')}
         </RegText>
-        <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
-      </View>
+      </ZingoHeader>
 
       <ScrollView
         style={{ maxHeight: '85%' }}

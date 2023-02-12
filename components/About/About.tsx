@@ -9,8 +9,7 @@ import RegText from '../Components/RegText';
 import Button from '../Button';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
-import ZingoLogoImage from '../ZingoLogoImage';
-import Header from '../Header';
+import ZingoHeader from '../ZingoHeader';
 
 type AboutProps = {
   closeModal: () => void;
@@ -35,7 +34,7 @@ const About: React.FunctionComponent<AboutProps> = ({ closeModal }) => {
         height: '100%',
         backgroundColor: colors.background,
       }}>
-      <Header>
+      <ZingoHeader>
         <ZecAmount
           currencyName={info.currencyName ? info.currencyName : ''}
           size={36}
@@ -46,7 +45,7 @@ const About: React.FunctionComponent<AboutProps> = ({ closeModal }) => {
           {translate('zingo') + ' ' + translate('version')}
         </RegText>
         <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
-      </Header>
+      </ZingoHeader>
 
       <ScrollView
         style={{ maxHeight: '85%' }}

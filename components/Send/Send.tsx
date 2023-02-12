@@ -25,6 +25,7 @@ import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import PriceFetcher from '../Components/PriceFetcher';
 import RPC from '../../app/rpc';
+import ZingoHeader from '../ZingoHeader';
 
 type SendProps = {
   setSendPageState: (sendPageState: SendPageStateClass) => void;
@@ -406,19 +407,7 @@ const Send: React.FunctionComponent<SendProps> = ({
             backgroundColor: colors.card,
             zIndex: -1,
           }}>
-          <View
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              paddingBottom: 0,
-              backgroundColor: colors.card,
-              zIndex: -1,
-              paddingTop: 10,
-            }}>
-            <Image
-              source={require('../../assets/img/logobig-zingo.png')}
-              style={{ width: 80, height: 80, resizeMode: 'contain' }}
-            />
+          <ZingoHeader>
             <View style={{ flexDirection: 'row' }}>
               <ZecAmount
                 currencyName={info.currencyName ? info.currencyName : ''}
@@ -538,7 +527,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                 </TouchableOpacity>
                 )*/}
             </View>
-          </View>
+          </ZingoHeader>
         </View>
       </Animated.View>
 
@@ -867,8 +856,8 @@ const Send: React.FunctionComponent<SendProps> = ({
               type="Primary"
               title={
                 validAmount === 1 &&
-                sendPageState.toaddr.amount &&
-                Number(sendPageState.toaddr.amount) === Utils.parseLocaleFloat(getMaxAmount().toFixed(8))
+                  sendPageState.toaddr.amount &&
+                  Number(sendPageState.toaddr.amount) === Utils.parseLocaleFloat(getMaxAmount().toFixed(8))
                   ? translate('send.button-all')
                   : translate('send.button')
               }
@@ -946,19 +935,7 @@ const Send: React.FunctionComponent<SendProps> = ({
               backgroundColor: colors.card,
               zIndex: -1,
             }}>
-            <View
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                backgroundColor: colors.card,
-                zIndex: -1,
-                padding: 10,
-                width: '100%',
-              }}>
-              <Image
-                source={require('../../assets/img/logobig-zingo.png')}
-                style={{ width: 80, height: 80, resizeMode: 'contain' }}
-              />
+            <ZingoHeader>
               <View style={{ flexDirection: 'column', alignItems: 'center' }}>
                 {totalBalance.total > 0 && (totalBalance.privateBal > 0 || totalBalance.transparentBal > 0) && (
                   <TouchableOpacity onPress={() => poolsMoreInfoOnClick()}>
@@ -1079,9 +1056,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                   </TouchableOpacity>
                   )*/}
               </View>
-
-              <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
-            </View>
+            </ZingoHeader>
           </View>
         </View>
 
@@ -1428,8 +1403,8 @@ const Send: React.FunctionComponent<SendProps> = ({
                 type="Primary"
                 title={
                   validAmount === 1 &&
-                  sendPageState.toaddr.amount &&
-                  Number(sendPageState.toaddr.amount) === Utils.parseLocaleFloat(getMaxAmount().toFixed(8))
+                    sendPageState.toaddr.amount &&
+                    Number(sendPageState.toaddr.amount) === Utils.parseLocaleFloat(getMaxAmount().toFixed(8))
                     ? translate('send.button-all')
                     : translate('send.button')
                 }
