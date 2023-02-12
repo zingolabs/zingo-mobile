@@ -21,6 +21,7 @@ import SingleAddress from './components/SingleAddress';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import ZingoHeader from '../ZingoHeader';
+import ZingoHamburger from '../ZingoHamburger';
 
 type LegacyProps = {
   fetchTotalBalance: () => void;
@@ -306,6 +307,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ toggleMenuDrawer }) => {
           alignItems: 'stretch',
         }}>
 
+        <ZingoHamburger toggleMenuDrawer={toggleMenuDrawer} />
         <ZingoHeader>
           <ZecAmount
             currencyName={info.currencyName ? info.currencyName : ''}
@@ -323,15 +325,6 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ toggleMenuDrawer }) => {
             {translate('legacy.title')}
           </RegText>
         </ZingoHeader>
-
-        <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute' }}>
-          <TouchableOpacity
-            accessible={true}
-            accessibilityLabel={translate('menudrawer-acc')}
-            onPress={toggleMenuDrawer}>
-            <FontAwesomeIcon icon={faBars} size={48} color={colors.border} />
-          </TouchableOpacity>
-        </View>
 
         <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', right: 0 }}>
           {/*<OptionsMenu
@@ -420,6 +413,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ toggleMenuDrawer }) => {
           <ImportKey doImport={doImport} closeModal={() => setImportKeyModalVisible(false)} />
         </Modal>*/}
 
+        <ZingoHamburger toggleMenuDrawer={toggleMenuDrawer} />
         <ZingoHeader>
           <ZecAmount
             currencyName={info.currencyName ? info.currencyName : ''}
@@ -438,15 +432,6 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ toggleMenuDrawer }) => {
             {translate('legacy.title')}
           </RegText>
         </ZingoHeader>
-
-        <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute' }}>
-          <TouchableOpacity
-            accessible={true}
-            accessibilityLabel={translate('menudrawer-acc')}
-            onPress={toggleMenuDrawer}>
-            <FontAwesomeIcon icon={faBars} size={48} color={colors.border} />
-          </TouchableOpacity>
-        </View>
 
         <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', right: 0 }}>
           {/*<OptionsMenu

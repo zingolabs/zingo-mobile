@@ -1,12 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState } from 'react';
-import { View, ScrollView, Image, Modal, RefreshControl, Text } from 'react-native';
+import { View, ScrollView, Modal, RefreshControl, Text } from 'react-native';
 import Toast from 'react-native-simple-toast';
 import moment from 'moment';
 import 'moment/locale/es';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faBars, faInfo, faCheck, faPlay, faStop } from '@fortawesome/free-solid-svg-icons';
+import { faInfo, faCheck, faPlay, faStop } from '@fortawesome/free-solid-svg-icons';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
 import RPC from '../../app/rpc';
@@ -23,6 +23,7 @@ import { ContextAppLoaded } from '../../app/context';
 import PriceFetcher from '../Components/PriceFetcher';
 import ZingoLogoImage from '../ZingoLogoImage';
 import ZingoHeader from '../ZingoHeader';
+import ZingoHamburger from '../ZingoHamburger';
 
 type TransactionsProps = {
   doRefresh: () => void;
@@ -239,11 +240,7 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
         </View>
       </View>
 
-      <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute' }}>
-        <TouchableOpacity accessible={true} accessibilityLabel={translate('menudrawer-acc')} onPress={toggleMenuDrawer}>
-          <FontAwesomeIcon icon={faBars} size={48} color={colors.border} />
-        </TouchableOpacity>
-      </View>
+      <ZingoHamburger toggleMenuDrawer={toggleMenuDrawer} />
 
       <View style={{ padding: 10, position: 'absolute', right: 0, alignItems: 'flex-end' }}>
         <Text style={{ fontSize: 8, color: colors.border }}>
@@ -338,7 +335,7 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
           onRequestClose={() => setTxDetailModalShowing(false)}>
           <TxDetail tx={txDetail} closeModal={() => setTxDetailModalShowing(false)} />
         </Modal>
-
+        <ZingoHamburger toggleMenuDrawer={toggleMenuDrawer} />
         <ZingoHeader>
           <View style={{ flexDirection: 'column', alignItems: 'center' }}>
             {totalBalance.total > 0 && (totalBalance.privateBal > 0 || totalBalance.transparentBal > 0) && (
@@ -468,15 +465,6 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
               )*/}
           </View>
         </ZingoHeader>
-
-        <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute' }}>
-          <TouchableOpacity
-            accessible={true}
-            accessibilityLabel={translate('menudrawer-acc')}
-            onPress={toggleMenuDrawer}>
-            <FontAwesomeIcon icon={faBars} size={48} color={colors.border} />
-          </TouchableOpacity>
-        </View>
 
         <View style={{ padding: 10, position: 'absolute', right: 0, alignItems: 'flex-end' }}>
           <Text style={{ fontSize: 8, color: colors.border }}>

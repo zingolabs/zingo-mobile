@@ -1,12 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useRef, useCallback, useContext } from 'react';
-import { View, ScrollView, Modal, Image, Alert, Keyboard, TextInput, TouchableOpacity } from 'react-native';
+import { View, ScrollView, Modal, Alert, Keyboard, TextInput, TouchableOpacity } from 'react-native';
 import { faQrcode, faCheck, faInfo, faPlay, faStop } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme, useIsFocused } from '@react-navigation/native';
 import Toast from 'react-native-simple-toast';
 import { getNumberFormatSettings } from 'react-native-localize';
-import { faBars } from '@fortawesome/free-solid-svg-icons';
 import Animated, { EasingNode } from 'react-native-reanimated';
 
 import FadeText from '../Components/FadeText';
@@ -26,6 +25,7 @@ import { ContextAppLoaded } from '../../app/context';
 import PriceFetcher from '../Components/PriceFetcher';
 import RPC from '../../app/rpc';
 import ZingoHeader from '../ZingoHeader';
+import ZingoHamburger from '../ZingoHamburger';
 
 type SendProps = {
   setSendPageState: (sendPageState: SendPageStateClass) => void;
@@ -532,9 +532,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       </Animated.View>
 
       <Animated.View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', marginTop: slideAnim }}>
-        <TouchableOpacity accessible={true} accessibilityLabel={translate('menudrawer-acc')} onPress={toggleMenuDrawer}>
-          <FontAwesomeIcon icon={faBars} size={48} color={colors.border} />
-        </TouchableOpacity>
+        <ZingoHamburger toggleMenuDrawer={toggleMenuDrawer} />
       </Animated.View>
 
       <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
@@ -1060,14 +1058,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           </View>
         </View>
 
-        <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute' }}>
-          <TouchableOpacity
-            accessible={true}
-            accessibilityLabel={translate('menudrawer-acc')}
-            onPress={toggleMenuDrawer}>
-            <FontAwesomeIcon icon={faBars} size={48} color={colors.border} />
-          </TouchableOpacity>
-        </View>
+        <ZingoHamburger toggleMenuDrawer={toggleMenuDrawer} />
       </View>
       <View
         style={{

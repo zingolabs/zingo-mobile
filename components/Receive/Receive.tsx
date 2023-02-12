@@ -1,12 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState, ReactNode } from 'react';
-import { View, Image, TouchableOpacity } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
 //import { Modal } from 'react-native';
 import { TabView, TabBar, SceneRendererProps, Route, NavigationState } from 'react-native-tab-view';
 //import Toast from 'react-native-simple-toast';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faBars, faCheck, faPlay, faStop, faInfo } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faPlay, faStop, faInfo } from '@fortawesome/free-solid-svg-icons';
 //import { faEllipsisV } from '@fortawesome/free-solid-svg-icons';
 //import OptionsMenu from 'react-native-option-menu';
 
@@ -22,6 +22,7 @@ import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import PriceFetcher from '../Components/PriceFetcher';
 import ZingoHeader from '../ZingoHeader';
+import ZingoHamburger from '../ZingoHamburger';
 
 type ReceiveProps = {
   fetchTotalBalance: () => void;
@@ -250,6 +251,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
           width: '100%',
         }}>
 
+        <ZingoHamburger toggleMenuDrawer={toggleMenuDrawer} />
         <ZingoHeader>
           <View style={{ flexDirection: 'row' }}>
             <ZecAmount
@@ -334,14 +336,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
             </View>
           </View>
         </ZingoHeader>
-        <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute' }}>
-          <TouchableOpacity
-            accessible={true}
-            accessibilityLabel={translate('menudrawer-acc')}
-            onPress={toggleMenuDrawer}>
-            <FontAwesomeIcon icon={faBars} size={48} color={colors.border} />
-          </TouchableOpacity>
-        </View>
 
         <TabBar
           {...props}
@@ -407,116 +401,108 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
           <ImportKey doImport={doImport} closeModal={() => setImportKeyModalVisible(false)} />
         </Modal>*/}
 
-        <View
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'center',
-            backgroundColor: colors.card,
-            padding: 0,
-            margin: 0,
-          }}>
-          <ZingoHeader>
-            <View style={{ flexDirection: 'column', alignItems: 'center' }}>
-              {totalBalance.total > 0 && (totalBalance.privateBal > 0 || totalBalance.transparentBal > 0) && (
-                <TouchableOpacity onPress={() => poolsMoreInfoOnClick()}>
-                  <View
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'row',
-                      alignItems: 'flex-end',
-                      justifyContent: 'center',
-                      backgroundColor: colors.card,
-                      borderRadius: 10,
-                      margin: 0,
-                      padding: 0,
-                      minWidth: 48,
-                      minHeight: 48,
-                    }}>
-                    <RegText color={colors.primary}>{translate('transactions.pools')}</RegText>
-                    <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} style={{ marginBottom: 5 }} />
-                  </View>
-                </TouchableOpacity>
-              )}
-              <ZecAmount
-                currencyName={info.currencyName ? info.currencyName : ''}
-                size={36}
-                amtZec={totalBalance.total}
-                style={{ opacity: 0.5 }}
-              />
-              {currency === 'USD' && (
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <CurrencyAmount
-                    style={{ marginTop: 0, marginBottom: 5 }}
-                    price={zecPrice.zecPrice}
-                    amtZec={totalBalance.total}
-                    currency={currency}
-                  />
-                  <View style={{ marginLeft: 5 }}>
-                    <PriceFetcher setZecPrice={setZecPrice} />
-                  </View>
+        <ZingoHamburger toggleMenuDrawer={toggleMenuDrawer} />
+        <ZingoHeader>
+          <View style={{ flexDirection: 'column', alignItems: 'center' }}>
+            {totalBalance.total > 0 && (totalBalance.privateBal > 0 || totalBalance.transparentBal > 0) && (
+              <TouchableOpacity onPress={() => poolsMoreInfoOnClick()}>
+                <View
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'flex-end',
+                    justifyContent: 'center',
+                    backgroundColor: colors.card,
+                    borderRadius: 10,
+                    margin: 0,
+                    padding: 0,
+                    minWidth: 48,
+                    minHeight: 48,
+                  }}>
+                  <RegText color={colors.primary}>{translate('transactions.pools')}</RegText>
+                  <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} style={{ marginBottom: 5 }} />
                 </View>
-              )}
-            </View>
+              </TouchableOpacity>
+            )}
+            <ZecAmount
+              currencyName={info.currencyName ? info.currencyName : ''}
+              size={36}
+              amtZec={totalBalance.total}
+              style={{ opacity: 0.5 }}
+            />
+            {currency === 'USD' && (
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <CurrencyAmount
+                  style={{ marginTop: 0, marginBottom: 5 }}
+                  price={zecPrice.zecPrice}
+                  amtZec={totalBalance.total}
+                  currency={currency}
+                />
+                <View style={{ marginLeft: 5 }}>
+                  <PriceFetcher setZecPrice={setZecPrice} />
+                </View>
+              </View>
+            )}
+          </View>
 
-            <View style={{ width: '100%', height: 1, backgroundColor: colors.primary, marginTop: 5 }} />
+          <View style={{ width: '100%', height: 1, backgroundColor: colors.primary, marginTop: 5 }} />
 
+          <View
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexWrap: 'wrap',
+              marginVertical: 5,
+            }}>
             <View
               style={{
                 display: 'flex',
-                flexDirection: 'row',
+                flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexWrap: 'wrap',
-                marginVertical: 5,
               }}>
-              <View
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexWrap: 'wrap',
-                }}>
-                <RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
-                  {translate('receive.title')}
-                </RegText>
-                {/*<RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
+              <RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
+                {translate('receive.title')}
+              </RegText>
+              {/*<RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
                   {syncStatusDisplayLine ? translate('receive.title-syncing') : translate('receive.title')}
                 </RegText>
                 {!!syncStatusDisplayLine && (
                   <FadeText style={{ margin: 0, padding: 0 }}>{syncStatusDisplayLine}</FadeText>
                 )}*/}
-              </View>
-              <View
-                style={{
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  margin: 0,
-                  padding: 1,
-                  borderColor: colors.primary,
-                  borderWidth: 1,
-                  borderRadius: 10,
-                  minWidth: 20,
-                  minHeight: 20,
-                }}>
-                {!syncStatusDisplayLine && syncingStatus.synced && (
-                  <View style={{ margin: 0, padding: 0 }}>
-                    <FontAwesomeIcon icon={faCheck} color={colors.primary} />
-                  </View>
-                )}
-                {!syncStatusDisplayLine && !syncingStatus.synced && (
-                  <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
-                    <FontAwesomeIcon icon={faStop} color={colors.zingo} size={12} />
-                  </TouchableOpacity>
-                )}
-                {syncStatusDisplayLine && (
-                  <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
-                    <FontAwesomeIcon icon={faPlay} color={colors.primary} size={10} />
-                  </TouchableOpacity>
-                )}
-              </View>
-              {/*!!syncStatusDisplayLine && (
+            </View>
+            <View
+              style={{
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: 0,
+                padding: 1,
+                borderColor: colors.primary,
+                borderWidth: 1,
+                borderRadius: 10,
+                minWidth: 20,
+                minHeight: 20,
+              }}>
+              {!syncStatusDisplayLine && syncingStatus.synced && (
+                <View style={{ margin: 0, padding: 0 }}>
+                  <FontAwesomeIcon icon={faCheck} color={colors.primary} />
+                </View>
+              )}
+              {!syncStatusDisplayLine && !syncingStatus.synced && (
+                <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
+                  <FontAwesomeIcon icon={faStop} color={colors.zingo} size={12} />
+                </TouchableOpacity>
+              )}
+              {syncStatusDisplayLine && (
+                <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
+                  <FontAwesomeIcon icon={faPlay} color={colors.primary} size={10} />
+                </TouchableOpacity>
+              )}
+            </View>
+            {/*!!syncStatusDisplayLine && (
                 <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
                   <View
                     style={{
@@ -537,18 +523,8 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                   </View>
                 </TouchableOpacity>
                 )*/}
-            </View>
-          </ZingoHeader>
-        </View>
-
-        <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute' }}>
-          <TouchableOpacity
-            accessible={true}
-            accessibilityLabel={translate('menudrawer-acc')}
-            onPress={toggleMenuDrawer}>
-            <FontAwesomeIcon icon={faBars} size={48} color={colors.border} />
-          </TouchableOpacity>
-        </View>
+          </View>
+        </ZingoHeader>
 
         <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', right: 0 }}>
           {/*<OptionsMenu
