@@ -21,6 +21,7 @@ import TxDetail from './components/TxDetail';
 import TxSummaryLine from './components/TxSummaryLine';
 import { ContextAppLoaded } from '../../app/context';
 import PriceFetcher from '../Components/PriceFetcher';
+import ZingoLogoImage from '../ZingoLogoImage';
 
 type TransactionsProps = {
   doRefresh: () => void;
@@ -109,10 +110,7 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
           zIndex: -1,
           paddingTop: 10,
         }}>
-        <Image
-          source={require('../../assets/img/logobig-zingo.png')}
-          style={{ width: 80, height: 80, resizeMode: 'contain' }}
-        />
+        <ZingoLogoImage />
         <View style={{ flexDirection: 'row' }}>
           <ZecAmount
             currencyName={info.currencyName ? info.currencyName : ''}
@@ -256,6 +254,15 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
       </View>
 
       <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
+
+      <View style={{
+        padding: 10,
+        position: 'absolute',
+        right: 0,
+        alignItems: 'flex-end',
+      }}>
+        <Text>{transactions.length}</Text>
+      </View>
 
       <ScrollView
         accessible={true}

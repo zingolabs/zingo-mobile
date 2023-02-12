@@ -1,8 +1,7 @@
 # Zingo Android and iOS apps
 
 **WARNING! These apps are currently experimental!**
-Do not use these apps in production.
-Do not use these apps unless you specifically know what you are doing.
+Use at your own risk!
 
 ## Android build instructions
 
