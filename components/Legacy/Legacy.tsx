@@ -1,12 +1,10 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useContext, ReactNode } from 'react';
-import { View, Image, TouchableOpacity } from 'react-native';
+import { View } from 'react-native';
 //import { Modal } from 'react-native';
 import { TabView, TabBar, SceneRendererProps, NavigationState, Route } from 'react-native-tab-view';
 //import Toast from 'react-native-simple-toast';
 import { useTheme } from '@react-navigation/native';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faBars } from '@fortawesome/free-solid-svg-icons';
 //import { faEllipsisV } from '@fortawesome/free-solid-svg-icons';
 //import OptionsMenu from 'react-native-option-menu';
 
