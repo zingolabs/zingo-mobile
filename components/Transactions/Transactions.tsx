@@ -22,6 +22,7 @@ import TxSummaryLine from './components/TxSummaryLine';
 import { ContextAppLoaded } from '../../app/context';
 import PriceFetcher from '../Components/PriceFetcher';
 import ZingoLogoImage from '../ZingoLogoImage';
+import Header from '../Header';
 
 type TransactionsProps = {
   doRefresh: () => void;
@@ -338,18 +339,7 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
           <TxDetail tx={txDetail} closeModal={() => setTxDetailModalShowing(false)} />
         </Modal>
 
-        <View
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            backgroundColor: colors.card,
-            zIndex: -1,
-            padding: 10,
-          }}>
-          <Image
-            source={require('../../assets/img/logobig-zingo.png')}
-            style={{ width: 80, height: 80, resizeMode: 'contain' }}
-          />
+        <Header>
           <View style={{ flexDirection: 'column', alignItems: 'center' }}>
             {totalBalance.total > 0 && (totalBalance.privateBal > 0 || totalBalance.transparentBal > 0) && (
               <TouchableOpacity onPress={() => poolsMoreInfoOnClick()}>
@@ -478,8 +468,7 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
               )*/}
           </View>
 
-          <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
-        </View>
+        </Header>
 
         <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute' }}>
           <TouchableOpacity

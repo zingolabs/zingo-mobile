@@ -9,6 +9,8 @@ import RegText from '../Components/RegText';
 import Button from '../Button';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
+import ZingoLogoImage from '../ZingoLogoImage';
+import Header from '../Header';
 
 type AboutProps = {
   closeModal: () => void;
@@ -33,19 +35,7 @@ const About: React.FunctionComponent<AboutProps> = ({ closeModal }) => {
         height: '100%',
         backgroundColor: colors.background,
       }}>
-      <View
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          paddingBottom: 10,
-          backgroundColor: colors.card,
-          zIndex: -1,
-          paddingTop: 10,
-        }}>
-        <Image
-          source={require('../../assets/img/logobig-zingo.png')}
-          style={{ width: 80, height: 80, resizeMode: 'contain' }}
-        />
+      <Header>
         <ZecAmount
           currencyName={info.currencyName ? info.currencyName : ''}
           size={36}
@@ -56,7 +46,7 @@ const About: React.FunctionComponent<AboutProps> = ({ closeModal }) => {
           {translate('zingo') + ' ' + translate('version')}
         </RegText>
         <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
-      </View>
+      </Header>
 
       <ScrollView
         style={{ maxHeight: '85%' }}
