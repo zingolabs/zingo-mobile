@@ -1,9 +1,9 @@
 package com.zingo
 
-// import android.content.Context
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
+import kotlin.concurrent.thread
 
 @SmallTest
 class RPCModule {
@@ -11,7 +11,7 @@ class RPCModule {
 
     @Test
     fun callAddress() {
-        val resp = execute("address", "")
+        val resp = execute("addresses", "")
         assertThat(resp).isEqualTo(1)
     }
 }
