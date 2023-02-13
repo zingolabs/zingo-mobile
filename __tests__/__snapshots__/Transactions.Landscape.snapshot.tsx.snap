@@ -30,11 +30,59 @@ exports[`Component Transactions - test Transactions Landscape - snapshot 1`] = `
     <View
       style={
         {
+          "backgroundColor": "rgb(255, 255, 255)",
+          "padding": 10,
+          "position": "absolute",
+          "zIndex": 100,
+        }
+      }
+    >
+      <View
+        accessibilityLabel="text translated"
+        accessible={true}
+        collapsable={false}
+        focusable={true}
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          {
+            "opacity": 1,
+          }
+        }
+      >
+        <
+          color="rgb(216, 216, 216)"
+          icon={
+            {
+              "icon": [
+                448,
+                512,
+                [
+                  "navicon",
+                ],
+                "f0c9",
+                "M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z",
+              ],
+              "iconName": "bars",
+              "prefix": "fas",
+            }
+          }
+          size={36}
+        />
+      </View>
+    </View>
+    <View
+      style={
+        {
           "alignItems": "center",
           "backgroundColor": "rgb(255, 255, 255)",
           "display": "flex",
           "padding": 10,
-          "zIndex": -1,
         }
       }
     >
@@ -207,41 +255,6 @@ exports[`Component Transactions - test Transactions Landscape - snapshot 1`] = `
           }
         }
       />
-    </View>
-    <View
-      style={
-        {
-          "backgroundColor": "rgb(255, 255, 255)",
-          "padding": 10,
-          "position": "absolute",
-        }
-      }
-    >
-      <View
-        accessibilityLabel="text translated"
-        accessible={true}
-        onPress={[MockFunction]}
-      >
-        <
-          color="rgb(216, 216, 216)"
-          icon={
-            {
-              "icon": [
-                448,
-                512,
-                [
-                  "navicon",
-                ],
-                "f0c9",
-                "M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z",
-              ],
-              "iconName": "bars",
-              "prefix": "fas",
-            }
-          }
-          size={48}
-        />
-      </View>
     </View>
     <View
       style={

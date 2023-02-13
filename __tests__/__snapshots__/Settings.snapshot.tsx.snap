@@ -18,9 +18,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         "alignItems": "center",
         "backgroundColor": "rgb(255, 255, 255)",
         "display": "flex",
-        "paddingBottom": 10,
-        "paddingTop": 10,
-        "zIndex": -1,
+        "padding": 10,
       }
     }
   >

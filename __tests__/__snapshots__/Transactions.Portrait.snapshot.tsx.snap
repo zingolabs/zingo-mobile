@@ -188,13 +188,27 @@ exports[`Component Transactions - test Transactions Portrait - snapshot 1`] = `
         "backgroundColor": "rgb(255, 255, 255)",
         "padding": 10,
         "position": "absolute",
+        "zIndex": 100,
       }
     }
   >
     <View
       accessibilityLabel="text translated"
       accessible={true}
-      onPress={[MockFunction]}
+      collapsable={false}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        {
+          "opacity": 1,
+        }
+      }
     >
       <
         color="rgb(216, 216, 216)"
@@ -213,7 +227,7 @@ exports[`Component Transactions - test Transactions Portrait - snapshot 1`] = `
             "prefix": "fas",
           }
         }
-        size={48}
+        size={36}
       />
     </View>
   </View>
@@ -257,6 +271,20 @@ exports[`Component Transactions - test Transactions Portrait - snapshot 1`] = `
       }
     }
   />
+  <View
+    style={
+      {
+        "alignItems": "flex-end",
+        "padding": 10,
+        "position": "absolute",
+        "right": 0,
+      }
+    }
+  >
+    <Text>
+      2
+    </Text>
+  </View>
   <RCTScrollView
     accessibilityLabel="text translated"
     accessible={true}

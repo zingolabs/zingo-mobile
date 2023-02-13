@@ -55,8 +55,6 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
               "backgroundColor": "#011401",
               "display": "flex",
               "padding": 10,
-              "width": "100%",
-              "zIndex": -1,
             }
           }
         >
@@ -440,6 +438,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
           "backgroundColor": "#011401",
           "padding": 10,
           "position": "absolute",
+          "zIndex": 100,
         }
       }
     >
@@ -478,7 +477,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
               "prefix": "fas",
             }
           }
-          size={48}
+          size={36}
         />
       </View>
     </View>

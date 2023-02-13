@@ -18,9 +18,7 @@ exports[`Component About - test About - snapshot 1`] = `
         "alignItems": "center",
         "backgroundColor": "rgb(255, 255, 255)",
         "display": "flex",
-        "paddingBottom": 10,
-        "paddingTop": 10,
-        "zIndex": -1,
+        "padding": 10,
       }
     }
   >
@@ -104,6 +102,15 @@ exports[`Component About - test About - snapshot 1`] = `
     >
       text translated text translated
     </Text>
+    <View
+      style={
+        {
+          "backgroundColor": "rgb(0, 122, 255)",
+          "height": 1,
+          "width": "100%",
+        }
+      }
+    />
     <View
       style={
         {
