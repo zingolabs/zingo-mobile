@@ -49,3 +49,13 @@ with the chip on your system and start the emulated device.
 
 For notes on known issues and problems,
 see the [trouble-shooting notes](./TROUBLESHOOTING.md).
+
+
+### Debugging
+
+https://reactnative.dev/docs/debugging
+
+```
+npm install -g react-devtools
+react-devtools
+```
