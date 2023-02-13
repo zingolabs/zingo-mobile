@@ -39,14 +39,6 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
     >
       <View
         onLayout={[Function]}
-        style={
-          {
-            "alignItems": "center",
-            "backgroundColor": "#011401",
-            "display": "flex",
-            "zIndex": -1,
-          }
-        }
       >
         <View
           style={
@@ -54,8 +46,8 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
               "alignItems": "center",
               "backgroundColor": "#011401",
               "display": "flex",
-              "padding": 10,
-              "width": "100%",
+              "paddingBottom": 0,
+              "paddingTop": 10,
               "zIndex": -1,
             }
           }
@@ -77,11 +69,62 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
           <View
             style={
               {
-                "alignItems": "center",
-                "flexDirection": "column",
+                "flexDirection": "column-reverse",
+                "margin": 10,
               }
             }
           >
+            <View
+              style={
+                {
+                  "alignItems": "baseline",
+                  "flexDirection": "row",
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "#c3c3c3",
+                    "fontSize": 36,
+                  }
+                }
+              >
+                ᙇ
+              </Text>
+              <Text
+                style={
+                  {
+                    "color": "#c3c3c3",
+                    "fontSize": 36,
+                    "fontWeight": "700",
+                  }
+                }
+              >
+                 1.1234
+              </Text>
+              <Text
+                style={
+                  {
+                    "color": "#c3c3c3",
+                    "fontSize": 18,
+                    "paddingBottom": 0,
+                  }
+                }
+              >
+                5678
+              </Text>
+              <Text
+                style={
+                  {
+                    "color": "#c3c3c3",
+                    "fontSize": 36,
+                  }
+                }
+              >
+                 ZEC
+              </Text>
+            </View>
             <View
               accessible={true}
               collapsable={false}
@@ -102,13 +145,14 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
               <View
                 style={
                   {
-                    "alignItems": "flex-end",
+                    "alignItems": "center",
                     "backgroundColor": "#011401",
                     "borderRadius": 10,
                     "display": "flex",
                     "flexDirection": "row",
                     "justifyContent": "center",
                     "margin": 0,
+                    "marginLeft": 0,
                     "minHeight": 48,
                     "minWidth": 48,
                     "padding": 0,
@@ -143,14 +187,18 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                     }
                   }
                   size={14}
-                  style={
-                    {
-                      "marginBottom": 5,
-                    }
-                  }
                 />
               </View>
             </View>
+          </View>
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+              }
+            }
+          >
             <View
               style={
                 {
@@ -163,161 +211,166 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                 style={
                   {
                     "color": "#ffffff",
-                    "fontSize": 36,
+                    "fontSize": 20,
+                    "marginBottom": 5,
+                    "marginTop": 0,
                   }
                 }
               >
-                ᙇ
+                $
               </Text>
               <Text
                 style={
                   {
                     "color": "#ffffff",
-                    "fontSize": 36,
+                    "fontSize": 20,
                     "fontWeight": "700",
+                    "marginBottom": 5,
+                    "marginTop": 0,
                   }
                 }
               >
-                 1.1234
+                 37.44
               </Text>
               <Text
                 style={
                   {
                     "color": "#ffffff",
-                    "fontSize": 18,
-                    "paddingBottom": 0,
+                    "fontSize": 20,
+                    "marginBottom": 5,
+                    "marginTop": 0,
                   }
                 }
               >
-                5678
-              </Text>
-              <Text
-                style={
-                  {
-                    "color": "#ffffff",
-                    "fontSize": 36,
-                  }
-                }
-              >
-                 ZEC
+                 USD
               </Text>
             </View>
             <View
               style={
                 {
+                  "marginLeft": 5,
+                }
+              }
+            >
+              <View
+                accessible={true}
+                collapsable={false}
+                focusable={true}
+                onClick={[Function]}
+                onResponderGrant={[Function]}
+                onResponderMove={[Function]}
+                onResponderRelease={[Function]}
+                onResponderTerminate={[Function]}
+                onResponderTerminationRequest={[Function]}
+                onStartShouldSetResponder={[Function]}
+                style={
+                  {
+                    "opacity": 1,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "backgroundColor": "#011401",
+                      "borderRadius": 10,
+                      "flexDirection": "row",
+                      "justifyContent": "center",
+                      "margin": 0,
+                      "minHeight": 40,
+                      "minWidth": 40,
+                      "padding": 5,
+                    }
+                  }
+                >
+                  <
+                    color="#18bd18"
+                    icon={
+                      {
+                        "icon": [
+                          512,
+                          512,
+                          [
+                            128472,
+                            "refresh",
+                            "sync",
+                          ],
+                          "f021",
+                          "M105.1 202.6c7.7-21.8 20.2-42.3 37.8-59.8c62.5-62.5 163.8-62.5 226.3 0L386.3 160H336c-17.7 0-32 14.3-32 32s14.3 32 32 32H463.5c0 0 0 0 0 0h.4c17.7 0 32-14.3 32-32V64c0-17.7-14.3-32-32-32s-32 14.3-32 32v51.2L414.4 97.6c-87.5-87.5-229.3-87.5-316.8 0C73.2 122 55.6 150.7 44.8 181.4c-5.9 16.7 2.9 34.9 19.5 40.8s34.9-2.9 40.8-19.5zM39 289.3c-5 1.5-9.8 4.2-13.7 8.2c-4 4-6.7 8.8-8.1 14c-.3 1.2-.6 2.5-.8 3.8c-.3 1.7-.4 3.4-.4 5.1V448c0 17.7 14.3 32 32 32s32-14.3 32-32V396.9l17.6 17.5 0 0c87.5 87.4 229.3 87.4 316.7 0c24.4-24.4 42.1-53.1 52.9-83.7c5.9-16.7-2.9-34.9-19.5-40.8s-34.9 2.9-40.8 19.5c-7.7 21.8-20.2 42.3-37.8 59.8c-62.5 62.5-163.8 62.5-226.3 0l-.1-.1L125.6 352H176c17.7 0 32-14.3 32-32s-14.3-32-32-32H48.4c-1.6 0-3.2 .1-4.8 .3s-3.1 .5-4.6 1z",
+                        ],
+                        "iconName": "arrows-rotate",
+                        "prefix": "fas",
+                      }
+                    }
+                    size={20}
+                  />
+                </View>
+              </View>
+            </View>
+          </View>
+          <View
+            style={
+              {
+                "margin": 5,
+              }
+            }
+          >
+            <View
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
                   "alignItems": "center",
-                  "flexDirection": "row",
+                  "backgroundColor": "#18bd18",
+                  "borderColor": "#18bd18",
+                  "borderRadius": 10,
+                  "borderWidth": 2,
+                  "justifyContent": "center",
+                  "maxWidth": "90%",
+                  "minHeight": 48,
+                  "minWidth": "30%",
+                  "opacity": 1,
+                  "padding": 0,
+                  "paddingLeft": 20,
+                  "paddingRight": 20,
                 }
               }
             >
               <View
                 style={
                   {
-                    "alignItems": "baseline",
+                    "alignItems": "center",
+                    "display": "flex",
                     "flexDirection": "row",
+                    "justifyContent": "center",
+                    "margin": 0,
+                    "minHeight": 48,
+                    "minWidth": 48,
+                    "padding": 0,
                   }
                 }
               >
                 <Text
                   style={
                     {
-                      "color": "#ffffff",
-                      "fontSize": 20,
-                      "marginBottom": 5,
-                      "marginTop": 0,
+                      "color": "#011401",
+                      "fontSize": 16,
+                      "fontWeight": "bold",
+                      "textTransform": "uppercase",
                     }
                   }
                 >
-                  $
+                  text translated
                 </Text>
-                <Text
-                  style={
-                    {
-                      "color": "#ffffff",
-                      "fontSize": 20,
-                      "fontWeight": "700",
-                      "marginBottom": 5,
-                      "marginTop": 0,
-                    }
-                  }
-                >
-                   37.44
-                </Text>
-                <Text
-                  style={
-                    {
-                      "color": "#ffffff",
-                      "fontSize": 20,
-                      "marginBottom": 5,
-                      "marginTop": 0,
-                    }
-                  }
-                >
-                   USD
-                </Text>
-              </View>
-              <View
-                style={
-                  {
-                    "marginLeft": 5,
-                  }
-                }
-              >
-                <View
-                  accessible={true}
-                  collapsable={false}
-                  focusable={true}
-                  onClick={[Function]}
-                  onResponderGrant={[Function]}
-                  onResponderMove={[Function]}
-                  onResponderRelease={[Function]}
-                  onResponderTerminate={[Function]}
-                  onResponderTerminationRequest={[Function]}
-                  onStartShouldSetResponder={[Function]}
-                  style={
-                    {
-                      "opacity": 1,
-                    }
-                  }
-                >
-                  <View
-                    style={
-                      {
-                        "alignItems": "center",
-                        "backgroundColor": "#011401",
-                        "borderRadius": 10,
-                        "flexDirection": "row",
-                        "justifyContent": "center",
-                        "margin": 0,
-                        "minHeight": 40,
-                        "minWidth": 40,
-                        "padding": 5,
-                      }
-                    }
-                  >
-                    <
-                      color="#18bd18"
-                      icon={
-                        {
-                          "icon": [
-                            512,
-                            512,
-                            [
-                              128472,
-                              "refresh",
-                              "sync",
-                            ],
-                            "f021",
-                            "M105.1 202.6c7.7-21.8 20.2-42.3 37.8-59.8c62.5-62.5 163.8-62.5 226.3 0L386.3 160H336c-17.7 0-32 14.3-32 32s14.3 32 32 32H463.5c0 0 0 0 0 0h.4c17.7 0 32-14.3 32-32V64c0-17.7-14.3-32-32-32s-32 14.3-32 32v51.2L414.4 97.6c-87.5-87.5-229.3-87.5-316.8 0C73.2 122 55.6 150.7 44.8 181.4c-5.9 16.7 2.9 34.9 19.5 40.8s34.9-2.9 40.8-19.5zM39 289.3c-5 1.5-9.8 4.2-13.7 8.2c-4 4-6.7 8.8-8.1 14c-.3 1.2-.6 2.5-.8 3.8c-.3 1.7-.4 3.4-.4 5.1V448c0 17.7 14.3 32 32 32s32-14.3 32-32V396.9l17.6 17.5 0 0c87.5 87.4 229.3 87.4 316.7 0c24.4-24.4 42.1-53.1 52.9-83.7c5.9-16.7-2.9-34.9-19.5-40.8s-34.9 2.9-40.8 19.5c-7.7 21.8-20.2 42.3-37.8 59.8c-62.5 62.5-163.8 62.5-226.3 0l-.1-.1L125.6 352H176c17.7 0 32-14.3 32-32s-14.3-32-32-32H48.4c-1.6 0-3.2 .1-4.8 .3s-3.1 .5-4.6 1z",
-                          ],
-                          "iconName": "arrows-rotate",
-                          "prefix": "fas",
-                        }
-                      }
-                      size={20}
-                    />
-                  </View>
-                </View>
               </View>
             </View>
           </View>
@@ -326,7 +379,6 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
               {
                 "backgroundColor": "#18bd18",
                 "height": 1,
-                "marginTop": 5,
                 "width": "100%",
               }
             }
@@ -422,63 +474,104 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
               </View>
             </View>
           </View>
+        </View>
+        <View
+          style={
+            {
+              "backgroundColor": "#011401",
+              "padding": 10,
+              "position": "absolute",
+            }
+          }
+        >
           <View
+            accessibilityLabel="text translated"
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
             style={
               {
-                "backgroundColor": "#18bd18",
-                "height": 1,
-                "width": "100%",
+                "opacity": 1,
               }
             }
-          />
+          >
+            <
+              color="#ffffff"
+              icon={
+                {
+                  "icon": [
+                    448,
+                    512,
+                    [
+                      "navicon",
+                    ],
+                    "f0c9",
+                    "M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z",
+                  ],
+                  "iconName": "bars",
+                  "prefix": "fas",
+                }
+              }
+              size={48}
+            />
+          </View>
         </View>
-      </View>
-    </View>
-    <View
-      style={
-        {
-          "backgroundColor": "#011401",
-          "padding": 10,
-          "position": "absolute",
-        }
-      }
-    >
-      <View
-        accessibilityLabel="text translated"
-        accessible={true}
-        collapsable={false}
-        focusable={true}
-        onClick={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
-        style={
-          {
-            "opacity": 1,
-          }
-        }
-      >
-        <
-          color="#ffffff"
-          icon={
+        <View
+          style={
             {
-              "icon": [
-                448,
-                512,
-                [
-                  "navicon",
-                ],
-                "f0c9",
-                "M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z",
-              ],
-              "iconName": "bars",
-              "prefix": "fas",
+              "alignItems": "flex-end",
+              "padding": 10,
+              "position": "absolute",
+              "right": 0,
             }
           }
-          size={48}
+        >
+          <Text
+            style={
+              {
+                "color": "#ffffff",
+                "fontSize": 8,
+              }
+            }
+          >
+            text translated
+          </Text>
+          <Text
+            style={
+              {
+                "color": "#ffffff",
+                "fontSize": 8,
+              }
+            }
+          >
+            (600x300)-2.5
+          </Text>
+          <Text
+            style={
+              {
+                "color": "#ffffff",
+                "fontSize": 7,
+              }
+            }
+          >
+            text translated
+          </Text>
+        </View>
+        <View
+          style={
+            {
+              "backgroundColor": "#18bd18",
+              "height": 1,
+              "width": "100%",
+            }
+          }
         />
       </View>
     </View>

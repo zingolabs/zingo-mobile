@@ -50,6 +50,7 @@ exports[`Component Transactions - test Transactions Portrait - snapshot 1`] = `
       style={
         {
           "flexDirection": "row",
+          "margin": 0,
         }
       }
     >
@@ -158,7 +159,21 @@ exports[`Component Transactions - test Transactions Portrait - snapshot 1`] = `
         }
       >
         <View
-          onPress={[Function]}
+          accessible={true}
+          collapsable={false}
+          focusable={true}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            {
+              "opacity": 1,
+            }
+          }
         >
           <
             icon={
@@ -194,7 +209,20 @@ exports[`Component Transactions - test Transactions Portrait - snapshot 1`] = `
     <View
       accessibilityLabel="text translated"
       accessible={true}
-      onPress={[MockFunction]}
+      collapsable={false}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        {
+          "opacity": 1,
+        }
+      }
     >
       <
         color="rgb(216, 216, 216)"
@@ -227,6 +255,16 @@ exports[`Component Transactions - test Transactions Portrait - snapshot 1`] = `
       }
     }
   >
+    <Text
+      style={
+        {
+          "color": "rgb(216, 216, 216)",
+          "fontSize": 8,
+        }
+      }
+    >
+      text translated
+    </Text>
     <Text
       style={
         {

@@ -1,12 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useRef, useCallback, useContext } from 'react';
-import { View, ScrollView, Modal, Image, Alert, Keyboard, TextInput, TouchableOpacity } from 'react-native';
-import { faQrcode, faCheck, faInfo, faPlay, faStop } from '@fortawesome/free-solid-svg-icons';
+import { View, ScrollView, Modal, Alert, Keyboard, TextInput, TouchableOpacity } from 'react-native';
+import { faQrcode, faCheck, faInfo } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme, useIsFocused } from '@react-navigation/native';
 import Toast from 'react-native-simple-toast';
 import { getNumberFormatSettings } from 'react-native-localize';
-import { faBars } from '@fortawesome/free-solid-svg-icons';
 import Animated, { EasingNode } from 'react-native-reanimated';
 
 import FadeText from '../Components/FadeText';
@@ -25,6 +24,7 @@ import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import PriceFetcher from '../Components/PriceFetcher';
 import RPC from '../../app/rpc';
+import Header from '../Header';
 
 type SendProps = {
   setSendPageState: (sendPageState: SendPageStateClass) => void;
@@ -50,18 +50,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   setZecPrice,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const {
-    translate,
-    dimensions,
-    info,
-    totalBalance,
-    sendPageState,
-    syncingStatus,
-    navigation,
-    currency,
-    zecPrice,
-    sendAll,
-  } = context;
+  const { translate, dimensions, info, totalBalance, sendPageState, navigation, zecPrice, sendAll } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [qrcodeModalVisble, setQrcodeModalVisible] = useState(false);
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
@@ -75,7 +64,6 @@ const Send: React.FunctionComponent<SendProps> = ({
   const slideAnim = useRef(new Animated.Value(0)).current;
   const defaultFee = info.defaultFee || Utils.getFallbackDefaultFee();
   const { decimalSeparator } = getNumberFormatSettings();
-  const syncStatusDisplayLine = syncingStatus.inProgress ? `(${syncingStatus.blocks})` : '';
   const spendable = totalBalance.transparentBal + totalBalance.spendablePrivate + totalBalance.spendableOrchard;
   const stillConfirming = spendable !== totalBalance.total;
 
@@ -297,6 +285,8 @@ const Send: React.FunctionComponent<SendProps> = ({
   };
 
   const confirmSend = async () => {
+    // very first interrupt syncing Just in case...
+    await RPC.rpc_setInterruptSyncAfterBatch('true');
     // First, close the confirm modal and show the "computing" modal
     setConfirmModalVisible(false);
     setComputingModalVisible(true);
@@ -398,157 +388,17 @@ const Send: React.FunctionComponent<SendProps> = ({
           onLayout={e => {
             const { height } = e.nativeEvent.layout;
             setTitleViewHeight(height);
-          }}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            paddingBottom: 0,
-            backgroundColor: colors.card,
-            zIndex: -1,
           }}>
-          <View
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              paddingBottom: 0,
-              backgroundColor: colors.card,
-              zIndex: -1,
-              paddingTop: 10,
-            }}>
-            <Image
-              source={require('../../assets/img/logobig-zingo.png')}
-              style={{ width: 80, height: 80, resizeMode: 'contain' }}
-            />
-            <View style={{ flexDirection: 'row' }}>
-              <ZecAmount
-                currencyName={info.currencyName ? info.currencyName : ''}
-                size={36}
-                amtZec={totalBalance.total}
-              />
-              {totalBalance.total > 0 && (totalBalance.privateBal > 0 || totalBalance.transparentBal > 0) && (
-                <TouchableOpacity onPress={() => poolsMoreInfoOnClick()}>
-                  <View
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      backgroundColor: colors.card,
-                      borderRadius: 10,
-                      margin: 0,
-                      padding: 0,
-                      marginLeft: 5,
-                      minWidth: 48,
-                      minHeight: 48,
-                    }}>
-                    <RegText color={colors.primary}>{translate('transactions.pools')}</RegText>
-                    <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
-                  </View>
-                </TouchableOpacity>
-              )}
-            </View>
-            {currency === 'USD' && (
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <CurrencyAmount
-                  style={{ marginTop: 0, marginBottom: 5 }}
-                  price={zecPrice.zecPrice}
-                  amtZec={totalBalance.total}
-                  currency={currency}
-                />
-                <View style={{ marginLeft: 5 }}>
-                  <PriceFetcher setZecPrice={setZecPrice} />
-                </View>
-              </View>
-            )}
-
-            <View
-              style={{
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexWrap: 'wrap',
-                marginVertical: 5,
-              }}>
-              <View
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexWrap: 'wrap',
-                }}>
-                <RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
-                  {translate('send.title')}
-                </RegText>
-                {/*<RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
-                  {syncStatusDisplayLine ? translate('send.title-syncing') : translate('send.title')}
-                </RegText>
-                {!!syncStatusDisplayLine && (
-                  <FadeText style={{ margin: 0, padding: 0 }}>{syncStatusDisplayLine}</FadeText>
-                )}*/}
-              </View>
-              <View
-                style={{
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  margin: 0,
-                  padding: 1,
-                  borderColor: colors.primary,
-                  borderWidth: 1,
-                  borderRadius: 10,
-                  minWidth: 20,
-                  minHeight: 20,
-                }}>
-                {!syncStatusDisplayLine && syncingStatus.synced && (
-                  <View style={{ margin: 0, padding: 0 }}>
-                    <FontAwesomeIcon icon={faCheck} color={colors.primary} />
-                  </View>
-                )}
-                {!syncStatusDisplayLine && !syncingStatus.synced && (
-                  <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
-                    <FontAwesomeIcon icon={faStop} color={colors.zingo} size={12} />
-                  </TouchableOpacity>
-                )}
-                {syncStatusDisplayLine && (
-                  <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
-                    <FontAwesomeIcon icon={faPlay} color={colors.primary} size={10} />
-                  </TouchableOpacity>
-                )}
-              </View>
-              {/*!!syncStatusDisplayLine && (
-                <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
-                  <View
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      backgroundColor: colors.card,
-                      borderRadius: 10,
-                      margin: 0,
-                      padding: 0,
-                      marginLeft: 5,
-                      minWidth: 48,
-                      minHeight: 48,
-                    }}>
-                    <RegText color={colors.primary}>{translate('send.more')}</RegText>
-                    <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
-                  </View>
-                </TouchableOpacity>
-                )*/}
-            </View>
-          </View>
+          <Header
+            poolsMoreInfoOnClick={poolsMoreInfoOnClick}
+            syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
+            setComputingModalVisible={setComputingModalVisible}
+            toggleMenuDrawer={toggleMenuDrawer}
+            setZecPrice={setZecPrice}
+            title={translate('send.title')}
+          />
         </View>
       </Animated.View>
-
-      <Animated.View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', marginTop: slideAnim }}>
-        <TouchableOpacity accessible={true} accessibilityLabel={translate('menudrawer-acc')} onPress={toggleMenuDrawer}>
-          <FontAwesomeIcon icon={faBars} size={48} color={colors.border} />
-        </TouchableOpacity>
-      </Animated.View>
-
-      <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
 
       <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{}}>
         <View style={{ marginBottom: 30 }}>
@@ -939,159 +789,16 @@ const Send: React.FunctionComponent<SendProps> = ({
             onLayout={e => {
               const { height } = e.nativeEvent.layout;
               setTitleViewHeight(height);
-            }}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              backgroundColor: colors.card,
-              zIndex: -1,
             }}>
-            <View
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                backgroundColor: colors.card,
-                zIndex: -1,
-                padding: 10,
-                width: '100%',
-              }}>
-              <Image
-                source={require('../../assets/img/logobig-zingo.png')}
-                style={{ width: 80, height: 80, resizeMode: 'contain' }}
-              />
-              <View style={{ flexDirection: 'column', alignItems: 'center' }}>
-                {totalBalance.total > 0 && (totalBalance.privateBal > 0 || totalBalance.transparentBal > 0) && (
-                  <TouchableOpacity onPress={() => poolsMoreInfoOnClick()}>
-                    <View
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        alignItems: 'flex-end',
-                        justifyContent: 'center',
-                        backgroundColor: colors.card,
-                        borderRadius: 10,
-                        margin: 0,
-                        padding: 0,
-                        minWidth: 48,
-                        minHeight: 48,
-                      }}>
-                      <RegText color={colors.primary}>{translate('transactions.pools')}</RegText>
-                      <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} style={{ marginBottom: 5 }} />
-                    </View>
-                  </TouchableOpacity>
-                )}
-                <ZecAmount
-                  currencyName={info.currencyName ? info.currencyName : ''}
-                  size={36}
-                  amtZec={totalBalance.total}
-                />
-                {currency === 'USD' && (
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <CurrencyAmount
-                      style={{ marginTop: 0, marginBottom: 5 }}
-                      price={zecPrice.zecPrice}
-                      amtZec={totalBalance.total}
-                      currency={currency}
-                    />
-                    <View style={{ marginLeft: 5 }}>
-                      <PriceFetcher setZecPrice={setZecPrice} />
-                    </View>
-                  </View>
-                )}
-              </View>
-
-              <View style={{ width: '100%', height: 1, backgroundColor: colors.primary, marginTop: 5 }} />
-
-              <View
-                style={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexWrap: 'wrap',
-                  marginVertical: 5,
-                }}>
-                <View
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexWrap: 'wrap',
-                  }}>
-                  <RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
-                    {translate('send.title')}
-                  </RegText>
-                  {/*<RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
-                    {syncStatusDisplayLine ? translate('send.title-syncing') : translate('send.title')}
-                  </RegText>
-                  {!!syncStatusDisplayLine && (
-                    <FadeText style={{ margin: 0, padding: 0 }}>{syncStatusDisplayLine}</FadeText>
-                  )}*/}
-                </View>
-                <View
-                  style={{
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    margin: 0,
-                    padding: 1,
-                    borderColor: colors.primary,
-                    borderWidth: 1,
-                    borderRadius: 10,
-                    minWidth: 20,
-                    minHeight: 20,
-                  }}>
-                  {!syncStatusDisplayLine && syncingStatus.synced && (
-                    <View style={{ margin: 0, padding: 0 }}>
-                      <FontAwesomeIcon icon={faCheck} color={colors.primary} />
-                    </View>
-                  )}
-                  {!syncStatusDisplayLine && !syncingStatus.synced && (
-                    <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
-                      <FontAwesomeIcon icon={faStop} color={colors.zingo} size={12} />
-                    </TouchableOpacity>
-                  )}
-                  {syncStatusDisplayLine && (
-                    <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
-                      <FontAwesomeIcon icon={faPlay} color={colors.primary} size={10} />
-                    </TouchableOpacity>
-                  )}
-                </View>
-                {/*!!syncStatusDisplayLine && (
-                  <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
-                    <View
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        backgroundColor: colors.card,
-                        borderRadius: 10,
-                        margin: 0,
-                        padding: 0,
-                        marginLeft: 5,
-                        minWidth: 48,
-                        minHeight: 48,
-                      }}>
-                      <RegText color={colors.primary}>{translate('send.more')}</RegText>
-                      <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
-                    </View>
-                  </TouchableOpacity>
-                  )*/}
-              </View>
-
-              <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
-            </View>
+            <Header
+              poolsMoreInfoOnClick={poolsMoreInfoOnClick}
+              syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
+              setComputingModalVisible={setComputingModalVisible}
+              toggleMenuDrawer={toggleMenuDrawer}
+              setZecPrice={setZecPrice}
+              title={translate('send.title')}
+            />
           </View>
-        </View>
-
-        <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute' }}>
-          <TouchableOpacity
-            accessible={true}
-            accessibilityLabel={translate('menudrawer-acc')}
-            onPress={toggleMenuDrawer}>
-            <FontAwesomeIcon icon={faBars} size={48} color={colors.border} />
-          </TouchableOpacity>
         </View>
       </View>
       <View

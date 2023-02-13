@@ -23,210 +23,82 @@ exports[`Component Receive - test Receive Landscape - snapshot 1`] = `
     <View
       style={
         {
+          "alignItems": "center",
           "backgroundColor": "rgb(255, 255, 255)",
           "display": "flex",
-          "flexDirection": "row",
-          "justifyContent": "center",
-          "margin": 0,
-          "padding": 0,
+          "paddingBottom": 0,
+          "paddingTop": 10,
+          "zIndex": -1,
         }
       }
     >
+      <Image
+        source={
+          {
+            "testUri": "../../../assets/img/logobig-zingo.png",
+          }
+        }
+        style={
+          {
+            "height": 80,
+            "resizeMode": "contain",
+            "width": 80,
+          }
+        }
+      />
+      <View
+        style={
+          {
+            "height": 20,
+          }
+        }
+      />
+      <View
+        style={
+          {
+            "backgroundColor": "rgb(0, 122, 255)",
+            "height": 1,
+            "width": "100%",
+          }
+        }
+      />
       <View
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "rgb(255, 255, 255)",
-            "padding": 10,
-            "width": "100%",
-            "zIndex": -1,
+            "display": "flex",
+            "flexDirection": "row",
+            "flexWrap": "wrap",
+            "justifyContent": "center",
+            "marginVertical": 5,
           }
         }
       >
-        <Image
-          source={
-            {
-              "testUri": "../../../assets/img/logobig-zingo.png",
-            }
-          }
-          style={
-            {
-              "height": 80,
-              "resizeMode": "contain",
-              "width": 80,
-            }
-          }
-        />
-        <View
-          style={
-            {
-              "alignItems": "center",
-              "flexDirection": "column",
-            }
-          }
-        >
-          <View
-            style={
-              {
-                "alignItems": "baseline",
-                "flexDirection": "row",
-                "opacity": 0.5,
-              }
-            }
-          >
-            <Text
-              style={
-                {
-                  "color": undefined,
-                  "fontSize": 36,
-                }
-              }
-            >
-              ᙇ
-            </Text>
-            <Text
-              style={
-                {
-                  "color": undefined,
-                  "fontSize": 36,
-                  "fontWeight": "700",
-                }
-              }
-            >
-               1.1234
-            </Text>
-            <Text
-              style={
-                {
-                  "color": undefined,
-                  "fontSize": 18,
-                  "paddingBottom": 0,
-                }
-              }
-            >
-              5678
-            </Text>
-            <Text
-              style={
-                {
-                  "color": undefined,
-                  "fontSize": 36,
-                }
-              }
-            >
-               ZEC
-            </Text>
-          </View>
-        </View>
-        <View
-          style={
-            {
-              "backgroundColor": "rgb(0, 122, 255)",
-              "height": 1,
-              "marginTop": 5,
-              "width": "100%",
-            }
-          }
-        />
         <View
           style={
             {
               "alignItems": "center",
               "display": "flex",
-              "flexDirection": "row",
+              "flexDirection": "column",
               "flexWrap": "wrap",
               "justifyContent": "center",
-              "marginVertical": 5,
             }
           }
         >
-          <View
+          <Text
             style={
               {
-                "alignItems": "center",
-                "display": "flex",
-                "flexDirection": "column",
-                "flexWrap": "wrap",
-                "justifyContent": "center",
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 18,
+                "fontWeight": "600",
+                "opacity": 1,
+                "paddingHorizontal": 5,
               }
             }
           >
-            <Text
-              style={
-                {
-                  "color": "rgb(28, 28, 30)",
-                  "fontSize": 18,
-                  "fontWeight": "600",
-                  "opacity": 1,
-                  "paddingHorizontal": 5,
-                }
-              }
-            >
-              text translated
-            </Text>
-          </View>
-          <View
-            style={
-              {
-                "alignItems": "center",
-                "borderColor": "rgb(0, 122, 255)",
-                "borderRadius": 10,
-                "borderWidth": 1,
-                "justifyContent": "center",
-                "margin": 0,
-                "minHeight": 20,
-                "minWidth": 20,
-                "padding": 1,
-              }
-            }
-          >
-            <View
-              accessible={true}
-              collapsable={false}
-              focusable={true}
-              onClick={[Function]}
-              onResponderGrant={[Function]}
-              onResponderMove={[Function]}
-              onResponderRelease={[Function]}
-              onResponderTerminate={[Function]}
-              onResponderTerminationRequest={[Function]}
-              onStartShouldSetResponder={[Function]}
-              style={
-                {
-                  "opacity": 1,
-                }
-              }
-            >
-              <
-                icon={
-                  {
-                    "icon": [
-                      384,
-                      512,
-                      [
-                        9209,
-                      ],
-                      "f04d",
-                      "M0 128C0 92.7 28.7 64 64 64H320c35.3 0 64 28.7 64 64V384c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V128z",
-                    ],
-                    "iconName": "stop",
-                    "prefix": "fas",
-                  }
-                }
-                size={12}
-              />
-            </View>
-          </View>
+            text translated
+          </Text>
         </View>
-        <View
-          style={
-            {
-              "backgroundColor": "rgb(0, 122, 255)",
-              "height": 1,
-              "width": "100%",
-            }
-          }
-        />
       </View>
     </View>
     <View
@@ -277,6 +149,56 @@ exports[`Component Receive - test Receive Landscape - snapshot 1`] = `
         />
       </View>
     </View>
+    <View
+      style={
+        {
+          "alignItems": "flex-end",
+          "padding": 10,
+          "position": "absolute",
+          "right": 0,
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": "rgb(216, 216, 216)",
+            "fontSize": 8,
+          }
+        }
+      >
+        text translated
+      </Text>
+      <Text
+        style={
+          {
+            "color": "rgb(216, 216, 216)",
+            "fontSize": 8,
+          }
+        }
+      >
+        (600x300)-2.5
+      </Text>
+      <Text
+        style={
+          {
+            "color": "rgb(216, 216, 216)",
+            "fontSize": 7,
+          }
+        }
+      >
+        text translated
+      </Text>
+    </View>
+    <View
+      style={
+        {
+          "backgroundColor": "rgb(0, 122, 255)",
+          "height": 1,
+          "width": "100%",
+        }
+      }
+    />
     <View
       style={
         {

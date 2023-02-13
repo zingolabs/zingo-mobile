@@ -1,4 +1,4 @@
-package com.zingo
+package org.ZingoLabs.Zingo
 
 import android.content.Intent
 import com.facebook.react.HeadlessJsTaskService
