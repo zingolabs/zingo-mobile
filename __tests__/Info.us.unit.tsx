@@ -5,7 +5,7 @@
 import 'react-native';
 import React from 'react';
 
-import { render } from '@testing-library/react-native';
+import { render, screen } from '@testing-library/react-native';
 import Info from '../components/Info';
 import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
 
@@ -44,14 +44,11 @@ describe('Component Info - test', () => {
     state.totalBalance.total = 1.12345678;
     const onClose = jest.fn();
     const onSet = jest.fn();
-    const text: any = render(
+    render(
       <ContextAppLoadedProvider value={state}>
         <Info closeModal={onClose} setZecPrice={onSet} />
       </ContextAppLoadedProvider>,
-    ).toJSON();
-    expect(text.type).toBe('RCTSafeAreaView');
-    expect(text.children[1].children[0].children[0].children[5].children[0].children[1].children[0]).toBe(
-      '$ 33.33 USD per ZEC',
     );
+    screen.getByText('$ 33.33 USD per ZEC');
   });
 });

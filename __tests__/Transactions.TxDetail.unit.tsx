@@ -5,7 +5,7 @@
 import 'react-native';
 import React from 'react';
 
-import { render } from '@testing-library/react-native';
+import { render, screen } from '@testing-library/react-native';
 import TxDetail from '../components/Transactions/components/TxDetail';
 import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
 import { TransactionType, TxDetailType } from '../app/AppState';
@@ -66,7 +66,7 @@ describe('Component Transactions TxDetail - test', () => {
     const tx = {
       type: 'sent',
       address: 'UA-12345678901234567890',
-      amount: -0.000065,
+      amount: -0.0065,
       position: '',
       confirmations: 20,
       txid: 'txid-1234567890',
@@ -75,23 +75,18 @@ describe('Component Transactions TxDetail - test', () => {
       detailedTxns: [
         {
           address: 'other-UA-12345678901234567890',
-          amount: 0.000055,
+          amount: 0.0064,
           memo: 'memo-abcdefgh',
         },
       ] as TxDetailType[],
     } as TransactionType;
-    const text: any = render(
+    render(
       <ContextAppLoadedProvider value={state}>
         <TxDetail tx={tx} closeModal={onClose} />
       </ContextAppLoadedProvider>,
     ).toJSON();
-    expect(text.type).toBe('RCTSafeAreaView');
-    expect(text.children[0].children[0].children[2].children[3].children[1].children[0].children[1].children[0]).toBe(
-      ' 0.0000',
-    );
-    expect(text.children[0].children[0].children[2].children[3].children[1].children[0].children[2].children[0]).toBe(
-      '1000',
-    );
+    screen.getByText('0.0064');
+    screen.getByText('0.0001');
   });
 
   test('Transactions TxDetail - self sent transaction', () => {
@@ -100,7 +95,7 @@ describe('Component Transactions TxDetail - test', () => {
     const txSelfSend = {
       type: 'sent',
       address: 'UA-12345678901234567890',
-      amount: -0.00001,
+      amount: -0.0001,
       position: '',
       confirmations: 20,
       txid: 'txid-1234567890',
@@ -109,22 +104,17 @@ describe('Component Transactions TxDetail - test', () => {
       detailedTxns: [
         {
           address: 'other-UA-12345678901234567890',
-          amount: 0.00055,
+          amount: 0.0064,
           memo: 'memo-abcdefgh',
         },
       ] as TxDetailType[],
     } as TransactionType;
-    const textSelfSend: any = render(
+    render(
       <ContextAppLoadedProvider value={state}>
         <TxDetail tx={txSelfSend} closeModal={onClose} />
       </ContextAppLoadedProvider>,
-    ).toJSON();
-    expect(textSelfSend.type).toBe('RCTSafeAreaView');
-    expect(
-      textSelfSend.children[0].children[0].children[2].children[3].children[1].children[0].children[1].children[0],
-    ).toBe(' 0.0000');
-    expect(
-      textSelfSend.children[0].children[0].children[2].children[3].children[1].children[0].children[2].children[0],
-    ).toBe('1000');
+    );
+    screen.getByText('0.0064');
+    screen.getByText('0.0001');
   });
 });
