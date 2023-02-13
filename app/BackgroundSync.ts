@@ -1,6 +1,8 @@
 import RPCModule from '../components/RPCModule';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo, { NetInfoStateType } from '@react-native-community/netinfo';
+import { Notifications } from 'react-native-notifications';
+
 
 const BackgroundSync = async (task_data: any) => {
   const exists = await RPCModule.walletExists();
@@ -61,6 +63,12 @@ const BackgroundSync = async (task_data: any) => {
         console.log('BS: saving...');
         // update batch_num with the new value, otherwise never change
         batch_num = ss.batch_num;
+
+        Notifications.postLocalNotification({
+          body: "Batch " + batch_num + " of " + ss.batch_total,
+          title: "Zingo Sync",
+          silent: true,
+        })
       }
     }, 2000);
 
