@@ -1,18 +1,17 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState } from 'react';
-import { View, ScrollView, SafeAreaView, Image, Platform, TouchableOpacity, Text } from 'react-native';
+import { View, ScrollView, SafeAreaView, Platform, TouchableOpacity, Text } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import Clipboard from '@react-native-community/clipboard';
 import Toast from 'react-native-simple-toast';
 import QRCode from 'react-native-qrcode-svg';
 
 import FadeText from '../Components/FadeText';
-import RegText from '../Components/RegText';
-import ZecAmount from '../Components/ZecAmount';
 import Button from '../Button';
 import Utils from '../../app/utils';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
+import Header from '../Header';
 
 type PrivKeyProps = {
   closeModal: () => void;
@@ -22,7 +21,7 @@ type PrivKeyProps = {
 };
 const PrivKey: React.FunctionComponent<PrivKeyProps> = ({ address, keyType, privKey, closeModal }) => {
   const context = useContext(ContextAppLoaded);
-  const { totalBalance, info, translate } = context;
+  const { translate } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const fixedWidthFont = Platform.OS === 'android' ? 'monospace' : 'Courier';
 
@@ -54,30 +53,12 @@ const PrivKey: React.FunctionComponent<PrivKeyProps> = ({ address, keyType, priv
         height: '100%',
         backgroundColor: colors.background,
       }}>
-      <View
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          paddingBottom: 10,
-          backgroundColor: colors.card,
-          zIndex: -1,
-          paddingTop: 10,
-        }}>
-        <Image
-          source={require('../../assets/img/logobig-zingo.png')}
-          style={{ width: 80, height: 80, resizeMode: 'contain' }}
-        />
-        <ZecAmount
-          currencyName={info.currencyName ? info.currencyName : ''}
-          size={36}
-          amtZec={totalBalance.total}
-          style={{ opacity: 0.5 }}
-        />
-        <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
-          {keyTypeString} {translate('privkey.title')}
-        </RegText>
-        <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
-      </View>
+      <Header
+        title={keyTypeString + ' ' + translate('privkey.title')}
+        noBalance={true}
+        noSyncingStatus={true}
+        noDrawMenu={true}
+      />
 
       <ScrollView
         style={{ maxHeight: '85%' }}

@@ -28,15 +28,6 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
     transparent={false}
     visible={false}
   />
-  <View
-    style={
-      {
-        "backgroundColor": "#18bd18",
-        "height": 1,
-        "width": "100%",
-      }
-    }
-  />
   <RCTScrollView
     contentContainerStyle={{}}
     keyboardShouldPersistTaps="handled"

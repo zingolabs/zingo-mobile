@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
-import { View, ScrollView, SafeAreaView, Image, TouchableOpacity, TextInput } from 'react-native';
+import { View, ScrollView, SafeAreaView, TouchableOpacity, TextInput } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faDotCircle } from '@fortawesome/free-solid-svg-icons';
@@ -10,13 +10,13 @@ import Toast from 'react-native-simple-toast';
 import RegText from '../Components/RegText';
 import FadeText from '../Components/FadeText';
 import BoldText from '../Components/BoldText';
-import ZecAmount from '../Components/ZecAmount';
 import { parseServerURI, serverUris } from '../../app/uris';
 import Button from '../Button';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import moment from 'moment';
 import 'moment/locale/es';
+import Header from '../Header';
 
 type SettingsProps = {
   closeModal: () => void;
@@ -47,8 +47,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const context = useContext(ContextAppLoaded);
   const {
     walletSettings,
-    totalBalance,
-    info,
     translate,
     server: serverContext,
     currency: currencyContext,
@@ -195,30 +193,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         height: '100%',
         backgroundColor: colors.background,
       }}>
-      <View
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          paddingBottom: 10,
-          backgroundColor: colors.card,
-          zIndex: -1,
-          paddingTop: 10,
-        }}>
-        <Image
-          source={require('../../assets/img/logobig-zingo.png')}
-          style={{ width: 80, height: 80, resizeMode: 'contain' }}
-        />
-        <ZecAmount
-          currencyName={info.currencyName ? info.currencyName : ''}
-          size={36}
-          amtZec={totalBalance.total}
-          style={{ opacity: 0.5 }}
-        />
-        <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
-          {translate('settings.title')}
-        </RegText>
-        <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
-      </View>
+      <Header title={translate('settings.title')} noBalance={true} noSyncingStatus={true} noDrawMenu={true} />
 
       <ScrollView
         style={{ maxHeight: '85%' }}

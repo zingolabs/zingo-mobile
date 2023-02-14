@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useContext, useRef } from 'react';
-import { View, Image, SafeAreaView, ScrollView, TouchableOpacity, Text, TextInput, Keyboard } from 'react-native';
+import { View, SafeAreaView, ScrollView, TouchableOpacity, Text, TextInput, Keyboard } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import Toast from 'react-native-simple-toast';
 import Clipboard from '@react-native-community/clipboard';
@@ -9,13 +9,13 @@ import Animated, { EasingNode } from 'react-native-reanimated';
 
 import RegText from '../Components/RegText';
 import FadeText from '../Components/FadeText';
-import ZecAmount from '../Components/ZecAmount';
 import Button from '../Button';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded, ContextAppLoading } from '../../app/context';
-import { InfoType, TotalBalanceClass, WalletSeedType } from '../../app/AppState';
+import { InfoType, WalletSeedType } from '../../app/AppState';
 import RPCModule from '../RPCModule';
 import RPC from '../../app/rpc';
+import Header from '../Header';
 
 type TextsType = {
   new: string[];
@@ -35,19 +35,16 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
   const contextLoaded = useContext(ContextAppLoaded);
   const contextLoading = useContext(ContextAppLoading);
   let walletSeed: WalletSeedType,
-    totalBalance: TotalBalanceClass,
     translate: (key: string, config?: TranslateOptions) => string,
     info: InfoType,
     server: string;
   if (action === 'new' || action === 'restore') {
     walletSeed = contextLoading.walletSeed;
-    totalBalance = contextLoading.totalBalance;
     translate = contextLoading.translate;
     info = contextLoading.info;
     server = contextLoading.server;
   } else {
     walletSeed = contextLoaded.walletSeed;
-    totalBalance = contextLoaded.totalBalance;
     translate = contextLoaded.translate;
     info = contextLoaded.info;
     server = contextLoaded.server;
@@ -146,28 +143,13 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
           onLayout={e => {
             const { height } = e.nativeEvent.layout;
             setTitleViewHeight(height);
-          }}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            paddingBottom: 10,
-            backgroundColor: colors.card,
-            zIndex: -1,
-            paddingTop: 10,
           }}>
-          <Image
-            source={require('../../assets/img/logobig-zingo.png')}
-            style={{ width: 80, height: 80, resizeMode: 'contain' }}
+          <Header
+            title={translate('seed.title') + ' (' + translate(`seed.${action}`) + ')'}
+            noBalance={true}
+            noSyncingStatus={true}
+            noDrawMenu={true}
           />
-          <ZecAmount
-            currencyName={info.currencyName ? info.currencyName : ''}
-            size={36}
-            amtZec={totalBalance.total}
-            style={{ opacity: 0.5 }}
-          />
-          <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
-            {translate('seed.title')} ({translate(`seed.${action}`)})
-          </RegText>
         </View>
       </Animated.View>
 

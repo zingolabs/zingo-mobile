@@ -6,8 +6,6 @@ import Toast from 'react-native-simple-toast';
 import moment from 'moment';
 import 'moment/locale/es';
 import { useTheme } from '@react-navigation/native';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 
 import { TransactionType, TxDetailType } from '../../../app/AppState';
 import Utils from '../../../app/utils';
@@ -19,6 +17,7 @@ import FadeText from '../../Components/FadeText';
 import Button from '../../Button';
 import { ThemeType } from '../../../app/types';
 import { ContextAppLoaded } from '../../../app/context';
+import Header from '../../Header';
 
 type TxDetailProps = {
   tx: TransactionType;
@@ -73,19 +72,15 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
         height: '100%',
         backgroundColor: colors.background,
       }}>
+      <Header title={translate('transactions.details')} noBalance={true} noSyncingStatus={true} noDrawMenu={true} />
       <ScrollView
         contentContainerStyle={{
           flexDirection: 'column',
           alignItems: 'stretch',
           justifyContent: 'flex-start',
         }}>
-        <TouchableOpacity onPress={closeModal}>
-          <View style={{ display: 'flex', flexDirection: 'row', backgroundColor: colors.card }}>
-            <FontAwesomeIcon style={{ marginTop: 3 }} icon={faChevronLeft} color={colors.text} size={20} />
-            <RegText>{translate('transactions.back')}</RegText>
-          </View>
-        </TouchableOpacity>
-        <View style={{ display: 'flex', alignItems: 'center', padding: 10, backgroundColor: colors.card }}>
+        <View
+          style={{ display: 'flex', alignItems: 'center', padding: 10, backgroundColor: colors.card, marginTop: 10 }}>
           <RegText style={{ textTransform: 'capitalize' }} color={spendColor}>
             {!!tx.type && (tx.type === 'sent' ? translate('transactions.sent') : translate('transactions.receive'))}
           </RegText>

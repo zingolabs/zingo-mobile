@@ -1173,15 +1173,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                         <Text>{translate('loading')}</Text>
                       </View>
                     }>
-                    <Receive
-                      fetchTotalBalance={this.fetchTotalBalance}
-                      setUaAddress={this.setUaAddress}
-                      toggleMenuDrawer={this.toggleMenuDrawer}
-                      syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
-                      poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
-                      startRescan={this.startRescan}
-                      setZecPrice={this.setZecPrice}
-                    />
+                    <Receive setUaAddress={this.setUaAddress} toggleMenuDrawer={this.toggleMenuDrawer} />
                   </Suspense>
                 </>
               )}
@@ -1195,11 +1187,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                         <Text>{translate('loading')}</Text>
                       </View>
                     }>
-                    <Legacy
-                      fetchTotalBalance={this.fetchTotalBalance}
-                      toggleMenuDrawer={this.toggleMenuDrawer}
-                      startRescan={this.startRescan}
-                    />
+                    <Legacy toggleMenuDrawer={this.toggleMenuDrawer} />
                   </Suspense>
                 </>
               )}

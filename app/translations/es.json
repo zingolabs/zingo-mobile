@@ -294,7 +294,8 @@
     "pools": "grupos...",
     "transactions": "Transacciones",
     "sure": "¿Seguro? ",
-    "minago": " min."
+    "minago": " min.",
+    "details": "Detalles de la Transacción"
   },
   "report": {
     "title": "Informe de Sincronización",

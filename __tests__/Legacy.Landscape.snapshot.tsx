@@ -71,7 +71,7 @@ describe('Component Legacy - test', () => {
     const onFunction = jest.fn();
     const legacy = render(
       <ContextAppLoadedProvider value={state}>
-        <Legacy fetchTotalBalance={onFunction} toggleMenuDrawer={onFunction} startRescan={onFunction} />
+        <Legacy toggleMenuDrawer={onFunction} />
       </ContextAppLoadedProvider>,
     );
     expect(legacy.toJSON()).toMatchSnapshot();

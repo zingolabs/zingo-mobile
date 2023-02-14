@@ -11,6 +11,7 @@ import Button from '../../Button';
 import { useTheme } from '@react-navigation/native';
 import Utils from '../../../app/utils';
 import { ContextAppLoaded } from '../../../app/context';
+import Header from '../../Header';
 
 type ConfirmProps = {
   defaultFee: number;
@@ -36,11 +37,8 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSen
         height: '100%',
         backgroundColor: colors.background,
       }}>
+      <Header title={translate('send.confirm-title')} noBalance={true} noSyncingStatus={true} noDrawMenu={true} />
       <ScrollView contentContainerStyle={{ display: 'flex', justifyContent: 'flex-start' }}>
-        <View style={{ display: 'flex', alignItems: 'center', padding: 10, backgroundColor: colors.card }}>
-          <BoldText style={{ textAlign: 'center', margin: 10 }}>{translate('send.confirm-title')}</BoldText>
-        </View>
-
         <View
           style={{
             display: 'flex',
