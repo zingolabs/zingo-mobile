@@ -69,6 +69,7 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
       </Modal>
 
       <Header
+        testID="transaction text"
         poolsMoreInfoOnClick={poolsMoreInfoOnClick}
         syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
         setComputingModalVisible={setComputingModalVisible}

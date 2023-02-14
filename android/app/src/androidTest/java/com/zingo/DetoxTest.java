@@ -1,4 +1,4 @@
-package com.zingo;
+package org.ZingoLabs.Zingo;
 
 import com.wix.detox.Detox;
 import com.wix.detox.config.DetoxConfig;

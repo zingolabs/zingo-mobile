@@ -24,6 +24,7 @@ type HeaderProps = {
   noBalance?: boolean;
   noSyncingStatus?: boolean;
   noDrawMenu?: boolean;
+  testID?: string;
 };
 
 const Header: React.FunctionComponent<HeaderProps> = ({
@@ -36,6 +37,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   noBalance,
   noSyncingStatus,
   noDrawMenu,
+  testID,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, totalBalance, info, syncingStatus, currency, zecPrice, dimensions } = context;
@@ -159,7 +161,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               justifyContent: 'center',
               flexWrap: 'wrap',
             }}>
-            <RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
+            <RegText testID={testID} color={colors.money} style={{ paddingHorizontal: 5 }}>
               {title}
             </RegText>
           </View>
