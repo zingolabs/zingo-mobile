@@ -53,7 +53,6 @@
     "react-native-simple-toast": "^1.1.4",
     "react-native-svg": "^13.7.0",
     "react-native-tab-view": "^3.3.0",
-    "react-navigation": "^4.4.4",
     "url-parse": "^1.5.10"
   },
   "devDependencies": {
