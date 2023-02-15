@@ -291,8 +291,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       if (nextAppState.match(/inactive|background/) && this.state.appState === 'active') {
         console.log('App is gone to the background!');
         this.rpc.clearTimers();
-        // if the App go to the background, we don't want to stop the syncing, mostly in Android.
-        await RPC.rpc_setInterruptSyncAfterBatch('false');
         this.setState({
           syncingStatusReport: new SyncingStatusReportClass(),
           syncingStatus: {} as SyncingStatusType,

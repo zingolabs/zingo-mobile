@@ -1077,6 +1077,10 @@ export default class RPC {
         const progress = await JSON.parse(pro);
         const sendId = progress.id;
 
+        // bacause I don't know what the user are doing, I force every 2 seconds
+        // the interrupt flag to true
+        await RPC.rpc_setInterruptSyncAfterBatch('true');
+
         const updatedProgress = new SendProgressClass(0, 0, 0);
         if (sendId === prevSendId) {
           //console.log('progress id', sendId);
