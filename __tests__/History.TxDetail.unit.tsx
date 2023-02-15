@@ -6,7 +6,7 @@ import 'react-native';
 import React from 'react';
 
 import { render, screen } from '@testing-library/react-native';
-import TxDetail from '../components/Transactions/components/TxDetail';
+import TxDetail from '../components/History/components/TxDetail';
 import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
 import { TransactionType, TxDetailType } from '../app/AppState';
 

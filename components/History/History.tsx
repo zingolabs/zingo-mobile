@@ -15,7 +15,7 @@ import TxSummaryLine from './components/TxSummaryLine';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
 
-type TransactionsProps = {
+type HistoryProps = {
   doRefresh: () => void;
   toggleMenuDrawer: () => void;
   setComputingModalVisible: (visible: boolean) => void;
@@ -24,7 +24,7 @@ type TransactionsProps = {
   setZecPrice: (p: number, d: number) => void;
 };
 
-const Transactions: React.FunctionComponent<TransactionsProps> = ({
+const History: React.FunctionComponent<HistoryProps> = ({
   doRefresh,
   toggleMenuDrawer,
   setComputingModalVisible,
@@ -53,7 +53,7 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
   const returnPortrait = (
     <View
       accessible={true}
-      accessibilityLabel={translate('transactions.title-acc')}
+      accessibilityLabel={translate('history.title-acc')}
       style={{
         display: 'flex',
         justifyContent: 'flex-start',
@@ -75,18 +75,18 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
         setComputingModalVisible={setComputingModalVisible}
         toggleMenuDrawer={toggleMenuDrawer}
         setZecPrice={setZecPrice}
-        title={translate('transactions.title')}
+        title={translate('history.title')}
       />
 
       <ScrollView
         accessible={true}
-        accessibilityLabel={translate('transactions.list-acc')}
+        accessibilityLabel={translate('history.list-acc')}
         refreshControl={
           <RefreshControl
             refreshing={false}
             onRefresh={doRefresh}
             tintColor={colors.text}
-            title={translate('transactions.refreshing')}
+            title={translate('history.refreshing')}
           />
         }
         style={{ flexGrow: 1, marginTop: 10, width: '100%', height: '100%' }}>
@@ -121,13 +121,13 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
               justifyContent: 'flex-start',
               marginBottom: 30,
             }}>
-            <FadeText style={{ color: colors.primary }}>{translate('transactions.end')}</FadeText>
+            <FadeText style={{ color: colors.primary }}>{translate('history.end')}</FadeText>
           </View>
         )}
 
         {loadMoreButton && (
           <View style={{ flexDirection: 'row', justifyContent: 'center', margin: 30 }}>
-            <Button type="Secondary" title={translate('transactions.loadmore')} onPress={loadMoreClicked} />
+            <Button type="Secondary" title={translate('history.loadmore')} onPress={loadMoreClicked} />
           </View>
         )}
       </ScrollView>
@@ -138,7 +138,7 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
     <View style={{ flexDirection: 'row', height: '100%' }}>
       <View
         accessible={true}
-        accessibilityLabel={translate('transactions.title-acc')}
+        accessibilityLabel={translate('history.title-acc')}
         style={{
           display: 'flex',
           justifyContent: 'flex-start',
@@ -158,7 +158,7 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
           setComputingModalVisible={setComputingModalVisible}
           toggleMenuDrawer={toggleMenuDrawer}
           setZecPrice={setZecPrice}
-          title={translate('transactions.title')}
+          title={translate('history.title')}
         />
       </View>
       <View
@@ -171,18 +171,18 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
           width: '50%',
         }}>
         <RegText color={colors.money} style={{ paddingHorizontal: 5 }}>
-          {translate('transactions.transactions')}
+          {translate('history.transactions')}
         </RegText>
         <View style={{ width: '100%', height: 1, backgroundColor: colors.primary, marginTop: 5 }} />
         <ScrollView
           accessible={true}
-          accessibilityLabel={translate('transactions.list-acc')}
+          accessibilityLabel={translate('history.list-acc')}
           refreshControl={
             <RefreshControl
               refreshing={false}
               onRefresh={doRefresh}
               tintColor={colors.text}
-              title={translate('transactions.refreshing')}
+              title={translate('history.refreshing')}
             />
           }
           style={{ flexGrow: 1, marginTop: 0, height: '100%' }}>
@@ -217,13 +217,13 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
                 justifyContent: 'flex-start',
                 marginBottom: 30,
               }}>
-              <FadeText style={{ color: colors.primary }}>{translate('transactions.end')}</FadeText>
+              <FadeText style={{ color: colors.primary }}>{translate('history.end')}</FadeText>
             </View>
           )}
 
           {loadMoreButton && (
             <View style={{ flexDirection: 'row', justifyContent: 'center', margin: 30 }}>
-              <Button type="Secondary" title={translate('transactions.loadmore')} onPress={loadMoreClicked} />
+              <Button type="Secondary" title={translate('history.loadmore')} onPress={loadMoreClicked} />
             </View>
           )}
         </ScrollView>
@@ -240,4 +240,4 @@ const Transactions: React.FunctionComponent<TransactionsProps> = ({
   }
 };
 
-export default Transactions;
+export default History;

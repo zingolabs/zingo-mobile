@@ -33,13 +33,12 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
     };
 
     fn();
-    const inter = setInterval(fn, 1000);
+    const inter: NodeJS.Timeout = setInterval(fn, 1000);
 
     return () => clearInterval(inter);
   }, [zecPrice.date]);
 
   useEffect(() => {
-    let inter: number = 0;
     const fn = () => {
       if (count > 0) {
         setCount(count - 1);
@@ -51,10 +50,9 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
       }
     };
 
+    let inter: NodeJS.Timeout;
     if (refreshSure) {
       inter = setInterval(fn, 1000);
-    } else {
-      clearInterval(inter);
     }
 
     return () => clearInterval(inter);
@@ -88,7 +86,7 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
             <FontAwesomeIcon icon={faRefresh} size={20} color={colors.primary} />
             {refreshMinutes > 0 && (
               <FadeText style={{ marginLeft: 5 }}>
-                {formatMinutes(refreshMinutes) + translate('transactions.minago')}
+                {formatMinutes(refreshMinutes) + translate('history.minago')}
               </FadeText>
             )}
           </View>
@@ -146,7 +144,7 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
                 {count.toString()}
               </RegText>
             </View>
-            <RegText color={colors.background}>{translate('transactions.sure')}</RegText>
+            <RegText color={colors.background}>{translate('history.sure')}</RegText>
           </View>
         </TouchableOpacity>
       )}

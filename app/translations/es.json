@@ -41,9 +41,9 @@
     "of": "de",
     "eta": "ETA",
     "sec": "seg",
-    "wallet-menu": "MONEDERO",
+    "wallet-menu": "HISTORICO",
     "send-menu": "ENVIAR",
-    "uas-menu": "DU's",
+    "uas-menu": "RECIBIR",
     "legacy-menu": "HEREDADAS",
     "syncing": "Pausando la Sincronización para poder Enviar.",
     "zcash-url": "Tienes ya informada una dirección en la pantalla Enviar."
@@ -265,12 +265,12 @@
     "import-option": "Importar una Clave...",
     "title-acc": "Pantalla de Recibir"
   },
-  "transactions": {
+  "history": {
     "shieldfunds": "Blindar fondos",
     "shield-message": "Blindada in Tx:",
     "shield-error": "Error Blindando :",
-    "title": "Transacciones",
-    "title-syncing": "Transacciones - Sincronizando",
+    "title": "Histórico",
+    "title-syncing": "Histórico - Sincronizando",
     "more": "ver más...",
     "refreshing": "Refrescando",
     "end": "FIN",
@@ -292,7 +292,7 @@
     "title-acc": "Pantalla del Monedero",
     "list-acc": "Lista de Transacciones",
     "pools": "grupos...",
-    "transactions": "Transacciones",
+    "history": "Histórico",
     "sure": "¿Seguro? ",
     "minago": " min.",
     "details": "Detalles de la Transacción"

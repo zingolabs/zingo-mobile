@@ -72,7 +72,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
         height: '100%',
         backgroundColor: colors.background,
       }}>
-      <Header title={translate('transactions.details')} noBalance={true} noSyncingStatus={true} noDrawMenu={true} />
+      <Header title={translate('history.details')} noBalance={true} noSyncingStatus={true} noDrawMenu={true} />
       <ScrollView
         contentContainerStyle={{
           flexDirection: 'column',
@@ -82,7 +82,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
         <View
           style={{ display: 'flex', alignItems: 'center', padding: 10, backgroundColor: colors.card, marginTop: 10 }}>
           <RegText style={{ textTransform: 'capitalize' }} color={spendColor}>
-            {!!tx.type && (tx.type === 'sent' ? translate('transactions.sent') : translate('transactions.receive'))}
+            {!!tx.type && (tx.type === 'sent' ? translate('history.sent') : translate('history.receive'))}
           </RegText>
           <ZecAmount currencyName={info.currencyName ? info.currencyName : ''} size={36} amtZec={tx.amount} />
           {/*<CurrencyAmount amtZec={tx.amount} price={tx.zec_price} currency={'USD'} />*/}
@@ -91,22 +91,22 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
         <View style={{ margin: 10 }}>
           <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
             <View style={{ display: 'flex' }}>
-              <FadeText>{translate('transactions.time')}</FadeText>
+              <FadeText>{translate('history.time')}</FadeText>
               <RegText>{moment((tx.time || 0) * 1000).format('YYYY MMM D h:mm a')}</RegText>
             </View>
             <View style={{ display: 'flex', alignItems: 'flex-end' }}>
-              <FadeText>{translate('transactions.confirmations')}</FadeText>
+              <FadeText>{translate('history.confirmations')}</FadeText>
               <RegText>{tx.confirmations.toString()}</RegText>
             </View>
           </View>
 
           <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: 10 }}>
-            <FadeText>{translate('transactions.txid')}</FadeText>
+            <FadeText>{translate('history.txid')}</FadeText>
             <TouchableOpacity
               onPress={() => {
                 if (tx.txid) {
                   Clipboard.setString(tx.txid);
-                  Toast.show(translate('transactions.txcopied'), Toast.LONG);
+                  Toast.show(translate('history.txcopied'), Toast.LONG);
                   setExpandTxid(true);
                 }
               }}>
@@ -116,7 +116,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
                   <RegText>{tx.txid}</RegText>
                   <TouchableOpacity onPress={() => handleTxIDClick(tx.txid)}>
                     <Text style={{ color: colors.text, textDecorationLine: 'underline', margin: 15 }}>
-                      {translate('transactions.viewexplorer')}
+                      {translate('history.viewexplorer')}
                     </Text>
                   </TouchableOpacity>
                 </>
@@ -138,13 +138,13 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
                   borderBottomWidth: 1,
                 }}>
                 <View style={{ marginTop: 10 }}>
-                  <FadeText>{translate('transactions.address')}</FadeText>
+                  <FadeText>{translate('history.address')}</FadeText>
 
                   <TouchableOpacity
                     onPress={() => {
                       if (txd.address) {
                         Clipboard.setString(txd.address);
-                        Toast.show(translate('transactions.addresscopied'), Toast.LONG);
+                        Toast.show(translate('history.addresscopied'), Toast.LONG);
                         setExpandAddress(true);
                       }
                     }}>
@@ -159,7 +159,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
                 </View>
 
                 <View style={{ marginTop: 10 }}>
-                  <FadeText>{translate('transactions.amount')}</FadeText>
+                  <FadeText>{translate('history.amount')}</FadeText>
                   <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                     <ZecAmount amtZec={txd.amount} size={18} currencyName={'ᙇ'} />
                     {/*<CurrencyAmount
@@ -180,12 +180,12 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
 
                 {txd.memo && (
                   <View style={{ marginTop: 10 }}>
-                    <FadeText>{translate('transactions.memo')}</FadeText>
+                    <FadeText>{translate('history.memo')}</FadeText>
                     <TouchableOpacity
                       onPress={() => {
                         if (txd.memo) {
                           Clipboard.setString(txd.memo);
-                          Toast.show(translate('transactions.memocopied'), Toast.LONG);
+                          Toast.show(translate('history.memocopied'), Toast.LONG);
                         }
                       }}>
                       <RegText>{txd.memo}</RegText>
@@ -198,7 +198,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
 
           {fee > 0 && (
             <View style={{ display: 'flex', marginTop: 10 }}>
-              <FadeText>{translate('transactions.txfee')}</FadeText>
+              <FadeText>{translate('history.txfee')}</FadeText>
               <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                 <ZecAmount amtZec={fee} size={18} currencyName={'ᙇ'} />
                 {/*<CurrencyAmount style={{ fontSize: 18 }} amtZec={fee} price={tx.zec_price} currency={'USD'} />*/}

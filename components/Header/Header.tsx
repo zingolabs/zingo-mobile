@@ -55,9 +55,9 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         const shieldJSON = JSON.parse(shieldStr);
 
         if (shieldJSON.error) {
-          Toast.show(`${translate('transactions.shield-error')} ${shieldJSON.error}`, Toast.LONG);
+          Toast.show(`${translate('history.shield-error')} ${shieldJSON.error}`, Toast.LONG);
         } else {
-          Toast.show(`${translate('transactions.shield-message')} ${shieldJSON.txid}`);
+          Toast.show(`${translate('history.shield-message')} ${shieldJSON.txid}`);
         }
       }, 1000);
     }
@@ -112,7 +112,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                     minWidth: 48,
                     minHeight: 48,
                   }}>
-                  <RegText color={colors.primary}>{translate('transactions.pools')}</RegText>
+                  <RegText color={colors.primary}>{translate('history.pools')}</RegText>
                   <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
                 </View>
               </TouchableOpacity>
@@ -136,7 +136,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
 
         {showShieldButton && !noBalance && (
           <View style={{ margin: 5 }}>
-            <Button type="Primary" title={translate('transactions.shieldfunds')} onPress={shieldFunds} />
+            <Button type="Primary" title={translate('history.shieldfunds')} onPress={shieldFunds} />
           </View>
         )}
 
