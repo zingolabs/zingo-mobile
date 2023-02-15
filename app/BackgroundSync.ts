@@ -62,7 +62,7 @@ const BackgroundSync = async (task_data: any) => {
         // update batch_num with the new value, otherwise never change
         batch_num = ss.batch_num;
       }
-    }, 2000);
+    }, 5000);
 
     await Promise.race([RPCModule.execute('sync', ''), finishEarly.wait()]);
     clearInterval(saver);
