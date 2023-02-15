@@ -197,6 +197,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
                 minHeight: 100,
               }}>
               <TextInput
+                testID="seed.seedplaceholder"
                 placeholder={translate('seed.seedplaceholder')}
                 placeholderTextColor={colors.placeholder}
                 multiline
@@ -265,6 +266,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
                   minHeight: 48,
                 }}>
                 <TextInput
+                  testID="birthdayinput"
                   placeholder={'#'}
                   placeholderTextColor={colors.placeholder}
                   style={{
