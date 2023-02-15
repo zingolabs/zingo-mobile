@@ -252,7 +252,7 @@
     "title-acc": "Legacy Address Types Screen"
   },
   "receive": {
-    "u-title": "UNIFIED ADRESSES",
+    "u-title": "UNIFIED ADDRESS",
     "noaddress": "No Address",
     "unoprivkey": "No Unified address to import the Spending Key",
     "unoviewkey": "No Unified address to import the Full Viewing Key",

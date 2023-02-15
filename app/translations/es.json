@@ -252,7 +252,7 @@
     "title-acc": "Pantalla de Direcciones Anteriores Heredadas"
   },
   "receive": {
-    "u-title": "DIRECCIONES UNIFICADAS",
+    "u-title": "DIRECCION UNIFICADA",
     "noaddress": "Sin Direcciones",
     "unoprivkey": "No hay ninguna dirección Unificada para exportar su Clave Privada",
     "unoviewkey": "No hay ninguna dirección Unificada para exportar su Clave de Visualización",
