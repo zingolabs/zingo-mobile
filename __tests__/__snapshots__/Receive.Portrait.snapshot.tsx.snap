@@ -10,6 +10,14 @@ exports[`Component Receive - test Receive Portrait - snapshot 1`] = `
           "key": "uaddr",
           "title": "text translated",
         },
+        {
+          "key": "zaddr",
+          "title": "text translated",
+        },
+        {
+          "key": "taddr",
+          "title": "text translated",
+        },
       ],
     }
   }
