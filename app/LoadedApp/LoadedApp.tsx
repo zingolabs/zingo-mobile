@@ -53,10 +53,9 @@ import { parseZcashURI, serverUris, ZcashURITarget } from '../uris';
 import BackgroundFileImpl from '../../components/Background/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const Transactions = React.lazy(() => import('../../components/Transactions'));
+const History = React.lazy(() => import('../../components/History'));
 const Send = React.lazy(() => import('../../components/Send'));
 const Receive = React.lazy(() => import('../../components/Receive'));
-const Legacy = React.lazy(() => import('../../components/Legacy'));
 const About = React.lazy(() => import('../../components/About'));
 const Seed = React.lazy(() => import('../../components/Seed'));
 const Info = React.lazy(() => import('../../components/Info'));
@@ -1128,7 +1127,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                         <Text>{translate('loading')}</Text>
                       </View>
                     }>
-                    <Transactions
+                    <History
                       doRefresh={this.doRefresh}
                       toggleMenuDrawer={this.toggleMenuDrawer}
                       setComputingModalVisible={this.setComputingModalVisible}
@@ -1174,20 +1173,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                       </View>
                     }>
                     <Receive setUaAddress={this.setUaAddress} toggleMenuDrawer={this.toggleMenuDrawer} />
-                  </Suspense>
-                </>
-              )}
-            </Tab.Screen>
-            <Tab.Screen name={translate('loadedapp.legacy-menu')}>
-              {() => (
-                <>
-                  <Suspense
-                    fallback={
-                      <View>
-                        <Text>{translate('loading')}</Text>
-                      </View>
-                    }>
-                    <Legacy toggleMenuDrawer={this.toggleMenuDrawer} />
                   </Suspense>
                 </>
               )}

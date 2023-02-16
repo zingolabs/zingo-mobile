@@ -41,9 +41,9 @@
     "of": "of",
     "eta": "ETA",
     "sec": "sec",
-    "wallet-menu": "WALLET",
+    "wallet-menu": "HISTORY",
     "send-menu": "SEND",
-    "uas-menu": "UA's",
+    "uas-menu": "RECEIVE",
     "legacy-menu": "LEGACY",
     "syncing": "Pausing the Syncronization to be able to Send.",
     "zcash-url": "You have already an address in the send screen"
@@ -60,8 +60,10 @@
   },
   "settings": {
     "memos": [
-      { "value": "none",
-        "text": "Don't download any memos. Server will not learn what transactions belong to you." },
+      { 
+        "value": "none",
+        "text": "Don't download any memos. Server will not learn what transactions belong to you." 
+      },
       {
         "value": "wallet",
         "text": "Download only my memos. Server will learn what TxIDs belong to you, but can't see the addresses, amounts or memos."
@@ -250,7 +252,7 @@
     "title-acc": "Legacy Address Types Screen"
   },
   "receive": {
-    "u-title": "UNIFIED ADRESSES",
+    "u-title": "Unified Address",
     "noaddress": "No Address",
     "unoprivkey": "No Unified address to import the Spending Key",
     "unoviewkey": "No Unified address to import the Full Viewing Key",
@@ -263,12 +265,12 @@
     "import-option": "Import Key...",
     "title-acc": "Receive Screen"
   },
-  "transactions": {
+  "history": {
     "shieldfunds": "Shield funds",
     "shield-message": "Shielded in Tx:",
     "shield-error": "Error Shielding :",
-    "title": "Transactions",
-    "title-syncing": "Transactions - Syncing",
+    "title": "History",
+    "title-syncing": "History - Syncing",
     "more": "more...",
     "refreshing": "Refreshing",
     "end": "END",
@@ -290,7 +292,7 @@
     "title-acc": "Wallet Screen",
     "list-acc": "Transactions' List",
     "pools": "pools...",
-    "transactions": "Transactions",
+    "history": "History",
     "sure": "Sure? ",
     "minago": " min.",
     "details": "Transaction Details"

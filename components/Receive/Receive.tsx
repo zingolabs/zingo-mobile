@@ -16,6 +16,8 @@ import SingleAddress from './components/SingleAddress';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
+import RegText from '../Components/RegText';
+import { Scene } from 'react-native-tab-view/lib/typescript/src/types';
 
 type ReceiveProps = {
   setUaAddress: (uaAddress: string) => void;
@@ -27,12 +29,20 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ setUaAddress, toggleMe
   const { translate, dimensions, addresses, uaAddress } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [index, setIndex] = useState(0);
-  const [routes] = useState([{ key: 'uaddr', title: translate('receive.u-title') }]);
+  const [routes] = useState([
+    { key: 'uaddr', title: translate('receive.u-title') },
+    { key: 'zaddr', title: translate('legacy.z-title') },
+    { key: 'taddr', title: translate('legacy.t-title') },
+  ]);
 
   const [displayAddress, setDisplayAddress] = useState(uaAddress);
   const [oindex, setOIndex] = useState(0);
+  const [zindex, setZIndex] = useState(0);
+  const [tindex, setTIndex] = useState(0);
 
   const uaddrs = addresses.filter(a => a.addressKind === 'u') || [];
+  const zaddrs = addresses.filter(a => a.uaAddress === uaAddress && a.addressKind === 'z') || [];
+  const taddrs = addresses.filter(a => a.uaAddress === uaAddress && a.addressKind === 't') || [];
 
   if (displayAddress) {
     const displayAddressIndex = uaddrs.findIndex(a => a.address === displayAddress);
@@ -55,6 +65,24 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ setUaAddress, toggleMe
       }
       setOIndex(newIndex);
       setUaAddress(uaddrs[newIndex].address);
+    } else if (type === 'z') {
+      if (zaddrs.length === 0) {
+        return;
+      }
+      let newIndex = zindex - 1;
+      if (newIndex < 0) {
+        newIndex = zaddrs.length - 1;
+      }
+      setZIndex(newIndex);
+    } else if (type === 't') {
+      if (taddrs.length === 0) {
+        return;
+      }
+      let newIndex = tindex - 1;
+      if (newIndex < 0) {
+        newIndex = taddrs.length - 1;
+      }
+      setTIndex(newIndex);
     }
   };
 
@@ -67,6 +95,18 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ setUaAddress, toggleMe
       const newIndex = (oindex + 1) % uaddrs.length;
       setOIndex(newIndex);
       setUaAddress(uaddrs[newIndex].address);
+    } else if (type === 'z') {
+      if (zaddrs.length === 0) {
+        return;
+      }
+      const newIndex = (zindex + 1) % zaddrs.length;
+      setZIndex(newIndex);
+    } else if (type === 't') {
+      if (taddrs.length === 0) {
+        return;
+      }
+      const newIndex = (tindex + 1) % taddrs.length;
+      setTIndex(newIndex);
     }
   };
   /*
@@ -213,8 +253,81 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ setUaAddress, toggleMe
           />
         );
       }
+      case 'zaddr': {
+        let zaddr = translate('legacy.noaddress');
+        let zaddrKind = '';
+        if (zaddrs.length > 0) {
+          zaddr = zaddrs[zindex].address;
+          zaddrKind = zaddrs[zindex].addressKind;
+        }
+
+        return (
+          <SingleAddress
+            address={zaddr}
+            addressKind={zaddrKind}
+            index={zindex}
+            total={zaddrs.length}
+            prev={() => {
+              prev('z');
+            }}
+            next={() => {
+              next('z');
+            }}
+          />
+        );
+      }
+      case 'taddr': {
+        let taddr = translate('legacy.noaddress');
+        let taddrKind = '';
+        if (taddrs.length > 0) {
+          taddr = taddrs[tindex].address;
+          taddrKind = taddrs[tindex].addressKind;
+        }
+
+        return (
+          <SingleAddress
+            address={taddr}
+            addressKind={taddrKind}
+            index={tindex}
+            total={taddrs.length}
+            prev={() => {
+              prev('t');
+            }}
+            next={() => {
+              next('t');
+            }}
+          />
+        );
+      }
     }
   };
+
+  const renderLabelCustom: (
+    scene: Scene<Route> & {
+      focused: boolean;
+      color: string;
+    },
+  ) => ReactNode = ({ route, focused, color }) => (
+    <View style={{ width: (dimensions.width - 20) / 3, alignItems: 'center' }}>
+      <RegText
+        style={{
+          fontWeight: focused ? 'bold' : 'normal',
+          fontSize: focused ? 15 : 14,
+          color: color,
+        }}>
+        {route.title ? route.title : ''}
+      </RegText>
+      {route.key === 'uaddr' && (
+        <RegText style={{ fontSize: 11, color: focused ? colors.primary : color }}>(e.g. zingo, trezor)</RegText>
+      )}
+      {route.key === 'zaddr' && (
+        <RegText style={{ fontSize: 11, color: focused ? colors.primary : color }}>(e.g. old wallets)</RegText>
+      )}
+      {route.key === 'taddr' && (
+        <RegText style={{ fontSize: 11, color: focused ? colors.primary : color }}>(e.g. coinbase, gemini)</RegText>
+      )}
+    </View>
+  );
 
   const renderTabBarPortrait: (
     props: SceneRendererProps & {
@@ -284,6 +397,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ setUaAddress, toggleMe
           {...props}
           indicatorStyle={{ backgroundColor: colors.primary }}
           style={{ backgroundColor: colors.background }}
+          renderLabel={renderLabelCustom}
         />
       </View>
     );
@@ -300,6 +414,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ setUaAddress, toggleMe
         {...props}
         indicatorStyle={{ backgroundColor: colors.primary }}
         style={{ backgroundColor: 'transparent', width: dimensions.width / 2 - (dimensions.width * 60) / 812 }}
+        renderLabel={renderLabelCustom}
       />
     );
   };

@@ -6,7 +6,7 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
-import Transactions from '../components/Transactions';
+import History from '../components/History';
 import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
 
 jest.useFakeTimers();
@@ -119,7 +119,7 @@ describe('Component Transactions - test', () => {
     const onFunction = jest.fn();
     const transactions = render(
       <ContextAppLoadedProvider value={state}>
-        <Transactions
+        <History
           doRefresh={onFunction}
           toggleMenuDrawer={onFunction}
           setComputingModalVisible={onFunction}

@@ -46,7 +46,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   const doCopy = () => {
     if (address) {
       Clipboard.setString(address);
-      Toast.show(translate('transactions.addresscopied'), Toast.LONG);
+      Toast.show(translate('history.addresscopied'), Toast.LONG);
     }
   };
 
