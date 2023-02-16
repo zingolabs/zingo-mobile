@@ -483,7 +483,7 @@ exports[`Component SyncReport - test Matches the snapshot SyncReport 1`] = `
               }
             }
           >
-            1500101
+            1500100
           </Text>
           <Text
             style={
