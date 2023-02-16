@@ -16,6 +16,8 @@ import SingleAddress from './components/SingleAddress';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
+import RegText from '../Components/RegText';
+import { Scene } from 'react-native-tab-view/lib/typescript/src/types';
 
 type ReceiveProps = {
   setUaAddress: (uaAddress: string) => void;
@@ -300,6 +302,33 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ setUaAddress, toggleMe
     }
   };
 
+  const renderLabelCustom: (
+    scene: Scene<Route> & {
+      focused: boolean;
+      color: string;
+    },
+  ) => ReactNode = ({ route, focused, color }) => (
+    <View style={{ width: (dimensions.width - 20) / 3, alignItems: 'center' }}>
+      <RegText
+        style={{
+          fontWeight: focused ? 'bold' : 'normal',
+          fontSize: focused ? 15 : 14,
+          color: color,
+        }}>
+        {route.title ? route.title : ''}
+      </RegText>
+      {route.key === 'uaddr' && (
+        <RegText style={{ fontSize: 11, color: focused ? colors.primary : color }}>(e.g. zingo, trezor)</RegText>
+      )}
+      {route.key === 'zaddr' && (
+        <RegText style={{ fontSize: 11, color: focused ? colors.primary : color }}>(e.g. old wallets)</RegText>
+      )}
+      {route.key === 'taddr' && (
+        <RegText style={{ fontSize: 11, color: focused ? colors.primary : color }}>(e.g. coinbase, gemini)</RegText>
+      )}
+    </View>
+  );
+
   const renderTabBarPortrait: (
     props: SceneRendererProps & {
       navigationState: NavigationState<Route>;
@@ -368,6 +397,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ setUaAddress, toggleMe
           {...props}
           indicatorStyle={{ backgroundColor: colors.primary }}
           style={{ backgroundColor: colors.background }}
+          renderLabel={renderLabelCustom}
         />
       </View>
     );
@@ -384,6 +414,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ setUaAddress, toggleMe
         {...props}
         indicatorStyle={{ backgroundColor: colors.primary }}
         style={{ backgroundColor: 'transparent', width: dimensions.width / 2 - (dimensions.width * 60) / 812 }}
+        renderLabel={renderLabelCustom}
       />
     );
   };
