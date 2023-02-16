@@ -77,9 +77,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
           <View style={{ display: 'flex' }}>
             <FadeText style={{ fontSize: 18 }}>{displayAddress}</FadeText>
             <View style={{ display: 'flex', flexDirection: 'row' }}>
-              <FadeText>
-                {tx.type === 'sent' ? translate('transactions.sent') : translate('transactions.receive')}
-              </FadeText>
+              <FadeText>{tx.type === 'sent' ? translate('history.sent') : translate('history.receive')}</FadeText>
               <FadeText>{moment((tx.time || 0) * 1000).format('MMM D, h:mm a')}</FadeText>
             </View>
           </View>

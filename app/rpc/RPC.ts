@@ -36,9 +36,9 @@ export default class RPC {
   translate: (key: string, config?: TranslateOptions) => string;
   fetchBackgroundSyncing: () => void;
 
-  refreshTimerID: number;
-  updateTimerID?: number;
-  syncStatusID?: number;
+  refreshTimerID?: NodeJS.Timeout;
+  updateTimerID?: NodeJS.Timeout;
+  syncStatusTimerID?: NodeJS.Timeout;
 
   updateDataLock: boolean;
   updateDataCtr: number;
@@ -78,8 +78,6 @@ export default class RPC {
     this.fnSetRefreshUpdates = fnSetRefreshUpdates;
     this.translate = translate;
     this.fetchBackgroundSyncing = fetchBackgroundSyncing;
-
-    this.refreshTimerID = 0;
 
     this.updateDataLock = false;
     this.updateDataCtr = 0;
@@ -347,7 +345,7 @@ export default class RPC {
   clearTimers() {
     if (this.refreshTimerID) {
       clearInterval(this.refreshTimerID);
-      this.refreshTimerID = 0;
+      this.refreshTimerID = undefined;
     }
 
     if (this.updateTimerID) {
@@ -355,9 +353,9 @@ export default class RPC {
       this.updateTimerID = undefined;
     }
 
-    if (this.syncStatusID) {
-      clearInterval(this.syncStatusID);
-      this.syncStatusID = undefined;
+    if (this.syncStatusTimerID) {
+      clearInterval(this.syncStatusTimerID);
+      this.syncStatusTimerID = undefined;
     }
   }
 
@@ -517,7 +515,7 @@ export default class RPC {
       }
 
       // We need to wait for the sync to finish. The sync is done when
-      this.syncStatusID = setInterval(async () => {
+      this.syncStatusTimerID = setInterval(async () => {
         const s = await this.doSyncStatus();
         if (!s) {
           return;
@@ -664,9 +662,9 @@ export default class RPC {
         // Close the poll timer if the sync finished(checked via promise above)
         if (!this.inRefresh) {
           // We are synced. Cancel the poll timer
-          if (this.syncStatusID) {
-            clearInterval(this.syncStatusID);
-            this.syncStatusID = 0;
+          if (this.syncStatusTimerID) {
+            clearInterval(this.syncStatusTimerID);
+            this.syncStatusTimerID = undefined;
           }
 
           // And fetch the rest of the data.
