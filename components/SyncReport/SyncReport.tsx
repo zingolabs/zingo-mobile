@@ -331,7 +331,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
                       marginTop: 10,
                     }}>
                     <>
-                      <Text style={{ color: colors.primary }}>{birthday_plus_1}</Text>
+                      <Text style={{ color: colors.primary }}>{walletSeed.birthday}</Text>
                       <Text style={{ color: colors.primary }}>{syncingStatusReport.lastBlockServer}</Text>
                     </>
                   </View>
