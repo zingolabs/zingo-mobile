@@ -1130,7 +1130,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                     <History
                       doRefresh={this.doRefresh}
                       toggleMenuDrawer={this.toggleMenuDrawer}
-                      setComputingModalVisible={this.setComputingModalVisible}
                       syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
                       poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
                       setZecPrice={this.setZecPrice}

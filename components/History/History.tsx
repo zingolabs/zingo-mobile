@@ -18,7 +18,6 @@ import Header from '../Header';
 type HistoryProps = {
   doRefresh: () => void;
   toggleMenuDrawer: () => void;
-  setComputingModalVisible: (visible: boolean) => void;
   poolsMoreInfoOnClick: () => void;
   syncingStatusMoreInfoOnClick: () => void;
   setZecPrice: (p: number, d: number) => void;
@@ -27,7 +26,6 @@ type HistoryProps = {
 const History: React.FunctionComponent<HistoryProps> = ({
   doRefresh,
   toggleMenuDrawer,
-  setComputingModalVisible,
   poolsMoreInfoOnClick,
   syncingStatusMoreInfoOnClick,
   setZecPrice,
@@ -72,7 +70,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
         testID="transaction text"
         poolsMoreInfoOnClick={poolsMoreInfoOnClick}
         syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
-        setComputingModalVisible={setComputingModalVisible}
         toggleMenuDrawer={toggleMenuDrawer}
         setZecPrice={setZecPrice}
         title={translate('history.title')}
@@ -155,7 +152,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
         <Header
           poolsMoreInfoOnClick={poolsMoreInfoOnClick}
           syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
-          setComputingModalVisible={setComputingModalVisible}
           toggleMenuDrawer={toggleMenuDrawer}
           setZecPrice={setZecPrice}
           title={translate('history.title')}
