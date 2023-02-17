@@ -122,7 +122,6 @@ describe('Component Transactions - test', () => {
         <History
           doRefresh={onFunction}
           toggleMenuDrawer={onFunction}
-          setComputingModalVisible={onFunction}
           poolsMoreInfoOnClick={onFunction}
           syncingStatusMoreInfoOnClick={onFunction}
           setZecPrice={onFunction}

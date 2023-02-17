@@ -392,7 +392,6 @@ const Send: React.FunctionComponent<SendProps> = ({
           <Header
             poolsMoreInfoOnClick={poolsMoreInfoOnClick}
             syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
-            setComputingModalVisible={setComputingModalVisible}
             toggleMenuDrawer={toggleMenuDrawer}
             setZecPrice={setZecPrice}
             title={translate('send.title')}
@@ -793,7 +792,6 @@ const Send: React.FunctionComponent<SendProps> = ({
             <Header
               poolsMoreInfoOnClick={poolsMoreInfoOnClick}
               syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
-              setComputingModalVisible={setComputingModalVisible}
               toggleMenuDrawer={toggleMenuDrawer}
               setZecPrice={setZecPrice}
               title={translate('send.title')}

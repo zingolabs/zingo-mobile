@@ -10,14 +10,10 @@ import CurrencyAmount from '../Components/CurrencyAmount';
 import PriceFetcher from '../Components/PriceFetcher';
 import RegText from '../Components/RegText';
 import ZecAmount from '../Components/ZecAmount';
-import Button from '../Button';
-import RPC from '../../app/rpc';
-import Toast from 'react-native-simple-toast';
 
 type HeaderProps = {
   poolsMoreInfoOnClick?: () => void;
   syncingStatusMoreInfoOnClick?: () => void;
-  setComputingModalVisible?: (visible: boolean) => void;
   toggleMenuDrawer?: () => void;
   setZecPrice?: (p: number, d: number) => void;
   title: string;
@@ -30,7 +26,6 @@ type HeaderProps = {
 const Header: React.FunctionComponent<HeaderProps> = ({
   poolsMoreInfoOnClick,
   syncingStatusMoreInfoOnClick,
-  setComputingModalVisible,
   toggleMenuDrawer,
   setZecPrice,
   title,
@@ -43,29 +38,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   const { translate, totalBalance, info, syncingStatus, currency, zecPrice, dimensions } = context;
   const { colors } = useTheme() as unknown as ThemeType;
 
-  const showShieldButton = totalBalance && totalBalance.transparentBal > 0;
-  const shieldFunds = async () => {
-    setComputingModalVisible && setComputingModalVisible(true);
-
-    const shieldStr = await RPC.rpc_shieldTransparent();
-
-    setComputingModalVisible && setComputingModalVisible(false);
-    if (shieldStr) {
-      setTimeout(() => {
-        const shieldJSON = JSON.parse(shieldStr);
-
-        if (shieldJSON.error) {
-          Toast.show(`${translate('history.shield-error')} ${shieldJSON.error}`, Toast.LONG);
-        } else {
-          Toast.show(`${translate('history.shield-message')} ${shieldJSON.txid}`);
-        }
-      }, 1000);
-    }
-  };
-
   const syncStatusDisplayLine = syncingStatus.inProgress ? `(${syncingStatus.blocks})` : '';
-
-  //const balanceColor = transactions.find(t => t.confirmations === 0) ? colors.primary : colors.text;
   const balanceColor = colors.text;
 
   return (
@@ -131,12 +104,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             <View style={{ marginLeft: 5 }}>
               <PriceFetcher setZecPrice={setZecPrice} />
             </View>
-          </View>
-        )}
-
-        {showShieldButton && !noBalance && (
-          <View style={{ margin: 5 }}>
-            <Button type="Primary" title={translate('history.shieldfunds')} onPress={shieldFunds} />
           </View>
         )}
 
