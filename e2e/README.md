@@ -1,5 +1,6 @@
 to run all e2e tests:
 set up an emulator for Pixel_6_API_30
+start docker daemon
 From the root directory, run:
 >$ sh e2e/runall.sh
 

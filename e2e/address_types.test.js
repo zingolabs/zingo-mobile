@@ -15,6 +15,9 @@ describe('Example', () => {
     await element(by.id("seed.seedplaceholder")).typeText('lottery multiply patient simple ivory leisure swift square west despair beauty match crowd margin reject box always title photo remind word diet ecology badge');
     await element(by.id("birthdayinput")).typeText('1985000');
     await element(by.text("RESTORE WALLET")).tap();
-
   });
+
+  // it('generates a u-address', async () => {
+  //   await element(by.id("receive tab")).tap();
+  // });
 });

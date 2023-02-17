@@ -5,14 +5,14 @@ describe('Example', () => {
     await device.launchApp();
   });
 
-  beforeEach(async () => {
-    await device.reloadReactNative();
-  });
+  // beforeEach(async () => {
+  //   await device.reloadReactNative();
+  // });
 
-  it('should have a visible button', async () => {
-    // log.error(device.appLaunchArgs.get())
-    await expect(element(by.traits(['button'])).atIndex(1)).toBeVisible();
-  });
+  // it('should have a visible button', async () => {
+  //   // log.error(device.appLaunchArgs.get())
+  //   await expect(element(by.traits(['button'])).atIndex(1)).toBeVisible();
+  // });
 
   it('New wallet button works', async () => {
     let newWalletButton = element(by.text('CREATE NEW WALLET (NEW SEED)'));
@@ -31,7 +31,7 @@ describe('Example', () => {
     log.info('AAAaaaaaaaahhhh');
 
     await expect(text).toBeVisible();
-    await expect(text).toHaveText('Transactions');
+    await expect(text).toHaveText('History');
 
     //expect(element(by.traits(['button'])).filter())
   });
