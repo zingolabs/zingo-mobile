@@ -13,8 +13,7 @@
       android:roundIcon="@mipmap/zingo_round"
       android:allowBackup="false"
       android:largeHeap="true"
-      android:theme="@style/AppTheme"
-      android:networkSecurityConfig="@xml/network_security_config">
+      android:theme="@style/AppTheme">
       <uses-library android:name="org.apache.http.legacy" android:required="false"/>
       <activity
         android:name=".MainActivity"
