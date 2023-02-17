@@ -19,7 +19,7 @@ val START = "start"
 val STOP = "stop"
 
 class BackgroundSync : HeadlessJsTaskService() {
-    private val SERVICE_NOTIFICATION_ID = 12345;
+
 
 
 
@@ -40,14 +40,8 @@ class BackgroundSync : HeadlessJsTaskService() {
              stopForeground(true)
              stopSelf()
          } else if (intent?.action == START) {
-             val channelId =
-                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                     createNotificationChannel()
-                 } else {
-                     // If earlier version channel ID is not used
-                     // https://developer.android.com/reference/android/support/v4/app/NotificationCompat.Builder.html#NotificationCompat.Builder(android.content.Context)
-                     ""
-                 }
+             val channelId = intent.extras!!.getString("channelId")
+
 
              val notificationIntent = Intent(this, MainActivity::class.java)
              val contentIntent = PendingIntent.getActivity(
@@ -56,32 +50,21 @@ class BackgroundSync : HeadlessJsTaskService() {
                  notificationIntent,
                  PendingIntent.FLAG_CANCEL_CURRENT
              )
-             val notification: Notification = NotificationCompat.Builder(this, channelId)
+             val notification: Notification = NotificationCompat.Builder(this, channelId!!)
                  .setContentTitle("Zingo Sync")
                  .setContentText("Syncing...")
                  .setSmallIcon(R.mipmap.zingo)
                  .setContentIntent(contentIntent)
                  .setOngoing(true)
                  .build()
-             startForeground(SERVICE_NOTIFICATION_ID, notification)
+             startForeground(intent.extras!!.getInt("notifId")!!, notification)
              Log.i("Foreground sync", notification.toString())
              super.onStartCommand(intent, flags, startId)
          }
          return START_STICKY
      }
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun createNotificationChannel(): String{
-        val channelId = "zbschannel"
-        val channelName = "Zingo Background Sync"
-        val chan = NotificationChannel(channelId,
-            channelName, NotificationManager.IMPORTANCE_DEFAULT)
-        chan.lightColor = Color.BLUE
-        chan.lockscreenVisibility = Notification.VISIBILITY_PRIVATE
-        val service = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        service.createNotificationChannel(chan)
-        return channelId
-    }
+
 
 }
 

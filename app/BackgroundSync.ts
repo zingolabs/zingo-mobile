@@ -70,20 +70,15 @@ const BackgroundSync = async (task_data: any) => {
         // update batch_num with the new value, otherwise never change
         batch_num = ss.batch_num;
 
-        const channelId = await notifee.createChannel({
-          // Needs to match channelId in BackgroundSync.kt
-          // TODO: Unify constants between Kotlin and TypeScript
-          id: "zbschannel",
-          name: "Zingo Background Sync",
-        })
+        console.log("BS: channel id is:", task_data.channelId)
 
         await notifee.displayNotification({
           // Needs to match SERVICE_NOTIFICATION_ID in BackgroundSync.kt
           // TODO: Unify constants between Kotlin and TypeScript
-          id: '12345',
+          id: task_data.notifId.toString(),
           body: "Batch " + batch_num + " of " + ss.batch_total,
           title: "Zingo Sync",
-          android: { channelId }
+          android: { channelId: task_data.channelId }
         })
 
       }
