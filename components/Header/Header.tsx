@@ -176,7 +176,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         </View>
       )}
 
-      <View style={{ padding: 10, position: 'absolute', right: 0, alignItems: 'flex-end' }}>
+      <View style={{ display: 'none', padding: 10, position: 'absolute', right: 0, alignItems: 'flex-end' }}>
         <Text style={{ fontSize: 8, color: colors.border }}>{translate('version')}</Text>
         <Text style={{ fontSize: 8, color: colors.border }}>
           {'(' + dimensions.width + 'x' + dimensions.height + ')-' + dimensions.scale}
