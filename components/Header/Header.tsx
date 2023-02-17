@@ -2,8 +2,10 @@
 import { faBars, faCheck, faInfo, faPlay, faStop } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme } from '@react-navigation/native';
+import { TranslateOptions } from 'i18n-js/typings';
 import React, { useContext } from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
+import { DimensionsType } from '../../app/AppState';
 import { ContextAppLoaded } from '../../app/context';
 import { ThemeType } from '../../app/types';
 import CurrencyAmount from '../Components/CurrencyAmount';
@@ -21,6 +23,8 @@ type HeaderProps = {
   noSyncingStatus?: boolean;
   noDrawMenu?: boolean;
   testID?: string;
+  translate?: (key: string, config?: TranslateOptions | undefined) => string;
+  dimensions?: DimensionsType;
 };
 
 const Header: React.FunctionComponent<HeaderProps> = ({
@@ -33,9 +37,23 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   noSyncingStatus,
   noDrawMenu,
   testID,
+  translate: translateProp,
+  dimensions: dimensionsProp,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, totalBalance, info, syncingStatus, currency, zecPrice, dimensions } = context;
+  const { totalBalance, info, syncingStatus, currency, zecPrice } = context;
+  let translate;
+  if (translateProp) {
+    translate = translateProp;
+  } else {
+    translate = context.translate;
+  }
+  let dimensions;
+  if (dimensionsProp) {
+    dimensions = dimensionsProp;
+  } else {
+    dimensions = context.dimensions;
+  }
   const { colors } = useTheme() as unknown as ThemeType;
 
   const syncStatusDisplayLine = syncingStatus.inProgress ? `(${syncingStatus.blocks})` : '';

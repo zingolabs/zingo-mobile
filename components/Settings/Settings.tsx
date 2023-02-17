@@ -246,19 +246,21 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         </View>
 
         <View style={{ display: 'flex', marginLeft: 25 }}>
-          {serverUris().map((uri: string) => (
-            <TouchableOpacity
-              key={'touch-' + uri}
-              style={{ marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
-              onPress={() => setServer(uri)}>
-              <View style={{ display: 'flex', flexDirection: 'row', marginTop: 10 }}>
-                <FontAwesomeIcon icon={uri === server ? faDotCircle : farCircle} size={20} color={colors.border} />
-                <RegText key={'tex-' + uri} style={{ marginLeft: 10 }}>
-                  {uri}
-                </RegText>
-              </View>
-            </TouchableOpacity>
-          ))}
+          {serverUris().map((uri: string) =>
+            uri ? (
+              <TouchableOpacity
+                key={'touch-' + uri}
+                style={{ marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
+                onPress={() => setServer(uri)}>
+                <View style={{ display: 'flex', flexDirection: 'row', marginTop: 10 }}>
+                  <FontAwesomeIcon icon={uri === server ? faDotCircle : farCircle} size={20} color={colors.border} />
+                  <RegText key={'tex-' + uri} style={{ marginLeft: 10 }}>
+                    {uri}
+                  </RegText>
+                </View>
+              </TouchableOpacity>
+            ) : null,
+          )}
 
           <View style={{ display: 'flex', flexDirection: 'row' }}>
             <TouchableOpacity
