@@ -1,4 +1,4 @@
-import RPCModule from '../components/RPCModule';
+import RPCModule from './RPCModule';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo, { NetInfoStateType } from '@react-native-community/netinfo';
 
