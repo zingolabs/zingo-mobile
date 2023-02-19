@@ -83,57 +83,57 @@ exports[`Component SyncReport - test Matches the snapshot SyncReport 1`] = `
         </Text>
       </View>
     </View>
+    <View
+      style={
+        {
+          "alignItems": "flex-end",
+          "padding": 10,
+          "position": "absolute",
+          "right": 0,
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": "rgb(216, 216, 216)",
+            "fontSize": 8,
+          }
+        }
+      >
+        translated text
+      </Text>
+      <Text
+        style={
+          {
+            "color": "rgb(216, 216, 216)",
+            "fontSize": 8,
+          }
+        }
+      >
+        (undefinedxundefined)-undefined
+      </Text>
+      <Text
+        style={
+          {
+            "color": "rgb(216, 216, 216)",
+            "fontSize": 7,
+          }
+        }
+      >
+        translated text
+      </Text>
+    </View>
+    <View
+      style={
+        {
+          "backgroundColor": "rgb(0, 122, 255)",
+          "height": 1,
+          "width": "100%",
+        }
+      }
+    />
   </View>
-  <View
-    style={
-      {
-        "alignItems": "flex-end",
-        "padding": 10,
-        "position": "absolute",
-        "right": 0,
-      }
-    }
-  >
-    <Text
-      style={
-        {
-          "color": "rgb(216, 216, 216)",
-          "fontSize": 8,
-        }
-      }
-    >
-      translated text
-    </Text>
-    <Text
-      style={
-        {
-          "color": "rgb(216, 216, 216)",
-          "fontSize": 8,
-        }
-      }
-    >
-      (undefinedxundefined)-undefined
-    </Text>
-    <Text
-      style={
-        {
-          "color": "rgb(216, 216, 216)",
-          "fontSize": 7,
-        }
-      }
-    >
-      translated text
-    </Text>
-  </View>
-  <View
-    style={
-      {
-        "backgroundColor": "rgb(0, 122, 255)",
-        "height": 1,
-        "width": "100%",
-      }
-    }
-  />
   <RCTScrollView
     contentContainerStyle={
       {
@@ -807,6 +807,154 @@ exports[`Component SyncReport - test Matches the snapshot SyncReport 1`] = `
           >
             122
           </Text>
+        </View>
+        <View
+          style={
+            {
+              "margin": 10,
+            }
+          }
+        >
+          <RNSVGSvgView
+            bbHeight="100"
+            bbWidth="100"
+            focusable={false}
+            height={100}
+            style={
+              [
+                {
+                  "backgroundColor": "transparent",
+                  "borderWidth": 0,
+                },
+                {
+                  "flex": 0,
+                  "height": 100,
+                  "width": 100,
+                },
+              ]
+            }
+            width={100}
+          >
+            <RNSVGGroup
+              fill={
+                {
+                  "payload": 4278190080,
+                  "type": 0,
+                }
+              }
+            >
+              <RNSVGCircle
+                cx="50"
+                cy="50"
+                fill={null}
+                propList={
+                  [
+                    "fill",
+                    "stroke",
+                    "strokeWidth",
+                  ]
+                }
+                r="47.5"
+                stroke={
+                  {
+                    "payload": 4294967295,
+                    "type": 0,
+                  }
+                }
+                strokeWidth="5"
+              />
+              <RNSVGCircle
+                cx="50"
+                cy="50"
+                fill={null}
+                matrix={
+                  [
+                    6.123233995736766e-17,
+                    -1,
+                    1,
+                    6.123233995736766e-17,
+                    0,
+                    100,
+                  ]
+                }
+                propList={
+                  [
+                    "fill",
+                    "stroke",
+                    "strokeWidth",
+                    "strokeDasharray",
+                    "strokeDashoffset",
+                    "strokeLinecap",
+                  ]
+                }
+                r="47.5"
+                stroke={
+                  {
+                    "payload": 4278221567,
+                    "type": 0,
+                  }
+                }
+                strokeDasharray={
+                  [
+                    "298.45130209103036",
+                    "298.45130209103036",
+                  ]
+                }
+                strokeDashoffset={238.7610416728243}
+                strokeLinecap={1}
+                strokeWidth="5"
+              />
+              <RNSVGText
+                content={null}
+                dx={[]}
+                dy={[]}
+                fill={
+                  {
+                    "payload": 4280032286,
+                    "type": 0,
+                  }
+                }
+                font={
+                  {
+                    "fontSize": "20",
+                    "textAnchor": "middle",
+                  }
+                }
+                propList={
+                  [
+                    "fill",
+                  ]
+                }
+                rotate={[]}
+                x={
+                  [
+                    "50",
+                  ]
+                }
+                y={
+                  [
+                    "59",
+                  ]
+                }
+              >
+                <RNSVGTSpan
+                  content="1"
+                  dx={[]}
+                  dy={[]}
+                  fill={
+                    {
+                      "payload": 4278190080,
+                      "type": 0,
+                    }
+                  }
+                  font={{}}
+                  rotate={[]}
+                  x={[]}
+                  y={[]}
+                />
+              </RNSVGText>
+            </RNSVGGroup>
+          </RNSVGSvgView>
         </View>
         <View
           style={

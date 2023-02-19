@@ -90,57 +90,57 @@ exports[`Component ImportKey - test Matches the snapshot ImportKey 1`] = `
         </Text>
       </View>
     </View>
+    <View
+      style={
+        {
+          "alignItems": "flex-end",
+          "padding": 10,
+          "position": "absolute",
+          "right": 0,
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": "rgb(216, 216, 216)",
+            "fontSize": 8,
+          }
+        }
+      >
+        text translated
+      </Text>
+      <Text
+        style={
+          {
+            "color": "rgb(216, 216, 216)",
+            "fontSize": 8,
+          }
+        }
+      >
+        (undefinedxundefined)-undefined
+      </Text>
+      <Text
+        style={
+          {
+            "color": "rgb(216, 216, 216)",
+            "fontSize": 7,
+          }
+        }
+      >
+        text translated
+      </Text>
+    </View>
+    <View
+      style={
+        {
+          "backgroundColor": "rgb(0, 122, 255)",
+          "height": 1,
+          "width": "100%",
+        }
+      }
+    />
   </View>
-  <View
-    style={
-      {
-        "alignItems": "flex-end",
-        "padding": 10,
-        "position": "absolute",
-        "right": 0,
-      }
-    }
-  >
-    <Text
-      style={
-        {
-          "color": "rgb(216, 216, 216)",
-          "fontSize": 8,
-        }
-      }
-    >
-      text translated
-    </Text>
-    <Text
-      style={
-        {
-          "color": "rgb(216, 216, 216)",
-          "fontSize": 8,
-        }
-      }
-    >
-      (undefinedxundefined)-undefined
-    </Text>
-    <Text
-      style={
-        {
-          "color": "rgb(216, 216, 216)",
-          "fontSize": 7,
-        }
-      }
-    >
-      text translated
-    </Text>
-  </View>
-  <View
-    style={
-      {
-        "backgroundColor": "rgb(0, 122, 255)",
-        "height": 1,
-        "width": "100%",
-      }
-    }
-  />
   <RCTScrollView
     contentContainerStyle={
       {

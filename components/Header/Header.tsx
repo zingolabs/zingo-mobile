@@ -182,7 +182,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       </View>
 
       {!noDrawMenu && (
-        <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute' }}>
+        <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', left: 0 }}>
           <TouchableOpacity
             accessible={true}
             accessibilityLabel={translate('menudrawer-acc')}
