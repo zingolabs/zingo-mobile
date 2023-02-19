@@ -5,7 +5,7 @@ import { useTheme } from '@react-navigation/native';
 
 import RegText from '../../../components/Components/RegText';
 import { ThemeType } from '../../types';
-import CircularProgress from '../../../components/CircularProgress';
+import CircularProgress from '../../../components/Components/CircularProgress';
 import { ContextAppLoaded } from '../../context';
 import Header from '../../../components/Header';
 

@@ -9,7 +9,7 @@ import { TransactionType } from '../../app/AppState';
 import { ThemeType } from '../../app/types';
 import RegText from '../Components/RegText';
 import FadeText from '../Components/FadeText';
-import Button from '../Button';
+import Button from '../Components/Button';
 import TxDetail from './components/TxDetail';
 import TxSummaryLine from './components/TxSummaryLine';
 import { ContextAppLoaded } from '../../app/context';
