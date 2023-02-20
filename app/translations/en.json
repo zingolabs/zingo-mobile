@@ -311,7 +311,7 @@
     "processingbatch": "Processing Batch: ",
     "totalbatches": " of a TOTAL of Batches: ",
     "blocksperbatch": "Blocks per Batch",
-    "secondsperbatch": "Time Processing the Current Batch (seconds)",
+    "secondsperbatch": "Current Batch (seconds)",
     "blocks-title": "BLOCKS: ",
     "processingblock": "Processing Block: ",
     "totalblocks": " of a TOTAL of Blocks: ",

@@ -311,7 +311,7 @@
     "processingbatch": "Procesando Lote: ",
     "totalbatches": " de un TOTAL de Lotes: ",
     "blocksperbatch": "Bloques por Lote",
-    "secondsperbatch": "Tiempo procesando el Lote Actual (segundos)",
+    "secondsperbatch": "Lote Actual (segundos)",
     "blocks-title": "BLOQUES: ",
     "processingblock": "Procesando Bloque: ",
     "totalblocks": " de un TOTAL de Bloques: ",

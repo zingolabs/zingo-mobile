@@ -780,181 +780,190 @@ exports[`Component SyncReport - test Matches the snapshot SyncReport 1`] = `
         <View
           style={
             {
-              "display": "flex",
-              "marginTop": 20,
+              "alignItems": "flex-end",
+              "flexDirection": "row",
             }
           }
         >
-          <Text
+          <View
             style={
               {
-                "color": "rgb(28, 28, 30)",
-                "opacity": 0.65,
+                "display": "flex",
+                "marginTop": 20,
               }
             }
           >
-            translated text
-          </Text>
-          <Text
-            style={
-              {
-                "color": "rgb(28, 28, 30)",
-                "fontSize": 18,
-                "fontWeight": "600",
-                "opacity": 1,
-              }
-            }
-          >
-            122
-          </Text>
-        </View>
-        <View
-          style={
-            {
-              "margin": 10,
-            }
-          }
-        >
-          <RNSVGSvgView
-            bbHeight="100"
-            bbWidth="100"
-            focusable={false}
-            height={100}
-            style={
-              [
+            <Text
+              style={
                 {
-                  "backgroundColor": "transparent",
-                  "borderWidth": 0,
-                },
-                {
-                  "flex": 0,
-                  "height": 100,
-                  "width": 100,
-                },
-              ]
-            }
-            width={100}
-          >
-            <RNSVGGroup
-              fill={
-                {
-                  "payload": 4278190080,
-                  "type": 0,
+                  "color": "rgb(28, 28, 30)",
+                  "opacity": 0.65,
                 }
               }
             >
-              <RNSVGCircle
-                cx="50"
-                cy="50"
-                fill={null}
-                propList={
-                  [
-                    "fill",
-                    "stroke",
-                    "strokeWidth",
-                  ]
+              translated text
+            </Text>
+            <Text
+              style={
+                {
+                  "color": "rgb(28, 28, 30)",
+                  "fontSize": 18,
+                  "fontWeight": "600",
+                  "opacity": 1,
                 }
-                r="47.5"
-                stroke={
+              }
+            >
+              122
+            </Text>
+          </View>
+          <View
+            style={
+              {
+                "margin": 10,
+              }
+            }
+          >
+            <RNSVGSvgView
+              bbHeight="20"
+              bbWidth="20"
+              focusable={false}
+              height={20}
+              style={
+                [
                   {
-                    "payload": 4294967295,
-                    "type": 0,
-                  }
-                }
-                strokeWidth="5"
-              />
-              <RNSVGCircle
-                cx="50"
-                cy="50"
-                fill={null}
-                matrix={
-                  [
-                    6.123233995736766e-17,
-                    -1,
-                    1,
-                    6.123233995736766e-17,
-                    0,
-                    100,
-                  ]
-                }
-                propList={
-                  [
-                    "fill",
-                    "stroke",
-                    "strokeWidth",
-                    "strokeDasharray",
-                    "strokeDashoffset",
-                    "strokeLinecap",
-                  ]
-                }
-                r="47.5"
-                stroke={
+                    "backgroundColor": "transparent",
+                    "borderWidth": 0,
+                  },
                   {
-                    "payload": 4278221567,
-                    "type": 0,
-                  }
-                }
-                strokeDasharray={
-                  [
-                    "298.45130209103036",
-                    "298.45130209103036",
-                  ]
-                }
-                strokeDashoffset={238.7610416728243}
-                strokeLinecap={1}
-                strokeWidth="5"
-              />
-              <RNSVGText
-                content={null}
-                dx={[]}
-                dy={[]}
+                    "flex": 0,
+                    "height": 20,
+                    "width": 20,
+                  },
+                ]
+              }
+              width={20}
+            >
+              <RNSVGGroup
                 fill={
                   {
-                    "payload": 4280032286,
+                    "payload": 4278190080,
                     "type": 0,
                   }
                 }
-                font={
-                  {
-                    "fontSize": "20",
-                    "textAnchor": "middle",
-                  }
-                }
-                propList={
-                  [
-                    "fill",
-                  ]
-                }
-                rotate={[]}
-                x={
-                  [
-                    "50",
-                  ]
-                }
-                y={
-                  [
-                    "59",
-                  ]
-                }
               >
-                <RNSVGTSpan
-                  content="1"
+                <RNSVGCircle
+                  cx="10"
+                  cy="10"
+                  fill={null}
+                  propList={
+                    [
+                      "fill",
+                      "stroke",
+                      "strokeWidth",
+                    ]
+                  }
+                  r="9.5"
+                  stroke={
+                    {
+                      "payload": 4294967295,
+                      "type": 0,
+                    }
+                  }
+                  strokeWidth="1"
+                />
+                <RNSVGCircle
+                  cx="10"
+                  cy="10"
+                  fill={null}
+                  matrix={
+                    [
+                      6.123233995736766e-17,
+                      -1,
+                      1,
+                      6.123233995736766e-17,
+                      0,
+                      20,
+                    ]
+                  }
+                  propList={
+                    [
+                      "fill",
+                      "stroke",
+                      "strokeWidth",
+                      "strokeDasharray",
+                      "strokeDashoffset",
+                      "strokeLinecap",
+                    ]
+                  }
+                  r="9.5"
+                  stroke={
+                    {
+                      "payload": 4278221567,
+                      "type": 0,
+                    }
+                  }
+                  strokeDasharray={
+                    [
+                      "59.690260418206066",
+                      "59.690260418206066",
+                    ]
+                  }
+                  strokeDashoffset={47.752208334564855}
+                  strokeLinecap={1}
+                  strokeWidth="1"
+                />
+                <RNSVGText
+                  content={null}
                   dx={[]}
                   dy={[]}
                   fill={
                     {
-                      "payload": 4278190080,
+                      "payload": 4280032286,
                       "type": 0,
                     }
                   }
-                  font={{}}
+                  font={
+                    {
+                      "fontSize": "12",
+                      "textAnchor": "middle",
+                    }
+                  }
+                  propList={
+                    [
+                      "fill",
+                    ]
+                  }
                   rotate={[]}
-                  x={[]}
-                  y={[]}
-                />
-              </RNSVGText>
-            </RNSVGGroup>
-          </RNSVGSvgView>
+                  x={
+                    [
+                      "10",
+                    ]
+                  }
+                  y={
+                    [
+                      "15",
+                    ]
+                  }
+                >
+                  <RNSVGTSpan
+                    content=""
+                    dx={[]}
+                    dy={[]}
+                    fill={
+                      {
+                        "payload": 4278190080,
+                        "type": 0,
+                      }
+                    }
+                    font={{}}
+                    rotate={[]}
+                    x={[]}
+                    y={[]}
+                  />
+                </RNSVGText>
+              </RNSVGGroup>
+            </RNSVGSvgView>
+          </View>
         </View>
         <View
           style={
