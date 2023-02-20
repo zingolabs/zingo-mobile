@@ -741,9 +741,9 @@ export default class RPC {
               //  `Saving because batch num changed ${this.prevBatchNum} - ${batch_num}. seconds: ${this.seconds_batch}`,
               //);
             }
+            this.batches += batch_num - this.prevBatchNum;
             this.prevBatchNum = batch_num;
             this.seconds_batch = 0;
-            this.batches += batch_num - this.prevBatchNum;
           }
           // save wallet every 30 seconds in the same batch.
           if (this.seconds_batch > 0 && this.seconds_batch % 30 === 0) {
