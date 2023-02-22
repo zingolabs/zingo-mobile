@@ -87,7 +87,7 @@ exports[`Component Info - test Matches the snapshot Info 1`] = `
       style={
         {
           "alignItems": "flex-end",
-          "padding": 10,
+          "padding": 15,
           "position": "absolute",
           "right": 0,
         }
@@ -176,6 +176,13 @@ exports[`Component Info - test Matches the snapshot Info 1`] = `
           >
             translated text
           </Text>
+          <View
+            style={
+              {
+                "width": 10,
+              }
+            }
+          />
           <Text
             style={
               {
@@ -207,6 +214,13 @@ exports[`Component Info - test Matches the snapshot Info 1`] = `
           >
             translated text
           </Text>
+          <View
+            style={
+              {
+                "width": 10,
+              }
+            }
+          />
           <Text
             style={
               {
@@ -238,6 +252,13 @@ exports[`Component Info - test Matches the snapshot Info 1`] = `
           >
             translated text
           </Text>
+          <View
+            style={
+              {
+                "width": 10,
+              }
+            }
+          />
           <Text
             style={
               {
@@ -269,6 +290,13 @@ exports[`Component Info - test Matches the snapshot Info 1`] = `
           >
             translated text
           </Text>
+          <View
+            style={
+              {
+                "width": 10,
+              }
+            }
+          />
           <Text
             style={
               {
@@ -300,6 +328,13 @@ exports[`Component Info - test Matches the snapshot Info 1`] = `
           >
             translated text
           </Text>
+          <View
+            style={
+              {
+                "width": 10,
+              }
+            }
+          />
           <Text
             style={
               {

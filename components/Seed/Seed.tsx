@@ -9,11 +9,11 @@ import Animated, { EasingNode } from 'react-native-reanimated';
 
 import RegText from '../Components/RegText';
 import FadeText from '../Components/FadeText';
-import Button from '../Button';
+import Button from '../Components/Button';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded, ContextAppLoading } from '../../app/context';
 import { DimensionsType, InfoType, WalletSeedType } from '../../app/AppState';
-import RPCModule from '../RPCModule';
+import RPCModule from '../../app/RPCModule';
 import RPC from '../../app/rpc';
 import Header from '../Header';
 

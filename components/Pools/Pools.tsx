@@ -5,8 +5,8 @@ import { useTheme } from '@react-navigation/native';
 
 import ZecAmount from '../Components/ZecAmount';
 import BoldText from '../Components/BoldText';
-import Button from '../Button';
-import DetailLine from './components/DetailLine';
+import Button from '../Components/Button';
+import DetailLine from '../Components/DetailLine';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import RPC from '../../app/rpc';

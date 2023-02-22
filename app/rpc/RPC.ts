@@ -13,7 +13,7 @@ import {
   SendProgressClass,
   WalletSettingsClass,
 } from '../AppState';
-import RPCModule from '../../components/RPCModule';
+import RPCModule from '../RPCModule';
 import Utils from '../utils';
 import { RPCAddressType } from './types/RPCAddressType';
 import { RPCBalancesType } from './types/RPCBalancesType';

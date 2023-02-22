@@ -4,14 +4,14 @@ import { View, ScrollView, SafeAreaView, Text } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
 import { ThemeType } from '../../app/types';
-import Button from '../Button';
-import DetailLine from './components/DetailLine';
+import Button from '../Components/Button';
+import DetailLine from '../Components/DetailLine';
 import { ContextAppLoaded } from '../../app/context';
 import moment from 'moment';
 import 'moment/locale/es';
 import RPC from '../../app/rpc';
 import Header from '../Header';
-import CircularProgress from '../CircularProgress';
+import CircularProgress from '../Components/CircularProgress';
 
 type SyncReportProps = {
   closeModal: () => void;
