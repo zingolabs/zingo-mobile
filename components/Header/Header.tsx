@@ -107,7 +107,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           </View>
         )}
 
-        {dimensions.orientation === 'landscape' && (
+        {(
           <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
         )}
 
@@ -180,9 +180,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         <Text style={{ fontSize: 8, color: colors.border }}>{translate('version')}</Text>
         <Text style={{ fontSize: 8, color: colors.border }}>
           {'(' + dimensions.width + 'x' + dimensions.height + ')-' + dimensions.scale}
-        </Text>
-        <Text style={{ fontSize: 7, color: colors.border }}>
-          {dimensions.orientation === 'landscape' ? translate('info.landscape') : translate('info.portrait')}
         </Text>
       </View>
 

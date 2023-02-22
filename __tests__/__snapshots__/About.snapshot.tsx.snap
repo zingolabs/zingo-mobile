@@ -48,6 +48,15 @@ exports[`Component About - test About - snapshot 1`] = `
     <View
       style={
         {
+          "backgroundColor": "rgb(0, 122, 255)",
+          "height": 1,
+          "width": "100%",
+        }
+      }
+    />
+    <View
+      style={
+        {
           "alignItems": "center",
           "display": "flex",
           "flexDirection": "row",
@@ -113,16 +122,6 @@ exports[`Component About - test About - snapshot 1`] = `
       }
     >
       (undefinedxundefined)-undefined
-    </Text>
-    <Text
-      style={
-        {
-          "color": "rgb(216, 216, 216)",
-          "fontSize": 7,
-        }
-      }
-    >
-      text translated
     </Text>
   </View>
   <View
