@@ -48,6 +48,15 @@ exports[`Component PrivKey - test PrivKey Private - snapshot 1`] = `
     <View
       style={
         {
+          "backgroundColor": "rgb(0, 122, 255)",
+          "height": 1,
+          "width": "100%",
+        }
+      }
+    />
+    <View
+      style={
+        {
           "alignItems": "center",
           "display": "flex",
           "flexDirection": "row",
@@ -366,6 +375,15 @@ exports[`Component PrivKey - test PrivKey View - snapshot 1`] = `
       style={
         {
           "height": 20,
+        }
+      }
+    />
+    <View
+      style={
+        {
+          "backgroundColor": "rgb(0, 122, 255)",
+          "height": 1,
+          "width": "100%",
         }
       }
     />
