@@ -329,16 +329,6 @@ exports[`Component Transactions - test Transactions Landscape - snapshot 1`] = `
     >
       (600x300)-2.5
     </Text>
-    <Text
-      style={
-        {
-          "color": "rgb(216, 216, 216)",
-          "fontSize": 7,
-        }
-      }
-    >
-      text translated
-    </Text>
   </View>
   <View
     style={
