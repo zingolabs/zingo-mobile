@@ -110,6 +110,7 @@ exports[`Component Transactions - test Transactions Landscape - snapshot 1`] = `
       style={
         {
 <<<<<<< HEAD
+<<<<<<< HEAD
           "alignItems": "flex-end",
           "padding": 15,
           "position": "absolute",
@@ -162,6 +163,8 @@ exports[`Component Transactions - test Transactions Landscape - snapshot 1`] = `
     <View
       style={
         {
+=======
+>>>>>>> cb93fb8 (snippp)
           "alignItems": "center",
           "display": "flex",
           "flexDirection": "row",
