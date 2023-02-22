@@ -25,7 +25,7 @@ import { isEqual } from 'lodash';
 import { StackScreenProps } from '@react-navigation/stack';
 
 import RPC from '../rpc';
-import RPCModule from '../../components/RPCModule';
+import RPCModule from '../RPCModule';
 import {
   AppStateLoaded,
   SyncingStatusReportClass,

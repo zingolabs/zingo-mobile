@@ -7,7 +7,7 @@ import BoldText from '../../Components/BoldText';
 import RegText from '../../Components/RegText';
 import ZecAmount from '../../Components/ZecAmount';
 import CurrencyAmount from '../../Components/CurrencyAmount';
-import Button from '../../Button';
+import Button from '../../Components/Button';
 import { useTheme } from '@react-navigation/native';
 import Utils from '../../../app/utils';
 import { ContextAppLoaded } from '../../../app/context';

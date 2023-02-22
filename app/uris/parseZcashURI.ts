@@ -1,6 +1,6 @@
 import { Base64 } from 'js-base64';
 import Url from 'url-parse';
-import RPCModule from '../../components/RPCModule';
+import RPCModule from '../RPCModule';
 import ZcashURITarget from './ZcashURITarget';
 
 const parseZcashURI = async (uri: string): Promise<string | ZcashURITarget> => {

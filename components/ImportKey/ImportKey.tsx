@@ -7,8 +7,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
 import FadeText from '../Components/FadeText';
 import RegText from '../Components/RegText';
-import Button from '../Button';
-import Scanner from './components/Scanner';
+import Button from '../Components/Button';
+import ScannerKey from './components/ScannerKey';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
@@ -45,7 +45,7 @@ const ImportKey: React.FunctionComponent<ImportKeyProps> = ({ closeModal, doImpo
         transparent={false}
         visible={qrcodeModalVisible}
         onRequestClose={() => setQrcodeModalVisible(false)}>
-        <Scanner setPrivKeyText={setPrivKeyText} closeModal={() => setQrcodeModalVisible(false)} />
+        <ScannerKey setPrivKeyText={setPrivKeyText} closeModal={() => setQrcodeModalVisible(false)} />
       </Modal>
 
       <Header title={translate('import.title')} noBalance={true} noSyncingStatus={true} noDrawMenu={true} />

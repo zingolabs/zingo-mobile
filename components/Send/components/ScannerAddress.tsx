@@ -5,14 +5,14 @@ import { View, Platform } from 'react-native';
 import Toast from 'react-native-simple-toast';
 
 import RegText from '../../Components/RegText';
-import Button from '../../Button';
+import Button from '../../Components/Button';
 import { useTheme } from '@react-navigation/native';
 import { parseZcashURI } from '../../../app/uris';
-import RPCModule from '../../RPCModule';
+import RPCModule from '../../../app/RPCModule';
 import { ContextAppLoaded } from '../../../app/context';
 import { BarCodeReadEvent } from 'react-native-camera';
 
-type ScannerProps = {
+type ScannerAddressProps = {
   updateToField: (
     address: string | null,
     amount: string | null,
@@ -25,7 +25,7 @@ type ScannerProps = {
   height: number;
 };
 
-const Scanner: React.FunctionComponent<ScannerProps> = ({ updateToField, closeModal, width, height }) => {
+const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateToField, closeModal, width, height }) => {
   const context = useContext(ContextAppLoaded);
   const { translate } = context;
   const validateAddress = async (scannedAddress: string) => {
@@ -110,4 +110,4 @@ const Scanner: React.FunctionComponent<ScannerProps> = ({ updateToField, closeMo
   );
 };
 
-export default Scanner;
+export default ScannerAddress;

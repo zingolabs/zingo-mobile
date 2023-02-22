@@ -8,11 +8,11 @@ import { useTheme } from '@react-navigation/native';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
-import FadeText from '../../Components/FadeText';
+import FadeText from './FadeText';
 //import Button from '../../Button';
-import Utils from '../../../app/utils';
-import { ThemeType } from '../../../app/types';
-import { ContextAppLoaded } from '../../../app/context';
+import Utils from '../../app/utils';
+import { ThemeType } from '../../app/types';
+import { ContextAppLoaded } from '../../app/context';
 
 type SingleAddressProps = {
   address: string;
@@ -61,6 +61,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
         <View style={{ marginTop: 20, marginHorizontal: 20, padding: 10, backgroundColor: colors.border }}>
           <QRCode value={address} size={200} ecl="L" backgroundColor={colors.border} />
         </View>
+
         <View
           style={{
             flexDirection: 'row',

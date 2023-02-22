@@ -22,8 +22,8 @@ import * as RNLocalize from 'react-native-localize';
 import { StackScreenProps } from '@react-navigation/stack';
 
 import BoldText from '../../components/Components/BoldText';
-import Button from '../../components/Button';
-import RPCModule from '../../components/RPCModule';
+import Button from '../../components/Components/Button';
+import RPCModule from '../RPCModule';
 import { AppStateLoading, backgroundType, WalletSeedType } from '../AppState';
 import { serverUris } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';

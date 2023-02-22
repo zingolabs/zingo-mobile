@@ -6,7 +6,7 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
-import Button from '../components/Button';
+import Button from '../components/Components/Button';
 
 // test suite
 describe('Component Button - test', () => {

@@ -14,12 +14,12 @@ import ErrorText from '../Components/ErrorText';
 import RegText from '../Components/RegText';
 import ZecAmount from '../Components/ZecAmount';
 import CurrencyAmount from '../Components/CurrencyAmount';
-import Button from '../Button';
+import Button from '../Components/Button';
 import { SendPageStateClass, SendProgressClass, ToAddrClass } from '../../app/AppState';
 import { parseZcashURI, ZcashURITarget } from '../../app/uris';
-import RPCModule from '../RPCModule';
+import RPCModule from '../../app/RPCModule';
 import Utils from '../../app/utils';
-import Scanner from './components/Scanner';
+import ScannerAddress from './components/ScannerAddress';
 import Confirm from './components/Confirm';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
@@ -366,7 +366,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         transparent={false}
         visible={qrcodeModalVisble}
         onRequestClose={() => setQrcodeModalVisible(false)}>
-        <Scanner
+        <ScannerAddress
           updateToField={updateToField}
           closeModal={() => setQrcodeModalVisible(false)}
           width={dimensions.width - 42}
@@ -795,7 +795,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           transparent={false}
           visible={qrcodeModalVisble}
           onRequestClose={() => setQrcodeModalVisible(false)}>
-          <Scanner
+          <ScannerAddress
             updateToField={updateToField}
             closeModal={() => setQrcodeModalVisible(false)}
             width={dimensions.width / 2}
