@@ -107,10 +107,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           </View>
         )}
 
-        {(
-          <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
-        )}
-
         <View
           style={{
             display: 'flex',
