@@ -12,7 +12,7 @@ import { useTheme } from '@react-navigation/native';
 //import RPC from '../../app/rpc';
 //import PrivKey from '../PrivKey';
 //import ImportKey from '../ImportKey';
-import SingleAddress from './components/SingleAddress';
+import SingleAddress from '../Components/SingleAddress';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
