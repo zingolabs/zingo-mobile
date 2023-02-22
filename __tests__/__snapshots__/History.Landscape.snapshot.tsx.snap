@@ -109,62 +109,6 @@ exports[`Component Transactions - test Transactions Landscape - snapshot 1`] = `
     <View
       style={
         {
-<<<<<<< HEAD
-<<<<<<< HEAD
-          "alignItems": "flex-end",
-          "padding": 15,
-          "position": "absolute",
-          "right": 0,
-        }
-      }
-    >
-      <Text
-        style={
-          {
-            "color": "rgb(216, 216, 216)",
-            "fontSize": 8,
-          }
-        }
-      >
-        text translated
-      </Text>
-      <Text
-        style={
-          {
-            "color": "rgb(216, 216, 216)",
-            "fontSize": 8,
-          }
-        }
-      >
-        (600x300)-2.5
-      </Text>
-      <Text
-        style={
-          {
-            "color": "rgb(216, 216, 216)",
-            "fontSize": 7,
-          }
-        }
-      >
-        text translated
-      </Text>
-    </View>
-    <View
-      style={
-        {
-=======
->>>>>>> 424e584 (removed landscape mode)
-          "backgroundColor": "rgb(0, 122, 255)",
-          "height": 1,
-          "width": "100%",
-        }
-      }
-    />
-    <View
-      style={
-        {
-=======
->>>>>>> cb93fb8 (snippp)
           "alignItems": "center",
           "display": "flex",
           "flexDirection": "row",
@@ -306,7 +250,7 @@ exports[`Component Transactions - test Transactions Landscape - snapshot 1`] = `
     style={
       {
         "alignItems": "flex-end",
-        "padding": 10,
+        "padding": 15,
         "position": "absolute",
         "right": 0,
       }
