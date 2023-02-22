@@ -745,6 +745,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     </View>
   );
 
+<<<<<<< HEAD
   const returnLandscape = (
     <View style={{ flexDirection: 'row', height: '100%' }}>
       <View
@@ -1163,13 +1164,11 @@ const Send: React.FunctionComponent<SendProps> = ({
     </View>
   );
 
+=======
+>>>>>>> 424e584 (removed landscape mode)
   //console.log(dimensions);
 
-  if (dimensions.orientation === 'landscape') {
-    return returnLandscape;
-  } else {
-    return returnPortrait;
-  }
+  return returnPortrait;
 };
 
 export default Send;
