@@ -14,7 +14,7 @@ import ZecAmount from '../../Components/ZecAmount';
 //import CurrencyAmount from '../../Components/CurrencyAmount';
 import FadeText from '../../Components/FadeText';
 //import ZecPrice from '../../Components/ZecPrice';
-import Button from '../../Button';
+import Button from '../../Components/Button';
 import { ThemeType } from '../../../app/types';
 import { ContextAppLoaded } from '../../../app/context';
 import Header from '../../Header';
