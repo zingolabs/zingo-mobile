@@ -1,13 +1,27 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Component Receive - test Receive Landscape - snapshot 1`] = `
-<View
-  style={
+<
+  navigationState={
     {
-      "flexDirection": "row",
-      "height": "100%",
+      "index": 0,
+      "routes": [
+        {
+          "key": "uaddr",
+          "title": "text translated",
+        },
+        {
+          "key": "zaddr",
+          "title": "text translated",
+        },
+        {
+          "key": "taddr",
+          "title": "text translated",
+        },
+      ],
     }
   }
+<<<<<<< HEAD
 >
   <View
     accessibilityLabel="text translated"
@@ -248,4 +262,10 @@ exports[`Component Receive - test Receive Landscape - snapshot 1`] = `
     />
   </View>
 </View>
+=======
+  onIndexChange={[Function]}
+  renderScene={[Function]}
+  renderTabBar={[Function]}
+/>
+>>>>>>> 424e584 (removed landscape mode)
 `;

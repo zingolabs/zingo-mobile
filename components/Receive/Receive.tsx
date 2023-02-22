@@ -403,22 +403,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ setUaAddress, toggleMe
     );
   };
 
-  const renderTabBarLandscape: (
-    props: SceneRendererProps & {
-      navigationState: NavigationState<Route>;
-    },
-  ) => ReactNode = props => {
-    //console.log(props);
-    return (
-      <TabBar
-        {...props}
-        indicatorStyle={{ backgroundColor: colors.primary }}
-        style={{ backgroundColor: 'transparent', width: dimensions.width / 2 - (dimensions.width * 60) / 812 }}
-        renderLabel={renderLabelCustom}
-      />
-    );
-  };
-
   const returnPortrait = (
     <TabView
       navigationState={{ index, routes }}
@@ -428,90 +412,9 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ setUaAddress, toggleMe
     />
   );
 
-  const returnLandscape = (
-    <View style={{ flexDirection: 'row', height: '100%' }}>
-      <View
-        accessible={true}
-        accessibilityLabel={translate('receive.title-acc')}
-        style={{
-          display: 'flex',
-          justifyContent: 'flex-start',
-          width: '50%',
-        }}>
-        {/*<Modal
-          animationType="slide"
-          transparent={false}
-          visible={privKeyModalVisible}
-          onRequestClose={() => setPrivKeyModalVisible(false)}>
-          <PrivKey
-            address={address}
-            keyType={keyType}
-            privKey={privKey}
-            closeModal={() => setPrivKeyModalVisible(false)}
-          />
-        </Modal>*/}
-
-        {/*<Modal
-          animationType="slide"
-          transparent={false}
-          visible={importKeyModalVisible}
-          onRequestClose={() => setImportKeyModalVisible(false)}>
-          <ImportKey doImport={doImport} closeModal={() => setImportKeyModalVisible(false)} />
-        </Modal>*/}
-
-        <Header
-          toggleMenuDrawer={toggleMenuDrawer}
-          title={translate('receive.title')}
-          noBalance={true}
-          noSyncingStatus={true}
-        />
-
-        <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', right: 0 }}>
-          {/*<OptionsMenu
-            customButton={
-              <View accessible={true} accessibilityLabel={translate('menu-acc')}>
-                <FontAwesomeIcon icon={faEllipsisV} color={colors.border} size={48} />
-              </View>
-            }
-            buttonStyle={{ width: 32, height: 32, margin: 7.5, resizeMode: 'contain' }}
-            destructiveIndex={4}
-            options={[
-              translate('receive.newu-option'),
-              translate('receive.privkey-option'),
-              translate('receive.viewkey-option'),
-              translate('receive.import-option'),
-              translate('cancel'),
-            ]}
-            actions={[addO, viewPrivKey, viewViewingKey, importKey]}
-          />*/}
-        </View>
-      </View>
-      <View
-        style={{
-          borderLeftColor: colors.border,
-          borderLeftWidth: 1,
-          alignItems: 'center',
-          padding: 10,
-          height: '100%',
-          width: '50%',
-        }}>
-        <TabView
-          navigationState={{ index, routes }}
-          renderScene={renderScene}
-          renderTabBar={renderTabBarLandscape}
-          onIndexChange={setIndex}
-        />
-      </View>
-    </View>
-  );
-
   //console.log('render receive', index, routes);
 
-  if (dimensions.orientation === 'landscape') {
-    return returnLandscape;
-  } else {
-    return returnPortrait;
-  }
+  return returnPortrait;
 };
 
 export default Receive;
