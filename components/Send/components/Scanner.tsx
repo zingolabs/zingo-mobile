@@ -18,6 +18,7 @@ type ScannerProps = {
     amount: string | null,
     CurrencyAmount: string | null,
     memo: string | null,
+    includeUAMemo: boolean | null,
   ) => void;
   closeModal: () => void;
   width: number;
@@ -36,7 +37,7 @@ const Scanner: React.FunctionComponent<ScannerProps> = ({ updateToField, closeMo
     const valid = resultJSON?.status === 'success';
 
     if (valid) {
-      updateToField(scannedAddress, null, null, null);
+      updateToField(scannedAddress, null, null, null, null);
       closeModal();
     } else {
       // Try to parse as a URI
@@ -44,7 +45,7 @@ const Scanner: React.FunctionComponent<ScannerProps> = ({ updateToField, closeMo
         const target = await parseZcashURI(scannedAddress);
 
         if (typeof target !== 'string') {
-          updateToField(scannedAddress, null, null, null);
+          updateToField(scannedAddress, null, null, null, null);
           closeModal();
         } else {
           Toast.show(`${translate('scanner.uri-error')} ${target}`, Toast.LONG);
