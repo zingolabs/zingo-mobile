@@ -780,7 +780,6 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                 "padding": 0,
                 "paddingLeft": 20,
                 "paddingRight": 20,
->>>>>>> 424e584 (removed landscape mode)
               }
             }
           >

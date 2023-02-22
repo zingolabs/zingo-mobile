@@ -248,5 +248,4 @@ exports[`Component Receive - test Receive Landscape - snapshot 1`] = `
   renderScene={[Function]}
   renderTabBar={[Function]}
 />
->>>>>>> 424e584 (removed landscape mode)
 `;
