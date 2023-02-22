@@ -3,9 +3,9 @@ import React, { useContext } from 'react';
 import { View, ScrollView, SafeAreaView } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
-import Button from '../Button';
+import Button from '../Components/Button';
 import Utils from '../../app/utils';
-import DetailLine from './components/DetailLine';
+import DetailLine from '../Components/DetailLine';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import PriceFetcher from '../Components/PriceFetcher';

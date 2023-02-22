@@ -88,7 +88,7 @@ exports[`Component SyncReport - test Matches the snapshot SyncReport 1`] = `
     style={
       {
         "alignItems": "flex-end",
-        "padding": 10,
+        "padding": 15,
         "position": "absolute",
         "right": 0,
       }
@@ -176,6 +176,13 @@ exports[`Component SyncReport - test Matches the snapshot SyncReport 1`] = `
           >
             Sync ID
           </Text>
+          <View
+            style={
+              {
+                "width": 10,
+              }
+            }
+          />
           <Text
             style={
               {
@@ -733,6 +740,13 @@ exports[`Component SyncReport - test Matches the snapshot SyncReport 1`] = `
           >
             translated text
           </Text>
+          <View
+            style={
+              {
+                "width": 10,
+              }
+            }
+          />
           <Text
             style={
               {
@@ -764,6 +778,13 @@ exports[`Component SyncReport - test Matches the snapshot SyncReport 1`] = `
           >
             translated text
           </Text>
+          <View
+            style={
+              {
+                "width": 10,
+              }
+            }
+          />
           <Text
             style={
               {
@@ -795,6 +816,13 @@ exports[`Component SyncReport - test Matches the snapshot SyncReport 1`] = `
           >
             translated text
           </Text>
+          <View
+            style={
+              {
+                "width": 10,
+              }
+            }
+          />
           <Text
             style={
               {
@@ -836,6 +864,13 @@ exports[`Component SyncReport - test Matches the snapshot SyncReport 1`] = `
           >
             translated text
           </Text>
+          <View
+            style={
+              {
+                "width": 10,
+              }
+            }
+          />
           <Text
             style={
               {
