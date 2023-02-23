@@ -324,12 +324,12 @@ export default class RPC {
   async configure() {
     // every minute the App try to Sync the new blocks.
     if (!this.refreshTimerID) {
-      this.refreshTimerID = setInterval(() => this.refresh(false), 60 * 1000); // 1 min
+      this.refreshTimerID = setInterval(() => this.refresh(false), 30 * 1000); // 30 seconds
     }
 
     // every 3 seconds the App update all data
     if (!this.updateTimerID) {
-      this.updateTimerID = setInterval(() => this.updateData(), 3 * 1000); // 3 secs
+      this.updateTimerID = setInterval(() => this.updateData(), 5 * 1000); // 5 secs
     }
 
     // Load the current wallet data
@@ -657,7 +657,7 @@ export default class RPC {
 
         this.prevProgress = progress;
 
-        this.seconds_batch += 2;
+        this.seconds_batch += 5;
 
         // Close the poll timer if the sync finished(checked via promise above)
         if (!this.inRefresh) {
@@ -741,9 +741,9 @@ export default class RPC {
               //  `Saving because batch num changed ${this.prevBatchNum} - ${batch_num}. seconds: ${this.seconds_batch}`,
               //);
             }
+            this.batches += batch_num - this.prevBatchNum;
             this.prevBatchNum = batch_num;
             this.seconds_batch = 0;
-            this.batches += batch_num - this.prevBatchNum;
           }
           // save wallet every 30 seconds in the same batch.
           if (this.seconds_batch > 0 && this.seconds_batch % 30 === 0) {
@@ -779,7 +779,7 @@ export default class RPC {
             //console.log(`Saving wallet. seconds: ${this.seconds_batch}`);
           }
         }
-      }, 2000);
+      }, 5000);
     } else {
       // Already at the latest block
       //console.log('Already have latest block, waiting for next refresh');
@@ -1074,6 +1074,12 @@ export default class RPC {
         }
         const progress = await JSON.parse(pro);
         const sendId = progress.id;
+
+        // bacause I don't know what the user are doing, I force every 2 seconds
+        // the interrupt flag to true if the sync_interrupt is false
+        if (!progress.sync_interrupt) {
+          await RPC.rpc_setInterruptSyncAfterBatch('true');
+        }
 
         const updatedProgress = new SendProgressClass(0, 0, 0);
         if (sendId === prevSendId) {

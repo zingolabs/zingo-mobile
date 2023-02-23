@@ -899,6 +899,7 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
                 "minWidth": "95%",
               }
             }
+            testID="seed.seedplaceholder"
             value="pepe lolo titi"
           />
         </View>
@@ -1008,6 +1009,7 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
                 "minWidth": "20%",
               }
             }
+            testID="birthdayinput"
             value="1500100"
           />
         </View>

@@ -290,14 +290,20 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
 
   useDefaultServer_0 = async () => {
     this.setState({ actionButtonsDisabled: true });
-    await SettingsFileImpl.writeSettings('server', SERVER_DEFAULT_0);
-    this.setState({ server: SERVER_DEFAULT_0, actionButtonsDisabled: false });
+    if (SERVER_DEFAULT_0) {
+      await SettingsFileImpl.writeSettings('server', SERVER_DEFAULT_0);
+      this.setState({ server: SERVER_DEFAULT_0 });
+    }
+    this.setState({ actionButtonsDisabled: false });
   };
 
   useDefaultServer_1 = async () => {
     this.setState({ actionButtonsDisabled: true });
-    await SettingsFileImpl.writeSettings('server', SERVER_DEFAULT_1);
-    this.setState({ server: SERVER_DEFAULT_1, actionButtonsDisabled: false });
+    if (SERVER_DEFAULT_1) {
+      await SettingsFileImpl.writeSettings('server', SERVER_DEFAULT_1);
+      this.setState({ server: SERVER_DEFAULT_1 });
+    }
+    this.setState({ actionButtonsDisabled: false });
   };
 
   navigateToLoaded = () => {
@@ -420,7 +426,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                 <BoldText style={{ fontSize: 15, marginBottom: 3 }}>{translate('loadingapp.actualserver')}</BoldText>
                 <BoldText style={{ fontSize: 15, marginBottom: 10 }}>{server}</BoldText>
 
-                {server === SERVER_DEFAULT_1 && (
+                {server === SERVER_DEFAULT_1 && !!SERVER_DEFAULT_0 && (
                   <Button
                     type="Primary"
                     title={translate('loadingapp.changeserver')}
@@ -429,7 +435,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                     style={{ marginBottom: 10 }}
                   />
                 )}
-                {server === SERVER_DEFAULT_0 && (
+                {server === SERVER_DEFAULT_0 && !!SERVER_DEFAULT_1 && (
                   <Button
                     type="Primary"
                     title={translate('loadingapp.changeserver')}
@@ -438,7 +444,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                     style={{ marginBottom: 10 }}
                   />
                 )}
-                {server !== SERVER_DEFAULT_0 && server !== SERVER_DEFAULT_1 && (
+                {server !== SERVER_DEFAULT_0 && server !== SERVER_DEFAULT_1 && !!SERVER_DEFAULT_0 && (
                   <Button
                     type="Primary"
                     title={translate('loadingapp.changeserver')}
@@ -465,7 +471,9 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                   />
                 )}
 
-                <View style={{ marginTop: 50, display: 'flex', alignItems: 'center' }}>
+                <View
+                  testID="loadingapp.restorewalletseed"
+                  style={{ marginTop: 50, display: 'flex', alignItems: 'center' }}>
                   <Button
                     type="Secondary"
                     title={translate('loadingapp.restorewalletseed')}

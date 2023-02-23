@@ -83,57 +83,37 @@ exports[`Component Info - test Matches the snapshot Info 1`] = `
         </Text>
       </View>
     </View>
+    <View
+      style={
+        {
+          "alignItems": "flex-end",
+          "padding": 15,
+          "position": "absolute",
+          "right": 0,
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": "rgb(216, 216, 216)",
+            "fontSize": 8,
+          }
+        }
+      >
+        translated text
+      </Text>
+    </View>
+    <View
+      style={
+        {
+          "backgroundColor": "rgb(0, 122, 255)",
+          "height": 1,
+          "width": "100%",
+        }
+      }
+    />
   </View>
-  <View
-    style={
-      {
-        "alignItems": "flex-end",
-        "padding": 15,
-        "position": "absolute",
-        "right": 0,
-      }
-    }
-  >
-    <Text
-      style={
-        {
-          "color": "rgb(216, 216, 216)",
-          "fontSize": 8,
-        }
-      }
-    >
-      translated text
-    </Text>
-    <Text
-      style={
-        {
-          "color": "rgb(216, 216, 216)",
-          "fontSize": 8,
-        }
-      }
-    >
-      (undefinedxundefined)-undefined
-    </Text>
-    <Text
-      style={
-        {
-          "color": "rgb(216, 216, 216)",
-          "fontSize": 7,
-        }
-      }
-    >
-      translated text
-    </Text>
-  </View>
-  <View
-    style={
-      {
-        "backgroundColor": "rgb(0, 122, 255)",
-        "height": 1,
-        "width": "100%",
-      }
-    }
-  />
   <RCTScrollView
     contentContainerStyle={
       {
