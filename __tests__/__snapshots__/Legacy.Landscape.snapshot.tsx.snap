@@ -56,6 +56,15 @@ exports[`Component Legacy - test Legacy Landscape - snapshot 1`] = `
       <View
         style={
           {
+            "backgroundColor": "rgb(0, 122, 255)",
+            "height": 1,
+            "width": "100%",
+          }
+        }
+      />
+      <View
+        style={
+          {
             "alignItems": "center",
             "display": "flex",
             "flexDirection": "row",
