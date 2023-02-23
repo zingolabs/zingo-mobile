@@ -34,6 +34,8 @@ build/
 local.properties
 *.iml
 
+nohup.out
+
 # Visual Studio Code
 #
 .vscode/

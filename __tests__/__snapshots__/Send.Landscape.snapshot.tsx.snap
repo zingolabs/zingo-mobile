@@ -462,7 +462,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
           style={
             {
               "alignItems": "flex-end",
-              "padding": 10,
+              "padding": 15,
               "position": "absolute",
               "right": 0,
             }
