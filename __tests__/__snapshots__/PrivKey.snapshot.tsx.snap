@@ -103,26 +103,6 @@ exports[`Component PrivKey - test PrivKey Private - snapshot 1`] = `
       >
         text translated
       </Text>
-      <Text
-        style={
-          {
-            "color": "rgb(216, 216, 216)",
-            "fontSize": 8,
-          }
-        }
-      >
-        (undefinedxundefined)-undefined
-      </Text>
-      <Text
-        style={
-          {
-            "color": "rgb(216, 216, 216)",
-            "fontSize": 7,
-          }
-        }
-      >
-        text translated
-      </Text>
     </View>
     <View
       style={
@@ -442,26 +422,6 @@ exports[`Component PrivKey - test PrivKey View - snapshot 1`] = `
           {
             "color": "rgb(216, 216, 216)",
             "fontSize": 8,
-          }
-        }
-      >
-        text translated
-      </Text>
-      <Text
-        style={
-          {
-            "color": "rgb(216, 216, 216)",
-            "fontSize": 8,
-          }
-        }
-      >
-        (undefinedxundefined)-undefined
-      </Text>
-      <Text
-        style={
-          {
-            "color": "rgb(216, 216, 216)",
-            "fontSize": 7,
           }
         }
       >

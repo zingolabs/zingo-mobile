@@ -478,26 +478,6 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
             >
               text translated
             </Text>
-            <Text
-              style={
-                {
-                  "color": "#ffffff",
-                  "fontSize": 8,
-                }
-              }
-            >
-              (600x300)-2.5
-            </Text>
-            <Text
-              style={
-                {
-                  "color": "#ffffff",
-                  "fontSize": 7,
-                }
-              }
-            >
-              text translated
-            </Text>
           </View>
           <View
             style={
