@@ -112,7 +112,7 @@ exports[`Component SyncReport - test Matches the snapshot SyncReport 1`] = `
         }
       }
     >
-      (undefinedxundefined)-undefined
+      translated text
     </Text>
   </View>
   <View

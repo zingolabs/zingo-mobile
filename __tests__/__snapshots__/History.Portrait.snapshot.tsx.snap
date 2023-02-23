@@ -274,7 +274,7 @@ exports[`Component Transactions - test Transactions Portrait - snapshot 1`] = `
         }
       }
     >
-      (200x400)-1.5
+      text translated
     </Text>
   </View>
   <View
