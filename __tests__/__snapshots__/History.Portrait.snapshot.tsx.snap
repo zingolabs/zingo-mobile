@@ -128,7 +128,6 @@ exports[`Component Transactions - test Transactions Portrait - snapshot 1`] = `
             "justifyContent": "center",
           }
         }
-        testID="transaction title"
       >
         <Text
           style={

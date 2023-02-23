@@ -20,9 +20,6 @@ val STOP = "stop"
 
 class BackgroundSync : HeadlessJsTaskService() {
 
-
-
-
     override fun getTaskConfig(intent: Intent): HeadlessJsTaskConfig? {
         return intent.extras?.let {
             HeadlessJsTaskConfig(
@@ -48,7 +45,7 @@ class BackgroundSync : HeadlessJsTaskService() {
                  this,
                  0,
                  notificationIntent,
-                 PendingIntent.FLAG_CANCEL_CURRENT
+                 PendingIntent.FLAG_IMMUTABLE
              )
              val notification: Notification = NotificationCompat.Builder(this, channelId!!)
                  .setContentTitle("Zingo Sync")
