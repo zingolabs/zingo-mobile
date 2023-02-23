@@ -24,12 +24,14 @@ class MainActivity : ReactActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.w("", "Starting main activity")
         val service = Intent(applicationContext, BackgroundSync::class.java)
+        service.setAction(STOP)
         applicationContext.stopService(service)
         super.onCreate(null)
     }
 
     override fun onPause() {
         val channelId = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Log.w("", "Creating notification channel")
             createNotificationChannel()
         } else {
             // If earlier version channel ID is not used
