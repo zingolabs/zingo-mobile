@@ -7,7 +7,7 @@ import Toast from 'react-native-simple-toast';
 import QRCode from 'react-native-qrcode-svg';
 
 import FadeText from '../Components/FadeText';
-import Button from '../Button';
+import Button from '../Components/Button';
 import Utils from '../../app/utils';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';

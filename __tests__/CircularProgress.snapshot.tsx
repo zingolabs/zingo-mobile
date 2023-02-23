@@ -6,7 +6,7 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
-import CircularProgress from '../components/CircularProgress';
+import CircularProgress from '../components/Components/CircularProgress';
 
 // test suite
 describe('Component About - test', () => {

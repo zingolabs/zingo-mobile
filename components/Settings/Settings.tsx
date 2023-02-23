@@ -11,7 +11,7 @@ import RegText from '../Components/RegText';
 import FadeText from '../Components/FadeText';
 import BoldText from '../Components/BoldText';
 import { parseServerURI, serverUris } from '../../app/uris';
-import Button from '../Button';
+import Button from '../Components/Button';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import moment from 'moment';
