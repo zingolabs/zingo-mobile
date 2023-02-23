@@ -112,7 +112,7 @@ exports[`Component Rescan - test Rescan - snapshot 1`] = `
         }
       }
     >
-      (undefinedxundefined)-undefined
+      text translated
     </Text>
   </View>
   <View

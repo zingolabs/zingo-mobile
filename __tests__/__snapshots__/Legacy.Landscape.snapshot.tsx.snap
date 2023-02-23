@@ -168,7 +168,7 @@ exports[`Component Legacy - test Legacy Landscape - snapshot 1`] = `
           }
         }
       >
-        (600x300)-2.5
+        text translated
       </Text>
     </View>
     <View

@@ -112,7 +112,7 @@ exports[`Component Info - test Matches the snapshot Info 1`] = `
         }
       }
     >
-      (undefinedxundefined)-undefined
+      translated text
     </Text>
   </View>
   <View
