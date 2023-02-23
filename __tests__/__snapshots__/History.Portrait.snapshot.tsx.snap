@@ -250,7 +250,7 @@ exports[`Component Transactions - test Transactions Portrait - snapshot 1`] = `
     style={
       {
         "alignItems": "flex-end",
-        "padding": 15,
+        "padding": 10,
         "position": "absolute",
         "right": 0,
       }
@@ -271,16 +271,6 @@ exports[`Component Transactions - test Transactions Portrait - snapshot 1`] = `
         {
           "color": "rgb(216, 216, 216)",
           "fontSize": 8,
-        }
-      }
-    >
-      (200x400)-1.5
-    </Text>
-    <Text
-      style={
-        {
-          "color": "rgb(216, 216, 216)",
-          "fontSize": 7,
         }
       }
     >

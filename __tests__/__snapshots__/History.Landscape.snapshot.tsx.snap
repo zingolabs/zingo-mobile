@@ -265,7 +265,7 @@ exports[`Component Transactions - test Transactions Landscape - snapshot 1`] = `
       style={
         {
           "alignItems": "flex-end",
-          "padding": 15,
+          "padding": 10,
           "position": "absolute",
           "right": 0,
         }
@@ -286,16 +286,6 @@ exports[`Component Transactions - test Transactions Landscape - snapshot 1`] = `
           {
             "color": "rgb(216, 216, 216)",
             "fontSize": 8,
-          }
-        }
-      >
-        (600x300)-2.5
-      </Text>
-      <Text
-        style={
-          {
-            "color": "rgb(216, 216, 216)",
-            "fontSize": 7,
           }
         }
       >

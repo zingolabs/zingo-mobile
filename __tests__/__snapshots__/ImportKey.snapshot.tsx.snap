@@ -95,7 +95,7 @@ exports[`Component ImportKey - test Matches the snapshot ImportKey 1`] = `
     style={
       {
         "alignItems": "flex-end",
-        "padding": 15,
+        "padding": 10,
         "position": "absolute",
         "right": 0,
       }
@@ -116,16 +116,6 @@ exports[`Component ImportKey - test Matches the snapshot ImportKey 1`] = `
         {
           "color": "rgb(216, 216, 216)",
           "fontSize": 8,
-        }
-      }
-    >
-      (undefinedxundefined)-undefined
-    </Text>
-    <Text
-      style={
-        {
-          "color": "rgb(216, 216, 216)",
-          "fontSize": 7,
         }
       }
     >
