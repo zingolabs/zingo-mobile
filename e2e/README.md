@@ -1,12 +1,12 @@
-to run e2e tests:
+to run all e2e tests:
+set up an emulator for Pixel_6_API_30
+start docker daemon
+From the root directory, run:
+>$ sh e2e/runall.sh
 
-start an instance of the emulator, which should be documented in the regular development README
-Then, run:
 
->$ yarn start react-native start
+alternatively, setup and start a node react-native server with
+>$ sh e2e/setup.sh
 
-in another terminal:
->$ yarn detox build -c android.emu.debug 
->$ yarn detox test -c android.emu.debug
-
-instructions at https://wix.github.io/Detox/docs/introduction/project-setup/#1-command-line-tools-detox-cli
+then choose a test to run
+>$ yarn detox test SPECIFY -c android.emu.debug
