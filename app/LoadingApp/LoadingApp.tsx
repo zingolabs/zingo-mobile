@@ -471,7 +471,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                   />
                 )}
 
-                <View 
+                <View
                   testID="loadingapp.restorewalletseed"
                   style={{ marginTop: 50, display: 'flex', alignItems: 'center' }}>
                   <Button
