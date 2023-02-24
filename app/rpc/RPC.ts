@@ -1,6 +1,3 @@
-import { TranslateOptions } from 'i18n-js';
-//import BackgroundFetch from 'react-native-background-fetch';
-
 import {
   SyncingStatusReportClass,
   TotalBalanceClass,
@@ -33,7 +30,14 @@ export default class RPC {
   fnSetAllAddresses: (allAddresses: AddressClass[]) => void;
   fnSetRefreshUpdates: (inProgress: boolean, progress: number, blocks: string, synced: boolean) => void;
   fnSetWalletSettings: (settings: WalletSettingsClass) => void;
-  translate: (key: string, config?: TranslateOptions) => string;
+  translate: (
+    key: string,
+  ) =>
+    | string
+    | string[]
+    | { value: string; text: string }[]
+    | { value: boolean; text: string }[]
+    | { [key: string]: string[] };
   fetchBackgroundSyncing: () => void;
 
   refreshTimerID?: NodeJS.Timeout;
@@ -66,7 +70,14 @@ export default class RPC {
     fnSetWalletSettings: (settings: WalletSettingsClass) => void,
     fnSetInfo: (info: InfoType) => void,
     fnSetRefreshUpdates: (inProgress: boolean, progress: number, blocks: string, synced: boolean) => void,
-    translate: (key: string, config?: TranslateOptions) => string,
+    translate: (
+      key: string,
+    ) =>
+      | string
+      | string[]
+      | { value: string; text: string }[]
+      | { value: boolean; text: string }[]
+      | { [key: string]: string[] },
     fetchBackgroundSyncing: () => void,
   ) {
     this.fnSetSyncingStatusReport = fnSetSyncingStatusReport;
@@ -500,7 +511,7 @@ export default class RPC {
       this.prev_sync_id = -1;
       this.seconds_batch = 0;
       this.batches = 0;
-      this.message = this.translate('rpc.syncstart-message');
+      this.message = this.translate('rpc.syncstart-message') as string;
       this.process_end_block = fullRescan ? this.walletBirthday : this.lastWalletBlockHeight;
 
       // This is async, so when it is done, we finish the refresh.
@@ -546,7 +557,7 @@ export default class RPC {
             this.prevBatchNum = -1;
             this.seconds_batch = 0;
             this.batches = 0;
-            this.message = this.translate('rpc.syncstart-message');
+            this.message = this.translate('rpc.syncstart-message') as string;
             this.process_end_block = this.lastWalletBlockHeight;
           }
           this.prev_sync_id = ss.sync_id;
@@ -677,7 +688,7 @@ export default class RPC {
           await RPCModule.doSave();
           this.prevProgress = 0;
           progress = 0;
-          this.message = this.translate('rpc.syncend-message');
+          this.message = this.translate('rpc.syncend-message') as string;
 
           // I know it's finished.
           this.fnSetRefreshUpdates(false, 0, '', this.lastServerBlockHeight === this.lastWalletBlockHeight);

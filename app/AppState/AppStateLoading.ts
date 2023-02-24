@@ -1,4 +1,3 @@
-import { TranslateOptions } from 'i18n-js';
 import { StackScreenProps } from '@react-navigation/stack';
 
 import TotalBalanceClass from './classes/TotalBalanceClass';
@@ -30,7 +29,14 @@ export default interface AppStateLoading {
   sendAll: boolean;
   background: backgroundType;
 
-  translate: (key: string, config?: TranslateOptions) => string;
+  translate: (
+    key: string,
+  ) =>
+    | string
+    | string[]
+    | { value: string; text: string }[]
+    | { value: boolean; text: string }[]
+    | { [key: string]: string[] };
 
   // eslint-disable-next-line semi
 }
