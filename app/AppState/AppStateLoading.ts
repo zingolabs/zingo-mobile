@@ -1,4 +1,3 @@
-import { TranslateOptions } from 'i18n-js';
 import { StackScreenProps } from '@react-navigation/stack';
 
 import TotalBalanceClass from './classes/TotalBalanceClass';

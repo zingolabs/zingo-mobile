@@ -54,25 +54,26 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     sendAll: sendAllContext,
   } = context;
 
-  const memosArray: string = translate('settings.memos');
+  const memosArray = translate('settings.memos');
+  console.log(memosArray, typeof memosArray);
   let MEMOS: Options[] = [];
   if (typeof memosArray === 'object') {
     MEMOS = memosArray as Options[];
   }
 
-  const currenciesArray: string = translate('settings.currencies');
+  const currenciesArray = translate('settings.currencies');
   let CURRENCIES: Options[] = [];
   if (typeof currenciesArray === 'object') {
     CURRENCIES = currenciesArray as Options[];
   }
 
-  const languagesArray: string = translate('settings.languages');
+  const languagesArray = translate('settings.languages');
   let LANGUAGES: Options[] = [];
   if (typeof languagesArray === 'object') {
     LANGUAGES = languagesArray as Options[];
   }
 
-  const sendAllsArray: string = translate('settings.sendalls');
+  const sendAllsArray = translate('settings.sendalls');
   let SENDALLS: Options[] = [];
   if (typeof sendAllsArray === 'object') {
     SENDALLS = sendAllsArray as Options[];
@@ -103,28 +104,28 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       languageContext === language &&
       sendAllContext === sendAll
     ) {
-      Toast.show(translate('settings.nochanges'), Toast.LONG);
+      Toast.show(translate('settings.nochanges') as string, Toast.LONG);
       return;
     }
     if (!memos) {
-      Toast.show(translate('settings.ismemo'), Toast.LONG);
+      Toast.show(translate('settings.ismemo') as string, Toast.LONG);
       return;
     }
     if (!filter) {
-      Toast.show(translate('settings.isthreshold'), Toast.LONG);
+      Toast.show(translate('settings.isthreshold') as string, Toast.LONG);
       return;
     }
     if (!server) {
-      Toast.show(translate('settings.isserver'), Toast.LONG);
+      Toast.show(translate('settings.isserver') as string, Toast.LONG);
       return;
     }
     if (!language) {
-      Toast.show(translate('settings.islanguage'), Toast.LONG);
+      Toast.show(translate('settings.islanguage') as string, Toast.LONG);
       return;
     }
     const result = parseServerURI(server);
     if (result.toLowerCase().startsWith('error')) {
-      Toast.show(translate('settings.isuri'), Toast.LONG);
+      Toast.show(translate('settings.isuri') as string, Toast.LONG);
       return;
     }
 
@@ -173,7 +174,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
               color={colors.border}
             />
             <RegText key={'text-' + item.value} style={{ marginLeft: 10 }}>
-              {translate(`settings.value-${item.value}`)}
+              {translate(`settings.value-${item.value}`) as string}
             </RegText>
           </View>
         </TouchableOpacity>
@@ -193,7 +194,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         height: '100%',
         backgroundColor: colors.background,
       }}>
-      <Header title={translate('settings.title')} noBalance={true} noSyncingStatus={true} noDrawMenu={true} />
+      <Header title={translate('settings.title') as string} noBalance={true} noSyncingStatus={true} noDrawMenu={true} />
 
       <ScrollView
         style={{ maxHeight: '85%' }}
@@ -203,7 +204,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           justifyContent: 'flex-start',
         }}>
         <View style={{ display: 'flex', margin: 10 }}>
-          <BoldText>{translate('settings.sendall-title')}</BoldText>
+          <BoldText>{translate('settings.sendall-title') as string}</BoldText>
         </View>
 
         <View style={{ display: 'flex', marginLeft: 25 }}>
@@ -216,7 +217,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         </View>
 
         <View style={{ display: 'flex', margin: 10 }}>
-          <BoldText>{translate('settings.currency-title')}</BoldText>
+          <BoldText>{translate('settings.currency-title') as string}</BoldText>
         </View>
 
         <View style={{ display: 'flex', marginLeft: 25 }}>
@@ -229,7 +230,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         </View>
 
         <View style={{ display: 'flex', margin: 10 }}>
-          <BoldText>{translate('settings.language-title')}</BoldText>
+          <BoldText>{translate('settings.language-title') as string}</BoldText>
         </View>
 
         <View style={{ display: 'flex', marginLeft: 25 }}>
@@ -242,7 +243,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         </View>
 
         <View style={{ display: 'flex', margin: 10 }}>
-          <BoldText>{translate('settings.server-title')}</BoldText>
+          <BoldText>{translate('settings.server-title') as string}</BoldText>
         </View>
 
         <View style={{ display: 'flex', marginLeft: 25 }}>
@@ -268,14 +269,14 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
               onPress={() => setServer('')}>
               <View style={{ display: 'flex', flexDirection: 'row', marginTop: 10 }}>
                 {customIcon && <FontAwesomeIcon icon={customIcon} size={20} color={colors.border} />}
-                <RegText style={{ marginLeft: 10 }}>{translate('settings.custom')}</RegText>
+                <RegText style={{ marginLeft: 10 }}>{translate('settings.custom') as string}</RegText>
               </View>
             </TouchableOpacity>
 
             {customIcon === faDotCircle && (
               <View
                 accessible={true}
-                accessibilityLabel={translate('settings.server-acc')}
+                accessibilityLabel={translate('settings.server-acc') as string}
                 style={{
                   borderColor: colors.border,
                   borderWidth: 1,
@@ -308,13 +309,13 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         </View>
 
         <View style={{ display: 'flex', margin: 10 }}>
-          <BoldText>{translate('settings.threshold-title')}</BoldText>
+          <BoldText>{translate('settings.threshold-title') as string}</BoldText>
         </View>
 
         <View style={{ display: 'flex', marginLeft: 25 }}>
           <View
             accessible={true}
-            accessibilityLabel={translate('settings.threshold-acc')}
+            accessibilityLabel={translate('settings.threshold-acc') as string}
             style={{
               borderColor: colors.border,
               borderWidth: 1,
@@ -326,7 +327,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
               minHeight: 48,
             }}>
             <TextInput
-              placeholder={translate('settings.number')}
+              placeholder={translate('settings.number') as string}
               placeholderTextColor={colors.placeholder}
               keyboardType="numeric"
               style={{
@@ -346,7 +347,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         </View>
 
         <View style={{ display: 'flex', margin: 10 }}>
-          <BoldText>{translate('settings.memo-title')}</BoldText>
+          <BoldText>{translate('settings.memo-title') as string}</BoldText>
         </View>
 
         <View style={{ display: 'flex', marginLeft: 25, marginBottom: 30 }}>
@@ -361,8 +362,13 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           alignItems: 'center',
           marginVertical: 5,
         }}>
-        <Button type="Primary" title={translate('settings.save')} onPress={saveSettings} />
-        <Button type="Secondary" title={translate('cancel')} style={{ marginLeft: 10 }} onPress={closeModal} />
+        <Button type="Primary" title={translate('settings.save') as string} onPress={saveSettings} />
+        <Button
+          type="Secondary"
+          title={translate('cancel') as string}
+          style={{ marginLeft: 10 }}
+          onPress={closeModal}
+        />
       </View>
     </SafeAreaView>
   );

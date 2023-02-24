@@ -17,7 +17,7 @@ const About: React.FunctionComponent<AboutProps> = ({ closeModal }) => {
   const { translate } = context;
   const { colors } = useTheme() as unknown as ThemeType;
 
-  const arrayTxtObject: string = translate('about.copyright');
+  const arrayTxtObject = translate('about.copyright');
   let arrayTxt: string[] = [];
   if (typeof arrayTxtObject === 'object') {
     arrayTxt = arrayTxtObject as string[];
@@ -61,7 +61,7 @@ const About: React.FunctionComponent<AboutProps> = ({ closeModal }) => {
           alignItems: 'center',
           marginVertical: 5,
         }}>
-        <Button type="Secondary" title={translate('close')} onPress={closeModal} />
+        <Button type="Secondary" title={translate('close') as string} onPress={closeModal} />
       </View>
     </SafeAreaView>
   );
