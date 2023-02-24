@@ -61,6 +61,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
 
   return (
     <View
+      testID="header"
       style={{
         display: 'flex',
         alignItems: 'center',
