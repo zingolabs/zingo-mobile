@@ -4,7 +4,6 @@ import { View, SafeAreaView, ScrollView, TouchableOpacity, Text, TextInput, Keyb
 import { useTheme } from '@react-navigation/native';
 import Toast from 'react-native-simple-toast';
 import Clipboard from '@react-native-community/clipboard';
-import { TranslateOptions } from 'i18n-js';
 import Animated, { EasingNode } from 'react-native-reanimated';
 
 import RegText from '../Components/RegText';
@@ -35,7 +34,14 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
   const contextLoaded = useContext(ContextAppLoaded);
   const contextLoading = useContext(ContextAppLoading);
   let walletSeed: WalletSeedType,
-    translate: (key: string, config?: TranslateOptions) => string,
+    translate: (
+      key: string,
+    ) =>
+      | string
+      | string[]
+      | { value: string; text: string }[]
+      | { value: boolean; text: string }[]
+      | { [key: string]: string[] },
     info: InfoType,
     server: string,
     dimensions: DimensionsType;
@@ -65,7 +71,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
   const slideAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    const buttonTextsArray: string = translate('seed.buttontexts');
+    const buttonTextsArray = translate('seed.buttontexts');
     let buttonTexts = {} as TextsType;
     if (typeof buttonTextsArray === 'object') {
       buttonTexts = buttonTextsArray as TextsType;
@@ -168,7 +174,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
           justifyContent: 'flex-start',
         }}>
         <FadeText style={{ marginTop: 0, padding: 20, textAlign: 'center' }}>
-          {readOnly ? translate('seed.text-readonly') : translate('seed.text-no-readonly')}
+          {readOnly ? (translate('seed.text-readonly') as string) : (translate('seed.text-no-readonly') as string)}
         </FadeText>
         <View
           style={{
@@ -190,7 +196,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
           ) : (
             <View
               accessible={true}
-              accessibilityLabel={translate('seed.seed-acc')}
+              accessibilityLabel={translate('seed.seed-acc') as string}
               style={{
                 margin: 0,
                 borderWidth: 1,
@@ -203,7 +209,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
               }}>
               <TextInput
                 testID="seed.seedplaceholder"
-                placeholder={translate('seed.seedplaceholder')}
+                placeholder={translate('seed.seedplaceholder') as string}
                 placeholderTextColor={colors.placeholder}
                 multiline
                 style={{
@@ -226,7 +232,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
               onPress={() => {
                 if (seedPhrase) {
                   Clipboard.setString(seedPhrase);
-                  Toast.show(translate('seed.tapcopy-message'), Toast.LONG);
+                  Toast.show(translate('seed.tapcopy-message') as string, Toast.LONG);
                 }
               }}>
               <Text
@@ -238,7 +244,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
                   textAlign: 'center',
                   minHeight: 48,
                 }}>
-                {translate('seed.tapcopy')}
+                {translate('seed.tapcopy') as string}
               </Text>
             </TouchableOpacity>
             <View />
@@ -246,7 +252,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
         </View>
 
         <View style={{ marginTop: 10, alignItems: 'center' }}>
-          <FadeText style={{ textAlign: 'center' }}>{translate('seed.birthday-readonly')}</FadeText>
+          <FadeText style={{ textAlign: 'center' }}>{translate('seed.birthday-readonly') as string}</FadeText>
           {readOnly ? (
             <RegText color={colors.text} style={{ textAlign: 'center' }}>
               {birthdayNumber}
@@ -258,7 +264,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
               </FadeText>
               <View
                 accessible={true}
-                accessibilityLabel={translate('seed.birthday-acc')}
+                accessibilityLabel={translate('seed.birthday-acc') as string}
                 style={{
                   margin: 10,
                   borderWidth: 1,
@@ -302,17 +308,17 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
 
         {times === 3 && action === 'change' && (
           <FadeText style={{ marginTop: 20, padding: 20, textAlign: 'center', color: 'white' }}>
-            {translate('seed.change-warning')}
+            {translate('seed.change-warning') as string}
           </FadeText>
         )}
         {times === 3 && action === 'backup' && (
           <FadeText style={{ marginTop: 20, padding: 20, textAlign: 'center', color: 'white' }}>
-            {translate('seed.backup-warning')}
+            {translate('seed.backup-warning') as string}
           </FadeText>
         )}
         {times === 3 && action === 'server' && (
           <FadeText style={{ marginTop: 20, padding: 20, textAlign: 'center', color: 'white' }}>
-            {translate('seed.server-warning')}
+            {translate('seed.server-warning') as string}
           </FadeText>
         )}
 
@@ -321,7 +327,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
           times === 3 &&
           (action === 'change' || action === 'server') && (
             <FadeText style={{ color: colors.primary, textAlign: 'center', width: '100%' }}>
-              {translate('seed.mainnet-warning')}
+              {translate('seed.mainnet-warning') as string}
             </FadeText>
           )}
         <View style={{ marginBottom: 30 }} />
@@ -353,7 +359,12 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
           }}
         />
         {(times > 0 || action === 'restore') && (
-          <Button type="Secondary" title={translate('cancel')} style={{ marginLeft: 10 }} onPress={onClickCancel} />
+          <Button
+            type="Secondary"
+            title={translate('cancel') as string}
+            style={{ marginLeft: 10 }}
+            onPress={onClickCancel}
+          />
         )}
       </View>
     </SafeAreaView>

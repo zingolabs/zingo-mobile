@@ -2,7 +2,6 @@
 import { faBars, faCheck, faInfo, faPlay, faStop } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme } from '@react-navigation/native';
-import { TranslateOptions } from 'i18n-js/typings';
 import React, { useContext } from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { DimensionsType } from '../../app/AppState';
@@ -23,7 +22,14 @@ type HeaderProps = {
   noSyncingStatus?: boolean;
   noDrawMenu?: boolean;
   testID?: string;
-  translate?: (key: string, config?: TranslateOptions | undefined) => string;
+  translate?: (
+    key: string,
+  ) =>
+    | string
+    | string[]
+    | { value: string; text: string }[]
+    | { value: boolean; text: string }[]
+    | { [key: string]: string[] };
   dimensions?: DimensionsType;
 };
 
@@ -102,7 +108,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   minWidth: 48,
                   minHeight: 48,
                 }}>
-                <RegText color={colors.primary}>{translate('history.pools')}</RegText>
+                <RegText color={colors.primary}>{translate('history.pools') as string}</RegText>
                 <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
               </View>
             </TouchableOpacity>
@@ -185,7 +191,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', left: 0 }}>
           <TouchableOpacity
             accessible={true}
-            accessibilityLabel={translate('menudrawer-acc')}
+            accessibilityLabel={translate('menudrawer-acc') as string}
             onPress={toggleMenuDrawer}>
             <FontAwesomeIcon icon={faBars} size={48} color={colors.border} />
           </TouchableOpacity>
@@ -193,7 +199,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       )}
 
       <View style={{ padding: 15, position: 'absolute', right: 0, alignItems: 'flex-end' }}>
-        <Text style={{ fontSize: 8, color: colors.border }}>{translate('version')}</Text>
+        <Text style={{ fontSize: 8, color: colors.border }}>{translate('version') as string}</Text>
       </View>
 
       <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
