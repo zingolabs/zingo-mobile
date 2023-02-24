@@ -30,7 +30,7 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal, setZecPrice }) =
         height: '100%',
         backgroundColor: colors.background,
       }}>
-      <Header title={translate('info.title')} noBalance={true} noSyncingStatus={true} noDrawMenu={true} />
+      <Header title={translate('info.title') as string} noBalance={true} noSyncingStatus={true} noDrawMenu={true} />
 
       <ScrollView
         style={{ maxHeight: '85%' }}
@@ -40,37 +40,40 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal, setZecPrice }) =
           justifyContent: 'flex-start',
         }}>
         <View style={{ display: 'flex', margin: 20, marginBottom: 30 }}>
-          <DetailLine label={translate('info.version')} value={translate('zingo') + ' ' + translate('version')} />
           <DetailLine
-            label={translate('info.serverversion')}
-            value={info.version ? info.version : translate('loading')}
+            label={translate('info.version') as string}
+            value={translate('zingo') + ' ' + translate('version')}
           />
           <DetailLine
-            label={translate('info.lightwalletd')}
-            value={info.serverUri ? info.serverUri : translate('loading')}
+            label={translate('info.serverversion') as string}
+            value={info.version ? info.version : (translate('loading') as string)}
           />
           <DetailLine
-            label={translate('info.network')}
+            label={translate('info.lightwalletd') as string}
+            value={info.serverUri ? info.serverUri : (translate('loading') as string)}
+          />
+          <DetailLine
+            label={translate('info.network') as string}
             value={
               !info.chain_name
-                ? translate('loading')
+                ? (translate('loading') as string)
                 : info.chain_name.toLowerCase() === 'main' || info.chain_name.toLowerCase() === 'mainnet'
                 ? 'Mainnet'
                 : info.chain_name.toLowerCase() === 'test' || info.chain_name.toLowerCase() === 'testnet'
                 ? 'Testnet'
                 : info.chain_name.toLowerCase() === 'regtest'
                 ? 'Regtest'
-                : translate('info.unknown') + ' (' + info.chain_name + ')'
+                : (translate('info.unknown') as string) + ' (' + info.chain_name + ')'
             }
           />
           <DetailLine
-            label={translate('info.serverblock')}
-            value={info.latestBlock ? info.latestBlock.toString() : translate('loading')}
+            label={translate('info.serverblock') as string}
+            value={info.latestBlock ? info.latestBlock.toString() : (translate('loading') as string)}
           />
           {currency === 'USD' && (
             <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
               <DetailLine
-                label={translate('info.zecprice')}
+                label={translate('info.zecprice') as string}
                 value={
                   zecPrice.zecPrice > 0
                     ? `$ ${Utils.toLocaleFloat(zecPrice.zecPrice.toFixed(2))} ${currency} per ${
@@ -95,7 +98,7 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal, setZecPrice }) =
           alignItems: 'center',
           marginVertical: 5,
         }}>
-        <Button type="Secondary" title={translate('close')} onPress={closeModal} />
+        <Button type="Secondary" title={translate('close') as string} onPress={closeModal} />
       </View>
     </SafeAreaView>
   );

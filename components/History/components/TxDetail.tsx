@@ -72,7 +72,12 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
         height: '100%',
         backgroundColor: colors.background,
       }}>
-      <Header title={translate('history.details')} noBalance={true} noSyncingStatus={true} noDrawMenu={true} />
+      <Header
+        title={translate('history.details') as string}
+        noBalance={true}
+        noSyncingStatus={true}
+        noDrawMenu={true}
+      />
       <ScrollView
         contentContainerStyle={{
           flexDirection: 'column',
@@ -82,7 +87,8 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
         <View
           style={{ display: 'flex', alignItems: 'center', padding: 10, backgroundColor: colors.card, marginTop: 10 }}>
           <RegText style={{ textTransform: 'capitalize' }} color={spendColor}>
-            {!!tx.type && (tx.type === 'sent' ? translate('history.sent') : translate('history.receive'))}
+            {!!tx.type &&
+              (tx.type === 'sent' ? (translate('history.sent') as string) : (translate('history.receive') as string))}
           </RegText>
           <ZecAmount currencyName={info.currencyName ? info.currencyName : ''} size={36} amtZec={tx.amount} />
           {/*<CurrencyAmount amtZec={tx.amount} price={tx.zec_price} currency={'USD'} />*/}
@@ -91,22 +97,22 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
         <View style={{ margin: 10 }}>
           <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
             <View style={{ display: 'flex' }}>
-              <FadeText>{translate('history.time')}</FadeText>
+              <FadeText>{translate('history.time') as string}</FadeText>
               <RegText>{moment((tx.time || 0) * 1000).format('YYYY MMM D h:mm a')}</RegText>
             </View>
             <View style={{ display: 'flex', alignItems: 'flex-end' }}>
-              <FadeText>{translate('history.confirmations')}</FadeText>
+              <FadeText>{translate('history.confirmations') as string}</FadeText>
               <RegText>{tx.confirmations.toString()}</RegText>
             </View>
           </View>
 
           <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: 10 }}>
-            <FadeText>{translate('history.txid')}</FadeText>
+            <FadeText>{translate('history.txid') as string}</FadeText>
             <TouchableOpacity
               onPress={() => {
                 if (tx.txid) {
                   Clipboard.setString(tx.txid);
-                  Toast.show(translate('history.txcopied'), Toast.LONG);
+                  Toast.show(translate('history.txcopied') as string, Toast.LONG);
                   setExpandTxid(true);
                 }
               }}>
@@ -116,7 +122,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
                   <RegText>{tx.txid}</RegText>
                   <TouchableOpacity onPress={() => handleTxIDClick(tx.txid)}>
                     <Text style={{ color: colors.text, textDecorationLine: 'underline', margin: 15 }}>
-                      {translate('history.viewexplorer')}
+                      {translate('history.viewexplorer') as string}
                     </Text>
                   </TouchableOpacity>
                 </>
@@ -138,13 +144,13 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
                   borderBottomWidth: 1,
                 }}>
                 <View style={{ marginTop: 10 }}>
-                  <FadeText>{translate('history.address')}</FadeText>
+                  <FadeText>{translate('history.address') as string}</FadeText>
 
                   <TouchableOpacity
                     onPress={() => {
                       if (txd.address) {
                         Clipboard.setString(txd.address);
-                        Toast.show(translate('history.addresscopied'), Toast.LONG);
+                        Toast.show(translate('history.addresscopied') as string, Toast.LONG);
                         setExpandAddress(true);
                       }
                     }}>
@@ -159,7 +165,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
                 </View>
 
                 <View style={{ marginTop: 10 }}>
-                  <FadeText>{translate('history.amount')}</FadeText>
+                  <FadeText>{translate('history.amount') as string}</FadeText>
                   <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                     <ZecAmount amtZec={txd.amount} size={18} currencyName={'ᙇ'} />
                     {/*<CurrencyAmount
@@ -180,12 +186,12 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
 
                 {txd.memo && (
                   <View style={{ marginTop: 10 }}>
-                    <FadeText>{translate('history.memo')}</FadeText>
+                    <FadeText>{translate('history.memo') as string}</FadeText>
                     <TouchableOpacity
                       onPress={() => {
                         if (txd.memo) {
                           Clipboard.setString(txd.memo);
-                          Toast.show(translate('history.memocopied'), Toast.LONG);
+                          Toast.show(translate('history.memocopied') as string, Toast.LONG);
                         }
                       }}>
                       <RegText>{txd.memo}</RegText>
@@ -198,7 +204,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
 
           {fee > 0 && (
             <View style={{ display: 'flex', marginTop: 10 }}>
-              <FadeText>{translate('history.txfee')}</FadeText>
+              <FadeText>{translate('history.txfee') as string}</FadeText>
               <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                 <ZecAmount amtZec={fee} size={18} currencyName={'ᙇ'} />
                 {/*<CurrencyAmount style={{ fontSize: 18 }} amtZec={fee} price={tx.zec_price} currency={'USD'} />*/}
@@ -208,7 +214,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
         </View>
       </ScrollView>
       <View style={{ flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', margin: 10 }}>
-        <Button type="Secondary" title={translate('close')} onPress={closeModal} />
+        <Button type="Secondary" title={translate('close') as string} onPress={closeModal} />
       </View>
     </SafeAreaView>
   );
