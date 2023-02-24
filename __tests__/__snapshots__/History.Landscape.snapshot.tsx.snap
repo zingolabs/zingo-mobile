@@ -31,6 +31,7 @@ exports[`Component Transactions - test Transactions Landscape - snapshot 1`] = `
         "zIndex": -1,
       }
     }
+    testID="header"
   >
     <Image
       source={
@@ -315,6 +316,7 @@ exports[`Component Transactions - test Transactions Landscape - snapshot 1`] = `
             "flexDirection": "column",
           }
         }
+        testID="transactionList.1"
       >
         <View
           style={
@@ -494,6 +496,7 @@ exports[`Component Transactions - test Transactions Landscape - snapshot 1`] = `
             "flexDirection": "column",
           }
         }
+        testID="transactionList.2"
       >
         <View
           onPress={[Function]}
