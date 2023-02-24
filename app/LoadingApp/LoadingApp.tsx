@@ -24,7 +24,7 @@ import { StackScreenProps } from '@react-navigation/stack';
 import BoldText from '../../components/Components/BoldText';
 import Button from '../../components/Components/Button';
 import RPCModule from '../RPCModule';
-import { AppStateLoading, backgroundType, WalletSeedType } from '../AppState';
+import { AppStateLoading, backgroundType, WalletSeedType, TranslateType } from '../AppState';
 import { serverUris } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import RPC from '../rpc';
@@ -73,14 +73,7 @@ export default function LoadingApp(props: LoadingAppProps) {
   );
   const i18n = useMemo(() => new I18n(file), [file]);
 
-  const translate: (
-    key: string,
-  ) =>
-    | string
-    | string[]
-    | { value: string; text: string }[]
-    | { value: boolean; text: string }[]
-    | { [key: string]: string[] } = (key: string) => i18n.t(key);
+  const translate: (key: string) => TranslateType = (key: string) => i18n.t(key);
 
   const setI18nConfig = useCallback(async () => {
     // fallback if no available language fits
@@ -180,14 +173,7 @@ export default function LoadingApp(props: LoadingAppProps) {
 type LoadingAppClassProps = {
   navigation: StackScreenProps<any>['navigation'];
   route: StackScreenProps<any>['route'];
-  translate: (
-    key: string,
-  ) =>
-    | string
-    | string[]
-    | { value: string; text: string }[]
-    | { value: boolean; text: string }[]
-    | { [key: string]: string[] };
+  translate: (key: string) => TranslateType;
   theme: ThemeType;
   language: 'en' | 'es';
   currency: 'USD' | '';

@@ -9,6 +9,7 @@ import {
   WalletSeedType,
   SendProgressClass,
   WalletSettingsClass,
+  TranslateType,
 } from '../AppState';
 import RPCModule from '../RPCModule';
 import Utils from '../utils';
@@ -30,14 +31,7 @@ export default class RPC {
   fnSetAllAddresses: (allAddresses: AddressClass[]) => void;
   fnSetRefreshUpdates: (inProgress: boolean, progress: number, blocks: string, synced: boolean) => void;
   fnSetWalletSettings: (settings: WalletSettingsClass) => void;
-  translate: (
-    key: string,
-  ) =>
-    | string
-    | string[]
-    | { value: string; text: string }[]
-    | { value: boolean; text: string }[]
-    | { [key: string]: string[] };
+  translate: (key: string) => TranslateType;
   fetchBackgroundSyncing: () => void;
 
   refreshTimerID?: NodeJS.Timeout;
@@ -70,14 +64,7 @@ export default class RPC {
     fnSetWalletSettings: (settings: WalletSettingsClass) => void,
     fnSetInfo: (info: InfoType) => void,
     fnSetRefreshUpdates: (inProgress: boolean, progress: number, blocks: string, synced: boolean) => void,
-    translate: (
-      key: string,
-    ) =>
-      | string
-      | string[]
-      | { value: string; text: string }[]
-      | { value: boolean; text: string }[]
-      | { [key: string]: string[] },
+    translate: (key: string) => TranslateType,
     fetchBackgroundSyncing: () => void,
   ) {
     this.fnSetSyncingStatusReport = fnSetSyncingStatusReport;
