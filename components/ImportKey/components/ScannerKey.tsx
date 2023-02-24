@@ -38,7 +38,7 @@ const ScannerKey: React.FunctionComponent<ScannerKeyProps> = ({ setPrivKeyText, 
       onRead={onRead}
       reactivate={true}
       containerStyle={{ backgroundColor: colors.background }}
-      topContent={<RegText>{translate('scanner.text')}</RegText>}
+      topContent={<RegText>{translate('scanner.text') as string}</RegText>}
       bottomContent={
         <View
           style={{
@@ -49,7 +49,7 @@ const ScannerKey: React.FunctionComponent<ScannerKeyProps> = ({ setPrivKeyText, 
             width: '100%',
           }}>
           <View style={{ flexDirection: 'row', alignItems: 'stretch', justifyContent: 'space-evenly' }}>
-            <Button type="Secondary" title={translate('cancel')} onPress={doCancel} />
+            <Button type="Secondary" title={translate('cancel') as string} onPress={doCancel} />
           </View>
         </View>
       }

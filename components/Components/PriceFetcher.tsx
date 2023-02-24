@@ -144,7 +144,7 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
                 {count.toString()}
               </RegText>
             </View>
-            <RegText color={colors.background}>{translate('history.sure')}</RegText>
+            <RegText color={colors.background}>{translate('history.sure') as string}</RegText>
           </View>
         </TouchableOpacity>
       )}

@@ -23,7 +23,12 @@ const ComputingTxContent: React.FunctionComponent = () => {
         height: '100%',
         backgroundColor: colors.background,
       }}>
-      <Header title={translate('send.sending-title')} noBalance={true} noSyncingStatus={true} noDrawMenu={true} />
+      <Header
+        title={translate('send.sending-title') as string}
+        noBalance={true}
+        noSyncingStatus={true}
+        noDrawMenu={true}
+      />
       <View
         style={{
           display: 'flex',
@@ -31,9 +36,9 @@ const ComputingTxContent: React.FunctionComponent = () => {
           alignItems: 'center',
           height: '70%',
         }}>
-        <RegText>{translate('loadedapp.computingtx')}</RegText>
-        {!(progress && progress.sendInProgress) && <RegText>{translate('loadedapp.syncing')}</RegText>}
-        {!(progress && progress.sendInProgress) && <RegText>{translate('wait')}</RegText>}
+        <RegText>{translate('loadedapp.computingtx') as string}</RegText>
+        {!(progress && progress.sendInProgress) && <RegText>{translate('loadedapp.syncing') as string}</RegText>}
+        {!(progress && progress.sendInProgress) && <RegText>{translate('wait') as string}</RegText>}
         {progress && progress.sendInProgress && (
           <>
             <RegText>{`${translate('loadedapp.step')} ${progress.progress} ${translate('loadedapp.of')} ${

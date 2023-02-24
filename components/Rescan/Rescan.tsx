@@ -33,7 +33,7 @@ const Rescan: React.FunctionComponent<RescanProps> = ({ closeModal, startRescan 
         height: '100%',
         backgroundColor: colors.background,
       }}>
-      <Header title={translate('rescan.title')} noBalance={true} noSyncingStatus={true} noDrawMenu={true} />
+      <Header title={translate('rescan.title') as string} noBalance={true} noSyncingStatus={true} noDrawMenu={true} />
 
       <ScrollView
         style={{ maxHeight: '85%' }}
@@ -43,7 +43,7 @@ const Rescan: React.FunctionComponent<RescanProps> = ({ closeModal, startRescan 
           justifyContent: 'flex-start',
         }}>
         <View style={{ display: 'flex', margin: 20, marginBottom: 30 }}>
-          <RegText>{translate('rescan.text-1') + walletSeed.birthday + translate('rescan.text-2')}</RegText>
+          <RegText>{(translate('rescan.text-1') as string) + walletSeed.birthday + translate('rescan.text-2')}</RegText>
         </View>
       </ScrollView>
       <View
@@ -54,8 +54,13 @@ const Rescan: React.FunctionComponent<RescanProps> = ({ closeModal, startRescan 
           alignItems: 'center',
           marginVertical: 5,
         }}>
-        <Button type="Primary" title={translate('rescan.button')} onPress={doRescanAndClose} />
-        <Button type="Secondary" title={translate('cancel')} style={{ marginLeft: 10 }} onPress={closeModal} />
+        <Button type="Primary" title={translate('rescan.button') as string} onPress={doRescanAndClose} />
+        <Button
+          type="Secondary"
+          title={translate('cancel') as string}
+          style={{ marginLeft: 10 }}
+          onPress={closeModal}
+        />
       </View>
     </SafeAreaView>
   );
