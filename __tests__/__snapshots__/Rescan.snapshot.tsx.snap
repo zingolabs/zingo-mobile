@@ -23,6 +23,7 @@ exports[`Component Rescan - test Rescan - snapshot 1`] = `
         "zIndex": -1,
       }
     }
+    testID="header"
   >
     <Image
       source={

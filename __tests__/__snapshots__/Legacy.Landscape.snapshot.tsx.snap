@@ -31,6 +31,7 @@ exports[`Component Legacy - test Legacy Landscape - snapshot 1`] = `
           "zIndex": -1,
         }
       }
+      testID="header"
     >
       <Image
         source={
