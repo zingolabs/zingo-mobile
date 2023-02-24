@@ -1,6 +1,3 @@
-import { TranslateOptions } from 'i18n-js';
-//import BackgroundFetch from 'react-native-background-fetch';
-
 import {
   SyncingStatusReportClass,
   TotalBalanceClass,
@@ -12,6 +9,7 @@ import {
   WalletSeedType,
   SendProgressClass,
   WalletSettingsClass,
+  TranslateType,
 } from '../AppState';
 import RPCModule from '../RPCModule';
 import Utils from '../utils';
@@ -33,7 +31,7 @@ export default class RPC {
   fnSetAllAddresses: (allAddresses: AddressClass[]) => void;
   fnSetRefreshUpdates: (inProgress: boolean, progress: number, blocks: string, synced: boolean) => void;
   fnSetWalletSettings: (settings: WalletSettingsClass) => void;
-  translate: (key: string, config?: TranslateOptions) => string;
+  translate: (key: string) => TranslateType;
   fetchBackgroundSyncing: () => void;
 
   refreshTimerID?: NodeJS.Timeout;
@@ -66,7 +64,7 @@ export default class RPC {
     fnSetWalletSettings: (settings: WalletSettingsClass) => void,
     fnSetInfo: (info: InfoType) => void,
     fnSetRefreshUpdates: (inProgress: boolean, progress: number, blocks: string, synced: boolean) => void,
-    translate: (key: string, config?: TranslateOptions) => string,
+    translate: (key: string) => TranslateType,
     fetchBackgroundSyncing: () => void,
   ) {
     this.fnSetSyncingStatusReport = fnSetSyncingStatusReport;
