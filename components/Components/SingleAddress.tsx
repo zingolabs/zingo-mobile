@@ -46,7 +46,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   const doCopy = () => {
     if (address) {
       Clipboard.setString(address);
-      Toast.show(translate('history.addresscopied'), Toast.LONG);
+      Toast.show(translate('history.addresscopied') as string, Toast.LONG);
     }
   };
 
@@ -78,7 +78,10 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                 borderWidth: 2,
                 borderRadius: 10,
               }}>
-              <TouchableOpacity accessible={true} accessibilityLabel={translate('send.scan-acc')} onPress={prev}>
+              <TouchableOpacity
+                accessible={true}
+                accessibilityLabel={translate('send.scan-acc') as string}
+                onPress={prev}>
                 <FontAwesomeIcon style={{ margin: 5 }} size={48} icon={faChevronLeft} color={colors.primary} />
               </TouchableOpacity>
             </View>
@@ -86,13 +89,13 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
           <View style={{ width: 150, justifyContent: 'center', alignItems: 'center' }}>
             <TouchableOpacity onPress={doCopy}>
               <Text style={{ color: colors.text, textDecorationLine: 'underline', marginTop: 15, minHeight: 48 }}>
-                {translate('seed.tapcopy')}
+                {translate('seed.tapcopy') as string}
               </Text>
             </TouchableOpacity>
             {multi && (
               <Text style={{ color: colors.primary, marginTop: -25 }}>
                 {index + 1}
-                {translate('legacy.of')}
+                {translate('legacy.of') as string}
                 {total}
               </Text>
             )}
@@ -105,7 +108,10 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                 borderWidth: 2,
                 borderRadius: 10,
               }}>
-              <TouchableOpacity accessible={true} accessibilityLabel={translate('send.scan-acc')} onPress={next}>
+              <TouchableOpacity
+                accessible={true}
+                accessibilityLabel={translate('send.scan-acc') as string}
+                onPress={next}>
                 <FontAwesomeIcon style={{ margin: 5 }} size={48} icon={faChevronRight} color={colors.primary} />
               </TouchableOpacity>
             </View>

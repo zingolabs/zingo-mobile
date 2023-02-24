@@ -48,7 +48,7 @@ const ImportKey: React.FunctionComponent<ImportKeyProps> = ({ closeModal, doImpo
         <ScannerKey setPrivKeyText={setPrivKeyText} closeModal={() => setQrcodeModalVisible(false)} />
       </Modal>
 
-      <Header title={translate('import.title')} noBalance={true} noSyncingStatus={true} noDrawMenu={true} />
+      <Header title={translate('import.title') as string} noBalance={true} noSyncingStatus={true} noDrawMenu={true} />
 
       <ScrollView
         style={{ maxHeight: '85%' }}
@@ -58,11 +58,11 @@ const ImportKey: React.FunctionComponent<ImportKeyProps> = ({ closeModal, doImpo
           justifyContent: 'flex-start',
         }}
         keyboardShouldPersistTaps="handled">
-        <RegText style={{ margin: 10 }}>{translate('import.key-label')}</RegText>
+        <RegText style={{ margin: 10 }}>{translate('import.key-label') as string}</RegText>
 
         <View
           accessible={true}
-          accessibilityLabel={translate('import.key-acc')}
+          accessibilityLabel={translate('import.key-acc') as string}
           style={{
             padding: 10,
             maxWidth: '95%',
@@ -103,13 +103,13 @@ const ImportKey: React.FunctionComponent<ImportKeyProps> = ({ closeModal, doImpo
             marginTop: 50,
             textAlign: 'center',
           }}>
-          {translate('import.birthday')}
+          {translate('import.birthday') as string}
         </RegText>
-        <FadeText>{translate('seed.birthday-no-readonly')}</FadeText>
+        <FadeText>{translate('seed.birthday-no-readonly') as string}</FadeText>
 
         <View
           accessible={true}
-          accessibilityLabel={translate('import.birthday-acc')}
+          accessibilityLabel={translate('import.birthday-acc') as string}
           style={{
             padding: 10,
             maxWidth: '50%',
@@ -137,7 +137,7 @@ const ImportKey: React.FunctionComponent<ImportKeyProps> = ({ closeModal, doImpo
           />
         </View>
 
-        <RegText style={{ margin: 20, marginBottom: 30 }}>{translate('import.text')}</RegText>
+        <RegText style={{ margin: 20, marginBottom: 30 }}>{translate('import.text') as string}</RegText>
       </ScrollView>
       <View
         style={{
@@ -147,8 +147,13 @@ const ImportKey: React.FunctionComponent<ImportKeyProps> = ({ closeModal, doImpo
           alignItems: 'center',
           marginVertical: 5,
         }}>
-        <Button type="Primary" title={translate('import.button')} onPress={okButton} />
-        <Button type="Secondary" title={translate('cancel')} style={{ marginLeft: 10 }} onPress={closeModal} />
+        <Button type="Primary" title={translate('import.button') as string} onPress={okButton} />
+        <Button
+          type="Secondary"
+          title={translate('cancel') as string}
+          style={{ marginLeft: 10 }}
+          onPress={closeModal}
+        />
       </View>
     </SafeAreaView>
   );

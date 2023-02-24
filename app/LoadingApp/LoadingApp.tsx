@@ -17,7 +17,7 @@ import {
   Platform,
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
-import { I18n, TranslateOptions } from 'i18n-js';
+import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
 import { StackScreenProps } from '@react-navigation/stack';
 
@@ -232,7 +232,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
           this.navigateToLoaded();
         } else {
           this.setState({ screen: 1 });
-          Alert.alert(this.props.translate('loadingapp.readingwallet-label'), error);
+          Alert.alert(this.props.translate('loadingapp.readingwallet-label') as string, error);
         }
       } else {
         //console.log('Loading new wallet');
@@ -326,7 +326,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
         //await this.set_wallet_option('transaction_filter_threshold', '500');
       } else {
         this.setState({ actionButtonsDisabled: false });
-        Alert.alert(this.props.translate('loadingapp.creatingwallet-label'), seed);
+        Alert.alert(this.props.translate('loadingapp.creatingwallet-label') as string, seed);
       }
     });
   };
@@ -340,8 +340,8 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
 
     if (!seed) {
       Alert.alert(
-        this.props.translate('loadingapp.invalidseed-label'),
-        this.props.translate('loadingapp.invalidseed-error'),
+        this.props.translate('loadingapp.invalidseed-label') as string,
+        this.props.translate('loadingapp.invalidseed-error') as string,
       );
       return;
     }
@@ -362,7 +362,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
         this.navigateToLoaded();
       } else {
         this.setState({ actionButtonsDisabled: false });
-        Alert.alert(this.props.translate('loadingapp.readingwallet-label'), error);
+        Alert.alert(this.props.translate('loadingapp.readingwallet-label') as string, error);
       }
     });
   };
@@ -394,8 +394,10 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                 alignItems: 'center',
                 justifyContent: 'center',
               }}>
-              <Text style={{ color: colors.zingo, fontSize: 40, fontWeight: 'bold' }}>{translate('zingo')}</Text>
-              <Text style={{ color: colors.zingo, fontSize: 15 }}>{translate('version')}</Text>
+              <Text style={{ color: colors.zingo, fontSize: 40, fontWeight: 'bold' }}>
+                {translate('zingo') as string}
+              </Text>
+              <Text style={{ color: colors.zingo, fontSize: 15 }}>{translate('version') as string}</Text>
             </View>
           )}
           {screen === 1 && (
@@ -415,21 +417,25 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                   justifyContent: 'center',
                 }}>
                 <View style={{ marginBottom: 50, display: 'flex', alignItems: 'center' }}>
-                  <Text style={{ color: colors.zingo, fontSize: 40, fontWeight: 'bold' }}>{translate('zingo')}</Text>
-                  <Text style={{ color: colors.zingo, fontSize: 15 }}>{translate('version')}</Text>
+                  <Text style={{ color: colors.zingo, fontSize: 40, fontWeight: 'bold' }}>
+                    {translate('zingo') as string}
+                  </Text>
+                  <Text style={{ color: colors.zingo, fontSize: 15 }}>{translate('version') as string}</Text>
                   <Image
                     source={require('../../assets/img/logobig-zingo.png')}
                     style={{ width: 100, height: 100, resizeMode: 'contain', marginTop: 10 }}
                   />
                 </View>
 
-                <BoldText style={{ fontSize: 15, marginBottom: 3 }}>{translate('loadingapp.actualserver')}</BoldText>
+                <BoldText style={{ fontSize: 15, marginBottom: 3 }}>
+                  {translate('loadingapp.actualserver') as string}
+                </BoldText>
                 <BoldText style={{ fontSize: 15, marginBottom: 10 }}>{server}</BoldText>
 
                 {server === SERVER_DEFAULT_1 && !!SERVER_DEFAULT_0 && (
                   <Button
                     type="Primary"
-                    title={translate('loadingapp.changeserver')}
+                    title={translate('loadingapp.changeserver') as string}
                     disabled={actionButtonsDisabled}
                     onPress={this.useDefaultServer_0}
                     style={{ marginBottom: 10 }}
@@ -438,7 +444,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                 {server === SERVER_DEFAULT_0 && !!SERVER_DEFAULT_1 && (
                   <Button
                     type="Primary"
-                    title={translate('loadingapp.changeserver')}
+                    title={translate('loadingapp.changeserver') as string}
                     disabled={actionButtonsDisabled}
                     onPress={this.useDefaultServer_1}
                     style={{ marginBottom: 10 }}
@@ -447,7 +453,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                 {server !== SERVER_DEFAULT_0 && server !== SERVER_DEFAULT_1 && !!SERVER_DEFAULT_0 && (
                   <Button
                     type="Primary"
-                    title={translate('loadingapp.changeserver')}
+                    title={translate('loadingapp.changeserver') as string}
                     disabled={actionButtonsDisabled}
                     onPress={this.useDefaultServer_0}
                     style={{ marginBottom: 10 }}
@@ -456,7 +462,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
 
                 <Button
                   type="Primary"
-                  title={translate('loadingapp.createnewwallet')}
+                  title={translate('loadingapp.createnewwallet') as string}
                   disabled={actionButtonsDisabled}
                   onPress={this.createNewWallet}
                   style={{ marginBottom: 10, marginTop: 10 }}
@@ -464,7 +470,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                 {walletExists && (
                   <Button
                     type="Primary"
-                    title={translate('loadingapp.opencurrentwallet')}
+                    title={translate('loadingapp.opencurrentwallet') as string}
                     disabled={actionButtonsDisabled}
                     onPress={this.componentDidMount}
                     style={{ marginBottom: 10 }}
@@ -476,7 +482,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                   style={{ marginTop: 50, display: 'flex', alignItems: 'center' }}>
                   <Button
                     type="Secondary"
-                    title={translate('loadingapp.restorewalletseed')}
+                    title={translate('loadingapp.restorewalletseed') as string}
                     disabled={actionButtonsDisabled}
                     onPress={this.getwalletSeedToRestore}
                     style={{ margin: 10 }}
@@ -494,7 +500,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
               <Suspense
                 fallback={
                   <View>
-                    <Text>{translate('loading')}</Text>
+                    <Text>{translate('loading') as string}</Text>
                   </View>
                 }>
                 <Seed
@@ -514,7 +520,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
               <Suspense
                 fallback={
                   <View>
-                    <Text>{translate('loading')}</Text>
+                    <Text>{translate('loading') as string}</Text>
                   </View>
                 }>
                 <Seed

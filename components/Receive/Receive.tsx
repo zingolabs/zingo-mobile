@@ -30,9 +30,9 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ setUaAddress, toggleMe
   const { colors } = useTheme() as unknown as ThemeType;
   const [index, setIndex] = useState(0);
   const [routes] = useState([
-    { key: 'uaddr', title: translate('receive.u-title') },
-    { key: 'zaddr', title: translate('legacy.z-title') },
-    { key: 'taddr', title: translate('legacy.t-title') },
+    { key: 'uaddr', title: translate('receive.u-title') as string },
+    { key: 'zaddr', title: translate('legacy.z-title') as string },
+    { key: 'taddr', title: translate('legacy.t-title') as string },
   ]);
 
   const [displayAddress, setDisplayAddress] = useState(uaAddress);
@@ -229,7 +229,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ setUaAddress, toggleMe
   ) => ReactNode = ({ route }) => {
     switch (route.key) {
       case 'uaddr': {
-        let uaddr = translate('receive.noaddress');
+        let uaddr = translate('receive.noaddress') as string;
         let uaddrKind = '';
         //let receivers = '';
         if (uaddrs.length > 0) {
@@ -254,7 +254,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ setUaAddress, toggleMe
         );
       }
       case 'zaddr': {
-        let zaddr = translate('legacy.noaddress');
+        let zaddr = translate('legacy.noaddress') as string;
         let zaddrKind = '';
         if (zaddrs.length > 0) {
           zaddr = zaddrs[zindex].address;
@@ -277,7 +277,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ setUaAddress, toggleMe
         );
       }
       case 'taddr': {
-        let taddr = translate('legacy.noaddress');
+        let taddr = translate('legacy.noaddress') as string;
         let taddrKind = '';
         if (taddrs.length > 0) {
           taddr = taddrs[tindex].address;
@@ -337,7 +337,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ setUaAddress, toggleMe
     return (
       <View
         accessible={true}
-        accessibilityLabel={translate('receive.title-acc')}
+        accessibilityLabel={translate('receive.title-acc') as string}
         style={{
           display: 'flex',
           justifyContent: 'flex-start',
@@ -366,7 +366,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ setUaAddress, toggleMe
 
         <Header
           toggleMenuDrawer={toggleMenuDrawer}
-          title={translate('receive.title')}
+          title={translate('receive.title') as string}
           noBalance={true}
           noSyncingStatus={true}
         />

@@ -36,7 +36,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal }) => {
         height: '100%',
         backgroundColor: colors.background,
       }}>
-      <Header title={translate('pools.title')} noBalance={true} noSyncingStatus={true} noDrawMenu={true} />
+      <Header title={translate('pools.title') as string} noBalance={true} noSyncingStatus={true} noDrawMenu={true} />
 
       <ScrollView
         style={{ maxHeight: '85%' }}
@@ -46,10 +46,10 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal }) => {
           justifyContent: 'flex-start',
         }}>
         <View style={{ display: 'flex', margin: 20, marginBottom: 30 }}>
-          <BoldText>{translate('pools.orchard-title')}</BoldText>
+          <BoldText>{translate('pools.orchard-title') as string}</BoldText>
 
           <View style={{ display: 'flex', marginLeft: 25 }}>
-            <DetailLine label={translate('pools.orchard-balance')}>
+            <DetailLine label={translate('pools.orchard-balance') as string}>
               <ZecAmount
                 amtZec={totalBalance.orchardBal}
                 size={18}
@@ -62,7 +62,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal }) => {
                 }}
               />
             </DetailLine>
-            <DetailLine label={translate('pools.orchard-spendable-balance')}>
+            <DetailLine label={translate('pools.orchard-spendable-balance') as string}>
               <ZecAmount
                 amtZec={totalBalance.spendableOrchard}
                 size={18}
@@ -78,10 +78,10 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal }) => {
 
           <View style={{ height: 1, width: '100%', backgroundColor: 'white', marginTop: 15, marginBottom: 10 }} />
 
-          <BoldText>{translate('pools.sapling-title')}</BoldText>
+          <BoldText>{translate('pools.sapling-title') as string}</BoldText>
 
           <View style={{ display: 'flex', marginLeft: 25 }}>
-            <DetailLine label={translate('pools.sapling-balance')}>
+            <DetailLine label={translate('pools.sapling-balance') as string}>
               <ZecAmount
                 amtZec={totalBalance.privateBal}
                 size={18}
@@ -94,7 +94,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal }) => {
                 }}
               />
             </DetailLine>
-            <DetailLine label={translate('pools.sapling-spendable-balance')}>
+            <DetailLine label={translate('pools.sapling-spendable-balance') as string}>
               <ZecAmount
                 amtZec={totalBalance.spendablePrivate}
                 size={18}
@@ -110,10 +110,10 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal }) => {
 
           <View style={{ height: 1, width: '100%', backgroundColor: 'white', marginTop: 15, marginBottom: 10 }} />
 
-          <BoldText>{translate('pools.transparent-title')}</BoldText>
+          <BoldText>{translate('pools.transparent-title') as string}</BoldText>
 
           <View style={{ display: 'flex', marginLeft: 25 }}>
-            <DetailLine label={translate('pools.transparent-balance')}>
+            <DetailLine label={translate('pools.transparent-balance') as string}>
               <ZecAmount
                 amtZec={totalBalance.transparentBal}
                 size={18}
@@ -132,7 +132,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal }) => {
           alignItems: 'center',
           marginVertical: 5,
         }}>
-        <Button type="Secondary" title={translate('close')} onPress={closeModal} />
+        <Button type="Secondary" title={translate('close') as string} onPress={closeModal} />
       </View>
     </SafeAreaView>
   );

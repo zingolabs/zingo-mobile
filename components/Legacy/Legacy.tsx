@@ -27,8 +27,8 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ toggleMenuDrawer }) => {
   const { colors } = useTheme() as unknown as ThemeType;
   const [index, setIndex] = useState(0);
   const [routes] = useState([
-    { key: 'zaddr', title: translate('legacy.z-title') },
-    { key: 'taddr', title: translate('legacy.t-title') },
+    { key: 'zaddr', title: translate('legacy.z-title') as string },
+    { key: 'taddr', title: translate('legacy.t-title') as string },
   ]);
 
   const [displayAddress, setDisplayAddress] = useState('');
@@ -236,7 +236,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ toggleMenuDrawer }) => {
   ) => ReactNode = ({ route }) => {
     switch (route.key) {
       case 'zaddr': {
-        let zaddr = translate('legacy.noaddress');
+        let zaddr = translate('legacy.noaddress') as string;
         let zaddrKind = '';
         if (zaddrs.length > 0) {
           zaddr = zaddrs[zindex].address;
@@ -259,7 +259,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ toggleMenuDrawer }) => {
         );
       }
       case 'taddr': {
-        let taddr = translate('legacy.noaddress');
+        let taddr = translate('legacy.noaddress') as string;
         let taddrKind = '';
         if (taddrs.length > 0) {
           taddr = taddrs[tindex].address;
@@ -292,7 +292,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ toggleMenuDrawer }) => {
     return (
       <View
         accessible={true}
-        accessibilityLabel={translate('legacy.title-acc')}
+        accessibilityLabel={translate('legacy.title-acc') as string}
         style={{
           display: 'flex',
           justifyContent: 'flex-start',
@@ -321,7 +321,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ toggleMenuDrawer }) => {
 
         <Header
           toggleMenuDrawer={toggleMenuDrawer}
-          title={translate('legacy.title')}
+          title={translate('legacy.title') as string}
           noBalance={true}
           noSyncingStatus={true}
         />
@@ -386,7 +386,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ toggleMenuDrawer }) => {
     <View style={{ flexDirection: 'row', height: '100%' }}>
       <View
         accessible={true}
-        accessibilityLabel={translate('receive.title-acc')}
+        accessibilityLabel={translate('receive.title-acc') as string}
         style={{
           display: 'flex',
           justifyContent: 'flex-start',
@@ -415,7 +415,7 @@ const Legacy: React.FunctionComponent<LegacyProps> = ({ toggleMenuDrawer }) => {
 
         <Header
           toggleMenuDrawer={toggleMenuDrawer}
-          title={translate('legacy.title')}
+          title={translate('legacy.title') as string}
           noBalance={true}
           noSyncingStatus={true}
         />
