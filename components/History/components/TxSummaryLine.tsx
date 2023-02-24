@@ -22,6 +22,7 @@ type TxSummaryLineProps = {
   setTxDetailModalShowing: (b: boolean) => void;
 };
 const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
+  index,
   tx,
   month,
   setTxDetail,
@@ -39,7 +40,9 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
     tx.detailedTxns && tx.detailedTxns.length > 0 ? Utils.trimToSmall(tx.detailedTxns[0].address, 7) : 'Unknown';
 
   return (
-    <View style={{ display: 'flex', flexDirection: 'column' }}>
+    <View
+      testID={`transactionList.${index + 1}`} 
+      style={{ display: 'flex', flexDirection: 'column' }}>
       {month !== '' && (
         <View
           style={{
