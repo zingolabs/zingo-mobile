@@ -11,7 +11,7 @@ import FadeText from '../Components/FadeText';
 import Button from '../Components/Button';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded, ContextAppLoading } from '../../app/context';
-import { DimensionsType, InfoType, WalletSeedType } from '../../app/AppState';
+import { DimensionsType, InfoType, WalletSeedType, TranslateType } from '../../app/AppState';
 import RPCModule from '../../app/RPCModule';
 import RPC from '../../app/rpc';
 import Header from '../Header';
@@ -34,14 +34,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
   const contextLoaded = useContext(ContextAppLoaded);
   const contextLoading = useContext(ContextAppLoading);
   let walletSeed: WalletSeedType,
-    translate: (
-      key: string,
-    ) =>
-      | string
-      | string[]
-      | { value: string; text: string }[]
-      | { value: boolean; text: string }[]
-      | { [key: string]: string[] },
+    translate: (key: string) => TranslateType,
     info: InfoType,
     server: string,
     dimensions: DimensionsType;

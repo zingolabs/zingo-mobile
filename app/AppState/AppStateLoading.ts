@@ -7,6 +7,7 @@ import WalletSeedType from './types/WalletSeedType';
 import DimensionsType from './types/DimensionsType';
 import zecPriceType from './types/zecPriceType';
 import backgroundType from './types/backgroundType';
+import { TranslateType } from './types/TranslateType';
 
 export default interface AppStateLoading {
   navigation: StackScreenProps<any>['navigation'];
@@ -29,14 +30,7 @@ export default interface AppStateLoading {
   sendAll: boolean;
   background: backgroundType;
 
-  translate: (
-    key: string,
-  ) =>
-    | string
-    | string[]
-    | { value: string; text: string }[]
-    | { value: boolean; text: string }[]
-    | { [key: string]: string[] };
+  translate: (key: string) => TranslateType;
 
   // eslint-disable-next-line semi
 }

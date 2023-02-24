@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme } from '@react-navigation/native';
 import React, { useContext } from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
-import { DimensionsType } from '../../app/AppState';
+import { DimensionsType, TranslateType } from '../../app/AppState';
 import { ContextAppLoaded } from '../../app/context';
 import { ThemeType } from '../../app/types';
 import CurrencyAmount from '../Components/CurrencyAmount';
@@ -22,14 +22,7 @@ type HeaderProps = {
   noSyncingStatus?: boolean;
   noDrawMenu?: boolean;
   testID?: string;
-  translate?: (
-    key: string,
-  ) =>
-    | string
-    | string[]
-    | { value: string; text: string }[]
-    | { value: boolean; text: string }[]
-    | { [key: string]: string[] };
+  translate?: (key: string) => TranslateType;
   dimensions?: DimensionsType;
 };
 

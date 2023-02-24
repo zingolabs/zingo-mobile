@@ -43,6 +43,7 @@ import {
   AddressClass,
   zecPriceType,
   backgroundType,
+  TranslateType,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
@@ -105,14 +106,7 @@ export default function LoadedApp(props: LoadedAppProps) {
   );
   const i18n = useMemo(() => new I18n(file), [file]);
 
-  const translate: (
-    key: string,
-  ) =>
-    | string
-    | string[]
-    | { value: string; text: string }[]
-    | { value: boolean; text: string }[]
-    | { [key: string]: string[] } = (key: string) => i18n.t(key);
+  const translate: (key: string) => TranslateType = (key: string) => i18n.t(key);
 
   const setI18nConfig = useCallback(async () => {
     // fallback if no available language fits
@@ -211,14 +205,7 @@ export default function LoadedApp(props: LoadedAppProps) {
 type LoadedAppClassProps = {
   navigation: StackScreenProps<any>['navigation'];
   route: StackScreenProps<any>['route'];
-  translate: (
-    key: string,
-  ) =>
-    | string
-    | string[]
-    | { value: string; text: string }[]
-    | { value: boolean; text: string }[]
-    | { [key: string]: string[] };
+  translate: (key: string) => TranslateType;
   theme: ThemeType;
   language: 'en' | 'es';
   currency: 'USD' | '';
