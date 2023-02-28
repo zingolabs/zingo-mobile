@@ -112,6 +112,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                       "marginLeft": 5,
                     }
                   }
+                  testID="send.addressplaceholder"
                   value="UA-12345678901234567890"
                 />
               </View>
@@ -298,6 +299,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                         "minWidth": 48,
                       }
                     }
+                    testID="send.amount"
                     value="1.12345678"
                   />
                 </View>
@@ -703,6 +705,7 @@ exports[`Component Send - test Send Landscape - snapshot 1`] = `
                 "paddingRight": 20,
               }
             }
+            testID="send.button"
           >
             <View
               style={

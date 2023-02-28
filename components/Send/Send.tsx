@@ -432,6 +432,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         justifyContent: 'center',
                       }}>
                       <TextInput
+                        testID="send.addressplaceholder"
                         placeholder={translate('send.addressplaceholder')}
                         placeholderTextColor={colors.placeholder}
                         style={{
@@ -540,6 +541,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           minHeight: 48,
                         }}>
                         <TextInput
+                          testID="send.amount"
                           placeholder={`#${decimalSeparator}########`}
                           placeholderTextColor={colors.placeholder}
                           keyboardType="numeric"
@@ -691,6 +693,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       <View style={{ flexDirection: 'row' }}>
                         <FadeText style={{ marginTop: 3 }}>{translate('send.includeua')}</FadeText>
                         <CheckBox
+                          testID="send.checkboxUA"
                           disabled={false}
                           value={ta.includeUAMemo}
                           onValueChange={(value: boolean) => updateToField(null, null, null, null, value)}
@@ -746,6 +749,7 @@ const Send: React.FunctionComponent<SendProps> = ({
               marginVertical: 5,
             }}>
             <Button
+              testID="send.button"
               accessible={true}
               accessibilityLabel={'title ' + translate('send.button')}
               type="Primary"
