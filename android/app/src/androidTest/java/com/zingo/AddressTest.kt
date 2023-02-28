@@ -1,14 +1,27 @@
 package com.zingo
 
 import android.content.Context
+import android.util.Log
 import android.util.Base64
+import androidx.work.PeriodicWorkRequest
+import com.facebook.react.bridge.ReactApplicationContext
+import com.facebook.react.bridge.ReactContextBaseJavaModule
+import com.facebook.react.bridge.ReactMethod
+import com.facebook.react.bridge.Promise
+
+//import android.util.Log
+import java.io.File
 import java.io.InputStream
-import androidx.test.filters.SmallTest
-import com.google.common.truth.Truth.assertThat
-import org.junit.Test
+import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
-@SmallTest
+//import test dependencies
+// import androidx.test.filters.SmallTest
+import com.google.common.truth.Truth.assertThat
+import org.junit.Test
+
+// @SmallTest
+// class RPCModule internal constructor(private val reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
 class RPCModule {
     private external fun execute(cmd: String, args: String): String
     private external fun initfromseed(serveruri: String, seed: String, birthday: String, saplingOutputb64: String, saplingSpendb64: String, datadir: String): String
@@ -19,7 +32,7 @@ class RPCModule {
         val server = "https://mainnet.lightwalletd.com:9067"
         val seed = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art"
         val birthday = "1994000"
-        val datadir = "/home/oscar/temp/"
+        val datadir = ""
         
         val saplingSpendFile: InputStream = MainApplication.getAppContext()?.resources?.openRawResource(R.raw.saplingspend)!!
         var saplingSpend = saplingSpendFile.readBytes()
