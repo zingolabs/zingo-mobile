@@ -329,7 +329,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ setUaAddress, toggleMe
     </View>
   );
 
-  const renderTabBarPortrait: (
+  const renderTabBarPage: (
     props: SceneRendererProps & {
       navigationState: NavigationState<Route>;
     },
@@ -403,18 +403,18 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ setUaAddress, toggleMe
     );
   };
 
-  const returnPortrait = (
+  const returnPage = (
     <TabView
       navigationState={{ index, routes }}
       renderScene={renderScene}
-      renderTabBar={renderTabBarPortrait}
+      renderTabBar={renderTabBarPage}
       onIndexChange={setIndex}
     />
   );
 
   //console.log('render receive', index, routes);
 
-  return returnPortrait;
+  return returnPage;
 };
 
 export default Receive;

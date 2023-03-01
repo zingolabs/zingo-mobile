@@ -31,7 +31,7 @@ jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
 // test suite
 describe('Component Receive - test', () => {
   //snapshot test
-  test('Receive Portrait - snapshot', () => {
+  test('Receive - snapshot', () => {
     const state = defaultAppStateLoaded;
     state.uaAddress = 'UA-12345678901234567890';
     state.addresses = [
@@ -58,13 +58,6 @@ describe('Component Receive - test', () => {
       },
     ];
     state.translate = () => 'text translated';
-    state.dimensions = {
-      width: 200,
-      height: 400,
-      orientation: 'portrait',
-      deviceType: 'tablet',
-      scale: 1.5,
-    };
     state.info.currencyName = 'ZEC';
     state.totalBalance.total = 1.12345678;
     const onFunction = jest.fn();
