@@ -38,7 +38,7 @@ class RPCModule : Application() {
         val server = "https://mainnet.lightwalletd.com:9067"
         val seed = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art"
         val birthday = "1994000"
-        val datadir = getApplicationContext().getFilesDir().getPath()
+        val datadir = MainApplication.getAppContext()!!.getFilesDir().getPath()
         
         val saplingSpendFile: InputStream = MainApplication.getAppContext()?.resources?.openRawResource(R.raw.saplingspend)!!
         var saplingSpend = saplingSpendFile.readBytes()
