@@ -1,43 +1,21 @@
 package com.zingo
 
-import android.app.Application
-import android.content.Context
-import android.content.Intent
-import android.util.Log
 import android.util.Base64
-import androidx.work.PeriodicWorkRequest
-import com.facebook.react.bridge.ReactApplicationContext
-import com.facebook.react.bridge.ReactContextBaseJavaModule
-import com.facebook.react.bridge.ReactMethod
-import com.facebook.react.bridge.Promise
-import com.facebook.react.*
-import com.facebook.react.bridge.*
-import com.facebook.soloader.SoLoader
-import java.lang.reflect.InvocationTargetException
-
-//import android.util.Log
-import java.io.File
 import java.io.InputStream
-import java.util.concurrent.TimeUnit
-import kotlin.concurrent.thread
 
-//import test dependencies
-// import androidx.test.filters.SmallTest
+//test dependencies
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
-// @SmallTest
-// class RPCModule internal constructor(private val reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
-class RPCModule : Application() {
+class RPCModule {
     private external fun execute(cmd: String, args: String): String
     private external fun initfromseed(serveruri: String, seed: String, birthday: String, saplingOutputb64: String, saplingSpendb64: String, datadir: String): String
 
     @Test
-    fun callAddress() {
-    
+    fun callAddress() {  
         val server = "https://mainnet.lightwalletd.com:9067"
         val seed = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art"
-        val birthday = "1994000"
+        val birthday = "1"
         val datadir = MainApplication.getAppContext()!!.getFilesDir().getPath()
         
         val saplingSpendFile: InputStream = MainApplication.getAppContext()?.resources?.openRawResource(R.raw.saplingspend)!!
@@ -107,14 +85,10 @@ class RPCModule : Application() {
 
         saplingOutput = ByteArray(0)
 
-        // initlogging()
-
         val rseed = initfromseed(server, seed, birthday,
             saplingOutputEncoded.toString(),
             saplingSpendEncoded.toString(),
             datadir)
-            // reactContext.applicationContext.filesDir.absolutePath)
-        // Log.w("MAIN", seed)
     
         val resp = execute("addresses", "")
         assertThat(resp).isEqualTo(1)
