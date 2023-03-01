@@ -350,7 +350,7 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   //console.log('render send', 'w', dimensions.width, 'h', dimensions.height);
 
-  const returnPortrait = (
+  const returnPage = (
     <View
       accessible={true}
       accessibilityLabel={translate('send.title-acc') as string}
@@ -784,7 +784,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     </View>
   );
 
-  return returnPortrait;
+  return returnPage;
 };
 
 export default Send;

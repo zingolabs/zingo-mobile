@@ -65,7 +65,7 @@ jest.mock('@react-navigation/native', () => ({
 // test suite
 describe('Component Send - test', () => {
   //snapshot test
-  test('Send Landscape - snapshot', () => {
+  test('Send - snapshot', () => {
     const state = defaultAppStateLoaded;
     state.transactions = [
       {
@@ -116,13 +116,6 @@ describe('Component Send - test', () => {
       },
     ];
     state.translate = () => 'text translated';
-    state.dimensions = {
-      width: 200,
-      height: 400,
-      orientation: 'portrait',
-      deviceType: 'tablet',
-      scale: 2.5,
-    };
     state.currency = 'USD';
     state.info.currencyName = 'ZEC';
     state.zecPrice.zecPrice = 33.33;
