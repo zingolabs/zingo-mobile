@@ -47,7 +47,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
 
   //console.log('render transaction');
 
-  const returnPortrait = (
+  const returnPage = (
     <View
       accessible={true}
       accessibilityLabel={translate('history.title-acc')}
@@ -130,7 +130,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
     </View>
   );
 
-  return returnPortrait;
+  return returnPage;
 };
 
 export default History;

@@ -12,7 +12,7 @@ import FadeText from '../Components/FadeText';
 import Button from '../Components/Button';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded, ContextAppLoading } from '../../app/context';
-import { DimensionsType, InfoType, WalletSeedType } from '../../app/AppState';
+import { InfoType, WalletSeedType } from '../../app/AppState';
 import RPCModule from '../../app/RPCModule';
 import RPC from '../../app/rpc';
 import Header from '../Header';
@@ -37,20 +37,17 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
   let walletSeed: WalletSeedType,
     translate: (key: string, config?: TranslateOptions) => string,
     info: InfoType,
-    server: string,
-    dimensions: DimensionsType;
+    server: string;
   if (action === 'new' || action === 'restore') {
     walletSeed = contextLoading.walletSeed;
     translate = contextLoading.translate;
     info = contextLoading.info;
     server = contextLoading.server;
-    dimensions = contextLoading.dimensions;
   } else {
     walletSeed = contextLoaded.walletSeed;
     translate = contextLoaded.translate;
     info = contextLoaded.info;
     server = contextLoaded.server;
-    dimensions = contextLoaded.dimensions;
   }
 
   const { colors } = useTheme() as unknown as ThemeType;
@@ -153,7 +150,6 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
             noSyncingStatus={true}
             noDrawMenu={true}
             translate={translate}
-            dimensions={dimensions}
           />
         </View>
       </Animated.View>

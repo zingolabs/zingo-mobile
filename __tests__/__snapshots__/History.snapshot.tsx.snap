@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Component Transactions - test Transactions Portrait - snapshot 1`] = `
+exports[`Component Transactions - test Transactions - snapshot 1`] = `
 <View
   accessibilityLabel="text translated"
   accessible={true}

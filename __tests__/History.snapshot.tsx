@@ -56,7 +56,7 @@ jest.mock('react-native-gesture-handler', () => {
 // test suite
 describe('Component Transactions - test', () => {
   //snapshot test
-  test('Transactions Portrait - snapshot', () => {
+  test('Transactions - snapshot', () => {
     const state = defaultAppStateLoaded;
     state.transactions = [
       {
@@ -107,13 +107,6 @@ describe('Component Transactions - test', () => {
       },
     ];
     state.translate = () => 'text translated';
-    state.dimensions = {
-      width: 200,
-      height: 400,
-      orientation: 'portrait',
-      deviceType: 'tablet',
-      scale: 1.5,
-    };
     state.info.currencyName = 'ZEC';
     state.totalBalance.total = 1.12345678;
     const onFunction = jest.fn();
