@@ -1,6 +1,8 @@
 package com.zingo
 
+import android.app.Application
 import android.content.Context
+import android.content.Intent
 import android.util.Log
 import android.util.Base64
 import androidx.work.PeriodicWorkRequest
@@ -8,6 +10,10 @@ import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.Promise
+import com.facebook.react.*
+import com.facebook.react.bridge.*
+import com.facebook.soloader.SoLoader
+import java.lang.reflect.InvocationTargetException
 
 //import android.util.Log
 import java.io.File
@@ -22,7 +28,7 @@ import org.junit.Test
 
 // @SmallTest
 // class RPCModule internal constructor(private val reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
-class RPCModule {
+class RPCModule : Application() {
     private external fun execute(cmd: String, args: String): String
     private external fun initfromseed(serveruri: String, seed: String, birthday: String, saplingOutputb64: String, saplingSpendb64: String, datadir: String): String
 
@@ -32,7 +38,7 @@ class RPCModule {
         val server = "https://mainnet.lightwalletd.com:9067"
         val seed = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art"
         val birthday = "1994000"
-        val datadir = ""
+        val datadir = getApplicationContext().getFilesDir().getPath()
         
         val saplingSpendFile: InputStream = MainApplication.getAppContext()?.resources?.openRawResource(R.raw.saplingspend)!!
         var saplingSpend = saplingSpendFile.readBytes()
