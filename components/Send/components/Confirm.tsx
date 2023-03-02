@@ -86,7 +86,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSen
                   currency={currency}
                 />
               </View>
-              <FadeText style={{ marginTop: 10 }}>{translate('send.confirm-memo')}</FadeText>
+              <FadeText style={{ marginTop: 10 }}>{translate('send.confirm-memo') as string}</FadeText>
               <RegText testID="send.confirm-memo">{`${to.memo || ''}${to.memo ? '\n' : ''}${
                 to.includeUAMemo ? 'Reply to: \n' + uaAddress : ''
               }`}</RegText>
