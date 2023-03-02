@@ -19,7 +19,7 @@ import { faList, faUpload, faDownload, faCog, faAddressBook } from '@fortawesome
 import { useTheme } from '@react-navigation/native';
 import SideMenu from 'react-native-side-menu-updated';
 import Toast from 'react-native-simple-toast';
-import { I18n, TranslateOptions } from 'i18n-js';
+import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
 import { isEqual } from 'lodash';
 import { StackScreenProps } from '@react-navigation/stack';
@@ -43,6 +43,7 @@ import {
   AddressClass,
   zecPriceType,
   backgroundType,
+  TranslateType,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
@@ -105,7 +106,7 @@ export default function LoadedApp(props: LoadedAppProps) {
   );
   const i18n = useMemo(() => new I18n(file), [file]);
 
-  const translate = (key: string, config?: TranslateOptions) => i18n.t(key, config);
+  const translate: (key: string) => TranslateType = (key: string) => i18n.t(key);
 
   const setI18nConfig = useCallback(async () => {
     // fallback if no available language fits
@@ -204,7 +205,7 @@ export default function LoadedApp(props: LoadedAppProps) {
 type LoadedAppClassProps = {
   navigation: StackScreenProps<any>['navigation'];
   route: StackScreenProps<any>['route'];
-  translate: (key: string, config?: TranslateOptions) => string;
+  translate: (key: string) => TranslateType;
   theme: ThemeType;
   language: 'en' | 'es';
   currency: 'USD' | '';
@@ -318,7 +319,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
           screen: this.state.translate('loadedapp.send-menu'),
           initial: false,
         });
-        Toast.show(this.state.translate('loadedapp.zcash-url'), Toast.LONG);
+        Toast.show(this.state.translate('loadedapp.zcash-url') as string, Toast.LONG);
       }
     });
   };
@@ -663,7 +664,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       this.setState({ seedChangeModalVisible: true });
     } else if (item === 'Restore Wallet Backup') {
       if (info.currencyName && info.currencyName !== 'ZEC') {
-        Toast.show(this.props.translate('loadedapp.restoremainnet-error'), Toast.LONG);
+        Toast.show(this.props.translate('loadedapp.restoremainnet-error') as string, Toast.LONG);
         return;
       }
       if (info.currencyName) {
@@ -777,13 +778,13 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     const { info } = this.state;
     const resultStr =
       info.currencyName && info.currencyName !== 'ZEC'
-        ? await this.rpc.changeWalletNoBackup()
-        : await this.rpc.changeWallet();
+        ? ((await this.rpc.changeWalletNoBackup()) as string)
+        : ((await this.rpc.changeWallet()) as string);
 
     //console.log("jc change", resultStr);
     if (resultStr.toLowerCase().startsWith('error')) {
       //console.log(`Error change wallet. ${resultStr}`);
-      Alert.alert(this.props.translate('loadedapp.changingwallet-label'), resultStr);
+      Alert.alert(this.props.translate('loadedapp.changingwallet-label') as string, resultStr);
       return;
     }
 
@@ -793,12 +794,12 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   };
 
   onClickOKRestoreBackup = async () => {
-    const resultStr = await this.rpc.restoreBackup();
+    const resultStr = (await this.rpc.restoreBackup()) as string;
 
     //console.log("jc restore", resultStr);
     if (resultStr.toLowerCase().startsWith('error')) {
       //console.log(`Error restore backup wallet. ${resultStr}`);
-      Alert.alert(this.props.translate('loadedapp.restoringwallet-label'), resultStr);
+      Alert.alert(this.props.translate('loadedapp.restoringwallet-label') as string, resultStr);
       return;
     }
 
@@ -828,12 +829,12 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
     const resultStr2 =
       info.currencyName && info.currencyName !== 'ZEC'
-        ? await this.rpc.changeWalletNoBackup()
-        : await this.rpc.changeWallet();
+        ? ((await this.rpc.changeWalletNoBackup()) as string)
+        : ((await this.rpc.changeWallet()) as string);
     //console.log("jc change", resultStr);
     if (resultStr2.toLowerCase().startsWith('error')) {
       //console.log(`Error change wallet. ${resultStr}`);
-      Alert.alert(this.props.translate('loadedapp.changingwallet-label'), resultStr2);
+      Alert.alert(this.props.translate('loadedapp.changingwallet-label') as string, resultStr2);
       //return;
     }
 
@@ -921,7 +922,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
             <Suspense
               fallback={
                 <View>
-                  <Text>{translate('loading')}</Text>
+                  <Text>{translate('loading') as string}</Text>
                 </View>
               }>
               <About closeModal={() => this.setState({ aboutModalVisible: false })} />
@@ -936,7 +937,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
             <Suspense
               fallback={
                 <View>
-                  <Text>{translate('loading')}</Text>
+                  <Text>{translate('loading') as string}</Text>
                 </View>
               }>
               <Info closeModal={() => this.setState({ infoModalVisible: false })} setZecPrice={this.setZecPrice} />
@@ -951,7 +952,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
             <Suspense
               fallback={
                 <View>
-                  <Text>{translate('loading')}</Text>
+                  <Text>{translate('loading') as string}</Text>
                 </View>
               }>
               <SyncReport closeModal={() => this.setState({ syncReportModalVisible: false })} />
@@ -966,7 +967,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
             <Suspense
               fallback={
                 <View>
-                  <Text>{translate('loading')}</Text>
+                  <Text>{translate('loading') as string}</Text>
                 </View>
               }>
               <Pools closeModal={() => this.setState({ poolsModalVisible: false })} />
@@ -981,7 +982,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
             <Suspense
               fallback={
                 <View>
-                  <Text>{translate('loading')}</Text>
+                  <Text>{translate('loading') as string}</Text>
                 </View>
               }>
               <Rescan closeModal={() => this.setState({ rescanModalVisible: false })} startRescan={this.startRescan} />
@@ -996,7 +997,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
             <Suspense
               fallback={
                 <View>
-                  <Text>{translate('loading')}</Text>
+                  <Text>{translate('loading') as string}</Text>
                 </View>
               }>
               <Settings
@@ -1018,7 +1019,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
             <Suspense
               fallback={
                 <View>
-                  <Text>{translate('loading')}</Text>
+                  <Text>{translate('loading') as string}</Text>
                 </View>
               }>
               <Seed
@@ -1037,7 +1038,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
             <Suspense
               fallback={
                 <View>
-                  <Text>{translate('loading')}</Text>
+                  <Text>{translate('loading') as string}</Text>
                 </View>
               }>
               <Seed
@@ -1056,7 +1057,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
             <Suspense
               fallback={
                 <View>
-                  <Text>{translate('loading')}</Text>
+                  <Text>{translate('loading') as string}</Text>
                 </View>
               }>
               <Seed
@@ -1075,7 +1076,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
             <Suspense
               fallback={
                 <View>
-                  <Text>{translate('loading')}</Text>
+                  <Text>{translate('loading') as string}</Text>
                 </View>
               }>
               <Seed
@@ -1094,7 +1095,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
             <Suspense
               fallback={
                 <View>
-                  <Text>{translate('loading')}</Text>
+                  <Text>{translate('loading') as string}</Text>
                 </View>
               }>
               <ComputingTxContent />
@@ -1102,7 +1103,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
           </Modal>
 
           <Tab.Navigator
-            initialRouteName={translate('loadedapp.wallet-menu')}
+            initialRouteName={translate('loadedapp.wallet-menu') as string}
             screenOptions={({ route }) => ({
               tabBarIcon: ({ focused }) => fnTabBarIcon(route, focused),
               tabBarActiveTintColor: colors.background,
@@ -1116,13 +1117,13 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
               },
               headerShown: false,
             })}>
-            <Tab.Screen name={translate('loadedapp.wallet-menu')}>
+            <Tab.Screen name={translate('loadedapp.wallet-menu') as string}>
               {() => (
                 <>
                   <Suspense
                     fallback={
                       <View>
-                        <Text>{translate('loading')}</Text>
+                        <Text>{translate('loading') as string}</Text>
                       </View>
                     }>
                     <History
@@ -1136,13 +1137,13 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                 </>
               )}
             </Tab.Screen>
-            <Tab.Screen name={translate('loadedapp.send-menu')}>
+            <Tab.Screen name={translate('loadedapp.send-menu') as string}>
               {() => (
                 <>
                   <Suspense
                     fallback={
                       <View>
-                        <Text>{translate('loading')}</Text>
+                        <Text>{translate('loading') as string}</Text>
                       </View>
                     }>
                     <Send
@@ -1160,13 +1161,13 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                 </>
               )}
             </Tab.Screen>
-            <Tab.Screen name={translate('loadedapp.uas-menu')}>
+            <Tab.Screen name={translate('loadedapp.uas-menu') as string}>
               {() => (
                 <>
                   <Suspense
                     fallback={
                       <View>
-                        <Text>{translate('loading')}</Text>
+                        <Text>{translate('loading') as string}</Text>
                       </View>
                     }>
                     <Receive setUaAddress={this.setUaAddress} toggleMenuDrawer={this.toggleMenuDrawer} />

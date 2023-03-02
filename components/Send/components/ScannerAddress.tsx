@@ -90,7 +90,7 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateTo
               padding: 20,
             }}>
             <View style={{ width: width, alignItems: 'center' }}>
-              <RegText>{translate('scanner.scanaddress')}</RegText>
+              <RegText>{translate('scanner.scanaddress') as string}</RegText>
             </View>
           </View>
         }
@@ -101,7 +101,7 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateTo
               padding: 20,
             }}>
             <View style={{ width: width, alignItems: 'center' }}>
-              <Button type="Secondary" title={translate('cancel')} onPress={doCancel} />
+              <Button type="Secondary" title={translate('cancel') as string} onPress={doCancel} />
             </View>
           </View>
         }

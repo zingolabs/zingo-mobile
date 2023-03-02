@@ -50,7 +50,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const returnPortrait = (
     <View
       accessible={true}
-      accessibilityLabel={translate('history.title-acc')}
+      accessibilityLabel={translate('history.title-acc') as string}
       style={{
         display: 'flex',
         justifyContent: 'flex-start',
@@ -71,18 +71,18 @@ const History: React.FunctionComponent<HistoryProps> = ({
         syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
         toggleMenuDrawer={toggleMenuDrawer}
         setZecPrice={setZecPrice}
-        title={translate('history.title')}
+        title={translate('history.title') as string}
       />
 
       <ScrollView
         accessible={true}
-        accessibilityLabel={translate('history.list-acc')}
+        accessibilityLabel={translate('history.list-acc') as string}
         refreshControl={
           <RefreshControl
             refreshing={false}
             onRefresh={doRefresh}
             tintColor={colors.text}
-            title={translate('history.refreshing')}
+            title={translate('history.refreshing') as string}
           />
         }
         style={{ flexGrow: 1, marginTop: 10, width: '100%', height: '100%' }}>
@@ -117,13 +117,13 @@ const History: React.FunctionComponent<HistoryProps> = ({
               justifyContent: 'flex-start',
               marginBottom: 30,
             }}>
-            <FadeText style={{ color: colors.primary }}>{translate('history.end')}</FadeText>
+            <FadeText style={{ color: colors.primary }}>{translate('history.end') as string}</FadeText>
           </View>
         )}
 
         {loadMoreButton && (
           <View style={{ flexDirection: 'row', justifyContent: 'center', margin: 30 }}>
-            <Button type="Secondary" title={translate('history.loadmore')} onPress={loadMoreClicked} />
+            <Button type="Secondary" title={translate('history.loadmore') as string} onPress={loadMoreClicked} />
           </View>
         )}
       </ScrollView>

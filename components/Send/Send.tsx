@@ -315,7 +315,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         clearToAddr();
 
         if (navigation) {
-          navigation.navigate(translate('loadedapp.wallet-menu'));
+          navigation.navigate(translate('loadedapp.wallet-menu') as string);
           setTimeout(() => {
             Toast.show(`${translate('send.Broadcast')} ${txid}`, Toast.LONG);
           }, 1000);
@@ -326,7 +326,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         setTimeout(() => {
           console.log('sendtx error', error);
           Alert.alert(
-            translate('send.sending-error'),
+            translate('send.sending-error') as string,
             `${error}`,
             [{ text: 'OK', onPress: () => setComputingModalVisible(false) }],
             {
@@ -353,7 +353,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   const returnPortrait = (
     <View
       accessible={true}
-      accessibilityLabel={translate('send.title-acc')}
+      accessibilityLabel={translate('send.title-acc') as string}
       style={{
         display: 'flex',
         justifyContent: 'flex-start',
@@ -400,7 +400,7 @@ const Send: React.FunctionComponent<SendProps> = ({
             syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
             toggleMenuDrawer={toggleMenuDrawer}
             setZecPrice={setZecPrice}
-            title={translate('send.title')}
+            title={translate('send.title') as string}
           />
         </View>
       </Animated.View>
@@ -411,9 +411,9 @@ const Send: React.FunctionComponent<SendProps> = ({
             return (
               <View key={i} style={{ display: 'flex', padding: 10, marginTop: 10 }}>
                 <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                  <RegText>{translate('send.toaddress')}</RegText>
+                  <RegText>{translate('send.toaddress') as string}</RegText>
                   {validAddress === 1 && <FontAwesomeIcon icon={faCheck} color={colors.primary} />}
-                  {validAddress === -1 && <ErrorText>{translate('send.invalidaddress')}</ErrorText>}
+                  {validAddress === -1 && <ErrorText>{translate('send.invalidaddress') as string}</ErrorText>}
                 </View>
                 <View
                   style={{
@@ -426,7 +426,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                   <View style={{ flexDirection: 'row' }}>
                     <View
                       accessible={true}
-                      accessibilityLabel={translate('send.address-acc')}
+                      accessibilityLabel={translate('send.address-acc') as string}
                       style={{
                         flex: 1,
                         justifyContent: 'center',
@@ -452,7 +452,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       }}>
                       <TouchableOpacity
                         accessible={true}
-                        accessibilityLabel={translate('send.scan-acc')}
+                        accessibilityLabel={translate('send.scan-acc') as string}
                         onPress={() => {
                           setQrcodeModalVisible(true);
                         }}>
@@ -475,7 +475,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         minWidth: 48,
                         minHeight: 48,
                       }}>
-                      <FadeText>{translate('send.amount')}</FadeText>
+                      <FadeText>{translate('send.amount') as string}</FadeText>
                     </View>
                     {sendAll && (
                       <TouchableOpacity
@@ -499,12 +499,12 @@ const Send: React.FunctionComponent<SendProps> = ({
                             minWidth: 48,
                             minHeight: 48,
                           }}>
-                          <RegText color={colors.primary}>{translate('send.sendall')}</RegText>
+                          <RegText color={colors.primary}>{translate('send.sendall') as string}</RegText>
                         </View>
                       </TouchableOpacity>
                     )}
                   </View>
-                  {validAmount === -1 && <ErrorText>{translate('send.invalidamount')}</ErrorText>}
+                  {validAmount === -1 && <ErrorText>{translate('send.invalidamount') as string}</ErrorText>}
                 </View>
 
                 <View
@@ -529,7 +529,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       <RegText style={{ marginTop: 20, marginRight: 5, fontSize: 20 }}>{'\u1647'}</RegText>
                       <View
                         accessible={true}
-                        accessibilityLabel={translate('send.zec-acc')}
+                        accessibilityLabel={translate('send.zec-acc') as string}
                         style={{
                           flexGrow: 1,
                           borderWidth: 1,
@@ -574,7 +574,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           alignItems: 'center',
                           marginTop: 10,
                         }}>
-                        <RegText style={{ fontSize: 14 }}>{translate('send.spendable')}</RegText>
+                        <RegText style={{ fontSize: 14 }}>{translate('send.spendable') as string}</RegText>
                         <ZecAmount
                           currencyName={info.currencyName ? info.currencyName : ''}
                           color={stillConfirming ? 'red' : colors.money}
@@ -594,7 +594,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                               borderRadius: 10,
                             }}>
                             <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
-                            <FadeText>{translate('send.somefunds')}</FadeText>
+                            <FadeText>{translate('send.somefunds') as string}</FadeText>
                           </View>
                         </TouchableOpacity>
                       )}
@@ -607,7 +607,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         width: '35%',
                         marginTop: 5,
                       }}>
-                      <PriceFetcher setZecPrice={setZecPrice} textBefore={translate('send.nofetchprice')} />
+                      <PriceFetcher setZecPrice={setZecPrice} textBefore={translate('send.nofetchprice') as string} />
                     </View>
                   )}
 
@@ -628,7 +628,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         <RegText style={{ marginTop: 15, marginRight: 5 }}>$</RegText>
                         <View
                           accessible={true}
-                          accessibilityLabel={translate('send.usd-acc')}
+                          accessibilityLabel={translate('send.usd-acc') as string}
                           style={{
                             flexGrow: 1,
                             borderWidth: 1,
@@ -709,7 +709,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                     <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start' }}>
                       <View
                         accessible={true}
-                        accessibilityLabel={translate('send.memo-acc')}
+                        accessibilityLabel={translate('send.memo-acc') as string}
                         style={{
                           flexGrow: 1,
                           borderWidth: 1,
@@ -757,8 +757,8 @@ const Send: React.FunctionComponent<SendProps> = ({
                 validAmount === 1 &&
                 sendPageState.toaddr.amount &&
                 Number(sendPageState.toaddr.amount) === Utils.parseLocaleFloat(getMaxAmount().toFixed(8))
-                  ? translate('send.button-all')
-                  : translate('send.button')
+                  ? (translate('send.button-all') as string)
+                  : (translate('send.button') as string)
               }
               disabled={!sendButtonEnabled}
               onPress={() => {
@@ -767,7 +767,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                   sendPageState.toaddr.amount &&
                   Number(sendPageState.toaddr.amount) === Utils.parseLocaleFloat(getMaxAmount().toFixed(8))
                 ) {
-                  Toast.show(`${translate('send.sendall-message')}`, Toast.LONG);
+                  Toast.show(`${translate('send.sendall-message') as string}`, Toast.LONG);
                 }
                 setConfirmModalVisible(true);
               }}
@@ -775,7 +775,7 @@ const Send: React.FunctionComponent<SendProps> = ({
             <Button
               type="Secondary"
               style={{ marginLeft: 10 }}
-              title={translate('send.clear')}
+              title={translate('send.clear') as string}
               onPress={() => clearToAddr()}
             />
           </View>
