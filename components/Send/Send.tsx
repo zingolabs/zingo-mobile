@@ -60,7 +60,6 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [validAddress, setValidAddress] = useState(0); // 1 - OK, 0 - Empty, -1 - KO
   const [validAmount, setValidAmount] = useState(0); // 1 - OK, 0 - Empty, -1 - KO
   const [sendButtonEnabled, setSendButtonEnabled] = useState(false);
-  const [includeUAMemo, setIncludeUAMemo] = useState(false);
   const isFocused = useIsFocused();
 
   const slideAnim = useRef(new Animated.Value(0)).current;
@@ -210,6 +209,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     amount: string | null,
     amountCurrency: string | null,
     memo: string | null,
+    includeUAMemo: boolean | null,
   ) => {
     // Create the new state object
     const newState = new SendPageStateClass(new ToAddrClass(0));
@@ -280,6 +280,10 @@ const Send: React.FunctionComponent<SendProps> = ({
 
     if (memo !== null) {
       toAddr.memo = memo;
+    }
+
+    if (includeUAMemo !== null) {
+      toAddr.includeUAMemo = includeUAMemo;
     }
 
     newState.toaddr = newToAddr;
@@ -437,7 +441,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           marginLeft: 5,
                         }}
                         value={ta.to}
-                        onChangeText={(text: string) => updateToField(text, null, null, null)}
+                        onChangeText={(text: string) => updateToField(text, null, null, null, null)}
                         editable={true}
                       />
                     </View>
@@ -475,7 +479,13 @@ const Send: React.FunctionComponent<SendProps> = ({
                     {sendAll && (
                       <TouchableOpacity
                         onPress={() =>
-                          updateToField(null, Utils.parseLocaleFloat(getMaxAmount().toFixed(8)).toString(), null, null)
+                          updateToField(
+                            null,
+                            Utils.parseLocaleFloat(getMaxAmount().toFixed(8)).toString(),
+                            null,
+                            null,
+                            null,
+                          )
                         }>
                         <View
                           style={{
@@ -542,9 +552,9 @@ const Send: React.FunctionComponent<SendProps> = ({
                             marginLeft: 5,
                           }}
                           value={ta.amount.toString()}
-                          onChangeText={(text: string) => updateToField(null, text.substring(0, 20), null, null)}
+                          onChangeText={(text: string) => updateToField(null, text.substring(0, 20), null, null, null)}
                           onEndEditing={(e: any) =>
-                            updateToField(null, e.nativeEvent.text.substring(0, 20), null, null)
+                            updateToField(null, e.nativeEvent.text.substring(0, 20), null, null, null)
                           }
                           editable={true}
                           maxLength={20}
@@ -640,9 +650,11 @@ const Send: React.FunctionComponent<SendProps> = ({
                               marginLeft: 5,
                             }}
                             value={ta.amountCurrency.toString()}
-                            onChangeText={(text: string) => updateToField(null, null, text.substring(0, 15), null)}
+                            onChangeText={(text: string) =>
+                              updateToField(null, null, text.substring(0, 15), null, null)
+                            }
                             onEndEditing={(e: any) =>
-                              updateToField(null, null, e.nativeEvent.text.substring(0, 15), null)
+                              updateToField(null, null, e.nativeEvent.text.substring(0, 15), null, null)
                             }
                             editable={true}
                             maxLength={15}
@@ -673,16 +685,23 @@ const Send: React.FunctionComponent<SendProps> = ({
                       style={{
                         flexDirection: 'row',
                         justifyContent: 'space-between',
-                        borderColor: 'red',
-                        borderWidth: 1,
+                        alignItems: 'center',
                       }}>
-                      <FadeText style={{ marginTop: 10 }}>{translate('send.memo') as string}</FadeText>
-                      <CheckBox
-                        disabled={false}
-                        value={includeUAMemo}
-                        onValueChange={setIncludeUAMemo}
-                        style={{ borderColor: 'red', borderWidth: 1 }}
-                      />
+                      <FadeText style={{ marginTop: 10 }}>{translate('send.memo')}</FadeText>
+                      <View style={{ flexDirection: 'row' }}>
+                        <FadeText style={{ marginTop: 3 }}>{translate('send.includeua')}</FadeText>
+                        <CheckBox
+                          disabled={false}
+                          value={ta.includeUAMemo}
+                          onValueChange={(value: boolean) => updateToField(null, null, null, null, value)}
+                          tintColors={{ true: colors.primary, false: colors.text }}
+                          tintColor={colors.text}
+                          onCheckColor={colors.card}
+                          onFillColor={colors.primary}
+                          boxType={'square'}
+                          style={{}}
+                        />
+                      </View>
                     </View>
                     <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start' }}>
                       <View
@@ -708,7 +727,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                             marginLeft: 5,
                           }}
                           value={ta.memo}
-                          onChangeText={(text: string) => updateToField(null, null, null, text)}
+                          onChangeText={(text: string) => updateToField(null, null, null, text, null)}
                           editable={true}
                         />
                       </View>

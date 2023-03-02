@@ -4,6 +4,7 @@ export default class ToAddrClass {
   amount: string;
   amountCurrency: string;
   memo: string;
+  includeUAMemo: boolean;
 
   constructor(id: number) {
     this.id = id;
@@ -11,5 +12,6 @@ export default class ToAddrClass {
     this.amount = '';
     this.amountCurrency = '';
     this.memo = '';
+    this.includeUAMemo = false;
   }
 }

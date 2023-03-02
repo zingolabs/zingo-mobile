@@ -514,9 +514,9 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   };
 
   getSendManyJSON = (): Array<SendJsonToTypeType> => {
-    const { sendPageState } = this.state;
+    const { sendPageState, uaAddress } = this.state;
     const json: Array<SendJsonToTypeType> = [sendPageState.toaddr].flatMap((to: ToAddrClass) => {
-      const memo = to.memo || '';
+      const memo = `${to.memo || ''}${to.includeUAMemo ? '\nReply to: \n' + uaAddress : ''}`;
       const amount = parseInt((Number(to.amount) * 10 ** 8).toFixed(0), 10);
 
       if (memo === '') {
