@@ -7,6 +7,7 @@ import { useTheme, useIsFocused } from '@react-navigation/native';
 import Toast from 'react-native-simple-toast';
 import { getNumberFormatSettings } from 'react-native-localize';
 import Animated, { EasingNode } from 'react-native-reanimated';
+import CheckBox from '@react-native-community/checkbox';
 
 import FadeText from '../Components/FadeText';
 import ErrorText from '../Components/ErrorText';
@@ -59,6 +60,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [validAddress, setValidAddress] = useState(0); // 1 - OK, 0 - Empty, -1 - KO
   const [validAmount, setValidAmount] = useState(0); // 1 - OK, 0 - Empty, -1 - KO
   const [sendButtonEnabled, setSendButtonEnabled] = useState(false);
+  const [includeUAMemo, setIncludeUAMemo] = useState(false);
   const isFocused = useIsFocused();
 
   const slideAnim = useRef(new Animated.Value(0)).current;
@@ -667,7 +669,21 @@ const Send: React.FunctionComponent<SendProps> = ({
 
                 {memoEnabled === true && (
                   <>
-                    <FadeText style={{ marginTop: 10 }}>{translate('send.memo') as string}</FadeText>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        borderColor: 'red',
+                        borderWidth: 1,
+                      }}>
+                      <FadeText style={{ marginTop: 10 }}>{translate('send.memo') as string}</FadeText>
+                      <CheckBox
+                        disabled={false}
+                        value={includeUAMemo}
+                        onValueChange={setIncludeUAMemo}
+                        style={{ borderColor: 'red', borderWidth: 1 }}
+                      />
+                    </View>
                     <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start' }}>
                       <View
                         accessible={true}
