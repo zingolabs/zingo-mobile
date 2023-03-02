@@ -230,7 +230,9 @@
     "amountplaceholder": "numero",
     "nofetchprice": "Sin precio",
     "sendall": "Enviar Todo",
-    "sendall-message": "Estas a punto de enviar toda la cantidad en tu monedero"
+    "sendall-message": "Estas a punto de enviar toda la cantidad en tu monedero",
+    "includeua": "Incluir tu DU:",
+    "confirm-memo": "Memorándum"
   },
   "legacy": {
     "o-title": "U-Orchard",
