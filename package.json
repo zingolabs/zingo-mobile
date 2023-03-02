@@ -18,6 +18,7 @@
     "@fortawesome/react-native-fontawesome": "^0.3.0",
     "@react-native-async-storage/async-storage": "^1.17.11",
     "@react-native-community/art": "^1.2.0",
+    "@react-native-community/checkbox": "^0.5.14",
     "@react-native-community/clipboard": "^1.5.1",
     "@react-native-community/netinfo": "^9.3.7",
     "@react-navigation/bottom-tabs": "^6.4.0",
