@@ -1,4 +1,3 @@
-import { TranslateOptions } from 'i18n-js';
 import { StackScreenProps } from '@react-navigation/stack';
 
 import SyncingStatusReportClass from './classes/SyncingStatusReportClass';
@@ -18,6 +17,7 @@ import SyncingStatusType from './types/SyncingStatusType';
 import DimensionsType from './types/DimensionsType';
 import zecPriceType from './types/zecPriceType';
 import backgroundType from './types/backgroundType';
+import { TranslateType } from './types/TranslateType';
 
 export default interface AppStateLoaded {
   navigation: StackScreenProps<any>['navigation'];
@@ -106,7 +106,7 @@ export default interface AppStateLoaded {
   sendAll: boolean;
   background: backgroundType;
 
-  translate: (key: string, config?: TranslateOptions) => string;
+  translate: (key: string) => TranslateType;
 
   // eslint-disable-next-line semi
 }
