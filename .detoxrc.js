@@ -47,16 +47,22 @@ module.exports = {
         adbName: '.*'
       }
     },
-    emulator_64: {
+    emulator: {
       type: 'android.emulator',
       device: {
         avdName: 'Pixel_6_API_30_1'
       }
     },
+    emulator_64: {
+      type: 'android.emulator',
+      device: {
+        avdName: '30_ga_64'
+      }
+    },
     emulator_32: {
       type: 'android.emulator',
       device: {
-        avdName: 'Pixel_2_API_29'
+        avdName: '29_gaps_32'
       }
     }
   },
@@ -76,6 +82,10 @@ module.exports = {
     'android.att.release': {
       device: 'attached',
       app: 'android.release'
+    },
+    'android.emu.debug': {
+      device: 'emulator',
+      app: 'android.debug'
     },
     'android.emu.64': {
       device: 'emulator_64',
