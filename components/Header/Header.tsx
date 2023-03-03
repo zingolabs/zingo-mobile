@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme } from '@react-navigation/native';
 import React, { useContext } from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
-import { DimensionsType, TranslateType } from '../../app/AppState';
+import { TranslateType } from '../../app/AppState';
 import { ContextAppLoaded } from '../../app/context';
 import { ThemeType } from '../../app/types';
 import CurrencyAmount from '../Components/CurrencyAmount';
@@ -23,7 +23,6 @@ type HeaderProps = {
   noDrawMenu?: boolean;
   testID?: string;
   translate?: (key: string) => TranslateType;
-  dimensions?: DimensionsType;
 };
 
 const Header: React.FunctionComponent<HeaderProps> = ({
@@ -37,7 +36,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   noDrawMenu,
   testID,
   translate: translateProp,
-  dimensions: dimensionsProp,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { totalBalance, info, syncingStatus, currency, zecPrice } = context;
@@ -47,12 +45,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   } else {
     translate = context.translate;
   }
-  let dimensions;
-  if (dimensionsProp) {
-    dimensions = dimensionsProp;
-  } else {
-    dimensions = context.dimensions;
-  }
+
   const { colors } = useTheme() as unknown as ThemeType;
 
   const syncStatusDisplayLine = syncingStatus.inProgress ? `(${syncingStatus.blocks})` : '';
@@ -76,8 +69,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       {!noBalance && (
         <View
           style={{
-            flexDirection: dimensions.orientation === 'portrait' ? 'row' : 'column-reverse',
-            margin: dimensions.orientation === 'portrait' ? 0 : 10,
+            flexDirection: 'row',
+            margin: 0,
           }}>
           <ZecAmount
             currencyName={info.currencyName ? info.currencyName : ''}
@@ -97,7 +90,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   borderRadius: 10,
                   margin: 0,
                   padding: 0,
-                  marginLeft: dimensions.orientation === 'portrait' ? 5 : 0,
+                  marginLeft: 5,
                   minWidth: 48,
                   minHeight: 48,
                 }}>
@@ -121,10 +114,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             <PriceFetcher setZecPrice={setZecPrice} />
           </View>
         </View>
-      )}
-
-      {dimensions.orientation === 'landscape' && (
-        <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
       )}
 
       <View

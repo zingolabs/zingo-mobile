@@ -350,7 +350,7 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   //console.log('render send', 'w', dimensions.width, 'h', dimensions.height);
 
-  const returnPortrait = (
+  const returnPage = (
     <View
       accessible={true}
       accessibilityLabel={translate('send.title-acc') as string}
@@ -433,7 +433,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       }}>
                       <TextInput
                         testID="send.addressplaceholder"
-                        placeholder={translate('send.addressplaceholder')}
+                        placeholder={translate('send.addressplaceholder') as string}
                         placeholderTextColor={colors.placeholder}
                         style={{
                           color: colors.text,
@@ -689,9 +689,9 @@ const Send: React.FunctionComponent<SendProps> = ({
                         justifyContent: 'space-between',
                         alignItems: 'center',
                       }}>
-                      <FadeText style={{ marginTop: 10 }}>{translate('send.memo')}</FadeText>
+                      <FadeText style={{ marginTop: 10 }}>{translate('send.memo') as string}</FadeText>
                       <View style={{ flexDirection: 'row' }}>
-                        <FadeText style={{ marginTop: 3 }}>{translate('send.includeua')}</FadeText>
+                        <FadeText style={{ marginTop: 3 }}>{translate('send.includeua') as string}</FadeText>
                         <CheckBox
                           testID="send.checkboxUA"
                           disabled={false}
@@ -784,7 +784,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     </View>
   );
 
-  return returnPortrait;
+  return returnPage;
 };
 
 export default Send;
