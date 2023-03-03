@@ -1,4 +1,4 @@
-const { log } = require('detox');
+const { log, device, by, element } = require('detox');
 
 describe('Example', () => {
   beforeAll(async () => {
