@@ -7,6 +7,7 @@ import { useTheme, useIsFocused } from '@react-navigation/native';
 import Toast from 'react-native-simple-toast';
 import { getNumberFormatSettings } from 'react-native-localize';
 import Animated, { EasingNode } from 'react-native-reanimated';
+import CheckBox from '@react-native-community/checkbox';
 
 import FadeText from '../Components/FadeText';
 import ErrorText from '../Components/ErrorText';
@@ -208,6 +209,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     amount: string | null,
     amountCurrency: string | null,
     memo: string | null,
+    includeUAMemo: boolean | null,
   ) => {
     // Create the new state object
     const newState = new SendPageStateClass(new ToAddrClass(0));
@@ -280,6 +282,10 @@ const Send: React.FunctionComponent<SendProps> = ({
       toAddr.memo = memo;
     }
 
+    if (includeUAMemo !== null) {
+      toAddr.includeUAMemo = includeUAMemo;
+    }
+
     newState.toaddr = newToAddr;
     setSendPageState(newState);
   };
@@ -344,7 +350,7 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   //console.log('render send', 'w', dimensions.width, 'h', dimensions.height);
 
-  const returnPortrait = (
+  const returnPage = (
     <View
       accessible={true}
       accessibilityLabel={translate('send.title-acc') as string}
@@ -426,6 +432,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         justifyContent: 'center',
                       }}>
                       <TextInput
+                        testID="send.addressplaceholder"
                         placeholder={translate('send.addressplaceholder') as string}
                         placeholderTextColor={colors.placeholder}
                         style={{
@@ -435,7 +442,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           marginLeft: 5,
                         }}
                         value={ta.to}
-                        onChangeText={(text: string) => updateToField(text, null, null, null)}
+                        onChangeText={(text: string) => updateToField(text, null, null, null, null)}
                         editable={true}
                       />
                     </View>
@@ -473,7 +480,13 @@ const Send: React.FunctionComponent<SendProps> = ({
                     {sendAll && (
                       <TouchableOpacity
                         onPress={() =>
-                          updateToField(null, Utils.parseLocaleFloat(getMaxAmount().toFixed(8)).toString(), null, null)
+                          updateToField(
+                            null,
+                            Utils.parseLocaleFloat(getMaxAmount().toFixed(8)).toString(),
+                            null,
+                            null,
+                            null,
+                          )
                         }>
                         <View
                           style={{
@@ -528,6 +541,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           minHeight: 48,
                         }}>
                         <TextInput
+                          testID="send.amount"
                           placeholder={`#${decimalSeparator}########`}
                           placeholderTextColor={colors.placeholder}
                           keyboardType="numeric"
@@ -540,9 +554,9 @@ const Send: React.FunctionComponent<SendProps> = ({
                             marginLeft: 5,
                           }}
                           value={ta.amount.toString()}
-                          onChangeText={(text: string) => updateToField(null, text.substring(0, 20), null, null)}
+                          onChangeText={(text: string) => updateToField(null, text.substring(0, 20), null, null, null)}
                           onEndEditing={(e: any) =>
-                            updateToField(null, e.nativeEvent.text.substring(0, 20), null, null)
+                            updateToField(null, e.nativeEvent.text.substring(0, 20), null, null, null)
                           }
                           editable={true}
                           maxLength={20}
@@ -638,9 +652,11 @@ const Send: React.FunctionComponent<SendProps> = ({
                               marginLeft: 5,
                             }}
                             value={ta.amountCurrency.toString()}
-                            onChangeText={(text: string) => updateToField(null, null, text.substring(0, 15), null)}
+                            onChangeText={(text: string) =>
+                              updateToField(null, null, text.substring(0, 15), null, null)
+                            }
                             onEndEditing={(e: any) =>
-                              updateToField(null, null, e.nativeEvent.text.substring(0, 15), null)
+                              updateToField(null, null, e.nativeEvent.text.substring(0, 15), null, null)
                             }
                             editable={true}
                             maxLength={15}
@@ -667,7 +683,29 @@ const Send: React.FunctionComponent<SendProps> = ({
 
                 {memoEnabled === true && (
                   <>
-                    <FadeText style={{ marginTop: 10 }}>{translate('send.memo') as string}</FadeText>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                      }}>
+                      <FadeText style={{ marginTop: 10 }}>{translate('send.memo') as string}</FadeText>
+                      <View style={{ flexDirection: 'row' }}>
+                        <FadeText style={{ marginTop: 3 }}>{translate('send.includeua') as string}</FadeText>
+                        <CheckBox
+                          testID="send.checkboxUA"
+                          disabled={false}
+                          value={ta.includeUAMemo}
+                          onValueChange={(value: boolean) => updateToField(null, null, null, null, value)}
+                          tintColors={{ true: colors.primary, false: colors.text }}
+                          tintColor={colors.text}
+                          onCheckColor={colors.card}
+                          onFillColor={colors.primary}
+                          boxType={'square'}
+                          style={{}}
+                        />
+                      </View>
+                    </View>
                     <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start' }}>
                       <View
                         accessible={true}
@@ -692,7 +730,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                             marginLeft: 5,
                           }}
                           value={ta.memo}
-                          onChangeText={(text: string) => updateToField(null, null, null, text)}
+                          onChangeText={(text: string) => updateToField(null, null, null, text, null)}
                           editable={true}
                         />
                       </View>
@@ -711,6 +749,7 @@ const Send: React.FunctionComponent<SendProps> = ({
               marginVertical: 5,
             }}>
             <Button
+              testID="send.button"
               accessible={true}
               accessibilityLabel={'title ' + translate('send.button')}
               type="Primary"
@@ -745,7 +784,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     </View>
   );
 
-  return returnPortrait;
+  return returnPage;
 };
 
 export default Send;

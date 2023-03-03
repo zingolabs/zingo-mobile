@@ -141,8 +141,6 @@
     "unknown": "Unknown",
     "title": "Server Info",
     "resolution": "Device Screen",
-    "portrait": "Portrait Orientation",
-    "landscape": "Landscape Orientation",
     "tablet": "Tablet",
     "phone": "Phone"
   },
@@ -230,7 +228,9 @@
     "amountplaceholder": "number",
     "nofetchprice": "No price",
     "sendall": "Send All",
-    "sendall-message": "Your are about to send the entire amount in your wallet"
+    "sendall-message": "Your are about to send the entire amount in your wallet",
+    "includeua": "Include your UA:",
+    "confirm-memo": "Memo"
   },
   "legacy": {
     "o-title": "U-Orchard",

@@ -13,6 +13,7 @@ type ButtonProps = {
   style?: TextStyle;
   accessible?: boolean;
   accessibilityLabel?: string;
+  testID?: string;
 };
 
 const Button: React.FunctionComponent<ButtonProps> = ({
@@ -23,6 +24,7 @@ const Button: React.FunctionComponent<ButtonProps> = ({
   style,
   accessible,
   accessibilityLabel,
+  testID,
 }) => {
   const { colors } = useTheme() as unknown as ThemeType;
   // type: 'Primary' or 'Secondary'
@@ -56,6 +58,7 @@ const Button: React.FunctionComponent<ButtonProps> = ({
 
   return (
     <TouchableOpacity
+      testID={testID}
       accessible={accessible}
       accessibilityLabel={accessibilityLabel}
       style={{

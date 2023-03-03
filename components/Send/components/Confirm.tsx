@@ -21,7 +21,7 @@ type ConfirmProps = {
 };
 const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSend, defaultFee, sendAllAmount }) => {
   const context = useContext(ContextAppLoaded);
-  const { sendPageState, info, translate, currency, zecPrice } = context;
+  const { sendPageState, info, translate, currency, zecPrice, uaAddress } = context;
   const { colors } = useTheme();
 
   const sendingTotal = Number(sendPageState.toaddr.amount) + defaultFee;
@@ -86,7 +86,10 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSen
                   currency={currency}
                 />
               </View>
-              <RegText>{to.memo || ''}</RegText>
+              <FadeText style={{ marginTop: 10 }}>{translate('send.confirm-memo') as string}</FadeText>
+              <RegText testID="send.confirm-memo">{`${to.memo || ''}${to.memo ? '\n' : ''}${
+                to.includeUAMemo ? 'Reply to: \n' + uaAddress : ''
+              }`}</RegText>
             </View>
           );
         })}

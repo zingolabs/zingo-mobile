@@ -7,7 +7,7 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import Receive from '../components/Receive';
-import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
+import { ContextAppLoadedProvider, defaultAppStateLoaded } from '../app/context';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -31,7 +31,7 @@ jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
 // test suite
 describe('Component Receive - test', () => {
   //snapshot test
-  test('Receive Landscape - snapshot', () => {
+  test('Receive - snapshot', () => {
     const state = defaultAppStateLoaded;
     state.uaAddress = 'UA-12345678901234567890';
     state.addresses = [
@@ -58,13 +58,6 @@ describe('Component Receive - test', () => {
       },
     ];
     state.translate = () => 'text translated';
-    state.dimensions = {
-      width: 600,
-      height: 300,
-      orientation: 'landscape',
-      deviceType: 'phone',
-      scale: 2.5,
-    };
     state.info.currencyName = 'ZEC';
     state.totalBalance.total = 1.12345678;
     const onFunction = jest.fn();

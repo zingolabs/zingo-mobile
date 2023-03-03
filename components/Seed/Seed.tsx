@@ -11,7 +11,7 @@ import FadeText from '../Components/FadeText';
 import Button from '../Components/Button';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded, ContextAppLoading } from '../../app/context';
-import { DimensionsType, InfoType, WalletSeedType, TranslateType } from '../../app/AppState';
+import { InfoType, TranslateType, WalletSeedType } from '../../app/AppState';
 import RPCModule from '../../app/RPCModule';
 import RPC from '../../app/rpc';
 import Header from '../Header';
@@ -33,23 +33,17 @@ type SeedProps = {
 const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, action }) => {
   const contextLoaded = useContext(ContextAppLoaded);
   const contextLoading = useContext(ContextAppLoading);
-  let walletSeed: WalletSeedType,
-    translate: (key: string) => TranslateType,
-    info: InfoType,
-    server: string,
-    dimensions: DimensionsType;
+  let walletSeed: WalletSeedType, translate: (key: string) => TranslateType, info: InfoType, server: string;
   if (action === 'new' || action === 'restore') {
     walletSeed = contextLoading.walletSeed;
     translate = contextLoading.translate;
     info = contextLoading.info;
     server = contextLoading.server;
-    dimensions = contextLoading.dimensions;
   } else {
     walletSeed = contextLoaded.walletSeed;
     translate = contextLoaded.translate;
     info = contextLoaded.info;
     server = contextLoaded.server;
-    dimensions = contextLoaded.dimensions;
   }
 
   const { colors } = useTheme() as unknown as ThemeType;
@@ -152,7 +146,6 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
             noSyncingStatus={true}
             noDrawMenu={true}
             translate={translate}
-            dimensions={dimensions}
           />
         </View>
       </Animated.View>

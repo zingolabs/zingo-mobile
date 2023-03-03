@@ -6,8 +6,9 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
-import History from '../components/History';
+import Send from '../components/Send';
 import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
+import { ThemeType } from '../app/types';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -22,41 +23,49 @@ jest.mock('react-native-localize', () => ({
   },
 }));
 jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
-jest.mock('moment', () => {
-  // Here we are able to mock chain builder pattern
-  const mMoment = {
-    format: (p: string) => {
-      if (p === 'MMM YYYY') {
-        return 'Dec 2022';
-      } else if (p === 'YYYY MMM D h:mm a') {
-        return '2022 Dec 13 8:00 am';
-      } else if (p === 'MMM D, h:mm a') {
-        return 'Dec 13, 8:00 am';
-      }
-    },
+jest.mock('react-native-reanimated', () => {
+  return class Reanimated {
+    public static Value() {
+      return jest.fn(() => {});
+    }
+    public static View() {
+      return '';
+    }
   };
-  // Here we are able to mock the constructor and to modify instance methods
-  const fn = () => {
-    return mMoment;
-  };
-  // Here we are able to mock moment methods that depend on moment not on a moment instance
-  fn.locale = jest.fn();
-  return fn;
 });
-jest.mock('moment/locale/es', () => () => ({
-  defineLocale: jest.fn(),
+jest.mock('react-native', () => {
+  const RN = jest.requireActual('react-native');
+
+  RN.NativeModules.RPCModule = {
+    execute: jest.fn(() => '{}'),
+  };
+
+  return RN;
+});
+const Theme: ThemeType = {
+  dark: true,
+  colors: {
+    background: '#011401', //'#010101',
+    card: '#011401', //'#401717',
+    border: '#ffffff',
+    primary: '#18bd18', //'#df4100',
+    primaryDisabled: 'rgba(90, 140, 90, 1)',
+    text: '#c3c3c3',
+    zingo: '#888888',
+    placeholder: '#888888',
+    money: '#ffffff',
+    notification: '',
+  },
+};
+jest.mock('@react-navigation/native', () => ({
+  useIsFocused: jest.fn(),
+  useTheme: () => Theme,
 }));
-jest.mock('react-native-gesture-handler', () => {
-  const View = require('react-native').View;
-  return {
-    TouchableOpacity: View,
-  };
-});
 
 // test suite
-describe('Component Transactions - test', () => {
+describe('Component Send - test', () => {
   //snapshot test
-  test('Transactions Landscape - snapshot', () => {
+  test('Send - snapshot', () => {
     const state = defaultAppStateLoaded;
     state.transactions = [
       {
@@ -107,27 +116,37 @@ describe('Component Transactions - test', () => {
       },
     ];
     state.translate = () => 'text translated';
-    state.dimensions = {
-      width: 600,
-      height: 300,
-      orientation: 'landscape',
-      deviceType: 'phone',
-      scale: 2.5,
-    };
+    state.currency = 'USD';
     state.info.currencyName = 'ZEC';
+    state.zecPrice.zecPrice = 33.33;
+    state.info.defaultFee = 1000;
     state.totalBalance.total = 1.12345678;
+    state.totalBalance.orchardBal = 0.6;
+    state.totalBalance.spendableOrchard = 0.3;
+    state.totalBalance.privateBal = 0.4;
+    state.totalBalance.spendablePrivate = 0.2;
+    state.totalBalance.transparentBal = 0.12345678;
+    state.sendPageState.toaddr.id = 1234567890;
+    state.sendPageState.toaddr.to = 'UA-12345678901234567890';
+    state.sendPageState.toaddr.amount = '1.12345678';
+    state.sendPageState.toaddr.amountCurrency = '50.22';
+    state.sendPageState.toaddr.memo = 'memo';
     const onFunction = jest.fn();
-    const transactions = render(
+    const send = render(
       <ContextAppLoadedProvider value={state}>
-        <History
-          doRefresh={onFunction}
+        <Send
+          setSendPageState={onFunction}
+          sendTransaction={onFunction}
+          clearToAddr={onFunction}
+          setSendProgress={onFunction}
           toggleMenuDrawer={onFunction}
+          setComputingModalVisible={onFunction}
           poolsMoreInfoOnClick={onFunction}
           syncingStatusMoreInfoOnClick={onFunction}
           setZecPrice={onFunction}
         />
       </ContextAppLoadedProvider>,
     );
-    expect(transactions.toJSON()).toMatchSnapshot();
+    expect(send.toJSON()).toMatchSnapshot();
   });
 });
