@@ -2,6 +2,6 @@ beforeAll(async () => {
   await device.launchApp();
 });
 
-// beforeEach(async () => {
-//   await device.reloadReactNative();
-// });
+beforeEach(async () => {
+  await device.reloadReactNative();
+});
