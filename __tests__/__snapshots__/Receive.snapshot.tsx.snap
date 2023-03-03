@@ -1,0 +1,28 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Component Receive - test Receive - snapshot 1`] = `
+<
+  navigationState={
+    {
+      "index": 0,
+      "routes": [
+        {
+          "key": "uaddr",
+          "title": "text translated",
+        },
+        {
+          "key": "zaddr",
+          "title": "text translated",
+        },
+        {
+          "key": "taddr",
+          "title": "text translated",
+        },
+      ],
+    }
+  }
+  onIndexChange={[Function]}
+  renderScene={[Function]}
+  renderTabBar={[Function]}
+/>
+`;
