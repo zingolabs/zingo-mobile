@@ -1,13 +1,6 @@
 const { log, device, by, element } = require('detox');
 
 describe('Example', () => {
-  beforeAll(async () => {
-    await device.launchApp();
-  });
-
-  beforeEach(async () => {
-    // await device.reloadReactNative();
-  });
 
   it('Checkbox send screen -> include UA in memo field', async () => {
     await element(by.id('loadingapp.restorewalletseed')).tap();

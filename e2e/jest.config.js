@@ -9,4 +9,8 @@ module.exports = {
   reporters: ['detox/runners/jest/reporter'],
   testEnvironment: 'detox/runners/jest/testEnvironment',
   verbose: true,
+  globals: {
+    sync_timeout: 1000000
+  },
+  setupFilesAfterEnv: ['<rootDir>/e2e/setup-jest.js']
 };
