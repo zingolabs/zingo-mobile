@@ -1,9 +1,6 @@
 const { log, device, by, element } = require('detox');
 
 describe('Example', () => {
-  beforeAll(async () => {
-    await device.launchApp();
-  });
 
   it('New wallet button works', async () => {
     let newWalletButton = element(by.text('CREATE NEW WALLET (NEW SEED)'));
