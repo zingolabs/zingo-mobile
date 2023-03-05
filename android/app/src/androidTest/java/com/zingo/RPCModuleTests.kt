@@ -1,4 +1,4 @@
-package com.zingo
+package org.ZingoLabs.Zingo
 
 import android.util.Base64
 import java.io.InputStream
