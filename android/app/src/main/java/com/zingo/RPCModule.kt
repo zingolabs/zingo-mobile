@@ -61,13 +61,13 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun createNewWallet(server: String, promise: Promise) {
-        Log.w("MAIN", "Creating new wallet")
+        // Log.w("MAIN", "Creating new wallet")
 
         initlogging()
 
         // Create a seed
         val seed = initnew(server, reactContext.applicationContext.filesDir.absolutePath)
-        Log.w("MAIN-Seed", seed)
+        // Log.w("MAIN-Seed", seed)
 
         if (!seed.startsWith("Error")) {
             saveWallet()
@@ -146,8 +146,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 }
             }
         }
-
-        fileBytes = ByteArray(0)
 
         initlogging()
 
