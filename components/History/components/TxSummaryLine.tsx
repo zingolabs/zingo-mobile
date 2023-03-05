@@ -16,6 +16,7 @@ import 'moment/locale/es';
 import { ContextAppLoaded } from '../../../app/context';
 
 type TxSummaryLineProps = {
+  index: number;
   month: string;
   tx: TransactionType;
   setTxDetail: (t: TransactionType) => void;
@@ -40,9 +41,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
     tx.detailedTxns && tx.detailedTxns.length > 0 ? Utils.trimToSmall(tx.detailedTxns[0].address, 7) : 'Unknown';
 
   return (
-    <View
-      testID={`transactionList.${index + 1}`} 
-      style={{ display: 'flex', flexDirection: 'column' }}>
+    <View testID={`transactionList.${index + 1}`} style={{ display: 'flex', flexDirection: 'column' }}>
       {month !== '' && (
         <View
           style={{
