@@ -198,20 +198,11 @@ RCT_REMAP_METHOD(deleteExistingWalletBackup,
   @autoreleasepool {
     // RCTLogInfo(@"createNewWallet called");
 
-    NSString* pathSaplingOutput = [[NSBundle mainBundle]
-                      pathForResource:@"saplingoutput" ofType:@""];
-    NSData* saplingOutput = [NSData dataWithContentsOfFile:pathSaplingOutput];
-
-
-    NSString* pathSaplingSpend = [[NSBundle mainBundle]
-                      pathForResource:@"saplingspend" ofType:@""];
-    NSData* saplingSpend = [NSData dataWithContentsOfFile:pathSaplingSpend];
-
     NSArray *paths = NSSearchPathForDirectoriesInDomains
                     (NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
 
-    char* seed = init_new([server UTF8String], [[saplingOutput base64EncodedStringWithOptions:0] UTF8String], [[saplingSpend base64EncodedStringWithOptions:0] UTF8String], [documentsDirectory UTF8String]);
+    char* seed = init_new([server UTF8String], [documentsDirectory UTF8String]);
     NSString* seedStr = [NSString stringWithUTF8String:seed];
     rust_free(seed);
 
@@ -248,20 +239,11 @@ RCT_REMAP_METHOD(restoreWallet,
   @autoreleasepool {
     // RCTLogInfo(@"restoreWallet called with %@ %@", restoreSeed, birthday);
 
-    NSString* pathSaplingOutput = [[NSBundle mainBundle]
-                      pathForResource:@"saplingoutput" ofType:@""];
-    NSData* saplingOutput = [NSData dataWithContentsOfFile:pathSaplingOutput];
-
-
-    NSString* pathSaplingSpend = [[NSBundle mainBundle]
-                      pathForResource:@"saplingspend" ofType:@""];
-    NSData* saplingSpend = [NSData dataWithContentsOfFile:pathSaplingSpend];
-
     NSArray *paths = NSSearchPathForDirectoriesInDomains
                     (NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
 
-    char* seed = initfromseed([server UTF8String], [restoreSeed UTF8String], [birthday UTF8String], [[saplingOutput base64EncodedStringWithOptions:0] UTF8String], [[saplingSpend base64EncodedStringWithOptions:0] UTF8String], [documentsDirectory UTF8String]);
+    char* seed = initfromseed([server UTF8String], [restoreSeed UTF8String], [birthday UTF8String], [documentsDirectory UTF8String]);
     NSString* seedStr = [NSString stringWithUTF8String:seed];
     rust_free(seed);
 
@@ -281,18 +263,10 @@ RCT_REMAP_METHOD(restoreWallet,
     // RCTLogInfo(@"loadExistingWallet called");
     NSString* walletDataStr = [self readWallet];
 
-    NSString* pathSaplingOutput = [[NSBundle mainBundle]
-                      pathForResource:@"saplingoutput" ofType:@""];
-    NSData* saplingOutput = [NSData dataWithContentsOfFile:pathSaplingOutput];
-
-    NSString* pathSaplingSpend = [[NSBundle mainBundle]
-                      pathForResource:@"saplingspend" ofType:@""];
-    NSData* saplingSpend = [NSData dataWithContentsOfFile:pathSaplingSpend];
-
     NSArray *paths = NSSearchPathForDirectoriesInDomains
                     (NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
-    char* seed = initfromb64([server UTF8String], [walletDataStr UTF8String], [[saplingOutput base64EncodedStringWithOptions:0] UTF8String], [[saplingSpend base64EncodedStringWithOptions:0] UTF8String], [documentsDirectory UTF8String]);
+    char* seed = initfromb64([server UTF8String], [walletDataStr UTF8String], [documentsDirectory UTF8String]);
     NSString* seedStr = [NSString stringWithUTF8String:seed];
     rust_free(seed);
 
