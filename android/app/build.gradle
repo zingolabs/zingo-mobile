@@ -256,9 +256,9 @@ dependencies {
     // optional - Multiprocess support
     implementation "androidx.work:work-multiprocess:$work_version"
     
-    // androidx runner and rules APIs
-    androidTestImplementation "androidx.test:runner:1.5.2"
-    androidTestImplementation "androidx.test:rules:1.5.0"
+    // // androidx runner and rules APIs
+    // androidTestImplementation "androidx.test:runner:1.5.2"
+    // androidTestImplementation "androidx.test:rules:1.5.0"
     
     // google truth testing framework
     androidTestImplementation "com.google.truth:truth:1.1.3"

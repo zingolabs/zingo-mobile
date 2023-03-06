@@ -12,7 +12,7 @@ import org.junit.Test
 class RPCModule {
     private external fun execute(cmd: String, args: String): String
     private external fun initfromseed(serveruri: String, seed: String, birthday: String, saplingOutputb64: String, saplingSpendb64: String, datadir: String): String
-    
+
     data class Addresses (
     	val address : String,
     	val receivers : Receivers
@@ -30,7 +30,7 @@ class RPCModule {
         val seed = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art"
         val birthday = "1"
         val datadir = MainApplication.getAppContext()!!.getFilesDir().getPath()
-        
+
         val saplingSpendFile: InputStream = MainApplication.getAppContext()?.resources?.openRawResource(R.raw.saplingspend)!!
         var saplingSpend = saplingSpendFile.readBytes()
         saplingSpendFile.close()
@@ -102,14 +102,13 @@ class RPCModule {
             saplingOutputEncoded.toString(),
             saplingSpendEncoded.toString(),
             datadir)
-    
+
         val resp = execute("addresses", "")
         val addresses: List<Addresses> = jacksonObjectMapper().readValue(resp)
-        
+
         assertThat(addresses[0].address).isEqualTo("u16sw4v6wy7f4jzdny55yzl020tp3yqg3c85dc6n7mmq0urfm6adqg79hxmyk85ufn4lun4pfh5q48cc3kvxhxm3w978eqqecdd260gkzjrkun6z7m9mcrt2zszaj0mvk6ufux2zteqwh57cq906hz3rkg63duaeqsvjelv9h5srct0zq8rvlv23wz5hed7zuatqd7p6p4ztugc4t4w2g")
         assertThat(addresses[0].receivers.transparent).isEqualTo("t1dUDJ62ANtmebE8drFg7g2MWYwXHQ6Xu3F")
         assertThat(addresses[0].receivers.sapling).isEqualTo("zs16uhd4mux24se6wkm74vld0ec63d4dxt3d7m80l5xytreplkkllrrf9c7fj859mhp8tkcq9hxfvj")
         assertThat(addresses[0].receivers.orchard_exists).isEqualTo(true)
     }
 }
-
