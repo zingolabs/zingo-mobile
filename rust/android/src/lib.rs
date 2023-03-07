@@ -28,8 +28,6 @@ pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RPCModule_initnew(
     env: JNIEnv,
     _: JObject,
     j_serveruri: JString,
-    j_sapling_output: JString,
-    j_sapling_spend: JString,
     j_data_dir: JString,
 ) -> jstring {
     let server_uri = CString::from(CStr::from_ptr(
@@ -38,22 +36,11 @@ pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RPCModule_initnew(
     .into_string()
     .unwrap();
 
-    let sapling_output = CString::from(CStr::from_ptr(
-        env.get_string(j_sapling_output).unwrap().as_ptr(),
-    ))
-    .into_string()
-    .unwrap();
-    let sapling_spend = CString::from(CStr::from_ptr(
-        env.get_string(j_sapling_spend).unwrap().as_ptr(),
-    ))
-    .into_string()
-    .unwrap();
-
     let data_dir = CString::from(CStr::from_ptr(env.get_string(j_data_dir).unwrap().as_ptr()))
         .into_string()
         .unwrap();
 
-    let seed = rustlib::init_new(server_uri, sapling_output, sapling_spend, data_dir);
+    let seed = rustlib::init_new(server_uri, data_dir);
 
     let output = env.new_string(seed.as_str()).unwrap();
     output.into_inner()
@@ -66,8 +53,6 @@ pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RPCModule_initfromseed(
     j_serveruri: JString,
     j_seed: JString,
     j_birthday: JString,
-    j_sapling_output: JString,
-    j_sapling_spend: JString,
     j_data_dir: JString,
 ) -> jstring {
     let server_uri = CString::from(CStr::from_ptr(
@@ -76,7 +61,7 @@ pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RPCModule_initfromseed(
     .into_string()
     .unwrap();
 
-    let seed = CString::from(CStr::from_ptr(env.get_string(j_seed).unwrap().as_ptr()))
+    let seed_tmp = CString::from(CStr::from_ptr(env.get_string(j_seed).unwrap().as_ptr()))
         .into_string()
         .unwrap();
 
@@ -86,28 +71,14 @@ pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RPCModule_initfromseed(
         .parse::<u64>()
         .unwrap();
 
-    let sapling_output = CString::from(CStr::from_ptr(
-        env.get_string(j_sapling_output).unwrap().as_ptr(),
-    ))
-    .into_string()
-    .unwrap();
-
-    let sapling_spend = CString::from(CStr::from_ptr(
-        env.get_string(j_sapling_spend).unwrap().as_ptr(),
-    ))
-    .into_string()
-    .unwrap();
-
     let data_dir = CString::from(CStr::from_ptr(env.get_string(j_data_dir).unwrap().as_ptr()))
         .into_string()
         .unwrap();
 
     let seed = rustlib::init_from_seed(
         server_uri,
-        seed,
+        seed_tmp,
         birthday,
-        sapling_output,
-        sapling_spend,
         data_dir,
     );
 
@@ -121,8 +92,6 @@ pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RPCModule_initfromb64(
     _: JObject,
     j_serveruri: JString,
     j_base64: JString,
-    j_sapling_output: JString,
-    j_sapling_spend: JString,
     j_data_dir: JString,
 ) -> jstring {
     let base64 = CString::from(CStr::from_ptr(env.get_string(j_base64).unwrap().as_ptr()))
@@ -135,22 +104,11 @@ pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RPCModule_initfromb64(
     .into_string()
     .unwrap();
 
-    let sapling_output = CString::from(CStr::from_ptr(
-        env.get_string(j_sapling_output).unwrap().as_ptr(),
-    ))
-    .into_string()
-    .unwrap();
-    let sapling_spend = CString::from(CStr::from_ptr(
-        env.get_string(j_sapling_spend).unwrap().as_ptr(),
-    ))
-    .into_string()
-    .unwrap();
-
     let data_dir = CString::from(CStr::from_ptr(env.get_string(j_data_dir).unwrap().as_ptr()))
         .into_string()
         .unwrap();
 
-    let seed = rustlib::init_from_b64(server_uri, base64, sapling_output, sapling_spend, data_dir);
+    let seed = rustlib::init_from_b64(server_uri, base64, data_dir);
 
     let output = env.new_string(seed.as_str()).unwrap();
     output.into_inner()

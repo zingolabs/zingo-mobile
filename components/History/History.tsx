@@ -89,7 +89,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
         {transactions
           .slice(0, numTx)
           .sort((a, b) => b.time - a.time)
-          .flatMap((t,index) => {
+          .flatMap((t, index) => {
             let txmonth = moment(t.time * 1000).format('MMM YYYY');
 
             var month = '';

@@ -17,8 +17,6 @@
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		BEE8CE82BFAC39CF1118356C /* libPods-ZingoMobile-ZingoMobileTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 57C30AB6DAB41A2ED2699835 /* libPods-ZingoMobile-ZingoMobileTests.a */; };
 		DB4DE518264B103E0084F17D /* RPCModule.m in Sources */ = {isa = PBXBuildFile; fileRef = DB4DE517264B103E0084F17D /* RPCModule.m */; };
-		DB4DE51B264B10D40084F17D /* saplingspend in Resources */ = {isa = PBXBuildFile; fileRef = DB4DE519264B10D40084F17D /* saplingspend */; };
-		DB4DE51C264B10D40084F17D /* saplingoutput in Resources */ = {isa = PBXBuildFile; fileRef = DB4DE51A264B10D40084F17D /* saplingoutput */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -56,8 +54,6 @@
 		DB4DE515264B0FE30084F17D /* rust.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rust.h; sourceTree = "<group>"; };
 		DB4DE516264B103E0084F17D /* RPCModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RPCModule.h; sourceTree = "<group>"; };
 		DB4DE517264B103E0084F17D /* RPCModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RPCModule.m; sourceTree = "<group>"; };
-		DB4DE519264B10D40084F17D /* saplingspend */ = {isa = PBXFileReference; lastKnownFileType = file; name = saplingspend; path = ../android/app/src/main/res/raw/saplingspend; sourceTree = "<group>"; };
-		DB4DE51A264B10D40084F17D /* saplingoutput */ = {isa = PBXFileReference; lastKnownFileType = file; name = saplingoutput; path = ../android/app/src/main/res/raw/saplingoutput; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -104,8 +100,6 @@
 			isa = PBXGroup;
 			children = (
 				1F70326429905E6A001D70A2 /* ZingoMobile.entitlements */,
-				DB4DE51A264B10D40084F17D /* saplingoutput */,
-				DB4DE519264B10D40084F17D /* saplingspend */,
 				DB4DE516264B103E0084F17D /* RPCModule.h */,
 				DB4DE517264B103E0084F17D /* RPCModule.m */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
@@ -269,8 +263,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DB4DE51C264B10D40084F17D /* saplingoutput in Resources */,
-				DB4DE51B264B10D40084F17D /* saplingspend in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 			);

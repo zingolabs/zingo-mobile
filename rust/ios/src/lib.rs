@@ -14,36 +14,12 @@ pub extern "C" fn rust_free(s: *mut c_char) {
 #[no_mangle]
 pub extern "C" fn init_new(
     server_uri: *const c_char,
-    sapling_output: *const c_char,
-    sapling_spend: *const c_char,
     data_dir: *const c_char,
 ) -> *mut c_char {
     let c_str = unsafe { CStr::from_ptr(server_uri) };
     let server_uri = match c_str.to_str() {
         Err(_) => {
             return CString::new("Error parsing 'server_uri' argument".to_owned())
-                .unwrap()
-                .into_raw()
-        }
-        Ok(string) => string,
-    }
-    .to_string();
-
-    let c_str = unsafe { CStr::from_ptr(sapling_output) };
-    let sapling_output = match c_str.to_str() {
-        Err(_) => {
-            return CString::new("Error parsing 'sapling_output' argument".to_owned())
-                .unwrap()
-                .into_raw()
-        }
-        Ok(string) => string,
-    }
-    .to_string();
-
-    let c_str = unsafe { CStr::from_ptr(sapling_spend) };
-    let sapling_spend = match c_str.to_str() {
-        Err(_) => {
-            return CString::new("Error parsing 'sapling_spend' argument".to_owned())
                 .unwrap()
                 .into_raw()
         }
@@ -62,7 +38,7 @@ pub extern "C" fn init_new(
     }
     .to_string();
 
-    let seed = rustlib::init_new(server_uri, sapling_output, sapling_spend, data_dir);
+    let seed = rustlib::init_new(server_uri, data_dir);
 
     return CString::new(seed).unwrap().into_raw();
 }
@@ -72,8 +48,6 @@ pub extern "C" fn initfromseed(
     server_uri: *const c_char,
     seed: *const c_char,
     birthday: *const c_char,
-    sapling_output: *const c_char,
-    sapling_spend: *const c_char,
     data_dir: *const c_char,
 ) -> *mut c_char {
     let c_str = unsafe { CStr::from_ptr(server_uri) };
@@ -111,28 +85,6 @@ pub extern "C" fn initfromseed(
     .parse::<u64>()
     .unwrap();
 
-    let c_str = unsafe { CStr::from_ptr(sapling_output) };
-    let sapling_output = match c_str.to_str() {
-        Err(_) => {
-            return CString::new("Error parsing 'sapling_output' argument".to_owned())
-                .unwrap()
-                .into_raw()
-        }
-        Ok(string) => string,
-    }
-    .to_string();
-
-    let c_str = unsafe { CStr::from_ptr(sapling_spend) };
-    let sapling_spend = match c_str.to_str() {
-        Err(_) => {
-            return CString::new("Error parsing 'sapling_spend' argument".to_owned())
-                .unwrap()
-                .into_raw()
-        }
-        Ok(string) => string,
-    }
-    .to_string();
-
     let c_str = unsafe { CStr::from_ptr(data_dir) };
     let data_dir = match c_str.to_str() {
         Err(_) => {
@@ -147,8 +99,6 @@ pub extern "C" fn initfromseed(
         server_uri,
         seed,
         birthday,
-        sapling_output,
-        sapling_spend,
         data_dir,
     );
     return CString::new(seed).unwrap().into_raw();
@@ -158,8 +108,6 @@ pub extern "C" fn initfromseed(
 pub extern "C" fn initfromb64(
     server_uri: *const c_char,
     base64: *const c_char,
-    sapling_output: *const c_char,
-    sapling_spend: *const c_char,
     data_dir: *const c_char,
 ) -> *mut c_char {
     let c_str = unsafe { CStr::from_ptr(server_uri) };
@@ -184,28 +132,6 @@ pub extern "C" fn initfromb64(
     }
     .to_string();
 
-    let c_str = unsafe { CStr::from_ptr(sapling_output) };
-    let sapling_output = match c_str.to_str() {
-        Err(_) => {
-            return CString::new("Error parsing 'sapling_output' argument".to_owned())
-                .unwrap()
-                .into_raw()
-        }
-        Ok(string) => string,
-    }
-    .to_string();
-
-    let c_str = unsafe { CStr::from_ptr(sapling_spend) };
-    let sapling_spend = match c_str.to_str() {
-        Err(_) => {
-            return CString::new("Error parsing 'sapling_spend' argument".to_owned())
-                .unwrap()
-                .into_raw()
-        }
-        Ok(string) => string,
-    }
-    .to_string();
-
     let c_str = unsafe { CStr::from_ptr(data_dir) };
     let data_dir = match c_str.to_str() {
         Err(_) => {
@@ -217,7 +143,7 @@ pub extern "C" fn initfromb64(
     }
     .to_string();
 
-    let seed = rustlib::init_from_b64(server_uri, base64, sapling_output, sapling_spend, data_dir);
+    let seed = rustlib::init_from_b64(server_uri, base64, data_dir);
 
     return CString::new(seed).unwrap().into_raw();
 }
