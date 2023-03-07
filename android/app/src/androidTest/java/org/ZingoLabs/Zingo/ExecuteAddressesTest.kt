@@ -9,18 +9,20 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
-data class Addresses (
-	val address : String,
-	val receivers : Receivers
-)
-
-data class Receivers (
-	val transparent : String,
-	val sapling : String,
-	val orchard_exists : Boolean
-)
 
 class ExecuteAddressesTest {
+
+    data class Addresses (
+    	val address : String,
+    	val receivers : Receivers
+    )
+
+    data class Receivers (
+    	val transparent : String,
+    	val sapling : String,
+    	val orchard_exists : Boolean
+    )
+
     @Test
     fun executeAddresses() {  
         val server = "https://mainnet.lightwalletd.com:9067"
