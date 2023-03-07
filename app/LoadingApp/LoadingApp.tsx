@@ -332,7 +332,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
   };
 
   getwalletSeedToRestore = async () => {
-    this.setState({ walletSeed: {} as WalletSeedType, screen: 3, walletExists: false });
+    this.setState({ walletSeed: {} as WalletSeedType, screen: 3 });
   };
 
   doRestore = async (seed: string, birthday: number) => {
