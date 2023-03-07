@@ -14,5 +14,6 @@ describe('Renders wallet data correctly.', () => {
   //  
   it('renders correct addresses', async () => {
     // difficult to add testID to the tab, working on it
+    await element(by.text('RECEIVE')).tap();
   });
 });
