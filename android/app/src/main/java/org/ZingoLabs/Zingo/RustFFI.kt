@@ -6,8 +6,6 @@ class RustFFI {
         external fun execute(cmd: String, args: String): String
         external fun initnew(
             serveruri: String,
-            saplingOutputb64: String,
-            saplingSpendb64: String,
             datadir: String
         ): String
 
@@ -15,16 +13,12 @@ class RustFFI {
             serveruri: String,
             seed: String,
             birthday: String,
-            saplingOutputb64: String,
-            saplingSpendb64: String,
             datadir: String
         ): String
 
         external fun initfromb64(
             serveruri: String,
             datab64: String,
-            saplingOutputb64: String,
-            saplingSpendb64: String,
             datadir: String
         ): String
 
