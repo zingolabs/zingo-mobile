@@ -71,7 +71,10 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateTo
 
   const { colors } = useTheme();
   return (
-    <View style={{ width: '100%', height: '100%' }}>
+    <View style={{
+      width: '100%',
+      height: '100%',
+    }}>
       <QRCodeScanner
         onRead={onRead}
         reactivate={true}
@@ -84,7 +87,8 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateTo
         }}
         cameraStyle={{
           width: width,
-          height: Platform.OS === 'ios' ? height : height * 1.1
+          height: Platform.OS === 'ios' ? height : height * 1.1,
+          padding: -30,
         }}
         topContent={
           <View
