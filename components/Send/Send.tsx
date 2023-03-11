@@ -348,7 +348,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     })();
   }, [isFocused]);
 
-  //console.log('render send', 'w', dimensions.width, 'h', dimensions.height);
+  console.log('render send', 'w', dimensions.width, 'h', dimensions.height);
 
   const returnPage = (
     <View
@@ -370,7 +370,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           updateToField={updateToField}
           closeModal={() => setQrcodeModalVisible(false)}
           width={dimensions.width - 42}
-          height={dimensions.height * 0.7}
+          height={dimensions.height * 0.3}
         />
       </Modal>
 
