@@ -82,7 +82,10 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateTo
           padding: 10,
           margin: 10,
         }}
-        cameraStyle={{ width: width, height: Platform.OS === 'ios' ? height : height * 1.1 }}
+        cameraStyle={{
+          width: width,
+          height: Platform.OS === 'ios' ? height : height * 1.1
+        }}
         topContent={
           <View
             style={{
