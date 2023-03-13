@@ -1,14 +1,13 @@
 package org.ZingoLabs.Zingo
 
-import android.util.Base64
-import java.io.InputStream
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
+import org.junit.experimental.categories.Category
 
-
-class ExecuteAddressesTest {
+@Category(IntegrationTest::class)
+public class ExecuteAddressesTest {
 
     data class Addresses (
     	val address : String,
@@ -22,11 +21,11 @@ class ExecuteAddressesTest {
     )
 
     @Test
-    fun executeAddresses() {  
+    public fun executeAddresses() {  
         val server = "https://mainnet.lightwalletd.com:9067"
         val seed = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art"
         val birthday = "1"
-        val datadir = MainApplication.getAppContext()!!.getFilesDir().getPath()
+        val datadir = MainApplication.getAppContext()!!.filesDir.path
 
         RustFFI.initfromseed(server, seed, birthday, datadir)
 
