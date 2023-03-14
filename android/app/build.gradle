@@ -199,6 +199,30 @@ android {
         viewBinding = true
     }
 
+    testOptions {
+        managedDevices {
+            devices {
+                pixel2api29_x86 (com.android.build.api.dsl.ManagedVirtualDevice) {
+                    device = "Pixel 2"
+                    apiLevel = 29
+                    systemImageSource = "aosp"
+                    require64Bit = false
+                }
+                pixel2api30_x86_64 (com.android.build.api.dsl.ManagedVirtualDevice) {
+                    device = "Pixel 2"
+                    apiLevel = 30
+                    systemImageSource = "aosp"
+                    require64Bit = true
+                }
+            }
+            groups {
+                allArchs {
+                    targetDevices.add(devices.pixel2api29_x86)
+                    targetDevices.add(devices.pixel2api30_x86_64)
+                }
+            }
+        }
+    }
 }
 
 dependencies {
