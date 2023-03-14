@@ -7,7 +7,7 @@ import org.junit.Test
 import org.junit.experimental.categories.Category
 
 @Category(IntegrationTest::class)
-public class ExecuteAddressesTest {
+class ExecuteAddressesTest {
 
     data class Addresses (
     	val address : String,
@@ -21,7 +21,7 @@ public class ExecuteAddressesTest {
     )
 
     @Test
-    public fun executeAddresses() {  
+    fun executeAddresses() {  
         val server = "https://mainnet.lightwalletd.com:9067"
         val seed = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art"
         val birthday = "1"
