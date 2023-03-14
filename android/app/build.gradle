@@ -261,6 +261,9 @@ dependencies {
     
     // JSON parsing
     implementation "com.fasterxml.jackson.module:jackson-module-kotlin:2.14.+"
+    
+    // JUnit test runners
+    androidTestImplementation 'junit:junit:4.13'
 }
 
 // Run this once to be able to run the application with BUCK
