@@ -203,7 +203,7 @@
     "more": "more...",
     "toaddress": "To Address",
     "invalidaddress": "Invalid Address!",
-    "addressplaceholder": "Unified Address or Z-Sapling or T-Transparent",
+    "addressplaceholder": "Unified Address or Z-Sapling or Transparent",
     "invalidamount": "Invalid Amount!",
     "spendable": "Spendable: ",
     "somefunds": "Some funds still confirming or syncing",
@@ -233,9 +233,9 @@
     "confirm-memo": "Memo"
   },
   "legacy": {
-    "o-title": "U-Orchard",
+    "o-title": "Unified Address",
     "z-title": "Z-Sapling",
-    "t-title": "T-Transparent",
+    "t-title": "Transparent",
     "noaddress": "No Address",
     "znoprivkey-error": "No Z address to import the Private Key",
     "tnoprivkey-error": "No T address to import the Private Key",

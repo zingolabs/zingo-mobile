@@ -203,7 +203,7 @@
     "more": "ver más...",
     "toaddress": "A la Dirección",
     "invalidaddress": "Dirección Incorrecta!",
-    "addressplaceholder": "Dirección Unificada o Z-Sapling o T-Transparente",
+    "addressplaceholder": "Dirección Unificada o Z-Sapling o Transparente",
     "invalidamount": "Cantidad Incorrecta!",
     "spendable": "Disponible: ",
     "somefunds": "Algunos fondos todavía se están confirmando o sincronizando",
@@ -233,9 +233,9 @@
     "confirm-memo": "Memorándum"
   },
   "legacy": {
-    "o-title": "U-Orchard",
+    "o-title": "Dirección Unificada",
     "z-title": "Z-Sapling",
-    "t-title": "T-Transparent",
+    "t-title": "Transparente",
     "noaddress": "Sin Direcciones",
     "znoprivkey-error": "No hay ninguna dirección Z para exportar su Clave Privada",
     "tnoprivkey-error": "No hay ninguna dirección T para exportar su Clave Privada",
