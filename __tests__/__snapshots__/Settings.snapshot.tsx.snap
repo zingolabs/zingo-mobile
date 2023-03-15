@@ -104,6 +104,16 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
       >
         text translated
       </Text>
+      <Text
+        style={
+          {
+            "color": "rgb(216, 216, 216)",
+            "fontSize": 8,
+          }
+        }
+      >
+        (undefinedxundefined)-undefined
+      </Text>
     </View>
     <View
       style={
