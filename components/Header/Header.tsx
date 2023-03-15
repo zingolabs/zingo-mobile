@@ -38,7 +38,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   translate: translateProp,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { totalBalance, info, syncingStatus, currency, zecPrice } = context;
+  const { totalBalance, info, syncingStatus, currency, zecPrice, dimensions } = context;
   let translate;
   if (translateProp) {
     translate = translateProp;
@@ -183,6 +183,9 @@ const Header: React.FunctionComponent<HeaderProps> = ({
 
       <View style={{ padding: 15, position: 'absolute', right: 0, alignItems: 'flex-end' }}>
         <Text style={{ fontSize: 8, color: colors.border }}>{translate('version') as string}</Text>
+        {__DEV__ && <Text style={{ fontSize: 8, color: colors.border }}>
+          {'(' + dimensions.width + 'x' + dimensions.height + ')-' + dimensions.scale}
+        </Text>}
       </View>
 
       <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
