@@ -10,7 +10,7 @@ module.exports = {
   testEnvironment: 'detox/runners/jest/testEnvironment',
   verbose: true,
   globals: {
-    sync_timeout: 1000000
+    sync_timeout: 1000000,
   },
-  setupFilesAfterEnv: ['<rootDir>/e2e/setup-jest.js']
+  setupFilesAfterEnv: ['<rootDir>/e2e/setup-jest.js'],
 };

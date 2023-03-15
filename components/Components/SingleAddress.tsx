@@ -95,7 +95,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
             {multi && (
               <Text style={{ color: colors.primary, marginTop: -25 }}>
                 {index + 1}
-                {translate('legacy.of') as string}
+                {translate('receive.of') as string}
                 {total}
               </Text>
             )}
@@ -144,18 +144,18 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
           <View style={{ display: 'flex', flexDirection: 'row', marginTop: 10, alignItems: 'center', marginBottom: 100 }}>
             <Button
               type="Secondary"
-              title={translate('legacy.prev')}
+              title={translate('receive.prev')}
               style={{ width: '25%', margin: 10 }}
               onPress={prev}
             />
             <FadeText>
               {index + 1}
-              {translate('legacy.of')}
+              {translate('receive.of')}
               {total}
             </FadeText>
             <Button
               type="Secondary"
-              title={translate('legacy.next')}
+              title={translate('receive.next')}
               style={{ width: '25%', margin: 10 }}
               onPress={next}
             />

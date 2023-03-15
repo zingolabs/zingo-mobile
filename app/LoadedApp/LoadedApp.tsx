@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faList, faUpload, faDownload, faCog, faAddressBook } from '@fortawesome/free-solid-svg-icons';
+import { faList, faUpload, faDownload, faCog } from '@fortawesome/free-solid-svg-icons';
 import { useTheme } from '@react-navigation/native';
 import SideMenu from 'react-native-side-menu-updated';
 import Toast from 'react-native-simple-toast';
@@ -893,8 +893,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
         iconName = faUpload;
       } else if (route.name === translate('loadedapp.uas-menu')) {
         iconName = faDownload;
-      } else if (route.name === translate('loadedapp.legacy-menu')) {
-        iconName = faAddressBook;
       } else {
         iconName = faCog;
       }

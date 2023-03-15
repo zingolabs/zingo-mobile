@@ -44,7 +44,6 @@
     "wallet-menu": "HISTORICO",
     "send-menu": "ENVIAR",
     "uas-menu": "RECIBIR",
-    "legacy-menu": "HEREDADAS",
     "syncing": "Pausando la Sincronización para poder Enviar.",
     "zcash-url": "Tienes ya informada una dirección en la pantalla Enviar."
   },
@@ -232,25 +231,6 @@
     "includeua": "Incluir tu DU:",
     "confirm-memo": "Memorándum"
   },
-  "legacy": {
-    "o-title": "Dirección Unificada",
-    "z-title": "Z-Sapling",
-    "t-title": "Transparente",
-    "noaddress": "Sin Direcciones",
-    "znoprivkey-error": "No hay ninguna dirección Z para exportar su Clave Privada",
-    "tnoprivkey-error": "No hay ninguna dirección T para exportar su Clave Privada",
-    "tnohaveviewkey": "Las direcciones T no tienen Clave de Visualización",
-    "znoviewkey": "No hay ninguna dirección Z para exportar su Clave de Visualizacion",
-    "title": "Direcciones Anteriores Heredadas",
-    "newz-option": "Nueva Dirección Z",
-    "newt-option": "Nueva Dirección T",
-    "privkey-option": "Exportar la Clave Privada",
-    "viewkey-option": "Exportar la Clave de Visualización",
-    "of": " de ",
-    "prev": "Anterior",
-    "next": "Siguiente",
-    "title-acc": "Pantalla de Direcciones Anteriores Heredadas"
-  },
   "receive": {
     "u-title": "Dirección Unificada",
     "noaddress": "Sin Direcciones",
@@ -263,7 +243,12 @@
     "privkey-option": "Exportar la Clave para Gastar",
     "viewkey-option": "Exportar la Clave de Visualizacion Total",
     "import-option": "Importar una Clave...",
-    "title-acc": "Pantalla de Recibir"
+    "title-acc": "Pantalla de Recibir",
+    "z-title": "Z-Sapling",
+    "t-title": "Transparente",
+    "of": " de ",
+    "prev": "Anterior",
+    "next": "Siguiente"
   },
   "history": {
     "shieldfunds": "Blindar fondos",
