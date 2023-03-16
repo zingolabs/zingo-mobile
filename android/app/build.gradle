@@ -216,7 +216,7 @@ android {
                 }
             }
             groups {
-                allArchs {
+                x86_Archs {
                     targetDevices.add(devices.pixel2api29_x86)
                     targetDevices.add(devices.pixel2api30_x86_64)
                 }
