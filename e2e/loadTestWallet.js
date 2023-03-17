@@ -6,6 +6,6 @@ let loadTestWallet = async () => {
   );
   await element(by.id("birthdayinput")).replaceText('1994579');
   await element(by.text("RESTORE WALLET")).tap();
-};
+}
 
 export { loadTestWallet };
