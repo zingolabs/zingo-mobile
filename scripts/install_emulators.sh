@@ -1,5 +1,3 @@
-#! /usr/bin/env bash
-
 sdkmanager --install "system-images;android-29;google_apis_playstore;x86"
 sdkmanager --install "system-images;android-30;google_apis;x86_64"
 

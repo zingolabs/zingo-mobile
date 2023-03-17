@@ -111,6 +111,16 @@ exports[`Component ImportKey - test Matches the snapshot ImportKey 1`] = `
       >
         text translated
       </Text>
+      <Text
+        style={
+          {
+            "color": "rgb(216, 216, 216)",
+            "fontSize": 8,
+          }
+        }
+      >
+        (undefinedxundefined)-undefined
+      </Text>
     </View>
     <View
       style={

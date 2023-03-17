@@ -1,8 +1,10 @@
+const { log, device, by, element } = require('detox');
+
 import { loadTestWallet } from "./loadTestWallet.js";
 
 describe('Renders wallet data correctly.', () => {
   // i just pulled this seed out of thin air
-  it('loads my test wallet', loadTestWallet);
+  it('loads a wallet', loadTestWallet);
   
   // there is a transaction in this plant at 1994580, 1 block after the "birthday". 
   it('synks 1 block and renders a transaction. this should take less than a minute, but will time out after 16 minutes', async () => {
@@ -12,8 +14,8 @@ describe('Renders wallet data correctly.', () => {
   });
   
   //  
-  it('renders correct addresses', async () => {
-    // difficult to add testID to the tab, working on it
+  it('has a receive tab', async () => {
+    // we need to test these properties
     await element(by.text('RECEIVE')).tap();
   });
 });

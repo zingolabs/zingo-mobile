@@ -348,7 +348,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     })();
   }, [isFocused]);
 
-  //console.log('render send', 'w', dimensions.width, 'h', dimensions.height);
+  // console.log('render send', 'w', dimensions.width, 'h', dimensions.height);
 
   const returnPage = (
     <View
@@ -369,8 +369,6 @@ const Send: React.FunctionComponent<SendProps> = ({
         <ScannerAddress
           updateToField={updateToField}
           closeModal={() => setQrcodeModalVisible(false)}
-          width={dimensions.width - 42}
-          height={dimensions.height * 0.7}
         />
       </Modal>
 
@@ -451,6 +449,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         width: 58,
                       }}>
                       <TouchableOpacity
+                        testID="send.scan-button"
                         accessible={true}
                         accessibilityLabel={translate('send.scan-acc') as string}
                         onPress={() => {
@@ -720,6 +719,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           maxHeight: 150,
                         }}>
                         <TextInput
+                          testID="send.memo-field"
                           multiline
                           style={{
                             color: colors.text,
