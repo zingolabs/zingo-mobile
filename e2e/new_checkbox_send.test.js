@@ -1,10 +1,12 @@
-const { log, by, element } = require('detox');
+const { log, device, by, element } = require('detox');
 
-import { loadTestWallet } from './loadTestWallet.js';
+import { loadTestWallet } from "./loadTestWallet.js";
+
 
 describe('Example', () => {
-  it('loads a test wallet', loadTestWallet);
 
+  it('loads a test wallet', loadTestWallet);
+  
   it('Checkbox send screen -> include UA in memo field', async () => {
     await element(by.text('SEND')).tap();
     await element(by.id('send.addressplaceholder')).replaceText(

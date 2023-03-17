@@ -1,6 +1,7 @@
-import { log, by, element } from 'detox';
+const { log, device, by, element } = require('detox');
 
 describe('Example', () => {
+
   it('New wallet button works', async () => {
     let newWalletButton = element(by.text('CREATE NEW WALLET (NEW SEED)'));
     await newWalletButton.tap();
