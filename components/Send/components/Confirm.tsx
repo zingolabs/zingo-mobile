@@ -60,10 +60,14 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSen
           <CurrencyAmount amtZec={sendingTotal} price={zecPrice.zecPrice} currency={currency} />
         </View>
         {[sendPageState.toaddr].map(to => {
+          // 30 characters per line
+          const numLines = to.to.length < 40 ? 2 : to.to.length / 30;
           return (
             <View key={to.id} style={{ margin: 10 }}>
               <FadeText>{translate('send.to') as string}</FadeText>
-              <RegText>{Utils.splitStringIntoChunks(to.to, 8).join(' ')}</RegText>
+              {Utils.splitStringIntoChunks(to.to, Number(numLines.toFixed(0))).map((c: string, idx: number) => (
+                <RegText key={idx}>{c}</RegText>
+              ))}
 
               <FadeText style={{ marginTop: 10 }}>{translate('send.confirm-amount') as string}</FadeText>
               <View
@@ -87,9 +91,13 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSen
                 />
               </View>
               <FadeText style={{ marginTop: 10 }}>{translate('send.confirm-memo') as string}</FadeText>
-              <RegText testID="send.confirm-memo">{`${to.memo || ''}${to.memo ? '\n' : ''}${
-                to.includeUAMemo ? 'Reply to: \n' + uaAddress : ''
-              }`}</RegText>
+              <RegText
+                testID="send.confirm-memo"
+                >
+                {`${to.memo || ''}${to.memo ? '\n' : ''}${
+                  to.includeUAMemo ? 'Reply to: \n' + uaAddress : ''
+                }`}
+              </RegText>
             </View>
           );
         })}
