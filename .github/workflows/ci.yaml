@@ -39,7 +39,16 @@ jobs:
         with:                
           name:              jniLibs-${{ env.timestamp }}
           path:              android/app/src/main/jniLibs/
-      - run:                 ls -R android/app/src/main/
+      - run:                 ls -R android/app/src/main/jniLibs
+      - run:                 yarn install
+      - name:                Run integration tests
+        uses:                reactivecircus/android-emulator-runner@v2
+        with:
+          working-directoy:  ./android
+          api-level:         30
+          arch:              x86_64
+          profile:           Pixel 6
+          script:            ./gradlew connectedCheck -Pandroid.testInstrumentationRunnerArguments.class=org.ZingoLabs.Zingo.IntegrationTestSuite
   
   Test:
     runs-on:                 ubuntu-22.04
