@@ -79,26 +79,16 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateTo
         containerStyle={{
           backgroundColor: colors.background
         }}
-        cameraContainerStyle={{
-        }}
-        cameraStyle={{
-        }}
         topContent={
-          <View
-            style={{
-            }}>
-            <View style={{
-            }}>
+          <View>
+            <View>
               <RegText>{translate('scanner.scanaddress') as string}</RegText>
             </View>
           </View>
         }
         bottomContent={
-          <View
-            style={{
-            }}>
-            <View style={{ 
-            }}>
+          <View>
+            <View>
               <Button type="Secondary" title={translate('cancel') as string} onPress={doCancel} />
             </View>
           </View>
