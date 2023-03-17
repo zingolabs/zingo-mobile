@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
 import QRCodeScanner from 'react-native-qrcode-scanner';
-import { View, } from 'react-native';
+import { View, SafeAreaView } from 'react-native';
 import Toast from 'react-native-simple-toast';
 
 import RegText from '../../Components/RegText';
@@ -69,7 +69,7 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateTo
 
   const { colors } = useTheme();
   return (
-    <View style={{
+    <SafeAreaView style={{
       width: '100%',
       height: '100%',
       }}>
@@ -77,7 +77,10 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateTo
         onRead={onRead}
         reactivate={true}
         containerStyle={{
-          backgroundColor: colors.background
+          backgroundColor: colors.background,
+        }}
+        cameraContainerStyle={{
+          overflow: 'hidden',
         }}
         topContent={
           <View>
@@ -98,7 +101,7 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateTo
           </View>
         }
       />
-    </View>
+    </SafeAreaView>
   );
 };
 

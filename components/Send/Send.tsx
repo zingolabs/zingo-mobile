@@ -348,7 +348,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     })();
   }, [isFocused]);
 
-  console.log('render send', 'w', dimensions.width, 'h', dimensions.height);
+  // console.log('render send', 'w', dimensions.width, 'h', dimensions.height);
 
   const returnPage = (
     <View
