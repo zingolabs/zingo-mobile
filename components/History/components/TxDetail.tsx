@@ -131,6 +131,9 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
           </View>
 
           {tx.detailedTxns.map((txd: TxDetailType) => {
+            // 30 characters per line
+            const numLines = txd.address.length < 40 ? 2 : txd.address.length / 30;
+
             return (
               <View
                 key={txd.address}
@@ -154,11 +157,11 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
                         setExpandAddress(true);
                       }
                     }}>
-                    <View style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}>
+                    <View style={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap' }}>
                       {expandAddress &&
-                        Utils.splitStringIntoChunks(txd.address, 9).map((c: string, idx: number) => {
-                          return <RegText key={idx}>{c} </RegText>;
-                        })}
+                        Utils.splitStringIntoChunks(txd.address, Number(numLines.toFixed(0))).map(
+                          (c: string, idx: number) => <RegText key={idx}>{c}</RegText>,
+                        )}
                       {!expandAddress && <RegText>{Utils.trimToSmall(txd.address, 10)}</RegText>}
                     </View>
                   </TouchableOpacity>
