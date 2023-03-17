@@ -101,7 +101,11 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateTo
               padding: 20,
             }}>
             <View style={{ width: width, alignItems: 'center' }}>
-              <Button type="Secondary" title={translate('cancel') as string} onPress={doCancel} />
+              <Button
+                testID="send.scan.cancel"
+                type="Secondary"
+                title={translate('cancel') as string} onPress={doCancel}
+              />
             </View>
           </View>
         }

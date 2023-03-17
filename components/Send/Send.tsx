@@ -451,6 +451,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         width: 58,
                       }}>
                       <TouchableOpacity
+                        testID="send.scan-button"
                         accessible={true}
                         accessibilityLabel={translate('send.scan-acc') as string}
                         onPress={() => {
