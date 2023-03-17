@@ -369,8 +369,6 @@ const Send: React.FunctionComponent<SendProps> = ({
         <ScannerAddress
           updateToField={updateToField}
           closeModal={() => setQrcodeModalVisible(false)}
-          width={dimensions.width - 42}
-          height={dimensions.height * 0.3}
         />
       </Modal>
 
