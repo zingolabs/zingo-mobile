@@ -11,7 +11,7 @@ jobs:
   Build:
     runs-on:                 ubuntu-22.04
     outputs:
-      output1:               ${{ steps.create-timestamp.outputs.timestamp }}
+      timestamp:             ${{ steps.create-timestamp.outputs.timestamp }}
     steps:
       - id:                  create-timestamp
         run:                 echo "timestamp=$(date +%Y%m%d%H%M)" >> $GITHUB_OUTPUT
@@ -28,16 +28,16 @@ jobs:
   Integration_Test:
     runs-on:                 macos-12
     needs:                   Build
+    env:
+      timestamp:             ${{ needs.Build.outputs.timestamp }}
     steps:
-      - env:
-          timestamp:         ${{ needs.Build.outputs.output1 }}
       - name:                Checkout repository
         uses:                actions/checkout@v3
       - run:                 mkdir android/app/src/main/jniLibs
       - name:                Download native rust
         uses:                actions/download-artifact@v3
         with:                
-          name:              jniLibs-${{ env.timeatamp }}
+          name:              jniLibs-${{ env.timestamp }}
           path:              android/app/src/main/jniLibs/
       - run:                 ls -R android/app/src/main/
   
