@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
 import QRCodeScanner from 'react-native-qrcode-scanner';
-import { View, Platform } from 'react-native';
+import { View, } from 'react-native';
 import Toast from 'react-native-simple-toast';
 
 import RegText from '../../Components/RegText';
@@ -21,11 +21,9 @@ type ScannerAddressProps = {
     includeUAMemo: boolean | null,
   ) => void;
   closeModal: () => void;
-  width: number;
-  height: number;
 };
 
-const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateToField, closeModal, width, height }) => {
+const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateToField, closeModal }) => {
   const context = useContext(ContextAppLoaded);
   const { translate } = context;
   const validateAddress = async (scannedAddress: string) => {
@@ -74,29 +72,23 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateTo
     <View style={{
       width: '100%',
       height: '100%',
-    }}>
+      }}>
       <QRCodeScanner
         onRead={onRead}
         reactivate={true}
-        containerStyle={{ backgroundColor: colors.background }}
+        containerStyle={{
+          backgroundColor: colors.background
+        }}
         cameraContainerStyle={{
-          borderColor: Platform.OS === 'ios' ? colors.primary : colors.background,
-          borderWidth: Platform.OS === 'ios' ? 1 : 0,
-          padding: 10,
-          margin: 10,
         }}
         cameraStyle={{
-          width: width,
-          height: Platform.OS === 'ios' ? height : height * 1.1,
-          padding: -30,
         }}
         topContent={
           <View
             style={{
-              width: '100%',
-              padding: 20,
             }}>
-            <View style={{ width: width, alignItems: 'center' }}>
+            <View style={{
+            }}>
               <RegText>{translate('scanner.scanaddress') as string}</RegText>
             </View>
           </View>
@@ -104,8 +96,6 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateTo
         bottomContent={
           <View
             style={{
-              width: '100%',
-              padding: 20,
             }}>
             <View style={{ width: width, alignItems: 'center' }}>
               <Button
@@ -113,7 +103,6 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateTo
                 type="Secondary"
                 title={translate('cancel') as string} onPress={doCancel}
               />
-            </View>
           </View>
         }
       />
