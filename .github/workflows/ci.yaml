@@ -8,7 +8,8 @@ on:
       - dev
 
 jobs:
-  Build:
+  build:
+    name:                    Build
     runs-on:                 ubuntu-22.04
     outputs:
       timestamp:             ${{ steps.create-timestamp.outputs.timestamp }}
@@ -26,22 +27,27 @@ jobs:
           name:              jniLibs-${{ steps.create-timestamp.outputs.timestamp }}
           path:              android/app/src/main/jniLibs/
   
-  Integration_Test:
+  integration_test:
+    name:                    Integration Test
     runs-on:                 macos-12
-    needs:                   Build
+    needs:                   build
     env:
-      timestamp:             ${{ needs.Build.outputs.timestamp }}
+      timestamp:             ${{ needs.build.outputs.timestamp }}
     steps:
+      - name:                Setup Java
+        uses:                actions/setup-java@v3
+        with:
+          distribution:      'temurin'
+          java-verson:       '11'
       - name:                Checkout repository
         uses:                actions/checkout@v3
-      - run:                 ls -R android/app/src/main
-      - run:                 mkdir android/app/src/main/jniLibs
+      - name:                Create native rust directory
+        run:                 mkdir android/app/src/main/jniLibs
       - name:                Download native rust
         uses:                actions/download-artifact@v3
         with:                
           name:              jniLibs-${{ env.timestamp }}
           path:              android/app/src/main/jniLibs/
-      - run:                 ls -R android/app/src/main/jniLibs
       - run:                 yarn install
       - name:                Run integration tests
         uses:                reactivecircus/android-emulator-runner@v2
@@ -51,7 +57,8 @@ jobs:
           arch:              x86_64
           script:            ./gradlew connectedCheck -Pandroid.testInstrumentationRunnerArguments.class=org.ZingoLabs.Zingo.IntegrationTestSuite
   
-  Test:
+  test:
+    name:                    Test
     runs-on:                 ubuntu-22.04
     steps:
       - name:                Checkout repository
