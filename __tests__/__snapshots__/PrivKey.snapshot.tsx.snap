@@ -249,7 +249,21 @@ exports[`Component PrivKey - test PrivKey Private - snapshot 1`] = `
             }
           }
         >
-          priv-key-12345678901234567890
+          priv-key-123456
+        </Text>
+        <Text
+          style={
+            {
+              "color": "rgb(28, 28, 30)",
+              "flexBasis": "100%",
+              "fontFamily": "Courier",
+              "fontSize": 18,
+              "opacity": 0.65,
+              "textAlign": "center",
+            }
+          }
+        >
+          78901234567890
         </Text>
       </View>
     </View>
@@ -574,7 +588,21 @@ exports[`Component PrivKey - test PrivKey View - snapshot 1`] = `
             }
           }
         >
-          view-key-12345678901234567890
+          view-key-123456
+        </Text>
+        <Text
+          style={
+            {
+              "color": "rgb(28, 28, 30)",
+              "flexBasis": "100%",
+              "fontFamily": "Courier",
+              "fontSize": 18,
+              "opacity": 0.65,
+              "textAlign": "center",
+            }
+          }
+        >
+          78901234567890
         </Text>
       </View>
     </View>
