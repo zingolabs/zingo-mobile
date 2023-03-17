@@ -15,6 +15,24 @@ jobs:
         uses:                actions/checkout@v3
       - name:                Build NDK
         run:                 cd rust && ./build.sh
+      - name:                Upload native rust
+        uses:                actions/upload-artifact@v3
+        with:
+          name:              jniLibs
+          path:              android/app/src/main/jniLibs/
+  
+  Integration_Test:
+    needs:                   Build
+    runs-on:                 macos-12
+    steps:
+      - name:                Checkout repository
+        uses:                actions/checkout@v3
+      - name:                Download native rust
+        uses:                actions/download-artifact@v3
+        with:                
+          name:              jniLibs
+          path:              android/app/src/main/
+      - run:                 ls -R android/app/src/main/
   
   Test:
     runs-on:                 ubuntu-22.04
