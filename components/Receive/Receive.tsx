@@ -31,8 +31,8 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ setUaAddress, toggleMe
   const [index, setIndex] = useState(0);
   const [routes] = useState([
     { key: 'uaddr', title: translate('receive.u-title') as string },
-    { key: 'zaddr', title: translate('legacy.z-title') as string },
-    { key: 'taddr', title: translate('legacy.t-title') as string },
+    { key: 'zaddr', title: translate('receive.z-title') as string },
+    { key: 'taddr', title: translate('receive.t-title') as string },
   ]);
 
   const [displayAddress, setDisplayAddress] = useState(uaAddress);
@@ -254,7 +254,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ setUaAddress, toggleMe
         );
       }
       case 'zaddr': {
-        let zaddr = translate('legacy.noaddress') as string;
+        let zaddr = translate('receive.noaddress') as string;
         let zaddrKind = '';
         if (zaddrs.length > 0) {
           zaddr = zaddrs[zindex].address;
@@ -277,7 +277,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ setUaAddress, toggleMe
         );
       }
       case 'taddr': {
-        let taddr = translate('legacy.noaddress') as string;
+        let taddr = translate('receive.noaddress') as string;
         let taddrKind = '';
         if (taddrs.length > 0) {
           taddr = taddrs[tindex].address;

@@ -44,7 +44,6 @@
     "wallet-menu": "HISTORY",
     "send-menu": "SEND",
     "uas-menu": "RECEIVE",
-    "legacy-menu": "LEGACY",
     "syncing": "Pausing the Syncronization to be able to Send.",
     "zcash-url": "You have already an address in the send screen"
   },
@@ -203,7 +202,7 @@
     "more": "more...",
     "toaddress": "To Address",
     "invalidaddress": "Invalid Address!",
-    "addressplaceholder": "Unified Address or Z-Sapling or T-Transparent",
+    "addressplaceholder": "Unified Address or Z-Sapling or Transparent",
     "invalidamount": "Invalid Amount!",
     "spendable": "Spendable: ",
     "somefunds": "Some funds still confirming or syncing",
@@ -232,25 +231,6 @@
     "includeua": "Include your UA:",
     "confirm-memo": "Memo"
   },
-  "legacy": {
-    "o-title": "U-Orchard",
-    "z-title": "Z-Sapling",
-    "t-title": "T-Transparent",
-    "noaddress": "No Address",
-    "znoprivkey-error": "No Z address to import the Private Key",
-    "tnoprivkey-error": "No T address to import the Private Key",
-    "tnohaveviewkey": "T addresses do not have Viewing Keys",
-    "znoviewkey": "No Z address to import the Viewing Key",
-    "title": "Legacy Address Types",
-    "newz-option": "New Z Address",
-    "newt-option": "New T Address",
-    "privkey-option": "Export Private Key",
-    "viewkey-option": "Export Viewing Key",
-    "of": " of ",
-    "prev": "Prev",
-    "next": "Next",
-    "title-acc": "Legacy Address Types Screen"
-  },
   "receive": {
     "u-title": "Unified Address",
     "noaddress": "No Address",
@@ -263,7 +243,12 @@
     "privkey-option": "Export Spending Key",
     "viewkey-option": "Export Full Viewing Key",
     "import-option": "Import Key...",
-    "title-acc": "Receive Screen"
+    "title-acc": "Receive Screen",
+    "z-title": "Z-Sapling",
+    "t-title": "Transparent",
+    "of": " of ",
+    "prev": "Prev",
+    "next": "Next"
   },
   "history": {
     "shieldfunds": "Shield funds",
