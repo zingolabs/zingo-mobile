@@ -720,6 +720,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           maxHeight: 150,
                         }}>
                         <TextInput
+                          testID="send.memo-field"
                           multiline
                           style={{
                             color: colors.text,
