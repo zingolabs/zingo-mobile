@@ -188,7 +188,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
                         ? (translate('report.running') as string)
                         : (translate('report.finished') as string)) +
                       ')'
-                    : (translate('loading') as string)
+                    : (translate('connectingserver') as string)
                 }
               />
               {!!syncingStatusReport.lastError && (
@@ -198,19 +198,10 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
                   <View style={{ height: 2, width: '100%', backgroundColor: 'red', marginBottom: 10 }} />
                 </>
               )}
-              {/*!!syncStatusReport.message && (
-                <>
-                  <View style={{ height: 2, width: '100%', backgroundColor: colors.primary, marginTop: 10 }}></View>
-                  <DetailLine
-                    label="Info about the syncing"
-                    value={syncStatusReport.message}
-                  />
-                </>
-              )*/}
 
               <View style={{ height: 2, width: '100%', backgroundColor: 'white', marginTop: 15, marginBottom: 10 }} />
 
-              {!!maxBlocks && (
+              {!!maxBlocks && server_server > 0 && server_wallet > 0 && (
                 <>
                   <View
                     style={{
@@ -343,12 +334,14 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
                       </Text>
                     </View>
                   )}
+
+                  <View
+                    style={{ height: 1, width: '100%', backgroundColor: 'white', marginTop: 15, marginBottom: 10 }}
+                  />
                 </>
               )}
 
-              <View style={{ height: 1, width: '100%', backgroundColor: 'white', marginTop: 15, marginBottom: 10 }} />
-
-              {!!maxBlocks && (
+              {!!maxBlocks && !!syncingStatusReport.syncID && syncingStatusReport.syncID >= 0 && (
                 <>
                   <View
                     style={{
@@ -524,10 +517,10 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
                       </Text>
                     </View>
                   )}
+
+                  <View style={{ height: 2, width: '100%', backgroundColor: 'white', marginTop: 15 }} />
                 </>
               )}
-
-              <View style={{ height: 2, width: '100%', backgroundColor: 'white', marginTop: 15 }} />
 
               {syncingStatusReport.inProgress && syncingStatusReport.currentBatch > 0 && (
                 <>
@@ -579,7 +572,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
           </>
         ) : (
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-            <DetailLine label="" value={translate('loading') as string} />
+            <DetailLine label="" value={translate('connectingserver') as string} />
           </View>
         )}
       </ScrollView>

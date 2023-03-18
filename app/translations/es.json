@@ -2,6 +2,7 @@
   "zingo": "Zingo!",
   "version": "zingo-1.0.0 (120)",
   "loading": "cargando...",
+  "connectingserver": "Conectando con el servidor...",
   "wait": "Por favor espere...",
   "workingonit": "Estamos trabajando en esta funcionalidad",
   "close": "Cerrar",
