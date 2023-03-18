@@ -51,7 +51,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   setZecPrice,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, dimensions, info, totalBalance, sendPageState, navigation, zecPrice, sendAll } = context;
+  const { translate, info, totalBalance, sendPageState, navigation, zecPrice, sendAll } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [qrcodeModalVisble, setQrcodeModalVisible] = useState(false);
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
@@ -366,10 +366,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         transparent={false}
         visible={qrcodeModalVisble}
         onRequestClose={() => setQrcodeModalVisible(false)}>
-        <ScannerAddress
-          updateToField={updateToField}
-          closeModal={() => setQrcodeModalVisible(false)}
-        />
+        <ScannerAddress updateToField={updateToField} closeModal={() => setQrcodeModalVisible(false)} />
       </Modal>
 
       <Modal

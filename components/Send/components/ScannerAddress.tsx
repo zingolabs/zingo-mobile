@@ -69,9 +69,10 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateTo
 
   const { colors } = useTheme();
   return (
-    <SafeAreaView style={{
-      width: '100%',
-      height: '100%',
+    <SafeAreaView
+      style={{
+        width: '100%',
+        height: '100%',
       }}>
       <QRCodeScanner
         onRead={onRead}
@@ -95,7 +96,8 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateTo
               <Button
                 testID="send.scan.cancel"
                 type="Secondary"
-                title={translate('cancel') as string} onPress={doCancel}
+                title={translate('cancel') as string}
+                onPress={doCancel}
               />
             </View>
           </View>
