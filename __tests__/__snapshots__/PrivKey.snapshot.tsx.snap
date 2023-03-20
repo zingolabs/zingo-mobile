@@ -252,7 +252,7 @@ exports[`Component PrivKey - test PrivKey Private - snapshot 1`] = `
             {
               "color": "rgb(28, 28, 30)",
               "flexBasis": "100%",
-              "fontFamily": "Courier",
+              "fontFamily": "verdana",
               "fontSize": 18,
               "opacity": 0.65,
               "textAlign": "center",
@@ -266,7 +266,7 @@ exports[`Component PrivKey - test PrivKey Private - snapshot 1`] = `
             {
               "color": "rgb(28, 28, 30)",
               "flexBasis": "100%",
-              "fontFamily": "Courier",
+              "fontFamily": "verdana",
               "fontSize": 18,
               "opacity": 0.65,
               "textAlign": "center",
@@ -601,7 +601,7 @@ exports[`Component PrivKey - test PrivKey View - snapshot 1`] = `
             {
               "color": "rgb(28, 28, 30)",
               "flexBasis": "100%",
-              "fontFamily": "Courier",
+              "fontFamily": "verdana",
               "fontSize": 18,
               "opacity": 0.65,
               "textAlign": "center",
@@ -615,7 +615,7 @@ exports[`Component PrivKey - test PrivKey View - snapshot 1`] = `
             {
               "color": "rgb(28, 28, 30)",
               "flexBasis": "100%",
-              "fontFamily": "Courier",
+              "fontFamily": "verdana",
               "fontSize": 18,
               "opacity": 0.65,
               "textAlign": "center",
