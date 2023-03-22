@@ -1,0 +1,47 @@
+name: E2E (Android)
+
+on:
+  pull_request:
+    branches: [master]
+
+jobs:
+  build:
+    name: E2E (Android)
+    runs-on: macOS-latest
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Install Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '12'
+
+      - name: Install Yarn Dependencies
+        run: yarn install
+
+      - name: Install Java JDK
+        uses: joschi/setup-jdk@v1
+        with:
+          java-version: 'openjdk8'
+          architecture: 'x64'
+        env:
+          # https://github.com/actions/toolkit/issues/641#issuecomment-728963957
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+
+      - name: Run Unit Test(s)
+        run: yarn test
+
+      - name: Run Detox Build
+        run: yarn e2e:build android.emu.debug
+
+      - name: Run Detox Test(s)
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 29
+          target: default
+          arch: x86_64
+          profile: pixel
+          avd-name: Pixel_API_29_AOSP
+          script: bash ${{ github.workspace }}/scripts/run-e2e-android-release.sh
+
