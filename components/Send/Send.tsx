@@ -51,7 +51,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   setZecPrice,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, dimensions, info, totalBalance, sendPageState, navigation, zecPrice, sendAll } = context;
+  const { translate, info, totalBalance, sendPageState, navigation, zecPrice, sendAll } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [qrcodeModalVisble, setQrcodeModalVisible] = useState(false);
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
@@ -321,13 +321,26 @@ const Send: React.FunctionComponent<SendProps> = ({
           }, 1000);
         }
       } catch (err) {
-        const error = err;
+        const error = err as string;
+
+        let customError = '';
+        if (
+          error.includes('18: bad-txns-sapling-duplicate-nullifier') ||
+          error.includes('18: bad-txns-sprout-duplicate-nullifier') ||
+          error.includes('18: bad-txns-orchard-duplicate-nullifier')
+        ) {
+          // bad-txns-xxxxxxxxx-duplicate-nullifier (3 errors)
+          customError = translate('send.duplicate-nullifier-error') as string;
+        } else if (error.includes('64: dust')) {
+          // dust
+          customError = translate('send.dust-error') as string;
+        }
 
         setTimeout(() => {
           console.log('sendtx error', error);
           Alert.alert(
             translate('send.sending-error') as string,
-            `${error}`,
+            `${customError ? customError : error}`,
             [{ text: 'OK', onPress: () => setComputingModalVisible(false) }],
             {
               cancelable: false,
@@ -366,10 +379,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         transparent={false}
         visible={qrcodeModalVisble}
         onRequestClose={() => setQrcodeModalVisible(false)}>
-        <ScannerAddress
-          updateToField={updateToField}
-          closeModal={() => setQrcodeModalVisible(false)}
-        />
+        <ScannerAddress updateToField={updateToField} closeModal={() => setQrcodeModalVisible(false)} />
       </Modal>
 
       <Modal
