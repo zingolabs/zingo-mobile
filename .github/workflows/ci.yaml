@@ -24,7 +24,7 @@ jobs:
       - name:                Upload native rust
         uses:                actions/upload-artifact@v3
         with:
-          name:              jniLibs-${{ steps.create-timestamp.outputs.timestamp }}
+          name:              zingomobile-jniLibs-${{ steps.create-timestamp.outputs.timestamp }}
           path:              android/app/src/main/jniLibs/
 
   test:
@@ -63,7 +63,7 @@ jobs:
       - name:                Download native rust
         uses:                actions/download-artifact@v3
         with:                
-          name:              jniLibs-${{ env.timestamp }}
+          name:              zingomobile-jniLibs-${{ env.timestamp }}
           path:              android/app/src/main/jniLibs/
       - run:                 yarn install
       - name:                Run integration tests
