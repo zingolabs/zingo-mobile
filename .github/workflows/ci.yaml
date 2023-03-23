@@ -8,19 +8,69 @@ on:
       - dev
 
 jobs:
-  Build:
+  build:
+    name:                    Build
     runs-on:                 ubuntu-22.04
+    outputs:
+      timestamp:             ${{ steps.create-timestamp.outputs.timestamp }}
     steps:
+      - name:                Create timestamp
+        id:                  create-timestamp
+        run:                 echo "timestamp=$(date +%Y%m%d%H%M)" >> $GITHUB_OUTPUT
       - name:                Checkout repository
         uses:                actions/checkout@v3
       - name:                Build NDK
         run:                 cd rust && ./build.sh
-  
-  Test:
+      - name:                Upload native rust
+        uses:                actions/upload-artifact@v3
+        with:
+          name:              zingomobile-jniLibs-${{ steps.create-timestamp.outputs.timestamp }}
+          path:              android/app/src/main/jniLibs/
+
+  test:
+    name:                    Test
     runs-on:                 ubuntu-22.04
     steps:
       - name:                Checkout repository
         uses:                actions/checkout@v3
       - run:                 yarn install
       - name:                Run tests
-        run:                 yarn test
+        run:                 yarn test 
+
+  integration_test:
+    name:                    Integration Test
+    runs-on:                 macos-12
+    needs:                   build
+    env:
+      timestamp:             ${{ needs.build.outputs.timestamp }}
+    strategy:
+      matrix:
+        include:
+          - arch:            x86
+            api-level:       29
+          - arch:            x86_64
+            api-level:       30
+    steps:
+      - name:                Setup Java
+        uses:                actions/setup-java@v3
+        with:
+          distribution:      'temurin'
+          java-version:      '11'
+      - name:                Checkout repository
+        uses:                actions/checkout@v3
+      - name:                Create native rust directory
+        run:                 mkdir android/app/src/main/jniLibs
+      - name:                Download native rust
+        uses:                actions/download-artifact@v3
+        with:                
+          name:              zingomobile-jniLibs-${{ env.timestamp }}
+          path:              android/app/src/main/jniLibs/
+      - run:                 yarn install
+      - name:                Run integration tests
+        uses:                reactivecircus/android-emulator-runner@v2
+        with:
+          working-directory:  ./android
+          api-level:         ${{ matrix.api-level }}
+          arch:              ${{ matrix.arch }}
+          script:            ./gradlew connectedCheck -Pandroid.testInstrumentationRunnerArguments.class=org.ZingoLabs.Zingo.IntegrationTestSuite
+  

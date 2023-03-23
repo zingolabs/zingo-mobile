@@ -51,8 +51,6 @@ see the [trouble-shooting notes](./TROUBLESHOOTING.md).
 
 ### Android
 1. In the `./android` directory, run:
-   `./gradlew x86_ArchsGroupDebugAndroidTest 
-   -Pandroid.testoptions.manageddevices.emulator.gpu=swiftshader_indirect 
-   -Pandroid.testInstrumentationRunnerArguments.class=org.ZingoLabs.Zingo.IntegrationTestSuite`
-
+   `./integration_tests.sh`
+   
 The first run may take a long time to download the `x86` and `x86_64` system images.
