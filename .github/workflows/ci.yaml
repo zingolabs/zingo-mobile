@@ -32,12 +32,16 @@ jobs:
         uses: actions/checkout@v3
       - name: Cargo build
         working-directory: ./rust/android
-        run: >
-          AR=llvm-ar LD=ld RANLIB=llvm-ranlib CC=aarch64-linux-android23-clang
-          OPENSSL_DIR=/opt/openssl-3.0.5/aarch64 cargo +nightly build -Z build-std
-          --target aarch64-linux-android --release
+        run: cargo +nightly build -Z build-std --target aarch64-linux-android --release
+        env:
+          AR: llvm-ar
+          LD: ld
+          RANLIB: llvm-ranlib
+          CC: aarch64-linux-android23-clang
+          OPENSSL_DIR: /opt/openssl-3.0.5/aarch64
       - name: LLVM Strip
-        run: llvm-strip ../target/aarch64-linux-android/release/librust.so
+        working-directory: ./rust/target
+        run: llvm-strip ./aarch64-linux-android/release/librust.so
       - name: Upload native rust
         uses: actions/upload-artifact@v3
         with:
