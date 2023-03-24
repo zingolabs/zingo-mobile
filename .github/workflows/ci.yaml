@@ -53,7 +53,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: zingomobile-arm64-v8a-${{ env.timestamp }}
-          path: android/app/src/main/jniLibs/arm64-v8a/
+          path: rust/target/aarch64-linux-android/release
 
   # build:
   #   name: Build
