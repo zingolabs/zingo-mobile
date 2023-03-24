@@ -35,7 +35,9 @@ jobs:
         uses: actions/cache@v3
         id: cargo-cache
         with: 
-          path: /root/.cargo
+          path: |
+            /root/.cargo
+            rust/target/aarch64-linux-android/build
           key: cargo-arm64-v8a      
       - name: Cargo build
         working-directory: ./rust/android
@@ -54,6 +56,7 @@ jobs:
         with:
           name: zingomobile-arm64-v8a-${{ env.timestamp }}
           path: rust/target/aarch64-linux-android/release
+      - run: ls -R rust/target
 
   # build:
   #   name: Build
