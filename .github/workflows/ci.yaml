@@ -31,6 +31,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
       - name: Cargo build
+        working-directory: ./rust/android
         run: >
           AR=llvm-ar LD=ld RANLIB=llvm-ranlib CC=aarch64-linux-android23-clang
           OPENSSL_DIR=/opt/openssl-3.0.5/aarch64 cargo +nightly build -Z build-std
