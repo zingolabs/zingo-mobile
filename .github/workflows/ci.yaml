@@ -42,6 +42,7 @@ jobs:
     env:
       timestamp: ${{ needs.generate-uid.outputs.timestamp }}
       RUSTUP_HOME: /root/.rustup
+      CARGO_HOME: ~/.cargo
     container:
       image: zingodevops/android_builder:stable
       options: --security-opt seccomp=unconfined
@@ -53,10 +54,17 @@ jobs:
         id: cargo-cache
         with:
           path: |
-            /root/.cargo
-            rust/target/${{ matrix.target }}/build
+            ~/.cargo/.crates.toml
+            ~/.cargo/.crates2.json
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/            
+            ~/.cargo/registry/cache/
+            ~/.cargo/registry/git/db/
           key: cargo-${{ matrix.arch  }}-${{ hashFiles('rust/Cargo.lock') }}
           restore-keys: cargo-${{ matrix.arch  }}
+      - name: Copy cargo directory to cargo home
+        if: steps.cargo-cache.outputs.cache-hit != 'true'
+        run: cp -rn /root/.cargo ~/
       - name: Cargo build
         working-directory: ./rust/android
         run: cargo +nightly build -Z build-std --target ${{ matrix.target }} --release
@@ -64,7 +72,7 @@ jobs:
           AR: llvm-ar
           LD: ld
           RANLIB: llvm-ranlib
-          CC: ${{ matrix.cc }}23-clang
+          CC: ${{ matrix.target }}23-clang
           OPENSSL_DIR: /opt/openssl-3.0.5/${{ matrix.openssl_path }}
       - name: LLVM Strip
         working-directory: ./rust/target
@@ -72,7 +80,7 @@ jobs:
       - name: Upload native rust
         uses: actions/upload-artifact@v3
         with:
-          name: zingomobile-${{ matrix.arch }}-${{ env.timestamp }}
+          name: zingomobile-${{ matrix.arch  }}-${{ env.timestamp }}
           path: rust/target/${{ matrix.target }}/release
   
   test:
