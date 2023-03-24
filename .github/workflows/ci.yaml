@@ -64,7 +64,7 @@ jobs:
           AR: llvm-ar
           LD: ld
           RANLIB: llvm-ranlib
-          CC: ${{ matrix.target }}23-clang
+          CC: ${{ matrix.cc }}23-clang
           OPENSSL_DIR: /opt/openssl-3.0.5/${{ matrix.openssl_path }}
       - name: LLVM Strip
         working-directory: ./rust/target
@@ -72,7 +72,7 @@ jobs:
       - name: Upload native rust
         uses: actions/upload-artifact@v3
         with:
-          name: zingomobile-${{ matrix.arch  }}-${{ env.timestamp }}
+          name: zingomobile-${{ matrix.arch }}-${{ env.timestamp }}
           path: rust/target/${{ matrix.target }}/release
   
   test:
