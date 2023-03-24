@@ -19,8 +19,13 @@ jobs:
         run: echo "timestamp=$(date +%Y%m%d%H%M%S)" >> $GITHUB_OUTPUT
 
   build:
-    name: Build native rust (arm64-v8a)
+    name: Build native rust (${{ matrix.target }})
     runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        include:
+          - target: aarch64-linux-android
+            arch: aarch64
     needs: generate-uid
     env:
       timestamp: ${{ needs.generate-uid.outputs.timestamp }}
@@ -34,49 +39,29 @@ jobs:
       - name: Cargo cache
         uses: actions/cache@v3
         id: cargo-cache
-        with: 
+        with:
           path: |
             /root/.cargo
-            rust/target/aarch64-linux-android/build
-          key: cargo-arm64-v8a      
+            rust/target/${{ matrix.target }}/build
+          key: cargo-${{ matrix.arch }}
       - name: Cargo build
         working-directory: ./rust/android
-        run: cargo +nightly build -Z build-std --target aarch64-linux-android --release
+        run: cargo +nightly build -Z build-std --target ${{ matrix.target }} --release
         env:
           AR: llvm-ar
           LD: ld
           RANLIB: llvm-ranlib
-          CC: aarch64-linux-android23-clang
-          OPENSSL_DIR: /opt/openssl-3.0.5/aarch64
+          CC: ${{ matrix.target }}23-clang
+          OPENSSL_DIR: /opt/openssl-3.0.5/${{ matrix.arch }}
       - name: LLVM Strip
         working-directory: ./rust/target
-        run: llvm-strip ./aarch64-linux-android/release/librust.so
+        run: llvm-strip ./${{ matrix.target }}/release/librust.so
       - name: Upload native rust
         uses: actions/upload-artifact@v3
         with:
-          name: zingomobile-arm64-v8a-${{ env.timestamp }}
-          path: rust/target/aarch64-linux-android/release
-      - run: ls -R rust/target
-
-  # build:
-  #   name: Build
-  #   runs-on: ubuntu-22.04
-  #   outputs:
-  #     timestamp: ${{ steps.create-timestamp.outputs.timestamp }}
-  #   steps:
-  #     - name: Create timestamp
-  #       id: create-timestamp
-  #       run: echo "timestamp=$(date +%Y%m%d%H%M)" >> $GITHUB_OUTPUT
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v3
-  #     - name: Build NDK
-  #       run: cd rust && ./build.sh
-  #     - name: Upload native rust
-  #       uses: actions/upload-artifact@v3
-  #       with:
-  #         name: zingomobile-jniLibs-${{ steps.create-timestamp.outputs.timestamp }}
-  #         path: android/app/src/main/jniLibs/
-
+          name: ${{ matrix.arch }}-${{ env.timestamp }}
+          path: rust/target/${{ matrix.target }}/release
+  
   test:
     name: Test
     runs-on: ubuntu-22.04
