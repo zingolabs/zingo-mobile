@@ -3,9 +3,7 @@ name: CI
 on:
   pull_request:
   push:
-    branches:
-      - main
-      - dev
+    branches: [main, dev]
 
 jobs:
   generate-uid:
@@ -19,11 +17,17 @@ jobs:
         run: echo "timestamp=$(date +%Y%m%d%H%M%S)" >> $GITHUB_OUTPUT
 
   build:
-    name: Build native rust (${{ matrix.target }})
+    name: Build native rust (${{ matrix.arch }})
     runs-on: ubuntu-22.04
     strategy:
       matrix:
         include:
+          - target: i686-linux-android
+            arch: x86
+          - target: x86_64-linux-android
+            arch: x86_64
+          - target: armv7a-linux-androideabi
+            arch: armv7
           - target: aarch64-linux-android
             arch: aarch64
     needs: generate-uid
@@ -43,7 +47,8 @@ jobs:
           path: |
             /root/.cargo
             rust/target/${{ matrix.target }}/build
-          key: cargo-${{ matrix.arch }}
+          key: cargo-${{ matrix.arch }}-${{ hashFiles('rust/Cargo.lock') }}
+          restore-keys: cargo-${{ matrix.arch }}
       - name: Cargo build
         working-directory: ./rust/android
         run: cargo +nightly build -Z build-std --target ${{ matrix.target }} --release
