@@ -26,6 +26,7 @@ jobs:
       timestamp: ${{ needs.generate-uid.outputs.timestamp }}
     container:
       image: zingodevops/android_builder:stable
+      options: --security-opt seccomp=unconfined
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
