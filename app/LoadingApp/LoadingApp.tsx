@@ -252,12 +252,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
         // reading background task info
         if (Platform.OS === 'ios') {
           // this file only exists in IOS BS.
-          const backgroundJson = await BackgroundFileImpl.readBackground();
-          if (backgroundJson) {
-            this.setState({
-              background: backgroundJson,
-            });
-          }
+          this.fetchBackgroundSyncing();
         }
         // setting value for background task Android
         await AsyncStorage.setItem('@background', 'no');
@@ -286,6 +281,15 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
         scale: Number(screen.scale.toFixed(2)),
       },
     });
+  };
+
+  fetchBackgroundSyncing = async () => {
+    const backgroundJson = await BackgroundFileImpl.readBackground();
+    if (backgroundJson) {
+      this.setState({
+        background: backgroundJson,
+      });
+    }
   };
 
   useDefaultServer_0 = async () => {
