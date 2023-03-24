@@ -22,14 +22,22 @@ jobs:
     strategy:
       matrix:
         include:
-          - target: i686-linux-android
-            arch: x86
-          - target: x86_64-linux-android
-            arch: x86_64
-          - target: armv7a-linux-androideabi
-            arch: armv7
-          - target: aarch64-linux-android
-            arch: aarch64
+          - arch : x86
+            target: i686-linux-android
+            cc: i686-linux-android
+            openssl_path: x86
+          - arch : x86_64
+            target: x86_64-linux-android
+            cc: x86_64-linux-android
+            openssl_path: x86_64
+          - arch : armeabi-v7a
+            target: armv7-linux-androideabi
+            cc: armv7a-linux-androideabi
+            openssl_path: armv7
+          - arch : arm64-v8a
+            target: aarch64-linux-android
+            cc: aarch64-linux-android
+            openssl_path: aarch64
     needs: generate-uid
     env:
       timestamp: ${{ needs.generate-uid.outputs.timestamp }}
@@ -47,8 +55,8 @@ jobs:
           path: |
             /root/.cargo
             rust/target/${{ matrix.target }}/build
-          key: cargo-${{ matrix.arch }}-${{ hashFiles('rust/Cargo.lock') }}
-          restore-keys: cargo-${{ matrix.arch }}
+          key: cargo-${{ matrix.arch  }}-${{ hashFiles('rust/Cargo.lock') }}
+          restore-keys: cargo-${{ matrix.arch  }}
       - name: Cargo build
         working-directory: ./rust/android
         run: cargo +nightly build -Z build-std --target ${{ matrix.target }} --release
@@ -57,14 +65,14 @@ jobs:
           LD: ld
           RANLIB: llvm-ranlib
           CC: ${{ matrix.target }}23-clang
-          OPENSSL_DIR: /opt/openssl-3.0.5/${{ matrix.arch }}
+          OPENSSL_DIR: /opt/openssl-3.0.5/${{ matrix.openssl_path }}
       - name: LLVM Strip
         working-directory: ./rust/target
         run: llvm-strip ./${{ matrix.target }}/release/librust.so
       - name: Upload native rust
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.arch }}-${{ env.timestamp }}
+          name: zingomobile-${{ matrix.arch  }}-${{ env.timestamp }}
           path: rust/target/${{ matrix.target }}/release
   
   test:
@@ -77,64 +85,66 @@ jobs:
       - name: Run tests
         run: yarn test
 
-  # integration_test:
-  #   name: Integration Test
-  #   runs-on: macos-12
-  #   needs: build
-  #   env:
-  #     timestamp: ${{ needs.build.outputs.timestamp }}
-  #   strategy:
-  #     matrix:
-  #       include:
-  #         - arch: x86
-  #           api-level: 29
-  #         - arch: x86_64
-  #           api-level: 30
-  #   steps:
-  #     - name: Setup Java
-  #       uses: actions/setup-java@v3
-  #       with:
-  #         distribution: 'temurin'
-  #         java-version: '11'
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v3
-  #     - name: Gradle cache
-  #       uses: gradle/gradle-build-action@v2
-  #       with:
-  #         gradle-version: 7.3.3    
-  #     - name: AVD cache
-  #       uses: actions/cache@v3
-  #       id: avd-cache
-  #       with: 
-  #         path: |
-  #           ~/.android/avd/*
-  #           ~/.android/adb*
-  #         key: avd-${{ matrix.arch }}-api-${{ matrix.api-level }}      
-  #     - name: Create native rust directory
-  #       run: mkdir android/app/src/main/jniLibs
-  #     - name: Download native rust
-  #       uses: actions/download-artifact@v3
-  #       with: 
-  #         name: zingomobile-jniLibs-${{ env.timestamp }}
-  #         path: android/app/src/main/jniLibs/
-  #     - run: yarn install
-  #     - name: Create AVD and generate snapshot for caching
-  #       if: steps.avd-cache.outputs.cache-hit != 'true'
-  #       uses: reactivecircus/android-emulator-runner@v2
-  #       with:
-  #         api-level: ${{ matrix.api-level }}
-  #         arch: ${{ matrix.arch }}
-  #         force-avd-creation: false
-  #         emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-  #         disable-animations: false
-  #         script: echo "Generated AVD snapshot for caching."      i
-  #     - name: Run integration tests
-  #       uses: reactivecircus/android-emulator-runner@v2
-  #       with:
-  #         working-directory: ./android
-  #         api-level: ${{ matrix.api-level }}
-  #         arch: ${{ matrix.arch }}
-  #         force-avd-creation: false
-  #         emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-  #         disable-animations: true
-  #         script: ./gradlew connectedCheck -Pandroid.testInstrumentationRunnerArguments.class=org.ZingoLabs.Zingo.IntegrationTestSuite
+  integration_test:
+    name: Integration Test
+    runs-on: macos-12
+    needs: build
+    env:
+      timestamp: ${{ needs.generate-uid.outputs.timestamp }}
+    strategy:
+      matrix:
+        include:
+          - arch : x86
+            api-level: 29
+            jniLibs_dir: x86
+          - arch : x86_64
+            api-level: 30
+            jniLibs_dir: x86_64
+    steps:
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Gradle cache
+        uses: gradle/gradle-build-action@v2
+        with:
+          gradle-version: 7.3.3    
+      - name: AVD cache
+        uses: actions/cache@v3
+        id: avd-cache
+        with: 
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-${{ matrix.arch  }}-api-${{ matrix.api-level }}      
+      - name: Create native rust directory
+        run: mkdir android/app/src/main/jniLibs
+      - name: Download native rust
+        uses: actions/download-artifact@v3
+        with: 
+          name: zingomobile-${{ matrix.arch  }}-${{ env.timestamp }}
+          path: android/app/src/main/jniLibs/${{ matrix.jniLibs_dir }}
+      - run: yarn install
+      - name: Create AVD and generate snapshot for caching
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          arch: ${{ matrix.arch  }}
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: false
+          script: echo "Generated AVD snapshot for caching."      i
+      - name: Run integration tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          working-directory: ./android
+          api-level: ${{ matrix.api-level }}
+          arch: ${{ matrix.arch  }}
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          script: ./gradlew connectedCheck -Pandroid.testInstrumentationRunnerArguments.class=org.ZingoLabs.Zingo.IntegrationTestSuite
