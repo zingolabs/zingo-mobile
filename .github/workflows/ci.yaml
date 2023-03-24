@@ -31,8 +31,12 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      # - name: Install toolchain
-      #   run: rustup toolchain install nightly
+      - name: Cargo cache
+        uses: actions/cache@v3
+        id: cargo-cache
+        with: 
+          path: /root/.cargo
+          key: cargo-arm64-v8a      
       - name: Cargo build
         working-directory: ./rust/android
         run: cargo +nightly build -Z build-std --target aarch64-linux-android --release
