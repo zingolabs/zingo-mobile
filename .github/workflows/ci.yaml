@@ -44,7 +44,6 @@ jobs:
       RUSTUP_HOME: /root/.rustup
     container:
       image: zingodevops/android_builder:stable
-      options: --security-opt seccomp=unconfined
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -105,19 +104,19 @@ jobs:
     env:
       timestamp: ${{ needs.generate-uid.outputs.timestamp }}
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '11'
-      - name: Checkout repository
-        uses: actions/checkout@v3
       - name: Gradle cache
         uses: gradle/gradle-build-action@v2
         with:
           gradle-version: 7.3.3
           build-root-directory: ./android
-          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev' && !startsWith(github.ref, 'refs/pull/') }}
+          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev' }}
       - name: AVD cache
         uses: actions/cache@v3
         id: avd-cache
