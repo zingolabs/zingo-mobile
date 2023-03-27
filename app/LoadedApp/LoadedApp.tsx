@@ -284,6 +284,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
           this.fetchBackgroundSyncing();
         }
         this.rpc.setInRefresh(false);
+        this.rpc.clearTimers();
         this.rpc.configure();
         // setting value for background task Android
         await AsyncStorage.setItem('@background', 'no');
