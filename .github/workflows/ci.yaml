@@ -41,27 +41,24 @@ jobs:
     needs: generate-uid
     env:
       timestamp: ${{ needs.generate-uid.outputs.timestamp }}
-      RUSTUP_HOME: ~/.rustup
-      CARGO_HOME: ~/.cargo
+      RUSTUP_HOME: /root/.rustup
     container:
       image: zingodevops/android_builder:stable
       options: --security-opt seccomp=unconfined
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      - name: Symlink cargo and rustup
-        run: ln -s /root/.rustup /root/.cargo ~/
       - name: Cargo cache
         uses: actions/cache@v3
         id: cargo-cache
         with:
           path: |
-            ~/.cargo/.crates.toml
-            ~/.cargo/.crates2.json
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/            
-            ~/.cargo/registry/cache/
-            ~/.cargo/registry/git/db/
+            /root/.cargo/.crates.toml
+            /root/.cargo/.crates2.json
+            /root/.cargo/bin/
+            /root/.cargo/registry/index/            
+            /root/.cargo/registry/cache/
+            /root/.cargo/registry/git/db/
           key: cargo-${{ matrix.arch }}-${{ hashFiles('rust/Cargo.lock') }}
           restore-keys: cargo-${{ matrix.arch }}
       - name: Cargo build
