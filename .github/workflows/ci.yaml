@@ -41,7 +41,7 @@ jobs:
     needs: generate-uid
     env:
       timestamp: ${{ needs.generate-uid.outputs.timestamp }}
-      RUSTUP_HOME: /root/.rustup
+      RUSTUP_HOME: ~/.rustup
       CARGO_HOME: ~/.cargo
     container:
       image: zingodevops/android_builder:stable
@@ -49,6 +49,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+      - name: Symlink cargo and rustup
+        run: ln -s /root/.rustup /root/.cargo ~/
       - name: Cargo cache
         uses: actions/cache@v3
         id: cargo-cache
@@ -60,11 +62,8 @@ jobs:
             ~/.cargo/registry/index/            
             ~/.cargo/registry/cache/
             ~/.cargo/registry/git/db/
-          key: cargo-${{ matrix.arch  }}-${{ hashFiles('rust/Cargo.lock') }}
-          restore-keys: cargo-${{ matrix.arch  }}
-      - name: Copy cargo directory to cargo home
-        if: steps.cargo-cache.outputs.cache-hit != 'true'
-        run: cp -rn /root/.cargo ~/
+          key: cargo-${{ matrix.arch }}-${{ hashFiles('rust/Cargo.lock') }}
+          restore-keys: cargo-${{ matrix.arch }}
       - name: Cargo build
         working-directory: ./rust/android
         run: cargo +nightly build -Z build-std --target ${{ matrix.target }} --release
@@ -72,7 +71,7 @@ jobs:
           AR: llvm-ar
           LD: ld
           RANLIB: llvm-ranlib
-          CC: ${{ matrix.target }}23-clang
+          CC: ${{ matrix.cc }}23-clang
           OPENSSL_DIR: /opt/openssl-3.0.5/${{ matrix.openssl_path }}
       - name: LLVM Strip
         working-directory: ./rust/target
@@ -80,7 +79,7 @@ jobs:
       - name: Upload native rust
         uses: actions/upload-artifact@v3
         with:
-          name: zingomobile-${{ matrix.arch  }}-${{ env.timestamp }}
+          name: zingomobile-${{ matrix.arch }}-${{ env.timestamp }}
           path: rust/target/${{ matrix.target }}/release
   
   test:
@@ -133,7 +132,7 @@ jobs:
       - name: Download native rust
         uses: actions/download-artifact@v3
         with: 
-          name: zingomobile-${{ matrix.arch  }}-${{ env.timestamp }}
+          name: zingomobile-${{ matrix.arch }}-${{ env.timestamp }}
           path: android/app/src/main/jniLibs/${{ matrix.jniLibs_dir }}
       - run: yarn install
       - name: Create AVD and generate snapshot for caching
@@ -141,7 +140,7 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api-level }}
-          arch: ${{ matrix.arch  }}
+          arch: ${{ matrix.arch }}
           force-avd-creation: false
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: false
@@ -151,7 +150,7 @@ jobs:
         with:
           working-directory: ./android
           api-level: ${{ matrix.api-level }}
-          arch: ${{ matrix.arch  }}
+          arch: ${{ matrix.arch }}
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
