@@ -22,19 +22,19 @@ jobs:
     strategy:
       matrix:
         include:
-          - arch : x86
+          - arch: x86
             target: i686-linux-android
             cc: i686-linux-android
             openssl_path: x86
-          - arch : x86_64
+          - arch: x86_64
             target: x86_64-linux-android
             cc: x86_64-linux-android
             openssl_path: x86_64
-          - arch : armeabi-v7a
+          - arch: armeabi-v7a
             target: armv7-linux-androideabi
             cc: armv7a-linux-androideabi
             openssl_path: armv7
-          - arch : arm64-v8a
+          - arch: arm64-v8a
             target: aarch64-linux-android
             cc: aarch64-linux-android
             openssl_path: aarch64
@@ -92,9 +92,6 @@ jobs:
   integration_test:
     name: Integration Test
     runs-on: macos-12
-    needs: build
-    env:
-      timestamp: ${{ needs.generate-uid.outputs.timestamp }}
     strategy:
       matrix:
         include:
@@ -104,6 +101,9 @@ jobs:
           - arch : x86_64
             api-level: 30
             jniLibs_dir: x86_64
+    needs: [generate-uid, build]
+    env:
+      timestamp: ${{ needs.generate-uid.outputs.timestamp }}
     steps:
       - name: Setup Java
         uses: actions/setup-java@v3
@@ -123,7 +123,7 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-${{ matrix.arch  }}-api-${{ matrix.api-level }}      
+          key: avd-${{ matrix.arch }}-api-${{ matrix.api-level }}      
       - name: Create native rust directory
         run: mkdir android/app/src/main/jniLibs
       - name: Download native rust
