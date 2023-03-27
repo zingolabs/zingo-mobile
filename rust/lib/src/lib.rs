@@ -25,7 +25,7 @@ pub fn init_new(
     let server = construct_server_uri(Some(server_uri));
 
     let (mut config, latest_block_height) =
-        match zingolib::create_zingoconf_from_datadir(server, None) {
+        match zingolib::load_clientconfig(server, None) {
             Ok((c, h)) => (c, h),
             Err(e) => {
                 return format!("Error: {}", e);
@@ -68,7 +68,7 @@ pub fn init_from_seed(
     let server = construct_server_uri(Some(server_uri));
 
     let (mut config, _latest_block_height) =
-        match zingolib::create_zingoconf_from_datadir(server, None) {
+        match zingolib::load_clientconfig(server, None) {
             Ok((c, h)) => (c, h),
             Err(e) => {
                 return format!("Error: {}", e);
@@ -112,7 +112,7 @@ pub fn init_from_b64(
     let server = construct_server_uri(Some(server_uri));
 
     let (mut config, _latest_block_height) =
-        match zingolib::create_zingoconf_from_datadir(server, None) {
+        match zingolib::load_clientconfig(server, None) {
             Ok((c, h)) => (c, h),
             Err(e) => {
                 return format!("Error: {}", e);
@@ -202,7 +202,7 @@ pub fn execute(cmd: String, args_list: String) -> String {
 pub fn get_latest_block(server_uri: String) -> String {
     let server = construct_server_uri(Some(server_uri));
     let (_config, latest_block_height) =
-        match zingolib::create_zingoconf_from_datadir(server, None) {
+        match zingolib::load_clientconfig(server, None) {
             Ok((c, h)) => (c, h),
             Err(e) => {
                 return format!("Error: {}", e);
