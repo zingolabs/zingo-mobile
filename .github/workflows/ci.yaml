@@ -208,4 +208,4 @@ jobs:
       - name: Run Detox Build
         run: yarn detox build -c android.emu.debug -n avd-${{ matrix.arch }}-api-${{ matrix.api-level }}
       - name: Run Detox Test
-        run: yarn detox test -c android.emu.debug -n avd-${{ matrix.arch }}-api-${{ matrix.api-level }}
+        run: yarn detox test -c android.emu.debug -n test
