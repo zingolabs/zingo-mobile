@@ -153,7 +153,7 @@ jobs:
           script: ./gradlew connectedCheck -Pandroid.testInstrumentationRunnerArguments.class=org.ZingoLabs.Zingo.IntegrationTestSuite
 
   e2e_test:
-    name: Integration Test
+    name: End-to-End Test
     runs-on: macos-12
     strategy:
       matrix:
@@ -207,3 +207,5 @@ jobs:
           script: echo "Generated AVD snapshot for caching."
       - name: Run Detox Build
         run: yarn detox build -c android.emu.debug -n avd-${{ matrix.arch }}-api-${{ matrix.api-level }}
+      - name: Run Detox Test
+        run: yarn detox test -c android.emu.debug -n avd-${{ matrix.arch }}-api-${{ matrix.api-level }}
