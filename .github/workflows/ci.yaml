@@ -141,7 +141,7 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: false
-          script: echo "Generated AVD snapshot for caching."      i
+          script: echo "Generated AVD snapshot for caching."
       - name: Run integration tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -152,3 +152,59 @@ jobs:
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
           script: ./gradlew connectedCheck -Pandroid.testInstrumentationRunnerArguments.class=org.ZingoLabs.Zingo.IntegrationTestSuite
+
+  integration_test:
+    name: Integration Test
+    runs-on: macos-12
+    strategy:
+      matrix:
+        include:
+          - arch : x86
+            api-level: 29
+            jniLibs_dir: x86
+          - arch : x86_64
+            api-level: 30
+            jniLibs_dir: x86_64
+    needs: [generate-uid, build]
+    env:
+      timestamp: ${{ needs.generate-uid.outputs.timestamp }}
+    steps:
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Gradle cache
+        uses: gradle/gradle-build-action@v2
+        with:
+          gradle-version: 7.3.3
+          build-root-directory: ./android
+          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev' && github.ref != 'refs/pull/*' }}
+      - name: AVD cache
+        uses: actions/cache@v3
+        id: avd-cache
+        with: 
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-${{ matrix.arch }}-api-${{ matrix.api-level }}      
+      - name: Download native rust
+        uses: actions/download-artifact@v3
+        with: 
+          name: zingomobile-${{ matrix.arch }}-${{ env.timestamp }}
+          path: android/app/src/main/jniLibs/${{ matrix.jniLibs_dir }}
+      - run: yarn install
+      - name: Create AVD and generate snapshot for caching
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          arch: ${{ matrix.arch }}
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: false
+          script: echo "Generated AVD snapshot for caching."
+      - name: Run Detox Build
+        run: yarn detox build android.emu.debug
