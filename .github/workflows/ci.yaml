@@ -152,7 +152,7 @@ jobs:
           disable-animations: true
           script: ./gradlew connectedCheck -Pandroid.testInstrumentationRunnerArguments.class=org.ZingoLabs.Zingo.IntegrationTestSuite
 
-  integration_test:
+  e2e_test:
     name: Integration Test
     runs-on: macos-12
     strategy:
