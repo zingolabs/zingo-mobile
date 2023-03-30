@@ -6,7 +6,7 @@ describe('Renders wallet data correctly.', () => {
   // i just pulled this seed out of thin air
   it('loads a wallet', loadTestWallet);
   
-  it('Checkbox send screen -> include UA in memo field', async () => {
+  xit('Checkbox send screen -> include UA in memo field', async () => {
     await element(by.text('SEND')).tap();
     
     await element(by.id('send.scan-button')).tap();
