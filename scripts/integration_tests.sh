@@ -35,7 +35,9 @@ function wait_for() {
   fi
 }
 
-# ADB integration test
+
+
+# Create integration test report directory
 rm -rf app/build/outputs/integration_test_reports
 mkdir app/build/outputs/integration_test_reports
 
