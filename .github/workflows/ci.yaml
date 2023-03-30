@@ -16,8 +16,8 @@ jobs:
       - name: Run tests
         run: yarn test
   
-  generate-uid:
-    name: Generate UID
+  create-timestamp:
+    name: Create timestamp
     runs-on: ubuntu-22.04
     outputs:
       timestamp: ${{ steps.create-timestamp.outputs.timestamp }}
@@ -48,9 +48,9 @@ jobs:
             target: aarch64-linux-android
             cc: aarch64-linux-android
             openssl_path: aarch64
-    needs: generate-uid
+    needs: create-timestamp
     env:
-      timestamp: ${{ needs.generate-uid.outputs.timestamp }}
+      timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
       RUSTUP_HOME: /root/.rustup
     container:
       image: zingodevops/android_builder:stable
@@ -61,6 +61,7 @@ jobs:
         uses: actions/cache@v3
         id: cargo-cache
         with:
+          # TODO: ref paths from cargo
           path: |
             /root/.cargo/.crates.toml
             /root/.cargo/.crates2.json
@@ -100,9 +101,9 @@ jobs:
           - arch : x86_64
             api-level: 30
             jniLibs_dir: x86_64
-    needs: [generate-uid, build]
+    needs: [create-timestamp, build]
     env:
-      timestamp: ${{ needs.generate-uid.outputs.timestamp }}
+      timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
