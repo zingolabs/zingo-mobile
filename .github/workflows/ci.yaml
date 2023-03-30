@@ -205,6 +205,8 @@ jobs:
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: false
           script: echo "Generated AVD snapshot for caching."
+      - name: start react-native
+        run: nohup yarn react-native start > "out.yarn_react_native_start" &
       - name: Run Detox Build
         run: yarn detox build -c android.emu.debug -n test
       - name: Run Detox Test
