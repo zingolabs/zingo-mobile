@@ -35,11 +35,6 @@ function wait_for() {
   fi
 }
 
-# Gradle managed devices integration test
-# ./gradlew x86_ArchsGroupDebugAndroidTest \
-# -Pandroid.testoptions.manageddevices.emulator.gpu=swiftshader_indirect \
-# -Pandroid.testInstrumentationRunnerArguments.class=org.ZingoLabs.Zingo.IntegrationTestSuite
-
 # ADB integration test
 rm -rf app/build/outputs/integration_test_reports
 mkdir app/build/outputs/integration_test_reports
