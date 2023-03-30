@@ -35,7 +35,13 @@ function wait_for() {
   fi
 }
 
-
+# Setup working directory
+if [ ! -d "./android/app" ];
+then
+    echo "Failed. Run './scripts/integration_tests.sh' from zingo-mobile root directory."
+    exit 1
+fi
+cd android
 
 # Create integration test report directory
 rm -rf app/build/outputs/integration_test_reports
@@ -59,7 +65,7 @@ echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
 
 echo -e "\nWaiting for AVD to boot..."
 wait_for 600 boot_complete
-# avd_name=$(adb -H localhost -P 5037 -s emulator-5554 emu avd name | head -1)
+echo $(adb -H localhost -P 5037 -s emulator-5554 emu avd name | head -1)
 echo "Boot completed"
 adb -H localhost -P 5037 -s emulator-5554 shell getprop &> app/build/outputs/integration_test_reports/getprop.txt
 
@@ -67,31 +73,26 @@ echo -e "\nInstalling APKs..."
 adb -H localhost -P 5037 -s emulator-5554 install -r -t /home/oscar/src/zingo-mobile/android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
 adb -H localhost -P 5037 -s emulator-5554 install -r -t /home/oscar/src/zingo-mobile/android/app/build/outputs/apk/debug/app-debug.apk
 
-echo -e "\nStoring emulator info..."
+# Store emulator info and start logging
 adb -H localhost -P 5037 -s emulator-5554 shell cat /proc/meminfo &> app/build/outputs/integration_test_reports/meminfo.txt
 adb -H localhost -P 5037 -s emulator-5554 shell cat /proc/cpuinfo &> app/build/outputs/integration_test_reports/cpuinfo.txt
-
-echo -e "\nStart logging..."
-# log_date=$(adb -H localhost -P 5037 -s emulator-5554 shell date +%m-%d\ %H:%M:%S)
-# echo "${log_date}"
-# adb -H localhost -P 5037 -s emulator-5554 shell logcat -v threadtime -b main -T $log_date
 adb -H localhost -P 5037 -s emulator-5554 shell logcat -v threadtime -b main &> app/build/outputs/integration_test_reports/logcat.txt &
 
-echo -e "\nCreating additional test output directory..."
+# Create additional test output directory
 adb -H localhost -P 5037 -s emulator-5554 shell rm -rf "/sdcard/Android/media/org.ZingoLabs.Zingo/additional_test_output"
 adb -H localhost -P 5037 -s emulator-5554 shell mkdir -p "/sdcard/Android/media/org.ZingoLabs.Zingo/additional_test_output"
 
 echo -e "\nRunning integration tests..."
 adb -H localhost -P 5037 -s emulator-5554 shell am instrument -w -r -e class org.ZingoLabs.Zingo.IntegrationTestSuite \
 -e additionalTestOutputDir /sdcard/Android/media/org.ZingoLabs.Zingo/additional_test_output \
--e testTimeoutSeconds 31536000 org.ZingoLabs.Zingo.test/androidx.test.runner.AndroidJUnitRunner
+-e testTimeoutSeconds 31536000 org.ZingoLabs.Zingo.test/androidx.test.runner.AndroidJUnitRunner \
+| tee app/build/outputs/integration_test_reports/test_results.txt
+
+# Store additional test outputs
+adb -H localhost -P 5037 -s emulator-5554 shell cat /sdcard/Android/media/org.ZingoLabs.Zingo/additional_test_output \
+&> app/build/outputs/integration_test_reports/additional_test_output.txt
 
 # Kill emulator
 adb -s emulator-5554 emu kill
 
-
-# Gradle managed devices integration test
-# ./gradlew x86_ArchsGroupDebugAndroidTest \
-# -Pandroid.testoptions.manageddevices.emulator.gpu=swiftshader_indirect \
-# -Pandroid.testInstrumentationRunnerArguments.class=org.ZingoLabs.Zingo.IntegrationTestSuite
-
+echo -e "\nTest reports saved in 'zingo-mobile/android/app/build/outputs/integration_test_reports' directory."
