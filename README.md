@@ -52,7 +52,7 @@ see the [trouble-shooting notes](./TROUBLESHOOTING.md).
 ## Integration Tests
 
 ### Android
-1. In the `./android` directory, run:
-   `./integration_tests.sh`
+1. From the root directory, run:
+   `./scripts/integration_tests_gradle.sh`
    
 The first run may take a long time to download the `x86` and `x86_64` system images.
