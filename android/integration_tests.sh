@@ -35,13 +35,8 @@ function wait_for() {
   fi
 }
 
-# Gradle managed devices integration test
-# ./gradlew x86_ArchsGroupDebugAndroidTest \
-# -Pandroid.testoptions.manageddevices.emulator.gpu=swiftshader_indirect \
-# -Pandroid.testInstrumentationRunnerArguments.class=org.ZingoLabs.Zingo.IntegrationTestSuite
-
 # ADB integration test
-rm -r app/build/outputs/integration_test_reports
+rm -rf app/build/outputs/integration_test_reports
 mkdir app/build/outputs/integration_test_reports
 
 echo -e "\nBuilding APKs..."
@@ -58,20 +53,27 @@ echo -e "\nWaiting for emulator to launch..."
 emulator -avd pixel2_x86_64 -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -read-only -no-boot-anim \
 &> app/build/outputs/integration_test_reports/emulator.txt &
 wait_for 600 emulator_launch
-echo "$(adb devices | grep "emulator-5554" | cut -f1) successfully launched"
+echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
 
-echo -e "\nBooting..."
+echo -e "\nWaiting for AVD to boot..."
 wait_for 600 boot_complete
-echo "$(adb devices | grep "emulator-5554" | cut -f1) boot completed"
+# avd_name=$(adb -H localhost -P 5037 -s emulator-5554 emu avd name | head -1)
+echo "Boot completed"
 adb -H localhost -P 5037 -s emulator-5554 shell getprop &> app/build/outputs/integration_test_reports/getprop.txt
 
 echo -e "\nInstalling APKs..."
 adb -H localhost -P 5037 -s emulator-5554 install -r -t /home/oscar/src/zingo-mobile/android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
 adb -H localhost -P 5037 -s emulator-5554 install -r -t /home/oscar/src/zingo-mobile/android/app/build/outputs/apk/debug/app-debug.apk
 
-# Logging
-# adb -H localhost -P 5037 -s emulator-5554 shell date +%m-%d\ %H:%M:%S
-# adb -H localhost -P 5037 -s emulator-5554 shell logcat -v threadtime -b main -T '03-28 14:48:16.000'
+echo -e "\nStoring emulator info..."
+adb -H localhost -P 5037 -s emulator-5554 shell cat /proc/meminfo &> app/build/outputs/integration_test_reports/meminfo.txt
+adb -H localhost -P 5037 -s emulator-5554 shell cat /proc/cpuinfo &> app/build/outputs/integration_test_reports/cpuinfo.txt
+
+echo -e "\nStart logging..."
+# log_date=$(adb -H localhost -P 5037 -s emulator-5554 shell date +%m-%d\ %H:%M:%S)
+# echo "${log_date}"
+# adb -H localhost -P 5037 -s emulator-5554 shell logcat -v threadtime -b main -T $log_date
+adb -H localhost -P 5037 -s emulator-5554 shell logcat -v threadtime -b main &> app/build/outputs/integration_test_reports/logcat.txt &
 
 echo -e "\nCreating additional test output directory..."
 adb -H localhost -P 5037 -s emulator-5554 shell rm -rf "/sdcard/Android/media/org.ZingoLabs.Zingo/additional_test_output"
@@ -84,3 +86,10 @@ adb -H localhost -P 5037 -s emulator-5554 shell am instrument -w -r -e class org
 
 # Kill emulator
 adb -s emulator-5554 emu kill
+
+
+# Gradle managed devices integration test
+# ./gradlew x86_ArchsGroupDebugAndroidTest \
+# -Pandroid.testoptions.manageddevices.emulator.gpu=swiftshader_indirect \
+# -Pandroid.testInstrumentationRunnerArguments.class=org.ZingoLabs.Zingo.IntegrationTestSuite
+
