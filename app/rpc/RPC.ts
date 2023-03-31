@@ -106,15 +106,16 @@ export default class RPC {
     //console.log(resultStr);
 
     if (resultStr) {
-      if (resultStr.toLowerCase().startsWith('error')) {
+      if (resultStr.toLowerCase().startsWith('error') || isNaN(parseFloat(resultStr))) {
         //console.log(`Error fetching price ${resultStr}`);
         return 0;
       } else {
         return parseFloat(resultStr);
       }
+    } else {
+      //console.log(`Error fetching price ${resultStr}`);
+      return 0;
     }
-
-    return 0;
   }
 
   static async rpc_setWalletSettingOption(name: string, value: string): Promise<string> {
