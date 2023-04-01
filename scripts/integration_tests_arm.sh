@@ -50,8 +50,9 @@ echo -e "\nBuilding APKs..."
 ./gradlew assembleDebug assembleAndroidtest
 
 echo -e "\nDownloading system images..."
-sdk="system-images;android-30;aosp_atd;arm64-v8a"
-sdkmanager --install $sdk 
+sdk="system-images;android-30;google_atd;arm64-v8a"
+sdkmanager --install emulator --channel=3
+sdkmanager --install $sdk --channel=3 
 sdkmanager --licenses
 
 echo -e "Creating AVDs..."
