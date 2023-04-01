@@ -41,12 +41,22 @@ while getopts 'a:h' OPTION; do
             abi="$OPTARG"
             case "$abi" in
                 x86_64)
-                    sdk="system-images;android-30;default;x86_64"                    
-                    avd_target="default"
+                    sdk="system-images;android-30;google_apis;x86_64"                    
+                    sdk_api="android-30"
+                    sdk_target="google_apis"
+                    sdk_arch="x86_64"
                     ;;
                 x86) 
-                    sdk="system-images;android-29;default;x86"                    
-                    avd_target="default"
+                    sdk="system-images;android-30;google_apis;x86"                    
+                    sdk_api="android-30"
+                    sdk_target="google_apis"
+                    sdk_arch="x86"
+                    ;;
+                arm64-v8a)
+                    sdk="system-images;android-30;google_apis;x86_64"                    
+                    sdk_api="android-30"
+                    sdk_target="google_apis"
+                    sdk_arch="x86_64"
                     ;;
                 *)
                     echo "Invalid ABI." >&2
@@ -105,11 +115,14 @@ sdkmanager --install $sdk
 yes | sdkmanager --licenses
 
 echo -e "Creating AVDs..."
-echo no | avdmanager create avd --force --name "${avd_target}_${abi}" --package $sdk --abi "${avd_target}/${abi}"
+echo no | avdmanager create avd --force --name "${sdk_api}_${sdk_target}_${sdk_arch}" --package $sdk
+# echo no | avdmanager create avd --force --name "${sdk_api}_${sdk_target}_${sdk_arch}" --package $sdk --abi "${sdk_target}/${sdk_arch}"
 
 echo -e "\n\nWaiting for emulator to launch..."
-emulator -avd "${avd_target}_${abi}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -read-only -no-boot-anim \
+emulator -avd "${sdk_api}_${sdk_target}_${sdk_arch}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
 &> "${test_report_dir}/emulator.txt" &
+# emulator -avd "${sdk_api}_${sdk_target}_${sdk_arch}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -read-only -no-boot-anim \
+# &> "${test_report_dir}/emulator.txt" &
 wait_for 600 emulator_launch
 echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
 
