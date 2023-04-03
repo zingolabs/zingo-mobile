@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { View, Platform, ScrollView, TouchableOpacity, Text } from 'react-native';
+import { View, ScrollView, TouchableOpacity, Text } from 'react-native';
 import Clipboard from '@react-native-community/clipboard';
 import QRCode from 'react-native-qrcode-svg';
 import Toast from 'react-native-simple-toast';
@@ -41,7 +41,6 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   // 30 characters per line
   const numLines = addressKind === 't' ? 2 : address.length / 30;
   const chunks = Utils.splitStringIntoChunks(address, Number(numLines.toFixed(0)));
-  const fixedWidthFont = Platform.OS === 'android' ? 'monospace' : 'Courier';
 
   const doCopy = () => {
     if (address) {
@@ -131,7 +130,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
               style={{
                 flexBasis: '100%',
                 textAlign: 'center',
-                fontFamily: fixedWidthFont,
+                fontFamily: 'verdana',
                 fontSize: 16,
                 color: colors.text,
               }}>

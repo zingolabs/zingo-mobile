@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState } from 'react';
-import { View, ScrollView, SafeAreaView, Platform, TouchableOpacity, Text } from 'react-native';
+import { View, ScrollView, SafeAreaView, TouchableOpacity, Text } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import Clipboard from '@react-native-community/clipboard';
 import Toast from 'react-native-simple-toast';
@@ -23,7 +23,6 @@ const PrivKey: React.FunctionComponent<PrivKeyProps> = ({ address, keyType, priv
   const context = useContext(ContextAppLoaded);
   const { translate } = context;
   const { colors } = useTheme() as unknown as ThemeType;
-  const fixedWidthFont = Platform.OS === 'android' ? 'monospace' : 'Courier';
 
   const keyTypeString = keyType === 0 ? translate('privkey.privkey') : translate('privkey.viewkey');
 
@@ -98,7 +97,7 @@ const PrivKey: React.FunctionComponent<PrivKeyProps> = ({ address, keyType, priv
               style={{
                 flexBasis: '100%',
                 textAlign: 'center',
-                fontFamily: fixedWidthFont,
+                fontFamily: 'verdana',
                 fontSize: 18,
                 color: colors.text,
               }}>

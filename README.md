@@ -5,7 +5,7 @@
 ### Prerequisites
 1. `docker` (for building the rust library)
 2. `yarn`
-3. `nodejs`
+3. `nodejs` recommended version v16.16.0 LTS.
 
 Carefully follow the instructions to [setup Android Studio for your
 operating system](https://reactnative.dev/docs/environment-setup).
@@ -29,11 +29,13 @@ with the chip on your system and start the emulated device.
 ## iOS build instructions
 
 ### Prerequisites
-1. Install Rust
-2. Add the ios targets `rustup target add aarch64-apple-ios x86_64-apple-ios`
-3. `cargo install cargo-lipo`
-4. `cargo install cbindgen`
-5. `sudo gem install cocoapods` to install cocoapods
+1. `yarn`
+2. `nodejs` recommended version v16.16.0 LTS.
+3. Install Rust
+4. Add the ios targets `rustup target add aarch64-apple-ios x86_64-apple-ios`
+5. `cargo install cargo-lipo`
+6. `cargo install cbindgen`
+7. `sudo gem install cocoapods` to install cocoapods
 
 ### Building
 1. In the `./rust/ios` directory, run `./build.sh`.
