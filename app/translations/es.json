@@ -2,6 +2,7 @@
   "zingo": "Zingo!",
   "version": "zingo-1.0.0 (120)",
   "loading": "cargando...",
+  "connectingserver": "Conectando con el servidor...",
   "wait": "Por favor espere...",
   "workingonit": "Estamos trabajando en esta funcionalidad",
   "close": "Cerrar",
@@ -196,7 +197,7 @@
   },
   "send": {
     "Broadcast": "Transmitida con éxito Tx:",
-    "sending-error": "Error enviando Tx",
+    "sending-error": "Error enviando transacción",
     "title": "Enviar",
     "title-syncing": "Enviar - Sincronizando",
     "more": "ver más...",
@@ -229,7 +230,9 @@
     "sendall": "Enviar Todo",
     "sendall-message": "Estas a punto de enviar toda la cantidad en tu monedero",
     "includeua": "Incluir tu DU:",
-    "confirm-memo": "Memorándum"
+    "confirm-memo": "Memorándum",
+    "duplicate-nullifier-error": "Tus fondos están todavía confirmándose y probablemente sincronizándose. Puedes esperar hasta que tus fondos estén confirmados o puedes intentar enviar una cantidad más pequeña, La creaccion de la Transacción ha fallado!",
+    "dust-error" : "La cantidad que estás intentando enviar a una dirección Transparente is realmente infima, La creacción de la Transacción ha fallado!"
   },
   "receive": {
     "u-title": "Dirección Unificada",
