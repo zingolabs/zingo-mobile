@@ -321,13 +321,26 @@ const Send: React.FunctionComponent<SendProps> = ({
           }, 1000);
         }
       } catch (err) {
-        const error = err;
+        const error = err as string;
+
+        let customError = '';
+        if (
+          error.includes('18: bad-txns-sapling-duplicate-nullifier') ||
+          error.includes('18: bad-txns-sprout-duplicate-nullifier') ||
+          error.includes('18: bad-txns-orchard-duplicate-nullifier')
+        ) {
+          // bad-txns-xxxxxxxxx-duplicate-nullifier (3 errors)
+          customError = translate('send.duplicate-nullifier-error') as string;
+        } else if (error.includes('64: dust')) {
+          // dust
+          customError = translate('send.dust-error') as string;
+        }
 
         setTimeout(() => {
           console.log('sendtx error', error);
           Alert.alert(
             translate('send.sending-error') as string,
-            `${error}`,
+            `${customError ? customError : error}`,
             [{ text: 'OK', onPress: () => setComputingModalVisible(false) }],
             {
               cancelable: false,
