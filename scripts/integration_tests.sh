@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function emulator_launch() {
+function check_launch() {
   emu_status=$(adb devices | grep "emulator-5554" | cut -f1)
   if [ "${emu_status}" = "emulator-5554" ]
   then
@@ -10,7 +10,7 @@ function emulator_launch() {
   fi
 }
 
-function boot_complete() {
+function check_boot() {
   boot_status=$(adb -s emulator-5554 shell getprop sys.boot_completed)
   if [ "${boot_status}" = "1" ]
   then
@@ -42,22 +42,22 @@ while getopts 'a:h' OPTION; do
             case "$abi" in
                 x86_64)
                     sdk="system-images;android-30;google_apis;x86_64"                    
-                    sdk_api="android-30"
-                    sdk_target="google_apis"
-                    sdk_arch="x86_64"
+                    api="android-30"
+                    target="google_apis"
+                    arch="x86_64"
                     ;;
                 x86) 
                     sdk="system-images;android-30;google_apis;x86"                    
-                    sdk_api="android-30"
-                    sdk_target="google_apis"
-                    sdk_arch="x86"
+                    api="android-30"
+                    target="google_apis"
+                    arch="x86"
                     ;;
-                arm64-v8a)
-                    sdk="system-images;android-30;google_apis;x86_64"                    
-                    sdk_api="android-30"
-                    sdk_target="google_apis"
-                    sdk_arch="x86_64"
-                    ;;
+                # arm64-v8a)
+                #     sdk="system-images;android-30;google_apis;x86_64"                    
+                #     api="android-30"
+                #     target="google_apis"
+                #     arch="x86_64"
+                #     ;;
                 *)
                     echo "Invalid ABI." >&2
                     echo "Try '$(basename $0) -h' for more information." >&2
@@ -97,7 +97,7 @@ fi
 cd android
 
 echo -e "\nBuilding APKs..."
-./gradlew assembleDebug assembleAndroidtest
+./gradlew assembleDebug assembleAndroidTest
 
 # Create integration test report directory
 test_report_dir="app/build/outputs/integration_test_reports/${abi}"
@@ -115,19 +115,23 @@ sdkmanager --install $sdk
 yes | sdkmanager --licenses
 
 echo -e "Creating AVDs..."
-echo no | avdmanager create avd --force --name "${sdk_api}_${sdk_target}_${sdk_arch}" --package $sdk
-# echo no | avdmanager create avd --force --name "${sdk_api}_${sdk_target}_${sdk_arch}" --package $sdk --abi "${sdk_target}/${sdk_arch}"
+echo no | avdmanager create avd --force --name "${api}_${target}_${arch}" --package $sdk
+# echo no | avdmanager create avd --force --name "${api}_${target}_${arch}" --package $sdk --abi "${target}/${arch}"
+echo ""
 
-echo -e "\n\nWaiting for emulator to launch..."
-emulator -avd "${sdk_api}_${sdk_target}_${sdk_arch}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
+# Kill all emulators
+../scripts/kill_emulators.sh
+
+echo -e "\nWaiting for emulator to launch..."
+emulator -avd "${api}_${target}_${arch}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
 &> "${test_report_dir}/emulator.txt" &
-# emulator -avd "${sdk_api}_${sdk_target}_${sdk_arch}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -read-only -no-boot-anim \
+# emulator -avd "${api}_${target}_${arch}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-animi -read-only \
 # &> "${test_report_dir}/emulator.txt" &
-wait_for 600 emulator_launch
+wait_for 1800 check_launch
 echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
 
 echo -e "\nWaiting for AVD to boot..."
-wait_for 600 boot_complete
+wait_for 1800 check_boot
 echo $(adb -s emulator-5554 emu avd name | head -1)
 echo "Boot completed"
 
@@ -164,7 +168,7 @@ then
     &> "${test_report_dir}/additional_test_output.txt"
 fi
 
-# Kill emulator
-adb -s emulator-5554 emu kill
+# Kill all emulators
+../scripts/kill_emulators.sh
 
 echo -e "\nTest reports saved: zingo-mobile/android/${test_report_dir}"

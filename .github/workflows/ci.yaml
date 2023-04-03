@@ -111,18 +111,11 @@ jobs:
             api-level: 30
             target: default
             channel: stable
-          - abi: arm64-v8a
-            avd: arm64-v8a
-            # avd: x86_64
-            api-level: 30
-            target: aosp_atd
-            channel: canary
-          - abi: arm64-v8a
-            avd: arm64-v8a
-            # avd: x86_64
-            api-level: 29
-            target: default
-            channel: stable
+          # - abi: arm64-v8a
+          #   avd: x86_64
+          #   api-level: 30
+          #   target: aosp_atd
+          #   channel: canary
     needs: [create-timestamp, build]
     env:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
@@ -136,8 +129,8 @@ jobs:
           distribution: 'temurin'
           java-version: '11'
       
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v2
+      # - name: Setup Android SDK
+      #   uses: android-actions/setup-android@v2
       
       - name: Gradle cache
         uses: gradle/gradle-build-action@v2
@@ -171,8 +164,8 @@ jobs:
           arch: ${{ matrix.avd }}
           target: ${{ matrix.target }}
           channel: ${{ matrix.channel }}
-          emulator-boot-timeout: 10000
-          force-avd-creation: false
+          emulator-boot-timeout: 1800
+          force-avd-creation: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: false
           script: echo "Generated AVD snapshot for caching."      i
@@ -185,7 +178,7 @@ jobs:
           arch: ${{ matrix.avd }}
           target: ${{ matrix.target }}
           channel: ${{ matrix.channel }}
-          emulator-boot-timeout: 10000
+          emulator-boot-timeout: 1800
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
