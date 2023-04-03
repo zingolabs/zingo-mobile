@@ -258,7 +258,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       toAddr.amount = amount.replace(decimalSeparator, '.').substring(0, 20);
       if (isNaN(Number(toAddr.amount))) {
         toAddr.amountCurrency = '';
-      } else if (toAddr.amount && zecPrice) {
+      } else if (toAddr.amount && zecPrice && zecPrice.zecPrice > 0) {
         toAddr.amountCurrency = Utils.toLocaleFloat((parseFloat(toAddr.amount) * zecPrice.zecPrice).toFixed(2));
       } else {
         toAddr.amountCurrency = '';
@@ -270,7 +270,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       toAddr.amountCurrency = amountCurrency.replace(decimalSeparator, '.').substring(0, 15);
       if (isNaN(Number(toAddr.amountCurrency))) {
         toAddr.amount = '';
-      } else if (toAddr.amountCurrency && zecPrice) {
+      } else if (toAddr.amountCurrency && zecPrice && zecPrice.zecPrice > 0) {
         toAddr.amount = Utils.toLocaleFloat(Utils.maxPrecisionTrimmed(parseFloat(amountCurrency) / zecPrice.zecPrice));
       } else {
         toAddr.amount = '';
@@ -337,7 +337,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         }
 
         setTimeout(() => {
-          console.log('sendtx error', error);
+          //console.log('sendtx error', error);
           Alert.alert(
             translate('send.sending-error') as string,
             `${customError ? customError : error}`,
@@ -361,7 +361,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     })();
   }, [isFocused]);
 
-  // console.log('render send', 'w', dimensions.width, 'h', dimensions.height);
+  //console.log('render send', 'w', dimensions.width, 'h', dimensions.height);
 
   const returnPage = (
     <View

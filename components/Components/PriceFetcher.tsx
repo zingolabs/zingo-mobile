@@ -4,6 +4,7 @@ import { Platform, TouchableOpacity, View } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faRefresh } from '@fortawesome/free-solid-svg-icons';
+import Toast from 'react-native-simple-toast';
 import FadeText from './FadeText';
 import { ContextAppLoaded } from '../../app/context';
 import moment from 'moment';
@@ -97,9 +98,14 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
           onPress={async () => {
             if (setZecPrice) {
               const price = await RPC.rpc_getZecPrice();
-              if (price > 0) {
-                setZecPrice(price, Date.now());
+              // values:
+              // 0   - initial/default value
+              // -1  - error in Gemini/zingolib/RPCModule.
+              // > 0 - real value
+              if (price === -1) {
+                Toast.show(translate('info.errorgemini') as string, Toast.LONG);
               }
+              setZecPrice(price, Date.now());
               setRefreshSure(false);
               setRefreshMinutes(0);
               setCount(5);

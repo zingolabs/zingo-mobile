@@ -79,6 +79,8 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal, setZecPrice }) =
                     ? `$ ${Utils.toLocaleFloat(zecPrice.zecPrice.toFixed(2))} ${currency} per ${
                         info.currencyName ? info.currencyName : '---'
                       }`
+                    : zecPrice.zecPrice === -1
+                    ? (translate('info.errorgemini') as string)
                     : `$ -- ${currency} per ${info.currencyName ? info.currencyName : '---'}`
                 }
               />

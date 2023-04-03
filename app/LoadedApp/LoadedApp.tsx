@@ -310,7 +310,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     })();
 
     this.linking = Linking.addEventListener('url', async ({ url }) => {
-      console.log(url);
+      //console.log(url);
       const { to } = this.state.sendPageState.toaddr;
       if (url !== null && to === '') {
         this.readUrl(url);
@@ -333,7 +333,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   };
 
   readUrl = async (url: string) => {
-    console.log(url);
+    //console.log(url);
     // Attempt to parse as URI if it starts with zcash
     if (url.startsWith('zcash:')) {
       const target: string | ZcashURITarget = await parseZcashURI(url);

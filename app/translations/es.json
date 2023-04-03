@@ -142,7 +142,8 @@
     "title": "Información del Servidor",
     "resolution": "Pantalla",
     "tablet": "Tableta",
-    "phone": "Teléfono"
+    "phone": "Teléfono",
+    "errorgemini": "Error extrayendo el precio de Internet."
   },
   "rescan": {
     "title": "Re-Escanear",

@@ -55,7 +55,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   } = context;
 
   const memosArray = translate('settings.memos');
-  console.log(memosArray, typeof memosArray);
+  //console.log(memosArray, typeof memosArray);
   let MEMOS: Options[] = [];
   if (typeof memosArray === 'object') {
     MEMOS = memosArray as Options[];
