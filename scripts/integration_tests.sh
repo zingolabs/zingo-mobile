@@ -3,38 +3,34 @@
 create_snapshot=false
 
 function check_launch() {
-  emu_status=$(adb devices | grep "emulator-5554" | cut -f1)
-  if [ "${emu_status}" = "emulator-5554" ]
-  then
-      return 0;
-  else
-      return 1;
-  fi
+    emu_status=$(adb devices | grep "emulator-5554" | cut -f1)
+    if [ "${emu_status}" = "emulator-5554" ]; then
+        return 0;
+    else
+        return 1;
+    fi
 }
 
 function check_boot() {
-  boot_status=$(adb -s emulator-5554 shell getprop sys.boot_completed)
-  if [ "${boot_status}" = "1" ]
-  then
-      return 0;
-  else
-      return 1;
-  fi
+    boot_status=$(adb -s emulator-5554 shell getprop sys.boot_completed)
+    if [ "${boot_status}" = "1" ]; then
+        return 0;
+    else
+        return 1;
+    fi
 }
 
 function wait_for() {
-  timeout=$1
-  shift 1
-  until [ $timeout -le 0 ] || ("$@" &> /dev/null)
-  do
-      sleep 1
-      timeout=$(( timeout - 1 ))
-  done
-  if [ $timeout -le 0 ]
-  then
-      echo -e "\nFailed due to timeout"
-      exit 1
-  fi
+    timeout=$1
+    shift 1
+    until [ $timeout -le 0 ] || ("$@" &> /dev/null); do
+        sleep 1
+        timeout=$(( timeout - 1 ))
+    done
+    if [ $timeout -le 0 ]; then
+        echo -e "\nFailed due to timeout"
+        exit 1
+    fi
 }
 
 while getopts 'a:sh' OPTION; do
@@ -84,16 +80,14 @@ while getopts 'a:sh' OPTION; do
             ;;
     esac
 done
-if [ $OPTIND -eq 1 ]
-then 
+if [ $OPTIND -eq 1 ]; then 
     echo "Error: Required options missing" >&2
     echo "Try '$(basename $0) -h' for more information." >&2
     exit 1
 fi
 
 # Setup working directory
-if [ ! -d "./android/app" ];
-then
+if [ ! -d "./android/app" ]; then
     echo "Failed. Run './scripts/integration_tests.sh' from zingo-mobile root directory."
     exit 1
 fi
@@ -177,8 +171,7 @@ else
     | tee "${test_report_dir}/test_results.txt"
 
     # Store additional test outputs
-    if [ -n "$(adb -s emulator-5554 shell ls -A /sdcard/Android/media/org.ZingoLabs.Zingo/additional_test_output 2>/dev/null)" ]
-    then
+    if [ -n "$(adb -s emulator-5554 shell ls -A /sdcard/Android/media/org.ZingoLabs.Zingo/additional_test_output 2>/dev/null)" ]; then
         adb -s emulator-5554 shell cat /sdcard/Android/media/org.ZingoLabs.Zingo/additional_test_output/* \
         &> "${test_report_dir}/additional_test_output.txt"
     fi

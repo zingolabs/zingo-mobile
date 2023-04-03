@@ -1,8 +1,7 @@
 #!/bin/bash
 
 # Setup working directory
-if [ ! -d "./android/app" ];
-then
+if [ ! -d "./android/app" ]; then
     echo "Failed. Run './scripts/integration_tests_gradle.sh' from zingo-mobile root directory."
     exit 1
 fi
