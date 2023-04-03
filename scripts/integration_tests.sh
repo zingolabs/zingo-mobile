@@ -99,7 +99,7 @@ sdkmanager --install 'build-tools;33.0.2' platform-tools
 echo "Installing latest emulator..."
 sdkmanager --install emulator --channel=0
 
-echo "Installing system images..."
+echo "Installing system image..."
 sdkmanager --install $sdk
 yes | sdkmanager --licenses
 
@@ -122,7 +122,7 @@ if [ "$create_snapshot" = true ]; then
     echo "Boot completed"
     echo -e "\nSnapshot saved"
 else
-    echo "Building APKs..."
+    echo -e "\nBuilding APKs..."
     ./gradlew assembleDebug assembleAndroidTest
 
     # Create integration test report directory
