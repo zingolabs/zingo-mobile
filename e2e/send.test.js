@@ -24,11 +24,13 @@ describe('Renders wallet data correctly.', () => {
     await element(by.id('send.memo-field')).replaceText("1\n2\n3\n4\n5\n6\n7\n8");
     await element(by.id('send.button')).tap();
 
+    await element(by.id('send.scrollView')).scrollTo('bottom');
+    
     const memo = element(by.id('send.confirm-memo'));
 
     await expect(memo).toBeVisible(100);
     await expect(memo).toHaveText(
-      '1\n2\n3\n4\n5\n6\n7\n8Reply to: \nu1lx7nlnqqqs7p4hcqz4hyjgnw7h8zskcgr2f8dfhm96np0gnfdzu7jtms7q2pxd7ufy96wxzdsdy65jvp3td7fj2ltcz0jpak86ddyszl9ykn5s86q3xataya5867z3tj2x8cw0ljyrenymr2gcqmjf50gmexqj233yn3kdaxn2yukwcx87emurufakf82wapgnu5h3fvae6aw9uus2r',
+      '1\n2\n3\n4\n5\n6\n7\n8\nReply to: \nu1lx7nlnqqqs7p4hcqz4hyjgnw7h8zskcgr2f8dfhm96np0gnfdzu7jtms7q2pxd7ufy96wxzdsdy65jvp3td7fj2ltcz0jpak86ddyszl9ykn5s86q3xataya5867z3tj2x8cw0ljyrenymr2gcqmjf50gmexqj233yn3kdaxn2yukwcx87emurufakf82wapgnu5h3fvae6aw9uus2r',
     );
   });
   
