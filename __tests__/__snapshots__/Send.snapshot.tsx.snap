@@ -607,6 +607,11 @@ exports[`Component Send - test Send - snapshot 1`] = `
                   }
                 >
                   <View
+                    accessibilityState={
+                      {
+                        "disabled": false,
+                      }
+                    }
                     accessible={true}
                     collapsable={false}
                     focusable={true}
