@@ -2,7 +2,7 @@
   "zingo": "Zingo!",
   "version": "zingo-1.0.0 (120)",
   "loading": "loading...",
-  "connectingserver": "Connectig to the server...",
+  "connectingserver": "Connecting to the server...",
   "wait": "Please wait...",
   "workingonit": "We are working on this feature.",
   "close": "Close",
@@ -13,7 +13,7 @@
     "actualserver": "Actual server:",
     "changeserver": "CHANGE SERVER",
     "createnewwallet": "Create New Wallet (new seed)",
-    "opencurrentwallet": "Open Current wallet",
+    "opencurrentwallet": "Open Current Wallet",
     "restorewalletseed": "Restore wallet from Seed",
     "creatingwallet-label": "Error creating Wallet",
     "readingwallet-label": "Error reading Wallet",
@@ -46,7 +46,7 @@
     "send-menu": "SEND",
     "uas-menu": "RECEIVE",
     "syncing": "Pausing the Syncronization to be able to Send.",
-    "zcash-url": "You have already an address in the send screen"
+    "zcash-url": "You already have an address in the send screen"
   },
   "rpc": {
     "parsebirthday-error": "Error: Couldn't parse as a number:",
