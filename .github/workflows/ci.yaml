@@ -95,8 +95,8 @@ jobs:
           name: ${{ matrix.abi }}-${{ env.timestamp }}
           path: rust/target/${{ matrix.target }}/release/librust.so
   
-  integration_test:
-    name: Integration test
+  setup_tests:
+    name: Set up test environment
     runs-on: macos-12
     strategy:
       matrix:
@@ -170,6 +170,31 @@ jobs:
           disable-animations: false
           script: echo "Generated AVD snapshot for caching."      i
 
+  integration_test:
+    name: Integration test
+    runs-on: macos-12
+    strategy:
+      matrix:
+        include:
+          - abi: x86
+            avd: x86
+            api-level: 29
+            target: default
+            channel: stable
+          - abi: x86_64
+            avd: x86_64
+            api-level: 30
+            target: default
+            channel: stable
+          # - abi: arm64-v8a
+          #   avd: x86_64
+          #   api-level: 30
+          #   target: aosp_atd
+          #   channel: canary
+    needs: [create-timestamp, build, setup_tests]
+    env:
+      timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
+    steps:
       - name: Run integration tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
