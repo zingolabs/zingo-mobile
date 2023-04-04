@@ -505,7 +505,12 @@ export default class RPC {
       this.seconds_batch = 0;
       this.batches = 0;
       this.message = this.translate('rpc.syncstart-message') as string;
-      this.process_end_block = fullRescan ? this.walletBirthday : this.lastWalletBlockHeight;
+      // only if have the initial value (the first time), otherwise don't want to change it.
+      // (this is important when the App come back from the background to foreground with some BS done!)
+      if (this.process_end_block === -1) {
+        console.log('end block changed -1');
+        this.process_end_block = fullRescan ? this.walletBirthday : this.lastWalletBlockHeight;
+      }
 
       // This is async, so when it is done, we finish the refresh.
       if (fullRescan) {
@@ -551,7 +556,7 @@ export default class RPC {
             this.seconds_batch = 0;
             this.batches = 0;
             this.message = this.translate('rpc.syncstart-message') as string;
-            this.process_end_block = this.lastWalletBlockHeight;
+            this.process_end_block = fullRescan ? this.walletBirthday : this.lastWalletBlockHeight;
           }
           this.prev_sync_id = ss.sync_id;
         }
