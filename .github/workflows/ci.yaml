@@ -232,7 +232,6 @@ jobs:
           arch: ${{ matrix.avd }}
           target: ${{ matrix.target }}
           channel: ${{ matrix.channel }}
-          emulator-boot-timeout: 1800
           force-avd-creation: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: false
