@@ -152,7 +152,7 @@ jobs:
         with: 
           name: ${{ matrix.abi }}-${{ env.timestamp }}
           path: android/app/src/main/jniLibs/${{ matrix.abi }}
-      
+    
       - run: yarn install
       
       - name: Create AVD and generate snapshot for caching
@@ -173,23 +173,7 @@ jobs:
     name: Integration test
     runs-on: macos-12
     strategy:
-      matrix:
-        include:
-          - abi: x86
-            avd: x86
-            api-level: 29
-            target: default
-            channel: stable
-          - abi: x86_64
-            avd: x86_64
-            api-level: 30
-            target: default
-            channel: stable
-          # - abi: arm64-v8a
-          #   avd: x86_64
-          #   api-level: 30
-          #   target: aosp_atd
-          #   channel: canary
+      matrix: ${{ job.setup_tests.strategy.matrix }}
     needs: [create-timestamp, build, setup_tests]
     env:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
