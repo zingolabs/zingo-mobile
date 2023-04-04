@@ -251,4 +251,3 @@ jobs:
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
           script: yarn detox test -c android.emu.debug -n test
->>>>>>> 32a2fcc (e2e test in ci)
