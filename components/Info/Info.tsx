@@ -81,6 +81,8 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal, setZecPrice }) =
                       }`
                     : zecPrice.zecPrice === -1
                     ? (translate('info.errorgemini') as string)
+                    : zecPrice.zecPrice === -2
+                    ? (translate('info.errorrpcmodule') as string)
                     : `$ -- ${currency} per ${info.currencyName ? info.currencyName : '---'}`
                 }
               />

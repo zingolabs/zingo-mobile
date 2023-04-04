@@ -104,7 +104,8 @@ export default class RPC {
   static async rpc_getZecPrice(): Promise<number> {
     // values:
     // 0   - initial/default value
-    // -1  - error in Gemini/zingolib/RPCModule.
+    // -1  - error in Gemini/zingolib.
+    // -2  - error in RPCModule, likely.
     // > 0 - real value
     const resultStr: string = await RPCModule.execute('updatecurrentprice', '');
     //console.log(resultStr);
@@ -117,8 +118,8 @@ export default class RPC {
         return parseFloat(resultStr);
       }
     } else {
-      //console.log(`Error fetching price ${resultStr}`);
-      return -1;
+      //console.log(`Internal Error fetching price ${resultStr}`);
+      return -2;
     }
   }
 

@@ -143,7 +143,8 @@
     "resolution": "Pantalla",
     "tablet": "Tableta",
     "phone": "Teléfono",
-    "errorgemini": "Error extrayendo el precio de Internet."
+    "errorgemini": "Error extrayendo el precio de Internet.",
+    "errorrpcmodule": "Error Interno extrayendo el precio de Internet."
   },
   "rescan": {
     "title": "Re-Escanear",

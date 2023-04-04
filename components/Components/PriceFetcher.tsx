@@ -100,10 +100,14 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
               const price = await RPC.rpc_getZecPrice();
               // values:
               // 0   - initial/default value
-              // -1  - error in Gemini/zingolib/RPCModule.
+              // -1  - error in Gemini/zingolib.
+              // -2  - error in RPCModule, likely.
               // > 0 - real value
               if (price === -1) {
                 Toast.show(translate('info.errorgemini') as string, Toast.LONG);
+              }
+              if (price === -2) {
+                Toast.show(translate('info.errorrpcmodule') as string, Toast.LONG);
               }
               setZecPrice(price, Date.now());
               setRefreshSure(false);
