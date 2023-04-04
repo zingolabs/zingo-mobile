@@ -508,7 +508,6 @@ export default class RPC {
       // only if have the initial value (the first time), otherwise don't want to change it.
       // (this is important when the App come back from the background to foreground with some BS done!)
       if (this.process_end_block === -1) {
-        console.log('end block changed -1');
         this.process_end_block = fullRescan ? this.walletBirthday : this.lastWalletBlockHeight;
       }
 
