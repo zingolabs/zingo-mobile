@@ -50,6 +50,18 @@ while getopts 'a:sh' OPTION; do
                     target="google_apis"
                     arch="x86"
                     ;;
+                arm64-v8a)
+                    sdk="system-images;android-30;google_apis;x86_64"                    
+                    api="android-30"
+                    target="google_apis"
+                    arch="x86_64"
+                    ;;
+                # armeabi-v7a)
+                #     sdk="system-images;android-30;google_apis;x86"                    
+                #     api="android-30"
+                #     target="google_apis"
+                #     arch="x86"
+                #     ;;
                 *)
                     echo "Invalid ABI" >&2
                     echo "Try '$(basename $0) -h' for more information." >&2
@@ -67,8 +79,12 @@ while getopts 'a:sh' OPTION; do
             echo -e "      \t\tOptions:"
             echo -e "      \t\t  x86_64"
             echo -e "      \t\t  x86"
+            echo -e "      \t\t  arm64-v8a"
+            # echo -e "      \t\t  armeabi-v7a"
             echo -e "\n  -s\t\tCreate a snapshot of AVD after boot-up"
             echo -e "      \t\tDoes not run integration tests"
+            echo -e "      \t\tarm64-v8a uses x86_64 AVD"
+            # echo -e "      \t\tarmeabi-v7a uses x86 AVD"
             echo -e "\nExamples:"
             echo -e "  $(basename $0) -a x86_64 -s\tCreates snapshot for x86_64 ABI"
             echo -e "  $(basename $0) -a x86_64   \tRuns integration tests for x86_64 ABI from snapshot (if exists)"
@@ -123,7 +139,7 @@ if [ "$create_snapshot" = true ]; then
     echo -e "\nSnapshot saved"
 else
     echo -e "\nBuilding APKs..."
-    ./gradlew assembleDebug assembleAndroidTest
+    ./gradlew assembleDebug assembleAndroidTest -Psplitapk=true
 
     # Create integration test report directory
     test_report_dir="app/build/outputs/integration_test_reports/${abi}"
@@ -151,8 +167,8 @@ else
     adb shell settings put global animator_duration_scale 0.0
 
     echo -e "\nInstalling APKs..."
-    adb -s emulator-5554 install -r -t app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
-    adb -s emulator-5554 install -r -t app/build/outputs/apk/debug/app-arm64-v8a-debug.apk
+    adb -s emulator-5554 install -r -t "app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk"
+    adb -s emulator-5554 install -r -t "app/build/outputs/apk/debug/app-${abi}-debug.apk"
 
     # Store emulator info and start logging
     adb -s emulator-5554 shell getprop &> "${test_report_dir}/getprop.txt"
