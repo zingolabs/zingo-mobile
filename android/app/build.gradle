@@ -111,6 +111,15 @@ def jscFlavor = 'org.webkit:android-jsc:+'
  */
 def enableHermes = project.ext.react.get("enableHermes", false)
 
+
+/**
+ * Whether to enable building a seperate APK for each ABI.
+ *
+ * Defaults to false but can be set to true with the project properties flag
+ * e.g. ./gradlew assembleDebug -Psplitapk=true
+ */
+ext.splitapk = project.properties['splitapk'] ?: false
+
 android {
     namespace 'org.ZingoLabs.Zingo'
     ndkVersion rootProject.ext.ndkVersion
@@ -137,7 +146,7 @@ android {
 
     splits {
         abi {
-            enable true
+            enable splitapk.toBoolean()
             reset()
             include "x86", "x86_64", "armeabi-v7a", "arm64-v8a"
             universalApk false // If true, also generate a universal APK
@@ -178,6 +187,7 @@ android {
     }
 
     testOptions {
+        // Managed devices for gradle integration testing
         managedDevices {
             devices {
                 pixel2api29_x86 (com.android.build.api.dsl.ManagedVirtualDevice) {
