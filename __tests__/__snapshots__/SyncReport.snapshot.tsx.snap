@@ -355,7 +355,7 @@ exports[`Component SyncReport - test Matches the snapshot SyncReport 1`] = `
           <View
             style={
               {
-                "backgroundColor": "transparent",
+                "backgroundColor": "#333333",
                 "borderRightColor": "rgb(0, 122, 255)",
                 "borderRightWidth": 1,
                 "height": 10,
@@ -566,7 +566,7 @@ exports[`Component SyncReport - test Matches the snapshot SyncReport 1`] = `
                 "borderRightColor": "rgb(0, 122, 255)",
                 "borderRightWidth": 1,
                 "height": 10,
-                "width": "25.00006250015625%",
+                "width": "25.000062500156254%",
               }
             }
           />
