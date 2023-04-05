@@ -43,7 +43,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSen
         noSyncingStatus={true}
         noDrawMenu={true}
       />
-      <ScrollView contentContainerStyle={{ display: 'flex', justifyContent: 'flex-start' }}  testID="send.scrollView">
+      <ScrollView contentContainerStyle={{ display: 'flex', justifyContent: 'flex-start' }} testID="send.confirm.scrollView">
         <View
           style={{
             display: 'flex',

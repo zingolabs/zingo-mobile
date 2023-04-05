@@ -413,7 +413,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         </View>
       </Animated.View>
 
-      <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{}}>
+      <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{}} testID="send.scrollView">
         <View style={{ marginBottom: 30 }}>
           {[sendPageState.toaddr].map((ta, i) => {
             return (
