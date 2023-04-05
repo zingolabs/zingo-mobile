@@ -142,7 +142,9 @@
     "title": "Server Info",
     "resolution": "Device Screen",
     "tablet": "Tablet",
-    "phone": "Phone"
+    "phone": "Phone",
+    "errorgemini": "Error fetching the price from Internet.",
+    "errorrpcmodule": "Internal Error fetching the price from Internet"
   },
   "rescan": {
     "title": "Rescan",

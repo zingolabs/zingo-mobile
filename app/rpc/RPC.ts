@@ -97,24 +97,30 @@ export default class RPC {
   }
 
   static async rpc_setInterruptSyncAfterBatch(value: string): Promise<void> {
-    const resp = await RPCModule.execute('interrupt_sync_after_batch', value);
-    console.log('interrupt sync', value, resp);
+    await RPCModule.execute('interrupt_sync_after_batch', value);
+    //console.log('interrupt sync', value, resp);
   }
 
   static async rpc_getZecPrice(): Promise<number> {
+    // values:
+    // 0   - initial/default value
+    // -1  - error in Gemini/zingolib.
+    // -2  - error in RPCModule, likely.
+    // > 0 - real value
     const resultStr: string = await RPCModule.execute('updatecurrentprice', '');
     //console.log(resultStr);
 
     if (resultStr) {
-      if (resultStr.toLowerCase().startsWith('error')) {
+      if (resultStr.toLowerCase().startsWith('error') || isNaN(parseFloat(resultStr))) {
         //console.log(`Error fetching price ${resultStr}`);
-        return 0;
+        return -1;
       } else {
         return parseFloat(resultStr);
       }
+    } else {
+      //console.log(`Internal Error fetching price ${resultStr}`);
+      return -2;
     }
-
-    return 0;
   }
 
   static async rpc_setWalletSettingOption(name: string, value: string): Promise<string> {
@@ -372,7 +378,7 @@ export default class RPC {
   async doSync(): Promise<string> {
     const syncstr = await RPCModule.execute('sync', '');
 
-    console.log(`Sync exec result: ${syncstr}`);
+    //console.log(`Sync exec result: ${syncstr}`);
 
     if (syncstr) {
       return syncstr;
@@ -520,8 +526,8 @@ export default class RPC {
         }
         const ss = await JSON.parse(s);
 
-        console.log('sync wallet birthday', this.walletBirthday);
-        console.log('sync status', ss);
+        //console.log('sync wallet birthday', this.walletBirthday);
+        //console.log('sync status', ss);
 
         // syncronize status
         this.inRefresh = ss.in_progress;
