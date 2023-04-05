@@ -52,7 +52,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSen
             padding: 10,
             borderWidth: 1,
             borderRadius: 10,
-            borderColor: "red",
+            borderColor: colors.border,
           }}>
           <BoldText style={{ textAlign: 'center' }}>{translate('send.sending-title') as string}</BoldText>
 
