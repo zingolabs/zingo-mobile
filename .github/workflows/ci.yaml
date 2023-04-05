@@ -203,7 +203,7 @@ jobs:
       - name: Download native rust
         uses: actions/download-artifact@v3
         with: 
-          name: zingomobile-${{ matrix.arch }}-${{ env.timestamp }}
+          name: ${{ matrix.arch }}-${{ env.timestamp }}
           path: android/app/src/main/jniLibs/${{ matrix.jniLibs_dir }}
       - run: yarn install
       - name: Create AVD and generate snapshot for caching
