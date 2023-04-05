@@ -413,7 +413,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
                           borderLeftColor: colors.primary,
                           borderLeftWidth: 1,
                           borderRightColor: 'lightyellow',
-                          borderRightWidth: wallet_1 > 0 ? 1 : 0,
+                          borderRightWidth: wallet_old_synced_percent > 0 ? 1 : 0,
                         }}
                       />
                     )}
@@ -424,7 +424,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
                           width: wallet_new_synced_percent.toString() + '%',
                           backgroundColor: 'orange',
                           borderRightColor: 'orange',
-                          borderRightWidth: wallet_2 > 0 ? 1 : 0,
+                          borderRightWidth: wallet_new_synced_percent > 0 ? 1 : 0,
                         }}
                       />
                     )}
