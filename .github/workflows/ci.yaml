@@ -124,8 +124,8 @@ jobs:
         uses: android-actions/setup-android@v2
       
       - name: Add emulator to PATH
-        run: export PATH=$ANDROID_SDK_ROOT/emulator
-      
+        run: export PATH=$ANDROID_SDK_ROOT/emulator:$PATH
+            
       - name: Gradle cache
         uses: gradle/gradle-build-action@v2
         with:
@@ -140,8 +140,8 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-${{ matrix.avd }}      
-      
+          key: avd-${{ matrix.avd }}
+          
       - name: Download native rust
         uses: actions/download-artifact@v3
         with: 
