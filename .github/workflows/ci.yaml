@@ -253,6 +253,7 @@ jobs:
           channel: ${{ matrix.channel }}
           emulator-boot-timeout: 1800
           force-avd-creation: false
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           disable-animations: true
           script: yarn detox test -c android.emu.debug -n test
+        
