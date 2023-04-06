@@ -183,3 +183,32 @@ jobs:
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
           script: ./gradlew connectedCheck -Pandroid.testInstrumentationRunnerArguments.class=org.ZingoLabs.Zingo.IntegrationTestSuite
+        
+        
+  sdk_home_test:
+    name: SDK home test
+    runs-on: macos-12
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+      
+      - run: |
+          printenv | grep ANDROID
+          printenv | grep PATH
+          printenv
+      
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v2
+      
+      
+      - run: |
+          printenv | grep ANDROID
+          printenv | grep PATH
+          printenv
+      
