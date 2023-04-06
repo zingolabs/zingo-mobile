@@ -3,6 +3,10 @@
 create_snapshot=false
 
 function check_launch() {
+    echo "all_emus: "
+    echo $(adb devices)
+    echo "em5554:"
+    echo $(adb devices | grep "emulator-5554" | cut -f1)
     emu_status=$(adb devices | grep "emulator-5554" | cut -f1)
     if [ "${emu_status}" = "emulator-5554" ]; then
         return 0;
