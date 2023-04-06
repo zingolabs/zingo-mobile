@@ -133,10 +133,10 @@ if [ "$create_snapshot" = true ]; then
     
     # DEBUG
     printenv
-    emulator -list-avds
+    $ANDROID_HOME/emulator/emulator -list-avds
 
     echo -e "\n\nWaiting for emulator to launch..."
-    /bin/sh -c $ANDROID_HOME/emulator/emulator -avd "${api}_${target}_${arch}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
+    $ANDROID_HOME/emulator/emulator -avd "${api}_${target}_${arch}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
     -no-snapshot-load &
     # emulator -avd "${api}_${target}_${arch}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
     # -no-snapshot-load -port 5554 &> /dev/null &
