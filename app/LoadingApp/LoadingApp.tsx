@@ -227,7 +227,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
         this.setState({ walletExists: true });
         const error = await RPCModule.loadExistingWallet(this.state.server);
         //console.log('Load Wallet Exists result', error);
-        if (!error.startsWith('Error')) {
+        if (!error.toLowerCase().startsWith('error')) {
           // Load the wallet and navigate to the transactions screen
           this.navigateToLoaded();
         } else {
@@ -323,7 +323,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
     setTimeout(async () => {
       const seed: string = await RPCModule.createNewWallet(this.state.server);
 
-      if (!seed.startsWith('Error')) {
+      if (!seed.toLowerCase().startsWith('error')) {
         this.setState({ walletSeed: JSON.parse(seed), screen: 2, actionButtonsDisabled: false, walletExists: true });
         // default values for wallet options
         this.set_wallet_option('download_memos', 'wallet');
@@ -361,7 +361,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
       }
 
       const error = await RPCModule.restoreWallet(seed.toLowerCase(), walletBirthday || '0', server);
-      if (!error.startsWith('Error')) {
+      if (!error.toLowerCase().startsWith('error')) {
         this.setState({ actionButtonsDisabled: false });
         this.navigateToLoaded();
       } else {
