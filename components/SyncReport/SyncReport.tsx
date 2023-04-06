@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { View, ScrollView, SafeAreaView, Text } from 'react-native';
+import React, { useContext, useEffect, useState } from 'react';
+import { View, ScrollView, SafeAreaView, Text, ActivityIndicator } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
 import { ThemeType } from '../../app/types';
@@ -11,7 +11,6 @@ import moment from 'moment';
 import 'moment/locale/es';
 import RPC from '../../app/rpc';
 import Header from '../Header';
-import CircularProgress from '../Components/CircularProgress';
 
 type SyncReportProps = {
   closeModal: () => void;
@@ -25,7 +24,6 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
   const [points, setPoints] = useState([] as number[]);
   const [labels, setLabels] = useState([] as string[]);
   const [birthday_plus_1, setBirthday_plus_1] = useState(0);
-  const [count, setCount] = useState(1);
   moment.locale(language);
 
   useEffect(() => {
@@ -52,26 +50,6 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
     // but in the screen I show the real wallet birthday.
     setBirthday_plus_1((walletSeed.birthday || 0) + 1);
   }, [walletSeed.birthday]);
-
-  useEffect(() => {
-    if (syncingStatusReport.secondsPerBatch >= 0) {
-      setCount(1);
-    }
-  }, [syncingStatusReport.secondsPerBatch]);
-
-  const fCount = useCallback(() => {
-    if (count === 5) {
-      setCount(1);
-    } else {
-      setCount(count + 1);
-    }
-  }, [count]);
-
-  useEffect(() => {
-    const inter = setInterval(fCount, 1000);
-
-    return () => clearInterval(inter);
-  }, [fCount]);
 
   useEffect(() => {
     (async () => await RPC.rpc_setInterruptSyncAfterBatch('false'))();
@@ -546,13 +524,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
                       label={translate('report.secondsperbatch') as string}
                       value={syncingStatusReport.secondsPerBatch.toString()}
                     />
-                    <CircularProgress
-                      size={20}
-                      strokeWidth={1}
-                      textSize={12}
-                      text={''}
-                      progressPercent={(count * 100) / 5}
-                    />
+                    <ActivityIndicator size="large" color={colors.primary} />
                   </View>
                 </>
               )}
