@@ -3,10 +3,6 @@
 create_snapshot=false
 
 function check_launch() {
-    echo "all_emus: "
-    echo $(adb devices)
-    echo "em5554:"
-    echo $(adb devices | grep "emulator-5554" | cut -f1)
     emu_status=$(adb devices | grep "emulator-5554" | cut -f1)
     if [ "${emu_status}" = "emulator-5554" ]; then
         return 0;
@@ -27,8 +23,7 @@ function check_boot() {
 function wait_for() {
     timeout=$1
     shift 1
-    until [ $timeout -le 0 ] || ("$@"); do
-    # until [ $timeout -le 0 ] || ("$@" &> /dev/null); do
+    until [ $timeout -le 0 ] || ("$@" &> /dev/null); do
         sleep 1
         timeout=$(( timeout - 1 ))
     done
@@ -131,15 +126,9 @@ if [ "$create_snapshot" = true ]; then
     echo -e "\nCreating AVD..."
     echo no | avdmanager create avd --force --name "${api}_${target}_${arch}" --package $sdk --abi "${target}/${arch}"
 
-    # GIVE ME SOME CI!!!    
-    printenv
-    $ANDROID_HOME/emulator/emulator -list-avds
-
     echo -e "\n\nWaiting for emulator to launch..."
-    $ANDROID_HOME/emulator/emulator -avd "${api}_${target}_${arch}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
-    -no-snapshot-load &
-    # emulator -avd "${api}_${target}_${arch}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
-    # -no-snapshot-load -port 5554 &> /dev/null &
+    emulator -avd "${api}_${target}_${arch}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
+        -no-snapshot-load -port 5554 &> /dev/null &
     wait_for 1800 check_launch
     echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
 
@@ -162,7 +151,7 @@ else
 
     echo -e "\n\nWaiting for emulator to launch..."
     emulator -avd "${api}_${target}_${arch}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
-    -no-snapshot-save -port 5554 &> "${test_report_dir}/emulator.txt" &
+        -no-snapshot-save -port 5554 &> "${test_report_dir}/emulator.txt" &
     wait_for 1800 check_launch
     echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
 
@@ -193,14 +182,14 @@ else
 
     echo -e "\nRunning integration tests..."
     adb -s emulator-5554 shell am instrument -w -r -e class org.ZingoLabs.Zingo.IntegrationTestSuite \
-    -e additionalTestOutputDir /sdcard/Android/media/org.ZingoLabs.Zingo/additional_test_output \
-    -e testTimeoutSeconds 31536000 org.ZingoLabs.Zingo.test/androidx.test.runner.AndroidJUnitRunner \
-    | tee "${test_report_dir}/test_results.txt"
+        -e additionalTestOutputDir /sdcard/Android/media/org.ZingoLabs.Zingo/additional_test_output \
+        -e testTimeoutSeconds 31536000 org.ZingoLabs.Zingo.test/androidx.test.runner.AndroidJUnitRunner \
+        | tee "${test_report_dir}/test_results.txt"
 
     # Store additional test outputs
     if [ -n "$(adb -s emulator-5554 shell ls -A /sdcard/Android/media/org.ZingoLabs.Zingo/additional_test_output 2>/dev/null)" ]; then
         adb -s emulator-5554 shell cat /sdcard/Android/media/org.ZingoLabs.Zingo/additional_test_output/* \
-        &> "${test_report_dir}/additional_test_output.txt"
+            &> "${test_report_dir}/additional_test_output.txt"
     fi
 
     echo -e "\nTest reports saved: zingo-mobile/android/${test_report_dir}"

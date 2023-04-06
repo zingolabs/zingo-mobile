@@ -97,7 +97,10 @@ jobs:
   
   integration_test:
     name: Integration test
-    runs-on: macos-12
+    runs-on: macos-12    
+    defaults:
+      run:
+        shell: bash
     strategy:
       matrix:
         include:
@@ -124,7 +127,6 @@ jobs:
         uses: android-actions/setup-android@v2
       
       - name: Add emulator to PATH
-        shell: bash
         run: echo "${ANDROID_SDK_ROOT}/emulator" >> $GITHUB_PATH
             
       - name: Gradle cache
@@ -141,8 +143,7 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          # key: avd-${{ matrix.avd }}
-          key: TEST_avd-${{ matrix.avd }}
+          key: avd-${{ matrix.avd }}
           
       - name: Download native rust
         uses: actions/download-artifact@v3
@@ -154,7 +155,6 @@ jobs:
       
       - name: Create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
-        shell: bash
         run: ./scripts/integration_tests.sh -a ${{ matrix.avd }} -s
 
       - name: Run integration tests
