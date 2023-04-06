@@ -113,7 +113,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ setUaAddress, toggleMe
   const addO = async () => {
     //console.log('New O');
     //const newAddress = await RPC.rpc_createNewAddress('tzo');
-    //if (newAddress && !newAddress.startsWith('Error')) {
+    //if (newAddress && !newAddress.toLowerCase().startsWith('error')) {
     await fetchTotalBalance();
     //  if (newAddress) {
     //    setDisplayAddress(newAddress);
@@ -140,7 +140,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ setUaAddress, toggleMe
     const address = uaddrs[oindex].address;
     const k = await RPC.rpc_getPrivKeyAsString(address);
 
-    if (k && !k.startsWith('Error')) {
+    if (k && !k.toLowerCase().startsWith('error')) {
       setKeyType(0);
       setPrivKeyModalVisible(true);
       if (k) {
@@ -164,7 +164,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ setUaAddress, toggleMe
     const address = uaddrs[oindex].address;
     const k = await RPC.rpc_getViewKeyAsString(address);
 
-    if (k && !k.startsWith('Error')) {
+    if (k && !k.toLowerCase().startsWith('error')) {
       setKeyType(1);
       setPrivKeyModalVisible(true);
       if (k) {
@@ -196,7 +196,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ setUaAddress, toggleMe
     const addressList = await RPC.rpc_doImportPrivKey(key, birthday);
     //console.log(addressList);
 
-    if (typeof addressList === 'string' && addressList.startsWith('Error')) {
+    if (typeof addressList === 'string' && addressList.toLowerCase().startsWith('error')) {
       // Show the toast in settimeout, because it sometimes gets lost.
       setTimeout(() => {
         Toast.show(addressList, Toast.LONG);

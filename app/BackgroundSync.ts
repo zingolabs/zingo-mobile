@@ -9,7 +9,7 @@ const BackgroundSync = async (task_data: any) => {
   if (exists && exists !== 'false') {
     const server = await AsyncStorage.getItem('@server');
     let wallet = await RPCModule.loadExistingWallet(server);
-    if (wallet.startsWith('Error')) {
+    if (wallet.toLowerCase().startsWith('error')) {
       // We don't return an error message yet, just log the error and return
       console.error(wallet);
       return;
