@@ -131,7 +131,6 @@ if [ "$create_snapshot" = true ]; then
     echo -e "\nCreating AVD..."
     echo no | avdmanager create avd --force --name "${api}_${target}_${arch}" --package $sdk --abi "${target}/${arch}"
     
-    # DEBUG
     printenv
     $ANDROID_HOME/emulator/emulator -list-avds
 
