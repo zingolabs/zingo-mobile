@@ -153,7 +153,7 @@ jobs:
       - run: yarn install
       
       - name: Create AVD and generate snapshot for caching
-        if: steps.avd-cache.outputs.cache-hit != 'true'i
+        if: steps.avd-cache.outputs.cache-hit != 'true'
         shell: bash
         run: ./scripts/integration_tests.sh -a ${{ matrix.avd }} -s
 
