@@ -152,8 +152,8 @@ jobs:
       
       - name: Create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
-        run: ./scripts/integration_tests.sh -a {{ matrix.avd }} -s
+        run: ./scripts/integration_tests.sh -a ${{ matrix.avd }} -s
 
       - name: Run integration tests
-        run: ./scripts/integration_tests.sh -a {{ matrix.abi }}
+        run: ./scripts/integration_tests.sh -a ${{ matrix.abi }}
       
