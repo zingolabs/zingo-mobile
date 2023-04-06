@@ -130,9 +130,12 @@ yes | sdkmanager --licenses
 if [ "$create_snapshot" = true ]; then
     echo -e "\nCreating AVD..."
     echo no | avdmanager create avd --force --name "${api}_${target}_${arch}" --package $sdk --abi "${target}/${arch}"
+        
+    printenv
+    emulator -list-avds
 
     echo -e "\n\nWaiting for emulator to launch..."
-    emulator -avd "${api}_${target}_${arch}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
+    /bin/sh -c $ANDROID_HOME/emulator/emulator -avd "${api}_${target}_${arch}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
     -no-snapshot-load &
     # emulator -avd "${api}_${target}_${arch}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
     # -no-snapshot-load -port 5554 &> /dev/null &
@@ -157,7 +160,7 @@ else
     echo no | avdmanager create avd --name "${api}_${target}_${arch}" --package $sdk
 
     echo -e "\n\nWaiting for emulator to launch..."
-    /bin/sh -c emulator -avd "${api}_${target}_${arch}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
+    emulator -avd "${api}_${target}_${arch}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
     -no-snapshot-save -port 5554 &> "${test_report_dir}/emulator.txt" &
     wait_for 1800 check_launch
     echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
