@@ -23,7 +23,8 @@ function check_boot() {
 function wait_for() {
     timeout=$1
     shift 1
-    until [ $timeout -le 0 ] || ("$@" &> /dev/null); do
+    until [ $timeout -le 0 ] || ("$@"); do
+    # until [ $timeout -le 0 ] || ("$@" &> /dev/null); do
         sleep 1
         timeout=$(( timeout - 1 ))
     done
