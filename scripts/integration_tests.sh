@@ -133,7 +133,9 @@ if [ "$create_snapshot" = true ]; then
 
     echo -e "\n\nWaiting for emulator to launch..."
     emulator -avd "${api}_${target}_${arch}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
-    -no-snapshot-load -port 5554 &> /dev/null &
+    -no-snapshot-load &
+    # emulator -avd "${api}_${target}_${arch}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
+    # -no-snapshot-load -port 5554 &> /dev/null &
     wait_for 1800 check_launch
     echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
 
