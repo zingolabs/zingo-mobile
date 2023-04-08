@@ -5,13 +5,7 @@ on:
   push:
 
 jobs:
-  
-  create-timestamp:
-    uses: ./.github/workflows/timestamp.yaml
 
-  build:
-    uses: ./.github/workflows/build.yaml
-  
   setup_emulator:
     uses: ./.github/workflows/avd.yaml
   
@@ -27,7 +21,7 @@ jobs:
           - arch : x86_64
             api-level: 30
             jniLibs_dir: x86_64
-    needs: [create-timestamp, build, setup_emulator]
+    needs: [setup_emulator]
     steps:
       - name: Run Detox Build
         run: yarn detox build -c android.emu.debug -n test
