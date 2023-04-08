@@ -20,7 +20,7 @@ jobs:
           - arch : x86_64
             api-level: 30
             jniLibs_dir: x86_64
-    needs: [create-timestamp, build]
+    needs: [create-timestamp]
     env:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
     steps:
