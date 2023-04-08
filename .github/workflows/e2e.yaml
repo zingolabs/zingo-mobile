@@ -13,7 +13,7 @@ jobs:
     uses: ./.github/workflows/build.yaml
   
   setup_emulator:
-    uses: ./.github/workflows/avd.yaml@setup:w
+    uses: ./.github/workflows/avd.yaml@setup
   
   e2e_test:
     name: End-to-End Test
