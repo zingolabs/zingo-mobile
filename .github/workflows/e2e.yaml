@@ -5,6 +5,9 @@ on:
   push:
 
 jobs:
+  
+  create-timestamp:
+    uses: ./.github/workflows/timestamp.yaml
 
   build:
     uses: ./.github/workflows/build.yaml

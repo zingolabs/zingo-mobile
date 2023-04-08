@@ -1,20 +1,10 @@
-name: CI
+name: build
 
 on:
   workflow_call:
 
 jobs:
   
-  create-timestamp:
-    name: Create timestamp
-    runs-on: ubuntu-22.04
-    outputs:
-      timestamp: ${{ steps.create-timestamp.outputs.timestamp }}
-    steps:
-      - name: Create timestamp
-        id: create-timestamp
-        run: echo "timestamp=$(date +%Y%m%d%H%M%S)" >> $GITHUB_OUTPUT
-
   build:
     name: Build native rust (${{ matrix.abi }})
     runs-on: ubuntu-22.04
