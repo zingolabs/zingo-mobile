@@ -5,9 +5,6 @@ on:
 
 jobs:
 
-  create-timestamp:
-    uses: ./.github/workflows/timestamp.yaml
-  
   build:
     name: Build native rust (${{ matrix.abi }})
     runs-on: ubuntu-22.04
@@ -30,9 +27,7 @@ jobs:
             target: aarch64-linux-android
             cc: aarch64-linux-android
             openssl_path: aarch64
-    needs: create-timestamp
     env:
-      timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
       RUSTUP_HOME: /root/.rustup
     container:
       image: zingodevops/android_builder:stable

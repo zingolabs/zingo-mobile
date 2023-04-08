@@ -12,10 +12,7 @@ jobs:
   build:
     uses: ./.github/workflows/build.yaml
   
-  setup_emulator:
-    uses: ./.github/workflows/avd.yaml@setup:w
-  
-  e2e_test:
+  setup:
     name: End-to-End Test
     runs-on: macos-12
     strategy:
@@ -28,6 +25,8 @@ jobs:
             api-level: 30
             jniLibs_dir: x86_64
     needs: [create-timestamp, build]
+    env:
+      timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
     steps:
       - name: Setup Java
         uses: actions/setup-java@v3
@@ -56,6 +55,8 @@ jobs:
           name: ${{ matrix.arch }}-${{ env.timestamp }}
           path: android/app/src/main/jniLibs/${{ matrix.jniLibs_dir }}
       - run: yarn install
+      - name: kill avd
+        run: sh ./scripts/kill_emulators.sh
       - name: Create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: reactivecircus/android-emulator-runner@v2
@@ -70,16 +71,3 @@ jobs:
         run: killall node | echo
       - name: start react-native
         run: nohup yarn react-native start > "out.yarn_react_native_start" &
-      - name: Run Detox Build
-        run: yarn detox build -c android.emu.debug -n test
-      - name: dismiss android dialogs
-        run: adb shell am broadcast -a android.intent.action.CLOSE_SYSTEM_DIALOGS | echo 
-      - name: Run Detox Test
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: ${{ matrix.api-level }}
-          arch: ${{ matrix.arch }}
-          force-avd-creation: false
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: true
-          script: yarn detox test -c android.emu.debug -n test
