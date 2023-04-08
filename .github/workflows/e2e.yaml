@@ -23,37 +23,14 @@ jobs:
             jniLibs_dir: x86_64
     needs: [setup_emulator]
     steps:
-      - name: Setup Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '11'
       - name: Checkout repository
         uses: actions/checkout@v3
-      - name: Gradle cache
-        uses: gradle/gradle-build-action@v2
-        with:
-          gradle-version: 7.3.3
-          build-root-directory: ./android
-          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev' && github.ref != 'refs/pull/*' }}
-      - name: AVD cache
-        uses: actions/cache@v3
-        id: avd-cache
-        with: 
-          path: |
-            ~/.android/avd/*
-            ~/.android/adb*
-          key: avd-${{ matrix.arch }}-api-${{ matrix.api-level }}      
       - name: Download native rust
         uses: actions/download-artifact@v3
         with: 
           name: ${{ matrix.arch }}-${{ env.timestamp }}
           path: android/app/src/main/jniLibs/${{ matrix.jniLibs_dir }}
       - run: yarn install
-      - name: kill avd
-        run: sh ./scripts/kill_emulators.sh
-      - name: help user find package.json
-        run: ls | echo
       - name: Run Detox Build
         run: yarn detox build -c android.emu.debug -n test
       - name: Run Detox Test
