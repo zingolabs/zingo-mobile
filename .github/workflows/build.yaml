@@ -4,6 +4,9 @@ on:
   workflow_call:
 
 jobs:
+
+  create-timestamp:
+    uses: ./.github/workflows/timestamp.yaml
   
   build:
     name: Build native rust (${{ matrix.abi }})
