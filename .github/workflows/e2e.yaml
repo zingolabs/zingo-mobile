@@ -3,6 +3,7 @@ name: e2e
 on:
   pull_request:
   push:
+  workflow_dispatch:
 
 jobs:
 
@@ -23,14 +24,6 @@ jobs:
             jniLibs_dir: x86_64
     needs: [setup_emulator]
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-      - name: Download native rust
-        uses: actions/download-artifact@v3
-        with: 
-          name: ${{ matrix.arch }}-${{ env.timestamp }}
-          path: android/app/src/main/jniLibs/${{ matrix.jniLibs_dir }}
-      - run: yarn install
       - name: Run Detox Build
         run: yarn detox build -c android.emu.debug -n test
       - name: Run Detox Test
