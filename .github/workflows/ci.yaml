@@ -242,6 +242,8 @@ jobs:
         run: nohup yarn react-native start > "out.yarn_react_native_start" &
       - name: Run Detox Build
         run: yarn detox build -c android.emu.debug -n test
+      - name: dismiss android dialogs
+        run: adb shell am broadcast -a android.intent.action.CLOSE_SYSTEM_DIALOGS
       - name: Run Detox Test
         uses: reactivecircus/android-emulator-runner@v2
         with:
