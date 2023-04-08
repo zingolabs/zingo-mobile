@@ -24,7 +24,7 @@ jobs:
     needs: [setup_emulator]
     steps:
       - name: help user find package.json
-        run: ls
+        run: ls | echo
       - name: Run Detox Build
         run: yarn detox build -c android.emu.debug -n test
       - name: Run Detox Test
