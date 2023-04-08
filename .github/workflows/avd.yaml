@@ -8,9 +8,6 @@ jobs:
   create-timestamp:
     uses: ./.github/workflows/timestamp.yaml
 
-  build:
-    uses: ./.github/workflows/build.yaml
-  
   setup:
     name: End-to-End Test
     runs-on: macos-12
