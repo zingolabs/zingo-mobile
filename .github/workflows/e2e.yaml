@@ -23,6 +23,8 @@ jobs:
             jniLibs_dir: x86_64
     needs: [setup_emulator]
     steps:
+      - name: help user find package.json
+        run: ls
       - name: Run Detox Build
         run: yarn detox build -c android.emu.debug -n test
       - name: Run Detox Test
