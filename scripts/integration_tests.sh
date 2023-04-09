@@ -82,13 +82,13 @@ while getopts 'a:sh' OPTION; do
             echo -e "      \t\t  x86"
             echo -e "      \t\t  arm64-v8a"
             # echo -e "      \t\t  armeabi-v7a"
-            echo -e "\n  -s\t\tCreate a snapshot of AVD after boot-up"
+            echo -e "\n  -s\t\tCreate an AVD and snapshot for quick-boot"
             echo -e "      \t\tDoes not run integration tests"
-            echo -e "      \t\tarm64-v8a uses x86_64 AVD"
-            # echo -e "      \t\tarmeabi-v7a uses x86 AVD"
+            echo -e "      \t\tarm64-v8a ABIs use x86_64 AVDs"
+            # echo -e "      \t\tarmeabi-v7a ABIs use x86 AVDs"
             echo -e "\nExamples:"
-            echo -e "  $(basename $0) -a x86_64 -s\tCreates snapshot for x86_64 ABI"
-            echo -e "  $(basename $0) -a x86_64   \tRuns integration tests for x86_64 ABI from snapshot (if exists)"
+            echo -e "  $(basename $0) -a x86_64 -s\tCreates an AVD and quick-boot snapshot for x86_64 ABI"
+            echo -e "  $(basename $0) -a x86_64   \tRuns integration tests for x86_64 ABI from snapshot"
             exit 1
             ;;
         ?)
@@ -105,7 +105,8 @@ fi
 
 # Setup working directory
 if [ ! -d "./android/app" ]; then
-    echo "Failed. Run './scripts/integration_tests.sh' from zingo-mobile root directory."
+    echo "Error: Incorrect working directory"
+    echo "Try './scripts/$(basename $0)' from zingo-mobile root directory."
     exit 1
 fi
 cd android
@@ -118,7 +119,6 @@ sdkmanager --install emulator --channel=0
 
 echo "Installing system image..."
 sdkmanager --install $sdk
-# yes | sdkmanager --licenses
 sdkmanager --licenses
 
 # Kill all emulators
@@ -140,6 +140,9 @@ if [ "$create_snapshot" = true ]; then
     echo "Boot completed"
     echo -e "\nSnapshot saved"
 else
+    echo -e "\nChecking AVD has been created..."
+    emulator -list-avds | grep -q "${api}_${target}_${arch}"
+
     echo -e "\nBuilding APKs..."
     ./gradlew assembleDebug assembleAndroidTest -Psplitapk=true
 
@@ -147,9 +150,6 @@ else
     test_report_dir="app/build/outputs/integration_test_reports/${abi}"
     rm -rf $test_report_dir
     mkdir -p $test_report_dir
-
-    # echo -e "\nCreating AVD..."
-    # echo no | avdmanager create avd --name "${api}_${target}_${arch}" --package $sdk
 
     echo -e "\n\nWaiting for emulator to launch..."
     emulator -avd "${api}_${target}_${arch}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \

@@ -1,4 +1,5 @@
 #!/bin/bash
+set -Eeuo pipefail
 
 function check_kill() {
     last_emulator=$(adb devices | grep emulator | tail -1 | cut -f1)
