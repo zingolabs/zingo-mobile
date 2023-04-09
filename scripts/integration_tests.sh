@@ -122,7 +122,7 @@ yes | sdkmanager --licenses
 # Kill all emulators
 ../scripts/kill_emulators.sh
 
-if [ "$create_snapshot" = true ]; then
+if [ "$create_snapshot" ]; then
     echo -e "\nCreating AVD..."
     echo no | avdmanager create avd --force --name "${api}_${target}_${arch}" --package $sdk --abi "${target}/${arch}"
 
@@ -167,8 +167,8 @@ else
     adb shell settings put global animator_duration_scale 0.0
 
     echo -e "\nInstalling APKs..."
-    adb -s emulator-5554 install -r -t "app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk"
-    adb -s emulator-5554 install -r -t "app/build/outputs/apk/debug/app-${abi}-debug.apk"
+    if [ $(adb -s emulator-5554 install -r -t "app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk") ]; then; exit 1; fi
+    if [ $(adb -s emulator-5554 install -r -t "app/build/outputs/apk/debug/app-${abi}-debug.apk") ]; then; exit 1; fi
 
     # Store emulator info and start logging
     adb -s emulator-5554 shell getprop &> "${test_report_dir}/getprop.txt"
