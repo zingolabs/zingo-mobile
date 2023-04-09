@@ -169,8 +169,9 @@ else
     adb shell settings put global animator_duration_scale 0.0
 
     echo -e "\nInstalling APKs..."
-    adb -s emulator-5554 install -r -t "app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk"
-    adb -s emulator-5554 install -r -t "app/build/outputs/apk/debug/app-${abi}-debug.apk"
+    adb -s emulator-5554 install-multi-package -r -t --abi $abi \
+        "app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk" \
+        "app/build/outputs/apk/debug/app-${abi}-debug.apk"
 
     # Store emulator info and start logging
     adb -s emulator-5554 shell getprop &> "${test_report_dir}/getprop.txt"
