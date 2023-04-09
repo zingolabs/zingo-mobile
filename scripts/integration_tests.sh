@@ -1,4 +1,5 @@
 #!/bin/bash
+set -Eeuo pipefail
 
 create_snapshot=false
 
@@ -117,12 +118,13 @@ sdkmanager --install emulator --channel=0
 
 echo "Installing system image..."
 sdkmanager --install $sdk
-yes | sdkmanager --licenses
+# yes | sdkmanager --licenses
+sdkmanager --licenses
 
 # Kill all emulators
 ../scripts/kill_emulators.sh
 
-if [ "$create_snapshot" ]; then
+if [ "$create_snapshot" = true ]; then
     echo -e "\nCreating AVD..."
     echo no | avdmanager create avd --force --name "${api}_${target}_${arch}" --package $sdk --abi "${target}/${arch}"
 
@@ -146,8 +148,8 @@ else
     rm -rf $test_report_dir
     mkdir -p $test_report_dir
 
-    echo -e "\nCreating AVD..."
-    echo no | avdmanager create avd --name "${api}_${target}_${arch}" --package $sdk
+    # echo -e "\nCreating AVD..."
+    # echo no | avdmanager create avd --name "${api}_${target}_${arch}" --package $sdk
 
     echo -e "\n\nWaiting for emulator to launch..."
     emulator -avd "${api}_${target}_${arch}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
@@ -167,8 +169,8 @@ else
     adb shell settings put global animator_duration_scale 0.0
 
     echo -e "\nInstalling APKs..."
-    if [ $(adb -s emulator-5554 install -r -t "app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk") ]; then; exit 1; fi
-    if [ $(adb -s emulator-5554 install -r -t "app/build/outputs/apk/debug/app-${abi}-debug.apk") ]; then; exit 1; fi
+    adb -s emulator-5554 install -r -t "app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk"
+    adb -s emulator-5554 install -r -t "app/build/outputs/apk/debug/app-${abi}-debug.apk"
 
     # Store emulator info and start logging
     adb -s emulator-5554 shell getprop &> "${test_report_dir}/getprop.txt"
