@@ -1,7 +1,5 @@
 name: e2e
 
-
-
 on:
   pull_request:
   push:
@@ -19,7 +17,6 @@ jobs:
       - uses: ./.github/actions/avd
   
   e2e_test:
-    runs-on: macos-12
     name: End-to-End Test
     runs-on: macos-12
     strategy:
