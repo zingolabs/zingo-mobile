@@ -2,15 +2,10 @@ name: Build native rust action
 
 inputs:
   abi:
-    required: true
   target:
-    required: true
   cc:
-    required: true
   openssl_path:
-    required: true
   timestamp:
-    required: true
 
 env:
   timestamp: ${{ inputs.timestamp }}
@@ -36,6 +31,7 @@ runs:
     
     - name: Cargo build
       working-directory: ./rust/android
+      shell: bash
       run: cargo +nightly build -Z build-std --target ${{ inputs.target }} --release
       env:
         AR: llvm-ar
@@ -46,7 +42,8 @@ runs:
     
     - name: LLVM Strip
       working-directory: ./rust/target
-      run: llvm-strip ./${{ input.target }}/release/librust.so
+      shell: bash
+      run: llvm-strip ./${{ inputs.target }}/release/librust.so
     
     - name: Upload native rust
       uses: actions/upload-artifact@v3

@@ -45,6 +45,8 @@ jobs:
           target: ${{ matrix.target }}
           cc: ${{ matrix.cc }}
           openssl_path: ${{ matrix.openssl_path }}
+          timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
+
   
   e2e_test:
     name: End-to-End Test
