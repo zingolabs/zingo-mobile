@@ -6,11 +6,43 @@ on:
   workflow_dispatch:
 
 jobs:
-  setup_emulator:
-    runs-on: macos-12
+  checkout:
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
+  
+  create_timestamp:
+    runs-on: ubuntu-22.04
+    steps:
       - uses: ./.github/actions/timestamp
+    needs: checkout
+  
+  build_rust:
+    runs-on: ubuntu-22.04
+    needs: create_timestamp
+    strategy:
+      matrix:
+        include:
+          - abi: x86
+            target: i686-linux-android
+            cc: i686-linux-android
+            openssl_path: x86
+          - abi: x86_64
+            target: x86_64-linux-android
+            cc: x86_64-linux-android
+            openssl_path: x86_64
+          - abi: armeabi-v7a
+            target: armv7-linux-androideabi
+            cc: armv7a-linux-androideabi
+            openssl_path: armv7
+          - abi: arm64-v8a
+            target: aarch64-linux-android
+            cc: aarch64-linux-android
+            openssl_path: aarch64
+    container:
+      image: zingodevops/android_builder:stable
+    steps:
+      - uses: ./.github/actions/build_rust
   
   e2e_test:
     name: End-to-End Test
