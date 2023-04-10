@@ -1206,6 +1206,7 @@ export default class RPC {
     this.inRefresh = value;
     this.keepAwake(value);
   }
+
   getInRefresh(): boolean {
     return this.inRefresh;
   }

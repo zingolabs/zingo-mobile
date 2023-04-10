@@ -11,7 +11,6 @@ import moment from 'moment';
 import 'moment/locale/es';
 import RPC from '../../app/rpc';
 import Header from '../Header';
-import CircularProgress from '../Components/CircularProgress';
 import { NetInfoStateType } from '@react-native-community/netinfo';
 import RegText from '../Components/RegText';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
