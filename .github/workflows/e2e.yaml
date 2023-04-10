@@ -6,16 +6,12 @@ on:
   workflow_dispatch:
 
 jobs:
-  checkout:
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v3
   
   create_timestamp:
     runs-on: ubuntu-22.04
     steps:
+      - uses: actions/checkout@v3
       - uses: ./.github/actions/timestamp
-    needs: checkout
   
   build_rust:
     runs-on: ubuntu-22.04
