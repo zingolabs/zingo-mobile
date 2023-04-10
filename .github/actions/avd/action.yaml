@@ -36,8 +36,10 @@ runs:
         name: ${{ matrix.arch }}-${{ env.timestamp }}
         path: android/app/src/main/jniLibs/${{ matrix.jniLibs_dir }}
     - run: yarn install
+      shell: bash
     - name: kill avd
       run: sh ./scripts/kill_emulators.sh
+      shell: bash
     - name: Create AVD and generate snapshot for caching
       if: steps.avd-cache.outputs.cache-hit != 'true'
       uses: reactivecircus/android-emulator-runner@v2
@@ -50,5 +52,7 @@ runs:
         script: echo "Generated AVD snapshot for caching."
     - name: kill react-native
       run: killall node | echo
+      shell: bash
     - name: start react-native
       run: nohup yarn react-native start > "out.yarn_react_native_start" &
+      shell: bash
