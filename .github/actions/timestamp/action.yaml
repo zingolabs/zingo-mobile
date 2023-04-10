@@ -1,0 +1,13 @@
+name: Create timestamp action
+
+outputs:
+  timestamp:
+    value: ${{ steps.create_timestamp.outputs.timestamp }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Create timestamp step
+      id: create_timestamp
+      shell: bash
+      run: echo "timestamp=$(date +%Y%m%d%H%M%S)" >> $GITHUB_OUTPUT

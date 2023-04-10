@@ -1,0 +1,59 @@
+name: Build native rust
+
+runs:
+  using: "composite"
+  
+  steps:
+
+    - uses: ./.github/actions/build
+
+    - uses: ./.github/workflows/timestamp.yaml
+
+    - name: Setup Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '11'
+    - name: Checkout repository
+      uses: actions/checkout@v3
+    - name: Gradle cache
+      uses: gradle/gradle-build-action@v2
+      with:
+        gradle-version: 7.3.3
+        build-root-directory: ./android
+        cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev' && github.ref != 'refs/pull/*' }}
+    - name: AVD cache
+      uses: actions/cache@v3
+      id: avd-cache
+      with: 
+        path: |
+          ~/.android/avd/*
+          ~/.android/adb*
+        key: avd-${{ matrix.arch }}-api-${{ matrix.api-level }}      
+    - name: Download native rust
+      uses: actions/download-artifact@v3
+      with: 
+        name: ${{ matrix.arch }}-${{ env.timestamp }}
+        path: android/app/src/main/jniLibs/${{ matrix.jniLibs_dir }}
+    - run: yarn install
+      shell: bash
+    - name: kill avd
+      run: sh ./scripts/kill_emulators.sh
+      shell: bash
+    - name: Create AVD and generate snapshot for caching
+      if: steps.avd-cache.outputs.cache-hit != 'true'
+      uses: reactivecircus/android-emulator-runner@v2
+      with:
+        api-level: ${{ matrix.api-level }}
+        arch: ${{ matrix.arch }}
+        force-avd-creation: false
+        emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+        disable-animations: false
+        script: echo "Generated AVD snapshot for caching."
+    - name: kill react-native
+      run: killall node | echo
+      shell: bash
+    - name: start react-native
+      run: nohup yarn react-native start > "out.yarn_react_native_start" &
+      shell: bash
+
