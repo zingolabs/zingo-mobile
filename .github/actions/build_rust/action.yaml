@@ -13,7 +13,7 @@ inputs:
     required: yes
 
 env:
-  timestamp: ${{ inputs.timestamp }}
+  timestamp: ${{ INPUT_TIMESTAMP }}
   RUSTUP_HOME: /root/.rustup
 
 runs:
