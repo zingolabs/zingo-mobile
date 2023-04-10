@@ -1,5 +1,8 @@
 name: AVD_setup
 
+on:
+  workflow_call:
+
 jobs:
   
   uses: ./.github/workflows/build.yaml
