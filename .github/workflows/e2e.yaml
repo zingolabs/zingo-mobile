@@ -56,7 +56,6 @@ jobs:
           - arch : x86_64
             api-level: 30
             jniLibs_dir: x86_64
-    needs: [setup_emulator]
     steps:
       - name: Run Detox Build
         run: yarn detox build -c android.emu.debug -n test
