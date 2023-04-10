@@ -3,9 +3,6 @@ name: AVD_setup
 runs:
   using: "composite"
   
-  env:
-    timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
-
   steps:
 
     - uses: ./.github/actions/build
