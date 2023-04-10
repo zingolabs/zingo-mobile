@@ -24,6 +24,7 @@ import * as RNLocalize from 'react-native-localize';
 import { isEqual } from 'lodash';
 import { StackScreenProps } from '@react-navigation/stack';
 import NetInfo, { NetInfoSubscription } from '@react-native-community/netinfo';
+import { activateKeepAwake, deactivateKeepAwake } from '@sayem314/react-native-keep-awake';
 
 import RPC from '../rpc';
 import RPCModule from '../RPCModule';
@@ -258,6 +259,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       this.refreshUpdates,
       props.translate,
       this.fetchBackgroundSyncing,
+      this.keepAwake,
     );
 
     this.dim = {} as EmitterSubscription;
@@ -368,6 +370,14 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     this.appstate && this.appstate.remove();
     this.linking && this.linking.remove();
     this.unsubscribeNetInfo && this.unsubscribeNetInfo();
+  };
+
+  keepAwake = (keep: boolean): void => {
+    if (keep) {
+      activateKeepAwake();
+    } else {
+      deactivateKeepAwake();
+    }
   };
 
   readUrl = async (url: string) => {

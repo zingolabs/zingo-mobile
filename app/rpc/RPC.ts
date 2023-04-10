@@ -33,6 +33,7 @@ export default class RPC {
   fnSetWalletSettings: (settings: WalletSettingsClass) => void;
   translate: (key: string) => TranslateType;
   fetchBackgroundSyncing: () => void;
+  keepAwake: (keep: boolean) => void;
 
   refreshTimerID?: NodeJS.Timeout;
   updateTimerID?: NodeJS.Timeout;
@@ -65,6 +66,7 @@ export default class RPC {
     fnSetRefreshUpdates: (inProgress: boolean, progress: number, blocks: string, synced: boolean) => void,
     translate: (key: string) => TranslateType,
     fetchBackgroundSyncing: () => void,
+    keepAwake: (keep: boolean) => void,
   ) {
     this.fnSetSyncingStatusReport = fnSetSyncingStatusReport;
     this.fnSetTotalBalance = fnSetTotalBalance;
@@ -75,6 +77,7 @@ export default class RPC {
     this.fnSetRefreshUpdates = fnSetRefreshUpdates;
     this.translate = translate;
     this.fetchBackgroundSyncing = fetchBackgroundSyncing;
+    this.keepAwake = keepAwake;
 
     this.updateDataLock = false;
     this.updateDataCtr = 0;
@@ -445,7 +448,7 @@ export default class RPC {
 
     this.updateDataCtr += 1;
     if (this.inRefresh && this.updateDataCtr % 5 !== 0) {
-      // We're refreshing or sending, in which case update every 5th time
+      // We're refreshing, in which case update every 5th time
       return;
     }
 
@@ -501,6 +504,8 @@ export default class RPC {
     ) {
       // If the latest block height has changed, make sure to sync. This will happen in a new thread
       this.inRefresh = true;
+      // here we can keep the screen alive...
+      this.keepAwake(true);
 
       this.prevProgress = 0;
       this.prevBatchNum = -1;
@@ -513,10 +518,12 @@ export default class RPC {
       if (fullRescan) {
         this.doRescan().finally(() => {
           this.inRefresh = false;
+          this.keepAwake(false);
         });
       } else {
         this.doSync().finally(() => {
           this.inRefresh = false;
+          this.keepAwake(false);
         });
       }
 
@@ -674,6 +681,9 @@ export default class RPC {
             clearInterval(this.syncStatusTimerID);
             this.syncStatusTimerID = undefined;
           }
+
+          // here we can release the screen...
+          this.keepAwake(false);
 
           // And fetch the rest of the data.
           await this.loadWalletData();
@@ -1194,6 +1204,7 @@ export default class RPC {
 
   setInRefresh(value: boolean): void {
     this.inRefresh = value;
+    this.keepAwake(value);
   }
   getInRefresh(): boolean {
     return this.inRefresh;
