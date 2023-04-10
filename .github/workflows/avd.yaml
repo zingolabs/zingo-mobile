@@ -3,13 +3,8 @@ name: AVD_setup
 on:
   workflow_call:
 
-
-jobs:
+runs:
   
-  uses: ./.github/workflows/build.yaml
-
-  uses: ./.github/workflows/timestamp.yaml
-
   name: Setup Emulator
   runs-on: macos-12
   strategy:
@@ -25,6 +20,11 @@ jobs:
   env:
     timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
   steps:
+
+    - uses: ./.github/workflows/build.yaml
+
+    - uses: ./.github/workflows/timestamp.yaml
+
     - name: Setup Java
       uses: actions/setup-java@v3
       with:
