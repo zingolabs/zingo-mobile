@@ -2,10 +2,15 @@ name: Build native rust action
 
 inputs:
   abi:
+    required: yes
   target:
+    required: yes
   cc:
+    required: yes
   openssl_path:
+    required: yes
   timestamp:
+    required: yes
 
 env:
   timestamp: ${{ inputs.timestamp }}
