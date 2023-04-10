@@ -38,7 +38,13 @@ jobs:
     container:
       image: zingodevops/android_builder:stable
     steps:
+      - uses: actions/checkout@v3
       - uses: ./.github/actions/build_rust
+        with:
+          abi: ${{ matrix.abi }}
+          target: ${{ matrix.target }}
+          cc: ${{ matrix.cc }}
+          openssl_path: ${{ matrix.openssl_path }}
   
   e2e_test:
     name: End-to-End Test

@@ -31,25 +31,25 @@ runs:
           /root/.cargo/registry/index/            
           /root/.cargo/registry/cache/
           /root/.cargo/registry/git/db/
-        key: cargo-${{ matrix.abi }}-${{ hashFiles('rust/Cargo.lock') }}
-        restore-keys: cargo-${{ matrix.abi }}
+        key: cargo-${{ inputs.abi }}-${{ hashFiles('rust/Cargo.lock') }}
+        restore-keys: cargo-${{ inputs.abi }}
     
     - name: Cargo build
       working-directory: ./rust/android
-      run: cargo +nightly build -Z build-std --target ${{ matrix.target }} --release
+      run: cargo +nightly build -Z build-std --target ${{ inputs.target }} --release
       env:
         AR: llvm-ar
         LD: ld
         RANLIB: llvm-ranlib
-        CC: ${{ matrix.cc }}23-clang
-        OPENSSL_DIR: /opt/openssl-3.0.5/${{ matrix.openssl_path }}
+        CC: ${{ inputs.cc }}23-clang
+        OPENSSL_DIR: /opt/openssl-3.0.5/${{ inputs.openssl_path }}
     
     - name: LLVM Strip
       working-directory: ./rust/target
-      run: llvm-strip ./${{ matrix.target }}/release/librust.so
+      run: llvm-strip ./${{ input.target }}/release/librust.so
     
     - name: Upload native rust
       uses: actions/upload-artifact@v3
       with:
-        name: ${{ matrix.abi }}-${{ env.timestamp }}
-        path: rust/target/${{ matrix.target }}/release/librust.so
+        name: ${{ inputs.abi }}-${{ env.timestamp }}
+        path: rust/target/${{ inputs.target }}/release/librust.so
