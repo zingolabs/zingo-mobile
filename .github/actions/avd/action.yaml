@@ -2,19 +2,8 @@ name: AVD_setup
 
 runs:
   using: "composite"
-  
   name: Setup Emulator
-  runs-on: macos-12
-  strategy:
-    matrix:
-      include:
-        - arch : x86
-          api-level: 29
-          jniLibs_dir: x86
-        - arch : x86_64
-          api-level: 30
-          jniLibs_dir: x86_64
-  needs: [build, create-timestamp]
+  
   env:
     timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
   steps:
