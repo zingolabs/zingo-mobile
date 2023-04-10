@@ -19,7 +19,7 @@ runs:
     timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
   steps:
 
-    - uses: ./.github/workflows/build.yaml
+    - uses: ./.github/actions/build
 
     - uses: ./.github/workflows/timestamp.yaml
 
