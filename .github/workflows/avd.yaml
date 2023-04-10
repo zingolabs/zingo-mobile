@@ -4,6 +4,7 @@ on:
   workflow_call:
 
 runs:
+  using: "composite"
   
   name: Setup Emulator
   runs-on: macos-12
