@@ -140,8 +140,14 @@ if [ "$create_snapshot" = true ]; then
     echo "Boot completed"
     echo -e "\nSnapshot saved"
 else
-    echo -e "\nChecking AVD has been created..."
-    emulator -list-avds | grep -q "${api}_${target}_${arch}"
+    echo -e "\nChecking for AVD..."
+    if emulator -list-avds | grep -q "${api}_${target}_${arch}"; then
+        echo "AVD found: ${api}_${target}_${arch}"
+    else
+        echo "Error: AVD not found"
+        echo "Try '$(basename $0) -a ${abi} -s' to create an AVD and quick-boot snapshot."
+        exit 1
+    fi
 
     echo -e "\nBuilding APKs..."
     ./gradlew assembleDebug assembleAndroidTest -Psplitapk=true
@@ -169,7 +175,7 @@ else
     adb shell settings put global animator_duration_scale 0.0
 
     echo -e "\nInstalling APKs..."
-    adb -s emulator-5554 install-multi-package -r -t --abi $abi \
+    adb -s emulator-5554 install-multi-package -rtd --abi $abi \
         "app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk" \
         "app/build/outputs/apk/debug/app-${abi}-debug.apk"
 
