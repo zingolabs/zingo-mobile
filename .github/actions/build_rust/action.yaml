@@ -2,18 +2,23 @@ name: Build native rust action
 
 inputs:
   abi:
+    description: "input"
     required: yes
   target:
+    description: "input"
     required: yes
   cc:
+    description: "input"
     required: yes
   openssl_path:
+    description: "input"
     required: yes
   timestamp:
+    description: "input"
     required: yes
 
 env:
-  timestamp: ${{ INPUT_TIMESTAMP }}
+  timestamp: ${{ inputs.timestamp }}
   RUSTUP_HOME: /root/.rustup
 
 runs:
