@@ -159,7 +159,7 @@ else
 
     echo -e "\n\nWaiting for emulator to launch..."
     emulator -avd "${api}_${target}_${arch}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
-        -no-snapshot-save -port 5554 &> "${test_report_dir}/emulator.txt" &
+        -no-snapshot-save -read-only -port 5554 &> "${test_report_dir}/emulator.txt" &
     wait_for 1800 check_launch
     echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
 
@@ -175,7 +175,7 @@ else
     adb shell settings put global animator_duration_scale 0.0
 
     echo -e "\nInstalling APKs..."
-    adb -s emulator-5554 install-multi-package -r -t -d --abi $abi \
+    adb -s emulator-5554 install-multi-package -r -t --abi $abi \
         "app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk" \
         "app/build/outputs/apk/debug/app-${abi}-debug.apk"
 
