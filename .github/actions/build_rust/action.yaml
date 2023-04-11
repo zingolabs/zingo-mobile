@@ -18,7 +18,6 @@ inputs:
     required: yes
 
 env:
-  timestamp: ${{ inputs.timestamp }}
   RUSTUP_HOME: /root/.rustup
 
 runs:
