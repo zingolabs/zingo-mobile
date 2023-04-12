@@ -2,6 +2,8 @@
 set -Eeuo pipefail
 
 create_snapshot=false
+apk_installed=false
+install_attempts=0
 
 function check_launch() {
     emu_status=$(adb devices | grep "emulator-5554" | cut -f1)
@@ -175,10 +177,15 @@ else
     adb shell settings put global animator_duration_scale 0.0
 
     echo -e "\nInstalling APKs..."
-    sleep 5
-    adb -s emulator-5554 install-multi-package -r -t -d --abi $abi \
-        "app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk" \
-        "app/build/outputs/apk/debug/app-${abi}-debug.apk"
+    until [[ $apk_installed == true || $install_attempts -ge 5 ]]; do
+        if adb -s emulator-5554 install-multi-package -r -t -d --abi $abi \
+                "app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk" \
+                "app/build/outputs/apk/debug/app-${abi}-debug.apk" &> /dev/null; then
+            apk_installed=true
+            echo "Success"
+        fi              
+        install_attempts=$((install_attempts+1))
+    done
 
     # Store emulator info and start logging
     adb -s emulator-5554 shell getprop &> "${test_report_dir}/getprop.txt"
