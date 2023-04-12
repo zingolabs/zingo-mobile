@@ -64,6 +64,7 @@ describe('Component SyncReport - test', () => {
   state.syncingStatusReport.lastBlockServer = 1900100;
   state.syncingStatusReport.secondsPerBatch = 122;
   state.syncingStatusReport.process_end_block = 1600100;
+  state.netInfo.isConnected = true;
   const onClose = jest.fn();
   test('Matches the snapshot SyncReport', () => {
     const info: any = render(
