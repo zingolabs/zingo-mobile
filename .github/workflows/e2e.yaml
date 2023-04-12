@@ -63,7 +63,6 @@ jobs:
         uses: actions/cache@v3
         id: cargo-cache
         with:
-          # TODO: ref paths from cargo
           path: |
             /root/.cargo/.crates.toml
             /root/.cargo/.crates2.json
@@ -132,7 +131,7 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-            key: avd-${{ matrix.arch }}-api-${{ matrix.api-level }}      
+          key: avd-${{ matrix.arch }}-api-${{ matrix.api-level }}      
 
       - name: Download native rust
         uses: actions/download-artifact@v3
