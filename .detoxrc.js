@@ -3,7 +3,8 @@ module.exports = {
   testRunner: {
     args: {
       '$0': 'jest',
-      config: 'e2e/jest.config.js'
+      config: 'e2e/jest.config.js',
+      "testTimeout": 100000,
     },
     jest: {
       setupTimeout: 1000000
@@ -62,7 +63,7 @@ module.exports = {
     emulator_32: {
       type: 'android.emulator',
       device: {
-        avdName: '30_ga_32'
+        avdName: '29_gaps_32'
       }
     }
   },
