@@ -91,7 +91,7 @@ jobs:
       - name: Upload native rust
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.abi }}-${{ env.timestamp }}
+          name: ${{ matrix.abi }}
           path: rust/target/${{ matrix.target }}/release/librust.so
   
   integration_test:
@@ -150,7 +150,7 @@ jobs:
       - name: Download native rust
         uses: actions/download-artifact@v3
         with: 
-          name: ${{ matrix.abi }}-${{ env.timestamp }}
+          name: ${{ matrix.abi }}
           path: android/app/src/main/jniLibs/${{ matrix.abi }}
       
       - run: yarn install
@@ -220,7 +220,7 @@ jobs:
       - name: Download native rust
         uses: actions/download-artifact@v3
         with: 
-          name: ${{ matrix.arch }}-${{ env.timestamp }}
+          name: ${{ matrix.arch }}
           path: android/app/src/main/jniLibs/${{ matrix.arch }}
       
       - run: yarn install
