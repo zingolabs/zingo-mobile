@@ -200,7 +200,7 @@ jobs:
       - name: Download native rust
         uses: actions/download-artifact@v3
         with: 
-          name: ${{ matrix.arch }}
+          name: ${{ matrix.arch }}-${{ env.timestamp }}
           path: android/app/src/main/jniLibs/${{ matrix.arch }}
       
       - run: yarn install
