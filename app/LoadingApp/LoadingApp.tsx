@@ -20,11 +20,13 @@ import { useTheme } from '@react-navigation/native';
 import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
 import { StackScreenProps } from '@react-navigation/stack';
+import NetInfo, { NetInfoStateType, NetInfoSubscription } from '@react-native-community/netinfo';
+import Toast from 'react-native-simple-toast';
 
 import BoldText from '../../components/Components/BoldText';
 import Button from '../../components/Components/Button';
 import RPCModule from '../RPCModule';
-import { AppStateLoading, backgroundType, WalletSeedType, TranslateType } from '../AppState';
+import { AppStateLoading, BackgroundType, WalletSeedType, TranslateType, NetInfoType } from '../AppState';
 import { serverUris } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import RPC from '../rpc';
@@ -33,6 +35,8 @@ import { defaultAppStateLoading, ContextAppLoadingProvider } from '../context';
 import platform from '../platform/platform';
 import BackgroundFileImpl from '../../components/Background/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faCloudDownload } from '@fortawesome/free-solid-svg-icons';
 
 const Seed = React.lazy(() => import('../../components/Seed'));
 
@@ -61,7 +65,7 @@ export default function LoadingApp(props: LoadingAppProps) {
   const [currency, setCurrency] = useState('' as 'USD' | '');
   const [server, setServer] = useState(SERVER_DEFAULT_0 as string);
   const [sendAll, setSendAll] = useState(false);
-  const [background, setBackground] = useState({ batches: 0, date: 0 } as backgroundType);
+  const [background, setBackground] = useState({ batches: 0, date: 0 } as BackgroundType);
   const [loading, setLoading] = useState(true);
   //const forceUpdate = useForceUpdate();
   const file = useMemo(
@@ -179,18 +183,28 @@ type LoadingAppClassProps = {
   currency: 'USD' | '';
   server: string;
   sendAll: boolean;
-  background: backgroundType;
+  background: BackgroundType;
 };
 
 class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
   dim: EmitterSubscription;
   appstate: NativeEventSubscription;
-  linking: EmitterSubscription;
+  unsubscribeNetInfo: NetInfoSubscription;
 
   constructor(props: LoadingAppClassProps) {
     super(props);
 
     const screen = Dimensions.get('screen');
+
+    let netInfo: NetInfoType = {} as NetInfoType;
+    NetInfo.fetch().then(state => {
+      //console.log(state);
+      netInfo = {
+        isConnected: state.isConnected,
+        type: state.type,
+        isConnectionExpensive: state.details && state.details.isConnectionExpensive,
+      };
+    });
 
     this.state = {
       ...defaultAppStateLoading,
@@ -210,11 +224,13 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
         scale: Number(screen.scale.toFixed(2)),
       },
       appState: AppState.currentState,
+      netInfo: netInfo,
+      actionButtonsDisabled: !netInfo.isConnected ? true : false,
     };
 
     this.dim = {} as EmitterSubscription;
     this.appstate = {} as NativeEventSubscription;
-    this.linking = {} as EmitterSubscription;
+    this.unsubscribeNetInfo = {} as NetInfoSubscription;
   }
 
   componentDidMount = async () => {
@@ -242,7 +258,6 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
 
     this.dim = Dimensions.addEventListener('change', ({ screen }) => {
       this.setDimensions(screen);
-      //console.log('++++++++++++++++++++++++++++++++++ change dims', Dimensions.get('screen'));
     });
 
     this.appstate = AppState.addEventListener('change', async nextAppState => {
@@ -264,11 +279,27 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
       }
       this.setState({ appState: nextAppState });
     });
+
+    this.unsubscribeNetInfo = NetInfo.addEventListener(state => {
+      this.setState({
+        netInfo: {
+          isConnected: state.isConnected,
+          type: state.type,
+          isConnectionExpensive: state.details && state.details.isConnectionExpensive,
+        },
+        screen: 1,
+        actionButtonsDisabled: !state.isConnected ? true : false,
+      });
+      if (!state.isConnected) {
+        Toast.show(this.props.translate('loadedapp.connection-error') as string, Toast.LONG);
+      }
+    });
   };
 
   componentWillUnmount = () => {
-    this.dim.remove();
-    this.appstate.remove();
+    this.dim && this.dim.remove();
+    this.appstate && this.appstate.remove();
+    this.unsubscribeNetInfo && this.unsubscribeNetInfo();
   };
 
   setDimensions = (screen: ScaledSize) => {
@@ -376,7 +407,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
   };
 
   render() {
-    const { screen, walletSeed, actionButtonsDisabled, walletExists, server } = this.state;
+    const { screen, walletSeed, actionButtonsDisabled, walletExists, server, netInfo } = this.state;
     const { translate } = this.props;
     const { colors } = this.props.theme;
 
@@ -435,6 +466,50 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                   {translate('loadingapp.actualserver') as string}
                 </BoldText>
                 <BoldText style={{ fontSize: 15, marginBottom: 10 }}>{server}</BoldText>
+
+                {(!netInfo.isConnected ||
+                  netInfo.type === NetInfoStateType.cellular ||
+                  netInfo.isConnectionExpensive) && (
+                  <>
+                    <BoldText style={{ fontSize: 15, marginBottom: 3 }}>
+                      {translate('report.networkstatus') as string}
+                    </BoldText>
+                    <View
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'flex-end',
+                        marginHorizontal: 20,
+                      }}>
+                      <View style={{ display: 'flex', flexDirection: 'row', marginBottom: 10 }}>
+                        {!netInfo.isConnected && (
+                          <BoldText style={{ fontSize: 15, color: 'red' }}>
+                            {' '}
+                            {translate('report.nointernet') as string}{' '}
+                          </BoldText>
+                        )}
+                        {netInfo.type === NetInfoStateType.cellular && (
+                          <BoldText style={{ fontSize: 15, color: 'yellow' }}>
+                            {' '}
+                            {translate('report.cellulardata') as string}{' '}
+                          </BoldText>
+                        )}
+                        {netInfo.isConnectionExpensive && (
+                          <BoldText style={{ fontSize: 15, color: 'yellow' }}>
+                            {' '}
+                            {translate('report.connectionexpensive') as string}{' '}
+                          </BoldText>
+                        )}
+                      </View>
+                      <FontAwesomeIcon
+                        icon={faCloudDownload}
+                        color={!netInfo.isConnected ? 'red' : 'yellow'}
+                        size={15}
+                        style={{ marginBottom: 15, marginLeft: 5 }}
+                      />
+                    </View>
+                  </>
+                )}
 
                 {server === SERVER_DEFAULT_1 && !!SERVER_DEFAULT_0 && (
                   <Button

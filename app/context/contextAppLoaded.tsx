@@ -17,9 +17,10 @@ import {
   AddressClass,
   AddressBookClass,
   zecPriceType,
-  backgroundType,
+  BackgroundType,
   SendPageStateClass,
   ToAddrClass,
+  NetInfoType,
 } from '../AppState';
 
 export const defaultAppStateLoaded: AppStateLoaded = {
@@ -27,6 +28,7 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   route: {} as StackScreenProps<any>['route'],
   dimensions: {} as DimensionsType,
   appState: '' as string,
+  netInfo: {} as NetInfoType,
 
   syncingStatusReport: new SyncingStatusReportClass(),
   totalBalance: new TotalBalanceClass(),
@@ -71,7 +73,7 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   background: {
     batches: 0,
     date: 0,
-  } as backgroundType,
+  } as BackgroundType,
 
   translate: () => '',
 };

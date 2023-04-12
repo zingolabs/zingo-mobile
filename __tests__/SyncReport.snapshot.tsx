@@ -9,6 +9,18 @@ import { render } from '@testing-library/react-native';
 import SyncReport from '../components/SyncReport';
 import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
 
+const NetInfoStateType = {
+  unknown: 'unknown',
+  none: 'none',
+  cellular: 'cellular',
+  wifi: 'wifi',
+  bluetooth: 'bluetooth',
+  ethernet: 'ethernet',
+  wimax: 'wimax',
+  vpn: 'vpn',
+  other: 'other',
+};
+
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
   FontAwesomeIcon: '',
@@ -22,6 +34,18 @@ jest.mock('react-native-localize', () => ({
   },
 }));
 jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
+jest.mock('@react-native-community/netinfo', () => ({
+  RNCNetInfo: () => {
+    const RN = jest.requireActual('react-native');
+
+    RN.NativeModules.RNCNetInfo = {
+      execute: jest.fn(() => '{}'),
+    };
+
+    return RN;
+  },
+  NetInfoStateType: NetInfoStateType,
+}));
 
 // test suite
 describe('Component SyncReport - test', () => {

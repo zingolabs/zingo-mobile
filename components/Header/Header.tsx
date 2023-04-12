@@ -1,16 +1,17 @@
 /* eslint-disable react-native/no-inline-styles */
-import { faBars, faCheck, faInfo, faPlay, faStop } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faCheck, faInfoCircle, faPlay, faStop, faCloudDownload } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme } from '@react-navigation/native';
 import React, { useContext } from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
-import { TranslateType } from '../../app/AppState';
+import { DimensionsType, NetInfoType, TranslateType } from '../../app/AppState';
 import { ContextAppLoaded } from '../../app/context';
 import { ThemeType } from '../../app/types';
 import CurrencyAmount from '../Components/CurrencyAmount';
 import PriceFetcher from '../Components/PriceFetcher';
 import RegText from '../Components/RegText';
 import ZecAmount from '../Components/ZecAmount';
+import { NetInfoStateType } from '@react-native-community/netinfo';
 
 type HeaderProps = {
   poolsMoreInfoOnClick?: () => void;
@@ -23,6 +24,8 @@ type HeaderProps = {
   noDrawMenu?: boolean;
   testID?: string;
   translate?: (key: string) => TranslateType;
+  dimensions?: DimensionsType;
+  netInfo?: NetInfoType;
 };
 
 const Header: React.FunctionComponent<HeaderProps> = ({
@@ -36,14 +39,26 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   noDrawMenu,
   testID,
   translate: translateProp,
+  dimensions: dimensionsProp,
+  netInfo: netInfoProp,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { totalBalance, info, syncingStatus, currency, zecPrice, dimensions } = context;
-  let translate;
+  const { totalBalance, info, syncingStatus, currency, zecPrice } = context;
+  let translate, dimensions, netInfo;
   if (translateProp) {
     translate = translateProp;
   } else {
     translate = context.translate;
+  }
+  if (dimensionsProp) {
+    dimensions = dimensionsProp;
+  } else {
+    dimensions = context.dimensions;
+  }
+  if (netInfoProp) {
+    netInfo = netInfoProp;
+  } else {
+    netInfo = context.netInfo;
   }
 
   const { colors } = useTheme() as unknown as ThemeType;
@@ -91,12 +106,10 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   borderRadius: 10,
                   margin: 0,
                   padding: 0,
-                  marginLeft: 5,
                   minWidth: 48,
                   minHeight: 48,
                 }}>
-                <RegText color={colors.primary}>{translate('history.pools') as string}</RegText>
-                <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
+                <FontAwesomeIcon icon={faInfoCircle} size={18} color={colors.primary} />
               </View>
             </TouchableOpacity>
           )}
@@ -139,34 +152,42 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           </RegText>
         </View>
         {!noSyncingStatus && (
-          <View
-            style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              margin: 0,
-              padding: 1,
-              borderColor: colors.primary,
-              borderWidth: 1,
-              borderRadius: 10,
-              minWidth: 20,
-              minHeight: 20,
-            }}>
-            {!syncStatusDisplayLine && syncingStatus.synced && (
-              <View style={{ margin: 0, padding: 0 }}>
-                <FontAwesomeIcon icon={faCheck} color={colors.primary} />
-              </View>
-            )}
-            {!syncStatusDisplayLine && !syncingStatus.synced && (
+          <>
+            <View
+              style={{
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: 0,
+                marginRight: 5,
+                padding: 1,
+                borderColor: colors.primary,
+                borderWidth: 1,
+                borderRadius: 10,
+                minWidth: 20,
+                minHeight: 20,
+              }}>
+              {!syncStatusDisplayLine && syncingStatus.synced && (
+                <View style={{ margin: 0, padding: 0 }}>
+                  <FontAwesomeIcon icon={faCheck} color={colors.primary} />
+                </View>
+              )}
+              {!syncStatusDisplayLine && !syncingStatus.synced && (
+                <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
+                  <FontAwesomeIcon icon={faStop} color={colors.zingo} size={12} />
+                </TouchableOpacity>
+              )}
+              {syncStatusDisplayLine && (
+                <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
+                  <FontAwesomeIcon icon={faPlay} color={colors.primary} size={10} />
+                </TouchableOpacity>
+              )}
+            </View>
+            {(!netInfo.isConnected || netInfo.type === NetInfoStateType.cellular || netInfo.isConnectionExpensive) && (
               <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
-                <FontAwesomeIcon icon={faStop} color={colors.zingo} size={12} />
+                <FontAwesomeIcon icon={faCloudDownload} color={!netInfo.isConnected ? 'red' : 'yellow'} size={20} />
               </TouchableOpacity>
             )}
-            {syncStatusDisplayLine && (
-              <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
-                <FontAwesomeIcon icon={faPlay} color={colors.primary} size={10} />
-              </TouchableOpacity>
-            )}
-          </View>
+          </>
         )}
       </View>
 
@@ -183,7 +204,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
 
       <View style={{ padding: 15, position: 'absolute', right: 0, alignItems: 'flex-end' }}>
         <Text style={{ fontSize: 8, color: colors.border }}>{translate('version') as string}</Text>
-        {__DEV__ && (
+        {__DEV__ && !!dimensions && (
           <Text style={{ fontSize: 8, color: colors.border }}>
             {'(' + dimensions.width + 'x' + dimensions.height + ')-' + dimensions.scale}
           </Text>

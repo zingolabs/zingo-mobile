@@ -129,7 +129,11 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
               if (price === -2) {
                 Toast.show(translate('info.errorrpcmodule') as string, Toast.LONG);
               }
-              setZecPrice(price, Date.now());
+              if (price <= 0) {
+                setZecPrice(price, 0);
+              } else {
+                setZecPrice(price, Date.now());
+              }
               setRefreshSure(false);
               setRefreshMinutes(0);
               setCount(5);

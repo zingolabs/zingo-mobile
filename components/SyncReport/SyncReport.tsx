@@ -12,6 +12,10 @@ import 'moment/locale/es';
 import RPC from '../../app/rpc';
 import Header from '../Header';
 import CircularProgress from '../Components/CircularProgress';
+import { NetInfoStateType } from '@react-native-community/netinfo';
+import RegText from '../Components/RegText';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faCloudDownload } from '@fortawesome/free-solid-svg-icons';
 
 type SyncReportProps = {
   closeModal: () => void;
@@ -19,7 +23,7 @@ type SyncReportProps = {
 
 const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) => {
   const context = useContext(ContextAppLoaded);
-  const { syncingStatusReport, walletSeed, translate, background, language } = context;
+  const { syncingStatusReport, walletSeed, translate, background, language, netInfo } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [maxBlocks, setMaxBlocks] = useState(0);
   const [points, setPoints] = useState([] as number[]);
@@ -165,19 +169,54 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
           alignItems: 'stretch',
           justifyContent: 'flex-start',
         }}>
+        {(!netInfo.isConnected || netInfo.type === NetInfoStateType.cellular || netInfo.isConnectionExpensive) && (
+          <View
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'flex-end',
+              marginHorizontal: 20,
+            }}>
+            <DetailLine label={translate('report.networkstatus') as string}>
+              <View style={{ display: 'flex', flexDirection: 'row' }}>
+                {!netInfo.isConnected && <RegText color="red"> {translate('report.nointernet') as string} </RegText>}
+                {netInfo.type === NetInfoStateType.cellular && (
+                  <RegText color="yellow"> {translate('report.cellulardata') as string} </RegText>
+                )}
+                {netInfo.isConnectionExpensive && (
+                  <RegText color="yellow"> {translate('report.connectionexpensive') as string} </RegText>
+                )}
+              </View>
+            </DetailLine>
+            <FontAwesomeIcon
+              icon={faCloudDownload}
+              color={!netInfo.isConnected ? 'red' : 'yellow'}
+              size={20}
+              style={{ marginBottom: 5, marginLeft: 5 }}
+            />
+          </View>
+        )}
+        {background.batches > 0 && background.date > 0 && (
+          <View
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'flex-end',
+              margin: 20,
+            }}>
+            <DetailLine
+              label={translate('report.lastbackgroundsync') as string}
+              value={
+                background.batches.toString() +
+                translate('report.batches-date') +
+                moment(Number(Number(background.date).toFixed(0)) * 1000).format('YYYY MMM D h:mm a')
+              }
+            />
+          </View>
+        )}
         {maxBlocks ? (
           <>
             <View style={{ display: 'flex', margin: 20, marginBottom: 30 }}>
-              {background.batches > 0 && background.date > 0 && (
-                <DetailLine
-                  label={translate('report.lastbackgroundsync') as string}
-                  value={
-                    background.batches.toString() +
-                    translate('report.batches-date') +
-                    moment(Number(Number(background.date).toFixed(0)) * 1000).format('YYYY MMM D h:mm a')
-                  }
-                />
-              )}
               <DetailLine
                 label="Sync ID"
                 value={

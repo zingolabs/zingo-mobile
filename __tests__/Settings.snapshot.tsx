@@ -21,6 +21,15 @@ jest.mock('react-native-localize', () => ({
   },
 }));
 jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
+jest.mock('@react-native-community/netinfo', () => {
+  const RN = jest.requireActual('react-native');
+
+  RN.NativeModules.RNCNetInfo = {
+    execute: jest.fn(() => '{}'),
+  };
+
+  return RN;
+});
 jest.useFakeTimers();
 
 // test suite

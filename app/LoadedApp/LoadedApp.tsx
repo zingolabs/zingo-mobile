@@ -23,6 +23,7 @@ import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
 import { isEqual } from 'lodash';
 import { StackScreenProps } from '@react-navigation/stack';
+import NetInfo, { NetInfoSubscription } from '@react-native-community/netinfo';
 
 import RPC from '../rpc';
 import RPCModule from '../RPCModule';
@@ -42,8 +43,9 @@ import {
   WalletSettingsClass,
   AddressClass,
   zecPriceType,
-  backgroundType,
+  BackgroundType,
   TranslateType,
+  NetInfoType,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
@@ -94,7 +96,7 @@ export default function LoadedApp(props: LoadedAppProps) {
   const [currency, setCurrency] = useState('' as 'USD' | '');
   const [server, setServer] = useState(SERVER_DEFAULT_0 as string);
   const [sendAll, setSendAll] = useState(false);
-  const [background, setBackground] = useState({ batches: 0, date: 0 } as backgroundType);
+  const [background, setBackground] = useState({ batches: 0, date: 0 } as BackgroundType);
   const [loading, setLoading] = useState(true);
   //const forceUpdate = useForceUpdate();
   const file = useMemo(
@@ -211,7 +213,7 @@ type LoadedAppClassProps = {
   currency: 'USD' | '';
   server: string;
   sendAll: boolean;
-  background: backgroundType;
+  background: BackgroundType;
 };
 
 class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
@@ -219,11 +221,21 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   dim: EmitterSubscription;
   appstate: NativeEventSubscription;
   linking: EmitterSubscription;
+  unsubscribeNetInfo: NetInfoSubscription;
 
   constructor(props: LoadedAppClassProps) {
     super(props);
 
     const screen = Dimensions.get('screen');
+
+    let netInfo: NetInfoType = {} as NetInfoType;
+    NetInfo.fetch().then(state => {
+      netInfo = {
+        isConnected: state.isConnected,
+        type: state.type,
+        isConnectionExpensive: state.details && state.details.isConnectionExpensive,
+      };
+    });
 
     this.state = {
       ...defaultAppStateLoaded,
@@ -244,6 +256,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
         scale: Number(screen.scale.toFixed(2)),
       },
       appState: AppState.currentState,
+      netInfo: netInfo,
     };
 
     this.rpc = new RPC(
@@ -261,6 +274,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     this.dim = {} as EmitterSubscription;
     this.appstate = {} as NativeEventSubscription;
     this.linking = {} as EmitterSubscription;
+    this.unsubscribeNetInfo = {} as NetInfoSubscription;
   }
 
   componentDidMount = () => {
@@ -271,7 +285,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
     this.dim = Dimensions.addEventListener('change', ({ screen }) => {
       this.setDimensions(screen);
-      //console.log('++++++++++++++++++++++++++++++++++ change dims', Dimensions.get('screen'));
     });
 
     this.appstate = AppState.addEventListener('change', async nextAppState => {
@@ -323,13 +336,28 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
         Toast.show(this.state.translate('loadedapp.zcash-url') as string, Toast.LONG);
       }
     });
+
+    this.unsubscribeNetInfo = NetInfo.addEventListener(state => {
+      this.setState({
+        netInfo: {
+          isConnected: state.isConnected,
+          type: state.type,
+          isConnectionExpensive: state.details && state.details.isConnectionExpensive,
+        },
+      });
+      //console.log(state);
+      if (!state.isConnected) {
+        Toast.show(this.props.translate('loadedapp.connection-error') as string, Toast.LONG);
+      }
+    });
   };
 
   componentWillUnmount = () => {
     this.rpc.clearTimers();
-    this.dim.remove();
-    this.appstate.remove();
-    this.linking.remove();
+    this.dim && this.dim.remove();
+    this.appstate && this.appstate.remove();
+    this.linking && this.linking.remove();
+    this.unsubscribeNetInfo && this.unsubscribeNetInfo();
   };
 
   readUrl = async (url: string) => {

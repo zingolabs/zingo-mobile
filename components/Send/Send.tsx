@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useRef, useCallback, useContext } from 'react';
 import { View, ScrollView, Modal, Alert, Keyboard, TextInput, TouchableOpacity } from 'react-native';
-import { faQrcode, faCheck, faInfo } from '@fortawesome/free-solid-svg-icons';
+import { faQrcode, faCheck, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme, useIsFocused } from '@react-navigation/native';
 import Toast from 'react-native-simple-toast';
@@ -51,7 +51,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   setZecPrice,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, info, totalBalance, sendPageState, navigation, zecPrice, sendAll } = context;
+  const { translate, info, totalBalance, sendPageState, navigation, zecPrice, sendAll, netInfo } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [qrcodeModalVisble, setQrcodeModalVisible] = useState(false);
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
@@ -602,7 +602,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                               padding: 5,
                               borderRadius: 10,
                             }}>
-                            <FontAwesomeIcon icon={faInfo} size={14} color={colors.primary} />
+                            <FontAwesomeIcon icon={faInfoCircle} size={14} color={colors.primary} />
                             <FadeText>{translate('send.somefunds') as string}</FadeText>
                           </View>
                         </TouchableOpacity>
@@ -778,6 +778,10 @@ const Send: React.FunctionComponent<SendProps> = ({
                   Number(sendPageState.toaddr.amount) === Utils.parseLocaleFloat(getMaxAmount().toFixed(8))
                 ) {
                   Toast.show(`${translate('send.sendall-message') as string}`, Toast.LONG);
+                }
+                if (!netInfo.isConnected) {
+                  Toast.show(translate('loadedapp.connection-error') as string, Toast.LONG);
+                  return;
                 }
                 setConfirmModalVisible(true);
               }}
