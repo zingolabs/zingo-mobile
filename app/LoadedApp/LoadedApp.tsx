@@ -696,9 +696,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
         Toast.show(this.props.translate('loadedapp.restoremainnet-error') as string, Toast.LONG);
         return;
       }
-      if (info.currencyName) {
-        this.setState({ seedBackupModalVisible: true });
-      }
+      this.setState({ seedBackupModalVisible: true });
     }
   };
 

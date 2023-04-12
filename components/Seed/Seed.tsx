@@ -348,7 +348,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
             if (!seedPhrase) {
               return;
             }
-            if (!netInfo.isConnected) {
+            if (!netInfo.isConnected && (times > 0 || action === 'restore')) {
               Toast.show(translate('loadedapp.connection-error') as string, Toast.LONG);
               return;
             }

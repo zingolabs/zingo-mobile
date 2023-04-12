@@ -35,8 +35,6 @@ import { defaultAppStateLoading, ContextAppLoadingProvider } from '../context';
 import platform from '../platform/platform';
 import BackgroundFileImpl from '../../components/Background/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faCloudDownload } from '@fortawesome/free-solid-svg-icons';
 
 const Seed = React.lazy(() => import('../../components/Seed'));
 
@@ -281,13 +279,14 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
     });
 
     this.unsubscribeNetInfo = NetInfo.addEventListener(state => {
+      const { screen } = this.state;
       this.setState({
         netInfo: {
           isConnected: state.isConnected,
           type: state.type,
           isConnectionExpensive: state.details && state.details.isConnectionExpensive,
         },
-        screen: 1,
+        screen: screen !== 0 ? 1 : screen,
         actionButtonsDisabled: !state.isConnected ? true : false,
       });
       if (!state.isConnected) {
@@ -481,7 +480,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                         alignItems: 'flex-end',
                         marginHorizontal: 20,
                       }}>
-                      <View style={{ display: 'flex', flexDirection: 'row', marginBottom: 10 }}>
+                      <View style={{ display: 'flex', flexDirection: 'column', marginBottom: 10 }}>
                         {!netInfo.isConnected && (
                           <BoldText style={{ fontSize: 15, color: 'red' }}>
                             {' '}
@@ -501,12 +500,6 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                           </BoldText>
                         )}
                       </View>
-                      <FontAwesomeIcon
-                        icon={faCloudDownload}
-                        color={!netInfo.isConnected ? 'red' : 'yellow'}
-                        size={15}
-                        style={{ marginBottom: 15, marginLeft: 5 }}
-                      />
                     </View>
                   </>
                 )}

@@ -178,7 +178,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
               marginHorizontal: 20,
             }}>
             <DetailLine label={translate('report.networkstatus') as string}>
-              <View style={{ display: 'flex', flexDirection: 'row' }}>
+              <View style={{ display: 'flex', flexDirection: 'column' }}>
                 {!netInfo.isConnected && <RegText color="red"> {translate('report.nointernet') as string} </RegText>}
                 {netInfo.type === NetInfoStateType.cellular && (
                   <RegText color="yellow"> {translate('report.cellulardata') as string} </RegText>
@@ -214,7 +214,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
             />
           </View>
         )}
-        {maxBlocks ? (
+        {maxBlocks && netInfo.isConnected ? (
           <>
             <View style={{ display: 'flex', margin: 20, marginBottom: 30 }}>
               <DetailLine
@@ -611,7 +611,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
           </>
         ) : (
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-            <DetailLine label="" value={translate('connectingserver') as string} />
+            {netInfo.isConnected && <DetailLine label="" value={translate('connectingserver') as string} />}
           </View>
         )}
       </ScrollView>
