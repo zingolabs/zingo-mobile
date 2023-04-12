@@ -1,9 +1,9 @@
-name: CI
+name: e2e_test
 
 on:
-  pull_request:
   push:
-
+    branches: [e2e_ci]
+  
 jobs:
   test:
     name: Test
@@ -93,28 +93,19 @@ jobs:
         with:
           name: ${{ matrix.abi }}-${{ env.timestamp }}
           path: rust/target/${{ matrix.target }}/release/librust.so
-  
-  integration_test:
-    name: Integration test
+
+  e2e_test:
+    name: End-to-End Test
     runs-on: macos-12
     strategy:
       matrix:
+        arch: [x86, x86_64]
         include:
-          - abi: x86
-            avd: x86
-            api-level: 29
-            target: default
-            channel: stable
-          - abi: x86_64
-            avd: x86_64
-            api-level: 30
-            target: default
-            channel: stable
-          # - abi: arm64-v8a
-          #   avd: x86_64
-          #   api-level: 30
-          #   target: aosp_atd
-          #   channel: canary
+          - api-level: 27
+          - api-level: 28
+          - api-level: 29
+          - api-level: 30
+          - api-level: 31
     needs: [create-timestamp, build]
     env:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
@@ -128,16 +119,11 @@ jobs:
           distribution: 'temurin'
           java-version: '11'
       
-      # - name: Setup Android SDK
-      #   uses: android-actions/setup-android@v2
-      
       - name: Gradle cache
         uses: gradle/gradle-build-action@v2
         with:
           gradle-version: 7.3.3
           build-root-directory: ./android
-          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev' }}
-      
       - name: AVD cache
         uses: actions/cache@v3
         id: avd-cache
@@ -145,40 +131,35 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-${{ matrix.avd }}-api-${{ matrix.api-level }}      
       
+            key: avd-${{ matrix.arch }}-api-${{ matrix.api-level }}      
       - name: Download native rust
         uses: actions/download-artifact@v3
         with: 
-          name: ${{ matrix.abi }}-${{ env.timestamp }}
-          path: android/app/src/main/jniLibs/${{ matrix.abi }}
+          name: ${{ matrix.arch }}-${{ env.timestamp }}
+          path: android/app/src/main/jniLibs/${{ matrix.arch }}
       
       - run: yarn install
-      
       - name: Create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api-level }}
-          arch: ${{ matrix.avd }}
-          target: ${{ matrix.target }}
-          channel: ${{ matrix.channel }}
-          emulator-boot-timeout: 1800
-          force-avd-creation: true
+          arch: ${{ matrix.arch }}
+          force-avd-creation: false
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: false
           script: echo "Generated AVD snapshot for caching."
-
-      - name: Run integration tests
+      
+      - name: Run Detox Build
+        run: yarn detox build -c android.emu.debug -n test
+      - name: Run Detox Test
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          working-directory: ./android
           api-level: ${{ matrix.api-level }}
-          arch: ${{ matrix.avd }}
-          target: ${{ matrix.target }}
-          channel: ${{ matrix.channel }}
-          emulator-boot-timeout: 1800
+          arch: ${{ matrix.arch }}
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: ./gradlew connectedCheck -Pandroid.testInstrumentationRunnerArguments.class=org.ZingoLabs.Zingo.IntegrationTestSuite
+          script: yarn detox test -c android.emu.debug -n test
+
