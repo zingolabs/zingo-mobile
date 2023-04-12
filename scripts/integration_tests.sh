@@ -4,6 +4,11 @@ set -Eeuo pipefail
 create_snapshot=false
 apk_installed=false
 install_attempts=0
+set_api_lvl=false
+set_api_tgt=false
+valid_api_lvls=("25" "26" "27" "28" "29" "30" "31" "32" "33")
+valid_api_tgts=("default" "google_apis" "google_apis_playstore" "google_atd" "google-tv" \
+    "aosp_atd" "android-tv" "android-desktop" "android-wear"  "android-wear-cn")
 
 function check_launch() {
     emu_status=$(adb devices | grep "emulator-5554" | cut -f1)
@@ -31,46 +36,66 @@ function wait_for() {
         timeout=$(( timeout - 1 ))
     done
     if [ $timeout -le 0 ]; then
-        echo -e "\nFailed due to timeout"
+        echo -e "\nError: Timeout" >&2
         exit 1
     fi
 }
 
-while getopts 'a:sh' OPTION; do
+while getopts 'a:sl:t:h' OPTION; do
     case "$OPTION" in
         a)
             abi="$OPTARG"
             case "$abi" in
                 x86_64)
-                    sdk="system-images;android-30;google_apis;x86_64"                    
-                    api="android-30"
-                    target="google_apis"
+                    api_lvl_default="30"
+                    api_tgt_default="google_apis"
                     arch="x86_64"
                     ;;
                 x86) 
-                    sdk="system-images;android-30;google_apis;x86"                    
-                    api="android-30"
-                    target="google_apis"
+                    api_lvl_default="30"
+                    api_tgt_default="google_apis"
                     arch="x86"
                     ;;
                 arm64-v8a)
-                    sdk="system-images;android-30;google_apis;x86_64"                    
-                    api="android-30"
-                    target="google_apis"
+                    api_lvl_default="30"
+                    api_tgt_default="google_apis"
                     arch="x86_64"
                     ;;
-                # armeabi-v7a)
-                #     sdk="system-images;android-30;google_apis;x86"                    
-                #     api="android-30"
-                #     target="google_apis"
-                #     arch="x86"
-                #     ;;
+                armeabi-v7a)
+                    api_lvl_default="30"
+                    api_tgt_default="google_apis"
+                    arch="x86"
+                    ;;
                 *)
-                    echo "Invalid ABI" >&2
+                    echo "Error: Invalid ABI" >&2
                     echo "Try '$(basename $0) -h' for more information." >&2
                     exit 1
                     ;;
             esac
+            ;;
+        l)
+            api_lvl="$OPTARG"
+
+            # check api level is valid
+            if [[ $(echo ${valid_api_lvls[@]} | grep -ow "$api_lvl" | wc -w) != 1 ]]; then
+                echo "Error: Invalid API level" >&2
+                echo "Try '$(basename $0) -h' for more information." >&2
+                exit 1
+            fi
+                        
+            set_api_lvl=true
+            ;;
+        t)
+            api_tgt="$OPTARG"
+
+            # check api target is valid
+            if [[ $(echo ${valid_api_tgts[@]} | grep -ow "$api_tgt" | wc -w) != 1 ]]; then
+                echo "Error: Invalid API target" >&2
+                echo "Try '$(basename $0) -h' for more information." >&2
+                exit 1
+            fi
+                        
+            set_api_tgt=true
             ;;
         s)
             create_snapshot=true
@@ -78,16 +103,14 @@ while getopts 'a:sh' OPTION; do
             ;;
         h)
             echo "Run integration tests"
-            echo -e "\n  -a\t\tSelect target ABI (required)"
+            echo -e "\n  -a\t\tSelect ABI (required)"
             echo -e "      \t\tOptions:"
-            echo -e "      \t\t  x86_64"
-            echo -e "      \t\t  x86"
-            echo -e "      \t\t  arm64-v8a"
-            # echo -e "      \t\t  armeabi-v7a"
-            echo -e "\n  -s\t\tCreate an AVD and snapshot for quick-boot"
+            echo -e "      \t\t  'x86_64'"
+            echo -e "      \t\t  'x86'"
+            echo -e "      \t\t  'arm64-v8a' - uses x86_64 AVDs"
+            echo -e "      \t\t  'armeabi-v7a' - still in development"
+            echo -e "\n  -s\t\tCreate an AVD and snapshot for quick-boot (optional)"
             echo -e "      \t\tDoes not run integration tests"
-            echo -e "      \t\tarm64-v8a ABIs use x86_64 AVDs"
-            # echo -e "      \t\tarmeabi-v7a ABIs use x86 AVDs"
             echo -e "\nExamples:"
             echo -e "  $(basename $0) -a x86_64 -s\tCreates an AVD and quick-boot snapshot for x86_64 ABI"
             echo -e "  $(basename $0) -a x86_64   \tRuns integration tests for x86_64 ABI from snapshot"
@@ -99,16 +122,23 @@ while getopts 'a:sh' OPTION; do
             ;;
     esac
 done
-if [ $OPTIND -eq 1 ]; then 
-    echo "Error: Required options missing" >&2
-    echo "Try '$(basename $0) -h' for more information." >&2
-    exit 1
+# if [ $OPTIND -eq 1 ]; then 
+#     echo "Error: Required options missing" >&2
+#     echo "Try '$(basename $0) -h' for more information." >&2
+#     exit 1
+# fi
+
+if [[ $set_api_lvl == false ]]; then
+    api_lvl=$api_lvl_default
+fi
+if [[ $set_api_tgt == false ]]; then
+    api_tgt=$api_tgt_default
 fi
 
 # Setup working directory
 if [ ! -d "./android/app" ]; then
-    echo "Error: Incorrect working directory"
-    echo "Try './scripts/$(basename $0)' from zingo-mobile root directory."
+    echo "Error: Incorrect working directory" >&2
+    echo "Try './scripts/$(basename $0)' from zingo-mobile root directory." >&2
     exit 1
 fi
 cd android
@@ -120,6 +150,8 @@ echo "Installing latest emulator..."
 sdkmanager --install emulator --channel=0
 
 echo "Installing system image..."
+avd_name="android-${api_lvl}_${api_tgt}_${arch}"
+sdk="system-images;android-${api_lvl};${api_tgt};${arch}"
 sdkmanager --install $sdk
 sdkmanager --licenses
 
@@ -128,10 +160,10 @@ sdkmanager --licenses
 
 if [ "$create_snapshot" = true ]; then
     echo -e "\nCreating AVD..."
-    echo no | avdmanager create avd --force --name "${api}_${target}_${arch}" --package $sdk --abi "${target}/${arch}"
+    echo no | avdmanager create avd --force --name "${avd_name}" --package $sdk
 
     echo -e "\n\nWaiting for emulator to launch..."
-    emulator -avd "${api}_${target}_${arch}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
+    emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
         -no-snapshot-load -port 5554 &> /dev/null &
     wait_for 1800 check_launch
     echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
@@ -143,11 +175,11 @@ if [ "$create_snapshot" = true ]; then
     echo -e "\nSnapshot saved"
 else
     echo -e "\nChecking for AVD..."
-    if emulator -list-avds | grep -q "${api}_${target}_${arch}"; then
-        echo "AVD found: ${api}_${target}_${arch}"
+    if emulator -list-avds | grep -q "${avd_name}"; then
+        echo "AVD found: ${avd_name}"
     else
-        echo "Error: AVD not found"
-        echo "Try '$(basename $0) -a ${abi} -s' to create an AVD and quick-boot snapshot."
+        echo "Error: AVD not found" >&2
+        echo "Try '$(basename $0) -a ${abi} -s' to create an AVD and quick-boot snapshot." >&2
         exit 1
     fi
 
@@ -160,7 +192,7 @@ else
     mkdir -p $test_report_dir
 
     echo -e "\n\nWaiting for emulator to launch..."
-    emulator -avd "${api}_${target}_${arch}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
+    emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
         -no-snapshot-save -read-only -port 5554 &> "${test_report_dir}/emulator.txt" &
     wait_for 1800 check_launch
     echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
@@ -185,8 +217,8 @@ else
             echo "APK installation succeeded"
         fi              
         if [[ $install_attempts -ge 10 ]]; then
-            echo "Error: APK installation failed"
-            echo "For more information see 'zingo-mobile/android/${test_report_dir}/apk_installation.txt'"
+            echo "Error: APK installation failed" >&2
+            echo "For more information see 'zingo-mobile/android/${test_report_dir}/apk_installation.txt'" >&2
             exit 1
         fi
         install_attempts=$((install_attempts+1))
