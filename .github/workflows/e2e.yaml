@@ -1,10 +1,9 @@
-name: CI
+name: e2e_test
 
 on:
-  pull_request:
   push:
-    branches: [main, dev]
-
+    branches: [e2e_ci]
+  
 jobs:
   test:
     name: Test
@@ -94,103 +93,37 @@ jobs:
         with:
           name: ${{ matrix.abi }}-${{ env.timestamp }}
           path: rust/target/${{ matrix.target }}/release/librust.so
-  
-  integration_test:
-    name: Integration test
-    runs-on: macos-12    
-    defaults:
-      run:
-        shell: bash
-    strategy:
-      matrix:
-        include:
-          - abi: x86
-            avd: x86
-            api-level: 30
-          - abi: x86_64
-            avd: x86_64
-            api-level: 30
-          - abi: arm64-v8a
-            avd: x86_64
-            api-level: 30
-    needs: [create-timestamp, build]
-    env:
-      timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-      
-      - name: Setup Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '11'
-      
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v2
-      
-      - name: Add emulator to PATH
-        run: echo "${ANDROID_SDK_ROOT}/emulator" >> $GITHUB_PATH
-            
-      - name: Gradle cache
-        uses: gradle/gradle-build-action@v2
-        with:
-          gradle-version: 7.3.3
-          build-root-directory: ./android
-          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev' }}
-      
-      - name: AVD cache
-        uses: actions/cache@v3
-        id: avd-cache
-        with: 
-          path: |
-            ~/.android/avd/*
-            ~/.android/adb*
-          key: avd-${{ matrix.avd }}-api-${{ matrix.api-level }}-integ # will remove 'integ' once e2e is synced
-          
-      - name: Download native rust
-        uses: actions/download-artifact@v3
-        with: 
-          name: ${{ matrix.abi }}-${{ env.timestamp }}
-          path: android/app/src/main/jniLibs/${{ matrix.abi }}
-      
-      - run: yarn install
-      
-      - name: Create AVD and generate snapshot for caching
-        if: steps.avd-cache.outputs.cache-hit != 'true'
-        run: ./scripts/integration_tests.sh -a ${{ matrix.avd }} -s
 
-      - name: Run integration tests
- 
   e2e_test:
     name: End-to-End Test
     runs-on: macos-12
     strategy:
       matrix:
+        arch: [x86, x86_64]
         include:
-          - arch : x86
-            api-level: 29
-            jniLibs_dir: x86
-          - arch : x86_64
-            api-level: 30
-            jniLibs_dir: x86_64
+          - api-level: 27
+          - api-level: 28
+          - api-level: 29
+          - api-level: 30
+          - api-level: 31
     needs: [create-timestamp, build]
     env:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '11'
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      
       - name: Gradle cache
         uses: gradle/gradle-build-action@v2
         with:
           gradle-version: 7.3.3
           build-root-directory: ./android
-          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev' && github.ref != 'refs/pull/*' }}
       - name: AVD cache
         uses: actions/cache@v3
         id: avd-cache
@@ -198,12 +131,14 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-${{ matrix.arch }}-api-${{ matrix.api-level }}      
+      
+            key: avd-${{ matrix.arch }}-api-${{ matrix.api-level }}      
       - name: Download native rust
         uses: actions/download-artifact@v3
         with: 
           name: ${{ matrix.arch }}-${{ env.timestamp }}
-          path: android/app/src/main/jniLibs/${{ matrix.jniLibs_dir }}
+          path: android/app/src/main/jniLibs/${{ matrix.arch }}
+      
       - run: yarn install
       - name: Create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
@@ -215,10 +150,7 @@ jobs:
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: false
           script: echo "Generated AVD snapshot for caching."
-      - name: kill react-native
-        run: killall node
-      - name: start react-native
-        run: nohup yarn react-native start > "out.yarn_react_native_start" &
+      
       - name: Run Detox Build
         run: yarn detox build -c android.emu.debug -n test
       - name: Run Detox Test
@@ -226,8 +158,8 @@ jobs:
         with:
           api-level: ${{ matrix.api-level }}
           arch: ${{ matrix.arch }}
-          emulator-boot-timeout: 1800
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
           script: yarn detox test -c android.emu.debug -n test
+
