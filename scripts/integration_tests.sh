@@ -177,7 +177,7 @@ else
     adb shell settings put global animator_duration_scale 0.0
 
     echo -e "\nInstalling APKs..."
-    until [[ $apk_installed == true || $install_attempts -ge 5 ]]; do
+    until [[ $apk_installed == true ]]; do
         if adb -s emulator-5554 install-multi-package -r -t -d --abi $abi \
                 "app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk" \
                 "app/build/outputs/apk/debug/app-${abi}-debug.apk" &> /dev/null; then
@@ -185,6 +185,10 @@ else
             echo "Success"
         fi              
         install_attempts=$((install_attempts+1))
+        if [[ install_attempts -ge 10 ]]; then
+            echo "Error: APK installation failed"
+            exit 1
+        fi
     done
 
     # Store emulator info and start logging
