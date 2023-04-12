@@ -175,7 +175,8 @@ else
     adb shell settings put global animator_duration_scale 0.0
 
     echo -e "\nInstalling APKs..."
-    adb -s emulator-5554 install-multi-package -r -t --abi $abi \
+    sleep 5
+    adb -s emulator-5554 install-multi-package -r -t -d --abi $abi \
         "app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk" \
         "app/build/outputs/apk/debug/app-${abi}-debug.apk"
 
