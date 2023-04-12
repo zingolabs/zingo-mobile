@@ -161,6 +161,7 @@ jobs:
         run: ./scripts/integration_tests.sh -a ${{ matrix.avd }} -s
 
       - name: Run integration tests
+        run: ./scripts/integration_tests.sh -a ${{ matrix.abi }}
  
   e2e_test:
     name: End-to-End Test
