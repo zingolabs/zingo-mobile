@@ -184,11 +184,11 @@ else
             apk_installed=true
             echo "Success"
         fi              
-        install_attempts=$((install_attempts+1))
-        if [[ install_attempts -ge 10 ]]; then
+        if [[ $install_attempts -ge 10 ]]; then
             echo "Error: APK installation failed"
             exit 1
         fi
+        install_attempts=$((install_attempts+1))
     done
 
     # Store emulator info and start logging
