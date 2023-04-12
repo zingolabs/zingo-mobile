@@ -132,8 +132,8 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-      
             key: avd-${{ matrix.arch }}-api-${{ matrix.api-level }}      
+
       - name: Download native rust
         uses: actions/download-artifact@v3
         with: 
