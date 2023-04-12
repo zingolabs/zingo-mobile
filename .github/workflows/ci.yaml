@@ -221,7 +221,7 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-            key: avd-${{ matrix.arch }}-api-${{ matrix.api-level }}      
+          key: avd-${{ matrix.arch }}-api-${{ matrix.api-level }}      
 
       - name: Download native rust
         uses: actions/download-artifact@v3
@@ -252,5 +252,4 @@ jobs:
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
           script: yarn detox test -c android.emu.debug -n test
-
 
