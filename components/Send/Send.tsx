@@ -78,6 +78,10 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   useEffect(() => {
     const getMemoEnabled = async (address: string): Promise<boolean> => {
+      if (!netInfo.isConnected) {
+        Toast.show(translate('loadedapp.connection-error') as string, Toast.LONG);
+        return false;
+      }
       const result = await RPCModule.execute('parse', address);
       const resultJSON = await JSON.parse(result);
 
@@ -106,10 +110,14 @@ const Send: React.FunctionComponent<SendProps> = ({
     } else {
       setMemoEnabled(false);
     }
-  }, [sendPageState.toaddr, sendPageState.toaddr.to, info.currencyName]);
+  }, [sendPageState.toaddr, sendPageState.toaddr.to, info.currencyName, netInfo.isConnected, translate]);
 
   useEffect(() => {
     const parseAdressJSON = async (address: string): Promise<boolean> => {
+      if (!netInfo.isConnected) {
+        Toast.show(translate('loadedapp.connection-error') as string, Toast.LONG);
+        return false;
+      }
       const result = await RPCModule.execute('parse', address);
       const resultJSON = await JSON.parse(result);
 
@@ -174,6 +182,8 @@ const Send: React.FunctionComponent<SendProps> = ({
     getMaxAmount,
     decimalSeparator,
     info.currencyName,
+    netInfo.isConnected,
+    translate,
   ]);
 
   useEffect(() => {
@@ -291,6 +301,11 @@ const Send: React.FunctionComponent<SendProps> = ({
   };
 
   const confirmSend = async () => {
+    if (!netInfo.isConnected) {
+      setConfirmModalVisible(false);
+      Toast.show(translate('loadedapp.connection-error') as string, Toast.LONG);
+      return;
+    }
     // very first interrupt syncing Just in case...
     await RPC.rpc_setInterruptSyncAfterBatch('true');
     // First, close the confirm modal and show the "computing" modal

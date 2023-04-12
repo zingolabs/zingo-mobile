@@ -25,8 +25,12 @@ type ScannerAddressProps = {
 
 const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateToField, closeModal }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate } = context;
+  const { translate, netInfo } = context;
   const validateAddress = async (scannedAddress: string) => {
+    if (!netInfo.isConnected) {
+      Toast.show(translate('loadedapp.connection-error') as string, Toast.LONG);
+      return;
+    }
     const result = await RPCModule.execute('parse', scannedAddress);
     const resultJSON = await JSON.parse(result);
 
