@@ -180,12 +180,13 @@ else
     until [[ $apk_installed == true ]]; do
         if adb -s emulator-5554 install-multi-package -r -t -d --abi $abi \
                 "app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk" \
-                "app/build/outputs/apk/debug/app-${abi}-debug.apk" &> /dev/null; then
+                "app/build/outputs/apk/debug/app-${abi}-debug.apk" &> "${test_report_dir}/apk_installation.txt"; then
             apk_installed=true
-            echo "Success"
+            echo "APK installation succeeded"
         fi              
         if [[ $install_attempts -ge 10 ]]; then
             echo "Error: APK installation failed"
+            echo "For more information see 'zingo-mobile/android/${test_report_dir}/apk_installation.txt'"
             exit 1
         fi
         install_attempts=$((install_attempts+1))
