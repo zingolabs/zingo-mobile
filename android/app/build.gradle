@@ -85,16 +85,6 @@ project.ext.react = [
 apply from: "../../node_modules/react-native/react.gradle"
 
 /**
- * Set this to true to create two separate APKs instead of one:
- *   - An APK that only works on ARM devices
- *   - An APK that only works on x86 devices
- * The advantage is the size of the APK is reduced by about 4MB.
- * Upload all the APKs to the Play Store and people will download
- * the correct one based on the CPU architecture of their device.
- */
-def enableSeparateBuildPerCPUArchitecture = false
-
-/**
  * Run Proguard to shrink the Java bytecode in release builds.
  */
 def enableProguardInReleaseBuilds = false
@@ -121,6 +111,15 @@ def jscFlavor = 'org.webkit:android-jsc:+'
  */
 def enableHermes = project.ext.react.get("enableHermes", false)
 
+
+/**
+ * Whether to enable building a seperate APK for each ABI.
+ *
+ * Defaults to false but can be set to true with the project properties flag
+ * e.g. ./gradlew assembleDebug -Psplitapk=true
+ */
+ext.splitapk = project.properties['splitapk'] ?: false
+
 android {
     namespace 'org.ZingoLabs.Zingo'
     ndkVersion rootProject.ext.ndkVersion
@@ -144,14 +143,16 @@ android {
         testBuildType System.getProperty('testBuildType', 'debug')
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
+
     splits {
         abi {
+            enable splitapk.toBoolean()
             reset()
-            enable enableSeparateBuildPerCPUArchitecture
-            universalApk false  // If true, also generate a universal APK
             include "armeabi-v7a", "x86", "arm64-v8a", "x86_64"
+            universalApk false // If true, also generate a universal APK
         }
     }
+
     signingConfigs {
         debug {
             storeFile file('debug.keystore')
@@ -160,11 +161,13 @@ android {
             keyPassword 'android'
         }
     }
+
     packagingOptions {
         jniLibs {
             pickFirsts += ['lib/armeabi-v7a/libc++_shared.so', 'lib/arm64-v8a/libc++_shared.so', 'lib/x86/libc++_shared.so', 'lib/x86_64/libc++_shared.so']
         }
     }
+
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
@@ -179,27 +182,12 @@ android {
         }
     }
 
-
-    // applicationVariants are e.g. debug, release
-    applicationVariants.all { variant ->
-        variant.outputs.each { output ->
-            // For each separate APK per architecture, set a unique version code as described here:
-            // https://developer.android.com/studio/build/configure-apk-splits.html
-            // Example: versionCode 1 will generate 1001 for armeabi-v7a, 1002 for x86, etc.
-            def versionCodes = ["armeabi-v7a": 1, "x86": 2, "arm64-v8a": 3, "x86_64": 4]
-            def abi = output.getFilter(OutputFile.ABI)
-            if (abi != null) {  // null for the universal-debug, universal-release variants
-                output.versionCodeOverride =
-                        defaultConfig.versionCode * 1000 + versionCodes.get(abi)
-            }
-
-        }
-    }
     buildFeatures {
         viewBinding = true
     }
 
     testOptions {
+        // Managed devices for gradle integration testing
         managedDevices {
             devices {
                 pixel2api29_x86 (com.android.build.api.dsl.ManagedVirtualDevice) {
@@ -223,8 +211,50 @@ android {
             }
         }
     }
+    
+    // // applicationVariants are e.g. debug, release
+    // applicationVariants.all { variant ->
+    //     variant.outputs.each { output ->
+    //         // For each separate APK per architecture, set a unique version code as described here:
+    //         // https://developer.android.com/studio/build/configure-apk-splits.html
+    //         // Example: versionCode 1 will generate 1001 for armeabi-v7a, 1002 for x86, etc.
+    //         def versionCodes = ["armeabi-v7a": 1, "x86": 2, "arm64-v8a": 3, "x86_64": 4]
+    //         def abi = output.getFilter(OutputFile.ABI)
+    //         if (abi != null) {  // null for the universal-debug, universal-release variants
+    //             output.versionCodeOverride =
+    //                     defaultConfig.versionCode * 1000 + versionCodes.get(abi)
+    //         }
+    //     }
+    // }
 }
 
+
+// Map for the version code that gives each ABI a value.
+ext.abiCodes = ['armeabi-v7a':1, 'x86':2, 'arm64-v8a': 3, 'x86_64':4]
+
+// For each APK output variant, override versionCode with a combination of
+// ext.abiCodes * 10000 + variant.versionCode. 
+// variant.versionCode is equal to defaultConfig.versionCode.
+// If you configure product flavors that define their own versionCode, 
+// variant.versionCode uses that value instead.
+android.applicationVariants.all { variant ->
+  variant.outputs.each { output ->
+    def baseAbiVersionCode = project.ext.abiCodes.get(output.getFilter(OutputFile.ABI))
+
+    // Because abiCodes.get() returns null for ABIs that are not mapped by ext.abiCodes,
+    // the following code doesn't override the version code for universal APKs.
+    // However, because you want universal APKs to have the lowest version code,
+    // this outcome is desirable.
+    if (baseAbiVersionCode != null) {
+
+      // Assigns the new version code to versionCodeOverride, which changes the
+      // version code for only the output APK, not for the variant itself. Skipping
+      // this step causes Gradle to use the value of variant.versionCode for the APK.
+      output.versionCodeOverride = baseAbiVersionCode * 10000 + variant.versionCode
+    }
+  }
+}
+            
 dependencies {
     androidTestImplementation('com.wix:detox:+')
     implementation 'androidx.appcompat:appcompat:1.1.0'
