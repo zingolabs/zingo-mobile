@@ -173,6 +173,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       {!noDrawMenu && (
         <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', left: 0 }}>
           <TouchableOpacity
+            testID="header.drawmenu"
             accessible={true}
             accessibilityLabel={translate('menudrawer-acc') as string}
             onPress={toggleMenuDrawer}>

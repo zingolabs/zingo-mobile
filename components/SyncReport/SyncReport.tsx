@@ -467,7 +467,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
                           margin: 5,
                         }}
                       />
-                      <Text style={{ color: colors.text }}>
+                      <Text testID="syncreport.syncednow" style={{ color: colors.text }}>
                         {wallet_2 + (translate('report.blocks') as string) + wallet_new_synced_percent.toFixed(2) + '%'}
                       </Text>
                     </View>
@@ -494,7 +494,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
                           margin: 5,
                         }}
                       />
-                      <Text style={{ color: colors.text }}>
+                      <Text testID="syncreport.notyetsynced" style={{ color: colors.text }}>
                         {wallet_3 + (translate('report.blocks') as string) + wallet_for_synced_percent.toFixed(2) + '%'}
                       </Text>
                     </View>
@@ -507,6 +507,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
               {syncingStatusReport.inProgress && syncingStatusReport.currentBatch > 0 && (
                 <>
                   <DetailLine
+                    testID="syncreport.currentbatch"
                     label={translate('report.batches') as string}
                     value={
                       (translate('report.processingbatch') as string) +
