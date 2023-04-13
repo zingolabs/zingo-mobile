@@ -7,6 +7,12 @@ const BackgroundSync = async (task_data: any) => {
 
   // only if exists the wallet file make sense to do the sync.
   if (exists && exists !== 'false') {
+    // only if we have connection make sense to call RPCModule.
+    const network = await NetInfo.fetch();
+    if (!network.isConnected) {
+      console.log('BS: Not started (connected: ' + network.isConnected + ', type: ' + network.type + ')');
+      return;
+    }
     const server = await AsyncStorage.getItem('@server');
     let wallet = await RPCModule.loadExistingWallet(server);
     if (wallet.toLowerCase().startsWith('error')) {

@@ -239,14 +239,20 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
 
       if (exists && exists !== 'false') {
         this.setState({ walletExists: true });
-        const error = await RPCModule.loadExistingWallet(this.state.server);
-        //console.log('Load Wallet Exists result', error);
-        if (!error.toLowerCase().startsWith('error')) {
-          // Load the wallet and navigate to the transactions screen
-          this.navigateToLoaded();
+        const networkState = await NetInfo.fetch();
+        if (networkState.isConnected) {
+          const error = await RPCModule.loadExistingWallet(this.state.server);
+          //console.log('Load Wallet Exists result', error);
+          if (!error.toLowerCase().startsWith('error')) {
+            // Load the wallet and navigate to the transactions screen
+            this.navigateToLoaded();
+          } else {
+            this.setState({ screen: 1 });
+            Alert.alert(this.props.translate('loadingapp.readingwallet-label') as string, error);
+          }
         } else {
           this.setState({ screen: 1 });
-          Alert.alert(this.props.translate('loadingapp.readingwallet-label') as string, error);
+          Toast.show(this.props.translate('loadedapp.connection-error') as string, Toast.LONG);
         }
       } else {
         //console.log('Loading new wallet');
@@ -280,17 +286,34 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
 
     this.unsubscribeNetInfo = NetInfo.addEventListener(state => {
       const { screen } = this.state;
-      this.setState({
-        netInfo: {
-          isConnected: state.isConnected,
-          type: state.type,
-          isConnectionExpensive: state.details && state.details.isConnectionExpensive,
-        },
-        screen: screen !== 0 ? 1 : screen,
-        actionButtonsDisabled: !state.isConnected ? true : false,
-      });
-      if (!state.isConnected) {
-        Toast.show(this.props.translate('loadedapp.connection-error') as string, Toast.LONG);
+      const { isConnected, type, isConnectionExpensive } = this.state.netInfo;
+      if (
+        isConnected !== state.isConnected ||
+        type !== state.type ||
+        isConnectionExpensive !== state.details?.isConnectionExpensive
+      ) {
+        this.setState({
+          netInfo: {
+            isConnected: state.isConnected,
+            type: state.type,
+            isConnectionExpensive: state.details && state.details.isConnectionExpensive,
+          },
+          screen: screen !== 0 ? 1 : screen,
+          actionButtonsDisabled: !state.isConnected ? true : false,
+        });
+        if (isConnected !== state.isConnected) {
+          if (!state.isConnected) {
+            console.log('EVENT Loading: No internet connection.');
+            Toast.show(this.props.translate('loadedapp.connection-error') as string, Toast.LONG);
+          } else {
+            console.log('EVENT Loading: YESSSSS internet connection.');
+            if (screen !== 0) {
+              this.setState({ screen: 0 });
+              // I need some time until the network is fully ready.
+              setTimeout(() => this.componentDidMount(), 1000);
+            }
+          }
+        }
       }
     });
   };

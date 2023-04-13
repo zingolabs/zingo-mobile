@@ -45,7 +45,6 @@ import {
   zecPriceType,
   BackgroundType,
   TranslateType,
-  NetInfoType,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
@@ -228,15 +227,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
     const screen = Dimensions.get('screen');
 
-    let netInfo: NetInfoType = {} as NetInfoType;
-    NetInfo.fetch().then(state => {
-      netInfo = {
-        isConnected: state.isConnected,
-        type: state.type,
-        isConnectionExpensive: state.details && state.details.isConnectionExpensive,
-      };
-    });
-
     this.state = {
       ...defaultAppStateLoaded,
       navigation: props.navigation,
@@ -256,7 +246,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
         scale: Number(screen.scale.toFixed(2)),
       },
       appState: AppState.currentState,
-      netInfo: netInfo,
     };
 
     this.rpc = new RPC(
@@ -338,16 +327,37 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     });
 
     this.unsubscribeNetInfo = NetInfo.addEventListener(state => {
-      this.setState({
-        netInfo: {
-          isConnected: state.isConnected,
-          type: state.type,
-          isConnectionExpensive: state.details && state.details.isConnectionExpensive,
-        },
-      });
-      //console.log(state);
-      if (!state.isConnected) {
-        Toast.show(this.props.translate('loadedapp.connection-error') as string, Toast.LONG);
+      const { isConnected, type, isConnectionExpensive } = this.state.netInfo;
+      if (
+        isConnected !== state.isConnected ||
+        type !== state.type ||
+        isConnectionExpensive !== state.details?.isConnectionExpensive
+      ) {
+        this.setState({
+          netInfo: {
+            isConnected: state.isConnected,
+            type: state.type,
+            isConnectionExpensive: state.details && state.details.isConnectionExpensive,
+          },
+        });
+        if (isConnected !== state.isConnected) {
+          if (!state.isConnected) {
+            console.log('EVENT Loaded: No internet connection.');
+            this.rpc.clearTimers();
+            this.setState({
+              syncingStatusReport: new SyncingStatusReportClass(),
+              syncingStatus: {} as SyncingStatusType,
+            });
+            Toast.show(this.props.translate('loadedapp.connection-error') as string, Toast.LONG);
+          } else {
+            console.log('EVENT Loaded: YESSSSS internet connection.');
+            const inRefresh = this.rpc.getInRefresh();
+            if (inRefresh) {
+              // I need to start again the App only if it is Syncing...
+              this.navigateToLoading();
+            }
+          }
+        }
       }
     });
   };
@@ -717,7 +727,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       //console.log(`change server ok ${value}`);
     }
 
-    await this.rpc.setInRefresh(false);
+    this.rpc.setInRefresh(false);
     const error = await RPCModule.loadExistingWallet(value);
     if (!error.toLowerCase().startsWith('error')) {
       // Load the wallet and navigate to the transactions screen
@@ -760,7 +770,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
     // Refetch the settings to update
     this.rpc.fetchWalletSettings();
-    //this.navigateToLoading();
   };
 
   set_language_option = async (
@@ -788,7 +797,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
     // Refetch the settings to update
     this.rpc.fetchWalletSettings();
-    //this.navigateToLoading();
   };
 
   navigateToLoading = () => {
@@ -815,7 +823,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       return;
     }
 
-    await this.rpc.setInRefresh(false);
+    this.rpc.setInRefresh(false);
     this.setState({ seedChangeModalVisible: false });
     this.navigateToLoading();
   };
@@ -830,7 +838,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       return;
     }
 
-    await this.rpc.setInRefresh(false);
+    this.rpc.setInRefresh(false);
     this.setState({ seedBackupModalVisible: false });
     this.navigateToLoading();
   };
@@ -865,7 +873,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       //return;
     }
 
-    await this.rpc.setInRefresh(false);
+    this.rpc.setInRefresh(false);
     this.setState({ seedServerModalVisible: false });
     this.navigateToLoading();
   };
