@@ -188,6 +188,8 @@ jobs:
         with:
           gradle-version: 7.3.3
           build-root-directory: ./android
+          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev'}}
+      
       - name: AVD cache
         uses: actions/cache@v3
         id: avd-cache
