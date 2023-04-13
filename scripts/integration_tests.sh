@@ -8,7 +8,7 @@ create_snapshot=false
 apk_installed=false
 valid_api_lvls=("23" "24" "25" "26" "27" "28" "29" "30" "31" "32" "33")
 valid_api_tgts=("default" "google_apis" "google_apis_playstore" "google_atd" "google-tv" \
-    "aosp_atd" "android-tv" "android-desktop" "android-wear"  "android-wear-cn")
+    "aosp_atd" "android-tv" "android-desktop" "android-wear" "android-wear-cn")
 
 function check_launch() {
     emu_status=$(adb devices | grep "emulator-5554" | cut -f1)
@@ -77,7 +77,7 @@ while getopts 'a:sl:t:h' OPTION; do
         l)
             api_lvl="$OPTARG"
 
-            # check api level is valid
+            # Check API level is valid
             if [[ $(echo ${valid_api_lvls[@]} | grep -ow "${api_lvl}" | wc -w) != 1 ]]; then
                 echo "Error: Invalid API level" >&2
                 echo "Try '$(basename $0) -h' for more information." >&2
@@ -89,8 +89,8 @@ while getopts 'a:sl:t:h' OPTION; do
         t)
             api_tgt="$OPTARG"
 
-            # check api target is valid
-            if [[ $(echo ${valid_api_tgts[@]} | grep -ow "${api_tgt}" | wc -w) != 1 ]]; then
+            # Check API target is valid
+            if [[ $(echo ${valid_api_tgts[@]} | tr -d '-' | grep -ow "$(echo ${api_tgt} | tr -d '-')" | wc -w) != 1 ]]; then
                 echo "Error: Invalid API target" >&2
                 echo "Try '$(basename $0) -h' for more information." >&2
                 exit 1
