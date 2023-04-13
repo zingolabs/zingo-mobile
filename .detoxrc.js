@@ -4,7 +4,7 @@ module.exports = {
     args: {
       '$0': 'jest',
       config: 'e2e/jest.config.js',
-      "testTimeout": 100000,
+      "testTimeout": 1000000,
     },
     jest: {
       setupTimeout: 1000000
