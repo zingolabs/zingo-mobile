@@ -45,7 +45,7 @@ describe('Renders Sync Report data (blocks & batches) correctly.', () => {
 
     // a couple of examples:
     // batch: 1  -> means blocks between 0 and 100
-    // batch: 33 -> means blocks between 3200 and 33000
+    // batch: 33 -> means blocks between 3200 and 3300
     if (blockssyncednowNum < (batchNum * 100) - 100 || blockssyncednowNum > (batchNum * 100)) {
       fail('The synced blocks are not align with the synced batches');
     }
