@@ -51,7 +51,7 @@ module.exports = {
     emulator: {
       type: 'android.emulator',
       device: {
-        avdName: 'Pixel_6_API_30_1'
+        avdName: '30_ga_64'
       }
     },
     emulator_64: {
@@ -63,7 +63,7 @@ module.exports = {
     emulator_32: {
       type: 'android.emulator',
       device: {
-        avdName: '29_gaps_32'
+        avdName: '29_ga_32'
       }
     }
   },
