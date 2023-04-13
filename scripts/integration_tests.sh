@@ -1,12 +1,12 @@
 #!/bin/bash
 set -Eeuo pipefail
 
-create_snapshot=false
-apk_installed=false
-install_attempts=0
+set_abi=false
 set_api_lvl=false
 set_api_tgt=false
-valid_api_lvls=("25" "26" "27" "28" "29" "30" "31" "32" "33")
+create_snapshot=false
+apk_installed=false
+valid_api_lvls=("23" "24" "25" "26" "27" "28" "29" "30" "31" "32" "33")
 valid_api_tgts=("default" "google_apis" "google_apis_playstore" "google_atd" "google-tv" \
     "aosp_atd" "android-tv" "android-desktop" "android-wear"  "android-wear-cn")
 
@@ -72,12 +72,13 @@ while getopts 'a:sl:t:h' OPTION; do
                     exit 1
                     ;;
             esac
+            set_abi=true
             ;;
         l)
             api_lvl="$OPTARG"
 
             # check api level is valid
-            if [[ $(echo ${valid_api_lvls[@]} | grep -ow "$api_lvl" | wc -w) != 1 ]]; then
+            if [[ $(echo ${valid_api_lvls[@]} | grep -ow "${api_lvl}" | wc -w) != 1 ]]; then
                 echo "Error: Invalid API level" >&2
                 echo "Try '$(basename $0) -h' for more information." >&2
                 exit 1
@@ -89,7 +90,7 @@ while getopts 'a:sl:t:h' OPTION; do
             api_tgt="$OPTARG"
 
             # check api target is valid
-            if [[ $(echo ${valid_api_tgts[@]} | grep -ow "$api_tgt" | wc -w) != 1 ]]; then
+            if [[ $(echo ${valid_api_tgts[@]} | grep -ow "${api_tgt}" | wc -w) != 1 ]]; then
                 echo "Error: Invalid API target" >&2
                 echo "Try '$(basename $0) -h' for more information." >&2
                 exit 1
@@ -99,7 +100,6 @@ while getopts 'a:sl:t:h' OPTION; do
             ;;
         s)
             create_snapshot=true
-            shift 1
             ;;
         h)
             echo "Run integration tests"
@@ -122,12 +122,13 @@ while getopts 'a:sl:t:h' OPTION; do
             ;;
     esac
 done
-# if [ $OPTIND -eq 1 ]; then 
-#     echo "Error: Required options missing" >&2
-#     echo "Try '$(basename $0) -h' for more information." >&2
-#     exit 1
-# fi
+if [[ $set_abi == false ]]; then 
+    echo "Error: ABI not specified" >&2
+    echo "Try '$(basename $0) -h' for more information." >&2
+    exit 1
+fi
 
+# Set defaults
 if [[ $set_api_lvl == false ]]; then
     api_lvl=$api_lvl_default
 fi
@@ -152,15 +153,15 @@ sdkmanager --install emulator --channel=0
 echo "Installing system image..."
 avd_name="android-${api_lvl}_${api_tgt}_${arch}"
 sdk="system-images;android-${api_lvl};${api_tgt};${arch}"
-sdkmanager --install $sdk
+sdkmanager --install "${sdk}"
 sdkmanager --licenses
 
 # Kill all emulators
 ../scripts/kill_emulators.sh
 
-if [ "$create_snapshot" = true ]; then
+if [[ $create_snapshot == true ]]; then
     echo -e "\nCreating AVD..."
-    echo no | avdmanager create avd --force --name "${avd_name}" --package $sdk
+    echo no | avdmanager create avd --force --name "${avd_name}" --package "${sdk}"
 
     echo -e "\n\nWaiting for emulator to launch..."
     emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
@@ -175,12 +176,14 @@ if [ "$create_snapshot" = true ]; then
     echo -e "\nSnapshot saved"
 else
     echo -e "\nChecking for AVD..."
-    if emulator -list-avds | grep -q "${avd_name}"; then
-        echo "AVD found: ${avd_name}"
+    if [[ $(emulator -list-avds | grep -ow "${avd_name}" | wc -w) != 1 ]]; then
+        echo "AVD not found"
+        echo -e "\nCreating AVD..."
+        echo no | avdmanager create avd --force --name "${avd_name}" --package "${sdk}"
+        echo -e "\n\nTo to create a quick-boot snapshot for faster integration tests use the '-s' flag"
+        echo "Try '$(basename $0) -h' for more information."
     else
-        echo "Error: AVD not found" >&2
-        echo "Try '$(basename $0) -a ${abi} -s' to create an AVD and quick-boot snapshot." >&2
-        exit 1
+        echo "AVD found: ${avd_name}"
     fi
 
     echo -e "\nBuilding APKs..."
@@ -188,8 +191,8 @@ else
 
     # Create integration test report directory
     test_report_dir="app/build/outputs/integration_test_reports/${abi}"
-    rm -rf $test_report_dir
-    mkdir -p $test_report_dir
+    rm -rf "${test_report_dir}"
+    mkdir -p "${test_report_dir}"
 
     echo -e "\n\nWaiting for emulator to launch..."
     emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
@@ -209,19 +212,21 @@ else
     adb shell settings put global animator_duration_scale 0.0
 
     echo -e "\nInstalling APKs..."
+    i=0
     until [[ $apk_installed == true ]]; do
-        if adb -s emulator-5554 install-multi-package -r -t -d --abi $abi \
+        if adb -s emulator-5554 install-multi-package -r -t -d --abi "${abi}" \
                 "app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk" \
                 "app/build/outputs/apk/debug/app-${abi}-debug.apk" &> "${test_report_dir}/apk_installation.txt"; then
             apk_installed=true
             echo "APK installation succeeded"
         fi              
-        if [[ $install_attempts -ge 10 ]]; then
+        if [[ $i -ge 20 ]]; then
             echo "Error: APK installation failed" >&2
             echo "For more information see 'zingo-mobile/android/${test_report_dir}/apk_installation.txt'" >&2
             exit 1
         fi
-        install_attempts=$((install_attempts+1))
+        i=$((i+1))
+        sleep 1
     done
 
     # Store emulator info and start logging
