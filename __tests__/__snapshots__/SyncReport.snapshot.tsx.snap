@@ -655,6 +655,7 @@ exports[`Component SyncReport - test Matches the snapshot SyncReport 1`] = `
                 "color": "rgb(28, 28, 30)",
               }
             }
+            testID="syncreport.syncednow"
           >
             200000translated text50.00%
           </Text>
@@ -699,6 +700,7 @@ exports[`Component SyncReport - test Matches the snapshot SyncReport 1`] = `
                 "color": "rgb(28, 28, 30)",
               }
             }
+            testID="syncreport.notyetsynced"
           >
             100000translated text25.00%
           </Text>
@@ -747,6 +749,7 @@ exports[`Component SyncReport - test Matches the snapshot SyncReport 1`] = `
                 "opacity": 1,
               }
             }
+            testID="syncreport.currentbatch"
           >
             translated text5translated text50
           </Text>

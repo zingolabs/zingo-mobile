@@ -225,6 +225,7 @@ exports[`Component Transactions - test Transactions - snapshot 1`] = `
             "opacity": 1,
           }
         }
+        testID="header.drawmenu"
       >
         <
           color="rgb(216, 216, 216)"
