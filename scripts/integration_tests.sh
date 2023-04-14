@@ -9,6 +9,7 @@ apk_installed=false
 valid_api_lvls=("23" "24" "25" "26" "27" "28" "29" "30" "31" "32" "33")
 valid_api_tgts=("default" "google_apis" "google_apis_playstore" "google_atd" "google-tv" \
     "aosp_atd" "android-tv" "android-desktop" "android-wear" "android-wear-cn")
+timeout=1800    # default timeout set to 30 minutes
 
 function check_launch() {
     emu_status=$(adb devices | grep "emulator-5554" | cut -f1)
@@ -41,29 +42,29 @@ function wait_for() {
     fi
 }
 
-while getopts 'a:sl:t:h' OPTION; do
+while getopts 'a:l:t:sx:h' OPTION; do
     case "$OPTION" in
         a)
             abi="$OPTARG"
             case "$abi" in
                 x86_64)
                     api_lvl_default="30"
-                    api_tgt_default="google_apis"
+                    api_tgt_default="google_apis_playstore"
                     arch="x86_64"
                     ;;
                 x86) 
                     api_lvl_default="30"
-                    api_tgt_default="google_apis"
+                    api_tgt_default="google_apis_playstore"
                     arch="x86"
                     ;;
                 arm64-v8a)
                     api_lvl_default="30"
-                    api_tgt_default="google_apis"
+                    api_tgt_default="google_apis_playstore"
                     arch="x86_64"
                     ;;
                 armeabi-v7a)
                     api_lvl_default="30"
-                    api_tgt_default="google_apis"
+                    api_tgt_default="google_apis_playstore"
                     arch="x86"
                     ;;
                 *)
@@ -78,7 +79,8 @@ while getopts 'a:sl:t:h' OPTION; do
             api_lvl="$OPTARG"
 
             # Check API level is valid
-            if [[ $(echo ${valid_api_lvls[@]} | grep -ow "${api_lvl}" | wc -w) != 1 ]]; then
+            # tr -d '-' is used to remove all hyphons as they count as word boundaries for grep
+            if [[ $(echo ${valid_api_lvls[@]} | tr -d '-' | grep -ow "$(echo ${api_lvl} | tr -d '-')" | wc -w) != 1 ]]; then
                 echo "Error: Invalid API level" >&2
                 echo "Try '$(basename $0) -h' for more information." >&2
                 exit 1
@@ -90,6 +92,7 @@ while getopts 'a:sl:t:h' OPTION; do
             api_tgt="$OPTARG"
 
             # Check API target is valid
+            # tr -d '-' is used to remove all hyphons as they count as word boundaries for grep
             if [[ $(echo ${valid_api_tgts[@]} | tr -d '-' | grep -ow "$(echo ${api_tgt} | tr -d '-')" | wc -w) != 1 ]]; then
                 echo "Error: Invalid API target" >&2
                 echo "Try '$(basename $0) -h' for more information." >&2
@@ -101,19 +104,43 @@ while getopts 'a:sl:t:h' OPTION; do
         s)
             create_snapshot=true
             ;;
+        x)
+            timeout="$OPTARG"
+            
+            # Check timeout is an integer
+            if [ -z "${timeout##*[!0-9]*}" ]; then
+                echo "Error: Timeout must be an integer" >&2
+                exit 1
+            fi
+            ;;
         h)
-            echo "Run integration tests"
+            echo -e "\nRun integration tests."
             echo -e "\n  -a\t\tSelect ABI (required)"
-            echo -e "      \t\tOptions:"
-            echo -e "      \t\t  'x86_64'"
-            echo -e "      \t\t  'x86'"
-            echo -e "      \t\t  'arm64-v8a' - uses x86_64 AVDs"
-            echo -e "      \t\t  'armeabi-v7a' - still in development"
+            echo -e "      \t\t  Options:"
+            echo -e "      \t\t  'x86_64' - default system image: API 30 google_apis_playstore x86_64"
+            echo -e "      \t\t  'x86' - default system image: API 30 google_apis_playstore x86"
+            echo -e "      \t\t  'arm64-v8a' - default system image: API 30 google_apis_playstore x86_64"
+            echo -e "      \t\t  'armeabi-v7a' - default system image: API 30 google_apis_playstore x86"
+            echo -e "\n  -l\t\tSelect API level (optional)"
+            echo -e "      \t\t  Minimum API level: 23"
+            echo -e "\n  -t\t\tSelect API target (optional)"
+            echo -e "      \t\t  See examples on selecting system images below"
             echo -e "\n  -s\t\tCreate an AVD and snapshot for quick-boot (optional)"
-            echo -e "      \t\tDoes not run integration tests"
+            echo -e "      \t\t  Does not run integration tests"
+            echo -e "\n  -x\t\tSet timeout for emulator launch and AVD boot-up (optional)"
+            echo -e "      \t\t  Must be an integer"
             echo -e "\nExamples:"
-            echo -e "  $(basename $0) -a x86_64 -s\tCreates an AVD and quick-boot snapshot for x86_64 ABI"
-            echo -e "  $(basename $0) -a x86_64   \tRuns integration tests for x86_64 ABI from snapshot"
+            echo -e "  '$(basename $0) -a x86_64 -s'\tCreates an AVD and quick-boot snapshot for x86_64 ABI"
+            echo -e "  '$(basename $0) -a x86_64'   \tRuns integration tests for x86_64 ABI from snapshot"
+            echo -e "  '$(basename $0) -a x86 -l 29 -t google_apis'"
+            echo -e "                             \t\tSelect system image \"system-images;android-29;google_apis;x86\""
+            echo -e "\nRecommended system images for testing ARM ABIs:"
+            echo -e "  armeabi-v7a:"
+            echo -e "    \"system-images;android-30;google_apis_playstore;x86\" - default"
+            echo -e "    \"system-images;android-30;google-tv;x86\""
+            # TODO: add list of supported images for arm64-v8a
+            echo -e "\nFor a full list of system images, install android studio cmdline-tools and run:"
+            echo -e "  sdkmanager --list"
             exit 1
             ;;
         ?)
@@ -166,11 +193,11 @@ if [[ $create_snapshot == true ]]; then
     echo -e "\n\nWaiting for emulator to launch..."
     emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
         -no-snapshot-load -port 5554 &> /dev/null &
-    wait_for 1800 check_launch
+    wait_for $timeout check_launch
     echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
 
     echo -e "\nWaiting for AVD to boot..."
-    wait_for 1800 check_boot
+    wait_for $timeout check_boot
     echo $(adb -s emulator-5554 emu avd name | head -1)
     echo "Boot completed"
     echo -e "\nSnapshot saved"
@@ -197,11 +224,11 @@ else
     echo -e "\n\nWaiting for emulator to launch..."
     emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
         -no-snapshot-save -read-only -port 5554 &> "${test_report_dir}/emulator.txt" &
-    wait_for 1800 check_launch
+    wait_for $timeout check_launch
     echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
 
     echo -e "\nWaiting for AVD to boot..."
-    wait_for 1800 check_boot
+    wait_for $timeout check_boot
     echo $(adb -s emulator-5554 emu avd name | head -1)
     echo "Boot completed"
 
@@ -220,7 +247,7 @@ else
             apk_installed=true
             echo "APK installation succeeded"
         fi              
-        if [[ $i -ge 20 ]]; then
+        if [[ $i -ge 100 ]]; then
             echo "Error: APK installation failed" >&2
             echo "For more information see 'zingo-mobile/android/${test_report_dir}/apk_installation.txt'" >&2
             exit 1
