@@ -9,7 +9,7 @@ apk_installed=false
 valid_api_lvls=("23" "24" "25" "26" "27" "28" "29" "30" "31" "32" "33")
 valid_api_tgts=("default" "google_apis" "google_apis_playstore" "google_atd" "google-tv" \
     "aosp_atd" "android-tv" "android-desktop" "android-wear" "android-wear-cn")
-timeout=1800    # default timeout set to 30 minutes
+timeout=1800  # default timeout set to 30 minutes
 
 function check_launch() {
     emu_status=$(adb devices | grep "emulator-5554" | cut -f1)
@@ -114,7 +114,7 @@ while getopts 'a:l:t:sx:h' OPTION; do
             fi
             ;;
         h)
-            echo -e "\nRun integration tests."
+            echo -e "\nRun integration tests. Requires Android Studio cmdline-tools."
             echo -e "\n  -a\t\tSelect ABI (required)"
             echo -e "      \t\t  Options:"
             echo -e "      \t\t  'x86_64' - default system image: API 30 google_apis_playstore x86_64"
@@ -127,7 +127,8 @@ while getopts 'a:l:t:sx:h' OPTION; do
             echo -e "      \t\t  See examples on selecting system images below"
             echo -e "\n  -s\t\tCreate an AVD and snapshot for quick-boot (optional)"
             echo -e "      \t\t  Does not run integration tests"
-            echo -e "\n  -x\t\tSet timeout for emulator launch and AVD boot-up (optional)"
+            echo -e "\n  -x\t\tSet timeout in seconds for emulator launch and AVD boot-up (optional)"
+            echo -e "      \t\t  Default: 1800"
             echo -e "      \t\t  Must be an integer"
             echo -e "\nExamples:"
             echo -e "  '$(basename $0) -a x86_64 -s'\tCreates an AVD and quick-boot snapshot for x86_64 ABI"
@@ -139,8 +140,7 @@ while getopts 'a:l:t:sx:h' OPTION; do
             echo -e "    \"system-images;android-30;google_apis_playstore;x86\" - default"
             echo -e "    \"system-images;android-30;google-tv;x86\""
             # TODO: add list of supported images for arm64-v8a
-            echo -e "\nFor a full list of system images, install android studio cmdline-tools and run:"
-            echo -e "  sdkmanager --list"
+            echo -e "\nFor a full list of system images run 'sdkmanager --list'"
             exit 1
             ;;
         ?)
@@ -249,7 +249,7 @@ else
         fi              
         if [[ $i -ge 100 ]]; then
             echo "Error: APK installation failed" >&2
-            echo "For more information see 'zingo-mobile/android/${test_report_dir}/apk_installation.txt'" >&2
+            echo "For more information see 'android/${test_report_dir}/apk_installation.txt'" >&2
             exit 1
         fi
         i=$((i+1))
@@ -278,7 +278,7 @@ else
             &> "${test_report_dir}/additional_test_output.txt"
     fi
 
-    echo -e "\nTest reports saved: zingo-mobile/android/${test_report_dir}"
+    echo -e "\nTest reports saved: android/${test_report_dir}"
 fi
 
 # Kill all emulators
