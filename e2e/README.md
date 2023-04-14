@@ -29,5 +29,5 @@ check installed emulators with
 compare to the configuration aliases in `.detoxrs`
 pick a test called `e2e/TESTNAME.test.js`
 `yarn detox build TESTNAME -c CONFIGURATION`
-`yarn detox tests TESTNAME -c CONFIGURATION`
+`yarn detox test TESTNAME -c CONFIGURATION`
 

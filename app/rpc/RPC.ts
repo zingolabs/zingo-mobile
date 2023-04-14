@@ -54,7 +54,6 @@ export default class RPC {
   seconds_batch: number;
   batches: number;
   message: string;
-  process_end_block: number;
 
   constructor(
     fnSetSyncingStatusReport: (syncingStatusReport: SyncingStatusReportClass) => void,
@@ -93,7 +92,6 @@ export default class RPC {
     this.seconds_batch = 0;
     this.batches = 0;
     this.message = '';
-    this.process_end_block = -1;
   }
 
   static async rpc_setInterruptSyncAfterBatch(value: string): Promise<void> {
@@ -505,7 +503,6 @@ export default class RPC {
       this.seconds_batch = 0;
       this.batches = 0;
       this.message = this.translate('rpc.syncstart-message') as string;
-      this.process_end_block = fullRescan ? this.walletBirthday : this.lastWalletBlockHeight;
 
       // This is async, so when it is done, we finish the refresh.
       if (fullRescan) {
@@ -551,7 +548,6 @@ export default class RPC {
             this.seconds_batch = 0;
             this.batches = 0;
             this.message = this.translate('rpc.syncstart-message') as string;
-            this.process_end_block = this.lastWalletBlockHeight;
           }
           this.prev_sync_id = ss.sync_id;
         }
@@ -593,7 +589,10 @@ export default class RPC {
 
         const end_block: number = ss.end_block || 0; // lower
 
-        const total_general_blocks: number = this.lastServerBlockHeight - this.process_end_block;
+        // I want to know what was the first block of the current sync process
+        const process_end_block = end_block - batch_num * this.blocksPerBatch;
+
+        const total_general_blocks: number = this.lastServerBlockHeight - process_end_block;
 
         //const progress_blocks: number = (synced_blocks + trial_decryptions_blocks + txn_scan_blocks) / 3;
         const progress_blocks: number = (synced_blocks + trial_decryptions_blocks + witnesses_updated) / 3;
@@ -654,7 +653,7 @@ export default class RPC {
           secondsPerBatch: this.seconds_batch,
           percent: progress,
           message: this.message,
-          process_end_block: this.process_end_block,
+          process_end_block: process_end_block,
           lastBlockServer: this.lastServerBlockHeight,
         };
         this.fnSetSyncingStatusReport(statusGeneral);
@@ -735,7 +734,7 @@ export default class RPC {
                 secondsPerBatch: this.seconds_batch,
                 percent: progress,
                 message: this.message,
-                process_end_block: this.process_end_block,
+                process_end_block: process_end_block,
                 lastBlockServer: this.lastServerBlockHeight,
               };
               this.fnSetSyncingStatusReport(statusBatch);
@@ -774,7 +773,7 @@ export default class RPC {
               secondsPerBatch: this.seconds_batch,
               percent: progress,
               message: this.message,
-              process_end_block: this.process_end_block,
+              process_end_block: process_end_block,
               lastBlockServer: this.lastServerBlockHeight,
             };
             this.fnSetSyncingStatusReport(statusSeconds);

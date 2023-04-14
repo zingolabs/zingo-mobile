@@ -355,7 +355,7 @@ exports[`Component SyncReport - test Matches the snapshot SyncReport 1`] = `
           <View
             style={
               {
-                "backgroundColor": "transparent",
+                "backgroundColor": "#333333",
                 "borderRightColor": "rgb(0, 122, 255)",
                 "borderRightWidth": 1,
                 "height": 10,
@@ -566,7 +566,7 @@ exports[`Component SyncReport - test Matches the snapshot SyncReport 1`] = `
                 "borderRightColor": "rgb(0, 122, 255)",
                 "borderRightWidth": 1,
                 "height": 10,
-                "width": "25.00006250015625%",
+                "width": "25.000062500156254%",
               }
             }
           />
@@ -655,6 +655,7 @@ exports[`Component SyncReport - test Matches the snapshot SyncReport 1`] = `
                 "color": "rgb(28, 28, 30)",
               }
             }
+            testID="syncreport.syncednow"
           >
             200000translated text50.00%
           </Text>
@@ -699,6 +700,7 @@ exports[`Component SyncReport - test Matches the snapshot SyncReport 1`] = `
                 "color": "rgb(28, 28, 30)",
               }
             }
+            testID="syncreport.notyetsynced"
           >
             100000translated text25.00%
           </Text>
@@ -747,6 +749,7 @@ exports[`Component SyncReport - test Matches the snapshot SyncReport 1`] = `
                 "opacity": 1,
               }
             }
+            testID="syncreport.currentbatch"
           >
             translated text5translated text50
           </Text>
@@ -785,6 +788,7 @@ exports[`Component SyncReport - test Matches the snapshot SyncReport 1`] = `
                 "opacity": 1,
               }
             }
+            testID="syncreport.blocksperbatch"
           >
             100
           </Text>
@@ -835,154 +839,10 @@ exports[`Component SyncReport - test Matches the snapshot SyncReport 1`] = `
               122
             </Text>
           </View>
-          <View
-            style={
-              {
-                "margin": 10,
-              }
-            }
-          >
-            <RNSVGSvgView
-              bbHeight="20"
-              bbWidth="20"
-              focusable={false}
-              height={20}
-              style={
-                [
-                  {
-                    "backgroundColor": "transparent",
-                    "borderWidth": 0,
-                  },
-                  {
-                    "flex": 0,
-                    "height": 20,
-                    "width": 20,
-                  },
-                ]
-              }
-              width={20}
-            >
-              <RNSVGGroup
-                fill={
-                  {
-                    "payload": 4278190080,
-                    "type": 0,
-                  }
-                }
-              >
-                <RNSVGCircle
-                  cx="10"
-                  cy="10"
-                  fill={null}
-                  propList={
-                    [
-                      "fill",
-                      "stroke",
-                      "strokeWidth",
-                    ]
-                  }
-                  r="9.5"
-                  stroke={
-                    {
-                      "payload": 4294967295,
-                      "type": 0,
-                    }
-                  }
-                  strokeWidth="1"
-                />
-                <RNSVGCircle
-                  cx="10"
-                  cy="10"
-                  fill={null}
-                  matrix={
-                    [
-                      6.123233995736766e-17,
-                      -1,
-                      1,
-                      6.123233995736766e-17,
-                      0,
-                      20,
-                    ]
-                  }
-                  propList={
-                    [
-                      "fill",
-                      "stroke",
-                      "strokeWidth",
-                      "strokeDasharray",
-                      "strokeDashoffset",
-                      "strokeLinecap",
-                    ]
-                  }
-                  r="9.5"
-                  stroke={
-                    {
-                      "payload": 4278221567,
-                      "type": 0,
-                    }
-                  }
-                  strokeDasharray={
-                    [
-                      "59.690260418206066",
-                      "59.690260418206066",
-                    ]
-                  }
-                  strokeDashoffset={47.752208334564855}
-                  strokeLinecap={1}
-                  strokeWidth="1"
-                />
-                <RNSVGText
-                  content={null}
-                  dx={[]}
-                  dy={[]}
-                  fill={
-                    {
-                      "payload": 4280032286,
-                      "type": 0,
-                    }
-                  }
-                  font={
-                    {
-                      "fontSize": "12",
-                      "textAnchor": "middle",
-                    }
-                  }
-                  propList={
-                    [
-                      "fill",
-                    ]
-                  }
-                  rotate={[]}
-                  x={
-                    [
-                      "10",
-                    ]
-                  }
-                  y={
-                    [
-                      "15",
-                    ]
-                  }
-                >
-                  <RNSVGTSpan
-                    content=""
-                    dx={[]}
-                    dy={[]}
-                    fill={
-                      {
-                        "payload": 4278190080,
-                        "type": 0,
-                      }
-                    }
-                    font={{}}
-                    rotate={[]}
-                    x={[]}
-                    y={[]}
-                  />
-                </RNSVGText>
-              </RNSVGGroup>
-            </RNSVGSvgView>
-          </View>
+          <ActivityIndicator
+            color="rgb(0, 122, 255)"
+            size="large"
+          />
         </View>
         <View
           style={
