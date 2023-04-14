@@ -52,6 +52,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     currency: currencyContext,
     language: languageContext,
     sendAll: sendAllContext,
+    netInfo,
   } = context;
 
   const memosArray = translate('settings.memos');
@@ -126,6 +127,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     const result = parseServerURI(server);
     if (result.toLowerCase().startsWith('error')) {
       Toast.show(translate('settings.isuri') as string, Toast.LONG);
+      return;
+    }
+
+    if (!netInfo.isConnected) {
+      Toast.show(translate('loadedapp.connection-error') as string, Toast.LONG);
       return;
     }
 

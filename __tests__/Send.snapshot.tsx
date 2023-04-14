@@ -42,6 +42,15 @@ jest.mock('react-native', () => {
 
   return RN;
 });
+jest.mock('@react-native-community/netinfo', () => {
+  const RN = jest.requireActual('react-native');
+
+  RN.NativeModules.RNCNetInfo = {
+    execute: jest.fn(() => '{}'),
+  };
+
+  return RN;
+});
 const Theme: ThemeType = {
   dark: true,
   colors: {

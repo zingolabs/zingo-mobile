@@ -52,6 +52,15 @@ jest.mock('react-native-gesture-handler', () => {
     TouchableOpacity: View,
   };
 });
+jest.mock('@react-native-community/netinfo', () => {
+  const RN = jest.requireActual('react-native');
+
+  RN.NativeModules.RNCNetInfo = {
+    execute: jest.fn(() => '{}'),
+  };
+
+  return RN;
+});
 
 // test suite
 describe('Component Transactions - test', () => {

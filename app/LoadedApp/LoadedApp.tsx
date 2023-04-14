@@ -23,6 +23,7 @@ import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
 import { isEqual } from 'lodash';
 import { StackScreenProps } from '@react-navigation/stack';
+import NetInfo, { NetInfoSubscription } from '@react-native-community/netinfo';
 
 import RPC from '../rpc';
 import RPCModule from '../RPCModule';
@@ -42,7 +43,7 @@ import {
   WalletSettingsClass,
   AddressClass,
   zecPriceType,
-  backgroundType,
+  BackgroundType,
   TranslateType,
 } from '../AppState';
 import Utils from '../utils';
@@ -94,7 +95,7 @@ export default function LoadedApp(props: LoadedAppProps) {
   const [currency, setCurrency] = useState('' as 'USD' | '');
   const [server, setServer] = useState(SERVER_DEFAULT_0 as string);
   const [sendAll, setSendAll] = useState(false);
-  const [background, setBackground] = useState({ batches: 0, date: 0 } as backgroundType);
+  const [background, setBackground] = useState({ batches: 0, date: 0 } as BackgroundType);
   const [loading, setLoading] = useState(true);
   //const forceUpdate = useForceUpdate();
   const file = useMemo(
@@ -211,7 +212,7 @@ type LoadedAppClassProps = {
   currency: 'USD' | '';
   server: string;
   sendAll: boolean;
-  background: backgroundType;
+  background: BackgroundType;
 };
 
 class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
@@ -219,6 +220,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   dim: EmitterSubscription;
   appstate: NativeEventSubscription;
   linking: EmitterSubscription;
+  unsubscribeNetInfo: NetInfoSubscription;
 
   constructor(props: LoadedAppClassProps) {
     super(props);
@@ -261,6 +263,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     this.dim = {} as EmitterSubscription;
     this.appstate = {} as NativeEventSubscription;
     this.linking = {} as EmitterSubscription;
+    this.unsubscribeNetInfo = {} as NetInfoSubscription;
   }
 
   componentDidMount = () => {
@@ -271,7 +274,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
     this.dim = Dimensions.addEventListener('change', ({ screen }) => {
       this.setDimensions(screen);
-      //console.log('++++++++++++++++++++++++++++++++++ change dims', Dimensions.get('screen'));
     });
 
     this.appstate = AppState.addEventListener('change', async nextAppState => {
@@ -323,13 +325,49 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
         Toast.show(this.state.translate('loadedapp.zcash-url') as string, Toast.LONG);
       }
     });
+
+    this.unsubscribeNetInfo = NetInfo.addEventListener(state => {
+      const { isConnected, type, isConnectionExpensive } = this.state.netInfo;
+      if (
+        isConnected !== state.isConnected ||
+        type !== state.type ||
+        isConnectionExpensive !== state.details?.isConnectionExpensive
+      ) {
+        this.setState({
+          netInfo: {
+            isConnected: state.isConnected,
+            type: state.type,
+            isConnectionExpensive: state.details && state.details.isConnectionExpensive,
+          },
+        });
+        if (isConnected !== state.isConnected) {
+          if (!state.isConnected) {
+            console.log('EVENT Loaded: No internet connection.');
+            this.rpc.clearTimers();
+            this.setState({
+              syncingStatusReport: new SyncingStatusReportClass(),
+              syncingStatus: {} as SyncingStatusType,
+            });
+            Toast.show(this.props.translate('loadedapp.connection-error') as string, Toast.LONG);
+          } else {
+            console.log('EVENT Loaded: YESSSSS internet connection.');
+            const inRefresh = this.rpc.getInRefresh();
+            if (inRefresh) {
+              // I need to start again the App only if it is Syncing...
+              this.navigateToLoading();
+            }
+          }
+        }
+      }
+    });
   };
 
   componentWillUnmount = () => {
     this.rpc.clearTimers();
-    this.dim.remove();
-    this.appstate.remove();
-    this.linking.remove();
+    this.dim && this.dim.remove();
+    this.appstate && this.appstate.remove();
+    this.linking && this.linking.remove();
+    this.unsubscribeNetInfo && this.unsubscribeNetInfo();
   };
 
   readUrl = async (url: string) => {
@@ -668,9 +706,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
         Toast.show(this.props.translate('loadedapp.restoremainnet-error') as string, Toast.LONG);
         return;
       }
-      if (info.currencyName) {
-        this.setState({ seedBackupModalVisible: true });
-      }
+      this.setState({ seedBackupModalVisible: true });
     }
   };
 
@@ -691,7 +727,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       //console.log(`change server ok ${value}`);
     }
 
-    await this.rpc.setInRefresh(false);
+    this.rpc.setInRefresh(false);
     const error = await RPCModule.loadExistingWallet(value);
     if (!error.toLowerCase().startsWith('error')) {
       // Load the wallet and navigate to the transactions screen
@@ -734,7 +770,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
     // Refetch the settings to update
     this.rpc.fetchWalletSettings();
-    //this.navigateToLoading();
   };
 
   set_language_option = async (
@@ -762,7 +797,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
     // Refetch the settings to update
     this.rpc.fetchWalletSettings();
-    //this.navigateToLoading();
   };
 
   navigateToLoading = () => {
@@ -789,7 +823,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       return;
     }
 
-    await this.rpc.setInRefresh(false);
+    this.rpc.setInRefresh(false);
     this.setState({ seedChangeModalVisible: false });
     this.navigateToLoading();
   };
@@ -804,7 +838,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       return;
     }
 
-    await this.rpc.setInRefresh(false);
+    this.rpc.setInRefresh(false);
     this.setState({ seedBackupModalVisible: false });
     this.navigateToLoading();
   };
@@ -839,7 +873,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       //return;
     }
 
-    await this.rpc.setInRefresh(false);
+    this.rpc.setInRefresh(false);
     this.setState({ seedServerModalVisible: false });
     this.navigateToLoading();
   };

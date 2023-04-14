@@ -46,7 +46,8 @@
     "send-menu": "ENVIAR",
     "uas-menu": "RECIBIR",
     "syncing": "Pausando la Sincronización para poder Enviar.",
-    "zcash-url": "Tienes ya informada una dirección en la pantalla Enviar."
+    "zcash-url": "Tienes ya informada una dirección en la pantalla Enviar.",
+    "connection-error": "No existe conexión a Internet, Zingo así no puede funcionar correctamente."
   },
   "rpc": {
     "parsebirthday-error": "Error: No es posible convertirlo en un número:",
@@ -306,7 +307,11 @@
     "processingblock": "Procesando Bloque: ",
     "totalblocks": " de un TOTAL de Bloques: ",
     "lastbackgroundsync": "ULTIMA SINCRONIZACION EN SEGUNDO PLANO",
-    "batches-date": " Lotes en: "
+    "batches-date": " Lotes en: ",
+    "networkstatus": "Estado de la Red (Internet)",
+    "nointernet": "Sin conexión a Internet.",
+    "cellulardata": "Usando solo Datos del Móvil.",
+    "connectionexpensive": "conexión Costosa/Cara."
   },
   "import": {
     "title": "Importar Clave",

@@ -4,6 +4,7 @@ import { View, ScrollView, SafeAreaView, TouchableOpacity, Modal, TextInput } fr
 import { useTheme } from '@react-navigation/native';
 import { faQrcode } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import Toast from 'react-native-simple-toast';
 
 import FadeText from '../Components/FadeText';
 import RegText from '../Components/RegText';
@@ -19,7 +20,7 @@ type ImportKeyProps = {
 };
 const ImportKey: React.FunctionComponent<ImportKeyProps> = ({ closeModal, doImport }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate } = context;
+  const { translate, netInfo } = context;
   const { colors } = useTheme() as unknown as ThemeType;
 
   const [privKeyText, setPrivKeyText] = useState('');
@@ -27,6 +28,10 @@ const ImportKey: React.FunctionComponent<ImportKeyProps> = ({ closeModal, doImpo
   const [qrcodeModalVisible, setQrcodeModalVisible] = useState(false);
 
   const okButton = () => {
+    if (!netInfo.isConnected) {
+      Toast.show(translate('loadedapp.connection-error') as string, Toast.LONG);
+      return;
+    }
     doImport(privKeyText, birthday);
     closeModal();
   };

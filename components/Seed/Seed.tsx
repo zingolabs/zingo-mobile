@@ -11,7 +11,7 @@ import FadeText from '../Components/FadeText';
 import Button from '../Components/Button';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded, ContextAppLoading } from '../../app/context';
-import { InfoType, TranslateType, WalletSeedType } from '../../app/AppState';
+import { DimensionsType, InfoType, NetInfoType, TranslateType, WalletSeedType } from '../../app/AppState';
 import RPCModule from '../../app/RPCModule';
 import RPC from '../../app/rpc';
 import Header from '../Header';
@@ -33,17 +33,26 @@ type SeedProps = {
 const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, action }) => {
   const contextLoaded = useContext(ContextAppLoaded);
   const contextLoading = useContext(ContextAppLoading);
-  let walletSeed: WalletSeedType, translate: (key: string) => TranslateType, info: InfoType, server: string;
+  let walletSeed: WalletSeedType,
+    translate: (key: string) => TranslateType,
+    info: InfoType,
+    server: string,
+    dimensions: DimensionsType,
+    netInfo: NetInfoType;
   if (action === 'new' || action === 'restore') {
     walletSeed = contextLoading.walletSeed;
     translate = contextLoading.translate;
     info = contextLoading.info;
     server = contextLoading.server;
+    dimensions = contextLoading.dimensions;
+    netInfo = contextLoading.netInfo;
   } else {
     walletSeed = contextLoaded.walletSeed;
     translate = contextLoaded.translate;
     info = contextLoaded.info;
     server = contextLoaded.server;
+    dimensions = contextLoaded.dimensions;
+    netInfo = contextLoaded.netInfo;
   }
 
   const { colors } = useTheme() as unknown as ThemeType;
@@ -146,6 +155,8 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
             noSyncingStatus={true}
             noDrawMenu={true}
             translate={translate}
+            dimensions={dimensions}
+            netInfo={netInfo}
           />
         </View>
       </Animated.View>
@@ -335,6 +346,10 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
           title={!!texts && !!texts[action] ? texts[action][times] : ''}
           onPress={() => {
             if (!seedPhrase) {
+              return;
+            }
+            if (!netInfo.isConnected && (times > 0 || action === 'restore')) {
+              Toast.show(translate('loadedapp.connection-error') as string, Toast.LONG);
               return;
             }
             if (times === 0 || times === 3) {
