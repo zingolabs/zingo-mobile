@@ -788,6 +788,7 @@ exports[`Component SyncReport - test Matches the snapshot SyncReport 1`] = `
                 "opacity": 1,
               }
             }
+            testID="syncreport.blocksperbatch"
           >
             100
           </Text>
