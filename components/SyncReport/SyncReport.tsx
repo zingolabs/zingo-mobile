@@ -517,6 +517,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
                     }
                   />
                   <DetailLine
+                    testID="syncreport.blocksperbatch"
                     label={translate('report.blocksperbatch') as string}
                     value={syncingStatusReport.blocksPerBatch.toString()}
                   />
