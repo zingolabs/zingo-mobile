@@ -194,6 +194,9 @@ jobs:
           - abi: x86_64
             avd: x86_64
             api-level: 30
+          - abi: armeabi-v7a
+            avd: x86
+            api-level: 30
           - abi: arm64-v8a
             avd: x86_64
             api-level: 30
