@@ -42,6 +42,7 @@ jobs:
         id: check-cache
         uses: actions/cache@v3
         with:
+          path: rust/target/${{ matrix.abi }}/release/librust.so
           key: native-rust-${{ matrix.abi }}-${{ hashFiles('**/Cargo.lock', '**/*.rs') }}
           lookup-only: true
           fail-on-cache-miss: true
@@ -169,13 +170,13 @@ jobs:
         id: native-rust-cache
         uses: actions/cache@v3
         with:
-          path: rust/target/${{ matrix.target }}/release/librust.so
+          path: rust/target/${{ matrix.abi }}/release/librust.so
           key: native-rust-${{ matrix.abi }}-${{ hashFiles('**/Cargo.lock', '**/*.rs') }}
       
       - name: Move native rust to jniLibs
         run: |
           mkdir -p android/app/src/main/jniLibs/${{ matrix.abi }}
-          mv rust/target/${{ matrix.target }}/release/librust.so android/app/src/main/jniLibs/${{ matrix.abi }}
+          mv rust/target/${{ matrix.abi }}/release/librust.so android/app/src/main/jniLibs/${{ matrix.abi }}
       
       - run: yarn install
       
