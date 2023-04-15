@@ -50,7 +50,7 @@ jobs:
   build:
     name: Build native rust (${{ matrix.abi }})
     needs: check_rust_hash
-    if: needs.check_rust_hash.outputs.trigger_build == 'failure'
+    if: needs.check_rust_hash.outputs.trigger_build != 'success'
     runs-on: ubuntu-22.04
     strategy:
       matrix:
