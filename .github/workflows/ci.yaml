@@ -42,7 +42,7 @@ jobs:
         uses: actions/cache@v3
         with:
           key: native-rust-${{ matrix.abi }}-${{ hashFiles('**/Cargo.lock', '**/*.rs') }}
-          look-up only: true
+          lookup-only: true
           fail-on-cache-miss: true
 
   build:
