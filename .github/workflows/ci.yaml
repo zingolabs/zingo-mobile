@@ -33,7 +33,8 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        abi: [x86, x86_64, armeabi-v7a, arm64-v8a]
+        abi: [x86]
+        # abi: [x86, x86_64, armeabi-v7a, arm64-v8a]
     outputs:
       trigger_build: ${{ steps.check-cache.conclusion }}
     steps:      
