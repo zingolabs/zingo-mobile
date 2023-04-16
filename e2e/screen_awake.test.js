@@ -24,6 +24,10 @@ describe('Kepp the screen awake while syncing.', () => {
     const t = execSync('adb -e shell settings get system screen_off_timeout');
     log.info('screen off timeout:', t.toString().trim());
 
+    if (Number(t.toString().trim()) !== 10000) {
+      fail('setting screen off timeout is not working, it is not 10000 (10 s.)');
+    }
+
     const resultGet = spawnSync('adb', ['-e', 'shell', 'dumpsys', 'power']);
 
     if (resultGet.status !== 0) {

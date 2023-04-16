@@ -3,5 +3,5 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-  await device.reloadReactNative();
+  // await device.reloadReactNative();
 });
