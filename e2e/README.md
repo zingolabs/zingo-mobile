@@ -4,6 +4,8 @@ These e2e tests depend on emulating or attaching a device.
 you can do this with android studio. create a api-level 30 x86_64 device and name it 30_ga_64
 alternatively, if you dont have android studio, this can help: https://github.com/fluidvanadium/androidstacker
 
+2) install the necessary emulator with scripts/install_emulator_for_e2e.sh
+
 3) build zingo-mobile
 `$ sh scripts/setup.sh`
 
