@@ -473,12 +473,12 @@ export default class RPC {
   async refresh(fullRefresh: boolean, fullRescan?: boolean) {
     // If we're in refresh, we don't overlap
     if (this.inRefresh) {
-      console.log('in refresh is true');
+      //console.log('in refresh is true');
       return;
     }
 
     if (this.syncStatusTimerID) {
-      console.log('syncStatusTimerID exists already');
+      //console.log('syncStatusTimerID exists already');
       return;
     }
 
@@ -536,7 +536,7 @@ export default class RPC {
         const ss = await JSON.parse(s);
 
         //console.log('sync wallet birthday', this.walletBirthday);
-        console.log('sync status', ss);
+        //console.log('sync status', ss);
 
         // syncronize status
         this.inRefresh = ss.in_progress;
@@ -719,7 +719,7 @@ export default class RPC {
           this.fnSetSyncingStatusReport(statusFinished);
 
           //console.log('sync status', ss);
-          console.log(`Finished refresh at ${this.lastWalletBlockHeight} id: ${ss.sync_id}`);
+          //console.log(`Finished refresh at ${this.lastWalletBlockHeight} id: ${ss.sync_id}`);
         } else {
           // If we're doing a long sync, every time the batch_num changes, save the wallet
           if (this.prevBatchNum !== batch_num) {
@@ -755,9 +755,9 @@ export default class RPC {
               this.fnSetSyncingStatusReport(statusBatch);
 
               //console.log('sync status', ss);
-              console.log(
-                `Saving because batch num changed ${this.prevBatchNum} - ${batch_num}. seconds: ${this.seconds_batch}`,
-              );
+              //console.log(
+              //  `Saving because batch num changed ${this.prevBatchNum} - ${batch_num}. seconds: ${this.seconds_batch}`,
+              //);
             }
             this.batches += batch_num - this.prevBatchNum;
             this.prevBatchNum = batch_num;
@@ -794,13 +794,13 @@ export default class RPC {
             this.fnSetSyncingStatusReport(statusSeconds);
 
             //console.log('sync status', ss);
-            console.log(`Saving wallet. seconds: ${this.seconds_batch}`);
+            //console.log(`Saving wallet. seconds: ${this.seconds_batch}`);
           }
         }
       }, 5000);
     } else {
       // Already at the latest block
-      console.log('Already have latest block, waiting for next refresh');
+      //console.log('Already have latest block, waiting for next refresh');
     }
   }
 

@@ -344,7 +344,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
         });
         if (isConnected !== state.isConnected) {
           if (!state.isConnected) {
-            console.log('EVENT Loaded: No internet connection.');
+            //console.log('EVENT Loaded: No internet connection.');
             this.rpc.clearTimers();
             this.setState({
               syncingStatusReport: new SyncingStatusReportClass(),
@@ -352,7 +352,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
             });
             Toast.show(this.props.translate('loadedapp.connection-error') as string, Toast.LONG);
           } else {
-            console.log('EVENT Loaded: YESSSSS internet connection.');
+            //console.log('EVENT Loaded: YES internet connection.');
             const inRefresh = this.rpc.getInRefresh();
             if (inRefresh) {
               // I need to start again the App only if it is Syncing...
