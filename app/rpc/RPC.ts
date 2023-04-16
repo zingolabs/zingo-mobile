@@ -33,6 +33,7 @@ export default class RPC {
   fnSetWalletSettings: (settings: WalletSettingsClass) => void;
   translate: (key: string) => TranslateType;
   fetchBackgroundSyncing: () => void;
+  keepAwake: (keep: boolean) => void;
 
   refreshTimerID?: NodeJS.Timeout;
   updateTimerID?: NodeJS.Timeout;
@@ -65,6 +66,7 @@ export default class RPC {
     fnSetRefreshUpdates: (inProgress: boolean, progress: number, blocks: string, synced: boolean) => void,
     translate: (key: string) => TranslateType,
     fetchBackgroundSyncing: () => void,
+    keepAwake: (keep: boolean) => void,
   ) {
     this.fnSetSyncingStatusReport = fnSetSyncingStatusReport;
     this.fnSetTotalBalance = fnSetTotalBalance;
@@ -75,6 +77,7 @@ export default class RPC {
     this.fnSetRefreshUpdates = fnSetRefreshUpdates;
     this.translate = translate;
     this.fetchBackgroundSyncing = fetchBackgroundSyncing;
+    this.keepAwake = keepAwake;
 
     this.updateDataLock = false;
     this.updateDataCtr = 0;
@@ -445,7 +448,7 @@ export default class RPC {
 
     this.updateDataCtr += 1;
     if (this.inRefresh && this.updateDataCtr % 5 !== 0) {
-      // We're refreshing or sending, in which case update every 5th time
+      // We're refreshing, in which case update every 5th time
       return;
     }
 
@@ -470,12 +473,12 @@ export default class RPC {
   async refresh(fullRefresh: boolean, fullRescan?: boolean) {
     // If we're in refresh, we don't overlap
     if (this.inRefresh) {
-      console.log('in refresh is true');
+      //console.log('in refresh is true');
       return;
     }
 
     if (this.syncStatusTimerID) {
-      console.log('syncStatusTimerID exists already');
+      //console.log('syncStatusTimerID exists already');
       return;
     }
 
@@ -501,6 +504,8 @@ export default class RPC {
     ) {
       // If the latest block height has changed, make sure to sync. This will happen in a new thread
       this.inRefresh = true;
+      // here we can keep the screen alive...
+      this.keepAwake(true);
 
       this.prevProgress = 0;
       this.prevBatchNum = -1;
@@ -513,10 +518,12 @@ export default class RPC {
       if (fullRescan) {
         this.doRescan().finally(() => {
           this.inRefresh = false;
+          this.keepAwake(false);
         });
       } else {
         this.doSync().finally(() => {
           this.inRefresh = false;
+          this.keepAwake(false);
         });
       }
 
@@ -529,7 +536,7 @@ export default class RPC {
         const ss = await JSON.parse(s);
 
         //console.log('sync wallet birthday', this.walletBirthday);
-        console.log('sync status', ss);
+        //console.log('sync status', ss);
 
         // syncronize status
         this.inRefresh = ss.in_progress;
@@ -675,6 +682,9 @@ export default class RPC {
             this.syncStatusTimerID = undefined;
           }
 
+          // here we can release the screen...
+          this.keepAwake(false);
+
           // And fetch the rest of the data.
           await this.loadWalletData();
 
@@ -709,7 +719,7 @@ export default class RPC {
           this.fnSetSyncingStatusReport(statusFinished);
 
           //console.log('sync status', ss);
-          console.log(`Finished refresh at ${this.lastWalletBlockHeight} id: ${ss.sync_id}`);
+          //console.log(`Finished refresh at ${this.lastWalletBlockHeight} id: ${ss.sync_id}`);
         } else {
           // If we're doing a long sync, every time the batch_num changes, save the wallet
           if (this.prevBatchNum !== batch_num) {
@@ -745,9 +755,9 @@ export default class RPC {
               this.fnSetSyncingStatusReport(statusBatch);
 
               //console.log('sync status', ss);
-              console.log(
-                `Saving because batch num changed ${this.prevBatchNum} - ${batch_num}. seconds: ${this.seconds_batch}`,
-              );
+              //console.log(
+              //  `Saving because batch num changed ${this.prevBatchNum} - ${batch_num}. seconds: ${this.seconds_batch}`,
+              //);
             }
             this.batches += batch_num - this.prevBatchNum;
             this.prevBatchNum = batch_num;
@@ -784,13 +794,13 @@ export default class RPC {
             this.fnSetSyncingStatusReport(statusSeconds);
 
             //console.log('sync status', ss);
-            console.log(`Saving wallet. seconds: ${this.seconds_batch}`);
+            //console.log(`Saving wallet. seconds: ${this.seconds_batch}`);
           }
         }
       }, 5000);
     } else {
       // Already at the latest block
-      console.log('Already have latest block, waiting for next refresh');
+      //console.log('Already have latest block, waiting for next refresh');
     }
   }
 
@@ -1194,7 +1204,9 @@ export default class RPC {
 
   setInRefresh(value: boolean): void {
     this.inRefresh = value;
+    this.keepAwake(value);
   }
+
   getInRefresh(): boolean {
     return this.inRefresh;
   }

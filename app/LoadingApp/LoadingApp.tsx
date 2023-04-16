@@ -303,10 +303,10 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
         });
         if (isConnected !== state.isConnected) {
           if (!state.isConnected) {
-            console.log('EVENT Loading: No internet connection.');
+            //console.log('EVENT Loading: No internet connection.');
             Toast.show(this.props.translate('loadedapp.connection-error') as string, Toast.LONG);
           } else {
-            console.log('EVENT Loading: YESSSSS internet connection.');
+            //console.log('EVENT Loading: YESSSSS internet connection.');
             if (screen !== 0) {
               this.setState({ screen: 0 });
               // I need some time until the network is fully ready.
