@@ -60,7 +60,8 @@ jobs:
         uses: actions/cache@v3
         with:
           path: android/app/src/main/jniLibs/${{ matrix.abi }}
-          key: native-rust-${{ matrix.abi }}-${{ hashFiles('**/Cargo.toml', '**/Cargo.lock', '**/*.rs', 'rust/cargo_version.txt') }}
+          key: native-rust-${{ matrix.abi }}-${{ hashFiles('**/Cargo.toml', '**/*.rs', 'rust/cargo_version.txt') }}
+          # key: native-rust-${{ matrix.abi }}-${{ hashFiles('**/Cargo.toml', '**/Cargo.lock', '**/*.rs', 'rust/cargo_version.txt') }}
           lookup-only: true
           fail-on-cache-miss: true
   
@@ -155,7 +156,8 @@ jobs:
         uses: actions/cache@v3
         with:
           path: android/app/src/main/jniLibs/${{ matrix.abi }}
-          key: native-rust-${{ matrix.abi }}-${{ hashFiles('**/Cargo.toml', '**/Cargo.lock', '**/*.rs', 'rust/cargo_version.txt') }}
+          key: native-rust-${{ matrix.abi }}-${{ hashFiles('**/Cargo.toml', '**/*.rs', 'rust/cargo_version.txt') }}
+          # key: native-rust-${{ matrix.abi }}-${{ hashFiles('**/Cargo.toml', '**/Cargo.lock', '**/*.rs', 'rust/cargo_version.txt') }}
   
   integration_test:
     name: Integration test
@@ -221,7 +223,8 @@ jobs:
         uses: actions/cache@v3
         with:
           path: android/app/src/main/jniLibs/${{ matrix.abi }}
-          key: native-rust-${{ matrix.abi }}-${{ hashFiles('**/Cargo.toml', '**/Cargo.lock', '**/*.rs', 'rust/cargo_version.txt') }}
+          key: native-rust-${{ matrix.abi }}-${{ hashFiles('**/Cargo.toml', '**/*.rs', 'rust/cargo_version.txt') }}
+          # key: native-rust-${{ matrix.abi }}-${{ hashFiles('**/Cargo.toml', '**/Cargo.lock', '**/*.rs', 'rust/cargo_version.txt') }}
       
       - run: yarn install
       
