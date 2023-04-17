@@ -32,6 +32,8 @@ jobs:
     name: Check rust hash
     runs-on: ubuntu-22.04
     # continue-on-error: true
+    outputs:
+      status: ${{ steps.check-cache.conclusion }}
     strategy:
       matrix:
         abi: [x86, x86_64, armeabi-v7a, arm64-v8a]
@@ -52,7 +54,7 @@ jobs:
     name: Build native rust (${{ matrix.abi }})
     needs: check_rust_hash
     # if: ${{ failure() }}
-    if: ${{ contains(needs.*.result, 'failure') }}
+    if: ${{ contains(needs.*.outputs.status, 'failure') }}
     runs-on: ubuntu-22.04
     strategy:
       matrix:
