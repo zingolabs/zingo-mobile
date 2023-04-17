@@ -30,14 +30,12 @@ jobs:
   
   check_rust_hash:
     name: Check rust hash
-    needs: create-timestamp
     runs-on: ubuntu-22.04
     container:
       image: zingodevops/android_builder:stable
     outputs:
       status: ${{ steps.check-cache.outcome }}
-    env:
-      timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
+      cache-key: ${{ steps.create-cache-key.outputs.cache-key }}
     strategy:
       matrix:
         abi: [x86, x86_64, armeabi-v7a, arm64-v8a]
@@ -49,19 +47,16 @@ jobs:
       - name: Store Cargo version
         run: echo $(cargo --version) >> rust/cargo_version.txt
       
-      - name: Upload Cargo version
-        uses: actions/upload-artifact@v3
-        with:
-          name: cargo-version-${{ env.timestamp }}
-          path: rust/cargo_version.txt
+      - name: Create cache key
+        id: create-cache-key
+        run: echo "cache-key=${{ hashFiles('rust/**/Cargo.toml', 'rust/**/Cargo.lock', 'rust/**/*.rs', 'rust/cargo_version.txt') }}" >> $GITHUB_OUTPUT
       
       - name: Check if native rust cache exists
         id: check-cache
         uses: actions/cache@v3
         with:
           path: android/app/src/main/jniLibs/${{ matrix.abi }}
-          # key: native-rust-${{ matrix.abi }}-${{ hashFiles('**/Cargo.toml', '**/Cargo.lock', '**/*.rs', 'rust/cargo_version.txt') }}
-          key: native-rust-${{ matrix.abi }}-${{ hashFiles('rust/**/Cargo.toml', 'rust/**/Cargo.lock', 'rust/**/*.rs', 'rust/cargo_version.txt') }}
+          key: native-rust-${{ matrix.abi }}-${{ steps.create-cache-key.outputs.cache-key }}
           lookup-only: true
           fail-on-cache-miss: true
   
@@ -80,13 +75,13 @@ jobs:
 
   build:
     name: Build native rust (${{ matrix.abi }})
-    needs: [create-timestamp, check_rust_hash]
+    needs: [check_rust_hash]
     if: ${{ contains(needs.*.outputs.status, 'failure') }}
     runs-on: ubuntu-22.04
     container:
       image: zingodevops/android_builder:stable
     env:
-      timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
+      cache-key: ${{ needs.check_rust_hash.outputs.cache-key }}
       RUSTUP_HOME: /root/.rustup
     strategy:
       matrix:
@@ -110,12 +105,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      
-      - name: Download Cargo version
-        uses: actions/download-artifact@v3
-        with:
-          name: cargo-version-${{ env.timestamp }}
-          path: rust/cargo_version.txt
       
       - name: Cargo cache
         id: cargo-cache
@@ -156,18 +145,17 @@ jobs:
         uses: actions/cache@v3
         with:
           path: android/app/src/main/jniLibs/${{ matrix.abi }}
-          # key: native-rust-${{ matrix.abi }}-${{ hashFiles('**/Cargo.toml', '**/Cargo.lock', '**/*.rs', 'rust/cargo_version.txt') }}
-          key: native-rust-${{ matrix.abi }}-${{ hashFiles('rust/**/Cargo.toml', 'rust/**/Cargo.lock', 'rust/**/*.rs', 'rust/cargo_version.txt') }}
+          key: native-rust-${{ matrix.abi }}-${{ env.cache-key }}
   
   integration_test:
     name: Integration test
-    needs: [create-timestamp, build]
+    needs: [check_rust_hash, build]
     runs-on: macos-12    
     defaults:
       run:
         shell: bash
     env:
-      timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
+      cache-key: ${{ needs.check_rust_hash.outputs.cache-key }}
     strategy:
       matrix:
         include:
@@ -184,12 +172,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Download Cargo version
-        uses: actions/download-artifact@v3
-        with:
-          name: cargo-version-${{ env.timestamp }}
-          path: rust/cargo_version.txt
-      
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
@@ -223,8 +205,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: android/app/src/main/jniLibs/${{ matrix.abi }}
-          # key: native-rust-${{ matrix.abi }}-${{ hashFiles('**/Cargo.toml', '**/Cargo.lock', '**/*.rs', 'rust/cargo_version.txt') }}
-          key: native-rust-${{ matrix.abi }}-${{ hashFiles('rust/**/Cargo.toml', 'rust/**/Cargo.lock', 'rust/**/*.rs', 'rust/cargo_version.txt') }}
+          key: native-rust-${{ matrix.abi }}-${{ env.cache-key }}
       
       - run: yarn install
       
