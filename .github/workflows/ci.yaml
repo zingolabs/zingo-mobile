@@ -51,7 +51,8 @@ jobs:
   build:
     name: Build native rust (${{ matrix.abi }})
     needs: check_rust_hash
-    if: ${{ failure() }}
+    # if: ${{ failure() }}
+    if: ${{ contains(needs.*.result, 'failure') }}
     runs-on: ubuntu-22.04
     strategy:
       matrix:
