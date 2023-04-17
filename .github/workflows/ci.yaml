@@ -127,7 +127,7 @@ jobs:
       - name: Move native rust to jniLibs
         run: |
           mkdir -p android/app/src/main/jniLibs/${{ matrix.abi }}
-          mv rust/target/${{ matrix.abi }}/release/librust.so android/app/src/main/jniLibs/${{ matrix.abi }}
+          mv rust/target/${{ matrix.target }}/release/librust.so android/app/src/main/jniLibs/${{ matrix.abi }}
       
       - name: Native rust cache
         id: native-rust-cache
