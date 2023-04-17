@@ -31,9 +31,9 @@ jobs:
   check_rust_hash:
     name: Check rust hash
     runs-on: ubuntu-22.04
-    # continue-on-error: true
+    continue-on-error: true
     outputs:
-      status: ${{ steps.check-cache.conclusion }}
+      status: ${{ steps.check-cache.outcome }}
     strategy:
       matrix:
         abi: [x86, x86_64, armeabi-v7a, arm64-v8a]
@@ -49,6 +49,24 @@ jobs:
           key: native-rust-${{ matrix.abi }}-${{ hashFiles('**/Cargo.toml', '**/Cargo.lock', '**/*.rs') }}
           lookup-only: true
           fail-on-cache-miss: true
+  
+  debug:
+    needs: check_rust_hash
+    if: ${{ always() }}
+    runs-on: ubuntu-22.04
+    steps:
+      - name: print all output statuses
+        env:
+          OUT_STAT: ${{ toJson(needs.*.outputs.status) }}
+        run: echo "$OUT_STAT"
+      
+      - name: print failures
+        env:
+          OUT_FAIL: ${{ toJson(contains(needs.*.outputs.status, 'failure')) }}
+        run: echo "$OUT_FAIL"
+      
+      - name: print failures raw
+        run: echo ${{ contains(needs.*.outputs.status, 'failure') }}
 
   build:
     name: Build native rust (${{ matrix.abi }})
