@@ -141,7 +141,6 @@ jobs:
           mv rust/target/${{ matrix.target }}/release/librust.so android/app/src/main/jniLibs/${{ matrix.abi }}
       
       - name: Native rust cache
-        id: native-rust-cache
         uses: actions/cache@v3
         with:
           path: android/app/src/main/jniLibs/${{ matrix.abi }}
@@ -202,11 +201,11 @@ jobs:
           key: avd-${{ matrix.avd }}-api-${{ matrix.api-level }}-integ # will remove 'integ' once e2e is synced
           
       - name: Native rust cache
-        id: native-rust-cache
         uses: actions/cache@v3
         with:
           path: android/app/src/main/jniLibs/${{ matrix.abi }}
           key: native-rust-${{ matrix.abi }}-${{ env.cache-key }}
+          fail-on-cache-miss: true
       
       - run: yarn install
       
