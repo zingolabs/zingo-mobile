@@ -47,7 +47,8 @@
     "uas-menu": "RECIBIR",
     "syncing": "Pausando la Sincronización para poder Enviar.",
     "zcash-url": "Tienes ya informada una dirección en la pantalla Enviar.",
-    "connection-error": "No existe conexión a Internet, Zingo así no puede funcionar correctamente."
+    "connection-error": "No existe conexión a Internet, Zingo así no puede funcionar correctamente.",
+    "tryingnewserver": "Intentanso conectar con el nuevo Servidor... Puede llevar varios segundos."
   },
   "rpc": {
     "parsebirthday-error": "Error: No es posible convertirlo en un número:",

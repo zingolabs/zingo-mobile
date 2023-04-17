@@ -272,7 +272,9 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     this.clearToAddr();
 
     // Configure the RPC to start doing refreshes
-    this.rpc.configure();
+    (async () => {
+      await this.rpc.configure();
+    })();
 
     this.dim = Dimensions.addEventListener('change', ({ screen }) => {
       this.setDimensions(screen);
@@ -289,7 +291,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
         }
         this.rpc.setInRefresh(false);
         this.rpc.clearTimers();
-        this.rpc.configure();
+        await this.rpc.configure();
         // setting value for background task Android
         await AsyncStorage.setItem('@background', 'no');
       }
@@ -658,10 +660,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     await this.rpc.fetchTotalBalance();
   };
 
-  clearTimers = () => {
-    this.rpc.clearTimers();
-  };
-
   toggleMenuDrawer = () => {
     this.setState({
       isMenuDrawerOpen: !this.state.isMenuDrawerOpen,
@@ -731,6 +729,10 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     // here I know the server was changed, clean all the tasks before anything.
     this.rpc.setInRefresh(false);
     this.rpc.clearTimers();
+    this.setState({
+      syncingStatusReport: new SyncingStatusReportClass(),
+      syncingStatus: {} as SyncingStatusType,
+    });
     // when I try to open the wallet in the new server:
     // - the seed doesn't exists (the type of sever is different `mainnet` / `testnet` / `regtest` ...).
     //   The App have to go to the initial screen
@@ -739,15 +741,15 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     const error = await RPCModule.loadExistingWallet(value);
     if (!error.toLowerCase().startsWith('error')) {
       // Load the wallet and navigate to the transactions screen
-      //console.log(`wallet loaded ok ${value}`);
+      console.log(`wallet loaded ok ${value}`);
       await SettingsFileImpl.writeSettings(name, value);
       this.setState({
         server: value,
       });
+      // the server is changed, the App needs to restart the timeout tasks from the beginning
+      await this.rpc.configure();
       // Refetch the settings to update
       this.rpc.fetchWalletSettings();
-      // the server is changed, the App needs to restart the timeout tasks from the beginning
-      this.rpc.configure();
       return;
     } else {
       //console.log(`Error Reading Wallet ${value} - ${error}`);
@@ -1113,9 +1115,9 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
               }>
               <Seed
                 onClickOK={() => this.onClickOKServerWallet()}
-                onClickCancel={() => {
+                onClickCancel={async () => {
                   // restart all the tasks again, nothing happen.
-                  this.rpc.configure();
+                  await this.rpc.configure();
                   this.setState({ seedServerModalVisible: false });
                 }}
                 action={'server'}

@@ -47,7 +47,8 @@
     "uas-menu": "RECEIVE",
     "syncing": "Pausing the Syncronization to be able to Send.",
     "zcash-url": "You already have an address in the send screen",
-    "connection-error": "No Internet connection, Zingo can't work properly this way."
+    "connection-error": "No Internet connection, Zingo can't work properly this way.",
+    "tryingnewserver": "Trying to connect to the new Server... Can take a few seconds."
   },
   "rpc": {
     "parsebirthday-error": "Error: Couldn't parse as a number:",

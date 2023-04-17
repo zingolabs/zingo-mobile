@@ -134,6 +134,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       Toast.show(translate('loadedapp.connection-error') as string, Toast.LONG);
       return;
     }
+    Toast.show(translate('loadedapp.tryingnewserver') as string, Toast.LONG);
     setDisabled(true);
     const resultServer = await checkServerURI(server, serverContext);
     setDisabled(false);
