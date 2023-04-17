@@ -30,23 +30,37 @@ jobs:
   
   check_rust_hash:
     name: Check rust hash
+    needs: create-timestamp
     runs-on: ubuntu-22.04
-    continue-on-error: true
+    container:
+      image: zingodevops/android_builder:stable
     outputs:
       status: ${{ steps.check-cache.outcome }}
+    env:
+      timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
     strategy:
       matrix:
         abi: [x86, x86_64, armeabi-v7a, arm64-v8a]
+    continue-on-error: true
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+      
+      - name: Store Cargo version
+        run: echo $(cargo --version) >> rust/cargo_version.txt
+      
+      - name: Upload Cargo version
+        uses: actions/upload-artifact@v3
+        with:
+          name: cargo-version-${{ env.timestamp }}
+          path: rust/cargo_version.txt
       
       - name: Check if native rust cache exists
         id: check-cache
         uses: actions/cache@v3
         with:
-          path: rust/target/${{ matrix.abi }}/release/librust.so
-          key: native-rust-${{ matrix.abi }}-${{ hashFiles('**/Cargo.toml', '**/Cargo.lock', '**/*.rs') }}
+          path: android/app/src/main/jniLibs/${{ matrix.abi }}
+          key: native-rust-${{ matrix.abi }}-${{ hashFiles('**/Cargo.toml', '**/Cargo.lock', '**/*.rs', 'rust/cargo_version.txt') }}
           lookup-only: true
           fail-on-cache-miss: true
   
@@ -65,9 +79,14 @@ jobs:
 
   build:
     name: Build native rust (${{ matrix.abi }})
-    needs: check_rust_hash
+    needs: [create-timestamp, check_rust_hash]
     if: ${{ contains(needs.*.outputs.status, 'failure') }}
     runs-on: ubuntu-22.04
+    container:
+      image: zingodevops/android_builder:stable
+    env:
+      timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
+      RUSTUP_HOME: /root/.rustup
     strategy:
       matrix:
         include:
@@ -87,13 +106,15 @@ jobs:
             target: aarch64-linux-android
             cc: aarch64-linux-android
             openssl_path: aarch64
-    env:
-      RUSTUP_HOME: /root/.rustup
-    container:
-      image: zingodevops/android_builder:stable
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+      
+      - name: Download Cargo version
+        uses: actions/download-artifact@v3
+        with:
+          name: cargo-version-${{ env.timestamp }}
+          path: rust/cargo_version.txt
       
       - name: Cargo cache
         id: cargo-cache
@@ -134,14 +155,17 @@ jobs:
         uses: actions/cache@v3
         with:
           path: android/app/src/main/jniLibs/${{ matrix.abi }}
-          key: native-rust-${{ matrix.abi }}-${{ hashFiles('**/Cargo.toml', '**/Cargo.lock', '**/*.rs') }}
+          key: native-rust-${{ matrix.abi }}-${{ hashFiles('**/Cargo.toml', '**/Cargo.lock', '**/*.rs', 'rust/cargo_version.txt') }}
   
   integration_test:
     name: Integration test
+    needs: [create-timestamp, build]
     runs-on: macos-12    
     defaults:
       run:
         shell: bash
+    env:
+      timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
     strategy:
       matrix:
         include:
@@ -154,10 +178,15 @@ jobs:
           - abi: arm64-v8a
             avd: x86_64
             api-level: 30
-    needs: build
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+
+      - name: Download Cargo version
+        uses: actions/download-artifact@v3
+        with:
+          name: cargo-version-${{ env.timestamp }}
+          path: rust/cargo_version.txt
       
       - name: Setup Java
         uses: actions/setup-java@v3
@@ -192,7 +221,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: android/app/src/main/jniLibs/${{ matrix.abi }}
-          key: native-rust-${{ matrix.abi }}-${{ hashFiles('**/Cargo.toml', '**/Cargo.lock', '**/*.rs') }}
+          key: native-rust-${{ matrix.abi }}-${{ hashFiles('**/Cargo.toml', '**/Cargo.lock', '**/*.rs', 'rust/cargo_version.txt') }}
       
       - run: yarn install
       
