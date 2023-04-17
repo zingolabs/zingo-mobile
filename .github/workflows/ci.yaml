@@ -150,7 +150,7 @@ jobs:
   integration_test:
     name: Integration test
     needs: [check_rust_hash, build]
-    if: ${{ needs.build.outputs.status, 'success') || needs.build.outputs.status, 'skipped') }}
+    if: ${{ jobs.build.result == 'success') || jobs.build.result == 'skipped' }}
     runs-on: macos-12    
     defaults:
       run:
