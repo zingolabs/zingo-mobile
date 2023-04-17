@@ -10,7 +10,7 @@ import Toast from 'react-native-simple-toast';
 import RegText from '../Components/RegText';
 import FadeText from '../Components/FadeText';
 import BoldText from '../Components/BoldText';
-import { parseServerURI, serverUris } from '../../app/uris';
+import { checkServerURI, parseServerURI, serverUris } from '../../app/uris';
 import Button from '../Components/Button';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
@@ -89,6 +89,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [language, setLanguage] = useState(languageContext);
   const [sendAll, setSendAll] = useState(sendAllContext);
   const [customIcon, setCustomIcon] = useState(farCircle);
+  const [disabled, setDisabled] = useState(false);
 
   moment.locale(language);
 
@@ -124,14 +125,20 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       Toast.show(translate('settings.islanguage') as string, Toast.LONG);
       return;
     }
-    const result = parseServerURI(server);
-    if (result.toLowerCase().startsWith('error')) {
+    const resultUri = parseServerURI(server);
+    if (resultUri.toLowerCase().startsWith('error')) {
       Toast.show(translate('settings.isuri') as string, Toast.LONG);
       return;
     }
-
     if (!netInfo.isConnected) {
       Toast.show(translate('loadedapp.connection-error') as string, Toast.LONG);
+      return;
+    }
+    setDisabled(true);
+    const resultServer = await checkServerURI(server, serverContext);
+    setDisabled(false);
+    if (!resultServer) {
+      Toast.show(translate('loadedapp.changeservernew-error') as string, Toast.LONG);
       return;
     }
 
@@ -171,6 +178,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     return DATA.map(item => (
       <View key={'view-' + item.value}>
         <TouchableOpacity
+          disabled={disabled}
           style={{ marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
           onPress={() => setOption(typeOption(item.value))}>
           <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
@@ -256,6 +264,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           {serverUris().map((uri: string) =>
             uri ? (
               <TouchableOpacity
+                disabled={disabled}
                 key={'touch-' + uri}
                 style={{ marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
                 onPress={() => setServer(uri)}>
@@ -294,7 +303,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                   minHeight: 48,
                 }}>
                 <TextInput
-                  placeholder={'... http------.---:--- ...'}
+                  placeholder={'... https://------.---:--- ...'}
                   placeholderTextColor={colors.placeholder}
                   style={{
                     color: colors.text,
@@ -306,7 +315,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                   }}
                   value={server}
                   onChangeText={(text: string) => setServer(text)}
-                  editable={true}
+                  editable={!disabled}
                   maxLength={100}
                 />
               </View>
@@ -346,7 +355,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
               }}
               value={filter}
               onChangeText={(text: string) => setFilter(text)}
-              editable={true}
+              editable={!disabled}
               maxLength={6}
             />
           </View>
@@ -368,8 +377,14 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           alignItems: 'center',
           marginVertical: 5,
         }}>
-        <Button type="Primary" title={translate('settings.save') as string} onPress={saveSettings} />
         <Button
+          disabled={disabled}
+          type="Primary"
+          title={translate('settings.save') as string}
+          onPress={saveSettings}
+        />
+        <Button
+          disabled={disabled}
           type="Secondary"
           title={translate('cancel') as string}
           style={{ marginLeft: 10 }}
