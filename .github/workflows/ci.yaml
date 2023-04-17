@@ -83,8 +83,6 @@ jobs:
     env:
       cache-key: ${{ needs.check_rust_hash.outputs.cache-key }}
       RUSTUP_HOME: /root/.rustup
-    output:
-      job_status: ${{ jobs.build.result }}
     strategy:
       matrix:
         include:
