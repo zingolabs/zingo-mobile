@@ -57,22 +57,16 @@ jobs:
     steps:
       - name: print all output statuses
         env:
-          OUT_STAT: ${{ toJson(needs.*.outputs.status) }}
+          OUT_STAT: ${{ toJson(needs.check_rust_hash*.outputs.status) }}
         run: echo "$OUT_STAT"
       
-      - name: print failures
-        env:
-          OUT_FAIL: ${{ toJson(contains(needs.*.outputs.status, 'failure')) }}
-        run: echo "$OUT_FAIL"
-      
-      - name: print failures raw
-        run: echo ${{ contains(needs.*.outputs.status, 'failure') }}
+      - name: print true if one check hash failed
+        run: echo ${{ contains(needs.check_rust_hash*.outputs.status, 'failure') }}
 
   build:
     name: Build native rust (${{ matrix.abi }})
     needs: check_rust_hash
-    # if: ${{ failure() }}
-    if: ${{ contains(needs.*.outputs.status, 'failure') }}
+    if: ${{ contains(needs.check_rust_hash*.outputs.status, 'failure') }}
     runs-on: ubuntu-22.04
     strategy:
       matrix:
@@ -130,11 +124,16 @@ jobs:
         working-directory: ./rust/target
         run: llvm-strip ./${{ matrix.target }}/release/librust.so
       
+      - name: Move native rust to jniLibs
+        run: |
+          mkdir -p android/app/src/main/jniLibs/${{ matrix.abi }}
+          mv rust/target/${{ matrix.abi }}/release/librust.so android/app/src/main/jniLibs/${{ matrix.abi }}
+      
       - name: Native rust cache
         id: native-rust-cache
         uses: actions/cache@v3
         with:
-          path: rust/target/${{ matrix.target }}/release/librust.so
+          path: android/app/src/main/jniLibs/${{ matrix.abi }}
           key: native-rust-${{ matrix.abi }}-${{ hashFiles('**/Cargo.toml', '**/Cargo.lock', '**/*.rs') }}
   
   integration_test:
@@ -192,13 +191,8 @@ jobs:
         id: native-rust-cache
         uses: actions/cache@v3
         with:
-          path: rust/target/${{ matrix.abi }}/release/librust.so
+          path: android/app/src/main/jniLibs/${{ matrix.abi }}
           key: native-rust-${{ matrix.abi }}-${{ hashFiles('**/Cargo.toml', '**/Cargo.lock', '**/*.rs') }}
-      
-      - name: Move native rust to jniLibs
-        run: |
-          mkdir -p android/app/src/main/jniLibs/${{ matrix.abi }}
-          mv rust/target/${{ matrix.abi }}/release/librust.so android/app/src/main/jniLibs/${{ matrix.abi }}
       
       - run: yarn install
       
