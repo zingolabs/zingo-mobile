@@ -34,13 +34,15 @@ jobs:
     outputs:
       trigger_build: ${{ steps.check-cache.conclusion }}
     steps:      
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
       - name: Check if native rust cache exists
         id: check-cache
         uses: actions/cache@v3
         with:
           path: rust/target/x86/release/librust.so
-          key: native-rust-x86-${{ hashFiles('**/Cargo.lock') }}
-          # key: native-rust-x86-${{ hashFiles('**/Cargo.toml', '**/Cargo.lock', '**/*.rs') }}
+          key: native-rust-x86-${{ hashFiles('**/Cargo.toml', '**/Cargo.lock', '**/*.rs') }}
           lookup-only: true
           fail-on-cache-miss: true
 
