@@ -31,7 +31,7 @@ jobs:
   check_rust_hash:
     name: Check rust hash
     runs-on: ubuntu-22.04
-    continue-on-error: true
+    # continue-on-error: true
     strategy:
       matrix:
         abi: [x86, x86_64, armeabi-v7a, arm64-v8a]
