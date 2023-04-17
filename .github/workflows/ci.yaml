@@ -57,16 +57,16 @@ jobs:
     steps:
       - name: print all output statuses
         env:
-          OUT_STAT: ${{ toJson(needs.check_rust_hash*.outputs.status) }}
+          OUT_STAT: ${{ toJson(needs.*.outputs.status) }}
         run: echo "$OUT_STAT"
       
       - name: print true if one check hash failed
-        run: echo ${{ contains(needs.check_rust_hash*.outputs.status, 'failure') }}
+        run: echo ${{ contains(needs.*.outputs.status, 'failure') }}
 
   build:
     name: Build native rust (${{ matrix.abi }})
     needs: check_rust_hash
-    if: ${{ contains(needs.check_rust_hash*.outputs.status, 'failure') }}
+    if: ${{ contains(needs.*.outputs.status, 'failure') }}
     runs-on: ubuntu-22.04
     strategy:
       matrix:
