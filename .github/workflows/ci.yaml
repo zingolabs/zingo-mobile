@@ -53,7 +53,7 @@ jobs:
       
       - name: Check if native rust cache exists
         id: check-cache
-        uses: actions/cache/restore@v3
+        uses: actions/cache@v3
         with:
           path: android/app/src/main/jniLibs/${{ matrix.abi }}
           key: native-rust-${{ matrix.abi }}-${{ steps.create-cache-key.outputs.cache-key }}
@@ -141,7 +141,7 @@ jobs:
           mv rust/target/${{ matrix.target }}/release/librust.so android/app/src/main/jniLibs/${{ matrix.abi }}
       
       - name: Native rust cache
-        uses: actions/cache/save@v3
+        uses: actions/cache@v3
         with:
           path: android/app/src/main/jniLibs/${{ matrix.abi }}
           key: native-rust-${{ matrix.abi }}-${{ env.cache-key }}
@@ -201,7 +201,7 @@ jobs:
           key: avd-${{ matrix.avd }}-api-${{ matrix.api-level }}-integ # will remove 'integ' once e2e is synced
           
       - name: Native rust cache
-        uses: actions/cache/restore@v3
+        uses: actions/cache@v3
         with:
           path: android/app/src/main/jniLibs/${{ matrix.abi }}
           key: native-rust-${{ matrix.abi }}-${{ env.cache-key }}
