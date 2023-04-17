@@ -28,18 +28,13 @@ jobs:
         id: create-timestamp
         run: echo "timestamp=$(date +%Y%m%d%H%M%S)" >> $GITHUB_OUTPUT
   
-  check_rust_hash:
-    name: Check rust hash
+  create-cache-key:
+    name: Create cache key
     runs-on: ubuntu-22.04
     container:
       image: zingodevops/android_builder:stable
     outputs:
-      status: ${{ steps.check-cache.outcome }}
       cache-key: ${{ steps.create-cache-key.outputs.cache-key }}
-    strategy:
-      matrix:
-        abi: [x86, x86_64, armeabi-v7a, arm64-v8a]
-    continue-on-error: true
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -50,18 +45,34 @@ jobs:
       - name: Create cache key
         id: create-cache-key
         run: echo "cache-key=${{ hashFiles('rust/**/Cargo.toml', 'rust/**/Cargo.lock', 'rust/**/*.rs', 'rust/cargo_version.txt') }}" >> $GITHUB_OUTPUT
-      
+  
+  check-build-cache:
+    name: Check build cache
+    needs: create-cache-key
+    runs-on: ubuntu-22.04
+    env:
+      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+    outputs:
+      status: ${{ steps.check-build-cache.outcome }}
+    strategy:
+      matrix:
+        abi: [x86, x86_64, armeabi-v7a, arm64-v8a]
+    continue-on-error: true
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+           
       - name: Check if native rust cache exists
-        id: check-cache
+        id: check-build-cache
         uses: actions/cache@v3
         with:
           path: android/app/src/main/jniLibs/${{ matrix.abi }}
-          key: native-rust-${{ matrix.abi }}-${{ steps.create-cache-key.outputs.cache-key }}
+          key: native-rust-${{ matrix.abi }}-${{ env.cache-key }}
           lookup-only: true
           fail-on-cache-miss: true
   
   debug:
-    needs: check_rust_hash
+    needs: check-build-cache
     if: ${{ always() }}
     runs-on: ubuntu-22.04
     steps:
@@ -75,13 +86,13 @@ jobs:
 
   build:
     name: Build native rust (${{ matrix.abi }})
-    needs: [check_rust_hash]
+    needs: [create-cache-key, check-build-cache]
     if: ${{ contains(needs.*.outputs.status, 'failure') }}
     runs-on: ubuntu-22.04
     container:
       image: zingodevops/android_builder:stable
     env:
-      cache-key: ${{ needs.check_rust_hash.outputs.cache-key }}
+      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
       RUSTUP_HOME: /root/.rustup
     strategy:
       matrix:
@@ -135,27 +146,47 @@ jobs:
         working-directory: ./rust/target
         run: llvm-strip ./${{ matrix.target }}/release/librust.so
       
-      - name: Move native rust to jniLibs
-        run: |
-          mkdir -p android/app/src/main/jniLibs/${{ matrix.abi }}
-          mv rust/target/${{ matrix.target }}/release/librust.so android/app/src/main/jniLibs/${{ matrix.abi }}
+      - name: Upload native rust
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.abi }}-${{ env.cache-key }}
+          path: rust/target/${{ matrix.target }}/release/librust.so
       
-      - name: Native rust cache
-        uses: actions/cache@v3
+  cache-native-rust:
+    name: Cache native rust
+    needs: [create-cache-key, build]
+    runs-on: ubuntu-22.04
+    env:
+      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+    strategy:
+      matrix:
+        abi: [x86, x86_64, armeabi-v7a, arm64-v8a]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Download native rust
+        uses: actions/download-artifact@v3
+        with: 
+          name: ${{ matrix.abi }}-${{ env.cache-key }}
+          path: android/app/src/main/jniLibs/${{ matrix.abi }}
+      
+      - name: Cache native rust
+        uses: actions/cache@v3 # try save only?
         with:
           path: android/app/src/main/jniLibs/${{ matrix.abi }}
           key: native-rust-${{ matrix.abi }}-${{ env.cache-key }}
   
   integration_test:
     name: Integration test
-    needs: [check_rust_hash, build]
+    needs: [create-cache-key, cache-native-rust]
     if: ${{ ! cancelled() }}
     runs-on: ubuntu-22.04
     defaults:
       run:
         shell: bash
     env:
-      cache-key: ${{ needs.check_rust_hash.outputs.cache-key }}
+      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
     strategy:
       matrix:
         include:
