@@ -8,7 +8,7 @@ on:
 jobs:
   test:
     name: Test
-    runs-on: ubuntu-22.04
+    runs-on: macos-12
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -20,7 +20,7 @@ jobs:
   
   create-timestamp:
     name: Create timestamp
-    runs-on: ubuntu-22.04
+    runs-on: macos-12
     outputs:
       timestamp: ${{ steps.create-timestamp.outputs.timestamp }}
     steps:
@@ -30,7 +30,7 @@ jobs:
   
   check_rust_hash:
     name: Check rust hash
-    runs-on: ubuntu-22.04
+    runs-on: macos-12
     container:
       image: zingodevops/android_builder:stable
     outputs:
@@ -53,7 +53,7 @@ jobs:
       
       - name: Check if native rust cache exists
         id: check-cache
-        uses: actions/cache@v3
+        uses: actions/cache/restore@v3
         with:
           path: android/app/src/main/jniLibs/${{ matrix.abi }}
           key: native-rust-${{ matrix.abi }}-${{ steps.create-cache-key.outputs.cache-key }}
@@ -63,7 +63,7 @@ jobs:
   debug:
     needs: check_rust_hash
     if: ${{ always() }}
-    runs-on: ubuntu-22.04
+    runs-on: macos-12
     steps:
       - name: print all output statuses
         env:
@@ -77,7 +77,7 @@ jobs:
     name: Build native rust (${{ matrix.abi }})
     needs: [check_rust_hash]
     if: ${{ contains(needs.*.outputs.status, 'failure') }}
-    runs-on: ubuntu-22.04
+    runs-on: macos-12
     container:
       image: zingodevops/android_builder:stable
     env:
@@ -141,7 +141,7 @@ jobs:
           mv rust/target/${{ matrix.target }}/release/librust.so android/app/src/main/jniLibs/${{ matrix.abi }}
       
       - name: Native rust cache
-        uses: actions/cache@v3
+        uses: actions/cache/save@v3
         with:
           path: android/app/src/main/jniLibs/${{ matrix.abi }}
           key: native-rust-${{ matrix.abi }}-${{ env.cache-key }}
@@ -150,7 +150,7 @@ jobs:
     name: Integration test
     needs: [check_rust_hash, build]
     if: ${{ ! cancelled() }}
-    runs-on: macos-12    
+    runs-on: macos-12
     defaults:
       run:
         shell: bash
@@ -201,7 +201,7 @@ jobs:
           key: avd-${{ matrix.avd }}-api-${{ matrix.api-level }}-integ # will remove 'integ' once e2e is synced
           
       - name: Native rust cache
-        uses: actions/cache@v3
+        uses: actions/cache/restore@v3
         with:
           path: android/app/src/main/jniLibs/${{ matrix.abi }}
           key: native-rust-${{ matrix.abi }}-${{ env.cache-key }}
