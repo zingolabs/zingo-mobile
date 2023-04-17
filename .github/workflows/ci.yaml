@@ -8,7 +8,7 @@ on:
 jobs:
   test:
     name: Test
-    runs-on: macos-12
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -20,7 +20,7 @@ jobs:
   
   create-timestamp:
     name: Create timestamp
-    runs-on: macos-12
+    runs-on: ubuntu-22.04
     outputs:
       timestamp: ${{ steps.create-timestamp.outputs.timestamp }}
     steps:
@@ -30,7 +30,7 @@ jobs:
   
   check_rust_hash:
     name: Check rust hash
-    runs-on: macos-12
+    runs-on: ubuntu-22.04
     container:
       image: zingodevops/android_builder:stable
     outputs:
@@ -63,7 +63,7 @@ jobs:
   debug:
     needs: check_rust_hash
     if: ${{ always() }}
-    runs-on: macos-12
+    runs-on: ubuntu-22.04
     steps:
       - name: print all output statuses
         env:
@@ -77,7 +77,7 @@ jobs:
     name: Build native rust (${{ matrix.abi }})
     needs: [check_rust_hash]
     if: ${{ contains(needs.*.outputs.status, 'failure') }}
-    runs-on: macos-12
+    runs-on: ubuntu-22.04
     container:
       image: zingodevops/android_builder:stable
     env:
@@ -150,7 +150,7 @@ jobs:
     name: Integration test
     needs: [check_rust_hash, build]
     if: ${{ ! cancelled() }}
-    runs-on: macos-12
+    runs-on: ubuntu-22.04
     defaults:
       run:
         shell: bash
