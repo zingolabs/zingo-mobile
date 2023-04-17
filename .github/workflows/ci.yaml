@@ -83,6 +83,8 @@ jobs:
     env:
       cache-key: ${{ needs.check_rust_hash.outputs.cache-key }}
       RUSTUP_HOME: /root/.rustup
+    output:
+      job_status: ${{ jobs.build.result }}
     strategy:
       matrix:
         include:
@@ -150,7 +152,7 @@ jobs:
   integration_test:
     name: Integration test
     needs: [check_rust_hash, build]
-    if: ${{ jobs.build.result == 'success') || jobs.build.result == 'skipped' }}
+    if: ${{ ! cancelled() }}
     runs-on: macos-12    
     defaults:
       run:
