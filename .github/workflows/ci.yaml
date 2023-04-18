@@ -82,20 +82,6 @@ jobs:
         if: ${{ ! cancelled() }}
         run: echo "status_${{ matrix.abi }}=${{ steps.check_build_cache.outcome }}" >> $GITHUB_OUTPUT
   
-  debug:
-    needs: check_build_cache
-    if: ${{ always() }}
-    runs-on: ubuntu-22.04
-    steps:
-      - name: print all output statuses
-        env:
-          OUT_STAT: ${{ toJson(needs.*.outputs.*) }}
-        run: echo "$OUT_STAT"
-      
-      - name: print true if one check hash failed
-        run: echo ${{ contains(needs.*.outputs.*, 'failure') }}
-        # run: echo ${{ contains(needs.*.outputs.status_${{ matrix.abi }}, 'failure') }}
-
   build:
     name: Build native rust (${{ matrix.abi }})
     needs: [create_cache_key, check_build_cache]
@@ -184,7 +170,7 @@ jobs:
           path: android/app/src/main/jniLibs/${{ matrix.abi }}
       
       - name: Cache native rust
-        uses: actions/cache@v3 # try save only?
+        uses: actions/cache@v3
         with:
           path: android/app/src/main/jniLibs/${{ matrix.abi }}
           key: native-rust-${{ matrix.abi }}-${{ env.cache_key }}
