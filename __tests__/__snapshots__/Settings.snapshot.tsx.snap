@@ -171,11 +171,6 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
       >
         <View>
           <View
-            accessibilityState={
-              {
-                "disabled": false,
-              }
-            }
             accessible={true}
             collapsable={false}
             focusable={true}
@@ -265,11 +260,6 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         </View>
         <View>
           <View
-            accessibilityState={
-              {
-                "disabled": false,
-              }
-            }
             accessible={true}
             collapsable={false}
             focusable={true}
@@ -378,11 +368,6 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
       >
         <View>
           <View
-            accessibilityState={
-              {
-                "disabled": false,
-              }
-            }
             accessible={true}
             collapsable={false}
             focusable={true}
@@ -472,11 +457,6 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         </View>
         <View>
           <View
-            accessibilityState={
-              {
-                "disabled": false,
-              }
-            }
             accessible={true}
             collapsable={false}
             focusable={true}
@@ -585,11 +565,6 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
       >
         <View>
           <View
-            accessibilityState={
-              {
-                "disabled": false,
-              }
-            }
             accessible={true}
             collapsable={false}
             focusable={true}
@@ -668,11 +643,6 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         </View>
         <View>
           <View
-            accessibilityState={
-              {
-                "disabled": false,
-              }
-            }
             accessible={true}
             collapsable={false}
             focusable={true}
@@ -791,11 +761,6 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         }
       >
         <View
-          accessibilityState={
-            {
-              "disabled": false,
-            }
-          }
           accessible={true}
           collapsable={false}
           focusable={true}
@@ -872,11 +837,6 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           </View>
         </View>
         <View
-          accessibilityState={
-            {
-              "disabled": false,
-            }
-          }
           accessible={true}
           collapsable={false}
           focusable={true}
@@ -1045,7 +1005,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               editable={true}
               maxLength={100}
               onChangeText={[Function]}
-              placeholder="... https://------.---:--- ..."
+              placeholder=" https://------.---:--- "
               style={
                 {
                   "color": "rgb(28, 28, 30)",
@@ -1158,11 +1118,6 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
       >
         <View>
           <View
-            accessibilityState={
-              {
-                "disabled": false,
-              }
-            }
             accessible={true}
             collapsable={false}
             focusable={true}
@@ -1252,11 +1207,6 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         </View>
         <View>
           <View
-            accessibilityState={
-              {
-                "disabled": false,
-              }
-            }
             accessible={true}
             collapsable={false}
             focusable={true}
@@ -1335,11 +1285,6 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         </View>
         <View>
           <View
-            accessibilityState={
-              {
-                "disabled": false,
-              }
-            }
             accessible={true}
             collapsable={false}
             focusable={true}
