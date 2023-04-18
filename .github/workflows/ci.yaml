@@ -286,7 +286,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: android/app/src/main/jniLibs/${{ matrix.abi }}
-          key: native-rust-${{ matrix.abi }}-${{ env.cache_key }}
+          key: native-rust-${{ matrix.arch }}-${{ env.cache_key }}
           fail-on-cache-miss: true
       
       - name: Create AVD and generate snapshot for caching
