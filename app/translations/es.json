@@ -48,7 +48,8 @@
     "syncing": "Pausando la Sincronización para poder Enviar.",
     "zcash-url": "Tienes ya informada una dirección en la pantalla Enviar.",
     "connection-error": "No existe conexión a Internet, Zingo así no puede funcionar correctamente.",
-    "tryingnewserver": "Intentanso conectar con el nuevo Servidor... Puede llevar varios segundos."
+    "tryingnewserver": "Intentando conectar con el nuevo Servidor... Puede llevar varios segundos.",
+    "tryingnewserver-error": "Después de 30 segundos el nuevo Servidor no responde."
   },
   "rpc": {
     "parsebirthday-error": "Error: No es posible convertirlo en un número:",

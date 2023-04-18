@@ -539,7 +539,9 @@ export default class RPC {
         console.log('sync', this.syncStatusTimerID, 'status', ss);
 
         // syncronize status
-        this.inRefresh = ss.in_progress;
+        if (this.syncStatusTimerID) {
+          this.inRefresh = ss.in_progress;
+        }
 
         // if the sync_id change then reset the %
         if (this.prev_sync_id !== ss.sync_id) {

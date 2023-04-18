@@ -89,7 +89,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [language, setLanguage] = useState(languageContext);
   const [sendAll, setSendAll] = useState(sendAllContext);
   const [customIcon, setCustomIcon] = useState(farCircle);
-  const [disabled, setDisabled] = useState(false);
+  const [disabled, setDisabled] = useState<boolean | undefined>();
 
   moment.locale(language);
 
@@ -97,11 +97,26 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     setCustomIcon(serverUris().find((s: string) => s === server) ? farCircle : faDotCircle);
   }, [server]);
 
+  useEffect(() => {
+    // start checking the new server
+    if (disabled) {
+      Toast.show(translate('loadedapp.tryingnewserver') as string, Toast.LONG);
+    }
+    // if the server cheking takes more then 30 seconds.
+    if (!disabled && disabled !== undefined) {
+      Toast.show(translate('loadedapp.tryingnewserver-error') as string, Toast.LONG);
+      // in this point the sync process is blocked, who knows why.
+      // if I save the actual server before the customization... is going to work.
+      set_server_option('server', serverContext);
+    }
+  }, [disabled, serverContext, set_server_option, translate]);
+
   const saveSettings = async () => {
+    let serverParsed = server;
     if (
       walletSettings.download_memos === memos &&
       walletSettings.transaction_filter_threshold === filter &&
-      serverContext === server &&
+      serverContext === serverParsed &&
       currencyContext === currency &&
       languageContext === language &&
       sendAllContext === sendAll
@@ -117,7 +132,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       Toast.show(translate('settings.isthreshold') as string, Toast.LONG);
       return;
     }
-    if (!server) {
+    if (!serverParsed) {
       Toast.show(translate('settings.isserver') as string, Toast.LONG);
       return;
     }
@@ -125,22 +140,46 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       Toast.show(translate('settings.islanguage') as string, Toast.LONG);
       return;
     }
-    const resultUri = parseServerURI(server);
-    if (resultUri.toLowerCase().startsWith('error')) {
-      Toast.show(translate('settings.isuri') as string, Toast.LONG);
-      return;
+
+    if (serverContext !== serverParsed) {
+      const resultUri = parseServerURI(serverParsed);
+      if (resultUri.toLowerCase().startsWith('error')) {
+        Toast.show(translate('settings.isuri') as string, Toast.LONG);
+        return;
+      } else {
+        // url-parse sometimes is too wise, and if you put:
+        // server: `http:/zec-server.com:9067` the parser understand this. Good.
+        // but this value will be store in the settings and the value is wrong.
+        // so, this function if everything is OK return the URI well formmatted.
+        // and I save it in the state ASAP.
+        if (serverParsed !== resultUri) {
+          serverParsed = resultUri;
+          setServer(resultUri);
+        }
+      }
     }
+
     if (!netInfo.isConnected) {
       Toast.show(translate('loadedapp.connection-error') as string, Toast.LONG);
       return;
     }
-    Toast.show(translate('loadedapp.tryingnewserver') as string, Toast.LONG);
-    setDisabled(true);
-    const resultServer = await checkServerURI(server, serverContext);
-    setDisabled(false);
-    if (!resultServer) {
-      Toast.show(translate('loadedapp.changeservernew-error') as string, Toast.LONG);
-      return;
+
+    if (serverContext !== serverParsed) {
+      setDisabled(true);
+      const resultServer = await checkServerURI(serverParsed, serverContext, setDisabled);
+      // if disabled is true  -> fast response -> show the toast with the error
+      // if disabled is false -> 30 seconds error before this task end -> don't show the error,
+      //                         it was showed before.
+      if (!resultServer) {
+        if (disabled) {
+          Toast.show(translate('loadedapp.changeservernew-error') as string, Toast.LONG);
+        }
+        // in this point the sync process is blocked, who knows why.
+        // if I save the actual server before the customization... is going to work.
+        set_server_option('server', serverContext);
+        setDisabled(undefined);
+        return;
+      }
     }
 
     if (walletSettings.download_memos !== memos) {
@@ -156,11 +195,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       await set_sendAll_option('sendAll', sendAll);
     }
     // the last one
-    if (serverContext !== server) {
+    if (serverContext !== serverParsed) {
       if (languageContext !== language) {
         await set_language_option('language', language, false);
       }
-      set_server_option('server', server);
+      set_server_option('server', serverParsed);
     } else {
       if (languageContext !== language) {
         await set_language_option('language', language, true);
@@ -281,6 +320,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
           <View style={{ display: 'flex', flexDirection: 'row' }}>
             <TouchableOpacity
+              disabled={disabled}
               style={{ marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
               onPress={() => setServer('')}>
               <View style={{ display: 'flex', flexDirection: 'row', marginTop: 10 }}>
@@ -304,7 +344,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                   minHeight: 48,
                 }}>
                 <TextInput
-                  placeholder={'... https://------.---:--- ...'}
+                  placeholder={' https://------.---:--- '}
                   placeholderTextColor={colors.placeholder}
                   style={{
                     color: colors.text,

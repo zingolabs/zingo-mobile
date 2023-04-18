@@ -710,10 +710,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     } else if (item === 'Change Wallet') {
       this.setState({ seedChangeModalVisible: true });
     } else if (item === 'Restore Wallet Backup') {
-      if (info.currencyName && info.currencyName !== 'ZEC') {
-        Toast.show(this.props.translate('loadedapp.restoremainnet-error') as string, Toast.LONG);
-        return;
-      }
       this.setState({ seedBackupModalVisible: true });
     }
   };
@@ -727,12 +723,12 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
   set_server_option = async (name: 'server' | 'currency' | 'language' | 'sendAll', value: string): Promise<void> => {
     // here I know the server was changed, clean all the tasks before anything.
-    this.rpc.setInRefresh(false);
     this.rpc.clearTimers();
     this.setState({
       syncingStatusReport: new SyncingStatusReportClass(),
       syncingStatus: {} as SyncingStatusType,
     });
+    this.rpc.setInRefresh(false);
     // when I try to open the wallet in the new server:
     // - the seed doesn't exists (the type of sever is different `mainnet` / `testnet` / `regtest` ...).
     //   The App have to go to the initial screen
@@ -749,7 +745,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       // the server is changed, the App needs to restart the timeout tasks from the beginning
       await this.rpc.configure();
       // Refetch the settings to update
-      this.rpc.fetchWalletSettings();
+      await this.rpc.fetchWalletSettings();
       return;
     } else {
       //console.log(`Error Reading Wallet ${value} - ${error}`);

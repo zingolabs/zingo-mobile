@@ -15,7 +15,15 @@ const parseServerURI = (uri: string): string => {
     return 'Error: Bad URI';
   }
 
-  return 'URI is OK';
+  let port = parsedUri.port;
+
+  if (!port) {
+    // by default -> 9067
+    // for `zecwallet` -> 443
+    port = uri.includes('lwdv3.zecwallet') ? '443' : '9067';
+  }
+
+  return `${parsedUri.protocol}//${parsedUri.hostname}:${port}`;
 };
 
 export default parseServerURI;
