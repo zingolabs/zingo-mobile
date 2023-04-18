@@ -87,11 +87,11 @@ jobs:
     steps:
       - name: print all output statuses
         env:
-          OUT_STAT: ${{ toJson(needs) }}
+          OUT_STAT: ${{ toJson(needs.*.outputs) }}
         run: echo "$OUT_STAT"
       
       - name: print true if one check hash failed
-        run: echo ${{ contains(needs, 'failure') }}
+        run: echo ${{ contains(needs.*.outputs, 'failure') }}
         # run: echo ${{ contains(needs.*.outputs.status_${{ matrix.abi }}, 'failure') }}
 
   build:
