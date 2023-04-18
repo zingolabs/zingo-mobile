@@ -247,6 +247,7 @@ jobs:
  
   e2e_test:
     name: End-to-End Test
+    if: ${{ ! cancelled() }}
     runs-on: macos-12
     strategy:
       matrix:
