@@ -282,11 +282,12 @@ jobs:
             ~/.android/adb*
           key: avd-${{ matrix.arch }}-api-${{ matrix.api-level }}      
 
-      - name: Download native rust
-        uses: actions/download-artifact@v3
-        with: 
-          name: ${{ matrix.arch }}-${{ env.timestamp }}
-          path: android/app/src/main/jniLibs/${{ matrix.arch }}
+      - name: Native rust cache
+        uses: actions/cache@v3
+        with:
+          path: android/app/src/main/jniLibs/${{ matrix.abi }}
+          key: native-rust-${{ matrix.abi }}-${{ env.cache_key }}
+          fail-on-cache-miss: true
       
       - name: Create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
