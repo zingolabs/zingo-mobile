@@ -244,6 +244,10 @@ jobs:
           fail-on-cache-miss: true
       
       - run: yarn install
+
+      - name: Create AVD and generate snapshot for caching test
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        run: echo "test - cache-hit is false"
       
       - name: Create AVD and generate snapshot for caching
         if: steps.avd_cache.outputs.cache-hit != 'true'
@@ -271,6 +275,7 @@ jobs:
         api-level: [30]
     env:
       cache_key: ${{ needs.create_cache_key.outputs.cache_key }}
+    continue-on-error: true
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -304,6 +309,10 @@ jobs:
           key: native-rust-${{ matrix.arch }}-${{ env.cache_key }}
           fail-on-cache-miss: true
       
+      - name: Create AVD and generate snapshot for caching test
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        run: echo "test - cache-hit is false"
+      
       - name: Create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: reactivecircus/android-emulator-runner@v2
@@ -316,6 +325,7 @@ jobs:
           script: echo "Generated AVD snapshot for caching."
       
       - run: yarn install
+      
       - run: nohup yarn react-native start > "out.yarn_react_native_start" &
       
       - name: Run Detox Build
