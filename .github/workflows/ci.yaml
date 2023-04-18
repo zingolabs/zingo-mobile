@@ -178,14 +178,12 @@ jobs:
   
   integration_test:
     name: Integration test
-    needs: [create_cache_key, cache_native_rust]
+    needs: [timestamp, create_cache_key, cache_native_rust]
     if: ${{ ! cancelled() }}
     runs-on: macos-12
-    defaults:
-      run:
-        shell: bash
     env:
       cache_key: ${{ needs.create_cache_key.outputs.cache_key }}
+      timestamp: ${{ needs.create_timestamp.outputs.timestamp }}
     strategy:
       matrix:
         include:
@@ -205,9 +203,6 @@ jobs:
             avd-arch: x86_64
             api-level: 30
             api-target: google_apis_playstore
-    needs: [create-timestamp, build]
-    env:
-      timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -255,6 +250,12 @@ jobs:
 
       - name: Run integration tests
         run: ./scripts/integration_tests.sh -a ${{ matrix.abi }}
+
+      - name: Upload test reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-reports-${{ matrix.abi }}-${{ env.timestamp }}
+          path: android/app/build/outputs/integration_test_reports
  
   e2e_test:
     name: End-to-End Test
@@ -327,8 +328,3 @@ jobs:
           disable-animations: true
           script: yarn detox test -c android.emu.debug -n test
       
-      - name: Upload test reports
-        uses: actions/upload-artifact@v3
-        with:
-          name: test-reports-${{ matrix.abi }}-${{ env.timestamp }}
-          path: android/app/build/outputs/integration_test_reports
