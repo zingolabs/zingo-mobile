@@ -84,17 +84,15 @@ jobs:
     needs: check_build_cache
     if: ${{ always() }}
     runs-on: ubuntu-22.04
-    strategy:
-      matrix:
-        abi: [x86, x86_64, armeabi-v7a, arm64-v8a]
     steps:
       - name: print all output statuses
         env:
-          OUT_STAT: ${{ toJson(needs.*.outputs.status_${{ matrix.abi }}) }}
+          OUT_STAT: ${{ toJson(needs) }}
         run: echo "$OUT_STAT"
       
       - name: print true if one check hash failed
-        run: echo ${{ contains(needs.*.outputs.status_${{ matrix.abi }}, 'failure') }}
+        run: echo ${{ contains(needs, 'failure') }}
+        # run: echo ${{ contains(needs.*.outputs.status_${{ matrix.abi }}, 'failure') }}
 
   build:
     name: Build native rust (${{ matrix.abi }})
