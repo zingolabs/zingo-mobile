@@ -75,6 +75,7 @@ jobs:
           path: android/app/src/main/jniLibs/${{ matrix.abi }}
           key: native-rust-${{ matrix.abi }}-${{ env.cache_key }}
           lookup-only: true
+          fail-on-cache-miss: true
   
       - name: Set output status
         id: set_output_status
