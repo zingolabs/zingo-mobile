@@ -9,7 +9,7 @@ apk_installed=false
 valid_api_lvls=("23" "24" "25" "26" "27" "28" "29" "30" "31" "32" "33")
 valid_api_tgts=("default" "google_apis" "google_apis_playstore" "google_atd" "google-tv" \
     "aosp_atd" "android-tv" "android-desktop" "android-wear" "android-wear-cn")
-timeout=1800  # default timeout set to 30 minutes
+timeout_seconds=1800  # default timeout set to 30 minutes
 
 function check_launch() {
     emu_status=$(adb devices | grep "emulator-5554" | cut -f1)
@@ -30,13 +30,13 @@ function check_boot() {
 }
 
 function wait_for() {
-    timeout=$1
+    timeout_seconds=$1
     shift 1
-    until [ $timeout -le 0 ] || ("$@" &> /dev/null); do
+    until [ $timeout_seconds -le 0 ] || ("$@" &> /dev/null); do
         sleep 1
-        timeout=$(( timeout - 1 ))
+        timeout_seconds=$(( timeout_seconds - 1 ))
     done
-    if [ $timeout -le 0 ]; then
+    if [ $timeout_seconds -le 0 ]; then
         echo -e "\nError: Timeout" >&2
         exit 1
     fi
@@ -105,10 +105,9 @@ while getopts 'a:l:t:sx:h' OPTION; do
             create_snapshot=true
             ;;
         x)
-            timeout="$OPTARG"
+            timeout_seconds="$OPTARG"
             
-            # Check timeout is an integer
-            if [ -z "${timeout##*[!0-9]*}" ]; then
+            if [ -z "${timeout_seconds##*[!0-9]*}" ]; then
                 echo "Error: Timeout must be an integer" >&2
                 exit 1
             fi
@@ -193,11 +192,11 @@ if [[ $create_snapshot == true ]]; then
     echo -e "\n\nWaiting for emulator to launch..."
     emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
         -no-snapshot-load -port 5554 &> /dev/null &
-    wait_for $timeout check_launch
+    wait_for $timeout_seconds check_launch
     echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
 
     echo -e "\nWaiting for AVD to boot..."
-    wait_for $timeout check_boot
+    wait_for $timeout_seconds check_boot
     echo $(adb -s emulator-5554 emu avd name | head -1)
     echo "Boot completed"
     echo -e "\nSnapshot saved"
@@ -224,11 +223,11 @@ else
     echo -e "\n\nWaiting for emulator to launch..."
     emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
         -no-snapshot-save -read-only -port 5554 &> "${test_report_dir}/emulator.txt" &
-    wait_for $timeout check_launch
+    wait_for $timeout_seconds check_launch
     echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
 
     echo -e "\nWaiting for AVD to boot..."
-    wait_for $timeout check_boot
+    wait_for $timeout_seconds check_boot
     echo $(adb -s emulator-5554 emu avd name | head -1)
     echo "Boot completed"
 
@@ -279,6 +278,11 @@ else
     fi
 
     echo -e "\nTest reports saved: android/${test_report_dir}"
+        
+    if [ $(cat "android/${test_report_dir}/test_results.txt" | grep INSTRUMENTATION_CODE | cut -d' ' -f2) -ne 0 ]; then
+        echo -e "\nIntegration tests FAILED"
+        exit 1
+    fi
 fi
 
 # Kill all emulators
