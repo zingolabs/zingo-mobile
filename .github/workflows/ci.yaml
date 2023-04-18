@@ -188,19 +188,19 @@ jobs:
       matrix:
         include:
           - abi: x86
-            # avd-arch: x86
+            avd-arch: x86
             # api-level: 30
             # api-target: google_apis_playstore
           - abi: x86_64
-            # avd-arch: x86_64
+            avd-arch: x86_64
             # api-level: 30
             # api-target: google_apis_playstore
           - abi: armeabi-v7a
-            # avd-arch: x86
+            avd-arch: x86
             # api-level: 30
             # api-target: google_apis_playstore
           - abi: arm64-v8a
-            # avd-arch: x86_64
+            avd-arch: x86_64
             # api-level: 30
             # api-target: google_apis_playstore
     steps:
@@ -233,7 +233,7 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-${{ matrix.abi }}
+          key: avd-${{ matrix.abi }}-arm32-test
           # key: avd-${{ matrix.avd-arch }}-api-${{ matrix.api-level }}-${{ matrix.api-target }}
           
       - name: Native rust cache
@@ -247,13 +247,14 @@ jobs:
       
       - name: Create AVD and generate snapshot for caching
         if: steps.avd_cache.outputs.cache-hit != 'true'
-        run: ./scripts/integration_tests.sh -a ${{ matrix.abi }} -s
+        run: ./scripts/integration_tests.sh -a ${{ matrix.avd-arch }} -s
         # run: ./scripts/integration_tests.sh -a ${{ matrix.avd-arch }} -s
 
       - name: Run integration tests
         run: ./scripts/integration_tests.sh -a ${{ matrix.abi }}
 
       - name: Upload test reports
+        if: ${{ ! cancelled() }}
         uses: actions/upload-artifact@v3
         with:
           name: test-reports-${{ matrix.abi }}-${{ env.timestamp }}
