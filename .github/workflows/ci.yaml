@@ -18,14 +18,14 @@ jobs:
       - name: Run tests
         run: yarn test
   
-  create-timestamp:
+  create_timestamp:
     name: Create timestamp
     runs-on: ubuntu-22.04
     outputs:
-      timestamp: ${{ steps.create-timestamp.outputs.timestamp }}
+      timestamp: ${{ steps.create_timestamp.outputs.timestamp }}
     steps:
       - name: Create timestamp
-        id: create-timestamp
+        id: create_timestamp
         run: echo "timestamp=$(date +%Y%m%d%H%M%S)" >> $GITHUB_OUTPUT
   
   create_cache_key:
@@ -252,9 +252,9 @@ jobs:
       matrix:
         arch: [x86_64]
         api-level: [30]
-    needs: [create-timestamp, build]
+    needs: [create_timestamp, build]
     env:
-      timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
+      timestamp: ${{ needs.create_timestamp.outputs.timestamp }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -303,6 +303,7 @@ jobs:
       
       - name: Run Detox Build
         run: yarn detox build -c android.emu.debug -n test
+      
       - name: Run Detox Test
         uses: reactivecircus/android-emulator-runner@v2
         with:
