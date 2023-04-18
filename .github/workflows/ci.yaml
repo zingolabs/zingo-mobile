@@ -285,7 +285,7 @@ jobs:
       - name: Native rust cache
         uses: actions/cache@v3
         with:
-          path: android/app/src/main/jniLibs/${{ matrix.abi }}
+          path: android/app/src/main/jniLibs/${{ matrix.arch }}
           key: native-rust-${{ matrix.arch }}-${{ env.cache_key }}
           fail-on-cache-miss: true
       
