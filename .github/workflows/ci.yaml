@@ -55,11 +55,14 @@ jobs:
     env:
       cache_key: ${{ needs.create_cache_key.outputs.cache_key }}
     outputs:
-      status: ${{ steps.check_build_cache.outcome }}
+      status_x86: ${{ steps.set_output_status.outputs.status_x86 }}
+      status_x86_64: ${{ steps.set_output_status.outputs.status_x86_64 }}
+      status_armeabi-v7a: ${{ steps.set_output_status.outputs.status_armeabi-v7a }}
+      status_arm64-v8a: ${{ steps.set_output_status.outputs.status_arm64-v8a }}
     strategy:
       matrix:
         abi: [x86, x86_64, armeabi-v7a, arm64-v8a]
-      fail-fast: true
+      fail-fast: false
     continue-on-error: true
     steps:
       - name: Checkout repository
@@ -72,20 +75,26 @@ jobs:
           path: android/app/src/main/jniLibs/${{ matrix.abi }}
           key: native-rust-${{ matrix.abi }}-${{ env.cache_key }}
           lookup-only: true
-          fail-on-cache-miss: true
+  
+      - name: Set output status
+        id: set_output_status
+        run: echo "status_${{ matrix.abi }}=${{ steps.check_build_cache.outcome }}" >> $GITHUB_OUTPUT
   
   debug:
     needs: check_build_cache
     if: ${{ always() }}
     runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        abi: [x86, x86_64, armeabi-v7a, arm64-v8a]
     steps:
       - name: print all output statuses
         env:
-          OUT_STAT: ${{ toJson(needs.*.outputs.status) }}
+          OUT_STAT: ${{ toJson(needs.*.outputs.status_${{ matrix.abi }}) }}
         run: echo "$OUT_STAT"
       
       - name: print true if one check hash failed
-        run: echo ${{ contains(needs.*.outputs.status, 'failure') }}
+        run: echo ${{ contains(needs.*.outputs.status_${{ matrix.abi }}, 'failure') }}
 
   build:
     name: Build native rust (${{ matrix.abi }})
