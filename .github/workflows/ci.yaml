@@ -247,15 +247,15 @@ jobs:
  
   e2e_test:
     name: End-to-End Test
+    needs: [create_cache_key, cache_native_rust]
     if: ${{ ! cancelled() }}
     runs-on: macos-12
     strategy:
       matrix:
         arch: [x86_64]
         api-level: [30]
-    needs: [create_timestamp, build]
     env:
-      timestamp: ${{ needs.create_timestamp.outputs.timestamp }}
+      cache_key: ${{ needs.create_cache_key.outputs.cache_key }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
