@@ -89,17 +89,17 @@ jobs:
     steps:
       - name: print all output statuses
         env:
-          OUT_STAT: ${{ toJson(needs.*.outputs) }}
+          OUT_STAT: ${{ toJson(needs.*.outputs.*) }}
         run: echo "$OUT_STAT"
       
       - name: print true if one check hash failed
-        run: echo ${{ contains(needs.*.outputs, 'failure') }}
+        run: echo ${{ contains(needs.*.outputs.*, 'failure') }}
         # run: echo ${{ contains(needs.*.outputs.status_${{ matrix.abi }}, 'failure') }}
 
   build:
     name: Build native rust (${{ matrix.abi }})
     needs: [create_cache_key, check_build_cache]
-    if: ${{ contains(needs.*.outputs.status, 'failure') }}
+    if: ${{ contains(needs.*.outputs.*, 'failure') }}
     runs-on: ubuntu-22.04
     container:
       image: zingodevops/android_builder:stable
