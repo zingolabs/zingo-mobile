@@ -79,6 +79,7 @@ jobs:
   
       - name: Set output status
         id: set_output_status
+        if: ${{ ! cancelled() }}
         run: echo "status_${{ matrix.abi }}=${{ steps.check_build_cache.outcome }}" >> $GITHUB_OUTPUT
   
   debug:
