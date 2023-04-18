@@ -188,21 +188,21 @@ jobs:
       matrix:
         include:
           - abi: x86
-            avd-arch: x86
-            api-level: 30
-            api-target: google_apis_playstore
+            # avd-arch: x86
+            # api-level: 30
+            # api-target: google_apis_playstore
           - abi: x86_64
-            avd-arch: x86_64
-            api-level: 30
-            api-target: google_apis_playstore
+            # avd-arch: x86_64
+            # api-level: 30
+            # api-target: google_apis_playstore
           - abi: armeabi-v7a
-            avd-arch: x86
-            api-level: 30
-            api-target: google_apis_playstore
+            # avd-arch: x86
+            # api-level: 30
+            # api-target: google_apis_playstore
           - abi: arm64-v8a
-            avd-arch: x86_64
-            api-level: 30
-            api-target: google_apis_playstore
+            # avd-arch: x86_64
+            # api-level: 30
+            # api-target: google_apis_playstore
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -233,7 +233,8 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-${{ matrix.avd-arch }}-api-${{ matrix.api-level }}-${{ matrix.api-target }}
+          key: avd-${{ matrix.abi }}
+          # key: avd-${{ matrix.avd-arch }}-api-${{ matrix.api-level }}-${{ matrix.api-target }}
           
       - name: Native rust cache
         uses: actions/cache@v3
@@ -246,7 +247,8 @@ jobs:
       
       - name: Create AVD and generate snapshot for caching
         if: steps.avd_cache.outputs.cache-hit != 'true'
-        run: ./scripts/integration_tests.sh -a ${{ matrix.avd }} -s
+        run: ./scripts/integration_tests.sh -a ${{ matrix.abi }} -s
+        # run: ./scripts/integration_tests.sh -a ${{ matrix.avd-arch }} -s
 
       - name: Run integration tests
         run: ./scripts/integration_tests.sh -a ${{ matrix.abi }}
