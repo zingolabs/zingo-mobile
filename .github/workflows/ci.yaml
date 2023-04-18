@@ -178,7 +178,7 @@ jobs:
   
   integration_test:
     name: Integration test
-    needs: [timestamp, create_cache_key, cache_native_rust]
+    needs: [create_timestamp, create_cache_key, cache_native_rust]
     if: ${{ ! cancelled() }}
     runs-on: macos-12
     env:
