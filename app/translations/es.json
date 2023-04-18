@@ -49,7 +49,8 @@
     "zcash-url": "Tienes ya informada una dirección en la pantalla Enviar.",
     "connection-error": "No existe conexión a Internet, Zingo así no puede funcionar correctamente.",
     "tryingnewserver": "Intentando conectar con el nuevo Servidor... Puede llevar varios segundos.",
-    "tryingnewserver-error": "Después de 30 segundos el nuevo Servidor no responde."
+    "tryingnewserver-error": "Después de 30 segundos el nuevo Servidor no responde.",
+    "readingwallet": "Leyendo satisfactoriamente el monedero activo usando el Servidor nuevo:"
   },
   "rpc": {
     "parsebirthday-error": "Error: No es posible convertirlo en un número:",

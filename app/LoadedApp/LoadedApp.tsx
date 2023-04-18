@@ -684,7 +684,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   };
 
   onMenuItemSelected = async (item: string) => {
-    const { info } = this.state;
     this.setState({
       isMenuDrawerOpen: false,
       selectedMenuDrawerItem: item,
@@ -738,6 +737,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     if (!error.toLowerCase().startsWith('error')) {
       // Load the wallet and navigate to the transactions screen
       console.log(`wallet loaded ok ${value}`);
+      Toast.show(`${this.props.translate('loadedapp.readingwallet')} ${value}`, Toast.LONG);
       await SettingsFileImpl.writeSettings(name, value);
       this.setState({
         server: value,
@@ -748,6 +748,10 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       await this.rpc.fetchWalletSettings();
       return;
     } else {
+      // I need to open the modal ASAP.
+      this.setState({
+        seedServerModalVisible: true,
+      });
       //console.log(`Error Reading Wallet ${value} - ${error}`);
       Toast.show(`${this.props.translate('loadedapp.readingwallet-error')} ${value}`, Toast.LONG);
 
@@ -756,9 +760,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       await RPCModule.execute('changeserver', old_settings.server);
 
       // go to the seed screen for changing the wallet for another in the new server or cancel this action.
-      await this.fetchWalletSeedAndBirthday();
+      this.fetchWalletSeedAndBirthday();
       this.setState({
-        seedServerModalVisible: true,
         newServer: value,
         server: old_settings.server,
       });

@@ -194,19 +194,24 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     if (sendAllContext !== sendAll) {
       await set_sendAll_option('sendAll', sendAll);
     }
-    // the last one
+
+    // I need a little time in this modal because maybe the wallet cannot be open with the new server
+    let ms = 100;
     if (serverContext !== serverParsed) {
       if (languageContext !== language) {
         await set_language_option('language', language, false);
       }
       set_server_option('server', serverParsed);
+      ms = 1500;
     } else {
       if (languageContext !== language) {
         await set_language_option('language', language, true);
       }
     }
 
-    closeModal();
+    setTimeout(() => {
+      closeModal();
+    }, ms);
   };
 
   const optionsRadio = (
