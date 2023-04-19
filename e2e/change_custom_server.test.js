@@ -8,14 +8,16 @@ describe('Change the Server.', () => {
   // i just pulled this seed out of thin air
   it('loads a wallet', loadTestWallet);
   
-  it('Go settings & change to a correct server URI.', async () => {
+  it('Go settings & change to a correct Mainnet server URI.', async () => {
+    // go to setting modal screen
     await waitFor(element(by.id('header.drawmenu'))).toBeVisible().withTimeout(100000);
     await element(by.id('header.drawmenu')).tap();
     await element(by.id('menu.settings')).tap();
 
+    // scrolling until find the custom server field
     await element(by.id('settings.scrollView')).scroll(500, 'down');
 
-    // waiting for second server radio button
+    // waiting for custom server radio button
     await waitFor(element(by.id('settings.customServer'))).toBeVisible().withTimeout(20000);
 
     // choose the custom server 
@@ -25,12 +27,13 @@ describe('Change the Server.', () => {
     await waitFor(element(by.id('settings.customServerField'))).toBeVisible().withTimeout(20000);
     await element(by.id("settings.customServerField")).replaceText('https://lwdv3.zecwallet.co');
 
+    // save the new server
     await element(by.id('settings.button.save')).tap();
 
-    // waiting for second server radio button
+    // waiting for starting to sync
     await waitFor(element(by.id('header.playIcon'))).toBeVisible().withTimeout(50000);
 
-    // the sync process have to run normally with the other server
+    // the sync process have to run normally with the new server
     await element(by.id('header.drawmenu')).tap();
     await element(by.id('menu.syncreport')).tap();
 

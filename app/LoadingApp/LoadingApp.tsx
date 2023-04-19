@@ -556,6 +556,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                 )}
 
                 <Button
+                  testID="loadingapp.createnewwallet"
                   type="Primary"
                   title={translate('loadingapp.createnewwallet') as string}
                   disabled={actionButtonsDisabled}

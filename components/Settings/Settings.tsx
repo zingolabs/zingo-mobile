@@ -100,7 +100,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   useEffect(() => {
     // start checking the new server
     if (disabled) {
-      Toast.show(translate('loadedapp.tryingnewserver') as string, Toast.LONG);
+      Toast.show(translate('loadedapp.tryingnewserver') as string, Toast.SHORT);
     }
     // if the server cheking takes more then 30 seconds.
     if (!disabled && disabled !== undefined) {
