@@ -2,18 +2,18 @@
 set -Eeuo pipefail
 
 set_abi=false
-set_api_lvl=false
-set_api_tgt=false
+set_api_level=false
+set_api_target=false
 create_snapshot=false
 apk_installed=false
-valid_api_lvls=("23" "24" "25" "26" "27" "28" "29" "30" "31" "32" "33")
-valid_api_tgts=("default" "google_apis" "google_apis_playstore" "google_atd" "google-tv" \
+valid_api_levels=("23" "24" "25" "26" "27" "28" "29" "30" "31" "32" "33")
+valid_api_targets=("default" "google_apis" "google_apis_playstore" "google_atd" "google-tv" \
     "aosp_atd" "android-tv" "android-desktop" "android-wear" "android-wear-cn")
 timeout_seconds=1800  # default timeout set to 30 minutes
 
 function check_launch() {
-    emu_status=$(adb devices | grep "emulator-5554" | cut -f1)
-    if [ "${emu_status}" = "emulator-5554" ]; then
+    emulator_status=$(adb devices | grep "emulator-5554" | cut -f1)
+    if [ "${emulator_status}" = "emulator-5554" ]; then
         return 0;
     else
         return 1;
@@ -48,23 +48,23 @@ while getopts 'a:l:t:sx:h' OPTION; do
             abi="$OPTARG"
             case "$abi" in
                 x86_64)
-                    api_lvl_default="30"
-                    api_tgt_default="google_apis_playstore"
+                    api_level_default="30"
+                    api_target_default="google_apis_playstore"
                     arch="x86_64"
                     ;;
                 x86) 
-                    api_lvl_default="30"
-                    api_tgt_default="google_apis_playstore"
+                    api_level_default="30"
+                    api_target_default="google_apis_playstore"
                     arch="x86"
                     ;;
                 arm64-v8a)
-                    api_lvl_default="30"
-                    api_tgt_default="google_apis_playstore"
+                    api_level_default="30"
+                    api_target_default="google_apis_playstore"
                     arch="x86_64"
                     ;;
                 armeabi-v7a)
-                    api_lvl_default="30"
-                    api_tgt_default="google_apis_playstore"
+                    api_level_default="30"
+                    api_target_default="google_apis_playstore"
                     arch="x86"
                     ;;
                 *)
@@ -76,30 +76,30 @@ while getopts 'a:l:t:sx:h' OPTION; do
             set_abi=true
             ;;
         l)
-            api_lvl="$OPTARG"
+            api_level="$OPTARG"
 
             # Check API level is valid
             # tr -d '-' is used to remove all hyphons as they count as word boundaries for grep
-            if [[ $(echo ${valid_api_lvls[@]} | tr -d '-' | grep -ow "$(echo ${api_lvl} | tr -d '-')" | wc -w) != 1 ]]; then
+            if [[ $(echo ${valid_api_levels[@]} | tr -d '-' | grep -ow "$(echo ${api_level} | tr -d '-')" | wc -w) != 1 ]]; then
                 echo "Error: Invalid API level" >&2
                 echo "Try '$(basename $0) -h' for more information." >&2
                 exit 1
             fi
                         
-            set_api_lvl=true
+            set_api_level=true
             ;;
         t)
-            api_tgt="$OPTARG"
+            api_target="$OPTARG"
 
             # Check API target is valid
             # tr -d '-' is used to remove all hyphons as they count as word boundaries for grep
-            if [[ $(echo ${valid_api_tgts[@]} | tr -d '-' | grep -ow "$(echo ${api_tgt} | tr -d '-')" | wc -w) != 1 ]]; then
+            if [[ $(echo ${valid_api_targets[@]} | tr -d '-' | grep -ow "$(echo ${api_target} | tr -d '-')" | wc -w) != 1 ]]; then
                 echo "Error: Invalid API target" >&2
                 echo "Try '$(basename $0) -h' for more information." >&2
                 exit 1
             fi
                         
-            set_api_tgt=true
+            set_api_target=true
             ;;
         s)
             create_snapshot=true
@@ -155,11 +155,11 @@ if [[ $set_abi == false ]]; then
 fi
 
 # Set defaults
-if [[ $set_api_lvl == false ]]; then
-    api_lvl=$api_lvl_default
+if [[ $set_api_level == false ]]; then
+    api_level=$api_level_default
 fi
-if [[ $set_api_tgt == false ]]; then
-    api_tgt=$api_tgt_default
+if [[ $set_api_target == false ]]; then
+    api_target=$api_target_default
 fi
 
 # Setup working directory
@@ -177,8 +177,8 @@ echo "Installing latest emulator..."
 sdkmanager --install emulator --channel=0
 
 echo "Installing system image..."
-avd_name="android-${api_lvl}_${api_tgt}_${arch}"
-sdk="system-images;android-${api_lvl};${api_tgt};${arch}"
+avd_name="android-${api_level}_${api_target}_${arch}"
+sdk="system-images;android-${api_level};${api_target};${arch}"
 sdkmanager --install "${sdk}"
 sdkmanager --licenses
 
@@ -198,16 +198,10 @@ if [[ $create_snapshot == true ]]; then
     echo -e "\nWaiting for AVD to boot..."
     wait_for $timeout_seconds check_boot
     echo $(adb -s emulator-5554 emu avd name | head -1)
-    echo "Boot completed"
+    echo "Boot completed" && sleep 1
     echo -e "\nSnapshot saved"
 else
     echo -e "\nChecking for AVD..."
-    echo "list"
-    echo $(emulator -list-avds) # debug
-    echo "list - grep -ow avd name"
-    echo $(emulator -list-avds | grep -ow "${avd_name}") # debug
-    echo "list - grep -ow avd name - wc -w"
-    echo $(emulator -list-avds | grep -ow "${avd_name}" | wc -w) # debug
     if [ $(emulator -list-avds | grep -ow "${avd_name}" | wc -w) -ne 1 ]; then
         echo "AVD not found"
         echo -e "\nCreating AVD..."
@@ -235,7 +229,7 @@ else
     echo -e "\nWaiting for AVD to boot..."
     wait_for $timeout_seconds check_boot
     echo $(adb -s emulator-5554 emu avd name | head -1)
-    echo "Boot completed"
+    echo "Boot completed" && sleep 1
 
     # Disable animations
     adb shell input keyevent 82
