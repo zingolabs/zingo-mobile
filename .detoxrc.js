@@ -45,14 +45,13 @@ module.exports = {
     attached: {
       type: 'android.attached',
       device: {
-        adbName: 'R9JT10D7AFV'
+        adbName: '.*'
       }
     },
     emulator: {
       type: 'android.emulator',
       device: {
-        avdName: '30_ga_64',
-        avdName: 'Pixel_XL_API_32'
+        avdName: '30_ga_64'
       }
     },
     emulator_64: {
