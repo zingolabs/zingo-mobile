@@ -28,6 +28,14 @@ function check_boot() {
     fi
 }
 
+function check_device_online() {
+    device_status=$(adb devices | grep emulator-5554 | cut -f2)
+    if [ "${device_status}" = "offline" ]; then
+        return 1;
+    fi
+    return 0;
+}
+
 function wait_for() {
     timeout_seconds=$1
     shift 1
@@ -227,29 +235,15 @@ else
 
     echo -e "\nWaiting for AVD to boot..."
     wait_for $timeout_seconds check_boot
+    wait_for $timeout_seconds check_device_online
     echo $(adb -s emulator-5554 emu avd name | head -1)
-    echo "Boot completed" && sleep 1
+    echo "Device online" && sleep 1
 
-    echo -e "\nDisabling animations..."
-    i=0
-    step_complete=false
-    until [[ $step_complete == true ]]; do
-        if adb shell input keyevent 82; then
-            adb shell settings put global window_animation_scale 0.0
-            adb shell settings put global transition_animation_scale 0.0
-            adb shell settings put global animator_duration_scale 0.0
-            step_complete=true
-            echo "Successfully disabled animations"
-        else
-            echo "Failed to disable animations. Retrying..."
-        fi
-        if [[ $i -ge 100 ]]; then
-            echo "Error: Failed to disable animations" >&2
-            exit 1
-        fi
-        i=$((i+1))
-        sleep 1
-    done
+    # Disable animations
+    adb shell input keyevent 82
+    adb shell settings put global window_animation_scale 0.0
+    adb shell settings put global transition_animation_scale 0.0
+    adb shell settings put global animator_duration_scale 0.0
 
     echo -e "\nInstalling APKs..."
     i=0
