@@ -239,7 +239,7 @@ else
             adb shell settings put global transition_animation_scale 0.0
             adb shell settings put global animator_duration_scale 0.0
             step_complete=true
-            echo "Successfully disabled animationss"
+            echo "Successfully disabled animations"
         else
             echo "Failed to disable animations. Retrying..."
         fi
@@ -298,6 +298,8 @@ else
         echo -e "\nIntegration tests FAILED"
         exit 1
     fi
+
+    echo -e "\nIntegration tests PASSED"
 fi
 
 # Kill all emulators
