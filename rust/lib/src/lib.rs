@@ -17,6 +17,19 @@ lazy_static! {
     static ref LIGHTCLIENT: Mutex<RefCell<Option<Arc<LightClient>>>> =
         Mutex::new(RefCell::new(None));
 }
+use zingoconfig::ChainType;
+fn infer_chaintype(server_uri: &str) -> ChainType {
+    // Attempt to guess type from known URIs
+    match server_uri {
+        "https://mainnet.lightwalletd.com:9067"
+        | "https://lwdv2.zecwallet.co:1443"
+        | "https://lwdv3.zecwallet.co" => ChainType::Mainnet,
+        "https://testnet.lightwalletd.com:9067" => ChainType::Testnet,
+        x if x.contains("127.0.0.1") | x.contains("localhost") => ChainType::Regtest,
+        x if x.contains("fakemain") => ChainType::FakeMainnet,
+        _ => panic!("Unrecognized server URI, is it a new server?  What chain does it serve?"),
+    }
+}
 
 fn lock_client_return_seed(lightclient: LightClient) -> String {
     let seed = match lightclient.do_seed_phrase_sync() {
@@ -33,29 +46,23 @@ fn lock_client_return_seed(lightclient: LightClient) -> String {
 
     seed
 }
-fn construct_uri_load_config(
-    uri: String,
-    data_dir: String,
-) -> Result<(zingoconfig::ZingoConfig, u64), String> {
-    let server = construct_server_uri(Some(uri));
+pub fn init_new(server_uri: String, data_dir: String) -> String {
+    let lightwalletd_uri = construct_server_uri(Some(server_uri));
+    let chaintype = infer_chaintype(&lightwalletd_uri.host().expect("It's a URI, it has a host."));
+    let block_height = get_latest_block(lightwalletd_uri.to_string())
+        .parse::<u64>()
+        .expect("This will be an integer.");
 
-    let (mut config, latest_block_height) = match zingolib::load_clientconfig(server, None) {
-        Ok((c, h)) => (c, h),
+    let mut config = match zingolib::load_clientconfig(lightwalletd_uri, None, chaintype) {
+        Ok(c) => c,
         Err(e) => {
-            return Err(format!("Error: Config load: {}", e));
+            return format!("Error: {}", e);
         }
     };
 
     config.set_data_dir(data_dir);
-    Ok((config, latest_block_height))
-}
-pub fn init_new(server_uri: String, data_dir: String) -> String {
-    let (config, latest_block_height);
-    match construct_uri_load_config(server_uri, data_dir) {
-        Ok((c, h)) => (config, latest_block_height) = (c, h),
-        Err(s) => return s,
-    }
-    let lightclient = match LightClient::new(&config, latest_block_height.saturating_sub(100)) {
+
+    let lightclient = match LightClient::new(&config, block_height.saturating_sub(100)) {
         Ok(l) => l,
         Err(e) => {
             return format!("Error: {}", e);
@@ -65,11 +72,20 @@ pub fn init_new(server_uri: String, data_dir: String) -> String {
 }
 
 pub fn init_from_seed(server_uri: String, seed: String, birthday: u64, data_dir: String) -> String {
-    let (config, _latest_block_height);
-    match construct_uri_load_config(server_uri, data_dir) {
-        Ok((c, h)) => (config, _latest_block_height) = (c, h),
-        Err(s) => return s,
-    }
+    let lightwalletd_uri = construct_server_uri(Some(server_uri));
+    let chaintype = infer_chaintype(&lightwalletd_uri.host().expect("It's a URI, it has a host."));
+
+    //TODO:  Properly for this case, load_clientconfig should receive None for chaintype
+    //and respect the truth presented by the wallet.
+    let mut config = match zingolib::load_clientconfig(lightwalletd_uri, None, chaintype) {
+        Ok(c) => c,
+        Err(e) => {
+            return format!("Error: {}", e);
+        }
+    };
+
+    config.set_data_dir(data_dir);
+
     let lightclient = match LightClient::new_from_wallet_base(
         WalletBase::MnemonicPhrase(seed),
         &config,
@@ -85,11 +101,21 @@ pub fn init_from_seed(server_uri: String, seed: String, birthday: u64, data_dir:
 }
 
 pub fn init_from_b64(server_uri: String, base64_data: String, data_dir: String) -> String {
-    let (config, _latest_block_height);
-    match construct_uri_load_config(server_uri, data_dir) {
-        Ok((c, h)) => (config, _latest_block_height) = (c, h),
-        Err(s) => return s,
-    }
+    let serverlightwalletd_uri = construct_server_uri(Some(server_uri));
+    let chaintype = infer_chaintype(&lightwalletd_uri.host().expect("It's a URI, it has a host."));
+
+    //TODO:  Properly for this case, load_clientconfig should receive None for chaintype
+    //and respect the truth presented by the wallet.
+
+    let mut config = match zingolib::load_clientconfig(serverlightwalletd_uri, None, chaintype) {
+        Ok(c) => c,
+        Err(e) => {
+            return format!("Error: {}", e);
+        }
+    };
+
+    config.set_data_dir(data_dir);
+
     let decoded_bytes = match decode(&base64_data) {
         Ok(b) => b,
         Err(e) => {
@@ -153,12 +179,6 @@ pub fn execute(cmd: String, args_list: String) -> String {
 }
 
 pub fn get_latest_block(server_uri: String) -> String {
-    let (_config, latest_block_height);
-    match construct_uri_load_config(server_uri, "".to_string()) {
-        Ok((c, h)) => (_config, latest_block_height) = (c, h),
-        Err(s) => return s,
-    }
-    let resp: String = latest_block_height.to_string();
-
-    resp
+    let lightwalletd_uri = construct_server_uri(Some(server_uri));
+    zingolib::get_latest_block_height(lightwalletd_uri)
 }
