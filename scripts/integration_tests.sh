@@ -205,10 +205,10 @@ else
     echo "list"
     echo $(emulator -list-avds) # debug
     echo "list - grep -ow avd name"
-    echo $(emulator -list-avds | grep -ow "${avd_name}" | wc -w) # debug
+    echo $(emulator -list-avds | grep -ow "${avd_name}") # debug
     echo "list - grep -ow avd name - wc -w"
     echo $(emulator -list-avds | grep -ow "${avd_name}" | wc -w) # debug
-    if [ $(emulator -list-avds | grep -ow "${avd_name}" | wc -w) != 1 ]; then
+    if [ $(emulator -list-avds | grep -ow "${avd_name}" | wc -w) -ne 1 ]; then
         echo "AVD not found"
         echo -e "\nCreating AVD..."
         echo no | avdmanager create avd --force --name "${avd_name}" --package "${sdk}"
