@@ -280,7 +280,7 @@ else
 
     echo -e "\nTest reports saved: android/${test_report_dir}"
         
-    if [ $(cat "${test_report_dir}/test_results.txt" | grep INSTRUMENTATION_CODE | cut -d' ' -f2) -ne 0 ]; then
+    if [ $(cat "${test_report_dir}/test_results.txt" | grep INSTRUMENTATION_CODE | cut -d' ' -f2) -ne -1 ]; then
         echo -e "\nIntegration tests FAILED"
         exit 1
     fi

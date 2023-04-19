@@ -6,8 +6,8 @@ on:
     branches: [main, dev]
 
 jobs:
-  test:
-    name: Test
+  jest-test:
+    name: Jest test
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout repository
@@ -15,20 +15,19 @@ jobs:
       
       - run: yarn install
       
-      - name: Run tests
-        run: yarn test
+      - run: yarn test
   
-  create_timestamp:
+  create-timestamp:
     name: Create timestamp
     runs-on: ubuntu-22.04
     outputs:
-      timestamp: ${{ steps.create_timestamp.outputs.timestamp }}
+      timestamp: ${{ steps.create-timestamp.outputs.timestamp }}
     steps:
       - name: Create timestamp
-        id: create_timestamp
+        id: create-timestamp
         run: echo "timestamp=$(date +%Y%m%d%H%M%S)" >> $GITHUB_OUTPUT
   
-  create_cache_key:
+  create-cache-key:
     name: Create cache key
     runs-on: ubuntu-22.04
     container:
@@ -36,7 +35,7 @@ jobs:
     env:
       RUSTUP_HOME: /root/.rustup
     outputs:
-      cache_key: ${{ steps.create_cache_key.outputs.cache_key }}
+      cache-key: ${{ steps.create-cache-key.outputs.cache-key }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -45,52 +44,52 @@ jobs:
         run: echo $(cargo --version) >> rust/cargo_version.txt
       
       - name: Create cache key
-        id: create_cache_key
-        run: echo "cache_key=${{ hashFiles('rust/**/Cargo.toml', 'rust/**/Cargo.lock', 'rust/**/*.rs', 'rust/cargo_version.txt') }}" >> $GITHUB_OUTPUT
+        id: create-cache-key
+        run: echo "cache-key=${{ hashFiles('rust/**/Cargo.toml', 'rust/**/Cargo.lock', 'rust/**/*.rs', 'rust/cargo_version.txt') }}" >> $GITHUB_OUTPUT
   
-  check_build_cache:
+  check-build-cache:
     name: Check build cache
-    needs: create_cache_key
+    needs: create-cache-key
     runs-on: macos-12
     env:
-      cache_key: ${{ needs.create_cache_key.outputs.cache_key }}
+      CACHE-KEY: ${{ needs.create-cache-key.outputs.cache-key }}
     outputs:
-      status_x86: ${{ steps.set_output_status.outputs.status_x86 }}
-      status_x86_64: ${{ steps.set_output_status.outputs.status_x86_64 }}
-      status_armeabi-v7a: ${{ steps.set_output_status.outputs.status_armeabi-v7a }}
-      status_arm64-v8a: ${{ steps.set_output_status.outputs.status_arm64-v8a }}
+      status-x86: ${{ steps.set-output-status.outputs.status-x86 }}
+      status-x86-64: ${{ steps.set-output-status.outputs.status-x86_64 }}
+      status-armeabi-v7a: ${{ steps.set-output-status.outputs.status-armeabi-v7a }}
+      status-arm64-v8a: ${{ steps.set-output-status.outputs.status-arm64-v8a }}
     strategy:
       fail-fast: false
       matrix:
-        abi: [x86, x86_64, armeabi-v7a, arm64-v8a]
+        abi: [ x86, x86_64, armeabi-v7a, arm64-v8a ]
     continue-on-error: true
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
            
       - name: Check if native rust cache exists
-        id: check_build_cache
+        id: check-build-cache
         uses: actions/cache@v3
         with:
           path: android/app/src/main/jniLibs/${{ matrix.abi }}
-          key: native-rust-${{ matrix.abi }}-${{ env.cache_key }}
+          key: native-rust-${{ matrix.abi }}-${{ env.CACHE-KEY }}
           lookup-only: true
           fail-on-cache-miss: true
   
       - name: Set output status
-        id: set_output_status
+        id: set-output-status
         if: ${{ ! cancelled() }}
-        run: echo "status_${{ matrix.abi }}=${{ steps.check_build_cache.outcome }}" >> $GITHUB_OUTPUT
+        run: echo "status-${{ matrix.abi }}=${{ steps.check-build-cache.outcome }}" >> $GITHUB_OUTPUT
   
   build:
     name: Build native rust (${{ matrix.abi }})
-    needs: [create_cache_key, check_build_cache]
+    needs: [ create-cache-key, check-build-cache ]
     if: ${{ contains(needs.*.outputs.*, 'failure') }}
     runs-on: ubuntu-22.04
     container:
       image: zingodevops/android_builder:stable
     env:
-      cache_key: ${{ needs.create_cache_key.outputs.cache_key }}
+      CACHE-KEY: ${{ needs.create-cache-key.outputs.cache-key }}
       RUSTUP_HOME: /root/.rustup
     strategy:
       matrix:
@@ -116,7 +115,7 @@ jobs:
         uses: actions/checkout@v3
       
       - name: Cargo cache
-        id: cargo_cache
+        id: cargo-cache
         uses: actions/cache@v3
         with:
           # Following cargo cache recommendations:
@@ -148,18 +147,18 @@ jobs:
       - name: Upload native rust
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.abi }}-${{ env.cache_key }}
+          name: ${{ matrix.abi }}-${{ env.CACHE-KEY }}
           path: rust/target/${{ matrix.target }}/release/librust.so
       
-  cache_native_rust:
+  cache-native-rust:
     name: Cache native rust
-    needs: [create_cache_key, build]
+    needs: [ create-cache-key, build ]
     runs-on: macos-12
     env:
-      cache_key: ${{ needs.create_cache_key.outputs.cache_key }}
+      CACHE-KEY: ${{ needs.create-cache-key.outputs.cache-key }}
     strategy:
       matrix:
-        abi: [x86, x86_64, armeabi-v7a, arm64-v8a]
+        abi: [ x86, x86_64, armeabi-v7a, arm64-v8a ]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -167,23 +166,23 @@ jobs:
       - name: Download native rust
         uses: actions/download-artifact@v3
         with: 
-          name: ${{ matrix.abi }}-${{ env.cache_key }}
+          name: ${{ matrix.abi }}-${{ env.CACHE-KEY }}
           path: android/app/src/main/jniLibs/${{ matrix.abi }}
       
       - name: Cache native rust
         uses: actions/cache@v3
         with:
           path: android/app/src/main/jniLibs/${{ matrix.abi }}
-          key: native-rust-${{ matrix.abi }}-${{ env.cache_key }}
+          key: native-rust-${{ matrix.abi }}-${{ env.CACHE-KEY }}
   
-  integration_test:
+  integration-test:
     name: Integration test
-    needs: [create_timestamp, create_cache_key, cache_native_rust]
+    needs: [ create-timestamp, create-cache-key, cache-native-rust ]
     if: ${{ ! cancelled() }}
     runs-on: macos-12
     env:
-      cache_key: ${{ needs.create_cache_key.outputs.cache_key }}
-      timestamp: ${{ needs.create_timestamp.outputs.timestamp }}
+      CACHE-KEY: ${{ needs.create-cache-key.outputs.cache-key }}
+      TIMESTAMP: ${{ needs.create-timestamp.outputs.timestamp }}
     strategy:
       fail-fast: false
       matrix:
@@ -229,7 +228,7 @@ jobs:
       
       - name: AVD cache
         uses: actions/cache@v3
-        id: avd_cache
+        id: avd-cache
         with: 
           path: |
             ~/.android/avd/*
@@ -240,13 +239,13 @@ jobs:
         uses: actions/cache@v3
         with:
           path: android/app/src/main/jniLibs/${{ matrix.abi }}
-          key: native-rust-${{ matrix.abi }}-${{ env.cache_key }}
+          key: native-rust-${{ matrix.abi }}-${{ env.CACHE-KEY }}
           fail-on-cache-miss: true
       
       - run: yarn install
 
       - name: Create AVD and generate snapshot for caching
-        if: steps.avd_cache.outputs.cache-hit != 'true'
+        if: steps.avd-cache.outputs.cache-hit != 'true'
         run: ./scripts/integration_tests.sh -a ${{ matrix.avd-arch }} -s
 
       - name: Run integration tests
@@ -256,20 +255,20 @@ jobs:
         if: ${{ ! cancelled() }}
         uses: actions/upload-artifact@v3
         with:
-          name: test-reports-${{ matrix.abi }}-${{ env.timestamp }}
+          name: test-reports-${{ matrix.abi }}-${{ env.TIMESTAMP }}
           path: android/app/build/outputs/integration_test_reports
  
-  e2e_test:
+  e2e-test:
     name: End-to-End Test
-    needs: [create_cache_key, cache_native_rust]
+    needs: [ create-cache-key, cache-native-rust ]
     if: ${{ ! cancelled() }}
     runs-on: macos-12
     strategy:
       matrix:
-        arch: [x86_64]
-        api-level: [30]
+        arch: [ x86_64 ]
+        api-level: [ 30 ]
     env:
-      cache_key: ${{ needs.create_cache_key.outputs.cache_key }}
+      CACHE-KEY: ${{ needs.create-cache-key.outputs.cache-key }}
     continue-on-error: true
     steps:
       - name: Checkout repository
@@ -290,7 +289,7 @@ jobs:
       
       - name: AVD cache
         uses: actions/cache@v3
-        id: avd_cache
+        id: avd-cache
         with: 
           path: |
             ~/.android/avd/*
@@ -301,15 +300,11 @@ jobs:
         uses: actions/cache@v3
         with:
           path: android/app/src/main/jniLibs/${{ matrix.arch }}
-          key: native-rust-${{ matrix.arch }}-${{ env.cache_key }}
+          key: native-rust-${{ matrix.arch }}-${{ env.CACHE-KEY }}
           fail-on-cache-miss: true
       
-      - name: Create AVD and generate snapshot for caching test
-        if: steps.avd_cache.outputs.cache-hit != 'true'
-        run: echo "test - cache-hit is false"
-      
       - name: Create AVD and generate snapshot for caching
-        if: steps.avd_cache.outputs.cache-hit != 'true'
+        if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api-level }}
