@@ -233,7 +233,7 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-${{ matrix.avd-arch }}-arm32-test
+          key: avd-${{ matrix.avd-arch }}-integ
           
       - name: Native rust cache
         uses: actions/cache@v3
