@@ -138,6 +138,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         "maxHeight": "85%",
       }
     }
+    testID="settings.scrollView"
   >
     <View>
       <View
@@ -780,7 +781,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               "opacity": 1,
             }
           }
-          testID="firstServer"
+          testID="settings.firstServer"
         >
           <View
             style={
@@ -857,7 +858,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               "opacity": 1,
             }
           }
-          testID="secondServer"
+          testID="settings.secondServer"
         >
           <View
             style={
@@ -942,6 +943,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                 "opacity": 1,
               }
             }
+            testID="settings.customServer"
           >
             <View
               style={
@@ -1018,6 +1020,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                   "minWidth": "50%",
                 }
               }
+              testID="settings.customServerField"
               value="https://zcash.es"
             />
           </View>
