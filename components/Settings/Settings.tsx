@@ -256,6 +256,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       <Header title={translate('settings.title') as string} noBalance={true} noSyncingStatus={true} noDrawMenu={true} />
 
       <ScrollView
+        testID="settings.scrollView"
         style={{ maxHeight: '85%' }}
         contentContainerStyle={{
           flexDirection: 'column',
@@ -306,9 +307,16 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         </View>
 
         <View style={{ display: 'flex', marginLeft: 25 }}>
-          {serverUris().map((uri: string) =>
+          {serverUris().map((uri: string, i: number) =>
             uri ? (
               <TouchableOpacity
+                testID={
+                  i === 0
+                    ? 'settings.firstServer'
+                    : i === 1
+                    ? 'settings.secondServer'
+                    : 'settings.' + i.toString + '-Server'
+                }
                 disabled={disabled}
                 key={'touch-' + uri}
                 style={{ marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
@@ -325,6 +333,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
           <View style={{ display: 'flex', flexDirection: 'row' }}>
             <TouchableOpacity
+              testID="settings.customServer"
               disabled={disabled}
               style={{ marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
               onPress={() => setServer('')}>
@@ -349,7 +358,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                   minHeight: 48,
                 }}>
                 <TextInput
-                  placeholder={' https://------.---:--- '}
+                  testID="settings.customServerField"
+                  placeholder={'https://------.---:---'}
                   placeholderTextColor={colors.placeholder}
                   style={{
                     color: colors.text,
@@ -424,6 +434,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           marginVertical: 5,
         }}>
         <Button
+          testID="settings.button.save"
           disabled={disabled}
           type="Primary"
           title={translate('settings.save') as string}

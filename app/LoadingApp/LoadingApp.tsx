@@ -572,10 +572,9 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                   />
                 )}
 
-                <View
-                  testID="loadingapp.restorewalletseed"
-                  style={{ marginTop: 50, display: 'flex', alignItems: 'center' }}>
+                <View style={{ marginTop: 50, display: 'flex', alignItems: 'center' }}>
                   <Button
+                    testID="loadingapp.restorewalletseed"
                     type="Secondary"
                     title={translate('loadingapp.restorewalletseed') as string}
                     disabled={actionButtonsDisabled}

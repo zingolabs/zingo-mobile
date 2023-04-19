@@ -177,7 +177,9 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 </TouchableOpacity>
               )}
               {syncStatusDisplayLine && (
-                <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
+                <TouchableOpacity
+                  testID="header.playIcon"
+                  onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
                   <FontAwesomeIcon icon={faPlay} color={colors.primary} size={10} />
                 </TouchableOpacity>
               )}

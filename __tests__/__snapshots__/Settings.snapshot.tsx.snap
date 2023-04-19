@@ -780,6 +780,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               "opacity": 1,
             }
           }
+          testID="firstServer"
         >
           <View
             style={
@@ -856,6 +857,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               "opacity": 1,
             }
           }
+          testID="secondServer"
         >
           <View
             style={
@@ -1005,7 +1007,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               editable={true}
               maxLength={100}
               onChangeText={[Function]}
-              placeholder=" https://------.---:--- "
+              placeholder="https://------.---:---"
               style={
                 {
                   "color": "rgb(28, 28, 30)",
@@ -1414,6 +1416,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           "paddingRight": 20,
         }
       }
+      testID="settings.button.save"
     >
       <View
         style={
