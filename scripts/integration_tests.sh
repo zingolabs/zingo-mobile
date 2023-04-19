@@ -202,16 +202,16 @@ if [[ $create_snapshot == true ]]; then
     echo -e "\nSnapshot saved"
 else
     echo -e "\nChecking for AVD..."
-    echo $(emulator -list-avds)
-    # if [[ $(emulator -list-avds | grep -ow "${avd_name}" | wc -w) != 1 ]]; then
-    #     echo "AVD not found"
-    #     echo -e "\nCreating AVD..."
-    #     echo no | avdmanager create avd --force --name "${avd_name}" --package "${sdk}"
-    #     echo -e "\n\nTo create a quick-boot snapshot for faster integration tests use the '-s' flag"
-    #     echo "Try '$(basename $0) -h' for more information."
-    # else
-    #     echo "AVD found: ${avd_name}"
-    # fi
+    echo $(emulator -list-avds) # debug
+    if [[ $(emulator -list-avds | grep -ow "${avd_name}" | wc -w) != 1 ]]; then
+        echo "AVD not found"
+        echo -e "\nCreating AVD..."
+        echo no | avdmanager create avd --force --name "${avd_name}" --package "${sdk}"
+        echo -e "\n\nTo create a quick-boot snapshot for faster integration tests use the '-s' flag"
+        echo "Try '$(basename $0) -h' for more information."
+    else
+        echo "AVD found: ${avd_name}"
+    fi
 
     echo -e "\nBuilding APKs..."
     ./gradlew assembleDebug assembleAndroidTest -Psplitapk=true
