@@ -5,7 +5,6 @@ set_abi=false
 set_api_level=false
 set_api_target=false
 create_snapshot=false
-apk_installed=false
 valid_api_levels=("23" "24" "25" "26" "27" "28" "29" "30" "31" "32" "33")
 valid_api_targets=("default" "google_apis" "google_apis_playstore" "google_atd" "google-tv" \
     "aosp_atd" "android-tv" "android-desktop" "android-wear" "android-wear-cn")
@@ -231,23 +230,39 @@ else
     echo $(adb -s emulator-5554 emu avd name | head -1)
     echo "Boot completed" && sleep 1
 
-    # Disable animations
-    adb shell input keyevent 82
-    adb shell settings put global window_animation_scale 0.0
-    adb shell settings put global transition_animation_scale 0.0
-    adb shell settings put global animator_duration_scale 0.0
+    echo -e "\nDisabling animations..."
+    i=0
+    step_complete=false
+    until [[ $step_complete == true ]]; do
+        if adb shell input keyevent 82; then
+            adb shell settings put global window_animation_scale 0.0
+            adb shell settings put global transition_animation_scale 0.0
+            adb shell settings put global animator_duration_scale 0.0
+            step_complete=true
+            echo "Successfully disabled animationss"
+        else
+            echo "Failed to disable animations. Retrying..."
+        fi
+        if [[ $i -ge 100 ]]; then
+            echo "Error: Failed to disable animations" >&2
+            exit 1
+        fi
+        i=$((i+1))
+        sleep 1
+    done
 
     echo -e "\nInstalling APKs..."
     i=0
-    until [[ $apk_installed == true ]]; do
+    step_complete=false
+    until [[ $step_complete == true ]]; do
         if adb -s emulator-5554 install-multi-package -r -t -d --abi "${abi}" \
                 "app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk" \
                 "app/build/outputs/apk/debug/app-${abi}-debug.apk" &> "${test_report_dir}/apk_installation.txt"; then
-            apk_installed=true
-            echo "APK installation succeeded"
+            step_complete=true
+            echo "Successfully installed APKs"
         fi              
         if [[ $i -ge 100 ]]; then
-            echo "Error: APK installation failed" >&2
+            echo "Error: Failed to install APKs" >&2
             echo "For more information see 'android/${test_report_dir}/apk_installation.txt'" >&2
             exit 1
         fi
