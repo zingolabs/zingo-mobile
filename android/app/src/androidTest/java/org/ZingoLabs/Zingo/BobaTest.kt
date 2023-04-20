@@ -29,32 +29,40 @@ class BobaTest {
 
         RustFFI.initfromseed(server, seed, birthday, datadir)
 
-        val pre_balance = RustFFI.execute("balance", "")
+        var balance = RustFFI.execute("balance", "")
         System.out.println("Balance:")
-        System.out.println(pre_balance)
+        System.out.println(balance)
 
-        val sync_test = RustFFI.execute("sync", "")
+        var sync_info = RustFFI.execute("sync", "")
         System.out.println("Sync info:")
-        System.out.println(sync_test)
+        System.out.println(sync_info)
+        
+        var sync_status = RustFFI.execute("syncstatus", "")
+        System.out.println("Sync status:")
+        System.out.println(sync_status)
 
-        val mid_balance = RustFFI.execute("balance", "")
+        balance = RustFFI.execute("balance", "")
         System.out.println("Balance:")
-        System.out.println(mid_balance)
-
-        var send_prog = RustFFI.execute("sendprogress", "")
-        System.out.println("Send progress (pre-send):")
-        System.out.println(send_prog)
+        System.out.println(balance)
         
         RustFFI.execute("send", "utest16d8e0rz3g5nqem3kkz0hz4tv86m0yfvuzz6mapfvc4zsftq9t6req0grd5jnph7ftwftrhvdjkcly9spqrpa2rqx4strfcyuw8x4sxm9p5ww3xyl3s3dv9pyhsp3tqu0hnjuthc940cg5sf972wxx79pqzlv9mve66hkf9y559kk4ne9c5cecn22h4p4cnu06wfmkewz5xe9cjmdjga 10000")
 
-        send_prog = RustFFI.execute("sendprogress", "")
-        System.out.println("Send progress (post-send):")
+        var send_prog = RustFFI.execute("sendprogress", "")
+        System.out.println("Send progress after send:")
         System.out.println(send_prog)
         
-        val post_balance = RustFFI.execute("balance", "")
+        sync_info = RustFFI.execute("sync", "")
+        System.out.println("Sync info:")
+        System.out.println(sync_info)
+
+        sync_status = RustFFI.execute("syncstatus", "")
+        System.out.println("Sync status:")
+        System.out.println(sync_status)
+
+        balance = RustFFI.execute("balance", "")
         System.out.println("Balance:")
-        System.out.println(post_balance)
+        System.out.println(balance)
         
-        assertThat(post_balance).isEqualTo(pre_balance)
+        assertThat(balance).isEqualTo("")
     }
 }
