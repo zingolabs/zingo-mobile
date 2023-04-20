@@ -12,7 +12,10 @@ pub extern "C" fn rust_free(s: *mut c_char) {
 }
 
 #[no_mangle]
-pub extern "C" fn init_new(server_uri: *const c_char, data_dir: *const c_char) -> *mut c_char {
+pub extern "C" fn init_new(
+    server_uri: *const c_char,
+    data_dir: *const c_char,
+) -> *mut c_char {
     let c_str = unsafe { CStr::from_ptr(server_uri) };
     let server_uri = match c_str.to_str() {
         Err(_) => {
@@ -92,7 +95,12 @@ pub extern "C" fn initfromseed(
         Ok(string) => string,
     }
     .to_string();
-    let seed = rustlib::init_from_seed(server_uri, seed, birthday, data_dir);
+    let seed = rustlib::init_from_seed(
+        server_uri,
+        seed,
+        birthday,
+        data_dir,
+    );
     return CString::new(seed).unwrap().into_raw();
 }
 
@@ -177,7 +185,9 @@ pub extern "C" fn execute(cmd: *const c_char, args_list: *const c_char) -> *mut 
 }
 
 #[no_mangle]
-pub extern "C" fn get_latest_block(server_uri: *const c_char) -> *mut c_char {
+pub extern "C" fn get_latest_block(
+    server_uri: *const c_char,
+) -> *mut c_char {
     let c_str = unsafe { CStr::from_ptr(server_uri) };
     let server_uri = match c_str.to_str() {
         Err(_) => {
