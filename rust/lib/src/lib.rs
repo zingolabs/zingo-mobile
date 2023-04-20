@@ -51,10 +51,9 @@ fn build_config_from_uri_chaintype(
     chain_type: Option<ChainType>,
 ) -> zingoconfig::ZingoConfig {
     let lightwalletd_uri = construct_lightwalletd_uri(Some(server_uri));
-    let chaintype = if *&chain_type.is_some() {
-        chain_type.expect("To unwrap Some(chaintype)")
-    } else {
-        infer_chaintype(&lightwalletd_uri.to_string())
+    let chaintype = match chain_type {
+        Some(chaintype) => chaintype,
+        None => infer_chaintype(&lightwalletd_uri.to_string()),
     };
     match zingolib::load_clientconfig(lightwalletd_uri, None, chaintype) {
         Ok(c) => c,
