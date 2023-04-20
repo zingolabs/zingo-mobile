@@ -6,7 +6,7 @@ use std::sync::{Arc, Mutex};
 
 use base64::{decode, encode};
 
-use zingoconfig::construct_server_uri;
+use zingoconfig::{self, construct_server_uri};
 use zingolib::wallet::WalletBase;
 use zingolib::{commands, lightclient::LightClient};
 
@@ -49,9 +49,9 @@ fn lock_client_return_seed(lightclient: LightClient) -> String {
 fn build_config_from_uri_chaintype(
     server_uri: String,
     chain_type: Option<ChainType>,
-) -> ZingoConfig {
+) -> zingoconfig::ZingoConfig {
     let lightwalletd_uri = construct_server_uri(Some(server_uri));
-    let chaintype = if chain_type.is_some {
+    let chaintype = if &chain_type.is_some() {
         chain_type.expect("To unwrap Some(chaintype)")
     } else {
         infer_chaintype(&lightwalletd_uri.to_string())
