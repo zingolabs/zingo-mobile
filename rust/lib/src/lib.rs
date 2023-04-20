@@ -23,7 +23,7 @@ fn infer_chaintype(server_uri: &str) -> ChainType {
     match server_uri {
         "https://mainnet.lightwalletd.com:9067"
         | "https://lwdv2.zecwallet.co:1443"
-        | "https://lwdv3.zecwallet.co" => ChainType::Mainnet,
+        | "https://lwdv3.zecwallet.co:443" => ChainType::Mainnet,
         "https://testnet.lightwalletd.com:9067" => ChainType::Testnet,
         x if x.contains("127.0.0.1") | x.contains("localhost") => ChainType::Regtest,
         x if x.contains("fakemain") => ChainType::FakeMainnet,
