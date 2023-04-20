@@ -39,12 +39,13 @@ fn construct_uri_load_config(
 ) -> Result<(zingoconfig::ZingoConfig, u64), String> {
     let server = construct_server_uri(Some(uri));
 
-    let (mut config, latest_block_height) = match zingolib::load_clientconfig(server, None) {
-        Ok((c, h)) => (c, h),
-        Err(e) => {
-            return Err(format!("Error: Config load: {}", e));
-        }
-    };
+    let (mut config, latest_block_height) =
+        match zingolib::load_clientconfig(server, None, zingoconfig::ChainType::Mainnet) {
+            Ok((c, h)) => (c, h),
+            Err(e) => {
+                return Err(format!("Error: Config load: {}", e));
+            }
+        };
 
     config.set_data_dir(data_dir);
     Ok((config, latest_block_height))
