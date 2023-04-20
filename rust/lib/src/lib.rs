@@ -21,7 +21,7 @@ use zingoconfig::ChainType;
 fn infer_chaintype(server_uri: &str) -> ChainType {
     // Attempt to guess type from known URIs
     match server_uri {
-        "https://mainnet.lightwalletd.com:9067"
+        "https://mainnet.lightwalletd.com:9067/"
         | "https://lwdv2.zecwallet.co:1443"
         | "https://lwdv3.zecwallet.co:443" => ChainType::Mainnet,
         "https://testnet.lightwalletd.com:9067" => ChainType::Testnet,
@@ -38,6 +38,7 @@ fn lock_client_return_seed(lightclient: LightClient) -> String {
             return format!("Error: {}", e);
         }
     };
+    dbg!("got seed");
 
     let lc = Arc::new(lightclient);
     LightClient::start_mempool_monitor(lc.clone());
@@ -63,17 +64,21 @@ fn build_config_from_uri(server_uri: String) -> zingoconfig::ZingoConfig {
 pub fn init_new(server_uri: String, data_dir: String) -> String {
     let mut config = build_config_from_uri(server_uri.clone());
 
+    dbg!("config is created!");
     config.set_data_dir(data_dir);
 
+    dbg!("set_data_dir");
     let block_height = get_latest_block(server_uri)
         .parse::<u64>()
         .expect("To parse out a u64");
+    dbg!("got block_height");
     let lightclient = match LightClient::new(&config, block_height.saturating_sub(100)) {
         Ok(l) => l,
         Err(e) => {
             return format!("Error: {}", e);
         }
     };
+    dbg!("light client created");
     lock_client_return_seed(lightclient)
 }
 
