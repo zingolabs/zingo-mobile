@@ -6,7 +6,7 @@ use std::sync::{Arc, Mutex};
 
 use base64::{decode, encode};
 
-use zingoconfig::{self, construct_server_uri};
+use zingoconfig::{self, construct_lightwalletd_uri};
 use zingolib::wallet::WalletBase;
 use zingolib::{commands, lightclient::LightClient};
 
@@ -50,8 +50,8 @@ fn build_config_from_uri_chaintype(
     server_uri: String,
     chain_type: Option<ChainType>,
 ) -> zingoconfig::ZingoConfig {
-    let lightwalletd_uri = construct_server_uri(Some(server_uri));
-    let chaintype = if &chain_type.is_some() {
+    let lightwalletd_uri = construct_lightwalletd_uri(Some(server_uri));
+    let chaintype = if *&chain_type.is_some() {
         chain_type.expect("To unwrap Some(chaintype)")
     } else {
         infer_chaintype(&lightwalletd_uri.to_string())
@@ -59,16 +59,18 @@ fn build_config_from_uri_chaintype(
     match zingolib::load_clientconfig(lightwalletd_uri, None, chaintype) {
         Ok(c) => c,
         Err(e) => {
-            return format!("Error: {}", e);
+            panic!("Error: {}", e);
         }
     }
 }
 pub fn init_new(server_uri: String, data_dir: String, chain_type: Option<ChainType>) -> String {
-    let mut config = build_config_from_uri_chaintype(server_uri, chain_type);
+    let mut config = build_config_from_uri_chaintype(server_uri.clone(), chain_type);
 
     config.set_data_dir(data_dir);
 
-    let block_height = get_latest_block(config.lightwalletd_uri);
+    let block_height = get_latest_block(server_uri)
+        .parse::<u64>()
+        .expect("To parse out a u64");
     let lightclient = match LightClient::new(&config, block_height.saturating_sub(100)) {
         Ok(l) => l,
         Err(e) => {
@@ -176,6 +178,6 @@ pub fn execute(cmd: String, args_list: String) -> String {
 }
 
 pub fn get_latest_block(server_uri: String) -> String {
-    let lightwalletd_uri = construct_server_uri(Some(server_uri));
-    zingolib::get_latest_block_height(lightwalletd_uri)
+    let lightwalletd_uri = construct_lightwalletd_uri(Some(server_uri));
+    zingolib::get_latest_block_height(lightwalletd_uri).to_string()
 }

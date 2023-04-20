@@ -43,7 +43,7 @@ pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RustFFI_00024Companion_initnew
         .into_string()
         .unwrap();
 
-    let seed = rustlib::init_new(server_uri, data_dir);
+    let seed = rustlib::init_new(server_uri, data_dir, None);
 
     let output = env.new_string(seed.as_str()).unwrap();
     output.into_inner()
@@ -78,7 +78,7 @@ pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RustFFI_00024Companion_initfro
         .into_string()
         .unwrap();
 
-    let seed = rustlib::init_from_seed(server_uri, seed_tmp, birthday, data_dir);
+    let seed = rustlib::init_from_seed(server_uri, seed_tmp, birthday, data_dir, None);
 
     let output = env.new_string(seed.as_str()).unwrap();
     output.into_inner()
@@ -106,7 +106,7 @@ pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RustFFI_00024Companion_initfro
         .into_string()
         .unwrap();
 
-    let seed = rustlib::init_from_b64(server_uri, base64, data_dir);
+    let seed = rustlib::init_from_b64(server_uri, base64, data_dir, None);
 
     let output = env.new_string(seed.as_str()).unwrap();
     output.into_inner()
