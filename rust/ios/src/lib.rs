@@ -35,7 +35,7 @@ pub extern "C" fn init_new(server_uri: *const c_char, data_dir: *const c_char) -
     }
     .to_string();
 
-    let seed = rustlib::init_new(server_uri, data_dir, None);
+    let seed = rustlib::init_new(server_uri, data_dir);
 
     return CString::new(seed).unwrap().into_raw();
 }
@@ -92,7 +92,7 @@ pub extern "C" fn initfromseed(
         Ok(string) => string,
     }
     .to_string();
-    let seed = rustlib::init_from_seed(server_uri, seed, birthday, data_dir, None);
+    let seed = rustlib::init_from_seed(server_uri, seed, birthday, data_dir);
     return CString::new(seed).unwrap().into_raw();
 }
 
@@ -135,7 +135,7 @@ pub extern "C" fn initfromb64(
     }
     .to_string();
 
-    let seed = rustlib::init_from_b64(server_uri, base64, data_dir, None);
+    let seed = rustlib::init_from_b64(server_uri, base64, data_dir);
 
     return CString::new(seed).unwrap().into_raw();
 }

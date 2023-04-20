@@ -46,15 +46,13 @@ fn lock_client_return_seed(lightclient: LightClient) -> String {
 
     seed
 }
-fn build_config_from_uri_chaintype(
-    server_uri: String,
-    chain_type: Option<ChainType>,
-) -> zingoconfig::ZingoConfig {
+fn build_config_from_uri(server_uri: String) -> zingoconfig::ZingoConfig {
     let lightwalletd_uri = construct_lightwalletd_uri(Some(server_uri));
-    let chaintype = match chain_type {
+    /*let chaintype = match chain_type {
         Some(chaintype) => chaintype,
         None => infer_chaintype(&lightwalletd_uri.to_string()),
-    };
+    };*/
+    let chaintype = infer_chaintype(&lightwalletd_uri.to_string());
     match zingolib::load_clientconfig(lightwalletd_uri, None, chaintype) {
         Ok(c) => c,
         Err(e) => {
@@ -62,8 +60,8 @@ fn build_config_from_uri_chaintype(
         }
     }
 }
-pub fn init_new(server_uri: String, data_dir: String, chain_type: Option<ChainType>) -> String {
-    let mut config = build_config_from_uri_chaintype(server_uri.clone(), chain_type);
+pub fn init_new(server_uri: String, data_dir: String) -> String {
+    let mut config = build_config_from_uri(server_uri.clone());
 
     config.set_data_dir(data_dir);
 
@@ -79,14 +77,8 @@ pub fn init_new(server_uri: String, data_dir: String, chain_type: Option<ChainTy
     lock_client_return_seed(lightclient)
 }
 
-pub fn init_from_seed(
-    server_uri: String,
-    seed: String,
-    birthday: u64,
-    data_dir: String,
-    chain_type: Option<ChainType>,
-) -> String {
-    let mut config = build_config_from_uri_chaintype(server_uri, chain_type);
+pub fn init_from_seed(server_uri: String, seed: String, birthday: u64, data_dir: String) -> String {
+    let mut config = build_config_from_uri(server_uri);
 
     config.set_data_dir(data_dir);
 
@@ -104,13 +96,8 @@ pub fn init_from_seed(
     lock_client_return_seed(lightclient)
 }
 
-pub fn init_from_b64(
-    server_uri: String,
-    base64_data: String,
-    data_dir: String,
-    chain_type: Option<ChainType>,
-) -> String {
-    let mut config = build_config_from_uri_chaintype(server_uri, chain_type);
+pub fn init_from_b64(server_uri: String, base64_data: String, data_dir: String) -> String {
+    let mut config = build_config_from_uri(server_uri);
 
     config.set_data_dir(data_dir);
 
