@@ -200,6 +200,7 @@ if [[ $create_snapshot == true ]]; then
     emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
         -no-snapshot-load -port 5554 &> /dev/null &
     wait_for $timeout_seconds check_launch
+    wait_for $timeout_seconds check_device_online
     echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
 
     echo -e "\nWaiting for AVD to boot..."
@@ -218,6 +219,9 @@ else
     else
         echo "AVD found: ${avd_name}"
     fi
+        
+    echo -e "\nRunning yarn install..."
+    yarn install
 
     echo -e "\nBuilding APKs..."
     ./gradlew assembleDebug assembleAndroidTest -Psplitapk=true
