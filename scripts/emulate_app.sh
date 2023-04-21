@@ -272,6 +272,8 @@ else
     adb -s emulator-5554 shell cat /proc/cpuinfo &> "${test_report_dir}/cpuinfo.txt"
     adb -s emulator-5554 shell logcat -v threadtime -b main &> "${test_report_dir}/logcat.txt" &
     
+    # Start react-native
+    killall node
     nohup yarn react-native start > "${test_report_dir}/react_native.out" &> /dev/null &
         
     echo -e "\nLaunching App..."
