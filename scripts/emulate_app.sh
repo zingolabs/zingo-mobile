@@ -273,7 +273,10 @@ else
     adb -s emulator-5554 shell logcat -v threadtime -b main &> "${test_report_dir}/logcat.txt" &
     
     # Start react-native
-    killall node
+    if killall node; then
+        echo -e "\nAll node processes killed."
+        echo -e "\nRestarting react native..."
+    fi
     nohup yarn react-native start > "${test_report_dir}/react_native.out" &> /dev/null &
         
     echo -e "\nLaunching App..."
