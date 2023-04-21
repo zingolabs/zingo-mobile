@@ -210,6 +210,9 @@ if [[ $create_snapshot == true ]]; then
     echo $(adb -s emulator-5554 emu avd name | head -1)
     echo "Boot completed" && sleep 1
     echo -e "\nSnapshot saved"
+
+    # Kill emulator
+    ../scripts/kill_emulators.sh
 else
     echo -e "\nChecking for AVD..."
     if [ $(emulator -list-avds | grep -ow "${avd_name}" | wc -w) -ne 1 ]; then
