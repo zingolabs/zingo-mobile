@@ -242,8 +242,6 @@ jobs:
           key: native-rust-${{ matrix.abi }}-${{ env.CACHE-KEY }}
           fail-on-cache-miss: true
       
-      - run: yarn install
-
       - name: Create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
         run: ./scripts/integration_tests.sh -a ${{ matrix.avd-arch }} -s
