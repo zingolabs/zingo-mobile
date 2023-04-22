@@ -162,6 +162,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
                       {!tx.address && <RegText>{'Unknown'}</RegText>}
                       {!expandAddress && !!tx.address && <RegText>{Utils.trimToSmall(txd.address, 10)}</RegText>}
                       {expandAddress &&
+                        !!tx.address &&
                         Utils.splitStringIntoChunks(txd.address, Number(numLines.toFixed(0))).map(
                           (c: string, idx: number) => <RegText key={idx}>{c}</RegText>,
                         )}
