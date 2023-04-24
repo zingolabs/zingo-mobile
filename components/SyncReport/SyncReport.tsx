@@ -94,11 +94,19 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
     - wallet_1 : first block of the sync process (end_block)
     - wallet_2 : current block of the sync process
     - wallet_3 : empty part of the wallet bar
+
+    EDGE case: sometimes when you restore from seed & you don't remember the
+    birthday the sync process have to start from 419200... so your wallet have
+    this birthday. But sometimes in some point of the sync process the server can
+    give you the real birthday... so the process start point is older than the
+    birthday, even if it seems wrong/weird, this screen show the right info.
   */
 
   let wallet_1: number =
     syncingStatusReport.process_end_block && birthday_plus_1
-      ? syncingStatusReport.process_end_block - birthday_plus_1 || 0
+      ? syncingStatusReport.process_end_block > birthday_plus_1
+        ? syncingStatusReport.process_end_block - birthday_plus_1 || 0
+        : syncingStatusReport.process_end_block
       : 0;
   let wallet_2: number =
     syncingStatusReport.currentBlock && syncingStatusReport.process_end_block
@@ -388,7 +396,11 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
                       marginTop: 10,
                     }}>
                     <>
-                      <Text style={{ color: colors.primary }}>{walletSeed.birthday}</Text>
+                      <Text style={{ color: colors.primary }}>
+                        {syncingStatusReport.process_end_block > birthday_plus_1
+                          ? walletSeed.birthday
+                          : syncingStatusReport.process_end_block}
+                      </Text>
                       <Text style={{ color: colors.primary }}>{syncingStatusReport.lastBlockServer}</Text>
                     </>
                   </View>
