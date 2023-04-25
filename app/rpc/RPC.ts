@@ -3,7 +3,7 @@ import {
   TotalBalanceClass,
   AddressClass,
   TransactionType,
-  TxDetailType,
+  TxDetailType as OutgoingTxDetailType,
   InfoType,
   SendJsonToTypeType,
   WalletSeedType,
@@ -281,20 +281,22 @@ export default class RPC {
   // We combine detailed transactions if they are sent to the same outgoing address in the same txid. This
   // is usually done to split long memos.
   // Remember to add up both amounts and combine memos
-  static rpc_combineTxDetails(txdetails: TxDetailType[]): TxDetailType[] {
+  static rpc_combineTxDetails(txdetails: OutgoingTxDetailType[]): OutgoingTxDetailType[] {
     // First, group by outgoing address.
-    const m = new Map<string, TxDetailType[]>();
+    const m = new Map<string, OutgoingTxDetailType[]>();
     txdetails.forEach(i => {
       const coll = m.get(i.address);
       if (!coll) {
         m.set(i.address, [i]);
       } else {
+        // TODO: Check whether this is still necessary now that zingolib groups multiple sends to the 
+        // same address within a transaction, into a single transaction.
         coll.push(i);
       }
     });
 
     // Reduce the groups to a single TxDetail, combining memos and summing amounts
-    const reducedDetailedTxns: TxDetailType[] = [];
+    const reducedDetailedTxns: OutgoingTxDetailType[] = [];
     m.forEach((txns, toaddr) => {
       const totalAmount = txns.reduce((sum, i) => sum + i.amount, 0);
 
@@ -313,7 +315,7 @@ export default class RPC {
         .sort((a, b) => a.num - b.num)
         .map(a => a.memo);
 
-      const detail: TxDetailType = {
+      const detail: OutgoingTxDetailType = {
         address: toaddr,
         amount: totalAmount,
         memo: memos && memos.length > 0 ? memos.join('') : undefined,
@@ -981,10 +983,10 @@ export default class RPC {
       //console.log('--------------------------------------------------');
       //}
 
-      var txdetail: TxDetailType[] = [];
+      var txdetail: OutgoingTxDetailType[] = [];
       if (tx.outgoing_metadata) {
-        const dts: TxDetailType[] = tx.outgoing_metadata.map((o: RPCOutgoingMetadataType) => {
-          const detail: TxDetailType = {
+        const dts: OutgoingTxDetailType[] = tx.outgoing_metadata.map((o: RPCOutgoingMetadataType) => {
+          const detail: OutgoingTxDetailType = {
             address: o.address || '',
             amount: (o.value || 0) / 10 ** 8,
             memo: o.memo,
@@ -995,7 +997,7 @@ export default class RPC {
 
         txdetail = RPC.rpc_combineTxDetails(dts);
       } else {
-        const detail: TxDetailType = {
+        const detail: OutgoingTxDetailType = {
           address: tx.address || '',
           amount: (tx.amount || 0) / 10 ** 8,
           memo: tx.memo,
