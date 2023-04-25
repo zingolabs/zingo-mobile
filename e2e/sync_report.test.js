@@ -9,7 +9,9 @@ describe('Renders Sync Report data (blocks & batches) correctly.', () => {
   it('loads a wallet', loadTestWallet);
   
   it('When App go to background & back to foreground -> Report Screen: blocks & batches are aligned', async () => {
+    await waitFor(element(by.id('header.drawmenu'))).toBeVisible().withTimeout(20000);
     await element(by.id('header.drawmenu')).tap();
+    await waitFor(element(by.id('menu.syncreport'))).toBeVisible().withTimeout(20000);
     await element(by.id('menu.syncreport')).tap();
 
     // waiting for starting the sync process
