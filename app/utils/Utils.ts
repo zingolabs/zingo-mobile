@@ -2,9 +2,11 @@ import { getNumberFormatSettings } from 'react-native-localize';
 import { ZecAmountSplitType } from './ZecAmountSplitType';
 
 export default class Utils {
-  static trimToSmall(addr: string, numChars?: number): string {
+  static trimToSmall(addr?: string, numChars?: number): string {
+    if (!addr) {
+      return '';
+    }
     const trimSize = numChars || 5;
-
     return `${addr.slice(0, trimSize)}...${addr.slice(addr.length - trimSize)}`;
   }
 

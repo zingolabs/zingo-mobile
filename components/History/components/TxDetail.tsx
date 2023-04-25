@@ -98,11 +98,11 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
           <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
             <View style={{ display: 'flex' }}>
               <FadeText>{translate('history.time') as string}</FadeText>
-              <RegText>{moment((tx.time || 0) * 1000).format('YYYY MMM D h:mm a')}</RegText>
+              <RegText>{tx.time ? moment((tx.time || 0) * 1000).format('YYYY MMM D h:mm a') : '--'}</RegText>
             </View>
             <View style={{ display: 'flex', alignItems: 'flex-end' }}>
               <FadeText>{translate('history.confirmations') as string}</FadeText>
-              <RegText>{tx.confirmations.toString()}</RegText>
+              <RegText>{tx.confirmations ? tx.confirmations.toString() : '-'}</RegText>
             </View>
           </View>
 
@@ -116,8 +116,9 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
                   setExpandTxid(true);
                 }
               }}>
-              {!expandTxid && <RegText>{Utils.trimToSmall(tx.txid, 10)}</RegText>}
-              {expandTxid && (
+              {!tx.txid && <RegText>{'Unknown'}</RegText>}
+              {!expandTxid && !!tx.txid && <RegText>{Utils.trimToSmall(tx.txid, 10)}</RegText>}
+              {expandTxid && !!tx.txid && (
                 <>
                   <RegText>{tx.txid}</RegText>
                   <TouchableOpacity onPress={() => handleTxIDClick(tx.txid)}>
@@ -158,11 +159,13 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
                       }
                     }}>
                     <View style={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap' }}>
+                      {!tx.address && <RegText>{'Unknown'}</RegText>}
+                      {!expandAddress && !!tx.address && <RegText>{Utils.trimToSmall(txd.address, 10)}</RegText>}
                       {expandAddress &&
+                        !!tx.address &&
                         Utils.splitStringIntoChunks(txd.address, Number(numLines.toFixed(0))).map(
                           (c: string, idx: number) => <RegText key={idx}>{c}</RegText>,
                         )}
-                      {!expandAddress && <RegText>{Utils.trimToSmall(txd.address, 10)}</RegText>}
                     </View>
                   </TouchableOpacity>
                 </View>

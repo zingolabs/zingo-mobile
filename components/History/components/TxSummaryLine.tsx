@@ -38,7 +38,9 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
   moment.locale(language);
 
   const displayAddress =
-    tx.detailedTxns && tx.detailedTxns.length > 0 ? Utils.trimToSmall(tx.detailedTxns[0].address, 7) : 'Unknown';
+    tx.detailedTxns && tx.detailedTxns.length > 0 && tx.detailedTxns[0].address
+      ? Utils.trimToSmall(tx.detailedTxns[0].address, 7)
+      : 'Unknown';
 
   return (
     <View testID={`transactionList.${index + 1}`} style={{ display: 'flex', flexDirection: 'column' }}>
@@ -82,7 +84,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
               <FadeText>
                 {tx.type === 'sent' ? (translate('history.sent') as string) : (translate('history.receive') as string)}
               </FadeText>
-              <FadeText>{moment((tx.time || 0) * 1000).format('MMM D, h:mm a')}</FadeText>
+              <FadeText>{tx.time ? moment((tx.time || 0) * 1000).format('MMM D, h:mm a') : '--'}</FadeText>
             </View>
           </View>
           <ZecAmount
