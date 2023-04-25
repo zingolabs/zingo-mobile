@@ -10,8 +10,9 @@ describe('Change the Server.', () => {
   
   it('Go settings & change to an existent server in the list.', async () => {
     // go to setting modal screen
-    await waitFor(element(by.id('header.drawmenu'))).toBeVisible().withTimeout(100000);
+    await waitFor(element(by.id('header.drawmenu'))).toBeVisible().withTimeout(20000);
     await element(by.id('header.drawmenu')).tap();
+    await waitFor(element(by.id('menu.settings'))).toBeVisible().withTimeout(20000);
     await element(by.id('menu.settings')).tap();
 
     // scrolling until find the second server field
