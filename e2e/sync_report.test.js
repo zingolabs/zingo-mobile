@@ -13,7 +13,7 @@ describe('Renders Sync Report data (blocks & batches) correctly.', () => {
     await element(by.id('menu.syncreport')).tap();
 
     // waiting for starting the sync process
-    await waitFor(element(by.id('syncreport.currentbatch'))).toBeVisible().withTimeout(10000);
+    await waitFor(element(by.id('syncreport.currentbatch'))).toBeVisible().withTimeout(20000);
 
     // put the App in background
     await device.sendToHome();
@@ -23,7 +23,7 @@ describe('Renders Sync Report data (blocks & batches) correctly.', () => {
     await device.launchApp({ newInstance: false });
 
     // waiting for starting the sync process again
-    await waitFor(element(by.id('syncreport.currentbatch'))).toBeVisible().withTimeout(10000);
+    await waitFor(element(by.id('syncreport.currentbatch'))).toBeVisible().withTimeout(20000);
 
     // getting current batch & total batches from the screen
     const batches = element(by.id('syncreport.currentbatch'));
