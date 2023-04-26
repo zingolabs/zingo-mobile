@@ -9,13 +9,13 @@ describe('Renders Sync Report data (blocks & batches) correctly.', () => {
   it('loads a wallet', loadTestWallet);
   
   it('When App go to background & back to foreground -> Report Screen: blocks & batches are aligned', async () => {
-    await waitFor(element(by.id('header.drawmenu'))).toBeVisible().withTimeout(20000);
+    await waitFor(element(by.id('header.drawmenu'))).toBeVisible().withTimeout(sync_timeout);
     await element(by.id('header.drawmenu')).tap();
-    await waitFor(element(by.id('menu.syncreport'))).toBeVisible().withTimeout(20000);
+    await waitFor(element(by.id('menu.syncreport'))).toBeVisible().withTimeout(sync_timeout);
     await element(by.id('menu.syncreport')).tap();
 
     // waiting for starting the sync process
-    await waitFor(element(by.id('syncreport.currentbatch'))).toBeVisible().withTimeout(20000);
+    await waitFor(element(by.id('syncreport.currentbatch'))).toBeVisible().withTimeout(sync_timeout);
 
     // put the App in background
     await device.sendToHome();
@@ -25,7 +25,7 @@ describe('Renders Sync Report data (blocks & batches) correctly.', () => {
     await device.launchApp({ newInstance: false });
 
     // waiting for starting the sync process again
-    await waitFor(element(by.id('syncreport.currentbatch'))).toBeVisible().withTimeout(20000);
+    await waitFor(element(by.id('syncreport.currentbatch'))).toBeVisible().withTimeout(sync_timeout);
 
     // getting current batch & total batches from the screen
     const batches = element(by.id('syncreport.currentbatch'));
