@@ -560,7 +560,17 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
   setInfo = (newInfo: InfoType) => {
     if (!isEqual(this.state.info, newInfo)) {
-      this.setState({ info: newInfo });
+      let newNewInfo = newInfo;
+      // if currencyName is empty,
+      // I need to rescue the last value from the state.
+      if (!newNewInfo.currencyName) {
+        const { info } = this.state;
+        const { currencyName } = info;
+        if (currencyName) {
+          newNewInfo.currencyName = currencyName;
+        }
+      }
+      this.setState({ info: newNewInfo });
     }
   };
 
