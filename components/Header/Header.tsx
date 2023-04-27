@@ -88,12 +88,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             flexDirection: 'row',
             margin: 0,
           }}>
-          <ZecAmount
-            currencyName={info.currencyName ? info.currencyName : ''}
-            color={balanceColor}
-            size={36}
-            amtZec={totalBalance.total}
-          />
+          <ZecAmount currencyName={info.currencyName} color={balanceColor} size={36} amtZec={totalBalance.total} />
           {totalBalance.total > 0 && (totalBalance.privateBal > 0 || totalBalance.transparentBal > 0) && (
             <TouchableOpacity onPress={() => poolsMoreInfoOnClick && poolsMoreInfoOnClick()}>
               <View
@@ -153,37 +148,37 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         </View>
         {!noSyncingStatus && (
           <>
-            <View
-              style={{
-                alignItems: 'center',
-                justifyContent: 'center',
-                margin: 0,
-                marginRight: 5,
-                padding: 1,
-                borderColor: colors.primary,
-                borderWidth: 1,
-                borderRadius: 10,
-                minWidth: 20,
-                minHeight: 20,
-              }}>
-              {!syncStatusDisplayLine && syncingStatus.synced && (
-                <View testID="header.checkIcon" style={{ margin: 0, padding: 0 }}>
-                  <FontAwesomeIcon icon={faCheck} color={colors.primary} />
-                </View>
-              )}
-              {!syncStatusDisplayLine && !syncingStatus.synced && (
-                <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
-                  <FontAwesomeIcon icon={faStop} color={colors.zingo} size={12} />
-                </TouchableOpacity>
-              )}
-              {syncStatusDisplayLine && (
-                <TouchableOpacity
-                  testID="header.playIcon"
-                  onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
-                  <FontAwesomeIcon icon={faPlay} color={colors.primary} size={10} />
-                </TouchableOpacity>
-              )}
-            </View>
+            {netInfo.isConnected && (
+              <View
+                style={{
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: 0,
+                  marginRight: 5,
+                  padding: 1,
+                  borderColor: colors.primary,
+                  borderWidth: 1,
+                  borderRadius: 10,
+                  minWidth: 20,
+                  minHeight: 20,
+                }}>
+                {!syncStatusDisplayLine && syncingStatus.synced && (
+                  <View style={{ margin: 0, padding: 0 }}>
+                    <FontAwesomeIcon icon={faCheck} color={colors.primary} />
+                  </View>
+                )}
+                {!syncStatusDisplayLine && !syncingStatus.synced && (
+                  <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
+                    <FontAwesomeIcon icon={faStop} color={colors.zingo} size={12} />
+                  </TouchableOpacity>
+                )}
+                {syncStatusDisplayLine && (
+                  <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
+                    <FontAwesomeIcon icon={faPlay} color={colors.primary} size={10} />
+                  </TouchableOpacity>
+                )}
+              </View>
+            )}
             {(!netInfo.isConnected || netInfo.type === NetInfoStateType.cellular || netInfo.isConnectionExpensive) && (
               <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
                 <FontAwesomeIcon icon={faCloudDownload} color={!netInfo.isConnected ? 'red' : 'yellow'} size={20} />
