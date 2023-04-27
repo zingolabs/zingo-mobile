@@ -1,11 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect, useState } from 'react';
-import { View, ScrollView, SafeAreaView, TouchableOpacity, TextInput } from 'react-native';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import { View, ScrollView, SafeAreaView, TouchableOpacity, TextInput, Keyboard } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faDotCircle } from '@fortawesome/free-solid-svg-icons';
 import { faCircle as farCircle } from '@fortawesome/free-regular-svg-icons';
 import Toast from 'react-native-simple-toast';
+import Animated, { EasingNode } from 'react-native-reanimated';
 
 import RegText from '../Components/RegText';
 import FadeText from '../Components/FadeText';
@@ -90,6 +91,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [sendAll, setSendAll] = useState(sendAllContext);
   const [customIcon, setCustomIcon] = useState(farCircle);
   const [disabled, setDisabled] = useState<boolean | undefined>();
+  const [titleViewHeight, setTitleViewHeight] = useState(0);
+
+  const slideAnim = useRef(new Animated.Value(0)).current;
 
   moment.locale(language);
 
@@ -110,6 +114,30 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       set_server_option('server', serverContext);
     }
   }, [disabled, serverContext, set_server_option, translate]);
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
+      Animated.timing(slideAnim, {
+        toValue: 0 - titleViewHeight + 25,
+        duration: 100,
+        easing: EasingNode.linear,
+        //useNativeDriver: true,
+      }).start();
+    });
+    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 100,
+        easing: EasingNode.linear,
+        //useNativeDriver: true,
+      }).start();
+    });
+
+    return () => {
+      !!keyboardDidShowListener && keyboardDidShowListener.remove();
+      !!keyboardDidHideListener && keyboardDidHideListener.remove();
+    };
+  }, [slideAnim, titleViewHeight]);
 
   const saveSettings = async () => {
     let serverParsed = server;
@@ -253,7 +281,20 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         height: '100%',
         backgroundColor: colors.background,
       }}>
-      <Header title={translate('settings.title') as string} noBalance={true} noSyncingStatus={true} noDrawMenu={true} />
+      <Animated.View style={{ marginTop: slideAnim }}>
+        <View
+          onLayout={e => {
+            const { height } = e.nativeEvent.layout;
+            setTitleViewHeight(height);
+          }}>
+          <Header
+            title={translate('settings.title') as string}
+            noBalance={true}
+            noSyncingStatus={true}
+            noDrawMenu={true}
+          />
+        </View>
+      </Animated.View>
 
       <ScrollView
         testID="settings.scrollView"
