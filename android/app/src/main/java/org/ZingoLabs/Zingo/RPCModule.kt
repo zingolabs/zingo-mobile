@@ -182,14 +182,24 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun deleteExistingWallet(promise: Promise) {
-        MainApplication.getAppContext()!!.deleteFile("wallet.dat")
-        promise.resolve(true)
+        val file = MainApplication.getAppContext()?.getFileStreamPath("wallet.dat")
+        val isDeteled = file?.delete()
+        if (isDeteled == true) {
+            promise.resolve(true)
+        } else {
+            promise.resolve(false)
+        }
     }
 
     @ReactMethod
     fun deleteExistingWalletBackup(promise: Promise) {
-        MainApplication.getAppContext()!!.deleteFile("wallet.backup.dat")
-        promise.resolve(true)
+        val file = MainApplication.getAppContext()?.getFileStreamPath("wallet.backup.dat")
+        val isDeteled = file?.delete()
+        if (isDeteled == true) {
+            promise.resolve(true)
+        } else {
+            promise.resolve(false)
+        }
     }
 
 
