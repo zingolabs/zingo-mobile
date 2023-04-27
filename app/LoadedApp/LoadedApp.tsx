@@ -822,9 +822,9 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     // no need to do backups of the wallets.
     let resultStr = '';
     if (info.currencyName === 'TAZ') {
-      (await this.rpc.changeWalletNoBackup()) as string;
+      resultStr = (await this.rpc.changeWalletNoBackup()) as string;
     } else {
-      (await this.rpc.changeWallet()) as string;
+      resultStr = (await this.rpc.changeWallet()) as string;
     }
 
     //console.log("jc change", resultStr);
