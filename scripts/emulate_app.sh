@@ -196,7 +196,7 @@ sdkmanager --licenses
 
 if [[ $create_snapshot == true ]]; then
     echo -e "\nCreating AVD..."
-    echo no | avdmanager create avd --force --name "${avd_name}" --package "${sdk}" --device "${avd_skin}" --skin "${avd_skin}"
+    echo no | avdmanager create avd --force --name "${avd_name}" --package "${sdk}" --device "${avd_skin}"
 
     echo -e "\n\nWaiting for emulator to launch..."
     emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
@@ -218,7 +218,7 @@ else
     if [ $(emulator -list-avds | grep -ow "${avd_name}" | wc -w) -ne 1 ]; then
         echo "AVD not found"
         echo -e "\nCreating AVD..."
-        echo no | avdmanager create avd --force --name "${avd_name}" --package "${sdk}" --device "${avd_skin}" --skin "${avd_skin}"
+        echo no | avdmanager create avd --force --name "${avd_name}" --package "${sdk}" --device "${avd_skin}"
         echo -e "\n\nTo create a quick-boot snapshot use the '-s' flag"
         echo "Try '$(basename $0) -h' for more information."
     else
