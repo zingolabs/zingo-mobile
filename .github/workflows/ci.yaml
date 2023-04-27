@@ -314,7 +314,7 @@ jobs:
       
       - run: yarn install
       
-      - run: nohup yarn react-native start > "out.yarn_react_native_start" &
+      - run: nohup yarn react-native start > "yarn_react_native_start.out" &
       
       - name: Run Detox Build
         run: yarn detox build -c android.emu.debug -n test
