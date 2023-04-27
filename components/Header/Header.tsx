@@ -167,7 +167,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 minHeight: 20,
               }}>
               {!syncStatusDisplayLine && syncingStatus.synced && (
-                <View style={{ margin: 0, padding: 0 }}>
+                <View testID="header.checkIcon" style={{ margin: 0, padding: 0 }}>
                   <FontAwesomeIcon icon={faCheck} color={colors.primary} />
                 </View>
               )}
@@ -177,7 +177,9 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 </TouchableOpacity>
               )}
               {syncStatusDisplayLine && (
-                <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
+                <TouchableOpacity
+                  testID="header.playIcon"
+                  onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
                   <FontAwesomeIcon icon={faPlay} color={colors.primary} size={10} />
                 </TouchableOpacity>
               )}

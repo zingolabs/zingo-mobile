@@ -272,7 +272,9 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     this.clearToAddr();
 
     // Configure the RPC to start doing refreshes
-    this.rpc.configure();
+    (async () => {
+      await this.rpc.configure();
+    })();
 
     this.dim = Dimensions.addEventListener('change', ({ screen }) => {
       this.setDimensions(screen);
@@ -289,7 +291,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
         }
         this.rpc.setInRefresh(false);
         this.rpc.clearTimers();
-        this.rpc.configure();
+        await this.rpc.configure();
         // setting value for background task Android
         await AsyncStorage.setItem('@background', 'no');
       }
@@ -658,10 +660,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     await this.rpc.fetchTotalBalance();
   };
 
-  clearTimers = () => {
-    this.rpc.clearTimers();
-  };
-
   toggleMenuDrawer = () => {
     this.setState({
       isMenuDrawerOpen: !this.state.isMenuDrawerOpen,
@@ -686,7 +684,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   };
 
   onMenuItemSelected = async (item: string) => {
-    const { info } = this.state;
     this.setState({
       isMenuDrawerOpen: false,
       selectedMenuDrawerItem: item,
@@ -712,10 +709,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     } else if (item === 'Change Wallet') {
       this.setState({ seedChangeModalVisible: true });
     } else if (item === 'Restore Wallet Backup') {
-      if (info.currencyName && info.currencyName !== 'ZEC') {
-        Toast.show(this.props.translate('loadedapp.restoremainnet-error') as string, Toast.LONG);
-        return;
-      }
       this.setState({ seedBackupModalVisible: true });
     }
   };
@@ -728,46 +721,49 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   };
 
   set_server_option = async (name: 'server' | 'currency' | 'language' | 'sendAll', value: string): Promise<void> => {
-    const resultStrServer: string = await RPCModule.execute('changeserver', value);
-    if (resultStrServer.toLowerCase().startsWith('error')) {
-      //console.log(`Error change server ${value} - ${resultStrServer}`);
-      Toast.show(`${this.props.translate('loadedapp.changeservernew-error')} ${value}`, Toast.LONG);
-      return;
-    } else {
-      //console.log(`change server ok ${value}`);
-    }
-
+    // here I know the server was changed, clean all the tasks before anything.
+    this.rpc.clearTimers();
+    this.setState({
+      syncingStatusReport: new SyncingStatusReportClass(),
+      syncingStatus: {} as SyncingStatusType,
+    });
     this.rpc.setInRefresh(false);
+    // when I try to open the wallet in the new server:
+    // - the seed doesn't exists (the type of sever is different `mainnet` / `testnet` / `regtest` ...).
+    //   The App have to go to the initial screen
+    // - the seed exists and the App can open the wallet in the new server.
+    //   But I have to restart the sync if needed.
     const error = await RPCModule.loadExistingWallet(value);
     if (!error.toLowerCase().startsWith('error')) {
       // Load the wallet and navigate to the transactions screen
-      //console.log(`wallet loaded ok ${value}`);
+      console.log(`wallet loaded ok ${value}`);
+      Toast.show(`${this.props.translate('loadedapp.readingwallet')} ${value}`, Toast.LONG);
       await SettingsFileImpl.writeSettings(name, value);
       this.setState({
         server: value,
       });
+      // the server is changed, the App needs to restart the timeout tasks from the beginning
+      await this.rpc.configure();
       // Refetch the settings to update
-      this.rpc.fetchWalletSettings();
+      await this.rpc.fetchWalletSettings();
       return;
     } else {
+      // I need to open the modal ASAP.
+      this.setState({
+        seedServerModalVisible: true,
+      });
       //console.log(`Error Reading Wallet ${value} - ${error}`);
       Toast.show(`${this.props.translate('loadedapp.readingwallet-error')} ${value}`, Toast.LONG);
 
+      // we need to restore the old server because the new doesn't have the seed of the current wallet.
       const old_settings = await SettingsFileImpl.readSettings();
-      const resultStr: string = await RPCModule.execute('changeserver', old_settings.server);
-      if (resultStr.toLowerCase().startsWith('error')) {
-        //console.log(`Error change server ${old_settings.server} - ${resultStr}`);
-        Toast.show(`${this.props.translate('loadedapp.changeserverold-error')} ${value}`, Toast.LONG);
-        //return;
-      } else {
-        //console.log(`change server ok ${old_settings.server} - ${resultStr}`);
-      }
+      await RPCModule.execute('changeserver', old_settings.server);
 
-      // go to the seed screen for changing the wallet for another in the new server
-      await this.fetchWalletSeedAndBirthday();
+      // go to the seed screen for changing the wallet for another in the new server or cancel this action.
+      this.fetchWalletSeedAndBirthday();
       this.setState({
-        seedServerModalVisible: true,
         newServer: value,
+        server: old_settings.server,
       });
     }
   };
@@ -854,23 +850,17 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   };
 
   onClickOKServerWallet = async () => {
-    const resultStr: string = await RPCModule.execute('changeserver', this.state.newServer);
-    if (resultStr.toLowerCase().startsWith('error')) {
-      //console.log(`Error change server ${value} - ${resultStr}`);
-      Toast.show(`${this.props.translate('loadedapp.changeservernew-error')} ${resultStr}`, Toast.LONG);
-      return;
-    } else {
-      //console.log(`change server ok ${value}`);
-    }
+    const { info } = this.state;
 
     if (this.state.newServer) {
+      await RPCModule.execute('changeserver', this.state.newServer);
+
       await SettingsFileImpl.writeSettings('server', this.state.newServer);
       this.setState({
         server: this.state.newServer,
+        newServer: '',
       });
     }
-
-    const { info } = this.state;
 
     const resultStr2 =
       info.currencyName && info.currencyName !== 'ZEC'
@@ -883,8 +873,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       //return;
     }
 
-    this.rpc.setInRefresh(false);
     this.setState({ seedServerModalVisible: false });
+    // no need to restart the tasks because is about to restart the app.
     this.navigateToLoading();
   };
 
@@ -1124,7 +1114,11 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
               }>
               <Seed
                 onClickOK={() => this.onClickOKServerWallet()}
-                onClickCancel={() => this.setState({ seedServerModalVisible: false })}
+                onClickCancel={async () => {
+                  // restart all the tasks again, nothing happen.
+                  await this.rpc.configure();
+                  this.setState({ seedServerModalVisible: false });
+                }}
                 action={'server'}
               />
             </Suspense>

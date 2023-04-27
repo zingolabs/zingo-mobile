@@ -10,7 +10,7 @@ import Toast from 'react-native-simple-toast';
 import RegText from '../Components/RegText';
 import FadeText from '../Components/FadeText';
 import BoldText from '../Components/BoldText';
-import { parseServerURI, serverUris } from '../../app/uris';
+import { checkServerURI, parseServerURI, serverUris } from '../../app/uris';
 import Button from '../Components/Button';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
@@ -89,6 +89,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [language, setLanguage] = useState(languageContext);
   const [sendAll, setSendAll] = useState(sendAllContext);
   const [customIcon, setCustomIcon] = useState(farCircle);
+  const [disabled, setDisabled] = useState<boolean | undefined>();
 
   moment.locale(language);
 
@@ -96,11 +97,26 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     setCustomIcon(serverUris().find((s: string) => s === server) ? farCircle : faDotCircle);
   }, [server]);
 
+  useEffect(() => {
+    // start checking the new server
+    if (disabled) {
+      Toast.show(translate('loadedapp.tryingnewserver') as string, Toast.SHORT);
+    }
+    // if the server cheking takes more then 30 seconds.
+    if (!disabled && disabled !== undefined) {
+      Toast.show(translate('loadedapp.tryingnewserver-error') as string, Toast.LONG);
+      // in this point the sync process is blocked, who knows why.
+      // if I save the actual server before the customization... is going to work.
+      set_server_option('server', serverContext);
+    }
+  }, [disabled, serverContext, set_server_option, translate]);
+
   const saveSettings = async () => {
+    let serverParsed = server;
     if (
       walletSettings.download_memos === memos &&
       walletSettings.transaction_filter_threshold === filter &&
-      serverContext === server &&
+      serverContext === serverParsed &&
       currencyContext === currency &&
       languageContext === language &&
       sendAllContext === sendAll
@@ -116,7 +132,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       Toast.show(translate('settings.isthreshold') as string, Toast.LONG);
       return;
     }
-    if (!server) {
+    if (!serverParsed) {
       Toast.show(translate('settings.isserver') as string, Toast.LONG);
       return;
     }
@@ -124,15 +140,46 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       Toast.show(translate('settings.islanguage') as string, Toast.LONG);
       return;
     }
-    const result = parseServerURI(server);
-    if (result.toLowerCase().startsWith('error')) {
-      Toast.show(translate('settings.isuri') as string, Toast.LONG);
-      return;
+
+    if (serverContext !== serverParsed) {
+      const resultUri = parseServerURI(serverParsed);
+      if (resultUri.toLowerCase().startsWith('error')) {
+        Toast.show(translate('settings.isuri') as string, Toast.LONG);
+        return;
+      } else {
+        // url-parse sometimes is too wise, and if you put:
+        // server: `http:/zec-server.com:9067` the parser understand this. Good.
+        // but this value will be store in the settings and the value is wrong.
+        // so, this function if everything is OK return the URI well formmatted.
+        // and I save it in the state ASAP.
+        if (serverParsed !== resultUri) {
+          serverParsed = resultUri;
+          setServer(resultUri);
+        }
+      }
     }
 
     if (!netInfo.isConnected) {
       Toast.show(translate('loadedapp.connection-error') as string, Toast.LONG);
       return;
+    }
+
+    if (serverContext !== serverParsed) {
+      setDisabled(true);
+      const resultServer = await checkServerURI(serverParsed, serverContext, setDisabled);
+      // if disabled is true  -> fast response -> show the toast with the error
+      // if disabled is false -> 30 seconds error before this task end -> don't show the error,
+      //                         it was showed before.
+      if (!resultServer) {
+        if (disabled) {
+          Toast.show(translate('loadedapp.changeservernew-error') as string, Toast.LONG);
+        }
+        // in this point the sync process is blocked, who knows why.
+        // if I save the actual server before the customization... is going to work.
+        set_server_option('server', serverContext);
+        setDisabled(undefined);
+        return;
+      }
     }
 
     if (walletSettings.download_memos !== memos) {
@@ -147,19 +194,24 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     if (sendAllContext !== sendAll) {
       await set_sendAll_option('sendAll', sendAll);
     }
-    // the last one
-    if (serverContext !== server) {
+
+    // I need a little time in this modal because maybe the wallet cannot be open with the new server
+    let ms = 100;
+    if (serverContext !== serverParsed) {
       if (languageContext !== language) {
         await set_language_option('language', language, false);
       }
-      set_server_option('server', server);
+      set_server_option('server', serverParsed);
+      ms = 1500;
     } else {
       if (languageContext !== language) {
         await set_language_option('language', language, true);
       }
     }
 
-    closeModal();
+    setTimeout(() => {
+      closeModal();
+    }, ms);
   };
 
   const optionsRadio = (
@@ -171,6 +223,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     return DATA.map(item => (
       <View key={'view-' + item.value}>
         <TouchableOpacity
+          disabled={disabled}
           style={{ marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
           onPress={() => setOption(typeOption(item.value))}>
           <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
@@ -203,6 +256,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       <Header title={translate('settings.title') as string} noBalance={true} noSyncingStatus={true} noDrawMenu={true} />
 
       <ScrollView
+        testID="settings.scrollView"
         style={{ maxHeight: '85%' }}
         contentContainerStyle={{
           flexDirection: 'column',
@@ -253,9 +307,17 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         </View>
 
         <View style={{ display: 'flex', marginLeft: 25 }}>
-          {serverUris().map((uri: string) =>
+          {serverUris().map((uri: string, i: number) =>
             uri ? (
               <TouchableOpacity
+                testID={
+                  i === 0
+                    ? 'settings.firstServer'
+                    : i === 1
+                    ? 'settings.secondServer'
+                    : 'settings.' + i.toString + '-Server'
+                }
+                disabled={disabled}
                 key={'touch-' + uri}
                 style={{ marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
                 onPress={() => setServer(uri)}>
@@ -271,6 +333,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
           <View style={{ display: 'flex', flexDirection: 'row' }}>
             <TouchableOpacity
+              testID="settings.customServer"
+              disabled={disabled}
               style={{ marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
               onPress={() => setServer('')}>
               <View style={{ display: 'flex', flexDirection: 'row', marginTop: 10 }}>
@@ -294,7 +358,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                   minHeight: 48,
                 }}>
                 <TextInput
-                  placeholder={'... http------.---:--- ...'}
+                  testID="settings.customServerField"
+                  placeholder={'https://------.---:---'}
                   placeholderTextColor={colors.placeholder}
                   style={{
                     color: colors.text,
@@ -306,7 +371,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                   }}
                   value={server}
                   onChangeText={(text: string) => setServer(text)}
-                  editable={true}
+                  editable={!disabled}
                   maxLength={100}
                 />
               </View>
@@ -346,7 +411,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
               }}
               value={filter}
               onChangeText={(text: string) => setFilter(text)}
-              editable={true}
+              editable={!disabled}
               maxLength={6}
             />
           </View>
@@ -368,8 +433,15 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           alignItems: 'center',
           marginVertical: 5,
         }}>
-        <Button type="Primary" title={translate('settings.save') as string} onPress={saveSettings} />
         <Button
+          testID="settings.button.save"
+          disabled={disabled}
+          type="Primary"
+          title={translate('settings.save') as string}
+          onPress={saveSettings}
+        />
+        <Button
+          disabled={disabled}
           type="Secondary"
           title={translate('cancel') as string}
           style={{ marginLeft: 10 }}

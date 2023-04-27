@@ -338,6 +338,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
           marginVertical: 5,
         }}>
         <Button
+          testID="seed.button.OK"
           type="Primary"
           style={{
             backgroundColor: times === 3 ? 'red' : colors.primary,

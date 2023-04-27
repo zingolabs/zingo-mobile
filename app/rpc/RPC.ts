@@ -326,7 +326,7 @@ export default class RPC {
   }
 
   // this is only for the first time when the App is booting.
-  async configure() {
+  async configure(): Promise<void> {
     // every minute the App try to Sync the new blocks.
     if (!this.refreshTimerID) {
       this.refreshTimerID = setInterval(() => this.refresh(false), 30 * 1000); // 30 seconds
@@ -347,7 +347,7 @@ export default class RPC {
     }, 1000);
   }
 
-  clearTimers() {
+  clearTimers(): void {
     if (this.refreshTimerID) {
       clearInterval(this.refreshTimerID);
       this.refreshTimerID = undefined;
@@ -473,12 +473,12 @@ export default class RPC {
   async refresh(fullRefresh: boolean, fullRescan?: boolean) {
     // If we're in refresh, we don't overlap
     if (this.inRefresh) {
-      //console.log('in refresh is true');
+      console.log('in refresh is true');
       return;
     }
 
     if (this.syncStatusTimerID) {
-      //console.log('syncStatusTimerID exists already');
+      console.log('syncStatusTimerID exists already');
       return;
     }
 
@@ -489,7 +489,7 @@ export default class RPC {
     await this.fetchWalletBirthday();
     await this.fetchServerHeight();
     if (!this.lastServerBlockHeight) {
-      //console.log('the last server block is zero');
+      console.log('the last server block is zero');
       return;
     }
 
@@ -536,10 +536,12 @@ export default class RPC {
         const ss = await JSON.parse(s);
 
         //console.log('sync wallet birthday', this.walletBirthday);
-        //console.log('sync status', ss);
+        console.log('sync', this.syncStatusTimerID, 'status', ss);
 
         // syncronize status
-        this.inRefresh = ss.in_progress;
+        if (this.syncStatusTimerID) {
+          this.inRefresh = ss.in_progress;
+        }
 
         // if the sync_id change then reset the %
         if (this.prev_sync_id !== ss.sync_id) {
@@ -800,7 +802,7 @@ export default class RPC {
       }, 5000);
     } else {
       // Already at the latest block
-      //console.log('Already have latest block, waiting for next refresh');
+      console.log('Already have latest block, waiting for next refresh');
     }
   }
 

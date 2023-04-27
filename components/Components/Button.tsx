@@ -66,7 +66,8 @@ const Button: React.FunctionComponent<ButtonProps> = ({
         ...styleCommon,
         ...style,
       }}
-      onPress={() => !disabled && onPress && onPress()}>
+      disabled={disabled}
+      onPress={() => onPress()}>
       <View
         style={{
           display: 'flex',

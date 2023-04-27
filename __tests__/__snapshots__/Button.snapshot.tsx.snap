@@ -2,6 +2,11 @@
 
 exports[`Component Button - test Button Primary - snapshot 1`] = `
 <View
+  accessibilityState={
+    {
+      "disabled": false,
+    }
+  }
   accessible={true}
   collapsable={false}
   focusable={true}
@@ -62,6 +67,11 @@ exports[`Component Button - test Button Primary - snapshot 1`] = `
 
 exports[`Component Button - test Button Secondary - snapshot 1`] = `
 <View
+  accessibilityState={
+    {
+      "disabled": false,
+    }
+  }
   accessible={true}
   collapsable={false}
   focusable={true}
