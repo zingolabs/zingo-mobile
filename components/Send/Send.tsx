@@ -851,7 +851,10 @@ const Send: React.FunctionComponent<SendProps> = ({
                   Toast.show(translate('loadedapp.connection-error') as string, Toast.LONG);
                   return;
                 }
-                setConfirmModalVisible(true);
+                // waiting while closing the keyboard, just in case.
+                setTimeout(async () => {
+                  setConfirmModalVisible(true);
+                }, 100);
               }}
             />
             <Button

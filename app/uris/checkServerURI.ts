@@ -1,7 +1,12 @@
 import Url from 'url-parse';
 import RPCModule from '../RPCModule';
 
-const checkServerURI = async (uri: string, oldUri: string, setDisabled: (s: boolean) => void): Promise<boolean> => {
+type checkServerURIReturn = {
+  result: boolean;
+  timeout: boolean;
+};
+
+const checkServerURI = async (uri: string, oldUri: string): Promise<checkServerURIReturn> => {
   const parsedUri = new Url(uri, true);
 
   let port = parsedUri.port;
@@ -12,46 +17,51 @@ const checkServerURI = async (uri: string, oldUri: string, setDisabled: (s: bool
     port = uri.includes('lwdv3.zecwallet') ? '443' : '9067';
   }
 
-  console.log(`BEFORE checking server: ${parsedUri.protocol}//${parsedUri.hostname}:${port}`);
+  try {
+    const resultStrServerPromise = RPCModule.execute(
+      'changeserver',
+      `${parsedUri.protocol}//${parsedUri.hostname}:${port}`,
+    );
+    const timeoutServerPromise = new Promise((resolve, reject) => {
+      setTimeout(() => {
+        reject(new Error('Timeout'));
+      }, 30000);
+    });
 
-  // I will give it 30 seconds to try to connect
-  // in my tests I waited a few minutes until I get a timeout
-  // I don't understand this.
-  let task = setTimeout(async () => {
-    console.log('BEFORE restore server exit in 30s');
-    await RPCModule.execute('changeserver', oldUri);
-    console.log('AFTER restore server exit in 30s');
-    setDisabled(false);
-  }, 30000);
-  const resultStrServer: string = await RPCModule.execute(
-    'changeserver',
-    `${parsedUri.protocol}//${parsedUri.hostname}:${port}`,
-  );
-  console.log(resultStrServer);
-  console.log(`AFTER checking server: ${parsedUri.protocol}//${parsedUri.hostname}:${port}`);
-  if (resultStrServer.toLowerCase().startsWith('error')) {
-    console.log(`Error when change server ${resultStrServer}`);
+    const resultStrServer: string = await Promise.race([resultStrServerPromise, timeoutServerPromise]);
+
+    if (resultStrServer.toLowerCase().startsWith('error')) {
+      // I have to restore the old server again. Just in case.
+      await RPCModule.execute('changeserver', oldUri);
+      // error, no timeout
+      return { result: false, timeout: false };
+    } else {
+      // the server is changed
+      const infoStrPromise = RPCModule.execute('info', '');
+      const timeoutInfoPromise = new Promise((resolve, reject) => {
+        setTimeout(() => {
+          reject(new Error('Timeout'));
+        }, 30000);
+      });
+
+      const infoStr: string = await Promise.race([infoStrPromise, timeoutInfoPromise]);
+
+      if (infoStr.toLowerCase().startsWith('error')) {
+        // I have to restore the old server again.
+        await RPCModule.execute('changeserver', oldUri);
+        // error, no timeout
+        return { result: false, timeout: false };
+      }
+    }
+  } catch (error: any) {
     // I have to restore the old server again. Just in case.
     await RPCModule.execute('changeserver', oldUri);
-    clearTimeout(task);
-    return false;
-  } else {
-    // the server is changed
-    console.log('BEFORE info');
-    const infoStr: string = await RPCModule.execute('info', '');
-    console.log(infoStr);
-    console.log('AFTER info');
-    if (infoStr.toLowerCase().startsWith('error')) {
-      console.log('error in info when change server', infoStr);
-      // I have to restore the old server again.
-      await RPCModule.execute('changeserver', oldUri);
-      clearTimeout(task);
-      return false;
-    }
+    // error, YES timeout
+    return { result: false, timeout: true };
   }
 
-  clearTimeout(task);
-  return true;
+  // NO error, no timeout
+  return { result: true, timeout: false };
 };
 
 export default checkServerURI;

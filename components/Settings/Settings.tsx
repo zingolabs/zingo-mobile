@@ -22,7 +22,11 @@ import Header from '../Header';
 type SettingsProps = {
   closeModal: () => void;
   set_wallet_option: (name: string, value: string) => Promise<void>;
-  set_server_option: (name: 'server' | 'currency' | 'language' | 'sendAll', value: string) => Promise<void>;
+  set_server_option: (
+    name: 'server' | 'currency' | 'language' | 'sendAll',
+    value: string,
+    noToast?: boolean,
+  ) => Promise<void>;
   set_currency_option: (name: 'server' | 'currency' | 'language' | 'sendAll', value: string) => Promise<void>;
   set_language_option: (
     name: 'server' | 'currency' | 'language' | 'sendAll',
@@ -90,7 +94,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [language, setLanguage] = useState(languageContext);
   const [sendAll, setSendAll] = useState(sendAllContext);
   const [customIcon, setCustomIcon] = useState(farCircle);
-  const [disabled, setDisabled] = useState<boolean | undefined>();
+  const [disabled, setDisabled] = useState<boolean>();
   const [titleViewHeight, setTitleViewHeight] = useState(0);
 
   const slideAnim = useRef(new Animated.Value(0)).current;
@@ -100,20 +104,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   useEffect(() => {
     setCustomIcon(serverUris().find((s: string) => s === server) ? farCircle : faDotCircle);
   }, [server]);
-
-  useEffect(() => {
-    // start checking the new server
-    if (disabled) {
-      Toast.show(translate('loadedapp.tryingnewserver') as string, Toast.SHORT);
-    }
-    // if the server cheking takes more then 30 seconds.
-    if (!disabled && disabled !== undefined) {
-      Toast.show(translate('loadedapp.tryingnewserver-error') as string, Toast.LONG);
-      // in this point the sync process is blocked, who knows why.
-      // if I save the actual server before the customization... is going to work.
-      set_server_option('server', serverContext);
-    }
-  }, [disabled, serverContext, set_server_option, translate]);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
@@ -194,18 +184,19 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
     if (serverContext !== serverParsed) {
       setDisabled(true);
-      const resultServer = await checkServerURI(serverParsed, serverContext, setDisabled);
-      // if disabled is true  -> fast response -> show the toast with the error
-      // if disabled is false -> 30 seconds error before this task end -> don't show the error,
-      //                         it was showed before.
-      if (!resultServer) {
-        if (disabled) {
-          Toast.show(translate('loadedapp.changeservernew-error') as string, Toast.LONG);
+      Toast.show(translate('loadedapp.tryingnewserver') as string, Toast.SHORT);
+      const { result, timeout } = await checkServerURI(serverParsed, serverContext);
+      if (!result) {
+        // if the server checking takes more then 30 seconds.
+        if (timeout === true) {
+          Toast.show(translate('loadedapp.tryingnewserver-error') as string, Toast.LONG);
+        } else {
+          Toast.show((translate('loadedapp.changeservernew-error') as string) + serverParsed, Toast.LONG);
         }
         // in this point the sync process is blocked, who knows why.
         // if I save the actual server before the customization... is going to work.
-        set_server_option('server', serverContext);
-        setDisabled(undefined);
+        set_server_option('server', serverContext, true);
+        setDisabled(false);
         return;
       }
     }
@@ -269,8 +260,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       </View>
     ));
   };
-
-  //console.log(walletSettings);
 
   return (
     <SafeAreaView
@@ -481,7 +470,12 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           disabled={disabled}
           type="Primary"
           title={translate('settings.save') as string}
-          onPress={saveSettings}
+          onPress={() => {
+            // waiting while closing the keyboard, just in case.
+            setTimeout(async () => {
+              await saveSettings();
+            }, 100);
+          }}
         />
         <Button
           disabled={disabled}
