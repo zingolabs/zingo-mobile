@@ -3,7 +3,7 @@ import {
   TotalBalanceClass,
   AddressClass,
   TransactionType,
-  TxDetailType as OutgoingTxDetailType,
+  OutgoingTxDetailType,
   InfoType,
   SendJsonToTypeType,
   WalletSeedType,

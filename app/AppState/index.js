@@ -15,7 +15,7 @@ import InfoType from './types/InfoType';
 import SendJsonToTypeType from './types/SendJsonToTypeType';
 import TransactionType from './types/TransactionType';
 import SyncingStatusType from './types/SyncingStatusType';
-import TxDetailType from './types/TxDetailType';
+import OutgoingTxDetailType from './types/OutgoingTxDetailType';
 import WalletSeedType from './types/WalletSeedType';
 import zecPriceType from './types/zecPriceType';
 import { TranslateType } from './types/TranslateType';
@@ -40,7 +40,7 @@ export {
   TotalBalanceClass,
   WalletSettingsClass,
   TransactionType,
-  TxDetailType,
+  OutgoingTxDetailType,
   WalletSeedType,
   SyncingStatusType,
   SendJsonToTypeType,

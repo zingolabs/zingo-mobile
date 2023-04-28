@@ -1,4 +1,4 @@
-export default interface TxDetailType {
+export default interface OutgoingTxDetailType {
   address: string;
   amount: number;
   memo?: string;
