@@ -1169,6 +1169,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                       syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
                       poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
                       setZecPrice={this.setZecPrice}
+                      setComputingModalVisible={this.setComputingModalVisible}
                     />
                   </Suspense>
                 </>
