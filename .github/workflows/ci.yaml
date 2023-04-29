@@ -5,6 +5,10 @@ on:
   push:
     branches: [main, dev]
 
+env:
+  maxAttempts: 3
+  rerunFailedOnly: false
+
 jobs:
   jest-test:
     name: Jest test
@@ -176,7 +180,7 @@ jobs:
           key: native-rust-${{ matrix.abi }}-${{ env.CACHE-KEY }}
   
   integration-test:
-    name: Integration test
+    name: "Integration test - Attempt ${{ github.run_attempt }}"
     needs: [ create-timestamp, create-cache-key, cache-native-rust ]
     if: ${{ ! cancelled() }}
     runs-on: macos-12
@@ -203,7 +207,21 @@ jobs:
             avd-arch: x86_64
             # api-level: 30
             # api-target: google_apis_playstore
+    outputs:
+      nextAttempt: ${{ steps.set_output_variables.outputs.nextAttempt }}
+      maxAttempts: ${{ steps.set_output_variables.outputs.maxAttempts }}
+
     steps:
+      - name: Set output variables
+        id: set_output_variables
+        shell: pwsh
+        run: |
+          $attempt = [int]$env:GITHUB_RUN_ATTEMPT
+          $maxAttempts = [int]$env:maxAttempts
+          $nextAttempt = $attempt + 1
+          echo "::set-output name=nextAttempt::$nextAttempt"
+          echo "::set-output name=maxAttempts::$maxAttempts"  
+  
       - name: Checkout repository
         uses: actions/checkout@v3
 
@@ -255,6 +273,37 @@ jobs:
         with:
           name: test-reports-${{ matrix.abi }}-${{ env.TIMESTAMP }}
           path: android/app/build/outputs/integration_test_reports
+
+    rerun_workflow_job:
+    name: "Integration test - Rerun ${{ github.run_id }}"
+    runs-on: ubuntu-latest
+    needs: attempt_job
+    if: failure() && ( needs.attempt_job.outputs.nextAttempt <= needs.attempt_job.outputs.maxAttempts )
+    env:
+      attempt: ${{ needs.attempt_job.outputs.nextAttempt }}
+    steps:
+      - name: "Trigger Attempt ${{ needs.attempt_job.outputs.nextAttempt }}"
+        shell: pwsh
+        env:
+          # GITHUB_TOKEN with actions: write will NOT work
+          # PAT Token must have workflow scope
+          GH_CLI_TOKEN: ${{ secrets.PAT_TOKEN }}
+        run: |
+          echo "Running gh auth login..."
+          $env:GH_CLI_TOKEN | gh auth login --with-token
+          if(!$?) { exit 1 }
+          echo "Triggering rerun attempt $env:nextAttempt"
+          echo "
+          gh workflow run rerun-workflow.yml
+            --raw-field runId=$env:GITHUB_RUN_ID
+            --raw-field rerunFailedOnly=$env:rerunFailedOnly
+            --repo $env:GITHUB_REPOSITORY
+          "
+          gh workflow run rerun-workflow.yml `
+            --raw-field runId=$env:GITHUB_RUN_ID `
+            --raw-field rerunFailedOnly=$env:rerunFailedOnly `
+            --repo $env:GITHUB_REPOSITORY
+          if(!$?) { exit 1 }
  
   e2e-test:
     name: End-to-End Test

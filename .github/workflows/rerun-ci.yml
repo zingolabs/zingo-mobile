@@ -1,0 +1,54 @@
+name: Rerun workflow
+
+on:
+  workflow_dispatch:
+    inputs:
+      runId:
+        required: true
+        type: string
+      rerunFailedOnly:
+        required: false
+        type: boolean
+        default: 'false'
+
+env:
+  runId: ${{ github.event.inputs.runId }}
+  rerunFailedOnly: ${{ github.event.inputs.rerunFailedOnly }}
+
+jobs:
+  retry_workflow_job:
+    name: Rerun ${{ github.event.inputs.runId }}
+    runs-on: ubuntu-latest
+    steps:
+      # Upgrade gh cli to use the --failed parameter (added in version 2.6.0 (2022-03-15))
+      # This takes 1m 30s
+      - name: Upgrade gh cli to latest stable
+        if: github.event.inputs.rerunFailedOnly == 'true'
+        shell: pwsh
+        run: |
+          gh --version
+          brew update
+          brew doctor
+          brew install gh
+          gh --version
+      - name: "Rerun ${{ github.event.inputs.runId }}"
+        shell: pwsh
+        env:
+          # GITHUB_TOKEN with actions: write will NOT work
+          # PAT Token must have workflow scope
+          GH_CLI_TOKEN: ${{ secrets.PAT_TOKEN }}
+        run: |
+          echo "Running gh auth login..."
+          $env:GH_CLI_TOKEN | gh auth login --with-token
+          if(!$?) { exit 1 }
+
+          echo "Retrying run..."
+          $rerunFailedOnly = [Convert]::ToBoolean($env:rerunFailedOnly)
+          if($rerunFailedOnly) {
+            echo "gh run rerun $env:runId --failed --repo $env:GITHUB_REPOSITORY"
+            gh run rerun $env:runId --failed --repo $env:GITHUB_REPOSITORY
+          } else {
+            echo "gh run rerun $env:runId --repo $env:GITHUB_REPOSITORY"
+            gh run rerun $env:runId --repo $env:GITHUB_REPOSITORY
+          }
+          if(!$?) { exit 1 }
