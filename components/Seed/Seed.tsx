@@ -113,10 +113,10 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
         (async () => {
           const resp: string = await RPCModule.getLatestBlock(server);
           //console.log(resp);
-          if (!resp.toLowerCase().startsWith('error')) {
+          if (resp && !resp.toLowerCase().startsWith('error')) {
             setLatestBlock(Number(resp));
           } else {
-            //console.log('error latest block', resp);
+            console.log('error latest block', resp);
           }
         })();
       }

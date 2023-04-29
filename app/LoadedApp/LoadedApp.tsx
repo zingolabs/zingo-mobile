@@ -33,7 +33,6 @@ import {
   SyncingStatusReportClass,
   TotalBalanceClass,
   SendPageStateClass,
-  ReceivePageStateClass,
   InfoType,
   TransactionType,
   ToAddrClass,
@@ -624,7 +623,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       throw err;
     }
   };
-
+  /*
   // Get a single private key for this address, and return it as a string.
   getPrivKeyAsString = async (address: string): Promise<string> => {
     const pk = await RPC.rpc_getPrivKeyAsString(address);
@@ -661,7 +660,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       this.setState({ receivePageState: newReceivePageState });
     }
   };
-
+  */
   doRefresh = async () => {
     await this.rpc.refresh(false);
   };
@@ -743,8 +742,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     //   The App have to go to the initial screen
     // - the seed exists and the App can open the wallet in the new server.
     //   But I have to restart the sync if needed.
-    const error = await RPCModule.loadExistingWallet(value);
-    if (!error.toLowerCase().startsWith('error')) {
+    const result: string = await RPCModule.loadExistingWallet(value);
+    if (result && !result.toLowerCase().startsWith('error')) {
       // Load the wallet and navigate to the transactions screen
       console.log(`wallet loaded ok ${value}`);
       Toast.show(`${this.props.translate('loadedapp.readingwallet')} ${value}`, Toast.LONG);
@@ -948,8 +947,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
     //console.log('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
     //console.log('render LoadedApp', this.state.info);
-    //const res = async () => await RPCModule.execute('testbip', '');
-    //res().then(r => console.log(r));
 
     return (
       <ContextAppLoadedProvider value={this.state}>

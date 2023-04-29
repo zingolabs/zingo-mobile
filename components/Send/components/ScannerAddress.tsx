@@ -31,12 +31,21 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateTo
       Toast.show(translate('loadedapp.connection-error') as string, Toast.LONG);
       return;
     }
-    const result = await RPCModule.execute('parse', scannedAddress);
+    const result: string = await RPCModule.execute('parse', scannedAddress);
+    if (result) {
+      if (result.toLowerCase().startsWith('error')) {
+        Toast.show(`"${scannedAddress}" ${translate('scanner.nozcash-error')}`, Toast.LONG);
+        return;
+      }
+    } else {
+      Toast.show(`"${scannedAddress}" ${translate('scanner.nozcash-error')}`, Toast.LONG);
+      return;
+    }
     const resultJSON = await JSON.parse(result);
 
     //console.log('parse-1', scannedAddress, resultJSON);
 
-    const valid = resultJSON?.status === 'success';
+    const valid = resultJSON.status === 'success';
 
     if (valid) {
       updateToField(scannedAddress, null, null, null, null);
