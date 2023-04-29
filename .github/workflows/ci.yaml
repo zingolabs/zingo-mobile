@@ -274,10 +274,10 @@ jobs:
           name: test-reports-${{ matrix.abi }}-${{ env.TIMESTAMP }}
           path: android/app/build/outputs/integration_test_reports
 
-  rerun_workflow_job:
+  rerun-workflow-job:
     name: "Integration test - Rerun ${{ github.run_id }}"
     runs-on: ubuntu-latest
-    needs: attempt_job
+    needs: integration-test
     if: failure() && ( needs.attempt_job.outputs.nextAttempt <= needs.attempt_job.outputs.maxAttempts )
     env:
       attempt: ${{ needs.attempt_job.outputs.nextAttempt }}
