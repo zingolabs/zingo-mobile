@@ -46,7 +46,7 @@ const checkServerURI = async (uri: string, oldUri: string): Promise<checkServerU
 
       const infoStr: string = await Promise.race([infoStrPromise, timeoutInfoPromise]);
 
-      if (infoStr.toLowerCase().startsWith('error')) {
+      if (!infoStr || infoStr.toLowerCase().startsWith('error')) {
         // I have to restore the old server again.
         await RPCModule.execute('changeserver', oldUri);
         // error, no timeout
