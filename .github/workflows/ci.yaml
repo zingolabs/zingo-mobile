@@ -274,7 +274,7 @@ jobs:
           name: test-reports-${{ matrix.abi }}-${{ env.TIMESTAMP }}
           path: android/app/build/outputs/integration_test_reports
 
-    rerun_workflow_job:
+  rerun_workflow_job:
     name: "Integration test - Rerun ${{ github.run_id }}"
     runs-on: ubuntu-latest
     needs: attempt_job
@@ -294,12 +294,12 @@ jobs:
           if(!$?) { exit 1 }
           echo "Triggering rerun attempt $env:nextAttempt"
           echo "
-          gh workflow run rerun-workflow.yml
+          gh workflow run rerun-ci.yaml
             --raw-field runId=$env:GITHUB_RUN_ID
             --raw-field rerunFailedOnly=$env:rerunFailedOnly
             --repo $env:GITHUB_REPOSITORY
           "
-          gh workflow run rerun-workflow.yml `
+          gh workflow run rerun-ci.yaml `
             --raw-field runId=$env:GITHUB_RUN_ID `
             --raw-field rerunFailedOnly=$env:rerunFailedOnly `
             --repo $env:GITHUB_REPOSITORY
