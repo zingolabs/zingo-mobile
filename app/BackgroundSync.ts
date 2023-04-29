@@ -1,6 +1,7 @@
 import RPCModule from './RPCModule';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo, { NetInfoStateType } from '@react-native-community/netinfo';
+import { RPCSyncStatusType } from './rpc/types/RPCSyncStatusType';
 
 const BackgroundSync = async (task_data: any) => {
   const exists = await RPCModule.walletExists();
@@ -72,10 +73,10 @@ const BackgroundSync = async (task_data: any) => {
         console.log('BS: Internal Error sync status');
         return;
       }
-      const ss = await JSON.parse(syncStatusStr);
+      const ss: RPCSyncStatusType = await JSON.parse(syncStatusStr);
 
       console.log('BS:', ss);
-      if (ss.batch_num > -1 && batch_num !== ss.batch_num) {
+      if (ss.batch_num && ss.batch_num > -1 && batch_num !== ss.batch_num) {
         await RPCModule.doSave();
         console.log('BS: saving...');
         // update batch_num with the new value, otherwise never change
