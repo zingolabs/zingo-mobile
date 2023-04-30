@@ -52,7 +52,7 @@ import { ThemeType } from '../types';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import { ContextAppLoadedProvider, defaultAppStateLoaded } from '../context';
 import platform from '../platform/platform';
-import { parseZcashURI, serverUris, ZcashURITarget } from '../uris';
+import { parseZcashURI, serverUris, ZcashURITargetClass } from '../uris';
 import BackgroundFileImpl from '../../components/Background/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -386,7 +386,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     //console.log(url);
     // Attempt to parse as URI if it starts with zcash
     if (url.startsWith('zcash:')) {
-      const target: string | ZcashURITarget = await parseZcashURI(url);
+      const target: string | ZcashURITargetClass = await parseZcashURI(url, this.state.translate);
       //console.log(targets);
 
       if (typeof target !== 'string') {

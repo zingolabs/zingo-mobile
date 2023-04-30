@@ -16,7 +16,7 @@ import ZecAmount from '../Components/ZecAmount';
 import CurrencyAmount from '../Components/CurrencyAmount';
 import Button from '../Components/Button';
 import { SendPageStateClass, SendProgressClass, ToAddrClass } from '../../app/AppState';
-import { parseZcashURI, ZcashURITarget } from '../../app/uris';
+import { parseZcashURI, ZcashURITargetClass } from '../../app/uris';
 import RPCModule from '../../app/RPCModule';
 import Utils from '../../app/utils';
 import ScannerAddress from './components/ScannerAddress';
@@ -231,7 +231,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     if (address !== null) {
       // Attempt to parse as URI if it starts with zcash
       if (address.startsWith('zcash:')) {
-        const target: string | ZcashURITarget = await parseZcashURI(address);
+        const target: string | ZcashURITargetClass = await parseZcashURI(address, translate);
         //console.log(targets);
 
         if (typeof target !== 'string') {

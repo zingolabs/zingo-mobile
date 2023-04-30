@@ -9,6 +9,7 @@
   "cancel": "Cancelar",
   "menudrawer-acc": "Abrir Menu Lateral",
   "menu-acc": "Abrir Menu",
+  "donation": "Gracias por apoyar Zingo!",
   "loadingapp" : {
     "actualserver": "Servidor Activo:",
     "changeserver": "CAMBIAR SERVIDOR",
@@ -359,5 +360,19 @@
     "sapling-spendable-balance": "Cantidad para Gastar",
     "transparent-title": "TRANSPARENTE",
     "transparent-balance": "Cantidad Total"
+  },
+  "uris": {
+    "baduri": "Error: URI erronea.",
+    "notvalid": "no era una dirección válida para zcash (Unificada, Sapling or Transparente)",
+    "notvalidparameter": "no fue entendido como un parámetro válido",
+    "notvalidvalue": "no fue entendido como un valor válido",
+    "noindex": "Indice desconocido",
+    "duplicateparameter": "Parámetro duplicado",
+    "base64": "No se pudo interpretar (base64)",
+    "amount": "No se pudo interpretar (amount)",
+    "noparameter": "Parámetro desconocido",
+    "noamount": "No tenía una cantidad",
+    "noaddress": "No tenía una dirección",
+    "oneentry": "URI Debería tener al menos una entrada"
   }
 }
