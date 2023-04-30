@@ -216,6 +216,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
                   minWidth: '95%',
                   minHeight: 100,
                   marginLeft: 5,
+                  backgroundColor: 'transparent',
                 }}
                 value={seedPhrase}
                 onChangeText={(text: string) => setSeedPhrase(text)}
@@ -284,6 +285,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
                     minWidth: '20%',
                     minHeight: 48,
                     marginLeft: 5,
+                    backgroundColor: 'transparent',
                   }}
                   value={birthdayNumber}
                   onChangeText={(text: string) => {

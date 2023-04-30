@@ -368,6 +368,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                     minWidth: '50%',
                     minHeight: 48,
                     marginLeft: 5,
+                    backgroundColor: 'transparent',
                   }}
                   value={server}
                   onChangeText={(text: string) => setServer(text)}
@@ -408,6 +409,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 minWidth: '30%',
                 minHeight: 48,
                 marginLeft: 5,
+                backgroundColor: 'transparent',
               }}
               value={filter}
               onChangeText={(text: string) => setFilter(text)}
