@@ -107,6 +107,7 @@ exports[`Component Send - test Send - snapshot 1`] = `
                   placeholderTextColor="#888888"
                   style={
                     {
+                      "backgroundColor": "transparent",
                       "color": "#c3c3c3",
                       "fontSize": 16,
                       "fontWeight": "600",
@@ -293,6 +294,7 @@ exports[`Component Send - test Send - snapshot 1`] = `
                     placeholderTextColor="#888888"
                     style={
                       {
+                        "backgroundColor": "transparent",
                         "color": "#c3c3c3",
                         "fontSize": 18,
                         "fontWeight": "600",
@@ -525,6 +527,7 @@ exports[`Component Send - test Send - snapshot 1`] = `
                     placeholderTextColor="#888888"
                     style={
                       {
+                        "backgroundColor": "transparent",
                         "color": "#c3c3c3",
                         "fontSize": 18,
                         "fontWeight": "600",
