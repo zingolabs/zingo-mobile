@@ -30,7 +30,7 @@ export default class BackgroundFileImpl {
     try {
       //const b = await RNFS.readFile(fileName, 'utf8');
       //console.log('background file', b);
-      //console.log('background parse', JSON.parse((await RNFS.readFile(fileName, 'utf8')).toString()) as BackgroundType);
+      // TODO verify that JSON don't fail.
       return JSON.parse((await RNFS.readFile(fileName, 'utf8')).toString()) as BackgroundType;
     } catch (err) {
       // File probably doesn't exist, so return nothing

@@ -650,6 +650,7 @@ export default class RPC {
         if (returnStatus.toLowerCase().startsWith('error')) {
           return;
         }
+        // TODO verify that JSON don't fail.
         const ss: RPCSyncStatusType = await JSON.parse(returnStatus);
 
         //console.log('sync wallet birthday', this.walletBirthday);
@@ -1245,6 +1246,7 @@ export default class RPC {
     const prev: string = await this.doSendProgress();
     let prevSendId = -1;
     if (prev && !prev.toLowerCase().startsWith('error')) {
+      // TODO verify that JSON don't fail.
       const prevProgress: RPCSendProgressType = await JSON.parse(prev);
       prevSendId = prevProgress.id;
     }
@@ -1269,6 +1271,7 @@ export default class RPC {
         } else {
           return;
         }
+        // TODO verify that JSON don't fail.
         const progress: RPCSendProgressType = await JSON.parse(pro);
         const sendId = progress.id;
 

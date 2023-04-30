@@ -73,6 +73,7 @@ const BackgroundSync = async (task_data: any) => {
         console.log('BS: Internal Error sync status');
         return;
       }
+      // TODO: verify this JSON parse
       const ss: RPCSyncStatusType = await JSON.parse(syncStatusStr);
 
       console.log('BS:', ss);

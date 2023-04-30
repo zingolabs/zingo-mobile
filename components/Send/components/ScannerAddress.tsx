@@ -11,6 +11,7 @@ import { parseZcashURI } from '../../../app/uris';
 import RPCModule from '../../../app/RPCModule';
 import { ContextAppLoaded } from '../../../app/context';
 import { BarCodeReadEvent } from 'react-native-camera';
+import { RPCParseAddressType } from '../../../app/rpc/types/RPCParseAddressType';
 
 type ScannerAddressProps = {
   updateToField: (
@@ -41,7 +42,8 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateTo
       Toast.show(`"${scannedAddress}" ${translate('scanner.nozcash-error')}`, Toast.LONG);
       return;
     }
-    const resultJSON = await JSON.parse(result);
+    // TODO verify that JSON don't fail.
+    const resultJSON: RPCParseAddressType = await JSON.parse(result);
 
     //console.log('parse-1', scannedAddress, resultJSON);
 

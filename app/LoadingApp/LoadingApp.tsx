@@ -377,7 +377,9 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
       const seed: string = await RPCModule.createNewWallet(this.state.server);
 
       if (seed && !seed.toLowerCase().startsWith('error')) {
-        this.setState({ walletSeed: JSON.parse(seed), screen: 2, actionButtonsDisabled: false, walletExists: true });
+        // TODO verify that JSON don't fail.
+        const walletSeed: WalletSeedType = JSON.parse(seed);
+        this.setState({ walletSeed, screen: 2, actionButtonsDisabled: false, walletExists: true });
         // default values for wallet options
         this.set_wallet_option('download_memos', 'wallet');
         //await this.set_wallet_option('transaction_filter_threshold', '500');
