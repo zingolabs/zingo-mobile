@@ -27,7 +27,6 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
   const [maxBlocks, setMaxBlocks] = useState(0);
   const [points, setPoints] = useState([] as number[]);
   const [labels, setLabels] = useState([] as string[]);
-  const [birthday_plus_1, setBirthday_plus_1] = useState(0);
   moment.locale(language);
 
   useEffect(() => {
@@ -48,14 +47,6 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
   }, [syncingStatusReport.lastBlockServer]);
 
   useEffect(() => {
-    // for some reason when you run the sync process the first block you got (end_block) (yes `end_block`, this is not a mistake)
-    // is one more that the wallet height, if it's the first time you got the wallet birthday + 1
-    // because of that I need, for the math to add 1 in the birthday.
-    // but in the screen I show the real wallet birthday.
-    setBirthday_plus_1((walletSeed.birthday || 0) + 1);
-  }, [walletSeed.birthday]);
-
-  useEffect(() => {
     (async () => await RPC.rpc_setInterruptSyncAfterBatch('false'))();
   }, []);
 
@@ -67,10 +58,10 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
     - server_3 : empty part of the server bar
   */
 
-  const server_1: number = birthday_plus_1 || 0;
+  const server_1: number = walletSeed.birthday || 0;
   const server_2: number =
-    syncingStatusReport.lastBlockServer && birthday_plus_1
-      ? syncingStatusReport.lastBlockServer - birthday_plus_1 || 0
+    syncingStatusReport.lastBlockServer && walletSeed.birthday
+      ? syncingStatusReport.lastBlockServer - walletSeed.birthday || 0
       : 0;
   const server_3: number = maxBlocks ? maxBlocks - server_1 - server_2 : 0;
   const server_1_percent: number = (server_1 * 100) / maxBlocks;
@@ -84,8 +75,8 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
 
   const server_server: number = syncingStatusReport.lastBlockServer || 0;
   const server_wallet: number =
-    syncingStatusReport.lastBlockServer && birthday_plus_1
-      ? syncingStatusReport.lastBlockServer - birthday_plus_1 || 0
+    syncingStatusReport.lastBlockServer && walletSeed.birthday
+      ? syncingStatusReport.lastBlockServer - walletSeed.birthday || 0
       : 0;
 
   /*
@@ -94,11 +85,19 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
     - wallet_1 : first block of the sync process (end_block)
     - wallet_2 : current block of the sync process
     - wallet_3 : empty part of the wallet bar
+
+    EDGE case: sometimes when you restore from seed & you don't remember the
+    birthday the sync process have to start from 419200... so your wallet have
+    this birthday. But sometimes in some point of the sync process the server can
+    give you the real birthday... so the process start point is older than the
+    birthday, even if it seems wrong/weird, this screen show the right info.
   */
 
   let wallet_1: number =
-    syncingStatusReport.process_end_block && birthday_plus_1
-      ? syncingStatusReport.process_end_block - birthday_plus_1 || 0
+    syncingStatusReport.process_end_block && walletSeed.birthday
+      ? syncingStatusReport.process_end_block >= walletSeed.birthday
+        ? syncingStatusReport.process_end_block - walletSeed.birthday || 0
+        : syncingStatusReport.process_end_block
       : 0;
   let wallet_2: number =
     syncingStatusReport.currentBlock && syncingStatusReport.process_end_block
@@ -114,8 +113,10 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
   }
 
   const wallet_3: number =
-    syncingStatusReport.lastBlockServer && birthday_plus_1
-      ? syncingStatusReport.lastBlockServer - birthday_plus_1 - wallet_1 - wallet_2 || 0
+    syncingStatusReport.lastBlockServer && walletSeed.birthday
+      ? syncingStatusReport.process_end_block >= walletSeed.birthday
+        ? syncingStatusReport.lastBlockServer - walletSeed.birthday - wallet_1 - wallet_2 || 0
+        : syncingStatusReport.lastBlockServer - syncingStatusReport.process_end_block - wallet_1 - wallet_2 || 0
       : 0;
 
   let wallet_old_synced_percent: number = (wallet_1 * 100) / server_wallet;
@@ -135,11 +136,11 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
   const wallet_for_synced_percent: number = 100 - wallet_old_synced_percent - wallet_new_synced_percent;
 
   //console.log(
-  //  syncStatusReport,
-  //  birthday_plus_1,
-  //  syncStatusReport.process_end_block,
-  //  syncStatusReport.lastBlockWallet,
-  //  syncStatusReport.lastBlockServer,
+  //  syncingStatusReport,
+  //  walletSeed.birthday,
+  //  syncingStatusReport.process_end_block,
+  //  syncingStatusReport.lastBlockWallet,
+  //  syncingStatusReport.lastBlockServer,
   //);
   //console.log('server', server_1, server_2, server_3);
   //console.log('leyends', server_server, server_wallet, server_sync);
@@ -388,7 +389,11 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
                       marginTop: 10,
                     }}>
                     <>
-                      <Text style={{ color: colors.primary }}>{walletSeed.birthday}</Text>
+                      <Text style={{ color: colors.primary }}>
+                        {syncingStatusReport.process_end_block >= walletSeed.birthday
+                          ? walletSeed.birthday
+                          : syncingStatusReport.process_end_block}
+                      </Text>
                       <Text style={{ color: colors.primary }}>{syncingStatusReport.lastBlockServer}</Text>
                     </>
                   </View>
