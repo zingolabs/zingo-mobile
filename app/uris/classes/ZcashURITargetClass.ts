@@ -1,4 +1,4 @@
-export default class ZcashURITarget {
+export default class ZcashURITargetClass {
   address?: string;
 
   amount?: number;

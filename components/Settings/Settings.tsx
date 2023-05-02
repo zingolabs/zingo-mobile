@@ -142,7 +142,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     }
 
     if (serverContext !== serverParsed) {
-      const resultUri = parseServerURI(serverParsed);
+      const resultUri = parseServerURI(serverParsed, translate);
       if (resultUri.toLowerCase().startsWith('error')) {
         Toast.show(translate('settings.isuri') as string, Toast.LONG);
         return;

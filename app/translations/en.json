@@ -9,6 +9,7 @@
   "cancel": "Cancel",
   "menudrawer-acc": "Open Menu Drawer",
   "menu-acc": "Open Menu",
+  "donation": "Thanks for supporting Zingo!",
   "loadingapp": {
     "actualserver": "Actual server:",
     "changeserver": "CHANGE SERVER",
@@ -359,5 +360,19 @@
     "sapling-spendable-balance": "Spendable Balance",
     "transparent-title": "TRANSPARENT",
     "transparent-balance": "Total Balance"
+  },
+  "uris": {
+    "baduri": "Error: Bad URI.",
+    "notvalid": "was not a valid zcash address (Unified, Sapling or Transparent)",
+    "notvalidparameter": "was not understood as a valid parameter",
+    "notvalidvalue": "Didn't understand parameter value",
+    "noindex": "Unknown index",
+    "duplicateparameter": "Duplicate parameter",
+    "base64": "Couldn't parse (base64)",
+    "amount": "Couldn't parse (amount)",
+    "noparameter": "Unknown parameter",
+    "noamount": "Didn't have an amount",
+    "noaddress": "Didn't have an address",
+    "oneentry": "URI Should have at least 1 entry"
   }
 }

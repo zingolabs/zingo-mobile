@@ -1,8 +1,9 @@
 import Url from 'url-parse';
+import { TranslateType } from '../AppState';
 
-const parseServerURI = (uri: string): string => {
+const parseServerURI = (uri: string, translate: (key: string) => TranslateType): string => {
   if (!uri || uri === '') {
-    return 'Error: Bad URI';
+    return translate('uris.baduri') as string;
   }
 
   const parsedUri = new Url(uri, true);
@@ -12,7 +13,7 @@ const parseServerURI = (uri: string): string => {
     !parsedUri.protocol ||
     (parsedUri.protocol !== 'http:' && parsedUri.protocol !== 'https:')
   ) {
-    return 'Error: Bad URI';
+    return translate('uris.baduri') as string;
   }
 
   let port = parsedUri.port;

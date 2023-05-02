@@ -44,7 +44,7 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateTo
     } else {
       // Try to parse as a URI
       if (scannedAddress.startsWith('zcash:')) {
-        const target = await parseZcashURI(scannedAddress);
+        const target = await parseZcashURI(scannedAddress, translate);
 
         if (typeof target !== 'string') {
           updateToField(scannedAddress, null, null, null, null);
