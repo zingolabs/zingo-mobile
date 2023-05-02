@@ -34,9 +34,7 @@ build/
 local.properties
 *.iml
 
-nohup.out
-out.yarn_react_native_start
-yarn_react_native_start.out
+*.out
 
 # Visual Studio Code
 #
