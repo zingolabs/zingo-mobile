@@ -9,5 +9,5 @@ cd android
 
 # Run gradle managed devices integration test
 ./gradlew x86_ArchsGroupDebugAndroidTest \
--Pandroid.testoptions.manageddevices.emulator.gpu=swiftshader_indirect \
+-Pandroid.testoptions.manageddevices.emulator.gpu=host \
 -Pandroid.testInstrumentationRunnerArguments.class=org.ZingoLabs.Zingo.IntegrationTestSuite
