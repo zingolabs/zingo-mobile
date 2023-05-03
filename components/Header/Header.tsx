@@ -12,6 +12,9 @@ import PriceFetcher from '../Components/PriceFetcher';
 import RegText from '../Components/RegText';
 import ZecAmount from '../Components/ZecAmount';
 import { NetInfoStateType } from '@react-native-community/netinfo';
+import Button from '../Components/Button';
+import RPC from '../../app/rpc';
+import Toast from 'react-native-simple-toast';
 
 type HeaderProps = {
   poolsMoreInfoOnClick?: () => void;
@@ -26,6 +29,7 @@ type HeaderProps = {
   translate?: (key: string) => TranslateType;
   dimensions?: DimensionsType;
   netInfo?: NetInfoType;
+  setComputingModalVisible?: (visible: boolean) => void;
 };
 
 const Header: React.FunctionComponent<HeaderProps> = ({
@@ -41,10 +45,11 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   translate: translateProp,
   dimensions: dimensionsProp,
   netInfo: netInfoProp,
+  setComputingModalVisible,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { totalBalance, info, syncingStatus, currency, zecPrice } = context;
-  let translate, dimensions, netInfo;
+  let translate: (key: string) => TranslateType, dimensions, netInfo;
   if (translateProp) {
     translate = translateProp;
   } else {
@@ -65,6 +70,30 @@ const Header: React.FunctionComponent<HeaderProps> = ({
 
   const syncStatusDisplayLine = syncingStatus.inProgress ? `(${syncingStatus.blocks})` : '';
   const balanceColor = colors.text;
+
+  const showShieldButton = totalBalance && totalBalance.transparentBal > 0;
+  const shieldFunds = async () => {
+    if (setComputingModalVisible) {
+      setComputingModalVisible(true);
+    }
+
+    const shieldStr = await RPC.rpc_shieldTransparent();
+
+    if (setComputingModalVisible) {
+      setComputingModalVisible(false);
+    }
+    if (shieldStr) {
+      setTimeout(() => {
+        const shieldJSON = JSON.parse(shieldStr);
+
+        if (shieldJSON.error) {
+          Toast.show(`${translate('history.shield-error')} ${shieldJSON.error}`, Toast.LONG);
+        } else {
+          Toast.show(`${translate('history.shield-message')} ${shieldJSON.txid}`);
+        }
+      }, 1000);
+    }
+  };
 
   return (
     <View
@@ -122,6 +151,12 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           <View style={{ marginLeft: 5 }}>
             <PriceFetcher setZecPrice={setZecPrice} />
           </View>
+        </View>
+      )}
+
+      {showShieldButton && setComputingModalVisible && (
+        <View style={{ margin: 5 }}>
+          <Button type="Primary" title={translate('history.shieldfunds') as string} onPress={shieldFunds} />
         </View>
       )}
 

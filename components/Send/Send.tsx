@@ -67,6 +67,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   const { decimalSeparator } = getNumberFormatSettings();
   const spendable = totalBalance.transparentBal + totalBalance.spendablePrivate + totalBalance.spendableOrchard;
   const stillConfirming = spendable !== totalBalance.total;
+  const showShieldInfo = totalBalance && totalBalance.transparentBal > 0;
 
   const getMaxAmount = useCallback((): number => {
     let max = spendable - defaultFee;
@@ -424,6 +425,7 @@ const Send: React.FunctionComponent<SendProps> = ({
             toggleMenuDrawer={toggleMenuDrawer}
             setZecPrice={setZecPrice}
             title={translate('send.title') as string}
+            setComputingModalVisible={setComputingModalVisible}
           />
         </View>
       </Animated.View>
@@ -617,8 +619,34 @@ const Send: React.FunctionComponent<SendProps> = ({
                               padding: 5,
                               borderRadius: 10,
                             }}>
-                            <FontAwesomeIcon icon={faInfoCircle} size={14} color={colors.primary} />
+                            <FontAwesomeIcon
+                              icon={faInfoCircle}
+                              size={14}
+                              color={colors.primary}
+                              style={{ marginRight: 5 }}
+                            />
                             <FadeText>{translate('send.somefunds') as string}</FadeText>
+                          </View>
+                        </TouchableOpacity>
+                      )}
+                      {showShieldInfo && (
+                        <TouchableOpacity onPress={() => poolsMoreInfoOnClick()}>
+                          <View
+                            style={{
+                              display: 'flex',
+                              flexDirection: 'row',
+                              marginTop: 5,
+                              backgroundColor: colors.card,
+                              padding: 5,
+                              borderRadius: 10,
+                            }}>
+                            <FontAwesomeIcon
+                              icon={faInfoCircle}
+                              size={14}
+                              color={colors.primary}
+                              style={{ marginRight: 5 }}
+                            />
+                            <FadeText>{translate('send.needtoshield') as string}</FadeText>
                           </View>
                         </TouchableOpacity>
                       )}

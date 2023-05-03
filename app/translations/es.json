@@ -46,7 +46,7 @@
     "wallet-menu": "HISTORICO",
     "send-menu": "ENVIAR",
     "uas-menu": "RECIBIR",
-    "syncing": "Pausando la Sincronización para poder Enviar.",
+    "syncing": "Pausando la Sincronización para poder Completar la Transacción.",
     "zcash-url": "Tienes ya informada una dirección en la pantalla Enviar.",
     "connection-error": "No existe conexión a Internet, Zingo así no puede funcionar correctamente.",
     "tryingnewserver": "Intentando conectar con el nuevo Servidor... Puede llevar varios segundos.",
@@ -219,7 +219,7 @@
     "button-all": "ENviar Todo",
     "clear": "Limpiar",
     "confirm-title": "Confirmar Transacción",
-    "sending-title": "Enviando",
+    "sending-title": "Procesando",
     "confirm-amount": "Cantidad",
     "fee": "Comisión por Transacción",
     "confirm-button": "Confirmar",
@@ -239,7 +239,8 @@
     "includeua": "Incluir tu DU:",
     "confirm-memo": "Memorándum",
     "duplicate-nullifier-error": "Tus fondos están todavía confirmándose y probablemente sincronizándose. Puedes esperar hasta que tus fondos estén confirmados o puedes intentar enviar una cantidad más pequeña, La creaccion de la Transacción ha fallado!",
-    "dust-error" : "La cantidad que estás intentando enviar a una dirección Transparente is realmente infima, La creacción de la Transacción ha fallado!"
+    "dust-error" : "La cantidad que estás intentando enviar a una dirección Transparente is realmente infima, La creacción de la Transacción ha fallado!",
+    "needtoshield": "Hay fondos transparentes para Blindar"
   },
   "receive": {
     "u-title": "Dirección Unificada",
