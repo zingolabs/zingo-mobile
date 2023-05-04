@@ -867,8 +867,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
         //console.log(`change server ok ${value}`);
       }
 
-      await RPCModule.execute('changeserver', this.state.newServer);
-
       await SettingsFileImpl.writeSettings('server', this.state.newServer);
       this.setState({
         server: this.state.newServer,
