@@ -26,6 +26,7 @@ import { ContextAppLoaded } from '../../app/context';
 import PriceFetcher from '../Components/PriceFetcher';
 import RPC from '../../app/rpc';
 import Header from '../Header';
+import { RPCParseAddressType } from '../../app/rpc/types/RPCParseAddressType';
 
 type SendProps = {
   setSendPageState: (sendPageState: SendPageStateClass) => void;
@@ -83,8 +84,16 @@ const Send: React.FunctionComponent<SendProps> = ({
         Toast.show(translate('loadedapp.connection-error') as string, Toast.LONG);
         return false;
       }
-      const result = await RPCModule.execute('parse', address);
-      const resultJSON = await JSON.parse(result);
+      const result: string = await RPCModule.execute('parse', address);
+      if (result) {
+        if (result.toLowerCase().startsWith('error')) {
+          return false;
+        }
+      } else {
+        return false;
+      }
+      // TODO: check if the json parse is correct.
+      const resultJSON: RPCParseAddressType = await JSON.parse(result);
 
       //console.log('parse-memo', address, resultJSON);
 
@@ -93,9 +102,11 @@ const Send: React.FunctionComponent<SendProps> = ({
         resultJSON.address_kind !== 'transparent' &&
         ((!!info.currencyName &&
           info.currencyName === 'ZEC' &&
+          !!resultJSON.chain_name &&
           (resultJSON.chain_name.toLowerCase() === 'main' || resultJSON.chain_name.toLowerCase() === 'mainnet')) ||
           (!!info.currencyName &&
             info.currencyName !== 'ZEC' &&
+            !!resultJSON.chain_name &&
             (resultJSON.chain_name.toLowerCase() === 'test' ||
               resultJSON.chain_name.toLowerCase() === 'testnet' ||
               resultJSON.chain_name.toLowerCase() === 'regtest')))
@@ -119,8 +130,16 @@ const Send: React.FunctionComponent<SendProps> = ({
         Toast.show(translate('loadedapp.connection-error') as string, Toast.LONG);
         return false;
       }
-      const result = await RPCModule.execute('parse', address);
-      const resultJSON = await JSON.parse(result);
+      const result: string = await RPCModule.execute('parse', address);
+      if (result) {
+        if (result.toLowerCase().startsWith('error')) {
+          return false;
+        }
+      } else {
+        return false;
+      }
+      // TODO: check if the json parse is correct.
+      const resultJSON: RPCParseAddressType = await JSON.parse(result);
 
       //console.log('parse-address', address, resultJSON.status === 'success');
 
@@ -128,9 +147,11 @@ const Send: React.FunctionComponent<SendProps> = ({
         resultJSON.status === 'success' &&
         ((!!info.currencyName &&
           info.currencyName === 'ZEC' &&
+          !!resultJSON.chain_name &&
           (resultJSON.chain_name.toLowerCase() === 'main' || resultJSON.chain_name.toLowerCase() === 'mainnet')) ||
           (!!info.currencyName &&
             info.currencyName !== 'ZEC' &&
+            !!resultJSON.chain_name &&
             (resultJSON.chain_name.toLowerCase() === 'test' ||
               resultJSON.chain_name.toLowerCase() === 'testnet' ||
               resultJSON.chain_name.toLowerCase() === 'regtest')))

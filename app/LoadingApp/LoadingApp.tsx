@@ -241,14 +241,14 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
         this.setState({ walletExists: true });
         const networkState = await NetInfo.fetch();
         if (networkState.isConnected) {
-          const error = await RPCModule.loadExistingWallet(this.state.server);
+          const result: string = await RPCModule.loadExistingWallet(this.state.server);
           //console.log('Load Wallet Exists result', error);
-          if (!error.toLowerCase().startsWith('error')) {
+          if (result && !result.toLowerCase().startsWith('error')) {
             // Load the wallet and navigate to the transactions screen
             this.navigateToLoaded();
           } else {
             this.setState({ screen: 1 });
-            Alert.alert(this.props.translate('loadingapp.readingwallet-label') as string, error);
+            Alert.alert(this.props.translate('loadingapp.readingwallet-label') as string, result);
           }
         } else {
           this.setState({ screen: 1 });
@@ -376,8 +376,10 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
     setTimeout(async () => {
       const seed: string = await RPCModule.createNewWallet(this.state.server);
 
-      if (!seed.toLowerCase().startsWith('error')) {
-        this.setState({ walletSeed: JSON.parse(seed), screen: 2, actionButtonsDisabled: false, walletExists: true });
+      if (seed && !seed.toLowerCase().startsWith('error')) {
+        // TODO verify that JSON don't fail.
+        const walletSeed: WalletSeedType = JSON.parse(seed);
+        this.setState({ walletSeed, screen: 2, actionButtonsDisabled: false, walletExists: true });
         // default values for wallet options
         this.set_wallet_option('download_memos', 'wallet');
         //await this.set_wallet_option('transaction_filter_threshold', '500');
@@ -413,13 +415,13 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
         walletBirthday = '0';
       }
 
-      const error = await RPCModule.restoreWallet(seed.toLowerCase(), walletBirthday || '0', server);
-      if (!error.toLowerCase().startsWith('error')) {
+      const result: string = await RPCModule.restoreWallet(seed.toLowerCase(), walletBirthday || '0', server);
+      if (result && !result.toLowerCase().startsWith('error')) {
         this.setState({ actionButtonsDisabled: false });
         this.navigateToLoaded();
       } else {
         this.setState({ actionButtonsDisabled: false });
-        Alert.alert(this.props.translate('loadingapp.readingwallet-label') as string, error);
+        Alert.alert(this.props.translate('loadingapp.readingwallet-label') as string, result);
       }
     });
   };
