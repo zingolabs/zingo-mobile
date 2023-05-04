@@ -465,6 +465,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           fontWeight: '600',
                           fontSize: 16,
                           marginLeft: 5,
+                          backgroundColor: 'transparent',
                         }}
                         value={ta.to}
                         onChangeText={(text: string) => updateToField(text, null, null, null, null)}
@@ -578,6 +579,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                             minWidth: 48,
                             minHeight: 48,
                             marginLeft: 5,
+                            backgroundColor: 'transparent',
                           }}
                           value={ta.amount.toString()}
                           onChangeText={(text: string) => updateToField(null, text.substring(0, 20), null, null, null)}
@@ -702,6 +704,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                               minWidth: 48,
                               minHeight: 48,
                               marginLeft: 5,
+                              backgroundColor: 'transparent',
                             }}
                             value={ta.amountCurrency.toString()}
                             onChangeText={(text: string) =>
@@ -781,6 +784,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                             minWidth: 48,
                             minHeight: 48,
                             marginLeft: 5,
+                            backgroundColor: 'transparent',
                           }}
                           value={ta.memo}
                           onChangeText={(text: string) => updateToField(null, null, null, text, null)}

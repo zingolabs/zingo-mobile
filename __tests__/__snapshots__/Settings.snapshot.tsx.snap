@@ -1012,6 +1012,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               placeholder="https://------.---:---"
               style={
                 {
+                  "backgroundColor": "transparent",
                   "color": "rgb(28, 28, 30)",
                   "fontSize": 18,
                   "fontWeight": "600",
@@ -1079,6 +1080,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
             placeholder="text translated"
             style={
               {
+                "backgroundColor": "transparent",
                 "color": "rgb(28, 28, 30)",
                 "fontSize": 18,
                 "fontWeight": "600",

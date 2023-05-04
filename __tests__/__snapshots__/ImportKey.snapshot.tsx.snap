@@ -182,6 +182,7 @@ exports[`Component ImportKey - test Matches the snapshot ImportKey 1`] = `
           onChangeText={[Function]}
           style={
             {
+              "backgroundColor": "transparent",
               "color": "rgb(28, 28, 30)",
               "fontWeight": "600",
               "marginLeft": 5,
@@ -279,6 +280,7 @@ exports[`Component ImportKey - test Matches the snapshot ImportKey 1`] = `
           placeholder="#"
           style={
             {
+              "backgroundColor": "transparent",
               "color": "rgb(28, 28, 30)",
               "fontWeight": "600",
               "marginLeft": 5,
