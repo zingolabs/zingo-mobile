@@ -150,19 +150,19 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
   }
   const wallet_for_synced_percent: number = 100 - wallet_old_synced_percent - wallet_new_synced_percent;
 
-  console.log(
-    'birthday',
-    walletSeed.birthday,
-    'end',
-    syncingStatusReport.process_end_block,
-    'end fixed',
-    process_end_block_fixed,
-    'last wallet',
-    syncingStatusReport.lastBlockWallet,
-    'last server',
-    syncingStatusReport.lastBlockServer,
-  );
-  console.log('wallet', wallet_1, wallet_2, wallet_3);
+  //console.log(
+  //  'birthday',
+  //  walletSeed.birthday,
+  //  'end',
+  //  syncingStatusReport.process_end_block,
+  //  'end fixed',
+  //  process_end_block_fixed,
+  //  'last wallet',
+  //  syncingStatusReport.lastBlockWallet,
+  //  'last server',
+  //  syncingStatusReport.lastBlockServer,
+  //);
+  //console.log('wallet', wallet_1, wallet_2, wallet_3);
   //console.log('server', server_1, server_2, server_3);
   //console.log('leyends', server_server, server_wallet, server_sync);
   //console.log('wallet', wallet_old_synced, wallet_new_synced, wallet_for_synced);
