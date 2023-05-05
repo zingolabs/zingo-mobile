@@ -891,7 +891,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       });
     }
 
-    await this.rpc.fetchInfo();
+    await this.rpc.fetchInfoAndServerHeight();
     const afterCurrencyName = this.state.info.currencyName;
 
     // from TAZ to ZEC -> no backup the old test wallet.
