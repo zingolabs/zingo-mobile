@@ -15,6 +15,7 @@ import { NetInfoStateType } from '@react-native-community/netinfo';
 import Button from '../Components/Button';
 import RPC from '../../app/rpc';
 import Toast from 'react-native-simple-toast';
+import { RPCShieldType } from '../../app/rpc/types/RPCShieldType';
 
 type HeaderProps = {
   poolsMoreInfoOnClick?: () => void;
@@ -73,25 +74,32 @@ const Header: React.FunctionComponent<HeaderProps> = ({
 
   const showShieldButton = totalBalance && totalBalance.transparentBal > 0;
   const shieldFunds = async () => {
-    if (setComputingModalVisible) {
-      setComputingModalVisible(true);
+    if (!setComputingModalVisible) {
+      return;
     }
+    setComputingModalVisible(true);
 
     const shieldStr = await RPC.rpc_shieldTransparent();
 
-    if (setComputingModalVisible) {
-      setComputingModalVisible(false);
-    }
     if (shieldStr) {
-      setTimeout(() => {
-        const shieldJSON = JSON.parse(shieldStr);
+      if (shieldStr.toLowerCase().startsWith('error')) {
+        Toast.show(`${translate('history.shield-error')} ${shieldStr}`, Toast.LONG);
+        setTimeout(() => {
+          setComputingModalVisible(false);
+        }, 1000);
+      } else {
+        const shieldJSON: RPCShieldType = await JSON.parse(shieldStr);
 
         if (shieldJSON.error) {
           Toast.show(`${translate('history.shield-error')} ${shieldJSON.error}`, Toast.LONG);
         } else {
-          Toast.show(`${translate('history.shield-message')} ${shieldJSON.txid}`);
+          Toast.show(`${translate('history.shield-message')} ${shieldJSON.txid}`, Toast.LONG);
         }
-      }, 1000);
+
+        setTimeout(() => {
+          setComputingModalVisible(false);
+        }, 1000);
+      }
     }
   };
 
