@@ -544,7 +544,7 @@ exports[`Component SyncReport - test Matches the snapshot SyncReport 1`] = `
                 "borderRightColor": "lightyellow",
                 "borderRightWidth": 1,
                 "height": 10,
-                "width": "25%",
+                "width": "24.99975%",
               }
             }
           />
@@ -555,7 +555,7 @@ exports[`Component SyncReport - test Matches the snapshot SyncReport 1`] = `
                 "borderRightColor": "orange",
                 "borderRightWidth": 1,
                 "height": 10,
-                "width": "50%",
+                "width": "50.00025%",
               }
             }
           />
@@ -566,7 +566,7 @@ exports[`Component SyncReport - test Matches the snapshot SyncReport 1`] = `
                 "borderRightColor": "rgb(0, 122, 255)",
                 "borderRightWidth": 1,
                 "height": 10,
-                "width": "25%",
+                "width": "24.999999999999993%",
               }
             }
           />
@@ -612,7 +612,7 @@ exports[`Component SyncReport - test Matches the snapshot SyncReport 1`] = `
               }
             }
           >
-            100000translated text25.00%
+            99999translated text25.00%
           </Text>
         </View>
         <View
@@ -657,7 +657,7 @@ exports[`Component SyncReport - test Matches the snapshot SyncReport 1`] = `
             }
             testID="syncreport.syncednow"
           >
-            200000translated text50.00%
+            200001translated text50.00%
           </Text>
         </View>
         <View
