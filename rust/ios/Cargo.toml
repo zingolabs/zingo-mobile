@@ -6,7 +6,7 @@ edition = "2021"
 
 [dependencies]
 log = { workspace = true }
-rustlib = { path = "../lib" }
+rustappshim = { workspace = true }
 
 [lib]
 name = "rustios"
