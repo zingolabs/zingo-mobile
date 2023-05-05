@@ -115,6 +115,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         <View
           style={{
             flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
             margin: 0,
           }}>
           <ZecAmount currencyName={info.currencyName} color={balanceColor} size={36} amtZec={totalBalance.total} />
@@ -129,11 +131,12 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   backgroundColor: colors.card,
                   borderRadius: 10,
                   margin: 0,
+                  marginLeft: 5,
                   padding: 0,
-                  minWidth: 48,
-                  minHeight: 48,
+                  minWidth: 25,
+                  minHeight: 25,
                 }}>
-                <FontAwesomeIcon icon={faInfoCircle} size={18} color={colors.primary} />
+                <FontAwesomeIcon icon={faInfoCircle} size={25} color={colors.primary} />
               </View>
             </TouchableOpacity>
           )}
