@@ -61,7 +61,8 @@
     "sixtyseconds-message": "Stored the wallet every 60 seconds, batch:",
     "walletnotfound-error": "Error: Couldn't find any wallet.",
     "backupnotfound-error": "Error: Couldn't find any backup of any wallet.",
-    "of": "of"
+    "of": "of",
+    "deletewallet-error": "Error: Couldn't delete the current wallet."
   },
   "settings": {
     "memos": [

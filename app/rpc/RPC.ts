@@ -1345,8 +1345,12 @@ export default class RPC {
 
     //console.log('jc change wallet', exists);
     if (exists && exists !== 'false') {
-      await RPCModule.doSaveBackup();
-      await RPCModule.deleteExistingWallet();
+      (await RPCModule.doSaveBackup()) as Promise<void>;
+      const result = await RPCModule.deleteExistingWallet();
+
+      if (!(result && result !== 'false')) {
+        return this.translate('rpc.deletewallet-error');
+      }
     } else {
       return this.translate('rpc.walletnotfound-error');
     }
@@ -1358,7 +1362,11 @@ export default class RPC {
 
     //console.log('jc change wallet', exists);
     if (exists && exists !== 'false') {
-      await RPCModule.deleteExistingWallet();
+      const result = await RPCModule.deleteExistingWallet();
+
+      if (!(result && result !== 'false')) {
+        return this.translate('rpc.deletewallet-error');
+      }
     } else {
       return this.translate('rpc.walletnotfound-error');
     }

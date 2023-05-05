@@ -61,7 +61,8 @@
     "sixtyseconds-message": "Monedero almacenado cada 60 segundos, lote:",
     "walletnotfound-error": "Error: No se encuentra ningún monedero.",
     "backupnotfound-error": "Error: No se encuentra ninguna copia de seguridad de ningún monedero.",
-    "of": "de"
+    "of": "de",
+    "deletewallet-error": "Error: No se pudo borrar el monedero actual."
   },
   "settings": {
     "memos": [
