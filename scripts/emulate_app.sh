@@ -10,7 +10,7 @@ create_snapshot=false
 valid_api_levels=("23" "24" "25" "26" "27" "28" "29" "30" "31" "32" "33")
 valid_api_targets=("default" "google_apis" "google_apis_playstore" "google_atd" "google-tv" \
     "aosp_atd" "android-tv" "android-desktop" "android-wear" "android-wear-cn")
-timeout_seconds=600  # default timeout set to 10 minutes
+timeout_seconds=1800  # default timeout set to 30 minutes
 
 function check_launch() {
     emulator_status=$(adb devices | grep "emulator-5554" | cut -f1)
@@ -44,6 +44,7 @@ function wait_for() {
     shift 1
     until [ $timeout_seconds -le 0 ] || ("$@" &> /dev/null); do
         sleep 1
+        echo "waiting"
         timeout_seconds=$(( timeout_seconds - 1 ))
     done
     if [ $timeout_seconds -le 0 ]; then
@@ -179,21 +180,6 @@ if [ ! -d "./android/app" ]; then
     exit 1
 fi
 
-sdkmanager --licenses
-
-echo -e "\nInstalling latest build tools, platform tools, and platform..."
-sdkmanager --install 'build-tools;33.0.2' platform-tools
-
-echo "Installing latest emulator..."
-sdkmanager --install emulator --channel=0
-
-echo "Installing system image..."
-avd_name="${avd_skin}-android-${api_level}_${api_target}_${arch}"
-sdk="system-images;android-${api_level};${api_target};${arch}"
-platform="platforms;android-${api_level}"
-sdkmanager --install "${sdk}"
-sdkmanager --install "${platform}"
-
 cd android
 # Kill all emulators
 ../scripts/kill_emulators.sh
@@ -202,12 +188,28 @@ test_report_dir="app/build/outputs/emulate_app_reports/${abi}"
 rm -rf "${test_report_dir}"
 mkdir -p "${test_report_dir}"
 
+avd_name="${avd_skin}-android-${api_level}_${api_target}_${arch}"
+sdk="system-images;android-${api_level};${api_target};${arch}"
+platform="platforms;android-${api_level}"
+
 if [[ $create_snapshot == true ]]; then
+    sdkmanager --licenses
+
+    echo -e "\nInstalling latest build tools, platform tools, and platform..."
+    sdkmanager --install 'build-tools;33.0.2' platform-tools emulator
+
+    echo "Installing latest emulator..."
+    sdkmanager --install emulator --channel=0
+
+    echo "Installing system image..."
+    sdkmanager --install "${sdk}"
+    sdkmanager --install "${platform}"
+    
     echo -e "\nCreating AVD..."
     echo no | avdmanager create avd --force --name "${avd_name}" --package "${sdk}" --device "${avd_skin}"
 
     echo -e "\n\nWaiting for emulator to launch..."
-    emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim -no-snapshot-load -port 5554 &> "${test_report_dir}/emulator.txt" &
+    emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -no-boot-anim -no-snapshot-load -port 5554 &> "${test_report_dir}/emulator.txt" &
     wait_for $timeout_seconds check_launch
     echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
 
@@ -242,7 +244,7 @@ else
     # Create integration test report directory
 
     echo -e "\n\nWaiting for emulator to launch..."
-    emulator -avd "${avd_name}" -netdelay none -netspeed full -gpu swiftshader_indirect -no-boot-anim -no-snapshot-save -read-only -port 5554 &> "${test_report_dir}/emulator.txt" &
+    emulator -avd "${avd_name}" -netdelay none -netspeed full -no-boot-anim -no-snapshot-save -read-only -port 5554 &> "${test_report_dir}/emulator.txt" &
     wait_for $timeout_seconds check_launch
     echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
 
