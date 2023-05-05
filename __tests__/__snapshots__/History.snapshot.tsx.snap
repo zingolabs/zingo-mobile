@@ -50,7 +50,9 @@ exports[`Component Transactions - test Transactions - snapshot 1`] = `
     <View
       style={
         {
+          "alignItems": "center",
           "flexDirection": "row",
+          "justifyContent": "center",
           "margin": 0,
         }
       }
