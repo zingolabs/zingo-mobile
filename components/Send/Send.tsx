@@ -644,7 +644,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                             }}>
                             <FontAwesomeIcon
                               icon={faInfoCircle}
-                              size={14}
+                              size={20}
                               color={colors.primary}
                               style={{ marginRight: 5 }}
                             />
@@ -665,7 +665,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                             }}>
                             <FontAwesomeIcon
                               icon={faInfoCircle}
-                              size={14}
+                              size={20}
                               color={colors.primary}
                               style={{ marginRight: 5 }}
                             />

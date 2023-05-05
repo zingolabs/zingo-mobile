@@ -115,6 +115,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         <View
           style={{
             flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
             margin: 0,
           }}>
           <ZecAmount currencyName={info.currencyName} color={balanceColor} size={36} amtZec={totalBalance.total} />
@@ -129,11 +131,12 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   backgroundColor: colors.card,
                   borderRadius: 10,
                   margin: 0,
+                  marginLeft: 5,
                   padding: 0,
-                  minWidth: 48,
-                  minHeight: 48,
+                  minWidth: 25,
+                  minHeight: 25,
                 }}>
-                <FontAwesomeIcon icon={faInfoCircle} size={18} color={colors.primary} />
+                <FontAwesomeIcon icon={faInfoCircle} size={25} color={colors.primary} />
               </View>
             </TouchableOpacity>
           )}
@@ -194,22 +197,22 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   borderColor: colors.primary,
                   borderWidth: 1,
                   borderRadius: 10,
-                  minWidth: 20,
-                  minHeight: 20,
+                  minWidth: 25,
+                  minHeight: 25,
                 }}>
                 {!syncStatusDisplayLine && syncingStatus.synced && (
                   <View style={{ margin: 0, padding: 0 }}>
-                    <FontAwesomeIcon icon={faCheck} color={colors.primary} />
+                    <FontAwesomeIcon icon={faCheck} color={colors.primary} size={20} />
                   </View>
                 )}
                 {!syncStatusDisplayLine && !syncingStatus.synced && (
                   <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
-                    <FontAwesomeIcon icon={faStop} color={colors.zingo} size={12} />
+                    <FontAwesomeIcon icon={faStop} color={colors.zingo} size={17} />
                   </TouchableOpacity>
                 )}
                 {syncStatusDisplayLine && (
                   <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
-                    <FontAwesomeIcon icon={faPlay} color={colors.primary} size={10} />
+                    <FontAwesomeIcon icon={faPlay} color={colors.primary} size={17} />
                   </TouchableOpacity>
                 )}
               </View>
