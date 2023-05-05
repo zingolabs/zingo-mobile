@@ -12,10 +12,7 @@ pub extern "C" fn rust_free(s: *mut c_char) {
 }
 
 #[no_mangle]
-pub extern "C" fn init_new(
-    server_uri: *const c_char,
-    data_dir: *const c_char,
-) -> *mut c_char {
+pub extern "C" fn init_new(server_uri: *const c_char, data_dir: *const c_char) -> *mut c_char {
     let c_str = unsafe { CStr::from_ptr(server_uri) };
     let server_uri = match c_str.to_str() {
         Err(_) => {
@@ -38,7 +35,7 @@ pub extern "C" fn init_new(
     }
     .to_string();
 
-    let seed = rustlib::init_new(server_uri, data_dir);
+    let seed = zingoappshim::init_new(server_uri, data_dir);
 
     return CString::new(seed).unwrap().into_raw();
 }
@@ -95,12 +92,7 @@ pub extern "C" fn initfromseed(
         Ok(string) => string,
     }
     .to_string();
-    let seed = rustlib::init_from_seed(
-        server_uri,
-        seed,
-        birthday,
-        data_dir,
-    );
+    let seed = zingoappshim::init_from_seed(server_uri, seed, birthday, data_dir);
     return CString::new(seed).unwrap().into_raw();
 }
 
@@ -143,7 +135,7 @@ pub extern "C" fn initfromb64(
     }
     .to_string();
 
-    let seed = rustlib::init_from_b64(server_uri, base64, data_dir);
+    let seed = zingoappshim::init_from_b64(server_uri, base64, data_dir);
 
     return CString::new(seed).unwrap().into_raw();
 }
@@ -151,7 +143,7 @@ pub extern "C" fn initfromb64(
 #[no_mangle]
 pub extern "C" fn save() -> *mut c_char {
     // Return the wallet as a base64 encoded string
-    let encoded = rustlib::save_to_b64();
+    let encoded = zingoappshim::save_to_b64();
     return CString::new(encoded).unwrap().into_raw();
 }
 
@@ -179,15 +171,13 @@ pub extern "C" fn execute(cmd: *const c_char, args_list: *const c_char) -> *mut 
     }
     .to_string();
 
-    let resp = rustlib::execute(cmd, args_list);
+    let resp = zingoappshim::execute(cmd, args_list);
 
     return CString::new(resp).unwrap().into_raw();
 }
 
 #[no_mangle]
-pub extern "C" fn get_latest_block(
-    server_uri: *const c_char,
-) -> *mut c_char {
+pub extern "C" fn get_latest_block(server_uri: *const c_char) -> *mut c_char {
     let c_str = unsafe { CStr::from_ptr(server_uri) };
     let server_uri = match c_str.to_str() {
         Err(_) => {
@@ -199,7 +189,7 @@ pub extern "C" fn get_latest_block(
     }
     .to_string();
 
-    let resp = rustlib::get_latest_block(server_uri);
+    let resp = zingoappshim::get_latest_block(server_uri);
 
     return CString::new(resp).unwrap().into_raw();
 }

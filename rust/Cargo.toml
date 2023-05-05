@@ -6,7 +6,7 @@ members = [
 
 [workspace.dependencies]
 log = "0.4.8"
-zingoappshim = { git="https://github.com/zingolabs/zingolib", default-features=true, branch = "dev" }
+zingoappshim = { git="https://github.com/zancas/zingolib", default-features=true, branch = "add_app_shim" }
 
 [profile.release]
 debug = false

@@ -1733,7 +1733,7 @@ dependencies = [
  "serde",
  "subtle",
  "tracing",
- "zcash_note_encryption",
+ "zcash_note_encryption 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -2304,7 +2304,7 @@ dependencies = [
  "android_logger",
  "jni",
  "log",
- "rustlib",
+ "zingoappshim",
 ]
 
 [[package]]
@@ -2355,7 +2355,7 @@ name = "rustios"
 version = "1.0.1"
 dependencies = [
  "log",
- "rustlib",
+ "zingoappshim",
 ]
 
 [[package]]
@@ -2370,16 +2370,6 @@ dependencies = [
  "libc",
  "linux-raw-sys",
  "windows-sys 0.48.0",
-]
-
-[[package]]
-name = "rustlib"
-version = "1.0.1"
-dependencies = [
- "base64 0.11.0",
- "lazy_static",
- "zingoconfig",
- "zingolib",
 ]
 
 [[package]]
@@ -3762,7 +3752,7 @@ dependencies = [
  "which",
  "zcash_address",
  "zcash_encoding",
- "zcash_note_encryption",
+ "zcash_note_encryption 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "zcash_primitives",
 ]
 
@@ -3773,6 +3763,19 @@ source = "git+https://github.com/zingolabs/librustzcash?rev=acfdabc3629c93517e3c
 dependencies = [
  "byteorder",
  "nonempty",
+]
+
+[[package]]
+name = "zcash_note_encryption"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2eb2149e6cd5fbee36c5b87c601715a8c35554602f7fe84af38b636afa2db318"
+dependencies = [
+ "chacha20",
+ "chacha20poly1305",
+ "cipher",
+ "rand_core",
+ "subtle",
 ]
 
 [[package]]
@@ -3820,7 +3823,7 @@ dependencies = [
  "subtle",
  "zcash_address",
  "zcash_encoding",
- "zcash_note_encryption",
+ "zcash_note_encryption 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -3864,19 +3867,30 @@ dependencies = [
 [[package]]
 name = "zingo-memo"
 version = "0.1.0"
-source = "git+https://github.com/zingolabs/zingolib?branch=dev#a7c18204def59ab4793e6bfcdcb7c9b81d444de3"
+source = "git+https://github.com/zancas/zingolib?branch=add_app_shim#d0d970ccd028a702ac17c11d07f3f753e692b467"
 dependencies = [
  "zcash_address",
  "zcash_client_backend",
  "zcash_encoding",
- "zcash_note_encryption",
+ "zcash_note_encryption 0.3.0 (git+https://github.com/zingolabs/librustzcash?rev=acfdabc3629c93517e3c4742848996c595de6d3c)",
  "zcash_primitives",
+]
+
+[[package]]
+name = "zingoappshim"
+version = "1.0.1"
+source = "git+https://github.com/zancas/zingolib?branch=add_app_shim#d0d970ccd028a702ac17c11d07f3f753e692b467"
+dependencies = [
+ "base64 0.11.0",
+ "lazy_static",
+ "zingoconfig",
+ "zingolib",
 ]
 
 [[package]]
 name = "zingoconfig"
 version = "0.1.0"
-source = "git+https://github.com/zingolabs/zingolib?branch=dev#a7c18204def59ab4793e6bfcdcb7c9b81d444de3"
+source = "git+https://github.com/zancas/zingolib?branch=add_app_shim#d0d970ccd028a702ac17c11d07f3f753e692b467"
 dependencies = [
  "dirs",
  "http",
@@ -3889,7 +3903,7 @@ dependencies = [
 [[package]]
 name = "zingolib"
 version = "0.2.0"
-source = "git+https://github.com/zingolabs/zingolib?branch=dev#a7c18204def59ab4793e6bfcdcb7c9b81d444de3"
+source = "git+https://github.com/zancas/zingolib?branch=add_app_shim#d0d970ccd028a702ac17c11d07f3f753e692b467"
 dependencies = [
  "base58",
  "base64 0.13.1",
@@ -3941,7 +3955,7 @@ dependencies = [
  "zcash_address",
  "zcash_client_backend",
  "zcash_encoding",
- "zcash_note_encryption",
+ "zcash_note_encryption 0.3.0 (git+https://github.com/zingolabs/librustzcash?rev=acfdabc3629c93517e3c4742848996c595de6d3c)",
  "zcash_primitives",
  "zcash_proofs",
  "zingo-memo",
