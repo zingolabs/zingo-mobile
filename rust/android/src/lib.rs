@@ -43,7 +43,7 @@ pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RustFFI_00024Companion_initnew
         .into_string()
         .unwrap();
 
-    let seed = rustlib::init_new(server_uri, data_dir);
+    let seed = zingoappshim::init_new(server_uri, data_dir);
 
     let output = env.new_string(seed.as_str()).unwrap();
     output.into_inner()
@@ -78,7 +78,7 @@ pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RustFFI_00024Companion_initfro
         .into_string()
         .unwrap();
 
-    let seed = rustlib::init_from_seed(server_uri, seed_tmp, birthday, data_dir);
+    let seed = zingoappshim::init_from_seed(server_uri, seed_tmp, birthday, data_dir);
 
     let output = env.new_string(seed.as_str()).unwrap();
     output.into_inner()
@@ -106,7 +106,7 @@ pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RustFFI_00024Companion_initfro
         .into_string()
         .unwrap();
 
-    let seed = rustlib::init_from_b64(server_uri, base64, data_dir);
+    let seed = zingoappshim::init_from_b64(server_uri, base64, data_dir);
 
     let output = env.new_string(seed.as_str()).unwrap();
     output.into_inner()
@@ -117,7 +117,7 @@ pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RustFFI_00024Companion_save(
     env: JNIEnv,
     _: JObject,
 ) -> jstring {
-    let encoded = rustlib::save_to_b64();
+    let encoded = zingoappshim::save_to_b64();
     let output = env.new_string(encoded.as_str()).unwrap();
     output.into_inner()
 }
@@ -137,7 +137,7 @@ pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RustFFI_00024Companion_execute
         .into_string()
         .unwrap();
 
-    let resp = rustlib::execute(cmd, args_list);
+    let resp = zingoappshim::execute(cmd, args_list);
 
     let output = env.new_string(resp.as_str()).unwrap();
     output.into_inner()
@@ -155,7 +155,7 @@ pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RustFFI_00024Companion_getlate
     .into_string()
     .unwrap();
 
-    let resp = rustlib::get_latest_block(server_uri);
+    let resp = zingoappshim::get_latest_block(server_uri);
 
     let output = env.new_string(resp.as_str()).unwrap();
     output.into_inner()
