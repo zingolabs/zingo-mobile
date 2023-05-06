@@ -1,8 +1,11 @@
 use std::ffi::{CStr, CString};
 use std::os::raw::c_char;
 
+/// # Safety
+///
+/// CString assumed from pointer dereferences
 #[no_mangle]
-pub extern "C" fn rust_free(s: *mut c_char) {
+pub unsafe extern "C" fn rust_free(s: *mut c_char) {
     unsafe {
         if s.is_null() {
             return;
@@ -11,8 +14,14 @@ pub extern "C" fn rust_free(s: *mut c_char) {
     };
 }
 
+/// # Safety
+///
+/// Multiple C_Str's assumed form pointer dereferences
 #[no_mangle]
-pub extern "C" fn init_new(server_uri: *const c_char, data_dir: *const c_char) -> *mut c_char {
+pub unsafe extern "C" fn init_new(
+    server_uri: *const c_char,
+    data_dir: *const c_char,
+) -> *mut c_char {
     let c_str = unsafe { CStr::from_ptr(server_uri) };
     let server_uri = match c_str.to_str() {
         Err(_) => {
@@ -37,11 +46,13 @@ pub extern "C" fn init_new(server_uri: *const c_char, data_dir: *const c_char) -
 
     let seed = zingoappshim::init_new(server_uri, data_dir);
 
-    return CString::new(seed).unwrap().into_raw();
+    CString::new(seed).unwrap().into_raw()
 }
-
+/// # Safety
+///
+/// Multiple C_Str's assumed form pointer dereferences
 #[no_mangle]
-pub extern "C" fn initfromseed(
+pub unsafe extern "C" fn initfromseed(
     server_uri: *const c_char,
     seed: *const c_char,
     birthday: *const c_char,
@@ -93,11 +104,13 @@ pub extern "C" fn initfromseed(
     }
     .to_string();
     let seed = zingoappshim::init_from_seed(server_uri, seed, birthday, data_dir);
-    return CString::new(seed).unwrap().into_raw();
+    CString::new(seed).unwrap().into_raw()
 }
-
+/// # Safety
+///
+/// Multiple unchecked ptr derefences assumed to be strings
 #[no_mangle]
-pub extern "C" fn initfromb64(
+pub unsafe extern "C" fn initfromb64(
     server_uri: *const c_char,
     base64: *const c_char,
     data_dir: *const c_char,
@@ -137,18 +150,21 @@ pub extern "C" fn initfromb64(
 
     let seed = zingoappshim::init_from_b64(server_uri, base64, data_dir);
 
-    return CString::new(seed).unwrap().into_raw();
+    CString::new(seed).unwrap().into_raw()
 }
 
 #[no_mangle]
 pub extern "C" fn save() -> *mut c_char {
     // Return the wallet as a base64 encoded string
     let encoded = zingoappshim::save_to_b64();
-    return CString::new(encoded).unwrap().into_raw();
+    CString::new(encoded).unwrap().into_raw()
 }
 
+/// # Safety
+///
+/// This fn receives a ptr and dereferences is as a C_str
 #[no_mangle]
-pub extern "C" fn execute(cmd: *const c_char, args_list: *const c_char) -> *mut c_char {
+pub unsafe extern "C" fn execute(cmd: *const c_char, args_list: *const c_char) -> *mut c_char {
     let c_str = unsafe { CStr::from_ptr(cmd) };
     let cmd = match c_str.to_str() {
         Err(_) => {
@@ -173,11 +189,14 @@ pub extern "C" fn execute(cmd: *const c_char, args_list: *const c_char) -> *mut 
 
     let resp = zingoappshim::execute(cmd, args_list);
 
-    return CString::new(resp).unwrap().into_raw();
+    CString::new(resp).unwrap().into_raw()
 }
 
+/// # Safety
+///
+/// This fn receives a ptr and dereferences is as a C_str
 #[no_mangle]
-pub extern "C" fn get_latest_block(server_uri: *const c_char) -> *mut c_char {
+pub unsafe extern "C" fn get_latest_block(server_uri: *const c_char) -> *mut c_char {
     let c_str = unsafe { CStr::from_ptr(server_uri) };
     let server_uri = match c_str.to_str() {
         Err(_) => {
@@ -191,5 +210,5 @@ pub extern "C" fn get_latest_block(server_uri: *const c_char) -> *mut c_char {
 
     let resp = zingoappshim::get_latest_block(server_uri);
 
-    return CString::new(resp).unwrap().into_raw();
+    CString::new(resp).unwrap().into_raw()
 }
