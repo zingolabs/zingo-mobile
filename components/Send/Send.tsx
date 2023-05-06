@@ -451,7 +451,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         </View>
       </Animated.View>
 
-      <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{}} testID="send.scrollView">
+      <ScrollView contentContainerStyle={{}} testID="send.scrollView">
         <View style={{ marginBottom: 30 }}>
           {[sendPageState.toaddr].map((ta, i) => {
             return (
@@ -851,7 +851,10 @@ const Send: React.FunctionComponent<SendProps> = ({
                   Toast.show(translate('loadedapp.connection-error') as string, Toast.LONG);
                   return;
                 }
-                setConfirmModalVisible(true);
+                // waiting while closing the keyboard, just in case.
+                setTimeout(async () => {
+                  setConfirmModalVisible(true);
+                }, 100);
               }}
             />
             <Button

@@ -1,11 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect, useState } from 'react';
-import { View, ScrollView, SafeAreaView, TouchableOpacity, TextInput } from 'react-native';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import { View, ScrollView, SafeAreaView, TouchableOpacity, TextInput, Keyboard } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faDotCircle } from '@fortawesome/free-solid-svg-icons';
 import { faCircle as farCircle } from '@fortawesome/free-regular-svg-icons';
 import Toast from 'react-native-simple-toast';
+import Animated, { EasingNode } from 'react-native-reanimated';
 
 import RegText from '../Components/RegText';
 import FadeText from '../Components/FadeText';
@@ -21,7 +22,11 @@ import Header from '../Header';
 type SettingsProps = {
   closeModal: () => void;
   set_wallet_option: (name: string, value: string) => Promise<void>;
-  set_server_option: (name: 'server' | 'currency' | 'language' | 'sendAll', value: string) => Promise<void>;
+  set_server_option: (
+    name: 'server' | 'currency' | 'language' | 'sendAll',
+    value: string,
+    noToast?: boolean,
+  ) => Promise<void>;
   set_currency_option: (name: 'server' | 'currency' | 'language' | 'sendAll', value: string) => Promise<void>;
   set_language_option: (
     name: 'server' | 'currency' | 'language' | 'sendAll',
@@ -89,7 +94,10 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [language, setLanguage] = useState(languageContext);
   const [sendAll, setSendAll] = useState(sendAllContext);
   const [customIcon, setCustomIcon] = useState(farCircle);
-  const [disabled, setDisabled] = useState<boolean | undefined>();
+  const [disabled, setDisabled] = useState<boolean>();
+  const [titleViewHeight, setTitleViewHeight] = useState(0);
+
+  const slideAnim = useRef(new Animated.Value(0)).current;
 
   moment.locale(language);
 
@@ -98,18 +106,28 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   }, [server]);
 
   useEffect(() => {
-    // start checking the new server
-    if (disabled) {
-      Toast.show(translate('loadedapp.tryingnewserver') as string, Toast.SHORT);
-    }
-    // if the server cheking takes more then 30 seconds.
-    if (!disabled && disabled !== undefined) {
-      Toast.show(translate('loadedapp.tryingnewserver-error') as string, Toast.LONG);
-      // in this point the sync process is blocked, who knows why.
-      // if I save the actual server before the customization... is going to work.
-      set_server_option('server', serverContext);
-    }
-  }, [disabled, serverContext, set_server_option, translate]);
+    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
+      Animated.timing(slideAnim, {
+        toValue: 0 - titleViewHeight + 25,
+        duration: 100,
+        easing: EasingNode.linear,
+        //useNativeDriver: true,
+      }).start();
+    });
+    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 100,
+        easing: EasingNode.linear,
+        //useNativeDriver: true,
+      }).start();
+    });
+
+    return () => {
+      !!keyboardDidShowListener && keyboardDidShowListener.remove();
+      !!keyboardDidHideListener && keyboardDidHideListener.remove();
+    };
+  }, [slideAnim, titleViewHeight]);
 
   const saveSettings = async () => {
     let serverParsed = server;
@@ -166,18 +184,19 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
     if (serverContext !== serverParsed) {
       setDisabled(true);
-      const resultServer = await checkServerURI(serverParsed, serverContext, setDisabled);
-      // if disabled is true  -> fast response -> show the toast with the error
-      // if disabled is false -> 30 seconds error before this task end -> don't show the error,
-      //                         it was showed before.
-      if (!resultServer) {
-        if (disabled) {
-          Toast.show(translate('loadedapp.changeservernew-error') as string, Toast.LONG);
+      Toast.show(translate('loadedapp.tryingnewserver') as string, Toast.SHORT);
+      const { result, timeout } = await checkServerURI(serverParsed, serverContext);
+      if (!result) {
+        // if the server checking takes more then 30 seconds.
+        if (timeout === true) {
+          Toast.show(translate('loadedapp.tryingnewserver-error') as string, Toast.LONG);
+        } else {
+          Toast.show((translate('loadedapp.changeservernew-error') as string) + serverParsed, Toast.LONG);
         }
         // in this point the sync process is blocked, who knows why.
         // if I save the actual server before the customization... is going to work.
-        set_server_option('server', serverContext);
-        setDisabled(undefined);
+        set_server_option('server', serverContext, true);
+        setDisabled(false);
         return;
       }
     }
@@ -242,8 +261,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     ));
   };
 
-  //console.log(walletSettings);
-
   return (
     <SafeAreaView
       style={{
@@ -253,7 +270,20 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         height: '100%',
         backgroundColor: colors.background,
       }}>
-      <Header title={translate('settings.title') as string} noBalance={true} noSyncingStatus={true} noDrawMenu={true} />
+      <Animated.View style={{ marginTop: slideAnim }}>
+        <View
+          onLayout={e => {
+            const { height } = e.nativeEvent.layout;
+            setTitleViewHeight(height);
+          }}>
+          <Header
+            title={translate('settings.title') as string}
+            noBalance={true}
+            noSyncingStatus={true}
+            noDrawMenu={true}
+          />
+        </View>
+      </Animated.View>
 
       <ScrollView
         testID="settings.scrollView"
@@ -440,7 +470,12 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           disabled={disabled}
           type="Primary"
           title={translate('settings.save') as string}
-          onPress={saveSettings}
+          onPress={() => {
+            // waiting while closing the keyboard, just in case.
+            setTimeout(async () => {
+              await saveSettings();
+            }, 100);
+          }}
         />
         <Button
           disabled={disabled}

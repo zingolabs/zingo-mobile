@@ -729,7 +729,11 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     this.rpc.fetchWalletSettings();
   };
 
-  set_server_option = async (name: 'server' | 'currency' | 'language' | 'sendAll', value: string): Promise<void> => {
+  set_server_option = async (
+    name: 'server' | 'currency' | 'language' | 'sendAll',
+    value: string,
+    noToast?: boolean,
+  ): Promise<void> => {
     // here I know the server was changed, clean all the tasks before anything.
     this.rpc.clearTimers();
     this.setState({
@@ -746,7 +750,9 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     if (result && !result.toLowerCase().startsWith('error')) {
       // Load the wallet and navigate to the transactions screen
       console.log(`wallet loaded ok ${value}`);
-      Toast.show(`${this.props.translate('loadedapp.readingwallet')} ${value}`, Toast.LONG);
+      if (!noToast) {
+        Toast.show(`${this.props.translate('loadedapp.readingwallet')} ${value}`, Toast.LONG);
+      }
       await SettingsFileImpl.writeSettings(name, value);
       this.setState({
         server: value,
@@ -762,7 +768,9 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
         seedServerModalVisible: true,
       });
       //console.log(`Error Reading Wallet ${value} - ${error}`);
-      Toast.show(`${this.props.translate('loadedapp.readingwallet-error')} ${value}`, Toast.LONG);
+      if (!noToast) {
+        Toast.show(`${this.props.translate('loadedapp.readingwallet-error')} ${value}`, Toast.LONG);
+      }
 
       // we need to restore the old server because the new doesn't have the seed of the current wallet.
       const old_settings = await SettingsFileImpl.readSettings();

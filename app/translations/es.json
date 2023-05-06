@@ -33,9 +33,9 @@
     "restorebackupwallet": "Restaurar la última copia de Seguridad",
     "fundpools": "Agrupaciones de Fondos",
     "restoremainnet-error": "Esta opción está solamente disponible para la Red: 'Mainnet'.",
-    "changeservernew-error": "Error al intentar cambiar al Servidor nuevo:",
+    "changeservernew-error": "Error al intentar cambiar al Servidor nuevo: ",
     "readingwallet-error": "Error al intentar leer el monedero activo usando el Servidor nuevo:",
-    "changeserverold-error": "Error al intentar volver a cambiar al Servidor antiguo:",
+    "changeserverold-error": "Error al intentar volver a cambiar al Servidor antiguo: ",
     "changingwallet-label": "Error cambiando de Monedero",
     "restoringwallet-label": "Error restaurando el Monedero",
     "computingtx": "Procesando Transacción",
@@ -51,7 +51,7 @@
     "connection-error": "No existe conexión a Internet, Zingo así no puede funcionar correctamente.",
     "tryingnewserver": "Intentando conectar con el nuevo Servidor... Puede llevar varios segundos.",
     "tryingnewserver-error": "Después de 30 segundos el nuevo Servidor no responde.",
-    "readingwallet": "Leyendo satisfactoriamente el monedero activo usando el Servidor nuevo:"
+    "readingwallet": "Leyendo satisfactoriamente el monedero activo usando el Servidor:"
   },
   "rpc": {
     "parsebirthday-error": "Error: No es posible convertirlo en un número:",
