@@ -10,9 +10,8 @@ use jni::objects::{JObject, JString};
 use jni::sys::jstring;
 use jni::JNIEnv;
 use std::ffi::{CStr, CString};
-
 #[no_mangle]
-pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RustFFI_00024Companion_initlogging(
+pub extern "C" fn Java_org_ZingoLabs_Zingo_RustFFI_00024Companion_initlogging(
     env: JNIEnv,
     _: JObject,
 ) -> jstring {
@@ -26,6 +25,9 @@ pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RustFFI_00024Companion_initlog
     env.new_string("OK").unwrap().into_inner()
 }
 
+/// # Safety
+///
+/// CString from pointer data
 #[no_mangle]
 pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RustFFI_00024Companion_initnew(
     env: JNIEnv,
@@ -49,6 +51,9 @@ pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RustFFI_00024Companion_initnew
     output.into_inner()
 }
 
+/// # Safety
+///
+/// CString from pointer data
 #[no_mangle]
 pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RustFFI_00024Companion_initfromseed(
     env: JNIEnv,
@@ -84,6 +89,9 @@ pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RustFFI_00024Companion_initfro
     output.into_inner()
 }
 
+/// # Safety
+///
+/// CString from pointer data
 #[no_mangle]
 pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RustFFI_00024Companion_initfromb64(
     env: JNIEnv,
@@ -112,6 +120,9 @@ pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RustFFI_00024Companion_initfro
     output.into_inner()
 }
 
+/// # Safety
+///
+/// CString from pointer data
 #[no_mangle]
 pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RustFFI_00024Companion_save(
     env: JNIEnv,
@@ -122,6 +133,9 @@ pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RustFFI_00024Companion_save(
     output.into_inner()
 }
 
+/// # Safety
+///
+/// CString from pointer data
 #[no_mangle]
 pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RustFFI_00024Companion_execute(
     env: JNIEnv,
@@ -142,7 +156,9 @@ pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RustFFI_00024Companion_execute
     let output = env.new_string(resp.as_str()).unwrap();
     output.into_inner()
 }
-
+/// # Safety
+///
+/// CString from pointer data
 #[no_mangle]
 pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RustFFI_00024Companion_getlatestblock(
     env: JNIEnv,
