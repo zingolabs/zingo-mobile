@@ -44,7 +44,6 @@ function wait_for() {
     shift 1
     until [ $timeout_seconds -le 0 ] || ("$@" &> /dev/null); do
         sleep 1
-        echo "waiting"
         timeout_seconds=$(( timeout_seconds - 1 ))
     done
     if [ $timeout_seconds -le 0 ]; then
