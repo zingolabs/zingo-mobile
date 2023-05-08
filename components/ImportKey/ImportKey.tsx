@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState } from 'react';
-import { View, ScrollView, SafeAreaView, TouchableOpacity, Modal, TextInput } from 'react-native';
+import { View, SafeAreaView, TouchableOpacity, Modal, TextInput } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { faQrcode } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -13,6 +13,7 @@ import ScannerKey from './components/ScannerKey';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
+import ZingoScrollView from "../Components/ZingoScrollView"
 
 type ImportKeyProps = {
   closeModal: () => void;
@@ -55,7 +56,7 @@ const ImportKey: React.FunctionComponent<ImportKeyProps> = ({ closeModal, doImpo
 
       <Header title={translate('import.title') as string} noBalance={true} noSyncingStatus={true} noDrawMenu={true} />
 
-      <ScrollView
+      <ZingoScrollView
         style={{ maxHeight: '85%' }}
         contentContainerStyle={{
           flexDirection: 'column',
@@ -145,7 +146,7 @@ const ImportKey: React.FunctionComponent<ImportKeyProps> = ({ closeModal, doImpo
         </View>
 
         <RegText style={{ margin: 20, marginBottom: 30 }}>{translate('import.text') as string}</RegText>
-      </ScrollView>
+      </ZingoScrollView>
       <View
         style={{
           flexGrow: 1,
