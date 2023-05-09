@@ -11,6 +11,7 @@ valid_api_levels=("23" "24" "25" "26" "27" "28" "29" "30" "31" "32" "33")
 valid_api_targets=("default" "google_apis" "google_apis_playstore" "google_atd" "google-tv" \
     "aosp_atd" "android-tv" "android-desktop" "android-wear" "android-wear-cn")
 timeout_seconds=1800  # default timeout set to 30 minutes
+boot_app=true
 
 function check_launch() {
     emulator_status=$(adb devices | grep "emulator-5554" | cut -f1)
@@ -52,29 +53,29 @@ function wait_for() {
     fi
 }
 
-while getopts 'a:l:t:sx:h' OPTION; do
+while getopts 'a:l:t:sx:hY' OPTION; do
     case "$OPTION" in
         a)
             abi="$OPTARG"
             case "$abi" in
                 x86_64)
-                    api_level_default="30"
-                    api_target_default="google_apis_playstore"
+                    api_level="30"
+                    api_target="google_apis_playstore"
                     arch="x86_64"
                     ;;
                 x86) 
-                    api_level_default="30"
-                    api_target_default="google_apis_playstore"
+                    api_level="30"
+                    api_target="google_apis_playstore"
                     arch="x86"
                     ;;
                 arm64-v8a)
-                    api_level_default="30"
-                    api_target_default="google_apis_playstore"
+                    api_level="30"
+                    api_target="google_apis_playstore"
                     arch="x86_64"
                     ;;
                 armeabi-v7a)
-                    api_level_default="30"
-                    api_target_default="google_apis_playstore"
+                    api_level="30"
+                    api_target="google_apis_playstore"
                     arch="x86"
                     ;;
                 *)
@@ -122,6 +123,9 @@ while getopts 'a:l:t:sx:h' OPTION; do
                 exit 1
             fi
             ;;
+        Y)
+            boot_app=false
+            ;;
         h)
             echo -e "\nEmulate app from the command line. Requires Android Studio cmdline-tools."
             echo -e "\n  -a\t\tSelect ABI (required)"
@@ -139,6 +143,8 @@ while getopts 'a:l:t:sx:h' OPTION; do
             echo -e "\n  -x\t\tSet timeout in seconds for emulator launch and AVD boot-up (optional)"
             echo -e "      \t\t  Default: 1800"
             echo -e "      \t\t  Must be an integer"
+            echo -e "\n  -Y\t\tLaunch emulator but dont boot app."
+            echo -e "      \t\t  Default: launch emulator and boot app."
             echo -e "\nExamples:"
             echo -e "  '$(basename $0) -a x86_64 -s'\tCreates an AVD and quick-boot snapshot for x86_64 ABI"
             echo -e "  '$(basename $0) -a x86_64'   \tEmulates app for x86_64 ABI from snapshot"
@@ -164,24 +170,12 @@ if [[ $set_abi == false ]]; then
     exit 1
 fi
 
-# Set defaults
-if [[ $set_api_level == false ]]; then
-    api_level=$api_level_default
-fi
-if [[ $set_api_target == false ]]; then
-    api_target=$api_target_default
-fi
-
 # Setup working directory
 if [ ! -d "./android/app" ]; then
     echo "Error: Incorrect working directory" >&2
     echo "Try './scripts/$(basename $0)' from zingo-mobile root directory." >&2
     exit 1
 fi
-
-cd android
-# Kill all emulators
-../scripts/kill_emulators.sh
 
 test_report_dir="app/build/outputs/emulate_app_reports/${abi}"
 rm -rf "${test_report_dir}"
@@ -190,6 +184,10 @@ mkdir -p "${test_report_dir}"
 avd_name="${avd_skin}-android-${api_level}_${api_target}_${arch}"
 sdk="system-images;android-${api_level};${api_target};${arch}"
 platform="platforms;android-${api_level}"
+
+cd android
+# Kill all emulators
+../scripts/kill_emulators.sh
 
 if [[ $create_snapshot == true ]]; then
     sdkmanager --licenses
@@ -234,11 +232,6 @@ else
         echo "AVD found: ${avd_name}"
     fi
         
-    echo -e "\nRunning yarn install..."
-    yarn install
-
-    echo -e "\nBuilding APKs..."
-    ./gradlew assembleDebug -Psplitapk=true
 
     # Create integration test report directory
 
@@ -254,41 +247,49 @@ else
     echo $(adb -s emulator-5554 emu avd name | head -1)
     echo "Device online" && sleep 1
 
-    echo -e "\nInstalling APKs..."
-    i=0
-    step_complete=false
-    until [[ $step_complete == true ]]; do
-        if adb -s emulator-5554 install -r -t -d --abi "${abi}" \
-                "app/build/outputs/apk/debug/app-${abi}-debug.apk" &> "${test_report_dir}/apk_installation.txt"; then
-            step_complete=true
-            echo "Successfully installed APKs"
-        fi              
-        if [[ $i -ge 100 ]]; then
-            echo "Error: Failed to install APKs" >&2
-            echo "For more information see 'android/${test_report_dir}/apk_installation.txt'" >&2
-            exit 1
-        fi
-        i=$((i+1))
-        sleep 1
-    done
+    if "${boot_app}"; then
+        echo -e "\nRunning yarn install..."
+        yarn install
 
-    # Store emulator info and start logging
-    adb -s emulator-5554 shell getprop &> "${test_report_dir}/getprop.txt"
-    adb -s emulator-5554 shell cat /proc/meminfo &> "${test_report_dir}/meminfo.txt"
-    adb -s emulator-5554 shell cat /proc/cpuinfo &> "${test_report_dir}/cpuinfo.txt"
-    adb -s emulator-5554 shell logcat -v threadtime -b main &> "${test_report_dir}/logcat.txt" &
+        echo -e "\nBuilding APKs..."
+        ./gradlew assembleDebug -Psplitapk=true
+
+        echo -e "\nInstalling APKs..."
+        i=0
+        step_complete=false
+        until [[ $step_complete == true ]]; do
+            if adb -s emulator-5554 install -r -t -d --abi "${abi}" \
+                    "app/build/outputs/apk/debug/app-${abi}-debug.apk" &> "${test_report_dir}/apk_installation.txt"; then
+                step_complete=true
+                echo "Successfully installed APKs"
+            fi              
+            if [[ $i -ge 100 ]]; then
+                echo "Error: Failed to install APKs" >&2
+                echo "For more information see 'android/${test_report_dir}/apk_installation.txt'" >&2
+                exit 1
+            fi
+            i=$((i+1))
+            sleep 1
+        done
+
+        # Store emulator info and start logging
+        adb -s emulator-5554 shell getprop &> "${test_report_dir}/getprop.txt"
+        adb -s emulator-5554 shell cat /proc/meminfo &> "${test_report_dir}/meminfo.txt"
+        adb -s emulator-5554 shell cat /proc/cpuinfo &> "${test_report_dir}/cpuinfo.txt"
+        adb -s emulator-5554 shell logcat -v threadtime -b main &> "${test_report_dir}/logcat.txt" &
     
-    # Start react-native
-    if killall node; then
-        echo -e "\nAll node processes killed."
-        echo -e "\nRestarting react native..."
-    fi
-    nohup yarn react-native start > "${test_report_dir}/react_native.out" &> /dev/null &
+        # Start react-native
+        if killall node; then
+            echo -e "\nAll node processes killed."
+            echo -e "\nRestarting react native..."
+        fi
+        nohup yarn react-native start > "${test_report_dir}/react_native.out" &> /dev/null &
         
-    echo -e "\nLaunching App..."
-    nohup adb shell am start -n "org.ZingoLabs.Zingo/org.ZingoLabs.Zingo.MainActivity" -a android.intent.action.MAIN \
-        -c android.intent.category.LAUNCHER > "${test_report_dir}/launch_app.out" &> /dev/null &
+        echo -e "\nLaunching App..."
+        nohup adb shell am start -n "org.ZingoLabs.Zingo/org.ZingoLabs.Zingo.MainActivity" -a android.intent.action.MAIN \
+            -c android.intent.category.LAUNCHER > "${test_report_dir}/launch_app.out" &> /dev/null &
 
-    echo -e "\nTest reports saved: android/${test_report_dir}"        
+        echo -e "\nTest reports saved: android/${test_report_dir}"        
+    fi
 fi
 
