@@ -24,7 +24,6 @@ function check_launch() {
 
 function check_boot() {
     boot_status=$(adb -s emulator-5554 shell getprop sys.boot_completed)
-    echo $boot_status
     if [ "${boot_status}" = "1" ]; then
         return 0;
     else
@@ -176,18 +175,14 @@ if [ ! -d "./android/app" ]; then
     echo "Try './scripts/$(basename $0)' from zingo-mobile root directory." >&2
     exit 1
 fi
-
-test_report_dir="app/build/outputs/emulate_app_reports/${abi}"
-rm -rf "${test_report_dir}"
-mkdir -p "${test_report_dir}"
+cd android
+# Kill all emulators
+../scripts/kill_emulators.sh
 
 avd_name="${avd_skin}-android-${api_level}_${api_target}_${arch}"
 sdk="system-images;android-${api_level};${api_target};${arch}"
 platform="platforms;android-${api_level}"
 
-cd android
-# Kill all emulators
-../scripts/kill_emulators.sh
 
 if [[ $create_snapshot == true ]]; then
     sdkmanager --licenses
@@ -205,14 +200,17 @@ if [[ $create_snapshot == true ]]; then
     echo -e "\nCreating AVD..."
     echo no | avdmanager create avd --force --name "${avd_name}" --package "${sdk}" --device "${avd_skin}"
 
+    snapshot_report_dir="app/build/outputs/emulator_snapshot_reports/${abi}"
+    rm -rf "${snapshot_report_dir}"
+    mkdir -p "${snapshot_report_dir}"
+    
     echo -e "\n\nWaiting for emulator to launch..."
-    emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -no-boot-anim -no-snapshot-load -port 5554 &> "${test_report_dir}/emulator.txt" &
+    emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -no-boot-anim -no-snapshot-load -port 5554 &> "${snapshot_report_dir}/emulator.txt" &
     wait_for $timeout_seconds check_launch
     echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
 
     echo -e "\nWaiting for AVD to boot..."
     wait_for $timeout_seconds check_boot
-    echo -e "\nWaiting for AVD to be online..."
     wait_for $timeout_seconds check_device_online
     echo $(adb -s emulator-5554 emu avd name | head -1)
     echo "Boot completed" && sleep 1
@@ -231,9 +229,12 @@ else
     else
         echo "AVD found: ${avd_name}"
     fi
-        
 
     # Create integration test report directory
+        
+    test_report_dir="app/build/outputs/emulate_app_reports/${abi}"
+    rm -rf "${test_report_dir}"
+    mkdir -p "${test_report_dir}"
 
     echo -e "\n\nWaiting for emulator to launch..."
     emulator -avd "${avd_name}" -netdelay none -netspeed full -no-boot-anim -no-snapshot-save -read-only -port 5554 &> "${test_report_dir}/emulator.txt" &
@@ -242,7 +243,6 @@ else
 
     echo -e "\nWaiting for AVD to boot..."
     wait_for $timeout_seconds check_boot
-    echo -e "\nWaiting for AVD to be online..."
     wait_for $timeout_seconds check_device_online
     echo $(adb -s emulator-5554 emu avd name | head -1)
     echo "Device online" && sleep 1
