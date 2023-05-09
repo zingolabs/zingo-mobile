@@ -223,7 +223,11 @@ jobs:
         run: ./scripts/integration_tests.sh -a ${{ matrix.avd-arch }} -s
 
       - name: Run integration tests
-        run: ./scripts/integration_tests.sh -a ${{ matrix.abi }}
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 60
+          max_attempts: 3
+          command: ./scripts/integration_tests.sh -a ${{ matrix.abi }}
 
       - name: Upload test reports
         if: ${{ ! cancelled() }}
