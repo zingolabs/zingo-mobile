@@ -123,6 +123,9 @@ while getopts 'a:l:t:sx:h' OPTION; do
             ;;
         h)
             echo -e "\nEmulate app from the command line. Requires Android Studio cmdline-tools."
+            echo -e "\n  -s\t\tCreate an AVD and snapshot for quick-boot. (prerequisite)"
+            echo -e "      \t\t  Installs latest emulation tools and creates avd with abi specified by -a."
+            echo -e "      \t\t  Setup only. Does not run app."
             echo -e "\n  -a\t\tSelect ABI (required)"
             echo -e "      \t\t  Options:"
             echo -e "      \t\t  'x86_64' - default system image: API 30 google_apis_playstore x86_64"
@@ -133,8 +136,6 @@ while getopts 'a:l:t:sx:h' OPTION; do
             echo -e "      \t\t  Minimum API level: 23"
             echo -e "\n  -t\t\tSelect API target (optional)"
             echo -e "      \t\t  See examples on selecting system images below"
-            echo -e "\n  -s\t\tCreate an AVD and snapshot for quick-boot (optional)"
-            echo -e "      \t\t  Does not run app"
             echo -e "\n  -x\t\tSet timeout in seconds for emulator launch and AVD boot-up (optional)"
             echo -e "      \t\t  Default: 1800"
             echo -e "      \t\t  Must be an integer"
@@ -225,14 +226,12 @@ if [[ $create_snapshot == true ]]; then
 else
     echo -e "\nChecking for AVD..."
     if [ $(emulator -list-avds | grep -ow "${avd_name}" | wc -w) -ne 1 ]; then
-        echo "AVD not found"
-        echo -e "\nCreating AVD..."
-        echo no | avdmanager create avd --force --name "${avd_name}" --package "${sdk}" --device "${avd_skin}"
-        echo -e "\n\nTo create a quick-boot snapshot use the '-s' flag"
-        echo "Try '$(basename $0) -h' for more information."
-    else
-        echo "AVD found: ${avd_name}"
+        echo "Error: AVD not found" >&2
+        echo -e "\n\nTo create a quick-boot AVD snapshot use the '-s' flag" >&2
+        echo "Try '$(basename $0) -h' for more information." >&2
+        exit 1
     fi
+    echo "AVD found: ${avd_name}"
         
     echo -e "\nRunning yarn install..."
     yarn install
