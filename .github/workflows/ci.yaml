@@ -294,38 +294,17 @@ jobs:
             ~/.android/adb*
           key: avd-${{ matrix.arch }}-api-${{ matrix.api-level }}-e2e
 
-      - name: Native rust cache
-        uses: actions/cache@v3
-        with:
-          path: android/app/src/main/jniLibs/${{ matrix.arch }}
-          key: native-rust-${{ matrix.arch }}-${{ env.CACHE-KEY }}
-          fail-on-cache-miss: true
-      
       - name: Create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: ${{ matrix.api-level }}
-          arch: ${{ matrix.arch }}
-          force-avd-creation: false
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: false
-          script: echo "Generated AVD snapshot for caching."
-      
-      - run: yarn install
-      
-      - run: nohup yarn react-native start > "yarn_react_native_start.out" &
+        run: ./scripts/emulate_app.sh -a ${{ matrix.avd-arch }} -s
+
+      - name: Run integration tests
+        run: ./scripts/emulate_app.sh -a ${{ matrix.abi }}
       
       - name: Run Detox Build
-        run: yarn detox build -c android.emu.debug -n test
-      
+        run: yarn detox build -c android.emu.debug
+
       - name: Run Detox Test
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: ${{ matrix.api-level }}
-          arch: ${{ matrix.arch }}
-          force-avd-creation: false
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: true
-          script: yarn detox test -c android.emu.debug -n test
+        run: yarn detox test -c android.emu.debug
+      
       
