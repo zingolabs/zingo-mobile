@@ -197,7 +197,7 @@ if [[ $create_snapshot == true ]]; then
     echo no | avdmanager create avd --force --name "${avd_name}" --package "${sdk}"
 
     echo -e "\n\nWaiting for emulator to launch..."
-    emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
+    nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
         -no-snapshot-load -port 5554 &> /dev/null &
     wait_for $timeout_seconds check_launch
     wait_for $timeout_seconds check_device_online
@@ -206,7 +206,8 @@ if [[ $create_snapshot == true ]]; then
     echo -e "\nWaiting for AVD to boot..."
     wait_for $timeout_seconds check_boot
     echo $(adb -s emulator-5554 emu avd name | head -1)
-    echo "Boot completed" && sleep 1
+    echo "Boot completed" 
+    sleep 1
     echo -e "\nSnapshot saved"
 else
     echo -e "\nChecking for AVD..."
@@ -232,7 +233,7 @@ else
     mkdir -p "${test_report_dir}"
 
     echo -e "\n\nWaiting for emulator to launch..."
-    emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
+    nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
         -no-snapshot-save -read-only -port 5554 &> "${test_report_dir}/emulator.txt" &
     wait_for $timeout_seconds check_launch
     echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
@@ -241,7 +242,8 @@ else
     wait_for $timeout_seconds check_boot
     wait_for $timeout_seconds check_device_online
     echo $(adb -s emulator-5554 emu avd name | head -1)
-    echo "Device online" && sleep 1
+    echo "Device online"
+    sleep 1
 
     # Disable animations
     adb shell input keyevent 82
@@ -272,7 +274,7 @@ else
     adb -s emulator-5554 shell getprop &> "${test_report_dir}/getprop.txt"
     adb -s emulator-5554 shell cat /proc/meminfo &> "${test_report_dir}/meminfo.txt"
     adb -s emulator-5554 shell cat /proc/cpuinfo &> "${test_report_dir}/cpuinfo.txt"
-    adb -s emulator-5554 shell logcat -v threadtime -b main &> "${test_report_dir}/logcat.txt" &
+    nohup adb -s emulator-5554 shell logcat -v threadtime -b main &> "${test_report_dir}/logcat.txt" &
 
     # Create additional test output directory
     adb -s emulator-5554 shell rm -rf "/sdcard/Android/media/org.ZingoLabs.Zingo/additional_test_output"

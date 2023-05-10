@@ -183,7 +183,6 @@ cd android
 # Kill all emulators
 ../scripts/kill_emulators.sh
 
-
 avd_name="${avd_device}-android-${api_level}_${api_target}_${arch}"
 sdk="system-images;android-${api_level};${api_target};${arch}"
 platform="platforms;android-${api_level}"
@@ -210,7 +209,7 @@ if [[ $create_snapshot == true ]]; then
     mkdir -p "${snapshot_report_dir}"
 
     echo -e "\n\nWaiting for emulator to launch..."
-    emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -no-boot-anim -no-snapshot-load -port 5554 &> "${snapshot_report_dir}/emulator.txt" &
+    nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -no-boot-anim -no-snapshot-load -port 5554 &> "${snapshot_report_dir}/emulator.txt" &
     wait_for $timeout_seconds check_launch
     echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
 
@@ -245,7 +244,7 @@ else
     mkdir -p "${test_report_dir}"
 
     echo -e "\n\nWaiting for emulator to launch..."
-    emulator -avd "${avd_name}" -netdelay none -netspeed full -no-boot-anim -no-snapshot-save -read-only -port 5554 &> "${test_report_dir}/emulator.txt" &
+    nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-boot-anim -no-snapshot-save -read-only -port 5554 &> "${test_report_dir}/emulator.txt" &
     wait_for $timeout_seconds check_launch
     echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
 
@@ -277,19 +276,18 @@ else
     adb -s emulator-5554 shell getprop &> "${test_report_dir}/getprop.txt"
     adb -s emulator-5554 shell cat /proc/meminfo &> "${test_report_dir}/meminfo.txt"
     adb -s emulator-5554 shell cat /proc/cpuinfo &> "${test_report_dir}/cpuinfo.txt"
-    adb -s emulator-5554 shell logcat -v threadtime -b main &> "${test_report_dir}/logcat.txt" &
+    nohup adb -s emulator-5554 shell logcat -v threadtime -b main &> "${test_report_dir}/logcat.txt" &
     
     # Start react-native
-    if killall node; then
+    if killall node &> /dev/null; then
         echo -e "\nAll node processes killed."
         echo -e "\nRestarting react native..."
     fi
-    nohup yarn react-native start > "${test_report_dir}/react_native.out" &> /dev/null &
+    nohup yarn react-native start &> "${test_report_dir}/react_native.out" &
         
     echo -e "\nLaunching App..."
-    nohup adb shell am start -n "org.ZingoLabs.Zingo/org.ZingoLabs.Zingo.MainActivity" -a android.intent.action.MAIN \
-        -c android.intent.category.LAUNCHER > "${test_report_dir}/launch_app.out" &> /dev/null &
+    adb shell am start -n "org.ZingoLabs.Zingo/org.ZingoLabs.Zingo.MainActivity" -a android.intent.action.MAIN \
+        -c android.intent.category.LAUNCHER &> "${test_report_dir}/launch_app.out"
 
     echo -e "\nTest reports saved: android/${test_report_dir}"        
 fi
-
