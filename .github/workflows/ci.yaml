@@ -13,11 +13,11 @@ jobs:
   create-timestamp:
     uses: Oscar-Pepper/zingo-mobile/.github/workflows/create-timestamp.yaml@ci_DRY
     
-  test-timestamp:
-    runs-on: ubuntu-latest
-    needs: create-timestamp
-    steps:
-      - run: echo test
+  # test-timestamp:
+  #   runs-on: ubuntu-latest
+  #   needs: create-timestamp
+  #   steps:
+  #     - run: echo test
       # - run: echo ${{ needs.create-timestamp.outputs.timestamp }}
   
   # create-cache-key:
