@@ -8,16 +8,8 @@ on:
 
 jobs:
   jest-test:
-    name: Jest test
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-      
-      - run: yarn install
-      
-      - run: yarn test
-  
+    uses: ./github/workflows/jest-test.yaml
+    
   create-timestamp:
     name: Create timestamp
     runs-on: ubuntu-22.04

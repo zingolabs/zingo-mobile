@@ -1,0 +1,17 @@
+name: Jest test
+
+on:
+  workflow_call:
+
+jobs:
+  jest-test:
+    name: Jest test
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - run: yarn install
+      
+      - run: yarn test
+
