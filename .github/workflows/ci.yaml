@@ -8,7 +8,7 @@ on:
 
 jobs:
   jest-test:
-    uses: ./github/workflows/jest-test.yaml
+    uses: ./.github/workflows/jest-test.yaml
     
   create-timestamp:
     name: Create timestamp
