@@ -23,7 +23,6 @@ function check_launch() {
 
 function check_boot() {
     boot_status=$(adb -s emulator-5554 shell getprop sys.boot_completed)
-    echo $boot_status
     if [ "${boot_status}" = "1" ]; then
         return 0;
     else
