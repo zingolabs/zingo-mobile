@@ -182,9 +182,6 @@ cd android
 # Kill all emulators
 ../scripts/kill_emulators.sh
 
-test_report_dir="app/build/outputs/emulate_app_reports/${abi}"
-rm -rf "${test_report_dir}"
-mkdir -p "${test_report_dir}"
 
 avd_name="${avd_skin}-android-${api_level}_${api_target}_${arch}"
 sdk="system-images;android-${api_level};${api_target};${arch}"
@@ -205,6 +202,10 @@ if [[ $create_snapshot == true ]]; then
     
     echo -e "\nCreating AVD..."
     echo no | avdmanager create avd --force --name "${avd_name}" --package "${sdk}" --device "${avd_skin}"
+
+    test_report_dir="app/build/outputs/snapshot_reports/${abi}"
+    rm -rf "${test_report_dir}"
+    mkdir -p "${test_report_dir}"
 
     echo -e "\n\nWaiting for emulator to launch..."
     emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -no-boot-anim -no-snapshot-load -port 5554 &> "${test_report_dir}/emulator.txt" &
@@ -240,6 +241,9 @@ else
     ./gradlew assembleDebug -Psplitapk=true
 
     # Create integration test report directory
+    test_report_dir="app/build/outputs/emulate_app_reports/${abi}"
+    rm -rf "${test_report_dir}"
+    mkdir -p "${test_report_dir}"
 
     echo -e "\n\nWaiting for emulator to launch..."
     emulator -avd "${avd_name}" -netdelay none -netspeed full -no-boot-anim -no-snapshot-save -read-only -port 5554 &> "${test_report_dir}/emulator.txt" &
