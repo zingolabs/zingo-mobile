@@ -5,18 +5,15 @@ on:
     outputs:
       timestamp:
         description: "Timestamp"
-        value: ${{ jobs.create-timestamp.outputs.output1 }}
+        value: ${{ jobs.create-timestamp.outputs.timestamp }}
 
 jobs:
   create-timestamp:
     name: Create timestamp
     runs-on: ubuntu-22.04
     outputs:
-      output1: ${{ steps.create-timestamp-test.outputs.timestamp-test }}
-    # outputs:
-    #   timestamp: ${{ steps.create-timestamp.outputs.timestamp }}
+      timestamp: ${{ steps.create-timestamp.outputs.timestamp }}
     steps:
-      # - name: Create timestamp
-      - id: create-timestamp-test
-        run: echo "timestamp-test=test" >> $GITHUB_OUTPUT
-        # run: echo "timestamp=$(date +%Y%m%d%H%M%S)" >> $GITHUB_OUTPUT
+      - name: Create timestamp
+        id: create-timestamp
+        run: echo "timestamp=$(date +%Y%m%d%H%M%S)" >> $GITHUB_OUTPUT
