@@ -177,8 +177,8 @@ if [ ! -d "./android/app" ]; then
     echo "Try './scripts/$(basename $0)' from zingo-mobile root directory." >&2
     exit 1
 fi
-
 cd android
+
 # Kill all emulators
 ../scripts/kill_emulators.sh
 
