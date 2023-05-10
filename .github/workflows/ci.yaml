@@ -8,17 +8,16 @@ on:
 
 jobs:
   jest-test:
-    uses: oscar-pepper/zingo-mobile/.github/workflows/jest_test.yaml@ci_DRY
+    uses: oscar-pepper/zingo-mobile/.github/workflows/jest-test.yaml@ci_DRY
     
-  # create-timestamp:
-  #   name: Create timestamp
-  #   runs-on: ubuntu-22.04
-  #   outputs:
-  #     timestamp: ${{ steps.create-timestamp.outputs.timestamp }}
-  #   steps:
-  #     - name: Create timestamp
-  #       id: create-timestamp
-  #       run: echo "timestamp=$(date +%Y%m%d%H%M%S)" >> $GITHUB_OUTPUT
+  create-timestamp:
+    uses: oscar-pepper/zingo-mobile/.github/workflows/create-timestamp.yaml@ci_DRY
+    
+  test-timestamp:
+    runs-on: ubuntu-latest
+    needs: create-timestamp
+    steps:
+      - run: echo ${{ needs.create-timestamp.outputs.timestamp }}
   
   # create-cache-key:
   #   name: Create cache key
