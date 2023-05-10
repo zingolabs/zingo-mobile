@@ -203,12 +203,13 @@ if [[ $create_snapshot == true ]]; then
     echo -e "\nCreating AVD..."
     echo no | avdmanager create avd --force --name "${avd_name}" --package "${sdk}" --device "${avd_skin}"
 
-    test_report_dir="app/build/outputs/snapshot_reports/${abi}"
-    rm -rf "${test_report_dir}"
-    mkdir -p "${test_report_dir}"
+    # Create test report directory
+    snapshot_report_dir="app/build/outputs/snapshot_reports/${abi}"
+    rm -rf "${snapshot_report_dir}"
+    mkdir -p "${snapshot_report_dir}"
 
     echo -e "\n\nWaiting for emulator to launch..."
-    emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -no-boot-anim -no-snapshot-load -port 5554 &> "${test_report_dir}/emulator.txt" &
+    emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -no-boot-anim -no-snapshot-load -port 5554 &> "${snapshot_report_dir}/emulator.txt" &
     wait_for $timeout_seconds check_launch
     echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
 
@@ -239,7 +240,7 @@ else
     echo -e "\nBuilding APKs..."
     ./gradlew assembleDebug -Psplitapk=true
 
-    # Create integration test report directory
+    # Create test report directory
     test_report_dir="app/build/outputs/emulate_app_reports/${abi}"
     rm -rf "${test_report_dir}"
     mkdir -p "${test_report_dir}"
