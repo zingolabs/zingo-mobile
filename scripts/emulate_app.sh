@@ -1,7 +1,7 @@
 #!/bin/bash
 set -Eeuo pipefail
 
-avd_skin="pixel_2"
+avd_device="pixel_2"
 
 set_abi=false
 set_api_level=false
@@ -184,7 +184,7 @@ cd android
 ../scripts/kill_emulators.sh
 
 
-avd_name="${avd_skin}-android-${api_level}_${api_target}_${arch}"
+avd_name="${avd_device}-android-${api_level}_${api_target}_${arch}"
 sdk="system-images;android-${api_level};${api_target};${arch}"
 platform="platforms;android-${api_level}"
 
@@ -202,7 +202,7 @@ if [[ $create_snapshot == true ]]; then
     sdkmanager --install "${platform}"
     
     echo -e "\nCreating AVD..."
-    echo no | avdmanager create avd --force --name "${avd_name}" --package "${sdk}" --device "${avd_skin}"
+    echo no | avdmanager create avd --force --name "${avd_name}" --package "${sdk}" --device "${avd_device}"
 
     # Create test report directory
     snapshot_report_dir="app/build/outputs/snapshot_reports/${abi}"
