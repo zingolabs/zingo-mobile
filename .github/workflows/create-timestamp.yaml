@@ -2,10 +2,10 @@ name: Create timestamp
 
 on:
   workflow_call:
-    outputs:
-      timestamp:
-        description: "Timestamp"
-        value: ${{ jobs.create-timestamp.outputs.timestamp }}
+    # outputs:
+    #   timestamp:
+    #     description: "Timestamp"
+    #     value: ${{ jobs.create-timestamp.outputs.timestamp }}
 
 jobs:
   create-timestamp:
