@@ -10,14 +10,14 @@ jobs:
   jest-test:
     uses: oscar-pepper/zingo-mobile/.github/workflows/jest-test.yaml@ci_DRY
     
-  create-timestamp:
-    uses: oscar-pepper/zingo-mobile/.github/workflows/create-timestamp.yaml@ci_DRY
+  # create-timestamp:
+  #   uses: oscar-pepper/zingo-mobile/.github/workflows/create-timestamp.yaml@ci_DRY
     
-  test-timestamp:
-    runs-on: ubuntu-latest
-    needs: create-timestamp
-    steps:
-      - run: echo ${{ needs.create-timestamp.outputs.timestamp }}
+  # test-timestamp:
+  #   runs-on: ubuntu-latest
+  #   needs: create-timestamp
+  #   steps:
+  #     - run: echo ${{ needs.create-timestamp.outputs.timestamp }}
   
   # create-cache-key:
   #   name: Create cache key
