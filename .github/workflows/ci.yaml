@@ -8,7 +8,7 @@ on:
 
 jobs:
   jest-test:
-    uses: ./.github/workflows/jest_test.yaml
+    uses: Oscar-Pepper/zingo-mobile/.github/workflows/jest_test.yaml@ci_DRY
     
   # create-timestamp:
   #   name: Create timestamp
