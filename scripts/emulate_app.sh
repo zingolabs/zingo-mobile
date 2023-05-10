@@ -214,7 +214,6 @@ if [[ $create_snapshot == true ]]; then
 
     echo -e "\nWaiting for AVD to boot..."
     wait_for $timeout_seconds check_boot
-    echo -e "\nWaiting for AVD to be online..."
     wait_for $timeout_seconds check_device_online
     echo $(adb -s emulator-5554 emu avd name | head -1)
     echo "Boot completed" && sleep 1
@@ -252,7 +251,6 @@ else
 
     echo -e "\nWaiting for AVD to boot..."
     wait_for $timeout_seconds check_boot
-    echo -e "\nWaiting for AVD to be online..."
     wait_for $timeout_seconds check_device_online
     echo $(adb -s emulator-5554 emu avd name | head -1)
     echo "Device online" && sleep 1
