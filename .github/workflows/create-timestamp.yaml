@@ -11,10 +11,12 @@ jobs:
   create-timestamp:
     name: Create timestamp
     runs-on: ubuntu-22.04
+    outputs:
+      timestamp: ${{ steps.create-timestamp-test.outputs.timestamp-test }}
     # outputs:
     #   timestamp: ${{ steps.create-timestamp.outputs.timestamp }}
     steps:
       - name: Create timestamp
-        id: create-timestamp
-        run: echo test
+        id: create-timestamp-test
+        run: echo "timestamp-test=test" >> $GITHUB_OUTPUT
         # run: echo "timestamp=$(date +%Y%m%d%H%M%S)" >> $GITHUB_OUTPUT
