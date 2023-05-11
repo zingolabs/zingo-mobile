@@ -19,79 +19,14 @@ jobs:
   integration-test:
     uses: Oscar-Pepper/zingo-mobile/.github/workflows/integration-test.yaml@ci_DRY
     needs: [ create-timestamp, build ]
+    if: ${{ ! cancelled() }}
     with:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
       cache-key: ${{ needs.build.outputs.cache-key }}
-    
-  # e2e-test:
-  #   name: End-to-End Test
-  #   needs: [ create-cache-key, cache-native-rust ]
-  #   if: ${{ ! cancelled() }}
-  #   runs-on: macos-12
-  #   strategy:
-  #     matrix:
-  #       arch: [ x86_64 ]
-  #       api-level: [ 30 ]
-  #   env:
-  #     CACHE-KEY: ${{ needs.create-cache-key.outputs.cache-key }}
-  #   continue-on-error: true
-  #   steps:
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v3
-      
-  #     - name: Setup Java
-  #       uses: actions/setup-java@v3
-  #       with:
-  #         distribution: 'temurin'
-  #         java-version: '11'
-      
-  #     - name: Gradle cache
-  #       uses: gradle/gradle-build-action@v2
-  #       with:
-  #         gradle-version: 7.3.3
-  #         build-root-directory: ./android
-  #         cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev'}}
-      
-  #     - name: AVD cache
-  #       uses: actions/cache@v3
-  #       id: avd-cache
-  #       with: 
-  #         path: |
-  #           ~/.android/avd/*
-  #           ~/.android/adb*
-  #         key: avd-${{ matrix.arch }}-api-${{ matrix.api-level }}-e2e
-
-  #     - name: Native rust cache
-  #       uses: actions/cache@v3
-  #       with:
-  #         path: android/app/src/main/jniLibs/${{ matrix.arch }}
-  #         key: native-rust-${{ matrix.arch }}-${{ env.CACHE-KEY }}
-  #         fail-on-cache-miss: true
-      
-  #     - name: Create AVD and generate snapshot for caching
-  #       if: steps.avd-cache.outputs.cache-hit != 'true'
-  #       uses: reactivecircus/android-emulator-runner@v2
-  #       with:
-  #         api-level: ${{ matrix.api-level }}
-  #         arch: ${{ matrix.arch }}
-  #         force-avd-creation: false
-  #         emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-  #         disable-animations: false
-  #         script: echo "Generated AVD snapshot for caching."
-      
-  #     - run: yarn install
-      
-  #     - run: nohup yarn react-native start > "yarn_react_native_start.out" &
-      
-  #     - name: Run Detox Build
-  #       run: yarn detox build -c android.emu.debug -n test
-      
-  #     - name: Run Detox Test
-  #       uses: reactivecircus/android-emulator-runner@v2
-  #       with:
-  #         api-level: ${{ matrix.api-level }}
-  #         arch: ${{ matrix.arch }}
-  #         force-avd-creation: false
-  #         emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-  #         disable-animations: true
-  #         script: yarn detox test -c android.emu.debug -n test
+  
+  e2e-test:
+    uses: Oscar-Pepper/zingo-mobile/.github/workflows/e2e-test.yaml@ci_DRY
+    needs: build
+    if: ${{ ! cancelled() }}
+    with:
+      cache-key: ${{ needs.build.outputs.cache-key }}
