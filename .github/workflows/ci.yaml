@@ -15,79 +15,14 @@ jobs:
     
   build:
     uses: Oscar-Pepper/zingo-mobile/.github/workflows/build.yaml@ci_DRY
-      
-  # integration-test:
-  #   name: Integration test
-  #   needs: [ create-timestamp, create-cache-key, cache-native-rust ]
-  #   if: ${{ ! cancelled() }}
-  #   runs-on: macos-12
-  #   env:
-  #     CACHE-KEY: ${{ needs.create-cache-key.outputs.cache-key }}
-  #     TIMESTAMP: ${{ needs.create-timestamp.outputs.timestamp }}
-  #   strategy:
-  #     matrix:
-  #       include:
-  #         - abi: armeabi-v7a
-  #           avd-arch: x86
-  #           # api-level: 30
-  #           # api-target: google_apis_playstore
-  #   steps:
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v3
-
-  #     - name: Setup Java
-  #       uses: actions/setup-java@v3
-  #       with:
-  #         distribution: 'temurin'
-  #         java-version: '11'
-      
-  #     - name: Setup Android SDK
-  #       uses: android-actions/setup-android@v2
-      
-  #     - name: Add emulator to PATH
-  #       run: echo "${ANDROID_SDK_ROOT}/emulator" >> $GITHUB_PATH
-            
-  #     - name: Gradle cache
-  #       uses: gradle/gradle-build-action@v2
-  #       with:
-  #         gradle-version: 7.3.3
-  #         build-root-directory: ./android
-  #         cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev' }}
-      
-  #     - name: AVD cache
-  #       uses: actions/cache@v3
-  #       id: avd-cache
-  #       with: 
-  #         path: |
-  #           ~/.android/avd/*
-  #           ~/.android/adb*
-  #         key: avd-${{ matrix.avd-arch }}-integ
-          
-  #     - name: Native rust cache
-  #       uses: actions/cache@v3
-  #       with:
-  #         path: android/app/src/main/jniLibs/${{ matrix.abi }}
-  #         key: native-rust-${{ matrix.abi }}-${{ env.CACHE-KEY }}
-  #         fail-on-cache-miss: true
-      
-  #     - name: Create AVD and generate snapshot for caching
-  #       if: steps.avd-cache.outputs.cache-hit != 'true'
-  #       run: ./scripts/integration_tests.sh -a ${{ matrix.avd-arch }} -s
-
-  #     - name: Run integration tests
-  #       uses: nick-fields/retry@v2
-  #       with:
-  #         timeout_minutes: 60
-  #         max_attempts: 3
-  #         command: ./scripts/integration_tests.sh -a ${{ matrix.abi }}
-
-  #     - name: Upload test reports
-  #       if: ${{ ! cancelled() }}
-  #       uses: actions/upload-artifact@v3
-  #       with:
-  #         name: test-reports-${{ matrix.abi }}-${{ env.TIMESTAMP }}
-  #         path: android/app/build/outputs/integration_test_reports
- 
+       
+  integration-test:
+    uses: Oscar-Pepper/zingo-mobile/.github/workflows/integration-test.yaml@ci_DRY
+    needs: [ create-timestamp, build ]
+    with:
+      timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
+      cache-key: ${{ needs.build.outputs.cache-key }}
+    
   # e2e-test:
   #   name: End-to-End Test
   #   needs: [ create-cache-key, cache-native-rust ]

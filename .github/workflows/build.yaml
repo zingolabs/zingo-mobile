@@ -2,6 +2,10 @@ name: Build
 
 on:
   workflow_call:
+    outputs:
+      cache-key:
+        description: "Cache key"
+        value: ${{ jobs.create-cache-key.outputs.cache-key }}
 
 jobs:
   create-cache-key:
