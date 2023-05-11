@@ -40,7 +40,7 @@ jobs:
         run: echo "cache-found=${{ steps.check-build-cache.outcome }}" >> $GITHUB_OUTPUT
   
   build:
-    name: Build native rust (${{ env.ARCH }})
+    name: Build native rust ($ARCH)
     needs: check-build-cache
     if: ${{ needs.check-build-cache.outputs.cache-found == 'failure' }}
     runs-on: ubuntu-22.04
