@@ -1,7 +1,7 @@
 #!/bin/bash
 set -Eeuo pipefail
 
-avd_skin="pixel_2"
+avd_device="pixel_2"
 
 set_abi=false
 set_api_level=false
@@ -123,6 +123,9 @@ while getopts 'a:l:t:sx:h' OPTION; do
             ;;
         h)
             echo -e "\nEmulate app from the command line. Requires Android Studio cmdline-tools."
+            echo -e "\n  -s\t\tCreate an AVD and snapshot for quick-boot. (prerequisite)"
+            echo -e "      \t\t  Installs latest emulation tools and creates avd with abi specified by -a."
+            echo -e "      \t\t  Setup only. Does not run app."
             echo -e "\n  -a\t\tSelect ABI (required)"
             echo -e "      \t\t  Options:"
             echo -e "      \t\t  'x86_64' - default system image: API 30 google_apis_playstore x86_64"
@@ -133,8 +136,6 @@ while getopts 'a:l:t:sx:h' OPTION; do
             echo -e "      \t\t  Minimum API level: 23"
             echo -e "\n  -t\t\tSelect API target (optional)"
             echo -e "      \t\t  See examples on selecting system images below"
-            echo -e "\n  -s\t\tCreate an AVD and snapshot for quick-boot (optional)"
-            echo -e "      \t\t  Does not run app"
             echo -e "\n  -x\t\tSet timeout in seconds for emulator launch and AVD boot-up (optional)"
             echo -e "      \t\t  Default: 1800"
             echo -e "      \t\t  Must be an integer"
@@ -179,28 +180,37 @@ if [ ! -d "./android/app" ]; then
 fi
 cd android
 
-echo -e "\nInstalling latest build tools, platform tools, and platform..."
-sdkmanager --install 'build-tools;33.0.2' platform-tools
-
-echo "Installing latest emulator..."
-sdkmanager --install emulator --channel=0
-
-echo "Installing system image..."
-avd_name="${avd_skin}-android-${api_level}_${api_target}_${arch}"
-sdk="system-images;android-${api_level};${api_target};${arch}"
-sdkmanager --install "${sdk}"
-sdkmanager --licenses
-
 # Kill all emulators
 ../scripts/kill_emulators.sh
 
+
+avd_name="${avd_device}-android-${api_level}_${api_target}_${arch}"
+sdk="system-images;android-${api_level};${api_target};${arch}"
+platform="platforms;android-${api_level}"
+
 if [[ $create_snapshot == true ]]; then
+    sdkmanager --licenses
+
+    echo -e "\nInstalling latest build tools, platform tools, and platform..."
+    sdkmanager --install 'build-tools;33.0.2' platform-tools emulator
+
+    echo "Installing latest emulator..."
+    sdkmanager --install emulator --channel=0
+
+    echo "Installing system image..."
+    sdkmanager --install "${sdk}"
+    sdkmanager --install "${platform}"
+    
     echo -e "\nCreating AVD..."
-    echo no | avdmanager create avd --force --name "${avd_name}" --package "${sdk}" --device "${avd_skin}"
+    echo no | avdmanager create avd --force --name "${avd_name}" --package "${sdk}" --device "${avd_device}"
+
+    # Create test report directory
+    snapshot_report_dir="app/build/outputs/snapshot_reports/${abi}"
+    rm -rf "${snapshot_report_dir}"
+    mkdir -p "${snapshot_report_dir}"
 
     echo -e "\n\nWaiting for emulator to launch..."
-    emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
-        -no-snapshot-load -port 5554 &> /dev/null &
+    emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -no-boot-anim -no-snapshot-load -port 5554 &> "${snapshot_report_dir}/emulator.txt" &
     wait_for $timeout_seconds check_launch
     echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
 
@@ -216,14 +226,12 @@ if [[ $create_snapshot == true ]]; then
 else
     echo -e "\nChecking for AVD..."
     if [ $(emulator -list-avds | grep -ow "${avd_name}" | wc -w) -ne 1 ]; then
-        echo "AVD not found"
-        echo -e "\nCreating AVD..."
-        echo no | avdmanager create avd --force --name "${avd_name}" --package "${sdk}" --device "${avd_skin}"
-        echo -e "\n\nTo create a quick-boot snapshot use the '-s' flag"
-        echo "Try '$(basename $0) -h' for more information."
-    else
-        echo "AVD found: ${avd_name}"
+        echo "Error: AVD not found" >&2
+        echo -e "\n\nTo create a quick-boot AVD snapshot use the '-s' flag" >&2
+        echo "Try '$(basename $0) -h' for more information." >&2
+        exit 1
     fi
+    echo "AVD found: ${avd_name}"
         
     echo -e "\nRunning yarn install..."
     yarn install
@@ -231,14 +239,13 @@ else
     echo -e "\nBuilding APKs..."
     ./gradlew assembleDebug -Psplitapk=true
 
-    # Create integration test report directory
+    # Create test report directory
     test_report_dir="app/build/outputs/emulate_app_reports/${abi}"
     rm -rf "${test_report_dir}"
     mkdir -p "${test_report_dir}"
 
     echo -e "\n\nWaiting for emulator to launch..."
-    emulator -avd "${avd_name}" -netdelay none -netspeed full -gpu swiftshader_indirect -no-boot-anim \
-        -no-snapshot-save -read-only -port 5554 &> "${test_report_dir}/emulator.txt" &
+    emulator -avd "${avd_name}" -netdelay none -netspeed full -no-boot-anim -no-snapshot-save -read-only -port 5554 &> "${test_report_dir}/emulator.txt" &
     wait_for $timeout_seconds check_launch
     echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
 
