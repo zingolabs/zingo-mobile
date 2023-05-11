@@ -11,8 +11,8 @@ on:
         type: string
 
 env:
-  ARCH: ${{ inputs.arch }}
   CACHE-KEY: ${{ inputs.cache-key }}
+  ARCH: ${{ inputs.arch }}
 
 jobs:
   check-build-cache:
@@ -58,6 +58,20 @@ jobs:
           echo "TARGET=x86_64-linux-android" >> $GITHUB_ENV
           echo "CC=x86_64-linux-android" >> $GITHUB_ENV
           echo "OPENSSL_PATH=x86_64" >> $GITHUB_ENV
+      
+      - name: Set envs for x86
+        if: ${{ env.ARCH == 'x86' }}
+        run: |
+          echo "TARGET=i686-linux-android" >> $GITHUB_ENV
+          echo "CC=i686-linux-android" >> $GITHUB_ENV
+          echo "OPENSSL_PATH=x86" >> $GITHUB_ENV
+      
+      - name: Set envs for arm64-v8a
+        if: ${{ env.ARCH == 'arm64-v8a' }}
+        run: |
+          echo "TARGET=aarch64-linux-android" >> $GITHUB_ENV
+          echo "CC=aarch64-linux-android" >> $GITHUB_ENV
+          echo "OPENSSL_PATH=aarch64" >> $GITHUB_ENV
       
       - name: Set envs for armeabi-v7a
         if: ${{ env.ARCH == 'armeabi-v7a' }}
