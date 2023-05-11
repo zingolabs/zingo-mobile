@@ -296,10 +296,10 @@ jobs:
 
       - name: Create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
-        run: ./scripts/emulate_app.sh -a ${{ matrix.avd-arch }} -s
+        run: ./scripts/emulate_app.sh -a ${{ matrix.arch }} -s
 
       - name: Run integration tests
-        run: ./scripts/emulate_app.sh -a ${{ matrix.abi }}
+        run: ./scripts/emulate_app.sh -a ${{ matrix.arch }}
       
       - name: Run Detox Build
         run: yarn detox build -c android.emu.debug
