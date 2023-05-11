@@ -35,9 +35,9 @@ jobs:
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
       abi: armeabi-v7a
   
-  # e2e-test:
-  #   uses: Oscar-Pepper/zingo-mobile/.github/workflows/e2e-test.yaml@ci_DRY
-  #   needs: [ create-cache-key, build ]
-  #   if: ${{ ! cancelled() }}
-  #   with:
-  #     cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+  e2e-test:
+    uses: Oscar-Pepper/zingo-mobile/.github/workflows/e2e-test.yaml@ci_DRY
+    needs: [ create-cache-key, build ]
+    if: ${{ ! cancelled() }}
+    with:
+      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
