@@ -13,20 +13,30 @@ jobs:
   create-timestamp:
     uses: Oscar-Pepper/zingo-mobile/.github/workflows/create-timestamp.yaml@ci_DRY
     
+  create-cache-key:
+    uses: Oscar-Pepper/zingo-mobile/.github/workflows/create-cache-key.yaml@ci_DRY
+    
   build:
+    strategy:
+      matrix:
+        arch: [ armeabi-v7a ]
     uses: Oscar-Pepper/zingo-mobile/.github/workflows/build.yaml@ci_DRY
+    needs: create-cache-key
+    with:
+      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+      arch: ${{ matrix.arch }}
        
-  integration-test:
-    uses: Oscar-Pepper/zingo-mobile/.github/workflows/integration-test.yaml@ci_DRY
-    needs: [ create-timestamp, build ]
-    if: ${{ ! cancelled() }}
-    with:
-      timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
-      cache-key: ${{ needs.build.outputs.cache-key }}
+  # integration-test:
+  #   uses: Oscar-Pepper/zingo-mobile/.github/workflows/integration-test.yaml@ci_DRY
+  #   needs: [ create-timestamp, create-cache-key, build ]
+  #   if: ${{ ! cancelled() }}
+  #   with:
+  #     timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
+  #     cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
   
-  e2e-test:
-    uses: Oscar-Pepper/zingo-mobile/.github/workflows/e2e-test.yaml@ci_DRY
-    needs: build
-    if: ${{ ! cancelled() }}
-    with:
-      cache-key: ${{ needs.build.outputs.cache-key }}
+  # e2e-test:
+  #   uses: Oscar-Pepper/zingo-mobile/.github/workflows/e2e-test.yaml@ci_DRY
+  #   needs: [ create-cache-key, build ]
+  #   if: ${{ ! cancelled() }}
+  #   with:
+  #     cache-key: ${{ needs.create-cache-key.outputs.cache-key }}

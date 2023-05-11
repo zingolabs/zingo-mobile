@@ -2,44 +2,21 @@ name: Build
 
 on:
   workflow_call:
-    outputs:
+    inputs:
       cache-key:
-        description: "Cache key"
-        value: ${{ jobs.create-cache-key.outputs.cache-key }}
+        required: true
+        type: string
+      arch:
+        required: true
+        type: string
 
 jobs:
-  create-cache-key:
-    name: Create cache key
-    runs-on: ubuntu-22.04
-    container:
-      image: zingodevops/android_builder:stable
-    env:
-      RUSTUP_HOME: /root/.rustup
-    outputs:
-      cache-key: ${{ steps.create-cache-key.outputs.cache-key }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-      
-      - name: Store Cargo version
-        run: echo $(cargo --version) >> rust/cargo_version.txt
-      
-      - name: Create cache key
-        id: create-cache-key
-        run: echo "cache-key=${{ hashFiles('rust/**/Cargo.toml', 'rust/**/Cargo.lock', 'rust/**/*.rs', 'rust/cargo_version.txt') }}" >> $GITHUB_OUTPUT
-  
   check-build-cache:
     name: Check build cache
     needs: create-cache-key
     runs-on: macos-12
-    env:
-      CACHE-KEY: ${{ needs.create-cache-key.outputs.cache-key }}
     outputs:
-      status-armeabi-v7a: ${{ steps.set-output-status.outputs.status-armeabi-v7a }}
-    strategy:
-      fail-fast: false
-      matrix:
-        abi: [ armeabi-v7a ]
+      status: ${{ steps.set-output-status.outputs.status }}
     continue-on-error: true
     steps:
       - name: Checkout repository
@@ -49,36 +26,35 @@ jobs:
         id: check-build-cache
         uses: actions/cache@v3
         with:
-          path: android/app/src/main/jniLibs/${{ matrix.abi }}
-          key: native-rust-${{ matrix.abi }}-${{ env.CACHE-KEY }}
+          path: android/app/src/main/jniLibs/${{ inputs.arch }}
+          key: native-rust-${{ inputs.arch }}-${{ inputs.cache-key }}
           lookup-only: true
           fail-on-cache-miss: true
   
       - name: Set output status
         id: set-output-status
         if: ${{ ! cancelled() }}
-        run: echo "status-${{ matrix.abi }}=${{ steps.check-build-cache.outcome }}" >> $GITHUB_OUTPUT
+        run: echo "status=${{ steps.check-build-cache.outcome }}" >> $GITHUB_OUTPUT
   
   build:
-    name: Build native rust (${{ matrix.abi }})
-    needs: [ create-cache-key, check-build-cache ]
-    if: ${{ contains(needs.*.outputs.*, 'failure') }}
+    name: Build native rust (${{ inputs.arch }})
+    needs: check-build-cache
+    if: ${{ needs.check-build-cache.outputs.status }} == 'failure'
     runs-on: ubuntu-22.04
     container:
       image: zingodevops/android_builder:stable
     env:
-      CACHE-KEY: ${{ needs.create-cache-key.outputs.cache-key }}
       RUSTUP_HOME: /root/.rustup
-    strategy:
-      matrix:
-        include:
-          - abi: armeabi-v7a
-            target: armv7-linux-androideabi
-            cc: armv7a-linux-androideabi
-            openssl_path: armv7
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+      
+      - name: Set envs for armeabi-v7a
+        if: ${{ inputs.arch }} == 'armeabi-v7a'
+        run: |
+          echo "TARGET=armv7-linux-androideabi" >> $GITHUB_ENV
+          echo "CC=armv7a-linux-androideabi" >> $GITHUB_ENV
+          echo "OPENSSL_PATH=armv7" >> $GITHUB_ENV
       
       - name: Cargo cache
         id: cargo-cache
@@ -93,38 +69,33 @@ jobs:
             /root/.cargo/registry/index/            
             /root/.cargo/registry/cache/
             /root/.cargo/registry/git/db/
-          key: cargo-${{ matrix.abi }}-${{ hashFiles('rust/Cargo.lock') }}
-          restore-keys: cargo-${{ matrix.abi }}
+          key: cargo-${{ inputs.arch }}-${{ hashFiles('rust/Cargo.lock') }}
+          restore-keys: cargo-${{ inputs.arch }}
       
       - name: Cargo build
         working-directory: ./rust/android
-        run: cargo +nightly build -Z build-std --target ${{ matrix.target }} --release
+        run: cargo +nightly build -Z build-std --target ${{ env.TARGET }} --release
         env:
           AR: llvm-ar
           LD: ld
           RANLIB: llvm-ranlib
-          CC: ${{ matrix.cc }}23-clang
-          OPENSSL_DIR: /opt/openssl-3.0.5/${{ matrix.openssl_path }}
+          CC: ${{ env.CC }}23-clang
+          OPENSSL_DIR: /opt/openssl-3.0.5/${{ env.OPENSSL_PATH }}
       
       - name: LLVM Strip
         working-directory: ./rust/target
-        run: llvm-strip ./${{ matrix.target }}/release/librust.so
+        run: llvm-strip ./${{ env.TARGET }}/release/librust.so
       
       - name: Upload native rust
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.abi }}-${{ env.CACHE-KEY }}
-          path: rust/target/${{ matrix.target }}/release/librust.so
+          name: ${{ inputs.arch }}-${{ inputs.cache-key }}
+          path: rust/target/${{ env.TARGET }}/release/librust.so
       
   cache-native-rust:
     name: Cache native rust
-    needs: [ create-cache-key, build ]
+    needs: build
     runs-on: macos-12
-    env:
-      CACHE-KEY: ${{ needs.create-cache-key.outputs.cache-key }}
-    strategy:
-      matrix:
-        abi: [ armeabi-v7a ]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -132,11 +103,11 @@ jobs:
       - name: Download native rust
         uses: actions/download-artifact@v3
         with: 
-          name: ${{ matrix.abi }}-${{ env.CACHE-KEY }}
-          path: android/app/src/main/jniLibs/${{ matrix.abi }}
+          name: ${{ inputs.arch }}-${{ inputs.cache-key }}
+          path: android/app/src/main/jniLibs/${{ inputs.arch }}
       
       - name: Cache native rust
         uses: actions/cache@v3
         with:
-          path: android/app/src/main/jniLibs/${{ matrix.abi }}
-          key: native-rust-${{ matrix.abi }}-${{ env.CACHE-KEY }}
+          path: android/app/src/main/jniLibs/${{ inputs.arch }}
+          key: native-rust-${{ inputs.arch }}-${{ inputs.cache-key }}
