@@ -13,7 +13,6 @@ on:
 jobs:
   check-build-cache:
     name: Check build cache
-    needs: create-cache-key
     runs-on: macos-12
     outputs:
       status: ${{ steps.set-output-status.outputs.status }}
