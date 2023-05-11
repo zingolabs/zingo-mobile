@@ -10,12 +10,16 @@ on:
         required: true
         type: string
 
+env:
+  ARCH: ${{ inputs.arch }}
+  CACHE-KEY: ${{ inputs.cache-key }}
+
 jobs:
   check-build-cache:
     name: Check build cache
     runs-on: macos-12
     outputs:
-      status: ${{ steps.set-output-status.outputs.status }}
+      cache-found: ${{ steps.set-cache-found.outputs.cache-found }}
     continue-on-error: true
     steps:
       - name: Checkout repository
@@ -30,15 +34,15 @@ jobs:
           lookup-only: true
           fail-on-cache-miss: true
   
-      - name: Set output status
-        id: set-output-status
+      - name: Set cache-found
+        id: set-cache-found
         if: ${{ ! cancelled() }}
-        run: echo "status=${{ steps.check-build-cache.outcome }}" >> $GITHUB_OUTPUT
+        run: echo "cache-found=${{ steps.check-build-cache.outcome }}" >> $GITHUB_OUTPUT
   
   build:
-    name: Build native rust (${{ inputs.arch }})
+    name: Build native rust (${{ env.ARCH }})
     needs: check-build-cache
-    if: ${{ contains(needs.*.outputs.*, 'failure') }}
+    if: ${{ needs.check-build-cache.outputs.cache-found == 'failure' }}
     runs-on: ubuntu-22.04
     container:
       image: zingodevops/android_builder:stable
