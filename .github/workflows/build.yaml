@@ -52,6 +52,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
       
+      - name: Set envs for x86_64
+        if: ${{ env.ARCH == 'x86_64' }}
+        run: |
+          echo "TARGET=x86_64-linux-android" >> $GITHUB_ENV
+          echo "CC=x86_64-linux-android" >> $GITHUB_ENV
+          echo "OPENSSL_PATH=x86_64" >> $GITHUB_ENV
+      
       - name: Set envs for armeabi-v7a
         if: ${{ env.ARCH == 'armeabi-v7a' }}
         run: |

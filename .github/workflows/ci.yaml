@@ -19,7 +19,7 @@ jobs:
   build:
     strategy:
       matrix:
-        arch: [ armeabi-v7a ]
+        arch: [ x86_64, armeabi-v7a ]
     uses: Oscar-Pepper/zingo-mobile/.github/workflows/build.yaml@ci_DRY
     needs: create-cache-key
     with:
