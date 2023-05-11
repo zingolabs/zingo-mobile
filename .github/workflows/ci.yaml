@@ -8,26 +8,26 @@ on:
 
 jobs:
   jest-test:
-    uses: Oscar-Pepper/zingo-mobile/.github/workflows/jest-test.yaml@ci_DRY
+    uses: ./.github/workflows/jest-test.yaml
     
   create-timestamp:
-    uses: Oscar-Pepper/zingo-mobile/.github/workflows/create-timestamp.yaml@ci_DRY
+    uses: ./.github/workflows/create-timestamp.yaml
     
   create-cache-key:
-    uses: Oscar-Pepper/zingo-mobile/.github/workflows/create-cache-key.yaml@ci_DRY
+    uses: ./.github/workflows/create-cache-key.yaml
     
   build:
     strategy:
       matrix:
         arch: [ x86_64, armeabi-v7a ]
-    uses: Oscar-Pepper/zingo-mobile/.github/workflows/build.yaml@ci_DRY
+    uses: ./.github/workflows/build.yaml
     needs: create-cache-key
     with:
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
       arch: ${{ matrix.arch }}
        
   integration-test:
-    uses: Oscar-Pepper/zingo-mobile/.github/workflows/integration-test.yaml@ci_DRY
+    uses: ./.github/workflows/integration-test.yaml
     needs: [ create-timestamp, create-cache-key, build ]
     if: ${{ ! cancelled() }}
     with:
@@ -36,7 +36,7 @@ jobs:
       abi: armeabi-v7a
   
   e2e-test:
-    uses: Oscar-Pepper/zingo-mobile/.github/workflows/e2e-test.yaml@ci_DRY
+    uses: ./.github/workflows/e2e-test.yaml
     needs: [ create-cache-key, build ]
     if: ${{ ! cancelled() }}
     with:
