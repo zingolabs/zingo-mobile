@@ -1,0 +1,29 @@
+name: Create cache key
+
+on:
+  workflow_call:
+    outputs:
+      cache-key:
+        description: "Cache key"
+        value: ${{ jobs.create-cache-key.outputs.cache-key }}
+
+jobs:
+  create-cache-key:
+    name: Create cache key
+    runs-on: ubuntu-22.04
+    container:
+      image: zingodevops/android_builder:stable
+    env:
+      RUSTUP_HOME: /root/.rustup
+    outputs:
+      cache-key: ${{ steps.create-cache-key.outputs.cache-key }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Store Cargo version
+        run: echo $(cargo --version) >> rust/cargo_version.txt
+      
+      - name: Create cache key
+        id: create-cache-key
+        run: echo "cache-key=${{ hashFiles('rust/**/Cargo.toml', 'rust/**/Cargo.lock', 'rust/**/*.rs', 'rust/cargo_version.txt') }}" >> $GITHUB_OUTPUT
