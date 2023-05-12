@@ -403,7 +403,7 @@ export default class RPC {
 
   // this is only for the first time when the App is booting.
   async configure(): Promise<void> {
-    // every minute the App try to Sync the new blocks.
+    // every 30 seconds the App try to Sync the new blocks.
     if (!this.refreshTimerID) {
       this.refreshTimerID = setInterval(() => this.refresh(false), 30 * 1000); // 30 seconds
     }

@@ -732,7 +732,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   set_server_option = async (
     name: 'server' | 'currency' | 'language' | 'sendAll',
     value: string,
-    noToast?: boolean,
+    toast: boolean,
+    same_chain_name: boolean,
   ): Promise<void> => {
     // here I know the server was changed, clean all the tasks before anything.
     this.rpc.clearTimers();
@@ -741,34 +742,47 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       syncingStatus: {} as SyncingStatusType,
     });
     this.rpc.setInRefresh(false);
-    // when I try to open the wallet in the new server:
-    // - the seed doesn't exists (the type of sever is different `mainnet` / `testnet` / `regtest` ...).
-    //   The App have to go to the initial screen
-    // - the seed exists and the App can open the wallet in the new server.
-    //   But I have to restart the sync if needed.
-    const result: string = await RPCModule.loadExistingWallet(value);
-    if (result && !result.toLowerCase().startsWith('error')) {
-      // Load the wallet and navigate to the transactions screen
-      console.log(`wallet loaded ok ${value}`);
-      if (!noToast) {
-        Toast.show(`${this.props.translate('loadedapp.readingwallet')} ${value}`, Toast.LONG);
-      }
-      await SettingsFileImpl.writeSettings(name, value);
-      this.setState({
-        server: value,
-      });
-      // the server is changed, the App needs to restart the timeout tasks from the beginning
-      await this.rpc.configure();
-      // Refetch the settings to update
-      await this.rpc.fetchWalletSettings();
-      return;
+
+    // First we need to check the `chain_name` between servers, if this is different
+    // we cannot try to open the current wallet, because make not sense.
+    let error = false;
+    if (!same_chain_name) {
+      error = true;
     } else {
+      // when I try to open the wallet in the new server:
+      // - the seed doesn't exists (the type of sever is different `mainnet` / `testnet` / `regtest` ...).
+      //   The App have to go to the initial screen
+      // - the seed exists and the App can open the wallet in the new server.
+      //   But I have to restart the sync if needed.
+      const result: string = await RPCModule.loadExistingWallet(value);
+      if (result && !result.toLowerCase().startsWith('error')) {
+        // Load the wallet and navigate to the transactions screen
+        console.log(`wallet loaded ok ${value}`);
+        if (toast) {
+          Toast.show(`${this.props.translate('loadedapp.readingwallet')} ${value}`, Toast.LONG);
+        }
+        await SettingsFileImpl.writeSettings(name, value);
+        this.setState({
+          server: value,
+        });
+        // the server is changed, the App needs to restart the timeout tasks from the beginning
+        await this.rpc.configure();
+        // Refetch the settings to update
+        await this.rpc.fetchWalletSettings();
+        return;
+      } else {
+        error = true;
+      }
+    }
+
+    // if the chain_name id different between server or we cannot open the wallet...
+    if (error) {
       // I need to open the modal ASAP.
       this.setState({
         seedServerModalVisible: true,
       });
       //console.log(`Error Reading Wallet ${value} - ${error}`);
-      if (!noToast) {
+      if (toast) {
         Toast.show(`${this.props.translate('loadedapp.readingwallet-error')} ${value}`, Toast.LONG);
       }
 

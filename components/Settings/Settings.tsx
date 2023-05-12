@@ -25,7 +25,8 @@ type SettingsProps = {
   set_server_option: (
     name: 'server' | 'currency' | 'language' | 'sendAll',
     value: string,
-    noToast?: boolean,
+    toast: boolean,
+    same_chain_name: boolean,
   ) => Promise<void>;
   set_currency_option: (name: 'server' | 'currency' | 'language' | 'sendAll', value: string) => Promise<void>;
   set_language_option: (
@@ -51,6 +52,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 }) => {
   const context = useContext(ContextAppLoaded);
   const {
+    info,
     walletSettings,
     translate,
     server: serverContext,
@@ -131,6 +133,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
   const saveSettings = async () => {
     let serverParsed = server;
+    let sameServerChainName = true;
+    const chain_name = info.chain_name;
     if (
       walletSettings.download_memos === memos &&
       walletSettings.transaction_filter_threshold === filter &&
@@ -185,7 +189,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     if (serverContext !== serverParsed) {
       setDisabled(true);
       Toast.show(translate('loadedapp.tryingnewserver') as string, Toast.SHORT);
-      const { result, timeout } = await checkServerURI(serverParsed, serverContext);
+      const { result, timeout, new_chain_name } = await checkServerURI(serverParsed, serverContext);
       if (!result) {
         // if the server checking takes more then 30 seconds.
         if (timeout === true) {
@@ -195,9 +199,14 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         }
         // in this point the sync process is blocked, who knows why.
         // if I save the actual server before the customization... is going to work.
-        set_server_option('server', serverContext, true);
+        set_server_option('server', serverContext, false, sameServerChainName);
         setDisabled(false);
         return;
+      } else {
+        console.log('new', new_chain_name, 'old', chain_name);
+        if (new_chain_name && new_chain_name !== chain_name) {
+          sameServerChainName = false;
+        }
       }
     }
 
@@ -220,7 +229,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       if (languageContext !== language) {
         await set_language_option('language', language, false);
       }
-      set_server_option('server', serverParsed);
+      set_server_option('server', serverParsed, true, sameServerChainName);
       ms = 1500;
     } else {
       if (languageContext !== language) {
