@@ -23,7 +23,8 @@ jobs:
     steps:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
-        run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
+        run: echo "REPO-OWNER=Oscar-Pepper" >> $GITHUB_ENV
+        # run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
       
       - run: echo $REPO-OWNER
       
@@ -31,6 +32,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: $REPO-OWNER/zingo-mobile
+          ref: ci_DRY_2-0 # TEMP
       
       - name: Store Cargo version
         run: echo $(cargo --version) >> rust/cargo_version.txt
