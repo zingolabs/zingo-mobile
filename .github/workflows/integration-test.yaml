@@ -23,9 +23,15 @@ jobs:
     name: Integration test
     runs-on: macos-12
     steps:
+      - name: Set envs for zingolib CI
+        if: ${{ contains(github.repository, 'zingolib') }}
+        run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
+            
       - name: Checkout repository
         uses: actions/checkout@v3
-
+        with:
+          repository: ${{ env.REPO-OWNER }}/zingo-mobile
+        
       - name: Set envs for x86_64
         if: ${{ env.ABI == 'x86_64' }}
         run: echo "AVD-ARCH=x86_64" >> $GITHUB_ENV
