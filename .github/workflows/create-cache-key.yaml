@@ -7,6 +7,9 @@ on:
         description: "Cache key"
         value: ${{ jobs.create-cache-key.outputs.cache-key }}
 
+env:
+  REPO-OWNER: ${{ github.repository_owner }}
+
 jobs:
   create-cache-key:
     name: Create cache key
@@ -18,8 +21,16 @@ jobs:
     outputs:
       cache-key: ${{ steps.create-cache-key.outputs.cache-key }}
     steps:
+      - name: Set envs for zingolib CI
+        if: ${{ contains(github.repository, 'zingolib') }}
+        run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
+      
+      - run: echo $REPO-OWNER
+      
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          repository: $REPO-OWNER/zingo-mobile
       
       - name: Store Cargo version
         run: echo $(cargo --version) >> rust/cargo_version.txt
