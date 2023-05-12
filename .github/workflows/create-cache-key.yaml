@@ -23,16 +23,22 @@ jobs:
     steps:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
-        run: echo "REPO-OWNER=Oscar-Pepper" >> $GITHUB_ENV
+        run: echo "REPO-OWNER=Oscar-Pepper" >> $GITHUB_ENV # TEMP
         # run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
-      
-      - run: echo $${{ env.REPO-OWNER }}
-      
+            
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
           ref: ci_DRY_2-0 # TEMP
+        
+      - name: Cargo update for zingolib CI
+        if: ${{ contains(github.repository, 'zingolib') }}
+        run: |
+          echo "zingolib_ref=$(echo ${GITHUB_REF} | sed 's/\//\\\//g')" >> $GITHUB_ENV
+          sed -i "/^zingolib\|^zingoconfig/ s/branch = \"dev\"/rev = \"${{ env.zingolib_ref }}\"/" "rust/lib/Cargo.toml"
+          if cat rust/lib/Cargo.toml | grep "^zingolib\|^zingoconfig" | grep -q "branch"; then exit 1; fi
+          cargo update -p zingolib --aggressive
       
       - name: Store Cargo version
         run: echo $(cargo --version) >> rust/cargo_version.txt
