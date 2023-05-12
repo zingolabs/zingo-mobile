@@ -25,14 +25,12 @@ jobs:
     steps:     
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
-        run: echo "REPO-OWNER=Oscar-Pepper" >> $GITHUB_ENV # TEMP
-        # run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
+        run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
             
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
-          ref: ci_DRY_2-0 # TEMP
         
       - name: Check if native rust cache exists
         id: check-build-cache
@@ -60,14 +58,12 @@ jobs:
     steps:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
-        run: echo "REPO-OWNER=Oscar-Pepper" >> $GITHUB_ENV # TEMP
-        # run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
+        run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
             
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
-          ref: ci_DRY_2-0 # TEMP
         
       - name: Cargo update for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
@@ -148,16 +144,13 @@ jobs:
     steps:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
-        run: echo "REPO-OWNER=Oscar-Pepper" >> $GITHUB_ENV # TEMP
-        # run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
+        run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
             
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
-          ref: ci_DRY_2-0 # TEMP
-        
-      
+            
       - name: Download native rust
         uses: actions/download-artifact@v3
         with: 
