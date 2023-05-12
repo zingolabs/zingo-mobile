@@ -26,12 +26,12 @@ jobs:
         run: echo "REPO-OWNER=Oscar-Pepper" >> $GITHUB_ENV
         # run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
       
-      - run: echo $REPO-OWNER
+      - run: echo $${{ env.REPO-OWNER }}
       
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          repository: $REPO-OWNER/zingo-mobile
+          repository: ${{ env.REPO-OWNER }}/zingo-mobile
           ref: ci_DRY_2-0 # TEMP
       
       - name: Store Cargo version
