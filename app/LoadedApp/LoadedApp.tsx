@@ -25,6 +25,7 @@ import { isEqual } from 'lodash';
 import { StackScreenProps } from '@react-navigation/stack';
 import NetInfo, { NetInfoSubscription } from '@react-native-community/netinfo';
 import { activateKeepAwake, deactivateKeepAwake } from '@sayem314/react-native-keep-awake';
+import deepDiff from 'deep-diff';
 
 import RPC from '../rpc';
 import RPCModule from '../RPCModule';
@@ -185,6 +186,8 @@ export default function LoadedApp(props: LoadedAppProps) {
   //  return () => RNLocalize.removeEventListener('change', handleLocalizationChange);
   //}, [handleLocalizationChange]);
 
+  console.log('render LoadedApp - 2');
+
   if (loading) {
     return null;
   } else {
@@ -255,7 +258,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       this.setAllAddresses,
       this.setWalletSettings,
       this.setInfo,
-      this.refreshUpdates,
+      this.setSyncingStatus,
       props.translate,
       this.fetchBackgroundSyncing,
       this.keepAwake,
@@ -373,6 +376,13 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     this.unsubscribeNetInfo && this.unsubscribeNetInfo();
   };
 
+  //componentDidUpdate(prevProps: Readonly<LoadedAppClassProps>, prevState: Readonly<AppStateLoaded>): void {
+  //  const diff = deepDiff({ ...this.props, ...this.state }, { ...prevProps, ...prevState });
+  //  if (diff) {
+  //    console.log('+++++++++++', diff);
+  //  }
+  //}
+
   keepAwake = (keep: boolean): void => {
     if (keep) {
       activateKeepAwake();
@@ -448,11 +458,10 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   };
 
   fetchBackgroundSyncing = async () => {
-    const backgroundJson = await BackgroundFileImpl.readBackground();
-    if (backgroundJson) {
-      this.setState({
-        background: backgroundJson,
-      });
+    const backgroundJson: BackgroundType = await BackgroundFileImpl.readBackground();
+    if (!isEqual(this.state.background, backgroundJson)) {
+      console.log('fetch background sync info');
+      this.setState({ background: backgroundJson });
     }
   };
 
@@ -476,50 +485,52 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
   setTotalBalance = (totalBalance: TotalBalanceClass) => {
     if (!isEqual(this.state.totalBalance, totalBalance)) {
-      //console.log('total balance');
+      console.log('fetch total balance');
       this.setState({ totalBalance });
     }
   };
 
   setSyncingStatusReport = (syncingStatusReport: SyncingStatusReportClass) => {
-    this.setState({ syncingStatusReport });
+    if (!isEqual(this.state.syncingStatusReport, syncingStatusReport)) {
+      console.log('fetch syncing status report');
+      this.setState({ syncingStatusReport });
+    }
   };
 
   setTransactionList = (transactions: TransactionType[]) => {
-    if (!isEqual(this.state.transactions, transactions)) {
-      //console.log('transactions');
+    if (deepDiff(this.state.transactions, transactions)) {
+      console.log('fetch transactions');
       this.setState({ transactions });
     }
   };
 
   setAllAddresses = (addresses: AddressClass[]) => {
-    const { uaAddress } = this.state;
-    if (!isEqual(this.state.addresses, addresses) || uaAddress === '') {
-      //console.log('addresses');
-      if (uaAddress === '') {
-        this.setState({ addresses, uaAddress: addresses[0].uaAddress });
-      } else {
-        this.setState({ addresses });
-      }
+    if (deepDiff(this.state.addresses, addresses)) {
+      console.log('fetch addresses');
+      this.setState({ addresses });
+    }
+    if (this.state.uaAddress !== addresses[0].uaAddress) {
+      this.setState({ uaAddress: addresses[0].uaAddress });
     }
   };
 
   setWalletSettings = (walletSettings: WalletSettingsClass) => {
-    this.setState({ walletSettings });
+    if (!isEqual(this.state.walletSettings, walletSettings)) {
+      console.log('fetch wallet settings');
+      this.setState({ walletSettings });
+    }
   };
 
   setSendPageState = (sendPageState: SendPageStateClass) => {
-    this.setState({ sendPageState });
+    if (!isEqual(this.state.sendPageState, sendPageState)) {
+      console.log('fetch send page state');
+      this.setState({ sendPageState });
+    }
   };
 
-  refreshUpdates = (inProgress: boolean, progress: number, blocks: string, synced: boolean) => {
-    const syncingStatus: SyncingStatusType = {
-      inProgress,
-      progress,
-      blocks,
-      synced,
-    };
+  setSyncingStatus = (syncingStatus: SyncingStatusType) => {
     if (!isEqual(this.state.syncingStatus, syncingStatus)) {
+      console.log('fetch syncing status');
       this.setState({ syncingStatus });
     }
   };
@@ -540,33 +551,31 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       zecPrice: newZecPrice,
       date: newDate,
     } as zecPriceType;
-    if (!isEqual(this.state.zecPrice, newZecPrice)) {
+    if (!isEqual(this.state.zecPrice, zecPrice)) {
       this.setState({ zecPrice });
     }
-  };
-
-  setRescanning = (rescanning: boolean) => {
-    this.setState({ rescanning });
   };
 
   setComputingModalVisible = (visible: boolean) => {
     this.setState({ computingModalVisible: visible });
   };
 
-  setSendProgress = (progress: SendProgressClass) => {
-    this.setState({ sendProgress: progress });
+  setSendProgress = (sendProgress: SendProgressClass) => {
+    if (!isEqual(this.state.sendProgress, sendProgress)) {
+      console.log('fetch send progress');
+      this.setState({ sendProgress });
+    }
   };
 
   setInfo = (newInfo: InfoType) => {
     if (!isEqual(this.state.info, newInfo)) {
+      console.log('fetch info');
       let newNewInfo = newInfo;
       // if currencyName is empty,
       // I need to rescue the last value from the state.
       if (!newNewInfo.currencyName) {
-        const { info } = this.state;
-        const { currencyName } = info;
-        if (currencyName) {
-          newNewInfo.currencyName = currencyName;
+        if (this.state.info.currencyName) {
+          newNewInfo.currencyName = this.state.info.currencyName;
         }
       }
       this.setState({ info: newNewInfo });
@@ -681,14 +690,13 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
   fetchWalletSeedAndBirthday = async () => {
     const walletSeed = await RPC.rpc_fetchSeedAndBirthday();
-    if (walletSeed) {
+    if (!isEqual(this.state.walletSeed, walletSeed)) {
+      console.log('fetch wallet seed & birthday');
       this.setState({ walletSeed });
     }
   };
 
   startRescan = () => {
-    this.setRescanning(true);
-    this.setTransactionList([]);
     this.rpc.rescan();
   };
 
@@ -725,7 +733,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   set_wallet_option = async (name: string, value: string): Promise<void> => {
     await RPC.rpc_setWalletSettingOption(name, value);
 
-    // Refetch the settings to update
+    // Refetch the settings updated
     this.rpc.fetchWalletSettings();
   };
 
@@ -982,6 +990,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
     //console.log('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
     //console.log('render LoadedApp', this.state.info);
+
+    console.log('render LoadedAppClass - 3');
 
     return (
       <ContextAppLoadedProvider value={this.state}>
