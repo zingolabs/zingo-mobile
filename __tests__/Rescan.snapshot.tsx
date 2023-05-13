@@ -45,7 +45,7 @@ describe('Component Rescan - test', () => {
   test('Rescan - snapshot', () => {
     const rescan = render(
       <ContextAppLoadedProvider value={state}>
-        <Rescan closeModal={onClose} startRescan={onRescan} />
+        <Rescan closeModal={onClose} doRescan={onRescan} />
       </ContextAppLoadedProvider>,
     );
     expect(rescan.toJSON()).toMatchSnapshot();

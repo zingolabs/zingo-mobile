@@ -552,14 +552,6 @@ export default class RPC {
     await this.fetchInfoAndServerHeight();
   }
 
-  async rescan() {
-    //console.log('RPC Rescan triggered');
-    // Empty out the transactions list to start with.
-    this.fnSetTransactionsList([]);
-
-    await this.refresh(false, true);
-  }
-
   async updateData() {
     //console.log("Update data triggered");
     if (this.updateDataLock) {

@@ -12,10 +12,10 @@ import Header from '../Header';
 
 type RescanProps = {
   closeModal: () => void;
-  startRescan: () => void;
+  doRescan: () => void;
 };
 
-const Rescan: React.FunctionComponent<RescanProps> = ({ closeModal, startRescan }) => {
+const Rescan: React.FunctionComponent<RescanProps> = ({ closeModal, doRescan }) => {
   const context = useContext(ContextAppLoaded);
   const { walletSeed, translate, netInfo } = context;
   const { colors } = useTheme() as unknown as ThemeType;
@@ -25,7 +25,7 @@ const Rescan: React.FunctionComponent<RescanProps> = ({ closeModal, startRescan 
       Toast.show(translate('loadedapp.connection-error') as string, Toast.LONG);
       return;
     }
-    startRescan();
+    doRescan();
     closeModal();
   };
 

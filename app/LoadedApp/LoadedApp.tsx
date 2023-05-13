@@ -307,7 +307,9 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
         // setting value for background task Android
         await AsyncStorage.setItem('@background', 'yes');
       }
-      this.setState({ appState: nextAppState });
+      if (this.state.appState !== nextAppState) {
+        this.setState({ appState: nextAppState });
+      }
     });
 
     (async () => {
@@ -552,6 +554,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       date: newDate,
     } as zecPriceType;
     if (!isEqual(this.state.zecPrice, zecPrice)) {
+      console.log('fetch zec price');
       this.setState({ zecPrice });
     }
   };
@@ -567,18 +570,18 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     }
   };
 
-  setInfo = (newInfo: InfoType) => {
-    if (!isEqual(this.state.info, newInfo)) {
+  setInfo = (info: InfoType) => {
+    if (!isEqual(this.state.info, info)) {
       console.log('fetch info');
-      let newNewInfo = newInfo;
+      let newInfo = info;
       // if currencyName is empty,
       // I need to rescue the last value from the state.
-      if (!newNewInfo.currencyName) {
+      if (!newInfo.currencyName) {
         if (this.state.info.currencyName) {
-          newNewInfo.currencyName = this.state.info.currencyName;
+          newInfo.currencyName = this.state.info.currencyName;
         }
       }
-      this.setState({ info: newNewInfo });
+      this.setState({ info: newInfo });
     }
   };
 
@@ -674,6 +677,11 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     await this.rpc.refresh(false);
   };
 
+  doRescan = () => {
+    this.setTransactionList([]);
+    this.rpc.refresh(false, true);
+  };
+
   fetchTotalBalance = async () => {
     await this.rpc.fetchTotalBalance();
   };
@@ -694,10 +702,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       console.log('fetch wallet seed & birthday');
       this.setState({ walletSeed });
     }
-  };
-
-  startRescan = () => {
-    this.rpc.rescan();
   };
 
   onMenuItemSelected = async (item: string) => {
@@ -1070,7 +1074,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                   <Text>{translate('loading') as string}</Text>
                 </View>
               }>
-              <Rescan closeModal={() => this.setState({ rescanModalVisible: false })} startRescan={this.startRescan} />
+              <Rescan closeModal={() => this.setState({ rescanModalVisible: false })} doRescan={this.doRescan} />
             </Suspense>
           </Modal>
 
