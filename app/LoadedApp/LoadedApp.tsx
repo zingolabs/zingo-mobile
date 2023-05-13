@@ -341,6 +341,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
         type !== state.type ||
         isConnectionExpensive !== state.details?.isConnectionExpensive
       ) {
+        console.log('fetch net info');
         this.setState({
           netInfo: {
             isConnected: state.isConnected,
@@ -448,15 +449,21 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   };
 
   setDimensions = (screen: ScaledSize) => {
-    this.setState({
-      dimensions: {
-        width: Number(screen.width.toFixed(0)),
-        height: Number(screen.height.toFixed(0)),
-        orientation: platform.isPortrait(screen) ? 'portrait' : 'landscape',
-        deviceType: platform.isTablet(screen) ? 'tablet' : 'phone',
-        scale: Number(screen.scale.toFixed(2)),
-      },
-    });
+    if (
+      this.state.dimensions.width !== Number(screen.width.toFixed(0)) ||
+      this.state.dimensions.height !== Number(screen.height.toFixed(0))
+    ) {
+      console.log('fetch screen dimensions');
+      this.setState({
+        dimensions: {
+          width: Number(screen.width.toFixed(0)),
+          height: Number(screen.height.toFixed(0)),
+          orientation: platform.isPortrait(screen) ? 'portrait' : 'landscape',
+          deviceType: platform.isTablet(screen) ? 'tablet' : 'phone',
+          scale: Number(screen.scale.toFixed(2)),
+        },
+      });
+    }
   };
 
   fetchBackgroundSyncing = async () => {
@@ -678,13 +685,16 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   };
 
   doRescan = () => {
+    // TODO: when click rescan the txs list is empty, but
+    // after a couple of seconds the txs come back... because
+    // the rescan process take a while to start.
     this.setTransactionList([]);
     this.rpc.refresh(false, true);
   };
 
-  fetchTotalBalance = async () => {
-    await this.rpc.fetchTotalBalance();
-  };
+  //fetchTotalBalance = async () => {
+  //  await this.rpc.fetchTotalBalance();
+  //};
 
   toggleMenuDrawer = () => {
     this.setState({
@@ -991,9 +1001,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       const iconColor = focused ? colors.background : colors.money;
       return <FontAwesomeIcon icon={iconName} color={iconColor} />;
     };
-
-    //console.log('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
-    //console.log('render LoadedApp', this.state.info);
 
     console.log('render LoadedAppClass - 3');
 
