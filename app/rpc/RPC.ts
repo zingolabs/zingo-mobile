@@ -629,15 +629,21 @@ export default class RPC {
 
       // This is async, so when it is done, we finish the refresh.
       if (fullRescan) {
-        this.doRescan().finally(() => {
-          this.inRefresh = false;
-          this.keepAwake(false);
-        });
+        this.doRescan()
+          .then(result => console.log('rescan finished', result))
+          .catch(error => console.log('rescan error', error))
+          .finally(() => {
+            this.inRefresh = false;
+            this.keepAwake(false);
+          });
       } else {
-        this.doSync().finally(() => {
-          this.inRefresh = false;
-          this.keepAwake(false);
-        });
+        this.doSync()
+          .then(result => console.log('sync finished', result))
+          .catch(error => console.log('sync error', error))
+          .finally(() => {
+            this.inRefresh = false;
+            this.keepAwake(false);
+          });
       }
 
       // We need to wait for the sync to finish. The sync is done when
@@ -1239,8 +1245,8 @@ export default class RPC {
 
     // This is async, so fire and forget
     this.doSend(JSON.stringify(sendJson))
-      .then(r => console.log('End Send OK: ' + r))
-      .catch(e => console.log('End Send ERROR: ' + e));
+      .then(r => console.log('send finished: ' + r))
+      .catch(e => console.log('Send error ' + e));
 
     const startTimeSeconds = new Date().getTime() / 1000;
 
