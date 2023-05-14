@@ -262,7 +262,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       this.setInfo,
       this.setSyncingStatus,
       props.translate,
-      this.fetchBackgroundSyncing,
       this.keepAwake,
     );
 
@@ -368,8 +367,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
             Toast.show(this.props.translate('loadedapp.connection-error') as string, Toast.LONG);
           } else {
             //console.log('EVENT Loaded: YES internet connection.');
-            const inRefresh = this.rpc.getInRefresh();
-            if (inRefresh) {
+            if (this.rpc.getInRefresh()) {
               // I need to start again the App only if it is Syncing...
               this.navigateToLoading();
             }
