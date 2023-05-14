@@ -251,7 +251,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
         scale: Number(screen.scale.toFixed(2)),
       },
       appState: AppState.currentState,
-      insightModalVisible: true,
     };
 
     this.rpc = new RPC(

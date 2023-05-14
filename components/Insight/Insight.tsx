@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import { View, ScrollView, SafeAreaView, Image, TouchableOpacity } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { PieChart } from 'react-native-svg-charts';
@@ -11,7 +11,7 @@ import Clipboard from '@react-native-community/clipboard';
 
 import RegText from '../Components/RegText';
 import ZecAmount from '../Components/ZecAmount';
-import Button from '../Button';
+import Button from '../Components/Button';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Utils from '../../app/utils';
@@ -21,25 +21,47 @@ type InfoProps = {
   closeModal: () => void;
 };
 
-const Labels = ({ slices }) => {
-  return slices.map((slice, index) => {
-    const { labelCentroid, pieCentroid, data } = slice;
-    return (
-      <G key={index}>
-        <Line
-          x1={labelCentroid[0]}
-          y1={labelCentroid[1]}
-          x2={pieCentroid[0]}
-          y2={pieCentroid[1]}
-          stroke={data.svg.fill}
-        />
-        <Circle cx={labelCentroid[0]} cy={labelCentroid[1]} r={15} fill={data.svg.fill} />
-        <Text x={labelCentroid[0] - 10} y={labelCentroid[1] + 5}>
-          {data.value.toFixed(2)}
-        </Text>
-      </G>
-    );
-  });
+type sliceType = {
+  labelCentroid: number[];
+  pieCentroid: number[];
+  data: {
+    svg: {
+      fill: string;
+    };
+    value: number;
+    key: string;
+  };
+};
+
+type LabelProps = {
+  slices?: sliceType[];
+};
+
+const Labels: React.FunctionComponent<LabelProps> = props => {
+  const { slices } = props;
+  return (
+    <>
+      {!!slices &&
+        slices.map((slice: sliceType, index: number) => {
+          const { labelCentroid, pieCentroid, data } = slice;
+          return (
+            <G key={index}>
+              <Line
+                x1={labelCentroid[0]}
+                y1={labelCentroid[1]}
+                x2={pieCentroid[0]}
+                y2={pieCentroid[1]}
+                stroke={data.svg.fill}
+              />
+              <Circle cx={labelCentroid[0]} cy={labelCentroid[1]} r={15} fill={data.svg.fill} />
+              <Text x={labelCentroid[0] - 10} y={labelCentroid[1] + 5}>
+                {data.value.toFixed(2)}
+              </Text>
+            </G>
+          );
+        })}
+    </>
+  );
 };
 
 const data = [1.009, 0.0004, 10.009, 3, 1.909, 13.0987];
@@ -64,7 +86,7 @@ const pieData = data
     key: `pie-${index}`,
   }));
 
-const Info: React.FunctionComponent<InfoProps> = ({ closeModal }) => {
+const Insight: React.FunctionComponent<InfoProps> = ({ closeModal }) => {
   const context = useContext(ContextAppLoaded);
   const { info, totalBalance, translate } = context;
   const { colors } = useTheme() as unknown as ThemeType;
@@ -98,7 +120,7 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal }) => {
           style={{ opacity: 0.5 }}
         />
         <RegText color={colors.money} style={{ marginTop: 5, padding: 5 }}>
-          {translate('insight.title')}
+          {translate('insight.title') as string}
         </RegText>
         <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
       </View>
@@ -106,7 +128,7 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal }) => {
       <ScrollView style={{ maxHeight: '85%' }} contentContainerStyle={{}}>
         <View style={{ display: 'flex', margin: 20, marginBottom: 30 }}>
           <PieChart style={{ height: 400 }} data={pieData} innerRadius={50} outerRadius={150} labelRadius={180}>
-            <Labels slices={undefined} />
+            <Labels />
           </PieChart>
         </View>
         <View style={{ display: 'flex', width: '100%', margin: 20, alignItems: 'center' }}>
@@ -120,7 +142,7 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal }) => {
                     onPress={() => {
                       if (uas[index]) {
                         Clipboard.setString(uas[index]);
-                        Toast.show(translate('transactions.addresscopied'), Toast.LONG);
+                        Toast.show(translate('transactions.addresscopied') as string, Toast.LONG);
                       }
                     }}>
                     <View>
@@ -148,10 +170,10 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal }) => {
           alignItems: 'center',
           marginVertical: 5,
         }}>
-        <Button type="Secondary" title={translate('close')} onPress={closeModal} />
+        <Button type="Secondary" title={translate('close') as string} onPress={closeModal} />
       </View>
     </SafeAreaView>
   );
 };
 
-export default Info;
+export default Insight;

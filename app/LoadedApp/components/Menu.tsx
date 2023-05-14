@@ -22,7 +22,6 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected }) => {
   const item = {
     fontSize: 14,
     paddingTop: 15,
-    color: colors.text,
   };
 
   const onItemSelectedWrapper = (value: string) => {
@@ -69,7 +68,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected }) => {
           {translate('loadedapp.report') as string}
         </RegText>
 
-        <RegText onPress={() => onItemSelectedWrapper('Fund Pools')} style={item} color={colors.primary}>
+        <RegText onPress={() => onItemSelectedWrapper('Fund Pools')} style={item}>
           {translate('loadedapp.fundpools') as string}
         </RegText>
 
