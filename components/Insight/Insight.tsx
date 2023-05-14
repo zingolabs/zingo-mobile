@@ -40,11 +40,15 @@ type LabelProps = {
 
 const Labels: React.FunctionComponent<LabelProps> = props => {
   const { slices } = props;
+  const totalValue = slices ? slices.reduce((acc, curr) => acc + curr.data.value, 0) : 0;
+
   return (
     <>
       {!!slices &&
         slices.map((slice: sliceType, index: number) => {
           const { labelCentroid, pieCentroid, data } = slice;
+          const percent = ((100 * data.value) / totalValue).toFixed(0);
+
           return (
             <G key={index}>
               <Line
@@ -56,7 +60,7 @@ const Labels: React.FunctionComponent<LabelProps> = props => {
               />
               <Circle cx={labelCentroid[0]} cy={labelCentroid[1]} r={15} fill={data.svg.fill} />
               <Text x={labelCentroid[0] - 10} y={labelCentroid[1] + 5}>
-                {data.value.toFixed(2)}
+                {(Number(percent) === 0 ? '<1%' : percent) + '%'}
               </Text>
             </G>
           );
@@ -77,7 +81,7 @@ const uas = [
 const tags = ['filomeno', 'free2z', 'Shileded Labs', 'codetoinspire', 'Safeway', 'Tag Coffee'];
 
 // eslint-disable-next-line no-bitwise
-const randomColor = () => ('#' + ((Math.random() * 0xffffff) << 0).toString(16) + '000000').slice(0, 7);
+const randomColor = () => ('#' + ((Math.random() * 0xfffff) << 0).toString(16) + '000').slice(0, 7); // lighter colors
 
 const pieData = data
   .filter(value => value > 0)
@@ -112,6 +116,9 @@ const Insight: React.FunctionComponent<InfoProps> = ({ closeModal }) => {
         <View style={{ display: 'flex', width: '100%', margin: 20, alignItems: 'center' }}>
           <View>
             {pieData.map((item, index) => {
+              const totalValue = pieData ? pieData.reduce((acc, curr) => acc + curr.value, 0) : 0;
+              const percent = ((100 * item.value) / totalValue).toFixed(0);
+
               return (
                 <View key={`tag-${index}`} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
                   <FontAwesomeIcon style={{ margin: 5 }} size={20} icon={faQrcode} color={item.svg.fill} />
@@ -120,7 +127,7 @@ const Insight: React.FunctionComponent<InfoProps> = ({ closeModal }) => {
                     onPress={() => {
                       if (uas[index]) {
                         Clipboard.setString(uas[index]);
-                        Toast.show(translate('transactions.addresscopied') as string, Toast.LONG);
+                        Toast.show(translate('history.addresscopied') as string, Toast.LONG);
                       }
                     }}>
                     <View>
@@ -133,6 +140,7 @@ const Insight: React.FunctionComponent<InfoProps> = ({ closeModal }) => {
                     amtZec={item.value}
                     style={{ opacity: 0.5, marginHorizontal: 5 }}
                   />
+                  <RegText>{(Number(percent) === 0 ? '<1%' : percent) + '%'}</RegText>
                 </View>
               );
             })}
