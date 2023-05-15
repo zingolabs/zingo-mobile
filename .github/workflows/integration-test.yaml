@@ -17,6 +17,7 @@ env:
   CACHE-KEY: ${{ inputs.cache-key }}
   TIMESTAMP: ${{ inputs.timestamp }}
   ABI: ${{ inputs.abi }}
+  REPO-OWNER: ${{ github.repository_owner }}
 
 jobs:
   integration-test:
