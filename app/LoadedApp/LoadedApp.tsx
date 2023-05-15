@@ -536,10 +536,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   };
 
   setSendPageState = (sendPageState: SendPageStateClass) => {
-    if (!isEqual(this.state.sendPageState, sendPageState)) {
-      console.log('fetch send page state');
-      this.setState({ sendPageState });
-    }
+    console.log('fetch send page state');
+    this.setState({ sendPageState });
   };
 
   setSyncingStatus = (syncingStatus: SyncingStatusType) => {
