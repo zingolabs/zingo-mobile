@@ -30,6 +30,7 @@ import { RPCSeedType } from './types/RPCSeedType';
 import { RPCSyncStatusType } from './types/RPCSyncStatusType';
 import { RPCGetOptionType } from './types/RPCGetOptionType';
 import { RPCSendProgressType } from './types/RPCSendProgressType';
+import { RPCSyncRescan } from './types/RPCSyncRescanType';
 
 export default class RPC {
   fnSetSyncingStatusReport: (syncingStatusReport: SyncingStatusReportClass) => void;
@@ -62,6 +63,7 @@ export default class RPC {
   prev_sync_id: number;
   seconds_batch: number;
   batches: number;
+  latest_block: number;
 
   timers: NodeJS.Timeout[];
 
@@ -103,6 +105,8 @@ export default class RPC {
     this.prev_sync_id = -1;
     this.seconds_batch = 0;
     this.batches = 0;
+    this.latest_block = -1;
+
     this.timers = [];
   }
 
@@ -678,11 +682,20 @@ export default class RPC {
       this.prev_sync_id = -1;
       this.seconds_batch = 0;
       this.batches = 0;
+      this.latest_block = -1;
 
       // This is async, so when it is done, we finish the refresh.
       if (fullRescan) {
         this.doRescan()
-          .then(result => console.log('rescan finished', result))
+          .then(result => {
+            console.log('rescan finished', result);
+            if (result && !result.toLowerCase().startsWith('error')) {
+              const resultJSON: RPCSyncRescan = JSON.parse(result);
+              if (resultJSON.result === 'success' && resultJSON.latest_block) {
+                this.latest_block = resultJSON.latest_block;
+              }
+            }
+          })
           .catch(error => console.log('rescan error', error))
           .finally(() => {
             this.inRefresh = false;
@@ -690,7 +703,15 @@ export default class RPC {
           });
       } else {
         this.doSync()
-          .then(result => console.log('sync finished', result))
+          .then(result => {
+            console.log('sync finished', result);
+            if (result && !result.toLowerCase().startsWith('error')) {
+              const resultJSON: RPCSyncRescan = JSON.parse(result);
+              if (resultJSON.result === 'success' && resultJSON.latest_block) {
+                this.latest_block = resultJSON.latest_block;
+              }
+            }
+          })
           .catch(error => console.log('sync error', error))
           .finally(() => {
             this.inRefresh = false;
@@ -708,7 +729,7 @@ export default class RPC {
         const ss: RPCSyncStatusType = await JSON.parse(returnStatus);
 
         //console.log('sync wallet birthday', this.walletBirthday);
-        //console.log('sync', this.syncStatusTimerID, 'status', ss);
+        console.log('sync', this.syncStatusTimerID, 'status', ss);
 
         // syncronize status
         if (this.syncStatusTimerID) {
@@ -775,7 +796,15 @@ export default class RPC {
         const end_block: number = ss.end_block || 0; // lower
 
         // I want to know what was the first block of the current sync process
-        const process_end_block = end_block - batch_num * this.blocksPerBatch;
+        let process_end_block: number = 0;
+        // when the App is syncing the new blocks and sync finished really fast
+        // the synstatus have almost all of the fields undefined.
+        // if we have latest_block means that the sync process finished in that block
+        if (end_block === 0 && batch_num === 0) {
+          process_end_block = this.latest_block !== -1 ? this.latest_block : this.lastServerBlockHeight;
+        } else {
+          process_end_block = end_block - batch_num * this.blocksPerBatch;
+        }
 
         const total_general_blocks: number = this.lastServerBlockHeight - process_end_block;
 
@@ -882,7 +911,7 @@ export default class RPC {
             lastError: ss.last_error,
             blocksPerBatch: this.blocksPerBatch,
             secondsPerBatch: 0,
-            process_end_block: this.lastWalletBlockHeight,
+            process_end_block: process_end_block,
             lastBlockServer: this.lastServerBlockHeight,
           };
           this.fnSetSyncingStatusReport(statusFinished);
