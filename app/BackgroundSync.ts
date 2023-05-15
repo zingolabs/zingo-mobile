@@ -58,7 +58,7 @@ const BackgroundSync = async (task_data: any) => {
       const background = await AsyncStorage.getItem('@background');
       if (background === 'no') {
         clearInterval(saver);
-        console.log('BS: FInished (foreground)');
+        console.log('BS: Finished (going to foreground)');
         finishEarly.done();
         return;
       }
@@ -87,15 +87,17 @@ const BackgroundSync = async (task_data: any) => {
 
     await Promise.race([RPCModule.execute('sync', ''), finishEarly.wait()]);
     clearInterval(saver);
+  } else {
+    console.log('BS: wallet file does not exist');
   }
-  console.log('BS: FInished (end)');
+  console.log('BS: Finished (end of syncing)');
 };
 
 export default BackgroundSync;
 
 function manuallyResolve() {
   let resolve: Function;
-  // new Promise takes a function as an arument. When that function is called
+  // new Promise takes a function as an argument. When that function is called
   // the promise resolves with the value output by that function.
   // By passing the function out of the promise, we can call it later
   // in order to resolve the promise at will

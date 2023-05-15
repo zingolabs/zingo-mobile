@@ -289,23 +289,28 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
         // reading background task info
         if (Platform.OS === 'ios') {
           // this file only exists in IOS BS.
-          this.fetchBackgroundSyncing();
+          await this.fetchBackgroundSyncing();
         }
         this.rpc.setInRefresh(false);
-        this.rpc.clearTimers();
+        await this.rpc.clearTimers();
+        console.log('clear timers');
         await this.rpc.configure();
+        console.log('configure start timers');
         // setting value for background task Android
         await AsyncStorage.setItem('@background', 'no');
+        console.log('background no in storage');
       }
       if (nextAppState.match(/inactive|background/) && this.state.appState === 'active') {
         console.log('App is gone to the background!');
-        this.rpc.clearTimers();
-        this.setState({
-          syncingStatusReport: new SyncingStatusReportClass(),
-          syncingStatus: {} as SyncingStatusType,
-        });
+        this.rpc.setInRefresh(false);
+        await this.rpc.clearTimers();
+        console.log('clear timers');
+        this.setSyncingStatus({} as SyncingStatusType);
+        this.setSyncingStatusReport(new SyncingStatusReportClass());
+        console.log('clear sync status state');
         // setting value for background task Android
         await AsyncStorage.setItem('@background', 'yes');
+        console.log('background yes in storage');
       }
       if (this.state.appState !== nextAppState) {
         this.setState({ appState: nextAppState });
@@ -334,7 +339,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       }
     });
 
-    this.unsubscribeNetInfo = NetInfo.addEventListener(state => {
+    this.unsubscribeNetInfo = NetInfo.addEventListener(async state => {
       const { isConnected, type, isConnectionExpensive } = this.state.netInfo;
       if (
         isConnected !== state.isConnected ||
@@ -352,7 +357,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
         if (isConnected !== state.isConnected) {
           if (!state.isConnected) {
             //console.log('EVENT Loaded: No internet connection.');
-            this.rpc.clearTimers();
+            await this.rpc.clearTimers();
             this.setState({
               syncingStatusReport: new SyncingStatusReportClass(),
               syncingStatus: {} as SyncingStatusType,
@@ -371,8 +376,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     });
   };
 
-  componentWillUnmount = () => {
-    this.rpc.clearTimers();
+  componentWillUnmount = async () => {
+    await this.rpc.clearTimers();
     this.dim && this.dim.remove();
     this.appstate && this.appstate.remove();
     this.linking && this.linking.remove();
@@ -757,7 +762,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     noToast?: boolean,
   ): Promise<void> => {
     // here I know the server was changed, clean all the tasks before anything.
-    this.rpc.clearTimers();
+    await this.rpc.clearTimers();
     this.setState({
       syncingStatusReport: new SyncingStatusReportClass(),
       syncingStatus: {} as SyncingStatusType,
@@ -844,10 +849,10 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     this.rpc.fetchWalletSettings();
   };
 
-  navigateToLoading = () => {
+  navigateToLoading = async () => {
     const { navigation } = this.props;
 
-    this.rpc.clearTimers();
+    await this.rpc.clearTimers();
     navigation.reset({
       index: 0,
       routes: [{ name: 'LoadingApp' }],

@@ -63,6 +63,8 @@ export default class RPC {
   seconds_batch: number;
   batches: number;
 
+  timers: NodeJS.Timeout[];
+
   constructor(
     fnSetSyncingStatusReport: (syncingStatusReport: SyncingStatusReportClass) => void,
     fnSetTotalBalance: (totalBalance: TotalBalanceClass) => void,
@@ -101,6 +103,7 @@ export default class RPC {
     this.prev_sync_id = -1;
     this.seconds_batch = 0;
     this.batches = 0;
+    this.timers = [];
   }
 
   static async rpc_setInterruptSyncAfterBatch(value: string): Promise<void> {
@@ -408,14 +411,33 @@ export default class RPC {
         console.log('interval refresh');
         this.refresh(false);
       }, 30 * 1000); // 30 seconds
+      console.log('create refresh timer', this.refreshTimerID);
+      this.timers.push(this.refreshTimerID);
     }
 
     // every 5 seconds the App update all data
     if (!this.updateTimerID) {
       this.updateTimerID = setInterval(() => {
-        console.log('interval update');
+        console.log('interval update', this.timers);
+        this.sanatizeTimers();
         this.updateData();
       }, 5 * 1000); // 5 secs
+      console.log('create update timer', this.updateTimerID);
+      this.timers.push(this.updateTimerID);
+    }
+
+    // and now the array of timers...
+    let deleted: number[] = [];
+    for (var i = 0; i < this.timers.length; i++) {
+      if (this.timers[i] !== this.refreshTimerID && this.timers[i] !== this.updateTimerID) {
+        clearInterval(this.timers[i]);
+        deleted.push(i);
+        console.log('kill item array timers', this.timers[i]);
+      }
+    }
+    // remove the cleared timers.
+    for (var i = 0; i < deleted.length; i++) {
+      this.timers.splice(deleted[i], 1);
     }
 
     // Load the current wallet data
@@ -428,20 +450,50 @@ export default class RPC {
     }, 1000);
   }
 
-  clearTimers(): void {
+  async clearTimers(): Promise<void> {
     if (this.refreshTimerID) {
       clearInterval(this.refreshTimerID);
       this.refreshTimerID = undefined;
+      console.log('kill refresh timer', this.refreshTimerID);
     }
 
     if (this.updateTimerID) {
       clearInterval(this.updateTimerID);
       this.updateTimerID = undefined;
+      console.log('kill update timer', this.updateTimerID);
     }
 
     if (this.syncStatusTimerID) {
       clearInterval(this.syncStatusTimerID);
       this.syncStatusTimerID = undefined;
+      console.log('kill syncstatus timer', this.syncStatusTimerID);
+    }
+
+    // and now the array of timers...
+    while (this.timers.length > 0) {
+      const inter = this.timers.pop();
+      clearInterval(inter);
+      console.log('kill item array timers', inter);
+    }
+  }
+
+  async sanatizeTimers(): Promise<void> {
+    // and now the array of timers...
+    let deleted: number[] = [];
+    for (var i = 0; i < this.timers.length; i++) {
+      if (
+        this.timers[i] !== this.refreshTimerID &&
+        this.timers[i] !== this.updateTimerID &&
+        this.timers[i] !== this.syncStatusTimerID
+      ) {
+        clearInterval(this.timers[i]);
+        deleted.push(i);
+        console.log('sanatize - kill item array timers', this.timers[i]);
+      }
+    }
+    // remove the cleared timers.
+    for (var i = 0; i < deleted.length; i++) {
+      this.timers.splice(deleted[i], 1);
     }
   }
 
@@ -648,7 +700,6 @@ export default class RPC {
 
       // We need to wait for the sync to finish. The sync is done when
       this.syncStatusTimerID = setInterval(async () => {
-        console.log('interval sync/rescan');
         const returnStatus = await this.doSyncStatus();
         if (returnStatus.toLowerCase().startsWith('error')) {
           return;
@@ -765,6 +816,10 @@ export default class RPC {
           current_block = this.lastServerBlockHeight;
         }
 
+        this.seconds_batch += 5;
+
+        console.log('+++++++++++++++ interval sync/rescan, secs', this.seconds_batch, 'timer', this.syncStatusTimerID);
+
         this.fnSetSyncingStatus({
           inProgress: ss.in_progress,
           synced: this.lastServerBlockHeight === this.lastWalletBlockHeight,
@@ -787,8 +842,6 @@ export default class RPC {
         this.fnSetSyncingStatusReport(statusGeneral);
 
         this.prevProgress = progress;
-
-        this.seconds_batch += 5;
 
         // Close the poll timer if the sync finished(checked via promise above)
         if (!this.inRefresh) {
@@ -908,6 +961,8 @@ export default class RPC {
           }
         }
       }, 5000);
+      console.log('create sync/rescan timer', this.syncStatusTimerID);
+      this.timers.push(this.syncStatusTimerID);
     } else {
       // Already at the latest block
       console.log('Already have latest block, waiting for next refresh');
