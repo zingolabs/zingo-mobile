@@ -290,7 +290,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       toAddr.amount = amount.replace(decimalSeparator, '.').substring(0, 20);
       if (isNaN(Number(toAddr.amount))) {
         toAddr.amountCurrency = '';
-      } else if (toAddr.amount && zecPrice && zecPrice.zecPrice > 0) {
+      } else if (zecPrice && zecPrice.zecPrice > 0) {
         toAddr.amountCurrency = Utils.toLocaleFloat((parseFloat(toAddr.amount) * zecPrice.zecPrice).toFixed(2));
       } else {
         toAddr.amountCurrency = '';
