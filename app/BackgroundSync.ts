@@ -4,16 +4,35 @@ import NetInfo, { NetInfoStateType } from '@react-native-community/netinfo';
 import { RPCSyncStatusType } from './rpc/types/RPCSyncStatusType';
 
 const BackgroundSync = async (task_data: any) => {
+  // this not interact with the server.
   const exists = await RPCModule.walletExists();
 
   // only if exists the wallet file make sense to do the sync.
   if (exists && exists !== 'false') {
     // only if we have connection make sense to call RPCModule.
-    const network = await NetInfo.fetch();
-    if (!network.isConnected) {
-      console.log('BS: Not started (connected: ' + network.isConnected + ', type: ' + network.type + ')');
+    const networkState = await NetInfo.fetch();
+    if (
+      !networkState.isConnected ||
+      networkState.type === NetInfoStateType.cellular ||
+      (networkState.details !== null && networkState.details.isConnectionExpensive)
+    ) {
+      console.log(
+        'BS: Not started (connected: ' + networkState.isConnected,
+        +', type: ' +
+          networkState.type +
+          +', expensive connection: ' +
+          networkState.details?.isConnectionExpensive +
+          ')',
+      );
       return;
     }
+    // if the App goes to Foreground kill the interval
+    const background = await AsyncStorage.getItem('@background');
+    if (background === 'no') {
+      console.log('BS: Not started (going to foreground)');
+      return;
+    }
+    /* no need to load wallet again, it's loaded already in the RPC session.
     const server = await AsyncStorage.getItem('@server');
     let wallet: string = await RPCModule.loadExistingWallet(server);
     if (wallet) {
@@ -26,6 +45,7 @@ const BackgroundSync = async (task_data: any) => {
       console.log('BS: Internal Error load wallet');
       return;
     }
+    */
 
     let batch_num = -1;
     console.log('BS:', task_data);
@@ -36,18 +56,18 @@ const BackgroundSync = async (task_data: any) => {
     let finishEarly = manuallyResolve();
 
     let saver = setInterval(async () => {
-      const networkState = await NetInfo.fetch();
+      const networkStateSaver = await NetInfo.fetch();
       if (
-        !networkState.isConnected ||
-        networkState.type === NetInfoStateType.cellular ||
-        (networkState.details !== null && networkState.details.isConnectionExpensive)
+        !networkStateSaver.isConnected ||
+        networkStateSaver.type === NetInfoStateType.cellular ||
+        (networkStateSaver.details !== null && networkStateSaver.details.isConnectionExpensive)
       ) {
         console.log(
-          'BS: Interrupted (connected: ' + networkState.isConnected,
+          'BS: Interrupted (connected: ' + networkStateSaver.isConnected,
           +', type: ' +
-            networkState.type +
+            networkStateSaver.type +
             +', expensive connection: ' +
-            networkState.details?.isConnectionExpensive +
+            networkStateSaver.details?.isConnectionExpensive +
             ')',
         );
         clearInterval(saver);
@@ -55,8 +75,8 @@ const BackgroundSync = async (task_data: any) => {
         return;
       }
       // if the App goes to Foreground kill the interval
-      const background = await AsyncStorage.getItem('@background');
-      if (background === 'no') {
+      const backgroundSaver = await AsyncStorage.getItem('@background');
+      if (backgroundSaver === 'no') {
         clearInterval(saver);
         console.log('BS: Finished (going to foreground)');
         finishEarly.done();
