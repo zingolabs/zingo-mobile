@@ -291,26 +291,23 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
           // this file only exists in IOS BS.
           await this.fetchBackgroundSyncing();
         }
-        this.rpc.setInRefresh(false);
-        await this.rpc.clearTimers();
-        console.log('clear timers');
-        await this.rpc.configure();
-        console.log('configure start timers');
         // setting value for background task Android
         await AsyncStorage.setItem('@background', 'no');
         console.log('background no in storage');
+        await this.rpc.configure();
+        console.log('configure start timers');
       }
       if (nextAppState.match(/inactive|background/) && this.state.appState === 'active') {
         console.log('App is gone to the background!');
+        // setting value for background task Android
+        await AsyncStorage.setItem('@background', 'yes');
+        console.log('background yes in storage');
         this.rpc.setInRefresh(false);
         await this.rpc.clearTimers();
         console.log('clear timers');
         this.setSyncingStatus({} as SyncingStatusType);
         this.setSyncingStatusReport(new SyncingStatusReportClass());
         console.log('clear sync status state');
-        // setting value for background task Android
-        await AsyncStorage.setItem('@background', 'yes');
-        console.log('background yes in storage');
       }
       if (this.state.appState !== nextAppState) {
         this.setState({ appState: nextAppState });
