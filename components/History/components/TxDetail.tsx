@@ -131,6 +131,16 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
             </TouchableOpacity>
           </View>
 
+          {fee > 0 && (
+            <View style={{ display: 'flex', marginTop: 10 }}>
+              <FadeText>{translate('history.txfee') as string}</FadeText>
+              <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                <ZecAmount amtZec={fee} size={18} currencyName={'ᙇ'} />
+                {/*<CurrencyAmount style={{ fontSize: 18 }} amtZec={fee} price={tx.zec_price} currency={'USD'} />*/}
+              </View>
+            </View>
+          )}
+
           {tx.detailedTxns.map((txd: TxDetailType) => {
             // 30 characters per line
             const numLines = txd.address.length < 40 ? 2 : txd.address.length / 30;
@@ -207,16 +217,6 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
               </View>
             );
           })}
-
-          {fee > 0 && (
-            <View style={{ display: 'flex', marginTop: 10 }}>
-              <FadeText>{translate('history.txfee') as string}</FadeText>
-              <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                <ZecAmount amtZec={fee} size={18} currencyName={'ᙇ'} />
-                {/*<CurrencyAmount style={{ fontSize: 18 }} amtZec={fee} price={tx.zec_price} currency={'USD'} />*/}
-              </View>
-            </View>
-          )}
         </View>
       </ScrollView>
       <View style={{ flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', margin: 10 }}>
