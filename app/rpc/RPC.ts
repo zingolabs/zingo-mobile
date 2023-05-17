@@ -847,7 +847,7 @@ export default class RPC {
 
         this.seconds_batch += 5;
 
-        console.log('+++++++++++++++ interval sync/rescan, secs', this.seconds_batch, 'timer', this.syncStatusTimerID);
+        console.log('interval sync/rescan, secs', this.seconds_batch, 'timer', this.syncStatusTimerID);
 
         this.fnSetSyncingStatus({
           inProgress: ss.in_progress,
@@ -951,7 +951,7 @@ export default class RPC {
 
               //console.log('sync status', ss);
               console.log(
-                `Saving because batch num changed ${this.prevBatchNum} - ${batch_num}. seconds: ${this.seconds_batch}`,
+                `@@@@@@@@@@@ Saving because batch num changed ${this.prevBatchNum} - ${batch_num}. seconds: ${this.seconds_batch}`,
               );
             }
             this.batches += batch_num - this.prevBatchNum;
@@ -986,7 +986,7 @@ export default class RPC {
             this.fnSetSyncingStatusReport(statusSeconds);
 
             //console.log('sync status', ss);
-            console.log(`Saving wallet. seconds: ${this.seconds_batch}`);
+            console.log(`@@@@@@@@@@@Saving wallet. seconds: ${this.seconds_batch}`);
           }
         }
       }, 5000);
