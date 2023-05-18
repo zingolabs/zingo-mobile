@@ -423,7 +423,7 @@ export default class RPC {
     if (!this.updateTimerID) {
       this.updateTimerID = setInterval(() => {
         console.log('interval update', this.timers);
-        this.sanatizeTimers();
+        this.sanitizeTimers();
         this.updateData();
       }, 5 * 1000); // 5 secs
       console.log('create update timer', this.updateTimerID);
@@ -481,7 +481,7 @@ export default class RPC {
     }
   }
 
-  async sanatizeTimers(): Promise<void> {
+  async sanitizeTimers(): Promise<void> {
     // and now the array of timers...
     let deleted: number[] = [];
     for (var i = 0; i < this.timers.length; i++) {
@@ -492,7 +492,7 @@ export default class RPC {
       ) {
         clearInterval(this.timers[i]);
         deleted.push(i);
-        console.log('sanatize - kill item array timers', this.timers[i]);
+        console.log('sanitize - kill item array timers', this.timers[i]);
       }
     }
     // remove the cleared timers.
