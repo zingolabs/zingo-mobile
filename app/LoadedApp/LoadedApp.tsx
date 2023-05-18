@@ -289,6 +289,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
           this.fetchBackgroundSyncing();
         }
         this.rpc.setInRefresh(false);
+        this.keepAwake(false);
         this.rpc.clearTimers();
         await this.rpc.configure();
         // setting value for background task Android
@@ -741,6 +742,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       syncingStatus: {} as SyncingStatusType,
     });
     this.rpc.setInRefresh(false);
+    this.keepAwake(false);
     // when I try to open the wallet in the new server:
     // - the seed doesn't exists (the type of sever is different `mainnet` / `testnet` / `regtest` ...).
     //   The App have to go to the initial screen
@@ -852,6 +854,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     }
 
     this.rpc.setInRefresh(false);
+    this.keepAwake(false);
     this.setState({ seedChangeModalVisible: false });
     this.navigateToLoading();
   };
@@ -867,6 +870,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     }
 
     this.rpc.setInRefresh(false);
+    this.keepAwake(false);
     this.setState({ seedBackupModalVisible: false });
     this.navigateToLoading();
   };
