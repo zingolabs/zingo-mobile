@@ -665,6 +665,7 @@ export default class RPC {
     ) {
       // If the latest block height has changed, make sure to sync. This will happen in a new thread
       this.setInRefresh(true);
+      this.keepAwake(true);
 
       this.prevProgress = 0;
       this.prevBatchNum = -1;
