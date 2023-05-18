@@ -221,7 +221,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
               display: 'flex',
               flexDirection: 'row',
               alignItems: 'flex-end',
-              margin: 20,
+              marginHorizontal: 20,
             }}>
             <DetailLine
               label={translate('report.lastbackgroundsync') as string}
@@ -235,7 +235,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
         )}
         {maxBlocks && netInfo.isConnected ? (
           <>
-            <View style={{ display: 'flex', margin: 20, marginBottom: 30 }}>
+            <View style={{ display: 'flex', marginHorizontal: 20, marginBottom: 30 }}>
               <DetailLine
                 label="Sync ID"
                 value={
