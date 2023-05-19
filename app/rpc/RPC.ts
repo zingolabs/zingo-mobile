@@ -1316,6 +1316,8 @@ export default class RPC {
     sendJson: Array<SendJsonToTypeType>,
     setSendProgress: (arg0: SendProgressClass) => void,
   ): Promise<string> {
+    // keep awake the screen/device while sending.
+    this.keepAwake(true);
     // First, get the previous send progress id, so we know which ID to track
     const prev: string = await this.doSendProgress();
     let prevSendId = -1;
@@ -1329,8 +1331,14 @@ export default class RPC {
 
     // This is async, so fire and forget
     this.doSend(JSON.stringify(sendJson))
-      .then(r => console.log('send finished: ' + r))
-      .catch(e => console.log('Send error ' + e));
+      .then(r => console.log('End Send OK: ' + r))
+      .catch(e => console.log('End Send ERROR: ' + e))
+      .finally(() => {
+        if (!this.inRefresh) {
+          // if not syncing, then not keep awake the screen/device when the send is finished.
+          this.keepAwake(false);
+        }
+      });
 
     const startTimeSeconds = new Date().getTime() / 1000;
 
@@ -1468,7 +1476,6 @@ export default class RPC {
 
   setInRefresh(value: boolean): void {
     this.inRefresh = value;
-    this.keepAwake(value);
   }
 
   getInRefresh(): boolean {

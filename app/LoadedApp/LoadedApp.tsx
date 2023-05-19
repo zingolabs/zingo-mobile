@@ -764,7 +764,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       syncingStatus: {} as SyncingStatusType,
     });
     this.rpc.setInRefresh(false);
-
+    this.keepAwake(false);
     // First we need to check the `chain_name` between servers, if this is different
     // we cannot try to open the current wallet, because make not sense.
     let error = false;
@@ -888,6 +888,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     }
 
     this.rpc.setInRefresh(false);
+    this.keepAwake(false);
     this.setState({ seedChangeModalVisible: false });
     this.navigateToLoading();
   };
@@ -903,6 +904,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     }
 
     this.rpc.setInRefresh(false);
+    this.keepAwake(false);
     this.setState({ seedBackupModalVisible: false });
     this.navigateToLoading();
   };
