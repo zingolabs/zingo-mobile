@@ -144,8 +144,8 @@ exports[`Component SyncReport - test Matches the snapshot SyncReport 1`] = `
         style={
           {
             "display": "flex",
-            "margin": 20,
             "marginBottom": 30,
+            "marginHorizontal": 20,
           }
         }
       >
