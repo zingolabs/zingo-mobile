@@ -12,6 +12,10 @@ import PriceFetcher from '../Components/PriceFetcher';
 import RegText from '../Components/RegText';
 import ZecAmount from '../Components/ZecAmount';
 import { NetInfoStateType } from '@react-native-community/netinfo';
+import Button from '../Components/Button';
+import RPC from '../../app/rpc';
+import Toast from 'react-native-simple-toast';
+import { RPCShieldType } from '../../app/rpc/types/RPCShieldType';
 
 type HeaderProps = {
   poolsMoreInfoOnClick?: () => void;
@@ -26,6 +30,7 @@ type HeaderProps = {
   translate?: (key: string) => TranslateType;
   dimensions?: DimensionsType;
   netInfo?: NetInfoType;
+  setComputingModalVisible?: (visible: boolean) => void;
 };
 
 const Header: React.FunctionComponent<HeaderProps> = ({
@@ -41,10 +46,11 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   translate: translateProp,
   dimensions: dimensionsProp,
   netInfo: netInfoProp,
+  setComputingModalVisible,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { totalBalance, info, syncingStatus, currency, zecPrice } = context;
-  let translate, dimensions, netInfo;
+  let translate: (key: string) => TranslateType, dimensions, netInfo;
   if (translateProp) {
     translate = translateProp;
   } else {
@@ -66,6 +72,37 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   const syncStatusDisplayLine = syncingStatus.inProgress ? `(${syncingStatus.blocks})` : '';
   const balanceColor = colors.text;
 
+  const showShieldButton = totalBalance && totalBalance.transparentBal > 0;
+  const shieldFunds = async () => {
+    if (!setComputingModalVisible) {
+      return;
+    }
+    setComputingModalVisible(true);
+
+    const shieldStr = await RPC.rpc_shieldTransparent();
+
+    if (shieldStr) {
+      if (shieldStr.toLowerCase().startsWith('error')) {
+        Toast.show(`${translate('history.shield-error')} ${shieldStr}`, Toast.LONG);
+        setTimeout(() => {
+          setComputingModalVisible(false);
+        }, 1000);
+      } else {
+        const shieldJSON: RPCShieldType = await JSON.parse(shieldStr);
+
+        if (shieldJSON.error) {
+          Toast.show(`${translate('history.shield-error')} ${shieldJSON.error}`, Toast.LONG);
+        } else {
+          Toast.show(`${translate('history.shield-message')} ${shieldJSON.txid}`, Toast.LONG);
+        }
+
+        setTimeout(() => {
+          setComputingModalVisible(false);
+        }, 1000);
+      }
+    }
+  };
+
   return (
     <View
       testID="header"
@@ -86,6 +123,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         <View
           style={{
             flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
             margin: 0,
           }}>
           <ZecAmount currencyName={info.currencyName} color={balanceColor} size={36} amtZec={totalBalance.total} />
@@ -100,11 +139,12 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   backgroundColor: colors.card,
                   borderRadius: 10,
                   margin: 0,
+                  marginLeft: 5,
                   padding: 0,
-                  minWidth: 48,
-                  minHeight: 48,
+                  minWidth: 25,
+                  minHeight: 25,
                 }}>
-                <FontAwesomeIcon icon={faInfoCircle} size={18} color={colors.primary} />
+                <FontAwesomeIcon icon={faInfoCircle} size={25} color={colors.primary} />
               </View>
             </TouchableOpacity>
           )}
@@ -122,6 +162,12 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           <View style={{ marginLeft: 5 }}>
             <PriceFetcher setZecPrice={setZecPrice} />
           </View>
+        </View>
+      )}
+
+      {showShieldButton && setComputingModalVisible && (
+        <View style={{ margin: 5 }}>
+          <Button type="Primary" title={translate('history.shieldfunds') as string} onPress={shieldFunds} />
         </View>
       )}
 
@@ -159,22 +205,22 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   borderColor: colors.primary,
                   borderWidth: 1,
                   borderRadius: 10,
-                  minWidth: 20,
-                  minHeight: 20,
+                  minWidth: 25,
+                  minHeight: 25,
                 }}>
                 {!syncStatusDisplayLine && syncingStatus.synced && (
                   <View style={{ margin: 0, padding: 0 }}>
-                    <FontAwesomeIcon icon={faCheck} color={colors.primary} />
+                    <FontAwesomeIcon icon={faCheck} color={colors.primary} size={20} />
                   </View>
                 )}
                 {!syncStatusDisplayLine && !syncingStatus.synced && (
                   <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
-                    <FontAwesomeIcon icon={faStop} color={colors.zingo} size={12} />
+                    <FontAwesomeIcon icon={faStop} color={colors.zingo} size={17} />
                   </TouchableOpacity>
                 )}
                 {syncStatusDisplayLine && (
                   <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
-                    <FontAwesomeIcon icon={faPlay} color={colors.primary} size={10} />
+                    <FontAwesomeIcon icon={faPlay} color={colors.primary} size={17} />
                   </TouchableOpacity>
                 )}
               </View>

@@ -39,12 +39,12 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
     (tx.detailedTxns && tx.detailedTxns.reduce((s: number, d: TxDetailType) => s + (d.amount ? d.amount : 0), 0)) || 0;
   let fee = 0;
   // normal case: spend 1600 fee 1000 sent 600
-  if (tx.type === 'sent' && tx.amount && Math.abs(tx.amount) > Math.abs(sum)) {
+  if (tx.type === 'sent' && Math.abs(tx.amount) > Math.abs(sum)) {
     fee = Math.abs(tx.amount) - Math.abs(sum);
   }
   // self-send case: spend 1000 fee 1000 sent 0
   // this is temporary until we have a new field in 'list' object, called: fee.
-  if (tx.type === 'sent' && tx.amount && Math.abs(tx.amount) <= Math.abs(sum)) {
+  if (tx.type === 'sent' && Math.abs(tx.amount) <= Math.abs(sum)) {
     fee = Math.abs(tx.amount);
   }
 

@@ -1,0 +1,46 @@
+name: Create cache key
+
+on:
+  workflow_call:
+    outputs:
+      cache-key:
+        description: "Cache key"
+        value: ${{ jobs.create-cache-key.outputs.cache-key }}
+
+env:
+  REPO-OWNER: ${{ github.repository_owner }}
+
+jobs:
+  create-cache-key:
+    name: Create cache key
+    runs-on: ubuntu-22.04
+    container:
+      image: zingodevops/android_builder:stable
+    env:
+      RUSTUP_HOME: /root/.rustup
+    outputs:
+      cache-key: ${{ steps.create-cache-key.outputs.cache-key }}
+    steps:
+      - name: Set envs for zingolib CI
+        if: ${{ contains(github.repository, 'zingolib') }}
+        run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
+            
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          repository: ${{ env.REPO-OWNER }}/zingo-mobile
+        
+      - name: Cargo update for zingolib CI
+        if: ${{ contains(github.repository, 'zingolib') }}
+        run: |
+          echo "zingolib_ref=$(echo ${GITHUB_REF} | sed 's/\//\\\//g')" >> $GITHUB_ENV
+          sed -i "/^zingolib\|^zingoconfig/ s/branch = \"dev\"/rev = \"${{ env.zingolib_ref }}\"/" "rust/lib/Cargo.toml"
+          if cat rust/lib/Cargo.toml | grep "^zingolib\|^zingoconfig" | grep -q "branch"; then exit 1; fi
+          cd rust && cargo update -p zingolib -p zingoconfig --aggressive
+      
+      - name: Store Cargo version
+        run: echo $(cargo --version) >> rust/cargo_version.txt
+      
+      - name: Create cache key
+        id: create-cache-key
+        run: echo "cache-key=${{ hashFiles('rust/**/Cargo.toml', 'rust/**/Cargo.lock', 'rust/**/*.rs', 'rust/cargo_version.txt') }}" >> $GITHUB_OUTPUT

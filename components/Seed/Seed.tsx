@@ -113,10 +113,10 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
         (async () => {
           const resp: string = await RPCModule.getLatestBlock(server);
           //console.log(resp);
-          if (!resp.toLowerCase().startsWith('error')) {
+          if (resp && !resp.toLowerCase().startsWith('error')) {
             setLatestBlock(Number(resp));
           } else {
-            //console.log('error latest block', resp);
+            console.log('error latest block', resp);
           }
         })();
       }
@@ -216,6 +216,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
                   minWidth: '95%',
                   minHeight: 100,
                   marginLeft: 5,
+                  backgroundColor: 'transparent',
                 }}
                 value={seedPhrase}
                 onChangeText={(text: string) => setSeedPhrase(text)}
@@ -284,6 +285,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
                     minWidth: '20%',
                     minHeight: 48,
                     marginLeft: 5,
+                    backgroundColor: 'transparent',
                   }}
                   value={birthdayNumber}
                   onChangeText={(text: string) => {
@@ -354,7 +356,14 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
               return;
             }
             if (times === 0 || times === 3) {
-              onClickOK(seedPhrase, Number(birthdayNumber));
+              if (action === 'restore') {
+                // waiting while closing the keyboard, just in case.
+                setTimeout(async () => {
+                  onClickOK(seedPhrase, Number(birthdayNumber));
+                }, 100);
+              } else {
+                onClickOK(seedPhrase, Number(birthdayNumber));
+              }
             } else if (times === 1 || times === 2) {
               setTimes(times + 1);
             }

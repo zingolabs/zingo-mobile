@@ -33,7 +33,6 @@ import {
   SyncingStatusReportClass,
   TotalBalanceClass,
   SendPageStateClass,
-  ReceivePageStateClass,
   InfoType,
   TransactionType,
   ToAddrClass,
@@ -624,7 +623,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       throw err;
     }
   };
-
+  /*
   // Get a single private key for this address, and return it as a string.
   getPrivKeyAsString = async (address: string): Promise<string> => {
     const pk = await RPC.rpc_getPrivKeyAsString(address);
@@ -661,7 +660,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       this.setState({ receivePageState: newReceivePageState });
     }
   };
-
+  */
   doRefresh = async () => {
     await this.rpc.refresh(false);
   };
@@ -730,7 +729,11 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     this.rpc.fetchWalletSettings();
   };
 
-  set_server_option = async (name: 'server' | 'currency' | 'language' | 'sendAll', value: string): Promise<void> => {
+  set_server_option = async (
+    name: 'server' | 'currency' | 'language' | 'sendAll',
+    value: string,
+    noToast?: boolean,
+  ): Promise<void> => {
     // here I know the server was changed, clean all the tasks before anything.
     this.rpc.clearTimers();
     this.setState({
@@ -743,11 +746,13 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     //   The App have to go to the initial screen
     // - the seed exists and the App can open the wallet in the new server.
     //   But I have to restart the sync if needed.
-    const error = await RPCModule.loadExistingWallet(value);
-    if (!error.toLowerCase().startsWith('error')) {
+    const result: string = await RPCModule.loadExistingWallet(value);
+    if (result && !result.toLowerCase().startsWith('error')) {
       // Load the wallet and navigate to the transactions screen
       console.log(`wallet loaded ok ${value}`);
-      Toast.show(`${this.props.translate('loadedapp.readingwallet')} ${value}`, Toast.LONG);
+      if (!noToast) {
+        Toast.show(`${this.props.translate('loadedapp.readingwallet')} ${value}`, Toast.LONG);
+      }
       await SettingsFileImpl.writeSettings(name, value);
       this.setState({
         server: value,
@@ -763,7 +768,9 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
         seedServerModalVisible: true,
       });
       //console.log(`Error Reading Wallet ${value} - ${error}`);
-      Toast.show(`${this.props.translate('loadedapp.readingwallet-error')} ${value}`, Toast.LONG);
+      if (!noToast) {
+        Toast.show(`${this.props.translate('loadedapp.readingwallet-error')} ${value}`, Toast.LONG);
+      }
 
       // we need to restore the old server because the new doesn't have the seed of the current wallet.
       const old_settings = await SettingsFileImpl.readSettings();
@@ -827,10 +834,15 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
   onClickOKChangeWallet = async () => {
     const { info } = this.state;
-    const resultStr =
-      info.currencyName && info.currencyName !== 'ZEC'
-        ? ((await this.rpc.changeWalletNoBackup()) as string)
-        : ((await this.rpc.changeWallet()) as string);
+
+    // if the App is working with a test server
+    // no need to do backups of the wallets.
+    let resultStr = '';
+    if (info.currencyName === 'TAZ') {
+      resultStr = (await this.rpc.changeWalletNoBackup()) as string;
+    } else {
+      resultStr = (await this.rpc.changeWallet()) as string;
+    }
 
     //console.log("jc change", resultStr);
     if (resultStr.toLowerCase().startsWith('error')) {
@@ -860,10 +872,17 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   };
 
   onClickOKServerWallet = async () => {
-    const { info } = this.state;
+    const beforeCurrencyName = this.state.info.currencyName;
 
     if (this.state.newServer) {
-      await RPCModule.execute('changeserver', this.state.newServer);
+      const resultStr: string = await RPCModule.execute('changeserver', this.state.newServer);
+      if (resultStr.toLowerCase().startsWith('error')) {
+        //console.log(`Error change server ${value} - ${resultStr}`);
+        Toast.show(`${this.props.translate('loadedapp.changeservernew-error')} ${resultStr}`, Toast.LONG);
+        return;
+      } else {
+        //console.log(`change server ok ${value}`);
+      }
 
       await SettingsFileImpl.writeSettings('server', this.state.newServer);
       this.setState({
@@ -872,10 +891,25 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       });
     }
 
-    const resultStr2 =
-      info.currencyName && info.currencyName !== 'ZEC'
-        ? ((await this.rpc.changeWalletNoBackup()) as string)
-        : ((await this.rpc.changeWallet()) as string);
+    await this.rpc.fetchInfoAndServerHeight();
+    const afterCurrencyName = this.state.info.currencyName;
+
+    // from TAZ to ZEC -> no backup the old test wallet.
+    // from TAZ to TAZ -> no use case here, likely. no backup just in case.
+    // from ZEC to TAZ -> it's interesting to backup the old real wallet. Just in case.
+    // from ZEC to ZEC -> no use case here, likely. backup just in case.
+    let resultStr2 = '';
+    if (
+      (beforeCurrencyName === 'TAZ' && afterCurrencyName === 'ZEC') ||
+      (beforeCurrencyName === 'TAZ' && afterCurrencyName === 'TAZ')
+    ) {
+      // no backup
+      resultStr2 = (await this.rpc.changeWalletNoBackup()) as string;
+    } else {
+      // backup
+      resultStr2 = (await this.rpc.changeWallet()) as string;
+    }
+
     //console.log("jc change", resultStr);
     if (resultStr2.toLowerCase().startsWith('error')) {
       //console.log(`Error change wallet. ${resultStr}`);
@@ -948,8 +982,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
     //console.log('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
     //console.log('render LoadedApp', this.state.info);
-    //const res = async () => await RPCModule.execute('testbip', '');
-    //res().then(r => console.log(r));
 
     return (
       <ContextAppLoadedProvider value={this.state}>
@@ -1179,6 +1211,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                       syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
                       poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
                       setZecPrice={this.setZecPrice}
+                      setComputingModalVisible={this.setComputingModalVisible}
                     />
                   </Suspense>
                 </>

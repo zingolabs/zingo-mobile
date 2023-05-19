@@ -28,7 +28,8 @@ export default class SettingsFileImpl {
 
     try {
       //const b = await RNFS.readFile(fileName, 'utf8');
-      //console.log('background file', b);
+      //console.log('settings file', b);
+      // TODO verify that JSON don't fail.
       return JSON.parse((await RNFS.readFile(fileName, 'utf8')).toString()) as SettingsFileClass;
     } catch (err) {
       // File probably doesn't exist, so return nothing

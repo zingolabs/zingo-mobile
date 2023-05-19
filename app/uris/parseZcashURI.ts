@@ -1,6 +1,7 @@
 import { Base64 } from 'js-base64';
 import Url from 'url-parse';
 import RPCModule from '../RPCModule';
+import { RPCParseAddressType } from '../rpc/types/RPCParseAddressType';
 import ZcashURITargetClass from './classes/ZcashURITargetClass';
 import { TranslateType } from '../AppState';
 
@@ -23,9 +24,16 @@ const parseZcashURI = async (
   // The first address is special, it can be the "host" part of the URI
   const address = parsedUri.pathname;
 
-  const resultParse = await RPCModule.execute('parse', address);
-  //console.log('parse', resultParse);
-  const resultParseJSON = await JSON.parse(resultParse);
+  const resultParse: string = await RPCModule.execute('parse', address);
+  if (resultParse) {
+    if (resultParse.toLowerCase().startsWith('error')) {
+      return 'Right now it is not possible to verify the address with the server';
+    }
+  } else {
+    return 'Right now it is not possible to verify the address with the server';
+  }
+  // TODO: check if the json parse is correct.
+  const resultParseJSON: RPCParseAddressType = await JSON.parse(resultParse);
 
   const validParse = resultParseJSON.status === 'success';
 
@@ -69,9 +77,16 @@ const parseZcashURI = async (
         if (typeof target.address !== 'undefined') {
           return `${translate('uris.duplicateparameter')} "${qName}"`;
         }
-        const result = await RPCModule.execute('parse', value);
-        //console.log('parse', result);
-        const resultJSON = await JSON.parse(result);
+        const result: string = await RPCModule.execute('parse', value);
+        if (result) {
+          if (result.toLowerCase().startsWith('error')) {
+            return 'Right now it is not possible to verify the address with the server';
+          }
+        } else {
+          return 'Right now it is not possible to verify the address with the server';
+        }
+        // TODO: check if the json parse is correct.
+        const resultJSON: RPCParseAddressType = await JSON.parse(result);
 
         const valid = resultJSON.status === 'success';
 
