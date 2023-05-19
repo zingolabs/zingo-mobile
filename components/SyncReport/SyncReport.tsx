@@ -170,6 +170,8 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
   //console.log(maxBlocks, labels, points);
   //console.log('report', background.batches, background.date, Number(background.date).toFixed(0));
 
+  console.log('render sync report - 5');
+
   return (
     <SafeAreaView
       style={{
@@ -221,7 +223,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
               display: 'flex',
               flexDirection: 'row',
               alignItems: 'flex-end',
-              margin: 20,
+              marginHorizontal: 20,
             }}>
             <DetailLine
               label={translate('report.lastbackgroundsync') as string}
@@ -235,7 +237,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
         )}
         {maxBlocks && netInfo.isConnected ? (
           <>
-            <View style={{ display: 'flex', margin: 20, marginBottom: 30 }}>
+            <View style={{ display: 'flex', marginHorizontal: 20, marginBottom: 30 }}>
               <DetailLine
                 label="Sync ID"
                 value={

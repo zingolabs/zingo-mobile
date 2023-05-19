@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useRef, useCallback, useContext } from 'react';
-import { View, ScrollView, Modal, Alert, Keyboard, TextInput, TouchableOpacity } from 'react-native';
+import { View, ScrollView, Modal, Alert, Keyboard, TextInput, TouchableOpacity, Platform } from 'react-native';
 import { faQrcode, faCheck, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme, useIsFocused } from '@react-navigation/native';
@@ -398,7 +398,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     })();
   }, [isFocused]);
 
-  //console.log('render send', 'w', dimensions.width, 'h', dimensions.height);
+  console.log('render Send - 4');
 
   const returnPage = (
     <View
@@ -767,7 +767,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       }}>
                       <FadeText style={{ marginTop: 10 }}>{translate('send.memo') as string}</FadeText>
                       <View style={{ flexDirection: 'row' }}>
-                        <FadeText style={{ marginTop: 3 }}>{translate('send.includeua') as string}</FadeText>
+                        <FadeText style={{ marginTop: Platform.OS === 'ios' ? 5 : 3 }}>{translate('send.includeua') as string}</FadeText>
                         <CheckBox
                           testID="send.checkboxUA"
                           disabled={false}
@@ -777,8 +777,9 @@ const Send: React.FunctionComponent<SendProps> = ({
                           tintColor={colors.text}
                           onCheckColor={colors.card}
                           onFillColor={colors.primary}
-                          boxType={'square'}
-                          style={{}}
+                          onTintColor={colors.primary}
+                          boxType="square"
+                          style={{ transform: Platform.OS === 'ios' ? [{scaleX: 0.7}, {scaleY: 0.7}] : [] }}
                         />
                       </View>
                     </View>

@@ -42,6 +42,8 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
       ? Utils.trimToSmall(tx.detailedTxns[0].address, 7)
       : 'Unknown';
 
+  //console.log('render TxSummaryLine - 5', index);
+
   return (
     <View testID={`transactionList.${index + 1}`} style={{ display: 'flex', flexDirection: 'column' }}>
       {month !== '' && (
@@ -100,4 +102,4 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
   );
 };
 
-export default TxSummaryLine;
+export default React.memo(TxSummaryLine);

@@ -56,9 +56,6 @@ export default interface AppStateLoaded {
   // getinfo and getblockchaininfo result
   info: InfoType;
 
-  // Is the app rescanning?
-  rescanning: boolean;
-
   // Callbacks for the password dialog box
   //passwordState: PasswordState;
 
