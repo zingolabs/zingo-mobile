@@ -39,7 +39,6 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   sendPageState: new SendPageStateClass(new ToAddrClass(0)),
   receivePageState: new ReceivePageStateClass(''),
   info: {} as InfoType,
-  rescanning: false,
   walletSettings: new WalletSettingsClass(),
   syncingStatus: {} as SyncingStatusType,
   errorModalData: new ErrorModalDataClass('', ''),

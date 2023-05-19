@@ -25,6 +25,7 @@ import { isEqual } from 'lodash';
 import { StackScreenProps } from '@react-navigation/stack';
 import NetInfo, { NetInfoSubscription } from '@react-native-community/netinfo';
 import { activateKeepAwake, deactivateKeepAwake } from '@sayem314/react-native-keep-awake';
+import deepDiff from 'deep-diff';
 
 import RPC from '../rpc';
 import RPCModule from '../RPCModule';
@@ -185,6 +186,8 @@ export default function LoadedApp(props: LoadedAppProps) {
   //  return () => RNLocalize.removeEventListener('change', handleLocalizationChange);
   //}, [handleLocalizationChange]);
 
+  console.log('render LoadedApp - 2');
+
   if (loading) {
     return null;
   } else {
@@ -255,7 +258,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       this.setAllAddresses,
       this.setWalletSettings,
       this.setInfo,
-      this.refreshUpdates,
+      this.setSyncingStatus,
       props.translate,
       this.fetchBackgroundSyncing,
       this.keepAwake,
@@ -286,25 +289,29 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
         // reading background task info
         if (Platform.OS === 'ios') {
           // this file only exists in IOS BS.
-          this.fetchBackgroundSyncing();
+          await this.fetchBackgroundSyncing();
         }
-        this.rpc.setInRefresh(false);
-        this.rpc.clearTimers();
-        await this.rpc.configure();
         // setting value for background task Android
         await AsyncStorage.setItem('@background', 'no');
+        console.log('background no in storage');
+        await this.rpc.configure();
+        console.log('configure start timers');
       }
       if (nextAppState.match(/inactive|background/) && this.state.appState === 'active') {
         console.log('App is gone to the background!');
-        this.rpc.clearTimers();
-        this.setState({
-          syncingStatusReport: new SyncingStatusReportClass(),
-          syncingStatus: {} as SyncingStatusType,
-        });
         // setting value for background task Android
         await AsyncStorage.setItem('@background', 'yes');
+        console.log('background yes in storage');
+        this.rpc.setInRefresh(false);
+        await this.rpc.clearTimers();
+        console.log('clear timers');
+        this.setSyncingStatus({} as SyncingStatusType);
+        this.setSyncingStatusReport(new SyncingStatusReportClass());
+        console.log('clear sync status state');
       }
-      this.setState({ appState: nextAppState });
+      if (this.state.appState !== nextAppState) {
+        this.setState({ appState: nextAppState });
+      }
     });
 
     (async () => {
@@ -329,13 +336,14 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       }
     });
 
-    this.unsubscribeNetInfo = NetInfo.addEventListener(state => {
+    this.unsubscribeNetInfo = NetInfo.addEventListener(async state => {
       const { isConnected, type, isConnectionExpensive } = this.state.netInfo;
       if (
         isConnected !== state.isConnected ||
         type !== state.type ||
         isConnectionExpensive !== state.details?.isConnectionExpensive
       ) {
+        console.log('fetch net info');
         this.setState({
           netInfo: {
             isConnected: state.isConnected,
@@ -346,7 +354,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
         if (isConnected !== state.isConnected) {
           if (!state.isConnected) {
             //console.log('EVENT Loaded: No internet connection.');
-            this.rpc.clearTimers();
+            await this.rpc.clearTimers();
             this.setState({
               syncingStatusReport: new SyncingStatusReportClass(),
               syncingStatus: {} as SyncingStatusType,
@@ -365,13 +373,20 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     });
   };
 
-  componentWillUnmount = () => {
-    this.rpc.clearTimers();
+  componentWillUnmount = async () => {
+    await this.rpc.clearTimers();
     this.dim && this.dim.remove();
     this.appstate && this.appstate.remove();
     this.linking && this.linking.remove();
     this.unsubscribeNetInfo && this.unsubscribeNetInfo();
   };
+
+  //componentDidUpdate(prevProps: Readonly<LoadedAppClassProps>, prevState: Readonly<AppStateLoaded>): void {
+  //  const diff = deepDiff({ ...this.props, ...this.state }, { ...prevProps, ...prevState });
+  //  if (diff) {
+  //    console.log('+++++++++++', diff);
+  //  }
+  //}
 
   keepAwake = (keep: boolean): void => {
     if (keep) {
@@ -436,23 +451,28 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   };
 
   setDimensions = (screen: ScaledSize) => {
-    this.setState({
-      dimensions: {
-        width: Number(screen.width.toFixed(0)),
-        height: Number(screen.height.toFixed(0)),
-        orientation: platform.isPortrait(screen) ? 'portrait' : 'landscape',
-        deviceType: platform.isTablet(screen) ? 'tablet' : 'phone',
-        scale: Number(screen.scale.toFixed(2)),
-      },
-    });
+    if (
+      this.state.dimensions.width !== Number(screen.width.toFixed(0)) ||
+      this.state.dimensions.height !== Number(screen.height.toFixed(0))
+    ) {
+      console.log('fetch screen dimensions');
+      this.setState({
+        dimensions: {
+          width: Number(screen.width.toFixed(0)),
+          height: Number(screen.height.toFixed(0)),
+          orientation: platform.isPortrait(screen) ? 'portrait' : 'landscape',
+          deviceType: platform.isTablet(screen) ? 'tablet' : 'phone',
+          scale: Number(screen.scale.toFixed(2)),
+        },
+      });
+    }
   };
 
   fetchBackgroundSyncing = async () => {
-    const backgroundJson = await BackgroundFileImpl.readBackground();
-    if (backgroundJson) {
-      this.setState({
-        background: backgroundJson,
-      });
+    const backgroundJson: BackgroundType = await BackgroundFileImpl.readBackground();
+    if (!isEqual(this.state.background, backgroundJson)) {
+      console.log('fetch background sync info');
+      this.setState({ background: backgroundJson });
     }
   };
 
@@ -476,50 +496,50 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
   setTotalBalance = (totalBalance: TotalBalanceClass) => {
     if (!isEqual(this.state.totalBalance, totalBalance)) {
-      //console.log('total balance');
+      console.log('fetch total balance');
       this.setState({ totalBalance });
     }
   };
 
   setSyncingStatusReport = (syncingStatusReport: SyncingStatusReportClass) => {
-    this.setState({ syncingStatusReport });
+    if (!isEqual(this.state.syncingStatusReport, syncingStatusReport)) {
+      console.log('fetch syncing status report');
+      this.setState({ syncingStatusReport });
+    }
   };
 
   setTransactionList = (transactions: TransactionType[]) => {
-    if (!isEqual(this.state.transactions, transactions)) {
-      //console.log('transactions');
+    if (deepDiff(this.state.transactions, transactions)) {
+      console.log('fetch transactions');
       this.setState({ transactions });
     }
   };
 
   setAllAddresses = (addresses: AddressClass[]) => {
-    const { uaAddress } = this.state;
-    if (!isEqual(this.state.addresses, addresses) || uaAddress === '') {
-      //console.log('addresses');
-      if (uaAddress === '') {
-        this.setState({ addresses, uaAddress: addresses[0].uaAddress });
-      } else {
-        this.setState({ addresses });
-      }
+    if (deepDiff(this.state.addresses, addresses)) {
+      console.log('fetch addresses');
+      this.setState({ addresses });
+    }
+    if (this.state.uaAddress !== addresses[0].uaAddress) {
+      this.setState({ uaAddress: addresses[0].uaAddress });
     }
   };
 
   setWalletSettings = (walletSettings: WalletSettingsClass) => {
-    this.setState({ walletSettings });
+    if (!isEqual(this.state.walletSettings, walletSettings)) {
+      console.log('fetch wallet settings');
+      this.setState({ walletSettings });
+    }
   };
 
   setSendPageState = (sendPageState: SendPageStateClass) => {
+    console.log('fetch send page state');
     this.setState({ sendPageState });
   };
 
-  refreshUpdates = (inProgress: boolean, progress: number, blocks: string, synced: boolean) => {
-    const syncingStatus: SyncingStatusType = {
-      inProgress,
-      progress,
-      blocks,
-      synced,
-    };
+  setSyncingStatus = (syncingStatus: SyncingStatusType) => {
     if (!isEqual(this.state.syncingStatus, syncingStatus)) {
+      console.log('fetch syncing status');
       this.setState({ syncingStatus });
     }
   };
@@ -540,36 +560,35 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       zecPrice: newZecPrice,
       date: newDate,
     } as zecPriceType;
-    if (!isEqual(this.state.zecPrice, newZecPrice)) {
+    if (!isEqual(this.state.zecPrice, zecPrice)) {
+      console.log('fetch zec price');
       this.setState({ zecPrice });
     }
-  };
-
-  setRescanning = (rescanning: boolean) => {
-    this.setState({ rescanning });
   };
 
   setComputingModalVisible = (visible: boolean) => {
     this.setState({ computingModalVisible: visible });
   };
 
-  setSendProgress = (progress: SendProgressClass) => {
-    this.setState({ sendProgress: progress });
+  setSendProgress = (sendProgress: SendProgressClass) => {
+    if (!isEqual(this.state.sendProgress, sendProgress)) {
+      console.log('fetch send progress');
+      this.setState({ sendProgress });
+    }
   };
 
-  setInfo = (newInfo: InfoType) => {
-    if (!isEqual(this.state.info, newInfo)) {
-      let newNewInfo = newInfo;
+  setInfo = (info: InfoType) => {
+    if (!isEqual(this.state.info, info)) {
+      console.log('fetch info');
+      let newInfo = info;
       // if currencyName is empty,
       // I need to rescue the last value from the state.
-      if (!newNewInfo.currencyName) {
-        const { info } = this.state;
-        const { currencyName } = info;
-        if (currencyName) {
-          newNewInfo.currencyName = currencyName;
+      if (!newInfo.currencyName) {
+        if (this.state.info.currencyName) {
+          newInfo.currencyName = this.state.info.currencyName;
         }
       }
-      this.setState({ info: newNewInfo });
+      this.setState({ info: newInfo });
     }
   };
 
@@ -665,9 +684,17 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     await this.rpc.refresh(false);
   };
 
-  fetchTotalBalance = async () => {
-    await this.rpc.fetchTotalBalance();
+  doRescan = () => {
+    // TODO: when click rescan the txs list is empty, but
+    // after a couple of seconds the txs come back... because
+    // the rescan process take a while to start.
+    this.setTransactionList([]);
+    this.rpc.refresh(false, true);
   };
+
+  //fetchTotalBalance = async () => {
+  //  await this.rpc.fetchTotalBalance();
+  //};
 
   toggleMenuDrawer = () => {
     this.setState({
@@ -681,15 +708,10 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
   fetchWalletSeedAndBirthday = async () => {
     const walletSeed = await RPC.rpc_fetchSeedAndBirthday();
-    if (walletSeed) {
+    if (!isEqual(this.state.walletSeed, walletSeed)) {
+      console.log('fetch wallet seed & birthday');
       this.setState({ walletSeed });
     }
-  };
-
-  startRescan = () => {
-    this.setRescanning(true);
-    this.setTransactionList([]);
-    this.rpc.rescan();
   };
 
   onMenuItemSelected = async (item: string) => {
@@ -725,7 +747,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   set_wallet_option = async (name: string, value: string): Promise<void> => {
     await RPC.rpc_setWalletSettingOption(name, value);
 
-    // Refetch the settings to update
+    // Refetch the settings updated
     this.rpc.fetchWalletSettings();
   };
 
@@ -735,7 +757,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     noToast?: boolean,
   ): Promise<void> => {
     // here I know the server was changed, clean all the tasks before anything.
-    this.rpc.clearTimers();
+    await this.rpc.clearTimers();
     this.setState({
       syncingStatusReport: new SyncingStatusReportClass(),
       syncingStatus: {} as SyncingStatusType,
@@ -822,10 +844,10 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     this.rpc.fetchWalletSettings();
   };
 
-  navigateToLoading = () => {
+  navigateToLoading = async () => {
     const { navigation } = this.props;
 
-    this.rpc.clearTimers();
+    await this.rpc.clearTimers();
     navigation.reset({
       index: 0,
       routes: [{ name: 'LoadingApp' }],
@@ -980,8 +1002,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       return <FontAwesomeIcon icon={iconName} color={iconColor} />;
     };
 
-    //console.log('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
-    //console.log('render LoadedApp', this.state.info);
+    console.log('render LoadedAppClass - 3');
 
     return (
       <ContextAppLoadedProvider value={this.state}>
@@ -1060,7 +1081,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                   <Text>{translate('loading') as string}</Text>
                 </View>
               }>
-              <Rescan closeModal={() => this.setState({ rescanModalVisible: false })} startRescan={this.startRescan} />
+              <Rescan closeModal={() => this.setState({ rescanModalVisible: false })} doRescan={this.doRescan} />
             </Suspense>
           </Modal>
 

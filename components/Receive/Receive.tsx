@@ -412,7 +412,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ setUaAddress, toggleMe
     />
   );
 
-  //console.log('render receive', index, routes);
+  console.log('render Receive - 4');
 
   return returnPage;
 };
