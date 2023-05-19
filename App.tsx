@@ -27,6 +27,7 @@ const Theme: ThemeType = {
 const Stack = createStackNavigator();
 
 export default function App() {
+  console.log('render App - 1');
   return (
     <NavigationContainer theme={Theme}>
       <SafeAreaView

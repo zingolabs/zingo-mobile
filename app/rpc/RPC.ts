@@ -10,6 +10,7 @@ import {
   SendProgressClass,
   WalletSettingsClass,
   TranslateType,
+  SyncingStatusType,
 } from '../AppState';
 import RPCModule from '../RPCModule';
 import Utils from '../utils';
@@ -29,6 +30,7 @@ import { RPCSeedType } from './types/RPCSeedType';
 import { RPCSyncStatusType } from './types/RPCSyncStatusType';
 import { RPCGetOptionType } from './types/RPCGetOptionType';
 import { RPCSendProgressType } from './types/RPCSendProgressType';
+import { RPCSyncRescan } from './types/RPCSyncRescanType';
 
 export default class RPC {
   fnSetSyncingStatusReport: (syncingStatusReport: SyncingStatusReportClass) => void;
@@ -36,7 +38,7 @@ export default class RPC {
   fnSetTotalBalance: (totalBalance: TotalBalanceClass) => void;
   fnSetTransactionsList: (txList: TransactionType[]) => void;
   fnSetAllAddresses: (allAddresses: AddressClass[]) => void;
-  fnSetRefreshUpdates: (inProgress: boolean, progress: number, blocks: string, synced: boolean) => void;
+  fnSetSyncingStatus: (syncingStatus: SyncingStatusType) => void;
   fnSetWalletSettings: (settings: WalletSettingsClass) => void;
   translate: (key: string) => TranslateType;
   fetchBackgroundSyncing: () => void;
@@ -61,7 +63,9 @@ export default class RPC {
   prev_sync_id: number;
   seconds_batch: number;
   batches: number;
-  message: string;
+  latest_block: number;
+
+  timers: NodeJS.Timeout[];
 
   constructor(
     fnSetSyncingStatusReport: (syncingStatusReport: SyncingStatusReportClass) => void,
@@ -70,7 +74,7 @@ export default class RPC {
     fnSetAllAddresses: (addresses: AddressClass[]) => void,
     fnSetWalletSettings: (settings: WalletSettingsClass) => void,
     fnSetInfo: (info: InfoType) => void,
-    fnSetRefreshUpdates: (inProgress: boolean, progress: number, blocks: string, synced: boolean) => void,
+    fnSetSyncingStatus: (syncingStatus: SyncingStatusType) => void,
     translate: (key: string) => TranslateType,
     fetchBackgroundSyncing: () => void,
     keepAwake: (keep: boolean) => void,
@@ -81,7 +85,7 @@ export default class RPC {
     this.fnSetAllAddresses = fnSetAllAddresses;
     this.fnSetWalletSettings = fnSetWalletSettings;
     this.fnSetInfo = fnSetInfo;
-    this.fnSetRefreshUpdates = fnSetRefreshUpdates;
+    this.fnSetSyncingStatus = fnSetSyncingStatus;
     this.translate = translate;
     this.fetchBackgroundSyncing = fetchBackgroundSyncing;
     this.keepAwake = keepAwake;
@@ -101,7 +105,9 @@ export default class RPC {
     this.prev_sync_id = -1;
     this.seconds_batch = 0;
     this.batches = 0;
-    this.message = '';
+    this.latest_block = -1;
+
+    this.timers = [];
   }
 
   static async rpc_setInterruptSyncAfterBatch(value: string): Promise<void> {
@@ -405,12 +411,37 @@ export default class RPC {
   async configure(): Promise<void> {
     // every minute the App try to Sync the new blocks.
     if (!this.refreshTimerID) {
-      this.refreshTimerID = setInterval(() => this.refresh(false), 30 * 1000); // 30 seconds
+      this.refreshTimerID = setInterval(() => {
+        console.log('interval refresh');
+        this.refresh(false);
+      }, 30 * 1000); // 30 seconds
+      console.log('create refresh timer', this.refreshTimerID);
+      this.timers.push(this.refreshTimerID);
     }
 
     // every 5 seconds the App update all data
     if (!this.updateTimerID) {
-      this.updateTimerID = setInterval(() => this.updateData(), 5 * 1000); // 5 secs
+      this.updateTimerID = setInterval(() => {
+        console.log('interval update', this.timers);
+        this.sanitizeTimers();
+        this.updateData();
+      }, 5 * 1000); // 5 secs
+      console.log('create update timer', this.updateTimerID);
+      this.timers.push(this.updateTimerID);
+    }
+
+    // and now the array of timers...
+    let deleted: number[] = [];
+    for (var i = 0; i < this.timers.length; i++) {
+      if (this.timers[i] !== this.refreshTimerID && this.timers[i] !== this.updateTimerID) {
+        clearInterval(this.timers[i]);
+        deleted.push(i);
+        console.log('kill item array timers', this.timers[i]);
+      }
+    }
+    // remove the cleared timers.
+    for (var i = 0; i < deleted.length; i++) {
+      this.timers.splice(deleted[i], 1);
     }
 
     // Load the current wallet data
@@ -423,20 +454,50 @@ export default class RPC {
     }, 1000);
   }
 
-  clearTimers(): void {
+  async clearTimers(): Promise<void> {
     if (this.refreshTimerID) {
       clearInterval(this.refreshTimerID);
       this.refreshTimerID = undefined;
+      console.log('kill refresh timer', this.refreshTimerID);
     }
 
     if (this.updateTimerID) {
       clearInterval(this.updateTimerID);
       this.updateTimerID = undefined;
+      console.log('kill update timer', this.updateTimerID);
     }
 
     if (this.syncStatusTimerID) {
       clearInterval(this.syncStatusTimerID);
       this.syncStatusTimerID = undefined;
+      console.log('kill syncstatus timer', this.syncStatusTimerID);
+    }
+
+    // and now the array of timers...
+    while (this.timers.length > 0) {
+      const inter = this.timers.pop();
+      clearInterval(inter);
+      console.log('kill item array timers', inter);
+    }
+  }
+
+  async sanitizeTimers(): Promise<void> {
+    // and now the array of timers...
+    let deleted: number[] = [];
+    for (var i = 0; i < this.timers.length; i++) {
+      if (
+        this.timers[i] !== this.refreshTimerID &&
+        this.timers[i] !== this.updateTimerID &&
+        this.timers[i] !== this.syncStatusTimerID
+      ) {
+        clearInterval(this.timers[i]);
+        deleted.push(i);
+        console.log('sanitize - kill item array timers', this.timers[i]);
+      }
+    }
+    // remove the cleared timers.
+    for (var i = 0; i < deleted.length; i++) {
+      this.timers.splice(deleted[i], 1);
     }
   }
 
@@ -547,14 +608,6 @@ export default class RPC {
     await this.fetchInfoAndServerHeight();
   }
 
-  async rescan() {
-    //console.log('RPC Rescan triggered');
-    // Empty out the transactions list to start with.
-    this.fnSetTransactionsList([]);
-
-    await this.refresh(false, true);
-  }
-
   async updateData() {
     //console.log("Update data triggered");
     if (this.updateDataLock) {
@@ -629,19 +682,41 @@ export default class RPC {
       this.prev_sync_id = -1;
       this.seconds_batch = 0;
       this.batches = 0;
-      this.message = this.translate('rpc.syncstart-message') as string;
+      this.latest_block = -1;
 
       // This is async, so when it is done, we finish the refresh.
       if (fullRescan) {
-        this.doRescan().finally(() => {
-          this.inRefresh = false;
-          this.keepAwake(false);
-        });
+        this.doRescan()
+          .then(result => {
+            console.log('rescan finished', result);
+            if (result && !result.toLowerCase().startsWith('error')) {
+              const resultJSON: RPCSyncRescan = JSON.parse(result);
+              if (resultJSON.result === 'success' && resultJSON.latest_block) {
+                this.latest_block = resultJSON.latest_block;
+              }
+            }
+          })
+          .catch(error => console.log('rescan error', error))
+          .finally(() => {
+            this.inRefresh = false;
+            this.keepAwake(false);
+          });
       } else {
-        this.doSync().finally(() => {
-          this.inRefresh = false;
-          this.keepAwake(false);
-        });
+        this.doSync()
+          .then(result => {
+            console.log('sync finished', result);
+            if (result && !result.toLowerCase().startsWith('error')) {
+              const resultJSON: RPCSyncRescan = JSON.parse(result);
+              if (resultJSON.result === 'success' && resultJSON.latest_block) {
+                this.latest_block = resultJSON.latest_block;
+              }
+            }
+          })
+          .catch(error => console.log('sync error', error))
+          .finally(() => {
+            this.inRefresh = false;
+            this.keepAwake(false);
+          });
       }
 
       // We need to wait for the sync to finish. The sync is done when
@@ -679,7 +754,6 @@ export default class RPC {
             this.prevBatchNum = -1;
             this.seconds_batch = 0;
             this.batches = 0;
-            this.message = this.translate('rpc.syncstart-message') as string;
           }
           this.prev_sync_id = ss.sync_id;
         }
@@ -722,7 +796,15 @@ export default class RPC {
         const end_block: number = ss.end_block || 0; // lower
 
         // I want to know what was the first block of the current sync process
-        const process_end_block = end_block - batch_num * this.blocksPerBatch;
+        let process_end_block: number = 0;
+        // when the App is syncing the new blocks and sync finished really fast
+        // the synstatus have almost all of the fields undefined.
+        // if we have latest_block means that the sync process finished in that block
+        if (end_block === 0 && batch_num === 0) {
+          process_end_block = this.latest_block !== -1 ? this.latest_block : this.lastServerBlockHeight;
+        } else {
+          process_end_block = end_block - batch_num * this.blocksPerBatch;
+        }
 
         const total_general_blocks: number = this.lastServerBlockHeight - process_end_block;
 
@@ -763,14 +845,14 @@ export default class RPC {
           current_block = this.lastServerBlockHeight;
         }
 
-        this.fnSetRefreshUpdates(
-          ss.in_progress,
-          0,
-          `${current_block ? current_block.toFixed(0).toString() : ''} ${this.translate('rpc.of')} ${
-            this.lastServerBlockHeight ? this.lastServerBlockHeight.toString() : ''
-          }`,
-          this.lastServerBlockHeight === this.lastWalletBlockHeight,
-        );
+        this.seconds_batch += 5;
+
+        console.log('interval sync/rescan, secs', this.seconds_batch, 'timer', this.syncStatusTimerID);
+
+        this.fnSetSyncingStatus({
+          inProgress: ss.in_progress,
+          synced: this.lastServerBlockHeight === this.lastWalletBlockHeight,
+        } as SyncingStatusType);
 
         // store SyncStatusReport object for a new screen
         const statusGeneral: SyncingStatusReportClass = {
@@ -783,16 +865,12 @@ export default class RPC {
           lastError: ss.last_error,
           blocksPerBatch: this.blocksPerBatch,
           secondsPerBatch: this.seconds_batch,
-          percent: progress,
-          message: this.message,
           process_end_block: process_end_block,
           lastBlockServer: this.lastServerBlockHeight,
         };
         this.fnSetSyncingStatusReport(statusGeneral);
 
         this.prevProgress = progress;
-
-        this.seconds_batch += 5;
 
         // Close the poll timer if the sync finished(checked via promise above)
         if (!this.inRefresh) {
@@ -815,10 +893,12 @@ export default class RPC {
           await RPCModule.doSave();
           this.prevProgress = 0;
           progress = 0;
-          this.message = this.translate('rpc.syncend-message') as string;
 
           // I know it's finished.
-          this.fnSetRefreshUpdates(false, 0, '', this.lastServerBlockHeight === this.lastWalletBlockHeight);
+          this.fnSetSyncingStatus({
+            inProgress: false,
+            synced: this.lastServerBlockHeight === this.lastWalletBlockHeight,
+          } as SyncingStatusType);
 
           // store SyncStatusReport object for a new screen
           const statusFinished: SyncingStatusReportClass = {
@@ -831,15 +911,13 @@ export default class RPC {
             lastError: ss.last_error,
             blocksPerBatch: this.blocksPerBatch,
             secondsPerBatch: 0,
-            percent: 0,
-            message: this.message,
-            process_end_block: this.lastWalletBlockHeight,
+            process_end_block: process_end_block,
             lastBlockServer: this.lastServerBlockHeight,
           };
           this.fnSetSyncingStatusReport(statusFinished);
 
           //console.log('sync status', ss);
-          //console.log(`Finished refresh at ${this.lastWalletBlockHeight} id: ${ss.sync_id}`);
+          console.log(`Finished refresh at ${this.lastWalletBlockHeight} id: ${ss.sync_id}`);
         } else {
           // If we're doing a long sync, every time the batch_num changes, save the wallet
           if (this.prevBatchNum !== batch_num) {
@@ -854,7 +932,6 @@ export default class RPC {
 
               await RPCModule.doSave();
               this.batches = 0;
-              this.message = this.translate('rpc.walletstored-message') + ` ${batch_num + 1}`;
 
               // store SyncStatusReport object for a new screen
               const statusBatch: SyncingStatusReportClass = {
@@ -867,17 +944,15 @@ export default class RPC {
                 lastError: ss.last_error,
                 blocksPerBatch: this.blocksPerBatch,
                 secondsPerBatch: this.seconds_batch,
-                percent: progress,
-                message: this.message,
                 process_end_block: process_end_block,
                 lastBlockServer: this.lastServerBlockHeight,
               };
               this.fnSetSyncingStatusReport(statusBatch);
 
               //console.log('sync status', ss);
-              //console.log(
-              //  `Saving because batch num changed ${this.prevBatchNum} - ${batch_num}. seconds: ${this.seconds_batch}`,
-              //);
+              console.log(
+                `@@@@@@@@@@@ Saving because batch num changed ${this.prevBatchNum} - ${batch_num}. seconds: ${this.seconds_batch}`,
+              );
             }
             this.batches += batch_num - this.prevBatchNum;
             this.prevBatchNum = batch_num;
@@ -893,7 +968,6 @@ export default class RPC {
             await this.fetchInfoAndServerHeight();
 
             await RPCModule.doSave();
-            this.message = this.translate('rpc.sixtyseconds-message') + ` ${batch_num + 1}`;
 
             // store SyncStatusReport object for a new screen
             const statusSeconds: SyncingStatusReportClass = {
@@ -906,18 +980,18 @@ export default class RPC {
               lastError: ss.last_error,
               blocksPerBatch: this.blocksPerBatch,
               secondsPerBatch: this.seconds_batch,
-              percent: progress,
-              message: this.message,
               process_end_block: process_end_block,
               lastBlockServer: this.lastServerBlockHeight,
             };
             this.fnSetSyncingStatusReport(statusSeconds);
 
             //console.log('sync status', ss);
-            //console.log(`Saving wallet. seconds: ${this.seconds_batch}`);
+            console.log(`@@@@@@@@@@@Saving wallet. seconds: ${this.seconds_batch}`);
           }
         }
       }, 5000);
+      console.log('create sync/rescan timer', this.syncStatusTimerID);
+      this.timers.push(this.syncStatusTimerID);
     } else {
       // Already at the latest block
       console.log('Already have latest block, waiting for next refresh');
@@ -1255,8 +1329,8 @@ export default class RPC {
 
     // This is async, so fire and forget
     this.doSend(JSON.stringify(sendJson))
-      .then(r => console.log('End Send OK: ' + r))
-      .catch(e => console.log('End Send ERROR: ' + e));
+      .then(r => console.log('send finished: ' + r))
+      .catch(e => console.log('Send error ' + e));
 
     const startTimeSeconds = new Date().getTime() / 1000;
 
