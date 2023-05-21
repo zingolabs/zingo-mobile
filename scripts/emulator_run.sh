@@ -52,7 +52,7 @@ function wait_for() {
 }
 
 echo -e "\n\nWaiting for emulator to launch..."
-emulator -avd "${avd_name}" -port 5555 |& tee "${output_dir}/emulator_run.txt" &
+emulator -avd "${avd_name}" -netdelay none -netspeed full -no-boot-anim -no-snapshot-save -read-only -port 5555 |& tee "${output_dir}/emulator_run.txt" &
 
 wait_for $timeout_seconds check_launch
 echo "$(adb devices | grep "emulator-5555" | cut -f1) launch successful"
