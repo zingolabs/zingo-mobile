@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { View, ScrollView, SafeAreaView, TouchableOpacity } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { PieChart } from 'react-native-svg-charts';
@@ -17,21 +17,22 @@ import { ContextAppLoaded } from '../../app/context';
 import Utils from '../../app/utils';
 import FadeText from '../Components/FadeText';
 import Header from '../Header';
+import RPCModule from '../../app/RPCModule';
 
-type InfoProps = {
-  closeModal: () => void;
+type DataType = {
+  svg: {
+    fill: string;
+  };
+  value: number;
+  key: string;
+  address: string;
+  tag: string;
 };
 
 type sliceType = {
   labelCentroid: number[];
   pieCentroid: number[];
-  data: {
-    svg: {
-      fill: string;
-    };
-    value: number;
-    key: string;
-  };
+  data: DataType;
 };
 
 type LabelProps = {
@@ -69,32 +70,106 @@ const Labels: React.FunctionComponent<LabelProps> = props => {
   );
 };
 
-const data = [1.009, 0.0004, 10.009, 3, 1.909, 13.0987];
-const uas = [
-  'u1ecda0fsgq6efntnxglssrpjr7rktfhrkunhyaa99hp6724l20sndm83gpnmevcc8h7txxa2m7xt4e3qyyd34lwn62v7gse0dzn2a04m4hxsp2e2lk8mflw9r9kuv2cue6ldtvgvccnt9ge6fmdq9dveputxyyl53sfsd72ffen98x3yt80crsut5yu4x5hltg90w5m0zyh2w5mfp3pk',
-  'u2fsgq6efntnxglssrpjr7rktfhrkunhyaa99hp6724l20sndm83gpnmevcc8h7txxa2m7xt4e3qyyd34lwn62v7gse0dzn2a04m4hxsp2e2lk8mflw9r9kuv2cue6ldtvgvccnt9ge6fmdq9dveputxyyl53sfsd72ffen98x3yt80crsut5yu4x5hltg90w5m0zyh2hklaijfliafhy',
-  'u3sjalisjfdflaisojfdlaapjr7rktfhrkunhyaa99hp6724l20sndm83gpnmevcc8h7txxa2m7xt4e3qyyd34lwn62v7gse0dzn2a04m4hxsp2e2lk8mflw9r9kuv2cue6ldtvgvccnt9ge6fmdq9dveputxyyl53sfsd72ffen98x3yt80crsut5jashnlsakvlskvlskdvslkdvsli',
-  'u4asdlcikjaldsdfjalsdafpjr7rktfhrkunhyaa99hp6724l20sndm83gpnmevcc8h7txxa2m7xt4e3qyyd34lwn62v7gse0dzn2a04m4hxsp2e2lk8mflw9r9kuv2cue6ldtvgvccnt9ge6fmdq9dveputxyyl53sfsd72ffen98x3ytiaujhfkaishdjdflaijflaisfjlaissflll',
-  'u5kcjaoscjaosjcklaoskjlpjr7rktfhrkunhyaa99hp6724l20sndm83gpnmevcc8h7txxa2m7xt4e3qyyd34lwn62v7gse0dzn2a04m4hxsp2e2lk8mflw9r9kuv2cue6ldtvgvccnt9ge6fmdq9dveputxyyl53sfsd72ffjahlisflaijflakfjlajieuilqapsjfhskdjhfdloma',
-  'u6efanlaksdlakstnxglssrpjr7rktfhrkunhyaa99hp6724l20sndm83gpnmevcc8h7txxa2m7xt4e3qyyd34lwn62v7gse0dzn2a04m4hxsp2e2lk8mflw9r9kuv2cue6ldtvgvccnt9ge6fmdq9dveputxyyl53sfsd72ffen98x3yt80crsukfjfslidfjwioemcslkjdfiejfwio',
-];
-const tags = ['filomeno', 'free2z', 'Shileded Labs', 'codetoinspire', 'Safeway', 'Tag Coffee'];
+type InsightProps = {
+  closeModal: () => void;
+};
 
-// eslint-disable-next-line no-bitwise
-const randomColor = () => ('#' + ((Math.random() * 0xfffff) << 0).toString(16) + '000').slice(0, 7); // lighter colors
-
-const pieData = data
-  .filter(value => value > 0)
-  .map((value, index) => ({
-    value,
-    svg: { fill: randomColor() },
-    key: `pie-${index}`,
-  }));
-
-const Insight: React.FunctionComponent<InfoProps> = ({ closeModal }) => {
+const Insight: React.FunctionComponent<InsightProps> = ({ closeModal }) => {
   const context = useContext(ContextAppLoaded);
   const { info, translate } = context;
   const { colors } = useTheme() as unknown as ThemeType;
+  const [pieAmounts, setPieAmounts] = useState<DataType[]>([]);
+  const [expandAddress, setExpandAddress] = useState<boolean[]>([]);
+
+  // eslint-disable-next-line no-bitwise
+  const randomColor = () => ('#' + ((Math.random() * 0xfffff) << 0).toString(16) + '000').slice(0, 7); // lighter colors
+
+  useEffect(() => {
+    (async () => {
+      const resultStr = await RPCModule.execute('value_to_address', '');
+      console.log('#################', resultStr);
+      const resultJSON = await JSON.parse(resultStr);
+      let amounts: { value: number; address: string; tag: string }[] = [];
+      const resultJSONEntries: [string, number][] = Object.entries(resultJSON) as [string, number][];
+      resultJSONEntries.forEach(([key, value]) => {
+        if (value > 0) {
+          amounts.push({ value: value / 10 ** 8, address: key, tag: '' });
+        }
+      });
+      const newPieAmounts: DataType[] = amounts
+        .sort((a, b) => b.value - a.value)
+        .map((item, index) => {
+          return {
+            value: item.value,
+            address: item.address,
+            tag: item.tag,
+            svg: { fill: randomColor() },
+            key: `pie-${index}`,
+          };
+        });
+      setPieAmounts(newPieAmounts);
+      const newExpandAddress = Array(newPieAmounts.length).fill(false);
+      setExpandAddress(newExpandAddress);
+    })();
+  }, []);
+
+  const selectExpandAddress = (index: number) => {
+    let newExpandAddress = Array(expandAddress.length).fill(false);
+    newExpandAddress[index] = true;
+    setExpandAddress(newExpandAddress);
+  };
+
+  const line = (item: DataType, index: number) => {
+    const totalValue = pieAmounts ? pieAmounts.reduce((acc, curr) => acc + curr.value, 0) : 0;
+    const percent = ((100 * item.value) / totalValue).toFixed(0);
+    // 30 characters per line
+    const numLines = item.address.length < 40 ? 2 : item.address.length / 30;
+    return (
+      <View key={`tag-${index}`}>
+        {expandAddress[index] && <View style={{ height: 1, backgroundColor: colors.primaryDisabled }} />}
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
+          {(!expandAddress[index] || item.address === 'fee') && (
+            <FontAwesomeIcon style={{ margin: 5 }} size={20} icon={faQrcode} color={item.svg.fill} />
+          )}
+          <FadeText style={{ marginHorizontal: 10 }}>{item.tag}</FadeText>
+          <TouchableOpacity
+            onPress={() => {
+              if (item.address) {
+                Clipboard.setString(item.address);
+                Toast.show(translate('history.addresscopied') as string, Toast.LONG);
+                if (item.address !== 'fee') {
+                  selectExpandAddress(index);
+                }
+              }
+            }}>
+            <View style={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap' }}>
+              {!expandAddress[index] && !!item.address && (
+                <RegText>{item.address.length > 20 ? Utils.trimToSmall(item.address, 10) : item.address}</RegText>
+              )}
+              {expandAddress[index] &&
+                !!item.address &&
+                Utils.splitStringIntoChunks(item.address, Number(numLines.toFixed(0))).map((c: string, idx: number) => (
+                  <RegText key={idx}>{c}</RegText>
+                ))}
+            </View>
+          </TouchableOpacity>
+          <ZecAmount
+            currencyName={info.currencyName ? info.currencyName : ''}
+            size={15}
+            amtZec={item.value}
+            style={{ opacity: 0.5, marginHorizontal: 5 }}
+          />
+          <RegText>{(Number(percent) === 0 ? '<1' : percent) + '%'}</RegText>
+          {expandAddress[index] && item.address !== 'fee' && (
+            <FontAwesomeIcon style={{ margin: 5 }} size={20} icon={faQrcode} color={item.svg.fill} />
+          )}
+        </View>
+        {expandAddress[index] && <View style={{ height: 1, backgroundColor: colors.primaryDisabled }} />}
+      </View>
+    );
+  };
+
+  console.log('render insight');
 
   return (
     <SafeAreaView
@@ -109,41 +184,23 @@ const Insight: React.FunctionComponent<InfoProps> = ({ closeModal }) => {
 
       <ScrollView style={{ maxHeight: '85%' }} contentContainerStyle={{}}>
         <View style={{ display: 'flex', margin: 20, marginBottom: 30 }}>
-          <PieChart style={{ height: 400 }} data={pieData} innerRadius={50} outerRadius={150} labelRadius={180}>
+          <PieChart style={{ height: 400 }} data={pieAmounts} innerRadius={50} outerRadius={150} labelRadius={180}>
             <Labels />
           </PieChart>
         </View>
         <View style={{ display: 'flex', width: '100%', margin: 20, alignItems: 'center' }}>
           <View>
-            {pieData.map((item, index) => {
-              const totalValue = pieData ? pieData.reduce((acc, curr) => acc + curr.value, 0) : 0;
-              const percent = ((100 * item.value) / totalValue).toFixed(0);
-
-              return (
-                <View key={`tag-${index}`} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
-                  <FontAwesomeIcon style={{ margin: 5 }} size={20} icon={faQrcode} color={item.svg.fill} />
-                  <FadeText style={{ marginHorizontal: 10 }}>{tags[index]}</FadeText>
-                  <TouchableOpacity
-                    onPress={() => {
-                      if (uas[index]) {
-                        Clipboard.setString(uas[index]);
-                        Toast.show(translate('history.addresscopied') as string, Toast.LONG);
-                      }
-                    }}>
-                    <View>
-                      <RegText>{Utils.trimToSmall(uas[index], 10)}</RegText>
-                    </View>
-                  </TouchableOpacity>
-                  <ZecAmount
-                    currencyName={info.currencyName ? info.currencyName : ''}
-                    size={15}
-                    amtZec={item.value}
-                    style={{ opacity: 0.5, marginHorizontal: 5 }}
-                  />
-                  <RegText>{(Number(percent) === 0 ? '<1%' : percent) + '%'}</RegText>
-                </View>
-              );
-            })}
+            {pieAmounts
+              .filter(item => item.address === 'fee')
+              .map((item, index) => {
+                return line(item, index);
+              })}
+            <View style={{ height: 2, backgroundColor: colors.primary }} />
+            {pieAmounts
+              .filter(item => item.address !== 'fee')
+              .map((item, index) => {
+                return line(item, index);
+              })}
           </View>
         </View>
       </ScrollView>
