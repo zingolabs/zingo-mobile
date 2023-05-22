@@ -8,10 +8,11 @@ import { ThemeType } from '../../types';
 import CircularProgress from '../../../components/Components/CircularProgress';
 import { ContextAppLoaded } from '../../context';
 import Header from '../../../components/Header';
+import FadeText from '../../../components/Components/FadeText';
 
 const ComputingTxContent: React.FunctionComponent = () => {
   const context = useContext(ContextAppLoaded);
-  const { sendProgress: progress, translate } = context;
+  const { sendProgress: progress, translate, syncingStatusReport } = context;
   const { colors } = useTheme() as unknown as ThemeType;
 
   return (
@@ -38,6 +39,28 @@ const ComputingTxContent: React.FunctionComponent = () => {
         }}>
         <RegText>{translate('loadedapp.computingtx') as string}</RegText>
         {!(progress && progress.sendInProgress) && <RegText>{translate('loadedapp.syncing') as string}</RegText>}
+        {!(__DEV__ && progress && progress.sendInProgress) && (
+          <>
+            {syncingStatusReport.inProgress && syncingStatusReport.currentBatch > 0 && (
+              <FadeText>
+                {(translate('report.processingbatch') as string) +
+                  syncingStatusReport.currentBatch +
+                  (translate('report.totalbatches') as string) +
+                  syncingStatusReport.totalBatches}
+              </FadeText>
+            )}
+            {syncingStatusReport.inProgress &&
+              syncingStatusReport.currentBlock > 0 &&
+              !!syncingStatusReport.lastBlockServer && (
+                <FadeText>
+                  {(translate('report.processingblock') as string) +
+                    syncingStatusReport.currentBlock +
+                    (translate('report.totalblocks') as string) +
+                    syncingStatusReport.lastBlockServer}
+                </FadeText>
+              )}
+          </>
+        )}
         {!(progress && progress.sendInProgress) && <RegText>{translate('wait') as string}</RegText>}
         {progress && progress.sendInProgress && (
           <>
