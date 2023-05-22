@@ -17,12 +17,14 @@ adb -s emulator-5555 shell cat /proc/cpuinfo &> "${output_dir}/cpuinfo.txt"
 adb -s emulator-5555 shell logcat -v threadtime -b main &> "${output_dir}/logcat.txt" &
 
 # Start react-native
-# if killall -9 node &> /dev/null; then
-#     echo -e "\nAll node processes killed."
-#     echo -e "\nRestarting react native..."
-# fi
-# nohup yarn react-native start |& tee "${output_dir}/react-native_start.txt" &
+if killall -9 node &> /dev/null; then
+    echo -e "\nAll node processes killed."
+    echo -e "\nRestarting react native..."
+fi
+nohup yarn react-native start |& tee "${output_dir}/react-native_start.txt" &
   
+sleep 3
+
 echo -e "\nLaunching App..."
 adb shell am start -n "org.ZingoLabs.Zingo/org.ZingoLabs.Zingo.MainActivity" -a android.intent.action.MAIN -c android.intent.category.LAUNCHER &> "${output_dir}/launch_app.txt"
 

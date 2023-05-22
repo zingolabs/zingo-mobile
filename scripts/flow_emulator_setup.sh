@@ -4,6 +4,9 @@
 #> docker
 #> sdkmanager (android command line tools, needs accept licenses)
 
-./scripts/flow_emulator_setup.sh $@
+./scripts/emulator_target.sh $@
 
-./scripts/flow_emulator_run_apk.sh
+./scripts/emulator_dependencies.sh
+
+./scripts/emulator_create.sh
+"
