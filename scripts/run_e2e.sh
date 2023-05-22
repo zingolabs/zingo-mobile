@@ -6,7 +6,9 @@
 
 # build native rust
 echo -e "\nBuild native rust..."
+cd rust
 ./rust/build.sh
+cd ..
 
 # download typescript libraries?
 yarn install
