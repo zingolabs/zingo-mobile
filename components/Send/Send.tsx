@@ -767,7 +767,9 @@ const Send: React.FunctionComponent<SendProps> = ({
                       }}>
                       <FadeText style={{ marginTop: 10 }}>{translate('send.memo') as string}</FadeText>
                       <View style={{ flexDirection: 'row' }}>
-                        <FadeText style={{ marginTop: Platform.OS === 'ios' ? 5 : 3 }}>{translate('send.includeua') as string}</FadeText>
+                        <FadeText style={{ marginTop: Platform.OS === 'ios' ? 5 : 3 }}>
+                          {translate('send.includeua') as string}
+                        </FadeText>
                         <CheckBox
                           testID="send.checkboxUA"
                           disabled={false}
@@ -779,7 +781,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           onFillColor={colors.primary}
                           onTintColor={colors.primary}
                           boxType="square"
-                          style={{ transform: Platform.OS === 'ios' ? [{scaleX: 0.7}, {scaleY: 0.7}] : [] }}
+                          style={{ transform: Platform.OS === 'ios' ? [{ scaleX: 0.7 }, { scaleY: 0.7 }] : [] }}
                         />
                       </View>
                     </View>

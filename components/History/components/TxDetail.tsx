@@ -79,6 +79,9 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
         noDrawMenu={true}
       />
       <ScrollView
+        showsVerticalScrollIndicator={true}
+        persistentScrollbar={true}
+        indicatorStyle={'white'}
         contentContainerStyle={{
           flexDirection: 'column',
           alignItems: 'stretch',

@@ -63,7 +63,7 @@ module.exports = {
     emulator_32: {
       type: 'android.emulator',
       device: {
-        avdName: '29_ga_32'
+        avdName: '30_ga_32'
       }
     }
   },
