@@ -53,7 +53,7 @@ function wait_for() {
 }
 
 echo -e "\n\nWaiting for emulator to launch..."
-emulator -avd "${avd_name}" -netdelay none -netspeed full -port 5554 |& tee "${output_dir}/emulator_run.txt" &
+emulator -avd "${avd_name}" -netdelay none -netspeed full -no-boot-anim -no-snapshot-save -read-only -port 5554 |& tee "${output_dir}/emulator_run.txt" &
 
 adb kill-server
 adb start-server
