@@ -201,7 +201,12 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal }) => {
       }}>
       <Header title={translate('insight.title') as string} noBalance={true} noSyncingStatus={true} noDrawMenu={true} />
 
-      <ScrollView style={{ maxHeight: '85%' }} contentContainerStyle={{}}>
+      <ScrollView
+        showsVerticalScrollIndicator={true}
+        persistentScrollbar={true}
+        indicatorStyle={'white'}
+        style={{ maxHeight: '85%' }}
+        contentContainerStyle={{}}>
         <View style={{ display: 'flex', margin: 20 }}>
           <PieChart
             style={{ height: dimensions.width * 0.7 }}
