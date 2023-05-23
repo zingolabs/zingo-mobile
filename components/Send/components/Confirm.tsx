@@ -43,7 +43,12 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSen
         noSyncingStatus={true}
         noDrawMenu={true}
       />
-      <ScrollView contentContainerStyle={{ display: 'flex', justifyContent: 'flex-start' }} showsVerticalScrollIndicator={true} persistentScrollbar={true} indicatorStyle={'white'} testID="send.confirm.scrollView">
+      <ScrollView
+        contentContainerStyle={{ display: 'flex', justifyContent: 'flex-start' }}
+        showsVerticalScrollIndicator={true}
+        persistentScrollbar={true}
+        indicatorStyle={'white'}
+        testID="send.confirm.scrollView">
         <View
           style={{
             display: 'flex',
@@ -52,7 +57,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSen
             padding: 10,
             borderWidth: 1,
             borderRadius: 10,
-            borderColor: "red",
+            borderColor: colors.border,
           }}>
           <BoldText style={{ textAlign: 'center' }}>{translate('send.sending-title') as string}</BoldText>
 
