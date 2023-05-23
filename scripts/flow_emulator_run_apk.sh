@@ -12,6 +12,8 @@ avd_name="${avd_device}-android-${api_level}_${api_target}_${arch}"
 sdk="system-images;android-${api_level};${api_target};${arch}"
 platform="platforms;android-${api_level}"
 
+./scripts/kill_emulators.sh
+
 ./scripts/emulator_run.sh
 
 ./scripts/emulator_install_apk.sh
