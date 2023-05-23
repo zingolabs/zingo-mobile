@@ -8,4 +8,6 @@ echo -e "\nRunning yarn install..."
 yarn install
 
 echo -e "\nBuilding APKs..."
+cd android
 ./gradlew assembleDebug -Psplitapk=true
+cd ..

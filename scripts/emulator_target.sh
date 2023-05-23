@@ -104,8 +104,9 @@ if [[ $set_api_target == false ]]; then
     api_target=$api_target_default
 fi
 
+mkdir "android/app/build/outputs"
+mkdir "android/app/build/outputs/emulator_output"
 output_dir="android/app/build/outputs/emulator_output"
-mkdir "${output_dir}"
 
 echo $abi > "${output_dir}/target_abi.txt"
 echo $api_level > "${output_dir}/target_api_level.txt"
