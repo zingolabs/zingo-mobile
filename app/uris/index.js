@@ -1,6 +1,7 @@
 import parseServerURI from './parseServerURI';
 import parseZcashURI from './parseZcashURI';
 import serverUris from './serverUris';
-import ZcashURITarget from './ZcashURITarget';
+import ZcashURITargetClass from './classes/ZcashURITargetClass';
+import checkServerURI from './checkServerURI';
 
-export { parseServerURI, parseZcashURI, serverUris, ZcashURITarget };
+export { parseServerURI, parseZcashURI, serverUris, ZcashURITargetClass, checkServerURI };

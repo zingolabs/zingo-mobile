@@ -17,7 +17,7 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({ price, s
   const { colors } = useTheme() as unknown as ThemeType;
   var currencyString;
 
-  if (!price || typeof amtZec === 'undefined') {
+  if (typeof price === 'undefined' || typeof amtZec === 'undefined' || price <= 0) {
     currencyString = '--';
   } else {
     const currencyAmount = price * amtZec;

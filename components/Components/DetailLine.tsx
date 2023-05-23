@@ -11,15 +11,20 @@ type DetailLineProps = {
   label: string;
   value?: string;
   children?: ReactNode;
+  testID?: string;
 };
 
-const DetailLine: React.FunctionComponent<DetailLineProps> = ({ label, value, children }) => {
+const DetailLine: React.FunctionComponent<DetailLineProps> = ({ label, value, children, testID }) => {
   const { colors } = useTheme() as unknown as ThemeType;
   return (
     <View style={{ display: 'flex', marginTop: 20 }}>
       <FadeText>{label}</FadeText>
       <View style={{ width: 10 }} />
-      {value && <RegText color={colors.text}>{value}</RegText>}
+      {value && (
+        <RegText testID={testID} color={colors.text}>
+          {value}
+        </RegText>
+      )}
       {children}
     </View>
   );

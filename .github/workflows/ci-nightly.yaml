@@ -1,0 +1,45 @@
+name: CI (Nightly)
+
+on:
+  schedule:
+    - cron: '30 5 * * *'
+  workflow_dispatch:
+
+jobs:
+  jest-test:
+    uses: ./.github/workflows/jest-test.yaml
+    
+  create-timestamp:
+    uses: ./.github/workflows/create-timestamp.yaml
+    
+  create-cache-key:
+    uses: ./.github/workflows/create-cache-key.yaml
+    
+  build:
+    strategy:
+      matrix:
+        arch: [ x86_64, x86, arm64-v8a, armeabi-v7a ]
+    uses: ./.github/workflows/build.yaml
+    needs: create-cache-key
+    with:
+      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+      arch: ${{ matrix.arch }}
+       
+  integration-test:
+    strategy:
+      matrix:
+        abi: [ x86_64, x86, arm64-v8a, armeabi-v7a ]
+    uses: ./.github/workflows/integration-test.yaml
+    needs: [ create-timestamp, create-cache-key, build ]
+    if: ${{ ! cancelled() }}
+    with:
+      timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
+      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+      abi: ${{ matrix.abi }}  
+
+  e2e-test:
+    uses: ./.github/workflows/e2e-test.yaml
+    needs: [ create-cache-key, build ]
+    if: ${{ ! cancelled() }}
+    with:
+      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}

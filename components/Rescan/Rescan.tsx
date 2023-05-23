@@ -2,6 +2,7 @@
 import React, { useContext } from 'react';
 import { View, ScrollView, SafeAreaView } from 'react-native';
 import { useTheme } from '@react-navigation/native';
+import Toast from 'react-native-simple-toast';
 
 import RegText from '../Components/RegText';
 import Button from '../Components/Button';
@@ -11,16 +12,20 @@ import Header from '../Header';
 
 type RescanProps = {
   closeModal: () => void;
-  startRescan: () => void;
+  doRescan: () => void;
 };
 
-const Rescan: React.FunctionComponent<RescanProps> = ({ closeModal, startRescan }) => {
+const Rescan: React.FunctionComponent<RescanProps> = ({ closeModal, doRescan }) => {
   const context = useContext(ContextAppLoaded);
-  const { walletSeed, translate } = context;
+  const { walletSeed, translate, netInfo } = context;
   const { colors } = useTheme() as unknown as ThemeType;
 
   const doRescanAndClose = () => {
-    startRescan();
+    if (!netInfo.isConnected) {
+      Toast.show(translate('loadedapp.connection-error') as string, Toast.LONG);
+      return;
+    }
+    doRescan();
     closeModal();
   };
 

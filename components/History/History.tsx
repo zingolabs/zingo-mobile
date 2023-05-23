@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { View, ScrollView, Modal, RefreshControl } from 'react-native';
 import moment from 'moment';
 import 'moment/locale/es';
@@ -20,6 +20,7 @@ type HistoryProps = {
   poolsMoreInfoOnClick: () => void;
   syncingStatusMoreInfoOnClick: () => void;
   setZecPrice: (p: number, d: number) => void;
+  setComputingModalVisible: (visible: boolean) => void;
 };
 
 const History: React.FunctionComponent<HistoryProps> = ({
@@ -28,26 +29,37 @@ const History: React.FunctionComponent<HistoryProps> = ({
   poolsMoreInfoOnClick,
   syncingStatusMoreInfoOnClick,
   setZecPrice,
+  setComputingModalVisible,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, transactions, language } = context;
+  moment.locale(language);
+
   const { colors } = useTheme() as unknown as ThemeType;
   const [isTxDetailModalShowing, setTxDetailModalShowing] = useState(false);
   const [txDetail, setTxDetail] = useState<TransactionType>({} as TransactionType);
-
-  const [numTx, setNumTx] = useState<number>(100);
-  const loadMoreButton = numTx < (transactions.length || 0);
-  moment.locale(language);
-
-  const loadMoreClicked = () => {
-    setNumTx(numTx + 100);
-  };
+  const [numTx, setNumTx] = useState<number>(50);
+  const [loadMoreButton, setLoadMoreButton] = useState<boolean>(numTx < (transactions.length || 0));
+  const [transactionsSorted, setTransactionsSorted] = useState<TransactionType[]>([]);
 
   var lastMonth = '';
 
-  //console.log('render transaction');
+  const fetchTransactionsSorted = useMemo(() => {
+    return transactions.slice(0, numTx).sort((a, b) => b.time - a.time);
+  }, [transactions, numTx]);
 
-  const returnPage = (
+  useEffect(() => {
+    setLoadMoreButton(numTx < (transactions.length || 0));
+    setTransactionsSorted(fetchTransactionsSorted);
+  }, [fetchTransactionsSorted, numTx, transactions]);
+
+  const loadMoreClicked = useCallback(() => {
+    setNumTx(numTx + 50);
+  }, [numTx]);
+
+  console.log('render History - 4');
+
+  return (
     <View
       accessible={true}
       accessibilityLabel={translate('history.title-acc') as string}
@@ -72,6 +84,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
         toggleMenuDrawer={toggleMenuDrawer}
         setZecPrice={setZecPrice}
         title={translate('history.title') as string}
+        setComputingModalVisible={setComputingModalVisible}
       />
 
       <ScrollView
@@ -86,52 +99,58 @@ const History: React.FunctionComponent<HistoryProps> = ({
           />
         }
         style={{ flexGrow: 1, marginTop: 10, width: '100%', height: '100%' }}>
-        {transactions
-          .slice(0, numTx)
-          .sort((a, b) => b.time - a.time)
-          .flatMap((t, index) => {
-            let txmonth = moment(t.time * 1000).format('MMM YYYY');
+        {transactionsSorted.flatMap((t, index) => {
+          let txmonth = t.time ? moment(t.time * 1000).format('MMM YYYY') : '--- ----';
 
-            var month = '';
-            if (txmonth !== lastMonth) {
-              month = txmonth;
-              lastMonth = txmonth;
-            }
+          var month = '';
+          if (txmonth !== lastMonth) {
+            month = txmonth;
+            lastMonth = txmonth;
+          }
 
-            return (
-              <TxSummaryLine
-                index={index}
-                key={`${t.txid}-${t.type}`}
-                tx={t}
-                month={month}
-                setTxDetail={(ttt: TransactionType) => setTxDetail(ttt)}
-                setTxDetailModalShowing={(bbb: boolean) => setTxDetailModalShowing(bbb)}
-              />
-            );
-          })}
-        {!!transactions && !!transactions.length && (
+          return (
+            <TxSummaryLine
+              index={index}
+              key={`${t.txid}-${t.type}`}
+              tx={t}
+              month={month}
+              setTxDetail={(ttt: TransactionType) => setTxDetail(ttt)}
+              setTxDetailModalShowing={(bbb: boolean) => setTxDetailModalShowing(bbb)}
+            />
+          );
+        })}
+        {loadMoreButton ? (
           <View
             style={{
-              height: 100,
+              height: 150,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'flex-start',
+              marginTop: 5,
               marginBottom: 30,
             }}>
-            <FadeText style={{ color: colors.primary }}>{translate('history.end') as string}</FadeText>
-          </View>
-        )}
-
-        {loadMoreButton && (
-          <View style={{ flexDirection: 'row', justifyContent: 'center', margin: 30 }}>
             <Button type="Secondary" title={translate('history.loadmore') as string} onPress={loadMoreClicked} />
           </View>
+        ) : (
+          <>
+            {!!transactions && !!transactions.length && (
+              <View
+                style={{
+                  height: 150,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'flex-start',
+                  marginTop: 5,
+                  marginBottom: 30,
+                }}>
+                <FadeText style={{ color: colors.primary }}>{translate('history.end') as string}</FadeText>
+              </View>
+            )}
+          </>
         )}
       </ScrollView>
     </View>
   );
-
-  return returnPage;
 };
 
-export default History;
+export default React.memo(History);

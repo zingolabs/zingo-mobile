@@ -1,0 +1,90 @@
+name: End-to-end test
+
+on:
+  workflow_call:
+    inputs:
+      cache-key:
+        required: true
+        type: string
+
+env:
+  REPO-OWNER: ${{ github.repository_owner }}
+
+jobs:
+  e2e-test:
+    name: End-to-end test
+    runs-on: macos-12
+    strategy:
+      matrix:
+        include:
+          - arch: x86_64
+            api-level: 30
+    env:
+      CACHE-KEY: ${{ inputs.cache-key }}
+    continue-on-error: true  #temporary while e2e is still flaky
+    steps:
+      - name: Set envs for zingolib CI
+        if: ${{ contains(github.repository, 'zingolib') }}
+        run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
+            
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          repository: ${{ env.REPO-OWNER }}/zingo-mobile
+        
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+      
+      - name: Gradle cache
+        uses: gradle/gradle-build-action@v2
+        with:
+          gradle-version: 7.3.3
+          build-root-directory: ./android
+          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev'}}
+      
+      - name: AVD cache
+        uses: actions/cache@v3
+        id: avd-cache
+        with: 
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-${{ matrix.arch }}-api-${{ matrix.api-level }}-e2e
+
+      - name: Native rust cache
+        uses: actions/cache@v3
+        with:
+          path: android/app/src/main/jniLibs/${{ matrix.arch }}
+          key: native-rust-${{ matrix.arch }}-${{ env.CACHE-KEY }}
+          fail-on-cache-miss: true
+      
+      - name: Create AVD and generate snapshot for caching
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          arch: ${{ matrix.arch }}
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: false
+          script: echo "Generated AVD snapshot for caching."
+      
+      - run: yarn install
+      
+      - run: nohup yarn react-native start > "yarn_react_native_start.out" &
+      
+      - name: Run Detox Build
+        run: yarn detox build -c android.emu.debug -n test
+      
+      - name: Run Detox Test
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          arch: ${{ matrix.arch }}
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          script: yarn detox test -c android.emu.debug -n test

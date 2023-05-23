@@ -8,7 +8,8 @@ import {
   TotalBalanceClass,
   WalletSeedType,
   zecPriceType,
-  backgroundType,
+  BackgroundType,
+  NetInfoType,
 } from '../AppState';
 
 export const defaultAppStateLoading: AppStateLoading = {
@@ -16,6 +17,7 @@ export const defaultAppStateLoading: AppStateLoading = {
   route: {} as StackScreenProps<any>['route'],
   dimensions: {} as DimensionsType,
   appState: '' as string,
+  netInfo: {} as NetInfoType,
 
   screen: 0,
   actionButtonsDisabled: false,
@@ -36,7 +38,7 @@ export const defaultAppStateLoading: AppStateLoading = {
   background: {
     batches: 0,
     date: 0,
-  } as backgroundType,
+  } as BackgroundType,
 
   translate: () => '',
 };

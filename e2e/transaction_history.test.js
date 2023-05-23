@@ -12,10 +12,4 @@ describe('Renders wallet data correctly.', () => {
     await element(by.id("transactionList.1")).tap();
     // we will test various attributes of this transaction once we testID them
   });
-  
-  //  
-  it('has a receive tab', async () => {
-    // we need to test these properties
-    await element(by.text('RECEIVE')).tap();
-  });
 });

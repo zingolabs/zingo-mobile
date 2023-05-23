@@ -22,6 +22,15 @@ jest.mock('react-native-localize', () => ({
   },
 }));
 jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
+jest.mock('@react-native-community/netinfo', () => {
+  const RN = jest.requireActual('react-native');
+
+  RN.NativeModules.RNCNetInfo = {
+    execute: jest.fn(() => '{}'),
+  };
+
+  return RN;
+});
 
 // test suite
 describe('Component Rescan - test', () => {
@@ -36,7 +45,7 @@ describe('Component Rescan - test', () => {
   test('Rescan - snapshot', () => {
     const rescan = render(
       <ContextAppLoadedProvider value={state}>
-        <Rescan closeModal={onClose} startRescan={onRescan} />
+        <Rescan closeModal={onClose} doRescan={onRescan} />
       </ContextAppLoadedProvider>,
     );
     expect(rescan.toJSON()).toMatchSnapshot();

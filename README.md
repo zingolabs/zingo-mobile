@@ -52,7 +52,17 @@ see the [trouble-shooting notes](./TROUBLESHOOTING.md).
 ## Integration Tests
 
 ### Android
-1. In the `./android` directory, run:
-   `./integration_tests.sh`
+1. To create a quick-boot snapshot. From the root directory, run:
+   `./scripts/integration_tests.sh -a x86_64 -s`
+2. To run the integration tests. From the root directory, run:
+   `./scripts/integration_tests.sh -a x86_64`
+3. To test other ABIs, such as x86. Specify the target ABI with the `-a` flag:
+   `-a x86`
    
+For more information. From the root directory, run:
+`./scripts/integration_tests.sh -h`
+
 The first run may take a long time to download the `x86` and `x86_64` system images.
+
+Alternatively, to run gradle managed devices integration tests. From the root directory, run:
+`./scripts/integration_tests_gradle.sh`

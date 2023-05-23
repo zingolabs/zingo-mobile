@@ -11,6 +11,7 @@ import { parseZcashURI } from '../../../app/uris';
 import RPCModule from '../../../app/RPCModule';
 import { ContextAppLoaded } from '../../../app/context';
 import { BarCodeReadEvent } from 'react-native-camera';
+import { RPCParseAddressType } from '../../../app/rpc/types/RPCParseAddressType';
 
 type ScannerAddressProps = {
   updateToField: (
@@ -25,14 +26,28 @@ type ScannerAddressProps = {
 
 const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateToField, closeModal }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate } = context;
+  const { translate, netInfo } = context;
   const validateAddress = async (scannedAddress: string) => {
-    const result = await RPCModule.execute('parse', scannedAddress);
-    const resultJSON = await JSON.parse(result);
+    if (!netInfo.isConnected) {
+      Toast.show(translate('loadedapp.connection-error') as string, Toast.LONG);
+      return;
+    }
+    const result: string = await RPCModule.execute('parse', scannedAddress);
+    if (result) {
+      if (result.toLowerCase().startsWith('error')) {
+        Toast.show(`"${scannedAddress}" ${translate('scanner.nozcash-error')}`, Toast.LONG);
+        return;
+      }
+    } else {
+      Toast.show(`"${scannedAddress}" ${translate('scanner.nozcash-error')}`, Toast.LONG);
+      return;
+    }
+    // TODO verify that JSON don't fail.
+    const resultJSON: RPCParseAddressType = await JSON.parse(result);
 
     //console.log('parse-1', scannedAddress, resultJSON);
 
-    const valid = resultJSON?.status === 'success';
+    const valid = resultJSON.status === 'success';
 
     if (valid) {
       updateToField(scannedAddress, null, null, null, null);
@@ -40,7 +55,7 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateTo
     } else {
       // Try to parse as a URI
       if (scannedAddress.startsWith('zcash:')) {
-        const target = await parseZcashURI(scannedAddress);
+        const target = await parseZcashURI(scannedAddress, translate);
 
         if (typeof target !== 'string') {
           updateToField(scannedAddress, null, null, null, null);

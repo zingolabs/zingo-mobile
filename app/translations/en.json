@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo!",
-  "version": "zingo-1.0.0 (120)",
+  "version": "zingo-1.2.1 (122)",
   "loading": "loading...",
   "connectingserver": "Connecting to the server...",
   "wait": "Please wait...",
@@ -9,6 +9,7 @@
   "cancel": "Cancel",
   "menudrawer-acc": "Open Menu Drawer",
   "menu-acc": "Open Menu",
+  "donation": "Thanks for supporting Zingo!",
   "loadingapp": {
     "actualserver": "Actual server:",
     "changeserver": "CHANGE SERVER",
@@ -32,9 +33,9 @@
     "restorebackupwallet": "Restore Last Wallet Backup",
     "fundpools": "Fund Pools",
     "restoremainnet-error": "This option is only available for 'Mainnet' servers.",
-    "changeservernew-error": "Error trying to change the server to the new one:",
+    "changeservernew-error": "Error trying to change the server to the new one: ",
     "readingwallet-error": "Error trying to read the wallet with the new server:",
-    "changeserverold-error": "Error trying to change the server to the old one:",
+    "changeserverold-error": "Error trying to change the server to the old one: ",
     "changingwallet-label": "Error changing Wallet",
     "restoringwallet-label": "Error restoring Wallet",
     "computingtx": "Computing Transaction",
@@ -45,8 +46,12 @@
     "wallet-menu": "HISTORY",
     "send-menu": "SEND",
     "uas-menu": "RECEIVE",
-    "syncing": "Pausing the Syncronization to be able to Send.",
-    "zcash-url": "You already have an address in the send screen"
+    "syncing": "Pausing the Syncronization to be able to Complete the Transaction.",
+    "zcash-url": "You already have an address in the send screen",
+    "connection-error": "No Internet connection, Zingo can't work properly this way.",
+    "tryingnewserver": "Trying to connect to the new Server... Can take a few seconds.",
+    "tryingnewserver-error": "After 30 seconds the new server doesn't respond.",
+    "readingwallet": "Reading successfully the wallet with the server:"
   },
   "rpc": {
     "parsebirthday-error": "Error: Couldn't parse as a number:",
@@ -56,7 +61,8 @@
     "sixtyseconds-message": "Stored the wallet every 60 seconds, batch:",
     "walletnotfound-error": "Error: Couldn't find any wallet.",
     "backupnotfound-error": "Error: Couldn't find any backup of any wallet.",
-    "of": "of"
+    "of": "of",
+    "deletewallet-error": "Error: Couldn't delete the current wallet."
   },
   "settings": {
     "memos": [
@@ -142,7 +148,9 @@
     "title": "Server Info",
     "resolution": "Device Screen",
     "tablet": "Tablet",
-    "phone": "Phone"
+    "phone": "Phone",
+    "errorgemini": "Error fetching the price from Internet.",
+    "errorrpcmodule": "Internal Error fetching the price from Internet"
   },
   "rescan": {
     "title": "Rescan",
@@ -212,7 +220,7 @@
     "button-all": "Send All",
     "clear": "Clear",
     "confirm-title": "Confirm Transaction",
-    "sending-title": "Sending",
+    "sending-title": "Processing",
     "confirm-amount": "Amount",
     "fee": "Fee",
     "confirm-button": "Confirm",
@@ -232,7 +240,8 @@
     "includeua": "Include your UA:",
     "confirm-memo": "Memo",
     "duplicate-nullifier-error": "Your funds are still confirming and probably syncing. You can wait until the funds are confirmed or you can try to send now with a lower amount. The Transaction build failed!",
-    "dust-error" : "The amount that you are trying to send to a Transparent address is really tiny. The Transaction build failed!"
+    "dust-error" : "The amount that you are trying to send to a Transparent address is really tiny. The Transaction build failed!",
+    "needtoshield": "Have transparent funds to shield"
   },
   "receive": {
     "u-title": "Unified Address",
@@ -304,7 +313,11 @@
     "processingblock": "Processing Block: ",
     "totalblocks": " of a TOTAL of Blocks: ",
     "lastbackgroundsync": "LAST BACKGROUND SYNCING",
-    "batches-date": " Batches at: "
+    "batches-date": " Batches at: ",
+    "networkstatus": "Network Status (Internet)",
+    "nointernet": "No Internet Connection.",
+    "cellulardata": "Only Cellular Data.",
+    "connectionexpensive": "Connection Expensive."
   },
   "import": {
     "title": "Import Key",
@@ -349,5 +362,19 @@
     "sapling-spendable-balance": "Spendable Balance",
     "transparent-title": "TRANSPARENT",
     "transparent-balance": "Total Balance"
+  },
+  "uris": {
+    "baduri": "Error: Bad URI.",
+    "notvalid": "was not a valid zcash address (Unified, Sapling or Transparent)",
+    "notvalidparameter": "was not understood as a valid parameter",
+    "notvalidvalue": "Didn't understand parameter value",
+    "noindex": "Unknown index",
+    "duplicateparameter": "Duplicate parameter",
+    "base64": "Couldn't parse (base64)",
+    "amount": "Couldn't parse (amount)",
+    "noparameter": "Unknown parameter",
+    "noamount": "Didn't have an amount",
+    "noaddress": "Didn't have an address",
+    "oneentry": "URI Should have at least 1 entry"
   }
 }

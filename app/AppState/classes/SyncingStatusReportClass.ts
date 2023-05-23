@@ -23,10 +23,6 @@ export default class SyncingStatusReportClass {
 
   secondsPerBatch: number;
 
-  percent: number;
-
-  message: string;
-
   process_end_block: number;
 
   lastBlockServer: number;
@@ -41,8 +37,6 @@ export default class SyncingStatusReportClass {
     this.inProgress = false;
     this.lastError = '';
     this.secondsPerBatch = 0;
-    this.percent = 0;
-    this.message = '';
     this.process_end_block = 0;
     this.lastBlockServer = 0;
   }

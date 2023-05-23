@@ -1,36 +1,48 @@
 import { Base64 } from 'js-base64';
 import Url from 'url-parse';
 import RPCModule from '../RPCModule';
-import ZcashURITarget from './ZcashURITarget';
+import { RPCParseAddressType } from '../rpc/types/RPCParseAddressType';
+import ZcashURITargetClass from './classes/ZcashURITargetClass';
+import { TranslateType } from '../AppState';
 
-const parseZcashURI = async (uri: string): Promise<string | ZcashURITarget> => {
+const parseZcashURI = async (
+  uri: string,
+  translate: (key: string) => TranslateType,
+): Promise<string | ZcashURITargetClass> => {
   if (!uri || uri === '') {
-    return 'Bad URI';
+    return translate('uris.baduri') as string;
   }
 
   const parsedUri = new Url(uri, true);
   if (!parsedUri || parsedUri.protocol !== 'zcash:') {
-    return 'Bad URI';
+    return translate('uris.baduri') as string;
   }
   //console.log(parsedUri);
 
-  const targets: Map<number, ZcashURITarget> = new Map();
+  const targets: Map<number, ZcashURITargetClass> = new Map();
 
   // The first address is special, it can be the "host" part of the URI
   const address = parsedUri.pathname;
 
-  const resultParse = await RPCModule.execute('parse', address);
-  //console.log('parse', resultParse);
-  const resultParseJSON = await JSON.parse(resultParse);
+  const resultParse: string = await RPCModule.execute('parse', address);
+  if (resultParse) {
+    if (resultParse.toLowerCase().startsWith('error')) {
+      return 'Right now it is not possible to verify the address with the server';
+    }
+  } else {
+    return 'Right now it is not possible to verify the address with the server';
+  }
+  // TODO: check if the json parse is correct.
+  const resultParseJSON: RPCParseAddressType = await JSON.parse(resultParse);
 
   const validParse = resultParseJSON.status === 'success';
 
   if (address && !validParse) {
-    return `"${address || ''}" was not a valid zcash address (UA, Orchard, Z or T)`;
+    return `"${address || ''}" ${translate('uris.notvalid')}`;
   }
 
   // Has to have at least 1 element
-  const t = new ZcashURITarget();
+  const t = new ZcashURITargetClass();
   if (address) {
     t.address = address;
   }
@@ -42,55 +54,62 @@ const parseZcashURI = async (uri: string): Promise<string | ZcashURITarget> => {
   for (const [q, value] of Object.entries(params)) {
     const [qName, qIdxS, extra] = q.split('.');
     if (typeof extra !== 'undefined') {
-      return `"${q}" was not understood as a valid parameter`;
+      return `"${q}" ${translate('uris.notvalidparameter')}`;
     }
 
     if (typeof value !== 'string') {
-      return `Didn't understand parameter value "${q}"`;
+      return `${translate('uris.notvalidvalue')} "${q}"`;
     }
 
     const qIdx = parseInt(qIdxS, 10) || 0;
 
     if (!targets.has(qIdx)) {
-      targets.set(qIdx, new ZcashURITarget());
+      targets.set(qIdx, new ZcashURITargetClass());
     }
 
     const target = targets.get(qIdx);
     if (!target) {
-      return `Unknown index ${qIdx}`;
+      return `${translate('uris.noindex')} ${qIdx}`;
     }
 
     switch (qName.toLowerCase()) {
       case 'address':
         if (typeof target.address !== 'undefined') {
-          return `Duplicate parameter "${qName}"`;
+          return `${translate('uris.duplicateparameter')} "${qName}"`;
         }
-        const result = await RPCModule.execute('parse', value);
-        //console.log('parse', result);
-        const resultJSON = await JSON.parse(result);
+        const result: string = await RPCModule.execute('parse', value);
+        if (result) {
+          if (result.toLowerCase().startsWith('error')) {
+            return 'Right now it is not possible to verify the address with the server';
+          }
+        } else {
+          return 'Right now it is not possible to verify the address with the server';
+        }
+        // TODO: check if the json parse is correct.
+        const resultJSON: RPCParseAddressType = await JSON.parse(result);
 
         const valid = resultJSON.status === 'success';
 
         if (!valid) {
-          return `"${value}" was not a recognized zcash address`;
+          return `"${value}" ${translate('uris.notvalid')}`;
         }
         target.address = value;
         break;
       case 'label':
         if (typeof target.label !== 'undefined') {
-          return `Duplicate parameter "${qName}"`;
+          return `${translate('uris.duplicateparameter')} "${qName}"`;
         }
         target.label = value;
         break;
       case 'message':
         if (typeof target.message !== 'undefined') {
-          return `Duplicate parameter "${qName}"`;
+          return `${translate('uris.duplicateparameter')} "${qName}"`;
         }
         target.message = value;
         break;
       case 'memo':
         if (typeof target.memoBase64 !== 'undefined') {
-          return `Duplicate parameter "${qName}"`;
+          return `${translate('uris.duplicateparameter')} "${qName}"`;
         }
 
         // Parse as base64
@@ -98,23 +117,23 @@ const parseZcashURI = async (uri: string): Promise<string | ZcashURITarget> => {
           target.memoString = Base64.decode(value);
           target.memoBase64 = value;
         } catch (e) {
-          return `Couldn't parse "${value}" as base64`;
+          return `${translate('uris.base64')} "${value}"`;
         }
 
         break;
       case 'amount':
         if (typeof target.amount !== 'undefined') {
-          return `Duplicate parameter "${qName}"`;
+          return `${translate('uris.duplicateparameter')} "${qName}"`;
         }
         const a = parseFloat(value);
         if (isNaN(a)) {
-          return `Amount "${value}" could not be parsed`;
+          return `${translate('uris.amount')} "${value}"`;
         }
 
         target.amount = a;
         break;
       default:
-        return `Unknown parameter "${qName}"`;
+        return `${translate('uris.noparameter')} "${qName}"`;
     }
   }
 
@@ -122,26 +141,26 @@ const parseZcashURI = async (uri: string): Promise<string | ZcashURITarget> => {
   if (targets.size > 1) {
     for (const [key, value] of targets) {
       if (typeof value.amount === 'undefined') {
-        return `URI ${key} didn't have an amount`;
+        return `${key}. ${translate('uris.noamount')}`;
       }
 
       if (typeof value.address === 'undefined') {
-        return `URI ${key} didn't have an address`;
+        return `${key}. ${translate('uris.noaddress')}`;
       }
     }
   } else {
     // If there is only 1 entry, make sure it has at least an address
     if (!targets.get(0)) {
-      return 'URI Should have at least 1 entry';
+      return translate('uris.oneentry') as string;
     }
 
     if (typeof targets.get(0)?.address === 'undefined') {
-      return `URI ${0} didn't have an address`;
+      return `${0}. ${translate('uris.noaddress')}`;
     }
   }
 
   // Convert to plain array
-  const ans: ZcashURITarget[] = new Array(targets.size);
+  const ans: ZcashURITargetClass[] = new Array(targets.size);
   targets.forEach((tgt, idx) => {
     ans[idx] = tgt;
   });

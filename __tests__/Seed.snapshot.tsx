@@ -37,6 +37,15 @@ jest.mock('react-native-reanimated', () => {
     }
   };
 });
+jest.mock('@react-native-community/netinfo', () => {
+  const RN = jest.requireActual('react-native');
+
+  RN.NativeModules.RNCNetInfo = {
+    execute: jest.fn(() => '{}'),
+  };
+
+  return RN;
+});
 
 // test suite
 describe('Component Seed - test', () => {

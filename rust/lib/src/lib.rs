@@ -6,7 +6,7 @@ use std::sync::{Arc, Mutex};
 
 use base64::{decode, encode};
 
-use zingoconfig::construct_server_uri;
+use zingoconfig::construct_lightwalletd_uri;
 use zingolib::wallet::WalletBase;
 use zingolib::{commands, lightclient::LightClient};
 
@@ -18,25 +18,7 @@ lazy_static! {
         Mutex::new(RefCell::new(None));
 }
 
-pub fn init_new(server_uri: String, data_dir: String) -> String {
-    let server = construct_server_uri(Some(server_uri));
-
-    let (mut config, latest_block_height) = match zingolib::load_clientconfig(server, None) {
-        Ok((c, h)) => (c, h),
-        Err(e) => {
-            return format!("Error: {}", e);
-        }
-    };
-
-    config.set_data_dir(data_dir);
-
-    let lightclient = match LightClient::new(&config, latest_block_height.saturating_sub(100)) {
-        Ok(l) => l,
-        Err(e) => {
-            return format!("Error: {}", e);
-        }
-    };
-
+fn lock_client_return_seed(lightclient: LightClient) -> String {
     let seed = match lightclient.do_seed_phrase_sync() {
         Ok(s) => s.dump(),
         Err(e) => {
@@ -51,19 +33,62 @@ pub fn init_new(server_uri: String, data_dir: String) -> String {
 
     seed
 }
+fn construct_uri_load_config(
+    uri: String,
+    data_dir: String,
+) -> Result<(zingoconfig::ZingoConfig, http::Uri), String> {
+    let lightwalletd_uri = construct_lightwalletd_uri(Some(uri));
 
-pub fn init_from_seed(server_uri: String, seed: String, birthday: u64, data_dir: String) -> String {
-    let server = construct_server_uri(Some(server_uri));
-
-    let (mut config, _latest_block_height) = match zingolib::load_clientconfig(server, None) {
-        Ok((c, h)) => (c, h),
+    let mut config = match zingolib::load_clientconfig(
+        lightwalletd_uri.clone(),
+        None,
+        zingoconfig::ChainType::Mainnet,
+    ) {
+        Ok(c) => c,
         Err(e) => {
-            return format!("Error: {}", e);
+            return Err(format!("Error: Config load: {}", e));
         }
     };
 
     config.set_data_dir(data_dir);
+    Ok((config, lightwalletd_uri))
+}
+pub fn init_new(server_uri: String, data_dir: String) -> String {
+    let (config, lightwalletd_uri);
+    match construct_uri_load_config(server_uri, data_dir) {
+        Ok((c, h)) => (config, lightwalletd_uri) = (c, h),
+        Err(s) => return s,
+    }
+    let latest_block_height =
+        match zingolib::get_latest_block_height(lightwalletd_uri)
+            .map_err(|e| format! {"Error: {e}"})
+        {
+            Ok(height) => height,
+            Err(e) => return e,
+        };
+    let lightclient = match LightClient::new(
+        &config,
+        latest_block_height.saturating_sub(100),
+    ) {
+        Ok(l) => l,
+        Err(e) => {
+            return format!("Error: {}", e);
+        }
+    };
+    lock_client_return_seed(lightclient)
+}
 
+pub fn init_from_seed(
+    server_uri: String,
+    seed: String,
+    birthday: u64,
+    data_dir: String,
+) -> String {
+    let (config, _lightwalletd_uri);
+    match construct_uri_load_config(server_uri, data_dir) {
+        Ok((c, h)) => (config, _lightwalletd_uri) = (c, h),
+        Err(s) => return s,
+    }
     let lightclient = match LightClient::new_from_wallet_base(
         WalletBase::MnemonicPhrase(seed),
         &config,
@@ -75,34 +100,19 @@ pub fn init_from_seed(server_uri: String, seed: String, birthday: u64, data_dir:
             return format!("Error: {}", e);
         }
     };
-
-    let seed = match lightclient.do_seed_phrase_sync() {
-        Ok(s) => s.dump(),
-        Err(e) => {
-            return format!("Error: {}", e);
-        }
-    };
-
-    let lc = Arc::new(lightclient);
-    LightClient::start_mempool_monitor(lc.clone());
-
-    LIGHTCLIENT.lock().unwrap().replace(Some(lc));
-
-    seed
+    lock_client_return_seed(lightclient)
 }
 
-pub fn init_from_b64(server_uri: String, base64_data: String, data_dir: String) -> String {
-    let server = construct_server_uri(Some(server_uri));
-
-    let (mut config, _latest_block_height) = match zingolib::load_clientconfig(server, None) {
-        Ok((c, h)) => (c, h),
-        Err(e) => {
-            return format!("Error: {}", e);
-        }
-    };
-
-    config.set_data_dir(data_dir);
-
+pub fn init_from_b64(
+    server_uri: String,
+    base64_data: String,
+    data_dir: String,
+) -> String {
+    let (config, _lightwalletd_uri);
+    match construct_uri_load_config(server_uri, data_dir) {
+        Ok((c, h)) => (config, _lightwalletd_uri) = (c, h),
+        Err(s) => return s,
+    }
     let decoded_bytes = match decode(&base64_data) {
         Ok(b) => b,
         Err(e) => {
@@ -110,26 +120,15 @@ pub fn init_from_b64(server_uri: String, base64_data: String, data_dir: String) 
         }
     };
 
-    let lightclient = match LightClient::read_wallet_from_buffer(&config, &decoded_bytes[..]) {
-        Ok(l) => l,
-        Err(e) => {
-            return format!("Error: {}", e);
-        }
-    };
-
-    let seed = match lightclient.do_seed_phrase_sync() {
-        Ok(s) => s.dump(),
-        Err(e) => {
-            return format!("Error: {}", e);
-        }
-    };
-
-    let lc = Arc::new(lightclient);
-    LightClient::start_mempool_monitor(lc.clone());
-
-    LIGHTCLIENT.lock().unwrap().replace(Some(lc));
-
-    seed
+    let lightclient =
+        match LightClient::read_wallet_from_buffer(&config, &decoded_bytes[..])
+        {
+            Ok(l) => l,
+            Err(e) => {
+                return format!("Error: {}", e);
+            }
+        };
+    lock_client_return_seed(lightclient)
 }
 
 pub fn save_to_b64() -> String {
@@ -172,22 +171,20 @@ pub fn execute(cmd: String, args_list: String) -> String {
         } else {
             vec![args_list.as_ref()]
         };
-        resp = commands::do_user_command(&cmd, &args, lightclient.as_ref()).clone();
+        resp = commands::do_user_command(&cmd, &args, lightclient.as_ref())
+            .clone();
     };
 
     resp
 }
 
 pub fn get_latest_block(server_uri: String) -> String {
-    let server = construct_server_uri(Some(server_uri));
-    let (_config, latest_block_height) = match zingolib::load_clientconfig(server, None) {
-        Ok((c, h)) => (c, h),
-        Err(e) => {
-            return format!("Error: {}", e);
-        }
-    };
-
-    let resp: String = latest_block_height.to_string();
-
-    resp
+    let lightwalletd_uri: http::Uri =
+        server_uri.parse().expect("To be able to represent a Uri.");
+    match zingolib::get_latest_block_height(lightwalletd_uri)
+        .map_err(|e| format! {"Error: {e}"})
+    {
+        Ok(height) => height.to_string(),
+        Err(e) => e,
+    }
 }

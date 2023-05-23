@@ -39,12 +39,12 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
     (tx.detailedTxns && tx.detailedTxns.reduce((s: number, d: TxDetailType) => s + (d.amount ? d.amount : 0), 0)) || 0;
   let fee = 0;
   // normal case: spend 1600 fee 1000 sent 600
-  if (tx.type === 'sent' && tx.amount && Math.abs(tx.amount) > Math.abs(sum)) {
+  if (tx.type === 'sent' && Math.abs(tx.amount) > Math.abs(sum)) {
     fee = Math.abs(tx.amount) - Math.abs(sum);
   }
   // self-send case: spend 1000 fee 1000 sent 0
   // this is temporary until we have a new field in 'list' object, called: fee.
-  if (tx.type === 'sent' && tx.amount && Math.abs(tx.amount) <= Math.abs(sum)) {
+  if (tx.type === 'sent' && Math.abs(tx.amount) <= Math.abs(sum)) {
     fee = Math.abs(tx.amount);
   }
 
@@ -98,11 +98,11 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
           <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
             <View style={{ display: 'flex' }}>
               <FadeText>{translate('history.time') as string}</FadeText>
-              <RegText>{moment((tx.time || 0) * 1000).format('YYYY MMM D h:mm a')}</RegText>
+              <RegText>{tx.time ? moment((tx.time || 0) * 1000).format('YYYY MMM D h:mm a') : '--'}</RegText>
             </View>
             <View style={{ display: 'flex', alignItems: 'flex-end' }}>
               <FadeText>{translate('history.confirmations') as string}</FadeText>
-              <RegText>{tx.confirmations.toString()}</RegText>
+              <RegText>{tx.confirmations ? tx.confirmations.toString() : '-'}</RegText>
             </View>
           </View>
 
@@ -116,8 +116,9 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
                   setExpandTxid(true);
                 }
               }}>
-              {!expandTxid && <RegText>{Utils.trimToSmall(tx.txid, 10)}</RegText>}
-              {expandTxid && (
+              {!tx.txid && <RegText>{'Unknown'}</RegText>}
+              {!expandTxid && !!tx.txid && <RegText>{Utils.trimToSmall(tx.txid, 10)}</RegText>}
+              {expandTxid && !!tx.txid && (
                 <>
                   <RegText>{tx.txid}</RegText>
                   <TouchableOpacity onPress={() => handleTxIDClick(tx.txid)}>
@@ -129,6 +130,16 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
               )}
             </TouchableOpacity>
           </View>
+
+          {fee > 0 && (
+            <View style={{ display: 'flex', marginTop: 10 }}>
+              <FadeText>{translate('history.txfee') as string}</FadeText>
+              <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                <ZecAmount amtZec={fee} size={18} currencyName={'ᙇ'} />
+                {/*<CurrencyAmount style={{ fontSize: 18 }} amtZec={fee} price={tx.zec_price} currency={'USD'} />*/}
+              </View>
+            </View>
+          )}
 
           {tx.detailedTxns.map((txd: TxDetailType) => {
             // 30 characters per line
@@ -158,11 +169,13 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
                       }
                     }}>
                     <View style={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap' }}>
+                      {!tx.address && <RegText>{'Unknown'}</RegText>}
+                      {!expandAddress && !!tx.address && <RegText>{Utils.trimToSmall(txd.address, 10)}</RegText>}
                       {expandAddress &&
+                        !!tx.address &&
                         Utils.splitStringIntoChunks(txd.address, Number(numLines.toFixed(0))).map(
                           (c: string, idx: number) => <RegText key={idx}>{c}</RegText>,
                         )}
-                      {!expandAddress && <RegText>{Utils.trimToSmall(txd.address, 10)}</RegText>}
                     </View>
                   </TouchableOpacity>
                 </View>
@@ -204,16 +217,6 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
               </View>
             );
           })}
-
-          {fee > 0 && (
-            <View style={{ display: 'flex', marginTop: 10 }}>
-              <FadeText>{translate('history.txfee') as string}</FadeText>
-              <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                <ZecAmount amtZec={fee} size={18} currencyName={'ᙇ'} />
-                {/*<CurrencyAmount style={{ fontSize: 18 }} amtZec={fee} price={tx.zec_price} currency={'USD'} />*/}
-              </View>
-            </View>
-          )}
         </View>
       </ScrollView>
       <View style={{ flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', margin: 10 }}>

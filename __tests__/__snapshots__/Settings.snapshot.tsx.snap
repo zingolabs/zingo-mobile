@@ -12,119 +12,6 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
     }
   }
 >
-  <View
-    style={
-      {
-        "alignItems": "center",
-        "backgroundColor": "rgb(255, 255, 255)",
-        "display": "flex",
-        "paddingBottom": 0,
-        "paddingTop": 10,
-        "zIndex": -1,
-      }
-    }
-    testID="header"
-  >
-    <Image
-      source={
-        {
-          "testUri": "../../../assets/img/logobig-zingo.png",
-        }
-      }
-      style={
-        {
-          "height": 80,
-          "resizeMode": "contain",
-          "width": 80,
-        }
-      }
-    />
-    <View
-      style={
-        {
-          "height": 20,
-        }
-      }
-    />
-    <View
-      style={
-        {
-          "alignItems": "center",
-          "display": "flex",
-          "flexDirection": "row",
-          "flexWrap": "wrap",
-          "justifyContent": "center",
-          "marginVertical": 5,
-        }
-      }
-    >
-      <View
-        style={
-          {
-            "alignItems": "center",
-            "display": "flex",
-            "flexDirection": "column",
-            "flexWrap": "wrap",
-            "justifyContent": "center",
-          }
-        }
-      >
-        <Text
-          style={
-            {
-              "color": "rgb(28, 28, 30)",
-              "fontSize": 18,
-              "fontWeight": "600",
-              "opacity": 1,
-              "paddingHorizontal": 5,
-            }
-          }
-        >
-          text translated
-        </Text>
-      </View>
-    </View>
-    <View
-      style={
-        {
-          "alignItems": "flex-end",
-          "padding": 15,
-          "position": "absolute",
-          "right": 0,
-        }
-      }
-    >
-      <Text
-        style={
-          {
-            "color": "rgb(216, 216, 216)",
-            "fontSize": 8,
-          }
-        }
-      >
-        text translated
-      </Text>
-      <Text
-        style={
-          {
-            "color": "rgb(216, 216, 216)",
-            "fontSize": 8,
-          }
-        }
-      >
-        (undefinedxundefined)-undefined
-      </Text>
-    </View>
-    <View
-      style={
-        {
-          "backgroundColor": "rgb(0, 122, 255)",
-          "height": 1,
-          "width": "100%",
-        }
-      }
-    />
-  </View>
   <RCTScrollView
     contentContainerStyle={
       {
@@ -138,6 +25,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         "maxHeight": "85%",
       }
     }
+    testID="settings.scrollView"
   >
     <View>
       <View
@@ -780,6 +668,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               "opacity": 1,
             }
           }
+          testID="settings.firstServer"
         >
           <View
             style={
@@ -837,6 +726,83 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           </View>
         </View>
         <View
+          accessible={true}
+          collapsable={false}
+          focusable={true}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            {
+              "marginBottom": 5,
+              "marginRight": 10,
+              "maxHeight": 50,
+              "minHeight": 48,
+              "opacity": 1,
+            }
+          }
+          testID="settings.secondServer"
+        >
+          <View
+            style={
+              {
+                "display": "flex",
+                "flexDirection": "row",
+                "marginTop": 10,
+              }
+            }
+          >
+            <
+              color="rgb(216, 216, 216)"
+              icon={
+                {
+                  "icon": [
+                    512,
+                    512,
+                    [
+                      128308,
+                      128309,
+                      128992,
+                      128993,
+                      128994,
+                      128995,
+                      128996,
+                      9679,
+                      9898,
+                      9899,
+                      11044,
+                      61708,
+                      61915,
+                    ],
+                    "f111",
+                    "M512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256zM256 48C141.1 48 48 141.1 48 256C48 370.9 141.1 464 256 464C370.9 464 464 370.9 464 256C464 141.1 370.9 48 256 48z",
+                  ],
+                  "iconName": "circle",
+                  "prefix": "far",
+                }
+              }
+              size={20}
+            />
+            <Text
+              style={
+                {
+                  "color": "rgb(28, 28, 30)",
+                  "fontSize": 18,
+                  "fontWeight": "600",
+                  "marginLeft": 10,
+                  "opacity": 1,
+                }
+              }
+            >
+              https://lwdv3.zecwallet.co:443
+            </Text>
+          </View>
+        </View>
+        <View
           style={
             {
               "display": "flex",
@@ -864,6 +830,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                 "opacity": 1,
               }
             }
+            testID="settings.customServer"
           >
             <View
               style={
@@ -929,9 +896,10 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               editable={true}
               maxLength={100}
               onChangeText={[Function]}
-              placeholder="... http------.---:--- ..."
+              placeholder="https://------.---:---"
               style={
                 {
+                  "backgroundColor": "transparent",
                   "color": "rgb(28, 28, 30)",
                   "fontSize": 18,
                   "fontWeight": "600",
@@ -940,6 +908,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                   "minWidth": "50%",
                 }
               }
+              testID="settings.customServerField"
               value="https://zcash.es"
             />
           </View>
@@ -998,6 +967,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
             placeholder="text translated"
             style={
               {
+                "backgroundColor": "transparent",
                 "color": "rgb(28, 28, 30)",
                 "fontSize": 18,
                 "fontWeight": "600",
@@ -1338,6 +1308,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           "paddingRight": 20,
         }
       }
+      testID="settings.button.save"
     >
       <View
         style={

@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo!",
-  "version": "zingo-1.0.0 (120)",
+  "version": "zingo-1.2.1 (122)",
   "loading": "cargando...",
   "connectingserver": "Conectando con el servidor...",
   "wait": "Por favor espere...",
@@ -9,6 +9,7 @@
   "cancel": "Cancelar",
   "menudrawer-acc": "Abrir Menu Lateral",
   "menu-acc": "Abrir Menu",
+  "donation": "Gracias por apoyar Zingo!",
   "loadingapp" : {
     "actualserver": "Servidor Activo:",
     "changeserver": "CAMBIAR SERVIDOR",
@@ -32,9 +33,9 @@
     "restorebackupwallet": "Restaurar la última copia de Seguridad",
     "fundpools": "Agrupaciones de Fondos",
     "restoremainnet-error": "Esta opción está solamente disponible para la Red: 'Mainnet'.",
-    "changeservernew-error": "Error al intentar cambiar al Servidor nuevo:",
+    "changeservernew-error": "Error al intentar cambiar al Servidor nuevo: ",
     "readingwallet-error": "Error al intentar leer el monedero activo usando el Servidor nuevo:",
-    "changeserverold-error": "Error al intentar volver a cambiar al Servidor antiguo:",
+    "changeserverold-error": "Error al intentar volver a cambiar al Servidor antiguo: ",
     "changingwallet-label": "Error cambiando de Monedero",
     "restoringwallet-label": "Error restaurando el Monedero",
     "computingtx": "Procesando Transacción",
@@ -45,8 +46,12 @@
     "wallet-menu": "HISTORICO",
     "send-menu": "ENVIAR",
     "uas-menu": "RECIBIR",
-    "syncing": "Pausando la Sincronización para poder Enviar.",
-    "zcash-url": "Tienes ya informada una dirección en la pantalla Enviar."
+    "syncing": "Pausando la Sincronización para poder Completar la Transacción.",
+    "zcash-url": "Tienes ya informada una dirección en la pantalla Enviar.",
+    "connection-error": "No existe conexión a Internet, Zingo así no puede funcionar correctamente.",
+    "tryingnewserver": "Intentando conectar con el nuevo Servidor... Puede llevar varios segundos.",
+    "tryingnewserver-error": "Después de 30 segundos el nuevo Servidor no responde.",
+    "readingwallet": "Leyendo satisfactoriamente el monedero activo usando el Servidor:"
   },
   "rpc": {
     "parsebirthday-error": "Error: No es posible convertirlo en un número:",
@@ -56,7 +61,8 @@
     "sixtyseconds-message": "Monedero almacenado cada 60 segundos, lote:",
     "walletnotfound-error": "Error: No se encuentra ningún monedero.",
     "backupnotfound-error": "Error: No se encuentra ninguna copia de seguridad de ningún monedero.",
-    "of": "de"
+    "of": "de",
+    "deletewallet-error": "Error: No se pudo borrar el monedero actual."
   },
   "settings": {
     "memos": [
@@ -142,7 +148,9 @@
     "title": "Información del Servidor",
     "resolution": "Pantalla",
     "tablet": "Tableta",
-    "phone": "Teléfono"
+    "phone": "Teléfono",
+    "errorgemini": "Error extrayendo el precio de Internet.",
+    "errorrpcmodule": "Error Interno extrayendo el precio de Internet."
   },
   "rescan": {
     "title": "Re-Escanear",
@@ -212,7 +220,7 @@
     "button-all": "ENviar Todo",
     "clear": "Limpiar",
     "confirm-title": "Confirmar Transacción",
-    "sending-title": "Enviando",
+    "sending-title": "Procesando",
     "confirm-amount": "Cantidad",
     "fee": "Comisión por Transacción",
     "confirm-button": "Confirmar",
@@ -232,7 +240,8 @@
     "includeua": "Incluir tu DU:",
     "confirm-memo": "Memorándum",
     "duplicate-nullifier-error": "Tus fondos están todavía confirmándose y probablemente sincronizándose. Puedes esperar hasta que tus fondos estén confirmados o puedes intentar enviar una cantidad más pequeña, La creaccion de la Transacción ha fallado!",
-    "dust-error" : "La cantidad que estás intentando enviar a una dirección Transparente is realmente infima, La creacción de la Transacción ha fallado!"
+    "dust-error" : "La cantidad que estás intentando enviar a una dirección Transparente is realmente infima, La creacción de la Transacción ha fallado!",
+    "needtoshield": "Hay fondos transparentes para Blindar"
   },
   "receive": {
     "u-title": "Dirección Unificada",
@@ -255,7 +264,7 @@
   },
   "history": {
     "shieldfunds": "Blindar fondos",
-    "shield-message": "Blindada in Tx:",
+    "shield-message": "Blindada en Tx:",
     "shield-error": "Error Blindando :",
     "title": "Histórico",
     "title-syncing": "Histórico - Sincronizando",
@@ -304,7 +313,11 @@
     "processingblock": "Procesando Bloque: ",
     "totalblocks": " de un TOTAL de Bloques: ",
     "lastbackgroundsync": "ULTIMA SINCRONIZACION EN SEGUNDO PLANO",
-    "batches-date": " Lotes en: "
+    "batches-date": " Lotes en: ",
+    "networkstatus": "Estado de la Red (Internet)",
+    "nointernet": "Sin conexión a Internet.",
+    "cellulardata": "Usando solo Datos del Móvil.",
+    "connectionexpensive": "conexión Costosa/Cara."
   },
   "import": {
     "title": "Importar Clave",
@@ -349,5 +362,19 @@
     "sapling-spendable-balance": "Cantidad para Gastar",
     "transparent-title": "TRANSPARENTE",
     "transparent-balance": "Cantidad Total"
+  },
+  "uris": {
+    "baduri": "Error: URI erronea.",
+    "notvalid": "no era una dirección válida para zcash (Unificada, Sapling or Transparente)",
+    "notvalidparameter": "no fue entendido como un parámetro válido",
+    "notvalidvalue": "no fue entendido como un valor válido",
+    "noindex": "Indice desconocido",
+    "duplicateparameter": "Parámetro duplicado",
+    "base64": "No se pudo interpretar (base64)",
+    "amount": "No se pudo interpretar (amount)",
+    "noparameter": "Parámetro desconocido",
+    "noamount": "No tenía una cantidad",
+    "noaddress": "No tenía una dirección",
+    "oneentry": "URI Debería tener al menos una entrada"
   }
 }

@@ -30,7 +30,7 @@ exports[`Component Send - test Send - snapshot 1`] = `
   />
   <RCTScrollView
     contentContainerStyle={{}}
-    keyboardShouldPersistTaps="handled"
+    testID="send.scrollView"
   >
     <View>
       <View
@@ -106,6 +106,7 @@ exports[`Component Send - test Send - snapshot 1`] = `
                   placeholderTextColor="#888888"
                   style={
                     {
+                      "backgroundColor": "transparent",
                       "color": "#c3c3c3",
                       "fontSize": 16,
                       "fontWeight": "600",
@@ -292,6 +293,7 @@ exports[`Component Send - test Send - snapshot 1`] = `
                     placeholderTextColor="#888888"
                     style={
                       {
+                        "backgroundColor": "transparent",
                         "color": "#c3c3c3",
                         "fontSize": 18,
                         "fontWeight": "600",
@@ -437,17 +439,89 @@ exports[`Component Send - test Send - snapshot 1`] = `
                       icon={
                         {
                           "icon": [
-                            192,
                             512,
-                            [],
-                            "f129",
-                            "M144 80c0 26.5-21.5 48-48 48s-48-21.5-48-48s21.5-48 48-48s48 21.5 48 48zM0 224c0-17.7 14.3-32 32-32H96c17.7 0 32 14.3 32 32V448h32c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H64V256H32c-17.7 0-32-14.3-32-32z",
+                            512,
+                            [
+                              "info-circle",
+                            ],
+                            "f05a",
+                            "M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512zM216 336h24V272H216c-13.3 0-24-10.7-24-24s10.7-24 24-24h48c13.3 0 24 10.7 24 24v88h8c13.3 0 24 10.7 24 24s-10.7 24-24 24H216c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-144c-17.7 0-32-14.3-32-32s14.3-32 32-32s32 14.3 32 32s-14.3 32-32 32z",
                           ],
-                          "iconName": "info",
+                          "iconName": "circle-info",
                           "prefix": "fas",
                         }
                       }
-                      size={14}
+                      size={20}
+                      style={
+                        {
+                          "marginRight": 5,
+                        }
+                      }
+                    />
+                    <Text
+                      style={
+                        {
+                          "color": "#c3c3c3",
+                          "opacity": 0.65,
+                        }
+                      }
+                    >
+                      text translated
+                    </Text>
+                  </View>
+                </View>
+                <View
+                  accessible={true}
+                  collapsable={false}
+                  focusable={true}
+                  onClick={[Function]}
+                  onResponderGrant={[Function]}
+                  onResponderMove={[Function]}
+                  onResponderRelease={[Function]}
+                  onResponderTerminate={[Function]}
+                  onResponderTerminationRequest={[Function]}
+                  onStartShouldSetResponder={[Function]}
+                  style={
+                    {
+                      "opacity": 1,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      {
+                        "backgroundColor": "#011401",
+                        "borderRadius": 10,
+                        "display": "flex",
+                        "flexDirection": "row",
+                        "marginTop": 5,
+                        "padding": 5,
+                      }
+                    }
+                  >
+                    <
+                      color="#18bd18"
+                      icon={
+                        {
+                          "icon": [
+                            512,
+                            512,
+                            [
+                              "info-circle",
+                            ],
+                            "f05a",
+                            "M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512zM216 336h24V272H216c-13.3 0-24-10.7-24-24s10.7-24 24-24h48c13.3 0 24 10.7 24 24v88h8c13.3 0 24 10.7 24 24s-10.7 24-24 24H216c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-144c-17.7 0-32-14.3-32-32s14.3-32 32-32s32 14.3 32 32s-14.3 32-32 32z",
+                          ],
+                          "iconName": "circle-info",
+                          "prefix": "fas",
+                        }
+                      }
+                      size={20}
+                      style={
+                        {
+                          "marginRight": 5,
+                        }
+                      }
                     />
                     <Text
                       style={
@@ -522,6 +596,7 @@ exports[`Component Send - test Send - snapshot 1`] = `
                     placeholderTextColor="#888888"
                     style={
                       {
+                        "backgroundColor": "transparent",
                         "color": "#c3c3c3",
                         "fontSize": 18,
                         "fontWeight": "600",
@@ -607,6 +682,11 @@ exports[`Component Send - test Send - snapshot 1`] = `
                   }
                 >
                   <View
+                    accessibilityState={
+                      {
+                        "disabled": false,
+                      }
+                    }
                     accessible={true}
                     collapsable={false}
                     focusable={true}
@@ -679,6 +759,11 @@ exports[`Component Send - test Send - snapshot 1`] = `
         >
           <View
             accessibilityLabel="title text translated"
+            accessibilityState={
+              {
+                "disabled": true,
+              }
+            }
             accessible={true}
             collapsable={false}
             focusable={true}

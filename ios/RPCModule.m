@@ -143,18 +143,24 @@ RCT_REMAP_METHOD(walletBackupExists,
   NSString *fileName = [NSString stringWithFormat:@"%@/wallet.dat.txt",
                                                 documentsDirectory];
   // Delete the file
-  [[NSFileManager defaultManager] removeItemAtPath:fileName error:nil];
-
-  return true;
+  NSError *error;
+  if ([[NSFileManager defaultManager] removeItemAtPath:fileName error:&error]) {
+      return true;
+  } else {
+      NSLog(@"Error delete wallet: %@", error.localizedDescription);
+      return false;
+  }
 }
 
 // Delete an existing wallet file
 RCT_REMAP_METHOD(deleteExistingWallet,
                  deleteExistingWalletWithResolver:(RCTPromiseResolveBlock)resolve
                  deleteExistingWalletWithRejecter:(RCTPromiseRejectBlock)reject) {
-  [self deleteExistingWallet];
-
-  resolve(@"true");
+  if ([self deleteExistingWallet]) {
+    resolve(@"true");
+  } else {
+    resolve(@"false");
+  };
 }
 
 RCT_REMAP_METHOD(deleteExistingWalletBackup,
@@ -169,9 +175,13 @@ RCT_REMAP_METHOD(deleteExistingWalletBackup,
   NSString *fileName = [NSString stringWithFormat:@"%@/wallet.backup.dat.txt",
                                                 documentsDirectory];
   // Delete the file
-  [[NSFileManager defaultManager] removeItemAtPath:fileName error:nil];
-
-  resolve(@"true");
+  NSError *error;
+  if ([[NSFileManager defaultManager] removeItemAtPath:fileName error:&error]) {
+      resolve(@"true");
+  } else {
+      NSLog(@"Error delete backup wallet: %@", error.localizedDescription);
+      resolve(@"false");
+  }
 }
 
 // (Non react) Save the current wallet to disk

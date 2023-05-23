@@ -26,7 +26,7 @@ class MainActivity : ReactActivity() {
         val service = Intent(applicationContext, BackgroundSync::class.java)
         val bundle = Bundle()
 
-        bundle.putString("foo", "bar")
+        bundle.putString("BS: start syncing", "Native")
 
         service.putExtras(bundle)
 

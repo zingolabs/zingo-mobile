@@ -1,16 +1,17 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect, useState } from 'react';
-import { View, ScrollView, SafeAreaView, TouchableOpacity, TextInput } from 'react-native';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import { View, ScrollView, SafeAreaView, TouchableOpacity, TextInput, Keyboard } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faDotCircle } from '@fortawesome/free-solid-svg-icons';
 import { faCircle as farCircle } from '@fortawesome/free-regular-svg-icons';
 import Toast from 'react-native-simple-toast';
+import Animated, { EasingNode } from 'react-native-reanimated';
 
 import RegText from '../Components/RegText';
 import FadeText from '../Components/FadeText';
 import BoldText from '../Components/BoldText';
-import { parseServerURI, serverUris } from '../../app/uris';
+import { checkServerURI, parseServerURI, serverUris } from '../../app/uris';
 import Button from '../Components/Button';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
@@ -21,7 +22,12 @@ import Header from '../Header';
 type SettingsProps = {
   closeModal: () => void;
   set_wallet_option: (name: string, value: string) => Promise<void>;
-  set_server_option: (name: 'server' | 'currency' | 'language' | 'sendAll', value: string) => Promise<void>;
+  set_server_option: (
+    name: 'server' | 'currency' | 'language' | 'sendAll',
+    value: string,
+    toast: boolean,
+    same_chain_name: boolean,
+  ) => Promise<void>;
   set_currency_option: (name: 'server' | 'currency' | 'language' | 'sendAll', value: string) => Promise<void>;
   set_language_option: (
     name: 'server' | 'currency' | 'language' | 'sendAll',
@@ -46,16 +52,18 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 }) => {
   const context = useContext(ContextAppLoaded);
   const {
+    info,
     walletSettings,
     translate,
     server: serverContext,
     currency: currencyContext,
     language: languageContext,
     sendAll: sendAllContext,
+    netInfo,
   } = context;
 
   const memosArray = translate('settings.memos');
-  console.log(memosArray, typeof memosArray);
+  //console.log(memosArray, typeof memosArray);
   let MEMOS: Options[] = [];
   if (typeof memosArray === 'object') {
     MEMOS = memosArray as Options[];
@@ -88,6 +96,10 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [language, setLanguage] = useState(languageContext);
   const [sendAll, setSendAll] = useState(sendAllContext);
   const [customIcon, setCustomIcon] = useState(farCircle);
+  const [disabled, setDisabled] = useState<boolean>();
+  const [titleViewHeight, setTitleViewHeight] = useState(0);
+
+  const slideAnim = useRef(new Animated.Value(0)).current;
 
   moment.locale(language);
 
@@ -95,11 +107,38 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     setCustomIcon(serverUris().find((s: string) => s === server) ? farCircle : faDotCircle);
   }, [server]);
 
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
+      Animated.timing(slideAnim, {
+        toValue: 0 - titleViewHeight + 25,
+        duration: 100,
+        easing: EasingNode.linear,
+        //useNativeDriver: true,
+      }).start();
+    });
+    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 100,
+        easing: EasingNode.linear,
+        //useNativeDriver: true,
+      }).start();
+    });
+
+    return () => {
+      !!keyboardDidShowListener && keyboardDidShowListener.remove();
+      !!keyboardDidHideListener && keyboardDidHideListener.remove();
+    };
+  }, [slideAnim, titleViewHeight]);
+
   const saveSettings = async () => {
+    let serverParsed = server;
+    let sameServerChainName = true;
+    const chain_name = info.chain_name;
     if (
       walletSettings.download_memos === memos &&
       walletSettings.transaction_filter_threshold === filter &&
-      serverContext === server &&
+      serverContext === serverParsed &&
       currencyContext === currency &&
       languageContext === language &&
       sendAllContext === sendAll
@@ -115,7 +154,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       Toast.show(translate('settings.isthreshold') as string, Toast.LONG);
       return;
     }
-    if (!server) {
+    if (!serverParsed) {
       Toast.show(translate('settings.isserver') as string, Toast.LONG);
       return;
     }
@@ -123,10 +162,52 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       Toast.show(translate('settings.islanguage') as string, Toast.LONG);
       return;
     }
-    const result = parseServerURI(server);
-    if (result.toLowerCase().startsWith('error')) {
-      Toast.show(translate('settings.isuri') as string, Toast.LONG);
+
+    if (serverContext !== serverParsed) {
+      const resultUri = parseServerURI(serverParsed, translate);
+      if (resultUri.toLowerCase().startsWith('error')) {
+        Toast.show(translate('settings.isuri') as string, Toast.LONG);
+        return;
+      } else {
+        // url-parse sometimes is too wise, and if you put:
+        // server: `http:/zec-server.com:9067` the parser understand this. Good.
+        // but this value will be store in the settings and the value is wrong.
+        // so, this function if everything is OK return the URI well formmatted.
+        // and I save it in the state ASAP.
+        if (serverParsed !== resultUri) {
+          serverParsed = resultUri;
+          setServer(resultUri);
+        }
+      }
+    }
+
+    if (!netInfo.isConnected) {
+      Toast.show(translate('loadedapp.connection-error') as string, Toast.LONG);
       return;
+    }
+
+    if (serverContext !== serverParsed) {
+      setDisabled(true);
+      Toast.show(translate('loadedapp.tryingnewserver') as string, Toast.SHORT);
+      const { result, timeout, new_chain_name } = await checkServerURI(serverParsed, serverContext);
+      if (!result) {
+        // if the server checking takes more then 30 seconds.
+        if (timeout === true) {
+          Toast.show(translate('loadedapp.tryingnewserver-error') as string, Toast.LONG);
+        } else {
+          Toast.show((translate('loadedapp.changeservernew-error') as string) + serverParsed, Toast.LONG);
+        }
+        // in this point the sync process is blocked, who knows why.
+        // if I save the actual server before the customization... is going to work.
+        set_server_option('server', serverContext, false, sameServerChainName);
+        setDisabled(false);
+        return;
+      } else {
+        console.log('new', new_chain_name, 'old', chain_name);
+        if (new_chain_name && new_chain_name !== chain_name) {
+          sameServerChainName = false;
+        }
+      }
     }
 
     if (walletSettings.download_memos !== memos) {
@@ -141,19 +222,24 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     if (sendAllContext !== sendAll) {
       await set_sendAll_option('sendAll', sendAll);
     }
-    // the last one
-    if (serverContext !== server) {
+
+    // I need a little time in this modal because maybe the wallet cannot be open with the new server
+    let ms = 100;
+    if (serverContext !== serverParsed) {
       if (languageContext !== language) {
         await set_language_option('language', language, false);
       }
-      set_server_option('server', server);
+      set_server_option('server', serverParsed, true, sameServerChainName);
+      ms = 1500;
     } else {
       if (languageContext !== language) {
         await set_language_option('language', language, true);
       }
     }
 
-    closeModal();
+    setTimeout(() => {
+      closeModal();
+    }, ms);
   };
 
   const optionsRadio = (
@@ -165,6 +251,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     return DATA.map(item => (
       <View key={'view-' + item.value}>
         <TouchableOpacity
+          disabled={disabled}
           style={{ marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
           onPress={() => setOption(typeOption(item.value))}>
           <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
@@ -183,8 +270,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     ));
   };
 
-  //console.log(walletSettings);
-
   return (
     <SafeAreaView
       style={{
@@ -194,9 +279,23 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         height: '100%',
         backgroundColor: colors.background,
       }}>
-      <Header title={translate('settings.title') as string} noBalance={true} noSyncingStatus={true} noDrawMenu={true} />
+      <Animated.View style={{ marginTop: slideAnim }}>
+        <View
+          onLayout={e => {
+            const { height } = e.nativeEvent.layout;
+            setTitleViewHeight(height);
+          }}>
+          <Header
+            title={translate('settings.title') as string}
+            noBalance={true}
+            noSyncingStatus={true}
+            noDrawMenu={true}
+          />
+        </View>
+      </Animated.View>
 
       <ScrollView
+        testID="settings.scrollView"
         style={{ maxHeight: '85%' }}
         contentContainerStyle={{
           flexDirection: 'column',
@@ -247,9 +346,17 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         </View>
 
         <View style={{ display: 'flex', marginLeft: 25 }}>
-          {serverUris().map((uri: string) =>
+          {serverUris().map((uri: string, i: number) =>
             uri ? (
               <TouchableOpacity
+                testID={
+                  i === 0
+                    ? 'settings.firstServer'
+                    : i === 1
+                    ? 'settings.secondServer'
+                    : 'settings.' + i.toString + '-Server'
+                }
+                disabled={disabled}
                 key={'touch-' + uri}
                 style={{ marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
                 onPress={() => setServer(uri)}>
@@ -265,6 +372,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
           <View style={{ display: 'flex', flexDirection: 'row' }}>
             <TouchableOpacity
+              testID="settings.customServer"
+              disabled={disabled}
               style={{ marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
               onPress={() => setServer('')}>
               <View style={{ display: 'flex', flexDirection: 'row', marginTop: 10 }}>
@@ -288,7 +397,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                   minHeight: 48,
                 }}>
                 <TextInput
-                  placeholder={'... http------.---:--- ...'}
+                  testID="settings.customServerField"
+                  placeholder={'https://------.---:---'}
                   placeholderTextColor={colors.placeholder}
                   style={{
                     color: colors.text,
@@ -297,10 +407,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                     minWidth: '50%',
                     minHeight: 48,
                     marginLeft: 5,
+                    backgroundColor: 'transparent',
                   }}
                   value={server}
                   onChangeText={(text: string) => setServer(text)}
-                  editable={true}
+                  editable={!disabled}
                   maxLength={100}
                 />
               </View>
@@ -337,10 +448,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 minWidth: '30%',
                 minHeight: 48,
                 marginLeft: 5,
+                backgroundColor: 'transparent',
               }}
               value={filter}
               onChangeText={(text: string) => setFilter(text)}
-              editable={true}
+              editable={!disabled}
               maxLength={6}
             />
           </View>
@@ -362,8 +474,20 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           alignItems: 'center',
           marginVertical: 5,
         }}>
-        <Button type="Primary" title={translate('settings.save') as string} onPress={saveSettings} />
         <Button
+          testID="settings.button.save"
+          disabled={disabled}
+          type="Primary"
+          title={translate('settings.save') as string}
+          onPress={() => {
+            // waiting while closing the keyboard, just in case.
+            setTimeout(async () => {
+              await saveSettings();
+            }, 100);
+          }}
+        />
+        <Button
+          disabled={disabled}
           type="Secondary"
           title={translate('cancel') as string}
           style={{ marginLeft: 10 }}

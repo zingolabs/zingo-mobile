@@ -1,9 +1,10 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
-import { Platform, TouchableOpacity, View } from 'react-native';
+import { Platform, TouchableOpacity, View, ActivityIndicator } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faRefresh } from '@fortawesome/free-solid-svg-icons';
+import Toast from 'react-native-simple-toast';
 import FadeText from './FadeText';
 import { ContextAppLoaded } from '../../app/context';
 import moment from 'moment';
@@ -21,6 +22,7 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
   const [refreshSure, setRefreshSure] = useState(false);
   const [refreshMinutes, setRefreshMinutes] = useState(0);
   const [count, setCount] = useState(5);
+  const [loading, setLoading] = useState(false);
   const { colors } = useTheme();
 
   useEffect(() => {
@@ -68,8 +70,25 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
 
   return (
     <>
-      {!refreshSure && (
-        <TouchableOpacity onPress={() => setRefreshSure(true)}>
+      {loading && (
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: colors.card,
+            borderRadius: 10,
+            margin: 0,
+            padding: 5,
+            minWidth: 40,
+            minHeight: 40,
+          }}>
+          {textBefore && <RegText style={{ marginRight: 10, color: colors.text }}>{textBefore}</RegText>}
+          <ActivityIndicator size="small" color={colors.primary} />
+        </View>
+      )}
+      {!refreshSure && !loading && (
+        <TouchableOpacity disabled={loading} onPress={() => setRefreshSure(true)}>
           <View
             style={{
               flexDirection: 'row',
@@ -92,17 +111,33 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
           </View>
         </TouchableOpacity>
       )}
-      {refreshSure && (
+      {refreshSure && !loading && (
         <TouchableOpacity
+          disabled={loading}
           onPress={async () => {
             if (setZecPrice) {
+              setLoading(true);
               const price = await RPC.rpc_getZecPrice();
-              if (price > 0) {
+              // values:
+              // 0   - initial/default value
+              // -1  - error in Gemini/zingolib.
+              // -2  - error in RPCModule, likely.
+              // > 0 - real value
+              if (price === -1) {
+                Toast.show(translate('info.errorgemini') as string, Toast.LONG);
+              }
+              if (price === -2) {
+                Toast.show(translate('info.errorrpcmodule') as string, Toast.LONG);
+              }
+              if (price <= 0) {
+                setZecPrice(price, 0);
+              } else {
                 setZecPrice(price, Date.now());
               }
               setRefreshSure(false);
               setRefreshMinutes(0);
               setCount(5);
+              setLoading(false);
             }
           }}>
           <View

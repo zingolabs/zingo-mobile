@@ -1,19 +1,52 @@
 import RPCModule from './RPCModule';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo, { NetInfoStateType } from '@react-native-community/netinfo';
+import { RPCSyncStatusType } from './rpc/types/RPCSyncStatusType';
 
 const BackgroundSync = async (task_data: any) => {
+  // this not interact with the server.
   const exists = await RPCModule.walletExists();
 
   // only if exists the wallet file make sense to do the sync.
   if (exists && exists !== 'false') {
-    const server = await AsyncStorage.getItem('@server');
-    let wallet = await RPCModule.loadExistingWallet(server);
-    if (wallet.startsWith('Error')) {
-      // We don't return an error message yet, just log the error and return
-      console.error(wallet);
+    // only if we have connection make sense to call RPCModule.
+    const networkState = await NetInfo.fetch();
+    if (
+      !networkState.isConnected ||
+      networkState.type === NetInfoStateType.cellular ||
+      (networkState.details !== null && networkState.details.isConnectionExpensive)
+    ) {
+      console.log(
+        'BS: Not started (connected: ' + networkState.isConnected,
+        +', type: ' +
+          networkState.type +
+          +', expensive connection: ' +
+          networkState.details?.isConnectionExpensive +
+          ')',
+      );
       return;
     }
+    // if the App goes to Foreground kill the interval
+    const background = await AsyncStorage.getItem('@background');
+    if (background === 'no') {
+      console.log('BS: Not started (going to foreground)');
+      return;
+    }
+    /* no need to load wallet again, it's loaded already in the RPC session.
+    const server = await AsyncStorage.getItem('@server');
+    let wallet: string = await RPCModule.loadExistingWallet(server);
+    if (wallet) {
+      if (wallet.toLowerCase().startsWith('error')) {
+        // We don't return an error message yet, just log the error and return
+        console.log(`BS: Error load wallet ${wallet}`);
+        return;
+      }
+    } else {
+      console.log('BS: Internal Error load wallet');
+      return;
+    }
+    */
+
     let batch_num = -1;
     console.log('BS:', task_data);
 
@@ -23,18 +56,18 @@ const BackgroundSync = async (task_data: any) => {
     let finishEarly = manuallyResolve();
 
     let saver = setInterval(async () => {
-      const networkState = await NetInfo.fetch();
+      const networkStateSaver = await NetInfo.fetch();
       if (
-        !networkState.isConnected ||
-        networkState.type === NetInfoStateType.cellular ||
-        (networkState.details !== null && networkState.details.isConnectionExpensive)
+        !networkStateSaver.isConnected ||
+        networkStateSaver.type === NetInfoStateType.cellular ||
+        (networkStateSaver.details !== null && networkStateSaver.details.isConnectionExpensive)
       ) {
         console.log(
-          'BS: Interrupted (connected: ' + networkState.isConnected,
+          'BS: Interrupted (connected: ' + networkStateSaver.isConnected,
           +', type: ' +
-            networkState.type +
+            networkStateSaver.type +
             +', expensive connection: ' +
-            networkState.details?.isConnectionExpensive +
+            networkStateSaver.details?.isConnectionExpensive +
             ')',
         );
         clearInterval(saver);
@@ -42,21 +75,29 @@ const BackgroundSync = async (task_data: any) => {
         return;
       }
       // if the App goes to Foreground kill the interval
-      const background = await AsyncStorage.getItem('@background');
-      if (background === 'no') {
+      const backgroundSaver = await AsyncStorage.getItem('@background');
+      if (backgroundSaver === 'no') {
         clearInterval(saver);
-        console.log('BS: FInished (foreground)');
+        console.log('BS: Finished (going to foreground)');
         finishEarly.done();
         return;
       }
 
-      const s = await RPCModule.execute('syncstatus', '');
-      if (!s) {
+      const syncStatusStr: string = await RPCModule.execute('syncstatus', '');
+      if (syncStatusStr) {
+        if (syncStatusStr.toLowerCase().startsWith('error')) {
+          console.log(`BS: Error sync status ${syncStatusStr}`);
+          return;
+        }
+      } else {
+        console.log('BS: Internal Error sync status');
         return;
       }
-      const ss = await JSON.parse(s);
+      // TODO: verify this JSON parse
+      const ss: RPCSyncStatusType = await JSON.parse(syncStatusStr);
+
       console.log('BS:', ss);
-      if (ss.batch_num > -1 && batch_num !== ss.batch_num) {
+      if (ss.batch_num && ss.batch_num > -1 && batch_num !== ss.batch_num) {
         await RPCModule.doSave();
         console.log('BS: saving...');
         // update batch_num with the new value, otherwise never change
@@ -66,15 +107,17 @@ const BackgroundSync = async (task_data: any) => {
 
     await Promise.race([RPCModule.execute('sync', ''), finishEarly.wait()]);
     clearInterval(saver);
+  } else {
+    console.log('BS: wallet file does not exist');
   }
-  console.log('BS: FInished (end)');
+  console.log('BS: Finished (end of syncing)');
 };
 
 export default BackgroundSync;
 
 function manuallyResolve() {
   let resolve: Function;
-  // new Promise takes a function as an arument. When that function is called
+  // new Promise takes a function as an argument. When that function is called
   // the promise resolves with the value output by that function.
   // By passing the function out of the promise, we can call it later
   // in order to resolve the promise at will

@@ -23,6 +23,9 @@ import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
 import { isEqual } from 'lodash';
 import { StackScreenProps } from '@react-navigation/stack';
+import NetInfo, { NetInfoSubscription } from '@react-native-community/netinfo';
+import { activateKeepAwake, deactivateKeepAwake } from '@sayem314/react-native-keep-awake';
+import deepDiff from 'deep-diff';
 
 import RPC from '../rpc';
 import RPCModule from '../RPCModule';
@@ -31,7 +34,6 @@ import {
   SyncingStatusReportClass,
   TotalBalanceClass,
   SendPageStateClass,
-  ReceivePageStateClass,
   InfoType,
   TransactionType,
   ToAddrClass,
@@ -42,7 +44,7 @@ import {
   WalletSettingsClass,
   AddressClass,
   zecPriceType,
-  backgroundType,
+  BackgroundType,
   TranslateType,
 } from '../AppState';
 import Utils from '../utils';
@@ -50,7 +52,7 @@ import { ThemeType } from '../types';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import { ContextAppLoadedProvider, defaultAppStateLoaded } from '../context';
 import platform from '../platform/platform';
-import { parseZcashURI, serverUris, ZcashURITarget } from '../uris';
+import { parseZcashURI, serverUris, ZcashURITargetClass } from '../uris';
 import BackgroundFileImpl from '../../components/Background/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -94,7 +96,7 @@ export default function LoadedApp(props: LoadedAppProps) {
   const [currency, setCurrency] = useState('' as 'USD' | '');
   const [server, setServer] = useState(SERVER_DEFAULT_0 as string);
   const [sendAll, setSendAll] = useState(false);
-  const [background, setBackground] = useState({ batches: 0, date: 0 } as backgroundType);
+  const [background, setBackground] = useState({ batches: 0, date: 0 } as BackgroundType);
   const [loading, setLoading] = useState(true);
   //const forceUpdate = useForceUpdate();
   const file = useMemo(
@@ -184,6 +186,8 @@ export default function LoadedApp(props: LoadedAppProps) {
   //  return () => RNLocalize.removeEventListener('change', handleLocalizationChange);
   //}, [handleLocalizationChange]);
 
+  console.log('render LoadedApp - 2');
+
   if (loading) {
     return null;
   } else {
@@ -211,7 +215,7 @@ type LoadedAppClassProps = {
   currency: 'USD' | '';
   server: string;
   sendAll: boolean;
-  background: backgroundType;
+  background: BackgroundType;
 };
 
 class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
@@ -219,6 +223,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   dim: EmitterSubscription;
   appstate: NativeEventSubscription;
   linking: EmitterSubscription;
+  unsubscribeNetInfo: NetInfoSubscription;
 
   constructor(props: LoadedAppClassProps) {
     super(props);
@@ -253,25 +258,28 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       this.setAllAddresses,
       this.setWalletSettings,
       this.setInfo,
-      this.refreshUpdates,
+      this.setSyncingStatus,
       props.translate,
       this.fetchBackgroundSyncing,
+      this.keepAwake,
     );
 
     this.dim = {} as EmitterSubscription;
     this.appstate = {} as NativeEventSubscription;
     this.linking = {} as EmitterSubscription;
+    this.unsubscribeNetInfo = {} as NetInfoSubscription;
   }
 
   componentDidMount = () => {
     this.clearToAddr();
 
     // Configure the RPC to start doing refreshes
-    this.rpc.configure();
+    (async () => {
+      await this.rpc.configure();
+    })();
 
     this.dim = Dimensions.addEventListener('change', ({ screen }) => {
       this.setDimensions(screen);
-      //console.log('++++++++++++++++++++++++++++++++++ change dims', Dimensions.get('screen'));
     });
 
     this.appstate = AppState.addEventListener('change', async nextAppState => {
@@ -281,25 +289,29 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
         // reading background task info
         if (Platform.OS === 'ios') {
           // this file only exists in IOS BS.
-          this.fetchBackgroundSyncing();
+          await this.fetchBackgroundSyncing();
         }
-        this.rpc.setInRefresh(false);
-        this.rpc.clearTimers();
-        this.rpc.configure();
         // setting value for background task Android
         await AsyncStorage.setItem('@background', 'no');
+        console.log('background no in storage');
+        await this.rpc.configure();
+        console.log('configure start timers');
       }
       if (nextAppState.match(/inactive|background/) && this.state.appState === 'active') {
         console.log('App is gone to the background!');
-        this.rpc.clearTimers();
-        this.setState({
-          syncingStatusReport: new SyncingStatusReportClass(),
-          syncingStatus: {} as SyncingStatusType,
-        });
         // setting value for background task Android
         await AsyncStorage.setItem('@background', 'yes');
+        console.log('background yes in storage');
+        this.rpc.setInRefresh(false);
+        await this.rpc.clearTimers();
+        console.log('clear timers');
+        this.setSyncingStatus({} as SyncingStatusType);
+        this.setSyncingStatusReport(new SyncingStatusReportClass());
+        console.log('clear sync status state');
       }
-      this.setState({ appState: nextAppState });
+      if (this.state.appState !== nextAppState) {
+        this.setState({ appState: nextAppState });
+      }
     });
 
     (async () => {
@@ -310,7 +322,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     })();
 
     this.linking = Linking.addEventListener('url', async ({ url }) => {
-      console.log(url);
+      //console.log(url);
       const { to } = this.state.sendPageState.toaddr;
       if (url !== null && to === '') {
         this.readUrl(url);
@@ -323,20 +335,72 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
         Toast.show(this.state.translate('loadedapp.zcash-url') as string, Toast.LONG);
       }
     });
+
+    this.unsubscribeNetInfo = NetInfo.addEventListener(async state => {
+      const { isConnected, type, isConnectionExpensive } = this.state.netInfo;
+      if (
+        isConnected !== state.isConnected ||
+        type !== state.type ||
+        isConnectionExpensive !== state.details?.isConnectionExpensive
+      ) {
+        console.log('fetch net info');
+        this.setState({
+          netInfo: {
+            isConnected: state.isConnected,
+            type: state.type,
+            isConnectionExpensive: state.details && state.details.isConnectionExpensive,
+          },
+        });
+        if (isConnected !== state.isConnected) {
+          if (!state.isConnected) {
+            //console.log('EVENT Loaded: No internet connection.');
+            await this.rpc.clearTimers();
+            this.setState({
+              syncingStatusReport: new SyncingStatusReportClass(),
+              syncingStatus: {} as SyncingStatusType,
+            });
+            Toast.show(this.props.translate('loadedapp.connection-error') as string, Toast.LONG);
+          } else {
+            //console.log('EVENT Loaded: YES internet connection.');
+            const inRefresh = this.rpc.getInRefresh();
+            if (inRefresh) {
+              // I need to start again the App only if it is Syncing...
+              this.navigateToLoading();
+            }
+          }
+        }
+      }
+    });
   };
 
-  componentWillUnmount = () => {
-    this.rpc.clearTimers();
-    this.dim.remove();
-    this.appstate.remove();
-    this.linking.remove();
+  componentWillUnmount = async () => {
+    await this.rpc.clearTimers();
+    this.dim && this.dim.remove();
+    this.appstate && this.appstate.remove();
+    this.linking && this.linking.remove();
+    this.unsubscribeNetInfo && this.unsubscribeNetInfo();
+  };
+
+  //componentDidUpdate(prevProps: Readonly<LoadedAppClassProps>, prevState: Readonly<AppStateLoaded>): void {
+  //  const diff = deepDiff({ ...this.props, ...this.state }, { ...prevProps, ...prevState });
+  //  if (diff) {
+  //    console.log('+++++++++++', diff);
+  //  }
+  //}
+
+  keepAwake = (keep: boolean): void => {
+    if (keep) {
+      activateKeepAwake();
+    } else {
+      deactivateKeepAwake();
+    }
   };
 
   readUrl = async (url: string) => {
-    console.log(url);
+    //console.log(url);
     // Attempt to parse as URI if it starts with zcash
     if (url.startsWith('zcash:')) {
-      const target: string | ZcashURITarget = await parseZcashURI(url);
+      const target: string | ZcashURITargetClass = await parseZcashURI(url, this.state.translate);
       //console.log(targets);
 
       if (typeof target !== 'string') {
@@ -387,23 +451,28 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   };
 
   setDimensions = (screen: ScaledSize) => {
-    this.setState({
-      dimensions: {
-        width: Number(screen.width.toFixed(0)),
-        height: Number(screen.height.toFixed(0)),
-        orientation: platform.isPortrait(screen) ? 'portrait' : 'landscape',
-        deviceType: platform.isTablet(screen) ? 'tablet' : 'phone',
-        scale: Number(screen.scale.toFixed(2)),
-      },
-    });
+    if (
+      this.state.dimensions.width !== Number(screen.width.toFixed(0)) ||
+      this.state.dimensions.height !== Number(screen.height.toFixed(0))
+    ) {
+      console.log('fetch screen dimensions');
+      this.setState({
+        dimensions: {
+          width: Number(screen.width.toFixed(0)),
+          height: Number(screen.height.toFixed(0)),
+          orientation: platform.isPortrait(screen) ? 'portrait' : 'landscape',
+          deviceType: platform.isTablet(screen) ? 'tablet' : 'phone',
+          scale: Number(screen.scale.toFixed(2)),
+        },
+      });
+    }
   };
 
   fetchBackgroundSyncing = async () => {
-    const backgroundJson = await BackgroundFileImpl.readBackground();
-    if (backgroundJson) {
-      this.setState({
-        background: backgroundJson,
-      });
+    const backgroundJson: BackgroundType = await BackgroundFileImpl.readBackground();
+    if (!isEqual(this.state.background, backgroundJson)) {
+      console.log('fetch background sync info');
+      this.setState({ background: backgroundJson });
     }
   };
 
@@ -427,50 +496,50 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
   setTotalBalance = (totalBalance: TotalBalanceClass) => {
     if (!isEqual(this.state.totalBalance, totalBalance)) {
-      //console.log('total balance');
+      console.log('fetch total balance');
       this.setState({ totalBalance });
     }
   };
 
   setSyncingStatusReport = (syncingStatusReport: SyncingStatusReportClass) => {
-    this.setState({ syncingStatusReport });
+    if (!isEqual(this.state.syncingStatusReport, syncingStatusReport)) {
+      console.log('fetch syncing status report');
+      this.setState({ syncingStatusReport });
+    }
   };
 
   setTransactionList = (transactions: TransactionType[]) => {
-    if (!isEqual(this.state.transactions, transactions)) {
-      //console.log('transactions');
+    if (deepDiff(this.state.transactions, transactions)) {
+      console.log('fetch transactions');
       this.setState({ transactions });
     }
   };
 
   setAllAddresses = (addresses: AddressClass[]) => {
-    const { uaAddress } = this.state;
-    if (!isEqual(this.state.addresses, addresses) || uaAddress === '') {
-      //console.log('addresses');
-      if (uaAddress === '') {
-        this.setState({ addresses, uaAddress: addresses[0].uaAddress });
-      } else {
-        this.setState({ addresses });
-      }
+    if (deepDiff(this.state.addresses, addresses)) {
+      console.log('fetch addresses');
+      this.setState({ addresses });
+    }
+    if (this.state.uaAddress !== addresses[0].uaAddress) {
+      this.setState({ uaAddress: addresses[0].uaAddress });
     }
   };
 
   setWalletSettings = (walletSettings: WalletSettingsClass) => {
-    this.setState({ walletSettings });
+    if (!isEqual(this.state.walletSettings, walletSettings)) {
+      console.log('fetch wallet settings');
+      this.setState({ walletSettings });
+    }
   };
 
   setSendPageState = (sendPageState: SendPageStateClass) => {
+    console.log('fetch send page state');
     this.setState({ sendPageState });
   };
 
-  refreshUpdates = (inProgress: boolean, progress: number, blocks: string, synced: boolean) => {
-    const syncingStatus: SyncingStatusType = {
-      inProgress,
-      progress,
-      blocks,
-      synced,
-    };
+  setSyncingStatus = (syncingStatus: SyncingStatusType) => {
     if (!isEqual(this.state.syncingStatus, syncingStatus)) {
+      console.log('fetch syncing status');
       this.setState({ syncingStatus });
     }
   };
@@ -491,25 +560,34 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       zecPrice: newZecPrice,
       date: newDate,
     } as zecPriceType;
-    if (!isEqual(this.state.zecPrice, newZecPrice)) {
+    if (!isEqual(this.state.zecPrice, zecPrice)) {
+      console.log('fetch zec price');
       this.setState({ zecPrice });
     }
-  };
-
-  setRescanning = (rescanning: boolean) => {
-    this.setState({ rescanning });
   };
 
   setComputingModalVisible = (visible: boolean) => {
     this.setState({ computingModalVisible: visible });
   };
 
-  setSendProgress = (progress: SendProgressClass) => {
-    this.setState({ sendProgress: progress });
+  setSendProgress = (sendProgress: SendProgressClass) => {
+    if (!isEqual(this.state.sendProgress, sendProgress)) {
+      console.log('fetch send progress');
+      this.setState({ sendProgress });
+    }
   };
 
-  setInfo = (newInfo: InfoType) => {
-    if (!isEqual(this.state.info, newInfo)) {
+  setInfo = (info: InfoType) => {
+    if (!isEqual(this.state.info, info)) {
+      console.log('fetch info');
+      let newInfo = info;
+      // if currencyName is empty,
+      // I need to rescue the last value from the state.
+      if (!newInfo.currencyName) {
+        if (this.state.info.currencyName) {
+          newInfo.currencyName = this.state.info.currencyName;
+        }
+      }
       this.setState({ info: newInfo });
     }
   };
@@ -564,7 +642,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       throw err;
     }
   };
-
+  /*
   // Get a single private key for this address, and return it as a string.
   getPrivKeyAsString = async (address: string): Promise<string> => {
     const pk = await RPC.rpc_getPrivKeyAsString(address);
@@ -601,18 +679,22 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       this.setState({ receivePageState: newReceivePageState });
     }
   };
-
+  */
   doRefresh = async () => {
     await this.rpc.refresh(false);
   };
 
-  fetchTotalBalance = async () => {
-    await this.rpc.fetchTotalBalance();
+  doRescan = () => {
+    // TODO: when click rescan the txs list is empty, but
+    // after a couple of seconds the txs come back... because
+    // the rescan process take a while to start.
+    this.setTransactionList([]);
+    this.rpc.refresh(false, true);
   };
 
-  clearTimers = () => {
-    this.rpc.clearTimers();
-  };
+  //fetchTotalBalance = async () => {
+  //  await this.rpc.fetchTotalBalance();
+  //};
 
   toggleMenuDrawer = () => {
     this.setState({
@@ -626,19 +708,13 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
   fetchWalletSeedAndBirthday = async () => {
     const walletSeed = await RPC.rpc_fetchSeedAndBirthday();
-    if (walletSeed) {
+    if (!isEqual(this.state.walletSeed, walletSeed)) {
+      console.log('fetch wallet seed & birthday');
       this.setState({ walletSeed });
     }
   };
 
-  startRescan = () => {
-    this.setRescanning(true);
-    this.setTransactionList([]);
-    this.rpc.rescan();
-  };
-
   onMenuItemSelected = async (item: string) => {
-    const { info } = this.state;
     this.setState({
       isMenuDrawerOpen: false,
       selectedMenuDrawerItem: item,
@@ -664,64 +740,83 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     } else if (item === 'Change Wallet') {
       this.setState({ seedChangeModalVisible: true });
     } else if (item === 'Restore Wallet Backup') {
-      if (info.currencyName && info.currencyName !== 'ZEC') {
-        Toast.show(this.props.translate('loadedapp.restoremainnet-error') as string, Toast.LONG);
-        return;
-      }
-      if (info.currencyName) {
-        this.setState({ seedBackupModalVisible: true });
-      }
+      this.setState({ seedBackupModalVisible: true });
     }
   };
 
   set_wallet_option = async (name: string, value: string): Promise<void> => {
     await RPC.rpc_setWalletSettingOption(name, value);
 
-    // Refetch the settings to update
+    // Refetch the settings updated
     this.rpc.fetchWalletSettings();
   };
 
-  set_server_option = async (name: 'server' | 'currency' | 'language' | 'sendAll', value: string): Promise<void> => {
-    const resultStrServer: string = await RPCModule.execute('changeserver', value);
-    if (resultStrServer.toLowerCase().startsWith('error')) {
-      //console.log(`Error change server ${value} - ${resultStrServer}`);
-      Toast.show(`${this.props.translate('loadedapp.changeservernew-error')} ${value}`, Toast.LONG);
-      return;
+  set_server_option = async (
+    name: 'server' | 'currency' | 'language' | 'sendAll',
+    value: string,
+    toast: boolean,
+    same_chain_name: boolean,
+  ): Promise<void> => {
+    // here I know the server was changed, clean all the tasks before anything.
+    await this.rpc.clearTimers();
+    this.setState({
+      syncingStatusReport: new SyncingStatusReportClass(),
+      syncingStatus: {} as SyncingStatusType,
+    });
+    this.rpc.setInRefresh(false);
+    this.keepAwake(false);
+    // First we need to check the `chain_name` between servers, if this is different
+    // we cannot try to open the current wallet, because make not sense.
+    let error = false;
+    if (!same_chain_name) {
+      error = true;
     } else {
-      //console.log(`change server ok ${value}`);
+      // when I try to open the wallet in the new server:
+      // - the seed doesn't exists (the type of sever is different `mainnet` / `testnet` / `regtest` ...).
+      //   The App have to go to the initial screen
+      // - the seed exists and the App can open the wallet in the new server.
+      //   But I have to restart the sync if needed.
+      const result: string = await RPCModule.loadExistingWallet(value);
+      if (result && !result.toLowerCase().startsWith('error')) {
+        // Load the wallet and navigate to the transactions screen
+        console.log(`wallet loaded ok ${value}`);
+        if (toast) {
+          Toast.show(`${this.props.translate('loadedapp.readingwallet')} ${value}`, Toast.LONG);
+        }
+        await SettingsFileImpl.writeSettings(name, value);
+        this.setState({
+          server: value,
+        });
+        // the server is changed, the App needs to restart the timeout tasks from the beginning
+        await this.rpc.configure();
+        // Refetch the settings to update
+        await this.rpc.fetchWalletSettings();
+        return;
+      } else {
+        error = true;
+      }
     }
 
-    await this.rpc.setInRefresh(false);
-    const error = await RPCModule.loadExistingWallet(value);
-    if (!error.toLowerCase().startsWith('error')) {
-      // Load the wallet and navigate to the transactions screen
-      //console.log(`wallet loaded ok ${value}`);
-      await SettingsFileImpl.writeSettings(name, value);
-      this.setState({
-        server: value,
-      });
-      // Refetch the settings to update
-      this.rpc.fetchWalletSettings();
-      return;
-    } else {
-      //console.log(`Error Reading Wallet ${value} - ${error}`);
-      Toast.show(`${this.props.translate('loadedapp.readingwallet-error')} ${value}`, Toast.LONG);
-
-      const old_settings = await SettingsFileImpl.readSettings();
-      const resultStr: string = await RPCModule.execute('changeserver', old_settings.server);
-      if (resultStr.toLowerCase().startsWith('error')) {
-        //console.log(`Error change server ${old_settings.server} - ${resultStr}`);
-        Toast.show(`${this.props.translate('loadedapp.changeserverold-error')} ${value}`, Toast.LONG);
-        //return;
-      } else {
-        //console.log(`change server ok ${old_settings.server} - ${resultStr}`);
-      }
-
-      // go to the seed screen for changing the wallet for another in the new server
-      await this.fetchWalletSeedAndBirthday();
+    // if the chain_name id different between server or we cannot open the wallet...
+    if (error) {
+      // I need to open the modal ASAP.
       this.setState({
         seedServerModalVisible: true,
+      });
+      //console.log(`Error Reading Wallet ${value} - ${error}`);
+      if (toast) {
+        Toast.show(`${this.props.translate('loadedapp.readingwallet-error')} ${value}`, Toast.LONG);
+      }
+
+      // we need to restore the old server because the new doesn't have the seed of the current wallet.
+      const old_settings = await SettingsFileImpl.readSettings();
+      await RPCModule.execute('changeserver', old_settings.server);
+
+      // go to the seed screen for changing the wallet for another in the new server or cancel this action.
+      this.fetchWalletSeedAndBirthday();
+      this.setState({
         newServer: value,
+        server: old_settings.server,
       });
     }
   };
@@ -734,7 +829,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
     // Refetch the settings to update
     this.rpc.fetchWalletSettings();
-    //this.navigateToLoading();
   };
 
   set_language_option = async (
@@ -762,13 +856,12 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
     // Refetch the settings to update
     this.rpc.fetchWalletSettings();
-    //this.navigateToLoading();
   };
 
-  navigateToLoading = () => {
+  navigateToLoading = async () => {
     const { navigation } = this.props;
 
-    this.rpc.clearTimers();
+    await this.rpc.clearTimers();
     navigation.reset({
       index: 0,
       routes: [{ name: 'LoadingApp' }],
@@ -777,10 +870,15 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
   onClickOKChangeWallet = async () => {
     const { info } = this.state;
-    const resultStr =
-      info.currencyName && info.currencyName !== 'ZEC'
-        ? ((await this.rpc.changeWalletNoBackup()) as string)
-        : ((await this.rpc.changeWallet()) as string);
+
+    // if the App is working with a test server
+    // no need to do backups of the wallets.
+    let resultStr = '';
+    if (info.currencyName === 'TAZ') {
+      resultStr = (await this.rpc.changeWalletNoBackup()) as string;
+    } else {
+      resultStr = (await this.rpc.changeWallet()) as string;
+    }
 
     //console.log("jc change", resultStr);
     if (resultStr.toLowerCase().startsWith('error')) {
@@ -789,7 +887,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       return;
     }
 
-    await this.rpc.setInRefresh(false);
+    this.rpc.setInRefresh(false);
+    this.keepAwake(false);
     this.setState({ seedChangeModalVisible: false });
     this.navigateToLoading();
   };
@@ -804,34 +903,51 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       return;
     }
 
-    await this.rpc.setInRefresh(false);
+    this.rpc.setInRefresh(false);
+    this.keepAwake(false);
     this.setState({ seedBackupModalVisible: false });
     this.navigateToLoading();
   };
 
   onClickOKServerWallet = async () => {
-    const resultStr: string = await RPCModule.execute('changeserver', this.state.newServer);
-    if (resultStr.toLowerCase().startsWith('error')) {
-      //console.log(`Error change server ${value} - ${resultStr}`);
-      Toast.show(`${this.props.translate('loadedapp.changeservernew-error')} ${resultStr}`, Toast.LONG);
-      return;
-    } else {
-      //console.log(`change server ok ${value}`);
-    }
+    const beforeCurrencyName = this.state.info.currencyName;
 
     if (this.state.newServer) {
+      const resultStr: string = await RPCModule.execute('changeserver', this.state.newServer);
+      if (resultStr.toLowerCase().startsWith('error')) {
+        //console.log(`Error change server ${value} - ${resultStr}`);
+        Toast.show(`${this.props.translate('loadedapp.changeservernew-error')} ${resultStr}`, Toast.LONG);
+        return;
+      } else {
+        //console.log(`change server ok ${value}`);
+      }
+
       await SettingsFileImpl.writeSettings('server', this.state.newServer);
       this.setState({
         server: this.state.newServer,
+        newServer: '',
       });
     }
 
-    const { info } = this.state;
+    await this.rpc.fetchInfoAndServerHeight();
+    const afterCurrencyName = this.state.info.currencyName;
 
-    const resultStr2 =
-      info.currencyName && info.currencyName !== 'ZEC'
-        ? ((await this.rpc.changeWalletNoBackup()) as string)
-        : ((await this.rpc.changeWallet()) as string);
+    // from TAZ to ZEC -> no backup the old test wallet.
+    // from TAZ to TAZ -> no use case here, likely. no backup just in case.
+    // from ZEC to TAZ -> it's interesting to backup the old real wallet. Just in case.
+    // from ZEC to ZEC -> no use case here, likely. backup just in case.
+    let resultStr2 = '';
+    if (
+      (beforeCurrencyName === 'TAZ' && afterCurrencyName === 'ZEC') ||
+      (beforeCurrencyName === 'TAZ' && afterCurrencyName === 'TAZ')
+    ) {
+      // no backup
+      resultStr2 = (await this.rpc.changeWalletNoBackup()) as string;
+    } else {
+      // backup
+      resultStr2 = (await this.rpc.changeWallet()) as string;
+    }
+
     //console.log("jc change", resultStr);
     if (resultStr2.toLowerCase().startsWith('error')) {
       //console.log(`Error change wallet. ${resultStr}`);
@@ -839,8 +955,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       //return;
     }
 
-    await this.rpc.setInRefresh(false);
     this.setState({ seedServerModalVisible: false });
+    // no need to restart the tasks because is about to restart the app.
     this.navigateToLoading();
   };
 
@@ -902,10 +1018,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       return <FontAwesomeIcon icon={iconName} color={iconColor} />;
     };
 
-    //console.log('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
-    //console.log('render LoadedApp', this.state.info);
-    //const res = async () => await RPCModule.execute('testbip', '');
-    //res().then(r => console.log(r));
+    console.log('render LoadedAppClass - 3');
 
     return (
       <ContextAppLoadedProvider value={this.state}>
@@ -984,7 +1097,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                   <Text>{translate('loading') as string}</Text>
                 </View>
               }>
-              <Rescan closeModal={() => this.setState({ rescanModalVisible: false })} startRescan={this.startRescan} />
+              <Rescan closeModal={() => this.setState({ rescanModalVisible: false })} doRescan={this.doRescan} />
             </Suspense>
           </Modal>
 
@@ -1080,7 +1193,11 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
               }>
               <Seed
                 onClickOK={() => this.onClickOKServerWallet()}
-                onClickCancel={() => this.setState({ seedServerModalVisible: false })}
+                onClickCancel={async () => {
+                  // restart all the tasks again, nothing happen.
+                  await this.rpc.configure();
+                  this.setState({ seedServerModalVisible: false });
+                }}
                 action={'server'}
               />
             </Suspense>
@@ -1131,6 +1248,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                       syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
                       poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
                       setZecPrice={this.setZecPrice}
+                      setComputingModalVisible={this.setComputingModalVisible}
                     />
                   </Suspense>
                 </>

@@ -53,7 +53,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected }) => {
           {translate('loadedapp.info') as string}
         </RegText>
 
-        <RegText onPress={() => onItemSelectedWrapper('Settings')} style={item}>
+        <RegText testID="menu.settings" onPress={() => onItemSelectedWrapper('Settings')} style={item}>
           {translate('loadedapp.settings') as string}
         </RegText>
 
@@ -65,7 +65,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected }) => {
           {translate('loadedapp.rescanwallet') as string}
         </RegText>
 
-        <RegText onPress={() => onItemSelectedWrapper('Sync Report')} style={item}>
+        <RegText testID="menu.syncreport" onPress={() => onItemSelectedWrapper('Sync Report')} style={item}>
           {translate('loadedapp.report') as string}
         </RegText>
 

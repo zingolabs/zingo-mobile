@@ -11,7 +11,7 @@ import FadeText from '../Components/FadeText';
 import Button from '../Components/Button';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded, ContextAppLoading } from '../../app/context';
-import { InfoType, TranslateType, WalletSeedType } from '../../app/AppState';
+import { DimensionsType, InfoType, NetInfoType, TranslateType, WalletSeedType } from '../../app/AppState';
 import RPCModule from '../../app/RPCModule';
 import RPC from '../../app/rpc';
 import Header from '../Header';
@@ -33,17 +33,26 @@ type SeedProps = {
 const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, action }) => {
   const contextLoaded = useContext(ContextAppLoaded);
   const contextLoading = useContext(ContextAppLoading);
-  let walletSeed: WalletSeedType, translate: (key: string) => TranslateType, info: InfoType, server: string;
+  let walletSeed: WalletSeedType,
+    translate: (key: string) => TranslateType,
+    info: InfoType,
+    server: string,
+    dimensions: DimensionsType,
+    netInfo: NetInfoType;
   if (action === 'new' || action === 'restore') {
     walletSeed = contextLoading.walletSeed;
     translate = contextLoading.translate;
     info = contextLoading.info;
     server = contextLoading.server;
+    dimensions = contextLoading.dimensions;
+    netInfo = contextLoading.netInfo;
   } else {
     walletSeed = contextLoaded.walletSeed;
     translate = contextLoaded.translate;
     info = contextLoaded.info;
     server = contextLoaded.server;
+    dimensions = contextLoaded.dimensions;
+    netInfo = contextLoaded.netInfo;
   }
 
   const { colors } = useTheme() as unknown as ThemeType;
@@ -104,7 +113,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
         (async () => {
           const resp: string = await RPCModule.getLatestBlock(server);
           //console.log(resp);
-          if (!resp.toLowerCase().startsWith('error')) {
+          if (resp && !resp.toLowerCase().startsWith('error')) {
             setLatestBlock(Number(resp));
           } else {
             console.log('error latest block', resp);
@@ -146,6 +155,8 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
             noSyncingStatus={true}
             noDrawMenu={true}
             translate={translate}
+            dimensions={dimensions}
+            netInfo={netInfo}
           />
         </View>
       </Animated.View>
@@ -205,6 +216,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
                   minWidth: '95%',
                   minHeight: 100,
                   marginLeft: 5,
+                  backgroundColor: 'transparent',
                 }}
                 value={seedPhrase}
                 onChangeText={(text: string) => setSeedPhrase(text)}
@@ -273,6 +285,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
                     minWidth: '20%',
                     minHeight: 48,
                     marginLeft: 5,
+                    backgroundColor: 'transparent',
                   }}
                   value={birthdayNumber}
                   onChangeText={(text: string) => {
@@ -327,6 +340,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
           marginVertical: 5,
         }}>
         <Button
+          testID="seed.button.OK"
           type="Primary"
           style={{
             backgroundColor: times === 3 ? 'red' : colors.primary,
@@ -337,8 +351,19 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
             if (!seedPhrase) {
               return;
             }
+            if (!netInfo.isConnected && (times > 0 || action === 'restore')) {
+              Toast.show(translate('loadedapp.connection-error') as string, Toast.LONG);
+              return;
+            }
             if (times === 0 || times === 3) {
-              onClickOK(seedPhrase, Number(birthdayNumber));
+              if (action === 'restore') {
+                // waiting while closing the keyboard, just in case.
+                setTimeout(async () => {
+                  onClickOK(seedPhrase, Number(birthdayNumber));
+                }, 100);
+              } else {
+                onClickOK(seedPhrase, Number(birthdayNumber));
+              }
             } else if (times === 1 || times === 2) {
               setTimes(times + 1);
             }

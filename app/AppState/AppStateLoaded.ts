@@ -16,14 +16,16 @@ import WalletSeedType from './types/WalletSeedType';
 import SyncingStatusType from './types/SyncingStatusType';
 import DimensionsType from './types/DimensionsType';
 import zecPriceType from './types/zecPriceType';
-import backgroundType from './types/backgroundType';
+import BackgroundType from './types/BackgroundType';
 import { TranslateType } from './types/TranslateType';
+import NetInfoType from './types/NetInfoType';
 
 export default interface AppStateLoaded {
   navigation: StackScreenProps<any>['navigation'];
   route: StackScreenProps<any>['route'];
   dimensions: DimensionsType;
   appState: string;
+  netInfo: NetInfoType;
 
   // Info about the current sync process
   syncingStatusReport: SyncingStatusReportClass;
@@ -53,9 +55,6 @@ export default interface AppStateLoaded {
 
   // getinfo and getblockchaininfo result
   info: InfoType;
-
-  // Is the app rescanning?
-  rescanning: boolean;
 
   // Callbacks for the password dialog box
   //passwordState: PasswordState;
@@ -104,7 +103,7 @@ export default interface AppStateLoaded {
 
   zecPrice: zecPriceType;
   sendAll: boolean;
-  background: backgroundType;
+  background: BackgroundType;
 
   translate: (key: string) => TranslateType;
 
