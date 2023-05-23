@@ -147,7 +147,8 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
           {
             "alignItems": "center",
             "display": "flex",
-            "margin": 10,
+            "margin": 0,
+            "padding": 0,
             "width": "100%",
           }
         }

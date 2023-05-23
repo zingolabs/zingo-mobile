@@ -128,10 +128,10 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal }) => {
       <View key={`tag-${index}`}>
         {expandAddress[index] && index > 0 && <View style={{ height: 1, backgroundColor: colors.primaryDisabled }} />}
         <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
-          {!expandAddress[index] && (
+          {(!expandAddress[index] || item.address === 'fee') && (
             <FontAwesomeIcon style={{ margin: 5 }} size={20} icon={faQrcode} color={item.svg.fill} />
           )}
-          {!!item.tag && <FadeText style={{ marginHorizontal: 10 }}>{item.tag}</FadeText>}
+          {!!item.tag && <FadeText style={{ marginHorizontal: 5 }}>{item.tag}</FadeText>}
           <TouchableOpacity
             onPress={() => {
               if (item.address !== 'fee') {
@@ -197,7 +197,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal }) => {
             <Labels />
           </PieChart>
         </View>
-        <View style={{ display: 'flex', width: '100%', margin: 10, alignItems: 'center' }}>
+        <View style={{ display: 'flex', width: '100%', margin: 0, padding: 0, alignItems: 'center' }}>
           <View>
             {pieAmounts
               .filter(item => item.address === 'fee')
