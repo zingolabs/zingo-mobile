@@ -90,7 +90,7 @@ exports[`Component Transactions - test Transactions - snapshot 1`] = `
           style={
             {
               "color": "rgb(28, 28, 30)",
-              "fontSize": 18,
+              "fontSize": 25.2,
               "paddingBottom": 0,
             }
           }
@@ -459,7 +459,7 @@ exports[`Component Transactions - test Transactions - snapshot 1`] = `
                 style={
                   {
                     "color": "rgb(0, 122, 255)",
-                    "fontSize": 9,
+                    "fontSize": 12.6,
                     "paddingBottom": 0,
                   }
                 }
@@ -615,7 +615,7 @@ exports[`Component Transactions - test Transactions - snapshot 1`] = `
                 style={
                   {
                     "color": "rgb(0, 122, 255)",
-                    "fontSize": 9,
+                    "fontSize": 12.6,
                     "paddingBottom": 0,
                   }
                 }
