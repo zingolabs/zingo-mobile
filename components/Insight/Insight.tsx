@@ -61,7 +61,7 @@ const Labels: React.FunctionComponent<LabelProps> = props => {
               />
               <Circle cx={labelCentroid[0]} cy={labelCentroid[1]} r={15} fill={data.svg.fill} />
               <Text x={labelCentroid[0] - 10} y={labelCentroid[1] + 5}>
-                {(Number(percent) === 0 ? '<1%' : percent) + '%'}
+                {(Number(percent) === 0 ? '<1' : percent) + '%'}
               </Text>
             </G>
           );
@@ -76,13 +76,13 @@ type InsightProps = {
 
 const Insight: React.FunctionComponent<InsightProps> = ({ closeModal }) => {
   const context = useContext(ContextAppLoaded);
-  const { info, translate } = context;
+  const { info, translate, dimensions } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [pieAmounts, setPieAmounts] = useState<DataType[]>([]);
   const [expandAddress, setExpandAddress] = useState<boolean[]>([]);
 
   // eslint-disable-next-line no-bitwise
-  const randomColor = () => ('#' + ((Math.random() * 0xfffff) << 0).toString(16) + '000').slice(0, 7); // lighter colors
+  const randomColor = () => ('#' + ((Math.random() * 0xfffff) << 0).toString(16) + '000000').slice(0, 7); // lighter colors
 
   useEffect(() => {
     (async () => {
@@ -126,20 +126,16 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal }) => {
     const numLines = item.address.length < 40 ? 2 : item.address.length / 30;
     return (
       <View key={`tag-${index}`}>
-        {expandAddress[index] && <View style={{ height: 1, backgroundColor: colors.primaryDisabled }} />}
+        {expandAddress[index] && index > 0 && <View style={{ height: 1, backgroundColor: colors.primaryDisabled }} />}
         <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
-          {(!expandAddress[index] || item.address === 'fee') && (
-            <FontAwesomeIcon style={{ margin: 5 }} size={20} icon={faQrcode} color={item.svg.fill} />
-          )}
-          <FadeText style={{ marginHorizontal: 10 }}>{item.tag}</FadeText>
+          <FontAwesomeIcon style={{ margin: 5 }} size={20} icon={faQrcode} color={item.svg.fill} />
+          {item.tag && <FadeText style={{ marginHorizontal: 10 }}>{item.tag}</FadeText>}
           <TouchableOpacity
             onPress={() => {
-              if (item.address) {
+              if (item.address !== 'fee') {
                 Clipboard.setString(item.address);
                 Toast.show(translate('history.addresscopied') as string, Toast.LONG);
-                if (item.address !== 'fee') {
-                  selectExpandAddress(index);
-                }
+                selectExpandAddress(index);
               }
             }}>
             <View style={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap' }}>
@@ -153,16 +149,20 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal }) => {
                 ))}
             </View>
           </TouchableOpacity>
-          <ZecAmount
-            currencyName={info.currencyName ? info.currencyName : ''}
-            size={15}
-            amtZec={item.value}
-            style={{ opacity: 0.5, marginHorizontal: 5 }}
-          />
-          <RegText>{(Number(percent) === 0 ? '<1' : percent) + '%'}</RegText>
-          {expandAddress[index] && item.address !== 'fee' && (
-            <FontAwesomeIcon style={{ margin: 5 }} size={20} icon={faQrcode} color={item.svg.fill} />
-          )}
+          <View
+            style={{
+              flexDirection: expandAddress[index] && item.address !== 'fee' ? 'column' : 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+            <ZecAmount
+              currencyName={info.currencyName ? info.currencyName : ''}
+              size={15}
+              amtZec={item.value}
+              style={{ opacity: 0.5, marginHorizontal: 5 }}
+            />
+            <RegText>{(Number(percent) === 0 ? '<1' : percent) + '%'}</RegText>
+          </View>
         </View>
         {expandAddress[index] && <View style={{ height: 1, backgroundColor: colors.primaryDisabled }} />}
       </View>
@@ -183,19 +183,24 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal }) => {
       <Header title={translate('insight.title') as string} noBalance={true} noSyncingStatus={true} noDrawMenu={true} />
 
       <ScrollView style={{ maxHeight: '85%' }} contentContainerStyle={{}}>
-        <View style={{ display: 'flex', margin: 20, marginBottom: 30 }}>
-          <PieChart style={{ height: 400 }} data={pieAmounts} innerRadius={50} outerRadius={150} labelRadius={180}>
+        <View style={{ display: 'flex', margin: 20 }}>
+          <PieChart
+            style={{ height: dimensions.width * 0.7 }}
+            data={pieAmounts}
+            innerRadius={dimensions.width * 0.09}
+            outerRadius={dimensions.width * 0.23}
+            labelRadius={dimensions.width * 0.23 + 30}>
             <Labels />
           </PieChart>
         </View>
-        <View style={{ display: 'flex', width: '100%', margin: 20, alignItems: 'center' }}>
+        <View style={{ display: 'flex', width: '100%', margin: 10, alignItems: 'center' }}>
           <View>
             {pieAmounts
               .filter(item => item.address === 'fee')
               .map((item, index) => {
                 return line(item, index);
               })}
-            <View style={{ height: 2, backgroundColor: colors.primary }} />
+            <View style={{ height: 1, backgroundColor: colors.primary }} />
             {pieAmounts
               .filter(item => item.address !== 'fee')
               .map((item, index) => {

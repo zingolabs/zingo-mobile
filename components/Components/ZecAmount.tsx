@@ -36,7 +36,9 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({ color, style, size
     <View style={{ ...style, flexDirection: 'row', alignItems: 'baseline' }}>
       <Text style={{ fontSize: size, color }}>{'\u1647'}</Text>
       <Text style={{ fontSize: size, fontWeight: '700', color }}>{' ' + Utils.toLocaleFloat(splits.bigPart)}</Text>
-      <Text style={{ fontSize: size / 2, color, paddingBottom: alignmentPadding }}>{splits.smallPart}</Text>
+      {splits.smallPart !== '0000' && (
+        <Text style={{ fontSize: size / 2, color, paddingBottom: alignmentPadding }}>{splits.smallPart}</Text>
+      )}
       <Text style={{ fontSize: size, color }}>{' ' + currencyName}</Text>
     </View>
   );
