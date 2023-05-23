@@ -125,47 +125,62 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal }) => {
     // 30 characters per line
     const numLines = item.address.length < 40 ? 2 : item.address.length / 30;
     return (
-      <View key={`tag-${index}`}>
+      <View style={{ width: '100%' }} key={`tag-${index}`}>
         {expandAddress[index] && index > 0 && <View style={{ height: 1, backgroundColor: colors.primaryDisabled }} />}
-        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
-          {(!expandAddress[index] || item.address === 'fee') && (
-            <FontAwesomeIcon style={{ margin: 5 }} size={20} icon={faQrcode} color={item.svg.fill} />
-          )}
-          {!!item.tag && <FadeText style={{ marginHorizontal: 5 }}>{item.tag}</FadeText>}
-          <TouchableOpacity
-            onPress={() => {
-              if (item.address !== 'fee') {
-                Clipboard.setString(item.address);
-                Toast.show(translate('history.addresscopied') as string, Toast.LONG);
-                selectExpandAddress(index);
-              }
-            }}>
-            <View style={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap' }}>
-              {!expandAddress[index] && !!item.address && (
-                <RegText>{item.address.length > 20 ? Utils.trimToSmall(item.address, 10) : item.address}</RegText>
-              )}
-              {expandAddress[index] &&
-                !!item.address &&
-                Utils.splitStringIntoChunks(item.address, Number(numLines.toFixed(0))).map((c: string, idx: number) => (
-                  <RegText color={item.svg.fill} key={idx}>
-                    {c}
-                  </RegText>
-                ))}
-            </View>
-          </TouchableOpacity>
+        <View
+          style={{
+            width: '100%',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            marginBottom: 5,
+          }}>
           <View
             style={{
-              flexDirection: expandAddress[index] && item.address !== 'fee' ? 'column' : 'row',
+              flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'center',
             }}>
+            {(!expandAddress[index] || item.address === 'fee') && (
+              <FontAwesomeIcon style={{ margin: 5 }} size={20} icon={faQrcode} color={item.svg.fill} />
+            )}
+            {!!item.tag && <FadeText style={{ marginHorizontal: 5 }}>{item.tag}</FadeText>}
+            <TouchableOpacity
+              onPress={() => {
+                if (item.address !== 'fee') {
+                  Clipboard.setString(item.address);
+                  Toast.show(translate('history.addresscopied') as string, Toast.LONG);
+                  selectExpandAddress(index);
+                }
+              }}>
+              <View style={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap' }}>
+                {!expandAddress[index] && !!item.address && (
+                  <RegText>{item.address.length > 20 ? Utils.trimToSmall(item.address, 10) : item.address}</RegText>
+                )}
+                {expandAddress[index] &&
+                  !!item.address &&
+                  Utils.splitStringIntoChunks(item.address, Number(numLines.toFixed(0))).map(
+                    (c: string, idx: number) => (
+                      <RegText color={item.svg.fill} key={idx}>
+                        {c}
+                      </RegText>
+                    ),
+                  )}
+              </View>
+            </TouchableOpacity>
+          </View>
+          <View
+            style={{
+              flexDirection: expandAddress[index] && item.address !== 'fee' ? 'column-reverse' : 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+            <RegText>{(Number(percent) === 0 ? '<1' : percent) + '%'}</RegText>
             <ZecAmount
               currencyName={info.currencyName ? info.currencyName : ''}
               size={15}
               amtZec={item.value}
               style={{ opacity: 0.5, marginHorizontal: 5 }}
             />
-            <RegText>{(Number(percent) === 0 ? '<1' : percent) + '%'}</RegText>
           </View>
         </View>
         {expandAddress[index] && <View style={{ height: 1, backgroundColor: colors.primaryDisabled }} />}
@@ -197,8 +212,8 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal }) => {
             <Labels />
           </PieChart>
         </View>
-        <View style={{ display: 'flex', width: '100%', margin: 0, padding: 0, alignItems: 'center' }}>
-          <View>
+        <View style={{ display: 'flex', marginHorizontal: 5, padding: 0, alignItems: 'center' }}>
+          <View style={{ width: '100%' }}>
             {pieAmounts
               .filter(item => item.address === 'fee')
               .map((item, index) => {

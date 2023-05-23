@@ -147,13 +147,18 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
           {
             "alignItems": "center",
             "display": "flex",
-            "margin": 0,
+            "marginHorizontal": 5,
             "padding": 0,
-            "width": "100%",
           }
         }
       >
-        <View>
+        <View
+          style={
+            {
+              "width": "100%",
+            }
+          }
+        >
           <View
             style={
               {
