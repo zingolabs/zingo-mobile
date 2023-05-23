@@ -128,8 +128,10 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal }) => {
       <View key={`tag-${index}`}>
         {expandAddress[index] && index > 0 && <View style={{ height: 1, backgroundColor: colors.primaryDisabled }} />}
         <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
-          <FontAwesomeIcon style={{ margin: 5 }} size={20} icon={faQrcode} color={item.svg.fill} />
-          {item.tag && <FadeText style={{ marginHorizontal: 10 }}>{item.tag}</FadeText>}
+          {!expandAddress[index] && (
+            <FontAwesomeIcon style={{ margin: 5 }} size={20} icon={faQrcode} color={item.svg.fill} />
+          )}
+          {!!item.tag && <FadeText style={{ marginHorizontal: 10 }}>{item.tag}</FadeText>}
           <TouchableOpacity
             onPress={() => {
               if (item.address !== 'fee') {
@@ -145,7 +147,9 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal }) => {
               {expandAddress[index] &&
                 !!item.address &&
                 Utils.splitStringIntoChunks(item.address, Number(numLines.toFixed(0))).map((c: string, idx: number) => (
-                  <RegText key={idx}>{c}</RegText>
+                  <RegText color={item.svg.fill} key={idx}>
+                    {c}
+                  </RegText>
                 ))}
             </View>
           </TouchableOpacity>

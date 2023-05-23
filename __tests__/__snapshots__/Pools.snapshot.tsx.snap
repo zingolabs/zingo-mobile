@@ -228,17 +228,6 @@ exports[`Component Info - test Matches the snapshot Info 1`] = `
                 style={
                   {
                     "color": undefined,
-                    "fontSize": 9,
-                    "paddingBottom": 0,
-                  }
-                }
-              >
-                0000
-              </Text>
-              <Text
-                style={
-                  {
-                    "color": undefined,
                     "fontSize": 18,
                   }
                 }
@@ -300,17 +289,6 @@ exports[`Component Info - test Matches the snapshot Info 1`] = `
                 }
               >
                  0.3000
-              </Text>
-              <Text
-                style={
-                  {
-                    "color": "red",
-                    "fontSize": 9,
-                    "paddingBottom": 0,
-                  }
-                }
-              >
-                0000
               </Text>
               <Text
                 style={
@@ -415,17 +393,6 @@ exports[`Component Info - test Matches the snapshot Info 1`] = `
                 style={
                   {
                     "color": undefined,
-                    "fontSize": 9,
-                    "paddingBottom": 0,
-                  }
-                }
-              >
-                0000
-              </Text>
-              <Text
-                style={
-                  {
-                    "color": undefined,
                     "fontSize": 18,
                   }
                 }
@@ -487,17 +454,6 @@ exports[`Component Info - test Matches the snapshot Info 1`] = `
                 }
               >
                  0.2000
-              </Text>
-              <Text
-                style={
-                  {
-                    "color": "red",
-                    "fontSize": 9,
-                    "paddingBottom": 0,
-                  }
-                }
-              >
-                0000
               </Text>
               <Text
                 style={

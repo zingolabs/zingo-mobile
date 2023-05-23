@@ -121,9 +121,7 @@ describe('Component Components - test', () => {
     expect(text.children[1].type).toBe('Text');
     expect(text.children[1].children[0]).toBe(' 0.0000');
     expect(text.children[2].type).toBe('Text');
-    expect(text.children[2].children[0]).toBe('0000');
-    expect(text.children[3].type).toBe('Text');
-    expect(text.children[3].children[0]).toBe(' ZEC');
+    expect(text.children[2].children[0]).toBe(' ZEC');
   });
 
   test('ZecAmount - amtZec -1.123456789 rounded up result -1.12345679 ZEC', () => {
