@@ -82,9 +82,6 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal }) => {
   const [expandAddress, setExpandAddress] = useState<boolean[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
-  // eslint-disable-next-line no-bitwise
-  const randomColor = () => ('#' + ((Math.random() * 0xfffff) << 0).toString(16) + '000000').slice(0, 7); // lighter colors
-
   useEffect(() => {
     (async () => {
       setLoading(true);
@@ -98,6 +95,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal }) => {
           amounts.push({ value: value / 10 ** 8, address: key, tag: '' });
         }
       });
+      const randomColors = Utils.generateColorList(amounts.length);
       const newPieAmounts: DataType[] = amounts
         .sort((a, b) => b.value - a.value)
         .map((item, index) => {
@@ -105,7 +103,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal }) => {
             value: item.value,
             address: item.address,
             tag: item.tag,
-            svg: { fill: randomColor() },
+            svg: { fill: item.address === 'fee' ? colors.zingo : randomColors[index] },
             key: `pie-${index}`,
           };
         });
@@ -114,7 +112,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal }) => {
       setExpandAddress(newExpandAddress);
       setLoading(false);
     })();
-  }, []);
+  }, [colors.zingo]);
 
   const selectExpandAddress = (index: number) => {
     let newExpandAddress = Array(expandAddress.length).fill(false);

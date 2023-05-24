@@ -127,6 +127,9 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
   </View>
   <RCTScrollView
     contentContainerStyle={{}}
+    indicatorStyle="white"
+    persistentScrollbar={true}
+    showsVerticalScrollIndicator={true}
     style={
       {
         "maxHeight": "85%",
@@ -141,7 +144,12 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
             "margin": 20,
           }
         }
-      />
+      >
+        <ActivityIndicator
+          color="rgb(0, 122, 255)"
+          size="large"
+        />
+      </View>
       <View
         style={
           {
@@ -158,16 +166,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
               "width": "100%",
             }
           }
-        >
-          <View
-            style={
-              {
-                "backgroundColor": "rgb(0, 122, 255)",
-                "height": 1,
-              }
-            }
-          />
-        </View>
+        />
       </View>
     </View>
   </RCTScrollView>

@@ -2,6 +2,8 @@ import { getNumberFormatSettings } from 'react-native-localize';
 import { ZecAmountSplitType } from './types/ZecAmountSplitType';
 import { TranslateType } from '../AppState';
 
+import randomColor from 'randomcolor';
+
 export default class Utils {
   static trimToSmall(addr?: string, numChars?: number): string {
     if (!addr) {
@@ -163,5 +165,20 @@ export default class Utils {
 
   static getBlockExplorerTxIDURL(txid: string): string {
     return `https://blockchair.com/zcash/transaction/${txid}`;
+  }
+
+  static generateColorList(numColors: number): string[] {
+    const colorList: string[] = [];
+
+    for (let i = 0; i < numColors; i++) {
+      const color = randomColor({
+        luminosity: 'bright', // Define la luminosidad de los colores generados
+        format: 'hex', // Formato de color en hexadecimal
+      });
+
+      colorList.push(color);
+    }
+
+    return colorList;
   }
 }
