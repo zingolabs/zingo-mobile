@@ -9,6 +9,7 @@ import zecPriceType from './types/zecPriceType';
 import BackgroundType from './types/BackgroundType';
 import { TranslateType } from './types/TranslateType';
 import NetInfoType from './types/NetInfoType';
+import BackgroundErrorType from './types/BackgroundErrorType';
 
 export default interface AppStateLoading {
   navigation: StackScreenProps<any>['navigation'];
@@ -33,6 +34,7 @@ export default interface AppStateLoading {
   background: BackgroundType;
 
   translate: (key: string) => TranslateType;
+  backgroundError: BackgroundErrorType;
 
   // eslint-disable-next-line semi
 }

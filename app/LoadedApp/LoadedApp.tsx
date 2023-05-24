@@ -296,6 +296,10 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
         console.log('background no in storage');
         await this.rpc.configure();
         console.log('configure start timers');
+        if (this.state.backgroundError && (this.state.backgroundError.title || this.state.backgroundError.error)) {
+          Alert.alert(this.state.backgroundError.title, this.state.backgroundError.error);
+          this.setBackgroundError('', '');
+        }
       }
       if (nextAppState.match(/inactive|background/) && this.state.appState === 'active') {
         console.log('App is gone to the background!');
@@ -883,7 +887,12 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     //console.log("jc change", resultStr);
     if (resultStr.toLowerCase().startsWith('error')) {
       //console.log(`Error change wallet. ${resultStr}`);
-      Alert.alert(this.props.translate('loadedapp.changingwallet-label') as string, resultStr);
+      const background = await AsyncStorage.getItem('@background');
+      if (background === 'yes') {
+        this.setBackgroundError(this.props.translate('loadedapp.changingwallet-label') as string, resultStr);
+      } else {
+        Alert.alert(this.props.translate('loadedapp.changingwallet-label') as string, resultStr);
+      }
       return;
     }
 
@@ -899,7 +908,12 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     //console.log("jc restore", resultStr);
     if (resultStr.toLowerCase().startsWith('error')) {
       //console.log(`Error restore backup wallet. ${resultStr}`);
-      Alert.alert(this.props.translate('loadedapp.restoringwallet-label') as string, resultStr);
+      const background = await AsyncStorage.getItem('@background');
+      if (background === 'yes') {
+        this.setBackgroundError(this.props.translate('loadedapp.restoringwallet-label') as string, resultStr);
+      } else {
+        Alert.alert(this.props.translate('loadedapp.restoringwallet-label') as string, resultStr);
+      }
       return;
     }
 
@@ -951,7 +965,12 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     //console.log("jc change", resultStr);
     if (resultStr2.toLowerCase().startsWith('error')) {
       //console.log(`Error change wallet. ${resultStr}`);
-      Alert.alert(this.props.translate('loadedapp.changingwallet-label') as string, resultStr2);
+      const background = await AsyncStorage.getItem('@background');
+      if (background === 'yes') {
+        this.setBackgroundError(this.props.translate('loadedapp.changingwallet-label') as string, resultStr2);
+      } else {
+        Alert.alert(this.props.translate('loadedapp.changingwallet-label') as string, resultStr2);
+      }
       //return;
     }
 
@@ -971,6 +990,10 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
   poolsMoreInfoOnClick = async () => {
     this.setState({ poolsModalVisible: true });
+  };
+
+  setBackgroundError = (title: string, error: string) => {
+    this.setState({ backgroundError: { title, error } });
   };
 
   render() {
@@ -1273,6 +1296,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                       syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
                       poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
                       setZecPrice={this.setZecPrice}
+                      setBackgroundError={this.setBackgroundError}
                     />
                   </Suspense>
                 </>

@@ -153,6 +153,7 @@ describe('Component Send - test', () => {
           poolsMoreInfoOnClick={onFunction}
           syncingStatusMoreInfoOnClick={onFunction}
           setZecPrice={onFunction}
+          setBackgroundError={onFunction}
         />
       </ContextAppLoadedProvider>,
     );

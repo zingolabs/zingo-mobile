@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { SafeAreaView, View } from 'react-native';
+import { ActivityIndicator, SafeAreaView, View } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
 import RegText from '../../../components/Components/RegText';
@@ -39,6 +39,9 @@ const ComputingTxContent: React.FunctionComponent = () => {
         }}>
         <RegText>{translate('loadedapp.computingtx') as string}</RegText>
         {!(progress && progress.sendInProgress) && <RegText>{translate('loadedapp.syncing') as string}</RegText>}
+        {syncingStatusReport.inProgress &&
+          syncingStatusReport.currentBlock > 0 &&
+          !!syncingStatusReport.lastBlockServer && <ActivityIndicator size="large" color={colors.primary} />}
         {!(__DEV__ && progress && progress.sendInProgress) && (
           <>
             {syncingStatusReport.inProgress && syncingStatusReport.currentBatch > 0 && (

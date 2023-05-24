@@ -27,6 +27,7 @@ import PriceFetcher from '../Components/PriceFetcher';
 import RPC from '../../app/rpc';
 import Header from '../Header';
 import { RPCParseAddressType } from '../../app/rpc/types/RPCParseAddressType';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type SendProps = {
   setSendPageState: (sendPageState: SendPageStateClass) => void;
@@ -38,6 +39,7 @@ type SendProps = {
   syncingStatusMoreInfoOnClick: () => void;
   poolsMoreInfoOnClick: () => void;
   setZecPrice: (p: number, d: number) => void;
+  setBackgroundError: (title: string, error: string) => void;
 };
 
 const Send: React.FunctionComponent<SendProps> = ({
@@ -50,6 +52,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   syncingStatusMoreInfoOnClick,
   poolsMoreInfoOnClick,
   setZecPrice,
+  setBackgroundError,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, info, totalBalance, sendPageState, navigation, zecPrice, sendAll, netInfo } = context;
@@ -358,6 +361,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           }, 1000);
         }
       } catch (err) {
+        setComputingModalVisible(false);
         const error = err as string;
 
         let customError = '';
@@ -373,16 +377,23 @@ const Send: React.FunctionComponent<SendProps> = ({
           customError = translate('send.dust-error') as string;
         }
 
-        setTimeout(() => {
+        setTimeout(async () => {
           //console.log('sendtx error', error);
-          Alert.alert(
-            translate('send.sending-error') as string,
-            `${customError ? customError : error}`,
-            [{ text: 'OK', onPress: () => setComputingModalVisible(false) }],
-            {
-              cancelable: false,
-            },
-          );
+          // if the App is in background I need to store the error
+          // and when the App come back to foreground shows it to the user.
+          const background = await AsyncStorage.getItem('@background');
+          if (background === 'yes') {
+            setBackgroundError(translate('send.sending-error') as string, `${customError ? customError : error}`);
+          } else {
+            Alert.alert(
+              translate('send.sending-error') as string,
+              `${customError ? customError : error}`,
+              [{ text: 'OK', onPress: () => setComputingModalVisible(false) }],
+              {
+                cancelable: false,
+              },
+            );
+          }
         }, 1000);
       }
     });
