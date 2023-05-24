@@ -356,6 +356,12 @@ const Send: React.FunctionComponent<SendProps> = ({
 
         if (navigation) {
           navigation.navigate(translate('loadedapp.wallet-menu') as string);
+        }
+
+        const background = await AsyncStorage.getItem('@background');
+        if (background === 'yes') {
+          setBackgroundError(translate('send.confirm-title') as string, `${translate('send.Broadcast')} ${txid}`);
+        } else {
           setTimeout(() => {
             Toast.show(`${translate('send.Broadcast')} ${txid}`, Toast.LONG);
           }, 1000);
