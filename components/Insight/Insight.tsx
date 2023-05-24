@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
-import { View, ScrollView, SafeAreaView, TouchableOpacity } from 'react-native';
+import { View, ScrollView, SafeAreaView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { PieChart } from 'react-native-svg-charts';
 import { Circle, G, Line, Text } from 'react-native-svg';
@@ -80,12 +80,14 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal }) => {
   const { colors } = useTheme() as unknown as ThemeType;
   const [pieAmounts, setPieAmounts] = useState<DataType[]>([]);
   const [expandAddress, setExpandAddress] = useState<boolean[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
   // eslint-disable-next-line no-bitwise
   const randomColor = () => ('#' + ((Math.random() * 0xfffff) << 0).toString(16) + '000000').slice(0, 7); // lighter colors
 
   useEffect(() => {
     (async () => {
+      setLoading(true);
       const resultStr = await RPCModule.execute('value_to_address', '');
       console.log('#################', resultStr);
       const resultJSON = await JSON.parse(resultStr);
@@ -110,6 +112,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal }) => {
       setPieAmounts(newPieAmounts);
       const newExpandAddress = Array(newPieAmounts.length).fill(false);
       setExpandAddress(newExpandAddress);
+      setLoading(false);
     })();
   }, []);
 
@@ -208,28 +211,36 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal }) => {
         style={{ maxHeight: '85%' }}
         contentContainerStyle={{}}>
         <View style={{ display: 'flex', margin: 20 }}>
-          <PieChart
-            style={{ height: dimensions.width * 0.7 }}
-            data={pieAmounts}
-            innerRadius={dimensions.width * 0.09}
-            outerRadius={dimensions.width * 0.23}
-            labelRadius={dimensions.width * 0.23 + 30}>
-            <Labels />
-          </PieChart>
+          {loading ? (
+            <ActivityIndicator size="large" color={colors.primary} />
+          ) : (
+            <PieChart
+              style={{ height: dimensions.width * 0.7 }}
+              data={pieAmounts}
+              innerRadius={dimensions.width * 0.09}
+              outerRadius={dimensions.width * 0.23}
+              labelRadius={dimensions.width * 0.23 + 30}>
+              <Labels />
+            </PieChart>
+          )}
         </View>
         <View style={{ display: 'flex', marginHorizontal: 5, padding: 0, alignItems: 'center' }}>
           <View style={{ width: '100%' }}>
-            {pieAmounts
-              .filter(item => item.address === 'fee')
-              .map((item, index) => {
-                return line(item, index);
-              })}
-            <View style={{ height: 1, backgroundColor: colors.primary }} />
-            {pieAmounts
-              .filter(item => item.address !== 'fee')
-              .map((item, index) => {
-                return line(item, index);
-              })}
+            {!loading && (
+              <>
+                {pieAmounts
+                  .filter(item => item.address === 'fee')
+                  .map((item, index) => {
+                    return line(item, index);
+                  })}
+                <View style={{ height: 1, backgroundColor: colors.primary }} />
+                {pieAmounts
+                  .filter(item => item.address !== 'fee')
+                  .map((item, index) => {
+                    return line(item, index);
+                  })}
+              </>
+            )}
           </View>
         </View>
       </ScrollView>
