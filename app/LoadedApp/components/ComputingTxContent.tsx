@@ -38,10 +38,14 @@ const ComputingTxContent: React.FunctionComponent = () => {
           height: '70%',
         }}>
         <RegText>{translate('loadedapp.computingtx') as string}</RegText>
-        {!(progress && progress.sendInProgress) && <RegText>{translate('loadedapp.syncing') as string}</RegText>}
-        {syncingStatusReport.inProgress &&
-          syncingStatusReport.currentBlock > 0 &&
-          !!syncingStatusReport.lastBlockServer && <ActivityIndicator size="large" color={colors.primary} />}
+        {!(progress && progress.sendInProgress) && (
+          <>
+            <RegText>{translate('loadedapp.syncing') as string}</RegText>
+            {syncingStatusReport.inProgress &&
+              syncingStatusReport.currentBlock > 0 &&
+              !!syncingStatusReport.lastBlockServer && <ActivityIndicator size="large" color={colors.primary} />}
+          </>
+        )}
         {!(__DEV__ && progress && progress.sendInProgress) && (
           <>
             {syncingStatusReport.inProgress && syncingStatusReport.currentBatch > 0 && (
