@@ -10,6 +10,9 @@
   "menudrawer-acc": "Open Menu Drawer",
   "menu-acc": "Open Menu",
   "donation": "Thanks for supporting Zingo!",
+  "insight": {
+    "title": "Financial Insight (sent)"
+  },
   "loadingapp": {
     "actualserver": "Actual server:",
     "changeserver": "CHANGE SERVER",
@@ -32,6 +35,7 @@
     "changewallet": "Change to another Wallet",
     "restorebackupwallet": "Restore Last Wallet Backup",
     "fundpools": "Fund Pools",
+    "insight": "Financial Insight (sent)",
     "restoremainnet-error": "This option is only available for 'Mainnet' servers.",
     "changeservernew-error": "Error trying to change the server to the new one: ",
     "readingwallet-error": "Error trying to read the wallet with the new server:",

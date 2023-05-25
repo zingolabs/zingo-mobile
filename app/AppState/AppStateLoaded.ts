@@ -93,6 +93,7 @@ export default interface AppStateLoaded {
 
   syncReportModalVisible: boolean;
   poolsModalVisible: boolean;
+  insightModalVisible: boolean;
 
   newServer: string;
 

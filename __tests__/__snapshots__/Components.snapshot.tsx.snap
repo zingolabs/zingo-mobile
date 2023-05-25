@@ -141,7 +141,7 @@ exports[`Component Components - test ZecAmount - snapshot 1`] = `
     style={
       {
         "color": "red",
-        "fontSize": 10,
+        "fontSize": 14,
         "paddingBottom": 0,
       }
     }

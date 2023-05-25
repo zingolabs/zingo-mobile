@@ -386,17 +386,6 @@ exports[`Component Send - test Send - snapshot 1`] = `
                       style={
                         {
                           "color": "red",
-                          "fontSize": 7.5,
-                          "paddingBottom": 0,
-                        }
-                      }
-                    >
-                      0000
-                    </Text>
-                    <Text
-                      style={
-                        {
-                          "color": "red",
                           "fontSize": 15,
                         }
                       }

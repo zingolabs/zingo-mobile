@@ -22,7 +22,6 @@ import { RPCSaplingNoteType } from './types/RPCSaplingNoteType';
 import { RPCUtxoNoteType } from './types/RPCUtxoNoteType';
 import { RPCTransactionType } from './types/RPCTransationType';
 import { RPCOutgoingMetadataType } from './types/RPCOutgoingMetadataType';
-import { Platform } from 'react-native';
 import { RPCInfoType } from './types/RPCInfoType';
 import { RPCDefaultFeeType } from './types/RPCDefaultFeeType';
 import { RPCWalletHeight } from './types/RPCWalletHeightType';
@@ -41,7 +40,6 @@ export default class RPC {
   fnSetSyncingStatus: (syncingStatus: SyncingStatusType) => void;
   fnSetWalletSettings: (settings: WalletSettingsClass) => void;
   translate: (key: string) => TranslateType;
-  fetchBackgroundSyncing: () => void;
   keepAwake: (keep: boolean) => void;
 
   refreshTimerID?: NodeJS.Timeout;
@@ -77,7 +75,6 @@ export default class RPC {
     fnSetInfo: (info: InfoType) => void,
     fnSetSyncingStatus: (syncingStatus: SyncingStatusType) => void,
     translate: (key: string) => TranslateType,
-    fetchBackgroundSyncing: () => void,
     keepAwake: (keep: boolean) => void,
   ) {
     this.fnSetSyncingStatusReport = fnSetSyncingStatusReport;
@@ -88,7 +85,6 @@ export default class RPC {
     this.fnSetInfo = fnSetInfo;
     this.fnSetSyncingStatus = fnSetSyncingStatus;
     this.translate = translate;
-    this.fetchBackgroundSyncing = fetchBackgroundSyncing;
     this.keepAwake = keepAwake;
 
     this.updateDataLock = false;
@@ -632,11 +628,6 @@ export default class RPC {
     // And fetch the rest of the data.
     await this.loadWalletData();
 
-    if (Platform.OS === 'ios') {
-      // this file only exists in IOS BS.
-      this.fetchBackgroundSyncing();
-    }
-
     //console.log(`Finished update data at ${lastServerBlockHeight}`);
     this.updateDataLock = false;
   }
@@ -665,8 +656,6 @@ export default class RPC {
       return;
     }
 
-    //console.log(fullRefresh, fullRescan, this.lastWalletBlockHeight, this.lastServerBlockHeight, this.inRefresh);
-
     // if it's sending now, don't fire the sync process.
     if (
       fullRefresh ||
@@ -675,8 +664,7 @@ export default class RPC {
       this.lastWalletBlockHeight < this.lastServerBlockHeight
     ) {
       // If the latest block height has changed, make sure to sync. This will happen in a new thread
-      this.inRefresh = true;
-      // here we can keep the screen alive...
+      this.setInRefresh(true);
       this.keepAwake(true);
 
       this.prevProgress = 0;
@@ -735,7 +723,7 @@ export default class RPC {
 
         // syncronize status
         if (this.syncStatusTimerID) {
-          this.inRefresh = ss.in_progress;
+          this.setInRefresh(ss.in_progress);
         }
 
         // if the sync_id change then reset the %

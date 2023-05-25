@@ -121,9 +121,7 @@ describe('Component Components - test', () => {
     expect(text.children[1].type).toBe('Text');
     expect(text.children[1].children[0]).toBe(' 0.0000');
     expect(text.children[2].type).toBe('Text');
-    expect(text.children[2].children[0]).toBe('0000');
-    expect(text.children[3].type).toBe('Text');
-    expect(text.children[3].children[0]).toBe(' ZEC');
+    expect(text.children[2].children[0]).toBe(' ZEC');
   });
 
   test('ZecAmount - amtZec -1.123456789 rounded up result -1.12345679 ZEC', () => {
@@ -169,7 +167,7 @@ describe('Component Components - test', () => {
     expect(text.children[3].props.style.color).toBe('red');
   });
 
-  test('ZecAmount - size 11 result same and same / 2', () => {
+  test('ZecAmount - size 11 result same and same * 0.7', () => {
     const text: any = render(<ZecAmount size={11} currencyName={'ZEC'} />).toJSON();
     expect(text.type).toBe('View');
     expect(text.children[0].type).toBe('Text');
@@ -180,7 +178,7 @@ describe('Component Components - test', () => {
     expect(text.children[1].props.style.fontSize).toBe(11);
     expect(text.children[2].type).toBe('Text');
     expect(text.children[2].children).toBe(null);
-    expect(text.children[2].props.style.fontSize).toBe(11 / 2);
+    expect(text.children[2].props.style.fontSize).toBe(11 * 0.7);
     expect(text.children[3].type).toBe('Text');
     expect(text.children[3].children[0]).toBe(' ZEC');
     expect(text.children[3].props.style.fontSize).toBe(11);
