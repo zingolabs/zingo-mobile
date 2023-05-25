@@ -1,5 +1,6 @@
 #!/bin/bash
 
+echo ""
 cd rust
 ./build.sh
 cd ..
@@ -11,3 +12,4 @@ echo -e "\nBuilding APKs..."
 cd android
 ./gradlew assembleDebug -Psplitapk=true
 cd ..
+
