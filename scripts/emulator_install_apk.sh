@@ -3,8 +3,6 @@ set -e
 
 source ./scripts/emulator_read_target.sh
 
-adb -s emulator-5554 install -r -t -d --abi "${abi}" "android/app/build/outputs/apk/debug/app-${abi}-debug.apk" |& tee "${output_dir}/emulator_install_apk.txt"
-
 echo -e "\nInstalling APKs..."
 i=0
 step_complete=false
