@@ -38,7 +38,7 @@ if killall -9 node &> /dev/null; then
     echo -e "\nAll node processes killed."
     echo -e "\nRestarting react native..."
 fi
-nohup yarn react-native start |& tee "${output_dir}/react-native_start.txt" &
+nohup yarn react-native start &> "${output_dir}/react-native_start.txt" &
 
 echo -e "\nWaiting for react-native/node/metro..."
 wait_for $timeout_seconds check_metro_server

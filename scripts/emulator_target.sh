@@ -113,3 +113,4 @@ echo $api_level > "${output_dir}/target_api_level.txt"
 echo $api_target > "${output_dir}/target_api.txt"
 echo $avd_device > "${output_dir}/target_avd_device.txt"
 echo $arch > "${output_dir}/target_arch.txt"
+
