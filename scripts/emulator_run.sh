@@ -1,15 +1,7 @@
 #!/bin/bash
+set -e
 
-output_dir="android/app/build/outputs/emulator_output"
-
-api_level=`cat ./${output_dir}/target_api_level.txt`
-api_target=`cat ./${output_dir}/target_api.txt`
-avd_device=`cat ./${output_dir}/target_avd_device.txt`
-arch=`cat ./${output_dir}/target_arch.txt`
-
-avd_name="${avd_device}-android-${api_level}_${api_target}_${arch}"
-sdk="system-images;android-${api_level};${api_target};${arch}"
-platform="platforms;android-${api_level}"
+source ./scripts/emulator_read_target.sh
 
 timeout_seconds=1800  # default timeout set to 30 minutes
 

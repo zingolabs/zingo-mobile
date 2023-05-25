@@ -1,13 +1,7 @@
 #!/bin/bash
+set -e
 
-output_dir="android/app/build/outputs/emulator_output"
-
-api_level=`cat ./${output_dir}/target_api_level.txt`
-api_target=`cat ./${output_dir}/target_api.txt`
-arch=`cat ./${output_dir}/target_arch.txt`
-
-sdk="system-images;android-${api_level};${api_target};${arch}"
-platform="platforms;android-${api_level}"
+source ./scripts/emulator_read_target.sh
 
 sdkmanager --version &>> /dev/null
 if [ ! $? -eq 0 ]; then

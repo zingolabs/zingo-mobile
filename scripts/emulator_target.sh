@@ -10,7 +10,7 @@ valid_api_levels=("23" "24" "25" "26" "27" "28" "29" "30" "31" "32" "33")
 valid_api_targets=("default" "google_apis" "google_apis_playstore" "google_atd" "google-tv" \
     "aosp_atd" "android-tv" "android-desktop" "android-wear" "android-wear-cn")
 
-while getopts 'a:l:t:sx:h' OPTION; do
+while getopts 'a:l:t:h' OPTION; do
     case "$OPTION" in
         a)
             abi="$OPTARG"

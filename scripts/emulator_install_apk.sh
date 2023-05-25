@@ -1,8 +1,7 @@
 #!/bin/bash
+set -e
 
-output_dir="android/app/build/outputs/emulator_output"
-
-abi=`cat ./${output_dir}/target_abi.txt`
+source ./scripts/emulator_read_target.sh
 
 adb -s emulator-5554 install -r -t -d --abi "${abi}" "android/app/build/outputs/apk/debug/app-${abi}-debug.apk" |& tee "${output_dir}/emulator_install_apk.txt"
 
