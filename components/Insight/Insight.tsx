@@ -48,7 +48,7 @@ const Labels: React.FunctionComponent<LabelProps> = props => {
       {!!slices &&
         slices.map((slice: sliceType, index: number) => {
           const { labelCentroid, pieCentroid, data } = slice;
-          const percent = ((100 * data.value) / totalValue).toFixed(0);
+          const percent = (100 * data.value) / totalValue;
 
           return (
             <G key={index}>
@@ -60,8 +60,8 @@ const Labels: React.FunctionComponent<LabelProps> = props => {
                 stroke={data.svg.fill}
               />
               <Circle cx={labelCentroid[0]} cy={labelCentroid[1]} r={15} fill={data.svg.fill} />
-              <Text x={labelCentroid[0] - 10} y={labelCentroid[1] + 5}>
-                {(Number(percent) === 0 ? '<1' : percent) + '%'}
+              <Text x={labelCentroid[0] - (percent === 100 ? 15 : 10)} y={labelCentroid[1] + 5}>
+                {getPercent(percent)}
               </Text>
             </G>
           );
@@ -69,6 +69,10 @@ const Labels: React.FunctionComponent<LabelProps> = props => {
     </>
   );
 };
+
+const getPercent = (percent: number) => {
+  return ((percent < 1 ? '<1' : percent < 100 && percent >= 99 ? '99' : percent.toFixed(0)) + '%');
+}
 
 type InsightProps = {
   closeModal: () => void;
@@ -122,9 +126,9 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal }) => {
 
   const line = (item: DataType, index: number) => {
     const totalValue = pieAmounts ? pieAmounts.reduce((acc, curr) => acc + curr.value, 0) : 0;
-    const percent = ((100 * item.value) / totalValue).toFixed(0);
+    const percent = (100 * item.value) / totalValue;
     // 30 characters per line
-    const numLines = item.address.length < 40 ? 2 : item.address.length / 30;
+    const numLines = item.address.length < 40 ? 2 : item.address.length / (dimensions.width < 500 ? 21 : 30);
     return (
       <View style={{ width: '100%' }} key={`tag-${index}`}>
         {expandAddress[index] && index > 0 && <View style={{ height: 1, backgroundColor: colors.primaryDisabled }} />}
@@ -155,7 +159,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal }) => {
               }}>
               <View style={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap' }}>
                 {!expandAddress[index] && !!item.address && (
-                  <RegText>{item.address.length > 20 ? Utils.trimToSmall(item.address, 10) : item.address}</RegText>
+                  <RegText>{item.address.length > (dimensions.width < 500 ? 10 : 20) ? Utils.trimToSmall(item.address, dimensions.width < 500 ? 5 : 10) : item.address}</RegText>
                 )}
                 {expandAddress[index] &&
                   !!item.address &&
@@ -175,7 +179,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal }) => {
               alignItems: 'center',
               justifyContent: 'center',
             }}>
-            <RegText>{(Number(percent) === 0 ? '<1' : percent) + '%'}</RegText>
+            <RegText>{getPercent(percent)}</RegText>
             <ZecAmount
               currencyName={info.currencyName ? info.currencyName : ''}
               size={15}
