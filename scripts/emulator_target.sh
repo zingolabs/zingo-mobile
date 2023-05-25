@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 avd_device="pixel_2"
 set_abi=false
