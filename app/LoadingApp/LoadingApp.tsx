@@ -249,12 +249,11 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
             this.navigateToLoaded();
           } else {
             this.setState({ screen: 1 });
-            const background = await AsyncStorage.getItem('@background');
-            if (background === 'yes') {
-              this.setBackgroundError(this.props.translate('loadingapp.readingwallet-label') as string, result);
-            } else {
-              Alert.alert(this.props.translate('loadingapp.readingwallet-label') as string, result);
-            }
+            createAlert(
+              this.setBackgroundError,
+              this.props.translate('loadingapp.readingwallet-label') as string,
+              result,
+            );
           }
         } else {
           this.setState({ screen: 1 });

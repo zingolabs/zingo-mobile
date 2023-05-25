@@ -381,7 +381,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           customError = translate('send.dust-error') as string;
         }
 
-        setTimeout(async () => {
+        setTimeout(() => {
           //console.log('sendtx error', error);
           // if the App is in background I need to store the error
           // and when the App come back to foreground shows it to the user.
