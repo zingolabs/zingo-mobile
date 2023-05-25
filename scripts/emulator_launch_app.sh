@@ -28,10 +28,10 @@ function wait_for() {
 }
 
 # Store emulator info and start logging
-adb -s emulator-5555 shell getprop &> "${output_dir}/getprop.txt"
-adb -s emulator-5555 shell cat /proc/meminfo &> "${output_dir}/meminfo.txt"
-adb -s emulator-5555 shell cat /proc/cpuinfo &> "${output_dir}/cpuinfo.txt"
-adb -s emulator-5555 shell logcat -v threadtime -b main &> "${output_dir}/logcat.txt" &
+adb -s emulator-5554 shell getprop &> "${output_dir}/getprop.txt"
+adb -s emulator-5554 shell cat /proc/meminfo &> "${output_dir}/meminfo.txt"
+adb -s emulator-5554 shell cat /proc/cpuinfo &> "${output_dir}/cpuinfo.txt"
+adb -s emulator-5554 shell logcat -v threadtime -b main &> "${output_dir}/logcat.txt" &
 
 # Start react-native
 if killall -9 node &> /dev/null; then
