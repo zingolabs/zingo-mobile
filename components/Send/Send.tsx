@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useRef, useCallback, useContext } from 'react';
-import { View, ScrollView, Modal, Alert, Keyboard, TextInput, TouchableOpacity, Platform } from 'react-native';
+import { View, ScrollView, Modal, Keyboard, TextInput, TouchableOpacity, Platform } from 'react-native';
 import { faQrcode, faCheck, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme, useIsFocused } from '@react-navigation/native';
@@ -27,6 +27,7 @@ import PriceFetcher from '../Components/PriceFetcher';
 import RPC from '../../app/rpc';
 import Header from '../Header';
 import { RPCParseAddressType } from '../../app/rpc/types/RPCParseAddressType';
+import { createAlert } from '../../app/createAlert';
 
 type SendProps = {
   setSendPageState: (sendPageState: SendPageStateClass) => void;
@@ -38,6 +39,7 @@ type SendProps = {
   syncingStatusMoreInfoOnClick: () => void;
   poolsMoreInfoOnClick: () => void;
   setZecPrice: (p: number, d: number) => void;
+  setBackgroundError: (title: string, error: string) => void;
 };
 
 const Send: React.FunctionComponent<SendProps> = ({
@@ -50,6 +52,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   syncingStatusMoreInfoOnClick,
   poolsMoreInfoOnClick,
   setZecPrice,
+  setBackgroundError,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, info, totalBalance, sendPageState, navigation, zecPrice, sendAll, netInfo } = context;
@@ -353,11 +356,16 @@ const Send: React.FunctionComponent<SendProps> = ({
 
         if (navigation) {
           navigation.navigate(translate('loadedapp.wallet-menu') as string);
-          setTimeout(() => {
-            Toast.show(`${translate('send.Broadcast')} ${txid}`, Toast.LONG);
-          }, 1000);
         }
+
+        createAlert(
+          setBackgroundError,
+          translate('send.confirm-title') as string,
+          `${translate('send.Broadcast')} ${txid}`,
+          true,
+        );
       } catch (err) {
+        setComputingModalVisible(false);
         const error = err as string;
 
         let customError = '';
@@ -375,13 +383,12 @@ const Send: React.FunctionComponent<SendProps> = ({
 
         setTimeout(() => {
           //console.log('sendtx error', error);
-          Alert.alert(
+          // if the App is in background I need to store the error
+          // and when the App come back to foreground shows it to the user.
+          createAlert(
+            setBackgroundError,
             translate('send.sending-error') as string,
             `${customError ? customError : error}`,
-            [{ text: 'OK', onPress: () => setComputingModalVisible(false) }],
-            {
-              cancelable: false,
-            },
           );
         }, 1000);
       }
@@ -447,6 +454,7 @@ const Send: React.FunctionComponent<SendProps> = ({
             setZecPrice={setZecPrice}
             title={translate('send.title') as string}
             setComputingModalVisible={setComputingModalVisible}
+            setBackgroundError={setBackgroundError}
           />
         </View>
       </Animated.View>

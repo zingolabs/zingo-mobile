@@ -56,6 +56,7 @@ export default class RPC {
   walletBirthday: number;
 
   inRefresh: boolean;
+  inSend: boolean;
   blocksPerBatch: number;
 
   prevProgress: number;
@@ -98,6 +99,7 @@ export default class RPC {
     this.walletBirthday = 0;
 
     this.inRefresh = false;
+    this.inSend = false;
     this.blocksPerBatch = 100;
 
     this.prevProgress = 0;
@@ -616,8 +618,8 @@ export default class RPC {
     }
 
     this.updateDataCtr += 1;
-    if (this.inRefresh && this.updateDataCtr % 5 !== 0) {
-      // We're refreshing, in which case update every 5th time
+    if ((this.inRefresh || this.inSend) && this.updateDataCtr % 5 !== 0) {
+      // We're refreshing, or sending, in which case update every 5th time
       return;
     }
 
@@ -995,6 +997,11 @@ export default class RPC {
     } else {
       // Already at the latest block
       console.log('Already have latest block, waiting for next refresh');
+      // Here I know the sync process is over, I need to inform to the UI.
+      this.fnSetSyncingStatus({
+        inProgress: false,
+        synced: this.lastServerBlockHeight === this.lastWalletBlockHeight,
+      } as SyncingStatusType);
     }
   }
 
@@ -1316,6 +1323,8 @@ export default class RPC {
     sendJson: Array<SendJsonToTypeType>,
     setSendProgress: (arg0: SendProgressClass) => void,
   ): Promise<string> {
+    // sending
+    this.setInSend(true);
     // keep awake the screen/device while sending.
     this.keepAwake(true);
     // First, get the previous send progress id, so we know which ID to track
@@ -1334,9 +1343,13 @@ export default class RPC {
       .then(r => console.log('End Send OK: ' + r))
       .catch(e => console.log('End Send ERROR: ' + e))
       .finally(() => {
+        // sending is over
+        this.setInSend(false);
         if (!this.inRefresh) {
           // if not syncing, then not keep awake the screen/device when the send is finished.
           this.keepAwake(false);
+        } else {
+          this.keepAwake(true);
         }
       });
 
@@ -1371,7 +1384,7 @@ export default class RPC {
           return;
         }
 
-        //console.log('progress', progress);
+        console.log('progress', progress);
 
         // Calculate ETA.
         let secondsPerComputation = 3; // default
@@ -1389,6 +1402,9 @@ export default class RPC {
         }
 
         //console.log(`ETA calculated = ${eta}`);
+
+        // syncronize status with inSend
+        this.setInSend(progress.sending);
 
         updatedProgress.progress = progress.progress;
         //updatedProgress.total = Math.max(progress.total, progress.progress); // sometimes, due to change, the total can be off by 1
@@ -1480,5 +1496,13 @@ export default class RPC {
 
   getInRefresh(): boolean {
     return this.inRefresh;
+  }
+
+  setInSend(value: boolean): void {
+    this.inSend = value;
+  }
+
+  getInSend(): boolean {
+    return this.inSend;
   }
 }

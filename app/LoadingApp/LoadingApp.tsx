@@ -35,6 +35,7 @@ import { defaultAppStateLoading, ContextAppLoadingProvider } from '../context';
 import platform from '../platform/platform';
 import BackgroundFileImpl from '../../components/Background/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { createAlert } from '../createAlert';
 
 const Seed = React.lazy(() => import('../../components/Seed'));
 
@@ -248,7 +249,11 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
             this.navigateToLoaded();
           } else {
             this.setState({ screen: 1 });
-            Alert.alert(this.props.translate('loadingapp.readingwallet-label') as string, result);
+            createAlert(
+              this.setBackgroundError,
+              this.props.translate('loadingapp.readingwallet-label') as string,
+              result,
+            );
           }
         } else {
           this.setState({ screen: 1 });
@@ -265,7 +270,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
     });
 
     this.appstate = AppState.addEventListener('change', async nextAppState => {
-      await AsyncStorage.setItem('@server', this.state.server);
+      //await AsyncStorage.setItem('@server', this.state.server);
       if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
         console.log('App has come to the foreground!');
         // reading background task info
@@ -275,6 +280,10 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
         }
         // setting value for background task Android
         await AsyncStorage.setItem('@background', 'no');
+        if (this.state.backgroundError && (this.state.backgroundError.title || this.state.backgroundError.error)) {
+          Alert.alert(this.state.backgroundError.title, this.state.backgroundError.error);
+          this.setBackgroundError('', '');
+        }
       }
       if (nextAppState.match(/inactive|background/) && this.state.appState === 'active') {
         console.log('App is gone to the background!');
@@ -385,7 +394,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
         //await this.set_wallet_option('transaction_filter_threshold', '500');
       } else {
         this.setState({ actionButtonsDisabled: false });
-        Alert.alert(this.props.translate('loadingapp.creatingwallet-label') as string, seed);
+        createAlert(this.setBackgroundError, this.props.translate('loadingapp.creatingwallet-label') as string, seed);
       }
     });
   };
@@ -398,7 +407,8 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
     const { server } = this.state;
 
     if (!seed) {
-      Alert.alert(
+      createAlert(
+        this.setBackgroundError,
         this.props.translate('loadingapp.invalidseed-label') as string,
         this.props.translate('loadingapp.invalidseed-error') as string,
       );
@@ -421,13 +431,17 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
         this.navigateToLoaded();
       } else {
         this.setState({ actionButtonsDisabled: false });
-        Alert.alert(this.props.translate('loadingapp.readingwallet-label') as string, result);
+        createAlert(this.setBackgroundError, this.props.translate('loadingapp.readingwallet-label') as string, result);
       }
     });
   };
 
   set_wallet_option = async (name: string, value: string) => {
     await RPC.rpc_setWalletSettingOption(name, value);
+  };
+
+  setBackgroundError = (title: string, error: string) => {
+    this.setState({ backgroundError: { title, error } });
   };
 
   render() {

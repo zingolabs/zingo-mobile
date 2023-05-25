@@ -21,6 +21,7 @@ import zecPriceType from './types/zecPriceType';
 import { TranslateType } from './types/TranslateType';
 import NetInfoType from './types/NetInfoType';
 import BackgroundType from './types/BackgroundType';
+import BackgroundErrorType from './types/BackgroundErrorType';
 
 import AppStateLoaded from './AppStateLoaded';
 import AppStateLoading from './AppStateLoading';
@@ -48,6 +49,7 @@ export {
   DimensionsType,
   zecPriceType,
   BackgroundType,
+  BackgroundErrorType,
   TranslateType,
   NetInfoType,
 };

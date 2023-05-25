@@ -14,8 +14,8 @@ import ZecAmount from '../Components/ZecAmount';
 import { NetInfoStateType } from '@react-native-community/netinfo';
 import Button from '../Components/Button';
 import RPC from '../../app/rpc';
-import Toast from 'react-native-simple-toast';
 import { RPCShieldType } from '../../app/rpc/types/RPCShieldType';
+import { createAlert } from '../../app/createAlert';
 
 type HeaderProps = {
   poolsMoreInfoOnClick?: () => void;
@@ -31,6 +31,7 @@ type HeaderProps = {
   dimensions?: DimensionsType;
   netInfo?: NetInfoType;
   setComputingModalVisible?: (visible: boolean) => void;
+  setBackgroundError?: (title: string, error: string) => void;
 };
 
 const Header: React.FunctionComponent<HeaderProps> = ({
@@ -47,6 +48,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   dimensions: dimensionsProp,
   netInfo: netInfoProp,
   setComputingModalVisible,
+  setBackgroundError,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { totalBalance, info, syncingStatus, currency, zecPrice } = context;
@@ -72,33 +74,51 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   const balanceColor = colors.text;
 
   const showShieldButton = totalBalance && totalBalance.transparentBal > 0;
+
   const shieldFunds = async () => {
-    if (!setComputingModalVisible) {
+    if (!setComputingModalVisible || !setBackgroundError) {
       return;
     }
+
     setComputingModalVisible(true);
+    // We need to activate this flag because if the App is syncing
+    // while shielding, then it going to finish the current batch
+    // and after that it run the shield process.
+    await RPC.rpc_setInterruptSyncAfterBatch('true');
 
     const shieldStr = await RPC.rpc_shieldTransparent();
 
     if (shieldStr) {
       if (shieldStr.toLowerCase().startsWith('error')) {
-        Toast.show(`${translate('history.shield-error')} ${shieldStr}`, Toast.LONG);
-        setTimeout(() => {
-          setComputingModalVisible(false);
-        }, 1000);
+        createAlert(
+          setBackgroundError,
+          translate('history.shieldfunds') as string,
+          `${translate('history.shield-error')} ${shieldStr}`,
+          true,
+        );
       } else {
         const shieldJSON: RPCShieldType = await JSON.parse(shieldStr);
 
         if (shieldJSON.error) {
-          Toast.show(`${translate('history.shield-error')} ${shieldJSON.error}`, Toast.LONG);
+          createAlert(
+            setBackgroundError,
+            translate('history.shieldfunds') as string,
+            `${translate('history.shield-error')} ${shieldJSON.error}`,
+            true,
+          );
         } else {
-          Toast.show(`${translate('history.shield-message')} ${shieldJSON.txid}`, Toast.LONG);
+          createAlert(
+            setBackgroundError,
+            translate('history.shieldfunds') as string,
+            `${translate('history.shield-message')} ${shieldJSON.txid}`,
+            true,
+          );
         }
-
-        setTimeout(() => {
-          setComputingModalVisible(false);
-        }, 1000);
       }
+      setTimeout(() => {
+        setComputingModalVisible(false);
+      }, 1000);
+      await RPC.rpc_setInterruptSyncAfterBatch('false');
     }
   };
 

@@ -128,6 +128,7 @@ describe('Component Transactions - test', () => {
           syncingStatusMoreInfoOnClick={onFunction}
           setZecPrice={onFunction}
           setComputingModalVisible={onFunction}
+          setBackgroundError={onFunction}
         />
       </ContextAppLoadedProvider>,
     );

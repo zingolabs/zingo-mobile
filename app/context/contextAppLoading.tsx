@@ -10,6 +10,7 @@ import {
   zecPriceType,
   BackgroundType,
   NetInfoType,
+  BackgroundErrorType,
 } from '../AppState';
 
 export const defaultAppStateLoading: AppStateLoading = {
@@ -41,6 +42,7 @@ export const defaultAppStateLoading: AppStateLoading = {
   } as BackgroundType,
 
   translate: () => '',
+  backgroundError: {} as BackgroundErrorType,
 };
 
 export const ContextAppLoading = React.createContext(defaultAppStateLoading);

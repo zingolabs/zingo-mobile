@@ -21,6 +21,7 @@ type HistoryProps = {
   syncingStatusMoreInfoOnClick: () => void;
   setZecPrice: (p: number, d: number) => void;
   setComputingModalVisible: (visible: boolean) => void;
+  setBackgroundError: (title: string, error: string) => void;
 };
 
 const History: React.FunctionComponent<HistoryProps> = ({
@@ -30,6 +31,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
   syncingStatusMoreInfoOnClick,
   setZecPrice,
   setComputingModalVisible,
+  setBackgroundError,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, transactions, language } = context;
@@ -85,6 +87,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
         setZecPrice={setZecPrice}
         title={translate('history.title') as string}
         setComputingModalVisible={setComputingModalVisible}
+        setBackgroundError={setBackgroundError}
       />
 
       <ScrollView

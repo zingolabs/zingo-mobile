@@ -21,6 +21,7 @@ import {
   SendPageStateClass,
   ToAddrClass,
   NetInfoType,
+  BackgroundErrorType,
 } from '../AppState';
 
 export const defaultAppStateLoaded: AppStateLoaded = {
@@ -75,6 +76,7 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   } as BackgroundType,
 
   translate: () => '',
+  backgroundError: {} as BackgroundErrorType,
 };
 
 export const ContextAppLoaded = React.createContext(defaultAppStateLoaded);
