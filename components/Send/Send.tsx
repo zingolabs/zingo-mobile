@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useRef, useCallback, useContext } from 'react';
-import { View, ScrollView, Modal, Alert, Keyboard, TextInput, TouchableOpacity, Platform } from 'react-native';
+import { View, ScrollView, Modal, Keyboard, TextInput, TouchableOpacity, Platform } from 'react-native';
 import { faQrcode, faCheck, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme, useIsFocused } from '@react-navigation/native';
@@ -27,7 +27,7 @@ import PriceFetcher from '../Components/PriceFetcher';
 import RPC from '../../app/rpc';
 import Header from '../Header';
 import { RPCParseAddressType } from '../../app/rpc/types/RPCParseAddressType';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { createAlert } from '../../app/createAlert';
 
 type SendProps = {
   setSendPageState: (sendPageState: SendPageStateClass) => void;
@@ -358,14 +358,12 @@ const Send: React.FunctionComponent<SendProps> = ({
           navigation.navigate(translate('loadedapp.wallet-menu') as string);
         }
 
-        const background = await AsyncStorage.getItem('@background');
-        if (background === 'yes') {
-          setBackgroundError(translate('send.confirm-title') as string, `${translate('send.Broadcast')} ${txid}`);
-        } else {
-          setTimeout(() => {
-            Toast.show(`${translate('send.Broadcast')} ${txid}`, Toast.LONG);
-          }, 1000);
-        }
+        createAlert(
+          setBackgroundError,
+          translate('send.confirm-title') as string,
+          `${translate('send.Broadcast')} ${txid}`,
+          true,
+        );
       } catch (err) {
         setComputingModalVisible(false);
         const error = err as string;
@@ -387,19 +385,11 @@ const Send: React.FunctionComponent<SendProps> = ({
           //console.log('sendtx error', error);
           // if the App is in background I need to store the error
           // and when the App come back to foreground shows it to the user.
-          const background = await AsyncStorage.getItem('@background');
-          if (background === 'yes') {
-            setBackgroundError(translate('send.sending-error') as string, `${customError ? customError : error}`);
-          } else {
-            Alert.alert(
-              translate('send.sending-error') as string,
-              `${customError ? customError : error}`,
-              [{ text: 'OK', onPress: () => setComputingModalVisible(false) }],
-              {
-                cancelable: false,
-              },
-            );
-          }
+          createAlert(
+            setBackgroundError,
+            translate('send.sending-error') as string,
+            `${customError ? customError : error}`,
+          );
         }, 1000);
       }
     });
@@ -464,6 +454,7 @@ const Send: React.FunctionComponent<SendProps> = ({
             setZecPrice={setZecPrice}
             title={translate('send.title') as string}
             setComputingModalVisible={setComputingModalVisible}
+            setBackgroundError={setBackgroundError}
           />
         </View>
       </Animated.View>

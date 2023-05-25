@@ -55,6 +55,7 @@ import platform from '../platform/platform';
 import { parseZcashURI, serverUris, ZcashURITargetClass } from '../uris';
 import BackgroundFileImpl from '../../components/Background/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { createAlert } from '../createAlert';
 
 const History = React.lazy(() => import('../../components/History'));
 const Send = React.lazy(() => import('../../components/Send'));
@@ -887,12 +888,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     //console.log("jc change", resultStr);
     if (resultStr.toLowerCase().startsWith('error')) {
       //console.log(`Error change wallet. ${resultStr}`);
-      const background = await AsyncStorage.getItem('@background');
-      if (background === 'yes') {
-        this.setBackgroundError(this.props.translate('loadedapp.changingwallet-label') as string, resultStr);
-      } else {
-        Alert.alert(this.props.translate('loadedapp.changingwallet-label') as string, resultStr);
-      }
+      createAlert(this.setBackgroundError, this.props.translate('loadedapp.changingwallet-label') as string, resultStr);
       return;
     }
 
@@ -908,12 +904,11 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     //console.log("jc restore", resultStr);
     if (resultStr.toLowerCase().startsWith('error')) {
       //console.log(`Error restore backup wallet. ${resultStr}`);
-      const background = await AsyncStorage.getItem('@background');
-      if (background === 'yes') {
-        this.setBackgroundError(this.props.translate('loadedapp.restoringwallet-label') as string, resultStr);
-      } else {
-        Alert.alert(this.props.translate('loadedapp.restoringwallet-label') as string, resultStr);
-      }
+      createAlert(
+        this.setBackgroundError,
+        this.props.translate('loadedapp.restoringwallet-label') as string,
+        resultStr,
+      );
       return;
     }
 
@@ -965,12 +960,11 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     //console.log("jc change", resultStr);
     if (resultStr2.toLowerCase().startsWith('error')) {
       //console.log(`Error change wallet. ${resultStr}`);
-      const background = await AsyncStorage.getItem('@background');
-      if (background === 'yes') {
-        this.setBackgroundError(this.props.translate('loadedapp.changingwallet-label') as string, resultStr2);
-      } else {
-        Alert.alert(this.props.translate('loadedapp.changingwallet-label') as string, resultStr2);
-      }
+      createAlert(
+        this.setBackgroundError,
+        this.props.translate('loadedapp.changingwallet-label') as string,
+        resultStr2,
+      );
       //return;
     }
 
@@ -1272,6 +1266,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                       poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
                       setZecPrice={this.setZecPrice}
                       setComputingModalVisible={this.setComputingModalVisible}
+                      setBackgroundError={this.setBackgroundError}
                     />
                   </Suspense>
                 </>

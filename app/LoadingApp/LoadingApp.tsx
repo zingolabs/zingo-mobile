@@ -35,6 +35,7 @@ import { defaultAppStateLoading, ContextAppLoadingProvider } from '../context';
 import platform from '../platform/platform';
 import BackgroundFileImpl from '../../components/Background/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { createAlert } from '../createAlert';
 
 const Seed = React.lazy(() => import('../../components/Seed'));
 
@@ -394,12 +395,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
         //await this.set_wallet_option('transaction_filter_threshold', '500');
       } else {
         this.setState({ actionButtonsDisabled: false });
-        const background = await AsyncStorage.getItem('@background');
-        if (background === 'yes') {
-          this.setBackgroundError(this.props.translate('loadingapp.creatingwallet-label') as string, seed);
-        } else {
-          Alert.alert(this.props.translate('loadingapp.creatingwallet-label') as string, seed);
-        }
+        createAlert(this.setBackgroundError, this.props.translate('loadingapp.creatingwallet-label') as string, seed);
       }
     });
   };
@@ -412,18 +408,11 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
     const { server } = this.state;
 
     if (!seed) {
-      const background = await AsyncStorage.getItem('@background');
-      if (background === 'yes') {
-        this.setBackgroundError(
-          this.props.translate('loadingapp.invalidseed-label') as string,
-          this.props.translate('loadingapp.invalidseed-error') as string,
-        );
-      } else {
-        Alert.alert(
-          this.props.translate('loadingapp.invalidseed-label') as string,
-          this.props.translate('loadingapp.invalidseed-error') as string,
-        );
-      }
+      createAlert(
+        this.setBackgroundError,
+        this.props.translate('loadingapp.invalidseed-label') as string,
+        this.props.translate('loadingapp.invalidseed-error') as string,
+      );
       return;
     }
 
@@ -443,12 +432,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
         this.navigateToLoaded();
       } else {
         this.setState({ actionButtonsDisabled: false });
-        const background = await AsyncStorage.getItem('@background');
-        if (background === 'yes') {
-          this.setBackgroundError(this.props.translate('loadingapp.readingwallet-label') as string, result);
-        } else {
-          Alert.alert(this.props.translate('loadingapp.readingwallet-label') as string, result);
-        }
+        createAlert(this.setBackgroundError, this.props.translate('loadingapp.readingwallet-label') as string, result);
       }
     });
   };
