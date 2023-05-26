@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo ""
+echo "/nBuilding native rust..."
 cd rust
 ./build.sh
 cd ..
