@@ -13,7 +13,7 @@ until [[ $step_complete == true ]]; do
     fi              
     if [[ $i -ge 100 ]]; then
         echo "Error: Failed to install APKs" >&2
-        echo "For more information see 'android/${test_report_dir}/apk_installation.txt'" >&2
+        echo "For more information see '${output}/apk_installation.txt'" >&2
         exit 1
     fi
     i=$((i+1))
