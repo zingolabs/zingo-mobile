@@ -1,4 +1,7 @@
 #!/bin/bash
+set -e
+
+cd "`git rev-parse --show-toplevel`"
 
 echo "/nBuilding native rust..."
 cd rust

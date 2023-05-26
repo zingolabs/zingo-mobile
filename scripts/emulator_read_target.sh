@@ -2,7 +2,8 @@
 
 # this script needs to be run with export to work.
 
-output_dir="android/app/build/outputs/emulator_output"
+gbd=`git rev-parse --show-toplevel`
+output_dir="${gbd}/android/app/build/outputs/emulator_output"
 
 api_level=`cat ./${output_dir}/target_api_level.txt`
 api_target=`cat ./${output_dir}/target_api.txt`

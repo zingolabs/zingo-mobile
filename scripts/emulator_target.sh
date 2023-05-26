@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+cd "`git rev-parse --show-toplevel`"
+
 avd_device="pixel_2"
 set_abi=false
 set_api_level=false
@@ -105,7 +107,7 @@ if [[ $set_api_target == false ]]; then
     api_target=$api_target_default
 fi
 
-output_dir="android/app/build/outputs/emulator_output"
+output_dir="${PWD}/android/app/build/outputs/emulator_output"
 mkdir -p "${output_dir}"
 
 echo $abi > "${output_dir}/target_abi.txt"

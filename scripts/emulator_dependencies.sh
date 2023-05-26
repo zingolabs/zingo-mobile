@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+cd "`git rev-parse --show-toplevel`"
+
 source ./scripts/emulator_read_target.sh
 
 sdkmanager --version &>> /dev/null

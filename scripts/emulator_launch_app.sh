@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+cd "`git rev-parse --show-toplevel`"
+
 source ./scripts/emulator_read_target.sh
 
 timeout_seconds=1800  # default timeout set to 30 minutes

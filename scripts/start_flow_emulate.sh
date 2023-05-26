@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+cd "`git rev-parse --show-toplevel`"
+
 #prerequisites:
 #> docker
 #> sdkmanager (android command line tools, needs accept licenses)

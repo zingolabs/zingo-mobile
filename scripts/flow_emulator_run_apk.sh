@@ -1,6 +1,7 @@
 #!/bin/bash
+set -e
 
-./scripts/kill_emulators.sh
+cd "`git rev-parse --show-toplevel`"
 
 ./scripts/emulator_run.sh
 
