@@ -310,7 +310,7 @@
     "next": "Next"
   },
   "history": {
-    "shieldfunds": "Shield funds",
+    "shieldfunds": "Shield All funds",
     "shield-message": "Shielded in Tx:",
     "shield-error": "Error Shielding :",
     "title": "History",

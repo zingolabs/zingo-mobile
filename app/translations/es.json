@@ -310,7 +310,7 @@
     "next": "Siguiente"
   },
   "history": {
-    "shieldfunds": "Blindar fondos",
+    "shieldfunds": "Blindar Todos los fondos",
     "shield-message": "Blindada en Tx:",
     "shield-error": "Error Blindando :",
     "title": "Histórico",
