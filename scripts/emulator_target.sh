@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-cd "`git rev-parse --show-toplevel`"
+cd $(git rev-parse --show-toplevel)
 
 avd_device="pixel_2"
 set_abi=false
