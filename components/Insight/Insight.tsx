@@ -71,8 +71,8 @@ const Labels: React.FunctionComponent<LabelProps> = props => {
 };
 
 const getPercent = (percent: number) => {
-  return ((percent < 1 ? '<1' : percent < 100 && percent >= 99 ? '99' : percent.toFixed(0)) + '%');
-}
+  return (percent < 1 ? '<1' : percent < 100 && percent >= 99 ? '99' : percent.toFixed(0)) + '%';
+};
 
 type InsightProps = {
   closeModal: () => void;
@@ -131,13 +131,14 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal }) => {
     const numLines = item.address.length < 40 ? 2 : item.address.length / (dimensions.width < 500 ? 21 : 30);
     return (
       <View style={{ width: '100%' }} key={`tag-${index}`}>
-        {expandAddress[index] && index > 0 && <View style={{ height: 1, backgroundColor: colors.primaryDisabled }} />}
         <View
           style={{
             width: '100%',
             flexDirection: 'row',
             justifyContent: 'space-between',
             marginBottom: 5,
+            borderBottomColor: '#333333',
+            borderBottomWidth: item.address !== 'fee' ? 1 : 0,
           }}>
           <View
             style={{
@@ -157,9 +158,18 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal }) => {
                   selectExpandAddress(index);
                 }
               }}>
-              <View style={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap' }}>
+              <View
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  flexWrap: 'wrap',
+                }}>
                 {!expandAddress[index] && !!item.address && (
-                  <RegText>{item.address.length > (dimensions.width < 500 ? 10 : 20) ? Utils.trimToSmall(item.address, dimensions.width < 500 ? 5 : 10) : item.address}</RegText>
+                  <RegText>
+                    {item.address.length > (dimensions.width < 500 ? 10 : 20)
+                      ? Utils.trimToSmall(item.address, dimensions.width < 500 ? 5 : 10)
+                      : item.address}
+                  </RegText>
                 )}
                 {expandAddress[index] &&
                   !!item.address &&
@@ -188,7 +198,6 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal }) => {
             />
           </View>
         </View>
-        {expandAddress[index] && <View style={{ height: 1, backgroundColor: colors.primaryDisabled }} />}
       </View>
     );
   };
