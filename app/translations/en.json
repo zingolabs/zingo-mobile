@@ -11,7 +11,8 @@
   "menu-acc": "Open Menu",
   "donation": "Thanks for supporting Zingo!",
   "insight": {
-    "title": "Financial Insight (sent)"
+    "title": "Financial Insight (sent)",
+    "no-data": "There is no data in your Wallet, no sent transactions."
   },
   "loadingapp": {
     "actualserver": "Actual server:",

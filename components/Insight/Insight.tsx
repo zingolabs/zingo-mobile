@@ -222,8 +222,13 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal }) => {
         style={{ maxHeight: '85%' }}
         contentContainerStyle={{}}>
         <View style={{ display: 'flex', margin: 20 }}>
+          {!loading && (!pieAmounts || !pieAmounts.length) && (
+            <View style={{ width: '100%', alignItems: 'center', marginTop: 100 }}>
+              <RegText>{translate('insight.no-data') as string}</RegText>
+            </View>
+          )}
           {loading ? (
-            <ActivityIndicator size="large" color={colors.primary} />
+            <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 100 }} />
           ) : (
             <PieChart
               style={{ height: dimensions.width * 0.7 }}
@@ -237,7 +242,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal }) => {
         </View>
         <View style={{ display: 'flex', marginHorizontal: 5, padding: 0, alignItems: 'center' }}>
           <View style={{ width: '100%' }}>
-            {!loading && (
+            {!loading && !!pieAmounts && !!pieAmounts.length && (
               <>
                 {pieAmounts
                   .filter(item => item.address === 'fee')
