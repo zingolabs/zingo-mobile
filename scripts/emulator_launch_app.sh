@@ -8,7 +8,7 @@ source ./scripts/emulator_read_target.sh
 timeout_seconds=1800  # default timeout set to 30 minutes
 
 function check_metro_server() {
-    metro_status=$(cat ./${output_dir}/react-native_start.txt | grep Metro)
+    metro_status=$(cat ${output_dir}/react-native_start.txt | grep Metro)
     if [[ "${metro_status}" == *"Metro"* ]]; then
         return 0;
     else
