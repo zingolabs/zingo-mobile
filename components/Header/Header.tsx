@@ -89,7 +89,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
 
   const balanceColor = colors.text;
 
-  const showShieldButton = totalBalance && totalBalance.transparentBal > 0;
+  const showShieldButton = totalBalance && (totalBalance.transparentBal > 0 || totalBalance.privateBal > 0);
 
   const shieldFunds = async () => {
     if (!setComputingModalVisible || !setBackgroundError) {
