@@ -55,7 +55,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   setBackgroundError,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, info, totalBalance, sendPageState, navigation, zecPrice, sendAll, netInfo } = context;
+  const { translate, info, totalBalance, sendPageState, navigation, zecPrice, sendAll, netInfo, privacy } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [qrcodeModalVisble, setQrcodeModalVisible] = useState(false);
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
@@ -637,6 +637,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           color={stillConfirming ? 'red' : colors.money}
                           size={15}
                           amtZec={getMaxAmount()}
+                          privacy={privacy}
                         />
                       </View>
                       {stillConfirming && (
@@ -756,6 +757,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           price={zecPrice.zecPrice}
                           amtZec={getMaxAmount()}
                           currency={'USD'}
+                          privacy={privacy}
                         />
                         <View style={{ marginLeft: 5 }}>
                           <PriceFetcher setZecPrice={setZecPrice} />

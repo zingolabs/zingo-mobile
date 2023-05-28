@@ -8,7 +8,10 @@ export default class SettingsFileImpl {
   }
 
   // Write the server setting
-  static async writeSettings(name: 'server' | 'currency' | 'language' | 'sendAll', value: string | boolean) {
+  static async writeSettings(
+    name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
+    value: string | boolean,
+  ) {
     const fileName = await this.getFileName();
     const settings = await this.readSettings();
     const newSettings: SettingsFileClass = { ...settings, [name]: value };

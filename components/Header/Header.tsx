@@ -51,7 +51,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   setBackgroundError,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { totalBalance, info, syncingStatus, currency, zecPrice } = context;
+  const { totalBalance, info, syncingStatus, currency, zecPrice, privacy } = context;
   let translate: (key: string) => TranslateType, dimensions, netInfo;
   if (translateProp) {
     translate = translateProp;
@@ -120,6 +120,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     }
   };
 
+  console.log('render header', title, privacy);
+
   return (
     <View
       testID="header"
@@ -144,7 +146,13 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             justifyContent: 'center',
             margin: 0,
           }}>
-          <ZecAmount currencyName={info.currencyName} color={balanceColor} size={36} amtZec={totalBalance.total} />
+          <ZecAmount
+            currencyName={info.currencyName}
+            color={balanceColor}
+            size={36}
+            amtZec={totalBalance.total}
+            privacy={privacy}
+          />
           {totalBalance.total > 0 && (totalBalance.privateBal > 0 || totalBalance.transparentBal > 0) && (
             <TouchableOpacity onPress={() => poolsMoreInfoOnClick && poolsMoreInfoOnClick()}>
               <View
@@ -175,6 +183,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             price={zecPrice.zecPrice}
             amtZec={totalBalance.total}
             currency={currency}
+            privacy={privacy}
           />
           <View style={{ marginLeft: 5 }}>
             <PriceFetcher setZecPrice={setZecPrice} />

@@ -990,6 +990,7 @@ export default class RPC {
         inProgress: false,
         synced: this.lastServerBlockHeight === this.lastWalletBlockHeight,
       } as SyncingStatusType);
+      // TODO: in sync report screen we need to update the last server blocks.
     }
   }
 
@@ -1070,18 +1071,20 @@ export default class RPC {
       }
       const balanceJSON: RPCBalancesType = await JSON.parse(balanceStr);
 
-      const orchardBal: number = (balanceJSON.orchard_balance || 0) / 10 ** 8;
-      const privateBal: number = (balanceJSON.sapling_balance || 0) / 10 ** 8;
-      const transparentBal: number = (balanceJSON.transparent_balance || 0) / 10 ** 8;
+      const orchardBal: number = balanceJSON.orchard_balance || 0;
+      const privateBal: number = balanceJSON.sapling_balance || 0;
+      const transparentBal: number = balanceJSON.transparent_balance || 0;
+
+      const total = orchardBal + privateBal + transparentBal;
 
       // Total Balance
       const balance: TotalBalanceClass = {
-        orchardBal,
-        privateBal,
-        transparentBal,
+        orchardBal: orchardBal / 10 ** 8,
+        privateBal: privateBal / 10 ** 8,
+        transparentBal: transparentBal / 10 ** 8,
         spendableOrchard: (balanceJSON.spendable_orchard_balance || 0) / 10 ** 8,
         spendablePrivate: (balanceJSON.spendable_sapling_balance || 0) / 10 ** 8,
-        total: orchardBal + privateBal + transparentBal,
+        total: total / 10 ** 8,
       };
       this.fnSetTotalBalance(balance);
 

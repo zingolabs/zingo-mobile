@@ -114,6 +114,16 @@
         "text": "Disable the sending all button because could be a risk to have it."
       }
     ],
+    "privacys": [
+      {
+        "value": true,
+        "text": "High Privacy, all the sensitive information is hidden."
+      },
+      {
+        "value": false,
+        "text": "Normal Privacy, you can see all the information."
+      }
+    ],
     "nochanges": "No changes registred.",
     "ismemo": "You need to choose the download memos option to save.",
     "isthreshold": "You need to choose the transaction filter threshold option to save.",
@@ -128,19 +138,22 @@
     "save": "Save",
     "server-acc": "Server URI Field",
     "threshold-acc": "Threshold Field",
-    "value-none": "none",
-    "value-wallet": "wallet",
-    "value-all": "all",
+    "value-memo-none": "none",
+    "value-memo-wallet": "wallet",
+    "value-memo-all": "all",
     "currency-title": "CURRENCY",
     "language-title": "LANGUAGE",
     "islanguage": "You need to choose a language to save.",
     "sendall-title": "THE BUTTON 'Send All' (Amount)",
-    "value-": "No currency",
-    "value-USD": "US Dollar",
-    "value-en": "English",
-    "value-es": "Spanish",
-    "value-true": "Enable",
-    "value-false": "Disable"
+    "privacy-title": "Switch between HIGH or NORMAL Privacy",
+    "value-currency-": "No currency",
+    "value-currency-USD": "US Dollar",
+    "value-language-en": "English",
+    "value-language-es": "Spanish",
+    "value-sendall-true": "Enable",
+    "value-sendall-false": "Disable",
+    "value-privacy-true": "HIGH",
+    "value-privacy-false": "Normal"
   },
   "info": {
     "version": "Version",

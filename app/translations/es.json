@@ -14,7 +14,7 @@
     "title": "Visión Financiera (enviado)",
     "no-data": "No hay datos en tu Monedero, ninguna transacción enviada."
   },
-  "loadingapp" : {
+  "loadingapp": {
     "actualserver": "Servidor Activo:",
     "changeserver": "CAMBIAR SERVIDOR",
     "createnewwallet": "Crear Monedero Nuevo (nueva semilla)",
@@ -114,6 +114,16 @@
         "text": "Desactiva el boton para enviar toda la cantidad porque puede ser un riesgo tenerlo activado."
       }
     ],
+    "privacys": [
+      {
+        "value": true,
+        "text": "Alta Privacidad, toda la informacion sensible esta oculta."
+      },
+      {
+        "value": false,
+        "text": "Privacidad Normal, se puede ver toda la información."
+      }
+    ],
     "nochanges": "No se haan registrado cambios.",
     "ismemo": "Necesitas escoger una opción de Memorándum para poder grabar.",
     "isthreshold": "Necesitas escoger una opción de umbral para poder grabar.",
@@ -128,19 +138,22 @@
     "save": "Grabar",
     "server-acc": "Campo de la URI del Servidor",
     "threshold-acc": "Campo del Umbral del Filtro de Transacciones",
-    "value-none": "ninguno",
-    "value-wallet": "billetera",
-    "value-all": "todos",
+    "value-memo-none": "ninguno",
+    "value-memo-wallet": "billetera",
+    "value-memo-all": "todos",
     "currency-title": "MONEDA",
     "language-title": "IDIOMA",
     "islanguage": "Necesitas escoger un Idioma para poder grabar.",
     "sendall-title": "EL BOTON 'Enviar todo' (Cantidad)",
-    "value-": "Sin moneda",
-    "value-USD": "US Dólares",
-    "value-en": "Inglés",
-    "value-es": "Español",
-    "value-true": "Activar",
-    "value-false": "Desactivar"
+    "privacy-title": "Cambiar entre ALTA Privacidad o NORMAL",
+    "value-currency-": "Sin moneda",
+    "value-currency-USD": "US Dólares",
+    "value-language-en": "Inglés",
+    "value-language-es": "Español",
+    "value-sendall-true": "Activar",
+    "value-sendall-false": "Desactivar",
+    "value-privacy-true": "ALTA",
+    "value-privacy-false": "Normal"
   },
   "info": {
     "version": "Versión",

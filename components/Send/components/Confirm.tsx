@@ -21,7 +21,7 @@ type ConfirmProps = {
 };
 const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSend, defaultFee, sendAllAmount }) => {
   const context = useContext(ContextAppLoaded);
-  const { sendPageState, info, translate, currency, zecPrice, uaAddress } = context;
+  const { sendPageState, info, translate, currency, zecPrice, uaAddress, privacy } = context;
   const { colors } = useTheme();
 
   const sendingTotal = Number(sendPageState.toaddr.amount) + defaultFee;
@@ -61,8 +61,12 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSen
           }}>
           <BoldText style={{ textAlign: 'center' }}>{translate('send.sending-title') as string}</BoldText>
 
-          <ZecAmount currencyName={info.currencyName ? info.currencyName : ''} amtZec={sendingTotal} />
-          <CurrencyAmount amtZec={sendingTotal} price={zecPrice.zecPrice} currency={currency} />
+          <ZecAmount
+            currencyName={info.currencyName ? info.currencyName : ''}
+            amtZec={sendingTotal}
+            privacy={privacy}
+          />
+          <CurrencyAmount amtZec={sendingTotal} price={zecPrice.zecPrice} currency={currency} privacy={privacy} />
         </View>
         {[sendPageState.toaddr].map(to => {
           // 30 characters per line
@@ -87,12 +91,14 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSen
                   currencyName={info.currencyName ? info.currencyName : ''}
                   size={18}
                   amtZec={Number(to.amount)}
+                  privacy={privacy}
                 />
                 <CurrencyAmount
                   style={{ fontSize: 18 }}
                   amtZec={Number(to.amount)}
                   price={zecPrice.zecPrice}
                   currency={currency}
+                  privacy={privacy}
                 />
               </View>
               <FadeText style={{ marginTop: 10 }}>{translate('send.confirm-memo') as string}</FadeText>
@@ -113,6 +119,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSen
               amtZec={defaultFee}
               price={zecPrice.zecPrice}
               currency={currency}
+              privacy={privacy}
             />
           </View>
         </View>

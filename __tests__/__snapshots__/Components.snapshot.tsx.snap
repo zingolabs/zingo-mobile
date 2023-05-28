@@ -16,6 +16,162 @@ exports[`Component Components - test BoldText - snapshot 1`] = `
 </Text>
 `;
 
+exports[`Component Components - test CurrencyAmount High Privacy - snapshot 1`] = `
+<View
+  style={
+    {
+      "alignItems": "baseline",
+      "flexDirection": "row",
+    }
+  }
+>
+  <View
+    accessibilityState={
+      {
+        "disabled": false,
+      }
+    }
+    accessible={true}
+    collapsable={false}
+    focusable={true}
+    onClick={[Function]}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
+    style={
+      {
+        "opacity": 1,
+      }
+    }
+  >
+    <View
+      style={
+        {
+          "alignItems": "baseline",
+          "flexDirection": "row",
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "backgroundColor": "red",
+            "color": undefined,
+            "fontSize": 20,
+          }
+        }
+      >
+        $
+      </Text>
+      <Text
+        style={
+          {
+            "backgroundColor": "red",
+            "color": undefined,
+            "fontSize": 20,
+            "fontWeight": "700",
+          }
+        }
+      >
+         -.--
+      </Text>
+      <Text
+        style={
+          {
+            "backgroundColor": "red",
+            "color": undefined,
+            "fontSize": 20,
+          }
+        }
+      >
+         USD
+      </Text>
+    </View>
+  </View>
+</View>
+`;
+
+exports[`Component Components - test CurrencyAmount Normal Privacy - snapshot 1`] = `
+<View
+  style={
+    {
+      "alignItems": "baseline",
+      "flexDirection": "row",
+    }
+  }
+>
+  <View
+    accessibilityState={
+      {
+        "disabled": true,
+      }
+    }
+    accessible={true}
+    collapsable={false}
+    focusable={true}
+    onClick={[Function]}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
+    style={
+      {
+        "opacity": 1,
+      }
+    }
+  >
+    <View
+      style={
+        {
+          "alignItems": "baseline",
+          "flexDirection": "row",
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "backgroundColor": "red",
+            "color": undefined,
+            "fontSize": 20,
+          }
+        }
+      >
+        $
+      </Text>
+      <Text
+        style={
+          {
+            "backgroundColor": "red",
+            "color": undefined,
+            "fontSize": 20,
+            "fontWeight": "700",
+          }
+        }
+      >
+         44.93
+      </Text>
+      <Text
+        style={
+          {
+            "backgroundColor": "red",
+            "color": undefined,
+            "fontSize": 20,
+          }
+        }
+      >
+         USD
+      </Text>
+    </View>
+  </View>
+</View>
+`;
+
 exports[`Component Components - test ErrorText - snapshot 1`] = `
 <Text
   style={
@@ -60,53 +216,7 @@ exports[`Component Components - test RegText - snapshot 1`] = `
 </Text>
 `;
 
-exports[`Component Components - test UsdAmount - snapshot 1`] = `
-<View
-  style={
-    {
-      "alignItems": "baseline",
-      "flexDirection": "row",
-    }
-  }
->
-  <Text
-    style={
-      {
-        "backgroundColor": "red",
-        "color": undefined,
-        "fontSize": 20,
-      }
-    }
-  >
-    $
-  </Text>
-  <Text
-    style={
-      {
-        "backgroundColor": "red",
-        "color": undefined,
-        "fontSize": 20,
-        "fontWeight": "700",
-      }
-    }
-  >
-     44.93
-  </Text>
-  <Text
-    style={
-      {
-        "backgroundColor": "red",
-        "color": undefined,
-        "fontSize": 20,
-      }
-    }
-  >
-     USD
-  </Text>
-</View>
-`;
-
-exports[`Component Components - test ZecAmount - snapshot 1`] = `
+exports[`Component Components - test ZecAmount High Privacy - snapshot 1`] = `
 <View
   style={
     {
@@ -116,60 +226,157 @@ exports[`Component Components - test ZecAmount - snapshot 1`] = `
     }
   }
 >
-  <Text
+  <View
+    accessibilityState={
+      {
+        "disabled": false,
+      }
+    }
+    accessible={true}
+    collapsable={false}
+    focusable={true}
+    onClick={[Function]}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
     style={
       {
-        "color": "red",
-        "fontSize": 20,
+        "opacity": 1,
       }
     }
   >
-    ᙇ
-  </Text>
-  <Text
-    style={
-      {
-        "color": "red",
-        "fontSize": 20,
-        "fontWeight": "700",
+    <View
+      style={
+        {
+          "alignItems": "baseline",
+          "backgroundColor": "red",
+          "flexDirection": "row",
+        }
       }
-    }
-  >
-     1.1234
-  </Text>
-  <Text
-    style={
-      {
-        "color": "red",
-        "fontSize": 14,
-        "paddingBottom": 0,
-      }
-    }
-  >
-    5678
-  </Text>
-  <Text
-    style={
-      {
-        "color": "red",
-        "fontSize": 20,
-      }
-    }
-  >
-     ZEC
-  </Text>
+    >
+      <Text
+        style={
+          {
+            "color": "red",
+            "fontSize": 20,
+          }
+        }
+      >
+        ᙇ
+      </Text>
+      <Text
+        style={
+          {
+            "color": "red",
+            "fontSize": 20,
+            "fontWeight": "700",
+          }
+        }
+      >
+         -.----
+      </Text>
+      <Text
+        style={
+          {
+            "color": "red",
+            "fontSize": 20,
+          }
+        }
+      >
+         ZEC
+      </Text>
+    </View>
+  </View>
 </View>
 `;
 
-exports[`Component Components - test ZecPrice - snapshot 1`] = `
-<Text
+exports[`Component Components - test ZecAmount Normal Privacy - snapshot 1`] = `
+<View
   style={
     {
-      "color": "rgb(28, 28, 30)",
-      "opacity": 0.65,
+      "alignItems": "baseline",
+      "backgroundColor": "red",
+      "flexDirection": "row",
     }
   }
 >
-  $ 39.99 USD per ZEC
-</Text>
+  <View
+    accessibilityState={
+      {
+        "disabled": true,
+      }
+    }
+    accessible={true}
+    collapsable={false}
+    focusable={true}
+    onClick={[Function]}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
+    style={
+      {
+        "opacity": 1,
+      }
+    }
+  >
+    <View
+      style={
+        {
+          "alignItems": "baseline",
+          "backgroundColor": "red",
+          "flexDirection": "row",
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": "red",
+            "fontSize": 20,
+          }
+        }
+      >
+        ᙇ
+      </Text>
+      <Text
+        style={
+          {
+            "color": "red",
+            "fontSize": 20,
+            "fontWeight": "700",
+          }
+        }
+      >
+         1.1234
+      </Text>
+      <Text
+        style={
+          {
+            "color": "red",
+            "fontSize": 14,
+            "paddingBottom": 0,
+          }
+        }
+      >
+        5678
+      </Text>
+      <Text
+        style={
+          {
+            "color": "red",
+            "fontSize": 20,
+          }
+        }
+      >
+         ZEC
+      </Text>
+    </View>
+  </View>
+</View>
 `;

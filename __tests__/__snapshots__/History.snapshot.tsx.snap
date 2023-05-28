@@ -65,48 +65,80 @@ exports[`Component Transactions - test Transactions - snapshot 1`] = `
           }
         }
       >
-        <Text
+        <View
+          accessibilityState={
+            {
+              "disabled": true,
+            }
+          }
+          accessible={true}
+          collapsable={false}
+          focusable={true}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
           style={
             {
-              "color": "rgb(28, 28, 30)",
-              "fontSize": 36,
+              "opacity": 1,
             }
           }
         >
-          ᙇ
-        </Text>
-        <Text
-          style={
-            {
-              "color": "rgb(28, 28, 30)",
-              "fontSize": 36,
-              "fontWeight": "700",
+          <View
+            style={
+              {
+                "alignItems": "baseline",
+                "flexDirection": "row",
+              }
             }
-          }
-        >
-           1.1234
-        </Text>
-        <Text
-          style={
-            {
-              "color": "rgb(28, 28, 30)",
-              "fontSize": 25.2,
-              "paddingBottom": 0,
-            }
-          }
-        >
-          5678
-        </Text>
-        <Text
-          style={
-            {
-              "color": "rgb(28, 28, 30)",
-              "fontSize": 36,
-            }
-          }
-        >
-           ZEC
-        </Text>
+          >
+            <Text
+              style={
+                {
+                  "color": "rgb(28, 28, 30)",
+                  "fontSize": 36,
+                }
+              }
+            >
+              ᙇ
+            </Text>
+            <Text
+              style={
+                {
+                  "color": "rgb(28, 28, 30)",
+                  "fontSize": 36,
+                  "fontWeight": "700",
+                }
+              }
+            >
+               1.1234
+            </Text>
+            <Text
+              style={
+                {
+                  "color": "rgb(28, 28, 30)",
+                  "fontSize": 25.2,
+                  "paddingBottom": 0,
+                }
+              }
+            >
+              5678
+            </Text>
+            <Text
+              style={
+                {
+                  "color": "rgb(28, 28, 30)",
+                  "fontSize": 36,
+                }
+              }
+            >
+               ZEC
+            </Text>
+          </View>
+        </View>
       </View>
     </View>
     <View
@@ -434,48 +466,84 @@ exports[`Component Transactions - test Transactions - snapshot 1`] = `
                 }
               }
             >
-              <Text
+              <View
+                accessibilityState={
+                  {
+                    "disabled": true,
+                  }
+                }
+                accessible={true}
+                collapsable={false}
+                focusable={true}
+                onClick={[Function]}
+                onResponderGrant={[Function]}
+                onResponderMove={[Function]}
+                onResponderRelease={[Function]}
+                onResponderTerminate={[Function]}
+                onResponderTerminationRequest={[Function]}
+                onStartShouldSetResponder={[Function]}
                 style={
                   {
-                    "color": "rgb(0, 122, 255)",
-                    "fontSize": 18,
+                    "opacity": 1,
                   }
                 }
               >
-                ᙇ
-              </Text>
-              <Text
-                style={
-                  {
-                    "color": "rgb(0, 122, 255)",
-                    "fontSize": 18,
-                    "fontWeight": "700",
+                <View
+                  style={
+                    {
+                      "alignItems": "baseline",
+                      "alignSelf": "baseline",
+                      "flexDirection": "row",
+                      "flexGrow": 1,
+                      "justifyContent": "flex-end",
+                      "paddingRight": 5,
+                    }
                   }
-                }
-              >
-                 0.1234
-              </Text>
-              <Text
-                style={
-                  {
-                    "color": "rgb(0, 122, 255)",
-                    "fontSize": 12.6,
-                    "paddingBottom": 0,
-                  }
-                }
-              >
-                5678
-              </Text>
-              <Text
-                style={
-                  {
-                    "color": "rgb(0, 122, 255)",
-                    "fontSize": 18,
-                  }
-                }
-              >
-                 ᙇ
-              </Text>
+                >
+                  <Text
+                    style={
+                      {
+                        "color": "rgb(0, 122, 255)",
+                        "fontSize": 18,
+                      }
+                    }
+                  >
+                    ᙇ
+                  </Text>
+                  <Text
+                    style={
+                      {
+                        "color": "rgb(0, 122, 255)",
+                        "fontSize": 18,
+                        "fontWeight": "700",
+                      }
+                    }
+                  >
+                     0.1234
+                  </Text>
+                  <Text
+                    style={
+                      {
+                        "color": "rgb(0, 122, 255)",
+                        "fontSize": 12.6,
+                        "paddingBottom": 0,
+                      }
+                    }
+                  >
+                    5678
+                  </Text>
+                  <Text
+                    style={
+                      {
+                        "color": "rgb(0, 122, 255)",
+                        "fontSize": 18,
+                      }
+                    }
+                  >
+                     ᙇ
+                  </Text>
+                </View>
+              </View>
             </View>
           </View>
         </View>
@@ -590,48 +658,84 @@ exports[`Component Transactions - test Transactions - snapshot 1`] = `
                 }
               }
             >
-              <Text
+              <View
+                accessibilityState={
+                  {
+                    "disabled": true,
+                  }
+                }
+                accessible={true}
+                collapsable={false}
+                focusable={true}
+                onClick={[Function]}
+                onResponderGrant={[Function]}
+                onResponderMove={[Function]}
+                onResponderRelease={[Function]}
+                onResponderTerminate={[Function]}
+                onResponderTerminationRequest={[Function]}
+                onStartShouldSetResponder={[Function]}
                 style={
                   {
-                    "color": "rgb(0, 122, 255)",
-                    "fontSize": 18,
+                    "opacity": 1,
                   }
                 }
               >
-                ᙇ
-              </Text>
-              <Text
-                style={
-                  {
-                    "color": "rgb(0, 122, 255)",
-                    "fontSize": 18,
-                    "fontWeight": "700",
+                <View
+                  style={
+                    {
+                      "alignItems": "baseline",
+                      "alignSelf": "baseline",
+                      "flexDirection": "row",
+                      "flexGrow": 1,
+                      "justifyContent": "flex-end",
+                      "paddingRight": 5,
+                    }
                   }
-                }
-              >
-                 0.8765
-              </Text>
-              <Text
-                style={
-                  {
-                    "color": "rgb(0, 122, 255)",
-                    "fontSize": 12.6,
-                    "paddingBottom": 0,
-                  }
-                }
-              >
-                4321
-              </Text>
-              <Text
-                style={
-                  {
-                    "color": "rgb(0, 122, 255)",
-                    "fontSize": 18,
-                  }
-                }
-              >
-                 ᙇ
-              </Text>
+                >
+                  <Text
+                    style={
+                      {
+                        "color": "rgb(0, 122, 255)",
+                        "fontSize": 18,
+                      }
+                    }
+                  >
+                    ᙇ
+                  </Text>
+                  <Text
+                    style={
+                      {
+                        "color": "rgb(0, 122, 255)",
+                        "fontSize": 18,
+                        "fontWeight": "700",
+                      }
+                    }
+                  >
+                     0.8765
+                  </Text>
+                  <Text
+                    style={
+                      {
+                        "color": "rgb(0, 122, 255)",
+                        "fontSize": 12.6,
+                        "paddingBottom": 0,
+                      }
+                    }
+                  >
+                    4321
+                  </Text>
+                  <Text
+                    style={
+                      {
+                        "color": "rgb(0, 122, 255)",
+                        "fontSize": 18,
+                      }
+                    }
+                  >
+                     ᙇ
+                  </Text>
+                </View>
+              </View>
             </View>
           </View>
         </View>
