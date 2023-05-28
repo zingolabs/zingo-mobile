@@ -1,9 +1,9 @@
 #!/bin/bash
 set -e
 
-cd "`git rev-parse --show-toplevel`"
+cd $(git rev-parse --show-toplevel)
 
-echo "/nBuilding native rust..."
+echo -e "\nBuilding native rust..."
 cd rust
 ./build.sh
 cd ..
