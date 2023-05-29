@@ -211,7 +211,8 @@
     "text-readonly": "Esta es tu Frase Semilla. Por favor apúntala cuidadosamente. Es la única manera que tienes para restaurar/acceder tu monedero activo de nuevo.",
     "text-no-readonly": "Introduce tu Frase Semilla (son 24 palabras)",
     "tapcopy": "Pulsar para copiar",
-    "tapcopy-message": "Frase Semilla copiada al Portapapeles",
+    "tapcopy-seed-message": "Frase Semilla copiada al Portapapeles",
+    "tapcopy-birthday-message": "Cumpleaños copiado al Portapapeles",
     "birthday-readonly": "Cumpleaños del Monedero",
     "birthday-no-readonly": "Altura de bloque de la primera transacción. (Está bien si no la sabes o no te acuerdas) Rango de valores entre",
     "change-warning": "YA NO TENDRÁS ACCESO A ESTE MONEDERO, Y VAS A ABRIR OTRO MONEDERO DIFERENTE",
@@ -350,9 +351,9 @@
   },
   "about": {
     "copyright": [
-      "Copyright (c) 2022, ZingoLabs.",
+      "Copyright (c) 2023, ZingoLabs.",
       "Construida con React Native.",
-      "La Licencia MIT (MIT) Copyright (c) 2022 Zingo!",
+      "La Licencia MIT (MIT) Copyright (c) 2023 Zingo!",
       "Por la presente se otorga permiso, sin cargo, a cualquier persona que obtenga una copia de este software y los archivos de documentación asociados (el 'Software'), para operar con el Software sin restricciones, incluidos, entre otros, los derechos de uso, copia, modificación, fusión , publicar, distribuir, otorgar sublicencias y/o vender copias del Software, y permitir que las personas a las que se les proporcione el Software lo hagan, sujeto a las siguientes condiciones:",
       "El aviso de derechos de autor anterior y este aviso de permiso se incluirán en todas las copias o partes sustanciales del Software.",
       "EL SOFTWARE SE PROPORCIONA 'TAL CUAL', SIN GARANTÍA DE NINGÚN TIPO, EXPRESA O IMPLÍCITA, INCLUYENDO, ENTRE OTRAS, LAS GARANTÍAS DE COMERCIABILIDAD, IDONEIDAD PARA UN FIN DETERMINADO Y NO VIOLACIÓN. EN NINGÚN CASO LOS AUTORES O LOS TITULARES DE LOS DERECHOS DE AUTOR SERÁN RESPONSABLES DE CUALQUIER RECLAMACIÓN, DAÑOS U OTRA RESPONSABILIDAD, YA SEA EN UNA ACCIÓN DE CONTRATO, AGRAVIO O DE CUALQUIER OTRO TIPO, QUE SURJA DE, FUERA DE O EN RELACIÓN CON EL SOFTWARE O EL USO U OTROS TRATOS EN EL SOFTWARE."

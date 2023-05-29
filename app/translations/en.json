@@ -211,7 +211,8 @@
     "text-readonly": "This is your seed phrase. Please write it down carefully. It is the only way to restore your actual wallet.",
     "text-no-readonly": "Enter your seed phrase (24 words)",
     "tapcopy": "Tap to copy",
-    "tapcopy-message": "Copied Seed to Clipboard",
+    "tapcopy-seed-message": "Copied Seed to Clipboard",
+    "tapcopy-birthday-message": "Copied Birthday to Clipboard",
     "birthday-readonly": "Wallet Birthday",
     "birthday-no-readonly": "Block height of first transaction. (It's OK, if you don't know) Value range between ",
     "change-warning": "YOU WILL HAVE NO LONGER ACCESS TO THIS WALLET, AND YOU ARE GOING TO ACCESS TO ANOTHER DIFFERENT WALLET",
@@ -350,9 +351,9 @@
   },
   "about": {
     "copyright": [
-      "Copyright (c) 2022, ZingoLabs.",
+      "Copyright (c) 2023, ZingoLabs.",
       "Built with React Native.",
-      "The MIT License (MIT) Copyright (c) 2022 Zingo!",
+      "The MIT License (MIT) Copyright (c) 2023 Zingo!",
       "Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the 'Software'), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:",
       "The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.",
       "THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE."

@@ -15,6 +15,7 @@ import { DimensionsType, InfoType, NetInfoType, TranslateType, WalletSeedType } 
 import RPCModule from '../../app/RPCModule';
 import RPC from '../../app/rpc';
 import Header from '../Header';
+import Utils from '../../app/utils';
 
 type TextsType = {
   new: string[];
@@ -38,7 +39,8 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
     info: InfoType,
     server: string,
     dimensions: DimensionsType,
-    netInfo: NetInfoType;
+    netInfo: NetInfoType,
+    privacy: boolean;
   if (action === 'new' || action === 'restore') {
     walletSeed = contextLoading.walletSeed;
     translate = contextLoading.translate;
@@ -46,6 +48,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
     server = contextLoading.server;
     dimensions = contextLoading.dimensions;
     netInfo = contextLoading.netInfo;
+    privacy = contextLoading.privacy;
   } else {
     walletSeed = contextLoaded.walletSeed;
     translate = contextLoaded.translate;
@@ -53,6 +56,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
     server = contextLoaded.server;
     dimensions = contextLoaded.dimensions;
     netInfo = contextLoaded.netInfo;
+    privacy = contextLoaded.privacy;
   }
 
   const { colors } = useTheme() as unknown as ThemeType;
@@ -63,8 +67,32 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
   const [readOnly, setReadOnly] = useState(true);
   const [titleViewHeight, setTitleViewHeight] = useState(0);
   const [latestBlock, setLatestBlock] = useState(0);
+  const [expandSeed, setExpandSeed] = useState(false);
+  const [expandBirthday, setExpandBithday] = useState(false);
 
   const slideAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (privacy) {
+      setExpandSeed(false);
+      setExpandBithday(false);
+    } else {
+      setExpandSeed(true);
+      setExpandBithday(true);
+    }
+  }, [privacy]);
+
+  useEffect(() => {
+    if (!expandSeed && !privacy) {
+      setExpandSeed(true);
+    }
+  }, [expandSeed, privacy]);
+
+  useEffect(() => {
+    if (!expandBirthday && !privacy) {
+      setExpandBithday(true);
+    }
+  }, [expandBirthday, privacy]);
 
   useEffect(() => {
     const buttonTextsArray = translate('seed.buttontexts');
@@ -184,13 +212,27 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
             maxHeight: '40%',
           }}>
           {readOnly ? (
-            <RegText
-              color={colors.text}
-              style={{
-                textAlign: 'center',
+            <TouchableOpacity
+              onPress={() => {
+                if (seedPhrase) {
+                  Clipboard.setString(seedPhrase);
+                  Toast.show(translate('seed.tapcopy-seed-message') as string, Toast.LONG);
+                  setExpandSeed(true);
+                  if (privacy) {
+                    setTimeout(() => {
+                      setExpandSeed(false);
+                    }, 5000);
+                  }
+                }
               }}>
-              {seedPhrase}
-            </RegText>
+              <RegText
+                color={colors.text}
+                style={{
+                  textAlign: 'center',
+                }}>
+                {!expandSeed ? Utils.trimToSmall(seedPhrase, 5) : seedPhrase}
+              </RegText>
+            </TouchableOpacity>
           ) : (
             <View
               accessible={true}
@@ -231,7 +273,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
               onPress={() => {
                 if (seedPhrase) {
                   Clipboard.setString(seedPhrase);
-                  Toast.show(translate('seed.tapcopy-message') as string, Toast.LONG);
+                  Toast.show(translate('seed.tapcopy-seed-message') as string, Toast.LONG);
                 }
               }}>
               <Text
@@ -253,9 +295,23 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
         <View style={{ marginTop: 10, alignItems: 'center' }}>
           <FadeText style={{ textAlign: 'center' }}>{translate('seed.birthday-readonly') as string}</FadeText>
           {readOnly ? (
-            <RegText color={colors.text} style={{ textAlign: 'center' }}>
-              {birthdayNumber}
-            </RegText>
+            <TouchableOpacity
+              onPress={() => {
+                if (birthdayNumber) {
+                  Clipboard.setString(birthdayNumber);
+                  Toast.show(translate('seed.tapcopy-birthday-message') as string, Toast.LONG);
+                  setExpandBithday(true);
+                  if (privacy) {
+                    setTimeout(() => {
+                      setExpandBithday(false);
+                    }, 5000);
+                  }
+                }
+              }}>
+              <RegText color={colors.text} style={{ textAlign: 'center' }}>
+                {!expandBirthday ? Utils.trimToSmall(birthdayNumber, 1) : birthdayNumber}
+              </RegText>
+            </TouchableOpacity>
           ) : (
             <>
               <FadeText style={{ textAlign: 'center' }}>
