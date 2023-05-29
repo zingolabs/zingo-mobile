@@ -61,19 +61,37 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
           }
         }
       >
-        <Text
+        <View
+          accessible={true}
+          collapsable={false}
+          focusable={true}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
           style={
             {
-              "color": "rgb(28, 28, 30)",
-              "fontSize": 18,
-              "fontWeight": "600",
               "opacity": 1,
-              "textAlign": "center",
             }
           }
         >
-          pepe lolo titi
-        </Text>
+          <Text
+            style={
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 18,
+                "fontWeight": "600",
+                "opacity": 1,
+                "textAlign": "center",
+              }
+            }
+          >
+            pepe lolo titi
+          </Text>
+        </View>
         <View
           style={
             {
@@ -137,19 +155,37 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
         >
           text translated
         </Text>
-        <Text
+        <View
+          accessible={true}
+          collapsable={false}
+          focusable={true}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
           style={
             {
-              "color": "rgb(28, 28, 30)",
-              "fontSize": 18,
-              "fontWeight": "600",
               "opacity": 1,
-              "textAlign": "center",
             }
           }
         >
-          1500100
-        </Text>
+          <Text
+            style={
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 18,
+                "fontWeight": "600",
+                "opacity": 1,
+                "textAlign": "center",
+              }
+            }
+          >
+            1500100
+          </Text>
+        </View>
       </View>
       <View
         style={
@@ -350,19 +386,37 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
           }
         }
       >
-        <Text
+        <View
+          accessible={true}
+          collapsable={false}
+          focusable={true}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
           style={
             {
-              "color": "rgb(28, 28, 30)",
-              "fontSize": 18,
-              "fontWeight": "600",
               "opacity": 1,
-              "textAlign": "center",
             }
           }
         >
-          pepe lolo titi
-        </Text>
+          <Text
+            style={
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 18,
+                "fontWeight": "600",
+                "opacity": 1,
+                "textAlign": "center",
+              }
+            }
+          >
+            pepe lolo titi
+          </Text>
+        </View>
         <View
           style={
             {
@@ -426,19 +480,37 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
         >
           text translated
         </Text>
-        <Text
+        <View
+          accessible={true}
+          collapsable={false}
+          focusable={true}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
           style={
             {
-              "color": "rgb(28, 28, 30)",
-              "fontSize": 18,
-              "fontWeight": "600",
               "opacity": 1,
-              "textAlign": "center",
             }
           }
         >
-          1500100
-        </Text>
+          <Text
+            style={
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 18,
+                "fontWeight": "600",
+                "opacity": 1,
+                "textAlign": "center",
+              }
+            }
+          >
+            1500100
+          </Text>
+        </View>
       </View>
       <View
         style={
@@ -639,19 +711,37 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
           }
         }
       >
-        <Text
+        <View
+          accessible={true}
+          collapsable={false}
+          focusable={true}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
           style={
             {
-              "color": "rgb(28, 28, 30)",
-              "fontSize": 18,
-              "fontWeight": "600",
               "opacity": 1,
-              "textAlign": "center",
             }
           }
         >
-          pepe lolo titi
-        </Text>
+          <Text
+            style={
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 18,
+                "fontWeight": "600",
+                "opacity": 1,
+                "textAlign": "center",
+              }
+            }
+          >
+            pepe lolo titi
+          </Text>
+        </View>
         <View
           style={
             {
@@ -715,19 +805,37 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
         >
           text translated
         </Text>
-        <Text
+        <View
+          accessible={true}
+          collapsable={false}
+          focusable={true}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
           style={
             {
-              "color": "rgb(28, 28, 30)",
-              "fontSize": 18,
-              "fontWeight": "600",
               "opacity": 1,
-              "textAlign": "center",
             }
           }
         >
-          1500100
-        </Text>
+          <Text
+            style={
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 18,
+                "fontWeight": "600",
+                "opacity": 1,
+                "textAlign": "center",
+              }
+            }
+          >
+            1500100
+          </Text>
+        </View>
       </View>
       <View
         style={
@@ -1218,19 +1326,37 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
           }
         }
       >
-        <Text
+        <View
+          accessible={true}
+          collapsable={false}
+          focusable={true}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
           style={
             {
-              "color": "rgb(28, 28, 30)",
-              "fontSize": 18,
-              "fontWeight": "600",
               "opacity": 1,
-              "textAlign": "center",
             }
           }
         >
-          pepe lolo titi
-        </Text>
+          <Text
+            style={
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 18,
+                "fontWeight": "600",
+                "opacity": 1,
+                "textAlign": "center",
+              }
+            }
+          >
+            pepe lolo titi
+          </Text>
+        </View>
         <View
           style={
             {
@@ -1294,19 +1420,37 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
         >
           text translated
         </Text>
-        <Text
+        <View
+          accessible={true}
+          collapsable={false}
+          focusable={true}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
           style={
             {
-              "color": "rgb(28, 28, 30)",
-              "fontSize": 18,
-              "fontWeight": "600",
               "opacity": 1,
-              "textAlign": "center",
             }
           }
         >
-          1500100
-        </Text>
+          <Text
+            style={
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 18,
+                "fontWeight": "600",
+                "opacity": 1,
+                "textAlign": "center",
+              }
+            }
+          >
+            1500100
+          </Text>
+        </View>
       </View>
       <View
         style={
@@ -1507,19 +1651,37 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
           }
         }
       >
-        <Text
+        <View
+          accessible={true}
+          collapsable={false}
+          focusable={true}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
           style={
             {
-              "color": "rgb(28, 28, 30)",
-              "fontSize": 18,
-              "fontWeight": "600",
               "opacity": 1,
-              "textAlign": "center",
             }
           }
         >
-          pepe lolo titi
-        </Text>
+          <Text
+            style={
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 18,
+                "fontWeight": "600",
+                "opacity": 1,
+                "textAlign": "center",
+              }
+            }
+          >
+            pepe lolo titi
+          </Text>
+        </View>
         <View
           style={
             {
@@ -1583,19 +1745,37 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
         >
           text translated
         </Text>
-        <Text
+        <View
+          accessible={true}
+          collapsable={false}
+          focusable={true}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
           style={
             {
-              "color": "rgb(28, 28, 30)",
-              "fontSize": 18,
-              "fontWeight": "600",
               "opacity": 1,
-              "textAlign": "center",
             }
           }
         >
-          1500100
-        </Text>
+          <Text
+            style={
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 18,
+                "fontWeight": "600",
+                "opacity": 1,
+                "textAlign": "center",
+              }
+            }
+          >
+            1500100
+          </Text>
+        </View>
       </View>
       <View
         style={

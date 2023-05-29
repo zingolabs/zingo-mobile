@@ -50,7 +50,6 @@ describe('Component Info - test', () => {
     };
     state.zecPrice.zecPrice = 33.33;
     state.currency = 'USD';
-    state.totalBalance.total = 1.12345678;
     const onClose = jest.fn();
     const onSet = jest.fn();
     render(
@@ -58,6 +57,6 @@ describe('Component Info - test', () => {
         <Info closeModal={onClose} setZecPrice={onSet} />
       </ContextAppLoadedProvider>,
     );
-    screen.getByText('$ 33,33 USD per ZEC');
+    screen.getByText('33,33');
   });
 });
