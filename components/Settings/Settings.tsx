@@ -23,18 +23,28 @@ type SettingsProps = {
   closeModal: () => void;
   set_wallet_option: (name: string, value: string) => Promise<void>;
   set_server_option: (
-    name: 'server' | 'currency' | 'language' | 'sendAll',
+    name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
     value: string,
     toast: boolean,
     same_chain_name: boolean,
   ) => Promise<void>;
-  set_currency_option: (name: 'server' | 'currency' | 'language' | 'sendAll', value: string) => Promise<void>;
+  set_currency_option: (
+    name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
+    value: string,
+  ) => Promise<void>;
   set_language_option: (
-    name: 'server' | 'currency' | 'language' | 'sendAll',
+    name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
     value: string,
     reset: boolean,
   ) => Promise<void>;
-  set_sendAll_option: (name: 'server' | 'currency' | 'language' | 'sendAll', value: boolean) => Promise<void>;
+  set_sendAll_option: (
+    name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
+    value: boolean,
+  ) => Promise<void>;
+  set_privacy_option: (
+    name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
+    value: boolean,
+  ) => Promise<void>;
 };
 
 type Options = {
@@ -48,6 +58,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   set_currency_option,
   set_language_option,
   set_sendAll_option,
+  set_privacy_option,
   closeModal,
 }) => {
   const context = useContext(ContextAppLoaded);
@@ -59,6 +70,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     currency: currencyContext,
     language: languageContext,
     sendAll: sendAllContext,
+    privacy: privacyContext,
     netInfo,
   } = context;
 
@@ -87,6 +99,12 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     SENDALLS = sendAllsArray as Options[];
   }
 
+  const privacysArray = translate('settings.privacys');
+  let PRIVACYS: Options[] = [];
+  if (typeof privacysArray === 'object') {
+    PRIVACYS = privacysArray as Options[];
+  }
+
   const { colors } = useTheme() as unknown as ThemeType;
 
   const [memos, setMemos] = useState(walletSettings.download_memos);
@@ -95,6 +113,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [currency, setCurrency] = useState(currencyContext);
   const [language, setLanguage] = useState(languageContext);
   const [sendAll, setSendAll] = useState(sendAllContext);
+  const [privacy, setPrivacy] = useState(privacyContext);
   const [customIcon, setCustomIcon] = useState(farCircle);
   const [disabled, setDisabled] = useState<boolean>();
   const [titleViewHeight, setTitleViewHeight] = useState(0);
@@ -141,7 +160,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       serverContext === serverParsed &&
       currencyContext === currency &&
       languageContext === language &&
-      sendAllContext === sendAll
+      sendAllContext === sendAll &&
+      privacyContext === privacy
     ) {
       Toast.show(translate('settings.nochanges') as string, Toast.LONG);
       return;
@@ -222,6 +242,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     if (sendAllContext !== sendAll) {
       await set_sendAll_option('sendAll', sendAll);
     }
+    if (privacyContext !== privacy) {
+      await set_privacy_option('privacy', privacy);
+    }
 
     // I need a little time in this modal because maybe the wallet cannot be open with the new server
     let ms = 100;
@@ -247,6 +270,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     setOption: React.Dispatch<React.SetStateAction<string | boolean>>,
     typeOption: StringConstructor | BooleanConstructor,
     valueOption: string | boolean,
+    label: string,
   ) => {
     return DATA.map(item => (
       <View key={'view-' + item.value}>
@@ -261,7 +285,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
               color={colors.border}
             />
             <RegText key={'text-' + item.value} style={{ marginLeft: 10 }}>
-              {translate(`settings.value-${item.value}`) as string}
+              {translate(`settings.value-${label}-${item.value}`) as string}
             </RegText>
           </View>
         </TouchableOpacity>
@@ -290,6 +314,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             noBalance={true}
             noSyncingStatus={true}
             noDrawMenu={true}
+            noPrivacy={true}
           />
         </View>
       </Animated.View>
@@ -303,6 +328,20 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           justifyContent: 'flex-start',
         }}>
         <View style={{ display: 'flex', margin: 10 }}>
+          <BoldText>{translate('settings.privacy-title') as string}</BoldText>
+        </View>
+
+        <View style={{ display: 'flex', marginLeft: 25 }}>
+          {optionsRadio(
+            PRIVACYS,
+            setPrivacy as React.Dispatch<React.SetStateAction<string | boolean>>,
+            Boolean,
+            privacy,
+            'privacy',
+          )}
+        </View>
+
+        <View style={{ display: 'flex', margin: 10 }}>
           <BoldText>{translate('settings.sendall-title') as string}</BoldText>
         </View>
 
@@ -312,6 +351,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             setSendAll as React.Dispatch<React.SetStateAction<string | boolean>>,
             Boolean,
             sendAll,
+            'sendall',
           )}
         </View>
 
@@ -325,6 +365,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             setCurrency as React.Dispatch<React.SetStateAction<string | boolean>>,
             String,
             currency,
+            'currency',
           )}
         </View>
 
@@ -338,6 +379,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             setLanguage as React.Dispatch<React.SetStateAction<string | boolean>>,
             String,
             language,
+            'language',
           )}
         </View>
 
@@ -463,7 +505,13 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         </View>
 
         <View style={{ display: 'flex', marginLeft: 25, marginBottom: 30 }}>
-          {optionsRadio(MEMOS, setMemos as React.Dispatch<React.SetStateAction<string | boolean>>, String, memos)}
+          {optionsRadio(
+            MEMOS,
+            setMemos as React.Dispatch<React.SetStateAction<string | boolean>>,
+            String,
+            memos,
+            'memo',
+          )}
         </View>
       </ScrollView>
       <View

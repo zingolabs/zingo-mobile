@@ -110,5 +110,7 @@ export default interface AppStateLoaded {
   translate: (key: string) => TranslateType;
   backgroundError: BackgroundErrorType;
 
+  privacy: boolean;
+
   // eslint-disable-next-line semi
 }

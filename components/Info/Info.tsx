@@ -4,12 +4,13 @@ import { View, ScrollView, SafeAreaView } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
 import Button from '../Components/Button';
-import Utils from '../../app/utils';
 import DetailLine from '../Components/DetailLine';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import PriceFetcher from '../Components/PriceFetcher';
 import Header from '../Header';
+import CurrencyAmount from '../Components/CurrencyAmount';
+import RegText from '../Components/RegText';
 
 type InfoProps = {
   closeModal: () => void;
@@ -18,7 +19,7 @@ type InfoProps = {
 
 const Info: React.FunctionComponent<InfoProps> = ({ closeModal, setZecPrice }) => {
   const context = useContext(ContextAppLoaded);
-  const { info, translate, currency, zecPrice } = context;
+  const { info, translate, currency, zecPrice, privacy } = context;
   const { colors } = useTheme() as unknown as ThemeType;
 
   return (
@@ -30,7 +31,13 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal, setZecPrice }) =
         height: '100%',
         backgroundColor: colors.background,
       }}>
-      <Header title={translate('info.title') as string} noBalance={true} noSyncingStatus={true} noDrawMenu={true} />
+      <Header
+        title={translate('info.title') as string}
+        noBalance={true}
+        noSyncingStatus={true}
+        noDrawMenu={true}
+        noPrivacy={true}
+      />
 
       <ScrollView
         style={{ maxHeight: '85%' }}
@@ -72,20 +79,15 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal, setZecPrice }) =
           />
           {currency === 'USD' && (
             <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
-              <DetailLine
-                label={translate('info.zecprice') as string}
-                value={
-                  zecPrice.zecPrice > 0
-                    ? `$ ${Utils.toLocaleFloat(zecPrice.zecPrice.toFixed(2))} ${currency} per ${
-                        info.currencyName ? info.currencyName : '---'
-                      }`
-                    : zecPrice.zecPrice === -1
-                    ? (translate('info.errorgemini') as string)
-                    : zecPrice.zecPrice === -2
-                    ? (translate('info.errorrpcmodule') as string)
-                    : `$ -- ${currency} per ${info.currencyName ? info.currencyName : '---'}`
-                }
-              />
+              <DetailLine label={translate('info.zecprice') as string}>
+                {zecPrice.zecPrice === -1 && (
+                  <RegText color={colors.text}>{translate('info.errorgemini') as string}</RegText>
+                )}
+                {zecPrice.zecPrice === -2 && (
+                  <RegText color={colors.text}>{translate('info.errorrpcmodule') as string}</RegText>
+                )}
+                <CurrencyAmount price={zecPrice.zecPrice} amtZec={1} currency={currency} privacy={privacy} />
+              </DetailLine>
               <View style={{ marginLeft: 5 }}>
                 <PriceFetcher setZecPrice={setZecPrice} />
               </View>

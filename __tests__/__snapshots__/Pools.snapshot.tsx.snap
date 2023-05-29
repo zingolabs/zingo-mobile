@@ -114,6 +114,86 @@ exports[`Component Info - test Matches the snapshot Info 1`] = `
       >
         (undefinedxundefined)-undefined
       </Text>
+      <View
+        accessible={true}
+        collapsable={false}
+        focusable={true}
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          {
+            "opacity": 1,
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "justifyContent": "center",
+              "marginTop": 15,
+            }
+          }
+        >
+          <Text
+            style={
+              {
+                "color": "rgb(216, 216, 216)",
+                "fontSize": 13,
+              }
+            }
+          >
+            translated text
+          </Text>
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "borderColor": undefined,
+                "borderRadius": 5,
+                "borderWidth": 1,
+                "flexDirection": "row",
+                "justifyContent": "center",
+                "paddingHorizontal": 5,
+              }
+            }
+          >
+            <Text
+              style={
+                {
+                  "color": "rgb(216, 216, 216)",
+                  "fontSize": 13,
+                  "marginRight": 5,
+                }
+              }
+            >
+              translated text
+            </Text>
+            <
+              icon={
+                {
+                  "icon": [
+                    576,
+                    512,
+                    [],
+                    "f3c1",
+                    "M352 144c0-44.2 35.8-80 80-80s80 35.8 80 80v48c0 17.7 14.3 32 32 32s32-14.3 32-32V144C576 64.5 511.5 0 432 0S288 64.5 288 144v48H64c-35.3 0-64 28.7-64 64V448c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V256c0-35.3-28.7-64-64-64H352V144z",
+                  ],
+                  "iconName": "lock-open",
+                  "prefix": "fas",
+                }
+              }
+              size={14}
+            />
+          </View>
+        </View>
+      </View>
     </View>
     <View
       style={
@@ -203,37 +283,70 @@ exports[`Component Info - test Matches the snapshot Info 1`] = `
                 }
               }
             >
-              <Text
+              <View
+                accessibilityState={
+                  {
+                    "disabled": true,
+                  }
+                }
+                accessible={true}
+                collapsable={false}
+                focusable={true}
+                onClick={[Function]}
+                onResponderGrant={[Function]}
+                onResponderMove={[Function]}
+                onResponderRelease={[Function]}
+                onResponderTerminate={[Function]}
+                onResponderTerminationRequest={[Function]}
+                onStartShouldSetResponder={[Function]}
                 style={
                   {
-                    "color": undefined,
-                    "fontSize": 18,
+                    "opacity": 1,
                   }
                 }
               >
-                ᙇ
-              </Text>
-              <Text
-                style={
-                  {
-                    "color": undefined,
-                    "fontSize": 18,
-                    "fontWeight": "700",
+                <View
+                  style={
+                    {
+                      "alignItems": "baseline",
+                      "flexDirection": "row",
+                      "opacity": 0.5,
+                    }
                   }
-                }
-              >
-                 0.6000
-              </Text>
-              <Text
-                style={
-                  {
-                    "color": undefined,
-                    "fontSize": 18,
-                  }
-                }
-              >
-                 ZEC
-              </Text>
+                >
+                  <Text
+                    style={
+                      {
+                        "color": undefined,
+                        "fontSize": 18,
+                      }
+                    }
+                  >
+                    ᙇ
+                  </Text>
+                  <Text
+                    style={
+                      {
+                        "color": undefined,
+                        "fontSize": 18,
+                        "fontWeight": "700",
+                      }
+                    }
+                  >
+                     0.6000
+                  </Text>
+                  <Text
+                    style={
+                      {
+                        "color": undefined,
+                        "fontSize": 18,
+                      }
+                    }
+                  >
+                     ZEC
+                  </Text>
+                </View>
+              </View>
             </View>
           </View>
           <View
@@ -269,37 +382,69 @@ exports[`Component Info - test Matches the snapshot Info 1`] = `
                 }
               }
             >
-              <Text
+              <View
+                accessibilityState={
+                  {
+                    "disabled": true,
+                  }
+                }
+                accessible={true}
+                collapsable={false}
+                focusable={true}
+                onClick={[Function]}
+                onResponderGrant={[Function]}
+                onResponderMove={[Function]}
+                onResponderRelease={[Function]}
+                onResponderTerminate={[Function]}
+                onResponderTerminationRequest={[Function]}
+                onStartShouldSetResponder={[Function]}
                 style={
                   {
-                    "color": "red",
-                    "fontSize": 18,
+                    "opacity": 1,
                   }
                 }
               >
-                ᙇ
-              </Text>
-              <Text
-                style={
-                  {
-                    "color": "red",
-                    "fontSize": 18,
-                    "fontWeight": "700",
+                <View
+                  style={
+                    {
+                      "alignItems": "baseline",
+                      "flexDirection": "row",
+                    }
                   }
-                }
-              >
-                 0.3000
-              </Text>
-              <Text
-                style={
-                  {
-                    "color": "red",
-                    "fontSize": 18,
-                  }
-                }
-              >
-                 ZEC
-              </Text>
+                >
+                  <Text
+                    style={
+                      {
+                        "color": "red",
+                        "fontSize": 18,
+                      }
+                    }
+                  >
+                    ᙇ
+                  </Text>
+                  <Text
+                    style={
+                      {
+                        "color": "red",
+                        "fontSize": 18,
+                        "fontWeight": "700",
+                      }
+                    }
+                  >
+                     0.3000
+                  </Text>
+                  <Text
+                    style={
+                      {
+                        "color": "red",
+                        "fontSize": 18,
+                      }
+                    }
+                  >
+                     ZEC
+                  </Text>
+                </View>
+              </View>
             </View>
           </View>
         </View>
@@ -368,37 +513,70 @@ exports[`Component Info - test Matches the snapshot Info 1`] = `
                 }
               }
             >
-              <Text
+              <View
+                accessibilityState={
+                  {
+                    "disabled": true,
+                  }
+                }
+                accessible={true}
+                collapsable={false}
+                focusable={true}
+                onClick={[Function]}
+                onResponderGrant={[Function]}
+                onResponderMove={[Function]}
+                onResponderRelease={[Function]}
+                onResponderTerminate={[Function]}
+                onResponderTerminationRequest={[Function]}
+                onStartShouldSetResponder={[Function]}
                 style={
                   {
-                    "color": undefined,
-                    "fontSize": 18,
+                    "opacity": 1,
                   }
                 }
               >
-                ᙇ
-              </Text>
-              <Text
-                style={
-                  {
-                    "color": undefined,
-                    "fontSize": 18,
-                    "fontWeight": "700",
+                <View
+                  style={
+                    {
+                      "alignItems": "baseline",
+                      "flexDirection": "row",
+                      "opacity": 0.5,
+                    }
                   }
-                }
-              >
-                 0.4000
-              </Text>
-              <Text
-                style={
-                  {
-                    "color": undefined,
-                    "fontSize": 18,
-                  }
-                }
-              >
-                 ZEC
-              </Text>
+                >
+                  <Text
+                    style={
+                      {
+                        "color": undefined,
+                        "fontSize": 18,
+                      }
+                    }
+                  >
+                    ᙇ
+                  </Text>
+                  <Text
+                    style={
+                      {
+                        "color": undefined,
+                        "fontSize": 18,
+                        "fontWeight": "700",
+                      }
+                    }
+                  >
+                     0.4000
+                  </Text>
+                  <Text
+                    style={
+                      {
+                        "color": undefined,
+                        "fontSize": 18,
+                      }
+                    }
+                  >
+                     ZEC
+                  </Text>
+                </View>
+              </View>
             </View>
           </View>
           <View
@@ -434,37 +612,69 @@ exports[`Component Info - test Matches the snapshot Info 1`] = `
                 }
               }
             >
-              <Text
+              <View
+                accessibilityState={
+                  {
+                    "disabled": true,
+                  }
+                }
+                accessible={true}
+                collapsable={false}
+                focusable={true}
+                onClick={[Function]}
+                onResponderGrant={[Function]}
+                onResponderMove={[Function]}
+                onResponderRelease={[Function]}
+                onResponderTerminate={[Function]}
+                onResponderTerminationRequest={[Function]}
+                onStartShouldSetResponder={[Function]}
                 style={
                   {
-                    "color": "red",
-                    "fontSize": 18,
+                    "opacity": 1,
                   }
                 }
               >
-                ᙇ
-              </Text>
-              <Text
-                style={
-                  {
-                    "color": "red",
-                    "fontSize": 18,
-                    "fontWeight": "700",
+                <View
+                  style={
+                    {
+                      "alignItems": "baseline",
+                      "flexDirection": "row",
+                    }
                   }
-                }
-              >
-                 0.2000
-              </Text>
-              <Text
-                style={
-                  {
-                    "color": "red",
-                    "fontSize": 18,
-                  }
-                }
-              >
-                 ZEC
-              </Text>
+                >
+                  <Text
+                    style={
+                      {
+                        "color": "red",
+                        "fontSize": 18,
+                      }
+                    }
+                  >
+                    ᙇ
+                  </Text>
+                  <Text
+                    style={
+                      {
+                        "color": "red",
+                        "fontSize": 18,
+                        "fontWeight": "700",
+                      }
+                    }
+                  >
+                     0.2000
+                  </Text>
+                  <Text
+                    style={
+                      {
+                        "color": "red",
+                        "fontSize": 18,
+                      }
+                    }
+                  >
+                     ZEC
+                  </Text>
+                </View>
+              </View>
             </View>
           </View>
         </View>
@@ -532,48 +742,80 @@ exports[`Component Info - test Matches the snapshot Info 1`] = `
                 }
               }
             >
-              <Text
+              <View
+                accessibilityState={
+                  {
+                    "disabled": true,
+                  }
+                }
+                accessible={true}
+                collapsable={false}
+                focusable={true}
+                onClick={[Function]}
+                onResponderGrant={[Function]}
+                onResponderMove={[Function]}
+                onResponderRelease={[Function]}
+                onResponderTerminate={[Function]}
+                onResponderTerminationRequest={[Function]}
+                onStartShouldSetResponder={[Function]}
                 style={
                   {
-                    "color": undefined,
-                    "fontSize": 18,
+                    "opacity": 1,
                   }
                 }
               >
-                ᙇ
-              </Text>
-              <Text
-                style={
-                  {
-                    "color": undefined,
-                    "fontSize": 18,
-                    "fontWeight": "700",
+                <View
+                  style={
+                    {
+                      "alignItems": "baseline",
+                      "flexDirection": "row",
+                    }
                   }
-                }
-              >
-                 0.1234
-              </Text>
-              <Text
-                style={
-                  {
-                    "color": undefined,
-                    "fontSize": 12.6,
-                    "paddingBottom": 0,
-                  }
-                }
-              >
-                5678
-              </Text>
-              <Text
-                style={
-                  {
-                    "color": undefined,
-                    "fontSize": 18,
-                  }
-                }
-              >
-                 ZEC
-              </Text>
+                >
+                  <Text
+                    style={
+                      {
+                        "color": undefined,
+                        "fontSize": 18,
+                      }
+                    }
+                  >
+                    ᙇ
+                  </Text>
+                  <Text
+                    style={
+                      {
+                        "color": undefined,
+                        "fontSize": 18,
+                        "fontWeight": "700",
+                      }
+                    }
+                  >
+                     0.1234
+                  </Text>
+                  <Text
+                    style={
+                      {
+                        "color": undefined,
+                        "fontSize": 12.6,
+                        "paddingBottom": 0,
+                      }
+                    }
+                  >
+                    5678
+                  </Text>
+                  <Text
+                    style={
+                      {
+                        "color": undefined,
+                        "fontSize": 18,
+                      }
+                    }
+                  >
+                     ZEC
+                  </Text>
+                </View>
+              </View>
             </View>
           </View>
         </View>

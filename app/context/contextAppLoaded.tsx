@@ -78,6 +78,7 @@ export const defaultAppStateLoaded: AppStateLoaded = {
 
   translate: () => '',
   backgroundError: {} as BackgroundErrorType,
+  privacy: false,
 };
 
 export const ContextAppLoaded = React.createContext(defaultAppStateLoaded);

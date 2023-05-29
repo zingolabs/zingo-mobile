@@ -56,6 +56,35 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
             "marginLeft": 25,
           }
         }
+      />
+      <View
+        style={
+          {
+            "display": "flex",
+            "margin": 10,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "rgb(28, 28, 30)",
+              "fontSize": 18,
+              "fontWeight": "bold",
+              "opacity": 0.87,
+            }
+          }
+        >
+          text translated
+        </Text>
+      </View>
+      <View
+        style={
+          {
+            "display": "flex",
+            "marginLeft": 25,
+          }
+        }
       >
         <View>
           <View

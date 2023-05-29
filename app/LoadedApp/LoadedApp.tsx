@@ -98,6 +98,7 @@ export default function LoadedApp(props: LoadedAppProps) {
   const [currency, setCurrency] = useState('' as 'USD' | '');
   const [server, setServer] = useState(SERVER_DEFAULT_0 as string);
   const [sendAll, setSendAll] = useState(false);
+  const [privacy, setPrivacy] = useState(false);
   const [background, setBackground] = useState({ batches: 0, date: 0 } as BackgroundType);
   const [loading, setLoading] = useState(true);
   //const forceUpdate = useForceUpdate();
@@ -159,6 +160,11 @@ export default function LoadedApp(props: LoadedAppProps) {
     } else {
       await SettingsFileImpl.writeSettings('sendAll', sendAll);
     }
+    if (settings.privacy) {
+      setPrivacy(settings.privacy);
+    } else {
+      await SettingsFileImpl.writeSettings('privacy', privacy);
+    }
 
     // reading background task info
     if (Platform.OS === 'ios') {
@@ -169,7 +175,7 @@ export default function LoadedApp(props: LoadedAppProps) {
         setBackground(backgroundJson);
       }
     }
-  }, [currency, file, i18n, sendAll, server]);
+  }, [currency, file, i18n, privacy, sendAll, server]);
 
   useEffect(() => {
     (async () => {
@@ -202,6 +208,7 @@ export default function LoadedApp(props: LoadedAppProps) {
         currency={currency}
         server={server}
         sendAll={sendAll}
+        privacy={privacy}
         background={background}
       />
     );
@@ -217,6 +224,7 @@ type LoadedAppClassProps = {
   currency: 'USD' | '';
   server: string;
   sendAll: boolean;
+  privacy: boolean;
   background: BackgroundType;
 };
 
@@ -242,6 +250,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       language: props.language,
       currency: props.currency,
       sendAll: props.sendAll,
+      privacy: props.privacy,
       background: props.background,
       dimensions: {
         width: Number(screen.width.toFixed(0)),
@@ -759,7 +768,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   };
 
   set_server_option = async (
-    name: 'server' | 'currency' | 'language' | 'sendAll',
+    name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
     value: string,
     toast: boolean,
     same_chain_name: boolean,
@@ -828,7 +837,10 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     }
   };
 
-  set_currency_option = async (name: 'server' | 'currency' | 'language' | 'sendAll', value: string): Promise<void> => {
+  set_currency_option = async (
+    name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
+    value: string,
+  ): Promise<void> => {
     await SettingsFileImpl.writeSettings(name, value);
     this.setState({
       currency: value as 'USD' | '',
@@ -839,7 +851,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   };
 
   set_language_option = async (
-    name: 'server' | 'currency' | 'language' | 'sendAll',
+    name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
     value: string,
     reset: boolean,
   ): Promise<void> => {
@@ -855,10 +867,26 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     }
   };
 
-  set_sendAll_option = async (name: 'server' | 'currency' | 'language' | 'sendAll', value: boolean): Promise<void> => {
+  set_sendAll_option = async (
+    name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
+    value: boolean,
+  ): Promise<void> => {
     await SettingsFileImpl.writeSettings(name, value);
     this.setState({
       sendAll: value as boolean,
+    });
+
+    // Refetch the settings to update
+    this.rpc.fetchWalletSettings();
+  };
+
+  set_privacy_option = async (
+    name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
+    value: boolean,
+  ): Promise<void> => {
+    await SettingsFileImpl.writeSettings(name, value);
+    this.setState({
+      privacy: value as boolean,
     });
 
     // Refetch the settings to update
@@ -1102,7 +1130,10 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                   <Text>{translate('loading') as string}</Text>
                 </View>
               }>
-              <Pools closeModal={() => this.setState({ poolsModalVisible: false })} />
+              <Pools
+                closeModal={() => this.setState({ poolsModalVisible: false })}
+                set_privacy_option={this.set_privacy_option}
+              />
             </Suspense>
           </Modal>
 
@@ -1117,7 +1148,10 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                   <Text>{translate('loading') as string}</Text>
                 </View>
               }>
-              <Insight closeModal={() => this.setState({ insightModalVisible: false })} />
+              <Insight
+                closeModal={() => this.setState({ insightModalVisible: false })}
+                set_privacy_option={this.set_privacy_option}
+              />
             </Suspense>
           </Modal>
 
@@ -1154,6 +1188,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                 set_currency_option={this.set_currency_option}
                 set_language_option={this.set_language_option}
                 set_sendAll_option={this.set_sendAll_option}
+                set_privacy_option={this.set_privacy_option}
               />
             </Suspense>
           </Modal>
@@ -1285,6 +1320,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                       setZecPrice={this.setZecPrice}
                       setComputingModalVisible={this.setComputingModalVisible}
                       setBackgroundError={this.setBackgroundError}
+                      set_privacy_option={this.set_privacy_option}
                     />
                   </Suspense>
                 </>
@@ -1310,6 +1346,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                       poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
                       setZecPrice={this.setZecPrice}
                       setBackgroundError={this.setBackgroundError}
+                      set_privacy_option={this.set_privacy_option}
                     />
                   </Suspense>
                 </>
@@ -1324,7 +1361,11 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                         <Text>{translate('loading') as string}</Text>
                       </View>
                     }>
-                    <Receive setUaAddress={this.setUaAddress} toggleMenuDrawer={this.toggleMenuDrawer} />
+                    <Receive
+                      setUaAddress={this.setUaAddress}
+                      toggleMenuDrawer={this.toggleMenuDrawer}
+                      set_privacy_option={this.set_privacy_option}
+                    />
                   </Suspense>
                 </>
               )}

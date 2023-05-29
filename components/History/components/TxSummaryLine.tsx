@@ -30,7 +30,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
   setTxDetailModalShowing,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, language } = context;
+  const { translate, language, privacy } = context;
   const { colors } = useTheme() as unknown as ThemeType;
 
   const amountColor = tx.confirmations === 0 ? colors.primaryDisabled : tx.amount > 0 ? colors.primary : colors.text;
@@ -95,6 +95,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
             currencyName={'ᙇ'}
             color={amountColor}
             amtZec={tx.amount}
+            privacy={privacy}
           />
         </View>
       </TouchableOpacity>

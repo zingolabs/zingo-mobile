@@ -22,9 +22,13 @@ import { Scene } from 'react-native-tab-view/lib/typescript/src/types';
 type ReceiveProps = {
   setUaAddress: (uaAddress: string) => void;
   toggleMenuDrawer: () => void;
+  set_privacy_option: (
+    name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
+    value: boolean,
+  ) => Promise<void>;
 };
 
-const Receive: React.FunctionComponent<ReceiveProps> = ({ setUaAddress, toggleMenuDrawer }) => {
+const Receive: React.FunctionComponent<ReceiveProps> = ({ setUaAddress, toggleMenuDrawer, set_privacy_option }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, dimensions, addresses, uaAddress } = context;
   const { colors } = useTheme() as unknown as ThemeType;
@@ -369,6 +373,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ setUaAddress, toggleMe
           title={translate('receive.title') as string}
           noBalance={true}
           noSyncingStatus={true}
+          set_privacy_option={set_privacy_option}
         />
 
         <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', right: 0 }}>

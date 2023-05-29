@@ -181,7 +181,13 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
         height: '100%',
         backgroundColor: colors.background,
       }}>
-      <Header title={translate('report.title') as string} noBalance={true} noSyncingStatus={true} noDrawMenu={true} />
+      <Header
+        title={translate('report.title') as string}
+        noBalance={true}
+        noSyncingStatus={true}
+        noDrawMenu={true}
+        noPrivacy={true}
+      />
 
       <ScrollView
         style={{ maxHeight: '85%' }}

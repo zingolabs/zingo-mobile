@@ -64,6 +64,7 @@ export default function LoadingApp(props: LoadingAppProps) {
   const [currency, setCurrency] = useState('' as 'USD' | '');
   const [server, setServer] = useState(SERVER_DEFAULT_0 as string);
   const [sendAll, setSendAll] = useState(false);
+  const [privacy, setPrivacy] = useState(false);
   const [background, setBackground] = useState({ batches: 0, date: 0 } as BackgroundType);
   const [loading, setLoading] = useState(true);
   //const forceUpdate = useForceUpdate();
@@ -127,6 +128,11 @@ export default function LoadingApp(props: LoadingAppProps) {
     } else {
       await SettingsFileImpl.writeSettings('sendAll', sendAll);
     }
+    if (settings.privacy) {
+      setPrivacy(settings.privacy);
+    } else {
+      await SettingsFileImpl.writeSettings('privacy', privacy);
+    }
 
     // reading background task info
     if (Platform.OS === 'ios') {
@@ -136,7 +142,7 @@ export default function LoadingApp(props: LoadingAppProps) {
         setBackground(backgroundJson);
       }
     }
-  }, [currency, file, i18n, sendAll, server]);
+  }, [currency, file, i18n, privacy, sendAll, server]);
 
   useEffect(() => {
     (async () => {
@@ -167,6 +173,7 @@ export default function LoadingApp(props: LoadingAppProps) {
         currency={currency}
         server={server}
         sendAll={sendAll}
+        privacy={privacy}
         background={background}
       />
     );
@@ -182,6 +189,7 @@ type LoadingAppClassProps = {
   currency: 'USD' | '';
   server: string;
   sendAll: boolean;
+  privacy: boolean;
   background: BackgroundType;
 };
 
@@ -214,6 +222,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
       language: props.language,
       currency: props.currency,
       sendAll: props.sendAll,
+      privacy: props.privacy,
       background: props.background,
       dimensions: {
         width: Number(screen.width.toFixed(0)),

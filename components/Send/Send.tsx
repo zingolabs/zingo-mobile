@@ -40,6 +40,10 @@ type SendProps = {
   poolsMoreInfoOnClick: () => void;
   setZecPrice: (p: number, d: number) => void;
   setBackgroundError: (title: string, error: string) => void;
+  set_privacy_option: (
+    name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
+    value: boolean,
+  ) => Promise<void>;
 };
 
 const Send: React.FunctionComponent<SendProps> = ({
@@ -53,9 +57,10 @@ const Send: React.FunctionComponent<SendProps> = ({
   poolsMoreInfoOnClick,
   setZecPrice,
   setBackgroundError,
+  set_privacy_option,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, info, totalBalance, sendPageState, navigation, zecPrice, sendAll, netInfo } = context;
+  const { translate, info, totalBalance, sendPageState, navigation, zecPrice, sendAll, netInfo, privacy } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [qrcodeModalVisble, setQrcodeModalVisible] = useState(false);
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
@@ -455,6 +460,7 @@ const Send: React.FunctionComponent<SendProps> = ({
             title={translate('send.title') as string}
             setComputingModalVisible={setComputingModalVisible}
             setBackgroundError={setBackgroundError}
+            set_privacy_option={set_privacy_option}
           />
         </View>
       </Animated.View>
@@ -637,6 +643,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           color={stillConfirming ? 'red' : colors.money}
                           size={15}
                           amtZec={getMaxAmount()}
+                          privacy={privacy}
                         />
                       </View>
                       {stillConfirming && (
@@ -756,6 +763,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           price={zecPrice.zecPrice}
                           amtZec={getMaxAmount()}
                           currency={'USD'}
+                          privacy={privacy}
                         />
                         <View style={{ marginLeft: 5 }}>
                           <PriceFetcher setZecPrice={setZecPrice} />

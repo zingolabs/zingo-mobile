@@ -845,7 +845,7 @@ export default class RPC {
         } as SyncingStatusType);
 
         // store SyncStatusReport object for a new screen
-        const statusGeneral: SyncingStatusReportClass = {
+        this.fnSetSyncingStatusReport({
           syncID: ss.sync_id,
           totalBatches: batch_total,
           currentBatch: ss.in_progress ? batch_num + 1 : 0,
@@ -857,8 +857,7 @@ export default class RPC {
           secondsPerBatch: this.seconds_batch,
           process_end_block: process_end_block,
           lastBlockServer: this.lastServerBlockHeight,
-        };
-        this.fnSetSyncingStatusReport(statusGeneral);
+        } as SyncingStatusReportClass);
 
         this.prevProgress = progress;
 
@@ -891,7 +890,7 @@ export default class RPC {
           } as SyncingStatusType);
 
           // store SyncStatusReport object for a new screen
-          const statusFinished: SyncingStatusReportClass = {
+          this.fnSetSyncingStatusReport({
             syncID: ss.sync_id,
             totalBatches: 0,
             currentBatch: 0,
@@ -903,8 +902,7 @@ export default class RPC {
             secondsPerBatch: 0,
             process_end_block: process_end_block,
             lastBlockServer: this.lastServerBlockHeight,
-          };
-          this.fnSetSyncingStatusReport(statusFinished);
+          } as SyncingStatusReportClass);
 
           //console.log('sync status', ss);
           console.log(`Finished refresh at ${this.lastWalletBlockHeight} id: ${ss.sync_id}`);
@@ -924,7 +922,7 @@ export default class RPC {
               this.batches = 0;
 
               // store SyncStatusReport object for a new screen
-              const statusBatch: SyncingStatusReportClass = {
+              this.fnSetSyncingStatusReport({
                 syncID: ss.sync_id,
                 totalBatches: batch_total,
                 currentBatch: ss.in_progress ? batch_num + 1 : 0,
@@ -936,8 +934,7 @@ export default class RPC {
                 secondsPerBatch: this.seconds_batch,
                 process_end_block: process_end_block,
                 lastBlockServer: this.lastServerBlockHeight,
-              };
-              this.fnSetSyncingStatusReport(statusBatch);
+              } as SyncingStatusReportClass);
 
               //console.log('sync status', ss);
               console.log(
@@ -960,7 +957,7 @@ export default class RPC {
             await RPCModule.doSave();
 
             // store SyncStatusReport object for a new screen
-            const statusSeconds: SyncingStatusReportClass = {
+            this.fnSetSyncingStatusReport({
               syncID: ss.sync_id,
               totalBatches: batch_total,
               currentBatch: ss.in_progress ? batch_num + 1 : 0,
@@ -972,8 +969,7 @@ export default class RPC {
               secondsPerBatch: this.seconds_batch,
               process_end_block: process_end_block,
               lastBlockServer: this.lastServerBlockHeight,
-            };
-            this.fnSetSyncingStatusReport(statusSeconds);
+            } as SyncingStatusReportClass);
 
             //console.log('sync status', ss);
             console.log(`@@@@@@@@@@@Saving wallet. seconds: ${this.seconds_batch}`);
@@ -1070,18 +1066,20 @@ export default class RPC {
       }
       const balanceJSON: RPCBalancesType = await JSON.parse(balanceStr);
 
-      const orchardBal: number = (balanceJSON.orchard_balance || 0) / 10 ** 8;
-      const privateBal: number = (balanceJSON.sapling_balance || 0) / 10 ** 8;
-      const transparentBal: number = (balanceJSON.transparent_balance || 0) / 10 ** 8;
+      const orchardBal: number = balanceJSON.orchard_balance || 0;
+      const privateBal: number = balanceJSON.sapling_balance || 0;
+      const transparentBal: number = balanceJSON.transparent_balance || 0;
+
+      const total = orchardBal + privateBal + transparentBal;
 
       // Total Balance
       const balance: TotalBalanceClass = {
-        orchardBal,
-        privateBal,
-        transparentBal,
+        orchardBal: orchardBal / 10 ** 8,
+        privateBal: privateBal / 10 ** 8,
+        transparentBal: transparentBal / 10 ** 8,
         spendableOrchard: (balanceJSON.spendable_orchard_balance || 0) / 10 ** 8,
         spendablePrivate: (balanceJSON.spendable_sapling_balance || 0) / 10 ** 8,
-        total: orchardBal + privateBal + transparentBal,
+        total: total / 10 ** 8,
       };
       this.fnSetTotalBalance(balance);
 

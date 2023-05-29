@@ -1,5 +1,14 @@
 /* eslint-disable react-native/no-inline-styles */
-import { faBars, faCheck, faInfoCircle, faPlay, faStop, faCloudDownload } from '@fortawesome/free-solid-svg-icons';
+import {
+  faBars,
+  faCheck,
+  faInfoCircle,
+  faPlay,
+  faStop,
+  faCloudDownload,
+  faLockOpen,
+  faLock,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme } from '@react-navigation/native';
 import React, { useContext } from 'react';
@@ -32,6 +41,11 @@ type HeaderProps = {
   netInfo?: NetInfoType;
   setComputingModalVisible?: (visible: boolean) => void;
   setBackgroundError?: (title: string, error: string) => void;
+  noPrivacy?: boolean;
+  set_privacy_option?: (
+    name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
+    value: boolean,
+  ) => Promise<void>;
 };
 
 const Header: React.FunctionComponent<HeaderProps> = ({
@@ -49,9 +63,11 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   netInfo: netInfoProp,
   setComputingModalVisible,
   setBackgroundError,
+  noPrivacy,
+  set_privacy_option,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { totalBalance, info, syncingStatus, currency, zecPrice } = context;
+  const { totalBalance, info, syncingStatus, currency, zecPrice, privacy } = context;
   let translate: (key: string) => TranslateType, dimensions, netInfo;
   if (translateProp) {
     translate = translateProp;
@@ -120,6 +136,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     }
   };
 
+  console.log('render header', title, privacy);
+
   return (
     <View
       testID="header"
@@ -144,7 +162,13 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             justifyContent: 'center',
             margin: 0,
           }}>
-          <ZecAmount currencyName={info.currencyName} color={balanceColor} size={36} amtZec={totalBalance.total} />
+          <ZecAmount
+            currencyName={info.currencyName}
+            color={balanceColor}
+            size={36}
+            amtZec={totalBalance.total}
+            privacy={privacy}
+          />
           {totalBalance.total > 0 && (totalBalance.privateBal > 0 || totalBalance.transparentBal > 0) && (
             <TouchableOpacity onPress={() => poolsMoreInfoOnClick && poolsMoreInfoOnClick()}>
               <View
@@ -175,6 +199,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             price={zecPrice.zecPrice}
             amtZec={totalBalance.total}
             currency={currency}
+            privacy={privacy}
           />
           <View style={{ marginLeft: 5 }}>
             <PriceFetcher setZecPrice={setZecPrice} />
@@ -269,6 +294,43 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           <Text style={{ fontSize: 8, color: colors.border }}>
             {'(' + dimensions.width + 'x' + dimensions.height + ')-' + dimensions.scale}
           </Text>
+        )}
+        {!noPrivacy && set_privacy_option && (
+          <TouchableOpacity onPress={() => set_privacy_option('privacy', !privacy)}>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginTop: 15,
+              }}>
+              <Text style={{ fontSize: 13, color: colors.border }}>{translate('settings.privacy') as string}</Text>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  borderWidth: privacy ? 2 : 1,
+                  borderColor: privacy ? colors.primary : colors.primaryDisabled,
+                  borderRadius: 5,
+                  paddingHorizontal: 5,
+                }}>
+                <Text
+                  style={{
+                    fontSize: 13,
+                    color: colors.border,
+                    marginRight: 5,
+                  }}>
+                  {`${privacy ? translate('settings.value-privacy-true') : translate('settings.value-privacy-false')}`}
+                </Text>
+                {privacy ? (
+                  <FontAwesomeIcon icon={faLock} size={14} color={colors.primary} />
+                ) : (
+                  <FontAwesomeIcon icon={faLockOpen} size={14} color={colors.primaryDisabled} />
+                )}
+              </View>
+            </View>
+          </TouchableOpacity>
         )}
       </View>
 

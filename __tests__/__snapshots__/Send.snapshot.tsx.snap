@@ -361,37 +361,69 @@ exports[`Component Send - test Send - snapshot 1`] = `
                       }
                     }
                   >
-                    <Text
+                    <View
+                      accessibilityState={
+                        {
+                          "disabled": true,
+                        }
+                      }
+                      accessible={true}
+                      collapsable={false}
+                      focusable={true}
+                      onClick={[Function]}
+                      onResponderGrant={[Function]}
+                      onResponderMove={[Function]}
+                      onResponderRelease={[Function]}
+                      onResponderTerminate={[Function]}
+                      onResponderTerminationRequest={[Function]}
+                      onStartShouldSetResponder={[Function]}
                       style={
                         {
-                          "color": "red",
-                          "fontSize": 15,
+                          "opacity": 1,
                         }
                       }
                     >
-                      ᙇ
-                    </Text>
-                    <Text
-                      style={
-                        {
-                          "color": "red",
-                          "fontSize": 15,
-                          "fontWeight": "700",
+                      <View
+                        style={
+                          {
+                            "alignItems": "baseline",
+                            "flexDirection": "row",
+                          }
                         }
-                      }
-                    >
-                       0.0000
-                    </Text>
-                    <Text
-                      style={
-                        {
-                          "color": "red",
-                          "fontSize": 15,
-                        }
-                      }
-                    >
-                       ZEC
-                    </Text>
+                      >
+                        <Text
+                          style={
+                            {
+                              "color": "red",
+                              "fontSize": 15,
+                            }
+                          }
+                        >
+                          ᙇ
+                        </Text>
+                        <Text
+                          style={
+                            {
+                              "color": "red",
+                              "fontSize": 15,
+                              "fontWeight": "700",
+                            }
+                          }
+                        >
+                           0.0000
+                        </Text>
+                        <Text
+                          style={
+                            {
+                              "color": "red",
+                              "fontSize": 15,
+                            }
+                          }
+                        >
+                           ZEC
+                        </Text>
+                      </View>
+                    </View>
                   </View>
                 </View>
                 <View
@@ -628,40 +660,72 @@ exports[`Component Send - test Send - snapshot 1`] = `
                     }
                   }
                 >
-                  <Text
+                  <View
+                    accessibilityState={
+                      {
+                        "disabled": true,
+                      }
+                    }
+                    accessible={true}
+                    collapsable={false}
+                    focusable={true}
+                    onClick={[Function]}
+                    onResponderGrant={[Function]}
+                    onResponderMove={[Function]}
+                    onResponderRelease={[Function]}
+                    onResponderTerminate={[Function]}
+                    onResponderTerminationRequest={[Function]}
+                    onStartShouldSetResponder={[Function]}
                     style={
                       {
-                        "color": "#ffffff",
-                        "fontSize": 13,
-                        "marginTop": 10,
+                        "opacity": 1,
                       }
                     }
                   >
-                    $
-                  </Text>
-                  <Text
-                    style={
-                      {
-                        "color": "#ffffff",
-                        "fontSize": 13,
-                        "fontWeight": "700",
-                        "marginTop": 10,
+                    <View
+                      style={
+                        {
+                          "alignItems": "baseline",
+                          "flexDirection": "row",
+                        }
                       }
-                    }
-                  >
-                     0.00
-                  </Text>
-                  <Text
-                    style={
-                      {
-                        "color": "#ffffff",
-                        "fontSize": 13,
-                        "marginTop": 10,
-                      }
-                    }
-                  >
-                     USD
-                  </Text>
+                    >
+                      <Text
+                        style={
+                          {
+                            "color": "#ffffff",
+                            "fontSize": 13,
+                            "marginTop": 10,
+                          }
+                        }
+                      >
+                        $
+                      </Text>
+                      <Text
+                        style={
+                          {
+                            "color": "#ffffff",
+                            "fontSize": 13,
+                            "fontWeight": "700",
+                            "marginTop": 10,
+                          }
+                        }
+                      >
+                         0.00
+                      </Text>
+                      <Text
+                        style={
+                          {
+                            "color": "#ffffff",
+                            "fontSize": 13,
+                            "marginTop": 10,
+                          }
+                        }
+                      >
+                         USD
+                      </Text>
+                    </View>
+                  </View>
                 </View>
                 <View
                   style={

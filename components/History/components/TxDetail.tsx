@@ -11,9 +11,7 @@ import { TransactionType, TxDetailType } from '../../../app/AppState';
 import Utils from '../../../app/utils';
 import RegText from '../../Components/RegText';
 import ZecAmount from '../../Components/ZecAmount';
-//import CurrencyAmount from '../../Components/CurrencyAmount';
 import FadeText from '../../Components/FadeText';
-//import ZecPrice from '../../Components/ZecPrice';
 import Button from '../../Components/Button';
 import { ThemeType } from '../../../app/types';
 import { ContextAppLoaded } from '../../../app/context';
@@ -26,7 +24,7 @@ type TxDetailProps = {
 
 const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) => {
   const context = useContext(ContextAppLoaded);
-  const { info, translate, language } = context;
+  const { info, translate, language, privacy } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const spendColor =
     tx.confirmations === 0 ? colors.primaryDisabled : (tx.amount || 0) > 0 ? colors.primary : colors.text;
@@ -77,6 +75,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
         noBalance={true}
         noSyncingStatus={true}
         noDrawMenu={true}
+        noPrivacy={true}
       />
       <ScrollView
         showsVerticalScrollIndicator={true}
@@ -93,8 +92,12 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
             {!!tx.type &&
               (tx.type === 'sent' ? (translate('history.sent') as string) : (translate('history.receive') as string))}
           </RegText>
-          <ZecAmount currencyName={info.currencyName ? info.currencyName : ''} size={36} amtZec={tx.amount} />
-          {/*<CurrencyAmount amtZec={tx.amount} price={tx.zec_price} currency={'USD'} />*/}
+          <ZecAmount
+            currencyName={info.currencyName ? info.currencyName : ''}
+            size={36}
+            amtZec={tx.amount}
+            privacy={privacy}
+          />
         </View>
 
         <View style={{ margin: 10 }}>
@@ -138,8 +141,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
             <View style={{ display: 'flex', marginTop: 10 }}>
               <FadeText>{translate('history.txfee') as string}</FadeText>
               <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                <ZecAmount amtZec={fee} size={18} currencyName={'ᙇ'} />
-                {/*<CurrencyAmount style={{ fontSize: 18 }} amtZec={fee} price={tx.zec_price} currency={'USD'} />*/}
+                <ZecAmount amtZec={fee} size={18} currencyName={'ᙇ'} privacy={privacy} />
               </View>
             </View>
           )}
@@ -172,10 +174,10 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
                       }
                     }}>
                     <View style={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap' }}>
-                      {!tx.address && <RegText>{'Unknown'}</RegText>}
-                      {!expandAddress && !!tx.address && <RegText>{Utils.trimToSmall(txd.address, 10)}</RegText>}
+                      {!txd.address && <RegText>{'Unknown'}</RegText>}
+                      {!expandAddress && !!txd.address && <RegText>{Utils.trimToSmall(txd.address, 10)}</RegText>}
                       {expandAddress &&
-                        !!tx.address &&
+                        !!txd.address &&
                         Utils.splitStringIntoChunks(txd.address, Number(numLines.toFixed(0))).map(
                           (c: string, idx: number) => <RegText key={idx}>{c}</RegText>,
                         )}
@@ -186,20 +188,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
                 <View style={{ marginTop: 10 }}>
                   <FadeText>{translate('history.amount') as string}</FadeText>
                   <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <ZecAmount amtZec={txd.amount} size={18} currencyName={'ᙇ'} />
-                    {/*<CurrencyAmount
-                      style={{ fontSize: 18 }}
-                      amtZec={txd.amount}
-                      price={tx.zec_price}
-                      currency={'USD'}
-                      />*/}
-                  </View>
-                  <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
-                    {/*<ZecPrice
-                      price={tx.zec_price}
-                      currencyName={info.currencyName ? info.currencyName : ''}
-                    currency={'USD'}
-                    />*/}
+                    <ZecAmount amtZec={txd.amount} size={18} currencyName={'ᙇ'} privacy={privacy} />
                   </View>
                 </View>
 

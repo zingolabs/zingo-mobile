@@ -43,6 +43,7 @@ export const defaultAppStateLoading: AppStateLoading = {
 
   translate: () => '',
   backgroundError: {} as BackgroundErrorType,
+  privacy: false,
 };
 
 export const ContextAppLoading = React.createContext(defaultAppStateLoading);

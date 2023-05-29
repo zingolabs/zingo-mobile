@@ -76,11 +76,15 @@ const getPercent = (percent: number) => {
 
 type InsightProps = {
   closeModal: () => void;
+  set_privacy_option: (
+    name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
+    value: boolean,
+  ) => Promise<void>;
 };
 
-const Insight: React.FunctionComponent<InsightProps> = ({ closeModal }) => {
+const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, set_privacy_option }) => {
   const context = useContext(ContextAppLoaded);
-  const { info, translate, dimensions } = context;
+  const { info, translate, dimensions, privacy } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [pieAmounts, setPieAmounts] = useState<DataType[]>([]);
   const [expandAddress, setExpandAddress] = useState<boolean[]>([]);
@@ -194,7 +198,8 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal }) => {
               currencyName={info.currencyName ? info.currencyName : ''}
               size={15}
               amtZec={item.value}
-              style={{ opacity: 0.5, marginHorizontal: 5 }}
+              style={{ marginHorizontal: 5 }}
+              privacy={privacy}
             />
           </View>
         </View>
@@ -213,7 +218,13 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal }) => {
         height: '100%',
         backgroundColor: colors.background,
       }}>
-      <Header title={translate('insight.title') as string} noBalance={true} noSyncingStatus={true} noDrawMenu={true} />
+      <Header
+        title={translate('insight.title') as string}
+        noBalance={true}
+        noSyncingStatus={true}
+        noDrawMenu={true}
+        set_privacy_option={set_privacy_option}
+      />
 
       <ScrollView
         showsVerticalScrollIndicator={true}
