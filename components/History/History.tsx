@@ -64,7 +64,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
     setNumTx(numTx + 50);
   }, [numTx]);
 
-  console.log('render History - 4');
+  //console.log('render History - 4');
 
   return (
     <View

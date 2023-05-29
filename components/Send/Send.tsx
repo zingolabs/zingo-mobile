@@ -410,7 +410,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     })();
   }, [isFocused]);
 
-  console.log('render Send - 4');
+  //console.log('render Send - 4');
 
   const returnPage = (
     <View

@@ -281,7 +281,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
     this.appstate = AppState.addEventListener('change', async nextAppState => {
       //await AsyncStorage.setItem('@server', this.state.server);
       if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
-        console.log('App has come to the foreground!');
+        //console.log('App has come to the foreground!');
         // reading background task info
         if (Platform.OS === 'ios') {
           // this file only exists in IOS BS.
@@ -295,7 +295,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
         }
       }
       if (nextAppState.match(/inactive|background/) && this.state.appState === 'active') {
-        console.log('App is gone to the background!');
+        //console.log('App is gone to the background!');
         // setting value for background task Android
         await AsyncStorage.setItem('@background', 'yes');
       }

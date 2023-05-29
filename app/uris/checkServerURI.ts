@@ -35,7 +35,7 @@ const checkServerURI = async (uri: string, oldUri: string): Promise<checkServerU
 
     if (!resultStrServer || resultStrServer.toLowerCase().startsWith('error')) {
       // I have to restore the old server again. Just in case.
-      console.log('changeserver', resultStrServer);
+      //console.log('changeserver', resultStrServer);
       await RPCModule.execute('changeserver', oldUri);
       // error, no timeout
       return { result: false, timeout: false, new_chain_name };
@@ -51,7 +51,7 @@ const checkServerURI = async (uri: string, oldUri: string): Promise<checkServerU
       const infoStr: string = await Promise.race([infoStrPromise, timeoutInfoPromise]);
 
       if (!infoStr || infoStr.toLowerCase().startsWith('error')) {
-        console.log('info', infoStr);
+        //console.log('info', infoStr);
         // I have to restore the old server again.
         await RPCModule.execute('changeserver', oldUri);
         // error, no timeout
@@ -62,7 +62,7 @@ const checkServerURI = async (uri: string, oldUri: string): Promise<checkServerU
       }
     }
   } catch (error: any) {
-    console.log('catch', error);
+    //console.log('catch', error);
     // I have to restore the old server again. Just in case.
     await RPCModule.execute('changeserver', oldUri);
     // error, YES timeout

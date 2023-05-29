@@ -136,7 +136,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     }
   };
 
-  console.log('render header', title, privacy);
+  //console.log('render header', title, privacy);
 
   return (
     <View
