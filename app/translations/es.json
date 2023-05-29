@@ -153,7 +153,8 @@
     "value-sendall-true": "Activar",
     "value-sendall-false": "Desactivar",
     "value-privacy-true": "ALTA",
-    "value-privacy-false": "Normal"
+    "value-privacy-false": "Normal",
+    "privacy": "Privacidad: "
   },
   "info": {
     "version": "Versión",

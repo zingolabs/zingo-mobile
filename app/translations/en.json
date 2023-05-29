@@ -153,7 +153,8 @@
     "value-sendall-true": "Enable",
     "value-sendall-false": "Disable",
     "value-privacy-true": "HIGH",
-    "value-privacy-false": "Normal"
+    "value-privacy-false": "Normal",
+    "privacy": "Privacy: "
   },
   "info": {
     "version": "Version",

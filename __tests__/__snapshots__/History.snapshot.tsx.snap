@@ -334,7 +334,7 @@ exports[`Component Transactions - test Transactions - snapshot 1`] = `
               }
             }
           >
-            Privacy: 
+            text translated
           </Text>
           <View
             style={
@@ -358,7 +358,7 @@ exports[`Component Transactions - test Transactions - snapshot 1`] = `
                 }
               }
             >
-              Normal
+              text translated
             </Text>
             <
               icon={

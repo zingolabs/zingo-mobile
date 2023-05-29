@@ -304,7 +304,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 alignItems: 'center',
                 marginTop: 15,
               }}>
-              <Text style={{ fontSize: 13, color: colors.border }}>{'Privacy: '}</Text>
+              <Text style={{ fontSize: 13, color: colors.border }}>{translate('settings.privacy') as string}</Text>
               <View
                 style={{
                   flexDirection: 'row',
@@ -321,7 +321,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                     color: colors.border,
                     marginRight: 5,
                   }}>
-                  {privacy ? 'HIGH' : 'Normal'}
+                  {`${privacy ? translate('settings.value-privacy-true') : translate('settings.value-privacy-false')}`}
                 </Text>
                 {privacy ? (
                   <FontAwesomeIcon icon={faLock} size={14} color={colors.primary} />
