@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo!",
-  "version": "zingo-1.2.1 (122)",
+  "version": "zingo-1.2.2 (123)",
   "loading": "cargando...",
   "connectingserver": "Conectando con el servidor...",
   "wait": "Por favor espere...",
@@ -11,7 +11,8 @@
   "menu-acc": "Abrir Menu",
   "donation": "Gracias por apoyar Zingo!",
   "insight": {
-    "title": "Visión Financiera (enviado)"
+    "title": "Visión Financiera (enviado)",
+    "no-data": "No hay datos en tu Monedero, ninguna transacción enviada."
   },
   "loadingapp" : {
     "actualserver": "Servidor Activo:",

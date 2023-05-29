@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo!",
-  "version": "zingo-1.2.1 (122)",
+  "version": "zingo-1.2.2 (123)",
   "loading": "loading...",
   "connectingserver": "Connecting to the server...",
   "wait": "Please wait...",
@@ -11,7 +11,8 @@
   "menu-acc": "Open Menu",
   "donation": "Thanks for supporting Zingo!",
   "insight": {
-    "title": "Financial Insight (sent)"
+    "title": "Financial Insight (sent)",
+    "no-data": "There is no data in your Wallet, no sent transactions."
   },
   "loadingapp": {
     "actualserver": "Actual server:",

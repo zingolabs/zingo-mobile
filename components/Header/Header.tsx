@@ -115,9 +115,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           );
         }
       }
-      setTimeout(() => {
-        setComputingModalVisible(false);
-      }, 1000);
+      setComputingModalVisible(false);
       await RPC.rpc_setInterruptSyncAfterBatch('false');
     }
   };

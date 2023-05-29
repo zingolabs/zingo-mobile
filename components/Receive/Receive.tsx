@@ -318,10 +318,10 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ setUaAddress, toggleMe
         {route.title ? route.title : ''}
       </RegText>
       {route.key === 'uaddr' && (
-        <RegText style={{ fontSize: 11, color: focused ? colors.primary : color }}>(e.g. zingo, trezor)</RegText>
+        <RegText style={{ fontSize: 11, color: focused ? colors.primary : color }}>(e.g. zingo)</RegText>
       )}
       {route.key === 'zaddr' && (
-        <RegText style={{ fontSize: 11, color: focused ? colors.primary : color }}>(e.g. old wallets)</RegText>
+        <RegText style={{ fontSize: 11, color: focused ? colors.primary : color }}>(e.g. ledger, old wallets)</RegText>
       )}
       {route.key === 'taddr' && (
         <RegText style={{ fontSize: 11, color: focused ? colors.primary : color }}>(e.g. coinbase, gemini)</RegText>
