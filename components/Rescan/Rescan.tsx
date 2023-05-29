@@ -38,7 +38,13 @@ const Rescan: React.FunctionComponent<RescanProps> = ({ closeModal, doRescan }) 
         height: '100%',
         backgroundColor: colors.background,
       }}>
-      <Header title={translate('rescan.title') as string} noBalance={true} noSyncingStatus={true} noDrawMenu={true} />
+      <Header
+        title={translate('rescan.title') as string}
+        noBalance={true}
+        noSyncingStatus={true}
+        noDrawMenu={true}
+        noPrivacy={true}
+      />
 
       <ScrollView
         style={{ maxHeight: '85%' }}

@@ -129,6 +129,7 @@ describe('Component Transactions - test', () => {
           setZecPrice={onFunction}
           setComputingModalVisible={onFunction}
           setBackgroundError={onFunction}
+          set_privacy_option={onFunction}
         />
       </ContextAppLoadedProvider>,
     );

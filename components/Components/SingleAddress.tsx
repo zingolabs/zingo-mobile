@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { View, ScrollView, TouchableOpacity, Text } from 'react-native';
 import Clipboard from '@react-native-community/clipboard';
 import QRCode from 'react-native-qrcode-svg';
@@ -32,14 +32,39 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   next,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate } = context;
+  const { translate, privacy } = context;
   //console.log(`Addresses ${addresses}: ${multipleAddresses}`);
   const { colors } = useTheme() as unknown as ThemeType;
+  const [expandAddress, setExpandAddress] = useState(false);
+  const [expandQRAddress, setExpandQRAddress] = useState(false);
+
+  useEffect(() => {
+    if (privacy) {
+      setExpandAddress(false);
+      setExpandQRAddress(false);
+    } else {
+      setExpandAddress(true);
+      setExpandQRAddress(true);
+    }
+  }, [privacy]);
+
+  useEffect(() => {
+    if (!expandAddress && !privacy) {
+      setExpandAddress(true);
+    }
+  }, [expandAddress, privacy]);
+
+  useEffect(() => {
+    if (!expandQRAddress && !privacy) {
+      setExpandQRAddress(true);
+    }
+  }, [expandQRAddress, privacy]);
 
   const multi = total > 1;
 
   // 30 characters per line
   const numLines = addressKind === 't' ? 2 : address.length / 30;
+  const numChars = addressKind === 't' ? 5 : 12;
   const chunks = Utils.splitStringIntoChunks(address, Number(numLines.toFixed(0)));
 
   const doCopy = () => {
@@ -58,7 +83,37 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
           },
         ]}>
         <View style={{ marginTop: 20, marginHorizontal: 20, padding: 10, backgroundColor: colors.border }}>
-          <QRCode value={address} size={200} ecl="L" backgroundColor={colors.border} />
+          <TouchableOpacity
+            onPress={() => {
+              if (address) {
+                Clipboard.setString(address);
+                Toast.show(translate('history.addresscopied') as string, Toast.LONG);
+                setExpandQRAddress(true);
+                if (privacy) {
+                  setTimeout(() => {
+                    setExpandQRAddress(false);
+                  }, 5000);
+                }
+              }
+            }}>
+            {expandQRAddress ? (
+              <QRCode value={address} size={200} ecl="L" backgroundColor={colors.border} />
+            ) : (
+              <View
+                style={{
+                  width: 200,
+                  height: 200,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  borderWidth: 1,
+                  borderColor: colors.text,
+                }}>
+                <Text style={{ color: colors.zingo, textDecorationLine: 'underline', marginTop: 15, minHeight: 48 }}>
+                  {translate('seed.tapreveal') as string}
+                </Text>
+              </View>
+            )}
+          </TouchableOpacity>
         </View>
 
         <View
@@ -116,28 +171,44 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
             </View>
           )}
         </View>
-        <View
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            justifyContent: 'center',
-            marginBottom: 30,
+        <TouchableOpacity
+          onPress={() => {
+            if (address) {
+              Clipboard.setString(address);
+              Toast.show(translate('history.addresscopied') as string, Toast.LONG);
+              setExpandAddress(true);
+              if (privacy) {
+                setTimeout(() => {
+                  setExpandAddress(false);
+                }, 5000);
+              }
+            }
           }}>
-          {chunks.map(c => (
-            <FadeText
-              key={c}
-              style={{
-                flexBasis: '100%',
-                textAlign: 'center',
-                fontFamily: 'verdana',
-                fontSize: 16,
-                color: colors.text,
-              }}>
-              {c}
-            </FadeText>
-          ))}
-        </View>
+          <View
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              justifyContent: 'center',
+              marginBottom: 30,
+            }}>
+            {!expandAddress && <FadeText>{Utils.trimToSmall(address, numChars)}</FadeText>}
+            {expandAddress &&
+              chunks.map(c => (
+                <FadeText
+                  key={c}
+                  style={{
+                    flexBasis: '100%',
+                    textAlign: 'center',
+                    fontFamily: 'verdana',
+                    fontSize: 16,
+                    color: colors.text,
+                  }}>
+                  {c}
+                </FadeText>
+              ))}
+          </View>
+        </TouchableOpacity>
 
         {/*multi && (
           <View style={{ display: 'flex', flexDirection: 'row', marginTop: 10, alignItems: 'center', marginBottom: 100 }}>

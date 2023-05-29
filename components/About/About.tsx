@@ -37,6 +37,7 @@ const About: React.FunctionComponent<AboutProps> = ({ closeModal }) => {
         noBalance={true}
         noSyncingStatus={true}
         noDrawMenu={true}
+        noPrivacy={true}
       />
 
       <ScrollView

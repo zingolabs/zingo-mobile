@@ -14,11 +14,15 @@ import Header from '../Header';
 
 type PoolsProps = {
   closeModal: () => void;
+  set_privacy_option: (
+    name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
+    value: boolean,
+  ) => Promise<void>;
 };
 
-const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal }) => {
+const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, set_privacy_option }) => {
   const context = useContext(ContextAppLoaded);
-  const { totalBalance, info, translate } = context;
+  const { totalBalance, info, translate, privacy } = context;
   const { colors } = useTheme() as unknown as ThemeType;
 
   useEffect(() => {
@@ -36,7 +40,13 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal }) => {
         height: '100%',
         backgroundColor: colors.background,
       }}>
-      <Header title={translate('pools.title') as string} noBalance={true} noSyncingStatus={true} noDrawMenu={true} />
+      <Header
+        title={translate('pools.title') as string}
+        noBalance={true}
+        noSyncingStatus={true}
+        noDrawMenu={true}
+        set_privacy_option={set_privacy_option}
+      />
 
       <ScrollView
         style={{ maxHeight: '85%' }}
@@ -60,6 +70,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal }) => {
                       ? 1
                       : 0.5,
                 }}
+                privacy={privacy}
               />
             </DetailLine>
             <DetailLine label={translate('pools.orchard-spendable-balance') as string}>
@@ -72,6 +83,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal }) => {
                     ? colors.primary
                     : 'red'
                 }
+                privacy={privacy}
               />
             </DetailLine>
           </View>
@@ -92,6 +104,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal }) => {
                       ? 1
                       : 0.5,
                 }}
+                privacy={privacy}
               />
             </DetailLine>
             <DetailLine label={translate('pools.sapling-spendable-balance') as string}>
@@ -104,6 +117,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal }) => {
                     ? colors.primary
                     : 'red'
                 }
+                privacy={privacy}
               />
             </DetailLine>
           </View>
@@ -118,6 +132,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal }) => {
                 amtZec={totalBalance.transparentBal}
                 size={18}
                 currencyName={info.currencyName ? info.currencyName : ''}
+                privacy={privacy}
               />
             </DetailLine>
           </View>

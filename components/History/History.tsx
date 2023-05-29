@@ -22,6 +22,10 @@ type HistoryProps = {
   setZecPrice: (p: number, d: number) => void;
   setComputingModalVisible: (visible: boolean) => void;
   setBackgroundError: (title: string, error: string) => void;
+  set_privacy_option: (
+    name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
+    value: boolean,
+  ) => Promise<void>;
 };
 
 const History: React.FunctionComponent<HistoryProps> = ({
@@ -32,6 +36,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
   setZecPrice,
   setComputingModalVisible,
   setBackgroundError,
+  set_privacy_option,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, transactions, language } = context;
@@ -88,6 +93,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
         title={translate('history.title') as string}
         setComputingModalVisible={setComputingModalVisible}
         setBackgroundError={setBackgroundError}
+        set_privacy_option={set_privacy_option}
       />
 
       <ScrollView

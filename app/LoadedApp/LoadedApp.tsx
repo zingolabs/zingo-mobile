@@ -1130,7 +1130,10 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                   <Text>{translate('loading') as string}</Text>
                 </View>
               }>
-              <Pools closeModal={() => this.setState({ poolsModalVisible: false })} />
+              <Pools
+                closeModal={() => this.setState({ poolsModalVisible: false })}
+                set_privacy_option={this.set_privacy_option}
+              />
             </Suspense>
           </Modal>
 
@@ -1145,7 +1148,10 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                   <Text>{translate('loading') as string}</Text>
                 </View>
               }>
-              <Insight closeModal={() => this.setState({ insightModalVisible: false })} />
+              <Insight
+                closeModal={() => this.setState({ insightModalVisible: false })}
+                set_privacy_option={this.set_privacy_option}
+              />
             </Suspense>
           </Modal>
 
@@ -1314,6 +1320,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                       setZecPrice={this.setZecPrice}
                       setComputingModalVisible={this.setComputingModalVisible}
                       setBackgroundError={this.setBackgroundError}
+                      set_privacy_option={this.set_privacy_option}
                     />
                   </Suspense>
                 </>
@@ -1339,6 +1346,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                       poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
                       setZecPrice={this.setZecPrice}
                       setBackgroundError={this.setBackgroundError}
+                      set_privacy_option={this.set_privacy_option}
                     />
                   </Suspense>
                 </>
@@ -1353,7 +1361,11 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                         <Text>{translate('loading') as string}</Text>
                       </View>
                     }>
-                    <Receive setUaAddress={this.setUaAddress} toggleMenuDrawer={this.toggleMenuDrawer} />
+                    <Receive
+                      setUaAddress={this.setUaAddress}
+                      toggleMenuDrawer={this.toggleMenuDrawer}
+                      set_privacy_option={this.set_privacy_option}
+                    />
                   </Suspense>
                 </>
               )}

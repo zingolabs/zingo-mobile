@@ -314,6 +314,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             noBalance={true}
             noSyncingStatus={true}
             noDrawMenu={true}
+            noPrivacy={true}
           />
         </View>
       </Animated.View>

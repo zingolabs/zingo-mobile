@@ -24,6 +24,12 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({ price, s
     setPrivacyHigh(privacy || false);
   }, [privacy]);
 
+  useEffect(() => {
+    if (privacyHigh && !privacy) {
+      setPrivacyHigh(false);
+    }
+  }, [privacyHigh, privacy]);
+
   var currencyString;
 
   if (typeof price === 'undefined' || typeof amtZec === 'undefined' || price <= 0) {

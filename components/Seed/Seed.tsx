@@ -154,6 +154,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
             noBalance={true}
             noSyncingStatus={true}
             noDrawMenu={true}
+            noPrivacy={true}
             translate={translate}
             dimensions={dimensions}
             netInfo={netInfo}

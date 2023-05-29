@@ -40,6 +40,10 @@ type SendProps = {
   poolsMoreInfoOnClick: () => void;
   setZecPrice: (p: number, d: number) => void;
   setBackgroundError: (title: string, error: string) => void;
+  set_privacy_option: (
+    name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
+    value: boolean,
+  ) => Promise<void>;
 };
 
 const Send: React.FunctionComponent<SendProps> = ({
@@ -53,6 +57,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   poolsMoreInfoOnClick,
   setZecPrice,
   setBackgroundError,
+  set_privacy_option,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, info, totalBalance, sendPageState, navigation, zecPrice, sendAll, netInfo, privacy } = context;
@@ -455,6 +460,7 @@ const Send: React.FunctionComponent<SendProps> = ({
             title={translate('send.title') as string}
             setComputingModalVisible={setComputingModalVisible}
             setBackgroundError={setBackgroundError}
+            set_privacy_option={set_privacy_option}
           />
         </View>
       </Animated.View>

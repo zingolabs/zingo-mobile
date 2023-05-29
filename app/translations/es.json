@@ -219,7 +219,8 @@
     "mainnet-warning": "NO SE VA A HACER COPIA DE SEGURIDAD DE ESTE MONEDERO. SOLO DISPONIBLE EN LA RED: 'MAINNET'.",
     "seedplaceholder": "Semilla (24 palabras)",
     "seed-acc": "Campo Frase Semilla",
-    "birthday-acc": "Campo Cumpleaños"
+    "birthday-acc": "Campo Cumpleaños",
+    "tapreveal": "Pulsar para revelar"
   },
   "send": {
     "Broadcast": "Transmitida con éxito Tx:",

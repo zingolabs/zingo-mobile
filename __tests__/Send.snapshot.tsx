@@ -154,6 +154,7 @@ describe('Component Send - test', () => {
           syncingStatusMoreInfoOnClick={onFunction}
           setZecPrice={onFunction}
           setBackgroundError={onFunction}
+          set_privacy_option={onFunction}
         />
       </ContextAppLoadedProvider>,
     );

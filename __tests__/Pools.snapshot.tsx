@@ -48,7 +48,7 @@ describe('Component Info - test', () => {
   test('Matches the snapshot Info', () => {
     const info: any = render(
       <ContextAppLoadedProvider value={state}>
-        <Pools closeModal={onClose} />
+        <Pools closeModal={onClose} set_privacy_option={onClose} />
       </ContextAppLoadedProvider>,
     );
     expect(info.toJSON()).toMatchSnapshot();

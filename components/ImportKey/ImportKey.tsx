@@ -53,7 +53,13 @@ const ImportKey: React.FunctionComponent<ImportKeyProps> = ({ closeModal, doImpo
         <ScannerKey setPrivKeyText={setPrivKeyText} closeModal={() => setQrcodeModalVisible(false)} />
       </Modal>
 
-      <Header title={translate('import.title') as string} noBalance={true} noSyncingStatus={true} noDrawMenu={true} />
+      <Header
+        title={translate('import.title') as string}
+        noBalance={true}
+        noSyncingStatus={true}
+        noDrawMenu={true}
+        noPrivacy={true}
+      />
 
       <ScrollView
         style={{ maxHeight: '85%' }}

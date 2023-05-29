@@ -29,6 +29,7 @@ const ComputingTxContent: React.FunctionComponent = () => {
         noBalance={true}
         noSyncingStatus={true}
         noDrawMenu={true}
+        noPrivacy={true}
       />
       <View
         style={{

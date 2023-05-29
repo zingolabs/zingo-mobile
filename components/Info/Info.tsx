@@ -30,7 +30,13 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal, setZecPrice }) =
         height: '100%',
         backgroundColor: colors.background,
       }}>
-      <Header title={translate('info.title') as string} noBalance={true} noSyncingStatus={true} noDrawMenu={true} />
+      <Header
+        title={translate('info.title') as string}
+        noBalance={true}
+        noSyncingStatus={true}
+        noDrawMenu={true}
+        noPrivacy={true}
+      />
 
       <ScrollView
         style={{ maxHeight: '85%' }}

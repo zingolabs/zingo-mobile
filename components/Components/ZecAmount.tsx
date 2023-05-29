@@ -26,6 +26,12 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({ color, style, size
     setPrivacyHigh(privacy || false);
   }, [privacy]);
 
+  useEffect(() => {
+    if (privacyHigh && !privacy) {
+      setPrivacyHigh(false);
+    }
+  }, [privacyHigh, privacy]);
+
   if (!size) {
     size = 24;
   }

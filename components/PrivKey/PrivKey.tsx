@@ -57,6 +57,7 @@ const PrivKey: React.FunctionComponent<PrivKeyProps> = ({ address, keyType, priv
         noBalance={true}
         noSyncingStatus={true}
         noDrawMenu={true}
+        noPrivacy={true}
       />
 
       <ScrollView

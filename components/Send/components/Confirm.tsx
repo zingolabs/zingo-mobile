@@ -42,6 +42,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSen
         noBalance={true}
         noSyncingStatus={true}
         noDrawMenu={true}
+        noPrivacy={true}
       />
       <ScrollView
         contentContainerStyle={{ display: 'flex', justifyContent: 'flex-start' }}
@@ -113,7 +114,12 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSen
           <FadeText>{translate('send.fee') as string}</FadeText>
           <View
             style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
-            <ZecAmount currencyName={info.currencyName ? info.currencyName : ''} size={18} amtZec={defaultFee} />
+            <ZecAmount
+              currencyName={info.currencyName ? info.currencyName : ''}
+              size={18}
+              amtZec={defaultFee}
+              privacy={privacy}
+            />
             <CurrencyAmount
               style={{ fontSize: 18 }}
               amtZec={defaultFee}

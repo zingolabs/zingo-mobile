@@ -75,6 +75,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
         noBalance={true}
         noSyncingStatus={true}
         noDrawMenu={true}
+        noPrivacy={true}
       />
       <ScrollView
         showsVerticalScrollIndicator={true}
@@ -173,10 +174,10 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
                       }
                     }}>
                     <View style={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap' }}>
-                      {!tx.address && <RegText>{'Unknown'}</RegText>}
-                      {!expandAddress && !!tx.address && <RegText>{Utils.trimToSmall(txd.address, 10)}</RegText>}
+                      {!txd.address && <RegText>{'Unknown'}</RegText>}
+                      {!expandAddress && !!txd.address && <RegText>{Utils.trimToSmall(txd.address, 10)}</RegText>}
                       {expandAddress &&
-                        !!tx.address &&
+                        !!txd.address &&
                         Utils.splitStringIntoChunks(txd.address, Number(numLines.toFixed(0))).map(
                           (c: string, idx: number) => <RegText key={idx}>{c}</RegText>,
                         )}

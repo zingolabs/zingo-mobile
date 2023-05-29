@@ -1,5 +1,14 @@
 /* eslint-disable react-native/no-inline-styles */
-import { faBars, faCheck, faInfoCircle, faPlay, faStop, faCloudDownload } from '@fortawesome/free-solid-svg-icons';
+import {
+  faBars,
+  faCheck,
+  faInfoCircle,
+  faPlay,
+  faStop,
+  faCloudDownload,
+  faLockOpen,
+  faLock,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme } from '@react-navigation/native';
 import React, { useContext } from 'react';
@@ -32,6 +41,11 @@ type HeaderProps = {
   netInfo?: NetInfoType;
   setComputingModalVisible?: (visible: boolean) => void;
   setBackgroundError?: (title: string, error: string) => void;
+  noPrivacy?: boolean;
+  set_privacy_option?: (
+    name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
+    value: boolean,
+  ) => Promise<void>;
 };
 
 const Header: React.FunctionComponent<HeaderProps> = ({
@@ -49,6 +63,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   netInfo: netInfoProp,
   setComputingModalVisible,
   setBackgroundError,
+  noPrivacy,
+  set_privacy_option,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { totalBalance, info, syncingStatus, currency, zecPrice, privacy } = context;
@@ -278,6 +294,43 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           <Text style={{ fontSize: 8, color: colors.border }}>
             {'(' + dimensions.width + 'x' + dimensions.height + ')-' + dimensions.scale}
           </Text>
+        )}
+        {!noPrivacy && set_privacy_option && (
+          <TouchableOpacity onPress={() => set_privacy_option('privacy', !privacy)}>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginTop: 15,
+              }}>
+              <Text style={{ fontSize: 13, color: colors.border }}>{'Privacy: '}</Text>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  borderWidth: privacy ? 2 : 1,
+                  borderColor: privacy ? colors.primary : colors.primaryDisabled,
+                  borderRadius: 5,
+                  paddingHorizontal: 5,
+                }}>
+                <Text
+                  style={{
+                    fontSize: 13,
+                    color: colors.border,
+                    marginRight: 5,
+                  }}>
+                  {privacy ? 'HIGH' : 'Normal'}
+                </Text>
+                {privacy ? (
+                  <FontAwesomeIcon icon={faLock} size={14} color={colors.primary} />
+                ) : (
+                  <FontAwesomeIcon icon={faLockOpen} size={14} color={colors.primaryDisabled} />
+                )}
+              </View>
+            </View>
+          </TouchableOpacity>
         )}
       </View>
 
