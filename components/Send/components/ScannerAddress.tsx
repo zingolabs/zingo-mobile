@@ -90,6 +90,7 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateTo
         height: '100%',
       }}>
       <QRCodeScanner
+        showMarker={true}
         onRead={onRead}
         reactivate={true}
         containerStyle={{
