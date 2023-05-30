@@ -94,7 +94,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, set_privac
     (async () => {
       setLoading(true);
       const resultStr = await RPCModule.execute('value_to_address', '');
-      console.log('#################', resultStr);
+      //console.log('#################', resultStr);
       const resultJSON = await JSON.parse(resultStr);
       let amounts: { value: number; address: string; tag: string }[] = [];
       const resultJSONEntries: [string, number][] = Object.entries(resultJSON) as [string, number][];
@@ -207,7 +207,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, set_privac
     );
   };
 
-  console.log('render insight');
+  //console.log('render insight');
 
   return (
     <SafeAreaView

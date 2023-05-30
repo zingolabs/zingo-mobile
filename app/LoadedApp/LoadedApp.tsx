@@ -194,7 +194,7 @@ export default function LoadedApp(props: LoadedAppProps) {
   //  return () => RNLocalize.removeEventListener('change', handleLocalizationChange);
   //}, [handleLocalizationChange]);
 
-  console.log('render LoadedApp - 2');
+  //console.log('render LoadedApp - 2');
 
   if (loading) {
     return null;
@@ -295,7 +295,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     this.appstate = AppState.addEventListener('change', async nextAppState => {
       //await AsyncStorage.setItem('@server', this.state.server);
       if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
-        console.log('App has come to the foreground!');
+        //console.log('App has come to the foreground!');
         // reading background task info
         if (Platform.OS === 'ios') {
           // this file only exists in IOS BS.
@@ -303,25 +303,25 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
         }
         // setting value for background task Android
         await AsyncStorage.setItem('@background', 'no');
-        console.log('background no in storage');
+        //console.log('background no in storage');
         await this.rpc.configure();
-        console.log('configure start timers');
+        //console.log('configure start timers');
         if (this.state.backgroundError && (this.state.backgroundError.title || this.state.backgroundError.error)) {
           Alert.alert(this.state.backgroundError.title, this.state.backgroundError.error);
           this.setBackgroundError('', '');
         }
       }
       if (nextAppState.match(/inactive|background/) && this.state.appState === 'active') {
-        console.log('App is gone to the background!');
+        //console.log('App is gone to the background!');
         // setting value for background task Android
         await AsyncStorage.setItem('@background', 'yes');
-        console.log('background yes in storage');
+        //console.log('background yes in storage');
         this.rpc.setInRefresh(false);
         await this.rpc.clearTimers();
-        console.log('clear timers');
+        //console.log('clear timers');
         this.setSyncingStatus({} as SyncingStatusType);
         this.setSyncingStatusReport(new SyncingStatusReportClass());
-        console.log('clear sync status state');
+        //console.log('clear sync status state');
       }
       if (this.state.appState !== nextAppState) {
         this.setState({ appState: nextAppState });
@@ -357,7 +357,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
         type !== state.type ||
         isConnectionExpensive !== state.details?.isConnectionExpensive
       ) {
-        console.log('fetch net info');
+        //console.log('fetch net info');
         this.setState({
           netInfo: {
             isConnected: state.isConnected,
@@ -393,13 +393,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     this.linking && this.linking.remove();
     this.unsubscribeNetInfo && this.unsubscribeNetInfo();
   };
-
-  //componentDidUpdate(prevProps: Readonly<LoadedAppClassProps>, prevState: Readonly<AppStateLoaded>): void {
-  //  const diff = deepDiff({ ...this.props, ...this.state }, { ...prevProps, ...prevState });
-  //  if (diff) {
-  //    console.log('+++++++++++', diff);
-  //  }
-  //}
 
   keepAwake = (keep: boolean): void => {
     if (keep) {
@@ -469,7 +462,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       this.state.dimensions.width !== Number(screen.width.toFixed(0)) ||
       this.state.dimensions.height !== Number(screen.height.toFixed(0))
     ) {
-      console.log('fetch screen dimensions');
+      //console.log('fetch screen dimensions');
       this.setState({
         dimensions: {
           width: Number(screen.width.toFixed(0)),
@@ -485,7 +478,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   fetchBackgroundSyncing = async () => {
     const backgroundJson: BackgroundType = await BackgroundFileImpl.readBackground();
     if (!isEqual(this.state.background, backgroundJson)) {
-      console.log('fetch background sync info');
+      //console.log('fetch background sync info');
       this.setState({ background: backgroundJson });
     }
   };
@@ -510,28 +503,28 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
   setTotalBalance = (totalBalance: TotalBalanceClass) => {
     if (!isEqual(this.state.totalBalance, totalBalance)) {
-      console.log('fetch total balance');
+      //console.log('fetch total balance');
       this.setState({ totalBalance });
     }
   };
 
   setSyncingStatusReport = (syncingStatusReport: SyncingStatusReportClass) => {
     if (!isEqual(this.state.syncingStatusReport, syncingStatusReport)) {
-      console.log('fetch syncing status report');
+      //console.log('fetch syncing status report');
       this.setState({ syncingStatusReport });
     }
   };
 
   setTransactionList = (transactions: TransactionType[]) => {
     if (deepDiff(this.state.transactions, transactions)) {
-      console.log('fetch transactions');
+      //console.log('fetch transactions');
       this.setState({ transactions });
     }
   };
 
   setAllAddresses = (addresses: AddressClass[]) => {
     if (deepDiff(this.state.addresses, addresses)) {
-      console.log('fetch addresses');
+      //console.log('fetch addresses');
       this.setState({ addresses });
     }
     if (this.state.uaAddress !== addresses[0].uaAddress) {
@@ -541,19 +534,19 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
   setWalletSettings = (walletSettings: WalletSettingsClass) => {
     if (!isEqual(this.state.walletSettings, walletSettings)) {
-      console.log('fetch wallet settings');
+      //console.log('fetch wallet settings');
       this.setState({ walletSettings });
     }
   };
 
   setSendPageState = (sendPageState: SendPageStateClass) => {
-    console.log('fetch send page state');
+    //console.log('fetch send page state');
     this.setState({ sendPageState });
   };
 
   setSyncingStatus = (syncingStatus: SyncingStatusType) => {
     if (!isEqual(this.state.syncingStatus, syncingStatus)) {
-      console.log('fetch syncing status');
+      //console.log('fetch syncing status');
       this.setState({ syncingStatus });
     }
   };
@@ -575,7 +568,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       date: newDate,
     } as zecPriceType;
     if (!isEqual(this.state.zecPrice, zecPrice)) {
-      console.log('fetch zec price');
+      //console.log('fetch zec price');
       this.setState({ zecPrice });
     }
   };
@@ -586,14 +579,14 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
   setSendProgress = (sendProgress: SendProgressClass) => {
     if (!isEqual(this.state.sendProgress, sendProgress)) {
-      console.log('fetch send progress');
+      //console.log('fetch send progress');
       this.setState({ sendProgress });
     }
   };
 
   setInfo = (info: InfoType) => {
     if (!isEqual(this.state.info, info)) {
-      console.log('fetch info');
+      //console.log('fetch info');
       let newInfo = info;
       // if currencyName is empty,
       // I need to rescue the last value from the state.
@@ -723,7 +716,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   fetchWalletSeedAndBirthday = async () => {
     const walletSeed = await RPC.rpc_fetchSeedAndBirthday();
     if (!isEqual(this.state.walletSeed, walletSeed)) {
-      console.log('fetch wallet seed & birthday');
+      //console.log('fetch wallet seed & birthday');
       this.setState({ walletSeed });
     }
   };
@@ -795,7 +788,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       const result: string = await RPCModule.loadExistingWallet(value);
       if (result && !result.toLowerCase().startsWith('error')) {
         // Load the wallet and navigate to the transactions screen
-        console.log(`wallet loaded ok ${value}`);
+        //console.log(`wallet loaded ok ${value}`);
         if (toast) {
           Toast.show(`${this.props.translate('loadedapp.readingwallet')} ${value}`, Toast.LONG);
         }
@@ -1066,7 +1059,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       return <FontAwesomeIcon icon={iconName} color={iconColor} />;
     };
 
-    console.log('render LoadedAppClass - 3');
+    //console.log('render LoadedAppClass - 3');
 
     return (
       <ContextAppLoadedProvider value={this.state}>

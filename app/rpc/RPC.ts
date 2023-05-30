@@ -410,21 +410,21 @@ export default class RPC {
     // every 30 seconds the App try to Sync the new blocks.
     if (!this.refreshTimerID) {
       this.refreshTimerID = setInterval(() => {
-        console.log('interval refresh');
+        //console.log('interval refresh');
         this.refresh(false);
       }, 30 * 1000); // 30 seconds
-      console.log('create refresh timer', this.refreshTimerID);
+      //console.log('create refresh timer', this.refreshTimerID);
       this.timers.push(this.refreshTimerID);
     }
 
     // every 5 seconds the App update all data
     if (!this.updateTimerID) {
       this.updateTimerID = setInterval(() => {
-        console.log('interval update', this.timers);
+        //console.log('interval update', this.timers);
         this.sanitizeTimers();
         this.updateData();
       }, 5 * 1000); // 5 secs
-      console.log('create update timer', this.updateTimerID);
+      //console.log('create update timer', this.updateTimerID);
       this.timers.push(this.updateTimerID);
     }
 
@@ -434,7 +434,7 @@ export default class RPC {
       if (this.timers[i] !== this.refreshTimerID && this.timers[i] !== this.updateTimerID) {
         clearInterval(this.timers[i]);
         deleted.push(i);
-        console.log('kill item array timers', this.timers[i]);
+        //console.log('kill item array timers', this.timers[i]);
       }
     }
     // remove the cleared timers.
@@ -456,26 +456,26 @@ export default class RPC {
     if (this.refreshTimerID) {
       clearInterval(this.refreshTimerID);
       this.refreshTimerID = undefined;
-      console.log('kill refresh timer', this.refreshTimerID);
+      //console.log('kill refresh timer', this.refreshTimerID);
     }
 
     if (this.updateTimerID) {
       clearInterval(this.updateTimerID);
       this.updateTimerID = undefined;
-      console.log('kill update timer', this.updateTimerID);
+      //console.log('kill update timer', this.updateTimerID);
     }
 
     if (this.syncStatusTimerID) {
       clearInterval(this.syncStatusTimerID);
       this.syncStatusTimerID = undefined;
-      console.log('kill syncstatus timer', this.syncStatusTimerID);
+      //console.log('kill syncstatus timer', this.syncStatusTimerID);
     }
 
     // and now the array of timers...
     while (this.timers.length > 0) {
       const inter = this.timers.pop();
       clearInterval(inter);
-      console.log('kill item array timers', inter);
+      //console.log('kill item array timers', inter);
     }
   }
 
@@ -490,7 +490,7 @@ export default class RPC {
       ) {
         clearInterval(this.timers[i]);
         deleted.push(i);
-        console.log('sanitize - kill item array timers', this.timers[i]);
+        //console.log('sanitize - kill item array timers', this.timers[i]);
       }
     }
     // remove the cleared timers.
@@ -635,12 +635,12 @@ export default class RPC {
   async refresh(fullRefresh: boolean, fullRescan?: boolean) {
     // If we're in refresh, we don't overlap
     if (this.inRefresh) {
-      console.log('in refresh is true');
+      //console.log('in refresh is true');
       return;
     }
 
     if (this.syncStatusTimerID) {
-      console.log('syncStatusTimerID exists already');
+      //console.log('syncStatusTimerID exists already');
       return;
     }
 
@@ -652,7 +652,7 @@ export default class RPC {
     await this.fetchInfoAndServerHeight();
 
     if (!this.lastServerBlockHeight) {
-      console.log('the last server block is zero');
+      //console.log('the last server block is zero');
       return;
     }
 
@@ -678,7 +678,7 @@ export default class RPC {
       if (fullRescan) {
         this.doRescan()
           .then(result => {
-            console.log('rescan finished', result);
+            //console.log('rescan finished', result);
             if (result && !result.toLowerCase().startsWith('error')) {
               const resultJSON: RPCSyncRescan = JSON.parse(result);
               if (resultJSON.result === 'success' && resultJSON.latest_block) {
@@ -694,7 +694,7 @@ export default class RPC {
       } else {
         this.doSync()
           .then(result => {
-            console.log('sync finished', result);
+            //console.log('sync finished', result);
             if (result && !result.toLowerCase().startsWith('error')) {
               const resultJSON: RPCSyncRescan = JSON.parse(result);
               if (resultJSON.result === 'success' && resultJSON.latest_block) {
@@ -719,7 +719,7 @@ export default class RPC {
         const ss: RPCSyncStatusType = await JSON.parse(returnStatus);
 
         //console.log('sync wallet birthday', this.walletBirthday);
-        console.log('sync', this.syncStatusTimerID, 'status', ss);
+        //console.log('sync', this.syncStatusTimerID, 'status', ss);
 
         // syncronize status
         if (this.syncStatusTimerID) {
@@ -837,7 +837,7 @@ export default class RPC {
 
         this.seconds_batch += 5;
 
-        console.log('interval sync/rescan, secs', this.seconds_batch, 'timer', this.syncStatusTimerID);
+        //console.log('interval sync/rescan, secs', this.seconds_batch, 'timer', this.syncStatusTimerID);
 
         this.fnSetSyncingStatus({
           inProgress: ss.in_progress,
@@ -905,7 +905,7 @@ export default class RPC {
           } as SyncingStatusReportClass);
 
           //console.log('sync status', ss);
-          console.log(`Finished refresh at ${this.lastWalletBlockHeight} id: ${ss.sync_id}`);
+          //console.log(`Finished refresh at ${this.lastWalletBlockHeight} id: ${ss.sync_id}`);
         } else {
           // If we're doing a long sync, every time the batch_num changes, save the wallet
           if (this.prevBatchNum !== batch_num) {
@@ -937,9 +937,9 @@ export default class RPC {
               } as SyncingStatusReportClass);
 
               //console.log('sync status', ss);
-              console.log(
-                `@@@@@@@@@@@ Saving because batch num changed ${this.prevBatchNum} - ${batch_num}. seconds: ${this.seconds_batch}`,
-              );
+              //console.log(
+              //  `@@@@@@@@@@@ Saving because batch num changed ${this.prevBatchNum} - ${batch_num}. seconds: ${this.seconds_batch}`,
+              //);
             }
             this.batches += batch_num - this.prevBatchNum;
             this.prevBatchNum = batch_num;
@@ -972,15 +972,15 @@ export default class RPC {
             } as SyncingStatusReportClass);
 
             //console.log('sync status', ss);
-            console.log(`@@@@@@@@@@@Saving wallet. seconds: ${this.seconds_batch}`);
+            //console.log(`@@@@@@@@@@@Saving wallet. seconds: ${this.seconds_batch}`);
           }
         }
       }, 5000);
-      console.log('create sync/rescan timer', this.syncStatusTimerID);
+      //console.log('create sync/rescan timer', this.syncStatusTimerID);
       this.timers.push(this.syncStatusTimerID);
     } else {
       // Already at the latest block
-      console.log('Already have latest block, waiting for next refresh');
+      //console.log('Already have latest block, waiting for next refresh');
       // Here I know the sync process is over, I need to inform to the UI.
       this.fnSetSyncingStatus({
         inProgress: false,
@@ -1370,7 +1370,7 @@ export default class RPC {
           return;
         }
 
-        console.log('progress', progress);
+        //console.log('progress', progress);
 
         // Calculate ETA.
         let secondsPerComputation = 3; // default

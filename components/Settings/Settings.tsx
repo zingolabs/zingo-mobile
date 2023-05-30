@@ -223,7 +223,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         setDisabled(false);
         return;
       } else {
-        console.log('new', new_chain_name, 'old', chain_name);
+        //console.log('new', new_chain_name, 'old', chain_name);
         if (new_chain_name && new_chain_name !== chain_name) {
           sameServerChainName = false;
         }
