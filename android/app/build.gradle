@@ -116,9 +116,13 @@ def enableHermes = project.ext.react.get("enableHermes", false)
  * Whether to enable building a seperate APK for each ABI.
  *
  * Defaults to false but can be set to true with the project properties flag
- * e.g. ./gradlew assembleDebug -Psplitapk=true
+ * e.g. ./gradlew assembleDebug -PsplitApk=true
+ *
+ * Additional option to include a universal APK
+ * e.g. ./gradlew assembleRelease -PsplitApk=true -PincludeUniversalApk=true
  */
-ext.splitapk = project.properties['splitapk'] ?: false
+ext.splitApk = project.properties['splitApk'] ?: false
+ext.includeUniversalApk = project.properties['includeUniversalApk'] ?: false
 
 android {
     namespace 'org.ZingoLabs.Zingo'
@@ -146,10 +150,10 @@ android {
 
     splits {
         abi {
-            enable splitapk.toBoolean()
+            enable splitApk.toBoolean()
             reset()
             include "armeabi-v7a", "x86", "arm64-v8a", "x86_64"
-            universalApk false // If true, also generate a universal APK
+            universalApk includeUniversalApk.toBoolean()
         }
     }
 
