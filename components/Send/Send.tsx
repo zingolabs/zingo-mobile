@@ -75,7 +75,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   const defaultFee = info.defaultFee || Utils.getFallbackDefaultFee();
   const { decimalSeparator } = getNumberFormatSettings();
   const spendable = totalBalance.transparentBal + totalBalance.spendablePrivate + totalBalance.spendableOrchard;
-  const stillConfirming = spendable !== totalBalance.total;
+  const stillConfirming = parseFloat(spendable.toFixed(8)) !== totalBalance.total;
   const showShieldInfo = totalBalance && totalBalance.transparentBal > 0;
 
   const getMaxAmount = useCallback((): number => {
