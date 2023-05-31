@@ -236,7 +236,7 @@ else
     yarn install
 
     echo -e "\nBuilding APKs..."
-    ./gradlew assembleDebug -Psplitapk=true
+    ./gradlew assembleDebug -PsplitApk=true
 
     # Create test report directory
     test_report_dir="app/build/outputs/emulate_app_reports/${abi}"

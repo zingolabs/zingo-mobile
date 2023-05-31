@@ -13,6 +13,6 @@ yarn install
 
 echo -e "\nBuilding APKs..."
 cd android
-./gradlew assembleDebug -Psplitapk=true
+./gradlew assembleDebug -PsplitApk=true
 cd ..
 
