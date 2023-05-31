@@ -1,22 +1,22 @@
 These e2e tests depend on emulating or attaching a device.
 
-1) setup android stack
-you can do this with android studio. create a api-level 30 x86_64 device and name it 30_ga_64
-alternatively, if you dont have android studio, this can help: https://github.com/fluidvanadium/androidstacker
+0) install prerequisites
+# 1) docker
+# 2) sdkmanager (android commandline tools: https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip)
 
-2) install the necessary emulator with scripts/install_emulator_for_e2e.sh
+1) set up emulator
 
-3) build zingo-mobile
-`$ sh scripts/setup.sh`
+`./scripts/start_flow_emulator.sh -a x86_64`
 
-4) run e2e tests
-`$ sh scripts/run_e2e.sh`
+2) run all tests
+`yarn detox build -c android.emu.debug`
+`yarn detox test -c android.emu.debug`
 
-or to run with specifications:
-check installed emulators with 
-`$ emulator -list-avds`
-compare to the configuration aliases in `.detoxrs`
-pick a test called `e2e/TESTNAME.test.js`
-`yarn detox build TESTNAME -c CONFIGURATION`
-`yarn detox test TESTNAME -c CONFIGURATION`
+to run a specific test)
+`yarn detox test TESTNAME -c android.emu.debug`
+
+alternative flow for testing a 32-bit architecture. make sure the -c configuration matches the emulator
+`./scripts/start_flow_emulator.sh -a x86`
+`yarn detox build -c android.emu.32`
+`yarn detox test -c android.emu.32`
 

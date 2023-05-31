@@ -51,19 +51,19 @@ module.exports = {
     emulator: {
       type: 'android.emulator',
       device: {
-        avdName: '30_ga_64'
+        avdName: 'pixel_2-android-30_google_apis_playstore_x86_64'
       }
     },
     emulator_64: {
       type: 'android.emulator',
       device: {
-        avdName: '30_ga_64'
+        avdName: 'pixel_2-android-30_google_apis_playstore_x86_64'
       }
     },
     emulator_32: {
       type: 'android.emulator',
       device: {
-        avdName: '30_ga_32'
+        avdName: 'pixel_2-android-30_google_apis_playstore_x86'
       }
     }
   },
