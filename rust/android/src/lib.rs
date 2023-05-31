@@ -85,6 +85,42 @@ pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RustFFI_00024Companion_initfro
 }
 
 #[no_mangle]
+pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RustFFI_00024Companion_initfromufvk(
+    env: JNIEnv,
+    _: JObject,
+    j_serveruri: JString,
+    j_ufvk: JString,
+    j_birthday: JString,
+    j_data_dir: JString,
+) -> jstring {
+    let server_uri = CString::from(CStr::from_ptr(
+        env.get_string(j_serveruri).unwrap().as_ptr(),
+    ))
+    .into_string()
+    .unwrap();
+
+    let ufvk_tmp = CString::from(CStr::from_ptr(env.get_string(j_ufvk).unwrap().as_ptr()))
+        .into_string()
+        .unwrap();
+
+    let birthday = CString::from(CStr::from_ptr(env.get_string(j_birthday).unwrap().as_ptr()))
+        .into_string()
+        .unwrap()
+        .parse::<u64>()
+        .unwrap();
+
+    let data_dir = CString::from(CStr::from_ptr(env.get_string(j_data_dir).unwrap().as_ptr()))
+        .into_string()
+        .unwrap();
+
+    let _no_seed_warning = rustlib::init_from_ufvk(server_uri, ufvk_tmp, birthday, data_dir);
+
+    let output = env.new_string("Wallet created from ufvk, no seed available").unwrap();
+    output.into_inner()
+}
+
+
+#[no_mangle]
 pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RustFFI_00024Companion_initfromb64(
     env: JNIEnv,
     _: JObject,
