@@ -39,7 +39,7 @@ describe('Component Rescan - test', () => {
   state.translate = () => 'text translated';
   state.info.currencyName = 'ZEC';
   state.totalBalance.total = 1.12345678;
-  state.walletSeed.birthday = 1900100;
+  state.wallet.birthday = 1900100;
   const onClose = jest.fn();
   const onRescan = jest.fn();
   test('Rescan - snapshot', () => {

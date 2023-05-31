@@ -12,7 +12,7 @@ import WalletSettingsClass from './classes/WalletSettingsClass';
 
 import TransactionType from './types/TransactionType';
 import InfoType from './types/InfoType';
-import WalletSeedType from './types/WalletSeedType';
+import WalletType from './types/WalletType';
 import SyncingStatusType from './types/SyncingStatusType';
 import DimensionsType from './types/DimensionsType';
 import zecPriceType from './types/zecPriceType';
@@ -71,7 +71,7 @@ export default interface AppStateLoaded {
   // Build progress from Tx
   sendProgress: SendProgressClass;
 
-  walletSeed: WalletSeedType;
+  wallet: WalletType;
 
   isMenuDrawerOpen: boolean;
 
@@ -112,6 +112,7 @@ export default interface AppStateLoaded {
   backgroundError: BackgroundErrorType;
 
   privacy: boolean;
+  readOnly: boolean;
   poolsToShieldSelectSapling: boolean;
   poolsToShieldSelectTransparent: boolean;
 

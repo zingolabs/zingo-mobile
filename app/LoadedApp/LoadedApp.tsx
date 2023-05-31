@@ -695,11 +695,11 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     this.setState({ isMenuDrawerOpen });
   };
 
-  fetchWalletSeedAndBirthday = async () => {
-    const walletSeed = await RPC.rpc_fetchSeedAndBirthday();
-    if (!isEqual(this.state.walletSeed, walletSeed)) {
-      //console.log('fetch wallet seed & birthday');
-      this.setState({ walletSeed });
+  fetchWallet = async () => {
+    const wallet = await RPC.rpc_fetchWallet();
+    if (!isEqual(this.state.wallet, wallet)) {
+      //console.log('fetch wallet seed or Viewing Key & birthday');
+      this.setState({ wallet });
     }
   };
 
@@ -709,7 +709,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       selectedMenuDrawerItem: item,
     });
 
-    await this.fetchWalletSeedAndBirthday();
+    await this.fetchWallet();
 
     // Depending on the menu item, open the appropriate modal
     if (item === 'About') {
@@ -806,7 +806,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       await RPCModule.execute('changeserver', old_settings.server.uri);
 
       // go to the seed screen for changing the wallet for another in the new server or cancel this action.
-      this.fetchWalletSeedAndBirthday();
+      this.fetchWallet();
       this.setState({
         newServer: value as ServerType,
         server: old_settings.server,
@@ -977,7 +977,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   };
 
   syncingStatusMoreInfoOnClick = async () => {
-    await this.fetchWalletSeedAndBirthday();
+    await this.fetchWallet();
     this.setState({ syncReportModalVisible: true });
   };
 

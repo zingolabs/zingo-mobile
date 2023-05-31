@@ -36,7 +36,7 @@ type SeedProps = {
 const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, action, setBackgroundError }) => {
   const contextLoaded = useContext(ContextAppLoaded);
   const contextLoading = useContext(ContextAppLoading);
-  let walletSeed: WalletSeedType,
+  let wallet: WalletType,
     translate: (key: string) => TranslateType,
     info: InfoType,
     server: ServerType,
@@ -44,7 +44,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
     netInfo: NetInfoType,
     privacy: boolean;
   if (action === 'new' || action === 'restore') {
-    walletSeed = contextLoading.walletSeed;
+    wallet = contextLoading.wallet;
     translate = contextLoading.translate;
     info = contextLoading.info;
     server = contextLoading.server;
@@ -52,7 +52,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
     netInfo = contextLoading.netInfo;
     privacy = contextLoading.privacy;
   } else {
-    walletSeed = contextLoaded.walletSeed;
+    wallet = contextLoaded.wallet;
     translate = contextLoaded.translate;
     info = contextLoaded.info;
     server = contextLoaded.server;
@@ -107,9 +107,9 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
       action === 'new' || action === 'view' || action === 'change' || action === 'backup' || action === 'server',
     );
     setTimes(action === 'change' || action === 'backup' || action === 'server' ? 1 : 0);
-    setSeedPhrase(walletSeed.seed || '');
-    setBirthdayNumber((walletSeed.birthday && walletSeed.birthday.toString()) || '');
-  }, [action, walletSeed.seed, walletSeed.birthday, walletSeed, translate]);
+    setSeedPhrase(wallet.seed || '');
+    setBirthdayNumber((wallet.birthday && wallet.birthday.toString()) || '');
+  }, [action, wallet.seed, wallet.birthday, wallet, translate]);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
@@ -164,7 +164,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
   }, [action]);
 
   //console.log('=================================');
-  //console.log(walletSeed.seed, walletSeed.birthday);
+  //console.log(wallet.seed, wallet.birthday);
   //console.log(seedPhrase, birthdayNumber);
   //console.log(latestBlock);
 

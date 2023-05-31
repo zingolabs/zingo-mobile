@@ -54,7 +54,7 @@ describe('Component SyncReport - test', () => {
   state.translate = () => 'translated text';
   state.info.currencyName = 'ZEC';
   state.totalBalance.total = 1.12345678;
-  state.walletSeed.birthday = 1500100;
+  state.wallet.birthday = 1500100;
   state.syncingStatusReport.syncID = 1;
   state.syncingStatusReport.inProgress = true;
   state.syncingStatusReport.currentBatch = 5;

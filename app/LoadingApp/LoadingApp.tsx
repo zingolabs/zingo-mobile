@@ -43,6 +43,7 @@ import platform from '../platform/platform';
 import BackgroundFileImpl from '../../components/Background/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '../createAlert';
+import ImportKey from '../../components/ImportKey';
 import { isEqual } from 'lodash';
 
 const Seed = React.lazy(() => import('../../components/Seed'));
@@ -406,8 +407,8 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
 
       if (seed && !seed.toLowerCase().startsWith('error')) {
         // TODO verify that JSON don't fail.
-        const walletSeed: WalletSeedType = JSON.parse(seed);
-        this.setState({ walletSeed, screen: 2, actionButtonsDisabled: false, walletExists: true });
+        const wallet: WalletType = JSON.parse(seed);
+        this.setState({ wallet, screen: 2, actionButtonsDisabled: false, walletExists: true });
         // default values for wallet options
         this.set_wallet_option('download_memos', 'wallet');
         //await this.set_wallet_option('transaction_filter_threshold', '500');
@@ -817,21 +818,31 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                     />
                   )}
 
-                  <View style={{ marginTop: 50, display: 'flex', alignItems: 'center' }}>
-                    <Button
-                      testID="loadingapp.restorewalletseed"
-                      type="Secondary"
-                      title={translate('loadingapp.restorewalletseed') as string}
-                      disabled={actionButtonsDisabled}
-                      onPress={this.getwalletSeedToRestore}
-                      style={{ margin: 10 }}
-                    />
-                  </View>
+                <View style={{ marginTop: 50, display: 'flex', alignItems: 'center' }}>
+                  <Button
+                    testID="loadingapp.restorewalletseed"
+                    type="Secondary"
+                    title={translate('loadingapp.restorewalletseed') as string}
+                    disabled={actionButtonsDisabled}
+                    onPress={() => this.getwalletToRestore('seed')}
+                    style={{ margin: 10 }}
+                  />
                 </View>
-              </ScrollView>
-            </>
+
+                <View style={{ marginTop: 50, display: 'flex', alignItems: 'center' }}>
+                  <Button
+                    testID="loadingapp.restorewalletviewingkey"
+                    type="Secondary"
+                    title={translate('loadingapp.restorewalletviewingkey') as string}
+                    disabled={actionButtonsDisabled}
+                    onPress={() => this.getwalletToRestore('viewingkey')}
+                    style={{ margin: 10 }}
+                  />
+                </View>
+              </View>
+            </ScrollView>
           )}
-          {screen === 2 && walletSeed && (
+          {screen === 2 && wallet && (
             <Modal
               animationType="slide"
               transparent={false}
@@ -867,7 +878,25 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                   onClickOK={(s: string, b: number) => this.doRestore(s, b)}
                   onClickCancel={() => this.setState({ screen: 1, actionButtonsDisabled: false })}
                   action={'restore'}
-                  setBackgroundError={this.setBackgroundError}
+                />
+              </Suspense>
+            </Modal>
+          )}
+          {screen === 4 && (
+            <Modal
+              animationType="slide"
+              transparent={false}
+              visible={screen === 4}
+              onRequestClose={() => this.setState({ screen: 1 })}>
+              <Suspense
+                fallback={
+                  <View>
+                    <Text>{translate('loading') as string}</Text>
+                  </View>
+                }>
+                <ImportKey
+                  onClickOK={(s: string, b: number) => this.doRestore(s, b)}
+                  onClickCancel={() => this.setState({ screen: 1 })}
                 />
               </Suspense>
             </Modal>

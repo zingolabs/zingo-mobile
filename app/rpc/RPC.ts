@@ -6,7 +6,7 @@ import {
   TxDetailType,
   InfoType,
   SendJsonToTypeType,
-  WalletSeedType,
+  WalletType,
   SendProgressClass,
   WalletSettingsClass,
   TranslateType,
@@ -337,25 +337,30 @@ export default class RPC {
     }
   }
 
-  static async rpc_fetchSeedAndBirthday(): Promise<WalletSeedType> {
-    try {
-      const seedStr: string = await RPCModule.execute('seed', '');
-      if (seedStr) {
-        if (seedStr.toLowerCase().startsWith('error')) {
-          console.log(`Error seed ${seedStr}`);
-          return {} as WalletSeedType;
+  static async rpc_fetchWallet(readOnly: boolean): Promise<WalletType> {
+    if (readOnly) {
+      // viewing key
+    } else {
+      // seed
+      try {
+        const seedStr: string = await RPCModule.execute('seed', '');
+        if (seedStr) {
+          if (seedStr.toLowerCase().startsWith('error')) {
+            console.log(`Error seed ${seedStr}`);
+            return {} as WalletType;
+          }
+        } else {
+          console.log('Internal Error seed');
+          return {} as WalletType;
         }
-      } else {
-        console.log('Internal Error seed');
-        return {} as WalletSeedType;
-      }
-      const seedJSON: RPCSeedType = await JSON.parse(seedStr);
-      const seed: WalletSeedType = { seed: seedJSON.seed, birthday: seedJSON.birthday };
+        const seedJSON: RPCSeedType = await JSON.parse(seedStr);
+        const seed: WalletType = { seed: seedJSON.seed, birthday: seedJSON.birthday, readOnly };
 
-      return seed;
-    } catch (error) {
-      console.log(`Critical Error seed ${error}`);
-      return {} as WalletSeedType;
+        return seed;
+      } catch (error) {
+        console.log(`Critical Error seed ${error}`);
+        return {} as WalletType;
+      }
     }
   }
 
@@ -1186,10 +1191,10 @@ export default class RPC {
   }
 
   async fetchWalletBirthday(): Promise<void> {
-    const walletSeed = await RPC.rpc_fetchSeedAndBirthday();
+    const wallet = await RPC.rpc_fetchWallet();
 
-    if (walletSeed) {
-      this.walletBirthday = walletSeed.birthday;
+    if (wallet) {
+      this.walletBirthday = wallet.birthday;
     }
   }
 

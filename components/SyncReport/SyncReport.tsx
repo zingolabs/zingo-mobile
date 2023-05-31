@@ -22,7 +22,7 @@ type SyncReportProps = {
 
 const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) => {
   const context = useContext(ContextAppLoaded);
-  const { syncingStatusReport, walletSeed, translate, background, language, netInfo } = context;
+  const { syncingStatusReport, wallet, translate, background, language, netInfo } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [maxBlocks, setMaxBlocks] = useState(0);
   const [points, setPoints] = useState([] as number[]);
@@ -57,7 +57,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
   let process_end_block_fixed = 0;
   if (
     syncingStatusReport.process_end_block &&
-    syncingStatusReport.process_end_block !== walletSeed.birthday &&
+    syncingStatusReport.process_end_block !== wallet.birthday &&
     syncingStatusReport.process_end_block < syncingStatusReport.lastBlockWallet
   ) {
     process_end_block_fixed = syncingStatusReport.process_end_block - 1;
@@ -73,11 +73,9 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
     - server_3 : empty part of the server bar
   */
 
-  const server_1: number = walletSeed.birthday || 0;
+  const server_1: number = wallet.birthday || 0;
   const server_2: number =
-    syncingStatusReport.lastBlockServer && walletSeed.birthday
-      ? syncingStatusReport.lastBlockServer - walletSeed.birthday
-      : 0;
+    syncingStatusReport.lastBlockServer && wallet.birthday ? syncingStatusReport.lastBlockServer - wallet.birthday : 0;
   const server_3: number = maxBlocks ? maxBlocks - server_1 - server_2 : 0;
   const server_1_percent: number = (server_1 * 100) / maxBlocks;
   const server_2_percent: number = (server_2 * 100) / maxBlocks;
@@ -90,9 +88,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
 
   const server_server: number = syncingStatusReport.lastBlockServer || 0;
   const server_wallet: number =
-    syncingStatusReport.lastBlockServer && walletSeed.birthday
-      ? syncingStatusReport.lastBlockServer - walletSeed.birthday
-      : 0;
+    syncingStatusReport.lastBlockServer && wallet.birthday ? syncingStatusReport.lastBlockServer - wallet.birthday : 0;
 
   /*
     WALLET points:
@@ -109,9 +105,9 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
   */
 
   let wallet_1: number =
-    process_end_block_fixed && walletSeed.birthday
-      ? process_end_block_fixed >= walletSeed.birthday
-        ? process_end_block_fixed - walletSeed.birthday
+    process_end_block_fixed && wallet.birthday
+      ? process_end_block_fixed >= wallet.birthday
+        ? process_end_block_fixed - wallet.birthday
         : process_end_block_fixed
       : 0;
   let wallet_2: number =
@@ -128,9 +124,9 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
   }
 
   const wallet_3: number =
-    syncingStatusReport.lastBlockServer && walletSeed.birthday
-      ? process_end_block_fixed >= walletSeed.birthday
-        ? syncingStatusReport.lastBlockServer - walletSeed.birthday - wallet_1 - wallet_2
+    syncingStatusReport.lastBlockServer && wallet.birthday
+      ? process_end_block_fixed >= wallet.birthday
+        ? syncingStatusReport.lastBlockServer - wallet.birthday - wallet_1 - wallet_2
         : syncingStatusReport.lastBlockServer - process_end_block_fixed - wallet_1 - wallet_2
       : 0;
 
@@ -152,7 +148,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
 
   //console.log(
   //  'birthday',
-  //  walletSeed.birthday,
+  //  wallet.birthday,
   //  'end',
   //  syncingStatusReport.process_end_block,
   //  'end fixed',
@@ -419,7 +415,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
                     }}>
                     <>
                       <Text style={{ color: colors.primary }}>
-                        {process_end_block_fixed >= walletSeed.birthday ? walletSeed.birthday : process_end_block_fixed}
+                        {process_end_block_fixed >= wallet.birthday ? wallet.birthday : process_end_block_fixed}
                       </Text>
                       <Text style={{ color: colors.primary }}>{syncingStatusReport.lastBlockServer}</Text>
                     </>

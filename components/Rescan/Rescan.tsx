@@ -17,7 +17,7 @@ type RescanProps = {
 
 const Rescan: React.FunctionComponent<RescanProps> = ({ closeModal, doRescan }) => {
   const context = useContext(ContextAppLoaded);
-  const { walletSeed, translate, netInfo } = context;
+  const { wallet, translate, netInfo } = context;
   const { colors } = useTheme() as unknown as ThemeType;
 
   const doRescanAndClose = () => {
@@ -54,7 +54,7 @@ const Rescan: React.FunctionComponent<RescanProps> = ({ closeModal, doRescan }) 
           justifyContent: 'flex-start',
         }}>
         <View style={{ display: 'flex', margin: 20, marginBottom: 30 }}>
-          <RegText>{(translate('rescan.text-1') as string) + walletSeed.birthday + translate('rescan.text-2')}</RegText>
+          <RegText>{(translate('rescan.text-1') as string) + wallet.birthday + translate('rescan.text-2')}</RegText>
         </View>
       </ScrollView>
       <View
