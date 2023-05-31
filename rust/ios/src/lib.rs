@@ -105,6 +105,70 @@ pub extern "C" fn initfromseed(
 }
 
 #[no_mangle]
+pub extern "C" fn initfromufvk(
+    server_uri: *const c_char,
+    ufvk: *const c_char,
+    birthday: *const c_char,
+    data_dir: *const c_char,
+) -> *mut c_char {
+    let c_str = unsafe { CStr::from_ptr(server_uri) };
+    let server_uri = match c_str.to_str() {
+        Err(_) => {
+            return CString::new("Error parsing 'server_uri' argument".to_owned())
+                .unwrap()
+                .into_raw()
+        }
+        Ok(string) => string,
+    }
+    .to_string();
+
+    let c_str = unsafe { CStr::from_ptr(ufvk) };
+    let ufvk_tmp = match c_str.to_str() {
+        Err(_) => {
+            return CString::new("Error parsing 'ufvk' argument".to_owned())
+                .unwrap()
+                .into_raw()
+        }
+        Ok(string) => string,
+    }
+    .to_string();
+
+    let c_str = unsafe { CStr::from_ptr(birthday) };
+    let birthday = match c_str.to_str() {
+        Err(_) => {
+            return CString::new("Error parsing 'birthday' argument".to_owned())
+                .unwrap()
+                .into_raw()
+        }
+        Ok(string) => string,
+    }
+    .to_string()
+    .parse::<u64>()
+    .unwrap();
+
+    let c_str = unsafe { CStr::from_ptr(data_dir) };
+    let data_dir = match c_str.to_str() {
+        Err(_) => {
+            return CString::new("Error parsing 'data_dir' argument".to_owned())
+                .unwrap()
+                .into_raw()
+        }
+        Ok(string) => string,
+    }
+    .to_string();
+    
+    let _no_seed_warning = rustlib::init_from_ufvk(
+        server_uri,
+        ufvk_tmp,
+        birthday,
+        data_dir,
+    );
+
+    let output = "Wallet created from ufvk, no seed available".to_string();
+    return CString::new(output).unwrap().into_raw();
+}
+
+#[no_mangle]
 pub extern "C" fn initfromb64(
     server_uri: *const c_char,
     base64: *const c_char,

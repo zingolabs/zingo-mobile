@@ -434,7 +434,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
         walletBirthday = '0';
       }
 
-      const result: string = await RPCModule.restoreWallet(seed.toLowerCase(), walletBirthday || '0', server);
+      const result: string = await RPCModule.restoreWalletFromSeed(seed.toLowerCase(), walletBirthday || '0', server);
       if (result && !result.toLowerCase().startsWith('error')) {
         this.setState({ actionButtonsDisabled: false });
         this.navigateToLoaded();
