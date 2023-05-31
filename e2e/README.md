@@ -14,7 +14,7 @@ pick a test called `e2e/TESTNAME.test.js`
 `yarn detox build -c android.emu.debug`
 `yarn detox test TESTNAME -c android.emu.debug`
 
-alt)
+alternative flow for testing a 32-bit architecture)
 `./scripts/start_flow_emulator.sh -a armeabi-v7a`
 `yarn detox test -c android.emu.32`
 `yarn detox build -c android.emu.32`
