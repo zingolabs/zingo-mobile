@@ -288,7 +288,7 @@
     "confirm-memo": "Memorándum",
     "duplicate-nullifier-error": "Tus fondos están todavía confirmándose y probablemente sincronizándose. Puedes esperar hasta que tus fondos estén confirmados o puedes intentar enviar una cantidad más pequeña, La creaccion de la Transacción ha fallado!",
     "dust-error" : "La cantidad que estás intentando enviar a una dirección Transparente is realmente infima, La creacción de la Transacción ha fallado!",
-    "needtoshield": "Hay fondos transparentes para Blindar"
+    "needtoshield": "Hay fondos para Blindar"
   },
   "receive": {
     "u-title": "Dirección Unificada",

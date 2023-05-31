@@ -288,7 +288,7 @@
     "confirm-memo": "Memo",
     "duplicate-nullifier-error": "Your funds are still confirming and probably syncing. You can wait until the funds are confirmed or you can try to send now with a lower amount. The Transaction build failed!",
     "dust-error" : "The amount that you are trying to send to a Transparent address is really tiny. The Transaction build failed!",
-    "needtoshield": "Have transparent funds to shield"
+    "needtoshield": "Have funds to shield"
   },
   "receive": {
     "u-title": "Unified Address",
