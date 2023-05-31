@@ -8,13 +8,14 @@ These e2e tests depend on emulating or attaching a device.
 
 `./scripts/start_flow_emulator.sh -a x86_64`
 
-2) 
-
-pick a test called `e2e/TESTNAME.test.js`
+2) run all tests
 `yarn detox build -c android.emu.debug`
+`yarn detox test -c android.emu.debug`
+
+to run a specific test)
 `yarn detox test TESTNAME -c android.emu.debug`
 
-alternative flow for testing a 32-bit architecture)
+alternative flow for testing a 32-bit architecture. make sure the -c configuration matches the emulator
 `./scripts/start_flow_emulator.sh -a armeabi-v7a`
 `yarn detox build -c android.emu.32`
 `yarn detox test -c android.emu.32`
