@@ -16,7 +16,7 @@ to run a specific test)
 `yarn detox test TESTNAME -c android.emu.debug`
 
 alternative flow for testing a 32-bit architecture. make sure the -c configuration matches the emulator
-`./scripts/start_flow_emulator.sh -a armeabi-v7a`
+`./scripts/start_flow_emulator.sh -a x86`
 `yarn detox build -c android.emu.32`
 `yarn detox test -c android.emu.32`
 
