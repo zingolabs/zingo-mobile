@@ -1,8 +1,6 @@
-import FullViewvingKeysType from './FullViewingKeysType';
-
 export default interface WalletType {
   seed?: string;
-  FullViewingKey?: FullViewvingKeysType;
+  ufvk?: string;
   birthday: number;
 
   // eslint-disable-next-line semi

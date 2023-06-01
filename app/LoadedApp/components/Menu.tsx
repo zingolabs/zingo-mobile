@@ -17,7 +17,7 @@ type MenuProps = {
 
 const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate } = context;
+  const { translate, readOnly } = context;
   const { colors } = useTheme();
   const item = {
     fontSize: 14,
@@ -57,7 +57,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected }) => {
         </RegText>
 
         <RegText onPress={() => onItemSelectedWrapper('Wallet')} style={item}>
-          {translate('loadedapp.wallet') as string}
+          {readOnly ? (translate('loadedapp.wallet') as string) : (translate('loadedapp.walletseed') as string)}
         </RegText>
 
         <RegText onPress={() => onItemSelectedWrapper('Rescan')} style={item}>

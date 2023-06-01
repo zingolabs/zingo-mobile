@@ -66,6 +66,8 @@ export default class RPC {
 
   timers: NodeJS.Timeout[];
 
+  readOnly: boolean;
+
   constructor(
     fnSetSyncingStatusReport: (syncingStatusReport: SyncingStatusReportClass) => void,
     fnSetTotalBalance: (totalBalance: TotalBalanceClass) => void,
@@ -76,6 +78,7 @@ export default class RPC {
     fnSetSyncingStatus: (syncingStatus: SyncingStatusType) => void,
     translate: (key: string) => TranslateType,
     keepAwake: (keep: boolean) => void,
+    readOnly: boolean,
   ) {
     this.fnSetSyncingStatusReport = fnSetSyncingStatusReport;
     this.fnSetTotalBalance = fnSetTotalBalance;
@@ -106,6 +109,8 @@ export default class RPC {
     this.latest_block = -1;
 
     this.timers = [];
+
+    this.readOnly = readOnly;
   }
 
   static async rpc_setInterruptSyncAfterBatch(value: string): Promise<void> {
@@ -340,6 +345,34 @@ export default class RPC {
   static async rpc_fetchWallet(readOnly: boolean): Promise<WalletType> {
     if (readOnly) {
       // viewing key
+      try {
+        const ufvkStr: string = await RPCModule.execute('exportufvk', '');
+        if (ufvkStr) {
+          if (ufvkStr.toLowerCase().startsWith('error')) {
+            console.log(`Error ufvk ${ufvkStr}`);
+            return {} as WalletType;
+          }
+        } else {
+          console.log('Internal Error ufvk');
+          return {} as WalletType;
+        }
+        const birthdayStr: string = await RPCModule.execute('get_birthday', '');
+        if (birthdayStr) {
+          if (birthdayStr.toLowerCase().startsWith('error')) {
+            console.log(`Error get_birthday ${birthdayStr}`);
+            return {} as WalletType;
+          }
+        } else {
+          console.log('Internal Error get_birthday');
+          return {} as WalletType;
+        }
+        const ufvk: WalletType = { ufvk: ufvkStr, birthday: Number(birthdayStr) };
+
+        return ufvk;
+      } catch (error) {
+        console.log(`Critical Error ufvk / get_birthday ${error}`);
+        return {} as WalletType;
+      }
     } else {
       // seed
       try {
@@ -354,7 +387,7 @@ export default class RPC {
           return {} as WalletType;
         }
         const seedJSON: RPCSeedType = await JSON.parse(seedStr);
-        const seed: WalletType = { seed: seedJSON.seed, birthday: seedJSON.birthday, readOnly };
+        const seed: WalletType = { seed: seedJSON.seed, birthday: seedJSON.birthday };
 
         return seed;
       } catch (error) {
@@ -1191,7 +1224,7 @@ export default class RPC {
   }
 
   async fetchWalletBirthday(): Promise<void> {
-    const wallet = await RPC.rpc_fetchWallet();
+    const wallet = await RPC.rpc_fetchWallet(this.readOnly);
 
     if (wallet) {
       this.walletBirthday = wallet.birthday;
@@ -1496,5 +1529,13 @@ export default class RPC {
 
   getInSend(): boolean {
     return this.inSend;
+  }
+
+  setReadOnly(value: boolean): void {
+    this.readOnly = value;
+  }
+
+  getReadOnly(): boolean {
+    return this.readOnly;
   }
 }

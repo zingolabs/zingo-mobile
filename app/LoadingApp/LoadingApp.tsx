@@ -419,11 +419,8 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
     });
   };
 
-  getwalletSeedToRestore = async () => {
-    this.setState({ actionButtonsDisabled: true });
-    setTimeout(() => {
-      this.setState({ walletSeed: {} as WalletSeedType, screen: 3 });
-    });
+  getwalletToRestore = async (type: 'seed' | 'ufvk') => {
+    this.setState({ wallet: {} as WalletType, screen: type === 'seed' ? 3 : 4 });
   };
 
   doRestore = async (seed: string, birthday: number) => {
@@ -831,11 +828,11 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
 
                 <View style={{ marginTop: 50, display: 'flex', alignItems: 'center' }}>
                   <Button
-                    testID="loadingapp.restorewalletviewingkey"
+                    testID="loadingapp.restorewalletufvk"
                     type="Secondary"
-                    title={translate('loadingapp.restorewalletviewingkey') as string}
+                    title={translate('loadingapp.restorewalletufvk') as string}
                     disabled={actionButtonsDisabled}
-                    onPress={() => this.getwalletToRestore('viewingkey')}
+                    onPress={() => this.getwalletToRestore('ufvk')}
                     style={{ margin: 10 }}
                   />
                 </View>

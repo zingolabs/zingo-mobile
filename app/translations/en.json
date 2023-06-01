@@ -29,7 +29,7 @@
     "createnewwallet": "Create New Wallet (new seed)",
     "opencurrentwallet": "Open Current Wallet",
     "restorewalletseed": "Restore wallet from Seed",
-    "restorewalletviewingkey": "Restore wallet from Viewing Key",
+    "restorewalletufvk": "Restore wallet from Viewing Key",
     "creatingwallet-label": "Error creating Wallet",
     "readingwallet-label": "Error reading Wallet",
     "invalidseed-label": "Invalid Seed Phrase",
@@ -41,7 +41,7 @@
     "options": "Options",
     "settings": "Settings",
     "walletseed": "Wallet Seed",
-    "walletviewingkey": "Wallet Viewing Key",
+    "walletufvk": "Wallet Viewing Key",
     "rescanwallet": "Rescan Wallet",
     "report": "Sync / Rescan Report",
     "changewallet": "Change to another Wallet",
@@ -373,11 +373,11 @@
     "connectionexpensive": "Connection Expensive."
   },
   "import": {
-    "title": "Import Key",
-    "key-label": "Spending/Private or Full Viewing/Viewing key",
+    "title": "Viewing Key",
+    "key-label": "Enter the Unified Full Viewing key",
     "birthday": "Key Birthday",
-    "text": "Importing a key requires a rescan, and make take a long time to complete. Your balances will update automatically.",
-    "button": "Import",
+    "text": "Restoring from viewing key requires a rescan, and make take a long time to complete.",
+    "button": "Restore Wallet",
     "key-acc": "Key Field",
     "birthday-acc": "Birthday Field"
   },
@@ -392,7 +392,7 @@
     ]
   },
   "scanner": {
-    "text" : "Scan a Spending/Private or Full Viewing/Viewing Key",
+    "text" : "Scan a Unified Full Viewing Key",
     "uri-error": "URI Error:",
     "nozcash-error": "is not a valid Zcash Address",
     "scanaddress": "Scan a Zcash Address"

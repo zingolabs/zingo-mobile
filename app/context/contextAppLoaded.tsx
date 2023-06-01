@@ -54,6 +54,7 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   infoModalVisible: false,
   rescanModalVisible: false,
   seedViewModalVisible: false,
+  ufvkViewModalVisible: false,
   seedChangeModalVisible: false,
   seedBackupModalVisible: false,
   seedServerModalVisible: false,

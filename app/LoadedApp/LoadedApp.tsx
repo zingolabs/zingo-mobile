@@ -58,6 +58,7 @@ import BackgroundFileImpl from '../../components/Background/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Insight from '../../components/Insight';
 import { createAlert } from '../createAlert';
+import Ufvk from '../../components/Ufvk';
 
 const History = React.lazy(() => import('../../components/History'));
 const Send = React.lazy(() => import('../../components/Send'));
@@ -247,6 +248,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       this.setSyncingStatus,
       props.translate,
       this.keepAwake,
+      false,
     );
 
     this.dim = {} as EmitterSubscription;
@@ -422,6 +424,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       infoModalVisible: false,
       rescanModalVisible: false,
       seedViewModalVisible: false,
+      ufvkViewModalVisible: false,
       seedChangeModalVisible: false,
       seedBackupModalVisible: false,
       seedServerModalVisible: false,
@@ -696,7 +699,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   };
 
   fetchWallet = async () => {
-    const wallet = await RPC.rpc_fetchWallet();
+    const wallet = await RPC.rpc_fetchWallet(this.state.readOnly);
     if (!isEqual(this.state.wallet, wallet)) {
       //console.log('fetch wallet seed or Viewing Key & birthday');
       this.setState({ wallet });
@@ -726,8 +729,12 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       this.setState({ poolsModalVisible: true });
     } else if (item === 'Insight') {
       this.setState({ insightModalVisible: true });
-    } else if (item === 'Wallet Seed') {
-      this.setState({ seedViewModalVisible: true });
+    } else if (item === 'Wallet') {
+      if (this.state.readOnly) {
+        this.setState({ ufvkViewModalVisible: true });
+      } else {
+        this.setState({ seedViewModalVisible: true });
+      }
     } else if (item === 'Change Wallet') {
       this.setState({ seedChangeModalVisible: true });
     } else if (item === 'Restore Wallet Backup') {
@@ -1000,6 +1007,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       computingModalVisible,
       rescanModalVisible,
       seedViewModalVisible,
+      ufvkViewModalVisible,
       seedChangeModalVisible,
       seedBackupModalVisible,
       seedServerModalVisible,
@@ -1176,6 +1184,25 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
               <Seed
                 onClickOK={() => this.setState({ seedViewModalVisible: false })}
                 onClickCancel={() => this.setState({ seedViewModalVisible: false })}
+                action={'view'}
+              />
+            </Suspense>
+          </Modal>
+
+          <Modal
+            animationType="slide"
+            transparent={false}
+            visible={ufvkViewModalVisible}
+            onRequestClose={() => this.setState({ ufvkViewModalVisible: false })}>
+            <Suspense
+              fallback={
+                <View>
+                  <Text>{translate('loading') as string}</Text>
+                </View>
+              }>
+              <Ufvk
+                onClickOK={() => this.setState({ ufvkViewModalVisible: false })}
+                onClickCancel={() => this.setState({ ufvkViewModalVisible: false })}
                 action={'view'}
               />
             </Suspense>

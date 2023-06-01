@@ -22,6 +22,16 @@ jest.mock('react-native-localize', () => ({
   },
 }));
 jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
+jest.mock('react-native-reanimated', () => {
+  return class Reanimated {
+    public static Value() {
+      return jest.fn(() => {});
+    }
+    public static View() {
+      return '';
+    }
+  };
+});
 jest.mock('@react-native-community/netinfo', () => {
   const RN = jest.requireActual('react-native');
 
@@ -40,11 +50,11 @@ describe('Component ImportKey - test', () => {
     state.translate = () => 'text translated';
     state.info.currencyName = 'ZEC';
     state.totalBalance.total = 1.12345678;
-    const onClose = jest.fn();
-    const onImport = jest.fn();
+    const onCancel = jest.fn();
+    const onOK = jest.fn();
     const importKey = render(
       <ContextAppLoadedProvider value={state}>
-        <ImportKeyModal closeModal={onClose} doImport={onImport} />
+        <ImportKeyModal onClickCancel={onCancel} onClickOK={onOK} />
       </ContextAppLoadedProvider>,
     );
     expect(importKey.toJSON()).toMatchSnapshot();

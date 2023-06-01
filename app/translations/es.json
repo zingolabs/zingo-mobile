@@ -29,7 +29,7 @@
     "createnewwallet": "Crear Monedero Nuevo (nueva semilla)",
     "opencurrentwallet": "Abrir Monedero Activo",
     "restorewalletseed": "Restaurar Monedero con la Semilla",
-    "restorewalletviewingkey": "Restaurar Monedero con la Clave de Visualización",
+    "restorewalletufvk": "Restaurar Monedero con la Clave de Visualización",
     "creatingwallet-label": "Error Creando el Monedero",
     "readingwallet-label": "Error Leyendo el Monedero",
     "invalidseed-label": "Semilla incorrecta",
@@ -41,7 +41,7 @@
     "options": "Opciones",
     "settings": "Parámetros",
     "walletseed": "Semilla del Monedero",
-    "walletviewingkey": "Clave de Visualización del Monedero",
+    "walletufvk": "Clave de Visualización del Monedero",
     "rescanwallet": "Re-Escanear el Monedero",
     "report": "Informe de Sincronización",
     "changewallet": "Abrir otro Monedero",
@@ -373,11 +373,11 @@
     "connectionexpensive": "conexión Costosa/Cara."
   },
   "import": {
-    "title": "Importar Clave",
-    "key-label": "Clave Gastar/Privada o de Visualización Total/Visualización",
+    "title": "Clave de Visualización",
+    "key-label": "Introduce la Clave de Visualización Totalmente Unificada",
     "birthday": "Cumpleaños de la Clave",
-    "text": "Importar una Clave implica un Re-escaneo completo, y puede tomar mucho tiempo completarlo. Tus Balances se actualizarán automáticamente.",
-    "button": "Importar",
+    "text": "Importar una Clave implica un Re-escaneo completo, y puede tomar mucho tiempo completarlo.",
+    "button": "Restaurar Monedero",
     "key-acc": "Campo Clave",
     "birthday-acc": "Campo Cumpleaños"
   },
@@ -392,7 +392,7 @@
     ]
   },
   "scanner": {
-    "text" : "Escanea una Clave Gastar/Privada o una de Visualizacion Total/Visualización",
+    "text" : "Escanea una Clave de Visualización Totalmente Unificada",
     "uri-error": "URI Error:",
     "nozcash-error": "no es una dirección Zcash válida",
     "scanaddress": "Escanea una dirección Zcash"
