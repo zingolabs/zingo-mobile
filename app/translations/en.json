@@ -33,7 +33,9 @@
     "creatingwallet-label": "Error creating Wallet",
     "readingwallet-label": "Error reading Wallet",
     "invalidseed-label": "Invalid Seed Phrase",
-    "invalidseed-error": "The seed phrase was invalid. Review every single word of the seed."
+    "invalidseed-error": "The seed phrase was invalid. Review every single word of the seed.",
+    "invalidufvk-label": "Invalid Unified Full Viewing Key",
+    "invalidufvk-error": "The Viewing Key was invalid. Review the Key and/or scan it again."
   },
   "loadedapp": {
     "about": "About Zingo!",

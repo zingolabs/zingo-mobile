@@ -33,7 +33,9 @@
     "creatingwallet-label": "Error Creando el Monedero",
     "readingwallet-label": "Error Leyendo el Monedero",
     "invalidseed-label": "Semilla incorrecta",
-    "invalidseed-error": "La semilla proporcionada no es correcta. Revisa cada una de las palabras."
+    "invalidseed-error": "La semilla proporcionada no es correcta. Revisa cada una de las palabras.",
+    "invalidufvk-label": "Clave de Visualización incorrecta",
+    "invalidufvk-error": "La Clave de Visualización proporcionada no es correcta. Revisa la clave y/o escaneala de nuevo."
   },
   "loadedapp": {
     "about": "Sobre Zingo!",

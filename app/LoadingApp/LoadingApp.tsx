@@ -423,13 +423,23 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
     this.setState({ wallet: {} as WalletType, screen: type === 'seed' ? 3 : 4 });
   };
 
-  doRestore = async (seed: string, birthday: number) => {
-    if (!seed) {
-      createAlert(
-        this.setBackgroundError,
-        this.props.translate('loadingapp.invalidseed-label') as string,
-        this.props.translate('loadingapp.invalidseed-error') as string,
-      );
+  doRestore = async (seed_ufvk: string, birthday: number, type: 'seed' | 'ufvk') => {
+    const { server } = this.state;
+
+    if (!seed_ufvk) {
+      if (type === 'seed') {
+        createAlert(
+          this.setBackgroundError,
+          this.props.translate('loadingapp.invalidseed-label') as string,
+          this.props.translate('loadingapp.invalidseed-error') as string,
+        );
+      } else {
+        createAlert(
+          this.setBackgroundError,
+          this.props.translate('loadingapp.invalidufvk-label') as string,
+          this.props.translate('loadingapp.invalidufvk-error') as string,
+        );
+      }
       return;
     }
 
@@ -443,17 +453,18 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
         walletBirthday = '0';
       }
 
-      const result: string = await RPCModule.restoreWalletFromSeed(
-        seed.toLowerCase(),
-        walletBirthday || '0',
-        this.state.server.uri,
-        this.state.server.chain_name,
-      );
+      let result: string;
+      if (type === 'seed') {
+        result = await RPCModule.restoreWalletFromSeed(seed_ufvk.toLowerCase(), walletBirthday || '0', server, 'main');
+      } else {
+        result = await RPCModule.restoreWalletFromUfvk(seed_ufvk, walletBirthday || '0', server, 'main');
+      }
       if (result && !result.toLowerCase().startsWith('error')) {
         this.setState({ actionButtonsDisabled: false });
         this.navigateToLoaded();
       } else {
         this.setState({ actionButtonsDisabled: false });
+        // this message work for both.
         createAlert(this.setBackgroundError, this.props.translate('loadingapp.readingwallet-label') as string, result);
       }
     });
@@ -872,7 +883,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                   </View>
                 }>
                 <Seed
-                  onClickOK={(s: string, b: number) => this.doRestore(s, b)}
+                  onClickOK={(s: string, b: number) => this.doRestore(s, b, 'seed')}
                   onClickCancel={() => this.setState({ screen: 1, actionButtonsDisabled: false })}
                   action={'restore'}
                 />
@@ -892,7 +903,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                   </View>
                 }>
                 <ImportKey
-                  onClickOK={(s: string, b: number) => this.doRestore(s, b)}
+                  onClickOK={(s: string, b: number) => this.doRestore(s, b, 'ufvk')}
                   onClickCancel={() => this.setState({ screen: 1 })}
                 />
               </Suspense>
