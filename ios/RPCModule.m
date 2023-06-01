@@ -240,14 +240,14 @@ RCT_REMAP_METHOD(createNewWallet,
 }
 
 // restore a wallet from a given seed and birthday. This also saves the wallet
-RCT_REMAP_METHOD(restoreWallet,
+RCT_REMAP_METHOD(restoreWalletFromSeed,
                  restoreSeed:(NSString*)restoreSeed
                  birthday:(NSString*)birthday
                  server:(NSString*)server
-                 restoreWalletWithResolver:(RCTPromiseResolveBlock)resolve
-                 restoreWalletWithRejecter:(RCTPromiseRejectBlock)reject) {
+                 restoreWalletFromSeedWithResolver:(RCTPromiseResolveBlock)resolve
+                 restoreWalletFromSeedWithRejecter:(RCTPromiseRejectBlock)reject) {
   @autoreleasepool {
-    // RCTLogInfo(@"restoreWallet called with %@ %@", restoreSeed, birthday);
+    // RCTLogInfo(@"restoreWalletFromSeed called with %@ %@", restoreSeed, birthday);
 
     NSArray *paths = NSSearchPathForDirectoriesInDomains
                     (NSDocumentDirectory, NSUserDomainMask, YES);
@@ -265,6 +265,34 @@ RCT_REMAP_METHOD(restoreWallet,
     }
 
     resolve(seedStr);
+  }
+}
+
+RCT_REMAP_METHOD(restoreWalletFromUfvk,
+                 restoreUfvk:(NSString*)restoreUfvk
+                 birthday:(NSString*)birthday
+                 server:(NSString*)server
+                 restoreWalletFromUfvkWithResolver:(RCTPromiseResolveBlock)resolve
+                 restoreWalletFromUfvkWithRejecter:(RCTPromiseRejectBlock)reject) {
+  @autoreleasepool {
+    // RCTLogInfo(@"restoreWalletFromUfvk called with %@ %@", restoreUfvk, birthday);
+
+    NSArray *paths = NSSearchPathForDirectoriesInDomains
+                    (NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+
+    char* ufvk = initfromufvk([server UTF8String], [restoreUfvk UTF8String], [birthday UTF8String], [documentsDirectory UTF8String]);
+    NSString* ufvkStr = [NSString stringWithUTF8String:ufvk];
+    rust_free(ufvk);
+
+    // RCTLogInfo(@"Ufvk: %@", ufvkStr);
+
+    if (![ufvkStr hasPrefix:@"Error"]) {
+      // Also save the wallet after restore
+      [self saveWalletInternal];
+    }
+
+    resolve(ufvkStr);
   }
 }
 

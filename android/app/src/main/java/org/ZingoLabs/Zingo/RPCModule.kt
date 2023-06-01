@@ -69,19 +69,35 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun restoreWallet(seed: String, birthday: String, server: String, promise: Promise) {
+    fun restoreWalletFromSeed(seed: String, birthday: String, server: String, promise: Promise) {
         // Log.w("MAIN", "Restoring wallet with seed $seed")
 
         RustFFI.initlogging()
 
         val rseed = RustFFI.initfromseed(server, seed, birthday, reactContext.applicationContext.filesDir.absolutePath)
-        // Log.w("MAIN", seed)
+        // Log.w("MAIN", rseed)
 
         if (!rseed.startsWith("Error")) {
             saveWallet()
         }
 
         promise.resolve(rseed)
+    }
+
+    @ReactMethod
+    fun restoreWalletFromUfvk(ufvk: String, birthday: String, server: String, promise: Promise) {
+        // Log.w("MAIN", "Restoring wallet with ufvk $ufvk")
+
+        RustFFI.initlogging()
+
+        val rufvk = RustFFI.initfromufvk(server, ufvk, birthday, reactContext.applicationContext.filesDir.absolutePath)
+        // Log.w("MAIN", rufvk)
+
+        if (!rufvk.startsWith("Error")) {
+            saveWallet()
+        }
+
+        promise.resolve(rufvk)
     }
 
     @ReactMethod

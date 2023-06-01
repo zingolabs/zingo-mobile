@@ -16,6 +16,13 @@ class RustFFI {
             datadir: String
         ): String
 
+        external fun initfromufvk(
+            serveruri: String,
+            ufvk: String,
+            birthday: String,
+            datadir: String
+        ): String
+
         external fun initfromb64(
             serveruri: String,
             datab64: String,
