@@ -419,7 +419,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       </View>
 
       <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', left: 0 }}>
-        <>
+        <View style={{ width: 48, alignItems: 'center' }}>
           {!noDrawMenu && (
             <TouchableOpacity
               testID="header.drawmenu"
@@ -431,10 +431,10 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           )}
           {readOnly && (
             <TouchableOpacity onPress={() => null}>
-              <FontAwesomeIcon icon={faSnowflake} size={50} color={colors.zingo} />
+              <FontAwesomeIcon icon={faSnowflake} size={48} color={colors.zingo} />
             </TouchableOpacity>
           )}
-        </>
+        </View>
       </View>
 
       <View style={{ padding: 15, position: 'absolute', right: 0, alignItems: 'flex-end' }}>
