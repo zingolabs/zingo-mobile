@@ -80,5 +80,5 @@ Alternatively, to run gradle managed devices integration tests. From the root di
 if you already have the emulator created, you can target it without recreating it: `./scripts/emulator_target -a x86_64`
 
 3) start yarn react-native (node) server and run yarn detox
-   `./scripts/flow_run_e2e.sh ALL`
-or to run a specific test: `./scripts/flow_run_e2e.sh new_wallet`
+   `./scripts/flow_test_e2e.sh ALL`
+or to run a specific test: `./scripts/flow_test_e2e.sh new_wallet`

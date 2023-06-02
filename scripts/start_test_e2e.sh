@@ -13,4 +13,4 @@ shift
 
 ./scripts/emulator_target.sh $@
 
-./scripts/flow_run_e2e.sh $test_suite
+./scripts/flow_test_e2e.sh $test_suite
