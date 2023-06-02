@@ -36,8 +36,13 @@ jobs:
       abi: armeabi-v7a
   
   e2e-test:
+    strategy:
+      matrix:
+        abi: [ x86 ]
     uses: ./.github/workflows/e2e-test.yaml
     needs: [ create-cache-key, build ]
     if: ${{ ! cancelled() }}
     with:
+      timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+      abi: ${{ matrix.abi }}  
