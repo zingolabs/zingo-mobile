@@ -1,10 +1,7 @@
 #!/bin/bash
 set -e
-
 cd $(git rev-parse --show-toplevel)
-
 source ./scripts/emulator_read_target.sh
-
 timeout_seconds=1800  # default timeout set to 30 minutes
 
 function check_launch() {
@@ -45,6 +42,8 @@ function wait_for() {
         exit 1
     fi
 }
+
+./scripts/kill_emulators.sh
 
 echo -e "\n\nWaiting for emulator to launch..."
 nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-boot-anim -no-snapshot-save -read-only -port 5554 &> "${output_dir}/emulator_boot.txt" &

@@ -8,8 +8,7 @@ if [[ "${test_suite}" == "ALL" ]]; then
   test_suite="";
 fi
 
-killall node
-nohup yarn react-native start &> "${output_dir}/react-native_start.txt" &
+./scripts/yarn_react-native_node_server.sh
 
 detox_target="android.emu.${arch}"
 yarn detox build -c $detox_target

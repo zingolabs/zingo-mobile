@@ -10,4 +10,4 @@ cd $(git rev-parse --show-toplevel)
 
 ./scripts/emulator_target.sh $@
 
-./scripts/flow_emulator_run_interactive.sh
+./scripts/flow_emulate_interactive.sh
