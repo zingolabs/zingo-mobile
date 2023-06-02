@@ -35,7 +35,6 @@ echo 'ran react-native'
 
 =======
 echo 'killing node'
-killall node
 
 echo 'yarn react-native start'
 nohup yarn react-native start &> "${output_dir}/react-native_start.txt" &
