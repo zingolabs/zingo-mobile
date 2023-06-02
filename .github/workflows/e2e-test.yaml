@@ -95,6 +95,8 @@ jobs:
           max_attempts: 3
           command: ./scripts/emulator_create.sh
 
+      - run: yarn install
+      
       - name: Run e2e tests
         run: "./scripts/flow_test_e2e.sh new_wallet"
         # uses: nick-fields/retry@v2
