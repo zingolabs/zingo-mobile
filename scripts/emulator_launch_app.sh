@@ -36,7 +36,7 @@ adb -s emulator-5554 shell cat /proc/cpuinfo &> "${output_dir}/cpuinfo.txt"
 adb -s emulator-5554 shell logcat -v threadtime -b main &> "${output_dir}/logcat.txt" &
 
 # Start react-native
-./scripts/yarn_react-native_node_server.sh
+./scripts/node_reboot.sh
 
 echo -e "\nWaiting for react-native/node/metro..."
 wait_for $timeout_seconds check_metro_server
