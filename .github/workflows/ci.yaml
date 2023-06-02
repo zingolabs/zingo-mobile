@@ -7,9 +7,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  jest-test:
-    uses: ./.github/workflows/jest-test.yaml
-    
   create-timestamp:
     uses: ./.github/workflows/create-timestamp.yaml
     
