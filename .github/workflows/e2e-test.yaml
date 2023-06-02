@@ -96,7 +96,7 @@ jobs:
           command: ./scripts/emulator_create.sh
 
       - name: Run e2e tests
-        run: ./scripts/flow_test_e2e.sh new_wallet
+        run: "./scripts/flow_test_e2e.sh new_wallet"
         # uses: nick-fields/retry@v2
         # with:
         #   timeout_minutes: 60
