@@ -42,11 +42,11 @@ describe('Component Ufvk - test', () => {
   state.wallet.ufvk =
     'uview1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890';
   const onClose = jest.fn();
-  const onSet = jest.fn();
+  const onOK = jest.fn();
   test('PrivKey Private - snapshot', () => {
     const privKey = render(
       <ContextAppLoadedProvider value={state}>
-        <Ufvk onClickCancel={onClose} set_privacy_option={onSet} />
+        <Ufvk onClickCancel={onClose} onClickOK={onOK} action="view" />
       </ContextAppLoadedProvider>,
     );
     expect(privKey.toJSON()).toMatchSnapshot();

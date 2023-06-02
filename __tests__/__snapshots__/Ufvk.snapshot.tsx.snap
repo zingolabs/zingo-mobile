@@ -80,9 +80,28 @@ exports[`Component Ufvk - test PrivKey Private - snapshot 1`] = `
             }
           }
         >
-          text translated
+          text translated (text translated)
         </Text>
       </View>
+    </View>
+    <View
+      style={
+        {
+          "backgroundColor": "rgb(255, 255, 255)",
+          "left": 0,
+          "padding": 10,
+          "position": "absolute",
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "width": 48,
+          }
+        }
+      />
     </View>
     <View
       style={
@@ -114,86 +133,6 @@ exports[`Component Ufvk - test PrivKey Private - snapshot 1`] = `
       >
         (undefinedxundefined)-undefined
       </Text>
-      <View
-        accessible={true}
-        collapsable={false}
-        focusable={true}
-        onClick={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
-        style={
-          {
-            "opacity": 1,
-          }
-        }
-      >
-        <View
-          style={
-            {
-              "alignItems": "center",
-              "flexDirection": "row",
-              "justifyContent": "center",
-              "marginTop": 15,
-            }
-          }
-        >
-          <Text
-            style={
-              {
-                "color": "rgb(216, 216, 216)",
-                "fontSize": 13,
-              }
-            }
-          >
-            text translated
-          </Text>
-          <View
-            style={
-              {
-                "alignItems": "center",
-                "borderColor": undefined,
-                "borderRadius": 5,
-                "borderWidth": 1,
-                "flexDirection": "row",
-                "justifyContent": "center",
-                "paddingHorizontal": 5,
-              }
-            }
-          >
-            <Text
-              style={
-                {
-                  "color": "rgb(216, 216, 216)",
-                  "fontSize": 13,
-                  "marginRight": 5,
-                }
-              }
-            >
-              text translated
-            </Text>
-            <
-              icon={
-                {
-                  "icon": [
-                    576,
-                    512,
-                    [],
-                    "f3c1",
-                    "M352 144c0-44.2 35.8-80 80-80s80 35.8 80 80v48c0 17.7 14.3 32 32 32s32-14.3 32-32V144C576 64.5 511.5 0 432 0S288 64.5 288 144v48H64c-35.3 0-64 28.7-64 64V448c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V256c0-35.3-28.7-64-64-64H352V144z",
-                  ],
-                  "iconName": "lock-open",
-                  "prefix": "fas",
-                }
-              }
-              size={14}
-            />
-          </View>
-        </View>
-      </View>
     </View>
     <View
       style={
@@ -205,6 +144,15 @@ exports[`Component Ufvk - test PrivKey Private - snapshot 1`] = `
       }
     />
   </View>
+  <View
+    style={
+      {
+        "backgroundColor": "rgb(0, 122, 255)",
+        "height": 1,
+        "width": "100%",
+      }
+    }
+  />
   <RCTScrollView
     contentContainerStyle={
       {
@@ -220,13 +168,25 @@ exports[`Component Ufvk - test PrivKey Private - snapshot 1`] = `
     }
   >
     <View>
+      <Text
+        style={
+          {
+            "color": "rgb(28, 28, 30)",
+            "marginTop": 0,
+            "opacity": 0.65,
+            "padding": 20,
+            "textAlign": "center",
+          }
+        }
+      >
+        text translated
+      </Text>
       <View
         style={
           {
             "alignItems": "center",
             "display": "flex",
             "flexDirection": "column",
-            "marginBottom": 30,
             "marginTop": 0,
           }
         }
@@ -448,6 +408,13 @@ exports[`Component Ufvk - test PrivKey Private - snapshot 1`] = `
           </RCTScrollView>
         </View>
       </View>
+      <View
+        style={
+          {
+            "marginBottom": 30,
+          }
+        }
+      />
     </View>
   </RCTScrollView>
   <View
@@ -475,9 +442,11 @@ exports[`Component Ufvk - test PrivKey Private - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
+          "backgroundColor": "rgb(0, 122, 255)",
           "borderColor": "rgb(0, 122, 255)",
           "borderRadius": 10,
           "borderWidth": 2,
+          "color": "rgb(0, 122, 255)",
           "justifyContent": "center",
           "maxWidth": "90%",
           "minHeight": 48,
@@ -506,15 +475,13 @@ exports[`Component Ufvk - test PrivKey Private - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(0, 122, 255)",
+              "color": "rgb(242, 242, 242)",
               "fontSize": 16,
               "fontWeight": "bold",
               "textTransform": "uppercase",
             }
           }
-        >
-          text translated
-        </Text>
+        />
       </View>
     </View>
   </View>
