@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 cd $(git rev-parse --show-toplevel)
-source ./scripts/emulator_target.sh $@
+source ./scripts/emulator_read_target.sh
 
 killall node
 nohup yarn react-native start &> "${output_dir}/react-native_start.txt" &
