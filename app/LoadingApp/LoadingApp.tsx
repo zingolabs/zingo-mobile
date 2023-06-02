@@ -232,17 +232,20 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
     await AsyncStorage.setItem('@background', 'no');
     setTimeout(async () => {
       const exists = await RPCModule.walletExists();
-      //console.log('Wallet Exists result', exists);
+      console.log('Wallet Exists result', exists);
 
       if (exists && exists !== 'false') {
         this.setState({ walletExists: true });
         const networkState = await NetInfo.fetch();
         if (networkState.isConnected) {
-          const result: string = await RPCModule.loadExistingWallet(
-            this.state.server.uri,
-            this.state.server.chain_name,
-          );
-          //console.log('Load Wallet Exists result', error);
+          let result: string = await RPCModule.loadExistingWallet(this.state.server, 'main');
+          if (result === 'Error: This wallet is watch-only.') {
+            // here I know this wallet is from an ufvk.
+            this.setState({ readOnly: true });
+            // this warning is not an error, bypassing...
+            result = 'OK';
+          }
+          console.log('Load Wallet Exists result', result);
           if (result && !result.toLowerCase().startsWith('error')) {
             // Load the wallet and navigate to the transactions screen
             this.navigateToLoaded();
@@ -259,7 +262,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
           Toast.show(this.props.translate('loadedapp.connection-error') as string, Toast.LONG);
         }
       } else {
-        //console.log('Loading new wallet');
+        console.log('Loading new wallet');
         this.setState({ screen: 1, walletExists: false });
       }
     });
@@ -396,7 +399,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
     const { navigation } = this.props;
     navigation.reset({
       index: 0,
-      routes: [{ name: 'LoadedApp' }],
+      routes: [{ name: 'LoadedApp', params: { readOnly: this.state.readOnly } }],
     });
   };
 
@@ -458,9 +461,15 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
         result = await RPCModule.restoreWalletFromSeed(seed_ufvk.toLowerCase(), walletBirthday || '0', server, 'main');
       } else {
         result = await RPCModule.restoreWalletFromUfvk(seed_ufvk, walletBirthday || '0', server, 'main');
+        if (result === 'Error: This wallet is watch-only.') {
+          // this warning is not an error, bypassing...
+          result = 'ok';
+        }
       }
+      console.log(seed_ufvk);
+      console.log(result);
       if (result && !result.toLowerCase().startsWith('error')) {
-        this.setState({ actionButtonsDisabled: false });
+        this.setState({ actionButtonsDisabled: false, readOnly: type === 'seed' ? false : true });
         this.navigateToLoaded();
       } else {
         this.setState({ actionButtonsDisabled: false });

@@ -105,6 +105,7 @@ export default function LoadedApp(props: LoadedAppProps) {
   const i18n = useMemo(() => new I18n(file), [file]);
 
   const translate: (key: string) => TranslateType = (key: string) => i18n.t(key);
+  const readOnly = props.route.params ? props.route.params.readOnly : false;
 
   useEffect(() => {
     (async () => {
@@ -186,6 +187,7 @@ export default function LoadedApp(props: LoadedAppProps) {
         sendAll={sendAll}
         privacy={privacy}
         background={background}
+        readOnly={readOnly}
       />
     );
   }
@@ -202,6 +204,7 @@ type LoadedAppClassProps = {
   sendAll: boolean;
   privacy: boolean;
   background: BackgroundType;
+  readOnly: boolean;
 };
 
 class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
@@ -228,6 +231,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       sendAll: props.sendAll,
       privacy: props.privacy,
       background: props.background,
+      readOnly: props.readOnly,
       dimensions: {
         width: Number(screen.width.toFixed(0)),
         height: Number(screen.height.toFixed(0)),
@@ -248,7 +252,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       this.setSyncingStatus,
       props.translate,
       this.keepAwake,
-      false,
+      props.readOnly,
     );
 
     this.dim = {} as EmitterSubscription;
@@ -382,7 +386,11 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     //console.log(url);
     // Attempt to parse as URI if it starts with zcash
     if (url.startsWith('zcash:')) {
-      const target: string | ZcashURITargetClass = await parseZcashURI(url, this.state.translate);
+      const target: string | ZcashURITargetClass = await parseZcashURI(
+        url,
+        this.state.translate,
+        this.state.info.currencyName,
+      );
       //console.log(targets);
 
       if (typeof target !== 'string') {
@@ -700,8 +708,9 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
   fetchWallet = async () => {
     const wallet = await RPC.rpc_fetchWallet(this.state.readOnly);
+    console.log(wallet, this.state.readOnly);
     if (!isEqual(this.state.wallet, wallet)) {
-      //console.log('fetch wallet seed or Viewing Key & birthday');
+      console.log('fetch wallet seed or Viewing Key & birthday');
       this.setState({ wallet });
     }
   };
@@ -1201,9 +1210,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                 </View>
               }>
               <Ufvk
-                onClickOK={() => this.setState({ ufvkViewModalVisible: false })}
                 onClickCancel={() => this.setState({ ufvkViewModalVisible: false })}
-                action={'view'}
+                set_privacy_option={this.set_privacy_option}
               />
             </Suspense>
           </Modal>

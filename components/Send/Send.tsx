@@ -97,7 +97,6 @@ const Send: React.FunctionComponent<SendProps> = ({
         return false;
       }
       const result: string = await RPCModule.execute('parse_address', address);
-      //console.log(result, result.length);
       if (result) {
         if (result.toLowerCase().startsWith('error') || result.toLowerCase() === 'null') {
           return false;
@@ -135,7 +134,6 @@ const Send: React.FunctionComponent<SendProps> = ({
         return false;
       }
       const result: string = await RPCModule.execute('parse_address', address);
-      //console.log(address, result, result.length);
       if (result) {
         if (result.toLowerCase().startsWith('error') || result.toLowerCase() === 'null') {
           return false;
@@ -246,7 +244,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     if (address !== null) {
       // Attempt to parse as URI if it starts with zcash
       if (address.startsWith('zcash:')) {
-        const target: string | ZcashURITargetClass = await parseZcashURI(address, translate);
+        const target: string | ZcashURITargetClass = await parseZcashURI(address, translate, info.currencyName);
         //console.log(targets);
 
         if (typeof target !== 'string') {

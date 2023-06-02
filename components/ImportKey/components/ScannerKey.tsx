@@ -10,15 +10,12 @@ type ScannerKeyProps = {
 const ScannerKey: React.FunctionComponent<ScannerKeyProps> = ({ setPrivKeyText, closeModal }) => {
   const context = useContext(ContextAppLoading);
   const { translate } = context;
-  const validateKey = (scannedKey: string) => {
-    setPrivKeyText(scannedKey);
-    closeModal();
-  };
 
-  const onRead = (e: BarCodeReadEvent) => {
+  const onRead = async (e: BarCodeReadEvent) => {
     const scandata = e.data.trim();
 
-    validateKey(scandata);
+    setPrivKeyText(scandata);
+    closeModal();
   };
 
   const doCancel = () => {

@@ -8,6 +8,7 @@ import { TranslateType } from '../AppState';
 const parseZcashURI = async (
   uri: string,
   translate: (key: string) => TranslateType,
+  currencyName: string,
 ): Promise<string | ZcashURITargetClass> => {
   if (!uri || uri === '') {
     return translate('uris.baduri') as string;
@@ -25,17 +26,30 @@ const parseZcashURI = async (
   const address = parsedUri.pathname;
 
   const resultParse: string = await RPCModule.execute('parse_address', address);
+  const resultParse: string = await RPCModule.execute('parse_address', address);
   if (resultParse) {
     if (resultParse.toLowerCase().startsWith('error') || resultParse.toLowerCase() === 'null') {
-      return 'Right now it is not possible to verify the address with the server';
+      return translate('uris.parseerror') as string;
     }
   } else {
-    return 'Right now it is not possible to verify the address with the server';
+    return translate('uris.parseerror') as string;
   }
   // TODO: check if the json parse is correct.
   const resultParseJSON: RPCParseAddressType = await JSON.parse(resultParse);
 
-  const validParse = resultParseJSON.status === 'success';
+  const validParse =
+    resultParseJSON.status === 'success' &&
+    ((!!currencyName &&
+      currencyName === 'ZEC' &&
+      !!resultParseJSON.chain_name &&
+      (resultParseJSON.chain_name.toLowerCase() === 'main' ||
+        resultParseJSON.chain_name.toLowerCase() === 'mainnet')) ||
+      (!!currencyName &&
+        currencyName !== 'ZEC' &&
+        !!resultParseJSON.chain_name &&
+        (resultParseJSON.chain_name.toLowerCase() === 'test' ||
+          resultParseJSON.chain_name.toLowerCase() === 'testnet' ||
+          resultParseJSON.chain_name.toLowerCase() === 'regtest')));
 
   if (address && !validParse) {
     return `"${address || ''}" ${translate('uris.notvalid')}`;
@@ -78,17 +92,29 @@ const parseZcashURI = async (
           return `${translate('uris.duplicateparameter')} "${qName}"`;
         }
         const result: string = await RPCModule.execute('parse_address', value);
+        const result: string = await RPCModule.execute('parse_address', value);
         if (result) {
           if (result.toLowerCase().startsWith('error') || result.toLowerCase() === 'null') {
-            return 'Right now it is not possible to verify the address with the server';
+            return translate('uris.parseerror') as string;
           }
         } else {
-          return 'Right now it is not possible to verify the address with the server';
+          return translate('uris.parseerror') as string;
         }
         // TODO: check if the json parse is correct.
         const resultJSON: RPCParseAddressType = await JSON.parse(result);
 
-        const valid = resultJSON.status === 'success';
+        const valid =
+          resultJSON.status === 'success' &&
+          ((!!currencyName &&
+            currencyName === 'ZEC' &&
+            !!resultJSON.chain_name &&
+            (resultJSON.chain_name.toLowerCase() === 'main' || resultJSON.chain_name.toLowerCase() === 'mainnet')) ||
+            (!!currencyName &&
+              currencyName !== 'ZEC' &&
+              !!resultJSON.chain_name &&
+              (resultJSON.chain_name.toLowerCase() === 'test' ||
+                resultJSON.chain_name.toLowerCase() === 'testnet' ||
+                resultJSON.chain_name.toLowerCase() === 'regtest')));
 
         if (!valid) {
           return `"${value}" ${translate('uris.notvalid')}`;

@@ -397,12 +397,13 @@
     "text" : "Escanea una Clave de Visualización Totalmente Unificada",
     "uri-error": "URI Error:",
     "nozcash-error": "no es una dirección Zcash válida",
-    "scanaddress": "Escanea una dirección Zcash"
+    "scanaddress": "Escanea una dirección Zcash",
+    "noviewkey-error": "No es una Clave de Visualización Totalmente Unificada valida"
   },
   "privkey": {
-    "privkey": " Gastar/Privada ",
-    "viewkey": " Visualizacion Total/Visualización ",
-    "nokey": "Sin Claves",
+    "privkey": "Gastar/Privada ",
+    "viewkey": "Clave de Visualizacion",
+    "nokey": "Sin Clave",
     "tapcopy-message": "Clave copiada al portapapeles",
     "title": "Clave",
     "address": "Dirección"
@@ -430,6 +431,7 @@
     "noparameter": "Parámetro desconocido",
     "noamount": "No tenía una cantidad",
     "noaddress": "No tenía una dirección",
-    "oneentry": "URI Debería tener al menos una entrada"
+    "oneentry": "URI Debería tener al menos una entrada",
+    "parseerror": "En este momento no es posible verificar la dirección en el Servidor"
   }
 }

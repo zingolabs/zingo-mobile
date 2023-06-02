@@ -15,6 +15,7 @@ import { ThemeType } from '../../app/types';
 import { ContextAppLoading } from '../../app/context';
 import Header from '../Header';
 import RPCModule from '../../app/RPCModule';
+import { RPCParseViewKeyType } from '../../app/rpc/types/RPCParseViewKeyType';
 
 type ImportKeyProps = {
   onClickCancel: () => void;
@@ -30,6 +31,7 @@ const ImportKey: React.FunctionComponent<ImportKeyProps> = ({ onClickCancel, onC
   const [qrcodeModalVisible, setQrcodeModalVisible] = useState(false);
   const [titleViewHeight, setTitleViewHeight] = useState(0);
   const [latestBlock, setLatestBlock] = useState(0);
+  const [currencyName, setCurrencyName] = useState('');
 
   const slideAnim = useRef(new Animated.Value(0)).current;
 
@@ -73,12 +75,64 @@ const ImportKey: React.FunctionComponent<ImportKeyProps> = ({ onClickCancel, onC
     }
   }, [info.latestBlock, latestBlock, server]);
 
-  const okButton = () => {
+  useEffect(() => {
+    // TODO: Here I assume this value is undefined because the App
+    // doesn't connect to the server yet. We need to change that in some
+    // future. It's not an easy task right now.
+    if (info.currencyName) {
+      setCurrencyName(info.currencyName);
+    } else {
+      setCurrencyName('ZEC');
+    }
+  }, [info.currencyName, currencyName]);
+
+  const okButton = async () => {
     if (!netInfo.isConnected) {
       Toast.show(translate('loadedapp.connection-error') as string, Toast.LONG);
       return;
     }
+    const valid = await validateKey(privKeyText);
+    if (!valid) {
+      return;
+    }
     onClickOK(privKeyText, Number(birthday));
+  };
+
+  const validateKey = async (scannedKey: string): Promise<boolean> => {
+    const result: string = await RPCModule.execute('parse_viewkey', scannedKey);
+    if (result) {
+      if (result.toLowerCase().startsWith('error')) {
+        Toast.show(`${translate('scanner.noviewkey-error')}`, Toast.LONG);
+        return false;
+      }
+    } else {
+      Toast.show(`${translate('scanner.noviewkey-error')}`, Toast.LONG);
+      return false;
+    }
+    // TODO verify that JSON don't fail.
+    const resultJSON: RPCParseViewKeyType = await JSON.parse(result);
+
+    console.log('parse ufvk', scannedKey, resultJSON, currencyName);
+
+    const valid =
+      resultJSON.status === 'success' &&
+      ((!!currencyName &&
+        currencyName === 'ZEC' &&
+        !!resultJSON.chain_name &&
+        (resultJSON.chain_name.toLowerCase() === 'main' || resultJSON.chain_name.toLowerCase() === 'mainnet')) ||
+        (!!currencyName &&
+          currencyName !== 'ZEC' &&
+          !!resultJSON.chain_name &&
+          (resultJSON.chain_name.toLowerCase() === 'test' ||
+            resultJSON.chain_name.toLowerCase() === 'testnet' ||
+            resultJSON.chain_name.toLowerCase() === 'regtest')));
+
+    if (valid) {
+      return true;
+    } else {
+      Toast.show(`${translate('scanner.noviewkey-error')}`, Toast.LONG);
+      return false;
+    }
   };
 
   return (

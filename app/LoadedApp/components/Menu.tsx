@@ -57,7 +57,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected }) => {
         </RegText>
 
         <RegText onPress={() => onItemSelectedWrapper('Wallet')} style={item}>
-          {readOnly ? (translate('loadedapp.wallet') as string) : (translate('loadedapp.walletseed') as string)}
+          {readOnly ? (translate('loadedapp.walletufvk') as string) : (translate('loadedapp.walletseed') as string)}
         </RegText>
 
         <RegText onPress={() => onItemSelectedWrapper('Rescan')} style={item}>

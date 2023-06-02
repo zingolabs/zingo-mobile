@@ -397,11 +397,12 @@
     "text" : "Scan a Unified Full Viewing Key",
     "uri-error": "URI Error:",
     "nozcash-error": "is not a valid Zcash Address",
-    "scanaddress": "Scan a Zcash Address"
+    "scanaddress": "Scan a Zcash Address",
+    "noviewkey-error": "It is not a valid Unified Full Viewing Key"
   },
   "privkey": {
-    "privkey": " Spending/Private ",
-    "viewkey": " Full Viewing/Viewing ",
+    "privkey": "Spending/Private ",
+    "viewkey": "Viewing Key ",
     "nokey": "No Key",
     "tapcopy-message": "Copied Key to Clipboard",
     "title": "Key",
@@ -430,6 +431,7 @@
     "noparameter": "Unknown parameter",
     "noamount": "Didn't have an amount",
     "noaddress": "Didn't have an address",
-    "oneentry": "URI Should have at least 1 entry"
+    "oneentry": "URI Should have at least 1 entry",
+    "parseerror": "Right now it is not possible to verify the address with the server"
   }
 }
