@@ -44,7 +44,7 @@ import BackgroundFileImpl from '../../components/Background/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '../createAlert';
 import ImportKey from '../../components/ImportKey';
-import { isEqual } from 'lodash';
+import { RPCWalletKindType } from '../rpc/types/RPCWalletKindType';
 
 const Seed = React.lazy(() => import('../../components/Seed'));
 
@@ -240,14 +240,18 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
         if (networkState.isConnected) {
           let result: string = await RPCModule.loadExistingWallet(this.state.server, 'main');
           if (result === 'Error: This wallet is watch-only.') {
-            // here I know this wallet is from an ufvk.
-            this.setState({ readOnly: true });
             // this warning is not an error, bypassing...
             result = 'OK';
           }
           console.log('Load Wallet Exists result', result);
           if (result && !result.toLowerCase().startsWith('error')) {
             // Load the wallet and navigate to the transactions screen
+            const walletKindStr: string = await RPCModule.execute('wallet_kind', '');
+            console.log(walletKindStr);
+            const walletKindJSON: RPCWalletKindType = await JSON.parse(walletKindStr);
+            this.setState({
+              readOnly: walletKindJSON.kind === 'Seeded' ? false : true,
+            });
             this.navigateToLoaded();
           } else {
             this.setState({ screen: 1 });

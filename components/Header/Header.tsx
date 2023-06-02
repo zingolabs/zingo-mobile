@@ -422,6 +422,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         <View style={{ width: 48, alignItems: 'center' }}>
           {!noDrawMenu && (
             <TouchableOpacity
+              style={{ marginBottom: 5 }}
               testID="header.drawmenu"
               accessible={true}
               accessibilityLabel={translate('menudrawer-acc') as string}
