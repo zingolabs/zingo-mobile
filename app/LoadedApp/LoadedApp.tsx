@@ -432,10 +432,13 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       infoModalVisible: false,
       rescanModalVisible: false,
       seedViewModalVisible: false,
-      ufvkViewModalVisible: false,
       seedChangeModalVisible: false,
       seedBackupModalVisible: false,
       seedServerModalVisible: false,
+      ufvkViewModalVisible: false,
+      ufvkChangeModalVisible: false,
+      ufvkBackupModalVisible: false,
+      ufvkServerModalVisible: false,
       syncReportModalVisible: false,
       poolsModalVisible: false,
       insightModalVisible: false,
@@ -745,9 +748,17 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
         this.setState({ seedViewModalVisible: true });
       }
     } else if (item === 'Change Wallet') {
-      this.setState({ seedChangeModalVisible: true });
+      if (this.state.readOnly) {
+        this.setState({ ufvkChangeModalVisible: true });
+      } else {
+        this.setState({ seedChangeModalVisible: true });
+      }
     } else if (item === 'Restore Wallet Backup') {
-      this.setState({ seedBackupModalVisible: true });
+      if (this.state.readOnly) {
+        this.setState({ ufvkBackupModalVisible: true });
+      } else {
+        this.setState({ seedBackupModalVisible: true });
+      }
     }
   };
 
@@ -809,9 +820,15 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     // if the chain_name id different between server or we cannot open the wallet...
     if (error) {
       // I need to open the modal ASAP.
-      this.setState({
-        seedServerModalVisible: true,
-      });
+      if (this.state.readOnly) {
+        this.setState({
+          ufvkServerModalVisible: true,
+        });
+      } else {
+        this.setState({
+          seedServerModalVisible: true,
+        });
+      }
       //console.log(`Error Reading Wallet ${value} - ${error}`);
       if (toast) {
         Toast.show(`${this.props.translate('loadedapp.readingwallet-error')} ${value.uri}`, Toast.LONG);
@@ -982,10 +999,13 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
         //return;
       }
 
+    if (this.state.readOnly) {
+      this.setState({ ufvkServerModalVisible: false });
+    } else {
       this.setState({ seedServerModalVisible: false });
-      // no need to restart the tasks because is about to restart the app.
-      this.navigateToLoading();
     }
+    // no need to restart the tasks because is about to restart the app.
+    this.navigateToLoading();
   };
 
   setUaAddress = (uaAddress: string) => {
@@ -1016,10 +1036,13 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       computingModalVisible,
       rescanModalVisible,
       seedViewModalVisible,
-      ufvkViewModalVisible,
       seedChangeModalVisible,
       seedBackupModalVisible,
       seedServerModalVisible,
+      ufvkViewModalVisible,
+      ufvkChangeModalVisible,
+      ufvkBackupModalVisible,
+      ufvkServerModalVisible,
     } = this.state;
     const { translate } = this.props;
     const { colors } = this.props.theme;
@@ -1201,24 +1224,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
           <Modal
             animationType="slide"
             transparent={false}
-            visible={ufvkViewModalVisible}
-            onRequestClose={() => this.setState({ ufvkViewModalVisible: false })}>
-            <Suspense
-              fallback={
-                <View>
-                  <Text>{translate('loading') as string}</Text>
-                </View>
-              }>
-              <Ufvk
-                onClickCancel={() => this.setState({ ufvkViewModalVisible: false })}
-                set_privacy_option={this.set_privacy_option}
-              />
-            </Suspense>
-          </Modal>
-
-          <Modal
-            animationType="slide"
-            transparent={false}
             visible={seedChangeModalVisible}
             onRequestClose={() => this.setState({ seedChangeModalVisible: false })}>
             <Suspense
@@ -1280,6 +1285,86 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
           <Modal
             animationType="slide"
             transparent={false}
+            visible={ufvkViewModalVisible}
+            onRequestClose={() => this.setState({ ufvkViewModalVisible: false })}>
+            <Suspense
+              fallback={
+                <View>
+                  <Text>{translate('loading') as string}</Text>
+                </View>
+              }>
+              <Ufvk
+                onClickOK={() => this.setState({ ufvkViewModalVisible: false })}
+                onClickCancel={() => this.setState({ ufvkViewModalVisible: false })}
+                action={'view'}
+              />
+            </Suspense>
+          </Modal>
+
+          <Modal
+            animationType="slide"
+            transparent={false}
+            visible={ufvkChangeModalVisible}
+            onRequestClose={() => this.setState({ ufvkChangeModalVisible: false })}>
+            <Suspense
+              fallback={
+                <View>
+                  <Text>{translate('loading') as string}</Text>
+                </View>
+              }>
+              <Ufvk
+                onClickOK={() => this.onClickOKChangeWallet()}
+                onClickCancel={() => this.setState({ ufvkChangeModalVisible: false })}
+                action={'change'}
+              />
+            </Suspense>
+          </Modal>
+
+          <Modal
+            animationType="slide"
+            transparent={false}
+            visible={ufvkBackupModalVisible}
+            onRequestClose={() => this.setState({ ufvkBackupModalVisible: false })}>
+            <Suspense
+              fallback={
+                <View>
+                  <Text>{translate('loading') as string}</Text>
+                </View>
+              }>
+              <Ufvk
+                onClickOK={() => this.onClickOKRestoreBackup()}
+                onClickCancel={() => this.setState({ ufvkBackupModalVisible: false })}
+                action={'backup'}
+              />
+            </Suspense>
+          </Modal>
+
+          <Modal
+            animationType="slide"
+            transparent={false}
+            visible={ufvkServerModalVisible}
+            onRequestClose={() => this.setState({ ufvkServerModalVisible: false })}>
+            <Suspense
+              fallback={
+                <View>
+                  <Text>{translate('loading') as string}</Text>
+                </View>
+              }>
+              <Ufvk
+                onClickOK={() => this.onClickOKServerWallet()}
+                onClickCancel={async () => {
+                  // restart all the tasks again, nothing happen.
+                  await this.rpc.configure();
+                  this.setState({ ufvkServerModalVisible: false });
+                }}
+                action={'server'}
+              />
+            </Suspense>
+          </Modal>
+
+          <Modal
+            animationType="slide"
+            transparent={false}
             visible={computingModalVisible}
             onRequestClose={() => this.setState({ computingModalVisible: false })}>
             <Suspense
@@ -1332,34 +1417,34 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                 </>
               )}
             </Tab.Screen>
-            <Tab.Screen name={translate('loadedapp.send-menu') as string}>
-              {() => (
-                <>
-                  <Suspense
-                    fallback={
-                      <View>
-                        <Text>{translate('loading') as string}</Text>
-                      </View>
-                    }>
-                    <Send
-                      setSendPageState={this.setSendPageState}
-                      sendTransaction={this.sendTransaction}
-                      clearToAddr={this.clearToAddr}
-                      setSendProgress={this.setSendProgress}
-                      toggleMenuDrawer={this.toggleMenuDrawer}
-                      setComputingModalVisible={this.setComputingModalVisible}
-                      syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
-                      poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
-                      setZecPrice={this.setZecPrice}
-                      setBackgroundError={this.setBackgroundError}
-                      set_privacy_option={this.set_privacy_option}
-                      setPoolsToShieldSelectSapling={this.setPoolsToShieldSelectSapling}
-                      setPoolsToShieldSelectTransparent={this.setPoolsToShieldSelectTransparent}
-                    />
-                  </Suspense>
-                </>
-              )}
-            </Tab.Screen>
+            {!this.state.readOnly && (
+              <Tab.Screen name={translate('loadedapp.send-menu') as string}>
+                {() => (
+                  <>
+                    <Suspense
+                      fallback={
+                        <View>
+                          <Text>{translate('loading') as string}</Text>
+                        </View>
+                      }>
+                      <Send
+                        setSendPageState={this.setSendPageState}
+                        sendTransaction={this.sendTransaction}
+                        clearToAddr={this.clearToAddr}
+                        setSendProgress={this.setSendProgress}
+                        toggleMenuDrawer={this.toggleMenuDrawer}
+                        setComputingModalVisible={this.setComputingModalVisible}
+                        syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
+                        poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
+                        setZecPrice={this.setZecPrice}
+                        setBackgroundError={this.setBackgroundError}
+                        set_privacy_option={this.set_privacy_option}
+                      />
+                    </Suspense>
+                  </>
+                )}
+              </Tab.Screen>
+            )}
             <Tab.Screen name={translate('loadedapp.uas-menu') as string}>
               {() => (
                 <>

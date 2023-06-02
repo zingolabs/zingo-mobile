@@ -401,12 +401,36 @@
     "noviewkey-error": "No es una Clave de Visualización Totalmente Unificada valida"
   },
   "privkey": {
+    "buttontexts": {
+      "new": ["Ya he guardado \n la clave de visualización"],
+      "change": [
+        "",
+        "Ya he guardado \n la clave de visualización",
+        "Realmente quieres \n cambiar tu \n monedero activo",
+        "Estás seguro \n al 100%"
+      ],
+      "server": [
+        "",
+        "Ya he guardado \n la clave de visualización",
+        "Realmente quieres \n cambiar el \n servidor activo",
+        "Estás seguro \n al 100%"
+      ],
+      "view": ["Ya he guardado \n la clave de visualización"],
+      "restore": ["Restaurar Monedero"],
+      "backup": [
+        "",
+        "Ya he guardado \n la clave de visualización",
+        "Realmente quieres \n restaurar tu \n copia de seguridad",
+        "Estás seguro \n al 100%"
+      ]
+    },
     "privkey": "Gastar/Privada ",
     "viewkey": "Clave de Visualizacion",
     "nokey": "Sin Clave",
     "tapcopy-message": "Clave copiada al portapapeles",
     "title": "Clave",
-    "address": "Dirección"
+    "address": "Dirección",
+    "text-readonly": "Esta es tu clave de visualización. Por favor apúntala/copiala cuidadosamente. Es la única manera que tienes para restaurar/acceder tu monedero activo de nuevo."
   },
   "pools": {
     "title": "Agrupaciones de Fondos",

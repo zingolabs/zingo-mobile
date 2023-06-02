@@ -8,6 +8,7 @@ import {
   faCloudDownload,
   faLockOpen,
   faLock,
+  faSnowflake,
   faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -79,6 +80,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     currency,
     zecPrice,
     privacy,
+    readOnly,
     poolsToShieldSelectSapling,
     poolsToShieldSelectTransparent,
   } = context;
@@ -416,17 +418,24 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         )}
       </View>
 
-      {!noDrawMenu && (
-        <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', left: 0 }}>
-          <TouchableOpacity
-            testID="header.drawmenu"
-            accessible={true}
-            accessibilityLabel={translate('menudrawer-acc') as string}
-            onPress={toggleMenuDrawer}>
-            <FontAwesomeIcon icon={faBars} size={48} color={colors.border} />
-          </TouchableOpacity>
-        </View>
-      )}
+      <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', left: 0 }}>
+        <>
+          {!noDrawMenu && (
+            <TouchableOpacity
+              testID="header.drawmenu"
+              accessible={true}
+              accessibilityLabel={translate('menudrawer-acc') as string}
+              onPress={toggleMenuDrawer}>
+              <FontAwesomeIcon icon={faBars} size={48} color={colors.border} />
+            </TouchableOpacity>
+          )}
+          {readOnly && (
+            <TouchableOpacity onPress={() => null}>
+              <FontAwesomeIcon icon={faSnowflake} size={50} color={colors.zingo} />
+            </TouchableOpacity>
+          )}
+        </>
+      </View>
 
       <View style={{ padding: 15, position: 'absolute', right: 0, alignItems: 'flex-end' }}>
         <Text style={{ fontSize: 8, color: colors.border }}>{translate('version') as string}</Text>

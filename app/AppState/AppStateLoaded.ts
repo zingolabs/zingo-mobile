@@ -88,10 +88,14 @@ export default interface AppStateLoaded {
   rescanModalVisible: boolean;
 
   seedViewModalVisible: boolean;
-  ufvkViewModalVisible: boolean;
   seedChangeModalVisible: boolean;
   seedBackupModalVisible: boolean;
   seedServerModalVisible: boolean;
+
+  ufvkViewModalVisible: boolean;
+  ufvkChangeModalVisible: boolean;
+  ufvkBackupModalVisible: boolean;
+  ufvkServerModalVisible: boolean;
 
   syncReportModalVisible: boolean;
   poolsModalVisible: boolean;
