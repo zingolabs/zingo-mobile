@@ -51,13 +51,13 @@ module.exports = {
     emulator_x86_64: {
       type: 'android.emulator',
       device: {
-        avdName: 'pixel_2-android-30_google_apis_playstore_x86_64'
+        avdName: 'android-30_google_apis_playstore_x86_64'
       }
     },
     emulator_x86: {
       type: 'android.emulator',
       device: {
-        avdName: 'pixel_2-android-30_google_apis_playstore_x86'
+        avdName: 'android-30_google_apis_playstore_x86'
       }
     }
   },
