@@ -1,22 +1,23 @@
 These e2e tests depend on emulating or attaching a device.
+If you want to understand deeper, read the shell files.
 
 0) install prerequisites
 # 1) docker
 # 2) sdkmanager (android commandline tools: https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip)
+# yarn
 
-1) set up emulator
+1) build rust + typescript + kotlin. requires docker
 
-`./scripts/start_flow_emulator.sh -a x86_64`
+`./scripts/build_apk.sh`
 
-2) run all tests
-`yarn detox build -c android.emu.debug`
-`yarn detox test -c android.emu.debug`
+2) choose a build target to run against. currently works against x86 and x86_64. download and create emulator with sdkmanager.
 
-to run a specific test)
-`yarn detox test TESTNAME -c android.emu.debug`
+`./scripts/flow_emulator_setup.sh -a x86`
 
-alternative flow for testing a 32-bit architecture. make sure the -c configuration matches the emulator
-`./scripts/start_flow_emulator.sh -a x86`
-`yarn detox build -c android.emu.32`
-`yarn detox test -c android.emu.32`
+if you already have the emulator created, you can target it without recreating it: `./scripts/emulator_target -a x86_64`
+
+3) start yarn react-native (node) server and run yarn detox
+
+`./scripts/run_e2e.sh`
+to run a specific test): `./scripts/run_e2e.sh new_wallet`
 
