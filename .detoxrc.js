@@ -48,19 +48,13 @@ module.exports = {
         adbName: '.*'
       }
     },
-    emulator: {
+    emulator_x86_64: {
       type: 'android.emulator',
       device: {
         avdName: 'pixel_2-android-30_google_apis_playstore_x86_64'
       }
     },
-    emulator_64: {
-      type: 'android.emulator',
-      device: {
-        avdName: 'pixel_2-android-30_google_apis_playstore_x86_64'
-      }
-    },
-    emulator_32: {
+    emulator_x86: {
       type: 'android.emulator',
       device: {
         avdName: 'pixel_2-android-30_google_apis_playstore_x86'
@@ -85,15 +79,15 @@ module.exports = {
       app: 'android.release'
     },
     'android.emu.debug': {
-      device: 'emulator',
+      device: 'emulator_x86',
       app: 'android.debug'
     },
-    'android.emu.64': {
-      device: 'emulator_64',
+    'android.emu.x86_64': {
+      device: 'emulator_x86_64',
       app: 'android.debug'
     },
-    'android.emu.32': {
-      device: 'emulator_32',
+    'android.emu.x86': {
+      device: 'emulator_x86',
       app: 'android.debug'
     },
   }
