@@ -5,7 +5,7 @@ cd $(git rev-parse --show-toplevel)
 
 source ./scripts/emulator_read_target.sh
 
-timeout_seconds=1800  # default timeout set to 30 minutes
+timeout_seconds=180  # default timeout set to 3 minutes
 
 function check_metro_server() {
     metro_status=$(cat ${output_dir}/react-native_start.txt | grep Metro)
@@ -33,7 +33,7 @@ function wait_for() {
 adb -s emulator-5554 shell getprop &> "${output_dir}/getprop.txt"
 adb -s emulator-5554 shell cat /proc/meminfo &> "${output_dir}/meminfo.txt"
 adb -s emulator-5554 shell cat /proc/cpuinfo &> "${output_dir}/cpuinfo.txt"
-adb -s emulator-5554 shell logcat -v threadtime -b main &> "${output_dir}/logcat.txt" &
+nohup adb -s emulator-5554 shell logcat -v threadtime -b main &> "${output_dir}/logcat.txt" &
 
 # Start react-native
 if killall -9 node &> /dev/null; then
