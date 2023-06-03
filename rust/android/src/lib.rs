@@ -141,13 +141,8 @@ pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RustFFI_00024Companion_execute
     j_command: JString,
     j_argslist: JString,
 ) -> jstring {
-    let cmd = CString::from(CStr::from_ptr(env.get_string(j_command).unwrap().as_ptr()))
-        .into_string()
-        .unwrap();
-
-    let args_list = CString::from(CStr::from_ptr(env.get_string(j_argslist).unwrap().as_ptr()))
-        .into_string()
-        .unwrap();
+    let cmd = unsafe_unpack_ptr_to_string(j_command, &env);
+    let args_list = unsafe_unpack_ptr_to_string(j_argslist, &env);
 
     let resp = rustlib::execute(cmd, args_list);
 
@@ -161,12 +156,7 @@ pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RustFFI_00024Companion_getlate
     _: JObject,
     j_serveruri: JString,
 ) -> jstring {
-    let server_uri = CString::from(CStr::from_ptr(
-        env.get_string(j_serveruri).unwrap().as_ptr(),
-    ))
-    .into_string()
-    .unwrap();
-
+    let server_uri = unsafe_unpack_ptr_to_string(j_serveruri, &env);
     let resp = rustlib::get_latest_block(server_uri);
 
     let output = env.new_string(resp.as_str()).unwrap();
