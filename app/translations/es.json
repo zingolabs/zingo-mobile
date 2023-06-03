@@ -181,7 +181,7 @@
     "value-sendall-false": "Desactivar",
     "value-privacy-true": "Alta",
     "value-privacy-false": "Normal",
-    "privacy": "Privacidad: ",
+    "privacy": "Priv: ",
     "value-chain_name-main": "Mainnet",
     "value-chain_name-test": "Testnet",
     "value-chain_name-regtest": "Regtest"
