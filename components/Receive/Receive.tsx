@@ -11,7 +11,6 @@ import { useTheme } from '@react-navigation/native';
 //import Utils from '../../app/utils';
 //import RPC from '../../app/rpc';
 //import PrivKey from '../PrivKey';
-//import ImportKey from '../ImportKey';
 import SingleAddress from '../Components/SingleAddress';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
@@ -181,13 +180,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ setUaAddress, toggleMe
       }
     }
     return;
-  };
-
-  const [importKeyModalVisible, setImportKeyModalVisible] = useState(false);
-
-  const importKey = async () => {
-    Toast.show('Error: ' + translate('workingonit'), Toast.LONG);
-    //setImportKeyModalVisible(true);
   };
 
   const doImport = async (key: string, birthday: string) => {
@@ -360,14 +352,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ setUaAddress, toggleMe
           />
         </Modal>*/}
 
-        {/*<Modal
-          animationType="slide"
-          transparent={false}
-          visible={importKeyModalVisible}
-          onRequestClose={() => setImportKeyModalVisible(false)}>
-          <ImportKey doImport={doImport} closeModal={() => setImportKeyModalVisible(false)} />
-        </Modal>*/}
-
         <Header
           toggleMenuDrawer={toggleMenuDrawer}
           title={translate('receive.title') as string}
@@ -392,7 +376,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ setUaAddress, toggleMe
               translate('receive.import-option'),
               translate('cancel'),
             ]},
-            actions={[addO, viewPrivKey, viewViewingKey, importKey]}
+            actions={[addO, viewPrivKey, viewViewingKey]}
           />*/}
         </View>
 

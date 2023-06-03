@@ -6,7 +6,7 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
-import ImportKeyModal from '../components/ImportKey';
+import { ImportUfvk } from '../components/Ufvk';
 import { ContextAppLoadedProvider, defaultAppStateLoaded } from '../app/context';
 
 jest.useFakeTimers();
@@ -43,20 +43,20 @@ jest.mock('@react-native-community/netinfo', () => {
 });
 
 // test suite
-describe('Component ImportKey - test', () => {
+describe('Component ImportUfvk - test', () => {
   //snapshot test
-  test('Matches the snapshot ImportKey', () => {
+  test('Matches the snapshot ImportUfvk', () => {
     const state = defaultAppStateLoaded;
     state.translate = () => 'text translated';
     state.info.currencyName = 'ZEC';
     state.totalBalance.total = 1.12345678;
     const onCancel = jest.fn();
     const onOK = jest.fn();
-    const importKey = render(
+    const importUfvk = render(
       <ContextAppLoadedProvider value={state}>
-        <ImportKeyModal onClickCancel={onCancel} onClickOK={onOK} />
+        <ImportUfvk onClickCancel={onCancel} onClickOK={onOK} />
       </ContextAppLoadedProvider>,
     );
-    expect(importKey.toJSON()).toMatchSnapshot();
+    expect(importUfvk.toJSON()).toMatchSnapshot();
   });
 });

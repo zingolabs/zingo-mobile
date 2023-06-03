@@ -58,7 +58,7 @@ import BackgroundFileImpl from '../../components/Background/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Insight from '../../components/Insight';
 import { createAlert } from '../createAlert';
-import Ufvk from '../../components/Ufvk';
+import { ShowUfvk } from '../../components/Ufvk';
 
 const History = React.lazy(() => import('../../components/History'));
 const Send = React.lazy(() => import('../../components/Send'));
@@ -1293,7 +1293,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                   <Text>{translate('loading') as string}</Text>
                 </View>
               }>
-              <Ufvk
+              <ShowUfvk
                 onClickOK={() => this.setState({ ufvkViewModalVisible: false })}
                 onClickCancel={() => this.setState({ ufvkViewModalVisible: false })}
                 action={'view'}
@@ -1312,7 +1312,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                   <Text>{translate('loading') as string}</Text>
                 </View>
               }>
-              <Ufvk
+              <ShowUfvk
                 onClickOK={() => this.onClickOKChangeWallet()}
                 onClickCancel={() => this.setState({ ufvkChangeModalVisible: false })}
                 action={'change'}
@@ -1331,7 +1331,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                   <Text>{translate('loading') as string}</Text>
                 </View>
               }>
-              <Ufvk
+              <ShowUfvk
                 onClickOK={() => this.onClickOKRestoreBackup()}
                 onClickCancel={() => this.setState({ ufvkBackupModalVisible: false })}
                 action={'backup'}
@@ -1350,7 +1350,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                   <Text>{translate('loading') as string}</Text>
                 </View>
               }>
-              <Ufvk
+              <ShowUfvk
                 onClickOK={() => this.onClickOKServerWallet()}
                 onClickCancel={async () => {
                   // restart all the tasks again, nothing happen.

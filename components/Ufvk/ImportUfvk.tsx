@@ -10,18 +10,18 @@ import Animated, { EasingNode } from 'react-native-reanimated';
 import FadeText from '../Components/FadeText';
 import RegText from '../Components/RegText';
 import Button from '../Components/Button';
-import ScannerKey from './components/ScannerKey';
+import ScannerUfvk from './components/ScannerUfvk';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoading } from '../../app/context';
 import Header from '../Header';
 import RPCModule from '../../app/RPCModule';
 import { RPCParseViewKeyType } from '../../app/rpc/types/RPCParseViewKeyType';
 
-type ImportKeyProps = {
+type ImportUfvkProps = {
   onClickCancel: () => void;
   onClickOK: (keyText: string, birthday: number) => Promise<void>;
 };
-const ImportKey: React.FunctionComponent<ImportKeyProps> = ({ onClickCancel, onClickOK }) => {
+const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, onClickOK }) => {
   const context = useContext(ContextAppLoading);
   const { translate, netInfo, dimensions, info, server } = context;
   const { colors } = useTheme() as unknown as ThemeType;
@@ -149,7 +149,7 @@ const ImportKey: React.FunctionComponent<ImportKeyProps> = ({ onClickCancel, onC
         transparent={false}
         visible={qrcodeModalVisible}
         onRequestClose={() => setQrcodeModalVisible(false)}>
-        <ScannerKey setPrivKeyText={setPrivKeyText} closeModal={() => setQrcodeModalVisible(false)} />
+        <ScannerUfvk setPrivKeyText={setPrivKeyText} closeModal={() => setQrcodeModalVisible(false)} />
       </Modal>
 
       <Animated.View style={{ marginTop: slideAnim }}>
@@ -298,4 +298,4 @@ const ImportKey: React.FunctionComponent<ImportKeyProps> = ({ onClickCancel, onC
   );
 };
 
-export default ImportKey;
+export default ImportUfvk;

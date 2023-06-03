@@ -1,3 +1,4 @@
-import Ufvk from './Ufvk';
+import ShowUfvk from './ShowUfvk';
+import ImportUfvk from './ImportUfvk';
 
-export default Ufvk;
+export { ShowUfvk, ImportUfvk };

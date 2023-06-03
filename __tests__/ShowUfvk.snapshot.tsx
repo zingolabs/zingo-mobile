@@ -6,7 +6,7 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
-import Ufvk from '../components/Ufvk';
+import { ShowUfvk } from '../components/Ufvk';
 import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
 
 jest.useFakeTimers();
@@ -46,7 +46,7 @@ describe('Component Ufvk - test', () => {
   test('PrivKey Private - snapshot', () => {
     const privKey = render(
       <ContextAppLoadedProvider value={state}>
-        <Ufvk onClickCancel={onClose} onClickOK={onOK} action="view" />
+        <ShowUfvk onClickCancel={onClose} onClickOK={onOK} action="view" />
       </ContextAppLoadedProvider>,
     );
     expect(privKey.toJSON()).toMatchSnapshot();

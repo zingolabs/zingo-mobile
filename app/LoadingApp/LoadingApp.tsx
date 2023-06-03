@@ -43,7 +43,7 @@ import platform from '../platform/platform';
 import BackgroundFileImpl from '../../components/Background/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '../createAlert';
-import ImportKey from '../../components/ImportKey';
+import { ImportUfvk } from '../../components/Ufvk';
 import { RPCWalletKindType } from '../rpc/types/RPCWalletKindType';
 
 const Seed = React.lazy(() => import('../../components/Seed'));
@@ -915,7 +915,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                     <Text>{translate('loading') as string}</Text>
                   </View>
                 }>
-                <ImportKey
+                <ImportUfvk
                   onClickOK={(s: string, b: number) => this.doRestore(s, b, 'ufvk')}
                   onClickCancel={() => this.setState({ screen: 1 })}
                 />

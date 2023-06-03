@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Component ImportKey - test Matches the snapshot ImportKey 1`] = `
+exports[`Component ImportUfvk - test Matches the snapshot ImportUfvk 1`] = `
 <RCTSafeAreaView
   style={
     {

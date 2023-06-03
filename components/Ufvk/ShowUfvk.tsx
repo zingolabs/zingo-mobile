@@ -21,12 +21,12 @@ type TextsType = {
   backup: string[];
 };
 
-type UfvkProps = {
+type ShowUfvkProps = {
   onClickOK: () => void;
   onClickCancel: () => void;
   action: 'change' | 'view' | 'backup' | 'server';
 };
-const Ufvk: React.FunctionComponent<UfvkProps> = ({ onClickOK, onClickCancel, action }) => {
+const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCancel, action }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, wallet, info, netInfo } = context;
   const { ufvk } = wallet;
@@ -159,4 +159,4 @@ const Ufvk: React.FunctionComponent<UfvkProps> = ({ onClickOK, onClickCancel, ac
   );
 };
 
-export default Ufvk;
+export default ShowUfvk;
