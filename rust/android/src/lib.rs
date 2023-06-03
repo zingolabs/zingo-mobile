@@ -46,12 +46,6 @@ pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RustFFI_00024Companion_initnew
     .into_string()
     .unwrap();
 
-    let chain_hint = CString::from(CStr::from_ptr(
-        env.get_string(j_chain_hint).unwrap().as_ptr(),
-    ))
-    .into_string()
-    .unwrap();
-
     let data_dir = CString::from(CStr::from_ptr(env.get_string(j_data_dir).unwrap().as_ptr()))
         .into_string()
         .unwrap();
