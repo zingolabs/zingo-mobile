@@ -46,6 +46,7 @@ pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RustFFI_00024Companion_initnew
     let chain_hint = unsafe_unpack_ptr_to_string(j_chain_hint, &env);
     let server_uri = unsafe_unpack_ptr_to_string(j_serveruri, &env);
     let data_dir = unsafe_unpack_ptr_to_string(j_data_dir, &env);
+
     let seed = rustlib::init_new(server_uri, data_dir, &chain_hint);
 
     let output = env.new_string(seed.as_str()).unwrap();
@@ -62,26 +63,13 @@ pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RustFFI_00024Companion_initfro
     j_data_dir: JString,
     j_chain_hint: JString,
 ) -> jstring {
-    let chain_hint = unsafe_unpack_ptr_to_string(j_chain_hint, &env);
-    let server_uri = CString::from(CStr::from_ptr(
-        env.get_string(j_serveruri).unwrap().as_ptr(),
-    ))
-    .into_string()
-    .unwrap();
-
-    let seed_tmp = CString::from(CStr::from_ptr(env.get_string(j_seed).unwrap().as_ptr()))
-        .into_string()
-        .unwrap();
-
-    let birthday = CString::from(CStr::from_ptr(env.get_string(j_birthday).unwrap().as_ptr()))
-        .into_string()
-        .unwrap()
+    let server_uri = unsafe_unpack_ptr_to_string(j_serveruri, &env);
+    let seed_tmp = unsafe_unpack_ptr_to_string(j_seed, &env);
+    let birthday = unsafe_unpack_ptr_to_string(j_birthday, &env)
         .parse::<u64>()
         .unwrap();
-
-    let data_dir = CString::from(CStr::from_ptr(env.get_string(j_data_dir).unwrap().as_ptr()))
-        .into_string()
-        .unwrap();
+    let data_dir = unsafe_unpack_ptr_to_string(j_data_dir, &env);
+    let chain_hint = unsafe_unpack_ptr_to_string(j_chain_hint, &env);
 
     let seed = rustlib::init_from_seed(server_uri, seed_tmp, birthday, data_dir, &chain_hint);
 
@@ -99,30 +87,13 @@ pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RustFFI_00024Companion_initfro
     j_data_dir: JString,
     j_chain_hint: JString,
 ) -> jstring {
-    let chain_hint = CString::from(CStr::from_ptr(
-        env.get_string(j_chain_hint).unwrap().as_ptr(),
-    ))
-    .into_string()
-    .unwrap();
-    let server_uri = CString::from(CStr::from_ptr(
-        env.get_string(j_serveruri).unwrap().as_ptr(),
-    ))
-    .into_string()
-    .unwrap();
-
-    let ufvk_tmp = CString::from(CStr::from_ptr(env.get_string(j_ufvk).unwrap().as_ptr()))
-        .into_string()
-        .unwrap();
-
-    let birthday = CString::from(CStr::from_ptr(env.get_string(j_birthday).unwrap().as_ptr()))
-        .into_string()
-        .unwrap()
+    let server_uri = unsafe_unpack_ptr_to_string(j_serveruri, &env);
+    let ufvk_tmp = unsafe_unpack_ptr_to_string(j_ufvk, &env);
+    let birthday = unsafe_unpack_ptr_to_string(j_birthday, &env)
         .parse::<u64>()
         .unwrap();
-
-    let data_dir = CString::from(CStr::from_ptr(env.get_string(j_data_dir).unwrap().as_ptr()))
-        .into_string()
-        .unwrap();
+    let data_dir = unsafe_unpack_ptr_to_string(j_data_dir, &env);
+    let chain_hint = unsafe_unpack_ptr_to_string(j_chain_hint, &env);
 
     let _no_seed_warning =
         rustlib::init_from_ufvk(server_uri, ufvk_tmp, birthday, data_dir, &chain_hint);
@@ -142,24 +113,10 @@ pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RustFFI_00024Companion_initfro
     j_data_dir: JString,
     j_chain_hint: JString,
 ) -> jstring {
-    let chain_hint = CString::from(CStr::from_ptr(
-        env.get_string(j_chain_hint).unwrap().as_ptr(),
-    ))
-    .into_string()
-    .unwrap();
-    let base64 = CString::from(CStr::from_ptr(env.get_string(j_base64).unwrap().as_ptr()))
-        .into_string()
-        .unwrap();
-
-    let server_uri = CString::from(CStr::from_ptr(
-        env.get_string(j_serveruri).unwrap().as_ptr(),
-    ))
-    .into_string()
-    .unwrap();
-
-    let data_dir = CString::from(CStr::from_ptr(env.get_string(j_data_dir).unwrap().as_ptr()))
-        .into_string()
-        .unwrap();
+    let server_uri = unsafe_unpack_ptr_to_string(j_serveruri, &env);
+    let base64 = unsafe_unpack_ptr_to_string(j_base64, &env);
+    let data_dir = unsafe_unpack_ptr_to_string(j_data_dir, &env);
+    let chain_hint = unsafe_unpack_ptr_to_string(j_chain_hint, &env);
 
     let seed = rustlib::init_from_b64(server_uri, base64, data_dir, &chain_hint);
 
