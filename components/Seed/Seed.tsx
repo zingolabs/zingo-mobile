@@ -16,6 +16,7 @@ import RPCModule from '../../app/RPCModule';
 import RPC from '../../app/rpc';
 import Header from '../Header';
 import Utils from '../../app/utils';
+import { createAlert } from '../../app/createAlert';
 
 type TextsType = {
   new: string[];
@@ -30,8 +31,9 @@ type SeedProps = {
   onClickOK: (seedPhrase: string, birthdayNumber: number) => void;
   onClickCancel: () => void;
   action: 'new' | 'change' | 'view' | 'restore' | 'backup' | 'server';
+  setBackgroundError?: (title: string, error: string) => void;
 };
-const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, action }) => {
+const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, action, setBackgroundError }) => {
   const contextLoaded = useContext(ContextAppLoaded);
   const contextLoading = useContext(ContextAppLoading);
   let walletSeed: WalletSeedType,
@@ -145,11 +147,15 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
             setLatestBlock(Number(resp));
           } else {
             //console.log('error latest block', resp);
+            if (setBackgroundError) {
+              createAlert(setBackgroundError, translate('loadingapp.creatingwallet-label') as string, resp);
+            }
+            onClickCancel();
           }
         })();
       }
     }
-  }, [action, info.latestBlock, latestBlock, server]);
+  }, [action, info.latestBlock, latestBlock, onClickCancel, server, setBackgroundError, translate]);
 
   useEffect(() => {
     if (action !== 'new' && action !== 'restore') {

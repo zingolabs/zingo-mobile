@@ -15,6 +15,7 @@ import {
   AppState,
   NativeEventSubscription,
   Platform,
+  TextInput,
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { I18n } from 'i18n-js';
@@ -23,11 +24,16 @@ import { StackScreenProps } from '@react-navigation/stack';
 import NetInfo, { NetInfoStateType, NetInfoSubscription } from '@react-native-community/netinfo';
 import Toast from 'react-native-simple-toast';
 
+import OptionsMenu from 'react-native-option-menu';
+
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faEllipsisV } from '@fortawesome/free-solid-svg-icons';
+
 import BoldText from '../../components/Components/BoldText';
 import Button from '../../components/Components/Button';
 import RPCModule from '../RPCModule';
 import { AppStateLoading, BackgroundType, WalletSeedType, TranslateType, NetInfoType } from '../AppState';
-import { serverUris } from '../uris';
+import { parseServerURI, serverUris } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import RPC from '../rpc';
 import { ThemeType } from '../types';
@@ -243,6 +249,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
 
   componentDidMount = async () => {
     // First, check if a wallet exists. Do it async so the basic screen has time to render
+    await AsyncStorage.setItem('@background', 'no');
     setTimeout(async () => {
       const exists = await RPCModule.walletExists();
       //console.log('Wallet Exists result', exists);
@@ -381,6 +388,18 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
     this.setState({ actionButtonsDisabled: false });
   };
 
+  useCustomServer = async (customServer: string) => {
+    this.setState({ actionButtonsDisabled: true });
+    const customServerParsed = parseServerURI(customServer, this.state.translate);
+    if (customServerParsed.toLowerCase().startsWith('error')) {
+      Toast.show(this.state.translate('settings.isuri') as string, Toast.LONG);
+    } else {
+      await SettingsFileImpl.writeSettings('server', customServerParsed);
+      this.setState({ server: customServerParsed, customServerShow: false });
+    }
+    this.setState({ actionButtonsDisabled: false });
+  };
+
   navigateToLoaded = () => {
     const { navigation } = this.props;
     navigation.reset({
@@ -409,7 +428,10 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
   };
 
   getwalletSeedToRestore = async () => {
-    this.setState({ walletSeed: {} as WalletSeedType, screen: 3 });
+    this.setState({ actionButtonsDisabled: true });
+    setTimeout(() => {
+      this.setState({ walletSeed: {} as WalletSeedType, screen: 3 });
+    });
   };
 
   doRestore = async (seed: string, birthday: number) => {
@@ -458,8 +480,13 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
     this.setState({ backgroundError: { title, error } });
   };
 
+  customServer = () => {
+    this.setState({ customServerShow: true });
+  };
+
   render() {
-    const { screen, walletSeed, actionButtonsDisabled, walletExists, server, netInfo } = this.state;
+    const { screen, walletSeed, actionButtonsDisabled, walletExists, server, netInfo, customServerShow, customServer } =
+      this.state;
     const { translate } = this.props;
     const { colors } = this.props.theme;
 
@@ -488,133 +515,204 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
             </View>
           )}
           {screen === 1 && (
-            <ScrollView
-              style={{ maxHeight: '100%' }}
-              contentContainerStyle={{
-                flexDirection: 'column',
-                alignItems: 'stretch',
-                justifyContent: 'flex-start',
-                padding: 20,
-              }}>
+            <>
               <View
                 style={{
-                  flex: 1,
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
+                  backgroundColor: colors.card,
+                  padding: 10,
+                  position: 'absolute',
+                  top: 0,
+                  right: 0,
                 }}>
-                <View style={{ marginBottom: 50, display: 'flex', alignItems: 'center' }}>
-                  <Text style={{ color: colors.zingo, fontSize: 40, fontWeight: 'bold' }}>
-                    {translate('zingo') as string}
-                  </Text>
-                  <Text style={{ color: colors.zingo, fontSize: 15 }}>{translate('version') as string}</Text>
-                  <Image
-                    source={require('../../assets/img/logobig-zingo.png')}
-                    style={{ width: 100, height: 100, resizeMode: 'contain', marginTop: 10 }}
-                  />
-                </View>
-
-                <BoldText style={{ fontSize: 15, marginBottom: 3 }}>
-                  {translate('loadingapp.actualserver') as string}
-                </BoldText>
-                <BoldText style={{ fontSize: 15, marginBottom: 10 }}>{server}</BoldText>
-
-                {(!netInfo.isConnected ||
-                  netInfo.type === NetInfoStateType.cellular ||
-                  netInfo.isConnectionExpensive) && (
-                  <>
-                    <BoldText style={{ fontSize: 15, marginBottom: 3 }}>
-                      {translate('report.networkstatus') as string}
-                    </BoldText>
-                    <View
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        alignItems: 'flex-end',
-                        marginHorizontal: 20,
-                      }}>
-                      <View style={{ display: 'flex', flexDirection: 'column', marginBottom: 10 }}>
-                        {!netInfo.isConnected && (
-                          <BoldText style={{ fontSize: 15, color: 'red' }}>
-                            {' '}
-                            {translate('report.nointernet') as string}{' '}
-                          </BoldText>
-                        )}
-                        {netInfo.type === NetInfoStateType.cellular && (
-                          <BoldText style={{ fontSize: 15, color: 'yellow' }}>
-                            {' '}
-                            {translate('report.cellulardata') as string}{' '}
-                          </BoldText>
-                        )}
-                        {netInfo.isConnectionExpensive && (
-                          <BoldText style={{ fontSize: 15, color: 'yellow' }}>
-                            {' '}
-                            {translate('report.connectionexpensive') as string}{' '}
-                          </BoldText>
-                        )}
-                      </View>
-                    </View>
-                  </>
-                )}
-
-                {server === SERVER_DEFAULT_1 && !!SERVER_DEFAULT_0 && (
-                  <Button
-                    type="Primary"
-                    title={translate('loadingapp.changeserver') as string}
-                    disabled={actionButtonsDisabled}
-                    onPress={this.useDefaultServer_0}
-                    style={{ marginBottom: 10 }}
-                  />
-                )}
-                {server === SERVER_DEFAULT_0 && !!SERVER_DEFAULT_1 && (
-                  <Button
-                    type="Primary"
-                    title={translate('loadingapp.changeserver') as string}
-                    disabled={actionButtonsDisabled}
-                    onPress={this.useDefaultServer_1}
-                    style={{ marginBottom: 10 }}
-                  />
-                )}
-                {server !== SERVER_DEFAULT_0 && server !== SERVER_DEFAULT_1 && !!SERVER_DEFAULT_0 && (
-                  <Button
-                    type="Primary"
-                    title={translate('loadingapp.changeserver') as string}
-                    disabled={actionButtonsDisabled}
-                    onPress={this.useDefaultServer_0}
-                    style={{ marginBottom: 10 }}
-                  />
-                )}
-
-                <Button
-                  testID="loadingapp.createnewwallet"
-                  type="Primary"
-                  title={translate('loadingapp.createnewwallet') as string}
-                  disabled={actionButtonsDisabled}
-                  onPress={this.createNewWallet}
-                  style={{ marginBottom: 10, marginTop: 10 }}
+                <OptionsMenu
+                  customButton={<FontAwesomeIcon icon={faEllipsisV} color={'#ffffff'} size={48} />}
+                  buttonStyle={{ width: 48, padding: 10, resizeMode: 'contain' }}
+                  destructiveIndex={5}
+                  options={['Custom Server...', 'Cancel']}
+                  actions={[this.customServer]}
                 />
-                {walletExists && (
-                  <Button
-                    type="Primary"
-                    title={translate('loadingapp.opencurrentwallet') as string}
-                    disabled={actionButtonsDisabled}
-                    onPress={this.componentDidMount}
-                    style={{ marginBottom: 10 }}
-                  />
-                )}
-
-                <View style={{ marginTop: 50, display: 'flex', alignItems: 'center' }}>
-                  <Button
-                    testID="loadingapp.restorewalletseed"
-                    type="Secondary"
-                    title={translate('loadingapp.restorewalletseed') as string}
-                    disabled={actionButtonsDisabled}
-                    onPress={this.getwalletSeedToRestore}
-                    style={{ margin: 10 }}
-                  />
-                </View>
               </View>
-            </ScrollView>
+              <ScrollView
+                style={{ maxHeight: '100%' }}
+                contentContainerStyle={{
+                  flexDirection: 'column',
+                  alignItems: 'stretch',
+                  justifyContent: 'flex-start',
+                  padding: 20,
+                }}>
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                  <View style={{ marginBottom: 50, display: 'flex', alignItems: 'center' }}>
+                    <Text style={{ color: colors.zingo, fontSize: 40, fontWeight: 'bold' }}>
+                      {translate('zingo') as string}
+                    </Text>
+                    <Text style={{ color: colors.zingo, fontSize: 15 }}>{translate('version') as string}</Text>
+                    <Image
+                      source={require('../../assets/img/logobig-zingo.png')}
+                      style={{ width: 100, height: 100, resizeMode: 'contain', marginTop: 10 }}
+                    />
+                  </View>
+
+                  <BoldText style={{ fontSize: 15, marginBottom: 3 }}>
+                    {translate('loadingapp.actualserver') as string}
+                  </BoldText>
+                  <BoldText style={{ fontSize: 15, marginBottom: 10 }}>{server}</BoldText>
+
+                  {customServerShow && (
+                    <>
+                      <View
+                        style={{
+                          borderColor: colors.border,
+                          borderWidth: 1,
+                          marginBottom: 10,
+                          width: '100%',
+                          maxWidth: '100%',
+                          minWidth: '50%',
+                          minHeight: 48,
+                          alignItems: 'center',
+                        }}>
+                        <TextInput
+                          placeholder={'https://------.---:---'}
+                          placeholderTextColor={colors.placeholder}
+                          style={{
+                            color: colors.text,
+                            fontWeight: '600',
+                            fontSize: 18,
+                            minWidth: '50%',
+                            minHeight: 48,
+                            marginLeft: 5,
+                            backgroundColor: 'transparent',
+                          }}
+                          value={customServer}
+                          onChangeText={(text: string) => this.setState({ customServer: text })}
+                          editable={true}
+                          maxLength={100}
+                        />
+                      </View>
+                      <View style={{ flexDirection: 'row' }}>
+                        <Button
+                          type="Primary"
+                          title={translate('save') as string}
+                          disabled={actionButtonsDisabled}
+                          onPress={() => this.useCustomServer(customServer)}
+                          style={{ marginBottom: 10 }}
+                        />
+                        <Button
+                          type="Secondary"
+                          title={translate('cancel') as string}
+                          disabled={actionButtonsDisabled}
+                          onPress={() => this.setState({ customServerShow: false })}
+                          style={{ marginBottom: 10, marginLeft: 10 }}
+                        />
+                      </View>
+                    </>
+                  )}
+
+                  {(!netInfo.isConnected ||
+                    netInfo.type === NetInfoStateType.cellular ||
+                    netInfo.isConnectionExpensive) && (
+                    <>
+                      <BoldText style={{ fontSize: 15, marginBottom: 3 }}>
+                        {translate('report.networkstatus') as string}
+                      </BoldText>
+                      <View
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          alignItems: 'flex-end',
+                          marginHorizontal: 20,
+                        }}>
+                        <View style={{ display: 'flex', flexDirection: 'column', marginBottom: 10 }}>
+                          {!netInfo.isConnected && (
+                            <BoldText style={{ fontSize: 15, color: 'red' }}>
+                              {' '}
+                              {translate('report.nointernet') as string}{' '}
+                            </BoldText>
+                          )}
+                          {netInfo.type === NetInfoStateType.cellular && (
+                            <BoldText style={{ fontSize: 15, color: 'yellow' }}>
+                              {' '}
+                              {translate('report.cellulardata') as string}{' '}
+                            </BoldText>
+                          )}
+                          {netInfo.isConnectionExpensive && (
+                            <BoldText style={{ fontSize: 15, color: 'yellow' }}>
+                              {' '}
+                              {translate('report.connectionexpensive') as string}{' '}
+                            </BoldText>
+                          )}
+                        </View>
+                      </View>
+                    </>
+                  )}
+
+                  {!customServerShow && server === SERVER_DEFAULT_1 && !!SERVER_DEFAULT_0 && (
+                    <Button
+                      type="Primary"
+                      title={translate('loadingapp.changeserver') as string}
+                      disabled={actionButtonsDisabled}
+                      onPress={this.useDefaultServer_0}
+                      style={{ marginBottom: 10 }}
+                    />
+                  )}
+                  {!customServerShow && server === SERVER_DEFAULT_0 && !!SERVER_DEFAULT_1 && (
+                    <Button
+                      type="Primary"
+                      title={translate('loadingapp.changeserver') as string}
+                      disabled={actionButtonsDisabled}
+                      onPress={this.useDefaultServer_1}
+                      style={{ marginBottom: 10 }}
+                    />
+                  )}
+                  {!customServerShow &&
+                    server !== SERVER_DEFAULT_0 &&
+                    server !== SERVER_DEFAULT_1 &&
+                    !!SERVER_DEFAULT_0 && (
+                      <Button
+                        type="Primary"
+                        title={translate('loadingapp.changeserver') as string}
+                        disabled={actionButtonsDisabled}
+                        onPress={this.useDefaultServer_0}
+                        style={{ marginBottom: 10 }}
+                      />
+                    )}
+
+                  <Button
+                    testID="loadingapp.createnewwallet"
+                    type="Primary"
+                    title={translate('loadingapp.createnewwallet') as string}
+                    disabled={actionButtonsDisabled}
+                    onPress={this.createNewWallet}
+                    style={{ marginBottom: 10, marginTop: 10 }}
+                  />
+                  {walletExists && (
+                    <Button
+                      type="Primary"
+                      title={translate('loadingapp.opencurrentwallet') as string}
+                      disabled={actionButtonsDisabled}
+                      onPress={this.componentDidMount}
+                      style={{ marginBottom: 10 }}
+                    />
+                  )}
+
+                  <View style={{ marginTop: 50, display: 'flex', alignItems: 'center' }}>
+                    <Button
+                      testID="loadingapp.restorewalletseed"
+                      type="Secondary"
+                      title={translate('loadingapp.restorewalletseed') as string}
+                      disabled={actionButtonsDisabled}
+                      onPress={this.getwalletSeedToRestore}
+                      style={{ margin: 10 }}
+                    />
+                  </View>
+                </View>
+              </ScrollView>
+            </>
           )}
           {screen === 2 && walletSeed && (
             <Modal
@@ -650,8 +748,9 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                 }>
                 <Seed
                   onClickOK={(s: string, b: number) => this.doRestore(s, b)}
-                  onClickCancel={() => this.setState({ screen: 1 })}
+                  onClickCancel={() => this.setState({ screen: 1, actionButtonsDisabled: false })}
                   action={'restore'}
+                  setBackgroundError={this.setBackgroundError}
                 />
               </Suspense>
             </Modal>

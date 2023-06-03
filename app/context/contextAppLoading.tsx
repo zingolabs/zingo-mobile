@@ -17,7 +17,7 @@ export const defaultAppStateLoading: AppStateLoading = {
   navigation: {} as StackScreenProps<any>['navigation'],
   route: {} as StackScreenProps<any>['route'],
   dimensions: {} as DimensionsType,
-  appState: '' as string,
+  appState: '',
   netInfo: {} as NetInfoType,
 
   screen: 0,
@@ -27,7 +27,7 @@ export const defaultAppStateLoading: AppStateLoading = {
   totalBalance: new TotalBalanceClass(),
   info: {} as InfoType,
 
-  server: '' as string,
+  server: '',
   currency: '',
   language: 'en',
 
@@ -44,6 +44,8 @@ export const defaultAppStateLoading: AppStateLoading = {
   translate: () => '',
   backgroundError: {} as BackgroundErrorType,
   privacy: false,
+  customServerShow: false,
+  customServer: '',
 };
 
 export const ContextAppLoading = React.createContext(defaultAppStateLoading);

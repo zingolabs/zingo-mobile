@@ -37,6 +37,8 @@ export default interface AppStateLoading {
   backgroundError: BackgroundErrorType;
 
   privacy: boolean;
+  customServerShow: boolean;
+  customServer: string;
 
   // eslint-disable-next-line semi
 }

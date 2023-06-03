@@ -37,6 +37,7 @@ const Button: React.FunctionComponent<ButtonProps> = ({
         }
       : type === 'Secondary'
       ? {
+          backgroundColor: disabled ? colors.secondaryDisabled : colors.background,
           borderColor: colors.primary,
           borderWidth: 2,
         }
