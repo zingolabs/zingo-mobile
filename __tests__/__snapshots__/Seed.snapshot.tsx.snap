@@ -278,6 +278,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
+          "backgroundColor": "rgb(242, 242, 242)",
           "borderColor": "rgb(0, 122, 255)",
           "borderRadius": 10,
           "borderWidth": 2,
@@ -603,6 +604,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
+          "backgroundColor": "rgb(242, 242, 242)",
           "borderColor": "rgb(0, 122, 255)",
           "borderRadius": 10,
           "borderWidth": 2,
@@ -1218,6 +1220,7 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
+          "backgroundColor": "rgb(242, 242, 242)",
           "borderColor": "rgb(0, 122, 255)",
           "borderRadius": 10,
           "borderWidth": 2,
@@ -1543,6 +1546,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
+          "backgroundColor": "rgb(242, 242, 242)",
           "borderColor": "rgb(0, 122, 255)",
           "borderRadius": 10,
           "borderWidth": 2,

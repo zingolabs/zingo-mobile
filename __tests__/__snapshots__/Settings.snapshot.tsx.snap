@@ -1381,6 +1381,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
+          "backgroundColor": "rgb(242, 242, 242)",
           "borderColor": "rgb(0, 122, 255)",
           "borderRadius": 10,
           "borderWidth": 2,
