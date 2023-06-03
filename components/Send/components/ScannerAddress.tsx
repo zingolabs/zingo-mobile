@@ -71,7 +71,7 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateTo
           return;
         }
       } else {
-        Toast.show(`"${scannedAddress}" ${translate('scanner.nozcash-error')}`, Toast.LONG);
+        Toast.show(`${translate('scanner.nozcash-error')}`, Toast.LONG);
         return;
       }
     }
