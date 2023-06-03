@@ -20,7 +20,7 @@ pub extern "C" fn init_new(
     let chain_hint_str = unsafe { CStr::from_ptr(chain_hint) };
     let chain_hint = match chain_hint_str.to_str() {
         Err(_) => {
-            return CString::new("Error parsing 'server_uri' argument".to_owned())
+            return CString::new("Error parsing 'chain_hint' argument".to_owned())
                 .unwrap()
                 .into_raw()
         }
@@ -60,7 +60,18 @@ pub extern "C" fn initfromseed(
     seed: *const c_char,
     birthday: *const c_char,
     data_dir: *const c_char,
+    chain_hint: *const c_char,
 ) -> *mut c_char {
+    let chain_hint_str = unsafe { CStr::from_ptr(chain_hint) };
+    let chain_hint = match chain_hint_str.to_str() {
+        Err(_) => {
+            return CString::new("Error parsing 'chain_hint' argument".to_owned())
+                .unwrap()
+                .into_raw()
+        }
+        Ok(string) => string,
+    }
+    .to_string();
     let c_str = unsafe { CStr::from_ptr(server_uri) };
     let server_uri = match c_str.to_str() {
         Err(_) => {
@@ -106,7 +117,7 @@ pub extern "C" fn initfromseed(
         Ok(string) => string,
     }
     .to_string();
-    let seed = rustlib::init_from_seed(server_uri, seed, birthday, data_dir);
+    let seed = rustlib::init_from_seed(server_uri, seed, birthday, data_dir, &chain_hint);
     return CString::new(seed).unwrap().into_raw();
 }
 
@@ -116,7 +127,18 @@ pub extern "C" fn initfromufvk(
     ufvk: *const c_char,
     birthday: *const c_char,
     data_dir: *const c_char,
+    chain_hint: *const c_char,
 ) -> *mut c_char {
+    let chain_hint_str = unsafe { CStr::from_ptr(chain_hint) };
+    let chain_hint = match chain_hint_str.to_str() {
+        Err(_) => {
+            return CString::new("Error parsing 'chain_hint' argument".to_owned())
+                .unwrap()
+                .into_raw()
+        }
+        Ok(string) => string,
+    }
+    .to_string();
     let c_str = unsafe { CStr::from_ptr(server_uri) };
     let server_uri = match c_str.to_str() {
         Err(_) => {
@@ -163,7 +185,8 @@ pub extern "C" fn initfromufvk(
     }
     .to_string();
 
-    let _no_seed_warning = rustlib::init_from_ufvk(server_uri, ufvk_tmp, birthday, data_dir);
+    let _no_seed_warning =
+        rustlib::init_from_ufvk(server_uri, ufvk_tmp, birthday, data_dir, &chain_hint);
 
     let output = "Wallet created from ufvk, no seed available".to_string();
     return CString::new(output).unwrap().into_raw();
@@ -174,7 +197,18 @@ pub extern "C" fn initfromb64(
     server_uri: *const c_char,
     base64: *const c_char,
     data_dir: *const c_char,
+    chain_hint: *const c_char,
 ) -> *mut c_char {
+    let chain_hint_str = unsafe { CStr::from_ptr(chain_hint) };
+    let chain_hint = match chain_hint_str.to_str() {
+        Err(_) => {
+            return CString::new("Error parsing 'chain_hint' argument".to_owned())
+                .unwrap()
+                .into_raw()
+        }
+        Ok(string) => string,
+    }
+    .to_string();
     let c_str = unsafe { CStr::from_ptr(server_uri) };
     let server_uri = match c_str.to_str() {
         Err(_) => {
@@ -208,7 +242,7 @@ pub extern "C" fn initfromb64(
     }
     .to_string();
 
-    let seed = rustlib::init_from_b64(server_uri, base64, data_dir);
+    let seed = rustlib::init_from_b64(server_uri, base64, data_dir, &chain_hint);
 
     return CString::new(seed).unwrap().into_raw();
 }
