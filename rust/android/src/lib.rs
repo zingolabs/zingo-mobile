@@ -11,6 +11,15 @@ use jni::sys::jstring;
 use jni::JNIEnv;
 use std::ffi::{CStr, CString};
 
+unsafe fn unsafe_unpack_ptr_to_string(j_config_hint: JString, env: &JNIEnv) -> String {
+    unsafe {
+        CString::from(CStr::from_ptr(
+            env.get_string(j_config_hint).unwrap().as_ptr(),
+        ))
+        .into_string()
+        .unwrap()
+    }
+}
 #[no_mangle]
 pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RustFFI_00024Companion_initlogging(
     env: JNIEnv,
