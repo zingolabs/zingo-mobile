@@ -52,13 +52,13 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun createNewWallet(server: String, promise: Promise) {
+    fun createNewWallet(server: String, chainhint: String, promise: Promise) {
         // Log.w("MAIN", "Creating new wallet")
 
         RustFFI.initlogging()
 
         // Create a seed
-        val seed = RustFFI.initnew(server, reactContext.applicationContext.filesDir.absolutePath)
+        val seed = RustFFI.initnew(server, reactContext.applicationContext.filesDir.absolutePath, chainhint)
         // Log.w("MAIN-Seed", seed)
 
         if (!seed.startsWith("Error")) {
@@ -69,12 +69,12 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun restoreWalletFromSeed(seed: String, birthday: String, server: String, promise: Promise) {
+    fun restoreWalletFromSeed(seed: String, birthday: String, server: String, chainhint: String, promise: Promise) {
         // Log.w("MAIN", "Restoring wallet with seed $seed")
 
         RustFFI.initlogging()
 
-        val rseed = RustFFI.initfromseed(server, seed, birthday, reactContext.applicationContext.filesDir.absolutePath)
+        val rseed = RustFFI.initfromseed(server, seed, birthday, reactContext.applicationContext.filesDir.absolutePath, chainhint)
         // Log.w("MAIN", rseed)
 
         if (!rseed.startsWith("Error")) {
@@ -85,12 +85,12 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun restoreWalletFromUfvk(ufvk: String, birthday: String, server: String, promise: Promise) {
+    fun restoreWalletFromUfvk(ufvk: String, birthday: String, server: String, chainhint: String, promise: Promise) {
         // Log.w("MAIN", "Restoring wallet with ufvk $ufvk")
 
         RustFFI.initlogging()
 
-        val rufvk = RustFFI.initfromufvk(server, ufvk, birthday, reactContext.applicationContext.filesDir.absolutePath)
+        val rufvk = RustFFI.initfromufvk(server, ufvk, birthday, reactContext.applicationContext.filesDir.absolutePath, chainhint)
         // Log.w("MAIN", rufvk)
 
         if (!rufvk.startsWith("Error")) {
@@ -101,7 +101,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun loadExistingWallet(server: String, promise: Promise) {
+    fun loadExistingWallet(server: String, chainhint: String, promise: Promise) {
         // Read the file
         val file: InputStream = MainApplication.getAppContext()?.openFileInput("wallet.dat")!!
         var fileBytes = file.readBytes()
@@ -159,7 +159,8 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
         val wseed = RustFFI.initfromb64(server,
             fileb64.toString(),
-            reactContext.applicationContext.filesDir.absolutePath)
+            reactContext.applicationContext.filesDir.absolutePath,
+            chainhint)
         // Log.w("MAIN", wseed)
 
         promise.resolve(wseed)

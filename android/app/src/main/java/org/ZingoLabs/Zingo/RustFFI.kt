@@ -6,27 +6,31 @@ class RustFFI {
         external fun execute(cmd: String, args: String): String
         external fun initnew(
             serveruri: String,
-            datadir: String
+            datadir: String,
+            chainhint: String
         ): String
 
         external fun initfromseed(
             serveruri: String,
             seed: String,
             birthday: String,
-            datadir: String
+            datadir: String,
+            chainhint: String
         ): String
 
         external fun initfromufvk(
             serveruri: String,
             ufvk: String,
             birthday: String,
-            datadir: String
+            datadir: String,
+            chainhint: String
         ): String
 
         external fun initfromb64(
             serveruri: String,
             datab64: String,
-            datadir: String
+            datadir: String,
+            chainhint: String
         ): String
 
         external fun save(): String
