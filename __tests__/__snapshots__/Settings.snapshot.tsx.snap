@@ -905,40 +905,50 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               </Text>
             </View>
           </View>
-          <View
-            accessibilityLabel="text translated"
-            accessible={true}
-            style={
-              {
-                "borderColor": "rgb(216, 216, 216)",
-                "borderWidth": 1,
-                "marginLeft": 5,
-                "maxHeight": 48,
-                "maxWidth": "80%",
-                "minHeight": 48,
-                "minWidth": "50%",
-                "width": "auto",
-              }
-            }
-          >
-            <TextInput
-              editable={true}
-              maxLength={100}
-              onChangeText={[Function]}
-              placeholder="https://------.---:---"
+          <View>
+            <View
+              accessibilityLabel="text translated"
+              accessible={true}
               style={
                 {
-                  "backgroundColor": "transparent",
-                  "color": "rgb(28, 28, 30)",
-                  "fontSize": 18,
-                  "fontWeight": "600",
+                  "borderColor": "rgb(216, 216, 216)",
+                  "borderWidth": 1,
                   "marginLeft": 5,
+                  "maxWidth": "80%",
                   "minHeight": 48,
                   "minWidth": "50%",
+                  "width": "auto",
                 }
               }
-              testID="settings.customServerField"
-              value="https://zcash.es"
+            >
+              <TextInput
+                editable={true}
+                maxLength={100}
+                onChangeText={[Function]}
+                placeholder="https://------.---:---"
+                style={
+                  {
+                    "backgroundColor": "transparent",
+                    "color": "rgb(28, 28, 30)",
+                    "fontSize": 18,
+                    "fontWeight": "600",
+                    "marginLeft": 5,
+                    "minHeight": 48,
+                    "minWidth": "50%",
+                  }
+                }
+                testID="settings.customServerField"
+                value="https://zcash.es"
+              />
+            </View>
+            <View
+              style={
+                {
+                  "display": "flex",
+                  "marginBottom": 30,
+                  "marginLeft": 25,
+                }
+              }
             />
           </View>
         </View>

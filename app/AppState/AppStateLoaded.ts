@@ -20,6 +20,7 @@ import BackgroundType from './types/BackgroundType';
 import { TranslateType } from './types/TranslateType';
 import NetInfoType from './types/NetInfoType';
 import BackgroundErrorType from './types/BackgroundErrorType';
+import ServerType from './types/ServerType';
 
 export default interface AppStateLoaded {
   navigation: StackScreenProps<any>['navigation'];
@@ -95,11 +96,11 @@ export default interface AppStateLoaded {
   poolsModalVisible: boolean;
   insightModalVisible: boolean;
 
-  newServer: string;
+  newServer: ServerType;
 
   uaAddress: string;
 
-  server: string;
+  server: ServerType;
   language: 'en' | 'es';
   currency: 'USD' | '';
 

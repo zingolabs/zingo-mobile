@@ -11,6 +11,7 @@ import {
   BackgroundType,
   NetInfoType,
   BackgroundErrorType,
+  ServerType,
 } from '../AppState';
 
 export const defaultAppStateLoading: AppStateLoading = {
@@ -27,7 +28,7 @@ export const defaultAppStateLoading: AppStateLoading = {
   totalBalance: new TotalBalanceClass(),
   info: {} as InfoType,
 
-  server: '',
+  server: {} as ServerType,
   currency: '',
   language: 'en',
 
@@ -45,7 +46,7 @@ export const defaultAppStateLoading: AppStateLoading = {
   backgroundError: {} as BackgroundErrorType,
   privacy: false,
   customServerShow: false,
-  customServer: '',
+  customServer: {} as ServerType,
 };
 
 export const ContextAppLoading = React.createContext(defaultAppStateLoading);

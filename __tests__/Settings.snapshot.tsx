@@ -103,7 +103,7 @@ describe('Component Settings - test', () => {
   };
   state.info.currencyName = 'ZEC';
   state.totalBalance.total = 1.12345678;
-  state.server = 'https://zcash.es';
+  state.server = { uri: 'https://zcash.es', chain_name: 'main' };
   state.currency = 'USD';
   state.language = 'en';
   state.sendAll = false;

@@ -46,6 +46,7 @@ import {
   zecPriceType,
   BackgroundType,
   TranslateType,
+  ServerType,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
@@ -90,13 +91,13 @@ type LoadedAppProps = {
   route: StackScreenProps<any>['route'];
 };
 
-const SERVER_DEFAULT_0 = serverUris()[0];
+const SERVER_DEFAULT_0: ServerType = serverUris()[0];
 
 export default function LoadedApp(props: LoadedAppProps) {
   const theme = useTheme() as unknown as ThemeType;
   const [language, setLanguage] = useState('en' as 'en' | 'es');
   const [currency, setCurrency] = useState('' as 'USD' | '');
-  const [server, setServer] = useState(SERVER_DEFAULT_0 as string);
+  const [server, setServer] = useState<ServerType>(SERVER_DEFAULT_0);
   const [sendAll, setSendAll] = useState(false);
   const [privacy, setPrivacy] = useState(false);
   const [background, setBackground] = useState({ batches: 0, date: 0 } as BackgroundType);
@@ -222,7 +223,7 @@ type LoadedAppClassProps = {
   theme: ThemeType;
   language: 'en' | 'es';
   currency: 'USD' | '';
-  server: string;
+  server: ServerType;
   sendAll: boolean;
   privacy: boolean;
   background: BackgroundType;
@@ -293,7 +294,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     });
 
     this.appstate = AppState.addEventListener('change', async nextAppState => {
-      //await AsyncStorage.setItem('@server', this.state.server);
       if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
         //console.log('App has come to the foreground!');
         // reading background task info
@@ -762,7 +762,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
   set_server_option = async (
     name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
-    value: string,
+    value: string | ServerType,
     toast: boolean,
     same_chain_name: boolean,
   ): Promise<void> => {
@@ -794,7 +794,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
         }
         await SettingsFileImpl.writeSettings(name, value);
         this.setState({
-          server: value,
+          server: value as ServerType,
         });
         // the server is changed, the App needs to restart the timeout tasks from the beginning
         await this.rpc.configure();
@@ -824,7 +824,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       // go to the seed screen for changing the wallet for another in the new server or cancel this action.
       this.fetchWalletSeedAndBirthday();
       this.setState({
-        newServer: value,
+        newServer: value as ServerType,
         server: old_settings.server,
       });
     }
@@ -957,7 +957,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       await SettingsFileImpl.writeSettings('server', this.state.newServer);
       this.setState({
         server: this.state.newServer,
-        newServer: '',
+        newServer: {} as ServerType,
       });
     }
 

@@ -32,7 +32,7 @@ import { faEllipsisV } from '@fortawesome/free-solid-svg-icons';
 import BoldText from '../../components/Components/BoldText';
 import Button from '../../components/Components/Button';
 import RPCModule from '../RPCModule';
-import { AppStateLoading, BackgroundType, WalletSeedType, TranslateType, NetInfoType } from '../AppState';
+import { AppStateLoading, BackgroundType, WalletSeedType, TranslateType, NetInfoType, ServerType } from '../AppState';
 import { parseServerURI, serverUris } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import RPC from '../rpc';
@@ -42,6 +42,7 @@ import platform from '../platform/platform';
 import BackgroundFileImpl from '../../components/Background/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '../createAlert';
+import { isEqual } from 'lodash';
 
 const Seed = React.lazy(() => import('../../components/Seed'));
 
@@ -68,7 +69,7 @@ export default function LoadingApp(props: LoadingAppProps) {
   const theme = useTheme() as unknown as ThemeType;
   const [language, setLanguage] = useState('en' as 'en' | 'es');
   const [currency, setCurrency] = useState('' as 'USD' | '');
-  const [server, setServer] = useState(SERVER_DEFAULT_0 as string);
+  const [server, setServer] = useState<ServerType>(SERVER_DEFAULT_0);
   const [sendAll, setSendAll] = useState(false);
   const [privacy, setPrivacy] = useState(false);
   const [background, setBackground] = useState({ batches: 0, date: 0 } as BackgroundType);
@@ -193,7 +194,7 @@ type LoadingAppClassProps = {
   theme: ThemeType;
   language: 'en' | 'es';
   currency: 'USD' | '';
-  server: string;
+  server: ServerType;
   sendAll: boolean;
   privacy: boolean;
   background: BackgroundType;
@@ -388,14 +389,16 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
     this.setState({ actionButtonsDisabled: false });
   };
 
-  useCustomServer = async (customServer: string) => {
+  useCustomServer = async (customServer: ServerType) => {
     this.setState({ actionButtonsDisabled: true });
-    const customServerParsed = parseServerURI(customServer, this.state.translate);
-    if (customServerParsed.toLowerCase().startsWith('error')) {
+    const uri: string = parseServerURI(customServer.uri, this.state.translate);
+    const chain_name: 'main' | 'test' | 'regtest' = customServer.chain_name;
+    if (uri.toLowerCase().startsWith('error')) {
       Toast.show(this.state.translate('settings.isuri') as string, Toast.LONG);
     } else {
-      await SettingsFileImpl.writeSettings('server', customServerParsed);
-      this.setState({ server: customServerParsed, customServerShow: false });
+      const newCustomServer: ServerType = { uri, chain_name };
+      await SettingsFileImpl.writeSettings('server', newCustomServer);
+      this.setState({ server: newCustomServer, customServerShow: false });
     }
     this.setState({ actionButtonsDisabled: false });
   };
@@ -435,8 +438,6 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
   };
 
   doRestore = async (seed: string, birthday: number) => {
-    const { server } = this.state;
-
     if (!seed) {
       createAlert(
         this.setBackgroundError,
@@ -561,7 +562,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                   <BoldText style={{ fontSize: 15, marginBottom: 3 }}>
                     {translate('loadingapp.actualserver') as string}
                   </BoldText>
-                  <BoldText style={{ fontSize: 15, marginBottom: 10 }}>{server}</BoldText>
+                  <BoldText style={{ fontSize: 15, marginBottom: 10 }}>{server.uri}</BoldText>
 
                   {customServerShow && (
                     <>
@@ -588,8 +589,15 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                             marginLeft: 5,
                             backgroundColor: 'transparent',
                           }}
-                          value={customServer}
-                          onChangeText={(text: string) => this.setState({ customServer: text })}
+                          value={customServer.uri}
+                          onChangeText={(text: string) => {
+                            this.setState(state => ({
+                              customServer: {
+                                uri: text,
+                                chain_name: state.customServer.chain_name,
+                              },
+                            }));
+                          }}
                           editable={true}
                           maxLength={100}
                         />
@@ -651,7 +659,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                     </>
                   )}
 
-                  {!customServerShow && server === SERVER_DEFAULT_1 && !!SERVER_DEFAULT_0 && (
+                  {!customServerShow && isEqual(server, SERVER_DEFAULT_1) && !!SERVER_DEFAULT_0.uri && (
                     <Button
                       type="Primary"
                       title={translate('loadingapp.changeserver') as string}
@@ -660,7 +668,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                       style={{ marginBottom: 10 }}
                     />
                   )}
-                  {!customServerShow && server === SERVER_DEFAULT_0 && !!SERVER_DEFAULT_1 && (
+                  {!customServerShow && isEqual(server, SERVER_DEFAULT_0) && !!SERVER_DEFAULT_1.uri && (
                     <Button
                       type="Primary"
                       title={translate('loadingapp.changeserver') as string}
@@ -670,9 +678,9 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                     />
                   )}
                   {!customServerShow &&
-                    server !== SERVER_DEFAULT_0 &&
-                    server !== SERVER_DEFAULT_1 &&
-                    !!SERVER_DEFAULT_0 && (
+                    !isEqual(server, SERVER_DEFAULT_0) &&
+                    !isEqual(server, SERVER_DEFAULT_1) &&
+                    !!SERVER_DEFAULT_0.uri && (
                       <Button
                         type="Primary"
                         title={translate('loadingapp.changeserver') as string}

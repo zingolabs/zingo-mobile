@@ -11,7 +11,7 @@ import FadeText from '../Components/FadeText';
 import Button from '../Components/Button';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded, ContextAppLoading } from '../../app/context';
-import { DimensionsType, InfoType, NetInfoType, TranslateType, WalletSeedType } from '../../app/AppState';
+import { DimensionsType, InfoType, NetInfoType, ServerType, TranslateType, WalletSeedType } from '../../app/AppState';
 import RPCModule from '../../app/RPCModule';
 import RPC from '../../app/rpc';
 import Header from '../Header';
@@ -39,7 +39,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
   let walletSeed: WalletSeedType,
     translate: (key: string) => TranslateType,
     info: InfoType,
-    server: string,
+    server: ServerType,
     dimensions: DimensionsType,
     netInfo: NetInfoType,
     privacy: boolean;
@@ -141,7 +141,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
         setLatestBlock(info.latestBlock);
       } else {
         (async () => {
-          const resp: string = await RPCModule.getLatestBlock(server);
+          const resp: string = await RPCModule.getLatestBlock(server.uri);
           //console.log(resp);
           if (resp && !resp.toLowerCase().startsWith('error')) {
             setLatestBlock(Number(resp));
@@ -155,7 +155,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
         })();
       }
     }
-  }, [action, info.latestBlock, latestBlock, onClickCancel, server, setBackgroundError, translate]);
+  }, [action, info.latestBlock, latestBlock, onClickCancel, server.uri, setBackgroundError, translate]);
 
   useEffect(() => {
     if (action !== 'new' && action !== 'restore') {
