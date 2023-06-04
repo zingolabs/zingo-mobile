@@ -64,9 +64,9 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal, setZecPrice }) =
             value={
               !info.chain_name
                 ? (translate('loading') as string)
-                : info.chain_name.toLowerCase() === 'main' || info.chain_name.toLowerCase() === 'mainnet'
+                : info.chain_name.toLowerCase() === 'main'
                 ? 'Mainnet'
-                : info.chain_name.toLowerCase() === 'test' || info.chain_name.toLowerCase() === 'testnet'
+                : info.chain_name.toLowerCase() === 'test'
                 ? 'Testnet'
                 : info.chain_name.toLowerCase() === 'regtest'
                 ? 'Regtest'

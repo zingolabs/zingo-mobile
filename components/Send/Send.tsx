@@ -108,16 +108,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       return (
         resultJSON.status === 'success' &&
         resultJSON.address_kind !== 'transparent' &&
-        ((!!info.currencyName &&
-          info.currencyName === 'ZEC' &&
-          !!resultJSON.chain_name &&
-          (resultJSON.chain_name.toLowerCase() === 'main' || resultJSON.chain_name.toLowerCase() === 'mainnet')) ||
-          (!!info.currencyName &&
-            info.currencyName !== 'ZEC' &&
-            !!resultJSON.chain_name &&
-            (resultJSON.chain_name.toLowerCase() === 'test' ||
-              resultJSON.chain_name.toLowerCase() === 'testnet' ||
-              resultJSON.chain_name.toLowerCase() === 'regtest')))
+        resultJSON.chain_name === info.chain_name
       );
     };
 
@@ -130,7 +121,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     } else {
       setMemoEnabled(false);
     }
-  }, [sendPageState.toaddr, sendPageState.toaddr.to, info.currencyName, netInfo.isConnected, translate]);
+  }, [info.chain_name, netInfo.isConnected, sendPageState.toaddr.to, translate]);
 
   useEffect(() => {
     const parseAdressJSON = async (address: string): Promise<boolean> => {
@@ -151,19 +142,7 @@ const Send: React.FunctionComponent<SendProps> = ({
 
       //console.log('parse-address', address, resultJSON.status === 'success');
 
-      return (
-        resultJSON.status === 'success' &&
-        ((!!info.currencyName &&
-          info.currencyName === 'ZEC' &&
-          !!resultJSON.chain_name &&
-          (resultJSON.chain_name.toLowerCase() === 'main' || resultJSON.chain_name.toLowerCase() === 'mainnet')) ||
-          (!!info.currencyName &&
-            info.currencyName !== 'ZEC' &&
-            !!resultJSON.chain_name &&
-            (resultJSON.chain_name.toLowerCase() === 'test' ||
-              resultJSON.chain_name.toLowerCase() === 'testnet' ||
-              resultJSON.chain_name.toLowerCase() === 'regtest')))
-      );
+      return resultJSON.status === 'success' && resultJSON.chain_name === info.chain_name;
     };
 
     var to = sendPageState.toaddr;
@@ -204,17 +183,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         setValidAmount(0);
       }
     }
-  }, [
-    sendPageState.toaddr,
-    sendPageState.toaddr.to,
-    sendPageState.toaddr.amount,
-    sendPageState.toaddr.amountCurrency,
-    getMaxAmount,
-    decimalSeparator,
-    info.currencyName,
-    netInfo.isConnected,
-    translate,
-  ]);
+  }, [decimalSeparator, getMaxAmount, info.chain_name, netInfo.isConnected, sendPageState.toaddr, translate]);
 
   useEffect(() => {
     setSendButtonEnabled(validAddress === 1 && validAmount === 1);

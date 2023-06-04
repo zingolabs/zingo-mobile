@@ -152,7 +152,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
   const saveSettings = async () => {
     let serverParsed = server;
-    let sameServerChainName = true;
+    let same_server_chain_name = true;
     const chain_name = info.chain_name;
     if (
       walletSettings.download_memos === memos &&
@@ -219,13 +219,13 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         }
         // in this point the sync process is blocked, who knows why.
         // if I save the actual server before the customization... is going to work.
-        set_server_option('server', serverContext, false, sameServerChainName);
+        set_server_option('server', serverContext, false, same_server_chain_name);
         setDisabled(false);
         return;
       } else {
         //console.log('new', new_chain_name, 'old', chain_name);
         if (new_chain_name && new_chain_name !== chain_name) {
-          sameServerChainName = false;
+          same_server_chain_name = false;
         }
       }
     }
@@ -252,7 +252,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       if (languageContext !== language) {
         await set_language_option('language', language, false);
       }
-      set_server_option('server', serverParsed, true, sameServerChainName);
+      set_server_option('server', serverParsed, true, same_server_chain_name);
       ms = 1500;
     } else {
       if (languageContext !== language) {

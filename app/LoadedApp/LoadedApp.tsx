@@ -781,7 +781,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       error = true;
     } else {
       // when I try to open the wallet in the new server:
-      // - the seed doesn't exists (the type of sever is different `mainnet` / `testnet` / `regtest` ...).
+      // - the seed doesn't exists (the type of sever is different `main` / `test` / `regtest` ...).
       //   The App have to go to the initial screen
       // - the seed exists and the App can open the wallet in the new server.
       //   But I have to restart the sync if needed.

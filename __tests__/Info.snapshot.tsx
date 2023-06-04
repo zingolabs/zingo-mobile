@@ -46,7 +46,7 @@ describe('Component Info - test', () => {
       currencyName: 'ZEC',
       solps: 0,
       defaultFee: 1000,
-      chain_name: 'mainnet',
+      chain_name: 'main',
     };
     state.zecPrice.zecPrice = 33.33;
     state.translate = () => 'translated text';
