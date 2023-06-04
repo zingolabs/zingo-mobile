@@ -251,7 +251,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
         this.setState({ walletExists: true });
         const networkState = await NetInfo.fetch();
         if (networkState.isConnected) {
-          const result: string = await RPCModule.loadExistingWallet(this.state.server);
+          const result: string = await RPCModule.loadExistingWallet(this.state.server, 'main');
           //console.log('Load Wallet Exists result', error);
           if (result && !result.toLowerCase().startsWith('error')) {
             // Load the wallet and navigate to the transactions screen
@@ -392,7 +392,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
   createNewWallet = () => {
     this.setState({ actionButtonsDisabled: true });
     setTimeout(async () => {
-      const seed: string = await RPCModule.createNewWallet(this.state.server);
+      const seed: string = await RPCModule.createNewWallet(this.state.server, 'main');
 
       if (seed && !seed.toLowerCase().startsWith('error')) {
         // TODO verify that JSON don't fail.
@@ -434,7 +434,12 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
         walletBirthday = '0';
       }
 
-      const result: string = await RPCModule.restoreWalletFromSeed(seed.toLowerCase(), walletBirthday || '0', server);
+      const result: string = await RPCModule.restoreWalletFromSeed(
+        seed.toLowerCase(),
+        walletBirthday || '0',
+        server,
+        'main',
+      );
       if (result && !result.toLowerCase().startsWith('error')) {
         this.setState({ actionButtonsDisabled: false });
         this.navigateToLoaded();

@@ -785,7 +785,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       //   The App have to go to the initial screen
       // - the seed exists and the App can open the wallet in the new server.
       //   But I have to restart the sync if needed.
-      const result: string = await RPCModule.loadExistingWallet(value);
+      const result: string = await RPCModule.loadExistingWallet(value, 'main');
       if (result && !result.toLowerCase().startsWith('error')) {
         // Load the wallet and navigate to the transactions screen
         //console.log(`wallet loaded ok ${value}`);
