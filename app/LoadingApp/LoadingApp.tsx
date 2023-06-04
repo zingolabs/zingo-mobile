@@ -460,7 +460,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
       const result: string = await RPCModule.restoreWalletFromSeed(
         seed.toLowerCase(),
         walletBirthday || '0',
-        server,
+        this.state.server.uri,
         'main',
       );
       if (result && !result.toLowerCase().startsWith('error')) {
