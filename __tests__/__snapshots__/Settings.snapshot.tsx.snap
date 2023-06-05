@@ -831,14 +831,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
             </Text>
           </View>
         </View>
-        <View
-          style={
-            {
-              "display": "flex",
-              "flexDirection": "row",
-            }
-          }
-        >
+        <View>
           <View
             accessible={true}
             collapsable={false}
@@ -914,7 +907,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                   "borderColor": "rgb(216, 216, 216)",
                   "borderWidth": 1,
                   "marginLeft": 5,
-                  "maxWidth": "80%",
+                  "maxWidth": "90%",
                   "minHeight": 48,
                   "minWidth": "50%",
                   "width": "auto",
@@ -933,6 +926,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                     "fontSize": 18,
                     "fontWeight": "600",
                     "marginLeft": 5,
+                    "maxWidth": "90%",
                     "minHeight": 48,
                     "minWidth": "50%",
                   }
