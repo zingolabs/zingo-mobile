@@ -764,8 +764,9 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
     value: string | ServerType,
     toast: boolean,
-    same_chain_name: boolean,
+    same_server_chain_name: boolean,
   ): Promise<void> => {
+    const valueServer = value as ServerType;
     // here I know the server was changed, clean all the tasks before anything.
     await this.rpc.clearTimers();
     this.setState({
@@ -777,7 +778,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     // First we need to check the `chain_name` between servers, if this is different
     // we cannot try to open the current wallet, because make not sense.
     let error = false;
-    if (!same_chain_name) {
+    if (!same_server_chain_name) {
       error = true;
     } else {
       // when I try to open the wallet in the new server:
@@ -785,7 +786,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       //   The App have to go to the initial screen
       // - the seed exists and the App can open the wallet in the new server.
       //   But I have to restart the sync if needed.
-      const result: string = await RPCModule.loadExistingWallet(value, 'main');
+      const result: string = await RPCModule.loadExistingWallet(valueServer.uri, valueServer.chain_name);
       if (result && !result.toLowerCase().startsWith('error')) {
         // Load the wallet and navigate to the transactions screen
         //console.log(`wallet loaded ok ${value}`);
@@ -942,9 +943,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   };
 
   onClickOKServerWallet = async () => {
-    const beforeCurrencyName = this.state.info.currencyName;
-
     if (this.state.newServer) {
+      const beforeServer = this.state.server;
       const resultStr: string = await RPCModule.execute('changeserver', this.state.newServer);
       if (resultStr.toLowerCase().startsWith('error')) {
         //console.log(`Error change server ${value} - ${resultStr}`);
@@ -959,41 +959,34 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
         server: this.state.newServer,
         newServer: {} as ServerType,
       });
+
+      await this.rpc.fetchInfoAndServerHeight();
+
+      let resultStr2 = '';
+      // if the server was testnet or regtest -> no need backup the wallet.
+      if (beforeServer.chain_name === 'test' || beforeServer.chain_name === 'regtest') {
+        // no backup
+        resultStr2 = (await this.rpc.changeWalletNoBackup()) as string;
+      } else {
+        // backup
+        resultStr2 = (await this.rpc.changeWallet()) as string;
+      }
+
+      //console.log("jc change", resultStr);
+      if (resultStr2.toLowerCase().startsWith('error')) {
+        //console.log(`Error change wallet. ${resultStr}`);
+        createAlert(
+          this.setBackgroundError,
+          this.props.translate('loadedapp.changingwallet-label') as string,
+          resultStr2,
+        );
+        //return;
+      }
+
+      this.setState({ seedServerModalVisible: false });
+      // no need to restart the tasks because is about to restart the app.
+      this.navigateToLoading();
     }
-
-    await this.rpc.fetchInfoAndServerHeight();
-    const afterCurrencyName = this.state.info.currencyName;
-
-    // from TAZ to ZEC -> no backup the old test wallet.
-    // from TAZ to TAZ -> no use case here, likely. no backup just in case.
-    // from ZEC to TAZ -> it's interesting to backup the old real wallet. Just in case.
-    // from ZEC to ZEC -> no use case here, likely. backup just in case.
-    let resultStr2 = '';
-    if (
-      (beforeCurrencyName === 'TAZ' && afterCurrencyName === 'ZEC') ||
-      (beforeCurrencyName === 'TAZ' && afterCurrencyName === 'TAZ')
-    ) {
-      // no backup
-      resultStr2 = (await this.rpc.changeWalletNoBackup()) as string;
-    } else {
-      // backup
-      resultStr2 = (await this.rpc.changeWallet()) as string;
-    }
-
-    //console.log("jc change", resultStr);
-    if (resultStr2.toLowerCase().startsWith('error')) {
-      //console.log(`Error change wallet. ${resultStr}`);
-      createAlert(
-        this.setBackgroundError,
-        this.props.translate('loadedapp.changingwallet-label') as string,
-        resultStr2,
-      );
-      //return;
-    }
-
-    this.setState({ seedServerModalVisible: false });
-    // no need to restart the tasks because is about to restart the app.
-    this.navigateToLoading();
   };
 
   setUaAddress = (uaAddress: string) => {

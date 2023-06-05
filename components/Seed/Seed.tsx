@@ -384,14 +384,11 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
           </FadeText>
         )}
 
-        {info.currencyName &&
-          info.currencyName !== 'ZEC' &&
-          times === 3 &&
-          (action === 'change' || action === 'server') && (
-            <FadeText style={{ color: colors.primary, textAlign: 'center', width: '100%' }}>
-              {translate('seed.mainnet-warning') as string}
-            </FadeText>
-          )}
+        {server.chain_name !== 'main' && times === 3 && (action === 'change' || action === 'server') && (
+          <FadeText style={{ color: colors.primary, textAlign: 'center', width: '100%' }}>
+            {translate('seed.mainnet-warning') as string}
+          </FadeText>
+        )}
         <View style={{ marginBottom: 30 }} />
       </ScrollView>
       <View

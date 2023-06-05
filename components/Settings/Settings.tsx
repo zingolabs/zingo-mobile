@@ -28,7 +28,7 @@ type SettingsProps = {
     name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
     value: string | ServerType,
     toast: boolean,
-    same_chain_name: boolean,
+    same_server_chain_name: boolean,
   ) => Promise<void>;
   set_currency_option: (
     name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',

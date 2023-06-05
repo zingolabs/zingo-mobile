@@ -16,6 +16,7 @@ import {
   NativeEventSubscription,
   Platform,
   TextInput,
+  TouchableOpacity,
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { I18n } from 'i18n-js';
@@ -27,7 +28,7 @@ import Toast from 'react-native-simple-toast';
 import OptionsMenu from 'react-native-option-menu';
 
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faEllipsisV } from '@fortawesome/free-solid-svg-icons';
+import { faEllipsisV, faCashRegister } from '@fortawesome/free-solid-svg-icons';
 
 import BoldText from '../../components/Components/BoldText';
 import Button from '../../components/Components/Button';
@@ -168,6 +169,8 @@ export default function LoadingApp(props: LoadingAppProps) {
   //  return () => RNLocalize.removeEventListener('change', handleLocalizationChange);
   //}, [handleLocalizationChange]);
 
+  console.log('render loadingApp - 2');
+
   if (loading) {
     return null;
   } else {
@@ -259,7 +262,10 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
         this.setState({ walletExists: true });
         const networkState = await NetInfo.fetch();
         if (networkState.isConnected) {
-          const result: string = await RPCModule.loadExistingWallet(this.state.server, 'main');
+          const result: string = await RPCModule.loadExistingWallet(
+            this.state.server.uri,
+            this.state.server.chain_name,
+          );
           //console.log('Load Wallet Exists result', error);
           if (result && !result.toLowerCase().startsWith('error')) {
             // Load the wallet and navigate to the transactions screen
@@ -392,7 +398,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
   useCustomServer = async (customServer: ServerType) => {
     this.setState({ actionButtonsDisabled: true });
     const uri: string = parseServerURI(customServer.uri, this.state.translate);
-    const chain_name: 'main' | 'test' | 'regtest' = customServer.chain_name;
+    const chain_name = customServer.chain_name;
     if (uri.toLowerCase().startsWith('error')) {
       Toast.show(this.state.translate('settings.isuri') as string, Toast.LONG);
     } else {
@@ -414,7 +420,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
   createNewWallet = () => {
     this.setState({ actionButtonsDisabled: true });
     setTimeout(async () => {
-      const seed: string = await RPCModule.createNewWallet(this.state.server, 'main');
+      const seed: string = await RPCModule.createNewWallet(this.state.server.uri, this.state.server.chain_name);
 
       if (seed && !seed.toLowerCase().startsWith('error')) {
         // TODO verify that JSON don't fail.
@@ -461,7 +467,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
         seed.toLowerCase(),
         walletBirthday || '0',
         this.state.server.uri,
-        'main',
+        this.state.server.chain_name,
       );
       if (result && !result.toLowerCase().startsWith('error')) {
         this.setState({ actionButtonsDisabled: false });
@@ -490,6 +496,8 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
       this.state;
     const { translate } = this.props;
     const { colors } = this.props.theme;
+
+    console.log('render loadingAppClass - 3');
 
     return (
       <ContextAppLoadingProvider value={this.state}>
@@ -560,12 +568,157 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                   </View>
 
                   <BoldText style={{ fontSize: 15, marginBottom: 3 }}>
-                    {translate('loadingapp.actualserver') as string}
+                    {`${translate('loadingapp.actualserver') as string} [${
+                      translate(`settings.value-chain_name-${this.state.server.chain_name}`) as string
+                    }]`}
                   </BoldText>
                   <BoldText style={{ fontSize: 15, marginBottom: 10 }}>{server.uri}</BoldText>
 
                   {customServerShow && (
-                    <>
+                    <View
+                      style={{
+                        borderColor: colors.primaryDisabled,
+                        borderWidth: 1,
+                        paddingTop: 10,
+                        paddingLeft: 10,
+                        paddingRight: 10,
+                        marginBottom: 5,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}>
+                      <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                        <TouchableOpacity
+                          onPress={() =>
+                            this.setState(state => ({
+                              customServer: {
+                                uri: state.customServer.uri,
+                                chain_name: 'main',
+                              },
+                            }))
+                          }>
+                          <View
+                            style={{
+                              flexDirection: 'row',
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                              marginBottom: 10,
+                            }}>
+                            <View
+                              style={{
+                                flexDirection: 'row',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                borderWidth: this.state.customServer.chain_name === 'main' ? 2 : 1,
+                                borderColor:
+                                  this.state.customServer.chain_name === 'main'
+                                    ? colors.primary
+                                    : colors.primaryDisabled,
+                                borderRadius: 5,
+                                paddingHorizontal: 5,
+                              }}>
+                              <Text
+                                style={{
+                                  fontSize: 13,
+                                  color: colors.border,
+                                  marginRight: 5,
+                                }}>
+                                {translate('settings.value-chain_name-main') as string}
+                              </Text>
+                              {this.state.customServer.chain_name === 'main' && (
+                                <FontAwesomeIcon icon={faCashRegister} size={14} color={colors.primary} />
+                              )}
+                            </View>
+                          </View>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          style={{ marginLeft: 5 }}
+                          onPress={() =>
+                            this.setState(state => ({
+                              customServer: {
+                                uri: state.customServer.uri,
+                                chain_name: 'test',
+                              },
+                            }))
+                          }>
+                          <View
+                            style={{
+                              flexDirection: 'row',
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                              marginBottom: 10,
+                            }}>
+                            <View
+                              style={{
+                                flexDirection: 'row',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                borderWidth: this.state.customServer.chain_name === 'test' ? 2 : 1,
+                                borderColor:
+                                  this.state.customServer.chain_name === 'test'
+                                    ? colors.primary
+                                    : colors.primaryDisabled,
+                                borderRadius: 5,
+                                paddingHorizontal: 5,
+                              }}>
+                              <Text
+                                style={{
+                                  fontSize: 13,
+                                  color: colors.border,
+                                  marginRight: 5,
+                                }}>
+                                {translate('settings.value-chain_name-test') as string}
+                              </Text>
+                              {this.state.customServer.chain_name === 'test' && (
+                                <FontAwesomeIcon icon={faCashRegister} size={14} color={colors.primary} />
+                              )}
+                            </View>
+                          </View>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          style={{ marginLeft: 5 }}
+                          onPress={() =>
+                            this.setState(state => ({
+                              customServer: {
+                                uri: state.customServer.uri,
+                                chain_name: 'regtest',
+                              },
+                            }))
+                          }>
+                          <View
+                            style={{
+                              flexDirection: 'row',
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                              marginBottom: 10,
+                            }}>
+                            <View
+                              style={{
+                                flexDirection: 'row',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                borderWidth: this.state.customServer.chain_name === 'regtest' ? 2 : 1,
+                                borderColor:
+                                  this.state.customServer.chain_name === 'regtest'
+                                    ? colors.primary
+                                    : colors.primaryDisabled,
+                                borderRadius: 5,
+                                paddingHorizontal: 5,
+                              }}>
+                              <Text
+                                style={{
+                                  fontSize: 13,
+                                  color: colors.border,
+                                  marginRight: 5,
+                                }}>
+                                {translate('settings.value-chain_name-regtest') as string}
+                              </Text>
+                              {this.state.customServer.chain_name === 'regtest' && (
+                                <FontAwesomeIcon icon={faCashRegister} size={14} color={colors.primary} />
+                              )}
+                            </View>
+                          </View>
+                        </TouchableOpacity>
+                      </View>
                       <View
                         style={{
                           borderColor: colors.border,
@@ -618,7 +771,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                           style={{ marginBottom: 10, marginLeft: 10 }}
                         />
                       </View>
-                    </>
+                    </View>
                   )}
 
                   {(!netInfo.isConnected ||

@@ -46,7 +46,7 @@ export const defaultAppStateLoading: AppStateLoading = {
   backgroundError: {} as BackgroundErrorType,
   privacy: false,
   customServerShow: false,
-  customServer: {} as ServerType,
+  customServer: { uri: '', chain_name: 'main' } as ServerType,
 };
 
 export const ContextAppLoading = React.createContext(defaultAppStateLoading);
