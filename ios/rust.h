@@ -5,14 +5,15 @@
 
 void rust_free(char *s);
 
-char *init_new(const char *server_uri, const char *data_dir);
+char *init_new(const char *server_uri, const char *data_dir, const char *chainhint);
 
 char *initfromseed(const char *server_uri,
                    const char *seed,
                    const char *birthday,
-                   const char *data_dir);
+                   const char *data_dir,
+                   const char *chainhint);
 
-char *initfromb64(const char *server_uri, const char *base64, const char *data_dir);
+char *initfromb64(const char *server_uri, const char *base64, const char *data_dir, const char *chainhint);
 
 char *save(void);
 

@@ -740,7 +740,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     toast: boolean,
     same_server_chain_name: boolean,
   ): Promise<void> => {
-    console.log(value);
+    //console.log(value, same_server_chain_name);
     // here I know the server was changed, clean all the tasks before anything.
     await this.rpc.clearTimers();
     this.setState({
@@ -795,7 +795,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
       // we need to restore the old server because the new doesn't have the seed of the current wallet.
       const old_settings = await SettingsFileImpl.readSettings();
-      await RPCModule.execute('changeserver', old_settings.server);
+      await RPCModule.execute('changeserver', old_settings.server.uri);
 
       // go to the seed screen for changing the wallet for another in the new server or cancel this action.
       this.fetchWalletSeedAndBirthday();
@@ -920,7 +920,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   onClickOKServerWallet = async () => {
     if (this.state.newServer) {
       const beforeServer = this.state.server;
-      const resultStr: string = await RPCModule.execute('changeserver', this.state.newServer);
+      const resultStr: string = await RPCModule.execute('changeserver', this.state.newServer.uri);
       if (resultStr.toLowerCase().startsWith('error')) {
         //console.log(`Error change server ${value} - ${resultStr}`);
         Toast.show(`${this.props.translate('loadedapp.changeservernew-error')} ${resultStr}`, Toast.LONG);
