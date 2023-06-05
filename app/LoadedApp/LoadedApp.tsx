@@ -1,4 +1,4 @@
-import React, { Component, Suspense, useState, useMemo, useCallback, useEffect } from 'react';
+import React, { Component, Suspense, useState, useMemo, useEffect } from 'react';
 import {
   Modal,
   View,
@@ -78,14 +78,6 @@ const es = require('../translations/es.json');
 
 const Tab = createBottomTabNavigator();
 
-//const useForceUpdate = () => {
-//  const [value, setValue] = useState(0);
-//  return () => {
-//    const newValue = value + 1;
-//    return setValue(newValue);
-//  };
-//};
-
 type LoadedAppProps = {
   navigation: StackScreenProps<any>['navigation'];
   route: StackScreenProps<any>['route'];
@@ -102,7 +94,6 @@ export default function LoadedApp(props: LoadedAppProps) {
   const [privacy, setPrivacy] = useState(false);
   const [background, setBackground] = useState({ batches: 0, date: 0 } as BackgroundType);
   const [loading, setLoading] = useState(true);
-  //const forceUpdate = useForceUpdate();
   const file = useMemo(
     () => ({
       en: en,
@@ -114,86 +105,69 @@ export default function LoadedApp(props: LoadedAppProps) {
 
   const translate: (key: string) => TranslateType = (key: string) => i18n.t(key);
 
-  const setI18nConfig = useCallback(async () => {
-    // fallback if no available language fits
-    const fallback = { languageTag: 'en', isRTL: false };
-
-    //console.log(RNLocalize.findBestAvailableLanguage(Object.keys(file)));
-    //console.log(RNLocalize.getLocales());
-
-    const { languageTag, isRTL } = RNLocalize.findBestAvailableLanguage(Object.keys(file)) || fallback;
-
-    // clear translation cache
-    //if (translate && translate.cache) {
-    //  translate?.cache?.clear?.();
-    //}
-    // update layout direction
-    I18nManager.forceRTL(isRTL);
-
-    //I have to check what language is in the settings
-    const settings = await SettingsFileImpl.readSettings();
-    if (settings.language) {
-      setLanguage(settings.language);
-      i18n.locale = settings.language;
-      //console.log('apploaded settings', settings.language, settings.currency);
-    } else {
-      const lang =
-        languageTag === 'en' || languageTag === 'es'
-          ? (languageTag as 'en' | 'es')
-          : (fallback.languageTag as 'en' | 'es');
-      setLanguage(lang);
-      i18n.locale = lang;
-      await SettingsFileImpl.writeSettings('language', lang);
-      //console.log('apploaded NO settings', languageTag);
-    }
-    if (settings.currency) {
-      setCurrency(settings.currency);
-    } else {
-      await SettingsFileImpl.writeSettings('currency', currency);
-    }
-    if (settings.server) {
-      setServer(settings.server);
-    } else {
-      await SettingsFileImpl.writeSettings('server', server);
-    }
-    if (settings.sendAll) {
-      setSendAll(settings.sendAll);
-    } else {
-      await SettingsFileImpl.writeSettings('sendAll', sendAll);
-    }
-    if (settings.privacy) {
-      setPrivacy(settings.privacy);
-    } else {
-      await SettingsFileImpl.writeSettings('privacy', privacy);
-    }
-
-    // reading background task info
-    if (Platform.OS === 'ios') {
-      // this file only exists in IOS BS.
-      const backgroundJson = await BackgroundFileImpl.readBackground();
-      //console.log('background', backgroundJson);
-      if (backgroundJson) {
-        setBackground(backgroundJson);
-      }
-    }
-  }, [currency, file, i18n, privacy, sendAll, server]);
-
   useEffect(() => {
     (async () => {
-      await setI18nConfig();
+      // fallback if no available language fits
+      const fallback = { languageTag: 'en', isRTL: false };
+
+      //console.log(RNLocalize.findBestAvailableLanguage(Object.keys(file)));
+      //console.log(RNLocalize.getLocales());
+
+      const { languageTag, isRTL } = RNLocalize.findBestAvailableLanguage(Object.keys(file)) || fallback;
+
+      // update layout direction
+      I18nManager.forceRTL(isRTL);
+
+      //I have to check what language is in the settings
+      const settings = await SettingsFileImpl.readSettings();
+      if (settings.language) {
+        setLanguage(settings.language);
+        i18n.locale = settings.language;
+        //console.log('apploaded settings', settings.language, settings.currency);
+      } else {
+        const lang =
+          languageTag === 'en' || languageTag === 'es'
+            ? (languageTag as 'en' | 'es')
+            : (fallback.languageTag as 'en' | 'es');
+        setLanguage(lang);
+        i18n.locale = lang;
+        await SettingsFileImpl.writeSettings('language', lang);
+        //console.log('apploaded NO settings', languageTag);
+      }
+      if (settings.currency) {
+        setCurrency(settings.currency);
+      } else {
+        await SettingsFileImpl.writeSettings('currency', currency);
+      }
+      if (settings.server) {
+        setServer(settings.server);
+      } else {
+        await SettingsFileImpl.writeSettings('server', server);
+      }
+      if (settings.sendAll) {
+        setSendAll(settings.sendAll);
+      } else {
+        await SettingsFileImpl.writeSettings('sendAll', sendAll);
+      }
+      if (settings.privacy) {
+        setPrivacy(settings.privacy);
+      } else {
+        await SettingsFileImpl.writeSettings('privacy', privacy);
+      }
+
+      // reading background task info
+      if (Platform.OS === 'ios') {
+        // this file only exists in IOS BS.
+        const backgroundJson = await BackgroundFileImpl.readBackground();
+        //console.log('background', backgroundJson);
+        if (backgroundJson) {
+          setBackground(backgroundJson);
+        }
+      }
       setLoading(false);
     })();
-  }, [setI18nConfig]);
-
-  //const handleLocalizationChange = useCallback(() => {
-  //  setI18nConfig();
-  //  forceUpdate();
-  //}, [setI18nConfig, forceUpdate]);
-
-  //useEffect(() => {
-  //  RNLocalize.addEventListener('change', handleLocalizationChange);
-  //  return () => RNLocalize.removeEventListener('change', handleLocalizationChange);
-  //}, [handleLocalizationChange]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   //console.log('render LoadedApp - 2');
 

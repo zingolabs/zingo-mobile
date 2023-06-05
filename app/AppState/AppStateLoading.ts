@@ -39,7 +39,8 @@ export default interface AppStateLoading {
 
   privacy: boolean;
   customServerShow: boolean;
-  customServer: ServerType;
+  customServerUri: string;
+  customServerChainName: 'main' | 'test' | 'regtest';
 
   // eslint-disable-next-line semi
 }

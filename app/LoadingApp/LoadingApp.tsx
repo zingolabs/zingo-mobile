@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { Component, Suspense, useState, useMemo, useCallback, useEffect } from 'react';
+import React, { Component, Suspense, useState, useMemo, useEffect } from 'react';
 import {
   View,
   Alert,
@@ -50,14 +50,6 @@ const Seed = React.lazy(() => import('../../components/Seed'));
 const en = require('../translations/en.json');
 const es = require('../translations/es.json');
 
-//const useForceUpdate = () => {
-//  const [value, setValue] = useState(0);
-//  return () => {
-//    const newValue = value + 1;
-//    return setValue(newValue);
-//  };
-//};
-
 type LoadingAppProps = {
   navigation: StackScreenProps<any>['navigation'];
   route: StackScreenProps<any>['route'];
@@ -75,7 +67,6 @@ export default function LoadingApp(props: LoadingAppProps) {
   const [privacy, setPrivacy] = useState(false);
   const [background, setBackground] = useState({ batches: 0, date: 0 } as BackgroundType);
   const [loading, setLoading] = useState(true);
-  //const forceUpdate = useForceUpdate();
   const file = useMemo(
     () => ({
       en: en,
@@ -87,87 +78,71 @@ export default function LoadingApp(props: LoadingAppProps) {
 
   const translate: (key: string) => TranslateType = (key: string) => i18n.t(key);
 
-  const setI18nConfig = useCallback(async () => {
-    // fallback if no available language fits
-    const fallback = { languageTag: 'en', isRTL: false };
-
-    //console.log(RNLocalize.findBestAvailableLanguage(Object.keys(file)));
-    //console.log(RNLocalize.getLocales());
-
-    const { languageTag, isRTL } = RNLocalize.findBestAvailableLanguage(Object.keys(file)) || fallback;
-
-    // clear translation cache
-    //if (translate && translate.cache) {
-    //  translate?.cache?.clear?.();
-    //}
-    // update layout direction
-    I18nManager.forceRTL(isRTL);
-
-    //I have to check what language is in the settings
-    const settings = await SettingsFileImpl.readSettings();
-    if (settings.language) {
-      setLanguage(settings.language);
-      i18n.locale = settings.language;
-      //console.log('apploading settings', settings.language, settings.currency);
-    } else {
-      const lang =
-        languageTag === 'en' || languageTag === 'es'
-          ? (languageTag as 'en' | 'es')
-          : (fallback.languageTag as 'en' | 'es');
-      setLanguage(lang);
-      i18n.locale = lang;
-      await SettingsFileImpl.writeSettings('language', lang);
-      //console.log('apploading NO settings', languageTag);
-    }
-    if (settings.currency) {
-      setCurrency(settings.currency);
-    } else {
-      await SettingsFileImpl.writeSettings('currency', currency);
-    }
-    if (settings.server) {
-      setServer(settings.server);
-      console.log('settings', settings.server);
-    } else {
-      await SettingsFileImpl.writeSettings('server', server);
-      console.log('NO settings', settings.server);
-    }
-    if (settings.sendAll) {
-      setSendAll(settings.sendAll);
-    } else {
-      await SettingsFileImpl.writeSettings('sendAll', sendAll);
-    }
-    if (settings.privacy) {
-      setPrivacy(settings.privacy);
-    } else {
-      await SettingsFileImpl.writeSettings('privacy', privacy);
-    }
-
-    // reading background task info
-    if (Platform.OS === 'ios') {
-      // this file only exists in IOS BS.
-      const backgroundJson = await BackgroundFileImpl.readBackground();
-      if (backgroundJson) {
-        setBackground(backgroundJson);
-      }
-    }
-  }, [currency, file, i18n, privacy, sendAll, server]);
-
   useEffect(() => {
     (async () => {
-      await setI18nConfig();
+      console.log('*************** useEffect set I18n');
+      // fallback if no available language fits
+      const fallback = { languageTag: 'en', isRTL: false };
+
+      //console.log(RNLocalize.findBestAvailableLanguage(Object.keys(file)));
+      //console.log(RNLocalize.getLocales());
+
+      const { languageTag, isRTL } = RNLocalize.findBestAvailableLanguage(Object.keys(file)) || fallback;
+
+      // update layout direction
+      I18nManager.forceRTL(isRTL);
+
+      //I have to check what language is in the settings
+      const settings = await SettingsFileImpl.readSettings();
+      if (settings.language) {
+        setLanguage(settings.language);
+        i18n.locale = settings.language;
+        //console.log('apploading settings', settings.language, settings.currency);
+      } else {
+        const lang =
+          languageTag === 'en' || languageTag === 'es'
+            ? (languageTag as 'en' | 'es')
+            : (fallback.languageTag as 'en' | 'es');
+        setLanguage(lang);
+        i18n.locale = lang;
+        await SettingsFileImpl.writeSettings('language', lang);
+        //console.log('apploading NO settings', languageTag);
+      }
+      if (settings.currency) {
+        setCurrency(settings.currency);
+      } else {
+        await SettingsFileImpl.writeSettings('currency', currency);
+      }
+      if (settings.server) {
+        setServer(settings.server);
+        console.log('settings', settings.server);
+      } else {
+        await SettingsFileImpl.writeSettings('server', server);
+        console.log('NO settings', settings.server);
+      }
+      if (settings.sendAll) {
+        setSendAll(settings.sendAll);
+      } else {
+        await SettingsFileImpl.writeSettings('sendAll', sendAll);
+      }
+      if (settings.privacy) {
+        setPrivacy(settings.privacy);
+      } else {
+        await SettingsFileImpl.writeSettings('privacy', privacy);
+      }
+
+      // reading background task info
+      if (Platform.OS === 'ios') {
+        // this file only exists in IOS BS.
+        const backgroundJson = await BackgroundFileImpl.readBackground();
+        if (backgroundJson) {
+          setBackground(backgroundJson);
+        }
+      }
       setLoading(false);
     })();
-  }, [setI18nConfig]);
-
-  //const handleLocalizationChange = useCallback(() => {
-  //  setI18nConfig();
-  //  forceUpdate();
-  //}, [setI18nConfig, forceUpdate]);
-
-  //useEffect(() => {
-  //  RNLocalize.addEventListener('change', handleLocalizationChange);
-  //  return () => RNLocalize.removeEventListener('change', handleLocalizationChange);
-  //}, [handleLocalizationChange]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   console.log('render loadingApp - 2');
 
@@ -395,16 +370,23 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
     this.setState({ actionButtonsDisabled: false });
   };
 
-  usingCustomServer = async (customServer: ServerType) => {
+  usingCustomServer = async () => {
+    if (!this.state.customServerUri) {
+      return;
+    }
     this.setState({ actionButtonsDisabled: true });
-    const uri: string = parseServerURI(customServer.uri, this.state.translate);
-    const chain_name = customServer.chain_name;
+    const uri: string = parseServerURI(this.state.customServerUri, this.state.translate);
+    const chain_name = this.state.customServerChainName;
     if (uri.toLowerCase().startsWith('error')) {
       Toast.show(this.state.translate('settings.isuri') as string, Toast.LONG);
     } else {
-      const newCustomServer: ServerType = { uri, chain_name };
-      await SettingsFileImpl.writeSettings('server', newCustomServer);
-      this.setState({ server: newCustomServer, customServerShow: false });
+      await SettingsFileImpl.writeSettings('server', { uri, chain_name });
+      this.setState({
+        server: { uri, chain_name },
+        customServerShow: false,
+        customServerUri: '',
+        customServerChainName: 'main',
+      });
     }
     this.setState({ actionButtonsDisabled: false });
   };
@@ -491,17 +473,18 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
     this.setState({ customServerShow: true });
   };
 
-  onPressChainName = async (chain_name: 'main' | 'test' | 'regtest') => {
-    this.setState({ actionButtonsDisabled: true });
-    const uri: string = this.state.customServer.uri;
-    const newCustomServer: ServerType = { uri, chain_name };
-    await SettingsFileImpl.writeSettings('server', newCustomServer);
-    this.setState({ server: newCustomServer, actionButtonsDisabled: false });
-  };
-
   render() {
-    const { screen, walletSeed, actionButtonsDisabled, walletExists, server, netInfo, customServerShow, customServer } =
-      this.state;
+    const {
+      screen,
+      walletSeed,
+      actionButtonsDisabled,
+      walletExists,
+      server,
+      netInfo,
+      customServerShow,
+      customServerUri,
+      customServerChainName,
+    } = this.state;
     const { translate } = this.props;
     const { colors } = this.props.theme;
 
@@ -577,7 +560,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
 
                   <BoldText style={{ fontSize: 15, marginBottom: 3 }}>
                     {`${translate('loadingapp.actualserver') as string} [${
-                      translate(`settings.value-chain_name-${this.state.server.chain_name}`) as string
+                      translate(`settings.value-chain_name-${server.chain_name}`) as string
                     }]`}
                   </BoldText>
                   <BoldText style={{ fontSize: 15, marginBottom: 10 }}>{server.uri}</BoldText>
@@ -595,7 +578,9 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                         alignItems: 'center',
                       }}>
                       <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-                        <TouchableOpacity onPress={() => this.onPressChainName('main')}>
+                        <TouchableOpacity
+                          style={{ marginHorizontal: 5 }}
+                          onPress={() => this.setState({ customServerChainName: 'main' })}>
                           <View
                             style={{
                               flexDirection: 'row',
@@ -608,11 +593,8 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                                 flexDirection: 'row',
                                 justifyContent: 'center',
                                 alignItems: 'center',
-                                borderWidth: this.state.customServer.chain_name === 'main' ? 2 : 1,
-                                borderColor:
-                                  this.state.customServer.chain_name === 'main'
-                                    ? colors.primary
-                                    : colors.primaryDisabled,
+                                borderWidth: customServerChainName === 'main' ? 2 : 1,
+                                borderColor: customServerChainName === 'main' ? colors.primary : colors.primaryDisabled,
                                 borderRadius: 5,
                                 paddingHorizontal: 5,
                               }}>
@@ -624,13 +606,15 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                                 }}>
                                 {translate('settings.value-chain_name-main') as string}
                               </Text>
-                              {this.state.customServer.chain_name === 'main' && (
+                              {customServerChainName === 'main' && (
                                 <FontAwesomeIcon icon={faCashRegister} size={14} color={colors.primary} />
                               )}
                             </View>
                           </View>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={() => this.onPressChainName('test')}>
+                        <TouchableOpacity
+                          style={{ marginHorizontal: 5 }}
+                          onPress={() => this.setState({ customServerChainName: 'test' })}>
                           <View
                             style={{
                               flexDirection: 'row',
@@ -643,11 +627,8 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                                 flexDirection: 'row',
                                 justifyContent: 'center',
                                 alignItems: 'center',
-                                borderWidth: this.state.customServer.chain_name === 'test' ? 2 : 1,
-                                borderColor:
-                                  this.state.customServer.chain_name === 'test'
-                                    ? colors.primary
-                                    : colors.primaryDisabled,
+                                borderWidth: customServerChainName === 'test' ? 2 : 1,
+                                borderColor: customServerChainName === 'test' ? colors.primary : colors.primaryDisabled,
                                 borderRadius: 5,
                                 paddingHorizontal: 5,
                               }}>
@@ -659,13 +640,15 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                                 }}>
                                 {translate('settings.value-chain_name-test') as string}
                               </Text>
-                              {this.state.customServer.chain_name === 'test' && (
+                              {customServerChainName === 'test' && (
                                 <FontAwesomeIcon icon={faCashRegister} size={14} color={colors.primary} />
                               )}
                             </View>
                           </View>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={() => this.onPressChainName('regtest')}>
+                        <TouchableOpacity
+                          style={{ marginHorizontal: 5 }}
+                          onPress={() => this.setState({ customServerChainName: 'regtest' })}>
                           <View
                             style={{
                               flexDirection: 'row',
@@ -678,11 +661,9 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                                 flexDirection: 'row',
                                 justifyContent: 'center',
                                 alignItems: 'center',
-                                borderWidth: this.state.customServer.chain_name === 'regtest' ? 2 : 1,
+                                borderWidth: customServerChainName === 'regtest' ? 2 : 1,
                                 borderColor:
-                                  this.state.customServer.chain_name === 'regtest'
-                                    ? colors.primary
-                                    : colors.primaryDisabled,
+                                  customServerChainName === 'regtest' ? colors.primary : colors.primaryDisabled,
                                 borderRadius: 5,
                                 paddingHorizontal: 5,
                               }}>
@@ -694,7 +675,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                                 }}>
                                 {translate('settings.value-chain_name-regtest') as string}
                               </Text>
-                              {this.state.customServer.chain_name === 'regtest' && (
+                              {customServerChainName === 'regtest' && (
                                 <FontAwesomeIcon icon={faCashRegister} size={14} color={colors.primary} />
                               )}
                             </View>
@@ -719,20 +700,13 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                             color: colors.text,
                             fontWeight: '600',
                             fontSize: 18,
-                            minWidth: '50%',
+                            minWidth: '90%',
                             minHeight: 48,
                             marginLeft: 5,
                             backgroundColor: 'transparent',
                           }}
-                          value={customServer.uri}
-                          onChangeText={(text: string) => {
-                            this.setState(state => ({
-                              customServer: {
-                                uri: text,
-                                chain_name: state.customServer.chain_name,
-                              },
-                            }));
-                          }}
+                          value={customServerUri}
+                          onChangeText={(text: string) => this.setState({ customServerUri: text })}
                           editable={true}
                           maxLength={100}
                         />
@@ -742,7 +716,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                           type="Primary"
                           title={translate('save') as string}
                           disabled={actionButtonsDisabled}
-                          onPress={() => this.usingCustomServer(customServer)}
+                          onPress={this.usingCustomServer}
                           style={{ marginBottom: 10 }}
                         />
                         <Button
