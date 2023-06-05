@@ -126,10 +126,10 @@ export default function LoadingApp(props: LoadingAppProps) {
     }
     if (settings.server) {
       setServer(settings.server);
-      //console.log('settings', settings.server);
+      console.log('settings', settings.server);
     } else {
       await SettingsFileImpl.writeSettings('server', server);
-      //console.log('NO settings', settings.server);
+      console.log('NO settings', settings.server);
     }
     if (settings.sendAll) {
       setSendAll(settings.sendAll);
@@ -377,7 +377,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
     }
   };
 
-  useDefaultServer_0 = async () => {
+  usingDefaultServer_0 = async () => {
     this.setState({ actionButtonsDisabled: true });
     if (SERVER_DEFAULT_0) {
       await SettingsFileImpl.writeSettings('server', SERVER_DEFAULT_0);
@@ -386,7 +386,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
     this.setState({ actionButtonsDisabled: false });
   };
 
-  useDefaultServer_1 = async () => {
+  usingDefaultServer_1 = async () => {
     this.setState({ actionButtonsDisabled: true });
     if (SERVER_DEFAULT_1) {
       await SettingsFileImpl.writeSettings('server', SERVER_DEFAULT_1);
@@ -395,7 +395,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
     this.setState({ actionButtonsDisabled: false });
   };
 
-  useCustomServer = async (customServer: ServerType) => {
+  usingCustomServer = async (customServer: ServerType) => {
     this.setState({ actionButtonsDisabled: true });
     const uri: string = parseServerURI(customServer.uri, this.state.translate);
     const chain_name = customServer.chain_name;
@@ -491,13 +491,21 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
     this.setState({ customServerShow: true });
   };
 
+  onPressChainName = async (chain_name: 'main' | 'test' | 'regtest') => {
+    this.setState({ actionButtonsDisabled: true });
+    const uri: string = this.state.customServer.uri;
+    const newCustomServer: ServerType = { uri, chain_name };
+    await SettingsFileImpl.writeSettings('server', newCustomServer);
+    this.setState({ server: newCustomServer, actionButtonsDisabled: false });
+  };
+
   render() {
     const { screen, walletSeed, actionButtonsDisabled, walletExists, server, netInfo, customServerShow, customServer } =
       this.state;
     const { translate } = this.props;
     const { colors } = this.props.theme;
 
-    console.log('render loadingAppClass - 3');
+    console.log('render loadingAppClass - 3', server);
 
     return (
       <ContextAppLoadingProvider value={this.state}>
@@ -587,15 +595,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                         alignItems: 'center',
                       }}>
                       <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-                        <TouchableOpacity
-                          onPress={() =>
-                            this.setState(state => ({
-                              customServer: {
-                                uri: state.customServer.uri,
-                                chain_name: 'main',
-                              },
-                            }))
-                          }>
+                        <TouchableOpacity onPress={() => this.onPressChainName('main')}>
                           <View
                             style={{
                               flexDirection: 'row',
@@ -630,16 +630,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                             </View>
                           </View>
                         </TouchableOpacity>
-                        <TouchableOpacity
-                          style={{ marginLeft: 5 }}
-                          onPress={() =>
-                            this.setState(state => ({
-                              customServer: {
-                                uri: state.customServer.uri,
-                                chain_name: 'test',
-                              },
-                            }))
-                          }>
+                        <TouchableOpacity onPress={() => this.onPressChainName('test')}>
                           <View
                             style={{
                               flexDirection: 'row',
@@ -674,16 +665,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                             </View>
                           </View>
                         </TouchableOpacity>
-                        <TouchableOpacity
-                          style={{ marginLeft: 5 }}
-                          onPress={() =>
-                            this.setState(state => ({
-                              customServer: {
-                                uri: state.customServer.uri,
-                                chain_name: 'regtest',
-                              },
-                            }))
-                          }>
+                        <TouchableOpacity onPress={() => this.onPressChainName('regtest')}>
                           <View
                             style={{
                               flexDirection: 'row',
@@ -760,7 +742,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                           type="Primary"
                           title={translate('save') as string}
                           disabled={actionButtonsDisabled}
-                          onPress={() => this.useCustomServer(customServer)}
+                          onPress={() => this.usingCustomServer(customServer)}
                           style={{ marginBottom: 10 }}
                         />
                         <Button
@@ -817,7 +799,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                       type="Primary"
                       title={translate('loadingapp.changeserver') as string}
                       disabled={actionButtonsDisabled}
-                      onPress={this.useDefaultServer_0}
+                      onPress={this.usingDefaultServer_0}
                       style={{ marginBottom: 10 }}
                     />
                   )}
@@ -826,7 +808,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                       type="Primary"
                       title={translate('loadingapp.changeserver') as string}
                       disabled={actionButtonsDisabled}
-                      onPress={this.useDefaultServer_1}
+                      onPress={this.usingDefaultServer_1}
                       style={{ marginBottom: 10 }}
                     />
                   )}
@@ -838,7 +820,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                         type="Primary"
                         title={translate('loadingapp.changeserver') as string}
                         disabled={actionButtonsDisabled}
-                        onPress={this.useDefaultServer_0}
+                        onPress={this.usingDefaultServer_0}
                         style={{ marginBottom: 10 }}
                       />
                     )}
