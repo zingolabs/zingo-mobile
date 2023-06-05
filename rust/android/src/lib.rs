@@ -50,7 +50,7 @@ pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RustFFI_00024Companion_initnew
         .into_string()
         .unwrap();
 
-    let seed = rustlib::init_new(server_uri, data_dir, &chain_hint);
+    let seed = rustlib::init_new(server_uri, data_dir, chain_hint);
 
     let output = env.new_string(seed.as_str()).unwrap();
     output.into_inner()
@@ -91,7 +91,7 @@ pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RustFFI_00024Companion_initfro
         .into_string()
         .unwrap();
 
-    let seed = rustlib::init_from_seed(server_uri, seed_tmp, birthday, data_dir, &chain_hint);
+    let seed = rustlib::init_from_seed(server_uri, seed_tmp, birthday, data_dir, chain_hint);
 
     let output = env.new_string(seed.as_str()).unwrap();
     output.into_inner()
@@ -132,12 +132,14 @@ pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RustFFI_00024Companion_initfro
         .into_string()
         .unwrap();
 
-    let _no_seed_warning =
-        rustlib::init_from_ufvk(server_uri, ufvk_tmp, birthday, data_dir, &chain_hint);
+    let no_seed_warning =
+        rustlib::init_from_ufvk(server_uri, ufvk_tmp, birthday, data_dir, chain_hint);
 
-    let output = env
-        .new_string("Wallet created from ufvk, no seed available")
-        .unwrap();
+    // I need to see if there is some error here...
+    //let output = env
+    //    .new_string("Wallet created from ufvk, no seed available")
+    //    .unwrap();
+    let output = env.new_string(no_seed_warning.as_str()).unwrap();
     output.into_inner()
 }
 
@@ -169,7 +171,7 @@ pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RustFFI_00024Companion_initfro
         .into_string()
         .unwrap();
 
-    let seed = rustlib::init_from_b64(server_uri, base64, data_dir, &chain_hint);
+    let seed = rustlib::init_from_b64(server_uri, base64, data_dir, chain_hint);
 
     let output = env.new_string(seed.as_str()).unwrap();
     output.into_inner()
