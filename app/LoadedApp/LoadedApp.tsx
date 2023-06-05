@@ -736,11 +736,11 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
   set_server_option = async (
     name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
-    value: string | ServerType,
+    value: ServerType,
     toast: boolean,
     same_server_chain_name: boolean,
   ): Promise<void> => {
-    const valueServer = value as ServerType;
+    console.log(value);
     // here I know the server was changed, clean all the tasks before anything.
     await this.rpc.clearTimers();
     this.setState({
@@ -760,16 +760,17 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       //   The App have to go to the initial screen
       // - the seed exists and the App can open the wallet in the new server.
       //   But I have to restart the sync if needed.
-      const result: string = await RPCModule.loadExistingWallet(valueServer.uri, valueServer.chain_name);
+      const result: string = await RPCModule.loadExistingWallet(value.uri, value.chain_name);
+      console.log(result);
       if (result && !result.toLowerCase().startsWith('error')) {
         // Load the wallet and navigate to the transactions screen
-        //console.log(`wallet loaded ok ${value}`);
+        console.log(`wallet loaded ok ${value.uri}`);
         if (toast) {
-          Toast.show(`${this.props.translate('loadedapp.readingwallet')} ${value}`, Toast.LONG);
+          Toast.show(`${this.props.translate('loadedapp.readingwallet')} ${value.uri}`, Toast.LONG);
         }
         await SettingsFileImpl.writeSettings(name, value);
         this.setState({
-          server: value as ServerType,
+          server: value,
         });
         // the server is changed, the App needs to restart the timeout tasks from the beginning
         await this.rpc.configure();
@@ -789,7 +790,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       });
       //console.log(`Error Reading Wallet ${value} - ${error}`);
       if (toast) {
-        Toast.show(`${this.props.translate('loadedapp.readingwallet-error')} ${value}`, Toast.LONG);
+        Toast.show(`${this.props.translate('loadedapp.readingwallet-error')} ${value.uri}`, Toast.LONG);
       }
 
       // we need to restore the old server because the new doesn't have the seed of the current wallet.

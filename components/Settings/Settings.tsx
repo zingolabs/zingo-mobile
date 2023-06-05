@@ -26,7 +26,7 @@ type SettingsProps = {
   set_wallet_option: (name: string, value: string) => Promise<void>;
   set_server_option: (
     name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
-    value: string | ServerType,
+    value: ServerType,
     toast: boolean,
     same_server_chain_name: boolean,
   ) => Promise<void>;
@@ -117,8 +117,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
   const [memos, setMemos] = useState(walletSettings.download_memos);
   const [filter, setFilter] = useState(walletSettings.transaction_filter_threshold);
-  const [serverUri, setServerUri] = useState(serverContext.uri);
-  const [serverChainName, setServerChainName] = useState(serverContext.chain_name);
+  const [customServerUri, setCustomServerUri] = useState(serverContext.uri);
+  const [customServerChainName, setCustomServerChainName] = useState(serverContext.chain_name);
   const [currency, setCurrency] = useState(currencyContext);
   const [language, setLanguage] = useState(languageContext);
   const [sendAll, setSendAll] = useState(sendAllContext);
@@ -133,11 +133,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
   useEffect(() => {
     setCustomIcon(
-      serverUris().find((s: ServerType) => isEqual(s, { uri: serverUri, chain_name: serverChainName } as ServerType))
+      serverUris().find((s: ServerType) => isEqual(s, { uri: customServerUri, chain_name: customServerChainName }))
         ? farCircle
         : faDotCircle,
     );
-  }, [serverUri, serverChainName]);
+  }, [customServerChainName, customServerUri]);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
@@ -164,13 +164,14 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   }, [slideAnim, titleViewHeight]);
 
   const saveSettings = async () => {
-    let serverUriParsed = serverUri;
+    let serverUriParsed = customServerUri;
     let same_server_chain_name = true;
     const chain_name = info.chain_name;
     if (
       walletSettings.download_memos === memos &&
       walletSettings.transaction_filter_threshold === filter &&
-      isEqual(serverContext, { uri: serverUri, chain_name: serverChainName } as ServerType) &&
+      serverContext.uri === customServerUri &&
+      serverContext.chain_name === customServerChainName &&
       currencyContext === currency &&
       languageContext === language &&
       sendAllContext === sendAll &&
@@ -196,7 +197,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       return;
     }
 
-    if (!isEqual(serverContext, { uri: serverUri, chain_name: serverChainName } as ServerType)) {
+    if (serverContext.uri !== customServerUri) {
       const resultUri = parseServerURI(serverUriParsed, translate);
       if (resultUri.toLowerCase().startsWith('error')) {
         Toast.show(translate('settings.isuri') as string, Toast.LONG);
@@ -209,7 +210,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         // and I save it in the state ASAP.
         if (serverUriParsed !== resultUri) {
           serverUriParsed = resultUri;
-          setServerUri(resultUri);
+          setCustomServerUri(resultUri);
         }
       }
     }
@@ -219,7 +220,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       return;
     }
 
-    if (!isEqual(serverContext, { uri: serverUri, chain_name: serverChainName } as ServerType)) {
+    if (serverContext.uri !== serverUriParsed || serverContext.chain_name !== customServerChainName) {
       setDisabled(true);
       Toast.show(translate('loadedapp.tryingnewserver') as string, Toast.SHORT);
       const { result, timeout, new_chain_name } = await checkServerURI(serverUriParsed, serverContext.uri);
@@ -261,13 +262,13 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
     // I need a little time in this modal because maybe the wallet cannot be open with the new server
     let ms = 100;
-    if (!isEqual(serverContext, { uri: serverUri, chain_name: serverChainName } as ServerType)) {
+    if (serverContext.uri !== serverUriParsed || serverContext.chain_name !== customServerChainName) {
       if (languageContext !== language) {
         await set_language_option('language', language, false);
       }
       set_server_option(
         'server',
-        { uri: serverUri, chain_name: serverChainName } as ServerType,
+        { uri: serverUriParsed, chain_name: customServerChainName } as ServerType,
         true,
         same_server_chain_name,
       );
@@ -419,10 +420,13 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 disabled={disabled}
                 key={'touch-' + s.uri}
                 style={{ marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
-                onPress={() => setServerUri(s.uri)}>
+                onPress={() => {
+                  setCustomServerUri(s.uri);
+                  setCustomServerChainName(s.chain_name);
+                }}>
                 <View style={{ display: 'flex', flexDirection: 'row', marginTop: 10 }}>
                   <FontAwesomeIcon
-                    icon={serverUri === s.uri ? faDotCircle : farCircle}
+                    icon={customServerUri === s.uri ? faDotCircle : farCircle}
                     size={20}
                     color={colors.border}
                   />
@@ -434,12 +438,12 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             ) : null,
           )}
 
-          <View style={{ display: 'flex', flexDirection: 'row' }}>
+          <View>
             <TouchableOpacity
               testID="settings.customServer"
               disabled={disabled}
               style={{ marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
-              onPress={() => setServerUri('')}>
+              onPress={() => setCustomServerUri('')}>
               <View style={{ display: 'flex', flexDirection: 'row', marginTop: 10 }}>
                 {customIcon && <FontAwesomeIcon icon={customIcon} size={20} color={colors.border} />}
                 <RegText style={{ marginLeft: 10 }}>{translate('settings.custom') as string}</RegText>
@@ -456,7 +460,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                     borderWidth: 1,
                     marginLeft: 5,
                     width: 'auto',
-                    maxWidth: '80%',
+                    maxWidth: '90%',
                     minWidth: '50%',
                     minHeight: 48,
                   }}>
@@ -469,12 +473,13 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                       fontWeight: '600',
                       fontSize: 18,
                       minWidth: '50%',
+                      maxWidth: '90%',
                       minHeight: 48,
                       marginLeft: 5,
                       backgroundColor: 'transparent',
                     }}
-                    value={serverUri}
-                    onChangeText={(text: string) => setServerUri(text)}
+                    value={customServerUri}
+                    onChangeText={(text: string) => setCustomServerUri(text)}
                     editable={!disabled}
                     maxLength={100}
                   />
@@ -482,9 +487,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 <View style={{ display: 'flex', marginLeft: 25, marginBottom: 30 }}>
                   {optionsRadio(
                     CHAIN_NAMES,
-                    setServerChainName as React.Dispatch<React.SetStateAction<string | boolean>>,
+                    setCustomServerChainName as React.Dispatch<React.SetStateAction<string | boolean>>,
                     String,
-                    serverChainName,
+                    customServerChainName,
                     'chain_name',
                   )}
                 </View>
