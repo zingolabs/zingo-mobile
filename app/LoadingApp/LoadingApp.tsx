@@ -238,7 +238,8 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
         this.setState({ walletExists: true });
         const networkState = await NetInfo.fetch();
         if (networkState.isConnected) {
-          let result: string = await RPCModule.loadExistingWallet(this.state.server, 'main');
+          const chain_name: string = 'main';
+          let result: string = await RPCModule.loadExistingWallet(this.state.server, chain_name);
           if (result === 'Error: This wallet is watch-only.') {
             // this warning is not an error, bypassing...
             result = 'OK';
@@ -461,10 +462,21 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
       }
 
       let result: string;
+      const chain_name: string = 'main';
       if (type === 'seed') {
-        result = await RPCModule.restoreWalletFromSeed(seed_ufvk.toLowerCase(), walletBirthday || '0', server, 'main');
+        result = await RPCModule.restoreWalletFromSeed(
+          seed_ufvk.toLowerCase(),
+          walletBirthday || '0',
+          server,
+          chain_name,
+        );
       } else {
-        result = await RPCModule.restoreWalletFromUfvk(seed_ufvk, walletBirthday || '0', server, 'main');
+        result = await RPCModule.restoreWalletFromUfvk(
+          seed_ufvk.toLowerCase(),
+          walletBirthday || '0',
+          server,
+          chain_name,
+        );
         if (result === 'Error: This wallet is watch-only.') {
           // this warning is not an error, bypassing...
           result = 'ok';
