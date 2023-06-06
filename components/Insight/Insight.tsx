@@ -89,18 +89,34 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, set_privac
   const [pieAmounts, setPieAmounts] = useState<DataType[]>([]);
   const [expandAddress, setExpandAddress] = useState<boolean[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [tab, setTab] = useState<'sent' | 'sends' | 'memobytes'>('sent');
 
   useEffect(() => {
     (async () => {
       setLoading(true);
-      const resultStr = await RPCModule.execute('value_to_address', '');
-      //console.log('#################', resultStr);
+      let resultStr: string = '';
+      switch (tab) {
+        case 'sent':
+          resultStr = await RPCModule.execute('value_to_address', '');
+          console.log('################# value', resultStr);
+          break;
+        case 'sends':
+          resultStr = await RPCModule.execute('sends_to_address', '');
+          console.log('################# value', resultStr);
+          break;
+        case 'memobytes':
+          resultStr = await RPCModule.execute('memobytes_to_address', '');
+          console.log('################# value', resultStr);
+          break;
+        default:
+          break;
+      }
       const resultJSON = await JSON.parse(resultStr);
       let amounts: { value: number; address: string; tag: string }[] = [];
       const resultJSONEntries: [string, number][] = Object.entries(resultJSON) as [string, number][];
       resultJSONEntries.forEach(([key, value]) => {
         if (value > 0) {
-          amounts.push({ value: value / 10 ** 8, address: key, tag: '' });
+          amounts.push({ value: tab === 'sent' ? value / 10 ** 8 : value, address: key, tag: '' });
         }
       });
       const randomColors = Utils.generateColorList(amounts.length);
@@ -120,7 +136,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, set_privac
       setExpandAddress(newExpandAddress);
       setLoading(false);
     })();
-  }, [colors.zingo]);
+  }, [colors.zingo, tab]);
 
   const selectExpandAddress = (index: number) => {
     let newExpandAddress = Array(expandAddress.length).fill(false);
@@ -194,13 +210,21 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, set_privac
               justifyContent: 'center',
             }}>
             <RegText>{getPercent(percent)}</RegText>
-            <ZecAmount
-              currencyName={info.currencyName ? info.currencyName : ''}
-              size={15}
-              amtZec={item.value}
-              style={{ marginHorizontal: 5 }}
-              privacy={privacy}
-            />
+            {tab === 'sent' ? (
+              <ZecAmount
+                currencyName={info.currencyName ? info.currencyName : ''}
+                size={15}
+                amtZec={item.value}
+                style={{ marginHorizontal: 5 }}
+                privacy={privacy}
+              />
+            ) : (
+              <RegText style={{ marginLeft: 10 }}>
+                {'# ' +
+                  item.value.toString() +
+                  (tab === 'sends' ? translate('insight.sends-unit') : translate('insight.memobytes-unit'))}
+              </RegText>
+            )}
           </View>
         </View>
       </View>
@@ -225,6 +249,75 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, set_privac
         noDrawMenu={true}
         set_privacy_option={set_privacy_option}
       />
+
+      <View style={{ width: '100%', flexDirection: 'row', marginTop: 10 }}>
+        <TouchableOpacity onPress={() => setTab('sent')}>
+          <View
+            style={{
+              width: (dimensions.width - 20) / 3,
+              alignItems: 'center',
+              borderBottomColor: colors.primary,
+              borderBottomWidth: tab === 'sent' ? 2 : 0,
+              paddingBottom: 10,
+            }}>
+            <RegText
+              style={{
+                fontWeight: tab === 'sent' ? 'bold' : 'normal',
+                fontSize: tab === 'sent' ? 15 : 14,
+                color: colors.text,
+              }}>
+              {translate('insight.sent') as string}
+            </RegText>
+            <RegText style={{ fontSize: 11, color: tab === 'sent' ? colors.primary : colors.text }}>
+              ({translate('insight.sent-text') as string})
+            </RegText>
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => setTab('sends')}>
+          <View
+            style={{
+              width: (dimensions.width - 20) / 3,
+              alignItems: 'center',
+              borderBottomColor: colors.primary,
+              borderBottomWidth: tab === 'sends' ? 2 : 0,
+              paddingBottom: 10,
+            }}>
+            <RegText
+              style={{
+                fontWeight: tab === 'sends' ? 'bold' : 'normal',
+                fontSize: tab === 'sends' ? 15 : 14,
+                color: colors.text,
+              }}>
+              {translate('insight.sends') as string}
+            </RegText>
+            <RegText style={{ fontSize: 11, color: tab === 'sends' ? colors.primary : colors.text }}>
+              ({translate('insight.sends-text') as string})
+            </RegText>
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => setTab('memobytes')}>
+          <View
+            style={{
+              width: (dimensions.width - 20) / 3,
+              alignItems: 'center',
+              borderBottomColor: colors.primary,
+              borderBottomWidth: tab === 'memobytes' ? 2 : 0,
+              paddingBottom: 10,
+            }}>
+            <RegText
+              style={{
+                fontWeight: tab === 'memobytes' ? 'bold' : 'normal',
+                fontSize: tab === 'memobytes' ? 15 : 14,
+                color: colors.text,
+              }}>
+              {translate('insight.memobytes') as string}
+            </RegText>
+            <RegText style={{ fontSize: 11, color: tab === 'memobytes' ? colors.primary : colors.text }}>
+              ({translate('insight.memobytes-text') as string})
+            </RegText>
+          </View>
+        </TouchableOpacity>
+      </View>
 
       <ScrollView
         showsVerticalScrollIndicator={true}

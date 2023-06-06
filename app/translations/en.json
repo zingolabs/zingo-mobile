@@ -11,8 +11,16 @@
   "menu-acc": "Open Menu",
   "donation": "Thanks for supporting Zingo!",
   "insight": {
-    "title": "Financial Insight (sent)",
-    "no-data": "There is no data in your Wallet, no sent transactions."
+    "title": "Financial Insight",
+    "no-data": "There is no data in your Wallet, no sent transactions.",
+    "sent": "Sent",
+    "sends": "# sends",
+    "memobytes": "# bytes",
+    "sent-text": "Sent amounts",
+    "sends-text": "Number of sends",
+    "memobytes-text": "Number of bytes",
+    "sends-unit": " sends.",
+    "memobytes-unit": " chars."
   },
   "loadingapp": {
     "actualserver": "Actual server:",
@@ -36,7 +44,7 @@
     "changewallet": "Change to another Wallet",
     "restorebackupwallet": "Restore Last Wallet Backup",
     "fundpools": "Fund Pools",
-    "insight": "Financial Insight (sent)",
+    "insight": "Financial Insight",
     "restoremainnet-error": "This option is only available for 'Mainnet' servers.",
     "changeservernew-error": "Error trying to change the server to the new one: ",
     "readingwallet-error": "Error trying to read the wallet with the new server:",
