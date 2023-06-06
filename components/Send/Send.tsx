@@ -92,7 +92,8 @@ const Send: React.FunctionComponent<SendProps> = ({
         Toast.show(translate('loadedapp.connection-error') as string, Toast.LONG);
         return false;
       }
-      const result: string = await RPCModule.execute('parse', address);
+      const result: string = await RPCModule.execute('parse_address', address);
+      console.log(result, result.length);
       if (result) {
         if (result.toLowerCase().startsWith('error')) {
           return false;
@@ -129,7 +130,8 @@ const Send: React.FunctionComponent<SendProps> = ({
         Toast.show(translate('loadedapp.connection-error') as string, Toast.LONG);
         return false;
       }
-      const result: string = await RPCModule.execute('parse', address);
+      const result: string = await RPCModule.execute('parse_address', address);
+      console.log(result, result.length);
       if (result) {
         if (result.toLowerCase().startsWith('error')) {
           return false;

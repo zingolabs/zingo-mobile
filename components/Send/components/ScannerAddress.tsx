@@ -32,7 +32,7 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateTo
       Toast.show(translate('loadedapp.connection-error') as string, Toast.LONG);
       return;
     }
-    const result: string = await RPCModule.execute('parse', scannedAddress);
+    const result: string = await RPCModule.execute('parse_address', scannedAddress);
     if (result) {
       if (result.toLowerCase().startsWith('error')) {
         Toast.show(`"${scannedAddress}" ${translate('scanner.nozcash-error')}`, Toast.LONG);
