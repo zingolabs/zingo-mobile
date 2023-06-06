@@ -3,6 +3,8 @@ set -e
 cd $(git rev-parse --show-toplevel)
 source ./scripts/emulator_read_target.sh
 
+timeout_seconds=180
+
 function check_metro_server() {
     metro_status=$(cat ${output_dir}/react-native_start.txt | grep Metro)
     if [[ "${metro_status}" == *"Metro"* ]]; then
@@ -15,11 +17,11 @@ function check_metro_server() {
 function wait_for() {
     timeout_seconds=$1
     shift 1
-    until [ $timeout_seconds -le 0 ] || ("$@" &> /dev/null); do
+    until [[ $timeout_seconds -le 0 ]] || ("$@" &> /dev/null); do
         sleep 1
         timeout_seconds=$(( timeout_seconds - 1 ))
     done
-    if [ $timeout_seconds -le 0 ]; then
+    if [[ $timeout_seconds -le 0 ]]; then
         echo -e "\nError: Timeout" >&2
         exit 1
     fi
