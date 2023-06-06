@@ -5,7 +5,7 @@ cd $(git rev-parse --show-toplevel)
 
 source ./scripts/emulator_read_target.sh
 
-sdkmanager --version &>> /dev/null
+sdkmanager --version &> /dev/null
 if [ ! $? -eq 0 ]; then
   echo "Error: sdkmanager not found" >&2
   exit 1
