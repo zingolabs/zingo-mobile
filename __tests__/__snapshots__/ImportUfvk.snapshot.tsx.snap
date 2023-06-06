@@ -51,6 +51,8 @@ exports[`Component ImportUfvk - test Matches the snapshot ImportUfvk 1`] = `
             "borderColor": "rgb(28, 28, 30)",
             "borderRadius": 10,
             "borderWidth": 1,
+            "flexDirection": "row",
+            "justifyContent": "space-between",
             "margin": 10,
             "maxHeight": "40%",
             "padding": 10,
@@ -65,11 +67,10 @@ exports[`Component ImportUfvk - test Matches the snapshot ImportUfvk 1`] = `
               "borderColor": "rgb(28, 28, 30)",
               "borderRadius": 10,
               "borderWidth": 1,
-              "margin": 0,
-              "maxHeight": "70%",
-              "maxWidth": "100%",
-              "minHeight": 100,
-              "minWidth": "95%",
+              "flex": 1,
+              "justifyContent": "center",
+              "marginRight": 5,
+              "width": "auto",
             }
           }
         >
@@ -83,9 +84,8 @@ exports[`Component ImportUfvk - test Matches the snapshot ImportUfvk 1`] = `
                 "color": "rgb(28, 28, 30)",
                 "fontSize": 16,
                 "fontWeight": "600",
-                "marginLeft": 5,
+                "marginHorizontal": 5,
                 "minHeight": 100,
-                "minWidth": "95%",
               }
             }
             value=""
@@ -104,7 +104,6 @@ exports[`Component ImportUfvk - test Matches the snapshot ImportUfvk 1`] = `
           onStartShouldSetResponder={[Function]}
           style={
             {
-              "alignItems": "center",
               "opacity": 1,
             }
           }
@@ -124,12 +123,7 @@ exports[`Component ImportUfvk - test Matches the snapshot ImportUfvk 1`] = `
                 "prefix": "fas",
               }
             }
-            size={50}
-            style={
-              {
-                "margin": 5,
-              }
-            }
+            size={48}
           />
         </View>
       </View>
