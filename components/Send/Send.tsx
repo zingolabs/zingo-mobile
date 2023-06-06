@@ -93,9 +93,9 @@ const Send: React.FunctionComponent<SendProps> = ({
         return false;
       }
       const result: string = await RPCModule.execute('parse_address', address);
-      console.log(result, result.length);
+      //console.log(result, result.length);
       if (result) {
-        if (result.toLowerCase().startsWith('error')) {
+        if (result.toLowerCase().startsWith('error') || result.toLowerCase() === 'null') {
           return false;
         }
       } else {
@@ -131,9 +131,9 @@ const Send: React.FunctionComponent<SendProps> = ({
         return false;
       }
       const result: string = await RPCModule.execute('parse_address', address);
-      console.log(result, result.length);
+      //console.log(address, result, result.length);
       if (result) {
-        if (result.toLowerCase().startsWith('error')) {
+        if (result.toLowerCase().startsWith('error') || result.toLowerCase() === 'null') {
           return false;
         }
       } else {
@@ -185,7 +185,17 @@ const Send: React.FunctionComponent<SendProps> = ({
         setValidAmount(0);
       }
     }
-  }, [decimalSeparator, getMaxAmount, info.chain_name, netInfo.isConnected, sendPageState.toaddr, translate]);
+  }, [
+    decimalSeparator,
+    getMaxAmount,
+    info.chain_name,
+    netInfo.isConnected,
+    sendPageState.toaddr,
+    sendPageState.toaddr.to,
+    sendPageState.toaddr.amountCurrency,
+    sendPageState.toaddr.amount,
+    translate,
+  ]);
 
   useEffect(() => {
     setSendButtonEnabled(validAddress === 1 && validAmount === 1);

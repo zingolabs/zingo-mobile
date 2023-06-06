@@ -26,7 +26,7 @@ const parseZcashURI = async (
 
   const resultParse: string = await RPCModule.execute('parse_address', address);
   if (resultParse) {
-    if (resultParse.toLowerCase().startsWith('error')) {
+    if (resultParse.toLowerCase().startsWith('error') || resultParse.toLowerCase() === 'null') {
       return 'Right now it is not possible to verify the address with the server';
     }
   } else {
@@ -79,7 +79,7 @@ const parseZcashURI = async (
         }
         const result: string = await RPCModule.execute('parse_address', value);
         if (result) {
-          if (result.toLowerCase().startsWith('error')) {
+          if (result.toLowerCase().startsWith('error') || result.toLowerCase() === 'null') {
             return 'Right now it is not possible to verify the address with the server';
           }
         } else {

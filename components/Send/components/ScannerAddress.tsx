@@ -34,7 +34,7 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateTo
     }
     const result: string = await RPCModule.execute('parse_address', scannedAddress);
     if (result) {
-      if (result.toLowerCase().startsWith('error')) {
+      if (result.toLowerCase().startsWith('error') || result.toLowerCase() === 'null') {
         Toast.show(`"${scannedAddress}" ${translate('scanner.nozcash-error')}`, Toast.LONG);
         return;
       }
