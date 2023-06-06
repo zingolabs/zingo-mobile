@@ -232,7 +232,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
     await AsyncStorage.setItem('@background', 'no');
     setTimeout(async () => {
       const exists = await RPCModule.walletExists();
-      console.log('Wallet Exists result', exists);
+      console.log('Wallet Exists result', exists, this.state.server);
 
       if (exists && exists !== 'false') {
         this.setState({ walletExists: true });
@@ -851,25 +851,25 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                     />
                   )}
 
-                <View style={{ marginTop: 50, display: 'flex', alignItems: 'center' }}>
+                <View style={{ marginTop: 20, display: 'flex', alignItems: 'center' }}>
                   <Button
                     testID="loadingapp.restorewalletseed"
                     type="Secondary"
                     title={translate('loadingapp.restorewalletseed') as string}
                     disabled={actionButtonsDisabled}
                     onPress={() => this.getwalletToRestore('seed')}
-                    style={{ margin: 10 }}
+                    style={{ marginBottom: 10 }}
                   />
                 </View>
 
-                <View style={{ marginTop: 50, display: 'flex', alignItems: 'center' }}>
+                <View style={{ marginTop: 20, display: 'flex', alignItems: 'center' }}>
                   <Button
                     testID="loadingapp.restorewalletufvk"
                     type="Secondary"
                     title={translate('loadingapp.restorewalletufvk') as string}
                     disabled={actionButtonsDisabled}
                     onPress={() => this.getwalletToRestore('ufvk')}
-                    style={{ margin: 10 }}
+                    style={{ marginBottom: 10 }}
                   />
                 </View>
               </View>

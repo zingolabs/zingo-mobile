@@ -193,19 +193,20 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
             borderRadius: 10,
             borderColor: colors.text,
             maxHeight: '40%',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
           }}>
           <View
             accessible={true}
             accessibilityLabel={translate('seed.seed-acc') as string}
             style={{
-              margin: 0,
+              marginRight: 5,
               borderWidth: 1,
               borderRadius: 10,
               borderColor: colors.text,
-              maxWidth: '100%',
-              maxHeight: '70%',
-              minWidth: '95%',
-              minHeight: 100,
+              width: 'auto',
+              flex: 1,
+              justifyContent: 'center',
             }}>
             <TextInput
               multiline
@@ -213,9 +214,8 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
                 color: colors.text,
                 fontWeight: '600',
                 fontSize: 16,
-                minWidth: '95%',
                 minHeight: 100,
-                marginLeft: 5,
+                marginHorizontal: 5,
                 backgroundColor: 'transparent',
               }}
               value={privKeyText}
@@ -224,11 +224,10 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
             />
           </View>
           <TouchableOpacity
-            style={{ alignItems: 'center' }}
             onPress={() => {
               setQrcodeModalVisible(true);
             }}>
-            <FontAwesomeIcon style={{ margin: 5 }} size={50} icon={faQrcode} color={colors.border} />
+            <FontAwesomeIcon size={48} icon={faQrcode} color={colors.border} />
           </TouchableOpacity>
         </View>
 
