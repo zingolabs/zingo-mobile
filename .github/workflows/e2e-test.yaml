@@ -109,7 +109,7 @@ jobs:
         with:
           timeout_minutes: 60
           max_attempts: 3
-          command: "./scripts/emulator_boot.sh"
+          command: "./scripts/emulator_boot.sh '-no-window'"
       
       - name: Run Detox e2e tests
         uses: nick-fields/retry@v2

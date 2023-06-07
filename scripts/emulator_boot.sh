@@ -46,7 +46,7 @@ function wait_for() {
 ./scripts/kill_emulators.sh
 
 echo -e "\n\nWaiting for emulator to launch..."
-nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-boot-anim -no-snapshot-save -read-only -port 5554 &> "${output_dir}/emulator_boot.txt" &
+nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-boot-anim -no-snapshot-save -read-only -port 5554 -no-audio -camera-back none "$@" &> "${output_dir}/emulator_boot.txt" &
 
 adb kill-server
 adb start-server
