@@ -26,8 +26,8 @@ type HistoryProps = {
     name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
     value: boolean,
   ) => Promise<void>;
-  setPoolsToShieldSelectSapling?: (v: boolean) => void;
-  setPoolsToShieldSelectTransparent?: (v: boolean) => void;
+  setPoolsToShieldSelectSapling: (v: boolean) => void;
+  setPoolsToShieldSelectTransparent: (v: boolean) => void;
 };
 
 const History: React.FunctionComponent<HistoryProps> = ({

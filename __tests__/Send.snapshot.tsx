@@ -155,6 +155,8 @@ describe('Component Send - test', () => {
           setZecPrice={onFunction}
           setBackgroundError={onFunction}
           set_privacy_option={onFunction}
+          setPoolsToShieldSelectSapling={onFunction}
+          setPoolsToShieldSelectTransparent={onFunction}
         />
       </ContextAppLoadedProvider>,
     );
