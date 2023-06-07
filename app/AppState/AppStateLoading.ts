@@ -38,6 +38,8 @@ export default interface AppStateLoading {
   backgroundError: BackgroundErrorType;
 
   privacy: boolean;
+  readOnly: boolean;
+
   customServerShow: boolean;
   customServerUri: string;
   customServerChainName: 'main' | 'test' | 'regtest';

@@ -26,7 +26,6 @@ const parseZcashURI = async (
   const address = parsedUri.pathname;
 
   const resultParse: string = await RPCModule.execute('parse_address', address);
-  const resultParse: string = await RPCModule.execute('parse_address', address);
   if (resultParse) {
     if (resultParse.toLowerCase().startsWith('error') || resultParse.toLowerCase() === 'null') {
       return translate('uris.parseerror') as string;
@@ -91,7 +90,6 @@ const parseZcashURI = async (
         if (typeof target.address !== 'undefined') {
           return `${translate('uris.duplicateparameter')} "${qName}"`;
         }
-        const result: string = await RPCModule.execute('parse_address', value);
         const result: string = await RPCModule.execute('parse_address', value);
         if (result) {
           if (result.toLowerCase().startsWith('error') || result.toLowerCase() === 'null') {

@@ -999,13 +999,14 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
         //return;
       }
 
-    if (this.state.readOnly) {
-      this.setState({ ufvkServerModalVisible: false });
-    } else {
-      this.setState({ seedServerModalVisible: false });
+      if (this.state.readOnly) {
+        this.setState({ ufvkServerModalVisible: false });
+      } else {
+        this.setState({ seedServerModalVisible: false });
+      }
+      // no need to restart the tasks because is about to restart the app.
+      this.navigateToLoading();
     }
-    // no need to restart the tasks because is about to restart the app.
-    this.navigateToLoading();
   };
 
   setUaAddress = (uaAddress: string) => {

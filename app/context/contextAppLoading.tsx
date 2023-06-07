@@ -45,6 +45,8 @@ export const defaultAppStateLoading: AppStateLoading = {
   translate: () => '',
   backgroundError: {} as BackgroundErrorType,
   privacy: false,
+  readOnly: false,
+
   customServerShow: false,
   customServerUri: '',
   customServerChainName: 'main',

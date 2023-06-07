@@ -33,7 +33,7 @@ import { faEllipsisV, faCashRegister } from '@fortawesome/free-solid-svg-icons';
 import BoldText from '../../components/Components/BoldText';
 import Button from '../../components/Components/Button';
 import RPCModule from '../RPCModule';
-import { AppStateLoading, BackgroundType, WalletSeedType, TranslateType, NetInfoType, ServerType } from '../AppState';
+import { AppStateLoading, BackgroundType, WalletType, TranslateType, NetInfoType, ServerType } from '../AppState';
 import { parseServerURI, serverUris } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import RPC from '../rpc';
@@ -45,6 +45,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '../createAlert';
 import { ImportUfvk } from '../../components/Ufvk';
 import { RPCWalletKindType } from '../rpc/types/RPCWalletKindType';
+import { isEqual } from 'lodash';
 
 const Seed = React.lazy(() => import('../../components/Seed'));
 
@@ -510,7 +511,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
   render() {
     const {
       screen,
-      walletSeed,
+      wallet,
       actionButtonsDisabled,
       walletExists,
       server,
@@ -851,29 +852,30 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                     />
                   )}
 
-                <View style={{ marginTop: 20, display: 'flex', alignItems: 'center' }}>
-                  <Button
-                    testID="loadingapp.restorewalletseed"
-                    type="Secondary"
-                    title={translate('loadingapp.restorewalletseed') as string}
-                    disabled={actionButtonsDisabled}
-                    onPress={() => this.getwalletToRestore('seed')}
-                    style={{ marginBottom: 10 }}
-                  />
-                </View>
+                  <View style={{ marginTop: 20, display: 'flex', alignItems: 'center' }}>
+                    <Button
+                      testID="loadingapp.restorewalletseed"
+                      type="Secondary"
+                      title={translate('loadingapp.restorewalletseed') as string}
+                      disabled={actionButtonsDisabled}
+                      onPress={() => this.getwalletToRestore('seed')}
+                      style={{ marginBottom: 10 }}
+                    />
+                  </View>
 
-                <View style={{ marginTop: 20, display: 'flex', alignItems: 'center' }}>
-                  <Button
-                    testID="loadingapp.restorewalletufvk"
-                    type="Secondary"
-                    title={translate('loadingapp.restorewalletufvk') as string}
-                    disabled={actionButtonsDisabled}
-                    onPress={() => this.getwalletToRestore('ufvk')}
-                    style={{ marginBottom: 10 }}
-                  />
+                  <View style={{ marginTop: 20, display: 'flex', alignItems: 'center' }}>
+                    <Button
+                      testID="loadingapp.restorewalletufvk"
+                      type="Secondary"
+                      title={translate('loadingapp.restorewalletufvk') as string}
+                      disabled={actionButtonsDisabled}
+                      onPress={() => this.getwalletToRestore('ufvk')}
+                      style={{ marginBottom: 10 }}
+                    />
+                  </View>
                 </View>
-              </View>
-            </ScrollView>
+              </ScrollView>
+            </>
           )}
           {screen === 2 && wallet && (
             <Modal

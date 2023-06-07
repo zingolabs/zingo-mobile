@@ -8,7 +8,7 @@ type checkServerURIReturn = {
 };
 
 const checkServerURI = async (uri: string, oldUri: string): Promise<checkServerURIReturn> => {
-  let new_chain_name: string | undefined;
+  let new_chain_name: 'main' | 'test' | 'regtest' | undefined;
 
   try {
     const resultStrServerPromise = RPCModule.execute('changeserver', uri);
