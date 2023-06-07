@@ -104,6 +104,13 @@ jobs:
           max_attempts: 3
           command: "./scripts/flow_detox_setup.sh"
       
+      - name: Boot emulator
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 60
+          max_attempts: 3
+          command: "./scripts/emulator_boot.sh"
+      
       - name: Run Detox e2e tests
         uses: nick-fields/retry@v2
         with:
