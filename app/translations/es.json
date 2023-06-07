@@ -11,8 +11,16 @@
   "menu-acc": "Abrir Menu",
   "donation": "Gracias por apoyar Zingo!",
   "insight": {
-    "title": "Visión Financiera (enviado)",
-    "no-data": "No hay datos en tu Monedero, ninguna transacción enviada."
+    "title": "Visión Financiera",
+    "no-data": "No hay datos en tu Monedero, ninguna transacción enviada.",
+    "sent": "Enviado",
+    "sends": "# envios",
+    "memobytes": "# carácteres",
+    "sent-text": "Cantidades enviadas",
+    "sends-text": "Numero de envios",
+    "memobytes-text": "Numero de carácteres",
+    "sends-unit": " env.",
+    "memobytes-unit": " car."
   },
   "loadingapp": {
     "actualserver": "Servidor Activo:",
@@ -36,7 +44,7 @@
     "changewallet": "Abrir otro Monedero",
     "restorebackupwallet": "Restaurar la última copia de Seguridad",
     "fundpools": "Agrupaciones de Fondos",
-    "insight": "Visión Financiera (enviado)",
+    "insight": "Visión Financiera",
     "restoremainnet-error": "Esta opción está solamente disponible para la Red: 'Mainnet'.",
     "changeservernew-error": "Error al intentar cambiar al Servidor nuevo: ",
     "readingwallet-error": "Error al intentar leer el monedero activo usando el Servidor nuevo:",

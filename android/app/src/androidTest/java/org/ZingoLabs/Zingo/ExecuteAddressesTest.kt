@@ -23,11 +23,12 @@ class ExecuteAddressesTest {
     @Test
     fun executeAddresses() {  
         val server = "https://mainnet.lightwalletd.com:9067"
+        val chainhint = "main"
         val seed = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art"
         val birthday = "1"
         val datadir = MainApplication.getAppContext()!!.filesDir.path
 
-        RustFFI.initfromseed(server, seed, birthday, datadir)
+        RustFFI.initfromseed(server, seed, birthday, datadir, chainhint)
 
         val resp = RustFFI.execute("addresses", "")
         val addresses: List<Addresses> = jacksonObjectMapper().readValue(resp)
