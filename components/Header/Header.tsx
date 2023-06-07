@@ -8,6 +8,7 @@ import {
   faCloudDownload,
   faLockOpen,
   faLock,
+  faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme } from '@react-navigation/native';
@@ -46,6 +47,8 @@ type HeaderProps = {
     name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
     value: boolean,
   ) => Promise<void>;
+  setPoolsToShieldSelectSapling?: (v: boolean) => void;
+  setPoolsToShieldSelectTransparent?: (v: boolean) => void;
 };
 
 const Header: React.FunctionComponent<HeaderProps> = ({
@@ -65,9 +68,21 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   setBackgroundError,
   noPrivacy,
   set_privacy_option,
+  setPoolsToShieldSelectSapling,
+  setPoolsToShieldSelectTransparent,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { totalBalance, info, syncingStatus, currency, zecPrice, privacy } = context;
+  const {
+    totalBalance,
+    info,
+    syncingStatus,
+    currency,
+    zecPrice,
+    privacy,
+    poolsToShieldSelectSapling,
+    poolsToShieldSelectTransparent,
+  } = context;
+
   let translate: (key: string) => TranslateType, dimensions, netInfo;
   if (translateProp) {
     translate = translateProp;
@@ -91,8 +106,39 @@ const Header: React.FunctionComponent<HeaderProps> = ({
 
   const showShieldButton = totalBalance && (totalBalance.transparentBal > 0 || totalBalance.privateBal > 0);
 
+  let poolsToShield: '' | 'all' | 'transparent' | 'sapling' = '';
+
+  if (totalBalance.transparentBal > 0 && totalBalance.privateBal > 0) {
+    poolsToShield = 'all';
+  } else if (totalBalance.transparentBal > 0) {
+    poolsToShield = 'transparent';
+  } else if (totalBalance.privateBal > 0) {
+    poolsToShield = 'sapling';
+  } else {
+    poolsToShield = '';
+  }
+
   const shieldFunds = async () => {
     if (!setComputingModalVisible || !setBackgroundError) {
+      return;
+    }
+    if (poolsToShield === '') {
+      return;
+    }
+
+    let pools: 'all' | 'transparent' | 'sapling' | '' = poolsToShield;
+
+    if (pools === 'all') {
+      if (!poolsToShieldSelectSapling && !poolsToShieldSelectTransparent) {
+        pools = '';
+      } else if (poolsToShieldSelectSapling && !poolsToShieldSelectTransparent) {
+        pools = 'sapling';
+      } else if (!poolsToShieldSelectSapling && poolsToShieldSelectTransparent) {
+        pools = 'transparent';
+      }
+    }
+
+    if (pools === '') {
       return;
     }
 
@@ -101,8 +147,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     // while shielding, then it going to finish the current batch
     // and after that it run the shield process.
     await RPC.rpc_setInterruptSyncAfterBatch('true');
-
-    const shieldStr = await RPC.rpc_shieldTransparent();
+    const shieldStr = await RPC.rpc_shieldTransparent(pools);
 
     if (shieldStr) {
       if (shieldStr.toLowerCase().startsWith('error')) {
@@ -136,7 +181,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     }
   };
 
-  //console.log('render header', title, privacy);
+  //console.log('render header');
 
   return (
     <View
@@ -207,9 +252,104 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         </View>
       )}
 
-      {showShieldButton && setComputingModalVisible && (
-        <View style={{ margin: 5 }}>
-          <Button type="Primary" title={translate('history.shieldfunds') as string} onPress={shieldFunds} />
+      {showShieldButton && !!poolsToShield && setComputingModalVisible && (
+        <View style={{ margin: 5, flexDirection: 'row' }}>
+          <Button
+            type="Primary"
+            title={
+              translate(
+                `history.shieldfunds-${
+                  poolsToShield !== 'all'
+                    ? poolsToShield
+                    : poolsToShieldSelectSapling && poolsToShieldSelectTransparent
+                    ? 'all'
+                    : poolsToShieldSelectSapling
+                    ? 'sapling'
+                    : poolsToShieldSelectTransparent
+                    ? 'transparent'
+                    : 'all'
+                }`,
+              ) as string
+            }
+            onPress={shieldFunds}
+            disabled={poolsToShield === 'all' && !poolsToShieldSelectSapling && !poolsToShieldSelectTransparent}
+          />
+          {poolsToShield === 'all' && setPoolsToShieldSelectSapling && setPoolsToShieldSelectTransparent && (
+            <View style={{ alignItems: 'flex-start' }}>
+              <TouchableOpacity
+                style={{ marginHorizontal: 10 }}
+                onPress={() => setPoolsToShieldSelectSapling(!poolsToShieldSelectSapling)}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    marginBottom: 10,
+                  }}>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      borderWidth: poolsToShieldSelectSapling ? 2 : 1,
+                      borderColor: poolsToShieldSelectSapling ? colors.primary : colors.primaryDisabled,
+                      borderRadius: 5,
+                      paddingHorizontal: 5,
+                    }}>
+                    <Text
+                      style={{
+                        fontSize: 13,
+                        color: colors.border,
+                        marginRight: 5,
+                      }}>
+                      {translate('history.shieldfunds-z') as string}
+                    </Text>
+                    {poolsToShieldSelectSapling ? (
+                      <FontAwesomeIcon icon={faCheck} size={14} color={colors.primary} />
+                    ) : (
+                      <FontAwesomeIcon icon={faXmark} size={14} color={'red'} />
+                    )}
+                  </View>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{ marginHorizontal: 10 }}
+                onPress={() => setPoolsToShieldSelectTransparent(!poolsToShieldSelectTransparent)}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    marginBottom: 0,
+                  }}>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      borderWidth: poolsToShieldSelectTransparent ? 2 : 1,
+                      borderColor: poolsToShieldSelectTransparent ? colors.primary : colors.primaryDisabled,
+                      borderRadius: 5,
+                      paddingHorizontal: 5,
+                    }}>
+                    <Text
+                      style={{
+                        fontSize: 13,
+                        color: colors.border,
+                        marginRight: 5,
+                      }}>
+                      {translate('history.shieldfunds-t') as string}
+                    </Text>
+                    {poolsToShieldSelectTransparent ? (
+                      <FontAwesomeIcon icon={faCheck} size={14} color={colors.primary} />
+                    ) : (
+                      <FontAwesomeIcon icon={faXmark} size={14} color={'red'} />
+                    )}
+                  </View>
+                </View>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
       )}
 

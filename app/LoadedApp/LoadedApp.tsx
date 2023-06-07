@@ -475,6 +475,14 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     this.setState({ errorModalData });
   };
 
+  setPoolsToShieldSelectSapling = (value: boolean) => {
+    this.setState({ poolsToShieldSelectSapling: value });
+  };
+
+  setPoolsToShieldSelectTransparent = (value: boolean) => {
+    this.setState({ poolsToShieldSelectTransparent: value });
+  };
+
   setTotalBalance = (totalBalance: TotalBalanceClass) => {
     if (!isEqual(this.state.totalBalance, totalBalance)) {
       //console.log('fetch total balance');
@@ -1027,7 +1035,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       return <FontAwesomeIcon icon={iconName} color={iconColor} />;
     };
 
-    //console.log('render LoadedAppClass - 3');
+    console.log('render LoadedAppClass - 3');
 
     return (
       <ContextAppLoadedProvider value={this.state}>
@@ -1282,6 +1290,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                       setComputingModalVisible={this.setComputingModalVisible}
                       setBackgroundError={this.setBackgroundError}
                       set_privacy_option={this.set_privacy_option}
+                      setPoolsToShieldSelectSapling={this.setPoolsToShieldSelectSapling}
+                      setPoolsToShieldSelectTransparent={this.setPoolsToShieldSelectTransparent}
                     />
                   </Suspense>
                 </>
@@ -1308,6 +1318,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                       setZecPrice={this.setZecPrice}
                       setBackgroundError={this.setBackgroundError}
                       set_privacy_option={this.set_privacy_option}
+                      setPoolsToShieldSelectSapling={this.setPoolsToShieldSelectSapling}
+                      setPoolsToShieldSelectTransparent={this.setPoolsToShieldSelectTransparent}
                     />
                   </Suspense>
                 </>
