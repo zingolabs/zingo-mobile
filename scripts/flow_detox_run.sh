@@ -8,10 +8,6 @@ if [[ "${test_suite}" == "ALL" ]]; then
   test_suite="";
 fi
 
-echo 'going to react-native'  #dbg
-./scripts/node_reboot.sh
-echo 'ran react-native' #dbg
-
 detox_target="android.emu.${arch}"
 echo 'ready to detox test ${detox_target} ${test_suite}' #dbg
 yarn detox test -c $detox_target $test_suite

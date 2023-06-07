@@ -110,6 +110,7 @@ jobs:
           timeout_minutes: 60
           max_attempts: 3
           command: "./scripts/flow_detox_run.sh new_wallet"
+          on_retry_command: "./scripts/node_reboot.sh"
 
         # uses: nick-fields/retry@v2
         # with:

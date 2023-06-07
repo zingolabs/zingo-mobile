@@ -29,10 +29,15 @@ function wait_for() {
     fi
 }
 
+echo "going to kill node" #dbg
+
 if killall -9 node &> /dev/null; then
     echo -e "\nAll node processes killed."
     echo -e "\nRestarting react native..."
 fi
+
+echo "starting rnn" #dbg
+
 nohup yarn react-native start &> "${output_dir}/react-native_start.txt" &
 
 echo -e "\nWaiting for react-native/node/metro..."
