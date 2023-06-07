@@ -10,9 +10,3 @@ cd ..
 
 echo -e "\nRunning yarn install..."
 yarn install
-
-echo -e "\nBuilding APKs..."
-cd android
-./gradlew assembleDebug -PsplitApk=true
-cd ..
-

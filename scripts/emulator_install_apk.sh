@@ -1,9 +1,12 @@
 #!/bin/bash
 set -e
-
 cd $(git rev-parse --show-toplevel)
-
 source ./scripts/emulator_read_target.sh
+
+echo -e "\nBuilding APKs..."
+cd android
+./gradlew assembleDebug -PsplitApk=true
+cd ..
 
 echo -e "\nInstalling APKs..."
 i=0

@@ -1,8 +1,8 @@
 const { log, device, by, element } = require('detox');
 
-describe('Example', () => {
+describe('New Wallet', () => {
 
-  it('New wallet button works', async () => {
+  it('New wallet creation flow works.', async () => {
     let newWalletButton = element(by.text('CREATE NEW WALLET (NEW SEED)'));
     await newWalletButton.tap();
     await element(by.text('I HAVE SAVED \n THE SEED')).tap();

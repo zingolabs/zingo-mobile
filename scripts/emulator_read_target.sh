@@ -11,7 +11,7 @@ avd_device=`cat ${output_dir}/target_avd_device.txt`
 arch=`cat ${output_dir}/target_arch.txt`
 abi=`cat ${output_dir}/target_abi.txt`
 
-avd_name="${avd_device}-android-${api_level}_${api_target}_${arch}"
+avd_name="android-${api_level}_${api_target}_${arch}"
 sdk="system-images;android-${api_level};${api_target};${arch}"
 platform="platforms;android-${api_level}"
 
