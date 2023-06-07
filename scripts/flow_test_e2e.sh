@@ -3,7 +3,7 @@ set -e
 cd $(git rev-parse --show-toplevel)
 source ./scripts/emulator_read_target.sh
 
-echo 'started flow script'
+echo 'started flow script' #dbg
 
 test_suite=$1
 if [[ "${test_suite}" == "ALL" ]]; then
