@@ -98,7 +98,11 @@ jobs:
       - run: yarn install
       
       - name: Run e2e tests
-        run: "./scripts/flow_test_e2e.sh new_wallet"
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 60
+          max_attempts: 3
+          command: "./scripts/flow_test_e2e.sh new_wallet"
         # uses: nick-fields/retry@v2
         # with:
         #   timeout_minutes: 60
