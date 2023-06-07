@@ -5,6 +5,8 @@ source ./scripts/emulator_read_target.sh
 
 timeout_seconds=180
 
+echo "starting node reboot process"
+
 function check_metro_server() {
     metro_status=$(cat ${output_dir}/react-native_start.txt | grep Metro)
     if [[ "${metro_status}" == *"Metro"* ]]; then
