@@ -205,6 +205,184 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
       }
     />
   </View>
+  <View
+    style={
+      {
+        "flexDirection": "row",
+        "marginTop": 10,
+        "width": "100%",
+      }
+    }
+  >
+    <View
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        {
+          "opacity": 1,
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "borderBottomColor": "rgb(0, 122, 255)",
+            "borderBottomWidth": 2,
+            "paddingBottom": 10,
+            "width": NaN,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "rgb(28, 28, 30)",
+              "fontSize": 15,
+              "fontWeight": "bold",
+              "opacity": 1,
+            }
+          }
+        >
+          text translated
+        </Text>
+        <Text
+          style={
+            {
+              "color": "rgb(0, 122, 255)",
+              "fontSize": 11,
+              "fontWeight": "600",
+              "opacity": 1,
+            }
+          }
+        >
+          (
+          text translated
+          )
+        </Text>
+      </View>
+    </View>
+    <View
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        {
+          "opacity": 1,
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "borderBottomColor": "rgb(0, 122, 255)",
+            "borderBottomWidth": 0,
+            "paddingBottom": 10,
+            "width": NaN,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "rgb(28, 28, 30)",
+              "fontSize": 14,
+              "fontWeight": "normal",
+              "opacity": 1,
+            }
+          }
+        >
+          text translated
+        </Text>
+        <Text
+          style={
+            {
+              "color": "rgb(28, 28, 30)",
+              "fontSize": 11,
+              "fontWeight": "600",
+              "opacity": 1,
+            }
+          }
+        >
+          (
+          text translated
+          )
+        </Text>
+      </View>
+    </View>
+    <View
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        {
+          "opacity": 1,
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "borderBottomColor": "rgb(0, 122, 255)",
+            "borderBottomWidth": 0,
+            "paddingBottom": 10,
+            "width": NaN,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "rgb(28, 28, 30)",
+              "fontSize": 14,
+              "fontWeight": "normal",
+              "opacity": 1,
+            }
+          }
+        >
+          text translated
+        </Text>
+        <Text
+          style={
+            {
+              "color": "rgb(28, 28, 30)",
+              "fontSize": 11,
+              "fontWeight": "600",
+              "opacity": 1,
+            }
+          }
+        >
+          (
+          text translated
+          )
+        </Text>
+      </View>
+    </View>
+  </View>
   <RCTScrollView
     contentContainerStyle={{}}
     indicatorStyle="white"
