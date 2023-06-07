@@ -7,6 +7,7 @@
   "workingonit": "Estamos trabajando en esta funcionalidad",
   "close": "Cerrar",
   "cancel": "Cancelar",
+  "save": "Grabar",
   "menudrawer-acc": "Abrir Menu Lateral",
   "menu-acc": "Abrir Menu",
   "donation": "Gracias por apoyar Zingo!",
@@ -132,6 +133,20 @@
         "text": "Privacidad Normal, se puede ver toda la información."
       }
     ],
+    "chain_names": [
+      { 
+        "value": "main",
+        "text": "Red Mainnet." 
+      },
+      {
+        "value": "test",
+        "text": "Red Testnet."
+      },
+      {
+        "value": "regtest",
+        "text": "Red Local Regtest."
+      }
+    ],
     "nochanges": "No se haan registrado cambios.",
     "ismemo": "Necesitas escoger una opción de Memorándum para poder grabar.",
     "isthreshold": "Necesitas escoger una opción de umbral para poder grabar.",
@@ -162,7 +177,10 @@
     "value-sendall-false": "Desactivar",
     "value-privacy-true": "Alta",
     "value-privacy-false": "Normal",
-    "privacy": "Privacidad: "
+    "privacy": "Privacidad: ",
+    "value-chain_name-main": "Mainnet",
+    "value-chain_name-test": "Testnet",
+    "value-chain_name-regtest": "Regtest"
   },
   "info": {
     "version": "Versión",
@@ -226,7 +244,7 @@
     "change-warning": "YA NO TENDRÁS ACCESO A ESTE MONEDERO, Y VAS A ABRIR OTRO MONEDERO DIFERENTE",
     "backup-warning": "YA NO TENDRÁS ACCESO A ESTE MONEDERO, Y VAS A ABRIR LA COPIA DE SEGURIDAD DEL ÚLTIMO MONEDERO USADO ANTERIOR",
     "server-warning": "YA NO TENDRÁS ACCESO A ESTE MONEDERO, Y VAS A CAMBIAR A OTRO SERVIDOR EN EL CUAL TU MONEDERO ACTIVO NO EXISTE",
-    "mainnet-warning": "NO SE VA A HACER COPIA DE SEGURIDAD DE ESTE MONEDERO. SOLO DISPONIBLE EN LA RED: 'MAINNET'.",
+    "mainnet-warning": "NO SE VA A HACER COPIA DE SEGURIDAD DE ESTE MONEDERO. SOLO ESTA DISPONIBLE EN: 'MAINNET'.",
     "seedplaceholder": "Semilla (24 palabras)",
     "seed-acc": "Campo Frase Semilla",
     "birthday-acc": "Campo Cumpleaños",

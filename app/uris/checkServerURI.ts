@@ -5,14 +5,14 @@ import { RPCInfoType } from '../rpc/types/RPCInfoType';
 type checkServerURIReturn = {
   result: boolean;
   timeout: boolean;
-  new_chain_name?: string;
+  new_chain_name?: 'main' | 'test' | 'regtest';
 };
 
 const checkServerURI = async (uri: string, oldUri: string): Promise<checkServerURIReturn> => {
   const parsedUri = new Url(uri, true);
 
   let port = parsedUri.port;
-  let new_chain_name: string | undefined;
+  let new_chain_name;
 
   if (!port) {
     // by default -> 9067

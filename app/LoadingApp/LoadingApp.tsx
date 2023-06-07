@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { Component, Suspense, useState, useMemo, useCallback, useEffect } from 'react';
+import React, { Component, Suspense, useState, useMemo, useEffect } from 'react';
 import {
   View,
   Alert,
@@ -15,6 +15,8 @@ import {
   AppState,
   NativeEventSubscription,
   Platform,
+  TextInput,
+  TouchableOpacity,
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { I18n } from 'i18n-js';
@@ -23,11 +25,16 @@ import { StackScreenProps } from '@react-navigation/stack';
 import NetInfo, { NetInfoStateType, NetInfoSubscription } from '@react-native-community/netinfo';
 import Toast from 'react-native-simple-toast';
 
+import OptionsMenu from 'react-native-option-menu';
+
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faEllipsisV, faCashRegister } from '@fortawesome/free-solid-svg-icons';
+
 import BoldText from '../../components/Components/BoldText';
 import Button from '../../components/Components/Button';
 import RPCModule from '../RPCModule';
-import { AppStateLoading, BackgroundType, WalletSeedType, TranslateType, NetInfoType } from '../AppState';
-import { serverUris } from '../uris';
+import { AppStateLoading, BackgroundType, WalletSeedType, TranslateType, NetInfoType, ServerType } from '../AppState';
+import { parseServerURI, serverUris } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import RPC from '../rpc';
 import { ThemeType } from '../types';
@@ -36,19 +43,12 @@ import platform from '../platform/platform';
 import BackgroundFileImpl from '../../components/Background/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '../createAlert';
+import { isEqual } from 'lodash';
 
 const Seed = React.lazy(() => import('../../components/Seed'));
 
 const en = require('../translations/en.json');
 const es = require('../translations/es.json');
-
-//const useForceUpdate = () => {
-//  const [value, setValue] = useState(0);
-//  return () => {
-//    const newValue = value + 1;
-//    return setValue(newValue);
-//  };
-//};
 
 type LoadingAppProps = {
   navigation: StackScreenProps<any>['navigation'];
@@ -62,12 +62,11 @@ export default function LoadingApp(props: LoadingAppProps) {
   const theme = useTheme() as unknown as ThemeType;
   const [language, setLanguage] = useState('en' as 'en' | 'es');
   const [currency, setCurrency] = useState('' as 'USD' | '');
-  const [server, setServer] = useState(SERVER_DEFAULT_0 as string);
+  const [server, setServer] = useState<ServerType>(SERVER_DEFAULT_0);
   const [sendAll, setSendAll] = useState(false);
   const [privacy, setPrivacy] = useState(false);
   const [background, setBackground] = useState({ batches: 0, date: 0 } as BackgroundType);
   const [loading, setLoading] = useState(true);
-  //const forceUpdate = useForceUpdate();
   const file = useMemo(
     () => ({
       en: en,
@@ -79,87 +78,73 @@ export default function LoadingApp(props: LoadingAppProps) {
 
   const translate: (key: string) => TranslateType = (key: string) => i18n.t(key);
 
-  const setI18nConfig = useCallback(async () => {
-    // fallback if no available language fits
-    const fallback = { languageTag: 'en', isRTL: false };
-
-    //console.log(RNLocalize.findBestAvailableLanguage(Object.keys(file)));
-    //console.log(RNLocalize.getLocales());
-
-    const { languageTag, isRTL } = RNLocalize.findBestAvailableLanguage(Object.keys(file)) || fallback;
-
-    // clear translation cache
-    //if (translate && translate.cache) {
-    //  translate?.cache?.clear?.();
-    //}
-    // update layout direction
-    I18nManager.forceRTL(isRTL);
-
-    //I have to check what language is in the settings
-    const settings = await SettingsFileImpl.readSettings();
-    if (settings.language) {
-      setLanguage(settings.language);
-      i18n.locale = settings.language;
-      //console.log('apploading settings', settings.language, settings.currency);
-    } else {
-      const lang =
-        languageTag === 'en' || languageTag === 'es'
-          ? (languageTag as 'en' | 'es')
-          : (fallback.languageTag as 'en' | 'es');
-      setLanguage(lang);
-      i18n.locale = lang;
-      await SettingsFileImpl.writeSettings('language', lang);
-      //console.log('apploading NO settings', languageTag);
-    }
-    if (settings.currency) {
-      setCurrency(settings.currency);
-    } else {
-      await SettingsFileImpl.writeSettings('currency', currency);
-    }
-    if (settings.server) {
-      setServer(settings.server);
-      //console.log('settings', settings.server);
-    } else {
-      await SettingsFileImpl.writeSettings('server', server);
-      //console.log('NO settings', settings.server);
-    }
-    if (settings.sendAll) {
-      setSendAll(settings.sendAll);
-    } else {
-      await SettingsFileImpl.writeSettings('sendAll', sendAll);
-    }
-    if (settings.privacy) {
-      setPrivacy(settings.privacy);
-    } else {
-      await SettingsFileImpl.writeSettings('privacy', privacy);
-    }
-
-    // reading background task info
-    if (Platform.OS === 'ios') {
-      // this file only exists in IOS BS.
-      const backgroundJson = await BackgroundFileImpl.readBackground();
-      if (backgroundJson) {
-        setBackground(backgroundJson);
-      }
-    }
-  }, [currency, file, i18n, privacy, sendAll, server]);
-
   useEffect(() => {
     (async () => {
-      await setI18nConfig();
+      console.log('*************** useEffect set I18n');
+      // fallback if no available language fits
+      const fallback = { languageTag: 'en', isRTL: false };
+
+      //console.log(RNLocalize.findBestAvailableLanguage(Object.keys(file)));
+      //console.log(RNLocalize.getLocales());
+
+      const { languageTag, isRTL } = RNLocalize.findBestAvailableLanguage(Object.keys(file)) || fallback;
+
+      // update layout direction
+      I18nManager.forceRTL(isRTL);
+
+      //I have to check what language is in the settings
+      const settings = await SettingsFileImpl.readSettings();
+      if (settings.language) {
+        setLanguage(settings.language);
+        i18n.locale = settings.language;
+        //console.log('apploading settings', settings.language, settings.currency);
+      } else {
+        const lang =
+          languageTag === 'en' || languageTag === 'es'
+            ? (languageTag as 'en' | 'es')
+            : (fallback.languageTag as 'en' | 'es');
+        setLanguage(lang);
+        i18n.locale = lang;
+        await SettingsFileImpl.writeSettings('language', lang);
+        //console.log('apploading NO settings', languageTag);
+      }
+      if (settings.currency) {
+        setCurrency(settings.currency);
+      } else {
+        await SettingsFileImpl.writeSettings('currency', currency);
+      }
+      if (settings.server) {
+        setServer(settings.server);
+        console.log('settings', settings.server);
+      } else {
+        await SettingsFileImpl.writeSettings('server', server);
+        console.log('NO settings', settings.server);
+      }
+      if (settings.sendAll) {
+        setSendAll(settings.sendAll);
+      } else {
+        await SettingsFileImpl.writeSettings('sendAll', sendAll);
+      }
+      if (settings.privacy) {
+        setPrivacy(settings.privacy);
+      } else {
+        await SettingsFileImpl.writeSettings('privacy', privacy);
+      }
+
+      // reading background task info
+      if (Platform.OS === 'ios') {
+        // this file only exists in IOS BS.
+        const backgroundJson = await BackgroundFileImpl.readBackground();
+        if (backgroundJson) {
+          setBackground(backgroundJson);
+        }
+      }
       setLoading(false);
     })();
-  }, [setI18nConfig]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  //const handleLocalizationChange = useCallback(() => {
-  //  setI18nConfig();
-  //  forceUpdate();
-  //}, [setI18nConfig, forceUpdate]);
-
-  //useEffect(() => {
-  //  RNLocalize.addEventListener('change', handleLocalizationChange);
-  //  return () => RNLocalize.removeEventListener('change', handleLocalizationChange);
-  //}, [handleLocalizationChange]);
+  console.log('render loadingApp - 2');
 
   if (loading) {
     return null;
@@ -187,7 +172,7 @@ type LoadingAppClassProps = {
   theme: ThemeType;
   language: 'en' | 'es';
   currency: 'USD' | '';
-  server: string;
+  server: ServerType;
   sendAll: boolean;
   privacy: boolean;
   background: BackgroundType;
@@ -243,6 +228,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
 
   componentDidMount = async () => {
     // First, check if a wallet exists. Do it async so the basic screen has time to render
+    await AsyncStorage.setItem('@background', 'no');
     setTimeout(async () => {
       const exists = await RPCModule.walletExists();
       //console.log('Wallet Exists result', exists);
@@ -251,7 +237,10 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
         this.setState({ walletExists: true });
         const networkState = await NetInfo.fetch();
         if (networkState.isConnected) {
-          const result: string = await RPCModule.loadExistingWallet(this.state.server, 'main');
+          const result: string = await RPCModule.loadExistingWallet(
+            this.state.server.uri,
+            this.state.server.chain_name,
+          );
           //console.log('Load Wallet Exists result', error);
           if (result && !result.toLowerCase().startsWith('error')) {
             // Load the wallet and navigate to the transactions screen
@@ -363,7 +352,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
     }
   };
 
-  useDefaultServer_0 = async () => {
+  usingDefaultServer_0 = async () => {
     this.setState({ actionButtonsDisabled: true });
     if (SERVER_DEFAULT_0) {
       await SettingsFileImpl.writeSettings('server', SERVER_DEFAULT_0);
@@ -372,11 +361,32 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
     this.setState({ actionButtonsDisabled: false });
   };
 
-  useDefaultServer_1 = async () => {
+  usingDefaultServer_1 = async () => {
     this.setState({ actionButtonsDisabled: true });
     if (SERVER_DEFAULT_1) {
       await SettingsFileImpl.writeSettings('server', SERVER_DEFAULT_1);
       this.setState({ server: SERVER_DEFAULT_1 });
+    }
+    this.setState({ actionButtonsDisabled: false });
+  };
+
+  usingCustomServer = async () => {
+    if (!this.state.customServerUri) {
+      return;
+    }
+    this.setState({ actionButtonsDisabled: true });
+    const uri: string = parseServerURI(this.state.customServerUri, this.state.translate);
+    const chain_name = this.state.customServerChainName;
+    if (uri.toLowerCase().startsWith('error')) {
+      Toast.show(this.state.translate('settings.isuri') as string, Toast.LONG);
+    } else {
+      await SettingsFileImpl.writeSettings('server', { uri, chain_name });
+      this.setState({
+        server: { uri, chain_name },
+        customServerShow: false,
+        customServerUri: '',
+        customServerChainName: 'main',
+      });
     }
     this.setState({ actionButtonsDisabled: false });
   };
@@ -392,7 +402,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
   createNewWallet = () => {
     this.setState({ actionButtonsDisabled: true });
     setTimeout(async () => {
-      const seed: string = await RPCModule.createNewWallet(this.state.server, 'main');
+      const seed: string = await RPCModule.createNewWallet(this.state.server.uri, this.state.server.chain_name);
 
       if (seed && !seed.toLowerCase().startsWith('error')) {
         // TODO verify that JSON don't fail.
@@ -409,12 +419,13 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
   };
 
   getwalletSeedToRestore = async () => {
-    this.setState({ walletSeed: {} as WalletSeedType, screen: 3 });
+    this.setState({ actionButtonsDisabled: true });
+    setTimeout(() => {
+      this.setState({ walletSeed: {} as WalletSeedType, screen: 3 });
+    });
   };
 
   doRestore = async (seed: string, birthday: number) => {
-    const { server } = this.state;
-
     if (!seed) {
       createAlert(
         this.setBackgroundError,
@@ -437,8 +448,8 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
       const result: string = await RPCModule.restoreWalletFromSeed(
         seed.toLowerCase(),
         walletBirthday || '0',
-        server,
-        'main',
+        this.state.server.uri,
+        this.state.server.chain_name,
       );
       if (result && !result.toLowerCase().startsWith('error')) {
         this.setState({ actionButtonsDisabled: false });
@@ -458,10 +469,26 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
     this.setState({ backgroundError: { title, error } });
   };
 
+  customServer = () => {
+    this.setState({ customServerShow: true });
+  };
+
   render() {
-    const { screen, walletSeed, actionButtonsDisabled, walletExists, server, netInfo } = this.state;
+    const {
+      screen,
+      walletSeed,
+      actionButtonsDisabled,
+      walletExists,
+      server,
+      netInfo,
+      customServerShow,
+      customServerUri,
+      customServerChainName,
+    } = this.state;
     const { translate } = this.props;
     const { colors } = this.props.theme;
+
+    console.log('render loadingAppClass - 3', server);
 
     return (
       <ContextAppLoadingProvider value={this.state}>
@@ -488,133 +515,321 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
             </View>
           )}
           {screen === 1 && (
-            <ScrollView
-              style={{ maxHeight: '100%' }}
-              contentContainerStyle={{
-                flexDirection: 'column',
-                alignItems: 'stretch',
-                justifyContent: 'flex-start',
-                padding: 20,
-              }}>
+            <>
               <View
                 style={{
-                  flex: 1,
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
+                  backgroundColor: colors.card,
+                  padding: 10,
+                  position: 'absolute',
+                  top: 0,
+                  right: 0,
                 }}>
-                <View style={{ marginBottom: 50, display: 'flex', alignItems: 'center' }}>
-                  <Text style={{ color: colors.zingo, fontSize: 40, fontWeight: 'bold' }}>
-                    {translate('zingo') as string}
-                  </Text>
-                  <Text style={{ color: colors.zingo, fontSize: 15 }}>{translate('version') as string}</Text>
-                  <Image
-                    source={require('../../assets/img/logobig-zingo.png')}
-                    style={{ width: 100, height: 100, resizeMode: 'contain', marginTop: 10 }}
-                  />
-                </View>
+                <OptionsMenu
+                  customButton={<FontAwesomeIcon icon={faEllipsisV} color={'#ffffff'} size={48} />}
+                  buttonStyle={{ width: 48, padding: 10, resizeMode: 'contain' }}
+                  destructiveIndex={5}
+                  options={['Custom Server...', 'Cancel']}
+                  actions={[this.customServer]}
+                />
+              </View>
+              <ScrollView
+                style={{ maxHeight: '100%' }}
+                contentContainerStyle={{
+                  flexDirection: 'column',
+                  alignItems: 'stretch',
+                  justifyContent: 'flex-start',
+                  padding: 20,
+                }}>
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                  <View style={{ marginBottom: 50, display: 'flex', alignItems: 'center' }}>
+                    <Text style={{ color: colors.zingo, fontSize: 40, fontWeight: 'bold' }}>
+                      {translate('zingo') as string}
+                    </Text>
+                    <Text style={{ color: colors.zingo, fontSize: 15 }}>{translate('version') as string}</Text>
+                    <Image
+                      source={require('../../assets/img/logobig-zingo.png')}
+                      style={{ width: 100, height: 100, resizeMode: 'contain', marginTop: 10 }}
+                    />
+                  </View>
 
-                <BoldText style={{ fontSize: 15, marginBottom: 3 }}>
-                  {translate('loadingapp.actualserver') as string}
-                </BoldText>
-                <BoldText style={{ fontSize: 15, marginBottom: 10 }}>{server}</BoldText>
+                  <BoldText style={{ fontSize: 15, marginBottom: 3 }}>
+                    {`${translate('loadingapp.actualserver') as string} [${
+                      translate(`settings.value-chain_name-${server.chain_name}`) as string
+                    }]`}
+                  </BoldText>
+                  <BoldText style={{ fontSize: 15, marginBottom: 10 }}>{server.uri}</BoldText>
 
-                {(!netInfo.isConnected ||
-                  netInfo.type === NetInfoStateType.cellular ||
-                  netInfo.isConnectionExpensive) && (
-                  <>
-                    <BoldText style={{ fontSize: 15, marginBottom: 3 }}>
-                      {translate('report.networkstatus') as string}
-                    </BoldText>
+                  {customServerShow && (
                     <View
                       style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        alignItems: 'flex-end',
-                        marginHorizontal: 20,
+                        borderColor: colors.primaryDisabled,
+                        borderWidth: 1,
+                        paddingTop: 10,
+                        paddingLeft: 10,
+                        paddingRight: 10,
+                        marginBottom: 5,
+                        justifyContent: 'center',
+                        alignItems: 'center',
                       }}>
-                      <View style={{ display: 'flex', flexDirection: 'column', marginBottom: 10 }}>
-                        {!netInfo.isConnected && (
-                          <BoldText style={{ fontSize: 15, color: 'red' }}>
-                            {' '}
-                            {translate('report.nointernet') as string}{' '}
-                          </BoldText>
-                        )}
-                        {netInfo.type === NetInfoStateType.cellular && (
-                          <BoldText style={{ fontSize: 15, color: 'yellow' }}>
-                            {' '}
-                            {translate('report.cellulardata') as string}{' '}
-                          </BoldText>
-                        )}
-                        {netInfo.isConnectionExpensive && (
-                          <BoldText style={{ fontSize: 15, color: 'yellow' }}>
-                            {' '}
-                            {translate('report.connectionexpensive') as string}{' '}
-                          </BoldText>
-                        )}
+                      <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                        <TouchableOpacity
+                          style={{ marginHorizontal: 5 }}
+                          onPress={() => this.setState({ customServerChainName: 'main' })}>
+                          <View
+                            style={{
+                              flexDirection: 'row',
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                              marginBottom: 10,
+                            }}>
+                            <View
+                              style={{
+                                flexDirection: 'row',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                borderWidth: customServerChainName === 'main' ? 2 : 1,
+                                borderColor: customServerChainName === 'main' ? colors.primary : colors.primaryDisabled,
+                                borderRadius: 5,
+                                paddingHorizontal: 5,
+                              }}>
+                              <Text
+                                style={{
+                                  fontSize: 13,
+                                  color: colors.border,
+                                  marginRight: 5,
+                                }}>
+                                {translate('settings.value-chain_name-main') as string}
+                              </Text>
+                              {customServerChainName === 'main' && (
+                                <FontAwesomeIcon icon={faCashRegister} size={14} color={colors.primary} />
+                              )}
+                            </View>
+                          </View>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          style={{ marginHorizontal: 5 }}
+                          onPress={() => this.setState({ customServerChainName: 'test' })}>
+                          <View
+                            style={{
+                              flexDirection: 'row',
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                              marginBottom: 10,
+                            }}>
+                            <View
+                              style={{
+                                flexDirection: 'row',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                borderWidth: customServerChainName === 'test' ? 2 : 1,
+                                borderColor: customServerChainName === 'test' ? colors.primary : colors.primaryDisabled,
+                                borderRadius: 5,
+                                paddingHorizontal: 5,
+                              }}>
+                              <Text
+                                style={{
+                                  fontSize: 13,
+                                  color: colors.border,
+                                  marginRight: 5,
+                                }}>
+                                {translate('settings.value-chain_name-test') as string}
+                              </Text>
+                              {customServerChainName === 'test' && (
+                                <FontAwesomeIcon icon={faCashRegister} size={14} color={colors.primary} />
+                              )}
+                            </View>
+                          </View>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          style={{ marginHorizontal: 5 }}
+                          onPress={() => this.setState({ customServerChainName: 'regtest' })}>
+                          <View
+                            style={{
+                              flexDirection: 'row',
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                              marginBottom: 10,
+                            }}>
+                            <View
+                              style={{
+                                flexDirection: 'row',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                borderWidth: customServerChainName === 'regtest' ? 2 : 1,
+                                borderColor:
+                                  customServerChainName === 'regtest' ? colors.primary : colors.primaryDisabled,
+                                borderRadius: 5,
+                                paddingHorizontal: 5,
+                              }}>
+                              <Text
+                                style={{
+                                  fontSize: 13,
+                                  color: colors.border,
+                                  marginRight: 5,
+                                }}>
+                                {translate('settings.value-chain_name-regtest') as string}
+                              </Text>
+                              {customServerChainName === 'regtest' && (
+                                <FontAwesomeIcon icon={faCashRegister} size={14} color={colors.primary} />
+                              )}
+                            </View>
+                          </View>
+                        </TouchableOpacity>
+                      </View>
+                      <View
+                        style={{
+                          borderColor: colors.border,
+                          borderWidth: 1,
+                          marginBottom: 10,
+                          width: '100%',
+                          maxWidth: '100%',
+                          minWidth: '50%',
+                          minHeight: 48,
+                          alignItems: 'center',
+                        }}>
+                        <TextInput
+                          placeholder={'https://------.---:---'}
+                          placeholderTextColor={colors.placeholder}
+                          style={{
+                            color: colors.text,
+                            fontWeight: '600',
+                            fontSize: 18,
+                            minWidth: '90%',
+                            minHeight: 48,
+                            marginLeft: 5,
+                            backgroundColor: 'transparent',
+                          }}
+                          value={customServerUri}
+                          onChangeText={(text: string) => this.setState({ customServerUri: text })}
+                          editable={true}
+                          maxLength={100}
+                        />
+                      </View>
+                      <View style={{ flexDirection: 'row' }}>
+                        <Button
+                          type="Primary"
+                          title={translate('save') as string}
+                          disabled={actionButtonsDisabled}
+                          onPress={this.usingCustomServer}
+                          style={{ marginBottom: 10 }}
+                        />
+                        <Button
+                          type="Secondary"
+                          title={translate('cancel') as string}
+                          disabled={actionButtonsDisabled}
+                          onPress={() => this.setState({ customServerShow: false })}
+                          style={{ marginBottom: 10, marginLeft: 10 }}
+                        />
                       </View>
                     </View>
-                  </>
-                )}
+                  )}
 
-                {server === SERVER_DEFAULT_1 && !!SERVER_DEFAULT_0 && (
-                  <Button
-                    type="Primary"
-                    title={translate('loadingapp.changeserver') as string}
-                    disabled={actionButtonsDisabled}
-                    onPress={this.useDefaultServer_0}
-                    style={{ marginBottom: 10 }}
-                  />
-                )}
-                {server === SERVER_DEFAULT_0 && !!SERVER_DEFAULT_1 && (
-                  <Button
-                    type="Primary"
-                    title={translate('loadingapp.changeserver') as string}
-                    disabled={actionButtonsDisabled}
-                    onPress={this.useDefaultServer_1}
-                    style={{ marginBottom: 10 }}
-                  />
-                )}
-                {server !== SERVER_DEFAULT_0 && server !== SERVER_DEFAULT_1 && !!SERVER_DEFAULT_0 && (
-                  <Button
-                    type="Primary"
-                    title={translate('loadingapp.changeserver') as string}
-                    disabled={actionButtonsDisabled}
-                    onPress={this.useDefaultServer_0}
-                    style={{ marginBottom: 10 }}
-                  />
-                )}
+                  {(!netInfo.isConnected ||
+                    netInfo.type === NetInfoStateType.cellular ||
+                    netInfo.isConnectionExpensive) && (
+                    <>
+                      <BoldText style={{ fontSize: 15, marginBottom: 3 }}>
+                        {translate('report.networkstatus') as string}
+                      </BoldText>
+                      <View
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          alignItems: 'flex-end',
+                          marginHorizontal: 20,
+                        }}>
+                        <View style={{ display: 'flex', flexDirection: 'column', marginBottom: 10 }}>
+                          {!netInfo.isConnected && (
+                            <BoldText style={{ fontSize: 15, color: 'red' }}>
+                              {' '}
+                              {translate('report.nointernet') as string}{' '}
+                            </BoldText>
+                          )}
+                          {netInfo.type === NetInfoStateType.cellular && (
+                            <BoldText style={{ fontSize: 15, color: 'yellow' }}>
+                              {' '}
+                              {translate('report.cellulardata') as string}{' '}
+                            </BoldText>
+                          )}
+                          {netInfo.isConnectionExpensive && (
+                            <BoldText style={{ fontSize: 15, color: 'yellow' }}>
+                              {' '}
+                              {translate('report.connectionexpensive') as string}{' '}
+                            </BoldText>
+                          )}
+                        </View>
+                      </View>
+                    </>
+                  )}
 
-                <Button
-                  testID="loadingapp.createnewwallet"
-                  type="Primary"
-                  title={translate('loadingapp.createnewwallet') as string}
-                  disabled={actionButtonsDisabled}
-                  onPress={this.createNewWallet}
-                  style={{ marginBottom: 10, marginTop: 10 }}
-                />
-                {walletExists && (
-                  <Button
-                    type="Primary"
-                    title={translate('loadingapp.opencurrentwallet') as string}
-                    disabled={actionButtonsDisabled}
-                    onPress={this.componentDidMount}
-                    style={{ marginBottom: 10 }}
-                  />
-                )}
+                  {!customServerShow && isEqual(server, SERVER_DEFAULT_1) && !!SERVER_DEFAULT_0.uri && (
+                    <Button
+                      type="Primary"
+                      title={translate('loadingapp.changeserver') as string}
+                      disabled={actionButtonsDisabled}
+                      onPress={this.usingDefaultServer_0}
+                      style={{ marginBottom: 10 }}
+                    />
+                  )}
+                  {!customServerShow && isEqual(server, SERVER_DEFAULT_0) && !!SERVER_DEFAULT_1.uri && (
+                    <Button
+                      type="Primary"
+                      title={translate('loadingapp.changeserver') as string}
+                      disabled={actionButtonsDisabled}
+                      onPress={this.usingDefaultServer_1}
+                      style={{ marginBottom: 10 }}
+                    />
+                  )}
+                  {!customServerShow &&
+                    !isEqual(server, SERVER_DEFAULT_0) &&
+                    !isEqual(server, SERVER_DEFAULT_1) &&
+                    !!SERVER_DEFAULT_0.uri && (
+                      <Button
+                        type="Primary"
+                        title={translate('loadingapp.changeserver') as string}
+                        disabled={actionButtonsDisabled}
+                        onPress={this.usingDefaultServer_0}
+                        style={{ marginBottom: 10 }}
+                      />
+                    )}
 
-                <View style={{ marginTop: 50, display: 'flex', alignItems: 'center' }}>
                   <Button
-                    testID="loadingapp.restorewalletseed"
-                    type="Secondary"
-                    title={translate('loadingapp.restorewalletseed') as string}
+                    testID="loadingapp.createnewwallet"
+                    type="Primary"
+                    title={translate('loadingapp.createnewwallet') as string}
                     disabled={actionButtonsDisabled}
-                    onPress={this.getwalletSeedToRestore}
-                    style={{ margin: 10 }}
+                    onPress={this.createNewWallet}
+                    style={{ marginBottom: 10, marginTop: 10 }}
                   />
+                  {walletExists && (
+                    <Button
+                      type="Primary"
+                      title={translate('loadingapp.opencurrentwallet') as string}
+                      disabled={actionButtonsDisabled}
+                      onPress={this.componentDidMount}
+                      style={{ marginBottom: 10 }}
+                    />
+                  )}
+
+                  <View style={{ marginTop: 50, display: 'flex', alignItems: 'center' }}>
+                    <Button
+                      testID="loadingapp.restorewalletseed"
+                      type="Secondary"
+                      title={translate('loadingapp.restorewalletseed') as string}
+                      disabled={actionButtonsDisabled}
+                      onPress={this.getwalletSeedToRestore}
+                      style={{ margin: 10 }}
+                    />
+                  </View>
                 </View>
-              </View>
-            </ScrollView>
+              </ScrollView>
+            </>
           )}
           {screen === 2 && walletSeed && (
             <Modal
@@ -650,8 +865,9 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                 }>
                 <Seed
                   onClickOK={(s: string, b: number) => this.doRestore(s, b)}
-                  onClickCancel={() => this.setState({ screen: 1 })}
+                  onClickCancel={() => this.setState({ screen: 1, actionButtonsDisabled: false })}
                   action={'restore'}
+                  setBackgroundError={this.setBackgroundError}
                 />
               </Suspense>
             </Modal>

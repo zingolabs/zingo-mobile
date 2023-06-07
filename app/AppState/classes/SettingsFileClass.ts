@@ -1,11 +1,13 @@
+import ServerType from '../types/ServerType';
+
 export default class SettingsFileClass {
-  server: string;
+  server: ServerType;
   currency: 'USD' | '';
   language: 'en' | 'es';
   sendAll: boolean;
   privacy: boolean;
 
-  constructor(server: string, currency: 'USD' | '', language: 'en' | 'es', sendAll: boolean, privacy: boolean) {
+  constructor(server: ServerType, currency: 'USD' | '', language: 'en' | 'es', sendAll: boolean, privacy: boolean) {
     this.server = server;
     this.currency = currency;
     this.language = language;

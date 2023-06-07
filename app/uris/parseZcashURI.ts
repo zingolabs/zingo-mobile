@@ -24,9 +24,9 @@ const parseZcashURI = async (
   // The first address is special, it can be the "host" part of the URI
   const address = parsedUri.pathname;
 
-  const resultParse: string = await RPCModule.execute('parse', address);
+  const resultParse: string = await RPCModule.execute('parse_address', address);
   if (resultParse) {
-    if (resultParse.toLowerCase().startsWith('error')) {
+    if (resultParse.toLowerCase().startsWith('error') || resultParse.toLowerCase() === 'null') {
       return 'Right now it is not possible to verify the address with the server';
     }
   } else {
@@ -77,9 +77,9 @@ const parseZcashURI = async (
         if (typeof target.address !== 'undefined') {
           return `${translate('uris.duplicateparameter')} "${qName}"`;
         }
-        const result: string = await RPCModule.execute('parse', value);
+        const result: string = await RPCModule.execute('parse_address', value);
         if (result) {
-          if (result.toLowerCase().startsWith('error')) {
+          if (result.toLowerCase().startsWith('error') || result.toLowerCase() === 'null') {
             return 'Right now it is not possible to verify the address with the server';
           }
         } else {

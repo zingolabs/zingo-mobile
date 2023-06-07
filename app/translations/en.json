@@ -7,6 +7,7 @@
   "workingonit": "We are working on this feature.",
   "close": "Close",
   "cancel": "Cancel",
+  "save": "Save",
   "menudrawer-acc": "Open Menu Drawer",
   "menu-acc": "Open Menu",
   "donation": "Thanks for supporting Zingo!",
@@ -132,6 +133,20 @@
         "text": "Normal Privacy, you can see all the information."
       }
     ],
+    "chain_names": [
+      { 
+        "value": "main",
+        "text": "Mainnet Network." 
+      },
+      {
+        "value": "test",
+        "text": "Testnet Network."
+      },
+      {
+        "value": "regtest",
+        "text": "Regtest Local Network."
+      }
+    ],
     "nochanges": "No changes registred.",
     "ismemo": "You need to choose the download memos option to save.",
     "isthreshold": "You need to choose the transaction filter threshold option to save.",
@@ -162,7 +177,10 @@
     "value-sendall-false": "Disable",
     "value-privacy-true": "High",
     "value-privacy-false": "Normal",
-    "privacy": "Privacy: "
+    "privacy": "Privacy: ",
+    "value-chain_name-main": "Mainnet",
+    "value-chain_name-test": "Testnet",
+    "value-chain_name-regtest": "Regtest"
   },
   "info": {
     "version": "Version",
@@ -226,7 +244,7 @@
     "change-warning": "YOU WILL HAVE NO LONGER ACCESS TO THIS WALLET, AND YOU ARE GOING TO ACCESS TO ANOTHER DIFFERENT WALLET",
     "backup-warning": "YOU WILL HAVE NO LONGER ACCESS TO THIS WALLET, AND YOU ARE GOING TO ACCESS TO YOUR BACKUP WALLET",
     "server-warning": "YOU WILL HAVE NO LONGER ACCESS TO THIS WALLET, AND YOU ARE GOING TO CHANGE TO ANOTHER SERVER IN WHICH YOUR ACTUAL WALLET DOESN'T EXIST",
-    "mainnet-warning": "NO BACKUP OF THIS WALLET. ONLY IN MAINNET.",
+    "mainnet-warning": "NO BACKUP OF THIS WALLET. ONLY AVAILABLE IN 'MAINNET'.",
     "seedplaceholder": "Seed (24 words)",
     "seed-acc": "Seed Phrase Field",
     "birthday-acc": "Birthday Field",

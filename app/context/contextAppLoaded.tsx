@@ -22,13 +22,14 @@ import {
   ToAddrClass,
   NetInfoType,
   BackgroundErrorType,
+  ServerType,
 } from '../AppState';
 
 export const defaultAppStateLoaded: AppStateLoaded = {
   navigation: {} as StackScreenProps<any>['navigation'],
   route: {} as StackScreenProps<any>['route'],
   dimensions: {} as DimensionsType,
-  appState: '' as string,
+  appState: '',
   netInfo: {} as NetInfoType,
 
   syncingStatusReport: new SyncingStatusReportClass(),
@@ -46,7 +47,7 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   sendProgress: new SendProgressClass(0, 0, 0),
   walletSeed: {} as WalletSeedType,
   isMenuDrawerOpen: false,
-  selectedMenuDrawerItem: '' as string,
+  selectedMenuDrawerItem: '',
   aboutModalVisible: false,
   computingModalVisible: false,
   settingsModalVisible: false,
@@ -59,10 +60,10 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   syncReportModalVisible: false,
   poolsModalVisible: false,
   insightModalVisible: false,
-  newServer: '' as string,
-  uaAddress: '' as string,
+  newServer: {} as ServerType,
+  uaAddress: '',
 
-  server: '' as string,
+  server: {} as ServerType,
   currency: '',
   language: 'en',
 

@@ -1,4 +1,4 @@
-import React, { Component, Suspense, useState, useMemo, useCallback, useEffect } from 'react';
+import React, { Component, Suspense, useState, useMemo, useEffect } from 'react';
 import {
   Modal,
   View,
@@ -46,6 +46,7 @@ import {
   zecPriceType,
   BackgroundType,
   TranslateType,
+  ServerType,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
@@ -77,31 +78,22 @@ const es = require('../translations/es.json');
 
 const Tab = createBottomTabNavigator();
 
-//const useForceUpdate = () => {
-//  const [value, setValue] = useState(0);
-//  return () => {
-//    const newValue = value + 1;
-//    return setValue(newValue);
-//  };
-//};
-
 type LoadedAppProps = {
   navigation: StackScreenProps<any>['navigation'];
   route: StackScreenProps<any>['route'];
 };
 
-const SERVER_DEFAULT_0 = serverUris()[0];
+const SERVER_DEFAULT_0: ServerType = serverUris()[0];
 
 export default function LoadedApp(props: LoadedAppProps) {
   const theme = useTheme() as unknown as ThemeType;
   const [language, setLanguage] = useState('en' as 'en' | 'es');
   const [currency, setCurrency] = useState('' as 'USD' | '');
-  const [server, setServer] = useState(SERVER_DEFAULT_0 as string);
+  const [server, setServer] = useState<ServerType>(SERVER_DEFAULT_0);
   const [sendAll, setSendAll] = useState(false);
   const [privacy, setPrivacy] = useState(false);
   const [background, setBackground] = useState({ batches: 0, date: 0 } as BackgroundType);
   const [loading, setLoading] = useState(true);
-  //const forceUpdate = useForceUpdate();
   const file = useMemo(
     () => ({
       en: en,
@@ -113,86 +105,69 @@ export default function LoadedApp(props: LoadedAppProps) {
 
   const translate: (key: string) => TranslateType = (key: string) => i18n.t(key);
 
-  const setI18nConfig = useCallback(async () => {
-    // fallback if no available language fits
-    const fallback = { languageTag: 'en', isRTL: false };
-
-    //console.log(RNLocalize.findBestAvailableLanguage(Object.keys(file)));
-    //console.log(RNLocalize.getLocales());
-
-    const { languageTag, isRTL } = RNLocalize.findBestAvailableLanguage(Object.keys(file)) || fallback;
-
-    // clear translation cache
-    //if (translate && translate.cache) {
-    //  translate?.cache?.clear?.();
-    //}
-    // update layout direction
-    I18nManager.forceRTL(isRTL);
-
-    //I have to check what language is in the settings
-    const settings = await SettingsFileImpl.readSettings();
-    if (settings.language) {
-      setLanguage(settings.language);
-      i18n.locale = settings.language;
-      //console.log('apploaded settings', settings.language, settings.currency);
-    } else {
-      const lang =
-        languageTag === 'en' || languageTag === 'es'
-          ? (languageTag as 'en' | 'es')
-          : (fallback.languageTag as 'en' | 'es');
-      setLanguage(lang);
-      i18n.locale = lang;
-      await SettingsFileImpl.writeSettings('language', lang);
-      //console.log('apploaded NO settings', languageTag);
-    }
-    if (settings.currency) {
-      setCurrency(settings.currency);
-    } else {
-      await SettingsFileImpl.writeSettings('currency', currency);
-    }
-    if (settings.server) {
-      setServer(settings.server);
-    } else {
-      await SettingsFileImpl.writeSettings('server', server);
-    }
-    if (settings.sendAll) {
-      setSendAll(settings.sendAll);
-    } else {
-      await SettingsFileImpl.writeSettings('sendAll', sendAll);
-    }
-    if (settings.privacy) {
-      setPrivacy(settings.privacy);
-    } else {
-      await SettingsFileImpl.writeSettings('privacy', privacy);
-    }
-
-    // reading background task info
-    if (Platform.OS === 'ios') {
-      // this file only exists in IOS BS.
-      const backgroundJson = await BackgroundFileImpl.readBackground();
-      //console.log('background', backgroundJson);
-      if (backgroundJson) {
-        setBackground(backgroundJson);
-      }
-    }
-  }, [currency, file, i18n, privacy, sendAll, server]);
-
   useEffect(() => {
     (async () => {
-      await setI18nConfig();
+      // fallback if no available language fits
+      const fallback = { languageTag: 'en', isRTL: false };
+
+      //console.log(RNLocalize.findBestAvailableLanguage(Object.keys(file)));
+      //console.log(RNLocalize.getLocales());
+
+      const { languageTag, isRTL } = RNLocalize.findBestAvailableLanguage(Object.keys(file)) || fallback;
+
+      // update layout direction
+      I18nManager.forceRTL(isRTL);
+
+      //I have to check what language is in the settings
+      const settings = await SettingsFileImpl.readSettings();
+      if (settings.language) {
+        setLanguage(settings.language);
+        i18n.locale = settings.language;
+        //console.log('apploaded settings', settings.language, settings.currency);
+      } else {
+        const lang =
+          languageTag === 'en' || languageTag === 'es'
+            ? (languageTag as 'en' | 'es')
+            : (fallback.languageTag as 'en' | 'es');
+        setLanguage(lang);
+        i18n.locale = lang;
+        await SettingsFileImpl.writeSettings('language', lang);
+        //console.log('apploaded NO settings', languageTag);
+      }
+      if (settings.currency) {
+        setCurrency(settings.currency);
+      } else {
+        await SettingsFileImpl.writeSettings('currency', currency);
+      }
+      if (settings.server) {
+        setServer(settings.server);
+      } else {
+        await SettingsFileImpl.writeSettings('server', server);
+      }
+      if (settings.sendAll) {
+        setSendAll(settings.sendAll);
+      } else {
+        await SettingsFileImpl.writeSettings('sendAll', sendAll);
+      }
+      if (settings.privacy) {
+        setPrivacy(settings.privacy);
+      } else {
+        await SettingsFileImpl.writeSettings('privacy', privacy);
+      }
+
+      // reading background task info
+      if (Platform.OS === 'ios') {
+        // this file only exists in IOS BS.
+        const backgroundJson = await BackgroundFileImpl.readBackground();
+        //console.log('background', backgroundJson);
+        if (backgroundJson) {
+          setBackground(backgroundJson);
+        }
+      }
       setLoading(false);
     })();
-  }, [setI18nConfig]);
-
-  //const handleLocalizationChange = useCallback(() => {
-  //  setI18nConfig();
-  //  forceUpdate();
-  //}, [setI18nConfig, forceUpdate]);
-
-  //useEffect(() => {
-  //  RNLocalize.addEventListener('change', handleLocalizationChange);
-  //  return () => RNLocalize.removeEventListener('change', handleLocalizationChange);
-  //}, [handleLocalizationChange]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   //console.log('render LoadedApp - 2');
 
@@ -222,7 +197,7 @@ type LoadedAppClassProps = {
   theme: ThemeType;
   language: 'en' | 'es';
   currency: 'USD' | '';
-  server: string;
+  server: ServerType;
   sendAll: boolean;
   privacy: boolean;
   background: BackgroundType;
@@ -293,7 +268,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     });
 
     this.appstate = AppState.addEventListener('change', async nextAppState => {
-      //await AsyncStorage.setItem('@server', this.state.server);
       if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
         //console.log('App has come to the foreground!');
         // reading background task info
@@ -762,10 +736,11 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
   set_server_option = async (
     name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
-    value: string,
+    value: ServerType,
     toast: boolean,
-    same_chain_name: boolean,
+    same_server_chain_name: boolean,
   ): Promise<void> => {
+    //console.log(value, same_server_chain_name);
     // here I know the server was changed, clean all the tasks before anything.
     await this.rpc.clearTimers();
     this.setState({
@@ -777,20 +752,21 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     // First we need to check the `chain_name` between servers, if this is different
     // we cannot try to open the current wallet, because make not sense.
     let error = false;
-    if (!same_chain_name) {
+    if (!same_server_chain_name) {
       error = true;
     } else {
       // when I try to open the wallet in the new server:
-      // - the seed doesn't exists (the type of sever is different `mainnet` / `testnet` / `regtest` ...).
+      // - the seed doesn't exists (the type of sever is different `main` / `test` / `regtest` ...).
       //   The App have to go to the initial screen
       // - the seed exists and the App can open the wallet in the new server.
       //   But I have to restart the sync if needed.
-      const result: string = await RPCModule.loadExistingWallet(value, 'main');
+      const result: string = await RPCModule.loadExistingWallet(value.uri, value.chain_name);
+      console.log(result);
       if (result && !result.toLowerCase().startsWith('error')) {
         // Load the wallet and navigate to the transactions screen
-        //console.log(`wallet loaded ok ${value}`);
+        console.log(`wallet loaded ok ${value.uri}`);
         if (toast) {
-          Toast.show(`${this.props.translate('loadedapp.readingwallet')} ${value}`, Toast.LONG);
+          Toast.show(`${this.props.translate('loadedapp.readingwallet')} ${value.uri}`, Toast.LONG);
         }
         await SettingsFileImpl.writeSettings(name, value);
         this.setState({
@@ -814,17 +790,17 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       });
       //console.log(`Error Reading Wallet ${value} - ${error}`);
       if (toast) {
-        Toast.show(`${this.props.translate('loadedapp.readingwallet-error')} ${value}`, Toast.LONG);
+        Toast.show(`${this.props.translate('loadedapp.readingwallet-error')} ${value.uri}`, Toast.LONG);
       }
 
       // we need to restore the old server because the new doesn't have the seed of the current wallet.
       const old_settings = await SettingsFileImpl.readSettings();
-      await RPCModule.execute('changeserver', old_settings.server);
+      await RPCModule.execute('changeserver', old_settings.server.uri);
 
       // go to the seed screen for changing the wallet for another in the new server or cancel this action.
       this.fetchWalletSeedAndBirthday();
       this.setState({
-        newServer: value,
+        newServer: value as ServerType,
         server: old_settings.server,
       });
     }
@@ -942,10 +918,9 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   };
 
   onClickOKServerWallet = async () => {
-    const beforeCurrencyName = this.state.info.currencyName;
-
     if (this.state.newServer) {
-      const resultStr: string = await RPCModule.execute('changeserver', this.state.newServer);
+      const beforeServer = this.state.server;
+      const resultStr: string = await RPCModule.execute('changeserver', this.state.newServer.uri);
       if (resultStr.toLowerCase().startsWith('error')) {
         //console.log(`Error change server ${value} - ${resultStr}`);
         Toast.show(`${this.props.translate('loadedapp.changeservernew-error')} ${resultStr}`, Toast.LONG);
@@ -957,43 +932,36 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       await SettingsFileImpl.writeSettings('server', this.state.newServer);
       this.setState({
         server: this.state.newServer,
-        newServer: '',
+        newServer: {} as ServerType,
       });
+
+      await this.rpc.fetchInfoAndServerHeight();
+
+      let resultStr2 = '';
+      // if the server was testnet or regtest -> no need backup the wallet.
+      if (beforeServer.chain_name === 'test' || beforeServer.chain_name === 'regtest') {
+        // no backup
+        resultStr2 = (await this.rpc.changeWalletNoBackup()) as string;
+      } else {
+        // backup
+        resultStr2 = (await this.rpc.changeWallet()) as string;
+      }
+
+      //console.log("jc change", resultStr);
+      if (resultStr2.toLowerCase().startsWith('error')) {
+        //console.log(`Error change wallet. ${resultStr}`);
+        createAlert(
+          this.setBackgroundError,
+          this.props.translate('loadedapp.changingwallet-label') as string,
+          resultStr2,
+        );
+        //return;
+      }
+
+      this.setState({ seedServerModalVisible: false });
+      // no need to restart the tasks because is about to restart the app.
+      this.navigateToLoading();
     }
-
-    await this.rpc.fetchInfoAndServerHeight();
-    const afterCurrencyName = this.state.info.currencyName;
-
-    // from TAZ to ZEC -> no backup the old test wallet.
-    // from TAZ to TAZ -> no use case here, likely. no backup just in case.
-    // from ZEC to TAZ -> it's interesting to backup the old real wallet. Just in case.
-    // from ZEC to ZEC -> no use case here, likely. backup just in case.
-    let resultStr2 = '';
-    if (
-      (beforeCurrencyName === 'TAZ' && afterCurrencyName === 'ZEC') ||
-      (beforeCurrencyName === 'TAZ' && afterCurrencyName === 'TAZ')
-    ) {
-      // no backup
-      resultStr2 = (await this.rpc.changeWalletNoBackup()) as string;
-    } else {
-      // backup
-      resultStr2 = (await this.rpc.changeWallet()) as string;
-    }
-
-    //console.log("jc change", resultStr);
-    if (resultStr2.toLowerCase().startsWith('error')) {
-      //console.log(`Error change wallet. ${resultStr}`);
-      createAlert(
-        this.setBackgroundError,
-        this.props.translate('loadedapp.changingwallet-label') as string,
-        resultStr2,
-      );
-      //return;
-    }
-
-    this.setState({ seedServerModalVisible: false });
-    // no need to restart the tasks because is about to restart the app.
-    this.navigateToLoading();
   };
 
   setUaAddress = (uaAddress: string) => {

@@ -10,6 +10,7 @@ import BackgroundType from './types/BackgroundType';
 import { TranslateType } from './types/TranslateType';
 import NetInfoType from './types/NetInfoType';
 import BackgroundErrorType from './types/BackgroundErrorType';
+import ServerType from './types/ServerType';
 
 export default interface AppStateLoading {
   navigation: StackScreenProps<any>['navigation'];
@@ -25,7 +26,7 @@ export default interface AppStateLoading {
   totalBalance: TotalBalanceClass;
   info: InfoType;
 
-  server: string;
+  server: ServerType;
   currency: 'USD' | '';
   language: 'en' | 'es';
 
@@ -37,6 +38,9 @@ export default interface AppStateLoading {
   backgroundError: BackgroundErrorType;
 
   privacy: boolean;
+  customServerShow: boolean;
+  customServerUri: string;
+  customServerChainName: 'main' | 'test' | 'regtest';
 
   // eslint-disable-next-line semi
 }

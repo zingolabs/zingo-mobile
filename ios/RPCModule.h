@@ -15,8 +15,8 @@
 
 -(void) saveWalletInternal;
 -(void) saveBackgroundFile:(NSString*)data;
--(NSString*) createNewWallet:(server:(NSString*)server, chainhint:(NSString*)chainhint);
--(NSString*) loadExistingWallet:(server:(NSString*)server, chainhint:(NSString*)chainhint);
+-(NSString*) createNewWallet:(NSString*)server chainhint:(NSString*)chainhint;
+-(NSString*) loadExistingWallet:(NSString*)server chainhint:(NSString*)chainhint;
 -(BOOL) deleteExistingWallet;
 
 @end

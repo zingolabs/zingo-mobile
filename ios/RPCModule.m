@@ -204,8 +204,8 @@ RCT_REMAP_METHOD(deleteExistingWalletBackup,
   [self saveWalletBackupFile:walletDataStr];
 }
 
--(NSString*) createNewWallet:(server:(NSString*)server,
-                              chainhint:(NSString*)chainhint) {
+-(NSString*) createNewWallet:(NSString*)server
+                              chainhint:(NSString*)chainhint {
   @autoreleasepool {
     // RCTLogInfo(@"createNewWallet called");
 
@@ -231,11 +231,11 @@ RCT_REMAP_METHOD(deleteExistingWalletBackup,
 // Create a new wallet, automatically saving it.
 RCT_REMAP_METHOD(createNewWallet,
                  server:(NSString*)server
-                 chainhint(NSString*)chainhint
+                 chainhint:(NSString*)chainhint
                  createNewWalletWithResolver:(RCTPromiseResolveBlock)resolve
                  rejected:(RCTPromiseRejectBlock)reject) {
   @autoreleasepool {
-    NSString* seedStr = [self createNewWallet:(server, chainhint)];
+    NSString* seedStr = [self createNewWallet:server chainhint:chainhint];
 
     resolve(seedStr);
   }
@@ -300,8 +300,8 @@ RCT_REMAP_METHOD(restoreWalletFromUfvk,
   }
 }
 
--(NSString*) loadExistingWallet:(server:(NSString*)server,
-                                 chainhint:(NSString*)chainhint) {
+-(NSString*) loadExistingWallet:(NSString*)server
+                                 chainhint:(NSString*)chainhint {
   @autoreleasepool {
     // RCTLogInfo(@"loadExistingWallet called");
     NSString* walletDataStr = [self readWallet];
@@ -326,7 +326,7 @@ RCT_REMAP_METHOD(loadExistingWallet,
                  loadExistingWalletWithResolver:(RCTPromiseResolveBlock)resolve
                  loadExistingWalletWithRejecter:(RCTPromiseRejectBlock)reject) {
   @autoreleasepool {
-    NSString *seedStr = [self loadExistingWallet:(server, chainhint)];
+    NSString *seedStr = [self loadExistingWallet:server chainhint:chainhint];
 
     resolve(seedStr);
   }
@@ -460,4 +460,5 @@ RCT_REMAP_METHOD(runBackgroundTask,
   resolve(resp);
 }
 */
+
 @end

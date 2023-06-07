@@ -32,20 +32,6 @@ const BackgroundSync = async (task_data: any) => {
       //console.log('BS: Not started (going to foreground)');
       return;
     }
-    /* no need to load wallet again, it's loaded already in the RPC session.
-    const server = await AsyncStorage.getItem('@server');
-    let wallet: string = await RPCModule.loadExistingWallet(server);
-    if (wallet) {
-      if (wallet.toLowerCase().startsWith('error')) {
-        // We don't return an error message yet, just log the error and return
-        //console.log(`BS: Error load wallet ${wallet}`);
-        return;
-      }
-    } else {
-      //console.log('BS: Internal Error load wallet');
-      return;
-    }
-    */
 
     let batch_num = -1;
     console.log('BS:', task_data);

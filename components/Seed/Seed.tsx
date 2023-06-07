@@ -11,11 +11,12 @@ import FadeText from '../Components/FadeText';
 import Button from '../Components/Button';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded, ContextAppLoading } from '../../app/context';
-import { DimensionsType, InfoType, NetInfoType, TranslateType, WalletSeedType } from '../../app/AppState';
+import { DimensionsType, InfoType, NetInfoType, ServerType, TranslateType, WalletSeedType } from '../../app/AppState';
 import RPCModule from '../../app/RPCModule';
 import RPC from '../../app/rpc';
 import Header from '../Header';
 import Utils from '../../app/utils';
+import { createAlert } from '../../app/createAlert';
 
 type TextsType = {
   new: string[];
@@ -30,14 +31,15 @@ type SeedProps = {
   onClickOK: (seedPhrase: string, birthdayNumber: number) => void;
   onClickCancel: () => void;
   action: 'new' | 'change' | 'view' | 'restore' | 'backup' | 'server';
+  setBackgroundError?: (title: string, error: string) => void;
 };
-const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, action }) => {
+const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, action, setBackgroundError }) => {
   const contextLoaded = useContext(ContextAppLoaded);
   const contextLoading = useContext(ContextAppLoading);
   let walletSeed: WalletSeedType,
     translate: (key: string) => TranslateType,
     info: InfoType,
-    server: string,
+    server: ServerType,
     dimensions: DimensionsType,
     netInfo: NetInfoType,
     privacy: boolean;
@@ -139,17 +141,21 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
         setLatestBlock(info.latestBlock);
       } else {
         (async () => {
-          const resp: string = await RPCModule.getLatestBlock(server);
+          const resp: string = await RPCModule.getLatestBlock(server.uri);
           //console.log(resp);
           if (resp && !resp.toLowerCase().startsWith('error')) {
             setLatestBlock(Number(resp));
           } else {
             //console.log('error latest block', resp);
+            if (setBackgroundError) {
+              createAlert(setBackgroundError, translate('loadingapp.creatingwallet-label') as string, resp);
+            }
+            onClickCancel();
           }
         })();
       }
     }
-  }, [action, info.latestBlock, latestBlock, server]);
+  }, [action, info.latestBlock, latestBlock, onClickCancel, server.uri, setBackgroundError, translate]);
 
   useEffect(() => {
     if (action !== 'new' && action !== 'restore') {
@@ -378,14 +384,11 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
           </FadeText>
         )}
 
-        {info.currencyName &&
-          info.currencyName !== 'ZEC' &&
-          times === 3 &&
-          (action === 'change' || action === 'server') && (
-            <FadeText style={{ color: colors.primary, textAlign: 'center', width: '100%' }}>
-              {translate('seed.mainnet-warning') as string}
-            </FadeText>
-          )}
+        {server.chain_name !== 'main' && times === 3 && (action === 'change' || action === 'server') && (
+          <FadeText style={{ color: colors.primary, textAlign: 'center', width: '100%' }}>
+            {translate('seed.mainnet-warning') as string}
+          </FadeText>
+        )}
         <View style={{ marginBottom: 30 }} />
       </ScrollView>
       <View

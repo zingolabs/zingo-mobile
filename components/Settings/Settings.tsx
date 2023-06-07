@@ -18,15 +18,17 @@ import { ContextAppLoaded } from '../../app/context';
 import moment from 'moment';
 import 'moment/locale/es';
 import Header from '../Header';
+import { ServerType } from '../../app/AppState';
+import { isEqual } from 'lodash';
 
 type SettingsProps = {
   closeModal: () => void;
   set_wallet_option: (name: string, value: string) => Promise<void>;
   set_server_option: (
     name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
-    value: string,
+    value: ServerType,
     toast: boolean,
-    same_chain_name: boolean,
+    same_server_chain_name: boolean,
   ) => Promise<void>;
   set_currency_option: (
     name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
@@ -105,11 +107,18 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     PRIVACYS = privacysArray as Options[];
   }
 
+  const chain_namesArray = translate('settings.chain_names');
+  let CHAIN_NAMES: Options[] = [];
+  if (typeof chain_namesArray === 'object') {
+    CHAIN_NAMES = chain_namesArray as Options[];
+  }
+
   const { colors } = useTheme() as unknown as ThemeType;
 
   const [memos, setMemos] = useState(walletSettings.download_memos);
   const [filter, setFilter] = useState(walletSettings.transaction_filter_threshold);
-  const [server, setServer] = useState(serverContext);
+  const [customServerUri, setCustomServerUri] = useState(serverContext.uri);
+  const [customServerChainName, setCustomServerChainName] = useState(serverContext.chain_name);
   const [currency, setCurrency] = useState(currencyContext);
   const [language, setLanguage] = useState(languageContext);
   const [sendAll, setSendAll] = useState(sendAllContext);
@@ -123,8 +132,12 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   moment.locale(language);
 
   useEffect(() => {
-    setCustomIcon(serverUris().find((s: string) => s === server) ? farCircle : faDotCircle);
-  }, [server]);
+    setCustomIcon(
+      serverUris().find((s: ServerType) => isEqual(s, { uri: customServerUri, chain_name: customServerChainName }))
+        ? farCircle
+        : faDotCircle,
+    );
+  }, [customServerChainName, customServerUri]);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
@@ -151,13 +164,14 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   }, [slideAnim, titleViewHeight]);
 
   const saveSettings = async () => {
-    let serverParsed = server;
-    let sameServerChainName = true;
+    let serverUriParsed = customServerUri;
+    let same_server_chain_name = true;
     const chain_name = info.chain_name;
     if (
       walletSettings.download_memos === memos &&
       walletSettings.transaction_filter_threshold === filter &&
-      serverContext === serverParsed &&
+      serverContext.uri === customServerUri &&
+      serverContext.chain_name === customServerChainName &&
       currencyContext === currency &&
       languageContext === language &&
       sendAllContext === sendAll &&
@@ -174,7 +188,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       Toast.show(translate('settings.isthreshold') as string, Toast.LONG);
       return;
     }
-    if (!serverParsed) {
+    if (!serverUriParsed) {
       Toast.show(translate('settings.isserver') as string, Toast.LONG);
       return;
     }
@@ -183,8 +197,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       return;
     }
 
-    if (serverContext !== serverParsed) {
-      const resultUri = parseServerURI(serverParsed, translate);
+    if (serverContext.uri !== customServerUri) {
+      const resultUri = parseServerURI(serverUriParsed, translate);
       if (resultUri.toLowerCase().startsWith('error')) {
         Toast.show(translate('settings.isuri') as string, Toast.LONG);
         return;
@@ -194,9 +208,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         // but this value will be store in the settings and the value is wrong.
         // so, this function if everything is OK return the URI well formmatted.
         // and I save it in the state ASAP.
-        if (serverParsed !== resultUri) {
-          serverParsed = resultUri;
-          setServer(resultUri);
+        if (serverUriParsed !== resultUri) {
+          serverUriParsed = resultUri;
+          setCustomServerUri(resultUri);
         }
       }
     }
@@ -206,26 +220,26 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       return;
     }
 
-    if (serverContext !== serverParsed) {
+    if (serverContext.uri !== serverUriParsed || serverContext.chain_name !== customServerChainName) {
       setDisabled(true);
       Toast.show(translate('loadedapp.tryingnewserver') as string, Toast.SHORT);
-      const { result, timeout, new_chain_name } = await checkServerURI(serverParsed, serverContext);
+      const { result, timeout, new_chain_name } = await checkServerURI(serverUriParsed, serverContext.uri);
       if (!result) {
         // if the server checking takes more then 30 seconds.
         if (timeout === true) {
           Toast.show(translate('loadedapp.tryingnewserver-error') as string, Toast.LONG);
         } else {
-          Toast.show((translate('loadedapp.changeservernew-error') as string) + serverParsed, Toast.LONG);
+          Toast.show((translate('loadedapp.changeservernew-error') as string) + serverUriParsed, Toast.LONG);
         }
         // in this point the sync process is blocked, who knows why.
         // if I save the actual server before the customization... is going to work.
-        set_server_option('server', serverContext, false, sameServerChainName);
+        set_server_option('server', serverContext, false, same_server_chain_name);
         setDisabled(false);
         return;
       } else {
         //console.log('new', new_chain_name, 'old', chain_name);
         if (new_chain_name && new_chain_name !== chain_name) {
-          sameServerChainName = false;
+          same_server_chain_name = false;
         }
       }
     }
@@ -248,11 +262,16 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
     // I need a little time in this modal because maybe the wallet cannot be open with the new server
     let ms = 100;
-    if (serverContext !== serverParsed) {
+    if (serverContext.uri !== serverUriParsed || serverContext.chain_name !== customServerChainName) {
       if (languageContext !== language) {
         await set_language_option('language', language, false);
       }
-      set_server_option('server', serverParsed, true, sameServerChainName);
+      set_server_option(
+        'server',
+        { uri: serverUriParsed, chain_name: customServerChainName } as ServerType,
+        true,
+        same_server_chain_name,
+      );
       ms = 1500;
     } else {
       if (languageContext !== language) {
@@ -388,8 +407,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         </View>
 
         <View style={{ display: 'flex', marginLeft: 25 }}>
-          {serverUris().map((uri: string, i: number) =>
-            uri ? (
+          {serverUris().map((s: ServerType, i: number) =>
+            s.uri ? (
               <TouchableOpacity
                 testID={
                   i === 0
@@ -399,25 +418,32 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                     : 'settings.' + i.toString + '-Server'
                 }
                 disabled={disabled}
-                key={'touch-' + uri}
+                key={'touch-' + s.uri}
                 style={{ marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
-                onPress={() => setServer(uri)}>
+                onPress={() => {
+                  setCustomServerUri(s.uri);
+                  setCustomServerChainName(s.chain_name);
+                }}>
                 <View style={{ display: 'flex', flexDirection: 'row', marginTop: 10 }}>
-                  <FontAwesomeIcon icon={uri === server ? faDotCircle : farCircle} size={20} color={colors.border} />
-                  <RegText key={'tex-' + uri} style={{ marginLeft: 10 }}>
-                    {uri}
+                  <FontAwesomeIcon
+                    icon={customServerUri === s.uri ? faDotCircle : farCircle}
+                    size={20}
+                    color={colors.border}
+                  />
+                  <RegText key={'tex-' + s.uri} style={{ marginLeft: 10 }}>
+                    {s.uri}
                   </RegText>
                 </View>
               </TouchableOpacity>
             ) : null,
           )}
 
-          <View style={{ display: 'flex', flexDirection: 'row' }}>
+          <View>
             <TouchableOpacity
               testID="settings.customServer"
               disabled={disabled}
               style={{ marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
-              onPress={() => setServer('')}>
+              onPress={() => setCustomServerUri('')}>
               <View style={{ display: 'flex', flexDirection: 'row', marginTop: 10 }}>
                 {customIcon && <FontAwesomeIcon icon={customIcon} size={20} color={colors.border} />}
                 <RegText style={{ marginLeft: 10 }}>{translate('settings.custom') as string}</RegText>
@@ -425,37 +451,48 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             </TouchableOpacity>
 
             {customIcon === faDotCircle && (
-              <View
-                accessible={true}
-                accessibilityLabel={translate('settings.server-acc') as string}
-                style={{
-                  borderColor: colors.border,
-                  borderWidth: 1,
-                  marginLeft: 5,
-                  width: 'auto',
-                  maxWidth: '80%',
-                  maxHeight: 48,
-                  minWidth: '50%',
-                  minHeight: 48,
-                }}>
-                <TextInput
-                  testID="settings.customServerField"
-                  placeholder={'https://------.---:---'}
-                  placeholderTextColor={colors.placeholder}
+              <View>
+                <View
+                  accessible={true}
+                  accessibilityLabel={translate('settings.server-acc') as string}
                   style={{
-                    color: colors.text,
-                    fontWeight: '600',
-                    fontSize: 18,
+                    borderColor: colors.border,
+                    borderWidth: 1,
+                    marginLeft: 5,
+                    width: 'auto',
+                    maxWidth: '90%',
                     minWidth: '50%',
                     minHeight: 48,
-                    marginLeft: 5,
-                    backgroundColor: 'transparent',
-                  }}
-                  value={server}
-                  onChangeText={(text: string) => setServer(text)}
-                  editable={!disabled}
-                  maxLength={100}
-                />
+                  }}>
+                  <TextInput
+                    testID="settings.customServerField"
+                    placeholder={'https://------.---:---'}
+                    placeholderTextColor={colors.placeholder}
+                    style={{
+                      color: colors.text,
+                      fontWeight: '600',
+                      fontSize: 18,
+                      minWidth: '50%',
+                      maxWidth: '90%',
+                      minHeight: 48,
+                      marginLeft: 5,
+                      backgroundColor: 'transparent',
+                    }}
+                    value={customServerUri}
+                    onChangeText={(text: string) => setCustomServerUri(text)}
+                    editable={!disabled}
+                    maxLength={100}
+                  />
+                </View>
+                <View style={{ display: 'flex', marginLeft: 25, marginBottom: 30 }}>
+                  {optionsRadio(
+                    CHAIN_NAMES,
+                    setCustomServerChainName as React.Dispatch<React.SetStateAction<string | boolean>>,
+                    String,
+                    customServerChainName,
+                    'chain_name',
+                  )}
+                </View>
               </View>
             )}
           </View>
