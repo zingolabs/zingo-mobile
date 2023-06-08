@@ -94,7 +94,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
           </FadeText>
         )}
 
-        {server.chain_name === 'main' && times === 3 && (action === 'change' || action === 'server') && (
+        {server.chain_name !== 'main' && times === 3 && (action === 'change' || action === 'server') && (
           <FadeText style={{ color: colors.primary, textAlign: 'center', width: '100%' }}>
             {translate('seed.mainnet-warning') as string}
           </FadeText>

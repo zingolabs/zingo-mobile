@@ -86,6 +86,7 @@ const Button: React.FunctionComponent<ButtonProps> = ({
             fontWeight: 'bold',
             textTransform: 'uppercase',
             fontSize: 16,
+            textAlign: 'center',
           }}>
           {title}
         </Text>

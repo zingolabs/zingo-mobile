@@ -26,10 +26,10 @@
   "loadingapp": {
     "actualserver": "Servidor Activo:",
     "changeserver": "CAMBIAR SERVIDOR",
-    "createnewwallet": "Crear Monedero Nuevo (nueva semilla)",
+    "createnewwallet": "Crear Monedero Nuevo\n(nueva semilla)",
     "opencurrentwallet": "Abrir Monedero Activo",
-    "restorewalletseed": "Restaurar Monedero con la Semilla",
-    "restorewalletufvk": "Restaurar Monedero con la Clave de Visualización",
+    "restorewalletseed": "Restaurar Monedero\ncon la Semilla",
+    "restorewalletufvk": "Restaurar Monedero con\nla Clave de Visualización",
     "creatingwallet-label": "Error Creando el Monedero",
     "readingwallet-label": "Error Leyendo el Monedero",
     "invalidseed-label": "Semilla incorrecta",
