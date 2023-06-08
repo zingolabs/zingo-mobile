@@ -3,12 +3,12 @@ import Url from 'url-parse';
 import RPCModule from '../RPCModule';
 import { RPCParseAddressType } from '../rpc/types/RPCParseAddressType';
 import ZcashURITargetClass from './classes/ZcashURITargetClass';
-import { TranslateType } from '../AppState';
+import { ServerType, TranslateType } from '../AppState';
 
 const parseZcashURI = async (
   uri: string,
   translate: (key: string) => TranslateType,
-  currencyName: string,
+  server: ServerType,
 ): Promise<string | ZcashURITargetClass> => {
   if (!uri || uri === '') {
     return translate('uris.baduri') as string;
@@ -36,19 +36,7 @@ const parseZcashURI = async (
   // TODO: check if the json parse is correct.
   const resultParseJSON: RPCParseAddressType = await JSON.parse(resultParse);
 
-  const validParse =
-    resultParseJSON.status === 'success' &&
-    ((!!currencyName &&
-      currencyName === 'ZEC' &&
-      !!resultParseJSON.chain_name &&
-      (resultParseJSON.chain_name.toLowerCase() === 'main' ||
-        resultParseJSON.chain_name.toLowerCase() === 'mainnet')) ||
-      (!!currencyName &&
-        currencyName !== 'ZEC' &&
-        !!resultParseJSON.chain_name &&
-        (resultParseJSON.chain_name.toLowerCase() === 'test' ||
-          resultParseJSON.chain_name.toLowerCase() === 'testnet' ||
-          resultParseJSON.chain_name.toLowerCase() === 'regtest')));
+  const validParse = resultParseJSON.status === 'success' && server.chain_name === resultParseJSON.chain_name;
 
   if (address && !validParse) {
     return `"${address || ''}" ${translate('uris.notvalid')}`;
@@ -101,18 +89,7 @@ const parseZcashURI = async (
         // TODO: check if the json parse is correct.
         const resultJSON: RPCParseAddressType = await JSON.parse(result);
 
-        const valid =
-          resultJSON.status === 'success' &&
-          ((!!currencyName &&
-            currencyName === 'ZEC' &&
-            !!resultJSON.chain_name &&
-            (resultJSON.chain_name.toLowerCase() === 'main' || resultJSON.chain_name.toLowerCase() === 'mainnet')) ||
-            (!!currencyName &&
-              currencyName !== 'ZEC' &&
-              !!resultJSON.chain_name &&
-              (resultJSON.chain_name.toLowerCase() === 'test' ||
-                resultJSON.chain_name.toLowerCase() === 'testnet' ||
-                resultJSON.chain_name.toLowerCase() === 'regtest')));
+        const valid = resultJSON.status === 'success' && server.chain_name === resultJSON.chain_name;
 
         if (!valid) {
           return `"${value}" ${translate('uris.notvalid')}`;

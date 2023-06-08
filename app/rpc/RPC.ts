@@ -30,6 +30,7 @@ import { RPCSyncStatusType } from './types/RPCSyncStatusType';
 import { RPCGetOptionType } from './types/RPCGetOptionType';
 import { RPCSendProgressType } from './types/RPCSendProgressType';
 import { RPCSyncRescan } from './types/RPCSyncRescanType';
+import { RPCUfvkType } from './types/RPCUfvkType';
 
 export default class RPC {
   fnSetSyncingStatusReport: (syncingStatusReport: SyncingStatusReportClass) => void;
@@ -356,17 +357,7 @@ export default class RPC {
           console.log('Internal Error ufvk');
           return {} as WalletType;
         }
-        const birthdayStr: string = await RPCModule.execute('get_birthday', '');
-        if (birthdayStr) {
-          if (birthdayStr.toLowerCase().startsWith('error')) {
-            console.log(`Error get_birthday ${birthdayStr}`);
-            return {} as WalletType;
-          }
-        } else {
-          console.log('Internal Error get_birthday');
-          return {} as WalletType;
-        }
-        const ufvk: WalletType = { ufvk: ufvkStr, birthday: Number(birthdayStr) };
+        const ufvk: WalletType = (await JSON.parse(ufvkStr)) as RPCUfvkType;
 
         return ufvk;
       } catch (error) {
@@ -386,8 +377,7 @@ export default class RPC {
           console.log('Internal Error seed');
           return {} as WalletType;
         }
-        const seedJSON: RPCSeedType = await JSON.parse(seedStr);
-        const seed: WalletType = { seed: seedJSON.seed, birthday: seedJSON.birthday };
+        const seed: WalletType = (await JSON.parse(seedStr)) as RPCSeedType;
 
         return seed;
       } catch (error) {
@@ -1468,7 +1458,7 @@ export default class RPC {
 
     //console.log('jc change wallet', exists);
     if (exists && exists !== 'false') {
-      (await RPCModule.doSaveBackup()) as Promise<void>;
+      await RPCModule.doSaveBackup();
       const result = await RPCModule.deleteExistingWallet();
 
       if (!(result && result !== 'false')) {

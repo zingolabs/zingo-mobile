@@ -64,7 +64,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
       setLatestBlock(info.latestBlock);
     } else {
       (async () => {
-        const resp: string = await RPCModule.getLatestBlock(server);
+        const resp: string = await RPCModule.getLatestBlock(server.uri);
         //console.log(resp);
         if (resp && !resp.toLowerCase().startsWith('error')) {
           setLatestBlock(Number(resp));
@@ -118,18 +118,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
 
     console.log('parse ufvk', scannedKey, resultJSON, currencyName);
 
-    const valid =
-      resultJSON.status === 'success' &&
-      ((!!currencyName &&
-        currencyName === 'ZEC' &&
-        !!resultJSON.chain_name &&
-        (resultJSON.chain_name.toLowerCase() === 'main' || resultJSON.chain_name.toLowerCase() === 'mainnet')) ||
-        (!!currencyName &&
-          currencyName !== 'ZEC' &&
-          !!resultJSON.chain_name &&
-          (resultJSON.chain_name.toLowerCase() === 'test' ||
-            resultJSON.chain_name.toLowerCase() === 'testnet' ||
-            resultJSON.chain_name.toLowerCase() === 'regtest')));
+    const valid = resultJSON.status === 'success' && resultJSON.chain_name === server.chain_name;
 
     if (valid) {
       return true;

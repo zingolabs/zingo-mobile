@@ -64,7 +64,8 @@ const Send: React.FunctionComponent<SendProps> = ({
   setPoolsToShieldSelectTransparent,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, info, totalBalance, sendPageState, navigation, zecPrice, sendAll, netInfo, privacy } = context;
+  const { translate, info, totalBalance, sendPageState, navigation, zecPrice, sendAll, netInfo, privacy, server } =
+    context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [qrcodeModalVisble, setQrcodeModalVisible] = useState(false);
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
@@ -112,7 +113,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       return (
         resultJSON.status === 'success' &&
         resultJSON.address_kind !== 'transparent' &&
-        resultJSON.chain_name === info.chain_name
+        resultJSON.chain_name === server.chain_name
       );
     };
 
@@ -125,7 +126,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     } else {
       setMemoEnabled(false);
     }
-  }, [info.chain_name, netInfo.isConnected, sendPageState.toaddr.to, translate]);
+  }, [server.chain_name, netInfo.isConnected, sendPageState.toaddr.to, translate]);
 
   useEffect(() => {
     const parseAdressJSON = async (address: string): Promise<boolean> => {
@@ -146,7 +147,7 @@ const Send: React.FunctionComponent<SendProps> = ({
 
       //console.log('parse-address', address, resultJSON.status === 'success');
 
-      return resultJSON.status === 'success' && resultJSON.chain_name === info.chain_name;
+      return resultJSON.status === 'success' && resultJSON.chain_name === server.chain_name;
     };
 
     var to = sendPageState.toaddr;
@@ -190,7 +191,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   }, [
     decimalSeparator,
     getMaxAmount,
-    info.chain_name,
+    server.chain_name,
     netInfo.isConnected,
     sendPageState.toaddr,
     sendPageState.toaddr.to,
@@ -244,7 +245,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     if (address !== null) {
       // Attempt to parse as URI if it starts with zcash
       if (address.startsWith('zcash:')) {
-        const target: string | ZcashURITargetClass = await parseZcashURI(address, translate, info.currencyName);
+        const target: string | ZcashURITargetClass = await parseZcashURI(address, translate, server);
         //console.log(targets);
 
         if (typeof target !== 'string') {

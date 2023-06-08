@@ -21,7 +21,7 @@ type ScannerAddressProps = {
 
 const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateToField, closeModal }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, netInfo, info } = context;
+  const { translate, netInfo, server } = context;
   const validateAddress = async (scannedAddress: string) => {
     if (!netInfo.isConnected) {
       Toast.show(translate('loadedapp.connection-error') as string, Toast.LONG);
@@ -42,18 +42,7 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateTo
 
     //console.log('parse-1', scannedAddress, resultJSON);
 
-    const valid =
-      resultJSON.status === 'success' &&
-      ((!!info.currencyName &&
-        info.currencyName === 'ZEC' &&
-        !!resultJSON.chain_name &&
-        (resultJSON.chain_name.toLowerCase() === 'main' || resultJSON.chain_name.toLowerCase() === 'mainnet')) ||
-        (!!info.currencyName &&
-          info.currencyName !== 'ZEC' &&
-          !!resultJSON.chain_name &&
-          (resultJSON.chain_name.toLowerCase() === 'test' ||
-            resultJSON.chain_name.toLowerCase() === 'testnet' ||
-            resultJSON.chain_name.toLowerCase() === 'regtest')));
+    const valid = resultJSON.status === 'success' && server.chain_name === resultJSON.chain_name;
 
     if (valid) {
       updateToField(scannedAddress, null, null, null, null);
@@ -61,7 +50,7 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateTo
     } else {
       // Try to parse as a URI
       if (scannedAddress.startsWith('zcash:')) {
-        const target = await parseZcashURI(scannedAddress, translate, info.currencyName);
+        const target = await parseZcashURI(scannedAddress, translate, server);
 
         if (typeof target !== 'string') {
           updateToField(scannedAddress, null, null, null, null);

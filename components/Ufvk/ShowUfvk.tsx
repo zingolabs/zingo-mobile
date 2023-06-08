@@ -28,7 +28,7 @@ type ShowUfvkProps = {
 };
 const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCancel, action }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, wallet, info, netInfo } = context;
+  const { translate, wallet, server, netInfo } = context;
   const { ufvk } = wallet;
   const { colors } = useTheme() as unknown as ThemeType;
   const [times, setTimes] = useState(0);
@@ -94,14 +94,11 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
           </FadeText>
         )}
 
-        {info.currencyName &&
-          info.currencyName !== 'ZEC' &&
-          times === 3 &&
-          (action === 'change' || action === 'server') && (
-            <FadeText style={{ color: colors.primary, textAlign: 'center', width: '100%' }}>
-              {translate('seed.mainnet-warning') as string}
-            </FadeText>
-          )}
+        {server.chain_name === 'main' && times === 3 && (action === 'change' || action === 'server') && (
+          <FadeText style={{ color: colors.primary, textAlign: 'center', width: '100%' }}>
+            {translate('seed.mainnet-warning') as string}
+          </FadeText>
+        )}
 
         <View style={{ display: 'flex', flexDirection: 'column', marginTop: 0, alignItems: 'center' }}>
           <SingleAddress

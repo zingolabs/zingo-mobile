@@ -64,11 +64,11 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal, setZecPrice }) =
             value={
               !info.chain_name
                 ? (translate('loading') as string)
-                : info.chain_name.toLowerCase() === 'main'
+                : info.chain_name === 'main'
                 ? 'Mainnet'
-                : info.chain_name.toLowerCase() === 'test'
+                : info.chain_name === 'test'
                 ? 'Testnet'
-                : info.chain_name.toLowerCase() === 'regtest'
+                : info.chain_name === 'regtest'
                 ? 'Regtest'
                 : (translate('info.unknown') as string) + ' (' + info.chain_name + ')'
             }

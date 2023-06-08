@@ -386,11 +386,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     //console.log(url);
     // Attempt to parse as URI if it starts with zcash
     if (url.startsWith('zcash:')) {
-      const target: string | ZcashURITargetClass = await parseZcashURI(
-        url,
-        this.state.translate,
-        this.state.info.currencyName,
-      );
+      const target: string | ZcashURITargetClass = await parseZcashURI(url, this.state.translate, this.state.server);
       //console.log(targets);
 
       if (typeof target !== 'string') {
@@ -914,15 +910,15 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   };
 
   onClickOKChangeWallet = async () => {
-    const { info } = this.state;
+    const { server } = this.state;
 
     // if the App is working with a test server
     // no need to do backups of the wallets.
     let resultStr = '';
-    if (info.currencyName === 'TAZ') {
-      resultStr = (await this.rpc.changeWalletNoBackup()) as string;
-    } else {
+    if (server.chain_name === 'main') {
       resultStr = (await this.rpc.changeWallet()) as string;
+    } else {
+      resultStr = (await this.rpc.changeWalletNoBackup()) as string;
     }
 
     //console.log("jc change", resultStr);
@@ -980,12 +976,12 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
       let resultStr2 = '';
       // if the server was testnet or regtest -> no need backup the wallet.
-      if (beforeServer.chain_name === 'test' || beforeServer.chain_name === 'regtest') {
-        // no backup
-        resultStr2 = (await this.rpc.changeWalletNoBackup()) as string;
-      } else {
+      if (beforeServer.chain_name === 'main') {
         // backup
         resultStr2 = (await this.rpc.changeWallet()) as string;
+      } else {
+        // no backup
+        resultStr2 = (await this.rpc.changeWalletNoBackup()) as string;
       }
 
       //console.log("jc change", resultStr);
