@@ -44,6 +44,8 @@ type SendProps = {
     name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
     value: boolean,
   ) => Promise<void>;
+  setPoolsToShieldSelectSapling: (v: boolean) => void;
+  setPoolsToShieldSelectTransparent: (v: boolean) => void;
 };
 
 const Send: React.FunctionComponent<SendProps> = ({
@@ -58,6 +60,8 @@ const Send: React.FunctionComponent<SendProps> = ({
   setZecPrice,
   setBackgroundError,
   set_privacy_option,
+  setPoolsToShieldSelectSapling,
+  setPoolsToShieldSelectTransparent,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, info, totalBalance, sendPageState, navigation, zecPrice, sendAll, netInfo, privacy } = context;
@@ -76,7 +80,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   const { decimalSeparator } = getNumberFormatSettings();
   const spendable = totalBalance.transparentBal + totalBalance.spendablePrivate + totalBalance.spendableOrchard;
   const stillConfirming = parseFloat(spendable.toFixed(8)) !== totalBalance.total;
-  const showShieldInfo = totalBalance && totalBalance.transparentBal > 0;
+  const showShieldInfo = totalBalance && (totalBalance.transparentBal > 0 || totalBalance.privateBal > 0);
 
   const getMaxAmount = useCallback((): number => {
     let max = spendable - defaultFee;
@@ -442,6 +446,8 @@ const Send: React.FunctionComponent<SendProps> = ({
             setComputingModalVisible={setComputingModalVisible}
             setBackgroundError={setBackgroundError}
             set_privacy_option={set_privacy_option}
+            setPoolsToShieldSelectSapling={setPoolsToShieldSelectSapling}
+            setPoolsToShieldSelectTransparent={setPoolsToShieldSelectTransparent}
           />
         </View>
       </Animated.View>

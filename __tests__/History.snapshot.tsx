@@ -130,6 +130,8 @@ describe('Component Transactions - test', () => {
           setComputingModalVisible={onFunction}
           setBackgroundError={onFunction}
           set_privacy_option={onFunction}
+          setPoolsToShieldSelectSapling={onFunction}
+          setPoolsToShieldSelectTransparent={onFunction}
         />
       </ContextAppLoadedProvider>,
     );

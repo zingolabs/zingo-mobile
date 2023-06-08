@@ -26,6 +26,8 @@ type HistoryProps = {
     name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
     value: boolean,
   ) => Promise<void>;
+  setPoolsToShieldSelectSapling: (v: boolean) => void;
+  setPoolsToShieldSelectTransparent: (v: boolean) => void;
 };
 
 const History: React.FunctionComponent<HistoryProps> = ({
@@ -37,6 +39,8 @@ const History: React.FunctionComponent<HistoryProps> = ({
   setComputingModalVisible,
   setBackgroundError,
   set_privacy_option,
+  setPoolsToShieldSelectSapling,
+  setPoolsToShieldSelectTransparent,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, transactions, language } = context;
@@ -94,6 +98,8 @@ const History: React.FunctionComponent<HistoryProps> = ({
         setComputingModalVisible={setComputingModalVisible}
         setBackgroundError={setBackgroundError}
         set_privacy_option={set_privacy_option}
+        setPoolsToShieldSelectSapling={setPoolsToShieldSelectSapling}
+        setPoolsToShieldSelectTransparent={setPoolsToShieldSelectTransparent}
       />
 
       <ScrollView

@@ -80,6 +80,8 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   translate: () => '',
   backgroundError: {} as BackgroundErrorType,
   privacy: false,
+  poolsToShieldSelectSapling: true,
+  poolsToShieldSelectTransparent: true,
 };
 
 export const ContextAppLoaded = React.createContext(defaultAppStateLoaded);

@@ -316,9 +316,10 @@ export default class RPC {
     return '';
   }
   */
-  static async rpc_shieldTransparent(): Promise<string> {
+  static async rpc_shieldTransparent(pools: string): Promise<string> {
     try {
-      const shieldStr: string = await RPCModule.execute('shield', '');
+      // using `all` or `transparent` or `sapling`...
+      const shieldStr: string = await RPCModule.execute('shield', pools);
       if (shieldStr) {
         if (shieldStr.toLowerCase().startsWith('error')) {
           console.log(`Error shield transparent ${shieldStr}`);

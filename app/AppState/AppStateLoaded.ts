@@ -112,6 +112,8 @@ export default interface AppStateLoaded {
   backgroundError: BackgroundErrorType;
 
   privacy: boolean;
+  poolsToShieldSelectSapling: boolean;
+  poolsToShieldSelectTransparent: boolean;
 
   // eslint-disable-next-line semi
 }
