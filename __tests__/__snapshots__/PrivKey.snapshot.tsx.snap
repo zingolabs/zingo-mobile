@@ -87,7 +87,6 @@ exports[`Component PrivKey - test PrivKey Private - snapshot 1`] = `
     <View
       style={
         {
-          "backgroundColor": "rgb(255, 255, 255)",
           "left": 0,
           "padding": 10,
           "position": "absolute",
@@ -456,7 +455,6 @@ exports[`Component PrivKey - test PrivKey View - snapshot 1`] = `
     <View
       style={
         {
-          "backgroundColor": "rgb(255, 255, 255)",
           "left": 0,
           "padding": 10,
           "position": "absolute",

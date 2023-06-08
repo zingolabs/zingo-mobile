@@ -98,15 +98,15 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, set_privac
       switch (tab) {
         case 'sent':
           resultStr = await RPCModule.execute('value_to_address', '');
-          console.log('################# value', resultStr);
+          //console.log('################# value', resultStr);
           break;
         case 'sends':
           resultStr = await RPCModule.execute('sends_to_address', '');
-          console.log('################# value', resultStr);
+          //console.log('################# sends', resultStr);
           break;
         case 'memobytes':
           resultStr = await RPCModule.execute('memobytes_to_address', '');
-          console.log('################# value', resultStr);
+          //console.log('################# memobytes', resultStr);
           break;
         default:
           break;

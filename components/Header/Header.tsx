@@ -208,6 +208,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             alignItems: 'center',
             justifyContent: 'center',
             margin: 0,
+            marginTop: readOnly ? 15 : 0,
           }}>
           <ZecAmount
             currencyName={info.currencyName ? info.currencyName : ''}
@@ -418,7 +419,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         )}
       </View>
 
-      <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', left: 0 }}>
+      <View style={{ padding: 10, position: 'absolute', left: 0 }}>
         <View style={{ width: 48, alignItems: 'center' }}>
           {!noDrawMenu && (
             <TouchableOpacity
