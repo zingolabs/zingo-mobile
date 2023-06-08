@@ -1,4 +1,3 @@
-import Url from 'url-parse';
 import RPCModule from '../RPCModule';
 import { RPCInfoType } from '../rpc/types/RPCInfoType';
 
@@ -9,22 +8,10 @@ type checkServerURIReturn = {
 };
 
 const checkServerURI = async (uri: string, oldUri: string): Promise<checkServerURIReturn> => {
-  const parsedUri = new Url(uri, true);
-
-  let port = parsedUri.port;
-  let new_chain_name;
-
-  if (!port) {
-    // by default -> 9067
-    // for `zecwallet` -> 443
-    port = uri.includes('lwdv3.zecwallet') ? '443' : '9067';
-  }
+  let new_chain_name: 'main' | 'test' | 'regtest' | undefined;
 
   try {
-    const resultStrServerPromise = RPCModule.execute(
-      'changeserver',
-      `${parsedUri.protocol}//${parsedUri.hostname}:${port}`,
-    );
+    const resultStrServerPromise = RPCModule.execute('changeserver', uri);
     const timeoutServerPromise = new Promise((resolve, reject) => {
       setTimeout(() => {
         reject(new Error('Promise changeserver Timeout 30 seconds'));

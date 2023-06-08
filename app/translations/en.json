@@ -29,10 +29,13 @@
     "createnewwallet": "Create New Wallet (new seed)",
     "opencurrentwallet": "Open Current Wallet",
     "restorewalletseed": "Restore wallet from Seed",
+    "restorewalletufvk": "Restore wallet from Viewing Key",
     "creatingwallet-label": "Error creating Wallet",
     "readingwallet-label": "Error reading Wallet",
     "invalidseed-label": "Invalid Seed Phrase",
-    "invalidseed-error": "The seed phrase was invalid. Review every single word of the seed."
+    "invalidseed-error": "The seed phrase was invalid. Review every single word of the seed.",
+    "invalidufvk-label": "Invalid Unified Full Viewing Key",
+    "invalidufvk-error": "The Viewing Key was invalid. Review the Key and/or scan it again."
   },
   "loadedapp": {
     "about": "About Zingo!",
@@ -40,6 +43,7 @@
     "options": "Options",
     "settings": "Settings",
     "walletseed": "Wallet Seed",
+    "walletufvk": "Wallet Viewing Key",
     "rescanwallet": "Rescan Wallet",
     "report": "Sync / Rescan Report",
     "changewallet": "Change to another Wallet",
@@ -233,7 +237,7 @@
     "server": "Server",
     "view": "View",
     "restore": "Restore",
-    "backup": "backup",
+    "backup": "Backup",
     "text-readonly": "This is your seed phrase. Please write it down carefully. It is the only way to restore your actual wallet.",
     "text-no-readonly": "Enter your seed phrase (24 words)",
     "tapcopy": "Tap to copy",
@@ -371,11 +375,11 @@
     "connectionexpensive": "Connection Expensive."
   },
   "import": {
-    "title": "Import Key",
-    "key-label": "Spending/Private or Full Viewing/Viewing key",
+    "title": "Viewing Key",
+    "key-label": "Enter the Unified Full Viewing key",
     "birthday": "Key Birthday",
-    "text": "Importing a key requires a rescan, and make take a long time to complete. Your balances will update automatically.",
-    "button": "Import",
+    "text": "Restoring from viewing key requires a rescan, and make take a long time to complete.",
+    "button": "Restore Wallet",
     "key-acc": "Key Field",
     "birthday-acc": "Birthday Field"
   },
@@ -390,18 +394,43 @@
     ]
   },
   "scanner": {
-    "text" : "Scan a Spending/Private or Full Viewing/Viewing Key",
+    "text" : "Scan a Unified Full Viewing Key",
     "uri-error": "URI Error:",
     "nozcash-error": "is not a valid Zcash Address",
-    "scanaddress": "Scan a Zcash Address"
+    "scanaddress": "Scan a Zcash Address",
+    "noviewkey-error": "It is not a valid Unified Full Viewing Key"
   },
   "privkey": {
-    "privkey": " Spending/Private ",
-    "viewkey": " Full Viewing/Viewing ",
+    "buttontexts": {
+      "new": ["I have saved \n the Viewing Key"],
+      "change": [
+        "",
+        "I have saved \n the Viewing Key",
+        "You really want \n to change your \n actual wallet",
+        "Are you sure \n 100% or more"
+      ],
+      "server": [
+        "",
+        "I have saved \n the Viewing Key",
+        "You really want \n to change your \n actual server",
+        "Are you sure \n 100% or more"
+      ],
+      "view": ["I have saved \n the Viewing Key"],
+      "restore": ["Restore Wallet"],
+      "backup": [
+        "",
+        "I have saved \n the Viewing Key",
+        "You really want \n to restore your \n backup wallet",
+        "Are you sure \n 100% or more"
+      ]
+    },
+    "privkey": "Spending/Private ",
+    "viewkey": "Viewing Key ",
     "nokey": "No Key",
     "tapcopy-message": "Copied Key to Clipboard",
     "title": "Key",
-    "address": "Address"
+    "address": "Address",
+    "text-readonly": "This is your viewing key. Please write/copy it down carefully. It is the only way to restore your actual wallet."
   },
   "pools": {
     "title": "Fund Pools",
@@ -426,6 +455,7 @@
     "noparameter": "Unknown parameter",
     "noamount": "Didn't have an amount",
     "noaddress": "Didn't have an address",
-    "oneentry": "URI Should have at least 1 entry"
+    "oneentry": "URI Should have at least 1 entry",
+    "parseerror": "Right now it is not possible to verify the address with the server"
   }
 }

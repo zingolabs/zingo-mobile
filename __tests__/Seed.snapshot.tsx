@@ -65,7 +65,7 @@ describe('Component Seed - test', () => {
       return 'text translated';
     }
   };
-  stateLoaded.walletSeed = {
+  stateLoaded.wallet = {
     seed: 'pepe lolo titi',
     birthday: 1500100,
   };
@@ -120,7 +120,7 @@ describe('Component Seed - test', () => {
       return 'text translated';
     }
   };
-  stateLoading.walletSeed = {
+  stateLoading.wallet = {
     seed: 'pepe lolo titi',
     birthday: 1500100,
   };

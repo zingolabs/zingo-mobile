@@ -65,7 +65,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 }) => {
   const context = useContext(ContextAppLoaded);
   const {
-    info,
+    server,
     walletSettings,
     translate,
     server: serverContext,
@@ -166,7 +166,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const saveSettings = async () => {
     let serverUriParsed = customServerUri;
     let same_server_chain_name = true;
-    const chain_name = info.chain_name;
+    const chain_name = server.chain_name;
     if (
       walletSettings.download_memos === memos &&
       walletSettings.transaction_filter_threshold === filter &&

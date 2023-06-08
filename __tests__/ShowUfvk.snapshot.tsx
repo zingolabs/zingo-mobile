@@ -6,7 +6,7 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
-import Rescan from '../components/Rescan';
+import { ShowUfvk } from '../components/Ufvk';
 import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
 
 jest.useFakeTimers();
@@ -33,21 +33,22 @@ jest.mock('@react-native-community/netinfo', () => {
 });
 
 // test suite
-describe('Component Rescan - test', () => {
+describe('Component Ufvk - test', () => {
   //snapshot test
   const state = defaultAppStateLoaded;
   state.translate = () => 'text translated';
   state.info.currencyName = 'ZEC';
   state.totalBalance.total = 1.12345678;
-  state.wallet.birthday = 1900100;
+  state.wallet.ufvk =
+    'uview1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890';
   const onClose = jest.fn();
-  const onRescan = jest.fn();
-  test('Rescan - snapshot', () => {
-    const rescan = render(
+  const onOK = jest.fn();
+  test('PrivKey Private - snapshot', () => {
+    const privKey = render(
       <ContextAppLoadedProvider value={state}>
-        <Rescan closeModal={onClose} doRescan={onRescan} />
+        <ShowUfvk onClickCancel={onClose} onClickOK={onOK} action="view" />
       </ContextAppLoadedProvider>,
     );
-    expect(rescan.toJSON()).toMatchSnapshot();
+    expect(privKey.toJSON()).toMatchSnapshot();
   });
 });

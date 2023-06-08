@@ -8,6 +8,7 @@ import {
   faCloudDownload,
   faLockOpen,
   faLock,
+  faSnowflake,
   faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -79,6 +80,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     currency,
     zecPrice,
     privacy,
+    readOnly,
     poolsToShieldSelectSapling,
     poolsToShieldSelectTransparent,
   } = context;
@@ -208,7 +210,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             margin: 0,
           }}>
           <ZecAmount
-            currencyName={info.currencyName}
+            currencyName={info.currencyName ? info.currencyName : ''}
             color={balanceColor}
             size={36}
             amtZec={totalBalance.total}
@@ -416,17 +418,25 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         )}
       </View>
 
-      {!noDrawMenu && (
-        <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', left: 0 }}>
-          <TouchableOpacity
-            testID="header.drawmenu"
-            accessible={true}
-            accessibilityLabel={translate('menudrawer-acc') as string}
-            onPress={toggleMenuDrawer}>
-            <FontAwesomeIcon icon={faBars} size={48} color={colors.border} />
-          </TouchableOpacity>
+      <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', left: 0 }}>
+        <View style={{ width: 48, alignItems: 'center' }}>
+          {!noDrawMenu && (
+            <TouchableOpacity
+              style={{ marginBottom: 5 }}
+              testID="header.drawmenu"
+              accessible={true}
+              accessibilityLabel={translate('menudrawer-acc') as string}
+              onPress={toggleMenuDrawer}>
+              <FontAwesomeIcon icon={faBars} size={48} color={colors.border} />
+            </TouchableOpacity>
+          )}
+          {readOnly && (
+            <TouchableOpacity onPress={() => null}>
+              <FontAwesomeIcon icon={faSnowflake} size={48} color={colors.zingo} />
+            </TouchableOpacity>
+          )}
         </View>
-      )}
+      </View>
 
       <View style={{ padding: 15, position: 'absolute', right: 0, alignItems: 'flex-end' }}>
         <Text style={{ fontSize: 8, color: colors.border }}>{translate('version') as string}</Text>

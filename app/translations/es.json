@@ -29,10 +29,13 @@
     "createnewwallet": "Crear Monedero Nuevo (nueva semilla)",
     "opencurrentwallet": "Abrir Monedero Activo",
     "restorewalletseed": "Restaurar Monedero con la Semilla",
+    "restorewalletufvk": "Restaurar Monedero con la Clave de Visualización",
     "creatingwallet-label": "Error Creando el Monedero",
     "readingwallet-label": "Error Leyendo el Monedero",
     "invalidseed-label": "Semilla incorrecta",
-    "invalidseed-error": "La semilla proporcionada no es correcta. Revisa cada una de las palabras."
+    "invalidseed-error": "La semilla proporcionada no es correcta. Revisa cada una de las palabras.",
+    "invalidufvk-label": "Clave de Visualización incorrecta",
+    "invalidufvk-error": "La Clave de Visualización proporcionada no es correcta. Revisa la clave y/o escaneala de nuevo."
   },
   "loadedapp": {
     "about": "Sobre Zingo!",
@@ -40,6 +43,7 @@
     "options": "Opciones",
     "settings": "Parámetros",
     "walletseed": "Semilla del Monedero",
+    "walletufvk": "Clave de Visualización del Monedero",
     "rescanwallet": "Re-Escanear el Monedero",
     "report": "Informe de Sincronización",
     "changewallet": "Abrir otro Monedero",
@@ -177,7 +181,7 @@
     "value-sendall-false": "Desactivar",
     "value-privacy-true": "Alta",
     "value-privacy-false": "Normal",
-    "privacy": "Privacidad: ",
+    "privacy": "Priv: ",
     "value-chain_name-main": "Mainnet",
     "value-chain_name-test": "Testnet",
     "value-chain_name-regtest": "Regtest"
@@ -371,11 +375,11 @@
     "connectionexpensive": "conexión Costosa/Cara."
   },
   "import": {
-    "title": "Importar Clave",
-    "key-label": "Clave Gastar/Privada o de Visualización Total/Visualización",
+    "title": "Clave de Visualización",
+    "key-label": "Introduce la Clave de Visualización Totalmente Unificada",
     "birthday": "Cumpleaños de la Clave",
-    "text": "Importar una Clave implica un Re-escaneo completo, y puede tomar mucho tiempo completarlo. Tus Balances se actualizarán automáticamente.",
-    "button": "Importar",
+    "text": "Importar una Clave implica un Re-escaneo completo, y puede tomar mucho tiempo completarlo.",
+    "button": "Restaurar Monedero",
     "key-acc": "Campo Clave",
     "birthday-acc": "Campo Cumpleaños"
   },
@@ -390,18 +394,43 @@
     ]
   },
   "scanner": {
-    "text" : "Escanea una Clave Gastar/Privada o una de Visualizacion Total/Visualización",
+    "text" : "Escanea una Clave de Visualización Totalmente Unificada",
     "uri-error": "URI Error:",
     "nozcash-error": "no es una dirección Zcash válida",
-    "scanaddress": "Escanea una dirección Zcash"
+    "scanaddress": "Escanea una dirección Zcash",
+    "noviewkey-error": "No es una Clave de Visualización Totalmente Unificada valida"
   },
   "privkey": {
-    "privkey": " Gastar/Privada ",
-    "viewkey": " Visualizacion Total/Visualización ",
-    "nokey": "Sin Claves",
+    "buttontexts": {
+      "new": ["Ya he guardado \n la clave de visualización"],
+      "change": [
+        "",
+        "Ya he guardado \n la clave de visualización",
+        "Realmente quieres \n cambiar tu \n monedero activo",
+        "Estás seguro \n al 100%"
+      ],
+      "server": [
+        "",
+        "Ya he guardado \n la clave de visualización",
+        "Realmente quieres \n cambiar el \n servidor activo",
+        "Estás seguro \n al 100%"
+      ],
+      "view": ["Ya he guardado \n la clave de visualización"],
+      "restore": ["Restaurar Monedero"],
+      "backup": [
+        "",
+        "Ya he guardado \n la clave de visualización",
+        "Realmente quieres \n restaurar tu \n copia de seguridad",
+        "Estás seguro \n al 100%"
+      ]
+    },
+    "privkey": "Gastar/Privada ",
+    "viewkey": "Clave de Visualizacion",
+    "nokey": "Sin Clave",
     "tapcopy-message": "Clave copiada al portapapeles",
     "title": "Clave",
-    "address": "Dirección"
+    "address": "Dirección",
+    "text-readonly": "Esta es tu clave de visualización. Por favor apúntala/copiala cuidadosamente. Es la única manera que tienes para restaurar/acceder tu monedero activo de nuevo."
   },
   "pools": {
     "title": "Agrupaciones de Fondos",
@@ -426,6 +455,7 @@
     "noparameter": "Parámetro desconocido",
     "noamount": "No tenía una cantidad",
     "noaddress": "No tenía una dirección",
-    "oneentry": "URI Debería tener al menos una entrada"
+    "oneentry": "URI Debería tener al menos una entrada",
+    "parseerror": "En este momento no es posible verificar la dirección en el Servidor"
   }
 }

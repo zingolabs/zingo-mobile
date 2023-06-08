@@ -6,7 +6,7 @@ import {
   TxDetailType,
   InfoType,
   SendJsonToTypeType,
-  WalletSeedType,
+  WalletType,
   SendProgressClass,
   WalletSettingsClass,
   TranslateType,
@@ -30,6 +30,7 @@ import { RPCSyncStatusType } from './types/RPCSyncStatusType';
 import { RPCGetOptionType } from './types/RPCGetOptionType';
 import { RPCSendProgressType } from './types/RPCSendProgressType';
 import { RPCSyncRescan } from './types/RPCSyncRescanType';
+import { RPCUfvkType } from './types/RPCUfvkType';
 
 export default class RPC {
   fnSetSyncingStatusReport: (syncingStatusReport: SyncingStatusReportClass) => void;
@@ -66,6 +67,8 @@ export default class RPC {
 
   timers: NodeJS.Timeout[];
 
+  readOnly: boolean;
+
   constructor(
     fnSetSyncingStatusReport: (syncingStatusReport: SyncingStatusReportClass) => void,
     fnSetTotalBalance: (totalBalance: TotalBalanceClass) => void,
@@ -76,6 +79,7 @@ export default class RPC {
     fnSetSyncingStatus: (syncingStatus: SyncingStatusType) => void,
     translate: (key: string) => TranslateType,
     keepAwake: (keep: boolean) => void,
+    readOnly: boolean,
   ) {
     this.fnSetSyncingStatusReport = fnSetSyncingStatusReport;
     this.fnSetTotalBalance = fnSetTotalBalance;
@@ -106,6 +110,8 @@ export default class RPC {
     this.latest_block = -1;
 
     this.timers = [];
+
+    this.readOnly = readOnly;
   }
 
   static async rpc_setInterruptSyncAfterBatch(value: string): Promise<void> {
@@ -337,25 +343,47 @@ export default class RPC {
     }
   }
 
-  static async rpc_fetchSeedAndBirthday(): Promise<WalletSeedType> {
-    try {
-      const seedStr: string = await RPCModule.execute('seed', '');
-      if (seedStr) {
-        if (seedStr.toLowerCase().startsWith('error')) {
-          console.log(`Error seed ${seedStr}`);
-          return {} as WalletSeedType;
+  static async rpc_fetchWallet(readOnly: boolean): Promise<WalletType> {
+    if (readOnly) {
+      // viewing key
+      try {
+        const ufvkStr: string = await RPCModule.execute('exportufvk', '');
+        if (ufvkStr) {
+          if (ufvkStr.toLowerCase().startsWith('error')) {
+            console.log(`Error ufvk ${ufvkStr}`);
+            return {} as WalletType;
+          }
+        } else {
+          console.log('Internal Error ufvk');
+          return {} as WalletType;
         }
-      } else {
-        console.log('Internal Error seed');
-        return {} as WalletSeedType;
-      }
-      const seedJSON: RPCSeedType = await JSON.parse(seedStr);
-      const seed: WalletSeedType = { seed: seedJSON.seed, birthday: seedJSON.birthday };
+        const ufvk: WalletType = (await JSON.parse(ufvkStr)) as RPCUfvkType;
 
-      return seed;
-    } catch (error) {
-      console.log(`Critical Error seed ${error}`);
-      return {} as WalletSeedType;
+        return ufvk;
+      } catch (error) {
+        console.log(`Critical Error ufvk / get_birthday ${error}`);
+        return {} as WalletType;
+      }
+    } else {
+      // seed
+      try {
+        const seedStr: string = await RPCModule.execute('seed', '');
+        if (seedStr) {
+          if (seedStr.toLowerCase().startsWith('error')) {
+            console.log(`Error seed ${seedStr}`);
+            return {} as WalletType;
+          }
+        } else {
+          console.log('Internal Error seed');
+          return {} as WalletType;
+        }
+        const seed: WalletType = (await JSON.parse(seedStr)) as RPCSeedType;
+
+        return seed;
+      } catch (error) {
+        console.log(`Critical Error seed ${error}`);
+        return {} as WalletType;
+      }
     }
   }
 
@@ -1186,10 +1214,10 @@ export default class RPC {
   }
 
   async fetchWalletBirthday(): Promise<void> {
-    const walletSeed = await RPC.rpc_fetchSeedAndBirthday();
+    const wallet = await RPC.rpc_fetchWallet(this.readOnly);
 
-    if (walletSeed) {
-      this.walletBirthday = walletSeed.birthday;
+    if (wallet) {
+      this.walletBirthday = wallet.birthday;
     }
   }
 
@@ -1430,7 +1458,7 @@ export default class RPC {
 
     //console.log('jc change wallet', exists);
     if (exists && exists !== 'false') {
-      (await RPCModule.doSaveBackup()) as Promise<void>;
+      await RPCModule.doSaveBackup();
       const result = await RPCModule.deleteExistingWallet();
 
       if (!(result && result !== 'false')) {
@@ -1491,5 +1519,13 @@ export default class RPC {
 
   getInSend(): boolean {
     return this.inSend;
+  }
+
+  setReadOnly(value: boolean): void {
+    this.readOnly = value;
+  }
+
+  getReadOnly(): boolean {
+    return this.readOnly;
   }
 }

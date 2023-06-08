@@ -87,6 +87,25 @@ exports[`Component PrivKey - test PrivKey Private - snapshot 1`] = `
     <View
       style={
         {
+          "backgroundColor": "rgb(255, 255, 255)",
+          "left": 0,
+          "padding": 10,
+          "position": "absolute",
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "width": 48,
+          }
+        }
+      />
+    </View>
+    <View
+      style={
+        {
           "alignItems": "flex-end",
           "padding": 15,
           "position": "absolute",
@@ -433,6 +452,25 @@ exports[`Component PrivKey - test PrivKey View - snapshot 1`] = `
           text translated text translated
         </Text>
       </View>
+    </View>
+    <View
+      style={
+        {
+          "backgroundColor": "rgb(255, 255, 255)",
+          "left": 0,
+          "padding": 10,
+          "position": "absolute",
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "width": 48,
+          }
+        }
+      />
     </View>
     <View
       style={

@@ -33,7 +33,7 @@ import { faEllipsisV, faCashRegister } from '@fortawesome/free-solid-svg-icons';
 import BoldText from '../../components/Components/BoldText';
 import Button from '../../components/Components/Button';
 import RPCModule from '../RPCModule';
-import { AppStateLoading, BackgroundType, WalletSeedType, TranslateType, NetInfoType, ServerType } from '../AppState';
+import { AppStateLoading, BackgroundType, WalletType, TranslateType, NetInfoType, ServerType } from '../AppState';
 import { parseServerURI, serverUris } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import RPC from '../rpc';
@@ -43,6 +43,8 @@ import platform from '../platform/platform';
 import BackgroundFileImpl from '../../components/Background/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '../createAlert';
+import { ImportUfvk } from '../../components/Ufvk';
+import { RPCWalletKindType } from '../rpc/types/RPCWalletKindType';
 import { isEqual } from 'lodash';
 
 const Seed = React.lazy(() => import('../../components/Seed'));
@@ -231,19 +233,26 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
     await AsyncStorage.setItem('@background', 'no');
     setTimeout(async () => {
       const exists = await RPCModule.walletExists();
-      //console.log('Wallet Exists result', exists);
+      console.log('Wallet Exists result', exists, this.state.server);
 
       if (exists && exists !== 'false') {
         this.setState({ walletExists: true });
         const networkState = await NetInfo.fetch();
         if (networkState.isConnected) {
-          const result: string = await RPCModule.loadExistingWallet(
-            this.state.server.uri,
-            this.state.server.chain_name,
-          );
-          //console.log('Load Wallet Exists result', error);
+          let result: string = await RPCModule.loadExistingWallet(this.state.server.uri, this.state.server.chain_name);
+          if (result === 'Error: This wallet is watch-only.') {
+            // this warning is not an error, bypassing...
+            result = 'OK';
+          }
+          console.log('Load Wallet Exists result', result);
           if (result && !result.toLowerCase().startsWith('error')) {
             // Load the wallet and navigate to the transactions screen
+            const walletKindStr: string = await RPCModule.execute('wallet_kind', '');
+            console.log(walletKindStr);
+            const walletKindJSON: RPCWalletKindType = await JSON.parse(walletKindStr);
+            this.setState({
+              readOnly: walletKindJSON.kind === 'Seeded' ? false : true,
+            });
             this.navigateToLoaded();
           } else {
             this.setState({ screen: 1 });
@@ -258,7 +267,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
           Toast.show(this.props.translate('loadedapp.connection-error') as string, Toast.LONG);
         }
       } else {
-        //console.log('Loading new wallet');
+        console.log('Loading new wallet');
         this.setState({ screen: 1, walletExists: false });
       }
     });
@@ -395,7 +404,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
     const { navigation } = this.props;
     navigation.reset({
       index: 0,
-      routes: [{ name: 'LoadedApp' }],
+      routes: [{ name: 'LoadedApp', params: { readOnly: this.state.readOnly } }],
     });
   };
 
@@ -406,8 +415,8 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
 
       if (seed && !seed.toLowerCase().startsWith('error')) {
         // TODO verify that JSON don't fail.
-        const walletSeed: WalletSeedType = JSON.parse(seed);
-        this.setState({ walletSeed, screen: 2, actionButtonsDisabled: false, walletExists: true });
+        const wallet: WalletType = JSON.parse(seed);
+        this.setState({ wallet, screen: 2, actionButtonsDisabled: false, walletExists: true });
         // default values for wallet options
         this.set_wallet_option('download_memos', 'wallet');
         //await this.set_wallet_option('transaction_filter_threshold', '500');
@@ -418,20 +427,25 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
     });
   };
 
-  getwalletSeedToRestore = async () => {
-    this.setState({ actionButtonsDisabled: true });
-    setTimeout(() => {
-      this.setState({ walletSeed: {} as WalletSeedType, screen: 3 });
-    });
+  getwalletToRestore = async (type: 'seed' | 'ufvk') => {
+    this.setState({ wallet: {} as WalletType, screen: type === 'seed' ? 3 : 4 });
   };
 
-  doRestore = async (seed: string, birthday: number) => {
-    if (!seed) {
-      createAlert(
-        this.setBackgroundError,
-        this.props.translate('loadingapp.invalidseed-label') as string,
-        this.props.translate('loadingapp.invalidseed-error') as string,
-      );
+  doRestore = async (seed_ufvk: string, birthday: number, type: 'seed' | 'ufvk') => {
+    if (!seed_ufvk) {
+      if (type === 'seed') {
+        createAlert(
+          this.setBackgroundError,
+          this.props.translate('loadingapp.invalidseed-label') as string,
+          this.props.translate('loadingapp.invalidseed-error') as string,
+        );
+      } else {
+        createAlert(
+          this.setBackgroundError,
+          this.props.translate('loadingapp.invalidufvk-label') as string,
+          this.props.translate('loadingapp.invalidufvk-error') as string,
+        );
+      }
       return;
     }
 
@@ -445,17 +459,34 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
         walletBirthday = '0';
       }
 
-      const result: string = await RPCModule.restoreWalletFromSeed(
-        seed.toLowerCase(),
-        walletBirthday || '0',
-        this.state.server.uri,
-        this.state.server.chain_name,
-      );
+      let result: string;
+      if (type === 'seed') {
+        result = await RPCModule.restoreWalletFromSeed(
+          seed_ufvk.toLowerCase(),
+          walletBirthday || '0',
+          this.state.server.uri,
+          this.state.server.chain_name,
+        );
+      } else {
+        result = await RPCModule.restoreWalletFromUfvk(
+          seed_ufvk.toLowerCase(),
+          walletBirthday || '0',
+          this.state.server.uri,
+          this.state.server.chain_name,
+        );
+        if (result === 'Error: This wallet is watch-only.') {
+          // this warning is not an error, bypassing...
+          result = 'ok';
+        }
+      }
+      console.log(seed_ufvk);
+      console.log(result);
       if (result && !result.toLowerCase().startsWith('error')) {
-        this.setState({ actionButtonsDisabled: false });
+        this.setState({ actionButtonsDisabled: false, readOnly: type === 'seed' ? false : true });
         this.navigateToLoaded();
       } else {
         this.setState({ actionButtonsDisabled: false });
+        // this message work for both.
         createAlert(this.setBackgroundError, this.props.translate('loadingapp.readingwallet-label') as string, result);
       }
     });
@@ -476,7 +507,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
   render() {
     const {
       screen,
-      walletSeed,
+      wallet,
       actionButtonsDisabled,
       walletExists,
       server,
@@ -817,21 +848,32 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                     />
                   )}
 
-                  <View style={{ marginTop: 50, display: 'flex', alignItems: 'center' }}>
+                  <View style={{ marginTop: 20, display: 'flex', alignItems: 'center' }}>
                     <Button
                       testID="loadingapp.restorewalletseed"
                       type="Secondary"
                       title={translate('loadingapp.restorewalletseed') as string}
                       disabled={actionButtonsDisabled}
-                      onPress={this.getwalletSeedToRestore}
-                      style={{ margin: 10 }}
+                      onPress={() => this.getwalletToRestore('seed')}
+                      style={{ marginBottom: 10 }}
+                    />
+                  </View>
+
+                  <View style={{ marginTop: 20, display: 'flex', alignItems: 'center' }}>
+                    <Button
+                      testID="loadingapp.restorewalletufvk"
+                      type="Secondary"
+                      title={translate('loadingapp.restorewalletufvk') as string}
+                      disabled={actionButtonsDisabled}
+                      onPress={() => this.getwalletToRestore('ufvk')}
+                      style={{ marginBottom: 10 }}
                     />
                   </View>
                 </View>
               </ScrollView>
             </>
           )}
-          {screen === 2 && walletSeed && (
+          {screen === 2 && wallet && (
             <Modal
               animationType="slide"
               transparent={false}
@@ -864,10 +906,28 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                   </View>
                 }>
                 <Seed
-                  onClickOK={(s: string, b: number) => this.doRestore(s, b)}
+                  onClickOK={(s: string, b: number) => this.doRestore(s, b, 'seed')}
                   onClickCancel={() => this.setState({ screen: 1, actionButtonsDisabled: false })}
                   action={'restore'}
-                  setBackgroundError={this.setBackgroundError}
+                />
+              </Suspense>
+            </Modal>
+          )}
+          {screen === 4 && (
+            <Modal
+              animationType="slide"
+              transparent={false}
+              visible={screen === 4}
+              onRequestClose={() => this.setState({ screen: 1 })}>
+              <Suspense
+                fallback={
+                  <View>
+                    <Text>{translate('loading') as string}</Text>
+                  </View>
+                }>
+                <ImportUfvk
+                  onClickOK={(s: string, b: number) => this.doRestore(s, b, 'ufvk')}
+                  onClickCancel={() => this.setState({ screen: 1 })}
                 />
               </Suspense>
             </Modal>

@@ -3,7 +3,7 @@ import { StackScreenProps } from '@react-navigation/stack';
 import TotalBalanceClass from './classes/TotalBalanceClass';
 
 import InfoType from './types/InfoType';
-import WalletSeedType from './types/WalletSeedType';
+import WalletType from './types/WalletType';
 import DimensionsType from './types/DimensionsType';
 import zecPriceType from './types/zecPriceType';
 import BackgroundType from './types/BackgroundType';
@@ -22,7 +22,7 @@ export default interface AppStateLoading {
   screen: number;
   actionButtonsDisabled: boolean;
   walletExists: boolean;
-  walletSeed: WalletSeedType;
+  wallet: WalletType;
   totalBalance: TotalBalanceClass;
   info: InfoType;
 
@@ -38,6 +38,8 @@ export default interface AppStateLoading {
   backgroundError: BackgroundErrorType;
 
   privacy: boolean;
+  readOnly: boolean;
+
   customServerShow: boolean;
   customServerUri: string;
   customServerChainName: 'main' | 'test' | 'regtest';

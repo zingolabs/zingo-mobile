@@ -10,8 +10,8 @@ describe('Renders wallet data correctly.', () => {
     await element(by.text('SEND')).tap();
     
     await element(by.id('send.scan-button')).tap();
-    await expect(element(by.id('send.scan.cancel'))).toBeVisible();
-    await element(by.id('send.scan.cancel')).tap();
+    await expect(element(by.id('scan.cancel'))).toBeVisible();
+    await element(by.id('scan.cancel')).tap();
   });
   
   it('adds return address to the memo if that option is selected, and correctly renders confirm screen', async () => {

@@ -6,7 +6,7 @@ import {
   DimensionsType,
   InfoType,
   TotalBalanceClass,
-  WalletSeedType,
+  WalletType,
   zecPriceType,
   BackgroundType,
   NetInfoType,
@@ -24,7 +24,7 @@ export const defaultAppStateLoading: AppStateLoading = {
   screen: 0,
   actionButtonsDisabled: false,
   walletExists: false,
-  walletSeed: {} as WalletSeedType,
+  wallet: {} as WalletType,
   totalBalance: new TotalBalanceClass(),
   info: {} as InfoType,
 
@@ -45,6 +45,8 @@ export const defaultAppStateLoading: AppStateLoading = {
   translate: () => '',
   backgroundError: {} as BackgroundErrorType,
   privacy: false,
+  readOnly: false,
+
   customServerShow: false,
   customServerUri: '',
   customServerChainName: 'main',

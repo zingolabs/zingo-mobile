@@ -1,17 +1,12 @@
-/* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import QRCodeScanner from 'react-native-qrcode-scanner';
-import { View, SafeAreaView } from 'react-native';
 import Toast from 'react-native-simple-toast';
 
-import RegText from '../../Components/RegText';
-import Button from '../../Components/Button';
-import { useTheme } from '@react-navigation/native';
 import { parseZcashURI } from '../../../app/uris';
 import RPCModule from '../../../app/RPCModule';
 import { ContextAppLoaded } from '../../../app/context';
 import { BarCodeReadEvent } from 'react-native-camera';
 import { RPCParseAddressType } from '../../../app/rpc/types/RPCParseAddressType';
+import Scanner from '../../Components/Scanner';
 
 type ScannerAddressProps = {
   updateToField: (
@@ -26,7 +21,7 @@ type ScannerAddressProps = {
 
 const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateToField, closeModal }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, netInfo } = context;
+  const { translate, netInfo, server } = context;
   const validateAddress = async (scannedAddress: string) => {
     if (!netInfo.isConnected) {
       Toast.show(translate('loadedapp.connection-error') as string, Toast.LONG);
@@ -47,7 +42,7 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateTo
 
     //console.log('parse-1', scannedAddress, resultJSON);
 
-    const valid = resultJSON.status === 'success';
+    const valid = resultJSON.status === 'success' && server.chain_name === resultJSON.chain_name;
 
     if (valid) {
       updateToField(scannedAddress, null, null, null, null);
@@ -55,7 +50,7 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateTo
     } else {
       // Try to parse as a URI
       if (scannedAddress.startsWith('zcash:')) {
-        const target = await parseZcashURI(scannedAddress, translate);
+        const target = await parseZcashURI(scannedAddress, translate, server);
 
         if (typeof target !== 'string') {
           updateToField(scannedAddress, null, null, null, null);
@@ -65,7 +60,7 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateTo
           return;
         }
       } else {
-        Toast.show(`"${scannedAddress}" ${translate('scanner.nozcash-error')}`, Toast.LONG);
+        Toast.show(`${translate('scanner.nozcash-error')}`, Toast.LONG);
         return;
       }
     }
@@ -73,53 +68,21 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateTo
 
   const onRead = (e: BarCodeReadEvent) => {
     const scandata = e.data.trim();
-    let scannedAddress = scandata;
 
-    validateAddress(scannedAddress);
+    validateAddress(scandata);
   };
 
   const doCancel = () => {
     closeModal();
   };
 
-  const { colors } = useTheme();
   return (
-    <SafeAreaView
-      style={{
-        width: '100%',
-        height: '100%',
-      }}>
-      <QRCodeScanner
-        showMarker={true}
-        onRead={onRead}
-        reactivate={true}
-        containerStyle={{
-          backgroundColor: colors.background,
-        }}
-        cameraContainerStyle={{
-          overflow: 'hidden',
-        }}
-        topContent={
-          <View>
-            <View>
-              <RegText>{translate('scanner.scanaddress') as string}</RegText>
-            </View>
-          </View>
-        }
-        bottomContent={
-          <View>
-            <View>
-              <Button
-                testID="send.scan.cancel"
-                type="Secondary"
-                title={translate('cancel') as string}
-                onPress={doCancel}
-              />
-            </View>
-          </View>
-        }
-      />
-    </SafeAreaView>
+    <Scanner
+      onRead={onRead}
+      doCancel={doCancel}
+      title={translate('scanner.scanaddress') as string}
+      button={translate('cancel') as string}
+    />
   );
 };
 
