@@ -1440,6 +1440,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                         setZecPrice={this.setZecPrice}
                         setBackgroundError={this.setBackgroundError}
                         set_privacy_option={this.set_privacy_option}
+                        setPoolsToShieldSelectSapling={this.setPoolsToShieldSelectSapling}
+                        setPoolsToShieldSelectTransparent={this.setPoolsToShieldSelectTransparent}
                       />
                     </Suspense>
                   </>
