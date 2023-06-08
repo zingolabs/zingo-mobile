@@ -71,14 +71,14 @@ The first run may take a long time to download the `x86` and `x86_64` system ima
 Alternatively, to run gradle managed devices integration tests. From the root directory, run:
 `./scripts/integration_tests_gradle.sh`
 
-### e2e Tests
-1) build rust + typescript + kotlin. requires docker
-   `./scripts/build_apk.sh`
+### e2e Tests with Detox
+0. build to step 3.
 
-2) choose a build target to run against. currently works against x86 and x86_64. download and create emulator with sdkmanager.
+1. choose a build target to run against. currently works against x86 and x86_64. download and create emulator with sdkmanager.
    `./scripts/flow_emulator_setup.sh -a x86`
-if you already have the emulator created, you can target it without recreating it: `./scripts/emulator_target -a x86_64`
+if you already have the emulator created, you can target it without recreating it: `./scripts/emulator_target.sh -a x86_64`
 
-3) start yarn react-native (node) server and run yarn detox
-   `./scripts/flow_test_e2e.sh ALL`
-or to run a specific test: `./scripts/flow_test_e2e.sh new_wallet`
+2. `yarn detox build -c android.emu.x86`
+
+3. `yarn detox test -c android.emu.x86`
+or to run a specific test: `yarn detox test -c android.emu.x86 new_wallet`
