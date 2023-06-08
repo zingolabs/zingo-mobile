@@ -356,6 +356,7 @@ exports[`Component PrivKey - test PrivKey Private - snapshot 1`] = `
               "color": "rgb(0, 122, 255)",
               "fontSize": 16,
               "fontWeight": "bold",
+              "textAlign": "center",
               "textTransform": "uppercase",
             }
           }
@@ -724,6 +725,7 @@ exports[`Component PrivKey - test PrivKey View - snapshot 1`] = `
               "color": "rgb(0, 122, 255)",
               "fontSize": 16,
               "fontWeight": "bold",
+              "textAlign": "center",
               "textTransform": "uppercase",
             }
           }

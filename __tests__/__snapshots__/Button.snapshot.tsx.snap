@@ -55,6 +55,7 @@ exports[`Component Button - test Button Primary - snapshot 1`] = `
           "color": "rgb(242, 242, 242)",
           "fontSize": 16,
           "fontWeight": "bold",
+          "textAlign": "center",
           "textTransform": "uppercase",
         }
       }
@@ -120,6 +121,7 @@ exports[`Component Button - test Button Secondary - snapshot 1`] = `
           "color": "rgb(0, 122, 255)",
           "fontSize": 16,
           "fontWeight": "bold",
+          "textAlign": "center",
           "textTransform": "uppercase",
         }
       }
