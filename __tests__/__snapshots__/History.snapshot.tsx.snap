@@ -54,6 +54,7 @@ exports[`Component Transactions - test Transactions - snapshot 1`] = `
           "flexDirection": "row",
           "justifyContent": "center",
           "margin": 0,
+          "marginTop": 0,
         }
       }
     >
@@ -222,7 +223,6 @@ exports[`Component Transactions - test Transactions - snapshot 1`] = `
     <View
       style={
         {
-          "backgroundColor": "rgb(255, 255, 255)",
           "left": 0,
           "padding": 10,
           "position": "absolute",
