@@ -210,7 +210,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             margin: 0,
           }}>
           <ZecAmount
-            currencyName={info.currencyName}
+            currencyName={info.currencyName ? info.currencyName : ''}
             color={balanceColor}
             size={36}
             amtZec={totalBalance.total}

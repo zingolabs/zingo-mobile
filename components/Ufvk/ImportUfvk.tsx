@@ -84,7 +84,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
     } else {
       setCurrencyName('ZEC');
     }
-  }, [info.currencyName, currencyName]);
+  }, [info.currencyName]);
 
   const okButton = async () => {
     if (!netInfo.isConnected) {
