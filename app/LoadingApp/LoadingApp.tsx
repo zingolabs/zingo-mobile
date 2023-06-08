@@ -82,7 +82,6 @@ export default function LoadingApp(props: LoadingAppProps) {
 
   useEffect(() => {
     (async () => {
-      console.log('*************** useEffect set I18n');
       // fallback if no available language fits
       const fallback = { languageTag: 'en', isRTL: false };
 
@@ -117,10 +116,10 @@ export default function LoadingApp(props: LoadingAppProps) {
       }
       if (settings.server) {
         setServer(settings.server);
-        console.log('settings', settings.server);
+        //console.log('settings', settings.server);
       } else {
         await SettingsFileImpl.writeSettings('server', server);
-        console.log('NO settings', settings.server);
+        //console.log('NO settings', settings.server);
       }
       if (settings.sendAll) {
         setSendAll(settings.sendAll);
@@ -146,7 +145,7 @@ export default function LoadingApp(props: LoadingAppProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  console.log('render loadingApp - 2');
+  //console.log('render loadingApp - 2');
 
   if (loading) {
     return null;
@@ -233,7 +232,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
     await AsyncStorage.setItem('@background', 'no');
     setTimeout(async () => {
       const exists = await RPCModule.walletExists();
-      console.log('Wallet Exists result', exists, this.state.server);
+      //console.log('Wallet Exists result', exists, this.state.server);
 
       if (exists && exists !== 'false') {
         this.setState({ walletExists: true });
@@ -244,11 +243,11 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
             // this warning is not an error, bypassing...
             result = 'OK';
           }
-          console.log('Load Wallet Exists result', result);
+          //console.log('Load Wallet Exists result', result);
           if (result && !result.toLowerCase().startsWith('error')) {
             // Load the wallet and navigate to the transactions screen
             const walletKindStr: string = await RPCModule.execute('wallet_kind', '');
-            console.log(walletKindStr);
+            //console.log(walletKindStr);
             const walletKindJSON: RPCWalletKindType = await JSON.parse(walletKindStr);
             this.setState({
               readOnly: walletKindJSON.kind === 'Seeded' ? false : true,
@@ -267,7 +266,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
           Toast.show(this.props.translate('loadedapp.connection-error') as string, Toast.LONG);
         }
       } else {
-        console.log('Loading new wallet');
+        //console.log('Loading new wallet');
         this.setState({ screen: 1, walletExists: false });
       }
     });
@@ -479,8 +478,8 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
           result = 'ok';
         }
       }
-      console.log(seed_ufvk);
-      console.log(result);
+      //console.log(seed_ufvk);
+      //console.log(result);
       if (result && !result.toLowerCase().startsWith('error')) {
         this.setState({ actionButtonsDisabled: false, readOnly: type === 'seed' ? false : true });
         this.navigateToLoaded();
@@ -519,7 +518,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
     const { translate } = this.props;
     const { colors } = this.props.theme;
 
-    console.log('render loadingAppClass - 3', server);
+    //console.log('render loadingAppClass - 3', server);
 
     return (
       <ContextAppLoadingProvider value={this.state}>
@@ -554,6 +553,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                   position: 'absolute',
                   top: 0,
                   right: 0,
+                  zIndex: 999,
                 }}>
                 <OptionsMenu
                   customButton={<FontAwesomeIcon icon={faEllipsisV} color={'#ffffff'} size={48} />}

@@ -31,7 +31,6 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
   const [qrcodeModalVisible, setQrcodeModalVisible] = useState(false);
   const [titleViewHeight, setTitleViewHeight] = useState(0);
   const [latestBlock, setLatestBlock] = useState(0);
-  const [currencyName, setCurrencyName] = useState('');
 
   const slideAnim = useRef(new Animated.Value(0)).current;
 
@@ -75,17 +74,6 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
     }
   }, [info.latestBlock, latestBlock, server]);
 
-  useEffect(() => {
-    // TODO: Here I assume this value is undefined because the App
-    // doesn't connect to the server yet. We need to change that in some
-    // future. It's not an easy task right now.
-    if (info.currencyName) {
-      setCurrencyName(info.currencyName);
-    } else {
-      setCurrencyName('ZEC');
-    }
-  }, [info.currencyName]);
-
   const okButton = async () => {
     if (!netInfo.isConnected) {
       Toast.show(translate('loadedapp.connection-error') as string, Toast.LONG);
@@ -103,7 +91,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const validateKey = async (scannedKey: string): Promise<boolean> => {
     const result: string = await RPCModule.execute('parse_viewkey', scannedKey);
-    console.log(result);
+    //console.log(result);
     if (result) {
       if (result.toLowerCase().startsWith('error')) {
         Toast.show(`${translate('scanner.noviewkey-error')}`, Toast.LONG);
@@ -116,7 +104,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
     // TODO verify that JSON don't fail.
     const resultJSON: RPCParseViewKeyType = await JSON.parse(result);
 
-    console.log('parse ufvk', scannedKey, resultJSON, currencyName);
+    //console.log('parse ufvk', scannedKey, resultJSON);
 
     const valid = resultJSON.status === 'success' && resultJSON.chain_name === server.chain_name;
 

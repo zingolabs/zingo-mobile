@@ -707,9 +707,9 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
   fetchWallet = async () => {
     const wallet = await RPC.rpc_fetchWallet(this.state.readOnly);
-    console.log(wallet, this.state.readOnly);
+    //console.log(wallet, this.state.readOnly);
     if (!isEqual(this.state.wallet, wallet)) {
-      console.log('fetch wallet seed or Viewing Key & birthday');
+      //console.log('fetch wallet seed or Viewing Key & birthday');
       this.setState({ wallet });
     }
   };
@@ -796,10 +796,10 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
         // this warning is not an error, bypassing...
         result = 'OK';
       }
-      console.log(result);
+      //console.log(result);
       if (result && !result.toLowerCase().startsWith('error')) {
         // Load the wallet and navigate to the transactions screen
-        console.log(`wallet loaded ok ${value.uri}`);
+        //console.log(`wallet loaded ok ${value.uri}`);
         if (toast) {
           Toast.show(`${this.props.translate('loadedapp.readingwallet')} ${value.uri}`, Toast.LONG);
         }
@@ -1076,7 +1076,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       return <FontAwesomeIcon icon={iconName} color={iconColor} />;
     };
 
-    console.log('render LoadedAppClass - 3');
+    //console.log('render LoadedAppClass - 3');
 
     return (
       <ContextAppLoadedProvider value={this.state}>
