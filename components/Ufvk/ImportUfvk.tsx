@@ -83,7 +83,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
     //if (!valid) {
     //  return;
     //}
-    onClickOK(privKeyText, Number(birthday));
+    onClickOK(privKeyText.trim(), Number(birthday));
   };
 
   // zingolib interfase have no way to initialize a `lightclient` with no action associated...

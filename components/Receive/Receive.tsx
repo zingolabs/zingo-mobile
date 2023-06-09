@@ -25,9 +25,15 @@ type ReceiveProps = {
     name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
     value: boolean,
   ) => Promise<void>;
+  setUfvkViewModalVisible?: (v: boolean) => void;
 };
 
-const Receive: React.FunctionComponent<ReceiveProps> = ({ setUaAddress, toggleMenuDrawer, set_privacy_option }) => {
+const Receive: React.FunctionComponent<ReceiveProps> = ({
+  setUaAddress,
+  toggleMenuDrawer,
+  set_privacy_option,
+  setUfvkViewModalVisible,
+}) => {
   const context = useContext(ContextAppLoaded);
   const { translate, dimensions, addresses, uaAddress } = context;
   const { colors } = useTheme() as unknown as ThemeType;
@@ -358,6 +364,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({ setUaAddress, toggleMe
           noBalance={true}
           noSyncingStatus={true}
           set_privacy_option={set_privacy_option}
+          setUfvkViewModalVisible={setUfvkViewModalVisible}
         />
 
         <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', right: 0 }}>

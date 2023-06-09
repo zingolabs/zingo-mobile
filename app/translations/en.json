@@ -378,7 +378,7 @@
     "title": "Viewing Key",
     "key-label": "Enter the Unified Full Viewing key",
     "birthday": "Key Birthday",
-    "text": "Restoring from viewing key requires a rescan, and make take a long time to complete.",
+    "text": "Restoring from viewing key requires a rescan, and may take a long time to complete.",
     "button": "Restore Wallet",
     "key-acc": "Key Field",
     "birthday-acc": "Birthday Field"

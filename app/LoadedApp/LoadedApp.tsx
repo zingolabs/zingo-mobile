@@ -485,6 +485,10 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     this.setState({ errorModalData });
   };
 
+  setUfvkViewModalVisible = (value: boolean) => {
+    this.setState({ ufvkViewModalVisible: value });
+  };
+
   setPoolsToShieldSelectSapling = (value: boolean) => {
     this.setState({ poolsToShieldSelectSapling: value });
   };
@@ -1413,6 +1417,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                       set_privacy_option={this.set_privacy_option}
                       setPoolsToShieldSelectSapling={this.setPoolsToShieldSelectSapling}
                       setPoolsToShieldSelectTransparent={this.setPoolsToShieldSelectTransparent}
+                      setUfvkViewModalVisible={this.setUfvkViewModalVisible}
                     />
                   </Suspense>
                 </>
@@ -1442,6 +1447,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                         set_privacy_option={this.set_privacy_option}
                         setPoolsToShieldSelectSapling={this.setPoolsToShieldSelectSapling}
                         setPoolsToShieldSelectTransparent={this.setPoolsToShieldSelectTransparent}
+                        setUfvkViewModalVisible={this.setUfvkViewModalVisible}
                       />
                     </Suspense>
                   </>
@@ -1461,6 +1467,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                       setUaAddress={this.setUaAddress}
                       toggleMenuDrawer={this.toggleMenuDrawer}
                       set_privacy_option={this.set_privacy_option}
+                      setUfvkViewModalVisible={this.setUfvkViewModalVisible}
                     />
                   </Suspense>
                 </>
