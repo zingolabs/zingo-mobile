@@ -106,7 +106,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
 
   const balanceColor = colors.text;
 
-  const showShieldButton = totalBalance && (totalBalance.transparentBal > 0 || totalBalance.privateBal > 0);
+  const showShieldButton =
+    !readOnly && totalBalance && (totalBalance.transparentBal > 0 || totalBalance.privateBal > 0);
 
   let poolsToShield: '' | 'all' | 'transparent' | 'sapling' = '';
 
