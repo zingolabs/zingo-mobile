@@ -50,6 +50,7 @@ type HeaderProps = {
   ) => Promise<void>;
   setPoolsToShieldSelectSapling?: (v: boolean) => void;
   setPoolsToShieldSelectTransparent?: (v: boolean) => void;
+  setUfvkViewModalVisible?: (v: boolean) => void;
 };
 
 const Header: React.FunctionComponent<HeaderProps> = ({
@@ -71,6 +72,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   set_privacy_option,
   setPoolsToShieldSelectSapling,
   setPoolsToShieldSelectTransparent,
+  setUfvkViewModalVisible,
 }) => {
   const context = useContext(ContextAppLoaded);
   const {
@@ -421,7 +423,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       </View>
 
       <View style={{ padding: 10, position: 'absolute', left: 0 }}>
-        <View style={{ width: 48, alignItems: 'center' }}>
+        <View style={{ alignItems: 'center' }}>
           {!noDrawMenu && (
             <TouchableOpacity
               style={{ marginBottom: 5 }}
@@ -433,9 +435,15 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             </TouchableOpacity>
           )}
           {readOnly && (
-            <TouchableOpacity onPress={() => null}>
-              <FontAwesomeIcon icon={faSnowflake} size={48} color={colors.zingo} />
-            </TouchableOpacity>
+            <>
+              {setUfvkViewModalVisible ? (
+                <TouchableOpacity onPress={() => setUfvkViewModalVisible(true)}>
+                  <FontAwesomeIcon icon={faSnowflake} size={48} color={colors.zingo} />
+                </TouchableOpacity>
+              ) : (
+                <FontAwesomeIcon icon={faSnowflake} size={24} color={colors.zingo} />
+              )}
+            </>
           )}
         </View>
       </View>

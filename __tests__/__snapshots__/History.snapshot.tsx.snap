@@ -233,7 +233,6 @@ exports[`Component Transactions - test Transactions - snapshot 1`] = `
         style={
           {
             "alignItems": "center",
-            "width": 48,
           }
         }
       >

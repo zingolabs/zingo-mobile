@@ -97,7 +97,6 @@ exports[`Component PrivKey - test PrivKey Private - snapshot 1`] = `
         style={
           {
             "alignItems": "center",
-            "width": 48,
           }
         }
       />
@@ -465,7 +464,6 @@ exports[`Component PrivKey - test PrivKey View - snapshot 1`] = `
         style={
           {
             "alignItems": "center",
-            "width": 48,
           }
         }
       />

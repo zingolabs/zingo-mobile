@@ -28,6 +28,7 @@ type HistoryProps = {
   ) => Promise<void>;
   setPoolsToShieldSelectSapling: (v: boolean) => void;
   setPoolsToShieldSelectTransparent: (v: boolean) => void;
+  setUfvkViewModalVisible?: (v: boolean) => void;
 };
 
 const History: React.FunctionComponent<HistoryProps> = ({
@@ -41,6 +42,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
   set_privacy_option,
   setPoolsToShieldSelectSapling,
   setPoolsToShieldSelectTransparent,
+  setUfvkViewModalVisible,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, transactions, language } = context;
@@ -100,6 +102,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
         set_privacy_option={set_privacy_option}
         setPoolsToShieldSelectSapling={setPoolsToShieldSelectSapling}
         setPoolsToShieldSelectTransparent={setPoolsToShieldSelectTransparent}
+        setUfvkViewModalVisible={setUfvkViewModalVisible}
       />
 
       <ScrollView

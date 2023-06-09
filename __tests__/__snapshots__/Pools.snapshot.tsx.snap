@@ -97,7 +97,6 @@ exports[`Component Info - test Matches the snapshot Info 1`] = `
         style={
           {
             "alignItems": "center",
-            "width": 48,
           }
         }
       />

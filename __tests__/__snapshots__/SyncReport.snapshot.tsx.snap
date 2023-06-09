@@ -97,7 +97,6 @@ exports[`Component SyncReport - test Matches the snapshot SyncReport 1`] = `
         style={
           {
             "alignItems": "center",
-            "width": 48,
           }
         }
       />
