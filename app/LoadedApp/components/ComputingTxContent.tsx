@@ -47,7 +47,7 @@ const ComputingTxContent: React.FunctionComponent = () => {
               !!syncingStatusReport.lastBlockServer && <ActivityIndicator size="large" color={colors.primary} />}
           </>
         )}
-        {!(__DEV__ && progress && progress.sendInProgress) && (
+        {__DEV__ && !(progress && progress.sendInProgress) && (
           <>
             {syncingStatusReport.inProgress && syncingStatusReport.currentBatch > 0 && (
               <FadeText>
