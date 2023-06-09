@@ -423,7 +423,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       </View>
 
       <View style={{ padding: 10, position: 'absolute', left: 0 }}>
-        <View style={{ width: 48, alignItems: 'center' }}>
+        <View style={{ alignItems: 'center' }}>
           {!noDrawMenu && (
             <TouchableOpacity
               style={{ marginBottom: 5 }}
@@ -441,7 +441,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   <FontAwesomeIcon icon={faSnowflake} size={48} color={colors.zingo} />
                 </TouchableOpacity>
               ) : (
-                <FontAwesomeIcon icon={faSnowflake} size={48} color={colors.zingo} />
+                <FontAwesomeIcon icon={faSnowflake} size={24} color={colors.zingo} />
               )}
             </>
           )}

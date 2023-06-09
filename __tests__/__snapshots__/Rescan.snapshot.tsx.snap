@@ -97,7 +97,6 @@ exports[`Component Rescan - test Rescan - snapshot 1`] = `
         style={
           {
             "alignItems": "center",
-            "width": 48,
           }
         }
       />

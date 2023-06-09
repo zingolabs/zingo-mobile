@@ -46,7 +46,6 @@ type SendProps = {
   ) => Promise<void>;
   setPoolsToShieldSelectSapling: (v: boolean) => void;
   setPoolsToShieldSelectTransparent: (v: boolean) => void;
-  setUfvkViewModalVisible?: (v: boolean) => void;
 };
 
 const Send: React.FunctionComponent<SendProps> = ({
@@ -63,7 +62,6 @@ const Send: React.FunctionComponent<SendProps> = ({
   set_privacy_option,
   setPoolsToShieldSelectSapling,
   setPoolsToShieldSelectTransparent,
-  setUfvkViewModalVisible,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, info, totalBalance, sendPageState, navigation, zecPrice, sendAll, netInfo, privacy, server } =
@@ -449,7 +447,6 @@ const Send: React.FunctionComponent<SendProps> = ({
             set_privacy_option={set_privacy_option}
             setPoolsToShieldSelectSapling={setPoolsToShieldSelectSapling}
             setPoolsToShieldSelectTransparent={setPoolsToShieldSelectTransparent}
-            setUfvkViewModalVisible={setUfvkViewModalVisible}
           />
         </View>
       </Animated.View>

@@ -485,7 +485,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     this.setState({ errorModalData });
   };
 
-  setUfvkViewModalVisible = (value: boolean) => {
+  setUfvkViewModalVisible = async (value: boolean) => {
+    await this.fetchWallet();
     this.setState({ ufvkViewModalVisible: value });
   };
 
@@ -1447,7 +1448,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                         set_privacy_option={this.set_privacy_option}
                         setPoolsToShieldSelectSapling={this.setPoolsToShieldSelectSapling}
                         setPoolsToShieldSelectTransparent={this.setPoolsToShieldSelectTransparent}
-                        setUfvkViewModalVisible={this.setUfvkViewModalVisible}
                       />
                     </Suspense>
                   </>

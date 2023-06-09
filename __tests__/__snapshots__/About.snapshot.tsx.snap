@@ -97,7 +97,6 @@ exports[`Component About - test About - snapshot 1`] = `
         style={
           {
             "alignItems": "center",
-            "width": 48,
           }
         }
       />
