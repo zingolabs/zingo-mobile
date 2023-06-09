@@ -240,6 +240,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         //console.log('new', new_chain_name, 'old', chain_name);
         if (new_chain_name && new_chain_name !== chain_name) {
           same_server_chain_name = false;
+          Toast.show(translate('loadedapp.differentchain-error') as string, Toast.LONG);
         }
       }
     }
