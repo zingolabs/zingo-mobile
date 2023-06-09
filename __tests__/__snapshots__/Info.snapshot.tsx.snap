@@ -419,6 +419,7 @@ exports[`Component Info - test Matches the snapshot Info 1`] = `
               "color": "rgb(0, 122, 255)",
               "fontSize": 16,
               "fontWeight": "bold",
+              "textAlign": "center",
               "textTransform": "uppercase",
             }
           }

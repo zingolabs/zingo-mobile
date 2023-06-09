@@ -26,10 +26,10 @@
   "loadingapp": {
     "actualserver": "Actual server:",
     "changeserver": "CHANGE SERVER",
-    "createnewwallet": "Create New Wallet (new seed)",
+    "createnewwallet": "Create New Wallet\n(new seed)",
     "opencurrentwallet": "Open Current Wallet",
-    "restorewalletseed": "Restore wallet from Seed",
-    "restorewalletufvk": "Restore wallet from Viewing Key",
+    "restorewalletseed": "Restore wallet\nfrom Seed",
+    "restorewalletufvk": "Restore wallet from\nViewing Key",
     "creatingwallet-label": "Error creating Wallet",
     "readingwallet-label": "Error reading Wallet",
     "invalidseed-label": "Invalid Seed Phrase",

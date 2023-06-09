@@ -1363,6 +1363,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               "color": "rgb(242, 242, 242)",
               "fontSize": 16,
               "fontWeight": "bold",
+              "textAlign": "center",
               "textTransform": "uppercase",
             }
           }
@@ -1421,6 +1422,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               "color": "rgb(0, 122, 255)",
               "fontSize": 16,
               "fontWeight": "bold",
+              "textAlign": "center",
               "textTransform": "uppercase",
             }
           }
