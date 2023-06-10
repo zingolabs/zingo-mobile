@@ -13,7 +13,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme } from '@react-navigation/native';
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { DimensionsType, NetInfoType, TranslateType } from '../../app/AppState';
 import { ContextAppLoaded } from '../../app/context';
@@ -27,6 +27,7 @@ import Button from '../Components/Button';
 import RPC from '../../app/rpc';
 import { RPCShieldType } from '../../app/rpc/types/RPCShieldType';
 import { createAlert } from '../../app/createAlert';
+import { Animated } from 'react-native';
 
 type HeaderProps = {
   poolsMoreInfoOnClick?: () => void;
@@ -105,6 +106,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   }
 
   const { colors } = useTheme() as unknown as ThemeType;
+  const opacityValue = useRef(new Animated.Value(1)).current;
 
   const balanceColor = colors.text;
 
@@ -185,6 +187,38 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       await RPC.rpc_setInterruptSyncAfterBatch('false');
     }
   };
+
+  useEffect(() => {
+    const animation = Animated.loop(
+      Animated.sequence([
+        Animated.delay(2000),
+        Animated.timing(opacityValue, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(opacityValue, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+      ]),
+    );
+    if (!noSyncingStatus) {
+      if (syncingStatus.inProgress) {
+        animation.start();
+      } else {
+        animation.stop();
+      }
+    }
+
+    return () => {
+      if (!noSyncingStatus) {
+        animation.stop();
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [syncingStatus.inProgress, noSyncingStatus]);
 
   //console.log('render header');
 
@@ -407,9 +441,11 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   </TouchableOpacity>
                 )}
                 {syncingStatus.inProgress && (
-                  <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
-                    <FontAwesomeIcon icon={faPlay} color={colors.primary} size={17} />
-                  </TouchableOpacity>
+                  <Animated.View style={{ opacity: opacityValue }}>
+                    <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
+                      <FontAwesomeIcon icon={faPlay} color={colors.syncing} size={17} />
+                    </TouchableOpacity>
+                  </Animated.View>
                 )}
               </View>
             )}
