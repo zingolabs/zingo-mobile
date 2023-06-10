@@ -201,7 +201,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       }}>
       <Image
         source={require('../../assets/img/logobig-zingo.png')}
-        style={{ width: 80, height: 80, resizeMode: 'contain' }}
+        style={{ width: 80, height: 80, resizeMode: 'contain', borderRadius: 10 }}
       />
       {noBalance && <View style={{ height: 20 }} />}
       {!noBalance && (

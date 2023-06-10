@@ -33,6 +33,7 @@ exports[`Component Info - test Matches the snapshot Info 1`] = `
       }
       style={
         {
+          "borderRadius": 10,
           "height": 80,
           "resizeMode": "contain",
           "width": 80,

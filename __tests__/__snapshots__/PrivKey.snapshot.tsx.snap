@@ -33,6 +33,7 @@ exports[`Component PrivKey - test PrivKey Private - snapshot 1`] = `
       }
       style={
         {
+          "borderRadius": 10,
           "height": 80,
           "resizeMode": "contain",
           "width": 80,
@@ -401,6 +402,7 @@ exports[`Component PrivKey - test PrivKey View - snapshot 1`] = `
       }
       style={
         {
+          "borderRadius": 10,
           "height": 80,
           "resizeMode": "contain",
           "width": 80,
