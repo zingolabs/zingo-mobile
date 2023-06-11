@@ -164,7 +164,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
   //console.log(maxBlocks, labels, points);
   //console.log('report', background.batches, background.date, Number(background.date).toFixed(0));
 
-  console.log('render sync report - 5', syncingStatus);
+  //console.log('render sync report - 5', syncingStatus);
 
   return (
     <SafeAreaView
