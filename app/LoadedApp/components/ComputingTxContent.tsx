@@ -12,7 +12,7 @@ import FadeText from '../../../components/Components/FadeText';
 
 const ComputingTxContent: React.FunctionComponent = () => {
   const context = useContext(ContextAppLoaded);
-  const { sendProgress: progress, translate, syncingStatusReport } = context;
+  const { sendProgress: progress, translate, syncingStatus } = context;
   const { colors } = useTheme() as unknown as ThemeType;
 
   return (
@@ -42,31 +42,29 @@ const ComputingTxContent: React.FunctionComponent = () => {
         {!(progress && progress.sendInProgress) && (
           <>
             <RegText>{translate('loadedapp.syncing') as string}</RegText>
-            {syncingStatusReport.inProgress &&
-              syncingStatusReport.currentBlock > 0 &&
-              !!syncingStatusReport.lastBlockServer && <ActivityIndicator size="large" color={colors.primary} />}
+            {syncingStatus.inProgress && syncingStatus.currentBlock > 0 && !!syncingStatus.lastBlockServer && (
+              <ActivityIndicator size="large" color={colors.primary} />
+            )}
           </>
         )}
         {__DEV__ && !(progress && progress.sendInProgress) && (
           <>
-            {syncingStatusReport.inProgress && syncingStatusReport.currentBatch > 0 && (
+            {syncingStatus.inProgress && syncingStatus.currentBatch > 0 && (
               <FadeText>
                 {(translate('report.processingbatch') as string) +
-                  syncingStatusReport.currentBatch +
+                  syncingStatus.currentBatch +
                   (translate('report.totalbatches') as string) +
-                  syncingStatusReport.totalBatches}
+                  syncingStatus.totalBatches}
               </FadeText>
             )}
-            {syncingStatusReport.inProgress &&
-              syncingStatusReport.currentBlock > 0 &&
-              !!syncingStatusReport.lastBlockServer && (
-                <FadeText>
-                  {(translate('report.processingblock') as string) +
-                    syncingStatusReport.currentBlock +
-                    (translate('report.totalblocks') as string) +
-                    syncingStatusReport.lastBlockServer}
-                </FadeText>
-              )}
+            {syncingStatus.inProgress && syncingStatus.currentBlock > 0 && !!syncingStatus.lastBlockServer && (
+              <FadeText>
+                {(translate('report.processingblock') as string) +
+                  syncingStatus.currentBlock +
+                  (translate('report.totalblocks') as string) +
+                  syncingStatus.lastBlockServer}
+              </FadeText>
+            )}
           </>
         )}
         {!(progress && progress.sendInProgress) && <RegText>{translate('wait') as string}</RegText>}

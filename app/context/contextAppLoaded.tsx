@@ -3,7 +3,7 @@ import { StackScreenProps } from '@react-navigation/stack';
 
 import {
   AppStateLoaded,
-  SyncingStatusReportClass,
+  SyncingStatusClass,
   TotalBalanceClass,
   ReceivePageStateClass,
   ErrorModalDataClass,
@@ -11,7 +11,6 @@ import {
   WalletSettingsClass,
   TransactionType,
   InfoType,
-  SyncingStatusType,
   WalletType,
   DimensionsType,
   AddressClass,
@@ -32,7 +31,7 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   appState: '',
   netInfo: {} as NetInfoType,
 
-  syncingStatusReport: new SyncingStatusReportClass(),
+  syncingStatus: new SyncingStatusClass(),
   totalBalance: new TotalBalanceClass(),
   addressPrivateKeys: new Map(),
   addresses: [] as AddressClass[],
@@ -42,7 +41,6 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   receivePageState: new ReceivePageStateClass(''),
   info: {} as InfoType,
   walletSettings: new WalletSettingsClass(),
-  syncingStatus: {} as SyncingStatusType,
   errorModalData: new ErrorModalDataClass('', ''),
   sendProgress: new SendProgressClass(0, 0, 0),
   wallet: {} as WalletType,

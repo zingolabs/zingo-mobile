@@ -354,6 +354,7 @@
     "title": "Informe de Sincronización",
     "running": "Ejecutando",
     "finished": "Finalizado",
+    "paused": "Pausado",
     "server-title": "SERVIDOR: ",
     "blocks": " Bloques. ",
     "wallet": "Monedero: ",

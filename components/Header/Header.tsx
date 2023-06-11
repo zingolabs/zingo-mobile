@@ -4,12 +4,13 @@ import {
   faCheck,
   faInfoCircle,
   faPlay,
-  faStop,
+  faPause,
   faCloudDownload,
   faLockOpen,
   faLock,
   faSnowflake,
   faXmark,
+  faWifi,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme } from '@react-navigation/native';
@@ -416,7 +417,10 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         </View>
         {!noSyncingStatus && (
           <>
-            {netInfo.isConnected && (
+            {netInfo.isConnected &&
+            !!syncingStatus.lastBlockServer &&
+            !!syncingStatus.syncID &&
+            syncingStatus.syncID >= 0 ? (
               <View
                 style={{
                   alignItems: 'center',
@@ -430,14 +434,14 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   minWidth: 25,
                   minHeight: 25,
                 }}>
-                {!syncingStatus.inProgress && syncingStatus.synced && (
+                {!syncingStatus.inProgress && syncingStatus.lastBlockServer === syncingStatus.lastBlockWallet && (
                   <View style={{ margin: 0, padding: 0 }}>
                     <FontAwesomeIcon icon={faCheck} color={colors.primary} size={20} />
                   </View>
                 )}
-                {!syncingStatus.inProgress && !syncingStatus.synced && (
+                {!syncingStatus.inProgress && syncingStatus.lastBlockServer !== syncingStatus.lastBlockWallet && (
                   <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
-                    <FontAwesomeIcon icon={faStop} color={colors.zingo} size={17} />
+                    <FontAwesomeIcon icon={faPause} color={colors.zingo} size={17} />
                   </TouchableOpacity>
                 )}
                 {syncingStatus.inProgress && (
@@ -447,6 +451,24 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                     </TouchableOpacity>
                   </Animated.View>
                 )}
+              </View>
+            ) : (
+              <View
+                style={{
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: 0,
+                  marginRight: 5,
+                  padding: 1,
+                  borderColor: colors.primaryDisabled,
+                  borderWidth: 1,
+                  borderRadius: 10,
+                  minWidth: 25,
+                  minHeight: 25,
+                }}>
+                <View style={{ margin: 0, padding: 0 }}>
+                  <FontAwesomeIcon icon={faWifi} color={colors.primaryDisabled} size={18} />
+                </View>
               </View>
             )}
             {(!netInfo.isConnected || netInfo.type === NetInfoStateType.cellular || netInfo.isConnectionExpensive) && (
