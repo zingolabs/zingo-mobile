@@ -54,7 +54,7 @@
     "changeservernew-error": "Error trying to change the server to the new one: ",
     "readingwallet-error": "Error trying to read the wallet with the new server:",
     "changeserverold-error": "Error trying to change the server to the old one: ",
-    "differentchain-error": "You are changing to a server with different chain, you will no longer have access to this wallet without the seed phrase.",
+    "differentchain-error": "You are changing to a server with a different chain, you will no longer have access to this wallet without the seed phrase.",
     "changingwallet-label": "Error changing Wallet",
     "restoringwallet-label": "Error restoring Wallet",
     "computingtx": "Computing Transaction",
