@@ -115,8 +115,11 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, set_privac
       let amounts: { value: number; address: string; tag: string }[] = [];
       const resultJSONEntries: [string, number][] = Object.entries(resultJSON) as [string, number][];
       resultJSONEntries.forEach(([key, value]) => {
-        if (value > 0) {
-          amounts.push({ value: tab === 'sent' ? value / 10 ** 8 : value, address: key, tag: '' });
+        if (!(tab !== 'sent' && key === 'fee')) {
+          // excluding the fee for `sends` and `memobytes`.
+          if (value > 0) {
+            amounts.push({ value: tab === 'sent' ? value / 10 ** 8 : value, address: key, tag: '' });
+          }
         }
       });
       const randomColors = Utils.generateColorList(amounts.length);
