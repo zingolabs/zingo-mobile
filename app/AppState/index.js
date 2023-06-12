@@ -5,7 +5,7 @@ import ReceivePageStateClass from './classes/ReceivePageStateClass';
 import SendPageStateClass from './classes/SendPageStateClass';
 import SendProgressClass from './classes/SendProgressClass';
 import SettingsFileClass from './classes/SettingsFileClass';
-import SyncingStatusReportClass from './classes/SyncingStatusReportClass';
+import SyncingStatusClass from './classes/SyncingStatusClass';
 import ToAddrClass from './classes/ToAddrClass';
 import TotalBalanceClass from './classes/TotalBalanceClass';
 import WalletSettingsClass from './classes/WalletSettingsClass';
@@ -14,7 +14,6 @@ import DimensionsType from './types/DimensionsType';
 import InfoType from './types/InfoType';
 import SendJsonToTypeType from './types/SendJsonToTypeType';
 import TransactionType from './types/TransactionType';
-import SyncingStatusType from './types/SyncingStatusType';
 import TxDetailType from './types/TxDetailType';
 import WalletType from './types/WalletType';
 import zecPriceType from './types/zecPriceType';
@@ -37,14 +36,13 @@ export {
   SendPageStateClass,
   SendProgressClass,
   SettingsFileClass,
-  SyncingStatusReportClass,
+  SyncingStatusClass,
   ToAddrClass,
   TotalBalanceClass,
   WalletSettingsClass,
   TransactionType,
   TxDetailType,
   WalletType,
-  SyncingStatusType,
   SendJsonToTypeType,
   InfoType,
   DimensionsType,

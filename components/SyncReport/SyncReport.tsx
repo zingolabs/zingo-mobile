@@ -22,7 +22,7 @@ type SyncReportProps = {
 
 const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) => {
   const context = useContext(ContextAppLoaded);
-  const { syncingStatusReport, wallet, translate, background, language, netInfo } = context;
+  const { syncingStatus, wallet, translate, background, language, netInfo } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [maxBlocks, setMaxBlocks] = useState(0);
   const [points, setPoints] = useState([] as number[]);
@@ -30,12 +30,12 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
   moment.locale(language);
 
   useEffect(() => {
-    if (syncingStatusReport.lastBlockServer) {
+    if (syncingStatus.lastBlockServer) {
       (async () => {
         const a = [0, 500000, 1000000, 1500000, 2000000, 2500000, 3000000, 3500000, 4000000, 4500000, 5000000];
         const l = ['0', '500K', '1M', '1.5M', '2M', '2.5M', '3M', '3.5M', '4M', '4.5M', '5M'];
         for (let i = 0; i < a.length; i++) {
-          if (syncingStatusReport.lastBlockServer < a[i]) {
+          if (syncingStatus.lastBlockServer < a[i]) {
             setMaxBlocks(a[i]);
             setPoints(a.slice(0, i));
             setLabels(l.slice(0, i + 1));
@@ -44,7 +44,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
         }
       })();
     }
-  }, [syncingStatusReport.lastBlockServer]);
+  }, [syncingStatus.lastBlockServer]);
 
   useEffect(() => {
     (async () => await RPC.rpc_setInterruptSyncAfterBatch('false'))();
@@ -56,13 +56,13 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
   // when end block process & wallet birthday are iqual, don't substract anything.
   let process_end_block_fixed = 0;
   if (
-    syncingStatusReport.process_end_block &&
-    syncingStatusReport.process_end_block !== wallet.birthday &&
-    syncingStatusReport.process_end_block < syncingStatusReport.lastBlockWallet
+    syncingStatus.process_end_block &&
+    syncingStatus.process_end_block !== wallet.birthday &&
+    syncingStatus.process_end_block < syncingStatus.lastBlockWallet
   ) {
-    process_end_block_fixed = syncingStatusReport.process_end_block - 1;
+    process_end_block_fixed = syncingStatus.process_end_block - 1;
   } else {
-    process_end_block_fixed = syncingStatusReport.process_end_block;
+    process_end_block_fixed = syncingStatus.process_end_block;
   }
 
   /*
@@ -75,7 +75,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
 
   const server_1: number = wallet.birthday || 0;
   const server_2: number =
-    syncingStatusReport.lastBlockServer && wallet.birthday ? syncingStatusReport.lastBlockServer - wallet.birthday : 0;
+    syncingStatus.lastBlockServer && wallet.birthday ? syncingStatus.lastBlockServer - wallet.birthday : 0;
   const server_3: number = maxBlocks ? maxBlocks - server_1 - server_2 : 0;
   const server_1_percent: number = (server_1 * 100) / maxBlocks;
   const server_2_percent: number = (server_2 * 100) / maxBlocks;
@@ -86,9 +86,9 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
     server_wallet : blocks of the wallet
   */
 
-  const server_server: number = syncingStatusReport.lastBlockServer || 0;
+  const server_server: number = syncingStatus.lastBlockServer || 0;
   const server_wallet: number =
-    syncingStatusReport.lastBlockServer && wallet.birthday ? syncingStatusReport.lastBlockServer - wallet.birthday : 0;
+    syncingStatus.lastBlockServer && wallet.birthday ? syncingStatus.lastBlockServer - wallet.birthday : 0;
 
   /*
     WALLET points:
@@ -111,9 +111,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
         : process_end_block_fixed
       : 0;
   let wallet_2: number =
-    syncingStatusReport.currentBlock && process_end_block_fixed
-      ? syncingStatusReport.currentBlock - process_end_block_fixed
-      : 0;
+    syncingStatus.currentBlock && process_end_block_fixed ? syncingStatus.currentBlock - process_end_block_fixed : 0;
 
   // It is really weird, but don't want any negative values in the UI.
   if (wallet_1 < 0) {
@@ -124,10 +122,10 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
   }
 
   const wallet_3: number =
-    syncingStatusReport.lastBlockServer && wallet.birthday
+    syncingStatus.lastBlockServer && wallet.birthday
       ? process_end_block_fixed >= wallet.birthday
-        ? syncingStatusReport.lastBlockServer - wallet.birthday - wallet_1 - wallet_2
-        : syncingStatusReport.lastBlockServer - process_end_block_fixed - wallet_1 - wallet_2
+        ? syncingStatus.lastBlockServer - wallet.birthday - wallet_1 - wallet_2
+        : syncingStatus.lastBlockServer - process_end_block_fixed - wallet_1 - wallet_2
       : 0;
 
   let wallet_old_synced_percent: number = (wallet_1 * 100) / server_wallet;
@@ -150,13 +148,13 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
   //  'birthday',
   //  wallet.birthday,
   //  'end',
-  //  syncingStatusReport.process_end_block,
+  //  syncingStatus.process_end_block,
   //  'end fixed',
   //  process_end_block_fixed,
   //  'last wallet',
-  //  syncingStatusReport.lastBlockWallet,
+  //  syncingStatus.lastBlockWallet,
   //  'last server',
-  //  syncingStatusReport.lastBlockServer,
+  //  syncingStatus.lastBlockServer,
   //);
   //console.log('wallet', wallet_1, wallet_2, wallet_3);
   //console.log('server', server_1, server_2, server_3);
@@ -166,7 +164,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
   //console.log(maxBlocks, labels, points);
   //console.log('report', background.batches, background.date, Number(background.date).toFixed(0));
 
-  //console.log('render sync report - 5');
+  //console.log('render sync report - 5', syncingStatus);
 
   return (
     <SafeAreaView
@@ -243,20 +241,22 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
               <DetailLine
                 label="Sync ID"
                 value={
-                  syncingStatusReport.syncID && syncingStatusReport.syncID >= 0
-                    ? syncingStatusReport.syncID +
+                  syncingStatus.syncID && syncingStatus.syncID >= 0
+                    ? syncingStatus.syncID +
                       ' - (' +
-                      (syncingStatusReport.inProgress
+                      (syncingStatus.inProgress
                         ? (translate('report.running') as string)
-                        : (translate('report.finished') as string)) +
+                        : syncingStatus.lastBlockServer === syncingStatus.lastBlockWallet
+                        ? (translate('report.finished') as string)
+                        : (translate('report.paused') as string)) +
                       ')'
                     : (translate('connectingserver') as string)
                 }
               />
-              {!!syncingStatusReport.lastError && (
+              {!!syncingStatus.lastError && (
                 <>
                   <View style={{ height: 2, width: '100%', backgroundColor: 'red', marginTop: 10 }} />
-                  <DetailLine label="Last Error" value={syncingStatusReport.lastError} />
+                  <DetailLine label="Last Error" value={syncingStatus.lastError} />
                   <View style={{ height: 2, width: '100%', backgroundColor: 'red', marginBottom: 10 }} />
                 </>
               )}
@@ -403,7 +403,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
                 </>
               )}
 
-              {!!maxBlocks && !!syncingStatusReport.syncID && syncingStatusReport.syncID >= 0 && (
+              {!!maxBlocks && !!syncingStatus.syncID && syncingStatus.syncID >= 0 && (
                 <>
                   <View
                     style={{
@@ -417,7 +417,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
                       <Text style={{ color: colors.primary }}>
                         {process_end_block_fixed >= wallet.birthday ? wallet.birthday : process_end_block_fixed}
                       </Text>
-                      <Text style={{ color: colors.primary }}>{syncingStatusReport.lastBlockServer}</Text>
+                      <Text style={{ color: colors.primary }}>{syncingStatus.lastBlockServer}</Text>
                     </>
                   </View>
                   <View
@@ -571,48 +571,46 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
                 </>
               )}
 
-              {syncingStatusReport.inProgress && syncingStatusReport.currentBatch > 0 && (
+              {syncingStatus.inProgress && syncingStatus.currentBatch > 0 && (
                 <>
                   <DetailLine
                     testID="syncreport.currentbatch"
                     label={translate('report.batches') as string}
                     value={
                       (translate('report.processingbatch') as string) +
-                      syncingStatusReport.currentBatch +
+                      syncingStatus.currentBatch +
                       (translate('report.totalbatches') as string) +
-                      syncingStatusReport.totalBatches
+                      syncingStatus.totalBatches
                     }
                   />
                   <DetailLine
                     testID="syncreport.blocksperbatch"
                     label={translate('report.blocksperbatch') as string}
-                    value={syncingStatusReport.blocksPerBatch.toString()}
+                    value={syncingStatus.blocksPerBatch.toString()}
                   />
                   <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
                     <DetailLine
                       label={translate('report.secondsperbatch') as string}
-                      value={syncingStatusReport.secondsPerBatch.toString()}
+                      value={syncingStatus.secondsPerBatch.toString()}
                     />
                     <ActivityIndicator size="large" color={colors.primary} />
                   </View>
                 </>
               )}
-              {syncingStatusReport.inProgress &&
-                syncingStatusReport.currentBlock > 0 &&
-                !!syncingStatusReport.lastBlockServer && (
-                  <>
-                    <View style={{ height: 2, width: '100%', backgroundColor: colors.primary, marginTop: 10 }} />
-                    <DetailLine
-                      label={translate('report.blocks-title') as string}
-                      value={
-                        (translate('report.processingblock') as string) +
-                        syncingStatusReport.currentBlock +
-                        (translate('report.totalblocks') as string) +
-                        syncingStatusReport.lastBlockServer
-                      }
-                    />
-                  </>
-                )}
+              {syncingStatus.inProgress && syncingStatus.currentBlock > 0 && !!syncingStatus.lastBlockServer && (
+                <>
+                  <View style={{ height: 2, width: '100%', backgroundColor: colors.primary, marginTop: 10 }} />
+                  <DetailLine
+                    label={translate('report.blocks-title') as string}
+                    value={
+                      (translate('report.processingblock') as string) +
+                      syncingStatus.currentBlock +
+                      (translate('report.totalblocks') as string) +
+                      syncingStatus.lastBlockServer
+                    }
+                  />
+                </>
+              )}
             </View>
           </>
         ) : (

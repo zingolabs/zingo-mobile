@@ -1,5 +1,4 @@
 import {
-  SyncingStatusReportClass,
   TotalBalanceClass,
   AddressClass,
   TransactionType,
@@ -10,7 +9,7 @@ import {
   SendProgressClass,
   WalletSettingsClass,
   TranslateType,
-  SyncingStatusType,
+  SyncingStatusClass,
 } from '../AppState';
 import RPCModule from '../RPCModule';
 import Utils from '../utils';
@@ -33,12 +32,11 @@ import { RPCSyncRescan } from './types/RPCSyncRescanType';
 import { RPCUfvkType } from './types/RPCUfvkType';
 
 export default class RPC {
-  fnSetSyncingStatusReport: (syncingStatusReport: SyncingStatusReportClass) => void;
   fnSetInfo: (info: InfoType) => void;
   fnSetTotalBalance: (totalBalance: TotalBalanceClass) => void;
   fnSetTransactionsList: (txList: TransactionType[]) => void;
   fnSetAllAddresses: (allAddresses: AddressClass[]) => void;
-  fnSetSyncingStatus: (syncingStatus: SyncingStatusType) => void;
+  fnSetSyncingStatus: (syncingStatus: SyncingStatusClass) => void;
   fnSetWalletSettings: (settings: WalletSettingsClass) => void;
   translate: (key: string) => TranslateType;
   keepAwake: (keep: boolean) => void;
@@ -64,24 +62,23 @@ export default class RPC {
   seconds_batch: number;
   batches: number;
   latest_block: number;
+  sync_id: number;
 
   timers: NodeJS.Timeout[];
 
   readOnly: boolean;
 
   constructor(
-    fnSetSyncingStatusReport: (syncingStatusReport: SyncingStatusReportClass) => void,
     fnSetTotalBalance: (totalBalance: TotalBalanceClass) => void,
     fnSetTransactionsList: (txlist: TransactionType[]) => void,
     fnSetAllAddresses: (addresses: AddressClass[]) => void,
     fnSetWalletSettings: (settings: WalletSettingsClass) => void,
     fnSetInfo: (info: InfoType) => void,
-    fnSetSyncingStatus: (syncingStatus: SyncingStatusType) => void,
+    fnSetSyncingStatus: (syncingStatus: SyncingStatusClass) => void,
     translate: (key: string) => TranslateType,
     keepAwake: (keep: boolean) => void,
     readOnly: boolean,
   ) {
-    this.fnSetSyncingStatusReport = fnSetSyncingStatusReport;
     this.fnSetTotalBalance = fnSetTotalBalance;
     this.fnSetTransactionsList = fnSetTransactionsList;
     this.fnSetAllAddresses = fnSetAllAddresses;
@@ -108,6 +105,7 @@ export default class RPC {
     this.seconds_batch = 0;
     this.batches = 0;
     this.latest_block = -1;
+    this.sync_id = -1;
 
     this.timers = [];
 
@@ -755,8 +753,10 @@ export default class RPC {
           this.setInRefresh(ss.in_progress);
         }
 
+        this.sync_id = ss.sync_id;
+
         // if the sync_id change then reset the %
-        if (this.prev_sync_id !== ss.sync_id) {
+        if (this.prev_sync_id !== this.sync_id) {
           if (this.prev_sync_id !== -1) {
             // And fetch the rest of the data.
             await this.loadWalletData();
@@ -768,13 +768,13 @@ export default class RPC {
             await RPCModule.doSave();
 
             //console.log('sync status', ss);
-            //console.log(`new sync process id: ${ss.sync_id}. Save the wallet.`);
+            //console.log(`new sync process id: ${this.sync_id}. Save the wallet.`);
             this.prevProgress = 0;
             this.prevBatchNum = -1;
             this.seconds_batch = 0;
             this.batches = 0;
           }
-          this.prev_sync_id = ss.sync_id;
+          this.prev_sync_id = this.sync_id;
         }
 
         // Post sync updates
@@ -868,14 +868,9 @@ export default class RPC {
 
         //console.log('interval sync/rescan, secs', this.seconds_batch, 'timer', this.syncStatusTimerID);
 
+        // store SyncStatus object for a new screen
         this.fnSetSyncingStatus({
-          inProgress: ss.in_progress,
-          synced: this.lastServerBlockHeight === this.lastWalletBlockHeight,
-        } as SyncingStatusType);
-
-        // store SyncStatusReport object for a new screen
-        this.fnSetSyncingStatusReport({
-          syncID: ss.sync_id,
+          syncID: this.sync_id,
           totalBatches: batch_total,
           currentBatch: ss.in_progress ? batch_num + 1 : 0,
           lastBlockWallet: this.lastWalletBlockHeight,
@@ -886,7 +881,7 @@ export default class RPC {
           secondsPerBatch: this.seconds_batch,
           process_end_block: process_end_block,
           lastBlockServer: this.lastServerBlockHeight,
-        } as SyncingStatusReportClass);
+        } as SyncingStatusClass);
 
         this.prevProgress = progress;
 
@@ -912,15 +907,9 @@ export default class RPC {
           this.prevProgress = 0;
           progress = 0;
 
-          // I know it's finished.
+          // store SyncStatus object for a new screen
           this.fnSetSyncingStatus({
-            inProgress: false,
-            synced: this.lastServerBlockHeight === this.lastWalletBlockHeight,
-          } as SyncingStatusType);
-
-          // store SyncStatusReport object for a new screen
-          this.fnSetSyncingStatusReport({
-            syncID: ss.sync_id,
+            syncID: this.sync_id,
             totalBatches: 0,
             currentBatch: 0,
             lastBlockWallet: this.lastWalletBlockHeight,
@@ -931,10 +920,10 @@ export default class RPC {
             secondsPerBatch: 0,
             process_end_block: process_end_block,
             lastBlockServer: this.lastServerBlockHeight,
-          } as SyncingStatusReportClass);
+          } as SyncingStatusClass);
 
           //console.log('sync status', ss);
-          //console.log(`Finished refresh at ${this.lastWalletBlockHeight} id: ${ss.sync_id}`);
+          //console.log(`Finished refresh at ${this.lastWalletBlockHeight} id: ${this.sync_id}`);
         } else {
           // If we're doing a long sync, every time the batch_num changes, save the wallet
           if (this.prevBatchNum !== batch_num) {
@@ -950,9 +939,9 @@ export default class RPC {
               await RPCModule.doSave();
               this.batches = 0;
 
-              // store SyncStatusReport object for a new screen
-              this.fnSetSyncingStatusReport({
-                syncID: ss.sync_id,
+              // store SyncStatus object for a new screen
+              this.fnSetSyncingStatus({
+                syncID: this.sync_id,
                 totalBatches: batch_total,
                 currentBatch: ss.in_progress ? batch_num + 1 : 0,
                 lastBlockWallet: this.lastWalletBlockHeight,
@@ -963,7 +952,7 @@ export default class RPC {
                 secondsPerBatch: this.seconds_batch,
                 process_end_block: process_end_block,
                 lastBlockServer: this.lastServerBlockHeight,
-              } as SyncingStatusReportClass);
+              } as SyncingStatusClass);
 
               //console.log('sync status', ss);
               //console.log(
@@ -985,9 +974,9 @@ export default class RPC {
 
             await RPCModule.doSave();
 
-            // store SyncStatusReport object for a new screen
-            this.fnSetSyncingStatusReport({
-              syncID: ss.sync_id,
+            // store SyncStatus object for a new screen
+            this.fnSetSyncingStatus({
+              syncID: this.sync_id,
               totalBatches: batch_total,
               currentBatch: ss.in_progress ? batch_num + 1 : 0,
               lastBlockWallet: this.lastWalletBlockHeight,
@@ -998,7 +987,7 @@ export default class RPC {
               secondsPerBatch: this.seconds_batch,
               process_end_block: process_end_block,
               lastBlockServer: this.lastServerBlockHeight,
-            } as SyncingStatusReportClass);
+            } as SyncingStatusClass);
 
             //console.log('sync status', ss);
             //console.log(`@@@@@@@@@@@Saving wallet. seconds: ${this.seconds_batch}`);
@@ -1012,9 +1001,18 @@ export default class RPC {
       //console.log('Already have latest block, waiting for next refresh');
       // Here I know the sync process is over, I need to inform to the UI.
       this.fnSetSyncingStatus({
+        syncID: this.sync_id,
+        totalBatches: 0,
+        currentBatch: 0,
+        lastBlockWallet: this.lastWalletBlockHeight,
+        currentBlock: this.lastWalletBlockHeight,
         inProgress: false,
-        synced: this.lastServerBlockHeight === this.lastWalletBlockHeight,
-      } as SyncingStatusType);
+        lastError: '',
+        blocksPerBatch: this.blocksPerBatch,
+        secondsPerBatch: 0,
+        process_end_block: this.lastServerBlockHeight,
+        lastBlockServer: this.lastServerBlockHeight,
+      } as SyncingStatusClass);
     }
   }
 

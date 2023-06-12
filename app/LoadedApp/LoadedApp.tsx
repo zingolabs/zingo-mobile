@@ -31,7 +31,6 @@ import RPC from '../rpc';
 import RPCModule from '../RPCModule';
 import {
   AppStateLoaded,
-  SyncingStatusReportClass,
   TotalBalanceClass,
   SendPageStateClass,
   InfoType,
@@ -39,7 +38,7 @@ import {
   ToAddrClass,
   ErrorModalDataClass,
   SendJsonToTypeType,
-  SyncingStatusType,
+  SyncingStatusClass,
   SendProgressClass,
   WalletSettingsClass,
   AddressClass,
@@ -243,7 +242,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     };
 
     this.rpc = new RPC(
-      this.setSyncingStatusReport,
       this.setTotalBalance,
       this.setTransactionList,
       this.setAllAddresses,
@@ -299,8 +297,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
         this.rpc.setInRefresh(false);
         await this.rpc.clearTimers();
         //console.log('clear timers');
-        this.setSyncingStatus({} as SyncingStatusType);
-        this.setSyncingStatusReport(new SyncingStatusReportClass());
+        this.setSyncingStatus(new SyncingStatusClass());
         //console.log('clear sync status state');
       }
       if (this.state.appState !== nextAppState) {
@@ -349,10 +346,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
           if (!state.isConnected) {
             //console.log('EVENT Loaded: No internet connection.');
             await this.rpc.clearTimers();
-            this.setState({
-              syncingStatusReport: new SyncingStatusReportClass(),
-              syncingStatus: {} as SyncingStatusType,
-            });
+            this.setSyncingStatus(new SyncingStatusClass());
             Toast.show(this.props.translate('loadedapp.connection-error') as string, Toast.LONG);
           } else {
             //console.log('EVENT Loaded: YES internet connection.');
@@ -505,10 +499,10 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     }
   };
 
-  setSyncingStatusReport = (syncingStatusReport: SyncingStatusReportClass) => {
-    if (!isEqual(this.state.syncingStatusReport, syncingStatusReport)) {
+  setSyncingStatus = (syncingStatus: SyncingStatusClass) => {
+    if (!isEqual(this.state.syncingStatus, syncingStatus)) {
       //console.log('fetch syncing status report');
-      this.setState({ syncingStatusReport });
+      this.setState({ syncingStatus });
     }
   };
 
@@ -539,13 +533,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   setSendPageState = (sendPageState: SendPageStateClass) => {
     //console.log('fetch send page state');
     this.setState({ sendPageState });
-  };
-
-  setSyncingStatus = (syncingStatus: SyncingStatusType) => {
-    if (!isEqual(this.state.syncingStatus, syncingStatus)) {
-      //console.log('fetch syncing status');
-      this.setState({ syncingStatus });
-    }
   };
 
   clearToAddr = () => {
@@ -779,10 +766,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     //console.log(value, same_server_chain_name);
     // here I know the server was changed, clean all the tasks before anything.
     await this.rpc.clearTimers();
-    this.setState({
-      syncingStatusReport: new SyncingStatusReportClass(),
-      syncingStatus: {} as SyncingStatusType,
-    });
+    this.setSyncingStatus(new SyncingStatusClass());
     this.rpc.setInRefresh(false);
     this.keepAwake(false);
     // First we need to check the `chain_name` between servers, if this is different

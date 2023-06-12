@@ -354,6 +354,7 @@
     "title": "Sync / Rescan Report",
     "running": "Running",
     "finished": "Finished",
+    "paused": "Paused",
     "server-title": "SERVER: ",
     "blocks": " Blocks. ",
     "wallet": "Wallet: ",

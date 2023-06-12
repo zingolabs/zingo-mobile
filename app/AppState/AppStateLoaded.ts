@@ -1,6 +1,5 @@
 import { StackScreenProps } from '@react-navigation/stack';
 
-import SyncingStatusReportClass from './classes/SyncingStatusReportClass';
 import TotalBalanceClass from './classes/TotalBalanceClass';
 import AddressClass from './classes/AddressClass';
 import AddressBookClass from './classes/AddressBookClass';
@@ -13,7 +12,7 @@ import WalletSettingsClass from './classes/WalletSettingsClass';
 import TransactionType from './types/TransactionType';
 import InfoType from './types/InfoType';
 import WalletType from './types/WalletType';
-import SyncingStatusType from './types/SyncingStatusType';
+import SyncingStatusClass from './classes/SyncingStatusClass';
 import DimensionsType from './types/DimensionsType';
 import zecPriceType from './types/zecPriceType';
 import BackgroundType from './types/BackgroundType';
@@ -28,9 +27,6 @@ export default interface AppStateLoaded {
   dimensions: DimensionsType;
   appState: string;
   netInfo: NetInfoType;
-
-  // Info about the current sync process
-  syncingStatusReport: SyncingStatusReportClass;
 
   // The total confirmed and unconfirmed balance in this wallet
   totalBalance: TotalBalanceClass;
@@ -63,7 +59,7 @@ export default interface AppStateLoaded {
 
   walletSettings: WalletSettingsClass;
 
-  syncingStatus: SyncingStatusType;
+  syncingStatus: SyncingStatusClass;
 
   // Data for any error or info modal
   errorModalData: ErrorModalDataClass;
