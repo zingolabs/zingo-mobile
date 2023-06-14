@@ -38,7 +38,7 @@ export default function App() {
           justifyContent: 'center',
           backgroundColor: Theme.colors.card,
         }}>
-        <Stack.Navigator initialRouteName="LoadingApp" screenOptions={{ headerShown: false }}>
+        <Stack.Navigator initialRouteName="LoadingApp" screenOptions={{ headerShown: false, animationEnabled: false }}>
           <Stack.Screen name="LoadingApp" component={LoadingApp} />
           <Stack.Screen name="LoadedApp" component={LoadedApp} />
         </Stack.Navigator>
