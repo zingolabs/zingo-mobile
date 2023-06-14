@@ -80,17 +80,17 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
 
         {times === 3 && action === 'change' && (
           <FadeText style={{ padding: 20, textAlign: 'center', color: 'white' }}>
-            {translate('seed.change-warning') as string}
+            {translate('privkey.change-warning') as string}
           </FadeText>
         )}
         {times === 3 && action === 'backup' && (
           <FadeText style={{ padding: 20, textAlign: 'center', color: 'white' }}>
-            {translate('seed.backup-warning') as string}
+            {translate('privkey.backup-warning') as string}
           </FadeText>
         )}
         {times === 3 && action === 'server' && (
           <FadeText style={{ padding: 20, textAlign: 'center', color: 'white' }}>
-            {translate('seed.server-warning') as string}
+            {translate('privkey.server-warning') as string}
           </FadeText>
         )}
 
