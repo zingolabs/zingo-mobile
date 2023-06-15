@@ -26,7 +26,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
   const { translate, netInfo, dimensions, info, server } = context;
   const { colors } = useTheme() as unknown as ThemeType;
 
-  const [privKeyText, setPrivKeyText] = useState('');
+  const [ufvkText, setUfvkText] = useState('');
   const [birthday, setBirthday] = useState('');
   const [qrcodeModalVisible, setQrcodeModalVisible] = useState(false);
   const [titleViewHeight, setTitleViewHeight] = useState(0);
@@ -79,11 +79,11 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
       Toast.show(translate('loadedapp.connection-error') as string, Toast.LONG);
       return;
     }
-    //const valid = await validateKey(privKeyText);
+    //const valid = await validateKey(ufvkText);
     //if (!valid) {
     //  return;
     //}
-    onClickOK(privKeyText.trim(), Number(birthday));
+    onClickOK(ufvkText.trim(), Number(birthday));
   };
 
   // zingolib interfase have no way to initialize a `lightclient` with no action associated...
@@ -130,7 +130,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
         transparent={false}
         visible={qrcodeModalVisible}
         onRequestClose={() => setQrcodeModalVisible(false)}>
-        <ScannerUfvk setPrivKeyText={setPrivKeyText} closeModal={() => setQrcodeModalVisible(false)} />
+        <ScannerUfvk setUfvkText={setUfvkText} closeModal={() => setQrcodeModalVisible(false)} />
       </Modal>
 
       <Animated.View style={{ marginTop: slideAnim }}>
@@ -195,8 +195,8 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
                 marginHorizontal: 5,
                 backgroundColor: 'transparent',
               }}
-              value={privKeyText}
-              onChangeText={setPrivKeyText}
+              value={ufvkText}
+              onChangeText={setUfvkText}
               editable={true}
             />
           </View>
