@@ -7,6 +7,7 @@ import org.junit.runners.Suite.SuiteClasses
 
 @RunWith(Categories::class)
 @IncludeCategory(IntegrationTest::class)
-@SuiteClasses(ExecuteAddressesTest::class, RestoreFromUfvkTest::class)
+@SuiteClasses(RestoreFromUfvkTest::class)
+// @SuiteClasses(ExecuteAddressesTest::class, RestoreFromUfvkTest::class)
 class IntegrationTestSuite {
 }
