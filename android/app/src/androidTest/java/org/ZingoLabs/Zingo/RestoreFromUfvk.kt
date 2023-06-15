@@ -23,11 +23,10 @@ class RestoreFromUfvkTest {
 
     @Test
     fun restoreFromUfvkTest() {
-        // Start test by deleting current wallet if it exists
-        // TODO: can we handle this device reset better for integ tests?
+        // Fail if wallet already exists
         val walletFile = File(MainApplication.getAppContext()?.filesDir, "wallet.dat")
         if (walletFile.exists()) {
-            walletFile.delete()
+            assertThat(true).isEqualTo(false)
         }
         
         val server = "https://mainnet.lightwalletd.com:9067"
