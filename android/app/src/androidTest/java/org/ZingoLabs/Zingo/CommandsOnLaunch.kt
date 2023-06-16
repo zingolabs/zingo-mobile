@@ -14,30 +14,60 @@ class CommandsOnLaunch {
         val birthday = "2123300"
         val datadir = MainApplication.getAppContext()!!.filesDir.path
 
-        var initfromufvk_resp = RustFFI.initfromufvk(server, ufvk, birthday, datadir, chainhint)
-        assertThat(initfromufvk_resp).isEqualTo("Error: This wallet is watch-only.")
-
-        var addresses_resp = RustFFI.execute("addresses", "")
-        var balance_resp = RustFFI.execute("balance", "")
-        RustFFI.execute("notes", "")
-        RustFFI.execute("list", "")
-        RustFFI.execute("info", "")
-        RustFFI.execute("defaultfee", "")
-        RustFFI.execute("getoption", "download_memos")
-        RustFFI.execute("getoption", "transaction_filter_threshold")
-        RustFFI.execute("height", "")
-        RustFFI.execute("exportufvk", "")
-        RustFFI.execute("sync", "")
-        RustFFI.execute("syncstatus", "")
-
+        var initfromufvk = RustFFI.initfromufvk(server, ufvk, birthday, datadir, chainhint)
+        assertThat(initfromufvk).isEqualTo("Error: This wallet is watch-only.")
         System.out.println("Init From UFVK:")
-        System.out.println(initfromufvk_resp)
-        System.out.println("Addresses:")
-        System.out.println(addresses_resp)
-        System.out.println("Balance:")
-        System.out.println(balance_resp)
+        System.out.println(initfromufvk)
 
-        assertThat(true).isEqualTo(false)
+        var addresses = RustFFI.execute("addresses", "")
+        System.out.println("Addresses:")
+        System.out.println(addresses)
+        
+        var balance = RustFFI.execute("balance", "")
+        System.out.println("Balance:")
+        System.out.println(balance)
+        
+        var notes = RustFFI.execute("notes", "")
+        System.out.println("Notes:")
+        System.out.println(notes)
+
+        var list = RustFFI.execute("list", "")
+        System.out.println("List:")
+        System.out.println(list)
+
+        var info = RustFFI.execute("info", "")
+        System.out.println("Info:")
+        System.out.println(info)
+
+        var defaultfee = RustFFI.execute("defaultfee", "")
+        System.out.println("Default Fee:")
+        System.out.println(defaultfee)
+
+        var getoption_download_memos = RustFFI.execute("getoption", "download_memos")
+        System.out.println("Get Option Download Memos:")
+        System.out.println(getoption_download_memos)
+
+        var getoption_filter_thr = RustFFI.execute("getoption", "transaction_filter_threshold")
+        System.out.println("Get Option Transaction Filter Threshold:")
+        System.out.println(getoption_filter_thr)
+
+        var height = RustFFI.execute("height", "")
+        System.out.println("Height:")
+        System.out.println(height)
+        
+        var exportufvk = RustFFI.execute("exportufvk", "")
+        System.out.println("Export UFVK:")
+        System.out.println(exportufvk)
+        
+        var sync = RustFFI.execute("sync", "")
+        System.out.println("Sync:")
+        System.out.println(sync)
+        
+        var syncstatus = RustFFI.execute("syncstatus", "")
+        System.out.println("Sync Status:")
+        System.out.println(syncstatus)
+
+        // assertThat(true).isEqualTo(false)
     }
 
     // @Test
