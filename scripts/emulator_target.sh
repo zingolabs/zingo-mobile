@@ -15,27 +15,43 @@ valid_api_targets=("default" "google_apis" "google_apis_playstore" "google_atd" 
 while getopts 'a:l:t:h' OPTION; do
     case "$OPTION" in
         a)
-            abi="$OPTARG"
-            case "$abi" in
+            a="$OPTARG"
+            case "$a" in
                 x86_64)
                     api_level_default="30"
                     api_target_default="google_apis_playstore"
                     arch="x86_64"
+                    abi="x86_64"
                     ;;
                 x86) 
                     api_level_default="30"
                     api_target_default="google_apis_playstore"
                     arch="x86"
+                    abi="x86"
+                    ;;
+                xarm64-v8a)
+                    api_level_default="30"
+                    api_target_default="google_apis_playstore"
+                    arch="x86_64"
+                    abi="arm64_v8a"
+                    ;;
+                xarmeabi-v7a)
+                    api_level_default="30"
+                    api_target_default="google_apis_playstore"
+                    arch="x86"
+                    abi="armeabi-v7a"
                     ;;
                 arm64-v8a)
                     api_level_default="30"
                     api_target_default="google_apis_playstore"
-                    arch="x86_64"
+                    arch="arm64_v8a"
+                    abi="arm64_v8a"
                     ;;
                 armeabi-v7a)
-                    api_level_default="30"
-                    api_target_default="google_apis_playstore"
-                    arch="x86"
+                    api_level_default="25"
+                    api_target_default="google_apis"
+                    arch="armeabi-v7a"
+                    abi="armeabi-v7a"
                     ;;
                 *)
                     echo "Error: Invalid ABI" >&2
