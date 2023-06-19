@@ -43,12 +43,12 @@ describe('Component Ufvk - test', () => {
     'uview1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890';
   const onClose = jest.fn();
   const onOK = jest.fn();
-  test('PrivKey Private - snapshot', () => {
-    const privKey = render(
+  test('Ufvk Private - snapshot', () => {
+    const ufvk = render(
       <ContextAppLoadedProvider value={state}>
         <ShowUfvk onClickCancel={onClose} onClickOK={onOK} action="view" />
       </ContextAppLoadedProvider>,
     );
-    expect(privKey.toJSON()).toMatchSnapshot();
+    expect(ufvk.toJSON()).toMatchSnapshot();
   });
 });

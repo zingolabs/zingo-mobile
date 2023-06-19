@@ -4,17 +4,17 @@ import { BarCodeReadEvent } from 'react-native-camera';
 import Scanner from '../../Components/Scanner';
 
 type ScannerKeyProps = {
-  setPrivKeyText: (k: string) => void;
+  setUfvkText: (k: string) => void;
   closeModal: () => void;
 };
-const ScannerKey: React.FunctionComponent<ScannerKeyProps> = ({ setPrivKeyText, closeModal }) => {
+const ScannerKey: React.FunctionComponent<ScannerKeyProps> = ({ setUfvkText, closeModal }) => {
   const context = useContext(ContextAppLoading);
   const { translate } = context;
 
   const onRead = async (e: BarCodeReadEvent) => {
     const scandata = e.data.trim();
 
-    setPrivKeyText(scandata);
+    setUfvkText(scandata);
     closeModal();
   };
 

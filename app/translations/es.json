@@ -402,7 +402,7 @@
     "scanaddress": "Escanea una dirección Zcash",
     "noviewkey-error": "No es una Clave de Visualización Totalmente Unificada valida"
   },
-  "privkey": {
+  "ufvk": {
     "buttontexts": {
       "new": ["Ya he guardado \n la clave de visualización"],
       "change": [
@@ -432,7 +432,10 @@
     "tapcopy-message": "Clave copiada al portapapeles",
     "title": "Clave",
     "address": "Dirección",
-    "text-readonly": "Esta es tu clave de visualización. Por favor apúntala/copiala cuidadosamente. Es la única manera que tienes para restaurar/acceder tu monedero activo de nuevo."
+    "text-readonly": "Esta es tu clave de visualización. Por favor apúntala/copiala cuidadosamente. Cualquiera que tenga una copia de esta clave puede ver las transacciones asociadas a este monedero.",
+    "change-warning": "SI CAMBIAS A OTRO MONEDERO, YA NO PODRAS VER ESTE MONEDERO SIN LA CLAVE DE VISUALIZACION.",
+    "backup-warning": "SI CAMBIAS A TU MONEDERO (COPIA DE SEGURIDAD), YA NO PODRAS VER ESTE MONEDERO SIN LA CLAVE DE VISUALIZACION.",
+    "server-warning": "SI CAMBIAS A UN SERVIDOR CON DIFERENTE TIPO DE CADENA, YA NO PODRAS VER ESTE MONEDERO SIN LA CLAVE DE VISUALIZACION."
   },
   "pools": {
     "title": "Agrupaciones de Fondos",

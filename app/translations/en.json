@@ -402,7 +402,7 @@
     "scanaddress": "Scan a Zcash Address",
     "noviewkey-error": "It is not a valid Unified Full Viewing Key"
   },
-  "privkey": {
+  "ufvk": {
     "buttontexts": {
       "new": ["I have saved \n the Viewing Key"],
       "change": [
@@ -432,7 +432,10 @@
     "tapcopy-message": "Copied Key to Clipboard",
     "title": "Key",
     "address": "Address",
-    "text-readonly": "This is your viewing key. Please write/copy it down carefully. It is the only way to restore your actual wallet."
+    "text-readonly": "This is your viewing key. Please write/copy it down carefully. Anyone who has a copy of the viewing key can observe all transactions to and from the associated wallet.",
+    "change-warning": "IF YOU CHANGE TO ANOTHER WALLET, YOU WILL NO LONGER BE ABLE TO VIEW THIS WALLET WITHOUT THE VIEWING KEY.",
+    "backup-warning": "IF YOU CHANGE TO YOUR BACKUP WALLET, YOU WILL NO LONGER BE ABLE TO VIEW THIS WALLET WITHOUT THE VIEWING KEY.",
+    "server-warning": "IF YOU CHANGE TO A SERVER WITH A DIFFERENT CHAIN, YOU WILL NO LONGER BE ABLE TO VIEW THIS WALLET WITHOUT THE VIEWING KEY"
   },
   "pools": {
     "title": "Fund Pools",

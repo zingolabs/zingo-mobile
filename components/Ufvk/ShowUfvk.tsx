@@ -35,7 +35,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
   const [texts, setTexts] = useState({} as TextsType);
 
   useEffect(() => {
-    const buttonTextsArray = translate('privkey.buttontexts');
+    const buttonTextsArray = translate('ufvk.buttontexts');
     let buttonTexts = {} as TextsType;
     if (typeof buttonTextsArray === 'object') {
       buttonTexts = buttonTextsArray as TextsType;
@@ -58,7 +58,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
         backgroundColor: colors.background,
       }}>
       <Header
-        title={translate('privkey.viewkey') + ' (' + translate(`seed.${action}`) + ')'}
+        title={translate('ufvk.viewkey') + ' (' + translate(`seed.${action}`) + ')'}
         noBalance={true}
         noSyncingStatus={true}
         noDrawMenu={true}
@@ -75,22 +75,22 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
           justifyContent: 'flex-start',
         }}>
         <FadeText style={{ marginTop: 0, padding: 20, textAlign: 'center' }}>
-          {translate('privkey.text-readonly') as string}
+          {translate('ufvk.text-readonly') as string}
         </FadeText>
 
         {times === 3 && action === 'change' && (
           <FadeText style={{ padding: 20, textAlign: 'center', color: 'white' }}>
-            {translate('seed.change-warning') as string}
+            {translate('ufvk.change-warning') as string}
           </FadeText>
         )}
         {times === 3 && action === 'backup' && (
           <FadeText style={{ padding: 20, textAlign: 'center', color: 'white' }}>
-            {translate('seed.backup-warning') as string}
+            {translate('ufvk.backup-warning') as string}
           </FadeText>
         )}
         {times === 3 && action === 'server' && (
           <FadeText style={{ padding: 20, textAlign: 'center', color: 'white' }}>
-            {translate('seed.server-warning') as string}
+            {translate('ufvk.server-warning') as string}
           </FadeText>
         )}
 
