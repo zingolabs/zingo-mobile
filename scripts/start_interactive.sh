@@ -8,6 +8,6 @@ cd $(git rev-parse --show-toplevel)
 
 ./scripts/rust_build_yarn_install.sh
 
-./scripts/emulator_target.sh $@
+./scripts/flow_emulator_setup.sh $@
 
 ./scripts/flow_emulate_interactive.sh

@@ -30,6 +30,7 @@ see the [trouble-shooting notes](./TROUBLESHOOTING.md).
 1. `docker` (for building the rust library)
 2. `yarn`
 3. `nodejs` recommended version v16.16.0 LTS.
+4. Android Studio or commandline tools
 
 Carefully follow the instructions to [setup Android Studio for your
 operating system](https://reactnative.dev/docs/environment-setup).
@@ -38,6 +39,11 @@ It is not neccessary to install watchman or the Android 12 system images.
 If you do not have a physical device, you can create and start
 a new Android 11, API 30 emulator device compatible
 with the chip on your system and start the emulated device.
+
+### Bash shortcut
+It is possible emulate android with the command line.
+1. install sdkmanager (or included with androidstudio). standalone setup has a quirk as navigated in `scripts/sdkmanager_install.sh`. then sdkmanager must be added to PATH.
+2. run `scripts/start_interactive.sh -a x86` to automatically set up the android sdk, build the app, and stream it to the emulator. it will boot, then take a minute to load from a local port. outputs are generated in `android/app/build/outputs/emulator_output/`
 
 ### Building
 0. Start docker daemon
