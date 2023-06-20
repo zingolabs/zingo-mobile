@@ -11,6 +11,6 @@ shift
 
 ./scripts/rust_build_yarn_install.sh
 
-./scripts/emulator_target.sh $@
+./scripts/flow_emulator_setup.sh $@
 
 ./scripts/flow_test_e2e.sh $test_suite
