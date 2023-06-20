@@ -71,7 +71,7 @@ class CommandsOnLaunch {
         assertThat(balance.unverified_orchard_balance).isEqualTo(0)
         assertThat(balance.transparent_balance).isEqualTo(0)
         
-        RustFFI.execute("notes", "")
+        var notes = RustFFI.execute("notes", "")
         System.out.println("Notes:")
         System.out.println(notes)
 
