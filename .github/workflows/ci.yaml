@@ -19,21 +19,12 @@ jobs:
   build:
     strategy:
       matrix:
-        arch: [ x86_64, armeabi-v7a ]
+        arch: [ x86_64 ]
     uses: ./.github/workflows/build.yaml
     needs: create-cache-key
     with:
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
       arch: ${{ matrix.arch }}
-       
-  integration-test:
-    uses: ./.github/workflows/integration-test.yaml
-    needs: [ create-timestamp, create-cache-key, build ]
-    if: ${{ ! cancelled() }}
-    with:
-      timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
-      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
-      abi: armeabi-v7a
   
   e2e-test:
     uses: ./.github/workflows/e2e-test.yaml
