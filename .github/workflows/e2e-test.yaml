@@ -74,6 +74,8 @@ jobs:
       
       - run: yarn install
       
+      - run: ./scripts/emulator_target.sh -a ${{ matrix.arch }}
+      
       - run: ./scripts/node_reboot.sh
       
       - name: Run Detox Build
@@ -87,4 +89,4 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: yarn detox test -c android.emu.debug -n test
+          script: yarn detox test -c android.emu.debug -n test 
