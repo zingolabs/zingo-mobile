@@ -38,6 +38,12 @@ jobs:
           distribution: 'temurin'
           java-version: '11'
       
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v2
+      
+      - name: Add emulator to PATH
+        run: echo "${ANDROID_SDK_ROOT}/emulator" >> $GITHUB_PATH
+
       - name: Gradle cache
         uses: gradle/gradle-build-action@v2
         with:
