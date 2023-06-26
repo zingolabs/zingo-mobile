@@ -82,7 +82,7 @@ jobs:
       - name: Run Detox Build
         run: yarn detox build -c android.emu.debug -n test
       
-      - name: Create AVD and generate snapshot for caching
+      - name: Run e2e tests
         uses: nick-fields/retry@v2
         with:
           timeout_minutes: 60
