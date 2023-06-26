@@ -83,7 +83,6 @@ jobs:
         run: yarn detox build -c android.emu.debug -n test
       
       - name: Create AVD and generate snapshot for caching
-        if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: nick-fields/retry@v2
         with:
           timeout_minutes: 60
