@@ -3,6 +3,8 @@ set -e
 cd $(git rev-parse --show-toplevel)
 source ./scripts/emulator_read_target.sh
 
+echo "BInG"
+
 test_suite=$1
 if [[ "${test_suite}" == "ALL" ]]; then
   test_suite="";
