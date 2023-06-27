@@ -398,7 +398,7 @@
   "scanner": {
     "text" : "Scan a Unified Full Viewing Key",
     "uri-error": "URI Error:",
-    "nozcash-error": "is not a valid Zcash Address",
+    "nozcash-error": "It is not a valid Zcash Address",
     "scanaddress": "Scan a Zcash Address",
     "noviewkey-error": "It is not a valid Unified Full Viewing Key"
   },
