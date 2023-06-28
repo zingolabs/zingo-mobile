@@ -138,20 +138,6 @@
         "text": "Privacidad Normal, se puede ver toda la información."
       }
     ],
-    "chain_names": [
-      { 
-        "value": "main",
-        "text": "Red Mainnet." 
-      },
-      {
-        "value": "test",
-        "text": "Red Testnet."
-      },
-      {
-        "value": "regtest",
-        "text": "Red Local Regtest."
-      }
-    ],
     "nochanges": "No se haan registrado cambios.",
     "ismemo": "Necesitas escoger una opción de Memorándum para poder grabar.",
     "isthreshold": "Necesitas escoger una opción de umbral para poder grabar.",
