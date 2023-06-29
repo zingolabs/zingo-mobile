@@ -122,6 +122,7 @@ describe('Component Settings - test', () => {
           set_language_option={onSetOption}
           set_sendAll_option={onSetOption}
           set_privacy_option={onSetOption}
+          set_mode_option={onSetOption}
         />
       </ContextAppLoadedProvider>,
     );

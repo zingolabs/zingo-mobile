@@ -138,6 +138,16 @@
         "text": "Normal Privacy, you can see all the information."
       }
     ],
+    "modes": [
+      {
+        "value": "basic",
+        "text": "Basic Mode, the most simple way to use Zingo."
+      },
+      {
+        "value": "expert",
+        "text": "Expert Mode, for advance user who have experience with Zcash."
+      }
+    ],
     "chain_names": [
       { 
         "value": "main",
@@ -174,6 +184,7 @@
     "islanguage": "You need to choose a language to save.",
     "sendall-title": "THE BUTTON 'Send All' (Amount)",
     "privacy-title": "Switch between High or Normal Privacy",
+    "mode-title": "Switch between Basic or Expert Mode",
     "value-currency-": "No currency",
     "value-currency-USD": "US Dollar",
     "value-language-en": "English",
@@ -182,7 +193,9 @@
     "value-sendall-false": "Disable",
     "value-privacy-true": "High",
     "value-privacy-false": "Normal",
-    "privacy": "Privacy: ",
+    "privacy": "Priv: ",
+    "value-mode-basic": "Basic",
+    "value-mode-expert": "Expert",
     "value-chain_name-main": "Mainnet",
     "value-chain_name-test": "Testnet",
     "value-chain_name-regtest": "Regtest"

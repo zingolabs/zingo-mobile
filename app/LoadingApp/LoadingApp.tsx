@@ -62,13 +62,14 @@ const SERVER_DEFAULT_1 = serverUris()[1];
 
 export default function LoadingApp(props: LoadingAppProps) {
   const theme = useTheme() as unknown as ThemeType;
-  const [language, setLanguage] = useState('en' as 'en' | 'es');
-  const [currency, setCurrency] = useState('' as 'USD' | '');
+  const [language, setLanguage] = useState<'en' | 'es'>('en');
+  const [currency, setCurrency] = useState<'USD' | ''>('');
   const [server, setServer] = useState<ServerType>(SERVER_DEFAULT_0);
-  const [sendAll, setSendAll] = useState(false);
-  const [privacy, setPrivacy] = useState(false);
-  const [background, setBackground] = useState({ batches: 0, date: 0 } as BackgroundType);
-  const [loading, setLoading] = useState(true);
+  const [sendAll, setSendAll] = useState<boolean>(false);
+  const [privacy, setPrivacy] = useState<boolean>(false);
+  const [mode, setMode] = useState<'basic' | 'expert'>('basic');
+  const [background, setBackground] = useState<BackgroundType>({ batches: 0, date: 0 });
+  const [loading, setLoading] = useState<boolean>(true);
   const file = useMemo(
     () => ({
       en: en,
@@ -131,6 +132,11 @@ export default function LoadingApp(props: LoadingAppProps) {
       } else {
         await SettingsFileImpl.writeSettings('privacy', privacy);
       }
+      if (settings.mode) {
+        setMode(settings.mode);
+      } else {
+        await SettingsFileImpl.writeSettings('mode', mode);
+      }
 
       // reading background task info
       if (Platform.OS === 'ios') {
@@ -160,6 +166,7 @@ export default function LoadingApp(props: LoadingAppProps) {
         server={server}
         sendAll={sendAll}
         privacy={privacy}
+        mode={mode}
         background={background}
       />
     );
@@ -176,6 +183,7 @@ type LoadingAppClassProps = {
   server: ServerType;
   sendAll: boolean;
   privacy: boolean;
+  mode: 'basic' | 'expert';
   background: BackgroundType;
 };
 
@@ -209,6 +217,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
       currency: props.currency,
       sendAll: props.sendAll,
       privacy: props.privacy,
+      mode: props.mode,
       background: props.background,
       dimensions: {
         width: Number(screen.width.toFixed(0)),

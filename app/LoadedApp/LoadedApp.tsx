@@ -87,13 +87,14 @@ const SERVER_DEFAULT_0: ServerType = serverUris()[0];
 
 export default function LoadedApp(props: LoadedAppProps) {
   const theme = useTheme() as unknown as ThemeType;
-  const [language, setLanguage] = useState('en' as 'en' | 'es');
-  const [currency, setCurrency] = useState('' as 'USD' | '');
+  const [language, setLanguage] = useState<'en' | 'es'>('en');
+  const [currency, setCurrency] = useState<'USD' | ''>('');
   const [server, setServer] = useState<ServerType>(SERVER_DEFAULT_0);
-  const [sendAll, setSendAll] = useState(false);
-  const [privacy, setPrivacy] = useState(false);
-  const [background, setBackground] = useState({ batches: 0, date: 0 } as BackgroundType);
-  const [loading, setLoading] = useState(true);
+  const [sendAll, setSendAll] = useState<boolean>(false);
+  const [privacy, setPrivacy] = useState<boolean>(false);
+  const [mode, setMode] = useState<'basic' | 'expert'>('basic');
+  const [background, setBackground] = useState<BackgroundType>({ batches: 0, date: 0 });
+  const [loading, setLoading] = useState<boolean>(true);
   const file = useMemo(
     () => ({
       en: en,
@@ -155,6 +156,11 @@ export default function LoadedApp(props: LoadedAppProps) {
       } else {
         await SettingsFileImpl.writeSettings('privacy', privacy);
       }
+      if (settings.mode) {
+        setMode(settings.mode);
+      } else {
+        await SettingsFileImpl.writeSettings('mode', mode);
+      }
 
       // reading background task info
       if (Platform.OS === 'ios') {
@@ -185,6 +191,7 @@ export default function LoadedApp(props: LoadedAppProps) {
         server={server}
         sendAll={sendAll}
         privacy={privacy}
+        mode={mode}
         background={background}
         readOnly={readOnly}
       />
@@ -202,6 +209,7 @@ type LoadedAppClassProps = {
   server: ServerType;
   sendAll: boolean;
   privacy: boolean;
+  mode: 'basic' | 'expert';
   background: BackgroundType;
   readOnly: boolean;
 };
@@ -229,6 +237,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       currency: props.currency,
       sendAll: props.sendAll,
       privacy: props.privacy,
+      mode: props.mode,
       background: props.background,
       readOnly: props.readOnly,
       dimensions: {
@@ -758,7 +767,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   };
 
   set_server_option = async (
-    name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
+    name: 'server',
     value: ServerType,
     toast: boolean,
     same_server_chain_name: boolean,
@@ -836,10 +845,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     }
   };
 
-  set_currency_option = async (
-    name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
-    value: string,
-  ): Promise<void> => {
+  set_currency_option = async (name: 'currency', value: string): Promise<void> => {
     await SettingsFileImpl.writeSettings(name, value);
     this.setState({
       currency: value as 'USD' | '',
@@ -849,11 +855,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     this.rpc.fetchWalletSettings();
   };
 
-  set_language_option = async (
-    name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
-    value: string,
-    reset: boolean,
-  ): Promise<void> => {
+  set_language_option = async (name: 'language', value: string, reset: boolean): Promise<void> => {
     await SettingsFileImpl.writeSettings(name, value);
     this.setState({
       language: value as 'en' | 'es',
@@ -866,10 +868,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     }
   };
 
-  set_sendAll_option = async (
-    name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
-    value: boolean,
-  ): Promise<void> => {
+  set_sendAll_option = async (name: 'sendAll', value: boolean): Promise<void> => {
     await SettingsFileImpl.writeSettings(name, value);
     this.setState({
       sendAll: value as boolean,
@@ -879,13 +878,20 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     this.rpc.fetchWalletSettings();
   };
 
-  set_privacy_option = async (
-    name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
-    value: boolean,
-  ): Promise<void> => {
+  set_privacy_option = async (name: 'privacy', value: boolean): Promise<void> => {
     await SettingsFileImpl.writeSettings(name, value);
     this.setState({
       privacy: value as boolean,
+    });
+
+    // Refetch the settings to update
+    this.rpc.fetchWalletSettings();
+  };
+
+  set_mode_option = async (name: 'mode', value: string): Promise<void> => {
+    await SettingsFileImpl.writeSettings(name, value);
+    this.setState({
+      mode: value as 'basic' | 'expert',
     });
 
     // Refetch the settings to update
@@ -1188,6 +1194,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                 set_language_option={this.set_language_option}
                 set_sendAll_option={this.set_sendAll_option}
                 set_privacy_option={this.set_privacy_option}
+                set_mode_option={this.set_mode_option}
               />
             </Suspense>
           </Modal>

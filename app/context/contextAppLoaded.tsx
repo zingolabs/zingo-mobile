@@ -85,6 +85,7 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   readOnly: false,
   poolsToShieldSelectSapling: true,
   poolsToShieldSelectTransparent: true,
+  mode: 'basic',
 };
 
 export const ContextAppLoaded = React.createContext(defaultAppStateLoaded);

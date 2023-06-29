@@ -44,5 +44,7 @@ export default interface AppStateLoading {
   customServerUri: string;
   customServerChainName: 'main' | 'test' | 'regtest';
 
+  mode: 'basic' | 'expert';
+
   // eslint-disable-next-line semi
 }

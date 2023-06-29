@@ -25,28 +25,16 @@ type SettingsProps = {
   closeModal: () => void;
   set_wallet_option: (name: string, value: string) => Promise<void>;
   set_server_option: (
-    name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
+    name: 'server',
     value: ServerType,
     toast: boolean,
     same_server_chain_name: boolean,
   ) => Promise<void>;
-  set_currency_option: (
-    name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
-    value: string,
-  ) => Promise<void>;
-  set_language_option: (
-    name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
-    value: string,
-    reset: boolean,
-  ) => Promise<void>;
-  set_sendAll_option: (
-    name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
-    value: boolean,
-  ) => Promise<void>;
-  set_privacy_option: (
-    name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
-    value: boolean,
-  ) => Promise<void>;
+  set_currency_option: (name: 'currency', value: string) => Promise<void>;
+  set_language_option: (name: 'language', value: string, reset: boolean) => Promise<void>;
+  set_sendAll_option: (name: 'sendAll', value: boolean) => Promise<void>;
+  set_privacy_option: (name: 'privacy', value: boolean) => Promise<void>;
+  set_mode_option: (name: 'mode', value: string) => Promise<void>;
 };
 
 type Options = {
@@ -61,6 +49,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   set_language_option,
   set_sendAll_option,
   set_privacy_option,
+  set_mode_option,
   closeModal,
 }) => {
   const context = useContext(ContextAppLoaded);
@@ -73,6 +62,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     language: languageContext,
     sendAll: sendAllContext,
     privacy: privacyContext,
+    mode: modeContext,
     netInfo,
   } = context;
 
@@ -107,6 +97,12 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     PRIVACYS = privacysArray as Options[];
   }
 
+  const modesArray = translate('settings.modes');
+  let MODES: Options[] = [];
+  if (typeof modesArray === 'object') {
+    MODES = modesArray as Options[];
+  }
+
   const chain_namesArray = translate('settings.chain_names');
   let CHAIN_NAMES: Options[] = [];
   if (typeof chain_namesArray === 'object') {
@@ -123,6 +119,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [language, setLanguage] = useState(languageContext);
   const [sendAll, setSendAll] = useState(sendAllContext);
   const [privacy, setPrivacy] = useState(privacyContext);
+  const [mode, setMode] = useState(modeContext);
   const [customIcon, setCustomIcon] = useState(farCircle);
   const [disabled, setDisabled] = useState<boolean>();
   const [titleViewHeight, setTitleViewHeight] = useState(0);
@@ -175,7 +172,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       currencyContext === currency &&
       languageContext === language &&
       sendAllContext === sendAll &&
-      privacyContext === privacy
+      privacyContext === privacy &&
+      modeContext === mode
     ) {
       Toast.show(translate('settings.nochanges') as string, Toast.LONG);
       return;
@@ -259,6 +257,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     }
     if (privacyContext !== privacy) {
       await set_privacy_option('privacy', privacy);
+    }
+    if (modeContext !== mode) {
+      await set_mode_option('mode', mode);
     }
 
     // I need a little time in this modal because maybe the wallet cannot be open with the new server
@@ -347,6 +348,14 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           alignItems: 'stretch',
           justifyContent: 'flex-start',
         }}>
+        <View style={{ display: 'flex', margin: 10 }}>
+          <BoldText>{translate('settings.mode-title') as string}</BoldText>
+        </View>
+
+        <View style={{ display: 'flex', marginLeft: 25 }}>
+          {optionsRadio(MODES, setMode as React.Dispatch<React.SetStateAction<string | boolean>>, String, mode, 'mode')}
+        </View>
+
         <View style={{ display: 'flex', margin: 10 }}>
           <BoldText>{translate('settings.privacy-title') as string}</BoldText>
         </View>

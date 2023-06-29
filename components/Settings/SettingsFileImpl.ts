@@ -11,7 +11,7 @@ export default class SettingsFileImpl {
 
   // Write the server setting
   static async writeSettings(
-    name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
+    name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy' | 'mode',
     value: string | boolean | ServerType,
   ) {
     const fileName = await this.getFileName();
