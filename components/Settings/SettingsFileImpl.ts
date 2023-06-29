@@ -11,12 +11,14 @@ export default class SettingsFileImpl {
 
   // Write the server setting
   static async writeSettings(
-    name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy' | 'mode',
+    name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy' | 'mode' | 'firstInstall',
     value: string | boolean | ServerType,
   ) {
     const fileName = await this.getFileName();
     const settings = await this.readSettings();
     const newSettings: SettingsFileClass = { ...settings, [name]: value };
+
+    //console.log(' settings write', newSettings);
 
     RNFS.writeFile(fileName, JSON.stringify(newSettings), 'utf8')
       .then(() => {
@@ -36,27 +38,31 @@ export default class SettingsFileImpl {
       const settings: SettingsFileClass = JSON.parse((await RNFS.readFile(fileName, 'utf8')).toString());
       // If server as string is found, I need to convert to: ServerType
       // if not, I'm losing the value
-      if (typeof settings.server === 'string') {
-        const ss: ServerType = { uri: settings.server, chain_name: 'main' };
-        const standard = serverUris().find((s: ServerType) => isEqual(s, ss));
-        if (standard) {
-          settings.server = ss;
+      if (settings.server) {
+        if (typeof settings.server === 'string') {
+          const ss: ServerType = { uri: settings.server, chain_name: 'main' };
+          const standard = serverUris().find((s: ServerType) => isEqual(s, ss));
+          if (standard) {
+            settings.server = ss;
+          } else {
+            // here probably the user have a cumtom server, but we don't know
+            // what is the chain_name -> we assign the default server.
+            settings.server = serverUris()[0];
+          }
         } else {
-          // here probably the user have a cumtom server, but we don't know
-          // what is the chain_name -> we assign the default server.
-          settings.server = serverUris()[0];
-        }
-      } else {
-        if (!settings.server.uri || !settings.server.chain_name) {
-          // if one or both field/s don't have valid value -> we assign the default server.
-          settings.server = serverUris()[0];
+          if (!settings.server.uri || !settings.server.chain_name) {
+            // if one or both field/s don't have valid value -> we assign the default server.
+            settings.server = serverUris()[0];
+          }
         }
       }
       return settings;
     } catch (err) {
-      // File probably doesn't exist, so return nothing
-      console.log('settings file:', err);
-      return {} as SettingsFileClass;
+      // The File doesn't exist, so return nothing
+      // Here I know 100% it is a fresh install or the user cleaned the device staorage
+      //console.log('settings read file:', err);
+      const settings: SettingsFileClass = { firstInstall: true } as SettingsFileClass;
+      return settings;
     }
   }
 }

@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useState, ReactNode } from 'react';
+import React, { useContext, useState, ReactNode, useEffect } from 'react';
 import { View } from 'react-native';
 //import { Modal } from 'react-native';
 import { TabView, TabBar, SceneRendererProps, Route, NavigationState } from 'react-native-tab-view';
@@ -32,14 +32,10 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   setUfvkViewModalVisible,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, dimensions, addresses, uaAddress } = context;
+  const { translate, dimensions, addresses, uaAddress, mode } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [index, setIndex] = useState(0);
-  const [routes] = useState([
-    { key: 'uaddr', title: translate('receive.u-title') as string },
-    { key: 'zaddr', title: translate('receive.z-title') as string },
-    { key: 'taddr', title: translate('receive.t-title') as string },
-  ]);
+  const [routes, setRoutes] = useState<{ key: string; title: string }[]>([]);
 
   const [displayAddress, setDisplayAddress] = useState(uaAddress);
   const [oindex, setOIndex] = useState(0);
@@ -115,6 +111,17 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
       setTIndex(newIndex);
     }
   };
+
+  useEffect(() => {
+    const basicModeRoutes = [{ key: 'uaddr', title: translate('receive.u-title') as string }];
+    const expertModeRoutes = [
+      { key: 'uaddr', title: translate('receive.u-title') as string },
+      { key: 'zaddr', title: translate('receive.z-title') as string },
+      { key: 'taddr', title: translate('receive.t-title') as string },
+    ];
+    setRoutes(mode === 'basic' ? basicModeRoutes : expertModeRoutes);
+  }, [mode, translate]);
+
   /*
   const addO = async () => {
     //console.log('New O');
@@ -238,18 +245,22 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
         }
 
         return (
-          <SingleAddress
-            address={uaddr}
-            addressKind={uaddrKind}
-            index={oindex}
-            total={uaddrs.length}
-            prev={() => {
-              prev('u');
-            }}
-            next={() => {
-              next('u');
-            }}
-          />
+          mode &&
+          !!addresses &&
+          !!uaAddress && (
+            <SingleAddress
+              address={uaddr}
+              addressKind={uaddrKind}
+              index={oindex}
+              total={uaddrs.length}
+              prev={() => {
+                prev('u');
+              }}
+              next={() => {
+                next('u');
+              }}
+            />
+          )
         );
       }
       case 'zaddr': {
@@ -261,18 +272,22 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
         }
 
         return (
-          <SingleAddress
-            address={zaddr}
-            addressKind={zaddrKind}
-            index={zindex}
-            total={zaddrs.length}
-            prev={() => {
-              prev('z');
-            }}
-            next={() => {
-              next('z');
-            }}
-          />
+          mode &&
+          !!addresses &&
+          !!uaAddress && (
+            <SingleAddress
+              address={zaddr}
+              addressKind={zaddrKind}
+              index={zindex}
+              total={zaddrs.length}
+              prev={() => {
+                prev('z');
+              }}
+              next={() => {
+                next('z');
+              }}
+            />
+          )
         );
       }
       case 'taddr': {
@@ -284,18 +299,22 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
         }
 
         return (
-          <SingleAddress
-            address={taddr}
-            addressKind={taddrKind}
-            index={tindex}
-            total={taddrs.length}
-            prev={() => {
-              prev('t');
-            }}
-            next={() => {
-              next('t');
-            }}
-          />
+          mode &&
+          !!addresses &&
+          !!uaAddress && (
+            <SingleAddress
+              address={taddr}
+              addressKind={taddrKind}
+              index={tindex}
+              total={taddrs.length}
+              prev={() => {
+                prev('t');
+              }}
+              next={() => {
+                next('t');
+              }}
+            />
+          )
         );
       }
     }
@@ -310,8 +329,8 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     <View style={{ width: (dimensions.width - 20) / 3, alignItems: 'center' }}>
       <RegText
         style={{
-          fontWeight: focused ? 'bold' : 'normal',
-          fontSize: focused ? 15 : 14,
+          fontWeight: mode === 'basic' ? 'normal' : focused ? 'bold' : 'normal',
+          fontSize: mode === 'basic' ? 14 : focused ? 15 : 14,
           color: color,
         }}>
         {route.title ? route.title : ''}

@@ -271,6 +271,11 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   componentDidMount = () => {
     this.clearToAddr();
 
+    // If the App is mounting this component, I know I have to reset the firstInstall props in settings.
+    (async () => {
+      await SettingsFileImpl.writeSettings('firstInstall', false);
+    })();
+
     // Configure the RPC to start doing refreshes
     (async () => {
       await this.rpc.configure();
@@ -1067,7 +1072,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
         iconName = faCog;
       }
 
-      const iconColor = focused ? colors.background : colors.money;
+      const iconColor = focused ? colors.zingo : colors.money;
       return <FontAwesomeIcon icon={iconName} color={iconColor} />;
     };
 
@@ -1378,44 +1383,46 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
             initialRouteName={translate('loadedapp.wallet-menu') as string}
             screenOptions={({ route }) => ({
               tabBarIcon: ({ focused }) => fnTabBarIcon(route, focused),
-              tabBarActiveTintColor: colors.background,
-              tabBarActiveBackgroundColor: colors.primary,
+              tabBarActiveTintColor: colors.zingo,
+              tabBarActiveBackgroundColor: colors.primaryDisabled,
               tabBarInactiveTintColor: colors.money,
               tabBarLabelStyle: { fontSize: 14 },
               tabBarStyle: {
                 borderRadius: 0,
-                borderTopColor: colors.primary,
+                borderTopColor: colors.primaryDisabled,
                 borderTopWidth: 1,
               },
               headerShown: false,
             })}>
-            <Tab.Screen name={translate('loadedapp.wallet-menu') as string}>
-              {() => (
-                <>
-                  <Suspense
-                    fallback={
-                      <View>
-                        <Text>{translate('loading') as string}</Text>
-                      </View>
-                    }>
-                    <History
-                      doRefresh={this.doRefresh}
-                      toggleMenuDrawer={this.toggleMenuDrawer}
-                      syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
-                      poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
-                      setZecPrice={this.setZecPrice}
-                      setComputingModalVisible={this.setComputingModalVisible}
-                      setBackgroundError={this.setBackgroundError}
-                      set_privacy_option={this.set_privacy_option}
-                      setPoolsToShieldSelectSapling={this.setPoolsToShieldSelectSapling}
-                      setPoolsToShieldSelectTransparent={this.setPoolsToShieldSelectTransparent}
-                      setUfvkViewModalVisible={this.setUfvkViewModalVisible}
-                    />
-                  </Suspense>
-                </>
-              )}
-            </Tab.Screen>
-            {!this.state.readOnly && (
+            {!(this.state.mode === 'basic' && this.state.transactions.length <= 0) && (
+              <Tab.Screen name={translate('loadedapp.wallet-menu') as string}>
+                {() => (
+                  <>
+                    <Suspense
+                      fallback={
+                        <View>
+                          <Text>{translate('loading') as string}</Text>
+                        </View>
+                      }>
+                      <History
+                        doRefresh={this.doRefresh}
+                        toggleMenuDrawer={this.toggleMenuDrawer}
+                        syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
+                        poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
+                        setZecPrice={this.setZecPrice}
+                        setComputingModalVisible={this.setComputingModalVisible}
+                        setBackgroundError={this.setBackgroundError}
+                        set_privacy_option={this.set_privacy_option}
+                        setPoolsToShieldSelectSapling={this.setPoolsToShieldSelectSapling}
+                        setPoolsToShieldSelectTransparent={this.setPoolsToShieldSelectTransparent}
+                        setUfvkViewModalVisible={this.setUfvkViewModalVisible}
+                      />
+                    </Suspense>
+                  </>
+                )}
+              </Tab.Screen>
+            )}
+            {!this.state.readOnly && !(this.state.mode === 'basic' && this.state.totalBalance.total <= 0) && (
               <Tab.Screen name={translate('loadedapp.send-menu') as string}>
                 {() => (
                   <>

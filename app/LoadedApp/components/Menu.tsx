@@ -17,7 +17,7 @@ type MenuProps = {
 
 const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, readOnly } = context;
+  const { translate, readOnly, mode, totalBalance, transactions } = context;
   const { colors } = useTheme();
   const item = {
     fontSize: 14,
@@ -48,41 +48,57 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected }) => {
           {translate('loadedapp.about') as string}
         </RegText>
 
-        <RegText onPress={() => onItemSelectedWrapper('Info')} style={item}>
-          {translate('loadedapp.info') as string}
-        </RegText>
+        {mode !== 'basic' && (
+          <RegText onPress={() => onItemSelectedWrapper('Info')} style={item}>
+            {translate('loadedapp.info') as string}
+          </RegText>
+        )}
 
         <RegText testID="menu.settings" onPress={() => onItemSelectedWrapper('Settings')} style={item}>
           {translate('loadedapp.settings') as string}
         </RegText>
 
-        <RegText onPress={() => onItemSelectedWrapper('Wallet')} style={item}>
-          {readOnly ? (translate('loadedapp.walletufvk') as string) : (translate('loadedapp.walletseed') as string)}
-        </RegText>
+        {!(mode === 'basic' && transactions.length <= 0) && !(mode === 'basic' && totalBalance.total <= 0) && (
+          <RegText onPress={() => onItemSelectedWrapper('Wallet')} style={item}>
+            {readOnly ? (translate('loadedapp.walletufvk') as string) : (translate('loadedapp.walletseed') as string)}
+          </RegText>
+        )}
 
-        <RegText onPress={() => onItemSelectedWrapper('Rescan')} style={item}>
-          {translate('loadedapp.rescanwallet') as string}
-        </RegText>
+        {mode !== 'basic' && (
+          <RegText onPress={() => onItemSelectedWrapper('Rescan')} style={item}>
+            {translate('loadedapp.rescanwallet') as string}
+          </RegText>
+        )}
 
-        <RegText testID="menu.syncreport" onPress={() => onItemSelectedWrapper('Sync Report')} style={item}>
-          {translate('loadedapp.report') as string}
-        </RegText>
+        {mode !== 'basic' && (
+          <RegText testID="menu.syncreport" onPress={() => onItemSelectedWrapper('Sync Report')} style={item}>
+            {translate('loadedapp.report') as string}
+          </RegText>
+        )}
 
-        <RegText onPress={() => onItemSelectedWrapper('Fund Pools')} style={item}>
-          {translate('loadedapp.fundpools') as string}
-        </RegText>
+        {mode !== 'basic' && (
+          <RegText onPress={() => onItemSelectedWrapper('Fund Pools')} style={item}>
+            {translate('loadedapp.fundpools') as string}
+          </RegText>
+        )}
 
-        <RegText onPress={() => onItemSelectedWrapper('Insight')} style={item} color={colors.primary}>
-          {translate('loadedapp.insight') as string}
-        </RegText>
+        {!(mode === 'basic' && transactions.length <= 0) && (
+          <RegText onPress={() => onItemSelectedWrapper('Insight')} style={item}>
+            {translate('loadedapp.insight') as string}
+          </RegText>
+        )}
 
-        <RegText onPress={() => onItemSelectedWrapper('Change Wallet')} style={item}>
-          {translate('loadedapp.changewallet') as string}
-        </RegText>
+        {mode !== 'basic' && (
+          <RegText onPress={() => onItemSelectedWrapper('Change Wallet')} style={item}>
+            {translate('loadedapp.changewallet') as string}
+          </RegText>
+        )}
 
-        <RegText onPress={() => onItemSelectedWrapper('Restore Wallet Backup')} style={item}>
-          {translate('loadedapp.restorebackupwallet') as string}
-        </RegText>
+        {mode !== 'basic' && (
+          <RegText onPress={() => onItemSelectedWrapper('Restore Wallet Backup')} style={item}>
+            {translate('loadedapp.restorebackupwallet') as string}
+          </RegText>
+        )}
       </View>
     </ScrollView>
   );

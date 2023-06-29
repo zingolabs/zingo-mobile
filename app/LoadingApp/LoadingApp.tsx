@@ -96,7 +96,22 @@ export default function LoadingApp(props: LoadingAppProps) {
 
       //I have to check what language is in the settings
       const settings = await SettingsFileImpl.readSettings();
-      if (settings.language) {
+      //console.log(settings);
+
+      // first I need to know if this launch is a fresh install...
+      // if firstInstall is true -> 100% is the first time.
+      if (settings.firstInstall) {
+        // basic mode
+        setMode('basic');
+        await SettingsFileImpl.writeSettings('mode', 'basic');
+      } else {
+        if (settings.mode === 'basic' || settings.mode === 'expert') {
+          setMode(settings.mode);
+        } else {
+          await SettingsFileImpl.writeSettings('mode', mode);
+        }
+      }
+      if (settings.language === 'en' || settings.language === 'es') {
         setLanguage(settings.language);
         i18n.locale = settings.language;
         //console.log('apploading settings', settings.language, settings.currency);
@@ -110,7 +125,7 @@ export default function LoadingApp(props: LoadingAppProps) {
         await SettingsFileImpl.writeSettings('language', lang);
         //console.log('apploading NO settings', languageTag);
       }
-      if (settings.currency) {
+      if (settings.currency === '' || settings.currency === 'USD') {
         setCurrency(settings.currency);
       } else {
         await SettingsFileImpl.writeSettings('currency', currency);
@@ -122,20 +137,15 @@ export default function LoadingApp(props: LoadingAppProps) {
         await SettingsFileImpl.writeSettings('server', server);
         //console.log('NO settings', settings.server);
       }
-      if (settings.sendAll) {
+      if (settings.sendAll === true || settings.sendAll === false) {
         setSendAll(settings.sendAll);
       } else {
         await SettingsFileImpl.writeSettings('sendAll', sendAll);
       }
-      if (settings.privacy) {
+      if (settings.privacy === true || settings.privacy === false) {
         setPrivacy(settings.privacy);
       } else {
         await SettingsFileImpl.writeSettings('privacy', privacy);
-      }
-      if (settings.mode) {
-        setMode(settings.mode);
-      } else {
-        await SettingsFileImpl.writeSettings('mode', mode);
       }
 
       // reading background task info
@@ -276,7 +286,13 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
         }
       } else {
         //console.log('Loading new wallet');
-        this.setState({ screen: 1, walletExists: false });
+        // if no wallet file & basic mode -> create a new wallet & go directly to history screen.
+        if (this.state.mode === 'basic') {
+          this.createNewWallet();
+          this.navigateToLoaded();
+        } else {
+          this.setState({ screen: 1, walletExists: false });
+        }
       }
     });
 
@@ -424,10 +440,16 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
       if (seed && !seed.toLowerCase().startsWith('error')) {
         // TODO verify that JSON don't fail.
         const wallet: WalletType = JSON.parse(seed);
-        this.setState({ wallet, screen: 2, actionButtonsDisabled: false, walletExists: true });
         // default values for wallet options
         this.set_wallet_option('download_memos', 'wallet');
         //await this.set_wallet_option('transaction_filter_threshold', '500');
+        // basic mode -> same screen.
+        this.setState(state => ({
+          wallet,
+          screen: state.mode === 'basic' ? state.screen : 2,
+          actionButtonsDisabled: false,
+          walletExists: true,
+        }));
       } else {
         this.setState({ actionButtonsDisabled: false });
         createAlert(this.setBackgroundError, this.props.translate('loadingapp.creatingwallet-label') as string, seed);
