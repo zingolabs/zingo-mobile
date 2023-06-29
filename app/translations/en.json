@@ -148,20 +148,6 @@
         "text": "Expert Mode, for advance user who have experience with Zcash."
       }
     ],
-    "chain_names": [
-      { 
-        "value": "main",
-        "text": "Mainnet Network." 
-      },
-      {
-        "value": "test",
-        "text": "Testnet Network."
-      },
-      {
-        "value": "regtest",
-        "text": "Regtest Local Network."
-      }
-    ],
     "nochanges": "No changes registred.",
     "ismemo": "You need to choose the download memos option to save.",
     "isthreshold": "You need to choose the transaction filter threshold option to save.",

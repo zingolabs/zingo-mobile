@@ -16,7 +16,6 @@ import {
   NativeEventSubscription,
   Platform,
   TextInput,
-  TouchableOpacity,
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { I18n } from 'i18n-js';
@@ -28,7 +27,7 @@ import Toast from 'react-native-simple-toast';
 import OptionsMenu from 'react-native-option-menu';
 
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faEllipsisV, faCashRegister } from '@fortawesome/free-solid-svg-icons';
+import { faEllipsisV } from '@fortawesome/free-solid-svg-icons';
 
 import BoldText from '../../components/Components/BoldText';
 import Button from '../../components/Components/Button';
@@ -46,6 +45,7 @@ import { createAlert } from '../createAlert';
 import { ImportUfvk } from '../../components/Ufvk';
 import { RPCWalletKindType } from '../rpc/types/RPCWalletKindType';
 import { isEqual } from 'lodash';
+import ChainTypeToggle from '../../components/Components/ChainTypeToggle';
 
 const Seed = React.lazy(() => import('../../components/Seed'));
 
@@ -512,6 +512,10 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
     this.setState({ customServerShow: true });
   };
 
+  onPressServerChainName = (chain: 'main' | 'test' | 'regtest') => {
+    this.setState({ customServerChainName: chain });
+  };
+
   render() {
     const {
       screen,
@@ -617,111 +621,11 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                         justifyContent: 'center',
                         alignItems: 'center',
                       }}>
-                      <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-                        <TouchableOpacity
-                          style={{ marginHorizontal: 5 }}
-                          onPress={() => this.setState({ customServerChainName: 'main' })}>
-                          <View
-                            style={{
-                              flexDirection: 'row',
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                              marginBottom: 10,
-                            }}>
-                            <View
-                              style={{
-                                flexDirection: 'row',
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                borderWidth: customServerChainName === 'main' ? 2 : 1,
-                                borderColor: customServerChainName === 'main' ? colors.primary : colors.primaryDisabled,
-                                borderRadius: 5,
-                                paddingHorizontal: 5,
-                              }}>
-                              <Text
-                                style={{
-                                  fontSize: 13,
-                                  color: colors.border,
-                                  marginRight: 5,
-                                }}>
-                                {translate('settings.value-chain_name-main') as string}
-                              </Text>
-                              {customServerChainName === 'main' && (
-                                <FontAwesomeIcon icon={faCashRegister} size={14} color={colors.primary} />
-                              )}
-                            </View>
-                          </View>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                          style={{ marginHorizontal: 5 }}
-                          onPress={() => this.setState({ customServerChainName: 'test' })}>
-                          <View
-                            style={{
-                              flexDirection: 'row',
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                              marginBottom: 10,
-                            }}>
-                            <View
-                              style={{
-                                flexDirection: 'row',
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                borderWidth: customServerChainName === 'test' ? 2 : 1,
-                                borderColor: customServerChainName === 'test' ? colors.primary : colors.primaryDisabled,
-                                borderRadius: 5,
-                                paddingHorizontal: 5,
-                              }}>
-                              <Text
-                                style={{
-                                  fontSize: 13,
-                                  color: colors.border,
-                                  marginRight: 5,
-                                }}>
-                                {translate('settings.value-chain_name-test') as string}
-                              </Text>
-                              {customServerChainName === 'test' && (
-                                <FontAwesomeIcon icon={faCashRegister} size={14} color={colors.primary} />
-                              )}
-                            </View>
-                          </View>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                          style={{ marginHorizontal: 5 }}
-                          onPress={() => this.setState({ customServerChainName: 'regtest' })}>
-                          <View
-                            style={{
-                              flexDirection: 'row',
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                              marginBottom: 10,
-                            }}>
-                            <View
-                              style={{
-                                flexDirection: 'row',
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                borderWidth: customServerChainName === 'regtest' ? 2 : 1,
-                                borderColor:
-                                  customServerChainName === 'regtest' ? colors.primary : colors.primaryDisabled,
-                                borderRadius: 5,
-                                paddingHorizontal: 5,
-                              }}>
-                              <Text
-                                style={{
-                                  fontSize: 13,
-                                  color: colors.border,
-                                  marginRight: 5,
-                                }}>
-                                {translate('settings.value-chain_name-regtest') as string}
-                              </Text>
-                              {customServerChainName === 'regtest' && (
-                                <FontAwesomeIcon icon={faCashRegister} size={14} color={colors.primary} />
-                              )}
-                            </View>
-                          </View>
-                        </TouchableOpacity>
-                      </View>
+                      <ChainTypeToggle
+                        customServerChainName={customServerChainName}
+                        onPress={this.onPressServerChainName}
+                        translate={translate}
+                      />
                       <View
                         style={{
                           borderColor: colors.border,

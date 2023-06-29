@@ -55,7 +55,7 @@ export default class SettingsFileImpl {
       return settings;
     } catch (err) {
       // File probably doesn't exist, so return nothing
-      //console.log(err);
+      console.log('settings file:', err);
       return {} as SettingsFileClass;
     }
   }

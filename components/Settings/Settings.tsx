@@ -20,6 +20,7 @@ import 'moment/locale/es';
 import Header from '../Header';
 import { ServerType } from '../../app/AppState';
 import { isEqual } from 'lodash';
+import ChainTypeToggle from '../Components/ChainTypeToggle';
 
 type SettingsProps = {
   closeModal: () => void;
@@ -54,7 +55,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 }) => {
   const context = useContext(ContextAppLoaded);
   const {
-    server,
     walletSettings,
     translate,
     server: serverContext,
@@ -101,12 +101,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   let MODES: Options[] = [];
   if (typeof modesArray === 'object') {
     MODES = modesArray as Options[];
-  }
-
-  const chain_namesArray = translate('settings.chain_names');
-  let CHAIN_NAMES: Options[] = [];
-  if (typeof chain_namesArray === 'object') {
-    CHAIN_NAMES = chain_namesArray as Options[];
   }
 
   const { colors } = useTheme() as unknown as ThemeType;
@@ -163,7 +157,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const saveSettings = async () => {
     let serverUriParsed = customServerUri;
     let same_server_chain_name = true;
-    const chain_name = server.chain_name;
+    const chain_name = serverContext.chain_name;
     if (
       walletSettings.download_memos === memos &&
       walletSettings.transaction_filter_threshold === filter &&
@@ -313,6 +307,10 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         <FadeText key={'fade-' + item.value}>{item.text}</FadeText>
       </View>
     ));
+  };
+
+  const onPressServerChainName = (chain: 'main' | 'test' | 'regtest') => {
+    setCustomServerChainName(chain);
   };
 
   return (
@@ -494,14 +492,31 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                     maxLength={100}
                   />
                 </View>
-                <View style={{ display: 'flex', marginLeft: 25, marginBottom: 30 }}>
-                  {optionsRadio(
-                    CHAIN_NAMES,
-                    setCustomServerChainName as React.Dispatch<React.SetStateAction<string | boolean>>,
-                    String,
-                    customServerChainName,
-                    'chain_name',
-                  )}
+                <View
+                  accessible={true}
+                  accessibilityLabel={translate('settings.server-acc') as string}
+                  style={{
+                    marginLeft: 5,
+                    width: 'auto',
+                    maxWidth: '90%',
+                    minWidth: '50%',
+                    minHeight: 48,
+                  }}>
+                  <View
+                    style={{
+                      paddingTop: 10,
+                      paddingLeft: 10,
+                      paddingRight: 10,
+                      marginBottom: 5,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <ChainTypeToggle
+                      customServerChainName={customServerChainName}
+                      onPress={onPressServerChainName}
+                      translate={translate}
+                    />
+                  </View>
                 </View>
               </View>
             )}
