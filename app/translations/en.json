@@ -182,6 +182,7 @@
     "privacy": "Priv: ",
     "value-mode-basic": "Basic",
     "value-mode-expert": "Expert",
+    "mode": "Mode: ",
     "value-chain_name-main": "Mainnet",
     "value-chain_name-test": "Testnet",
     "value-chain_name-regtest": "Regtest"

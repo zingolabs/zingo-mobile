@@ -520,6 +520,9 @@ const Header: React.FunctionComponent<HeaderProps> = ({
 
       <View style={{ padding: 15, position: 'absolute', right: 0, alignItems: 'flex-end' }}>
         <Text style={{ fontSize: 8, color: colors.border }}>{translate('version') as string}</Text>
+        <Text style={{ fontSize: 8, color: colors.border }}>{`${translate('settings.mode')}${translate(
+          `settings.value-mode-${mode}`,
+        )}`}</Text>
         {__DEV__ && !!dimensions && (
           <Text style={{ fontSize: 8, color: colors.border }}>
             {'(' + dimensions.width + 'x' + dimensions.height + ')-' + dimensions.scale}
@@ -532,7 +535,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 flexDirection: 'row',
                 justifyContent: 'center',
                 alignItems: 'center',
-                marginTop: 10,
+                marginTop: 5,
               }}>
               <Text style={{ fontSize: 13, color: colors.border }}>{translate('settings.privacy') as string}</Text>
               <View
