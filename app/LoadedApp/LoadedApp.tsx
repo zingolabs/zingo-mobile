@@ -1072,7 +1072,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
         iconName = faCog;
       }
 
-      const iconColor = focused ? colors.zingo : colors.money;
+      const iconColor = focused ? colors.background : colors.money;
       return <FontAwesomeIcon icon={iconName} color={iconColor} />;
     };
 
@@ -1383,13 +1383,13 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
             initialRouteName={translate('loadedapp.wallet-menu') as string}
             screenOptions={({ route }) => ({
               tabBarIcon: ({ focused }) => fnTabBarIcon(route, focused),
-              tabBarActiveTintColor: colors.zingo,
+              tabBarActiveTintColor: colors.background,
               tabBarActiveBackgroundColor: colors.primaryDisabled,
               tabBarInactiveTintColor: colors.money,
               tabBarLabelStyle: { fontSize: 14 },
               tabBarStyle: {
                 borderRadius: 0,
-                borderTopColor: colors.primaryDisabled,
+                borderTopColor: colors.primary,
                 borderTopWidth: 1,
               },
               headerShown: false,
