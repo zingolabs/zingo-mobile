@@ -89,7 +89,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected }) => {
         )}
 
         {mode !== 'basic' && (
-          <RegText onPress={() => onItemSelectedWrapper('Change Wallet')} style={item}>
+          <RegText testID="menu.changewallet" onPress={() => onItemSelectedWrapper('Change Wallet')} style={item}>
             {translate('loadedapp.changewallet') as string}
           </RegText>
         )}
