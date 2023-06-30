@@ -233,7 +233,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       }}>
       <Image
         source={require('../../assets/img/logobig-zingo.png')}
-        style={{ width: 80, height: 80, resizeMode: 'contain', borderRadius: 10 }}
+        style={{ width: 50, height: 50, resizeMode: 'contain', borderRadius: 10 }}
       />
       {noBalance && <View style={{ height: 20 }} />}
       {!noBalance && (
@@ -478,10 +478,10 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       </View>
 
       <View style={{ padding: 10, position: 'absolute', left: 0 }}>
-        <View style={{ alignItems: 'center' }}>
+        <View style={{ alignItems: 'center', flexDirection: 'row' }}>
           {!noDrawMenu && (
             <TouchableOpacity
-              style={{ marginBottom: 5 }}
+              style={{ marginRight: 5 }}
               testID="header.drawmenu"
               accessible={true}
               accessibilityLabel={translate('menudrawer-acc') as string}
@@ -493,7 +493,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             <>
               {setUfvkViewModalVisible ? (
                 <TouchableOpacity onPress={() => setUfvkViewModalVisible(true)}>
-                  <FontAwesomeIcon icon={faSnowflake} size={48} color={colors.zingo} />
+                  <FontAwesomeIcon icon={faSnowflake} size={24} color={colors.zingo} />
                 </TouchableOpacity>
               ) : (
                 <FontAwesomeIcon icon={faSnowflake} size={24} color={colors.zingo} />
@@ -517,7 +517,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 flexDirection: 'row',
                 justifyContent: 'center',
                 alignItems: 'center',
-                marginTop: 15,
+                marginTop: 10,
               }}>
               <Text style={{ fontSize: 13, color: colors.border }}>{translate('settings.privacy') as string}</Text>
               <View
