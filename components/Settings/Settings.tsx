@@ -368,6 +368,34 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           )}
         </View>
 
+        <View style={{ display: 'flex', margin: 10 }}>
+          <BoldText>{translate('settings.currency-title') as string}</BoldText>
+        </View>
+
+        <View style={{ display: 'flex', marginLeft: 25 }}>
+          {optionsRadio(
+            CURRENCIES,
+            setCurrency as React.Dispatch<React.SetStateAction<string | boolean>>,
+            String,
+            currency,
+            'currency',
+          )}
+        </View>
+
+        <View style={{ display: 'flex', margin: 10 }}>
+          <BoldText>{translate('settings.language-title') as string}</BoldText>
+        </View>
+
+        <View style={{ display: 'flex', marginLeft: 25 }}>
+          {optionsRadio(
+            LANGUAGES,
+            setLanguage as React.Dispatch<React.SetStateAction<string | boolean>>,
+            String,
+            language,
+            'language',
+          )}
+        </View>
+
         {modeContext !== 'basic' && (
           <>
             <View style={{ display: 'flex', margin: 10 }}>
@@ -381,34 +409,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 Boolean,
                 sendAll,
                 'sendall',
-              )}
-            </View>
-
-            <View style={{ display: 'flex', margin: 10 }}>
-              <BoldText>{translate('settings.currency-title') as string}</BoldText>
-            </View>
-
-            <View style={{ display: 'flex', marginLeft: 25 }}>
-              {optionsRadio(
-                CURRENCIES,
-                setCurrency as React.Dispatch<React.SetStateAction<string | boolean>>,
-                String,
-                currency,
-                'currency',
-              )}
-            </View>
-
-            <View style={{ display: 'flex', margin: 10 }}>
-              <BoldText>{translate('settings.language-title') as string}</BoldText>
-            </View>
-
-            <View style={{ display: 'flex', marginLeft: 25 }}>
-              {optionsRadio(
-                LANGUAGES,
-                setLanguage as React.Dispatch<React.SetStateAction<string | boolean>>,
-                String,
-                language,
-                'language',
               )}
             </View>
 
