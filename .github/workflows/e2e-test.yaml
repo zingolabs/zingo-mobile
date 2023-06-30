@@ -80,9 +80,13 @@ jobs:
       - run: ./scripts/node_reboot.sh
       
       - name: Run Detox Build
-        run: yarn detox build -c android.emu.debug -n test
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 60
+          max_attempts: 5
+          command: yarn detox build -c android.emu.debug -n test
       
-      - name: Run e2e tests
+      - name: Run Detox Test
         uses: nick-fields/retry@v2
         with:
           timeout_minutes: 60
