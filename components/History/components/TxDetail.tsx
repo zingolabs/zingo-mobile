@@ -20,9 +20,13 @@ import Header from '../../Header';
 type TxDetailProps = {
   tx: TransactionType;
   closeModal: () => void;
+  set_privacy_option: (
+    name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
+    value: boolean,
+  ) => Promise<void>;
 };
 
-const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) => {
+const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_privacy_option }) => {
   const context = useContext(ContextAppLoaded);
   const { info, translate, language, privacy } = context;
   const { colors } = useTheme() as unknown as ThemeType;
@@ -75,7 +79,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal }) =>
         noBalance={true}
         noSyncingStatus={true}
         noDrawMenu={true}
-        noPrivacy={true}
+        set_privacy_option={set_privacy_option}
       />
       <ScrollView
         showsVerticalScrollIndicator={true}
