@@ -131,6 +131,16 @@ exports[`Component Ufvk - test Ufvk Private - snapshot 1`] = `
           }
         }
       >
+        text translatedtext translated
+      </Text>
+      <Text
+        style={
+          {
+            "color": "rgb(216, 216, 216)",
+            "fontSize": 8,
+          }
+        }
+      >
         (undefinedxundefined)-undefined
       </Text>
     </View>

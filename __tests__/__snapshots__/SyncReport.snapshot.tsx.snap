@@ -131,6 +131,16 @@ exports[`Component SyncReport - test Matches the snapshot SyncReport 1`] = `
           }
         }
       >
+        translated texttranslated text
+      </Text>
+      <Text
+        style={
+          {
+            "color": "rgb(216, 216, 216)",
+            "fontSize": 8,
+          }
+        }
+      >
         (undefinedxundefined)-undefined
       </Text>
     </View>

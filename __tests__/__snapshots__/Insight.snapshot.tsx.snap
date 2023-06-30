@@ -131,6 +131,16 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
           }
         }
       >
+        text translatedtext translated
+      </Text>
+      <Text
+        style={
+          {
+            "color": "rgb(216, 216, 216)",
+            "fontSize": 8,
+          }
+        }
+      >
         (undefinedxundefined)-undefined
       </Text>
       <View
@@ -156,7 +166,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
               "alignItems": "center",
               "flexDirection": "row",
               "justifyContent": "center",
-              "marginTop": 10,
+              "marginTop": 5,
             }
           }
         >
