@@ -290,6 +290,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     return DATA.map(item => (
       <View key={'view-' + item.value}>
         <TouchableOpacity
+          testID={`settings-${label}-${item.value}`}
           disabled={disabled}
           style={{ marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
           onPress={() => setOption(typeOption(item.value))}>
