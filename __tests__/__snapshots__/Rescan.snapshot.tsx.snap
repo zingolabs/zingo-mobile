@@ -34,9 +34,9 @@ exports[`Component Rescan - test Rescan - snapshot 1`] = `
       style={
         {
           "borderRadius": 10,
-          "height": 80,
+          "height": 50,
           "resizeMode": "contain",
-          "width": 80,
+          "width": 50,
         }
       }
     />
@@ -98,6 +98,7 @@ exports[`Component Rescan - test Rescan - snapshot 1`] = `
         style={
           {
             "alignItems": "center",
+            "flexDirection": "row",
           }
         }
       />

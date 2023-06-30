@@ -69,6 +69,7 @@ describe('Component Transactions TxDetail - test', () => {
   const state = defaultAppStateLoaded;
   state.translate = () => 'translated text';
   const onClose = jest.fn();
+  const onSetOption = jest.fn();
   test('Transactions TxDetail - normal sent transaction', () => {
     state.info.currencyName = 'ZEC';
     state.totalBalance.total = 1.12345678;
@@ -91,7 +92,7 @@ describe('Component Transactions TxDetail - test', () => {
     } as TransactionType;
     render(
       <ContextAppLoadedProvider value={state}>
-        <TxDetail tx={tx} closeModal={onClose} />
+        <TxDetail tx={tx} closeModal={onClose} set_privacy_option={onSetOption} />
       </ContextAppLoadedProvider>,
     ).toJSON();
     screen.getByText('0.0064');
@@ -120,7 +121,7 @@ describe('Component Transactions TxDetail - test', () => {
     } as TransactionType;
     render(
       <ContextAppLoadedProvider value={state}>
-        <TxDetail tx={txSelfSend} closeModal={onClose} />
+        <TxDetail tx={txSelfSend} closeModal={onClose} set_privacy_option={onSetOption} />
       </ContextAppLoadedProvider>,
     );
     screen.getByText('0.0064');

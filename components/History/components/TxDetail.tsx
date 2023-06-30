@@ -20,10 +20,7 @@ import Header from '../../Header';
 type TxDetailProps = {
   tx: TransactionType;
   closeModal: () => void;
-  set_privacy_option: (
-    name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
-    value: boolean,
-  ) => Promise<void>;
+  set_privacy_option: (name: 'privacy', value: boolean) => Promise<void>;
 };
 
 const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_privacy_option }) => {
