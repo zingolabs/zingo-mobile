@@ -14,10 +14,7 @@ import Header from '../Header';
 
 type PoolsProps = {
   closeModal: () => void;
-  set_privacy_option: (
-    name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
-    value: boolean,
-  ) => Promise<void>;
+  set_privacy_option: (name: 'privacy', value: boolean) => Promise<void>;
 };
 
 const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, set_privacy_option }) => {

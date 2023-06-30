@@ -76,10 +76,7 @@ const getPercent = (percent: number) => {
 
 type InsightProps = {
   closeModal: () => void;
-  set_privacy_option: (
-    name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
-    value: boolean,
-  ) => Promise<void>;
+  set_privacy_option: (name: 'privacy', value: boolean) => Promise<void>;
 };
 
 const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, set_privacy_option }) => {
