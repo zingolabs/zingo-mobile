@@ -315,8 +315,8 @@
   },
   "history": {
     "shieldfunds-all": "Shield All funds",
-    "shieldfunds-transparent": "Shield Transparent funds",
-    "shieldfunds-sapling": "Upgrade funds to newest version",
+    "shieldfunds-transparent": "Shield Transparent\nfunds",
+    "shieldfunds-sapling": "Upgrade funds to\nnewest version",
     "shieldfunds-t": "Transparent",
     "shieldfunds-z": "Sapling",
     "shield-message": "Shielded in Tx:",
