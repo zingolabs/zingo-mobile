@@ -61,11 +61,20 @@ jest.mock('@react-native-community/netinfo', () => {
 
   return RN;
 });
+jest.mock('react-native', () => {
+  const RN = jest.requireActual('react-native');
+
+  RN.NativeModules.RPCModule = {
+    execute: jest.fn(() => '{}'),
+  };
+
+  return RN;
+});
 
 // test suite
-describe('Component Transactions - test', () => {
+describe('Component History - test', () => {
   //snapshot test
-  test('Transactions - snapshot', () => {
+  test('History - snapshot', () => {
     const state = defaultAppStateLoaded;
     state.transactions = [
       {

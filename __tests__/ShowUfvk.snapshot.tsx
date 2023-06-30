@@ -31,9 +31,18 @@ jest.mock('@react-native-community/netinfo', () => {
 
   return RN;
 });
+jest.mock('react-native', () => {
+  const RN = jest.requireActual('react-native');
+
+  RN.NativeModules.RPCModule = {
+    execute: jest.fn(() => '{}'),
+  };
+
+  return RN;
+});
 
 // test suite
-describe('Component Ufvk - test', () => {
+describe('Component ShowUfvk - test', () => {
   //snapshot test
   const state = defaultAppStateLoaded;
   state.translate = () => 'text translated';
@@ -43,7 +52,7 @@ describe('Component Ufvk - test', () => {
     'uview1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890';
   const onClose = jest.fn();
   const onOK = jest.fn();
-  test('Ufvk Private - snapshot', () => {
+  test('ShowUfvk - snapshot', () => {
     const ufvk = render(
       <ContextAppLoadedProvider value={state}>
         <ShowUfvk onClickCancel={onClose} onClickOK={onOK} action="view" />

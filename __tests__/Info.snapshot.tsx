@@ -31,11 +31,20 @@ jest.mock('@react-native-community/netinfo', () => {
 
   return RN;
 });
+jest.mock('react-native', () => {
+  const RN = jest.requireActual('react-native');
+
+  RN.NativeModules.RPCModule = {
+    execute: jest.fn(() => '{}'),
+  };
+
+  return RN;
+});
 
 // test suite
 describe('Component Info - test', () => {
   //snapshot test
-  test('Matches the snapshot Info', () => {
+  test('Info - snapshot', () => {
     const state = defaultAppStateLoaded;
     state.info = {
       serverUri: 'https://zcash.es',

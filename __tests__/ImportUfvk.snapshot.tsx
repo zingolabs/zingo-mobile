@@ -41,11 +41,20 @@ jest.mock('@react-native-community/netinfo', () => {
 
   return RN;
 });
+jest.mock('react-native', () => {
+  const RN = jest.requireActual('react-native');
+
+  RN.NativeModules.RPCModule = {
+    execute: jest.fn(() => '{}'),
+  };
+
+  return RN;
+});
 
 // test suite
 describe('Component ImportUfvk - test', () => {
   //snapshot test
-  test('Matches the snapshot ImportUfvk', () => {
+  test('ImportUfvk - snapshot', () => {
     const state = defaultAppStateLoaded;
     state.translate = () => 'text translated';
     state.info.currencyName = 'ZEC';

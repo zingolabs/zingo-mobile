@@ -31,9 +31,18 @@ jest.mock('@react-native-community/netinfo', () => {
 
   return RN;
 });
+jest.mock('react-native', () => {
+  const RN = jest.requireActual('react-native');
+
+  RN.NativeModules.RPCModule = {
+    execute: jest.fn(() => '{}'),
+  };
+
+  return RN;
+});
 
 // test suite
-describe('Component Info - test', () => {
+describe('Component Pools - test', () => {
   //snapshot test
   const state = defaultAppStateLoaded;
   state.translate = () => 'translated text';
@@ -45,7 +54,7 @@ describe('Component Info - test', () => {
   state.totalBalance.spendablePrivate = 0.2;
   state.totalBalance.transparentBal = 0.12345678;
   const onClose = jest.fn();
-  test('Matches the snapshot Info', () => {
+  test('Pools - snapshot', () => {
     const info: any = render(
       <ContextAppLoadedProvider value={state}>
         <Pools closeModal={onClose} set_privacy_option={onClose} />

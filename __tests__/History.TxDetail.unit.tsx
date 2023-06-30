@@ -62,15 +62,24 @@ jest.mock('@react-native-community/netinfo', () => {
 
   return RN;
 });
+jest.mock('react-native', () => {
+  const RN = jest.requireActual('react-native');
+
+  RN.NativeModules.RPCModule = {
+    execute: jest.fn(() => '{}'),
+  };
+
+  return RN;
+});
 
 // test suite
-describe('Component Transactions TxDetail - test', () => {
+describe('Component History TxDetail - test', () => {
   //unit test
   const state = defaultAppStateLoaded;
   state.translate = () => 'translated text';
   const onClose = jest.fn();
   const onSetOption = jest.fn();
-  test('Transactions TxDetail - normal sent transaction', () => {
+  test('History TxDetail - normal sent transaction', () => {
     state.info.currencyName = 'ZEC';
     state.totalBalance.total = 1.12345678;
     const tx = {
@@ -99,7 +108,7 @@ describe('Component Transactions TxDetail - test', () => {
     screen.getByText('0.0001');
   });
 
-  test('Transactions TxDetail - self sent transaction', () => {
+  test('History TxDetail - self sent transaction', () => {
     state.info.currencyName = 'ZEC';
     state.totalBalance.total = 1.12345678;
     const txSelfSend = {

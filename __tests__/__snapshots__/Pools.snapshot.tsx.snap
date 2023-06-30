@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Component Info - test Matches the snapshot Info 1`] = `
+exports[`Component Pools - test Pools - snapshot 1`] = `
 <RCTSafeAreaView
   style={
     {

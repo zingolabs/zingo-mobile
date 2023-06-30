@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Component SyncReport - test Matches the snapshot SyncReport 1`] = `
+exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
 <RCTSafeAreaView
   style={
     {

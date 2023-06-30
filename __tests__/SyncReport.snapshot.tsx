@@ -46,6 +46,15 @@ jest.mock('@react-native-community/netinfo', () => ({
   },
   NetInfoStateType: NetInfoStateType,
 }));
+jest.mock('react-native', () => {
+  const RN = jest.requireActual('react-native');
+
+  RN.NativeModules.RPCModule = {
+    execute: jest.fn(() => '{}'),
+  };
+
+  return RN;
+});
 
 // test suite
 describe('Component SyncReport - test', () => {
@@ -66,7 +75,7 @@ describe('Component SyncReport - test', () => {
   state.syncingStatus.process_end_block = 1600100;
   state.netInfo.isConnected = true;
   const onClose = jest.fn();
-  test('Matches the snapshot SyncReport', () => {
+  test('SyncReport - snapshot', () => {
     const info: any = render(
       <ContextAppLoadedProvider value={state}>
         <SyncReport closeModal={onClose} />
