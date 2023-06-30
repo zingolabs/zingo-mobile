@@ -30,11 +30,11 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateTo
     const result: string = await RPCModule.execute('parse_address', scannedAddress);
     if (result) {
       if (result.toLowerCase().startsWith('error') || result.toLowerCase() === 'null') {
-        Toast.show(`"${scannedAddress}" ${translate('scanner.nozcash-error')}`, Toast.LONG);
+        Toast.show(translate('scanner.nozcash-error') as string, Toast.LONG);
         return;
       }
     } else {
-      Toast.show(`"${scannedAddress}" ${translate('scanner.nozcash-error')}`, Toast.LONG);
+      Toast.show(translate('scanner.nozcash-error') as string, Toast.LONG);
       return;
     }
     // TODO verify that JSON don't fail.
@@ -60,7 +60,7 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateTo
           return;
         }
       } else {
-        Toast.show(`${translate('scanner.nozcash-error')}`, Toast.LONG);
+        Toast.show(translate('scanner.nozcash-error') as string, Toast.LONG);
         return;
       }
     }

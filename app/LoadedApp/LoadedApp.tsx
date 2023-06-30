@@ -758,7 +758,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   };
 
   set_server_option = async (
-    name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
+    name: 'server',
     value: ServerType,
     toast: boolean,
     same_server_chain_name: boolean,
@@ -836,10 +836,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     }
   };
 
-  set_currency_option = async (
-    name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
-    value: string,
-  ): Promise<void> => {
+  set_currency_option = async (name: 'currency', value: string): Promise<void> => {
     await SettingsFileImpl.writeSettings(name, value);
     this.setState({
       currency: value as 'USD' | '',
@@ -849,11 +846,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     this.rpc.fetchWalletSettings();
   };
 
-  set_language_option = async (
-    name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
-    value: string,
-    reset: boolean,
-  ): Promise<void> => {
+  set_language_option = async (name: 'language', value: string, reset: boolean): Promise<void> => {
     await SettingsFileImpl.writeSettings(name, value);
     this.setState({
       language: value as 'en' | 'es',
@@ -866,10 +859,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     }
   };
 
-  set_sendAll_option = async (
-    name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
-    value: boolean,
-  ): Promise<void> => {
+  set_sendAll_option = async (name: 'sendAll', value: boolean): Promise<void> => {
     await SettingsFileImpl.writeSettings(name, value);
     this.setState({
       sendAll: value as boolean,
@@ -879,10 +869,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     this.rpc.fetchWalletSettings();
   };
 
-  set_privacy_option = async (
-    name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
-    value: boolean,
-  ): Promise<void> => {
+  set_privacy_option = async (name: 'privacy', value: boolean): Promise<void> => {
     await SettingsFileImpl.writeSettings(name, value);
     this.setState({
       privacy: value as boolean,

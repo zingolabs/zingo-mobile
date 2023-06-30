@@ -46,10 +46,7 @@ type HeaderProps = {
   setComputingModalVisible?: (visible: boolean) => void;
   setBackgroundError?: (title: string, error: string) => void;
   noPrivacy?: boolean;
-  set_privacy_option?: (
-    name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
-    value: boolean,
-  ) => Promise<void>;
+  set_privacy_option?: (name: 'privacy', value: boolean) => Promise<void>;
   setPoolsToShieldSelectSapling?: (v: boolean) => void;
   setPoolsToShieldSelectTransparent?: (v: boolean) => void;
   setUfvkViewModalVisible?: (v: boolean) => void;

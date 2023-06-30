@@ -138,20 +138,6 @@
         "text": "Normal Privacy, you can see all the information."
       }
     ],
-    "chain_names": [
-      { 
-        "value": "main",
-        "text": "Mainnet Network." 
-      },
-      {
-        "value": "test",
-        "text": "Testnet Network."
-      },
-      {
-        "value": "regtest",
-        "text": "Regtest Local Network."
-      }
-    ],
     "nochanges": "No changes registred.",
     "ismemo": "You need to choose the download memos option to save.",
     "isthreshold": "You need to choose the transaction filter threshold option to save.",
@@ -317,7 +303,7 @@
   "history": {
     "shieldfunds-all": "Shield All funds",
     "shieldfunds-transparent": "Shield Transparent funds",
-    "shieldfunds-sapling": "Shield Sapling funds",
+    "shieldfunds-sapling": "Upgrade funds to newest version",
     "shieldfunds-t": "Transparent",
     "shieldfunds-z": "Sapling",
     "shield-message": "Shielded in Tx:",
@@ -398,7 +384,7 @@
   "scanner": {
     "text" : "Scan a Unified Full Viewing Key",
     "uri-error": "URI Error:",
-    "nozcash-error": "is not a valid Zcash Address",
+    "nozcash-error": "It is not a valid Zcash Address",
     "scanaddress": "Scan a Zcash Address",
     "noviewkey-error": "It is not a valid Unified Full Viewing Key"
   },

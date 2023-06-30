@@ -22,10 +22,7 @@ type HistoryProps = {
   setZecPrice: (p: number, d: number) => void;
   setComputingModalVisible: (visible: boolean) => void;
   setBackgroundError: (title: string, error: string) => void;
-  set_privacy_option: (
-    name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
-    value: boolean,
-  ) => Promise<void>;
+  set_privacy_option: (name: 'privacy', value: boolean) => Promise<void>;
   setPoolsToShieldSelectSapling: (v: boolean) => void;
   setPoolsToShieldSelectTransparent: (v: boolean) => void;
   setUfvkViewModalVisible?: (v: boolean) => void;
@@ -87,7 +84,11 @@ const History: React.FunctionComponent<HistoryProps> = ({
         transparent={false}
         visible={isTxDetailModalShowing}
         onRequestClose={() => setTxDetailModalShowing(false)}>
-        <TxDetail tx={txDetail} closeModal={() => setTxDetailModalShowing(false)} />
+        <TxDetail
+          tx={txDetail}
+          closeModal={() => setTxDetailModalShowing(false)}
+          set_privacy_option={set_privacy_option}
+        />
       </Modal>
 
       <Header

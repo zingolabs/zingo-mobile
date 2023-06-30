@@ -21,10 +21,7 @@ import { Scene } from 'react-native-tab-view/lib/typescript/src/types';
 type ReceiveProps = {
   setUaAddress: (uaAddress: string) => void;
   toggleMenuDrawer: () => void;
-  set_privacy_option: (
-    name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy',
-    value: boolean,
-  ) => Promise<void>;
+  set_privacy_option: (name: 'privacy', value: boolean) => Promise<void>;
   setUfvkViewModalVisible?: (v: boolean) => void;
 };
 
