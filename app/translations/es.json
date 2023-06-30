@@ -13,7 +13,7 @@
   "donation": "Gracias por apoyar Zingo!",
   "insight": {
     "title": "Visión Financiera",
-    "no-data": "No hay datos en tu Monedero, ninguna transacción enviada.",
+    "no-data": "No hay datos en tu Monedero que concuerden con el gráfico seleccionado.",
     "sent": "Enviado",
     "sends": "# envios",
     "memobytes": "# carácteres",

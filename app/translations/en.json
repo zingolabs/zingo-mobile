@@ -13,7 +13,7 @@
   "donation": "Thanks for supporting Zingo!",
   "insight": {
     "title": "Financial Insight",
-    "no-data": "There is no data in your Wallet, no sent transactions.",
+    "no-data": "There is no data in your Wallet that fit the graph selected.",
     "sent": "Sent",
     "sends": "# sends",
     "memobytes": "# bytes",
