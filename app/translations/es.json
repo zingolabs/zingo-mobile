@@ -384,7 +384,7 @@
   "scanner": {
     "text" : "Escanea una Clave de Visualización Totalmente Unificada",
     "uri-error": "URI Error:",
-    "nozcash-error": "no es una dirección Zcash válida",
+    "nozcash-error": "No es una dirección Zcash válida",
     "scanaddress": "Escanea una dirección Zcash",
     "noviewkey-error": "No es una Clave de Visualización Totalmente Unificada valida"
   },
