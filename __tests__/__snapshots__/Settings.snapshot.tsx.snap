@@ -136,7 +136,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                 "opacity": 1,
               }
             }
-            testID="settings-currency-"
+            testID="settings.currency-"
           >
             <View
               style={
@@ -226,7 +226,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                 "opacity": 1,
               }
             }
-            testID="settings-currency-USD"
+            testID="settings.currency-USD"
           >
             <View
               style={
@@ -335,7 +335,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                 "opacity": 1,
               }
             }
-            testID="settings-language-en"
+            testID="settings.language-en"
           >
             <View
               style={
@@ -414,7 +414,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                 "opacity": 1,
               }
             }
-            testID="settings-language-es"
+            testID="settings.language-es"
           >
             <View
               style={
