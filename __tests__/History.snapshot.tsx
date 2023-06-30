@@ -74,60 +74,93 @@ jest.mock('react-native', () => {
 // test suite
 describe('Component History - test', () => {
   //snapshot test
-  test('History - snapshot', () => {
-    const state = defaultAppStateLoaded;
-    state.transactions = [
-      {
-        type: 'sent',
-        address: 'sent-address-12345678901234567890',
-        amount: 0.12345678,
-        position: '',
-        confirmations: 22,
-        txid: 'sent-txid-1234567890',
-        time: Date.now(),
-        zec_price: 33.33,
-        detailedTxns: [],
-      },
-      {
-        type: 'receive',
-        address: 'receive-address-12345678901234567890',
-        amount: 0.87654321,
-        position: '',
-        confirmations: 133,
-        txid: 'receive-txid-1234567890',
-        time: Date.now(),
-        zec_price: 66.66,
-        detailedTxns: [],
-      },
-    ];
-    state.uaAddress = 'UA-12345678901234567890';
-    state.addresses = [
-      {
-        uaAddress: 'UA-12345678901234567890',
-        address: 'UA-12345678901234567890',
-        addressKind: 'u',
-        containsPending: false,
-        receivers: 'ozt',
-      },
-      {
-        uaAddress: 'UA-12345678901234567890',
-        address: 'sapling-12345678901234567890',
-        addressKind: 'z',
-        containsPending: false,
-        receivers: 'z',
-      },
-      {
-        uaAddress: 'UA-12345678901234567890',
-        address: 'transparent-12345678901234567890',
-        addressKind: 't',
-        containsPending: false,
-        receivers: 't',
-      },
-    ];
-    state.translate = () => 'text translated';
-    state.info.currencyName = 'ZEC';
-    state.totalBalance.total = 1.12345678;
-    const onFunction = jest.fn();
+  const state = defaultAppStateLoaded;
+  state.transactions = [
+    {
+      type: 'sent',
+      address: 'sent-address-12345678901234567890',
+      amount: 0.12345678,
+      position: '',
+      confirmations: 22,
+      txid: 'sent-txid-1234567890',
+      time: Date.now(),
+      zec_price: 33.33,
+      detailedTxns: [],
+    },
+    {
+      type: 'receive',
+      address: 'receive-address-12345678901234567890',
+      amount: 0.87654321,
+      position: '',
+      confirmations: 133,
+      txid: 'receive-txid-1234567890',
+      time: Date.now(),
+      zec_price: 66.66,
+      detailedTxns: [],
+    },
+  ];
+  state.uaAddress = 'UA-12345678901234567890';
+  state.addresses = [
+    {
+      uaAddress: 'UA-12345678901234567890',
+      address: 'UA-12345678901234567890',
+      addressKind: 'u',
+      containsPending: false,
+      receivers: 'ozt',
+    },
+    {
+      uaAddress: 'UA-12345678901234567890',
+      address: 'sapling-12345678901234567890',
+      addressKind: 'z',
+      containsPending: false,
+      receivers: 'z',
+    },
+    {
+      uaAddress: 'UA-12345678901234567890',
+      address: 'transparent-12345678901234567890',
+      addressKind: 't',
+      containsPending: false,
+      receivers: 't',
+    },
+  ];
+  state.translate = () => 'text translated';
+  state.info.currencyName = 'ZEC';
+  state.totalBalance.total = 1.12345678;
+  const onFunction = jest.fn();
+
+  test('History no currency, privacy normal & mode basic - snapshot', () => {
+    // no currency
+    state.currency = '';
+    // privacy normal
+    state.privacy = false;
+    // mode basic
+    state.mode = 'basic';
+    const transactions = render(
+      <ContextAppLoadedProvider value={state}>
+        <History
+          doRefresh={onFunction}
+          toggleMenuDrawer={onFunction}
+          poolsMoreInfoOnClick={onFunction}
+          syncingStatusMoreInfoOnClick={onFunction}
+          setZecPrice={onFunction}
+          setComputingModalVisible={onFunction}
+          setBackgroundError={onFunction}
+          set_privacy_option={onFunction}
+          setPoolsToShieldSelectSapling={onFunction}
+          setPoolsToShieldSelectTransparent={onFunction}
+        />
+      </ContextAppLoadedProvider>,
+    );
+    expect(transactions.toJSON()).toMatchSnapshot();
+  });
+
+  test('History currency USD, privacy high & mode expert - snapshot', () => {
+    // no currency
+    state.currency = 'USD';
+    // privacy normal
+    state.privacy = true;
+    // mode basic
+    state.mode = 'expert';
     const transactions = render(
       <ContextAppLoadedProvider value={state}>
         <History
