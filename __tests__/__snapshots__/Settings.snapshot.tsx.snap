@@ -136,6 +136,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                 "opacity": 1,
               }
             }
+            testID="settings-currency-"
           >
             <View
               style={
@@ -225,6 +226,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                 "opacity": 1,
               }
             }
+            testID="settings-currency-USD"
           >
             <View
               style={
@@ -333,6 +335,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                 "opacity": 1,
               }
             }
+            testID="settings-language-en"
           >
             <View
               style={
@@ -411,6 +414,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                 "opacity": 1,
               }
             }
+            testID="settings-language-es"
           >
             <View
               style={
