@@ -42,7 +42,8 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
     server: ServerType,
     dimensions: DimensionsType,
     netInfo: NetInfoType,
-    privacy: boolean;
+    privacy: boolean,
+    mode: 'basic' | 'expert';
   if (action === 'new' || action === 'restore') {
     wallet = contextLoading.wallet;
     translate = contextLoading.translate;
@@ -51,6 +52,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
     dimensions = contextLoading.dimensions;
     netInfo = contextLoading.netInfo;
     privacy = contextLoading.privacy;
+    mode = contextLoading.mode;
   } else {
     wallet = contextLoaded.wallet;
     translate = contextLoaded.translate;
@@ -59,6 +61,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
     dimensions = contextLoaded.dimensions;
     netInfo = contextLoaded.netInfo;
     privacy = contextLoaded.privacy;
+    mode = contextLoaded.mode;
   }
 
   const { colors } = useTheme() as unknown as ThemeType;
@@ -192,6 +195,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
             translate={translate}
             dimensions={dimensions}
             netInfo={netInfo}
+            mode={mode}
           />
         </View>
       </Animated.View>

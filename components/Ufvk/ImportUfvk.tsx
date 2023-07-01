@@ -23,7 +23,7 @@ type ImportUfvkProps = {
 };
 const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, onClickOK }) => {
   const context = useContext(ContextAppLoading);
-  const { translate, netInfo, dimensions, info, server } = context;
+  const { translate, netInfo, dimensions, info, server, mode } = context;
   const { colors } = useTheme() as unknown as ThemeType;
 
   const [ufvkText, setUfvkText] = useState('');
@@ -148,6 +148,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
             translate={translate}
             dimensions={dimensions}
             netInfo={netInfo}
+            mode={mode}
           />
         </View>
       </Animated.View>

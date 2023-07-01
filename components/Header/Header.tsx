@@ -43,6 +43,7 @@ type HeaderProps = {
   translate?: (key: string) => TranslateType;
   dimensions?: DimensionsType;
   netInfo?: NetInfoType;
+  mode?: 'basic' | 'expert';
   setComputingModalVisible?: (visible: boolean) => void;
   setBackgroundError?: (title: string, error: string) => void;
   noPrivacy?: boolean;
@@ -65,6 +66,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   translate: translateProp,
   dimensions: dimensionsProp,
   netInfo: netInfoProp,
+  mode: modeProp,
   setComputingModalVisible,
   setBackgroundError,
   noPrivacy,
@@ -84,10 +86,10 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     readOnly,
     poolsToShieldSelectSapling,
     poolsToShieldSelectTransparent,
-    mode,
+    transactions,
   } = context;
 
-  let translate: (key: string) => TranslateType, dimensions, netInfo;
+  let translate: (key: string) => TranslateType, dimensions, netInfo, mode;
   if (translateProp) {
     translate = translateProp;
   } else {
@@ -102,6 +104,11 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     netInfo = netInfoProp;
   } else {
     netInfo = context.netInfo;
+  }
+  if (modeProp) {
+    mode = modeProp;
+  } else {
+    mode = context.mode;
   }
 
   const { colors } = useTheme() as unknown as ThemeType;
@@ -164,7 +171,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     // while shielding, then it going to finish the current batch
     // and after that it run the shield process.
     await RPC.rpc_setInterruptSyncAfterBatch('true');
-    const shieldStr = await RPC.rpc_shieldTransparent(pools);
+    const shieldStr = await RPC.rpc_shieldFunds(pools);
 
     if (shieldStr) {
       if (shieldStr.toLowerCase().startsWith('error')) {
@@ -264,26 +271,28 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             amtZec={totalBalance.total}
             privacy={privacy}
           />
-          {totalBalance.total > 0 && (totalBalance.privateBal > 0 || totalBalance.transparentBal > 0) && (
-            <TouchableOpacity onPress={() => poolsMoreInfoOnClick && poolsMoreInfoOnClick()}>
-              <View
-                style={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  backgroundColor: colors.card,
-                  borderRadius: 10,
-                  margin: 0,
-                  marginLeft: 5,
-                  padding: 0,
-                  minWidth: 25,
-                  minHeight: 25,
-                }}>
-                <FontAwesomeIcon icon={faInfoCircle} size={25} color={colors.primary} />
-              </View>
-            </TouchableOpacity>
-          )}
+          {mode !== 'basic' &&
+            totalBalance.total > 0 &&
+            (totalBalance.privateBal > 0 || totalBalance.transparentBal > 0) && (
+              <TouchableOpacity onPress={() => poolsMoreInfoOnClick && poolsMoreInfoOnClick()}>
+                <View
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: colors.card,
+                    borderRadius: 10,
+                    margin: 0,
+                    marginLeft: 5,
+                    padding: 0,
+                    minWidth: 25,
+                    minHeight: 25,
+                  }}>
+                  <FontAwesomeIcon icon={faInfoCircle} size={25} color={colors.primary} />
+                </View>
+              </TouchableOpacity>
+            )}
         </View>
       )}
 
@@ -452,15 +461,25 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   </View>
                 )}
                 {!syncingStatus.inProgress && syncingStatus.lastBlockServer !== syncingStatus.lastBlockWallet && (
-                  <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
-                    <FontAwesomeIcon icon={faPause} color={colors.zingo} size={17} />
-                  </TouchableOpacity>
+                  <>
+                    {mode === 'basic' ? (
+                      <FontAwesomeIcon icon={faPause} color={colors.zingo} size={17} />
+                    ) : (
+                      <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
+                        <FontAwesomeIcon icon={faPause} color={colors.zingo} size={17} />
+                      </TouchableOpacity>
+                    )}
+                  </>
                 )}
                 {syncingStatus.inProgress && (
                   <Animated.View style={{ opacity: opacityValue }}>
-                    <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
+                    {mode === 'basic' ? (
                       <FontAwesomeIcon icon={faPlay} color={colors.syncing} size={17} />
-                    </TouchableOpacity>
+                    ) : (
+                      <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
+                        <FontAwesomeIcon icon={faPlay} color={colors.syncing} size={17} />
+                      </TouchableOpacity>
+                    )}
                   </Animated.View>
                 )}
               </View>
@@ -484,9 +503,15 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               </View>
             )}
             {(!netInfo.isConnected || netInfo.type === NetInfoStateType.cellular || netInfo.isConnectionExpensive) && (
-              <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
-                <FontAwesomeIcon icon={faCloudDownload} color={!netInfo.isConnected ? 'red' : 'yellow'} size={20} />
-              </TouchableOpacity>
+              <>
+                {mode === 'basic' ? (
+                  <FontAwesomeIcon icon={faCloudDownload} color={!netInfo.isConnected ? 'red' : 'yellow'} size={20} />
+                ) : (
+                  <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
+                    <FontAwesomeIcon icon={faCloudDownload} color={!netInfo.isConnected ? 'red' : 'yellow'} size={20} />
+                  </TouchableOpacity>
+                )}
+              </>
             )}
           </>
         )}
@@ -506,7 +531,9 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           )}
           {readOnly && (
             <>
-              {setUfvkViewModalVisible ? (
+              {setUfvkViewModalVisible &&
+              !(mode === 'basic' && transactions.length <= 0) &&
+              !(mode === 'basic' && totalBalance.total <= 0) ? (
                 <TouchableOpacity onPress={() => setUfvkViewModalVisible(true)}>
                   <FontAwesomeIcon icon={faSnowflake} size={24} color={colors.zingo} />
                 </TouchableOpacity>

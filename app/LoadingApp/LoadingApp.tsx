@@ -29,8 +29,6 @@ import OptionsMenu from 'react-native-option-menu';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faEllipsisV } from '@fortawesome/free-solid-svg-icons';
 
-import BoldText from '../../components/Components/BoldText';
-import Button from '../../components/Components/Button';
 import RPCModule from '../RPCModule';
 import { AppStateLoading, BackgroundType, WalletType, TranslateType, NetInfoType, ServerType } from '../AppState';
 import { parseServerURI, serverUris } from '../uris';
@@ -42,12 +40,14 @@ import platform from '../platform/platform';
 import BackgroundFileImpl from '../../components/Background/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '../createAlert';
-import { ImportUfvk } from '../../components/Ufvk';
 import { RPCWalletKindType } from '../rpc/types/RPCWalletKindType';
 import { isEqual } from 'lodash';
-import ChainTypeToggle from '../../components/Components/ChainTypeToggle';
 
+const BoldText = React.lazy(() => import('../../components/Components/BoldText'));
+const Button = React.lazy(() => import('../../components/Components/Button'));
 const Seed = React.lazy(() => import('../../components/Seed'));
+const ImportUfvk = React.lazy(() => import('../../components/Ufvk/ImportUfvk'));
+const ChainTypeToggle = React.lazy(() => import('../../components/Components/ChainTypeToggle'));
 
 const en = require('../translations/en.json');
 const es = require('../translations/es.json');

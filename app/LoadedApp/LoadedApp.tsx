@@ -55,9 +55,7 @@ import platform from '../platform/platform';
 import { parseZcashURI, serverUris, ZcashURITargetClass } from '../uris';
 import BackgroundFileImpl from '../../components/Background/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Insight from '../../components/Insight';
 import { createAlert } from '../createAlert';
-import { ShowUfvk } from '../../components/Ufvk';
 
 const History = React.lazy(() => import('../../components/History'));
 const Send = React.lazy(() => import('../../components/Send'));
@@ -69,6 +67,8 @@ const SyncReport = React.lazy(() => import('../../components/SyncReport'));
 const Rescan = React.lazy(() => import('../../components/Rescan'));
 const Settings = React.lazy(() => import('../../components/Settings'));
 const Pools = React.lazy(() => import('../../components/Pools'));
+const Insight = React.lazy(() => import('../../components/Insight'));
+const ShowUfvk = React.lazy(() => import('../../components/Ufvk/ShowUfvk'));
 
 const Menu = React.lazy(() => import('./components/Menu'));
 const ComputingTxContent = React.lazy(() => import('./components/ComputingTxContent'));

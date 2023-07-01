@@ -320,7 +320,7 @@ export default class RPC {
     return '';
   }
   */
-  static async rpc_shieldTransparent(pools: string): Promise<string> {
+  static async rpc_shieldFunds(pools: string): Promise<string> {
     try {
       // using `all` or `transparent` or `sapling`...
       const shieldStr: string = await RPCModule.execute('shield', pools);
