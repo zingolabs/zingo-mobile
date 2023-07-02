@@ -14,7 +14,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme } from '@react-navigation/native';
-import React, { useContext, useEffect, useRef } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { DimensionsType, NetInfoType, TranslateType } from '../../app/AppState';
 import { ContextAppLoaded } from '../../app/context';
@@ -89,7 +89,10 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     transactions,
   } = context;
 
-  let translate: (key: string) => TranslateType, dimensions, netInfo, mode;
+  let translate: (key: string) => TranslateType,
+    dimensions: DimensionsType,
+    netInfo: NetInfoType,
+    mode: 'basic' | 'expert';
   if (translateProp) {
     translate = translateProp;
   } else {
@@ -113,34 +116,35 @@ const Header: React.FunctionComponent<HeaderProps> = ({
 
   const { colors } = useTheme() as unknown as ThemeType;
   const opacityValue = useRef(new Animated.Value(1)).current;
+  const [showShieldButton, setShowShieldButton] = useState<boolean>(false);
+  const [poolsToShield, setPoolsToShield] = useState<'' | 'all' | 'transparent' | 'sapling'>('');
 
-  const balanceColor = colors.text;
+  useEffect(() => {
+    setShowShieldButton(!readOnly && totalBalance && (totalBalance.transparentBal > 0 || totalBalance.privateBal > 0));
 
-  const showShieldButton =
-    !readOnly && totalBalance && (totalBalance.transparentBal > 0 || totalBalance.privateBal > 0);
-
-  let poolsToShield: '' | 'all' | 'transparent' | 'sapling' = '';
-
-  if (totalBalance.transparentBal > 0 && totalBalance.privateBal > 0) {
-    poolsToShield = 'all';
-  } else if (totalBalance.transparentBal > 0) {
-    poolsToShield = 'transparent';
-  } else if (totalBalance.privateBal > 0) {
-    poolsToShield = 'sapling';
-  } else {
-    poolsToShield = '';
-  }
-
-  // for basic mode always have to be 'all', It's easier for the user.
-  if (mode === 'basic' && (poolsToShield === 'sapling' || poolsToShield === 'transparent')) {
-    poolsToShield = 'all';
-    if (setPoolsToShieldSelectSapling) {
-      setPoolsToShieldSelectSapling(true);
+    if (totalBalance.transparentBal > 0 && totalBalance.privateBal > 0) {
+      setPoolsToShield('all');
+    } else if (totalBalance.transparentBal > 0) {
+      setPoolsToShield('transparent');
+    } else if (totalBalance.privateBal > 0) {
+      setPoolsToShield('sapling');
+    } else {
+      setPoolsToShield('');
     }
-    if (setPoolsToShieldSelectTransparent) {
-      setPoolsToShieldSelectTransparent(true);
+  }, [readOnly, totalBalance, totalBalance.transparentBal, totalBalance.privateBal]);
+
+  useEffect(() => {
+    // for basic mode always have to be 'all', It's easier for the user.
+    if (mode === 'basic' && (poolsToShield === 'sapling' || poolsToShield === 'transparent')) {
+      setPoolsToShield('all');
+      if (setPoolsToShieldSelectSapling) {
+        setPoolsToShieldSelectSapling(true);
+      }
+      if (setPoolsToShieldSelectTransparent) {
+        setPoolsToShieldSelectTransparent(true);
+      }
     }
-  }
+  }, [mode, poolsToShield, setPoolsToShieldSelectSapling, setPoolsToShieldSelectTransparent]);
 
   const shieldFunds = async () => {
     if (!setComputingModalVisible || !setBackgroundError) {
@@ -266,7 +270,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           }}>
           <ZecAmount
             currencyName={info.currencyName ? info.currencyName : ''}
-            color={balanceColor}
+            color={colors.text}
             size={36}
             amtZec={totalBalance.total}
             privacy={privacy}
