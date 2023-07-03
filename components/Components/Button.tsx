@@ -32,13 +32,13 @@ const Button: React.FunctionComponent<ButtonProps> = ({
     type === 'Primary'
       ? {
           backgroundColor: disabled ? colors.primaryDisabled : colors.primary,
-          borderColor: colors.primary,
+          borderColor: disabled ? colors.primaryDisabled : colors.text,
           borderWidth: 2,
         }
       : type === 'Secondary'
       ? {
           backgroundColor: disabled ? colors.secondaryDisabled : colors.background,
-          borderColor: colors.primary,
+          borderColor: disabled ? colors.primaryDisabled : colors.primary,
           borderWidth: 2,
         }
       : {
