@@ -831,7 +831,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode expert - s
               {
                 "alignItems": "center",
                 "backgroundColor": "rgba(90, 140, 90, 1)",
-                "borderColor": "#18bd18",
+                "borderColor": "rgba(90, 140, 90, 1)",
                 "borderRadius": 10,
                 "borderWidth": 2,
                 "justifyContent": "center",
@@ -1772,7 +1772,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
               {
                 "alignItems": "center",
                 "backgroundColor": "rgba(90, 140, 90, 1)",
-                "borderColor": "#18bd18",
+                "borderColor": "rgba(90, 140, 90, 1)",
                 "borderRadius": 10,
                 "borderWidth": 2,
                 "justifyContent": "center",

@@ -405,12 +405,13 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
         }}>
         <Button
           testID="seed.button.OK"
-          type="Primary"
+          type={mode === 'basic' ? 'Secondary' : 'Primary'}
           style={{
-            backgroundColor: times === 3 ? 'red' : colors.primary,
-            color: times === 3 ? 'white' : colors.primary,
+            backgroundColor: times === 3 ? 'red' : mode === 'basic' ? colors.background : colors.primary,
           }}
-          title={!!texts && !!texts[action] ? texts[action][times] : ''}
+          title={
+            mode === 'basic' ? (translate('cancel') as string) : !!texts && !!texts[action] ? texts[action][times] : ''
+          }
           onPress={() => {
             if (!seedPhrase) {
               return;

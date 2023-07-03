@@ -219,7 +219,7 @@ exports[`Component Rescan - test Rescan - snapshot 1`] = `
         {
           "alignItems": "center",
           "backgroundColor": "rgb(0, 122, 255)",
-          "borderColor": "rgb(0, 122, 255)",
+          "borderColor": "rgb(28, 28, 30)",
           "borderRadius": 10,
           "borderWidth": 2,
           "justifyContent": "center",
