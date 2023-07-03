@@ -84,11 +84,11 @@ jobs:
         with:
           timeout_minutes: 60
           max_attempts: 5
-          command: yarn detox build -c android.emu.debug -n test
+          command: yarn detox build -c android.emu.debug
       
       - name: Run Detox Test
         uses: nick-fields/retry@v2
         with:
           timeout_minutes: 60
           max_attempts: 5
-          command: ./scripts/flow_test_e2e.sh new_wallet
+          command: yarn detox test -c android.emu.debug change_custom_testnet_server
