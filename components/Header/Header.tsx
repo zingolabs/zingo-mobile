@@ -508,9 +508,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             )}
             {(!netInfo.isConnected || netInfo.type === NetInfoStateType.cellular || netInfo.isConnectionExpensive) && (
               <>
-                {mode === 'basic' ? (
-                  <FontAwesomeIcon icon={faCloudDownload} color={!netInfo.isConnected ? 'red' : 'yellow'} size={20} />
-                ) : (
+                {mode !== 'basic' && (
                   <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
                     <FontAwesomeIcon icon={faCloudDownload} color={!netInfo.isConnected ? 'red' : 'yellow'} size={20} />
                   </TouchableOpacity>
