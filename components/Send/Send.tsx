@@ -520,7 +520,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         minWidth: 48,
                         minHeight: 48,
                       }}>
-                      <FadeText>{translate('send.amount') as string}</FadeText>
+                      <FadeText>{`${translate('send.amount')}`}</FadeText>
                     </View>
                     {sendAll && (
                       <TouchableOpacity
@@ -571,7 +571,9 @@ const Send: React.FunctionComponent<SendProps> = ({
                         flexDirection: 'row',
                         justifyContent: 'flex-start',
                       }}>
-                      <RegText style={{ marginTop: 20, marginRight: 5, fontSize: 20 }}>{'\u1647'}</RegText>
+                      <RegText style={{ marginTop: 22, marginRight: 5, fontSize: 20, transform: [{ scaleY: 1.5 }] }}>
+                        {'\u1647'}
+                      </RegText>
                       <View
                         accessible={true}
                         accessibilityLabel={translate('send.zec-acc') as string}
@@ -608,7 +610,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                           maxLength={20}
                         />
                       </View>
-                      <RegText style={{ marginTop: 19, marginRight: 10, marginLeft: 5 }}>ZEC</RegText>
                     </View>
 
                     <View style={{ display: 'flex', flexDirection: 'column' }}>
@@ -698,7 +699,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           flexDirection: 'row',
                           justifyContent: 'flex-start',
                         }}>
-                        <RegText style={{ marginTop: 15, marginRight: 5 }}>$</RegText>
+                        <RegText style={{ marginTop: 17, marginRight: 5 }}>$</RegText>
                         <View
                           accessible={true}
                           accessibilityLabel={translate('send.usd-acc') as string}
@@ -736,7 +737,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                             maxLength={15}
                           />
                         </View>
-                        <RegText style={{ marginTop: 15, marginLeft: 5 }}>{'USD'}</RegText>
                       </View>
 
                       <View style={{ flexDirection: 'column', alignItems: 'center' }}>
