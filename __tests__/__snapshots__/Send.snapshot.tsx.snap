@@ -260,8 +260,13 @@ exports[`Component Send - test Send currency USD, privacy high & mode expert - s
                       "fontSize": 20,
                       "fontWeight": "600",
                       "marginRight": 5,
-                      "marginTop": 20,
+                      "marginTop": 22,
                       "opacity": 1,
+                      "transform": [
+                        {
+                          "scaleY": 1.5,
+                        },
+                      ],
                     }
                   }
                 >
@@ -306,21 +311,6 @@ exports[`Component Send - test Send currency USD, privacy high & mode expert - s
                     value="1.12345678"
                   />
                 </View>
-                <Text
-                  style={
-                    {
-                      "color": "#c3c3c3",
-                      "fontSize": 18,
-                      "fontWeight": "600",
-                      "marginLeft": 5,
-                      "marginRight": 10,
-                      "marginTop": 19,
-                      "opacity": 1,
-                    }
-                  }
-                >
-                  ZEC
-                </Text>
               </View>
               <View
                 style={
@@ -584,7 +574,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode expert - s
                       "fontSize": 18,
                       "fontWeight": "600",
                       "marginRight": 5,
-                      "marginTop": 15,
+                      "marginTop": 17,
                       "opacity": 1,
                     }
                   }
@@ -629,20 +619,6 @@ exports[`Component Send - test Send currency USD, privacy high & mode expert - s
                     value="50.22"
                   />
                 </View>
-                <Text
-                  style={
-                    {
-                      "color": "#c3c3c3",
-                      "fontSize": 18,
-                      "fontWeight": "600",
-                      "marginLeft": 5,
-                      "marginTop": 15,
-                      "opacity": 1,
-                    }
-                  }
-                >
-                  USD
-                </Text>
               </View>
               <View
                 style={
@@ -1201,8 +1177,13 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                       "fontSize": 20,
                       "fontWeight": "600",
                       "marginRight": 5,
-                      "marginTop": 20,
+                      "marginTop": 22,
                       "opacity": 1,
+                      "transform": [
+                        {
+                          "scaleY": 1.5,
+                        },
+                      ],
                     }
                   }
                 >
@@ -1247,21 +1228,6 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                     value="1.12345678"
                   />
                 </View>
-                <Text
-                  style={
-                    {
-                      "color": "#c3c3c3",
-                      "fontSize": 18,
-                      "fontWeight": "600",
-                      "marginLeft": 5,
-                      "marginRight": 10,
-                      "marginTop": 19,
-                      "opacity": 1,
-                    }
-                  }
-                >
-                  ZEC
-                </Text>
               </View>
               <View
                 style={
@@ -1525,7 +1491,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                       "fontSize": 18,
                       "fontWeight": "600",
                       "marginRight": 5,
-                      "marginTop": 15,
+                      "marginTop": 17,
                       "opacity": 1,
                     }
                   }
@@ -1570,20 +1536,6 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                     value="50.22"
                   />
                 </View>
-                <Text
-                  style={
-                    {
-                      "color": "#c3c3c3",
-                      "fontSize": 18,
-                      "fontWeight": "600",
-                      "marginLeft": 5,
-                      "marginTop": 15,
-                      "opacity": 1,
-                    }
-                  }
-                >
-                  USD
-                </Text>
               </View>
               <View
                 style={
