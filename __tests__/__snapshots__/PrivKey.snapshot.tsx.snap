@@ -34,9 +34,9 @@ exports[`Component PrivKey - test PrivKey Private - snapshot 1`] = `
       style={
         {
           "borderRadius": 10,
-          "height": 80,
+          "height": 50,
           "resizeMode": "contain",
-          "width": 80,
+          "width": 50,
         }
       }
     />
@@ -98,6 +98,7 @@ exports[`Component PrivKey - test PrivKey Private - snapshot 1`] = `
         style={
           {
             "alignItems": "center",
+            "flexDirection": "row",
           }
         }
       />
@@ -121,6 +122,16 @@ exports[`Component PrivKey - test PrivKey Private - snapshot 1`] = `
         }
       >
         text translated
+      </Text>
+      <Text
+        style={
+          {
+            "color": "rgb(216, 216, 216)",
+            "fontSize": 8,
+          }
+        }
+      >
+        text translatedtext translated
       </Text>
       <Text
         style={
@@ -403,9 +414,9 @@ exports[`Component PrivKey - test PrivKey View - snapshot 1`] = `
       style={
         {
           "borderRadius": 10,
-          "height": 80,
+          "height": 50,
           "resizeMode": "contain",
-          "width": 80,
+          "width": 50,
         }
       }
     />
@@ -467,6 +478,7 @@ exports[`Component PrivKey - test PrivKey View - snapshot 1`] = `
         style={
           {
             "alignItems": "center",
+            "flexDirection": "row",
           }
         }
       />
@@ -490,6 +502,16 @@ exports[`Component PrivKey - test PrivKey View - snapshot 1`] = `
         }
       >
         text translated
+      </Text>
+      <Text
+        style={
+          {
+            "color": "rgb(216, 216, 216)",
+            "fontSize": 8,
+          }
+        }
+      >
+        text translatedtext translated
       </Text>
       <Text
         style={

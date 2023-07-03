@@ -13,7 +13,7 @@
   "donation": "Gracias por apoyar Zingo!",
   "insight": {
     "title": "Visión Financiera",
-    "no-data": "No hay datos en tu Monedero, ninguna transacción enviada.",
+    "no-data": "No hay datos en tu Monedero que concuerden con el gráfico seleccionado.",
     "sent": "Enviado",
     "sends": "# envios",
     "memobytes": "# carácteres",
@@ -43,7 +43,9 @@
     "options": "Opciones",
     "settings": "Parámetros",
     "walletseed": "Semilla del Monedero",
+    "walletseed-basic": "Frase Semilla de Respaldo del Monedero",
     "walletufvk": "Clave de Visualización del Monedero",
+    "walletufvk-basic": "Clave de Visualización de Respaldo del Monedero",
     "rescanwallet": "Re-Escanear el Monedero",
     "report": "Informe de Sincronización",
     "changewallet": "Abrir otro Monedero",
@@ -138,6 +140,16 @@
         "text": "Privacidad Normal, se puede ver toda la información."
       }
     ],
+    "modes": [
+      {
+        "value": "basic",
+        "text": "Modo Básico, la manera más fácil de usar Zingo."
+      },
+      {
+        "value": "expert",
+        "text": "Modo Experto, para el usuario avanzado."
+      }
+    ],
     "nochanges": "No se haan registrado cambios.",
     "ismemo": "Necesitas escoger una opción de Memorándum para poder grabar.",
     "isthreshold": "Necesitas escoger una opción de umbral para poder grabar.",
@@ -160,6 +172,7 @@
     "islanguage": "Necesitas escoger un Idioma para poder grabar.",
     "sendall-title": "EL BOTON 'Enviar todo' (Cantidad)",
     "privacy-title": "Cambiar entre Alta Privacidad o Normal",
+    "mode-title": "Cambiar entre Modo Básico o Experto",
     "value-currency-": "Sin moneda",
     "value-currency-USD": "US Dólares",
     "value-language-en": "Inglés",
@@ -169,6 +182,9 @@
     "value-privacy-true": "Alta",
     "value-privacy-false": "Normal",
     "privacy": "Priv: ",
+    "value-mode-basic": "Básico",
+    "value-mode-expert": "Experto",
+    "mode": "Modo: ",
     "value-chain_name-main": "Mainnet",
     "value-chain_name-test": "Testnet",
     "value-chain_name-regtest": "Regtest"
@@ -301,9 +317,9 @@
     "next": "Siguiente"
   },
   "history": {
-    "shieldfunds-all": "Blindar Todos los fondos",
-    "shieldfunds-transparent": "Blindar fondos Transparentes",
-    "shieldfunds-sapling": "Actualizar fondos a la última versión",
+    "shieldfunds-all": "Blindar Todos\nlos fondos",
+    "shieldfunds-transparent": "Blindar fondos\nTransparentes",
+    "shieldfunds-sapling": "Asignar fondos a\nla última versión",
     "shieldfunds-t": "Transparente",
     "shieldfunds-z": "Sapling",
     "shield-message": "Blindada en Tx:",

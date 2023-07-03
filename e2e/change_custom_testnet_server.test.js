@@ -9,7 +9,7 @@ describe('Change the Server.', () => {
   it('loads a wallet', loadTestWallet);
   
   it('Go settings & change to a correct Testnet server URI.', async () => {
-    // go to setting modal screen
+    // go to setting modal screen again
     await waitFor(element(by.id('header.drawmenu'))).toBeVisible().withTimeout(sync_timeout);
     await element(by.id('header.drawmenu')).tap();
     await waitFor(element(by.id('menu.settings'))).toBeVisible().withTimeout(sync_timeout);

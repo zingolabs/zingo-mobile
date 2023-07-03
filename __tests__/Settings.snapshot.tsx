@@ -40,6 +40,15 @@ jest.mock('@react-native-community/netinfo', () => {
 
   return RN;
 });
+jest.mock('react-native', () => {
+  const RN = jest.requireActual('react-native');
+
+  RN.NativeModules.RPCModule = {
+    execute: jest.fn(() => '{}'),
+  };
+
+  return RN;
+});
 jest.useFakeTimers();
 
 // test suite
@@ -122,6 +131,7 @@ describe('Component Settings - test', () => {
           set_language_option={onSetOption}
           set_sendAll_option={onSetOption}
           set_privacy_option={onSetOption}
+          set_mode_option={onSetOption}
         />
       </ContextAppLoadedProvider>,
     );

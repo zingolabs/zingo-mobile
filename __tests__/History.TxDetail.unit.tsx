@@ -62,14 +62,24 @@ jest.mock('@react-native-community/netinfo', () => {
 
   return RN;
 });
+jest.mock('react-native', () => {
+  const RN = jest.requireActual('react-native');
+
+  RN.NativeModules.RPCModule = {
+    execute: jest.fn(() => '{}'),
+  };
+
+  return RN;
+});
 
 // test suite
-describe('Component Transactions TxDetail - test', () => {
+describe('Component History TxDetail - test', () => {
   //unit test
   const state = defaultAppStateLoaded;
   state.translate = () => 'translated text';
   const onClose = jest.fn();
-  test('Transactions TxDetail - normal sent transaction', () => {
+  const onSetOption = jest.fn();
+  test('History TxDetail - normal sent transaction', () => {
     state.info.currencyName = 'ZEC';
     state.totalBalance.total = 1.12345678;
     const tx = {
@@ -91,14 +101,14 @@ describe('Component Transactions TxDetail - test', () => {
     } as TransactionType;
     render(
       <ContextAppLoadedProvider value={state}>
-        <TxDetail tx={tx} closeModal={onClose} />
+        <TxDetail tx={tx} closeModal={onClose} set_privacy_option={onSetOption} />
       </ContextAppLoadedProvider>,
     ).toJSON();
     screen.getByText('0.0064');
     screen.getByText('0.0001');
   });
 
-  test('Transactions TxDetail - self sent transaction', () => {
+  test('History TxDetail - self sent transaction', () => {
     state.info.currencyName = 'ZEC';
     state.totalBalance.total = 1.12345678;
     const txSelfSend = {
@@ -120,7 +130,7 @@ describe('Component Transactions TxDetail - test', () => {
     } as TransactionType;
     render(
       <ContextAppLoadedProvider value={state}>
-        <TxDetail tx={txSelfSend} closeModal={onClose} />
+        <TxDetail tx={txSelfSend} closeModal={onClose} set_privacy_option={onSetOption} />
       </ContextAppLoadedProvider>,
     );
     screen.getByText('0.0064');

@@ -55,9 +55,7 @@ import platform from '../platform/platform';
 import { parseZcashURI, serverUris, ZcashURITargetClass } from '../uris';
 import BackgroundFileImpl from '../../components/Background/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Insight from '../../components/Insight';
 import { createAlert } from '../createAlert';
-import { ShowUfvk } from '../../components/Ufvk';
 
 const History = React.lazy(() => import('../../components/History'));
 const Send = React.lazy(() => import('../../components/Send'));
@@ -69,6 +67,8 @@ const SyncReport = React.lazy(() => import('../../components/SyncReport'));
 const Rescan = React.lazy(() => import('../../components/Rescan'));
 const Settings = React.lazy(() => import('../../components/Settings'));
 const Pools = React.lazy(() => import('../../components/Pools'));
+const Insight = React.lazy(() => import('../../components/Insight'));
+const ShowUfvk = React.lazy(() => import('../../components/Ufvk/ShowUfvk'));
 
 const Menu = React.lazy(() => import('./components/Menu'));
 const ComputingTxContent = React.lazy(() => import('./components/ComputingTxContent'));
@@ -87,13 +87,14 @@ const SERVER_DEFAULT_0: ServerType = serverUris()[0];
 
 export default function LoadedApp(props: LoadedAppProps) {
   const theme = useTheme() as unknown as ThemeType;
-  const [language, setLanguage] = useState('en' as 'en' | 'es');
-  const [currency, setCurrency] = useState('' as 'USD' | '');
+  const [language, setLanguage] = useState<'en' | 'es'>('en');
+  const [currency, setCurrency] = useState<'USD' | ''>('');
   const [server, setServer] = useState<ServerType>(SERVER_DEFAULT_0);
-  const [sendAll, setSendAll] = useState(false);
-  const [privacy, setPrivacy] = useState(false);
-  const [background, setBackground] = useState({ batches: 0, date: 0 } as BackgroundType);
-  const [loading, setLoading] = useState(true);
+  const [sendAll, setSendAll] = useState<boolean>(false);
+  const [privacy, setPrivacy] = useState<boolean>(false);
+  const [mode, setMode] = useState<'basic' | 'expert'>('basic');
+  const [background, setBackground] = useState<BackgroundType>({ batches: 0, date: 0 });
+  const [loading, setLoading] = useState<boolean>(true);
   const file = useMemo(
     () => ({
       en: en,
@@ -155,6 +156,11 @@ export default function LoadedApp(props: LoadedAppProps) {
       } else {
         await SettingsFileImpl.writeSettings('privacy', privacy);
       }
+      if (settings.mode) {
+        setMode(settings.mode);
+      } else {
+        await SettingsFileImpl.writeSettings('mode', mode);
+      }
 
       // reading background task info
       if (Platform.OS === 'ios') {
@@ -185,6 +191,7 @@ export default function LoadedApp(props: LoadedAppProps) {
         server={server}
         sendAll={sendAll}
         privacy={privacy}
+        mode={mode}
         background={background}
         readOnly={readOnly}
       />
@@ -202,6 +209,7 @@ type LoadedAppClassProps = {
   server: ServerType;
   sendAll: boolean;
   privacy: boolean;
+  mode: 'basic' | 'expert';
   background: BackgroundType;
   readOnly: boolean;
 };
@@ -229,6 +237,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       currency: props.currency,
       sendAll: props.sendAll,
       privacy: props.privacy,
+      mode: props.mode,
       background: props.background,
       readOnly: props.readOnly,
       dimensions: {
@@ -261,6 +270,11 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
   componentDidMount = () => {
     this.clearToAddr();
+
+    // If the App is mounting this component, I know I have to reset the firstInstall props in settings.
+    (async () => {
+      await SettingsFileImpl.writeSettings('firstInstall', false);
+    })();
 
     // Configure the RPC to start doing refreshes
     (async () => {
@@ -879,6 +893,16 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     this.rpc.fetchWalletSettings();
   };
 
+  set_mode_option = async (name: 'mode', value: string): Promise<void> => {
+    await SettingsFileImpl.writeSettings(name, value);
+    this.setState({
+      mode: value as 'basic' | 'expert',
+    });
+
+    // Refetch the settings to update
+    this.rpc.fetchWalletSettings();
+  };
+
   navigateToLoading = async () => {
     const { navigation } = this.props;
 
@@ -1049,7 +1073,11 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       }
 
       const iconColor = focused ? colors.background : colors.money;
-      return <FontAwesomeIcon icon={iconName} color={iconColor} />;
+      return focused ? (
+        <FontAwesomeIcon icon={iconName} color={iconColor} size={30} style={{ transform: [{ translateY: 8 }] }} />
+      ) : (
+        <FontAwesomeIcon icon={iconName} color={iconColor} />
+      );
     };
 
     //console.log('render LoadedAppClass - 3');
@@ -1175,6 +1203,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                 set_language_option={this.set_language_option}
                 set_sendAll_option={this.set_sendAll_option}
                 set_privacy_option={this.set_privacy_option}
+                set_mode_option={this.set_mode_option}
               />
             </Suspense>
           </Modal>
@@ -1358,10 +1387,10 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
             initialRouteName={translate('loadedapp.wallet-menu') as string}
             screenOptions={({ route }) => ({
               tabBarIcon: ({ focused }) => fnTabBarIcon(route, focused),
-              tabBarActiveTintColor: colors.background,
-              tabBarActiveBackgroundColor: colors.primary,
+              tabBarActiveTintColor: 'transparent',
+              tabBarActiveBackgroundColor: colors.primaryDisabled,
               tabBarInactiveTintColor: colors.money,
-              tabBarLabelStyle: { fontSize: 14 },
+              tabBarLabelStyle: { fontSize: 12 },
               tabBarStyle: {
                 borderRadius: 0,
                 borderTopColor: colors.primary,
@@ -1369,33 +1398,35 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
               },
               headerShown: false,
             })}>
-            <Tab.Screen name={translate('loadedapp.wallet-menu') as string}>
-              {() => (
-                <>
-                  <Suspense
-                    fallback={
-                      <View>
-                        <Text>{translate('loading') as string}</Text>
-                      </View>
-                    }>
-                    <History
-                      doRefresh={this.doRefresh}
-                      toggleMenuDrawer={this.toggleMenuDrawer}
-                      syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
-                      poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
-                      setZecPrice={this.setZecPrice}
-                      setComputingModalVisible={this.setComputingModalVisible}
-                      setBackgroundError={this.setBackgroundError}
-                      set_privacy_option={this.set_privacy_option}
-                      setPoolsToShieldSelectSapling={this.setPoolsToShieldSelectSapling}
-                      setPoolsToShieldSelectTransparent={this.setPoolsToShieldSelectTransparent}
-                      setUfvkViewModalVisible={this.setUfvkViewModalVisible}
-                    />
-                  </Suspense>
-                </>
-              )}
-            </Tab.Screen>
-            {!this.state.readOnly && (
+            {!(this.state.mode === 'basic' && this.state.transactions.length <= 0) && (
+              <Tab.Screen name={translate('loadedapp.wallet-menu') as string}>
+                {() => (
+                  <>
+                    <Suspense
+                      fallback={
+                        <View>
+                          <Text>{translate('loading') as string}</Text>
+                        </View>
+                      }>
+                      <History
+                        doRefresh={this.doRefresh}
+                        toggleMenuDrawer={this.toggleMenuDrawer}
+                        syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
+                        poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
+                        setZecPrice={this.setZecPrice}
+                        setComputingModalVisible={this.setComputingModalVisible}
+                        setBackgroundError={this.setBackgroundError}
+                        set_privacy_option={this.set_privacy_option}
+                        setPoolsToShieldSelectSapling={this.setPoolsToShieldSelectSapling}
+                        setPoolsToShieldSelectTransparent={this.setPoolsToShieldSelectTransparent}
+                        setUfvkViewModalVisible={this.setUfvkViewModalVisible}
+                      />
+                    </Suspense>
+                  </>
+                )}
+              </Tab.Screen>
+            )}
+            {!this.state.readOnly && !(this.state.mode === 'basic' && this.state.totalBalance.total <= 0) && (
               <Tab.Screen name={translate('loadedapp.send-menu') as string}>
                 {() => (
                   <>

@@ -117,5 +117,7 @@ export default interface AppStateLoaded {
   poolsToShieldSelectSapling: boolean;
   poolsToShieldSelectTransparent: boolean;
 
+  mode: 'basic' | 'expert';
+
   // eslint-disable-next-line semi
 }

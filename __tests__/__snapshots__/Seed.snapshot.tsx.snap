@@ -221,11 +221,10 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "rgb(0, 122, 255)",
+          "backgroundColor": "rgb(242, 242, 242)",
           "borderColor": "rgb(0, 122, 255)",
           "borderRadius": 10,
           "borderWidth": 2,
-          "color": "rgb(0, 122, 255)",
           "justifyContent": "center",
           "maxWidth": "90%",
           "minHeight": 48,
@@ -255,14 +254,16 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(242, 242, 242)",
+              "color": "rgb(0, 122, 255)",
               "fontSize": 16,
               "fontWeight": "bold",
               "textAlign": "center",
               "textTransform": "uppercase",
             }
           }
-        />
+        >
+          text translated
+        </Text>
       </View>
     </View>
     <View
@@ -549,11 +550,10 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "rgb(0, 122, 255)",
+          "backgroundColor": "rgb(242, 242, 242)",
           "borderColor": "rgb(0, 122, 255)",
           "borderRadius": 10,
           "borderWidth": 2,
-          "color": "rgb(0, 122, 255)",
           "justifyContent": "center",
           "maxWidth": "90%",
           "minHeight": 48,
@@ -583,14 +583,16 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(242, 242, 242)",
+              "color": "rgb(0, 122, 255)",
               "fontSize": 16,
               "fontWeight": "bold",
               "textAlign": "center",
               "textTransform": "uppercase",
             }
           }
-        />
+        >
+          text translated
+        </Text>
       </View>
     </View>
     <View
@@ -877,11 +879,10 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "rgb(0, 122, 255)",
+          "backgroundColor": "rgb(242, 242, 242)",
           "borderColor": "rgb(0, 122, 255)",
           "borderRadius": 10,
           "borderWidth": 2,
-          "color": "rgb(0, 122, 255)",
           "justifyContent": "center",
           "maxWidth": "90%",
           "minHeight": 48,
@@ -911,14 +912,16 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(242, 242, 242)",
+              "color": "rgb(0, 122, 255)",
               "fontSize": 16,
               "fontWeight": "bold",
               "textAlign": "center",
               "textTransform": "uppercase",
             }
           }
-        />
+        >
+          text translated
+        </Text>
       </View>
     </View>
   </View>
@@ -1018,7 +1021,7 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
                 "minWidth": "95%",
               }
             }
-            testID="seed.seedplaceholder"
+            testID="seed.seedinput"
             value="pepe lolo titi"
           />
         </View>
@@ -1129,7 +1132,7 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
                 "minWidth": "20%",
               }
             }
-            testID="birthdayinput"
+            testID="seed.birthdayinput"
             value="1500100"
           />
         </View>
@@ -1168,11 +1171,10 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "rgb(0, 122, 255)",
+          "backgroundColor": "rgb(242, 242, 242)",
           "borderColor": "rgb(0, 122, 255)",
           "borderRadius": 10,
           "borderWidth": 2,
-          "color": "rgb(0, 122, 255)",
           "justifyContent": "center",
           "maxWidth": "90%",
           "minHeight": 48,
@@ -1202,14 +1204,16 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(242, 242, 242)",
+              "color": "rgb(0, 122, 255)",
               "fontSize": 16,
               "fontWeight": "bold",
               "textAlign": "center",
               "textTransform": "uppercase",
             }
           }
-        />
+        >
+          text translated
+        </Text>
       </View>
     </View>
     <View
@@ -1496,11 +1500,10 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "rgb(0, 122, 255)",
+          "backgroundColor": "rgb(242, 242, 242)",
           "borderColor": "rgb(0, 122, 255)",
           "borderRadius": 10,
           "borderWidth": 2,
-          "color": "rgb(0, 122, 255)",
           "justifyContent": "center",
           "maxWidth": "90%",
           "minHeight": 48,
@@ -1530,14 +1533,16 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(242, 242, 242)",
+              "color": "rgb(0, 122, 255)",
               "fontSize": 16,
               "fontWeight": "bold",
               "textAlign": "center",
               "textTransform": "uppercase",
             }
           }
-        />
+        >
+          text translated
+        </Text>
       </View>
     </View>
     <View
@@ -1824,11 +1829,10 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "rgb(0, 122, 255)",
+          "backgroundColor": "rgb(242, 242, 242)",
           "borderColor": "rgb(0, 122, 255)",
           "borderRadius": 10,
           "borderWidth": 2,
-          "color": "rgb(0, 122, 255)",
           "justifyContent": "center",
           "maxWidth": "90%",
           "minHeight": 48,
@@ -1858,14 +1862,16 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(242, 242, 242)",
+              "color": "rgb(0, 122, 255)",
               "fontSize": 16,
               "fontWeight": "bold",
               "textAlign": "center",
               "textTransform": "uppercase",
             }
           }
-        />
+        >
+          text translated
+        </Text>
       </View>
     </View>
   </View>

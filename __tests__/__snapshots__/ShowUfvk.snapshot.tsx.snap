@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Component Ufvk - test Ufvk Private - snapshot 1`] = `
+exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
 <RCTSafeAreaView
   style={
     {
@@ -34,9 +34,9 @@ exports[`Component Ufvk - test Ufvk Private - snapshot 1`] = `
       style={
         {
           "borderRadius": 10,
-          "height": 80,
+          "height": 50,
           "resizeMode": "contain",
-          "width": 80,
+          "width": 50,
         }
       }
     />
@@ -98,6 +98,7 @@ exports[`Component Ufvk - test Ufvk Private - snapshot 1`] = `
         style={
           {
             "alignItems": "center",
+            "flexDirection": "row",
           }
         }
       />
@@ -121,6 +122,16 @@ exports[`Component Ufvk - test Ufvk Private - snapshot 1`] = `
         }
       >
         text translated
+      </Text>
+      <Text
+        style={
+          {
+            "color": "rgb(216, 216, 216)",
+            "fontSize": 8,
+          }
+        }
+      >
+        text translatedtext translated
       </Text>
       <Text
         style={
@@ -442,7 +453,7 @@ exports[`Component Ufvk - test Ufvk Private - snapshot 1`] = `
         {
           "alignItems": "center",
           "backgroundColor": "rgb(0, 122, 255)",
-          "borderColor": "rgb(0, 122, 255)",
+          "borderColor": "rgb(28, 28, 30)",
           "borderRadius": 10,
           "borderWidth": 2,
           "color": "rgb(0, 122, 255)",

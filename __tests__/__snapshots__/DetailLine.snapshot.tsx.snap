@@ -1,0 +1,72 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Component DetailLine - test DetailLine children - snapshot 1`] = `
+<View
+  style={
+    {
+      "display": "flex",
+      "marginTop": 20,
+    }
+  }
+>
+  <Text
+    style={
+      {
+        "color": "rgb(28, 28, 30)",
+        "opacity": 0.65,
+      }
+    }
+  >
+    label
+  </Text>
+  <View
+    style={
+      {
+        "width": 10,
+      }
+    }
+  />
+  <View />
+</View>
+`;
+
+exports[`Component DetailLine - test DetailLine value - snapshot 1`] = `
+<View
+  style={
+    {
+      "display": "flex",
+      "marginTop": 20,
+    }
+  }
+>
+  <Text
+    style={
+      {
+        "color": "rgb(28, 28, 30)",
+        "opacity": 0.65,
+      }
+    }
+  >
+    label
+  </Text>
+  <View
+    style={
+      {
+        "width": 10,
+      }
+    }
+  />
+  <Text
+    style={
+      {
+        "color": "rgb(28, 28, 30)",
+        "fontSize": 18,
+        "fontWeight": "600",
+        "opacity": 1,
+      }
+    }
+  >
+    value
+  </Text>
+</View>
+`;

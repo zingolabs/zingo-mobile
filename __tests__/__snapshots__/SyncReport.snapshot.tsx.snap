@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Component SyncReport - test Matches the snapshot SyncReport 1`] = `
+exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
 <RCTSafeAreaView
   style={
     {
@@ -34,9 +34,9 @@ exports[`Component SyncReport - test Matches the snapshot SyncReport 1`] = `
       style={
         {
           "borderRadius": 10,
-          "height": 80,
+          "height": 50,
           "resizeMode": "contain",
-          "width": 80,
+          "width": 50,
         }
       }
     />
@@ -98,6 +98,7 @@ exports[`Component SyncReport - test Matches the snapshot SyncReport 1`] = `
         style={
           {
             "alignItems": "center",
+            "flexDirection": "row",
           }
         }
       />
@@ -121,6 +122,16 @@ exports[`Component SyncReport - test Matches the snapshot SyncReport 1`] = `
         }
       >
         translated text
+      </Text>
+      <Text
+        style={
+          {
+            "color": "rgb(216, 216, 216)",
+            "fontSize": 8,
+          }
+        }
+      >
+        translated texttranslated text
       </Text>
       <Text
         style={

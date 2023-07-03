@@ -42,7 +42,8 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
     server: ServerType,
     dimensions: DimensionsType,
     netInfo: NetInfoType,
-    privacy: boolean;
+    privacy: boolean,
+    mode: 'basic' | 'expert';
   if (action === 'new' || action === 'restore') {
     wallet = contextLoading.wallet;
     translate = contextLoading.translate;
@@ -51,6 +52,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
     dimensions = contextLoading.dimensions;
     netInfo = contextLoading.netInfo;
     privacy = contextLoading.privacy;
+    mode = contextLoading.mode;
   } else {
     wallet = contextLoaded.wallet;
     translate = contextLoaded.translate;
@@ -59,6 +61,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
     dimensions = contextLoaded.dimensions;
     netInfo = contextLoaded.netInfo;
     privacy = contextLoaded.privacy;
+    mode = contextLoaded.mode;
   }
 
   const { colors } = useTheme() as unknown as ThemeType;
@@ -192,6 +195,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
             translate={translate}
             dimensions={dimensions}
             netInfo={netInfo}
+            mode={mode}
           />
         </View>
       </Animated.View>
@@ -254,7 +258,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
                 minHeight: 100,
               }}>
               <TextInput
-                testID="seed.seedplaceholder"
+                testID="seed.seedinput"
                 placeholder={translate('seed.seedplaceholder') as string}
                 placeholderTextColor={colors.placeholder}
                 multiline
@@ -338,7 +342,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
                   minHeight: 48,
                 }}>
                 <TextInput
-                  testID="birthdayinput"
+                  testID="seed.birthdayinput"
                   placeholder={'#'}
                   placeholderTextColor={colors.placeholder}
                   style={{
@@ -401,12 +405,13 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
         }}>
         <Button
           testID="seed.button.OK"
-          type="Primary"
+          type={mode === 'basic' ? 'Secondary' : 'Primary'}
           style={{
-            backgroundColor: times === 3 ? 'red' : colors.primary,
-            color: times === 3 ? 'white' : colors.primary,
+            backgroundColor: times === 3 ? 'red' : mode === 'basic' ? colors.background : colors.primary,
           }}
-          title={!!texts && !!texts[action] ? texts[action][times] : ''}
+          title={
+            mode === 'basic' ? (translate('cancel') as string) : !!texts && !!texts[action] ? texts[action][times] : ''
+          }
           onPress={() => {
             if (!seedPhrase) {
               return;

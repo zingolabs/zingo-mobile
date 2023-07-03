@@ -9,9 +9,9 @@ import { render } from '@testing-library/react-native';
 import CircularProgress from '../components/Components/CircularProgress';
 
 // test suite
-describe('Component About - test', () => {
+describe('Component CircularProgress - test', () => {
   //snapshot test
-  test('About - snapshot', () => {
+  test('CircularProgress - snapshot', () => {
     const about = render(
       <CircularProgress
         size={100}

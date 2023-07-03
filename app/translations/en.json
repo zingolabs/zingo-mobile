@@ -13,7 +13,7 @@
   "donation": "Thanks for supporting Zingo!",
   "insight": {
     "title": "Financial Insight",
-    "no-data": "There is no data in your Wallet, no sent transactions.",
+    "no-data": "There is no data in your Wallet that fit the graph selected.",
     "sent": "Sent",
     "sends": "# sends",
     "memobytes": "# bytes",
@@ -43,7 +43,9 @@
     "options": "Options",
     "settings": "Settings",
     "walletseed": "Wallet Seed",
+    "walletseed-basic": "Wallet Backup Seed Phrase",
     "walletufvk": "Wallet Viewing Key",
+    "walletufvk-basic": "Wallet Backup Viewing Key",
     "rescanwallet": "Rescan Wallet",
     "report": "Sync / Rescan Report",
     "changewallet": "Change to another Wallet",
@@ -138,6 +140,16 @@
         "text": "Normal Privacy, you can see all the information."
       }
     ],
+    "modes": [
+      {
+        "value": "basic",
+        "text": "Basic Mode, the most simple way to use Zingo."
+      },
+      {
+        "value": "expert",
+        "text": "Expert Mode, for the advanced user."
+      }
+    ],
     "nochanges": "No changes registred.",
     "ismemo": "You need to choose the download memos option to save.",
     "isthreshold": "You need to choose the transaction filter threshold option to save.",
@@ -160,6 +172,7 @@
     "islanguage": "You need to choose a language to save.",
     "sendall-title": "THE BUTTON 'Send All' (Amount)",
     "privacy-title": "Switch between High or Normal Privacy",
+    "mode-title": "Switch between Basic or Expert Mode",
     "value-currency-": "No currency",
     "value-currency-USD": "US Dollar",
     "value-language-en": "English",
@@ -168,7 +181,10 @@
     "value-sendall-false": "Disable",
     "value-privacy-true": "High",
     "value-privacy-false": "Normal",
-    "privacy": "Privacy: ",
+    "privacy": "Priv: ",
+    "value-mode-basic": "Basic",
+    "value-mode-expert": "Expert",
+    "mode": "Mode: ",
     "value-chain_name-main": "Mainnet",
     "value-chain_name-test": "Testnet",
     "value-chain_name-regtest": "Regtest"
@@ -302,8 +318,8 @@
   },
   "history": {
     "shieldfunds-all": "Shield All funds",
-    "shieldfunds-transparent": "Shield Transparent funds",
-    "shieldfunds-sapling": "Upgrade funds to newest version",
+    "shieldfunds-transparent": "Shield Transparent\nfunds",
+    "shieldfunds-sapling": "Upgrade funds to\nnewest version",
     "shieldfunds-t": "Transparent",
     "shieldfunds-z": "Sapling",
     "shield-message": "Shielded in Tx:",

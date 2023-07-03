@@ -1,0 +1,546 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Component Header - test Header Complex - snapshot 1`] = `
+<View
+  style={
+    {
+      "alignItems": "center",
+      "backgroundColor": "rgb(255, 255, 255)",
+      "display": "flex",
+      "paddingBottom": 0,
+      "paddingTop": 10,
+      "zIndex": -1,
+    }
+  }
+  testID="header"
+>
+  <Image
+    source={
+      {
+        "testUri": "../../../assets/img/logobig-zingo.png",
+      }
+    }
+    style={
+      {
+        "borderRadius": 10,
+        "height": 50,
+        "resizeMode": "contain",
+        "width": 50,
+      }
+    }
+  />
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flexDirection": "row",
+        "justifyContent": "center",
+        "margin": 0,
+        "marginTop": 0,
+      }
+    }
+  >
+    <View
+      style={
+        {
+          "alignItems": "baseline",
+          "flexDirection": "row",
+        }
+      }
+    >
+      <View
+        accessibilityState={
+          {
+            "disabled": true,
+          }
+        }
+        accessible={true}
+        collapsable={false}
+        focusable={true}
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          {
+            "opacity": 1,
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "alignItems": "baseline",
+              "flexDirection": "row",
+            }
+          }
+        >
+          <Text
+            style={
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 36,
+              }
+            }
+          >
+            ᙇ
+          </Text>
+          <Text
+            style={
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 36,
+                "fontWeight": "700",
+              }
+            }
+          >
+             1.1234
+          </Text>
+          <Text
+            style={
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 25.2,
+                "paddingBottom": 0,
+              }
+            }
+          >
+            5678
+          </Text>
+          <Text
+            style={
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 36,
+              }
+            }
+          >
+             ZEC
+          </Text>
+        </View>
+      </View>
+    </View>
+  </View>
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "display": "flex",
+        "flexDirection": "row",
+        "flexWrap": "wrap",
+        "justifyContent": "center",
+        "marginVertical": 5,
+      }
+    }
+  >
+    <View
+      style={
+        {
+          "alignItems": "center",
+          "display": "flex",
+          "flexDirection": "column",
+          "flexWrap": "wrap",
+          "justifyContent": "center",
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": "rgb(28, 28, 30)",
+            "fontSize": 18,
+            "fontWeight": "600",
+            "opacity": 1,
+            "paddingHorizontal": 5,
+          }
+        }
+        testID="transaction text"
+      >
+        title
+      </Text>
+    </View>
+    <View
+      style={
+        {
+          "alignItems": "center",
+          "borderColor": undefined,
+          "borderRadius": 10,
+          "borderWidth": 1,
+          "justifyContent": "center",
+          "margin": 0,
+          "marginRight": 5,
+          "minHeight": 25,
+          "minWidth": 25,
+          "padding": 1,
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "margin": 0,
+            "padding": 0,
+          }
+        }
+      >
+        <
+          icon={
+            {
+              "icon": [
+                640,
+                512,
+                [
+                  "wifi-3",
+                  "wifi-strong",
+                ],
+                "f1eb",
+                "M54.2 202.9C123.2 136.7 216.8 96 320 96s196.8 40.7 265.8 106.9c12.8 12.2 33 11.8 45.2-.9s11.8-33-.9-45.2C549.7 79.5 440.4 32 320 32S90.3 79.5 9.8 156.7C-2.9 169-3.3 189.2 8.9 202s32.5 13.2 45.2 .9zM320 256c56.8 0 108.6 21.1 148.2 56c13.3 11.7 33.5 10.4 45.2-2.8s10.4-33.5-2.8-45.2C459.8 219.2 393 192 320 192s-139.8 27.2-190.5 72c-13.3 11.7-14.5 31.9-2.8 45.2s31.9 14.5 45.2 2.8c39.5-34.9 91.3-56 148.2-56zm64 160c0-35.3-28.7-64-64-64s-64 28.7-64 64s28.7 64 64 64s64-28.7 64-64z",
+              ],
+              "iconName": "wifi",
+              "prefix": "fas",
+            }
+          }
+          size={18}
+        />
+      </View>
+    </View>
+  </View>
+  <View
+    style={
+      {
+        "left": 0,
+        "padding": 10,
+        "position": "absolute",
+      }
+    }
+  >
+    <View
+      style={
+        {
+          "alignItems": "center",
+          "flexDirection": "row",
+        }
+      }
+    >
+      <View
+        accessibilityLabel="text translated"
+        accessible={true}
+        collapsable={false}
+        focusable={true}
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          {
+            "marginRight": 5,
+            "opacity": 1,
+          }
+        }
+        testID="header.drawmenu"
+      >
+        <
+          color="rgb(216, 216, 216)"
+          icon={
+            {
+              "icon": [
+                448,
+                512,
+                [
+                  "navicon",
+                ],
+                "f0c9",
+                "M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z",
+              ],
+              "iconName": "bars",
+              "prefix": "fas",
+            }
+          }
+          size={48}
+        />
+      </View>
+    </View>
+  </View>
+  <View
+    style={
+      {
+        "alignItems": "flex-end",
+        "padding": 15,
+        "position": "absolute",
+        "right": 0,
+      }
+    }
+  >
+    <Text
+      style={
+        {
+          "color": "rgb(216, 216, 216)",
+          "fontSize": 8,
+        }
+      }
+    >
+      text translated
+    </Text>
+    <Text
+      style={
+        {
+          "color": "rgb(216, 216, 216)",
+          "fontSize": 8,
+        }
+      }
+    >
+      text translatedtext translated
+    </Text>
+    <Text
+      style={
+        {
+          "color": "rgb(216, 216, 216)",
+          "fontSize": 8,
+        }
+      }
+    >
+      (undefinedxundefined)-undefined
+    </Text>
+    <View
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        {
+          "opacity": 1,
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "flexDirection": "row",
+            "justifyContent": "center",
+            "marginTop": 5,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "rgb(216, 216, 216)",
+              "fontSize": 13,
+            }
+          }
+        >
+          text translated
+        </Text>
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "borderColor": undefined,
+              "borderRadius": 5,
+              "borderWidth": 1,
+              "flexDirection": "row",
+              "justifyContent": "center",
+              "paddingHorizontal": 5,
+            }
+          }
+        >
+          <Text
+            style={
+              {
+                "color": "rgb(216, 216, 216)",
+                "fontSize": 13,
+                "marginRight": 5,
+              }
+            }
+          >
+            text translated
+          </Text>
+          <
+            icon={
+              {
+                "icon": [
+                  576,
+                  512,
+                  [],
+                  "f3c1",
+                  "M352 144c0-44.2 35.8-80 80-80s80 35.8 80 80v48c0 17.7 14.3 32 32 32s32-14.3 32-32V144C576 64.5 511.5 0 432 0S288 64.5 288 144v48H64c-35.3 0-64 28.7-64 64V448c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V256c0-35.3-28.7-64-64-64H352V144z",
+                ],
+                "iconName": "lock-open",
+                "prefix": "fas",
+              }
+            }
+            size={14}
+          />
+        </View>
+      </View>
+    </View>
+  </View>
+  <View
+    style={
+      {
+        "backgroundColor": "rgb(0, 122, 255)",
+        "height": 1,
+        "width": "100%",
+      }
+    }
+  />
+</View>
+`;
+
+exports[`Component Header - test Header Simple - snapshot 1`] = `
+<View
+  style={
+    {
+      "alignItems": "center",
+      "backgroundColor": "rgb(255, 255, 255)",
+      "display": "flex",
+      "paddingBottom": 0,
+      "paddingTop": 10,
+      "zIndex": -1,
+    }
+  }
+  testID="header"
+>
+  <Image
+    source={
+      {
+        "testUri": "../../../assets/img/logobig-zingo.png",
+      }
+    }
+    style={
+      {
+        "borderRadius": 10,
+        "height": 50,
+        "resizeMode": "contain",
+        "width": 50,
+      }
+    }
+  />
+  <View
+    style={
+      {
+        "height": 20,
+      }
+    }
+  />
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "display": "flex",
+        "flexDirection": "row",
+        "flexWrap": "wrap",
+        "justifyContent": "center",
+        "marginVertical": 5,
+      }
+    }
+  >
+    <View
+      style={
+        {
+          "alignItems": "center",
+          "display": "flex",
+          "flexDirection": "column",
+          "flexWrap": "wrap",
+          "justifyContent": "center",
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": "rgb(28, 28, 30)",
+            "fontSize": 18,
+            "fontWeight": "600",
+            "opacity": 1,
+            "paddingHorizontal": 5,
+          }
+        }
+      >
+        title
+      </Text>
+    </View>
+  </View>
+  <View
+    style={
+      {
+        "left": 0,
+        "padding": 10,
+        "position": "absolute",
+      }
+    }
+  >
+    <View
+      style={
+        {
+          "alignItems": "center",
+          "flexDirection": "row",
+        }
+      }
+    />
+  </View>
+  <View
+    style={
+      {
+        "alignItems": "flex-end",
+        "padding": 15,
+        "position": "absolute",
+        "right": 0,
+      }
+    }
+  >
+    <Text
+      style={
+        {
+          "color": "rgb(216, 216, 216)",
+          "fontSize": 8,
+        }
+      }
+    >
+      text translated
+    </Text>
+    <Text
+      style={
+        {
+          "color": "rgb(216, 216, 216)",
+          "fontSize": 8,
+        }
+      }
+    >
+      text translatedtext translated
+    </Text>
+    <Text
+      style={
+        {
+          "color": "rgb(216, 216, 216)",
+          "fontSize": 8,
+        }
+      }
+    >
+      (undefinedxundefined)-undefined
+    </Text>
+  </View>
+  <View
+    style={
+      {
+        "backgroundColor": "rgb(0, 122, 255)",
+        "height": 1,
+        "width": "100%",
+      }
+    }
+  />
+</View>
+`;

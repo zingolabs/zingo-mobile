@@ -35,6 +35,7 @@ type SettingsProps = {
   set_language_option: (name: 'language', value: string, reset: boolean) => Promise<void>;
   set_sendAll_option: (name: 'sendAll', value: boolean) => Promise<void>;
   set_privacy_option: (name: 'privacy', value: boolean) => Promise<void>;
+  set_mode_option: (name: 'mode', value: string) => Promise<void>;
 };
 
 type Options = {
@@ -49,6 +50,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   set_language_option,
   set_sendAll_option,
   set_privacy_option,
+  set_mode_option,
   closeModal,
 }) => {
   const context = useContext(ContextAppLoaded);
@@ -60,6 +62,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     language: languageContext,
     sendAll: sendAllContext,
     privacy: privacyContext,
+    mode: modeContext,
     netInfo,
   } = context;
 
@@ -94,6 +97,12 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     PRIVACYS = privacysArray as Options[];
   }
 
+  const modesArray = translate('settings.modes');
+  let MODES: Options[] = [];
+  if (typeof modesArray === 'object') {
+    MODES = modesArray as Options[];
+  }
+
   const { colors } = useTheme() as unknown as ThemeType;
 
   const [memos, setMemos] = useState(walletSettings.download_memos);
@@ -104,6 +113,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [language, setLanguage] = useState(languageContext);
   const [sendAll, setSendAll] = useState(sendAllContext);
   const [privacy, setPrivacy] = useState(privacyContext);
+  const [mode, setMode] = useState(modeContext);
   const [customIcon, setCustomIcon] = useState(farCircle);
   const [disabled, setDisabled] = useState<boolean>();
   const [titleViewHeight, setTitleViewHeight] = useState(0);
@@ -156,7 +166,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       currencyContext === currency &&
       languageContext === language &&
       sendAllContext === sendAll &&
-      privacyContext === privacy
+      privacyContext === privacy &&
+      modeContext === mode
     ) {
       Toast.show(translate('settings.nochanges') as string, Toast.LONG);
       return;
@@ -241,6 +252,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     if (privacyContext !== privacy) {
       await set_privacy_option('privacy', privacy);
     }
+    if (modeContext !== mode) {
+      await set_mode_option('mode', mode);
+    }
 
     // I need a little time in this modal because maybe the wallet cannot be open with the new server
     let ms = 100;
@@ -276,6 +290,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     return DATA.map(item => (
       <View key={'view-' + item.value}>
         <TouchableOpacity
+          testID={`settings.${label}-${item.value}`}
           disabled={disabled}
           style={{ marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
           onPress={() => setOption(typeOption(item.value))}>
@@ -333,6 +348,14 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           justifyContent: 'flex-start',
         }}>
         <View style={{ display: 'flex', margin: 10 }}>
+          <BoldText>{translate('settings.mode-title') as string}</BoldText>
+        </View>
+
+        <View style={{ display: 'flex', marginLeft: 25 }}>
+          {optionsRadio(MODES, setMode as React.Dispatch<React.SetStateAction<string | boolean>>, String, mode, 'mode')}
+        </View>
+
+        <View style={{ display: 'flex', margin: 10 }}>
           <BoldText>{translate('settings.privacy-title') as string}</BoldText>
         </View>
 
@@ -343,20 +366,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             Boolean,
             privacy,
             'privacy',
-          )}
-        </View>
-
-        <View style={{ display: 'flex', margin: 10 }}>
-          <BoldText>{translate('settings.sendall-title') as string}</BoldText>
-        </View>
-
-        <View style={{ display: 'flex', marginLeft: 25 }}>
-          {optionsRadio(
-            SENDALLS,
-            setSendAll as React.Dispatch<React.SetStateAction<string | boolean>>,
-            Boolean,
-            sendAll,
-            'sendall',
           )}
         </View>
 
@@ -388,171 +397,189 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           )}
         </View>
 
-        <View style={{ display: 'flex', margin: 10 }}>
-          <BoldText>{translate('settings.server-title') as string}</BoldText>
-        </View>
+        {modeContext !== 'basic' && (
+          <>
+            <View style={{ display: 'flex', margin: 10 }}>
+              <BoldText>{translate('settings.sendall-title') as string}</BoldText>
+            </View>
 
-        <View style={{ display: 'flex', marginLeft: 25 }}>
-          {serverUris().map((s: ServerType, i: number) =>
-            s.uri ? (
-              <TouchableOpacity
-                testID={
-                  i === 0
-                    ? 'settings.firstServer'
-                    : i === 1
-                    ? 'settings.secondServer'
-                    : 'settings.' + i.toString + '-Server'
-                }
-                disabled={disabled}
-                key={'touch-' + s.uri}
-                style={{ marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
-                onPress={() => {
-                  setCustomServerUri(s.uri);
-                  setCustomServerChainName(s.chain_name);
-                }}>
-                <View style={{ display: 'flex', flexDirection: 'row', marginTop: 10 }}>
-                  <FontAwesomeIcon
-                    icon={customServerUri === s.uri ? faDotCircle : farCircle}
-                    size={20}
-                    color={colors.border}
-                  />
-                  <RegText key={'tex-' + s.uri} style={{ marginLeft: 10 }}>
-                    {s.uri}
-                  </RegText>
-                </View>
-              </TouchableOpacity>
-            ) : null,
-          )}
+            <View style={{ display: 'flex', marginLeft: 25 }}>
+              {optionsRadio(
+                SENDALLS,
+                setSendAll as React.Dispatch<React.SetStateAction<string | boolean>>,
+                Boolean,
+                sendAll,
+                'sendall',
+              )}
+            </View>
 
-          <View>
-            <TouchableOpacity
-              testID="settings.customServer"
-              disabled={disabled}
-              style={{ marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
-              onPress={() => setCustomServerUri('')}>
-              <View style={{ display: 'flex', flexDirection: 'row', marginTop: 10 }}>
-                {customIcon && <FontAwesomeIcon icon={customIcon} size={20} color={colors.border} />}
-                <RegText style={{ marginLeft: 10 }}>{translate('settings.custom') as string}</RegText>
-              </View>
-            </TouchableOpacity>
+            <View style={{ display: 'flex', margin: 10 }}>
+              <BoldText>{translate('settings.server-title') as string}</BoldText>
+            </View>
 
-            {customIcon === faDotCircle && (
-              <View>
-                <View
-                  accessible={true}
-                  accessibilityLabel={translate('settings.server-acc') as string}
-                  style={{
-                    borderColor: colors.border,
-                    borderWidth: 1,
-                    marginLeft: 5,
-                    width: 'auto',
-                    maxWidth: '90%',
-                    minWidth: '50%',
-                    minHeight: 48,
-                  }}>
-                  <TextInput
-                    testID="settings.customServerField"
-                    placeholder={'https://------.---:---'}
-                    placeholderTextColor={colors.placeholder}
-                    style={{
-                      color: colors.text,
-                      fontWeight: '600',
-                      fontSize: 18,
-                      minWidth: '50%',
-                      maxWidth: '90%',
-                      minHeight: 48,
-                      marginLeft: 5,
-                      backgroundColor: 'transparent',
-                    }}
-                    value={customServerUri}
-                    onChangeText={(text: string) => setCustomServerUri(text)}
-                    editable={!disabled}
-                    maxLength={100}
-                  />
-                </View>
-                <View
-                  accessible={true}
-                  accessibilityLabel={translate('settings.server-acc') as string}
-                  style={{
-                    marginLeft: 5,
-                    width: 'auto',
-                    maxWidth: '90%',
-                    minWidth: '50%',
-                    minHeight: 48,
-                  }}>
-                  <View
-                    style={{
-                      paddingTop: 10,
-                      paddingLeft: 10,
-                      paddingRight: 10,
-                      marginBottom: 5,
-                      justifyContent: 'center',
-                      alignItems: 'center',
+            <View style={{ display: 'flex', marginLeft: 25 }}>
+              {serverUris().map((s: ServerType, i: number) =>
+                s.uri ? (
+                  <TouchableOpacity
+                    testID={
+                      i === 0
+                        ? 'settings.firstServer'
+                        : i === 1
+                        ? 'settings.secondServer'
+                        : 'settings.' + i.toString + '-Server'
+                    }
+                    disabled={disabled}
+                    key={'touch-' + s.uri}
+                    style={{ marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
+                    onPress={() => {
+                      setCustomServerUri(s.uri);
+                      setCustomServerChainName(s.chain_name);
                     }}>
-                    <ChainTypeToggle
-                      customServerChainName={customServerChainName}
-                      onPress={onPressServerChainName}
-                      translate={translate}
-                    />
+                    <View style={{ display: 'flex', flexDirection: 'row', marginTop: 10 }}>
+                      <FontAwesomeIcon
+                        icon={customServerUri === s.uri ? faDotCircle : farCircle}
+                        size={20}
+                        color={colors.border}
+                      />
+                      <RegText key={'tex-' + s.uri} style={{ marginLeft: 10 }}>
+                        {s.uri}
+                      </RegText>
+                    </View>
+                  </TouchableOpacity>
+                ) : null,
+              )}
+
+              <View>
+                <TouchableOpacity
+                  testID="settings.customServer"
+                  disabled={disabled}
+                  style={{ marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
+                  onPress={() => setCustomServerUri('')}>
+                  <View style={{ display: 'flex', flexDirection: 'row', marginTop: 10 }}>
+                    {customIcon && <FontAwesomeIcon icon={customIcon} size={20} color={colors.border} />}
+                    <RegText style={{ marginLeft: 10 }}>{translate('settings.custom') as string}</RegText>
                   </View>
-                </View>
+                </TouchableOpacity>
+
+                {customIcon === faDotCircle && (
+                  <View>
+                    <View
+                      accessible={true}
+                      accessibilityLabel={translate('settings.server-acc') as string}
+                      style={{
+                        borderColor: colors.border,
+                        borderWidth: 1,
+                        marginLeft: 5,
+                        width: 'auto',
+                        maxWidth: '90%',
+                        minWidth: '50%',
+                        minHeight: 48,
+                      }}>
+                      <TextInput
+                        testID="settings.customServerField"
+                        placeholder={'https://------.---:---'}
+                        placeholderTextColor={colors.placeholder}
+                        style={{
+                          color: colors.text,
+                          fontWeight: '600',
+                          fontSize: 18,
+                          minWidth: '50%',
+                          maxWidth: '90%',
+                          minHeight: 48,
+                          marginLeft: 5,
+                          backgroundColor: 'transparent',
+                        }}
+                        value={customServerUri}
+                        onChangeText={(text: string) => setCustomServerUri(text)}
+                        editable={!disabled}
+                        maxLength={100}
+                      />
+                    </View>
+                    <View
+                      accessible={true}
+                      accessibilityLabel={translate('settings.server-acc') as string}
+                      style={{
+                        marginLeft: 5,
+                        width: 'auto',
+                        maxWidth: '90%',
+                        minWidth: '50%',
+                        minHeight: 48,
+                      }}>
+                      <View
+                        style={{
+                          paddingTop: 10,
+                          paddingLeft: 10,
+                          paddingRight: 10,
+                          marginBottom: 5,
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                        }}>
+                        <ChainTypeToggle
+                          customServerChainName={customServerChainName}
+                          onPress={onPressServerChainName}
+                          translate={translate}
+                        />
+                      </View>
+                    </View>
+                  </View>
+                )}
               </View>
-            )}
-          </View>
-        </View>
+            </View>
 
-        <View style={{ display: 'flex', margin: 10 }}>
-          <BoldText>{translate('settings.threshold-title') as string}</BoldText>
-        </View>
+            <View style={{ display: 'flex', margin: 10 }}>
+              <BoldText>{translate('settings.threshold-title') as string}</BoldText>
+            </View>
 
-        <View style={{ display: 'flex', marginLeft: 25 }}>
-          <View
-            accessible={true}
-            accessibilityLabel={translate('settings.threshold-acc') as string}
-            style={{
-              borderColor: colors.border,
-              borderWidth: 1,
-              marginLeft: 5,
-              width: 'auto',
-              maxWidth: '60%',
-              maxHeight: 48,
-              minWidth: '30%',
-              minHeight: 48,
-            }}>
-            <TextInput
-              placeholder={translate('settings.number') as string}
-              placeholderTextColor={colors.placeholder}
-              keyboardType="numeric"
-              style={{
-                color: colors.text,
-                fontWeight: '600',
-                fontSize: 18,
-                minWidth: '30%',
-                minHeight: 48,
-                marginLeft: 5,
-                backgroundColor: 'transparent',
-              }}
-              value={filter}
-              onChangeText={(text: string) => setFilter(text)}
-              editable={!disabled}
-              maxLength={6}
-            />
-          </View>
-        </View>
+            <View style={{ display: 'flex', marginLeft: 25 }}>
+              <View
+                accessible={true}
+                accessibilityLabel={translate('settings.threshold-acc') as string}
+                style={{
+                  borderColor: colors.border,
+                  borderWidth: 1,
+                  marginLeft: 5,
+                  width: 'auto',
+                  maxWidth: '60%',
+                  maxHeight: 48,
+                  minWidth: '30%',
+                  minHeight: 48,
+                }}>
+                <TextInput
+                  placeholder={translate('settings.number') as string}
+                  placeholderTextColor={colors.placeholder}
+                  keyboardType="numeric"
+                  style={{
+                    color: colors.text,
+                    fontWeight: '600',
+                    fontSize: 18,
+                    minWidth: '30%',
+                    minHeight: 48,
+                    marginLeft: 5,
+                    backgroundColor: 'transparent',
+                  }}
+                  value={filter}
+                  onChangeText={(text: string) => setFilter(text)}
+                  editable={!disabled}
+                  maxLength={6}
+                />
+              </View>
+            </View>
 
-        <View style={{ display: 'flex', margin: 10 }}>
-          <BoldText>{translate('settings.memo-title') as string}</BoldText>
-        </View>
+            <View style={{ display: 'flex', margin: 10 }}>
+              <BoldText>{translate('settings.memo-title') as string}</BoldText>
+            </View>
 
-        <View style={{ display: 'flex', marginLeft: 25, marginBottom: 30 }}>
-          {optionsRadio(
-            MEMOS,
-            setMemos as React.Dispatch<React.SetStateAction<string | boolean>>,
-            String,
-            memos,
-            'memo',
-          )}
-        </View>
+            <View style={{ display: 'flex', marginLeft: 25, marginBottom: 30 }}>
+              {optionsRadio(
+                MEMOS,
+                setMemos as React.Dispatch<React.SetStateAction<string | boolean>>,
+                String,
+                memos,
+                'memo',
+              )}
+            </View>
+          </>
+        )}
       </ScrollView>
       <View
         style={{

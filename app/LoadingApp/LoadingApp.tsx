@@ -29,8 +29,6 @@ import OptionsMenu from 'react-native-option-menu';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faEllipsisV } from '@fortawesome/free-solid-svg-icons';
 
-import BoldText from '../../components/Components/BoldText';
-import Button from '../../components/Components/Button';
 import RPCModule from '../RPCModule';
 import { AppStateLoading, BackgroundType, WalletType, TranslateType, NetInfoType, ServerType } from '../AppState';
 import { parseServerURI, serverUris } from '../uris';
@@ -42,12 +40,14 @@ import platform from '../platform/platform';
 import BackgroundFileImpl from '../../components/Background/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '../createAlert';
-import { ImportUfvk } from '../../components/Ufvk';
 import { RPCWalletKindType } from '../rpc/types/RPCWalletKindType';
 import { isEqual } from 'lodash';
-import ChainTypeToggle from '../../components/Components/ChainTypeToggle';
 
+const BoldText = React.lazy(() => import('../../components/Components/BoldText'));
+const Button = React.lazy(() => import('../../components/Components/Button'));
 const Seed = React.lazy(() => import('../../components/Seed'));
+const ImportUfvk = React.lazy(() => import('../../components/Ufvk/ImportUfvk'));
+const ChainTypeToggle = React.lazy(() => import('../../components/Components/ChainTypeToggle'));
 
 const en = require('../translations/en.json');
 const es = require('../translations/es.json');
@@ -62,13 +62,14 @@ const SERVER_DEFAULT_1 = serverUris()[1];
 
 export default function LoadingApp(props: LoadingAppProps) {
   const theme = useTheme() as unknown as ThemeType;
-  const [language, setLanguage] = useState('en' as 'en' | 'es');
-  const [currency, setCurrency] = useState('' as 'USD' | '');
+  const [language, setLanguage] = useState<'en' | 'es'>('en');
+  const [currency, setCurrency] = useState<'USD' | ''>('');
   const [server, setServer] = useState<ServerType>(SERVER_DEFAULT_0);
-  const [sendAll, setSendAll] = useState(false);
-  const [privacy, setPrivacy] = useState(false);
-  const [background, setBackground] = useState({ batches: 0, date: 0 } as BackgroundType);
-  const [loading, setLoading] = useState(true);
+  const [sendAll, setSendAll] = useState<boolean>(false);
+  const [privacy, setPrivacy] = useState<boolean>(false);
+  const [mode, setMode] = useState<'basic' | 'expert'>('basic');
+  const [background, setBackground] = useState<BackgroundType>({ batches: 0, date: 0 });
+  const [loading, setLoading] = useState<boolean>(true);
   const file = useMemo(
     () => ({
       en: en,
@@ -95,7 +96,22 @@ export default function LoadingApp(props: LoadingAppProps) {
 
       //I have to check what language is in the settings
       const settings = await SettingsFileImpl.readSettings();
-      if (settings.language) {
+      //console.log(settings);
+
+      // first I need to know if this launch is a fresh install...
+      // if firstInstall is true -> 100% is the first time.
+      if (settings.firstInstall) {
+        // basic mode
+        setMode('basic');
+        await SettingsFileImpl.writeSettings('mode', 'basic');
+      } else {
+        if (settings.mode === 'basic' || settings.mode === 'expert') {
+          setMode(settings.mode);
+        } else {
+          await SettingsFileImpl.writeSettings('mode', mode);
+        }
+      }
+      if (settings.language === 'en' || settings.language === 'es') {
         setLanguage(settings.language);
         i18n.locale = settings.language;
         //console.log('apploading settings', settings.language, settings.currency);
@@ -109,7 +125,7 @@ export default function LoadingApp(props: LoadingAppProps) {
         await SettingsFileImpl.writeSettings('language', lang);
         //console.log('apploading NO settings', languageTag);
       }
-      if (settings.currency) {
+      if (settings.currency === '' || settings.currency === 'USD') {
         setCurrency(settings.currency);
       } else {
         await SettingsFileImpl.writeSettings('currency', currency);
@@ -121,12 +137,12 @@ export default function LoadingApp(props: LoadingAppProps) {
         await SettingsFileImpl.writeSettings('server', server);
         //console.log('NO settings', settings.server);
       }
-      if (settings.sendAll) {
+      if (settings.sendAll === true || settings.sendAll === false) {
         setSendAll(settings.sendAll);
       } else {
         await SettingsFileImpl.writeSettings('sendAll', sendAll);
       }
-      if (settings.privacy) {
+      if (settings.privacy === true || settings.privacy === false) {
         setPrivacy(settings.privacy);
       } else {
         await SettingsFileImpl.writeSettings('privacy', privacy);
@@ -160,6 +176,7 @@ export default function LoadingApp(props: LoadingAppProps) {
         server={server}
         sendAll={sendAll}
         privacy={privacy}
+        mode={mode}
         background={background}
       />
     );
@@ -176,6 +193,7 @@ type LoadingAppClassProps = {
   server: ServerType;
   sendAll: boolean;
   privacy: boolean;
+  mode: 'basic' | 'expert';
   background: BackgroundType;
 };
 
@@ -209,6 +227,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
       currency: props.currency,
       sendAll: props.sendAll,
       privacy: props.privacy,
+      mode: props.mode,
       background: props.background,
       dimensions: {
         width: Number(screen.width.toFixed(0)),
@@ -267,7 +286,13 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
         }
       } else {
         //console.log('Loading new wallet');
-        this.setState({ screen: 1, walletExists: false });
+        // if no wallet file & basic mode -> create a new wallet & go directly to history screen.
+        if (this.state.mode === 'basic') {
+          this.createNewWallet();
+          this.navigateToLoaded();
+        } else {
+          this.setState({ screen: 1, walletExists: false });
+        }
       }
     });
 
@@ -415,10 +440,16 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
       if (seed && !seed.toLowerCase().startsWith('error')) {
         // TODO verify that JSON don't fail.
         const wallet: WalletType = JSON.parse(seed);
-        this.setState({ wallet, screen: 2, actionButtonsDisabled: false, walletExists: true });
         // default values for wallet options
         this.set_wallet_option('download_memos', 'wallet');
         //await this.set_wallet_option('transaction_filter_threshold', '500');
+        // basic mode -> same screen.
+        this.setState(state => ({
+          wallet,
+          screen: state.mode === 'basic' ? state.screen : 2,
+          actionButtonsDisabled: false,
+          walletExists: true,
+        }));
       } else {
         this.setState({ actionButtonsDisabled: false });
         createAlert(this.setBackgroundError, this.props.translate('loadingapp.creatingwallet-label') as string, seed);
