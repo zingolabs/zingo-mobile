@@ -8,6 +8,8 @@ if [[ "${test_suite}" == "ALL" ]]; then
   test_suite="";
 fi
 
+./scripts/kill_emulators.sh
+
 ./scripts/node_reboot.sh
 
 detox_target="android.emu.${arch}"
