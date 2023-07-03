@@ -84,11 +84,11 @@ jobs:
         with:
           timeout_minutes: 60
           max_attempts: 5
-          command: yarn detox build -c android.emu.debug
+          command: yarn detox build -c android.emu.${{ matrix.arch }}
       
       - name: Run Detox Test
         uses: nick-fields/retry@v2
         with:
           timeout_minutes: 60
           max_attempts: 5
-          command: yarn detox test -c android.emu.debug change_custom_testnet_server
+          command: yarn detox test -c android.emu.${{ matrix.arch }} change_custom_testnet_server
