@@ -60,7 +60,13 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected }) => {
 
         {!(mode === 'basic' && transactions.length <= 0) && !(mode === 'basic' && totalBalance.total <= 0) && (
           <RegText onPress={() => onItemSelectedWrapper('Wallet')} style={item}>
-            {readOnly ? (translate('loadedapp.walletufvk') as string) : (translate('loadedapp.walletseed') as string)}
+            {readOnly
+              ? mode === 'basic'
+                ? (translate('loadedapp.walletufvk-basic') as string)
+                : (translate('loadedapp.walletufvk') as string)
+              : mode === 'basic'
+              ? (translate('loadedapp.walletseed-basic') as string)
+              : (translate('loadedapp.walletseed') as string)}
           </RegText>
         )}
 
