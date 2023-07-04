@@ -82,7 +82,7 @@ const Button: React.FunctionComponent<ButtonProps> = ({
         }}>
         <Text
           style={{
-            color: type === 'Primary' ? colors.background : colors.primary,
+            color: type === 'Primary' ? colors.background : disabled ? colors.primaryDisabled : colors.primary,
             fontWeight: 'bold',
             textTransform: 'uppercase',
             fontSize: 16,
