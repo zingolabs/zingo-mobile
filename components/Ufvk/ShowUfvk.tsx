@@ -28,7 +28,7 @@ type ShowUfvkProps = {
 };
 const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCancel, action }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, wallet, server, netInfo } = context;
+  const { translate, wallet, server, netInfo, mode } = context;
   const { ufvk } = wallet;
   const { colors } = useTheme() as unknown as ThemeType;
   const [times, setTimes] = useState(0);
@@ -122,12 +122,13 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
           marginVertical: 5,
         }}>
         <Button
-          type="Primary"
+          type={mode === 'basic' ? 'Secondary' : 'Primary'}
           style={{
-            backgroundColor: times === 3 ? 'red' : colors.primary,
-            color: times === 3 ? 'white' : colors.primary,
+            backgroundColor: times === 3 ? 'red' : mode === 'basic' ? colors.background : colors.primary,
           }}
-          title={!!texts && !!texts[action] ? texts[action][times] : ''}
+          title={
+            mode === 'basic' ? (translate('cancel') as string) : !!texts && !!texts[action] ? texts[action][times] : ''
+          }
           onPress={() => {
             if (!ufvk) {
               return;

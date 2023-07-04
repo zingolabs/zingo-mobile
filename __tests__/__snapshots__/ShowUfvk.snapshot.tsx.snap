@@ -452,11 +452,10 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "rgb(0, 122, 255)",
-          "borderColor": "rgb(28, 28, 30)",
+          "backgroundColor": "rgb(242, 242, 242)",
+          "borderColor": "rgb(0, 122, 255)",
           "borderRadius": 10,
           "borderWidth": 2,
-          "color": "rgb(0, 122, 255)",
           "justifyContent": "center",
           "maxWidth": "90%",
           "minHeight": 48,
@@ -485,14 +484,16 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(242, 242, 242)",
+              "color": "rgb(0, 122, 255)",
               "fontSize": 16,
               "fontWeight": "bold",
               "textAlign": "center",
               "textTransform": "uppercase",
             }
           }
-        />
+        >
+          text translated
+        </Text>
       </View>
     </View>
   </View>
