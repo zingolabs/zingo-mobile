@@ -257,8 +257,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
         this.setState({ walletExists: true });
         const networkState = await NetInfo.fetch();
         if (networkState.isConnected) {
-          //let result: string = await RPCModule.loadExistingWallet(this.state.server.uri, this.state.server.chain_name);
-          let result = 'Error: ay ay ay ay';
+          let result: string = await RPCModule.loadExistingWallet(this.state.server.uri, this.state.server.chain_name);
           if (result === 'Error: This wallet is watch-only.') {
             // this warning is not an error, bypassing...
             result = 'OK';
