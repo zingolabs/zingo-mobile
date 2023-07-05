@@ -7,6 +7,6 @@ import org.junit.runners.Suite.SuiteClasses
 
 @RunWith(Categories::class)
 @IncludeCategory(IntegrationTest::class)
-@SuiteClasses(ExecuteAddressesTest::class)
+@SuiteClasses(CommandsOnLaunch::class)
 class IntegrationTestSuite {
 }
