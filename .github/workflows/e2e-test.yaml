@@ -86,6 +86,13 @@ jobs:
           max_attempts: 5
           command: yarn detox build -c android.emu.${{ matrix.arch }}
       
+      - name: Boot Emulator
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 60
+          max_attempts: 5
+          command: ./scripts/emulator_boot.sh
+
       - name: Run Detox Test
         uses: nick-fields/retry@v2
         with:
