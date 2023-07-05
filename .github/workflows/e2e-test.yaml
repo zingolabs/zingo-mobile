@@ -93,6 +93,13 @@ jobs:
           max_attempts: 5
           command: ./scripts/emulator_boot.sh
 
+      - name: Install Apk
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 60
+          max_attempts: 5
+          command: ./scripts/emulator_install_apk.sh
+
       - name: Run Detox Test
         uses: nick-fields/retry@v2
         with:
