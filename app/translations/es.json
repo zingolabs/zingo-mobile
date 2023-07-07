@@ -37,7 +37,7 @@
     "invalidufvk-label": "Clave de Visualización incorrecta",
     "invalidufvk-error": "La Clave de Visualización proporcionada no es correcta. Revisa la clave y/o escaneala de nuevo.",
     "custom": "Otro Servidor...",
-    "nointernet-message": "No hay una conexion a internet establecida. Zingo no puede funcionar en estas condiciones. Cuando el dispositivo disponga de una conexion a internet ya sea Movil o Wifi, Zingo arranacara automaticamente. Por favor solucione esta incidencia.",
+    "nointernet-message": "No hay una conexion a internet establecida. Por favor solucione esta incidencia.",
     "basicmode": "Cambiar a Modo Básico",
     "expertmode": "Cambiar a Modo Experto",
     "noopenwallet-message": "Ha ocurrido un error mientras el App estaba intentando abrir el monedero activo.",

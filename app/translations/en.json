@@ -37,7 +37,7 @@
     "invalidufvk-label": "Invalid Unified Full Viewing Key",
     "invalidufvk-error": "The Viewing Key was invalid. Review the Key and/or scan it again.",
     "custom": "Custom Server...",
-    "nointernet-message": "There is no established internet connection. Zingo cannot function under these conditions. When the device has an internet connection, either Mobile or Wifi, Zingo will start automatically. Please fix this issue.",
+    "nointernet-message": "There is no established internet connection. Please fix this issue.",
     "basicmode": "Change to Basic Mode",
     "expertmode": "Change to Expert Mode",
     "noopenwallet-message": "An error occurred while the App was trying to open the active wallet.",
