@@ -59,7 +59,9 @@ export default class RPC {
   prevProgress: number;
   prevBatchNum: number;
   prev_sync_id: number;
+  prev_current_block: number;
   seconds_batch: number;
+  seconds_block: number;
   batches: number;
   latest_block: number;
   sync_id: number;
@@ -102,7 +104,9 @@ export default class RPC {
     this.prevProgress = 0;
     this.prevBatchNum = -1;
     this.prev_sync_id = -1;
+    this.prev_current_block = -1;
     this.seconds_batch = 0;
+    this.seconds_block = 0;
     this.batches = 0;
     this.latest_block = -1;
     this.sync_id = -1;
@@ -698,8 +702,10 @@ export default class RPC {
       this.prevBatchNum = -1;
       this.prev_sync_id = -1;
       this.seconds_batch = 0;
+      this.seconds_block = 0;
       this.batches = 0;
       this.latest_block = -1;
+      this.prev_current_block = -1;
 
       // This is async, so when it is done, we finish the refresh.
       if (fullRescan) {
@@ -772,6 +778,7 @@ export default class RPC {
             this.prevProgress = 0;
             this.prevBatchNum = -1;
             this.seconds_batch = 0;
+            this.seconds_block = 0;
             this.batches = 0;
           }
           this.prev_sync_id = this.sync_id;
@@ -864,6 +871,22 @@ export default class RPC {
           current_block = this.lastServerBlockHeight;
         }
 
+        // if the current block is stalled I need to restart the App
+        let syncProcessStalled = false;
+        if (this.prev_current_block !== -1) {
+          if (this.prev_current_block === current_block) {
+            this.seconds_block += 5;
+            if (this.seconds_block >= 60) {
+              syncProcessStalled = true;
+            }
+          }
+        }
+        if (this.prev_current_block !== current_block) {
+          this.seconds_block = 0;
+        }
+
+        this.prev_current_block = current_block;
+
         this.seconds_batch += 5;
 
         //console.log('interval sync/rescan, secs', this.seconds_batch, 'timer', this.syncStatusTimerID);
@@ -881,6 +904,7 @@ export default class RPC {
           secondsPerBatch: this.seconds_batch,
           process_end_block: process_end_block,
           lastBlockServer: this.lastServerBlockHeight,
+          syncProcessStalled: syncProcessStalled,
         } as SyncingStatusClass);
 
         this.prevProgress = progress;
@@ -920,6 +944,7 @@ export default class RPC {
             secondsPerBatch: 0,
             process_end_block: process_end_block,
             lastBlockServer: this.lastServerBlockHeight,
+            syncProcessStalled: false,
           } as SyncingStatusClass);
 
           //console.log('sync status', ss);
@@ -952,6 +977,7 @@ export default class RPC {
                 secondsPerBatch: this.seconds_batch,
                 process_end_block: process_end_block,
                 lastBlockServer: this.lastServerBlockHeight,
+                syncProcessStalled: false,
               } as SyncingStatusClass);
 
               //console.log('sync status', ss);
@@ -987,6 +1013,7 @@ export default class RPC {
               secondsPerBatch: this.seconds_batch,
               process_end_block: process_end_block,
               lastBlockServer: this.lastServerBlockHeight,
+              syncProcessStalled: false,
             } as SyncingStatusClass);
 
             //console.log('sync status', ss);
@@ -1012,6 +1039,7 @@ export default class RPC {
         secondsPerBatch: 0,
         process_end_block: this.lastServerBlockHeight,
         lastBlockServer: this.lastServerBlockHeight,
+        syncProcessStalled: false,
       } as SyncingStatusClass);
     }
   }
