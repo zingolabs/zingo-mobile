@@ -25,7 +25,7 @@
   },
   "loadingapp": {
     "actualserver": "Actual server:",
-    "changeserver": "CHANGE SERVER",
+    "changeserver": "Change the Server",
     "createnewwallet": "Create New Wallet\n(new seed)",
     "opencurrentwallet": "Open Current Wallet",
     "restorewalletseed": "Restore wallet\nfrom Seed",
@@ -35,7 +35,13 @@
     "invalidseed-label": "Invalid Seed Phrase",
     "invalidseed-error": "The seed phrase was invalid. Review every single word of the seed.",
     "invalidufvk-label": "Invalid Unified Full Viewing Key",
-    "invalidufvk-error": "The Viewing Key was invalid. Review the Key and/or scan it again."
+    "invalidufvk-error": "The Viewing Key was invalid. Review the Key and/or scan it again.",
+    "custom": "Custom Server...",
+    "nointernet-message": "There is no established internet connection. Please fix this issue.",
+    "basicmode": "Change to Basic Mode",
+    "expertmode": "Change to Expert Mode",
+    "noopenwallet-message": "An error occurred while the App was trying to open the active wallet.",
+    "changeserver-basic": "Change the Server and\nOpen Current Wallet"
   },
   "loadedapp": {
     "about": "About Zingo!",
