@@ -25,7 +25,7 @@
   },
   "loadingapp": {
     "actualserver": "Servidor Activo:",
-    "changeserver": "CAMBIAR SERVIDOR",
+    "changeserver": "Cambiar de Servidor",
     "createnewwallet": "Crear Monedero Nuevo\n(nueva semilla)",
     "opencurrentwallet": "Abrir Monedero Activo",
     "restorewalletseed": "Restaurar Monedero\ncon la Semilla",
@@ -35,7 +35,13 @@
     "invalidseed-label": "Semilla incorrecta",
     "invalidseed-error": "La semilla proporcionada no es correcta. Revisa cada una de las palabras.",
     "invalidufvk-label": "Clave de Visualización incorrecta",
-    "invalidufvk-error": "La Clave de Visualización proporcionada no es correcta. Revisa la clave y/o escaneala de nuevo."
+    "invalidufvk-error": "La Clave de Visualización proporcionada no es correcta. Revisa la clave y/o escaneala de nuevo.",
+    "custom": "Otro Servidor...",
+    "nointernet-message": "No hay una conexion a internet establecida. Por favor solucione esta incidencia.",
+    "basicmode": "Cambiar a Modo Básico",
+    "expertmode": "Cambiar a Modo Experto",
+    "noopenwallet-message": "Ha ocurrido un error mientras el App estaba intentando abrir el monedero activo.",
+    "changeserver-basic": "Cambiar de Servidor and\nAbrir Monedero Activo"
   },
   "loadedapp": {
     "about": "Sobre Zingo!",

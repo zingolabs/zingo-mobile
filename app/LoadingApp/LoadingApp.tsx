@@ -282,7 +282,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
           }
         } else {
           this.setState({ screen: 1 });
-          Toast.show(this.props.translate('loadedapp.connection-error') as string, Toast.LONG);
+          //Toast.show(this.props.translate('loadedapp.connection-error') as string, Toast.LONG);
         }
       } else {
         //console.log('Loading new wallet');
@@ -385,22 +385,30 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
     }
   };
 
-  usingDefaultServer_0 = async () => {
+  usingDefaultServer_0 = async (mode: 'basic' | 'expert') => {
     this.setState({ actionButtonsDisabled: true });
     if (SERVER_DEFAULT_0) {
       await SettingsFileImpl.writeSettings('server', SERVER_DEFAULT_0);
       this.setState({ server: SERVER_DEFAULT_0 });
     }
-    this.setState({ actionButtonsDisabled: false });
+    if (mode === 'basic') {
+      this.setState({ actionButtonsDisabled: false }, () => this.componentDidMount());
+    } else {
+      this.setState({ actionButtonsDisabled: false });
+    }
   };
 
-  usingDefaultServer_1 = async () => {
+  usingDefaultServer_1 = async (mode: 'basic' | 'expert') => {
     this.setState({ actionButtonsDisabled: true });
     if (SERVER_DEFAULT_1) {
       await SettingsFileImpl.writeSettings('server', SERVER_DEFAULT_1);
       this.setState({ server: SERVER_DEFAULT_1 });
     }
-    this.setState({ actionButtonsDisabled: false });
+    if (mode === 'basic') {
+      this.setState({ actionButtonsDisabled: false }, () => this.componentDidMount());
+    } else {
+      this.setState({ actionButtonsDisabled: false });
+    }
   };
 
   usingCustomServer = async () => {
@@ -531,11 +539,20 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
   };
 
   customServer = () => {
-    this.setState({ customServerShow: true });
+    if (this.state.netInfo.isConnected) {
+      this.setState({ customServerShow: true });
+    } else {
+      Toast.show(this.props.translate('loadedapp.connection-error') as string, Toast.LONG);
+    }
   };
 
   onPressServerChainName = (chain: 'main' | 'test' | 'regtest') => {
     this.setState({ customServerChainName: chain });
+  };
+
+  changeMode = async (mode: 'basic' | 'expert') => {
+    this.setState({ mode });
+    await SettingsFileImpl.writeSettings('mode', mode);
   };
 
   render() {
@@ -549,6 +566,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
       customServerShow,
       customServerUri,
       customServerChainName,
+      mode,
     } = this.state;
     const { translate } = this.props;
     const { colors } = this.props.theme;
@@ -590,13 +608,31 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                   right: 0,
                   zIndex: 999,
                 }}>
-                <OptionsMenu
-                  customButton={<FontAwesomeIcon icon={faEllipsisV} color={'#ffffff'} size={48} />}
-                  buttonStyle={{ width: 48, padding: 10, resizeMode: 'contain' }}
-                  destructiveIndex={5}
-                  options={['Custom Server...', 'Cancel']}
-                  actions={[this.customServer]}
-                />
+                {netInfo.isConnected && (
+                  <>
+                    {mode === 'basic' ? (
+                      <OptionsMenu
+                        customButton={<FontAwesomeIcon icon={faEllipsisV} color={'#ffffff'} size={48} />}
+                        buttonStyle={{ width: 48, padding: 10, resizeMode: 'contain' }}
+                        destructiveIndex={5}
+                        options={[translate('loadingapp.expertmode'), translate('cancel')]}
+                        actions={[() => this.changeMode('expert')]}
+                      />
+                    ) : (
+                      <OptionsMenu
+                        customButton={<FontAwesomeIcon icon={faEllipsisV} color={'#ffffff'} size={48} />}
+                        buttonStyle={{ width: 48, padding: 10, resizeMode: 'contain' }}
+                        destructiveIndex={5}
+                        options={[
+                          translate('loadingapp.basicmode'),
+                          translate('loadingapp.custom'),
+                          translate('cancel'),
+                        ]}
+                        actions={[() => this.changeMode('basic'), this.customServer]}
+                      />
+                    )}
+                  </>
+                )}
               </View>
               <ScrollView
                 style={{ maxHeight: '100%' }}
@@ -624,12 +660,16 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                     />
                   </View>
 
-                  <BoldText style={{ fontSize: 15, marginBottom: 3 }}>
-                    {`${translate('loadingapp.actualserver') as string} [${
-                      translate(`settings.value-chain_name-${server.chain_name}`) as string
-                    }]`}
-                  </BoldText>
-                  <BoldText style={{ fontSize: 15, marginBottom: 10 }}>{server.uri}</BoldText>
+                  {netInfo.isConnected && (
+                    <>
+                      <BoldText style={{ fontSize: 15, marginBottom: 3 }}>
+                        {`${translate('loadingapp.actualserver') as string} [${
+                          translate(`settings.value-chain_name-${server.chain_name}`) as string
+                        }]`}
+                      </BoldText>
+                      <BoldText style={{ fontSize: 15, marginBottom: 10 }}>{server.uri}</BoldText>
+                    </>
+                  )}
 
                   {customServerShow && (
                     <View
@@ -734,46 +774,94 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                     </>
                   )}
 
-                  {!customServerShow && isEqual(server, SERVER_DEFAULT_1) && !!SERVER_DEFAULT_0.uri && (
-                    <Button
-                      type="Primary"
-                      title={translate('loadingapp.changeserver') as string}
-                      disabled={actionButtonsDisabled}
-                      onPress={this.usingDefaultServer_0}
-                      style={{ marginBottom: 10 }}
-                    />
+                  {mode === 'basic' && netInfo.isConnected && (
+                    <View
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'flex-end',
+                        marginHorizontal: 20,
+                        marginBottom: 20,
+                      }}>
+                      <View
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          marginTop: 20,
+                          borderColor: colors.primary,
+                          borderWidth: 1,
+                          borderRadius: 5,
+                          padding: 5,
+                        }}>
+                        <BoldText style={{ fontSize: 15, color: colors.primaryDisabled }}>
+                          {translate('loadingapp.noopenwallet-message') as string}
+                        </BoldText>
+                      </View>
+                    </View>
                   )}
-                  {!customServerShow && isEqual(server, SERVER_DEFAULT_0) && !!SERVER_DEFAULT_1.uri && (
-                    <Button
-                      type="Primary"
-                      title={translate('loadingapp.changeserver') as string}
-                      disabled={actionButtonsDisabled}
-                      onPress={this.usingDefaultServer_1}
-                      style={{ marginBottom: 10 }}
-                    />
-                  )}
-                  {!customServerShow &&
+
+                  {netInfo.isConnected &&
+                    !customServerShow &&
+                    isEqual(server, SERVER_DEFAULT_1) &&
+                    !!SERVER_DEFAULT_0.uri && (
+                      <Button
+                        type="Primary"
+                        title={
+                          (mode === 'basic'
+                            ? translate('loadingapp.changeserver-basic')
+                            : translate('loadingapp.changeserver')) as string
+                        }
+                        disabled={actionButtonsDisabled}
+                        onPress={() => this.usingDefaultServer_0(mode)}
+                        style={{ marginBottom: 10 }}
+                      />
+                    )}
+                  {netInfo.isConnected &&
+                    !customServerShow &&
+                    isEqual(server, SERVER_DEFAULT_0) &&
+                    !!SERVER_DEFAULT_1.uri && (
+                      <Button
+                        type="Primary"
+                        title={
+                          (mode === 'basic'
+                            ? translate('loadingapp.changeserver-basic')
+                            : translate('loadingapp.changeserver')) as string
+                        }
+                        disabled={actionButtonsDisabled}
+                        onPress={() => this.usingDefaultServer_1(mode)}
+                        style={{ marginBottom: 10 }}
+                      />
+                    )}
+                  {netInfo.isConnected &&
+                    !customServerShow &&
                     !isEqual(server, SERVER_DEFAULT_0) &&
                     !isEqual(server, SERVER_DEFAULT_1) &&
                     !!SERVER_DEFAULT_0.uri && (
                       <Button
                         type="Primary"
-                        title={translate('loadingapp.changeserver') as string}
+                        title={
+                          (mode === 'basic'
+                            ? translate('loadingapp.changeserver-basic')
+                            : translate('loadingapp.changeserver')) as string
+                        }
                         disabled={actionButtonsDisabled}
-                        onPress={this.usingDefaultServer_0}
+                        onPress={() => this.usingDefaultServer_0(mode)}
                         style={{ marginBottom: 10 }}
                       />
                     )}
 
-                  <Button
-                    testID="loadingapp.createnewwallet"
-                    type="Primary"
-                    title={translate('loadingapp.createnewwallet') as string}
-                    disabled={actionButtonsDisabled}
-                    onPress={this.createNewWallet}
-                    style={{ marginBottom: 10, marginTop: 10 }}
-                  />
-                  {walletExists && (
+                  {mode !== 'basic' && netInfo.isConnected && (
+                    <Button
+                      testID="loadingapp.createnewwallet"
+                      type="Primary"
+                      title={translate('loadingapp.createnewwallet') as string}
+                      disabled={actionButtonsDisabled}
+                      onPress={this.createNewWallet}
+                      style={{ marginBottom: 10, marginTop: 10 }}
+                    />
+                  )}
+
+                  {mode !== 'basic' && netInfo.isConnected && walletExists && (
                     <Button
                       type="Primary"
                       title={translate('loadingapp.opencurrentwallet') as string}
@@ -783,27 +871,56 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                     />
                   )}
 
-                  <View style={{ marginTop: 20, display: 'flex', alignItems: 'center' }}>
-                    <Button
-                      testID="loadingapp.restorewalletseed"
-                      type="Secondary"
-                      title={translate('loadingapp.restorewalletseed') as string}
-                      disabled={actionButtonsDisabled}
-                      onPress={() => this.getwalletToRestore('seed')}
-                      style={{ marginBottom: 10 }}
-                    />
-                  </View>
+                  {mode !== 'basic' && netInfo.isConnected && (
+                    <View style={{ marginTop: 20, display: 'flex', alignItems: 'center' }}>
+                      <Button
+                        testID="loadingapp.restorewalletseed"
+                        type="Secondary"
+                        title={translate('loadingapp.restorewalletseed') as string}
+                        disabled={actionButtonsDisabled}
+                        onPress={() => this.getwalletToRestore('seed')}
+                        style={{ marginBottom: 10 }}
+                      />
+                    </View>
+                  )}
 
-                  <View style={{ marginTop: 20, display: 'flex', alignItems: 'center' }}>
-                    <Button
-                      testID="loadingapp.restorewalletufvk"
-                      type="Secondary"
-                      title={translate('loadingapp.restorewalletufvk') as string}
-                      disabled={actionButtonsDisabled}
-                      onPress={() => this.getwalletToRestore('ufvk')}
-                      style={{ marginBottom: 10 }}
-                    />
-                  </View>
+                  {mode !== 'basic' && netInfo.isConnected && (
+                    <View style={{ marginTop: 20, display: 'flex', alignItems: 'center' }}>
+                      <Button
+                        testID="loadingapp.restorewalletufvk"
+                        type="Secondary"
+                        title={translate('loadingapp.restorewalletufvk') as string}
+                        disabled={actionButtonsDisabled}
+                        onPress={() => this.getwalletToRestore('ufvk')}
+                        style={{ marginBottom: 10 }}
+                      />
+                    </View>
+                  )}
+
+                  {!netInfo.isConnected && (
+                    <View
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'flex-end',
+                        marginHorizontal: 20,
+                      }}>
+                      <View
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          marginTop: 20,
+                          borderColor: colors.primary,
+                          borderWidth: 1,
+                          borderRadius: 5,
+                          padding: 5,
+                        }}>
+                        <BoldText style={{ fontSize: 15, color: colors.primaryDisabled }}>
+                          {translate('loadingapp.nointernet-message') as string}
+                        </BoldText>
+                      </View>
+                    </View>
+                  )}
                 </View>
               </ScrollView>
             </>
