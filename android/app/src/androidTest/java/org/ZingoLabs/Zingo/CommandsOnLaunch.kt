@@ -9,6 +9,11 @@ import com.fasterxml.jackson.module.kotlin.readValue
 @Category(IntegrationTest::class)
 class CommandsOnLaunch {
 
+    data class InitFromSeed (
+        val seed : String,
+        val birthday : Long
+    )
+
     data class Addresses (
     	val address : String,
     	val receivers : Receivers
@@ -20,21 +25,35 @@ class CommandsOnLaunch {
     	val orchard_exists : Boolean
     )
 
-    data class Balance (
-        // TODO: change to ULongs and fix errors with deserialising to unsigned
-        val sapling_balance : Long,
-        val verified_sapling_balance : Long,
-        val spendable_sapling_balance : Long,
-        val unverified_sapling_balance : Long,
-        val orchard_balance : Long,
-        val verified_orchard_balance : Long,
-        val spendable_orchard_balance : Long,
-        val unverified_orchard_balance : Long,
-        val transparent_balance : Long
-    )
+    @Test
+    fun executeAddressFromSeed() {
+        val mapper = jacksonObjectMapper()
+
+        val server = "https://mainnet.lightwalletd.com:9067"
+        val chainhint = "main"
+        val seed = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art"
+        val birthday = "2126800"
+        val datadir = MainApplication.getAppContext()!!.filesDir.path
+
+        var initFromSeedJson = RustFFI.initfromseed(server, seed, birthday, datadir, chainhint)
+        System.out.println("\nInit from seed:")
+        System.out.println(initFromSeedJson)
+        val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
+        assertThat(initFromSeed.seed).isEqualTo("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art")
+        assertThat(initFromSeed.birthday).isEqualTo(2126800)
+
+        var addressesJson = RustFFI.execute("addresses", "")
+        System.out.println("\nAddresses:")
+        System.out.println(addressesJson)
+        val addresses: List<Addresses> = mapper.readValue(addressesJson)
+        assertThat(addresses[0].address).isEqualTo("u16sw4v6wy7f4jzdny55yzl020tp3yqg3c85dc6n7mmq0urfm6adqg79hxmyk85ufn4lun4pfh5q48cc3kvxhxm3w978eqqecdd260gkzjrkun6z7m9mcrt2zszaj0mvk6ufux2zteqwh57cq906hz3rkg63duaeqsvjelv9h5srct0zq8rvlv23wz5hed7zuatqd7p6p4ztugc4t4w2g")
+        assertThat(addresses[0].receivers.transparent).isEqualTo("t1dUDJ62ANtmebE8drFg7g2MWYwXHQ6Xu3F")
+        assertThat(addresses[0].receivers.sapling).isEqualTo("zs16uhd4mux24se6wkm74vld0ec63d4dxt3d7m80l5xytreplkkllrrf9c7fj859mhp8tkcq9hxfvj")
+        assertThat(addresses[0].receivers.orchard_exists).isEqualTo(true)
+    }
 
     @Test
-    fun launchFromUfvkTest() {
+    fun executeAddressFromUfvk() {
         val mapper = jacksonObjectMapper()
 
         val server = "https://mainnet.lightwalletd.com:9067"
@@ -43,72 +62,18 @@ class CommandsOnLaunch {
         val birthday = "2126800"
         val datadir = MainApplication.getAppContext()!!.filesDir.path
 
-        var initfromufvk = RustFFI.initfromufvk(server, ufvk, birthday, datadir, chainhint)
-        System.out.println("Init From UFVK:")
-        System.out.println(initfromufvk)
-        assertThat(initfromufvk).isEqualTo("Error: This wallet is watch-only.")
+        var initFromUfvk = RustFFI.initfromufvk(server, ufvk, birthday, datadir, chainhint)
+        System.out.println("\nInit From UFVK:")
+        System.out.println(initFromUfvk)
+        assertThat(initFromUfvk).isEqualTo("Error: This wallet is watch-only.")
 
         var addressesJson = RustFFI.execute("addresses", "")
-        System.out.println("Addresses:")
+        System.out.println("\nAddresses:")
         System.out.println(addressesJson)
         val addresses: List<Addresses> = mapper.readValue(addressesJson)
         assertThat(addresses[0].address).isEqualTo("u16sw4v6wy7f4jzdny55yzl020tp3yqg3c85dc6n7mmq0urfm6adqg79hxmyk85ufn4lun4pfh5q48cc3kvxhxm3w978eqqecdd260gkzjrkun6z7m9mcrt2zszaj0mvk6ufux2zteqwh57cq906hz3rkg63duaeqsvjelv9h5srct0zq8rvlv23wz5hed7zuatqd7p6p4ztugc4t4w2g")
         assertThat(addresses[0].receivers.transparent).isEqualTo("t1dUDJ62ANtmebE8drFg7g2MWYwXHQ6Xu3F")
         assertThat(addresses[0].receivers.sapling).isEqualTo("zs16uhd4mux24se6wkm74vld0ec63d4dxt3d7m80l5xytreplkkllrrf9c7fj859mhp8tkcq9hxfvj")
         assertThat(addresses[0].receivers.orchard_exists).isEqualTo(true)
-        
-        var balanceJson = RustFFI.execute("balance", "")
-        System.out.println("Balance:")
-        System.out.println(balanceJson)
-        val balance: Balance = mapper.readValue(balanceJson)
-        assertThat(balance.sapling_balance).isEqualTo(0)
-        assertThat(balance.verified_sapling_balance).isEqualTo(0)
-        assertThat(balance.spendable_sapling_balance).isEqualTo(0)
-        assertThat(balance.unverified_sapling_balance).isEqualTo(0)
-        assertThat(balance.orchard_balance).isEqualTo(0)
-        assertThat(balance.verified_orchard_balance).isEqualTo(0)
-        assertThat(balance.spendable_orchard_balance).isEqualTo(0)
-        assertThat(balance.unverified_orchard_balance).isEqualTo(0)
-        assertThat(balance.transparent_balance).isEqualTo(0)
-        
-        var notes = RustFFI.execute("notes", "")
-        System.out.println("Notes:")
-        System.out.println(notes)
-
-        var list = RustFFI.execute("list", "")
-        System.out.println("List:")
-        System.out.println(list)
-
-        var info = RustFFI.execute("info", "")
-        System.out.println("Info:")
-        System.out.println(info)
-
-        var defaultfee = RustFFI.execute("defaultfee", "")
-        System.out.println("Default Fee:")
-        System.out.println(defaultfee)
-
-        var getoption_download_memos = RustFFI.execute("getoption", "download_memos")
-        System.out.println("Get Option Download Memos:")
-        System.out.println(getoption_download_memos)
-
-        var getoption_filter_thr = RustFFI.execute("getoption", "transaction_filter_threshold")
-        System.out.println("Get Option Transaction Filter Threshold:")
-        System.out.println(getoption_filter_thr)
-        
-        var exportufvk = RustFFI.execute("exportufvk", "")
-        System.out.println("Export UFVK:")
-        System.out.println(exportufvk)
-
-        var height = RustFFI.execute("height", "")
-        System.out.println("Height:")
-        System.out.println(height)
-
-        var sync = RustFFI.execute("sync", "")
-        System.out.println("Sync:")
-        System.out.println(sync)
-        
-        var syncstatus = RustFFI.execute("syncstatus", "")
-        System.out.println("Sync Status:")
-        System.out.println(syncstatus)        
-    }
+    }    
 }
