@@ -17,7 +17,7 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
   const [snacking, setSnacking] = useState<boolean>(false);
 
   const handleSnackbarClose = useCallback(() => {
-    console.log('remove first snackbar');
+    //console.log('remove first snackbar');
     Snackbar.dismiss();
     removeFirstSnackbar();
     setSnacking(false);
@@ -26,7 +26,7 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
   useEffect(() => {
     if (snackbars.length > 0 && !snacking) {
       const currentSnackbar = snackbars[0];
-      console.log('show snackbar', currentSnackbar);
+      //console.log('show snackbar', currentSnackbar);
       setSnacking(true);
       Snackbar.show({
         text: currentSnackbar.message,
@@ -61,7 +61,7 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
     }
   }, [handleSnackbarClose, snackbars, snackbars.length]);
 
-  console.log('snackbars', snackbars);
+  //console.log('snackbars', snackbars);
 
   return <View />;
 };
