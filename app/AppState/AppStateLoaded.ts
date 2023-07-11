@@ -20,6 +20,7 @@ import { TranslateType } from './types/TranslateType';
 import NetInfoType from './types/NetInfoType';
 import BackgroundErrorType from './types/BackgroundErrorType';
 import ServerType from './types/ServerType';
+import SnackbarType from './types/SnackbarType';
 
 export default interface AppStateLoaded {
   navigation: StackScreenProps<any>['navigation'];
@@ -111,6 +112,7 @@ export default interface AppStateLoaded {
 
   translate: (key: string) => TranslateType;
   backgroundError: BackgroundErrorType;
+  setBackgroundError: (title: string, error: string) => void;
 
   privacy: boolean;
   readOnly: boolean;
@@ -118,6 +120,8 @@ export default interface AppStateLoaded {
   poolsToShieldSelectTransparent: boolean;
 
   mode: 'basic' | 'expert';
+  snackbars: SnackbarType[];
+  addLastSnackbar: (snackbar: SnackbarType) => void;
 
   // eslint-disable-next-line semi
 }

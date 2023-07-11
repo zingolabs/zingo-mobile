@@ -3,7 +3,6 @@ import React, { useContext, useState, useEffect } from 'react';
 import { View, ScrollView, TouchableOpacity, Text } from 'react-native';
 import Clipboard from '@react-native-community/clipboard';
 import QRCode from 'react-native-qrcode-svg';
-import Toast from 'react-native-simple-toast';
 import { useTheme } from '@react-navigation/native';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -32,7 +31,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   next,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, privacy } = context;
+  const { translate, privacy, addLastSnackbar } = context;
   //console.log(`Addresses ${addresses}: ${multipleAddresses}`);
   const { colors } = useTheme() as unknown as ThemeType;
   const [expandAddress, setExpandAddress] = useState(false);
@@ -70,7 +69,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   const doCopy = () => {
     if (address) {
       Clipboard.setString(address);
-      Toast.show(translate('history.addresscopied') as string, Toast.LONG);
+      addLastSnackbar({ message: translate('history.addresscopied') as string, type: 'Primary' });
     }
   };
 
@@ -87,7 +86,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
             onPress={() => {
               if (address) {
                 Clipboard.setString(address);
-                Toast.show(translate('history.addresscopied') as string, Toast.LONG);
+                addLastSnackbar({ message: translate('history.addresscopied') as string, type: 'Primary' });
                 setExpandQRAddress(true);
                 if (privacy) {
                   setTimeout(() => {
@@ -175,7 +174,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
           onPress={() => {
             if (address) {
               Clipboard.setString(address);
-              Toast.show(translate('history.addresscopied') as string, Toast.LONG);
+              addLastSnackbar({ message: translate('history.addresscopied') as string, type: 'Primary' });
               setExpandAddress(true);
               if (privacy) {
                 setTimeout(() => {

@@ -1,5 +1,4 @@
 import React, { useContext } from 'react';
-import Toast from 'react-native-simple-toast';
 
 import { parseZcashURI } from '../../../app/uris';
 import RPCModule from '../../../app/RPCModule';
@@ -21,20 +20,20 @@ type ScannerAddressProps = {
 
 const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateToField, closeModal }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, netInfo, server } = context;
+  const { translate, netInfo, server, addLastSnackbar } = context;
   const validateAddress = async (scannedAddress: string) => {
     if (!netInfo.isConnected) {
-      Toast.show(translate('loadedapp.connection-error') as string, Toast.LONG);
+      addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
       return;
     }
     const result: string = await RPCModule.execute('parse_address', scannedAddress);
     if (result) {
       if (result.toLowerCase().startsWith('error') || result.toLowerCase() === 'null') {
-        Toast.show(translate('scanner.nozcash-error') as string, Toast.LONG);
+        addLastSnackbar({ message: translate('scanner.nozcash-error') as string, type: 'Primary' });
         return;
       }
     } else {
-      Toast.show(translate('scanner.nozcash-error') as string, Toast.LONG);
+      addLastSnackbar({ message: translate('scanner.nozcash-error') as string, type: 'Primary' });
       return;
     }
     // TODO verify that JSON don't fail.
@@ -56,11 +55,11 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateTo
           updateToField(scannedAddress, null, null, null, null);
           closeModal();
         } else {
-          Toast.show(`${translate('scanner.uri-error')} ${target}`, Toast.LONG);
+          addLastSnackbar({ message: `${translate('scanner.uri-error')} ${target}`, type: 'Primary' });
           return;
         }
       } else {
-        Toast.show(translate('scanner.nozcash-error') as string, Toast.LONG);
+        addLastSnackbar({ message: translate('scanner.nozcash-error') as string, type: 'Primary' });
         return;
       }
     }

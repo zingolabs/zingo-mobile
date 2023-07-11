@@ -5,7 +5,6 @@ import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faDotCircle } from '@fortawesome/free-solid-svg-icons';
 import { faCircle as farCircle } from '@fortawesome/free-regular-svg-icons';
-import Toast from 'react-native-simple-toast';
 import Animated, { EasingNode } from 'react-native-reanimated';
 
 import RegText from '../Components/RegText';
@@ -64,6 +63,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     privacy: privacyContext,
     mode: modeContext,
     netInfo,
+    addLastSnackbar,
   } = context;
 
   const memosArray = translate('settings.memos');
@@ -169,30 +169,30 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       privacyContext === privacy &&
       modeContext === mode
     ) {
-      Toast.show(translate('settings.nochanges') as string, Toast.LONG);
+      addLastSnackbar({ message: translate('settings.nochanges') as string, type: 'Primary' });
       return;
     }
     if (!memos) {
-      Toast.show(translate('settings.ismemo') as string, Toast.LONG);
+      addLastSnackbar({ message: translate('settings.ismemo') as string, type: 'Primary' });
       return;
     }
     if (!filter) {
-      Toast.show(translate('settings.isthreshold') as string, Toast.LONG);
+      addLastSnackbar({ message: translate('settings.isthreshold') as string, type: 'Primary' });
       return;
     }
     if (!serverUriParsed) {
-      Toast.show(translate('settings.isserver') as string, Toast.LONG);
+      addLastSnackbar({ message: translate('settings.isserver') as string, type: 'Primary' });
       return;
     }
     if (!language) {
-      Toast.show(translate('settings.islanguage') as string, Toast.LONG);
+      addLastSnackbar({ message: translate('settings.islanguage') as string, type: 'Primary' });
       return;
     }
 
     if (serverContext.uri !== customServerUri) {
       const resultUri = parseServerURI(serverUriParsed, translate);
       if (resultUri.toLowerCase().startsWith('error')) {
-        Toast.show(translate('settings.isuri') as string, Toast.LONG);
+        addLastSnackbar({ message: translate('settings.isuri') as string, type: 'Primary' });
         return;
       } else {
         // url-parse sometimes is too wise, and if you put:
@@ -208,20 +208,23 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     }
 
     if (!netInfo.isConnected) {
-      Toast.show(translate('loadedapp.connection-error') as string, Toast.LONG);
+      addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
       return;
     }
 
     if (serverContext.uri !== serverUriParsed || serverContext.chain_name !== customServerChainName) {
       setDisabled(true);
-      Toast.show(translate('loadedapp.tryingnewserver') as string, Toast.SHORT);
+      addLastSnackbar({ message: translate('loadedapp.tryingnewserver') as string, type: 'Primary' });
       const { result, timeout, new_chain_name } = await checkServerURI(serverUriParsed, serverContext.uri);
       if (!result) {
         // if the server checking takes more then 30 seconds.
         if (timeout === true) {
-          Toast.show(translate('loadedapp.tryingnewserver-error') as string, Toast.LONG);
+          addLastSnackbar({ message: translate('loadedapp.tryingnewserver-error') as string, type: 'Primary' });
         } else {
-          Toast.show((translate('loadedapp.changeservernew-error') as string) + serverUriParsed, Toast.LONG);
+          addLastSnackbar({
+            message: (translate('loadedapp.changeservernew-error') as string) + serverUriParsed,
+            type: 'Primary',
+          });
         }
         // in this point the sync process is blocked, who knows why.
         // if I save the actual server before the customization... is going to work.
@@ -232,7 +235,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         //console.log('new', new_chain_name, 'old', chain_name);
         if (new_chain_name && new_chain_name !== chain_name) {
           same_server_chain_name = false;
-          Toast.show(translate('loadedapp.differentchain-error') as string, Toast.LONG);
+          addLastSnackbar({ message: translate('loadedapp.differentchain-error') as string, type: 'Primary' });
         }
       }
     }

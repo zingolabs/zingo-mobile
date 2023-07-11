@@ -1,16 +1,9 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState, ReactNode, useEffect } from 'react';
 import { View } from 'react-native';
-//import { Modal } from 'react-native';
 import { TabView, TabBar, SceneRendererProps, Route, NavigationState } from 'react-native-tab-view';
-//import Toast from 'react-native-simple-toast';
 import { useTheme } from '@react-navigation/native';
-//import { faEllipsisV } from '@fortawesome/free-solid-svg-icons';
-//import OptionsMenu from 'react-native-option-menu';
 
-//import Utils from '../../app/utils';
-//import RPC from '../../app/rpc';
-//import PrivKey from '../PrivKey';
 import SingleAddress from '../Components/SingleAddress';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
@@ -121,112 +114,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     ];
     setRoutes(mode === 'basic' ? basicModeRoutes : expertModeRoutes);
   }, [mode, translate]);
-
-  /*
-  const addO = async () => {
-    //console.log('New O');
-    //const newAddress = await RPC.rpc_createNewAddress('tzo');
-    //if (newAddress && !newAddress.toLowerCase().startsWith('error')) {
-    await fetchTotalBalance();
-    //  if (newAddress) {
-    //    setDisplayAddress(newAddress);
-    //  }
-    //} else {
-    //  if (newAddress) {
-    Toast.show('Error: ' + translate('workingonit'), Toast.LONG);
-    return;
-    //  }
-    //}
-    //return;
-  };
-
-  const [privKeyModalVisible, setPrivKeyModalVisible] = useState(false);
-  const [keyType, setKeyType] = useState(0);
-  const [privKey, setPrivKey] = useState('');
-
-  const viewPrivKey = async () => {
-    if (uaddrs.length === 0) {
-      Toast.show(translate('receive.unoprivkey'), Toast.LONG);
-      return;
-    }
-
-    const address = uaddrs[oindex].address;
-    const k = await RPC.rpc_getPrivKeyAsString(address);
-
-    if (k && !k.toLowerCase().startsWith('error')) {
-      setKeyType(0);
-      setPrivKeyModalVisible(true);
-      if (k) {
-        setPrivKey(k);
-      }
-    } else {
-      if (k) {
-        Toast.show(k, Toast.LONG);
-        return;
-      }
-    }
-    return;
-  };
-
-  const viewViewingKey = async () => {
-    if (uaddrs.length === 0) {
-      Toast.show(translate('receive.unoviewkey'), Toast.LONG);
-      return;
-    }
-
-    const address = uaddrs[oindex].address;
-    const k = await RPC.rpc_getViewKeyAsString(address);
-
-    if (k && !k.toLowerCase().startsWith('error')) {
-      setKeyType(1);
-      setPrivKeyModalVisible(true);
-      if (k) {
-        setPrivKey(k);
-      }
-    } else {
-      if (k) {
-        Toast.show(k, Toast.LONG);
-        return;
-      }
-    }
-    return;
-  };
-
-  const doImport = async (key: string, birthday: string) => {
-    if (isNaN(parseInt(birthday, 10))) {
-      setTimeout(() => {
-        Toast.show(`${translate('rpc.parsebirthday-error')} ${birthday}`, Toast.LONG);
-      }, 1000);
-      return;
-    }
-    const addressList = await RPC.rpc_doImportPrivKey(key, birthday);
-    //console.log(addressList);
-
-    if (typeof addressList === 'string' && addressList.toLowerCase().startsWith('error')) {
-      // Show the toast in settimeout, because it sometimes gets lost.
-      setTimeout(() => {
-        Toast.show(addressList, Toast.LONG);
-      }, 1000);
-      return;
-    }
-
-    if (addressList && typeof addressList === 'string' && addressList.length > 0) {
-      const address = JSON.parse(addressList)[0];
-      // Show the toast in settimeout, because it sometimes gets lost.
-      setTimeout(() => {
-        Toast.show(`Importing ${Utils.trimToSmall(address)}`, Toast.LONG);
-      }, 1000);
-    }
-
-    startRescan();
-  };
-
-  let address = '';
-
-  if (uaddrs.length > 0) {
-    address = uaddrs[oindex].address;
-  }
-  */
 
   const renderScene: (
     props: SceneRendererProps & {

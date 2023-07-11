@@ -22,7 +22,6 @@ import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
 import { StackScreenProps } from '@react-navigation/stack';
 import NetInfo, { NetInfoStateType, NetInfoSubscription } from '@react-native-community/netinfo';
-import Toast from 'react-native-simple-toast';
 
 import OptionsMenu from 'react-native-option-menu';
 
@@ -42,6 +41,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '../createAlert';
 import { RPCWalletKindType } from '../rpc/types/RPCWalletKindType';
 import { isEqual } from 'lodash';
+import Snackbars from '../../components/Components/Snackbars';
+import SnackbarType from '../AppState/types/SnackbarType';
 
 const BoldText = React.lazy(() => import('../../components/Components/BoldText'));
 const Button = React.lazy(() => import('../../components/Components/Button'));
@@ -237,8 +238,10 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
         scale: Number(screen.scale.toFixed(2)),
       },
       appState: AppState.currentState,
+      setBackgroundError: this.setBackgroundError,
       netInfo: netInfo,
       actionButtonsDisabled: !netInfo.isConnected ? true : false,
+      addLastSnackbar: this.addLastSnackbar,
     };
 
     this.dim = {} as EmitterSubscription;
@@ -276,13 +279,17 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
             this.setState({ screen: 1 });
             createAlert(
               this.setBackgroundError,
+              this.addLastSnackbar,
               this.props.translate('loadingapp.readingwallet-label') as string,
               result,
             );
           }
         } else {
           this.setState({ screen: 1 });
-          Toast.show(this.props.translate('loadedapp.connection-error') as string, Toast.LONG);
+          this.addLastSnackbar({
+            message: this.props.translate('loadedapp.connection-error') as string,
+            type: 'Primary',
+          });
         }
       } else {
         //console.log('Loading new wallet');
@@ -344,7 +351,10 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
         if (isConnected !== state.isConnected) {
           if (!state.isConnected) {
             //console.log('EVENT Loading: No internet connection.');
-            Toast.show(this.props.translate('loadedapp.connection-error') as string, Toast.LONG);
+            this.addLastSnackbar({
+              message: this.props.translate('loadedapp.connection-error') as string,
+              type: 'Primary',
+            });
           } else {
             //console.log('EVENT Loading: YESSSSS internet connection.');
             if (screen !== 0) {
@@ -411,7 +421,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
     const uri: string = parseServerURI(this.state.customServerUri, this.state.translate);
     const chain_name = this.state.customServerChainName;
     if (uri.toLowerCase().startsWith('error')) {
-      Toast.show(this.state.translate('settings.isuri') as string, Toast.LONG);
+      this.addLastSnackbar({ message: this.state.translate('settings.isuri') as string, type: 'Primary' });
     } else {
       await SettingsFileImpl.writeSettings('server', { uri, chain_name });
       this.setState({
@@ -452,7 +462,12 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
         }));
       } else {
         this.setState({ actionButtonsDisabled: false });
-        createAlert(this.setBackgroundError, this.props.translate('loadingapp.creatingwallet-label') as string, seed);
+        createAlert(
+          this.setBackgroundError,
+          this.addLastSnackbar,
+          this.props.translate('loadingapp.creatingwallet-label') as string,
+          seed,
+        );
       }
     });
   };
@@ -466,12 +481,14 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
       if (type === 'seed') {
         createAlert(
           this.setBackgroundError,
+          this.addLastSnackbar,
           this.props.translate('loadingapp.invalidseed-label') as string,
           this.props.translate('loadingapp.invalidseed-error') as string,
         );
       } else {
         createAlert(
           this.setBackgroundError,
+          this.addLastSnackbar,
           this.props.translate('loadingapp.invalidufvk-label') as string,
           this.props.translate('loadingapp.invalidufvk-error') as string,
         );
@@ -517,7 +534,12 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
       } else {
         this.setState({ actionButtonsDisabled: false });
         // this message work for both.
-        createAlert(this.setBackgroundError, this.props.translate('loadingapp.readingwallet-label') as string, result);
+        createAlert(
+          this.setBackgroundError,
+          this.addLastSnackbar,
+          this.props.translate('loadingapp.readingwallet-label') as string,
+          result,
+        );
       }
     });
   };
@@ -538,6 +560,21 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
     this.setState({ customServerChainName: chain });
   };
 
+  addLastSnackbar = (snackbar: SnackbarType) => {
+    const newSnackbars = this.state.snackbars;
+    if (newSnackbars.filter(e => e.message === snackbar.message).length > 0) {
+      return;
+    }
+    newSnackbars.push(snackbar);
+    this.setState({ snackbars: newSnackbars });
+  };
+
+  removeFirstSnackbar = () => {
+    const newSnackbars = this.state.snackbars;
+    newSnackbars.pop();
+    this.setState({ snackbars: newSnackbars });
+  };
+
   render() {
     const {
       screen,
@@ -549,6 +586,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
       customServerShow,
       customServerUri,
       customServerChainName,
+      snackbars,
     } = this.state;
     const { translate } = this.props;
     const { colors } = this.props.theme;
@@ -565,6 +603,8 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
             height: '100%',
             backgroundColor: colors.background,
           }}>
+          <Snackbars snackbars={snackbars} removeFirstSnackbar={this.removeFirstSnackbar} translate={translate} />
+
           {screen === 0 && (
             <View
               style={{

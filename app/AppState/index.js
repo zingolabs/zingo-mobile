@@ -22,6 +22,7 @@ import NetInfoType from './types/NetInfoType';
 import BackgroundType from './types/BackgroundType';
 import BackgroundErrorType from './types/BackgroundErrorType';
 import ServerType from './types/ServerType';
+import SnackbarType from './types/SnackbarType';
 
 import AppStateLoaded from './AppStateLoaded';
 import AppStateLoading from './AppStateLoading';
@@ -52,4 +53,5 @@ export {
   TranslateType,
   NetInfoType,
   ServerType,
+  SnackbarType,
 };

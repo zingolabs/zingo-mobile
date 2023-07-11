@@ -12,7 +12,7 @@ import CircularProgress from '../components/Components/CircularProgress';
 describe('Component CircularProgress - test', () => {
   //snapshot test
   test('CircularProgress - snapshot', () => {
-    const about = render(
+    const circular = render(
       <CircularProgress
         size={100}
         strokeWidth={5}
@@ -21,6 +21,6 @@ describe('Component CircularProgress - test', () => {
         progressPercent={(2 * 100) / 4}
       />,
     );
-    expect(about.toJSON()).toMatchSnapshot();
+    expect(circular.toJSON()).toMatchSnapshot();
   });
 });

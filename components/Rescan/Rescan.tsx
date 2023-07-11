@@ -2,7 +2,6 @@
 import React, { useContext } from 'react';
 import { View, ScrollView, SafeAreaView } from 'react-native';
 import { useTheme } from '@react-navigation/native';
-import Toast from 'react-native-simple-toast';
 
 import RegText from '../Components/RegText';
 import Button from '../Components/Button';
@@ -17,12 +16,12 @@ type RescanProps = {
 
 const Rescan: React.FunctionComponent<RescanProps> = ({ closeModal, doRescan }) => {
   const context = useContext(ContextAppLoaded);
-  const { wallet, translate, netInfo } = context;
+  const { wallet, translate, netInfo, addLastSnackbar } = context;
   const { colors } = useTheme() as unknown as ThemeType;
 
   const doRescanAndClose = () => {
     if (!netInfo.isConnected) {
-      Toast.show(translate('loadedapp.connection-error') as string, Toast.LONG);
+      addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
       return;
     }
     doRescan();

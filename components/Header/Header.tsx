@@ -29,6 +29,7 @@ import RPC from '../../app/rpc';
 import { RPCShieldType } from '../../app/rpc/types/RPCShieldType';
 import { createAlert } from '../../app/createAlert';
 import { Animated } from 'react-native';
+import SnackbarType from '../../app/AppState/types/SnackbarType';
 
 type HeaderProps = {
   poolsMoreInfoOnClick?: () => void;
@@ -51,6 +52,7 @@ type HeaderProps = {
   setPoolsToShieldSelectSapling?: (v: boolean) => void;
   setPoolsToShieldSelectTransparent?: (v: boolean) => void;
   setUfvkViewModalVisible?: (v: boolean) => void;
+  addLastSnackbar?: (snackbar: SnackbarType) => void;
 };
 
 const Header: React.FunctionComponent<HeaderProps> = ({
@@ -74,6 +76,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   setPoolsToShieldSelectSapling,
   setPoolsToShieldSelectTransparent,
   setUfvkViewModalVisible,
+  addLastSnackbar,
 }) => {
   const context = useContext(ContextAppLoaded);
   const {
@@ -147,7 +150,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   }, [mode, poolsToShield, setPoolsToShieldSelectSapling, setPoolsToShieldSelectTransparent]);
 
   const shieldFunds = async () => {
-    if (!setComputingModalVisible || !setBackgroundError) {
+    if (!setComputingModalVisible || !setBackgroundError || !addLastSnackbar) {
       return;
     }
     if (poolsToShield === '') {
@@ -181,6 +184,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       if (shieldStr.toLowerCase().startsWith('error')) {
         createAlert(
           setBackgroundError,
+          addLastSnackbar,
           translate('history.shieldfunds') as string,
           `${translate('history.shield-error')} ${shieldStr}`,
           true,
@@ -191,6 +195,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         if (shieldJSON.error) {
           createAlert(
             setBackgroundError,
+            addLastSnackbar,
             translate('history.shieldfunds') as string,
             `${translate('history.shield-error')} ${shieldJSON.error}`,
             true,
@@ -198,6 +203,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         } else {
           createAlert(
             setBackgroundError,
+            addLastSnackbar,
             translate('history.shieldfunds') as string,
             `${translate('history.shield-message')} ${shieldJSON.txid}`,
             true,
