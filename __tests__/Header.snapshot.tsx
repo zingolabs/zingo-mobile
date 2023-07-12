@@ -51,7 +51,7 @@ describe('Component Header - test', () => {
     state.info.currencyName = 'ZEC';
     state.totalBalance.total = 1.12345678;
     const onFunction = jest.fn();
-    const about = render(
+    const header = render(
       <ContextAppLoadedProvider value={state}>
         <Header
           testID="transaction text"
@@ -66,9 +66,10 @@ describe('Component Header - test', () => {
           setPoolsToShieldSelectSapling={onFunction}
           setPoolsToShieldSelectTransparent={onFunction}
           setUfvkViewModalVisible={onFunction}
+          addLastSnackbar={onFunction}
         />
       </ContextAppLoadedProvider>,
     );
-    expect(about.toJSON()).toMatchSnapshot();
+    expect(header.toJSON()).toMatchSnapshot();
   });
 });

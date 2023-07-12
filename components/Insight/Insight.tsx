@@ -6,7 +6,6 @@ import { PieChart } from 'react-native-svg-charts';
 import { Circle, G, Line, Text } from 'react-native-svg';
 import { faQrcode } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import Toast from 'react-native-simple-toast';
 import Clipboard from '@react-native-community/clipboard';
 
 import RegText from '../Components/RegText';
@@ -81,7 +80,7 @@ type InsightProps = {
 
 const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, set_privacy_option }) => {
   const context = useContext(ContextAppLoaded);
-  const { info, translate, dimensions, privacy } = context;
+  const { info, translate, dimensions, privacy, addLastSnackbar } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [pieAmounts, setPieAmounts] = useState<DataType[]>([]);
   const [expandAddress, setExpandAddress] = useState<boolean[]>([]);
@@ -174,7 +173,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, set_privac
               onPress={() => {
                 if (item.address !== 'fee') {
                   Clipboard.setString(item.address);
-                  Toast.show(translate('history.addresscopied') as string, Toast.LONG);
+                  addLastSnackbar({ message: translate('history.addresscopied') as string, type: 'Primary' });
                   selectExpandAddress(index);
                 }
               }}>

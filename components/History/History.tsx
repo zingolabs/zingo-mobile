@@ -21,7 +21,6 @@ type HistoryProps = {
   syncingStatusMoreInfoOnClick: () => void;
   setZecPrice: (p: number, d: number) => void;
   setComputingModalVisible: (visible: boolean) => void;
-  setBackgroundError: (title: string, error: string) => void;
   set_privacy_option: (name: 'privacy', value: boolean) => Promise<void>;
   setPoolsToShieldSelectSapling: (v: boolean) => void;
   setPoolsToShieldSelectTransparent: (v: boolean) => void;
@@ -35,14 +34,13 @@ const History: React.FunctionComponent<HistoryProps> = ({
   syncingStatusMoreInfoOnClick,
   setZecPrice,
   setComputingModalVisible,
-  setBackgroundError,
   set_privacy_option,
   setPoolsToShieldSelectSapling,
   setPoolsToShieldSelectTransparent,
   setUfvkViewModalVisible,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, transactions, language } = context;
+  const { translate, transactions, language, setBackgroundError, addLastSnackbar } = context;
   moment.locale(language);
 
   const { colors } = useTheme() as unknown as ThemeType;
@@ -104,6 +102,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
         setPoolsToShieldSelectSapling={setPoolsToShieldSelectSapling}
         setPoolsToShieldSelectTransparent={setPoolsToShieldSelectTransparent}
         setUfvkViewModalVisible={setUfvkViewModalVisible}
+        addLastSnackbar={addLastSnackbar}
       />
 
       <ScrollView

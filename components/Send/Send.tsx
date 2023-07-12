@@ -4,7 +4,6 @@ import { View, ScrollView, Modal, Keyboard, TextInput, TouchableOpacity, Platfor
 import { faQrcode, faCheck, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme, useIsFocused } from '@react-navigation/native';
-import Toast from 'react-native-simple-toast';
 import { getNumberFormatSettings } from 'react-native-localize';
 import Animated, { EasingNode } from 'react-native-reanimated';
 import CheckBox from '@react-native-community/checkbox';
@@ -39,7 +38,6 @@ type SendProps = {
   syncingStatusMoreInfoOnClick: () => void;
   poolsMoreInfoOnClick: () => void;
   setZecPrice: (p: number, d: number) => void;
-  setBackgroundError: (title: string, error: string) => void;
   set_privacy_option: (name: 'privacy', value: boolean) => Promise<void>;
   setPoolsToShieldSelectSapling: (v: boolean) => void;
   setPoolsToShieldSelectTransparent: (v: boolean) => void;
@@ -55,14 +53,25 @@ const Send: React.FunctionComponent<SendProps> = ({
   syncingStatusMoreInfoOnClick,
   poolsMoreInfoOnClick,
   setZecPrice,
-  setBackgroundError,
   set_privacy_option,
   setPoolsToShieldSelectSapling,
   setPoolsToShieldSelectTransparent,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, info, totalBalance, sendPageState, navigation, zecPrice, sendAll, netInfo, privacy, server } =
-    context;
+  const {
+    translate,
+    info,
+    totalBalance,
+    sendPageState,
+    navigation,
+    zecPrice,
+    sendAll,
+    netInfo,
+    privacy,
+    server,
+    setBackgroundError,
+    addLastSnackbar,
+  } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [qrcodeModalVisble, setQrcodeModalVisible] = useState(false);
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
@@ -91,7 +100,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   useEffect(() => {
     const getMemoEnabled = async (address: string): Promise<boolean> => {
       if (!netInfo.isConnected) {
-        Toast.show(translate('loadedapp.connection-error') as string, Toast.LONG);
+        addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
         return false;
       }
       const result: string = await RPCModule.execute('parse_address', address);
@@ -123,12 +132,12 @@ const Send: React.FunctionComponent<SendProps> = ({
     } else {
       setMemoEnabled(false);
     }
-  }, [server.chain_name, netInfo.isConnected, sendPageState.toaddr.to, translate]);
+  }, [server.chain_name, netInfo.isConnected, sendPageState.toaddr.to, translate, addLastSnackbar]);
 
   useEffect(() => {
     const parseAdressJSON = async (address: string): Promise<boolean> => {
       if (!netInfo.isConnected) {
-        Toast.show(translate('loadedapp.connection-error') as string, Toast.LONG);
+        addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
         return false;
       }
       const result: string = await RPCModule.execute('parse_address', address);
@@ -195,6 +204,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     sendPageState.toaddr.amountCurrency,
     sendPageState.toaddr.amount,
     translate,
+    addLastSnackbar,
   ]);
 
   useEffect(() => {
@@ -264,7 +274,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           return;
         } else {
           // Show the error message as a toast
-          Toast.show(target);
+          addLastSnackbar({ message: target, type: 'Primary' });
           return;
         }
       } else {
@@ -314,7 +324,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   const confirmSend = async () => {
     if (!netInfo.isConnected) {
       setConfirmModalVisible(false);
-      Toast.show(translate('loadedapp.connection-error') as string, Toast.LONG);
+      addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
       return;
     }
     // very first interrupt syncing Just in case...
@@ -346,6 +356,7 @@ const Send: React.FunctionComponent<SendProps> = ({
 
         createAlert(
           setBackgroundError,
+          addLastSnackbar,
           translate('send.confirm-title') as string,
           `${translate('send.Broadcast')} ${txid}`,
           true,
@@ -373,6 +384,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           // and when the App come back to foreground shows it to the user.
           createAlert(
             setBackgroundError,
+            addLastSnackbar,
             translate('send.sending-error') as string,
             `${customError ? customError : error}`,
           );
@@ -444,6 +456,7 @@ const Send: React.FunctionComponent<SendProps> = ({
             set_privacy_option={set_privacy_option}
             setPoolsToShieldSelectSapling={setPoolsToShieldSelectSapling}
             setPoolsToShieldSelectTransparent={setPoolsToShieldSelectTransparent}
+            addLastSnackbar={addLastSnackbar}
           />
         </View>
       </Animated.View>
@@ -847,10 +860,10 @@ const Send: React.FunctionComponent<SendProps> = ({
                   sendPageState.toaddr.amount &&
                   Number(sendPageState.toaddr.amount) === Utils.parseLocaleFloat(getMaxAmount().toFixed(8))
                 ) {
-                  Toast.show(`${translate('send.sendall-message') as string}`, Toast.LONG);
+                  addLastSnackbar({ message: `${translate('send.sendall-message') as string}`, type: 'Primary' });
                 }
                 if (!netInfo.isConnected) {
-                  Toast.show(translate('loadedapp.connection-error') as string, Toast.LONG);
+                  addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
                   return;
                 }
                 // waiting while closing the keyboard, just in case.

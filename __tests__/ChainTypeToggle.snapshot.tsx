@@ -19,7 +19,7 @@ describe('Component ChainTypeToggle - test', () => {
   test('ChainTypeToggle - snapshot', () => {
     const onPress = jest.fn();
     const translate = () => 'text translated';
-    const about = render(<ChainTypeToggle customServerChainName="main" onPress={onPress} translate={translate} />);
-    expect(about.toJSON()).toMatchSnapshot();
+    const chain = render(<ChainTypeToggle customServerChainName="main" onPress={onPress} translate={translate} />);
+    expect(chain.toJSON()).toMatchSnapshot();
   });
 });

@@ -18,7 +18,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faList, faUpload, faDownload, faCog } from '@fortawesome/free-solid-svg-icons';
 import { useTheme } from '@react-navigation/native';
 import SideMenu from 'react-native-side-menu-updated';
-import Toast from 'react-native-simple-toast';
 import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
 import { isEqual } from 'lodash';
@@ -56,6 +55,8 @@ import { parseZcashURI, serverUris, ZcashURITargetClass } from '../uris';
 import BackgroundFileImpl from '../../components/Background/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '../createAlert';
+import Snackbars from '../../components/Components/Snackbars';
+import SnackbarType from '../AppState/types/SnackbarType';
 
 const History = React.lazy(() => import('../../components/History'));
 const Send = React.lazy(() => import('../../components/Send'));
@@ -248,6 +249,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
         scale: Number(screen.scale.toFixed(2)),
       },
       appState: AppState.currentState,
+      setBackgroundError: this.setBackgroundError,
+      addLastSnackbar: this.addLastSnackbar,
     };
 
     this.rpc = new RPC(
@@ -337,7 +340,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
           screen: this.state.translate('loadedapp.send-menu'),
           initial: false,
         });
-        Toast.show(this.state.translate('loadedapp.zcash-url') as string, Toast.LONG);
+        this.addLastSnackbar({ message: this.state.translate('loadedapp.zcash-url') as string, type: 'Primary' });
       }
     });
 
@@ -361,7 +364,10 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
             //console.log('EVENT Loaded: No internet connection.');
             await this.rpc.clearTimers();
             this.setSyncingStatus(new SyncingStatusClass());
-            Toast.show(this.props.translate('loadedapp.connection-error') as string, Toast.LONG);
+            this.addLastSnackbar({
+              message: this.props.translate('loadedapp.connection-error') as string,
+              type: 'Primary',
+            });
           } else {
             //console.log('EVENT Loaded: YES internet connection.');
             if (this.rpc.getInRefresh()) {
@@ -422,7 +428,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
         return;
       } else {
         // Show the error message as a toast
-        Toast.show(target);
+        this.addLastSnackbar({ message: target, type: 'Primary' });
         return;
       }
     }
@@ -804,7 +810,10 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
         // Load the wallet and navigate to the transactions screen
         //console.log(`wallet loaded ok ${value.uri}`);
         if (toast) {
-          Toast.show(`${this.props.translate('loadedapp.readingwallet')} ${value.uri}`, Toast.LONG);
+          this.addLastSnackbar({
+            message: `${this.props.translate('loadedapp.readingwallet')} ${value.uri}`,
+            type: 'Primary',
+          });
         }
         await SettingsFileImpl.writeSettings(name, value);
         this.setState({
@@ -834,7 +843,10 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       }
       //console.log(`Error Reading Wallet ${value} - ${error}`);
       if (toast) {
-        Toast.show(`${this.props.translate('loadedapp.readingwallet-error')} ${value.uri}`, Toast.LONG);
+        this.addLastSnackbar({
+          message: `${this.props.translate('loadedapp.readingwallet-error')} ${value.uri}`,
+          type: 'Primary',
+        });
       }
 
       // we need to restore the old server because the new doesn't have the seed of the current wallet.
@@ -928,7 +940,12 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     //console.log("jc change", resultStr);
     if (resultStr.toLowerCase().startsWith('error')) {
       //console.log(`Error change wallet. ${resultStr}`);
-      createAlert(this.setBackgroundError, this.props.translate('loadedapp.changingwallet-label') as string, resultStr);
+      createAlert(
+        this.setBackgroundError,
+        this.addLastSnackbar,
+        this.props.translate('loadedapp.changingwallet-label') as string,
+        resultStr,
+      );
       return;
     }
 
@@ -946,6 +963,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       //console.log(`Error restore backup wallet. ${resultStr}`);
       createAlert(
         this.setBackgroundError,
+        this.addLastSnackbar,
         this.props.translate('loadedapp.restoringwallet-label') as string,
         resultStr,
       );
@@ -964,7 +982,10 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       const resultStr: string = await RPCModule.execute('changeserver', this.state.newServer.uri);
       if (resultStr.toLowerCase().startsWith('error')) {
         //console.log(`Error change server ${value} - ${resultStr}`);
-        Toast.show(`${this.props.translate('loadedapp.changeservernew-error')} ${resultStr}`, Toast.LONG);
+        this.addLastSnackbar({
+          message: `${this.props.translate('loadedapp.changeservernew-error')} ${resultStr}`,
+          type: 'Primary',
+        });
         return;
       } else {
         //console.log(`change server ok ${value}`);
@@ -993,6 +1014,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
         //console.log(`Error change wallet. ${resultStr}`);
         createAlert(
           this.setBackgroundError,
+          this.addLastSnackbar,
           this.props.translate('loadedapp.changingwallet-label') as string,
           resultStr2,
         );
@@ -1026,6 +1048,21 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     this.setState({ backgroundError: { title, error } });
   };
 
+  addLastSnackbar = (snackbar: SnackbarType) => {
+    const newSnackbars = this.state.snackbars;
+    if (newSnackbars.filter(e => e.message === snackbar.message).length > 0) {
+      return;
+    }
+    newSnackbars.push(snackbar);
+    this.setState({ snackbars: newSnackbars });
+  };
+
+  removeFirstSnackbar = () => {
+    const newSnackbars = this.state.snackbars;
+    newSnackbars.pop();
+    this.setState({ snackbars: newSnackbars });
+  };
+
   render() {
     const {
       aboutModalVisible,
@@ -1044,6 +1081,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       ufvkChangeModalVisible,
       ufvkBackupModalVisible,
       ufvkServerModalVisible,
+      snackbars,
     } = this.state;
     const { translate } = this.props;
     const { colors } = this.props.theme;
@@ -1383,6 +1421,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
             </Suspense>
           </Modal>
 
+          <Snackbars snackbars={snackbars} removeFirstSnackbar={this.removeFirstSnackbar} translate={translate} />
+
           <Tab.Navigator
             initialRouteName={translate('loadedapp.wallet-menu') as string}
             screenOptions={({ route }) => ({
@@ -1415,7 +1455,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                         poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
                         setZecPrice={this.setZecPrice}
                         setComputingModalVisible={this.setComputingModalVisible}
-                        setBackgroundError={this.setBackgroundError}
                         set_privacy_option={this.set_privacy_option}
                         setPoolsToShieldSelectSapling={this.setPoolsToShieldSelectSapling}
                         setPoolsToShieldSelectTransparent={this.setPoolsToShieldSelectTransparent}
@@ -1446,7 +1485,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                         syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
                         poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
                         setZecPrice={this.setZecPrice}
-                        setBackgroundError={this.setBackgroundError}
                         set_privacy_option={this.set_privacy_option}
                         setPoolsToShieldSelectSapling={this.setPoolsToShieldSelectSapling}
                         setPoolsToShieldSelectTransparent={this.setPoolsToShieldSelectTransparent}

@@ -11,6 +11,7 @@ import { TranslateType } from './types/TranslateType';
 import NetInfoType from './types/NetInfoType';
 import BackgroundErrorType from './types/BackgroundErrorType';
 import ServerType from './types/ServerType';
+import SnackbarType from './types/SnackbarType';
 
 export default interface AppStateLoading {
   navigation: StackScreenProps<any>['navigation'];
@@ -36,6 +37,7 @@ export default interface AppStateLoading {
 
   translate: (key: string) => TranslateType;
   backgroundError: BackgroundErrorType;
+  setBackgroundError: (title: string, error: string) => void;
 
   privacy: boolean;
   readOnly: boolean;
@@ -45,6 +47,8 @@ export default interface AppStateLoading {
   customServerChainName: 'main' | 'test' | 'regtest';
 
   mode: 'basic' | 'expert';
+  snackbars: SnackbarType[];
+  addLastSnackbar: (snackbar: SnackbarType) => void;
 
   // eslint-disable-next-line semi
 }

@@ -13,6 +13,7 @@ import {
   BackgroundErrorType,
   ServerType,
 } from '../AppState';
+import SnackbarType from '../AppState/types/SnackbarType';
 
 export const defaultAppStateLoading: AppStateLoading = {
   navigation: {} as StackScreenProps<any>['navigation'],
@@ -44,12 +45,15 @@ export const defaultAppStateLoading: AppStateLoading = {
 
   translate: () => '',
   backgroundError: {} as BackgroundErrorType,
+  setBackgroundError: () => {},
   privacy: false,
   readOnly: false,
   customServerShow: false,
   customServerUri: '',
   customServerChainName: 'main',
   mode: 'basic',
+  snackbars: [] as SnackbarType[],
+  addLastSnackbar: () => {},
 };
 
 export const ContextAppLoading = React.createContext(defaultAppStateLoading);

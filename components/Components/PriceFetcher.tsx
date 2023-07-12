@@ -4,7 +4,6 @@ import { Platform, TouchableOpacity, View, ActivityIndicator } from 'react-nativ
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faRefresh } from '@fortawesome/free-solid-svg-icons';
-import Toast from 'react-native-simple-toast';
 import FadeText from './FadeText';
 import { ContextAppLoaded } from '../../app/context';
 import moment from 'moment';
@@ -18,7 +17,7 @@ type PriceFetcherProps = {
 
 const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice, textBefore }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, zecPrice } = context;
+  const { translate, zecPrice, addLastSnackbar } = context;
   const [refreshSure, setRefreshSure] = useState(false);
   const [refreshMinutes, setRefreshMinutes] = useState(0);
   const [count, setCount] = useState(5);
@@ -124,10 +123,10 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
               // -2  - error in RPCModule, likely.
               // > 0 - real value
               if (price === -1) {
-                Toast.show(translate('info.errorgemini') as string, Toast.LONG);
+                addLastSnackbar({ message: translate('info.errorgemini') as string, type: 'Primary' });
               }
               if (price === -2) {
-                Toast.show(translate('info.errorrpcmodule') as string, Toast.LONG);
+                addLastSnackbar({ message: translate('info.errorrpcmodule') as string, type: 'Primary' });
               }
               if (price <= 0) {
                 setZecPrice(price, 0);

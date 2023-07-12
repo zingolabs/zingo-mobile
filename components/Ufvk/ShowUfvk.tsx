@@ -2,7 +2,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { View, ScrollView, SafeAreaView } from 'react-native';
 import { useTheme } from '@react-navigation/native';
-import Toast from 'react-native-simple-toast';
 
 import Button from '../Components/Button';
 import { ThemeType } from '../../app/types';
@@ -28,7 +27,7 @@ type ShowUfvkProps = {
 };
 const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCancel, action }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, wallet, server, netInfo, mode } = context;
+  const { translate, wallet, server, netInfo, mode, addLastSnackbar } = context;
   const { ufvk } = wallet;
   const { colors } = useTheme() as unknown as ThemeType;
   const [times, setTimes] = useState(0);
@@ -134,7 +133,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
               return;
             }
             if (!netInfo.isConnected && times > 0) {
-              Toast.show(translate('loadedapp.connection-error') as string, Toast.LONG);
+              addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
               return;
             }
             if (times === 0 || times === 3) {
