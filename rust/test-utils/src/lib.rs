@@ -15,8 +15,4 @@ pub fn run_integration_test() -> (i32, String, String) {
     .unwrap();
 
     (exit_code, output, error)
-
-    // println!("Exit Code: {}", exit_code);
-    // println!("Output: {}", output);
-    // println!("Error: {}", error);
 }
