@@ -564,7 +564,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
     if (this.state.netInfo.isConnected) {
       this.setState({ customServerShow: true });
     } else {
-      Toast.show(this.props.translate('loadedapp.connection-error') as string, Toast.LONG);
+      this.addLastSnackbar({ message: this.props.translate('loadedapp.connection-error') as string, type: 'Primary' });
     }
   };
 
@@ -585,6 +585,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
     const newSnackbars = this.state.snackbars;
     newSnackbars.pop();
     this.setState({ snackbars: newSnackbars });
+  };
 
   changeMode = async (mode: 'basic' | 'expert') => {
     this.setState({ mode });
