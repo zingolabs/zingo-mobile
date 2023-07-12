@@ -29,10 +29,10 @@ class CommandsOnLaunch {
     fun executeAddressFromSeed() {
         val mapper = jacksonObjectMapper()
 
-        val server = "https://mainnet.lightwalletd.com:9067"
-        val chainhint = "main"
+        val server = "https://10.0.2.2:20000"
+        val chainhint = "regtest"
         val seed = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art"
-        val birthday = "2126800"
+        val birthday = "0"
         val datadir = MainApplication.getAppContext()!!.filesDir.path
 
         var initFromSeedJson = RustFFI.initfromseed(server, seed, birthday, datadir, chainhint)
@@ -40,7 +40,7 @@ class CommandsOnLaunch {
         System.out.println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
         assertThat(initFromSeed.seed).isEqualTo("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art")
-        assertThat(initFromSeed.birthday).isEqualTo(2126800)
+        assertThat(initFromSeed.birthday).isEqualTo(0)
 
         var addressesJson = RustFFI.execute("addresses", "")
         System.out.println("\nAddresses:")
