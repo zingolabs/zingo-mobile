@@ -123,7 +123,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            marginVertical: 15,
+            marginVertical: 0,
             width: '100%',
             justifyContent: 'space-evenly',
           }}>
