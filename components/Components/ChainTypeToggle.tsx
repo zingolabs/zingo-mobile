@@ -55,7 +55,7 @@ const ChainTypeToggle: React.FunctionComponent<ChainTypeToggleProps> = ({
           </View>
         </View>
       </TouchableOpacity>
-      <TouchableOpacity testID="settings.chaintype.test" style={{ marginHorizontal: 5 }} onPress={() => onPress('test')}>
+      <TouchableOpacity testID="chaintype.testnet" style={{ marginHorizontal: 5 }} onPress={() => onPress('test')}>
         <View
           style={{
             flexDirection: 'row',
