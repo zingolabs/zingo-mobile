@@ -106,47 +106,6 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
     <View
       style={
         {
-          "alignItems": "flex-end",
-          "padding": 15,
-          "position": "absolute",
-          "right": 0,
-        }
-      }
-    >
-      <Text
-        style={
-          {
-            "color": "rgb(216, 216, 216)",
-            "fontSize": 8,
-          }
-        }
-      >
-        text translated
-      </Text>
-      <Text
-        style={
-          {
-            "color": "rgb(216, 216, 216)",
-            "fontSize": 8,
-          }
-        }
-      >
-        text translatedtext translated
-      </Text>
-      <Text
-        style={
-          {
-            "color": "rgb(216, 216, 216)",
-            "fontSize": 8,
-          }
-        }
-      >
-        (undefinedxundefined)-undefined
-      </Text>
-    </View>
-    <View
-      style={
-        {
           "backgroundColor": "rgb(0, 122, 255)",
           "height": 1,
           "width": "100%",
@@ -254,7 +213,7 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
                     "alignItems": "center",
                     "flexDirection": "row",
                     "justifyContent": "space-evenly",
-                    "marginVertical": 15,
+                    "marginVertical": 0,
                     "width": "100%",
                   }
                 }
