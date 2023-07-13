@@ -1,3 +1,4 @@
+#![cfg(test)]
 use run_script::ScriptOptions;
 
 pub fn run_integration_test() -> (i32, String, String) {

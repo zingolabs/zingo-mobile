@@ -15,7 +15,7 @@ tokio =  { version = "1.24.2", features = ["full"] }
 zingo-testutils = { git="https://github.com/Oscar-Pepper/zingolib", default-features=true, branch = "mobile_regtest" }
 json = "0.12.4"
 env_logger = "0.10.0"
-test-utils = { path = "../test-utils" }
+test_utils = { path = "../test_utils" }
 
 [lib]
 crate-type = ["dylib"]
