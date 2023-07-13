@@ -134,7 +134,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     } else {
       setPoolsToShield('');
     }
-  }, [readOnly, totalBalance, totalBalance.transparentBal, totalBalance.privateBal]);
+  }, [mode, readOnly, totalBalance, totalBalance.transparentBal, totalBalance.privateBal]);
 
   useEffect(() => {
     // for basic mode always have to be 'all', It's easier for the user.
