@@ -17,7 +17,7 @@ type PriceFetcherProps = {
 
 const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice, textBefore }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, zecPrice, addLastSnackbar } = context;
+  const { translate, zecPrice, addLastSnackbar, mode } = context;
   const [refreshSure, setRefreshSure] = useState(false);
   const [refreshMinutes, setRefreshMinutes] = useState(0);
   const [count, setCount] = useState(5);
@@ -67,6 +67,33 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
     }
   };
 
+  const onPressFetch = async () => {
+    if (setZecPrice) {
+      setLoading(true);
+      const price = await RPC.rpc_getZecPrice();
+      // values:
+      // 0   - initial/default value
+      // -1  - error in Gemini/zingolib.
+      // -2  - error in RPCModule, likely.
+      // > 0 - real value
+      if (price === -1) {
+        addLastSnackbar({ message: translate('info.errorgemini') as string, type: 'Primary' });
+      }
+      if (price === -2) {
+        addLastSnackbar({ message: translate('info.errorrpcmodule') as string, type: 'Primary' });
+      }
+      if (price <= 0) {
+        setZecPrice(price, 0);
+      } else {
+        setZecPrice(price, Date.now());
+      }
+      setRefreshSure(false);
+      setRefreshMinutes(0);
+      setCount(5);
+      setLoading(false);
+    }
+  };
+
   return (
     <>
       {loading && (
@@ -87,7 +114,7 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
         </View>
       )}
       {!refreshSure && !loading && (
-        <TouchableOpacity disabled={loading} onPress={() => setRefreshSure(true)}>
+        <TouchableOpacity disabled={loading} onPress={() => (mode === 'basic' ? onPressFetch() : setRefreshSure(true))}>
           <View
             style={{
               flexDirection: 'row',
@@ -111,34 +138,7 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
         </TouchableOpacity>
       )}
       {refreshSure && !loading && (
-        <TouchableOpacity
-          disabled={loading}
-          onPress={async () => {
-            if (setZecPrice) {
-              setLoading(true);
-              const price = await RPC.rpc_getZecPrice();
-              // values:
-              // 0   - initial/default value
-              // -1  - error in Gemini/zingolib.
-              // -2  - error in RPCModule, likely.
-              // > 0 - real value
-              if (price === -1) {
-                addLastSnackbar({ message: translate('info.errorgemini') as string, type: 'Primary' });
-              }
-              if (price === -2) {
-                addLastSnackbar({ message: translate('info.errorrpcmodule') as string, type: 'Primary' });
-              }
-              if (price <= 0) {
-                setZecPrice(price, 0);
-              } else {
-                setZecPrice(price, Date.now());
-              }
-              setRefreshSure(false);
-              setRefreshMinutes(0);
-              setCount(5);
-              setLoading(false);
-            }
-          }}>
+        <TouchableOpacity disabled={loading} onPress={onPressFetch}>
           <View
             style={{
               flexDirection: 'row',

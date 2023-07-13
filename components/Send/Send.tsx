@@ -71,6 +71,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     server,
     setBackgroundError,
     addLastSnackbar,
+    mode,
   } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [qrcodeModalVisble, setQrcodeModalVisible] = useState(false);
@@ -435,7 +436,10 @@ const Send: React.FunctionComponent<SendProps> = ({
             setConfirmModalVisible(false);
           }}
           confirmSend={confirmSend}
-          sendAllAmount={Number(sendPageState.toaddr.amount) === Utils.parseLocaleFloat(getMaxAmount().toFixed(8))}
+          sendAllAmount={
+            mode !== 'basic' &&
+            Number(sendPageState.toaddr.amount) === Utils.parseLocaleFloat(getMaxAmount().toFixed(8))
+          }
         />
       </Modal>
 
@@ -535,7 +539,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       }}>
                       <FadeText>{`${translate('send.amount')}`}</FadeText>
                     </View>
-                    {sendAll && (
+                    {sendAll && mode !== 'basic' && (
                       <TouchableOpacity
                         onPress={() =>
                           updateToField(
@@ -858,6 +862,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                 if (
                   validAmount === 1 &&
                   sendPageState.toaddr.amount &&
+                  mode !== 'basic' &&
                   Number(sendPageState.toaddr.amount) === Utils.parseLocaleFloat(getMaxAmount().toFixed(8))
                 ) {
                   addLastSnackbar({ message: `${translate('send.sendall-message') as string}`, type: 'Primary' });
