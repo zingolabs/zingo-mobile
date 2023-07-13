@@ -30,6 +30,7 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
       setSnacking(true);
       Snackbar.show({
         text: currentSnackbar.message,
+        numberOfLines: 3,
         duration: Snackbar.LENGTH_INDEFINITE,
         marginBottom: 60,
         backgroundColor: colors.secondaryDisabled,
