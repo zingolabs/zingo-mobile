@@ -118,7 +118,11 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
               onPress={() => {
                 if (tx.txid) {
                   Clipboard.setString(tx.txid);
-                  addLastSnackbar({ message: translate('history.txcopied') as string, type: 'Primary' });
+                  addLastSnackbar({
+                    message: translate('history.txcopied') as string,
+                    type: 'Primary',
+                    duration: 'short',
+                  });
                   setExpandTxid(true);
                 }
               }}>
@@ -169,7 +173,11 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
                     onPress={() => {
                       if (txd.address) {
                         Clipboard.setString(txd.address);
-                        addLastSnackbar({ message: translate('history.addresscopied') as string, type: 'Primary' });
+                        addLastSnackbar({
+                          message: translate('history.addresscopied') as string,
+                          type: 'Primary',
+                          duration: 'short',
+                        });
                         setExpandAddress(true);
                       }
                     }}>
@@ -199,7 +207,11 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
                       onPress={() => {
                         if (txd.memo) {
                           Clipboard.setString(txd.memo);
-                          addLastSnackbar({ message: translate('history.memocopied') as string, type: 'Primary' });
+                          addLastSnackbar({
+                            message: translate('history.memocopied') as string,
+                            type: 'Primary',
+                            duration: 'short',
+                          });
                         }
                       }}>
                       <RegText>{txd.memo}</RegText>

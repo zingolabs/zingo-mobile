@@ -574,7 +574,8 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
 
   addLastSnackbar = (snackbar: SnackbarType) => {
     const newSnackbars = this.state.snackbars;
-    if (newSnackbars.filter(e => e.message === snackbar.message).length > 0) {
+    // if the last one is the same don't do anything.
+    if (newSnackbars.length > 0 && newSnackbars[newSnackbars.length - 1].message === snackbar.message) {
       return;
     }
     newSnackbars.push(snackbar);
@@ -583,13 +584,17 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
 
   removeFirstSnackbar = () => {
     const newSnackbars = this.state.snackbars;
-    newSnackbars.pop();
+    newSnackbars.shift();
     this.setState({ snackbars: newSnackbars });
   };
 
   changeMode = async (mode: 'basic' | 'expert') => {
     this.setState({ mode });
     await SettingsFileImpl.writeSettings('mode', mode);
+    // if the user selects expert mode & wants to change to another wallet
+    // and then the user wants to go to basic mode in the first screen
+    // the result will be the same -> create a new wallet.
+    this.componentDidMount();
   };
 
   render() {

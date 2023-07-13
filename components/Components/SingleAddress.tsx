@@ -69,7 +69,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   const doCopy = () => {
     if (address) {
       Clipboard.setString(address);
-      addLastSnackbar({ message: translate('history.addresscopied') as string, type: 'Primary' });
+      addLastSnackbar({ message: translate('history.addresscopied') as string, type: 'Primary', duration: 'short' });
     }
   };
 
@@ -86,7 +86,11 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
             onPress={() => {
               if (address) {
                 Clipboard.setString(address);
-                addLastSnackbar({ message: translate('history.addresscopied') as string, type: 'Primary' });
+                addLastSnackbar({
+                  message: translate('history.addresscopied') as string,
+                  type: 'Primary',
+                  duration: 'short',
+                });
                 setExpandQRAddress(true);
                 if (privacy) {
                   setTimeout(() => {
@@ -174,7 +178,11 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
           onPress={() => {
             if (address) {
               Clipboard.setString(address);
-              addLastSnackbar({ message: translate('history.addresscopied') as string, type: 'Primary' });
+              addLastSnackbar({
+                message: translate('history.addresscopied') as string,
+                type: 'Primary',
+                duration: 'short',
+              });
               setExpandAddress(true);
               if (privacy) {
                 setTimeout(() => {

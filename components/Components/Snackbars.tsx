@@ -15,11 +15,13 @@ type SnackbarProps = {
 const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFirstSnackbar, translate }) => {
   const { colors } = useTheme() as unknown as ThemeType;
   const [snacking, setSnacking] = useState<boolean>(false);
+  const [duration, setDuration] = useState<number>(4000);
 
   const handleSnackbarClose = useCallback(() => {
     //console.log('remove first snackbar');
     Snackbar.dismiss();
     removeFirstSnackbar();
+    setDuration(4000);
     setSnacking(false);
   }, [removeFirstSnackbar]);
 
@@ -27,9 +29,11 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
     if (snackbars.length > 0 && !snacking) {
       const currentSnackbar = snackbars[0];
       //console.log('show snackbar', currentSnackbar);
+      setDuration(currentSnackbar.duration === 'short' ? 1000 : 4000);
       setSnacking(true);
       Snackbar.show({
         text: currentSnackbar.message,
+        numberOfLines: 3,
         duration: Snackbar.LENGTH_INDEFINITE,
         marginBottom: 60,
         backgroundColor: colors.secondaryDisabled,
@@ -56,10 +60,10 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
     if (snackbars.length > 0) {
       const timer = setTimeout(() => {
         handleSnackbarClose();
-      }, 4000);
+      }, duration);
       return () => clearTimeout(timer);
     }
-  }, [handleSnackbarClose, snackbars, snackbars.length]);
+  }, [duration, handleSnackbarClose, snackbars, snackbars.length]);
 
   //console.log('snackbars', snackbars);
 

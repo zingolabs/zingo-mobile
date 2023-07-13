@@ -246,7 +246,11 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
                 if (seedPhrase) {
                   Clipboard.setString(seedPhrase);
                   if (addLastSnackbar) {
-                    addLastSnackbar({ message: translate('seed.tapcopy-seed-message') as string, type: 'Primary' });
+                    addLastSnackbar({
+                      message: translate('seed.tapcopy-seed-message') as string,
+                      type: 'Primary',
+                      duration: 'short',
+                    });
                   }
                   setExpandSeed(true);
                   if (privacy) {
@@ -305,7 +309,11 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
                 if (seedPhrase) {
                   Clipboard.setString(seedPhrase);
                   if (addLastSnackbar) {
-                    addLastSnackbar({ message: translate('seed.tapcopy-seed-message') as string, type: 'Primary' });
+                    addLastSnackbar({
+                      message: translate('seed.tapcopy-seed-message') as string,
+                      type: 'Primary',
+                      duration: 'short',
+                    });
                   }
                 }
               }}>
@@ -333,7 +341,11 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
                 if (birthdayNumber) {
                   Clipboard.setString(birthdayNumber);
                   if (addLastSnackbar) {
-                    addLastSnackbar({ message: translate('seed.tapcopy-birthday-message') as string, type: 'Primary' });
+                    addLastSnackbar({
+                      message: translate('seed.tapcopy-birthday-message') as string,
+                      type: 'Primary',
+                      duration: 'short',
+                    });
                   }
                   setExpandBithday(true);
                   if (privacy) {

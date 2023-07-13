@@ -38,7 +38,7 @@ const PrivKey: React.FunctionComponent<PrivKeyProps> = ({ address, keyType, priv
   const doCopy = () => {
     //if (address) {
     Clipboard.setString(privKey);
-    addLastSnackbar({ message: translate('privkey.tapcopy-message') as string, type: 'Primary' });
+    addLastSnackbar({ message: translate('privkey.tapcopy-message') as string, type: 'Primary', duration: 'short' });
     //}
   };
 
