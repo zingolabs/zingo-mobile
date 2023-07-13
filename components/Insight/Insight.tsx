@@ -173,7 +173,11 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, set_privac
               onPress={() => {
                 if (item.address !== 'fee') {
                   Clipboard.setString(item.address);
-                  addLastSnackbar({ message: translate('history.addresscopied') as string, type: 'Primary' });
+                  addLastSnackbar({
+                    message: translate('history.addresscopied') as string,
+                    type: 'Primary',
+                    duration: 'short',
+                  });
                   selectExpandAddress(index);
                 }
               }}>
