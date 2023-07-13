@@ -1,0 +1,32 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Component App - test App - snapshot 1`] = `
+<RCTSafeAreaView
+  style={
+    {
+      "backgroundColor": "#011401",
+      "flex": 1,
+      "justifyContent": "center",
+    }
+  }
+>
+  <MockedNavigator
+    initialRouteName="LoadingApp"
+    screenOptions={
+      {
+        "animationEnabled": false,
+        "headerShown": false,
+      }
+    }
+  >
+    <MockedScreen
+      component={[Function]}
+      name="LoadingApp"
+    />
+    <MockedScreen
+      component={[Function]}
+      name="LoadedApp"
+    />
+  </MockedNavigator>
+</RCTSafeAreaView>
+`;
