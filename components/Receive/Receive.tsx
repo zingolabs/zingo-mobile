@@ -375,6 +375,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
         </Modal>*/}
 
         <Header
+          testID="receive text"
           toggleMenuDrawer={toggleMenuDrawer}
           title={translate('receive.title') as string}
           noBalance={true}

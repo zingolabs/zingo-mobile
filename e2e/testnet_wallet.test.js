@@ -69,10 +69,14 @@ async function sync(background_duration) {
   // put the App in foregroung again
   await device.launchApp({ newInstance: false });
 
-  await waitFor(element(by.text("Finished"))).toBeVisible().withTimeout(sync_timeout)
+  // I think we don't need wait to finished to check if the sync numbers are correct.
+  //await waitFor(element(by.text("Finished"))).toBeVisible().withTimeout(sync_timeout)
 
   // waiting for starting the sync process again
-  // await waitFor(element(by.id('syncreport.currentbatch'))).toBeVisible().withTimeout(ui_timeout);
+  await waitFor(element(by.id('syncreport.currentbatch'))).toBeVisible().withTimeout(ui_timeout);
+
+  await waitFor(element(by.id('syncreport.scrollView'))).toBeVisible().withTimeout(sync_timeout);
+  await element(by.id('syncreport.scrollView')).scroll(500, 'down');
 
   // getting current batch & total batches from the screen
   const batches = element(by.id('syncreport.currentbatch'));
@@ -126,8 +130,12 @@ async function send(address) {
   await element(by.id('header.drawmenu')).tap();
   await waitFor(element(by.id('menu.settings'))).toBeVisible().withTimeout(ui_timeout);
   await element(by.id('menu.settings')).tap();
-  await waitFor(element(by.id('settings.sendalls-enable'))).toBeVisible().withTimeout(ui_timeout);
-  await element(by.id('settings.sendalls-enable')).tap();
+
+  await waitFor(element(by.id('settings.scrollView'))).toBeVisible().withTimeout(sync_timeout);
+  await element(by.id('settings.scrollView')).scroll(800, 'down');
+
+  await waitFor(element(by.id('settings.sendall-true'))).toBeVisible().withTimeout(ui_timeout);
+  await element(by.id('settings.sendall-true')).tap();
   await waitFor(element(by.id('settings.button.save'))).toBeVisible().withTimeout(ui_timeout);
   await element(by.id('settings.button.save')).tap();
 
@@ -149,7 +157,7 @@ describe('...', () => {
   it('joins testnet ', (() => joinTestnet()));
   it('loads a wallet (testnet)', (() => load('cabin bounce top boost village clutch enact owner thing harsh include valve whip puppy mutual sad glimpse wide social industry original power vital orient',"2412856")));
   
-  it('syncs...', (() => sync(10000)));
+  it('syncs...', (() => sync(50000)));
   
   it('sends...', (() => send('lala')));
 });

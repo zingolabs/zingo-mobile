@@ -460,7 +460,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   minHeight: 25,
                 }}>
                 {!syncingStatus.inProgress && syncingStatus.lastBlockServer === syncingStatus.lastBlockWallet && (
-                  <View style={{ margin: 0, padding: 0 }}>
+                  <View testID="header.checkIcon" style={{ margin: 0, padding: 0 }}>
                     <FontAwesomeIcon icon={faCheck} color={colors.primary} size={20} />
                   </View>
                 )}
@@ -476,7 +476,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   </>
                 )}
                 {syncingStatus.inProgress && (
-                  <Animated.View style={{ opacity: opacityValue }}>
+                  <Animated.View testID="header.playIcon" style={{ opacity: opacityValue }}>
                     {mode === 'basic' ? (
                       <FontAwesomeIcon icon={faPlay} color={colors.syncing} size={17} />
                     ) : (

@@ -16,22 +16,24 @@ describe('Change the Server.', () => {
     await element(by.id('menu.settings')).tap();
 
     // scrolling until find the second server field
-    await element(by.id('settings.scrollView')).scroll(400, 'down');
+    await waitFor(element(by.id('settings.scrollView'))).toBeVisible().withTimeout(sync_timeout);
+    await element(by.id('settings.scrollView')).scroll(900, 'down');
 
     // waiting for second server radio button
     await waitFor(element(by.id('settings.secondServer'))).toBeVisible().withTimeout(sync_timeout);
-
-    // choose the second server & save the settings.
     await element(by.id('settings.secondServer')).tap();
 
     // save the new server
+    await waitFor(element(by.id('settings.button.save'))).toBeVisible().withTimeout(sync_timeout);
     await element(by.id('settings.button.save')).tap();
 
     // waiting for second server radio button
     await waitFor(element(by.id('header.playIcon'))).toBeVisible().withTimeout(sync_timeout);
 
     // the sync process have to run normally with the other server
+    await waitFor(element(by.id('header.drawmenu'))).toBeVisible().withTimeout(sync_timeout);
     await element(by.id('header.drawmenu')).tap();
+    await waitFor(element(by.id('menu.syncreport'))).toBeVisible().withTimeout(sync_timeout);
     await element(by.id('menu.syncreport')).tap();
 
     // waiting for starting the sync process again
@@ -46,6 +48,8 @@ describe('Change the Server.', () => {
 
     // wait a little bit
     await sleep(10000);
+
+    await waitFor(element(by.id('syncreport.currentbatch'))).toBeVisible().withTimeout(sync_timeout);
 
     // getting blocks now synced from the screen
     const blockssyncednow_2 = element(by.id('syncreport.syncednow'));

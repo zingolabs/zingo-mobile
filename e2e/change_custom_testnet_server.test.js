@@ -16,19 +16,23 @@ describe('Change the Server.', () => {
     await element(by.id('menu.settings')).tap();
 
     // scrolling until find the custom server field
-    await element(by.id('settings.scrollView')).scroll(500, 'down');
+    await waitFor(element(by.id('settings.scrollView'))).toBeVisible().withTimeout(sync_timeout);
+    await element(by.id('settings.scrollView')).scroll(1000, 'down');
 
     // waiting for the custom server radio
     await waitFor(element(by.id('settings.customServer'))).toBeVisible().withTimeout(sync_timeout);
-
-    // choose the custom server 
     await element(by.id('settings.customServer')).tap();
 
     // waiting for the custom server field
     await waitFor(element(by.id('settings.customServerField'))).toBeVisible().withTimeout(sync_timeout);
     await element(by.id("settings.customServerField")).replaceText('https://testnet.lightwalletd.com');
 
+    // change to testnet toogle
+    await waitFor(element(by.id('chaintype.testnet'))).toBeVisible().withTimeout(sync_timeout);
+    await element(by.id("chaintype.testnet")).tap();
+
     // save the new testnet server
+    await waitFor(element(by.id('settings.button.save'))).toBeVisible().withTimeout(sync_timeout);
     await element(by.id('settings.button.save')).tap();
 
     // waiting for seed server change screen
@@ -45,6 +49,7 @@ describe('Change the Server.', () => {
     await element(by.id('loadingapp.createnewwallet')).tap();
     
     // click the button accepting the new testnet seed
+    await waitFor(element(by.id('seed.button.OK'))).toBeVisible().withTimeout(sync_timeout);
     await element(by.id('seed.button.OK')).tap();
 
     // waiting for a testnet new wallet fully synced

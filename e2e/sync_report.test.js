@@ -27,6 +27,9 @@ describe('Renders Sync Report data (blocks & batches) correctly.', () => {
     // waiting for starting the sync process again
     await waitFor(element(by.id('syncreport.currentbatch'))).toBeVisible().withTimeout(sync_timeout);
 
+    await waitFor(element(by.id('syncreport.scrollView'))).toBeVisible().withTimeout(sync_timeout);
+    await element(by.id('syncreport.scrollView')).scroll(500, 'down');
+
     // getting current batch & total batches from the screen
     const batches = element(by.id('syncreport.currentbatch'));
     const batches_attributes = await batches.getAttributes();
@@ -34,11 +37,13 @@ describe('Renders Sync Report data (blocks & batches) correctly.', () => {
     const batchesNum = Number(batches_attributes.text.split(':')[2]);
 
     // getting blocks now synced from the screen
+    await waitFor(element(by.id('syncreport.syncednow'))).toBeVisible().withTimeout(sync_timeout);
     const blockssyncednow = element(by.id('syncreport.syncednow'));
     const blockssyncednow_attributes = await blockssyncednow.getAttributes();
     const blockssyncednowNum = Number(blockssyncednow_attributes.text.split(' ')[0]);
 
     // getting blocks not yet sync from the screen
+    await waitFor(element(by.id('syncreport.notyetsynced'))).toBeVisible().withTimeout(sync_timeout);
     const blocksnotyetsynced = element(by.id('syncreport.notyetsynced'));
     const blocksnotyetsynced_attributes = await blocksnotyetsynced.getAttributes();
     const blocksnotyetsyncedNum = Number(blocksnotyetsynced_attributes.text.split(' ')[0]);
@@ -47,6 +52,7 @@ describe('Renders Sync Report data (blocks & batches) correctly.', () => {
     const blockstotalNum = blockssyncednowNum + blocksnotyetsyncedNum;
 
     // getting blocks per batch or batch size from the screen
+    await waitFor(element(by.id('syncreport.blocksperbatch'))).toBeVisible().withTimeout(sync_timeout);
     const batchsize = element(by.id('syncreport.blocksperbatch'));
     const batchsize_attributes = await batchsize.getAttributes();
     const batchsizeNum = Number(batchsize_attributes.text);
