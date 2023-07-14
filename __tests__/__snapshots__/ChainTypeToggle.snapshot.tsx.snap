@@ -99,6 +99,7 @@ exports[`Component ChainTypeToggle - test ChainTypeToggle - snapshot 1`] = `
         "opacity": 1,
       }
     }
+    testID="chaintype.testnet"
   >
     <View
       style={
