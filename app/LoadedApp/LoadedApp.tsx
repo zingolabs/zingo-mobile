@@ -1424,23 +1424,82 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
           <Snackbars snackbars={snackbars} removeFirstSnackbar={this.removeFirstSnackbar} translate={translate} />
 
-          <Tab.Navigator
-            initialRouteName={translate('loadedapp.wallet-menu') as string}
-            screenOptions={({ route }) => ({
-              tabBarIcon: ({ focused }) => fnTabBarIcon(route, focused),
-              tabBarActiveTintColor: 'transparent',
-              tabBarActiveBackgroundColor: colors.primaryDisabled,
-              tabBarInactiveTintColor: colors.money,
-              tabBarLabelStyle: { fontSize: 12 },
-              tabBarStyle: {
-                borderRadius: 0,
-                borderTopColor: colors.primary,
-                borderTopWidth: 1,
-              },
-              headerShown: false,
-            })}>
-            {!(this.state.mode === 'basic' && this.state.transactions.length <= 0) && (
-              <Tab.Screen name={translate('loadedapp.wallet-menu') as string}>
+          {this.state.mode !== 'basic' ||
+          (this.state.mode === 'basic' &&
+            (!(this.state.mode === 'basic' && this.state.transactions.length <= 0) ||
+              (!this.state.readOnly && !(this.state.mode === 'basic' && this.state.totalBalance.total <= 0)))) ? (
+            <Tab.Navigator
+              initialRouteName={translate('loadedapp.wallet-menu') as string}
+              screenOptions={({ route }) => ({
+                tabBarIcon: ({ focused }) => fnTabBarIcon(route, focused),
+                tabBarActiveTintColor: 'transparent',
+                tabBarActiveBackgroundColor: colors.primaryDisabled,
+                tabBarInactiveTintColor: colors.money,
+                tabBarLabelStyle: { fontSize: 12 },
+                tabBarStyle: {
+                  borderRadius: 0,
+                  borderTopColor: colors.primary,
+                  borderTopWidth: 1,
+                },
+                headerShown: false,
+              })}>
+              {!(this.state.mode === 'basic' && this.state.transactions.length <= 0) && (
+                <Tab.Screen name={translate('loadedapp.wallet-menu') as string}>
+                  {() => (
+                    <>
+                      <Suspense
+                        fallback={
+                          <View>
+                            <Text>{translate('loading') as string}</Text>
+                          </View>
+                        }>
+                        <History
+                          doRefresh={this.doRefresh}
+                          toggleMenuDrawer={this.toggleMenuDrawer}
+                          syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
+                          poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
+                          setZecPrice={this.setZecPrice}
+                          setComputingModalVisible={this.setComputingModalVisible}
+                          set_privacy_option={this.set_privacy_option}
+                          setPoolsToShieldSelectSapling={this.setPoolsToShieldSelectSapling}
+                          setPoolsToShieldSelectTransparent={this.setPoolsToShieldSelectTransparent}
+                          setUfvkViewModalVisible={this.setUfvkViewModalVisible}
+                        />
+                      </Suspense>
+                    </>
+                  )}
+                </Tab.Screen>
+              )}
+              {!this.state.readOnly && !(this.state.mode === 'basic' && this.state.totalBalance.total <= 0) && (
+                <Tab.Screen name={translate('loadedapp.send-menu') as string}>
+                  {() => (
+                    <>
+                      <Suspense
+                        fallback={
+                          <View>
+                            <Text>{translate('loading') as string}</Text>
+                          </View>
+                        }>
+                        <Send
+                          setSendPageState={this.setSendPageState}
+                          sendTransaction={this.sendTransaction}
+                          clearToAddr={this.clearToAddr}
+                          setSendProgress={this.setSendProgress}
+                          toggleMenuDrawer={this.toggleMenuDrawer}
+                          setComputingModalVisible={this.setComputingModalVisible}
+                          syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
+                          poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
+                          setZecPrice={this.setZecPrice}
+                          set_privacy_option={this.set_privacy_option}
+                          setPoolsToShieldSelectSapling={this.setPoolsToShieldSelectSapling}
+                          setPoolsToShieldSelectTransparent={this.setPoolsToShieldSelectTransparent}
+                        />
+                      </Suspense>
+                    </>
+                  )}
+                </Tab.Screen>
+              )}
+              <Tab.Screen name={translate('loadedapp.uas-menu') as string}>
                 {() => (
                   <>
                     <Suspense
@@ -1449,72 +1508,34 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                           <Text>{translate('loading') as string}</Text>
                         </View>
                       }>
-                      <History
-                        doRefresh={this.doRefresh}
+                      <Receive
+                        setUaAddress={this.setUaAddress}
                         toggleMenuDrawer={this.toggleMenuDrawer}
-                        syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
-                        poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
-                        setZecPrice={this.setZecPrice}
-                        setComputingModalVisible={this.setComputingModalVisible}
                         set_privacy_option={this.set_privacy_option}
-                        setPoolsToShieldSelectSapling={this.setPoolsToShieldSelectSapling}
-                        setPoolsToShieldSelectTransparent={this.setPoolsToShieldSelectTransparent}
                         setUfvkViewModalVisible={this.setUfvkViewModalVisible}
                       />
                     </Suspense>
                   </>
                 )}
               </Tab.Screen>
-            )}
-            {!this.state.readOnly && !(this.state.mode === 'basic' && this.state.totalBalance.total <= 0) && (
-              <Tab.Screen name={translate('loadedapp.send-menu') as string}>
-                {() => (
-                  <>
-                    <Suspense
-                      fallback={
-                        <View>
-                          <Text>{translate('loading') as string}</Text>
-                        </View>
-                      }>
-                      <Send
-                        setSendPageState={this.setSendPageState}
-                        sendTransaction={this.sendTransaction}
-                        clearToAddr={this.clearToAddr}
-                        setSendProgress={this.setSendProgress}
-                        toggleMenuDrawer={this.toggleMenuDrawer}
-                        setComputingModalVisible={this.setComputingModalVisible}
-                        syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
-                        poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
-                        setZecPrice={this.setZecPrice}
-                        set_privacy_option={this.set_privacy_option}
-                        setPoolsToShieldSelectSapling={this.setPoolsToShieldSelectSapling}
-                        setPoolsToShieldSelectTransparent={this.setPoolsToShieldSelectTransparent}
-                      />
-                    </Suspense>
-                  </>
-                )}
-              </Tab.Screen>
-            )}
-            <Tab.Screen name={translate('loadedapp.uas-menu') as string}>
-              {() => (
-                <>
-                  <Suspense
-                    fallback={
-                      <View>
-                        <Text>{translate('loading') as string}</Text>
-                      </View>
-                    }>
-                    <Receive
-                      setUaAddress={this.setUaAddress}
-                      toggleMenuDrawer={this.toggleMenuDrawer}
-                      set_privacy_option={this.set_privacy_option}
-                      setUfvkViewModalVisible={this.setUfvkViewModalVisible}
-                    />
-                  </Suspense>
-                </>
-              )}
-            </Tab.Screen>
-          </Tab.Navigator>
+            </Tab.Navigator>
+          ) : (
+            <>
+              <Suspense
+                fallback={
+                  <View>
+                    <Text>{translate('loading') as string}</Text>
+                  </View>
+                }>
+                <Receive
+                  setUaAddress={this.setUaAddress}
+                  toggleMenuDrawer={this.toggleMenuDrawer}
+                  set_privacy_option={this.set_privacy_option}
+                  setUfvkViewModalVisible={this.setUfvkViewModalVisible}
+                />
+              </Suspense>
+            </>
+          )}
         </SideMenu>
       </ContextAppLoadedProvider>
     );

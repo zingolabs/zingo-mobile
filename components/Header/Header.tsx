@@ -553,54 +553,58 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         </View>
       </View>
 
-      <View style={{ padding: 15, position: 'absolute', right: 0, alignItems: 'flex-end' }}>
-        <Text style={{ fontSize: 8, color: colors.border }}>{translate('version') as string}</Text>
-        <Text style={{ fontSize: 8, color: colors.border }}>{`${translate('settings.mode')}${translate(
-          `settings.value-mode-${mode}`,
-        )}`}</Text>
-        {__DEV__ && !!dimensions && (
-          <Text style={{ fontSize: 8, color: colors.border }}>
-            {'(' + dimensions.width + 'x' + dimensions.height + ')-' + dimensions.scale}
-          </Text>
-        )}
-        {!noPrivacy && set_privacy_option && (
-          <TouchableOpacity onPress={() => set_privacy_option('privacy', !privacy)}>
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginTop: 5,
-              }}>
-              <Text style={{ fontSize: 13, color: colors.border }}>{translate('settings.privacy') as string}</Text>
+      {mode !== 'basic' && (
+        <View style={{ padding: 15, position: 'absolute', right: 0, alignItems: 'flex-end' }}>
+          <Text style={{ fontSize: 8, color: colors.border }}>{translate('version') as string}</Text>
+          <Text style={{ fontSize: 8, color: colors.border }}>{`${translate('settings.mode')}${translate(
+            `settings.value-mode-${mode}`,
+          )}`}</Text>
+          {__DEV__ && !!dimensions && (
+            <Text style={{ fontSize: 8, color: colors.border }}>
+              {'(' + dimensions.width + 'x' + dimensions.height + ')-' + dimensions.scale}
+            </Text>
+          )}
+          {!noPrivacy && set_privacy_option && (
+            <TouchableOpacity onPress={() => set_privacy_option('privacy', !privacy)}>
               <View
                 style={{
                   flexDirection: 'row',
                   justifyContent: 'center',
                   alignItems: 'center',
-                  borderWidth: privacy ? 2 : 1,
-                  borderColor: privacy ? colors.primary : colors.primaryDisabled,
-                  borderRadius: 5,
-                  paddingHorizontal: 5,
+                  marginTop: 5,
                 }}>
-                <Text
+                <Text style={{ fontSize: 13, color: colors.border }}>{translate('settings.privacy') as string}</Text>
+                <View
                   style={{
-                    fontSize: 13,
-                    color: colors.border,
-                    marginRight: 5,
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    borderWidth: privacy ? 2 : 1,
+                    borderColor: privacy ? colors.primary : colors.primaryDisabled,
+                    borderRadius: 5,
+                    paddingHorizontal: 5,
                   }}>
-                  {`${privacy ? translate('settings.value-privacy-true') : translate('settings.value-privacy-false')}`}
-                </Text>
-                {privacy ? (
-                  <FontAwesomeIcon icon={faLock} size={14} color={colors.primary} />
-                ) : (
-                  <FontAwesomeIcon icon={faLockOpen} size={14} color={colors.primaryDisabled} />
-                )}
+                  <Text
+                    style={{
+                      fontSize: 13,
+                      color: colors.border,
+                      marginRight: 5,
+                    }}>
+                    {`${
+                      privacy ? translate('settings.value-privacy-true') : translate('settings.value-privacy-false')
+                    }`}
+                  </Text>
+                  {privacy ? (
+                    <FontAwesomeIcon icon={faLock} size={14} color={colors.primary} />
+                  ) : (
+                    <FontAwesomeIcon icon={faLockOpen} size={14} color={colors.primaryDisabled} />
+                  )}
+                </View>
               </View>
-            </View>
-          </TouchableOpacity>
-        )}
-      </View>
+            </TouchableOpacity>
+          )}
+        </View>
+      )}
 
       <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
     </View>
