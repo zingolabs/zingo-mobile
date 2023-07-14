@@ -30,6 +30,7 @@ import { RPCShieldType } from '../../app/rpc/types/RPCShieldType';
 import { createAlert } from '../../app/createAlert';
 import { Animated } from 'react-native';
 import SnackbarType from '../../app/AppState/types/SnackbarType';
+import FadeText from '../Components/FadeText';
 
 type HeaderProps = {
   poolsMoreInfoOnClick?: () => void;
@@ -90,6 +91,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     poolsToShieldSelectSapling,
     poolsToShieldSelectTransparent,
     transactions,
+    wallet,
   } = context;
 
   let translate: (key: string) => TranslateType,
@@ -121,6 +123,25 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   const opacityValue = useRef(new Animated.Value(1)).current;
   const [showShieldButton, setShowShieldButton] = useState<boolean>(false);
   const [poolsToShield, setPoolsToShield] = useState<'' | 'all' | 'transparent' | 'sapling'>('');
+
+  let currentBlock, lastBlockServer;
+  if (wallet.birthday < syncingStatus.currentBlock) {
+    currentBlock = syncingStatus.currentBlock - wallet.birthday;
+    lastBlockServer = syncingStatus.lastBlockServer - wallet.birthday;
+  } else {
+    currentBlock = syncingStatus.currentBlock;
+    lastBlockServer = syncingStatus.lastBlockServer;
+  }
+  /*
+  let percent = ((currentBlock * 100) / lastBlockServer).toFixed(2);
+  if (Number(percent) < 0) {
+    percent = '0.00';
+  }
+  if (Number(percent) >= 100) {
+    percent = '99.99';
+  }
+  */
+  let blocksRemaining = lastBlockServer - currentBlock || 0;
 
   useEffect(() => {
     setShowShieldButton(!readOnly && totalBalance && (totalBalance.transparentBal > 0 || totalBalance.privateBal > 0));
@@ -482,12 +503,24 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   </>
                 )}
                 {syncingStatus.inProgress && (
-                  <Animated.View style={{ opacity: opacityValue }}>
+                  <Animated.View
+                    style={{
+                      opacity: opacityValue,
+                      flexDirection: 'row',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
                     {mode === 'basic' ? (
-                      <FontAwesomeIcon icon={faPlay} color={colors.syncing} size={17} />
+                      <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                        <FontAwesomeIcon icon={faPlay} color={colors.syncing} size={17} />
+                        <FadeText style={{ fontSize: 10 }}>{`${blocksRemaining}`}</FadeText>
+                      </View>
                     ) : (
                       <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
-                        <FontAwesomeIcon icon={faPlay} color={colors.syncing} size={17} />
+                        <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                          <FontAwesomeIcon icon={faPlay} color={colors.syncing} size={17} />
+                          <FadeText style={{ fontSize: 10 }}>{`${blocksRemaining}`}</FadeText>
+                        </View>
                       </TouchableOpacity>
                     )}
                   </Animated.View>
@@ -512,6 +545,21 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 </View>
               </View>
             )}
+            {/*syncingStatus.inProgress && blocksRemaining > 0 && (
+              <View style={{ marginRight: 5 }}>
+                {mode === 'basic' ? (
+                  <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                    <FadeText style={{ fontSize: 10 }}>{`${blocksRemaining}`}</FadeText>
+                  </View>
+                ) : (
+                  <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                      <FadeText style={{ fontSize: 10 }}>{`${blocksRemaining}`}</FadeText>
+                    </View>
+                  </TouchableOpacity>
+                )}
+              </View>
+              )*/}
             {(!netInfo.isConnected || netInfo.type === NetInfoStateType.cellular || netInfo.isConnectionExpensive) && (
               <>
                 {mode !== 'basic' && (
