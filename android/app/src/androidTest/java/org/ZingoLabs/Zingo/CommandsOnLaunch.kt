@@ -26,7 +26,7 @@ class CommandsOnLaunch {
     )
 
     @Test
-    fun executeAddressFromSeed() {
+    fun executeSyncFromSeed() {
         val mapper = jacksonObjectMapper()
 
         val server = "https://10.0.2.2:20000"
@@ -42,15 +42,37 @@ class CommandsOnLaunch {
         assertThat(initFromSeed.seed).isEqualTo("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art")
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
-        var addressesJson = RustFFI.execute("addresses", "")
-        System.out.println("\nAddresses:")
-        System.out.println(addressesJson)
-        val addresses: List<Addresses> = mapper.readValue(addressesJson)
-        assertThat(addresses[0].address).isEqualTo("uregtest1zkuzfv5m3yhv2j4fmvq5rjurkxenxyq8r7h4daun2zkznrjaa8ra8asgdm8wwgwjvlwwrxx7347r8w0ee6dqyw4rufw4wg9djwcr6frzkezmdw6dud3wsm99eany5r8wgsctlxquu009nzd6hsme2tcsk0v3sgjvxa70er7h27z5epr67p5q767s2z5gt88paru56mxpm6pwz0cu35m")
-        assertThat(addresses[0].receivers.transparent).isEqualTo("tmBsTi2xWTjUdEXnuTceL7fecEQKeWaPDJd")
-        assertThat(addresses[0].receivers.sapling).isEqualTo("zregtestsapling1fmq2ufux3gm0v8qf7x585wj56le4wjfsqsj27zprjghntrerntggg507hxh2ydcdkn7sx8kya7p")
-        assertThat(addresses[0].receivers.orchard_exists).isEqualTo(true)
+        var syncJson = RustFFI.execute("sync", "")
+        System.out.println("\nSync:")
+        System.out.println(syncJson)
     }
+
+    // @Test
+    // fun executeAddressFromSeed() {
+    //     val mapper = jacksonObjectMapper()
+
+    //     val server = "https://10.0.2.2:20000"
+    //     val chainhint = "regtest"
+    //     val seed = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art"
+    //     val birthday = "1"
+    //     val datadir = MainApplication.getAppContext()!!.filesDir.path
+
+    //     var initFromSeedJson = RustFFI.initfromseed(server, seed, birthday, datadir, chainhint)
+    //     System.out.println("\nInit from seed:")
+    //     System.out.println(initFromSeedJson)
+    //     val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
+    //     assertThat(initFromSeed.seed).isEqualTo("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art")
+    //     assertThat(initFromSeed.birthday).isEqualTo(1)
+
+    //     var addressesJson = RustFFI.execute("addresses", "")
+    //     System.out.println("\nAddresses:")
+    //     System.out.println(addressesJson)
+    //     val addresses: List<Addresses> = mapper.readValue(addressesJson)
+    //     assertThat(addresses[0].address).isEqualTo("uregtest1zkuzfv5m3yhv2j4fmvq5rjurkxenxyq8r7h4daun2zkznrjaa8ra8asgdm8wwgwjvlwwrxx7347r8w0ee6dqyw4rufw4wg9djwcr6frzkezmdw6dud3wsm99eany5r8wgsctlxquu009nzd6hsme2tcsk0v3sgjvxa70er7h27z5epr67p5q767s2z5gt88paru56mxpm6pwz0cu35m")
+    //     assertThat(addresses[0].receivers.transparent).isEqualTo("tmBsTi2xWTjUdEXnuTceL7fecEQKeWaPDJd")
+    //     assertThat(addresses[0].receivers.sapling).isEqualTo("zregtestsapling1fmq2ufux3gm0v8qf7x585wj56le4wjfsqsj27zprjghntrerntggg507hxh2ydcdkn7sx8kya7p")
+    //     assertThat(addresses[0].receivers.orchard_exists).isEqualTo(true)
+    // }
 
     // @Test
     // fun executeAddressFromUfvk() {

@@ -20,7 +20,3 @@ test_utils = { path = "../test_utils" }
 [lib]
 crate-type = ["dylib"]
 
-[features]
-default = ["local_env"]
-local_env = []
-
