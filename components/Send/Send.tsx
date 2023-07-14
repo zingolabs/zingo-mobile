@@ -95,7 +95,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         return false;
       }
       const result: string = await RPCModule.execute('parse_address', address);
-      console.log(result);
+      //console.log(result);
       if (result) {
         if (result.toLowerCase().startsWith('error') || result.toLowerCase() === 'null') {
           return false;
@@ -133,7 +133,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         return false;
       }
       const result: string = await RPCModule.execute('parse_address', address);
-      console.log(result);
+      //console.log(result);
       if (result) {
         if (result.toLowerCase().startsWith('error') || result.toLowerCase() === 'null') {
           return false;
