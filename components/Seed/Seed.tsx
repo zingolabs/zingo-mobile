@@ -302,35 +302,37 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
               />
             </View>
           )}
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-            <View />
-            <TouchableOpacity
-              onPress={() => {
-                if (seedPhrase) {
-                  Clipboard.setString(seedPhrase);
-                  if (addLastSnackbar) {
-                    addLastSnackbar({
-                      message: translate('seed.tapcopy-seed-message') as string,
-                      type: 'Primary',
-                      duration: 'short',
-                    });
+          {action !== 'restore' && (
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <View />
+              <TouchableOpacity
+                onPress={() => {
+                  if (seedPhrase) {
+                    Clipboard.setString(seedPhrase);
+                    if (addLastSnackbar) {
+                      addLastSnackbar({
+                        message: translate('seed.tapcopy-seed-message') as string,
+                        type: 'Primary',
+                        duration: 'short',
+                      });
+                    }
                   }
-                }
-              }}>
-              <Text
-                style={{
-                  color: colors.text,
-                  textDecorationLine: 'underline',
-                  padding: 10,
-                  marginTop: 0,
-                  textAlign: 'center',
-                  minHeight: 48,
                 }}>
-                {translate('seed.tapcopy') as string}
-              </Text>
-            </TouchableOpacity>
-            <View />
-          </View>
+                <Text
+                  style={{
+                    color: colors.text,
+                    textDecorationLine: 'underline',
+                    padding: 10,
+                    marginTop: 0,
+                    textAlign: 'center',
+                    minHeight: 48,
+                  }}>
+                  {translate('seed.tapcopy') as string}
+                </Text>
+              </TouchableOpacity>
+              <View />
+            </View>
+          )}
         </View>
 
         <View style={{ marginTop: 10, alignItems: 'center' }}>
