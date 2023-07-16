@@ -198,7 +198,7 @@ type LoadingAppClassProps = {
   background: BackgroundType;
 };
 
-class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
+export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
   dim: EmitterSubscription;
   appstate: NativeEventSubscription;
   unsubscribeNetInfo: NetInfoSubscription;
@@ -369,9 +369,9 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
   };
 
   componentWillUnmount = () => {
-    this.dim && this.dim.remove();
-    this.appstate && this.appstate.remove();
-    this.unsubscribeNetInfo && this.unsubscribeNetInfo();
+    this.dim && typeof this.dim.remove === 'function' && this.dim.remove();
+    this.appstate && typeof this.appstate.remove === 'function' && this.appstate.remove();
+    this.unsubscribeNetInfo && typeof this.unsubscribeNetInfo === 'function' && this.unsubscribeNetInfo();
   };
 
   setDimensions = (screen: ScaledSize) => {

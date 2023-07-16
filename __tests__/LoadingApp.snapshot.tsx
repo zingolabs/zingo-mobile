@@ -6,11 +6,14 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
-import LoadingApp from '../app/LoadingApp';
-import { StackNavigationProp } from '@react-navigation/stack';
+import { LoadingAppClass } from '../app/LoadingApp';
+import { ThemeType } from '../app/types';
+
 // Importa el módulo I18n
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { I18n } from 'i18n-js';
+import { StackScreenProps } from '@react-navigation/stack';
+import { ServerType } from '../app/AppState';
 
 // Crea un mock para el constructor de I18n
 jest.mock('i18n-js', () => ({
@@ -40,13 +43,14 @@ jest.mock('react-native-tab-view', () => ({
 jest.mock('react-native-option-menu', () => '');
 jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
 jest.mock('@react-native-community/netinfo', () => {
-  const RN = jest.requireActual('react-native');
-
-  RN.NativeModules.RNCNetInfo = {
-    execute: jest.fn(() => '{}'),
+  return {
+    fetch: jest.fn().mockImplementation(() =>
+      Promise.resolve({
+        isConnected: true,
+        isInternetReachable: true,
+      }),
+    ),
   };
-
-  return RN;
 });
 jest.mock('react-native', () => {
   const RN = jest.requireActual('react-native');
@@ -62,24 +66,79 @@ jest.mock('react-native', () => {
 describe('Component LoadingApp - test', () => {
   //snapshot test
   test('LoadingApp - snapshot', () => {
-    // Crea objetos mockeados para navigation y route
-    const mockNavigation: StackNavigationProp<any, string | number | symbol, undefined> = {
+    const navigationMock: StackScreenProps<any>['navigation'] = {
+      // Propiedades y métodos necesarios para la navegación
       navigate: jest.fn(),
       goBack: jest.fn(),
       dispatch: jest.fn(),
       reset: jest.fn(),
       isFocused: jest.fn(),
       canGoBack: jest.fn(),
-      // Agrega otras propiedades y métodos necesarios para tus pruebas
+      getParent: jest.fn(),
+      getId: jest.fn(),
+      getState: jest.fn(),
+      setParams: jest.fn(),
+      setOptions: jest.fn(),
+      addListener: jest.fn(),
+      removeListener: jest.fn(),
+      replace: jest.fn(),
+      push: jest.fn(),
+      pop: jest.fn(),
+      popToTop: jest.fn(),
+      // Agrega cualquier otra propiedad o método necesario para tu caso
     };
-
-    const mockRoute = {
-      key: 'mock-key',
-      name: 'mock-route',
-      // Agrega otras propiedades necesarias para tus pruebas
+    // Declara un objeto mock para la ruta
+    const routeMock: StackScreenProps<any>['route'] = {
+      // Propiedades necesarias para la ruta
+      key: '',
+      name: '',
     };
-
-    const receive = render(<LoadingApp navigation={mockNavigation} route={mockRoute} />);
+    const theme: ThemeType = {
+      dark: true,
+      colors: {
+        background: '#011401', //'#010101',
+        card: '#011401', //'#401717',
+        border: '#ffffff',
+        primary: '#18bd18', //'#df4100',
+        primaryDisabled: '#5a8c5a', //'rgba(90, 140, 90, 1)',
+        secondaryDisabled: '#233623',
+        text: '#c3c3c3',
+        zingo: '#888888',
+        placeholder: '#888888',
+        money: '#ffffff',
+        syncing: '#ebff5a',
+        notification: '',
+      },
+    };
+    const translate = () => 'text traslated';
+    const language = 'en';
+    const currency = '';
+    const server: ServerType = {
+      uri: 'https://mainnet.lightwalletd.com:9067',
+      chain_name: 'main',
+    };
+    const sendAll = false;
+    const privacy = false;
+    const mode = 'basic';
+    const background = {
+      batches: 0,
+      date: 0,
+    };
+    const receive = render(
+      <LoadingAppClass
+        navigation={navigationMock}
+        route={routeMock}
+        translate={translate}
+        theme={theme}
+        language={language}
+        currency={currency}
+        server={server}
+        sendAll={sendAll}
+        privacy={privacy}
+        mode={mode}
+        background={background}
+      />,
+    );
     expect(receive.toJSON()).toMatchSnapshot();
   });
 });
