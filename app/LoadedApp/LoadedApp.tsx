@@ -215,7 +215,7 @@ type LoadedAppClassProps = {
   readOnly: boolean;
 };
 
-class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
+export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   rpc: RPC;
   dim: EmitterSubscription;
   appstate: NativeEventSubscription;
@@ -383,9 +383,9 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
   componentWillUnmount = async () => {
     await this.rpc.clearTimers();
-    this.dim && this.dim.remove();
-    this.appstate && this.appstate.remove();
-    this.linking && this.linking.remove();
+    this.dim && typeof this.dim.remove === 'function' && this.dim.remove();
+    this.appstate && typeof this.appstate.remove === 'function' && this.appstate.remove();
+    this.linking && typeof this.linking === 'function' && this.linking.remove();
     this.unsubscribeNetInfo && this.unsubscribeNetInfo();
   };
 

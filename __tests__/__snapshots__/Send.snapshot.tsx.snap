@@ -806,8 +806,8 @@ exports[`Component Send - test Send currency USD, privacy high & mode expert - s
             style={
               {
                 "alignItems": "center",
-                "backgroundColor": "rgba(90, 140, 90, 1)",
-                "borderColor": "rgba(90, 140, 90, 1)",
+                "backgroundColor": "#5a8c5a",
+                "borderColor": "#5a8c5a",
                 "borderRadius": 10,
                 "borderWidth": 2,
                 "justifyContent": "center",
@@ -1723,8 +1723,8 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
             style={
               {
                 "alignItems": "center",
-                "backgroundColor": "rgba(90, 140, 90, 1)",
-                "borderColor": "rgba(90, 140, 90, 1)",
+                "backgroundColor": "#5a8c5a",
+                "borderColor": "#5a8c5a",
                 "borderRadius": 10,
                 "borderWidth": 2,
                 "justifyContent": "center",

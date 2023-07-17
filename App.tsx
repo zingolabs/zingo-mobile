@@ -4,8 +4,8 @@ import { SafeAreaView } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
-import LoadedApp from './app/LoadedApp';
-import LoadingApp from './app/LoadingApp';
+import { LoadedApp } from './app/LoadedApp';
+import { LoadingApp } from './app/LoadingApp';
 import { ThemeType } from './app/types';
 
 const Theme: ThemeType = {
