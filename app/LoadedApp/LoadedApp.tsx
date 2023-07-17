@@ -1427,7 +1427,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
 
           {this.state.mode !== 'basic' ||
           (this.state.mode === 'basic' &&
-            (!(this.state.mode === 'basic' && this.state.transactions.length <= 0) ||
+            (!(
+              this.state.mode === 'basic' &&
+              (this.state.transactions.length <= 0 || this.state.totalBalance.total <= 0)
+            ) ||
               (!this.state.readOnly && !(this.state.mode === 'basic' && this.state.totalBalance.total <= 0)))) ? (
             <Tab.Navigator
               initialRouteName={translate('loadedapp.wallet-menu') as string}
@@ -1444,7 +1447,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 },
                 headerShown: false,
               })}>
-              {!(this.state.mode === 'basic' && this.state.transactions.length <= 0) && (
+              {!(
+                this.state.mode === 'basic' &&
+                (this.state.transactions.length <= 0 || this.state.totalBalance.total <= 0)
+              ) && (
                 <Tab.Screen name={translate('loadedapp.wallet-menu') as string}>
                   {() => (
                     <>
