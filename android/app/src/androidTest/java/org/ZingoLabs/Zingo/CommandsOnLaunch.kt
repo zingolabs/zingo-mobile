@@ -29,7 +29,7 @@ class CommandsOnLaunch {
     fun executeSyncFromSeed() {
         val mapper = jacksonObjectMapper()
 
-        val server = "https://10.0.2.2:20000"
+        val server = "http://10.0.2.2:20000"
         val chainhint = "regtest"
         val seed = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art"
         val birthday = "1"
@@ -42,9 +42,29 @@ class CommandsOnLaunch {
         assertThat(initFromSeed.seed).isEqualTo("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art")
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
+        var infoJson = RustFFI.execute("info", "")
+        System.out.println("\nInfo:")
+        System.out.println(infoJson)
+
+        var heightJson = RustFFI.execute("height", "")
+        System.out.println("\nHeight:")
+        System.out.println(heightJson)
+
         var syncJson = RustFFI.execute("sync", "")
         System.out.println("\nSync:")
         System.out.println(syncJson)
+
+        var syncStatusJson = RustFFI.execute("syncstatus", "")
+        System.out.println("\nSync Status:")
+        System.out.println(syncStatusJson)
+
+        heightJson = RustFFI.execute("height", "")
+        System.out.println("\nHeight:")
+        System.out.println(heightJson)
+
+        infoJson = RustFFI.execute("info", "")
+        System.out.println("\nInfo:")
+        System.out.println(infoJson)
     }
 
     // @Test

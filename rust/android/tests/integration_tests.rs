@@ -7,7 +7,7 @@ async fn execute_sync() {
     let (regtest_manager, child_process_handler) = scenarios::mobile_basic().await;
 
     regtest_manager
-        .generate_n_blocks(10)
+        .generate_n_blocks(20)
         .expect("Failed to generate blocks.");
 
     let (exit_code, output, error) = test_utils::run_integration_test();
