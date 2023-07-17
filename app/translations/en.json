@@ -11,6 +11,7 @@
   "menudrawer-acc": "Open Menu Drawer",
   "menu-acc": "Open Menu",
   "donation": "Thanks for supporting Zingo!",
+  "restarting": "Error connecting to the Server, the App will restart in a few seconds.",
   "insight": {
     "title": "Financial Insight",
     "no-data": "There is no data in your Wallet that fit the graph selected.",

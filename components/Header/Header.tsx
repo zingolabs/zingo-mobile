@@ -92,6 +92,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     poolsToShieldSelectTransparent,
     transactions,
     wallet,
+    restartApp,
   } = context;
 
   let translate: (key: string) => TranslateType,
@@ -142,6 +143,14 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   }
   */
   let blocksRemaining = lastBlockServer - currentBlock || 0;
+
+  useEffect(() => {
+    if (syncingStatus.syncProcessStalled && addLastSnackbar && restartApp) {
+      // if the sync process is stalled -> let's restart the App.
+      addLastSnackbar({ message: translate('restarting') as string, type: 'Primary', duration: 'short' });
+      setTimeout(() => restartApp(), 3000);
+    }
+  }, [addLastSnackbar, restartApp, syncingStatus.syncProcessStalled, translate]);
 
   useEffect(() => {
     setShowShieldButton(!readOnly && totalBalance && (totalBalance.transparentBal > 0 || totalBalance.privateBal > 0));

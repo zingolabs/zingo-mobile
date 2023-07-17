@@ -274,7 +274,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
             this.setState({
               readOnly: walletKindJSON.kind === 'Seeded' ? false : true,
             });
-            this.navigateToLoaded();
+            this.navigateToLoadedApp();
           } else {
             this.setState({ screen: 1 });
             createAlert(
@@ -296,7 +296,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
         // if no wallet file & basic mode -> create a new wallet & go directly to history screen.
         if (this.state.mode === 'basic') {
           this.createNewWallet();
-          this.navigateToLoaded();
+          this.navigateToLoadedApp();
         } else {
           this.setState({ screen: 1, walletExists: false });
         }
@@ -442,7 +442,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
     this.setState({ actionButtonsDisabled: false });
   };
 
-  navigateToLoaded = () => {
+  navigateToLoadedApp = () => {
     const { navigation } = this.props;
     navigation.reset({
       index: 0,
@@ -538,7 +538,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
       //console.log(result);
       if (result && !result.toLowerCase().startsWith('error')) {
         this.setState({ actionButtonsDisabled: false, readOnly: type === 'seed' ? false : true });
-        this.navigateToLoaded();
+        this.navigateToLoadedApp();
       } else {
         this.setState({ actionButtonsDisabled: false });
         // this message work for both.
@@ -975,7 +975,7 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
               animationType="slide"
               transparent={false}
               visible={screen === 2}
-              onRequestClose={() => this.navigateToLoaded()}>
+              onRequestClose={() => this.navigateToLoadedApp()}>
               <Suspense
                 fallback={
                   <View>
@@ -983,8 +983,8 @@ class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
                   </View>
                 }>
                 <Seed
-                  onClickOK={() => this.navigateToLoaded()}
-                  onClickCancel={() => this.navigateToLoaded()}
+                  onClickOK={() => this.navigateToLoadedApp()}
+                  onClickCancel={() => this.navigateToLoadedApp()}
                   action={'new'}
                 />
               </Suspense>

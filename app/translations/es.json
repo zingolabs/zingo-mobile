@@ -11,6 +11,7 @@
   "menudrawer-acc": "Abrir Menu Lateral",
   "menu-acc": "Abrir Menu",
   "donation": "Gracias por apoyar Zingo!",
+  "restarting": "Error conectando con el servidor, la Aplicación se reiniciará en breves segundos.",
   "insight": {
     "title": "Visión Financiera",
     "no-data": "No hay datos en tu Monedero que concuerden con el gráfico seleccionado.",

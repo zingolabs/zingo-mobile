@@ -251,6 +251,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       appState: AppState.currentState,
       setBackgroundError: this.setBackgroundError,
       addLastSnackbar: this.addLastSnackbar,
+      restartApp: this.navigateToLoadingApp,
     };
 
     this.rpc = new RPC(
@@ -372,7 +373,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
             //console.log('EVENT Loaded: YES internet connection.');
             if (this.rpc.getInRefresh()) {
               // I need to start again the App only if it is Syncing...
-              this.navigateToLoading();
+              this.navigateToLoadingApp();
             }
           }
         }
@@ -881,7 +882,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     // Refetch the settings to update
     this.rpc.fetchWalletSettings();
     if (reset) {
-      this.navigateToLoading();
+      this.navigateToLoadingApp();
     }
   };
 
@@ -915,7 +916,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     this.rpc.fetchWalletSettings();
   };
 
-  navigateToLoading = async () => {
+  navigateToLoadingApp = async () => {
     const { navigation } = this.props;
 
     await this.rpc.clearTimers();
@@ -952,7 +953,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     this.rpc.setInRefresh(false);
     this.keepAwake(false);
     this.setState({ seedChangeModalVisible: false });
-    this.navigateToLoading();
+    this.navigateToLoadingApp();
   };
 
   onClickOKRestoreBackup = async () => {
@@ -973,7 +974,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     this.rpc.setInRefresh(false);
     this.keepAwake(false);
     this.setState({ seedBackupModalVisible: false });
-    this.navigateToLoading();
+    this.navigateToLoadingApp();
   };
 
   onClickOKServerWallet = async () => {
@@ -1027,7 +1028,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
         this.setState({ seedServerModalVisible: false });
       }
       // no need to restart the tasks because is about to restart the app.
-      this.navigateToLoading();
+      this.navigateToLoadingApp();
     }
   };
 
