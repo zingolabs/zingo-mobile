@@ -42,29 +42,27 @@ class CommandsOnLaunch {
         assertThat(initFromSeed.seed).isEqualTo("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art")
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
-        var infoJson = RustFFI.execute("info", "")
-        System.out.println("\nInfo:")
-        System.out.println(infoJson)
-
         var heightJson = RustFFI.execute("height", "")
         System.out.println("\nHeight:")
         System.out.println(heightJson)
 
-        var syncJson = RustFFI.execute("sync", "")
-        System.out.println("\nSync:")
-        System.out.println(syncJson)
+        // var syncJson = RustFFI.execute("sync", "")
+        // System.out.println("\nSync:")
+        // System.out.println(syncJson)
 
-        var syncStatusJson = RustFFI.execute("syncstatus", "")
-        System.out.println("\nSync Status:")
-        System.out.println(syncStatusJson)
+        // var syncStatusJson = RustFFI.execute("syncstatus", "")
+        // System.out.println("\nSync Status:")
+        // System.out.println(syncStatusJson)
 
-        heightJson = RustFFI.execute("height", "")
-        System.out.println("\nHeight:")
-        System.out.println(heightJson)
+        // heightJson = RustFFI.execute("height", "")
+        // System.out.println("\nHeight:")
+        // System.out.println(heightJson)
 
-        infoJson = RustFFI.execute("info", "")
-        System.out.println("\nInfo:")
-        System.out.println(infoJson)
+        // var infoJson = RustFFI.execute("info", "")
+        // System.out.println("\nInfo:")
+        // System.out.println(infoJson)
+
+        // assertThat(1).isEqualTo(0)
     }
 
     // @Test
