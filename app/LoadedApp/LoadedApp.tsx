@@ -1427,11 +1427,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
 
           {this.state.mode !== 'basic' ||
           (this.state.mode === 'basic' &&
-            (!(
-              this.state.mode === 'basic' &&
-              (this.state.transactions.length <= 0 || this.state.totalBalance.total <= 0)
-            ) ||
-              (!this.state.readOnly && !(this.state.mode === 'basic' && this.state.totalBalance.total <= 0)))) ? (
+            (!(this.state.mode === 'basic' && this.state.transactions.length <= 0) ||
+              (!this.state.readOnly &&
+                !(this.state.mode === 'basic' && this.state.totalBalance.spendableOrchard <= 0)))) ? (
             <Tab.Navigator
               initialRouteName={translate('loadedapp.wallet-menu') as string}
               screenOptions={({ route }) => ({
@@ -1447,10 +1445,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 },
                 headerShown: false,
               })}>
-              {!(
-                this.state.mode === 'basic' &&
-                (this.state.transactions.length <= 0 || this.state.totalBalance.total <= 0)
-              ) && (
+              {!(this.state.mode === 'basic' && this.state.transactions.length <= 0) && (
                 <Tab.Screen name={translate('loadedapp.wallet-menu') as string}>
                   {() => (
                     <>
@@ -1477,35 +1472,36 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                   )}
                 </Tab.Screen>
               )}
-              {!this.state.readOnly && !(this.state.mode === 'basic' && this.state.totalBalance.total <= 0) && (
-                <Tab.Screen name={translate('loadedapp.send-menu') as string}>
-                  {() => (
-                    <>
-                      <Suspense
-                        fallback={
-                          <View>
-                            <Text>{translate('loading') as string}</Text>
-                          </View>
-                        }>
-                        <Send
-                          setSendPageState={this.setSendPageState}
-                          sendTransaction={this.sendTransaction}
-                          clearToAddr={this.clearToAddr}
-                          setSendProgress={this.setSendProgress}
-                          toggleMenuDrawer={this.toggleMenuDrawer}
-                          setComputingModalVisible={this.setComputingModalVisible}
-                          syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
-                          poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
-                          setZecPrice={this.setZecPrice}
-                          set_privacy_option={this.set_privacy_option}
-                          setPoolsToShieldSelectSapling={this.setPoolsToShieldSelectSapling}
-                          setPoolsToShieldSelectTransparent={this.setPoolsToShieldSelectTransparent}
-                        />
-                      </Suspense>
-                    </>
-                  )}
-                </Tab.Screen>
-              )}
+              {!this.state.readOnly &&
+                !(this.state.mode === 'basic' && this.state.totalBalance.spendableOrchard <= 0) && (
+                  <Tab.Screen name={translate('loadedapp.send-menu') as string}>
+                    {() => (
+                      <>
+                        <Suspense
+                          fallback={
+                            <View>
+                              <Text>{translate('loading') as string}</Text>
+                            </View>
+                          }>
+                          <Send
+                            setSendPageState={this.setSendPageState}
+                            sendTransaction={this.sendTransaction}
+                            clearToAddr={this.clearToAddr}
+                            setSendProgress={this.setSendProgress}
+                            toggleMenuDrawer={this.toggleMenuDrawer}
+                            setComputingModalVisible={this.setComputingModalVisible}
+                            syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
+                            poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
+                            setZecPrice={this.setZecPrice}
+                            set_privacy_option={this.set_privacy_option}
+                            setPoolsToShieldSelectSapling={this.setPoolsToShieldSelectSapling}
+                            setPoolsToShieldSelectTransparent={this.setPoolsToShieldSelectTransparent}
+                          />
+                        </Suspense>
+                      </>
+                    )}
+                  </Tab.Screen>
+                )}
               <Tab.Screen name={translate('loadedapp.uas-menu') as string}>
                 {() => (
                   <>

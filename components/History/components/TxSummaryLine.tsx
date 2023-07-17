@@ -3,7 +3,7 @@ import React, { useContext } from 'react';
 import { View } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons';
+import { faArrowDown, faArrowUp, faRefresh } from '@fortawesome/free-solid-svg-icons';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
 import ZecAmount from '../../Components/ZecAmount';
@@ -33,8 +33,10 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
   const { translate, language, privacy } = context;
   const { colors } = useTheme() as unknown as ThemeType;
 
-  const amountColor = tx.confirmations === 0 ? colors.primaryDisabled : tx.amount > 0 ? colors.primary : colors.text;
-  const txIcon = tx.amount >= 0 ? faArrowDown : faArrowUp;
+  const amountColor =
+    tx.confirmations === 0 ? colors.primaryDisabled : (tx.amount || 0) > 0 ? colors.primary : colors.text;
+
+  const txIcon = tx.confirmations === 0 ? faRefresh : (tx.amount || 0) >= 0 ? faArrowDown : faArrowUp;
   moment.locale(language);
 
   const displayAddress =
