@@ -1429,7 +1429,13 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
           (this.state.mode === 'basic' &&
             (!(this.state.mode === 'basic' && this.state.transactions.length <= 0) ||
               (!this.state.readOnly &&
-                !(this.state.mode === 'basic' && this.state.totalBalance.spendableOrchard <= 0)))) ? (
+                !(
+                  this.state.mode === 'basic' &&
+                  this.state.totalBalance.spendableOrchard +
+                    this.state.totalBalance.spendablePrivate +
+                    this.state.totalBalance.transparentBal <=
+                    0
+                )))) ? (
             <Tab.Navigator
               initialRouteName={translate('loadedapp.wallet-menu') as string}
               screenOptions={({ route }) => ({
@@ -1473,7 +1479,13 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 </Tab.Screen>
               )}
               {!this.state.readOnly &&
-                !(this.state.mode === 'basic' && this.state.totalBalance.spendableOrchard <= 0) && (
+                !(
+                  this.state.mode === 'basic' &&
+                  this.state.totalBalance.spendableOrchard +
+                    this.state.totalBalance.spendablePrivate +
+                    this.state.totalBalance.transparentBal <=
+                    0
+                ) && (
                   <Tab.Screen name={translate('loadedapp.send-menu') as string}>
                     {() => (
                       <>
