@@ -16,8 +16,7 @@ async fn execute_sync() {
     println!("Output: {}", output);
     println!("Error: {}", error);
 
-    assert_eq!(1, 2);
-    // assert_eq!(exit_code, 0);
+    assert_eq!(exit_code, 0);
 
     drop(child_process_handler);
 }
