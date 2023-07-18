@@ -35,7 +35,7 @@ class CommandsOnLaunch {
         val birthday = "1"
         val datadir = MainApplication.getAppContext()!!.filesDir.path
 
-        var initFromSeedJson = RustFFI.initfromseed(server, seed, birthday, datadir, chainhint)
+        var initFromSeedJson = RustFFI.initfromseed(server, seed, birthday, datadir, chainhint, false)
         System.out.println("\nInit from seed:")
         System.out.println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
