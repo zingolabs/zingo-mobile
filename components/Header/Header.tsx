@@ -153,18 +153,22 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   }, [addLastSnackbar, restartApp, syncingStatus.syncProcessStalled, translate]);
 
   useEffect(() => {
-    setShowShieldButton(!readOnly && totalBalance && (totalBalance.transparentBal > 0 || totalBalance.privateBal > 0));
+    setShowShieldButton(
+      !readOnly &&
+        totalBalance &&
+        (totalBalance.transparentBal > info.defaultFee || totalBalance.privateBal > info.defaultFee),
+    );
 
-    if (totalBalance.transparentBal > 0 && totalBalance.privateBal > 0) {
+    if (totalBalance.transparentBal > info.defaultFee && totalBalance.privateBal > info.defaultFee) {
       setPoolsToShield('all');
-    } else if (totalBalance.transparentBal > 0) {
+    } else if (totalBalance.transparentBal > info.defaultFee) {
       setPoolsToShield('transparent');
-    } else if (totalBalance.privateBal > 0) {
+    } else if (totalBalance.privateBal > info.defaultFee) {
       setPoolsToShield('sapling');
     } else {
       setPoolsToShield('');
     }
-  }, [mode, readOnly, totalBalance, totalBalance.transparentBal, totalBalance.privateBal]);
+  }, [mode, readOnly, totalBalance, totalBalance.transparentBal, totalBalance.privateBal, info.defaultFee]);
 
   useEffect(() => {
     // for basic mode always have to be 'all', It's easier for the user.
@@ -313,7 +317,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           />
           {mode !== 'basic' &&
             totalBalance.total > 0 &&
-            (totalBalance.privateBal > 0 || totalBalance.transparentBal > 0) && (
+            (totalBalance.privateBal > info.defaultFee || totalBalance.transparentBal > info.defaultFee) && (
               <TouchableOpacity onPress={() => poolsMoreInfoOnClick && poolsMoreInfoOnClick()}>
                 <View
                   style={{
