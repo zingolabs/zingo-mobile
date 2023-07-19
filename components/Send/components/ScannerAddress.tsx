@@ -1,6 +1,5 @@
 import React, { useContext } from 'react';
 
-import { parseZcashURI } from '../../../app/uris';
 import RPCModule from '../../../app/RPCModule';
 import { ContextAppLoaded } from '../../../app/context';
 import { BarCodeReadEvent } from 'react-native-camera';
@@ -26,6 +25,12 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateTo
       addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
       return;
     }
+    if (scannedAddress.startsWith('zcash:')) {
+      updateToField(scannedAddress, null, null, null, null);
+      closeModal();
+      return;
+    }
+
     const result: string = await RPCModule.execute('parse_address', scannedAddress);
     if (result) {
       if (result.toLowerCase().startsWith('error') || result.toLowerCase() === 'null') {
@@ -46,22 +51,6 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateTo
     if (valid) {
       updateToField(scannedAddress, null, null, null, null);
       closeModal();
-    } else {
-      // Try to parse as a URI
-      if (scannedAddress.startsWith('zcash:')) {
-        const target = await parseZcashURI(scannedAddress, translate, server);
-
-        if (typeof target !== 'string') {
-          updateToField(scannedAddress, null, null, null, null);
-          closeModal();
-        } else {
-          addLastSnackbar({ message: `${translate('scanner.uri-error')} ${target}`, type: 'Primary' });
-          return;
-        }
-      } else {
-        addLastSnackbar({ message: translate('scanner.nozcash-error') as string, type: 'Primary' });
-        return;
-      }
     }
   };
 
