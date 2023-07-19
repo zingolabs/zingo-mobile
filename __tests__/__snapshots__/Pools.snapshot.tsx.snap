@@ -683,7 +683,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                   <Text
                     style={
                       {
-                        "color": undefined,
+                        "color": "red",
                         "fontSize": 18,
                       }
                     }
@@ -693,7 +693,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                   <Text
                     style={
                       {
-                        "color": undefined,
+                        "color": "red",
                         "fontSize": 18,
                         "fontWeight": "700",
                       }
@@ -704,7 +704,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                   <Text
                     style={
                       {
-                        "color": undefined,
+                        "color": "red",
                         "fontSize": 12.6,
                         "paddingBottom": 0,
                       }
@@ -715,7 +715,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                   <Text
                     style={
                       {
-                        "color": undefined,
+                        "color": "red",
                         "fontSize": 18,
                       }
                     }
