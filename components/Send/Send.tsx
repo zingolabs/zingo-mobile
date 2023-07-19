@@ -88,9 +88,8 @@ const Send: React.FunctionComponent<SendProps> = ({
   const { decimalSeparator } = getNumberFormatSettings();
   // transparent is not spendable.
   const spendable = totalBalance.spendablePrivate + totalBalance.spendableOrchard;
-  const stillConfirming = parseFloat(spendable.toFixed(8)) !== totalBalance.total;
-  const showShieldInfo =
-    totalBalance && (totalBalance.transparentBal > info.defaultFee || totalBalance.privateBal > info.defaultFee);
+  const stillConfirming = parseFloat(spendable.toFixed(8)) !== totalBalance.total - totalBalance.transparentBal;
+  const showShieldInfo = totalBalance && totalBalance.transparentBal + totalBalance.privateBal > info.defaultFee;
 
   const getMaxAmount = useCallback((): number => {
     let max = spendable - defaultFee;

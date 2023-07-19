@@ -154,16 +154,14 @@ const Header: React.FunctionComponent<HeaderProps> = ({
 
   useEffect(() => {
     setShowShieldButton(
-      !readOnly &&
-        totalBalance &&
-        (totalBalance.transparentBal > info.defaultFee || totalBalance.privateBal > info.defaultFee),
+      !readOnly && totalBalance && totalBalance.transparentBal + totalBalance.privateBal > info.defaultFee,
     );
 
-    if (totalBalance.transparentBal > info.defaultFee && totalBalance.privateBal > info.defaultFee) {
+    if (totalBalance.transparentBal > 0 && totalBalance.privateBal > 0) {
       setPoolsToShield('all');
-    } else if (totalBalance.transparentBal > info.defaultFee) {
+    } else if (totalBalance.transparentBal > 0) {
       setPoolsToShield('transparent');
-    } else if (totalBalance.privateBal > info.defaultFee) {
+    } else if (totalBalance.privateBal > 0) {
       setPoolsToShield('sapling');
     } else {
       setPoolsToShield('');
@@ -317,7 +315,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           />
           {mode !== 'basic' &&
             totalBalance.total > 0 &&
-            (totalBalance.privateBal > info.defaultFee || totalBalance.transparentBal > info.defaultFee) && (
+            totalBalance.privateBal + totalBalance.transparentBal > info.defaultFee && (
               <TouchableOpacity onPress={() => poolsMoreInfoOnClick && poolsMoreInfoOnClick()}>
                 <View
                   style={{
@@ -356,106 +354,138 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       )}
 
       {showShieldButton && !!poolsToShield && setComputingModalVisible && (
-        <View style={{ margin: 5, flexDirection: 'row' }}>
-          <Button
-            type="Primary"
-            title={
-              translate(
-                `history.shieldfunds-${
-                  poolsToShield !== 'all'
-                    ? poolsToShield
-                    : poolsToShieldSelectSapling && poolsToShieldSelectTransparent
-                    ? 'all'
-                    : poolsToShieldSelectSapling
-                    ? 'sapling'
-                    : poolsToShieldSelectTransparent
-                    ? 'transparent'
-                    : 'all'
-                }`,
-              ) as string
-            }
-            onPress={shieldFunds}
-            disabled={poolsToShield === 'all' && !poolsToShieldSelectSapling && !poolsToShieldSelectTransparent}
-          />
-          {mode !== 'basic' &&
-            poolsToShield === 'all' &&
-            setPoolsToShieldSelectSapling &&
-            setPoolsToShieldSelectTransparent && (
-              <View style={{ alignItems: 'flex-start' }}>
-                <TouchableOpacity
-                  style={{ marginHorizontal: 10 }}
-                  onPress={() => setPoolsToShieldSelectSapling(!poolsToShieldSelectSapling)}>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      marginBottom: 10,
-                    }}>
+        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+          <FadeText style={{ fontSize: 8 }}>
+            {translate('history.shield-legend') +
+              ` ${
+                poolsToShield === 'sapling'
+                  ? totalBalance.privateBal - info.defaultFee
+                  : poolsToShield === 'transparent'
+                  ? totalBalance.transparentBal - info.defaultFee
+                  : poolsToShieldSelectSapling && poolsToShieldSelectTransparent
+                  ? totalBalance.privateBal + totalBalance.transparentBal - info.defaultFee
+                  : poolsToShieldSelectSapling
+                  ? totalBalance.privateBal - info.defaultFee
+                  : poolsToShieldSelectTransparent
+                  ? totalBalance.transparentBal - info.defaultFee
+                  : 0
+              }`}
+          </FadeText>
+          <View style={{ margin: 5, flexDirection: 'row' }}>
+            <Button
+              type="Primary"
+              title={
+                translate(
+                  `history.shieldfunds-${
+                    poolsToShield !== 'all'
+                      ? poolsToShield
+                      : poolsToShieldSelectSapling && poolsToShieldSelectTransparent
+                      ? 'all'
+                      : poolsToShieldSelectSapling
+                      ? 'sapling'
+                      : poolsToShieldSelectTransparent
+                      ? 'transparent'
+                      : 'all'
+                  }`,
+                ) as string
+              }
+              onPress={shieldFunds}
+              disabled={
+                poolsToShield === 'sapling' && totalBalance.privateBal > info.defaultFee
+                  ? false
+                  : poolsToShield === 'transparent' && totalBalance.transparentBal > info.defaultFee
+                  ? false
+                  : poolsToShieldSelectSapling &&
+                    poolsToShieldSelectTransparent &&
+                    totalBalance.privateBal + totalBalance.transparentBal > info.defaultFee
+                  ? false
+                  : poolsToShieldSelectSapling && totalBalance.privateBal > info.defaultFee
+                  ? false
+                  : poolsToShieldSelectTransparent && totalBalance.transparentBal > info.defaultFee
+                  ? false
+                  : true
+              }
+            />
+            {mode !== 'basic' &&
+              poolsToShield === 'all' &&
+              setPoolsToShieldSelectSapling &&
+              setPoolsToShieldSelectTransparent && (
+                <View style={{ alignItems: 'flex-start' }}>
+                  <TouchableOpacity
+                    style={{ marginHorizontal: 10 }}
+                    onPress={() => setPoolsToShieldSelectSapling(!poolsToShieldSelectSapling)}>
                     <View
                       style={{
                         flexDirection: 'row',
                         justifyContent: 'center',
                         alignItems: 'center',
-                        borderWidth: poolsToShieldSelectSapling ? 2 : 1,
-                        borderColor: poolsToShieldSelectSapling ? colors.primary : colors.primaryDisabled,
-                        borderRadius: 5,
-                        paddingHorizontal: 5,
+                        marginBottom: 10,
                       }}>
-                      <Text
+                      <View
                         style={{
-                          fontSize: 13,
-                          color: colors.border,
-                          marginRight: 5,
+                          flexDirection: 'row',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          borderWidth: poolsToShieldSelectSapling ? 2 : 1,
+                          borderColor: poolsToShieldSelectSapling ? colors.primary : colors.primaryDisabled,
+                          borderRadius: 5,
+                          paddingHorizontal: 5,
                         }}>
-                        {translate('history.shieldfunds-z') as string}
-                      </Text>
-                      {poolsToShieldSelectSapling ? (
-                        <FontAwesomeIcon icon={faCheck} size={14} color={colors.primary} />
-                      ) : (
-                        <FontAwesomeIcon icon={faXmark} size={14} color={'red'} />
-                      )}
+                        <Text
+                          style={{
+                            fontSize: 13,
+                            color: colors.border,
+                            marginRight: 5,
+                          }}>
+                          {translate('history.shieldfunds-z') as string}
+                        </Text>
+                        {poolsToShieldSelectSapling ? (
+                          <FontAwesomeIcon icon={faCheck} size={14} color={colors.primary} />
+                        ) : (
+                          <FontAwesomeIcon icon={faXmark} size={14} color={'red'} />
+                        )}
+                      </View>
                     </View>
-                  </View>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={{ marginHorizontal: 10 }}
-                  onPress={() => setPoolsToShieldSelectTransparent(!poolsToShieldSelectTransparent)}>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      marginBottom: 0,
-                    }}>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={{ marginHorizontal: 10 }}
+                    onPress={() => setPoolsToShieldSelectTransparent(!poolsToShieldSelectTransparent)}>
                     <View
                       style={{
                         flexDirection: 'row',
                         justifyContent: 'center',
                         alignItems: 'center',
-                        borderWidth: poolsToShieldSelectTransparent ? 2 : 1,
-                        borderColor: poolsToShieldSelectTransparent ? colors.primary : colors.primaryDisabled,
-                        borderRadius: 5,
-                        paddingHorizontal: 5,
+                        marginBottom: 0,
                       }}>
-                      <Text
+                      <View
                         style={{
-                          fontSize: 13,
-                          color: colors.border,
-                          marginRight: 5,
+                          flexDirection: 'row',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          borderWidth: poolsToShieldSelectTransparent ? 2 : 1,
+                          borderColor: poolsToShieldSelectTransparent ? colors.primary : colors.primaryDisabled,
+                          borderRadius: 5,
+                          paddingHorizontal: 5,
                         }}>
-                        {translate('history.shieldfunds-t') as string}
-                      </Text>
-                      {poolsToShieldSelectTransparent ? (
-                        <FontAwesomeIcon icon={faCheck} size={14} color={colors.primary} />
-                      ) : (
-                        <FontAwesomeIcon icon={faXmark} size={14} color={'red'} />
-                      )}
+                        <Text
+                          style={{
+                            fontSize: 13,
+                            color: colors.border,
+                            marginRight: 5,
+                          }}>
+                          {translate('history.shieldfunds-t') as string}
+                        </Text>
+                        {poolsToShieldSelectTransparent ? (
+                          <FontAwesomeIcon icon={faCheck} size={14} color={colors.primary} />
+                        ) : (
+                          <FontAwesomeIcon icon={faXmark} size={14} color={'red'} />
+                        )}
+                      </View>
                     </View>
-                  </View>
-                </TouchableOpacity>
-              </View>
-            )}
+                  </TouchableOpacity>
+                </View>
+              )}
+          </View>
         </View>
       )}
 
