@@ -1,12 +1,10 @@
 import React, { useContext } from 'react';
 
-import { ZcashURITargetClass, parseZcashURI } from '../../../app/uris';
 import RPCModule from '../../../app/RPCModule';
 import { ContextAppLoaded } from '../../../app/context';
 import { BarCodeReadEvent } from 'react-native-camera';
 import { RPCParseAddressType } from '../../../app/rpc/types/RPCParseAddressType';
 import Scanner from '../../Components/Scanner';
-import Utils from '../../../app/utils';
 
 type ScannerAddressProps = {
   updateToField: (
@@ -28,22 +26,9 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateTo
       return;
     }
     if (scannedAddress.startsWith('zcash:')) {
-      const target: string | ZcashURITargetClass = await parseZcashURI(scannedAddress, translate, server);
-      //console.log(targets);
-
-      if (typeof target !== 'string') {
-        [target].forEach(tgt => {
-          updateToField(
-            tgt.address || '',
-            Utils.maxPrecisionTrimmed(tgt.amount || 0),
-            null,
-            tgt.memoString || '',
-            null,
-          );
-        });
-        closeModal();
-        return;
-      }
+      updateToField(scannedAddress, null, null, null, null);
+      closeModal();
+      return;
     }
 
     const result: string = await RPCModule.execute('parse_address', scannedAddress);
