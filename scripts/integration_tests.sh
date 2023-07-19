@@ -281,7 +281,7 @@ else
     adb -s emulator-5554 shell mkdir -p "/sdcard/Android/media/org.ZingoLabs.Zingo/additional_test_output"
 
     echo -e "\nRunning integration tests..."
-    adb -s emulator-5554 shell am instrument -w -r -e class org.ZingoLabs.Zingo.IntegrationTestSuite \
+    adb -s emulator-5554 shell am instrument -w -r -e class org.ZingoLabs.Zingo.OfflineTestSuite \
         -e additionalTestOutputDir /sdcard/Android/media/org.ZingoLabs.Zingo/additional_test_output \
         -e testTimeoutSeconds 31536000 org.ZingoLabs.Zingo.test/androidx.test.runner.AndroidJUnitRunner \
         | tee "${test_report_dir}/test_results.txt"

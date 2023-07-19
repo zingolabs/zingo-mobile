@@ -1,4 +1,4 @@
 package org.ZingoLabs.Zingo
 
-interface IntegrationTest {
+interface OfflineTest {
 }
