@@ -3,9 +3,9 @@ use test_utils;
 use zingo_testutils::{self, scenarios};
 
 #[tokio::test]
-async fn run_offline_testsuite_arm32() {
+async fn offline_testsuite_arm32() {
     let (exit_code, output, error) =
-        test_utils::run_integration_test("armeabi-v7a", "OfflineTestSuite");
+        test_utils::android_integration_test("armeabi-v7a", "OfflineTestSuite");
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -23,7 +23,7 @@ async fn execute_sync_from_seed_x86_64() {
         .expect("Failed to generate blocks.");
 
     let (exit_code, output, error) =
-        test_utils::run_integration_test("x86_64", "ExecuteSyncFromSeed");
+        test_utils::android_integration_test("x86_64", "ExecuteSyncFromSeed");
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);

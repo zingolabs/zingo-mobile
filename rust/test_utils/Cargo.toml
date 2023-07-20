@@ -3,5 +3,3 @@ name = "test_utils"
 version = "0.1.0"
 edition = "2021"
 
-[dependencies]
-run_script = "^0.10.1"

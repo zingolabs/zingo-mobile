@@ -1,18 +1,21 @@
-use run_script::ScriptOptions;
+use std::process::Command;
 
-pub fn run_integration_test(abi: &str, test_name: &str) -> (i32, String, String) {
-    let options = ScriptOptions::new();
-    let args = vec![abi.to_string(), test_name.to_string()];
+pub fn android_integration_test(abi: &str, test_name: &str) -> (i32, String, String) {
+    let output = Command::new("sh")
+        .arg("-c")
+        .arg(format!(
+            r#"
+            cd $(git rev-parse --show-toplevel)
+            ./scripts/integration_tests.sh -a {} -e {}
+            "#,
+            abi, test_name
+        ))
+        .output()
+        .expect("Failed to execute command");
 
-    let (exit_code, output, error) = run_script::run(
-        r#"
-         cd $(git rev-parse --show-toplevel)
-         ./scripts/integration_tests.sh -a $1 -e $2
-         "#,
-        &args,
-        &options,
-    )
-    .unwrap();
+    let exit_code = output.status.code().unwrap_or(-1);
+    let stdout = String::from_utf8_lossy(&output.stdout).to_string();
+    let stderr = String::from_utf8_lossy(&output.stderr).to_string();
 
-    (exit_code, output, error)
+    (exit_code, stdout, stderr)
 }
