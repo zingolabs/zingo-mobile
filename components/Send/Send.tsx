@@ -86,9 +86,10 @@ const Send: React.FunctionComponent<SendProps> = ({
   const slideAnim = useRef(new Animated.Value(0)).current;
   const defaultFee = info.defaultFee || Utils.getFallbackDefaultFee();
   const { decimalSeparator } = getNumberFormatSettings();
-  const spendable = totalBalance.transparentBal + totalBalance.spendablePrivate + totalBalance.spendableOrchard;
-  const stillConfirming = parseFloat(spendable.toFixed(8)) !== totalBalance.total;
-  const showShieldInfo = totalBalance && (totalBalance.transparentBal > 0 || totalBalance.privateBal > 0);
+  // transparent is not spendable.
+  const spendable = totalBalance.spendablePrivate + totalBalance.spendableOrchard;
+  const stillConfirming = parseFloat(spendable.toFixed(8)) !== totalBalance.total - totalBalance.transparentBal;
+  const showShieldInfo = totalBalance && totalBalance.transparentBal + totalBalance.privateBal > info.defaultFee;
 
   const getMaxAmount = useCallback((): number => {
     let max = spendable - defaultFee;

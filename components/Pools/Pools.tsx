@@ -129,6 +129,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, set_privacy_op
                 amtZec={totalBalance.transparentBal}
                 size={18}
                 currencyName={info.currencyName ? info.currencyName : ''}
+                color={'red'}
                 privacy={privacy}
               />
             </DetailLine>

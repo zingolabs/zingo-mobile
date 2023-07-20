@@ -331,6 +331,7 @@
     "shieldfunds-z": "Sapling",
     "shield-message": "Shielded in Tx:",
     "shield-error": "Error Shielding :",
+    "shield-legend": "Increase your shielded spendable balance by shielding: ",
     "title": "History",
     "title-syncing": "History - Syncing",
     "more": "more...",

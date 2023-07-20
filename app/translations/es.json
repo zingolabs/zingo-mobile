@@ -331,6 +331,7 @@
     "shieldfunds-z": "Sapling",
     "shield-message": "Blindada en Tx:",
     "shield-error": "Error Blindando :",
+    "shield-legend": "Aumenta tu balance blindado gastable en: ",
     "title": "Histórico",
     "title-syncing": "Histórico - Sincronizando",
     "more": "ver más...",
