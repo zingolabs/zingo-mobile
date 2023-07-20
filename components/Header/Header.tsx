@@ -358,15 +358,17 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           <FadeText style={{ fontSize: 8 }}>
             {translate('history.shield-legend') +
               ` ${
-                poolsToShield === 'sapling'
+                poolsToShield === 'sapling' && totalBalance.privateBal > info.defaultFee
                   ? (totalBalance.privateBal - info.defaultFee).toFixed(8)
-                  : poolsToShield === 'transparent'
+                  : poolsToShield === 'transparent' && totalBalance.transparentBal > info.defaultFee
                   ? (totalBalance.transparentBal - info.defaultFee).toFixed(8)
-                  : poolsToShieldSelectSapling && poolsToShieldSelectTransparent
+                  : poolsToShieldSelectSapling &&
+                    poolsToShieldSelectTransparent &&
+                    totalBalance.privateBal + totalBalance.transparentBal > info.defaultFee
                   ? (totalBalance.privateBal + totalBalance.transparentBal - info.defaultFee).toFixed(8)
-                  : poolsToShieldSelectSapling
+                  : poolsToShieldSelectSapling && totalBalance.privateBal > info.defaultFee
                   ? (totalBalance.privateBal - info.defaultFee).toFixed(8)
-                  : poolsToShieldSelectTransparent
+                  : poolsToShieldSelectTransparent && totalBalance.transparentBal > info.defaultFee
                   ? (totalBalance.transparentBal - info.defaultFee).toFixed(8)
                   : 0
               }`}
