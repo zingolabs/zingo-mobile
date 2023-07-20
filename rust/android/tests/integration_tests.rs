@@ -3,8 +3,9 @@ use test_utils;
 use zingo_testutils::{self, scenarios};
 
 #[tokio::test]
-async fn run_offline_testsuite() {
-    let (exit_code, output, error) = test_utils::run_integration_test("x86_64", "OfflineTestSuite");
+async fn run_offline_testsuite_arm32() {
+    let (exit_code, output, error) =
+        test_utils::run_integration_test("armeabi-v7a", "OfflineTestSuite");
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -14,8 +15,8 @@ async fn run_offline_testsuite() {
 }
 
 #[tokio::test]
-async fn execute_sync_from_seed() {
-    let (regtest_manager, child_process_handler) = scenarios::mobile_basic().await;
+async fn execute_sync_from_seed_x86_64() {
+    let (regtest_manager, _child_process_handler) = scenarios::mobile_basic().await;
 
     regtest_manager
         .generate_n_blocks(10)
@@ -29,6 +30,4 @@ async fn execute_sync_from_seed() {
     println!("Error: {}", error);
 
     assert_eq!(exit_code, 0);
-
-    drop(child_process_handler);
 }
