@@ -2,9 +2,11 @@
 set -Eeuo pipefail
 
 set_abi=false
+set_test_name=false
 set_api_level=false
 set_api_target=false
 create_snapshot=false
+test_name_default="OfflineTestSuite"
 valid_api_levels=("23" "24" "25" "26" "27" "28" "29" "30" "31" "32" "33")
 valid_api_targets=("default" "google_apis" "google_apis_playstore" "google_atd" "google-tv" \
     "aosp_atd" "android-tv" "android-desktop" "android-wear" "android-wear-cn")
@@ -49,7 +51,7 @@ function wait_for() {
     fi
 }
 
-while getopts 'a:l:t:sx:h' OPTION; do
+while getopts 'a:l:e:t:sx:h' OPTION; do
     case "$OPTION" in
         a)
             abi="$OPTARG"
@@ -81,6 +83,10 @@ while getopts 'a:l:t:sx:h' OPTION; do
                     ;;
             esac
             set_abi=true
+            ;;
+        e)
+            test_name="$OPTARG"
+            set_test_name=true
             ;;
         l)
             api_level="$OPTARG"
@@ -127,6 +133,8 @@ while getopts 'a:l:t:sx:h' OPTION; do
             echo -e "      \t\t  'x86' - default system image: API 30 google_apis_playstore x86"
             echo -e "      \t\t  'arm64-v8a' - default system image: API 30 google_apis_playstore x86_64"
             echo -e "      \t\t  'armeabi-v7a' - default system image: API 30 google_apis_playstore x86"
+            echo -e "\n  -e\t\tSelect test name or test suite (optional)"
+            echo -e "      \t\t  Default: OfflineTestSuite"
             echo -e "\n  -l\t\tSelect API level (optional)"
             echo -e "      \t\t  Minimum API level: 23"
             echo -e "\n  -t\t\tSelect API target (optional)"
@@ -162,6 +170,9 @@ if [[ $set_abi == false ]]; then
 fi
 
 # Set defaults
+if [[ $set_test_name == false ]]; then
+    test_name=$test_name_default
+fi
 if [[ $set_api_level == false ]]; then
     api_level=$api_level_default
 fi
@@ -281,7 +292,7 @@ else
     adb -s emulator-5554 shell mkdir -p "/sdcard/Android/media/org.ZingoLabs.Zingo/additional_test_output"
 
     echo -e "\nRunning integration tests..."
-    adb -s emulator-5554 shell am instrument -w -r -e class org.ZingoLabs.Zingo.IntegrationTestSuite \
+    adb -s emulator-5554 shell am instrument -w -r -e class org.ZingoLabs.Zingo.$test_name \
         -e additionalTestOutputDir /sdcard/Android/media/org.ZingoLabs.Zingo/additional_test_output \
         -e testTimeoutSeconds 31536000 org.ZingoLabs.Zingo.test/androidx.test.runner.AndroidJUnitRunner \
         | tee "${test_report_dir}/test_results.txt"

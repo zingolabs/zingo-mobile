@@ -213,7 +213,7 @@ RCT_REMAP_METHOD(deleteExistingWalletBackup,
                     (NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
 
-    char* seed = init_new([server UTF8String], [documentsDirectory UTF8String], [chainhint UTF8String]);
+    char* seed = init_new([server UTF8String], [documentsDirectory UTF8String], [chainhint UTF8String], "true");
     NSString* seedStr = [NSString stringWithUTF8String:seed];
     rust_free(seed);
 
@@ -256,7 +256,7 @@ RCT_REMAP_METHOD(restoreWalletFromSeed,
                     (NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
 
-    char* seed = initfromseed([server UTF8String], [restoreSeed UTF8String], [birthday UTF8String], [documentsDirectory UTF8String], [chainhint UTF8String]);
+    char* seed = initfromseed([server UTF8String], [restoreSeed UTF8String], [birthday UTF8String], [documentsDirectory UTF8String], [chainhint UTF8String], "true");
     NSString* seedStr = [NSString stringWithUTF8String:seed];
     rust_free(seed);
 
@@ -285,7 +285,7 @@ RCT_REMAP_METHOD(restoreWalletFromUfvk,
                     (NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
 
-    char* ufvk = initfromufvk([server UTF8String], [restoreUfvk UTF8String], [birthday UTF8String], [documentsDirectory UTF8String], [chainhint UTF8String]);
+    char* ufvk = initfromufvk([server UTF8String], [restoreUfvk UTF8String], [birthday UTF8String], [documentsDirectory UTF8String], [chainhint UTF8String], "true");
     NSString* ufvkStr = [NSString stringWithUTF8String:ufvk];
     rust_free(ufvk);
 
@@ -309,7 +309,7 @@ RCT_REMAP_METHOD(restoreWalletFromUfvk,
     NSArray *paths = NSSearchPathForDirectoriesInDomains
                     (NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
-    char* seed = initfromb64([server UTF8String], [walletDataStr UTF8String], [documentsDirectory UTF8String], [chainhint UTF8String]);
+    char* seed = initfromb64([server UTF8String], [walletDataStr UTF8String], [documentsDirectory UTF8String], [chainhint UTF8String], "true");
     NSString* seedStr = [NSString stringWithUTF8String:seed];
     rust_free(seed);
 
