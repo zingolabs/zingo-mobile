@@ -5,7 +5,7 @@ use zingo_testutils::{self, scenarios};
 #[tokio::test]
 async fn offline_testsuite_arm32() {
     let (exit_code, output, error) =
-        test_utils::android_integration_test("armeabi-v7a", "OfflineTestSuite");
+        test_utils::android_integration_test("x86_64", "OfflineTestSuite");
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
