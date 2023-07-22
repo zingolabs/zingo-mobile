@@ -55,7 +55,7 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({ color, style, size
     <View style={{ ...style, flexDirection: 'row', alignItems: 'baseline' }}>
       <TouchableOpacity disabled={!privacyHigh} onPress={onPress}>
         <View style={{ ...style, flexDirection: 'row', alignItems: 'baseline' }}>
-          <Text style={{ fontSize: size, color }}>{'\u1647'}</Text>
+          <Text style={{ fontSize: size, color }}>{'\u1647' + 'EC'}</Text>
           {privacyHigh ? (
             <Text style={{ fontSize: size, fontWeight: '700', color }}>{' -' + decimalSeparator + '----'}</Text>
           ) : (
@@ -66,7 +66,6 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({ color, style, size
           {splits.smallPart !== '0000' && !privacyHigh && (
             <Text style={{ fontSize: size * 0.7, color, paddingBottom: alignmentPadding }}>{splits.smallPart}</Text>
           )}
-          <Text style={{ fontSize: size, color }}>{' ' + currencyName}</Text>
         </View>
       </TouchableOpacity>
     </View>

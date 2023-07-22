@@ -251,6 +251,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, set_privac
         noSyncingStatus={true}
         noDrawMenu={true}
         set_privacy_option={set_privacy_option}
+        addLastSnackbar={addLastSnackbar}
       />
 
       <View style={{ width: '100%', flexDirection: 'row', marginTop: 10 }}>

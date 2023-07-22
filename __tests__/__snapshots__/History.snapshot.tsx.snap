@@ -33,21 +33,179 @@ exports[`Component History - test History currency USD, privacy high & mode expe
     }
     testID="header"
   >
-    <Image
-      source={
-        {
-          "testUri": "../../../assets/img/logobig-zingo.png",
-        }
-      }
+    <View
       style={
         {
-          "borderRadius": 10,
-          "height": 50,
-          "resizeMode": "contain",
-          "width": 50,
+          "alignItems": "center",
+          "display": "flex",
+          "flexDirection": "row",
+          "flexWrap": "wrap",
+          "height": 40,
+          "justifyContent": "center",
+          "marginHorizontal": 5,
+          "marginVertical": 5,
         }
       }
-    />
+    >
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "borderColor": undefined,
+            "borderRadius": 10,
+            "borderWidth": 1,
+            "justifyContent": "center",
+            "margin": 0,
+            "marginRight": 5,
+            "minHeight": 25,
+            "minWidth": 25,
+            "padding": 1,
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "margin": 0,
+              "padding": 0,
+            }
+          }
+        >
+          <
+            icon={
+              {
+                "icon": [
+                  640,
+                  512,
+                  [
+                    "wifi-3",
+                    "wifi-strong",
+                  ],
+                  "f1eb",
+                  "M54.2 202.9C123.2 136.7 216.8 96 320 96s196.8 40.7 265.8 106.9c12.8 12.2 33 11.8 45.2-.9s11.8-33-.9-45.2C549.7 79.5 440.4 32 320 32S90.3 79.5 9.8 156.7C-2.9 169-3.3 189.2 8.9 202s32.5 13.2 45.2 .9zM320 256c56.8 0 108.6 21.1 148.2 56c13.3 11.7 33.5 10.4 45.2-2.8s10.4-33.5-2.8-45.2C459.8 219.2 393 192 320 192s-139.8 27.2-190.5 72c-13.3 11.7-14.5 31.9-2.8 45.2s31.9 14.5 45.2 2.8c39.5-34.9 91.3-56 148.2-56zm64 160c0-35.3-28.7-64-64-64s-64 28.7-64 64s28.7 64 64 64s64-28.7 64-64z",
+                ],
+                "iconName": "wifi",
+                "prefix": "fas",
+              }
+            }
+            size={18}
+          />
+        </View>
+      </View>
+      <View
+        accessible={true}
+        collapsable={false}
+        focusable={true}
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          {
+            "opacity": 1,
+          }
+        }
+      >
+        <
+          color="red"
+          icon={
+            {
+              "icon": [
+                640,
+                512,
+                [
+                  62337,
+                  "cloud-download",
+                  "cloud-download-alt",
+                ],
+                "f0ed",
+                "M144 480C64.5 480 0 415.5 0 336c0-62.8 40.2-116.2 96.2-135.9c-.1-2.7-.2-5.4-.2-8.1c0-88.4 71.6-160 160-160c59.3 0 111 32.2 138.7 80.2C409.9 102 428.3 96 448 96c53 0 96 43 96 96c0 12.2-2.3 23.8-6.4 34.6C596 238.4 640 290.1 640 352c0 70.7-57.3 128-128 128H144zm79-167l80 80c9.4 9.4 24.6 9.4 33.9 0l80-80c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-39 39V184c0-13.3-10.7-24-24-24s-24 10.7-24 24V318.1l-39-39c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9z",
+              ],
+              "iconName": "cloud-arrow-down",
+              "prefix": "fas",
+            }
+          }
+          size={20}
+        />
+      </View>
+      <View
+        accessible={true}
+        collapsable={false}
+        focusable={true}
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          {
+            "marginHorizontal": 5,
+            "opacity": 1,
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "justifyContent": "center",
+              "marginTop": 5,
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "borderColor": "rgb(0, 122, 255)",
+                "borderRadius": 5,
+                "borderWidth": 2,
+                "flexDirection": "row",
+                "justifyContent": "center",
+                "paddingHorizontal": 5,
+              }
+            }
+          >
+            <Text
+              style={
+                {
+                  "color": "rgb(216, 216, 216)",
+                  "fontSize": 13,
+                  "marginRight": 5,
+                }
+              }
+            >
+              text translated
+            </Text>
+            <
+              color="rgb(0, 122, 255)"
+              icon={
+                {
+                  "icon": [
+                    448,
+                    512,
+                    [
+                      128274,
+                    ],
+                    "f023",
+                    "M144 144v48H304V144c0-44.2-35.8-80-80-80s-80 35.8-80 80zM80 192V144C80 64.5 144.5 0 224 0s144 64.5 144 144v48h16c35.3 0 64 28.7 64 64V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V256c0-35.3 28.7-64 64-64H80z",
+                  ],
+                  "iconName": "lock",
+                  "prefix": "fas",
+                }
+              }
+              size={14}
+            />
+          </View>
+        </View>
+      </View>
+    </View>
     <View
       style={
         {
@@ -292,123 +450,26 @@ exports[`Component History - test History currency USD, privacy high & mode expe
         {
           "alignItems": "center",
           "display": "flex",
-          "flexDirection": "row",
+          "flexDirection": "column",
           "flexWrap": "wrap",
           "justifyContent": "center",
-          "marginVertical": 5,
         }
       }
     >
-      <View
+      <Text
         style={
           {
-            "alignItems": "center",
-            "display": "flex",
-            "flexDirection": "column",
-            "flexWrap": "wrap",
-            "justifyContent": "center",
-          }
-        }
-      >
-        <Text
-          style={
-            {
-              "color": "rgb(28, 28, 30)",
-              "fontSize": 18,
-              "fontWeight": "600",
-              "opacity": 1,
-              "paddingHorizontal": 5,
-            }
-          }
-          testID="transaction text"
-        >
-          text translated
-        </Text>
-      </View>
-      <View
-        style={
-          {
-            "alignItems": "center",
-            "borderColor": undefined,
-            "borderRadius": 10,
-            "borderWidth": 1,
-            "justifyContent": "center",
-            "margin": 0,
-            "marginRight": 5,
-            "minHeight": 25,
-            "minWidth": 25,
-            "padding": 1,
-          }
-        }
-      >
-        <View
-          style={
-            {
-              "margin": 0,
-              "padding": 0,
-            }
-          }
-        >
-          <
-            icon={
-              {
-                "icon": [
-                  640,
-                  512,
-                  [
-                    "wifi-3",
-                    "wifi-strong",
-                  ],
-                  "f1eb",
-                  "M54.2 202.9C123.2 136.7 216.8 96 320 96s196.8 40.7 265.8 106.9c12.8 12.2 33 11.8 45.2-.9s11.8-33-.9-45.2C549.7 79.5 440.4 32 320 32S90.3 79.5 9.8 156.7C-2.9 169-3.3 189.2 8.9 202s32.5 13.2 45.2 .9zM320 256c56.8 0 108.6 21.1 148.2 56c13.3 11.7 33.5 10.4 45.2-2.8s10.4-33.5-2.8-45.2C459.8 219.2 393 192 320 192s-139.8 27.2-190.5 72c-13.3 11.7-14.5 31.9-2.8 45.2s31.9 14.5 45.2 2.8c39.5-34.9 91.3-56 148.2-56zm64 160c0-35.3-28.7-64-64-64s-64 28.7-64 64s28.7 64 64 64s64-28.7 64-64z",
-                ],
-                "iconName": "wifi",
-                "prefix": "fas",
-              }
-            }
-            size={18}
-          />
-        </View>
-      </View>
-      <View
-        accessible={true}
-        collapsable={false}
-        focusable={true}
-        onClick={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
-        style={
-          {
+            "color": "rgb(28, 28, 30)",
+            "fontSize": 18,
+            "fontWeight": "600",
             "opacity": 1,
+            "paddingHorizontal": 5,
           }
         }
+        testID="transaction text"
       >
-        <
-          color="red"
-          icon={
-            {
-              "icon": [
-                640,
-                512,
-                [
-                  62337,
-                  "cloud-download",
-                  "cloud-download-alt",
-                ],
-                "f0ed",
-                "M144 480C64.5 480 0 415.5 0 336c0-62.8 40.2-116.2 96.2-135.9c-.1-2.7-.2-5.4-.2-8.1c0-88.4 71.6-160 160-160c59.3 0 111 32.2 138.7 80.2C409.9 102 428.3 96 448 96c53 0 96 43 96 96c0 12.2-2.3 23.8-6.4 34.6C596 238.4 640 290.1 640 352c0 70.7-57.3 128-128 128H144zm79-167l80 80c9.4 9.4 24.6 9.4 33.9 0l80-80c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-39 39V184c0-13.3-10.7-24-24-24s-24 10.7-24 24V318.1l-39-39c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9z",
-              ],
-              "iconName": "cloud-arrow-down",
-              "prefix": "fas",
-            }
-          }
-          size={20}
-        />
-      </View>
+        text translated
+      </Text>
     </View>
     <View
       style={
@@ -464,7 +525,7 @@ exports[`Component History - test History currency USD, privacy high & mode expe
                 "prefix": "fas",
               }
             }
-            size={48}
+            size={45}
           />
         </View>
       </View>
@@ -473,125 +534,27 @@ exports[`Component History - test History currency USD, privacy high & mode expe
       style={
         {
           "alignItems": "flex-end",
-          "padding": 15,
+          "padding": 10,
           "position": "absolute",
           "right": 0,
         }
       }
     >
-      <Text
-        style={
+      <Image
+        source={
           {
-            "color": "rgb(216, 216, 216)",
-            "fontSize": 8,
+            "testUri": "../../../assets/img/logobig-zingo.png",
           }
         }
-      >
-        text translated
-      </Text>
-      <Text
         style={
           {
-            "color": "rgb(216, 216, 216)",
-            "fontSize": 8,
+            "borderRadius": 10,
+            "height": 45,
+            "resizeMode": "contain",
+            "width": 45,
           }
         }
-      >
-        text translatedtext translated
-      </Text>
-      <Text
-        style={
-          {
-            "color": "rgb(216, 216, 216)",
-            "fontSize": 8,
-          }
-        }
-      >
-        (undefinedxundefined)-undefined
-      </Text>
-      <View
-        accessible={true}
-        collapsable={false}
-        focusable={true}
-        onClick={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
-        style={
-          {
-            "opacity": 1,
-          }
-        }
-      >
-        <View
-          style={
-            {
-              "alignItems": "center",
-              "flexDirection": "row",
-              "justifyContent": "center",
-              "marginTop": 5,
-            }
-          }
-        >
-          <Text
-            style={
-              {
-                "color": "rgb(216, 216, 216)",
-                "fontSize": 13,
-              }
-            }
-          >
-            text translated
-          </Text>
-          <View
-            style={
-              {
-                "alignItems": "center",
-                "borderColor": "rgb(0, 122, 255)",
-                "borderRadius": 5,
-                "borderWidth": 2,
-                "flexDirection": "row",
-                "justifyContent": "center",
-                "paddingHorizontal": 5,
-              }
-            }
-          >
-            <Text
-              style={
-                {
-                  "color": "rgb(216, 216, 216)",
-                  "fontSize": 13,
-                  "marginRight": 5,
-                }
-              }
-            >
-              text translated
-            </Text>
-            <
-              color="rgb(0, 122, 255)"
-              icon={
-                {
-                  "icon": [
-                    448,
-                    512,
-                    [
-                      128274,
-                    ],
-                    "f023",
-                    "M144 144v48H304V144c0-44.2-35.8-80-80-80s-80 35.8-80 80zM80 192V144C80 64.5 144.5 0 224 0s144 64.5 144 144v48h16c35.3 0 64 28.7 64 64V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V256c0-35.3 28.7-64 64-64H80z",
-                  ],
-                  "iconName": "lock",
-                  "prefix": "fas",
-                }
-              }
-              size={14}
-            />
-          </View>
-        </View>
-      </View>
+      />
     </View>
     <View
       style={
@@ -1072,21 +1035,66 @@ exports[`Component History - test History no currency, privacy normal & mode bas
     }
     testID="header"
   >
-    <Image
-      source={
-        {
-          "testUri": "../../../assets/img/logobig-zingo.png",
-        }
-      }
+    <View
       style={
         {
-          "borderRadius": 10,
-          "height": 50,
-          "resizeMode": "contain",
-          "width": 50,
+          "alignItems": "center",
+          "display": "flex",
+          "flexDirection": "row",
+          "flexWrap": "wrap",
+          "height": 40,
+          "justifyContent": "center",
+          "marginHorizontal": 5,
+          "marginVertical": 5,
         }
       }
-    />
+    >
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "borderColor": undefined,
+            "borderRadius": 10,
+            "borderWidth": 1,
+            "justifyContent": "center",
+            "margin": 0,
+            "marginRight": 5,
+            "minHeight": 25,
+            "minWidth": 25,
+            "padding": 1,
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "margin": 0,
+              "padding": 0,
+            }
+          }
+        >
+          <
+            icon={
+              {
+                "icon": [
+                  640,
+                  512,
+                  [
+                    "wifi-3",
+                    "wifi-strong",
+                  ],
+                  "f1eb",
+                  "M54.2 202.9C123.2 136.7 216.8 96 320 96s196.8 40.7 265.8 106.9c12.8 12.2 33 11.8 45.2-.9s11.8-33-.9-45.2C549.7 79.5 440.4 32 320 32S90.3 79.5 9.8 156.7C-2.9 169-3.3 189.2 8.9 202s32.5 13.2 45.2 .9zM320 256c56.8 0 108.6 21.1 148.2 56c13.3 11.7 33.5 10.4 45.2-2.8s10.4-33.5-2.8-45.2C459.8 219.2 393 192 320 192s-139.8 27.2-190.5 72c-13.3 11.7-14.5 31.9-2.8 45.2s31.9 14.5 45.2 2.8c39.5-34.9 91.3-56 148.2-56zm64 160c0-35.3-28.7-64-64-64s-64 28.7-64 64s28.7 64 64 64s64-28.7 64-64z",
+                ],
+                "iconName": "wifi",
+                "prefix": "fas",
+              }
+            }
+            size={18}
+          />
+        </View>
+      </View>
+    </View>
     <View
       style={
         {
@@ -1187,84 +1195,26 @@ exports[`Component History - test History no currency, privacy normal & mode bas
         {
           "alignItems": "center",
           "display": "flex",
-          "flexDirection": "row",
+          "flexDirection": "column",
           "flexWrap": "wrap",
           "justifyContent": "center",
-          "marginVertical": 5,
         }
       }
     >
-      <View
+      <Text
         style={
           {
-            "alignItems": "center",
-            "display": "flex",
-            "flexDirection": "column",
-            "flexWrap": "wrap",
-            "justifyContent": "center",
+            "color": "rgb(28, 28, 30)",
+            "fontSize": 18,
+            "fontWeight": "600",
+            "opacity": 1,
+            "paddingHorizontal": 5,
           }
         }
+        testID="transaction text"
       >
-        <Text
-          style={
-            {
-              "color": "rgb(28, 28, 30)",
-              "fontSize": 18,
-              "fontWeight": "600",
-              "opacity": 1,
-              "paddingHorizontal": 5,
-            }
-          }
-          testID="transaction text"
-        >
-          text translated
-        </Text>
-      </View>
-      <View
-        style={
-          {
-            "alignItems": "center",
-            "borderColor": undefined,
-            "borderRadius": 10,
-            "borderWidth": 1,
-            "justifyContent": "center",
-            "margin": 0,
-            "marginRight": 5,
-            "minHeight": 25,
-            "minWidth": 25,
-            "padding": 1,
-          }
-        }
-      >
-        <View
-          style={
-            {
-              "margin": 0,
-              "padding": 0,
-            }
-          }
-        >
-          <
-            icon={
-              {
-                "icon": [
-                  640,
-                  512,
-                  [
-                    "wifi-3",
-                    "wifi-strong",
-                  ],
-                  "f1eb",
-                  "M54.2 202.9C123.2 136.7 216.8 96 320 96s196.8 40.7 265.8 106.9c12.8 12.2 33 11.8 45.2-.9s11.8-33-.9-45.2C549.7 79.5 440.4 32 320 32S90.3 79.5 9.8 156.7C-2.9 169-3.3 189.2 8.9 202s32.5 13.2 45.2 .9zM320 256c56.8 0 108.6 21.1 148.2 56c13.3 11.7 33.5 10.4 45.2-2.8s10.4-33.5-2.8-45.2C459.8 219.2 393 192 320 192s-139.8 27.2-190.5 72c-13.3 11.7-14.5 31.9-2.8 45.2s31.9 14.5 45.2 2.8c39.5-34.9 91.3-56 148.2-56zm64 160c0-35.3-28.7-64-64-64s-64 28.7-64 64s28.7 64 64 64s64-28.7 64-64z",
-                ],
-                "iconName": "wifi",
-                "prefix": "fas",
-              }
-            }
-            size={18}
-          />
-        </View>
-      </View>
+        text translated
+      </Text>
     </View>
     <View
       style={
@@ -1320,10 +1270,36 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                 "prefix": "fas",
               }
             }
-            size={48}
+            size={45}
           />
         </View>
       </View>
+    </View>
+    <View
+      style={
+        {
+          "alignItems": "flex-end",
+          "padding": 10,
+          "position": "absolute",
+          "right": 0,
+        }
+      }
+    >
+      <Image
+        source={
+          {
+            "testUri": "../../../assets/img/logobig-zingo.png",
+          }
+        }
+        style={
+          {
+            "borderRadius": 10,
+            "height": 45,
+            "resizeMode": "contain",
+            "width": 45,
+          }
+        }
+      />
     </View>
     <View
       style={

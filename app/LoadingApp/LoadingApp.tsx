@@ -556,6 +556,13 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     await RPC.rpc_setWalletSettingOption(name, value);
   };
 
+  set_privacy_option = async (name: 'privacy', value: boolean): Promise<void> => {
+    await SettingsFileImpl.writeSettings(name, value);
+    this.setState({
+      privacy: value as boolean,
+    });
+  };
+
   setBackgroundError = (title: string, error: string) => {
     this.setState({ backgroundError: { title, error } });
   };
@@ -986,6 +993,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                   onClickOK={() => this.navigateToLoadedApp()}
                   onClickCancel={() => this.navigateToLoadedApp()}
                   action={'new'}
+                  set_privacy_option={this.set_privacy_option}
                 />
               </Suspense>
             </Modal>
@@ -1006,6 +1014,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                   onClickOK={(s: string, b: number) => this.doRestore(s, b, 'seed')}
                   onClickCancel={() => this.setState({ screen: 1, actionButtonsDisabled: false })}
                   action={'restore'}
+                  set_privacy_option={this.set_privacy_option}
                 />
               </Suspense>
             </Modal>
