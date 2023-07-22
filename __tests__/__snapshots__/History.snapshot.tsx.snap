@@ -259,11 +259,30 @@ exports[`Component History - test History currency USD, privacy high & mode expe
               style={
                 {
                   "color": "rgb(28, 28, 30)",
-                  "fontSize": 36,
+                  "fontSize": 25.2,
+                  "transform": [
+                    {
+                      "scale": 2,
+                    },
+                    {
+                      "translateY": 3.96,
+                    },
+                  ],
                 }
               }
             >
               ᙇ
+            </Text>
+            <Text
+              style={
+                {
+                  "color": "rgb(28, 28, 30)",
+                  "fontSize": 25.2,
+                  "marginLeft": 5.3999999999999995,
+                }
+              }
+            >
+              EC
             </Text>
             <Text
               style={
@@ -275,16 +294,6 @@ exports[`Component History - test History currency USD, privacy high & mode expe
               }
             >
                -.----
-            </Text>
-            <Text
-              style={
-                {
-                  "color": "rgb(28, 28, 30)",
-                  "fontSize": 36,
-                }
-              }
-            >
-               ZEC
             </Text>
           </View>
         </View>
@@ -360,18 +369,6 @@ exports[`Component History - test History currency USD, privacy high & mode expe
               }
             >
                -.--
-            </Text>
-            <Text
-              style={
-                {
-                  "color": undefined,
-                  "fontSize": 20,
-                  "marginBottom": 5,
-                  "marginTop": 0,
-                }
-              }
-            >
-               USD
             </Text>
           </View>
         </View>
@@ -474,6 +471,7 @@ exports[`Component History - test History currency USD, privacy high & mode expe
     <View
       style={
         {
+          "alignItems": "flex-start",
           "left": 0,
           "padding": 10,
           "position": "absolute",
@@ -534,7 +532,7 @@ exports[`Component History - test History currency USD, privacy high & mode expe
       style={
         {
           "alignItems": "flex-end",
-          "padding": 10,
+          "padding": 15,
           "position": "absolute",
           "right": 0,
         }
@@ -549,9 +547,9 @@ exports[`Component History - test History currency USD, privacy high & mode expe
         style={
           {
             "borderRadius": 10,
-            "height": 45,
+            "height": 38,
             "resizeMode": "contain",
-            "width": 45,
+            "width": 38,
           }
         }
       />
@@ -761,10 +759,29 @@ exports[`Component History - test History currency USD, privacy high & mode expe
                       {
                         "color": "rgb(0, 122, 255)",
                         "fontSize": 18,
+                        "transform": [
+                          {
+                            "scale": 2,
+                          },
+                          {
+                            "translateY": 2.88,
+                          },
+                        ],
                       }
                     }
                   >
                     ᙇ
+                  </Text>
+                  <Text
+                    style={
+                      {
+                        "color": "rgb(0, 122, 255)",
+                        "fontSize": 18,
+                        "marginLeft": 3.6,
+                      }
+                    }
+                  >
+                    EC
                   </Text>
                   <Text
                     style={
@@ -776,16 +793,6 @@ exports[`Component History - test History currency USD, privacy high & mode expe
                     }
                   >
                      -.----
-                  </Text>
-                  <Text
-                    style={
-                      {
-                        "color": "rgb(0, 122, 255)",
-                        "fontSize": 18,
-                      }
-                    }
-                  >
-                     ᙇ
                   </Text>
                 </View>
               </View>
@@ -942,10 +949,29 @@ exports[`Component History - test History currency USD, privacy high & mode expe
                       {
                         "color": "rgb(0, 122, 255)",
                         "fontSize": 18,
+                        "transform": [
+                          {
+                            "scale": 2,
+                          },
+                          {
+                            "translateY": 2.88,
+                          },
+                        ],
                       }
                     }
                   >
                     ᙇ
+                  </Text>
+                  <Text
+                    style={
+                      {
+                        "color": "rgb(0, 122, 255)",
+                        "fontSize": 18,
+                        "marginLeft": 3.6,
+                      }
+                    }
+                  >
+                    EC
                   </Text>
                   <Text
                     style={
@@ -957,16 +983,6 @@ exports[`Component History - test History currency USD, privacy high & mode expe
                     }
                   >
                      -.----
-                  </Text>
-                  <Text
-                    style={
-                      {
-                        "color": "rgb(0, 122, 255)",
-                        "fontSize": 18,
-                      }
-                    }
-                  >
-                     ᙇ
                   </Text>
                 </View>
               </View>
@@ -1148,11 +1164,30 @@ exports[`Component History - test History no currency, privacy normal & mode bas
               style={
                 {
                   "color": "rgb(28, 28, 30)",
-                  "fontSize": 36,
+                  "fontSize": 25.2,
+                  "transform": [
+                    {
+                      "scale": 2,
+                    },
+                    {
+                      "translateY": 3.96,
+                    },
+                  ],
                 }
               }
             >
               ᙇ
+            </Text>
+            <Text
+              style={
+                {
+                  "color": "rgb(28, 28, 30)",
+                  "fontSize": 25.2,
+                  "marginLeft": 5.3999999999999995,
+                }
+              }
+            >
+              EC
             </Text>
             <Text
               style={
@@ -1175,16 +1210,6 @@ exports[`Component History - test History no currency, privacy normal & mode bas
               }
             >
               5678
-            </Text>
-            <Text
-              style={
-                {
-                  "color": "rgb(28, 28, 30)",
-                  "fontSize": 36,
-                }
-              }
-            >
-               ZEC
             </Text>
           </View>
         </View>
@@ -1219,6 +1244,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
     <View
       style={
         {
+          "alignItems": "flex-start",
           "left": 0,
           "padding": 10,
           "position": "absolute",
@@ -1279,7 +1305,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
       style={
         {
           "alignItems": "flex-end",
-          "padding": 10,
+          "padding": 15,
           "position": "absolute",
           "right": 0,
         }
@@ -1294,9 +1320,9 @@ exports[`Component History - test History no currency, privacy normal & mode bas
         style={
           {
             "borderRadius": 10,
-            "height": 45,
+            "height": 38,
             "resizeMode": "contain",
-            "width": 45,
+            "width": 38,
           }
         }
       />
@@ -1506,10 +1532,29 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                       {
                         "color": "rgb(0, 122, 255)",
                         "fontSize": 18,
+                        "transform": [
+                          {
+                            "scale": 2,
+                          },
+                          {
+                            "translateY": 2.88,
+                          },
+                        ],
                       }
                     }
                   >
                     ᙇ
+                  </Text>
+                  <Text
+                    style={
+                      {
+                        "color": "rgb(0, 122, 255)",
+                        "fontSize": 18,
+                        "marginLeft": 3.6,
+                      }
+                    }
+                  >
+                    EC
                   </Text>
                   <Text
                     style={
@@ -1532,16 +1577,6 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                     }
                   >
                     5678
-                  </Text>
-                  <Text
-                    style={
-                      {
-                        "color": "rgb(0, 122, 255)",
-                        "fontSize": 18,
-                      }
-                    }
-                  >
-                     ᙇ
                   </Text>
                 </View>
               </View>
@@ -1698,10 +1733,29 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                       {
                         "color": "rgb(0, 122, 255)",
                         "fontSize": 18,
+                        "transform": [
+                          {
+                            "scale": 2,
+                          },
+                          {
+                            "translateY": 2.88,
+                          },
+                        ],
                       }
                     }
                   >
                     ᙇ
+                  </Text>
+                  <Text
+                    style={
+                      {
+                        "color": "rgb(0, 122, 255)",
+                        "fontSize": 18,
+                        "marginLeft": 3.6,
+                      }
+                    }
+                  >
+                    EC
                   </Text>
                   <Text
                     style={
@@ -1724,16 +1778,6 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                     }
                   >
                     4321
-                  </Text>
-                  <Text
-                    style={
-                      {
-                        "color": "rgb(0, 122, 255)",
-                        "fontSize": 18,
-                      }
-                    }
-                  >
-                     ᙇ
                   </Text>
                 </View>
               </View>

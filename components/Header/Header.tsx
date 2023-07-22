@@ -461,6 +461,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             size={36}
             amtZec={totalBalance.total}
             privacy={privacy}
+            smallPrefix={true}
           />
           {mode !== 'basic' &&
             totalBalance.total > 0 &&

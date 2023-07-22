@@ -386,10 +386,29 @@ exports[`Component Send - test Send currency USD, privacy high & mode expert - s
                             {
                               "color": "red",
                               "fontSize": 15,
+                              "transform": [
+                                {
+                                  "scale": 2,
+                                },
+                                {
+                                  "translateY": 2.4,
+                                },
+                              ],
                             }
                           }
                         >
                           ᙇ
+                        </Text>
+                        <Text
+                          style={
+                            {
+                              "color": "red",
+                              "fontSize": 15,
+                              "marginLeft": 3,
+                            }
+                          }
+                        >
+                          EC
                         </Text>
                         <Text
                           style={
@@ -401,16 +420,6 @@ exports[`Component Send - test Send currency USD, privacy high & mode expert - s
                           }
                         >
                            -.----
-                        </Text>
-                        <Text
-                          style={
-                            {
-                              "color": "red",
-                              "fontSize": 15,
-                            }
-                          }
-                        >
-                           ZEC
                         </Text>
                       </View>
                     </View>
@@ -623,17 +632,6 @@ exports[`Component Send - test Send currency USD, privacy high & mode expert - s
                         }
                       >
                          -.--
-                      </Text>
-                      <Text
-                        style={
-                          {
-                            "color": "#ffffff",
-                            "fontSize": 13,
-                            "marginTop": 10,
-                          }
-                        }
-                      >
-                         USD
                       </Text>
                     </View>
                   </View>
@@ -1238,10 +1236,29 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                             {
                               "color": "red",
                               "fontSize": 15,
+                              "transform": [
+                                {
+                                  "scale": 2,
+                                },
+                                {
+                                  "translateY": 2.4,
+                                },
+                              ],
                             }
                           }
                         >
                           ᙇ
+                        </Text>
+                        <Text
+                          style={
+                            {
+                              "color": "red",
+                              "fontSize": 15,
+                              "marginLeft": 3,
+                            }
+                          }
+                        >
+                          EC
                         </Text>
                         <Text
                           style={
@@ -1253,16 +1270,6 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                           }
                         >
                            0.0000
-                        </Text>
-                        <Text
-                          style={
-                            {
-                              "color": "red",
-                              "fontSize": 15,
-                            }
-                          }
-                        >
-                           ZEC
                         </Text>
                       </View>
                     </View>
@@ -1475,17 +1482,6 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                         }
                       >
                          0.00
-                      </Text>
-                      <Text
-                        style={
-                          {
-                            "color": "#ffffff",
-                            "fontSize": 13,
-                            "marginTop": 10,
-                          }
-                        }
-                      >
-                         USD
                       </Text>
                     </View>
                   </View>

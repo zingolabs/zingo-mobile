@@ -78,17 +78,6 @@ exports[`Component Components - test CurrencyAmount High Privacy - snapshot 1`] 
       >
          -.--
       </Text>
-      <Text
-        style={
-          {
-            "backgroundColor": "red",
-            "color": undefined,
-            "fontSize": 20,
-          }
-        }
-      >
-         USD
-      </Text>
     </View>
   </View>
 </View>
@@ -155,17 +144,6 @@ exports[`Component Components - test CurrencyAmount Normal Privacy - snapshot 1`
         }
       >
          44.93
-      </Text>
-      <Text
-        style={
-          {
-            "backgroundColor": "red",
-            "color": undefined,
-            "fontSize": 20,
-          }
-        }
-      >
-         USD
       </Text>
     </View>
   </View>
@@ -262,10 +240,29 @@ exports[`Component Components - test ZecAmount High Privacy - snapshot 1`] = `
           {
             "color": "red",
             "fontSize": 20,
+            "transform": [
+              {
+                "scale": 2,
+              },
+              {
+                "translateY": 3.2,
+              },
+            ],
           }
         }
       >
         ᙇ
+      </Text>
+      <Text
+        style={
+          {
+            "color": "red",
+            "fontSize": 20,
+            "marginLeft": 4,
+          }
+        }
+      >
+        EC
       </Text>
       <Text
         style={
@@ -277,16 +274,6 @@ exports[`Component Components - test ZecAmount High Privacy - snapshot 1`] = `
         }
       >
          -.----
-      </Text>
-      <Text
-        style={
-          {
-            "color": "red",
-            "fontSize": 20,
-          }
-        }
-      >
-         ZEC
       </Text>
     </View>
   </View>
@@ -339,10 +326,29 @@ exports[`Component Components - test ZecAmount Normal Privacy - snapshot 1`] = `
           {
             "color": "red",
             "fontSize": 20,
+            "transform": [
+              {
+                "scale": 2,
+              },
+              {
+                "translateY": 3.2,
+              },
+            ],
           }
         }
       >
         ᙇ
+      </Text>
+      <Text
+        style={
+          {
+            "color": "red",
+            "fontSize": 20,
+            "marginLeft": 4,
+          }
+        }
+      >
+        EC
       </Text>
       <Text
         style={
@@ -365,16 +371,6 @@ exports[`Component Components - test ZecAmount Normal Privacy - snapshot 1`] = `
         }
       >
         5678
-      </Text>
-      <Text
-        style={
-          {
-            "color": "red",
-            "fontSize": 20,
-          }
-        }
-      >
-         ZEC
       </Text>
     </View>
   </View>

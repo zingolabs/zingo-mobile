@@ -74,6 +74,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
     <View
       style={
         {
+          "alignItems": "flex-start",
           "left": 0,
           "padding": 10,
           "position": "absolute",
@@ -93,7 +94,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
       style={
         {
           "alignItems": "flex-end",
-          "padding": 10,
+          "padding": 15,
           "position": "absolute",
           "right": 0,
         }
@@ -108,9 +109,9 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
         style={
           {
             "borderRadius": 10,
-            "height": 45,
+            "height": 38,
             "resizeMode": "contain",
-            "width": 45,
+            "width": 38,
           }
         }
       />
@@ -239,10 +240,29 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                       {
                         "color": undefined,
                         "fontSize": 18,
+                        "transform": [
+                          {
+                            "scale": 2,
+                          },
+                          {
+                            "translateY": 2.88,
+                          },
+                        ],
                       }
                     }
                   >
                     ᙇ
+                  </Text>
+                  <Text
+                    style={
+                      {
+                        "color": undefined,
+                        "fontSize": 18,
+                        "marginLeft": 3.6,
+                      }
+                    }
+                  >
+                    EC
                   </Text>
                   <Text
                     style={
@@ -254,16 +274,6 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                     }
                   >
                      0.6000
-                  </Text>
-                  <Text
-                    style={
-                      {
-                        "color": undefined,
-                        "fontSize": 18,
-                      }
-                    }
-                  >
-                     ZEC
                   </Text>
                 </View>
               </View>
@@ -337,10 +347,29 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                       {
                         "color": "red",
                         "fontSize": 18,
+                        "transform": [
+                          {
+                            "scale": 2,
+                          },
+                          {
+                            "translateY": 2.88,
+                          },
+                        ],
                       }
                     }
                   >
                     ᙇ
+                  </Text>
+                  <Text
+                    style={
+                      {
+                        "color": "red",
+                        "fontSize": 18,
+                        "marginLeft": 3.6,
+                      }
+                    }
+                  >
+                    EC
                   </Text>
                   <Text
                     style={
@@ -352,16 +381,6 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                     }
                   >
                      0.3000
-                  </Text>
-                  <Text
-                    style={
-                      {
-                        "color": "red",
-                        "fontSize": 18,
-                      }
-                    }
-                  >
-                     ZEC
                   </Text>
                 </View>
               </View>
@@ -469,10 +488,29 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                       {
                         "color": undefined,
                         "fontSize": 18,
+                        "transform": [
+                          {
+                            "scale": 2,
+                          },
+                          {
+                            "translateY": 2.88,
+                          },
+                        ],
                       }
                     }
                   >
                     ᙇ
+                  </Text>
+                  <Text
+                    style={
+                      {
+                        "color": undefined,
+                        "fontSize": 18,
+                        "marginLeft": 3.6,
+                      }
+                    }
+                  >
+                    EC
                   </Text>
                   <Text
                     style={
@@ -484,16 +522,6 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                     }
                   >
                      0.4000
-                  </Text>
-                  <Text
-                    style={
-                      {
-                        "color": undefined,
-                        "fontSize": 18,
-                      }
-                    }
-                  >
-                     ZEC
                   </Text>
                 </View>
               </View>
@@ -567,10 +595,29 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                       {
                         "color": "red",
                         "fontSize": 18,
+                        "transform": [
+                          {
+                            "scale": 2,
+                          },
+                          {
+                            "translateY": 2.88,
+                          },
+                        ],
                       }
                     }
                   >
                     ᙇ
+                  </Text>
+                  <Text
+                    style={
+                      {
+                        "color": "red",
+                        "fontSize": 18,
+                        "marginLeft": 3.6,
+                      }
+                    }
+                  >
+                    EC
                   </Text>
                   <Text
                     style={
@@ -582,16 +629,6 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                     }
                   >
                      0.2000
-                  </Text>
-                  <Text
-                    style={
-                      {
-                        "color": "red",
-                        "fontSize": 18,
-                      }
-                    }
-                  >
-                     ZEC
                   </Text>
                 </View>
               </View>
@@ -697,10 +734,29 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                       {
                         "color": "red",
                         "fontSize": 18,
+                        "transform": [
+                          {
+                            "scale": 2,
+                          },
+                          {
+                            "translateY": 2.88,
+                          },
+                        ],
                       }
                     }
                   >
                     ᙇ
+                  </Text>
+                  <Text
+                    style={
+                      {
+                        "color": "red",
+                        "fontSize": 18,
+                        "marginLeft": 3.6,
+                      }
+                    }
+                  >
+                    EC
                   </Text>
                   <Text
                     style={
@@ -723,16 +779,6 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                     }
                   >
                     5678
-                  </Text>
-                  <Text
-                    style={
-                      {
-                        "color": "red",
-                        "fontSize": 18,
-                      }
-                    }
-                  >
-                     ZEC
                   </Text>
                 </View>
               </View>
