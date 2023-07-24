@@ -14,6 +14,7 @@ import { Scene } from 'react-native-tab-view/lib/typescript/src/types';
 type ReceiveProps = {
   setUaAddress: (uaAddress: string) => void;
   toggleMenuDrawer: () => void;
+  syncingStatusMoreInfoOnClick: () => void;
   set_privacy_option: (name: 'privacy', value: boolean) => Promise<void>;
   setUfvkViewModalVisible?: (v: boolean) => void;
 };
@@ -21,11 +22,12 @@ type ReceiveProps = {
 const Receive: React.FunctionComponent<ReceiveProps> = ({
   setUaAddress,
   toggleMenuDrawer,
+  syncingStatusMoreInfoOnClick,
   set_privacy_option,
   setUfvkViewModalVisible,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, dimensions, addresses, uaAddress, mode } = context;
+  const { translate, dimensions, addresses, uaAddress, mode, addLastSnackbar } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [index, setIndex] = useState(0);
   const [routes, setRoutes] = useState<{ key: string; title: string }[]>([]);
@@ -263,11 +265,12 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
 
         <Header
           toggleMenuDrawer={toggleMenuDrawer}
+          syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
           title={translate('receive.title') as string}
           noBalance={true}
-          noSyncingStatus={true}
           set_privacy_option={set_privacy_option}
           setUfvkViewModalVisible={setUfvkViewModalVisible}
+          addLastSnackbar={addLastSnackbar}
         />
 
         <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', right: 0 }}>

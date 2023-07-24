@@ -1263,6 +1263,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 onClickOK={() => this.setState({ seedViewModalVisible: false })}
                 onClickCancel={() => this.setState({ seedViewModalVisible: false })}
                 action={'view'}
+                set_privacy_option={this.set_privacy_option}
               />
             </Suspense>
           </Modal>
@@ -1282,6 +1283,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 onClickOK={() => this.onClickOKChangeWallet()}
                 onClickCancel={() => this.setState({ seedChangeModalVisible: false })}
                 action={'change'}
+                set_privacy_option={this.set_privacy_option}
               />
             </Suspense>
           </Modal>
@@ -1301,6 +1303,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 onClickOK={() => this.onClickOKRestoreBackup()}
                 onClickCancel={() => this.setState({ seedBackupModalVisible: false })}
                 action={'backup'}
+                set_privacy_option={this.set_privacy_option}
               />
             </Suspense>
           </Modal>
@@ -1324,6 +1327,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                   this.setState({ seedServerModalVisible: false });
                 }}
                 action={'server'}
+                set_privacy_option={this.set_privacy_option}
               />
             </Suspense>
           </Modal>
@@ -1343,6 +1347,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 onClickOK={() => this.setState({ ufvkViewModalVisible: false })}
                 onClickCancel={() => this.setState({ ufvkViewModalVisible: false })}
                 action={'view'}
+                set_privacy_option={this.set_privacy_option}
               />
             </Suspense>
           </Modal>
@@ -1362,6 +1367,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 onClickOK={() => this.onClickOKChangeWallet()}
                 onClickCancel={() => this.setState({ ufvkChangeModalVisible: false })}
                 action={'change'}
+                set_privacy_option={this.set_privacy_option}
               />
             </Suspense>
           </Modal>
@@ -1381,6 +1387,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 onClickOK={() => this.onClickOKRestoreBackup()}
                 onClickCancel={() => this.setState({ ufvkBackupModalVisible: false })}
                 action={'backup'}
+                set_privacy_option={this.set_privacy_option}
               />
             </Suspense>
           </Modal>
@@ -1404,6 +1411,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                   this.setState({ ufvkServerModalVisible: false });
                 }}
                 action={'server'}
+                set_privacy_option={this.set_privacy_option}
               />
             </Suspense>
           </Modal>
@@ -1495,10 +1503,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                             clearToAddr={this.clearToAddr}
                             setSendProgress={this.setSendProgress}
                             toggleMenuDrawer={this.toggleMenuDrawer}
-                            setComputingModalVisible={this.setComputingModalVisible}
                             syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
                             poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
                             setZecPrice={this.setZecPrice}
+                            setComputingModalVisible={this.setComputingModalVisible}
                             set_privacy_option={this.set_privacy_option}
                             setPoolsToShieldSelectSapling={this.setPoolsToShieldSelectSapling}
                             setPoolsToShieldSelectTransparent={this.setPoolsToShieldSelectTransparent}
@@ -1520,6 +1528,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                       <Receive
                         setUaAddress={this.setUaAddress}
                         toggleMenuDrawer={this.toggleMenuDrawer}
+                        syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
                         set_privacy_option={this.set_privacy_option}
                         setUfvkViewModalVisible={this.setUfvkViewModalVisible}
                       />
@@ -1539,6 +1548,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 <Receive
                   setUaAddress={this.setUaAddress}
                   toggleMenuDrawer={this.toggleMenuDrawer}
+                  syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
                   set_privacy_option={this.set_privacy_option}
                   setUfvkViewModalVisible={this.setUfvkViewModalVisible}
                 />

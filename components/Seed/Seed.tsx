@@ -10,7 +10,7 @@ import FadeText from '../Components/FadeText';
 import Button from '../Components/Button';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded, ContextAppLoading } from '../../app/context';
-import { DimensionsType, InfoType, NetInfoType, ServerType, TranslateType, WalletType } from '../../app/AppState';
+import { InfoType, NetInfoType, ServerType, TranslateType, WalletType } from '../../app/AppState';
 import RPCModule from '../../app/RPCModule';
 import RPC from '../../app/rpc';
 import Header from '../Header';
@@ -31,15 +31,15 @@ type SeedProps = {
   onClickOK: (seedPhrase: string, birthdayNumber: number) => void;
   onClickCancel: () => void;
   action: 'new' | 'change' | 'view' | 'restore' | 'backup' | 'server';
+  set_privacy_option: (name: 'privacy', value: boolean) => Promise<void>;
 };
-const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, action }) => {
+const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, action, set_privacy_option }) => {
   const contextLoaded = useContext(ContextAppLoaded);
   const contextLoading = useContext(ContextAppLoading);
   let wallet: WalletType,
     translate: (key: string) => TranslateType,
     info: InfoType,
     server: ServerType,
-    dimensions: DimensionsType,
     netInfo: NetInfoType,
     privacy: boolean,
     mode: 'basic' | 'expert',
@@ -50,7 +50,6 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
     translate = contextLoading.translate;
     info = contextLoading.info;
     server = contextLoading.server;
-    dimensions = contextLoading.dimensions;
     netInfo = contextLoading.netInfo;
     privacy = contextLoading.privacy;
     mode = contextLoading.mode;
@@ -61,7 +60,6 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
     translate = contextLoaded.translate;
     info = contextLoaded.info;
     server = contextLoaded.server;
-    dimensions = contextLoaded.dimensions;
     netInfo = contextLoaded.netInfo;
     privacy = contextLoaded.privacy;
     mode = contextLoaded.mode;
@@ -210,11 +208,11 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
             noBalance={true}
             noSyncingStatus={true}
             noDrawMenu={true}
-            noPrivacy={true}
+            set_privacy_option={set_privacy_option}
             translate={translate}
-            dimensions={dimensions}
             netInfo={netInfo}
             mode={mode}
+            addLastSnackbar={addLastSnackbar}
           />
         </View>
       </Animated.View>

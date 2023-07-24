@@ -12,6 +12,7 @@
   "menu-acc": "Abrir Menu",
   "donation": "Gracias por apoyar Zingo!",
   "restarting": "Error conectando con el servidor, la Aplicación se reiniciará en breves segundos.",
+  "change-privacy": "Nueva Política de Privacidad: ",
   "insight": {
     "title": "Visión Financiera",
     "no-data": "No hay datos en tu Monedero que concuerden con el gráfico seleccionado.",

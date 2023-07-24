@@ -25,18 +25,17 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
     }
     testID="header"
   >
-    <Image
-      source={
-        {
-          "testUri": "../../../assets/img/logobig-zingo.png",
-        }
-      }
+    <View
       style={
         {
-          "borderRadius": 10,
-          "height": 50,
-          "resizeMode": "contain",
-          "width": 50,
+          "alignItems": "center",
+          "display": "flex",
+          "flexDirection": "row",
+          "flexWrap": "wrap",
+          "height": 40,
+          "justifyContent": "center",
+          "marginHorizontal": 5,
+          "marginVertical": 5,
         }
       }
     />
@@ -52,42 +51,30 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
         {
           "alignItems": "center",
           "display": "flex",
-          "flexDirection": "row",
+          "flexDirection": "column",
           "flexWrap": "wrap",
           "justifyContent": "center",
-          "marginVertical": 5,
         }
       }
     >
-      <View
+      <Text
         style={
           {
-            "alignItems": "center",
-            "display": "flex",
-            "flexDirection": "column",
-            "flexWrap": "wrap",
-            "justifyContent": "center",
+            "color": "rgb(28, 28, 30)",
+            "fontSize": 18,
+            "fontWeight": "600",
+            "opacity": 1,
+            "paddingHorizontal": 5,
           }
         }
       >
-        <Text
-          style={
-            {
-              "color": "rgb(28, 28, 30)",
-              "fontSize": 18,
-              "fontWeight": "600",
-              "opacity": 1,
-              "paddingHorizontal": 5,
-            }
-          }
-        >
-          text translated (text translated)
-        </Text>
-      </View>
+        text translated (text translated)
+      </Text>
     </View>
     <View
       style={
         {
+          "alignItems": "flex-start",
           "left": 0,
           "padding": 10,
           "position": "absolute",
@@ -99,6 +86,32 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
           {
             "alignItems": "center",
             "flexDirection": "row",
+          }
+        }
+      />
+    </View>
+    <View
+      style={
+        {
+          "alignItems": "flex-end",
+          "padding": 15,
+          "position": "absolute",
+          "right": 0,
+        }
+      }
+    >
+      <Image
+        source={
+          {
+            "testUri": "../../../assets/img/logobig-zingo.png",
+          }
+        }
+        style={
+          {
+            "borderRadius": 10,
+            "height": 38,
+            "resizeMode": "contain",
+            "width": 38,
           }
         }
       />

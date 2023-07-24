@@ -32,14 +32,12 @@ describe('Component Components - test', () => {
     expect(text.type).toBe('View');
     expect(text.children[0].children[0].children[0].children[0]).toBe('$');
     expect(text.children[0].children[0].children[1].children[0]).toBe(' -.--');
-    expect(text.children[0].children[0].children[2].children[0]).toBe(' USD');
   });
   test('CurrencyAmount - price undefined result $ -- USD', () => {
     const text: any = render(<CurrencyAmount amtZec={1} style={{}} currency={'USD'} />).toJSON();
     expect(text.type).toBe('View');
     expect(text.children[0].children[0].children[0].children[0]).toBe('$');
     expect(text.children[0].children[0].children[1].children[0]).toBe(' -.--');
-    expect(text.children[0].children[0].children[2].children[0]).toBe(' USD');
   });
 
   test('CurrencyAmount - price 0 result $ -- USD', () => {
@@ -47,7 +45,6 @@ describe('Component Components - test', () => {
     expect(text.type).toBe('View');
     expect(text.children[0].children[0].children[0].children[0]).toBe('$');
     expect(text.children[0].children[0].children[1].children[0]).toBe(' -.--');
-    expect(text.children[0].children[0].children[2].children[0]).toBe(' USD');
   });
 
   test('CurrencyAmount - amtZec undefined result $ -- USD', () => {
@@ -55,7 +52,6 @@ describe('Component Components - test', () => {
     expect(text.type).toBe('View');
     expect(text.children[0].children[0].children[0].children[0]).toBe('$');
     expect(text.children[0].children[0].children[1].children[0]).toBe(' -.--');
-    expect(text.children[0].children[0].children[2].children[0]).toBe(' USD');
   });
 
   test('CurrencyAmount - price * amtZec really tiny result $ < 0.01 USD', () => {
@@ -63,7 +59,6 @@ describe('Component Components - test', () => {
     expect(text.type).toBe('View');
     expect(text.children[0].children[0].children[0].children[0]).toBe('$');
     expect(text.children[0].children[0].children[1].children[0]).toBe(' < 0.01');
-    expect(text.children[0].children[0].children[2].children[0]).toBe(' USD');
   });
 
   test('CurrencyAmount - price=2.9826 and amtZec=1.00098 result $ 2.99 USD', () => {
@@ -71,7 +66,6 @@ describe('Component Components - test', () => {
     expect(text.type).toBe('View');
     expect(text.children[0].children[0].children[0].children[0]).toBe('$');
     expect(text.children[0].children[0].children[1].children[0]).toBe(' 2.99');
-    expect(text.children[0].children[0].children[2].children[0]).toBe(' USD');
   });
 
   test("CurrencyAmount - style={backgroundColor: 'red'} result same", () => {
@@ -81,7 +75,6 @@ describe('Component Components - test', () => {
     expect(text.type).toBe('View');
     expect(text.children[0].children[0].children[0].props.style.backgroundColor).toBe('red');
     expect(text.children[0].children[0].children[1].props.style.backgroundColor).toBe('red');
-    expect(text.children[0].children[0].children[2].props.style.backgroundColor).toBe('red');
   });
 
   test('ZecAmount - High Privacy - amtZec -1.123456789 rounded up result -.---- ZEC', () => {
@@ -90,9 +83,9 @@ describe('Component Components - test', () => {
     expect(text.children[0].children[0].children[0].type).toBe('Text');
     expect(text.children[0].children[0].children[0].children[0]).toBe('\u1647');
     expect(text.children[0].children[0].children[1].type).toBe('Text');
-    expect(text.children[0].children[0].children[1].children[0]).toBe(' -.----');
+    expect(text.children[0].children[0].children[1].children[0]).toBe('EC');
     expect(text.children[0].children[0].children[2].type).toBe('Text');
-    expect(text.children[0].children[0].children[2].children[0]).toBe(' ZEC');
+    expect(text.children[0].children[0].children[2].children[0]).toBe(' -.----');
   });
 
   test('ZecAmount - All props missing result -- ZEC', () => {
@@ -101,11 +94,9 @@ describe('Component Components - test', () => {
     expect(text.children[0].children[0].children[0].type).toBe('Text');
     expect(text.children[0].children[0].children[0].children[0]).toBe('\u1647');
     expect(text.children[0].children[0].children[1].type).toBe('Text');
-    expect(text.children[0].children[0].children[1].children[0]).toBe(' --');
+    expect(text.children[0].children[0].children[1].children[0]).toBe('EC');
     expect(text.children[0].children[0].children[2].type).toBe('Text');
-    expect(text.children[0].children[0].children[2].children).toBe(null);
-    expect(text.children[0].children[0].children[3].type).toBe('Text');
-    expect(text.children[0].children[0].children[3].children[0]).toBe(' ZEC');
+    expect(text.children[0].children[0].children[2].children[0]).toBe(' --');
   });
 
   test('ZecAmount - amtZec 0 result 0.00000000 ZEC', () => {
@@ -114,9 +105,9 @@ describe('Component Components - test', () => {
     expect(text.children[0].children[0].children[0].type).toBe('Text');
     expect(text.children[0].children[0].children[0].children[0]).toBe('\u1647');
     expect(text.children[0].children[0].children[1].type).toBe('Text');
-    expect(text.children[0].children[0].children[1].children[0]).toBe(' 0.0000');
+    expect(text.children[0].children[0].children[1].children[0]).toBe('EC');
     expect(text.children[0].children[0].children[2].type).toBe('Text');
-    expect(text.children[0].children[0].children[2].children[0]).toBe(' ZEC');
+    expect(text.children[0].children[0].children[2].children[0]).toBe(' 0.0000');
   });
 
   test('ZecAmount - amtZec -1.123456789 rounded up result -1.12345679 ZEC', () => {
@@ -125,11 +116,11 @@ describe('Component Components - test', () => {
     expect(text.children[0].children[0].children[0].type).toBe('Text');
     expect(text.children[0].children[0].children[0].children[0]).toBe('\u1647');
     expect(text.children[0].children[0].children[1].type).toBe('Text');
-    expect(text.children[0].children[0].children[1].children[0]).toBe(' -1.1234');
+    expect(text.children[0].children[0].children[1].children[0]).toBe('EC');
     expect(text.children[0].children[0].children[2].type).toBe('Text');
-    expect(text.children[0].children[0].children[2].children[0]).toBe('5679');
+    expect(text.children[0].children[0].children[2].children[0]).toBe(' -1.1234');
     expect(text.children[0].children[0].children[3].type).toBe('Text');
-    expect(text.children[0].children[0].children[3].children[0]).toBe(' ZEC');
+    expect(text.children[0].children[0].children[3].children[0]).toBe('5679');
   });
 
   test('ZecAmount - amtZec 1.123456781 rounded down result 1.12345678 ZEC', () => {
@@ -138,11 +129,11 @@ describe('Component Components - test', () => {
     expect(text.children[0].children[0].children[0].type).toBe('Text');
     expect(text.children[0].children[0].children[0].children[0]).toBe('\u1647');
     expect(text.children[0].children[0].children[1].type).toBe('Text');
-    expect(text.children[0].children[0].children[1].children[0]).toBe(' 1.1234');
+    expect(text.children[0].children[0].children[1].children[0]).toBe('EC');
     expect(text.children[0].children[0].children[2].type).toBe('Text');
-    expect(text.children[0].children[0].children[2].children[0]).toBe('5678');
+    expect(text.children[0].children[0].children[2].children[0]).toBe(' 1.1234');
     expect(text.children[0].children[0].children[3].type).toBe('Text');
-    expect(text.children[0].children[0].children[3].children[0]).toBe(' ZEC');
+    expect(text.children[0].children[0].children[3].children[0]).toBe('5678');
   });
 
   test("ZecAmount - color 'red' result same", () => {
@@ -152,13 +143,13 @@ describe('Component Components - test', () => {
     expect(text.children[0].children[0].children[0].children[0]).toBe('\u1647');
     expect(text.children[0].children[0].children[0].props.style.color).toBe('red');
     expect(text.children[0].children[0].children[1].type).toBe('Text');
-    expect(text.children[0].children[0].children[1].children[0]).toBe(' --');
+    expect(text.children[0].children[0].children[1].children[0]).toBe('EC');
     expect(text.children[0].children[0].children[1].props.style.color).toBe('red');
     expect(text.children[0].children[0].children[2].type).toBe('Text');
-    expect(text.children[0].children[0].children[2].children).toBe(null);
+    expect(text.children[0].children[0].children[2].children[0]).toBe(' --');
     expect(text.children[0].children[0].children[2].props.style.color).toBe('red');
     expect(text.children[0].children[0].children[3].type).toBe('Text');
-    expect(text.children[0].children[0].children[3].children[0]).toBe(' ZEC');
+    expect(text.children[0].children[0].children[3].children).toBe(null);
     expect(text.children[0].children[0].children[3].props.style.color).toBe('red');
   });
 
@@ -169,39 +160,41 @@ describe('Component Components - test', () => {
     expect(text.children[0].children[0].children[0].children[0]).toBe('\u1647');
     expect(text.children[0].children[0].children[0].props.style.fontSize).toBe(11);
     expect(text.children[0].children[0].children[1].type).toBe('Text');
-    expect(text.children[0].children[0].children[1].children[0]).toBe(' --');
+    expect(text.children[0].children[0].children[1].children[0]).toBe('EC');
     expect(text.children[0].children[0].children[1].props.style.fontSize).toBe(11);
     expect(text.children[0].children[0].children[2].type).toBe('Text');
-    expect(text.children[0].children[0].children[2].children).toBe(null);
-    expect(text.children[0].children[0].children[2].props.style.fontSize).toBe(11 * 0.7);
+    expect(text.children[0].children[0].children[2].children[0]).toBe(' --');
+    expect(text.children[0].children[0].children[2].props.style.fontSize).toBe(11);
     expect(text.children[0].children[0].children[3].type).toBe('Text');
-    expect(text.children[0].children[0].children[3].children[0]).toBe(' ZEC');
-    expect(text.children[0].children[0].children[3].props.style.fontSize).toBe(11);
+    expect(text.children[0].children[0].children[3].children).toBe(null);
+    expect(text.children[0].children[0].children[3].props.style.fontSize).toBe(11 * 0.7);
   });
 
   test("ZecAmount - View style backgroundColor 'red' result same", () => {
     const text: any = render(<ZecAmount style={{ backgroundColor: 'red' }} currencyName={'ZEC'} />).toJSON();
     expect(text.type).toBe('View');
     expect(text.props.style.backgroundColor).toBe('red');
+    expect(text.children[0].children[0].children[0].type).toBe('Text');
     expect(text.children[0].children[0].children[0].children[0]).toBe('\u1647');
     expect(text.children[0].children[0].children[1].type).toBe('Text');
-    expect(text.children[0].children[0].children[1].children[0]).toBe(' --');
+    expect(text.children[0].children[0].children[1].children[0]).toBe('EC');
     expect(text.children[0].children[0].children[2].type).toBe('Text');
-    expect(text.children[0].children[0].children[2].children).toBe(null);
+    expect(text.children[0].children[0].children[2].children[0]).toBe(' --');
     expect(text.children[0].children[0].children[3].type).toBe('Text');
-    expect(text.children[0].children[0].children[3].children[0]).toBe(' ZEC');
+    expect(text.children[0].children[0].children[3].children).toBe(null);
   });
 
   test("ZecAmount - zecSymbol 'ZzZ' result same", () => {
     const text: any = render(<ZecAmount currencyName={'ZzZ'} />).toJSON();
     expect(text.type).toBe('View');
+    expect(text.children[0].children[0].children[0].type).toBe('Text');
     expect(text.children[0].children[0].children[0].children[0]).toBe('\u1647');
     expect(text.children[0].children[0].children[1].type).toBe('Text');
-    expect(text.children[0].children[0].children[1].children[0]).toBe(' --');
+    expect(text.children[0].children[0].children[1].children[0]).toBe('EC');
     expect(text.children[0].children[0].children[2].type).toBe('Text');
-    expect(text.children[0].children[0].children[2].children).toBe(null);
+    expect(text.children[0].children[0].children[2].children[0]).toBe(' --');
     expect(text.children[0].children[0].children[3].type).toBe('Text');
-    expect(text.children[0].children[0].children[3].children[0]).toBe(' ZzZ');
+    expect(text.children[0].children[0].children[3].children).toBe(null);
   });
 
   test("BoldText - children 'bold text' result same", () => {

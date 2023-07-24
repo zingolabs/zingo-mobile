@@ -76,6 +76,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
         noSyncingStatus={true}
         noDrawMenu={true}
         set_privacy_option={set_privacy_option}
+        addLastSnackbar={addLastSnackbar}
       />
       <ScrollView
         showsVerticalScrollIndicator={true}

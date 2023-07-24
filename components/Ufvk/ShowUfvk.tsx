@@ -24,8 +24,9 @@ type ShowUfvkProps = {
   onClickOK: () => void;
   onClickCancel: () => void;
   action: 'change' | 'view' | 'backup' | 'server';
+  set_privacy_option: (name: 'privacy', value: boolean) => Promise<void>;
 };
-const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCancel, action }) => {
+const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCancel, action, set_privacy_option }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, wallet, server, netInfo, mode, addLastSnackbar } = context;
   const { ufvk } = wallet;
@@ -61,7 +62,8 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
         noBalance={true}
         noSyncingStatus={true}
         noDrawMenu={true}
-        noPrivacy={true}
+        set_privacy_option={set_privacy_option}
+        addLastSnackbar={addLastSnackbar}
       />
 
       <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
