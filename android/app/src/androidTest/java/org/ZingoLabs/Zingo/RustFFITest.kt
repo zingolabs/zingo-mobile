@@ -50,6 +50,25 @@ data class Sync (
     val total_blocks_synced : Long
 )
 
+data class Balance (
+    // TODO: change to ULongs and fix errors with deserialising to unsigned
+    val sapling_balance : Long,
+    val verified_sapling_balance : Long,
+    val spendable_sapling_balance : Long,
+    val unverified_sapling_balance : Long,
+    val orchard_balance : Long,
+    val verified_orchard_balance : Long,
+    val spendable_orchard_balance : Long,
+    val unverified_orchard_balance : Long,
+    val transparent_balance : Long
+)
+
+data class Send (
+    val address : String,
+    val amount : Long,
+    val memo : String?
+)
+
 @Category(OfflineTest::class)
 class ExecuteAddressesFromSeed {
     @Test
@@ -61,9 +80,9 @@ class ExecuteAddressesFromSeed {
         val seed = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art"
         val birthday = "1"
         val datadir = MainApplication.getAppContext()!!.filesDir.path
-        val monitor_mempool = "false"
+        val monitorMempool = "false"
 
-        var initFromSeedJson = RustFFI.initfromseed(server, seed, birthday, datadir, chainhint, monitor_mempool)
+        var initFromSeedJson = RustFFI.initfromseed(server, seed, birthday, datadir, chainhint, monitorMempool)
         System.out.println("\nInit from seed:")
         System.out.println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
@@ -92,9 +111,9 @@ class ExecuteAddressesFromUfvk {
         val ufvk = "uview1vmle9qzgsmzn8qskg06cjjt406eq3euvkn8un3t6sk7fjd72qp72guyskktr2gvgcpmd99qgquxdw7s54v0dfxn3degzhxp9gmvpve6vlvv459pxfre05v6l47aqx47rgh86t6n77svstd8ff6d8cwtn98uq66k6u5jqrpyz0pqflkppfq3djscrd2acnc7ymkd6fssk0t4rh2ynaux7z4ylt38jqgjhnu88h2jz8qwd3t5dwsc3ycvsea6grs4zg76r9vw48r9zvlphnpfsgc5eqpum7hghdm2eguw4h6n9m8rhuzh0qdc24z4z5ftcv6xxvvs3yrugea23xlys3f9qv0fenh0xp0hej8enlr82esl54hn27d6432kygwqx700ez84e72f03vtmece73dftpjvv3v7w65yaz2rjwmarxjzrnn02u5kx4p7a42k5lxgcgqgwjyp9w6x24ccm0dvlf4637ss6l3xmuv2strza60c5k5uasdcn"
         val birthday = "1"
         val datadir = MainApplication.getAppContext()!!.filesDir.path
-        val monitor_mempool = "false"
+        val monitorMempool = "false"
 
-        var initFromUfvk = RustFFI.initfromufvk(server, ufvk, birthday, datadir, chainhint, monitor_mempool)
+        var initFromUfvk = RustFFI.initfromufvk(server, ufvk, birthday, datadir, chainhint, monitorMempool)
         System.out.println("\nInit From UFVK:")
         System.out.println(initFromUfvk)
         assertThat(initFromUfvk).isEqualTo("Error: This wallet is watch-only.")
@@ -120,9 +139,9 @@ class ExecuteSyncFromSeed {
         val seed = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art"
         val birthday = "1"
         val datadir = MainApplication.getAppContext()!!.filesDir.path
-        val monitor_mempool = "false"
+        val monitorMempool = "false"
 
-        var initFromSeedJson = RustFFI.initfromseed(server, seed, birthday, datadir, chainhint, monitor_mempool)
+        var initFromSeedJson = RustFFI.initfromseed(server, seed, birthday, datadir, chainhint, monitorMempool)
         System.out.println("\nInit from seed:")
         System.out.println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
@@ -135,10 +154,10 @@ class ExecuteSyncFromSeed {
         val info: Info = mapper.readValue(infoJson)
 
         var heightJson = RustFFI.execute("height", "")
-        System.out.println("\nHeight before sync:")
+        System.out.println("\nHeight pre-sync:")
         System.out.println(heightJson)
-        val height_pre_sync: Height = mapper.readValue(heightJson)
-        assertThat(height_pre_sync.height).isEqualTo(0)
+        val heightPreSync: Height = mapper.readValue(heightJson)
+        assertThat(heightPreSync.height).isEqualTo(0)
 
         var syncJson = RustFFI.execute("sync", "")
         System.out.println("\nSync:")
@@ -149,10 +168,10 @@ class ExecuteSyncFromSeed {
         assertThat(sync.total_blocks_synced).isEqualTo(info.latest_block_height)
 
         heightJson = RustFFI.execute("height", "")
-        System.out.println("\nHeight after sync:")
+        System.out.println("\nHeight post-sync:")
         System.out.println(heightJson)
-        val height_post_sync: Height = mapper.readValue(heightJson)
-        assertThat(height_post_sync.height).isEqualTo(info.latest_block_height)
+        val heightPostSync: Height = mapper.readValue(heightJson)
+        assertThat(heightPostSync.height).isEqualTo(info.latest_block_height)
 
         val syncStatusJson = RustFFI.execute("syncstatus", "")
         System.out.println("\nSync status:")
@@ -160,6 +179,58 @@ class ExecuteSyncFromSeed {
         val syncStatus: SyncStatus = mapper.readValue(syncStatusJson)
         assertThat(syncStatus.sync_id).isEqualTo(1)
 
+    }
+}
+
+class ExecuteSend {
+    @Test
+    fun executeSend() {
+        val mapper = jacksonObjectMapper()
+
+        val server = "http://10.0.2.2:20000"
+        val chainhint = "regtest"
+        val seed = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art"
+        val birthday = "1"
+        val datadir = MainApplication.getAppContext()!!.filesDir.path
+        val monitorMempool = "false"
+
+        var initFromSeedJson = RustFFI.initfromseed(server, seed, birthday, datadir, chainhint, monitorMempool)
+        System.out.println("\nInit from seed:")
+        System.out.println(initFromSeedJson)
+        val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
+        assertThat(initFromSeed.seed).isEqualTo("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art")
+        assertThat(initFromSeed.birthday).isEqualTo(1)
+
+        var syncJson = RustFFI.execute("sync", "")
+        System.out.println("\nSync:")
+        System.out.println(syncJson)
+
+        var balanceJson = RustFFI.execute("balance", "")
+        System.out.println("\nBalance pre-send:")
+        System.out.println(balanceJson)
+        val balancePreSend: Balance = mapper.readValue(balanceJson)
+        assertThat(balancePreSend.spendable_sapling_balance).isEqualTo(625000000)
+        assertThat(balancePreSend.transparent_balance).isEqualTo(0)
+
+        val send = Send("tmBsTi2xWTjUdEXnuTceL7fecEQKeWaPDJd", 100000, null)
+
+        var sendJson = RustFFI.execute("send", mapper.writeValueAsString(listOf(send)))
+        System.out.println("\nSend:")
+        System.out.println(sendJson)
+
+        var sendProgressJson = RustFFI.execute("sendprogress", "")
+        System.out.println("\nSend progress:")
+        System.out.println(sendProgressJson)    
+
+        syncJson = RustFFI.execute("sync", "")
+        System.out.println("\nSync:")
+        System.out.println(syncJson)
+
+        balanceJson = RustFFI.execute("balance", "")
+        System.out.println("\nBalance post-send:")
+        System.out.println(balanceJson)
+        val balancePostSend: Balance = mapper.readValue(balanceJson)
+        assertThat(balancePostSend.transparent_balance).isEqualTo(100000)
     }
 }
 

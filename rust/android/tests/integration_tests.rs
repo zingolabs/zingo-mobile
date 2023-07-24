@@ -31,3 +31,17 @@ async fn execute_sync_from_seed_x86_64() {
 
     assert_eq!(exit_code, 0);
 }
+
+#[tokio::test]
+async fn execute_send_arm32() {
+    let (_regtest_manager, _child_process_handler) = scenarios::mobile_funded().await;
+
+    let (exit_code, output, error) =
+        test_utils::android_integration_test("armeabi-v7a", "ExecuteSend");
+
+    println!("Exit Code: {}", exit_code);
+    println!("Output: {}", output);
+    println!("Error: {}", error);
+
+    assert_eq!(exit_code, 0);
+}
