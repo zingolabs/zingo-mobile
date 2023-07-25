@@ -15,7 +15,7 @@ async fn offline_testsuite_arm32() {
 }
 
 #[tokio::test]
-async fn execute_sync_from_seed_x86_64() {
+async fn execute_sync_from_seed_arm32() {
     let (regtest_manager, _child_process_handler) = scenarios::unfunded_mobileclient().await;
 
     regtest_manager
@@ -23,7 +23,7 @@ async fn execute_sync_from_seed_x86_64() {
         .expect("Failed to generate blocks.");
 
     let (exit_code, output, error) =
-        test_utils::android_integration_test("x86_64", "ExecuteSyncFromSeed");
+        test_utils::android_integration_test("armeabi-v7a", "ExecuteSyncFromSeed");
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);

@@ -6,6 +6,15 @@ import org.junit.experimental.categories.Category
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 
+object Seeds {
+    const val ABANDON = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art"
+    const val HOSPITAL = "hospital museum valve antique skate museum unfold vocal weird milk scale social vessel identify crowd hospital control album rib bulb path oven civil tank"
+}
+
+object Ufvk {
+    const val ABANDON = "uview1vmle9qzgsmzn8qskg06cjjt406eq3euvkn8un3t6sk7fjd72qp72guyskktr2gvgcpmd99qgquxdw7s54v0dfxn3degzhxp9gmvpve6vlvv459pxfre05v6l47aqx47rgh86t6n77svstd8ff6d8cwtn98uq66k6u5jqrpyz0pqflkppfq3djscrd2acnc7ymkd6fssk0t4rh2ynaux7z4ylt38jqgjhnu88h2jz8qwd3t5dwsc3ycvsea6grs4zg76r9vw48r9zvlphnpfsgc5eqpum7hghdm2eguw4h6n9m8rhuzh0qdc24z4z5ftcv6xxvvs3yrugea23xlys3f9qv0fenh0xp0hej8enlr82esl54hn27d6432kygwqx700ez84e72f03vtmece73dftpjvv3v7w65yaz2rjwmarxjzrnn02u5kx4p7a42k5lxgcgqgwjyp9w6x24ccm0dvlf4637ss6l3xmuv2strza60c5k5uasdcn"
+}
+
 data class InitFromSeed (
     val seed : String,
     val birthday : Long
@@ -51,7 +60,6 @@ data class Sync (
 )
 
 data class Balance (
-    // TODO: change to ULongs and fix errors with deserialising to unsigned
     val sapling_balance : Long,
     val verified_sapling_balance : Long,
     val spendable_sapling_balance : Long,
@@ -77,7 +85,7 @@ class ExecuteAddressesFromSeed {
 
         val server = "http://10.0.2.2:20000"
         val chainhint = "main"
-        val seed = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art"
+        val seed = Seeds.ABANDON
         val birthday = "1"
         val datadir = MainApplication.getAppContext()!!.filesDir.path
         val monitorMempool = "false"
@@ -86,7 +94,7 @@ class ExecuteAddressesFromSeed {
         System.out.println("\nInit from seed:")
         System.out.println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
-        assertThat(initFromSeed.seed).isEqualTo("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art")
+        assertThat(initFromSeed.seed).isEqualTo(Seeds.ABANDON)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
         var addressesJson = RustFFI.execute("addresses", "")
@@ -108,7 +116,7 @@ class ExecuteAddressesFromUfvk {
 
         val server = "http://10.0.2.2:20000"
         val chainhint = "main"
-        val ufvk = "uview1vmle9qzgsmzn8qskg06cjjt406eq3euvkn8un3t6sk7fjd72qp72guyskktr2gvgcpmd99qgquxdw7s54v0dfxn3degzhxp9gmvpve6vlvv459pxfre05v6l47aqx47rgh86t6n77svstd8ff6d8cwtn98uq66k6u5jqrpyz0pqflkppfq3djscrd2acnc7ymkd6fssk0t4rh2ynaux7z4ylt38jqgjhnu88h2jz8qwd3t5dwsc3ycvsea6grs4zg76r9vw48r9zvlphnpfsgc5eqpum7hghdm2eguw4h6n9m8rhuzh0qdc24z4z5ftcv6xxvvs3yrugea23xlys3f9qv0fenh0xp0hej8enlr82esl54hn27d6432kygwqx700ez84e72f03vtmece73dftpjvv3v7w65yaz2rjwmarxjzrnn02u5kx4p7a42k5lxgcgqgwjyp9w6x24ccm0dvlf4637ss6l3xmuv2strza60c5k5uasdcn"
+        val ufvk = Ufvk.ABANDON
         val birthday = "1"
         val datadir = MainApplication.getAppContext()!!.filesDir.path
         val monitorMempool = "false"
@@ -136,7 +144,7 @@ class ExecuteSyncFromSeed {
 
         val server = "http://10.0.2.2:20000"
         val chainhint = "regtest"
-        val seed = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art"
+        val seed = Seeds.ABANDON
         val birthday = "1"
         val datadir = MainApplication.getAppContext()!!.filesDir.path
         val monitorMempool = "false"
@@ -145,7 +153,7 @@ class ExecuteSyncFromSeed {
         System.out.println("\nInit from seed:")
         System.out.println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
-        assertThat(initFromSeed.seed).isEqualTo("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art")
+        assertThat(initFromSeed.seed).isEqualTo(Seeds.ABANDON)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
         var infoJson = RustFFI.execute("info", "")
@@ -178,7 +186,6 @@ class ExecuteSyncFromSeed {
         System.out.println(syncStatusJson)
         val syncStatus: SyncStatus = mapper.readValue(syncStatusJson)
         assertThat(syncStatus.sync_id).isEqualTo(1)
-
     }
 }
 
@@ -189,7 +196,7 @@ class ExecuteSendFromOrchard {
 
         val server = "http://10.0.2.2:20000"
         val chainhint = "regtest"
-        val seed = "hospital museum valve antique skate museum unfold vocal weird milk scale social vessel identify crowd hospital control album rib bulb path oven civil tank"
+        val seed = Seeds.HOSPITAL
         val birthday = "1"
         val datadir = MainApplication.getAppContext()!!.filesDir.path
         val monitorMempool = "false"
@@ -198,7 +205,7 @@ class ExecuteSendFromOrchard {
         System.out.println("\nInit from seed:")
         System.out.println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
-        assertThat(initFromSeed.seed).isEqualTo("hospital museum valve antique skate museum unfold vocal weird milk scale social vessel identify crowd hospital control album rib bulb path oven civil tank")
+        assertThat(initFromSeed.seed).isEqualTo(Seeds.HOSPITAL)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
         var syncJson = RustFFI.execute("sync", "")
