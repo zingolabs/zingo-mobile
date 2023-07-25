@@ -6,6 +6,7 @@ set_test_name=false
 set_api_level=false
 set_api_target=false
 create_snapshot=false
+kill_emulators=false
 test_name_default="OfflineTestSuite"
 valid_api_levels=("23" "24" "25" "26" "27" "28" "29" "30" "31" "32" "33")
 valid_api_targets=("default" "google_apis" "google_apis_playstore" "google_atd" "google-tv" \
@@ -51,7 +52,7 @@ function wait_for() {
     fi
 }
 
-while getopts 'a:l:e:t:sx:h' OPTION; do
+while getopts 'a:l:ke:t:sx:h' OPTION; do
     case "$OPTION" in
         a)
             abi="$OPTARG"
@@ -101,6 +102,9 @@ while getopts 'a:l:e:t:sx:h' OPTION; do
                         
             set_api_level=true
             ;;
+        k)
+            kill_emulators=true
+            ;;
         t)
             api_target="$OPTARG"
 
@@ -137,6 +141,8 @@ while getopts 'a:l:e:t:sx:h' OPTION; do
             echo -e "      \t\t  Default: OfflineTestSuite"
             echo -e "\n  -l\t\tSelect API level (optional)"
             echo -e "      \t\t  Minimum API level: 23"
+            echo -e "\n  -k\t\tKill emulators before and after tests (optional)"
+            echo -e "      \t\t  Default: Don't kill emulators"
             echo -e "\n  -t\t\tSelect API target (optional)"
             echo -e "      \t\t  See examples on selecting system images below"
             echo -e "\n  -s\t\tCreate an AVD and snapshot for quick-boot (optional)"
@@ -147,6 +153,7 @@ while getopts 'a:l:e:t:sx:h' OPTION; do
             echo -e "\nExamples:"
             echo -e "  '$(basename $0) -a x86_64 -s'\tCreates an AVD and quick-boot snapshot for x86_64 ABI"
             echo -e "  '$(basename $0) -a x86_64'   \tRuns integration tests for x86_64 ABI from snapshot"
+            echo -e "  '$(basename $0) -a x86_64 -k'\tRuns integration tests for x86_64 ABI and kills all emulators"
             echo -e "  '$(basename $0) -a x86 -l 29 -t google_apis'"
             echo -e "                             \t\tSelect system image \"system-images;android-29;google_apis;x86\""
             echo -e "\nRecommended system images for testing ARM ABIs:"
@@ -201,7 +208,9 @@ sdkmanager --install "${sdk}"
 sdkmanager --licenses
 
 # Kill all emulators
-../scripts/kill_emulators.sh
+if [[ $kill_emulators == true ]]; then
+    ../scripts/kill_emulators.sh
+fi
 
 if [[ $create_snapshot == true ]]; then
     echo -e "\nCreating AVD..."
@@ -315,5 +324,7 @@ else
 fi
 
 # Kill all emulators
-../scripts/kill_emulators.sh
+if [[ $kill_emulators == true ]]; then
+    ../scripts/kill_emulators.sh
+fi
 
