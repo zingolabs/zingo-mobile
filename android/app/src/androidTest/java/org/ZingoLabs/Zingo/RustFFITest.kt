@@ -182,14 +182,14 @@ class ExecuteSyncFromSeed {
     }
 }
 
-class ExecuteSend {
+class ExecuteSendFromSeed {
     @Test
-    fun executeSend() {
+    fun executeSendFromSeed() {
         val mapper = jacksonObjectMapper()
 
         val server = "http://10.0.2.2:20000"
         val chainhint = "regtest"
-        val seed = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art"
+        val seed = "hospital museum valve antique skate museum unfold vocal weird milk scale social vessel identify crowd hospital control album rib bulb path oven civil tank"
         val birthday = "1"
         val datadir = MainApplication.getAppContext()!!.filesDir.path
         val monitorMempool = "false"
@@ -198,7 +198,7 @@ class ExecuteSend {
         System.out.println("\nInit from seed:")
         System.out.println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
-        assertThat(initFromSeed.seed).isEqualTo("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art")
+        assertThat(initFromSeed.seed).isEqualTo("hospital museum valve antique skate museum unfold vocal weird milk scale social vessel identify crowd hospital control album rib bulb path oven civil tank")
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
         var syncJson = RustFFI.execute("sync", "")
@@ -209,14 +209,14 @@ class ExecuteSend {
         System.out.println("\nBalance pre-send:")
         System.out.println(balanceJson)
         val balancePreSend: Balance = mapper.readValue(balanceJson)
-        assertThat(balancePreSend.spendable_sapling_balance).isEqualTo(625000000)
+        assertThat(balancePreSend.spendable_orchard_balance).isEqualTo(1000000)
         assertThat(balancePreSend.transparent_balance).isEqualTo(0)
 
         val send = Send("tmBsTi2xWTjUdEXnuTceL7fecEQKeWaPDJd", 100000, null)
 
-        var sendJson = RustFFI.execute("send", mapper.writeValueAsString(listOf(send)))
-        System.out.println("\nSend:")
-        System.out.println(sendJson)
+        var txidJson = RustFFI.execute("send", mapper.writeValueAsString(listOf(send)))
+        System.out.println("\nTXID:")
+        System.out.println(txidJson)
 
         var sendProgressJson = RustFFI.execute("sendprogress", "")
         System.out.println("\nSend progress:")
