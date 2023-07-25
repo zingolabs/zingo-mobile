@@ -38,7 +38,7 @@ async fn execute_send_from_orchard_arm32() {
         scenarios::funded_orchard_mobileclient(1_000_000).await;
 
     let (exit_code, output, error) =
-        test_utils::android_integration_test("armeabi-v7a", "ExecuteSend");
+        test_utils::android_integration_test("armeabi-v7a", "ExecuteSendFromOrchard");
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);

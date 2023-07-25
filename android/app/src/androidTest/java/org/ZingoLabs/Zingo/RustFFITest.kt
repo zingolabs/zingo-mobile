@@ -182,9 +182,9 @@ class ExecuteSyncFromSeed {
     }
 }
 
-class ExecuteSendFromSeed {
+class ExecuteSendFromOrchard {
     @Test
-    fun executeSendFromSeed() {
+    fun executeSendFromOrchard() {
         val mapper = jacksonObjectMapper()
 
         val server = "http://10.0.2.2:20000"
@@ -212,7 +212,12 @@ class ExecuteSendFromSeed {
         assertThat(balancePreSend.spendable_orchard_balance).isEqualTo(1000000)
         assertThat(balancePreSend.transparent_balance).isEqualTo(0)
 
-        val send = Send("tmBsTi2xWTjUdEXnuTceL7fecEQKeWaPDJd", 100000, null)
+        var addressesJson = RustFFI.execute("addresses", "")
+        System.out.println("\nAddresses:")
+        System.out.println(addressesJson)
+        val addresses: List<Addresses> = mapper.readValue(addressesJson)
+
+        val send = Send(addresses[0].receivers.transparent, 100000, null)
 
         var txidJson = RustFFI.execute("send", mapper.writeValueAsString(listOf(send)))
         System.out.println("\nTXID:")
