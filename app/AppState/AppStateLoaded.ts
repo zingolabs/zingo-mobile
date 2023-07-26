@@ -13,7 +13,6 @@ import TransactionType from './types/TransactionType';
 import InfoType from './types/InfoType';
 import WalletType from './types/WalletType';
 import SyncingStatusClass from './classes/SyncingStatusClass';
-import DimensionsType from './types/DimensionsType';
 import zecPriceType from './types/zecPriceType';
 import BackgroundType from './types/BackgroundType';
 import { TranslateType } from './types/TranslateType';
@@ -25,7 +24,6 @@ import SnackbarType from './types/SnackbarType';
 export default interface AppStateLoaded {
   navigation: StackScreenProps<any>['navigation'];
   route: StackScreenProps<any>['route'];
-  dimensions: DimensionsType;
   appState: string;
   netInfo: NetInfoType;
 

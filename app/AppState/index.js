@@ -10,7 +10,6 @@ import ToAddrClass from './classes/ToAddrClass';
 import TotalBalanceClass from './classes/TotalBalanceClass';
 import WalletSettingsClass from './classes/WalletSettingsClass';
 
-import DimensionsType from './types/DimensionsType';
 import InfoType from './types/InfoType';
 import SendJsonToTypeType from './types/SendJsonToTypeType';
 import TransactionType from './types/TransactionType';
@@ -46,7 +45,6 @@ export {
   WalletType,
   SendJsonToTypeType,
   InfoType,
-  DimensionsType,
   zecPriceType,
   BackgroundType,
   BackgroundErrorType,

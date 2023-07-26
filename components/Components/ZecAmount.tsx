@@ -69,7 +69,7 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
     setTimeout(() => setPrivacyHigh(true), 5000);
   };
 
-  console.log(size, corrector, Dimensions.get('screen'));
+  //console.log(size, corrector, Dimensions.get('screen'));
 
   return (
     <View style={{ ...style, flexDirection: 'row', alignItems: 'baseline' }}>

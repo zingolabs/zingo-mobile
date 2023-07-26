@@ -4,7 +4,6 @@ import TotalBalanceClass from './classes/TotalBalanceClass';
 
 import InfoType from './types/InfoType';
 import WalletType from './types/WalletType';
-import DimensionsType from './types/DimensionsType';
 import zecPriceType from './types/zecPriceType';
 import BackgroundType from './types/BackgroundType';
 import { TranslateType } from './types/TranslateType';
@@ -16,7 +15,6 @@ import SnackbarType from './types/SnackbarType';
 export default interface AppStateLoading {
   navigation: StackScreenProps<any>['navigation'];
   route: StackScreenProps<any>['route'];
-  dimensions: DimensionsType;
   appState: string;
   netInfo: NetInfoType;
 

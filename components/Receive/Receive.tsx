@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState, ReactNode, useEffect } from 'react';
-import { View } from 'react-native';
+import { Dimensions, View } from 'react-native';
 import { TabView, TabBar, SceneRendererProps, Route, NavigationState } from 'react-native-tab-view';
 import { useTheme } from '@react-navigation/native';
 
@@ -27,7 +27,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   setUfvkViewModalVisible,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, dimensions, addresses, uaAddress, mode, addLastSnackbar } = context;
+  const { translate, addresses, uaAddress, mode, addLastSnackbar } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [index, setIndex] = useState(0);
   const [routes, setRoutes] = useState<{ key: string; title: string }[]>([]);
@@ -40,6 +40,11 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   const uaddrs = addresses.filter(a => a.addressKind === 'u') || [];
   const zaddrs = addresses.filter(a => a.uaAddress === uaAddress && a.addressKind === 'z') || [];
   const taddrs = addresses.filter(a => a.uaAddress === uaAddress && a.addressKind === 't') || [];
+
+  const dimensions = {
+    width: Dimensions.get('screen').width,
+    height: Dimensions.get('screen').height,
+  };
 
   if (displayAddress) {
     const displayAddressIndex = uaddrs.findIndex(a => a.address === displayAddress);
