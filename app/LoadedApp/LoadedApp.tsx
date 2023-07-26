@@ -1445,6 +1445,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
               initialRouteName={translate('loadedapp.wallet-menu') as string}
               screenOptions={({ route }) => ({
                 tabBarIcon: ({ focused }) => fnTabBarIcon(route, focused),
+                tabBarLabelPosition: 'below-icon',
                 tabBarActiveTintColor: 'transparent',
                 tabBarActiveBackgroundColor: colors.primaryDisabled,
                 tabBarInactiveTintColor: colors.money,

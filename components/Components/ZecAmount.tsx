@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect } from 'react';
-import { Text, View, Platform, TextStyle, TouchableOpacity } from 'react-native';
+import { Text, View, Platform, TextStyle, TouchableOpacity, Dimensions } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { getNumberFormatSettings } from 'react-native-localize';
 
@@ -57,12 +57,19 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
     smallPrefix = false;
   }
 
+  // when the scale is more than 2 I need to fix some movements.
+  // Pixel 2 -> scale 2.625
+  // Samsung A8 Tablet -> 1.5
+  let corrector = Dimensions.get('screen').scale;
+
   const alignmentPadding = Platform.OS === 'android' ? 4 : 0;
 
   const onPress = () => {
     setPrivacyHigh(false);
     setTimeout(() => setPrivacyHigh(true), 5000);
   };
+
+  console.log(size, corrector, Dimensions.get('screen'));
 
   return (
     <View style={{ ...style, flexDirection: 'row', alignItems: 'baseline' }}>
@@ -72,12 +79,22 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
             style={{
               fontSize: size * (smallPrefix ? 0.7 : 1),
               color,
-              transform: [{ scale: 2 }, { translateY: size * (smallPrefix ? 0.11 : 0.16) }],
+              transform: [
+                { scale: 2 },
+                {
+                  translateY:
+                    size * corrector * (smallPrefix ? (corrector < 2 ? -0.01 : 0.045) : corrector < 2 ? -0.01 : 0.06),
+                },
+              ],
             }}>
             {'\u1647'}
           </Text>
           <Text
-            style={{ fontSize: size * (smallPrefix ? 0.7 : 1), color, marginLeft: size * (smallPrefix ? 0.15 : 0.2) }}>
+            style={{
+              fontSize: size * (smallPrefix ? 0.7 : 1),
+              color,
+              marginLeft: size * corrector * (smallPrefix ? (corrector < 2 ? 0.1 : 0.05) : corrector < 2 ? 0.15 : 0.07),
+            }}>
             {'EC'}
           </Text>
           {privacyHigh ? (

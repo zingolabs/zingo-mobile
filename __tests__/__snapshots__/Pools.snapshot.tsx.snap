@@ -245,7 +245,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                             "scale": 2,
                           },
                           {
-                            "translateY": 2.88,
+                            "translateY": 2.16,
                           },
                         ],
                       }
@@ -258,7 +258,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                       {
                         "color": undefined,
                         "fontSize": 18,
-                        "marginLeft": 3.6,
+                        "marginLeft": 2.5200000000000005,
                       }
                     }
                   >
@@ -352,7 +352,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                             "scale": 2,
                           },
                           {
-                            "translateY": 2.88,
+                            "translateY": 2.16,
                           },
                         ],
                       }
@@ -365,7 +365,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                       {
                         "color": "red",
                         "fontSize": 18,
-                        "marginLeft": 3.6,
+                        "marginLeft": 2.5200000000000005,
                       }
                     }
                   >
@@ -493,7 +493,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                             "scale": 2,
                           },
                           {
-                            "translateY": 2.88,
+                            "translateY": 2.16,
                           },
                         ],
                       }
@@ -506,7 +506,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                       {
                         "color": undefined,
                         "fontSize": 18,
-                        "marginLeft": 3.6,
+                        "marginLeft": 2.5200000000000005,
                       }
                     }
                   >
@@ -600,7 +600,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                             "scale": 2,
                           },
                           {
-                            "translateY": 2.88,
+                            "translateY": 2.16,
                           },
                         ],
                       }
@@ -613,7 +613,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                       {
                         "color": "red",
                         "fontSize": 18,
-                        "marginLeft": 3.6,
+                        "marginLeft": 2.5200000000000005,
                       }
                     }
                   >
@@ -739,7 +739,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                             "scale": 2,
                           },
                           {
-                            "translateY": 2.88,
+                            "translateY": 2.16,
                           },
                         ],
                       }
@@ -752,7 +752,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                       {
                         "color": "red",
                         "fontSize": 18,
-                        "marginLeft": 3.6,
+                        "marginLeft": 2.5200000000000005,
                       }
                     }
                   >

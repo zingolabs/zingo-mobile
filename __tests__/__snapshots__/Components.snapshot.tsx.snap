@@ -245,7 +245,7 @@ exports[`Component Components - test ZecAmount High Privacy - snapshot 1`] = `
                 "scale": 2,
               },
               {
-                "translateY": 3.2,
+                "translateY": 2.4,
               },
             ],
           }
@@ -258,7 +258,7 @@ exports[`Component Components - test ZecAmount High Privacy - snapshot 1`] = `
           {
             "color": "red",
             "fontSize": 20,
-            "marginLeft": 4,
+            "marginLeft": 2.8000000000000003,
           }
         }
       >
@@ -331,7 +331,7 @@ exports[`Component Components - test ZecAmount Normal Privacy - snapshot 1`] = `
                 "scale": 2,
               },
               {
-                "translateY": 3.2,
+                "translateY": 2.4,
               },
             ],
           }
@@ -344,7 +344,7 @@ exports[`Component Components - test ZecAmount Normal Privacy - snapshot 1`] = `
           {
             "color": "red",
             "fontSize": 20,
-            "marginLeft": 4,
+            "marginLeft": 2.8000000000000003,
           }
         }
       >
