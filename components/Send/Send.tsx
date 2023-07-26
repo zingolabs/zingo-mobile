@@ -828,7 +828,9 @@ const Send: React.FunctionComponent<SendProps> = ({
                             backgroundColor: 'transparent',
                           }}
                           value={ta.memo}
-                          onChangeText={(text: string) => updateToField(null, null, null, text, null)}
+                          onChangeText={(text: string) =>
+                            updateToField(null, !ta.amount && !!text ? '0' : null, null, text, null)
+                          }
                           editable={true}
                         />
                       </View>
