@@ -160,6 +160,7 @@ class ExecuteSyncFromSeed {
         System.out.println("\nInfo:")
         System.out.println(infoJson)
         val info: Info = mapper.readValue(infoJson)
+        assertThat(info.latest_block_height).isGreaterThan(0)
 
         var heightJson = RustFFI.execute("height", "")
         System.out.println("\nHeight pre-sync:")
