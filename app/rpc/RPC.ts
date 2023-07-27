@@ -882,6 +882,13 @@ export default class RPC {
         //  syncProcessStalled,
         //);
 
+        // if current block is lower than the previous current block
+        // The user need to see something not confusing.
+        if (current_block < this.prev_current_block) {
+          console.log('blocks down', current_block - this.prev_current_block);
+          current_block = this.prev_current_block;
+        }
+
         this.prev_current_block = current_block;
 
         this.seconds_batch += 5;
