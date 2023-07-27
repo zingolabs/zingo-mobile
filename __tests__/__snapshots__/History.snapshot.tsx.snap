@@ -265,7 +265,7 @@ exports[`Component History - test History currency USD, privacy high & mode expe
                       "scale": 2,
                     },
                     {
-                      "translateY": 3.96,
+                      "translateY": 3.2399999999999998,
                     },
                   ],
                 }
@@ -278,7 +278,7 @@ exports[`Component History - test History currency USD, privacy high & mode expe
                 {
                   "color": "rgb(28, 28, 30)",
                   "fontSize": 25.2,
-                  "marginLeft": 5.3999999999999995,
+                  "marginLeft": 3.6,
                 }
               }
             >
@@ -764,7 +764,7 @@ exports[`Component History - test History currency USD, privacy high & mode expe
                             "scale": 2,
                           },
                           {
-                            "translateY": 2.88,
+                            "translateY": 2.16,
                           },
                         ],
                       }
@@ -777,7 +777,7 @@ exports[`Component History - test History currency USD, privacy high & mode expe
                       {
                         "color": "rgb(0, 122, 255)",
                         "fontSize": 18,
-                        "marginLeft": 3.6,
+                        "marginLeft": 2.5200000000000005,
                       }
                     }
                   >
@@ -954,7 +954,7 @@ exports[`Component History - test History currency USD, privacy high & mode expe
                             "scale": 2,
                           },
                           {
-                            "translateY": 2.88,
+                            "translateY": 2.16,
                           },
                         ],
                       }
@@ -967,7 +967,7 @@ exports[`Component History - test History currency USD, privacy high & mode expe
                       {
                         "color": "rgb(0, 122, 255)",
                         "fontSize": 18,
-                        "marginLeft": 3.6,
+                        "marginLeft": 2.5200000000000005,
                       }
                     }
                   >
@@ -1170,7 +1170,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                       "scale": 2,
                     },
                     {
-                      "translateY": 3.96,
+                      "translateY": 3.2399999999999998,
                     },
                   ],
                 }
@@ -1183,7 +1183,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                 {
                   "color": "rgb(28, 28, 30)",
                   "fontSize": 25.2,
-                  "marginLeft": 5.3999999999999995,
+                  "marginLeft": 3.6,
                 }
               }
             >
@@ -1537,7 +1537,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                             "scale": 2,
                           },
                           {
-                            "translateY": 2.88,
+                            "translateY": 2.16,
                           },
                         ],
                       }
@@ -1550,7 +1550,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                       {
                         "color": "rgb(0, 122, 255)",
                         "fontSize": 18,
-                        "marginLeft": 3.6,
+                        "marginLeft": 2.5200000000000005,
                       }
                     }
                   >
@@ -1738,7 +1738,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                             "scale": 2,
                           },
                           {
-                            "translateY": 2.88,
+                            "translateY": 2.16,
                           },
                         ],
                       }
@@ -1751,7 +1751,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                       {
                         "color": "rgb(0, 122, 255)",
                         "fontSize": 18,
-                        "marginLeft": 3.6,
+                        "marginLeft": 2.5200000000000005,
                       }
                     }
                   >

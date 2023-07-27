@@ -5,9 +5,7 @@ import {
   Text,
   Alert,
   I18nManager,
-  Dimensions,
   EmitterSubscription,
-  ScaledSize,
   AppState,
   NativeEventSubscription,
   Platform,
@@ -50,7 +48,6 @@ import Utils from '../utils';
 import { ThemeType } from '../types';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import { ContextAppLoadedProvider, defaultAppStateLoaded } from '../context';
-import platform from '../platform/platform';
 import { parseZcashURI, serverUris, ZcashURITargetClass } from '../uris';
 import BackgroundFileImpl from '../../components/Background/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -217,15 +214,12 @@ type LoadedAppClassProps = {
 
 export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   rpc: RPC;
-  dim: EmitterSubscription;
   appstate: NativeEventSubscription;
   linking: EmitterSubscription;
   unsubscribeNetInfo: NetInfoSubscription;
 
   constructor(props: LoadedAppClassProps) {
     super(props);
-
-    const screen = Dimensions.get('screen');
 
     this.state = {
       ...defaultAppStateLoaded,
@@ -241,13 +235,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       mode: props.mode,
       background: props.background,
       readOnly: props.readOnly,
-      dimensions: {
-        width: Number(screen.width.toFixed(0)),
-        height: Number(screen.height.toFixed(0)),
-        orientation: platform.isPortrait(screen) ? 'portrait' : 'landscape',
-        deviceType: platform.isTablet(screen) ? 'tablet' : 'phone',
-        scale: Number(screen.scale.toFixed(2)),
-      },
       appState: AppState.currentState,
       setBackgroundError: this.setBackgroundError,
       addLastSnackbar: this.addLastSnackbar,
@@ -266,7 +253,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       props.readOnly,
     );
 
-    this.dim = {} as EmitterSubscription;
     this.appstate = {} as NativeEventSubscription;
     this.linking = {} as EmitterSubscription;
     this.unsubscribeNetInfo = {} as NetInfoSubscription;
@@ -284,10 +270,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     (async () => {
       await this.rpc.configure();
     })();
-
-    this.dim = Dimensions.addEventListener('change', ({ screen }) => {
-      this.setDimensions(screen);
-    });
 
     this.appstate = AppState.addEventListener('change', async nextAppState => {
       if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
@@ -383,7 +365,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
 
   componentWillUnmount = async () => {
     await this.rpc.clearTimers();
-    this.dim && typeof this.dim.remove === 'function' && this.dim.remove();
     this.appstate && typeof this.appstate.remove === 'function' && this.appstate.remove();
     this.linking && typeof this.linking === 'function' && this.linking.remove();
     this.unsubscribeNetInfo && this.unsubscribeNetInfo();
@@ -454,24 +435,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       poolsModalVisible: false,
       insightModalVisible: false,
     });
-  };
-
-  setDimensions = (screen: ScaledSize) => {
-    if (
-      this.state.dimensions.width !== Number(screen.width.toFixed(0)) ||
-      this.state.dimensions.height !== Number(screen.height.toFixed(0))
-    ) {
-      //console.log('fetch screen dimensions');
-      this.setState({
-        dimensions: {
-          width: Number(screen.width.toFixed(0)),
-          height: Number(screen.height.toFixed(0)),
-          orientation: platform.isPortrait(screen) ? 'portrait' : 'landscape',
-          deviceType: platform.isTablet(screen) ? 'tablet' : 'phone',
-          scale: Number(screen.scale.toFixed(2)),
-        },
-      });
-    }
   };
 
   fetchBackgroundSyncing = async () => {
@@ -1445,6 +1408,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
               initialRouteName={translate('loadedapp.wallet-menu') as string}
               screenOptions={({ route }) => ({
                 tabBarIcon: ({ focused }) => fnTabBarIcon(route, focused),
+                tabBarLabelPosition: 'below-icon',
                 tabBarActiveTintColor: 'transparent',
                 tabBarActiveBackgroundColor: colors.primaryDisabled,
                 tabBarInactiveTintColor: colors.money,

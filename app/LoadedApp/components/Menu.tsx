@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { ScrollView, View, Text } from 'react-native';
+import { ScrollView, View, Text, Dimensions } from 'react-native';
 
 import RegText from '../../../components/Components/RegText';
 import FadeText from '../../../components/Components/FadeText';
@@ -16,11 +16,15 @@ type MenuProps = {
 
 const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, readOnly, mode, totalBalance, transactions, dimensions } = context;
+  const { translate, readOnly, mode, totalBalance, transactions } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const item = {
     fontSize: 14,
     paddingTop: 15,
+  };
+  const dimensions = {
+    width: Dimensions.get('screen').width,
+    height: Dimensions.get('screen').height,
   };
 
   const onItemSelectedWrapper = (value: string) => {

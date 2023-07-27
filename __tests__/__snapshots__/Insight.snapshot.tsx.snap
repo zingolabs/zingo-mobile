@@ -159,7 +159,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
             "borderBottomColor": "rgb(0, 122, 255)",
             "borderBottomWidth": 2,
             "paddingBottom": 10,
-            "width": NaN,
+            "width": 243.33333333333334,
           }
         }
       >
@@ -215,7 +215,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
             "borderBottomColor": "rgb(0, 122, 255)",
             "borderBottomWidth": 0,
             "paddingBottom": 10,
-            "width": NaN,
+            "width": 243.33333333333334,
           }
         }
       >
@@ -271,7 +271,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
             "borderBottomColor": "rgb(0, 122, 255)",
             "borderBottomWidth": 0,
             "paddingBottom": 10,
-            "width": NaN,
+            "width": 243.33333333333334,
           }
         }
       >

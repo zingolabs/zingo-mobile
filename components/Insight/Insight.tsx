@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
-import { View, ScrollView, SafeAreaView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, ScrollView, SafeAreaView, TouchableOpacity, ActivityIndicator, Dimensions } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { PieChart } from 'react-native-svg-charts';
 import { Circle, G, Line, Text } from 'react-native-svg';
@@ -80,12 +80,16 @@ type InsightProps = {
 
 const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, set_privacy_option }) => {
   const context = useContext(ContextAppLoaded);
-  const { info, translate, dimensions, privacy, addLastSnackbar } = context;
+  const { info, translate, privacy, addLastSnackbar } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [pieAmounts, setPieAmounts] = useState<DataType[]>([]);
   const [expandAddress, setExpandAddress] = useState<boolean[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [tab, setTab] = useState<'sent' | 'sends' | 'memobytes'>('sent');
+  const dimensions = {
+    width: Dimensions.get('screen').width,
+    height: Dimensions.get('screen').height,
+  };
 
   useEffect(() => {
     (async () => {

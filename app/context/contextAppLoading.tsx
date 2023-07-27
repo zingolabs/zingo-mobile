@@ -3,7 +3,6 @@ import { StackScreenProps } from '@react-navigation/stack';
 
 import {
   AppStateLoading,
-  DimensionsType,
   InfoType,
   TotalBalanceClass,
   WalletType,
@@ -18,7 +17,6 @@ import SnackbarType from '../AppState/types/SnackbarType';
 export const defaultAppStateLoading: AppStateLoading = {
   navigation: {} as StackScreenProps<any>['navigation'],
   route: {} as StackScreenProps<any>['route'],
-  dimensions: {} as DimensionsType,
   appState: '',
   netInfo: {} as NetInfoType,
 

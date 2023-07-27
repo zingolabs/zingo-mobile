@@ -391,7 +391,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode expert - s
                                   "scale": 2,
                                 },
                                 {
-                                  "translateY": 2.4,
+                                  "translateY": 1.7999999999999998,
                                 },
                               ],
                             }
@@ -404,7 +404,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode expert - s
                             {
                               "color": "red",
                               "fontSize": 15,
-                              "marginLeft": 3,
+                              "marginLeft": 2.1,
                             }
                           }
                         >
@@ -1241,7 +1241,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                                   "scale": 2,
                                 },
                                 {
-                                  "translateY": 2.4,
+                                  "translateY": 1.7999999999999998,
                                 },
                               ],
                             }
@@ -1254,7 +1254,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                             {
                               "color": "red",
                               "fontSize": 15,
-                              "marginLeft": 3,
+                              "marginLeft": 2.1,
                             }
                           }
                         >

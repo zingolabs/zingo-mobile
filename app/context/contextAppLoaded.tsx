@@ -12,7 +12,6 @@ import {
   TransactionType,
   InfoType,
   WalletType,
-  DimensionsType,
   AddressClass,
   AddressBookClass,
   zecPriceType,
@@ -28,7 +27,6 @@ import SnackbarType from '../AppState/types/SnackbarType';
 export const defaultAppStateLoaded: AppStateLoaded = {
   navigation: {} as StackScreenProps<any>['navigation'],
   route: {} as StackScreenProps<any>['route'],
-  dimensions: {} as DimensionsType,
   appState: '',
   netInfo: {} as NetInfoType,
 

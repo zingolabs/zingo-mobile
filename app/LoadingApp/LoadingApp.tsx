@@ -9,9 +9,7 @@ import {
   Modal,
   ScrollView,
   I18nManager,
-  Dimensions,
   EmitterSubscription,
-  ScaledSize,
   AppState,
   NativeEventSubscription,
   Platform,
@@ -35,7 +33,6 @@ import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import RPC from '../rpc';
 import { ThemeType } from '../types';
 import { defaultAppStateLoading, ContextAppLoadingProvider } from '../context';
-import platform from '../platform/platform';
 import BackgroundFileImpl from '../../components/Background/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '../createAlert';
@@ -206,8 +203,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
   constructor(props: LoadingAppClassProps) {
     super(props);
 
-    const screen = Dimensions.get('screen');
-
     let netInfo: NetInfoType = {} as NetInfoType;
     NetInfo.fetch().then(state => {
       //console.log(state);
@@ -230,13 +225,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
       privacy: props.privacy,
       mode: props.mode,
       background: props.background,
-      dimensions: {
-        width: Number(screen.width.toFixed(0)),
-        height: Number(screen.height.toFixed(0)),
-        orientation: platform.isPortrait(screen) ? 'portrait' : 'landscape',
-        deviceType: platform.isTablet(screen) ? 'tablet' : 'phone',
-        scale: Number(screen.scale.toFixed(2)),
-      },
       appState: AppState.currentState,
       setBackgroundError: this.setBackgroundError,
       netInfo: netInfo,
@@ -301,10 +289,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
           this.setState({ screen: 1, walletExists: false });
         }
       }
-    });
-
-    this.dim = Dimensions.addEventListener('change', ({ screen }) => {
-      this.setDimensions(screen);
     });
 
     this.appstate = AppState.addEventListener('change', async nextAppState => {
@@ -372,18 +356,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     this.dim && typeof this.dim.remove === 'function' && this.dim.remove();
     this.appstate && typeof this.appstate.remove === 'function' && this.appstate.remove();
     this.unsubscribeNetInfo && typeof this.unsubscribeNetInfo === 'function' && this.unsubscribeNetInfo();
-  };
-
-  setDimensions = (screen: ScaledSize) => {
-    this.setState({
-      dimensions: {
-        width: Number(screen.width.toFixed(0)),
-        height: Number(screen.height.toFixed(0)),
-        orientation: platform.isPortrait(screen) ? 'portrait' : 'landscape',
-        deviceType: platform.isTablet(screen) ? 'tablet' : 'phone',
-        scale: Number(screen.scale.toFixed(2)),
-      },
-    });
   };
 
   fetchBackgroundSyncing = async () => {
