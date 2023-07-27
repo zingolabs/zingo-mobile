@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useContext, useRef } from 'react';
-import { View, SafeAreaView, ScrollView, TouchableOpacity, Text, TextInput, Keyboard } from 'react-native';
+import { View, SafeAreaView, ScrollView, TouchableOpacity, Text, TextInput, Keyboard, Alert } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import Clipboard from '@react-native-community/clipboard';
 import Animated, { EasingNode } from 'react-native-reanimated';
@@ -182,6 +182,39 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
       (async () => await RPC.rpc_setInterruptSyncAfterBatch('false'))();
     }
   }, [action]);
+
+  const onPressOK = () => {
+    Alert.alert(
+      !!texts && !!texts[action] ? texts[action][3] : '',
+      (action === 'change'
+        ? (translate('seed.change-warning') as string)
+        : action === 'backup'
+        ? (translate('seed.backup-warning') as string)
+        : action === 'server'
+        ? (translate('seed.server-warning') as string)
+        : '') +
+        (server.chain_name !== 'main' && (action === 'change' || action === 'server')
+          ? '\n' + (translate('seed.mainnet-warning') as string)
+          : ''),
+      [
+        {
+          text: 'confirm',
+          onPress: () => {
+            if (action === 'restore') {
+              // waiting while closing the keyboard, just in case.
+              setTimeout(async () => {
+                onClickOK(seedPhrase, Number(birthdayNumber));
+              }, 100);
+            } else {
+              onClickOK(seedPhrase, Number(birthdayNumber));
+            }
+          },
+        },
+        { text: translate('cancel') as string, onPress: () => onClickCancel(), style: 'cancel' },
+      ],
+      { cancelable: true, userInterfaceStyle: 'light' },
+    );
+  };
 
   //console.log('=================================');
   //console.log(wallet.seed, wallet.birthday);
@@ -412,28 +445,6 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
             </>
           )}
         </View>
-
-        {times === 3 && action === 'change' && (
-          <FadeText style={{ marginTop: 20, padding: 20, textAlign: 'center', color: 'white' }}>
-            {translate('seed.change-warning') as string}
-          </FadeText>
-        )}
-        {times === 3 && action === 'backup' && (
-          <FadeText style={{ marginTop: 20, padding: 20, textAlign: 'center', color: 'white' }}>
-            {translate('seed.backup-warning') as string}
-          </FadeText>
-        )}
-        {times === 3 && action === 'server' && (
-          <FadeText style={{ marginTop: 20, padding: 20, textAlign: 'center', color: 'white' }}>
-            {translate('seed.server-warning') as string}
-          </FadeText>
-        )}
-
-        {server.chain_name !== 'main' && times === 3 && (action === 'change' || action === 'server') && (
-          <FadeText style={{ color: colors.primary, textAlign: 'center', width: '100%' }}>
-            {translate('seed.mainnet-warning') as string}
-          </FadeText>
-        )}
         <View style={{ marginBottom: 30 }} />
       </ScrollView>
       <View
@@ -448,7 +459,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
           testID="seed.button.OK"
           type={mode === 'basic' ? 'Secondary' : 'Primary'}
           style={{
-            backgroundColor: times === 3 ? 'red' : mode === 'basic' ? colors.background : colors.primary,
+            backgroundColor: mode === 'basic' ? colors.background : colors.primary,
           }}
           title={
             mode === 'basic' ? (translate('cancel') as string) : !!texts && !!texts[action] ? texts[action][times] : ''
@@ -463,7 +474,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
               }
               return;
             }
-            if (times === 0 || times === 3) {
+            if (times === 0) {
               if (action === 'restore') {
                 // waiting while closing the keyboard, just in case.
                 setTimeout(async () => {
@@ -472,8 +483,10 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
               } else {
                 onClickOK(seedPhrase, Number(birthdayNumber));
               }
-            } else if (times === 1 || times === 2) {
+            } else if (times === 1) {
               setTimes(times + 1);
+            } else if (times === 2) {
+              onPressOK();
             }
           }}
         />

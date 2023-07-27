@@ -225,13 +225,13 @@
         "",
         "Open New",
         "You really want \n to change your \n actual wallet",
-        "Are you sure \n 100% or more"
+        "Are you sure 100% or more"
       ],
       "server": [
         "",
         "Change Server",
         "You really want \n to change your \n actual server",
-        "Are you sure \n 100% or more"
+        "Are you sure 100% or more"
       ],
       "view": ["I have saved \n the seed"],
       "restore": ["Restore Wallet"],
@@ -239,7 +239,7 @@
         "",
         "Restore",
         "You really want \n to restore your \n backup wallet",
-        "Are you sure \n 100% or more"
+        "Are you sure 100% or more"
       ]
     },
     "title": "Seed",
@@ -266,7 +266,8 @@
     "seedplaceholder": "Seed (24 words)",
     "seed-acc": "Seed Phrase Field",
     "birthday-acc": "Birthday Field",
-    "tapreveal": "Tap to reveal"
+    "tapreveal": "Tap to reveal",
+    "confirm-button": "Confirm"
   },
   "send": {
     "Broadcast": "Successfully Broadcast Tx:",
@@ -299,14 +300,17 @@
     "usd-acc": "USD Amount Field",
     "memo-acc": "Memo Field",
     "amountplaceholder": "number",
-    "nofetchprice": "No price",
+    "nofetchprice": "Tap here for USD Price",
     "sendall": "Send All",
     "sendall-message": "Your are about to send the entire amount in your wallet",
     "includeua": "Include your UA:",
     "confirm-memo": "Memo",
     "duplicate-nullifier-error": "Your funds are still confirming and probably syncing. You can wait until the funds are confirmed or you can try to send now with a lower amount. The Transaction build failed!",
     "dust-error" : "The amount that you are trying to send to a Transparent address is really tiny. The Transaction build failed!",
-    "needtoshield": "Have funds to shield"
+    "needtoshield": "Have funds to shield",
+    "fetchpricetitle": "Fetch USD Price",
+    "fetchpricebody": "Please confirm that you want to fetch the USD price from internet.",
+    "fetch-button": "fetch"
   },
   "receive": {
     "u-title": "Unified Address",
@@ -432,13 +436,13 @@
         "",
         "Open New",
         "You really want \n to change your \n actual wallet",
-        "Are you sure \n 100% or more"
+        "Are you sure 100% or more"
       ],
       "server": [
         "",
         "Change Server",
         "You really want \n to change your \n actual server",
-        "Are you sure \n 100% or more"
+        "Are you sure 100% or more"
       ],
       "view": ["I have saved \n the Viewing Key"],
       "restore": ["Restore Wallet"],
@@ -446,7 +450,7 @@
         "",
         "Restore",
         "You really want \n to restore your \n backup wallet",
-        "Are you sure \n 100% or more"
+        "Are you sure 100% or more"
       ]
     },
     "privkey": "Spending/Private ",
@@ -461,7 +465,8 @@
     "text-readonly-server": "Before changing another server, carefully write down the viewing key of the current wallet. It is the only way you will have to restore/access your current wallet.",
     "change-warning": "IF YOU CHANGE TO ANOTHER WALLET, YOU WILL NO LONGER BE ABLE TO VIEW THIS WALLET WITHOUT THE VIEWING KEY.",
     "backup-warning": "IF YOU CHANGE TO YOUR BACKUP WALLET, YOU WILL NO LONGER BE ABLE TO VIEW THIS WALLET WITHOUT THE VIEWING KEY.",
-    "server-warning": "IF YOU CHANGE TO A SERVER WITH A DIFFERENT CHAIN, YOU WILL NO LONGER BE ABLE TO VIEW THIS WALLET WITHOUT THE VIEWING KEY"
+    "server-warning": "IF YOU CHANGE TO A SERVER WITH A DIFFERENT CHAIN, YOU WILL NO LONGER BE ABLE TO VIEW THIS WALLET WITHOUT THE VIEWING KEY",
+    "confirm-button": "Confirm"
   },
   "pools": {
     "title": "Fund Pools",

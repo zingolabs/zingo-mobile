@@ -225,13 +225,13 @@
         "",
         "Abrir Nuevo",
         "Realmente quieres \n cambiar tu \n monedero activo",
-        "Estás seguro \n al 100%"
+        "Estás seguro al 100%"
       ],
       "server": [
         "",
         "Cambiar Servidor",
         "Realmente quieres \n cambiar el \n servidor activo",
-        "Estás seguro \n al 100%"
+        "Estás seguro al 100%"
       ],
       "view": ["Ya he guardado \n la semilla"],
       "restore": ["Restaurar Monedero"],
@@ -239,7 +239,7 @@
         "",
         "Restaurar",
         "Realmente quieres \n restaurar tu \n copia de seguridad",
-        "Estás seguro \n al 100%"
+        "Estás seguro al 100%"
       ]
     },
     "title": "Semilla",
@@ -266,7 +266,8 @@
     "seedplaceholder": "Semilla (24 palabras)",
     "seed-acc": "Campo Frase Semilla",
     "birthday-acc": "Campo Cumpleaños",
-    "tapreveal": "Pulsar para revelar"
+    "tapreveal": "Pulsar para revelar",
+    "confirm-button": "Confirmar"
   },
   "send": {
     "Broadcast": "Transmitida con éxito Tx:",
@@ -299,14 +300,17 @@
     "usd-acc": "Campo de Cantidad en Dólares",
     "memo-acc": "Campo del Memorándum",
     "amountplaceholder": "numero",
-    "nofetchprice": "Sin precio",
+    "nofetchprice": "Pulsa aquí para precio en USD",
     "sendall": "Enviar Todo",
     "sendall-message": "Estas a punto de enviar toda la cantidad en tu monedero",
     "includeua": "Incluir tu DU:",
     "confirm-memo": "Memorándum",
     "duplicate-nullifier-error": "Tus fondos están todavía confirmándose y probablemente sincronizándose. Puedes esperar hasta que tus fondos estén confirmados o puedes intentar enviar una cantidad más pequeña, La creaccion de la Transacción ha fallado!",
     "dust-error" : "La cantidad que estás intentando enviar a una dirección Transparente is realmente infima, La creacción de la Transacción ha fallado!",
-    "needtoshield": "Hay fondos para Blindar"
+    "needtoshield": "Hay fondos para Blindar",
+    "fetchpricetitle": "Consultar Precio USD",
+    "fetchpricebody": "Por favor confirma que quieres recuperar/consultar el precio en USD de internet.",
+    "fetch-button": "consultar"
   },
   "receive": {
     "u-title": "Dirección Unificada",
@@ -432,13 +436,13 @@
         "",
         "Abrir Nuevo",
         "Realmente quieres \n cambiar tu \n monedero activo",
-        "Estás seguro \n al 100%"
+        "Estás seguro al 100%"
       ],
       "server": [
         "",
         "Cambiar Servidor",
         "Realmente quieres \n cambiar el \n servidor activo",
-        "Estás seguro \n al 100%"
+        "Estás seguro al 100%"
       ],
       "view": ["Ya he guardado \n la clave de visualización"],
       "restore": ["Restaurar Monedero"],
@@ -446,7 +450,7 @@
         "",
         "Restaurar",
         "Realmente quieres \n restaurar tu \n copia de seguridad",
-        "Estás seguro \n al 100%"
+        "Estás seguro al 100%"
       ]
     },
     "privkey": "Gastar/Privada ",
@@ -461,7 +465,8 @@
     "text-readonly-server": "Antes de usar otro servidor, escriba cuidadosamente la clave de visualizacion del monedero actual. Es la única manera que tendrás de restaurar/acceder tu monedero actual.",
     "change-warning": "SI CAMBIAS A OTRO MONEDERO, YA NO PODRAS VER ESTE MONEDERO SIN LA CLAVE DE VISUALIZACION.",
     "backup-warning": "SI CAMBIAS A TU MONEDERO (COPIA DE SEGURIDAD), YA NO PODRAS VER ESTE MONEDERO SIN LA CLAVE DE VISUALIZACION.",
-    "server-warning": "SI CAMBIAS A UN SERVIDOR CON DIFERENTE TIPO DE CADENA, YA NO PODRAS VER ESTE MONEDERO SIN LA CLAVE DE VISUALIZACION."
+    "server-warning": "SI CAMBIAS A UN SERVIDOR CON DIFERENTE TIPO DE CADENA, YA NO PODRAS VER ESTE MONEDERO SIN LA CLAVE DE VISUALIZACION.",
+    "confirm-button": "Confirmar"
   },
   "pools": {
     "title": "Agrupaciones de Fondos",

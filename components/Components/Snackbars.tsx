@@ -35,7 +35,7 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
         text: currentSnackbar.message,
         numberOfLines: 3,
         duration: Snackbar.LENGTH_INDEFINITE,
-        marginBottom: 60,
+        marginBottom: 120,
         backgroundColor: colors.secondaryDisabled,
         textColor: colors.money,
         action: {
