@@ -328,17 +328,17 @@ export default class RPC {
       const shieldStr: string = await RPCModule.execute('shield', pools);
       if (shieldStr) {
         if (shieldStr.toLowerCase().startsWith('error')) {
-          console.log(`Error shield transparent ${shieldStr}`);
+          console.log(`Error shield ${pools} ${shieldStr}`);
           return shieldStr;
         }
       } else {
-        console.log('Internal Error shield transparent');
-        return 'Error: Internal RPC Error: shield transparent';
+        console.log('Internal Error shield ' + pools);
+        return 'Error: Internal RPC Error: shield ' + pools;
       }
 
       return shieldStr;
     } catch (error) {
-      console.log(`Critical Error shield transparent ${error}`);
+      console.log(`Critical Error shield ${pools} ${error}`);
       return `Error: ${error}`;
     }
   }
