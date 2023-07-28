@@ -886,7 +886,9 @@ export default class RPC {
         // The user need to see something not confusing.
         if (current_block > 0 && this.prev_current_block !== -1 && current_block < this.prev_current_block) {
           //console.log('blocks down', current_block - this.prev_current_block);
-          current_block = this.prev_current_block;
+          // I decided to add only one fake block because otherwise could seems stalled
+          // the user expect every 5 seconds the blocks change...
+          current_block = this.prev_current_block + 1;
         }
 
         this.prev_current_block = current_block;
