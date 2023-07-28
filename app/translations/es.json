@@ -223,13 +223,13 @@
       "new": ["Ya he guardado \n la semilla"],
       "change": [
         "",
-        "Ya he guardado \n la semilla",
+        "Abrir Nuevo",
         "Realmente quieres \n cambiar tu \n monedero activo",
         "Estás seguro \n al 100%"
       ],
       "server": [
         "",
-        "Ya he guardado \n la semilla",
+        "Cambiar Servidor",
         "Realmente quieres \n cambiar el \n servidor activo",
         "Estás seguro \n al 100%"
       ],
@@ -237,7 +237,7 @@
       "restore": ["Restaurar Monedero"],
       "backup": [
         "",
-        "Ya he guardado \n la semilla",
+        "Restaurar",
         "Realmente quieres \n restaurar tu \n copia de seguridad",
         "Estás seguro \n al 100%"
       ]
@@ -249,7 +249,10 @@
     "view": "Visualizar",
     "restore": "Restaurar",
     "backup": "Copia de seguridad",
-    "text-readonly": "Esta es tu Frase Semilla. Por favor apúntala cuidadosamente. Es la única manera que tienes para restaurar/acceder tu monedero activo de nuevo.",
+    "text-readonly": "Antes de cerrar esta ventana, escriba cuidadosamente la frase semilla del monedero actual. Es la única manera que tendrás de restaurar/acceder tu monedero actual.",
+    "text-readonly-backup": "Antes de restaurar la copia de seguridad del monedero anterior, escriba cuidadosamente la frase semilla del monedero actual. Es la única manera que tendrás de restaurar/acceder tu monedero actual.",
+    "text-readonly-change": "Antes de acceder a otro monedero, escriba cuidadosamente la frase semilla del monedero actual. Es la única manera que tendrás de restaurar/acceder tu monedero actual.",
+    "text-readonly-server": "Antes de usar otro servidor, escriba cuidadosamente la frase semilla del monedero actual. Es la única manera que tendrás de restaurar/acceder tu monedero actual.",
     "text-no-readonly": "Introduce tu Frase Semilla (son 24 palabras)",
     "tapcopy": "Pulsar para copiar",
     "tapcopy-seed-message": "Frase Semilla copiada al Portapapeles",
@@ -418,13 +421,13 @@
       "new": ["Ya he guardado \n la clave de visualización"],
       "change": [
         "",
-        "Ya he guardado \n la clave de visualización",
+        "Abrir Nuevo",
         "Realmente quieres \n cambiar tu \n monedero activo",
         "Estás seguro \n al 100%"
       ],
       "server": [
         "",
-        "Ya he guardado \n la clave de visualización",
+        "Cambiar Servidor",
         "Realmente quieres \n cambiar el \n servidor activo",
         "Estás seguro \n al 100%"
       ],
@@ -432,7 +435,7 @@
       "restore": ["Restaurar Monedero"],
       "backup": [
         "",
-        "Ya he guardado \n la clave de visualización",
+        "Restaurar",
         "Realmente quieres \n restaurar tu \n copia de seguridad",
         "Estás seguro \n al 100%"
       ]
@@ -443,7 +446,10 @@
     "tapcopy-message": "Clave copiada al portapapeles",
     "title": "Clave",
     "address": "Dirección",
-    "text-readonly": "Esta es tu clave de visualización. Por favor apúntala/copiala cuidadosamente. Cualquiera que tenga una copia de esta clave puede ver las transacciones asociadas a este monedero.",
+    "text-readonly": "Antes de cerrar esta ventana, escriba cuidadosamente la clave de visualizacion del monedero actual. Es la única manera que tendrás de restaurar/acceder tu monedero actual.",
+    "text-readonly-backup": "Antes de restaurar la copia de seguridad del monedero anterior, escriba cuidadosamente la clave de visualizacion del monedero actual. Es la única manera que tendrás de restaurar/acceder tu monedero actual.",
+    "text-readonly-change": "Antes de acceder a otro monedero, escriba cuidadosamente la clave de visualizacion del monedero actual. Es la única manera que tendrás de restaurar/acceder tu monedero actual.",
+    "text-readonly-server": "Antes de usar otro servidor, escriba cuidadosamente la clave de visualizacion del monedero actual. Es la única manera que tendrás de restaurar/acceder tu monedero actual.",
     "change-warning": "SI CAMBIAS A OTRO MONEDERO, YA NO PODRAS VER ESTE MONEDERO SIN LA CLAVE DE VISUALIZACION.",
     "backup-warning": "SI CAMBIAS A TU MONEDERO (COPIA DE SEGURIDAD), YA NO PODRAS VER ESTE MONEDERO SIN LA CLAVE DE VISUALIZACION.",
     "server-warning": "SI CAMBIAS A UN SERVIDOR CON DIFERENTE TIPO DE CADENA, YA NO PODRAS VER ESTE MONEDERO SIN LA CLAVE DE VISUALIZACION."

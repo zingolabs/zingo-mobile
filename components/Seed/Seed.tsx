@@ -227,7 +227,11 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
           justifyContent: 'flex-start',
         }}>
         <FadeText style={{ marginTop: 0, padding: 20, textAlign: 'center' }}>
-          {readOnly ? (translate('seed.text-readonly') as string) : (translate('seed.text-no-readonly') as string)}
+          {readOnly
+            ? action === 'backup' || action === 'change' || action === 'server'
+              ? (translate(`seed.text-readonly-${action}`) as string)
+              : (translate('seed.text-readonly') as string)
+            : (translate('seed.text-no-readonly') as string)}
         </FadeText>
         <View
           style={{

@@ -76,7 +76,9 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
           justifyContent: 'flex-start',
         }}>
         <FadeText style={{ marginTop: 0, padding: 20, textAlign: 'center' }}>
-          {translate('ufvk.text-readonly') as string}
+          {action === 'backup' || action === 'change' || action === 'server'
+            ? (translate(`ufvk.text-readonly-${action}`) as string)
+            : (translate('ufvk.text-readonly') as string)}
         </FadeText>
 
         {times === 3 && action === 'change' && (
