@@ -884,7 +884,7 @@ export default class RPC {
 
         // if current block is lower than the previous current block
         // The user need to see something not confusing.
-        if (current_block > 0 && current_block < this.prev_current_block) {
+        if (current_block > 0 && this.prev_current_block !== -1 && current_block < this.prev_current_block) {
           //console.log('blocks down', current_block - this.prev_current_block);
           current_block = this.prev_current_block;
         }
