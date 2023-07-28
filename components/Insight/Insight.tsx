@@ -1,12 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
-import { View, ScrollView, SafeAreaView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, ScrollView, SafeAreaView, TouchableOpacity, ActivityIndicator, Dimensions } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { PieChart } from 'react-native-svg-charts';
 import { Circle, G, Line, Text } from 'react-native-svg';
 import { faQrcode } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import Toast from 'react-native-simple-toast';
 import Clipboard from '@react-native-community/clipboard';
 
 import RegText from '../Components/RegText';
@@ -81,12 +80,16 @@ type InsightProps = {
 
 const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, set_privacy_option }) => {
   const context = useContext(ContextAppLoaded);
-  const { info, translate, dimensions, privacy } = context;
+  const { info, translate, privacy, addLastSnackbar } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [pieAmounts, setPieAmounts] = useState<DataType[]>([]);
   const [expandAddress, setExpandAddress] = useState<boolean[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [tab, setTab] = useState<'sent' | 'sends' | 'memobytes'>('sent');
+  const dimensions = {
+    width: Dimensions.get('screen').width,
+    height: Dimensions.get('screen').height,
+  };
 
   useEffect(() => {
     (async () => {
@@ -174,7 +177,11 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, set_privac
               onPress={() => {
                 if (item.address !== 'fee') {
                   Clipboard.setString(item.address);
-                  Toast.show(translate('history.addresscopied') as string, Toast.LONG);
+                  addLastSnackbar({
+                    message: translate('history.addresscopied') as string,
+                    type: 'Primary',
+                    duration: 'short',
+                  });
                   selectExpandAddress(index);
                 }
               }}>
@@ -248,6 +255,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, set_privac
         noSyncingStatus={true}
         noDrawMenu={true}
         set_privacy_option={set_privacy_option}
+        addLastSnackbar={addLastSnackbar}
       />
 
       <View style={{ width: '100%', flexDirection: 'row', marginTop: 10 }}>

@@ -58,11 +58,13 @@ const Theme: ThemeType = {
     card: '#011401', //'#401717',
     border: '#ffffff',
     primary: '#18bd18', //'#df4100',
-    primaryDisabled: 'rgba(90, 140, 90, 1)',
+    primaryDisabled: '#5a8c5a', //'rgba(90, 140, 90, 1)',
+    secondaryDisabled: '#233623',
     text: '#c3c3c3',
     zingo: '#888888',
     placeholder: '#888888',
     money: '#ffffff',
+    syncing: '#ebff5a',
     notification: '',
   },
 };
@@ -160,7 +162,6 @@ describe('Component Send - test', () => {
           poolsMoreInfoOnClick={onFunction}
           syncingStatusMoreInfoOnClick={onFunction}
           setZecPrice={onFunction}
-          setBackgroundError={onFunction}
           set_privacy_option={onFunction}
           setPoolsToShieldSelectSapling={onFunction}
           setPoolsToShieldSelectTransparent={onFunction}
@@ -189,7 +190,6 @@ describe('Component Send - test', () => {
           poolsMoreInfoOnClick={onFunction}
           syncingStatusMoreInfoOnClick={onFunction}
           setZecPrice={onFunction}
-          setBackgroundError={onFunction}
           set_privacy_option={onFunction}
           setPoolsToShieldSelectSapling={onFunction}
           setPoolsToShieldSelectTransparent={onFunction}

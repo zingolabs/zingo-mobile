@@ -18,7 +18,7 @@ describe('Component DetailLine - test', () => {
   });
   test('DetailLine children - snapshot', () => {
     const children = <View />;
-    const about = render(<DetailLine label="label" children={children} />);
-    expect(about.toJSON()).toMatchSnapshot();
+    const detail = render(<DetailLine label="label" children={children} />);
+    expect(detail.toJSON()).toMatchSnapshot();
   });
 });

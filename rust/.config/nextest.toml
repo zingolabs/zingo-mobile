@@ -1,0 +1,10 @@
+[profile.default]
+retries = 3
+test-threads = 1
+
+[profile.ci]
+retries = 3
+test-threads = 1
+failure-output = "immediate-final"
+fail-fast = false
+

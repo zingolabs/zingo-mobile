@@ -12,7 +12,6 @@ import {
   TransactionType,
   InfoType,
   WalletType,
-  DimensionsType,
   AddressClass,
   AddressBookClass,
   zecPriceType,
@@ -23,11 +22,11 @@ import {
   BackgroundErrorType,
   ServerType,
 } from '../AppState';
+import SnackbarType from '../AppState/types/SnackbarType';
 
 export const defaultAppStateLoaded: AppStateLoaded = {
   navigation: {} as StackScreenProps<any>['navigation'],
   route: {} as StackScreenProps<any>['route'],
-  dimensions: {} as DimensionsType,
   appState: '',
   netInfo: {} as NetInfoType,
 
@@ -81,11 +80,15 @@ export const defaultAppStateLoaded: AppStateLoaded = {
 
   translate: () => '',
   backgroundError: {} as BackgroundErrorType,
+  setBackgroundError: () => {},
   privacy: false,
   readOnly: false,
   poolsToShieldSelectSapling: true,
   poolsToShieldSelectTransparent: true,
   mode: 'basic',
+  snackbars: [] as SnackbarType[],
+  addLastSnackbar: () => {},
+  restartApp: () => {},
 };
 
 export const ContextAppLoaded = React.createContext(defaultAppStateLoaded);

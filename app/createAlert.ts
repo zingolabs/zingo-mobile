@@ -1,9 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Alert } from 'react-native';
-import Toast from 'react-native-simple-toast';
+import SnackbarType from './AppState/types/SnackbarType';
 
 export const createAlert = async (
   setBackgroundError: (title: string, error: string) => void,
+  addLastSnackbar: (snackbar: SnackbarType) => void,
   title: string,
   error: string,
   toast?: boolean,
@@ -14,7 +15,7 @@ export const createAlert = async (
   } else {
     if (toast) {
       setTimeout(() => {
-        Toast.show(error, Toast.LONG);
+        addLastSnackbar({ message: error, type: 'Primary' });
       }, 1000);
     } else {
       Alert.alert(title, error);

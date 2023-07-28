@@ -76,11 +76,11 @@ describe('Component SyncReport - test', () => {
   state.netInfo.isConnected = true;
   const onClose = jest.fn();
   test('SyncReport - snapshot', () => {
-    const info: any = render(
+    const sync = render(
       <ContextAppLoadedProvider value={state}>
         <SyncReport closeModal={onClose} />
       </ContextAppLoadedProvider>,
     );
-    expect(info.toJSON()).toMatchSnapshot();
+    expect(sync.toJSON()).toMatchSnapshot();
   });
 });

@@ -1,3 +1,4 @@
 import LoadingApp from './LoadingApp';
+import { LoadingAppClass } from './LoadingApp';
 
-export default LoadingApp;
+export { LoadingApp, LoadingAppClass };

@@ -2,7 +2,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { View, ScrollView, SafeAreaView } from 'react-native';
 import { useTheme } from '@react-navigation/native';
-import Toast from 'react-native-simple-toast';
 
 import Button from '../Components/Button';
 import { ThemeType } from '../../app/types';
@@ -25,10 +24,11 @@ type ShowUfvkProps = {
   onClickOK: () => void;
   onClickCancel: () => void;
   action: 'change' | 'view' | 'backup' | 'server';
+  set_privacy_option: (name: 'privacy', value: boolean) => Promise<void>;
 };
-const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCancel, action }) => {
+const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCancel, action, set_privacy_option }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, wallet, server, netInfo } = context;
+  const { translate, wallet, server, netInfo, mode, addLastSnackbar } = context;
   const { ufvk } = wallet;
   const { colors } = useTheme() as unknown as ThemeType;
   const [times, setTimes] = useState(0);
@@ -62,7 +62,8 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
         noBalance={true}
         noSyncingStatus={true}
         noDrawMenu={true}
-        noPrivacy={true}
+        set_privacy_option={set_privacy_option}
+        addLastSnackbar={addLastSnackbar}
       />
 
       <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
@@ -75,7 +76,9 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
           justifyContent: 'flex-start',
         }}>
         <FadeText style={{ marginTop: 0, padding: 20, textAlign: 'center' }}>
-          {translate('ufvk.text-readonly') as string}
+          {action === 'backup' || action === 'change' || action === 'server'
+            ? (translate(`ufvk.text-readonly-${action}`) as string)
+            : (translate('ufvk.text-readonly') as string)}
         </FadeText>
 
         {times === 3 && action === 'change' && (
@@ -122,18 +125,19 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
           marginVertical: 5,
         }}>
         <Button
-          type="Primary"
+          type={mode === 'basic' ? 'Secondary' : 'Primary'}
           style={{
-            backgroundColor: times === 3 ? 'red' : colors.primary,
-            color: times === 3 ? 'white' : colors.primary,
+            backgroundColor: times === 3 ? 'red' : mode === 'basic' ? colors.background : colors.primary,
           }}
-          title={!!texts && !!texts[action] ? texts[action][times] : ''}
+          title={
+            mode === 'basic' ? (translate('cancel') as string) : !!texts && !!texts[action] ? texts[action][times] : ''
+          }
           onPress={() => {
             if (!ufvk) {
               return;
             }
             if (!netInfo.isConnected && times > 0) {
-              Toast.show(translate('loadedapp.connection-error') as string, Toast.LONG);
+              addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
               return;
             }
             if (times === 0 || times === 3) {

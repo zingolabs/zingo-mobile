@@ -54,7 +54,7 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
             "alignItems": "center",
             "flexDirection": "row",
             "justifyContent": "space-evenly",
-            "marginVertical": 15,
+            "marginVertical": 0,
             "width": "100%",
           }
         }

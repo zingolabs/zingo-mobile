@@ -62,7 +62,6 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({ price, s
                 {' ' + Utils.toLocaleFloat(currencyString)}
               </Text>
             )}
-            <Text style={{ color: colors.money, fontSize: 20, ...style }}>{' ' + currency}</Text>
           </View>
         </TouchableOpacity>
       </View>

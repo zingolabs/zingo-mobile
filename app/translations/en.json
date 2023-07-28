@@ -11,6 +11,8 @@
   "menudrawer-acc": "Open Menu Drawer",
   "menu-acc": "Open Menu",
   "donation": "Thanks for supporting Zingo!",
+  "restarting": "Error connecting to the Server, the App will restart in a few seconds.",
+  "change-privacy": "New privacy policy: ",
   "insight": {
     "title": "Financial Insight",
     "no-data": "There is no data in your Wallet that fit the graph selected.",
@@ -25,7 +27,7 @@
   },
   "loadingapp": {
     "actualserver": "Actual server:",
-    "changeserver": "CHANGE SERVER",
+    "changeserver": "Change the Server",
     "createnewwallet": "Create New Wallet\n(new seed)",
     "opencurrentwallet": "Open Current Wallet",
     "restorewalletseed": "Restore wallet\nfrom Seed",
@@ -35,7 +37,13 @@
     "invalidseed-label": "Invalid Seed Phrase",
     "invalidseed-error": "The seed phrase was invalid. Review every single word of the seed.",
     "invalidufvk-label": "Invalid Unified Full Viewing Key",
-    "invalidufvk-error": "The Viewing Key was invalid. Review the Key and/or scan it again."
+    "invalidufvk-error": "The Viewing Key was invalid. Review the Key and/or scan it again.",
+    "custom": "Custom Server...",
+    "nointernet-message": "There is no established internet connection. Please fix this issue.",
+    "basicmode": "Change to Basic Mode",
+    "expertmode": "Change to Expert Mode",
+    "noopenwallet-message": "An error occurred while the App was trying to open the active wallet.",
+    "changeserver-basic": "Change the Server and\nOpen Current Wallet"
   },
   "loadedapp": {
     "about": "About Zingo!",
@@ -215,13 +223,13 @@
       "new": ["I have saved \n the seed"],
       "change": [
         "",
-        "I have saved \n the seed",
+        "Open New",
         "You really want \n to change your \n actual wallet",
         "Are you sure \n 100% or more"
       ],
       "server": [
         "",
-        "I have saved \n the seed",
+        "Change Server",
         "You really want \n to change your \n actual server",
         "Are you sure \n 100% or more"
       ],
@@ -229,7 +237,7 @@
       "restore": ["Restore Wallet"],
       "backup": [
         "",
-        "I have saved \n the seed",
+        "Restore",
         "You really want \n to restore your \n backup wallet",
         "Are you sure \n 100% or more"
       ]
@@ -241,7 +249,10 @@
     "view": "View",
     "restore": "Restore",
     "backup": "Backup",
-    "text-readonly": "This is your seed phrase. Please write it down carefully. It is the only way to restore your actual wallet.",
+    "text-readonly": "Before closing this screen, carefully write down the seed phrase of the current wallet. It is the only way you will have to restore/access your current wallet.",
+    "text-readonly-backup": "Before restoring the backup of the previous wallet, carefully write down the seed phrase of the current wallet. It is the only way you will have to restore/access your current wallet.",
+    "text-readonly-change": "Before accesing another wallet, carefully write down the seed phrase of the current wallet. It is the only way you will have to restore/access your current wallet.",
+    "text-readonly-server": "Before changing another server, carefully write down the seed phrase of the current wallet. It is the only way you will have to restore/access your current wallet.",
     "text-no-readonly": "Enter your seed phrase (24 words)",
     "tapcopy": "Tap to copy",
     "tapcopy-seed-message": "Copied Seed to Clipboard",
@@ -317,13 +328,23 @@
     "next": "Next"
   },
   "history": {
-    "shieldfunds-all": "Shield All funds",
-    "shieldfunds-transparent": "Shield Transparent\nfunds",
-    "shieldfunds-sapling": "Upgrade funds to\nnewest version",
-    "shieldfunds-t": "Transparent",
-    "shieldfunds-z": "Sapling",
-    "shield-message": "Shielded in Tx:",
-    "shield-error": "Error Shielding :",
+    "shield-all": "Shield All funds",
+    "shield-transparent": "Shield Transparent\nfunds",
+    "shield-sapling": "Upgrade funds to\nnewest version",
+    "shield-t": "Transparent",
+    "shield-z": "Sapling",
+    "shield-message-all": "Shielded in Tx:",
+    "shield-message-transparent": "Shielded in Tx:",
+    "shield-message-sapling": "Upgrade in Tx:",
+    "shield-error-all": "Error Shielding :",
+    "shield-error-transparent": "Error Shielding :",
+    "shield-error-sapling": "Error Upgrading :",
+    "shield-legend-all": "Increase your shielded spendable balance by shielding: ",
+    "shield-legend-transparent": "Increase your shielded spendable balance by shielding: ",
+    "shield-legend-sapling": "Migrate your funds to newest shielding: ",
+    "shield-title-all": "Shield All funds",
+    "shield-title-transparent": "Shield Transparent funds",
+    "shield-title-sapling": "Upgrade funds to newest version",
     "title": "History",
     "title-syncing": "History - Syncing",
     "more": "more...",
@@ -409,13 +430,13 @@
       "new": ["I have saved \n the Viewing Key"],
       "change": [
         "",
-        "I have saved \n the Viewing Key",
+        "Open New",
         "You really want \n to change your \n actual wallet",
         "Are you sure \n 100% or more"
       ],
       "server": [
         "",
-        "I have saved \n the Viewing Key",
+        "Change Server",
         "You really want \n to change your \n actual server",
         "Are you sure \n 100% or more"
       ],
@@ -423,7 +444,7 @@
       "restore": ["Restore Wallet"],
       "backup": [
         "",
-        "I have saved \n the Viewing Key",
+        "Restore",
         "You really want \n to restore your \n backup wallet",
         "Are you sure \n 100% or more"
       ]
@@ -434,7 +455,10 @@
     "tapcopy-message": "Copied Key to Clipboard",
     "title": "Key",
     "address": "Address",
-    "text-readonly": "This is your viewing key. Please write/copy it down carefully. Anyone who has a copy of the viewing key can observe all transactions to and from the associated wallet.",
+    "text-readonly": "Before closing this screen, carefully write down the viewing key of the current wallet. It is the only way you will have to restore/access your current wallet.",
+    "text-readonly-backup": "Before restoring the backup of the previous wallet, carefully write down the viewing key of the current wallet. It is the only way you will have to restore/access your current wallet.",
+    "text-readonly-change": "Before accesing another wallet, carefully write down the viewing key of the current wallet. It is the only way you will have to restore/access your current wallet.",
+    "text-readonly-server": "Before changing another server, carefully write down the viewing key of the current wallet. It is the only way you will have to restore/access your current wallet.",
     "change-warning": "IF YOU CHANGE TO ANOTHER WALLET, YOU WILL NO LONGER BE ABLE TO VIEW THIS WALLET WITHOUT THE VIEWING KEY.",
     "backup-warning": "IF YOU CHANGE TO YOUR BACKUP WALLET, YOU WILL NO LONGER BE ABLE TO VIEW THIS WALLET WITHOUT THE VIEWING KEY.",
     "server-warning": "IF YOU CHANGE TO A SERVER WITH A DIFFERENT CHAIN, YOU WILL NO LONGER BE ABLE TO VIEW THIS WALLET WITHOUT THE VIEWING KEY"

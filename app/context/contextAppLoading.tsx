@@ -3,7 +3,6 @@ import { StackScreenProps } from '@react-navigation/stack';
 
 import {
   AppStateLoading,
-  DimensionsType,
   InfoType,
   TotalBalanceClass,
   WalletType,
@@ -13,11 +12,11 @@ import {
   BackgroundErrorType,
   ServerType,
 } from '../AppState';
+import SnackbarType from '../AppState/types/SnackbarType';
 
 export const defaultAppStateLoading: AppStateLoading = {
   navigation: {} as StackScreenProps<any>['navigation'],
   route: {} as StackScreenProps<any>['route'],
-  dimensions: {} as DimensionsType,
   appState: '',
   netInfo: {} as NetInfoType,
 
@@ -44,12 +43,15 @@ export const defaultAppStateLoading: AppStateLoading = {
 
   translate: () => '',
   backgroundError: {} as BackgroundErrorType,
+  setBackgroundError: () => {},
   privacy: false,
   readOnly: false,
   customServerShow: false,
   customServerUri: '',
   customServerChainName: 'main',
   mode: 'basic',
+  snackbars: [] as SnackbarType[],
+  addLastSnackbar: () => {},
 };
 
 export const ContextAppLoading = React.createContext(defaultAppStateLoading);

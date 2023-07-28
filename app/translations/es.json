@@ -11,6 +11,8 @@
   "menudrawer-acc": "Abrir Menu Lateral",
   "menu-acc": "Abrir Menu",
   "donation": "Gracias por apoyar Zingo!",
+  "restarting": "Error conectando con el servidor, la Aplicación se reiniciará en breves segundos.",
+  "change-privacy": "Nueva Política de Privacidad: ",
   "insight": {
     "title": "Visión Financiera",
     "no-data": "No hay datos en tu Monedero que concuerden con el gráfico seleccionado.",
@@ -25,7 +27,7 @@
   },
   "loadingapp": {
     "actualserver": "Servidor Activo:",
-    "changeserver": "CAMBIAR SERVIDOR",
+    "changeserver": "Cambiar de Servidor",
     "createnewwallet": "Crear Monedero Nuevo\n(nueva semilla)",
     "opencurrentwallet": "Abrir Monedero Activo",
     "restorewalletseed": "Restaurar Monedero\ncon la Semilla",
@@ -35,7 +37,13 @@
     "invalidseed-label": "Semilla incorrecta",
     "invalidseed-error": "La semilla proporcionada no es correcta. Revisa cada una de las palabras.",
     "invalidufvk-label": "Clave de Visualización incorrecta",
-    "invalidufvk-error": "La Clave de Visualización proporcionada no es correcta. Revisa la clave y/o escaneala de nuevo."
+    "invalidufvk-error": "La Clave de Visualización proporcionada no es correcta. Revisa la clave y/o escaneala de nuevo.",
+    "custom": "Otro Servidor...",
+    "nointernet-message": "No hay una conexion a internet establecida. Por favor solucione esta incidencia.",
+    "basicmode": "Cambiar a Modo Básico",
+    "expertmode": "Cambiar a Modo Experto",
+    "noopenwallet-message": "Ha ocurrido un error mientras el App estaba intentando abrir el monedero activo.",
+    "changeserver-basic": "Cambiar de Servidor and\nAbrir Monedero Activo"
   },
   "loadedapp": {
     "about": "Sobre Zingo!",
@@ -215,13 +223,13 @@
       "new": ["Ya he guardado \n la semilla"],
       "change": [
         "",
-        "Ya he guardado \n la semilla",
+        "Abrir Nuevo",
         "Realmente quieres \n cambiar tu \n monedero activo",
         "Estás seguro \n al 100%"
       ],
       "server": [
         "",
-        "Ya he guardado \n la semilla",
+        "Cambiar Servidor",
         "Realmente quieres \n cambiar el \n servidor activo",
         "Estás seguro \n al 100%"
       ],
@@ -229,7 +237,7 @@
       "restore": ["Restaurar Monedero"],
       "backup": [
         "",
-        "Ya he guardado \n la semilla",
+        "Restaurar",
         "Realmente quieres \n restaurar tu \n copia de seguridad",
         "Estás seguro \n al 100%"
       ]
@@ -241,7 +249,10 @@
     "view": "Visualizar",
     "restore": "Restaurar",
     "backup": "Copia de seguridad",
-    "text-readonly": "Esta es tu Frase Semilla. Por favor apúntala cuidadosamente. Es la única manera que tienes para restaurar/acceder tu monedero activo de nuevo.",
+    "text-readonly": "Antes de cerrar esta ventana, escriba cuidadosamente la frase semilla del monedero actual. Es la única manera que tendrás de restaurar/acceder tu monedero actual.",
+    "text-readonly-backup": "Antes de restaurar la copia de seguridad del monedero anterior, escriba cuidadosamente la frase semilla del monedero actual. Es la única manera que tendrás de restaurar/acceder tu monedero actual.",
+    "text-readonly-change": "Antes de acceder a otro monedero, escriba cuidadosamente la frase semilla del monedero actual. Es la única manera que tendrás de restaurar/acceder tu monedero actual.",
+    "text-readonly-server": "Antes de usar otro servidor, escriba cuidadosamente la frase semilla del monedero actual. Es la única manera que tendrás de restaurar/acceder tu monedero actual.",
     "text-no-readonly": "Introduce tu Frase Semilla (son 24 palabras)",
     "tapcopy": "Pulsar para copiar",
     "tapcopy-seed-message": "Frase Semilla copiada al Portapapeles",
@@ -317,13 +328,23 @@
     "next": "Siguiente"
   },
   "history": {
-    "shieldfunds-all": "Blindar Todos\nlos fondos",
-    "shieldfunds-transparent": "Blindar fondos\nTransparentes",
-    "shieldfunds-sapling": "Asignar fondos a\nla última versión",
-    "shieldfunds-t": "Transparente",
-    "shieldfunds-z": "Sapling",
-    "shield-message": "Blindada en Tx:",
-    "shield-error": "Error Blindando :",
+    "shield-all": "Blindar Todos\nlos fondos",
+    "shield-transparent": "Blindar fondos\nTransparentes",
+    "shield-sapling": "Asignar fondos a\nla última versión",
+    "shield-t": "Transparente",
+    "shield-z": "Sapling",
+    "shield-message-all": "Blindados en Tx:",
+    "shield-message-transparent": "Blindados en Tx:",
+    "shield-message-sapling": "Asignados en Tx:",
+    "shield-error-all": "Error Blindando :",
+    "shield-error-transparent": "Error Blindando :",
+    "shield-error-sapling": "Error Asignando :",
+    "shield-legend-all": "Aumenta tu balance blindado gastable en: ",
+    "shield-legend-transparent": "Aumenta tu balance blindado gastable en: ",
+    "shield-legend-sapling": "Migra tus fondos al mas nuevo blindaje: ",
+    "shield-title-all": "Blindar Todos los fondos",
+    "shield-title-transparent": "Blindar fondos Transparentes",
+    "shield-title-sapling": "Asignar fondos a la última versión",
     "title": "Histórico",
     "title-syncing": "Histórico - Sincronizando",
     "more": "ver más...",
@@ -409,13 +430,13 @@
       "new": ["Ya he guardado \n la clave de visualización"],
       "change": [
         "",
-        "Ya he guardado \n la clave de visualización",
+        "Abrir Nuevo",
         "Realmente quieres \n cambiar tu \n monedero activo",
         "Estás seguro \n al 100%"
       ],
       "server": [
         "",
-        "Ya he guardado \n la clave de visualización",
+        "Cambiar Servidor",
         "Realmente quieres \n cambiar el \n servidor activo",
         "Estás seguro \n al 100%"
       ],
@@ -423,7 +444,7 @@
       "restore": ["Restaurar Monedero"],
       "backup": [
         "",
-        "Ya he guardado \n la clave de visualización",
+        "Restaurar",
         "Realmente quieres \n restaurar tu \n copia de seguridad",
         "Estás seguro \n al 100%"
       ]
@@ -434,7 +455,10 @@
     "tapcopy-message": "Clave copiada al portapapeles",
     "title": "Clave",
     "address": "Dirección",
-    "text-readonly": "Esta es tu clave de visualización. Por favor apúntala/copiala cuidadosamente. Cualquiera que tenga una copia de esta clave puede ver las transacciones asociadas a este monedero.",
+    "text-readonly": "Antes de cerrar esta ventana, escriba cuidadosamente la clave de visualizacion del monedero actual. Es la única manera que tendrás de restaurar/acceder tu monedero actual.",
+    "text-readonly-backup": "Antes de restaurar la copia de seguridad del monedero anterior, escriba cuidadosamente la clave de visualizacion del monedero actual. Es la única manera que tendrás de restaurar/acceder tu monedero actual.",
+    "text-readonly-change": "Antes de acceder a otro monedero, escriba cuidadosamente la clave de visualizacion del monedero actual. Es la única manera que tendrás de restaurar/acceder tu monedero actual.",
+    "text-readonly-server": "Antes de usar otro servidor, escriba cuidadosamente la clave de visualizacion del monedero actual. Es la única manera que tendrás de restaurar/acceder tu monedero actual.",
     "change-warning": "SI CAMBIAS A OTRO MONEDERO, YA NO PODRAS VER ESTE MONEDERO SIN LA CLAVE DE VISUALIZACION.",
     "backup-warning": "SI CAMBIAS A TU MONEDERO (COPIA DE SEGURIDAD), YA NO PODRAS VER ESTE MONEDERO SIN LA CLAVE DE VISUALIZACION.",
     "server-warning": "SI CAMBIAS A UN SERVIDOR CON DIFERENTE TIPO DE CADENA, YA NO PODRAS VER ESTE MONEDERO SIN LA CLAVE DE VISUALIZACION."

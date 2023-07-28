@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect } from 'react';
-import { Text, View, Platform, TextStyle, TouchableOpacity } from 'react-native';
+import { Text, View, Platform, TextStyle, TouchableOpacity, Dimensions } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { getNumberFormatSettings } from 'react-native-localize';
 
@@ -14,9 +14,18 @@ type ZecAmountProps = {
   style?: TextStyle;
   currencyName: string;
   privacy?: boolean;
+  smallPrefix?: boolean;
 };
 
-const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({ color, style, size, currencyName, amtZec, privacy }) => {
+const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
+  color,
+  style,
+  size,
+  currencyName,
+  amtZec,
+  privacy,
+  smallPrefix,
+}) => {
   const [privacyHigh, setPrivacyHigh] = useState<boolean>(privacy || false);
   const splits = Utils.splitZecAmountIntoBigSmall(amtZec);
   const { colors } = useTheme() as unknown as ThemeType;
@@ -44,6 +53,15 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({ color, style, size
     color = colors.money;
   }
 
+  if (!smallPrefix) {
+    smallPrefix = false;
+  }
+
+  // when the scale is more than 2 I need to fix some movements.
+  // Pixel 2 -> scale 2.625
+  // Samsung A8 Tablet -> 1.5
+  let corrector = Dimensions.get('screen').scale;
+
   const alignmentPadding = Platform.OS === 'android' ? 4 : 0;
 
   const onPress = () => {
@@ -51,11 +69,34 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({ color, style, size
     setTimeout(() => setPrivacyHigh(true), 5000);
   };
 
+  //console.log(size, corrector, Dimensions.get('screen'));
+
   return (
     <View style={{ ...style, flexDirection: 'row', alignItems: 'baseline' }}>
       <TouchableOpacity disabled={!privacyHigh} onPress={onPress}>
         <View style={{ ...style, flexDirection: 'row', alignItems: 'baseline' }}>
-          <Text style={{ fontSize: size, color }}>{'\u1647'}</Text>
+          <Text
+            style={{
+              fontSize: size * (smallPrefix ? 0.7 : 1),
+              color,
+              transform: [
+                { scale: 2 },
+                {
+                  translateY:
+                    size * corrector * (smallPrefix ? (corrector < 2 ? -0.01 : 0.045) : corrector < 2 ? -0.01 : 0.06),
+                },
+              ],
+            }}>
+            {'\u1647'}
+          </Text>
+          <Text
+            style={{
+              fontSize: size * (smallPrefix ? 0.7 : 1),
+              color,
+              marginLeft: size * corrector * (smallPrefix ? (corrector < 2 ? 0.1 : 0.05) : corrector < 2 ? 0.15 : 0.07),
+            }}>
+            {'EC'}
+          </Text>
           {privacyHigh ? (
             <Text style={{ fontSize: size, fontWeight: '700', color }}>{' -' + decimalSeparator + '----'}</Text>
           ) : (
@@ -66,7 +107,6 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({ color, style, size
           {splits.smallPart !== '0000' && !privacyHigh && (
             <Text style={{ fontSize: size * 0.7, color, paddingBottom: alignmentPadding }}>{splits.smallPart}</Text>
           )}
-          <Text style={{ fontSize: size, color }}>{' ' + currencyName}</Text>
         </View>
       </TouchableOpacity>
     </View>

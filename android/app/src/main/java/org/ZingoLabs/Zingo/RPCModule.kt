@@ -58,7 +58,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         RustFFI.initlogging()
 
         // Create a seed
-        val seed = RustFFI.initnew(server, reactContext.applicationContext.filesDir.absolutePath, chainhint)
+        val seed = RustFFI.initnew(server, reactContext.applicationContext.filesDir.absolutePath, chainhint, "true")
         // Log.w("MAIN-Seed", seed)
 
         if (!seed.startsWith("Error")) {
@@ -74,7 +74,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
         RustFFI.initlogging()
 
-        val rseed = RustFFI.initfromseed(server, seed, birthday, reactContext.applicationContext.filesDir.absolutePath, chainhint)
+        val rseed = RustFFI.initfromseed(server, seed, birthday, reactContext.applicationContext.filesDir.absolutePath, chainhint, "true")
         // Log.w("MAIN", rseed)
 
         if (!rseed.startsWith("Error")) {
@@ -90,7 +90,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
         RustFFI.initlogging()
 
-        val rufvk = RustFFI.initfromufvk(server, ufvk, birthday, reactContext.applicationContext.filesDir.absolutePath, chainhint)
+        val rufvk = RustFFI.initfromufvk(server, ufvk, birthday, reactContext.applicationContext.filesDir.absolutePath, chainhint, "true")
         // Log.w("MAIN", rufvk)
 
         if (!rufvk.startsWith("Error")) {
@@ -160,7 +160,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         val wseed = RustFFI.initfromb64(server,
             fileb64.toString(),
             reactContext.applicationContext.filesDir.absolutePath,
-            chainhint)
+            chainhint, "true")
         // Log.w("MAIN", wseed)
 
         promise.resolve(wseed)

@@ -16,7 +16,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme } from '@react-navigation/native';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
-import { DimensionsType, NetInfoType, TranslateType } from '../../app/AppState';
+import { NetInfoType, TranslateType } from '../../app/AppState';
 import { ContextAppLoaded } from '../../app/context';
 import { ThemeType } from '../../app/types';
 import CurrencyAmount from '../Components/CurrencyAmount';
@@ -29,6 +29,8 @@ import RPC from '../../app/rpc';
 import { RPCShieldType } from '../../app/rpc/types/RPCShieldType';
 import { createAlert } from '../../app/createAlert';
 import { Animated } from 'react-native';
+import SnackbarType from '../../app/AppState/types/SnackbarType';
+import FadeText from '../Components/FadeText';
 
 type HeaderProps = {
   poolsMoreInfoOnClick?: () => void;
@@ -41,7 +43,6 @@ type HeaderProps = {
   noDrawMenu?: boolean;
   testID?: string;
   translate?: (key: string) => TranslateType;
-  dimensions?: DimensionsType;
   netInfo?: NetInfoType;
   mode?: 'basic' | 'expert';
   setComputingModalVisible?: (visible: boolean) => void;
@@ -51,6 +52,7 @@ type HeaderProps = {
   setPoolsToShieldSelectSapling?: (v: boolean) => void;
   setPoolsToShieldSelectTransparent?: (v: boolean) => void;
   setUfvkViewModalVisible?: (v: boolean) => void;
+  addLastSnackbar?: (snackbar: SnackbarType) => void;
 };
 
 const Header: React.FunctionComponent<HeaderProps> = ({
@@ -64,7 +66,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   noDrawMenu,
   testID,
   translate: translateProp,
-  dimensions: dimensionsProp,
   netInfo: netInfoProp,
   mode: modeProp,
   setComputingModalVisible,
@@ -74,6 +75,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   setPoolsToShieldSelectSapling,
   setPoolsToShieldSelectTransparent,
   setUfvkViewModalVisible,
+  addLastSnackbar,
 }) => {
   const context = useContext(ContextAppLoaded);
   const {
@@ -87,21 +89,15 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     poolsToShieldSelectSapling,
     poolsToShieldSelectTransparent,
     transactions,
+    wallet,
+    restartApp,
   } = context;
 
-  let translate: (key: string) => TranslateType,
-    dimensions: DimensionsType,
-    netInfo: NetInfoType,
-    mode: 'basic' | 'expert';
+  let translate: (key: string) => TranslateType, netInfo: NetInfoType, mode: 'basic' | 'expert';
   if (translateProp) {
     translate = translateProp;
   } else {
     translate = context.translate;
-  }
-  if (dimensionsProp) {
-    dimensions = dimensionsProp;
-  } else {
-    dimensions = context.dimensions;
   }
   if (netInfoProp) {
     netInfo = netInfoProp;
@@ -119,8 +115,37 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   const [showShieldButton, setShowShieldButton] = useState<boolean>(false);
   const [poolsToShield, setPoolsToShield] = useState<'' | 'all' | 'transparent' | 'sapling'>('');
 
+  let currentBlock, lastBlockServer;
+  if (wallet.birthday < syncingStatus.currentBlock) {
+    currentBlock = syncingStatus.currentBlock - wallet.birthday;
+    lastBlockServer = syncingStatus.lastBlockServer - wallet.birthday;
+  } else {
+    currentBlock = syncingStatus.currentBlock;
+    lastBlockServer = syncingStatus.lastBlockServer;
+  }
+  /*
+  let percent = ((currentBlock * 100) / lastBlockServer).toFixed(2);
+  if (Number(percent) < 0) {
+    percent = '0.00';
+  }
+  if (Number(percent) >= 100) {
+    percent = '99.99';
+  }
+  */
+  let blocksRemaining = lastBlockServer - currentBlock || 0;
+
   useEffect(() => {
-    setShowShieldButton(!readOnly && totalBalance && (totalBalance.transparentBal > 0 || totalBalance.privateBal > 0));
+    if (syncingStatus.syncProcessStalled && addLastSnackbar && restartApp) {
+      // if the sync process is stalled -> let's restart the App.
+      addLastSnackbar({ message: translate('restarting') as string, type: 'Primary', duration: 'short' });
+      setTimeout(() => restartApp(), 3000);
+    }
+  }, [addLastSnackbar, restartApp, syncingStatus.syncProcessStalled, translate]);
+
+  useEffect(() => {
+    setShowShieldButton(
+      !readOnly && totalBalance && totalBalance.transparentBal + totalBalance.privateBal > info.defaultFee,
+    );
 
     if (totalBalance.transparentBal > 0 && totalBalance.privateBal > 0) {
       setPoolsToShield('all');
@@ -131,7 +156,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     } else {
       setPoolsToShield('');
     }
-  }, [readOnly, totalBalance, totalBalance.transparentBal, totalBalance.privateBal]);
+  }, [mode, readOnly, totalBalance, totalBalance.transparentBal, totalBalance.privateBal, info.defaultFee]);
 
   useEffect(() => {
     // for basic mode always have to be 'all', It's easier for the user.
@@ -147,7 +172,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   }, [mode, poolsToShield, setPoolsToShieldSelectSapling, setPoolsToShieldSelectTransparent]);
 
   const shieldFunds = async () => {
-    if (!setComputingModalVisible || !setBackgroundError) {
+    if (!setComputingModalVisible || !setBackgroundError || !addLastSnackbar) {
       return;
     }
     if (poolsToShield === '') {
@@ -181,8 +206,9 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       if (shieldStr.toLowerCase().startsWith('error')) {
         createAlert(
           setBackgroundError,
-          translate('history.shieldfunds') as string,
-          `${translate('history.shield-error')} ${shieldStr}`,
+          addLastSnackbar,
+          translate(`history.shield-title-${pools}`) as string,
+          `${translate(`history.shield-error-${pools}`)} ${shieldStr}`,
           true,
         );
       } else {
@@ -191,15 +217,17 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         if (shieldJSON.error) {
           createAlert(
             setBackgroundError,
-            translate('history.shieldfunds') as string,
-            `${translate('history.shield-error')} ${shieldJSON.error}`,
+            addLastSnackbar,
+            translate(`history.shield-title-${pools}`) as string,
+            `${translate(`history.shield-error-${pools}`)} ${shieldJSON.error}`,
             true,
           );
         } else {
           createAlert(
             setBackgroundError,
-            translate('history.shieldfunds') as string,
-            `${translate('history.shield-message')} ${shieldJSON.txid}`,
+            addLastSnackbar,
+            translate(`history.shield-title-${pools}`) as string,
+            `${translate(`history.shield-message-${pools}`)} ${shieldJSON.txid}`,
             true,
           );
         }
@@ -254,10 +282,169 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         zIndex: -1,
         paddingTop: 10,
       }}>
-      <Image
-        source={require('../../assets/img/logobig-zingo.png')}
-        style={{ width: 50, height: 50, resizeMode: 'contain', borderRadius: 10 }}
-      />
+      <View
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexWrap: 'wrap',
+          marginVertical: 5,
+          marginHorizontal: 5,
+          height: 40,
+        }}>
+        {!noSyncingStatus && (
+          <>
+            {netInfo.isConnected &&
+            !!syncingStatus.lastBlockServer &&
+            !!syncingStatus.syncID &&
+            syncingStatus.syncID >= 0 ? (
+              <View
+                style={{
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: 0,
+                  marginRight: 5,
+                  padding: 1,
+                  borderColor: colors.primary,
+                  borderWidth: 1,
+                  borderRadius: 10,
+                  minWidth: 25,
+                  minHeight: 25,
+                }}>
+                {!syncingStatus.inProgress && syncingStatus.lastBlockServer === syncingStatus.lastBlockWallet && (
+                  <View testID="header.checkIcon" style={{ margin: 0, padding: 0 }}>
+                    <FontAwesomeIcon icon={faCheck} color={colors.primary} size={20} />
+                  </View>
+                )}
+                {!syncingStatus.inProgress && syncingStatus.lastBlockServer !== syncingStatus.lastBlockWallet && (
+                  <>
+                    {mode === 'basic' ? (
+                      <FontAwesomeIcon icon={faPause} color={colors.zingo} size={17} />
+                    ) : (
+                      <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
+                        <FontAwesomeIcon icon={faPause} color={colors.zingo} size={17} />
+                      </TouchableOpacity>
+                    )}
+                  </>
+                )}
+                {syncingStatus.inProgress && (
+                  <Animated.View
+                    style={{
+                      opacity: opacityValue,
+                      flexDirection: 'row',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    {mode === 'basic' ? (
+                      <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                        <FontAwesomeIcon icon={faPlay} color={colors.syncing} size={17} />
+                        <FadeText style={{ fontSize: 10 }}>{`${blocksRemaining}`}</FadeText>
+                      </View>
+                    ) : (
+                      <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
+                        <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                          <FontAwesomeIcon icon={faPlay} color={colors.syncing} size={17} />
+                          <FadeText style={{ fontSize: 10 }}>{`${blocksRemaining}`}</FadeText>
+                        </View>
+                      </TouchableOpacity>
+                    )}
+                  </Animated.View>
+                )}
+              </View>
+            ) : (
+              <View
+                style={{
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: 0,
+                  marginRight: 5,
+                  padding: 1,
+                  borderColor: colors.primaryDisabled,
+                  borderWidth: 1,
+                  borderRadius: 10,
+                  minWidth: 25,
+                  minHeight: 25,
+                }}>
+                <View style={{ margin: 0, padding: 0 }}>
+                  <FontAwesomeIcon icon={faWifi} color={colors.primaryDisabled} size={18} />
+                </View>
+              </View>
+            )}
+            {/*syncingStatus.inProgress && blocksRemaining > 0 && (
+              <View style={{ marginRight: 5 }}>
+                {mode === 'basic' ? (
+                  <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                    <FadeText style={{ fontSize: 10 }}>{`${blocksRemaining}`}</FadeText>
+                  </View>
+                ) : (
+                  <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                      <FadeText style={{ fontSize: 10 }}>{`${blocksRemaining}`}</FadeText>
+                    </View>
+                  </TouchableOpacity>
+                )}
+              </View>
+              )*/}
+            {(!netInfo.isConnected || netInfo.type === NetInfoStateType.cellular || netInfo.isConnectionExpensive) && (
+              <>
+                {mode !== 'basic' && (
+                  <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
+                    <FontAwesomeIcon icon={faCloudDownload} color={!netInfo.isConnected ? 'red' : 'yellow'} size={20} />
+                  </TouchableOpacity>
+                )}
+              </>
+            )}
+          </>
+        )}
+        {mode !== 'basic' && !noPrivacy && set_privacy_option && addLastSnackbar && (
+          <TouchableOpacity
+            style={{ marginHorizontal: 5 }}
+            onPress={() => {
+              addLastSnackbar({
+                message: `${translate('change-privacy')} ${
+                  privacy ? translate('settings.value-privacy-false') : translate('settings.value-privacy-true')
+                }`,
+                type: 'Primary',
+              });
+              set_privacy_option('privacy', !privacy);
+            }}>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginTop: 5,
+              }}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  borderWidth: privacy ? 2 : 1,
+                  borderColor: privacy ? colors.primary : colors.primaryDisabled,
+                  borderRadius: 5,
+                  paddingHorizontal: 5,
+                }}>
+                <Text
+                  style={{
+                    fontSize: 13,
+                    color: colors.border,
+                    marginRight: 5,
+                  }}>
+                  {`${privacy ? translate('settings.value-privacy-true') : translate('settings.value-privacy-false')}`}
+                </Text>
+                {privacy ? (
+                  <FontAwesomeIcon icon={faLock} size={14} color={colors.primary} />
+                ) : (
+                  <FontAwesomeIcon icon={faLockOpen} size={14} color={colors.primaryDisabled} />
+                )}
+              </View>
+            </View>
+          </TouchableOpacity>
+        )}
+      </View>
+
       {noBalance && <View style={{ height: 20 }} />}
       {!noBalance && (
         <View
@@ -274,10 +461,11 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             size={36}
             amtZec={totalBalance.total}
             privacy={privacy}
+            smallPrefix={true}
           />
           {mode !== 'basic' &&
             totalBalance.total > 0 &&
-            (totalBalance.privateBal > 0 || totalBalance.transparentBal > 0) && (
+            totalBalance.privateBal + totalBalance.transparentBal > info.defaultFee && (
               <TouchableOpacity onPress={() => poolsMoreInfoOnClick && poolsMoreInfoOnClick()}>
                 <View
                   style={{
@@ -316,210 +504,175 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       )}
 
       {showShieldButton && !!poolsToShield && setComputingModalVisible && (
-        <View style={{ margin: 5, flexDirection: 'row' }}>
-          <Button
-            type="Primary"
-            title={
-              translate(
-                `history.shieldfunds-${
-                  poolsToShield !== 'all'
-                    ? poolsToShield
-                    : poolsToShieldSelectSapling && poolsToShieldSelectTransparent
-                    ? 'all'
-                    : poolsToShieldSelectSapling
-                    ? 'sapling'
-                    : poolsToShieldSelectTransparent
-                    ? 'transparent'
-                    : 'all'
-                }`,
-              ) as string
-            }
-            onPress={shieldFunds}
-            disabled={poolsToShield === 'all' && !poolsToShieldSelectSapling && !poolsToShieldSelectTransparent}
-          />
-          {mode !== 'basic' &&
-            poolsToShield === 'all' &&
-            setPoolsToShieldSelectSapling &&
-            setPoolsToShieldSelectTransparent && (
-              <View style={{ alignItems: 'flex-start' }}>
-                <TouchableOpacity
-                  style={{ marginHorizontal: 10 }}
-                  onPress={() => setPoolsToShieldSelectSapling(!poolsToShieldSelectSapling)}>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      marginBottom: 10,
-                    }}>
+        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+          <FadeText style={{ fontSize: 8 }}>
+            {(translate(
+              `history.shield-legend-${
+                poolsToShield !== 'all'
+                  ? poolsToShield
+                  : poolsToShieldSelectSapling && poolsToShieldSelectTransparent
+                  ? 'all'
+                  : poolsToShieldSelectSapling
+                  ? 'sapling'
+                  : poolsToShieldSelectTransparent
+                  ? 'transparent'
+                  : 'all'
+              }`,
+            ) as string) +
+              ` ${
+                poolsToShield === 'sapling' && totalBalance.privateBal > info.defaultFee
+                  ? (totalBalance.privateBal - info.defaultFee).toFixed(8)
+                  : poolsToShield === 'transparent' && totalBalance.transparentBal > info.defaultFee
+                  ? (totalBalance.transparentBal - info.defaultFee).toFixed(8)
+                  : poolsToShieldSelectSapling &&
+                    poolsToShieldSelectTransparent &&
+                    totalBalance.privateBal + totalBalance.transparentBal > info.defaultFee
+                  ? (totalBalance.privateBal + totalBalance.transparentBal - info.defaultFee).toFixed(8)
+                  : poolsToShieldSelectSapling && totalBalance.privateBal > info.defaultFee
+                  ? (totalBalance.privateBal - info.defaultFee).toFixed(8)
+                  : poolsToShieldSelectTransparent && totalBalance.transparentBal > info.defaultFee
+                  ? (totalBalance.transparentBal - info.defaultFee).toFixed(8)
+                  : 0
+              }`}
+          </FadeText>
+          <View style={{ margin: 5, flexDirection: 'row' }}>
+            <Button
+              type="Primary"
+              title={
+                translate(
+                  `history.shield-${
+                    poolsToShield !== 'all'
+                      ? poolsToShield
+                      : poolsToShieldSelectSapling && poolsToShieldSelectTransparent
+                      ? 'all'
+                      : poolsToShieldSelectSapling
+                      ? 'sapling'
+                      : poolsToShieldSelectTransparent
+                      ? 'transparent'
+                      : 'all'
+                  }`,
+                ) as string
+              }
+              onPress={shieldFunds}
+              disabled={
+                poolsToShield === 'sapling' && totalBalance.privateBal > info.defaultFee
+                  ? false
+                  : poolsToShield === 'transparent' && totalBalance.transparentBal > info.defaultFee
+                  ? false
+                  : poolsToShieldSelectSapling &&
+                    poolsToShieldSelectTransparent &&
+                    totalBalance.privateBal + totalBalance.transparentBal > info.defaultFee
+                  ? false
+                  : poolsToShieldSelectSapling && totalBalance.privateBal > info.defaultFee
+                  ? false
+                  : poolsToShieldSelectTransparent && totalBalance.transparentBal > info.defaultFee
+                  ? false
+                  : true
+              }
+            />
+            {mode !== 'basic' &&
+              poolsToShield === 'all' &&
+              setPoolsToShieldSelectSapling &&
+              setPoolsToShieldSelectTransparent && (
+                <View style={{ alignItems: 'flex-start' }}>
+                  <TouchableOpacity
+                    style={{ marginHorizontal: 10 }}
+                    onPress={() => setPoolsToShieldSelectSapling(!poolsToShieldSelectSapling)}>
                     <View
                       style={{
                         flexDirection: 'row',
                         justifyContent: 'center',
                         alignItems: 'center',
-                        borderWidth: poolsToShieldSelectSapling ? 2 : 1,
-                        borderColor: poolsToShieldSelectSapling ? colors.primary : colors.primaryDisabled,
-                        borderRadius: 5,
-                        paddingHorizontal: 5,
+                        marginBottom: 10,
                       }}>
-                      <Text
+                      <View
                         style={{
-                          fontSize: 13,
-                          color: colors.border,
-                          marginRight: 5,
+                          flexDirection: 'row',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          borderWidth: poolsToShieldSelectSapling ? 2 : 1,
+                          borderColor: poolsToShieldSelectSapling ? colors.primary : colors.primaryDisabled,
+                          borderRadius: 5,
+                          paddingHorizontal: 5,
                         }}>
-                        {translate('history.shieldfunds-z') as string}
-                      </Text>
-                      {poolsToShieldSelectSapling ? (
-                        <FontAwesomeIcon icon={faCheck} size={14} color={colors.primary} />
-                      ) : (
-                        <FontAwesomeIcon icon={faXmark} size={14} color={'red'} />
-                      )}
+                        <Text
+                          style={{
+                            fontSize: 13,
+                            color: colors.border,
+                            marginRight: 5,
+                          }}>
+                          {translate('history.shield-z') as string}
+                        </Text>
+                        {poolsToShieldSelectSapling ? (
+                          <FontAwesomeIcon icon={faCheck} size={14} color={colors.primary} />
+                        ) : (
+                          <FontAwesomeIcon icon={faXmark} size={14} color={'red'} />
+                        )}
+                      </View>
                     </View>
-                  </View>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={{ marginHorizontal: 10 }}
-                  onPress={() => setPoolsToShieldSelectTransparent(!poolsToShieldSelectTransparent)}>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      marginBottom: 0,
-                    }}>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={{ marginHorizontal: 10 }}
+                    onPress={() => setPoolsToShieldSelectTransparent(!poolsToShieldSelectTransparent)}>
                     <View
                       style={{
                         flexDirection: 'row',
                         justifyContent: 'center',
                         alignItems: 'center',
-                        borderWidth: poolsToShieldSelectTransparent ? 2 : 1,
-                        borderColor: poolsToShieldSelectTransparent ? colors.primary : colors.primaryDisabled,
-                        borderRadius: 5,
-                        paddingHorizontal: 5,
+                        marginBottom: 0,
                       }}>
-                      <Text
+                      <View
                         style={{
-                          fontSize: 13,
-                          color: colors.border,
-                          marginRight: 5,
+                          flexDirection: 'row',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          borderWidth: poolsToShieldSelectTransparent ? 2 : 1,
+                          borderColor: poolsToShieldSelectTransparent ? colors.primary : colors.primaryDisabled,
+                          borderRadius: 5,
+                          paddingHorizontal: 5,
                         }}>
-                        {translate('history.shieldfunds-t') as string}
-                      </Text>
-                      {poolsToShieldSelectTransparent ? (
-                        <FontAwesomeIcon icon={faCheck} size={14} color={colors.primary} />
-                      ) : (
-                        <FontAwesomeIcon icon={faXmark} size={14} color={'red'} />
-                      )}
+                        <Text
+                          style={{
+                            fontSize: 13,
+                            color: colors.border,
+                            marginRight: 5,
+                          }}>
+                          {translate('history.shield-t') as string}
+                        </Text>
+                        {poolsToShieldSelectTransparent ? (
+                          <FontAwesomeIcon icon={faCheck} size={14} color={colors.primary} />
+                        ) : (
+                          <FontAwesomeIcon icon={faXmark} size={14} color={'red'} />
+                        )}
+                      </View>
                     </View>
-                  </View>
-                </TouchableOpacity>
-              </View>
-            )}
+                  </TouchableOpacity>
+                </View>
+              )}
+          </View>
         </View>
       )}
 
       <View
         style={{
           display: 'flex',
-          flexDirection: 'row',
+          flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
           flexWrap: 'wrap',
-          marginVertical: 5,
         }}>
-        <View
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexWrap: 'wrap',
-          }}>
-          <RegText testID={testID} color={colors.money} style={{ paddingHorizontal: 5 }}>
-            {title}
-          </RegText>
-        </View>
-        {!noSyncingStatus && (
-          <>
-            {netInfo.isConnected &&
-            !!syncingStatus.lastBlockServer &&
-            !!syncingStatus.syncID &&
-            syncingStatus.syncID >= 0 ? (
-              <View
-                style={{
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  margin: 0,
-                  marginRight: 5,
-                  padding: 1,
-                  borderColor: colors.primary,
-                  borderWidth: 1,
-                  borderRadius: 10,
-                  minWidth: 25,
-                  minHeight: 25,
-                }}>
-                {!syncingStatus.inProgress && syncingStatus.lastBlockServer === syncingStatus.lastBlockWallet && (
-                  <View testID="header.checkIcon" style={{ margin: 0, padding: 0 }}>
-                    <FontAwesomeIcon icon={faCheck} color={colors.primary} size={20} />
-                  </View>
-                )}
-                {!syncingStatus.inProgress && syncingStatus.lastBlockServer !== syncingStatus.lastBlockWallet && (
-                  <>
-                    {mode === 'basic' ? (
-                      <FontAwesomeIcon icon={faPause} color={colors.zingo} size={17} />
-                    ) : (
-                      <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
-                        <FontAwesomeIcon icon={faPause} color={colors.zingo} size={17} />
-                      </TouchableOpacity>
-                    )}
-                  </>
-                )}
-                {syncingStatus.inProgress && (
-                  <Animated.View testID="header.playIcon" style={{ opacity: opacityValue }}>
-                    {mode === 'basic' ? (
-                      <FontAwesomeIcon icon={faPlay} color={colors.syncing} size={17} />
-                    ) : (
-                      <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
-                        <FontAwesomeIcon icon={faPlay} color={colors.syncing} size={17} />
-                      </TouchableOpacity>
-                    )}
-                  </Animated.View>
-                )}
-              </View>
-            ) : (
-              <View
-                style={{
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  margin: 0,
-                  marginRight: 5,
-                  padding: 1,
-                  borderColor: colors.primaryDisabled,
-                  borderWidth: 1,
-                  borderRadius: 10,
-                  minWidth: 25,
-                  minHeight: 25,
-                }}>
-                <View style={{ margin: 0, padding: 0 }}>
-                  <FontAwesomeIcon icon={faWifi} color={colors.primaryDisabled} size={18} />
-                </View>
-              </View>
-            )}
-            {(!netInfo.isConnected || netInfo.type === NetInfoStateType.cellular || netInfo.isConnectionExpensive) && (
-              <>
-                {mode !== 'basic' && (
-                  <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
-                    <FontAwesomeIcon icon={faCloudDownload} color={!netInfo.isConnected ? 'red' : 'yellow'} size={20} />
-                  </TouchableOpacity>
-                )}
-              </>
-            )}
-          </>
-        )}
+        <RegText testID={testID} color={colors.money} style={{ paddingHorizontal: 5 }}>
+          {title}
+        </RegText>
       </View>
 
-      <View style={{ padding: 10, position: 'absolute', left: 0 }}>
+      <View
+        style={{
+          padding: 10,
+          position: 'absolute',
+          left: 0,
+          alignItems: 'flex-start',
+        }}>
         <View style={{ alignItems: 'center', flexDirection: 'row' }}>
           {!noDrawMenu && (
             <TouchableOpacity
@@ -528,7 +681,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               accessible={true}
               accessibilityLabel={translate('menudrawer-acc') as string}
               onPress={toggleMenuDrawer}>
-              <FontAwesomeIcon icon={faBars} size={48} color={colors.border} />
+              <FontAwesomeIcon icon={faBars} size={45} color={colors.border} />
             </TouchableOpacity>
           )}
           {readOnly && (
@@ -547,53 +700,17 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         </View>
       </View>
 
-      <View style={{ padding: 15, position: 'absolute', right: 0, alignItems: 'flex-end' }}>
-        <Text style={{ fontSize: 8, color: colors.border }}>{translate('version') as string}</Text>
-        <Text style={{ fontSize: 8, color: colors.border }}>{`${translate('settings.mode')}${translate(
-          `settings.value-mode-${mode}`,
-        )}`}</Text>
-        {__DEV__ && !!dimensions && (
-          <Text style={{ fontSize: 8, color: colors.border }}>
-            {'(' + dimensions.width + 'x' + dimensions.height + ')-' + dimensions.scale}
-          </Text>
-        )}
-        {!noPrivacy && set_privacy_option && (
-          <TouchableOpacity onPress={() => set_privacy_option('privacy', !privacy)}>
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginTop: 5,
-              }}>
-              <Text style={{ fontSize: 13, color: colors.border }}>{translate('settings.privacy') as string}</Text>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  borderWidth: privacy ? 2 : 1,
-                  borderColor: privacy ? colors.primary : colors.primaryDisabled,
-                  borderRadius: 5,
-                  paddingHorizontal: 5,
-                }}>
-                <Text
-                  style={{
-                    fontSize: 13,
-                    color: colors.border,
-                    marginRight: 5,
-                  }}>
-                  {`${privacy ? translate('settings.value-privacy-true') : translate('settings.value-privacy-false')}`}
-                </Text>
-                {privacy ? (
-                  <FontAwesomeIcon icon={faLock} size={14} color={colors.primary} />
-                ) : (
-                  <FontAwesomeIcon icon={faLockOpen} size={14} color={colors.primaryDisabled} />
-                )}
-              </View>
-            </View>
-          </TouchableOpacity>
-        )}
+      <View
+        style={{
+          padding: 15,
+          position: 'absolute',
+          right: 0,
+          alignItems: 'flex-end',
+        }}>
+        <Image
+          source={require('../../assets/img/logobig-zingo.png')}
+          style={{ width: 38, height: 38, resizeMode: 'contain', borderRadius: 10 }}
+        />
       </View>
 
       <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />

@@ -10,5 +10,13 @@ android_logger = "0.11"
 log = { workspace = true }
 rustlib = { path = "../lib" }
 
+[dev-dependencies]
+tokio =  { version = "1.24.2", features = ["full"] }
+zingo-testutils = { git="https://github.com/zingolabs/zingolib", default-features=true, branch = "dev" }
+json = "0.12.4"
+env_logger = "0.10.0"
+test_utils = { path = "../test_utils" }
+
 [lib]
 crate-type = ["dylib"]
+

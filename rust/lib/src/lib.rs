@@ -45,6 +45,7 @@ fn construct_uri_load_config(
     uri: String,
     data_dir: String,
     chain_hint: String,
+    monitor_mempool: bool,
 ) -> Result<(zingoconfig::ZingoConfig, http::Uri), String> {
     let lightwalletd_uri = construct_lightwalletd_uri(Some(uri));
 
@@ -57,7 +58,12 @@ fn construct_uri_load_config(
         "regtest" => Regtest,
         _ => return Err("Error: Not a valid chain hint!".to_string()),
     };
-    let mut config = match zingolib::load_clientconfig(lightwalletd_uri.clone(), None, chaintype) {
+    let mut config = match zingolib::load_clientconfig(
+        lightwalletd_uri.clone(),
+        None,
+        chaintype,
+        monitor_mempool,
+    ) {
         Ok(c) => c,
         Err(e) => {
             return Err(format!("Error: Config load: {}", e));
@@ -68,9 +74,14 @@ fn construct_uri_load_config(
     Ok((config, lightwalletd_uri))
 }
 
-pub fn init_new(server_uri: String, data_dir: String, chain_hint: String) -> String {
+pub fn init_new(
+    server_uri: String,
+    data_dir: String,
+    chain_hint: String,
+    monitor_mempool: bool,
+) -> String {
     let (config, lightwalletd_uri);
-    match construct_uri_load_config(server_uri, data_dir, chain_hint) {
+    match construct_uri_load_config(server_uri, data_dir, chain_hint, monitor_mempool) {
         Ok((c, h)) => (config, lightwalletd_uri) = (c, h),
         Err(s) => return s,
     }
@@ -95,13 +106,14 @@ pub fn init_from_seed(
     birthday: u64,
     data_dir: String,
     chain_hint: String,
+    monitor_mempool: bool,
 ) -> String {
     let (config, _lightwalletd_uri);
-    match construct_uri_load_config(server_uri, data_dir, chain_hint) {
+    match construct_uri_load_config(server_uri, data_dir, chain_hint, monitor_mempool) {
         Ok((c, h)) => (config, _lightwalletd_uri) = (c, h),
         Err(s) => return s,
     }
-    let lightclient = match LightClient::new_from_wallet_base(
+    let lightclient = match LightClient::create_from_wallet_base(
         WalletBase::MnemonicPhrase(seed),
         &config,
         birthday,
@@ -121,19 +133,24 @@ pub fn init_from_ufvk(
     birthday: u64,
     data_dir: String,
     chain_hint: String,
+    monitor_mempool: bool,
 ) -> String {
     let (config, _lightwalletd_uri);
-    match construct_uri_load_config(server_uri, data_dir, chain_hint) {
+    match construct_uri_load_config(server_uri, data_dir, chain_hint, monitor_mempool) {
         Ok((c, h)) => (config, _lightwalletd_uri) = (c, h),
         Err(s) => return s,
     }
-    let lightclient =
-        match LightClient::new_from_wallet_base(WalletBase::Ufvk(ufvk), &config, birthday, false) {
-            Ok(l) => l,
-            Err(e) => {
-                return format!("Error: {}", e);
-            }
-        };
+    let lightclient = match LightClient::create_from_wallet_base(
+        WalletBase::Ufvk(ufvk),
+        &config,
+        birthday,
+        false,
+    ) {
+        Ok(l) => l,
+        Err(e) => {
+            return format!("Error: {}", e);
+        }
+    };
     lock_client_return_seed(lightclient)
 }
 
@@ -142,9 +159,10 @@ pub fn init_from_b64(
     base64_data: String,
     data_dir: String,
     chain_hint: String,
+    monitor_mempool: bool,
 ) -> String {
     let (config, _lightwalletd_uri);
-    match construct_uri_load_config(server_uri, data_dir, chain_hint) {
+    match construct_uri_load_config(server_uri, data_dir, chain_hint, monitor_mempool) {
         Ok((c, h)) => (config, _lightwalletd_uri) = (c, h),
         Err(s) => return s,
     }

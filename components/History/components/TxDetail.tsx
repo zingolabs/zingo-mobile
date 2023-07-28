@@ -2,7 +2,6 @@
 import React, { useContext, useState } from 'react';
 import { View, ScrollView, TouchableOpacity, SafeAreaView, Linking, Text } from 'react-native';
 import Clipboard from '@react-native-community/clipboard';
-import Toast from 'react-native-simple-toast';
 import moment from 'moment';
 import 'moment/locale/es';
 import { useTheme } from '@react-navigation/native';
@@ -25,7 +24,7 @@ type TxDetailProps = {
 
 const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_privacy_option }) => {
   const context = useContext(ContextAppLoaded);
-  const { info, translate, language, privacy } = context;
+  const { info, translate, language, privacy, addLastSnackbar } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const spendColor =
     tx.confirmations === 0 ? colors.primaryDisabled : (tx.amount || 0) > 0 ? colors.primary : colors.text;
@@ -77,6 +76,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
         noSyncingStatus={true}
         noDrawMenu={true}
         set_privacy_option={set_privacy_option}
+        addLastSnackbar={addLastSnackbar}
       />
       <ScrollView
         showsVerticalScrollIndicator={true}
@@ -119,7 +119,11 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
               onPress={() => {
                 if (tx.txid) {
                   Clipboard.setString(tx.txid);
-                  Toast.show(translate('history.txcopied') as string, Toast.LONG);
+                  addLastSnackbar({
+                    message: translate('history.txcopied') as string,
+                    type: 'Primary',
+                    duration: 'short',
+                  });
                   setExpandTxid(true);
                 }
               }}>
@@ -170,7 +174,11 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
                     onPress={() => {
                       if (txd.address) {
                         Clipboard.setString(txd.address);
-                        Toast.show(translate('history.addresscopied') as string, Toast.LONG);
+                        addLastSnackbar({
+                          message: translate('history.addresscopied') as string,
+                          type: 'Primary',
+                          duration: 'short',
+                        });
                         setExpandAddress(true);
                       }
                     }}>
@@ -200,7 +208,11 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
                       onPress={() => {
                         if (txd.memo) {
                           Clipboard.setString(txd.memo);
-                          Toast.show(translate('history.memocopied') as string, Toast.LONG);
+                          addLastSnackbar({
+                            message: translate('history.memocopied') as string,
+                            type: 'Primary',
+                            duration: 'short',
+                          });
                         }
                       }}>
                       <RegText>{txd.memo}</RegText>

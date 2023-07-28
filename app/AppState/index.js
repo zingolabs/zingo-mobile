@@ -10,7 +10,6 @@ import ToAddrClass from './classes/ToAddrClass';
 import TotalBalanceClass from './classes/TotalBalanceClass';
 import WalletSettingsClass from './classes/WalletSettingsClass';
 
-import DimensionsType from './types/DimensionsType';
 import InfoType from './types/InfoType';
 import SendJsonToTypeType from './types/SendJsonToTypeType';
 import TransactionType from './types/TransactionType';
@@ -22,6 +21,7 @@ import NetInfoType from './types/NetInfoType';
 import BackgroundType from './types/BackgroundType';
 import BackgroundErrorType from './types/BackgroundErrorType';
 import ServerType from './types/ServerType';
+import SnackbarType from './types/SnackbarType';
 
 import AppStateLoaded from './AppStateLoaded';
 import AppStateLoading from './AppStateLoading';
@@ -45,11 +45,11 @@ export {
   WalletType,
   SendJsonToTypeType,
   InfoType,
-  DimensionsType,
   zecPriceType,
   BackgroundType,
   BackgroundErrorType,
   TranslateType,
   NetInfoType,
   ServerType,
+  SnackbarType,
 };

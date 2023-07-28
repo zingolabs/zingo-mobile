@@ -20,9 +20,9 @@ describe('Component SingleAddress - test', () => {
   test('SingleAddress - snapshot', () => {
     const onPrev = jest.fn();
     const onNext = jest.fn();
-    const about = render(
+    const single = render(
       <SingleAddress address="hvkausdfskidjlfs" addressKind="u" index={0} total={1} prev={onPrev} next={onNext} />,
     );
-    expect(about.toJSON()).toMatchSnapshot();
+    expect(single.toJSON()).toMatchSnapshot();
   });
 });

@@ -2,7 +2,6 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
 import { View, SafeAreaView, ScrollView, TouchableOpacity, Text, TextInput, Keyboard } from 'react-native';
 import { useTheme } from '@react-navigation/native';
-import Toast from 'react-native-simple-toast';
 import Clipboard from '@react-native-community/clipboard';
 import Animated, { EasingNode } from 'react-native-reanimated';
 
@@ -11,12 +10,13 @@ import FadeText from '../Components/FadeText';
 import Button from '../Components/Button';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded, ContextAppLoading } from '../../app/context';
-import { DimensionsType, InfoType, NetInfoType, ServerType, TranslateType, WalletType } from '../../app/AppState';
+import { InfoType, NetInfoType, ServerType, TranslateType, WalletType } from '../../app/AppState';
 import RPCModule from '../../app/RPCModule';
 import RPC from '../../app/rpc';
 import Header from '../Header';
 import Utils from '../../app/utils';
 import { createAlert } from '../../app/createAlert';
+import SnackbarType from '../../app/AppState/types/SnackbarType';
 
 type TextsType = {
   new: string[];
@@ -31,37 +31,40 @@ type SeedProps = {
   onClickOK: (seedPhrase: string, birthdayNumber: number) => void;
   onClickCancel: () => void;
   action: 'new' | 'change' | 'view' | 'restore' | 'backup' | 'server';
-  setBackgroundError?: (title: string, error: string) => void;
+  set_privacy_option: (name: 'privacy', value: boolean) => Promise<void>;
 };
-const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, action, setBackgroundError }) => {
+const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, action, set_privacy_option }) => {
   const contextLoaded = useContext(ContextAppLoaded);
   const contextLoading = useContext(ContextAppLoading);
   let wallet: WalletType,
     translate: (key: string) => TranslateType,
     info: InfoType,
     server: ServerType,
-    dimensions: DimensionsType,
     netInfo: NetInfoType,
     privacy: boolean,
-    mode: 'basic' | 'expert';
+    mode: 'basic' | 'expert',
+    setBackgroundError: (title: string, error: string) => void,
+    addLastSnackbar: (snackbar: SnackbarType) => void;
   if (action === 'new' || action === 'restore') {
     wallet = contextLoading.wallet;
     translate = contextLoading.translate;
     info = contextLoading.info;
     server = contextLoading.server;
-    dimensions = contextLoading.dimensions;
     netInfo = contextLoading.netInfo;
     privacy = contextLoading.privacy;
     mode = contextLoading.mode;
+    setBackgroundError = contextLoading.setBackgroundError;
+    addLastSnackbar = contextLoading.addLastSnackbar;
   } else {
     wallet = contextLoaded.wallet;
     translate = contextLoaded.translate;
     info = contextLoaded.info;
     server = contextLoaded.server;
-    dimensions = contextLoaded.dimensions;
     netInfo = contextLoaded.netInfo;
     privacy = contextLoaded.privacy;
     mode = contextLoaded.mode;
+    setBackgroundError = contextLoaded.setBackgroundError;
+    addLastSnackbar = contextLoaded.addLastSnackbar;
   }
 
   const { colors } = useTheme() as unknown as ThemeType;
@@ -150,15 +153,29 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
             setLatestBlock(Number(resp));
           } else {
             //console.log('error latest block', resp);
-            if (setBackgroundError) {
-              createAlert(setBackgroundError, translate('loadingapp.creatingwallet-label') as string, resp);
+            if (setBackgroundError && addLastSnackbar) {
+              createAlert(
+                setBackgroundError,
+                addLastSnackbar,
+                translate('loadingapp.creatingwallet-label') as string,
+                resp,
+              );
             }
             onClickCancel();
           }
         })();
       }
     }
-  }, [action, info.latestBlock, latestBlock, onClickCancel, server.uri, setBackgroundError, translate]);
+  }, [
+    action,
+    addLastSnackbar,
+    info.latestBlock,
+    latestBlock,
+    onClickCancel,
+    server.uri,
+    setBackgroundError,
+    translate,
+  ]);
 
   useEffect(() => {
     if (action !== 'new' && action !== 'restore') {
@@ -191,11 +208,11 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
             noBalance={true}
             noSyncingStatus={true}
             noDrawMenu={true}
-            noPrivacy={true}
+            set_privacy_option={set_privacy_option}
             translate={translate}
-            dimensions={dimensions}
             netInfo={netInfo}
             mode={mode}
+            addLastSnackbar={addLastSnackbar}
           />
         </View>
       </Animated.View>
@@ -210,7 +227,11 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
           justifyContent: 'flex-start',
         }}>
         <FadeText style={{ marginTop: 0, padding: 20, textAlign: 'center' }}>
-          {readOnly ? (translate('seed.text-readonly') as string) : (translate('seed.text-no-readonly') as string)}
+          {readOnly
+            ? action === 'backup' || action === 'change' || action === 'server'
+              ? (translate(`seed.text-readonly-${action}`) as string)
+              : (translate('seed.text-readonly') as string)
+            : (translate('seed.text-no-readonly') as string)}
         </FadeText>
         <View
           style={{
@@ -226,7 +247,13 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
               onPress={() => {
                 if (seedPhrase) {
                   Clipboard.setString(seedPhrase);
-                  Toast.show(translate('seed.tapcopy-seed-message') as string, Toast.LONG);
+                  if (addLastSnackbar) {
+                    addLastSnackbar({
+                      message: translate('seed.tapcopy-seed-message') as string,
+                      type: 'Primary',
+                      duration: 'short',
+                    });
+                  }
                   setExpandSeed(true);
                   if (privacy) {
                     setTimeout(() => {
@@ -277,29 +304,37 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
               />
             </View>
           )}
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-            <View />
-            <TouchableOpacity
-              onPress={() => {
-                if (seedPhrase) {
-                  Clipboard.setString(seedPhrase);
-                  Toast.show(translate('seed.tapcopy-seed-message') as string, Toast.LONG);
-                }
-              }}>
-              <Text
-                style={{
-                  color: colors.text,
-                  textDecorationLine: 'underline',
-                  padding: 10,
-                  marginTop: 0,
-                  textAlign: 'center',
-                  minHeight: 48,
+          {action !== 'restore' && (
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <View />
+              <TouchableOpacity
+                onPress={() => {
+                  if (seedPhrase) {
+                    Clipboard.setString(seedPhrase);
+                    if (addLastSnackbar) {
+                      addLastSnackbar({
+                        message: translate('seed.tapcopy-seed-message') as string,
+                        type: 'Primary',
+                        duration: 'short',
+                      });
+                    }
+                  }
                 }}>
-                {translate('seed.tapcopy') as string}
-              </Text>
-            </TouchableOpacity>
-            <View />
-          </View>
+                <Text
+                  style={{
+                    color: colors.text,
+                    textDecorationLine: 'underline',
+                    padding: 10,
+                    marginTop: 0,
+                    textAlign: 'center',
+                    minHeight: 48,
+                  }}>
+                  {translate('seed.tapcopy') as string}
+                </Text>
+              </TouchableOpacity>
+              <View />
+            </View>
+          )}
         </View>
 
         <View style={{ marginTop: 10, alignItems: 'center' }}>
@@ -309,7 +344,13 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
               onPress={() => {
                 if (birthdayNumber) {
                   Clipboard.setString(birthdayNumber);
-                  Toast.show(translate('seed.tapcopy-birthday-message') as string, Toast.LONG);
+                  if (addLastSnackbar) {
+                    addLastSnackbar({
+                      message: translate('seed.tapcopy-birthday-message') as string,
+                      type: 'Primary',
+                      duration: 'short',
+                    });
+                  }
                   setExpandBithday(true);
                   if (privacy) {
                     setTimeout(() => {
@@ -417,7 +458,9 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
               return;
             }
             if (!netInfo.isConnected && (times > 0 || action === 'restore')) {
-              Toast.show(translate('loadedapp.connection-error') as string, Toast.LONG);
+              if (addLastSnackbar) {
+                addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
+              }
               return;
             }
             if (times === 0 || times === 3) {

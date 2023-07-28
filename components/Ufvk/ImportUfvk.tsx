@@ -4,7 +4,6 @@ import { View, ScrollView, SafeAreaView, TouchableOpacity, Modal, TextInput, Key
 import { useTheme } from '@react-navigation/native';
 import { faQrcode } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import Toast from 'react-native-simple-toast';
 import Animated, { EasingNode } from 'react-native-reanimated';
 
 import FadeText from '../Components/FadeText';
@@ -23,7 +22,7 @@ type ImportUfvkProps = {
 };
 const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, onClickOK }) => {
   const context = useContext(ContextAppLoading);
-  const { translate, netInfo, dimensions, info, server, mode } = context;
+  const { translate, netInfo, info, server, mode, addLastSnackbar } = context;
   const { colors } = useTheme() as unknown as ThemeType;
 
   const [ufvkText, setUfvkText] = useState('');
@@ -76,7 +75,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
 
   const okButton = async () => {
     if (!netInfo.isConnected) {
-      Toast.show(translate('loadedapp.connection-error') as string, Toast.LONG);
+      addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
       return;
     }
     //const valid = await validateKey(ufvkText);
@@ -94,11 +93,11 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
     //console.log(result);
     if (result) {
       if (result.toLowerCase().startsWith('error')) {
-        Toast.show(`${translate('scanner.noviewkey-error')}`, Toast.LONG);
+        addLastSnackbar({ message: `${translate('scanner.noviewkey-error')}`, type: 'Primary' });
         return false;
       }
     } else {
-      Toast.show(`${translate('scanner.noviewkey-error')}`, Toast.LONG);
+      addLastSnackbar({ message: `${translate('scanner.noviewkey-error')}`, type: 'Primary' });
       return false;
     }
     // TODO verify that JSON don't fail.
@@ -111,7 +110,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
     if (valid) {
       return true;
     } else {
-      Toast.show(`${translate('scanner.noviewkey-error')}`, Toast.LONG);
+      addLastSnackbar({ message: `${translate('scanner.noviewkey-error')}`, type: 'Primary' });
       return false;
     }
   };
@@ -146,7 +145,6 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
             noDrawMenu={true}
             noPrivacy={true}
             translate={translate}
-            dimensions={dimensions}
             netInfo={netInfo}
             mode={mode}
           />

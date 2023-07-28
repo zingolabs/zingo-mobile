@@ -5,9 +5,7 @@ import {
   Text,
   Alert,
   I18nManager,
-  Dimensions,
   EmitterSubscription,
-  ScaledSize,
   AppState,
   NativeEventSubscription,
   Platform,
@@ -18,7 +16,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faList, faUpload, faDownload, faCog } from '@fortawesome/free-solid-svg-icons';
 import { useTheme } from '@react-navigation/native';
 import SideMenu from 'react-native-side-menu-updated';
-import Toast from 'react-native-simple-toast';
 import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
 import { isEqual } from 'lodash';
@@ -51,11 +48,12 @@ import Utils from '../utils';
 import { ThemeType } from '../types';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import { ContextAppLoadedProvider, defaultAppStateLoaded } from '../context';
-import platform from '../platform/platform';
 import { parseZcashURI, serverUris, ZcashURITargetClass } from '../uris';
 import BackgroundFileImpl from '../../components/Background/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '../createAlert';
+import Snackbars from '../../components/Components/Snackbars';
+import SnackbarType from '../AppState/types/SnackbarType';
 
 const History = React.lazy(() => import('../../components/History'));
 const Send = React.lazy(() => import('../../components/Send'));
@@ -214,17 +212,14 @@ type LoadedAppClassProps = {
   readOnly: boolean;
 };
 
-class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
+export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
   rpc: RPC;
-  dim: EmitterSubscription;
   appstate: NativeEventSubscription;
   linking: EmitterSubscription;
   unsubscribeNetInfo: NetInfoSubscription;
 
   constructor(props: LoadedAppClassProps) {
     super(props);
-
-    const screen = Dimensions.get('screen');
 
     this.state = {
       ...defaultAppStateLoaded,
@@ -240,14 +235,10 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       mode: props.mode,
       background: props.background,
       readOnly: props.readOnly,
-      dimensions: {
-        width: Number(screen.width.toFixed(0)),
-        height: Number(screen.height.toFixed(0)),
-        orientation: platform.isPortrait(screen) ? 'portrait' : 'landscape',
-        deviceType: platform.isTablet(screen) ? 'tablet' : 'phone',
-        scale: Number(screen.scale.toFixed(2)),
-      },
       appState: AppState.currentState,
+      setBackgroundError: this.setBackgroundError,
+      addLastSnackbar: this.addLastSnackbar,
+      restartApp: this.navigateToLoadingApp,
     };
 
     this.rpc = new RPC(
@@ -262,7 +253,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       props.readOnly,
     );
 
-    this.dim = {} as EmitterSubscription;
     this.appstate = {} as NativeEventSubscription;
     this.linking = {} as EmitterSubscription;
     this.unsubscribeNetInfo = {} as NetInfoSubscription;
@@ -280,10 +270,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     (async () => {
       await this.rpc.configure();
     })();
-
-    this.dim = Dimensions.addEventListener('change', ({ screen }) => {
-      this.setDimensions(screen);
-    });
 
     this.appstate = AppState.addEventListener('change', async nextAppState => {
       if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
@@ -337,7 +323,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
           screen: this.state.translate('loadedapp.send-menu'),
           initial: false,
         });
-        Toast.show(this.state.translate('loadedapp.zcash-url') as string, Toast.LONG);
+        this.addLastSnackbar({ message: this.state.translate('loadedapp.zcash-url') as string, type: 'Primary' });
       }
     });
 
@@ -361,12 +347,15 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
             //console.log('EVENT Loaded: No internet connection.');
             await this.rpc.clearTimers();
             this.setSyncingStatus(new SyncingStatusClass());
-            Toast.show(this.props.translate('loadedapp.connection-error') as string, Toast.LONG);
+            this.addLastSnackbar({
+              message: this.props.translate('loadedapp.connection-error') as string,
+              type: 'Primary',
+            });
           } else {
             //console.log('EVENT Loaded: YES internet connection.');
             if (this.rpc.getInRefresh()) {
               // I need to start again the App only if it is Syncing...
-              this.navigateToLoading();
+              this.navigateToLoadingApp();
             }
           }
         }
@@ -376,9 +365,8 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
 
   componentWillUnmount = async () => {
     await this.rpc.clearTimers();
-    this.dim && this.dim.remove();
-    this.appstate && this.appstate.remove();
-    this.linking && this.linking.remove();
+    this.appstate && typeof this.appstate.remove === 'function' && this.appstate.remove();
+    this.linking && typeof this.linking === 'function' && this.linking.remove();
     this.unsubscribeNetInfo && this.unsubscribeNetInfo();
   };
 
@@ -422,7 +410,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
         return;
       } else {
         // Show the error message as a toast
-        Toast.show(target);
+        this.addLastSnackbar({ message: target, type: 'Primary' });
         return;
       }
     }
@@ -447,24 +435,6 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       poolsModalVisible: false,
       insightModalVisible: false,
     });
-  };
-
-  setDimensions = (screen: ScaledSize) => {
-    if (
-      this.state.dimensions.width !== Number(screen.width.toFixed(0)) ||
-      this.state.dimensions.height !== Number(screen.height.toFixed(0))
-    ) {
-      //console.log('fetch screen dimensions');
-      this.setState({
-        dimensions: {
-          width: Number(screen.width.toFixed(0)),
-          height: Number(screen.height.toFixed(0)),
-          orientation: platform.isPortrait(screen) ? 'portrait' : 'landscape',
-          deviceType: platform.isTablet(screen) ? 'tablet' : 'phone',
-          scale: Number(screen.scale.toFixed(2)),
-        },
-      });
-    }
   };
 
   fetchBackgroundSyncing = async () => {
@@ -804,7 +774,10 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
         // Load the wallet and navigate to the transactions screen
         //console.log(`wallet loaded ok ${value.uri}`);
         if (toast) {
-          Toast.show(`${this.props.translate('loadedapp.readingwallet')} ${value.uri}`, Toast.LONG);
+          this.addLastSnackbar({
+            message: `${this.props.translate('loadedapp.readingwallet')} ${value.uri}`,
+            type: 'Primary',
+          });
         }
         await SettingsFileImpl.writeSettings(name, value);
         this.setState({
@@ -834,7 +807,10 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       }
       //console.log(`Error Reading Wallet ${value} - ${error}`);
       if (toast) {
-        Toast.show(`${this.props.translate('loadedapp.readingwallet-error')} ${value.uri}`, Toast.LONG);
+        this.addLastSnackbar({
+          message: `${this.props.translate('loadedapp.readingwallet-error')} ${value.uri}`,
+          type: 'Primary',
+        });
       }
 
       // we need to restore the old server because the new doesn't have the seed of the current wallet.
@@ -869,7 +845,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     // Refetch the settings to update
     this.rpc.fetchWalletSettings();
     if (reset) {
-      this.navigateToLoading();
+      this.navigateToLoadingApp();
     }
   };
 
@@ -903,7 +879,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     this.rpc.fetchWalletSettings();
   };
 
-  navigateToLoading = async () => {
+  navigateToLoadingApp = async () => {
     const { navigation } = this.props;
 
     await this.rpc.clearTimers();
@@ -928,14 +904,19 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     //console.log("jc change", resultStr);
     if (resultStr.toLowerCase().startsWith('error')) {
       //console.log(`Error change wallet. ${resultStr}`);
-      createAlert(this.setBackgroundError, this.props.translate('loadedapp.changingwallet-label') as string, resultStr);
+      createAlert(
+        this.setBackgroundError,
+        this.addLastSnackbar,
+        this.props.translate('loadedapp.changingwallet-label') as string,
+        resultStr,
+      );
       return;
     }
 
     this.rpc.setInRefresh(false);
     this.keepAwake(false);
     this.setState({ seedChangeModalVisible: false });
-    this.navigateToLoading();
+    this.navigateToLoadingApp();
   };
 
   onClickOKRestoreBackup = async () => {
@@ -946,6 +927,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       //console.log(`Error restore backup wallet. ${resultStr}`);
       createAlert(
         this.setBackgroundError,
+        this.addLastSnackbar,
         this.props.translate('loadedapp.restoringwallet-label') as string,
         resultStr,
       );
@@ -955,7 +937,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     this.rpc.setInRefresh(false);
     this.keepAwake(false);
     this.setState({ seedBackupModalVisible: false });
-    this.navigateToLoading();
+    this.navigateToLoadingApp();
   };
 
   onClickOKServerWallet = async () => {
@@ -964,7 +946,10 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       const resultStr: string = await RPCModule.execute('changeserver', this.state.newServer.uri);
       if (resultStr.toLowerCase().startsWith('error')) {
         //console.log(`Error change server ${value} - ${resultStr}`);
-        Toast.show(`${this.props.translate('loadedapp.changeservernew-error')} ${resultStr}`, Toast.LONG);
+        this.addLastSnackbar({
+          message: `${this.props.translate('loadedapp.changeservernew-error')} ${resultStr}`,
+          type: 'Primary',
+        });
         return;
       } else {
         //console.log(`change server ok ${value}`);
@@ -993,6 +978,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
         //console.log(`Error change wallet. ${resultStr}`);
         createAlert(
           this.setBackgroundError,
+          this.addLastSnackbar,
           this.props.translate('loadedapp.changingwallet-label') as string,
           resultStr2,
         );
@@ -1005,7 +991,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
         this.setState({ seedServerModalVisible: false });
       }
       // no need to restart the tasks because is about to restart the app.
-      this.navigateToLoading();
+      this.navigateToLoadingApp();
     }
   };
 
@@ -1026,6 +1012,22 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
     this.setState({ backgroundError: { title, error } });
   };
 
+  addLastSnackbar = (snackbar: SnackbarType) => {
+    const newSnackbars = this.state.snackbars;
+    // if the last one is the same don't do anything.
+    if (newSnackbars.length > 0 && newSnackbars[newSnackbars.length - 1].message === snackbar.message) {
+      return;
+    }
+    newSnackbars.push(snackbar);
+    this.setState({ snackbars: newSnackbars });
+  };
+
+  removeFirstSnackbar = () => {
+    const newSnackbars = this.state.snackbars;
+    newSnackbars.shift();
+    this.setState({ snackbars: newSnackbars });
+  };
+
   render() {
     const {
       aboutModalVisible,
@@ -1044,6 +1046,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
       ufvkChangeModalVisible,
       ufvkBackupModalVisible,
       ufvkServerModalVisible,
+      snackbars,
     } = this.state;
     const { translate } = this.props;
     const { colors } = this.props.theme;
@@ -1223,6 +1226,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                 onClickOK={() => this.setState({ seedViewModalVisible: false })}
                 onClickCancel={() => this.setState({ seedViewModalVisible: false })}
                 action={'view'}
+                set_privacy_option={this.set_privacy_option}
               />
             </Suspense>
           </Modal>
@@ -1242,6 +1246,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                 onClickOK={() => this.onClickOKChangeWallet()}
                 onClickCancel={() => this.setState({ seedChangeModalVisible: false })}
                 action={'change'}
+                set_privacy_option={this.set_privacy_option}
               />
             </Suspense>
           </Modal>
@@ -1261,6 +1266,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                 onClickOK={() => this.onClickOKRestoreBackup()}
                 onClickCancel={() => this.setState({ seedBackupModalVisible: false })}
                 action={'backup'}
+                set_privacy_option={this.set_privacy_option}
               />
             </Suspense>
           </Modal>
@@ -1284,6 +1290,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                   this.setState({ seedServerModalVisible: false });
                 }}
                 action={'server'}
+                set_privacy_option={this.set_privacy_option}
               />
             </Suspense>
           </Modal>
@@ -1303,6 +1310,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                 onClickOK={() => this.setState({ ufvkViewModalVisible: false })}
                 onClickCancel={() => this.setState({ ufvkViewModalVisible: false })}
                 action={'view'}
+                set_privacy_option={this.set_privacy_option}
               />
             </Suspense>
           </Modal>
@@ -1322,6 +1330,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                 onClickOK={() => this.onClickOKChangeWallet()}
                 onClickCancel={() => this.setState({ ufvkChangeModalVisible: false })}
                 action={'change'}
+                set_privacy_option={this.set_privacy_option}
               />
             </Suspense>
           </Modal>
@@ -1341,6 +1350,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                 onClickOK={() => this.onClickOKRestoreBackup()}
                 onClickCancel={() => this.setState({ ufvkBackupModalVisible: false })}
                 action={'backup'}
+                set_privacy_option={this.set_privacy_option}
               />
             </Suspense>
           </Modal>
@@ -1364,6 +1374,7 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                   this.setState({ ufvkServerModalVisible: false });
                 }}
                 action={'server'}
+                set_privacy_option={this.set_privacy_option}
               />
             </Suspense>
           </Modal>
@@ -1383,23 +1394,93 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
             </Suspense>
           </Modal>
 
-          <Tab.Navigator
-            initialRouteName={translate('loadedapp.wallet-menu') as string}
-            screenOptions={({ route }) => ({
-              tabBarIcon: ({ focused }) => fnTabBarIcon(route, focused),
-              tabBarActiveTintColor: 'transparent',
-              tabBarActiveBackgroundColor: colors.primaryDisabled,
-              tabBarInactiveTintColor: colors.money,
-              tabBarLabelStyle: { fontSize: 12 },
-              tabBarStyle: {
-                borderRadius: 0,
-                borderTopColor: colors.primary,
-                borderTopWidth: 1,
-              },
-              headerShown: false,
-            })}>
-            {!(this.state.mode === 'basic' && this.state.transactions.length <= 0) && (
-              <Tab.Screen name={translate('loadedapp.wallet-menu') as string}>
+          <Snackbars snackbars={snackbars} removeFirstSnackbar={this.removeFirstSnackbar} translate={translate} />
+
+          {this.state.mode !== 'basic' ||
+          (this.state.mode === 'basic' &&
+            (!(this.state.mode === 'basic' && this.state.transactions.length <= 0) ||
+              (!this.state.readOnly &&
+                !(
+                  this.state.mode === 'basic' &&
+                  this.state.totalBalance.spendableOrchard + this.state.totalBalance.spendablePrivate <= 0
+                )))) ? (
+            <Tab.Navigator
+              initialRouteName={translate('loadedapp.wallet-menu') as string}
+              screenOptions={({ route }) => ({
+                tabBarIcon: ({ focused }) => fnTabBarIcon(route, focused),
+                tabBarLabelPosition: 'below-icon',
+                tabBarActiveTintColor: 'transparent',
+                tabBarActiveBackgroundColor: colors.primaryDisabled,
+                tabBarInactiveTintColor: colors.money,
+                tabBarLabelStyle: { fontSize: 12 },
+                tabBarStyle: {
+                  borderRadius: 0,
+                  borderTopColor: colors.primary,
+                  borderTopWidth: 1,
+                },
+                headerShown: false,
+              })}>
+              {!(this.state.mode === 'basic' && this.state.transactions.length <= 0) && (
+                <Tab.Screen name={translate('loadedapp.wallet-menu') as string}>
+                  {() => (
+                    <>
+                      <Suspense
+                        fallback={
+                          <View>
+                            <Text>{translate('loading') as string}</Text>
+                          </View>
+                        }>
+                        <History
+                          doRefresh={this.doRefresh}
+                          toggleMenuDrawer={this.toggleMenuDrawer}
+                          syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
+                          poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
+                          setZecPrice={this.setZecPrice}
+                          setComputingModalVisible={this.setComputingModalVisible}
+                          set_privacy_option={this.set_privacy_option}
+                          setPoolsToShieldSelectSapling={this.setPoolsToShieldSelectSapling}
+                          setPoolsToShieldSelectTransparent={this.setPoolsToShieldSelectTransparent}
+                          setUfvkViewModalVisible={this.setUfvkViewModalVisible}
+                        />
+                      </Suspense>
+                    </>
+                  )}
+                </Tab.Screen>
+              )}
+              {!this.state.readOnly &&
+                !(
+                  this.state.mode === 'basic' &&
+                  this.state.totalBalance.spendableOrchard + this.state.totalBalance.spendablePrivate <= 0
+                ) && (
+                  <Tab.Screen name={translate('loadedapp.send-menu') as string}>
+                    {() => (
+                      <>
+                        <Suspense
+                          fallback={
+                            <View>
+                              <Text>{translate('loading') as string}</Text>
+                            </View>
+                          }>
+                          <Send
+                            setSendPageState={this.setSendPageState}
+                            sendTransaction={this.sendTransaction}
+                            clearToAddr={this.clearToAddr}
+                            setSendProgress={this.setSendProgress}
+                            toggleMenuDrawer={this.toggleMenuDrawer}
+                            syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
+                            poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
+                            setZecPrice={this.setZecPrice}
+                            setComputingModalVisible={this.setComputingModalVisible}
+                            set_privacy_option={this.set_privacy_option}
+                            setPoolsToShieldSelectSapling={this.setPoolsToShieldSelectSapling}
+                            setPoolsToShieldSelectTransparent={this.setPoolsToShieldSelectTransparent}
+                          />
+                        </Suspense>
+                      </>
+                    )}
+                  </Tab.Screen>
+                )}
+              <Tab.Screen name={translate('loadedapp.uas-menu') as string}>
                 {() => (
                   <>
                     <Suspense
@@ -1408,74 +1489,36 @@ class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
                           <Text>{translate('loading') as string}</Text>
                         </View>
                       }>
-                      <History
-                        doRefresh={this.doRefresh}
+                      <Receive
+                        setUaAddress={this.setUaAddress}
                         toggleMenuDrawer={this.toggleMenuDrawer}
                         syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
-                        poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
-                        setZecPrice={this.setZecPrice}
-                        setComputingModalVisible={this.setComputingModalVisible}
-                        setBackgroundError={this.setBackgroundError}
                         set_privacy_option={this.set_privacy_option}
-                        setPoolsToShieldSelectSapling={this.setPoolsToShieldSelectSapling}
-                        setPoolsToShieldSelectTransparent={this.setPoolsToShieldSelectTransparent}
                         setUfvkViewModalVisible={this.setUfvkViewModalVisible}
                       />
                     </Suspense>
                   </>
                 )}
               </Tab.Screen>
-            )}
-            {!this.state.readOnly && !(this.state.mode === 'basic' && this.state.totalBalance.total <= 0) && (
-              <Tab.Screen name={translate('loadedapp.send-menu') as string}>
-                {() => (
-                  <>
-                    <Suspense
-                      fallback={
-                        <View>
-                          <Text>{translate('loading') as string}</Text>
-                        </View>
-                      }>
-                      <Send
-                        setSendPageState={this.setSendPageState}
-                        sendTransaction={this.sendTransaction}
-                        clearToAddr={this.clearToAddr}
-                        setSendProgress={this.setSendProgress}
-                        toggleMenuDrawer={this.toggleMenuDrawer}
-                        setComputingModalVisible={this.setComputingModalVisible}
-                        syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
-                        poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
-                        setZecPrice={this.setZecPrice}
-                        setBackgroundError={this.setBackgroundError}
-                        set_privacy_option={this.set_privacy_option}
-                        setPoolsToShieldSelectSapling={this.setPoolsToShieldSelectSapling}
-                        setPoolsToShieldSelectTransparent={this.setPoolsToShieldSelectTransparent}
-                      />
-                    </Suspense>
-                  </>
-                )}
-              </Tab.Screen>
-            )}
-            <Tab.Screen name={translate('loadedapp.uas-menu') as string}>
-              {() => (
-                <>
-                  <Suspense
-                    fallback={
-                      <View>
-                        <Text>{translate('loading') as string}</Text>
-                      </View>
-                    }>
-                    <Receive
-                      setUaAddress={this.setUaAddress}
-                      toggleMenuDrawer={this.toggleMenuDrawer}
-                      set_privacy_option={this.set_privacy_option}
-                      setUfvkViewModalVisible={this.setUfvkViewModalVisible}
-                    />
-                  </Suspense>
-                </>
-              )}
-            </Tab.Screen>
-          </Tab.Navigator>
+            </Tab.Navigator>
+          ) : (
+            <>
+              <Suspense
+                fallback={
+                  <View>
+                    <Text>{translate('loading') as string}</Text>
+                  </View>
+                }>
+                <Receive
+                  setUaAddress={this.setUaAddress}
+                  toggleMenuDrawer={this.toggleMenuDrawer}
+                  syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
+                  set_privacy_option={this.set_privacy_option}
+                  setUfvkViewModalVisible={this.setUfvkViewModalVisible}
+                />
+              </Suspense>
+            </>
+          )}
         </SideMenu>
       </ContextAppLoadedProvider>
     );

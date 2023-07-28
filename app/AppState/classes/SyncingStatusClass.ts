@@ -27,6 +27,8 @@ export default class SyncingStatusClass {
 
   lastBlockServer: number;
 
+  syncProcessStalled: boolean;
+
   constructor() {
     this.syncID = 0;
     this.totalBatches = 0;
@@ -39,5 +41,6 @@ export default class SyncingStatusClass {
     this.secondsPerBatch = 0;
     this.process_end_block = 0;
     this.lastBlockServer = 0;
+    this.syncProcessStalled = false;
   }
 }

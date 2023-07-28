@@ -6,7 +6,7 @@ import org.junit.experimental.categories.Categories.IncludeCategory
 import org.junit.runners.Suite.SuiteClasses
 
 @RunWith(Categories::class)
-@IncludeCategory(IntegrationTest::class)
-@SuiteClasses(ExecuteAddressesTest::class)
-class IntegrationTestSuite {
+@IncludeCategory(OfflineTest::class)
+@SuiteClasses(ExecuteAddressesFromSeed::class, ExecuteAddressesFromUfvk::class)
+class OfflineTestSuite {
 }

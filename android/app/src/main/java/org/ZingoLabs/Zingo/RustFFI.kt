@@ -7,7 +7,8 @@ class RustFFI {
         external fun initnew(
             serveruri: String,
             datadir: String,
-            chainhint: String
+            chainhint: String,
+            monitor_mempool: String
         ): String
 
         external fun initfromseed(
@@ -15,7 +16,8 @@ class RustFFI {
             seed: String,
             birthday: String,
             datadir: String,
-            chainhint: String
+            chainhint: String,
+            monitor_mempool: String
         ): String
 
         external fun initfromufvk(
@@ -23,14 +25,16 @@ class RustFFI {
             ufvk: String,
             birthday: String,
             datadir: String,
-            chainhint: String
+            chainhint: String,
+            monitor_mempool: String
         ): String
 
         external fun initfromb64(
             serveruri: String,
             datab64: String,
             datadir: String,
-            chainhint: String
+            chainhint: String,
+            monitor_mempool: String
         ): String
 
         external fun save(): String

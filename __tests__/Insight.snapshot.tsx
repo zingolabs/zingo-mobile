@@ -45,11 +45,11 @@ describe('Component Insight - test', () => {
     state.info.currencyName = 'ZEC';
     state.totalBalance.total = 1.25691111;
     const onClose = jest.fn();
-    const about = render(
+    const insight = render(
       <ContextAppLoadedProvider value={state}>
         <Insight closeModal={onClose} set_privacy_option={onClose} />
       </ContextAppLoadedProvider>,
     );
-    expect(about.toJSON()).toMatchSnapshot();
+    expect(insight.toJSON()).toMatchSnapshot();
   });
 });

@@ -19,7 +19,7 @@ type PoolsProps = {
 
 const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, set_privacy_option }) => {
   const context = useContext(ContextAppLoaded);
-  const { totalBalance, info, translate, privacy } = context;
+  const { totalBalance, info, translate, privacy, addLastSnackbar } = context;
   const { colors } = useTheme() as unknown as ThemeType;
 
   useEffect(() => {
@@ -43,6 +43,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, set_privacy_op
         noSyncingStatus={true}
         noDrawMenu={true}
         set_privacy_option={set_privacy_option}
+        addLastSnackbar={addLastSnackbar}
       />
 
       <ScrollView
@@ -129,6 +130,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, set_privacy_op
                 amtZec={totalBalance.transparentBal}
                 size={18}
                 currencyName={info.currencyName ? info.currencyName : ''}
+                color={'red'}
                 privacy={privacy}
               />
             </DetailLine>

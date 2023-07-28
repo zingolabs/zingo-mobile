@@ -135,7 +135,7 @@ describe('Component History - test', () => {
     state.privacy = false;
     // mode basic
     state.mode = 'basic';
-    const transactions = render(
+    const history = render(
       <ContextAppLoadedProvider value={state}>
         <History
           doRefresh={onFunction}
@@ -144,14 +144,13 @@ describe('Component History - test', () => {
           syncingStatusMoreInfoOnClick={onFunction}
           setZecPrice={onFunction}
           setComputingModalVisible={onFunction}
-          setBackgroundError={onFunction}
           set_privacy_option={onFunction}
           setPoolsToShieldSelectSapling={onFunction}
           setPoolsToShieldSelectTransparent={onFunction}
         />
       </ContextAppLoadedProvider>,
     );
-    expect(transactions.toJSON()).toMatchSnapshot();
+    expect(history.toJSON()).toMatchSnapshot();
   });
 
   test('History currency USD, privacy high & mode expert - snapshot', () => {
@@ -161,7 +160,7 @@ describe('Component History - test', () => {
     state.privacy = true;
     // mode basic
     state.mode = 'expert';
-    const transactions = render(
+    const history = render(
       <ContextAppLoadedProvider value={state}>
         <History
           doRefresh={onFunction}
@@ -170,13 +169,12 @@ describe('Component History - test', () => {
           syncingStatusMoreInfoOnClick={onFunction}
           setZecPrice={onFunction}
           setComputingModalVisible={onFunction}
-          setBackgroundError={onFunction}
           set_privacy_option={onFunction}
           setPoolsToShieldSelectSapling={onFunction}
           setPoolsToShieldSelectTransparent={onFunction}
         />
       </ContextAppLoadedProvider>,
     );
-    expect(transactions.toJSON()).toMatchSnapshot();
+    expect(history.toJSON()).toMatchSnapshot();
   });
 });

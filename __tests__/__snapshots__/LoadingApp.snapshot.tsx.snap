@@ -1,0 +1,49 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Component LoadingApp - test LoadingApp - snapshot 1`] = `
+<RCTSafeAreaView
+  style={
+    {
+      "alignItems": "center",
+      "backgroundColor": "#011401",
+      "display": "flex",
+      "height": "100%",
+      "justifyContent": "center",
+    }
+  }
+>
+  <View />
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "column",
+        "justifyContent": "center",
+      }
+    }
+  >
+    <Text
+      style={
+        {
+          "color": "#888888",
+          "fontSize": 40,
+          "fontWeight": "bold",
+        }
+      }
+    >
+      text traslated
+    </Text>
+    <Text
+      style={
+        {
+          "color": "#888888",
+          "fontSize": 15,
+        }
+      }
+    >
+      text traslated
+    </Text>
+  </View>
+</RCTSafeAreaView>
+`;

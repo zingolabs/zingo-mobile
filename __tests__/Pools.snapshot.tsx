@@ -55,11 +55,11 @@ describe('Component Pools - test', () => {
   state.totalBalance.transparentBal = 0.12345678;
   const onClose = jest.fn();
   test('Pools - snapshot', () => {
-    const info: any = render(
+    const pools = render(
       <ContextAppLoadedProvider value={state}>
         <Pools closeModal={onClose} set_privacy_option={onClose} />
       </ContextAppLoadedProvider>,
     );
-    expect(info.toJSON()).toMatchSnapshot();
+    expect(pools.toJSON()).toMatchSnapshot();
   });
 });

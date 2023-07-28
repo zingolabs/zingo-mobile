@@ -1025,49 +1025,6 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
             value="pepe lolo titi"
           />
         </View>
-        <View
-          style={
-            {
-              "flexDirection": "row",
-              "justifyContent": "space-between",
-            }
-          }
-        >
-          <View />
-          <View
-            accessible={true}
-            collapsable={false}
-            focusable={true}
-            onClick={[Function]}
-            onResponderGrant={[Function]}
-            onResponderMove={[Function]}
-            onResponderRelease={[Function]}
-            onResponderTerminate={[Function]}
-            onResponderTerminationRequest={[Function]}
-            onStartShouldSetResponder={[Function]}
-            style={
-              {
-                "opacity": 1,
-              }
-            }
-          >
-            <Text
-              style={
-                {
-                  "color": "rgb(28, 28, 30)",
-                  "marginTop": 0,
-                  "minHeight": 48,
-                  "padding": 10,
-                  "textAlign": "center",
-                  "textDecorationLine": "underline",
-                }
-              }
-            >
-              text translated
-            </Text>
-          </View>
-          <View />
-        </View>
       </View>
       <View
         style={
