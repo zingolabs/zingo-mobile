@@ -223,13 +223,13 @@
       "new": ["I have saved \n the seed"],
       "change": [
         "",
-        "I have saved \n the seed",
+        "Open New",
         "You really want \n to change your \n actual wallet",
         "Are you sure \n 100% or more"
       ],
       "server": [
         "",
-        "I have saved \n the seed",
+        "Change Server",
         "You really want \n to change your \n actual server",
         "Are you sure \n 100% or more"
       ],
@@ -237,7 +237,7 @@
       "restore": ["Restore Wallet"],
       "backup": [
         "",
-        "I have saved \n the seed",
+        "Restore",
         "You really want \n to restore your \n backup wallet",
         "Are you sure \n 100% or more"
       ]
@@ -249,7 +249,10 @@
     "view": "View",
     "restore": "Restore",
     "backup": "Backup",
-    "text-readonly": "This is your seed phrase. Please write it down carefully. It is the only way to restore your actual wallet.",
+    "text-readonly": "Before closing this screen, carefully type the seed phrase of the current wallet. It is the only way you will have to restore/access your current wallet.",
+    "text-readonly-backup": "Before restoring the backup of the previous wallet, carefully type the seed phrase of the current wallet. It is the only way you will have to restore/access your current wallet.",
+    "text-readonly-change": "Before accesing another wallet, carefully type the seed phrase of the current wallet. It is the only way you will have to restore/access your current wallet.",
+    "text-readonly-server": "Before changing another server, carefully type the seed phrase of the current wallet. It is the only way you will have to restore/access your current wallet.",
     "text-no-readonly": "Enter your seed phrase (24 words)",
     "tapcopy": "Tap to copy",
     "tapcopy-seed-message": "Copied Seed to Clipboard",
@@ -418,13 +421,13 @@
       "new": ["I have saved \n the Viewing Key"],
       "change": [
         "",
-        "I have saved \n the Viewing Key",
+        "Open New",
         "You really want \n to change your \n actual wallet",
         "Are you sure \n 100% or more"
       ],
       "server": [
         "",
-        "I have saved \n the Viewing Key",
+        "Change Server",
         "You really want \n to change your \n actual server",
         "Are you sure \n 100% or more"
       ],
@@ -432,7 +435,7 @@
       "restore": ["Restore Wallet"],
       "backup": [
         "",
-        "I have saved \n the Viewing Key",
+        "Restore",
         "You really want \n to restore your \n backup wallet",
         "Are you sure \n 100% or more"
       ]
@@ -443,7 +446,10 @@
     "tapcopy-message": "Copied Key to Clipboard",
     "title": "Key",
     "address": "Address",
-    "text-readonly": "This is your viewing key. Please write/copy it down carefully. Anyone who has a copy of the viewing key can observe all transactions to and from the associated wallet.",
+    "text-readonly": "Before closing this screen, carefully type the viewing key of the current wallet. It is the only way you will have to restore/access your current wallet.",
+    "text-readonly-backup": "Before restoring the backup of the previous wallet, carefully type the viewing key of the current wallet. It is the only way you will have to restore/access your current wallet.",
+    "text-readonly-change": "Before accesing another wallet, carefully type the viewing key of the current wallet. It is the only way you will have to restore/access your current wallet.",
+    "text-readonly-server": "Before changing another server, carefully type the viewing key of the current wallet. It is the only way you will have to restore/access your current wallet.",
     "change-warning": "IF YOU CHANGE TO ANOTHER WALLET, YOU WILL NO LONGER BE ABLE TO VIEW THIS WALLET WITHOUT THE VIEWING KEY.",
     "backup-warning": "IF YOU CHANGE TO YOUR BACKUP WALLET, YOU WILL NO LONGER BE ABLE TO VIEW THIS WALLET WITHOUT THE VIEWING KEY.",
     "server-warning": "IF YOU CHANGE TO A SERVER WITH A DIFFERENT CHAIN, YOU WILL NO LONGER BE ABLE TO VIEW THIS WALLET WITHOUT THE VIEWING KEY"
