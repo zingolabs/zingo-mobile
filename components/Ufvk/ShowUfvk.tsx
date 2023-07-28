@@ -145,8 +145,6 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
             if (times === 0) {
               onClickOK();
             } else if (times === 1) {
-              setTimes(times + 1);
-            } else if (times === 2) {
               onPressOK();
             }
           }}

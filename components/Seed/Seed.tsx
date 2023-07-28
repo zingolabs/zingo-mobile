@@ -484,8 +484,6 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
                 onClickOK(seedPhrase, Number(birthdayNumber));
               }
             } else if (times === 1) {
-              setTimes(times + 1);
-            } else if (times === 2) {
               onPressOK();
             }
           }}
