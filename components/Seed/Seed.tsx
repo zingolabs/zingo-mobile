@@ -198,7 +198,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
           : ''),
       [
         {
-          text: 'confirm',
+          text: translate('seed.confirm-button') as string,
           onPress: () => {
             if (action === 'restore') {
               // waiting while closing the keyboard, just in case.
