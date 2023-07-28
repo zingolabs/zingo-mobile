@@ -173,7 +173,7 @@
     "server-acc": "Campo de la URI del Servidor",
     "threshold-acc": "Campo del Umbral del Filtro de Transacciones",
     "value-memo-none": "ninguno",
-    "value-memo-wallet": "billetera",
+    "value-memo-wallet": "monedero",
     "value-memo-all": "todos",
     "currency-title": "MONEDA",
     "language-title": "IDIOMA",
@@ -225,13 +225,13 @@
         "",
         "Abrir Nuevo",
         "Realmente quieres \n cambiar tu \n monedero activo",
-        "Estás seguro al 100%"
+        "Estás seguro al 100%?"
       ],
       "server": [
         "",
         "Cambiar Servidor",
         "Realmente quieres \n cambiar el \n servidor activo",
-        "Estás seguro al 100%"
+        "Estás seguro al 100%?"
       ],
       "view": ["Ya he guardado \n la semilla"],
       "restore": ["Restaurar Monedero"],
@@ -239,7 +239,7 @@
         "",
         "Restaurar",
         "Realmente quieres \n restaurar tu \n copia de seguridad",
-        "Estás seguro al 100%"
+        "Estás seguro al 100%?"
       ]
     },
     "title": "Semilla",
@@ -259,10 +259,10 @@
     "tapcopy-birthday-message": "Cumpleaños copiado al Portapapeles",
     "birthday-readonly": "Cumpleaños del Monedero",
     "birthday-no-readonly": "Altura de bloque de la primera transacción. (Está bien si no la sabes o no te acuerdas) Rango de valores entre",
-    "change-warning": "SI CAMBIAS A OTRO MONEDERO, YA NO TENDRÁS ACCESO A ESTE MONEDERO SIN LA FRASE SEMILLA.",
-    "backup-warning": "SI CAMBIAS A TU MONEDERO (COPIA DE SEGURIDAD), YA NO TENDRÁS ACCESO A ESTE MONEDERO SIN LA FRASE SEMILLA.",
-    "server-warning": "SI CAMBIAS A UN SERVIDOR CON DIFERENTE TIPO DE CADENA, YA NO TENDRÁS ACCESO A ESTE MONEDERO SIN LA FRASE SEMILLA.",
-    "mainnet-warning": "NO SE VA A HACER COPIA DE SEGURIDAD DE ESTE MONEDERO. SOLO ESTA DISPONIBLE EN: 'MAINNET'.",
+    "change-warning": "Si cambias a otro monedero, ya no tendrás acceso a este monedero sin la frase semilla.",
+    "backup-warning": "Si cambias a tu monedero anterior (copia de seguridad), ya no tendrás acceso a este monedero sin la frase semilla.",
+    "server-warning": "Si cambias a un servidor con diferente tipo de cadena, ya no tendrás acceso a este monedero sin la frase semilla.",
+    "mainnet-warning": "No se va a hacer copia de seguridad del monedero activo, solo está disponible en: 'MAINNET'.",
     "seedplaceholder": "Semilla (24 palabras)",
     "seed-acc": "Campo Frase Semilla",
     "birthday-acc": "Campo Cumpleaños",
@@ -436,13 +436,13 @@
         "",
         "Abrir Nuevo",
         "Realmente quieres \n cambiar tu \n monedero activo",
-        "Estás seguro al 100%"
+        "Estás seguro al 100%?"
       ],
       "server": [
         "",
         "Cambiar Servidor",
         "Realmente quieres \n cambiar el \n servidor activo",
-        "Estás seguro al 100%"
+        "Estás seguro al 100%?"
       ],
       "view": ["Ya he guardado \n la clave de visualización"],
       "restore": ["Restaurar Monedero"],
@@ -450,7 +450,7 @@
         "",
         "Restaurar",
         "Realmente quieres \n restaurar tu \n copia de seguridad",
-        "Estás seguro al 100%"
+        "Estás seguro al 100%?"
       ]
     },
     "privkey": "Gastar/Privada ",
@@ -463,9 +463,10 @@
     "text-readonly-backup": "Antes de restaurar la copia de seguridad del monedero anterior, escriba cuidadosamente la clave de visualizacion del monedero actual. Es la única manera que tendrás de restaurar/acceder tu monedero actual.",
     "text-readonly-change": "Antes de acceder a otro monedero, escriba cuidadosamente la clave de visualizacion del monedero actual. Es la única manera que tendrás de restaurar/acceder tu monedero actual.",
     "text-readonly-server": "Antes de usar otro servidor, escriba cuidadosamente la clave de visualizacion del monedero actual. Es la única manera que tendrás de restaurar/acceder tu monedero actual.",
-    "change-warning": "SI CAMBIAS A OTRO MONEDERO, YA NO PODRAS VER ESTE MONEDERO SIN LA CLAVE DE VISUALIZACION.",
-    "backup-warning": "SI CAMBIAS A TU MONEDERO (COPIA DE SEGURIDAD), YA NO PODRAS VER ESTE MONEDERO SIN LA CLAVE DE VISUALIZACION.",
-    "server-warning": "SI CAMBIAS A UN SERVIDOR CON DIFERENTE TIPO DE CADENA, YA NO PODRAS VER ESTE MONEDERO SIN LA CLAVE DE VISUALIZACION.",
+    "change-warning": "Si cambias a otro monedero, ya no tendrás acceso a este monedero sin la frase semilla.",
+    "backup-warning": "Si cambias a tu monedero anterior (copia de seguridad), ya no tendrás acceso a este monedero sin la frase semilla.",
+    "server-warning": "Si cambias a un servidor con diferente tipo de cadena, ya no tendrás acceso a este monedero sin la frase semilla.",
+    "mainnet-warning": "No se va a hacer copia de seguridad del monedero activo, solo está disponible en: 'MAINNET'.",
     "confirm-button": "Confirmar"
   },
   "pools": {

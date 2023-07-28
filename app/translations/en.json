@@ -225,13 +225,13 @@
         "",
         "Open New",
         "You really want \n to change your \n actual wallet",
-        "Are you sure 100% or more"
+        "Are you 100% sure?"
       ],
       "server": [
         "",
         "Change Server",
         "You really want \n to change your \n actual server",
-        "Are you sure 100% or more"
+        "Are you 100% sure?"
       ],
       "view": ["I have saved \n the seed"],
       "restore": ["Restore Wallet"],
@@ -239,7 +239,7 @@
         "",
         "Restore",
         "You really want \n to restore your \n backup wallet",
-        "Are you sure 100% or more"
+        "Are you 100% sure?"
       ]
     },
     "title": "Seed",
@@ -259,10 +259,10 @@
     "tapcopy-birthday-message": "Copied Birthday to Clipboard",
     "birthday-readonly": "Wallet Birthday",
     "birthday-no-readonly": "Block height of first transaction. (It's OK, if you don't know) Value range between ",
-    "change-warning": "IF YOU CHANGE TO ANOTHER WALLET, YOU WILL NO LONGER HAVE ACCESS TO THIS WALLET WITHOUT THE SEED PHRASE.",
-    "backup-warning": "IF YOU CHANGE TO YOUR BACKUP WALLET, YOU WILL NO LONGER HAVE ACCESS TO THIS WALLET WITHOUT THE SEED PHRASE.",
-    "server-warning": "IF YOU CHANGE TO A SERVER WITH A DIFFERENT CHAIN, YOU WILL NO LONGER HAVE ACCESS TO THIS WALLET WITHOUT THE SEED PHRASE",
-    "mainnet-warning": "NO BACKUP OF THIS WALLET. ONLY AVAILABLE IN 'MAINNET'.",
+    "change-warning": "If you change to another wallet, you will no longer have access to this wallet without the see phrase.",
+    "backup-warning": "If you change to your backup wallet, you will no longer have access to this wallet without the see phrase.",
+    "server-warning": "If you change to a server with different chain, you will no longer have access to this wallet without the see phrase.",
+    "mainnet-warning": "No backup of this wallet, only available in 'MAINNET'.",
     "seedplaceholder": "Seed (24 words)",
     "seed-acc": "Seed Phrase Field",
     "birthday-acc": "Birthday Field",
@@ -436,13 +436,13 @@
         "",
         "Open New",
         "You really want \n to change your \n actual wallet",
-        "Are you sure 100% or more"
+        "Are you 100% sure?"
       ],
       "server": [
         "",
         "Change Server",
         "You really want \n to change your \n actual server",
-        "Are you sure 100% or more"
+        "Are you 100% sure?"
       ],
       "view": ["I have saved \n the Viewing Key"],
       "restore": ["Restore Wallet"],
@@ -450,7 +450,7 @@
         "",
         "Restore",
         "You really want \n to restore your \n backup wallet",
-        "Are you sure 100% or more"
+        "Are you 100% sure?"
       ]
     },
     "privkey": "Spending/Private ",
@@ -463,9 +463,10 @@
     "text-readonly-backup": "Before restoring the backup of the previous wallet, carefully write down the viewing key of the current wallet. It is the only way you will have to restore/access your current wallet.",
     "text-readonly-change": "Before accesing another wallet, carefully write down the viewing key of the current wallet. It is the only way you will have to restore/access your current wallet.",
     "text-readonly-server": "Before changing another server, carefully write down the viewing key of the current wallet. It is the only way you will have to restore/access your current wallet.",
-    "change-warning": "IF YOU CHANGE TO ANOTHER WALLET, YOU WILL NO LONGER BE ABLE TO VIEW THIS WALLET WITHOUT THE VIEWING KEY.",
-    "backup-warning": "IF YOU CHANGE TO YOUR BACKUP WALLET, YOU WILL NO LONGER BE ABLE TO VIEW THIS WALLET WITHOUT THE VIEWING KEY.",
-    "server-warning": "IF YOU CHANGE TO A SERVER WITH A DIFFERENT CHAIN, YOU WILL NO LONGER BE ABLE TO VIEW THIS WALLET WITHOUT THE VIEWING KEY",
+    "change-warning": "If you change to another wallet, you will no longer have access to this wallet without the see phrase.",
+    "backup-warning": "If you change to your backup wallet, you will no longer have access to this wallet without the see phrase.",
+    "server-warning": "If you change to a server with different chain, you will no longer have access to this wallet without the see phrase.",
+    "mainnet-warning": "No backup of this wallet, only available in 'MAINNET'.",
     "confirm-button": "Confirm"
   },
   "pools": {
