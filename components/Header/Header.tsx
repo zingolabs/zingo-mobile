@@ -207,8 +207,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         createAlert(
           setBackgroundError,
           addLastSnackbar,
-          translate('history.shieldfunds') as string,
-          `${translate('history.shield-error')} ${shieldStr}`,
+          translate(`history.shield-title-${pools}`) as string,
+          `${translate(`history.shield-error-${pools}`)} ${shieldStr}`,
           true,
         );
       } else {
@@ -218,16 +218,16 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           createAlert(
             setBackgroundError,
             addLastSnackbar,
-            translate('history.shieldfunds') as string,
-            `${translate('history.shield-error')} ${shieldJSON.error}`,
+            translate(`history.shield-title-${pools}`) as string,
+            `${translate(`history.shield-error-${pools}`)} ${shieldJSON.error}`,
             true,
           );
         } else {
           createAlert(
             setBackgroundError,
             addLastSnackbar,
-            translate('history.shieldfunds') as string,
-            `${translate('history.shield-message')} ${shieldJSON.txid}`,
+            translate(`history.shield-title-${pools}`) as string,
+            `${translate(`history.shield-message-${pools}`)} ${shieldJSON.txid}`,
             true,
           );
         }
@@ -506,7 +506,19 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       {showShieldButton && !!poolsToShield && setComputingModalVisible && (
         <View style={{ justifyContent: 'center', alignItems: 'center' }}>
           <FadeText style={{ fontSize: 8 }}>
-            {translate('history.shield-legend') +
+            {(translate(
+              `history.shield-legend-${
+                poolsToShield !== 'all'
+                  ? poolsToShield
+                  : poolsToShieldSelectSapling && poolsToShieldSelectTransparent
+                  ? 'all'
+                  : poolsToShieldSelectSapling
+                  ? 'sapling'
+                  : poolsToShieldSelectTransparent
+                  ? 'transparent'
+                  : 'all'
+              }`,
+            ) as string) +
               ` ${
                 poolsToShield === 'sapling' && totalBalance.privateBal > info.defaultFee
                   ? (totalBalance.privateBal - info.defaultFee).toFixed(8)
@@ -528,7 +540,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               type="Primary"
               title={
                 translate(
-                  `history.shieldfunds-${
+                  `history.shield-${
                     poolsToShield !== 'all'
                       ? poolsToShield
                       : poolsToShieldSelectSapling && poolsToShieldSelectTransparent
@@ -589,7 +601,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                             color: colors.border,
                             marginRight: 5,
                           }}>
-                          {translate('history.shieldfunds-z') as string}
+                          {translate('history.shield-z') as string}
                         </Text>
                         {poolsToShieldSelectSapling ? (
                           <FontAwesomeIcon icon={faCheck} size={14} color={colors.primary} />
@@ -625,7 +637,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                             color: colors.border,
                             marginRight: 5,
                           }}>
-                          {translate('history.shieldfunds-t') as string}
+                          {translate('history.shield-t') as string}
                         </Text>
                         {poolsToShieldSelectTransparent ? (
                           <FontAwesomeIcon icon={faCheck} size={14} color={colors.primary} />
