@@ -36,6 +36,9 @@ jobs:
     if: ${{ needs.check-regtest-cache.outputs.cache-found == 'failure' }}
     runs-on: ubuntu-22.04
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
       - name: Install dependencies and update certificates
         run: |
           sudo apt update
@@ -74,31 +77,42 @@ jobs:
           ref: v0.4.15
           path: lightwalletd
 
-      - run: |
+      - name: Build lightwalletd
+        run: |
+          cd lightwalletd \
           ls -la
-          ls -la lightwalletd
-          ls -la lightwalletd/lightwalletd
+        # && make
 
-# # Build lightwalletd
-# RUN git clone https://github.com/zcash/lightwalletd \
-#     && cd lightwalletd \
-#     && git checkout v0.4.15 \
-#     && make
+      - name: Checkout zcash repository
+        uses: actions/checkout@v3
+        with:
+          repository: zcash/zcash
+          ref: v5.6.1
+          path: zcash
 
-#       - name: Copy regtest binaries and zcash params from docker container
-#         run: |
-#           docker pull zingodevops/ci-build:stable
-#           id=$(docker create zingodevops/ci-build:stable)
-#           docker cp $id:/usr/bin/lightwalletd ./rust/regtest/bin
-#           docker cp $id:/zcash/src/zcashd ./rust/regtest/bin
-#           docker cp $id:/zcash/src/zcash-cli ./rust/regtest/bin
-#           docker cp $id:/root/.zcash-params /home/runner
-#       - name: Cache regtest
-#         uses: actions/cache@v3
-#         with:
-#           path: |
-#             rust/regtest/bin
-#             /home/runner/.zcash-params
-#           key: regtest
+      - name: Build zcash
+        run: |
+          cd zcash \
+          ls -la
+        # && ./zcutil/fetch-params.sh \
+        # && ./zcutil/clean.sh \
+        # && ./zcutil/build.sh -j$(nproc)
 
+      - name: Move regtest binaries
+        run: |
+          ls -la
+          ls -la /
+          ls -la /home/runner
+        # cp lightwalletd/lightwalletd ./rust/regtest/bin
+        # cp zcash/src/zcashd ./rust/regtest/bin
+        # cp zcash/src/zcash-cli ./rust/regtest/bin
+        # cp /.zcash-params /home/runner
+
+      # - name: Cache regtest
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: |
+      #       rust/regtest/bin
+      #       /home/runner/.zcash-params
+      #     key: regtest
 
