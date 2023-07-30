@@ -93,7 +93,7 @@ jobs:
         run: |
           cd zcash
           ./zcutil/fetch-params.sh
-          ./zcutil/clean.sh \
+          ./zcutil/clean.sh
           ./zcutil/build.sh -j$(nproc)
 
       - name: Move regtest binaries

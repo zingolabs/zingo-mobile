@@ -10,28 +10,28 @@ jobs:
   # jest-test:
   #   uses: ./.github/workflows/jest-test.yaml
     
-  # create-timestamp:
-  #   uses: ./.github/workflows/create-timestamp.yaml
+  create-timestamp:
+    uses: ./.github/workflows/create-timestamp.yaml
     
-  # create-cache-key:
-  #   uses: ./.github/workflows/create-cache-key.yaml
+  create-cache-key:
+    uses: ./.github/workflows/create-cache-key.yaml
     
-  # build-rust:
-  #   strategy:
-  #     matrix:
-  #       arch: [ x86_64, armeabi-v7a ]
-  #   uses: ./.github/workflows/build-rust.yaml
-  #   needs: create-cache-key
-  #   with:
-  #     cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
-  #     arch: ${{ matrix.arch }}
+  build-rust:
+    strategy:
+      matrix:
+        arch: [ x86_64, armeabi-v7a ]
+    uses: ./.github/workflows/build-rust.yaml
+    needs: create-cache-key
+    with:
+      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+      arch: ${{ matrix.arch }}
 
   build-regtest:
     uses: ./.github/workflows/build-regtest.yaml
        
   # integration-test:
   #   uses: ./.github/workflows/integration-test.yaml
-  #   needs: [ create-timestamp, create-cache-key, build-rust ]
+  #   needs: [ create-timestamp, create-cache-key, build-rust, build-regtest ]
   #   if: ${{ ! cancelled() }}
   #   with:
   #     timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
