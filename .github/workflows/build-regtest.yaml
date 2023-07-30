@@ -1,0 +1,104 @@
+name: Build regtest
+
+on:
+  workflow_call:
+
+jobs:
+  check-regtest-cache:
+    name: Check regtest cache
+    runs-on: ubuntu-22.04
+    outputs:
+      cache-found: ${{ steps.set-cache-found.outputs.cache-found }}
+    continue-on-error: true
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Check if regtest cache exists
+        id: check-regtest-cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            rust/regtest/bin
+            /home/runner/.zcash-params
+          key: regtest
+          fail-on-cache-miss: true
+          lookup-only: true
+
+      - name: Set cache-found
+        id: set-cache-found
+        if: ${{ ! cancelled() }}
+        run: echo "cache-found=${{ steps.check-regtest-cache.outcome }}" >> $GITHUB_OUTPUT
+
+  build-regtest:
+    name: Build regtest
+    needs: check-regtest-cache
+    if: ${{ needs.check-regtest-cache.outputs.cache-found == 'failure' }}
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Install dependencies and update certificates
+        run: |
+          apt update
+          apt install -y --no-install-recommends --no-install-suggests \
+          build-essential \
+          pkg-config \
+          libc6-dev \
+          m4 \
+          g++-multilib \
+          autoconf \
+          libtool \
+          ncurses-dev \
+          unzip \
+          git \
+          python3 \
+          python3-zmq \
+          zlib1g-dev \
+          curl \
+          bsdmainutils \
+          automake \
+          libtinfo5 \
+          ca-certificates \
+          gcc \
+          protobuf-compiler \
+          libssl-dev \
+          apt-transport-https \
+          gnupg2 \
+          procps \
+          golang
+          update-ca-certificates
+
+      - name: Checkout lightwalletd repository
+        uses: actions/checkout@v3
+        with:
+          repository: zcash/lightwalletd
+          ref: v0.4.15
+          path: lightwalletd
+
+      - run: |
+          ls -la
+          ls -la lightwalletd
+          ls -la lightwalletd/lightwalletd
+
+# # Build lightwalletd
+# RUN git clone https://github.com/zcash/lightwalletd \
+#     && cd lightwalletd \
+#     && git checkout v0.4.15 \
+#     && make
+
+#       - name: Copy regtest binaries and zcash params from docker container
+#         run: |
+#           docker pull zingodevops/ci-build:stable
+#           id=$(docker create zingodevops/ci-build:stable)
+#           docker cp $id:/usr/bin/lightwalletd ./rust/regtest/bin
+#           docker cp $id:/zcash/src/zcashd ./rust/regtest/bin
+#           docker cp $id:/zcash/src/zcash-cli ./rust/regtest/bin
+#           docker cp $id:/root/.zcash-params /home/runner
+#       - name: Cache regtest
+#         uses: actions/cache@v3
+#         with:
+#           path: |
+#             rust/regtest/bin
+#             /home/runner/.zcash-params
+#           key: regtest
+
+
