@@ -93,7 +93,7 @@ jobs:
       - name: Build zcash
         run: |
           cd zcash
-          ./zcutil/fetch-params.sh \
+          ./zcutil/fetch-params.sh
           ls -la
           ls -la src
         # ./zcutil/clean.sh \
