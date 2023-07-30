@@ -81,7 +81,6 @@ jobs:
         run: |
           cd lightwalletd
           make
-          ls -la
 
       - name: Checkout zcash repository
         uses: actions/checkout@v3
@@ -94,27 +93,20 @@ jobs:
         run: |
           cd zcash
           ./zcutil/fetch-params.sh
-          ls -la
-          ls -la src
-        # ./zcutil/clean.sh \
-        # ./zcutil/build.sh -j$(nproc)
+          ./zcutil/clean.sh \
+          ./zcutil/build.sh -j$(nproc)
 
       - name: Move regtest binaries
         run: |
-          ls -la
-          ls -la /
-          sudo ls -la /root
-          ls -la /home/runner
-        # cp lightwalletd/lightwalletd ./rust/regtest/bin
-        # cp zcash/src/zcashd ./rust/regtest/bin
-        # cp zcash/src/zcash-cli ./rust/regtest/bin
-        # cp /.zcash-params /home/runner
+          cp ./lightwalletd/lightwalletd ./rust/regtest/bin
+          cp ./zcash/src/zcashd ./rust/regtest/bin
+          cp ./zcash/src/zcash-cli ./rust/regtest/bin
 
-      # - name: Cache regtest
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: |
-      #       rust/regtest/bin
-      #       /home/runner/.zcash-params
-      #     key: regtest
+      - name: Cache regtest
+        uses: actions/cache@v3
+        with:
+          path: |
+            rust/regtest/bin
+            /home/runner/.zcash-params
+          key: regtest
 
