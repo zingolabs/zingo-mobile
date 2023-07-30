@@ -65,7 +65,7 @@ jobs:
           gnupg2 \
           procps \
           golang
-          update-ca-certificates
+          sudo update-ca-certificates
 
       - name: Checkout lightwalletd repository
         uses: actions/checkout@v3
