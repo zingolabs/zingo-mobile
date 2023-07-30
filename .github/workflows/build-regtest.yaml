@@ -80,8 +80,8 @@ jobs:
       - name: Build lightwalletd
         run: |
           cd lightwalletd
+          make
           ls -la
-        # && make
 
       - name: Checkout zcash repository
         uses: actions/checkout@v3
@@ -93,15 +93,17 @@ jobs:
       - name: Build zcash
         run: |
           cd zcash
+          ./zcutil/fetch-params.sh \
           ls -la
-        # && ./zcutil/fetch-params.sh \
-        # && ./zcutil/clean.sh \
-        # && ./zcutil/build.sh -j$(nproc)
+          ls -la src
+        # ./zcutil/clean.sh \
+        # ./zcutil/build.sh -j$(nproc)
 
       - name: Move regtest binaries
         run: |
           ls -la
           ls -la /
+          ls -la /root
           ls -la /home/runner
         # cp lightwalletd/lightwalletd ./rust/regtest/bin
         # cp zcash/src/zcashd ./rust/regtest/bin
