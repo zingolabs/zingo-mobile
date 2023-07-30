@@ -103,7 +103,7 @@ jobs:
         run: |
           ls -la
           ls -la /
-          ls -la /root
+          sudo ls -la /root
           ls -la /home/runner
         # cp lightwalletd/lightwalletd ./rust/regtest/bin
         # cp zcash/src/zcashd ./rust/regtest/bin
