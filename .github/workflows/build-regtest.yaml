@@ -79,7 +79,7 @@ jobs:
 
       - name: Build lightwalletd
         run: |
-          cd lightwalletd \
+          cd lightwalletd
           ls -la
         # && make
 
@@ -92,7 +92,7 @@ jobs:
 
       - name: Build zcash
         run: |
-          cd zcash \
+          cd zcash
           ls -la
         # && ./zcutil/fetch-params.sh \
         # && ./zcutil/clean.sh \
