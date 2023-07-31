@@ -75,7 +75,7 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-${{ env.AVD-ARCH }}-regtest
+          key: avd-${{ env.AVD-ARCH }}-integ
           
       - name: Native rust cache
         uses: actions/cache@v3
