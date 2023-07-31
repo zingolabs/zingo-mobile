@@ -49,7 +49,6 @@ jobs:
           unzip \
           git \
           python3 \
-          zlib1g-dev \
           curl \
           bsdmainutils \
           automake \
@@ -67,6 +66,7 @@ jobs:
         # g++-multilib \
         # ncurses-dev \ ncurses?
         # python3-zmq \ python-yq?
+        # zlib1g-dev \ zlib-ng?
         # sudo update-ca-certificates
 
       - name: Checkout lightwalletd repository
