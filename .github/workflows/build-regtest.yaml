@@ -46,7 +46,6 @@ jobs:
           m4 \
           autoconf \
           libtool \
-          ncurses-dev \
           unzip \
           git \
           python3 \
@@ -64,9 +63,10 @@ jobs:
           gnupg2 \
           procps \
           golang
-        # g++-multilib \
-        # libc6-dev \
         # build-essential \
+        # libc6-dev \ libccd?
+        # g++-multilib \
+        # ncurses-dev \ ncurses?
         # sudo update-ca-certificates
 
       - name: Checkout lightwalletd repository
