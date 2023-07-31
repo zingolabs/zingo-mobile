@@ -225,13 +225,13 @@
         "",
         "Abrir Nuevo",
         "Realmente quieres \n cambiar tu \n monedero activo",
-        "Estás seguro al 100%?"
+        "Estás seguro/a?"
       ],
       "server": [
         "",
         "Cambiar Servidor",
         "Realmente quieres \n cambiar el \n servidor activo",
-        "Estás seguro al 100%?"
+        "Estás seguro/a?"
       ],
       "view": ["Ya he guardado \n la semilla"],
       "restore": ["Restaurar Monedero"],
@@ -239,7 +239,7 @@
         "",
         "Restaurar",
         "Realmente quieres \n restaurar tu \n copia de seguridad",
-        "Estás seguro al 100%?"
+        "Estás seguro/a?"
       ]
     },
     "title": "Semilla",
@@ -436,13 +436,13 @@
         "",
         "Abrir Nuevo",
         "Realmente quieres \n cambiar tu \n monedero activo",
-        "Estás seguro al 100%?"
+        "Estás seguro/a?"
       ],
       "server": [
         "",
         "Cambiar Servidor",
         "Realmente quieres \n cambiar el \n servidor activo",
-        "Estás seguro al 100%?"
+        "Estás seguro/a?"
       ],
       "view": ["Ya he guardado \n la clave de visualización"],
       "restore": ["Restaurar Monedero"],
@@ -450,7 +450,7 @@
         "",
         "Restaurar",
         "Realmente quieres \n restaurar tu \n copia de seguridad",
-        "Estás seguro al 100%?"
+        "Estás seguro/a?"
       ]
     },
     "privkey": "Gastar/Privada ",

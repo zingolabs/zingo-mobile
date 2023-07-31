@@ -209,8 +209,8 @@
     "resolution": "Device Screen",
     "tablet": "Tablet",
     "phone": "Phone",
-    "errorgemini": "Error fetching the price from Internet.",
-    "errorrpcmodule": "Internal Error fetching the price from Internet"
+    "errorgemini": "Error fetching the price from the Internet.",
+    "errorrpcmodule": "Internal Error fetching the price from the Internet"
   },
   "rescan": {
     "title": "Rescan",
@@ -225,13 +225,13 @@
         "",
         "Open New",
         "You really want \n to change your \n actual wallet",
-        "Are you 100% sure?"
+        "Are you certain?"
       ],
       "server": [
         "",
         "Change Server",
         "You really want \n to change your \n actual server",
-        "Are you 100% sure?"
+        "Are you certain?"
       ],
       "view": ["I have saved \n the seed"],
       "restore": ["Restore Wallet"],
@@ -239,7 +239,7 @@
         "",
         "Restore",
         "You really want \n to restore your \n backup wallet",
-        "Are you 100% sure?"
+        "Are you certain?"
       ]
     },
     "title": "Seed",
@@ -307,9 +307,9 @@
     "confirm-memo": "Memo",
     "duplicate-nullifier-error": "Your funds are still confirming and probably syncing. You can wait until the funds are confirmed or you can try to send now with a lower amount. The Transaction build failed!",
     "dust-error" : "The amount that you are trying to send to a Transparent address is really tiny. The Transaction build failed!",
-    "needtoshield": "Have funds to shield",
+    "needtoshield": "You have funds to shield",
     "fetchpricetitle": "Fetch USD Price",
-    "fetchpricebody": "Please confirm that you want to fetch the USD price from internet.",
+    "fetchpricebody": "Please confirm that you want to fetch the USD price from the Internet.",
     "fetch-button": "fetch"
   },
   "receive": {
@@ -436,13 +436,13 @@
         "",
         "Open New",
         "You really want \n to change your \n actual wallet",
-        "Are you 100% sure?"
+        "Are you certain?"
       ],
       "server": [
         "",
         "Change Server",
         "You really want \n to change your \n actual server",
-        "Are you 100% sure?"
+        "Are you certain?"
       ],
       "view": ["I have saved \n the Viewing Key"],
       "restore": ["Restore Wallet"],
@@ -450,7 +450,7 @@
         "",
         "Restore",
         "You really want \n to restore your \n backup wallet",
-        "Are you 100% sure?"
+        "Are you certain?"
       ]
     },
     "privkey": "Spending/Private ",
