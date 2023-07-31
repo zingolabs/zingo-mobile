@@ -43,7 +43,6 @@ jobs:
         run: |
           brew install \
           pkg-config \
-          libc6-dev \
           m4 \
           g++-multilib \
           autoconf \
@@ -66,6 +65,7 @@ jobs:
           gnupg2 \
           procps \
           golang
+        # libc6-dev \
         # build-essential \
         # sudo update-ca-certificates
 
