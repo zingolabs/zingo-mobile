@@ -50,7 +50,6 @@ jobs:
           git \
           python3 \
           curl \
-          bsdmainutils \
           automake \
           libtinfo5 \
           ca-certificates \
@@ -67,6 +66,7 @@ jobs:
         # ncurses-dev \ ncurses?
         # python3-zmq \ python-yq?
         # zlib1g-dev \ zlib-ng?
+        # bsdmainutils \ binutils?
         # sudo update-ca-certificates
 
       - name: Checkout lightwalletd repository
