@@ -6,7 +6,7 @@ on:
 jobs:
   check-regtest-cache:
     name: Check regtest cache
-    runs-on: ubuntu-22.04
+    runs-on: macos-12
     outputs:
       cache-found: ${{ steps.set-cache-found.outputs.cache-found }}
     continue-on-error: true
@@ -34,15 +34,14 @@ jobs:
     name: Build regtest
     needs: check-regtest-cache
     if: ${{ needs.check-regtest-cache.outputs.cache-found == 'failure' }}
-    runs-on: ubuntu-22.04
+    runs-on: macos-12
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
       - name: Install dependencies and update certificates
         run: |
-          sudo apt update
-          sudo apt install -y --no-install-recommends --no-install-suggests \
+          brew install \
           build-essential \
           pkg-config \
           libc6-dev \
@@ -68,7 +67,7 @@ jobs:
           gnupg2 \
           procps \
           golang
-          sudo update-ca-certificates
+        # sudo update-ca-certificates
 
       - name: Checkout lightwalletd repository
         uses: actions/checkout@v3
