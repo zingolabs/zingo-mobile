@@ -44,7 +44,6 @@ jobs:
           brew install \
           pkg-config \
           m4 \
-          g++-multilib \
           autoconf \
           libtool \
           ncurses-dev \
@@ -65,6 +64,7 @@ jobs:
           gnupg2 \
           procps \
           golang
+        # g++-multilib \
         # libc6-dev \
         # build-essential \
         # sudo update-ca-certificates
