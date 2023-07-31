@@ -300,7 +300,7 @@
     "usd-acc": "Campo de Cantidad en Dólares",
     "memo-acc": "Campo del Memorándum",
     "amountplaceholder": "numero",
-    "nofetchprice": "Pulsa aquí para precio en USD",
+    "nofetchprice": "Buscar precio en USD",
     "sendall": "Enviar Todo",
     "sendall-message": "Estas a punto de enviar toda la cantidad en tu monedero",
     "includeua": "Incluir tu DU:",

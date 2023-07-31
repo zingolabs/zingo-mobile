@@ -300,7 +300,7 @@
     "usd-acc": "USD Amount Field",
     "memo-acc": "Memo Field",
     "amountplaceholder": "number",
-    "nofetchprice": "Tap here for USD Price",
+    "nofetchprice": "Fetch Price in USD",
     "sendall": "Send All",
     "sendall-message": "Your are about to send the entire amount in your wallet",
     "includeua": "Include your UA:",
