@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
-import { View, ScrollView, SafeAreaView } from 'react-native';
+import { View, ScrollView, SafeAreaView, Alert } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
 import Button from '../Components/Button';
@@ -48,6 +48,30 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
     (async () => await RPC.rpc_setInterruptSyncAfterBatch('false'))();
   }, []);
 
+  const onPressOK = () => {
+    Alert.alert(
+      !!texts && !!texts[action] ? texts[action][3] : '',
+      (action === 'change'
+        ? (translate('ufvk.change-warning') as string)
+        : action === 'backup'
+        ? (translate('ufvk.backup-warning') as string)
+        : action === 'server'
+        ? (translate('ufvk.server-warning') as string)
+        : '') +
+        (server.chain_name !== 'main' && (action === 'change' || action === 'server')
+          ? '\n' + (translate('ufvk.mainnet-warning') as string)
+          : ''),
+      [
+        {
+          text: translate('ufvk.confirm-button') as string,
+          onPress: () => onClickOK(),
+        },
+        { text: translate('cancel') as string, onPress: () => onClickCancel(), style: 'cancel' },
+      ],
+      { cancelable: true, userInterfaceStyle: 'light' },
+    );
+  };
+
   return (
     <SafeAreaView
       style={{
@@ -81,28 +105,6 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
             : (translate('ufvk.text-readonly') as string)}
         </FadeText>
 
-        {times === 3 && action === 'change' && (
-          <FadeText style={{ padding: 20, textAlign: 'center', color: 'white' }}>
-            {translate('ufvk.change-warning') as string}
-          </FadeText>
-        )}
-        {times === 3 && action === 'backup' && (
-          <FadeText style={{ padding: 20, textAlign: 'center', color: 'white' }}>
-            {translate('ufvk.backup-warning') as string}
-          </FadeText>
-        )}
-        {times === 3 && action === 'server' && (
-          <FadeText style={{ padding: 20, textAlign: 'center', color: 'white' }}>
-            {translate('ufvk.server-warning') as string}
-          </FadeText>
-        )}
-
-        {server.chain_name !== 'main' && times === 3 && (action === 'change' || action === 'server') && (
-          <FadeText style={{ color: colors.primary, textAlign: 'center', width: '100%' }}>
-            {translate('seed.mainnet-warning') as string}
-          </FadeText>
-        )}
-
         <View style={{ display: 'flex', flexDirection: 'column', marginTop: 0, alignItems: 'center' }}>
           <SingleAddress
             address={ufvk || ''}
@@ -127,7 +129,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
         <Button
           type={mode === 'basic' ? 'Secondary' : 'Primary'}
           style={{
-            backgroundColor: times === 3 ? 'red' : mode === 'basic' ? colors.background : colors.primary,
+            backgroundColor: mode === 'basic' ? colors.background : colors.primary,
           }}
           title={
             mode === 'basic' ? (translate('cancel') as string) : !!texts && !!texts[action] ? texts[action][times] : ''
@@ -140,10 +142,10 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
               addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
               return;
             }
-            if (times === 0 || times === 3) {
+            if (times === 0) {
               onClickOK();
-            } else if (times === 1 || times === 2) {
-              setTimes(times + 1);
+            } else if (times === 1) {
+              onPressOK();
             }
           }}
         />
