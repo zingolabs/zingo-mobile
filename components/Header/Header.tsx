@@ -335,17 +335,18 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                       flexDirection: 'row',
                       justifyContent: 'center',
                       alignItems: 'center',
+                      paddingHorizontal: 3,
                     }}>
                     {mode === 'basic' ? (
                       <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
                         <FontAwesomeIcon icon={faPlay} color={colors.syncing} size={17} />
-                        <FadeText style={{ fontSize: 10 }}>{`${blocksRemaining}`}</FadeText>
+                        <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{`${blocksRemaining}`}</FadeText>
                       </View>
                     ) : (
                       <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
                         <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
                           <FontAwesomeIcon icon={faPlay} color={colors.syncing} size={17} />
-                          <FadeText style={{ fontSize: 10 }}>{`${blocksRemaining}`}</FadeText>
+                          <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{`${blocksRemaining}`}</FadeText>
                         </View>
                       </TouchableOpacity>
                     )}
