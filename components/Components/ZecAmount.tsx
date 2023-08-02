@@ -75,28 +75,31 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
     <View style={{ ...style, flexDirection: 'row', alignItems: 'baseline' }}>
       <TouchableOpacity disabled={!privacyHigh} onPress={onPress}>
         <View style={{ ...style, flexDirection: 'row', alignItems: 'baseline' }}>
-          <Text
-            style={{
-              fontSize: size * (smallPrefix ? 0.7 : 1),
-              color,
-              transform: [
-                { scale: 2 },
-                {
-                  translateY:
-                    size * corrector * (smallPrefix ? (corrector < 2 ? -0.01 : 0.045) : corrector < 2 ? -0.01 : 0.06),
-                },
-              ],
-            }}>
-            {'\u1647'}
-          </Text>
-          <Text
-            style={{
-              fontSize: size * (smallPrefix ? 0.7 : 1),
-              color,
-              marginLeft: size * corrector * (smallPrefix ? (corrector < 2 ? 0.1 : 0.05) : corrector < 2 ? 0.15 : 0.07),
-            }}>
-            {'EC'}
-          </Text>
+          <View style={{ flexDirection: currencyName === 'TAZ' ? 'row-reverse' : 'row', alignItems: 'baseline' }}>
+            <Text
+              style={{
+                fontSize: size * (smallPrefix ? 0.7 : 1),
+                color,
+                transform: [
+                  { scale: 2 },
+                  {
+                    translateY:
+                      size * corrector * (smallPrefix ? (corrector < 2 ? -0.01 : 0.045) : corrector < 2 ? -0.01 : 0.06),
+                  },
+                ],
+              }}>
+              {currencyName === 'TAZ' || currencyName === 'ZEC' ? '\u1647' : null}
+            </Text>
+            <Text
+              style={{
+                fontSize: size * (smallPrefix ? 0.7 : 1),
+                color,
+                marginHorizontal:
+                  size * corrector * (smallPrefix ? (corrector < 2 ? 0.1 : 0.05) : corrector < 2 ? 0.15 : 0.07),
+              }}>
+              {currencyName === 'TAZ' ? 'TA' : currencyName === 'ZEC' ? 'EC' : currencyName}
+            </Text>
+          </View>
           {privacyHigh ? (
             <Text style={{ fontSize: size, fontWeight: '700', color }}>{' -' + decimalSeparator + '----'}</Text>
           ) : (

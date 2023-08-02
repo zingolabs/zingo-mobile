@@ -333,7 +333,7 @@
   },
   "history": {
     "shield-all": "Blindar Todos\nlos fondos",
-    "shield-transparent": "Blindar fondos\nTransparentes",
+    "shield-transparent": "Blindar fondos",
     "shield-sapling": "Asignar fondos a\nla última versión",
     "shield-t": "Transparente",
     "shield-z": "Sapling",
@@ -347,7 +347,7 @@
     "shield-legend-transparent": "Aumenta tu balance blindado gastable en: ",
     "shield-legend-sapling": "Migra tus fondos al mas nuevo blindaje: ",
     "shield-title-all": "Blindar Todos los fondos",
-    "shield-title-transparent": "Blindar fondos Transparentes",
+    "shield-title-transparent": "Blindar fondos",
     "shield-title-sapling": "Asignar fondos a la última versión",
     "title": "Histórico",
     "title-syncing": "Histórico - Sincronizando",

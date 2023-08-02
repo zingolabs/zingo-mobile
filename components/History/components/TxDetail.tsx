@@ -98,6 +98,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
             size={36}
             amtZec={tx.amount}
             privacy={privacy}
+            smallPrefix={true}
           />
         </View>
 
@@ -146,7 +147,12 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
             <View style={{ display: 'flex', marginTop: 10 }}>
               <FadeText>{translate('history.txfee') as string}</FadeText>
               <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                <ZecAmount amtZec={fee} size={18} currencyName={'ᙇ'} privacy={privacy} />
+                <ZecAmount
+                  amtZec={fee}
+                  size={18}
+                  currencyName={info.currencyName ? info.currencyName : ''}
+                  privacy={privacy}
+                />
               </View>
             </View>
           )}
@@ -197,7 +203,12 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
                 <View style={{ marginTop: 10 }}>
                   <FadeText>{translate('history.amount') as string}</FadeText>
                   <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <ZecAmount amtZec={txd.amount} size={18} currencyName={'ᙇ'} privacy={privacy} />
+                    <ZecAmount
+                      amtZec={txd.amount}
+                      size={18}
+                      currencyName={info.currencyName ? info.currencyName : ''}
+                      privacy={privacy}
+                    />
                   </View>
                 </View>
 

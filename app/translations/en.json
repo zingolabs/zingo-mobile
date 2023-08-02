@@ -333,7 +333,7 @@
   },
   "history": {
     "shield-all": "Shield All funds",
-    "shield-transparent": "Shield Transparent\nfunds",
+    "shield-transparent": "Shield funds",
     "shield-sapling": "Upgrade funds to\nnewest version",
     "shield-t": "Transparent",
     "shield-z": "Sapling",
@@ -347,7 +347,7 @@
     "shield-legend-transparent": "Increase your shielded spendable balance by shielding: ",
     "shield-legend-sapling": "Migrate your funds to newest shielding: ",
     "shield-title-all": "Shield All funds",
-    "shield-title-transparent": "Shield Transparent funds",
+    "shield-title-transparent": "Shield funds",
     "shield-title-sapling": "Upgrade funds to newest version",
     "title": "History",
     "title-syncing": "History - Syncing",

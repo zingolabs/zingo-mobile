@@ -66,6 +66,8 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSen
             currencyName={info.currencyName ? info.currencyName : ''}
             amtZec={sendingTotal}
             privacy={privacy}
+            size={36}
+            smallPrefix={true}
           />
           <CurrencyAmount amtZec={sendingTotal} price={zecPrice.zecPrice} currency={currency} privacy={privacy} />
         </View>
