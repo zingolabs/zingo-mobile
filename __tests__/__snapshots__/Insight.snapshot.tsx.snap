@@ -35,7 +35,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
           "height": 40,
           "justifyContent": "center",
           "marginHorizontal": 5,
-          "marginVertical": 5,
+          "marginTop": 12,
         }
       }
     />
@@ -76,7 +76,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
         {
           "alignItems": "flex-start",
           "left": 0,
-          "padding": 10,
+          "padding": 11.5,
           "position": "absolute",
         }
       }

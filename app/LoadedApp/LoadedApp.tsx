@@ -1415,7 +1415,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 tabBarLabelStyle: { fontSize: 12 },
                 tabBarStyle: {
                   borderRadius: 0,
-                  borderTopColor: colors.primary,
+                  borderTopColor: colors.primaryDisabled,
                   borderTopWidth: 1,
                 },
                 headerShown: false,
