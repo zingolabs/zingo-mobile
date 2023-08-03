@@ -88,7 +88,7 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
               height={size * (smallPrefix ? 0.7 : 1)}
               xml={xml}
               fill={color}
-              style={{ marginBottom: Platform.OS === 'android' ? size / (smallPrefix ? 4 : 6.5) : 0 }}
+              style={{ marginBottom: Platform.OS === 'android' ? size / (smallPrefix ? 4 : 6.5) : size / (smallPrefix ? 6 : 20) }}
             />
           ) : (
             <Text
@@ -131,7 +131,7 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
                 color,
                 margin: 0,
                 padding: 0,
-                marginBottom: Platform.OS === 'android' ? size / 10 : 0,
+                marginBottom: Platform.OS === 'android' ? size / 10 : size / 15,
               }}>
               {splits.smallPart}
             </Text>
