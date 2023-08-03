@@ -143,11 +143,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSen
         <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
           <Button
             type="Primary"
-            title={
-              sendAllAmount
-                ? (translate('send.confirm-button-all') as string)
-                : (translate('send.confirm-button') as string)
-            }
+            title={sendAllAmount ? (translate('send.confirm-button-all') as string) : (translate('confirm') as string)}
             onPress={confirmSend}
           />
           <Button

@@ -8,6 +8,7 @@
   "close": "Close",
   "cancel": "Cancel",
   "save": "Save",
+  "confirm": "Confirm",
   "menudrawer-acc": "Open Menu Drawer",
   "menu-acc": "Open Menu",
   "donation": "Thanks for supporting Zingo!",
@@ -267,7 +268,6 @@
     "seed-acc": "Seed Phrase Field",
     "birthday-acc": "Birthday Field",
     "tapreveal": "Tap to reveal",
-    "confirm-button": "Confirm"
   },
   "send": {
     "Broadcast": "Successfully Broadcast Tx:",
@@ -289,7 +289,6 @@
     "sending-title": "Processing",
     "confirm-amount": "Amount",
     "fee": "Fee",
-    "confirm-button": "Confirm",
     "confirm-button-all": "Confirm Send All",
     "amount": "   Amount",
     "to": "To",
@@ -467,7 +466,6 @@
     "backup-warning": "If you change to your backup wallet, you will no longer have access to this wallet without the seed phrase.",
     "server-warning": "If you change to a server with different chain, you will no longer have access to this wallet without the seed phrase.",
     "mainnet-warning": "No backup of this wallet, only available in 'MAINNET'.",
-    "confirm-button": "Confirm"
   },
   "pools": {
     "title": "Fund Pools",

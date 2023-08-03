@@ -8,6 +8,7 @@
   "close": "Cerrar",
   "cancel": "Cancelar",
   "save": "Grabar",
+  "confirm": "Confirmar",
   "menudrawer-acc": "Abrir Menu Lateral",
   "menu-acc": "Abrir Menu",
   "donation": "Gracias por apoyar Zingo!",
@@ -267,7 +268,6 @@
     "seed-acc": "Campo Frase Semilla",
     "birthday-acc": "Campo Cumpleaños",
     "tapreveal": "Pulsar para revelar",
-    "confirm-button": "Confirmar"
   },
   "send": {
     "Broadcast": "Transmitida con éxito Tx:",
@@ -289,7 +289,6 @@
     "sending-title": "Procesando",
     "confirm-amount": "Cantidad",
     "fee": "Comisión por Transacción",
-    "confirm-button": "Confirmar",
     "confirm-button-all": "Confirmar Enviar Todo",
     "amount": "   Cantidad",
     "to": "A",
@@ -467,7 +466,6 @@
     "backup-warning": "Si cambias a tu monedero anterior (copia de seguridad), ya no tendrás acceso a este monedero sin la frase semilla.",
     "server-warning": "Si cambias a un servidor con diferente tipo de cadena, ya no tendrás acceso a este monedero sin la frase semilla.",
     "mainnet-warning": "No se va a hacer copia de seguridad del monedero activo, solo está disponible en: 'MAINNET'.",
-    "confirm-button": "Confirmar"
   },
   "pools": {
     "title": "Agrupaciones de Fondos",

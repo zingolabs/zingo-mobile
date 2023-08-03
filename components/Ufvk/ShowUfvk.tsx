@@ -63,7 +63,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
           : ''),
       [
         {
-          text: translate('ufvk.confirm-button') as string,
+          text: translate('confirm') as string,
           onPress: () => onClickOK(),
         },
         { text: translate('cancel') as string, onPress: () => onClickCancel(), style: 'cancel' },
