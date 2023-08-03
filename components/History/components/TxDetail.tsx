@@ -15,6 +15,7 @@ import Button from '../../Components/Button';
 import { ThemeType } from '../../../app/types';
 import { ContextAppLoaded } from '../../../app/context';
 import Header from '../../Header';
+import BoldText from '../../Components/BoldText';
 
 type TxDetailProps = {
   tx: TransactionType;
@@ -88,11 +89,19 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
           justifyContent: 'flex-start',
         }}>
         <View
-          style={{ display: 'flex', alignItems: 'center', padding: 10, backgroundColor: colors.card, marginTop: 10 }}>
-          <RegText style={{ textTransform: 'capitalize' }} color={spendColor}>
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            margin: 25,
+            padding: 10,
+            borderWidth: 1,
+            borderRadius: 10,
+            borderColor: colors.border,
+          }}>
+          <BoldText style={{ textAlign: 'center', textTransform: 'capitalize', color: spendColor }}>
             {!!tx.type &&
               (tx.type === 'sent' ? (translate('history.sent') as string) : (translate('history.receive') as string))}
-          </RegText>
+          </BoldText>
           <ZecAmount
             currencyName={info.currencyName ? info.currencyName : ''}
             size={36}

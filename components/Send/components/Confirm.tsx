@@ -45,11 +45,15 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSen
         noPrivacy={true}
       />
       <ScrollView
-        contentContainerStyle={{ display: 'flex', justifyContent: 'flex-start' }}
         showsVerticalScrollIndicator={true}
         persistentScrollbar={true}
         indicatorStyle={'white'}
-        testID="send.confirm.scrollView">
+        testID="send.confirm.scrollView"
+        contentContainerStyle={{
+          flexDirection: 'column',
+          alignItems: 'stretch',
+          justifyContent: 'flex-start',
+        }}>
         <View
           style={{
             display: 'flex',
@@ -60,7 +64,9 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSen
             borderRadius: 10,
             borderColor: colors.border,
           }}>
-          <BoldText style={{ textAlign: 'center' }}>{translate('send.sending-title') as string}</BoldText>
+          <BoldText style={{ textAlign: 'center', textTransform: 'capitalize' }}>
+            {translate('send.sending-title') as string}
+          </BoldText>
 
           <ZecAmount
             currencyName={info.currencyName ? info.currencyName : ''}
@@ -87,8 +93,6 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSen
                   display: 'flex',
                   flexDirection: 'row',
                   justifyContent: 'space-between',
-                  alignItems: 'baseline',
-                  marginTop: 5,
                 }}>
                 <ZecAmount
                   currencyName={info.currencyName ? info.currencyName : ''}
@@ -106,7 +110,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSen
               </View>
               <FadeText style={{ marginTop: 10 }}>{translate('send.confirm-memo') as string}</FadeText>
               <RegText testID="send.confirm-memo">
-                {`${to.memo || ''}${to.memo ? '\n' : ''}${to.includeUAMemo ? 'Reply to: \n' + uaAddress : ''}`}
+                {`${to.memo || ''}${to.includeUAMemo ? '\nReply to: \n' + uaAddress : ''}`}
               </RegText>
             </View>
           );
@@ -115,7 +119,11 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSen
         <View style={{ margin: 10, marginBottom: 30 }}>
           <FadeText>{translate('send.fee') as string}</FadeText>
           <View
-            style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+            }}>
             <ZecAmount
               currencyName={info.currencyName ? info.currencyName : ''}
               size={18}
