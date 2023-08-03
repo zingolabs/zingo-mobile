@@ -35,7 +35,7 @@ exports[`Component About - test About - snapshot 1`] = `
           "height": 40,
           "justifyContent": "center",
           "marginHorizontal": 5,
-          "marginTop": 12,
+          "marginVertical": 5,
         }
       }
     />
@@ -76,7 +76,7 @@ exports[`Component About - test About - snapshot 1`] = `
         {
           "alignItems": "flex-start",
           "left": 0,
-          "padding": 11.5,
+          "padding": 10,
           "position": "absolute",
         }
       }

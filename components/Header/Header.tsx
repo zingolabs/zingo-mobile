@@ -15,7 +15,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme } from '@react-navigation/native';
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { Alert, Image, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { NetInfoType, TranslateType } from '../../app/AppState';
 import { ContextAppLoaded } from '../../app/context';
 import { ThemeType } from '../../app/types';
@@ -269,42 +269,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [syncingStatus.inProgress, noSyncingStatus]);
 
-  const onPressShieldFunds = () => {
-    Alert.alert(
-      translate(
-        `history.shield-title-${
-          poolsToShield !== 'all'
-            ? poolsToShield
-            : poolsToShieldSelectSapling && poolsToShieldSelectTransparent
-            ? 'all'
-            : poolsToShieldSelectSapling
-            ? 'sapling'
-            : poolsToShieldSelectTransparent
-            ? 'transparent'
-            : 'all'
-        }`,
-      ) as string,
-      translate(
-        `history.shield-legend-${
-          poolsToShield !== 'all'
-            ? poolsToShield
-            : poolsToShieldSelectSapling && poolsToShieldSelectTransparent
-            ? 'all'
-            : poolsToShieldSelectSapling
-            ? 'sapling'
-            : poolsToShieldSelectTransparent
-            ? 'transparent'
-            : 'all'
-        }`,
-      ) as string,
-      [
-        { text: translate('confirm') as string, onPress: () => shieldFunds() },
-        { text: translate('cancel') as string, style: 'cancel' },
-      ],
-      { cancelable: true, userInterfaceStyle: 'light' },
-    );
-  };
-
   //console.log('render header');
 
   return (
@@ -325,7 +289,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           alignItems: 'center',
           justifyContent: 'center',
           flexWrap: 'wrap',
-          marginTop: 12,
+          marginVertical: 5,
           marginHorizontal: 5,
           height: 40,
         }}>
@@ -451,6 +415,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 flexDirection: 'row',
                 justifyContent: 'center',
                 alignItems: 'center',
+                marginTop: 5,
               }}>
               <View
                 style={{
@@ -589,7 +554,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   }`,
                 ) as string
               }
-              onPress={onPressShieldFunds}
+              onPress={shieldFunds}
               disabled={
                 poolsToShield === 'sapling' && totalBalance.privateBal > info.defaultFee
                   ? false
@@ -704,7 +669,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
 
       <View
         style={{
-          padding: 11.5,
+          padding: 10,
           position: 'absolute',
           left: 0,
           alignItems: 'flex-start',

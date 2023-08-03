@@ -80,81 +80,121 @@ describe('Component Components - test', () => {
   test('ZecAmount - High Privacy - amtZec -1.123456789 rounded up result -.---- ZEC', () => {
     const text: any = render(<ZecAmount amtZec={-1.123456789} currencyName={'ZEC'} privacy={true} />).toJSON();
     expect(text.type).toBe('View');
+    expect(text.children[0].children[0].children[0].type).toBe('Text');
+    expect(text.children[0].children[0].children[0].children[0]).toBe('\u1647');
     expect(text.children[0].children[0].children[1].type).toBe('Text');
-    expect(text.children[0].children[0].children[1].children[0]).toBe(' -.----');
+    expect(text.children[0].children[0].children[1].children[0]).toBe('EC');
+    expect(text.children[0].children[0].children[2].type).toBe('Text');
+    expect(text.children[0].children[0].children[2].children[0]).toBe(' -.----');
   });
 
   test('ZecAmount - All props missing result -- ZEC', () => {
     const text: any = render(<ZecAmount currencyName={'ZEC'} />).toJSON();
     expect(text.type).toBe('View');
+    expect(text.children[0].children[0].children[0].type).toBe('Text');
+    expect(text.children[0].children[0].children[0].children[0]).toBe('\u1647');
     expect(text.children[0].children[0].children[1].type).toBe('Text');
-    expect(text.children[0].children[0].children[1].children[0]).toBe(' --');
+    expect(text.children[0].children[0].children[1].children[0]).toBe('EC');
+    expect(text.children[0].children[0].children[2].type).toBe('Text');
+    expect(text.children[0].children[0].children[2].children[0]).toBe(' --');
   });
 
   test('ZecAmount - amtZec 0 result 0.00000000 ZEC', () => {
     const text: any = render(<ZecAmount amtZec={0} currencyName={'ZEC'} />).toJSON();
     expect(text.type).toBe('View');
+    expect(text.children[0].children[0].children[0].type).toBe('Text');
+    expect(text.children[0].children[0].children[0].children[0]).toBe('\u1647');
     expect(text.children[0].children[0].children[1].type).toBe('Text');
-    expect(text.children[0].children[0].children[1].children[0]).toBe(' 0.0000');
+    expect(text.children[0].children[0].children[1].children[0]).toBe('EC');
+    expect(text.children[0].children[0].children[2].type).toBe('Text');
+    expect(text.children[0].children[0].children[2].children[0]).toBe(' 0.0000');
   });
 
   test('ZecAmount - amtZec -1.123456789 rounded up result -1.12345679 ZEC', () => {
     const text: any = render(<ZecAmount amtZec={-1.123456789} currencyName={'ZEC'} />).toJSON();
     expect(text.type).toBe('View');
+    expect(text.children[0].children[0].children[0].type).toBe('Text');
+    expect(text.children[0].children[0].children[0].children[0]).toBe('\u1647');
     expect(text.children[0].children[0].children[1].type).toBe('Text');
-    expect(text.children[0].children[0].children[1].children[0]).toBe(' -1.1234');
+    expect(text.children[0].children[0].children[1].children[0]).toBe('EC');
     expect(text.children[0].children[0].children[2].type).toBe('Text');
-    expect(text.children[0].children[0].children[2].children[0]).toBe('5679');
+    expect(text.children[0].children[0].children[2].children[0]).toBe(' -1.1234');
+    expect(text.children[0].children[0].children[3].type).toBe('Text');
+    expect(text.children[0].children[0].children[3].children[0]).toBe('5679');
   });
 
   test('ZecAmount - amtZec 1.123456781 rounded down result 1.12345678 ZEC', () => {
     const text: any = render(<ZecAmount amtZec={1.123456781} currencyName={'ZEC'} />).toJSON();
     expect(text.type).toBe('View');
+    expect(text.children[0].children[0].children[0].type).toBe('Text');
+    expect(text.children[0].children[0].children[0].children[0]).toBe('\u1647');
     expect(text.children[0].children[0].children[1].type).toBe('Text');
-    expect(text.children[0].children[0].children[1].children[0]).toBe(' 1.1234');
+    expect(text.children[0].children[0].children[1].children[0]).toBe('EC');
     expect(text.children[0].children[0].children[2].type).toBe('Text');
-    expect(text.children[0].children[0].children[2].children[0]).toBe('5678');
+    expect(text.children[0].children[0].children[2].children[0]).toBe(' 1.1234');
+    expect(text.children[0].children[0].children[3].type).toBe('Text');
+    expect(text.children[0].children[0].children[3].children[0]).toBe('5678');
   });
 
   test("ZecAmount - color 'red' result same", () => {
     const text: any = render(<ZecAmount color={'red'} currencyName={'ZEC'} />).toJSON();
     expect(text.type).toBe('View');
+    expect(text.children[0].children[0].children[0].type).toBe('Text');
+    expect(text.children[0].children[0].children[0].children[0]).toBe('\u1647');
+    expect(text.children[0].children[0].children[0].props.style.color).toBe('red');
     expect(text.children[0].children[0].children[1].type).toBe('Text');
-    expect(text.children[0].children[0].children[1].children[0]).toBe(' --');
+    expect(text.children[0].children[0].children[1].children[0]).toBe('EC');
     expect(text.children[0].children[0].children[1].props.style.color).toBe('red');
     expect(text.children[0].children[0].children[2].type).toBe('Text');
-    expect(text.children[0].children[0].children[2].children).toBe(null);
+    expect(text.children[0].children[0].children[2].children[0]).toBe(' --');
     expect(text.children[0].children[0].children[2].props.style.color).toBe('red');
+    expect(text.children[0].children[0].children[3].type).toBe('Text');
+    expect(text.children[0].children[0].children[3].children).toBe(null);
+    expect(text.children[0].children[0].children[3].props.style.color).toBe('red');
   });
 
   test('ZecAmount - size 11 result same and same * 0.7', () => {
     const text: any = render(<ZecAmount size={11} currencyName={'ZEC'} />).toJSON();
     expect(text.type).toBe('View');
+    expect(text.children[0].children[0].children[0].type).toBe('Text');
+    expect(text.children[0].children[0].children[0].children[0]).toBe('\u1647');
+    expect(text.children[0].children[0].children[0].props.style.fontSize).toBe(11);
     expect(text.children[0].children[0].children[1].type).toBe('Text');
-    expect(text.children[0].children[0].children[1].children[0]).toBe(' --');
+    expect(text.children[0].children[0].children[1].children[0]).toBe('EC');
     expect(text.children[0].children[0].children[1].props.style.fontSize).toBe(11);
     expect(text.children[0].children[0].children[2].type).toBe('Text');
-    expect(text.children[0].children[0].children[2].children).toBe(null);
-    expect(text.children[0].children[0].children[2].props.style.fontSize).toBe(11 * 0.7);
+    expect(text.children[0].children[0].children[2].children[0]).toBe(' --');
+    expect(text.children[0].children[0].children[2].props.style.fontSize).toBe(11);
+    expect(text.children[0].children[0].children[3].type).toBe('Text');
+    expect(text.children[0].children[0].children[3].children).toBe(null);
+    expect(text.children[0].children[0].children[3].props.style.fontSize).toBe(11 * 0.7);
   });
 
   test("ZecAmount - View style backgroundColor 'red' result same", () => {
     const text: any = render(<ZecAmount style={{ backgroundColor: 'red' }} currencyName={'ZEC'} />).toJSON();
     expect(text.type).toBe('View');
     expect(text.props.style.backgroundColor).toBe('red');
+    expect(text.children[0].children[0].children[0].type).toBe('Text');
+    expect(text.children[0].children[0].children[0].children[0]).toBe('\u1647');
     expect(text.children[0].children[0].children[1].type).toBe('Text');
-    expect(text.children[0].children[0].children[1].children[0]).toBe(' --');
+    expect(text.children[0].children[0].children[1].children[0]).toBe('EC');
     expect(text.children[0].children[0].children[2].type).toBe('Text');
-    expect(text.children[0].children[0].children[2].children).toBe(null);
+    expect(text.children[0].children[0].children[2].children[0]).toBe(' --');
+    expect(text.children[0].children[0].children[3].type).toBe('Text');
+    expect(text.children[0].children[0].children[3].children).toBe(null);
   });
 
   test("ZecAmount - zecSymbol 'ZzZ' result same", () => {
     const text: any = render(<ZecAmount currencyName={'ZzZ'} />).toJSON();
     expect(text.type).toBe('View');
+    expect(text.children[0].children[0].children[0].type).toBe('Text');
+    expect(text.children[0].children[0].children[0].children[0]).toBe('\u1647');
     expect(text.children[0].children[0].children[1].type).toBe('Text');
-    expect(text.children[0].children[0].children[1].children[0]).toBe(' --');
+    expect(text.children[0].children[0].children[1].children[0]).toBe('EC');
     expect(text.children[0].children[0].children[2].type).toBe('Text');
-    expect(text.children[0].children[0].children[2].children).toBe(null);
+    expect(text.children[0].children[0].children[2].children[0]).toBe(' --');
+    expect(text.children[0].children[0].children[3].type).toBe('Text');
+    expect(text.children[0].children[0].children[3].children).toBe(null);
   });
 
   test("BoldText - children 'bold text' result same", () => {

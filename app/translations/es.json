@@ -8,7 +8,6 @@
   "close": "Cerrar",
   "cancel": "Cancelar",
   "save": "Grabar",
-  "confirm": "Confirmar",
   "menudrawer-acc": "Abrir Menu Lateral",
   "menu-acc": "Abrir Menu",
   "donation": "Gracias por apoyar Zingo!",
@@ -267,7 +266,8 @@
     "seedplaceholder": "Semilla (24 palabras)",
     "seed-acc": "Campo Frase Semilla",
     "birthday-acc": "Campo Cumpleaños",
-    "tapreveal": "Pulsar para revelar"
+    "tapreveal": "Pulsar para revelar",
+    "confirm-button": "Confirmar"
   },
   "send": {
     "Broadcast": "Transmitida con éxito Tx:",
@@ -277,7 +277,7 @@
     "more": "ver más...",
     "toaddress": "A la Dirección",
     "invalidaddress": "Dirección Incorrecta!",
-    "addressplaceholder": "Unificada, Z-Sapling o Transparente",
+    "addressplaceholder": "Dirección Unificada o Z-Sapling o Transparente",
     "invalidamount": "Cantidad Incorrecta!",
     "spendable": "Disponible: ",
     "somefunds": "Algunos fondos todavía se están confirmando o sincronizando",
@@ -289,6 +289,7 @@
     "sending-title": "Procesando",
     "confirm-amount": "Cantidad",
     "fee": "Comisión por Transacción",
+    "confirm-button": "Confirmar",
     "confirm-button-all": "Confirmar Enviar Todo",
     "amount": "   Cantidad",
     "to": "A",
@@ -332,7 +333,7 @@
   },
   "history": {
     "shield-all": "Blindar Todos\nlos fondos",
-    "shield-transparent": "Blindar fondos",
+    "shield-transparent": "Blindar fondos\nTransparentes",
     "shield-sapling": "Asignar fondos a\nla última versión",
     "shield-t": "Transparente",
     "shield-z": "Sapling",
@@ -346,11 +347,8 @@
     "shield-legend-transparent": "Aumenta tu balance blindado gastable en: ",
     "shield-legend-sapling": "Migra tus fondos al mas nuevo blindaje: ",
     "shield-title-all": "Blindar Todos los fondos",
-    "shield-title-transparent": "Blindar fondos",
+    "shield-title-transparent": "Blindar fondos Transparentes",
     "shield-title-sapling": "Asignar fondos a la última versión",
-    "shield-alert-all": "Confirmar para asignar todos tus fondos al último pool blindado Orchard.",
-    "shield-alert-transparent": "Confirmar para blindar tus fondos al último pool blindado Orchard.",
-    "shield-alert-sapling": "Confirmar para asignar tus fondos al último pool blindado Orchard",
     "title": "Histórico",
     "title-syncing": "Histórico - Sincronizando",
     "more": "ver más...",
@@ -468,7 +466,8 @@
     "change-warning": "Si cambias a otro monedero, ya no tendrás acceso a este monedero sin la frase semilla.",
     "backup-warning": "Si cambias a tu monedero anterior (copia de seguridad), ya no tendrás acceso a este monedero sin la frase semilla.",
     "server-warning": "Si cambias a un servidor con diferente tipo de cadena, ya no tendrás acceso a este monedero sin la frase semilla.",
-    "mainnet-warning": "No se va a hacer copia de seguridad del monedero activo, solo está disponible en: 'MAINNET'."
+    "mainnet-warning": "No se va a hacer copia de seguridad del monedero activo, solo está disponible en: 'MAINNET'.",
+    "confirm-button": "Confirmar"
   },
   "pools": {
     "title": "Agrupaciones de Fondos",

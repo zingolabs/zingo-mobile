@@ -30,7 +30,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
   setTxDetailModalShowing,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, language, privacy, info } = context;
+  const { translate, language, privacy } = context;
   const { colors } = useTheme() as unknown as ThemeType;
 
   const amountColor =
@@ -94,7 +94,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
           <ZecAmount
             style={{ flexGrow: 1, alignSelf: 'baseline', justifyContent: 'flex-end', paddingRight: 5 }}
             size={18}
-            currencyName={info.currencyName ? info.currencyName : ''}
+            currencyName={'ᙇ'}
             color={amountColor}
             amtZec={tx.amount}
             privacy={privacy}
