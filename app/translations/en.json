@@ -267,7 +267,7 @@
     "seedplaceholder": "Seed (24 words)",
     "seed-acc": "Seed Phrase Field",
     "birthday-acc": "Birthday Field",
-    "tapreveal": "Tap to reveal",
+    "tapreveal": "Tap to reveal"
   },
   "send": {
     "Broadcast": "Successfully Broadcast Tx:",
@@ -348,6 +348,9 @@
     "shield-title-all": "Shield All funds",
     "shield-title-transparent": "Shield funds",
     "shield-title-sapling": "Upgrade funds to newest version",
+    "shield-alert-all": "Confirm to upgrade all your funds to the latest Orchard shielded pool.",
+    "shield-alert-transparent": "Confirm to shield your funds to the latest Orchard shielded pool.",
+    "shield-alert-sapling": "Confirm to upgrade your funds to the latest Orchard shielded pool",
     "title": "History",
     "title-syncing": "History - Syncing",
     "more": "more...",
@@ -465,7 +468,7 @@
     "change-warning": "If you change to another wallet, you will no longer have access to this wallet without the seed phrase.",
     "backup-warning": "If you change to your backup wallet, you will no longer have access to this wallet without the seed phrase.",
     "server-warning": "If you change to a server with different chain, you will no longer have access to this wallet without the seed phrase.",
-    "mainnet-warning": "No backup of this wallet, only available in 'MAINNET'.",
+    "mainnet-warning": "No backup of this wallet, only available in 'MAINNET'."
   },
   "pools": {
     "title": "Fund Pools",

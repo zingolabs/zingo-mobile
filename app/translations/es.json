@@ -267,7 +267,7 @@
     "seedplaceholder": "Semilla (24 palabras)",
     "seed-acc": "Campo Frase Semilla",
     "birthday-acc": "Campo Cumpleaños",
-    "tapreveal": "Pulsar para revelar",
+    "tapreveal": "Pulsar para revelar"
   },
   "send": {
     "Broadcast": "Transmitida con éxito Tx:",
@@ -348,6 +348,9 @@
     "shield-title-all": "Blindar Todos los fondos",
     "shield-title-transparent": "Blindar fondos",
     "shield-title-sapling": "Asignar fondos a la última versión",
+    "shield-alert-all": "Confirmar para asignar todos tus fondos al último pool blindado Orchard.",
+    "shield-alert-transparent": "Confirmar para blindar tus fondos al último pool blindado Orchard.",
+    "shield-alert-sapling": "Confirmar para asignar tus fondos al último pool blindado Orchard",
     "title": "Histórico",
     "title-syncing": "Histórico - Sincronizando",
     "more": "ver más...",
@@ -465,7 +468,7 @@
     "change-warning": "Si cambias a otro monedero, ya no tendrás acceso a este monedero sin la frase semilla.",
     "backup-warning": "Si cambias a tu monedero anterior (copia de seguridad), ya no tendrás acceso a este monedero sin la frase semilla.",
     "server-warning": "Si cambias a un servidor con diferente tipo de cadena, ya no tendrás acceso a este monedero sin la frase semilla.",
-    "mainnet-warning": "No se va a hacer copia de seguridad del monedero activo, solo está disponible en: 'MAINNET'.",
+    "mainnet-warning": "No se va a hacer copia de seguridad del monedero activo, solo está disponible en: 'MAINNET'."
   },
   "pools": {
     "title": "Agrupaciones de Fondos",
