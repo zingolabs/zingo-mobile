@@ -29,6 +29,17 @@ async fn execute_sync_from_seed(abi: &str) {
     assert_eq!(exit_code, 0);
 }
 
+async fn regchest(abi: &str) {
+    let (exit_code, output, error) =
+        test_utils::android_integration_test(abi, "ExecuteSendFromOrchard");
+
+    println!("Exit Code: {}", exit_code);
+    println!("Output: {}", output);
+    println!("Error: {}", error);
+
+    assert_eq!(exit_code, 0);
+}
+
 async fn execute_send_from_orchard(abi: &str) {
     let (_regtest_manager, _child_process_handler) =
         scenarios::funded_orchard_mobileclient(1_000_000).await;
@@ -78,6 +89,11 @@ mod x86_64 {
     #[tokio::test]
     async fn execute_send_from_orchard() {
         super::execute_send_from_orchard(ABI).await;
+    }
+
+    #[tokio::test]
+    async fn regchest() {
+        super::regchest(ABI).await;
     }
 }
 
