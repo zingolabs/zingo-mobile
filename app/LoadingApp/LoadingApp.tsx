@@ -660,12 +660,8 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                         customButton={<FontAwesomeIcon icon={faEllipsisV} color={'#ffffff'} size={48} />}
                         buttonStyle={{ width: 48, padding: 10, resizeMode: 'contain' }}
                         destructiveIndex={5}
-                        options={[
-                          translate('loadingapp.basicmode'),
-                          translate('loadingapp.custom'),
-                          translate('cancel'),
-                        ]}
-                        actions={[() => this.changeMode('basic'), this.customServer]}
+                        options={[translate('loadingapp.custom'), translate('cancel')]}
+                        actions={[this.customServer]}
                       />
                     )}
                   </>
