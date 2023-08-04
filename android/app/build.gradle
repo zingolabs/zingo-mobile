@@ -140,9 +140,9 @@ android {
         //applicationId 'com.ZingoMobile' // @Test
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 125 // Real
+        versionCode 126 // Real
         //versionCode 117 // @Test
-        versionName "zingo-1.2.4" // Real
+        versionName "zingo-1.2.5" // Real
         missingDimensionStrategy 'react-native-camera', 'general'
         testBuildType System.getProperty('testBuildType', 'debug')
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
