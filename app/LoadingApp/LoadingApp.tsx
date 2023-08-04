@@ -162,7 +162,18 @@ export default function LoadingApp(props: LoadingAppProps) {
   //console.log('render loadingApp - 2');
 
   if (loading) {
-    return null;
+    return (
+      <View
+        style={{
+          flex: 1,
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+        <Text style={{ color: '#888888', fontSize: 40, fontWeight: 'bold' }}>{translate('zingo') as string}</Text>
+        <Text style={{ color: '#888888', fontSize: 15 }}>{translate('version') as string}</Text>
+      </View>
+    );
   } else {
     return (
       <LoadingAppClass
@@ -237,12 +248,12 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     this.unsubscribeNetInfo = {} as NetInfoSubscription;
   }
 
-  componentDidMount = async () => {
-    // First, check if a wallet exists. Do it async so the basic screen has time to render
-    await AsyncStorage.setItem('@background', 'no');
-    setTimeout(async () => {
+  componentDidMount = () => {
+    (async () => {
+      // First, check if a wallet exists. Do it async so the basic screen has time to render
+      await AsyncStorage.setItem('@background', 'no');
       const exists = await RPCModule.walletExists();
-      //console.log('Wallet Exists result', exists, this.state.server);
+      //console.log('Wallet Exists result', this.state.screen, exists);
 
       if (exists && exists !== 'false') {
         this.setState({ walletExists: true });
@@ -263,6 +274,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
               readOnly: walletKindJSON.kind === 'Seeded' ? false : true,
             });
             this.navigateToLoadedApp();
+            //console.log('navigate to LoadedApp');
           } else {
             this.setState({ screen: 1 });
             createAlert(
@@ -280,16 +292,17 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
           });
         }
       } else {
-        //console.log('Loading new wallet');
+        //console.log('Loading new wallet', this.state.screen, this.state.walletExists);
         // if no wallet file & basic mode -> create a new wallet & go directly to history screen.
         if (this.state.mode === 'basic') {
           this.createNewWallet();
           this.navigateToLoadedApp();
+          //console.log('navigate to LoadedApp');
         } else {
           this.setState({ screen: 1, walletExists: false });
         }
       }
-    });
+    })();
 
     this.appstate = AppState.addEventListener('change', async nextAppState => {
       //await AsyncStorage.setItem('@server', this.state.server);
@@ -568,7 +581,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
   };
 
   changeMode = async (mode: 'basic' | 'expert') => {
-    this.setState({ mode });
+    this.setState({ mode, screen: 0 });
     await SettingsFileImpl.writeSettings('mode', mode);
     // if the user selects expert mode & wants to change to another wallet
     // and then the user wants to go to basic mode in the first screen
@@ -593,7 +606,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     const { translate } = this.props;
     const { colors } = this.props.theme;
 
-    //console.log('render loadingAppClass - 3', server);
+    //console.log('render loadingAppClass - 3', screen);
 
     return (
       <ContextAppLoadingProvider value={this.state}>

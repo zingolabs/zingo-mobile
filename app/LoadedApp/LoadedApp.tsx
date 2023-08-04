@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, { Component, Suspense, useState, useMemo, useEffect } from 'react';
 import {
   Modal,
@@ -177,7 +178,18 @@ export default function LoadedApp(props: LoadedAppProps) {
   //console.log('render LoadedApp - 2');
 
   if (loading) {
-    return null;
+    return (
+      <View
+        style={{
+          flex: 1,
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+        <Text style={{ color: '#888888', fontSize: 40, fontWeight: 'bold' }}>{translate('zingo') as string}</Text>
+        <Text style={{ color: '#888888', fontSize: 15 }}>{translate('version') as string}</Text>
+      </View>
+    );
   } else {
     return (
       <LoadedAppClass
@@ -1502,22 +1514,37 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
               </Tab.Screen>
             </Tab.Navigator>
           ) : (
-            <>
-              <Suspense
-                fallback={
-                  <View>
-                    <Text>{translate('loading') as string}</Text>
-                  </View>
-                }>
-                <Receive
-                  setUaAddress={this.setUaAddress}
-                  toggleMenuDrawer={this.toggleMenuDrawer}
-                  syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
-                  set_privacy_option={this.set_privacy_option}
-                  setUfvkViewModalVisible={this.setUfvkViewModalVisible}
-                />
-              </Suspense>
-            </>
+            <Tab.Navigator
+              initialRouteName={translate('loadedapp.uas-menu') as string}
+              screenOptions={{
+                tabBarStyle: {
+                  borderTopColor: colors.background,
+                  borderTopWidth: 0,
+                  height: 0,
+                },
+                headerShown: false,
+              }}>
+              <Tab.Screen name={translate('loadedapp.uas-menu') as string}>
+                {() => (
+                  <>
+                    <Suspense
+                      fallback={
+                        <View>
+                          <Text>{translate('loading') as string}</Text>
+                        </View>
+                      }>
+                      <Receive
+                        setUaAddress={this.setUaAddress}
+                        toggleMenuDrawer={this.toggleMenuDrawer}
+                        syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
+                        set_privacy_option={this.set_privacy_option}
+                        setUfvkViewModalVisible={this.setUfvkViewModalVisible}
+                      />
+                    </Suspense>
+                  </>
+                )}
+              </Tab.Screen>
+            </Tab.Navigator>
           )}
         </SideMenu>
       </ContextAppLoadedProvider>

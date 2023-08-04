@@ -115,7 +115,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected }) => {
         style={{
           padding: 10,
           position: 'absolute',
-          bottom: 0,
+          bottom: 5,
           flexDirection: 'row',
           backgroundColor: '#010101',
         }}>

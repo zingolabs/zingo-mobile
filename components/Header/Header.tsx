@@ -285,7 +285,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         }`,
       ) as string,
       translate(
-        `history.shield-legend-${
+        `history.shield-alert-${
           poolsToShield !== 'all'
             ? poolsToShield
             : poolsToShieldSelectSapling && poolsToShieldSelectTransparent
