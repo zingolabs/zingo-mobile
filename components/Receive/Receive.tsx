@@ -114,12 +114,12 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
 
   useEffect(() => {
     const basicModeRoutes = [{ key: 'uaddr', title: translate('receive.u-title') as string }];
-    const expertModeRoutes = [
+    const advancedModeRoutes = [
       { key: 'uaddr', title: translate('receive.u-title') as string },
       { key: 'zaddr', title: translate('receive.z-title') as string },
       { key: 'taddr', title: translate('receive.t-title') as string },
     ];
-    setRoutes(mode === 'basic' ? basicModeRoutes : expertModeRoutes);
+    setRoutes(mode === 'basic' ? basicModeRoutes : advancedModeRoutes);
   }, [mode, translate]);
 
   const renderScene: (

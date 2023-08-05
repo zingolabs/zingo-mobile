@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Component Send - test Send currency USD, privacy high & mode expert - snapshot 1`] = `
+exports[`Component Send - test Send currency USD, privacy high & mode advanced - snapshot 1`] = `
 <View
   accessibilityLabel="text translated"
   accessible={true}

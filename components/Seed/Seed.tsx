@@ -42,7 +42,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
     server: ServerType,
     netInfo: NetInfoType,
     privacy: boolean,
-    mode: 'basic' | 'expert',
+    mode: 'basic' | 'advanced',
     setBackgroundError: (title: string, error: string) => void,
     addLastSnackbar: (snackbar: SnackbarType) => void;
   if (action === 'new' || action === 'restore') {

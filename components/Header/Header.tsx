@@ -44,7 +44,7 @@ type HeaderProps = {
   testID?: string;
   translate?: (key: string) => TranslateType;
   netInfo?: NetInfoType;
-  mode?: 'basic' | 'expert';
+  mode?: 'basic' | 'advanced';
   setComputingModalVisible?: (visible: boolean) => void;
   setBackgroundError?: (title: string, error: string) => void;
   noPrivacy?: boolean;
@@ -93,7 +93,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     restartApp,
   } = context;
 
-  let translate: (key: string) => TranslateType, netInfo: NetInfoType, mode: 'basic' | 'expert';
+  let translate: (key: string) => TranslateType, netInfo: NetInfoType, mode: 'basic' | 'advanced';
   if (translateProp) {
     translate = translateProp;
   } else {

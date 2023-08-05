@@ -6,7 +6,7 @@ export default class SettingsFileClass {
   language: 'en' | 'es';
   sendAll: boolean;
   privacy: boolean;
-  mode: 'basic' | 'expert';
+  mode: 'basic' | 'advanced';
   firstInstall: boolean;
 
   constructor(
@@ -15,7 +15,7 @@ export default class SettingsFileClass {
     language: 'en' | 'es',
     sendAll: boolean,
     privacy: boolean,
-    mode: 'basic' | 'expert',
+    mode: 'basic' | 'advanced',
     firstInstall: boolean,
   ) {
     this.server = server;

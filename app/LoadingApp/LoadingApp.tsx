@@ -65,7 +65,7 @@ export default function LoadingApp(props: LoadingAppProps) {
   const [server, setServer] = useState<ServerType>(SERVER_DEFAULT_0);
   const [sendAll, setSendAll] = useState<boolean>(false);
   const [privacy, setPrivacy] = useState<boolean>(false);
-  const [mode, setMode] = useState<'basic' | 'expert'>('basic');
+  const [mode, setMode] = useState<'basic' | 'advanced'>('basic');
   const [background, setBackground] = useState<BackgroundType>({ batches: 0, date: 0 });
   const [loading, setLoading] = useState<boolean>(true);
   const file = useMemo(
@@ -103,7 +103,7 @@ export default function LoadingApp(props: LoadingAppProps) {
         setMode('basic');
         await SettingsFileImpl.writeSettings('mode', 'basic');
       } else {
-        if (settings.mode === 'basic' || settings.mode === 'expert') {
+        if (settings.mode === 'basic' || settings.mode === 'advanced') {
           setMode(settings.mode);
         } else {
           await SettingsFileImpl.writeSettings('mode', mode);
@@ -202,7 +202,7 @@ type LoadingAppClassProps = {
   server: ServerType;
   sendAll: boolean;
   privacy: boolean;
-  mode: 'basic' | 'expert';
+  mode: 'basic' | 'advanced';
   background: BackgroundType;
 };
 
@@ -380,7 +380,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     }
   };
 
-  usingDefaultServer_0 = async (mode: 'basic' | 'expert') => {
+  usingDefaultServer_0 = async (mode: 'basic' | 'advanced') => {
     this.setState({ actionButtonsDisabled: true });
     if (SERVER_DEFAULT_0) {
       await SettingsFileImpl.writeSettings('server', SERVER_DEFAULT_0);
@@ -393,7 +393,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     }
   };
 
-  usingDefaultServer_1 = async (mode: 'basic' | 'expert') => {
+  usingDefaultServer_1 = async (mode: 'basic' | 'advanced') => {
     this.setState({ actionButtonsDisabled: true });
     if (SERVER_DEFAULT_1) {
       await SettingsFileImpl.writeSettings('server', SERVER_DEFAULT_1);
@@ -580,10 +580,10 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     this.setState({ snackbars: newSnackbars });
   };
 
-  changeMode = async (mode: 'basic' | 'expert') => {
+  changeMode = async (mode: 'basic' | 'advanced') => {
     this.setState({ mode, screen: 0 });
     await SettingsFileImpl.writeSettings('mode', mode);
-    // if the user selects expert mode & wants to change to another wallet
+    // if the user selects advanced mode & wants to change to another wallet
     // and then the user wants to go to basic mode in the first screen
     // the result will be the same -> create a new wallet.
     this.componentDidMount();
@@ -652,8 +652,8 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                         customButton={<FontAwesomeIcon icon={faEllipsisV} color={'#ffffff'} size={48} />}
                         buttonStyle={{ width: 48, padding: 10, resizeMode: 'contain' }}
                         destructiveIndex={5}
-                        options={[translate('loadingapp.expertmode'), translate('cancel')]}
-                        actions={[() => this.changeMode('expert')]}
+                        options={[translate('loadingapp.advancedmode'), translate('cancel')]}
+                        actions={[() => this.changeMode('advanced')]}
                       />
                     ) : (
                       <OptionsMenu

@@ -117,7 +117,7 @@ export default interface AppStateLoaded {
   poolsToShieldSelectSapling: boolean;
   poolsToShieldSelectTransparent: boolean;
 
-  mode: 'basic' | 'expert';
+  mode: 'basic' | 'advanced';
   snackbars: SnackbarType[];
   addLastSnackbar: (snackbar: SnackbarType) => void;
   restartApp: () => void;

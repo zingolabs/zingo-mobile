@@ -42,7 +42,7 @@
     "custom": "Custom Server...",
     "nointernet-message": "There is no established internet connection. Please fix this issue.",
     "basicmode": "Change to Basic Mode",
-    "expertmode": "Change to Expert Mode",
+    "advancedmode": "Change to Advanced Mode",
     "noopenwallet-message": "An error occurred while the App was trying to open the active wallet.",
     "changeserver-basic": "Change the Server and\nOpen Current Wallet"
   },
@@ -155,8 +155,8 @@
         "text": "Basic Mode, the most simple way to use Zingo."
       },
       {
-        "value": "expert",
-        "text": "Expert Mode, for the advanced user."
+        "value": "advanced",
+        "text": "Advanced Mode, for the advanced user."
       }
     ],
     "nochanges": "No changes registred.",
@@ -181,7 +181,7 @@
     "islanguage": "You need to choose a language to save.",
     "sendall-title": "THE BUTTON 'Send All' (Amount)",
     "privacy-title": "Switch between High or Normal Privacy",
-    "mode-title": "Switch between Basic or Expert Mode",
+    "mode-title": "Switch between Basic or Advanced Mode",
     "value-currency-": "No currency",
     "value-currency-USD": "US Dollar",
     "value-language-en": "English",
@@ -192,7 +192,7 @@
     "value-privacy-false": "Normal",
     "privacy": "Priv: ",
     "value-mode-basic": "Basic",
-    "value-mode-expert": "Expert",
+    "value-mode-advanced": "Advanced",
     "mode": "Mode: ",
     "value-chain_name-main": "Mainnet",
     "value-chain_name-test": "Testnet",

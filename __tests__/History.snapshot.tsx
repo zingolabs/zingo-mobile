@@ -153,13 +153,13 @@ describe('Component History - test', () => {
     expect(history.toJSON()).toMatchSnapshot();
   });
 
-  test('History currency USD, privacy high & mode expert - snapshot', () => {
+  test('History currency USD, privacy high & mode advanced - snapshot', () => {
     // no currency
     state.currency = 'USD';
     // privacy normal
     state.privacy = true;
     // mode basic
-    state.mode = 'expert';
+    state.mode = 'advanced';
     const history = render(
       <ContextAppLoadedProvider value={state}>
         <History

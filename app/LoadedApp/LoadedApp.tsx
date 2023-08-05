@@ -91,7 +91,7 @@ export default function LoadedApp(props: LoadedAppProps) {
   const [server, setServer] = useState<ServerType>(SERVER_DEFAULT_0);
   const [sendAll, setSendAll] = useState<boolean>(false);
   const [privacy, setPrivacy] = useState<boolean>(false);
-  const [mode, setMode] = useState<'basic' | 'expert'>('basic');
+  const [mode, setMode] = useState<'basic' | 'advanced'>('basic');
   const [background, setBackground] = useState<BackgroundType>({ batches: 0, date: 0 });
   const [loading, setLoading] = useState<boolean>(true);
   const file = useMemo(
@@ -219,7 +219,7 @@ type LoadedAppClassProps = {
   server: ServerType;
   sendAll: boolean;
   privacy: boolean;
-  mode: 'basic' | 'expert';
+  mode: 'basic' | 'advanced';
   background: BackgroundType;
   readOnly: boolean;
 };
@@ -884,7 +884,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
   set_mode_option = async (name: 'mode', value: string): Promise<void> => {
     await SettingsFileImpl.writeSettings(name, value);
     this.setState({
-      mode: value as 'basic' | 'expert',
+      mode: value as 'basic' | 'advanced',
     });
 
     // Refetch the settings to update

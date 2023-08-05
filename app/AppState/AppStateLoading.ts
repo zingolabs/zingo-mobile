@@ -44,7 +44,7 @@ export default interface AppStateLoading {
   customServerUri: string;
   customServerChainName: 'main' | 'test' | 'regtest';
 
-  mode: 'basic' | 'expert';
+  mode: 'basic' | 'advanced';
   snackbars: SnackbarType[];
   addLastSnackbar: (snackbar: SnackbarType) => void;
 

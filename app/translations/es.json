@@ -42,7 +42,7 @@
     "custom": "Otro Servidor...",
     "nointernet-message": "No hay una conexion a internet establecida. Por favor solucione esta incidencia.",
     "basicmode": "Cambiar a Modo Básico",
-    "expertmode": "Cambiar a Modo Experto",
+    "advancedmode": "Cambiar a Modo Avanzado",
     "noopenwallet-message": "Ha ocurrido un error mientras el App estaba intentando abrir el monedero activo.",
     "changeserver-basic": "Cambiar de Servidor and\nAbrir Monedero Activo"
   },
@@ -155,8 +155,8 @@
         "text": "Modo Básico, la manera más fácil de usar Zingo."
       },
       {
-        "value": "expert",
-        "text": "Modo Experto, para el usuario avanzado."
+        "value": "advanced",
+        "text": "Modo Avanzado, para el usuario avanzado."
       }
     ],
     "nochanges": "No se haan registrado cambios.",
@@ -181,7 +181,7 @@
     "islanguage": "Necesitas escoger un Idioma para poder grabar.",
     "sendall-title": "EL BOTON 'Enviar todo' (Cantidad)",
     "privacy-title": "Cambiar entre Alta Privacidad o Normal",
-    "mode-title": "Cambiar entre Modo Básico o Experto",
+    "mode-title": "Cambiar entre Modo Básico o Avanzado",
     "value-currency-": "Sin moneda",
     "value-currency-USD": "US Dólares",
     "value-language-en": "Inglés",
@@ -192,7 +192,7 @@
     "value-privacy-false": "Normal",
     "privacy": "Priv: ",
     "value-mode-basic": "Básico",
-    "value-mode-expert": "Experto",
+    "value-mode-advanced": "Avanzado",
     "mode": "Modo: ",
     "value-chain_name-main": "Mainnet",
     "value-chain_name-test": "Testnet",
