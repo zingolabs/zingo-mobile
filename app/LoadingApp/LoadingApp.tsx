@@ -65,7 +65,7 @@ export default function LoadingApp(props: LoadingAppProps) {
   const [server, setServer] = useState<ServerType>(SERVER_DEFAULT_0);
   const [sendAll, setSendAll] = useState<boolean>(false);
   const [privacy, setPrivacy] = useState<boolean>(false);
-  const [mode, setMode] = useState<'basic' | 'advanced'>('basic');
+  const [mode, setMode] = useState<'basic' | 'advanced'>('advanced'); // by default advanced
   const [background, setBackground] = useState<BackgroundType>({ batches: 0, date: 0 });
   const [loading, setLoading] = useState<boolean>(true);
   const file = useMemo(
@@ -106,6 +106,7 @@ export default function LoadingApp(props: LoadingAppProps) {
         if (settings.mode === 'basic' || settings.mode === 'advanced') {
           setMode(settings.mode);
         } else {
+          // if it is not a fresh install -> advanced
           await SettingsFileImpl.writeSettings('mode', mode);
         }
       }
