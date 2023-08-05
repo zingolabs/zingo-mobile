@@ -367,7 +367,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
             //console.log('EVENT Loaded: YES internet connection.');
             if (this.rpc.getInRefresh()) {
               // I need to start again the App only if it is Syncing...
-              this.navigateToLoadingApp();
+              this.navigateToLoadingApp({});
             }
           }
         }
@@ -743,7 +743,15 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       } else {
         this.setState({ seedBackupModalVisible: true });
       }
+    } else if (item === 'Load Wallet From Seed') {
+      // change the mode to advance & restart the App in screen 3 directly.
+      await this.onClickOKChangeWallet({ screen: 3 });
     }
+  };
+
+  changeToAdvancedandLoadWalletFromSeed = async () => {
+    await this.set_mode_option('mode', 'advanced');
+    await this.onClickOKChangeWallet({ screen: 3 });
   };
 
   set_wallet_option = async (name: string, value: string): Promise<void> => {
@@ -857,7 +865,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     // Refetch the settings to update
     this.rpc.fetchWalletSettings();
     if (reset) {
-      this.navigateToLoadingApp();
+      this.navigateToLoadingApp({});
     }
   };
 
@@ -891,17 +899,25 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     this.rpc.fetchWalletSettings();
   };
 
-  navigateToLoadingApp = async () => {
+  navigateToLoadingApp = async (state: any) => {
     const { navigation } = this.props;
 
     await this.rpc.clearTimers();
+    if (!!state.screen && state.screen === 3) {
+      await this.set_mode_option('mode', 'advanced');
+    }
     navigation.reset({
       index: 0,
-      routes: [{ name: 'LoadingApp' }],
+      routes: [
+        {
+          name: 'LoadingApp',
+          params: state,
+        },
+      ],
     });
   };
 
-  onClickOKChangeWallet = async () => {
+  onClickOKChangeWallet = async (state: any) => {
     const { server } = this.state;
 
     // if the App is working with a test server
@@ -928,7 +944,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     this.rpc.setInRefresh(false);
     this.keepAwake(false);
     this.setState({ seedChangeModalVisible: false });
-    this.navigateToLoadingApp();
+    this.navigateToLoadingApp(state);
   };
 
   onClickOKRestoreBackup = async () => {
@@ -949,7 +965,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     this.rpc.setInRefresh(false);
     this.keepAwake(false);
     this.setState({ seedBackupModalVisible: false });
-    this.navigateToLoadingApp();
+    this.navigateToLoadingApp({});
   };
 
   onClickOKServerWallet = async () => {
@@ -1003,7 +1019,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
         this.setState({ seedServerModalVisible: false });
       }
       // no need to restart the tasks because is about to restart the app.
-      this.navigateToLoadingApp();
+      this.navigateToLoadingApp({});
     }
   };
 
@@ -1255,7 +1271,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 </View>
               }>
               <Seed
-                onClickOK={() => this.onClickOKChangeWallet()}
+                onClickOK={async () => await this.onClickOKChangeWallet({})}
                 onClickCancel={() => this.setState({ seedChangeModalVisible: false })}
                 action={'change'}
                 set_privacy_option={this.set_privacy_option}
@@ -1275,7 +1291,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 </View>
               }>
               <Seed
-                onClickOK={() => this.onClickOKRestoreBackup()}
+                onClickOK={async () => await this.onClickOKRestoreBackup()}
                 onClickCancel={() => this.setState({ seedBackupModalVisible: false })}
                 action={'backup'}
                 set_privacy_option={this.set_privacy_option}
@@ -1295,7 +1311,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 </View>
               }>
               <Seed
-                onClickOK={() => this.onClickOKServerWallet()}
+                onClickOK={async () => await this.onClickOKServerWallet()}
                 onClickCancel={async () => {
                   // restart all the tasks again, nothing happen.
                   await this.rpc.configure();
@@ -1339,7 +1355,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 </View>
               }>
               <ShowUfvk
-                onClickOK={() => this.onClickOKChangeWallet()}
+                onClickOK={async () => await this.onClickOKChangeWallet({})}
                 onClickCancel={() => this.setState({ ufvkChangeModalVisible: false })}
                 action={'change'}
                 set_privacy_option={this.set_privacy_option}
@@ -1359,7 +1375,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 </View>
               }>
               <ShowUfvk
-                onClickOK={() => this.onClickOKRestoreBackup()}
+                onClickOK={async () => await this.onClickOKRestoreBackup()}
                 onClickCancel={() => this.setState({ ufvkBackupModalVisible: false })}
                 action={'backup'}
                 set_privacy_option={this.set_privacy_option}
@@ -1379,7 +1395,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 </View>
               }>
               <ShowUfvk
-                onClickOK={() => this.onClickOKServerWallet()}
+                onClickOK={async () => await this.onClickOKServerWallet()}
                 onClickCancel={async () => {
                   // restart all the tasks again, nothing happen.
                   await this.rpc.configure();

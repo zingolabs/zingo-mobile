@@ -120,7 +120,7 @@ export default interface AppStateLoaded {
   mode: 'basic' | 'advanced';
   snackbars: SnackbarType[];
   addLastSnackbar: (snackbar: SnackbarType) => void;
-  restartApp: () => void;
+  restartApp: (s: any) => void;
 
   // eslint-disable-next-line semi
 }

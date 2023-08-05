@@ -109,6 +109,11 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected }) => {
               {translate('loadedapp.restorebackupwallet') as string}
             </RegText>
           )}
+          {mode === 'basic' && transactions.length === 0 && (
+            <RegText onPress={() => onItemSelectedWrapper('Load Wallet From Seed')} style={item}>
+              {translate('loadedapp.loadwalletfromseed-basic') as string}
+            </RegText>
+          )}
         </View>
       </ScrollView>
       <View

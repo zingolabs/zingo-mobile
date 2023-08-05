@@ -229,6 +229,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
       ...defaultAppStateLoading,
       navigation: props.navigation,
       route: props.route,
+      screen: !!props.route.params && !!props.route.params.screen ? props.route.params.screen : 0,
       translate: props.translate,
       server: props.server,
       language: props.language,
@@ -300,7 +301,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
           this.navigateToLoadedApp();
           //console.log('navigate to LoadedApp');
         } else {
-          this.setState({ screen: 1, walletExists: false });
+          this.setState(state => ({ screen: state.screen === 3 ? 3 : 1, walletExists: false }));
         }
       }
     })();
@@ -356,7 +357,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
           } else {
             //console.log('EVENT Loading: YESSSSS internet connection.');
             if (screen !== 0) {
-              this.setState({ screen: 0 });
+              this.setState({ screen: screen === 3 ? 3 : 0 });
               // I need some time until the network is fully ready.
               setTimeout(() => this.componentDidMount(), 1000);
             }
