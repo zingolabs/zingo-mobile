@@ -502,9 +502,20 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     }
   };
 
-  setTransactionList = (transactions: TransactionType[]) => {
+  setTransactionList = async (transactions: TransactionType[]) => {
     if (deepDiff(this.state.transactions, transactions)) {
       //console.log('fetch transactions');
+      const basicFirstViewSeed = (await SettingsFileImpl.readSettings()).basicFirstViewSeed;
+      if (
+        this.state.mode === 'basic' &&
+        !basicFirstViewSeed &&
+        this.state.transactions.length === 0 &&
+        transactions.length > 0
+      ) {
+        await SettingsFileImpl.writeSettings('basicFirstViewSeed', true);
+        await this.fetchWallet();
+        this.setState({ seedViewModalVisible: true });
+      }
       this.setState({ transactions });
     }
   };
@@ -747,11 +758,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       // change the mode to advance & restart the App in screen 3 directly.
       await this.onClickOKChangeWallet({ screen: 3 });
     }
-  };
-
-  changeToAdvancedandLoadWalletFromSeed = async () => {
-    await this.set_mode_option('mode', 'advanced');
-    await this.onClickOKChangeWallet({ screen: 3 });
   };
 
   set_wallet_option = async (name: string, value: string): Promise<void> => {

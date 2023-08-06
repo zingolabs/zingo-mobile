@@ -297,6 +297,9 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
         //console.log('Loading new wallet', this.state.screen, this.state.walletExists);
         // if no wallet file & basic mode -> create a new wallet & go directly to history screen.
         if (this.state.mode === 'basic') {
+          // setting the prop basicFirstViewSeed to false.
+          // this means when the user have funds, the seed screen will show up.
+          await SettingsFileImpl.writeSettings('basicFirstViewSeed', false);
           this.createNewWallet();
           this.navigateToLoadedApp();
           //console.log('navigate to LoadedApp');
