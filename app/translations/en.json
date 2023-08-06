@@ -61,7 +61,7 @@
     "restorebackupwallet": "Restore Last Wallet Backup",
     "fundpools": "Fund Pools",
     "insight": "Financial Insight",
-    "loadwalletfromseed-basic": "Load wallet from Seed (Advanced)",
+    "loadwalletfromseed-basic": "Restore wallet (Advanced)",
     "restoremainnet-error": "This option is only available for 'Mainnet' servers.",
     "changeservernew-error": "Error trying to change the server to the new one: ",
     "readingwallet-error": "Error trying to read the wallet with the new server:",
@@ -82,7 +82,9 @@
     "connection-error": "No Internet connection, Zingo can't work properly this way.",
     "tryingnewserver": "Trying to connect to the new Server... Can take a few seconds.",
     "tryingnewserver-error": "After 30 seconds the new server doesn't respond.",
-    "readingwallet": "Reading successfully the wallet with the server:"
+    "readingwallet": "Reading successfully the wallet with the server:",
+    "restorewallet-title": "Advanced Option",
+    "restorewallet-alert": "Confirm that you want to restore a new wallet using your seed phrase."
   },
   "rpc": {
     "parsebirthday-error": "Error: Couldn't parse as a number:",

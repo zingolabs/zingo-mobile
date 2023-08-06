@@ -503,19 +503,23 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
   };
 
   setTransactionList = async (transactions: TransactionType[]) => {
+    // only for basic mode
+    if (this.state.mode === 'basic') {
+      // only if the user doesn't see the seed the first time
+      const basicFirstViewSeed = (await SettingsFileImpl.readSettings()).basicFirstViewSeed;
+      if (!basicFirstViewSeed) {
+        // only if the App are in foreground
+        const background = await AsyncStorage.getItem('@background');
+        // only if the wallet have some transactions
+        if (background === 'no' && transactions.length > 0) {
+          await SettingsFileImpl.writeSettings('basicFirstViewSeed', true);
+          await this.fetchWallet();
+          this.setState({ seedViewModalVisible: true });
+        }
+      }
+    }
     if (deepDiff(this.state.transactions, transactions)) {
       //console.log('fetch transactions');
-      const basicFirstViewSeed = (await SettingsFileImpl.readSettings()).basicFirstViewSeed;
-      if (
-        this.state.mode === 'basic' &&
-        !basicFirstViewSeed &&
-        this.state.transactions.length === 0 &&
-        transactions.length > 0
-      ) {
-        await SettingsFileImpl.writeSettings('basicFirstViewSeed', true);
-        await this.fetchWallet();
-        this.setState({ seedViewModalVisible: true });
-      }
       this.setState({ transactions });
     }
   };
@@ -756,7 +760,19 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       }
     } else if (item === 'Load Wallet From Seed') {
       // change the mode to advance & restart the App in screen 3 directly.
-      await this.onClickOKChangeWallet({ screen: 3 });
+      const { translate } = this.state;
+      Alert.alert(
+        translate('loadedapp.restorewallet-title') as string,
+        translate('loadedapp.restorewallet-alert') as string,
+        [
+          {
+            text: translate('confirm') as string,
+            onPress: async () => await this.onClickOKChangeWallet({ screen: 3 }),
+          },
+          { text: translate('cancel') as string, style: 'cancel' },
+        ],
+        { cancelable: true, userInterfaceStyle: 'light' },
+      );
     }
   };
 
