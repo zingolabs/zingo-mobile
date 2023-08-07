@@ -105,7 +105,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
           <ZecAmount
             currencyName={info.currencyName ? info.currencyName : ''}
             size={36}
-            amtZec={tx.amount}
+            amtZec={Math.abs(tx.amount)}
             privacy={privacy}
             smallPrefix={true}
           />
