@@ -359,20 +359,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         </View>
 
         <View style={{ display: 'flex', margin: 10 }}>
-          <BoldText>{translate('settings.privacy-title') as string}</BoldText>
-        </View>
-
-        <View style={{ display: 'flex', marginLeft: 25 }}>
-          {optionsRadio(
-            PRIVACYS,
-            setPrivacy as React.Dispatch<React.SetStateAction<string | boolean>>,
-            Boolean,
-            privacy,
-            'privacy',
-          )}
-        </View>
-
-        <View style={{ display: 'flex', margin: 10 }}>
           <BoldText>{translate('settings.currency-title') as string}</BoldText>
         </View>
 
@@ -402,6 +388,20 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
         {modeContext !== 'basic' && (
           <>
+            <View style={{ display: 'flex', margin: 10 }}>
+              <BoldText>{translate('settings.privacy-title') as string}</BoldText>
+            </View>
+
+            <View style={{ display: 'flex', marginLeft: 25 }}>
+              {optionsRadio(
+                PRIVACYS,
+                setPrivacy as React.Dispatch<React.SetStateAction<string | boolean>>,
+                Boolean,
+                privacy,
+                'privacy',
+              )}
+            </View>
+
             <View style={{ display: 'flex', margin: 10 }}>
               <BoldText>{translate('settings.sendall-title') as string}</BoldText>
             </View>
