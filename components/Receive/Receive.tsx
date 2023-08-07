@@ -114,12 +114,12 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
 
   useEffect(() => {
     const basicModeRoutes = [{ key: 'uaddr', title: translate('receive.u-title') as string }];
-    const expertModeRoutes = [
+    const advancedModeRoutes = [
       { key: 'uaddr', title: translate('receive.u-title') as string },
       { key: 'zaddr', title: translate('receive.z-title') as string },
       { key: 'taddr', title: translate('receive.t-title') as string },
     ];
-    setRoutes(mode === 'basic' ? basicModeRoutes : expertModeRoutes);
+    setRoutes(mode === 'basic' ? basicModeRoutes : advancedModeRoutes);
   }, [mode, translate]);
 
   const renderScene: (
@@ -255,19 +255,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
           justifyContent: 'flex-start',
           width: '100%',
         }}>
-        {/*<Modal
-          animationType="slide"
-          transparent={false}
-          visible={privKeyModalVisible}
-          onRequestClose={() => setPrivKeyModalVisible(false)}>
-          <PrivKey
-            address={address}
-            keyType={keyType}
-            privKey={privKey}
-            closeModal={() => setPrivKeyModalVisible(false)}
-          />
-        </Modal>*/}
-
         <Header
           toggleMenuDrawer={toggleMenuDrawer}
           syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
@@ -277,28 +264,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
           setUfvkViewModalVisible={setUfvkViewModalVisible}
           addLastSnackbar={addLastSnackbar}
         />
-
-        <View style={{ backgroundColor: colors.card, padding: 10, position: 'absolute', right: 0 }}>
-          {/*<OptionsMenu
-            customButton={
-              <View accessible={true} accessibilityLabel={translate('menu-acc')}>
-                <FontAwesomeIcon icon={faEllipsisV} color={colors.border} size={48} />
-              </View>
-            }
-            buttonStyle={{ width: 32, height: 32, margin: 7.5, resizeMode: 'contain' }}
-            destructiveIndex={4}
-            options={[
-              translate('receive.newu-option'),
-              translate('receive.privkey-option'),
-              translate('receive.viewkey-option'),
-              translate('receive.import-option'),
-              translate('cancel'),
-            ]},
-            actions={[addO, viewPrivKey, viewViewingKey]}
-          />*/}
-        </View>
-
-        <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
 
         <TabBar
           {...props}

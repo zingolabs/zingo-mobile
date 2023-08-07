@@ -44,6 +44,7 @@ jest.mock('react-native-option-menu', () => '');
 jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
 jest.mock('@react-native-community/netinfo', () => {
   return {
+    addEventListener: jest.fn(),
     fetch: jest.fn().mockImplementation(() =>
       Promise.resolve({
         isConnected: true,

@@ -171,13 +171,13 @@ describe('Component Send - test', () => {
     expect(send.toJSON()).toMatchSnapshot();
   });
 
-  test('Send currency USD, privacy high & mode expert - snapshot', () => {
+  test('Send currency USD, privacy high & mode advanced - snapshot', () => {
     // no currency
     state.currency = 'USD';
     // privacy normal
     state.privacy = true;
     // mode basic
-    state.mode = 'expert';
+    state.mode = 'advanced';
     const send = render(
       <ContextAppLoadedProvider value={state}>
         <Send

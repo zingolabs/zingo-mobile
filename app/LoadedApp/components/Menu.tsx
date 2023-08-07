@@ -16,7 +16,7 @@ type MenuProps = {
 
 const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, readOnly, mode, totalBalance, transactions } = context;
+  const { translate, readOnly, mode, transactions } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const item = {
     fontSize: 14,
@@ -62,7 +62,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected }) => {
             {translate('loadedapp.settings') as string}
           </RegText>
 
-          {!(mode === 'basic' && transactions.length <= 0) && !(mode === 'basic' && totalBalance.total <= 0) && (
+          {!(mode === 'basic' && transactions.length <= 0) && (
             <RegText onPress={() => onItemSelectedWrapper('Wallet')} style={item}>
               {readOnly
                 ? mode === 'basic'
@@ -109,13 +109,18 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected }) => {
               {translate('loadedapp.restorebackupwallet') as string}
             </RegText>
           )}
+          {mode === 'basic' && transactions.length === 0 && (
+            <RegText onPress={() => onItemSelectedWrapper('Load Wallet From Seed')} style={item}>
+              {translate('loadedapp.loadwalletfromseed-basic') as string}
+            </RegText>
+          )}
         </View>
       </ScrollView>
       <View
         style={{
           padding: 10,
           position: 'absolute',
-          bottom: 0,
+          bottom: 5,
           flexDirection: 'row',
           backgroundColor: '#010101',
         }}>

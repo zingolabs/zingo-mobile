@@ -65,7 +65,7 @@ export default function LoadingApp(props: LoadingAppProps) {
   const [server, setServer] = useState<ServerType>(SERVER_DEFAULT_0);
   const [sendAll, setSendAll] = useState<boolean>(false);
   const [privacy, setPrivacy] = useState<boolean>(false);
-  const [mode, setMode] = useState<'basic' | 'expert'>('basic');
+  const [mode, setMode] = useState<'basic' | 'advanced'>('advanced'); // by default advanced
   const [background, setBackground] = useState<BackgroundType>({ batches: 0, date: 0 });
   const [loading, setLoading] = useState<boolean>(true);
   const file = useMemo(
@@ -103,9 +103,10 @@ export default function LoadingApp(props: LoadingAppProps) {
         setMode('basic');
         await SettingsFileImpl.writeSettings('mode', 'basic');
       } else {
-        if (settings.mode === 'basic' || settings.mode === 'expert') {
+        if (settings.mode === 'basic' || settings.mode === 'advanced') {
           setMode(settings.mode);
         } else {
+          // if it is not a fresh install -> advanced
           await SettingsFileImpl.writeSettings('mode', mode);
         }
       }
@@ -162,7 +163,18 @@ export default function LoadingApp(props: LoadingAppProps) {
   //console.log('render loadingApp - 2');
 
   if (loading) {
-    return null;
+    return (
+      <View
+        style={{
+          flex: 1,
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+        <Text style={{ color: '#888888', fontSize: 40, fontWeight: 'bold' }}>{translate('zingo') as string}</Text>
+        <Text style={{ color: '#888888', fontSize: 15 }}>{translate('version') as string}</Text>
+      </View>
+    );
   } else {
     return (
       <LoadingAppClass
@@ -191,7 +203,7 @@ type LoadingAppClassProps = {
   server: ServerType;
   sendAll: boolean;
   privacy: boolean;
-  mode: 'basic' | 'expert';
+  mode: 'basic' | 'advanced';
   background: BackgroundType;
 };
 
@@ -217,6 +229,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
       ...defaultAppStateLoading,
       navigation: props.navigation,
       route: props.route,
+      screen: !!props.route.params && !!props.route.params.screen ? props.route.params.screen : 0,
       translate: props.translate,
       server: props.server,
       language: props.language,
@@ -237,12 +250,12 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     this.unsubscribeNetInfo = {} as NetInfoSubscription;
   }
 
-  componentDidMount = async () => {
-    // First, check if a wallet exists. Do it async so the basic screen has time to render
-    await AsyncStorage.setItem('@background', 'no');
-    setTimeout(async () => {
+  componentDidMount = () => {
+    (async () => {
+      // First, check if a wallet exists. Do it async so the basic screen has time to render
+      await AsyncStorage.setItem('@background', 'no');
       const exists = await RPCModule.walletExists();
-      //console.log('Wallet Exists result', exists, this.state.server);
+      //console.log('Wallet Exists result', this.state.screen, exists);
 
       if (exists && exists !== 'false') {
         this.setState({ walletExists: true });
@@ -263,6 +276,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
               readOnly: walletKindJSON.kind === 'Seeded' ? false : true,
             });
             this.navigateToLoadedApp();
+            //console.log('navigate to LoadedApp');
           } else {
             this.setState({ screen: 1 });
             createAlert(
@@ -280,16 +294,20 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
           });
         }
       } else {
-        //console.log('Loading new wallet');
+        //console.log('Loading new wallet', this.state.screen, this.state.walletExists);
         // if no wallet file & basic mode -> create a new wallet & go directly to history screen.
         if (this.state.mode === 'basic') {
+          // setting the prop basicFirstViewSeed to false.
+          // this means when the user have funds, the seed screen will show up.
+          await SettingsFileImpl.writeSettings('basicFirstViewSeed', false);
           this.createNewWallet();
           this.navigateToLoadedApp();
+          //console.log('navigate to LoadedApp');
         } else {
-          this.setState({ screen: 1, walletExists: false });
+          this.setState(state => ({ screen: state.screen === 3 ? 3 : 1, walletExists: false }));
         }
       }
-    });
+    })();
 
     this.appstate = AppState.addEventListener('change', async nextAppState => {
       //await AsyncStorage.setItem('@server', this.state.server);
@@ -342,7 +360,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
           } else {
             //console.log('EVENT Loading: YESSSSS internet connection.');
             if (screen !== 0) {
-              this.setState({ screen: 0 });
+              this.setState({ screen: screen === 3 ? 3 : 0 });
               // I need some time until the network is fully ready.
               setTimeout(() => this.componentDidMount(), 1000);
             }
@@ -367,7 +385,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     }
   };
 
-  usingDefaultServer_0 = async (mode: 'basic' | 'expert') => {
+  usingDefaultServer_0 = async (mode: 'basic' | 'advanced') => {
     this.setState({ actionButtonsDisabled: true });
     if (SERVER_DEFAULT_0) {
       await SettingsFileImpl.writeSettings('server', SERVER_DEFAULT_0);
@@ -380,7 +398,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     }
   };
 
-  usingDefaultServer_1 = async (mode: 'basic' | 'expert') => {
+  usingDefaultServer_1 = async (mode: 'basic' | 'advanced') => {
     this.setState({ actionButtonsDisabled: true });
     if (SERVER_DEFAULT_1) {
       await SettingsFileImpl.writeSettings('server', SERVER_DEFAULT_1);
@@ -567,10 +585,10 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     this.setState({ snackbars: newSnackbars });
   };
 
-  changeMode = async (mode: 'basic' | 'expert') => {
-    this.setState({ mode });
+  changeMode = async (mode: 'basic' | 'advanced') => {
+    this.setState({ mode, screen: 0 });
     await SettingsFileImpl.writeSettings('mode', mode);
-    // if the user selects expert mode & wants to change to another wallet
+    // if the user selects advanced mode & wants to change to another wallet
     // and then the user wants to go to basic mode in the first screen
     // the result will be the same -> create a new wallet.
     this.componentDidMount();
@@ -593,7 +611,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     const { translate } = this.props;
     const { colors } = this.props.theme;
 
-    //console.log('render loadingAppClass - 3', server);
+    //console.log('render loadingAppClass - 3', screen);
 
     return (
       <ContextAppLoadingProvider value={this.state}>
@@ -639,20 +657,16 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                         customButton={<FontAwesomeIcon icon={faEllipsisV} color={'#ffffff'} size={48} />}
                         buttonStyle={{ width: 48, padding: 10, resizeMode: 'contain' }}
                         destructiveIndex={5}
-                        options={[translate('loadingapp.expertmode'), translate('cancel')]}
-                        actions={[() => this.changeMode('expert')]}
+                        options={[translate('loadingapp.advancedmode'), translate('cancel')]}
+                        actions={[() => this.changeMode('advanced')]}
                       />
                     ) : (
                       <OptionsMenu
                         customButton={<FontAwesomeIcon icon={faEllipsisV} color={'#ffffff'} size={48} />}
                         buttonStyle={{ width: 48, padding: 10, resizeMode: 'contain' }}
                         destructiveIndex={5}
-                        options={[
-                          translate('loadingapp.basicmode'),
-                          translate('loadingapp.custom'),
-                          translate('cancel'),
-                        ]}
-                        actions={[() => this.changeMode('basic'), this.customServer]}
+                        options={[translate('loadingapp.custom'), translate('cancel')]}
+                        actions={[this.customServer]}
                       />
                     )}
                   </>

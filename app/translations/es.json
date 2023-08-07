@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo!",
-  "version": "zingo-1.2.4 (125)",
+  "version": "zingo-1.2.5 (126)",
   "loading": "cargando...",
   "connectingserver": "Conectando con el servidor...",
   "wait": "Por favor espere...",
@@ -42,7 +42,7 @@
     "custom": "Otro Servidor...",
     "nointernet-message": "No hay una conexion a internet establecida. Por favor solucione esta incidencia.",
     "basicmode": "Cambiar a Modo Básico",
-    "expertmode": "Cambiar a Modo Experto",
+    "advancedmode": "Cambiar a Modo Avanzado",
     "noopenwallet-message": "Ha ocurrido un error mientras el App estaba intentando abrir el monedero activo.",
     "changeserver-basic": "Cambiar de Servidor and\nAbrir Monedero Activo"
   },
@@ -61,6 +61,7 @@
     "restorebackupwallet": "Restaurar la última copia de Seguridad",
     "fundpools": "Agrupaciones de Fondos",
     "insight": "Visión Financiera",
+    "loadwalletfromseed-basic": "Restaurar monedero (Avanzado)",
     "restoremainnet-error": "Esta opción está solamente disponible para la Red: 'Mainnet'.",
     "changeservernew-error": "Error al intentar cambiar al Servidor nuevo: ",
     "readingwallet-error": "Error al intentar leer el monedero activo usando el Servidor nuevo:",
@@ -81,7 +82,9 @@
     "connection-error": "No existe conexión a Internet, Zingo así no puede funcionar correctamente.",
     "tryingnewserver": "Intentando conectar con el nuevo Servidor... Puede llevar varios segundos.",
     "tryingnewserver-error": "Después de 30 segundos el nuevo Servidor no responde.",
-    "readingwallet": "Leyendo satisfactoriamente el monedero activo usando el Servidor:"
+    "readingwallet": "Leyendo satisfactoriamente el monedero activo usando el Servidor:",
+    "restorewallet-title": "Opción Avanzada",
+    "restorewallet-alert": "Confirmar que quiere restaurar un nuevo monedero usando su frase semilla."
   },
   "rpc": {
     "parsebirthday-error": "Error: No es posible convertirlo en un número:",
@@ -155,8 +158,8 @@
         "text": "Modo Básico, la manera más fácil de usar Zingo."
       },
       {
-        "value": "expert",
-        "text": "Modo Experto, para el usuario avanzado."
+        "value": "advanced",
+        "text": "Modo Avanzado, para el usuario avanzado."
       }
     ],
     "nochanges": "No se haan registrado cambios.",
@@ -181,7 +184,7 @@
     "islanguage": "Necesitas escoger un Idioma para poder grabar.",
     "sendall-title": "EL BOTON 'Enviar todo' (Cantidad)",
     "privacy-title": "Cambiar entre Alta Privacidad o Normal",
-    "mode-title": "Cambiar entre Modo Básico o Experto",
+    "mode-title": "Cambiar entre Modo Básico o Avanzado",
     "value-currency-": "Sin moneda",
     "value-currency-USD": "US Dólares",
     "value-language-en": "Inglés",
@@ -192,7 +195,7 @@
     "value-privacy-false": "Normal",
     "privacy": "Priv: ",
     "value-mode-basic": "Básico",
-    "value-mode-expert": "Experto",
+    "value-mode-advanced": "Avanzado",
     "mode": "Modo: ",
     "value-chain_name-main": "Mainnet",
     "value-chain_name-test": "Testnet",

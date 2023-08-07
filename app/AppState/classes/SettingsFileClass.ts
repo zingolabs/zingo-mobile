@@ -6,8 +6,9 @@ export default class SettingsFileClass {
   language: 'en' | 'es';
   sendAll: boolean;
   privacy: boolean;
-  mode: 'basic' | 'expert';
+  mode: 'basic' | 'advanced';
   firstInstall: boolean;
+  basicFirstViewSeed: boolean;
 
   constructor(
     server: ServerType,
@@ -15,8 +16,9 @@ export default class SettingsFileClass {
     language: 'en' | 'es',
     sendAll: boolean,
     privacy: boolean,
-    mode: 'basic' | 'expert',
+    mode: 'basic' | 'advanced',
     firstInstall: boolean,
+    basicFirstViewSeed: boolean,
   ) {
     this.server = server;
     this.currency = currency;
@@ -25,5 +27,6 @@ export default class SettingsFileClass {
     this.privacy = privacy;
     this.mode = mode;
     this.firstInstall = firstInstall;
+    this.basicFirstViewSeed = basicFirstViewSeed;
   }
 }

@@ -44,7 +44,7 @@ type HeaderProps = {
   testID?: string;
   translate?: (key: string) => TranslateType;
   netInfo?: NetInfoType;
-  mode?: 'basic' | 'expert';
+  mode?: 'basic' | 'advanced';
   setComputingModalVisible?: (visible: boolean) => void;
   setBackgroundError?: (title: string, error: string) => void;
   noPrivacy?: boolean;
@@ -93,7 +93,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     restartApp,
   } = context;
 
-  let translate: (key: string) => TranslateType, netInfo: NetInfoType, mode: 'basic' | 'expert';
+  let translate: (key: string) => TranslateType, netInfo: NetInfoType, mode: 'basic' | 'advanced';
   if (translateProp) {
     translate = translateProp;
   } else {
@@ -132,13 +132,19 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     percent = '99.99';
   }
   */
-  let blocksRemaining = lastBlockServer - currentBlock || 0;
+  let blocksRemaining = lastBlockServer - currentBlock;
+  // just in case, this value is weird...
+  // if the syncing is still inProgress and this value is cero -> it is better for UX to see 1.
+  // this use case is really rare.
+  if (blocksRemaining <= 0) {
+    blocksRemaining = 1;
+  }
 
   useEffect(() => {
     if (syncingStatus.syncProcessStalled && addLastSnackbar && restartApp) {
       // if the sync process is stalled -> let's restart the App.
       addLastSnackbar({ message: translate('restarting') as string, type: 'Primary', duration: 'short' });
-      setTimeout(() => restartApp(), 3000);
+      setTimeout(() => restartApp({}), 3000);
     }
   }, [addLastSnackbar, restartApp, syncingStatus.syncProcessStalled, translate]);
 
@@ -285,7 +291,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         }`,
       ) as string,
       translate(
-        `history.shield-legend-${
+        `history.shield-alert-${
           poolsToShield !== 'all'
             ? poolsToShield
             : poolsToShieldSelectSapling && poolsToShieldSelectTransparent

@@ -11,7 +11,7 @@ export default class SettingsFileImpl {
 
   // Write the server setting
   static async writeSettings(
-    name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy' | 'mode' | 'firstInstall',
+    name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy' | 'mode' | 'firstInstall' | 'basicFirstViewSeed',
     value: string | boolean | ServerType,
   ) {
     const fileName = await this.getFileName();
@@ -55,6 +55,12 @@ export default class SettingsFileImpl {
             settings.server = serverUris()[0];
           }
         }
+      }
+      if (!settings.hasOwnProperty('basicFirstViewSeed')) {
+        // by default we assume the user saw the seed,
+        // only if the user is basic and is creating a new wallet -> false.
+        // this means when the user have funds, the seed screen will show up.
+        settings.basicFirstViewSeed = true;
       }
       return settings;
     } catch (err) {

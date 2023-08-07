@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, { Component, Suspense, useState, useMemo, useEffect } from 'react';
 import {
   Modal,
@@ -90,7 +91,7 @@ export default function LoadedApp(props: LoadedAppProps) {
   const [server, setServer] = useState<ServerType>(SERVER_DEFAULT_0);
   const [sendAll, setSendAll] = useState<boolean>(false);
   const [privacy, setPrivacy] = useState<boolean>(false);
-  const [mode, setMode] = useState<'basic' | 'expert'>('basic');
+  const [mode, setMode] = useState<'basic' | 'advanced'>('basic');
   const [background, setBackground] = useState<BackgroundType>({ batches: 0, date: 0 });
   const [loading, setLoading] = useState<boolean>(true);
   const file = useMemo(
@@ -177,7 +178,18 @@ export default function LoadedApp(props: LoadedAppProps) {
   //console.log('render LoadedApp - 2');
 
   if (loading) {
-    return null;
+    return (
+      <View
+        style={{
+          flex: 1,
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+        <Text style={{ color: '#888888', fontSize: 40, fontWeight: 'bold' }}>{translate('zingo') as string}</Text>
+        <Text style={{ color: '#888888', fontSize: 15 }}>{translate('version') as string}</Text>
+      </View>
+    );
   } else {
     return (
       <LoadedAppClass
@@ -207,7 +219,7 @@ type LoadedAppClassProps = {
   server: ServerType;
   sendAll: boolean;
   privacy: boolean;
-  mode: 'basic' | 'expert';
+  mode: 'basic' | 'advanced';
   background: BackgroundType;
   readOnly: boolean;
 };
@@ -355,7 +367,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
             //console.log('EVENT Loaded: YES internet connection.');
             if (this.rpc.getInRefresh()) {
               // I need to start again the App only if it is Syncing...
-              this.navigateToLoadingApp();
+              this.navigateToLoadingApp({});
             }
           }
         }
@@ -490,7 +502,22 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     }
   };
 
-  setTransactionList = (transactions: TransactionType[]) => {
+  setTransactionList = async (transactions: TransactionType[]) => {
+    // only for basic mode
+    if (this.state.mode === 'basic') {
+      // only if the user doesn't see the seed the first time
+      const basicFirstViewSeed = (await SettingsFileImpl.readSettings()).basicFirstViewSeed;
+      if (!basicFirstViewSeed) {
+        // only if the App are in foreground
+        const background = await AsyncStorage.getItem('@background');
+        // only if the wallet have some transactions
+        if (background === 'no' && transactions.length > 0) {
+          await SettingsFileImpl.writeSettings('basicFirstViewSeed', true);
+          await this.fetchWallet();
+          this.setState({ seedViewModalVisible: true });
+        }
+      }
+    }
     if (deepDiff(this.state.transactions, transactions)) {
       //console.log('fetch transactions');
       this.setState({ transactions });
@@ -731,6 +758,21 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       } else {
         this.setState({ seedBackupModalVisible: true });
       }
+    } else if (item === 'Load Wallet From Seed') {
+      // change the mode to advance & restart the App in screen 3 directly.
+      const { translate } = this.state;
+      Alert.alert(
+        translate('loadedapp.restorewallet-title') as string,
+        translate('loadedapp.restorewallet-alert') as string,
+        [
+          {
+            text: translate('confirm') as string,
+            onPress: async () => await this.onClickOKChangeWallet({ screen: 3 }),
+          },
+          { text: translate('cancel') as string, style: 'cancel' },
+        ],
+        { cancelable: true, userInterfaceStyle: 'light' },
+      );
     }
   };
 
@@ -845,7 +887,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     // Refetch the settings to update
     this.rpc.fetchWalletSettings();
     if (reset) {
-      this.navigateToLoadingApp();
+      this.navigateToLoadingApp({});
     }
   };
 
@@ -872,24 +914,32 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
   set_mode_option = async (name: 'mode', value: string): Promise<void> => {
     await SettingsFileImpl.writeSettings(name, value);
     this.setState({
-      mode: value as 'basic' | 'expert',
+      mode: value as 'basic' | 'advanced',
     });
 
     // Refetch the settings to update
     this.rpc.fetchWalletSettings();
   };
 
-  navigateToLoadingApp = async () => {
+  navigateToLoadingApp = async (state: any) => {
     const { navigation } = this.props;
 
     await this.rpc.clearTimers();
+    if (!!state.screen && state.screen === 3) {
+      await this.set_mode_option('mode', 'advanced');
+    }
     navigation.reset({
       index: 0,
-      routes: [{ name: 'LoadingApp' }],
+      routes: [
+        {
+          name: 'LoadingApp',
+          params: state,
+        },
+      ],
     });
   };
 
-  onClickOKChangeWallet = async () => {
+  onClickOKChangeWallet = async (state: any) => {
     const { server } = this.state;
 
     // if the App is working with a test server
@@ -916,7 +966,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     this.rpc.setInRefresh(false);
     this.keepAwake(false);
     this.setState({ seedChangeModalVisible: false });
-    this.navigateToLoadingApp();
+    this.navigateToLoadingApp(state);
   };
 
   onClickOKRestoreBackup = async () => {
@@ -937,7 +987,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     this.rpc.setInRefresh(false);
     this.keepAwake(false);
     this.setState({ seedBackupModalVisible: false });
-    this.navigateToLoadingApp();
+    this.navigateToLoadingApp({});
   };
 
   onClickOKServerWallet = async () => {
@@ -991,7 +1041,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
         this.setState({ seedServerModalVisible: false });
       }
       // no need to restart the tasks because is about to restart the app.
-      this.navigateToLoadingApp();
+      this.navigateToLoadingApp({});
     }
   };
 
@@ -1243,7 +1293,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 </View>
               }>
               <Seed
-                onClickOK={() => this.onClickOKChangeWallet()}
+                onClickOK={async () => await this.onClickOKChangeWallet({})}
                 onClickCancel={() => this.setState({ seedChangeModalVisible: false })}
                 action={'change'}
                 set_privacy_option={this.set_privacy_option}
@@ -1263,7 +1313,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 </View>
               }>
               <Seed
-                onClickOK={() => this.onClickOKRestoreBackup()}
+                onClickOK={async () => await this.onClickOKRestoreBackup()}
                 onClickCancel={() => this.setState({ seedBackupModalVisible: false })}
                 action={'backup'}
                 set_privacy_option={this.set_privacy_option}
@@ -1283,7 +1333,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 </View>
               }>
               <Seed
-                onClickOK={() => this.onClickOKServerWallet()}
+                onClickOK={async () => await this.onClickOKServerWallet()}
                 onClickCancel={async () => {
                   // restart all the tasks again, nothing happen.
                   await this.rpc.configure();
@@ -1327,7 +1377,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 </View>
               }>
               <ShowUfvk
-                onClickOK={() => this.onClickOKChangeWallet()}
+                onClickOK={async () => await this.onClickOKChangeWallet({})}
                 onClickCancel={() => this.setState({ ufvkChangeModalVisible: false })}
                 action={'change'}
                 set_privacy_option={this.set_privacy_option}
@@ -1347,7 +1397,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 </View>
               }>
               <ShowUfvk
-                onClickOK={() => this.onClickOKRestoreBackup()}
+                onClickOK={async () => await this.onClickOKRestoreBackup()}
                 onClickCancel={() => this.setState({ ufvkBackupModalVisible: false })}
                 action={'backup'}
                 set_privacy_option={this.set_privacy_option}
@@ -1367,7 +1417,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 </View>
               }>
               <ShowUfvk
-                onClickOK={() => this.onClickOKServerWallet()}
+                onClickOK={async () => await this.onClickOKServerWallet()}
                 onClickCancel={async () => {
                   // restart all the tasks again, nothing happen.
                   await this.rpc.configure();
@@ -1502,22 +1552,37 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
               </Tab.Screen>
             </Tab.Navigator>
           ) : (
-            <>
-              <Suspense
-                fallback={
-                  <View>
-                    <Text>{translate('loading') as string}</Text>
-                  </View>
-                }>
-                <Receive
-                  setUaAddress={this.setUaAddress}
-                  toggleMenuDrawer={this.toggleMenuDrawer}
-                  syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
-                  set_privacy_option={this.set_privacy_option}
-                  setUfvkViewModalVisible={this.setUfvkViewModalVisible}
-                />
-              </Suspense>
-            </>
+            <Tab.Navigator
+              initialRouteName={translate('loadedapp.uas-menu') as string}
+              screenOptions={{
+                tabBarStyle: {
+                  borderTopColor: colors.background,
+                  borderTopWidth: 0,
+                  height: 0,
+                },
+                headerShown: false,
+              }}>
+              <Tab.Screen name={translate('loadedapp.uas-menu') as string}>
+                {() => (
+                  <>
+                    <Suspense
+                      fallback={
+                        <View>
+                          <Text>{translate('loading') as string}</Text>
+                        </View>
+                      }>
+                      <Receive
+                        setUaAddress={this.setUaAddress}
+                        toggleMenuDrawer={this.toggleMenuDrawer}
+                        syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
+                        set_privacy_option={this.set_privacy_option}
+                        setUfvkViewModalVisible={this.setUfvkViewModalVisible}
+                      />
+                    </Suspense>
+                  </>
+                )}
+              </Tab.Screen>
+            </Tab.Navigator>
           )}
         </SideMenu>
       </ContextAppLoadedProvider>

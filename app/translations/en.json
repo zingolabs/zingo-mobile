@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo!",
-  "version": "zingo-1.2.4 (125)",
+  "version": "zingo-1.2.5 (126)",
   "loading": "loading...",
   "connectingserver": "Connecting to the server...",
   "wait": "Please wait...",
@@ -42,7 +42,7 @@
     "custom": "Custom Server...",
     "nointernet-message": "There is no established internet connection. Please fix this issue.",
     "basicmode": "Change to Basic Mode",
-    "expertmode": "Change to Expert Mode",
+    "advancedmode": "Change to Advanced Mode",
     "noopenwallet-message": "An error occurred while the App was trying to open the active wallet.",
     "changeserver-basic": "Change the Server and\nOpen Current Wallet"
   },
@@ -61,6 +61,7 @@
     "restorebackupwallet": "Restore Last Wallet Backup",
     "fundpools": "Fund Pools",
     "insight": "Financial Insight",
+    "loadwalletfromseed-basic": "Restore wallet (Advanced)",
     "restoremainnet-error": "This option is only available for 'Mainnet' servers.",
     "changeservernew-error": "Error trying to change the server to the new one: ",
     "readingwallet-error": "Error trying to read the wallet with the new server:",
@@ -81,7 +82,9 @@
     "connection-error": "No Internet connection, Zingo can't work properly this way.",
     "tryingnewserver": "Trying to connect to the new Server... Can take a few seconds.",
     "tryingnewserver-error": "After 30 seconds the new server doesn't respond.",
-    "readingwallet": "Reading successfully the wallet with the server:"
+    "readingwallet": "Reading successfully the wallet with the server:",
+    "restorewallet-title": "Advanced Option",
+    "restorewallet-alert": "Confirm that you want to restore a new wallet using your seed phrase."
   },
   "rpc": {
     "parsebirthday-error": "Error: Couldn't parse as a number:",
@@ -155,8 +158,8 @@
         "text": "Basic Mode, the most simple way to use Zingo."
       },
       {
-        "value": "expert",
-        "text": "Expert Mode, for the advanced user."
+        "value": "advanced",
+        "text": "Advanced Mode, for the advanced user."
       }
     ],
     "nochanges": "No changes registred.",
@@ -181,7 +184,7 @@
     "islanguage": "You need to choose a language to save.",
     "sendall-title": "THE BUTTON 'Send All' (Amount)",
     "privacy-title": "Switch between High or Normal Privacy",
-    "mode-title": "Switch between Basic or Expert Mode",
+    "mode-title": "Switch between Basic or Advanced Mode",
     "value-currency-": "No currency",
     "value-currency-USD": "US Dollar",
     "value-language-en": "English",
@@ -192,7 +195,7 @@
     "value-privacy-false": "Normal",
     "privacy": "Priv: ",
     "value-mode-basic": "Basic",
-    "value-mode-expert": "Expert",
+    "value-mode-advanced": "Advanced",
     "mode": "Mode: ",
     "value-chain_name-main": "Mainnet",
     "value-chain_name-test": "Testnet",

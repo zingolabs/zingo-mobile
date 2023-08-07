@@ -7,9 +7,9 @@ let loadTestWallet = async () => {
   await waitFor(element(by.id('menu.settings'))).toBeVisible().withTimeout(sync_timeout);
   await element(by.id('menu.settings')).tap();
 
-  // first we need to change the App to expert mode
-  await waitFor(element(by.id('settings.mode-expert'))).toBeVisible().withTimeout(sync_timeout);
-  await element(by.id('settings.mode-expert')).tap();
+  // first we need to change the App to advanced mode
+  await waitFor(element(by.id('settings.mode-advanced'))).toBeVisible().withTimeout(sync_timeout);
+  await element(by.id('settings.mode-advanced')).tap();
   await waitFor(element(by.id('settings.button.save'))).toBeVisible().withTimeout(sync_timeout);
   await element(by.id('settings.button.save')).tap();
 
