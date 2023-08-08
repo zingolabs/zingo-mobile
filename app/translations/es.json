@@ -316,7 +316,7 @@
     "confirm-privacy-level": "Nivel de Privacidad",
     "private": "Privada",
     "amountrevealed" : "Monto Revelado",
-    "deshielded": "Desprotegida"
+    "deshielded": "Desblindada"
   },
   "receive": {
     "u-title": "Dirección Unificada",
