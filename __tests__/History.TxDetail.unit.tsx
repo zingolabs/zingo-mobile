@@ -134,6 +134,8 @@ describe('Component History TxDetail - test', () => {
       </ContextAppLoadedProvider>,
     );
     screen.getByText('0.0064');
-    screen.getByText('0.0001');
+    // because the negative symbol is not there.
+    const num = screen.getAllByText('0.0001');
+    expect(num.length).toBe(2);
   });
 });
