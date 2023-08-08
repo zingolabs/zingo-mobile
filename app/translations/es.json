@@ -312,7 +312,11 @@
     "needtoshield": "Hay fondos para Blindar",
     "fetchpricetitle": "Consultar Precio USD",
     "fetchpricebody": "Por favor confirma que quieres recuperar/consultar el precio en USD de internet.",
-    "fetch-button": "consultar"
+    "fetch-button": "consultar",
+    "confirm-privacy-level": "Nivel de Privacidad",
+    "private": "Privada",
+    "amountrevealed" : "Monto Revelado",
+    "deshielded": "Desprotegida"
   },
   "receive": {
     "u-title": "Dirección Unificada",

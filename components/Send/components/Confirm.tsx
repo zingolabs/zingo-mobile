@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { View, ScrollView, SafeAreaView } from 'react-native';
 
 import FadeText from '../../Components/FadeText';
@@ -12,6 +12,8 @@ import { useTheme } from '@react-navigation/native';
 import Utils from '../../../app/utils';
 import { ContextAppLoaded } from '../../../app/context';
 import Header from '../../Header';
+import { RPCParseAddressType } from '../../../app/rpc/types/RPCParseAddressType';
+import RPCModule from '../../../app/RPCModule';
 
 type ConfirmProps = {
   defaultFee: number;
@@ -21,10 +23,142 @@ type ConfirmProps = {
 };
 const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSend, defaultFee, sendAllAmount }) => {
   const context = useContext(ContextAppLoaded);
-  const { sendPageState, info, translate, currency, zecPrice, uaAddress, privacy } = context;
+  const {
+    sendPageState,
+    info,
+    translate,
+    currency,
+    zecPrice,
+    uaAddress,
+    privacy,
+    totalBalance,
+    netInfo,
+    addLastSnackbar,
+    server,
+  } = context;
   const { colors } = useTheme();
+  const [privacyLevel, setPrivacyLevel] = useState('-');
 
   const sendingTotal = Number(sendPageState.toaddr.amount) + defaultFee;
+
+  const getPrivacyLevel = useCallback(async () => {
+    if (!netInfo.isConnected) {
+      addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
+      return '-';
+    }
+
+    let from: 'orchard' | 'orchard+sapling' | 'sapling' | '' = '';
+    // amount + fee
+    if (Number(sendPageState.toaddr.amount) + defaultFee <= totalBalance.spendableOrchard) {
+      from = 'orchard';
+    } else if (
+      totalBalance.spendableOrchard > 0 &&
+      Number(sendPageState.toaddr.amount) + defaultFee <= totalBalance.spendableOrchard + totalBalance.spendablePrivate
+    ) {
+      from = 'orchard+sapling';
+    } else if (Number(sendPageState.toaddr.amount) + defaultFee <= totalBalance.spendablePrivate) {
+      from = 'sapling';
+    }
+
+    if (from === '') {
+      return '-';
+    }
+
+    const result: string = await RPCModule.execute('parse_address', sendPageState.toaddr.to);
+    if (result) {
+      if (result.toLowerCase().startsWith('error') || result.toLowerCase() === 'null') {
+        return '-';
+      }
+    } else {
+      return '-';
+    }
+    // TODO: check if the json parse is correct.
+    const resultJSON: RPCParseAddressType = await JSON.parse(result);
+
+    //console.log('parse-address', address, resultJSON.status === 'success');
+
+    if (resultJSON.status !== 'success' || resultJSON.chain_name !== server.chain_name) {
+      return '-';
+    }
+
+    //console.log(from, result, resultJSON);
+
+    // Private -> orchard to orchard (UA with orchard receiver)
+    if (
+      from === 'orchard' &&
+      resultJSON.address_kind === 'unified' &&
+      resultJSON.receivers_available?.includes('orchard')
+    ) {
+      return translate('send.private') as string;
+    }
+
+    // Private -> sapling to sapling (ZA or UA with sapling receiver and NO orchard receiver)
+    if (
+      from === 'sapling' &&
+      (resultJSON.address_kind === 'sapling' ||
+        (resultJSON.address_kind === 'unified' &&
+          resultJSON.receivers_available?.includes('sapling') &&
+          !resultJSON.receivers_available?.includes('orchard')))
+    ) {
+      return translate('send.private') as string;
+    }
+
+    // Amount Revealed -> orchard to sapling (ZA or UA with sapling receiver)
+    if (
+      from === 'orchard' &&
+      (resultJSON.address_kind === 'sapling' ||
+        (resultJSON.address_kind === 'unified' && resultJSON.receivers_available?.includes('sapling')))
+    ) {
+      return translate('send.amountrevealed') as string;
+    }
+
+    // Amount Revealed -> sapling to orchard (UA with orchard receiver)
+    if (
+      from === 'sapling' &&
+      resultJSON.address_kind === 'unified' &&
+      resultJSON.receivers_available?.includes('orchard')
+    ) {
+      return translate('send.amountrevealed') as string;
+    }
+
+    // Amount Revealed -> sapling+orchard to orchard or sapling (UA with orchard receiver or ZA or
+    // UA with sapling receiver)
+    if (
+      from === 'orchard+sapling' &&
+      (resultJSON.address_kind === 'sapling' ||
+        (resultJSON.address_kind === 'unified' &&
+          (resultJSON.receivers_available?.includes('orchard') || resultJSON.receivers_available?.includes('sapling'))))
+    ) {
+      return translate('send.amountrevealed') as string;
+    }
+
+    // Deshielded -> orchard or sapling or orchard+sapling to transparent
+    if (
+      (from === 'orchard' || from === 'sapling' || from === 'orchard+sapling') &&
+      resultJSON.address_kind === 'transparent'
+    ) {
+      return translate('send.deshielded') as string;
+    }
+
+    // whatever else
+    return '-';
+  }, [
+    addLastSnackbar,
+    defaultFee,
+    netInfo.isConnected,
+    sendPageState.toaddr.amount,
+    sendPageState.toaddr.to,
+    server.chain_name,
+    totalBalance.spendableOrchard,
+    totalBalance.spendablePrivate,
+    translate,
+  ]);
+
+  useEffect(() => {
+    (async () => {
+      setPrivacyLevel(await getPrivacyLevel());
+    })();
+  }, [getPrivacyLevel]);
 
   //console.log(sendPageState, price, defaultFee);
 
@@ -77,6 +211,10 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSen
           />
           <CurrencyAmount amtZec={sendingTotal} price={zecPrice.zecPrice} currency={currency} privacy={privacy} />
         </View>
+        <View style={{ marginHorizontal: 10 }}>
+          <FadeText style={{ marginTop: 10 }}>{translate('send.confirm-privacy-level') as string}</FadeText>
+          <RegText>{privacyLevel}</RegText>
+        </View>
         {[sendPageState.toaddr].map(to => {
           // 30 characters per line
           const numLines = to.to.length < 40 ? 2 : to.to.length / 30;
@@ -108,10 +246,14 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSen
                   privacy={privacy}
                 />
               </View>
-              <FadeText style={{ marginTop: 10 }}>{translate('send.confirm-memo') as string}</FadeText>
-              <RegText testID="send.confirm-memo">
-                {`${to.memo || ''}${to.includeUAMemo ? '\nReply to: \n' + uaAddress : ''}`}
-              </RegText>
+              {!!to.memo && (
+                <>
+                  <FadeText style={{ marginTop: 10 }}>{translate('send.confirm-memo') as string}</FadeText>
+                  <RegText testID="send.confirm-memo">
+                    {`${to.memo || ''}${to.includeUAMemo ? '\nReply to: \n' + uaAddress : ''}`}
+                  </RegText>
+                </>
+              )}
             </View>
           );
         })}
