@@ -14,6 +14,7 @@
   "donation": "Gracias por apoyar Zingo!",
   "restarting": "Error conectando con el servidor, la Aplicación se reiniciará en breves segundos.",
   "change-privacy": "Nueva Política de Privacidad: ",
+  "change-privacy-legend": ". Pulsa en cualquier cantidad como: 'ZEC -.- - - -' or '$ -.- -' para revelar el valor.",
   "insight": {
     "title": "Visión Financiera",
     "no-data": "No hay datos en tu Monedero que concuerden con el gráfico seleccionado.",
@@ -145,7 +146,7 @@
     "privacys": [
       {
         "value": true,
-        "text": "Alta Privacidad, toda la informacion sensible esta oculta."
+        "text": "Alta Privacidad, toda la informacion sensible esta oculta. Puedes Pulsar en cualquier cantidad como: 'ZEC -.- - - -' or '$ -.- -' para revelar el valor."
       },
       {
         "value": false,

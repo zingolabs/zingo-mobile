@@ -14,6 +14,7 @@
   "donation": "Thanks for supporting Zingo!",
   "restarting": "Error connecting to the Server, the App will restart in a few seconds.",
   "change-privacy": "New privacy policy: ",
+  "change-privacy-legend": ". Tap in any amount as: 'ZEC -.- - - -' or '$ -.- -' to reveal the value.",
   "insight": {
     "title": "Financial Insight",
     "no-data": "There is no data in your Wallet that fit the graph selected.",
@@ -145,7 +146,7 @@
     "privacys": [
       {
         "value": true,
-        "text": "High Privacy, all the sensitive information is hidden."
+        "text": "High Privacy, all the sensitive information is hidden. You can Tap in any amount as: 'ZEC -.- - - -' or '$ -.- -' to reveal the value."
       },
       {
         "value": false,

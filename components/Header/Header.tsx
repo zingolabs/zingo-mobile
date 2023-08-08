@@ -446,7 +446,10 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             onPress={() => {
               addLastSnackbar({
                 message: `${translate('change-privacy')} ${
-                  privacy ? translate('settings.value-privacy-false') : translate('settings.value-privacy-true')
+                  privacy
+                    ? translate('settings.value-privacy-false')
+                    : (((translate('settings.value-privacy-true') as string) +
+                        translate('change-privacy-legend')) as string)
                 }`,
                 type: 'Primary',
               });
