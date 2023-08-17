@@ -312,7 +312,12 @@
     "needtoshield": "You have funds to shield",
     "fetchpricetitle": "Fetch USD Price",
     "fetchpricebody": "Please confirm that you want to fetch the USD price from the Internet.",
-    "fetch-button": "fetch"
+    "fetch-button": "fetch",
+    "confirm-privacy-level": "Privacy Level",
+    "private": "Private",
+    "amountrevealed" : "Amount Revealed",
+    "deshielded": "Deshielded"
+
   },
   "receive": {
     "u-title": "Unified Address",
