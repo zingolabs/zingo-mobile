@@ -1,5 +1,5 @@
 import AddressClass from './classes/AddressClass';
-import AddressBookClass from './classes/AddressBookClass';
+import AddressBookFileClass from './classes/AddressBookFileClass';
 import ErrorModalDataClass from './classes/ErrorModalDataClass';
 import ReceivePageStateClass from './classes/ReceivePageStateClass';
 import SendPageStateClass from './classes/SendPageStateClass';
@@ -30,7 +30,7 @@ export {
   AppStateLoaded,
   AppStateLoading,
   AddressClass,
-  AddressBookClass,
+  AddressBookFileClass,
   ErrorModalDataClass,
   ReceivePageStateClass,
   SendPageStateClass,

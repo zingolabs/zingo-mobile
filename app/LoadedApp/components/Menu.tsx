@@ -62,6 +62,10 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected }) => {
             {translate('loadedapp.settings') as string}
           </RegText>
 
+          <RegText testID="menu.addressbook" onPress={() => onItemSelectedWrapper('Address Book')} style={item}>
+            {translate('loadedapp.addressbook') as string}
+          </RegText>
+
           {!(mode === 'basic' && transactions.length <= 0) && (
             <RegText onPress={() => onItemSelectedWrapper('Wallet')} style={item}>
               {readOnly

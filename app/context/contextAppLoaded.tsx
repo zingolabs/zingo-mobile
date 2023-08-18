@@ -34,7 +34,6 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   totalBalance: new TotalBalanceClass(),
   addressPrivateKeys: new Map(),
   addresses: [] as AddressClass[],
-  addressBook: [] as AddressBookClass[],
   transactions: [] as TransactionType[],
   sendPageState: new SendPageStateClass(new ToAddrClass(0)),
   receivePageState: new ReceivePageStateClass(''),
@@ -61,6 +60,7 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   syncReportModalVisible: false,
   poolsModalVisible: false,
   insightModalVisible: false,
+  addressBookModalVisible: false,
   newServer: {} as ServerType,
   uaAddress: '',
 

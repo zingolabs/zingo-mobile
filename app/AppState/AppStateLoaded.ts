@@ -2,7 +2,6 @@ import { StackScreenProps } from '@react-navigation/stack';
 
 import TotalBalanceClass from './classes/TotalBalanceClass';
 import AddressClass from './classes/AddressClass';
-import AddressBookClass from './classes/AddressBookClass';
 import ErrorModalDataClass from './classes/ErrorModalDataClass';
 import SendPageStateClass from './classes/SendPageStateClass';
 import SendProgressClass from './classes/SendProgressClass';
@@ -37,9 +36,6 @@ export default interface AppStateLoaded {
   // List of all addresses in the wallet, including change addresses and addresses
   // that don't have any balance or are unused
   addresses: AddressClass[];
-
-  // List of Address / Label pairs
-  addressBook: AddressBookClass[];
 
   // List of all T and Z and O transactions
   transactions: TransactionType[];
@@ -95,6 +91,7 @@ export default interface AppStateLoaded {
   syncReportModalVisible: boolean;
   poolsModalVisible: boolean;
   insightModalVisible: boolean;
+  addressBookModalVisible: boolean;
 
   newServer: ServerType;
 

@@ -17,6 +17,9 @@
   "donation": "Gracias por apoyar Zingo!",
   "restarting": "Error conectando con el servidor, la Aplicación se reiniciará en breves segundos.",
   "change-privacy": "Nueva Política de Privacidad: ",
+  "addressbook": {
+    "title": "Libreta de Direcciones"
+  },
   "change-privacy-legend": ".\nPulsar para revelar los valores ocultos.",
   "txtcopied": "Texto copiado al Portapapeles",
   "insight": {
@@ -67,6 +70,7 @@
     "fundpools": "Agrupaciones de Fondos",
     "insight": "Visión Financiera",
     "loadwalletfromseed-basic": "Restaurar monedero (Avanzado)",
+    "addressbook": "Libreta de Direcciones",
     "restoremainnet-error": "Esta opción está solamente disponible para la Red: 'Mainnet'.",
     "changeservernew-error": "Error al intentar cambiar al Servidor nuevo: ",
     "readingwallet-error": "Error al intentar leer el monedero activo usando el Servidor nuevo:",

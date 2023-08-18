@@ -57,6 +57,7 @@ import Snackbars from '../../components/Components/Snackbars';
 import SnackbarType from '../AppState/types/SnackbarType';
 import { RPCSeedType } from '../rpc/types/RPCSeedType';
 import { Launching } from '../LoadingApp';
+import AddressBook from '../../components/AddressBook/AddressBook';
 
 const History = React.lazy(() => import('../../components/History'));
 const Send = React.lazy(() => import('../../components/Send'));
@@ -464,6 +465,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       syncReportModalVisible: false,
       poolsModalVisible: false,
       insightModalVisible: false,
+      addressBookModalVisible: false,
     });
   };
 
@@ -795,6 +797,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
         ],
         { cancelable: true, userInterfaceStyle: 'light' },
       );
+    } else if (item === 'Address Book') {
+      this.setState({ addressBookModalVisible: true });
     }
   };
 
@@ -1127,6 +1131,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       ufvkChangeModalVisible,
       ufvkBackupModalVisible,
       ufvkServerModalVisible,
+      addressBookModalVisible,
       snackbars,
     } = this.state;
     const { translate } = this.props;
@@ -1472,6 +1477,21 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 </View>
               }>
               <ComputingTxContent />
+            </Suspense>
+          </Modal>
+
+          <Modal
+            animationType="slide"
+            transparent={false}
+            visible={addressBookModalVisible}
+            onRequestClose={() => this.setState({ addressBookModalVisible: false })}>
+            <Suspense
+              fallback={
+                <View>
+                  <Text>{translate('loading') as string}</Text>
+                </View>
+              }>
+              <AddressBook closeModal={() => this.setState({ insightModalVisible: false })} />
             </Suspense>
           </Modal>
 

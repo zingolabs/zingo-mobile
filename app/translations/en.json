@@ -17,6 +17,9 @@
   "donation": "Thanks for supporting Zingo!",
   "restarting": "Error connecting to the Server, the App will restart in a few seconds.",
   "change-privacy": "New privacy policy: ",
+  "addressbook": {
+    "title": "Address Book"
+  },
   "change-privacy-legend": ".\nTap to reveal the hidden values.",
   "txtcopied": "Text copied to Clipboard",
   "insight": {
@@ -67,6 +70,7 @@
     "fundpools": "Fund Pools",
     "insight": "Financial Insight",
     "loadwalletfromseed-basic": "Restore wallet (Advanced)",
+    "addressbook": "Address Book",
     "restoremainnet-error": "This option is only available for 'Mainnet' servers.",
     "changeservernew-error": "Error trying to change the server to the new one: ",
     "readingwallet-error": "Error trying to read the wallet with the new server:",
