@@ -7,17 +7,11 @@ import { RPCParseAddressType } from '../../../app/rpc/types/RPCParseAddressType'
 import Scanner from '../../Components/Scanner';
 
 type ScannerAddressProps = {
-  updateToField: (
-    address: string | null,
-    amount: string | null,
-    CurrencyAmount: string | null,
-    memo: string | null,
-    includeUAMemo: boolean | null,
-  ) => void;
+  setAddress: (address: string) => void;
   closeModal: () => void;
 };
 
-const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateToField, closeModal }) => {
+const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ setAddress, closeModal }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, netInfo, server, addLastSnackbar } = context;
   const validateAddress = async (scannedAddress: string) => {
@@ -26,7 +20,7 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateTo
       return;
     }
     if (scannedAddress.startsWith('zcash:')) {
-      updateToField(scannedAddress, null, null, null, null);
+      setAddress(scannedAddress);
       closeModal();
       return;
     }
@@ -54,7 +48,7 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateTo
     const valid = resultJSON.status === 'success' && server.chain_name === resultJSON.chain_name;
 
     if (valid) {
-      updateToField(scannedAddress, null, null, null, null);
+      setAddress(scannedAddress);
       closeModal();
     }
   };

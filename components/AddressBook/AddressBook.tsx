@@ -14,7 +14,6 @@ import AbDetail from './components/AbDetail';
 import AbSummaryLine from './components/AbSummaryLine';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
-import AddressBookFileImpl from './AddressBookFileImpl';
 
 type AddressBookProps = {
   closeModal: () => void;
@@ -22,7 +21,7 @@ type AddressBookProps = {
 
 const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, language, addLastSnackbar } = context;
+  const { translate, language } = context;
   moment.locale(language);
 
   const { colors } = useTheme() as unknown as ThemeType;
@@ -31,13 +30,16 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal }) 
   const [addressBookSorted, setAddressBookSorted] = useState<AddressBookFileClass[]>([]);
 
   const [currentItem, setCurrentItem] = useState<number | null>(null);
-  const [disabled, setDisabled] = useState<boolean>();
   const [titleViewHeight, setTitleViewHeight] = useState(0);
 
   const slideAnim = useRef(new Animated.Value(0)).current;
 
   const fetchAddressBookSorted = useMemo(async () => {
-    const addressBook = await AddressBookFileImpl.readAddressBook();
+    //const addressBook = await AddressBookFileImpl.readAddressBook();
+    const addressBook = [
+      { address: 'lasikdvjlsdivlsdvmlsdvmjslkdvmslkvlskdvlskdvlskvmlskmv', label: 'pepe' },
+      { address: 'hajdcnklasdclakscnmlakcnlaksclakscmlaskcalkialkkfialkfkalfkalfkajf', label: 'lolo' },
+    ];
     return addressBook.slice(0, numTx).sort((a, b) => {
       const nA = a.label.toUpperCase();
       const nB = b.label.toUpperCase();
@@ -91,7 +93,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal }) 
     setCurrentItem(-1);
   };
 
-  //console.log('render History - 4');
+  console.log('render Address Book - 4', currentItem);
 
   return (
     <SafeAreaView
@@ -109,7 +111,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal }) 
             setTitleViewHeight(height);
           }}>
           <Header
-            title={translate('settings.title') as string}
+            title={translate('addressbook.title') as string}
             noBalance={true}
             noSyncingStatus={true}
             noDrawMenu={true}
@@ -119,7 +121,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal }) 
       </Animated.View>
 
       <ScrollView
-        testID="settings.scrollView"
+        testID="addressbook.scrollView"
         style={{ maxHeight: '85%' }}
         contentContainerStyle={{
           flexDirection: 'column',
@@ -128,12 +130,20 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal }) 
         }}>
         {addressBookSorted.flatMap((aBItem, index) => {
           return (
-            <AbSummaryLine
-              index={index}
-              key={`${index}-${aBItem.label}`}
-              item={aBItem}
-              setCurrentItem={(idx: number) => setCurrentItem(idx)}
-            />
+            <View key={`container-${index}-${aBItem.label}`}>
+              {currentItem === index ? (
+                <AbDetail index={index} key={`detail-${index}-${aBItem.label}`} item={aBItem} />
+              ) : (
+                <AbSummaryLine
+                  index={index}
+                  key={`line-${index}-${aBItem.label}`}
+                  item={aBItem}
+                  setCurrentItem={(idx: number) => {
+                    setCurrentItem(idx);
+                  }}
+                />
+              )}
+            </View>
           );
         })}
         {loadMoreButton ? (
@@ -176,15 +186,11 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal }) 
         }}>
         <Button
           testID="addressbook.button.new"
-          disabled={disabled}
           type="Primary"
           title={translate('addressbook.new') as string}
-          onPress={async () => {
-            await newAddressBookItem();
-          }}
+          onPress={() => newAddressBookItem()}
         />
         <Button
-          disabled={disabled}
           type="Secondary"
           title={translate('cancel') as string}
           style={{ marginLeft: 10 }}

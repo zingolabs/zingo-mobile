@@ -177,6 +177,13 @@ exports[`Component LoadedApp - test LoadedApp - snapshot 1`] = `
       transparent={false}
       visible={false}
     />
+    <Modal
+      animationType="slide"
+      hardwareAccelerated={false}
+      onRequestClose={[Function]}
+      transparent={false}
+      visible={false}
+    />
     <View />
     <MockedBottomTabNavigator
       initialRouteName="text traslated"

@@ -1,71 +1,36 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext } from 'react';
-import { View } from 'react-native';
+import React from 'react';
+import { View, TouchableOpacity } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faArrowDown, faArrowUp, faRefresh } from '@fortawesome/free-solid-svg-icons';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import { faAddressCard, faQrcode, faTrashCan, faPencil } from '@fortawesome/free-solid-svg-icons';
+//import { TouchableOpacity } from 'react-native-gesture-handler';
 
-import ZecAmount from '../../Components/ZecAmount';
 import FadeText from '../../Components/FadeText';
-import { TransactionType } from '../../../app/AppState';
+import { AddressBookFileClass } from '../../../app/AppState';
 import Utils from '../../../app/utils';
 import { ThemeType } from '../../../app/types';
-import moment from 'moment';
-import 'moment/locale/es';
-import { ContextAppLoaded } from '../../../app/context';
+//import { ContextAppLoaded } from '../../../app/context';
 
 type AbSummaryLineProps = {
   index: number;
-  month: string;
-  tx: TransactionType;
-  setTxDetail: (t: TransactionType) => void;
-  setTxDetailModalShowing: (b: boolean) => void;
+  item: AddressBookFileClass;
+  setCurrentItem: (b: number) => void;
 };
-const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
-  index,
-  tx,
-  month,
-  setTxDetail,
-  setTxDetailModalShowing,
-}) => {
-  const context = useContext(ContextAppLoaded);
-  const { translate, language, privacy, info } = context;
+const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({ index, item, setCurrentItem }) => {
+  //const context = useContext(ContextAppLoaded);
+  //const { translate, privacy, info } = context;
   const { colors } = useTheme() as unknown as ThemeType;
 
-  const amountColor =
-    tx.confirmations === 0 ? colors.primaryDisabled : (tx.amount || 0) > 0 ? colors.primary : colors.text;
+  const displayAddress = item.address ? Utils.trimToSmall(item.address, 7) : 'Unknown';
 
-  const txIcon = tx.confirmations === 0 ? faRefresh : (tx.amount || 0) >= 0 ? faArrowDown : faArrowUp;
-  moment.locale(language);
-
-  const displayAddress =
-    tx.detailedTxns && tx.detailedTxns.length > 0 && tx.detailedTxns[0].address
-      ? Utils.trimToSmall(tx.detailedTxns[0].address, 7)
-      : 'Unknown';
-
-  //console.log('render TxSummaryLine - 5', index);
+  console.log('render Ab SummaryLine - 5', index);
 
   return (
-    <View testID={`transactionList.${index + 1}`} style={{ display: 'flex', flexDirection: 'column' }}>
-      {month !== '' && (
-        <View
-          style={{
-            paddingLeft: 15,
-            paddingTop: 5,
-            paddingBottom: 5,
-            borderTopWidth: 1,
-            borderBottomWidth: 1,
-            borderColor: colors.card,
-            backgroundColor: colors.background,
-          }}>
-          <FadeText>{month}</FadeText>
-        </View>
-      )}
+    <View testID={`addressBookList.${index + 1}`} style={{ display: 'flex', flexDirection: 'column' }}>
       <TouchableOpacity
         onPress={() => {
-          setTxDetail(tx);
-          setTxDetailModalShowing(true);
+          setCurrentItem(index);
         }}>
         <View
           style={{
@@ -76,29 +41,22 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
             borderBottomWidth: 1,
             borderBottomColor: colors.border,
           }}>
-          <FontAwesomeIcon
-            style={{ marginLeft: 5, marginRight: 5, marginTop: 5 }}
-            size={24}
-            icon={txIcon}
-            color={amountColor}
-          />
-          <View style={{ display: 'flex' }}>
-            <FadeText style={{ fontSize: 18 }}>{displayAddress}</FadeText>
-            <View style={{ display: 'flex', flexDirection: 'row' }}>
-              <FadeText>
-                {tx.type === 'sent' ? (translate('history.sent') as string) : (translate('history.receive') as string)}
-              </FadeText>
-              <FadeText>{tx.time ? moment((tx.time || 0) * 1000).format('MMM D, h:mm a') : '--'}</FadeText>
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'flex-start' }}>
+            <View style={{ flexDirection: 'row', marginBottom: 5 }}>
+              <FontAwesomeIcon style={{ marginHorizontal: 10 }} size={24} icon={faAddressCard} color={colors.zingo} />
+              <FadeText style={{ fontSize: 18, marginHorizontal: 10, color: colors.primary }}>{item.label}</FadeText>
+            </View>
+            <View style={{ flexDirection: 'row' }}>
+              <FontAwesomeIcon style={{ marginHorizontal: 10 }} size={24} icon={faQrcode} color={colors.zingo} />
+              <FadeText style={{ fontSize: 18, marginHorizontal: 10 }}>{displayAddress}</FadeText>
             </View>
           </View>
-          <ZecAmount
-            style={{ flexGrow: 1, alignSelf: 'baseline', justifyContent: 'flex-end', paddingRight: 5 }}
-            size={18}
-            currencyName={info.currencyName ? info.currencyName : ''}
-            color={amountColor}
-            amtZec={tx.amount}
-            privacy={privacy}
-          />
+          <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
+            <FontAwesomeIcon style={{}} size={24} icon={faPencil} color={colors.primary} />
+          </View>
+          <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
+            <FontAwesomeIcon style={{}} size={24} icon={faTrashCan} color={colors.primary} />
+          </View>
         </View>
       </TouchableOpacity>
     </View>

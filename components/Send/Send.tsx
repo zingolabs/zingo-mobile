@@ -461,7 +461,12 @@ const Send: React.FunctionComponent<SendProps> = ({
         transparent={false}
         visible={qrcodeModalVisble}
         onRequestClose={() => setQrcodeModalVisible(false)}>
-        <ScannerAddress updateToField={updateToField} closeModal={() => setQrcodeModalVisible(false)} />
+        <ScannerAddress
+          setAddress={(a: string) => {
+            updateToField(a, null, null, null, null);
+          }}
+          closeModal={() => setQrcodeModalVisible(false)}
+        />
       </Modal>
 
       <Modal

@@ -1,256 +1,100 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState } from 'react';
-import { View, ScrollView, TouchableOpacity, SafeAreaView, Linking, Text } from 'react-native';
-import Clipboard from '@react-native-community/clipboard';
-import moment from 'moment';
-import 'moment/locale/es';
+import { View, TextInput } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
-import { TransactionType, TxDetailType } from '../../../app/AppState';
-import Utils from '../../../app/utils';
-import RegText from '../../Components/RegText';
-import ZecAmount from '../../Components/ZecAmount';
-import FadeText from '../../Components/FadeText';
-import Button from '../../Components/Button';
+import { AddressBookFileClass } from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
+import RegText from '../../Components/RegText';
 import { ContextAppLoaded } from '../../../app/context';
-import Header from '../../Header';
-import BoldText from '../../Components/BoldText';
+import InputTextAddress from '../../Components/InputTextAddress';
+import { ZcashURITargetClass, parseZcashURI } from '../../../app/uris';
 
 type AbDetailProps = {
-  tx: TransactionType;
-  closeModal: () => void;
-  set_privacy_option: (name: 'privacy', value: boolean) => Promise<void>;
+  index: number;
+  item: AddressBookFileClass;
 };
-
-const AbDetail: React.FunctionComponent<AbDetailProps> = ({ tx, closeModal, set_privacy_option }) => {
+const AbDetail: React.FunctionComponent<AbDetailProps> = ({ index, item }) => {
   const context = useContext(ContextAppLoaded);
-  const { info, translate, language, privacy, addLastSnackbar, server } = context;
+  const { translate, server, addLastSnackbar } = context;
   const { colors } = useTheme() as unknown as ThemeType;
-  const spendColor =
-    tx.confirmations === 0 ? colors.primaryDisabled : (tx.amount || 0) > 0 ? colors.primary : colors.text;
+  const [label, setLabel] = useState<string>(item.label);
+  const [address, setAddress] = useState<string>(item.address);
 
-  const [expandAddress, setExpandAddress] = useState(false);
-  const [expandTxid, setExpandTxid] = useState(false);
-  moment.locale(language);
-
-  const sum =
-    (tx.detailedTxns && tx.detailedTxns.reduce((s: number, d: TxDetailType) => s + (d.amount ? d.amount : 0), 0)) || 0;
-  let fee = 0;
-  // normal case: spend 1600 fee 1000 sent 600
-  if (tx.type === 'sent' && Math.abs(tx.amount) > Math.abs(sum)) {
-    fee = Math.abs(tx.amount) - Math.abs(sum);
-  }
-  // self-send case: spend 1000 fee 1000 sent 0
-  // this is temporary until we have a new field in 'list' object, called: fee.
-  if (tx.type === 'sent' && Math.abs(tx.amount) <= Math.abs(sum)) {
-    fee = Math.abs(tx.amount);
-  }
-
-  const handleTxIDClick = (txid?: string) => {
-    if (!txid) {
+  const updateAddress = async (addr: string) => {
+    if (!addr) {
       return;
     }
+    let newAddress: string = addr;
+    // Attempt to parse as URI if it starts with zcash
+    if (addr.startsWith('zcash:')) {
+      const target: string | ZcashURITargetClass = await parseZcashURI(addr, translate, server);
+      //console.log(targets);
 
-    const url = Utils.getBlockExplorerTxIDURL(txid, server.chain_name);
-    Linking.canOpenURL(url).then(supported => {
-      if (supported) {
-        Linking.openURL(url);
+      if (typeof target !== 'string') {
+        // redo the to addresses
+        [target].forEach(tgt => {
+          newAddress = tgt.address || '';
+        });
+
+        setAddress(newAddress);
+        return;
       } else {
-        console.log("Don't know how to open URI: " + url);
+        // Show the error message as a toast
+        addLastSnackbar({ message: target, type: 'Primary' });
+        return;
       }
-    });
+    } else {
+      newAddress = addr.replace(/[ \t\n\r]+/g, ''); // Remove spaces
+    }
+
+    setAddress(newAddress);
   };
 
+  console.log('render Ab Detail - 5', index);
+
   return (
-    <SafeAreaView
-      style={{
-        display: 'flex',
-        justifyContent: 'flex-start',
-        alignItems: 'stretch',
-        height: '100%',
-        backgroundColor: colors.background,
-      }}>
-      <Header
-        title={translate('history.details') as string}
-        noBalance={true}
-        noSyncingStatus={true}
-        noDrawMenu={true}
-        set_privacy_option={set_privacy_option}
-        addLastSnackbar={addLastSnackbar}
-      />
-      <ScrollView
-        showsVerticalScrollIndicator={true}
-        persistentScrollbar={true}
-        indicatorStyle={'white'}
-        contentContainerStyle={{
-          flexDirection: 'column',
-          alignItems: 'stretch',
+    <View testID={`addressBookDetail.${index + 1}`} style={{ display: 'flex', flexDirection: 'column' }}>
+      <RegText style={{ marginTop: 10, paddingHorizontal: 10 }}>{translate('addressbook.label') as string}</RegText>
+      <View
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
           justifyContent: 'flex-start',
+          paddingHorizontal: 10,
+          marginTop: 10,
         }}>
         <View
+          accessible={true}
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            margin: 25,
-            padding: 10,
+            flexGrow: 1,
             borderWidth: 1,
-            borderRadius: 10,
-            borderColor: colors.border,
+            borderRadius: 5,
+            borderColor: colors.text,
+            minWidth: 48,
+            minHeight: 48,
+            maxHeight: 150,
           }}>
-          <BoldText style={{ textAlign: 'center', textTransform: 'capitalize', color: spendColor }}>
-            {!!tx.type &&
-              (tx.type === 'sent' ? (translate('history.sent') as string) : (translate('history.receive') as string))}
-          </BoldText>
-          <ZecAmount
-            currencyName={info.currencyName ? info.currencyName : ''}
-            size={36}
-            amtZec={Math.abs(tx.amount)}
-            privacy={privacy}
-            smallPrefix={true}
+          <TextInput
+            testID="addressbook.label-field"
+            style={{
+              color: colors.text,
+              fontWeight: '600',
+              fontSize: 18,
+              minWidth: 48,
+              minHeight: 48,
+              marginLeft: 5,
+              backgroundColor: 'transparent',
+            }}
+            value={label}
+            onChangeText={(text: string) => setLabel(text)}
+            editable={true}
           />
         </View>
-
-        <View style={{ margin: 10 }}>
-          <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
-            <View style={{ display: 'flex' }}>
-              <FadeText>{translate('history.time') as string}</FadeText>
-              <RegText>{tx.time ? moment((tx.time || 0) * 1000).format('YYYY MMM D h:mm a') : '--'}</RegText>
-            </View>
-            <View style={{ display: 'flex', alignItems: 'flex-end' }}>
-              <FadeText>{translate('history.confirmations') as string}</FadeText>
-              <RegText>{tx.confirmations ? tx.confirmations.toString() : '-'}</RegText>
-            </View>
-          </View>
-
-          <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: 10 }}>
-            <FadeText>{translate('history.txid') as string}</FadeText>
-            <TouchableOpacity
-              onPress={() => {
-                if (tx.txid) {
-                  Clipboard.setString(tx.txid);
-                  addLastSnackbar({
-                    message: translate('history.txcopied') as string,
-                    type: 'Primary',
-                    duration: 'short',
-                  });
-                  setExpandTxid(true);
-                }
-              }}>
-              {!tx.txid && <RegText>{'Unknown'}</RegText>}
-              {!expandTxid && !!tx.txid && <RegText>{Utils.trimToSmall(tx.txid, 10)}</RegText>}
-              {expandTxid && !!tx.txid && (
-                <>
-                  <RegText>{tx.txid}</RegText>
-                  {server.chain_name !== 'regtest' && (
-                    <TouchableOpacity onPress={() => handleTxIDClick(tx.txid)}>
-                      <Text style={{ color: colors.text, textDecorationLine: 'underline', margin: 15 }}>
-                        {translate('history.viewexplorer') as string}
-                      </Text>
-                    </TouchableOpacity>
-                  )}
-                </>
-              )}
-            </TouchableOpacity>
-          </View>
-
-          {fee > 0 && (
-            <View style={{ display: 'flex', marginTop: 10 }}>
-              <FadeText>{translate('history.txfee') as string}</FadeText>
-              <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                <ZecAmount
-                  amtZec={fee}
-                  size={18}
-                  currencyName={info.currencyName ? info.currencyName : ''}
-                  privacy={privacy}
-                />
-              </View>
-            </View>
-          )}
-
-          {tx.detailedTxns.map((txd: TxDetailType) => {
-            // 30 characters per line
-            const numLines = txd.address.length < 40 ? 2 : txd.address.length / 30;
-
-            return (
-              <View
-                key={txd.address}
-                style={{
-                  display: 'flex',
-                  marginTop: 10,
-                  paddingBottom: 15,
-                  borderTopColor: colors.card,
-                  borderTopWidth: 1,
-                  borderBottomColor: colors.card,
-                  borderBottomWidth: 1,
-                }}>
-                <View style={{ marginTop: 10 }}>
-                  <FadeText>{translate('history.address') as string}</FadeText>
-
-                  <TouchableOpacity
-                    onPress={() => {
-                      if (txd.address) {
-                        Clipboard.setString(txd.address);
-                        addLastSnackbar({
-                          message: translate('history.addresscopied') as string,
-                          type: 'Primary',
-                          duration: 'short',
-                        });
-                        setExpandAddress(true);
-                      }
-                    }}>
-                    <View style={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap' }}>
-                      {!txd.address && <RegText>{'Unknown'}</RegText>}
-                      {!expandAddress && !!txd.address && <RegText>{Utils.trimToSmall(txd.address, 10)}</RegText>}
-                      {expandAddress &&
-                        !!txd.address &&
-                        Utils.splitStringIntoChunks(txd.address, Number(numLines.toFixed(0))).map(
-                          (c: string, idx: number) => <RegText key={idx}>{c}</RegText>,
-                        )}
-                    </View>
-                  </TouchableOpacity>
-                </View>
-
-                <View style={{ marginTop: 10 }}>
-                  <FadeText>{translate('history.amount') as string}</FadeText>
-                  <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <ZecAmount
-                      amtZec={txd.amount}
-                      size={18}
-                      currencyName={info.currencyName ? info.currencyName : ''}
-                      privacy={privacy}
-                    />
-                  </View>
-                </View>
-
-                {txd.memo && (
-                  <View style={{ marginTop: 10 }}>
-                    <FadeText>{translate('history.memo') as string}</FadeText>
-                    <TouchableOpacity
-                      onPress={() => {
-                        if (txd.memo) {
-                          Clipboard.setString(txd.memo);
-                          addLastSnackbar({
-                            message: translate('history.memocopied') as string,
-                            type: 'Primary',
-                            duration: 'short',
-                          });
-                        }
-                      }}>
-                      <RegText>{txd.memo}</RegText>
-                    </TouchableOpacity>
-                  </View>
-                )}
-              </View>
-            );
-          })}
-        </View>
-      </ScrollView>
-      <View style={{ flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', margin: 10 }}>
-        <Button type="Secondary" title={translate('close') as string} onPress={closeModal} />
       </View>
-    </SafeAreaView>
+      <InputTextAddress address={address} setAddress={updateAddress} />
+    </View>
   );
 };
 
-export default AbDetail;
+export default React.memo(AbDetail);

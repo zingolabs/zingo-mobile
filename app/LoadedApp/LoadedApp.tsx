@@ -1491,7 +1491,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                   <Text>{translate('loading') as string}</Text>
                 </View>
               }>
-              <AddressBook closeModal={() => this.setState({ insightModalVisible: false })} />
+              <AddressBook closeModal={() => this.setState({ addressBookModalVisible: false })} />
             </Suspense>
           </Modal>
 
