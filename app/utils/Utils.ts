@@ -163,8 +163,14 @@ export default class Utils {
       .replace(new RegExp('_', 'g'), groupingSeparator);
   }
 
-  static getBlockExplorerTxIDURL(txid: string): string {
-    return `https://blockchair.com/zcash/transaction/${txid}`;
+  static getBlockExplorerTxIDURL(txid: string, chain_name: 'main' | 'test' | 'regtest'): string {
+    if (chain_name === 'test') {
+      return `https://testnet.zcashblockexplorer.com/transactions/${txid}`;
+    } else {
+      return `https://zcashblockexplorer.com/transactions/${txid}`;
+    }
+    // updated a new server
+    //return `https://blockchair.com/zcash/transaction/${txid}`;
   }
 
   static generateColorList(numColors: number): string[] {

@@ -25,7 +25,7 @@ type TxDetailProps = {
 
 const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_privacy_option }) => {
   const context = useContext(ContextAppLoaded);
-  const { info, translate, language, privacy, addLastSnackbar } = context;
+  const { info, translate, language, privacy, addLastSnackbar, server } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const spendColor =
     tx.confirmations === 0 ? colors.primaryDisabled : (tx.amount || 0) > 0 ? colors.primary : colors.text;
@@ -52,12 +52,12 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
       return;
     }
 
-    const url = Utils.getBlockExplorerTxIDURL(txid);
+    const url = Utils.getBlockExplorerTxIDURL(txid, server.chain_name);
     Linking.canOpenURL(url).then(supported => {
       if (supported) {
         Linking.openURL(url);
       } else {
-        //console.log("Don't know how to open URI: " + url);
+        console.log("Don't know how to open URI: " + url);
       }
     });
   };
@@ -142,11 +142,13 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
               {expandTxid && !!tx.txid && (
                 <>
                   <RegText>{tx.txid}</RegText>
-                  <TouchableOpacity onPress={() => handleTxIDClick(tx.txid)}>
-                    <Text style={{ color: colors.text, textDecorationLine: 'underline', margin: 15 }}>
-                      {translate('history.viewexplorer') as string}
-                    </Text>
-                  </TouchableOpacity>
+                  {server.chain_name !== 'regtest' && (
+                    <TouchableOpacity onPress={() => handleTxIDClick(tx.txid)}>
+                      <Text style={{ color: colors.text, textDecorationLine: 'underline', margin: 15 }}>
+                        {translate('history.viewexplorer') as string}
+                      </Text>
+                    </TouchableOpacity>
+                  )}
                 </>
               )}
             </TouchableOpacity>
