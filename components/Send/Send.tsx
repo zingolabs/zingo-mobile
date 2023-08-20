@@ -290,37 +290,25 @@ const Send: React.FunctionComponent<SendProps> = ({
     const toAddr = newToAddr;
 
     if (address !== null) {
+      toAddr.to = address;
       // Attempt to parse as URI if it starts with zcash
-      if (address.startsWith('zcash:')) {
+      if (address.toLowerCase().startsWith('zcash:')) {
         const target: string | ZcashURITargetClass = await parseZcashURI(address, translate, server);
-        //console.log(targets);
+        console.log(target);
 
         if (typeof target !== 'string') {
           // redo the to addresses
-          let uriToAddr: ToAddrClass = new ToAddrClass(0);
           [target].forEach(tgt => {
-            const to = new ToAddrClass(Utils.getNextToAddrID());
-
-            to.to = tgt.address || '';
-            to.amount = Utils.maxPrecisionTrimmed(tgt.amount || 0);
-            to.memo = tgt.memoString || '';
-
-            uriToAddr = to;
+            toAddr.to = tgt.address || '';
+            toAddr.amount = Utils.maxPrecisionTrimmed(tgt.amount || 0);
+            toAddr.memo = tgt.memoString || '';
           });
-
-          newState.toaddr = uriToAddr;
-
-          setSendPageState(newState);
-          return;
         } else {
           // Show the error message as a toast
           addLastSnackbar({ message: target, type: 'Primary' });
-          return;
+          //return;
         }
       } else {
-        if (!toAddr) {
-          return;
-        }
         toAddr.to = address.replace(/[ \t\n\r]+/g, ''); // Remove spaces
       }
     }

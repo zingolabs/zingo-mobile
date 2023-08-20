@@ -19,7 +19,7 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ setAddre
       addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
       return;
     }
-    if (scannedAddress.startsWith('zcash:')) {
+    if (scannedAddress.toLowerCase().startsWith('zcash:')) {
       setAddress(scannedAddress);
       closeModal();
       return;

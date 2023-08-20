@@ -27,7 +27,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({ index, item }) => {
     }
     let newAddress: string = addr;
     // Attempt to parse as URI if it starts with zcash
-    if (addr.startsWith('zcash:')) {
+    if (addr.toLowerCase().startsWith('zcash:')) {
       const target: string | ZcashURITargetClass = await parseZcashURI(addr, translate, server);
       //console.log(targets);
 
@@ -36,13 +36,10 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({ index, item }) => {
         [target].forEach(tgt => {
           newAddress = tgt.address || '';
         });
-
-        setAddress(newAddress);
-        return;
       } else {
         // Show the error message as a toast
         addLastSnackbar({ message: target, type: 'Primary' });
-        return;
+        //return;
       }
     } else {
       newAddress = addr.replace(/[ \t\n\r]+/g, ''); // Remove spaces

@@ -15,10 +15,10 @@ const parseZcashURI = async (
   }
 
   const parsedUri = new Url(uri, true);
-  if (!parsedUri || parsedUri.protocol !== 'zcash:') {
+  if (!parsedUri || parsedUri.protocol.toLowerCase() !== 'zcash:') {
     return translate('uris.baduri') as string;
   }
-  //console.log(parsedUri);
+  console.log(parsedUri);
 
   const targets: Map<number, ZcashURITargetClass> = new Map();
 
@@ -89,7 +89,7 @@ const parseZcashURI = async (
         const result: string = await RPCModule.execute('parse_address', value);
         if (result) {
           if (result.toLowerCase().startsWith('error') || result.toLowerCase() === 'null') {
-            return translate('uris.parseerror') as string;
+            return translate('uris.notvalid') as string;
           }
         } else {
           return translate('uris.parseerror') as string;
