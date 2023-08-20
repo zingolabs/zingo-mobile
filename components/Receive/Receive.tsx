@@ -220,7 +220,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
       color: string;
     },
   ) => ReactNode = ({ route, focused, color }) => (
-    <View style={{ width: (dimensions.width - 20) / 3, alignItems: 'center' }}>
+    <View style={{ width: (dimensions.width - 20) / (mode === 'basic' ? 1 : 3), alignItems: 'center' }}>
       <RegText
         style={{
           fontWeight: mode === 'basic' ? 'normal' : focused ? 'bold' : 'normal',
