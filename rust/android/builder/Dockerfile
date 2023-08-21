@@ -23,7 +23,8 @@ RUN apt update \
 
 # Install Android NDK
 RUN curl -vfL -o /tmp/android-ndk.zip https://dl.google.com/android/repository/android-ndk-${android_ndk_ver}-linux.zip \
-    && unzip /tmp/android-ndk.zip -d /usr/local/
+    && unzip /tmp/android-ndk.zip -d /usr/local/ \
+    && rm -rf /tmp/android-ndk.zip
 ENV ANDROID_NDK_HOME=/usr/local/android-ndk-${android_ndk_ver}
 ENV NDK_HOME=/usr/local/android-ndk-${android_ndk_ver}
 ENV ANDROID_NDK_ROOT=/usr/local/android-ndk-${android_ndk_ver}
@@ -65,7 +66,8 @@ RUN echo "[target.x86_64-linux-android]" >> $CARGO_HOME/config.toml \
 # Install and setup OpenSSL
 WORKDIR /opt
 RUN curl --proto '=https' --tlsv1.2 https://www.openssl.org/source/openssl-3.0.5.tar.gz -o openssl-3.0.5.tar.gz \
-    && tar xvf openssl-3.0.5.tar.gz
+    && tar xvf openssl-3.0.5.tar.gz \
+    && rm -rf openssl-3.0.5.tar.gz
 ENV OPENSSL_STATIC=yes
 WORKDIR /opt/openssl-3.0.5 
 RUN mkdir x86 \
