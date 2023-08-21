@@ -15,7 +15,7 @@ jobs:
     name: Create cache key
     runs-on: ubuntu-22.04
     container:
-      image: zingodevops/android_builder:stable
+      image: zingodevops/android_builder:001
     env:
       RUSTUP_HOME: /root/.rustup
     outputs:
