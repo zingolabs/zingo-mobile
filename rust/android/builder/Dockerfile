@@ -22,15 +22,14 @@ RUN apt update \
     && update-ca-certificates
 
 # Install Android NDK
-RUN curl -vfL -o /tmp/android-ndk.zip \
-    https://dl.google.com/android/repository/android-ndk-${android_ndk_ver}-linux.zip \
+RUN curl -vfL -o /tmp/android-ndk.zip https://dl.google.com/android/repository/android-ndk-${android_ndk_ver}-linux.zip \
     && unzip /tmp/android-ndk.zip -d /usr/local/
 ENV ANDROID_NDK_HOME=/usr/local/android-ndk-${android_ndk_ver}
 ENV NDK_HOME=/usr/local/android-ndk-${android_ndk_ver}
 ENV ANDROID_NDK_ROOT=/usr/local/android-ndk-${android_ndk_ver}
 ENV PATH=/usr/local/android-ndk-${android_ndk_ver}/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH
 
-# Install Rust and Cargo NDK
+# Install and setup Rust
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 ENV HOME=/root
 ENV CARGO_HOME=$HOME/.cargo
@@ -46,61 +45,56 @@ RUN rustup target add \
     i686-linux-android \
     x86_64-linux-android
 RUN cargo install cargo-ndk
+RUN echo "[target.aarch64-linux-android]" >> $CARGO_HOME/config.toml \
+    && echo "ar = \"llvm-ar\"" >> $CARGO_HOME/config.toml \
+    && echo "linker = \"aarch64-linux-android23-clang\"" >> $CARGO_HOME/config.toml \
+    && echo "" >> $CARGO_HOME/config.toml
+RUN echo "[target.armv7-linux-androideabi]" >> $CARGO_HOME/config.toml \
+    && echo "ar = \"llvm-ar\"" >> $CARGO_HOME/config.toml \
+    && echo "linker = \"armv7a-linux-androideabi23-clang\"" >> $CARGO_HOME/config.toml \
+    && echo "" >> $CARGO_HOME/config.toml
+RUN echo "[target.i686-linux-android]" >> $CARGO_HOME/config.toml \
+    && echo "ar = \"llvm-ar\"" >> $CARGO_HOME/config.toml \
+    && echo "linker = \"i686-linux-android23-clang\"" >> $CARGO_HOME/config.toml \
+    && echo "" >> $CARGO_HOME/config.toml
+RUN echo "[target.x86_64-linux-android]" >> $CARGO_HOME/config.toml \
+    && echo "ar = \"llvm-ar\"" >> $CARGO_HOME/config.toml \
+    && echo "linker = \"x86_64-linux-android23-clang\"" >> $CARGO_HOME/config.toml \
+    && echo "" >> $CARGO_HOME/config.toml
 
-# Setup Cargo
-RUN echo "[target.aarch64-linux-android]" >> $CARGO_HOME/config.toml
-RUN echo "ar = \"llvm-ar\"" >> $CARGO_HOME/config.toml
-RUN echo "linker = \"aarch64-linux-android23-clang\"" >> $CARGO_HOME/config.toml
-RUN echo "" >> $CARGO_HOME/config.toml
-
-RUN echo "[target.armv7-linux-androideabi]" >> $CARGO_HOME/config.toml
-RUN echo "ar = \"llvm-ar\"" >> $CARGO_HOME/config.toml
-RUN echo "linker = \"armv7a-linux-androideabi23-clang\"" >> $CARGO_HOME/config.toml
-RUN echo "" >> $CARGO_HOME/config.toml
-
-RUN echo "[target.i686-linux-android]" >> $CARGO_HOME/config.toml
-RUN echo "ar = \"llvm-ar\"" >> $CARGO_HOME/config.toml
-RUN echo "linker = \"i686-linux-android23-clang\"" >> $CARGO_HOME/config.toml
-RUN echo "" >> $CARGO_HOME/config.toml
-
-RUN echo "[target.x86_64-linux-android]" >> $CARGO_HOME/config.toml
-RUN echo "ar = \"llvm-ar\"" >> $CARGO_HOME/config.toml
-RUN echo "linker = \"x86_64-linux-android23-clang\"" >> $CARGO_HOME/config.toml
-RUN echo "" >> $CARGO_HOME/config.toml
-
-# Setup OpenSSL
+# Install and setup OpenSSL
 WORKDIR /opt
 RUN curl --proto '=https' --tlsv1.2 https://www.openssl.org/source/openssl-3.0.5.tar.gz -o openssl-3.0.5.tar.gz \
     && tar xvf openssl-3.0.5.tar.gz
 ENV OPENSSL_STATIC=yes
-
 WORKDIR /opt/openssl-3.0.5 
 RUN mkdir x86 \
     && mkdir aarch64 \
     && mkdir armv7 \
     && mkdir x86_64
-
 RUN ./Configure -mno-outline-atomics --prefix=/opt/openssl-3.0.5/aarch64  android-arm64 -U__ANDROID_API__ -D__ANDROID_API__=23 \
     && make -j$(nproc) \
     && make -j$(nproc) install \
     && make clean \
     && make distclean
-
 RUN ./Configure --prefix=/opt/openssl-3.0.5/armv7  android-arm -U__ANDROID_API__ -D__ANDROID_API__=23 \
     && make -j$(nproc) \
     && make -j$(nproc) install \
     && make clean \
     && make distclean
-
 RUN ./Configure -DBROKEN_CLANG_ATOMICS --prefix=/opt/openssl-3.0.5/x86  android-x86 -U__ANDROID_API__ -D__ANDROID_API__=23 \
     && make -j$(nproc) \
     && make -j$(nproc) install \
     && make clean \
     && make distclean
-
 RUN ./Configure --prefix=/opt/openssl-3.0.5/x86_64 -U__ANDROID_API__  android-x86_64 -D__ANDROID_API__=23 \
     && make -j$(nproc) \
     && make -j$(nproc) install \
     && make clean \
     && make distclean
+
+# Apt clean up
+RUN apt autoremove -y \
+    && apt clean \
+    && rm -rf /var/lib/apt/lists/*
 

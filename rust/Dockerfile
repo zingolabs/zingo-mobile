@@ -1,4 +1,4 @@
-FROM zingodevops/android_builder:stable as build_android
+FROM zingodevops/android_builder:001
 
 WORKDIR /opt/zingo/rust/android/
 
@@ -29,3 +29,4 @@ RUN AR=llvm-ar LD=ld RANLIB=llvm-ranlib CC=armv7a-linux-androideabi23-clang \
     OPENSSL_DIR=/opt/openssl-3.0.5/armv7 cargo +nightly build -Z build-std \
     --target armv7-linux-androideabi --release
 RUN llvm-strip ../target/armv7-linux-androideabi/release/librust.so
+
