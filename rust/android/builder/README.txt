@@ -5,4 +5,5 @@
  - run `docker login` and fill in the credentials for DockerHub
  - run `docker push zingodevops/android_builder:<new image version number>' to push to DockerHub
  - update the first line of `rust/Dockerfile` to the new image version number
+ - update the files in `.github/workflows/` directory to the new image version number
 
