@@ -52,7 +52,7 @@ jobs:
     if: ${{ needs.check-build-cache.outputs.cache-found == 'failure' }}
     runs-on: ubuntu-22.04
     container:
-      image: zingodevops/android_builder:001
+      image: zingodevops/android_builder:002
     env:
       RUSTUP_HOME: /root/.rustup
     steps:
