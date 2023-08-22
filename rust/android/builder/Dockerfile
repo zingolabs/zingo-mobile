@@ -74,7 +74,7 @@ RUN mkdir x86 \
     && mkdir aarch64 \
     && mkdir armv7 \
     && mkdir x86_64
-// -mno-outline-atomics removed
+# -mno-outline-atomics removed
 RUN ./Configure --prefix=/opt/openssl-3.1.2/aarch64  android-arm64 -U__ANDROID_API__ -D__ANDROID_API__=24 \
     && make -j$(nproc) \
     && make -j$(nproc) install \
@@ -85,7 +85,7 @@ RUN ./Configure --prefix=/opt/openssl-3.1.2/armv7  android-arm -U__ANDROID_API__
     && make -j$(nproc) install \
     && make clean \
     && make distclean
-// -DBROKEN_CLANG_ATOMICS removed
+# -DBROKEN_CLANG_ATOMICS removed
 RUN ./Configure --prefix=/opt/openssl-3.1.2/x86  android-x86 -U__ANDROID_API__ -D__ANDROID_API__=24 \
     && make -j$(nproc) \
     && make -j$(nproc) install \
