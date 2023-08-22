@@ -198,7 +198,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         // url-parse sometimes is too wise, and if you put:
         // server: `http:/zec-server.com:9067` the parser understand this. Good.
         // but this value will be store in the settings and the value is wrong.
-        // so, this function if everything is OK return the URI well formmatted.
+        // so, this function if everything is OK return the URI well formatted.
         // and I save it in the state ASAP.
         if (serverUriParsed !== resultUri) {
           serverUriParsed = resultUri;
