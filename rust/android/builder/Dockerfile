@@ -1,5 +1,5 @@
 FROM debian:bullseye-slim
-ARG android_ndk_ver=r25c
+ARG android_ndk_ver=r21e
 
 # Install dependencies
 RUN apt update \
@@ -22,7 +22,7 @@ RUN apt update \
     && update-ca-certificates
 
 # Install Android NDK
-RUN curl -vfL -o /tmp/android-ndk.zip https://dl.google.com/android/repository/android-ndk-${android_ndk_ver}-linux.zip \
+RUN curl -vfL -o /tmp/android-ndk.zip https://dl.google.com/android/repository/android-ndk-${android_ndk_ver}-linux-x86_64.zip \
     && unzip /tmp/android-ndk.zip -d /usr/local/ \
     && rm -rf /tmp/android-ndk.zip
 ENV ANDROID_NDK_HOME=/usr/local/android-ndk-${android_ndk_ver}
@@ -74,7 +74,8 @@ RUN mkdir x86 \
     && mkdir aarch64 \
     && mkdir armv7 \
     && mkdir x86_64
-RUN ./Configure -mno-outline-atomics --prefix=/opt/openssl-3.0.5/aarch64  android-arm64 -U__ANDROID_API__ -D__ANDROID_API__=23 \
+// -mno-outline-atomics removed
+RUN ./Configure --prefix=/opt/openssl-3.0.5/aarch64  android-arm64 -U__ANDROID_API__ -D__ANDROID_API__=23 \
     && make -j$(nproc) \
     && make -j$(nproc) install \
     && make clean \
@@ -84,7 +85,8 @@ RUN ./Configure --prefix=/opt/openssl-3.0.5/armv7  android-arm -U__ANDROID_API__
     && make -j$(nproc) install \
     && make clean \
     && make distclean
-RUN ./Configure -DBROKEN_CLANG_ATOMICS --prefix=/opt/openssl-3.0.5/x86  android-x86 -U__ANDROID_API__ -D__ANDROID_API__=23 \
+// -DBROKEN_CLANG_ATOMICS removed
+RUN ./Configure --prefix=/opt/openssl-3.0.5/x86  android-x86 -U__ANDROID_API__ -D__ANDROID_API__=23 \
     && make -j$(nproc) \
     && make -j$(nproc) install \
     && make clean \
