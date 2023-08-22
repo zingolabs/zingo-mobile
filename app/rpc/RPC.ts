@@ -751,7 +751,7 @@ export default class RPC {
         //console.log('sync wallet birthday', this.walletBirthday);
         //console.log('sync', this.syncStatusTimerID, 'status', ss);
 
-        // syncronize status
+        // synchronize status
         if (this.syncStatusTimerID) {
           this.setInRefresh(ss.in_progress);
         }
@@ -1413,7 +1413,7 @@ export default class RPC {
         const progress: RPCSendProgressType = await JSON.parse(pro);
         const sendId = progress.id;
 
-        // bacause I don't know what the user are doing, I force every 2 seconds
+        // because I don't know what the user are doing, I force every 2 seconds
         // the interrupt flag to true if the sync_interrupt is false
         if (!progress.sync_interrupt) {
           await RPC.rpc_setInterruptSyncAfterBatch('true');
@@ -1446,7 +1446,7 @@ export default class RPC {
 
         //console.log(`ETA calculated = ${eta}`);
 
-        // syncronize status with inSend
+        // synchronize status with inSend
         this.setInSend(progress.sending);
 
         updatedProgress.progress = progress.progress;

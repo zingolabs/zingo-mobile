@@ -37,7 +37,7 @@ see the [trouble-shooting notes](./TROUBLESHOOTING.md).
 
 Carefully follow the instructions to [setup Android Studio for your
 operating system](https://reactnative.dev/docs/environment-setup).
-It is not neccessary to install watchman or the Android 12 system images.
+It is not necessary to install watchman or the Android 12 system images.
 
 If you do not have a physical device, you can create and start
 a new Android 11, API 30 emulator device compatible

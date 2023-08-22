@@ -113,7 +113,7 @@ def enableHermes = project.ext.react.get("enableHermes", false)
 
 
 /**
- * Whether to enable building a seperate APK for each ABI.
+ * Whether to enable building a separate APK for each ABI.
  *
  * Defaults to false but can be set to true with the project properties flag
  * e.g. ./gradlew assembleDebug -PsplitApk=true

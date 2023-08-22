@@ -51,9 +51,9 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
   }, []);
 
   // ref: https://github.com/zingolabs/zingo-mobile/issues/327
-  // I have to substract 1 here, almost always.
-  // when end block process & last block wallet are iqual, don't substract anything.
-  // when end block process & wallet birthday are iqual, don't substract anything.
+  // I have to subtract 1 here, almost always.
+  // when end block process & last block wallet are equal, don't subtract anything.
+  // when end block process & wallet birthday are equal, don't subtract anything.
   let process_end_block_fixed = 0;
   if (
     syncingStatus.process_end_block &&
