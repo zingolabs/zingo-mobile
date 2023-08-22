@@ -146,7 +146,7 @@
     "privacys": [
       {
         "value": true,
-        "text": "High Privacy, all the sensitive information is hidden. Tap to reveal the hidden value."
+        "text": "High Privacy, all the sensitive information is hidden. Tap to reveal the hidden values."
       },
       {
         "value": false,
