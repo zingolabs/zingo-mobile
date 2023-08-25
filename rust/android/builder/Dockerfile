@@ -1,5 +1,6 @@
 FROM debian:bullseye-slim
-ARG android_ndk_ver=r21e
+ARG android_ndk_ver=r22b
+# 22.1.7171670
 
 # Install dependencies
 RUN apt update \
