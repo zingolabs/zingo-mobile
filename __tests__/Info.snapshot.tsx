@@ -54,7 +54,7 @@ describe('Component Info - test', () => {
       verificationProgress: 0,
       currencyName: 'ZEC',
       solps: 0,
-      defaultFee: 1000,
+      defaultFee: 10000,
       chain_name: 'main',
     };
     state.zecPrice.zecPrice = 33.33;
