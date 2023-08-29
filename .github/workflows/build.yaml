@@ -86,7 +86,7 @@ jobs:
         run: |
           echo "TARGET=i686-linux-android" >> $GITHUB_ENV
           echo "RUSTFLAGS=-Clink-arg=-latomic" >> $GITHUB_ENV
-          echo "CC=" >> $GITHUB_ENV
+          echo "CC=i686-linux-android" >> $GITHUB_ENV
           echo "OPENSSL_PATH=x86" >> $GITHUB_ENV
       
       - name: Set envs for arm64-v8a
@@ -129,7 +129,7 @@ jobs:
           AR: llvm-ar
           LD: ld
           RANLIB: llvm-ranlib
-          CC: ${{ env.CC }}23-clang
+          CC: ${{ env.CC }}24-clang
           OPENSSL_DIR: /opt/openssl-3.1.2/${{ env.OPENSSL_PATH }}
       
       - name: LLVM Strip
