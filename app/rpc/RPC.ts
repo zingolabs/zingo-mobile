@@ -708,7 +708,7 @@ export default class RPC {
       if (fullRescan) {
         this.doRescan()
           .then(result => {
-            //console.log('rescan finished', result);
+            console.log('rescan finished', result);
             if (result && !result.toLowerCase().startsWith('error')) {
               const resultJSON: RPCSyncRescan = JSON.parse(result);
               if (resultJSON.result === 'success' && resultJSON.latest_block) {
@@ -716,15 +716,18 @@ export default class RPC {
               }
             }
           })
-          .catch(error => console.log('rescan error', error))
-          .finally(() => {
-            this.inRefresh = false;
-            this.keepAwake(false);
-          });
+          .catch(error => console.log('rescan error', error));
+        //.finally(() => {
+        // with the new feature shardtree I can get an error here, but
+        // doesn't mean the sync/rescan process is finished, I have to
+        // rely on syncstatus finished instead
+        //this.inRefresh = false;
+        //this.keepAwake(false);
+        //});
       } else {
         this.doSync()
           .then(result => {
-            //console.log('sync finished', result);
+            console.log('sync finished', result);
             if (result && !result.toLowerCase().startsWith('error')) {
               const resultJSON: RPCSyncRescan = JSON.parse(result);
               if (resultJSON.result === 'success' && resultJSON.latest_block) {
@@ -732,11 +735,14 @@ export default class RPC {
               }
             }
           })
-          .catch(error => console.log('sync error', error))
-          .finally(() => {
-            this.inRefresh = false;
-            this.keepAwake(false);
-          });
+          .catch(error => console.log('sync error', error));
+        //.finally(() => {
+        // with the new feature shardtree I can get an error here, but
+        // doesn't mean the sync/rescan process is finished, I have to
+        // rely on syncstatus finished instead
+        //this.inRefresh = false;
+        //this.keepAwake(false);
+        //});
       }
 
       // We need to wait for the sync to finish. The sync is done when
@@ -749,7 +755,28 @@ export default class RPC {
         const ss: RPCSyncStatusType = await JSON.parse(returnStatus);
 
         //console.log('sync wallet birthday', this.walletBirthday);
-        //console.log('sync', this.syncStatusTimerID, 'status', ss);
+        //console.log('sync', this.syncStatusTimerID);
+        console.log(
+          'synced',
+          ss.synced_blocks,
+          'trial_decryptions',
+          ss.trial_decryptions_blocks,
+          'txn_scan',
+          ss.txn_scan_blocks,
+          'witnesses',
+          ss.witnesses_updated,
+          'TOTAL',
+          ss.total_blocks,
+          'batch_num',
+          ss.batch_num,
+          'batch_total',
+          ss.batch_total,
+          'end_block',
+          ss.end_block,
+          'start_block',
+          ss.start_block,
+        );
+        //console.log('--------------------------------------');
 
         // synchronize status
         if (this.syncStatusTimerID) {

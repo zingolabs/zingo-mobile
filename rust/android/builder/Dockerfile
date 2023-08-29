@@ -1,5 +1,6 @@
 FROM debian:bullseye-slim
 ARG android_ndk_ver=r21e
+# 21.4.7075529
 
 # Install dependencies
 RUN apt update \
