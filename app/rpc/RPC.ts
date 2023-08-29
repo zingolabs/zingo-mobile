@@ -718,8 +718,11 @@ export default class RPC {
           })
           .catch(error => console.log('rescan error', error))
           .finally(() => {
-            this.inRefresh = false;
-            this.keepAwake(false);
+            // with the new feature shardtree I can get an error here, but
+            // doesn't mean the sync/rescan process is finished, I have to
+            // rely on syncstatus finished instead
+            //this.inRefresh = false;
+            //this.keepAwake(false);
           });
       } else {
         this.doSync()
@@ -734,8 +737,11 @@ export default class RPC {
           })
           .catch(error => console.log('sync error', error))
           .finally(() => {
-            this.inRefresh = false;
-            this.keepAwake(false);
+            // with the new feature shardtree I can get an error here, but
+            // doesn't mean the sync/rescan process is finished, I have to
+            // rely on syncstatus finished instead
+            //this.inRefresh = false;
+            //this.keepAwake(false);
           });
       }
 
