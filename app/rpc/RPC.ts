@@ -205,6 +205,18 @@ export default class RPC {
       }
       const defaultFeeJSON: RPCDefaultFeeType = await JSON.parse(defaultFeeStr);
 
+      let zingolibStr: string = await RPCModule.execute('version', '');
+      if (zingolibStr) {
+        if (zingolibStr.toLowerCase().startsWith('error')) {
+          console.log(`Error zingolib version ${zingolibStr}`);
+          zingolibStr = '<error>';
+        }
+      } else {
+        console.log('Internal Error zingolib version');
+        zingolibStr = '<none>';
+      }
+      //const zingolibJSON = await JSON.parse(zingolibStr);
+
       const info: InfoType = {
         chain_name: infoJSON.chain_name,
         latestBlock: infoJSON.latest_block_height,
@@ -215,6 +227,7 @@ export default class RPC {
         currencyName: infoJSON.chain_name === 'main' ? 'ZEC' : 'TAZ',
         solps: 0,
         defaultFee: defaultFeeJSON.defaultfee / 10 ** 8 || Utils.getFallbackDefaultFee(),
+        zingolib: zingolibStr,
       };
 
       return info;

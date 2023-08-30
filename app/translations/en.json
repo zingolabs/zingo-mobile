@@ -215,7 +215,8 @@
     "tablet": "Tablet",
     "phone": "Phone",
     "errorgemini": "Error fetching the price from the Internet.",
-    "errorrpcmodule": "Internal Error fetching the price from the Internet"
+    "errorrpcmodule": "Internal Error fetching the price from the Internet",
+    "zingolib": "Zingolib version"
   },
   "rescan": {
     "title": "Rescan",

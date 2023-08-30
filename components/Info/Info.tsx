@@ -93,6 +93,7 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal, setZecPrice }) =
               </View>
             </View>
           )}
+          <DetailLine label={translate('info.zingolib') as string} value={info.zingolib} />
         </View>
       </ScrollView>
 
