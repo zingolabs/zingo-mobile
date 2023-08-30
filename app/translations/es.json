@@ -215,7 +215,8 @@
     "tablet": "Tableta",
     "phone": "Teléfono",
     "errorgemini": "Error extrayendo el precio de Internet.",
-    "errorrpcmodule": "Error Interno extrayendo el precio de Internet."
+    "errorrpcmodule": "Error Interno extrayendo el precio de Internet.",
+    "zingolib": "Versión de Zingolib"
   },
   "rescan": {
     "title": "Re-Escanear",
