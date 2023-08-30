@@ -64,7 +64,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   // 30 characters per line
   const numLines = addressKind === 't' ? 2 : address.length / 30;
   const numChars = addressKind === 't' ? 5 : 12;
-  const chunks = Utils.splitStringIntoChunks(address, Number(numLines.toFixed(0)));
+  const chunks = Utils.splitStringIntoChunks(address, parseInt(numLines.toFixed(0), 10));
 
   const doCopy = () => {
     if (address) {

@@ -52,6 +52,7 @@ export const defaultAppStateLoading: AppStateLoading = {
   mode: 'basic',
   snackbars: [] as SnackbarType[],
   addLastSnackbar: () => {},
+  customFee: 0,
 };
 
 export const ContextAppLoading = React.createContext(defaultAppStateLoading);

@@ -204,7 +204,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
                       {!expandAddress && !!txd.address && <RegText>{Utils.trimToSmall(txd.address, 10)}</RegText>}
                       {expandAddress &&
                         !!txd.address &&
-                        Utils.splitStringIntoChunks(txd.address, Number(numLines.toFixed(0))).map(
+                        Utils.splitStringIntoChunks(txd.address, parseInt(numLines.toFixed(0), 10)).map(
                           (c: string, idx: number) => <RegText key={idx}>{c}</RegText>,
                         )}
                     </View>

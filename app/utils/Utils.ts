@@ -92,6 +92,23 @@ export default class Utils {
     return 0.0001;
   }
 
+  static getFee(defaultFee: number, customFee: number): number {
+    if (!defaultFee && !customFee) {
+      return this.getFallbackDefaultFee();
+    }
+    if (customFee === 0) {
+      // the user didn't change this prop in settings
+      return defaultFee;
+    } else if (customFee < defaultFee) {
+      // the user changed it, but zingolib in some update now give a bigger fee,
+      // zingo-mobile pick up the bigger value between them.
+      return defaultFee;
+    } else {
+      // custom fee should be bigger than default fee.
+      return customFee;
+    }
+  }
+
   static getDonationAddress(chain_name: 'main' | 'test' | 'regtest'): string {
     if (chain_name !== 'main') {
       return 'ztestsapling...';
@@ -147,7 +164,7 @@ export default class Utils {
   static parseLocaleFloat(stringNumber: string): number {
     const { decimalSeparator, groupingSeparator } = getNumberFormatSettings();
 
-    return Number(
+    return parseFloat(
       stringNumber
         .replace(new RegExp(`\\${groupingSeparator}`, 'g'), '')
         .replace(new RegExp(`\\${decimalSeparator}`), '.'),

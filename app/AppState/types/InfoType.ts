@@ -7,7 +7,7 @@ export default interface InfoType {
   verificationProgress: number;
   currencyName: string;
   solps: number;
-  defaultFee: number;
+  defaultFee: number; // here is a float number, like 0.0001
   zingolib: string;
   // eslint-disable-next-line semi
 }

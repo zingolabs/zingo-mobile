@@ -68,6 +68,7 @@ export default function LoadingApp(props: LoadingAppProps) {
   const [mode, setMode] = useState<'basic' | 'advanced'>('advanced'); // by default advanced
   const [background, setBackground] = useState<BackgroundType>({ batches: 0, date: 0 });
   const [loading, setLoading] = useState<boolean>(true);
+  const [customFee, setCustomFee] = useState<number>(0);
   const file = useMemo(
     () => ({
       en: en,
@@ -131,10 +132,8 @@ export default function LoadingApp(props: LoadingAppProps) {
       }
       if (settings.server) {
         setServer(settings.server);
-        //console.log('settings', settings.server);
       } else {
         await SettingsFileImpl.writeSettings('server', server);
-        //console.log('NO settings', settings.server);
       }
       if (settings.sendAll === true || settings.sendAll === false) {
         setSendAll(settings.sendAll);
@@ -145,6 +144,11 @@ export default function LoadingApp(props: LoadingAppProps) {
         setPrivacy(settings.privacy);
       } else {
         await SettingsFileImpl.writeSettings('privacy', privacy);
+      }
+      if (settings.customFee >= 0) {
+        setCustomFee(settings.customFee);
+      } else {
+        await SettingsFileImpl.writeSettings('customFee', customFee);
       }
 
       // reading background task info
@@ -188,6 +192,7 @@ export default function LoadingApp(props: LoadingAppProps) {
         privacy={privacy}
         mode={mode}
         background={background}
+        customFee={customFee}
       />
     );
   }
@@ -205,6 +210,7 @@ type LoadingAppClassProps = {
   privacy: boolean;
   mode: 'basic' | 'advanced';
   background: BackgroundType;
+  customFee: number;
 };
 
 export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
@@ -243,6 +249,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
       netInfo: netInfo,
       actionButtonsDisabled: !netInfo.isConnected ? true : false,
       addLastSnackbar: this.addLastSnackbar,
+      customFee: props.customFee,
     };
 
     this.dim = {} as EmitterSubscription;

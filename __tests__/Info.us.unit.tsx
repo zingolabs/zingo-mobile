@@ -8,6 +8,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react-native';
 import Info from '../components/Info';
 import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
+import Utils from '../app/utils';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -54,7 +55,7 @@ describe('Component Info - test', () => {
       verificationProgress: 0,
       currencyName: 'ZEC',
       solps: 0,
-      defaultFee: 10000,
+      defaultFee: Utils.getFallbackDefaultFee(),
       chain_name: 'main',
       zingolib: 'mob-release...',
     };

@@ -125,6 +125,7 @@ describe('Component LoadingApp - test', () => {
       batches: 0,
       date: 0,
     };
+    const customFee = 0;
     const receive = render(
       <LoadingAppClass
         navigation={navigationMock}
@@ -138,6 +139,7 @@ describe('Component LoadingApp - test', () => {
         privacy={privacy}
         mode={mode}
         background={background}
+        customFee={customFee}
       />,
     );
     expect(receive.toJSON()).toMatchSnapshot();

@@ -94,6 +94,7 @@ export default function LoadedApp(props: LoadedAppProps) {
   const [mode, setMode] = useState<'basic' | 'advanced'>('basic');
   const [background, setBackground] = useState<BackgroundType>({ batches: 0, date: 0 });
   const [loading, setLoading] = useState<boolean>(true);
+  const [customFee, setCustomFee] = useState<number>(0);
   const file = useMemo(
     () => ({
       en: en,
@@ -135,7 +136,7 @@ export default function LoadedApp(props: LoadedAppProps) {
         await SettingsFileImpl.writeSettings('language', lang);
         //console.log('apploaded NO settings', languageTag);
       }
-      if (settings.currency) {
+      if (settings.currency === '' || settings.currency === 'USD') {
         setCurrency(settings.currency);
       } else {
         await SettingsFileImpl.writeSettings('currency', currency);
@@ -145,12 +146,12 @@ export default function LoadedApp(props: LoadedAppProps) {
       } else {
         await SettingsFileImpl.writeSettings('server', server);
       }
-      if (settings.sendAll) {
+      if (settings.sendAll === true || settings.sendAll === false) {
         setSendAll(settings.sendAll);
       } else {
         await SettingsFileImpl.writeSettings('sendAll', sendAll);
       }
-      if (settings.privacy) {
+      if (settings.privacy === true || settings.privacy === false) {
         setPrivacy(settings.privacy);
       } else {
         await SettingsFileImpl.writeSettings('privacy', privacy);
@@ -159,6 +160,11 @@ export default function LoadedApp(props: LoadedAppProps) {
         setMode(settings.mode);
       } else {
         await SettingsFileImpl.writeSettings('mode', mode);
+      }
+      if (settings.customFee >= 0) {
+        setCustomFee(settings.customFee);
+      } else {
+        await SettingsFileImpl.writeSettings('customFee', customFee);
       }
 
       // reading background task info
@@ -204,6 +210,7 @@ export default function LoadedApp(props: LoadedAppProps) {
         mode={mode}
         background={background}
         readOnly={readOnly}
+        customFee={customFee}
       />
     );
   }
@@ -222,6 +229,7 @@ type LoadedAppClassProps = {
   mode: 'basic' | 'advanced';
   background: BackgroundType;
   readOnly: boolean;
+  customFee: number;
 };
 
 export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
@@ -251,6 +259,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       setBackgroundError: this.setBackgroundError,
       addLastSnackbar: this.addLastSnackbar,
       restartApp: this.navigateToLoadingApp,
+      customFee: props.customFee,
     };
 
     this.rpc = new RPC(
@@ -600,7 +609,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     const { sendPageState, uaAddress } = this.state;
     const json: Array<SendJsonToTypeType> = [sendPageState.toaddr].flatMap((to: ToAddrClass) => {
       const memo = `${to.memo || ''}${to.includeUAMemo ? '\nReply to: \n' + uaAddress : ''}`;
-      const amount = parseInt((Number(to.amount) * 10 ** 8).toFixed(0), 10);
+      const amount = parseInt((parseFloat(to.amount) * 10 ** 8).toFixed(0), 10);
 
       if (memo === '') {
         return [{ address: to.to, amount } as SendJsonToTypeType];
@@ -917,6 +926,16 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     await SettingsFileImpl.writeSettings(name, value);
     this.setState({
       mode: value as 'basic' | 'advanced',
+    });
+
+    // Refetch the settings to update
+    this.rpc.fetchWalletSettings();
+  };
+
+  set_customFee_option = async (name: 'customFee', value: number): Promise<void> => {
+    await SettingsFileImpl.writeSettings(name, value);
+    this.setState({
+      customFee: value as number,
     });
 
     // Refetch the settings to update
@@ -1259,6 +1278,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 set_sendAll_option={this.set_sendAll_option}
                 set_privacy_option={this.set_privacy_option}
                 set_mode_option={this.set_mode_option}
+                set_customFee_option={this.set_customFee_option}
               />
             </Suspense>
           </Modal>

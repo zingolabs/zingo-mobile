@@ -116,6 +116,7 @@ describe('Component Settings - test', () => {
   state.currency = 'USD';
   state.language = 'en';
   state.sendAll = false;
+  state.customFee = 0;
   state.walletSettings.download_memos = 'wallet';
   state.walletSettings.transaction_filter_threshold = '500';
   const onClose = jest.fn();
@@ -132,6 +133,7 @@ describe('Component Settings - test', () => {
           set_sendAll_option={onSetOption}
           set_privacy_option={onSetOption}
           set_mode_option={onSetOption}
+          set_customFee_option={onSetOption}
         />
       </ContextAppLoadedProvider>,
     );

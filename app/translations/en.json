@@ -200,7 +200,10 @@
     "mode": "Mode: ",
     "value-chain_name-main": "Mainnet",
     "value-chain_name-test": "Testnet",
-    "value-chain_name-regtest": "Regtest"
+    "value-chain_name-regtest": "Regtest",
+    "customfee-title": "CUSTOM FEE",
+    "customfee-acc": "Custom Fee",
+    "iscustomfee": "The entered value is not valid. Valid range between 0.1 and"
   },
   "info": {
     "version": "Version",
@@ -321,7 +324,6 @@
     "private": "Private",
     "amountrevealed" : "Amount Revealed",
     "deshielded": "Deshielded"
-
   },
   "receive": {
     "u-title": "Unified Address",

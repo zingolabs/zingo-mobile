@@ -39,7 +39,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSen
   const { colors } = useTheme();
   const [privacyLevel, setPrivacyLevel] = useState('-');
 
-  const sendingTotal = Number(sendPageState.toaddr.amount) + defaultFee;
+  const sendingTotal = parseFloat(sendPageState.toaddr.amount) + defaultFee;
 
   const getPrivacyLevel = useCallback(async () => {
     if (!netInfo.isConnected) {
@@ -49,14 +49,15 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSen
 
     let from: 'orchard' | 'orchard+sapling' | 'sapling' | '' = '';
     // amount + fee
-    if (Number(sendPageState.toaddr.amount) + defaultFee <= totalBalance.spendableOrchard) {
+    if (parseFloat(sendPageState.toaddr.amount) + defaultFee <= totalBalance.spendableOrchard) {
       from = 'orchard';
     } else if (
       totalBalance.spendableOrchard > 0 &&
-      Number(sendPageState.toaddr.amount) + defaultFee <= totalBalance.spendableOrchard + totalBalance.spendablePrivate
+      parseFloat(sendPageState.toaddr.amount) + defaultFee <=
+        totalBalance.spendableOrchard + totalBalance.spendablePrivate
     ) {
       from = 'orchard+sapling';
-    } else if (Number(sendPageState.toaddr.amount) + defaultFee <= totalBalance.spendablePrivate) {
+    } else if (parseFloat(sendPageState.toaddr.amount) + defaultFee <= totalBalance.spendablePrivate) {
       from = 'sapling';
     }
 
@@ -221,7 +222,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSen
           return (
             <View key={to.id} style={{ margin: 10 }}>
               <FadeText>{translate('send.to') as string}</FadeText>
-              {Utils.splitStringIntoChunks(to.to, Number(numLines.toFixed(0))).map((c: string, idx: number) => (
+              {Utils.splitStringIntoChunks(to.to, parseInt(numLines.toFixed(0), 10)).map((c: string, idx: number) => (
                 <RegText key={idx}>{c}</RegText>
               ))}
 
@@ -235,12 +236,12 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSen
                 <ZecAmount
                   currencyName={info.currencyName ? info.currencyName : ''}
                   size={18}
-                  amtZec={Number(to.amount)}
+                  amtZec={parseFloat(to.amount)}
                   privacy={privacy}
                 />
                 <CurrencyAmount
                   style={{ fontSize: 18 }}
-                  amtZec={Number(to.amount)}
+                  amtZec={parseFloat(to.amount)}
                   price={zecPrice.zecPrice}
                   currency={currency}
                   privacy={privacy}

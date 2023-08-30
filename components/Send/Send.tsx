@@ -72,6 +72,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     setBackgroundError,
     addLastSnackbar,
     mode,
+    customFee,
   } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [qrcodeModalVisble, setQrcodeModalVisible] = useState(false);
@@ -84,7 +85,6 @@ const Send: React.FunctionComponent<SendProps> = ({
   const isFocused = useIsFocused();
 
   const slideAnim = useRef(new Animated.Value(0)).current;
-  const defaultFee = info.defaultFee || Utils.getFallbackDefaultFee();
   const { decimalSeparator } = getNumberFormatSettings();
   // transparent is not spendable.
   const spendable = totalBalance.spendablePrivate + totalBalance.spendableOrchard;
@@ -92,19 +92,19 @@ const Send: React.FunctionComponent<SendProps> = ({
   const showShieldInfo =
     totalBalance &&
     totalBalance.transparentBal > 0 &&
-    totalBalance.transparentBal + totalBalance.privateBal > info.defaultFee;
+    totalBalance.transparentBal + totalBalance.privateBal > Utils.getFee(info.defaultFee, customFee);
   const showUpgradeInfo =
     totalBalance &&
     totalBalance.transparentBal <= 0 &&
-    totalBalance.transparentBal + totalBalance.privateBal > info.defaultFee;
+    totalBalance.transparentBal + totalBalance.privateBal > Utils.getFee(info.defaultFee, customFee);
 
   const getMaxAmount = useCallback((): number => {
-    let max = spendable - defaultFee;
+    let max = spendable - Utils.getFee(info.defaultFee, customFee);
     if (max < 0) {
       return 0;
     }
     return max;
-  }, [spendable, defaultFee]);
+  }, [spendable, info.defaultFee, customFee]);
 
   useEffect(() => {
     const getMemoEnabled = async (address: string): Promise<boolean> => {
@@ -180,19 +180,20 @@ const Send: React.FunctionComponent<SendProps> = ({
 
     let invalid = false;
     if (to.amountCurrency !== '') {
-      if (isNaN(Number(to.amountCurrency))) {
+      if (isNaN(parseFloat(to.amountCurrency))) {
         setValidAmount(-1);
         invalid = true;
       }
     }
     if (!invalid) {
       if (to.amount !== '') {
-        if (isNaN(Number(to.amount))) {
+        if (isNaN(parseFloat(to.amount))) {
           setValidAmount(-1);
         } else {
           if (
-            Utils.parseLocaleFloat(Number(to.amount).toFixed(8)) >= 0 &&
-            Utils.parseLocaleFloat(Number(to.amount).toFixed(8)) <= Utils.parseLocaleFloat(getMaxAmount().toFixed(8))
+            Utils.parseLocaleFloat(parseFloat(to.amount).toFixed(8)) >= 0 &&
+            Utils.parseLocaleFloat(parseFloat(to.amount).toFixed(8)) <=
+              Utils.parseLocaleFloat(getMaxAmount().toFixed(8))
           ) {
             setValidAmount(1);
           } else {
@@ -296,7 +297,7 @@ const Send: React.FunctionComponent<SendProps> = ({
 
     if (amount !== null) {
       toAddr.amount = amount.replace(decimalSeparator, '.').substring(0, 20);
-      if (isNaN(Number(toAddr.amount))) {
+      if (isNaN(parseFloat(toAddr.amount))) {
         toAddr.amountCurrency = '';
       } else if (toAddr.amount && zecPrice && zecPrice.zecPrice > 0) {
         toAddr.amountCurrency = Utils.toLocaleFloat((parseFloat(toAddr.amount) * zecPrice.zecPrice).toFixed(2));
@@ -308,7 +309,7 @@ const Send: React.FunctionComponent<SendProps> = ({
 
     if (amountCurrency !== null) {
       toAddr.amountCurrency = amountCurrency.replace(decimalSeparator, '.').substring(0, 15);
-      if (isNaN(Number(toAddr.amountCurrency))) {
+      if (isNaN(parseFloat(toAddr.amountCurrency))) {
         toAddr.amount = '';
       } else if (toAddr.amountCurrency && zecPrice && zecPrice.zecPrice > 0) {
         toAddr.amount = Utils.toLocaleFloat(Utils.maxPrecisionTrimmed(parseFloat(amountCurrency) / zecPrice.zecPrice));
@@ -439,14 +440,14 @@ const Send: React.FunctionComponent<SendProps> = ({
         visible={confirmModalVisible}
         onRequestClose={() => setConfirmModalVisible(false)}>
         <Confirm
-          defaultFee={defaultFee}
+          defaultFee={Utils.getFee(info.defaultFee, customFee)}
           closeModal={() => {
             setConfirmModalVisible(false);
           }}
           confirmSend={confirmSend}
           sendAllAmount={
             mode !== 'basic' &&
-            Number(sendPageState.toaddr.amount) === Utils.parseLocaleFloat(getMaxAmount().toFixed(8))
+            parseFloat(sendPageState.toaddr.amount) === Utils.parseLocaleFloat(getMaxAmount().toFixed(8))
           }
         />
       </Modal>
@@ -867,7 +868,7 @@ const Send: React.FunctionComponent<SendProps> = ({
               title={
                 validAmount === 1 &&
                 sendPageState.toaddr.amount &&
-                Number(sendPageState.toaddr.amount) === Utils.parseLocaleFloat(getMaxAmount().toFixed(8))
+                parseFloat(sendPageState.toaddr.amount) === Utils.parseLocaleFloat(getMaxAmount().toFixed(8))
                   ? (translate('send.button-all') as string)
                   : (translate('send.button') as string)
               }
@@ -877,7 +878,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                   validAmount === 1 &&
                   sendPageState.toaddr.amount &&
                   mode !== 'basic' &&
-                  Number(sendPageState.toaddr.amount) === Utils.parseLocaleFloat(getMaxAmount().toFixed(8))
+                  parseFloat(sendPageState.toaddr.amount) === Utils.parseLocaleFloat(getMaxAmount().toFixed(8))
                 ) {
                   addLastSnackbar({ message: `${translate('send.sendall-message') as string}`, type: 'Primary' });
                 }

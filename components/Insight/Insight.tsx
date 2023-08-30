@@ -200,7 +200,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, set_privac
                 )}
                 {expandAddress[index] &&
                   !!item.address &&
-                  Utils.splitStringIntoChunks(item.address, Number(numLines.toFixed(0))).map(
+                  Utils.splitStringIntoChunks(item.address, parseInt(numLines.toFixed(0), 10)).map(
                     (c: string, idx: number) => (
                       <RegText color={item.svg.fill} key={idx}>
                         {c}

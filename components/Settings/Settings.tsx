@@ -5,6 +5,7 @@ import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faDotCircle } from '@fortawesome/free-solid-svg-icons';
 import { faCircle as farCircle } from '@fortawesome/free-regular-svg-icons';
+import { getNumberFormatSettings } from 'react-native-localize';
 import Animated, { EasingNode } from 'react-native-reanimated';
 
 import RegText from '../Components/RegText';
@@ -35,6 +36,7 @@ type SettingsProps = {
   set_sendAll_option: (name: 'sendAll', value: boolean) => Promise<void>;
   set_privacy_option: (name: 'privacy', value: boolean) => Promise<void>;
   set_mode_option: (name: 'mode', value: string) => Promise<void>;
+  set_customFee_option: (name: 'customFee', value: number) => Promise<void>;
 };
 
 type Options = {
@@ -50,6 +52,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   set_sendAll_option,
   set_privacy_option,
   set_mode_option,
+  set_customFee_option,
   closeModal,
 }) => {
   const context = useContext(ContextAppLoaded);
@@ -64,10 +67,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     mode: modeContext,
     netInfo,
     addLastSnackbar,
+    customFee: customFeeContext,
+    info,
   } = context;
 
   const memosArray = translate('settings.memos');
-  //console.log(memosArray, typeof memosArray);
   let MEMOS: Options[] = [];
   if (typeof memosArray === 'object') {
     MEMOS = memosArray as Options[];
@@ -114,11 +118,13 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [sendAll, setSendAll] = useState(sendAllContext);
   const [privacy, setPrivacy] = useState(privacyContext);
   const [mode, setMode] = useState(modeContext);
+  const [customFee, setCustomFee] = useState(customFeeContext.toString());
   const [customIcon, setCustomIcon] = useState(farCircle);
   const [disabled, setDisabled] = useState<boolean>();
   const [titleViewHeight, setTitleViewHeight] = useState(0);
 
   const slideAnim = useRef(new Animated.Value(0)).current;
+  const { decimalSeparator } = getNumberFormatSettings();
 
   moment.locale(language);
 
@@ -167,7 +173,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       languageContext === language &&
       sendAllContext === sendAll &&
       privacyContext === privacy &&
-      modeContext === mode
+      modeContext === mode &&
+      customFeeContext.toString() === customFee
     ) {
       addLastSnackbar({ message: translate('settings.nochanges') as string, type: 'Primary' });
       return;
@@ -186,6 +193,10 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     }
     if (!language) {
       addLastSnackbar({ message: translate('settings.islanguage') as string, type: 'Primary' });
+      return;
+    }
+    if (customFee !== '0' && (parseFloat(customFee) < info.defaultFee || parseFloat(customFee) > 0.1)) {
+      addLastSnackbar({ message: `${translate('settings.iscustomfee')} ${info.defaultFee}`, type: 'Primary' });
       return;
     }
 
@@ -232,7 +243,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         setDisabled(false);
         return;
       } else {
-        //console.log('new', new_chain_name, 'old', chain_name);
         if (new_chain_name && new_chain_name !== chain_name) {
           same_server_chain_name = false;
           addLastSnackbar({ message: translate('loadedapp.differentchain-error') as string, type: 'Primary' });
@@ -257,6 +267,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     }
     if (modeContext !== mode) {
       await set_mode_option('mode', mode);
+    }
+    if (customFeeContext.toString() !== customFee) {
+      await set_customFee_option('customFee', parseFloat(customFee));
     }
 
     // I need a little time in this modal because maybe the wallet cannot be open with the new server
@@ -316,6 +329,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const onPressServerChainName = (chain: 'main' | 'test' | 'regtest') => {
     setCustomServerChainName(chain);
   };
+
+  console.log('render settings', customFee, info.defaultFee);
 
   return (
     <SafeAreaView
@@ -388,6 +403,53 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
         {modeContext !== 'basic' && (
           <>
+            <View style={{ display: 'flex', margin: 10 }}>
+              <BoldText>{translate('settings.customfee-title') as string}</BoldText>
+            </View>
+
+            <View style={{ display: 'flex', marginLeft: 25 }}>
+              <View
+                accessible={true}
+                accessibilityLabel={translate('settings.customfee-acc') as string}
+                style={{
+                  borderColor: colors.border,
+                  borderWidth: 1,
+                  marginLeft: 5,
+                  width: 'auto',
+                  maxWidth: '60%',
+                  maxHeight: 48,
+                  minWidth: '30%',
+                  minHeight: 48,
+                }}>
+                <TextInput
+                  placeholder={`#${decimalSeparator}########`}
+                  placeholderTextColor={colors.placeholder}
+                  keyboardType="numeric"
+                  style={{
+                    color: colors.text,
+                    fontWeight: '600',
+                    fontSize: 18,
+                    minWidth: '30%',
+                    minHeight: 48,
+                    marginLeft: 5,
+                    backgroundColor: 'transparent',
+                  }}
+                  value={customFee === '0' ? info.defaultFee.toString() : customFee}
+                  onChangeText={(text: string) => {
+                    if (isNaN(parseFloat(text))) {
+                      setCustomFee(
+                        customFeeContext.toString() === '0' ? info.defaultFee.toString() : customFeeContext.toString(),
+                      );
+                    } else {
+                      setCustomFee(text);
+                    }
+                  }}
+                  editable={!disabled}
+                  maxLength={10}
+                />
+              </View>
+            </View>
+
             <View style={{ display: 'flex', margin: 10 }}>
               <BoldText>{translate('settings.privacy-title') as string}</BoldText>
             </View>
@@ -561,7 +623,13 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                     backgroundColor: 'transparent',
                   }}
                   value={filter}
-                  onChangeText={(text: string) => setFilter(text)}
+                  onChangeText={(text: string) => {
+                    if (isNaN(parseFloat(text))) {
+                      setFilter(walletSettings.transaction_filter_threshold);
+                    } else {
+                      setFilter(text);
+                    }
+                  }}
                   editable={!disabled}
                   maxLength={6}
                 />

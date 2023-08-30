@@ -158,7 +158,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
           const resp: string = await RPCModule.getLatestBlock(server.uri);
           //console.log(resp);
           if (resp && !resp.toLowerCase().startsWith('error')) {
-            setLatestBlock(Number(resp));
+            setLatestBlock(parseInt(resp, 10));
           } else {
             //console.log('error latest block', resp);
             if (setBackgroundError && addLastSnackbar) {
@@ -211,10 +211,10 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
             if (action === 'restore') {
               // waiting while closing the keyboard, just in case.
               setTimeout(async () => {
-                onClickOK(seedPhrase, Number(birthdayNumber));
+                onClickOK(seedPhrase, parseInt(birthdayNumber, 10));
               }, 100);
             } else {
-              onClickOK(seedPhrase, Number(birthdayNumber));
+              onClickOK(seedPhrase, parseInt(birthdayNumber, 10));
             }
           },
         },
@@ -439,12 +439,12 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
                   }}
                   value={birthdayNumber}
                   onChangeText={(text: string) => {
-                    if (isNaN(Number(text))) {
+                    if (isNaN(parseInt(text, 10))) {
                       setBirthdayNumber('');
-                    } else if (Number(text) <= 0 || Number(text) > latestBlock) {
+                    } else if (parseInt(text, 10) <= 0 || parseInt(text, 10) > latestBlock) {
                       setBirthdayNumber('');
                     } else {
-                      setBirthdayNumber(Number(text.replace('.', '').replace(',', '')).toFixed(0));
+                      setBirthdayNumber(parseInt(text.replace('.', '').replace(',', ''), 10).toFixed(0));
                     }
                   }}
                   editable={latestBlock ? true : false}
@@ -497,10 +497,10 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
               if (action === 'restore') {
                 // waiting while closing the keyboard, just in case.
                 setTimeout(async () => {
-                  onClickOK(seedPhrase, Number(birthdayNumber));
+                  onClickOK(seedPhrase, parseInt(birthdayNumber, 10));
                 }, 100);
               } else {
-                onClickOK(seedPhrase, Number(birthdayNumber));
+                onClickOK(seedPhrase, parseInt(birthdayNumber, 10));
               }
             } else if (times === 1) {
               onPressOK();

@@ -31,6 +31,7 @@ import { createAlert } from '../../app/createAlert';
 import { Animated } from 'react-native';
 import SnackbarType from '../../app/AppState/types/SnackbarType';
 import FadeText from '../Components/FadeText';
+import Utils from '../../app/utils';
 
 type HeaderProps = {
   poolsMoreInfoOnClick?: () => void;
@@ -93,6 +94,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     transactions,
     wallet,
     restartApp,
+    customFee,
   } = context;
 
   let translate: (key: string) => TranslateType, netInfo: NetInfoType, mode: 'basic' | 'advanced';
@@ -127,10 +129,10 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   }
   /*
   let percent = ((currentBlock * 100) / lastBlockServer).toFixed(2);
-  if (Number(percent) < 0) {
+  if (parseFloat(percent) < 0) {
     percent = '0.00';
   }
-  if (Number(percent) >= 100) {
+  if (parseFloat(percent) >= 100) {
     percent = '99.99';
   }
   */
@@ -152,7 +154,9 @@ const Header: React.FunctionComponent<HeaderProps> = ({
 
   useEffect(() => {
     setShowShieldButton(
-      !readOnly && totalBalance && totalBalance.transparentBal + totalBalance.privateBal > info.defaultFee,
+      !readOnly &&
+        totalBalance &&
+        totalBalance.transparentBal + totalBalance.privateBal > Utils.getFee(info.defaultFee, customFee),
     );
 
     if (totalBalance.transparentBal > 0 && totalBalance.privateBal > 0) {
@@ -164,7 +168,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     } else {
       setPoolsToShield('');
     }
-  }, [mode, readOnly, totalBalance, totalBalance.transparentBal, totalBalance.privateBal, info.defaultFee]);
+  }, [mode, readOnly, totalBalance, totalBalance.transparentBal, totalBalance.privateBal, info.defaultFee, customFee]);
 
   useEffect(() => {
     // for basic mode always have to be 'all', It's easier for the user.
@@ -512,7 +516,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           />
           {mode !== 'basic' &&
             totalBalance.total > 0 &&
-            totalBalance.privateBal + totalBalance.transparentBal > info.defaultFee && (
+            totalBalance.privateBal + totalBalance.transparentBal > Utils.getFee(info.defaultFee, customFee) && (
               <TouchableOpacity onPress={() => poolsMoreInfoOnClick && poolsMoreInfoOnClick()}>
                 <View
                   style={{
@@ -588,18 +592,24 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               }`,
             ) as string) +
               ` ${
-                poolsToShield === 'sapling' && totalBalance.privateBal > info.defaultFee
-                  ? (totalBalance.privateBal - info.defaultFee).toFixed(8)
-                  : poolsToShield === 'transparent' && totalBalance.transparentBal > info.defaultFee
-                  ? (totalBalance.transparentBal - info.defaultFee).toFixed(8)
+                poolsToShield === 'sapling' && totalBalance.privateBal > Utils.getFee(info.defaultFee, customFee)
+                  ? (totalBalance.privateBal - Utils.getFee(info.defaultFee, customFee)).toFixed(8)
+                  : poolsToShield === 'transparent' &&
+                    totalBalance.transparentBal > Utils.getFee(info.defaultFee, customFee)
+                  ? (totalBalance.transparentBal - Utils.getFee(info.defaultFee, customFee)).toFixed(8)
                   : poolsToShieldSelectSapling &&
                     poolsToShieldSelectTransparent &&
-                    totalBalance.privateBal + totalBalance.transparentBal > info.defaultFee
-                  ? (totalBalance.privateBal + totalBalance.transparentBal - info.defaultFee).toFixed(8)
-                  : poolsToShieldSelectSapling && totalBalance.privateBal > info.defaultFee
-                  ? (totalBalance.privateBal - info.defaultFee).toFixed(8)
-                  : poolsToShieldSelectTransparent && totalBalance.transparentBal > info.defaultFee
-                  ? (totalBalance.transparentBal - info.defaultFee).toFixed(8)
+                    totalBalance.privateBal + totalBalance.transparentBal > Utils.getFee(info.defaultFee, customFee)
+                  ? (
+                      totalBalance.privateBal +
+                      totalBalance.transparentBal -
+                      Utils.getFee(info.defaultFee, customFee)
+                    ).toFixed(8)
+                  : poolsToShieldSelectSapling && totalBalance.privateBal > Utils.getFee(info.defaultFee, customFee)
+                  ? (totalBalance.privateBal - Utils.getFee(info.defaultFee, customFee)).toFixed(8)
+                  : poolsToShieldSelectTransparent &&
+                    totalBalance.transparentBal > Utils.getFee(info.defaultFee, customFee)
+                  ? (totalBalance.transparentBal - Utils.getFee(info.defaultFee, customFee)).toFixed(8)
                   : 0
               }`}
           </FadeText>
@@ -623,17 +633,19 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               }
               onPress={onPressShieldFunds}
               disabled={
-                poolsToShield === 'sapling' && totalBalance.privateBal > info.defaultFee
+                poolsToShield === 'sapling' && totalBalance.privateBal > Utils.getFee(info.defaultFee, customFee)
                   ? false
-                  : poolsToShield === 'transparent' && totalBalance.transparentBal > info.defaultFee
+                  : poolsToShield === 'transparent' &&
+                    totalBalance.transparentBal > Utils.getFee(info.defaultFee, customFee)
                   ? false
                   : poolsToShieldSelectSapling &&
                     poolsToShieldSelectTransparent &&
-                    totalBalance.privateBal + totalBalance.transparentBal > info.defaultFee
+                    totalBalance.privateBal + totalBalance.transparentBal > Utils.getFee(info.defaultFee, customFee)
                   ? false
-                  : poolsToShieldSelectSapling && totalBalance.privateBal > info.defaultFee
+                  : poolsToShieldSelectSapling && totalBalance.privateBal > Utils.getFee(info.defaultFee, customFee)
                   ? false
-                  : poolsToShieldSelectTransparent && totalBalance.transparentBal > info.defaultFee
+                  : poolsToShieldSelectTransparent &&
+                    totalBalance.transparentBal > Utils.getFee(info.defaultFee, customFee)
                   ? false
                   : true
               }

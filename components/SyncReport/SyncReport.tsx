@@ -162,7 +162,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
   //console.log('wallet', wallet_old_synced, wallet_new_synced, wallet_for_synced);
   //console.log('wallet %', wallet_old_synced_percent, wallet_new_synced_percent, wallet_for_synced_percent);
   //console.log(maxBlocks, labels, points);
-  //console.log('report', background.batches, background.date, Number(background.date).toFixed(0));
+  //console.log('report', background.batches, background.date, parseInt(background.date).toFixed(0), 10);
 
   //console.log('render sync report - 5', syncingStatus);
 
@@ -230,7 +230,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
               value={
                 background.batches.toString() +
                 translate('report.batches-date') +
-                moment(Number(Number(background.date).toFixed(0)) * 1000).format('YYYY MMM D h:mm a')
+                moment(parseInt(background.date.toFixed(0), 10) * 1000).format('YYYY MMM D h:mm a')
               }
             />
           </View>

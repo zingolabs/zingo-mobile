@@ -65,7 +65,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
         const resp: string = await RPCModule.getLatestBlock(server.uri);
         //console.log(resp);
         if (resp && !resp.toLowerCase().startsWith('error')) {
-          setLatestBlock(Number(resp));
+          setLatestBlock(parseInt(resp, 10));
         } else {
           //console.log('error latest block', resp);
         }
@@ -82,7 +82,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
     //if (!valid) {
     //  return;
     //}
-    onClickOK(ufvkText.trim(), Number(birthday));
+    onClickOK(ufvkText.trim(), parseInt(birthday, 10));
   };
 
   // zingolib interfase have no way to initialize a `lightclient` with no action associated...
@@ -241,12 +241,12 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
               }}
               value={birthday}
               onChangeText={(text: string) => {
-                if (isNaN(Number(text))) {
+                if (isNaN(parseInt(text, 10))) {
                   setBirthday('');
-                } else if (Number(text) <= 0 || Number(text) > latestBlock) {
+                } else if (parseInt(text, 10) <= 0 || parseInt(text, 10) > latestBlock) {
                   setBirthday('');
                 } else {
-                  setBirthday(Number(text.replace('.', '').replace(',', '')).toFixed(0));
+                  setBirthday(parseInt(text.replace('.', '').replace(',', ''), 10).toFixed(0));
                 }
               }}
               editable={latestBlock ? true : false}

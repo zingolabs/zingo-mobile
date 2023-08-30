@@ -1,3 +1,3 @@
 export type RPCDefaultFeeType = {
-  defaultfee: number;
+  defaultfee: number; // here is a int number like 10000
 };

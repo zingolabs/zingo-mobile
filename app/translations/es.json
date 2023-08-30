@@ -200,7 +200,10 @@
     "mode": "Modo: ",
     "value-chain_name-main": "Mainnet",
     "value-chain_name-test": "Testnet",
-    "value-chain_name-regtest": "Regtest"
+    "value-chain_name-regtest": "Regtest",
+    "customfee-title": "COMISION PERSONALIZADA",
+    "customfee-acc": "Comisión Personalizada",
+    "iscustomfee": "El valor introducido no es valido. Rango valido entre 0.1 y"
   },
   "info": {
     "version": "Versión",

@@ -44,7 +44,7 @@ describe('Change the Server.', () => {
     // getting blocks now synced from the screen
     const blockssyncednow_1 = element(by.id('syncreport.syncednow'));
     const blockssyncednow_attributes_1 = await blockssyncednow_1.getAttributes();
-    const blockssyncednowNum_1 = Number(blockssyncednow_attributes_1.text.split(' ')[0]);
+    const blockssyncednowNum_1 = parseInt(blockssyncednow_attributes_1.text.split(' ')[0], 10);
 
     log.info('blocks 1:', blockssyncednowNum_1);
 
@@ -54,7 +54,7 @@ describe('Change the Server.', () => {
     // getting blocks now synced from the screen
     const blockssyncednow_2 = element(by.id('syncreport.syncednow'));
     const blockssyncednow_attributes_2 = await blockssyncednow_2.getAttributes();
-    const blockssyncednowNum_2 = Number(blockssyncednow_attributes_2.text.split(' ')[0]);
+    const blockssyncednowNum_2 = parseInt(blockssyncednow_attributes_2.text.split(' ')[0], 10);
 
     log.info('blocks 2:', blockssyncednowNum_2);
 

@@ -27,7 +27,7 @@ const PrivKey: React.FunctionComponent<PrivKeyProps> = ({ address, keyType, priv
 
   // 30 characters per line
   const numLines = privKey.length < 40 ? 2 : privKey.length / 30;
-  const keyChunks = Utils.splitStringIntoChunks(privKey, Number(numLines.toFixed(0)));
+  const keyChunks = Utils.splitStringIntoChunks(privKey, parseInt(numLines.toFixed(0), 10));
 
   const [expandAddress, setExpandAddress] = useState(false);
 

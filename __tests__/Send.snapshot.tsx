@@ -9,6 +9,7 @@ import { render } from '@testing-library/react-native';
 import Send from '../components/Send';
 import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
 import { ThemeType } from '../app/types';
+import Utils from '../app/utils';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -129,7 +130,7 @@ describe('Component Send - test', () => {
   state.currency = 'USD';
   state.info.currencyName = 'ZEC';
   state.zecPrice.zecPrice = 33.33;
-  state.info.defaultFee = 10000;
+  state.info.defaultFee = Utils.getFallbackDefaultFee();
   state.totalBalance.total = 1.12345678;
   state.totalBalance.orchardBal = 0.6;
   state.totalBalance.spendableOrchard = 0.3;
