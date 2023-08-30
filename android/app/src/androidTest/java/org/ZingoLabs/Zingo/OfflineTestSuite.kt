@@ -7,6 +7,6 @@ import org.junit.runners.Suite.SuiteClasses
 
 @RunWith(Categories::class)
 @IncludeCategory(OfflineTest::class)
-@SuiteClasses(ExecuteAddressesFromSeed::class, ExecuteAddressesFromUfvk::class)
+@SuiteClasses(ExecuteAddressesFromSeed::class, ExecuteAddressesFromUfvk::class, ExecuteVersionFromSeed::class)
 class OfflineTestSuite {
 }
