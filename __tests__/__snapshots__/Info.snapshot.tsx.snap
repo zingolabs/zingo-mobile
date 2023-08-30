@@ -340,6 +340,32 @@ exports[`Component Info - test Info - snapshot 1`] = `
             2000100
           </Text>
         </View>
+        <View
+          style={
+            {
+              "display": "flex",
+              "marginTop": 20,
+            }
+          }
+        >
+          <Text
+            style={
+              {
+                "color": "rgb(28, 28, 30)",
+                "opacity": 0.65,
+              }
+            }
+          >
+            translated text
+          </Text>
+          <View
+            style={
+              {
+                "width": 10,
+              }
+            }
+          />
+        </View>
       </View>
     </View>
   </RCTScrollView>
