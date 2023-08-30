@@ -137,6 +137,33 @@ class ExecuteAddressesFromUfvk {
     }    
 }
 
+@Category(OfflineTest::class)
+class ExecuteVersionFromSeed {
+    @Test
+    fun executeVersionFromSeed() {
+        val mapper = jacksonObjectMapper()
+
+        val server = "http://10.0.2.2:20000"
+        val chainhint = "main"
+        val seed = Seeds.ABANDON
+        val birthday = "1"
+        val datadir = MainApplication.getAppContext()!!.filesDir.path
+        val monitorMempool = "false"
+
+        var initFromSeedJson = RustFFI.initfromseed(server, seed, birthday, datadir, chainhint, monitorMempool)
+        System.out.println("\nInit from seed:")
+        System.out.println(initFromSeedJson)
+        val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
+        assertThat(initFromSeed.seed).isEqualTo(Seeds.ABANDON)
+        assertThat(initFromSeed.birthday).isEqualTo(1)
+
+        var version = RustFFI.execute("version", "")
+        System.out.println("\nVersion:")
+        System.out.println(version)
+        assertThat(version).startsWith("mob-release")
+    }
+}
+
 class ExecuteSyncFromSeed {
     @Test
     fun executeSyncFromSeed() {
