@@ -21,7 +21,7 @@ export default class SettingsFileImpl {
       | 'firstInstall'
       | 'basicFirstViewSeed'
       | 'customFee',
-    value: string | boolean | ServerType | number,
+    value: string | boolean | ServerType,
   ) {
     const fileName = await this.getFileName();
     const settings = await this.readSettings();

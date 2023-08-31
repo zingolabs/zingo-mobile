@@ -47,7 +47,7 @@ export default interface AppStateLoading {
   mode: 'basic' | 'advanced';
   snackbars: SnackbarType[];
   addLastSnackbar: (snackbar: SnackbarType) => void;
-  customFee: number;
+  customFee: string;
 
   // eslint-disable-next-line semi
 }

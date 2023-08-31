@@ -92,20 +92,16 @@ export default class Utils {
     return 0.0001;
   }
 
-  static getFee(defaultFee: number, customFee: number): number {
-    if (!defaultFee && !customFee) {
+  static getFee(defaultFeeNumber: number, customFee: string): number {
+    if (!defaultFeeNumber && !customFee) {
       return this.getFallbackDefaultFee();
     }
-    if (customFee === 0) {
+    if (customFee === '') {
       // the user didn't change this prop in settings
-      return defaultFee;
-    } else if (customFee < defaultFee) {
-      // the user changed it, but zingolib in some update now give a bigger fee,
-      // zingo-mobile pick up the bigger value between them.
-      return defaultFee;
+      return defaultFeeNumber || this.getFallbackDefaultFee();
     } else {
-      // custom fee should be bigger than default fee.
-      return customFee;
+      // custom fee set
+      return parseFloat(customFee) || this.getFallbackDefaultFee();
     }
   }
 

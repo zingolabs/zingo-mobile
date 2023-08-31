@@ -94,7 +94,7 @@ export default function LoadedApp(props: LoadedAppProps) {
   const [mode, setMode] = useState<'basic' | 'advanced'>('basic');
   const [background, setBackground] = useState<BackgroundType>({ batches: 0, date: 0 });
   const [loading, setLoading] = useState<boolean>(true);
-  const [customFee, setCustomFee] = useState<number>(0);
+  const [customFee, setCustomFee] = useState<string>('');
   const file = useMemo(
     () => ({
       en: en,
@@ -161,7 +161,7 @@ export default function LoadedApp(props: LoadedAppProps) {
       } else {
         await SettingsFileImpl.writeSettings('mode', mode);
       }
-      if (settings.customFee >= 0) {
+      if (settings.customFee) {
         setCustomFee(settings.customFee);
       } else {
         await SettingsFileImpl.writeSettings('customFee', customFee);
@@ -229,7 +229,7 @@ type LoadedAppClassProps = {
   mode: 'basic' | 'advanced';
   background: BackgroundType;
   readOnly: boolean;
-  customFee: number;
+  customFee: string;
 };
 
 export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
@@ -932,10 +932,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     this.rpc.fetchWalletSettings();
   };
 
-  set_customFee_option = async (name: 'customFee', value: number): Promise<void> => {
+  set_customFee_option = async (name: 'customFee', value: string): Promise<void> => {
     await SettingsFileImpl.writeSettings(name, value);
     this.setState({
-      customFee: value as number,
+      customFee: value as string,
     });
 
     // Refetch the settings to update

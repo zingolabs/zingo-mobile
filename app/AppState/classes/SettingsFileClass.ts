@@ -9,7 +9,7 @@ export default class SettingsFileClass {
   mode: 'basic' | 'advanced';
   firstInstall: boolean;
   basicFirstViewSeed: boolean;
-  customFee: number;
+  customFee: string;
 
   constructor(
     server: ServerType,
@@ -20,7 +20,7 @@ export default class SettingsFileClass {
     mode: 'basic' | 'advanced',
     firstInstall: boolean,
     basicFirstViewSeed: boolean,
-    customFee: number,
+    customFee: string,
   ) {
     this.server = server;
     this.currency = currency;

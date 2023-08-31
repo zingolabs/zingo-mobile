@@ -126,7 +126,7 @@ describe('Component LoadedApp - test', () => {
       date: 0,
     };
     const readOnly = false;
-    const customFee = 0;
+    const customFee = '';
     const receive = render(
       <LoadedAppClass
         navigation={navigationMock}

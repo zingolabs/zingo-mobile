@@ -203,7 +203,7 @@
     "value-chain_name-regtest": "Regtest",
     "customfee-title": "COMISION PERSONALIZADA",
     "customfee-acc": "Comisión Personalizada",
-    "iscustomfee": "El valor introducido no es valido. Rango valido entre 0.1 y"
+    "iscustomfee": "El valor introducido no es valido. Rango valido entre 0.00000001 y"
   },
   "info": {
     "version": "Versión",

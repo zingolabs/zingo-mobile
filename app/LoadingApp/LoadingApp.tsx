@@ -68,7 +68,7 @@ export default function LoadingApp(props: LoadingAppProps) {
   const [mode, setMode] = useState<'basic' | 'advanced'>('advanced'); // by default advanced
   const [background, setBackground] = useState<BackgroundType>({ batches: 0, date: 0 });
   const [loading, setLoading] = useState<boolean>(true);
-  const [customFee, setCustomFee] = useState<number>(0);
+  const [customFee, setCustomFee] = useState<string>('');
   const file = useMemo(
     () => ({
       en: en,
@@ -145,7 +145,7 @@ export default function LoadingApp(props: LoadingAppProps) {
       } else {
         await SettingsFileImpl.writeSettings('privacy', privacy);
       }
-      if (settings.customFee >= 0) {
+      if (settings.customFee) {
         setCustomFee(settings.customFee);
       } else {
         await SettingsFileImpl.writeSettings('customFee', customFee);
@@ -210,7 +210,7 @@ type LoadingAppClassProps = {
   privacy: boolean;
   mode: 'basic' | 'advanced';
   background: BackgroundType;
-  customFee: number;
+  customFee: string;
 };
 
 export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {

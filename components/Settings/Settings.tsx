@@ -36,7 +36,7 @@ type SettingsProps = {
   set_sendAll_option: (name: 'sendAll', value: boolean) => Promise<void>;
   set_privacy_option: (name: 'privacy', value: boolean) => Promise<void>;
   set_mode_option: (name: 'mode', value: string) => Promise<void>;
-  set_customFee_option: (name: 'customFee', value: number) => Promise<void>;
+  set_customFee_option: (name: 'customFee', value: string) => Promise<void>;
 };
 
 type Options = {
@@ -68,7 +68,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     netInfo,
     addLastSnackbar,
     customFee: customFeeContext,
-    info,
+    totalBalance,
   } = context;
 
   const memosArray = translate('settings.memos');
@@ -118,7 +118,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [sendAll, setSendAll] = useState(sendAllContext);
   const [privacy, setPrivacy] = useState(privacyContext);
   const [mode, setMode] = useState(modeContext);
-  const [customFee, setCustomFee] = useState(customFeeContext.toString());
+  const [customFee, setCustomFee] = useState(customFeeContext);
   const [customIcon, setCustomIcon] = useState(farCircle);
   const [disabled, setDisabled] = useState<boolean>();
   const [titleViewHeight, setTitleViewHeight] = useState(0);
@@ -174,7 +174,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       sendAllContext === sendAll &&
       privacyContext === privacy &&
       modeContext === mode &&
-      customFeeContext.toString() === customFee
+      customFeeContext === customFee
     ) {
       addLastSnackbar({ message: translate('settings.nochanges') as string, type: 'Primary' });
       return;
@@ -195,8 +195,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       addLastSnackbar({ message: translate('settings.islanguage') as string, type: 'Primary' });
       return;
     }
-    if (customFee !== '0' && (parseFloat(customFee) < info.defaultFee || parseFloat(customFee) > 0.1)) {
-      addLastSnackbar({ message: `${translate('settings.iscustomfee')} ${info.defaultFee}`, type: 'Primary' });
+    if (customFee && (parseFloat(customFee) < 0.00000001 || parseFloat(customFee) > totalBalance.total)) {
+      addLastSnackbar({ message: `${translate('settings.iscustomfee')} ${totalBalance.total}`, type: 'Primary' });
       return;
     }
 
@@ -268,8 +268,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     if (modeContext !== mode) {
       await set_mode_option('mode', mode);
     }
-    if (customFeeContext.toString() !== customFee) {
-      await set_customFee_option('customFee', parseFloat(customFee));
+    if (customFeeContext !== customFee) {
+      await set_customFee_option('customFee', customFee);
     }
 
     // I need a little time in this modal because maybe the wallet cannot be open with the new server
@@ -330,7 +330,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     setCustomServerChainName(chain);
   };
 
-  console.log('render settings', customFee, info.defaultFee);
+  console.log('render settings', customFee);
 
   return (
     <SafeAreaView
@@ -434,12 +434,10 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                     marginLeft: 5,
                     backgroundColor: 'transparent',
                   }}
-                  value={customFee === '0' ? info.defaultFee.toString() : customFee}
+                  value={customFee}
                   onChangeText={(text: string) => {
-                    if (isNaN(parseFloat(text))) {
-                      setCustomFee(
-                        customFeeContext.toString() === '0' ? info.defaultFee.toString() : customFeeContext.toString(),
-                      );
+                    if (text && isNaN(parseFloat(text))) {
+                      setCustomFee(customFeeContext);
                     } else {
                       setCustomFee(text);
                     }

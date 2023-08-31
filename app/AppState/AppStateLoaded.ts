@@ -121,7 +121,7 @@ export default interface AppStateLoaded {
   snackbars: SnackbarType[];
   addLastSnackbar: (snackbar: SnackbarType) => void;
   restartApp: (s: any) => void;
-  customFee: number;
+  customFee: string;
 
   // eslint-disable-next-line semi
 }

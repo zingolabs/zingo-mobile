@@ -125,7 +125,7 @@ describe('Component LoadingApp - test', () => {
       batches: 0,
       date: 0,
     };
-    const customFee = 0;
+    const customFee = '';
     const receive = render(
       <LoadingAppClass
         navigation={navigationMock}
