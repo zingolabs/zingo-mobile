@@ -30,6 +30,7 @@ import { RPCGetOptionType } from './types/RPCGetOptionType';
 import { RPCSendProgressType } from './types/RPCSendProgressType';
 import { RPCSyncRescan } from './types/RPCSyncRescanType';
 import { RPCUfvkType } from './types/RPCUfvkType';
+import { RPCSummariesType } from './types/RPCSummariesType';
 
 export default class RPC {
   fnSetInfo: (info: InfoType) => void;
@@ -1292,7 +1293,12 @@ export default class RPC {
   // Fetch all T and Z and O transactions
   async fetchTandZandOTransactions() {
     try {
+      const summariesStr: string = await RPCModule.execute('summaries', '');
+      console.log(summariesStr);
+      const summariesJSON: RPCSummariesType[] = await JSON.parse(summariesStr);
+      console.log(summariesJSON);
       const listStr: string = await RPCModule.execute('list', '');
+      console.log(listStr);
       if (listStr) {
         if (listStr.toLowerCase().startsWith('error')) {
           console.log(`Error txs list ${listStr}`);
