@@ -644,7 +644,8 @@ export default class RPC {
 
   async loadWalletData() {
     await this.fetchTotalBalance();
-    await this.fetchTandZandOTransactions();
+    //await this.fetchTandZandOTransactionsList();
+    await this.fetchTandZandOTransactionsSummaries();
     await this.fetchWalletSettings();
     await this.fetchInfoAndServerHeight();
   }
@@ -1291,12 +1292,11 @@ export default class RPC {
   }
 
   // Fetch all T and Z and O transactions
-  async fetchTandZandOTransactions() {
+  async fetchTandZandOTransactionsList() {
     try {
       const summariesStr: string = await RPCModule.execute('summaries', '');
       console.log(summariesStr);
-      const summariesJSON: RPCSummariesType[] = await JSON.parse(summariesStr);
-      console.log(summariesJSON);
+
       const listStr: string = await RPCModule.execute('list', '');
       console.log(listStr);
       if (listStr) {
@@ -1313,7 +1313,7 @@ export default class RPC {
       await this.fetchInfoAndServerHeight();
 
       let txlist: TransactionType[] = listJSON.map((tx: RPCTransactionType) => {
-        const type = tx.outgoing_metadata ? 'sent' : 'receive';
+        const type = tx.outgoing_metadata ? 'Sent' : 'Received';
 
         //if (tx.txid === '55d6efcb987e8c6b8842a4c78d4adc80d8ca4761e3ff670a730e4840d8659ead') {
         //console.log('tran: ', tx);
@@ -1346,7 +1346,7 @@ export default class RPC {
         const transaction: TransactionType = {
           type,
           address:
-            type === 'sent'
+            type === 'Sent'
               ? tx.outgoing_metadata && tx.outgoing_metadata.length > 0
                 ? tx.outgoing_metadata[0].address
                 : ''
@@ -1362,6 +1362,7 @@ export default class RPC {
           time: tx.datetime,
           position: tx.position,
           detailedTxns: txdetail,
+          memos: [],
         };
 
         return transaction;
@@ -1392,7 +1393,9 @@ export default class RPC {
 
         // Clone the first tx into a new one
         const combinedTx = Object.assign({}, txns[0]);
-        combinedTx.detailedTxns = RPC.rpc_combineTxDetails(txns.flatMap(tx => tx.detailedTxns));
+        combinedTx.detailedTxns = RPC.rpc_combineTxDetails(
+          txns.flatMap(tx => (tx.detailedTxns ? tx.detailedTxns : ({} as TxDetailType))),
+        );
 
         combinedTxList.push(combinedTx);
       });
@@ -1401,6 +1404,100 @@ export default class RPC {
       combinedTxList.sort((t1, t2) => t1.confirmations - t2.confirmations);
 
       this.fnSetTransactionsList(combinedTxList);
+    } catch (error) {
+      console.log(`Critical Error txs list ${error}`);
+      return;
+    }
+  }
+
+  // Fetch all T and Z and O transactions
+  async fetchTandZandOTransactionsSummaries() {
+    try {
+      const summariesStr: string = await RPCModule.execute('summaries', '');
+      //console.log(summariesStr);
+      if (summariesStr) {
+        if (summariesStr.toLowerCase().startsWith('error')) {
+          console.log(`Error txs summaries ${summariesStr}`);
+          return;
+        }
+      } else {
+        console.log('Internal Error txs summaries');
+        return;
+      }
+      const summariesJSON: RPCSummariesType[] = await JSON.parse(summariesStr);
+
+      await this.fetchInfoAndServerHeight();
+
+      let txlist: TransactionType[] = [];
+
+      summariesJSON
+        //.filter(tx => tx.kind !== 'Fee')
+        .forEach((tx: RPCSummariesType) => {
+          let currenttxlist: TransactionType[] = txlist.filter(t => t.txid === tx.txid);
+          if (currenttxlist.length === 0) {
+            currenttxlist = [{} as TransactionType];
+          }
+          let resttxlist: TransactionType[] = txlist.filter(t => t.txid !== tx.txid);
+
+          const type = tx.kind === 'Received' ? tx.kind : 'Sent';
+
+          //if (tx.txid === '55d6efcb987e8c6b8842a4c78d4adc80d8ca4761e3ff670a730e4840d8659ead') {
+          //console.log('tran: ', tx);
+          //console.log('meta: ', tx.outgoing_metadata);
+          //console.log('--------------------------------------------------');
+          //}
+
+          //var txdetail: TxDetailType[] = [];
+          //const detail: TxDetailType = {
+          //  address: tx.to_address || '',
+          //  amount: (tx.amount || 0) / 10 ** 8,
+          //  memos: tx.memos,
+          //};
+          //txdetail = [detail];
+
+          if (!currenttxlist[0].type) {
+            currenttxlist[0].type = type;
+          }
+          if (!currenttxlist[0].address) {
+            currenttxlist[0].address = tx.to_address ? tx.to_address : '';
+          }
+          if (tx.kind === 'Fee') {
+            currenttxlist[0].fee = (currenttxlist[0].fee ? currenttxlist[0].fee : 0) + tx.amount / 10 ** 8;
+            if (!currenttxlist[0].amount) {
+              currenttxlist[0].amount = 0;
+            }
+          } else {
+            currenttxlist[0].amount = (currenttxlist[0].amount ? currenttxlist[0].amount : 0) + tx.amount / 10 ** 8;
+            if (!currenttxlist[0].fee) {
+              currenttxlist[0].fee = 0;
+            }
+          }
+          currenttxlist[0].memos = [
+            ...(currenttxlist[0].memos ? currenttxlist[0].memos : []),
+            ...(tx.memos ? tx.memos : []),
+          ];
+          if (!currenttxlist[0].confirmations) {
+            currenttxlist[0].confirmations = this.lastServerBlockHeight
+              ? this.lastServerBlockHeight - tx.block_height + 1
+              : 0;
+          }
+          if (!currenttxlist[0].txid) {
+            currenttxlist[0].txid = tx.txid;
+          }
+          if (!currenttxlist[0].zec_price) {
+            currenttxlist[0].zec_price = tx.price;
+          }
+          if (!currenttxlist[0].time) {
+            currenttxlist[0].time = tx.datetime;
+          }
+          //currenttxlist[0].detailedTxns = txdetail;
+
+          txlist = [...currenttxlist, ...resttxlist];
+        });
+
+      //console.log(txlist);
+
+      this.fnSetTransactionsList(txlist);
     } catch (error) {
       console.log(`Critical Error txs list ${error}`);
       return;

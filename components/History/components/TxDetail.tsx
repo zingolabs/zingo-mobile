@@ -34,18 +34,18 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
   const [expandTxid, setExpandTxid] = useState(false);
   moment.locale(language);
 
-  const sum =
-    (tx.detailedTxns && tx.detailedTxns.reduce((s: number, d: TxDetailType) => s + (d.amount ? d.amount : 0), 0)) || 0;
-  let fee = 0;
+  //const sum =
+  //  (tx.detailedTxns && tx.detailedTxns.reduce((s: number, d: TxDetailType) => s + (d.amount ? d.amount : 0), 0)) || 0;
+  //let fee = 0;
   // normal case: spend 1600 fee 1000 sent 600
-  if (tx.type === 'sent' && Math.abs(tx.amount) > Math.abs(sum)) {
-    fee = Math.abs(tx.amount) - Math.abs(sum);
-  }
+  //if (tx.type === 'Sent' && Math.abs(tx.amount) > Math.abs(sum)) {
+  //  fee = Math.abs(tx.amount) - Math.abs(sum);
+  //}
   // self-send case: spend 1000 fee 1000 sent 0
   // this is temporary until we have a new field in 'list' object, called: fee.
-  if (tx.type === 'sent' && Math.abs(tx.amount) <= Math.abs(sum)) {
-    fee = Math.abs(tx.amount);
-  }
+  //if (tx.type === 'Sent' && Math.abs(tx.amount) <= Math.abs(sum)) {
+  //  fee = Math.abs(tx.amount);
+  //}
 
   const handleTxIDClick = (txid?: string) => {
     if (!txid) {
@@ -100,7 +100,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
           }}>
           <BoldText style={{ textAlign: 'center', textTransform: 'capitalize', color: spendColor }}>
             {!!tx.type &&
-              (tx.type === 'sent' ? (translate('history.sent') as string) : (translate('history.receive') as string))}
+              (tx.type === 'Sent' ? (translate('history.sent') as string) : (translate('history.receive') as string))}
           </BoldText>
           <ZecAmount
             currencyName={info.currencyName ? info.currencyName : ''}
@@ -154,12 +154,12 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
             </TouchableOpacity>
           </View>
 
-          {fee > 0 && (
+          {!!tx.fee && tx.fee > 0 && (
             <View style={{ display: 'flex', marginTop: 10 }}>
               <FadeText>{translate('history.txfee') as string}</FadeText>
               <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                 <ZecAmount
-                  amtZec={fee}
+                  amtZec={tx.fee}
                   size={18}
                   currencyName={info.currencyName ? info.currencyName : ''}
                   privacy={privacy}
@@ -168,82 +168,119 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
             </View>
           )}
 
-          {tx.detailedTxns.map((txd: TxDetailType) => {
-            // 30 characters per line
-            const numLines = txd.address.length < 40 ? 2 : txd.address.length / 30;
-
-            return (
-              <View
-                key={txd.address}
-                style={{
-                  display: 'flex',
-                  marginTop: 10,
-                  paddingBottom: 15,
-                  borderTopColor: colors.card,
-                  borderTopWidth: 1,
-                  borderBottomColor: colors.card,
-                  borderBottomWidth: 1,
-                }}>
-                <View style={{ marginTop: 10 }}>
-                  <FadeText>{translate('history.address') as string}</FadeText>
-
-                  <TouchableOpacity
-                    onPress={() => {
-                      if (txd.address) {
-                        Clipboard.setString(txd.address);
-                        addLastSnackbar({
-                          message: translate('history.addresscopied') as string,
-                          type: 'Primary',
-                          duration: 'short',
-                        });
-                        setExpandAddress(true);
-                      }
-                    }}>
-                    <View style={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap' }}>
-                      {!txd.address && <RegText>{'Unknown'}</RegText>}
-                      {!expandAddress && !!txd.address && <RegText>{Utils.trimToSmall(txd.address, 10)}</RegText>}
-                      {expandAddress &&
-                        !!txd.address &&
-                        Utils.splitStringIntoChunks(txd.address, Number(numLines.toFixed(0))).map(
-                          (c: string, idx: number) => <RegText key={idx}>{c}</RegText>,
-                        )}
+          {tx.memos &&
+            tx.memos.map((memo: string) => {
+              return (
+                <View
+                  key={memo}
+                  style={{
+                    display: 'flex',
+                    marginTop: 10,
+                    paddingBottom: 15,
+                    borderTopColor: colors.card,
+                    borderTopWidth: 1,
+                    borderBottomColor: colors.card,
+                    borderBottomWidth: 1,
+                  }}>
+                  {!!memo && (
+                    <View style={{ marginTop: 10 }}>
+                      <FadeText>{translate('history.memo') as string}</FadeText>
+                      <TouchableOpacity
+                        onPress={() => {
+                          if (memo) {
+                            Clipboard.setString(memo);
+                            addLastSnackbar({
+                              message: translate('history.memocopied') as string,
+                              type: 'Primary',
+                              duration: 'short',
+                            });
+                          }
+                        }}>
+                        <RegText>{memo}</RegText>
+                      </TouchableOpacity>
                     </View>
-                  </TouchableOpacity>
+                  )}
                 </View>
+              );
+            })}
 
-                <View style={{ marginTop: 10 }}>
-                  <FadeText>{translate('history.amount') as string}</FadeText>
-                  <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <ZecAmount
-                      amtZec={txd.amount}
-                      size={18}
-                      currencyName={info.currencyName ? info.currencyName : ''}
-                      privacy={privacy}
-                    />
-                  </View>
-                </View>
+          {tx.detailedTxns &&
+            tx.detailedTxns.map((txd: TxDetailType) => {
+              // 30 characters per line
+              const numLines = txd.address.length < 40 ? 2 : txd.address.length / 30;
 
-                {txd.memo && (
+              return (
+                <View
+                  key={txd.address}
+                  style={{
+                    display: 'flex',
+                    marginTop: 10,
+                    paddingBottom: 15,
+                    borderTopColor: colors.card,
+                    borderTopWidth: 1,
+                    borderBottomColor: colors.card,
+                    borderBottomWidth: 1,
+                  }}>
                   <View style={{ marginTop: 10 }}>
-                    <FadeText>{translate('history.memo') as string}</FadeText>
+                    <FadeText>{translate('history.address') as string}</FadeText>
+
                     <TouchableOpacity
                       onPress={() => {
-                        if (txd.memo) {
-                          Clipboard.setString(txd.memo);
+                        if (txd.address) {
+                          Clipboard.setString(txd.address);
                           addLastSnackbar({
-                            message: translate('history.memocopied') as string,
+                            message: translate('history.addresscopied') as string,
                             type: 'Primary',
                             duration: 'short',
                           });
+                          setExpandAddress(true);
                         }
                       }}>
-                      <RegText>{txd.memo}</RegText>
+                      <View style={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap' }}>
+                        {!txd.address && <RegText>{'Unknown'}</RegText>}
+                        {!expandAddress && !!txd.address && <RegText>{Utils.trimToSmall(txd.address, 10)}</RegText>}
+                        {expandAddress &&
+                          !!txd.address &&
+                          Utils.splitStringIntoChunks(txd.address, Number(numLines.toFixed(0))).map(
+                            (c: string, idx: number) => <RegText key={idx}>{c}</RegText>,
+                          )}
+                      </View>
                     </TouchableOpacity>
                   </View>
-                )}
-              </View>
-            );
-          })}
+
+                  <View style={{ marginTop: 10 }}>
+                    <FadeText>{translate('history.amount') as string}</FadeText>
+                    <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                      <ZecAmount
+                        amtZec={txd.amount}
+                        size={18}
+                        currencyName={info.currencyName ? info.currencyName : ''}
+                        privacy={privacy}
+                      />
+                    </View>
+                  </View>
+
+                  {txd.memo && (
+                    <View style={{ marginTop: 10 }}>
+                      <FadeText>{translate('history.memo') as string}</FadeText>
+                      <TouchableOpacity
+                        onPress={() => {
+                          if (txd.memo) {
+                            Clipboard.setString(txd.memo);
+                            addLastSnackbar({
+                              message: translate('history.memocopied') as string,
+                              type: 'Primary',
+                              duration: 'short',
+                            });
+                          }
+                        }}>
+                        <RegText>{txd.memo}</RegText>
+                      </TouchableOpacity>
+                    </View>
+                  )}
+                </View>
+              );
+            })}
         </View>
       </ScrollView>
       <View style={{ flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', margin: 10 }}>

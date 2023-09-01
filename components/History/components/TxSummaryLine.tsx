@@ -34,9 +34,9 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
   const { colors } = useTheme() as unknown as ThemeType;
 
   const amountColor =
-    tx.confirmations === 0 ? colors.primaryDisabled : (tx.amount || 0) > 0 ? colors.primary : colors.text;
+    tx.confirmations === 0 ? colors.primaryDisabled : tx.type === 'Received' ? colors.primary : colors.text;
 
-  const txIcon = tx.confirmations === 0 ? faRefresh : (tx.amount || 0) >= 0 ? faArrowDown : faArrowUp;
+  const txIcon = tx.confirmations === 0 ? faRefresh : tx.type === 'Received' ? faArrowDown : faArrowUp;
   moment.locale(language);
 
   const displayAddress =
@@ -86,7 +86,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
             <FadeText style={{ fontSize: 18 }}>{displayAddress}</FadeText>
             <View style={{ display: 'flex', flexDirection: 'row' }}>
               <FadeText>
-                {tx.type === 'sent' ? (translate('history.sent') as string) : (translate('history.receive') as string)}
+                {tx.type === 'Sent' ? (translate('history.sent') as string) : (translate('history.receive') as string)}
               </FadeText>
               <FadeText>{tx.time ? moment((tx.time || 0) * 1000).format('MMM D, h:mm a') : '--'}</FadeText>
             </View>
