@@ -56,6 +56,7 @@ describe('Component Info - test', () => {
       solps: 0,
       defaultFee: 10000,
       chain_name: 'main',
+      zingolib: 'mob-release...',
     };
     state.zecPrice.zecPrice = 33.33;
     state.currency = 'USD';
