@@ -216,7 +216,7 @@
     "phone": "Phone",
     "errorgemini": "Error fetching the price from the Internet.",
     "errorrpcmodule": "Internal Error fetching the price from the Internet",
-    "zingolib": "Zingolib version"
+    "zingolib": "Zingolib Version"
   },
   "rescan": {
     "title": "Rescan",
