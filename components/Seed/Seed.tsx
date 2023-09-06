@@ -17,6 +17,7 @@ import Header from '../Header';
 import Utils from '../../app/utils';
 import { createAlert } from '../../app/createAlert';
 import SnackbarType from '../../app/AppState/types/SnackbarType';
+import SettingsFileImpl from '../Settings/SettingsFileImpl';
 
 type TextsType = {
   new: string[];
@@ -77,8 +78,15 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
   const [latestBlock, setLatestBlock] = useState(0);
   const [expandSeed, setExpandSeed] = useState(false);
   const [expandBirthday, setExpandBithday] = useState(false);
+  const [basicFirstViewSeed, setBasicFirstViewSeed] = useState(true);
 
   const slideAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    (async () => {
+      setBasicFirstViewSeed((await SettingsFileImpl.readSettings()).basicFirstViewSeed);
+    })();
+  }, []);
 
   useEffect(() => {
     if (privacy) {
@@ -246,6 +254,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
             netInfo={netInfo}
             mode={mode}
             addLastSnackbar={addLastSnackbar}
+            receivedLegend={!basicFirstViewSeed}
           />
         </View>
       </Animated.View>
@@ -462,9 +471,15 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
             backgroundColor: mode === 'basic' ? colors.background : colors.primary,
           }}
           title={
-            mode === 'basic' ? (translate('cancel') as string) : !!texts && !!texts[action] ? texts[action][times] : ''
+            mode === 'basic'
+              ? !basicFirstViewSeed
+                ? (translate('seed.showtransactions') as string)
+                : (translate('close') as string)
+              : !!texts && !!texts[action]
+              ? texts[action][times]
+              : ''
           }
-          onPress={() => {
+          onPress={async () => {
             if (!seedPhrase) {
               return;
             }
@@ -473,6 +488,10 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
                 addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
               }
               return;
+            }
+            // the user just see the seed for the first time.
+            if (mode === 'basic' && !basicFirstViewSeed) {
+              await SettingsFileImpl.writeSettings('basicFirstViewSeed', true);
             }
             if (times === 0) {
               if (action === 'restore') {

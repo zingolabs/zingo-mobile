@@ -272,7 +272,8 @@
     "seedplaceholder": "Semilla (24 palabras)",
     "seed-acc": "Campo Frase Semilla",
     "birthday-acc": "Campo Cumpleaños",
-    "tapreveal": "Pulsar para revelar"
+    "tapreveal": "Pulsar para revelar",
+    "showtransactions": "Ver Transacciones"
   },
   "send": {
     "Broadcast": "Transmitida con éxito Tx:",

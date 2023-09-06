@@ -272,7 +272,8 @@
     "seedplaceholder": "Seed (24 words)",
     "seed-acc": "Seed Phrase Field",
     "birthday-acc": "Birthday Field",
-    "tapreveal": "Tap to reveal"
+    "tapreveal": "Tap to reveal",
+    "showtransactions": "Show Transactions"
   },
   "send": {
     "Broadcast": "Successfully Broadcast Tx:",
