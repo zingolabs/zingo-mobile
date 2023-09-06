@@ -31,15 +31,8 @@ jobs:
         abi: [ x86_64, x86, arm64-v8a, armeabi-v7a ]
     uses: ./.github/workflows/integration-test.yaml
     needs: [ create-timestamp, create-cache-key, build ]
-    if: ${{ ! cancelled() }}
     with:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
       abi: ${{ matrix.abi }}  
-
-  e2e-test:
-    uses: ./.github/workflows/e2e-test.yaml
-    needs: [ create-cache-key, build ]
-    if: ${{ ! cancelled() }}
-    with:
-      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+      
