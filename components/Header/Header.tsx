@@ -53,6 +53,7 @@ type HeaderProps = {
   setPoolsToShieldSelectTransparent?: (v: boolean) => void;
   setUfvkViewModalVisible?: (v: boolean) => void;
   addLastSnackbar?: (snackbar: SnackbarType) => void;
+  receivedLegend?: boolean;
 };
 
 const Header: React.FunctionComponent<HeaderProps> = ({
@@ -76,6 +77,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   setPoolsToShieldSelectTransparent,
   setUfvkViewModalVisible,
   addLastSnackbar,
+  receivedLegend,
 }) => {
   const context = useContext(ContextAppLoaded);
   const {
@@ -490,7 +492,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         )}
       </View>
 
-      {noBalance && <View style={{ height: 20 }} />}
+      {noBalance && !receivedLegend && <View style={{ height: 20 }} />}
       {!noBalance && (
         <View
           style={{
@@ -530,6 +532,27 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 </View>
               </TouchableOpacity>
             )}
+        </View>
+      )}
+
+      {receivedLegend && (
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: 0,
+            marginTop: readOnly ? 15 : 0,
+          }}>
+          <RegText color={colors.primary}>You received</RegText>
+          <ZecAmount
+            currencyName={info.currencyName ? info.currencyName : ''}
+            color={colors.primary}
+            size={18}
+            amtZec={totalBalance.total}
+            privacy={privacy}
+          />
+          <RegText color={colors.primary}>!!!</RegText>
         </View>
       )}
 

@@ -512,7 +512,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
         const background = await AsyncStorage.getItem('@background');
         // only if the wallet have some transactions
         if (background === 'no' && transactions.length > 0) {
-          await SettingsFileImpl.writeSettings('basicFirstViewSeed', true);
+          // I need to check this out in the seed screen.
+          // I will do this update later on
+          //await SettingsFileImpl.writeSettings('basicFirstViewSeed', true);
           await this.fetchWallet();
           this.setState({ seedViewModalVisible: true });
         }
@@ -1470,33 +1472,31 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 },
                 headerShown: false,
               })}>
-              {!(this.state.mode === 'basic' && this.state.transactions.length <= 0) && (
-                <Tab.Screen name={translate('loadedapp.wallet-menu') as string}>
-                  {() => (
-                    <>
-                      <Suspense
-                        fallback={
-                          <View>
-                            <Text>{translate('loading') as string}</Text>
-                          </View>
-                        }>
-                        <History
-                          doRefresh={this.doRefresh}
-                          toggleMenuDrawer={this.toggleMenuDrawer}
-                          syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
-                          poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
-                          setZecPrice={this.setZecPrice}
-                          setComputingModalVisible={this.setComputingModalVisible}
-                          set_privacy_option={this.set_privacy_option}
-                          setPoolsToShieldSelectSapling={this.setPoolsToShieldSelectSapling}
-                          setPoolsToShieldSelectTransparent={this.setPoolsToShieldSelectTransparent}
-                          setUfvkViewModalVisible={this.setUfvkViewModalVisible}
-                        />
-                      </Suspense>
-                    </>
-                  )}
-                </Tab.Screen>
-              )}
+              <Tab.Screen name={translate('loadedapp.wallet-menu') as string}>
+                {() => (
+                  <>
+                    <Suspense
+                      fallback={
+                        <View>
+                          <Text>{translate('loading') as string}</Text>
+                        </View>
+                      }>
+                      <History
+                        doRefresh={this.doRefresh}
+                        toggleMenuDrawer={this.toggleMenuDrawer}
+                        syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
+                        poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
+                        setZecPrice={this.setZecPrice}
+                        setComputingModalVisible={this.setComputingModalVisible}
+                        set_privacy_option={this.set_privacy_option}
+                        setPoolsToShieldSelectSapling={this.setPoolsToShieldSelectSapling}
+                        setPoolsToShieldSelectTransparent={this.setPoolsToShieldSelectTransparent}
+                        setUfvkViewModalVisible={this.setUfvkViewModalVisible}
+                      />
+                    </Suspense>
+                  </>
+                )}
+              </Tab.Screen>
               {!this.state.readOnly &&
                 !(
                   this.state.mode === 'basic' &&
@@ -1553,7 +1553,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
             </Tab.Navigator>
           ) : (
             <Tab.Navigator
-              initialRouteName={translate('loadedapp.uas-menu') as string}
+              initialRouteName={translate('loadedapp.wallet-menu') as string}
               screenOptions={{
                 tabBarStyle: {
                   borderTopColor: colors.background,
@@ -1562,7 +1562,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 },
                 headerShown: false,
               }}>
-              <Tab.Screen name={translate('loadedapp.uas-menu') as string}>
+              <Tab.Screen name={translate('loadedapp.wallet-menu') as string}>
                 {() => (
                   <>
                     <Suspense
