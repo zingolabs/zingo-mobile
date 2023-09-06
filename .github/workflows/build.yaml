@@ -46,7 +46,7 @@ jobs:
   build:
     name: Build native rust
     needs: check-build-cache
-    if: ${{ needs.check-build-cache.outputs.cache-found == 'false' }}
+    if: ${{ needs.check-build-cache.outputs.cache-found != 'true' }}
     runs-on: ubuntu-22.04
     container:
       image: zingodevops/android_builder:006
