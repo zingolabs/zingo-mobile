@@ -89,7 +89,14 @@ const Send: React.FunctionComponent<SendProps> = ({
   // transparent is not spendable.
   const spendable = totalBalance.spendablePrivate + totalBalance.spendableOrchard;
   const stillConfirming = parseFloat(spendable.toFixed(8)) !== totalBalance.total - totalBalance.transparentBal;
-  const showShieldInfo = totalBalance && totalBalance.transparentBal + totalBalance.privateBal > info.defaultFee;
+  const showShieldInfo =
+    totalBalance &&
+    totalBalance.transparentBal > 0 &&
+    totalBalance.transparentBal + totalBalance.privateBal > info.defaultFee;
+  const showUpgradeInfo =
+    totalBalance &&
+    totalBalance.transparentBal <= 0 &&
+    totalBalance.transparentBal + totalBalance.privateBal > info.defaultFee;
 
   const getMaxAmount = useCallback((): number => {
     let max = spendable - defaultFee;
@@ -669,7 +676,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           </View>
                         </TouchableOpacity>
                       )}
-                      {showShieldInfo && (
+                      {(showShieldInfo || showUpgradeInfo) && (
                         <TouchableOpacity onPress={() => poolsMoreInfoOnClick()}>
                           <View
                             style={{
@@ -686,7 +693,11 @@ const Send: React.FunctionComponent<SendProps> = ({
                               color={colors.primary}
                               style={{ marginRight: 5 }}
                             />
-                            <FadeText>{translate('send.needtoshield') as string}</FadeText>
+                            {showShieldInfo || mode === 'basic' ? (
+                              <FadeText>{translate('send.needtoshield') as string}</FadeText>
+                            ) : showUpgradeInfo ? (
+                              <FadeText>{translate('send.needtoupgrade') as string}</FadeText>
+                            ) : null}
                           </View>
                         </TouchableOpacity>
                       )}
