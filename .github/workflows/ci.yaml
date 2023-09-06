@@ -29,7 +29,6 @@ jobs:
   integration-test:
     uses: ./.github/workflows/integration-test.yaml
     needs: [ create-timestamp, create-cache-key, build ]
-    if: ${{ ! cancelled() }}
     with:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
