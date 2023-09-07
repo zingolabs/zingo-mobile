@@ -152,6 +152,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
       </Animated.View>
 
       <ScrollView
+        keyboardShouldPersistTaps="handled"
         style={{ maxHeight: '85%' }}
         contentContainerStyle={{
           flexDirection: 'column',

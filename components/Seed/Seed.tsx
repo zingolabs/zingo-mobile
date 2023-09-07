@@ -262,6 +262,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
       <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
 
       <ScrollView
+        keyboardShouldPersistTaps="handled"
         style={{ maxHeight: '85%' }}
         contentContainerStyle={{
           flexDirection: 'column',
