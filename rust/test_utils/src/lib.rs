@@ -4,6 +4,7 @@ use bollard::Docker;
 use std::default::Default;
 use std::process::Command;
 // use tokio::runtime::Runtime;
+use futures::{stream, StreamExt};
 
 pub async fn launch_regchest() {
     let docker = Docker::connect_with_local_defaults().unwrap();
