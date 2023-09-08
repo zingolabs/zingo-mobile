@@ -1,5 +1,5 @@
 #![forbid(unsafe_code)]
-use test_utils;
+use test_utils::{self, launch_regchest};
 use zingo_testutils::{self, scenarios};
 
 async fn offline_testsuite(abi: &str) {
@@ -30,6 +30,8 @@ async fn execute_sync_from_seed(abi: &str) {
 }
 
 async fn regchest(abi: &str) {
+    launch_regchest().await;
+
     let (exit_code, output, error) =
         test_utils::android_integration_test(abi, "ExecuteSendFromOrchard");
 
