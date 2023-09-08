@@ -308,6 +308,10 @@ else
     if [[ $(cat "${test_report_dir}/test_results.txt" | grep INSTRUMENTATION_CODE | cut -d' ' -f2) -ne -1 || \
             $(cat "${test_report_dir}/test_results.txt" | grep 'FAILURES!!!') ]]; then
         echo -e "\nIntegration tests FAILED"
+
+        # Kill all emulators
+        ../scripts/kill_emulators.sh
+
         exit 1
     fi
 
