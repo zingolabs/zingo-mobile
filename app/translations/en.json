@@ -389,7 +389,8 @@
     "history": "History",
     "sure": "Sure? ",
     "minago": " min.",
-    "details": "Transaction Details"
+    "details": "Transaction Details",
+    "pool": "Pool"
   },
   "report": {
     "title": "Sync / Rescan Report",

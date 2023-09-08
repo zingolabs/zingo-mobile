@@ -6,7 +6,7 @@ import moment from 'moment';
 import 'moment/locale/es';
 import { useTheme } from '@react-navigation/native';
 
-import { TransactionType, TxDetailType } from '../../../app/AppState';
+import { TransactionType } from '../../../app/AppState';
 import Utils from '../../../app/utils';
 import RegText from '../../Components/RegText';
 import ZecAmount from '../../Components/ZecAmount';
@@ -16,6 +16,7 @@ import { ThemeType } from '../../../app/types';
 import { ContextAppLoaded } from '../../../app/context';
 import Header from '../../Header';
 import BoldText from '../../Components/BoldText';
+import CurrencyAmount from '../../Components/CurrencyAmount';
 
 type TxDetailProps = {
   tx: TransactionType;
@@ -25,11 +26,14 @@ type TxDetailProps = {
 
 const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_privacy_option }) => {
   const context = useContext(ContextAppLoaded);
-  const { info, translate, language, privacy, addLastSnackbar, server } = context;
+  const { info, translate, language, privacy, addLastSnackbar, server, currency } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const spendColor =
-    tx.confirmations === 0 ? colors.primaryDisabled : (tx.amount || 0) > 0 ? colors.primary : colors.text;
-
+    tx.confirmations === 0 ? colors.primaryDisabled : tx.type === 'Received' ? colors.primary : colors.text;
+  let numLines = 1;
+  if (tx.address) {
+    numLines = tx.address.length < 40 ? 2 : tx.address.length / 30;
+  }
   const [expandAddress, setExpandAddress] = useState(false);
   const [expandTxid, setExpandTxid] = useState(false);
   moment.locale(language);
@@ -109,6 +113,9 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
             privacy={privacy}
             smallPrefix={true}
           />
+          {!!tx.zec_price && (
+            <CurrencyAmount price={tx.zec_price} amtZec={tx.amount} currency={currency} privacy={privacy} />
+          )}
         </View>
 
         <View style={{ margin: 10 }}>
@@ -154,6 +161,56 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
             </TouchableOpacity>
           </View>
 
+          {!!tx.address && (
+            <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: 10 }}>
+              <FadeText>{translate('history.address') as string}</FadeText>
+              <TouchableOpacity
+                onPress={() => {
+                  if (tx.address) {
+                    Clipboard.setString(tx.address);
+                    addLastSnackbar({
+                      message: translate('history.addresscopied') as string,
+                      type: 'Primary',
+                      duration: 'short',
+                    });
+                    setExpandAddress(true);
+                  }
+                }}>
+                <View style={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap' }}>
+                  {!tx.address && <RegText>{'Unknown'}</RegText>}
+                  {!expandAddress && !!tx.address && <RegText>{Utils.trimToSmall(tx.address, 10)}</RegText>}
+                  {expandAddress &&
+                    !!tx.address &&
+                    Utils.splitStringIntoChunks(tx.address, Number(numLines.toFixed(0))).map(
+                      (c: string, idx: number) => <RegText key={idx}>{c}</RegText>,
+                    )}
+                </View>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {!!tx.pool && (
+            <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: 10 }}>
+              <FadeText>{translate('history.pool') as string}</FadeText>
+              <RegText>{tx.pool}</RegText>
+            </View>
+          )}
+
+          <View style={{ marginTop: 10 }}>
+            <FadeText>{translate('history.amount') as string}</FadeText>
+            <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+              <ZecAmount
+                amtZec={tx.amount}
+                size={18}
+                currencyName={info.currencyName ? info.currencyName : ''}
+                privacy={privacy}
+              />
+              {!!tx.zec_price && (
+                <CurrencyAmount price={tx.zec_price} amtZec={tx.amount} currency={currency} privacy={privacy} />
+              )}
+            </View>
+          </View>
+
           {!!tx.fee && tx.fee > 0 && (
             <View style={{ display: 'flex', marginTop: 10 }}>
               <FadeText>{translate('history.txfee') as string}</FadeText>
@@ -197,84 +254,6 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
                           }
                         }}>
                         <RegText>{memo}</RegText>
-                      </TouchableOpacity>
-                    </View>
-                  )}
-                </View>
-              );
-            })}
-
-          {tx.detailedTxns &&
-            tx.detailedTxns.map((txd: TxDetailType) => {
-              // 30 characters per line
-              const numLines = txd.address.length < 40 ? 2 : txd.address.length / 30;
-
-              return (
-                <View
-                  key={txd.address}
-                  style={{
-                    display: 'flex',
-                    marginTop: 10,
-                    paddingBottom: 15,
-                    borderTopColor: colors.card,
-                    borderTopWidth: 1,
-                    borderBottomColor: colors.card,
-                    borderBottomWidth: 1,
-                  }}>
-                  <View style={{ marginTop: 10 }}>
-                    <FadeText>{translate('history.address') as string}</FadeText>
-
-                    <TouchableOpacity
-                      onPress={() => {
-                        if (txd.address) {
-                          Clipboard.setString(txd.address);
-                          addLastSnackbar({
-                            message: translate('history.addresscopied') as string,
-                            type: 'Primary',
-                            duration: 'short',
-                          });
-                          setExpandAddress(true);
-                        }
-                      }}>
-                      <View style={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap' }}>
-                        {!txd.address && <RegText>{'Unknown'}</RegText>}
-                        {!expandAddress && !!txd.address && <RegText>{Utils.trimToSmall(txd.address, 10)}</RegText>}
-                        {expandAddress &&
-                          !!txd.address &&
-                          Utils.splitStringIntoChunks(txd.address, Number(numLines.toFixed(0))).map(
-                            (c: string, idx: number) => <RegText key={idx}>{c}</RegText>,
-                          )}
-                      </View>
-                    </TouchableOpacity>
-                  </View>
-
-                  <View style={{ marginTop: 10 }}>
-                    <FadeText>{translate('history.amount') as string}</FadeText>
-                    <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                      <ZecAmount
-                        amtZec={txd.amount}
-                        size={18}
-                        currencyName={info.currencyName ? info.currencyName : ''}
-                        privacy={privacy}
-                      />
-                    </View>
-                  </View>
-
-                  {txd.memo && (
-                    <View style={{ marginTop: 10 }}>
-                      <FadeText>{translate('history.memo') as string}</FadeText>
-                      <TouchableOpacity
-                        onPress={() => {
-                          if (txd.memo) {
-                            Clipboard.setString(txd.memo);
-                            addLastSnackbar({
-                              message: translate('history.memocopied') as string,
-                              type: 'Primary',
-                              duration: 'short',
-                            });
-                          }
-                        }}>
-                        <RegText>{txd.memo}</RegText>
                       </TouchableOpacity>
                     </View>
                   )}

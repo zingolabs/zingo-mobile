@@ -39,10 +39,8 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
   const txIcon = tx.confirmations === 0 ? faRefresh : tx.type === 'Received' ? faArrowDown : faArrowUp;
   moment.locale(language);
 
-  const displayAddress =
-    tx.detailedTxns && tx.detailedTxns.length > 0 && tx.detailedTxns[0].address
-      ? Utils.trimToSmall(tx.detailedTxns[0].address, 7)
-      : 'Unknown';
+  // if no address I'm going to put txid here.
+  const displayAddress = tx.address ? Utils.trimToSmall(tx.address, 7) : Utils.trimToSmall(tx.txid, 7);
 
   //console.log('render TxSummaryLine - 5', index);
 

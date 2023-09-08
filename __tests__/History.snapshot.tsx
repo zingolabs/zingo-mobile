@@ -77,26 +77,24 @@ describe('Component History - test', () => {
   const state = defaultAppStateLoaded;
   state.transactions = [
     {
-      type: 'sent',
+      type: 'Sent',
       address: 'sent-address-12345678901234567890',
       amount: 0.12345678,
-      position: '',
+      fee: 0.0001,
       confirmations: 22,
       txid: 'sent-txid-1234567890',
       time: Date.now(),
       zec_price: 33.33,
-      detailedTxns: [],
     },
     {
-      type: 'receive',
+      type: 'Received',
       address: 'receive-address-12345678901234567890',
       amount: 0.87654321,
-      position: '',
+      pool: 'Orchard',
       confirmations: 133,
       txid: 'receive-txid-1234567890',
       time: Date.now(),
       zec_price: 66.66,
-      detailedTxns: [],
     },
   ];
   state.uaAddress = 'UA-12345678901234567890';

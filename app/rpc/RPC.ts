@@ -1439,7 +1439,7 @@ export default class RPC {
           }
           let resttxlist: TransactionType[] = txlist.filter(t => t.txid !== tx.txid);
 
-          const type = tx.kind === 'Received' ? tx.kind : 'Sent';
+          const type = tx.kind === 'Received' ? 'Received' : 'Sent';
 
           //if (tx.txid === '55d6efcb987e8c6b8842a4c78d4adc80d8ca4761e3ff670a730e4840d8659ead') {
           //console.log('tran: ', tx);
@@ -1459,7 +1459,7 @@ export default class RPC {
             currenttxlist[0].type = type;
           }
           if (!currenttxlist[0].address) {
-            currenttxlist[0].address = tx.to_address ? tx.to_address : '';
+            currenttxlist[0].address = tx.to_address === 'none' ? undefined : tx.to_address;
           }
           if (tx.kind === 'Fee') {
             currenttxlist[0].fee = (currenttxlist[0].fee ? currenttxlist[0].fee : 0) + tx.amount / 10 ** 8;
@@ -1484,14 +1484,22 @@ export default class RPC {
           if (!currenttxlist[0].txid) {
             currenttxlist[0].txid = tx.txid;
           }
-          if (!currenttxlist[0].zec_price) {
-            currenttxlist[0].zec_price = tx.price;
-          }
           if (!currenttxlist[0].time) {
             currenttxlist[0].time = tx.datetime;
           }
+          if (!currenttxlist[0].zec_price) {
+            currenttxlist[0].zec_price = tx.price === 'none' ? null : tx.price;
+          }
           //currenttxlist[0].detailedTxns = txdetail;
-
+          if (!currenttxlist[0].pool) {
+            currenttxlist[0].pool = tx.pool === 'none' ? undefined : tx.pool;
+          } else {
+            if (currenttxlist[0].pool !== tx.pool) {
+              // have more than one item for different pools
+              // I'm going to concat those values for now.
+              currenttxlist[0].pool += '/' + tx.pool;
+            }
+          }
           txlist = [...currenttxlist, ...resttxlist];
         });
 

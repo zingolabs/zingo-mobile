@@ -8,7 +8,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react-native';
 import TxDetail from '../components/History/components/TxDetail';
 import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
-import { TransactionType, TxDetailType } from '../app/AppState';
+import { TransactionType } from '../app/AppState';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -83,28 +83,22 @@ describe('Component History TxDetail - test', () => {
     state.info.currencyName = 'ZEC';
     state.totalBalance.total = 1.12345678;
     const tx = {
-      type: 'sent',
+      type: 'Sent',
       address: 'UA-12345678901234567890',
-      amount: -0.0065,
-      position: '',
+      amount: 0.0064,
+      fee: 0.0001,
       confirmations: 20,
       txid: 'txid-1234567890',
       time: Date.now(),
       zec_price: 33.33,
-      detailedTxns: [
-        {
-          address: 'other-UA-12345678901234567890',
-          amount: 0.0064,
-          memo: 'memo-abcdefgh',
-        },
-      ] as TxDetailType[],
     } as TransactionType;
     render(
       <ContextAppLoadedProvider value={state}>
         <TxDetail tx={tx} closeModal={onClose} set_privacy_option={onSetOption} />
       </ContextAppLoadedProvider>,
     ).toJSON();
-    screen.getByText('0.0064');
+    const num = screen.getAllByText('0.0064');
+    expect(num.length).toBe(2);
     screen.getByText('0.0001');
   });
 
@@ -112,30 +106,23 @@ describe('Component History TxDetail - test', () => {
     state.info.currencyName = 'ZEC';
     state.totalBalance.total = 1.12345678;
     const txSelfSend = {
-      type: 'sent',
+      type: 'Sent',
       address: 'UA-12345678901234567890',
-      amount: -0.0001,
-      position: '',
+      amount: 0,
+      fee: 0.0001,
       confirmations: 20,
       txid: 'txid-1234567890',
       time: Date.now(),
       zec_price: 33.33,
-      detailedTxns: [
-        {
-          address: 'other-UA-12345678901234567890',
-          amount: 0.0064,
-          memo: 'memo-abcdefgh',
-        },
-      ] as TxDetailType[],
     } as TransactionType;
     render(
       <ContextAppLoadedProvider value={state}>
         <TxDetail tx={txSelfSend} closeModal={onClose} set_privacy_option={onSetOption} />
       </ContextAppLoadedProvider>,
     );
-    screen.getByText('0.0064');
-    // because the negative symbol is not there.
-    const num = screen.getAllByText('0.0001');
+    const num = screen.getAllByText('0.0000');
     expect(num.length).toBe(2);
+    // because the negative symbol is not there.
+    screen.getByText('0.0001');
   });
 });

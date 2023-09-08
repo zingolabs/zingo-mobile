@@ -388,7 +388,8 @@
     "history": "Histórico",
     "sure": "¿Seguro? ",
     "minago": " min.",
-    "details": "Detalles de la Transacción"
+    "details": "Detalles de la Transacción",
+    "pool": "Grupo"
   },
   "report": {
     "title": "Informe de Sincronización",
