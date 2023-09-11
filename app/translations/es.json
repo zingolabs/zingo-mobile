@@ -371,6 +371,7 @@
     "back": " Atrás",
     "sent": "Enviado ",
     "receive": "Recibido ",
+    "sendtoself": "Auto-Enviado ",
     "time": "Hora",
     "confirmations": "Confirmaciones",
     "txid": "Transacción ID",

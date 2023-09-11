@@ -78,23 +78,59 @@ describe('Component History - test', () => {
   state.transactions = [
     {
       type: 'Sent',
-      address: 'sent-address-12345678901234567890',
-      amount: 0.12345678,
       fee: 0.0001,
       confirmations: 22,
       txid: 'sent-txid-1234567890',
       time: Date.now(),
       zec_price: 33.33,
+      txDetails: [
+        {
+          address: 'sent-address-1-12345678901234567890',
+          amount: 0.12345678,
+          memos: ['hola', '  & ', 'hello'],
+        },
+        {
+          address: 'sent-address-2-09876543210987654321',
+          amount: 0,
+          memos: ['hello', '  & ', 'hola'],
+        },
+      ],
+    },
+    {
+      type: 'SendToSelf',
+      fee: 0.0001,
+      confirmations: 12,
+      txid: 'sendtoself-txid-1234567890',
+      time: Date.now(),
+      zec_price: 33.33,
+      txDetails: [
+        {
+          address: '',
+          amount: 0,
+          memos: ['orchard memo', 'sapling memo'],
+        },
+      ],
     },
     {
       type: 'Received',
-      address: 'receive-address-12345678901234567890',
-      amount: 0.87654321,
-      pool: 'Orchard',
       confirmations: 133,
       txid: 'receive-txid-1234567890',
       time: Date.now(),
       zec_price: 66.66,
+      txDetails: [
+        {
+          address: '',
+          amount: 0.77654321,
+          pool: 'Orchard',
+          memos: ['hola', '  & ', 'hello'],
+        },
+        {
+          address: '',
+          amount: 0.1,
+          pool: 'Sapling',
+          memos: ['hello', '  & ', 'hola'],
+        },
+      ],
     },
   ];
   state.uaAddress = 'UA-12345678901234567890';

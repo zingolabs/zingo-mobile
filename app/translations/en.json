@@ -321,7 +321,6 @@
     "private": "Private",
     "amountrevealed" : "Amount Revealed",
     "deshielded": "Deshielded"
-
   },
   "receive": {
     "u-title": "Unified Address",
@@ -372,6 +371,7 @@
     "back": " Back",
     "sent": "Sent ",
     "receive": "Receive ",
+    "sendtoself": "Send-to-Self ",
     "time": "Time",
     "confirmations": "Confirmations",
     "txid": "Transaction ID",

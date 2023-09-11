@@ -40,7 +40,10 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
   moment.locale(language);
 
   // if no address I'm going to put txid here.
-  const displayAddress = tx.address ? Utils.trimToSmall(tx.address, 7) : Utils.trimToSmall(tx.txid, 7);
+  const displayAddress =
+    tx.txDetails.length === 1 && tx.txDetails[0].address
+      ? Utils.trimToSmall(tx.txDetails[0].address, 7)
+      : Utils.trimToSmall(tx.txid, 7);
 
   //console.log('render TxSummaryLine - 5', index);
 
@@ -84,7 +87,11 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
             <FadeText style={{ fontSize: 18 }}>{displayAddress}</FadeText>
             <View style={{ display: 'flex', flexDirection: 'row' }}>
               <FadeText>
-                {tx.type === 'Sent' ? (translate('history.sent') as string) : (translate('history.receive') as string)}
+                {tx.type === 'Sent'
+                  ? (translate('history.sent') as string)
+                  : tx.type === 'Received'
+                  ? (translate('history.receive') as string)
+                  : (translate('history.sendtoself') as string)}
               </FadeText>
               <FadeText>{tx.time ? moment((tx.time || 0) * 1000).format('MMM D, h:mm a') : '--'}</FadeText>
             </View>
@@ -94,7 +101,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
             size={18}
             currencyName={info.currencyName ? info.currencyName : ''}
             color={amountColor}
-            amtZec={tx.amount}
+            amtZec={tx.txDetails.reduce((s, d) => s + d.amount, 0) + (tx.fee ? tx.fee : 0)}
             privacy={privacy}
           />
         </View>
