@@ -1,4 +1,5 @@
 #![forbid(unsafe_code)]
+// use bollard::Docker;
 use test_utils;
 use zingo_testutils::{self, scenarios};
 
@@ -30,10 +31,12 @@ async fn execute_sync_from_seed(abi: &str) {
 }
 
 async fn regchest(abi: &str) {
-    test_utils::launch_regchest().await;
+    let docker = test_utils::launch_regchest().await;
 
     let (exit_code, output, error) =
         test_utils::android_integration_test(abi, "ExecuteSendFromOrchard");
+
+    test_utils::close_regchest(docker).await;
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);

@@ -1,12 +1,13 @@
-use bollard::container::*;
-// use bollard::models::*;
+use bollard::container::{
+    Config, CreateContainerOptions, LogsOptions, RemoveContainerOptions, StartContainerOptions,
+};
+use bollard::models::HostConfig;
 use bollard::Docker;
+use futures::StreamExt;
 use std::default::Default;
 use std::process::Command;
-// use tokio::runtime::Runtime;
-use futures::{stream, StreamExt};
 
-pub async fn launch_regchest() {
+pub async fn launch_regchest() -> Docker {
     let docker = Docker::connect_with_local_defaults().unwrap();
 
     let container_options = Some(CreateContainerOptions {
@@ -14,15 +15,23 @@ pub async fn launch_regchest() {
         platform: None,
     });
 
-    let config = bollard::container::Config {
-        image: Some("zingodevops/regchest:001"),
-        cmd: None,
+    let host_config = HostConfig {
+        network_mode: Some(String::from("host")),
         ..Default::default()
     };
 
-    match docker.create_container(container_options, config).await {
+    let container_config = Config {
+        image: Some("zingodevops/regchest:001"),
+        host_config: Some(host_config),
+        ..Default::default()
+    };
+
+    match docker
+        .create_container(container_options, container_config)
+        .await
+    {
         Ok(_) => println!("Regchest container created successfully"),
-        Err(e) => println!("Failed to create container: {}", e),
+        Err(e) => println!("Failed to create regchest container: {}", e),
     }
 
     match docker
@@ -30,29 +39,46 @@ pub async fn launch_regchest() {
         .await
     {
         Ok(_) => println!("Regchest container started successfully"),
-        Err(e) => println!("Failed to start container: {}", e),
+        Err(e) => println!("Failed to start regchest container: {}", e),
     }
 
-    let logs_options = LogsOptions {
+    let logs_options = Some(LogsOptions::<String> {
         stdout: true,
-        // follow: true,
+        follow: true,
         ..Default::default()
-    };
+    });
 
-    let mut stream = docker.logs("regchest", Some(logs_options));
+    let mut stream = docker.logs("regchest", logs_options);
 
     while let Some(result) = stream.next().await {
         match result {
-            Ok(msg) if msg.contains("success") => {
-                println!("Success message received, exiting loop.");
-                break;
+            Ok(message) => {
+                let m = &message.into_bytes();
+                let s = std::str::from_utf8(m).unwrap();
+                if s.contains("Successfully launched regtest environment!") {
+                    println!("Success message received, exiting loop.");
+                    break;
+                }
             }
-            Ok(_) => {}
             Err(_) => {
                 println!("Error in stream, exiting loop.");
                 break;
             }
         }
+    }
+
+    docker
+}
+
+pub async fn close_regchest(docker: Docker) {
+    let remove_options = Some(RemoveContainerOptions {
+        force: true,
+        ..Default::default()
+    });
+
+    match docker.remove_container("regchest", remove_options).await {
+        Ok(_) => println!("Regchest container removed successfully"),
+        Err(e) => println!("Failed to remove regchest container: {}", e),
     }
 }
 
