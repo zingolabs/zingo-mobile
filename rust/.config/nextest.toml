@@ -1,5 +1,5 @@
 [profile.default]
-# retries = 3
+retries = 3
 test-threads = 1
 
 [profile.ci]
