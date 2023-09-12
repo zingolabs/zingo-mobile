@@ -1,10 +1,8 @@
 #![forbid(unsafe_code)]
-// use bollard::Docker;
-use test_utils;
 use zingo_testutils::{self, scenarios};
 
 async fn offline_testsuite(abi: &str) {
-    let (exit_code, output, error) = test_utils::android_integration_test(abi, "OfflineTestSuite");
+    let (exit_code, output, error) = zingomobile_utils::android_integration_test(abi, "OfflineTestSuite");
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -21,7 +19,7 @@ async fn execute_sync_from_seed(abi: &str) {
         .expect("Failed to generate blocks.");
 
     let (exit_code, output, error) =
-        test_utils::android_integration_test(abi, "ExecuteSyncFromSeed");
+        zingomobile_utils::android_integration_test(abi, "ExecuteSyncFromSeed");
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -31,12 +29,15 @@ async fn execute_sync_from_seed(abi: &str) {
 }
 
 async fn regchest(abi: &str) {
-    let docker = test_utils::launch_regchest().await;
+    let docker = match regchest_utils::launch().await {
+        Ok(d) => d,
+        Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
+    };
 
     let (exit_code, output, error) =
-        test_utils::android_integration_test(abi, "ExecuteSendFromOrchard");
+        zingomobile_utils::android_integration_test(abi, "ExecuteSendFromOrchard");
 
-    test_utils::close_regchest(docker).await;
+    regchest_utils::close(docker).await;
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -50,7 +51,7 @@ async fn execute_send_from_orchard(abi: &str) {
         scenarios::funded_orchard_mobileclient(1_000_000).await;
 
     let (exit_code, output, error) =
-        test_utils::android_integration_test(abi, "ExecuteSendFromOrchard");
+        zingomobile_utils::android_integration_test(abi, "ExecuteSendFromOrchard");
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
