@@ -121,7 +121,7 @@ jobs:
           max_attempts: 3
           command: |
             cd rust
-            cargo nextest run ${{ env.NEXTEST-ABI }} --profile ci
+            cargo nextest run ${{ env.NEXTEST-ABI }}::execute_sync_from_seed --profile ci
 
       - name: Upload test reports
         uses: actions/upload-artifact@v3

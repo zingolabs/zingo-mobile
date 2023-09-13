@@ -2,7 +2,7 @@
 test-threads = 1
 
 [profile.ci]
-retries = 2
+# retries = 2
 test-threads = 1
 failure-output = "immediate-final"
 fail-fast = false
