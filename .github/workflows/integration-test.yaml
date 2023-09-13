@@ -48,20 +48,26 @@ jobs:
       - name: Set envs for armeabi-v7a
         if: ${{ env.ABI == 'armeabi-v7a' }}
         run: echo "AVD-ARCH=x86" >> $GITHUB_ENV
- 
-      # - uses: actions-rs/toolchain@v1
-      #   with:
-      #     toolchain: stable
-      #     override: true
 
-      # - run: mkdir -p ~/.cargo/bin      
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
 
       - name: Install latest nextest release
-        uses: taiki-e/install-action@nextest
+        uses: taiki-e/install-action@nextesto
 
-      # - name: Build cargo-nextest
-      #   run: cargo build --package cargo-nextest
-  
+      - name: Cargo cache
+        uses: Swatinem/rust-cache@v2
+
+      - name: Native rust cache
+        uses: actions/cache@v3
+        with:
+          path: android/app/src/main/jniLibs/${{ env.ABI }}
+          key: native-rust-${{ env.ABI }}-${{ env.CACHE-KEY }}
+          fail-on-cache-miss: true
+      
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
@@ -90,31 +96,6 @@ jobs:
             ~/.android/adb*
           key: avd-${{ env.AVD-ARCH }}-integ
           
-      - name: Native rust cache
-        uses: actions/cache@v3
-        with:
-          path: android/app/src/main/jniLibs/${{ env.ABI }}
-          key: native-rust-${{ env.ABI }}-${{ env.CACHE-KEY }}
-          fail-on-cache-miss: true
-      
-      - name: Cargo cache
-        id: cargo-cache
-        uses: actions/cache@v3
-        with:
-          # Following cargo cache recommendations:
-          # https://doc.rust-lang.org/cargo/guide/cargo-home.html
-          # added 'target' directory to skip compiling dependencies
-          path: |
-            /root/.cargo/.crates.toml
-            /root/.cargo/.crates2.json
-            /root/.cargo/bin/
-            /root/.cargo/registry/index/
-            /root/.cargo/registry/cache/
-            /root/.cargo/registry/git/db/
-            target/
-          key: cargo-zingomobile-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: cargo-zingomobile
-
       - name: Create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: nick-fields/retry@v2
