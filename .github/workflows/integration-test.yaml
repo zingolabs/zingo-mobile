@@ -65,8 +65,6 @@ jobs:
       - name: Pull regchest docker image
         run: docker pull zingodevops/regchest:001
 
-      - run: docker run --network host zingodevops/regchest:001
-      
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
