@@ -123,6 +123,7 @@ jobs:
           command: ./scripts/integration_tests.sh -a ${{ env.AVD-ARCH }} -s
 
       - name: Run integration tests
+        working-directory: ./rust
         run: cargo nextest run ${{ env.NEXTEST-ABI }}::execute_sync_from_seed --profile ci
 
       - name: Upload test reports
