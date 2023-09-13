@@ -123,13 +123,7 @@ jobs:
           command: ./scripts/integration_tests.sh -a ${{ env.AVD-ARCH }} -s
 
       - name: Run integration tests
-        uses: nick-fields/retry@v2
-        with:
-          timeout_minutes: 120
-          max_attempts: 3
-          command: |
-            cd rust
-            cargo nextest run ${{ env.NEXTEST-ABI }}::execute_sync_from_seed --profile ci
+        run: cargo nextest run ${{ env.NEXTEST-ABI }}::execute_sync_from_seed --profile ci
 
       - name: Upload test reports
         uses: actions/upload-artifact@v3
