@@ -57,6 +57,9 @@ jobs:
           echo "AVD-ARCH=x86" >> $GITHUB_ENV
           echo "NEXTEST-ABI=arm32" >> $GITHUB_ENV
 
+      - name: Pull regchest docker image
+        run: docker pull zingodevops/regchest:001
+      
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
