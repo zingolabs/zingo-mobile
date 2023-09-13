@@ -175,6 +175,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
                 key={txd.address + txd.pool}
                 style={{
                   display: 'flex',
+                  marginTop: tx.txDetails.length > 1 ? 10 : 0,
                   paddingBottom: 15,
                   borderTopColor: colors.text,
                   borderTopWidth: tx.txDetails.length > 1 ? 1 : 0,
