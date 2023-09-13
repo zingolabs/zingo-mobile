@@ -101,7 +101,7 @@ mod x86_64 {
     }
 }
 
-mod arm32 {
+mod armeabi-v7a {
     const ABI: &str = "armeabi-v7a";
 
     #[tokio::test]
@@ -120,7 +120,7 @@ mod arm32 {
     }
 }
 
-mod arm64 {
+mod arm64-v8a {
     const ABI: &str = "arm64-v8a";
 
     #[tokio::test]

@@ -97,6 +97,24 @@ jobs:
           key: native-rust-${{ env.ABI }}-${{ env.CACHE-KEY }}
           fail-on-cache-miss: true
       
+      - name: Cargo cache
+        id: cargo-cache
+        uses: actions/cache@v3
+        with:
+          # Following cargo cache recommendations:
+          # https://doc.rust-lang.org/cargo/guide/cargo-home.html
+          # added 'target' directory to skip compiling dependencies
+          path: |
+            /root/.cargo/.crates.toml
+            /root/.cargo/.crates2.json
+            /root/.cargo/bin/
+            /root/.cargo/registry/index/
+            /root/.cargo/registry/cache/
+            /root/.cargo/registry/git/db/
+            target/
+          key: cargo-zingomobile-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: cargo-zingomobile
+
       - name: Create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: nick-fields/retry@v2
