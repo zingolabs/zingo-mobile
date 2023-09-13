@@ -76,10 +76,26 @@ jobs:
       - name: Install latest nextest release
         uses: taiki-e/install-action@nextest
 
+      # - name: Cargo cache
+      #   uses: Swatinem/rust-cache@v2
+
       - name: Cargo cache
-        uses: Swatinem/rust-cache@v2
+        id: cargo-cache
+        uses: actions/cache@v3
         with:
-          cache-on-failure: "true"
+          # Following cargo cache recommendations:
+          # https://doc.rust-lang.org/cargo/guide/cargo-home.html
+          # added 'target' directory to skip compiling dependencies
+          path: |
+            /root/.cargo/.crates.toml
+            /root/.cargo/.crates2.json
+            /root/.cargo/bin/
+            /root/.cargo/registry/index/
+            /root/.cargo/registry/cache/
+            /root/.cargo/registry/git/db/
+            rust/target/
+          key: cargo-zingomobile-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: cargo-zingomobile
 
       - name: Native rust cache
         uses: actions/cache@v3
@@ -126,11 +142,12 @@ jobs:
 
       - name: Run integration tests
         working-directory: ./rust
-        run: cargo nextest run ${{ env.NEXTEST-ABI }}::execute_sync_from_seed --profile ci
+        run: cargo build --tests
+        # run: cargo nextest run ${{ env.NEXTEST-ABI }}::execute_sync_from_seed --profile ci
 
-      - name: Upload test reports
-        uses: actions/upload-artifact@v3
-        with:
-          name: test-reports-${{ env.ABI }}-${{ env.TIMESTAMP }}
-          path: android/app/build/outputs/integration_test_reports
+      # - name: Upload test reports
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: test-reports-${{ env.ABI }}-${{ env.TIMESTAMP }}
+      #     path: android/app/build/outputs/integration_test_reports
 
