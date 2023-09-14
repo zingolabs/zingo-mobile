@@ -57,7 +57,7 @@ jobs:
           echo "AVD-ARCH=x86" >> $GITHUB_ENV
           echo "NEXTEST-ABI=arm32" >> $GITHUB_ENV
 
-      - name: Install docker and set socket
+      - name: Install docker
         run: |
           brew install docker
           colima start
