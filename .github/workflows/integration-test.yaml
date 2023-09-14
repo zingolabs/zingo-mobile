@@ -143,6 +143,7 @@ jobs:
         run: cargo nextest run ${{ env.NEXTEST-ABI }}::execute_sync_from_seed --profile ci --features ci
 
       - name: Upload test reports
+        if: ${{ ! cancelled() }}
         uses: actions/upload-artifact@v3
         with:
           name: test-reports-${{ env.ABI }}-${{ env.TIMESTAMP }}
