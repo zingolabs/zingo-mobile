@@ -57,10 +57,11 @@ jobs:
           echo "AVD-ARCH=x86" >> $GITHUB_ENV
           echo "NEXTEST-ABI=arm32" >> $GITHUB_ENV
 
-      - name: Install docker
+      - name: Install docker and set socket
         run: |
           brew install docker
-          colima start      
+          colima start
+          echo "DEFAULT_SOCKET=/Users/runner/.colima/default/docker.sock" >> $GITHUB_ENV
 
       - name: Pull regchest docker image
         run: docker pull zingodevops/regchest:001
