@@ -61,7 +61,6 @@ jobs:
         run: |
           brew install docker
           colima start
-          echo "DEFAULT_SOCKET=unix:///Users/runner/.colima/default/docker.sock" >> $GITHUB_ENV
 
       - name: Pull regchest docker image
         run: docker pull zingodevops/regchest:001
