@@ -62,17 +62,6 @@ jobs:
           brew install docker
           colima start      
 
-      - name: Find Docker socket
-        run: |
-          sudo find / -name docker.sock
-      
-      - name: Set docker host
-        run: echo "DOCKER_HOST=unix:///var/run/docker.sock" >> $GITHUB_ENV
-
-      - name: Find Docker socket post set
-        run: |
-          sudo find / -name docker.sock
-      
       - name: Pull regchest docker image
         run: docker pull zingodevops/regchest:001
 
@@ -151,12 +140,11 @@ jobs:
 
       - name: Run integration tests
         working-directory: ./rust
-        run: cargo build --tests
-        # run: cargo nextest run ${{ env.NEXTEST-ABI }}::execute_sync_from_seed --profile ci
+        run: cargo nextest run ${{ env.NEXTEST-ABI }}::execute_sync_from_seed --profile ci
 
-      # - name: Upload test reports
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: test-reports-${{ env.ABI }}-${{ env.TIMESTAMP }}
-      #     path: android/app/build/outputs/integration_test_reports
+      - name: Upload test reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-reports-${{ env.ABI }}-${{ env.TIMESTAMP }}
+          path: android/app/build/outputs/integration_test_reports
 
