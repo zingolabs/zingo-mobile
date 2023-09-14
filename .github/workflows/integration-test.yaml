@@ -62,6 +62,17 @@ jobs:
           brew install docker
           colima start      
 
+      - name: Find Docker socket
+        run: |
+          sudo find / -name docker.sock
+      
+      - name: Set docker host
+        run: echo "DOCKER_HOST=unix:///var/run/docker.sock" >> $GITHUB_ENV
+
+      - name: Find Docker socket post set
+        run: |
+          sudo find / -name docker.sock
+      
       - name: Pull regchest docker image
         run: docker pull zingodevops/regchest:001
 
