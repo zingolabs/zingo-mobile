@@ -71,7 +71,7 @@ jobs:
           profile: minimal
           override: true
 
-      - name: Install latest nextest release
+      - name: Install nextest
         uses: taiki-e/install-action@nextest
 
       # - name: Cargo cache
@@ -140,7 +140,7 @@ jobs:
 
       - name: Run integration tests
         working-directory: ./rust
-        run: cargo nextest run ${{ env.NEXTEST-ABI }}::execute_sync_from_seed --profile ci --features ci
+        run: RUST_BACKTRACE=1 cargo nextest run ${{ env.NEXTEST-ABI }}::execute_sync_from_seed --profile ci --features ci
 
       - name: Upload test reports
         if: ${{ ! cancelled() }}
