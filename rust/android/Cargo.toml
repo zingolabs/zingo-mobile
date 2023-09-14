@@ -4,6 +4,9 @@ version = "1.0.1"
 authors = ["Zingolabs <zingo@zingolabs.com>"]
 edition = "2021"
 
+[features]
+ci = []
+
 [dependencies]
 jni = { version = "0.19.0", default-features = false }
 android_logger = "0.11"

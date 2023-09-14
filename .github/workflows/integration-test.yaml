@@ -141,7 +141,7 @@ jobs:
 
       - name: Run integration tests
         working-directory: ./rust
-        run: cargo nextest run ${{ env.NEXTEST-ABI }}::execute_sync_from_seed --profile ci
+        run: cargo nextest run ${{ env.NEXTEST-ABI }}::execute_sync_from_seed --profile ci --features ci
 
       - name: Upload test reports
         uses: actions/upload-artifact@v3

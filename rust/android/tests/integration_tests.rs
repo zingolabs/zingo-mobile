@@ -1,6 +1,11 @@
 #![forbid(unsafe_code)]
 // use zingo_testutils::{self, scenarios};
 
+#[cfg(feature = "ci")]
+const UNIX_SOCKET: Option<&str> = Some("/Users/runner/.colima/default/docker.sock");
+#[cfg(not(feature = "ci"))]
+const UNIX_SOCKET: Option<&str> = None;
+
 async fn offline_testsuite(abi: &str) {
     let (exit_code, output, error) =
         zingomobile_utils::android_integration_test(abi, "OfflineTestSuite");
@@ -19,7 +24,7 @@ async fn execute_sync_from_seed(abi: &str) {
     //     .generate_n_blocks(10)
     //     .expect("Failed to generate blocks.");
 
-    let docker = match regchest_utils::launch().await {
+    let docker = match regchest_utils::launch(UNIX_SOCKET).await {
         Ok(d) => d,
         Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
     };
@@ -43,7 +48,7 @@ async fn execute_send_from_orchard(abi: &str) {
     // let (_regtest_manager, _child_process_handler) =
     //     scenarios::funded_orchard_mobileclient(1_000_000).await;
 
-    let docker = match regchest_utils::launch().await {
+    let docker = match regchest_utils::launch(UNIX_SOCKET).await {
         Ok(d) => d,
         Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
     };
