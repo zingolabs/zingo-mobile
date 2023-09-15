@@ -55,8 +55,9 @@ jobs:
         if: ${{ env.ABI == 'armeabi-v7a' }}
         run: |
           echo "AVD-ARCH=x86" >> $GITHUB_ENV
-          echo "NEXTEST-ABI=arm32" >> $GITHUB_ENV      - uses: actions-rs/toolchain@v1
-
+          echo "NEXTEST-ABI=arm32" >> $GITHUB_ENV      
+        
+      - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           profile: minimal
