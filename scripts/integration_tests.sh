@@ -5,6 +5,7 @@ set_abi=false
 set_test_name=false
 set_api_level=false
 set_api_target=false
+intel_host_os=true
 create_snapshot=false
 test_name_default="OfflineTestSuite"
 valid_api_levels=("23" "24" "25" "26" "27" "28" "29" "30" "31" "32" "33")
@@ -51,38 +52,14 @@ function wait_for() {
     fi
 }
 
-while getopts 'a:l:e:t:sx:h' OPTION; do
+while getopts 'a:Al:e:t:sx:h' OPTION; do
     case "$OPTION" in
         a)
             abi="$OPTARG"
-            case "$abi" in
-                x86_64)
-                    api_level_default="30"
-                    api_target_default="google_apis_playstore"
-                    arch="x86_64"
-                    ;;
-                x86) 
-                    api_level_default="30"
-                    api_target_default="google_apis_playstore"
-                    arch="x86"
-                    ;;
-                arm64-v8a)
-                    api_level_default="30"
-                    api_target_default="google_apis_playstore"
-                    arch="x86_64"
-                    ;;
-                armeabi-v7a)
-                    api_level_default="30"
-                    api_target_default="google_apis_playstore"
-                    arch="x86"
-                    ;;
-                *)
-                    echo "Error: Invalid ABI" >&2
-                    echo "Try '$(basename $0) -h' for more information." >&2
-                    exit 1
-                    ;;
-            esac
             set_abi=true
+            ;;
+        A)
+            intel_host_os=false
             ;;
         e)
             test_name="$OPTARG"
@@ -133,6 +110,8 @@ while getopts 'a:l:e:t:sx:h' OPTION; do
             echo -e "      \t\t  'x86' - default system image: API 30 google_apis_playstore x86"
             echo -e "      \t\t  'arm64-v8a' - default system image: API 30 google_apis_playstore x86_64"
             echo -e "      \t\t  'armeabi-v7a' - default system image: API 30 google_apis_playstore x86"
+            echo -e "\n  -A\t\t  Sets default system image of arm abis to arm instead of x86 (optional)"
+            echo -e "      \t\t  Use this option if the host OS is arm"
             echo -e "\n  -e\t\tSelect test name or test suite (optional)"
             echo -e "      \t\t  Default: OfflineTestSuite"
             echo -e "\n  -l\t\tSelect API level (optional)"
@@ -168,6 +147,50 @@ if [[ $set_abi == false ]]; then
     echo "Try '$(basename $0) -h' for more information." >&2
     exit 1
 fi
+
+case "$abi" in
+    x86_64)
+        api_level_default="30"
+        api_target_default="google_apis_playstore"
+        if [ $intel_host_os == true ]; then       
+            arch="x86_64"
+        else
+            arch="arm64-v8a"
+        fi
+        ;;
+    x86) 
+        api_level_default="30"
+        api_target_default="google_apis_playstore"
+        if [ $intel_host_os == true ]; then       
+            arch="x86"
+        else
+            arch="arm64-v8a"
+        fi
+        ;;
+    arm64-v8a)
+        api_level_default="30"
+        api_target_default="google_apis_playstore"
+        if [ $intel_host_os == true ]; then       
+            arch="x86_64"
+        else
+            arch="arm64-v8a"
+        fi
+        ;;
+    armeabi-v7a)
+        api_level_default="30"
+        api_target_default="google_apis_playstore"
+        if [ $intel_host_os == true ]; then       
+            arch="x86"
+        else
+            arch="arm64-v8a"
+        fi
+        ;;
+    *)
+        echo "Error: Invalid ABI" >&2
+        echo "Try '$(basename $0) -h' for more information." >&2
+        exit 1
+        ;;
+esac
 
 # Set defaults
 if [[ $set_test_name == false ]]; then
