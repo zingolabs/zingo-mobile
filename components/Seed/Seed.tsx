@@ -254,7 +254,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
             netInfo={netInfo}
             mode={mode}
             addLastSnackbar={addLastSnackbar}
-            receivedLegend={!basicFirstViewSeed}
+            receivedLegend={action === 'view' ? !basicFirstViewSeed : false}
           />
         </View>
       </Animated.View>

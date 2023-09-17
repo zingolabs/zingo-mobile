@@ -273,7 +273,8 @@
     "seed-acc": "Seed Phrase Field",
     "birthday-acc": "Birthday Field",
     "tapreveal": "Tap to reveal",
-    "showtransactions": "Show Transactions"
+    "showtransactions": "Show Transactions",
+    "youreceived": "You received"
   },
   "send": {
     "Broadcast": "Successfully Broadcast Tx:",

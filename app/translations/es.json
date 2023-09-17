@@ -273,7 +273,8 @@
     "seed-acc": "Campo Frase Semilla",
     "birthday-acc": "Campo Cumpleaños",
     "tapreveal": "Pulsar para revelar",
-    "showtransactions": "Ver Transacciones"
+    "showtransactions": "Ver Transacciones",
+    "youreceived": "Recibiste"
   },
   "send": {
     "Broadcast": "Transmitida con éxito Tx:",
