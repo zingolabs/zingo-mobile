@@ -131,8 +131,8 @@ android {
     compileSdkVersion rootProject.ext.compileSdkVersion
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility = "18.0.2.1"
+        targetCompatibility = "18.0.2.1"
     }
 
     defaultConfig {
