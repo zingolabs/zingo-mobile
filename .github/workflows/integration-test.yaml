@@ -114,7 +114,7 @@ jobs:
 
       - name: Run integration tests
         working-directory: ./rust
-        run: RUST_BACKTRACE=1 cargo nextest run ${{ env.NEXTEST-ABI }}::offline_testsuite --profile ci
+        run: cargo nextest run ${{ env.NEXTEST-ABI }}::offline_testsuite --profile ci
 
       - name: Upload test reports
         if: ${{ ! cancelled() }}
