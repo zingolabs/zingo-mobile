@@ -8,7 +8,7 @@ COPY lib/ /opt/zingo/rust/lib/
 COPY Cargo.lock /opt/zingo/rust/Cargo.lock
 COPY Cargo.toml /opt/zingo/rust/Cargo.toml
 COPY ios/ /opt/zingo/rust/ios/
-COPY test_utils/ /opt/zingo/rust/test_utils/
+COPY zingomobile_utils/ /opt/zingo/rust/zingomobile_utils/
 
 RUN AR=llvm-ar LD=ld RANLIB=llvm-ranlib CC=aarch64-linux-android24-clang \
     OPENSSL_DIR=/opt/openssl-3.1.2/aarch64 cargo +nightly build -Z build-std \

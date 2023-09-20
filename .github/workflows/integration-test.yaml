@@ -74,26 +74,8 @@ jobs:
       - name: Install nextest
         uses: taiki-e/install-action@nextest
 
-      # - name: Cargo cache
-      #   uses: Swatinem/rust-cache@v2
-
       - name: Cargo cache
-        id: cargo-cache
-        uses: actions/cache@v3
-        with:
-          # Following cargo cache recommendations:
-          # https://doc.rust-lang.org/cargo/guide/cargo-home.html
-          # added 'target' directory to skip compiling dependencies
-          path: |
-            /root/.cargo/.crates.toml
-            /root/.cargo/.crates2.json
-            /root/.cargo/bin/
-            /root/.cargo/registry/index/
-            /root/.cargo/registry/cache/
-            /root/.cargo/registry/git/db/
-            rust/target/
-          key: cargo-zingomobile-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: cargo-zingomobile
+        uses: Swatinem/rust-cache@v2
 
       - name: Native rust cache
         uses: actions/cache@v3
@@ -139,8 +121,11 @@ jobs:
           command: ./scripts/integration_tests.sh -a ${{ env.AVD-ARCH }} -s
 
       - name: Run integration tests
-        working-directory: ./rust
-        run: RUST_BACKTRACE=1 cargo nextest run ${{ env.NEXTEST-ABI }}::execute_sync_from_seed --profile ci --features ci
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 120
+          max_attempts: 3
+          command: RUST_BACKTRACE=1 cargo nextest run ${{ env.NEXTEST-ABI }} --profile ci --features ci
 
       - name: Upload test reports
         if: ${{ ! cancelled() }}
