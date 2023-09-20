@@ -126,7 +126,9 @@ jobs:
         with:
           timeout_minutes: 120
           max_attempts: 3
-          command: RUST_BACKTRACE=1 cargo nextest run ${{ env.NEXTEST-ABI }} --profile ci --features ci
+          command: |
+            cd rust
+            RUST_BACKTRACE=1 cargo nextest run ${{ env.NEXTEST-ABI }} --profile ci --features ci
 
       - name: Upload test reports
         if: ${{ ! cancelled() }}
