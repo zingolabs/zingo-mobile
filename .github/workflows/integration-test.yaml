@@ -64,7 +64,7 @@ jobs:
           colima start
 
       - name: Pull regchest docker image
-        run: docker pull zingodevops/regchest:001
+        run: docker pull zingodevops/regchest:002
 
       - uses: actions-rs/toolchain@v1
         with:
