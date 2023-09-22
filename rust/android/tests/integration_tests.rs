@@ -32,7 +32,7 @@ async fn execute_sync_from_seed(abi: &str) {
     let (exit_code, output, error) =
         zingomobile_utils::android_integration_test(abi, "ExecuteSyncFromSeed");
 
-    match regchest_utils::close(docker).await {
+    match regchest_utils::close(&docker).await {
         Ok(_) => (),
         Err(e) => panic!("Failed to close regchest docker container: {:?}", e),
     }
@@ -56,7 +56,7 @@ async fn execute_send_from_orchard(abi: &str) {
     let (exit_code, output, error) =
         zingomobile_utils::android_integration_test(abi, "ExecuteSendFromOrchard");
 
-    match regchest_utils::close(docker).await {
+    match regchest_utils::close(&docker).await {
         Ok(_) => (),
         Err(e) => panic!("Failed to close regchest docker container: {:?}", e),
     }
