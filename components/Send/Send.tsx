@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useRef, useCallback, useContext } from 'react';
-import { View, ScrollView, Modal, Keyboard, TextInput, TouchableOpacity, Platform } from 'react-native';
+import { View, ScrollView, Modal, Keyboard, TextInput, TouchableOpacity, Platform, Alert } from 'react-native';
 import { faQrcode, faCheck, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme, useIsFocused } from '@react-navigation/native';
@@ -82,6 +82,8 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [validAddress, setValidAddress] = useState(0); // 1 - OK, 0 - Empty, -1 - KO
   const [validAmount, setValidAmount] = useState(0); // 1 - OK, 0 - Empty, -1 - KO
   const [sendButtonEnabled, setSendButtonEnabled] = useState(false);
+  const [basicModeStep, setBasicModeStep] = useState(0);
+  const [withTip, setWithTip] = useState(false);
   const isFocused = useIsFocused();
 
   const slideAnim = useRef(new Animated.Value(0)).current;
@@ -436,12 +438,37 @@ const Send: React.FunctionComponent<SendProps> = ({
   useEffect(() => {
     (async () => {
       if (isFocused) {
+        // basic mode & step 0
+        if (mode === 'basic' && basicModeStep === 0) {
+          Alert.alert(
+            translate('send.xxxx') as string,
+            translate('send.yyyyyy') as string,
+            [
+              {
+                text: translate('send.sendpay') as string,
+                onPress: () => {
+                  setWithTip(false);
+                  setBasicModeStep(1);
+                },
+              },
+              {
+                text: translate('send.sendpaywithtip') as string,
+                onPress: () => {
+                  setWithTip(true);
+                  setBasicModeStep(1);
+                },
+              },
+              { text: translate('cancel') as string, style: 'cancel' },
+            ],
+            { cancelable: true, userInterfaceStyle: 'light' },
+          );
+        }
         await RPC.rpc_setInterruptSyncAfterBatch('true');
       } else {
         await RPC.rpc_setInterruptSyncAfterBatch('false');
       }
     })();
-  }, [isFocused]);
+  }, [basicModeStep, isFocused, mode, translate]);
 
   //console.log('render Send - 4');
 

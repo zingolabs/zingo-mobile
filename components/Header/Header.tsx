@@ -748,7 +748,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           justifyContent: 'center',
           flexWrap: 'wrap',
         }}>
-        <RegText testID={testID} color={colors.money} style={{ paddingHorizontal: 5 }}>
+        <RegText testID={testID} color={colors.money} style={{ paddingHorizontal: 5, marginBottom: 3 }}>
           {title}
         </RegText>
       </View>
