@@ -129,7 +129,6 @@ jobs:
 
       - name: Run integration tests
         working-directory: ./rust
-        run: cargo nextest run ${{ env.NEXTEST-ABI }} --profile ci --features "ci regchest"
         run: |
           cargo nextest run ${{ env.NEXTEST-ABI }} --verbose --profile ci \
             --archive-file nextest-archive.tar.zst --features "ci regchest" \
