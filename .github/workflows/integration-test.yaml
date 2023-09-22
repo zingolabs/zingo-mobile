@@ -23,6 +23,9 @@ jobs:
   integration-test:
     name: Integration test
     runs-on: macos-12
+    strategy:
+      matrix:
+        partition: [1, 2, 3, 4, 5, 6, 7, 8]
     steps:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
@@ -120,9 +123,17 @@ jobs:
           max_attempts: 3
           command: ./scripts/integration_tests.sh -a ${{ env.AVD-ARCH }} -s
 
+      - name: Build and archive tests
+        run: cargo nextest archive --verbose --workspace --features "ci regchest" \
+          --archive-file nextest-archive.tar.zst
+
       - name: Run integration tests
         working-directory: ./rust
         run: cargo nextest run ${{ env.NEXTEST-ABI }} --profile ci --features "ci regchest"
+        run: |
+          cargo nextest run ${{ env.NEXTEST-ABI }} --verbose --profile ci \
+            --archive-file nextest-archive.tar.zst --features "ci regchest" \
+            --workspace-remap ./ --partition count:${{ matrix.partition}}/8
 
       - name: Upload test reports
         if: ${{ ! cancelled() }}
