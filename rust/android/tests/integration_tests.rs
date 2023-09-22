@@ -1,5 +1,5 @@
 #![forbid(unsafe_code)]
-// use zingo_testutils::{self, scenarios};
+use zingo_testutils::{self, scenarios};
 
 #[cfg(feature = "ci")]
 const UNIX_SOCKET: Option<&str> = Some("/Users/runner/.colima/default/docker.sock");
@@ -18,12 +18,14 @@ async fn offline_testsuite(abi: &str) {
 }
 
 async fn execute_sync_from_seed(abi: &str) {
-    // let (regtest_manager, _child_process_handler) = scenarios::unfunded_mobileclient().await;
-
-    // regtest_manager
-    //     .generate_n_blocks(10)
-    //     .expect("Failed to generate blocks.");
-
+    #[cfg(not(feature = "regchest"))]
+    {
+        let (regtest_manager, _child_process_handler) = scenarios::unfunded_mobileclient().await;
+        regtest_manager
+            .generate_n_blocks(9)
+            .expect("Failed to generate blocks.");
+    }
+    #[cfg(feature = "regchest")]
     let docker = match regchest_utils::launch(UNIX_SOCKET).await {
         Ok(d) => d,
         Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
@@ -32,6 +34,7 @@ async fn execute_sync_from_seed(abi: &str) {
     let (exit_code, output, error) =
         zingomobile_utils::android_integration_test(abi, "ExecuteSyncFromSeed");
 
+    #[cfg(feature = "regchest")]
     match regchest_utils::close(&docker).await {
         Ok(_) => (),
         Err(e) => panic!("Failed to close regchest docker container: {:?}", e),
@@ -45,9 +48,12 @@ async fn execute_sync_from_seed(abi: &str) {
 }
 
 async fn execute_send_from_orchard(abi: &str) {
-    // let (_regtest_manager, _child_process_handler) =
-    //     scenarios::funded_orchard_mobileclient(1_000_000).await;
-
+    #[cfg(not(feature = "regchest"))]
+    {
+        let (_regtest_manager, _child_process_handler) =
+            scenarios::funded_orchard_mobileclient(1_000_000).await;
+    }
+    #[cfg(feature = "regchest")]
     let docker = match regchest_utils::launch(UNIX_SOCKET).await {
         Ok(d) => d,
         Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
@@ -56,6 +62,7 @@ async fn execute_send_from_orchard(abi: &str) {
     let (exit_code, output, error) =
         zingomobile_utils::android_integration_test(abi, "ExecuteSendFromOrchard");
 
+    #[cfg(feature = "regchest")]
     match regchest_utils::close(&docker).await {
         Ok(_) => (),
         Err(e) => panic!("Failed to close regchest docker container: {:?}", e),
