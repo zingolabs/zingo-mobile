@@ -252,6 +252,7 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
           "color": "rgb(28, 28, 30)",
           "fontSize": 18,
           "fontWeight": "600",
+          "marginBottom": 3,
           "opacity": 1,
           "paddingHorizontal": 5,
         }
@@ -411,6 +412,7 @@ exports[`Component Header - test Header Simple - snapshot 1`] = `
           "color": "rgb(28, 28, 30)",
           "fontSize": 18,
           "fontWeight": "600",
+          "marginBottom": 3,
           "opacity": 1,
           "paddingHorizontal": 5,
         }
