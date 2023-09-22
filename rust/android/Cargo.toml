@@ -19,7 +19,7 @@ zingo-testutils = { git="https://github.com/zingolabs/zingolib", default-feature
 json = "0.12.4"
 env_logger = "0.10.0"
 zingomobile_utils = { path = "../zingomobile_utils" }
-regchest_utils = { git="https://github.com/Oscar-Pepper/zingo-regchest", default-features=true, branch = "launch_regtest" }
+regchest_utils = { git="https://github.com/Oscar-Pepper/zingo-regchest", default-features=true, branch = "fix_unrecognized_token_task_error" }
 
 [lib]
 crate-type = ["dylib"]
