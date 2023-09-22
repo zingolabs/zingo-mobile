@@ -82,7 +82,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [validAddress, setValidAddress] = useState(0); // 1 - OK, 0 - Empty, -1 - KO
   const [validAmount, setValidAmount] = useState(0); // 1 - OK, 0 - Empty, -1 - KO
   const [sendButtonEnabled, setSendButtonEnabled] = useState(false);
-  const [basicModeStep, setBasicModeStep] = useState(0);
+  const [basicModeStep, setBasicModeStep] = useState<number | null>(null);
   const [withTip, setWithTip] = useState(false);
   const isFocused = useIsFocused();
 
@@ -439,38 +439,57 @@ const Send: React.FunctionComponent<SendProps> = ({
     (async () => {
       if (isFocused) {
         // basic mode & step 0
-        if (mode === 'basic' && basicModeStep === 0) {
+        if (basicModeStep === 0) {
           Alert.alert(
-            translate('send.xxxx') as string,
-            translate('send.yyyyyy') as string,
+            translate('send.type-title') as string,
+            translate('send.type-body') as string,
             [
               {
-                text: translate('send.sendpay') as string,
+                text: translate('send.type-sendpay') as string,
                 onPress: () => {
                   setWithTip(false);
                   setBasicModeStep(1);
+                  setQrcodeModalVisible(true);
                 },
               },
               {
-                text: translate('send.sendpaywithtip') as string,
+                text: translate('send.type-sendpaywithtip') as string,
                 onPress: () => {
                   setWithTip(true);
                   setBasicModeStep(1);
+                  setQrcodeModalVisible(true);
                 },
               },
-              { text: translate('cancel') as string, style: 'cancel' },
+              {
+                text: translate('cancel') as string,
+                style: 'cancel',
+                onPress: () => {
+                  setBasicModeStep(null);
+                },
+              },
             ],
             { cancelable: true, userInterfaceStyle: 'light' },
           );
         }
         await RPC.rpc_setInterruptSyncAfterBatch('true');
       } else {
+        setWithTip(false);
+        if (mode === 'basic') {
+          setBasicModeStep(0);
+        } else {
+          setBasicModeStep(null);
+        }
+        setQrcodeModalVisible(false);
         await RPC.rpc_setInterruptSyncAfterBatch('false');
       }
     })();
   }, [basicModeStep, isFocused, mode, translate]);
 
-  //console.log('render Send - 4');
+  useEffect(() => {
+    setBasicModeStep(mode === 'basic' ? 0 : null);
+  }, [mode]);
+
+  console.log('render Send', basicModeStep, withTip);
 
   const returnPage = (
     <View
@@ -487,8 +506,27 @@ const Send: React.FunctionComponent<SendProps> = ({
         animationType="slide"
         transparent={false}
         visible={qrcodeModalVisble}
-        onRequestClose={() => setQrcodeModalVisible(false)}>
-        <ScannerAddress updateToField={updateToField} closeModal={() => setQrcodeModalVisible(false)} />
+        onRequestClose={() => {
+          setQrcodeModalVisible(false);
+          setBasicModeStep(null);
+          setWithTip(false);
+        }}>
+        <ScannerAddress
+          updateToField={updateToField}
+          closeModalCancel={() => {
+            setQrcodeModalVisible(false);
+            setBasicModeStep(null);
+            setWithTip(false);
+          }}
+          closeModalOK={() => {
+            setQrcodeModalVisible(false);
+            if (basicModeStep === 1) {
+              setBasicModeStep(2);
+            } else if (basicModeStep === 3) {
+              setBasicModeStep(4);
+            }
+          }}
+        />
       </Modal>
 
       <Modal

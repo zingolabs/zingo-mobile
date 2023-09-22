@@ -14,10 +14,15 @@ type ScannerAddressProps = {
     memo: string | null,
     includeUAMemo: boolean | null,
   ) => void;
-  closeModal: () => void;
+  closeModalOK: () => void;
+  closeModalCancel: () => void;
 };
 
-const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateToField, closeModal }) => {
+const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({
+  updateToField,
+  closeModalOK,
+  closeModalCancel,
+}) => {
   const context = useContext(ContextAppLoaded);
   const { translate, netInfo, server, addLastSnackbar } = context;
   const validateAddress = async (scannedAddress: string) => {
@@ -27,7 +32,7 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateTo
     }
     if (scannedAddress.startsWith('zcash:')) {
       updateToField(scannedAddress, null, null, null, null);
-      closeModal();
+      closeModalOK();
       return;
     }
 
@@ -55,7 +60,7 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateTo
 
     if (valid) {
       updateToField(scannedAddress, null, null, null, null);
-      closeModal();
+      closeModalOK();
     }
   };
 
@@ -66,7 +71,7 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateTo
   };
 
   const doCancel = () => {
-    closeModal();
+    closeModalCancel();
   };
 
   return (
