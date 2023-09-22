@@ -103,20 +103,7 @@ jobs:
           echo "OPENSSL_PATH=armv7" >> $GITHUB_ENV
       
       - name: Cargo cache
-        id: cargo-cache
-        uses: actions/cache@v3
-        with:
-          # Following cargo cache recommendations:
-          # https://doc.rust-lang.org/cargo/guide/cargo-home.html
-          path: |
-            /root/.cargo/.crates.toml
-            /root/.cargo/.crates2.json
-            /root/.cargo/bin/
-            /root/.cargo/registry/index/            
-            /root/.cargo/registry/cache/
-            /root/.cargo/registry/git/db/
-          key: cargo-${{ env.ARCH }}-${{ hashFiles('rust/Cargo.lock') }}
-          restore-keys: cargo-${{ env.ARCH }}
+        uses: Swatinem/rust-cache@v2
       
       - name: Cargo build
         working-directory: ./rust/android
