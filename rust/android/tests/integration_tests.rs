@@ -1,9 +1,10 @@
 #![forbid(unsafe_code)]
+#[cfg(not(feature = "regchest"))]
 use zingo_testutils::{self, scenarios};
 
 #[cfg(feature = "ci")]
 const UNIX_SOCKET: Option<&str> = Some("/Users/runner/.colima/default/docker.sock");
-#[cfg(not(feature = "ci"))]
+#[cfg(all(not(feature = "ci"), feature = "regchest"))]
 const UNIX_SOCKET: Option<&str> = None;
 
 async fn offline_testsuite(abi: &str) {
