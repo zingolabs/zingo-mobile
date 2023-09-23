@@ -20,9 +20,45 @@ env:
   REPO-OWNER: ${{ github.repository_owner }}
 
 jobs:
+  build-test-artifacts:
+    name: Build test artifacts
+    runs-on: ubuntu-22.04
+    env:
+      RUSTFLAGS: -D warnings
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
+      - name: Install nextest
+        uses: taiki-e/install-action@nextest
+
+      - name: Cargo cache
+        uses: Swatinem/rust-cache@v2
+
+      - name: Build and archive tests
+        run: cargo nextest archive --verbose --workspace --features "ci regchest" \
+          --archive-file nextest-archive.tar.zst
+
+      - name: Upload archive
+        uses: actions/upload-artifact@v3
+        with:
+          name: nextest-archive
+          path: nextest-archive.tar.zst
+
   integration-test:
     name: Integration test
     runs-on: macos-12
+    needs: build-test-artifacts
+    env:
+      RUSTFLAGS: -D warnings
+    container:
+      image: zingodevops/ci-build:002
+      options: --security-opt seccomp=unconfined
     strategy:
       matrix:
         partition: [1, 2, 3, 4, 5, 6, 7, 8]
@@ -123,9 +159,10 @@ jobs:
           max_attempts: 3
           command: ./scripts/integration_tests.sh -a ${{ env.AVD-ARCH }} -s
 
-      - name: Build and archive tests
-        run: cargo nextest archive --verbose --workspace --features "ci regchest" \
-          --archive-file nextest-archive.tar.zst
+      - name: Download archive
+        uses: actions/download-artifact@v3
+        with:
+          name: nextest-archive
 
       - name: Run integration tests
         working-directory: ./rust
