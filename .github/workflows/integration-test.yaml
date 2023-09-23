@@ -45,7 +45,6 @@ jobs:
         run: cargo nextest archive --verbose --workspace --all-features --archive-file nextest-archive.tar.zst
 
       - name: Upload archive
-        working-directory: ./rust
         uses: actions/upload-artifact@v3
         with:
           name: nextest-archive
