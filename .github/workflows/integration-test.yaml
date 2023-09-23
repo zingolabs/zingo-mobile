@@ -41,8 +41,7 @@ jobs:
         uses: Swatinem/rust-cache@v2
 
       - name: Build and archive tests
-        run: cargo nextest archive --verbose --workspace --features "ci regchest" \
-          --archive-file nextest-archive.tar.zst
+        run: cargo nextest archive --verbose --workspace --all-features --archive-file nextest-archive.tar.zst
 
       - name: Upload archive
         uses: actions/upload-artifact@v3
@@ -50,18 +49,10 @@ jobs:
           name: nextest-archive
           path: nextest-archive.tar.zst
 
-  integration-test:
-    name: Integration test
+  prep-integration-test:
+    name: Preparing integration test
     runs-on: macos-12
     needs: build-test-artifacts
-    env:
-      RUSTFLAGS: -D warnings
-    container:
-      image: zingodevops/ci-build:002
-      options: --security-opt seccomp=unconfined
-    strategy:
-      matrix:
-        partition: [1, 2, 3, 4, 5, 6, 7, 8]
     steps:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
@@ -159,6 +150,14 @@ jobs:
           max_attempts: 3
           command: ./scripts/integration_tests.sh -a ${{ env.AVD-ARCH }} -s
 
+  integration-test:
+    name: Integration test
+    runs-on: macos-12
+    needs: prep-integration-test
+    strategy:
+      matrix:
+        partition: [1, 2, 3, 4, 5, 6, 7, 8]
+    steps:
       - name: Download archive
         uses: actions/download-artifact@v3
         with:
