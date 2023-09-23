@@ -41,6 +41,7 @@ jobs:
         uses: Swatinem/rust-cache@v2
 
       - name: Build and archive tests
+        working-directory: ./rust
         run: cargo nextest archive --verbose --workspace --all-features --archive-file nextest-archive.tar.zst
 
       - name: Upload archive
