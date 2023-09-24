@@ -155,17 +155,30 @@ jobs:
     name: Integration test
     runs-on: macos-12
     needs: prep-integration-test
+    env:
+      RUSTFLAGS: -D warnings
+    container:
+      image: zingodevops/ci-build:002
+      options: --security-opt seccomp=unconfined
     strategy:
       matrix:
         partition: [1, 2, 3, 4, 5, 6, 7, 8]
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Symlink lightwalletd and zcash binaries
+        run: ln -s /usr/bin/lightwalletd /usr/bin/zcashd /usr/bin/zcash-cli ./zingocli/regtest/bin/
+
+      - name: Symlink zcash parameters
+        run: ln -s /root/.zcash-params /github/home
+
       - name: Download archive
         uses: actions/download-artifact@v3
         with:
           name: nextest-archive
 
       - name: Run integration tests
-        working-directory: ./rust
         run: |
           cargo nextest run ${{ env.NEXTEST-ABI }} --verbose --profile ci \
             --archive-file nextest-archive.tar.zst --features "ci regchest" \
