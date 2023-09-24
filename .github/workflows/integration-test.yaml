@@ -88,26 +88,6 @@ jobs:
           echo "AVD-ARCH=x86" >> $GITHUB_ENV
           echo "NEXTEST-ABI=arm32" >> $GITHUB_ENV
 
-      - name: Install docker
-        run: |
-          brew install docker
-          colima start
-
-      - name: Pull regchest docker image
-        run: docker pull zingodevops/regchest:003
-
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          profile: minimal
-          override: true
-
-      - name: Install nextest
-        uses: taiki-e/install-action@nextest
-
-      - name: Cargo cache
-        uses: Swatinem/rust-cache@v2
-
       - name: Native rust cache
         uses: actions/cache@v3
         with:
@@ -157,9 +137,6 @@ jobs:
     needs: prep-integration-test
     env:
       RUSTFLAGS: -D warnings
-    container:
-      image: zingodevops/ci-build:002
-      options: --security-opt seccomp=unconfined
     strategy:
       matrix:
         partition: [1, 2, 3, 4, 5, 6, 7, 8]
@@ -167,10 +144,25 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up Docker
-        uses: actions/setup-docker@v3
+      - name: Install docker
+        run: |
+          brew install docker
+          colima start
+
+      - name: Pull regchest docker image
+        run: docker pull zingodevops/regchest:003
+
+      - uses: actions-rs/toolchain@v1
         with:
-          docker-version: 'latest'
+          toolchain: stable
+          profile: minimal
+          override: true
+
+      - name: Install nextest
+        uses: taiki-e/install-action@nextest
+
+      - name: Cargo cache
+        uses: Swatinem/rust-cache@v2
 
       - name: Symlink lightwalletd and zcash binaries
         run: ln -s /usr/bin/lightwalletd /usr/bin/zcashd /usr/bin/zcash-cli ./zingocli/regtest/bin/
