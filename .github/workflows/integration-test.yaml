@@ -46,7 +46,7 @@ jobs:
       - name: Upload archive
         uses: actions/upload-artifact@v3
         with:
-          name: nextest-archive
+          name: nextest-archive-${{ env.ABI }}
           path: ./rust/nextest-archive.tar.zst
 
   integration-test:
@@ -156,7 +156,7 @@ jobs:
       - name: Download archive
         uses: actions/download-artifact@v3
         with:
-          name: nextest-archive
+          name: nextest-archive-${{ env.ABI }}
 
       - name: Run integration tests
         working-directory: ./rust
