@@ -184,9 +184,10 @@ jobs:
           name: nextest-archive
 
       - name: Run integration tests
+        working-directory: ./rust
         run: |
           cargo nextest run ${{ env.NEXTEST-ABI }} --verbose --profile ci \
-            --archive-file nextest-archive.tar.zst --features "ci regchest" \
+            --archive-file ./../nextest-archive.tar.zst --features "ci regchest" \
             --workspace-remap ./ --partition count:${{ matrix.partition}}/8
 
       - name: Upload test reports
