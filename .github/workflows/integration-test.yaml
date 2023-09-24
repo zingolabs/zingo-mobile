@@ -163,7 +163,7 @@ jobs:
         run: |
           cargo nextest run ${{ env.NEXTEST-ABI }} --verbose --profile ci \
             --archive-file ./../nextest-archive.tar.zst \
-            --workspace-remap ./ --partition count:${{ matrix.partition}}/8
+            --workspace-remap ./ --partition count:${{ matrix.partition}}/3
 
       - name: Upload test reports
         if: ${{ ! cancelled() }}
