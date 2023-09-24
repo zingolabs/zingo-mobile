@@ -18,13 +18,12 @@ env:
   TIMESTAMP: ${{ inputs.timestamp }}
   ABI: ${{ inputs.abi }}
   REPO-OWNER: ${{ github.repository_owner }}
+  RUSTFLAGS: -D warnings
 
 jobs:
   build-test-artifacts:
     name: Build test artifacts
     runs-on: macos-12
-    env:
-      RUSTFLAGS: -D warnings
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -50,10 +49,13 @@ jobs:
           name: nextest-archive
           path: ./rust/nextest-archive.tar.zst
 
-  prep-integration-test:
-    name: Preparing integration test
+  integration-test:
+    name: Integration test
     runs-on: macos-12
     needs: build-test-artifacts
+    strategy:
+      matrix:
+        partition: [1, 2, 3, 4, 5, 6, 7, 8]
     steps:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
@@ -130,19 +132,6 @@ jobs:
           timeout_minutes: 60
           max_attempts: 3
           command: ./scripts/integration_tests.sh -a ${{ env.AVD-ARCH }} -s
-
-  integration-test:
-    name: Integration test
-    runs-on: macos-12
-    needs: prep-integration-test
-    env:
-      RUSTFLAGS: -D warnings
-    strategy:
-      matrix:
-        partition: [1, 2, 3, 4, 5, 6, 7, 8]
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
 
       - name: Install docker
         run: |
