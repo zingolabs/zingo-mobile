@@ -18,11 +18,44 @@ env:
   TIMESTAMP: ${{ inputs.timestamp }}
   ABI: ${{ inputs.abi }}
   REPO-OWNER: ${{ github.repository_owner }}
+  RUSTFLAGS: -D warnings
 
 jobs:
+  build-test-artifacts:
+    name: Build test artifacts
+    runs-on: macos-12
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
+      - name: Install nextest
+        uses: taiki-e/install-action@nextest
+
+      - name: Cargo cache
+        uses: Swatinem/rust-cache@v2
+
+      - name: Build and archive tests
+        working-directory: ./rust
+        run: cargo nextest archive --verbose --workspace --all-features --archive-file nextest-archive.tar.zst
+
+      - name: Upload archive
+        uses: actions/upload-artifact@v3
+        with:
+          name: nextest-archive-${{ env.ABI }}
+          path: ./rust/nextest-archive.tar.zst
+
   integration-test:
     name: Integration test
     runs-on: macos-12
+    needs: build-test-artifacts
+    strategy:
+      matrix:
+        partition: [1, 2, 3]
     steps:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
@@ -56,26 +89,6 @@ jobs:
         run: |
           echo "AVD-ARCH=x86" >> $GITHUB_ENV
           echo "NEXTEST-ABI=arm32" >> $GITHUB_ENV
-
-      - name: Install docker
-        run: |
-          brew install docker
-          colima start
-
-      - name: Pull regchest docker image
-        run: docker pull zingodevops/regchest:003
-
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          profile: minimal
-          override: true
-
-      - name: Install nextest
-        uses: taiki-e/install-action@nextest
-
-      - name: Cargo cache
-        uses: Swatinem/rust-cache@v2
 
       - name: Native rust cache
         uses: actions/cache@v3
@@ -120,9 +133,37 @@ jobs:
           max_attempts: 3
           command: ./scripts/integration_tests.sh -a ${{ env.AVD-ARCH }} -s
 
+      - name: Install docker
+        run: |
+          brew install docker
+          colima start
+
+      - name: Pull regchest docker image
+        run: docker pull zingodevops/regchest:003
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
+
+      - name: Install nextest
+        uses: taiki-e/install-action@nextest
+
+      - name: Cargo cache
+        uses: Swatinem/rust-cache@v2
+
+      - name: Download archive
+        uses: actions/download-artifact@v3
+        with:
+          name: nextest-archive-${{ env.ABI }}
+
       - name: Run integration tests
         working-directory: ./rust
-        run: cargo nextest run ${{ env.NEXTEST-ABI }} --profile ci --features "ci regchest"
+        run: |
+          cargo nextest run ${{ env.NEXTEST-ABI }} --verbose --profile ci \
+            --archive-file ./../nextest-archive.tar.zst \
+            --workspace-remap ./ --partition count:${{ matrix.partition}}/3
 
       - name: Upload test reports
         if: ${{ ! cancelled() }}
