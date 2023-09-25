@@ -28,10 +28,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - uses: actions-rs/toolchain@v1
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: stable
-          override: true
 
       - name: Install nextest
         uses: taiki-e/install-action@nextest
@@ -141,11 +140,9 @@ jobs:
       - name: Pull regchest docker image
         run: docker pull zingodevops/regchest:003
 
-      - uses: actions-rs/toolchain@v1
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: stable
-          profile: minimal
-          override: true
 
       - name: Install nextest
         uses: taiki-e/install-action@nextest
