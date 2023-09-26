@@ -313,6 +313,6 @@ class ExecuteSummariesFromSeed {
         System.out.println("\nSummaries:")
         System.out.println(summariesJson)
         val summaries: List<Summaries> = mapper.readValue(summariesJson)
-        assertThat(summaries.size).isEqualTo(1)
+        assertThat(summaries.size).isEqualTo(3)
     }
 }

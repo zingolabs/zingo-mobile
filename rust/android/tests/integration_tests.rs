@@ -76,7 +76,7 @@ async fn execute_send_from_orchard(abi: &str) {
 async fn execute_summaries_from_seed(abi: &str) {
     #[cfg(not(feature = "regchest"))]
     let (_regtest_manager, _child_process_handler) =
-        scenarios::funded_orchard_mobileclient(1_000_000).await;
+        scenarios::funded_orchard_with_3_txs_mobileclient(1_000_000).await;
     #[cfg(feature = "regchest")]
     let docker = match regchest_utils::launch(UNIX_SOCKET).await {
         Ok(d) => d,
