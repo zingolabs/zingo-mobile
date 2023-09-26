@@ -77,6 +77,18 @@ data class Send (
     val memo : String?
 )
 
+data class Summaries (
+    val block_height : Long,
+    datetime : Long,
+    txid : String,
+    price : String?,
+    amount : Long,
+    to_address : String?,
+    memos : List<String>?,
+    kind : String,
+    pool : String?
+)
+
 @Category(OfflineTest::class)
 class ExecuteAddressesFromSeed {
     @Test
@@ -274,3 +286,33 @@ class ExecuteSendFromOrchard {
     }
 }
 
+class ExecuteSummariesFromSeed {
+    @Test
+    fun executeSummariesFromSeed() {
+        val mapper = jacksonObjectMapper()
+
+        val server = "http://10.0.2.2:20000"
+        val chainhint = "regtest"
+        val seed = Seeds.HOSPITAL
+        val birthday = "1"
+        val datadir = MainApplication.getAppContext()!!.filesDir.path
+        val monitorMempool = "false"
+
+        var initFromSeedJson = RustFFI.initfromseed(server, seed, birthday, datadir, chainhint, monitorMempool)
+        System.out.println("\nInit from seed:")
+        System.out.println(initFromSeedJson)
+        val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
+        assertThat(initFromSeed.seed).isEqualTo(Seeds.HOSPITAL)
+        assertThat(initFromSeed.birthday).isEqualTo(1)
+
+        var syncJson = RustFFI.execute("sync", "")
+        System.out.println("\nSync:")
+        System.out.println(syncJson)
+
+        var summariesJson = RustFFI.execute("summaries", "")
+        System.out.println("\nSummaries:")
+        System.out.println(summariesJson)
+        val summaries: List<Summaries> = mapper.readValue(summariesJson)
+        assertThat(summaries.size).isEqualTo(1)
+    }
+}
