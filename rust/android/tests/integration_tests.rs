@@ -21,6 +21,7 @@ async fn offline_testsuite(abi: &str) {
 async fn execute_sync_from_seed(abi: &str) {
     #[cfg(not(feature = "regchest"))]
     let (regtest_manager, _child_process_handler) = scenarios::unfunded_mobileclient().await;
+    #[cfg(not(feature = "regchest"))]
     regtest_manager
         .generate_n_blocks(9)
         .expect("Failed to generate blocks.");
