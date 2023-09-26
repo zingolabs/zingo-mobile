@@ -8,7 +8,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react-native';
 import TxDetail from '../components/History/components/TxDetail';
 import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
-import { TransactionType, TxDetailType } from '../app/AppState';
+import { TransactionType } from '../app/AppState';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -79,63 +79,109 @@ describe('Component History TxDetail - test', () => {
   state.translate = () => 'translated text';
   const onClose = jest.fn();
   const onSetOption = jest.fn();
-  test('History TxDetail - normal sent transaction', () => {
+
+  test('History TxDetail - sent transaction with 2 addresses', () => {
     state.info.currencyName = 'ZEC';
     state.totalBalance.total = 1.12345678;
     const tx = {
-      type: 'sent',
-      address: 'UA-12345678901234567890',
-      amount: -0.0065,
-      position: '',
-      confirmations: 20,
-      txid: 'txid-1234567890',
+      type: 'Sent',
+      fee: 0.0001,
+      confirmations: 22,
+      txid: 'sent-txid-1234567890',
       time: Date.now(),
       zec_price: 33.33,
-      detailedTxns: [
+      txDetails: [
         {
-          address: 'other-UA-12345678901234567890',
-          amount: 0.0064,
-          memo: 'memo-abcdefgh',
+          address: 'sent-address-1-12345678901234567890',
+          amount: 0.12345678,
+          memos: ['hola', '  & ', 'hello'],
         },
-      ] as TxDetailType[],
+        {
+          address: 'sent-address-2-09876543210987654321',
+          amount: 0.1,
+          memos: ['hello', '  & ', 'hola'],
+        },
+      ],
     } as TransactionType;
     render(
       <ContextAppLoadedProvider value={state}>
         <TxDetail tx={tx} closeModal={onClose} set_privacy_option={onSetOption} />
       </ContextAppLoadedProvider>,
     ).toJSON();
-    screen.getByText('0.0064');
+    screen.getByText('0.2234');
+    screen.getByText('0.1234');
+    screen.getByText('0.1000');
     screen.getByText('0.0001');
+    screen.getByText('hola & hello');
+    screen.getByText('hello & hola');
+    const txt = screen.queryByText('hola & hellohello & hola');
+    expect(txt).toBe(null);
   });
 
   test('History TxDetail - self sent transaction', () => {
     state.info.currencyName = 'ZEC';
     state.totalBalance.total = 1.12345678;
     const txSelfSend = {
-      type: 'sent',
-      address: 'UA-12345678901234567890',
-      amount: -0.0001,
-      position: '',
-      confirmations: 20,
-      txid: 'txid-1234567890',
+      type: 'SendToSelf',
+      fee: 0.0001,
+      confirmations: 12,
+      txid: 'sendtoself-txid-1234567890',
       time: Date.now(),
       zec_price: 33.33,
-      detailedTxns: [
+      txDetails: [
         {
-          address: 'other-UA-12345678901234567890',
-          amount: 0.0064,
-          memo: 'memo-abcdefgh',
+          address: '',
+          amount: 0,
+          memos: ['orchard memo', 'sapling memo'],
         },
-      ] as TxDetailType[],
+      ],
     } as TransactionType;
     render(
       <ContextAppLoadedProvider value={state}>
         <TxDetail tx={txSelfSend} closeModal={onClose} set_privacy_option={onSetOption} />
       </ContextAppLoadedProvider>,
     );
-    screen.getByText('0.0064');
-    // because the negative symbol is not there.
-    const num = screen.getAllByText('0.0001');
+    const num = screen.getAllByText('0.0000');
     expect(num.length).toBe(2);
+    screen.getByText('0.0001');
+    screen.getByText('orchard memosapling memo');
+  });
+
+  test('History TxDetail - received transaction with 2 pools', () => {
+    state.info.currencyName = 'ZEC';
+    state.totalBalance.total = 1.12345678;
+    const txSelfSend = {
+      type: 'Received',
+      confirmations: 133,
+      txid: 'receive-txid-1234567890',
+      time: Date.now(),
+      zec_price: 66.66,
+      txDetails: [
+        {
+          address: '',
+          amount: 0.77654321,
+          pool: 'Orchard',
+          memos: ['hola', '  & ', 'hello'],
+        },
+        {
+          address: '',
+          amount: 0.1,
+          pool: 'Sapling',
+          memos: ['hello', '  & ', 'hola'],
+        },
+      ],
+    } as TransactionType;
+    render(
+      <ContextAppLoadedProvider value={state}>
+        <TxDetail tx={txSelfSend} closeModal={onClose} set_privacy_option={onSetOption} />
+      </ContextAppLoadedProvider>,
+    );
+    screen.getByText('0.8765');
+    screen.getByText('0.7765');
+    screen.getByText('0.1000');
+    screen.getByText('hola & hello');
+    screen.getByText('hello & hola');
+    const txt = screen.queryByText('hola & hellohello & hola');
+    expect(txt).toBe(null);
   });
 });

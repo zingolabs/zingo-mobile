@@ -16,6 +16,7 @@ import { ThemeType } from '../../../app/types';
 import { ContextAppLoaded } from '../../../app/context';
 import Header from '../../Header';
 import BoldText from '../../Components/BoldText';
+import CurrencyAmount from '../../Components/CurrencyAmount';
 
 type TxDetailProps = {
   tx: TransactionType;
@@ -25,27 +26,13 @@ type TxDetailProps = {
 
 const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_privacy_option }) => {
   const context = useContext(ContextAppLoaded);
-  const { info, translate, language, privacy, addLastSnackbar, server } = context;
+  const { info, translate, language, privacy, addLastSnackbar, server, currency } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const spendColor =
-    tx.confirmations === 0 ? colors.primaryDisabled : (tx.amount || 0) > 0 ? colors.primary : colors.text;
-
+    tx.confirmations === 0 ? colors.primaryDisabled : tx.type === 'Received' ? colors.primary : colors.text;
   const [expandAddress, setExpandAddress] = useState(false);
   const [expandTxid, setExpandTxid] = useState(false);
   moment.locale(language);
-
-  const sum =
-    (tx.detailedTxns && tx.detailedTxns.reduce((s: number, d: TxDetailType) => s + (d.amount ? d.amount : 0), 0)) || 0;
-  let fee = 0;
-  // normal case: spend 1600 fee 1000 sent 600
-  if (tx.type === 'sent' && Math.abs(tx.amount) > Math.abs(sum)) {
-    fee = Math.abs(tx.amount) - Math.abs(sum);
-  }
-  // self-send case: spend 1000 fee 1000 sent 0
-  // this is temporary until we have a new field in 'list' object, called: fee.
-  if (tx.type === 'sent' && Math.abs(tx.amount) <= Math.abs(sum)) {
-    fee = Math.abs(tx.amount);
-  }
 
   const handleTxIDClick = (txid?: string) => {
     if (!txid) {
@@ -99,16 +86,27 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
             borderColor: colors.border,
           }}>
           <BoldText style={{ textAlign: 'center', textTransform: 'capitalize', color: spendColor }}>
-            {!!tx.type &&
-              (tx.type === 'sent' ? (translate('history.sent') as string) : (translate('history.receive') as string))}
+            {tx.type === 'Sent'
+              ? (translate('history.sent') as string)
+              : tx.type === 'Received'
+              ? (translate('history.receive') as string)
+              : (translate('history.sendtoself') as string)}
           </BoldText>
           <ZecAmount
             currencyName={info.currencyName ? info.currencyName : ''}
             size={36}
-            amtZec={Math.abs(tx.amount)}
+            amtZec={tx.txDetails.reduce((s, d) => s + d.amount, 0)}
             privacy={privacy}
             smallPrefix={true}
           />
+          {!!tx.zec_price && (
+            <CurrencyAmount
+              price={tx.zec_price}
+              amtZec={tx.txDetails.reduce((s, d) => s + d.amount, 0)}
+              currency={currency}
+              privacy={privacy}
+            />
+          )}
         </View>
 
         <View style={{ margin: 10 }}>
@@ -154,12 +152,12 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
             </TouchableOpacity>
           </View>
 
-          {fee > 0 && (
+          {!!tx.fee && tx.fee > 0 && (
             <View style={{ display: 'flex', marginTop: 10 }}>
               <FadeText>{translate('history.txfee') as string}</FadeText>
               <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                 <ZecAmount
-                  amtZec={fee}
+                  amtZec={tx.fee}
                   size={18}
                   currencyName={info.currencyName ? info.currencyName : ''}
                   privacy={privacy}
@@ -168,48 +166,54 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
             </View>
           )}
 
-          {tx.detailedTxns.map((txd: TxDetailType) => {
+          {tx.txDetails.map((txd: TxDetailType) => {
             // 30 characters per line
-            const numLines = txd.address.length < 40 ? 2 : txd.address.length / 30;
+            const numLines = txd.address ? (txd.address.length < 40 ? 2 : txd.address.length / 30) : 0;
 
             return (
               <View
-                key={txd.address}
+                key={txd.address + txd.pool}
                 style={{
                   display: 'flex',
-                  marginTop: 10,
+                  marginTop: tx.txDetails.length > 1 ? 10 : 0,
                   paddingBottom: 15,
-                  borderTopColor: colors.card,
-                  borderTopWidth: 1,
-                  borderBottomColor: colors.card,
-                  borderBottomWidth: 1,
+                  borderTopColor: colors.text,
+                  borderTopWidth: tx.txDetails.length > 1 ? 1 : 0,
                 }}>
-                <View style={{ marginTop: 10 }}>
-                  <FadeText>{translate('history.address') as string}</FadeText>
+                {!!txd.address && (
+                  <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: 10 }}>
+                    <FadeText>{translate('history.address') as string}</FadeText>
+                    <TouchableOpacity
+                      onPress={() => {
+                        if (txd.address) {
+                          Clipboard.setString(txd.address);
+                          addLastSnackbar({
+                            message: translate('history.addresscopied') as string,
+                            type: 'Primary',
+                            duration: 'short',
+                          });
+                          setExpandAddress(true);
+                        }
+                      }}>
+                      <View style={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap' }}>
+                        {!txd.address && <RegText>{'Unknown'}</RegText>}
+                        {!expandAddress && !!txd.address && <RegText>{Utils.trimToSmall(txd.address, 10)}</RegText>}
+                        {expandAddress &&
+                          !!txd.address &&
+                          Utils.splitStringIntoChunks(txd.address, Number(numLines.toFixed(0))).map(
+                            (c: string, idx: number) => <RegText key={idx}>{c}</RegText>,
+                          )}
+                      </View>
+                    </TouchableOpacity>
+                  </View>
+                )}
 
-                  <TouchableOpacity
-                    onPress={() => {
-                      if (txd.address) {
-                        Clipboard.setString(txd.address);
-                        addLastSnackbar({
-                          message: translate('history.addresscopied') as string,
-                          type: 'Primary',
-                          duration: 'short',
-                        });
-                        setExpandAddress(true);
-                      }
-                    }}>
-                    <View style={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap' }}>
-                      {!txd.address && <RegText>{'Unknown'}</RegText>}
-                      {!expandAddress && !!txd.address && <RegText>{Utils.trimToSmall(txd.address, 10)}</RegText>}
-                      {expandAddress &&
-                        !!txd.address &&
-                        Utils.splitStringIntoChunks(txd.address, Number(numLines.toFixed(0))).map(
-                          (c: string, idx: number) => <RegText key={idx}>{c}</RegText>,
-                        )}
-                    </View>
-                  </TouchableOpacity>
-                </View>
+                {!!txd.pool && (
+                  <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: 10 }}>
+                    <FadeText>{translate('history.pool') as string}</FadeText>
+                    <RegText>{txd.pool}</RegText>
+                  </View>
+                )}
 
                 <View style={{ marginTop: 10 }}>
                   <FadeText>{translate('history.amount') as string}</FadeText>
@@ -220,16 +224,19 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
                       currencyName={info.currencyName ? info.currencyName : ''}
                       privacy={privacy}
                     />
+                    {!!tx.zec_price && (
+                      <CurrencyAmount price={tx.zec_price} amtZec={txd.amount} currency={currency} privacy={privacy} />
+                    )}
                   </View>
                 </View>
 
-                {txd.memo && (
+                {txd.memos && (
                   <View style={{ marginTop: 10 }}>
                     <FadeText>{translate('history.memo') as string}</FadeText>
                     <TouchableOpacity
                       onPress={() => {
-                        if (txd.memo) {
-                          Clipboard.setString(txd.memo);
+                        if (txd.memos) {
+                          Clipboard.setString(txd.memos.join(''));
                           addLastSnackbar({
                             message: translate('history.memocopied') as string,
                             type: 'Primary',
@@ -237,7 +244,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
                           });
                         }
                       }}>
-                      <RegText>{txd.memo}</RegText>
+                      <RegText>{txd.memos.join('')}</RegText>
                     </TouchableOpacity>
                   </View>
                 )}

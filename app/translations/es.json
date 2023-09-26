@@ -273,7 +273,8 @@
     "seed-acc": "Campo Frase Semilla",
     "birthday-acc": "Campo Cumpleaños",
     "tapreveal": "Pulsar para revelar",
-    "showtransactions": "Ver Transacciones"
+    "showtransactions": "Ver Transacciones",
+    "youreceived": "Recibiste"
   },
   "send": {
     "Broadcast": "Transmitida con éxito Tx:",
@@ -371,6 +372,7 @@
     "back": " Atrás",
     "sent": "Enviado ",
     "receive": "Recibido ",
+    "sendtoself": "Auto-Enviado ",
     "time": "Hora",
     "confirmations": "Confirmaciones",
     "txid": "Transacción ID",
@@ -388,7 +390,8 @@
     "history": "Histórico",
     "sure": "¿Seguro? ",
     "minago": " min.",
-    "details": "Detalles de la Transacción"
+    "details": "Detalles de la Transacción",
+    "pool": "Grupo"
   },
   "report": {
     "title": "Informe de Sincronización",

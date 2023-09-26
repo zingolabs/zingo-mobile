@@ -77,26 +77,60 @@ describe('Component History - test', () => {
   const state = defaultAppStateLoaded;
   state.transactions = [
     {
-      type: 'sent',
-      address: 'sent-address-12345678901234567890',
-      amount: 0.12345678,
-      position: '',
+      type: 'Sent',
+      fee: 0.0001,
       confirmations: 22,
       txid: 'sent-txid-1234567890',
       time: Date.now(),
       zec_price: 33.33,
-      detailedTxns: [],
+      txDetails: [
+        {
+          address: 'sent-address-1-12345678901234567890',
+          amount: 0.12345678,
+          memos: ['hola', '  & ', 'hello'],
+        },
+        {
+          address: 'sent-address-2-09876543210987654321',
+          amount: 0,
+          memos: ['hello', '  & ', 'hola'],
+        },
+      ],
     },
     {
-      type: 'receive',
-      address: 'receive-address-12345678901234567890',
-      amount: 0.87654321,
-      position: '',
+      type: 'SendToSelf',
+      fee: 0.0001,
+      confirmations: 12,
+      txid: 'sendtoself-txid-1234567890',
+      time: Date.now(),
+      zec_price: 33.33,
+      txDetails: [
+        {
+          address: '',
+          amount: 0,
+          memos: ['orchard memo', 'sapling memo'],
+        },
+      ],
+    },
+    {
+      type: 'Received',
       confirmations: 133,
       txid: 'receive-txid-1234567890',
       time: Date.now(),
       zec_price: 66.66,
-      detailedTxns: [],
+      txDetails: [
+        {
+          address: '',
+          amount: 0.77654321,
+          pool: 'Orchard',
+          memos: ['hola', '  & ', 'hello'],
+        },
+        {
+          address: '',
+          amount: 0.1,
+          pool: 'Sapling',
+          memos: ['hello', '  & ', 'hola'],
+        },
+      ],
     },
   ];
   state.uaAddress = 'UA-12345678901234567890';

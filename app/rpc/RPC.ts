@@ -19,8 +19,6 @@ import { RPCNotesType } from './types/RPCNotesType';
 import { RPCOrchardNoteType } from './types/RPCOrchardNoteType';
 import { RPCSaplingNoteType } from './types/RPCSaplingNoteType';
 import { RPCUtxoNoteType } from './types/RPCUtxoNoteType';
-import { RPCTransactionType } from './types/RPCTransationType';
-import { RPCOutgoingMetadataType } from './types/RPCOutgoingMetadataType';
 import { RPCInfoType } from './types/RPCInfoType';
 import { RPCDefaultFeeType } from './types/RPCDefaultFeeType';
 import { RPCWalletHeight } from './types/RPCWalletHeightType';
@@ -30,6 +28,7 @@ import { RPCGetOptionType } from './types/RPCGetOptionType';
 import { RPCSendProgressType } from './types/RPCSendProgressType';
 import { RPCSyncRescan } from './types/RPCSyncRescanType';
 import { RPCUfvkType } from './types/RPCUfvkType';
+import { RPCSummariesType } from './types/RPCSummariesType';
 
 export default class RPC {
   fnSetInfo: (info: InfoType) => void;
@@ -403,17 +402,19 @@ export default class RPC {
   // We combine detailed transactions if they are sent to the same outgoing address in the same txid. This
   // is usually done to split long memos.
   // Remember to add up both amounts and combine memos
-  static rpc_combineTxDetails(txdetails: TxDetailType[]): TxDetailType[] {
+  static rpc_combineTxDetailsByAddress(txdetails: TxDetailType[]): TxDetailType[] {
     // First, group by outgoing address.
     const m = new Map<string, TxDetailType[]>();
-    txdetails.forEach(i => {
-      const coll = m.get(i.address);
-      if (!coll) {
-        m.set(i.address, [i]);
-      } else {
-        coll.push(i);
-      }
-    });
+    txdetails
+      .filter(i => i.address !== undefined)
+      .forEach(i => {
+        const coll = m.get(i.address as string);
+        if (!coll) {
+          m.set(i.address as string, [i]);
+        } else {
+          coll.push(i);
+        }
+      });
 
     // Reduce the groups to a single TxDetail, combining memos and summing amounts
     const reducedDetailedTxns: TxDetailType[] = [];
@@ -421,24 +422,86 @@ export default class RPC {
       const totalAmount = txns.reduce((sum, i) => sum + i.amount, 0);
 
       const memos = txns
-        .filter(i => i.memo)
+        .filter(i => i.memos && i.memos.length > 0)
         .map(i => {
-          const rex = /\((\d+)\/(\d+)\)((.|[\r\n])*)/;
-          const tags = i.memo && i.memo.match(rex);
-          if (tags && tags.length >= 4) {
-            return { num: parseInt(tags[1], 10), memo: tags[3] };
-          }
+          const combinedMemo = i.memos
+            ?.filter(memo => memo)
+            .map(memo => {
+              const rex = /\((\d+)\/(\d+)\)((.|[\r\n])*)/;
+              const tags = memo.match(rex);
+              if (tags && tags.length >= 4) {
+                return { num: parseInt(tags[1], 10), memo: tags[3] };
+              }
 
-          // Just return as is
-          return { num: 0, memo: i.memo };
+              // Just return as is
+              return { num: 0, memo };
+            })
+            .sort((a, b) => a.num - b.num)
+            .map(a => a.memo);
+          return combinedMemo && combinedMemo.length > 0 ? combinedMemo.join('') : undefined;
         })
-        .sort((a, b) => a.num - b.num)
-        .map(a => a.memo);
+        .map(a => a);
 
       const detail: TxDetailType = {
         address: toaddr,
         amount: totalAmount,
-        memo: memos && memos.length > 0 ? memos.join('') : undefined,
+        memos: memos && memos.length > 0 ? [memos.join('')] : undefined,
+      };
+
+      reducedDetailedTxns.push(detail);
+    });
+
+    return reducedDetailedTxns;
+  }
+
+  // We combine detailed transactions if they are received to the same pool in the same txid. This
+  // is usually done to split long memos.
+  // Remember to add up both amounts and combine memos
+  static rpc_combineTxDetailsByPool(txdetails: TxDetailType[]): TxDetailType[] {
+    // First, group by pool.
+    const m = new Map<'Orchard' | 'Sapling' | 'Transparent', TxDetailType[]>();
+    txdetails
+      .filter(i => i.pool !== undefined)
+      .forEach(i => {
+        const coll = m.get(i.pool as 'Orchard' | 'Sapling' | 'Transparent');
+        if (!coll) {
+          m.set(i.pool as 'Orchard' | 'Sapling' | 'Transparent', [i]);
+        } else {
+          coll.push(i);
+        }
+      });
+
+    // Reduce the groups to a single TxDetail, combining memos and summing amounts
+    const reducedDetailedTxns: TxDetailType[] = [];
+    m.forEach((txns, pool) => {
+      const totalAmount = txns.reduce((sum, i) => sum + i.amount, 0);
+
+      const memos = txns
+        .filter(i => i.memos && i.memos.length > 0)
+        .map(i => {
+          const combinedMemo = i.memos
+            ?.filter(memo => memo)
+            .map(memo => {
+              const rex = /\((\d+)\/(\d+)\)((.|[\r\n])*)/;
+              const tags = memo.match(rex);
+              if (tags && tags.length >= 4) {
+                return { num: parseInt(tags[1], 10), memo: tags[3] };
+              }
+
+              // Just return as is
+              return { num: 0, memo };
+            })
+            .sort((a, b) => a.num - b.num)
+            .map(a => a.memo);
+          return combinedMemo && combinedMemo.length > 0 ? combinedMemo.join('') : undefined;
+        })
+        .map(a => a);
+
+      const detail: TxDetailType = {
+        address: '',
+        amount: totalAmount,
+        memos: memos && memos.length > 0 ? [memos.join('')] : undefined,
+        pool: pool,
       };
 
       reducedDetailedTxns.push(detail);
@@ -643,7 +706,8 @@ export default class RPC {
 
   async loadWalletData() {
     await this.fetchTotalBalance();
-    await this.fetchTandZandOTransactions();
+    //await this.fetchTandZandOTransactionsList();
+    await this.fetchTandZandOTransactionsSummaries();
     await this.fetchWalletSettings();
     await this.fetchInfoAndServerHeight();
   }
@@ -1290,109 +1354,101 @@ export default class RPC {
   }
 
   // Fetch all T and Z and O transactions
-  async fetchTandZandOTransactions() {
+  async fetchTandZandOTransactionsSummaries() {
     try {
-      const listStr: string = await RPCModule.execute('list', '');
-      if (listStr) {
-        if (listStr.toLowerCase().startsWith('error')) {
-          console.log(`Error txs list ${listStr}`);
+      const summariesStr: string = await RPCModule.execute('summaries', '');
+      //console.log(summariesStr);
+      if (summariesStr) {
+        if (summariesStr.toLowerCase().startsWith('error')) {
+          console.log(`Error txs summaries ${summariesStr}`);
           return;
         }
       } else {
-        console.log('Internal Error txs list');
+        console.log('Internal Error txs summaries');
         return;
       }
-      const listJSON: RPCTransactionType[] = await JSON.parse(listStr);
+      const summariesJSON: RPCSummariesType[] = await JSON.parse(summariesStr);
 
       await this.fetchInfoAndServerHeight();
 
-      let txlist: TransactionType[] = listJSON.map((tx: RPCTransactionType) => {
-        const type = tx.outgoing_metadata ? 'sent' : 'receive';
+      let txList: TransactionType[] = [];
 
-        //if (tx.txid === '55d6efcb987e8c6b8842a4c78d4adc80d8ca4761e3ff670a730e4840d8659ead') {
-        //console.log('tran: ', tx);
-        //console.log('meta: ', tx.outgoing_metadata);
-        //console.log('--------------------------------------------------');
-        //}
+      summariesJSON
+        //.filter(tx => tx.kind !== 'Fee')
+        .forEach((tx: RPCSummariesType) => {
+          let currentTxList: TransactionType[] = txList.filter(t => t.txid === tx.txid);
+          if (currentTxList.length === 0) {
+            currentTxList = [{} as TransactionType];
+            currentTxList[0].txDetails = [];
+          }
+          let restTxList: TransactionType[] = txList.filter(t => t.txid !== tx.txid);
 
-        var txdetail: TxDetailType[] = [];
-        if (tx.outgoing_metadata) {
-          const dts: TxDetailType[] = tx.outgoing_metadata.map((o: RPCOutgoingMetadataType) => {
-            const detail: TxDetailType = {
-              address: o.address || '',
-              amount: (o.value || 0) / 10 ** 8,
-              memo: o.memo,
-            };
+          const type = tx.kind === 'Fee' ? 'Sent' : tx.kind;
+          if (!currentTxList[0].type && !!type) {
+            currentTxList[0].type = type;
+          }
+          if (!currentTxList[0].confirmations) {
+            currentTxList[0].confirmations = this.lastServerBlockHeight
+              ? this.lastServerBlockHeight - tx.block_height + 1
+              : 0;
+          }
+          if (!currentTxList[0].txid && !!tx.txid) {
+            currentTxList[0].txid = tx.txid;
+          }
+          if (!currentTxList[0].time && !!tx.datetime) {
+            currentTxList[0].time = tx.datetime;
+          }
+          if (!currentTxList[0].zec_price && !!tx.price && tx.price !== 'None') {
+            currentTxList[0].zec_price = tx.price;
+          }
 
-            return detail;
-          });
+          //if (tx.txid === '6a2f7f432d6d5e52fdf55b9e592606dc4d90e8998e7d3eb67f6b3588191f5b3f') {
+          //  console.log('tran: ', tx);
+          //  console.log('--------------------------------------------------');
+          //}
 
-          txdetail = RPC.rpc_combineTxDetails(dts);
-        } else {
-          const detail: TxDetailType = {
-            address: tx.address || '',
-            amount: (tx.amount || 0) / 10 ** 8,
-            memo: tx.memo,
-          };
-          txdetail = [detail];
-        }
+          let currenttxdetails: TxDetailType = {} as TxDetailType;
+          if (tx.kind === 'Fee') {
+            currentTxList[0].fee = (currentTxList[0].fee ? currentTxList[0].fee : 0) + tx.amount / 10 ** 8;
+            if (currentTxList[0].txDetails.length === 0) {
+              // when only have 1 item with `Fee`, we assume this tx is `Sent`.
+              currenttxdetails.address = '';
+              currenttxdetails.amount = 0;
+              currentTxList[0].txDetails.push(currenttxdetails);
+            }
+          } else {
+            currenttxdetails.address = !tx.to_address || tx.to_address === 'None' ? '' : tx.to_address;
+            currenttxdetails.amount = tx.amount / 10 ** 8;
+            currenttxdetails.memos = !tx.memos ? undefined : tx.memos;
+            currenttxdetails.pool = !tx.pool || tx.pool === 'None' ? undefined : tx.pool;
+            currentTxList[0].txDetails.push(currenttxdetails);
+          }
 
-        const transaction: TransactionType = {
-          type,
-          address:
-            type === 'sent'
-              ? tx.outgoing_metadata && tx.outgoing_metadata.length > 0
-                ? tx.outgoing_metadata[0].address
-                : ''
-              : tx.address,
-          amount: tx.amount / 10 ** 8,
-          confirmations: tx.unconfirmed
-            ? 0
-            : this.lastServerBlockHeight
-            ? this.lastServerBlockHeight - tx.block_height + 1
-            : 0,
-          txid: tx.txid,
-          zec_price: tx.zec_price,
-          time: tx.datetime,
-          position: tx.position,
-          detailedTxns: txdetail,
-        };
-
-        return transaction;
-      });
+          //currentTxList[0].txDetails.forEach(det => console.log(det.memos));
+          //console.log(currentTxList[0]);
+          txList = [...currentTxList, ...restTxList];
+        });
 
       //console.log(txlist);
 
-      // If you send yourself transactions, the underlying SDK doesn't handle it very well, so
-      // we suppress these in the UI to make things a bit clearer.
-      //txlist = txlist.filter((tx: Transaction) => !(tx.type === 'sent' && tx.amount < 0 && tx.detailedTxns.length === 0));
-
-      // We need to group transactions that have the same (txid and send/receive), for multi-part memos
-      const m = new Map();
-      txlist.forEach((tx: TransactionType) => {
-        const key = tx.txid + tx.type;
-        const coll = m.get(key);
-        if (!coll) {
-          m.set(key, [tx]);
-        } else {
-          coll.push(tx);
-        }
-      });
-
       // Now, combine the amounts and memos
       const combinedTxList: TransactionType[] = [];
-      m.forEach((txns: TransactionType[]) => {
-        // Get all the txdetails and merge them
+      txList.forEach((txns: TransactionType) => {
+        const combinedTx = txns;
+        if (txns.type === 'Sent' || txns.type === 'SendToSelf') {
+          // using address for `Sent` & `SendToSelf`
+          combinedTx.txDetails = RPC.rpc_combineTxDetailsByAddress(txns.txDetails);
+        } else {
+          // using pool for `Received`
+          combinedTx.txDetails = RPC.rpc_combineTxDetailsByPool(txns.txDetails);
+        }
 
-        // Clone the first tx into a new one
-        const combinedTx = Object.assign({}, txns[0]);
-        combinedTx.detailedTxns = RPC.rpc_combineTxDetails(txns.flatMap(tx => tx.detailedTxns));
-
+        //combinedTx.txDetails.forEach(det => console.log(det.memos));
+        //console.log(combinedTx);
         combinedTxList.push(combinedTx);
       });
 
-      // Sort the list by confirmations
-      combinedTxList.sort((t1, t2) => t1.confirmations - t2.confirmations);
+      //console.log(combinedTxList);
 
       this.fnSetTransactionsList(combinedTxList);
     } catch (error) {

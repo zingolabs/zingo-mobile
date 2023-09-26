@@ -535,7 +535,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         </View>
       )}
 
-      {receivedLegend && (
+      {receivedLegend && totalBalance.total > 0 && (
         <View
           style={{
             flexDirection: 'row',
@@ -544,7 +544,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             margin: 0,
             marginTop: readOnly ? 15 : 0,
           }}>
-          <RegText color={colors.primary}>You received</RegText>
+          <RegText color={colors.primary}>{translate('seed.youreceived') as string}</RegText>
           <ZecAmount
             currencyName={info.currencyName ? info.currencyName : ''}
             color={colors.primary}

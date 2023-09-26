@@ -273,7 +273,8 @@
     "seed-acc": "Seed Phrase Field",
     "birthday-acc": "Birthday Field",
     "tapreveal": "Tap to reveal",
-    "showtransactions": "Show Transactions"
+    "showtransactions": "Show Transactions",
+    "youreceived": "You received"
   },
   "send": {
     "Broadcast": "Successfully Broadcast Tx:",
@@ -321,7 +322,6 @@
     "private": "Private",
     "amountrevealed" : "Amount Revealed",
     "deshielded": "Deshielded"
-
   },
   "receive": {
     "u-title": "Unified Address",
@@ -372,6 +372,7 @@
     "back": " Back",
     "sent": "Sent ",
     "receive": "Receive ",
+    "sendtoself": "Send-to-Self ",
     "time": "Time",
     "confirmations": "Confirmations",
     "txid": "Transaction ID",
@@ -389,7 +390,8 @@
     "history": "History",
     "sure": "Sure? ",
     "minago": " min.",
-    "details": "Transaction Details"
+    "details": "Transaction Details",
+    "pool": "Pool"
   },
   "report": {
     "title": "Sync / Rescan Report",
