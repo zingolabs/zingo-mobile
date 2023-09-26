@@ -27,6 +27,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          repository: ${{ env.REPO-OWNER }}/zingo-mobile
 
       - uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
@@ -40,7 +42,7 @@ jobs:
 
       - name: Build and archive tests
         working-directory: ./rust
-        run: cargo nextest archive --verbose --workspace --all-features --archive-file nextest-archive.tar.zst
+        run: cargo nextest archive --verbose --features "ci regchest" --archive-file nextest-archive.tar.zst
 
       - name: Upload archive
         uses: actions/upload-artifact@v3
@@ -147,20 +149,18 @@ jobs:
       - name: Install nextest
         uses: taiki-e/install-action@nextest
 
-      - name: Cargo cache
-        uses: Swatinem/rust-cache@v2
-
       - name: Download archive
         uses: actions/download-artifact@v3
         with:
           name: nextest-archive-${{ env.ABI }}
+          path: ./rust
 
       - name: Run integration tests
         working-directory: ./rust
         run: |
           cargo nextest run ${{ env.NEXTEST-ABI }} --verbose --profile ci \
-            --archive-file ./../nextest-archive.tar.zst \
-            --workspace-remap ./ --partition count:${{ matrix.partition}}/3
+            --archive-file nextest-archive.tar.zst \
+            --partition count:${{ matrix.partition}}/3
 
       - name: Upload test reports
         if: ${{ ! cancelled() }}
