@@ -79,14 +79,14 @@ data class Send (
 
 data class Summaries (
     val block_height : Long,
-    datetime : Long,
-    txid : String,
-    price : String?,
-    amount : Long,
-    to_address : String?,
-    memos : List<String>?,
-    kind : String,
-    pool : String?
+    val datetime : Long,
+    val txid : String,
+    val price : String?,
+    val amount : Long,
+    val to_address : String?,
+    val memos : List<String>?,
+    val kind : String,
+    val pool : String?
 )
 
 @Category(OfflineTest::class)
