@@ -20,11 +20,8 @@ async fn offline_testsuite(abi: &str) {
 
 async fn execute_sync_from_seed(abi: &str) {
     #[cfg(not(feature = "regchest"))]
-    let (regtest_manager, _child_process_handler) = scenarios::unfunded_mobileclient().await;
-    #[cfg(not(feature = "regchest"))]
-    regtest_manager
-        .generate_n_blocks(9)
-        .expect("Failed to generate blocks.");
+    let (regtest_manager, _child_process_handler) = 
+        scenarios::funded_orchard_with_3_txs_mobileclient(1_000_000).await;
     #[cfg(feature = "regchest")]
     let docker = match regchest_utils::launch(UNIX_SOCKET).await {
         Ok(d) => d,
@@ -50,7 +47,7 @@ async fn execute_sync_from_seed(abi: &str) {
 async fn execute_send_from_orchard(abi: &str) {
     #[cfg(not(feature = "regchest"))]
     let (_regtest_manager, _child_process_handler) =
-        scenarios::funded_orchard_mobileclient(1_000_000).await;
+        scenarios::funded_orchard_with_3_txs_mobileclient(1_000_000).await;
     #[cfg(feature = "regchest")]
     let docker = match regchest_utils::launch(UNIX_SOCKET).await {
         Ok(d) => d,
