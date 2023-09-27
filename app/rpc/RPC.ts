@@ -1411,7 +1411,8 @@ export default class RPC {
           if (tx.kind === 'Fee') {
             currentTxList[0].fee = (currentTxList[0].fee ? currentTxList[0].fee : 0) + tx.amount / 10 ** 8;
             if (currentTxList[0].txDetails.length === 0) {
-              // when only have 1 item with `Fee`, we assume this tx is `Sent`.
+              // when only have 1 item with `Fee`, we assume this tx is `SendToSelf`.
+              currentTxList[0].type = 'SendToSelf';
               currenttxdetails.address = '';
               currenttxdetails.amount = 0;
               currentTxList[0].txDetails.push(currenttxdetails);
