@@ -288,11 +288,11 @@ class ExecuteSendFromOrchard {
         System.out.println(balanceJson)
         val balancePostSend: Balance = mapper.readValue(balanceJson)
         // because the balance is unverified for a while.
-        assertThat(balancePreSend.orchard_balance).isEqualTo(670000)
-        //assertThat(balancePreSend.verified_orchard_balance).isEqualTo(670000)
-        //assertThat(balancePreSend.spendable_orchard_balance).isEqualTo(670000)
-        assertThat(balancePreSend.verified_sapling_balance).isEqualTo(100000)
-        assertThat(balancePreSend.spendable_sapling_balance).isEqualTo(100000)
+        assertThat(balancePostSend.orchard_balance).isEqualTo(670000)
+        //assertThat(balancePostSend.verified_orchard_balance).isEqualTo(670000)
+        //assertThat(balancePostSend.spendable_orchard_balance).isEqualTo(670000)
+        assertThat(balancePostSend.verified_sapling_balance).isEqualTo(100000)
+        assertThat(balancePostSend.spendable_sapling_balance).isEqualTo(100000)
         assertThat(balancePostSend.transparent_balance).isEqualTo(100000)
     }
 }
