@@ -91,6 +91,24 @@ jobs:
           echo "AVD-ARCH=x86" >> $GITHUB_ENV
           echo "NEXTEST-ABI=arm32" >> $GITHUB_ENV
 
+      - name: Install docker
+        run: |
+          brew install docker
+          colima start
+
+      - name: Pull regchest docker image
+        run: docker pull zingodevops/regchest:004
+
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Install nextest
+        uses: taiki-e/install-action@nextest
+
+      - name: Cargo cache
+        uses: Swatinem/rust-cache@v2
+
       - name: Native rust cache
         uses: actions/cache@v3
         with:
@@ -133,21 +151,6 @@ jobs:
           timeout_minutes: 60
           max_attempts: 3
           command: ./scripts/integration_tests.sh -a ${{ env.AVD-ARCH }} -s
-
-      - name: Install docker
-        run: |
-          brew install docker
-          colima start
-
-      - name: Pull regchest docker image
-        run: docker pull zingodevops/regchest:004
-
-      - uses: actions-rust-lang/setup-rust-toolchain@v1
-        with:
-          toolchain: stable
-
-      - name: Install nextest
-        uses: taiki-e/install-action@nextest
 
       - name: Download archive
         uses: actions/download-artifact@v3
