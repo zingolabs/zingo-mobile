@@ -25,7 +25,7 @@ jobs:
     name: Build test artifacts
     runs-on: macos-12
     steps:
-    - name: Set envs for zingolib CI
+      - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
         run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
 
