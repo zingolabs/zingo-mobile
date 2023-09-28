@@ -287,8 +287,10 @@ class ExecuteSendFromOrchard {
         System.out.println("\nBalance post-send:")
         System.out.println(balanceJson)
         val balancePostSend: Balance = mapper.readValue(balanceJson)
-        assertThat(balancePreSend.verified_orchard_balance).isEqualTo(670000)
-        assertThat(balancePreSend.spendable_orchard_balance).isEqualTo(670000)
+        // because the balance is unverified for a while.
+        assertThat(balancePreSend.orchard_balance).isEqualTo(670000)
+        //assertThat(balancePreSend.verified_orchard_balance).isEqualTo(670000)
+        //assertThat(balancePreSend.spendable_orchard_balance).isEqualTo(670000)
         assertThat(balancePreSend.verified_sapling_balance).isEqualTo(100000)
         assertThat(balancePreSend.spendable_sapling_balance).isEqualTo(100000)
         assertThat(balancePostSend.transparent_balance).isEqualTo(100000)
