@@ -5,6 +5,7 @@ import org.junit.Test
 import org.junit.experimental.categories.Category
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import com.google.common.collect.Range
 
 object Seeds {
     const val ABANDON = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art"
@@ -327,7 +328,7 @@ class ExecuteSummariesFromSeed {
         // 3. SendToSelf - 10_000 - Two possible results:
         //      3.1. only one item with the fee.
         //      3.2. two items: SendToSelf = 0 & fee
-        assertThat(summaries.size).isIn(4, 5)
+        assertThat(summaries.size).isIn(Range.closed(4, 5))
         // first item have to be a `Received`
         assertThat(summaries[0].kind).isEqualTo("Received")
         assertThat(summaries[0].pool).isEqualTo("Orchard")
