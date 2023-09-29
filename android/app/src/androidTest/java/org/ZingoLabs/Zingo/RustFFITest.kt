@@ -5,6 +5,7 @@ import org.junit.Test
 import org.junit.experimental.categories.Category
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import com.google.common.collect.Range
 
 object Seeds {
     const val ABANDON = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art"
@@ -75,6 +76,18 @@ data class Send (
     val address : String,
     val amount : Long,
     val memo : String?
+)
+
+data class Summaries (
+    val block_height : Long,
+    val datetime : Long,
+    val txid : String,
+    val price : String?,
+    val amount : Long,
+    val to_address : String?,
+    val memos : List<String>?,
+    val kind : String,
+    val pool : String?
 )
 
 @Category(OfflineTest::class)
@@ -244,7 +257,10 @@ class ExecuteSendFromOrchard {
         System.out.println("\nBalance pre-send:")
         System.out.println(balanceJson)
         val balancePreSend: Balance = mapper.readValue(balanceJson)
-        assertThat(balancePreSend.spendable_orchard_balance).isEqualTo(1000000)
+        assertThat(balancePreSend.verified_orchard_balance).isEqualTo(780000)
+        assertThat(balancePreSend.spendable_orchard_balance).isEqualTo(780000)
+        assertThat(balancePreSend.verified_sapling_balance).isEqualTo(100000)
+        assertThat(balancePreSend.spendable_sapling_balance).isEqualTo(100000)
         assertThat(balancePreSend.transparent_balance).isEqualTo(0)
 
         var addressesJson = RustFFI.execute("addresses", "")
@@ -252,6 +268,7 @@ class ExecuteSendFromOrchard {
         System.out.println(addressesJson)
         val addresses: List<Addresses> = mapper.readValue(addressesJson)
 
+        // 100_000 + 10_000fee -> 110_000 / 780_000 - 110_000 -> 670_000
         val send = Send(addresses[0].receivers.transparent, 100000, null)
 
         var txidJson = RustFFI.execute("send", mapper.writeValueAsString(listOf(send)))
@@ -270,7 +287,75 @@ class ExecuteSendFromOrchard {
         System.out.println("\nBalance post-send:")
         System.out.println(balanceJson)
         val balancePostSend: Balance = mapper.readValue(balanceJson)
+        // because the balance is unverified for a while.
+        assertThat(balancePostSend.orchard_balance).isEqualTo(670000)
+        //assertThat(balancePostSend.verified_orchard_balance).isEqualTo(670000)
+        //assertThat(balancePostSend.spendable_orchard_balance).isEqualTo(670000)
+        assertThat(balancePostSend.verified_sapling_balance).isEqualTo(100000)
+        assertThat(balancePostSend.spendable_sapling_balance).isEqualTo(100000)
         assertThat(balancePostSend.transparent_balance).isEqualTo(100000)
     }
 }
 
+class ExecuteSummariesFromSeed {
+    @Test
+    fun executeSummariesFromSeed() {
+        val mapper = jacksonObjectMapper()
+
+        val server = "http://10.0.2.2:20000"
+        val chainhint = "regtest"
+        val seed = Seeds.HOSPITAL
+        val birthday = "1"
+        val datadir = MainApplication.getAppContext()!!.filesDir.path
+        val monitorMempool = "false"
+
+        var initFromSeedJson = RustFFI.initfromseed(server, seed, birthday, datadir, chainhint, monitorMempool)
+        System.out.println("\nInit from seed:")
+        System.out.println(initFromSeedJson)
+        val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
+        assertThat(initFromSeed.seed).isEqualTo(Seeds.HOSPITAL)
+        assertThat(initFromSeed.birthday).isEqualTo(1)
+
+        var syncJson = RustFFI.execute("sync", "")
+        System.out.println("\nSync:")
+        System.out.println(syncJson)
+
+        var summariesJson = RustFFI.execute("summaries", "")
+        System.out.println("\nSummaries:")
+        System.out.println(summariesJson)
+        val summaries: List<Summaries> = mapper.readValue(summariesJson)
+        // the summaries can have 4 or 5 items for 3 different txs
+        // 1. Received - 1_000_000 - orchard (1 item)
+        // 2. Sent - 110_000 - uregtest1zkuzfv5m3... (2 items: Sent & fee)
+        // 3. SendToSelf - 10_000 - Two possible results:
+        //      3.1. only one item with the fee.
+        //      3.2. two items: SendToSelf = 0 & fee
+        assertThat(summaries.size).isIn(Range.closed(4, 5))
+        // first item have to be a `Received`
+        assertThat(summaries[0].kind).isEqualTo("Received")
+        assertThat(summaries[0].pool).isEqualTo("Orchard")
+        assertThat(summaries[0].amount).isEqualTo(1000000)
+        // second item have to be a `Sent`
+        assertThat(summaries[1].kind).isEqualTo("Sent")
+        assertThat(summaries[1].to_address).isEqualTo("uregtest1zkuzfv5m3yhv2j4fmvq5rjurkxenxyq8r7h4daun2zkznrjaa8ra8asgdm8wwgwjvlwwrxx7347r8w0ee6dqyw4rufw4wg9djwcr6frzkezmdw6dud3wsm99eany5r8wgsctlxquu009nzd6hsme2tcsk0v3sgjvxa70er7h27z5epr67p5q767s2z5gt88paru56mxpm6pwz0cu35m")
+        assertThat(summaries[1].amount).isEqualTo(100000)
+        // third item have to be a `fee` from the last `Sent` with the same txid
+        assertThat(summaries[2].kind).isEqualTo("Fee")
+        assertThat(summaries[2].txid).isEqualTo(summaries[1].txid)
+        assertThat(summaries[2].amount).isEqualTo(10000)
+        if (summaries.size == 4) {
+            // fourth item have to be a `fee` from a `SendToSelf` tx
+            assertThat(summaries[3].kind).isEqualTo("Fee")
+            assertThat(summaries[3].amount).isEqualTo(10000)
+        } else {
+            // fouth item have to be a `SendToSelf`
+            assertThat(summaries[3].kind).isEqualTo("SendToSelf")
+            assertThat(summaries[3].amount).isEqualTo(0)
+            // fifth item have to be a `fee` from the last `SendToSelf` with the same txid
+            assertThat(summaries[4].kind).isEqualTo("Fee")
+            assertThat(summaries[4].txid).isEqualTo(summaries[3].txid)
+            assertThat(summaries[4].amount).isEqualTo(10000)
+        }
+        
+    }
+}

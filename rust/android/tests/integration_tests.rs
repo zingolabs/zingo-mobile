@@ -20,11 +20,8 @@ async fn offline_testsuite(abi: &str) {
 
 async fn execute_sync_from_seed(abi: &str) {
     #[cfg(not(feature = "regchest"))]
-    let (regtest_manager, _child_process_handler) = scenarios::unfunded_mobileclient().await;
-    #[cfg(not(feature = "regchest"))]
-    regtest_manager
-        .generate_n_blocks(9)
-        .expect("Failed to generate blocks.");
+    let (_regtest_manager, _child_process_handler) = 
+        scenarios::funded_orchard_with_3_txs_mobileclient(1_000_000).await;
     #[cfg(feature = "regchest")]
     let docker = match regchest_utils::launch(UNIX_SOCKET).await {
         Ok(d) => d,
@@ -50,7 +47,7 @@ async fn execute_sync_from_seed(abi: &str) {
 async fn execute_send_from_orchard(abi: &str) {
     #[cfg(not(feature = "regchest"))]
     let (_regtest_manager, _child_process_handler) =
-        scenarios::funded_orchard_mobileclient(1_000_000).await;
+        scenarios::funded_orchard_with_3_txs_mobileclient(1_000_000).await;
     #[cfg(feature = "regchest")]
     let docker = match regchest_utils::launch(UNIX_SOCKET).await {
         Ok(d) => d,
@@ -59,6 +56,32 @@ async fn execute_send_from_orchard(abi: &str) {
 
     let (exit_code, output, error) =
         zingomobile_utils::android_integration_test(abi, "ExecuteSendFromOrchard");
+
+    #[cfg(feature = "regchest")]
+    match regchest_utils::close(&docker).await {
+        Ok(_) => (),
+        Err(e) => panic!("Failed to close regchest docker container: {:?}", e),
+    }
+
+    println!("Exit Code: {}", exit_code);
+    println!("Output: {}", output);
+    println!("Error: {}", error);
+
+    assert_eq!(exit_code, 0);
+}
+
+async fn execute_summaries_from_seed(abi: &str) {
+    #[cfg(not(feature = "regchest"))]
+    let (_regtest_manager, _child_process_handler) =
+        scenarios::funded_orchard_with_3_txs_mobileclient(1_000_000).await;
+    #[cfg(feature = "regchest")]
+    let docker = match regchest_utils::launch(UNIX_SOCKET).await {
+        Ok(d) => d,
+        Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
+    };
+
+    let (exit_code, output, error) =
+        zingomobile_utils::android_integration_test(abi, "ExecuteSummariesFromSeed");
 
     #[cfg(feature = "regchest")]
     match regchest_utils::close(&docker).await {
@@ -90,6 +113,11 @@ mod x86 {
     async fn execute_send_from_orchard() {
         super::execute_send_from_orchard(ABI).await;
     }
+
+    #[tokio::test]
+    async fn execute_summaries_from_seed() {
+        super::execute_summaries_from_seed(ABI).await;
+    }
 }
 
 mod x86_64 {
@@ -108,6 +136,11 @@ mod x86_64 {
     #[tokio::test]
     async fn execute_send_from_orchard() {
         super::execute_send_from_orchard(ABI).await;
+    }
+
+    #[tokio::test]
+    async fn execute_summaries_from_seed() {
+        super::execute_summaries_from_seed(ABI).await;
     }
 }
 
@@ -128,6 +161,11 @@ mod arm32 {
     async fn execute_send_from_orchard() {
         super::execute_send_from_orchard(ABI).await;
     }
+
+    #[tokio::test]
+    async fn execute_summaries_from_seed() {
+        super::execute_summaries_from_seed(ABI).await;
+    }
 }
 
 mod arm64 {
@@ -146,5 +184,10 @@ mod arm64 {
     #[tokio::test]
     async fn execute_send_from_orchard() {
         super::execute_send_from_orchard(ABI).await;
+    }
+
+    #[tokio::test]
+    async fn execute_summaries_from_seed() {
+        super::execute_summaries_from_seed(ABI).await;
     }
 }
