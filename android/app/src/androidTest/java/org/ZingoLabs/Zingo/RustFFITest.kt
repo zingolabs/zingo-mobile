@@ -141,7 +141,7 @@ class ExecuteAddressesFromUfvk {
 
         var initFromUfvkJson = RustFFI.initfromufvk(server, ufvk, birthday, datadir, chainhint, monitorMempool)
         System.out.println("\nInit From UFVK:")
-        System.out.println(initFromUfvk)
+        System.out.println(initFromUfvkJson)
         val initFromUfvk: InitFromUfvk = mapper.readValue(initFromUfvkJson)
         assertThat(initFromUfvk.error).startsWith("This wallet is watch-only")
 
