@@ -18,7 +18,12 @@ object Ufvk {
 
 data class InitFromSeed (
     val seed : String,
-    val birthday : Long
+    val birthday : Long,
+    val account_index: Long
+)
+
+data class InitFromUfvk (
+    val error : String
 )
 
 data class Addresses (
@@ -134,10 +139,11 @@ class ExecuteAddressesFromUfvk {
         val datadir = MainApplication.getAppContext()!!.filesDir.path
         val monitorMempool = "false"
 
-        var initFromUfvk = RustFFI.initfromufvk(server, ufvk, birthday, datadir, chainhint, monitorMempool)
+        var initFromUfvkJson = RustFFI.initfromufvk(server, ufvk, birthday, datadir, chainhint, monitorMempool)
         System.out.println("\nInit From UFVK:")
-        System.out.println(initFromUfvk)
-        assertThat(initFromUfvk).isEqualTo("Error: This wallet is watch-only.")
+        System.out.println(initFromUfvkJson)
+        val initFromUfvk: InitFromUfvk = mapper.readValue(initFromUfvkJson)
+        assertThat(initFromUfvk.error).startsWith("This wallet is watch-only")
 
         var addressesJson = RustFFI.execute("addresses", "")
         System.out.println("\nAddresses:")
@@ -173,7 +179,8 @@ class ExecuteVersionFromSeed {
         var version = RustFFI.execute("version", "")
         System.out.println("\nVersion:")
         System.out.println(version)
-        assertThat(version).startsWith("mob-release")
+        // we used for zingolib version: `mob-release` & `mob-prerelease`
+        assertThat(version).startsWith("mob-")
     }
 }
 

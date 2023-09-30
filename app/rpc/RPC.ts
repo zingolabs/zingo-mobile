@@ -389,7 +389,14 @@ export default class RPC {
           console.log('Internal Error seed');
           return {} as WalletType;
         }
-        const seed: WalletType = (await JSON.parse(seedStr)) as RPCSeedType;
+        const RPCseed: RPCSeedType = await JSON.parse(seedStr);
+        const seed: WalletType = {} as WalletType;
+        if (RPCseed.seed) {
+          seed.seed = RPCseed.seed;
+        }
+        if (RPCseed.birthday) {
+          seed.birthday = RPCseed.birthday;
+        }
 
         return seed;
       } catch (error) {

@@ -40,6 +40,7 @@ import { RPCWalletKindType } from '../rpc/types/RPCWalletKindType';
 import { isEqual } from 'lodash';
 import Snackbars from '../../components/Components/Snackbars';
 import SnackbarType from '../AppState/types/SnackbarType';
+import { RPCSeedType } from '../rpc/types/RPCSeedType';
 
 const BoldText = React.lazy(() => import('../../components/Components/BoldText'));
 const Button = React.lazy(() => import('../../components/Components/Button'));
@@ -262,21 +263,30 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
         const networkState = await NetInfo.fetch();
         if (networkState.isConnected) {
           let result: string = await RPCModule.loadExistingWallet(this.state.server.uri, this.state.server.chain_name);
-          if (result === 'Error: This wallet is watch-only.') {
-            // this warning is not an error, bypassing...
-            result = 'OK';
-          }
+
           //console.log('Load Wallet Exists result', result);
           if (result && !result.toLowerCase().startsWith('error')) {
-            // Load the wallet and navigate to the transactions screen
-            const walletKindStr: string = await RPCModule.execute('wallet_kind', '');
-            //console.log(walletKindStr);
-            const walletKindJSON: RPCWalletKindType = await JSON.parse(walletKindStr);
-            this.setState({
-              readOnly: walletKindJSON.kind === 'Seeded' ? false : true,
-            });
-            this.navigateToLoadedApp();
-            //console.log('navigate to LoadedApp');
+            // here result can have an `error` field for watch-only which is actually OK.
+            const resultJson: RPCSeedType = await JSON.parse(result);
+            if (!resultJson.error || (resultJson.error && resultJson.error.startsWith('This wallet is watch-only'))) {
+              // Load the wallet and navigate to the transactions screen
+              const walletKindStr: string = await RPCModule.execute('wallet_kind', '');
+              //console.log(walletKindStr);
+              const walletKindJSON: RPCWalletKindType = await JSON.parse(walletKindStr);
+              this.setState({
+                readOnly: walletKindJSON.kind === 'Seeded' ? false : true,
+              });
+              this.navigateToLoadedApp();
+              //console.log('navigate to LoadedApp');
+            } else {
+              this.setState({ screen: 1 });
+              createAlert(
+                this.setBackgroundError,
+                this.addLastSnackbar,
+                this.props.translate('loadingapp.readingwallet-label') as string,
+                result,
+              );
+            }
           } else {
             this.setState({ screen: 1 });
             createAlert(
@@ -519,16 +529,25 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
           this.state.server.uri,
           this.state.server.chain_name,
         );
-        if (result === 'Error: This wallet is watch-only.') {
-          // this warning is not an error, bypassing...
-          result = 'ok';
-        }
       }
       //console.log(seed_ufvk);
       //console.log(result);
       if (result && !result.toLowerCase().startsWith('error')) {
-        this.setState({ actionButtonsDisabled: false, readOnly: type === 'seed' ? false : true });
-        this.navigateToLoadedApp();
+        // here result can have an `error` field for watch-only which is actually OK.
+        const resultJson: RPCSeedType = await JSON.parse(result);
+        if (!resultJson.error || (resultJson.error && resultJson.error.startsWith('This wallet is watch-only'))) {
+          this.setState({ actionButtonsDisabled: false, readOnly: type === 'seed' ? false : true });
+          this.navigateToLoadedApp();
+        } else {
+          this.setState({ actionButtonsDisabled: false });
+          // this message work for both.
+          createAlert(
+            this.setBackgroundError,
+            this.addLastSnackbar,
+            this.props.translate('loadingapp.readingwallet-label') as string,
+            result,
+          );
+        }
       } else {
         this.setState({ actionButtonsDisabled: false });
         // this message work for both.
