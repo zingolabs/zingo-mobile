@@ -101,7 +101,7 @@ jobs:
           colima start
 
       - name: Pull regchest docker image
-        run: docker pull zingodevops/regchest:004
+        run: docker pull zingodevops/regchest:005
 
       - uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
