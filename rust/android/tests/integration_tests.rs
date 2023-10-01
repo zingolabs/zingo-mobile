@@ -23,7 +23,7 @@ async fn execute_sync_from_seed(abi: &str) {
     let (_regtest_manager, _child_process_handler) = 
         scenarios::funded_orchard_mobileclient(1_000_000).await;
     #[cfg(feature = "regchest")]
-    let docker = match regchest_utils::launch(UNIX_SOCKET, "funded_orchard_mobileclient".to_string()).await {
+    let docker = match regchest_utils::launch(UNIX_SOCKET, Some("funded_orchard_mobileclient")).await {
         Ok(d) => d,
         Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
     };
@@ -49,7 +49,7 @@ async fn execute_send_from_orchard(abi: &str) {
     let (_regtest_manager, _child_process_handler) =
         scenarios::funded_orchard_mobileclient(1_000_000).await;
     #[cfg(feature = "regchest")]
-    let docker = match regchest_utils::launch(UNIX_SOCKET, "funded_orchard_mobileclient".to_string()).await {
+    let docker = match regchest_utils::launch(UNIX_SOCKET, Some("funded_orchard_mobileclient")).await {
         Ok(d) => d,
         Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
     };
@@ -75,7 +75,7 @@ async fn execute_summaries_from_seed(abi: &str) {
     let (_regtest_manager, _child_process_handler) =
         scenarios::funded_orchard_with_3_txs_mobileclient(1_000_000).await;
     #[cfg(feature = "regchest")]
-    let docker = match regchest_utils::launch(UNIX_SOCKET, "funded_orchard_with_3_txs_mobileclient".to_string()).await {
+    let docker = match regchest_utils::launch(UNIX_SOCKET, Some("funded_orchard_with_3_txs_mobileclient")).await {
         Ok(d) => d,
         Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
     };
