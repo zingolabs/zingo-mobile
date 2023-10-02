@@ -46,13 +46,13 @@ jobs:
 
       - name: Build and archive tests
         working-directory: ./rust
-        run: cargo nextest archive --verbose --features "ci regchest" --archive-file nextest-archive.tar.zst
+        run: cargo nextest archive --verbose --features "ci regchest" --archive-file nextest-archive-${{ env.ABI }}.tar.zst
 
       - name: Upload archive
         uses: actions/upload-artifact@v3
         with:
           name: nextest-archive-${{ env.ABI }}
-          path: ./rust/nextest-archive.tar.zst
+          path: ./rust/nextest-archive-${{ env.ABI }}.tar.zst
 
   integration-test:
     name: Integration test
@@ -166,7 +166,7 @@ jobs:
         working-directory: ./rust
         run: |
           cargo nextest run ${{ env.NEXTEST-ABI }} --verbose --profile ci \
-            --archive-file nextest-archive.tar.zst \
+            --archive-file nextest-archive-${{ env.ABI }}.tar.zst \
             --partition count:${{ matrix.partition}}/4
 
       - name: Upload test reports
