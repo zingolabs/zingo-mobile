@@ -20,6 +20,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         "justifyContent": "flex-start",
       }
     }
+    keyboardShouldPersistTaps="handled"
     style={
       {
         "maxHeight": "85%",
