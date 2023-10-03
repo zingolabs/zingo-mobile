@@ -173,6 +173,6 @@ jobs:
         if: ${{ ! cancelled() }}
         uses: actions/upload-artifact@v3
         with:
-          name: test-reports-${{ env.ABI }}-${{ env.TIMESTAMP }}
+          name: test-reports-${{ env.ABI }}-${{ matrix.partition}}-${{ env.TIMESTAMP }}
           path: android/app/build/outputs/integration_test_reports
 
