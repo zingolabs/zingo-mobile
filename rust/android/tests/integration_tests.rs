@@ -96,7 +96,7 @@ async fn execute_summaries_from_seed(abi: &str) {
     assert_eq!(exit_code, 0);
 }
 
-mod x86 {
+mod x86_32 {
     const ABI: &str = "x86";
 
     #[tokio::test]
