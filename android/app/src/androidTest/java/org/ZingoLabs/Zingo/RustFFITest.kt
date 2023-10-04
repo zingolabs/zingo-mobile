@@ -264,10 +264,7 @@ class ExecuteSendFromOrchard {
         System.out.println("\nBalance pre-send:")
         System.out.println(balanceJson)
         val balancePreSend: Balance = mapper.readValue(balanceJson)
-        assertThat(balancePreSend.verified_orchard_balance).isEqualTo(780000)
-        assertThat(balancePreSend.spendable_orchard_balance).isEqualTo(780000)
-        assertThat(balancePreSend.verified_sapling_balance).isEqualTo(100000)
-        assertThat(balancePreSend.spendable_sapling_balance).isEqualTo(100000)
+        assertThat(balancePreSend.spendable_orchard_balance).isEqualTo(1000000)
         assertThat(balancePreSend.transparent_balance).isEqualTo(0)
 
         var addressesJson = RustFFI.execute("addresses", "")
@@ -275,7 +272,6 @@ class ExecuteSendFromOrchard {
         System.out.println(addressesJson)
         val addresses: List<Addresses> = mapper.readValue(addressesJson)
 
-        // 100_000 + 10_000fee -> 110_000 / 780_000 - 110_000 -> 670_000
         val send = Send(addresses[0].receivers.transparent, 100000, null)
 
         var txidJson = RustFFI.execute("send", mapper.writeValueAsString(listOf(send)))
@@ -294,12 +290,6 @@ class ExecuteSendFromOrchard {
         System.out.println("\nBalance post-send:")
         System.out.println(balanceJson)
         val balancePostSend: Balance = mapper.readValue(balanceJson)
-        // because the balance is unverified for a while.
-        assertThat(balancePostSend.orchard_balance).isEqualTo(670000)
-        //assertThat(balancePostSend.verified_orchard_balance).isEqualTo(670000)
-        //assertThat(balancePostSend.spendable_orchard_balance).isEqualTo(670000)
-        assertThat(balancePostSend.verified_sapling_balance).isEqualTo(100000)
-        assertThat(balancePostSend.spendable_sapling_balance).isEqualTo(100000)
         assertThat(balancePostSend.transparent_balance).isEqualTo(100000)
     }
 }

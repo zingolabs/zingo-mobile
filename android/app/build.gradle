@@ -135,6 +135,10 @@ android {
         targetCompatibility = "18.0.2.1"
     }
 
+    kotlinOptions {
+        jvmTarget = '18'
+    }
+
     defaultConfig {
         applicationId 'org.ZingoLabs.Zingo' // Real
         //applicationId 'com.ZingoMobile' // @Test
@@ -292,7 +296,7 @@ dependencies {
     } else {
         implementation jscFlavor
     }
-	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
+	implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
 
     def work_version = "2.7.1"
 
