@@ -404,9 +404,9 @@ class ExecuteSaplingBalanceFromSeed {
         System.out.println(balanceJson)
         val balancePreSend: Balance = mapper.readValue(balanceJson)
 
-        assertThat(balancePreSend.orchard_balance).isEqualTo(84000)
-        assertThat(balancePreSend.verified_orchard_balance).isEqualTo(84000)
-        assertThat(balancePreSend.spendable_orchard_balance).isEqualTo(84000)
+        assertThat(balancePreSend.orchard_balance).isEqualTo(840000)
+        assertThat(balancePreSend.verified_orchard_balance).isEqualTo(840000)
+        assertThat(balancePreSend.spendable_orchard_balance).isEqualTo(840000)
         assertThat(balancePreSend.sapling_balance).isEqualTo(0)
         assertThat(balancePreSend.verified_sapling_balance).isEqualTo(0)
         assertThat(balancePreSend.spendable_sapling_balance).isEqualTo(0)
