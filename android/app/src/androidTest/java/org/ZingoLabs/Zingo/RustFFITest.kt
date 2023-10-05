@@ -102,7 +102,7 @@ class ExecuteAddressesFromSeed {
         val mapper = jacksonObjectMapper()
 
         val server = "http://10.0.2.2:20000"
-        val chainhint = "regtest"
+        val chainhint = "main"
         val seed = Seeds.ABANDON
         val birthday = "1"
         val datadir = MainApplication.getAppContext()!!.filesDir.path
@@ -133,7 +133,7 @@ class ExecuteAddressesFromUfvk {
         val mapper = jacksonObjectMapper()
 
         val server = "http://10.0.2.2:20000"
-        val chainhint = "regtest"
+        val chainhint = "main"
         val ufvk = Ufvk.ABANDON
         val birthday = "1"
         val datadir = MainApplication.getAppContext()!!.filesDir.path
@@ -163,7 +163,7 @@ class ExecuteVersionFromSeed {
         val mapper = jacksonObjectMapper()
 
         val server = "http://10.0.2.2:20000"
-        val chainhint = "regtest"
+        val chainhint = "main"
         val seed = Seeds.ABANDON
         val birthday = "1"
         val datadir = MainApplication.getAppContext()!!.filesDir.path
