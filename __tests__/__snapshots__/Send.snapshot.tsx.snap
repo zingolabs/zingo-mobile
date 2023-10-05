@@ -30,6 +30,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
   />
   <RCTScrollView
     contentContainerStyle={{}}
+    keyboardShouldPersistTaps="handled"
     testID="send.scrollView"
   >
     <View>
@@ -327,7 +328,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                       "display": "flex",
                       "flexDirection": "row",
                       "justifyContent": "flex-start",
-                      "marginTop": 10,
+                      "marginTop": 5,
                     }
                   }
                 >
@@ -628,64 +629,86 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                 <View
                   style={
                     {
-                      "alignItems": "baseline",
+                      "alignItems": "center",
                       "flexDirection": "row",
                     }
                   }
                 >
-                  <View
-                    accessibilityState={
-                      {
-                        "disabled": false,
-                      }
-                    }
-                    accessible={true}
-                    collapsable={false}
-                    focusable={true}
-                    onClick={[Function]}
-                    onResponderGrant={[Function]}
-                    onResponderMove={[Function]}
-                    onResponderRelease={[Function]}
-                    onResponderTerminate={[Function]}
-                    onResponderTerminationRequest={[Function]}
-                    onStartShouldSetResponder={[Function]}
+                  <Text
                     style={
                       {
+                        "color": "#c3c3c3",
+                        "fontSize": 12.5,
+                        "fontWeight": "600",
+                        "marginTop": 11,
                         "opacity": 1,
                       }
                     }
                   >
+                    text translated
+                  </Text>
+                  <View
+                    style={
+                      {
+                        "alignItems": "baseline",
+                        "flexDirection": "row",
+                      }
+                    }
+                  >
                     <View
+                      accessibilityState={
+                        {
+                          "disabled": false,
+                        }
+                      }
+                      accessible={true}
+                      collapsable={false}
+                      focusable={true}
+                      onClick={[Function]}
+                      onResponderGrant={[Function]}
+                      onResponderMove={[Function]}
+                      onResponderRelease={[Function]}
+                      onResponderTerminate={[Function]}
+                      onResponderTerminationRequest={[Function]}
+                      onStartShouldSetResponder={[Function]}
                       style={
                         {
-                          "alignItems": "baseline",
-                          "flexDirection": "row",
+                          "opacity": 1,
                         }
                       }
                     >
-                      <Text
+                      <View
                         style={
                           {
-                            "color": "#ffffff",
-                            "fontSize": 13,
-                            "marginTop": 10,
+                            "alignItems": "baseline",
+                            "flexDirection": "row",
                           }
                         }
                       >
-                        $
-                      </Text>
-                      <Text
-                        style={
-                          {
-                            "color": "#ffffff",
-                            "fontSize": 13,
-                            "fontWeight": "700",
-                            "marginTop": 10,
+                        <Text
+                          style={
+                            {
+                              "color": "#ffffff",
+                              "fontSize": 12.5,
+                              "marginTop": 11,
+                            }
                           }
-                        }
-                      >
-                         -.--
-                      </Text>
+                        >
+                          $
+                        </Text>
+                        <Text
+                          style={
+                            {
+                              "color": "#ffffff",
+                              "fontSize": 12.5,
+                              "fontWeight": "700",
+                              "marginTop": 11,
+                            }
+                          }
+                        >
+                           -.--
+                        </Text>
+                      </View>
                     </View>
                   </View>
                 </View>
@@ -933,6 +956,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
   />
   <RCTScrollView
     contentContainerStyle={{}}
+    keyboardShouldPersistTaps="handled"
     testID="send.scrollView"
   >
     <View>
@@ -1230,7 +1254,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                       "display": "flex",
                       "flexDirection": "row",
                       "justifyContent": "flex-start",
-                      "marginTop": 10,
+                      "marginTop": 5,
                     }
                   }
                 >
@@ -1531,64 +1555,86 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                 <View
                   style={
                     {
-                      "alignItems": "baseline",
+                      "alignItems": "center",
                       "flexDirection": "row",
                     }
                   }
                 >
-                  <View
-                    accessibilityState={
-                      {
-                        "disabled": true,
-                      }
-                    }
-                    accessible={true}
-                    collapsable={false}
-                    focusable={true}
-                    onClick={[Function]}
-                    onResponderGrant={[Function]}
-                    onResponderMove={[Function]}
-                    onResponderRelease={[Function]}
-                    onResponderTerminate={[Function]}
-                    onResponderTerminationRequest={[Function]}
-                    onStartShouldSetResponder={[Function]}
+                  <Text
                     style={
                       {
+                        "color": "#c3c3c3",
+                        "fontSize": 12.5,
+                        "fontWeight": "600",
+                        "marginTop": 11,
                         "opacity": 1,
                       }
                     }
                   >
+                    text translated
+                  </Text>
+                  <View
+                    style={
+                      {
+                        "alignItems": "baseline",
+                        "flexDirection": "row",
+                      }
+                    }
+                  >
                     <View
+                      accessibilityState={
+                        {
+                          "disabled": true,
+                        }
+                      }
+                      accessible={true}
+                      collapsable={false}
+                      focusable={true}
+                      onClick={[Function]}
+                      onResponderGrant={[Function]}
+                      onResponderMove={[Function]}
+                      onResponderRelease={[Function]}
+                      onResponderTerminate={[Function]}
+                      onResponderTerminationRequest={[Function]}
+                      onStartShouldSetResponder={[Function]}
                       style={
                         {
-                          "alignItems": "baseline",
-                          "flexDirection": "row",
+                          "opacity": 1,
                         }
                       }
                     >
-                      <Text
+                      <View
                         style={
                           {
-                            "color": "#ffffff",
-                            "fontSize": 13,
-                            "marginTop": 10,
+                            "alignItems": "baseline",
+                            "flexDirection": "row",
                           }
                         }
                       >
-                        $
-                      </Text>
-                      <Text
-                        style={
-                          {
-                            "color": "#ffffff",
-                            "fontSize": 13,
-                            "fontWeight": "700",
-                            "marginTop": 10,
+                        <Text
+                          style={
+                            {
+                              "color": "#ffffff",
+                              "fontSize": 12.5,
+                              "marginTop": 11,
+                            }
                           }
-                        }
-                      >
-                         0.00
-                      </Text>
+                        >
+                          $
+                        </Text>
+                        <Text
+                          style={
+                            {
+                              "color": "#ffffff",
+                              "fontSize": 12.5,
+                              "fontWeight": "700",
+                              "marginTop": 11,
+                            }
+                          }
+                        >
+                           0.00
+                        </Text>
+                      </View>
                     </View>
                   </View>
                 </View>

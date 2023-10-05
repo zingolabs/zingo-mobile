@@ -29,6 +29,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
         "justifyContent": "flex-start",
       }
     }
+    keyboardShouldPersistTaps="handled"
     style={
       {
         "maxHeight": "85%",
@@ -358,6 +359,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
         "justifyContent": "flex-start",
       }
     }
+    keyboardShouldPersistTaps="handled"
     style={
       {
         "maxHeight": "85%",
@@ -687,6 +689,7 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
         "justifyContent": "flex-start",
       }
     }
+    keyboardShouldPersistTaps="handled"
     style={
       {
         "maxHeight": "85%",
@@ -957,6 +960,7 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
         "justifyContent": "flex-start",
       }
     }
+    keyboardShouldPersistTaps="handled"
     style={
       {
         "maxHeight": "85%",
@@ -1265,6 +1269,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
         "justifyContent": "flex-start",
       }
     }
+    keyboardShouldPersistTaps="handled"
     style={
       {
         "maxHeight": "85%",
@@ -1594,6 +1599,7 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
         "justifyContent": "flex-start",
       }
     }
+    keyboardShouldPersistTaps="handled"
     style={
       {
         "maxHeight": "85%",

@@ -24,22 +24,26 @@ const parseZcashURI = async (
 
   // The first address is special, it can be the "host" part of the URI
   const address = parsedUri.pathname;
+  //console.log(address);
 
-  const resultParse: string = await RPCModule.execute('parse_address', address);
-  if (resultParse) {
-    if (resultParse.toLowerCase().startsWith('error') || resultParse.toLowerCase() === 'null') {
+  if (address) {
+    const resultParse: string = await RPCModule.execute('parse_address', address);
+    if (resultParse) {
+      if (resultParse.toLowerCase().startsWith('error') || resultParse.toLowerCase() === 'null') {
+        return translate('uris.parseerror') as string;
+      }
+    } else {
       return translate('uris.parseerror') as string;
     }
-  } else {
-    return translate('uris.parseerror') as string;
-  }
-  // TODO: check if the json parse is correct.
-  const resultParseJSON: RPCParseAddressType = await JSON.parse(resultParse);
+    // TODO: check if the json parse is correct.
+    //console.log(resultParse);
+    const resultParseJSON: RPCParseAddressType = await JSON.parse(resultParse);
 
-  const validParse = resultParseJSON.status === 'success' && server.chain_name === resultParseJSON.chain_name;
+    const validParse = resultParseJSON.status === 'success' && server.chain_name === resultParseJSON.chain_name;
 
-  if (address && !validParse) {
-    return `"${address || ''}" ${translate('uris.notvalid')}`;
+    if (address && !validParse) {
+      return `"${address || ''}" ${translate('uris.notvalid')}`;
+    }
   }
 
   // Has to have at least 1 element

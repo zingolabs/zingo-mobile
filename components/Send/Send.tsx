@@ -473,7 +473,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         </View>
       </Animated.View>
 
-      <ScrollView contentContainerStyle={{}} testID="send.scrollView">
+      <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{}} testID="send.scrollView">
         <View style={{ marginBottom: 30 }}>
           {[sendPageState.toaddr].map((ta, i) => {
             return (
@@ -644,7 +644,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           flexDirection: 'row',
                           justifyContent: 'flex-start',
                           alignItems: 'center',
-                          marginTop: 10,
+                          marginTop: 5,
                         }}>
                         <RegText style={{ fontSize: 14 }}>{translate('send.spendable') as string}</RegText>
                         <ZecAmount
@@ -769,14 +769,18 @@ const Send: React.FunctionComponent<SendProps> = ({
                       </View>
 
                       <View style={{ flexDirection: 'column', alignItems: 'center' }}>
-                        {/*<RegText style={{ marginBottom: 5 }}>{translate('send.price')}</RegText>*/}
-                        <CurrencyAmount
-                          style={{ marginTop: 10, fontSize: 13 }}
-                          price={zecPrice.zecPrice}
-                          amtZec={getMaxAmount()}
-                          currency={'USD'}
-                          privacy={privacy}
-                        />
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                          <RegText style={{ marginTop: 11, fontSize: 12.5 }}>
+                            {translate('send.spendable') as string}
+                          </RegText>
+                          <CurrencyAmount
+                            style={{ marginTop: 11, fontSize: 12.5 }}
+                            price={zecPrice.zecPrice}
+                            amtZec={getMaxAmount()}
+                            currency={'USD'}
+                            privacy={privacy}
+                          />
+                        </View>
                         <View style={{ marginLeft: 5 }}>
                           <PriceFetcher setZecPrice={setZecPrice} />
                         </View>

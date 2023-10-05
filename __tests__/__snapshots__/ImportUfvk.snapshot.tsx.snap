@@ -27,6 +27,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
         "justifyContent": "flex-start",
       }
     }
+    keyboardShouldPersistTaps="handled"
     style={
       {
         "maxHeight": "85%",
