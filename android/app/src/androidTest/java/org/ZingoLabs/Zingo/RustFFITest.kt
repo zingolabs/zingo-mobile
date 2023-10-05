@@ -380,10 +380,15 @@ class ExecuteSaplingBalanceFromSeed {
         System.out.println("\nSync:")
         System.out.println(syncJson)
         
+        var summariesJson = RustFFI.execute("summaries", "")
+        System.out.println("\nSummaries:")
+        System.out.println(summariesJson)
+        
         var balanceJson = RustFFI.execute("balance", "")
         System.out.println("\nBalance:")
         System.out.println(balanceJson)
         val balancePreSend: Balance = mapper.readValue(balanceJson)
+
         // something simple to check all the structure, and when everything is in place
         // I will create the real test here...
         assertThat(balancePreSend.orchard_balance).isEqualTo(30000)
