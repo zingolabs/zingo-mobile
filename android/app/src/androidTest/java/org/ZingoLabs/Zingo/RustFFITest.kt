@@ -383,16 +383,33 @@ class ExecuteSaplingBalanceFromSeed {
         var summariesJson = RustFFI.execute("summaries", "")
         System.out.println("\nSummaries:")
         System.out.println(summariesJson)
-        
+
+        // Summaries
+        // 1. Received in orchard pool =     +500_000
+        // 2. Received in sapling pool =     +250_000
+        // 3. Received in transparent pool = +250_000
+        // 4. Send - 100_000 + 10_000fee =   -110_000
+        // 5. SendToSelf orchard pool =       -10_000 (one item: Fee)
+        // 6. SendToSelf sapling pool =       -10_000 (one item: Fee)
+        // 7. SendToSelf transparent pool =   -10_000 (two items: SendToSelf & Fee)
+        // 8. Shielding transparent pool =    -10_000 (one item: Fee)
+        // 9. Upgrading sapling pool =        -10_000 (one item: Fee)
+        //
+        // orchard pool = 84_000
+        // sapling pool = 0
+        // transparent =  0
+
         var balanceJson = RustFFI.execute("balance", "")
         System.out.println("\nBalance:")
         System.out.println(balanceJson)
         val balancePreSend: Balance = mapper.readValue(balanceJson)
 
-        // something simple to check all the structure, and when everything is in place
-        // I will create the real test here...
-        assertThat(balancePreSend.orchard_balance).isEqualTo(30000)
+        assertThat(balancePreSend.orchard_balance).isEqualTo(84000)
+        assertThat(balancePreSend.verified_orchard_balance).isEqualTo(84000)
+        assertThat(balancePreSend.spendable_orchard_balance).isEqualTo(84000)
         assertThat(balancePreSend.sapling_balance).isEqualTo(0)
+        assertThat(balancePreSend.verified_sapling_balance).isEqualTo(0)
+        assertThat(balancePreSend.spendable_sapling_balance).isEqualTo(0)
         assertThat(balancePreSend.transparent_balance).isEqualTo(0)
     }
 }
