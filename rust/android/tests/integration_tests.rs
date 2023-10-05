@@ -96,6 +96,32 @@ async fn execute_summaries_from_seed(abi: &str) {
     assert_eq!(exit_code, 0);
 }
 
+async fn execute_sapling_balance_from_seed(abi: &str) {
+    #[cfg(not(feature = "regchest"))]
+    let (_regtest_manager, _child_process_handler) =
+        scenarios::funded_orchard_sapling_transparent_shielded_mobileclient(1_000_000).await;
+    #[cfg(feature = "regchest")]
+    let docker = match regchest_utils::launch(UNIX_SOCKET, Some("funded_orchard_sapling_transparent_shielded_mobileclient")).await {
+        Ok(d) => d,
+        Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
+    };
+
+    let (exit_code, output, error) =
+        zingomobile_utils::android_integration_test(abi, "ExecuteSaplingBalanceFromSeed");
+
+    #[cfg(feature = "regchest")]
+    match regchest_utils::close(&docker).await {
+        Ok(_) => (),
+        Err(e) => panic!("Failed to close regchest docker container: {:?}", e),
+    }
+
+    println!("Exit Code: {}", exit_code);
+    println!("Output: {}", output);
+    println!("Error: {}", error);
+
+    assert_eq!(exit_code, 0);
+}
+
 mod x86_32 {
     const ABI: &str = "x86";
 
@@ -117,6 +143,11 @@ mod x86_32 {
     #[tokio::test]
     async fn execute_summaries_from_seed() {
         super::execute_summaries_from_seed(ABI).await;
+    }
+
+    #[tokio::test]
+    async fn execute_sapling_balance_from_seed() {
+        super::execute_sapling_balance_from_seed(ABI).await;
     }
 }
 
@@ -142,6 +173,11 @@ mod x86_64 {
     async fn execute_summaries_from_seed() {
         super::execute_summaries_from_seed(ABI).await;
     }
+
+    #[tokio::test]
+    async fn execute_sapling_balance_from_seed() {
+        super::execute_sapling_balance_from_seed(ABI).await;
+    }
 }
 
 mod arm32 {
@@ -166,6 +202,11 @@ mod arm32 {
     async fn execute_summaries_from_seed() {
         super::execute_summaries_from_seed(ABI).await;
     }
+
+    #[tokio::test]
+    async fn execute_sapling_balance_from_seed() {
+        super::execute_sapling_balance_from_seed(ABI).await;
+    }
 }
 
 mod arm64 {
@@ -189,5 +230,10 @@ mod arm64 {
     #[tokio::test]
     async fn execute_summaries_from_seed() {
         super::execute_summaries_from_seed(ABI).await;
+    }
+
+    #[tokio::test]
+    async fn execute_sapling_balance_from_seed() {
+        super::execute_sapling_balance_from_seed(ABI).await;
     }
 }

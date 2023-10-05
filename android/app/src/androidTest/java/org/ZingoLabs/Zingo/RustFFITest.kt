@@ -102,7 +102,7 @@ class ExecuteAddressesFromSeed {
         val mapper = jacksonObjectMapper()
 
         val server = "http://10.0.2.2:20000"
-        val chainhint = "main"
+        val chainhint = "regtest"
         val seed = Seeds.ABANDON
         val birthday = "1"
         val datadir = MainApplication.getAppContext()!!.filesDir.path
@@ -133,7 +133,7 @@ class ExecuteAddressesFromUfvk {
         val mapper = jacksonObjectMapper()
 
         val server = "http://10.0.2.2:20000"
-        val chainhint = "main"
+        val chainhint = "regtest"
         val ufvk = Ufvk.ABANDON
         val birthday = "1"
         val datadir = MainApplication.getAppContext()!!.filesDir.path
@@ -163,7 +163,7 @@ class ExecuteVersionFromSeed {
         val mapper = jacksonObjectMapper()
 
         val server = "http://10.0.2.2:20000"
-        val chainhint = "main"
+        val chainhint = "regtest"
         val seed = Seeds.ABANDON
         val birthday = "1"
         val datadir = MainApplication.getAppContext()!!.filesDir.path
@@ -354,5 +354,39 @@ class ExecuteSummariesFromSeed {
             assertThat(summaries[4].amount).isEqualTo(10000)
         }
         
+    }
+}
+
+class ExecuteSaplingBalanceFromSeed {
+    @Test
+    fun executeSaplingBalanceFromSeed() {
+        val mapper = jacksonObjectMapper()
+
+        val server = "http://10.0.2.2:20000"
+        val chainhint = "regtest"
+        val seed = Seeds.HOSPITAL
+        val birthday = "1"
+        val datadir = MainApplication.getAppContext()!!.filesDir.path
+        val monitorMempool = "false"
+
+        var initFromSeedJson = RustFFI.initfromseed(server, seed, birthday, datadir, chainhint, monitorMempool)
+        System.out.println("\nInit from seed:")
+        System.out.println(initFromSeedJson)
+        val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
+        assertThat(initFromSeed.seed).isEqualTo(Seeds.HOSPITAL)
+        assertThat(initFromSeed.birthday).isEqualTo(1)
+
+        var syncJson = RustFFI.execute("sync", "")
+        System.out.println("\nSync:")
+        System.out.println(syncJson)
+        
+        var balanceJson = RustFFI.execute("balance", "")
+        System.out.println("\nBalance:")
+        System.out.println(balanceJson)
+        val balancePreSend: Balance = mapper.readValue(balanceJson)
+        // something simple to check all the structure, and when everything is in place
+        // I will create the real test here...
+        assertThat(balancePreSend.spendable_orchard_balance).isEqualTo(1000000)
+        assertThat(balancePreSend.transparent_balance).isEqualTo(0)
     }
 }
