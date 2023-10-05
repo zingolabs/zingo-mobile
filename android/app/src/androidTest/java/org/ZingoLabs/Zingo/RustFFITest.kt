@@ -386,7 +386,8 @@ class ExecuteSaplingBalanceFromSeed {
         val balancePreSend: Balance = mapper.readValue(balanceJson)
         // something simple to check all the structure, and when everything is in place
         // I will create the real test here...
-        assertThat(balancePreSend.spendable_orchard_balance).isEqualTo(1000000)
+        assertThat(balancePreSend.orchard_balance).isEqualTo(30000)
+        assertThat(balancePreSend.sapling_balance).isEqualTo(0)
         assertThat(balancePreSend.transparent_balance).isEqualTo(0)
     }
 }
