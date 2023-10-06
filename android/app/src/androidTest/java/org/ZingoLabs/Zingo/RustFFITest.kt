@@ -395,21 +395,21 @@ class ExecuteSaplingBalanceFromSeed {
         // 8. Shielding transparent pool =    -10_000 (one item: Fee)
         // 9. Upgrading sapling pool =        -10_000 (one item: Fee)
         //
-        // orchard pool = 84_000
+        // orchard pool = 840_000
         // sapling pool = 0
         // transparent =  0
 
         var balanceJson = RustFFI.execute("balance", "")
         System.out.println("\nBalance:")
         System.out.println(balanceJson)
-        val balancePreSend: Balance = mapper.readValue(balanceJson)
+        val balance: Balance = mapper.readValue(balanceJson)
 
-        assertThat(balancePreSend.orchard_balance).isEqualTo(840000)
-        assertThat(balancePreSend.verified_orchard_balance).isEqualTo(840000)
-        assertThat(balancePreSend.spendable_orchard_balance).isEqualTo(840000)
-        assertThat(balancePreSend.sapling_balance).isEqualTo(0)
-        assertThat(balancePreSend.verified_sapling_balance).isEqualTo(0)
-        assertThat(balancePreSend.spendable_sapling_balance).isEqualTo(0)
-        assertThat(balancePreSend.transparent_balance).isEqualTo(0)
+        assertThat(balance.orchard_balance).isEqualTo(840000)
+        assertThat(balance.verified_orchard_balance).isEqualTo(840000)
+        assertThat(balance.spendable_orchard_balance).isEqualTo(840000)
+        assertThat(balance.sapling_balance).isEqualTo(0)
+        assertThat(balance.verified_sapling_balance).isEqualTo(0)
+        assertThat(balance.spendable_sapling_balance).isEqualTo(0)
+        assertThat(balance.transparent_balance).isEqualTo(0)
     }
 }
