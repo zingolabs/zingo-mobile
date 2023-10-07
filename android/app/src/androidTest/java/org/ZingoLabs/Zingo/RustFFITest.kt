@@ -356,3 +356,60 @@ class ExecuteSummariesFromSeed {
         
     }
 }
+
+class ExecuteSaplingBalanceFromSeed {
+    @Test
+    fun executeSaplingBalanceFromSeed() {
+        val mapper = jacksonObjectMapper()
+
+        val server = "http://10.0.2.2:20000"
+        val chainhint = "regtest"
+        val seed = Seeds.HOSPITAL
+        val birthday = "1"
+        val datadir = MainApplication.getAppContext()!!.filesDir.path
+        val monitorMempool = "false"
+
+        var initFromSeedJson = RustFFI.initfromseed(server, seed, birthday, datadir, chainhint, monitorMempool)
+        System.out.println("\nInit from seed:")
+        System.out.println(initFromSeedJson)
+        val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
+        assertThat(initFromSeed.seed).isEqualTo(Seeds.HOSPITAL)
+        assertThat(initFromSeed.birthday).isEqualTo(1)
+
+        var syncJson = RustFFI.execute("sync", "")
+        System.out.println("\nSync:")
+        System.out.println(syncJson)
+        
+        var summariesJson = RustFFI.execute("summaries", "")
+        System.out.println("\nSummaries:")
+        System.out.println(summariesJson)
+
+        // Summaries
+        // 1. Received in orchard pool =     +500_000
+        // 2. Received in sapling pool =     +250_000
+        // 3. Received in transparent pool = +250_000
+        // 4. Send - 100_000 + 10_000fee =   -110_000
+        // 5. SendToSelf orchard pool =       -10_000 (one item: Fee)
+        // 6. SendToSelf sapling pool =       -10_000 (one item: Fee)
+        // 7. SendToSelf transparent pool =   -10_000 (two items: SendToSelf & Fee)
+        // 8. Shielding transparent pool =    -10_000 (one item: Fee)
+        // 9. Upgrading sapling pool =        -10_000 (one item: Fee)
+        //
+        // orchard pool = 840_000
+        // sapling pool = 0
+        // transparent =  0
+
+        var balanceJson = RustFFI.execute("balance", "")
+        System.out.println("\nBalance:")
+        System.out.println(balanceJson)
+        val balance: Balance = mapper.readValue(balanceJson)
+
+        assertThat(balance.orchard_balance).isEqualTo(840000)
+        assertThat(balance.verified_orchard_balance).isEqualTo(840000)
+        assertThat(balance.spendable_orchard_balance).isEqualTo(840000)
+        assertThat(balance.sapling_balance).isEqualTo(0)
+        assertThat(balance.verified_sapling_balance).isEqualTo(0)
+        assertThat(balance.spendable_sapling_balance).isEqualTo(0)
+        assertThat(balance.transparent_balance).isEqualTo(0)
+    }
+}
