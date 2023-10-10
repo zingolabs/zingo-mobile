@@ -16,8 +16,7 @@ rustlib = { path = "../lib" }
 
 [dev-dependencies]
 tokio =  { version = "1.24.2", features = ["full"] }
-zingo-testutils = { git="https://github.com/Oscar-Pepper/zingolib", default-features=true, branch = "regtest_network_upgrade_activation_heights" }
-# zingo-testutils = { git="https://github.com/zingolabs/zingolib", default-features=true, branch = "dev" }
+zingo-testutils = { git="https://github.com/zingolabs/zingolib", default-features=true, branch = "dev" }
 json = "0.12.4"
 env_logger = "0.10.0"
 zingomobile_utils = { path = "../zingomobile_utils" }
