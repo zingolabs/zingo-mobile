@@ -244,6 +244,24 @@ const Send: React.FunctionComponent<SendProps> = ({
     };
   }, [slideAnim, titleViewHeight]);
 
+  useEffect(() => {
+    (async () => {
+      if (mode === 'basic') {
+        const price = await RPC.rpc_getZecPrice();
+        // values:
+        // 0   - initial/default value
+        // -1  - error in Gemini/zingolib.
+        // -2  - error in RPCModule, likely.
+        // > 0 - real value
+        if (price <= 0) {
+          setZecPrice(price, 0);
+        } else {
+          setZecPrice(price, Date.now());
+        }
+      }
+    })();
+  }, [mode, setZecPrice]);
+
   const updateToField = async (
     address: string | null,
     amount: string | null,
