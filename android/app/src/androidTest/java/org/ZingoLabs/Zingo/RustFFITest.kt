@@ -154,7 +154,7 @@ class ExecuteAddressesFromUfvk {
         System.out.println("\nExport Ufvk:")
         System.out.println(exportUfvkJson)
         val exportUfvk: ExportUfvk = mapper.readValue(exportUfvkJson)
-        assertThat(exportUfvk.ufvk).isEqualTo(ufvk.ABANDON)
+        assertThat(exportUfvk.ufvk).isEqualTo(Ufvk.ABANDON)
         assertThat(exportUfvk.birthday).isEqualTo(1)
 
         var addressesJson = RustFFI.execute("addresses", "")
