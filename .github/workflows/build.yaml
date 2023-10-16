@@ -74,7 +74,6 @@ jobs:
         if: ${{ env.ARCH == 'x86_64' }}
         run: |
           echo "TARGET=x86_64-linux-android" >> $GITHUB_ENV
-          echo "RUSTFLAGS=" >> $GITHUB_ENV
           echo "CC=x86_64-linux-android" >> $GITHUB_ENV
           echo "OPENSSL_PATH=x86_64" >> $GITHUB_ENV
       
@@ -82,7 +81,6 @@ jobs:
         if: ${{ env.ARCH == 'x86' }}
         run: |
           echo "TARGET=i686-linux-android" >> $GITHUB_ENV
-          echo "RUSTFLAGS=-Clink-arg=-latomic" >> $GITHUB_ENV
           echo "CC=i686-linux-android" >> $GITHUB_ENV
           echo "OPENSSL_PATH=x86" >> $GITHUB_ENV
       
@@ -90,7 +88,6 @@ jobs:
         if: ${{ env.ARCH == 'arm64-v8a' }}
         run: |
           echo "TARGET=aarch64-linux-android" >> $GITHUB_ENV
-          echo "RUSTFLAGS=" >> $GITHUB_ENV
           echo "CC=aarch64-linux-android" >> $GITHUB_ENV
           echo "OPENSSL_PATH=aarch64" >> $GITHUB_ENV
       
@@ -98,7 +95,6 @@ jobs:
         if: ${{ env.ARCH == 'armeabi-v7a' }}
         run: |
           echo "TARGET=armv7-linux-androideabi" >> $GITHUB_ENV
-          echo "RUSTFLAGS=" >> $GITHUB_ENV
           echo "CC=armv7a-linux-androideabi" >> $GITHUB_ENV
           echo "OPENSSL_PATH=armv7" >> $GITHUB_ENV
       
@@ -109,7 +105,6 @@ jobs:
         working-directory: ./rust/android
         run: cargo +nightly build -Z build-std --target ${{ env.TARGET }} --release
         env:
-          RUSTFLAGS: ${{ env.RUSTFLAGS }}
           AR: llvm-ar
           LD: ld
           RANLIB: llvm-ranlib
