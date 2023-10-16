@@ -25,7 +25,7 @@ RUN AR=llvm-ar LD=ld RANLIB=llvm-ranlib CC=armv7a-linux-androideabi24-clang \
     --target armv7-linux-androideabi --release
 RUN llvm-strip ../target/armv7-linux-androideabi/release/librust.so
 
-RUN RUSTFLAGS="-C link-arg=-latomic" AR=llvm-ar LD=ld RANLIB=llvm-ranlib CC=i686-linux-android24-clang \
+RUN AR=llvm-ar LD=ld RANLIB=llvm-ranlib CC=i686-linux-android24-clang \
     OPENSSL_DIR=/opt/openssl-3.1.3/x86 cargo +nightly build -Z build-std \
     --target i686-linux-android --release
 RUN llvm-strip ../target/i686-linux-android/release/librust.so
