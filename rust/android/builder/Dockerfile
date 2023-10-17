@@ -46,7 +46,6 @@ RUN rustup target add \
     armv7-linux-androideabi \
     i686-linux-android \
     x86_64-linux-android
-# RUN cargo install cargo-ndk
 RUN echo "[target.aarch64-linux-android]" >> $CARGO_HOME/config.toml \
     && echo "ar = \"llvm-ar\"" >> $CARGO_HOME/config.toml \
     && echo "linker = \"aarch64-linux-android24-clang\"" >> $CARGO_HOME/config.toml \
