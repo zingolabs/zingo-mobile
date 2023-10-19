@@ -26,6 +26,11 @@ data class InitFromUfvk (
     val error : String
 )
 
+data class ExportUfvk (
+    val ufvk : String,
+    val birthday : Long
+)
+
 data class Addresses (
 	val address : String,
 	val receivers : Receivers
@@ -144,6 +149,13 @@ class ExecuteAddressesFromUfvk {
         System.out.println(initFromUfvkJson)
         val initFromUfvk: InitFromUfvk = mapper.readValue(initFromUfvkJson)
         assertThat(initFromUfvk.error).startsWith("This wallet is watch-only")
+
+        var exportUfvkJson = RustFFI.execute("exportufvk", "")
+        System.out.println("\nExport Ufvk:")
+        System.out.println(exportUfvkJson)
+        val exportUfvk: ExportUfvk = mapper.readValue(exportUfvkJson)
+        assertThat(exportUfvk.ufvk).isEqualTo(Ufvk.ABANDON)
+        assertThat(exportUfvk.birthday).isEqualTo(1)
 
         var addressesJson = RustFFI.execute("addresses", "")
         System.out.println("\nAddresses:")
