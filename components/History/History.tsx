@@ -74,8 +74,8 @@ const History: React.FunctionComponent<HistoryProps> = ({
       style={{
         display: 'flex',
         justifyContent: 'flex-start',
-        marginBottom: 140,
         width: '100%',
+        height: '100%',
       }}>
       <Modal
         animationType="slide"
@@ -116,7 +116,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
             title={translate('history.refreshing') as string}
           />
         }
-        style={{ flexGrow: 1, marginTop: 10, width: '100%', height: '100%' }}>
+        style={{ flexGrow: 1, marginTop: 10, width: '100%' }}>
         {transactionsSorted.flatMap((t, index) => {
           let txmonth = t.time ? moment(t.time * 1000).format('MMM YYYY') : '--- ----';
 
@@ -140,11 +140,10 @@ const History: React.FunctionComponent<HistoryProps> = ({
         {loadMoreButton ? (
           <View
             style={{
-              height: 150,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'flex-start',
-              marginTop: 5,
+              marginTop: 10,
               marginBottom: 30,
             }}>
             <Button type="Secondary" title={translate('history.loadmore') as string} onPress={loadMoreClicked} />
@@ -154,11 +153,10 @@ const History: React.FunctionComponent<HistoryProps> = ({
             {!!transactions && !!transactions.length && (
               <View
                 style={{
-                  height: 150,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'flex-start',
-                  marginTop: 5,
+                  marginTop: 10,
                   marginBottom: 30,
                 }}>
                 <FadeText style={{ color: colors.primary }}>{translate('history.end') as string}</FadeText>

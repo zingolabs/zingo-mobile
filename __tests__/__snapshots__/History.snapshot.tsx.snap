@@ -7,8 +7,8 @@ exports[`Component History - test History currency USD, privacy high & mode adva
   style={
     {
       "display": "flex",
+      "height": "100%",
       "justifyContent": "flex-start",
-      "marginBottom": 140,
       "width": "100%",
     }
   }
@@ -630,7 +630,6 @@ exports[`Component History - test History currency USD, privacy high & mode adva
     style={
       {
         "flexGrow": 1,
-        "height": "100%",
         "marginTop": 10,
         "width": "100%",
       }
@@ -1384,10 +1383,9 @@ exports[`Component History - test History currency USD, privacy high & mode adva
           {
             "alignItems": "center",
             "display": "flex",
-            "height": 150,
             "justifyContent": "flex-start",
             "marginBottom": 30,
-            "marginTop": 5,
+            "marginTop": 10,
           }
         }
       >
@@ -1414,8 +1412,8 @@ exports[`Component History - test History no currency, privacy normal & mode bas
   style={
     {
       "display": "flex",
+      "height": "100%",
       "justifyContent": "flex-start",
-      "marginBottom": 140,
       "width": "100%",
     }
   }
@@ -1795,7 +1793,6 @@ exports[`Component History - test History no currency, privacy normal & mode bas
     style={
       {
         "flexGrow": 1,
-        "height": "100%",
         "marginTop": 10,
         "width": "100%",
       }
@@ -2575,10 +2572,9 @@ exports[`Component History - test History no currency, privacy normal & mode bas
           {
             "alignItems": "center",
             "display": "flex",
-            "height": 150,
             "justifyContent": "flex-start",
             "marginBottom": 30,
-            "marginTop": 5,
+            "marginTop": 10,
           }
         }
       >
