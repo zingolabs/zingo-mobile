@@ -394,7 +394,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
   readUrl = async (url: string) => {
     //console.log(url);
     // Attempt to parse as URI if it starts with zcash
-    if (url.startsWith('zcash:')) {
+    // only if it is a spendable wallet
+    if (url.startsWith('zcash:') && !this.state.readOnly) {
       const target: string | ZcashURITargetClass = await parseZcashURI(url, this.state.translate, this.state.server);
       //console.log(targets);
 
