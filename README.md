@@ -7,7 +7,7 @@ Google Play: [https://play.google.com/store/apps/details?id=org.ZingoLabs.Zingo]
 
 ### Prerequisites
 1. `yarn`
-2. `nodejs` recommended version v16.16.0 LTS.
+2. `nodejs` recommended version v16.20.2 LTS.
 3. Install Rust
 4. Add the ios targets `rustup target add aarch64-apple-ios x86_64-apple-ios`
 5. `cargo install cargo-lipo`
@@ -32,7 +32,7 @@ see the [trouble-shooting notes](./TROUBLESHOOTING.md).
 ### Prerequisites
 1. `docker` (for building the rust library)
 2. `yarn`
-3. `nodejs` recommended version v16.16.0 LTS.
+3. `nodejs` recommended version v16.20.2 LTS.
 4. Android Studio or commandline tools
 
 Carefully follow the instructions to [setup Android Studio for your
