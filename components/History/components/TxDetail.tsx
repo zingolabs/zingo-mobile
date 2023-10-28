@@ -29,7 +29,11 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
   const { info, translate, language, privacy, addLastSnackbar, server, currency } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const spendColor =
-    tx.confirmations === 0 ? colors.primaryDisabled : tx.type === 'Received' ? colors.primary : colors.text;
+    tx.confirmations === null || tx.confirmations === 0
+      ? colors.primaryDisabled
+      : tx.type === 'Received'
+      ? colors.primary
+      : colors.text;
   const [expandAddress, setExpandAddress] = useState(false);
   const [expandTxid, setExpandTxid] = useState(false);
   moment.locale(language);
@@ -117,7 +121,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
             </View>
             <View style={{ display: 'flex', alignItems: 'flex-end' }}>
               <FadeText>{translate('history.confirmations') as string}</FadeText>
-              <RegText>{tx.confirmations ? tx.confirmations.toString() : '-'}</RegText>
+              <RegText>{tx.confirmations === null ? '-' : tx.confirmations.toString()}</RegText>
             </View>
           </View>
 

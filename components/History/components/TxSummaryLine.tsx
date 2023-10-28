@@ -34,9 +34,14 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
   const { colors } = useTheme() as unknown as ThemeType;
 
   const amountColor =
-    tx.confirmations === 0 ? colors.primaryDisabled : tx.type === 'Received' ? colors.primary : colors.text;
+    tx.confirmations === null || tx.confirmations === 0
+      ? colors.primaryDisabled
+      : tx.type === 'Received'
+      ? colors.primary
+      : colors.text;
 
-  const txIcon = tx.confirmations === 0 ? faRefresh : tx.type === 'Received' ? faArrowDown : faArrowUp;
+  const txIcon =
+    tx.confirmations === null || tx.confirmations === 0 ? faRefresh : tx.type === 'Received' ? faArrowDown : faArrowUp;
   moment.locale(language);
 
   // if no address I'm going to put txid here.

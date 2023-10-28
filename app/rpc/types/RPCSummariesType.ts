@@ -8,4 +8,5 @@ export type RPCSummariesType = {
   memos?: string[];
   kind: 'Sent' | 'Received' | 'SendToSelf' | 'Fee';
   pool?: 'Orchard' | 'Sapling' | 'Transparent' | 'None';
+  unconfirmed: boolean;
 };
