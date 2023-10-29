@@ -29,11 +29,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
   const { info, translate, language, privacy, addLastSnackbar, server, currency } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const spendColor =
-    tx.confirmations === null || tx.confirmations === 0
-      ? colors.primaryDisabled
-      : tx.type === 'Received'
-      ? colors.primary
-      : colors.text;
+    tx.confirmations === 0 ? colors.primaryDisabled : tx.type === 'Received' ? colors.primary : colors.text;
   const [expandAddress, setExpandAddress] = useState(false);
   const [expandTxid, setExpandTxid] = useState(false);
   moment.locale(language);
