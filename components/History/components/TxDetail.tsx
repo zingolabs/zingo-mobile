@@ -117,7 +117,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
             </View>
             <View style={{ display: 'flex', alignItems: 'flex-end' }}>
               <FadeText>{translate('history.confirmations') as string}</FadeText>
-              <RegText>{tx.confirmations ? tx.confirmations.toString() : '-'}</RegText>
+              <RegText>{tx.confirmations.toString()}</RegText>
             </View>
           </View>
 

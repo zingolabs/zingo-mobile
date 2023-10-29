@@ -1394,7 +1394,9 @@ export default class RPC {
           if (!currentTxList[0].type && !!type) {
             currentTxList[0].type = type;
           }
-          if (!currentTxList[0].confirmations) {
+          if (tx.unconfirmed) {
+            currentTxList[0].confirmations = 0;
+          } else if (!currentTxList[0].confirmations) {
             currentTxList[0].confirmations = this.lastServerBlockHeight
               ? this.lastServerBlockHeight - tx.block_height + 1
               : 0;

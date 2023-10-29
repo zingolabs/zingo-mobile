@@ -97,7 +97,8 @@ data class Summaries (
     val to_address : String?,
     val memos : List<String>?,
     val kind : String,
-    val pool : String?
+    val pool : String?,
+    val unconfirmed : Boolean
 )
 
 @Category(OfflineTest::class)
