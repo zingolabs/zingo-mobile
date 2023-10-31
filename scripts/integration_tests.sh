@@ -209,6 +209,10 @@ if [ ! -d "./android/app" ]; then
     echo "Try './scripts/$(basename $0)' from zingo-mobile root directory." >&2
     exit 1
 fi
+
+echo -e "\nRunning yarn install..."
+yarn install
+
 cd android
 
 echo -e "\nInstalling latest build tools, platform tools, and platform..."
@@ -254,9 +258,6 @@ else
     else
         echo "AVD found: ${avd_name}"
     fi
-        
-    echo -e "\nRunning yarn install..."
-    yarn install
 
     echo -e "\nBuilding APKs..."
     ./gradlew assembleDebug assembleAndroidTest -PsplitApk=true
