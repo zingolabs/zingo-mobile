@@ -326,6 +326,10 @@ class ExecuteSummariesFromSeed {
         assertThat(initFromSeed.seed).isEqualTo(Seeds.HOSPITAL)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
+        var price = RustFFI.execute("updatecurrentprice", "")
+        System.out.println("\nPrice:")
+        System.out.println(price)
+
         var syncJson = RustFFI.execute("sync", "")
         System.out.println("\nSync:")
         System.out.println(syncJson)
