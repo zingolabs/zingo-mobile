@@ -32,7 +32,6 @@
     "js-base64": "^3.7.2",
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
-    "node-gyp": "^10.0.0",
     "patch-package": "^6.5.1",
     "postinstall-postinstall": "^2.1.0",
     "prettier": "^2.7.1",
