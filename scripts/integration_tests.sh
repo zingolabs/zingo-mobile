@@ -211,6 +211,7 @@ if [ ! -d "./android/app" ]; then
 fi
 
 echo -e "\nRunning yarn install..."
+yarn global add node-gyp
 yarn install
 
 cd android
