@@ -1,10 +1,9 @@
-#import <React/RCTBridgeDelegate.h>
+#import <RCTAppDelegate.h>
 #import <UIKit/UIKit.h>
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate, RCTBridgeDelegate>
+@interface AppDelegate : RCTAppDelegate
 
 @property (atomic) BOOL syncFinished;
-@property (nonatomic, strong) UIWindow *window;
 
 //-(void)syncingProcessBackgroundTask:(NSString *)noValue;
 //-(void)syncingStatusProcessBackgroundTask:(NSString *)noValue;

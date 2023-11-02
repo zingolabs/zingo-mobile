@@ -236,7 +236,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
                     <TouchableOpacity
                       onPress={() => {
                         if (txd.memos) {
-                          Clipboard.setString(txd.memos.join(''));
+                          Clipboard.setString(txd.memos.join(' '));
                           addLastSnackbar({
                             message: translate('history.memocopied') as string,
                             type: 'Primary',
@@ -244,7 +244,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
                           });
                         }
                       }}>
-                      <RegText>{txd.memos.join('')}</RegText>
+                      <RegText>{txd.memos.join(' ')}</RegText>
                     </TouchableOpacity>
                   </View>
                 )}

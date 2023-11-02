@@ -144,7 +144,7 @@ describe('Component History TxDetail - test', () => {
     const num = screen.getAllByText('0.0000');
     expect(num.length).toBe(2);
     screen.getByText('0.0001');
-    screen.getByText('orchard memosapling memo');
+    screen.getByText('orchard memo sapling memo');
   });
 
   test('History TxDetail - received transaction with 2 pools', () => {
@@ -181,7 +181,7 @@ describe('Component History TxDetail - test', () => {
     screen.getByText('0.1000');
     screen.getByText('hola & hello');
     screen.getByText('hello & hola');
-    const txt = screen.queryByText('hola & hellohello & hola');
+    const txt = screen.queryByText('hola & hello hello & hola');
     expect(txt).toBe(null);
   });
 });

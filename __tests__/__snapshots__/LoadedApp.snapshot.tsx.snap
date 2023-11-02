@@ -34,7 +34,6 @@ exports[`Component LoadedApp - test LoadedApp - snapshot 1`] = `
   </View>
   <View
     collapsable={false}
-    forwardedRef={[Function]}
     onMoveShouldSetResponder={[Function]}
     onMoveShouldSetResponderCapture={[Function]}
     onResponderEnd={[Function]}

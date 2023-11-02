@@ -2,34 +2,45 @@ package org.ZingoLabs.Zingo
 
 import android.app.Application
 import android.content.Context
-import android.content.Intent
 import com.facebook.react.*
-import com.facebook.react.bridge.*
-import com.facebook.react.jstasks.HeadlessJsTaskConfig
+import com.facebook.react.PackageList
+import com.facebook.react.ReactApplication
+import com.facebook.react.ReactNativeHost
+import com.facebook.react.ReactPackage
+import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint
+import com.facebook.react.defaults.DefaultReactNativeHost
 import com.facebook.soloader.SoLoader
 import java.lang.reflect.InvocationTargetException
-
 
 class MainApplication : Application(), ReactApplication {
 
 
-    private val mReactNativeHost: ReactNativeHost = object : ReactNativeHost(this) {
+    private val mReactNativeHost: ReactNativeHost = object : DefaultReactNativeHost(this) {
         override fun getUseDeveloperSupport(): Boolean {
             return BuildConfig.DEBUG
         }
 
-        override fun getPackages(): List<ReactPackage> {
+        override fun getPackages(): MutableList<ReactPackage> {
             // Packages that cannot be autolinked yet can be added manually here, for example:
             // packages.add(new MyReactNativePackage());
             val packages: MutableList<ReactPackage> = PackageList(this).packages
 
             packages.add(RPCPackage())
+
             return packages
         }
 
         override fun getJSMainModuleName(): String {
             return "index"
         }
+
+        //override fun isNewArchEnabled(): Boolean {
+        //    return BuildConfig.IS_NEW_ARCHITECTURE_ENABLED
+        //}
+
+        //override fun isHermesEnabled(): Boolean {
+        //    return BuildConfig.IS_HERMES_ENABLED
+        //}
     }
 
     override fun getReactNativeHost(): ReactNativeHost {
@@ -38,14 +49,16 @@ class MainApplication : Application(), ReactApplication {
 
     override fun onCreate() {
         super.onCreate()
-        MainApplication.context = getApplicationContext()
+        context = applicationContext
 
 
         SoLoader.init(this, false)
-        // initializeFlipper(this, reactNativeHost.reactInstanceManager)
+        if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
+            // If you opted-in for the New Architecture, we load the native entry point for this app.
+            DefaultNewArchitectureEntryPoint.load()
+        }
+        initializeFlipper(this, reactNativeHost.reactInstanceManager)
     }
-
-
 
     companion object {
         /**
@@ -78,7 +91,7 @@ class MainApplication : Application(), ReactApplication {
             }
         }
 
-        private var context: Context? = null
+        var context: Context? = null
         fun getAppContext(): Context? {
             return context
         }

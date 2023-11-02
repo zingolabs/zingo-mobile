@@ -58,6 +58,8 @@ jest.mock('react-native', () => {
 
   RN.NativeModules.RPCModule = {
     execute: jest.fn(() => '{}'),
+    walletExists: jest.fn(() => '{}'),
+    loadExistingWallet: jest.fn(() => '{}'),
   };
 
   return RN;

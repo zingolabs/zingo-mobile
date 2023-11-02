@@ -445,14 +445,14 @@ export default class RPC {
             })
             .sort((a, b) => a.num - b.num)
             .map(a => a.memo);
-          return combinedMemo && combinedMemo.length > 0 ? combinedMemo.join('') : undefined;
+          return combinedMemo && combinedMemo.length > 0 ? combinedMemo.join(' ') : undefined;
         })
         .map(a => a);
 
       const detail: TxDetailType = {
         address: toaddr,
         amount: totalAmount,
-        memos: memos && memos.length > 0 ? [memos.join('')] : undefined,
+        memos: memos && memos.length > 0 ? [memos.join(' ')] : undefined,
       };
 
       reducedDetailedTxns.push(detail);
@@ -500,14 +500,14 @@ export default class RPC {
             })
             .sort((a, b) => a.num - b.num)
             .map(a => a.memo);
-          return combinedMemo && combinedMemo.length > 0 ? combinedMemo.join('') : undefined;
+          return combinedMemo && combinedMemo.length > 0 ? combinedMemo.join(' ') : undefined;
         })
         .map(a => a);
 
       const detail: TxDetailType = {
         address: '',
         amount: totalAmount,
-        memos: memos && memos.length > 0 ? [memos.join('')] : undefined,
+        memos: memos && memos.length > 0 ? [memos.join(' ')] : undefined,
         pool: pool,
       };
 

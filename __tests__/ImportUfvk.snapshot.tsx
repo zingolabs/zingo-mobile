@@ -46,6 +46,7 @@ jest.mock('react-native', () => {
 
   RN.NativeModules.RPCModule = {
     execute: jest.fn(() => '{}'),
+    getLatestBlock: jest.fn(() => '{}'),
   };
 
   return RN;
