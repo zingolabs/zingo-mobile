@@ -1,4 +1,4 @@
-FROM zingodevops/android_builder:007 as build_android
+FROM zingodevops/android_builder:008 as build_android
 
 WORKDIR /opt/zingo/rust/android/
 
