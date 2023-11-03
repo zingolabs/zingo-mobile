@@ -81,7 +81,7 @@ async fn execute_summaries_from_seed(abi: &str) {
     };
 
     let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test(abi, "ExecuteSummariesFromSeed");
+        zingomobile_utils::android_integration_test(abi, "UpdateCurrentPriceAndSummariesFromSeed");
 
     #[cfg(feature = "regchest")]
     match regchest_utils::close(&docker).await {

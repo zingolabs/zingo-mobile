@@ -307,9 +307,9 @@ class ExecuteSendFromOrchard {
     }
 }
 
-class ExecuteSummariesFromSeed {
+class UpdateCurrentPriceAndSummariesFromSeed {
     @Test
-    fun executeSummariesFromSeed() {
+    fun updateCurrentPriceAndSummariesFromSeed() {
         val mapper = jacksonObjectMapper()
 
         val server = "http://10.0.2.2:20000"
