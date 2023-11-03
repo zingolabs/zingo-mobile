@@ -1,6 +1,6 @@
 FROM debian:bullseye-slim
-ARG android_ndk_ver=r26b
-# 21.4.7075529
+ARG android_ndk_ver=r23c
+# 23.2.8568313
 
 # Install dependencies
 RUN apt update \
@@ -75,13 +75,13 @@ RUN mkdir x86 \
     && mkdir armv7 \
     && mkdir x86_64
 # -mno-outline-atomics removed
-RUN ./Configure --prefix=/opt/openssl-3.1.3/aarch64 android-arm64 -march=armv9.4-a \
+RUN ./Configure --prefix=/opt/openssl-3.1.3/aarch64 android-arm64 \
     -U__ANDROID_API__ -D__ANDROID_API__=24 \
     && make -j$(nproc) \
     && make -j$(nproc) install \
     && make clean \
     && make distclean
-RUN ./Configure --prefix=/opt/openssl-3.1.3/armv7 android-arm -march=armv9.4-a \
+RUN ./Configure --prefix=/opt/openssl-3.1.3/armv7 android-arm \
     -U__ANDROID_API__ -D__ANDROID_API__=24 \
     && make -j$(nproc) \
     && make -j$(nproc) install \
