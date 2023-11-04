@@ -14,6 +14,7 @@
       android:roundIcon="@mipmap/zingo_round"
       android:allowBackup="false"
       android:largeHeap="true"
+      android:usesCleartextTraffic="false"
       android:theme="@style/AppTheme">
       <uses-library android:name="org.apache.http.legacy" android:required="false"/>
       <activity
