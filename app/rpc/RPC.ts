@@ -790,6 +790,8 @@ export default class RPC {
 
       // This is async, so when it is done, we finish the refresh.
       if (fullRescan) {
+        // clean the transaction list before.
+        this.fnSetTransactionsList([]);
         this.doRescan()
           .then(result => {
             console.log('rescan finished', result);
@@ -835,8 +837,12 @@ export default class RPC {
         if (returnStatus.toLowerCase().startsWith('error')) {
           return;
         }
-        // TODO verify that JSON don't fail.
-        const ss: RPCSyncStatusType = await JSON.parse(returnStatus);
+        let ss = {} as RPCSyncStatusType;
+        try {
+          ss = await JSON.parse(returnStatus);
+        } catch (e) {
+          return;
+        }
 
         //console.log('sync wallet birthday', this.walletBirthday);
         //console.log('sync', this.syncStatusTimerID);
@@ -1480,9 +1486,11 @@ export default class RPC {
     const prev: string = await this.doSendProgress();
     let prevSendId = -1;
     if (prev && !prev.toLowerCase().startsWith('error')) {
-      // TODO verify that JSON don't fail.
-      const prevProgress: RPCSendProgressType = await JSON.parse(prev);
-      prevSendId = prevProgress.id;
+      let prevProgress = {} as RPCSendProgressType;
+      try {
+        prevProgress = await JSON.parse(prev);
+        prevSendId = prevProgress.id;
+      } catch (e) {}
     }
 
     //console.log('prev progress id', prevSendId);
@@ -1508,16 +1516,17 @@ export default class RPC {
     const sendTxPromise = new Promise<string>((resolve, reject) => {
       const intervalID = setInterval(async () => {
         const pro: string = await this.doSendProgress();
-        if (pro) {
-          if (pro.toLowerCase().startsWith('error')) {
-            return;
-          }
-        } else {
+        if (pro && pro.toLowerCase().startsWith('error')) {
           return;
         }
-        // TODO verify that JSON don't fail.
-        const progress: RPCSendProgressType = await JSON.parse(pro);
-        const sendId = progress.id;
+        let progress = {} as RPCSendProgressType;
+        let sendId = -1;
+        try {
+          progress = await JSON.parse(pro);
+          sendId = progress.id;
+        } catch (e) {
+          return;
+        }
 
         // because I don't know what the user are doing, I force every 2 seconds
         // the interrupt flag to true if the sync_interrupt is false

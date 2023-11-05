@@ -35,9 +35,13 @@ const parseZcashURI = async (
     } else {
       return translate('uris.parseerror') as string;
     }
-    // TODO: check if the json parse is correct.
     //console.log(resultParse);
-    const resultParseJSON: RPCParseAddressType = await JSON.parse(resultParse);
+    let resultParseJSON = {} as RPCParseAddressType;
+    try {
+      resultParseJSON = await JSON.parse(resultParse);
+    } catch (e) {
+      return translate('uris.parseerror') as string;
+    }
 
     const validParse = resultParseJSON.status === 'success' && server.chain_name === resultParseJSON.chain_name;
 
@@ -90,8 +94,12 @@ const parseZcashURI = async (
         } else {
           return translate('uris.parseerror') as string;
         }
-        // TODO: check if the json parse is correct.
-        const resultJSON: RPCParseAddressType = await JSON.parse(result);
+        let resultJSON = {} as RPCParseAddressType;
+        try {
+          resultJSON = await JSON.parse(result);
+        } catch (e) {
+          return translate('uris.parseerror') as string;
+        }
 
         const valid = resultJSON.status === 'success' && server.chain_name === resultJSON.chain_name;
 

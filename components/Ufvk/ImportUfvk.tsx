@@ -100,8 +100,13 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
       addLastSnackbar({ message: `${translate('scanner.noviewkey-error')}`, type: 'Primary' });
       return false;
     }
-    // TODO verify that JSON don't fail.
-    const resultJSON: RPCParseViewKeyType = await JSON.parse(result);
+    let resultJSON = {} as RPCParseViewKeyType;
+    try {
+      resultJSON = await JSON.parse(result);
+    } catch (e) {
+      addLastSnackbar({ message: `${translate('scanner.noviewkey-error')}`, type: 'Primary' });
+      return false;
+    }
 
     //console.log('parse ufvk', scannedKey, resultJSON);
 
