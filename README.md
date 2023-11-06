@@ -1,93 +1,129 @@
 # Zingo Android and iOS apps
-
 App Store: [https://apps.apple.com/app/zingo/id1668209531](https://apps.apple.com/app/zingo/id1668209531)  
 Google Play: [https://play.google.com/store/apps/details?id=org.ZingoLabs.Zingo](https://play.google.com/store/apps/details?id=org.ZingoLabs.Zingo)
 
-## iOS build instructions
+# iOS
 
-### Prerequisites
-1. `yarn`
-2. `nodejs` recommended version v17 or higher
-3. Install Rust
-4. Add the ios targets `rustup target add aarch64-apple-ios x86_64-apple-ios`
-5. `cargo install cargo-lipo`
-6. `cargo install cbindgen`
-7. `sudo gem install cocoapods` to install cocoapods
+## Prerequisites
+1. Yarn
+2. NodeJS (recommended version 17+)
+3. Rust (https://www.rust-lang.org/tools/install)
+4. Rustup iOS targets (`rustup target add aarch64-apple-ios x86_64-apple-ios`)
+5. Cargo-lipo (`cargo install cargo-lipo`)
+6. Cbindgen (`cargo install cbindgen`)
+7. Cocaopods (`sudo gem install cocoapods`)
 
-### Building
-1. In the `./rust/ios` directory, run `./build.sh`.
-   This step will take a long time.
-2. In the `./ios` directory, run `pod install`
-3. From the root `./` of the project, run `yarn install`
-4. Run `yarn react-native start` to start the dev server
-5. Run `yarn run ios` to install the app on an emulator/connected device.
-   You can also open the `./ios` folder in XCode and run it there.
+## Building
+1. In the `rust/ios` directory, run:  
+      `./build.sh`  
+   This step may take a long time.
+2. From the root of the project, run:  
+      `yarn`
+3. In the `ios` directory, run:  
+      `pod install`
 
-For notes on known issues and problems,
-see the [trouble-shooting notes](./TROUBLESHOOTING.md).
+## Launching the app
+1. In a terminal, run:  
+      `yarn start`
+2. In a separate terminal, run:  
+      `yarn ios`  
+   You can also open the `ios` directory in XCode and run it there.
 
+# Android
 
-## Android build instructions
+## Prerequisites
+1. Yarn
+2. NodeJS (recommended version 17+)
+3. Rust (https://www.rust-lang.org/tools/install)
+4. Docker (Docker Engine)
+5. OpenJDK 18
+6. Android SDK Command-line Tools  
+      install via Android Studio SDK Manager:  
+         https://developer.android.com/studio/install  
+      or as standalone:  
+         https://developer.android.com/tools  
+7. Cargo nextest (https://nexte.st/book/installing-from-source.html)
 
-### Prerequisites
-1. `docker` (for building the rust library)
-2. `yarn`
-3. `nodejs` recommended version v17 or higher
-4. Android Studio or commandline tools
+The React Native tools require some environment variables to be set up in order to build apps with
+native code. Add the following lines to your $HOME/.bash_profile or $HOME/.bashrc config file:  
+   export ANDROID_HOME=$HOME/Android/Sdk  
+   export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin  
+   export PATH=$PATH:$ANDROID_HOME/platform-tools  
+   export PATH=$PATH:$ANDROID_HOME/emulator  
 
-Carefully follow the instructions to [setup Android Studio for your
-operating system](https://reactnative.dev/docs/environment-setup).
-It is not necessary to install watchman or the Android 12 system images.
+## Building
+1. In the `rust` directory, run:  
+      `./build.sh`  
+   This step may take a long time.
+2. From the root of the project, run:  
+      `yarn`
 
-If you do not have a physical device, you can create and start
-a new Android 11, API 30 emulator device compatible
-with the chip on your system and start the emulated device.
+## Launching the app
 
-### Bash shortcut
-It is possible emulate android with the command line.
-1. install sdkmanager (or included with androidstudio). standalone setup has a quirk as navigated in `scripts/sdkmanager_install.sh`. then sdkmanager must be added to PATH.
-2. run `scripts/start_interactive.sh -a x86` to automatically set up the android sdk, build the app, and stream it to the emulator. it will boot, then take a minute to load from a local port. outputs are generated in `android/app/build/outputs/emulator_output/`
-
-### Building
-0. Start docker daemon
-1. AS A NONROOT USER: In the `rust/` directory, run `./build.sh`.
-   This step will take a long time.
-2. From the root of the project, run `yarn install`
-3. Run `yarn react-native start` to start the dev server
-4. Run `yarn run android` to compile and install the app on an
-   emulator or connected device. You can also open the `android` directory
-   in Android Studio as a project, select 'app' and the API 30 system image
-   in the upper toolbar and click the "Run 'app'" button.
+### Android Studio
+1. For Android emulations, you can create and start a new AVD, compatible with your CPU architecture 
+   i.e. x86_64. The recommended API is API 30 (Android 11). Alternatively, you can connect to a
+   physical device (https://reactnative.dev/docs/running-on-device).
+2. In `File > Settings`, navigate to `Build, Execution and Deployment > Build Tools > Gradle` and
+   check the `Gradle JDK` matches your JDK version.
+2. In a terminal, run:  
+      `yarn start`
+3. Open the `android` directory in Android Studio as a project, select 'app' and the previously
+   created AVD in the upper toolbar and click the "Run 'app'" button.
+   Alternatively, launch an AVD and in a separate terminal, run:  
+      `yarn android` 
+   
+### Android SDK Command-line Tools (Standalone)
+You can also emulate android from the command line without using Android Studio.
+1. Check that the Android SDK cmdline-tools binaries are in the following directory:  
+     `$ANDROID_HOME/cmdline-tools/latest/bin`
+2. From the root directory run:  
+     `scripts/start_interactive.sh -a x86`  
+   Outputs are generated in `android/app/build/outputs/emulator_output/`
 
 ## Android Tests
 
-### Prerequisites
-4. `sdkmanager` (android commandline tools or android studio)
+### Yarn Tests
+1. From the root directory, run:  
+      `yarn test`
 
 ### Integration Tests
-1. To create a quick-boot snapshot. From the root directory, run:
-   `./scripts/integration_tests.sh -a x86_64 -s`
-2. To run the integration tests. From the root directory, run:
-   `./scripts/integration_tests.sh -a x86_64`
-3. To test other ABIs, such as x86. Specify the target ABI with the `-a` flag:
-   `-a x86`
-   
-For more information. From the root directory, run:
-`./scripts/integration_tests.sh -h`
+1. Create quick-boot snapshots to speed up AVD launch times. From the root directory, run:  
+      `./scripts/integration_tests.sh -a x86_64 -s`  
+      `./scripts/integration_tests.sh -a x86 -s`  
+   By default, this uses Google Playstore API 30 system images. Other images may be used for testing
+   by specifying the api level and target. However, using other images with the cargo test runner
+   is still under development. 
+2. To run the integration tests. From the `rust` directory, run:  
+      `cargo nextest run`  
+   Specify to run specific ABI:  
+      `cargo nextest run x86_64`  
+      `cargo nextest run x86_32`  
+      `cargo nextest run arm64`  
+      `cargo nextest run arm32`  
+   Specify to run a specific test on all ABIs:  
+      `cargo nextest run test_name`  
+   Specify to run a specific ABI and test:  
+      `cargo nextest run x86_64::test_name`  
 
-The first run may take a long time to download the `x86` and `x86_64` system images.
+For more information on running integration tests on non-default AVDs, run:  
+   `./scripts/integration_tests.sh -h`  
+Without the cargo test runner these emulated android devices will not be able to connect to a
+lightwalletd/zcashd regtest network. Therefore, only tests in the "Offline Testsuite" may be tested.
 
-Alternatively, to run gradle managed devices integration tests. From the root directory, run:
-`./scripts/integration_tests_gradle.sh`
+### End-to-End Tests
+1. Run:  
+     `yarn start`
+2. Download and create AVD with sdkmanager:  
+   For testing x86 (32-bit) run `./scripts/flow_emulator_setup.sh -a x86`  
+   For testing x86_64 (64-bit) run `./scripts/flow_emulator_setup.sh -a x86_64`  
+   If you already have the emulator created, you can target it without recreating it:  
+      `./scripts/emulator_target.sh -a x86_64`
+3. `yarn detox build -c android.emu.x86`
+4. To run all tests:  
+     `yarn detox test -c android.emu.x86`  
+   or to run a specific test:  
+     `yarn detox test -c android.emu.x86 test_name`
 
-### e2e Tests with Detox
-0. build to step 3.
-
-1. choose a build target to run against. currently works against x86 and x86_64. download and create emulator with sdkmanager.
-   `./scripts/flow_emulator_setup.sh -a x86`
-if you already have the emulator created, you can target it without recreating it: `./scripts/emulator_target.sh -a x86_64`
-
-2. `yarn detox build -c android.emu.x86`
-
-3. `yarn detox test -c android.emu.x86`
-or to run a specific test: `yarn detox test -c android.emu.x86 new_wallet`
+# Troubleshooting
+For notes on known issues and problems, see the [trouble-shooting notes](./TROUBLESHOOTING.md).

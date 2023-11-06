@@ -103,14 +103,14 @@ while getopts 'a:Al:e:t:sx:h' OPTION; do
             fi
             ;;
         h)
-            echo -e "\nRun integration tests. Requires Android Studio cmdline-tools."
+            echo -e "\nRun integration tests. Requires Android SDK Command-line Tools."
             echo -e "\n  -a\t\tSelect ABI (required)"
             echo -e "      \t\t  Options:"
             echo -e "      \t\t  'x86_64' - default system image: API 30 google_apis_playstore x86_64"
             echo -e "      \t\t  'x86' - default system image: API 30 google_apis_playstore x86"
             echo -e "      \t\t  'arm64-v8a' - default system image: API 30 google_apis_playstore x86_64"
             echo -e "      \t\t  'armeabi-v7a' - default system image: API 30 google_apis_playstore x86"
-            echo -e "\n  -A\t\t  Sets default system image of arm abis to arm instead of x86 (optional)"
+            echo -e "\n  -A\t\tSets default system image of arm abis to arm instead of x86 (optional)"
             echo -e "      \t\t  Use this option if the host OS is arm"
             echo -e "\n  -e\t\tSelect test name or test suite (optional)"
             echo -e "      \t\t  Default: OfflineTestSuite"
@@ -226,7 +226,7 @@ echo "Installing system image..."
 avd_name="android-${api_level}_${api_target}_${arch}"
 sdk="system-images;android-${api_level};${api_target};${arch}"
 sdkmanager --install "${sdk}"
-sdkmanager --licenses
+echo y | sdkmanager --licenses
 
 # Kill all emulators
 ../scripts/kill_emulators.sh
