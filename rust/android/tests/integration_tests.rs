@@ -70,7 +70,7 @@ async fn execute_send_from_orchard(abi: &str) {
     assert_eq!(exit_code, 0);
 }
 
-async fn execute_summaries_from_seed(abi: &str) {
+async fn execute_currentprice_and_summaries_from_seed(abi: &str) {
     #[cfg(not(feature = "regchest"))]
     let (_regtest_manager, _child_process_handler) =
         scenarios::funded_orchard_with_3_txs_mobileclient(1_000_000).await;
@@ -81,7 +81,7 @@ async fn execute_summaries_from_seed(abi: &str) {
     };
 
     let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test(abi, "ExecuteSummariesFromSeed");
+        zingomobile_utils::android_integration_test(abi, "UpdateCurrentPriceAndSummariesFromSeed");
 
     #[cfg(feature = "regchest")]
     match regchest_utils::close(&docker).await {
@@ -141,8 +141,8 @@ mod x86_32 {
     }
 
     #[tokio::test]
-    async fn execute_summaries_from_seed() {
-        super::execute_summaries_from_seed(ABI).await;
+    async fn execute_currentprice_and_summaries_from_seed() {
+        super::execute_currentprice_and_summaries_from_seed(ABI).await;
     }
 
     #[tokio::test]
@@ -170,8 +170,8 @@ mod x86_64 {
     }
 
     #[tokio::test]
-    async fn execute_summaries_from_seed() {
-        super::execute_summaries_from_seed(ABI).await;
+    async fn execute_currentprice_and_summaries_from_seed() {
+        super::execute_currentprice_and_summaries_from_seed(ABI).await;
     }
 
     #[tokio::test]
@@ -199,8 +199,8 @@ mod arm32 {
     }
 
     #[tokio::test]
-    async fn execute_summaries_from_seed() {
-        super::execute_summaries_from_seed(ABI).await;
+    async fn execute_currentprice_and_summaries_from_seed() {
+        super::execute_currentprice_and_summaries_from_seed(ABI).await;
     }
 
     #[tokio::test]
@@ -228,8 +228,8 @@ mod arm64 {
     }
 
     #[tokio::test]
-    async fn execute_summaries_from_seed() {
-        super::execute_summaries_from_seed(ABI).await;
+    async fn execute_currentprice_and_summaries_from_seed() {
+        super::execute_currentprice_and_summaries_from_seed(ABI).await;
     }
 
     #[tokio::test]

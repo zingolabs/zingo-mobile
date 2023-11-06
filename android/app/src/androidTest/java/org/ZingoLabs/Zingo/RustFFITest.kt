@@ -307,9 +307,9 @@ class ExecuteSendFromOrchard {
     }
 }
 
-class ExecuteSummariesFromSeed {
+class UpdateCurrentPriceAndSummariesFromSeed {
     @Test
-    fun executeSummariesFromSeed() {
+    fun updateCurrentPriceAndSummariesFromSeed() {
         val mapper = jacksonObjectMapper()
 
         val server = "http://10.0.2.2:20000"
@@ -325,6 +325,10 @@ class ExecuteSummariesFromSeed {
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
         assertThat(initFromSeed.seed).isEqualTo(Seeds.HOSPITAL)
         assertThat(initFromSeed.birthday).isEqualTo(1)
+
+        var price = RustFFI.execute("updatecurrentprice", "")
+        System.out.println("\nPrice:")
+        System.out.println(price)
 
         var syncJson = RustFFI.execute("sync", "")
         System.out.println("\nSync:")
