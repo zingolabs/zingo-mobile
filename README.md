@@ -14,22 +14,20 @@ Google Play: [https://play.google.com/store/apps/details?id=org.ZingoLabs.Zingo]
 7. Cocaopods (`sudo gem install cocoapods`)
 
 ## Building
-1. In the `./rust/ios` directory, run:
+1. In the `rust/ios` directory, run:
       `./build.sh`.
    This step may take a long time.
-2. In the `./ios` directory, run:
+2. From the root of the project, run:
+      `yarn`
+3. In the `ios` directory, run:
       `pod install`
-3. From the root of the project, run:
-      `yarn install`
-
-For notes on known issues and problems, see the [trouble-shooting notes](./TROUBLESHOOTING.md).
 
 ## Launching the app
 1. In a terminal, run:
       `yarn start`
 2. In a separate terminal, run:
-      `yarn run ios`
-   You can also open the `./ios` folder in XCode and run it there.
+      `yarn ios`
+   You can also open the `ios` directory in XCode and run it there.
 
 # Android
 
@@ -58,7 +56,7 @@ native code. Add the following lines to your $HOME/.bash_profile or $HOME/.bashr
       `./build.sh`.
    This step may take a long time.
 2. From the root of the project, run:
-      `yarn install`
+      `yarn`
 
 ## Launching the app
 
@@ -73,14 +71,14 @@ native code. Add the following lines to your $HOME/.bash_profile or $HOME/.bashr
 3. Open the `android` directory in Android Studio as a project, select 'app' and the previously
    created AVD in the upper toolbar and click the "Run 'app'" button.
    Alternatively, launch an AVD and in a separate terminal, run:
-      `yarn run android` 
+      `yarn android` 
    
 ### Android SDK Command-line Tools (Standalone)
 You can also emulate android from the command line without using Android Studio.
-1. Standalone setup has a quirk as navigated in `scripts/sdkmanager_install.sh`. Then, sdkmanager
-   must be added to PATH.
-2. Run `scripts/start_interactive.sh -a x86` to automatically set up the android sdk, build the app,
-   and stream it to the emulator. It will boot, then take a minute to load from a local port.
+1. Check that the Android SDK cmdline-tools binaries are in the following directory:
+     `$ANDROID_HOME/cmdline-tools/latest/bin`
+2. From the root directory run:
+     `scripts/start_interactive.sh -a x86`
    Outputs are generated in `android/app/build/outputs/emulator_output/`
 
 ## Android Tests
@@ -114,7 +112,8 @@ Without the cargo test runner these emulated android devices will not be able to
 lightwalletd/zcashd regtest network. Therefore, only tests in the "Offline Testsuite" may be tested.
 
 ### End-to-End Tests
-1. Run `yarn react-native start` to start the dev server
+1. Run:
+     `yarn start`
 2. Download and create AVD with sdkmanager:
    For testing x86 (32-bit) run `./scripts/flow_emulator_setup.sh -a x86`
    For testing x86_64 (64-bit) run `./scripts/flow_emulator_setup.sh -a x86_64`
@@ -124,3 +123,6 @@ lightwalletd/zcashd regtest network. Therefore, only tests in the "Offline Tests
 4. `yarn detox test -c android.emu.x86`
    or to run a specific test: 
    `yarn detox test -c android.emu.x86 test_name`
+
+# Troubleshooting
+For notes on known issues and problems, see the [trouble-shooting notes](./TROUBLESHOOTING.md).
