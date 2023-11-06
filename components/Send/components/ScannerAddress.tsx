@@ -41,8 +41,13 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ updateTo
       addLastSnackbar({ message: translate('scanner.nozcash-error') as string, type: 'Primary' });
       return;
     }
-    // TODO verify that JSON don't fail.
-    const resultJSON: RPCParseAddressType = await JSON.parse(result);
+    let resultJSON = {} as RPCParseAddressType;
+    try {
+      resultJSON = await JSON.parse(result);
+    } catch (e) {
+      addLastSnackbar({ message: translate('scanner.nozcash-error') as string, type: 'Primary' });
+      return;
+    }
 
     //console.log('parse-1', scannedAddress, resultJSON);
 

@@ -79,8 +79,14 @@ const BackgroundSync = async (task_data: any) => {
         //console.log('BS: Internal Error sync status');
         return;
       }
-      // TODO: verify this JSON parse
-      const ss: RPCSyncStatusType = await JSON.parse(syncStatusStr);
+
+      let ss = {} as RPCSyncStatusType;
+      try {
+        ss = await JSON.parse(syncStatusStr);
+      } catch (e) {
+        //console.log('BS: Error parsing syncstatus JSON', e);
+        return;
+      }
 
       //console.log('BS:', ss);
       if (ss.batch_num && ss.batch_num > -1 && batch_num !== ss.batch_num) {

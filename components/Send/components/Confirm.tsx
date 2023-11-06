@@ -72,8 +72,12 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSen
     } else {
       return '-';
     }
-    // TODO: check if the json parse is correct.
-    const resultJSON: RPCParseAddressType = await JSON.parse(result);
+    let resultJSON = {} as RPCParseAddressType;
+    try {
+      resultJSON = await JSON.parse(result);
+    } catch (e) {
+      return '-';
+    }
 
     //console.log('parse-address', address, resultJSON.status === 'success');
 

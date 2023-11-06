@@ -691,10 +691,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
   };
 
   doRescan = () => {
-    // TODO: when click rescan the txs list is empty, but
-    // after a couple of seconds the txs come back... because
-    // the rescan process take a while to start.
-    this.setTransactionList([]);
     this.rpc.refresh(false, true);
   };
 

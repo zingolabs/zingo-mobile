@@ -34,7 +34,6 @@ export default class SettingsFileImpl {
     const fileName = await this.getFileName();
 
     try {
-      // TODO verify that JSON don't fail.
       const settings: SettingsFileClass = JSON.parse((await RNFS.readFile(fileName, 'utf8')).toString());
       // If server as string is found, I need to convert to: ServerType
       // if not, I'm losing the value
