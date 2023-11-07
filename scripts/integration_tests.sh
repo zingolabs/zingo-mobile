@@ -217,7 +217,7 @@ yarn install
 cd android
 
 echo -e "\nInstalling latest build tools, platform tools, and platform..."
-sdkmanager --install 'build-tools;33.0.2' platform-tools
+sdkmanager --install 'build-tools;34.0.0' platform-tools
 
 echo "Installing latest emulator..."
 sdkmanager --install emulator --channel=0
@@ -229,7 +229,7 @@ sdkmanager --install "${sdk}"
 echo y | sdkmanager --licenses
 
 # Kill all emulators
-../scripts/kill_emulators.sh
+../scripts/script_utils/kill_emulators.sh
 
 if [[ $create_snapshot == true ]]; then
     echo -e "\nCreating AVD..."
@@ -335,7 +335,7 @@ else
         echo -e "\nIntegration tests FAILED"
 
         # Kill all emulators
-        ../scripts/kill_emulators.sh
+        ../scripts/script_utils/kill_emulators.sh
 
         exit 1
     fi
@@ -344,5 +344,5 @@ else
 fi
 
 # Kill all emulators
-../scripts/kill_emulators.sh
+../scripts/script_utils/kill_emulators.sh
 
