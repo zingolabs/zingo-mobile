@@ -69,7 +69,9 @@ RCT_REMAP_METHOD(walletBackupExists,
   // Write to user's documents app directory
   NSString *fileName = [NSString stringWithFormat:@"%@/wallet.dat.txt",
                                                 documentsDirectory];
-  [data writeToFile:fileName atomically:YES encoding:NSUTF8StringEncoding error:nil];
+  if (![data writeToFile:fileName atomically:YES encoding:NSUTF8StringEncoding error:nil]) {
+    RCTLogInfo(@"Couldn't save the wallet");
+  };
 
   // RCTLogInfo(@"Saved file");
 }
@@ -82,7 +84,9 @@ RCT_REMAP_METHOD(walletBackupExists,
   // Write to user's documents app directory
   NSString *fileName = [NSString stringWithFormat:@"%@/wallet.backup.dat.txt",
                                                 documentsDirectory];
-  [data writeToFile:fileName atomically:YES encoding:NSUTF8StringEncoding error:nil];
+  if (![data writeToFile:fileName atomically:YES encoding:NSUTF8StringEncoding error:nil]) {
+    RCTLogInfo(@"Couldn't save the wallet backup");
+  };
 
   // RCTLogInfo(@"Saved backup file");
 }
@@ -190,7 +194,7 @@ RCT_REMAP_METHOD(deleteExistingWalletBackup,
   char *walletDat = save();
   NSString* walletDataStr = [NSString stringWithUTF8String:walletDat];
   rust_free(walletDat);
-
+  
   [self saveWalletFile:walletDataStr];
 }
 
