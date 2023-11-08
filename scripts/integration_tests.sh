@@ -229,7 +229,7 @@ sdkmanager --install "${sdk}"
 echo y | sdkmanager --licenses
 
 # Kill all emulators
-../scripts/script_utils/kill_emulators.sh
+../scripts/kill_emulators.sh
 
 if [[ $create_snapshot == true ]]; then
     echo -e "\nCreating AVD..."
@@ -335,7 +335,7 @@ else
         echo -e "\nIntegration tests FAILED"
 
         # Kill all emulators
-        ../scripts/script_utils/kill_emulators.sh
+        ../scripts/kill_emulators.sh
 
         exit 1
     fi
@@ -344,5 +344,5 @@ else
 fi
 
 # Kill all emulators
-../scripts/script_utils/kill_emulators.sh
+../scripts/kill_emulators.sh
 

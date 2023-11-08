@@ -43,11 +43,15 @@ Google Play: [https://play.google.com/store/apps/details?id=org.ZingoLabs.Zingo]
 7. Cargo nextest (https://nexte.st/book/installing-from-source.html)
 
 The React Native tools require some environment variables to be set up in order to build apps with
-native code. Add the following lines to your $HOME/.bash_profile or $HOME/.bashrc config file: <br />
-`export ANDROID_HOME=$HOME/Android/Sdk` <br />
-`export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin` <br />
-`export PATH=$PATH:$ANDROID_HOME/platform-tools` <br />
-`export PATH=$PATH:$ANDROID_HOME/emulator` <br />
+native code. <br />
+Add the following lines to your `$HOME/.bash_profile` or `$HOME/.profile` config file: <br />
+`PATH="$PATH:$ANDROID_HOME/cmdline-tools/latest/bin"` <br />
+`PATH="$PATH:$ANDROID_HOME/platform-tools"` <br />
+`PATH="$PATH:$ANDROID_HOME/emulator"` <br />
+Add the following lines to your `$HOME/.bashrc` config file: <br />
+`export ANDROID_HOME="$HOME/Android/Sdk"` <br />
+Also, make sure your JAVA_HOME is set, for example: <br />
+`export JAVA_HOME="/usr/lib/jvm/jdk-18.0.2"`
 
 ## Building
 1. In the `rust` directory, run: <br />
@@ -58,9 +62,10 @@ native code. Add the following lines to your $HOME/.bash_profile or $HOME/.bashr
 
 ## Launching the app
 ### Android Studio
-1. For Android emulations, you can create and start a new AVD, compatible with your CPU architecture 
-   i.e. x86_64. The recommended API is API 30 (Android 11). Alternatively, you can connect to a
-   physical device (https://reactnative.dev/docs/running-on-device).
+1. For Android emulations, you can create a new AVD, compatible with your CPU architecture 
+   i.e. x86_64 (https://developer.android.com/studio/run/managing-avds). The recommended API is API 
+   30 (Android 11). Alternatively, you can connect to a physical device
+   (https://reactnative.dev/docs/running-on-device).
 2. In `File > Settings`, navigate to `Build, Execution and Deployment > Build Tools > Gradle` and
    check the `Gradle JDK` matches your JDK version.
 2. In a terminal, run: <br />
@@ -108,20 +113,17 @@ Without the cargo test runner these emulated android devices will not be able to
 lightwalletd/zcashd regtest network. Therefore, only tests in the "Offline Testsuite" may be tested.
 
 ### End-to-End Tests
-1. In a terminal, run: <br />
+1. Launch the emulated AVD by clicking the 'play' icon in Android Studio's `Device Manager`.
+   Alternatively, connect to a physical device. See previous section 'Launching the app' for more
+   details.
+2. In a terminal, run: <br />
    `yarn start`
-2. In a separate terminal, download and create an AVD with sdkmanager. <br />
-   For testing x86 (32-bit) run: <br />
-   `./scripts/flow_emulator_setup.sh -a x86` <br />
-   For testing x86_64 (64-bit) run: <br />
-   `./scripts/flow_emulator_setup.sh -a x86_64` <br />
-   If you already have the emulator created, you can target it without recreating it: <br />
-   `./scripts/emulator_target.sh -a x86_64`
-3. `yarn detox build -c android.emu.x86`
+3. In a separate terminal, to build:. <br />
+   `yarn detox build -c android.att.debug`
 4. To run all tests: <br />
-   `yarn detox test -c android.emu.x86` <br />
+   `yarn detox test -c android.att.debug` <br />
    or to run a specific test: <br />
-   `yarn detox test -c android.emu.x86 test_name`
+   `yarn detox test -c android.att.debug test_name`
 
 # Troubleshooting
 For notes on known issues and problems, see the [trouble-shooting notes](./TROUBLESHOOTING.md).
