@@ -1,7 +1,8 @@
 // loads the 'recipient' from zingolib mobileclient regtest scenarios
+// requires e2e test to be run by cargo test runner
+// see `rust/android/test/e2e_tests.rs`
 let loadRecipientWallet = async () => {
-  // the start always is like a fress install -> create a new wallet
-  // first we need to change the App to advanced mode
+  // switch to advanced mode
   await waitFor(element(by.id('header.drawmenu'))).toBeVisible().withTimeout(sync_timeout);
   await element(by.id('header.drawmenu')).tap();
   await waitFor(element(by.id('menu.settings'))).toBeVisible().withTimeout(sync_timeout);
@@ -12,12 +13,10 @@ let loadRecipientWallet = async () => {
   await element(by.id('settings.button.save')).tap();
 
   // connect to regtest network
-
   await waitFor(element(by.id('header.drawmenu'))).toBeVisible().withTimeout(sync_timeout);
   await element(by.id('header.drawmenu')).tap();
   await waitFor(element(by.id('menu.settings'))).toBeVisible().withTimeout(sync_timeout);
   await element(by.id('menu.settings')).tap();
-
   await element(by.id('settings.scrollView')).scroll(700, 'down');
   await waitFor(element(by.id('settings.customServer'))).toBeVisible().withTimeout(sync_timeout);
   await element(by.id('settings.customServer')).tap();
@@ -42,6 +41,8 @@ let loadRecipientWallet = async () => {
   await element(by.id("seed.birthdayinput")).replaceText('3');
   await waitFor(element(by.id('seed.button.OK'))).toBeVisible().withTimeout(sync_timeout);
   await element(by.id('seed.button.OK')).tap();
+
+  await waitFor(element(by.id('loadingapp.restorewalletseed'))).toBeVisible().withTimeout(sync_timeout);
 }
 
 export { loadRecipientWallet };

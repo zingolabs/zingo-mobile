@@ -10,7 +10,7 @@ const UNIX_SOCKET: Option<&str> = None;
 async fn e2e_reload_while_tx_unconfirmed() {
     #[cfg(not(feature = "regchest"))]
     let (_regtest_manager, _child_process_handler) =
-        scenarios::funded_orchard_mobileclient(1_000_000).await;
+        scenarios::funded_orchard_mobileclient(2_000_000).await;
     #[cfg(feature = "regchest")]
     let docker =
         match regchest_utils::launch(UNIX_SOCKET, Some("funded_orchard_mobileclient")).await {
