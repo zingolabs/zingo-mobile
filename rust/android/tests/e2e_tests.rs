@@ -18,7 +18,7 @@ async fn e2e_reload_while_tx_unconfirmed() {
         };
 
     let (exit_code, output, error) =
-        zingomobile_utils::android_e2e_test("reload_while_tx_unconfirmed");
+        zingomobile_utils::android_e2e_test("reload_while_tx_unconfirmed.test.js");
 
     #[cfg(feature = "regchest")]
     match regchest_utils::close(&docker).await {

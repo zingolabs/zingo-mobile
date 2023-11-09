@@ -20,10 +20,6 @@ let loadTestWallet = async () => {
   await element(by.id('menu.changewallet')).tap();
 
   await waitFor(element(by.id('seed.button.OK'))).toBeVisible().withTimeout(sync_timeout);
-
-  // three taps to be really sure...
-  await element(by.id('seed.button.OK')).tap();
-  await element(by.id('seed.button.OK')).tap();
   await element(by.id('seed.button.OK')).tap();
 
   await waitFor(element(by.id('loadingapp.restorewalletseed'))).toBeVisible().withTimeout(sync_timeout);
@@ -36,6 +32,8 @@ let loadTestWallet = async () => {
   await element(by.id("seed.birthdayinput")).replaceText('1994579');
   await waitFor(element(by.id('seed.button.OK'))).toBeVisible().withTimeout(sync_timeout);
   await element(by.id('seed.button.OK')).tap();
+  await waitFor(element(by.text('CONFIRM'))).toBeVisible().withTimeout(sync_timeout);
+  await element(by.text('CONFIRM')).tap();
 }
 
 export { loadTestWallet };

@@ -41,7 +41,7 @@ pub fn android_e2e_test(test_name: &str) -> (i32, String, String) {
             r#"
             cd $(git rev-parse --show-toplevel)
             yarn detox build -c android.att.debug
-            yarn detox test -c android.att.debug {}
+            yarn detox test -c android.att.debug {}.test.js
             "#,
             test_name
         ))

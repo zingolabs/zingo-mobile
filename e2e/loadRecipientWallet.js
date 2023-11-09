@@ -19,10 +19,6 @@ let loadRecipientWallet = async () => {
   await element(by.id('menu.changewallet')).tap();
 
   await waitFor(element(by.id('seed.button.OK'))).toBeVisible().withTimeout(sync_timeout);
-
-  // three taps to be really sure...
-  await element(by.id('seed.button.OK')).tap();
-  await element(by.id('seed.button.OK')).tap();
   await element(by.id('seed.button.OK')).tap();
 
   await waitFor(element(by.id('loadingapp.restorewalletseed'))).toBeVisible().withTimeout(sync_timeout);
