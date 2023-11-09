@@ -6,6 +6,7 @@ const UNIX_SOCKET: Option<&str> = Some("/Users/runner/.colima/default/docker.soc
 #[cfg(all(not(feature = "ci"), feature = "regchest"))]
 const UNIX_SOCKET: Option<&str> = None;
 
+#[tokio::test]
 async fn e2e_reload_while_tx_unconfirmed() {
     #[cfg(not(feature = "regchest"))]
     let (_regtest_manager, _child_process_handler) =
@@ -18,7 +19,7 @@ async fn e2e_reload_while_tx_unconfirmed() {
         };
 
     let (exit_code, output, error) =
-        zingomobile_utils::android_e2e_test("reload_while_tx_unconfirmed.test.js");
+        zingomobile_utils::android_e2e_test("reload_while_tx_unconfirmed");
 
     #[cfg(feature = "regchest")]
     match regchest_utils::close(&docker).await {
