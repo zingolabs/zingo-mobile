@@ -243,7 +243,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
               <DetailLine
                 label="Sync ID"
                 value={
-                  syncingStatus.syncID && syncingStatus.syncID >= 0
+                  syncingStatus.syncID >= 0
                     ? syncingStatus.syncID +
                       ' - (' +
                       (syncingStatus.inProgress
@@ -405,7 +405,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
                 </>
               )}
 
-              {!!maxBlocks && !!syncingStatus.syncID && syncingStatus.syncID >= 0 && (
+              {!!maxBlocks && syncingStatus.syncID >= 0 && (
                 <>
                   <View
                     style={{

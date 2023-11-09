@@ -339,10 +339,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         }}>
         {!noSyncingStatus && (
           <>
-            {netInfo.isConnected &&
-            !!syncingStatus.lastBlockServer &&
-            !!syncingStatus.syncID &&
-            syncingStatus.syncID >= 0 ? (
+            {netInfo.isConnected && !!syncingStatus.lastBlockServer && syncingStatus.syncID >= 0 ? (
               <View
                 style={{
                   alignItems: 'center',
