@@ -1,4 +1,3 @@
-#![forbid(unsafe_code)]
 #[cfg(not(feature = "regchest"))]
 use zingo_testutils::{self, scenarios};
 
@@ -20,13 +19,14 @@ async fn offline_testsuite(abi: &str) {
 
 async fn execute_sync_from_seed(abi: &str) {
     #[cfg(not(feature = "regchest"))]
-    let (_regtest_manager, _child_process_handler) = 
+    let (_regtest_manager, _child_process_handler) =
         scenarios::funded_orchard_mobileclient(1_000_000).await;
     #[cfg(feature = "regchest")]
-    let docker = match regchest_utils::launch(UNIX_SOCKET, Some("funded_orchard_mobileclient")).await {
-        Ok(d) => d,
-        Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
-    };
+    let docker =
+        match regchest_utils::launch(UNIX_SOCKET, Some("funded_orchard_mobileclient")).await {
+            Ok(d) => d,
+            Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
+        };
 
     let (exit_code, output, error) =
         zingomobile_utils::android_integration_test(abi, "ExecuteSyncFromSeed");
@@ -49,10 +49,11 @@ async fn execute_send_from_orchard(abi: &str) {
     let (_regtest_manager, _child_process_handler) =
         scenarios::funded_orchard_mobileclient(1_000_000).await;
     #[cfg(feature = "regchest")]
-    let docker = match regchest_utils::launch(UNIX_SOCKET, Some("funded_orchard_mobileclient")).await {
-        Ok(d) => d,
-        Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
-    };
+    let docker =
+        match regchest_utils::launch(UNIX_SOCKET, Some("funded_orchard_mobileclient")).await {
+            Ok(d) => d,
+            Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
+        };
 
     let (exit_code, output, error) =
         zingomobile_utils::android_integration_test(abi, "ExecuteSendFromOrchard");
@@ -75,10 +76,13 @@ async fn execute_currentprice_and_summaries_from_seed(abi: &str) {
     let (_regtest_manager, _child_process_handler) =
         scenarios::funded_orchard_with_3_txs_mobileclient(1_000_000).await;
     #[cfg(feature = "regchest")]
-    let docker = match regchest_utils::launch(UNIX_SOCKET, Some("funded_orchard_with_3_txs_mobileclient")).await {
-        Ok(d) => d,
-        Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
-    };
+    let docker =
+        match regchest_utils::launch(UNIX_SOCKET, Some("funded_orchard_with_3_txs_mobileclient"))
+            .await
+        {
+            Ok(d) => d,
+            Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
+        };
 
     let (exit_code, output, error) =
         zingomobile_utils::android_integration_test(abi, "UpdateCurrentPriceAndSummariesFromSeed");
@@ -101,7 +105,12 @@ async fn execute_sapling_balance_from_seed(abi: &str) {
     let (_regtest_manager, _child_process_handler) =
         scenarios::funded_orchard_sapling_transparent_shielded_mobileclient(1_000_000).await;
     #[cfg(feature = "regchest")]
-    let docker = match regchest_utils::launch(UNIX_SOCKET, Some("funded_orchard_sapling_transparent_shielded_mobileclient")).await {
+    let docker = match regchest_utils::launch(
+        UNIX_SOCKET,
+        Some("funded_orchard_sapling_transparent_shielded_mobileclient"),
+    )
+    .await
+    {
         Ok(d) => d,
         Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
     };
