@@ -684,6 +684,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                   <>
                     {mode === 'basic' ? (
                       <OptionsMenu
+                        testID="options.menu"
                         customButton={<FontAwesomeIcon icon={faEllipsisV} color={'#ffffff'} size={48} />}
                         buttonStyle={{ width: 48, padding: 10, resizeMode: 'contain' }}
                         destructiveIndex={5}
