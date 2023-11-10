@@ -1,6 +1,6 @@
 const { log, by, element } = require('detox');
 
-import { loadTestWallet } from "./loadTestWallet.js";
+import { loadTestWallet } from "./e2e-utils/loadTestWallet.js";
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 

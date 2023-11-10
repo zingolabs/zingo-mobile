@@ -1,18 +1,76 @@
 const { log, device, by, element } = require('detox');
 
-import { loadRecipientWallet } from "./loadRecipientWallet.js";
+import { loadRecipientWallet } from "./e2e-utils/loadRecipientWallet.js";
 
-describe('Renders wallet data correctly.', () => {
-  // i just pulled this seed out of thin air
-  it('loads a wallet', loadRecipientWallet);
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-  // it('adds return address to the memo if that option is selected, and correctly renders confirm screen', async () => {
-  //   await element(by.id('send.addressplaceholder')).replaceText(
-  //     'zregtestsapling1fkc26vpg566hgnx33n5uvgye4neuxt4358k68atnx78l5tg2dewdycesmr4m5pn56ffzsa7lyj6',
-  //   );
-  //   await element(by.id('send.amount')).replaceText('20000');
-  //   await element(by.id('send.scrollView')).scrollTo('bottom');
-  //   await element(by.id('send.button')).tap();
+describe('Maintains correct information while tx unconfirmed', () => {
+  it('should send from orchard to sapling pool', async () => {
+    await loadRecipientWallet();
+    await sleep(10000);
+    await element(by.text('SEND')).tap();
+    await element(by.id('send.addressplaceholder')).replaceText(
+      'zregtestsapling1fkc26vpg566hgnx33n5uvgye4neuxt4358k68atnx78l5tg2dewdycesmr4m5pn56ffzsa7lyj6',
+    );
+    await element(by.id('send.amount')).replaceText('0.0002');
+    await element(by.id('send.scrollView')).scrollTo('bottom');
+    await element(by.id('send.button')).tap();
+    await element(by.text('CONFIRM')).tap();
 
-  // });  
+    // verify pool balances
+    await waitFor(element(by.id('header.drawmenu'))).toBeVisible().withTimeout(sync_timeout);
+    await element(by.id('header.drawmenu')).tap();
+    await element(by.id('menu.fund-pools')).tap();
+    await expect(element(by.id('orchard-total-balance.big-part'))).toHaveText(' 0.0097');
+    await expect(element(by.id('orchard-total-balance.small-part'))).not.toBeVisible();
+    await expect(element(by.id('orchard-spendable-balance.big-part'))).toHaveText(' 0.0000');
+    await expect(element(by.id('orchard-spendable-balance.small-part'))).not.toBeVisible();
+    await expect(element(by.id('sapling-total-balance.big-part'))).toHaveText(' 0.0002');
+    await expect(element(by.id('sapling-total-balance.small-part'))).not.toBeVisible();
+    await expect(element(by.id('sapling-spendable-balance.big-part'))).toHaveText(' 0.0000');
+    await expect(element(by.id('sapling-spendable-balance.small-part'))).not.toBeVisible();
+    await expect(element(by.id('transparent-balance.big-part'))).toHaveText(' 0.0000');
+    await expect(element(by.id('transparent-total-balance.small-part'))).not.toBeVisible();
+    await element(by.id('fund-pools.button.close')).tap();
+  });
+  it('should show correct pool balances after going to background', async () => {
+    await device.sendToHome();
+    await sleep(1000);
+    await device.launchApp({ newInstance: false });
+    
+    // verify pool balances
+    await waitFor(element(by.id('header.drawmenu'))).toBeVisible().withTimeout(sync_timeout);
+    await element(by.id('header.drawmenu')).tap();
+    await element(by.id('menu.fund-pools')).tap();
+    await expect(element(by.id('orchard-total-balance.big-part'))).toHaveText(' 0.0097');
+    await expect(element(by.id('orchard-total-balance.small-part'))).not.toBeVisible();
+    await expect(element(by.id('orchard-spendable-balance.big-part'))).toHaveText(' 0.0000');
+    await expect(element(by.id('orchard-spendable-balance.small-part'))).not.toBeVisible();
+    await expect(element(by.id('sapling-total-balance.big-part'))).toHaveText(' 0.0002');
+    await expect(element(by.id('sapling-total-balance.small-part'))).not.toBeVisible();
+    await expect(element(by.id('sapling-spendable-balance.big-part'))).toHaveText(' 0.0000');
+    await expect(element(by.id('sapling-spendable-balance.small-part'))).not.toBeVisible();
+    await expect(element(by.id('transparent-balance.big-part'))).toHaveText(' 0.0000');
+    await expect(element(by.id('transparent-total-balance.small-part'))).not.toBeVisible();
+  });
+  it('should show correct pool balances after restarting', async () => {
+    await device.sendToHome();
+    await sleep(1000);
+    await device.launchApp({ newInstance: true });
+    
+    // verify pool balances
+    await waitFor(element(by.id('header.drawmenu'))).toBeVisible().withTimeout(sync_timeout);
+    await element(by.id('header.drawmenu')).tap();
+    await element(by.id('menu.fund-pools')).tap();
+    await expect(element(by.id('orchard-total-balance.big-part'))).toHaveText(' 0.0097');
+    await expect(element(by.id('orchard-total-balance.small-part'))).not.toBeVisible();
+    await expect(element(by.id('orchard-spendable-balance.big-part'))).toHaveText(' 0.0000');
+    await expect(element(by.id('orchard-spendable-balance.small-part'))).not.toBeVisible();
+    await expect(element(by.id('sapling-total-balance.big-part'))).toHaveText(' 0.0002');
+    await expect(element(by.id('sapling-total-balance.small-part'))).not.toBeVisible();
+    await expect(element(by.id('sapling-spendable-balance.big-part'))).toHaveText(' 0.0000');
+    await expect(element(by.id('sapling-spendable-balance.small-part'))).not.toBeVisible();
+    await expect(element(by.id('transparent-balance.big-part'))).toHaveText(' 0.0000');
+    await expect(element(by.id('transparent-total-balance.small-part'))).not.toBeVisible();
+  });
 });
