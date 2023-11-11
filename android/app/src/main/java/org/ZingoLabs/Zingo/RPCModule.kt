@@ -273,7 +273,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
         try {
             val fileBytes = Base64.decode(b64encoded, Base64.NO_WRAP)
-            // Log.w("MAIN", "file size${fileBytes.size}")
+            Log.w("MAIN", "file size: ${fileBytes.size} bytes")
 
             // Save file to disk
             val file = MainApplication.getAppContext()?.openFileOutput("wallet.dat", Context.MODE_PRIVATE)
