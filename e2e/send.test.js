@@ -21,12 +21,12 @@ describe('Renders wallet data correctly.', () => {
     );
     await element(by.id('send.amount')).replaceText('0');
     await element(by.id('send.checkboxUA')).tap();
-    await element(by.id('send.scrollView')).scrollTo('bottom');
+    await element(by.id('send.scroll-view')).scrollTo('bottom');
     await element(by.id('send.memo-field')).replaceText("1\n2\n3\n4\n5\n6\n7\n8");
-    await element(by.id('send.scrollView')).scrollTo('bottom');
+    await element(by.id('send.scroll-view')).scrollTo('bottom');
     await element(by.id('send.button')).tap();
 
-    await element(by.id('send.confirm.scrollView')).scrollTo('bottom');
+    await element(by.id('send.confirm.scroll-view')).scrollTo('bottom');
     
     const memo = element(by.id('send.confirm-memo'));
 

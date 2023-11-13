@@ -16,17 +16,17 @@ describe('Change the Server.', () => {
     await element(by.id('menu.settings')).tap();
 
     // scrolling until find the custom server field
-    await element(by.id('settings.scrollView')).scroll(500, 'down');
+    await element(by.id('settings.scroll-view')).scroll(500, 'down');
 
     // waiting for the custom server radio
-    await waitFor(element(by.id('settings.customServer'))).toBeVisible().withTimeout(sync_timeout);
+    await waitFor(element(by.id('settings.custom-server'))).toBeVisible().withTimeout(sync_timeout);
 
     // choose the custom server 
-    await element(by.id('settings.customServer')).tap();
+    await element(by.id('settings.custom-server')).tap();
 
     // waiting for the custom server field
-    await waitFor(element(by.id('settings.customServerField'))).toBeVisible().withTimeout(sync_timeout);
-    await element(by.id("settings.customServerField")).replaceText('https://testnet.lightwalletd.com');
+    await waitFor(element(by.id('settings.custom-server-field'))).toBeVisible().withTimeout(sync_timeout);
+    await element(by.id("settings.custom-server-field")).replaceText('https://testnet.lightwalletd.com');
 
     // save the new testnet server
     await element(by.id('settings.button.save')).tap();

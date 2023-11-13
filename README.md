@@ -118,12 +118,10 @@ lightwalletd/zcashd regtest network. Therefore, only tests in the "Offline Tests
    details.
 2. In a terminal, run: <br />
    `yarn start`
-3. In a separate terminal, to build:. <br />
-   `yarn detox build -c android.att.debug`
-4. To run all tests: <br />
-   `yarn detox test -c android.att.debug` <br />
+3. In a separate terminal, to run all tests: <br />
+   `cargo nextest run e2e`
    or to run a specific test: <br />
-   `yarn detox test -c android.att.debug test_name`
+   `cargo nextest run e2e::test_name`
 
 # Troubleshooting
 For notes on known issues and problems, see the [trouble-shooting notes](./TROUBLESHOOTING.md).

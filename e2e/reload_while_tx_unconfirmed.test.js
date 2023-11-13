@@ -13,7 +13,7 @@ describe('Maintains correct information while tx unconfirmed', () => {
       'zregtestsapling1fkc26vpg566hgnx33n5uvgye4neuxt4358k68atnx78l5tg2dewdycesmr4m5pn56ffzsa7lyj6',
     );
     await element(by.id('send.amount')).replaceText('0.0002');
-    await element(by.id('send.scrollView')).scrollTo('bottom');
+    await element(by.id('send.scroll-view')).scrollTo('bottom');
     await element(by.id('send.button')).tap();
     await element(by.text('CONFIRM')).tap();
 

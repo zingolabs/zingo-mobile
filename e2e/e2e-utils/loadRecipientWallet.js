@@ -11,10 +11,10 @@ let loadRecipientWallet = async () => {
   // connect to regtest network
   await element(by.id('header.drawmenu')).tap();
   await element(by.id('menu.settings')).tap();
-  await element(by.id('settings.scrollView')).scroll(700, 'down');
-  await element(by.id('settings.customServer')).tap();
-  await element(by.id("settings.customServerChain.regtest")).tap();
-  await element(by.id("settings.customServerField")).replaceText('http://10.0.2.2:20000');
+  await element(by.id('settings.scroll-view')).scroll(700, 'down');
+  await element(by.id('settings.custom-server')).tap();
+  await element(by.id("settings.custom-server-chain.regtest")).tap();
+  await element(by.id("settings.custom-server-field")).replaceText('http://10.0.2.2:20000');
   await element(by.id('settings.button.save')).tap();
   await element(by.id('seed.button.OK')).tap();
   await element(by.text('CONFIRM')).tap();

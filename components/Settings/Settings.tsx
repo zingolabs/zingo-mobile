@@ -344,7 +344,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
       <ScrollView
         keyboardShouldPersistTaps="handled"
-        testID="settings.scrollView"
+        testID="settings.scroll-view"
         style={{ maxHeight: '85%' }}
         contentContainerStyle={{
           flexDirection: 'column',
@@ -455,7 +455,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
               <View>
                 <TouchableOpacity
-                  testID="settings.customServer"
+                  testID="settings.custom-server"
                   disabled={disabled}
                   style={{ marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
                   onPress={() => setCustomServerUri('')}>
@@ -480,7 +480,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                         minHeight: 48,
                       }}>
                       <TextInput
-                        testID="settings.customServerField"
+                        testID="settings.custom-server-field"
                         placeholder={'https://------.---:---'}
                         placeholderTextColor={colors.placeholder}
                         style={{
