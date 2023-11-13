@@ -24,7 +24,7 @@ const ChainTypeToggle: React.FunctionComponent<ChainTypeToggleProps> = ({
   return (
     <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
       <TouchableOpacity
-        testID="settings.customServerChain.mainnet"
+        testID="settings.custom-server-chain.mainnet"
         style={{ marginHorizontal: 5 }}
         onPress={() => onPress('main')}>
         <View
@@ -59,7 +59,7 @@ const ChainTypeToggle: React.FunctionComponent<ChainTypeToggleProps> = ({
         </View>
       </TouchableOpacity>
       <TouchableOpacity
-        testID="settings.customServerChain.testnet"
+        testID="settings.custom-server-chain.testnet"
         style={{ marginHorizontal: 5 }}
         onPress={() => onPress('test')}>
         <View
@@ -94,7 +94,7 @@ const ChainTypeToggle: React.FunctionComponent<ChainTypeToggleProps> = ({
         </View>
       </TouchableOpacity>
       <TouchableOpacity 
-        testID="settings.customServerChain.regtest"
+        testID="settings.custom-server-chain.regtest"
         style={{ marginHorizontal: 5 }} 
         onPress={() => onPress('regtest')}>
         <View

@@ -1637,6 +1637,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                   "padding": 0,
                 }
               }
+              testID="undefined.big-part"
             >
                1.1234
             </Text>
@@ -1650,6 +1651,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                   "padding": 0,
                 }
               }
+              testID="undefined.small-part"
             >
               5678
             </Text>
@@ -2054,6 +2056,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                         "padding": 0,
                       }
                     }
+                    testID="undefined.big-part"
                   >
                      0.1235
                   </Text>
@@ -2067,6 +2070,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                         "padding": 0,
                       }
                     }
+                    testID="undefined.small-part"
                   >
                     5678
                   </Text>
@@ -2306,6 +2310,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                         "padding": 0,
                       }
                     }
+                    testID="undefined.big-part"
                   >
                      0.0001
                   </Text>
@@ -2545,6 +2550,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                         "padding": 0,
                       }
                     }
+                    testID="undefined.big-part"
                   >
                      0.8765
                   </Text>
@@ -2558,6 +2564,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                         "padding": 0,
                       }
                     }
+                    testID="undefined.small-part"
                   >
                     4321
                   </Text>

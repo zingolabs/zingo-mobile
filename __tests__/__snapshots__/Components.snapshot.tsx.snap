@@ -462,6 +462,7 @@ exports[`Component Components - test ZecAmount Normal Privacy - snapshot 1`] = `
             "padding": 0,
           }
         }
+        testID="undefined.big-part"
       >
          1.1234
       </Text>
@@ -475,6 +476,7 @@ exports[`Component Components - test ZecAmount Normal Privacy - snapshot 1`] = `
             "padding": 0,
           }
         }
+        testID="undefined.small-part"
       >
         5678
       </Text>

@@ -1,3 +1,5 @@
+// end-to-end tests currently require an emulated AVD and `yarn start` to be launched manually before running tests
+
 #[cfg(not(feature = "regchest"))]
 use zingo_testutils::{self, scenarios};
 
