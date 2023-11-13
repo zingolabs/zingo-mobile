@@ -96,7 +96,7 @@ You can also emulate android from the command line without using Android Studio.
    by specifying the api level and target. However, using other images with the cargo test runner
    is still under development.
 2. To run the integration tests. From the `rust` directory, run: <br />
-   `cargo nextest run` <br />
+   `cargo nextest run -E 'not test(e2e)'` <br />
    Specify to run specific ABI: <br />
    `cargo nextest run x86_64` <br />
    `cargo nextest run x86_32` <br />
