@@ -1,6 +1,6 @@
 // loads the 'recipient' from zingolib mobileclient regtest scenarios
 // requires e2e test to be run by cargo test runner
-// see `rust/android/test/e2e_tests.rs`
+// see `rust/android/test/e2e_tests.rs` and `README.md`
 let loadRecipientWallet = async () => {
   // switch to advanced mode
   await element(by.id('header.drawmenu')).tap();

@@ -1,3 +1,5 @@
+// fixes https://github.com/zingolabs/zingolib/issues/613
+
 const { log, device, by, element } = require('detox');
 
 import { loadRecipientWallet } from "./e2e-utils/loadRecipientWallet.js";

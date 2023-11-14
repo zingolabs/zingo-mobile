@@ -118,10 +118,20 @@ lightwalletd/zcashd regtest network. Therefore, only tests in the "Offline Tests
    details.
 2. In a terminal, run: <br />
    `yarn start`
-3. In a separate terminal, to run all tests: <br />
+3. In a separate terminal, from the `rust` directory, run all tests: <br />
    `cargo nextest run e2e`
-   or to run a specific test: <br />
+   or run a specific test: <br />
    `cargo nextest run e2e::test_name`
+
+### Regchest
+Integration tests and end-to-end tests can be run on non-linux hosts with Regchest
+(https://github.com/zingolabs/zingo-regchest). Regchest manages the zcash/lightwalletd regtest 
+network in a docker container. Before running tests, pull the latest Regchest image from docker: <br />
+`docker pull zingodevops/regchest:007`
+
+To run tests with Regchest, add the `--features regchest` flag, for example: <br />
+`cargo nextest run --features regchest -E 'not test(e2e)'` <br />
+`cargo nextest run --features regchest e2e`
 
 # Troubleshooting
 For notes on known issues and problems, see the [trouble-shooting notes](./TROUBLESHOOTING.md).
