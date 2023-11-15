@@ -29,9 +29,15 @@ const parseServerURI = (uri: string, translate: (key: string) => TranslateType):
       port = '443';
     }
     // by default -> 9067
-    // for `zecwallet` -> 443
+    // for some `lightwalletd` -> 443
     if (!port) {
-      port = uri.includes('lwdv3.zecwallet') ? '443' : '9067';
+      port =
+        uri.includes('na.lightwalletd') ||
+        uri.includes('sa.lightwalletd') ||
+        uri.includes('eu.lightwalletd') ||
+        uri.includes('ai.lightwalletd')
+          ? '443'
+          : '9067';
     }
   }
 
