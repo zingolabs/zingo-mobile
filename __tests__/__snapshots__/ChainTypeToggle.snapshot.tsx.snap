@@ -27,6 +27,7 @@ exports[`Component ChainTypeToggle - test ChainTypeToggle - snapshot 1`] = `
         "opacity": 1,
       }
     }
+    testID="settings.custom-server-chain.mainnet"
   >
     <View
       style={
@@ -99,6 +100,7 @@ exports[`Component ChainTypeToggle - test ChainTypeToggle - snapshot 1`] = `
         "opacity": 1,
       }
     }
+    testID="settings.custom-server-chain.testnet"
   >
     <View
       style={
@@ -154,6 +156,7 @@ exports[`Component ChainTypeToggle - test ChainTypeToggle - snapshot 1`] = `
         "opacity": 1,
       }
     }
+    testID="settings.custom-server-chain.regtest"
   >
     <View
       style={

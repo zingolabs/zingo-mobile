@@ -1,6 +1,6 @@
 const { log, by, element } = require('detox');
 
-import { loadTestWallet } from "./loadTestWallet.js";
+import { loadTestWallet } from "./e2e-utils/loadTestWallet.js";
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -16,7 +16,7 @@ describe('Change the Server.', () => {
     await element(by.id('menu.settings')).tap();
 
     // scrolling until find the second server field
-    await element(by.id('settings.scrollView')).scroll(400, 'down');
+    await element(by.id('settings.scroll-view')).scroll(400, 'down');
 
     // waiting for second server radio button
     await waitFor(element(by.id('settings.secondServer'))).toBeVisible().withTimeout(sync_timeout);

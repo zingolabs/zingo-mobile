@@ -186,7 +186,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSen
         showsVerticalScrollIndicator={true}
         persistentScrollbar={true}
         indicatorStyle={'white'}
-        testID="send.confirm.scrollView"
+        testID="send.confirm.scroll-view"
         contentContainerStyle={{
           flexDirection: 'column',
           alignItems: 'stretch',
