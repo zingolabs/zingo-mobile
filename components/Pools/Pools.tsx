@@ -151,7 +151,12 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, set_privacy_op
           alignItems: 'center',
           marginVertical: 5,
         }}>
-        <Button testID="fund-pools.button.close" type="Secondary" title={translate('close') as string} onPress={closeModal} />
+        <Button
+          testID="fund-pools.button.close"
+          type="Secondary"
+          title={translate('close') as string}
+          onPress={closeModal}
+        />
       </View>
     </SafeAreaView>
   );

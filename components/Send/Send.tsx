@@ -94,9 +94,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     totalBalance.transparentBal > 0 &&
     totalBalance.transparentBal + totalBalance.spendablePrivate > info.defaultFee;
   const showUpgradeInfo =
-    totalBalance &&
-    totalBalance.transparentBal <= 0 &&
-    totalBalance.transparentBal + totalBalance.spendablePrivate > info.defaultFee;
+    totalBalance && totalBalance.transparentBal <= 0 && totalBalance.spendablePrivate > info.defaultFee;
 
   const getMaxAmount = useCallback((): number => {
     let max = spendable - defaultFee;
