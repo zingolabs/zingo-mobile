@@ -89,6 +89,7 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   snackbars: [] as SnackbarType[],
   addLastSnackbar: () => {},
   restartApp: () => {},
+  someUnconfirmed: false,
 };
 
 export const ContextAppLoaded = React.createContext(defaultAppStateLoaded);

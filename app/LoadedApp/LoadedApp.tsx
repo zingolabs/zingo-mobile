@@ -524,7 +524,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     }
     if (deepDiff(this.state.transactions, transactions)) {
       //console.log('fetch transactions');
-      this.setState({ transactions });
+      // set someUnconfirmed as well here when I know there is something new in transactions
+      const unconfirmed: number =
+        transactions.length > 0 ? transactions.filter((tx: TransactionType) => tx.confirmations === 0).length : 0;
+      this.setState({ transactions, someUnconfirmed: unconfirmed > 0 });
     }
   };
 
