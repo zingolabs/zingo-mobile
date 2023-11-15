@@ -96,7 +96,7 @@ You can also emulate android from the command line without using Android Studio.
    by specifying the api level and target. However, using other images with the cargo test runner
    is still under development.
 2. To run the integration tests. From the `rust` directory, run: <br />
-   `cargo nextest run` <br />
+   `cargo nextest run -E 'not test(e2e)'` <br />
    Specify to run specific ABI: <br />
    `cargo nextest run x86_64` <br />
    `cargo nextest run x86_32` <br />
@@ -118,12 +118,20 @@ lightwalletd/zcashd regtest network. Therefore, only tests in the "Offline Tests
    details.
 2. In a terminal, run: <br />
    `yarn start`
-3. In a separate terminal, to build:. <br />
-   `yarn detox build -c android.att.debug`
-4. To run all tests: <br />
-   `yarn detox test -c android.att.debug` <br />
-   or to run a specific test: <br />
-   `yarn detox test -c android.att.debug test_name`
+3. In a separate terminal, from the `rust` directory, run all tests: <br />
+   `cargo nextest run e2e`
+   or run a specific test: <br />
+   `cargo nextest run e2e::test_name`
+
+### Regchest
+Integration tests and end-to-end tests can be run on non-linux hosts with Regchest
+(https://github.com/zingolabs/zingo-regchest). Regchest manages the zcash/lightwalletd regtest 
+network in a docker container. Before running tests, pull the latest Regchest image from docker: <br />
+`docker pull zingodevops/regchest:007`
+
+To run tests with Regchest, add the `--features regchest` flag, for example: <br />
+`cargo nextest run --features regchest -E 'not test(e2e)'` <br />
+`cargo nextest run --features regchest e2e`
 
 # Troubleshooting
 For notes on known issues and problems, see the [trouble-shooting notes](./TROUBLESHOOTING.md).

@@ -235,6 +235,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                       "padding": 0,
                     }
                   }
+                  testID="orchard-total-balance"
                 >
                   <RNSVGSvgView
                     align="xMidYMid"
@@ -318,6 +319,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                         "padding": 0,
                       }
                     }
+                    testID="orchard-total-balance.big-part"
                   >
                      0.6000
                   </Text>
@@ -389,6 +391,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                       "padding": 0,
                     }
                   }
+                  testID="orchard-spendable-balance"
                 >
                   <RNSVGSvgView
                     align="xMidYMid"
@@ -478,6 +481,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                         "padding": 0,
                       }
                     }
+                    testID="orchard-spendable-balance.big-part"
                   >
                      0.3000
                   </Text>
@@ -582,6 +586,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                       "padding": 0,
                     }
                   }
+                  testID="sapling-total-balance"
                 >
                   <RNSVGSvgView
                     align="xMidYMid"
@@ -665,6 +670,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                         "padding": 0,
                       }
                     }
+                    testID="sapling-total-balance.big-part"
                   >
                      0.4000
                   </Text>
@@ -736,6 +742,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                       "padding": 0,
                     }
                   }
+                  testID="sapling-spendable-balance"
                 >
                   <RNSVGSvgView
                     align="xMidYMid"
@@ -825,6 +832,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                         "padding": 0,
                       }
                     }
+                    testID="sapling-spendable-balance.big-part"
                   >
                      0.2000
                   </Text>
@@ -928,6 +936,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                       "padding": 0,
                     }
                   }
+                  testID="transparent-balance"
                 >
                   <RNSVGSvgView
                     align="xMidYMid"
@@ -1017,6 +1026,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                         "padding": 0,
                       }
                     }
+                    testID="transparent-balance.big-part"
                   >
                      0.1234
                   </Text>
@@ -1030,6 +1040,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                         "padding": 0,
                       }
                     }
+                    testID="transparent-balance.small-part"
                   >
                     5678
                   </Text>
@@ -1080,6 +1091,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
           "paddingRight": 20,
         }
       }
+      testID="fund-pools.button.close"
     >
       <View
         style={

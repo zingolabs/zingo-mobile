@@ -1,7 +1,7 @@
 const { log, device, by, element } = require('detox');
 const { spawnSync, execSync } = require('child_process');
 
-import { loadTestWallet } from "./loadTestWallet.js";
+import { loadTestWallet } from "./e2e-utils/loadTestWallet.js";
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 

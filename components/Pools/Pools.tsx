@@ -59,6 +59,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, set_privacy_op
           <View style={{ display: 'flex', marginLeft: 25 }}>
             <DetailLine label={translate('pools.orchard-balance') as string}>
               <ZecAmount
+                testID="orchard-total-balance"
                 amtZec={totalBalance.orchardBal}
                 size={18}
                 currencyName={info.currencyName ? info.currencyName : ''}
@@ -73,6 +74,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, set_privacy_op
             </DetailLine>
             <DetailLine label={translate('pools.orchard-spendable-balance') as string}>
               <ZecAmount
+                testID="orchard-spendable-balance"
                 amtZec={totalBalance.spendableOrchard}
                 size={18}
                 currencyName={info.currencyName ? info.currencyName : ''}
@@ -93,6 +95,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, set_privacy_op
           <View style={{ display: 'flex', marginLeft: 25 }}>
             <DetailLine label={translate('pools.sapling-balance') as string}>
               <ZecAmount
+                testID="sapling-total-balance"
                 amtZec={totalBalance.privateBal}
                 size={18}
                 currencyName={info.currencyName ? info.currencyName : ''}
@@ -107,6 +110,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, set_privacy_op
             </DetailLine>
             <DetailLine label={translate('pools.sapling-spendable-balance') as string}>
               <ZecAmount
+                testID="sapling-spendable-balance"
                 amtZec={totalBalance.spendablePrivate}
                 size={18}
                 currencyName={info.currencyName ? info.currencyName : ''}
@@ -127,6 +131,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, set_privacy_op
           <View style={{ display: 'flex', marginLeft: 25 }}>
             <DetailLine label={translate('pools.transparent-balance') as string}>
               <ZecAmount
+                testID="transparent-balance"
                 amtZec={totalBalance.transparentBal}
                 size={18}
                 currencyName={info.currencyName ? info.currencyName : ''}
@@ -146,7 +151,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, set_privacy_op
           alignItems: 'center',
           marginVertical: 5,
         }}>
-        <Button type="Secondary" title={translate('close') as string} onPress={closeModal} />
+        <Button testID="fund-pools.button.close" type="Secondary" title={translate('close') as string} onPress={closeModal} />
       </View>
     </SafeAreaView>
   );
