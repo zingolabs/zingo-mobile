@@ -509,7 +509,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           />
           {mode !== 'basic' &&
             totalBalance.total > 0 &&
-            totalBalance.spendablePrivate + totalBalance.transparentBal > info.defaultFee && (
+            (totalBalance.privateBal > 0 || totalBalance.transparentBal > 0 || totalBalance.spendablePrivate > 0) && (
               <TouchableOpacity onPress={() => poolsMoreInfoOnClick && poolsMoreInfoOnClick()}>
                 <View
                   style={{
