@@ -11,6 +11,9 @@ import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import RPC from '../../app/rpc';
 import Header from '../Header';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import FadeText from '../Components/FadeText';
+import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 
 type PoolsProps = {
   closeModal: () => void;
@@ -19,7 +22,7 @@ type PoolsProps = {
 
 const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, set_privacy_option }) => {
   const context = useContext(ContextAppLoaded);
-  const { totalBalance, info, translate, privacy, addLastSnackbar } = context;
+  const { totalBalance, info, translate, privacy, addLastSnackbar, someUnconfirmed } = context;
   const { colors } = useTheme() as unknown as ThemeType;
 
   useEffect(() => {
@@ -140,6 +143,21 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, set_privacy_op
               />
             </DetailLine>
           </View>
+
+          {someUnconfirmed && (
+            <View
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                marginTop: 5,
+                backgroundColor: colors.card,
+                padding: 5,
+                borderRadius: 10,
+              }}>
+              <FontAwesomeIcon icon={faInfoCircle} size={20} color={colors.primary} style={{ marginRight: 5 }} />
+              <FadeText>{translate('send.somefunds') as string}</FadeText>
+            </View>
+          )}
         </View>
       </ScrollView>
 
@@ -151,7 +169,12 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, set_privacy_op
           alignItems: 'center',
           marginVertical: 5,
         }}>
-        <Button testID="fund-pools.button.close" type="Secondary" title={translate('close') as string} onPress={closeModal} />
+        <Button
+          testID="fund-pools.button.close"
+          type="Secondary"
+          title={translate('close') as string}
+          onPress={closeModal}
+        />
       </View>
     </SafeAreaView>
   );

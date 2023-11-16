@@ -7,7 +7,7 @@ const serverUris = (): ServerType[] => {
       chain_name: 'main',
     },
     {
-      uri: 'https://lwdv3.zecwallet.co:443',
+      uri: 'https://lwd1.zcash-infra.com:9067',
       chain_name: 'main',
     },
   ];

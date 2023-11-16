@@ -73,3 +73,6 @@ buck-out/
 
 # e2e test logs
 30_ga_64-15860.log
+
+# bundle file
+/**/index.android.bundle

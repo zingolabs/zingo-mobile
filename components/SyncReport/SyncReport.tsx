@@ -27,6 +27,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
   const [maxBlocks, setMaxBlocks] = useState(0);
   const [points, setPoints] = useState([] as number[]);
   const [labels, setLabels] = useState([] as string[]);
+  const [showBackgroundLegend, setShowBackgroundLegend] = useState(true);
   moment.locale(language);
 
   useEffect(() => {
@@ -48,6 +49,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
 
   useEffect(() => {
     (async () => await RPC.rpc_setInterruptSyncAfterBatch('false'))();
+    setTimeout(() => setShowBackgroundLegend(false), 5000); // 5 seconds only
   }, []);
 
   // ref: https://github.com/zingolabs/zingo-mobile/issues/327
@@ -217,7 +219,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
             />
           </View>
         )}
-        {background.batches > 0 && background.date > 0 && (
+        {background.batches > 0 && background.date > 0 && showBackgroundLegend && (
           <View
             style={{
               display: 'flex',
@@ -241,7 +243,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
               <DetailLine
                 label="Sync ID"
                 value={
-                  syncingStatus.syncID && syncingStatus.syncID >= 0
+                  syncingStatus.syncID >= 0
                     ? syncingStatus.syncID +
                       ' - (' +
                       (syncingStatus.inProgress
@@ -403,7 +405,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
                 </>
               )}
 
-              {!!maxBlocks && !!syncingStatus.syncID && syncingStatus.syncID >= 0 && (
+              {!!maxBlocks && syncingStatus.syncID >= 0 && (
                 <>
                   <View
                     style={{

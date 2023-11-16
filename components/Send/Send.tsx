@@ -72,6 +72,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     setBackgroundError,
     addLastSnackbar,
     mode,
+    someUnconfirmed,
   } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [qrcodeModalVisble, setQrcodeModalVisible] = useState(false);
@@ -88,15 +89,19 @@ const Send: React.FunctionComponent<SendProps> = ({
   const { decimalSeparator } = getNumberFormatSettings();
   // transparent is not spendable.
   const spendable = totalBalance.spendablePrivate + totalBalance.spendableOrchard;
-  const stillConfirming = parseFloat(spendable.toFixed(8)) !== totalBalance.total - totalBalance.transparentBal;
+
+  const stillConfirming =
+    totalBalance.orchardBal !== totalBalance.spendableOrchard ||
+    totalBalance.privateBal !== totalBalance.spendablePrivate ||
+    someUnconfirmed;
   const showShieldInfo =
     totalBalance &&
-    totalBalance.transparentBal > 0 &&
-    totalBalance.transparentBal + totalBalance.privateBal > info.defaultFee;
+    (someUnconfirmed ? 0 : totalBalance.transparentBal) > 0 &&
+    (someUnconfirmed ? 0 : totalBalance.transparentBal) + totalBalance.spendablePrivate > info.defaultFee;
   const showUpgradeInfo =
     totalBalance &&
-    totalBalance.transparentBal <= 0 &&
-    totalBalance.transparentBal + totalBalance.privateBal > info.defaultFee;
+    (someUnconfirmed ? 0 : totalBalance.transparentBal) === 0 &&
+    totalBalance.spendablePrivate > info.defaultFee;
 
   const getMaxAmount = useCallback((): number => {
     let max = spendable - defaultFee;

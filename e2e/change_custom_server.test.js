@@ -26,7 +26,7 @@ describe('Change the Server.', () => {
 
     // waiting for the custom server field
     await waitFor(element(by.id('settings.custom-server-field'))).toBeVisible().withTimeout(sync_timeout);
-    await element(by.id("settings.custom-server-field")).replaceText('https://lwdv3.zecwallet.co');
+    await element(by.id("settings.custom-server-field")).replaceText('https://lwd1.zcash-infra.com:9067');
 
     // save the new server
     await element(by.id('settings.button.save')).tap();

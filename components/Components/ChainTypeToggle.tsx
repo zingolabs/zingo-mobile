@@ -93,9 +93,9 @@ const ChainTypeToggle: React.FunctionComponent<ChainTypeToggleProps> = ({
           </View>
         </View>
       </TouchableOpacity>
-      <TouchableOpacity 
+      <TouchableOpacity
         testID="settings.custom-server-chain.regtest"
-        style={{ marginHorizontal: 5 }} 
+        style={{ marginHorizontal: 5 }}
         onPress={() => onPress('regtest')}>
         <View
           style={{

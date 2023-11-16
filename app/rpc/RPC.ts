@@ -792,6 +792,14 @@ export default class RPC {
       if (fullRescan) {
         // clean the transaction list before.
         this.fnSetTransactionsList([]);
+        this.fnSetTotalBalance({
+          orchardBal: 0,
+          privateBal: 0,
+          transparentBal: 0,
+          spendableOrchard: 0,
+          spendablePrivate: 0,
+          total: 0,
+        });
         this.doRescan()
           .then(result => {
             console.log('rescan finished', result);

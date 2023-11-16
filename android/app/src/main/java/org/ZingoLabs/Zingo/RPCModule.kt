@@ -182,7 +182,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             fileWallet2?.write(fileBytesBackup)
             fileWallet2?.close()
         } catch (e: IllegalArgumentException) {
-            // Log.e("MAIN", "Couldn't save the wallet with the backup")
+            Log.e("MAIN", "Couldn't save the wallet with the backup")
         }
 
         try {
@@ -191,7 +191,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             fileBackup2?.write(fileBytesWallet)
             fileBackup2?.close()
         } catch (e: IllegalArgumentException) {
-            // Log.e("MAIN", "Couldn't save the backup with the wallet")
+            Log.e("MAIN", "Couldn't save the backup with the wallet")
         }
 
         promise.resolve(true)
@@ -273,14 +273,14 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
         try {
             val fileBytes = Base64.decode(b64encoded, Base64.NO_WRAP)
-            // Log.w("MAIN", "file size${fileBytes.size}")
+            Log.w("MAIN", "file size: ${fileBytes.size} bytes")
 
             // Save file to disk
             val file = MainApplication.getAppContext()?.openFileOutput("wallet.dat", Context.MODE_PRIVATE)
             file?.write(fileBytes)
             file?.close()
         } catch (e: IllegalArgumentException) {
-            // Log.e("MAIN", "Couldn't save the wallet")
+            Log.e("MAIN", "Couldn't save the wallet")
         }
     }
 
@@ -302,7 +302,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             file?.write(fileBytes)
             file?.close()
         } catch (e: IllegalArgumentException) {
-            // Log.e("MAIN", "Couldn't save the wallet backup")
+            Log.e("MAIN", "Couldn't save the wallet backup")
         }
     }
 
