@@ -91,14 +91,16 @@ const Send: React.FunctionComponent<SendProps> = ({
   const spendable = totalBalance.spendablePrivate + totalBalance.spendableOrchard;
 
   const stillConfirming =
-    parseFloat(spendable.toFixed(8)) !== totalBalance.total - (someUnconfirmed ? 0 : totalBalance.transparentBal);
+    totalBalance.orchardBal !== totalBalance.spendableOrchard ||
+    totalBalance.privateBal !== totalBalance.spendablePrivate ||
+    someUnconfirmed;
   const showShieldInfo =
     totalBalance &&
     (someUnconfirmed ? 0 : totalBalance.transparentBal) > 0 &&
     (someUnconfirmed ? 0 : totalBalance.transparentBal) + totalBalance.spendablePrivate > info.defaultFee;
   const showUpgradeInfo =
     totalBalance &&
-    (someUnconfirmed ? 0 : totalBalance.transparentBal) <= 0 &&
+    (someUnconfirmed ? 0 : totalBalance.transparentBal) === 0 &&
     totalBalance.spendablePrivate > info.defaultFee;
 
   const getMaxAmount = useCallback((): number => {
