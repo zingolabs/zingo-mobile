@@ -6,7 +6,7 @@ import {
   InfoType,
   TotalBalanceClass,
   WalletType,
-  zecPriceType,
+  ZecPriceType,
   BackgroundType,
   NetInfoType,
   BackgroundErrorType,
@@ -34,7 +34,7 @@ export const defaultAppStateLoading: AppStateLoading = {
   zecPrice: {
     zecPrice: 0,
     date: 0,
-  } as zecPriceType,
+  } as ZecPriceType,
   sendAll: false,
   background: {
     batches: 0,

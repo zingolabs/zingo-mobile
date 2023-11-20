@@ -40,7 +40,7 @@ import {
   SendProgressClass,
   WalletSettingsClass,
   AddressClass,
-  zecPriceType,
+  ZecPriceType,
   BackgroundType,
   TranslateType,
   ServerType,
@@ -568,7 +568,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     const zecPrice = {
       zecPrice: newZecPrice,
       date: newDate,
-    } as zecPriceType;
+    } as ZecPriceType;
     if (!isEqual(this.state.zecPrice, zecPrice)) {
       //console.log('fetch zec price');
       this.setState({ zecPrice });

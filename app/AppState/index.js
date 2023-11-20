@@ -15,13 +15,13 @@ import SendJsonToTypeType from './types/SendJsonToTypeType';
 import TransactionType from './types/TransactionType';
 import TxDetailType from './types/TxDetailType';
 import WalletType from './types/WalletType';
-import zecPriceType from './types/zecPriceType';
 import { TranslateType } from './types/TranslateType';
 import NetInfoType from './types/NetInfoType';
 import BackgroundType from './types/BackgroundType';
 import BackgroundErrorType from './types/BackgroundErrorType';
 import ServerType from './types/ServerType';
 import SnackbarType from './types/SnackbarType';
+import ZecPriceType from './types/ZecPriceType';
 
 import AppStateLoaded from './AppStateLoaded';
 import AppStateLoading from './AppStateLoading';
@@ -45,7 +45,7 @@ export {
   WalletType,
   SendJsonToTypeType,
   InfoType,
-  zecPriceType,
+  ZecPriceType,
   BackgroundType,
   BackgroundErrorType,
   TranslateType,
