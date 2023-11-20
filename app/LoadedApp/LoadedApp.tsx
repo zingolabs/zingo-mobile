@@ -923,6 +923,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     await SettingsFileImpl.writeSettings(name, value);
     this.setState({
       mode: value as 'basic' | 'advanced',
+      poolsToShieldSelectSapling: true,
+      poolsToShieldSelectTransparent: true,
     });
 
     // Refetch the settings to update
