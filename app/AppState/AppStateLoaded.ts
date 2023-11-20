@@ -20,6 +20,7 @@ import NetInfoType from './types/NetInfoType';
 import BackgroundErrorType from './types/BackgroundErrorType';
 import ServerType from './types/ServerType';
 import SnackbarType from './types/SnackbarType';
+import FetchErrorType from './types/FetchErrorType';
 
 export default interface AppStateLoaded {
   navigation: StackScreenProps<any>['navigation'];
@@ -122,6 +123,9 @@ export default interface AppStateLoaded {
   addLastSnackbar: (snackbar: SnackbarType) => void;
   restartApp: (s: any) => void;
   someUnconfirmed: boolean;
+
+  fetchError: FetchErrorType;
+  setFetchError: (command: string, error: string) => void;
 
   // eslint-disable-next-line semi
 }

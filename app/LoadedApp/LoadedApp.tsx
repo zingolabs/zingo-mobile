@@ -44,6 +44,7 @@ import {
   BackgroundType,
   TranslateType,
   ServerType,
+  FetchErrorType,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
@@ -252,6 +253,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       setBackgroundError: this.setBackgroundError,
       addLastSnackbar: this.addLastSnackbar,
       restartApp: this.navigateToLoadingApp,
+      setFetchError: this.setFetchError,
     };
 
     this.rpc = new RPC(
@@ -264,6 +266,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       props.translate,
       this.keepAwake,
       props.readOnly,
+      this.setFetchError,
     );
 
     this.appstate = {} as NativeEventSubscription;
@@ -1070,6 +1073,14 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
 
   setBackgroundError = (title: string, error: string) => {
     this.setState({ backgroundError: { title, error } });
+  };
+
+  setFetchError = (command: string, error: string) => {
+    this.setState({ fetchError: { command, error } });
+    // remove the error in 5 seconds, if this error is persistent
+    // then appears all the time because the fetching process is
+    // executed every 5 seconds
+    setTimeout(() => this.setState({ fetchError: {} as FetchErrorType }), 5000);
   };
 
   addLastSnackbar = (snackbar: SnackbarType) => {

@@ -21,8 +21,9 @@ import {
   NetInfoType,
   BackgroundErrorType,
   ServerType,
+  SnackbarType,
+  FetchErrorType,
 } from '../AppState';
-import SnackbarType from '../AppState/types/SnackbarType';
 
 export const defaultAppStateLoaded: AppStateLoaded = {
   navigation: {} as StackScreenProps<any>['navigation'],
@@ -90,6 +91,8 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   addLastSnackbar: () => {},
   restartApp: () => {},
   someUnconfirmed: false,
+  fetchError: {} as FetchErrorType,
+  setFetchError: () => {},
 };
 
 export const ContextAppLoaded = React.createContext(defaultAppStateLoaded);

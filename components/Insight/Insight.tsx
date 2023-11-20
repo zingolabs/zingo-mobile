@@ -86,6 +86,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, set_privac
   const [expandAddress, setExpandAddress] = useState<boolean[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [tab, setTab] = useState<'sent' | 'sends' | 'memobytes'>('sent');
+  const [error, setError] = useState<string>('');
   const dimensions = {
     width: Dimensions.get('screen').width,
     height: Dimensions.get('screen').height,
@@ -93,51 +94,67 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, set_privac
 
   useEffect(() => {
     (async () => {
-      setLoading(true);
-      let resultStr: string = '';
-      switch (tab) {
-        case 'sent':
-          resultStr = await RPCModule.execute('value_to_address', '');
-          //console.log('################# value', resultStr);
-          break;
-        case 'sends':
-          resultStr = await RPCModule.execute('sends_to_address', '');
-          //console.log('################# sends', resultStr);
-          break;
-        case 'memobytes':
-          resultStr = await RPCModule.execute('memobytes_to_address', '');
-          //console.log('################# memobytes', resultStr);
-          break;
-        default:
-          break;
-      }
-      const resultJSON = await JSON.parse(resultStr);
-      let amounts: { value: number; address: string; tag: string }[] = [];
-      const resultJSONEntries: [string, number][] = Object.entries(resultJSON) as [string, number][];
-      resultJSONEntries.forEach(([key, value]) => {
-        if (!(tab !== 'sent' && key === 'fee')) {
-          // excluding the fee for `sends` and `memobytes`.
-          if (value > 0) {
-            amounts.push({ value: tab === 'sent' ? value / 10 ** 8 : value, address: key, tag: '' });
-          }
+      try {
+        setLoading(true);
+        let cmd: string = '';
+        switch (tab) {
+          case 'sent':
+            cmd = 'value_to_address';
+            break;
+          case 'sends':
+            cmd = 'sends_to_address';
+            break;
+          case 'memobytes':
+            cmd = 'memobytes_to_address';
+            break;
+          default:
+            break;
         }
-      });
-      const randomColors = Utils.generateColorList(amounts.length);
-      const newPieAmounts: DataType[] = amounts
-        .sort((a, b) => b.value - a.value)
-        .map((item, index) => {
-          return {
-            value: item.value,
-            address: item.address,
-            tag: item.tag,
-            svg: { fill: item.address === 'fee' ? colors.zingo : randomColors[index] },
-            key: `pie-${index}`,
-          };
-        });
-      setPieAmounts(newPieAmounts);
-      const newExpandAddress = Array(newPieAmounts.length).fill(false);
-      setExpandAddress(newExpandAddress);
-      setLoading(false);
+
+        const resultStr = await RPCModule.execute(cmd, '');
+        //console.log('#################', cmd, resultStr);
+        if (resultStr) {
+          if (resultStr.toLowerCase().startsWith('error')) {
+            console.log(`Error fetching ${cmd} ${resultStr}`);
+            setError(`Error fetching ${cmd} ${resultStr}`);
+          } else {
+            const resultJSON = await JSON.parse(resultStr);
+            let amounts: { value: number; address: string; tag: string }[] = [];
+            const resultJSONEntries: [string, number][] = Object.entries(resultJSON) as [string, number][];
+            resultJSONEntries.forEach(([key, value]) => {
+              if (!(tab !== 'sent' && key === 'fee')) {
+                // excluding the fee for `sends` and `memobytes`.
+                if (value > 0) {
+                  amounts.push({ value: tab === 'sent' ? value / 10 ** 8 : value, address: key, tag: '' });
+                }
+              }
+            });
+            const randomColors = Utils.generateColorList(amounts.length);
+            const newPieAmounts: DataType[] = amounts
+              .sort((a, b) => b.value - a.value)
+              .map((item, index) => {
+                return {
+                  value: item.value,
+                  address: item.address,
+                  tag: item.tag,
+                  svg: { fill: item.address === 'fee' ? colors.zingo : randomColors[index] },
+                  key: `pie-${index}`,
+                };
+              });
+            setPieAmounts(newPieAmounts);
+            const newExpandAddress = Array(newPieAmounts.length).fill(false);
+            setExpandAddress(newExpandAddress);
+            setError('');
+          }
+        } else {
+          console.log(`Internal Error fetching ${cmd}`);
+          setError(`Internal Error fetching ${cmd}`);
+        }
+        setLoading(false);
+      } catch (err) {
+        setError(`${err}`);
+        setLoading(false);
+      }
     })();
   }, [colors.zingo, tab]);
 
@@ -336,7 +353,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, set_privac
         <View style={{ display: 'flex', margin: 20 }}>
           {!loading && (!pieAmounts || !pieAmounts.length) && (
             <View style={{ width: '100%', alignItems: 'center', marginTop: 100 }}>
-              <RegText>{translate('insight.no-data') as string}</RegText>
+              {error ? <RegText>{error}</RegText> : <RegText>{translate('insight.no-data') as string}</RegText>}
             </View>
           )}
           {loading ? (

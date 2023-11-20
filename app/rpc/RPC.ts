@@ -68,6 +68,8 @@ export default class RPC {
 
   readOnly: boolean;
 
+  fnSetFetchError: (command: string, error: string) => void;
+
   constructor(
     fnSetTotalBalance: (totalBalance: TotalBalanceClass) => void,
     fnSetTransactionsList: (txlist: TransactionType[]) => void,
@@ -78,6 +80,7 @@ export default class RPC {
     translate: (key: string) => TranslateType,
     keepAwake: (keep: boolean) => void,
     readOnly: boolean,
+    fnSetFetchError: (command: string, error: string) => void,
   ) {
     this.fnSetTotalBalance = fnSetTotalBalance;
     this.fnSetTransactionsList = fnSetTransactionsList;
@@ -111,6 +114,8 @@ export default class RPC {
     this.timers = [];
 
     this.readOnly = readOnly;
+
+    this.fnSetFetchError = fnSetFetchError;
   }
 
   static async rpc_setInterruptSyncAfterBatch(value: string): Promise<void> {
@@ -612,101 +617,121 @@ export default class RPC {
   }
 
   async doRescan(): Promise<string> {
+    const cmd = 'rescan';
     try {
-      const rescanStr: string = await RPCModule.execute('rescan', '');
+      const rescanStr: string = await RPCModule.execute(cmd, '');
       if (rescanStr) {
         if (rescanStr.toLowerCase().startsWith('error')) {
           console.log(`Error rescan ${rescanStr}`);
+          this.fnSetFetchError(cmd, rescanStr);
           return rescanStr;
         }
       } else {
         console.log('Internal Error rescan');
+        this.fnSetFetchError(cmd, 'Error: Internal RPC Error');
         return 'Error: Internal RPC Error: rescan';
       }
 
       return rescanStr;
     } catch (error) {
       console.log(`Critical Error rescan ${error}`);
+      this.fnSetFetchError(cmd, `${error}`);
       return `Error: ${error}`;
     }
   }
 
   async doSync(): Promise<string> {
+    const cmd = 'sync';
     try {
-      const syncStr: string = await RPCModule.execute('sync', '');
+      const syncStr: string = await RPCModule.execute(cmd, '');
       if (syncStr) {
         if (syncStr.toLowerCase().startsWith('error')) {
           console.log(`Error sync ${syncStr}`);
+          this.fnSetFetchError(cmd, syncStr);
           return syncStr;
         }
       } else {
         console.log('Internal Error sync');
+        this.fnSetFetchError(cmd, 'Error: Internal RPC Error');
         return 'Error: Internal RPC Error: sync';
       }
 
       return syncStr;
     } catch (error) {
       console.log(`Critical Error sync ${error}`);
+      this.fnSetFetchError(cmd, `${error}`);
       return `Error: ${error}`;
     }
   }
 
   async doSyncStatus(): Promise<string> {
+    const cmd = 'syncstatus';
     try {
-      const syncStatusStr: string = await RPCModule.execute('syncstatus', '');
+      const syncStatusStr: string = await RPCModule.execute(cmd, '');
       if (syncStatusStr) {
         if (syncStatusStr.toLowerCase().startsWith('error')) {
           console.log(`Error sync status ${syncStatusStr}`);
+          this.fnSetFetchError(cmd, syncStatusStr);
           return syncStatusStr;
         }
       } else {
         console.log('Internal Error sync status');
+        this.fnSetFetchError(cmd, 'Error: Internal RPC Error');
         return 'Error: Internal RPC Error: sync status';
       }
 
       return syncStatusStr;
     } catch (error) {
       console.log(`Critical Error sync status ${error}`);
+      this.fnSetFetchError(cmd, `${error}`);
       return `Error: ${error}`;
     }
   }
 
   async doSend(sendJSON: string): Promise<string> {
+    const cmd = 'send';
     try {
-      const sendStr: string = await RPCModule.execute('send', sendJSON);
+      const sendStr: string = await RPCModule.execute(cmd, sendJSON);
       if (sendStr) {
         if (sendStr.toLowerCase().startsWith('error')) {
           console.log(`Error send ${sendStr}`);
+          this.fnSetFetchError(cmd, sendStr);
           return sendStr;
         }
       } else {
         console.log('Internal Error send');
+        this.fnSetFetchError(cmd, 'Error: Internal RPC Error');
         return 'Error: Internal RPC Error: send';
       }
 
       return sendStr;
     } catch (error) {
       console.log(`Critical Error send ${error}`);
+      this.fnSetFetchError(cmd, `${error}`);
       return `Error: ${error}`;
     }
   }
 
   async doSendProgress(): Promise<string> {
+    const cmd = 'sendprogress';
     try {
-      const sendProgressStr: string = await RPCModule.execute('sendprogress', '');
+      const sendProgressStr: string = await RPCModule.execute(cmd, '');
       if (sendProgressStr) {
         if (sendProgressStr.toLowerCase().startsWith('error')) {
           console.log(`Error send progress ${sendProgressStr}`);
+          this.fnSetFetchError(cmd, sendProgressStr);
           return sendProgressStr;
         }
       } else {
         console.log('Internal Error send progress');
+        this.fnSetFetchError(cmd, 'Error: Internal RPC Error');
         return 'Error: Internal RPC Error: send progress';
       }
 
       return sendProgressStr;
     } catch (error) {
       console.log(`Critical Error send progress ${error}`);
+      this.fnSetFetchError(cmd, `${error}`);
       return `Error: ${error}`;
     }
   }
@@ -1172,30 +1197,32 @@ export default class RPC {
   }
 
   async fetchWalletSettings(): Promise<void> {
+    const cmd = 'getoption';
     try {
-      const download_memos_str: string = await RPCModule.execute('getoption', 'download_memos');
+      const download_memos_str: string = await RPCModule.execute(cmd, 'download_memos');
       if (download_memos_str) {
         if (download_memos_str.toLowerCase().startsWith('error')) {
           console.log(`Error download memos ${download_memos_str}`);
+          this.fnSetFetchError(cmd, download_memos_str);
           return;
         }
       } else {
         console.log('Internal Error download memos');
+        this.fnSetFetchError(cmd, 'Error: Internal RPC Error download memos');
         return;
       }
       const download_memos_json: RPCGetOptionType = await JSON.parse(download_memos_str);
 
-      const transaction_filter_threshold_str: string = await RPCModule.execute(
-        'getoption',
-        'transaction_filter_threshold',
-      );
+      const transaction_filter_threshold_str: string = await RPCModule.execute(cmd, 'transaction_filter_threshold');
       if (transaction_filter_threshold_str) {
         if (transaction_filter_threshold_str.toLowerCase().startsWith('error')) {
           console.log(`Error transaction filter threshold ${transaction_filter_threshold_str}`);
+          this.fnSetFetchError(cmd, transaction_filter_threshold_str);
           return;
         }
       } else {
         console.log('Internal Error transaction filter threshold');
+        this.fnSetFetchError(cmd, 'Error: Internal RPC Error transaction filter threshold');
         return;
       }
       const transaction_filter_threshold_json: RPCGetOptionType = await JSON.parse(transaction_filter_threshold_str);
@@ -1207,7 +1234,8 @@ export default class RPC {
 
       this.fnSetWalletSettings(walletSettings);
     } catch (error) {
-      console.log(`Critical Error transaction filter threshold ${error}`);
+      console.log(`Critical Error getoption ${error}`);
+      this.fnSetFetchError(cmd, `${error}`);
       return;
     }
   }
@@ -1228,10 +1256,12 @@ export default class RPC {
       if (addressesStr) {
         if (addressesStr.toLowerCase().startsWith('error')) {
           console.log(`Error addresses ${addressesStr}`);
+          this.fnSetFetchError('addresses', addressesStr);
           return;
         }
       } else {
         console.log('Internal Error addresses');
+        this.fnSetFetchError('addresses', 'Error: Internal RPC Error');
         return;
       }
       const addressesJSON: RPCAddressType[] = await JSON.parse(addressesStr);
@@ -1240,10 +1270,12 @@ export default class RPC {
       if (balanceStr) {
         if (balanceStr.toLowerCase().startsWith('error')) {
           console.log(`Error balance ${balanceStr}`);
+          this.fnSetFetchError('balance', balanceStr);
           return;
         }
       } else {
         console.log('Internal Error balance');
+        this.fnSetFetchError('balance', 'Error: Internal RPC Error');
         return;
       }
       const balanceJSON: RPCBalancesType = await JSON.parse(balanceStr);
@@ -1270,10 +1302,12 @@ export default class RPC {
       if (pendingNotes) {
         if (pendingNotes.toLowerCase().startsWith('error')) {
           console.log(`Error notes ${pendingNotes}`);
+          this.fnSetFetchError('notes', pendingNotes);
           return;
         }
       } else {
         console.log('Internal Error notes');
+        this.fnSetFetchError('notes', 'Error: Internal RPC Error');
         return;
       }
       const pendingNotesJSON: RPCNotesType = await JSON.parse(pendingNotes);
@@ -1341,20 +1375,24 @@ export default class RPC {
       this.fnSetAllAddresses(allAddresses);
     } catch (error) {
       console.log(`Critical Error notes ${error}`);
+      this.fnSetFetchError('balance', `${error}`);
       return;
     }
   }
 
   async fetchWalletHeight(): Promise<void> {
+    const cmd = 'height';
     try {
-      const heightStr: string = await RPCModule.execute('height', '');
+      const heightStr: string = await RPCModule.execute(cmd, '');
       if (heightStr) {
         if (heightStr.toLowerCase().startsWith('error')) {
           console.log(`Error wallet height ${heightStr}`);
+          this.fnSetFetchError(cmd, heightStr);
           return;
         }
       } else {
         console.log('Internal Error wallet height');
+        this.fnSetFetchError(cmd, 'Error: Internal RPC Error');
         return;
       }
       const heightJSON: RPCWalletHeight = await JSON.parse(heightStr);
@@ -1362,6 +1400,7 @@ export default class RPC {
       this.lastWalletBlockHeight = heightJSON.height;
     } catch (error) {
       console.log(`Critical Error wallet height ${error}`);
+      this.fnSetFetchError(cmd, `${error}`);
       return;
     }
   }
@@ -1376,16 +1415,19 @@ export default class RPC {
 
   // Fetch all T and Z and O transactions
   async fetchTandZandOTransactionsSummaries() {
+    const cmd = 'summaries';
     try {
-      const summariesStr: string = await RPCModule.execute('summaries', '');
+      const summariesStr: string = await RPCModule.execute(cmd, '');
       //console.log(summariesStr);
       if (summariesStr) {
         if (summariesStr.toLowerCase().startsWith('error')) {
           console.log(`Error txs summaries ${summariesStr}`);
+          this.fnSetFetchError(cmd, summariesStr);
           return;
         }
       } else {
         console.log('Internal Error txs summaries');
+        this.fnSetFetchError(cmd, 'Error: Internal RPC Error');
         return;
       }
       const summariesJSON: RPCSummariesType[] = await JSON.parse(summariesStr);
@@ -1476,7 +1518,8 @@ export default class RPC {
 
       this.fnSetTransactionsList(combinedTxList);
     } catch (error) {
-      console.log(`Critical Error txs list ${error}`);
+      console.log(`Critical Error txs summaries ${error}`);
+      this.fnSetFetchError(cmd, `${error}`);
       return;
     }
   }

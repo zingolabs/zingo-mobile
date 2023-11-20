@@ -94,6 +94,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     wallet,
     restartApp,
     someUnconfirmed,
+    fetchError,
   } = context;
 
   let translate: (key: string) => TranslateType, netInfo: NetInfoType, mode: 'basic' | 'advanced';
@@ -801,6 +802,24 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       </View>
 
       <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
+
+      {!!fetchError && !!fetchError.error && (
+        <>
+          <View
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexWrap: 'wrap',
+            }}>
+            <RegText testID={testID} color={colors.primary} style={{ paddingHorizontal: 5, marginBottom: 3 }}>
+              {`${fetchError.command}: ${fetchError.error}`}
+            </RegText>
+          </View>
+          <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
+        </>
+      )}
     </View>
   );
 };
