@@ -508,21 +508,24 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
   };
 
   setTransactionList = async (transactions: TransactionType[]) => {
+    const basicFirstViewSeed = (await SettingsFileImpl.readSettings()).basicFirstViewSeed;
     // only for basic mode
     if (this.state.mode === 'basic') {
       // only if the user doesn't see the seed the first time
-      const basicFirstViewSeed = (await SettingsFileImpl.readSettings()).basicFirstViewSeed;
       if (!basicFirstViewSeed) {
         // only if the App are in foreground
         const background = await AsyncStorage.getItem('@background');
         // only if the wallet have some transactions
         if (background === 'no' && transactions.length > 0) {
           // I need to check this out in the seed screen.
-          // I will do this update later on
-          //await SettingsFileImpl.writeSettings('basicFirstViewSeed', true);
           await this.fetchWallet();
           this.setState({ seedViewModalVisible: true });
         }
+      }
+    } else {
+      // for advanced mode
+      if (!basicFirstViewSeed) {
+        await SettingsFileImpl.writeSettings('basicFirstViewSeed', true);
       }
     }
     if (deepDiff(this.state.transactions, transactions)) {

@@ -314,6 +314,8 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
           this.navigateToLoadedApp();
           //console.log('navigate to LoadedApp');
         } else {
+          // for advanced mode
+          await SettingsFileImpl.writeSettings('basicFirstViewSeed', true);
           this.setState(state => ({ screen: state.screen === 3 ? 3 : 1, walletExists: false }));
         }
       }
