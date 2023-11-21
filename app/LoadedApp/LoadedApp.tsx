@@ -372,6 +372,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
             if (this.rpc.getInRefresh()) {
               // I need to start again the App only if it is Syncing...
               this.navigateToLoadingApp({});
+            } else {
+              // restart the interval process again if it is not syncing...
+              await this.rpc.configure();
             }
           }
         }
