@@ -84,6 +84,19 @@ You can also emulate android from the command line without using Android Studio.
    Outputs are generated in `android/app/build/outputs/emulator_output`
 
 ## Testing
+### Prerequesites
+Integration tests and end-to-end tests require a regtest server. On linux hosts, these may be run
+locally by installing the lightwalletd, zcashd and zcash-cli binaries
+(https://github.com/zingolabs/zingolib#regtest). From the `rust/android/regtest/bin/` directory run: <br />
+`ln -s path/to/lightwalletd/binary path/to/zcashd/binary path/to/zcash-cli/binary ./` <br />
+From the `rust/android/lightwalletd_bin` directory run: <br />
+`ln -s path/to/lightwalletd/binary ./`
+
+Alternatively, integration tests and end-to-end tests can be run on non-linux hosts with Regchest
+(https://github.com/zingolabs/zingo-regchest). Regchest manages the zcash/lightwalletd regtest 
+network in a docker container. Before running tests, pull the latest Regchest image from docker: <br />
+`docker pull zingodevops/regchest:007`
+
 ### Yarn Tests
 1. From the root directory, run: <br />
    `yarn test`
@@ -107,6 +120,9 @@ You can also emulate android from the command line without using Android Studio.
    Specify to run a specific ABI and test: <br />
    `cargo nextest run x86_64::test_name`
 
+To run tests with Regchest, add the `--features regchest` flag, for example: <br />
+`cargo nextest run --features regchest -E 'not test(e2e)'`
+
 For more information on running integration tests on non-default AVDs, run: <br />
 `./scripts/integration_tests.sh -h` <br />
 Without the cargo test runner these emulated android devices will not be able to connect to a
@@ -123,15 +139,8 @@ lightwalletd/zcashd regtest network. Therefore, only tests in the "Offline Tests
    or run a specific test: <br />
    `cargo nextest run e2e::test_name`
 
-### Regchest
-Integration tests and end-to-end tests can be run on non-linux hosts with Regchest
-(https://github.com/zingolabs/zingo-regchest). Regchest manages the zcash/lightwalletd regtest 
-network in a docker container. Before running tests, pull the latest Regchest image from docker: <br />
-`docker pull zingodevops/regchest:007`
-
-To run tests with Regchest, add the `--features regchest` flag, for example: <br />
-`cargo nextest run --features regchest -E 'not test(e2e)'` <br />
-`cargo nextest run --features regchest e2e`
+Regchest is still under development and currently not able to run darkside end-to-end tests: <br />
+`cargo nextest run --features regchest -E 'test(e2e) and not test(darkside)'`
 
 # Troubleshooting
 For notes on known issues and problems, see the [trouble-shooting notes](./TROUBLESHOOTING.md).
