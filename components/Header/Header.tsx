@@ -803,7 +803,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
 
       <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
 
-      {!!fetchError && !!fetchError.error && netInfo.isConnected && (
+      {!!fetchError && !!fetchError.error && netInfo.isConnected && mode !== 'basic' && (
         <>
           <View
             style={{
