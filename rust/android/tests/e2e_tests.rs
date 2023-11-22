@@ -63,5 +63,26 @@ mod e2e {
 
             assert_eq!(exit_code, 0);
         }
+        #[tokio::test]
+        async fn interrupt_sync() {
+            let darkside_handler = DarksideHandler::new(Some(20000));
+
+            let server_id = zingoconfig::construct_lightwalletd_uri(Some(format!(
+                "http://127.0.0.1:{}",
+                darkside_handler.grpc_port
+            )));
+            prepare_darksidewalletd(server_id.clone(), true)
+                .await
+                .unwrap();
+
+            let (exit_code, output, error) =
+                zingomobile_utils::android_e2e_test("darkside_interrupt_sync");
+
+            println!("Exit Code: {}", exit_code);
+            println!("Output: {}", output);
+            println!("Error: {}", error);
+
+            assert_eq!(exit_code, 0);
+        }
     }
 }

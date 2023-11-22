@@ -4,8 +4,8 @@ import { loadDarksideWallet } from "./e2e-utils/loadDarksideWallet.js";
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-describe('Server interrupt', () => {
-  it('should maintain correct balance when server is interrupted', async () => {
+describe('Interrupt sync', () => {
+  it('should maintain correct balance when sync is interrupted', async () => {
     await loadDarksideWallet();
     await sleep(10000);
 
@@ -15,7 +15,7 @@ describe('Server interrupt', () => {
     await element(by.id('menu.fund-pools')).tap();
     await expect(element(by.id('orchard-total-balance.big-part'))).toHaveText(' 1.0000');
     await expect(element(by.id('orchard-total-balance.small-part'))).not.toBeVisible();
-    await expect(element(by.id('orchard-spendable-balance.big-part'))).toHaveText(' 0.0000');
+    await expect(element(by.id('orchard-spendable-balance.big-part'))).toHaveText(' 1.0000');
     await expect(element(by.id('orchard-spendable-balance.small-part'))).not.toBeVisible();
     await expect(element(by.id('sapling-total-balance.big-part'))).toHaveText(' 0.0000');
     await expect(element(by.id('sapling-total-balance.small-part'))).not.toBeVisible();
