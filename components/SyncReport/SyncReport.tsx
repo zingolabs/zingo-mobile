@@ -630,7 +630,12 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
           alignItems: 'center',
           marginVertical: 5,
         }}>
-        <Button type="Secondary" title={translate('close') as string} onPress={closeModal} />
+        <Button
+          testID="syncreport.button.close"
+          type="Secondary"
+          title={translate('close') as string}
+          onPress={closeModal}
+        />
       </View>
     </SafeAreaView>
   );
