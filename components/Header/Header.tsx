@@ -366,7 +366,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 }}>
                 {!syncingStatus.inProgress && syncingStatus.lastBlockServer === syncingStatus.lastBlockWallet && (
                   <View style={{ margin: 0, padding: 0 }}>
-                    <FontAwesomeIcon icon={faCheck} color={colors.primary} size={20} />
+                    <FontAwesomeIcon testID="header.sync-facheck" icon={faCheck} color={colors.primary} size={20} />
                   </View>
                 )}
                 {!syncingStatus.inProgress && syncingStatus.lastBlockServer !== syncingStatus.lastBlockWallet && (

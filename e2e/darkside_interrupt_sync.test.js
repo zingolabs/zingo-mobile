@@ -106,7 +106,10 @@ describe('Interrupt sync', () => {
     await sleep(5000);
     await device.launchApp({ newInstance: false });
 
-    // close sunc report screen
+    // put the App to sleep because we need some progress in the syncing for 20 seconds
+    await sleep(20000);
+
+    // close sync report screen
     await waitFor(element(by.id('syncreport.button.close'))).toBeVisible().withTimeout(sync_timeout);
     await element(by.id('syncreport.button.close')).tap();
 
