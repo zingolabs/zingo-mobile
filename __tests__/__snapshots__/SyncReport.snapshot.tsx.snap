@@ -936,6 +936,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           "paddingRight": 20,
         }
       }
+      testID="syncreport.button.close"
     >
       <View
         style={
