@@ -1,5 +1,5 @@
 
-let loadTestWallet = async () => {
+let loadTestLongSyncWallet = async () => {
   // the start always is like a fress install -> create a new wallet
   // go to setting modal screen
   await waitFor(element(by.id('header.drawmenu'))).toBeVisible().withTimeout(sync_timeout);
@@ -35,4 +35,4 @@ let loadTestWallet = async () => {
   await element(by.id('seed.button.OK')).tap();
 }
 
-export { loadTestWallet };
+export { loadTestLongSyncWallet };
