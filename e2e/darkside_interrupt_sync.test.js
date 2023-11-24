@@ -16,47 +16,55 @@ describe('Interrupt sync', () => {
     await element(by.id('menu.syncreport')).tap();
 
     // put the App to sleep because we need some progress in the syncing for 120 seconds, 2 min.
-    await sleep(120000);
+    await sleep(90000);
 
     // background for 30 seconds. The same effect that close & open the App.
     await device.sendToHome();
-    await sleep(30000);
+    await sleep(60000);
     await device.launchApp({ newInstance: false });
 
     // put the App to sleep because we need some progress in the syncing for 120 seconds, 2 min.
-    await sleep(120000);
+    await sleep(90000);
 
     // background for 30 seconds. The same effect that close & open the App.
     await device.sendToHome();
-    await sleep(5000);
+    await sleep(60000);
     await device.launchApp({ newInstance: false });
 
     // put the App to sleep because we need some progress in the syncing for 120 seconds, 2 min.
-    await sleep(120000);
+    await sleep(90000);
 
     // background for 30 seconds. The same effect that close & open the App.
     await device.sendToHome();
-    await sleep(30000);
+    await sleep(60000);
     await device.launchApp({ newInstance: false });
 
     // put the App to sleep because we need some progress in the syncing for 120 seconds, 2 min.
-    await sleep(120000);
+    await sleep(90000);
 
     // background for 30 seconds. The same effect that close & open the App.
     await device.sendToHome();
-    await sleep(30000);
+    await sleep(60000);
     await device.launchApp({ newInstance: false });
 
     // put the App to sleep because we need some progress in the syncing for 120 seconds, 2 min.
-    await sleep(120000);
+    await sleep(90000);
 
     // background for 30 seconds. The same effect that close & open the App.
     await device.sendToHome();
-    await sleep(30000);
+    await sleep(60000);
     await device.launchApp({ newInstance: false });
 
     // put the App to sleep because we need some progress in the syncing for 120 seconds, 2 min.
-    await sleep(120000);
+    await sleep(90000);
+
+    // background for 30 seconds. The same effect that close & open the App.
+    await device.sendToHome();
+    await sleep(60000);
+    await device.launchApp({ newInstance: false });
+
+    // put the App to sleep because we need some progress in the syncing for 120 seconds, 2 min.
+    await sleep(90000);
 
     // close sync report screen
     await waitFor(element(by.id('syncreport.button.close'))).toBeVisible().withTimeout(sync_timeout);
