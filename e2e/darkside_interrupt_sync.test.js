@@ -7,132 +7,23 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 describe('Syncs a darkside chain', () => {
   it('should sync the darkside chain', async () => {
     await loadDarksideWallet();
-    await sleep(10000);
+    await sleep(5000);
 
     // verify pool balances
     await waitFor(element(by.id('header.drawmenu'))).toBeVisible().withTimeout(sync_timeout);
     await element(by.id('header.drawmenu')).tap();
     await element(by.id('menu.syncreport')).tap();
 
-    // // put the App to sleep because we need some progress in the syncing for 20 seconds
-    // await sleep(20000);
-
     // await waitFor(async () => {
-    //   const notyetsynced = Number(await element(by.id('syncreport.notyetsynced')).getAttributes('text'));
-    //   return notyetsynced < 990000
+    //   const notyetsynced = await element(by.id('syncreport.notyetsynced')).getAttributes('text');
+    //   return Number(notyetsynced) < 500000
     // }).withTimeout(sync_timeout);
-
-    // // background for 5 seconds. The same effect that close & open the App.
+    
+    // // // background for 5 seconds. The same effect that close & open the App.
     // await device.sendToHome();
     // await sleep(5000);
     // await device.launchApp({ newInstance: false });
 
-    // // put the App to sleep because we need some progress in the syncing for 20 seconds
-    // await sleep(20000);
-
-    // await waitFor(async () => {
-    //   const notyetsynced = Number(await element(by.id('syncreport.notyetsynced')).getAttributes('text'));
-    //   return notyetsynced < 980000
-    // }).withTimeout(sync_timeout);
-
-    // // background for 5 seconds. The same effect that close & open the App.
-    // await device.sendToHome();
-    // await sleep(5000);
-    // await device.launchApp({ newInstance: false });
-
-    // // put the App to sleep because we need some progress in the syncing for 20 seconds
-    // await sleep(20000);
-
-    // await waitFor(async () => {
-    //   const notyetsynced = Number(await element(by.id('syncreport.notyetsynced')).getAttributes('text'));
-    //   return notyetsynced < 970000
-    // }).withTimeout(sync_timeout);
-
-    // // background for 5 seconds. The same effect that close & open the App.
-    // await device.sendToHome();
-    // await sleep(5000);
-    // await device.launchApp({ newInstance: false });
-
-    // // put the App to sleep because we need some progress in the syncing for 20 seconds
-    // await sleep(20000);
-
-    // await waitFor(async () => {
-    //   const notyetsynced = Number(await element(by.id('syncreport.notyetsynced')).getAttributes('text'));
-    //   return notyetsynced < 960000
-    // }).withTimeout(sync_timeout);
-
-    // // background for 5 seconds. The same effect that close & open the App.
-    // await device.sendToHome();
-    // await sleep(5000);
-    // await device.launchApp({ newInstance: false });
-
-    // // put the App to sleep because we need some progress in the syncing for 20 seconds
-    // await sleep(20000);
-
-    // await waitFor(async () => {
-    //   const notyetsynced = Number(await element(by.id('syncreport.notyetsynced')).getAttributes('text'));
-    //   return notyetsynced < 950000
-    // }).withTimeout(sync_timeout);
-
-    // // background for 5 seconds. The same effect that close & open the App.
-    // await device.sendToHome();
-    // await sleep(5000);
-    // await device.launchApp({ newInstance: false });
-
-    // // put the App to sleep because we need some progress in the syncing for 20 seconds
-    // await sleep(20000);
-
-    // await waitFor(async () => {
-    //   const notyetsynced = Number(await element(by.id('syncreport.notyetsynced')).getAttributes('text'));
-    //   return notyetsynced < 940000
-    // }).withTimeout(sync_timeout);
-
-    // // background for 5 seconds. The same effect that close & open the App.
-    // await device.sendToHome();
-    // await sleep(5000);
-    // await device.launchApp({ newInstance: false });
-
-    // // put the App to sleep because we need some progress in the syncing for 20 seconds
-    // await sleep(20000);
-
-    // await waitFor(async () => {
-    //   const notyetsynced = Number(await element(by.id('syncreport.notyetsynced')).getAttributes('text'));
-    //   return notyetsynced < 930000
-    // }).withTimeout(sync_timeout);
-
-    // // background for 5 seconds. The same effect that close & open the App.
-    // await device.sendToHome();
-    // await sleep(5000);
-    // await device.launchApp({ newInstance: false });
-
-    // // put the App to sleep because we need some progress in the syncing for 20 seconds
-    // await sleep(20000);
-
-    // await waitFor(async () => {
-    //   const notyetsynced = Number(await element(by.id('syncreport.notyetsynced')).getAttributes('text'));
-    //   return notyetsynced < 920000
-    // }).withTimeout(sync_timeout);
-
-    // // background for 5 seconds. The same effect that close & open the App.
-    // await device.sendToHome();
-    // await sleep(5000);
-    // await device.launchApp({ newInstance: false });
-
-    // // put the App to sleep because we need some progress in the syncing for 20 seconds
-    // await sleep(20000);
-
-    // await waitFor(async () => {
-    //   const notyetsynced = Number(await element(by.id('syncreport.notyetsynced')).getAttributes('text'));
-    //   return notyetsynced < 910000
-    // }).withTimeout(sync_timeout);
-
-    // // background for 5 seconds. The same effect that close & open the App.
-    // await device.sendToHome();
-    // await sleep(5000);
-    // await device.launchApp({ newInstance: false });
-
-    // // put the App to sleep because we need some progress in the syncing for 20 seconds
-    // await sleep(20000);
 
     // // close sync report screen
     // await waitFor(element(by.id('syncreport.button.close'))).toBeVisible().withTimeout(sync_timeout);
