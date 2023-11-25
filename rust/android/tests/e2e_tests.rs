@@ -40,7 +40,7 @@ mod e2e {
     }
 
     mod darkside {
-        use darkside_tests::utils::{prepare_darksidewalletd, DarksideHandler};
+        use darkside_tests::utils::{prepare_darksidewalletd, DarksideConnector, DarksideHandler};
 
         #[tokio::test]
         async fn simple_sync() {
@@ -56,6 +56,31 @@ mod e2e {
 
             let (exit_code, output, error) =
                 zingomobile_utils::android_e2e_test("darkside_simple_sync");
+
+            println!("Exit Code: {}", exit_code);
+            println!("Output: {}", output);
+            println!("Error: {}", error);
+
+            assert_eq!(exit_code, 0);
+        }
+        #[tokio::test]
+        async fn interrupt_sync() {
+            let darkside_handler = DarksideHandler::new(Some(20000));
+
+            let server_id = zingoconfig::construct_lightwalletd_uri(Some(format!(
+                "http://127.0.0.1:{}",
+                darkside_handler.grpc_port
+            )));
+            prepare_darksidewalletd(server_id.clone(), true)
+                .await
+                .unwrap();
+
+            let connector = DarksideConnector(server_id.clone());
+            connector.stage_blocks_create(4, 999997, 1).await.unwrap();
+            connector.apply_staged(1000000).await.unwrap();
+
+            let (exit_code, output, error) =
+                zingomobile_utils::android_e2e_test("darkside_interrupt_sync");
 
             println!("Exit Code: {}", exit_code);
             println!("Output: {}", output);

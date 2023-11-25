@@ -509,7 +509,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
                           margin: 5,
                         }}
                       />
-                      <Text style={{ color: colors.text }}>
+                      <Text testID="syncreport.syncedbefore"  style={{ color: colors.text }}>
                         {wallet_1 + (translate('report.blocks') as string) + wallet_old_synced_percent.toFixed(2) + '%'}
                       </Text>
                     </View>
@@ -630,7 +630,12 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
           alignItems: 'center',
           marginVertical: 5,
         }}>
-        <Button type="Secondary" title={translate('close') as string} onPress={closeModal} />
+        <Button
+          testID="syncreport.button.close"
+          type="Secondary"
+          title={translate('close') as string}
+          onPress={closeModal}
+        />
       </View>
     </SafeAreaView>
   );
