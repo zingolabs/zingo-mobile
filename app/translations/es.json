@@ -264,7 +264,7 @@
     "tapcopy-seed-message": "Frase Semilla copiada al Portapapeles",
     "tapcopy-birthday-message": "Cumpleaños copiado al Portapapeles",
     "birthday-readonly": "Cumpleaños del Monedero",
-    "birthday-no-readonly": "Altura de bloque de la primera transacción. (Está bien si no la sabes o no te acuerdas) Rango de valores entre",
+    "birthday-no-readonly": "Altura de bloque de la primera transacción. (Está bien si no la sabes o no te acuerdas)\nRango de valores entre",
     "change-warning": "Si cambias a otro monedero, ya no tendrás acceso a este monedero sin la frase semilla.",
     "backup-warning": "Si cambias a tu monedero anterior (copia de seguridad), ya no tendrás acceso a este monedero sin la frase semilla.",
     "server-warning": "Si cambias a un servidor con diferente tipo de cadena, ya no tendrás acceso a este monedero sin la frase semilla.",

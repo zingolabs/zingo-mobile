@@ -264,7 +264,7 @@
     "tapcopy-seed-message": "Copied Seed to Clipboard",
     "tapcopy-birthday-message": "Copied Birthday to Clipboard",
     "birthday-readonly": "Wallet Birthday",
-    "birthday-no-readonly": "Block height of first transaction. (It's OK, if you don't know) Value range between ",
+    "birthday-no-readonly": "Block height of first transaction. (It's OK, if you don't know)\nValue range between ",
     "change-warning": "If you change to another wallet, you will no longer have access to this wallet without the seed phrase.",
     "backup-warning": "If you change to your backup wallet, you will no longer have access to this wallet without the seed phrase.",
     "server-warning": "If you change to a server with different chain, you will no longer have access to this wallet without the seed phrase.",

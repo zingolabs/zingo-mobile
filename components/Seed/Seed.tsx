@@ -283,7 +283,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
             borderWidth: 1,
             borderRadius: 10,
             borderColor: colors.text,
-            maxHeight: '40%',
+            maxHeight: '45%',
           }}>
           {readOnly ? (
             <TouchableOpacity
