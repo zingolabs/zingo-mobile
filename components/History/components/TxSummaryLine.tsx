@@ -33,7 +33,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
   const { translate, language, privacy, info, mode } = context;
   const { colors } = useTheme() as unknown as ThemeType;
 
-  const amount = tx.txDetails.reduce((s, d) => s + d.amount, 0);
+  const amount = tx.txDetails.reduce((s, d) => s + d.amount, 0) + (tx.fee ? tx.fee : 0);
 
   const amountColor =
     tx.confirmations === 0 ? colors.primaryDisabled : tx.type === 'Received' ? colors.primary : colors.text;
@@ -125,7 +125,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
                           paddingRight: 10,
                           margin: 0,
                         }}
-                        size={tx.txDetails.length === 1 ? 18 : 15}
+                        size={15}
                         currencyName={info.currencyName ? info.currencyName : ''}
                         color={amountColor}
                         amtZec={txd.amount}
@@ -149,7 +149,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
                   : (translate('history.sendtoself') as string)}
               </FadeText>
               <FadeText>{tx.time ? moment((tx.time || 0) * 1000).format('MMM D, h:mm a') : '--'}</FadeText>
-              {!!amount && (tx.txDetails.length > 1 || (tx.txDetails.length === 1 && tx.type === 'Received')) && (
+              {!!amount && (
                 <ZecAmount
                   style={{ flexGrow: 1, justifyContent: 'flex-end', paddingRight: 10, margin: 0 }}
                   size={18}
