@@ -118,19 +118,21 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
                         </>
                       )}
                       {!!txd.pool && <FadeText style={{ fontSize: 15 }}>{txd.pool}</FadeText>}
-                      <ZecAmount
-                        style={{
-                          flexGrow: 1,
-                          justifyContent: 'flex-end',
-                          paddingRight: 10,
-                          margin: 0,
-                        }}
-                        size={15}
-                        currencyName={info.currencyName ? info.currencyName : ''}
-                        color={amountColor}
-                        amtZec={txd.amount}
-                        privacy={privacy}
-                      />
+                      {tx.txDetails.length > 1 && (
+                        <ZecAmount
+                          style={{
+                            flexGrow: 1,
+                            justifyContent: 'flex-end',
+                            paddingRight: 10,
+                            margin: 0,
+                          }}
+                          size={15}
+                          currencyName={info.currencyName ? info.currencyName : ''}
+                          color={amountColor}
+                          amtZec={txd.amount}
+                          privacy={privacy}
+                        />
+                      )}
                     </View>
                   );
                 })}
