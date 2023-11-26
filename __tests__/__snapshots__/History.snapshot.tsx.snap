@@ -794,7 +794,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                           }
                         }
                       >
-                        fee:
+                        text translated
                       </Text>
                       <RNSVGSvgView
                         align="xMidYMid"
@@ -1521,7 +1521,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                           }
                         }
                       >
-                        fee:
+                        text translated
                       </Text>
                       <RNSVGSvgView
                         align="xMidYMid"
@@ -2818,7 +2818,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                           }
                         }
                       >
-                        fee:
+                        text translated
                       </Text>
                       <RNSVGSvgView
                         align="xMidYMid"
@@ -3244,7 +3244,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                           }
                         }
                       >
-                        fee:
+                        text translated
                       </Text>
                       <RNSVGSvgView
                         align="xMidYMid"

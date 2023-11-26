@@ -98,7 +98,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
                   color={amountColor}
                   amtZec={tx.fee}
                   privacy={privacy}
-                  label={'fee:'}
+                  label={translate('send.fee') as string}
                 />
               )}
             </View>
