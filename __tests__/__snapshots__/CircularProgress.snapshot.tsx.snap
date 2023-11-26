@@ -3,7 +3,7 @@
 exports[`Component CircularProgress - test CircularProgress - snapshot 1`] = `
 <View
   style={
-    {
+    Object {
       "margin": 10,
     }
   }
@@ -14,12 +14,12 @@ exports[`Component CircularProgress - test CircularProgress - snapshot 1`] = `
     focusable={false}
     height={100}
     style={
-      [
-        {
+      Array [
+        Object {
           "backgroundColor": "transparent",
           "borderWidth": 0,
         },
-        {
+        Object {
           "flex": 0,
           "height": 100,
           "width": 100,
@@ -30,7 +30,7 @@ exports[`Component CircularProgress - test CircularProgress - snapshot 1`] = `
   >
     <RNSVGGroup
       fill={
-        {
+        Object {
           "payload": 4278190080,
           "type": 0,
         }
@@ -41,7 +41,7 @@ exports[`Component CircularProgress - test CircularProgress - snapshot 1`] = `
         cy="50"
         fill={null}
         propList={
-          [
+          Array [
             "fill",
             "stroke",
             "strokeWidth",
@@ -49,7 +49,7 @@ exports[`Component CircularProgress - test CircularProgress - snapshot 1`] = `
         }
         r="47.5"
         stroke={
-          {
+          Object {
             "payload": 4294967295,
             "type": 0,
           }
@@ -61,7 +61,7 @@ exports[`Component CircularProgress - test CircularProgress - snapshot 1`] = `
         cy="50"
         fill={null}
         matrix={
-          [
+          Array [
             6.123233995736766e-17,
             -1,
             1,
@@ -71,7 +71,7 @@ exports[`Component CircularProgress - test CircularProgress - snapshot 1`] = `
           ]
         }
         propList={
-          [
+          Array [
             "fill",
             "stroke",
             "strokeWidth",
@@ -82,13 +82,13 @@ exports[`Component CircularProgress - test CircularProgress - snapshot 1`] = `
         }
         r="47.5"
         stroke={
-          {
+          Object {
             "payload": 4278221567,
             "type": 0,
           }
         }
         strokeDasharray={
-          [
+          Array [
             "298.45130209103036",
             "298.45130209103036",
           ]
@@ -99,51 +99,51 @@ exports[`Component CircularProgress - test CircularProgress - snapshot 1`] = `
       />
       <RNSVGText
         content={null}
-        dx={[]}
-        dy={[]}
+        dx={Array []}
+        dy={Array []}
         fill={
-          {
+          Object {
             "payload": 4280032286,
             "type": 0,
           }
         }
         font={
-          {
+          Object {
             "fontSize": "20",
             "textAnchor": "middle",
           }
         }
         propList={
-          [
+          Array [
             "fill",
           ]
         }
-        rotate={[]}
+        rotate={Array []}
         x={
-          [
+          Array [
             "50",
           ]
         }
         y={
-          [
+          Array [
             "59",
           ]
         }
       >
         <RNSVGTSpan
           content="50%"
-          dx={[]}
-          dy={[]}
+          dx={Array []}
+          dy={Array []}
           fill={
-            {
+            Object {
               "payload": 4278190080,
               "type": 0,
             }
           }
-          font={{}}
-          rotate={[]}
-          x={[]}
-          y={[]}
+          font={Object {}}
+          rotate={Array []}
+          x={Array []}
+          y={Array []}
         />
       </RNSVGText>
     </RNSVGGroup>

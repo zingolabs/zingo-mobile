@@ -17,6 +17,7 @@ type ZecAmountProps = {
   privacy?: boolean;
   smallPrefix?: boolean;
   testID?: string;
+  label?: string;
 };
 
 const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
@@ -28,6 +29,7 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
   privacy,
   smallPrefix,
   testID,
+  label,
 }) => {
   const [privacyHigh, setPrivacyHigh] = useState<boolean>(privacy || false);
   const splits = Utils.splitZecAmountIntoBigSmall(amtZec);
@@ -75,7 +77,7 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
   //console.log(xml);
 
   return (
-    <View style={{ ...style, flexDirection: 'row', margin: 5 }}>
+    <View style={{ flexDirection: 'row', margin: 5, ...style }}>
       <TouchableOpacity disabled={!privacyHigh} onPress={onPress}>
         <View
           testID={testID}
@@ -85,6 +87,18 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
             margin: 0,
             padding: 0,
           }}>
+          {label && (
+            <Text
+              style={{
+                fontSize: size * (smallPrefix ? 0.7 : 1),
+                color,
+                margin: 0,
+                padding: 0,
+                paddingRight: 5,
+              }}>
+              {label}
+            </Text>
+          )}
           {currencyName === 'ZEC' ? (
             <SvgXml
               width={size * 2 * (smallPrefix ? 0.7 : 1)}

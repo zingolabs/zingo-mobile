@@ -3,7 +3,7 @@
 exports[`Component Insight - test Insight - snapshot 1`] = `
 <RCTSafeAreaView
   style={
-    {
+    Object {
       "alignItems": "stretch",
       "backgroundColor": "rgb(242, 242, 242)",
       "display": "flex",
@@ -14,7 +14,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
 >
   <View
     style={
-      {
+      Object {
         "alignItems": "center",
         "backgroundColor": "rgb(255, 255, 255)",
         "display": "flex",
@@ -27,7 +27,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
   >
     <View
       style={
-        {
+        Object {
           "alignItems": "center",
           "display": "flex",
           "flexDirection": "row",
@@ -41,14 +41,14 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
     />
     <View
       style={
-        {
+        Object {
           "height": 20,
         }
       }
     />
     <View
       style={
-        {
+        Object {
           "alignItems": "center",
           "display": "flex",
           "flexDirection": "column",
@@ -59,7 +59,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
     >
       <Text
         style={
-          {
+          Object {
             "color": "rgb(28, 28, 30)",
             "fontSize": 18,
             "fontWeight": "600",
@@ -73,7 +73,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
     </View>
     <View
       style={
-        {
+        Object {
           "alignItems": "flex-start",
           "left": 0,
           "padding": 11.5,
@@ -83,7 +83,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
     >
       <View
         style={
-          {
+          Object {
             "alignItems": "center",
             "flexDirection": "row",
           }
@@ -92,7 +92,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
     </View>
     <View
       style={
-        {
+        Object {
           "alignItems": "flex-end",
           "padding": 15,
           "position": "absolute",
@@ -102,12 +102,12 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
     >
       <Image
         source={
-          {
+          Object {
             "testUri": "../../../assets/img/logobig-zingo.png",
           }
         }
         style={
-          {
+          Object {
             "borderRadius": 10,
             "height": 38,
             "resizeMode": "contain",
@@ -118,7 +118,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
     </View>
     <View
       style={
-        {
+        Object {
           "backgroundColor": "rgb(0, 122, 255)",
           "height": 1,
           "width": "100%",
@@ -128,7 +128,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
   </View>
   <View
     style={
-      {
+      Object {
         "flexDirection": "row",
         "marginTop": 10,
         "width": "100%",
@@ -147,14 +147,14 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        {
+        Object {
           "opacity": 1,
         }
       }
     >
       <View
         style={
-          {
+          Object {
             "alignItems": "center",
             "borderBottomColor": "rgb(0, 122, 255)",
             "borderBottomWidth": 2,
@@ -165,7 +165,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
       >
         <Text
           style={
-            {
+            Object {
               "color": "rgb(28, 28, 30)",
               "fontSize": 15,
               "fontWeight": "bold",
@@ -177,7 +177,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
         </Text>
         <Text
           style={
-            {
+            Object {
               "color": "rgb(0, 122, 255)",
               "fontSize": 11,
               "fontWeight": "600",
@@ -203,14 +203,14 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        {
+        Object {
           "opacity": 1,
         }
       }
     >
       <View
         style={
-          {
+          Object {
             "alignItems": "center",
             "borderBottomColor": "rgb(0, 122, 255)",
             "borderBottomWidth": 0,
@@ -221,7 +221,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
       >
         <Text
           style={
-            {
+            Object {
               "color": "rgb(28, 28, 30)",
               "fontSize": 14,
               "fontWeight": "normal",
@@ -233,7 +233,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
         </Text>
         <Text
           style={
-            {
+            Object {
               "color": "rgb(28, 28, 30)",
               "fontSize": 11,
               "fontWeight": "600",
@@ -259,14 +259,14 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        {
+        Object {
           "opacity": 1,
         }
       }
     >
       <View
         style={
-          {
+          Object {
             "alignItems": "center",
             "borderBottomColor": "rgb(0, 122, 255)",
             "borderBottomWidth": 0,
@@ -277,7 +277,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
       >
         <Text
           style={
-            {
+            Object {
               "color": "rgb(28, 28, 30)",
               "fontSize": 14,
               "fontWeight": "normal",
@@ -289,7 +289,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
         </Text>
         <Text
           style={
-            {
+            Object {
               "color": "rgb(28, 28, 30)",
               "fontSize": 11,
               "fontWeight": "600",
@@ -305,12 +305,12 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
     </View>
   </View>
   <RCTScrollView
-    contentContainerStyle={{}}
+    contentContainerStyle={Object {}}
     indicatorStyle="white"
     persistentScrollbar={true}
     showsVerticalScrollIndicator={true}
     style={
-      {
+      Object {
         "maxHeight": "85%",
       }
     }
@@ -318,7 +318,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
     <View>
       <View
         style={
-          {
+          Object {
             "display": "flex",
             "margin": 20,
           }
@@ -328,7 +328,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
           color="rgb(0, 122, 255)"
           size="large"
           style={
-            {
+            Object {
               "marginTop": 100,
             }
           }
@@ -336,7 +336,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
       </View>
       <View
         style={
-          {
+          Object {
             "alignItems": "center",
             "display": "flex",
             "marginHorizontal": 5,
@@ -346,7 +346,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
       >
         <View
           style={
-            {
+            Object {
               "width": "100%",
             }
           }
@@ -356,7 +356,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
   </RCTScrollView>
   <View
     style={
-      {
+      Object {
         "alignItems": "center",
         "flexDirection": "row",
         "flexGrow": 1,
@@ -377,7 +377,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        {
+        Object {
           "alignItems": "center",
           "backgroundColor": "rgb(242, 242, 242)",
           "borderColor": "rgb(0, 122, 255)",
@@ -396,7 +396,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
     >
       <View
         style={
-          {
+          Object {
             "alignItems": "center",
             "display": "flex",
             "flexDirection": "row",
@@ -410,7 +410,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
       >
         <Text
           style={
-            {
+            Object {
               "color": "rgb(0, 122, 255)",
               "fontSize": 16,
               "fontWeight": "bold",

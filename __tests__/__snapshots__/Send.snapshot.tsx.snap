@@ -5,7 +5,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
   accessibilityLabel="text translated"
   accessible={true}
   style={
-    {
+    Object {
       "display": "flex",
       "height": "100%",
       "justifyContent": "flex-start",
@@ -29,21 +29,21 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
     visible={false}
   />
   <RCTScrollView
-    contentContainerStyle={{}}
+    contentContainerStyle={Object {}}
     keyboardShouldPersistTaps="handled"
     testID="send.scroll-view"
   >
     <View>
       <View
         style={
-          {
+          Object {
             "marginBottom": 30,
           }
         }
       >
         <View
           style={
-            {
+            Object {
               "display": "flex",
               "marginTop": 10,
               "padding": 10,
@@ -52,7 +52,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
         >
           <View
             style={
-              {
+              Object {
                 "display": "flex",
                 "flexDirection": "row",
                 "justifyContent": "space-between",
@@ -61,7 +61,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
           >
             <Text
               style={
-                {
+                Object {
                   "color": "#c3c3c3",
                   "fontSize": 18,
                   "fontWeight": "600",
@@ -74,7 +74,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
           </View>
           <View
             style={
-              {
+              Object {
                 "borderColor": "#c3c3c3",
                 "borderRadius": 5,
                 "borderWidth": 1,
@@ -85,7 +85,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
           >
             <View
               style={
-                {
+                Object {
                   "flexDirection": "row",
                 }
               }
@@ -94,7 +94,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                 accessibilityLabel="text translated"
                 accessible={true}
                 style={
-                  {
+                  Object {
                     "flex": 1,
                     "justifyContent": "center",
                   }
@@ -106,7 +106,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                   placeholder="text translated"
                   placeholderTextColor="#888888"
                   style={
-                    {
+                    Object {
                       "backgroundColor": "transparent",
                       "color": "#c3c3c3",
                       "fontSize": 16,
@@ -120,7 +120,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
               </View>
               <View
                 style={
-                  {
+                  Object {
                     "width": 58,
                   }
                 }
@@ -138,7 +138,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
                   style={
-                    {
+                    Object {
                       "opacity": 1,
                     }
                   }
@@ -147,11 +147,11 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                   <
                     color="#ffffff"
                     icon={
-                      {
-                        "icon": [
+                      Object {
+                        "icon": Array [
                           448,
                           512,
-                          [],
+                          Array [],
                           "f029",
                           "M0 80C0 53.5 21.5 32 48 32h96c26.5 0 48 21.5 48 48v96c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V80zM64 96v64h64V96H64zM0 336c0-26.5 21.5-48 48-48h96c26.5 0 48 21.5 48 48v96c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V336zm64 16v64h64V352H64zM304 32h96c26.5 0 48 21.5 48 48v96c0 26.5-21.5 48-48 48H304c-26.5 0-48-21.5-48-48V80c0-26.5 21.5-48 48-48zm80 64H320v64h64V96zM256 304c0-8.8 7.2-16 16-16h64c8.8 0 16 7.2 16 16s7.2 16 16 16h32c8.8 0 16-7.2 16-16s7.2-16 16-16s16 7.2 16 16v96c0 8.8-7.2 16-16 16H368c-8.8 0-16-7.2-16-16s-7.2-16-16-16s-16 7.2-16 16v64c0 8.8-7.2 16-16 16H272c-8.8 0-16-7.2-16-16V304zM368 480a16 16 0 1 1 0-32 16 16 0 1 1 0 32zm64 0a16 16 0 1 1 0-32 16 16 0 1 1 0 32z",
                         ],
@@ -161,7 +161,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                     }
                     size={48}
                     style={
-                      {
+                      Object {
                         "margin": 5,
                       }
                     }
@@ -172,7 +172,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
           </View>
           <View
             style={
-              {
+              Object {
                 "display": "flex",
                 "flexDirection": "row",
                 "justifyContent": "space-between",
@@ -182,7 +182,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
           >
             <View
               style={
-                {
+                Object {
                   "flexDirection": "row",
                   "justifyContent": "flex-end",
                   "minHeight": 48,
@@ -192,7 +192,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
             >
               <View
                 style={
-                  {
+                  Object {
                     "alignItems": "center",
                     "borderRadius": 10,
                     "justifyContent": "flex-end",
@@ -206,7 +206,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
               >
                 <Text
                   style={
-                    {
+                    Object {
                       "color": "#c3c3c3",
                       "opacity": 0.65,
                     }
@@ -218,7 +218,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
             </View>
             <Text
               style={
-                {
+                Object {
                   "color": "#18bd18",
                 }
               }
@@ -228,7 +228,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
           </View>
           <View
             style={
-              {
+              Object {
                 "display": "flex",
                 "flexDirection": "row",
                 "justifyContent": "space-between",
@@ -237,7 +237,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
           >
             <View
               style={
-                {
+                Object {
                   "display": "flex",
                   "flexDirection": "column",
                   "justifyContent": "flex-start",
@@ -247,7 +247,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
             >
               <View
                 style={
-                  {
+                  Object {
                     "display": "flex",
                     "flexDirection": "row",
                     "justifyContent": "flex-start",
@@ -256,15 +256,15 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
               >
                 <Text
                   style={
-                    {
+                    Object {
                       "color": "#c3c3c3",
                       "fontSize": 20,
                       "fontWeight": "600",
                       "marginRight": 5,
                       "marginTop": 22,
                       "opacity": 1,
-                      "transform": [
-                        {
+                      "transform": Array [
+                        Object {
                           "scaleY": 1.5,
                         },
                       ],
@@ -277,7 +277,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                   accessibilityLabel="text translated"
                   accessible={true}
                   style={
-                    {
+                    Object {
                       "borderColor": "#c3c3c3",
                       "borderRadius": 5,
                       "borderWidth": 1,
@@ -298,7 +298,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                     placeholder="#.########"
                     placeholderTextColor="#888888"
                     style={
-                      {
+                      Object {
                         "backgroundColor": "transparent",
                         "color": "#c3c3c3",
                         "fontSize": 18,
@@ -315,7 +315,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
               </View>
               <View
                 style={
-                  {
+                  Object {
                     "display": "flex",
                     "flexDirection": "column",
                   }
@@ -323,7 +323,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
               >
                 <View
                   style={
-                    {
+                    Object {
                       "alignItems": "center",
                       "display": "flex",
                       "flexDirection": "row",
@@ -334,7 +334,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                 >
                   <Text
                     style={
-                      {
+                      Object {
                         "color": "#c3c3c3",
                         "fontSize": 14,
                         "fontWeight": "600",
@@ -346,7 +346,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                   </Text>
                   <View
                     style={
-                      {
+                      Object {
                         "flexDirection": "row",
                         "margin": 5,
                       }
@@ -354,7 +354,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                   >
                     <View
                       accessibilityState={
-                        {
+                        Object {
                           "disabled": false,
                         }
                       }
@@ -369,14 +369,14 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                       onResponderTerminationRequest={[Function]}
                       onStartShouldSetResponder={[Function]}
                       style={
-                        {
+                        Object {
                           "opacity": 1,
                         }
                       }
                     >
                       <View
                         style={
-                          {
+                          Object {
                             "alignItems": "flex-end",
                             "flexDirection": "row",
                             "margin": 0,
@@ -395,15 +395,15 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                           minX={0}
                           minY={0}
                           style={
-                            [
-                              {
+                            Array [
+                              Object {
                                 "backgroundColor": "transparent",
                                 "borderWidth": 0,
                               },
-                              {
+                              Object {
                                 "marginBottom": 0.75,
                               },
-                              {
+                              Object {
                                 "flex": 0,
                                 "height": 15,
                                 "width": 30,
@@ -413,22 +413,22 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                           vbHeight={147.85}
                           vbWidth={282.84}
                           width={30}
-                          xml="<?xml version="1.0" encoding="UTF-8"?>
-  <svg viewBox="0 0 282.84 147.85">
-    <polygon points="34.44 107.62 34.44 106.98 87.19 34.17 87.19 20.12 56.09 20.12 56.09 0 35.98 0 35.98 20.12 5.04 20.12 5.04 40.24 53.93 40.24 53.93 40.88 0 114.64 0 127.73 35.98 127.73 35.98 147.85 56.09 147.85 56.09 127.73 88.03 127.73 88.03 107.62 34.44 107.62"/>
-    <polygon points="180.89 39.03 180.89 19.35 124.56 19.35 110.48 19.35 102.52 19.35 102.52 127.75 110.48 127.75 124.56 127.75 180.89 127.75 180.89 108.07 124.56 108.07 124.56 83.77 172.04 83.77 172.04 64.09 124.56 64.09 124.56 39.03 180.89 39.03"/>
-    <path d="m240.92,128.87c-8.96,0-16.59-1.58-22.89-4.73-6.3-3.16-11.12-7.75-14.44-13.79-3.33-6.04-4.99-13.33-4.99-21.88v-29.75c0-8.6,1.66-15.9,4.99-21.92,3.33-6.01,8.14-10.61,14.44-13.79,6.3-3.18,13.93-4.77,22.89-4.77,7.4,0,13.99,1.47,19.75,4.4,5.77,2.93,10.54,7.18,14.32,12.75,3.78,5.57,6.4,12.33,7.85,20.28h-22.85c-.86-3.63-2.19-6.7-3.98-9.21-1.8-2.51-3.97-4.44-6.52-5.78-2.55-1.34-5.41-2.01-8.57-2.01-6.17,0-10.96,1.75-14.36,5.26-3.41,3.5-5.11,8.44-5.11,14.8v29.75c0,6.36,1.7,11.28,5.11,14.76,3.41,3.48,8.19,5.22,14.36,5.22,4.83,0,8.9-1.48,12.23-4.44,3.33-2.96,5.61-7.14,6.84-12.56h22.85c-1.5,7.9-4.14,14.65-7.93,20.24-3.78,5.59-8.54,9.85-14.28,12.79-5.74,2.93-12.31,4.4-19.71,4.4Z"/>
+                          xml="<?xml version=\\"1.0\\" encoding=\\"UTF-8\\"?>
+  <svg viewBox=\\"0 0 282.84 147.85\\">
+    <polygon points=\\"34.44 107.62 34.44 106.98 87.19 34.17 87.19 20.12 56.09 20.12 56.09 0 35.98 0 35.98 20.12 5.04 20.12 5.04 40.24 53.93 40.24 53.93 40.88 0 114.64 0 127.73 35.98 127.73 35.98 147.85 56.09 147.85 56.09 127.73 88.03 127.73 88.03 107.62 34.44 107.62\\"/>
+    <polygon points=\\"180.89 39.03 180.89 19.35 124.56 19.35 110.48 19.35 102.52 19.35 102.52 127.75 110.48 127.75 124.56 127.75 180.89 127.75 180.89 108.07 124.56 108.07 124.56 83.77 172.04 83.77 172.04 64.09 124.56 64.09 124.56 39.03 180.89 39.03\\"/>
+    <path d=\\"m240.92,128.87c-8.96,0-16.59-1.58-22.89-4.73-6.3-3.16-11.12-7.75-14.44-13.79-3.33-6.04-4.99-13.33-4.99-21.88v-29.75c0-8.6,1.66-15.9,4.99-21.92,3.33-6.01,8.14-10.61,14.44-13.79,6.3-3.18,13.93-4.77,22.89-4.77,7.4,0,13.99,1.47,19.75,4.4,5.77,2.93,10.54,7.18,14.32,12.75,3.78,5.57,6.4,12.33,7.85,20.28h-22.85c-.86-3.63-2.19-6.7-3.98-9.21-1.8-2.51-3.97-4.44-6.52-5.78-2.55-1.34-5.41-2.01-8.57-2.01-6.17,0-10.96,1.75-14.36,5.26-3.41,3.5-5.11,8.44-5.11,14.8v29.75c0,6.36,1.7,11.28,5.11,14.76,3.41,3.48,8.19,5.22,14.36,5.22,4.83,0,8.9-1.48,12.23-4.44,3.33-2.96,5.61-7.14,6.84-12.56h22.85c-1.5,7.9-4.14,14.65-7.93,20.24-3.78,5.59-8.54,9.85-14.28,12.79-5.74,2.93-12.31,4.4-19.71,4.4Z\\"/>
   </svg>"
                         >
                           <RNSVGGroup
                             fill={
-                              {
+                              Object {
                                 "payload": 4294901760,
                                 "type": 0,
                               }
                             }
                             propList={
-                              [
+                              Array [
                                 "fill",
                               ]
                             }
@@ -436,7 +436,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                             <RNSVGPath
                               d="M34.44 107.62 34.44 106.98 87.19 34.17 87.19 20.12 56.09 20.12 56.09 0 35.98 0 35.98 20.12 5.04 20.12 5.04 40.24 53.93 40.24 53.93 40.88 0 114.64 0 127.73 35.98 127.73 35.98 147.85 56.09 147.85 56.09 127.73 88.03 127.73 88.03 107.62 34.44 107.62z"
                               fill={
-                                {
+                                Object {
                                   "payload": 4278190080,
                                   "type": 0,
                                 }
@@ -445,7 +445,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                             <RNSVGPath
                               d="M180.89 39.03 180.89 19.35 124.56 19.35 110.48 19.35 102.52 19.35 102.52 127.75 110.48 127.75 124.56 127.75 180.89 127.75 180.89 108.07 124.56 108.07 124.56 83.77 172.04 83.77 172.04 64.09 124.56 64.09 124.56 39.03 180.89 39.03z"
                               fill={
-                                {
+                                Object {
                                   "payload": 4278190080,
                                   "type": 0,
                                 }
@@ -454,7 +454,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                             <RNSVGPath
                               d="m240.92,128.87c-8.96,0-16.59-1.58-22.89-4.73-6.3-3.16-11.12-7.75-14.44-13.79-3.33-6.04-4.99-13.33-4.99-21.88v-29.75c0-8.6,1.66-15.9,4.99-21.92,3.33-6.01,8.14-10.61,14.44-13.79,6.3-3.18,13.93-4.77,22.89-4.77,7.4,0,13.99,1.47,19.75,4.4,5.77,2.93,10.54,7.18,14.32,12.75,3.78,5.57,6.4,12.33,7.85,20.28h-22.85c-.86-3.63-2.19-6.7-3.98-9.21-1.8-2.51-3.97-4.44-6.52-5.78-2.55-1.34-5.41-2.01-8.57-2.01-6.17,0-10.96,1.75-14.36,5.26-3.41,3.5-5.11,8.44-5.11,14.8v29.75c0,6.36,1.7,11.28,5.11,14.76,3.41,3.48,8.19,5.22,14.36,5.22,4.83,0,8.9-1.48,12.23-4.44,3.33-2.96,5.61-7.14,6.84-12.56h22.85c-1.5,7.9-4.14,14.65-7.93,20.24-3.78,5.59-8.54,9.85-14.28,12.79-5.74,2.93-12.31,4.4-19.71,4.4Z"
                               fill={
-                                {
+                                Object {
                                   "payload": 4278190080,
                                   "type": 0,
                                 }
@@ -464,7 +464,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                         </RNSVGSvgView>
                         <Text
                           style={
-                            {
+                            Object {
                               "color": "red",
                               "fontSize": 15,
                               "fontWeight": "700",
@@ -491,14 +491,14 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
                   style={
-                    {
+                    Object {
                       "opacity": 1,
                     }
                   }
                 >
                   <View
                     style={
-                      {
+                      Object {
                         "backgroundColor": "#011401",
                         "borderRadius": 10,
                         "display": "flex",
@@ -511,11 +511,11 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                     <
                       color="#18bd18"
                       icon={
-                        {
-                          "icon": [
+                        Object {
+                          "icon": Array [
                             512,
                             512,
-                            [
+                            Array [
                               "info-circle",
                             ],
                             "f05a",
@@ -527,14 +527,14 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                       }
                       size={20}
                       style={
-                        {
+                        Object {
                           "marginRight": 5,
                         }
                       }
                     />
                     <Text
                       style={
-                        {
+                        Object {
                           "color": "#c3c3c3",
                           "opacity": 0.65,
                         }
@@ -548,7 +548,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
             </View>
             <View
               style={
-                {
+                Object {
                   "display": "flex",
                   "flexDirection": "column",
                   "justifyContent": "flex-start",
@@ -558,7 +558,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
             >
               <View
                 style={
-                  {
+                  Object {
                     "display": "flex",
                     "flexDirection": "row",
                     "justifyContent": "flex-start",
@@ -567,7 +567,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
               >
                 <Text
                   style={
-                    {
+                    Object {
                       "color": "#c3c3c3",
                       "fontSize": 18,
                       "fontWeight": "600",
@@ -583,7 +583,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                   accessibilityLabel="text translated"
                   accessible={true}
                   style={
-                    {
+                    Object {
                       "borderColor": "#c3c3c3",
                       "borderRadius": 5,
                       "borderWidth": 1,
@@ -604,7 +604,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                     placeholder="#.##"
                     placeholderTextColor="#888888"
                     style={
-                      {
+                      Object {
                         "backgroundColor": "transparent",
                         "color": "#c3c3c3",
                         "fontSize": 18,
@@ -620,7 +620,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
               </View>
               <View
                 style={
-                  {
+                  Object {
                     "alignItems": "center",
                     "flexDirection": "column",
                   }
@@ -628,7 +628,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
               >
                 <View
                   style={
-                    {
+                    Object {
                       "alignItems": "center",
                       "flexDirection": "row",
                     }
@@ -636,7 +636,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                 >
                   <Text
                     style={
-                      {
+                      Object {
                         "color": "#c3c3c3",
                         "fontSize": 12.5,
                         "fontWeight": "600",
@@ -649,7 +649,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                   </Text>
                   <View
                     style={
-                      {
+                      Object {
                         "alignItems": "baseline",
                         "flexDirection": "row",
                       }
@@ -657,7 +657,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                   >
                     <View
                       accessibilityState={
-                        {
+                        Object {
                           "disabled": false,
                         }
                       }
@@ -672,14 +672,14 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                       onResponderTerminationRequest={[Function]}
                       onStartShouldSetResponder={[Function]}
                       style={
-                        {
+                        Object {
                           "opacity": 1,
                         }
                       }
                     >
                       <View
                         style={
-                          {
+                          Object {
                             "alignItems": "baseline",
                             "flexDirection": "row",
                           }
@@ -687,7 +687,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                       >
                         <Text
                           style={
-                            {
+                            Object {
                               "color": "#ffffff",
                               "fontSize": 12.5,
                               "marginTop": 11,
@@ -698,7 +698,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                         </Text>
                         <Text
                           style={
-                            {
+                            Object {
                               "color": "#ffffff",
                               "fontSize": 12.5,
                               "fontWeight": "700",
@@ -714,14 +714,14 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                 </View>
                 <View
                   style={
-                    {
+                    Object {
                       "marginLeft": 5,
                     }
                   }
                 >
                   <View
                     accessibilityState={
-                      {
+                      Object {
                         "disabled": false,
                       }
                     }
@@ -736,14 +736,14 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                     onResponderTerminationRequest={[Function]}
                     onStartShouldSetResponder={[Function]}
                     style={
-                      {
+                      Object {
                         "opacity": 1,
                       }
                     }
                   >
                     <View
                       style={
-                        {
+                        Object {
                           "alignItems": "center",
                           "backgroundColor": "#011401",
                           "borderRadius": 10,
@@ -759,11 +759,11 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                       <
                         color="#18bd18"
                         icon={
-                          {
-                            "icon": [
+                          Object {
+                            "icon": Array [
                               512,
                               512,
-                              [
+                              Array [
                                 128472,
                                 "refresh",
                                 "sync",
@@ -786,7 +786,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
         </View>
         <View
           style={
-            {
+            Object {
               "alignItems": "center",
               "flexDirection": "row",
               "flexGrow": 1,
@@ -798,7 +798,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
           <View
             accessibilityLabel="title text translated"
             accessibilityState={
-              {
+              Object {
                 "disabled": true,
               }
             }
@@ -813,7 +813,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
             style={
-              {
+              Object {
                 "alignItems": "center",
                 "backgroundColor": "#5a8c5a",
                 "borderColor": "#5a8c5a",
@@ -833,7 +833,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
           >
             <View
               style={
-                {
+                Object {
                   "alignItems": "center",
                   "display": "flex",
                   "flexDirection": "row",
@@ -847,7 +847,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
             >
               <Text
                 style={
-                  {
+                  Object {
                     "color": "#011401",
                     "fontSize": 16,
                     "fontWeight": "bold",
@@ -872,7 +872,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
             style={
-              {
+              Object {
                 "alignItems": "center",
                 "backgroundColor": "#011401",
                 "borderColor": "#18bd18",
@@ -892,7 +892,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
           >
             <View
               style={
-                {
+                Object {
                   "alignItems": "center",
                   "display": "flex",
                   "flexDirection": "row",
@@ -906,7 +906,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
             >
               <Text
                 style={
-                  {
+                  Object {
                     "color": "#18bd18",
                     "fontSize": 16,
                     "fontWeight": "bold",
@@ -931,7 +931,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
   accessibilityLabel="text translated"
   accessible={true}
   style={
-    {
+    Object {
       "display": "flex",
       "height": "100%",
       "justifyContent": "flex-start",
@@ -955,21 +955,21 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
     visible={false}
   />
   <RCTScrollView
-    contentContainerStyle={{}}
+    contentContainerStyle={Object {}}
     keyboardShouldPersistTaps="handled"
     testID="send.scroll-view"
   >
     <View>
       <View
         style={
-          {
+          Object {
             "marginBottom": 30,
           }
         }
       >
         <View
           style={
-            {
+            Object {
               "display": "flex",
               "marginTop": 10,
               "padding": 10,
@@ -978,7 +978,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
         >
           <View
             style={
-              {
+              Object {
                 "display": "flex",
                 "flexDirection": "row",
                 "justifyContent": "space-between",
@@ -987,7 +987,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
           >
             <Text
               style={
-                {
+                Object {
                   "color": "#c3c3c3",
                   "fontSize": 18,
                   "fontWeight": "600",
@@ -1000,7 +1000,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
           </View>
           <View
             style={
-              {
+              Object {
                 "borderColor": "#c3c3c3",
                 "borderRadius": 5,
                 "borderWidth": 1,
@@ -1011,7 +1011,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
           >
             <View
               style={
-                {
+                Object {
                   "flexDirection": "row",
                 }
               }
@@ -1020,7 +1020,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                 accessibilityLabel="text translated"
                 accessible={true}
                 style={
-                  {
+                  Object {
                     "flex": 1,
                     "justifyContent": "center",
                   }
@@ -1032,7 +1032,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                   placeholder="text translated"
                   placeholderTextColor="#888888"
                   style={
-                    {
+                    Object {
                       "backgroundColor": "transparent",
                       "color": "#c3c3c3",
                       "fontSize": 16,
@@ -1046,7 +1046,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
               </View>
               <View
                 style={
-                  {
+                  Object {
                     "width": 58,
                   }
                 }
@@ -1064,7 +1064,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
                   style={
-                    {
+                    Object {
                       "opacity": 1,
                     }
                   }
@@ -1073,11 +1073,11 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                   <
                     color="#ffffff"
                     icon={
-                      {
-                        "icon": [
+                      Object {
+                        "icon": Array [
                           448,
                           512,
-                          [],
+                          Array [],
                           "f029",
                           "M0 80C0 53.5 21.5 32 48 32h96c26.5 0 48 21.5 48 48v96c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V80zM64 96v64h64V96H64zM0 336c0-26.5 21.5-48 48-48h96c26.5 0 48 21.5 48 48v96c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V336zm64 16v64h64V352H64zM304 32h96c26.5 0 48 21.5 48 48v96c0 26.5-21.5 48-48 48H304c-26.5 0-48-21.5-48-48V80c0-26.5 21.5-48 48-48zm80 64H320v64h64V96zM256 304c0-8.8 7.2-16 16-16h64c8.8 0 16 7.2 16 16s7.2 16 16 16h32c8.8 0 16-7.2 16-16s7.2-16 16-16s16 7.2 16 16v96c0 8.8-7.2 16-16 16H368c-8.8 0-16-7.2-16-16s-7.2-16-16-16s-16 7.2-16 16v64c0 8.8-7.2 16-16 16H272c-8.8 0-16-7.2-16-16V304zM368 480a16 16 0 1 1 0-32 16 16 0 1 1 0 32zm64 0a16 16 0 1 1 0-32 16 16 0 1 1 0 32z",
                         ],
@@ -1087,7 +1087,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                     }
                     size={48}
                     style={
-                      {
+                      Object {
                         "margin": 5,
                       }
                     }
@@ -1098,7 +1098,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
           </View>
           <View
             style={
-              {
+              Object {
                 "display": "flex",
                 "flexDirection": "row",
                 "justifyContent": "space-between",
@@ -1108,7 +1108,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
           >
             <View
               style={
-                {
+                Object {
                   "flexDirection": "row",
                   "justifyContent": "flex-end",
                   "minHeight": 48,
@@ -1118,7 +1118,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
             >
               <View
                 style={
-                  {
+                  Object {
                     "alignItems": "center",
                     "borderRadius": 10,
                     "justifyContent": "flex-end",
@@ -1132,7 +1132,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
               >
                 <Text
                   style={
-                    {
+                    Object {
                       "color": "#c3c3c3",
                       "opacity": 0.65,
                     }
@@ -1144,7 +1144,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
             </View>
             <Text
               style={
-                {
+                Object {
                   "color": "#18bd18",
                 }
               }
@@ -1154,7 +1154,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
           </View>
           <View
             style={
-              {
+              Object {
                 "display": "flex",
                 "flexDirection": "row",
                 "justifyContent": "space-between",
@@ -1163,7 +1163,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
           >
             <View
               style={
-                {
+                Object {
                   "display": "flex",
                   "flexDirection": "column",
                   "justifyContent": "flex-start",
@@ -1173,7 +1173,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
             >
               <View
                 style={
-                  {
+                  Object {
                     "display": "flex",
                     "flexDirection": "row",
                     "justifyContent": "flex-start",
@@ -1182,15 +1182,15 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
               >
                 <Text
                   style={
-                    {
+                    Object {
                       "color": "#c3c3c3",
                       "fontSize": 20,
                       "fontWeight": "600",
                       "marginRight": 5,
                       "marginTop": 22,
                       "opacity": 1,
-                      "transform": [
-                        {
+                      "transform": Array [
+                        Object {
                           "scaleY": 1.5,
                         },
                       ],
@@ -1203,7 +1203,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                   accessibilityLabel="text translated"
                   accessible={true}
                   style={
-                    {
+                    Object {
                       "borderColor": "#c3c3c3",
                       "borderRadius": 5,
                       "borderWidth": 1,
@@ -1224,7 +1224,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                     placeholder="#.########"
                     placeholderTextColor="#888888"
                     style={
-                      {
+                      Object {
                         "backgroundColor": "transparent",
                         "color": "#c3c3c3",
                         "fontSize": 18,
@@ -1241,7 +1241,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
               </View>
               <View
                 style={
-                  {
+                  Object {
                     "display": "flex",
                     "flexDirection": "column",
                   }
@@ -1249,7 +1249,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
               >
                 <View
                   style={
-                    {
+                    Object {
                       "alignItems": "center",
                       "display": "flex",
                       "flexDirection": "row",
@@ -1260,7 +1260,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                 >
                   <Text
                     style={
-                      {
+                      Object {
                         "color": "#c3c3c3",
                         "fontSize": 14,
                         "fontWeight": "600",
@@ -1272,7 +1272,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                   </Text>
                   <View
                     style={
-                      {
+                      Object {
                         "flexDirection": "row",
                         "margin": 5,
                       }
@@ -1280,7 +1280,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                   >
                     <View
                       accessibilityState={
-                        {
+                        Object {
                           "disabled": true,
                         }
                       }
@@ -1295,14 +1295,14 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                       onResponderTerminationRequest={[Function]}
                       onStartShouldSetResponder={[Function]}
                       style={
-                        {
+                        Object {
                           "opacity": 1,
                         }
                       }
                     >
                       <View
                         style={
-                          {
+                          Object {
                             "alignItems": "flex-end",
                             "flexDirection": "row",
                             "margin": 0,
@@ -1321,15 +1321,15 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                           minX={0}
                           minY={0}
                           style={
-                            [
-                              {
+                            Array [
+                              Object {
                                 "backgroundColor": "transparent",
                                 "borderWidth": 0,
                               },
-                              {
+                              Object {
                                 "marginBottom": 0.75,
                               },
-                              {
+                              Object {
                                 "flex": 0,
                                 "height": 15,
                                 "width": 30,
@@ -1339,22 +1339,22 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                           vbHeight={147.85}
                           vbWidth={282.84}
                           width={30}
-                          xml="<?xml version="1.0" encoding="UTF-8"?>
-  <svg viewBox="0 0 282.84 147.85">
-    <polygon points="34.44 107.62 34.44 106.98 87.19 34.17 87.19 20.12 56.09 20.12 56.09 0 35.98 0 35.98 20.12 5.04 20.12 5.04 40.24 53.93 40.24 53.93 40.88 0 114.64 0 127.73 35.98 127.73 35.98 147.85 56.09 147.85 56.09 127.73 88.03 127.73 88.03 107.62 34.44 107.62"/>
-    <polygon points="180.89 39.03 180.89 19.35 124.56 19.35 110.48 19.35 102.52 19.35 102.52 127.75 110.48 127.75 124.56 127.75 180.89 127.75 180.89 108.07 124.56 108.07 124.56 83.77 172.04 83.77 172.04 64.09 124.56 64.09 124.56 39.03 180.89 39.03"/>
-    <path d="m240.92,128.87c-8.96,0-16.59-1.58-22.89-4.73-6.3-3.16-11.12-7.75-14.44-13.79-3.33-6.04-4.99-13.33-4.99-21.88v-29.75c0-8.6,1.66-15.9,4.99-21.92,3.33-6.01,8.14-10.61,14.44-13.79,6.3-3.18,13.93-4.77,22.89-4.77,7.4,0,13.99,1.47,19.75,4.4,5.77,2.93,10.54,7.18,14.32,12.75,3.78,5.57,6.4,12.33,7.85,20.28h-22.85c-.86-3.63-2.19-6.7-3.98-9.21-1.8-2.51-3.97-4.44-6.52-5.78-2.55-1.34-5.41-2.01-8.57-2.01-6.17,0-10.96,1.75-14.36,5.26-3.41,3.5-5.11,8.44-5.11,14.8v29.75c0,6.36,1.7,11.28,5.11,14.76,3.41,3.48,8.19,5.22,14.36,5.22,4.83,0,8.9-1.48,12.23-4.44,3.33-2.96,5.61-7.14,6.84-12.56h22.85c-1.5,7.9-4.14,14.65-7.93,20.24-3.78,5.59-8.54,9.85-14.28,12.79-5.74,2.93-12.31,4.4-19.71,4.4Z"/>
+                          xml="<?xml version=\\"1.0\\" encoding=\\"UTF-8\\"?>
+  <svg viewBox=\\"0 0 282.84 147.85\\">
+    <polygon points=\\"34.44 107.62 34.44 106.98 87.19 34.17 87.19 20.12 56.09 20.12 56.09 0 35.98 0 35.98 20.12 5.04 20.12 5.04 40.24 53.93 40.24 53.93 40.88 0 114.64 0 127.73 35.98 127.73 35.98 147.85 56.09 147.85 56.09 127.73 88.03 127.73 88.03 107.62 34.44 107.62\\"/>
+    <polygon points=\\"180.89 39.03 180.89 19.35 124.56 19.35 110.48 19.35 102.52 19.35 102.52 127.75 110.48 127.75 124.56 127.75 180.89 127.75 180.89 108.07 124.56 108.07 124.56 83.77 172.04 83.77 172.04 64.09 124.56 64.09 124.56 39.03 180.89 39.03\\"/>
+    <path d=\\"m240.92,128.87c-8.96,0-16.59-1.58-22.89-4.73-6.3-3.16-11.12-7.75-14.44-13.79-3.33-6.04-4.99-13.33-4.99-21.88v-29.75c0-8.6,1.66-15.9,4.99-21.92,3.33-6.01,8.14-10.61,14.44-13.79,6.3-3.18,13.93-4.77,22.89-4.77,7.4,0,13.99,1.47,19.75,4.4,5.77,2.93,10.54,7.18,14.32,12.75,3.78,5.57,6.4,12.33,7.85,20.28h-22.85c-.86-3.63-2.19-6.7-3.98-9.21-1.8-2.51-3.97-4.44-6.52-5.78-2.55-1.34-5.41-2.01-8.57-2.01-6.17,0-10.96,1.75-14.36,5.26-3.41,3.5-5.11,8.44-5.11,14.8v29.75c0,6.36,1.7,11.28,5.11,14.76,3.41,3.48,8.19,5.22,14.36,5.22,4.83,0,8.9-1.48,12.23-4.44,3.33-2.96,5.61-7.14,6.84-12.56h22.85c-1.5,7.9-4.14,14.65-7.93,20.24-3.78,5.59-8.54,9.85-14.28,12.79-5.74,2.93-12.31,4.4-19.71,4.4Z\\"/>
   </svg>"
                         >
                           <RNSVGGroup
                             fill={
-                              {
+                              Object {
                                 "payload": 4294901760,
                                 "type": 0,
                               }
                             }
                             propList={
-                              [
+                              Array [
                                 "fill",
                               ]
                             }
@@ -1362,7 +1362,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                             <RNSVGPath
                               d="M34.44 107.62 34.44 106.98 87.19 34.17 87.19 20.12 56.09 20.12 56.09 0 35.98 0 35.98 20.12 5.04 20.12 5.04 40.24 53.93 40.24 53.93 40.88 0 114.64 0 127.73 35.98 127.73 35.98 147.85 56.09 147.85 56.09 127.73 88.03 127.73 88.03 107.62 34.44 107.62z"
                               fill={
-                                {
+                                Object {
                                   "payload": 4278190080,
                                   "type": 0,
                                 }
@@ -1371,7 +1371,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                             <RNSVGPath
                               d="M180.89 39.03 180.89 19.35 124.56 19.35 110.48 19.35 102.52 19.35 102.52 127.75 110.48 127.75 124.56 127.75 180.89 127.75 180.89 108.07 124.56 108.07 124.56 83.77 172.04 83.77 172.04 64.09 124.56 64.09 124.56 39.03 180.89 39.03z"
                               fill={
-                                {
+                                Object {
                                   "payload": 4278190080,
                                   "type": 0,
                                 }
@@ -1380,7 +1380,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                             <RNSVGPath
                               d="m240.92,128.87c-8.96,0-16.59-1.58-22.89-4.73-6.3-3.16-11.12-7.75-14.44-13.79-3.33-6.04-4.99-13.33-4.99-21.88v-29.75c0-8.6,1.66-15.9,4.99-21.92,3.33-6.01,8.14-10.61,14.44-13.79,6.3-3.18,13.93-4.77,22.89-4.77,7.4,0,13.99,1.47,19.75,4.4,5.77,2.93,10.54,7.18,14.32,12.75,3.78,5.57,6.4,12.33,7.85,20.28h-22.85c-.86-3.63-2.19-6.7-3.98-9.21-1.8-2.51-3.97-4.44-6.52-5.78-2.55-1.34-5.41-2.01-8.57-2.01-6.17,0-10.96,1.75-14.36,5.26-3.41,3.5-5.11,8.44-5.11,14.8v29.75c0,6.36,1.7,11.28,5.11,14.76,3.41,3.48,8.19,5.22,14.36,5.22,4.83,0,8.9-1.48,12.23-4.44,3.33-2.96,5.61-7.14,6.84-12.56h22.85c-1.5,7.9-4.14,14.65-7.93,20.24-3.78,5.59-8.54,9.85-14.28,12.79-5.74,2.93-12.31,4.4-19.71,4.4Z"
                               fill={
-                                {
+                                Object {
                                   "payload": 4278190080,
                                   "type": 0,
                                 }
@@ -1390,7 +1390,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                         </RNSVGSvgView>
                         <Text
                           style={
-                            {
+                            Object {
                               "color": "red",
                               "fontSize": 15,
                               "fontWeight": "700",
@@ -1418,14 +1418,14 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
                   style={
-                    {
+                    Object {
                       "opacity": 1,
                     }
                   }
                 >
                   <View
                     style={
-                      {
+                      Object {
                         "backgroundColor": "#011401",
                         "borderRadius": 10,
                         "display": "flex",
@@ -1438,11 +1438,11 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                     <
                       color="#18bd18"
                       icon={
-                        {
-                          "icon": [
+                        Object {
+                          "icon": Array [
                             512,
                             512,
-                            [
+                            Array [
                               "info-circle",
                             ],
                             "f05a",
@@ -1454,14 +1454,14 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                       }
                       size={20}
                       style={
-                        {
+                        Object {
                           "marginRight": 5,
                         }
                       }
                     />
                     <Text
                       style={
-                        {
+                        Object {
                           "color": "#c3c3c3",
                           "opacity": 0.65,
                         }
@@ -1475,7 +1475,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
             </View>
             <View
               style={
-                {
+                Object {
                   "display": "flex",
                   "flexDirection": "column",
                   "justifyContent": "flex-start",
@@ -1485,7 +1485,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
             >
               <View
                 style={
-                  {
+                  Object {
                     "display": "flex",
                     "flexDirection": "row",
                     "justifyContent": "flex-start",
@@ -1494,7 +1494,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
               >
                 <Text
                   style={
-                    {
+                    Object {
                       "color": "#c3c3c3",
                       "fontSize": 18,
                       "fontWeight": "600",
@@ -1510,7 +1510,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                   accessibilityLabel="text translated"
                   accessible={true}
                   style={
-                    {
+                    Object {
                       "borderColor": "#c3c3c3",
                       "borderRadius": 5,
                       "borderWidth": 1,
@@ -1531,7 +1531,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                     placeholder="#.##"
                     placeholderTextColor="#888888"
                     style={
-                      {
+                      Object {
                         "backgroundColor": "transparent",
                         "color": "#c3c3c3",
                         "fontSize": 18,
@@ -1547,7 +1547,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
               </View>
               <View
                 style={
-                  {
+                  Object {
                     "alignItems": "center",
                     "flexDirection": "column",
                   }
@@ -1555,7 +1555,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
               >
                 <View
                   style={
-                    {
+                    Object {
                       "alignItems": "center",
                       "flexDirection": "row",
                     }
@@ -1563,7 +1563,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                 >
                   <Text
                     style={
-                      {
+                      Object {
                         "color": "#c3c3c3",
                         "fontSize": 12.5,
                         "fontWeight": "600",
@@ -1576,7 +1576,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                   </Text>
                   <View
                     style={
-                      {
+                      Object {
                         "alignItems": "baseline",
                         "flexDirection": "row",
                       }
@@ -1584,7 +1584,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                   >
                     <View
                       accessibilityState={
-                        {
+                        Object {
                           "disabled": true,
                         }
                       }
@@ -1599,14 +1599,14 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                       onResponderTerminationRequest={[Function]}
                       onStartShouldSetResponder={[Function]}
                       style={
-                        {
+                        Object {
                           "opacity": 1,
                         }
                       }
                     >
                       <View
                         style={
-                          {
+                          Object {
                             "alignItems": "baseline",
                             "flexDirection": "row",
                           }
@@ -1614,7 +1614,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                       >
                         <Text
                           style={
-                            {
+                            Object {
                               "color": "#ffffff",
                               "fontSize": 12.5,
                               "marginTop": 11,
@@ -1625,7 +1625,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                         </Text>
                         <Text
                           style={
-                            {
+                            Object {
                               "color": "#ffffff",
                               "fontSize": 12.5,
                               "fontWeight": "700",
@@ -1641,14 +1641,14 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                 </View>
                 <View
                   style={
-                    {
+                    Object {
                       "marginLeft": 5,
                     }
                   }
                 >
                   <View
                     accessibilityState={
-                      {
+                      Object {
                         "disabled": false,
                       }
                     }
@@ -1663,14 +1663,14 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                     onResponderTerminationRequest={[Function]}
                     onStartShouldSetResponder={[Function]}
                     style={
-                      {
+                      Object {
                         "opacity": 1,
                       }
                     }
                   >
                     <View
                       style={
-                        {
+                        Object {
                           "alignItems": "center",
                           "backgroundColor": "#011401",
                           "borderRadius": 10,
@@ -1686,11 +1686,11 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                       <
                         color="#18bd18"
                         icon={
-                          {
-                            "icon": [
+                          Object {
+                            "icon": Array [
                               512,
                               512,
-                              [
+                              Array [
                                 128472,
                                 "refresh",
                                 "sync",
@@ -1713,7 +1713,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
         </View>
         <View
           style={
-            {
+            Object {
               "alignItems": "center",
               "flexDirection": "row",
               "flexGrow": 1,
@@ -1725,7 +1725,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
           <View
             accessibilityLabel="title text translated"
             accessibilityState={
-              {
+              Object {
                 "disabled": true,
               }
             }
@@ -1740,7 +1740,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
             style={
-              {
+              Object {
                 "alignItems": "center",
                 "backgroundColor": "#5a8c5a",
                 "borderColor": "#5a8c5a",
@@ -1760,7 +1760,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
           >
             <View
               style={
-                {
+                Object {
                   "alignItems": "center",
                   "display": "flex",
                   "flexDirection": "row",
@@ -1774,7 +1774,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
             >
               <Text
                 style={
-                  {
+                  Object {
                     "color": "#011401",
                     "fontSize": 16,
                     "fontWeight": "bold",
@@ -1799,7 +1799,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
             style={
-              {
+              Object {
                 "alignItems": "center",
                 "backgroundColor": "#011401",
                 "borderColor": "#18bd18",
@@ -1819,7 +1819,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
           >
             <View
               style={
-                {
+                Object {
                   "alignItems": "center",
                   "display": "flex",
                   "flexDirection": "row",
@@ -1833,7 +1833,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
             >
               <Text
                 style={
-                  {
+                  Object {
                     "color": "#18bd18",
                     "fontSize": 16,
                     "fontWeight": "bold",

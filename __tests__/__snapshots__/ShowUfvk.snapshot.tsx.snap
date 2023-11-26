@@ -3,7 +3,7 @@
 exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
 <RCTSafeAreaView
   style={
-    {
+    Object {
       "alignItems": "stretch",
       "backgroundColor": "rgb(242, 242, 242)",
       "display": "flex",
@@ -14,7 +14,7 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
 >
   <View
     style={
-      {
+      Object {
         "alignItems": "center",
         "backgroundColor": "rgb(255, 255, 255)",
         "display": "flex",
@@ -27,7 +27,7 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
   >
     <View
       style={
-        {
+        Object {
           "alignItems": "center",
           "display": "flex",
           "flexDirection": "row",
@@ -41,14 +41,14 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
     />
     <View
       style={
-        {
+        Object {
           "height": 20,
         }
       }
     />
     <View
       style={
-        {
+        Object {
           "alignItems": "center",
           "display": "flex",
           "flexDirection": "column",
@@ -59,7 +59,7 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
     >
       <Text
         style={
-          {
+          Object {
             "color": "rgb(28, 28, 30)",
             "fontSize": 18,
             "fontWeight": "600",
@@ -73,7 +73,7 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
     </View>
     <View
       style={
-        {
+        Object {
           "alignItems": "flex-start",
           "left": 0,
           "padding": 11.5,
@@ -83,7 +83,7 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
     >
       <View
         style={
-          {
+          Object {
             "alignItems": "center",
             "flexDirection": "row",
           }
@@ -92,7 +92,7 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
     </View>
     <View
       style={
-        {
+        Object {
           "alignItems": "flex-end",
           "padding": 15,
           "position": "absolute",
@@ -102,12 +102,12 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
     >
       <Image
         source={
-          {
+          Object {
             "testUri": "../../../assets/img/logobig-zingo.png",
           }
         }
         style={
-          {
+          Object {
             "borderRadius": 10,
             "height": 38,
             "resizeMode": "contain",
@@ -118,7 +118,7 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
     </View>
     <View
       style={
-        {
+        Object {
           "backgroundColor": "rgb(0, 122, 255)",
           "height": 1,
           "width": "100%",
@@ -128,7 +128,7 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
   </View>
   <View
     style={
-      {
+      Object {
         "backgroundColor": "rgb(0, 122, 255)",
         "height": 1,
         "width": "100%",
@@ -137,14 +137,14 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
   />
   <RCTScrollView
     contentContainerStyle={
-      {
+      Object {
         "alignItems": "stretch",
         "flexDirection": "column",
         "justifyContent": "flex-start",
       }
     }
     style={
-      {
+      Object {
         "maxHeight": "85%",
       }
     }
@@ -152,7 +152,7 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
     <View>
       <Text
         style={
-          {
+          Object {
             "color": "rgb(28, 28, 30)",
             "marginTop": 0,
             "opacity": 0.65,
@@ -165,7 +165,7 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
       </Text>
       <View
         style={
-          {
+          Object {
             "alignItems": "center",
             "display": "flex",
             "flexDirection": "column",
@@ -175,15 +175,15 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
       >
         <View
           style={
-            {
+            Object {
               "flexDirection": "column",
             }
           }
         >
           <RCTScrollView
             contentContainerStyle={
-              [
-                {
+              Array [
+                Object {
                   "alignItems": "center",
                 },
               ]
@@ -192,7 +192,7 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
             <View>
               <View
                 style={
-                  {
+                  Object {
                     "backgroundColor": "rgb(216, 216, 216)",
                     "marginHorizontal": 20,
                     "marginTop": 20,
@@ -212,7 +212,7 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
                   style={
-                    {
+                    Object {
                       "opacity": 1,
                     }
                   }
@@ -222,7 +222,7 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
               </View>
               <View
                 style={
-                  {
+                  Object {
                     "alignItems": "center",
                     "flexDirection": "row",
                     "justifyContent": "space-evenly",
@@ -233,7 +233,7 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
               >
                 <View
                   style={
-                    {
+                    Object {
                       "alignItems": "center",
                       "justifyContent": "center",
                       "width": 150,
@@ -252,14 +252,14 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
                     onResponderTerminationRequest={[Function]}
                     onStartShouldSetResponder={[Function]}
                     style={
-                      {
+                      Object {
                         "opacity": 1,
                       }
                     }
                   >
                     <Text
                       style={
-                        {
+                        Object {
                           "color": "rgb(28, 28, 30)",
                           "marginTop": 15,
                           "minHeight": 48,
@@ -284,14 +284,14 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
                 style={
-                  {
+                  Object {
                     "opacity": 1,
                   }
                 }
               >
                 <View
                   style={
-                    {
+                    Object {
                       "display": "flex",
                       "flexDirection": "row",
                       "flexWrap": "wrap",
@@ -302,7 +302,7 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
                 >
                   <Text
                     style={
-                      {
+                      Object {
                         "color": "rgb(28, 28, 30)",
                         "flexBasis": "100%",
                         "fontFamily": "verdana",
@@ -316,7 +316,7 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
                   </Text>
                   <Text
                     style={
-                      {
+                      Object {
                         "color": "rgb(28, 28, 30)",
                         "flexBasis": "100%",
                         "fontFamily": "verdana",
@@ -330,7 +330,7 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
                   </Text>
                   <Text
                     style={
-                      {
+                      Object {
                         "color": "rgb(28, 28, 30)",
                         "flexBasis": "100%",
                         "fontFamily": "verdana",
@@ -344,7 +344,7 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
                   </Text>
                   <Text
                     style={
-                      {
+                      Object {
                         "color": "rgb(28, 28, 30)",
                         "flexBasis": "100%",
                         "fontFamily": "verdana",
@@ -358,7 +358,7 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
                   </Text>
                   <Text
                     style={
-                      {
+                      Object {
                         "color": "rgb(28, 28, 30)",
                         "flexBasis": "100%",
                         "fontFamily": "verdana",
@@ -372,7 +372,7 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
                   </Text>
                   <Text
                     style={
-                      {
+                      Object {
                         "color": "rgb(28, 28, 30)",
                         "flexBasis": "100%",
                         "fontFamily": "verdana",
@@ -392,7 +392,7 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
       </View>
       <View
         style={
-          {
+          Object {
             "marginBottom": 30,
           }
         }
@@ -401,7 +401,7 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
   </RCTScrollView>
   <View
     style={
-      {
+      Object {
         "alignItems": "center",
         "flexDirection": "row",
         "flexGrow": 1,
@@ -422,7 +422,7 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        {
+        Object {
           "alignItems": "center",
           "backgroundColor": "rgb(242, 242, 242)",
           "borderColor": "rgb(0, 122, 255)",
@@ -441,7 +441,7 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
     >
       <View
         style={
-          {
+          Object {
             "alignItems": "center",
             "display": "flex",
             "flexDirection": "row",
@@ -455,7 +455,7 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
       >
         <Text
           style={
-            {
+            Object {
               "color": "rgb(0, 122, 255)",
               "fontSize": 16,
               "fontWeight": "bold",
