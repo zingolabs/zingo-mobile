@@ -1229,6 +1229,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                   style={
                     Object {
                       "color": "rgb(28, 28, 30)",
+                      "fontWeight": "bold",
                       "opacity": 0.65,
                     }
                   }
@@ -1638,6 +1639,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                   style={
                     Object {
                       "color": "rgb(28, 28, 30)",
+                      "fontWeight": "bold",
                       "opacity": 0.65,
                     }
                   }
@@ -2075,7 +2077,8 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                 <Text
                   style={
                     Object {
-                      "color": "rgb(28, 28, 30)",
+                      "color": "rgb(0, 122, 255)",
+                      "fontWeight": "bold",
                       "opacity": 0.65,
                     }
                   }
@@ -2934,6 +2937,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                   style={
                     Object {
                       "color": "rgb(28, 28, 30)",
+                      "fontWeight": "bold",
                       "opacity": 0.65,
                     }
                   }
@@ -3359,6 +3363,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                   style={
                     Object {
                       "color": "rgb(28, 28, 30)",
+                      "fontWeight": "bold",
                       "opacity": 0.65,
                     }
                   }
@@ -3479,7 +3484,8 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                 <Text
                   style={
                     Object {
-                      "color": "rgb(28, 28, 30)",
+                      "color": "rgb(0, 122, 255)",
+                      "fontWeight": "bold",
                       "opacity": 0.65,
                     }
                   }

@@ -42,10 +42,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
   moment.locale(language);
 
   // if no address I'm going to put txid here.
-  const displayAddress =
-    tx.txDetails.length === 1 && tx.txDetails[0].address
-      ? Utils.trimToSmall(tx.txDetails[0].address, 7)
-      : Utils.trimToSmall(tx.txid, 7);
+  const displayAddress = Utils.trimToSmall(tx.txid, 7);
 
   //console.log('render TxSummaryLine - 5', index);
 
@@ -106,8 +103,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
               )}
             </View>
             <View style={{ display: 'flex', flexGrow: 1 }}>
-              {tx.txDetails.length > 1 &&
-                mode !== 'basic' &&
+              {((tx.txDetails.length === 1 && tx.type === 'Sent') || (tx.txDetails.length > 1 && mode !== 'basic')) &&
                 tx.txDetails.map((txd: TxDetailType) => {
                   return (
                     <View
@@ -129,7 +125,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
                           paddingRight: 10,
                           margin: 0,
                         }}
-                        size={15}
+                        size={tx.txDetails.length === 1 ? 18 : 15}
                         currencyName={info.currencyName ? info.currencyName : ''}
                         color={amountColor}
                         amtZec={txd.amount}
@@ -145,7 +141,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
                 flexDirection: 'row',
                 alignItems: 'center',
               }}>
-              <FadeText>
+              <FadeText style={{ fontWeight: 'bold', color: amountColor }}>
                 {tx.type === 'Sent'
                   ? (translate('history.sent') as string)
                   : tx.type === 'Received'
@@ -153,7 +149,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
                   : (translate('history.sendtoself') as string)}
               </FadeText>
               <FadeText>{tx.time ? moment((tx.time || 0) * 1000).format('MMM D, h:mm a') : '--'}</FadeText>
-              {!!amount && (
+              {!!amount && (tx.txDetails.length > 1 || (tx.txDetails.length === 1 && tx.type === 'Received')) && (
                 <ZecAmount
                   style={{ flexGrow: 1, justifyContent: 'flex-end', paddingRight: 10, margin: 0 }}
                   size={18}
