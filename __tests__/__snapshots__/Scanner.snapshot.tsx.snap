@@ -3,7 +3,7 @@
 exports[`Component Scanner - test Scanner - snapshot 1`] = `
 <RCTSafeAreaView
   style={
-    Object {
+    {
       "height": "100%",
       "width": "100%",
     }

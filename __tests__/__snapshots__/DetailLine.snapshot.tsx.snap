@@ -3,7 +3,7 @@
 exports[`Component DetailLine - test DetailLine children - snapshot 1`] = `
 <View
   style={
-    Object {
+    {
       "display": "flex",
       "marginTop": 20,
     }
@@ -11,7 +11,7 @@ exports[`Component DetailLine - test DetailLine children - snapshot 1`] = `
 >
   <Text
     style={
-      Object {
+      {
         "color": "rgb(28, 28, 30)",
         "opacity": 0.65,
       }
@@ -21,7 +21,7 @@ exports[`Component DetailLine - test DetailLine children - snapshot 1`] = `
   </Text>
   <View
     style={
-      Object {
+      {
         "width": 10,
       }
     }
@@ -33,7 +33,7 @@ exports[`Component DetailLine - test DetailLine children - snapshot 1`] = `
 exports[`Component DetailLine - test DetailLine value - snapshot 1`] = `
 <View
   style={
-    Object {
+    {
       "display": "flex",
       "marginTop": 20,
     }
@@ -41,7 +41,7 @@ exports[`Component DetailLine - test DetailLine value - snapshot 1`] = `
 >
   <Text
     style={
-      Object {
+      {
         "color": "rgb(28, 28, 30)",
         "opacity": 0.65,
       }
@@ -51,14 +51,14 @@ exports[`Component DetailLine - test DetailLine value - snapshot 1`] = `
   </Text>
   <View
     style={
-      Object {
+      {
         "width": 10,
       }
     }
   />
   <Text
     style={
-      Object {
+      {
         "color": "rgb(28, 28, 30)",
         "fontSize": 18,
         "fontWeight": "600",

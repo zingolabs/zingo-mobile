@@ -3,7 +3,7 @@
 exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
 <RCTSafeAreaView
   style={
-    Object {
+    {
       "alignItems": "stretch",
       "backgroundColor": "rgb(242, 242, 242)",
       "display": "flex",
@@ -14,7 +14,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
 >
   <View
     style={
-      Object {
+      {
         "alignItems": "center",
         "backgroundColor": "rgb(255, 255, 255)",
         "display": "flex",
@@ -27,7 +27,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
   >
     <View
       style={
-        Object {
+        {
           "alignItems": "center",
           "display": "flex",
           "flexDirection": "row",
@@ -41,14 +41,14 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
     />
     <View
       style={
-        Object {
+        {
           "height": 20,
         }
       }
     />
     <View
       style={
-        Object {
+        {
           "alignItems": "center",
           "display": "flex",
           "flexDirection": "column",
@@ -59,7 +59,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
     >
       <Text
         style={
-          Object {
+          {
             "color": "rgb(28, 28, 30)",
             "fontSize": 18,
             "fontWeight": "600",
@@ -74,7 +74,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
     </View>
     <View
       style={
-        Object {
+        {
           "alignItems": "flex-start",
           "left": 0,
           "padding": 11.5,
@@ -84,7 +84,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
     >
       <View
         style={
-          Object {
+          {
             "alignItems": "center",
             "flexDirection": "row",
           }
@@ -93,7 +93,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
     </View>
     <View
       style={
-        Object {
+        {
           "alignItems": "flex-end",
           "padding": 15,
           "position": "absolute",
@@ -103,12 +103,12 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
     >
       <Image
         source={
-          Object {
+          {
             "testUri": "../../../assets/img/logobig-zingo.png",
           }
         }
         style={
-          Object {
+          {
             "borderRadius": 10,
             "height": 38,
             "resizeMode": "contain",
@@ -119,7 +119,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
     </View>
     <View
       style={
-        Object {
+        {
           "backgroundColor": "rgb(0, 122, 255)",
           "height": 1,
           "width": "100%",
@@ -129,14 +129,14 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
   </View>
   <RCTScrollView
     contentContainerStyle={
-      Object {
+      {
         "alignItems": "stretch",
         "flexDirection": "column",
         "justifyContent": "flex-start",
       }
     }
     style={
-      Object {
+      {
         "maxHeight": "85%",
       }
     }
@@ -144,7 +144,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
     <View>
       <View
         style={
-          Object {
+          {
             "display": "flex",
             "marginBottom": 30,
             "marginHorizontal": 20,
@@ -153,7 +153,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
       >
         <View
           style={
-            Object {
+            {
               "display": "flex",
               "marginTop": 20,
             }
@@ -161,7 +161,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
         >
           <Text
             style={
-              Object {
+              {
                 "color": "rgb(28, 28, 30)",
                 "opacity": 0.65,
               }
@@ -171,14 +171,14 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           </Text>
           <View
             style={
-              Object {
+              {
                 "width": 10,
               }
             }
           />
           <Text
             style={
-              Object {
+              {
                 "color": "rgb(28, 28, 30)",
                 "fontSize": 18,
                 "fontWeight": "600",
@@ -191,7 +191,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
         </View>
         <View
           style={
-            Object {
+            {
               "backgroundColor": "white",
               "height": 2,
               "marginBottom": 10,
@@ -202,7 +202,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
         />
         <View
           style={
-            Object {
+            {
               "display": "flex",
               "flexDirection": "row",
               "justifyContent": "space-between",
@@ -213,7 +213,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
         >
           <Text
             style={
-              Object {
+              {
                 "color": "rgb(0, 122, 255)",
               }
             }
@@ -222,7 +222,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           </Text>
           <Text
             style={
-              Object {
+              {
                 "color": "rgb(0, 122, 255)",
               }
             }
@@ -231,7 +231,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           </Text>
           <Text
             style={
-              Object {
+              {
                 "color": "rgb(0, 122, 255)",
               }
             }
@@ -240,7 +240,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           </Text>
           <Text
             style={
-              Object {
+              {
                 "color": "rgb(0, 122, 255)",
               }
             }
@@ -249,7 +249,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           </Text>
           <Text
             style={
-              Object {
+              {
                 "color": "rgb(0, 122, 255)",
               }
             }
@@ -259,7 +259,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
         </View>
         <View
           style={
-            Object {
+            {
               "display": "flex",
               "flexDirection": "row",
               "width": "100%",
@@ -268,7 +268,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
         >
           <View
             style={
-              Object {
+              {
                 "borderLeftColor": "rgb(0, 122, 255)",
                 "borderLeftWidth": 1,
                 "borderRightColor": "rgb(0, 122, 255)",
@@ -280,7 +280,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           />
           <View
             style={
-              Object {
+              {
                 "borderLeftColor": "rgb(0, 122, 255)",
                 "borderLeftWidth": 1,
                 "borderRightColor": "rgb(0, 122, 255)",
@@ -292,7 +292,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           />
           <View
             style={
-              Object {
+              {
                 "borderLeftColor": "rgb(0, 122, 255)",
                 "borderLeftWidth": 1,
                 "borderRightColor": "rgb(0, 122, 255)",
@@ -304,7 +304,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           />
           <View
             style={
-              Object {
+              {
                 "borderLeftColor": "rgb(0, 122, 255)",
                 "borderLeftWidth": 1,
                 "borderRightColor": "rgb(0, 122, 255)",
@@ -317,7 +317,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
         </View>
         <View
           style={
-            Object {
+            {
               "borderBottomColor": "rgb(0, 122, 255)",
               "borderBottomWidth": 2,
               "display": "flex",
@@ -330,7 +330,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
         >
           <View
             style={
-              Object {
+              {
                 "backgroundColor": "blue",
                 "borderLeftColor": "rgb(0, 122, 255)",
                 "borderLeftWidth": 1,
@@ -343,7 +343,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           />
           <View
             style={
-              Object {
+              {
                 "backgroundColor": "yellow",
                 "borderBottomColor": "blue",
                 "borderBottomWidth": 5,
@@ -356,7 +356,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           />
           <View
             style={
-              Object {
+              {
                 "backgroundColor": "#333333",
                 "borderRightColor": "rgb(0, 122, 255)",
                 "borderRightWidth": 1,
@@ -368,7 +368,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
         </View>
         <View
           style={
-            Object {
+            {
               "alignItems": "center",
               "display": "flex",
               "flexDirection": "row",
@@ -380,7 +380,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
         >
           <Text
             style={
-              Object {
+              {
                 "color": "rgb(0, 122, 255)",
               }
             }
@@ -389,7 +389,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           </Text>
           <View
             style={
-              Object {
+              {
                 "backgroundColor": "blue",
                 "display": "flex",
                 "flexDirection": "row",
@@ -402,7 +402,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           />
           <Text
             style={
-              Object {
+              {
                 "color": "rgb(28, 28, 30)",
               }
             }
@@ -412,7 +412,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
         </View>
         <View
           style={
-            Object {
+            {
               "alignItems": "center",
               "display": "flex",
               "flexDirection": "row",
@@ -424,7 +424,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
         >
           <Text
             style={
-              Object {
+              {
                 "color": "rgb(0, 122, 255)",
               }
             }
@@ -433,7 +433,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           </Text>
           <View
             style={
-              Object {
+              {
                 "backgroundColor": "yellow",
                 "display": "flex",
                 "flexDirection": "row",
@@ -446,7 +446,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           />
           <Text
             style={
-              Object {
+              {
                 "color": "rgb(28, 28, 30)",
               }
             }
@@ -456,7 +456,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
         </View>
         <View
           style={
-            Object {
+            {
               "backgroundColor": "white",
               "height": 1,
               "marginBottom": 10,
@@ -467,7 +467,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
         />
         <View
           style={
-            Object {
+            {
               "display": "flex",
               "flexDirection": "row",
               "justifyContent": "space-between",
@@ -478,7 +478,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
         >
           <Text
             style={
-              Object {
+              {
                 "color": "rgb(0, 122, 255)",
               }
             }
@@ -487,7 +487,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           </Text>
           <Text
             style={
-              Object {
+              {
                 "color": "rgb(0, 122, 255)",
               }
             }
@@ -497,7 +497,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
         </View>
         <View
           style={
-            Object {
+            {
               "display": "flex",
               "flexDirection": "row",
               "justifyContent": "space-between",
@@ -507,7 +507,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
         >
           <View
             style={
-              Object {
+              {
                 "borderLeftColor": "rgb(0, 122, 255)",
                 "borderLeftWidth": 1,
                 "height": 10,
@@ -516,7 +516,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           />
           <View
             style={
-              Object {
+              {
                 "borderRightColor": "rgb(0, 122, 255)",
                 "borderRightWidth": 1,
                 "height": 10,
@@ -526,7 +526,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
         </View>
         <View
           style={
-            Object {
+            {
               "borderBottomColor": "rgb(0, 122, 255)",
               "borderBottomWidth": 2,
               "display": "flex",
@@ -539,7 +539,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
         >
           <View
             style={
-              Object {
+              {
                 "backgroundColor": "lightyellow",
                 "borderLeftColor": "rgb(0, 122, 255)",
                 "borderLeftWidth": 1,
@@ -552,7 +552,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           />
           <View
             style={
-              Object {
+              {
                 "backgroundColor": "orange",
                 "borderRightColor": "orange",
                 "borderRightWidth": 1,
@@ -563,7 +563,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           />
           <View
             style={
-              Object {
+              {
                 "backgroundColor": "#333333",
                 "borderRightColor": "rgb(0, 122, 255)",
                 "borderRightWidth": 1,
@@ -575,7 +575,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
         </View>
         <View
           style={
-            Object {
+            {
               "alignItems": "center",
               "display": "flex",
               "flexDirection": "row",
@@ -587,7 +587,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
         >
           <Text
             style={
-              Object {
+              {
                 "color": "rgb(0, 122, 255)",
               }
             }
@@ -596,7 +596,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           </Text>
           <View
             style={
-              Object {
+              {
                 "backgroundColor": "lightyellow",
                 "display": "flex",
                 "flexDirection": "row",
@@ -609,7 +609,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           />
           <Text
             style={
-              Object {
+              {
                 "color": "rgb(28, 28, 30)",
               }
             }
@@ -619,7 +619,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
         </View>
         <View
           style={
-            Object {
+            {
               "alignItems": "center",
               "display": "flex",
               "flexDirection": "row",
@@ -631,7 +631,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
         >
           <Text
             style={
-              Object {
+              {
                 "color": "rgb(0, 122, 255)",
               }
             }
@@ -640,7 +640,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           </Text>
           <View
             style={
-              Object {
+              {
                 "backgroundColor": "orange",
                 "display": "flex",
                 "flexDirection": "row",
@@ -653,7 +653,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           />
           <Text
             style={
-              Object {
+              {
                 "color": "rgb(28, 28, 30)",
               }
             }
@@ -664,7 +664,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
         </View>
         <View
           style={
-            Object {
+            {
               "alignItems": "center",
               "display": "flex",
               "flexDirection": "row",
@@ -676,7 +676,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
         >
           <Text
             style={
-              Object {
+              {
                 "color": "rgb(0, 122, 255)",
               }
             }
@@ -685,7 +685,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           </Text>
           <View
             style={
-              Object {
+              {
                 "backgroundColor": "#333333",
                 "display": "flex",
                 "flexDirection": "row",
@@ -698,7 +698,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           />
           <Text
             style={
-              Object {
+              {
                 "color": "rgb(28, 28, 30)",
               }
             }
@@ -709,7 +709,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
         </View>
         <View
           style={
-            Object {
+            {
               "backgroundColor": "white",
               "height": 2,
               "marginTop": 15,
@@ -719,7 +719,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
         />
         <View
           style={
-            Object {
+            {
               "display": "flex",
               "marginTop": 20,
             }
@@ -727,7 +727,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
         >
           <Text
             style={
-              Object {
+              {
                 "color": "rgb(28, 28, 30)",
                 "opacity": 0.65,
               }
@@ -737,14 +737,14 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           </Text>
           <View
             style={
-              Object {
+              {
                 "width": 10,
               }
             }
           />
           <Text
             style={
-              Object {
+              {
                 "color": "rgb(28, 28, 30)",
                 "fontSize": 18,
                 "fontWeight": "600",
@@ -758,7 +758,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
         </View>
         <View
           style={
-            Object {
+            {
               "display": "flex",
               "marginTop": 20,
             }
@@ -766,7 +766,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
         >
           <Text
             style={
-              Object {
+              {
                 "color": "rgb(28, 28, 30)",
                 "opacity": 0.65,
               }
@@ -776,14 +776,14 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           </Text>
           <View
             style={
-              Object {
+              {
                 "width": 10,
               }
             }
           />
           <Text
             style={
-              Object {
+              {
                 "color": "rgb(28, 28, 30)",
                 "fontSize": 18,
                 "fontWeight": "600",
@@ -797,7 +797,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
         </View>
         <View
           style={
-            Object {
+            {
               "alignItems": "flex-end",
               "flexDirection": "row",
             }
@@ -805,7 +805,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
         >
           <View
             style={
-              Object {
+              {
                 "display": "flex",
                 "marginTop": 20,
               }
@@ -813,7 +813,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           >
             <Text
               style={
-                Object {
+                {
                   "color": "rgb(28, 28, 30)",
                   "opacity": 0.65,
                 }
@@ -823,14 +823,14 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             </Text>
             <View
               style={
-                Object {
+                {
                   "width": 10,
                 }
               }
             />
             <Text
               style={
-                Object {
+                {
                   "color": "rgb(28, 28, 30)",
                   "fontSize": 18,
                   "fontWeight": "600",
@@ -848,7 +848,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
         </View>
         <View
           style={
-            Object {
+            {
               "backgroundColor": "rgb(0, 122, 255)",
               "height": 2,
               "marginTop": 10,
@@ -858,7 +858,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
         />
         <View
           style={
-            Object {
+            {
               "display": "flex",
               "marginTop": 20,
             }
@@ -866,7 +866,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
         >
           <Text
             style={
-              Object {
+              {
                 "color": "rgb(28, 28, 30)",
                 "opacity": 0.65,
               }
@@ -876,14 +876,14 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           </Text>
           <View
             style={
-              Object {
+              {
                 "width": 10,
               }
             }
           />
           <Text
             style={
-              Object {
+              {
                 "color": "rgb(28, 28, 30)",
                 "fontSize": 18,
                 "fontWeight": "600",
@@ -899,7 +899,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
   </RCTScrollView>
   <View
     style={
-      Object {
+      {
         "alignItems": "center",
         "flexDirection": "row",
         "flexGrow": 1,
@@ -920,7 +920,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        Object {
+        {
           "alignItems": "center",
           "backgroundColor": "rgb(242, 242, 242)",
           "borderColor": "rgb(0, 122, 255)",
@@ -939,7 +939,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
     >
       <View
         style={
-          Object {
+          {
             "alignItems": "center",
             "display": "flex",
             "flexDirection": "row",
@@ -953,7 +953,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
       >
         <Text
           style={
-            Object {
+            {
               "color": "rgb(0, 122, 255)",
               "fontSize": 16,
               "fontWeight": "bold",

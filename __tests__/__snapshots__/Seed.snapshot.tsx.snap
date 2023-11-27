@@ -3,7 +3,7 @@
 exports[`Component Seed - test Seed Backup - snapshot 1`] = `
 <RCTSafeAreaView
   style={
-    Object {
+    {
       "alignItems": "stretch",
       "backgroundColor": "rgb(242, 242, 242)",
       "display": "flex",
@@ -14,7 +14,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
 >
   <View
     style={
-      Object {
+      {
         "backgroundColor": "rgb(0, 122, 255)",
         "height": 1,
         "width": "100%",
@@ -23,7 +23,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
   />
   <RCTScrollView
     contentContainerStyle={
-      Object {
+      {
         "alignItems": "stretch",
         "flexDirection": "column",
         "justifyContent": "flex-start",
@@ -31,7 +31,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
     }
     keyboardShouldPersistTaps="handled"
     style={
-      Object {
+      {
         "maxHeight": "85%",
       }
     }
@@ -39,7 +39,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
     <View>
       <Text
         style={
-          Object {
+          {
             "color": "rgb(28, 28, 30)",
             "marginTop": 0,
             "opacity": 0.65,
@@ -52,7 +52,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
       </Text>
       <View
         style={
-          Object {
+          {
             "borderColor": "rgb(28, 28, 30)",
             "borderRadius": 10,
             "borderWidth": 1,
@@ -74,14 +74,14 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
           style={
-            Object {
+            {
               "opacity": 1,
             }
           }
         >
           <Text
             style={
-              Object {
+              {
                 "color": "rgb(28, 28, 30)",
                 "fontSize": 18,
                 "fontWeight": "600",
@@ -95,7 +95,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
         </View>
         <View
           style={
-            Object {
+            {
               "flexDirection": "row",
               "justifyContent": "space-between",
             }
@@ -114,14 +114,14 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
             style={
-              Object {
+              {
                 "opacity": 1,
               }
             }
           >
             <Text
               style={
-                Object {
+                {
                   "color": "rgb(28, 28, 30)",
                   "marginTop": 0,
                   "minHeight": 48,
@@ -139,7 +139,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
       </View>
       <View
         style={
-          Object {
+          {
             "alignItems": "center",
             "marginTop": 10,
           }
@@ -147,7 +147,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
       >
         <Text
           style={
-            Object {
+            {
               "color": "rgb(28, 28, 30)",
               "opacity": 0.65,
               "textAlign": "center",
@@ -168,14 +168,14 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
           style={
-            Object {
+            {
               "opacity": 1,
             }
           }
         >
           <Text
             style={
-              Object {
+              {
                 "color": "rgb(28, 28, 30)",
                 "fontSize": 18,
                 "fontWeight": "600",
@@ -190,7 +190,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
       </View>
       <View
         style={
-          Object {
+          {
             "marginBottom": 30,
           }
         }
@@ -199,7 +199,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
   </RCTScrollView>
   <View
     style={
-      Object {
+      {
         "alignItems": "center",
         "flexDirection": "row",
         "flexGrow": 1,
@@ -220,7 +220,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        Object {
+        {
           "alignItems": "center",
           "backgroundColor": "rgb(242, 242, 242)",
           "borderColor": "rgb(0, 122, 255)",
@@ -240,7 +240,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
     >
       <View
         style={
-          Object {
+          {
             "alignItems": "center",
             "display": "flex",
             "flexDirection": "row",
@@ -254,7 +254,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
       >
         <Text
           style={
-            Object {
+            {
               "color": "rgb(0, 122, 255)",
               "fontSize": 16,
               "fontWeight": "bold",
@@ -279,7 +279,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        Object {
+        {
           "alignItems": "center",
           "backgroundColor": "rgb(242, 242, 242)",
           "borderColor": "rgb(0, 122, 255)",
@@ -299,7 +299,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
     >
       <View
         style={
-          Object {
+          {
             "alignItems": "center",
             "display": "flex",
             "flexDirection": "row",
@@ -313,7 +313,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
       >
         <Text
           style={
-            Object {
+            {
               "color": "rgb(0, 122, 255)",
               "fontSize": 16,
               "fontWeight": "bold",
@@ -333,7 +333,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
 exports[`Component Seed - test Seed Change - snapshot 1`] = `
 <RCTSafeAreaView
   style={
-    Object {
+    {
       "alignItems": "stretch",
       "backgroundColor": "rgb(242, 242, 242)",
       "display": "flex",
@@ -344,7 +344,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
 >
   <View
     style={
-      Object {
+      {
         "backgroundColor": "rgb(0, 122, 255)",
         "height": 1,
         "width": "100%",
@@ -353,7 +353,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
   />
   <RCTScrollView
     contentContainerStyle={
-      Object {
+      {
         "alignItems": "stretch",
         "flexDirection": "column",
         "justifyContent": "flex-start",
@@ -361,7 +361,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
     }
     keyboardShouldPersistTaps="handled"
     style={
-      Object {
+      {
         "maxHeight": "85%",
       }
     }
@@ -369,7 +369,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
     <View>
       <Text
         style={
-          Object {
+          {
             "color": "rgb(28, 28, 30)",
             "marginTop": 0,
             "opacity": 0.65,
@@ -382,7 +382,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
       </Text>
       <View
         style={
-          Object {
+          {
             "borderColor": "rgb(28, 28, 30)",
             "borderRadius": 10,
             "borderWidth": 1,
@@ -404,14 +404,14 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
           style={
-            Object {
+            {
               "opacity": 1,
             }
           }
         >
           <Text
             style={
-              Object {
+              {
                 "color": "rgb(28, 28, 30)",
                 "fontSize": 18,
                 "fontWeight": "600",
@@ -425,7 +425,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
         </View>
         <View
           style={
-            Object {
+            {
               "flexDirection": "row",
               "justifyContent": "space-between",
             }
@@ -444,14 +444,14 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
             style={
-              Object {
+              {
                 "opacity": 1,
               }
             }
           >
             <Text
               style={
-                Object {
+                {
                   "color": "rgb(28, 28, 30)",
                   "marginTop": 0,
                   "minHeight": 48,
@@ -469,7 +469,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
       </View>
       <View
         style={
-          Object {
+          {
             "alignItems": "center",
             "marginTop": 10,
           }
@@ -477,7 +477,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
       >
         <Text
           style={
-            Object {
+            {
               "color": "rgb(28, 28, 30)",
               "opacity": 0.65,
               "textAlign": "center",
@@ -498,14 +498,14 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
           style={
-            Object {
+            {
               "opacity": 1,
             }
           }
         >
           <Text
             style={
-              Object {
+              {
                 "color": "rgb(28, 28, 30)",
                 "fontSize": 18,
                 "fontWeight": "600",
@@ -520,7 +520,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
       </View>
       <View
         style={
-          Object {
+          {
             "marginBottom": 30,
           }
         }
@@ -529,7 +529,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
   </RCTScrollView>
   <View
     style={
-      Object {
+      {
         "alignItems": "center",
         "flexDirection": "row",
         "flexGrow": 1,
@@ -550,7 +550,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        Object {
+        {
           "alignItems": "center",
           "backgroundColor": "rgb(242, 242, 242)",
           "borderColor": "rgb(0, 122, 255)",
@@ -570,7 +570,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
     >
       <View
         style={
-          Object {
+          {
             "alignItems": "center",
             "display": "flex",
             "flexDirection": "row",
@@ -584,7 +584,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
       >
         <Text
           style={
-            Object {
+            {
               "color": "rgb(0, 122, 255)",
               "fontSize": 16,
               "fontWeight": "bold",
@@ -609,7 +609,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        Object {
+        {
           "alignItems": "center",
           "backgroundColor": "rgb(242, 242, 242)",
           "borderColor": "rgb(0, 122, 255)",
@@ -629,7 +629,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
     >
       <View
         style={
-          Object {
+          {
             "alignItems": "center",
             "display": "flex",
             "flexDirection": "row",
@@ -643,7 +643,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
       >
         <Text
           style={
-            Object {
+            {
               "color": "rgb(0, 122, 255)",
               "fontSize": 16,
               "fontWeight": "bold",
@@ -663,7 +663,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
 exports[`Component Seed - test Seed New - snapshot 1`] = `
 <RCTSafeAreaView
   style={
-    Object {
+    {
       "alignItems": "stretch",
       "backgroundColor": "rgb(242, 242, 242)",
       "display": "flex",
@@ -674,7 +674,7 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
 >
   <View
     style={
-      Object {
+      {
         "backgroundColor": "rgb(0, 122, 255)",
         "height": 1,
         "width": "100%",
@@ -683,7 +683,7 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
   />
   <RCTScrollView
     contentContainerStyle={
-      Object {
+      {
         "alignItems": "stretch",
         "flexDirection": "column",
         "justifyContent": "flex-start",
@@ -691,7 +691,7 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
     }
     keyboardShouldPersistTaps="handled"
     style={
-      Object {
+      {
         "maxHeight": "85%",
       }
     }
@@ -699,7 +699,7 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
     <View>
       <Text
         style={
-          Object {
+          {
             "color": "rgb(28, 28, 30)",
             "marginTop": 0,
             "opacity": 0.65,
@@ -712,7 +712,7 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
       </Text>
       <View
         style={
-          Object {
+          {
             "borderColor": "rgb(28, 28, 30)",
             "borderRadius": 10,
             "borderWidth": 1,
@@ -734,14 +734,14 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
           style={
-            Object {
+            {
               "opacity": 1,
             }
           }
         >
           <Text
             style={
-              Object {
+              {
                 "color": "rgb(28, 28, 30)",
                 "fontSize": 18,
                 "fontWeight": "600",
@@ -755,7 +755,7 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
         </View>
         <View
           style={
-            Object {
+            {
               "flexDirection": "row",
               "justifyContent": "space-between",
             }
@@ -774,14 +774,14 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
             style={
-              Object {
+              {
                 "opacity": 1,
               }
             }
           >
             <Text
               style={
-                Object {
+                {
                   "color": "rgb(28, 28, 30)",
                   "marginTop": 0,
                   "minHeight": 48,
@@ -799,7 +799,7 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
       </View>
       <View
         style={
-          Object {
+          {
             "alignItems": "center",
             "marginTop": 10,
           }
@@ -807,7 +807,7 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
       >
         <Text
           style={
-            Object {
+            {
               "color": "rgb(28, 28, 30)",
               "opacity": 0.65,
               "textAlign": "center",
@@ -828,14 +828,14 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
           style={
-            Object {
+            {
               "opacity": 1,
             }
           }
         >
           <Text
             style={
-              Object {
+              {
                 "color": "rgb(28, 28, 30)",
                 "fontSize": 18,
                 "fontWeight": "600",
@@ -850,7 +850,7 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
       </View>
       <View
         style={
-          Object {
+          {
             "marginBottom": 30,
           }
         }
@@ -859,7 +859,7 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
   </RCTScrollView>
   <View
     style={
-      Object {
+      {
         "alignItems": "center",
         "flexDirection": "row",
         "flexGrow": 1,
@@ -880,7 +880,7 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        Object {
+        {
           "alignItems": "center",
           "backgroundColor": "rgb(242, 242, 242)",
           "borderColor": "rgb(0, 122, 255)",
@@ -900,7 +900,7 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
     >
       <View
         style={
-          Object {
+          {
             "alignItems": "center",
             "display": "flex",
             "flexDirection": "row",
@@ -914,7 +914,7 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
       >
         <Text
           style={
-            Object {
+            {
               "color": "rgb(0, 122, 255)",
               "fontSize": 16,
               "fontWeight": "bold",
@@ -934,7 +934,7 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
 exports[`Component Seed - test Seed Restore - snapshot 1`] = `
 <RCTSafeAreaView
   style={
-    Object {
+    {
       "alignItems": "stretch",
       "backgroundColor": "rgb(242, 242, 242)",
       "display": "flex",
@@ -945,7 +945,7 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
 >
   <View
     style={
-      Object {
+      {
         "backgroundColor": "rgb(0, 122, 255)",
         "height": 1,
         "width": "100%",
@@ -954,7 +954,7 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
   />
   <RCTScrollView
     contentContainerStyle={
-      Object {
+      {
         "alignItems": "stretch",
         "flexDirection": "column",
         "justifyContent": "flex-start",
@@ -962,7 +962,7 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
     }
     keyboardShouldPersistTaps="handled"
     style={
-      Object {
+      {
         "maxHeight": "85%",
       }
     }
@@ -970,7 +970,7 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
     <View>
       <Text
         style={
-          Object {
+          {
             "color": "rgb(28, 28, 30)",
             "marginTop": 0,
             "opacity": 0.65,
@@ -983,7 +983,7 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
       </Text>
       <View
         style={
-          Object {
+          {
             "borderColor": "rgb(28, 28, 30)",
             "borderRadius": 10,
             "borderWidth": 1,
@@ -997,7 +997,7 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
           accessibilityLabel="text translated"
           accessible={true}
           style={
-            Object {
+            {
               "borderColor": "rgb(28, 28, 30)",
               "borderRadius": 10,
               "borderWidth": 1,
@@ -1015,7 +1015,7 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
             onChangeText={[Function]}
             placeholder="text translated"
             style={
-              Object {
+              {
                 "backgroundColor": "transparent",
                 "color": "rgb(28, 28, 30)",
                 "fontSize": 16,
@@ -1032,7 +1032,7 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
       </View>
       <View
         style={
-          Object {
+          {
             "alignItems": "center",
             "marginTop": 10,
           }
@@ -1040,7 +1040,7 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
       >
         <Text
           style={
-            Object {
+            {
               "color": "rgb(28, 28, 30)",
               "opacity": 0.65,
               "textAlign": "center",
@@ -1051,7 +1051,7 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
         </Text>
         <Text
           style={
-            Object {
+            {
               "color": "rgb(28, 28, 30)",
               "opacity": 0.65,
               "textAlign": "center",
@@ -1064,7 +1064,7 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
           accessibilityLabel="text translated"
           accessible={true}
           style={
-            Object {
+            {
               "borderColor": "rgb(28, 28, 30)",
               "borderRadius": 10,
               "borderWidth": 1,
@@ -1083,7 +1083,7 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
             onChangeText={[Function]}
             placeholder="#"
             style={
-              Object {
+              {
                 "backgroundColor": "transparent",
                 "color": "rgb(28, 28, 30)",
                 "fontSize": 18,
@@ -1100,7 +1100,7 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
       </View>
       <View
         style={
-          Object {
+          {
             "marginBottom": 30,
           }
         }
@@ -1109,7 +1109,7 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
   </RCTScrollView>
   <View
     style={
-      Object {
+      {
         "alignItems": "center",
         "flexDirection": "row",
         "flexGrow": 1,
@@ -1130,7 +1130,7 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        Object {
+        {
           "alignItems": "center",
           "backgroundColor": "rgb(242, 242, 242)",
           "borderColor": "rgb(0, 122, 255)",
@@ -1150,7 +1150,7 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
     >
       <View
         style={
-          Object {
+          {
             "alignItems": "center",
             "display": "flex",
             "flexDirection": "row",
@@ -1164,7 +1164,7 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
       >
         <Text
           style={
-            Object {
+            {
               "color": "rgb(0, 122, 255)",
               "fontSize": 16,
               "fontWeight": "bold",
@@ -1189,7 +1189,7 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        Object {
+        {
           "alignItems": "center",
           "backgroundColor": "rgb(242, 242, 242)",
           "borderColor": "rgb(0, 122, 255)",
@@ -1209,7 +1209,7 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
     >
       <View
         style={
-          Object {
+          {
             "alignItems": "center",
             "display": "flex",
             "flexDirection": "row",
@@ -1223,7 +1223,7 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
       >
         <Text
           style={
-            Object {
+            {
               "color": "rgb(0, 122, 255)",
               "fontSize": 16,
               "fontWeight": "bold",
@@ -1243,7 +1243,7 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
 exports[`Component Seed - test Seed Server - snapshot 1`] = `
 <RCTSafeAreaView
   style={
-    Object {
+    {
       "alignItems": "stretch",
       "backgroundColor": "rgb(242, 242, 242)",
       "display": "flex",
@@ -1254,7 +1254,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
 >
   <View
     style={
-      Object {
+      {
         "backgroundColor": "rgb(0, 122, 255)",
         "height": 1,
         "width": "100%",
@@ -1263,7 +1263,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
   />
   <RCTScrollView
     contentContainerStyle={
-      Object {
+      {
         "alignItems": "stretch",
         "flexDirection": "column",
         "justifyContent": "flex-start",
@@ -1271,7 +1271,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
     }
     keyboardShouldPersistTaps="handled"
     style={
-      Object {
+      {
         "maxHeight": "85%",
       }
     }
@@ -1279,7 +1279,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
     <View>
       <Text
         style={
-          Object {
+          {
             "color": "rgb(28, 28, 30)",
             "marginTop": 0,
             "opacity": 0.65,
@@ -1292,7 +1292,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
       </Text>
       <View
         style={
-          Object {
+          {
             "borderColor": "rgb(28, 28, 30)",
             "borderRadius": 10,
             "borderWidth": 1,
@@ -1314,14 +1314,14 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
           style={
-            Object {
+            {
               "opacity": 1,
             }
           }
         >
           <Text
             style={
-              Object {
+              {
                 "color": "rgb(28, 28, 30)",
                 "fontSize": 18,
                 "fontWeight": "600",
@@ -1335,7 +1335,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
         </View>
         <View
           style={
-            Object {
+            {
               "flexDirection": "row",
               "justifyContent": "space-between",
             }
@@ -1354,14 +1354,14 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
             style={
-              Object {
+              {
                 "opacity": 1,
               }
             }
           >
             <Text
               style={
-                Object {
+                {
                   "color": "rgb(28, 28, 30)",
                   "marginTop": 0,
                   "minHeight": 48,
@@ -1379,7 +1379,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
       </View>
       <View
         style={
-          Object {
+          {
             "alignItems": "center",
             "marginTop": 10,
           }
@@ -1387,7 +1387,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
       >
         <Text
           style={
-            Object {
+            {
               "color": "rgb(28, 28, 30)",
               "opacity": 0.65,
               "textAlign": "center",
@@ -1408,14 +1408,14 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
           style={
-            Object {
+            {
               "opacity": 1,
             }
           }
         >
           <Text
             style={
-              Object {
+              {
                 "color": "rgb(28, 28, 30)",
                 "fontSize": 18,
                 "fontWeight": "600",
@@ -1430,7 +1430,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
       </View>
       <View
         style={
-          Object {
+          {
             "marginBottom": 30,
           }
         }
@@ -1439,7 +1439,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
   </RCTScrollView>
   <View
     style={
-      Object {
+      {
         "alignItems": "center",
         "flexDirection": "row",
         "flexGrow": 1,
@@ -1460,7 +1460,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        Object {
+        {
           "alignItems": "center",
           "backgroundColor": "rgb(242, 242, 242)",
           "borderColor": "rgb(0, 122, 255)",
@@ -1480,7 +1480,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
     >
       <View
         style={
-          Object {
+          {
             "alignItems": "center",
             "display": "flex",
             "flexDirection": "row",
@@ -1494,7 +1494,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
       >
         <Text
           style={
-            Object {
+            {
               "color": "rgb(0, 122, 255)",
               "fontSize": 16,
               "fontWeight": "bold",
@@ -1519,7 +1519,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        Object {
+        {
           "alignItems": "center",
           "backgroundColor": "rgb(242, 242, 242)",
           "borderColor": "rgb(0, 122, 255)",
@@ -1539,7 +1539,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
     >
       <View
         style={
-          Object {
+          {
             "alignItems": "center",
             "display": "flex",
             "flexDirection": "row",
@@ -1553,7 +1553,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
       >
         <Text
           style={
-            Object {
+            {
               "color": "rgb(0, 122, 255)",
               "fontSize": 16,
               "fontWeight": "bold",
@@ -1573,7 +1573,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
 exports[`Component Seed - test Seed View - snapshot 1`] = `
 <RCTSafeAreaView
   style={
-    Object {
+    {
       "alignItems": "stretch",
       "backgroundColor": "rgb(242, 242, 242)",
       "display": "flex",
@@ -1584,7 +1584,7 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
 >
   <View
     style={
-      Object {
+      {
         "backgroundColor": "rgb(0, 122, 255)",
         "height": 1,
         "width": "100%",
@@ -1593,7 +1593,7 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
   />
   <RCTScrollView
     contentContainerStyle={
-      Object {
+      {
         "alignItems": "stretch",
         "flexDirection": "column",
         "justifyContent": "flex-start",
@@ -1601,7 +1601,7 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
     }
     keyboardShouldPersistTaps="handled"
     style={
-      Object {
+      {
         "maxHeight": "85%",
       }
     }
@@ -1609,7 +1609,7 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
     <View>
       <Text
         style={
-          Object {
+          {
             "color": "rgb(28, 28, 30)",
             "marginTop": 0,
             "opacity": 0.65,
@@ -1622,7 +1622,7 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
       </Text>
       <View
         style={
-          Object {
+          {
             "borderColor": "rgb(28, 28, 30)",
             "borderRadius": 10,
             "borderWidth": 1,
@@ -1644,14 +1644,14 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
           style={
-            Object {
+            {
               "opacity": 1,
             }
           }
         >
           <Text
             style={
-              Object {
+              {
                 "color": "rgb(28, 28, 30)",
                 "fontSize": 18,
                 "fontWeight": "600",
@@ -1665,7 +1665,7 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
         </View>
         <View
           style={
-            Object {
+            {
               "flexDirection": "row",
               "justifyContent": "space-between",
             }
@@ -1684,14 +1684,14 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
             style={
-              Object {
+              {
                 "opacity": 1,
               }
             }
           >
             <Text
               style={
-                Object {
+                {
                   "color": "rgb(28, 28, 30)",
                   "marginTop": 0,
                   "minHeight": 48,
@@ -1709,7 +1709,7 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
       </View>
       <View
         style={
-          Object {
+          {
             "alignItems": "center",
             "marginTop": 10,
           }
@@ -1717,7 +1717,7 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
       >
         <Text
           style={
-            Object {
+            {
               "color": "rgb(28, 28, 30)",
               "opacity": 0.65,
               "textAlign": "center",
@@ -1738,14 +1738,14 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
           style={
-            Object {
+            {
               "opacity": 1,
             }
           }
         >
           <Text
             style={
-              Object {
+              {
                 "color": "rgb(28, 28, 30)",
                 "fontSize": 18,
                 "fontWeight": "600",
@@ -1760,7 +1760,7 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
       </View>
       <View
         style={
-          Object {
+          {
             "marginBottom": 30,
           }
         }
@@ -1769,7 +1769,7 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
   </RCTScrollView>
   <View
     style={
-      Object {
+      {
         "alignItems": "center",
         "flexDirection": "row",
         "flexGrow": 1,
@@ -1790,7 +1790,7 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        Object {
+        {
           "alignItems": "center",
           "backgroundColor": "rgb(242, 242, 242)",
           "borderColor": "rgb(0, 122, 255)",
@@ -1810,7 +1810,7 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
     >
       <View
         style={
-          Object {
+          {
             "alignItems": "center",
             "display": "flex",
             "flexDirection": "row",
@@ -1824,7 +1824,7 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
       >
         <Text
           style={
-            Object {
+            {
               "color": "rgb(0, 122, 255)",
               "fontSize": 16,
               "fontWeight": "bold",

@@ -3,7 +3,7 @@
 exports[`Component Button - test Button Primary - snapshot 1`] = `
 <View
   accessibilityState={
-    Object {
+    {
       "disabled": false,
     }
   }
@@ -18,7 +18,7 @@ exports[`Component Button - test Button Primary - snapshot 1`] = `
   onResponderTerminationRequest={[Function]}
   onStartShouldSetResponder={[Function]}
   style={
-    Object {
+    {
       "alignItems": "center",
       "backgroundColor": "rgb(0, 122, 255)",
       "borderColor": "rgb(28, 28, 30)",
@@ -37,7 +37,7 @@ exports[`Component Button - test Button Primary - snapshot 1`] = `
 >
   <View
     style={
-      Object {
+      {
         "alignItems": "center",
         "display": "flex",
         "flexDirection": "row",
@@ -51,7 +51,7 @@ exports[`Component Button - test Button Primary - snapshot 1`] = `
   >
     <Text
       style={
-        Object {
+        {
           "color": "rgb(242, 242, 242)",
           "fontSize": 16,
           "fontWeight": "bold",
@@ -69,7 +69,7 @@ exports[`Component Button - test Button Primary - snapshot 1`] = `
 exports[`Component Button - test Button Secondary - snapshot 1`] = `
 <View
   accessibilityState={
-    Object {
+    {
       "disabled": false,
     }
   }
@@ -84,7 +84,7 @@ exports[`Component Button - test Button Secondary - snapshot 1`] = `
   onResponderTerminationRequest={[Function]}
   onStartShouldSetResponder={[Function]}
   style={
-    Object {
+    {
       "alignItems": "center",
       "backgroundColor": "rgb(242, 242, 242)",
       "borderColor": "rgb(0, 122, 255)",
@@ -103,7 +103,7 @@ exports[`Component Button - test Button Secondary - snapshot 1`] = `
 >
   <View
     style={
-      Object {
+      {
         "alignItems": "center",
         "display": "flex",
         "flexDirection": "row",
@@ -117,7 +117,7 @@ exports[`Component Button - test Button Secondary - snapshot 1`] = `
   >
     <Text
       style={
-        Object {
+        {
           "color": "rgb(0, 122, 255)",
           "fontSize": 16,
           "fontWeight": "bold",

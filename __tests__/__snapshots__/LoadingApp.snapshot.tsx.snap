@@ -3,7 +3,7 @@
 exports[`Component LoadingApp - test LoadingApp - snapshot 1`] = `
 <RCTSafeAreaView
   style={
-    Object {
+    {
       "alignItems": "center",
       "backgroundColor": "#011401",
       "display": "flex",
@@ -15,7 +15,7 @@ exports[`Component LoadingApp - test LoadingApp - snapshot 1`] = `
   <View />
   <View
     style={
-      Object {
+      {
         "alignItems": "center",
         "flex": 1,
         "flexDirection": "column",
@@ -25,7 +25,7 @@ exports[`Component LoadingApp - test LoadingApp - snapshot 1`] = `
   >
     <Text
       style={
-        Object {
+        {
           "color": "#888888",
           "fontSize": 40,
           "fontWeight": "bold",
@@ -36,7 +36,7 @@ exports[`Component LoadingApp - test LoadingApp - snapshot 1`] = `
     </Text>
     <Text
       style={
-        Object {
+        {
           "color": "#888888",
           "fontSize": 15,
         }

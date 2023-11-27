@@ -3,15 +3,15 @@
 exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
 <View
   style={
-    Object {
+    {
       "flexDirection": "column",
     }
   }
 >
   <RCTScrollView
     contentContainerStyle={
-      Array [
-        Object {
+      [
+        {
           "alignItems": "center",
         },
       ]
@@ -20,7 +20,7 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
     <View>
       <View
         style={
-          Object {
+          {
             "backgroundColor": "rgb(216, 216, 216)",
             "marginHorizontal": 20,
             "marginTop": 20,
@@ -40,7 +40,7 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
           style={
-            Object {
+            {
               "opacity": 1,
             }
           }
@@ -50,7 +50,7 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
       </View>
       <View
         style={
-          Object {
+          {
             "alignItems": "center",
             "flexDirection": "row",
             "justifyContent": "space-evenly",
@@ -61,7 +61,7 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
       >
         <View
           style={
-            Object {
+            {
               "alignItems": "center",
               "justifyContent": "center",
               "width": 150,
@@ -80,14 +80,14 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
             style={
-              Object {
+              {
                 "opacity": 1,
               }
             }
           >
             <Text
               style={
-                Object {
+                {
                   "color": "rgb(28, 28, 30)",
                   "marginTop": 15,
                   "minHeight": 48,
@@ -110,14 +110,14 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          Object {
+          {
             "opacity": 1,
           }
         }
       >
         <View
           style={
-            Object {
+            {
               "display": "flex",
               "flexDirection": "row",
               "flexWrap": "wrap",
@@ -128,7 +128,7 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
         >
           <Text
             style={
-              Object {
+              {
                 "color": "rgb(28, 28, 30)",
                 "flexBasis": "100%",
                 "fontFamily": "verdana",
