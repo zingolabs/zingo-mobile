@@ -40,7 +40,14 @@ mod e2e {
     }
 
     mod darkside {
-        use darkside_tests::utils::{prepare_darksidewalletd, DarksideConnector, DarksideHandler};
+        use darkside_tests::{
+            constants,
+            darkside_types::{RawTransaction, TreeState},
+            utils::{
+                prepare_darksidewalletd, update_tree_states_for_transaction, DarksideConnector,
+                DarksideHandler,
+            },
+        };
 
         #[tokio::test]
         async fn simple_sync() {
@@ -75,9 +82,34 @@ mod e2e {
                 .await
                 .unwrap();
 
-            let connector = DarksideConnector(server_id.clone());
-            connector.stage_blocks_create(4, 999997, 1).await.unwrap();
-            connector.apply_staged(1000000).await.unwrap();
+            // let connector = DarksideConnector(server_id.clone());
+            // connector.stage_blocks_create(4, 999997, 1).await.unwrap();
+
+            // connector
+            //     .stage_transactions_stream(vec![(
+            //         hex::decode(constants::O_TO_O_SEND_TO_SELF).unwrap(),
+            //         50,
+            //     )])
+            //     .await
+            //     .unwrap();
+            // let tree_height_50 = update_tree_states_for_transaction(
+            //     &server_id.clone(),
+            //     RawTransaction {
+            //         data: hex::decode(constants::O_TO_O_SEND_TO_SELF).unwrap(),
+            //         height: 50,
+            //     },
+            //     50,
+            // )
+            // .await;
+            // connector
+            //     .add_tree_state(TreeState {
+            //         height: 51,
+            //         ..tree_height_50
+            //     })
+            //     .await
+            //     .unwrap();
+
+            // connector.apply_staged(1000000).await.unwrap();
 
             let (exit_code, output, error) =
                 zingomobile_utils::android_e2e_test("darkside_interrupt_sync");
