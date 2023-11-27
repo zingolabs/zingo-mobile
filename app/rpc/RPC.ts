@@ -635,7 +635,7 @@ export default class RPC {
       return rescanStr;
     } catch (error) {
       console.log(`Critical Error rescan ${error}`);
-      this.fnSetFetchError(cmd, `${error}`);
+      this.fnSetFetchError(cmd, `Error catch ${error}`);
       return `Error: ${error}`;
     }
   }
@@ -659,7 +659,7 @@ export default class RPC {
       return syncStr;
     } catch (error) {
       console.log(`Critical Error sync ${error}`);
-      this.fnSetFetchError(cmd, `${error}`);
+      this.fnSetFetchError(cmd, `Error catch ${error}`);
       return `Error: ${error}`;
     }
   }
