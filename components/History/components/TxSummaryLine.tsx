@@ -114,7 +114,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
             </View>
             <View style={{ display: 'flex', flexGrow: 1, flexDirection: tx.type === 'Received' ? 'row' : 'column' }}>
               {mode !== 'basic' &&
-                tx.txDetails.map((txd: TxDetailType) => {
+                tx.txDetails.map((txd: TxDetailType, ind: number) => {
                   return (
                     <View
                       key={txd.address + txd.pool}
@@ -131,7 +131,9 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
                       )}
                       {!!txd.pool &&
                         ((tx.txDetails.length === 1 && txd.pool !== 'Orchard') || tx.txDetails.length > 1) && (
-                          <FadeText style={{ fontSize: 15, opacity: 1 }}>{txd.pool}</FadeText>
+                          <FadeText style={{ fontSize: 15, opacity: 1 }}>
+                            {txd.pool + (ind < tx.txDetails.length - 1 ? '   -' : '')}
+                          </FadeText>
                         )}
                       {false && (
                         <ZecAmount
