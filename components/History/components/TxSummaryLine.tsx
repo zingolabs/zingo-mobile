@@ -42,7 +42,10 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
   moment.locale(language);
 
   // if no address I'm going to put txid here.
-  const displayAddress = Utils.trimToSmall(tx.txid, 7);
+  const displayId = Utils.trimToSmall(tx.txid, 7);
+  // only for basic mode
+  const displayAddress =
+    tx.txDetails.length === 1 && mode === 'basic' ? Utils.trimToSmall(tx.txDetails[0].address, 10) : '';
 
   //console.log('render TxSummaryLine - 5', index);
 
@@ -89,8 +92,15 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
                 flexDirection: 'row',
                 alignItems: 'center',
               }}>
-              <FadeText style={{ fontSize: 18 }}>{displayAddress}</FadeText>
-              {tx.fee && (
+              <FadeText
+                style={{
+                  fontSize: 18,
+                  fontWeight: displayAddress ? 'bold' : 'normal',
+                  opacity: displayAddress ? 1 : 0.45,
+                }}>
+                {displayAddress ? displayAddress : displayId}
+              </FadeText>
+              {tx.fee && mode !== 'basic' && (
                 <ZecAmount
                   style={{ flexGrow: 1, justifyContent: 'flex-end', paddingRight: 5, opacity: !amount ? 1 : 0.6 }}
                   size={15}
@@ -102,8 +112,8 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
                 />
               )}
             </View>
-            <View style={{ display: 'flex', flexGrow: 1 }}>
-              {((tx.txDetails.length === 1 && tx.type === 'Sent') || (tx.txDetails.length > 1 && mode !== 'basic')) &&
+            <View style={{ display: 'flex', flexGrow: 1, flexDirection: tx.type === 'Received' ? 'row' : 'column' }}>
+              {mode !== 'basic' &&
                 tx.txDetails.map((txd: TxDetailType) => {
                   return (
                     <View
@@ -113,12 +123,17 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
                         <>
                           {!txd.address && <FadeText style={{ fontSize: 15 }}>{'Unknown'}</FadeText>}
                           {!!txd.address && (
-                            <FadeText style={{ fontSize: 15 }}>{Utils.trimToSmall(txd.address, 10)}</FadeText>
+                            <FadeText style={{ fontSize: 15, opacity: 1 }}>
+                              {Utils.trimToSmall(txd.address, 10)}
+                            </FadeText>
                           )}
                         </>
                       )}
-                      {!!txd.pool && <FadeText style={{ fontSize: 15 }}>{txd.pool}</FadeText>}
-                      {tx.txDetails.length > 1 && (
+                      {!!txd.pool &&
+                        ((tx.txDetails.length === 1 && txd.pool !== 'Orchard') || tx.txDetails.length > 1) && (
+                          <FadeText style={{ fontSize: 15, opacity: 1 }}>{txd.pool}</FadeText>
+                        )}
+                      {false && (
                         <ZecAmount
                           style={{
                             flexGrow: 1,
@@ -143,7 +158,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
                 flexDirection: 'row',
                 alignItems: 'center',
               }}>
-              <FadeText style={{ fontWeight: 'bold', color: amountColor }}>
+              <FadeText style={{ fontWeight: 'bold', color: amountColor, opacity: 0.9 }}>
                 {tx.type === 'Sent'
                   ? (translate('history.sent') as string)
                   : tx.type === 'Received'
