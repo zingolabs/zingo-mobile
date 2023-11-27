@@ -3,10 +3,10 @@
 exports[`Component Receive - test Receive - snapshot 1`] = `
 <
   navigationState={
-    {
+    Object {
       "index": 0,
-      "routes": [
-        {
+      "routes": Array [
+        Object {
           "key": "uaddr",
           "title": "text translated",
         },

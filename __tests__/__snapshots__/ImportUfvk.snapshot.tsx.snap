@@ -3,7 +3,7 @@
 exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
 <RCTSafeAreaView
   style={
-    {
+    Object {
       "alignItems": "stretch",
       "backgroundColor": "rgb(242, 242, 242)",
       "display": "flex",
@@ -21,7 +21,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
   />
   <RCTScrollView
     contentContainerStyle={
-      {
+      Object {
         "alignItems": "stretch",
         "flexDirection": "column",
         "justifyContent": "flex-start",
@@ -29,7 +29,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
     }
     keyboardShouldPersistTaps="handled"
     style={
-      {
+      Object {
         "maxHeight": "85%",
       }
     }
@@ -37,7 +37,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
     <View>
       <Text
         style={
-          {
+          Object {
             "color": "rgb(28, 28, 30)",
             "marginTop": 0,
             "opacity": 0.65,
@@ -48,7 +48,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
       />
       <View
         style={
-          {
+          Object {
             "borderColor": "rgb(28, 28, 30)",
             "borderRadius": 10,
             "borderWidth": 1,
@@ -64,7 +64,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
           accessibilityLabel=""
           accessible={true}
           style={
-            {
+            Object {
               "borderColor": "rgb(28, 28, 30)",
               "borderRadius": 10,
               "borderWidth": 1,
@@ -80,7 +80,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
             multiline={true}
             onChangeText={[Function]}
             style={
-              {
+              Object {
                 "backgroundColor": "transparent",
                 "color": "rgb(28, 28, 30)",
                 "fontSize": 16,
@@ -104,7 +104,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
           style={
-            {
+            Object {
               "opacity": 1,
             }
           }
@@ -112,11 +112,11 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
           <
             color="rgb(216, 216, 216)"
             icon={
-              {
-                "icon": [
+              Object {
+                "icon": Array [
                   448,
                   512,
-                  [],
+                  Array [],
                   "f029",
                   "M0 80C0 53.5 21.5 32 48 32h96c26.5 0 48 21.5 48 48v96c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V80zM64 96v64h64V96H64zM0 336c0-26.5 21.5-48 48-48h96c26.5 0 48 21.5 48 48v96c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V336zm64 16v64h64V352H64zM304 32h96c26.5 0 48 21.5 48 48v96c0 26.5-21.5 48-48 48H304c-26.5 0-48-21.5-48-48V80c0-26.5 21.5-48 48-48zm80 64H320v64h64V96zM256 304c0-8.8 7.2-16 16-16h64c8.8 0 16 7.2 16 16s7.2 16 16 16h32c8.8 0 16-7.2 16-16s7.2-16 16-16s16 7.2 16 16v96c0 8.8-7.2 16-16 16H368c-8.8 0-16-7.2-16-16s-7.2-16-16-16s-16 7.2-16 16v64c0 8.8-7.2 16-16 16H272c-8.8 0-16-7.2-16-16V304zM368 480a16 16 0 1 1 0-32 16 16 0 1 1 0 32zm64 0a16 16 0 1 1 0-32 16 16 0 1 1 0 32z",
                 ],
@@ -130,7 +130,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
       </View>
       <View
         style={
-          {
+          Object {
             "alignItems": "center",
             "marginTop": 10,
           }
@@ -138,7 +138,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
       >
         <Text
           style={
-            {
+            Object {
               "color": "rgb(28, 28, 30)",
               "opacity": 0.65,
             }
@@ -146,7 +146,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
         />
         <Text
           style={
-            {
+            Object {
               "color": "rgb(28, 28, 30)",
               "opacity": 0.65,
               "textAlign": "center",
@@ -159,7 +159,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
           accessibilityLabel=""
           accessible={true}
           style={
-            {
+            Object {
               "borderColor": "rgb(28, 28, 30)",
               "borderRadius": 10,
               "borderWidth": 1,
@@ -178,7 +178,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
             onChangeText={[Function]}
             placeholder="#"
             style={
-              {
+              Object {
                 "backgroundColor": "transparent",
                 "color": "rgb(28, 28, 30)",
                 "fontSize": 18,
@@ -193,7 +193,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
         </View>
         <Text
           style={
-            {
+            Object {
               "color": "rgb(28, 28, 30)",
               "fontSize": 18,
               "fontWeight": "600",
@@ -208,7 +208,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
   </RCTScrollView>
   <View
     style={
-      {
+      Object {
         "alignItems": "center",
         "flexDirection": "row",
         "flexGrow": 1,
@@ -229,7 +229,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        {
+        Object {
           "alignItems": "center",
           "backgroundColor": "rgb(0, 122, 255)",
           "borderColor": "rgb(28, 28, 30)",
@@ -248,7 +248,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
     >
       <View
         style={
-          {
+          Object {
             "alignItems": "center",
             "display": "flex",
             "flexDirection": "row",
@@ -262,7 +262,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
       >
         <Text
           style={
-            {
+            Object {
               "color": "rgb(242, 242, 242)",
               "fontSize": 16,
               "fontWeight": "bold",
@@ -285,7 +285,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        {
+        Object {
           "alignItems": "center",
           "backgroundColor": "rgb(242, 242, 242)",
           "borderColor": "rgb(0, 122, 255)",
@@ -305,7 +305,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
     >
       <View
         style={
-          {
+          Object {
             "alignItems": "center",
             "display": "flex",
             "flexDirection": "row",
@@ -319,7 +319,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
       >
         <Text
           style={
-            {
+            Object {
               "color": "rgb(0, 122, 255)",
               "fontSize": 16,
               "fontWeight": "bold",
