@@ -119,7 +119,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
                     <View
                       key={txd.address + txd.pool}
                       style={{ display: 'flex', flexDirection: 'row', marginLeft: 10 }}>
-                      {!!txd.address && (
+                      {!!txd.address && ind < 3 && (
                         <>
                           {!txd.address && <FadeText style={{ fontSize: 15 }}>{'Unknown'}</FadeText>}
                           {!!txd.address && (
@@ -130,25 +130,16 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
                         </>
                       )}
                       {!!txd.pool &&
+                        ind < 3 &&
                         ((tx.txDetails.length === 1 && txd.pool !== 'Orchard') || tx.txDetails.length > 1) && (
                           <FadeText style={{ fontSize: 15, opacity: 1 }}>
-                            {txd.pool + (ind < tx.txDetails.length - 1 ? '   -' : '')}
+                            {txd.pool + (ind < tx.txDetails.length - 1 ? '   -' : ' ')}
                           </FadeText>
                         )}
-                      {false && (
-                        <ZecAmount
-                          style={{
-                            flexGrow: 1,
-                            justifyContent: 'flex-end',
-                            paddingRight: 10,
-                            margin: 0,
-                          }}
-                          size={15}
-                          currencyName={info.currencyName ? info.currencyName : ''}
-                          color={amountColor}
-                          amtZec={txd.amount}
-                          privacy={privacy}
-                        />
+                      {ind === 3 && (
+                        <FadeText style={{ fontSize: 11 }}>
+                          {'(' + tx.txDetails.length + ' ' + (translate('send.more') as string) + ')'}
+                        </FadeText>
                       )}
                     </View>
                   );
