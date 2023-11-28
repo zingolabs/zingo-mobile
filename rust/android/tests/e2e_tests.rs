@@ -42,12 +42,13 @@ mod e2e {
     mod darkside {
         use darkside_tests::{
             constants,
-            darkside_types::{RawTransaction, TreeState},
             utils::{
-                prepare_darksidewalletd, update_tree_states_for_transaction, DarksideConnector,
-                DarksideHandler,
+                init_darksidewalletd, prepare_darksidewalletd, read_block_dataset,
+                stage_transaction, update_tree_state_and_apply_staged,
+                update_tree_states_for_transaction, DarksideConnector, DarksideHandler,
             },
         };
+        use zingo_testutils::regtest::get_cargo_manifest_dir;
 
         #[tokio::test]
         async fn simple_sync() {
@@ -72,44 +73,41 @@ mod e2e {
         }
         #[tokio::test]
         async fn interrupt_sync() {
-            let darkside_handler = DarksideHandler::new(Some(20000));
-
-            let server_id = zingoconfig::construct_lightwalletd_uri(Some(format!(
-                "http://127.0.0.1:{}",
-                darkside_handler.grpc_port
-            )));
-            prepare_darksidewalletd(server_id.clone(), true)
+            // initialise darksidewalletd and stage first part of blockchain
+            let (_handler, connector) = init_darksidewalletd(Some(20000)).await.unwrap();
+            const BLOCKCHAIN_HEIGHT: i32 = 150_000;
+            connector
+                .stage_blocks_create(2, BLOCKCHAIN_HEIGHT - 1, 0)
                 .await
                 .unwrap();
+            stage_transaction(
+                &connector,
+                2,
+                constants::ABANDON_TO_DARKSIDE_SAP_10_000_000_ZAT,
+            )
+            .await;
 
-            // let connector = DarksideConnector(server_id.clone());
-            // connector.stage_blocks_create(4, 999997, 1).await.unwrap();
+            let tx_set_path = format!(
+                "{}/{}",
+                get_cargo_manifest_dir().to_string_lossy(),
+                constants::INTERRUPT_SYNC_TX_SET
+            );
+            let tx_set = read_block_dataset(tx_set_path);
 
-            // connector
-            //     .stage_transactions_stream(vec![(
-            //         hex::decode(constants::O_TO_O_SEND_TO_SELF).unwrap(),
-            //         50,
-            //     )])
-            //     .await
-            //     .unwrap();
-            // let tree_height_50 = update_tree_states_for_transaction(
-            //     &server_id.clone(),
-            //     RawTransaction {
-            //         data: hex::decode(constants::O_TO_O_SEND_TO_SELF).unwrap(),
-            //         height: 50,
-            //     },
-            //     50,
-            // )
-            // .await;
-            // connector
-            //     .add_tree_state(TreeState {
-            //         height: 51,
-            //         ..tree_height_50
-            //     })
-            //     .await
-            //     .unwrap();
+            // stage a send to self every thousand blocks
+            for thousands_blocks_count in 1..(BLOCKCHAIN_HEIGHT / 1000) as u64 {
+                update_tree_state_and_apply_staged(&connector, thousands_blocks_count * 1000 - 1)
+                    .await;
+                stage_transaction(
+                    &connector,
+                    thousands_blocks_count * 1000,
+                    &tx_set[(thousands_blocks_count - 1) as usize],
+                )
+                .await;
+            }
 
-            // connector.apply_staged(1000000).await.unwrap();
+            // apply last part of the blockchain
+            connector.apply_staged(BLOCKCHAIN_HEIGHT).await.unwrap();
 
             let (exit_code, output, error) =
                 zingomobile_utils::android_e2e_test("darkside_interrupt_sync");

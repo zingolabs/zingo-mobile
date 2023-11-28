@@ -16,6 +16,7 @@ let loadDarksideWallet = async () => {
   await element(by.id("settings.custom-server-chain.regtest")).tap();
   await element(by.id("settings.custom-server-field")).replaceText('http://10.0.2.2:20000');
   await element(by.id('settings.button.save')).tap();
+  await waitFor(element(by.id('seed.button.OK'))).toBeVisible().withTimeout(sync_timeout);
   await element(by.id('seed.button.OK')).tap();
   await element(by.text('CONFIRM')).tap();
 
