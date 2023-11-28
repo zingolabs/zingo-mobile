@@ -79,5 +79,7 @@ describe('Interrupt sync', () => {
     await expect(element(by.id('transparent-balance.big-part'))).toHaveText(' 0.0000');
     await expect(element(by.id('transparent-total-balance.small-part'))).not.toBeVisible();
     await element(by.id('fund-pools.button.close')).tap();
+
+    await sleep(180000);
   });
 });
