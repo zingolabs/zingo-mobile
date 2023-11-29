@@ -14,14 +14,16 @@ import AbDetail from './components/AbDetail';
 import AbSummaryLine from './components/AbSummaryLine';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
+import AddressBookFileImpl from './AddressBookFileImpl';
 
 type AddressBookProps = {
   closeModal: () => void;
+  setAddressBook: (ab: AddressBookFileClass[]) => void;
 };
 
-const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal }) => {
+const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, setAddressBook }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, language } = context;
+  const { translate, language, addressBook } = context;
   moment.locale(language);
 
   const { colors } = useTheme() as unknown as ThemeType;
@@ -31,15 +33,11 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal }) 
 
   const [currentItem, setCurrentItem] = useState<number | null>(null);
   const [titleViewHeight, setTitleViewHeight] = useState(0);
+  const [action, setAction] = useState<'Add' | 'Modify' | 'Delete' | null>(null);
 
   const slideAnim = useRef(new Animated.Value(0)).current;
 
   const fetchAddressBookSorted = useMemo(async () => {
-    //const addressBook = await AddressBookFileImpl.readAddressBook();
-    const addressBook = [
-      { address: 'lasikdvjlsdivlsdvmlsdvmjslkdvmslkvlskdvlskdvlskvmlskmv', label: 'pepe' },
-      { address: 'hajdcnklasdclakscnmlakcnlaksclakscmlaskcalkialkkfialkfkalfkalfkajf', label: 'lolo' },
-    ];
     return addressBook.slice(0, numTx).sort((a, b) => {
       const nA = a.label.toUpperCase();
       const nB = b.label.toUpperCase();
@@ -51,7 +49,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal }) 
         return 0;
       }
     });
-  }, [numTx]);
+  }, [addressBook, numTx]);
 
   useEffect(() => {
     (async () => {
@@ -91,9 +89,29 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal }) 
 
   const newAddressBookItem = () => {
     setCurrentItem(-1);
+    setAction('Add');
   };
 
-  console.log('render Address Book - 4', currentItem);
+  const cancel = () => {
+    setCurrentItem(null);
+    setAction(null);
+  };
+
+  const doAction = async (a: 'Add' | 'Modify' | 'Delete', label: string, address: string) => {
+    if (!label || !address) {
+      return;
+    }
+    let ab: AddressBookFileClass[] = [];
+    if (a === 'Delete') {
+      ab = await AddressBookFileImpl.removeAddressBookItem(label, address);
+    } else {
+      ab = await AddressBookFileImpl.writeAddressBookItem(label, address);
+    }
+    setAddressBook(ab);
+    cancel();
+  };
+
+  console.log('render Address Book - 4', currentItem, action);
 
   return (
     <SafeAreaView
@@ -122,25 +140,55 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal }) 
 
       <ScrollView
         testID="addressbook.scrollView"
+        keyboardShouldPersistTaps="handled"
         style={{ maxHeight: '85%' }}
         contentContainerStyle={{
           flexDirection: 'column',
           alignItems: 'stretch',
           justifyContent: 'flex-start',
         }}>
+        {currentItem === -1 && action !== null && (
+          <AbDetail
+            index={-1}
+            key={'detail-new'}
+            item={{} as AddressBookFileClass}
+            cancel={cancel}
+            action={action}
+            doAction={doAction}
+          />
+        )}
+        {currentItem !== null && currentItem > -1 && action !== null && (
+          <AbDetail
+            index={currentItem}
+            key={`detail-${currentItem}-${addressBookSorted[currentItem].label}`}
+            item={addressBookSorted[currentItem]}
+            cancel={cancel}
+            action={action}
+            doAction={doAction}
+          />
+        )}
+        {addressBookSorted.length === 0 && (
+          <View
+            style={{
+              height: 150,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'flex-start',
+              marginTop: 30,
+            }}>
+            <FadeText style={{ color: colors.primary }}>{translate('addressbook.empty') as string}</FadeText>
+          </View>
+        )}
         {addressBookSorted.flatMap((aBItem, index) => {
           return (
             <View key={`container-${index}-${aBItem.label}`}>
-              {currentItem === index ? (
-                <AbDetail index={index} key={`detail-${index}-${aBItem.label}`} item={aBItem} />
-              ) : (
+              {currentItem !== index && (
                 <AbSummaryLine
                   index={index}
                   key={`line-${index}-${aBItem.label}`}
                   item={aBItem}
-                  setCurrentItem={(idx: number) => {
-                    setCurrentItem(idx);
-                  }}
+                  setCurrentItem={setCurrentItem}
+                  setAction={setAction}
                 />
               )}
             </View>
@@ -176,27 +224,29 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal }) 
           </>
         )}
       </ScrollView>
-      <View
-        style={{
-          flexGrow: 1,
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'center',
-          marginVertical: 5,
-        }}>
-        <Button
-          testID="addressbook.button.new"
-          type="Primary"
-          title={translate('addressbook.new') as string}
-          onPress={() => newAddressBookItem()}
-        />
-        <Button
-          type="Secondary"
-          title={translate('cancel') as string}
-          style={{ marginLeft: 10 }}
-          onPress={closeModal}
-        />
-      </View>
+      {currentItem === null && (
+        <View
+          style={{
+            flexGrow: 1,
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginVertical: 5,
+          }}>
+          <Button
+            testID="addressbook.button.new"
+            type="Primary"
+            title={translate('addressbook.new') as string}
+            onPress={() => newAddressBookItem()}
+          />
+          <Button
+            type="Secondary"
+            title={translate('cancel') as string}
+            style={{ marginLeft: 10 }}
+            onPress={closeModal}
+          />
+        </View>
+      )}
     </SafeAreaView>
   );
 };

@@ -22,7 +22,12 @@
     "end": "Fin",
     "new": "Nuevo",
     "loadmore": "Cargar más",
-    "label": "Etiqueta/Contacto/Apodo"
+    "label": "Etiqueta/Contacto/Apodo",
+    "add": "Añadir",
+    "modify": "Modificar",
+    "delete": "Borrar",
+    "empty": "No existen contactos todavía.",
+    "nochanges": "No se haan registrado cambios."
   },
   "change-privacy-legend": ".\nPulsar para revelar los valores ocultos.",
   "txtcopied": "Texto copiado al Portapapeles",

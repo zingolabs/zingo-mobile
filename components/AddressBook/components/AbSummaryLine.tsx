@@ -16,8 +16,9 @@ type AbSummaryLineProps = {
   index: number;
   item: AddressBookFileClass;
   setCurrentItem: (b: number) => void;
+  setAction: (action: 'Add' | 'Modify' | 'Delete') => void;
 };
-const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({ index, item, setCurrentItem }) => {
+const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({ index, item, setCurrentItem, setAction }) => {
   //const context = useContext(ContextAppLoaded);
   //const { translate, privacy, info } = context;
   const { colors } = useTheme() as unknown as ThemeType;
@@ -31,6 +32,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({ index, ite
       <TouchableOpacity
         onPress={() => {
           setCurrentItem(index);
+          setAction('Modify');
         }}>
         <View
           style={{
@@ -52,10 +54,17 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({ index, ite
             </View>
           </View>
           <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
-            <FontAwesomeIcon style={{}} size={24} icon={faPencil} color={colors.primary} />
+            <FontAwesomeIcon style={{}} size={20} icon={faPencil} color={colors.primary} />
           </View>
           <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
-            <FontAwesomeIcon style={{}} size={24} icon={faTrashCan} color={colors.primary} />
+            <TouchableOpacity
+              style={{ zIndex: 999 }}
+              onPress={() => {
+                setCurrentItem(index);
+                setAction('Delete');
+              }}>
+              <FontAwesomeIcon style={{ opacity: 0.8 }} size={20} icon={faTrashCan} color={'red'} />
+            </TouchableOpacity>
           </View>
         </View>
       </TouchableOpacity>

@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { View, TextInput } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
@@ -9,17 +9,59 @@ import RegText from '../../Components/RegText';
 import { ContextAppLoaded } from '../../../app/context';
 import InputTextAddress from '../../Components/InputTextAddress';
 import { ZcashURITargetClass, parseZcashURI } from '../../../app/uris';
+import Button from '../../Components/Button';
+import FadeText from '../../Components/FadeText';
 
 type AbDetailProps = {
   index: number;
   item: AddressBookFileClass;
+  cancel: () => void;
+  action: 'Add' | 'Modify' | 'Delete';
+  doAction: (action: 'Add' | 'Modify' | 'Delete', label: string, address: string) => void;
 };
-const AbDetail: React.FunctionComponent<AbDetailProps> = ({ index, item }) => {
+const AbDetail: React.FunctionComponent<AbDetailProps> = ({ index, item, cancel, action: actionProp, doAction }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, server, addLastSnackbar } = context;
+  const { translate, server, addLastSnackbar, addressBook } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [label, setLabel] = useState<string>(item.label);
   const [address, setAddress] = useState<string>(item.address);
+  const [action, setAction] = useState<'Add' | 'Modify' | 'Delete'>(actionProp);
+  const [error, setError] = useState<string>('');
+
+  useEffect(() => {
+    if (item.label !== label && item.address !== address) {
+      setAction('Add');
+    } else {
+      setAction(actionProp);
+    }
+    if (!error) {
+      if (item.label !== label && addressBook.filter((elem: AddressBookFileClass) => elem.label === label).length > 0) {
+        if (
+          item.address !== address &&
+          addressBook.filter((elem: AddressBookFileClass) => elem.address === address).length > 0
+        ) {
+          setError('This label and this address already exists');
+        } else {
+          setError('This label already exists');
+        }
+      } else {
+        if (
+          item.address !== address &&
+          addressBook.filter((elem: AddressBookFileClass) => elem.address === address).length > 0
+        ) {
+          setError('This address already exists');
+        } else {
+          setError('');
+        }
+      }
+    }
+  }, [actionProp, address, addressBook, error, item.address, item.label, label, translate]);
+
+  const setErrorAddress = (e: string) => {
+    if (!error) {
+      setError(e);
+    }
+  };
 
   const updateAddress = async (addr: string) => {
     if (!addr) {
@@ -51,7 +93,9 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({ index, item }) => {
   console.log('render Ab Detail - 5', index);
 
   return (
-    <View testID={`addressBookDetail.${index + 1}`} style={{ display: 'flex', flexDirection: 'column' }}>
+    <View
+      testID={`addressBookDetail.${index + 1}`}
+      style={{ display: 'flex', flexDirection: 'column', borderColor: colors.primary, borderWidth: 1, margin: 10 }}>
       <RegText style={{ marginTop: 10, paddingHorizontal: 10 }}>{translate('addressbook.label') as string}</RegText>
       <View
         style={{
@@ -85,11 +129,53 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({ index, item }) => {
             }}
             value={label}
             onChangeText={(text: string) => setLabel(text)}
-            editable={true}
+            editable={action !== 'Delete'}
           />
         </View>
       </View>
-      <InputTextAddress address={address} setAddress={updateAddress} />
+      <InputTextAddress
+        address={address}
+        setAddress={updateAddress}
+        setError={setErrorAddress}
+        disabled={action === 'Delete'}
+      />
+      {!!error && (
+        <View
+          style={{
+            flexGrow: 1,
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginVertical: 5,
+          }}>
+          <FadeText style={{ color: colors.primary }}>{error}</FadeText>
+        </View>
+      )}
+      <View
+        style={{
+          flexGrow: 1,
+          flexDirection: 'row',
+          justifyContent: 'center',
+          alignItems: 'center',
+          marginVertical: 5,
+        }}>
+        <Button
+          testID="addressbook.button.action"
+          type="Primary"
+          title={translate(`addressbook.${action.toLowerCase()}`) as string}
+          onPress={() => {
+            if (item.label === label && item.address === address && action !== 'Delete') {
+              setError(translate('addressbook.nochanges') as string);
+              return;
+            } else {
+              setError('');
+            }
+            doAction(action, label, address);
+          }}
+          disabled={action === 'Delete' ? false : error ? true : false}
+        />
+        <Button type="Secondary" title={translate('cancel') as string} style={{ marginLeft: 10 }} onPress={cancel} />
+      </View>
     </View>
   );
 };

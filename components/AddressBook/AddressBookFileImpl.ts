@@ -8,20 +8,21 @@ export default class AddressBookFileImpl {
   }
 
   // Write only one item
-  static async writeAddressBookItem(label: string, address: string) {
+  static async writeAddressBookItem(label: string, address: string): Promise<AddressBookFileClass[]> {
     const fileName = await this.getFileName();
     const addressBook = await this.readAddressBook();
 
-    let newAddressBook: AddressBookFileClass[];
-    if (addressBook.filter(item => item.label === label && item.address === address).length >= 0) {
+    if (addressBook.filter(item => item.label === label && item.address === address).length > 0) {
       // already exists the combination of label & address -> do nothing
-      return;
+      return addressBook;
     }
+
+    let newAddressBook: AddressBookFileClass[];
     const newItem: AddressBookFileClass = { label, address };
-    if (addressBook.filter(item => item.label === label).length >= 0) {
+    if (addressBook.filter(item => item.label === label).length > 0) {
       // already exists the label -> update the address
       newAddressBook = [...addressBook.filter(item => item.label !== label), newItem];
-    } else if (addressBook.filter(item => item.address === address).length >= 0) {
+    } else if (addressBook.filter(item => item.address === address).length > 0) {
       // already exists the address -> update the label
       newAddressBook = [...addressBook.filter(item => item.address !== address), newItem];
     } else {
@@ -33,15 +34,16 @@ export default class AddressBookFileImpl {
 
     RNFS.writeFile(fileName, JSON.stringify(newAddressBook), 'utf8')
       .then(() => {
-        //console.log('FILE WRITTEN!')
+        //console.log('FILE WRITTEN!');
       })
       .catch(() => {
-        //console.log(err.message)
+        return [] as AddressBookFileClass[];
       });
+    return newAddressBook;
   }
 
   // remove one item
-  static async removeAddressBookItem(label: string, address: string) {
+  static async removeAddressBookItem(label: string, address: string): Promise<AddressBookFileClass[]> {
     const fileName = await this.getFileName();
     const addressBook = await this.readAddressBook();
 
@@ -57,8 +59,9 @@ export default class AddressBookFileImpl {
         //console.log('FILE WRITTEN!')
       })
       .catch(() => {
-        //console.log(err.message)
+        return [] as AddressBookFileClass[];
       });
+    return newAddressBook;
   }
 
   // Read the entire address book
@@ -66,13 +69,11 @@ export default class AddressBookFileImpl {
     const fileName = await this.getFileName();
 
     try {
-      // TODO verify that JSON don't fail.
       const addressBook: AddressBookFileClass[] = JSON.parse((await RNFS.readFile(fileName, 'utf8')).toString());
       return addressBook;
     } catch (err) {
       // The File doesn't exist, so return nothing
-      const addressBook = [] as AddressBookFileClass[];
-      return addressBook;
+      return [] as AddressBookFileClass[];
     }
   }
 }

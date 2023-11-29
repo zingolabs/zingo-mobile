@@ -22,7 +22,12 @@
     "end": "End",
     "new": "New",
     "loadmore": "Load More",
-    "label": "Tag/Label/Contact/Nym"
+    "label": "Tag/Label/Contact/Nym",
+    "add": "Add",
+    "modify": "Modify",
+    "delete": "Delete",
+    "empty": "No contacts yet.",
+    "nochanges": "No changes registered."
   },
   "change-privacy-legend": ".\nTap to reveal the hidden values.",
   "txtcopied": "Text copied to Clipboard",

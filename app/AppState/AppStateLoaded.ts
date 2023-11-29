@@ -19,6 +19,7 @@ import NetInfoType from './types/NetInfoType';
 import BackgroundErrorType from './types/BackgroundErrorType';
 import ServerType from './types/ServerType';
 import SnackbarType from './types/SnackbarType';
+import AddressBookFileClass from './classes/AddressBookFileClass';
 
 export default interface AppStateLoaded {
   navigation: StackScreenProps<any>['navigation'];
@@ -119,6 +120,8 @@ export default interface AppStateLoaded {
   addLastSnackbar: (snackbar: SnackbarType) => void;
   restartApp: (s: any) => void;
   someUnconfirmed: boolean;
+
+  addressBook: AddressBookFileClass[];
 
   // eslint-disable-next-line semi
 }

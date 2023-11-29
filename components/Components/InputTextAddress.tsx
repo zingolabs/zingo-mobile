@@ -17,8 +17,15 @@ import RegText from './RegText';
 type InputTextAddressProps = {
   address: string;
   setAddress: (a: string) => void;
+  setError: (e: string) => void;
+  disabled: boolean;
 };
-const InputTextAddress: React.FunctionComponent<InputTextAddressProps> = ({ address, setAddress }) => {
+const InputTextAddress: React.FunctionComponent<InputTextAddressProps> = ({
+  address,
+  setAddress,
+  setError,
+  disabled,
+}) => {
   const context = useContext(ContextAppLoaded);
   const { netInfo, addLastSnackbar, translate, server } = context;
   const { colors } = useTheme() as unknown as ThemeType;
@@ -50,11 +57,12 @@ const InputTextAddress: React.FunctionComponent<InputTextAddressProps> = ({ addr
     if (address) {
       parseAdressJSON(address).then(r => {
         setValidAddress(r ? 1 : -1);
+        setError(r ? '' : (translate('send.invalidaddress') as string));
       });
     } else {
       setValidAddress(0);
     }
-  }, [addLastSnackbar, address, netInfo.isConnected, server.chain_name, translate]);
+  }, [addLastSnackbar, address, netInfo.isConnected, server.chain_name, setError, translate]);
 
   console.log('render input text address');
 
@@ -102,7 +110,7 @@ const InputTextAddress: React.FunctionComponent<InputTextAddressProps> = ({ addr
                 }}
                 value={address}
                 onChangeText={(text: string) => setAddress(text)}
-                editable={true}
+                editable={!disabled}
               />
             </View>
             <View
@@ -111,6 +119,7 @@ const InputTextAddress: React.FunctionComponent<InputTextAddressProps> = ({ addr
               }}>
               <TouchableOpacity
                 testID="send.scan-button"
+                disabled={disabled}
                 accessible={true}
                 accessibilityLabel={translate('send.scan-acc') as string}
                 onPress={() => {
