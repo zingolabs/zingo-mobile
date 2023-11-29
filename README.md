@@ -34,7 +34,7 @@ Google Play: [https://play.google.com/store/apps/details?id=org.ZingoLabs.Zingo]
 2. NodeJS (recommended version 17+)
 3. Rust (https://www.rust-lang.org/tools/install)
 4. Docker (Docker Engine)
-5. OpenJDK 18
+5. OpenJDK 18 (https://jdk.java.net/archive/)
 6. Android SDK Command-line Tools <br />
    Install via Android Studio SDK Manager: <br />
    https://developer.android.com/studio/install <br />
