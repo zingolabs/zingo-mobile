@@ -36,7 +36,8 @@ Google Play: [https://play.google.com/store/apps/details?id=org.ZingoLabs.Zingo]
 4. Docker (Docker Engine)
 5. OpenJDK 18 (https://jdk.java.net/archive/)
 
-curl https://download.java.net/java/GA/jdk18.0.2/f6ad4b4450fd4d298113270ec84f30ee/9/GPL/openjdk-18.0.2_linux-aarch64_bin.tar.gz -o ${JAVA_HOME}/openjdk-18.0.2_linux-aarch64_bin.tar.gz
+    1. curl https://download.java.net/java/GA/jdk18.0.2/f6ad4b4450fd4d298113270ec84f30ee/9/GPL/openjdk-18.0.2_linux-aarch64_bin.tar.gz -o ${JAVA_HOME}/openjdk-18.0.2_linux-aarch64_bin.tar.gz
+    2. tar -xzvf openjdk-18.0.2_linux-aarch64_bin.tar.gz
 
 6. Android SDK Command-line Tools <br />
    Install via Android Studio SDK Manager: <br />
