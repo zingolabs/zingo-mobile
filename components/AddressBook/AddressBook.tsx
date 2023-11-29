@@ -14,6 +14,7 @@ import AbDetail from './components/AbDetail';
 import AbSummaryLine from './components/AbSummaryLine';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
+import AddressBookFileImpl from './AddressBookFileImpl';
 
 type AddressBookProps = {
   closeModal: () => void;
