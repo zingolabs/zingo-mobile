@@ -35,6 +35,8 @@ Google Play: [https://play.google.com/store/apps/details?id=org.ZingoLabs.Zingo]
 3. Rust (https://www.rust-lang.org/tools/install)
 4. Docker (Docker Engine)
 5. OpenJDK 18 (https://jdk.java.net/archive/)
+51. untar it to a folder and set JAVA_HOME there
+52. add $JAVA_HOME/bin to $PATH
 6. Android SDK Command-line Tools <br />
    Install via Android Studio SDK Manager: <br />
    https://developer.android.com/studio/install <br />
