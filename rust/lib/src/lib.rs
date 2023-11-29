@@ -236,7 +236,7 @@ mod tests {
         }
         let test_client = LightClient::build(&config)
             .set_wallet_dir(wallet_base)
-            .create();
+            .create()
             .expect("To create a lightclient.");
         dbg!(test_client.do_info().await);
     }
