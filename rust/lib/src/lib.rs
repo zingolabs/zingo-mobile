@@ -234,7 +234,9 @@ mod tests {
             Ok((c, h)) => (config, _lightwalletd_uri) = (c, h),
             Err(_) => panic!(),
         }
-        let test_client = LightClient::create_unconnected(&config, wallet_base, 1)
+        let test_client = LightClient::build(&config)
+            .set_wallet_dir(wallet_base)
+            .create();
             .expect("To create a lightclient.");
         dbg!(test_client.do_info().await);
     }
