@@ -19,8 +19,8 @@ hex = "0.3"
 tokio =  { version = "1.24.2", features = ["full"] }
 zingolib = { workspace = true }
 zingoconfig = { workspace = true }
-zingo-testutils = { git="https://github.com/Oscar-Pepper/zingolib", default-features=true, branch = "add_interrupt_sync_test" }
-darkside-tests = { git="https://github.com/Oscar-Pepper/zingolib", default-features=true, branch = "add_interrupt_sync_test" }
+zingo-testutils = { git="https://github.com/Oscar-Pepper/zingolib", default-features=true, branch = "darkside_helpers" }
+darkside-tests = { git="https://github.com/Oscar-Pepper/zingolib", default-features=true, branch = "darkside_helpers" }
 json = "0.12.4"
 env_logger = "0.10.0"
 zingomobile_utils = { path = "../zingomobile_utils" }
