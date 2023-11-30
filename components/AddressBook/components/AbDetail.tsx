@@ -27,6 +27,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({ index, item, cancel,
   const [address, setAddress] = useState<string>(item.address);
   const [action, setAction] = useState<'Add' | 'Modify' | 'Delete'>(actionProp);
   const [error, setError] = useState<string>('');
+  const [errorAddress, setErrorAddress] = useState<string>('');
 
   useEffect(() => {
     if (item.label !== label && item.address !== address) {
@@ -34,37 +35,36 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({ index, item, cancel,
     } else {
       setAction(actionProp);
     }
-    if (!error) {
-      if (item.label !== label && addressBook.filter((elem: AddressBookFileClass) => elem.label === label).length > 0) {
-        if (
-          item.address !== address &&
-          addressBook.filter((elem: AddressBookFileClass) => elem.address === address).length > 0
-        ) {
-          setError('This label and this address already exists');
-        } else {
-          setError('This label already exists');
-        }
+    setError('');
+    if (!label || !address) {
+      setError(translate('addressbook.fillboth') as string);
+    }
+    if (item.label !== label && addressBook.filter((elem: AddressBookFileClass) => elem.label === label).length > 0) {
+      if (
+        item.address !== address &&
+        addressBook.filter((elem: AddressBookFileClass) => elem.address === address).length > 0
+      ) {
+        setError(translate('addressbook.bothexists') as string);
       } else {
-        if (
-          item.address !== address &&
-          addressBook.filter((elem: AddressBookFileClass) => elem.address === address).length > 0
-        ) {
-          setError('This address already exists');
-        } else {
-          setError('');
+        setError(translate('addressbook.labelexists') as string);
+      }
+    } else {
+      if (
+        item.address !== address &&
+        addressBook.filter((elem: AddressBookFileClass) => elem.address === address).length > 0
+      ) {
+        setError(translate('addressbook.addressexists') as string);
+      } else {
+        if (item.label === label && item.address === address && action !== 'Delete') {
+          setError(translate('addressbook.nochanges') as string);
         }
       }
     }
-  }, [actionProp, address, addressBook, error, item.address, item.label, label, translate]);
-
-  const setErrorAddress = (e: string) => {
-    if (!error) {
-      setError(e);
-    }
-  };
+  }, [action, actionProp, address, addressBook, error, item.address, item.label, label, translate]);
 
   const updateAddress = async (addr: string) => {
     if (!addr) {
+      setAddress('');
       return;
     }
     let newAddress: string = addr;
@@ -90,7 +90,8 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({ index, item, cancel,
     setAddress(newAddress);
   };
 
-  console.log('render Ab Detail - 5', index);
+  //console.log('render Ab Detail - 5', index, address, label);
+  //console.log(error, errorAddress);
 
   return (
     <View
@@ -139,7 +140,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({ index, item, cancel,
         setError={setErrorAddress}
         disabled={action === 'Delete'}
       />
-      {!!error && (
+      {(!!error || !!errorAddress) && (
         <View
           style={{
             flexGrow: 1,
@@ -148,7 +149,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({ index, item, cancel,
             alignItems: 'center',
             marginVertical: 5,
           }}>
-          <FadeText style={{ color: colors.primary }}>{error}</FadeText>
+          <FadeText style={{ color: colors.primary }}>{error + errorAddress}</FadeText>
         </View>
       )}
       <View
@@ -164,15 +165,9 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({ index, item, cancel,
           type="Primary"
           title={translate(`addressbook.${action.toLowerCase()}`) as string}
           onPress={() => {
-            if (item.label === label && item.address === address && action !== 'Delete') {
-              setError(translate('addressbook.nochanges') as string);
-              return;
-            } else {
-              setError('');
-            }
             doAction(action, label, address);
           }}
-          disabled={action === 'Delete' ? false : error ? true : false}
+          disabled={action === 'Delete' ? false : error || errorAddress ? true : false}
         />
         <Button type="Secondary" title={translate('cancel') as string} style={{ marginLeft: 10 }} onPress={cancel} />
       </View>

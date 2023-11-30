@@ -27,7 +27,11 @@
     "modify": "Modify",
     "delete": "Delete",
     "empty": "No contacts yet.",
-    "nochanges": "No changes registered."
+    "nochanges": "No changes registered. ",
+    "fillboth": "Please fill out both fields. ",
+    "bothexists": "This label and this address already exists. ",
+    "labelexists": "This label already exists. ",
+    "addressexists": "This address already exists. "
   },
   "change-privacy-legend": ".\nTap to reveal the hidden values.",
   "txtcopied": "Text copied to Clipboard",

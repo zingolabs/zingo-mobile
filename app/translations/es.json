@@ -27,7 +27,11 @@
     "modify": "Modificar",
     "delete": "Borrar",
     "empty": "No existen contactos todavía.",
-    "nochanges": "No se haan registrado cambios."
+    "nochanges": "No se haan registrado cambios.",
+    "fillboth": "Por favor rellena ambos campos. ",
+    "bothexists": "Esta etiqueta y esta dirección ya existen. ",
+    "labelexists": "Esta etiqueta ya existe. ",
+    "addressexists": "Esta dirección ya existe. "
   },
   "change-privacy-legend": ".\nPulsar para revelar los valores ocultos.",
   "txtcopied": "Texto copiado al Portapapeles",

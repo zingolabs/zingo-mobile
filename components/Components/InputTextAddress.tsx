@@ -61,10 +61,11 @@ const InputTextAddress: React.FunctionComponent<InputTextAddressProps> = ({
       });
     } else {
       setValidAddress(0);
+      setError('');
     }
   }, [addLastSnackbar, address, netInfo.isConnected, server.chain_name, setError, translate]);
 
-  console.log('render input text address');
+  //console.log('render input text address');
 
   return (
     <View style={{ display: 'flex', flexDirection: 'column' }}>
