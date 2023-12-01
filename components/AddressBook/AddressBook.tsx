@@ -111,7 +111,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
     cancel();
   };
 
-  console.log('render Address Book - 4', currentItem, action);
+  //console.log('render Address Book - 4', currentItem, action);
 
   return (
     <SafeAreaView

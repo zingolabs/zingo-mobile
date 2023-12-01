@@ -294,7 +294,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       // Attempt to parse as URI if it starts with zcash
       if (address.toLowerCase().startsWith('zcash:')) {
         const target: string | ZcashURITargetClass = await parseZcashURI(address, translate, server);
-        console.log(target);
+        //console.log(target);
 
         if (typeof target !== 'string') {
           // redo the to addresses

@@ -25,7 +25,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({ index, ite
 
   const displayAddress = item.address ? Utils.trimToSmall(item.address, 7) : 'Unknown';
 
-  console.log('render Ab SummaryLine - 5', index);
+  //console.log('render Ab SummaryLine - 5', index);
 
   return (
     <View testID={`addressBookList.${index + 1}`} style={{ display: 'flex', flexDirection: 'column' }}>

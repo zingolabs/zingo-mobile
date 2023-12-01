@@ -18,7 +18,7 @@ const parseZcashURI = async (
   if (!parsedUri || parsedUri.protocol.toLowerCase() !== 'zcash:') {
     return translate('uris.baduri') as string;
   }
-  console.log(parsedUri);
+  //console.log(parsedUri);
 
   const targets: Map<number, ZcashURITargetClass> = new Map();
 
