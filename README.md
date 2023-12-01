@@ -34,7 +34,11 @@ Google Play: [https://play.google.com/store/apps/details?id=org.ZingoLabs.Zingo]
 2. NodeJS (recommended version 17+)
 3. Rust (https://www.rust-lang.org/tools/install)
 4. Docker (Docker Engine)
-5. OpenJDK 18
+5. OpenJDK 18 (https://jdk.java.net/archive/)
+
+    1. curl https://download.java.net/java/GA/jdk18.0.2/f6ad4b4450fd4d298113270ec84f30ee/9/GPL/openjdk-18.0.2_linux-x64_bin.tar.gz -o openjdk-18.0.2_linux-x64_bin.tar.gz
+    2. tar -xzvf openjdk-18.0.2_linux-x64_bin.tar.gz
+
 6. Android SDK Command-line Tools <br />
    Install via Android Studio SDK Manager: <br />
    https://developer.android.com/studio/install <br />
@@ -129,6 +133,7 @@ Without the cargo test runner these emulated android devices will not be able to
 lightwalletd/zcashd regtest network. Therefore, only tests in the "Offline Testsuite" may be tested.
 
 ### End-to-End Tests
+0. Note there needs to be a lightwalletd in rust/android/lightwalletd_bin
 1. Launch the emulated AVD by clicking the 'play' icon in Android Studio's `Device Manager`.
    Alternatively, connect to a physical device. See previous section 'Launching the app' for more
    details.
