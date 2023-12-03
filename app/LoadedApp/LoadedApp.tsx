@@ -498,7 +498,47 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
 
   setTotalBalance = (totalBalance: TotalBalanceClass) => {
     if (!isEqual(this.state.totalBalance, totalBalance)) {
-      //console.log('fetch total balance');
+      //console.log('&&&&&&& +++++++ fetch total balance');
+      if (this.state.totalBalance.orchardBal !== totalBalance.orchardBal) {
+        console.log(
+          '------- orchard balance changed',
+          this.state.totalBalance.orchardBal,
+          '=>',
+          totalBalance.orchardBal,
+        );
+      }
+      if (this.state.totalBalance.spendableOrchard !== totalBalance.spendableOrchard) {
+        console.log(
+          '------- orchard spendable balance changed',
+          this.state.totalBalance.spendableOrchard,
+          '=>',
+          totalBalance.spendableOrchard,
+        );
+      }
+      if (this.state.totalBalance.privateBal !== totalBalance.privateBal) {
+        console.log(
+          '------- sapling balance changed',
+          this.state.totalBalance.privateBal,
+          '=>',
+          totalBalance.privateBal,
+        );
+      }
+      if (this.state.totalBalance.spendablePrivate !== totalBalance.spendablePrivate) {
+        console.log(
+          '------- sapling spendable balance changed',
+          this.state.totalBalance.spendablePrivate,
+          '=>',
+          totalBalance.spendablePrivate,
+        );
+      }
+      if (this.state.totalBalance.transparentBal !== totalBalance.transparentBal) {
+        console.log(
+          '------- transparent balance changed',
+          this.state.totalBalance.transparentBal,
+          '=>',
+          totalBalance.transparentBal,
+        );
+      }
       this.setState({ totalBalance });
     }
   };
@@ -532,7 +572,35 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       }
     }
     if (deepDiff(this.state.transactions, transactions)) {
-      //console.log('fetch transactions');
+      console.log('+++++++ fetch transactions');
+      // check if some tx have changes
+      this.state.transactions.forEach((value: TransactionType) => {
+        const newValueArray: TransactionType[] = transactions.filter((t: TransactionType) => t.txid === value.txid);
+        if (newValueArray.length === 1) {
+          const newValue: TransactionType = newValueArray[0];
+          if (newValue.fee !== value.fee) {
+            console.log('&&&&&&& fee changed', value.txid, value.confirmations, value.fee, '=>', newValue.fee);
+          }
+          if (newValue.fee && newValue.fee !== 0.0001) {
+            console.log('&&&&&&& fee wrong', value.txid, newValue.fee);
+          } else if (value.fee && value.fee !== 0.0001) {
+            console.log('&&&&&&& fee wrong', value.txid, value.fee);
+          }
+          if (
+            newValue.txDetails.reduce((sum, i) => sum + i.amount, 0) !==
+            value.txDetails.reduce((sum, i) => sum + i.amount, 0)
+          ) {
+            console.log(
+              '&&&&&&& Total Amount changed',
+              value.txid,
+              value.confirmations,
+              value.txDetails.reduce((sum, i) => sum + i.amount, 0),
+              '=>',
+              newValue.txDetails.reduce((sum, i) => sum + i.amount, 0),
+            );
+          }
+        }
+      });
       // set someUnconfirmed as well here when I know there is something new in transactions
       const unconfirmed: number =
         transactions.length > 0 ? transactions.filter((tx: TransactionType) => tx.confirmations === 0).length : 0;
