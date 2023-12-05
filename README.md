@@ -53,7 +53,7 @@ Add the following lines to your `$HOME/.bash_profile` or `$HOME/.profile` config
 `PATH="$PATH:$ANDROID_HOME/platform-tools"` <br />
 `PATH="$PATH:$ANDROID_HOME/emulator"` <br />
 Add the following lines to your `$HOME/.bashrc` config file: <br />
-`export ANDROID_HOME="$HOME/Android/Sdk"` <br />
+`export ANDROID_SDK_ROOT="$HOME/Android/Sdk"` <br />
 Also, make sure your JAVA_HOME is set, for example: <br />
 `export JAVA_HOME="/usr/lib/jvm/jdk-18.0.2"`
 
