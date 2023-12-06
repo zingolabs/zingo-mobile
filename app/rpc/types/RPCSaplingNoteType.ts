@@ -2,7 +2,7 @@ export type RPCSaplingNoteType = {
   created_in_block: number;
   datetime: number;
   created_in_txid: string;
-  value: string;
+  value: number;
   unconfirmed: string;
   is_change: boolean;
   address: string;

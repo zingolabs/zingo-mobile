@@ -23,6 +23,7 @@ import ServerType from './types/ServerType';
 import SnackbarType from './types/SnackbarType';
 import ZecPriceType from './types/ZecPriceType';
 import FetchErrorType from './types/FetchErrorType';
+import NoteType from './types/NoteType';
 
 import AppStateLoaded from './AppStateLoaded';
 import AppStateLoading from './AppStateLoading';
@@ -42,6 +43,7 @@ export {
   TotalBalanceClass,
   WalletSettingsClass,
   TransactionType,
+  NoteType,
   TxDetailType,
   WalletType,
   SendJsonToTypeType,
