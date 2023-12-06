@@ -20,6 +20,7 @@ import NetInfoType from './types/NetInfoType';
 import BackgroundErrorType from './types/BackgroundErrorType';
 import ServerType from './types/ServerType';
 import SnackbarType from './types/SnackbarType';
+import NoteType from './types/NoteType';
 
 export default interface AppStateLoaded {
   navigation: StackScreenProps<any>['navigation'];
@@ -43,6 +44,9 @@ export default interface AppStateLoaded {
 
   // List of all T and Z and O transactions
   transactions: TransactionType[];
+
+  // List of Notes
+  notes: NoteType[];
 
   // The state of the send page, as the user constructs a transaction
   sendPageState: SendPageStateClass;

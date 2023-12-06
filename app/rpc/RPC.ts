@@ -10,6 +10,7 @@ import {
   WalletSettingsClass,
   TranslateType,
   SyncingStatusClass,
+  NoteType,
 } from '../AppState';
 import RPCModule from '../RPCModule';
 import Utils from '../utils';
@@ -34,6 +35,7 @@ export default class RPC {
   fnSetInfo: (info: InfoType) => void;
   fnSetTotalBalance: (totalBalance: TotalBalanceClass) => void;
   fnSetTransactionsList: (txList: TransactionType[]) => void;
+  fnSetNoteList: (noteList: NoteType[]) => void;
   fnSetAllAddresses: (allAddresses: AddressClass[]) => void;
   fnSetSyncingStatus: (syncingStatus: SyncingStatusClass) => void;
   fnSetWalletSettings: (settings: WalletSettingsClass) => void;
@@ -71,6 +73,7 @@ export default class RPC {
   constructor(
     fnSetTotalBalance: (totalBalance: TotalBalanceClass) => void,
     fnSetTransactionsList: (txlist: TransactionType[]) => void,
+    fnSetNoteList: (notelist: NoteType[]) => void,
     fnSetAllAddresses: (addresses: AddressClass[]) => void,
     fnSetWalletSettings: (settings: WalletSettingsClass) => void,
     fnSetInfo: (info: InfoType) => void,
@@ -81,6 +84,7 @@ export default class RPC {
   ) {
     this.fnSetTotalBalance = fnSetTotalBalance;
     this.fnSetTransactionsList = fnSetTransactionsList;
+    this.fnSetNoteList = fnSetNoteList;
     this.fnSetAllAddresses = fnSetAllAddresses;
     this.fnSetWalletSettings = fnSetWalletSettings;
     this.fnSetInfo = fnSetInfo;
@@ -1264,6 +1268,125 @@ export default class RPC {
       }
       const pendingNotesJSON: RPCNotesType = await JSON.parse(pendingNotes);
 
+      // storing all notes in the state
+      const notes: NoteType[] = [] as NoteType[];
+      pendingNotesJSON.pending_orchard_notes.forEach((orchard: RPCOrchardNoteType) => {
+        let note: NoteType = {} as NoteType;
+        note.pool = 'Orchard';
+        note.type = 'Pending';
+
+        note.created_in_block = orchard.created_in_block;
+        note.datetime = orchard.datetime;
+        note.created_in_txid = orchard.created_in_txid;
+        note.address = orchard.address;
+        note.is_change = orchard.is_change;
+        note.spendable = orchard.spendable;
+        note.spent = orchard.spent;
+        note.spent_at_height = orchard.spent_at_height;
+        note.unconfirmed = orchard.unconfirmed;
+        note.unconfirmed_spent = orchard.unconfirmed_spent;
+        note.value = orchard.value / 10 ** 8;
+
+        notes.push(note);
+      });
+      pendingNotesJSON.unspent_orchard_notes.forEach((orchard: RPCOrchardNoteType) => {
+        let note: NoteType = {} as NoteType;
+        note.pool = 'Orchard';
+        note.type = 'Unspent';
+
+        note.created_in_block = orchard.created_in_block;
+        note.datetime = orchard.datetime;
+        note.created_in_txid = orchard.created_in_txid;
+        note.address = orchard.address;
+        note.is_change = orchard.is_change;
+        note.spendable = orchard.spendable;
+        note.spent = orchard.spent;
+        note.spent_at_height = orchard.spent_at_height;
+        note.unconfirmed = orchard.unconfirmed;
+        note.unconfirmed_spent = orchard.unconfirmed_spent;
+        note.value = orchard.value / 10 ** 8;
+
+        notes.push(note);
+      });
+
+      pendingNotesJSON.pending_sapling_notes.forEach((sapling: RPCSaplingNoteType) => {
+        let note: NoteType = {} as NoteType;
+        note.pool = 'Sapling';
+        note.type = 'Pending';
+
+        note.created_in_block = sapling.created_in_block;
+        note.datetime = sapling.datetime;
+        note.created_in_txid = sapling.created_in_txid;
+        note.address = sapling.address;
+        note.is_change = sapling.is_change;
+        note.spendable = sapling.spendable;
+        note.spent = sapling.spent;
+        note.spent_at_height = sapling.spent_at_height;
+        note.unconfirmed = sapling.unconfirmed;
+        note.unconfirmed_spent = sapling.unconfirmed_spent;
+        note.value = sapling.value / 10 ** 8;
+
+        notes.push(note);
+      });
+      pendingNotesJSON.unspent_sapling_notes.forEach((sapling: RPCSaplingNoteType) => {
+        let note: NoteType = {} as NoteType;
+        note.pool = 'Sapling';
+        note.type = 'Unspent';
+
+        note.created_in_block = sapling.created_in_block;
+        note.datetime = sapling.datetime;
+        note.created_in_txid = sapling.created_in_txid;
+        note.address = sapling.address;
+        note.is_change = sapling.is_change;
+        note.spendable = sapling.spendable;
+        note.spent = sapling.spent;
+        note.spent_at_height = sapling.spent_at_height;
+        note.unconfirmed = sapling.unconfirmed;
+        note.unconfirmed_spent = sapling.unconfirmed_spent;
+        note.value = sapling.value / 10 ** 8;
+
+        notes.push(note);
+      });
+
+      pendingNotesJSON.pending_utxos.forEach((transparent: RPCUtxoNoteType) => {
+        let note: NoteType = {} as NoteType;
+        note.pool = 'Transparent';
+        note.type = 'Pending';
+
+        note.created_in_block = transparent.created_in_block;
+        note.datetime = transparent.datetime;
+        note.created_in_txid = transparent.created_in_txid;
+        note.address = transparent.address;
+        note.is_change = transparent.is_change;
+        note.scriptkey = transparent.scriptkey;
+        note.spent = transparent.spent;
+        note.spent_at_height = transparent.spent_at_height;
+        note.unconfirmed_spent = transparent.unconfirmed_spent;
+        note.value = transparent.value / 10 ** 8;
+
+        notes.push(note);
+      });
+      pendingNotesJSON.utxos.forEach((transparent: RPCUtxoNoteType) => {
+        let note: NoteType = {} as NoteType;
+        note.pool = 'Transparent';
+        note.type = 'Unspent';
+
+        note.created_in_block = transparent.created_in_block;
+        note.datetime = transparent.datetime;
+        note.created_in_txid = transparent.created_in_txid;
+        note.address = transparent.address;
+        note.is_change = transparent.is_change;
+        note.scriptkey = transparent.scriptkey;
+        note.spent = transparent.spent;
+        note.spent_at_height = transparent.spent_at_height;
+        note.unconfirmed_spent = transparent.unconfirmed_spent;
+        note.value = transparent.value / 10 ** 8;
+
+        notes.push(note);
+      });
+
+      this.fnSetNoteList(notes);
+
       const pendingAddress = new Map();
 
       // Process orchard notes
@@ -1411,7 +1534,7 @@ export default class RPC {
             currentTxList[0].zec_price = tx.price;
           }
 
-          //if (tx.txid.startsWith('426e')) {
+          //if (tx.txid.startsWith('4c8f8fecb585dbb1cf1e3e68a5f4c070e971147f36c6dbff20d274e62c6ece62')) {
           //  console.log('tran: ', tx);
           //  console.log('--------------------------------------------------');
           //}

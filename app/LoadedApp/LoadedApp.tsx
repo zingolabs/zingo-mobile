@@ -44,6 +44,7 @@ import {
   BackgroundType,
   TranslateType,
   ServerType,
+  NoteType,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
@@ -257,6 +258,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     this.rpc = new RPC(
       this.setTotalBalance,
       this.setTransactionList,
+      this.setNoteList,
       this.setAllAddresses,
       this.setWalletSettings,
       this.setInfo,
@@ -547,6 +549,182 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     }
   };
 
+  setNoteList = (notes: NoteType[]) => {
+    if (!isEqual(this.state.notes, notes)) {
+      console.log('******* fetch notes', notes.length);
+      console.log('******* fetch orchard notes', notes.filter((n: NoteType) => n.pool === 'Orchard').length);
+      console.log('******* fetch sapling notes', notes.filter((n: NoteType) => n.pool === 'Sapling').length);
+      console.log('******* fetch transparent notes', notes.filter((n: NoteType) => n.pool === 'Transparent').length);
+      this.state.notes
+        .filter((n: NoteType) => n.pool === 'Sapling')
+        .forEach((value: NoteType) => {
+          const newValueArray: NoteType[] = notes.filter(
+            (n: NoteType) =>
+              n.created_in_txid === value.created_in_txid && n.pool === value.pool && n.value === value.value,
+          );
+          if (newValueArray.length === 1) {
+            const newValue: NoteType = newValueArray[0];
+            if (newValue.type !== value.type) {
+              console.log(
+                '**####### note type changed',
+                value.created_in_txid,
+                value.created_in_block,
+                value.value,
+                value.type,
+                value.type,
+                '=>',
+                `${newValue.type}**`,
+              );
+            }
+            if (newValue.value !== value.value) {
+              console.log(
+                '**####### note value changed',
+                value.created_in_txid,
+                value.created_in_block,
+                value.type,
+                value.value,
+                '=>',
+                `${newValue.value}**`,
+              );
+            }
+            if (newValue.created_in_block !== value.created_in_block) {
+              console.log(
+                '**####### note created block changed',
+                value.created_in_txid,
+                value.value,
+                value.type,
+                value.created_in_block,
+                '=>',
+                `${newValue.created_in_block}**`,
+              );
+            }
+            if (newValue.datetime !== value.datetime) {
+              console.log(
+                '**####### note date time changed',
+                value.created_in_txid,
+                value.created_in_block,
+                value.value,
+                value.type,
+                value.datetime,
+                '=>',
+                `${newValue.datetime}**`,
+              );
+            }
+            if (newValue.unconfirmed !== value.unconfirmed) {
+              console.log(
+                '**####### note unconfirmed changed',
+                value.created_in_txid,
+                value.created_in_block,
+                value.value,
+                value.type,
+                value.unconfirmed,
+                '=>',
+                `${newValue.unconfirmed}**`,
+              );
+            }
+            if (newValue.is_change !== value.is_change) {
+              console.log(
+                '**####### note is change changed',
+                value.created_in_txid,
+                value.created_in_block,
+                value.value,
+                value.type,
+                value.is_change,
+                '=>',
+                `${newValue.is_change}**`,
+              );
+            }
+            if (newValue.address !== value.address) {
+              console.log(
+                '**####### note address changed',
+                value.created_in_txid,
+                value.created_in_block,
+                value.value,
+                value.type,
+                value.address,
+                '=>',
+                `${newValue.address}**`,
+              );
+            }
+            if (newValue.spendable !== value.spendable) {
+              console.log(
+                '**####### note spendable changed',
+                value.created_in_txid,
+                value.created_in_block,
+                value.value,
+                value.type,
+                value.spendable,
+                '=>',
+                `${newValue.spendable}**`,
+              );
+            }
+            if (newValue.spent !== value.spent) {
+              console.log(
+                '**####### note spent changed',
+                value.created_in_txid,
+                value.created_in_block,
+                value.value,
+                value.type,
+                value.spent,
+                '=>',
+                `${newValue.spent}**`,
+              );
+            }
+            if (newValue.spent_at_height !== value.spent_at_height) {
+              console.log(
+                '**####### note spend at height changed',
+                value.created_in_txid,
+                value.created_in_block,
+                value.value,
+                value.type,
+                value.spent_at_height,
+                '=>',
+                `${newValue.spent_at_height}**`,
+              );
+            }
+            if (newValue.unconfirmed_spent !== value.unconfirmed_spent) {
+              console.log(
+                '**####### note unconfirmed spent changed',
+                value.created_in_txid,
+                value.created_in_block,
+                value.value,
+                value.type,
+                value.unconfirmed_spent,
+                '=>',
+                `${newValue.unconfirmed_spent}**`,
+              );
+            }
+          } else if (newValueArray.length === 0) {
+            // that note is deleted
+            console.log('####### note DELETED', value.created_in_txid, value.created_in_block, value.value, value.type);
+          } else {
+            // find more than 1 item
+            console.log(
+              '####### note MORE THAN ONE ITEM',
+              value.created_in_txid,
+              value.created_in_block,
+              value.value,
+              value.type,
+            );
+            console.log('#######', newValueArray);
+          }
+        });
+      notes
+        .filter((n: NoteType) => n.pool === 'Sapling')
+        .forEach((value: NoteType) => {
+          const newValueArray: NoteType[] = this.state.notes.filter(
+            (n: NoteType) =>
+              n.created_in_txid === value.created_in_txid && n.pool === value.pool && n.value === value.value,
+          );
+          if (newValueArray.length === 0) {
+            // that note is deleted
+            console.log('####### NEW note', value.created_in_txid, value.created_in_block, value.value, value.type);
+          }
+        });
+      this.setState({ notes });
+    }
+  };
+
   setTransactionList = async (transactions: TransactionType[]) => {
     const basicFirstViewSeed = (await SettingsFileImpl.readSettings()).basicFirstViewSeed;
     // only for basic mode
@@ -569,31 +747,67 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       }
     }
     if (deepDiff(this.state.transactions, transactions)) {
-      console.log('+++++++ fetch transactions');
+      console.log('+++++++ fetch transactions', transactions.length);
       // check if some tx have changes
       this.state.transactions.forEach((value: TransactionType) => {
         const newValueArray: TransactionType[] = transactions.filter((t: TransactionType) => t.txid === value.txid);
         if (newValueArray.length === 1) {
           const newValue: TransactionType = newValueArray[0];
           if (newValue.fee !== value.fee) {
-            console.log('&&&&&&& fee changed', value.txid, value.confirmations, value.fee, '=>', newValue.fee);
-          }
-          if (newValue.fee && newValue.fee !== 0.0001) {
-            console.log('&&&&&&& fee wrong', value.txid, newValue.fee);
-          } else if (value.fee && value.fee !== 0.0001) {
-            console.log('&&&&&&& fee wrong', value.txid, value.fee);
+            console.log('**&&&&&&& fee changed', value.txid, value.confirmations, value.fee, '=>', `${newValue.fee}**`);
+          } else if (newValue.type !== 'Received' && newValue.fee !== 0.0001 && newValue.fee !== 0.00001) {
+            console.log('&&&&&&& fee wrong', value.txid, `${newValue.fee}`);
+          } else if (value.type !== 'Received' && value.fee !== 0.0001 && value.fee !== 0.00001) {
+            console.log('&&&&&&& fee wrong', value.txid, `${value.fee}`);
           }
           if (
             newValue.txDetails.reduce((sum, i) => sum + i.amount, 0) !==
             value.txDetails.reduce((sum, i) => sum + i.amount, 0)
           ) {
             console.log(
-              '&&&&&&& Total Amount changed',
+              '**&&&&&&& Total Amount changed',
               value.txid,
               value.confirmations,
               value.txDetails.reduce((sum, i) => sum + i.amount, 0),
               '=>',
-              newValue.txDetails.reduce((sum, i) => sum + i.amount, 0),
+              `${newValue.txDetails.reduce((sum, i) => sum + i.amount, 0)}**`,
+            );
+          }
+          if (newValue.type !== value.type) {
+            console.log(
+              '**&&&&&&& type changed',
+              value.txid,
+              value.confirmations,
+              value.type,
+              '=>',
+              `${newValue.type}**`,
+            );
+          }
+          if (newValue.time !== value.time) {
+            console.log(
+              '**&&&&&&& time changed',
+              value.txid,
+              value.confirmations,
+              value.time,
+              '=>',
+              `${newValue.time}**`,
+            );
+          }
+        }
+      });
+      transactions.forEach((value: TransactionType) => {
+        const newValueArray: TransactionType[] = this.state.transactions.filter(
+          (t: TransactionType) => t.txid === value.txid,
+        );
+        if (newValueArray.length === 0) {
+          if (value.type !== 'Received' && value.fee !== 0.0001 && value.fee !== 0.00001) {
+            console.log('**&&&&&&& new fee wrong', value.txid, `${value.fee}**`);
+          }
+          if (value.type === 'SendToSelf' && value.txDetails.reduce((sum, i) => sum + i.amount, 0) !== 0) {
+            console.log(
+              '**&&&&&&& new sendtoself amount wrong',
+              value.txid,
+              `${value.txDetails.reduce((sum, i) => sum + i.amount, 0)}**`,
             );
           }
         }
