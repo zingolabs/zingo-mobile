@@ -573,7 +573,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 value.created_in_txid,
                 value.created_in_block,
                 value.value,
-                value.type,
+                value.spendable,
                 value.type,
                 '=>',
                 `${newValue.type}**`,
@@ -585,6 +585,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 value.created_in_txid,
                 value.created_in_block,
                 value.type,
+                value.spendable,
                 value.value,
                 '=>',
                 `${newValue.value}**`,
@@ -596,6 +597,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 value.created_in_txid,
                 value.value,
                 value.type,
+                value.spendable,
                 value.created_in_block,
                 '=>',
                 `${newValue.created_in_block}**`,
@@ -608,6 +610,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 value.created_in_block,
                 value.value,
                 value.type,
+                value.spendable,
                 value.datetime,
                 '=>',
                 `${newValue.datetime}**`,
@@ -620,6 +623,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 value.created_in_block,
                 value.value,
                 value.type,
+                value.spendable,
                 value.unconfirmed,
                 '=>',
                 `${newValue.unconfirmed}**`,
@@ -632,6 +636,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 value.created_in_block,
                 value.value,
                 value.type,
+                value.spendable,
                 value.is_change,
                 '=>',
                 `${newValue.is_change}**`,
@@ -644,6 +649,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 value.created_in_block,
                 value.value,
                 value.type,
+                value.spendable,
                 value.address,
                 '=>',
                 `${newValue.address}**`,
@@ -668,6 +674,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 value.created_in_block,
                 value.value,
                 value.type,
+                value.spendable,
                 value.spent,
                 '=>',
                 `${newValue.spent}**`,
@@ -680,6 +687,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 value.created_in_block,
                 value.value,
                 value.type,
+                value.spendable,
                 value.spent_at_height,
                 '=>',
                 `${newValue.spent_at_height}**`,
@@ -692,6 +700,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 value.created_in_block,
                 value.value,
                 value.type,
+                value.spendable,
                 value.unconfirmed_spent,
                 '=>',
                 `${newValue.unconfirmed_spent}**`,
@@ -699,7 +708,14 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
             }
           } else if (newValueArray.length === 0) {
             // that note is deleted
-            console.log('####### note DELETED', value.created_in_txid, value.created_in_block, value.value, value.type);
+            console.log(
+              '####### note DELETED',
+              value.created_in_txid,
+              value.created_in_block,
+              value.value,
+              value.type,
+              value.spendable,
+            );
           } else {
             // find more than 1 item
             console.log(
@@ -708,6 +724,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
               value.created_in_block,
               value.value,
               value.type,
+              value.spendable,
             );
             console.log('#######', newValueArray);
           }
@@ -721,7 +738,14 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
           );
           if (newValueArray.length === 0) {
             // that note is deleted
-            console.log('####### NEW note', value.created_in_txid, value.created_in_block, value.value, value.type);
+            console.log(
+              '####### NEW note',
+              value.created_in_txid,
+              value.created_in_block,
+              value.value,
+              value.type,
+              value.spendable,
+            );
           }
         });
       this.setState({ notes });
