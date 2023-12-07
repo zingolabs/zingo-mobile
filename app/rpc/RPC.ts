@@ -1413,7 +1413,7 @@ export default class RPC {
           } else if (!currentTxList[0].confirmations) {
             currentTxList[0].confirmations = this.lastServerBlockHeight
               ? this.lastServerBlockHeight - tx.block_height + 1
-              : 0;
+              : this.lastWalletBlockHeight - tx.block_height + 1;
           }
           if (!currentTxList[0].txid && !!tx.txid) {
             currentTxList[0].txid = tx.txid;
