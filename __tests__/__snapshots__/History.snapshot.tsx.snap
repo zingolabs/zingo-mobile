@@ -742,7 +742,8 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                   style={
                     {
                       "color": "rgb(28, 28, 30)",
-                      "opacity": 0.65,
+                      "fontWeight": "bold",
+                      "opacity": 1,
                     }
                   }
                 >
@@ -981,7 +982,8 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                   style={
                     {
                       "color": "rgb(28, 28, 30)",
-                      "opacity": 0.65,
+                      "fontWeight": "bold",
+                      "opacity": 1,
                     }
                   }
                 >
@@ -1219,8 +1221,9 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                 <Text
                   style={
                     {
-                      "color": "rgb(28, 28, 30)",
-                      "opacity": 0.65,
+                      "color": "rgb(0, 122, 255)",
+                      "fontWeight": "bold",
+                      "opacity": 1,
                     }
                   }
                 >
@@ -1908,7 +1911,8 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                   style={
                     {
                       "color": "rgb(28, 28, 30)",
-                      "opacity": 0.65,
+                      "fontWeight": "bold",
+                      "opacity": 1,
                     }
                   }
                 >
@@ -2162,7 +2166,8 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                   style={
                     {
                       "color": "rgb(28, 28, 30)",
-                      "opacity": 0.65,
+                      "fontWeight": "bold",
+                      "opacity": 1,
                     }
                   }
                 >
@@ -2401,8 +2406,9 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                 <Text
                   style={
                     {
-                      "color": "rgb(28, 28, 30)",
-                      "opacity": 0.65,
+                      "color": "rgb(0, 122, 255)",
+                      "fontWeight": "bold",
+                      "opacity": 1,
                     }
                   }
                 >
