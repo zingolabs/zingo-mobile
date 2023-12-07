@@ -86,7 +86,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
           <View style={{ display: 'flex' }}>
             <FadeText style={{ fontSize: 18 }}>{displayAddress}</FadeText>
             <View style={{ display: 'flex', flexDirection: 'row' }}>
-              <FadeText>
+              <FadeText style={{ opacity: 1, fontWeight: 'bold', color: amountColor }}>
                 {tx.type === 'Sent'
                   ? (translate('history.sent') as string)
                   : tx.type === 'Received'
