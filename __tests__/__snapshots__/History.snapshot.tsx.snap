@@ -511,6 +511,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
             "color": "rgb(28, 28, 30)",
             "fontSize": 18,
             "fontWeight": "600",
+            "marginBottom": 3,
             "opacity": 1,
             "paddingHorizontal": 5,
           }
@@ -1676,6 +1677,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
             "color": "rgb(28, 28, 30)",
             "fontSize": 18,
             "fontWeight": "600",
+            "marginBottom": 3,
             "opacity": 1,
             "paddingHorizontal": 5,
           }
