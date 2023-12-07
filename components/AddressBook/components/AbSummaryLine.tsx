@@ -45,12 +45,22 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({ index, ite
           }}>
           <View style={{ flex: 1, justifyContent: 'center', alignItems: 'flex-start' }}>
             <View style={{ flexDirection: 'row', marginBottom: 5 }}>
-              <FontAwesomeIcon style={{ marginHorizontal: 10 }} size={24} icon={faAddressCard} color={colors.zingo} />
-              <FadeText style={{ fontSize: 18, marginHorizontal: 10, color: colors.primary }}>{item.label}</FadeText>
+              <FontAwesomeIcon
+                style={{ marginHorizontal: 10 }}
+                size={24}
+                icon={faAddressCard}
+                color={colors.primaryDisabled}
+              />
+              <FadeText
+                style={{ fontSize: 18, marginHorizontal: 10, color: colors.primary, opacity: 1, fontWeight: 'bold' }}>
+                {item.label}
+              </FadeText>
             </View>
             <View style={{ flexDirection: 'row' }}>
               <FontAwesomeIcon style={{ marginHorizontal: 10 }} size={24} icon={faQrcode} color={colors.zingo} />
-              <FadeText style={{ fontSize: 18, marginHorizontal: 10 }}>{displayAddress}</FadeText>
+              <FadeText style={{ fontSize: 18, marginHorizontal: 10, opacity: 1, fontWeight: 'bold' }}>
+                {displayAddress}
+              </FadeText>
             </View>
           </View>
           <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>

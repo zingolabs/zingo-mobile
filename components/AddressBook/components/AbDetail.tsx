@@ -36,7 +36,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({ index, item, cancel,
       setAction(actionProp);
     }
     setError('');
-    if (!label || !address) {
+    if ((!label || !address) && action === 'Modify') {
       setError(translate('addressbook.fillboth') as string);
     }
     if (item.label !== label && addressBook.filter((elem: AddressBookFileClass) => elem.label === label).length > 0) {
@@ -55,7 +55,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({ index, item, cancel,
       ) {
         setError(translate('addressbook.addressexists') as string);
       } else {
-        if (item.label === label && item.address === address && action !== 'Delete') {
+        if (item.label === label && item.address === address && action === 'Modify') {
           setError(translate('addressbook.nochanges') as string);
         }
       }

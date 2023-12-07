@@ -62,7 +62,10 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected }) => {
             {translate('loadedapp.settings') as string}
           </RegText>
 
-          <RegText testID="menu.addressbook" onPress={() => onItemSelectedWrapper('Address Book')} style={item}>
+          <RegText
+            testID="menu.addressbook"
+            onPress={() => onItemSelectedWrapper('Address Book')}
+            style={{ ...item, color: colors.primary }}>
             {translate('loadedapp.addressbook') as string}
           </RegText>
 

@@ -167,7 +167,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
             doAction={doAction}
           />
         )}
-        {addressBookSorted.length === 0 && (
+        {addressBookSorted.length === 0 && currentItem !== -1 && (
           <View
             style={{
               height: 150,
