@@ -52,7 +52,7 @@ mod e2e {
         use zingolib::get_base_address;
 
         #[tokio::test]
-        async fn simple_sync() {
+        async fn simple_sync_test() {
             const BLOCKCHAIN_HEIGHT: i32 = 1_000;
 
             // initialise darksidewalletd and stage blocks and initial funds
@@ -64,7 +64,7 @@ mod e2e {
             stage_transaction(
                 &connector,
                 2,
-                constants::ABANDON_TO_DARKSIDE_SAP_10_000_000_ZAT,
+                constants::ABANDON_TO_DARKSIDE_ORCH_10_000_000_ZAT,
             )
             .await;
 
