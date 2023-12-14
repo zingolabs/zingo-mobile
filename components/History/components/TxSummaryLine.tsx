@@ -14,6 +14,7 @@ import { ThemeType } from '../../../app/types';
 import moment from 'moment';
 import 'moment/locale/es';
 import { ContextAppLoaded } from '../../../app/context';
+import AddressItem from '../../Components/AddressItem';
 
 type TxSummaryLineProps = {
   index: number;
@@ -41,9 +42,11 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
 
   // if no address I'm going to put txid here.
   const displayAddress =
-    tx.txDetails.length === 1 && tx.txDetails[0].address
-      ? Utils.trimToSmall(tx.txDetails[0].address, 7)
-      : Utils.trimToSmall(tx.txid, 7);
+    tx.txDetails.length === 1 && tx.txDetails[0].address ? (
+      <AddressItem address={tx.txDetails[0].address} oneLine={true} />
+    ) : (
+      <FadeText style={{ fontSize: 18 }}>{Utils.trimToSmall(tx.txid, 7)}</FadeText>
+    );
 
   //console.log('render TxSummaryLine - 5', index);
 
@@ -84,7 +87,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
             color={amountColor}
           />
           <View style={{ display: 'flex' }}>
-            <FadeText style={{ fontSize: 18 }}>{displayAddress}</FadeText>
+            {displayAddress}
             <View style={{ display: 'flex', flexDirection: 'row' }}>
               <FadeText style={{ opacity: 1, fontWeight: 'bold', color: amountColor }}>
                 {tx.type === 'Sent'

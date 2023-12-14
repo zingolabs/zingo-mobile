@@ -412,7 +412,8 @@
     "sure": "¿Seguro? ",
     "minago": " min.",
     "details": "Detalles de la Transacción",
-    "pool": "Grupo"
+    "pool": "Grupo",
+    "contactcopied": "Contacto copiado al portapapeles"
   },
   "report": {
     "title": "Informe de Sincronización",

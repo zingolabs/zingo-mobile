@@ -9,11 +9,11 @@ import ZecAmount from '../../Components/ZecAmount';
 import CurrencyAmount from '../../Components/CurrencyAmount';
 import Button from '../../Components/Button';
 import { useTheme } from '@react-navigation/native';
-import Utils from '../../../app/utils';
 import { ContextAppLoaded } from '../../../app/context';
 import Header from '../../Header';
 import { RPCParseAddressType } from '../../../app/rpc/types/RPCParseAddressType';
 import RPCModule from '../../../app/RPCModule';
+import AddressItem from '../../Components/AddressItem';
 
 type ConfirmProps = {
   defaultFee: number;
@@ -220,14 +220,9 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSen
           <RegText>{privacyLevel}</RegText>
         </View>
         {[sendPageState.toaddr].map(to => {
-          // 30 characters per line
-          const numLines = to.to.length < 40 ? 2 : to.to.length / 30;
           return (
             <View key={to.id} style={{ margin: 10 }}>
-              <FadeText>{translate('send.to') as string}</FadeText>
-              {Utils.splitStringIntoChunks(to.to, Number(numLines.toFixed(0))).map((c: string, idx: number) => (
-                <RegText key={idx}>{c}</RegText>
-              ))}
+              <AddressItem address={to.to} label={translate('send.to') as string} />
 
               <FadeText style={{ marginTop: 10 }}>{translate('send.confirm-amount') as string}</FadeText>
               <View

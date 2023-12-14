@@ -412,7 +412,8 @@
     "sure": "Sure? ",
     "minago": " min.",
     "details": "Transaction Details",
-    "pool": "Pool"
+    "pool": "Pool",
+    "contactcopied": "Copied Contact to Clipboard"
   },
   "report": {
     "title": "Sync / Rescan Report",
