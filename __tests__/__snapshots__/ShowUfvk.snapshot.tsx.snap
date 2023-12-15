@@ -366,96 +366,132 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
                     {
                       "display": "flex",
                       "flexDirection": "row",
-                      "flexWrap": "wrap",
                       "justifyContent": "center",
                       "marginBottom": 30,
                     }
                   }
                 >
-                  <Text
+                  <View
                     style={
                       {
-                        "color": "rgb(28, 28, 30)",
-                        "flexBasis": "100%",
-                        "fontFamily": "verdana",
-                        "fontSize": 16,
-                        "opacity": 0.65,
-                        "textAlign": "center",
+                        "alignItems": "flex-start",
+                        "display": "flex",
+                        "flexDirection": "row",
                       }
                     }
                   >
-                    uview12345678901234567890123
-                  </Text>
-                  <Text
-                    style={
-                      {
-                        "color": "rgb(28, 28, 30)",
-                        "flexBasis": "100%",
-                        "fontFamily": "verdana",
-                        "fontSize": 16,
-                        "opacity": 0.65,
-                        "textAlign": "center",
+                    <View
+                      style={
+                        {
+                          "alignItems": "flex-start",
+                          "display": "flex",
+                          "flexDirection": "column",
+                          "marginRight": 10,
+                        }
                       }
-                    }
-                  >
-                    4567890123456789012345678901
-                  </Text>
-                  <Text
-                    style={
-                      {
-                        "color": "rgb(28, 28, 30)",
-                        "flexBasis": "100%",
-                        "fontFamily": "verdana",
-                        "fontSize": 16,
-                        "opacity": 0.65,
-                        "textAlign": "center",
-                      }
-                    }
-                  >
-                    2345678901234567890123456789
-                  </Text>
-                  <Text
-                    style={
-                      {
-                        "color": "rgb(28, 28, 30)",
-                        "flexBasis": "100%",
-                        "fontFamily": "verdana",
-                        "fontSize": 16,
-                        "opacity": 0.65,
-                        "textAlign": "center",
-                      }
-                    }
-                  >
-                    0123456789012345678901234567
-                  </Text>
-                  <Text
-                    style={
-                      {
-                        "color": "rgb(28, 28, 30)",
-                        "flexBasis": "100%",
-                        "fontFamily": "verdana",
-                        "fontSize": 16,
-                        "opacity": 0.65,
-                        "textAlign": "center",
-                      }
-                    }
-                  >
-                    8901234567890123456789012345
-                  </Text>
-                  <Text
-                    style={
-                      {
-                        "color": "rgb(28, 28, 30)",
-                        "flexBasis": "100%",
-                        "fontFamily": "verdana",
-                        "fontSize": 16,
-                        "opacity": 0.65,
-                        "textAlign": "center",
-                      }
-                    }
-                  >
-                    6789012345678901234567890
-                  </Text>
+                    >
+                      <View
+                        accessible={true}
+                        collapsable={false}
+                        focusable={true}
+                        onClick={[Function]}
+                        onResponderGrant={[Function]}
+                        onResponderMove={[Function]}
+                        onResponderRelease={[Function]}
+                        onResponderTerminate={[Function]}
+                        onResponderTerminationRequest={[Function]}
+                        onStartShouldSetResponder={[Function]}
+                        style={
+                          {
+                            "opacity": 1,
+                          }
+                        }
+                      >
+                        <View
+                          style={
+                            {
+                              "display": "flex",
+                              "flexDirection": "column",
+                              "flexWrap": "wrap",
+                            }
+                          }
+                        >
+                          <Text
+                            style={
+                              {
+                                "color": "rgb(28, 28, 30)",
+                                "fontSize": 18,
+                                "fontWeight": "600",
+                                "opacity": 1,
+                              }
+                            }
+                          >
+                            uview12345678901234567890123
+                          </Text>
+                          <Text
+                            style={
+                              {
+                                "color": "rgb(28, 28, 30)",
+                                "fontSize": 18,
+                                "fontWeight": "600",
+                                "opacity": 1,
+                              }
+                            }
+                          >
+                            4567890123456789012345678901
+                          </Text>
+                          <Text
+                            style={
+                              {
+                                "color": "rgb(28, 28, 30)",
+                                "fontSize": 18,
+                                "fontWeight": "600",
+                                "opacity": 1,
+                              }
+                            }
+                          >
+                            2345678901234567890123456789
+                          </Text>
+                          <Text
+                            style={
+                              {
+                                "color": "rgb(28, 28, 30)",
+                                "fontSize": 18,
+                                "fontWeight": "600",
+                                "opacity": 1,
+                              }
+                            }
+                          >
+                            0123456789012345678901234567
+                          </Text>
+                          <Text
+                            style={
+                              {
+                                "color": "rgb(28, 28, 30)",
+                                "fontSize": 18,
+                                "fontWeight": "600",
+                                "opacity": 1,
+                              }
+                            }
+                          >
+                            8901234567890123456789012345
+                          </Text>
+                          <Text
+                            style={
+                              {
+                                "color": "rgb(28, 28, 30)",
+                                "fontSize": 18,
+                                "fontWeight": "600",
+                                "opacity": 1,
+                              }
+                            }
+                          >
+                            6789012345678901234567890
+                          </Text>
+                        </View>
+                      </View>
+                    </View>
+                  </View>
                 </View>
               </View>
             </View>

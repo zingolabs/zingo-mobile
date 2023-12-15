@@ -59,18 +59,28 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
               }
             }
           >
-            <Text
+            <View
               style={
                 {
-                  "color": "#c3c3c3",
-                  "fontSize": 18,
-                  "fontWeight": "600",
-                  "opacity": 1,
+                  "display": "flex",
+                  "flexDirection": "row",
                 }
               }
             >
-              text translated
-            </Text>
+              <Text
+                style={
+                  {
+                    "color": "#c3c3c3",
+                    "fontSize": 18,
+                    "fontWeight": "600",
+                    "marginRight": 10,
+                    "opacity": 1,
+                  }
+                }
+              >
+                text translated
+              </Text>
+            </View>
           </View>
           <View
             style={
@@ -985,18 +995,28 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
               }
             }
           >
-            <Text
+            <View
               style={
                 {
-                  "color": "#c3c3c3",
-                  "fontSize": 18,
-                  "fontWeight": "600",
-                  "opacity": 1,
+                  "display": "flex",
+                  "flexDirection": "row",
                 }
               }
             >
-              text translated
-            </Text>
+              <Text
+                style={
+                  {
+                    "color": "#c3c3c3",
+                    "fontSize": 18,
+                    "fontWeight": "600",
+                    "marginRight": 10,
+                    "opacity": 1,
+                  }
+                }
+              >
+                text translated
+              </Text>
+            </View>
           </View>
           <View
             style={
