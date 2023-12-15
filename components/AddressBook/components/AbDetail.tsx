@@ -150,6 +150,8 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
               marginLeft: 5,
               backgroundColor: 'transparent',
             }}
+            placeholder={translate('addressbook.label-placeholder') as string}
+            placeholderTextColor={colors.placeholder}
             value={label}
             onChangeText={(text: string) => setLabel(text)}
             editable={action !== 'Delete'}

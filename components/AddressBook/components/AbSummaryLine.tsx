@@ -1,26 +1,35 @@
 /* eslint-disable react-native/no-inline-styles */
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, TouchableOpacity } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faAddressCard, faQrcode, faTrashCan, faPencil } from '@fortawesome/free-solid-svg-icons';
+import { faAddressCard, faQrcode, faTrashCan, faPencil, faArrowUp } from '@fortawesome/free-solid-svg-icons';
 //import { TouchableOpacity } from 'react-native-gesture-handler';
 
 import FadeText from '../../Components/FadeText';
-import { AddressBookFileClass } from '../../../app/AppState';
+import { AddressBookFileClass, SendPageStateClass, ToAddrClass } from '../../../app/AppState';
 import Utils from '../../../app/utils';
 import { ThemeType } from '../../../app/types';
-//import { ContextAppLoaded } from '../../../app/context';
+import { ContextAppLoaded } from '../../../app/context';
 
 type AbSummaryLineProps = {
   index: number;
   item: AddressBookFileClass;
   setCurrentItem: (b: number) => void;
   setAction: (action: 'Add' | 'Modify' | 'Delete') => void;
+  setSendPageState: (s: SendPageStateClass) => void;
+  closeModal: () => void;
 };
-const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({ index, item, setCurrentItem, setAction }) => {
-  //const context = useContext(ContextAppLoaded);
-  //const { translate, privacy, info } = context;
+const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
+  index,
+  item,
+  setCurrentItem,
+  setAction,
+  setSendPageState,
+  closeModal,
+}) => {
+  const context = useContext(ContextAppLoaded);
+  const { translate, navigation } = context;
   const { colors } = useTheme() as unknown as ThemeType;
 
   const displayAddress = item.address ? Utils.trimToSmall(item.address, 7) : 'Unknown';
@@ -34,21 +43,21 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({ index, ite
 
   return (
     <View testID={`addressBookList.${index + 1}`} style={{ display: 'flex', flexDirection: 'column' }}>
-      <TouchableOpacity
-        onPress={() => {
-          setCurrentItem(index);
-          setAction('Modify');
+      <View
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          marginTop: 15,
+          paddingBottom: 15,
+          borderBottomWidth: 1,
+          borderBottomColor: colors.border,
         }}>
-        <View
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            marginTop: 15,
-            paddingBottom: 15,
-            borderBottomWidth: 1,
-            borderBottomColor: colors.border,
-          }}>
-          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'flex-start' }}>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'flex-start' }}>
+          <TouchableOpacity
+            onPress={() => {
+              setCurrentItem(index);
+              setAction('Modify');
+            }}>
             <View style={{ flexDirection: 'row', marginBottom: 5 }}>
               <FontAwesomeIcon
                 style={{ marginHorizontal: 10 }}
@@ -67,22 +76,46 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({ index, ite
                 {displayAddress}
               </FadeText>
             </View>
-          </View>
-          <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
-            <FontAwesomeIcon style={{}} size={20} icon={faPencil} color={colors.primary} />
-          </View>
-          <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
-            <TouchableOpacity
-              style={{ zIndex: 999 }}
-              onPress={() => {
-                setCurrentItem(index);
-                setAction('Delete');
-              }}>
-              <FontAwesomeIcon style={{ opacity: 0.8 }} size={20} icon={faTrashCan} color={colors.money} />
-            </TouchableOpacity>
-          </View>
+          </TouchableOpacity>
         </View>
-      </TouchableOpacity>
+        <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
+          <TouchableOpacity
+            style={{ zIndex: 999, padding: 10 }}
+            onPress={() => {
+              setCurrentItem(index);
+              setAction('Modify');
+            }}>
+            <FontAwesomeIcon style={{ opacity: 0.8 }} size={20} icon={faPencil} color={colors.money} />
+          </TouchableOpacity>
+        </View>
+        <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
+          <TouchableOpacity
+            style={{ zIndex: 999, padding: 10 }}
+            onPress={() => {
+              // enviar
+              const sendPageState = new SendPageStateClass(new ToAddrClass(0));
+              sendPageState.toaddr.to = item.address;
+              setSendPageState(sendPageState);
+              closeModal();
+              navigation.navigate('LoadedApp', {
+                screen: translate('loadedapp.send-menu'),
+                initial: false,
+              });
+            }}>
+            <FontAwesomeIcon style={{ opacity: 0.8 }} size={20} icon={faArrowUp} color={colors.primary} />
+          </TouchableOpacity>
+        </View>
+        <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
+          <TouchableOpacity
+            style={{ zIndex: 999, padding: 10 }}
+            onPress={() => {
+              setCurrentItem(index);
+              setAction('Delete');
+            }}>
+            <FontAwesomeIcon style={{ opacity: 0.8 }} size={20} icon={faTrashCan} color={colors.money} />
+          </TouchableOpacity>
+        </View>
+      </View>
     </View>
   );
 };

@@ -6,7 +6,7 @@ import 'moment/locale/es';
 import { useTheme } from '@react-navigation/native';
 import Animated, { EasingNode } from 'react-native-reanimated';
 
-import { AddressBookFileClass } from '../../app/AppState';
+import { AddressBookFileClass, SendPageStateClass } from '../../app/AppState';
 import { ThemeType } from '../../app/types';
 import FadeText from '../Components/FadeText';
 import Button from '../Components/Button';
@@ -19,9 +19,10 @@ import AddressBookFileImpl from './AddressBookFileImpl';
 type AddressBookProps = {
   closeModal: () => void;
   setAddressBook: (ab: AddressBookFileClass[]) => void;
+  setSendPageState: (s: SendPageStateClass) => void;
 };
 
-const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, setAddressBook }) => {
+const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, setAddressBook, setSendPageState }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, language, addressBook, addressBookCurrentAddress } = context;
   moment.locale(language);
@@ -204,6 +205,8 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
                     item={aBItem}
                     setCurrentItem={setCurrentItem}
                     setAction={setAction}
+                    setSendPageState={setSendPageState}
+                    closeModal={closeModal}
                   />
                 )}
               </View>
