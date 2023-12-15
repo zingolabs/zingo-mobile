@@ -223,7 +223,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSen
           return (
             <View key={to.id} style={{ margin: 10 }}>
               <FadeText>{translate('send.to') as string}</FadeText>
-              <AddressItem address={to.to} />
+              <AddressItem address={to.to} withIcon={true} />
 
               <FadeText style={{ marginTop: 10 }}>{translate('send.confirm-amount') as string}</FadeText>
               <View

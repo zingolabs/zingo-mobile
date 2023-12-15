@@ -17,6 +17,7 @@ import Utils from '../../app/utils';
 import FadeText from '../Components/FadeText';
 import Header from '../Header';
 import RPCModule from '../../app/RPCModule';
+import AddressItem from '../Components/AddressItem';
 
 type DataType = {
   svg: {
@@ -191,6 +192,9 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, set_privac
                   flexDirection: 'column',
                   flexWrap: 'wrap',
                 }}>
+                {item.address !== 'fee' && (
+                  <AddressItem address={item.address} oneLine={true} onlyContact={true} withIcon={true} />
+                )}
                 {!expandAddress[index] && !!item.address && (
                   <RegText>
                     {item.address.length > (dimensions.width < 500 ? 10 : 20)

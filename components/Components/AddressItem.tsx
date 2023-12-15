@@ -15,9 +15,10 @@ type AddressItemProps = {
   address: string;
   oneLine?: boolean;
   onlyContact?: boolean;
+  withIcon?: boolean;
 };
 
-const AddressItem: React.FunctionComponent<AddressItemProps> = ({ address, oneLine, onlyContact }) => {
+const AddressItem: React.FunctionComponent<AddressItemProps> = ({ address, oneLine, onlyContact, withIcon }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, addLastSnackbar, addressBook, launchAddressBook } = context;
   const { colors } = useTheme() as unknown as ThemeType;
@@ -33,11 +34,17 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({ address, oneLi
 
   return (
     <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start' }}>
-      <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+      <View
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-start',
+          marginRight: onlyContact ? 0 : 10,
+        }}>
         {contact && (
           <TouchableOpacity
             onPress={() => {
-              if (contact && !oneLine) {
+              if (contact) {
                 Clipboard.setString(contact);
                 addLastSnackbar({
                   message: translate('history.contactcopied') as string,
@@ -88,10 +95,10 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({ address, oneLi
           </TouchableOpacity>
         )}
       </View>
-      {!oneLine && !contact && (
+      {withIcon && !contact && (
         <TouchableOpacity onPress={() => launchAddressBook(address)}>
           <FontAwesomeIcon
-            style={{ marginHorizontal: 10, marginTop: 3 }}
+            style={{ marginTop: 3 }}
             size={20}
             icon={faAddressCard}
             color={contact ? colors.zingo : colors.primaryDisabled}

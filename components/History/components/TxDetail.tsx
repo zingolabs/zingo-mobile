@@ -191,7 +191,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
                   borderTopWidth: tx.txDetails.length > 1 ? 1 : 0,
                 }}>
                 <FadeText style={{ marginTop: 10 }}>{translate('history.address') as string}</FadeText>
-                {!!txd.address && <AddressItem address={txd.address} />}
+                {!!txd.address && <AddressItem address={txd.address} withIcon={true} />}
 
                 {!!txd.pool && (
                   <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: 10 }}>

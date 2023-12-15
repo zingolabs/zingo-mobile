@@ -506,7 +506,9 @@ const Send: React.FunctionComponent<SendProps> = ({
                 <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                   <View style={{ display: 'flex', flexDirection: 'row' }}>
                     <RegText style={{ marginRight: 10 }}>{translate('send.toaddress') as string}</RegText>
-                    <AddressItem address={ta.to} oneLine={true} onlyContact={true} />
+                    {validAddress === 1 && (
+                      <AddressItem address={ta.to} oneLine={true} onlyContact={true} withIcon={true} />
+                    )}
                   </View>
                   {validAddress === 1 && <FontAwesomeIcon icon={faCheck} color={colors.primary} />}
                   {validAddress === -1 && <ErrorText>{translate('send.invalidaddress') as string}</ErrorText>}
