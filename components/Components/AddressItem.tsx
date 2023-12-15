@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { TouchableOpacity, View } from 'react-native';
 import Clipboard from '@react-native-community/clipboard';
 import { ContextAppLoaded } from '../../app/context';
@@ -20,7 +20,7 @@ type AddressItemProps = {
 
 const AddressItem: React.FunctionComponent<AddressItemProps> = ({ address, oneLine, onlyContact, withIcon }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, addLastSnackbar, addressBook, launchAddressBook } = context;
+  const { translate, addLastSnackbar, addressBook, launchAddressBook, privacy } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [expandAddress, setExpandAddress] = useState(false);
   const [expandContact, setExpandContact] = useState(false);
@@ -31,6 +31,24 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({ address, oneLi
     .map((ab: AddressBookFileClass) => ab.label)
     .join(' ');
   const numLinesContact = contact ? (contact.length < 20 ? 1 : contact.length / 20) : 0;
+
+  useEffect(() => {
+    if (!oneLine) {
+      if (privacy) {
+        setExpandAddress(false);
+      } else {
+        setExpandAddress(true);
+      }
+    }
+  }, [oneLine, privacy]);
+
+  useEffect(() => {
+    if (!oneLine) {
+      if (!expandAddress && !privacy) {
+        setExpandAddress(true);
+      }
+    }
+  }, [expandAddress, oneLine, privacy]);
 
   return (
     <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start' }}>
@@ -45,13 +63,20 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({ address, oneLi
           <TouchableOpacity
             onPress={() => {
               if (contact) {
-                Clipboard.setString(contact);
-                addLastSnackbar({
-                  message: translate('history.contactcopied') as string,
-                  type: 'Primary',
-                  duration: 'short',
-                });
+                if (!oneLine) {
+                  Clipboard.setString(contact);
+                  addLastSnackbar({
+                    message: translate('history.contactcopied') as string,
+                    type: 'Primary',
+                    duration: 'short',
+                  });
+                }
                 setExpandContact(true);
+                if (privacy) {
+                  setTimeout(() => {
+                    setExpandContact(false);
+                  }, 5000);
+                }
               }
             }}>
             <View style={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap' }}>
@@ -81,6 +106,11 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({ address, oneLi
                   duration: 'short',
                 });
                 setExpandAddress(true);
+                if (privacy) {
+                  setTimeout(() => {
+                    setExpandAddress(false);
+                  }, 5000);
+                }
               }
             }}>
             <View style={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap' }}>
