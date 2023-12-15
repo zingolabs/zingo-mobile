@@ -122,6 +122,8 @@ export default interface AppStateLoaded {
   someUnconfirmed: boolean;
 
   addressBook: AddressBookFileClass[];
+  launchAddressBook: (a: string) => void;
+  addressBookCurrentAddress: string;
 
   // eslint-disable-next-line semi
 }

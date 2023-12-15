@@ -190,6 +190,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
                   borderTopColor: colors.text,
                   borderTopWidth: tx.txDetails.length > 1 ? 1 : 0,
                 }}>
+                <FadeText style={{ marginTop: 10 }}>{translate('history.address') as string}</FadeText>
                 {!!txd.address && <AddressItem address={txd.address} />}
 
                 {!!txd.pool && (

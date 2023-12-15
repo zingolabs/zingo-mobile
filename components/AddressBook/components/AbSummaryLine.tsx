@@ -24,6 +24,11 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({ index, ite
   const { colors } = useTheme() as unknown as ThemeType;
 
   const displayAddress = item.address ? Utils.trimToSmall(item.address, 7) : 'Unknown';
+  const displayContact = item.label
+    ? item.label.length > 20
+      ? Utils.trimToSmall(item.label, 8)
+      : item.label
+    : 'Unknown';
 
   //console.log('render Ab SummaryLine - 5', index);
 
@@ -53,7 +58,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({ index, ite
               />
               <FadeText
                 style={{ fontSize: 18, marginHorizontal: 10, color: colors.primary, opacity: 1, fontWeight: 'bold' }}>
-                {item.label}
+                {displayContact}
               </FadeText>
             </View>
             <View style={{ flexDirection: 'row' }}>
@@ -73,7 +78,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({ index, ite
                 setCurrentItem(index);
                 setAction('Delete');
               }}>
-              <FontAwesomeIcon style={{ opacity: 0.8 }} size={20} icon={faTrashCan} color={'red'} />
+              <FontAwesomeIcon style={{ opacity: 0.8 }} size={20} icon={faTrashCan} color={colors.money} />
             </TouchableOpacity>
           </View>
         </View>

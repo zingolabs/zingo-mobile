@@ -18,8 +18,16 @@ type AbDetailProps = {
   cancel: () => void;
   action: 'Add' | 'Modify' | 'Delete';
   doAction: (action: 'Add' | 'Modify' | 'Delete', label: string, address: string) => void;
+  addressBookCurrentAddress?: string;
 };
-const AbDetail: React.FunctionComponent<AbDetailProps> = ({ index, item, cancel, action: actionProp, doAction }) => {
+const AbDetail: React.FunctionComponent<AbDetailProps> = ({
+  index,
+  item,
+  cancel,
+  action: actionProp,
+  doAction,
+  addressBookCurrentAddress,
+}) => {
   const context = useContext(ContextAppLoaded);
   const { translate, server, addLastSnackbar, addressBook } = context;
   const { colors } = useTheme() as unknown as ThemeType;
@@ -30,6 +38,9 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({ index, item, cancel,
   const [errorAddress, setErrorAddress] = useState<string>('');
 
   useEffect(() => {
+    if (addressBookCurrentAddress) {
+      setAddress(addressBookCurrentAddress);
+    }
     if (item.label !== label && item.address !== address) {
       setAction('Add');
     } else {
@@ -60,7 +71,18 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({ index, item, cancel,
         }
       }
     }
-  }, [action, actionProp, address, addressBook, error, item.address, item.label, label, translate]);
+  }, [
+    action,
+    actionProp,
+    address,
+    addressBook,
+    addressBookCurrentAddress,
+    error,
+    item.address,
+    item.label,
+    label,
+    translate,
+  ]);
 
   const updateAddress = async (addr: string) => {
     if (!addr) {

@@ -279,6 +279,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       addLastSnackbar: this.addLastSnackbar,
       restartApp: this.navigateToLoadingApp,
       addressBook: props.addressBook,
+      launchAddressBook: this.launchAddressBook,
     };
 
     this.rpc = new RPC(
@@ -477,6 +478,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       poolsModalVisible: false,
       insightModalVisible: false,
       addressBookModalVisible: false,
+      addressBookCurrentAddress: '',
     });
   };
 
@@ -809,7 +811,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
         { cancelable: true, userInterfaceStyle: 'light' },
       );
     } else if (item === 'Address Book') {
-      this.setState({ addressBookModalVisible: true });
+      this.setState({ addressBookModalVisible: true, addressBookCurrentAddress: '' });
     }
   };
 
@@ -1126,6 +1128,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     const newSnackbars = this.state.snackbars;
     newSnackbars.shift();
     this.setState({ snackbars: newSnackbars });
+  };
+
+  launchAddressBook = (address: string) => {
+    this.setState({ addressBookModalVisible: true, addressBookCurrentAddress: address });
   };
 
   render() {
@@ -1499,7 +1505,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
             animationType="slide"
             transparent={false}
             visible={addressBookModalVisible}
-            onRequestClose={() => this.setState({ addressBookModalVisible: false })}>
+            onRequestClose={() => this.setState({ addressBookModalVisible: false, addressBookCurrentAddress: '' })}>
             <Suspense
               fallback={
                 <View>
@@ -1507,7 +1513,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 </View>
               }>
               <AddressBook
-                closeModal={() => this.setState({ addressBookModalVisible: false })}
+                closeModal={() => this.setState({ addressBookModalVisible: false, addressBookCurrentAddress: '' })}
                 setAddressBook={this.setAddressBook}
               />
             </Suspense>

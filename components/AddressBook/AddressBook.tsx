@@ -23,7 +23,7 @@ type AddressBookProps = {
 
 const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, setAddressBook }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, language, addressBook } = context;
+  const { translate, language, addressBook, addressBookCurrentAddress } = context;
   moment.locale(language);
 
   const { colors } = useTheme() as unknown as ThemeType;
@@ -56,8 +56,18 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
       const abs = await fetchAddressBookSorted;
       setLoadMoreButton(numTx < (abs.length || 0));
       setAddressBookSorted(abs);
+      // find the current address
+      if (addressBookCurrentAddress) {
+        const index: number = abs.findIndex((i: AddressBookFileClass) => i.address === addressBookCurrentAddress);
+        if (index === -1) {
+          setAction('Add');
+        } else {
+          setAction('Modify');
+        }
+        setCurrentItem(index);
+      }
     })();
-  }, [fetchAddressBookSorted, numTx]);
+  }, [addressBookCurrentAddress, fetchAddressBookSorted, numTx]);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
@@ -95,6 +105,9 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
   const cancel = () => {
     setCurrentItem(null);
     setAction(null);
+    if (addressBookCurrentAddress) {
+      closeModal();
+    }
   };
 
   const doAction = async (a: 'Add' | 'Modify' | 'Delete', label: string, address: string) => {
@@ -155,6 +168,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
             cancel={cancel}
             action={action}
             doAction={doAction}
+            addressBookCurrentAddress={addressBookCurrentAddress}
           />
         )}
         {currentItem !== null && currentItem > -1 && action !== null && (
@@ -179,21 +193,22 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
             <FadeText style={{ color: colors.primary }}>{translate('addressbook.empty') as string}</FadeText>
           </View>
         )}
-        {addressBookSorted.flatMap((aBItem, index) => {
-          return (
-            <View key={`container-${index}-${aBItem.label}`}>
-              {currentItem !== index && (
-                <AbSummaryLine
-                  index={index}
-                  key={`line-${index}-${aBItem.label}`}
-                  item={aBItem}
-                  setCurrentItem={setCurrentItem}
-                  setAction={setAction}
-                />
-              )}
-            </View>
-          );
-        })}
+        {!addressBookCurrentAddress &&
+          addressBookSorted.flatMap((aBItem, index) => {
+            return (
+              <View key={`container-${index}-${aBItem.label}`}>
+                {currentItem !== index && (
+                  <AbSummaryLine
+                    index={index}
+                    key={`line-${index}-${aBItem.label}`}
+                    item={aBItem}
+                    setCurrentItem={setCurrentItem}
+                    setAction={setAction}
+                  />
+                )}
+              </View>
+            );
+          })}
         {loadMoreButton ? (
           <View
             style={{
@@ -208,7 +223,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
           </View>
         ) : (
           <>
-            {!!addressBookSorted && !!addressBookSorted.length && (
+            {!addressBookCurrentAddress && !!addressBookSorted && !!addressBookSorted.length && (
               <View
                 style={{
                   height: 150,

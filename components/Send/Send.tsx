@@ -27,6 +27,7 @@ import RPC from '../../app/rpc';
 import Header from '../Header';
 import { RPCParseAddressType } from '../../app/rpc/types/RPCParseAddressType';
 import { createAlert } from '../../app/createAlert';
+import AddressItem from '../Components/AddressItem';
 
 type SendProps = {
   setSendPageState: (sendPageState: SendPageStateClass) => void;
@@ -503,7 +504,10 @@ const Send: React.FunctionComponent<SendProps> = ({
             return (
               <View key={i} style={{ display: 'flex', padding: 10, marginTop: 10 }}>
                 <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                  <RegText>{translate('send.toaddress') as string}</RegText>
+                  <View style={{ display: 'flex', flexDirection: 'row' }}>
+                    <RegText style={{ marginRight: 10 }}>{translate('send.toaddress') as string}</RegText>
+                    <AddressItem address={ta.to} oneLine={true} onlyContact={true} />
+                  </View>
                   {validAddress === 1 && <FontAwesomeIcon icon={faCheck} color={colors.primary} />}
                   {validAddress === -1 && <ErrorText>{translate('send.invalidaddress') as string}</ErrorText>}
                 </View>

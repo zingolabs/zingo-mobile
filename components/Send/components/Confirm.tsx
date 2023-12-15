@@ -222,7 +222,8 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSen
         {[sendPageState.toaddr].map(to => {
           return (
             <View key={to.id} style={{ margin: 10 }}>
-              <AddressItem address={to.to} label={translate('send.to') as string} />
+              <FadeText>{translate('send.to') as string}</FadeText>
+              <AddressItem address={to.to} />
 
               <FadeText style={{ marginTop: 10 }}>{translate('send.confirm-amount') as string}</FadeText>
               <View

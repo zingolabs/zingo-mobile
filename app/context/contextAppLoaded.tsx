@@ -94,6 +94,8 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   restartApp: () => {},
   someUnconfirmed: false,
   addressBook: [] as AddressBookFileClass[],
+  launchAddressBook: () => {},
+  addressBookCurrentAddress: '',
 };
 
 export const ContextAppLoaded = React.createContext(defaultAppStateLoaded);
