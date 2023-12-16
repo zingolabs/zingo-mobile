@@ -1,12 +1,13 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useRef, useCallback, useContext } from 'react';
 import { View, ScrollView, Modal, Keyboard, TextInput, TouchableOpacity, Platform } from 'react-native';
-import { faQrcode, faCheck, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
+import { faQrcode, faCheck, faInfoCircle, faAddressCard } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme, useIsFocused } from '@react-navigation/native';
 import { getNumberFormatSettings } from 'react-native-localize';
 import Animated, { EasingNode } from 'react-native-reanimated';
 import CheckBox from '@react-native-community/checkbox';
+import RNPickerSelect from 'react-native-picker-select';
 
 import FadeText from '../Components/FadeText';
 import ErrorText from '../Components/ErrorText';
@@ -14,7 +15,7 @@ import RegText from '../Components/RegText';
 import ZecAmount from '../Components/ZecAmount';
 import CurrencyAmount from '../Components/CurrencyAmount';
 import Button from '../Components/Button';
-import { SendPageStateClass, SendProgressClass, ToAddrClass } from '../../app/AppState';
+import { AddressBookFileClass, SendPageStateClass, SendProgressClass, ToAddrClass } from '../../app/AppState';
 import { parseZcashURI, ZcashURITargetClass } from '../../app/uris';
 import RPCModule from '../../app/RPCModule';
 import Utils from '../../app/utils';
@@ -74,6 +75,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     addLastSnackbar,
     mode,
     someUnconfirmed,
+    addressBook,
   } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [qrcodeModalVisble, setQrcodeModalVisible] = useState(false);
@@ -83,6 +85,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [validAddress, setValidAddress] = useState(0); // 1 - OK, 0 - Empty, -1 - KO
   const [validAmount, setValidAmount] = useState(0); // 1 - OK, 0 - Empty, -1 - KO
   const [sendButtonEnabled, setSendButtonEnabled] = useState(false);
+  const [itemsPicker, setItemsPicker] = useState([] as { label: string; value: string }[]);
   const isFocused = useIsFocused();
 
   const slideAnim = useRef(new Animated.Value(0)).current;
@@ -275,6 +278,14 @@ const Send: React.FunctionComponent<SendProps> = ({
       }
     })();
   }, [mode, setZecPrice]);
+
+  useEffect(() => {
+    const items = addressBook.map((item: AddressBookFileClass) => ({
+      label: item.label,
+      value: item.address,
+    }));
+    setItemsPicker(items);
+  }, [addressBook]);
 
   const updateToField = async (
     address: string | null,
@@ -547,8 +558,24 @@ const Send: React.FunctionComponent<SendProps> = ({
                     </View>
                     <View
                       style={{
-                        width: 58,
+                        display: 'flex',
+                        flexDirection: 'row',
+                        width: 95,
                       }}>
+                      <RNPickerSelect
+                        value={ta.to}
+                        items={itemsPicker}
+                        placeholder={{ label: translate('addressbook.select-placeholder') as string, value: '' }}
+                        onValueChange={(itemValue: string) => {
+                          updateToField(itemValue, null, null, null, null);
+                        }}>
+                        <FontAwesomeIcon
+                          style={{ margin: 5 }}
+                          size={38}
+                          icon={faAddressCard}
+                          color={colors.primaryDisabled}
+                        />
+                      </RNPickerSelect>
                       <TouchableOpacity
                         testID="send.scan-button"
                         accessible={true}
@@ -556,7 +583,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         onPress={() => {
                           setQrcodeModalVisible(true);
                         }}>
-                        <FontAwesomeIcon style={{ margin: 5 }} size={48} icon={faQrcode} color={colors.border} />
+                        <FontAwesomeIcon style={{ margin: 5 }} size={38} icon={faQrcode} color={colors.border} />
                       </TouchableOpacity>
                     </View>
                   </View>
