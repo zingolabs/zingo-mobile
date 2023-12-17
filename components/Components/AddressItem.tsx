@@ -131,7 +131,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({ address, oneLi
             style={{ marginTop: 3 }}
             size={20}
             icon={faAddressCard}
-            color={contact ? colors.zingo : colors.primaryDisabled}
+            color={contact ? colors.zingo : colors.primary}
           />
         </TouchableOpacity>
       )}

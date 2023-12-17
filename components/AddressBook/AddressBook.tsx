@@ -3,7 +3,7 @@ import React, { useContext, useState, useEffect, useCallback, useMemo, useRef } 
 import { View, ScrollView, SafeAreaView, Keyboard } from 'react-native';
 import moment from 'moment';
 import 'moment/locale/es';
-import { useTheme } from '@react-navigation/native';
+import { useTheme, useScrollToTop } from '@react-navigation/native';
 import Animated, { EasingNode } from 'react-native-reanimated';
 
 import { AddressBookFileClass, SendPageStateClass } from '../../app/AppState';
@@ -37,6 +37,9 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
   const [action, setAction] = useState<'Add' | 'Modify' | 'Delete' | null>(null);
 
   const slideAnim = useRef(new Animated.Value(0)).current;
+  const scrollViewRef = useRef<ScrollView>(null);
+
+  useScrollToTop(scrollViewRef);
 
   const fetchAddressBookSorted = useMemo(async () => {
     return addressBook.slice(0, numTx).sort((a, b) => {
@@ -125,6 +128,12 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
     cancel();
   };
 
+  const handleScrollToTop = () => {
+    if (scrollViewRef.current) {
+      scrollViewRef.current.scrollTo({ y: 0, animated: true });
+    }
+  };
+
   //console.log('render Address Book - 4', currentItem, action);
 
   return (
@@ -153,6 +162,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
       </Animated.View>
 
       <ScrollView
+        ref={scrollViewRef}
         testID="addressbook.scrollView"
         keyboardShouldPersistTaps="handled"
         style={{ maxHeight: '85%' }}
@@ -198,6 +208,25 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
           addressBookSorted.flatMap((aBItem, index) => {
             return (
               <View key={`container-${index}-${aBItem.label}`}>
+                {currentItem === index && (
+                  <AbSummaryLine
+                    index={index}
+                    key={`line-${index}-${aBItem.label}`}
+                    item={aBItem}
+                    setCurrentItem={setCurrentItem}
+                    setAction={setAction}
+                    setSendPageState={setSendPageState}
+                    closeModal={closeModal}
+                    handleScrollToTop={handleScrollToTop}
+                  />
+                )}
+              </View>
+            );
+          })}
+        {!addressBookCurrentAddress &&
+          addressBookSorted.flatMap((aBItem, index) => {
+            return (
+              <View key={`container-${index}-${aBItem.label}`}>
                 {currentItem !== index && (
                   <AbSummaryLine
                     index={index}
@@ -207,6 +236,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
                     setAction={setAction}
                     setSendPageState={setSendPageState}
                     closeModal={closeModal}
+                    handleScrollToTop={handleScrollToTop}
                   />
                 )}
               </View>

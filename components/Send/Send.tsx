@@ -569,12 +569,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         onValueChange={(itemValue: string) => {
                           updateToField(itemValue, null, null, null, null);
                         }}>
-                        <FontAwesomeIcon
-                          style={{ margin: 5 }}
-                          size={38}
-                          icon={faAddressCard}
-                          color={colors.primaryDisabled}
-                        />
+                        <FontAwesomeIcon style={{ margin: 5 }} size={38} icon={faAddressCard} color={colors.primary} />
                       </RNPickerSelect>
                       <TouchableOpacity
                         testID="send.scan-button"

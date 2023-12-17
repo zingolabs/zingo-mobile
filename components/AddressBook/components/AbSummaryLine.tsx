@@ -19,6 +19,7 @@ type AbSummaryLineProps = {
   setAction: (action: 'Add' | 'Modify' | 'Delete') => void;
   setSendPageState: (s: SendPageStateClass) => void;
   closeModal: () => void;
+  handleScrollToTop: () => void;
 };
 const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
   index,
@@ -27,6 +28,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
   setAction,
   setSendPageState,
   closeModal,
+  handleScrollToTop,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, navigation } = context;
@@ -57,6 +59,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
             onPress={() => {
               setCurrentItem(index);
               setAction('Modify');
+              handleScrollToTop();
             }}>
             <View style={{ flexDirection: 'row', marginBottom: 5 }}>
               <FontAwesomeIcon
@@ -84,6 +87,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
             onPress={() => {
               setCurrentItem(index);
               setAction('Modify');
+              handleScrollToTop();
             }}>
             <FontAwesomeIcon style={{ opacity: 0.8 }} size={20} icon={faPencil} color={colors.money} />
           </TouchableOpacity>
@@ -102,7 +106,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
                 initial: false,
               });
             }}>
-            <FontAwesomeIcon style={{ opacity: 0.8 }} size={20} icon={faArrowUp} color={colors.primary} />
+            <FontAwesomeIcon size={20} icon={faArrowUp} color={colors.primary} />
           </TouchableOpacity>
         </View>
         <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
@@ -111,6 +115,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
             onPress={() => {
               setCurrentItem(index);
               setAction('Delete');
+              handleScrollToTop();
             }}>
             <FontAwesomeIcon style={{ opacity: 0.8 }} size={20} icon={faTrashCan} color={colors.money} />
           </TouchableOpacity>
