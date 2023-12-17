@@ -144,7 +144,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
             style={{
               color: colors.text,
               fontWeight: '600',
-              fontSize: 18,
+              fontSize: 14,
               minWidth: 48,
               minHeight: 48,
               marginLeft: 5,

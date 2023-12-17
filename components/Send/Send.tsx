@@ -547,7 +547,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         style={{
                           color: colors.text,
                           fontWeight: '600',
-                          fontSize: 16,
+                          fontSize: 14,
                           marginLeft: 5,
                           backgroundColor: 'transparent',
                         }}
@@ -560,17 +560,25 @@ const Send: React.FunctionComponent<SendProps> = ({
                       style={{
                         display: 'flex',
                         flexDirection: 'row',
-                        width: 95,
+                        alignItems: 'center',
+                        justifyContent: 'center',
                       }}>
-                      <RNPickerSelect
-                        value={ta.to}
-                        items={itemsPicker}
-                        placeholder={{ label: translate('addressbook.select-placeholder') as string, value: '' }}
-                        onValueChange={(itemValue: string) => {
-                          updateToField(itemValue, null, null, null, null);
-                        }}>
-                        <FontAwesomeIcon style={{ margin: 5 }} size={38} icon={faAddressCard} color={colors.primary} />
-                      </RNPickerSelect>
+                      {itemsPicker.length > 0 && (
+                        <RNPickerSelect
+                          value={ta.to}
+                          items={itemsPicker}
+                          placeholder={{ label: translate('addressbook.select-placeholder') as string, value: '' }}
+                          onValueChange={(itemValue: string) => {
+                            updateToField(itemValue, null, null, null, null);
+                          }}>
+                          <FontAwesomeIcon
+                            style={{ marginRight: 7 }}
+                            size={42}
+                            icon={faAddressCard}
+                            color={colors.primary}
+                          />
+                        </RNPickerSelect>
+                      )}
                       <TouchableOpacity
                         testID="send.scan-button"
                         accessible={true}
@@ -578,7 +586,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         onPress={() => {
                           setQrcodeModalVisible(true);
                         }}>
-                        <FontAwesomeIcon style={{ margin: 5 }} size={38} icon={faQrcode} color={colors.border} />
+                        <FontAwesomeIcon style={{ marginRight: 5 }} size={35} icon={faQrcode} color={colors.border} />
                       </TouchableOpacity>
                     </View>
                   </View>
@@ -672,7 +680,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           style={{
                             color: colors.text,
                             fontWeight: '600',
-                            fontSize: 18,
+                            fontSize: 16,
                             minWidth: 48,
                             minHeight: 48,
                             marginLeft: 5,
@@ -801,7 +809,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                             style={{
                               color: colors.text,
                               fontWeight: '600',
-                              fontSize: 18,
+                              fontSize: 16,
                               minWidth: 48,
                               minHeight: 48,
                               marginLeft: 5,
@@ -888,7 +896,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           style={{
                             color: colors.text,
                             fontWeight: '600',
-                            fontSize: 18,
+                            fontSize: 14,
                             minWidth: 48,
                             minHeight: 48,
                             marginLeft: 5,
