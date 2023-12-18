@@ -114,7 +114,13 @@ const InputTextAddress: React.FunctionComponent<InputTextAddressProps> = ({
                 editable={!disabled}
               />
             </View>
-            <View>
+            <View
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
               <TouchableOpacity
                 testID="send.scan-button"
                 disabled={disabled}
@@ -123,7 +129,7 @@ const InputTextAddress: React.FunctionComponent<InputTextAddressProps> = ({
                 onPress={() => {
                   setQrcodeModalVisible(true);
                 }}>
-                <FontAwesomeIcon style={{ margin: 5 }} size={42} icon={faQrcode} color={colors.border} />
+                <FontAwesomeIcon style={{ marginRight: 5 }} size={35} icon={faQrcode} color={colors.border} />
               </TouchableOpacity>
             </View>
           </View>

@@ -573,7 +573,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           }}>
                           <FontAwesomeIcon
                             style={{ marginRight: 7 }}
-                            size={42}
+                            size={39}
                             icon={faAddressCard}
                             color={colors.primary}
                           />

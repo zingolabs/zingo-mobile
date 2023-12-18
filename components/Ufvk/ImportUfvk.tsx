@@ -209,7 +209,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
             onPress={() => {
               setQrcodeModalVisible(true);
             }}>
-            <FontAwesomeIcon size={48} icon={faQrcode} color={colors.border} />
+            <FontAwesomeIcon size={35} icon={faQrcode} color={colors.border} />
           </TouchableOpacity>
         </View>
 
