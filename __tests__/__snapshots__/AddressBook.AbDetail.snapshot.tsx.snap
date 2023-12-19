@@ -1,0 +1,1116 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Component Address Book Details - test Address Book Datails - Add - snapshot 1`] = `
+<View
+  style={
+    {
+      "borderColor": "#18bd18",
+      "borderWidth": 1,
+      "display": "flex",
+      "flexDirection": "column",
+      "margin": 10,
+    }
+  }
+  testID="addressBookDetail.0"
+>
+  <Text
+    style={
+      {
+        "color": "#c3c3c3",
+        "fontSize": 18,
+        "fontWeight": "600",
+        "marginTop": 10,
+        "opacity": 1,
+        "paddingHorizontal": 10,
+      }
+    }
+  >
+    translated text
+  </Text>
+  <View
+    style={
+      {
+        "display": "flex",
+        "flexDirection": "row",
+        "justifyContent": "flex-start",
+        "marginTop": 10,
+        "paddingHorizontal": 10,
+      }
+    }
+  >
+    <View
+      accessible={true}
+      style={
+        {
+          "borderColor": "#c3c3c3",
+          "borderRadius": 5,
+          "borderWidth": 1,
+          "flexGrow": 1,
+          "maxHeight": 150,
+          "minHeight": 48,
+          "minWidth": 48,
+        }
+      }
+    >
+      <TextInput
+        editable={true}
+        onChangeText={[Function]}
+        placeholder="translated text"
+        placeholderTextColor="#888888"
+        style={
+          {
+            "backgroundColor": "transparent",
+            "color": "#c3c3c3",
+            "fontSize": 14,
+            "fontWeight": "600",
+            "marginLeft": 5,
+            "minHeight": 48,
+            "minWidth": 48,
+          }
+        }
+        testID="addressbook.label-field"
+      />
+    </View>
+  </View>
+  <View
+    style={
+      {
+        "display": "flex",
+        "flexDirection": "column",
+      }
+    }
+  >
+    <Modal
+      animationType="slide"
+      hardwareAccelerated={false}
+      onRequestClose={[Function]}
+      transparent={false}
+      visible={false}
+    />
+    <View
+      style={
+        {
+          "display": "flex",
+          "marginTop": 10,
+          "padding": 10,
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "display": "flex",
+            "flexDirection": "row",
+            "justifyContent": "space-between",
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "#c3c3c3",
+              "fontSize": 18,
+              "fontWeight": "600",
+              "opacity": 1,
+            }
+          }
+        >
+          translated text
+        </Text>
+      </View>
+      <View
+        style={
+          {
+            "borderColor": "#c3c3c3",
+            "borderRadius": 5,
+            "borderWidth": 1,
+            "flex": 1,
+            "marginTop": 5,
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "flexDirection": "row",
+            }
+          }
+        >
+          <View
+            accessibilityLabel="translated text"
+            accessible={true}
+            style={
+              {
+                "flex": 1,
+                "justifyContent": "center",
+              }
+            }
+          >
+            <TextInput
+              editable={true}
+              onChangeText={[Function]}
+              placeholder="translated text"
+              placeholderTextColor="#888888"
+              style={
+                {
+                  "backgroundColor": "transparent",
+                  "color": "#c3c3c3",
+                  "fontSize": 14,
+                  "fontWeight": "600",
+                  "marginLeft": 5,
+                }
+              }
+              testID="send.addressplaceholder"
+            />
+          </View>
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "display": "flex",
+                "flexDirection": "row",
+                "justifyContent": "center",
+              }
+            }
+          >
+            <View
+              accessibilityLabel="translated text"
+              accessibilityState={
+                {
+                  "disabled": false,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "opacity": 1,
+                }
+              }
+              testID="send.scan-button"
+            >
+              <
+                color="#ffffff"
+                icon={
+                  {
+                    "icon": [
+                      448,
+                      512,
+                      [],
+                      "f029",
+                      "M0 80C0 53.5 21.5 32 48 32h96c26.5 0 48 21.5 48 48v96c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V80zM64 96v64h64V96H64zM0 336c0-26.5 21.5-48 48-48h96c26.5 0 48 21.5 48 48v96c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V336zm64 16v64h64V352H64zM304 32h96c26.5 0 48 21.5 48 48v96c0 26.5-21.5 48-48 48H304c-26.5 0-48-21.5-48-48V80c0-26.5 21.5-48 48-48zm80 64H320v64h64V96zM256 304c0-8.8 7.2-16 16-16h64c8.8 0 16 7.2 16 16s7.2 16 16 16h32c8.8 0 16-7.2 16-16s7.2-16 16-16s16 7.2 16 16v96c0 8.8-7.2 16-16 16H368c-8.8 0-16-7.2-16-16s-7.2-16-16-16s-16 7.2-16 16v64c0 8.8-7.2 16-16 16H272c-8.8 0-16-7.2-16-16V304zM368 480a16 16 0 1 1 0-32 16 16 0 1 1 0 32zm64 0a16 16 0 1 1 0-32 16 16 0 1 1 0 32z",
+                    ],
+                    "iconName": "qrcode",
+                    "prefix": "fas",
+                  }
+                }
+                size={35}
+                style={
+                  {
+                    "marginRight": 5,
+                  }
+                }
+              />
+            </View>
+          </View>
+        </View>
+      </View>
+    </View>
+  </View>
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flexDirection": "row",
+        "flexGrow": 1,
+        "justifyContent": "center",
+        "marginVertical": 5,
+      }
+    }
+  >
+    <View
+      accessibilityState={
+        {
+          "disabled": false,
+        }
+      }
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        {
+          "alignItems": "center",
+          "backgroundColor": "#18bd18",
+          "borderColor": "#c3c3c3",
+          "borderRadius": 10,
+          "borderWidth": 2,
+          "justifyContent": "center",
+          "maxWidth": "90%",
+          "minHeight": 48,
+          "minWidth": "30%",
+          "opacity": 1,
+          "padding": 0,
+          "paddingLeft": 20,
+          "paddingRight": 20,
+        }
+      }
+      testID="addressbook.button.action"
+    >
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "display": "flex",
+            "flexDirection": "row",
+            "justifyContent": "center",
+            "margin": 0,
+            "minHeight": 48,
+            "minWidth": 48,
+            "padding": 0,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "#011401",
+              "fontSize": 16,
+              "fontWeight": "bold",
+              "textAlign": "center",
+              "textTransform": "uppercase",
+            }
+          }
+        >
+          translated text
+        </Text>
+      </View>
+    </View>
+    <View
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        {
+          "alignItems": "center",
+          "backgroundColor": "#011401",
+          "borderColor": "#18bd18",
+          "borderRadius": 10,
+          "borderWidth": 2,
+          "justifyContent": "center",
+          "marginLeft": 10,
+          "maxWidth": "90%",
+          "minHeight": 48,
+          "minWidth": "30%",
+          "opacity": 1,
+          "padding": 0,
+          "paddingLeft": 20,
+          "paddingRight": 20,
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "display": "flex",
+            "flexDirection": "row",
+            "justifyContent": "center",
+            "margin": 0,
+            "minHeight": 48,
+            "minWidth": 48,
+            "padding": 0,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "#18bd18",
+              "fontSize": 16,
+              "fontWeight": "bold",
+              "textAlign": "center",
+              "textTransform": "uppercase",
+            }
+          }
+        >
+          translated text
+        </Text>
+      </View>
+    </View>
+  </View>
+</View>
+`;
+
+exports[`Component Address Book Details - test Address Book Datails - Delete - snapshot 1`] = `
+<View
+  style={
+    {
+      "borderColor": "#18bd18",
+      "borderWidth": 1,
+      "display": "flex",
+      "flexDirection": "column",
+      "margin": 10,
+    }
+  }
+  testID="addressBookDetail.2"
+>
+  <Text
+    style={
+      {
+        "color": "#c3c3c3",
+        "fontSize": 18,
+        "fontWeight": "600",
+        "marginTop": 10,
+        "opacity": 1,
+        "paddingHorizontal": 10,
+      }
+    }
+  >
+    translated text
+  </Text>
+  <View
+    style={
+      {
+        "display": "flex",
+        "flexDirection": "row",
+        "justifyContent": "flex-start",
+        "marginTop": 10,
+        "paddingHorizontal": 10,
+      }
+    }
+  >
+    <View
+      accessible={true}
+      style={
+        {
+          "borderColor": "#c3c3c3",
+          "borderRadius": 5,
+          "borderWidth": 1,
+          "flexGrow": 1,
+          "maxHeight": 150,
+          "minHeight": 48,
+          "minWidth": 48,
+        }
+      }
+    >
+      <TextInput
+        editable={false}
+        onChangeText={[Function]}
+        placeholder="translated text"
+        placeholderTextColor="#888888"
+        style={
+          {
+            "backgroundColor": "transparent",
+            "color": "#c3c3c3",
+            "fontSize": 14,
+            "fontWeight": "600",
+            "marginLeft": 5,
+            "minHeight": 48,
+            "minWidth": 48,
+          }
+        }
+        testID="addressbook.label-field"
+        value="lolo"
+      />
+    </View>
+  </View>
+  <View
+    style={
+      {
+        "display": "flex",
+        "flexDirection": "column",
+      }
+    }
+  >
+    <Modal
+      animationType="slide"
+      hardwareAccelerated={false}
+      onRequestClose={[Function]}
+      transparent={false}
+      visible={false}
+    />
+    <View
+      style={
+        {
+          "display": "flex",
+          "marginTop": 10,
+          "padding": 10,
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "display": "flex",
+            "flexDirection": "row",
+            "justifyContent": "space-between",
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "#c3c3c3",
+              "fontSize": 18,
+              "fontWeight": "600",
+              "opacity": 1,
+            }
+          }
+        >
+          translated text
+        </Text>
+      </View>
+      <View
+        style={
+          {
+            "borderColor": "#c3c3c3",
+            "borderRadius": 5,
+            "borderWidth": 1,
+            "flex": 1,
+            "marginTop": 5,
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "flexDirection": "row",
+            }
+          }
+        >
+          <View
+            accessibilityLabel="translated text"
+            accessible={true}
+            style={
+              {
+                "flex": 1,
+                "justifyContent": "center",
+              }
+            }
+          >
+            <TextInput
+              editable={false}
+              onChangeText={[Function]}
+              placeholder="translated text"
+              placeholderTextColor="#888888"
+              style={
+                {
+                  "backgroundColor": "transparent",
+                  "color": "#c3c3c3",
+                  "fontSize": 14,
+                  "fontWeight": "600",
+                  "marginLeft": 5,
+                }
+              }
+              testID="send.addressplaceholder"
+              value="u0987654321_____________"
+            />
+          </View>
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "display": "flex",
+                "flexDirection": "row",
+                "justifyContent": "center",
+              }
+            }
+          >
+            <View
+              accessibilityLabel="translated text"
+              accessibilityState={
+                {
+                  "disabled": true,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "opacity": 1,
+                }
+              }
+              testID="send.scan-button"
+            >
+              <
+                color="#ffffff"
+                icon={
+                  {
+                    "icon": [
+                      448,
+                      512,
+                      [],
+                      "f029",
+                      "M0 80C0 53.5 21.5 32 48 32h96c26.5 0 48 21.5 48 48v96c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V80zM64 96v64h64V96H64zM0 336c0-26.5 21.5-48 48-48h96c26.5 0 48 21.5 48 48v96c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V336zm64 16v64h64V352H64zM304 32h96c26.5 0 48 21.5 48 48v96c0 26.5-21.5 48-48 48H304c-26.5 0-48-21.5-48-48V80c0-26.5 21.5-48 48-48zm80 64H320v64h64V96zM256 304c0-8.8 7.2-16 16-16h64c8.8 0 16 7.2 16 16s7.2 16 16 16h32c8.8 0 16-7.2 16-16s7.2-16 16-16s16 7.2 16 16v96c0 8.8-7.2 16-16 16H368c-8.8 0-16-7.2-16-16s-7.2-16-16-16s-16 7.2-16 16v64c0 8.8-7.2 16-16 16H272c-8.8 0-16-7.2-16-16V304zM368 480a16 16 0 1 1 0-32 16 16 0 1 1 0 32zm64 0a16 16 0 1 1 0-32 16 16 0 1 1 0 32z",
+                    ],
+                    "iconName": "qrcode",
+                    "prefix": "fas",
+                  }
+                }
+                size={35}
+                style={
+                  {
+                    "marginRight": 5,
+                  }
+                }
+              />
+            </View>
+          </View>
+        </View>
+      </View>
+    </View>
+  </View>
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flexDirection": "row",
+        "flexGrow": 1,
+        "justifyContent": "center",
+        "marginVertical": 5,
+      }
+    }
+  >
+    <View
+      accessibilityState={
+        {
+          "disabled": false,
+        }
+      }
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        {
+          "alignItems": "center",
+          "backgroundColor": "#18bd18",
+          "borderColor": "#c3c3c3",
+          "borderRadius": 10,
+          "borderWidth": 2,
+          "justifyContent": "center",
+          "maxWidth": "90%",
+          "minHeight": 48,
+          "minWidth": "30%",
+          "opacity": 1,
+          "padding": 0,
+          "paddingLeft": 20,
+          "paddingRight": 20,
+        }
+      }
+      testID="addressbook.button.action"
+    >
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "display": "flex",
+            "flexDirection": "row",
+            "justifyContent": "center",
+            "margin": 0,
+            "minHeight": 48,
+            "minWidth": 48,
+            "padding": 0,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "#011401",
+              "fontSize": 16,
+              "fontWeight": "bold",
+              "textAlign": "center",
+              "textTransform": "uppercase",
+            }
+          }
+        >
+          translated text
+        </Text>
+      </View>
+    </View>
+    <View
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        {
+          "alignItems": "center",
+          "backgroundColor": "#011401",
+          "borderColor": "#18bd18",
+          "borderRadius": 10,
+          "borderWidth": 2,
+          "justifyContent": "center",
+          "marginLeft": 10,
+          "maxWidth": "90%",
+          "minHeight": 48,
+          "minWidth": "30%",
+          "opacity": 1,
+          "padding": 0,
+          "paddingLeft": 20,
+          "paddingRight": 20,
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "display": "flex",
+            "flexDirection": "row",
+            "justifyContent": "center",
+            "margin": 0,
+            "minHeight": 48,
+            "minWidth": 48,
+            "padding": 0,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "#18bd18",
+              "fontSize": 16,
+              "fontWeight": "bold",
+              "textAlign": "center",
+              "textTransform": "uppercase",
+            }
+          }
+        >
+          translated text
+        </Text>
+      </View>
+    </View>
+  </View>
+</View>
+`;
+
+exports[`Component Address Book Details - test Address Book Datails - Modify - snapshot 1`] = `
+<View
+  style={
+    {
+      "borderColor": "#18bd18",
+      "borderWidth": 1,
+      "display": "flex",
+      "flexDirection": "column",
+      "margin": 10,
+    }
+  }
+  testID="addressBookDetail.1"
+>
+  <Text
+    style={
+      {
+        "color": "#c3c3c3",
+        "fontSize": 18,
+        "fontWeight": "600",
+        "marginTop": 10,
+        "opacity": 1,
+        "paddingHorizontal": 10,
+      }
+    }
+  >
+    translated text
+  </Text>
+  <View
+    style={
+      {
+        "display": "flex",
+        "flexDirection": "row",
+        "justifyContent": "flex-start",
+        "marginTop": 10,
+        "paddingHorizontal": 10,
+      }
+    }
+  >
+    <View
+      accessible={true}
+      style={
+        {
+          "borderColor": "#c3c3c3",
+          "borderRadius": 5,
+          "borderWidth": 1,
+          "flexGrow": 1,
+          "maxHeight": 150,
+          "minHeight": 48,
+          "minWidth": 48,
+        }
+      }
+    >
+      <TextInput
+        editable={true}
+        onChangeText={[Function]}
+        placeholder="translated text"
+        placeholderTextColor="#888888"
+        style={
+          {
+            "backgroundColor": "transparent",
+            "color": "#c3c3c3",
+            "fontSize": 14,
+            "fontWeight": "600",
+            "marginLeft": 5,
+            "minHeight": 48,
+            "minWidth": 48,
+          }
+        }
+        testID="addressbook.label-field"
+        value="pepe"
+      />
+    </View>
+  </View>
+  <View
+    style={
+      {
+        "display": "flex",
+        "flexDirection": "column",
+      }
+    }
+  >
+    <Modal
+      animationType="slide"
+      hardwareAccelerated={false}
+      onRequestClose={[Function]}
+      transparent={false}
+      visible={false}
+    />
+    <View
+      style={
+        {
+          "display": "flex",
+          "marginTop": 10,
+          "padding": 10,
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "display": "flex",
+            "flexDirection": "row",
+            "justifyContent": "space-between",
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "#c3c3c3",
+              "fontSize": 18,
+              "fontWeight": "600",
+              "opacity": 1,
+            }
+          }
+        >
+          translated text
+        </Text>
+      </View>
+      <View
+        style={
+          {
+            "borderColor": "#c3c3c3",
+            "borderRadius": 5,
+            "borderWidth": 1,
+            "flex": 1,
+            "marginTop": 5,
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "flexDirection": "row",
+            }
+          }
+        >
+          <View
+            accessibilityLabel="translated text"
+            accessible={true}
+            style={
+              {
+                "flex": 1,
+                "justifyContent": "center",
+              }
+            }
+          >
+            <TextInput
+              editable={true}
+              onChangeText={[Function]}
+              placeholder="translated text"
+              placeholderTextColor="#888888"
+              style={
+                {
+                  "backgroundColor": "transparent",
+                  "color": "#c3c3c3",
+                  "fontSize": 14,
+                  "fontWeight": "600",
+                  "marginLeft": 5,
+                }
+              }
+              testID="send.addressplaceholder"
+              value="u1234567890_____________"
+            />
+          </View>
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "display": "flex",
+                "flexDirection": "row",
+                "justifyContent": "center",
+              }
+            }
+          >
+            <View
+              accessibilityLabel="translated text"
+              accessibilityState={
+                {
+                  "disabled": false,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                {
+                  "opacity": 1,
+                }
+              }
+              testID="send.scan-button"
+            >
+              <
+                color="#ffffff"
+                icon={
+                  {
+                    "icon": [
+                      448,
+                      512,
+                      [],
+                      "f029",
+                      "M0 80C0 53.5 21.5 32 48 32h96c26.5 0 48 21.5 48 48v96c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V80zM64 96v64h64V96H64zM0 336c0-26.5 21.5-48 48-48h96c26.5 0 48 21.5 48 48v96c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V336zm64 16v64h64V352H64zM304 32h96c26.5 0 48 21.5 48 48v96c0 26.5-21.5 48-48 48H304c-26.5 0-48-21.5-48-48V80c0-26.5 21.5-48 48-48zm80 64H320v64h64V96zM256 304c0-8.8 7.2-16 16-16h64c8.8 0 16 7.2 16 16s7.2 16 16 16h32c8.8 0 16-7.2 16-16s7.2-16 16-16s16 7.2 16 16v96c0 8.8-7.2 16-16 16H368c-8.8 0-16-7.2-16-16s-7.2-16-16-16s-16 7.2-16 16v64c0 8.8-7.2 16-16 16H272c-8.8 0-16-7.2-16-16V304zM368 480a16 16 0 1 1 0-32 16 16 0 1 1 0 32zm64 0a16 16 0 1 1 0-32 16 16 0 1 1 0 32z",
+                    ],
+                    "iconName": "qrcode",
+                    "prefix": "fas",
+                  }
+                }
+                size={35}
+                style={
+                  {
+                    "marginRight": 5,
+                  }
+                }
+              />
+            </View>
+          </View>
+        </View>
+      </View>
+    </View>
+  </View>
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flexDirection": "row",
+        "flexGrow": 1,
+        "justifyContent": "center",
+        "marginVertical": 5,
+      }
+    }
+  >
+    <Text
+      style={
+        {
+          "color": "#18bd18",
+          "opacity": 0.65,
+        }
+      }
+    >
+      translated text
+    </Text>
+  </View>
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flexDirection": "row",
+        "flexGrow": 1,
+        "justifyContent": "center",
+        "marginVertical": 5,
+      }
+    }
+  >
+    <View
+      accessibilityState={
+        {
+          "disabled": true,
+        }
+      }
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        {
+          "alignItems": "center",
+          "backgroundColor": "#5a8c5a",
+          "borderColor": "#5a8c5a",
+          "borderRadius": 10,
+          "borderWidth": 2,
+          "justifyContent": "center",
+          "maxWidth": "90%",
+          "minHeight": 48,
+          "minWidth": "30%",
+          "opacity": 1,
+          "padding": 0,
+          "paddingLeft": 20,
+          "paddingRight": 20,
+        }
+      }
+      testID="addressbook.button.action"
+    >
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "display": "flex",
+            "flexDirection": "row",
+            "justifyContent": "center",
+            "margin": 0,
+            "minHeight": 48,
+            "minWidth": 48,
+            "padding": 0,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "#011401",
+              "fontSize": 16,
+              "fontWeight": "bold",
+              "textAlign": "center",
+              "textTransform": "uppercase",
+            }
+          }
+        >
+          translated text
+        </Text>
+      </View>
+    </View>
+    <View
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        {
+          "alignItems": "center",
+          "backgroundColor": "#011401",
+          "borderColor": "#18bd18",
+          "borderRadius": 10,
+          "borderWidth": 2,
+          "justifyContent": "center",
+          "marginLeft": 10,
+          "maxWidth": "90%",
+          "minHeight": 48,
+          "minWidth": "30%",
+          "opacity": 1,
+          "padding": 0,
+          "paddingLeft": 20,
+          "paddingRight": 20,
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "display": "flex",
+            "flexDirection": "row",
+            "justifyContent": "center",
+            "margin": 0,
+            "minHeight": 48,
+            "minWidth": 48,
+            "padding": 0,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "#18bd18",
+              "fontSize": 16,
+              "fontWeight": "bold",
+              "textAlign": "center",
+              "textTransform": "uppercase",
+            }
+          }
+        >
+          translated text
+        </Text>
+      </View>
+    </View>
+  </View>
+</View>
+`;
