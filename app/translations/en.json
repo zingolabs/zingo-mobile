@@ -196,6 +196,16 @@
         "text": "Advanced Mode, for the advanced user."
       }
     ],
+    "debugmodes": [
+      {
+        "value": true,
+        "text": "Enable the possibility of sending Errors/Issues to the Zingo developers."
+      },
+      {
+        "value": false,
+        "text": "Disable the possibility of sending Errors/Issues to the Zingo developers."
+      }
+    ],
     "nochanges": "No changes registered.",
     "ismemo": "You need to choose the download memos option to save.",
     "isthreshold": "You need to choose the transaction filter threshold option to save.",
@@ -217,6 +227,7 @@
     "language-title": "LANGUAGE",
     "islanguage": "You need to choose a language to save.",
     "sendall-title": "THE BUTTON 'Send All' (Amount)",
+    "debugmode-title": "DEBUG MODE",
     "privacy-title": "Switch between High or Normal Privacy",
     "mode-title": "Switch between Basic or Advanced Mode",
     "value-currency-": "No currency",
@@ -225,6 +236,8 @@
     "value-language-es": "Spanish",
     "value-sendall-true": "Enable",
     "value-sendall-false": "Disable",
+    "value-debugmode-true": "Enable",
+    "value-debugmode-false": "Disable",
     "value-privacy-true": "High",
     "value-privacy-false": "Normal",
     "privacy": "Priv: ",

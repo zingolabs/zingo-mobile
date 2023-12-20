@@ -133,6 +133,7 @@ describe('Component Settings - test', () => {
           set_privacy_option={onSetOption}
           set_mode_option={onSetOption}
           set_security_option={onSetOption}
+          set_debugMode_option={onSetOption}
         />
       </ContextAppLoadedProvider>,
     );

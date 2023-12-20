@@ -16,6 +16,7 @@ export default class SettingsFileClass {
   // - null: means is a fresh install
   // - string: means it have a normal value
   security: SecurityType;
+  debugMode: boolean;
 
   constructor(
     server: ServerType,
@@ -28,6 +29,7 @@ export default class SettingsFileClass {
     basicFirstViewSeed: boolean,
     version: string,
     security: SecurityType,
+    debugMode: boolean,
   ) {
     this.server = server;
     this.currency = currency;
@@ -39,5 +41,6 @@ export default class SettingsFileClass {
     this.basicFirstViewSeed = basicFirstViewSeed;
     this.version = version;
     this.security = security;
+    this.debugMode = debugMode;
   }
 }

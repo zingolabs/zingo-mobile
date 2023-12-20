@@ -106,6 +106,7 @@ export default function LoadedApp(props: LoadedAppProps) {
   const [mode, setMode] = useState<'basic' | 'advanced'>('advanced'); // by default advanced
   const [background, setBackground] = useState<BackgroundType>({ batches: 0, message: '', date: 0, dateEnd: 0 });
   const [addressBook, setAddressBook] = useState<AddressBookFileClass[]>([]);
+  const [debugMode, setDebugMode] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [security, setSecurity] = useState<SecurityType>({
     startApp: true,
@@ -201,6 +202,11 @@ export default function LoadedApp(props: LoadedAppProps) {
       } else {
         await SettingsFileImpl.writeSettings('security', security);
       }
+      if (settings.debugMode === true || settings.debugMode === false) {
+        setDebugMode(settings.debugMode);
+      } else {
+        await SettingsFileImpl.writeSettings('debugMode', debugMode);
+      }
 
       // reading background task info
       const backgroundJson = await BackgroundFileImpl.readBackground();
@@ -249,6 +255,7 @@ export default function LoadedApp(props: LoadedAppProps) {
         toggleTheme={props.toggleTheme}
         addressBook={addressBook}
         security={security}
+        debugMode={debugMode}
       />
     );
   }
@@ -270,6 +277,7 @@ type LoadedAppClassProps = {
   toggleTheme: (mode: 'basic' | 'advanced') => void;
   addressBook: AddressBookFileClass[];
   security: SecurityType;
+  debugMode: boolean;
 };
 
 export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
@@ -299,9 +307,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       setBackgroundError: this.setBackgroundError,
       addLastSnackbar: this.addLastSnackbar,
       restartApp: this.navigateToLoadingApp,
-      addressBook: props.addressBook,
-      launchAddressBook: this.launchAddressBook,
-      security: props.security,
     };
 
     this.rpc = new RPC(
@@ -1050,6 +1055,16 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     this.rpc.fetchWalletSettings();
   };
 
+  set_debugMode_option = async (name: 'debugMode', value: boolean): Promise<void> => {
+    await SettingsFileImpl.writeSettings(name, value);
+    this.setState({
+      debugMode: value as boolean,
+    });
+
+    // Refetch the settings to update
+    this.rpc.fetchWalletSettings();
+  };
+
   navigateToLoadingApp = async (state: any) => {
     const { navigation } = this.props;
 
@@ -1408,6 +1423,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 set_privacy_option={this.set_privacy_option}
                 set_mode_option={this.set_mode_option}
                 set_security_option={this.set_security_option}
+                set_debugMode_option={this.set_debugMode_option}
               />
             </Suspense>
           </Modal>

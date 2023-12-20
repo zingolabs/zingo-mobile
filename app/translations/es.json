@@ -196,6 +196,16 @@
         "text": "Modo Avanzado, para el usuario avanzado."
       }
     ],
+    "debugmodes": [
+      {
+        "value": true,
+        "text": "Activa la posibilidad de enviar Errores/Incidencias a los desarrolladores de Zingo."
+      },
+      {
+        "value": false,
+        "text": "Desactiva la posibilidad de enviar Errores/Incidencias a los desarrolladores de Zingo."
+      }
+    ],
     "nochanges": "No se han registrado cambios.",
     "ismemo": "Necesitas escoger una opción de Memorándum para poder grabar.",
     "isthreshold": "Necesitas escoger una opción de umbral para poder grabar.",
@@ -217,6 +227,7 @@
     "language-title": "IDIOMA",
     "islanguage": "Necesitas escoger un Idioma para poder grabar.",
     "sendall-title": "EL BOTON 'Enviar todo' (Cantidad)",
+    "debugmode-title": "MODO DEPURACION",
     "privacy-title": "Cambiar entre Alta Privacidad o Normal",
     "mode-title": "Cambiar entre Modo Básico o Avanzado",
     "value-currency-": "Sin moneda",
@@ -225,6 +236,8 @@
     "value-language-es": "Español",
     "value-sendall-true": "Activar",
     "value-sendall-false": "Desactivar",
+    "value-debugmode-true": "Activar",
+    "value-debugmode-false": "Desactivar",
     "value-privacy-true": "Alta",
     "value-privacy-false": "Normal",
     "privacy": "Priv: ",
