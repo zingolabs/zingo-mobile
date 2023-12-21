@@ -12,6 +12,13 @@ exports[`Component LoadingApp - test LoadingApp - snapshot 1`] = `
     }
   }
 >
+  <Modal
+    animationType="slide"
+    hardwareAccelerated={false}
+    onRequestClose={[Function]}
+    transparent={false}
+    visible={false}
+  />
   <View />
   <RCTSafeAreaView
     style={

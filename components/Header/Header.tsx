@@ -11,6 +11,7 @@ import {
   faSnowflake,
   faXmark,
   faWifi,
+  faBug,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme } from '@react-navigation/native';
@@ -34,8 +35,6 @@ import FadeText from '../Components/FadeText';
 import simpleBiometrics from '../../app/simpleBiometrics';
 
 type HeaderProps = {
-  poolsMoreInfoOnClick?: () => void;
-  syncingStatusMoreInfoOnClick?: () => void;
   toggleMenuDrawer?: () => void;
   setZecPrice?: (p: number, d: number) => void;
   title: string;
@@ -55,11 +54,12 @@ type HeaderProps = {
   setUfvkViewModalVisible?: (v: boolean) => void;
   addLastSnackbar?: (snackbar: SnackbarType) => void;
   receivedLegend?: boolean;
+  debugMode?: boolean;
+  noDebugMode?: boolean;
+  issueReportMoreInfoOnClick?: () => void;
 };
 
 const Header: React.FunctionComponent<HeaderProps> = ({
-  poolsMoreInfoOnClick,
-  syncingStatusMoreInfoOnClick,
   toggleMenuDrawer,
   setZecPrice,
   title,
@@ -79,6 +79,9 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   setUfvkViewModalVisible,
   addLastSnackbar,
   receivedLegend,
+  debugMode: debugModeProp,
+  noDebugMode,
+  issueReportMoreInfoOnClick: issueReportMoreInfoOnClickProp,
 }) => {
   const context = useContext(ContextAppLoaded);
   const {
@@ -96,9 +99,15 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     restartApp,
     someUnconfirmed,
     security,
+    syncingStatusMoreInfoOnClick,
+    poolsMoreInfoOnClick,
   } = context;
 
-  let translate: (key: string) => TranslateType, netInfo: NetInfoType, mode: 'basic' | 'advanced';
+  let translate: (key: string) => TranslateType,
+    netInfo: NetInfoType,
+    mode: 'basic' | 'advanced',
+    debugMode: boolean,
+    issueReportMoreInfoOnClick: () => void;
   if (translateProp) {
     translate = translateProp;
   } else {
@@ -113,6 +122,16 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     mode = modeProp;
   } else {
     mode = context.mode;
+  }
+  if (debugModeProp) {
+    debugMode = debugModeProp;
+  } else {
+    debugMode = context.debugMode;
+  }
+  if (issueReportMoreInfoOnClickProp) {
+    issueReportMoreInfoOnClick = issueReportMoreInfoOnClickProp;
+  } else {
+    issueReportMoreInfoOnClick = context.issueReportMoreInfoOnClick;
   }
 
   const { colors } = useTheme() as unknown as ThemeType;
@@ -485,7 +504,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                     <FadeText style={{ fontSize: 10 }}>{`${blocksRemaining}`}</FadeText>
                   </View>
                 ) : (
-                  <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
+                  <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
                     <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
                       <FadeText style={{ fontSize: 10 }}>{`${blocksRemaining}`}</FadeText>
                     </View>
@@ -496,7 +515,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             {(!netInfo.isConnected || netInfo.type === NetInfoStateType.cellular || netInfo.isConnectionExpensive) && (
               <>
                 {mode !== 'basic' && (
-                  <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
+                  <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
                     <FontAwesomeIcon icon={faCloudDownload} color={!netInfo.isConnected ? 'red' : 'yellow'} size={20} />
                   </TouchableOpacity>
                 )}
@@ -552,6 +571,13 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             </View>
           </TouchableOpacity>
         )}
+        {!noDebugMode && debugMode && (
+          <TouchableOpacity onPress={() => issueReportMoreInfoOnClick()}>
+            <View style={{ marginRight: 5 }}>
+              <FontAwesomeIcon icon={faBug} color={colors.zingo} size={20} />
+            </View>
+          </TouchableOpacity>
+        )}
       </View>
 
       {noBalance && !receivedLegend && <View style={{ height: 20 }} />}
@@ -576,7 +602,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             (totalBalance.orchardBal !== totalBalance.spendableOrchard ||
               totalBalance.privateBal > 0 ||
               totalBalance.transparentBal > 0) && (
-              <TouchableOpacity onPress={() => poolsMoreInfoOnClick && poolsMoreInfoOnClick()}>
+              <TouchableOpacity onPress={() => poolsMoreInfoOnClick()}>
                 <View
                   style={{
                     display: 'flex',

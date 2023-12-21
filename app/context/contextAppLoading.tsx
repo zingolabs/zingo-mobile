@@ -60,6 +60,8 @@ export const defaultAppStateLoading: AppStateLoading = {
   startingApp: true,
   security: {} as SecurityType,
   debugMode: false,
+  issueReportModalVisible: false,
+  issueReportMoreInfoOnClick: () => {},
 };
 
 export const ContextAppLoading = React.createContext(defaultAppStateLoading);

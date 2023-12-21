@@ -14,7 +14,6 @@ import { Scene } from 'react-native-tab-view/lib/typescript/src/types';
 type ReceiveProps = {
   setUaAddress: (uaAddress: string) => void;
   toggleMenuDrawer: () => void;
-  syncingStatusMoreInfoOnClick: () => void;
   set_privacy_option: (name: 'privacy', value: boolean) => Promise<void>;
   setUfvkViewModalVisible?: (v: boolean) => void;
 };
@@ -22,7 +21,6 @@ type ReceiveProps = {
 const Receive: React.FunctionComponent<ReceiveProps> = ({
   setUaAddress,
   toggleMenuDrawer,
-  syncingStatusMoreInfoOnClick,
   set_privacy_option,
   setUfvkViewModalVisible,
 }) => {
@@ -251,7 +249,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
         }}>
         <Header
           toggleMenuDrawer={toggleMenuDrawer}
-          syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
           title={translate('receive.title') as string}
           noBalance={true}
           set_privacy_option={set_privacy_option}

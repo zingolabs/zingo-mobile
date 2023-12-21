@@ -13,6 +13,7 @@ import {
   AppState,
   NativeEventSubscription,
   TextInput,
+  TouchableOpacity,
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { I18n } from 'i18n-js';
@@ -23,7 +24,7 @@ import NetInfo, { NetInfoStateType, NetInfoSubscription } from '@react-native-co
 import OptionsMenu from 'react-native-option-menu';
 
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faEllipsisV } from '@fortawesome/free-solid-svg-icons';
+import { faBug, faEllipsisV } from '@fortawesome/free-solid-svg-icons';
 
 import RPCModule from '../RPCModule';
 import {
@@ -50,6 +51,7 @@ import SnackbarType from '../AppState/types/SnackbarType';
 import { RPCSeedType } from '../rpc/types/RPCSeedType';
 import Launching from './Launching';
 import simpleBiometrics from '../simpleBiometrics';
+import IssueReport from '../../components/IssueReport';
 
 const BoldText = React.lazy(() => import('../../components/Components/BoldText'));
 const Button = React.lazy(() => import('../../components/Components/Button'));
@@ -311,6 +313,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
           : true,
       security: props.security,
       debugMode: props.debugMode,
+      issueReportMoreInfoOnClick: this.issueReportMoreInfoOnClick,
     };
 
     this.dim = {} as EmitterSubscription;
@@ -684,6 +687,10 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     });
   };
 
+  issueReportMoreInfoOnClick = async () => {
+    this.setState({ issueReportModalVisible: true });
+  };
+
   setBackgroundError = (title: string, error: string) => {
     this.setState({ backgroundError: { title, error } });
   };
@@ -741,6 +748,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
       mode,
       firstLaunchingMessage,
       biometricsFailed,
+      issueReportModalVisible,
     } = this.state;
     const { translate } = this.props;
     const { colors } = this.props.theme;
@@ -757,6 +765,21 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
             height: '100%',
             backgroundColor: colors.background,
           }}>
+          <Modal
+            animationType="slide"
+            transparent={false}
+            visible={issueReportModalVisible}
+            onRequestClose={() => this.setState({ issueReportModalVisible: false })}>
+            <Suspense
+              fallback={
+                <View>
+                  <Text>{translate('loading') as string}</Text>
+                </View>
+              }>
+              <IssueReport from={'LoadingApp'} closeModal={() => this.setState({ issueReportModalVisible: false })} />
+            </Suspense>
+          </Modal>
+
           <Snackbars snackbars={snackbars} removeFirstSnackbar={this.removeFirstSnackbar} translate={translate} />
 
           {screen === 0 && (
@@ -781,7 +804,14 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                   zIndex: 999,
                 }}>
                 {netInfo.isConnected && !actionButtonsDisabled && (
-                  <>
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    {this.state.debugMode && (
+                      <TouchableOpacity onPress={() => this.issueReportMoreInfoOnClick()}>
+                        <View style={{ marginRight: 5 }}>
+                          <FontAwesomeIcon icon={faBug} color={colors.zingo} size={20} />
+                        </View>
+                      </TouchableOpacity>
+                    )}
                     {mode === 'basic' ? (
                       <OptionsMenu
                         customButton={<FontAwesomeIcon icon={faEllipsisV} color={'#ffffff'} size={48} />}
@@ -799,7 +829,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                         actions={[this.customServer]}
                       />
                     )}
-                  </>
+                  </View>
                 )}
               </View>
               <ScrollView

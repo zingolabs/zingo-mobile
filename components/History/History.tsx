@@ -17,8 +17,6 @@ import Header from '../Header';
 type HistoryProps = {
   doRefresh: () => void;
   toggleMenuDrawer: () => void;
-  poolsMoreInfoOnClick: () => void;
-  syncingStatusMoreInfoOnClick: () => void;
   setZecPrice: (p: number, d: number) => void;
   setComputingModalVisible: (visible: boolean) => void;
   set_privacy_option: (name: 'privacy', value: boolean) => Promise<void>;
@@ -31,8 +29,6 @@ type HistoryProps = {
 const History: React.FunctionComponent<HistoryProps> = ({
   doRefresh,
   toggleMenuDrawer,
-  poolsMoreInfoOnClick,
-  syncingStatusMoreInfoOnClick,
   setZecPrice,
   setComputingModalVisible,
   set_privacy_option,
@@ -95,8 +91,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
 
       <Header
         testID="transaction text"
-        poolsMoreInfoOnClick={poolsMoreInfoOnClick}
-        syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
         toggleMenuDrawer={toggleMenuDrawer}
         setZecPrice={setZecPrice}
         title={translate('history.title') as string}
