@@ -108,6 +108,42 @@ describe('Component Settings - test', () => {
         },
       ];
     }
+    if (p === 'settings.privacys') {
+      return [
+        {
+          value: true,
+          text: 'text true',
+        },
+        {
+          value: false,
+          text: 'text false',
+        },
+      ];
+    }
+    if (p === 'settings.modes') {
+      return [
+        {
+          value: 'basic',
+          text: 'text true',
+        },
+        {
+          value: 'advanced',
+          text: 'text false',
+        },
+      ];
+    }
+    if (p === 'settings.debugmodes') {
+      return [
+        {
+          value: true,
+          text: 'text true',
+        },
+        {
+          value: false,
+          text: 'text false',
+        },
+      ];
+    }
     return 'text translated';
   };
   state.info.currencyName = 'ZEC';

@@ -714,7 +714,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 setDebugMode as React.Dispatch<React.SetStateAction<string | boolean>>,
                 Boolean,
                 debugMode,
-                'debugMode',
+                'debugmode',
               )}
             </View>
           </>
