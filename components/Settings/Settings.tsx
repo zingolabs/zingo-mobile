@@ -112,7 +112,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
   const debugModesArray = translate('settings.debugmodes');
   let DEBUGMODES: Options[] = [];
-  if (typeof sendAllsArray === 'object') {
+  if (typeof debugModesArray === 'object') {
     DEBUGMODES = debugModesArray as Options[];
   }
 

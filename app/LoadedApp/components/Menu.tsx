@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext } from 'react';
-import { ScrollView, View, Text, Dimensions } from 'react-native';
+import React, { useContext, useState } from 'react';
+import { ScrollView, View, Text, Dimensions, TouchableOpacity, Alert } from 'react-native';
 
 import RegText from '../../../components/Components/RegText';
 import FadeText from '../../../components/Components/FadeText';
@@ -11,15 +11,22 @@ import RPC from '../../rpc';
 import { ThemeType } from '../../types';
 import simpleBiometrics from '../../simpleBiometrics';
 
+type Options = {
+  value: string;
+  text: string;
+};
+
 type MenuProps = {
   onItemSelected: (item: string) => Promise<void>;
   updateMenuState: (isOpen: boolean) => void;
+  set_debugMode_option: (name: 'debugMode', value: boolean) => Promise<void>;
 };
 
-const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuState }) => {
+const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuState, set_debugMode_option }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, readOnly, mode, transactions, addLastSnackbar, security } = context;
+  const { translate, readOnly, mode, transactions, addLastSnackbar, security, addLastSnackbar, debugMode } = context;
   const { colors } = useTheme() as unknown as ThemeType;
+  const [onLongPressTimes, setOnLongPressTimes] = useState<number>(0);
   const item = {
     fontSize: 14,
     paddingTop: 15,
@@ -28,6 +35,11 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuSt
     width: Dimensions.get('screen').width,
     height: Dimensions.get('screen').height,
   };
+  const debugModesArray = translate('settings.debugmodes');
+  let DEBUGMODES: Options[] = [];
+  if (typeof debugModesArray === 'object') {
+    DEBUGMODES = debugModesArray as Options[];
+  }
 
   const onItemSelectedWrapper = async (value: string) => {
     if (
@@ -58,6 +70,32 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuSt
       // or if the security check of the screen is false in settings
       (async () => await RPC.rpc_setInterruptSyncAfterBatch('false'))();
       onItemSelected(value);
+    }
+  };
+
+  const debugModeOnPress = () => {
+    if (onLongPressTimes === 0) {
+      // need another long Press to Activate Debug Mode
+      addLastSnackbar({ message: translate('settings.keeppressing') as string, type: 'Primary' });
+      setOnLongPressTimes(1);
+    } else {
+      Alert.alert(
+        translate('settings.debugmode-title') as string,
+        DEBUGMODES.filter((it: Options) => Boolean(it.value) !== debugMode)[0].text,
+        [
+          {
+            text: translate(
+              `settings.value-debugmode-${
+                DEBUGMODES.filter((it: Options) => Boolean(it.value) !== debugMode)[0].value
+              }`,
+            ) as string,
+            onPress: () => set_debugMode_option('debugMode', !debugMode),
+          },
+          { text: translate('cancel') as string, style: 'cancel' },
+        ],
+        { cancelable: true, userInterfaceStyle: 'light' },
+      );
+      setOnLongPressTimes(0);
     }
   };
 
@@ -151,20 +189,27 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuSt
           )}
         </View>
       </ScrollView>
-      <View
-        style={{
-          padding: 10,
-          position: 'absolute',
-          bottom: 5,
-          flexDirection: 'row',
-          backgroundColor: '#010101',
-        }}>
-        <Text style={{ fontSize: 8, color: colors.border }}>Version : </Text>
-        <Text style={{ fontSize: 8, color: colors.primaryDisabled }}>{translate('version') as string}</Text>
-        <Text style={{ fontSize: 8, color: colors.border, marginLeft: 10 }}>{`${translate('settings.mode')}${translate(
-          `settings.value-mode-${mode}`,
-        )}`}</Text>
-      </View>
+      <TouchableOpacity onLongPress={() => debugModeOnPress()}>
+        <View
+          style={{
+            padding: 10,
+            position: 'absolute',
+            bottom: 5,
+            flexDirection: 'row',
+            backgroundColor: '#010101',
+          }}>
+          <Text style={{ fontSize: 8, color: colors.border }}>Version : </Text>
+          <Text style={{ fontSize: 8, color: colors.primaryDisabled }}>{translate('version') as string}</Text>
+          <Text style={{ fontSize: 8, color: colors.border, marginLeft: 5 }}>{`${translate('settings.mode')}${translate(
+            `settings.value-mode-${mode}`,
+          )}`}</Text>
+          {debugMode && (
+            <Text style={{ fontSize: 8, color: colors.primary, marginLeft: 5 }}>
+              {translate('settings.debugmode-title') as string}
+            </Text>
+          )}
+        </View>
+      </TouchableOpacity>
     </View>
   );
 };

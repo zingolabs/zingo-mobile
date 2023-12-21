@@ -247,6 +247,7 @@
     "value-chain_name-main": "Mainnet",
     "value-chain_name-test": "Testnet",
     "value-chain_name-regtest": "Regtest",
+    "keeppressing": "Keep Pressing to access to the debug mode setting",
     "security-title": "APPLY DEVICE SECURITY TO SCREENS/OPTIONS",
     "security-startapp": "When the App starts.",
     "security-foregroundapp": "When the App go to the Foreground.",
