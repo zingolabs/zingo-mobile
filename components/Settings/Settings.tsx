@@ -703,22 +703,21 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 'memo',
               )}
             </View>
-
-            <View style={{ display: 'flex', margin: 10 }}>
-              <BoldText>{translate('settings.debugmode-title') as string}</BoldText>
-            </View>
-
-            <View style={{ display: 'flex', marginLeft: 25 }}>
-              {optionsRadio(
-                DEBUGMODES,
-                setDebugMode as React.Dispatch<React.SetStateAction<string | boolean>>,
-                Boolean,
-                debugMode,
-                'debugmode',
-              )}
-            </View>
           </>
         )}
+        <View style={{ display: 'flex', margin: 10 }}>
+          <BoldText>{translate('settings.debugmode-title') as string}</BoldText>
+        </View>
+
+        <View style={{ display: 'flex', marginLeft: 25 }}>
+          {optionsRadio(
+            DEBUGMODES,
+            setDebugMode as React.Dispatch<React.SetStateAction<string | boolean>>,
+            Boolean,
+            debugMode,
+            'debugmode',
+          )}
+        </View>
       </ScrollView>
       <View
         style={{
