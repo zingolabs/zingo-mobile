@@ -17,6 +17,7 @@ export default class SettingsFileClass {
   // - string: means it have a normal value
   security: SecurityType;
   debugMode: boolean;
+  firstDebugMode: boolean;
 
   constructor(
     server: ServerType,
@@ -30,6 +31,7 @@ export default class SettingsFileClass {
     version: string,
     security: SecurityType,
     debugMode: boolean,
+    firstDebugMode: boolean,
   ) {
     this.server = server;
     this.currency = currency;
@@ -42,5 +44,6 @@ export default class SettingsFileClass {
     this.version = version;
     this.security = security;
     this.debugMode = debugMode;
+    this.firstDebugMode = firstDebugMode;
   }
 }

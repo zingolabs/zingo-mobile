@@ -497,6 +497,18 @@
       "EL SOFTWARE SE PROPORCIONA 'TAL CUAL', SIN GARANTÍA DE NINGÚN TIPO, EXPRESA O IMPLÍCITA, INCLUYENDO, ENTRE OTRAS, LAS GARANTÍAS DE COMERCIABILIDAD, IDONEIDAD PARA UN FIN DETERMINADO Y NO VIOLACIÓN. EN NINGÚN CASO LOS AUTORES O LOS TITULARES DE LOS DERECHOS DE AUTOR SERÁN RESPONSABLES DE CUALQUIER RECLAMACIÓN, DAÑOS U OTRA RESPONSABILIDAD, YA SEA EN UNA ACCIÓN DE CONTRATO, AGRAVIO O DE CUALQUIER OTRO TIPO, QUE SURJA DE, FUERA DE O EN RELACIÓN CON EL SOFTWARE O EL USO U OTROS TRATOS EN EL SOFTWARE."
     ]
   },
+  "issuereport": {
+    "title-firstdebugmode": "Activacion del Modo Depuracion",
+    "firstdebugmode": [
+      ".",
+      ".",
+      ".",
+      ".",
+      ".",
+      "."
+    ],
+    "title": "Reportar Incidencia/Error a Zingo"
+  },
   "scanner": {
     "text" : "Escanea una Clave de Visualización Totalmente Unificada",
     "uri-error": "URI Error:",

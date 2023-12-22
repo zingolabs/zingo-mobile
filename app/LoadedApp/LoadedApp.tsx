@@ -335,7 +335,12 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     this.clearToAddr();
 
     (async () => {
-      // Configure the RPC to start doing refreshes
+      await SettingsFileImpl.writeSettings('firstInstall', false);
+      await SettingsFileImpl.writeSettings('firstDebugMode', false);
+    })();
+
+    // Configure the RPC to start doing refreshes
+    (async () => {
       await this.rpc.configure();
 
       //console.log(await SettingsFileImpl.readSettings());

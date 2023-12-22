@@ -11,7 +11,7 @@ import Header from '../Header';
 import { TranslateType } from '../../app/AppState';
 
 type IssueReportProps = {
-  from: 'LoadedApp' | 'LoadingApp';
+  from: 'LoadedApp' | 'LoadingApp' | 'LoadingApp-firstDebugMode';
   closeModal: () => void;
 };
 const IssueReport: React.FunctionComponent<IssueReportProps> = ({ from, closeModal }) => {
@@ -25,8 +25,7 @@ const IssueReport: React.FunctionComponent<IssueReportProps> = ({ from, closeMod
   }
   const { colors } = useTheme() as unknown as ThemeType;
 
-  //const arrayTxtObject = translate('about.copyright');
-  const arrayTxtObject = '';
+  const arrayTxtObject = translate('issuereport.firstdebugmode');
 
   let arrayTxt: string[] = [];
   if (typeof arrayTxtObject === 'object') {
@@ -43,7 +42,11 @@ const IssueReport: React.FunctionComponent<IssueReportProps> = ({ from, closeMod
         backgroundColor: colors.background,
       }}>
       <Header
-        title={' '}
+        title={
+          from === 'LoadingApp-firstDebugMode'
+            ? (translate('issuereport.title-firstdebugmode') as string)
+            : (translate('issuereport.title') as string)
+        }
         noBalance={true}
         noSyncingStatus={true}
         noDrawMenu={true}
@@ -59,8 +62,8 @@ const IssueReport: React.FunctionComponent<IssueReportProps> = ({ from, closeMod
           justifyContent: 'flex-start',
           padding: 20,
         }}>
-        {arrayTxt.map((txt: string) => (
-          <FadeText style={{ marginBottom: 30 }} key={txt.substring(0, 10)}>
+        {arrayTxt.map((txt: string, index: number) => (
+          <FadeText style={{ marginBottom: 30 }} key={`${index}-${txt.substring(0, 10)}`}>
             {txt}
           </FadeText>
         ))}

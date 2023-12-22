@@ -269,6 +269,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
   dim: EmitterSubscription;
   appstate: NativeEventSubscription;
   unsubscribeNetInfo: NetInfoSubscription;
+  loadingAppFrom: 'LoadingApp' | 'LoadingApp-firstDebugMode';
 
   constructor(props: LoadingAppClassProps) {
     super(props);
@@ -319,6 +320,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     this.dim = {} as EmitterSubscription;
     this.appstate = {} as NativeEventSubscription;
     this.unsubscribeNetInfo = {} as NetInfoSubscription;
+    this.loadingAppFrom = 'LoadingApp';
   }
 
   componentDidMount = async () => {
@@ -351,7 +353,14 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
 
     this.setState({ actionButtonsDisabled: true });
     (async () => {
-      // First, check if a wallet exists. Do it async so the basic screen has time to render
+      // first check if this is a new install or is a new release with debugMode
+      const settings = await SettingsFileImpl.readSettings();
+      if (settings.firstInstall || settings.firstDebugMode) {
+        this.loadingAppFrom = 'LoadingApp-firstDebugMode';
+        this.issueReportMoreInfoOnClick();
+      }
+
+      // check if a wallet exists. Do it async so the basic screen has time to render
       await AsyncStorage.setItem('@background', 'no');
       const exists = await RPCModule.walletExists();
       //console.log('Wallet Exists result', this.state.screen, exists);
@@ -407,7 +416,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
         }
       } else {
         //console.log('Loading new wallet', this.state.screen, this.state.walletExists);
-        // if no wallet file & basic mode -> create a new wallet & go directly to history screen.
+        // if no wallet file & basic mode -> create a new wallet & go directly to receive screen.
         if (this.state.mode === 'basic') {
           // setting the prop basicFirstViewSeed to false.
           // this means when the user have funds, the seed screen will show up.
@@ -776,7 +785,10 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                   <Text>{translate('loading') as string}</Text>
                 </View>
               }>
-              <IssueReport from={'LoadingApp'} closeModal={() => this.setState({ issueReportModalVisible: false })} />
+              <IssueReport
+                from={this.loadingAppFrom}
+                closeModal={() => this.setState({ issueReportModalVisible: false })}
+              />
             </Suspense>
           </Modal>
 
