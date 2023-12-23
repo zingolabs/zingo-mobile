@@ -77,7 +77,9 @@
     "basicmode": "Cambiar a Modo Básico",
     "advancedmode": "Cambiar a Modo Avanzado",
     "noopenwallet-message": "Ha ocurrido un error mientras el App estaba intentando abrir el monedero activo.",
-    "changeserver-basic": "Cambiar de Servidor y\nAbrir Monedero Activo"
+    "changeserver-basic": "Cambiar de Servidor y\nAbrir Monedero Activo",
+    "alert-newwallet-title": "CREAR UNA NUEVA BILLETERA",
+    "alert-newwallet-body": "Puedes confirmar que realmente quieres crear una billetera nueva y perder el acceso a la billetera actual."
   },
   "loadedapp": {
     "about": "Sobre Zingo!",

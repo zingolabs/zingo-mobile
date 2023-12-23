@@ -77,7 +77,9 @@
     "basicmode": "Change to Basic Mode",
     "advancedmode": "Change to Advanced Mode",
     "noopenwallet-message": "An error occurred while the App was trying to open the active wallet.",
-    "changeserver-basic": "Change the Server and\nOpen Current Wallet"
+    "changeserver-basic": "Change the Server and\nOpen Current Wallet",
+    "alert-newwallet-title": "CREATE A NEW WALLET",
+    "alert-newwallet-body": "Can you confirm that you really want to create a new wallet and lose access to the current wallet."
   },
   "loadedapp": {
     "about": "About Zingo!",
