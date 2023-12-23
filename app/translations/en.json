@@ -508,7 +508,8 @@
       ".",
       "."
     ],
-    "title": "Report Issue/Error to Zingo"
+    "title": "Report Issue/Error to Zingo",
+    "send-report": "Send Report"
   },
   "scanner": {
     "text" : "Scan a Unified Full Viewing Key",

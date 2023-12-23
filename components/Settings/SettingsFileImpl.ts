@@ -102,8 +102,8 @@ export default class SettingsFileImpl {
         };
       }
       if (!settings.hasOwnProperty('debugMode')) {
-        // if this property doesn't exists the App need to know
-        // about the user choice about debug mode.
+        // if this property doesn't exists, the App need to know
+        // about the user choice of debug mode.
         settings.firstDebugMode = true;
       }
       return settings;

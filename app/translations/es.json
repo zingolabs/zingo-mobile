@@ -507,7 +507,8 @@
       ".",
       "."
     ],
-    "title": "Reportar Incidencia/Error a Zingo"
+    "title": "Reportar Incidencia/Error a Zingo",
+    "send-report": "Enviar Informe"
   },
   "scanner": {
     "text" : "Escanea una Clave de Visualización Totalmente Unificada",

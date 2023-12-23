@@ -9,6 +9,7 @@ import { ThemeType } from '../../app/types';
 import { ContextAppLoaded, ContextAppLoading } from '../../app/context';
 import Header from '../Header';
 import { TranslateType } from '../../app/AppState';
+import SettingsFileImpl from '../Settings/SettingsFileImpl';
 
 type IssueReportProps = {
   from: 'LoadedApp' | 'LoadingApp' | 'LoadingApp-firstDebugMode';
@@ -25,6 +26,7 @@ const IssueReport: React.FunctionComponent<IssueReportProps> = ({ from, closeMod
   }
   const { colors } = useTheme() as unknown as ThemeType;
 
+  //const [disabled, setDisabled] = useState<boolean>(false);
   const arrayTxtObject = translate('issuereport.firstdebugmode');
 
   let arrayTxt: string[] = [];
@@ -76,7 +78,31 @@ const IssueReport: React.FunctionComponent<IssueReportProps> = ({ from, closeMod
           alignItems: 'center',
           marginVertical: 5,
         }}>
-        <Button type="Secondary" title={translate('close') as string} onPress={closeModal} />
+        <Button
+          testID="issuereport.button.save"
+          disabled={false}
+          type="Primary"
+          title={
+            from === 'LoadingApp-firstDebugMode'
+              ? (translate('settings.value-debugmode-true') as string)
+              : (translate('issuereport.send-report') as string)
+          }
+          onPress={async () => {
+            if (from === 'LoadingApp-firstDebugMode') {
+              // enable or disable the debug mode
+              await SettingsFileImpl.writeSettings('debugMode', true);
+            } else {
+              // send a report
+            }
+          }}
+        />
+        <Button
+          disabled={false}
+          type="Secondary"
+          title={translate('cancel') as string}
+          style={{ marginLeft: 10 }}
+          onPress={closeModal}
+        />
       </View>
     </SafeAreaView>
   );

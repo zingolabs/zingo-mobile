@@ -143,6 +143,7 @@ export default function LoadingApp(props: LoadingAppProps) {
         setMode('basic');
         props.toggleTheme('basic');
         await SettingsFileImpl.writeSettings('mode', 'basic');
+        await SettingsFileImpl.writeSettings('firstInstall', false);
       } else {
         if (settings.mode === 'basic' || settings.mode === 'advanced') {
           setMode(settings.mode);
@@ -269,7 +270,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
   dim: EmitterSubscription;
   appstate: NativeEventSubscription;
   unsubscribeNetInfo: NetInfoSubscription;
-  loadingAppFrom: 'LoadingApp' | 'LoadingApp-firstDebugMode';
 
   constructor(props: LoadingAppClassProps) {
     super(props);
@@ -320,7 +320,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     this.dim = {} as EmitterSubscription;
     this.appstate = {} as NativeEventSubscription;
     this.unsubscribeNetInfo = {} as NetInfoSubscription;
-    this.loadingAppFrom = 'LoadingApp';
   }
 
   componentDidMount = async () => {
@@ -353,11 +352,13 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
 
     this.setState({ actionButtonsDisabled: true });
     (async () => {
-      // first check if this is a new install or is a new release with debugMode
+      // first check if it is a new release with debugMode
+      // only for advanced users
       const settings = await SettingsFileImpl.readSettings();
-      if (settings.firstInstall || settings.firstDebugMode) {
-        this.loadingAppFrom = 'LoadingApp-firstDebugMode';
-        this.issueReportMoreInfoOnClick();
+      if (settings.firstDebugMode && this.state.mode !== 'basic') {
+        this.setState({ screen: 5 });
+        await SettingsFileImpl.writeSettings('firstDebugMode', false);
+        return;
       }
 
       // check if a wallet exists. Do it async so the basic screen has time to render
@@ -785,10 +786,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                   <Text>{translate('loading') as string}</Text>
                 </View>
               }>
-              <IssueReport
-                from={this.loadingAppFrom}
-                closeModal={() => this.setState({ issueReportModalVisible: false })}
-              />
+              <IssueReport from={'LoadingApp'} closeModal={() => this.setState({ issueReportModalVisible: false })} />
             </Suspense>
           </Modal>
 
@@ -1191,7 +1189,32 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                 }>
                 <ImportUfvk
                   onClickOK={(s: string, b: number) => this.doRestore(s, b, 'ufvk')}
-                  onClickCancel={() => this.setState({ screen: 1 })}
+                  onClickCancel={() => this.setState({ screen: 1, actionButtonsDisabled: false })}
+                />
+              </Suspense>
+            </Modal>
+          )}
+          {screen === 5 && (
+            <Modal
+              animationType="slide"
+              transparent={false}
+              visible={screen === 5}
+              onRequestClose={() => {
+                this.setState({ screen: 0 });
+                this.componentDidMount();
+              }}>
+              <Suspense
+                fallback={
+                  <View>
+                    <Text>{translate('loading') as string}</Text>
+                  </View>
+                }>
+                <IssueReport
+                  from={'LoadingApp-firstDebugMode'}
+                  closeModal={() => {
+                    this.setState({ screen: 0 });
+                    this.componentDidMount();
+                  }}
                 />
               </Suspense>
             </Modal>
