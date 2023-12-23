@@ -1064,7 +1064,24 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                       type="Primary"
                       title={translate('loadingapp.createnewwallet') as string}
                       disabled={actionButtonsDisabled}
-                      onPress={this.createNewWallet}
+                      onPress={() => {
+                        if (this.state.walletExists) {
+                          Alert.alert(
+                            translate('loadingapp.alert-newwallet-title') as string,
+                            translate('loadingapp.alert-newwallet-body') as string,
+                            [
+                              {
+                                text: translate('confirm') as string,
+                                onPress: () => this.createNewWallet(),
+                              },
+                              { text: translate('cancel') as string, style: 'cancel' },
+                            ],
+                            { cancelable: true, userInterfaceStyle: 'light' },
+                          );
+                        } else {
+                          this.createNewWallet();
+                        }
+                      }}
                       style={{ marginBottom: 10, marginTop: 10 }}
                     />
                   )}
