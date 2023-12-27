@@ -515,7 +515,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             {(!netInfo.isConnected || netInfo.type === NetInfoStateType.cellular || netInfo.isConnectionExpensive) && (
               <>
                 {mode !== 'basic' && (
-                  <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick()}>
+                  <TouchableOpacity style={{ marginRight: 5 }} onPress={() => syncingStatusMoreInfoOnClick()}>
                     <FontAwesomeIcon icon={faCloudDownload} color={!netInfo.isConnected ? 'red' : 'yellow'} size={20} />
                   </TouchableOpacity>
                 )}
@@ -525,7 +525,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         )}
         {mode !== 'basic' && !noPrivacy && set_privacy_option && addLastSnackbar && (
           <TouchableOpacity
-            style={{ marginHorizontal: 5 }}
+            style={{ marginRight: 5 }}
             onPress={() => {
               addLastSnackbar({
                 message: `${translate('change-privacy')} ${
@@ -572,10 +572,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           </TouchableOpacity>
         )}
         {!noDebugMode && debugMode && (
-          <TouchableOpacity onPress={() => issueReportMoreInfoOnClick()}>
-            <View style={{ marginRight: 5 }}>
-              <FontAwesomeIcon icon={faBug} color={colors.zingo} size={20} />
-            </View>
+          <TouchableOpacity style={{ marginRight: 5 }} onPress={() => issueReportMoreInfoOnClick()}>
+            <FontAwesomeIcon icon={faBug} color={colors.zingo} size={20} />
           </TouchableOpacity>
         )}
       </View>
