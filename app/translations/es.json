@@ -510,7 +510,21 @@
       "."
     ],
     "title": "Reportar Incidencia/Error a Zingo",
-    "send-report": "Enviar Informe"
+    "send-report": "Enviar Informe",
+    "activation-message": "¡Bienvenido al Modo de Depuración!",
+    "activation-description": "Para ayudarnos a mejorar la aplicación, puedes activar el Modo de Depuración. Esto recopilará datos internos sobre el funcionamiento de la aplicación en tu dispositivo. Todos los datos serán anonimizados para proteger tu privacidad.",
+    "activation-terms": "Por favor, revisa y acepta los términos antes de continuar.",
+    "activation-accept": "Acepto los términos y activo el Modo de Depuración",
+    "terms-title": "Términos y Condiciones del Modo de Depuración",
+    "terms-description": "Al activar el Modo de Depuración, estás dando permiso para recopilar datos internos de la aplicación en tu dispositivo. Estos datos se utilizarán únicamente con fines de diagnóstico y mejora de la aplicación. Garantizamos que todos los datos recopilados se anonimizarán para proteger tu privacidad. No recopilaremos información personal identificable.",
+    "terms-question": "¿Aceptas los términos y deseas activar el Modo de Depuración?",
+    "terms-accept": "Sí, acepto los términos y activo el Modo de Depuración",
+    "terms-reject": "No, prefiero no activar el Modo de Depuración",
+    "deactivation-title": "Desactivación del Modo de Depuración",
+    "deactivation-description": "En cualquier momento, puedes desactivar el Modo de Depuración desde la configuración de la aplicación. Esto detendrá la recopilación de datos internos. Recuerda que al desactivar el Modo de Depuración, no podremos recibir información útil para mejorar la aplicación.",
+    "deactivation-question": "¿Deseas desactivar el Modo de Depuración?",
+    "deactivation-accept": "Sí, desactivo el Modo de Depuración",
+    "deactivation-reject": "No, quiero seguir ayudando a mejorar la aplicación"
   },
   "scanner": {
     "text" : "Escanea una Clave de Visualización Totalmente Unificada",

@@ -511,7 +511,21 @@
       "."
     ],
     "title": "Report Issue/Error to Zingo",
-    "send-report": "Send Report"
+    "send-report": "Send Report",
+    "activation-message": "Welcome to Debug Mode!",
+    "activation-description": "To help us improve the application, you can activate Debug Mode. This will collect internal data about the application's performance on your device. All data will be anonymized to protect your privacy.",
+    "activation-terms": "Please review and accept the terms before proceeding.",
+    "activation-accept": "I accept the terms and activate Debug Mode",
+    "terms-title": "Terms and Conditions of Debug Mode",
+    "terms-description": "By activating Debug Mode, you are giving permission to collect internal data from the application on your device. This data will be used solely for diagnostic and improvement purposes. We guarantee that all collected data will be anonymized to protect your privacy. We will not collect personally identifiable information.",
+    "terms-question": "Do you accept the terms and want to activate Debug Mode?",
+    "terms-accept": "Yes, I accept the terms and activate Debug Mode",
+    "terms-reject": "No, I prefer not to activate Debug Mode",
+    "deactivation-title": "Deactivation of Debug Mode",
+    "deactivation-description": "At any time, you can deactivate Debug Mode from the application settings. This will stop the collection of internal data. Remember that by deactivating Debug Mode, we won't be able to receive useful information to improve the application.",
+    "deactivation-question": "Do you want to deactivate Debug Mode?",
+    "deactivation-accept": "Yes, I deactivate Debug Mode",
+    "deactivation-reject": "No, I want to continue helping improve the application"
   },
   "scanner": {
     "text" : "Scan a Unified Full Viewing Key",
