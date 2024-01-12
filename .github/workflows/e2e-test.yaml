@@ -9,6 +9,7 @@ on:
 
 env:
   REPO-OWNER: ${{ github.repository_owner }}
+  SEGMENT_DOWNLOAD_TIMEOUT_MINS: '5'
 
 jobs:
   e2e-test:
@@ -33,7 +34,7 @@ jobs:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
         
       - name: Setup Java
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '18'

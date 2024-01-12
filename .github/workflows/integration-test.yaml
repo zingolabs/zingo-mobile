@@ -19,6 +19,7 @@ env:
   ABI: ${{ inputs.abi }}
   REPO-OWNER: ${{ github.repository_owner }}
   RUSTFLAGS: -D warnings
+  SEGMENT_DOWNLOAD_TIMEOUT_MINS: '5'
 
 jobs:
   build-test-artifacts:
@@ -38,11 +39,16 @@ jobs:
         with:
           toolchain: stable
 
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v2
+
       - name: Install nextest
         uses: taiki-e/install-action@nextest
 
       - name: Cargo cache
         uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ./rust
 
       - name: Build and archive tests
         working-directory: ./rust
@@ -58,6 +64,8 @@ jobs:
     name: Integration test
     runs-on: macos-12
     needs: build-test-artifacts
+    container:
+      image: zingodevops/regchest:008
     strategy:
       matrix:
         partition: [1, 2, 3, 4, 5]
@@ -95,23 +103,10 @@ jobs:
           echo "AVD-ARCH=x86" >> $GITHUB_ENV
           echo "NEXTEST-ABI=arm32" >> $GITHUB_ENV
 
-      - name: Install docker
-        run: |
-          brew install docker
-          colima start
-
-      - name: Pull regchest docker image
-        run: docker pull zingodevops/regchest:007
-
-      - uses: actions-rust-lang/setup-rust-toolchain@v1
-        with:
-          toolchain: stable
-
-      - name: Install nextest
-        uses: taiki-e/install-action@nextest
-
       - name: Cargo cache
         uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ./rust
 
       - name: Native rust cache
         uses: actions/cache@v3
@@ -121,7 +116,7 @@ jobs:
           fail-on-cache-miss: true
       
       - name: Setup Java
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '18'

@@ -100,6 +100,13 @@ RUN ./Configure --prefix=/opt/openssl-3.1.3/x86_64 android-x86_64 \
     && make clean \
     && make distclean
 
+# Install Node.js
+ENV NODE_VERSION=20.9.0
+WORKDIR /opt
+RUN curl -O https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz \
+    && tar -xf node-v${NODE_VERSION}-linux-x64.tar.xz -C /usr/local --strip-components=1 \
+    && rm -f node-v${NODE_VERSION}-linux-x64.tar.xz
+
 # Apt clean up
 RUN apt autoremove -y \
     && apt clean \
