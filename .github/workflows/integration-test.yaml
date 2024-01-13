@@ -63,6 +63,8 @@ jobs:
     name: Integration test
     runs-on: macos-12
     needs: build-test-artifacts
+    container:
+      image: zingodevops/regchest:007
     strategy:
       matrix:
         partition: [1, 2, 3, 4, 5]
@@ -99,14 +101,6 @@ jobs:
         run: |
           echo "AVD-ARCH=x86" >> $GITHUB_ENV
           echo "NEXTEST-ABI=arm32" >> $GITHUB_ENV
-
-      - name: Install docker
-        run: |
-          brew install docker
-          colima start
-
-      - name: Pull regchest docker image
-        run: docker pull zingodevops/regchest:007
 
       - uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
