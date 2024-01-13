@@ -102,6 +102,11 @@ jobs:
           echo "AVD-ARCH=x86" >> $GITHUB_ENV
           echo "NEXTEST-ABI=arm32" >> $GITHUB_ENV
 
+      - name: Install docker
+        run: |
+          brew install docker
+          colima start
+
       - uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: stable
