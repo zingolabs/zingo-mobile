@@ -100,6 +100,12 @@ jobs:
           echo "AVD-ARCH=x86" >> $GITHUB_ENV
           echo "NEXTEST-ABI=arm32" >> $GITHUB_ENV
 
+      - name: Download archive
+        uses: actions/download-artifact@v3
+        with:
+          name: nextest-archive-${{ env.ABI }}
+          path: ./rust
+
       - name: Install docker
         run: |
           brew install docker
@@ -162,12 +168,6 @@ jobs:
           timeout_minutes: 60
           max_attempts: 3
           command: ./scripts/integration_tests.sh -a ${{ env.AVD-ARCH }} -s
-
-      - name: Download archive
-        uses: actions/download-artifact@v3
-        with:
-          name: nextest-archive-${{ env.ABI }}
-          path: ./rust
 
       - name: Run integration tests
         working-directory: ./rust
