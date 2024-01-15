@@ -121,7 +121,7 @@ while getopts 'a:Al:e:t:sx:h' OPTION; do
             echo -e "\n  -s\t\tCreate an AVD and snapshot for quick-boot (optional)"
             echo -e "      \t\t  Does not run integration tests"
             echo -e "\n  -x\t\tSet timeout in seconds for emulator launch and AVD boot-up (optional)"
-            echo -e "      \t\t  Default: 1800"
+            echo -e "      \t\t  Default: 3600"
             echo -e "      \t\t  Must be an integer"
             echo -e "\nExamples:"
             echo -e "  '$(basename $0) -a x86_64 -s'\tCreates an AVD and quick-boot snapshot for x86_64 ABI"

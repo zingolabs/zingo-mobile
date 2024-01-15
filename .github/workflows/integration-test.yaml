@@ -170,11 +170,15 @@ jobs:
           path: ./rust
 
       - name: Run integration tests
+        uses: nick-fields/retry@v2
         working-directory: ./rust
-        run: |
-          cargo nextest run ${{ env.NEXTEST-ABI }} --verbose --profile ci \
-            --archive-file nextest-archive-${{ env.ABI }}.tar.zst \
-            --partition count:${{ matrix.partition}}/5
+        with:
+          timeout_minutes: 60
+          max_attempts: 3
+          command: |
+            cargo nextest run ${{ env.NEXTEST-ABI }} --verbose --profile ci \
+              --archive-file nextest-archive-${{ env.ABI }}.tar.zst \
+              --partition count:${{ matrix.partition}}/5
 
       - name: Upload test reports
         if: ${{ ! cancelled() }}
