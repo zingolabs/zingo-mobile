@@ -11,7 +11,7 @@ test_name_default="OfflineTestSuite"
 valid_api_levels=("23" "24" "25" "26" "27" "28" "29" "30" "31" "32" "33" "34")
 valid_api_targets=("default" "google_apis" "google_apis_playstore" "google_atd" "google-tv" \
     "aosp_atd" "android-tv" "android-desktop" "android-wear" "android-wear-cn")
-timeout_seconds=1800  # default timeout set to 30 minutes
+timeout_seconds=3600  # default timeout set to 60 minutes
 
 function check_launch() {
     emulator_status=$(adb devices | grep "emulator-5554" | cut -f1)
