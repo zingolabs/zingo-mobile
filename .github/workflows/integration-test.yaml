@@ -62,6 +62,7 @@ jobs:
   integration-test:
     name: Integration test
     runs-on: macos-12
+    timeout-minutes: 60
     needs: build-test-artifacts
     strategy:
       matrix:
