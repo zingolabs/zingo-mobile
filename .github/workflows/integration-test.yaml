@@ -101,6 +101,9 @@ jobs:
           echo "AVD-ARCH=x86" >> $GITHUB_ENV
           echo "NEXTEST-ABI=arm32" >> $GITHUB_ENV
 
+      - name: Install Docker
+        run: brew install docker
+
       - name: Pull regchest docker image
         run: docker pull zingodevops/regchest:007
 
@@ -128,9 +131,6 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '18'
-
-      - name: Install Docker
-        run: brew install docker
       
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
