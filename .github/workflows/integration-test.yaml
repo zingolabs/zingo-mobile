@@ -103,8 +103,10 @@ jobs:
 
       - name: Install docker
         run: |
-          brew install docker colima
-          colima start
+          sudo apt-get update
+          sudo apt-get install -y docker.io
+          sudo systemctl start docker
+          sudo systemctl enable docker
 
       - name: Pull regchest docker image
         run: docker pull zingodevops/regchest:007
