@@ -102,7 +102,9 @@ jobs:
           echo "NEXTEST-ABI=arm32" >> $GITHUB_ENV
 
       - name: Install Docker
-        run: brew install docker
+        run: |
+          brew install docker
+          systemctl start docker
 
       - name: Pull regchest docker image
         run: docker pull zingodevops/regchest:007
