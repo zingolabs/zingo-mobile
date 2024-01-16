@@ -23,7 +23,7 @@ env:
 jobs:
   build-test-artifacts:
     name: Build test artifacts
-    runs-on: ubuntu-22.04
+    runs-on: macos-13
     steps:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
@@ -61,7 +61,7 @@ jobs:
 
   integration-test:
     name: Integration test
-    runs-on: ubuntu-22.04
+    runs-on: macos-13
     timeout-minutes: 60
     needs: build-test-artifacts
     strategy:
@@ -128,6 +128,9 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '18'
+
+      - name: Install Docker
+        run: brew install docker
       
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
