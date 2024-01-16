@@ -2,7 +2,7 @@
 use zingo_testutils::{self, scenarios};
 
 #[cfg(feature = "ci")]
-const UNIX_SOCKET: Option<&str> = Some("/Users/runner/.colima/default/docker.sock");
+const UNIX_SOCKET: Option<&str> = Some("/var/run/docker.sock");
 #[cfg(all(not(feature = "ci"), feature = "regchest"))]
 const UNIX_SOCKET: Option<&str> = None;
 

@@ -170,7 +170,6 @@ jobs:
         with:
           timeout_minutes: 60
           max_attempts: 3
-          continue_on_error: true
           command: |
             cd ./rust
             cargo nextest run ${{ env.NEXTEST-ABI }} --verbose --profile ci \
