@@ -104,7 +104,7 @@ jobs:
       - name: Install Docker
         run: |
           brew install docker colima
-          start colima
+          colima start
 
       - name: Pull regchest docker image
         run: docker pull zingodevops/regchest:007
