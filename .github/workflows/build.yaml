@@ -18,7 +18,7 @@ env:
 jobs:
   check-build-cache:
     name: Check build cache
-    runs-on: macos-latest
+    runs-on: macos-latest-xl
     outputs:
       cache-found: ${{ steps.set-cache-found.outputs.cache-found }}
     steps:     
@@ -126,7 +126,7 @@ jobs:
   cache-native-rust:
     name: Cache native rust
     needs: build
-    runs-on: macos-latest
+    runs-on: macos-latest-xl
     steps:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
