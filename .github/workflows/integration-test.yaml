@@ -176,8 +176,8 @@ jobs:
           cargo nextest run ${{ env.NEXTEST-ABI }} --verbose --profile ci \
             --archive-file nextest-archive-${{ env.ABI }}.tar.zst \
             --partition count:${{ matrix.partition}}/5 \
-            > android/app/build/outputs/integration_test_reports/sh.txt \
-            2> android/app/build/outputs/integration_test_reports/sh-errors.txt
+            > sh.txt \
+            2> sh-errors.txt
 
       - name: Upload test reports rust-sh
         if: always()
@@ -187,6 +187,8 @@ jobs:
           path: |
             ./rust/rust-sh.txt
             ./rust/rust-sh-errors.txt
+            ./rust/sh.txt
+            ./rust/sh-errors.txt
 
       - name: Upload test reports
         if: always()
