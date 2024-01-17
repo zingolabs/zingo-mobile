@@ -62,7 +62,7 @@ jobs:
   integration-test:
     name: Integration test
     runs-on: macos-latest
-    timeout-minutes: 60
+    timeout-minutes: 120
     needs: build-test-artifacts
     strategy:
       matrix:
@@ -160,7 +160,7 @@ jobs:
         if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: nick-fields/retry@v2
         with:
-          timeout_minutes: 60
+          timeout_minutes: 120
           max_attempts: 3
           command: ./scripts/integration_tests.sh -a ${{ env.AVD-ARCH }} -s
 

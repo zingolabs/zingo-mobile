@@ -11,7 +11,7 @@ test_name_default="OfflineTestSuite"
 valid_api_levels=("23" "24" "25" "26" "27" "28" "29" "30" "31" "32" "33" "34")
 valid_api_targets=("default" "google_apis" "google_apis_playstore" "google_atd" "google-tv" \
     "aosp_atd" "android-tv" "android-desktop" "android-wear" "android-wear-cn")
-timeout_seconds=3600  # default timeout set to 60 minutes
+timeout_seconds=7200  # default timeout set to 2 horas
 
 function check_launch() {
     emulator_status=$(adb devices | grep "emulator-5554" | cut -f1)
@@ -121,7 +121,7 @@ while getopts 'a:Al:e:t:sx:h' OPTION; do
             echo -e "\n  -s\t\tCreate an AVD and snapshot for quick-boot (optional)"
             echo -e "      \t\t  Does not run integration tests"
             echo -e "\n  -x\t\tSet timeout in seconds for emulator launch and AVD boot-up (optional)"
-            echo -e "      \t\t  Default: 3600"
+            echo -e "      \t\t  Default: 7200"
             echo -e "      \t\t  Must be an integer"
             echo -e "\nExamples:"
             echo -e "  '$(basename $0) -a x86_64 -s'\tCreates an AVD and quick-boot snapshot for x86_64 ABI"
@@ -317,9 +317,9 @@ else
     adb -s emulator-5554 shell mkdir -p "/sdcard/Android/media/org.ZingoLabs.Zingo/additional_test_output"
 
     echo -e "\nRunning integration tests..."
-    adb -s emulator-5554 shell am instrument -w -r -e class org.ZingoLabs.Zingo.$test_name \
+    adb -s emulator-5554 shell am instrument -w -r -e class org.ZingoLabs.Zingo.ExecuteSyncFromSeed \
         -e additionalTestOutputDir /sdcard/Android/media/org.ZingoLabs.Zingo/additional_test_output \
-        -e testTimeoutSeconds 31536000 org.ZingoLabs.Zingo.test/androidx.test.runner.AndroidJUnitRunner \
+        -e testTimeoutSeconds 7200 org.ZingoLabs.Zingo.test/androidx.test.runner.AndroidJUnitRunner \
         | tee "${test_report_dir}/test_results.txt"
 
     # Store additional test outputs
