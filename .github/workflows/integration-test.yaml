@@ -103,7 +103,7 @@ jobs:
 
       - name: Install Docker
         run: |
-          brew install docker colima
+          brew install docker
           colima start
 
       - name: Pull regchest docker image
