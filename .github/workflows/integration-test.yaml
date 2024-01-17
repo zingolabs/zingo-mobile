@@ -175,7 +175,10 @@ jobs:
         run: |
           cargo nextest run ${{ env.NEXTEST-ABI }} --verbose --profile ci \
             --archive-file nextest-archive-${{ env.ABI }}.tar.zst \
-            --partition count:${{ matrix.partition}}/5
+            --partition count:${{ matrix.partition}}/5 \
+            > android/app/build/outputs/integration_test_reports/sh.txt \
+            2> android/app/build/outputs/integration_test_reports/sh-errors.txt
+
 
       - name: Upload test reports
         if: always()
