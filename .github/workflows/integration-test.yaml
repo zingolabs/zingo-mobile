@@ -179,6 +179,14 @@ jobs:
             > android/app/build/outputs/integration_test_reports/sh.txt \
             2> android/app/build/outputs/integration_test_reports/sh-errors.txt
 
+      - name: Upload test reports rust-sh
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-reports-rust-sh-${{ env.ABI }}-${{ matrix.partition}}-${{ env.TIMESTAMP }}
+          path: |
+            ./rust/rust-sh.txt
+            ./rust/rust-sh-errors.txt
 
       - name: Upload test reports
         if: always()
