@@ -240,8 +240,9 @@ if [[ $create_snapshot == true ]]; then
     nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
         -no-snapshot-load -port 5554 &> "${test_report_dir}/emulator-snapshot.txt" &
     wait_for $timeout_seconds check_launch
-    wait_for $timeout_seconds check_device_online
     echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
+    wait_for $timeout_seconds check_device_online
+    echo -e "\nDevice online"
 
     echo -e "\nWaiting for AVD to boot..."
     wait_for $timeout_seconds check_boot
@@ -274,12 +275,13 @@ else
         -no-snapshot-save -read-only -port 5554 &> "${test_report_dir}/emulator.txt" &
     wait_for $timeout_seconds check_launch
     echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
+    wait_for $timeout_seconds check_device_online
+    echo "Device online"
 
     echo -e "\nWaiting for AVD to boot..."
     wait_for $timeout_seconds check_boot
-    wait_for $timeout_seconds check_device_online
     echo $(adb -s emulator-5554 emu avd name | head -1)
-    echo "Device online"
+    echo "Boot completed" 
     sleep 1
 
     # Disable animations

@@ -144,8 +144,8 @@ jobs:
         id: avd-cache
         with: 
           path: |
-            ${ANDROID_SDK_ROOT}/platform-tools/avd/*
-            ${ANDROID_SDK_ROOT}/platform-tools/adb/*
+            ${ANDROID_SDK_ROOT}/**/platform-tools/avd/*
+            ${ANDROID_SDK_ROOT}/**/platform-tools/adb/*
           key: avd-${{ env.AVD-ARCH }}-integ-macos
 
       - name: Create AVD and generate snapshot for caching
@@ -155,6 +155,18 @@ jobs:
           timeout_minutes: 120
           max_attempts: 3
           command: ./scripts/integration_tests.sh -a ${{ env.AVD-ARCH }} -s
+
+      - name: AVD cache snapshot
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: actions/cache@v3
+        with: 
+          path: |
+            ${ANDROID_SDK_ROOT}/**/platform-tools/avd/*
+            ${ANDROID_SDK_ROOT}/**/platform-tools/adb/*
+          key: avd-${{ env.AVD-ARCH }}-integ-macos
+
+      - name: run directly sh
+        run: ./scripts/integration_tests.sh -a ${{ env.AVD-ARCH }} -e ExecuteSyncFromSeed
 
       - name: Download archive
         uses: actions/download-artifact@v3
