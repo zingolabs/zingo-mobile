@@ -58,8 +58,6 @@ jobs:
   integration-test:
     name: Integration test
     runs-on: macos-latest
-    container:
-      image: zingodevops/regchest:007
     timeout-minutes: 120
     needs: build-test-artifacts
     strategy:
@@ -104,6 +102,9 @@ jobs:
           brew install docker
           colima start
 
+      - name: Pull regchest docker image
+        run: docker pull zingodevops/regchest:007
+
       - name: Install nextest
         uses: taiki-e/install-action@nextest
 
@@ -117,7 +118,6 @@ jobs:
         with:
           path: android/app/src/main/jniLibs/${{ env.ABI }}
           key: native-rust-${{ env.ABI }}-${{ env.CACHE-KEY }}
-          fail-on-cache-miss: true
       
       - name: Add emulator to PATH
         run: echo "${ANDROID_SDK_ROOT}/emulator" >> $GITHUB_PATH
