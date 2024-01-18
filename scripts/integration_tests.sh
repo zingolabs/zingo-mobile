@@ -1,6 +1,6 @@
 #!/bin/bash
 set -Eeuo pipefail
-trap cleanup SIGINT SIGTERM ERR EXIT
+trap cleanup SIGINT SIGTERM ERR
 
 set_abi=false
 set_test_name=false
@@ -15,7 +15,7 @@ valid_api_targets=("default" "google_apis" "google_apis_playstore" "google_atd" 
 timeout_seconds=7200  # default timeout set to 2 horas
 
 function cleanup() {
-    trap - SIGINT SIGTERM ERR EXIT
+    trap - SIGINT SIGTERM ERR
 
     # Kill all emulators
     ../scripts/kill_emulators.sh
