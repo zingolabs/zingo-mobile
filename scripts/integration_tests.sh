@@ -268,14 +268,15 @@ if [[ $create_snapshot == true ]]; then
     echo -e "\nSnapshot saved"
 else
     echo -e "\nChecking for AVD..."
-    if [ $(emulator -list-avds | grep -ow "${avd_name}" | wc -w) -ne 1 ]; then
+    avd_status=$(emulator -list-avds | grep -ow "${avd_name}" | wc -w)
+    if [ "${avd_status}" = "1" ]; then
+        echo "AVD found: ${avd_name}"
+    else
         echo "AVD not found"
         echo -e "\nCreating AVD..."
         echo no | avdmanager create avd --force --name "${avd_name}" --package "${sdk}"
         echo -e "\n\nTo create a quick-boot snapshot for faster integration tests use the '-s' flag"
         echo "Try '$(basename $0) -h' for more information."
-    else
-        echo "AVD found: ${avd_name}"
     fi
 
     echo -e "\nBuilding APKs..."
