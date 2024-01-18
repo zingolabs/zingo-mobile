@@ -1,5 +1,5 @@
 #!/bin/bash
-set -Eeuo pipefail
+set -Eeuxo pipefail
 
 set_abi=false
 set_test_name=false

@@ -118,6 +118,13 @@ jobs:
         with:
           path: android/app/src/main/jniLibs/${{ env.ABI }}
           key: native-rust-${{ env.ABI }}-${{ env.CACHE-KEY }}
+          fail-on-cache-miss: true
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '18'
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
