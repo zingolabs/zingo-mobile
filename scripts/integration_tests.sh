@@ -240,6 +240,11 @@ sdk="system-images;android-${api_level};${api_target};${arch}"
 sdkmanager --install "${sdk}"
 echo y | sdkmanager --licenses
 
+# Create integration test report directory
+test_report_dir="app/build/outputs/integration_test_reports/${abi}"
+rm -rf "${test_report_dir}"
+mkdir -p "${test_report_dir}"
+
 # Kill all emulators
 ../scripts/kill_emulators.sh
 
@@ -275,11 +280,6 @@ else
 
     echo -e "\nBuilding APKs..."
     ./gradlew assembleDebug assembleAndroidTest -PsplitApk=true
-
-    # Create integration test report directory
-    test_report_dir="app/build/outputs/integration_test_reports/${abi}"
-    rm -rf "${test_report_dir}"
-    mkdir -p "${test_report_dir}"
 
     echo -e "\n\nWaiting for emulator to launch..."
     nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
