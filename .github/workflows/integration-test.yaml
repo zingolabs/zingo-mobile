@@ -56,7 +56,7 @@ jobs:
           path: ./rust/nextest-archive-${{ env.ABI }}.tar.zst
 
   avd-snapshot-cache:
-  name: Integration test
+  name: AVD snapshot cache
     runs-on: macos-latest
     timeout-minutes: 120
     needs: build-test-artifacts
