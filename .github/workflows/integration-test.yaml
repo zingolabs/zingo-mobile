@@ -97,7 +97,7 @@ jobs:
           echo "AVD-ARCH=x86" >> $GITHUB_ENV
           echo "NEXTEST-ABI=arm32" >> $GITHUB_ENV
 
-      - name: Install Docker
+      - name: Install docker
         run: |
           brew install docker
           colima start
@@ -144,9 +144,9 @@ jobs:
         id: avd-cache
         with: 
           path: |
-            ~/.android/avd/*
-            ~/.android/adb*
-          key: avd-${{ env.AVD-ARCH }}-integ
+            ${ANDROID_SDK_ROOT}/platform-tools/avd/*
+            ${ANDROID_SDK_ROOT}/platform-tools/adb/*
+          key: avd-${{ env.AVD-ARCH }}-integ-macos
 
       - name: Create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'

@@ -35,8 +35,9 @@ function check_device_online() {
     device_status=$(adb devices | grep emulator-5554 | cut -f2)
     if [ "${device_status}" = "offline" ]; then
         return 1;
+    else
+        return 0;
     fi
-    return 0;
 }
 
 function wait_for() {
@@ -237,7 +238,7 @@ if [[ $create_snapshot == true ]]; then
 
     echo -e "\n\nWaiting for emulator to launch..."
     nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
-        -no-snapshot-load -port 5554 &> /dev/null &
+        -no-snapshot-load -port 5554 &> "${test_report_dir}/emulator-snapshot.txt" &
     wait_for $timeout_seconds check_launch
     wait_for $timeout_seconds check_device_online
     echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
