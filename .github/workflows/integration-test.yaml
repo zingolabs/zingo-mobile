@@ -91,6 +91,12 @@ jobs:
         run: |
           echo "AVD-ARCH=x86" >> $GITHUB_ENV
 
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '18'
+
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
       
