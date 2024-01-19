@@ -20,7 +20,7 @@ function cleanup() {
     # Kill all emulators
     ../scripts/kill_emulators.sh
 
-    echo -e "Cleanup done! - trap"
+    echo -e "\n\nCleanup done! - trap"
     exit 1
 }
 
@@ -267,6 +267,8 @@ else
     echo $(emulator -list-avds)
     echo $(emulator -list-avds | grep -ow "${avd_name}" | wc -w)
     avd_status=$(emulator -list-avds | grep -ow "${avd_name}" | wc -w)
+    echo $avd_name
+    echo $avd_status
     if [[ $avd_status == 0 ]]; then
         echo "AVD not found"
         echo -e "\nCreating AVD..."
