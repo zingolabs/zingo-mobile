@@ -240,11 +240,6 @@ sdk="system-images;android-${api_level};${api_target};${arch}"
 sdkmanager --install "${sdk}"
 echo y | sdkmanager --licenses
 
-# Create integration test report directory
-test_report_dir="app/build/outputs/integration_test_reports/${abi}"
-rm -rf "${test_report_dir}"
-mkdir -p "${test_report_dir}"
-
 # Kill all emulators
 ../scripts/kill_emulators.sh
 
@@ -254,7 +249,7 @@ if [[ $create_snapshot == true ]]; then
 
     echo -e "\n\nWaiting for emulator to launch..."
     nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
-        -no-snapshot-load -port 5554 &> "${test_report_dir}/emulator-snapshot.txt" &
+        -no-snapshot-load -port 5554 &> /dev/null &
     wait_for $timeout_seconds check_launch
     echo "$(adb devices | grep emulator-5554 | cut -f1) launch successful"
     wait_for $timeout_seconds check_device_online
@@ -265,6 +260,7 @@ if [[ $create_snapshot == true ]]; then
     echo $(adb -s emulator-5554 emu avd name | head -1)
     echo "Boot completed" 
     sleep 1
+
     echo -e "\nSnapshot saved"
 else
     echo -e "\nChecking for AVD..."
@@ -278,8 +274,10 @@ else
         echo "AVD found: ${avd_name}"
     fi
 
-    echo -e "\nBuilding APKs..."
-    ./gradlew assembleDebug assembleAndroidTest -PsplitApk=true
+    # Create integration test report directory
+    test_report_dir="app/build/outputs/integration_test_reports/${abi}"
+    rm -rf "${test_report_dir}"
+    mkdir -p "${test_report_dir}"
 
     echo -e "\n\nWaiting for emulator to launch..."
     nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
@@ -294,6 +292,9 @@ else
     echo $(adb -s emulator-5554 emu avd name | head -1)
     echo "Boot completed" 
     sleep 1
+
+    echo -e "\nBuilding APKs..."
+    ./gradlew assembleDebug assembleAndroidTest -PsplitApk=true
 
     # Disable animations
     adb shell input keyevent 82
