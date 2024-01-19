@@ -256,13 +256,13 @@ if [[ $create_snapshot == true ]]; then
     nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
         -no-snapshot-load -port 5554 &> "${test_report_dir}/emulator-snapshot.txt" &
     wait_for $timeout_seconds check_launch
-    echo "${adb devices | grep "emulator-5554" | cut -f1} launch successful"
+    echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
     wait_for $timeout_seconds check_device_online
     echo -e "\nDevice online"
 
     echo -e "\nWaiting for AVD to boot..."
     wait_for $timeout_seconds check_boot
-    echo "${adb -s emulator-5554 emu avd name | head -1}"
+    echo $(adb -s emulator-5554 emu avd name | head -1)
     echo "Boot completed" 
     sleep 1
     echo -e "\nSnapshot saved"
@@ -286,13 +286,13 @@ else
     nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
         -no-snapshot-save -read-only -port 5554 &> "${test_report_dir}/emulator.txt" &
     wait_for $timeout_seconds check_launch
-    echo "${adb devices | grep "emulator-5554" | cut -f1} launch successful"
+    echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
     wait_for $timeout_seconds check_device_online
     echo -e "\nDevice online"
 
     echo -e "\nWaiting for AVD to boot..."
     wait_for $timeout_seconds check_boot
-    echo "${adb -s emulator-5554 emu avd name | head -1}"
+    echo $(adb -s emulator-5554 emu avd name | head -1)
     echo "Boot completed" 
     sleep 1
 
@@ -338,7 +338,7 @@ else
         | tee "${test_report_dir}/test_results.txt"
 
     # Store additional test outputs
-    if [ -n "${adb -s emulator-5554 shell ls -A /sdcard/Android/media/org.ZingoLabs.Zingo/additional_test_output 2>/dev/null}" ]; then
+    if [ -n "$(adb -s emulator-5554 shell ls -A /sdcard/Android/media/org.ZingoLabs.Zingo/additional_test_output 2>/dev/null)" ]; then
         adb -s emulator-5554 shell cat /sdcard/Android/media/org.ZingoLabs.Zingo/additional_test_output/* \
             &> "${test_report_dir}/additional_test_output.txt"
     fi
