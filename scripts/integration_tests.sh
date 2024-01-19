@@ -25,7 +25,7 @@ function cleanup() {
 }
 
 function check_launch() {
-    emulator_status=$(adb devices | grep "emulator-5554" | cut -f1)
+    emulator_status=$(adb devices | grep emulator-5554 | cut -f1)
     if [ "${emulator_status}" = "emulator-5554" ]; then
         return 0;
     else
@@ -256,7 +256,7 @@ if [[ $create_snapshot == true ]]; then
     nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
         -no-snapshot-load -port 5554 &> "${test_report_dir}/emulator-snapshot.txt" &
     wait_for $timeout_seconds check_launch
-    echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
+    echo "$(adb devices | grep emulator-5554 | cut -f1) launch successful"
     wait_for $timeout_seconds check_device_online
     echo -e "\nDevice online"
 
@@ -268,15 +268,14 @@ if [[ $create_snapshot == true ]]; then
     echo -e "\nSnapshot saved"
 else
     echo -e "\nChecking for AVD..."
-    avd_status=$(emulator -list-avds | grep -ow "${avd_name}" | wc -w)
-    if [ "${avd_status}" = "1" ]; then
-        echo "AVD found: ${avd_name}"
-    else
+    if [ $(emulator -list-avds | grep -ow "${avd_name}" | wc -w) -ne 1 ]; then
         echo "AVD not found"
         echo -e "\nCreating AVD..."
         echo no | avdmanager create avd --force --name "${avd_name}" --package "${sdk}"
         echo -e "\n\nTo create a quick-boot snapshot for faster integration tests use the '-s' flag"
         echo "Try '${basename $0} -h' for more information."
+    else
+        echo "AVD found: ${avd_name}"
     fi
 
     echo -e "\nBuilding APKs..."
@@ -286,7 +285,7 @@ else
     nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
         -no-snapshot-save -read-only -port 5554 &> "${test_report_dir}/emulator.txt" &
     wait_for $timeout_seconds check_launch
-    echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
+    echo "$(adb devices | grep emulator-5554 | cut -f1) launch successful"
     wait_for $timeout_seconds check_device_online
     echo -e "\nDevice online"
 
