@@ -104,7 +104,7 @@ jobs:
         run: echo "${ANDROID_SDK_ROOT}/emulator" >> $GITHUB_PATH
 
       - name: AVD cache
-        uses: actions/cache@v3
+        uses: actions/cache/restore@v3
         id: avd-cache-snapshot
         with: 
           path: |
@@ -123,7 +123,7 @@ jobs:
 
       - name: AVD cache snapshot
         if: steps.avd-cache-snapshot.outputs.cache-hit != 'true'
-        uses: actions/cache@v3
+        uses: actions/cache/save@v3
         with: 
           path: |
             ${ANDROID_SDK_ROOT}/**/platform-tools/avd
@@ -215,7 +215,7 @@ jobs:
           cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev' }}
 
       - name: AVD cache
-        uses: actions/cache@v3
+        uses: actions/cache/restore@v3
         with: 
           path: |
             ${ANDROID_SDK_ROOT}/**/platform-tools/avd

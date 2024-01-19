@@ -25,7 +25,7 @@ function cleanup() {
 }
 
 function check_launch() {
-    emulator_status=$(adb devices | grep "emulator-5554" | cut -f1)
+    emulator_status="${adb devices | grep "emulator-5554" | cut -f1}"
     if [ "${emulator_status}" = "emulator-5554" ]; then
         return 0;
     else
@@ -34,7 +34,7 @@ function check_launch() {
 }
 
 function check_boot() {
-    boot_status=$(adb -s emulator-5554 shell getprop sys.boot_completed)
+    boot_status="${adb -s emulator-5554 shell getprop sys.boot_completed}"
     if [ "${boot_status}" = "1" ]; then
         return 0;
     else
@@ -43,7 +43,7 @@ function check_boot() {
 }
 
 function check_device_online() {
-    device_status=$(adb devices | grep emulator-5554 | cut -f2)
+    device_status="${adb devices | grep emulator-5554 | cut -f2}"
     if [ "${device_status}" = "offline" ]; then
         return 1;
     else
@@ -256,18 +256,18 @@ if [[ $create_snapshot == true ]]; then
     nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
         -no-snapshot-load -port 5554 &> "${test_report_dir}/emulator-snapshot.txt" &
     wait_for $timeout_seconds check_launch
-    echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
+    echo "${adb devices | grep "emulator-5554" | cut -f1} launch successful"
     wait_for $timeout_seconds check_device_online
     echo -e "\nDevice online"
 
     echo -e "\nWaiting for AVD to boot..."
     wait_for $timeout_seconds check_boot
-    echo $(adb -s emulator-5554 emu avd name | head -1)
+    echo "${adb -s emulator-5554 emu avd name | head -1}"
     echo "Boot completed" 
     sleep 1
     echo -e "\nSnapshot saved"
 else
-    avd_status=$(emulator -list-avds | grep -ow "${avd_name}" | wc -w)
+    avd_status="${emulator -list-avds | grep -ow "${avd_name}" | wc -w}"
     echo -e "\nChecking for AVD...$(avd_status)"
     if [ "${avd_status}" = "1" ]; then
         echo "AVD found: ${avd_name}"

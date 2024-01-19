@@ -55,7 +55,7 @@ jobs:
           key: avd-${{ matrix.arch }}-api-${{ matrix.api-level }}-e2e
 
       - name: Native rust cache
-        uses: actions/cache@v3
+        uses: actions/cache/restore@v3
         with:
           path: android/app/src/main/jniLibs/${{ matrix.arch }}
           key: native-rust-${{ matrix.arch }}-${{ env.CACHE-KEY }}
