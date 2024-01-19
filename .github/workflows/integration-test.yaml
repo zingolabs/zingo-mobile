@@ -108,8 +108,7 @@ jobs:
         id: avd-cache-snapshot
         with: 
           path: |
-            ${ANDROID_SDK_ROOT}/**/platform-tools/avd
-            ${ANDROID_SDK_ROOT}/**/platform-tools/adb
+            ${ANDROID_SDK_ROOT}/platform-tools
           key: avd-${{ env.AVD-ARCH }}-integ-macos
           lookup-only: true
 
@@ -126,8 +125,7 @@ jobs:
         uses: actions/cache/save@v3
         with: 
           path: |
-            ${ANDROID_SDK_ROOT}/**/platform-tools/avd
-            ${ANDROID_SDK_ROOT}/**/platform-tools/adb
+            ${ANDROID_SDK_ROOT}/platform-tools
           key: avd-${{ env.AVD-ARCH }}-integ-macos
 
   integration-test:
@@ -218,8 +216,7 @@ jobs:
         uses: actions/cache/restore@v3
         with: 
           path: |
-            ${ANDROID_SDK_ROOT}/**/platform-tools/avd
-            ${ANDROID_SDK_ROOT}/**/platform-tools/adb
+            ${ANDROID_SDK_ROOT}/platform-tools
           key: avd-${{ env.AVD-ARCH }}-integ-macos
 
       - name: run directly sh
