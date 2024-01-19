@@ -264,12 +264,11 @@ if [[ $create_snapshot == true ]]; then
     echo -e "\nSnapshot saved"
 else
     echo -e "\nChecking for AVD..."
-    #echo $(emulator -list-avds)
-    #echo $((emulator -list-avds | grep -ow "${avd_name}" | wc -w))
-    #avd_status=$((emulator -list-avds | grep -ow "${avd_name}" | wc -w))
-    #echo $avd_name
-    #echo $avd_status
-    if [[ $(echo $(emulator -list-avds) | grep -ow "${avd_name}" | wc -w) == 0 ]]; then
+    list_avds=$(emulator -list-avds)
+    echo $(list_avds)
+    found=$(echo ${list_avds} | grep -ow "${avd_name}" | wc -w)
+    echo $(found)
+    if [ "$(found)" = "0" ]; then
         echo "AVD not found"
         echo -e "\nCreating AVD..."
         echo no | avdmanager create avd --force --name "${avd_name}" --package "${sdk}"
