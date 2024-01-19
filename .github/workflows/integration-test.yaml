@@ -216,14 +216,6 @@ jobs:
           build-root-directory: ./android
           cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev' }}
 
-      - name: AVD cache
-        uses: actions/cache/restore@v3
-        with: 
-          path: |
-            ~/.android/avd/*
-            ~/.android/adb*
-          key: avd-${{ env.AVD-ARCH }}-integ
-
       - name: run directly sh
         uses: nick-fields/retry@v2
         with:
