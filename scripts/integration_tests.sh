@@ -273,7 +273,7 @@ else
         echo -e "\nCreating AVD..."
         echo no | avdmanager create avd --force --name "${avd_name}" --package "${sdk}"
         echo -e "\n\nTo create a quick-boot snapshot for faster integration tests use the '-s' flag"
-        echo "Try '${basename $0} -h' for more information."
+        echo "Try '$(basename $0) -h' for more information."
     else
         echo "AVD found: ${avd_name}"
     fi
