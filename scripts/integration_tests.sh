@@ -265,8 +265,8 @@ if [[ $create_snapshot == true ]]; then
 else
     echo -e "\nChecking for AVD..."
     echo $(emulator -list-avds)
-    echo $(emulator -list-avds | grep -ow "${avd_name}" | wc -w)
-    avd_status=$(emulator -list-avds | grep -ow "${avd_name}" | wc -w)
+    echo $((emulator -list-avds | grep -ow "${avd_name}" | wc -w))
+    avd_status=$((emulator -list-avds | grep -ow "${avd_name}" | wc -w))
     echo $avd_name
     echo $avd_status
     if [[ $avd_status == 0 ]]; then
