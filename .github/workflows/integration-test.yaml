@@ -193,8 +193,8 @@ jobs:
       - name: Native rust cache
         uses: actions/cache@v3
         with:
-          path: android/app/src/main/jniLibs/${{ env.AVD-ARCH }}
-          key: native-rust-${{ env.AVD-ARCH }}-${{ env.CACHE-KEY }}
+          path: android/app/src/main/jniLibs/${{ env.ABI }}
+          key: native-rust-${{ env.ABI }}-${{ env.CACHE-KEY }}
           fail-on-cache-miss: true
 
       - name: Setup Java
@@ -229,7 +229,7 @@ jobs:
         with:
           timeout_minutes: 120
           max_attempts: 3
-          command: ./scripts/integration_tests.sh -a ${{ env.AVD-ARCH }} -e ExecuteSyncFromSeed
+          command: ./scripts/integration_tests.sh -a ${{ env.ABI }} -e ExecuteSyncFromSeed
 
       - name: Download archive
         uses: actions/download-artifact@v3
