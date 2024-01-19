@@ -111,8 +111,9 @@ jobs:
         id: avd-cache-snapshot
         with: 
           path: |
-            ${ANDROID_SDK_ROOT}/platform-tools
-          key: avd-${{ env.AVD-ARCH }}-integ-macos
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-${{ env.AVD-ARCH }}-integ
           lookup-only: true
 
       - name: Create AVD and generate snapshot for caching
@@ -128,8 +129,10 @@ jobs:
         uses: actions/cache/save@v3
         with: 
           path: |
-            ${ANDROID_SDK_ROOT}/platform-tools
-          key: avd-${{ env.AVD-ARCH }}-integ-macos
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-${{ env.AVD-ARCH }}-integ
+
 
   integration-test:
     name: Integration test
@@ -219,8 +222,9 @@ jobs:
         uses: actions/cache/restore@v3
         with: 
           path: |
-            ${ANDROID_SDK_ROOT}/platform-tools
-          key: avd-${{ env.AVD-ARCH }}-integ-macos
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-${{ env.AVD-ARCH }}-integ
 
       - name: run directly sh
         uses: nick-fields/retry@v2
