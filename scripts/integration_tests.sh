@@ -265,10 +265,10 @@ if [[ $create_snapshot == true ]]; then
 else
     echo -e "\nChecking for AVD..."
     list_avds=$(emulator -list-avds)
-    echo "$(list_avds)"
+    echo "${list_avds}"
     found=$(echo "${list_avds}" | grep -ow "${avd_name}" | wc -w)
-    echo "$(found)"
-    if [ "$(found)" = "0" ]; then
+    echo "${found}"
+    if [ "${found}" = "0" ]; then
         echo "AVD not found"
         echo -e "\nCreating AVD..."
         echo no | avdmanager create avd --force --name "${avd_name}" --package "${sdk}"
