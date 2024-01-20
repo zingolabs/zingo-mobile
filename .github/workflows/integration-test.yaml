@@ -91,19 +91,6 @@ jobs:
         run: |
           echo "AVD-ARCH=x86" >> $GITHUB_ENV
 
-      - name: Setup Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '18'
-
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-      
-      - name: Add emulator to PATH
-        run: |
-          echo "${ANDROID_SDK_ROOT}/emulator" >> $GITHUB_PATH
-
       - name: AVD cache
         uses: actions/cache/restore@v3
         id: avd-cache-snapshot
@@ -113,6 +100,22 @@ jobs:
             ~/.android/adb*
           key: avd-${{ env.AVD-ARCH }}-integ
           lookup-only: true
+
+      - name: Setup Java
+        if: steps.avd-cache-snapshot.outputs.cache-hit != 'true'
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '18'
+
+      - name: Setup Android SDK
+        if: steps.avd-cache-snapshot.outputs.cache-hit != 'true'
+        uses: android-actions/setup-android@v3
+
+      - name: Add emulator to PATH
+        if: steps.avd-cache-snapshot.outputs.cache-hit != 'true'
+        run: |
+          echo "${ANDROID_SDK_ROOT}/emulator" >> $GITHUB_PATH
 
       - name: Create AVD and generate snapshot for caching
         if: steps.avd-cache-snapshot.outputs.cache-hit != 'true'
