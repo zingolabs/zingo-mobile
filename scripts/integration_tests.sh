@@ -266,7 +266,7 @@ else
     echo -e "\nChecking for AVD..."
     list_avds=$(emulator -list-avds)
     echo "list avds: ${list_avds}"
-    if [[ $(echo ${list_avds} | grep -ow "$(echo ${avd_name})" | wc -w) != 1 ]]; then
+    if [[ $(echo ${list_avds} | grep -ow "${avd_name}" | wc -w) != 1 ]]; then
         echo "AVD not found"
         echo -e "\nCreating AVD..."
         echo no | avdmanager create avd --force --name "${avd_name}" --package "${sdk}"
