@@ -267,16 +267,17 @@ else
     list_avds=$(emulator -list-avds)
     echo "list avds: ${list_avds}"
     echo "avd name : ${avd_name}"
-    echo "count    : $(echo "${list_avds}" | tr -d '-' | grep -ow "$(echo ${avd_name} | tr -d '-')" | wc -w)"
     # tr -d '-' is used to remove all hyphons as they count as word boundaries for grep
-    if [[ $(echo "${list_avds}" | tr -d '-' | grep -ow "$(echo ${avd_name} | tr -d '-')" | wc -w) != 1 ]]; then
+    count=$(echo "${list_avds}" | tr -d '-' | grep -ow "$(echo ${avd_name} | tr -d '-')" | wc -w)
+    echo "count    : ${count}"
+    if [ "${count}" = "1" ]; then
+        echo "AVD found: ${avd_name}"
+    else
         echo "AVD not found"
         echo -e "\nCreating AVD..."
         echo no | avdmanager create avd --force --name "${avd_name}" --package "${sdk}"
         echo -e "\n\nTo create a quick-boot snapshot for faster integration tests use the '-s' flag"
         echo "Try '$(basename $0) -h' for more information."
-    else
-        echo "AVD found: ${avd_name}"
     fi
 
     # Create integration test report directory
