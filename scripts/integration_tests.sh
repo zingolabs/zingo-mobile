@@ -267,8 +267,9 @@ else
     list_avds=$(emulator -list-avds)
     echo "list avds: ${list_avds}"
     echo "avd name : ${avd_name}"
+    echo "count    : $(echo "${list_avds}" | tr -d '-' | grep -ow "$(echo ${avd_name} | tr -d '-')" | wc -w)"
     # tr -d '-' is used to remove all hyphons as they count as word boundaries for grep
-    if [[ $(echo ${list_avds} | tr -d '-' | grep -ow "$(echo ${avd_name} | tr -d '-')" | wc -w) != 1 ]]; then
+    if [[ $(echo "${list_avds}" | tr -d '-' | grep -ow "$(echo ${avd_name} | tr -d '-')" | wc -w) != 1 ]]; then
         echo "AVD not found"
         echo -e "\nCreating AVD..."
         echo no | avdmanager create avd --force --name "${avd_name}" --package "${sdk}"
