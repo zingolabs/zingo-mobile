@@ -270,7 +270,9 @@ else
     # tr -d '-' is used to remove all hyphons as they count as word boundaries for grep
     count=$(echo "${list_avds}" | tr -d '-' | grep -ow "$(echo ${avd_name} | tr -d '-')" | wc -w)
     echo "count    : ${count}"
-    if [ "${count}" = "1" ]; then
+    trimmed_count=$(echo "${count}" | tr -d ' ')
+    echo "count    : ${trimmed_count}"
+    if [ "${trimmed_count}" = "1" ]; then
         echo "AVD found: ${avd_name}"
     else
         echo "AVD not found"
