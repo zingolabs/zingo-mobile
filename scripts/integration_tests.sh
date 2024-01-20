@@ -267,7 +267,7 @@ else
     list_avds=$(emulator -list-avds)
     echo "$(list_avds)"
     found=$(echo "${list_avds}" | grep -ow "${avd_name}" | wc -w)
-    echo $(found)
+    echo "$(found)"
     if [ "$(found)" = "0" ]; then
         echo "AVD not found"
         echo -e "\nCreating AVD..."
