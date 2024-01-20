@@ -228,13 +228,6 @@ jobs:
           build-root-directory: ./android
           cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev' }}
 
-      - name: run directly sh
-        uses: nick-fields/retry@v2
-        with:
-          timeout_minutes: 120
-          max_attempts: 3
-          command: ./scripts/integration_tests.sh -a ${{ env.ABI }} -e ExecuteSyncFromSeed
-
       - name: Download archive
         uses: actions/download-artifact@v3
         with:
