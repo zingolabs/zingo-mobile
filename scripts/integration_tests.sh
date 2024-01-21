@@ -353,7 +353,7 @@ else
     
     code=$(cat "${test_report_dir}/test_results.txt" | grep INSTRUMENTATION_CODE: | cut -d' ' -f2 | tr -d ' ')
     echo "code: ${code}"
-    if [[ "${code}" -ne "-1" || $(cat "${test_report_dir}/test_results.txt" | grep -q "FAILURES!!!") ]]; then
+    if [[ "${code}" -ne "-1" || $(cat "${test_report_dir}/test_results.txt" | grep -q "FAILURES!!!") -eq 0 ]]; then
         echo -e "\nIntegration tests FAILED"
 
         # Kill all emulators
