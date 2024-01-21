@@ -351,9 +351,9 @@ else
 
     echo -e "\nTest reports saved: android/${test_report_dir}"
     
-    code=$(cat "${test_report_dir}/test_results.txt" | grep 'INSTRUMENTATION_CODE:' | cut -d' ' -f2 | tr -d ' ')
+    code=$(cat "${test_report_dir}/test_results.txt" | grep INSTRUMENTATION_CODE: | cut -d' ' -f2 | tr -d ' ')
     echo "code: ${code}"
-    failss=$(cat "${test_report_dir}/test_results.txt" | grep -ow 'FAILURES!!!' | wc -w)
+    failss=$(cat "${test_report_dir}/test_results.txt" | grep -ow "FAILURES!!!" | wc -w | tr -d ' ')
     echo "failures: ${failss}"
     if [[ "${code}" -ne "-1" || "${failss}" -ne "0" ]]; then
         echo -e "\nIntegration tests FAILED"
