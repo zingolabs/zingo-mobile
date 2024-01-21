@@ -22,10 +22,9 @@ env:
 
 jobs:
   testing-sh:
-    name: AVD snapshot cache
+    name: Testing sh script
     runs-on: macos-latest
     timeout-minutes: 120
-    needs: build-test-artifacts
     steps:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
@@ -88,6 +87,7 @@ jobs:
     name: Build test artifacts
     runs-on: macos-latest
     timeout-minutes: 120
+    needs: testing-sh
     steps:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
