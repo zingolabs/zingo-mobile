@@ -351,12 +351,18 @@ else
 
     echo -e "\nTest reports saved: android/${test_report_dir}"
     
+    word="FAILURES"
+    count_fails=$(cat "${test_report_dir}/test_results.txt" | grep -ow "$(echo ${word})" | wc -w)
+    trimmed_count_fails=$(echo "${count_fails}" | tr -d ' ')
+    
+    #failss=$(cat "${test_report_dir}/test_results.txt" | grep -ow "FAILURES" | wc -w)
+    #trimmed_failss=$(echo "${failss}" | tr -d ' ')
+    
+    echo "fails: ${trimmed_count_fails}"
+    
     code=$(cat "${test_report_dir}/test_results.txt" | grep INSTRUMENTATION_CODE: | cut -d' ' -f2 | tr -d ' ')
     echo "code: ${code}"
-    failss=$(cat "${test_report_dir}/test_results.txt" | grep -ow "FAILURES" | wc -w)
-    trimmed_failss=$(echo "${failss}" | tr -d ' ')
-    echo "fails: ${trimmed_failss}"
-    if [[ "${code}" -ne "-1" || "${trimmed_failss}" -ne "0" ]]; then
+    if [[ "${code}" -ne "-1" || "${trimmed_count_fails}" -ne "0" ]]; then
         echo -e "\nIntegration tests FAILED"
 
         # Kill all emulators
