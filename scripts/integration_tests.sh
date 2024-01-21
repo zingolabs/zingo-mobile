@@ -355,6 +355,7 @@ else
     echo "code: ${code}"
     failss=$(cat "${test_report_dir}/test_results.txt" | grep -ow "FAILURES!!!" | wc -w)
     trimmed_failss=$(echo "${failss}" | tr -d ' ')
+    echo "fails: ${trimmed_failss}"
     if [[ "${code}" -ne "-1" || "${trimmed_failss}" -ne "0" ]]; then
         echo -e "\nIntegration tests FAILED"
 
