@@ -353,7 +353,7 @@ else
     
     code=$(cat "${test_report_dir}/test_results.txt" | grep INSTRUMENTATION_CODE: | cut -d' ' -f2 | tr -d ' ')
     echo "code: ${code}"
-    failss=$(cat "${test_report_dir}/test_results.txt" | grep -ow "FAILURES!!!" | wc -w)
+    failss=$(cat "${test_report_dir}/test_results.txt" | grep -ow "FAILURES" | wc -w)
     trimmed_failss=$(echo "${failss}" | tr -d ' ')
     echo "fails: ${trimmed_failss}"
     if [[ "${code}" -ne "-1" || "${trimmed_failss}" -ne "0" ]]; then
