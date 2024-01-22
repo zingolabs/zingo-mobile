@@ -1,5 +1,15 @@
 #!/bin/bash
 set -Eeuo pipefail
+function cleanup() {
+    echo -e "\nline: $1... command: $2...  code exit: $3..."
+    echo -e "\nError - Cleanup start! - trap"
+
+    # Kill all emulators
+    ../scripts/kill_emulators.sh
+
+    echo -e "\nError - Cleanup done! - trap"
+    exit 1
+}
 trap "cleanup $LINENO $BASH_COMMAND $?" SIGINT SIGTERM ERR
 
 set_abi=false
@@ -13,17 +23,6 @@ valid_api_levels=("23" "24" "25" "26" "27" "28" "29" "30" "31" "32" "33" "34")
 valid_api_targets=("default" "google_apis" "google_apis_playstore" "google_atd" "google-tv" \
     "aosp_atd" "android-tv" "android-desktop" "android-wear" "android-wear-cn")
 timeout_seconds=7200  # default timeout set to 2 horas
-
-function cleanup() {
-    echo -e "\nline: $1... command: $2...  code exit: $3..."
-    echo -e "\nError - Cleanup start! - trap"
-
-    # Kill all emulators
-    ../scripts/kill_emulators.sh
-
-    echo -e "\nError - Cleanup done! - trap"
-    exit 1
-}
 
 function check_launch() {
     emulator_status=$(adb devices | grep emulator-5554 | cut -f1)
