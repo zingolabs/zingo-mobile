@@ -99,9 +99,7 @@ jobs:
 
   build-test-artifacts:
     name: Build test artifacts
-    runs-on: ubuntu-latest
-    container:
-      image: zingodevops/regchest:007
+    runs-on: macos-latest
     timeout-minutes: 120
     needs: testing-sh
     steps:
@@ -113,11 +111,6 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
-
-      - name: Setup Docker image cache
-        uses: ScribeMD/docker-cache@0.3.7
-        with:
-          key: docker-cache-${{ runner.os }}-${{ hashFiles('.github/workflows/*') }}
 
       - name: Install protoc
         run: brew install protobuf
@@ -265,10 +258,13 @@ jobs:
           brew install docker
           colima start
 
-      - name: Setup Docker image cache
-        uses: ScribeMD/docker-cache@0.3.7
+      - name: Cache Docker images
+        uses: ScribeMD/docker-cache@0.3.6
         with:
-          key: docker-cache-${{ runner.os }}-${{ hashFiles('.github/workflows/*') }}
+          key: docker-ci-regchest:007
+
+      - name: Pull regchest docker image
+        run: docker pull zingodevops/regchest:007
 
       - name: Install nextest
         uses: taiki-e/install-action@nextest
