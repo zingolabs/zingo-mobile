@@ -95,7 +95,7 @@ jobs:
         with:
           timeout_minutes: 120
           max_attempts: 3
-          command: ./scripts/integration_tests.sh -a ${{ env.ABI }}
+          command: ./scripts/integration_tests.sh -a ${{ env.AVD-ARCH }}
 
   build-test-artifacts:
     name: Build test artifacts
