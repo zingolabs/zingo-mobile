@@ -354,7 +354,6 @@ else
     
     code=$(cat "${test_report_dir}/test_results.txt" | grep INSTRUMENTATION_CODE: | cut -d' ' -f2 | tr -d ' ')
     echo "code: ${code}"
-    echo "fails: $(cat "${test_report_dir}/test_results.txt" | grep "FAILURES!!!")"
     if [ "${code}" != "-1" ]; then
         echo -e "\nIntegration tests FAILED: code not -1"
 
