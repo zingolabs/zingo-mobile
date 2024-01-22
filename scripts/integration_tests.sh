@@ -164,7 +164,7 @@ case "$abi" in
     x86_64)
         api_level_default="30"
         api_target_default="google_apis_playstore"
-        if [ $intel_host_os == true ]; then       
+        if [[ $intel_host_os == true ]]; then       
             arch="x86_64"
         else
             arch="arm64-v8a"
@@ -173,7 +173,7 @@ case "$abi" in
     x86) 
         api_level_default="30"
         api_target_default="google_apis_playstore"
-        if [ $intel_host_os == true ]; then       
+        if [[ $intel_host_os == true ]]; then       
             arch="x86"
         else
             arch="arm64-v8a"
@@ -182,7 +182,7 @@ case "$abi" in
     arm64-v8a)
         api_level_default="30"
         api_target_default="google_apis_playstore"
-        if [ $intel_host_os == true ]; then       
+        if [[ $intel_host_os == true ]]; then       
             arch="x86_64"
         else
             arch="arm64-v8a"
@@ -191,7 +191,7 @@ case "$abi" in
     armeabi-v7a)
         api_level_default="30"
         api_target_default="google_apis_playstore"
-        if [ $intel_host_os == true ]; then       
+        if [[ $intel_host_os == true ]]; then       
             arch="x86"
         else
             arch="arm64-v8a"
@@ -353,10 +353,7 @@ else
     
     code=$(cat "${test_report_dir}/test_results.txt" | grep INSTRUMENTATION_CODE: | cut -d' ' -f2 | tr -d ' ')
     echo "code: ${code}"
-    #failed=$(cat "${test_report_dir}/test_results.txt" | grep -q "FAILURES!!!")
-    #echo "failed: ${failed}"
-    #if [[ "${code}" -ne "-1" || "${failed}" -eq "0" ]]; then
-    if [ "${code}" != "-1" ]; then
+    if [ "${code}" != "-1" ] || [ -n "$(cat "${test_report_dir}/test_results.txt" | grep "FAILURES!!!")"]; then
         echo -e "\nIntegration tests FAILED"
 
         # Kill all emulators
