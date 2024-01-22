@@ -1,6 +1,6 @@
 #!/bin/bash
 set -Eeuo pipefail
-trap cleanup SIGINT SIGTERM ERR
+trap "cleanup $LINENO $BASH_COMMAND $?" SIGINT SIGTERM ERR
 
 set_abi=false
 set_test_name=false
@@ -15,6 +15,7 @@ valid_api_targets=("default" "google_apis" "google_apis_playstore" "google_atd" 
 timeout_seconds=7200  # default timeout set to 2 horas
 
 function cleanup() {
+    echo -e "\n $1 $2 $3"
     echo -e "\nError - Cleanup start! - trap"
 
     # Kill all emulators
@@ -354,8 +355,16 @@ else
     code=$(cat "${test_report_dir}/test_results.txt" | grep INSTRUMENTATION_CODE: | cut -d' ' -f2 | tr -d ' ')
     echo "code: ${code}"
     echo "fails: $(cat "${test_report_dir}/test_results.txt" | grep "FAILURES!!!")"
-    if [ "${code}" != "-1" ] || [ -n "$(cat "${test_report_dir}/test_results.txt" | grep "FAILURES!!!")" ]; then
-        echo -e "\nIntegration tests FAILED"
+    if [ "${code}" != "-1" ]; then
+        echo -e "\nIntegration tests FAILED: code not -1"
+
+        # Kill all emulators
+        ../scripts/kill_emulators.sh
+
+        exit 1
+    fi
+    if [ -n "$(cat "${test_report_dir}/test_results.txt" | grep "FAILURES!!!")" ]; then
+        echo -e "\nIntegration tests FAILED: FAILURES!!!"
 
         # Kill all emulators
         ../scripts/kill_emulators.sh
