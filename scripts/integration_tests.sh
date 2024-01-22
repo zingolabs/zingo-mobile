@@ -349,11 +349,13 @@ else
             &> "${test_report_dir}/additional_test_output.txt"
     fi
 
+    echo -e "\nFAILURES!!!"
+
     echo -e "\nTest reports saved: android/${test_report_dir}"
     
     code=$(cat "${test_report_dir}/test_results.txt" | grep INSTRUMENTATION_CODE: | cut -d' ' -f2 | tr -d ' ')
     echo "code: ${code}"
-    if [ "${code}" != "-1" ] || [ -n "$(cat "${test_report_dir}/test_results.txt" | grep "FAILURES!!!")"]; then
+    if [ "${code}" != "-1" ] || [ -n "$(cat "${test_report_dir}/test_results.txt" | grep "FAILURES!!!")" ]; then
         echo -e "\nIntegration tests FAILED"
 
         # Kill all emulators
