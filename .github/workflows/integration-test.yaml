@@ -261,7 +261,7 @@ jobs:
       - name: Cache Docker images
         uses: ScribeMD/docker-cache@0.3.6
         with:
-          key: docker-ci-regchest:007
+          key: docker-ci-regchest-007
 
       - name: Pull regchest docker image
         run: docker pull zingodevops/regchest:007
