@@ -349,8 +349,6 @@ else
             &> "${test_report_dir}/additional_test_output.txt"
     fi
 
-    echo -e "\nFAILURES!!!"
-
     echo -e "\nTest reports saved: android/${test_report_dir}"
     
     code=$(cat "${test_report_dir}/test_results.txt" | grep INSTRUMENTATION_CODE: | cut -d' ' -f2 | tr -d ' ')
