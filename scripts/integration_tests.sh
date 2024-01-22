@@ -15,7 +15,7 @@ valid_api_targets=("default" "google_apis" "google_apis_playstore" "google_atd" 
 timeout_seconds=7200  # default timeout set to 2 horas
 
 function cleanup() {
-    echo -e "\n $1 $2 $3"
+    echo -e "\nline: $1... command: $2...  code exit: $3..."
     echo -e "\nError - Cleanup start! - trap"
 
     # Kill all emulators
