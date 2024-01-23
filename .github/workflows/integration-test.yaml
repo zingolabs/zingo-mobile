@@ -112,6 +112,9 @@ jobs:
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
 
+      - name: bash
+        run: which bash
+
       - name: Install protoc
         run: brew install protobuf
 
