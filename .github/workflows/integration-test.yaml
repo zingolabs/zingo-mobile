@@ -254,7 +254,7 @@ jobs:
           echo "NEXTEST-ABI=arm32" >> $GITHUB_ENV
 
       - name: Symbolic Link to /usr/bin/bash
-        run: ln -s /bin/bash /usr/bin/bash
+        run: sudo ln -s /bin/bash /usr/bin/bash
 
       - name: Add emulator to PATH
         run: echo "${ANDROID_SDK_ROOT}/emulator" >> $GITHUB_PATH
