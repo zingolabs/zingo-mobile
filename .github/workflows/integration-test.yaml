@@ -112,10 +112,6 @@ jobs:
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
 
-      - name: Add Bash to PATH
-        run: |
-          echo "/bin/bash" >> $GITHUB_PATH
-
       - name: Install protoc
         run: brew install protobuf
 
@@ -257,6 +253,12 @@ jobs:
           echo "AVD-ARCH=x86" >> $GITHUB_ENV
           echo "NEXTEST-ABI=arm32" >> $GITHUB_ENV
 
+      - name: Add Bash to PATH
+        run: echo "/bin/bash" >> $GITHUB_PATH
+
+      - name: Add emulator to PATH
+        run: echo "${ANDROID_SDK_ROOT}/emulator" >> $GITHUB_PATH
+
       - name: Install docker
         run: |
           brew install docker
@@ -302,9 +304,6 @@ jobs:
             ~/.android/avd/*
             ~/.android/adb*
           key: avd-${{ env.AVD-ARCH }}-integ
-      
-      - name: Add emulator to PATH
-        run: echo "${ANDROID_SDK_ROOT}/emulator" >> $GITHUB_PATH
             
       - name: Gradle cache
         uses: gradle/gradle-build-action@v2
