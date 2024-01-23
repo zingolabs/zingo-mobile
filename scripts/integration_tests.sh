@@ -288,14 +288,15 @@ else
     echo -e "\n\nWaiting for emulator to launch..."
     nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
         -no-snapshot-load -port 5554 &> "${test_report_dir}/emulator.txt" &
-    wait_for $timeout_seconds check_launch
-    echo "$(adb devices | grep emulator-5554 | cut -f1) launch successful"
-    wait_for $timeout_seconds check_device_online
-    echo -e "\nDevice online"
+    #wait_for $timeout_seconds check_launch
+    #echo "$(adb devices | grep emulator-5554 | cut -f1) launch successful"
+    #wait_for $timeout_seconds check_device_online
+    #echo -e "\nDevice online"
 
-    echo -e "\nWaiting for AVD to boot..."
-    wait_for $timeout_seconds check_boot
-    echo $(adb -s emulator-5554 emu avd name | head -1)
+    #echo -e "\nWaiting for AVD to boot..."
+    #wait_for $timeout_seconds check_boot
+    #echo $(adb -s emulator-5554 emu avd name | head -1)
+    adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed | tr -d '\r') ]]; do sleep 1; done'
     echo "Boot completed" 
     sleep 1
 
