@@ -183,7 +183,7 @@ jobs:
         with:
           timeout_minutes: 120
           max_attempts: 3
-          command: ./scripts/integration_tests.sh -a ${{ env.ABI }} -e ExecuteSyncFromSeed
+          command: ./scripts/integration_tests.sh -a ${{ env.ABI }} -e ExecuteSaplingBalanceFromSeed
 
       - name: Upload test reports
         if: always()
