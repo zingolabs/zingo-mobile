@@ -22,7 +22,7 @@ test_name_default="OfflineTestSuite"
 valid_api_levels=("23" "24" "25" "26" "27" "28" "29" "30" "31" "32" "33" "34")
 valid_api_targets=("default" "google_apis" "google_apis_playstore" "google_atd" "google-tv" \
     "aosp_atd" "android-tv" "android-desktop" "android-wear" "android-wear-cn")
-timeout_seconds=7200  # default timeout set to 2 horas
+timeout_seconds=600  # default timeout set to 10 minutes
 
 function check_launch() {
     emulator_status=$(adb devices | grep emulator-5554 | cut -f1)
@@ -133,7 +133,7 @@ while getopts 'a:Al:e:t:sx:h' OPTION; do
             echo -e "\n  -s\t\tCreate an AVD and snapshot for quick-boot (optional)"
             echo -e "      \t\t  Does not run integration tests"
             echo -e "\n  -x\t\tSet timeout in seconds for emulator launch and AVD boot-up (optional)"
-            echo -e "      \t\t  Default: 7200"
+            echo -e "      \t\t  Default: 600 (10 min)"
             echo -e "      \t\t  Must be an integer"
             echo -e "\nExamples:"
             echo -e "  '$(basename $0) -a x86_64 -s'\tCreates an AVD and quick-boot snapshot for x86_64 ABI"
@@ -248,7 +248,7 @@ if [[ $create_snapshot == true ]]; then
     echo no | avdmanager create avd --force --name "${avd_name}" --package "${sdk}"
 
     echo -e "\n\nWaiting for emulator to launch..."
-    nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
+    nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -accel on -gpu swiftshader_indirect -no-boot-anim \
         -no-snapshot-load -port 5554 &> /dev/null &
     wait_for $timeout_seconds check_launch
     echo "$(adb devices | grep emulator-5554 | cut -f1) launch successful"
@@ -286,17 +286,17 @@ else
     mkdir -p "${test_report_dir}"
 
     echo -e "\n\nWaiting for emulator to launch..."
-    nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
+    nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -accel on -gpu swiftshader_indirect -no-boot-anim \
         -no-snapshot-load -port 5554 &> "${test_report_dir}/emulator.txt" &
-    #wait_for $timeout_seconds check_launch
-    #echo "$(adb devices | grep emulator-5554 | cut -f1) launch successful"
-    #wait_for $timeout_seconds check_device_online
-    #echo -e "\nDevice online"
+    wait_for $timeout_seconds check_launch
+    echo "$(adb devices | grep emulator-5554 | cut -f1) launch successful"
+    wait_for $timeout_seconds check_device_online
+    echo -e "\nDevice online"
 
-    #echo -e "\nWaiting for AVD to boot..."
-    #wait_for $timeout_seconds check_boot
-    #echo $(adb -s emulator-5554 emu avd name | head -1)
-    adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed | tr -d '\r') ]]; do sleep 1; done'
+    echo -e "\nWaiting for AVD to boot..."
+    wait_for $timeout_seconds check_boot
+    echo $(adb -s emulator-5554 emu avd name | head -1)
+    #adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed | tr -d '\r') ]]; do sleep 1; done'
     echo "Boot completed" 
     sleep 1
 
