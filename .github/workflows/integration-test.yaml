@@ -112,8 +112,9 @@ jobs:
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
 
-      - name: bash
-        run: which bash
+      - name: Add Bash to PATH
+        run: |
+          echo "/bin/bash" >> $GITHUB_PATH
 
       - name: Install protoc
         run: brew install protobuf
