@@ -253,21 +253,10 @@ jobs:
           echo "AVD-ARCH=x86" >> $GITHUB_ENV
           echo "NEXTEST-ABI=arm32" >> $GITHUB_ENV
 
-      - name: Symbolic Link to /usr/bin/bash
-        run: sudo ln -s /bin/bash /usr/bin/bash
-
-      - name: Add emulator to PATH
-        run: echo "${ANDROID_SDK_ROOT}/emulator" >> $GITHUB_PATH
-
       - name: Install docker
         run: |
           brew install docker
           colima start
-
-      - name: Cache Docker images
-        uses: ScribeMD/docker-cache@0.3.6
-        with:
-          key: docker-ci-regchest-007
 
       - name: Pull regchest docker image
         run: docker pull zingodevops/regchest:007
@@ -304,6 +293,9 @@ jobs:
             ~/.android/avd/*
             ~/.android/adb*
           key: avd-${{ env.AVD-ARCH }}-integ
+      
+      - name: Add emulator to PATH
+        run: echo "${ANDROID_SDK_ROOT}/emulator" >> $GITHUB_PATH
             
       - name: Gradle cache
         uses: gradle/gradle-build-action@v2
