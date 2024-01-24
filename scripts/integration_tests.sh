@@ -367,9 +367,9 @@ else
 
         exit 1
     fi
-    failss=$(cat "${test_report_dir}/test_results.txt" | grep 'FAILURES!!!' | cut -d' ' -f1 | tr -d ' ')
+    failss=$(grep -c 'FAILURES!!!' ${test_report_dir}/test_results.txt)
     echo "fails: ${failss}"
-    if [ "${failss}" = "FAILURES!!!" ]; then
+    if [ "${failss}" != "0" ]; then
         echo -e "\nIntegration tests FAILED: FAILURES!!!"
 
         # Kill all emulators
