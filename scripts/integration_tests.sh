@@ -367,7 +367,7 @@ else
 
         exit 1
     fi
-    failss=$(cat "${test_report_dir}/test_results.txt" | grep FAILURES!!! | cut -d' ' -f1 | tr -d ' ')
+    failss=$(cat "${test_report_dir}/test_results.txt" | grep 'FAILURES!!!' | cut -d' ' -f1 | tr -d ' ')
     echo "fails: ${failss}"
     if [ "${failss}" = "FAILURES!!!" ]; then
         echo -e "\nIntegration tests FAILED: FAILURES!!!"
