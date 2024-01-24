@@ -60,6 +60,11 @@ function wait_for() {
     done
     if [ $timeout_seconds -le 0 ]; then
         echo -e "\nError: Timeout" >&2
+        echo -e "\nError: Timeout"
+
+        # Kill all emulators
+        ../scripts/kill_emulators.sh
+        
         exit 1
     fi
 }
