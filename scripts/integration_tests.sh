@@ -1,7 +1,7 @@
 #!/bin/bash
 set -Eeuo pipefail
 function cleanup() {
-    echo -e "\nline: $1... command: $2...  code exit: $3..."
+    echo -e "\nline: $1... \ncommand: $2...  \ncode exit: $3..."
     echo -e "\nError - Cleanup start! - trap"
 
     # Kill all emulators
