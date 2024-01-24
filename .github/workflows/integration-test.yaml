@@ -182,7 +182,7 @@ jobs:
         uses: nick-fields/retry@v2
         with:
           timeout_minutes: 120
-          max_attempts: 5
+          max_attempts: 3
           command: ./scripts/integration_tests.sh -a ${{ env.ABI }} -e ExecuteSaplingBalanceFromSeed
 
       - name: Upload test reports
@@ -373,7 +373,7 @@ jobs:
         uses: nick-fields/retry@v2
         with:
           timeout_minutes: 120
-          max_attempts: 5
+          max_attempts: 3
           command: ./scripts/integration_tests.sh -a ${{ env.ABI }} -s
 
       - name: AVD cache snapshot

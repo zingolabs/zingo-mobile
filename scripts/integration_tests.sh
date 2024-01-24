@@ -168,7 +168,7 @@ fi
 case "$abi" in
     x86_64)
         api_level_default="30"
-        api_target_default="google_apis_playstore"
+        api_target_default="default"
         if [[ $intel_host_os == true ]]; then       
             arch="x86_64"
         else
@@ -177,7 +177,7 @@ case "$abi" in
         ;;
     x86) 
         api_level_default="30"
-        api_target_default="google_apis_playstore"
+        api_target_default="default"
         if [[ $intel_host_os == true ]]; then       
             arch="x86"
         else
@@ -186,7 +186,7 @@ case "$abi" in
         ;;
     arm64-v8a)
         api_level_default="30"
-        api_target_default="google_apis_playstore"
+        api_target_default="default"
         if [[ $intel_host_os == true ]]; then       
             arch="x86_64"
         else
@@ -195,7 +195,7 @@ case "$abi" in
         ;;
     armeabi-v7a)
         api_level_default="30"
-        api_target_default="google_apis_playstore"
+        api_target_default="default"
         if [[ $intel_host_os == true ]]; then       
             arch="x86"
         else
