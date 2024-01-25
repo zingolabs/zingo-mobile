@@ -65,7 +65,7 @@ function wait_for() {
         ../scripts/kill_emulators.sh
 
         # remove the lock files of the device
-        rm "$HOME/.android/avd/${avd_name}.avd/*.lock"
+        rm -f ~/.android/avd/*.avd/*.lock
         
         exit 1
     fi
@@ -247,8 +247,8 @@ sdk="system-images;android-${api_level};${api_target};${arch}"
 sdkmanager --install "${sdk}"
 echo y | sdkmanager --licenses
 
-# Kill all emulators
-#../scripts/kill_emulators.sh
+# Kill all emulators, just in case.
+../scripts/kill_emulators.sh
 
 if [[ $create_snapshot == true ]]; then
     echo -e "\nCreating AVD..."
@@ -280,7 +280,7 @@ else
     if [ "${trimmed_count}" = "1" ]; then
         echo "AVD found: ${avd_name}"
         # remove the lock files of the device, just in case.
-        rm "$HOME/.android/avd/${avd_name}.avd/*.lock"
+        rm -f ~/.android/avd/*.avd/*.lock
     else
         echo "AVD not found"
         echo -e "\nCreating AVD..."
@@ -305,7 +305,6 @@ else
     echo -e "\nWaiting for AVD to boot..."
     wait_for $timeout_seconds check_boot
     echo $(adb -s emulator-5554 emu avd name | head -1)
-    #adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed | tr -d '\r') ]]; do sleep 1; done'
     echo "Boot completed" 
     sleep 1
 
