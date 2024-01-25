@@ -21,7 +21,7 @@ pub fn android_integration_test(abi: &str, test_name: &str) -> (i32, String, Str
         .arg(format!(
             r#"
             cd $(git rev-parse --show-toplevel)
-            ./scripts/integration_tests.sh -a {} -e {} > ./rust/rust-sh.txt 2> ./rust/rust-sh-errors.txt
+            ./scripts/integration_tests.sh -a {} -e {} >> ./rust/rust-sh.txt 2>> ./rust/rust-sh-errors.txt
             "#,
             abi, test_name
         ))
@@ -34,7 +34,7 @@ pub fn android_integration_test(abi: &str, test_name: &str) -> (i32, String, Str
         .arg(format!(
             r#"
             cd $(git rev-parse --show-toplevel)
-            ./scripts/integration_tests.sh -a {} -e {} -A > ./rust/rust-sh.txt 2> ./rust/rust-sh-errors.txt
+            ./scripts/integration_tests.sh -a {} -e {} -A >> ./rust/rust-sh.txt 2>> ./rust/rust-sh-errors.txt
             "#,
             abi, test_name
         ))
