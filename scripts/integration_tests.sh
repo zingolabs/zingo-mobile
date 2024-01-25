@@ -373,7 +373,7 @@ else
     # force a failure
     echo -e "FAILURES!!!"
 
-    if [ "$(grep -c "FAILURES\!\!\!" "${test_report_dir}/test_results.txt")" != "0" ]; then
+    if [ "$(grep -c "FAILURES!!!" "${test_report_dir}/test_results.txt")" != "0" ]; then
         echo -e "\nIntegration tests FAILED: FAILURES!!!"
 
         # Kill all emulators
