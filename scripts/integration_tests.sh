@@ -64,6 +64,9 @@ function wait_for() {
 
         # Kill all emulators
         ../scripts/kill_emulators.sh
+
+        # remove the lock files of the device
+        rm "~/.android/avd/${avd_name}.avd/*.lock" &> /dev/null
         
         exit 1
     fi
@@ -277,6 +280,8 @@ else
     trimmed_count=$(echo "${count}" | tr -d ' ')
     if [ "${trimmed_count}" = "1" ]; then
         echo "AVD found: ${avd_name}"
+        # remove the lock files of the device, just in case.
+        rm "~/.android/avd/${avd_name}.avd/*.lock" &> /dev/null
     else
         echo "AVD not found"
         echo -e "\nCreating AVD..."

@@ -18,7 +18,7 @@ function wait_for() {
       timeout=$(( timeout - 1 ))
   done
   if [ $timeout -le 0 ]; then
-      echo "Failed due to timeout"
+      echo -e "\nKill emulator Failed due to timeout"
       return 1;
   fi
 }
@@ -28,7 +28,7 @@ until ! adb devices | grep -q emulator; do
     emulator_id=$(adb devices | grep emulator | tail -1 | cut -f1)
     adb -s $emulator_id emu kill &> /dev/null
     echo -e "\nWaiting for ${emulator_id} to shutdown..."
-    if wait_for 10 check_kill $emulator_id; then
-        echo "Successfully shutdown ${emulator_id}."
+    if wait_for 30 check_kill $emulator_id; then
+        echo -e "\nSuccessfully shutdown ${emulator_id}."
     fi
 done
