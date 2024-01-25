@@ -367,7 +367,7 @@ else
 
         exit 1
     fi
-    failss=$(grep -c 'FAILURES\!\!\!' "${test_report_dir}/test_results.txt")
+    failss=$(grep -c "FAILURES\!\!\!" "${test_report_dir}/test_results.txt")
     echo "fails: ${failss}"
     if [ "${failss}" != "0" ]; then
         echo -e "\nIntegration tests FAILED: FAILURES!!!"
