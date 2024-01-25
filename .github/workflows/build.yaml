@@ -101,6 +101,7 @@ jobs:
       - name: Cargo cache
         uses: Swatinem/rust-cache@v2
         with:
+          shared-key: ${{ env.TARGET }}
           workspaces: rust
       
       - name: Cargo build

@@ -372,6 +372,7 @@ jobs:
       - name: Cargo cache
         uses: Swatinem/rust-cache@v2
         with:
+          shared-key: ${{ env.ABI }}
           workspaces: rust
 
       - name: Build and archive tests
@@ -564,6 +565,7 @@ jobs:
       - name: Cargo cache
         uses: Swatinem/rust-cache@v2
         with:
+          shared-key: ${{ env.ABI }}
           workspaces: rust
 
       - name: Run integration tests
