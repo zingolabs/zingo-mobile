@@ -561,6 +561,9 @@ jobs:
           name: nextest-archive-${{ env.ABI }}
           path: ./rust
 
+      - name: Cargo cache
+        uses: Swatinem/rust-cache@v2
+
       - name: Run integration tests
         working-directory: ./rust
         run: |
