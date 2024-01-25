@@ -54,19 +54,18 @@ function check_device_online() {
 function wait_for() {
     timeout_seconds=$1
     shift 1
-    until [ $timeout_seconds -le 0 ] || ("$@" &> /dev/null); do
+    until [ $timeout_seconds -le 0 ] || ("$@" > /dev/null 2> /dev/null); do
         sleep 1
         timeout_seconds=$(( timeout_seconds - 1 ))
     done
     if [ $timeout_seconds -le 0 ]; then
-        echo -e "\nError: Timeout" >&2
         echo -e "\nError: Timeout"
 
         # Kill all emulators
         ../scripts/kill_emulators.sh
 
         # remove the lock files of the device
-        rm "~/.android/avd/${avd_name}.avd/*.lock"
+        rm "$HOME/.android/avd/${avd_name}.avd/*.lock"
         
         exit 1
     fi
@@ -91,8 +90,8 @@ while getopts 'a:Al:e:t:sx:h' OPTION; do
             # Check API level is valid
             # tr -d '-' is used to remove all hyphons as they count as word boundaries for grep
             if [[ $(echo ${valid_api_levels[@]} | tr -d '-' | grep -ow "$(echo ${api_level} | tr -d '-')" | wc -w) != 1 ]]; then
-                echo "Error: Invalid API level" >&2
-                echo "Try '$(basename $0) -h' for more information." >&2
+                echo "Error: Invalid API level"
+                echo "Try '$(basename $0) -h' for more information."
                 exit 1
             fi
                         
@@ -104,8 +103,8 @@ while getopts 'a:Al:e:t:sx:h' OPTION; do
             # Check API target is valid
             # tr -d '-' is used to remove all hyphons as they count as word boundaries for grep
             if [[ $(echo ${valid_api_targets[@]} | tr -d '-' | grep -ow "$(echo ${api_target} | tr -d '-')" | wc -w) != 1 ]]; then
-                echo "Error: Invalid API target" >&2
-                echo "Try '$(basename $0) -h' for more information." >&2
+                echo "Error: Invalid API target"
+                echo "Try '$(basename $0) -h' for more information."
                 exit 1
             fi
                         
@@ -118,7 +117,7 @@ while getopts 'a:Al:e:t:sx:h' OPTION; do
             timeout_seconds="$OPTARG"
             
             if [ -z "${timeout_seconds##*[!0-9]*}" ]; then
-                echo "Error: Timeout must be an integer" >&2
+                echo "Error: Timeout must be an integer"
                 exit 1
             fi
             ;;
@@ -157,14 +156,14 @@ while getopts 'a:Al:e:t:sx:h' OPTION; do
             exit 1
             ;;
         ?)
-            echo "Try '$(basename $0) -h' for more information." >&2
+            echo "Try '$(basename $0) -h' for more information."
             exit 1
             ;;
     esac
 done
 if [[ $set_abi == false ]]; then 
-    echo "Error: ABI not specified" >&2
-    echo "Try '$(basename $0) -h' for more information." >&2
+    echo "Error: ABI not specified"
+    echo "Try '$(basename $0) -h' for more information."
     exit 1
 fi
 
@@ -206,8 +205,8 @@ case "$abi" in
         fi
         ;;
     *)
-        echo "Error: Invalid ABI" >&2
-        echo "Try '$(basename $0) -h' for more information." >&2
+        echo "Error: Invalid ABI"
+        echo "Try '$(basename $0) -h' for more information."
         exit 1
         ;;
 esac
@@ -225,8 +224,8 @@ fi
 
 # Setup working directory
 if [ ! -d "./android/app" ]; then
-    echo "Error: Incorrect working directory" >&2
-    echo "Try './scripts/$(basename $0)' from zingo-mobile root directory." >&2
+    echo "Error: Incorrect working directory"
+    echo "Try './scripts/$(basename $0)' from zingo-mobile root directory."
     exit 1
 fi
 
@@ -249,7 +248,7 @@ sdkmanager --install "${sdk}"
 echo y | sdkmanager --licenses
 
 # Kill all emulators
-../scripts/kill_emulators.sh
+#../scripts/kill_emulators.sh
 
 if [[ $create_snapshot == true ]]; then
     echo -e "\nCreating AVD..."
@@ -257,7 +256,7 @@ if [[ $create_snapshot == true ]]; then
 
     echo -e "\n\nWaiting for emulator to launch..."
     nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
-        -no-snapshot-load -port 5554 &> /dev/null &
+        -no-snapshot-load -port 5554 > /dev/null 2> /dev/null
     wait_for $timeout_seconds check_launch
     echo "$(adb devices | grep emulator-5554 | cut -f1) launch successful"
     wait_for $timeout_seconds check_device_online
@@ -281,7 +280,7 @@ else
     if [ "${trimmed_count}" = "1" ]; then
         echo "AVD found: ${avd_name}"
         # remove the lock files of the device, just in case.
-        rm "~/.android/avd/${avd_name}.avd/*.lock"
+        rm "$HOME/.android/avd/${avd_name}.avd/*.lock"
     else
         echo "AVD not found"
         echo -e "\nCreating AVD..."
@@ -297,7 +296,7 @@ else
 
     echo -e "\n\nWaiting for emulator to launch..."
     nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
-        -no-snapshot-load -port 5554 &>> "${test_report_dir}/emulator.txt" &
+        -no-snapshot-load -port 5554 >> "${test_report_dir}/emulator.txt" 2>> "${test_report_dir}/emulator.txt"
     wait_for $timeout_seconds check_launch
     echo "$(adb devices | grep emulator-5554 | cut -f1) launch successful"
     wait_for $timeout_seconds check_device_online
@@ -325,13 +324,13 @@ else
     until [[ $step_complete == true ]]; do
         if adb -s emulator-5554 install-multi-package -r -t -d --abi "${abi}" \
                 "app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk" \
-                "app/build/outputs/apk/debug/app-${abi}-debug.apk" &>> "${test_report_dir}/apk_installation.txt"; then
+                "app/build/outputs/apk/debug/app-${abi}-debug.apk" >> "${test_report_dir}/apk_installation.txt" 2>> "${test_report_dir}/apk_installation.txt"; then
             step_complete=true
             echo "Successfully installed APKs"
         fi              
         if [[ $i -ge 100 ]]; then
-            echo "Error: Failed to install APKs" >&2
-            echo "For more information see 'android/${test_report_dir}/apk_installation.txt'" >&2
+            echo "Error: Failed to install APKs"
+            echo "For more information see 'android/${test_report_dir}/apk_installation.txt'"
             exit 1
         fi
         i=$((i+1))
@@ -339,10 +338,10 @@ else
     done
 
     # Store emulator info and start logging
-    adb -s emulator-5554 shell getprop &>> "${test_report_dir}/getprop.txt"
-    adb -s emulator-5554 shell cat /proc/meminfo &>> "${test_report_dir}/meminfo.txt"
-    adb -s emulator-5554 shell cat /proc/cpuinfo &>> "${test_report_dir}/cpuinfo.txt"
-    nohup adb -s emulator-5554 shell logcat -v threadtime -b main &>> "${test_report_dir}/logcat.txt" &
+    adb -s emulator-5554 shell getprop >> "${test_report_dir}/getprop.txt" 2>> "${test_report_dir}/getprop.txt"
+    adb -s emulator-5554 shell cat /proc/meminfo >> "${test_report_dir}/meminfo.txt" 2>> "${test_report_dir}/meminfo.txt"
+    adb -s emulator-5554 shell cat /proc/cpuinfo >> "${test_report_dir}/cpuinfo.txt" 2>> "${test_report_dir}/cpuinfo.txt"
+    nohup adb -s emulator-5554 shell logcat -v threadtime -b main >> "${test_report_dir}/logcat.txt" 2>> "${test_report_dir}/logcat.txt"
 
     # Create additional test output directory
     adb -s emulator-5554 shell rm -rf "/sdcard/Android/media/org.ZingoLabs.Zingo/additional_test_output"
@@ -352,12 +351,12 @@ else
     adb -s emulator-5554 shell am instrument -w -r -e class org.ZingoLabs.Zingo.$test_name \
         -e additionalTestOutputDir /sdcard/Android/media/org.ZingoLabs.Zingo/additional_test_output \
         -e testTimeoutSeconds 7200 org.ZingoLabs.Zingo.test/androidx.test.runner.AndroidJUnitRunner \
-        | tee -a "${test_report_dir}/test_results.txt"
+        2>&1 | tee -a "${test_report_dir}/test_results.txt"
 
     # Store additional test outputs
-    if [ -n "$(adb -s emulator-5554 shell ls -A /sdcard/Android/media/org.ZingoLabs.Zingo/additional_test_output 2>/dev/null)" ]; then
+    if [ -n "$(adb -s emulator-5554 shell ls -A /sdcard/Android/media/org.ZingoLabs.Zingo/additional_test_output > /dev/null 2> /dev/null)" ]; then
         adb -s emulator-5554 shell cat /sdcard/Android/media/org.ZingoLabs.Zingo/additional_test_output/* \
-            &>> "${test_report_dir}/additional_test_output.txt"
+            >> "${test_report_dir}/additional_test_output.txt" 2>> "${test_report_dir}/additional_test_output.txt"
     fi
 
     echo -e "\nTest reports saved: android/${test_report_dir}"
