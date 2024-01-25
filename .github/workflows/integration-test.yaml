@@ -563,6 +563,8 @@ jobs:
 
       - name: Cargo cache
         uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust
 
       - name: Run integration tests
         working-directory: ./rust
