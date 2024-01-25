@@ -464,8 +464,10 @@ jobs:
 
   integration-test:
     name: Integration test
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     timeout-minutes: 120
+    container:
+      image: zingodevops/regchest:007
     needs: [ build-test-artifacts, avd-snapshot-cache ]
     strategy:
       matrix:
@@ -504,13 +506,11 @@ jobs:
           echo "AVD-ARCH=x86" >> $GITHUB_ENV
           echo "NEXTEST-ABI=arm32" >> $GITHUB_ENV
 
-      - name: Install docker
+      - name: Enable KVM
         run: |
-          brew install docker
-          colima start
-
-      - name: Pull regchest docker image
-        run: docker pull zingodevops/regchest:007
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
 
       - name: Install nextest
         uses: taiki-e/install-action@nextest
