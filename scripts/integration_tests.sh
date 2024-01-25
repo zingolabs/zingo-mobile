@@ -7,6 +7,9 @@ function cleanup() {
     # Kill all emulators
     ../scripts/kill_emulators.sh
 
+    # remove the lock files of the device
+    rm -f ~/.android/avd/*.avd/*.lock
+
     echo -e "\nError - Cleanup done! - trap"
     exit 1
 }
@@ -250,6 +253,9 @@ echo y | sdkmanager --licenses
 # Kill all emulators, just in case.
 ../scripts/kill_emulators.sh
 
+# remove the lock files of the device
+rm -f ~/.android/avd/*.avd/*.lock
+
 if [[ $create_snapshot == true ]]; then
     echo -e "\nCreating AVD..."
     echo no | avdmanager create avd --force --name "${avd_name}" --package "${sdk}"
@@ -368,6 +374,9 @@ else
         # Kill all emulators
         ../scripts/kill_emulators.sh
 
+        # remove the lock files of the device
+        rm -f ~/.android/avd/*.avd/*.lock
+
         exit 1
     fi
 
@@ -376,6 +385,9 @@ else
 
         # Kill all emulators
         ../scripts/kill_emulators.sh
+
+        # remove the lock files of the device
+        rm -f ~/.android/avd/*.avd/*.lock
 
         exit 1
     fi
@@ -386,3 +398,5 @@ fi
 # Kill all emulators
 ../scripts/kill_emulators.sh
 
+# remove the lock files of the device
+rm -f ~/.android/avd/*.avd/*.lock
