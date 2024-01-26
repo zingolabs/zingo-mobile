@@ -298,11 +298,13 @@ else
     # Create integration test report directory
     test_report_dir="app/build/outputs/integration_test_reports/${abi}"
     #rm -rf "${test_report_dir}"
-    #mkdir -p "${test_report_dir}"
+    if [ ! -d "${test_report_dir}" ]; then
+        mkdir -p "${test_report_dir}"
+    fi
 
     echo -e "\n\nWaiting for emulator to launch..."
     nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
-        -no-snapshot -no-snapshot-load -no-snapshot-save -port 5554 &>> "${test_report_dir}/emulator.txt" &
+        -no-snapshot -no-snapshot-load -no-snapshot-save -port 5554 &> "${test_report_dir}/emulator.txt" &
     wait_for $timeout_seconds check_launch
     echo "$(adb devices | grep emulator-5554 | cut -f1) launch successful"
     wait_for $timeout_seconds check_device_online
@@ -329,7 +331,7 @@ else
     until [[ $step_complete == true ]]; do
         if adb -s emulator-5554 install-multi-package -r -t -d --abi "${abi}" \
                 "app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk" \
-                "app/build/outputs/apk/debug/app-${abi}-debug.apk" &>> "${test_report_dir}/apk_installation.txt"; then
+                "app/build/outputs/apk/debug/app-${abi}-debug.apk" &> "${test_report_dir}/apk_installation.txt"; then
             step_complete=true
             echo "Successfully installed APKs"
         fi              
@@ -343,10 +345,10 @@ else
     done
 
     # Store emulator info and start logging
-    adb -s emulator-5554 shell getprop &>> "${test_report_dir}/getprop.txt"
-    adb -s emulator-5554 shell cat /proc/meminfo &>> "${test_report_dir}/meminfo.txt"
-    adb -s emulator-5554 shell cat /proc/cpuinfo &>> "${test_report_dir}/cpuinfo.txt"
-    nohup adb -s emulator-5554 shell logcat -v threadtime -b main &>> "${test_report_dir}/logcat.txt"
+    adb -s emulator-5554 shell getprop &> "${test_report_dir}/getprop.txt"
+    adb -s emulator-5554 shell cat /proc/meminfo &> "${test_report_dir}/meminfo.txt"
+    adb -s emulator-5554 shell cat /proc/cpuinfo &> "${test_report_dir}/cpuinfo.txt"
+    nohup adb -s emulator-5554 shell logcat -v threadtime -b main &> "${test_report_dir}/logcat.txt" &
 
     # Create additional test output directory
     adb -s emulator-5554 shell rm -rf "/sdcard/Android/media/org.ZingoLabs.Zingo/additional_test_output"
@@ -361,7 +363,7 @@ else
     # Store additional test outputs
     if [ -n "$(adb -s emulator-5554 shell ls -A /sdcard/Android/media/org.ZingoLabs.Zingo/additional_test_output 2> /dev/null)" ]; then
         adb -s emulator-5554 shell cat /sdcard/Android/media/org.ZingoLabs.Zingo/additional_test_output/* \
-            &>> "${test_report_dir}/additional_test_output.txt"
+            &> "${test_report_dir}/additional_test_output.txt"
     fi
 
     echo -e "\nTest reports saved: android/${test_report_dir}"
