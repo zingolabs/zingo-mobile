@@ -261,8 +261,8 @@ if [[ $create_snapshot == true ]]; then
     echo no | avdmanager create avd --force --name "${avd_name}" --package "${sdk}"
 
     echo -e "\n\nWaiting for emulator to launch..."
-    nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
-        -no-snapshot -no-snapshot-load -no-snapshot-save -port 5554 &> /dev/null &
+    nohup emulator -avd "${avd_name}" -netfast -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
+        -no-snapshot-load -verbose -port 5554 &> /dev/null &
     wait_for $timeout_seconds check_launch
     echo "$(adb devices | grep emulator-5554 | cut -f1) launch successful"
     wait_for $timeout_seconds check_device_online
@@ -303,8 +303,8 @@ else
     fi
 
     echo -e "\n\nWaiting for emulator to launch..."
-    nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
-        -no-snapshot -no-snapshot-load -no-snapshot-save -port 5554 &> "${test_report_dir}/emulator.txt" &
+    nohup emulator -avd "${avd_name}" -netfast -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
+        -no-snapshot-load -verbose -port 5554 &> "${test_report_dir}/emulator.txt" &
     wait_for $timeout_seconds check_launch
     echo "$(adb devices | grep emulator-5554 | cut -f1) launch successful"
     wait_for $timeout_seconds check_device_online
