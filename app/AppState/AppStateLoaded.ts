@@ -13,7 +13,7 @@ import TransactionType from './types/TransactionType';
 import InfoType from './types/InfoType';
 import WalletType from './types/WalletType';
 import SyncingStatusClass from './classes/SyncingStatusClass';
-import zecPriceType from './types/zecPriceType';
+import ZecPriceType from './types/ZecPriceType';
 import BackgroundType from './types/BackgroundType';
 import { TranslateType } from './types/TranslateType';
 import NetInfoType from './types/NetInfoType';
@@ -104,7 +104,7 @@ export default interface AppStateLoaded {
   language: 'en' | 'es';
   currency: 'USD' | '';
 
-  zecPrice: zecPriceType;
+  zecPrice: ZecPriceType;
   sendAll: boolean;
   background: BackgroundType;
 

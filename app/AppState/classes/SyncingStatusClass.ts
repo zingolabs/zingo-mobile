@@ -30,7 +30,7 @@ export default class SyncingStatusClass {
   syncProcessStalled: boolean;
 
   constructor() {
-    this.syncID = 0;
+    this.syncID = -1;
     this.totalBatches = 0;
     this.currentBatch = 0;
     this.blocksPerBatch = 100; // this is set in zingolib

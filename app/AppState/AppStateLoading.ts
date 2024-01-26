@@ -4,7 +4,7 @@ import TotalBalanceClass from './classes/TotalBalanceClass';
 
 import InfoType from './types/InfoType';
 import WalletType from './types/WalletType';
-import zecPriceType from './types/zecPriceType';
+import ZecPriceType from './types/ZecPriceType';
 import BackgroundType from './types/BackgroundType';
 import { TranslateType } from './types/TranslateType';
 import NetInfoType from './types/NetInfoType';
@@ -29,7 +29,7 @@ export default interface AppStateLoading {
   currency: 'USD' | '';
   language: 'en' | 'es';
 
-  zecPrice: zecPriceType;
+  zecPrice: ZecPriceType;
   sendAll: boolean;
   background: BackgroundType;
 

@@ -89,7 +89,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
             {tx.type === 'Sent'
               ? (translate('history.sent') as string)
               : tx.type === 'Received'
-              ? (translate('history.receive') as string)
+              ? (translate('history.received') as string)
               : (translate('history.sendtoself') as string)}
           </BoldText>
           <ZecAmount

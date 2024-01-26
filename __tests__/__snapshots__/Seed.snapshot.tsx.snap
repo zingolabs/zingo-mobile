@@ -57,7 +57,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
             "borderRadius": 10,
             "borderWidth": 1,
             "margin": 10,
-            "maxHeight": "40%",
+            "maxHeight": "45%",
             "padding": 10,
           }
         }
@@ -387,7 +387,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
             "borderRadius": 10,
             "borderWidth": 1,
             "margin": 10,
-            "maxHeight": "40%",
+            "maxHeight": "45%",
             "padding": 10,
           }
         }
@@ -717,7 +717,7 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
             "borderRadius": 10,
             "borderWidth": 1,
             "margin": 10,
-            "maxHeight": "40%",
+            "maxHeight": "45%",
             "padding": 10,
           }
         }
@@ -988,7 +988,7 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
             "borderRadius": 10,
             "borderWidth": 1,
             "margin": 10,
-            "maxHeight": "40%",
+            "maxHeight": "45%",
             "padding": 10,
           }
         }
@@ -1297,7 +1297,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
             "borderRadius": 10,
             "borderWidth": 1,
             "margin": 10,
-            "maxHeight": "40%",
+            "maxHeight": "45%",
             "padding": 10,
           }
         }
@@ -1627,7 +1627,7 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
             "borderRadius": 10,
             "borderWidth": 1,
             "margin": 10,
-            "maxHeight": "40%",
+            "maxHeight": "45%",
             "padding": 10,
           }
         }

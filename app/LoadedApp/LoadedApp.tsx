@@ -40,7 +40,7 @@ import {
   SendProgressClass,
   WalletSettingsClass,
   AddressClass,
-  zecPriceType,
+  ZecPriceType,
   BackgroundType,
   TranslateType,
   ServerType,
@@ -369,6 +369,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
             if (this.rpc.getInRefresh()) {
               // I need to start again the App only if it is Syncing...
               this.navigateToLoadingApp({});
+            } else {
+              // restart the interval process again if it is not syncing...
+              await this.rpc.configure();
             }
           }
         }
@@ -505,21 +508,24 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
   };
 
   setTransactionList = async (transactions: TransactionType[]) => {
+    const basicFirstViewSeed = (await SettingsFileImpl.readSettings()).basicFirstViewSeed;
     // only for basic mode
     if (this.state.mode === 'basic') {
       // only if the user doesn't see the seed the first time
-      const basicFirstViewSeed = (await SettingsFileImpl.readSettings()).basicFirstViewSeed;
       if (!basicFirstViewSeed) {
         // only if the App are in foreground
         const background = await AsyncStorage.getItem('@background');
         // only if the wallet have some transactions
         if (background === 'no' && transactions.length > 0) {
           // I need to check this out in the seed screen.
-          // I will do this update later on
-          //await SettingsFileImpl.writeSettings('basicFirstViewSeed', true);
           await this.fetchWallet();
           this.setState({ seedViewModalVisible: true });
         }
+      }
+    } else {
+      // for advanced mode
+      if (!basicFirstViewSeed) {
+        await SettingsFileImpl.writeSettings('basicFirstViewSeed', true);
       }
     }
     if (deepDiff(this.state.transactions, transactions)) {
@@ -568,7 +574,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     const zecPrice = {
       zecPrice: newZecPrice,
       date: newDate,
-    } as zecPriceType;
+    } as ZecPriceType;
     if (!isEqual(this.state.zecPrice, zecPrice)) {
       //console.log('fetch zec price');
       this.setState({ zecPrice });
@@ -923,6 +929,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     await SettingsFileImpl.writeSettings(name, value);
     this.setState({
       mode: value as 'basic' | 'advanced',
+      poolsToShieldSelectSapling: true,
+      poolsToShieldSelectTransparent: true,
     });
 
     // Refetch the settings to update

@@ -14,7 +14,7 @@ import {
   WalletType,
   AddressClass,
   AddressBookClass,
-  zecPriceType,
+  ZecPriceType,
   BackgroundType,
   SendPageStateClass,
   ToAddrClass,
@@ -71,7 +71,7 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   zecPrice: {
     zecPrice: 0,
     date: 0,
-  } as zecPriceType,
+  } as ZecPriceType,
   sendAll: false,
   background: {
     batches: 0,
