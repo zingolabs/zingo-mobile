@@ -1117,6 +1117,7 @@ export default class RPC {
             this.seconds_batch = 0;
           }
           // save wallet every 15 seconds in the same batch.
+          /* altum suggestion - remove the mid-batch saving...
           if (this.seconds_batch > 0 && this.seconds_batch % 15 === 0) {
             // And fetch the rest of the data.
             await this.loadWalletData();
@@ -1146,6 +1147,7 @@ export default class RPC {
             //console.log('sync status', ss);
             //console.log(`@@@@@@@@@@@Saving wallet. seconds: ${this.seconds_batch}`);
           }
+          */
         }
       }, 5000);
       //console.log('create sync/rescan timer', this.syncStatusTimerID);
