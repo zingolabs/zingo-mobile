@@ -1091,22 +1091,6 @@ export default class RPC {
               await RPCModule.doSave();
               this.batches = 0;
 
-              // store SyncStatus object for a new screen
-              this.fnSetSyncingStatus({
-                syncID: this.sync_id,
-                totalBatches: batch_total,
-                currentBatch: ss.in_progress ? batch_num + 1 : 0,
-                lastBlockWallet: this.lastWalletBlockHeight,
-                currentBlock: current_block,
-                inProgress: ss.in_progress,
-                lastError: ss.last_error,
-                blocksPerBatch: this.blocksPerBatch,
-                secondsPerBatch: this.seconds_batch,
-                process_end_block: process_end_block,
-                lastBlockServer: this.lastServerBlockHeight,
-                syncProcessStalled: false,
-              } as SyncingStatusClass);
-
               //console.log('sync status', ss);
               //console.log(
               //  `@@@@@@@@@@@ Saving because batch num changed ${this.prevBatchNum} - ${batch_num}. seconds: ${this.seconds_batch}`,
