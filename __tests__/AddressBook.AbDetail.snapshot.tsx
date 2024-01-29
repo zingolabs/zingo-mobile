@@ -10,7 +10,6 @@ import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context'
 import { ThemeType } from '../app/types';
 import AbDetail from '../components/AddressBook/components/AbDetail';
 import { AddressBookFileClass } from '../app/AppState';
-import AddressBook from '../components/AddressBook/AddressBook';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({

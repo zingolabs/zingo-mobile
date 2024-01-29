@@ -13,7 +13,6 @@ import {
   InfoType,
   WalletType,
   AddressClass,
-  AddressBookClass,
   ZecPriceType,
   BackgroundType,
   SendPageStateClass,
