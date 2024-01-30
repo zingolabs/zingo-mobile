@@ -77,7 +77,7 @@ PODS:
   - hermes-engine (0.70.7)
   - libevent (2.1.12)
   - OpenSSL-Universal (1.1.1100)
-  - Permission-Camera (3.10.1):
+  - Permission-Camera (3.6.1):
     - RNPermissions
   - RCT-Folly (2021.07.22.00):
     - boost
@@ -317,9 +317,9 @@ PODS:
     - React-Core
   - react-native-netinfo (9.5.0):
     - React-Core
-  - react-native-pager-view (6.2.2):
+  - react-native-pager-view (6.2.3):
     - React-Core
-  - react-native-safe-area-context (4.7.4):
+  - react-native-safe-area-context (4.8.2):
     - React-Core
   - React-perflogger (0.70.7)
   - React-RCTActionSheet (0.70.7):
@@ -389,20 +389,20 @@ PODS:
     - React-perflogger (= 0.70.7)
   - ReactNativeART (1.2.0):
     - React
-  - RNCAsyncStorage (1.19.4):
+  - RNCAsyncStorage (1.21.0):
     - React-Core
-  - RNCCheckbox (0.5.16):
+  - RNCCheckbox (0.5.17):
     - BEMCheckBox (~> 1.4)
     - React-Core
   - RNCClipboard (1.5.1):
     - React-Core
   - RNFS (2.20.0):
     - React-Core
-  - RNGestureHandler (2.13.4):
+  - RNGestureHandler (2.14.1):
     - React-Core
   - RNLocalize (2.2.6):
     - React-Core
-  - RNPermissions (3.10.1):
+  - RNPermissions (3.6.1):
     - React-Core
   - RNReanimated (2.17.0):
     - DoubleConversion
@@ -431,7 +431,7 @@ PODS:
     - React-RCTText
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNScreens (3.27.0):
+  - RNScreens (3.29.0):
     - React-Core
     - React-RCTImage
   - RNSnackbar (2.6.2):
@@ -667,7 +667,7 @@ SPEC CHECKSUMS:
   hermes-engine: 566e656aa95456a3f3f739fd76ea9a9656f2633f
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
   OpenSSL-Universal: ebc357f1e6bc71fa463ccb2fe676756aff50e88c
-  Permission-Camera: 9b70902f34a83c10e198d2d01f0e453e58842776
+  Permission-Camera: bf6791b17c7f614b6826019fcfdcc286d3a107f6
   RCT-Folly: 0080d0a6ebf2577475bda044aa59e2ca1f909cda
   RCTRequired: 837880d26ec119e105317dc28a456f3016bf16d1
   RCTTypeSafety: 5c854c04c3383cab04f404e25d408ed52124b300
@@ -686,8 +686,8 @@ SPEC CHECKSUMS:
   react-native-camera: 3eae183c1d111103963f3dd913b65d01aef8110f
   react-native-keep-awake: ad1d67f617756b139536977a0bf06b27cec0714a
   react-native-netinfo: 48c5f79a84fbc3ba1d28a8b0d04adeda72885fa8
-  react-native-pager-view: 02a5c4962530f7efc10dd51ee9cdabeff5e6c631
-  react-native-safe-area-context: 2cd91d532de12acdb0a9cbc8d43ac72a8e4c897c
+  react-native-pager-view: c29d484f19c49ff19525a94105e4ab2c4d4ae273
+  react-native-safe-area-context: 0ee144a6170530ccc37a0fd9388e28d06f516a89
   React-perflogger: 52a94f38c19a518d05726624b49bfc192639374d
   React-RCTActionSheet: 7b89fe64a852bc3ae39b91dbd142ef09931ef3f7
   React-RCTAnimation: ad84bfbf8c5f6f77e65092d0c2b0506b80b5cf99
@@ -701,15 +701,15 @@ SPEC CHECKSUMS:
   React-runtimeexecutor: 7cec9ed92ebde8309902530bb566819645c84ee5
   ReactCommon: 0253d197eaa7f6689dcd3e7d5360449ab93e10df
   ReactNativeART: 78edc68dd4a1e675338cd0cd113319cf3a65f2ab
-  RNCAsyncStorage: 3a8f7145d17cdd9f88e7b77666c94a09e4f759c8
-  RNCCheckbox: 75255b03e604bbcc26411eb31c4cbe3e3865f538
+  RNCAsyncStorage: 618d03a5f52fbccb3d7010076bc54712844c18ef
+  RNCCheckbox: a3ca9978cb0846b981d28da4e9914bd437403d77
   RNCClipboard: 41d8d918092ae8e676f18adada19104fa3e68495
   RNFS: 4ac0f0ea233904cb798630b3c077808c06931688
-  RNGestureHandler: 360f9c7e91ec49ac76f03e73fb394d92e2a88e55
+  RNGestureHandler: e98441928705d9d1184b599d7c1c6df2dd4f7724
   RNLocalize: d4b8af4e442d4bcca54e68fc687a2129b4d71a81
-  RNPermissions: 4e3714e18afe7141d000beae3755e5b5fb2f5e05
+  RNPermissions: dcdb7b99796bbeda6975a6e79ad519c41b251b1c
   RNReanimated: bec7736122a268883bdede07f1bf9cf4b40158db
-  RNScreens: 2b19e2471db8a581c83f381f4ea5d43071c9a3bf
+  RNScreens: fa9b582d85ae5d62c91c66003b5278458fed7aaa
   RNSnackbar: 3727b42bf6c4314a53c18185b5203e915a4ab020
   RNSVG: d00c8f91c3cbf6d476451313a18f04d220d4f396
   SocketRocket: fccef3f9c5cedea1353a9ef6ada904fde10d6608
