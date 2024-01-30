@@ -27,13 +27,13 @@ jobs:
         run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
             
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
         
       - name: Check if native rust cache exists
         id: check-build-cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: android/app/src/main/jniLibs/${{ env.ARCH }}
           key: native-rust-${{ env.ARCH }}-${{ env.CACHE-KEY }}
@@ -58,7 +58,7 @@ jobs:
         run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
             
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
         
@@ -118,7 +118,7 @@ jobs:
         run: llvm-strip ./${{ env.TARGET }}/release/librust.so
       
       - name: Upload native rust
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ env.ARCH }}-${{ env.CACHE-KEY }}
           path: rust/target/${{ env.TARGET }}/release/librust.so
@@ -133,18 +133,18 @@ jobs:
         run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
             
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
             
       - name: Download native rust
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with: 
           name: ${{ env.ARCH }}-${{ env.CACHE-KEY }}
           path: android/app/src/main/jniLibs/${{ env.ARCH }}
       
       - name: Cache native rust
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: android/app/src/main/jniLibs/${{ env.ARCH }}
           key: native-rust-${{ env.ARCH }}-${{ env.CACHE-KEY }}

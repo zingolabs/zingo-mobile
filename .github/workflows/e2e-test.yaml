@@ -28,12 +28,12 @@ jobs:
         run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
             
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
         
       - name: Setup Java
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '18'
@@ -46,7 +46,7 @@ jobs:
           cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev'}}
       
       - name: AVD cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         id: avd-cache
         with: 
           path: |
@@ -55,7 +55,7 @@ jobs:
           key: avd-${{ matrix.arch }}-api-${{ matrix.api-level }}-e2e
 
       - name: Native rust cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: android/app/src/main/jniLibs/${{ matrix.arch }}
           key: native-rust-${{ matrix.arch }}-${{ env.CACHE-KEY }}
