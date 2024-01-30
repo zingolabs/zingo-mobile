@@ -573,7 +573,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         )}
         {!noDebugMode && debugMode && (
           <TouchableOpacity style={{ marginRight: 5 }} onPress={() => issueReportMoreInfoOnClick()}>
-            <FontAwesomeIcon icon={faBug} color={colors.zingo} size={20} />
+            <FontAwesomeIcon icon={faBug} color={'#A32CC4'} size={20} />
           </TouchableOpacity>
         )}
       </View>

@@ -818,7 +818,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                     {this.state.debugMode && (
                       <TouchableOpacity onPress={() => this.issueReportMoreInfoOnClick()}>
                         <View style={{ marginRight: 5 }}>
-                          <FontAwesomeIcon icon={faBug} color={colors.zingo} size={20} />
+                          <FontAwesomeIcon icon={faBug} color={'#A32CC4'} size={20} />
                         </View>
                       </TouchableOpacity>
                     )}

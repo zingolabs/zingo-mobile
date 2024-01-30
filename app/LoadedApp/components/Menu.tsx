@@ -204,7 +204,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuSt
             `settings.value-mode-${mode}`,
           )}`}</Text>
           {debugMode && (
-            <Text style={{ fontSize: 8, color: colors.primary, marginLeft: 5 }}>
+            <Text style={{ fontSize: 8, color: '#A32CC4', marginLeft: 5 }}>
               {translate('settings.debugmode-title') as string}
             </Text>
           )}
