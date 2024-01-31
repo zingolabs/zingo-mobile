@@ -32,6 +32,3 @@ until ! adb devices | grep -q emulator; do
         echo "Successfully shutdown ${emulator_id}."
     fi
 done
-
-# let's remove the lock files, just in case.
-rm -rf  ~/.android/avd/*.avd/*.lock
