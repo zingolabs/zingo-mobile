@@ -49,6 +49,8 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
     });
   };
 
+  console.log('tx', tx.txDetails);
+
   return (
     <SafeAreaView
       style={{
@@ -190,8 +192,12 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
                   borderTopColor: colors.text,
                   borderTopWidth: tx.txDetails.length > 1 ? 1 : 0,
                 }}>
-                <FadeText style={{ marginTop: 10 }}>{translate('history.address') as string}</FadeText>
-                {!!txd.address && <AddressItem address={txd.address} withIcon={true} />}
+                {!!txd.address && (
+                  <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: 10 }}>
+                    <FadeText>{translate('history.address') as string}</FadeText>
+                    <AddressItem address={txd.address} withIcon={true} />
+                  </View>
+                )}
 
                 {!!txd.pool && (
                   <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: 10 }}>
