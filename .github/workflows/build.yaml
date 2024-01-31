@@ -118,7 +118,7 @@ jobs:
         run: llvm-strip ./${{ env.TARGET }}/release/librust.so
       
       - name: Upload native rust
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ env.ARCH }}-${{ env.CACHE-KEY }}
           path: rust/target/${{ env.TARGET }}/release/librust.so
@@ -138,7 +138,7 @@ jobs:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
             
       - name: Download native rust
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v3
         with: 
           name: ${{ env.ARCH }}-${{ env.CACHE-KEY }}
           path: android/app/src/main/jniLibs/${{ env.ARCH }}

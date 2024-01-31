@@ -54,7 +54,7 @@ jobs:
         run: cargo nextest archive --verbose --features "ci regchest" --archive-file nextest-archive-${{ env.ABI }}.tar.zst
 
       - name: Upload archive
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: nextest-archive-${{ env.ABI }}
           path: ./rust/nextest-archive-${{ env.ABI }}.tar.zst
@@ -164,7 +164,7 @@ jobs:
           command: ./scripts/integration_tests.sh -a ${{ env.AVD-ARCH }} -s
 
       - name: Download archive
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v3
         with:
           name: nextest-archive-${{ env.ABI }}
           path: ./rust
@@ -178,7 +178,7 @@ jobs:
 
       - name: Upload test reports
         if: ${{ ! cancelled() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: test-reports-${{ env.ABI }}-${{ matrix.partition}}-${{ env.TIMESTAMP }}
           path: android/app/build/outputs/integration_test_reports
