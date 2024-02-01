@@ -180,19 +180,7 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
                       }
                     }
                   >
-                    hvkausdf
-                  </Text>
-                  <Text
-                    style={
-                      {
-                        "color": "rgb(28, 28, 30)",
-                        "fontSize": 18,
-                        "fontWeight": "600",
-                        "opacity": 1,
-                      }
-                    }
-                  >
-                    skidjlfs
+                    hvkausd...kidjlfs
                   </Text>
                 </View>
               </View>

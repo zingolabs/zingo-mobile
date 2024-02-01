@@ -426,67 +426,7 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
                               }
                             }
                           >
-                            uview12345678901234567890123
-                          </Text>
-                          <Text
-                            style={
-                              {
-                                "color": "rgb(28, 28, 30)",
-                                "fontSize": 18,
-                                "fontWeight": "600",
-                                "opacity": 1,
-                              }
-                            }
-                          >
-                            4567890123456789012345678901
-                          </Text>
-                          <Text
-                            style={
-                              {
-                                "color": "rgb(28, 28, 30)",
-                                "fontSize": 18,
-                                "fontWeight": "600",
-                                "opacity": 1,
-                              }
-                            }
-                          >
-                            2345678901234567890123456789
-                          </Text>
-                          <Text
-                            style={
-                              {
-                                "color": "rgb(28, 28, 30)",
-                                "fontSize": 18,
-                                "fontWeight": "600",
-                                "opacity": 1,
-                              }
-                            }
-                          >
-                            0123456789012345678901234567
-                          </Text>
-                          <Text
-                            style={
-                              {
-                                "color": "rgb(28, 28, 30)",
-                                "fontSize": 18,
-                                "fontWeight": "600",
-                                "opacity": 1,
-                              }
-                            }
-                          >
-                            8901234567890123456789012345
-                          </Text>
-                          <Text
-                            style={
-                              {
-                                "color": "rgb(28, 28, 30)",
-                                "fontSize": 18,
-                                "fontWeight": "600",
-                                "opacity": 1,
-                              }
-                            }
-                          >
-                            6789012345678901234567890
+                            uview12...4567890
                           </Text>
                         </View>
                       </View>
