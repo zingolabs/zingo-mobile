@@ -36,7 +36,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: android/app/src/main/jniLibs/${{ env.ARCH }}
-          key: native-rust-${{ env.ARCH }}-${{ env.CACHE-KEY }}
+          key: native-librust-${{ env.ARCH }}-${{ env.CACHE-KEY }}
           lookup-only: true
   
       - name: Set cache-found
@@ -118,12 +118,12 @@ jobs:
         run: llvm-strip ./${{ env.TARGET }}/release/librust.so
       
       - name: Upload native rust
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.ARCH }}-${{ env.CACHE-KEY }}
+          name: native-librust-${{ env.ARCH }}-${{ env.CACHE-KEY }}
           path: rust/target/${{ env.TARGET }}/release/librust.so
       
-  cache-native-rust:
+  cache-native-librust:
     name: Cache native rust
     needs: build
     runs-on: macos-12
@@ -138,14 +138,14 @@ jobs:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
             
       - name: Download native rust
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with: 
-          name: ${{ env.ARCH }}-${{ env.CACHE-KEY }}
+          name: native-librust-${{ env.ARCH }}-${{ env.CACHE-KEY }}
           path: android/app/src/main/jniLibs/${{ env.ARCH }}
       
       - name: Cache native rust
         uses: actions/cache@v4
         with:
           path: android/app/src/main/jniLibs/${{ env.ARCH }}
-          key: native-rust-${{ env.ARCH }}-${{ env.CACHE-KEY }}
+          key: native-librust-${{ env.ARCH }}-${{ env.CACHE-KEY }}
 
