@@ -49,7 +49,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
     });
   };
 
-  console.log('tx', tx.txDetails);
+  //console.log('tx', tx.txDetails);
 
   return (
     <SafeAreaView

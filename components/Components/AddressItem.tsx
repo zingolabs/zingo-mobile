@@ -36,19 +36,9 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({ address, oneLi
     if (!oneLine) {
       if (privacy) {
         setExpandAddress(false);
-      } else {
-        setExpandAddress(true);
       }
     }
   }, [oneLine, privacy]);
-
-  useEffect(() => {
-    if (!oneLine) {
-      if (!expandAddress && !privacy) {
-        setExpandAddress(true);
-      }
-    }
-  }, [expandAddress, oneLine, privacy]);
 
   return (
     <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start' }}>
