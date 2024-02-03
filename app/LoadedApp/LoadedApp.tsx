@@ -125,11 +125,17 @@ export default function LoadedApp(props: LoadedAppProps) {
       // update layout direction
       I18nManager.forceRTL(isRTL);
 
+      // If the App is mounting this component, I know I have to reset the firstInstall prop in settings.
+      await SettingsFileImpl.writeSettings('firstInstall', false);
+
+      // If the App is mounting this component, I know I have to update the version prop in settings.
+      await SettingsFileImpl.writeSettings('version', translate('version') as string);
+
       //I have to check what language is in the settings
       const settings = await SettingsFileImpl.readSettings();
 
       // for testing
-      //delay(5000);
+      //await delay(5000);
 
       if (settings.language) {
         setLanguage(settings.language);
@@ -283,10 +289,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     this.clearToAddr();
 
     (async () => {
-      // If the App is mounting this component, I know I have to reset the firstInstall prop in settings.
-      await SettingsFileImpl.writeSettings('firstInstall', false);
-      // If the App is mounting this component, I know I have to update the version prop in settings.
-      await SettingsFileImpl.writeSettings('version', this.state.translate('version') as string);
       // Configure the RPC to start doing refreshes
       await this.rpc.configure();
 
@@ -1158,7 +1160,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       );
     };
 
-    //console.log('render LoadedAppClass - 3');
+    //console.log('render LoadedAppClass - 3', translate('version'));
 
     return (
       <ContextAppLoadedProvider value={this.state}>

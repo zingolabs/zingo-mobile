@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import { SafeAreaView, Text, View } from 'react-native';
+import { SafeAreaView, Text, View, ActivityIndicator } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
 import { ThemeType } from '../types';
@@ -9,6 +9,7 @@ import { TranslateType } from '../AppState';
 type LaunchingProps = {
   translate: (key: string) => TranslateType;
   firstLaunchingMessage: boolean;
+  message?: string;
 };
 
 const Launching: React.FunctionComponent<LaunchingProps> = props => {
@@ -44,6 +45,17 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
             marginTop: 20,
             padding: 10,
           }}>
+          {!!props.message && (
+            <Text
+              style={{
+                color: colors.primaryDisabled,
+                fontSize: 15,
+                marginTop: 10,
+              }}>
+              {props.message}
+            </Text>
+          )}
+          {props.firstLaunchingMessage && <ActivityIndicator size="large" color={colors.primary} />}
           <Text
             style={{
               color: colors.text,

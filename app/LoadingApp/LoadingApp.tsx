@@ -102,9 +102,6 @@ export default function LoadingApp(props: LoadingAppProps) {
       const settings = await SettingsFileImpl.readSettings();
       //console.log(settings);
 
-      // for testing
-      //delay(5000);
-
       // checking the version of the App in settings
       //console.log('versions, old:', settings.version, ' new:', translate('version') as string);
       if (settings.version === null) {
@@ -112,11 +109,7 @@ export default function LoadingApp(props: LoadingAppProps) {
         setFirstLaunchingMessage(false);
       } else if (settings.version === '' || settings.version !== (translate('version') as string)) {
         // this is an update
-        // delay for 3 seconds this message because if the upgrade takes less than 3 seconds
-        // the user doesn't need to see any message.
-        setTimeout(() => {
-          setFirstLaunchingMessage(true);
-        }, 3000);
+        setFirstLaunchingMessage(true);
       }
 
       // first I need to know if this launch is a fresh install...
@@ -171,6 +164,9 @@ export default function LoadingApp(props: LoadingAppProps) {
         await SettingsFileImpl.writeSettings('privacy', privacy);
       }
 
+      // for testing
+      //await delay(5000);
+
       // reading background task info
       if (Platform.OS === 'ios') {
         // this file only exists in IOS BS.
@@ -184,7 +180,7 @@ export default function LoadingApp(props: LoadingAppProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  //console.log('render loadingApp - 2');
+  //console.log('render loadingApp - 2', translate('version'));
 
   if (loading) {
     return (
@@ -276,12 +272,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     this.unsubscribeNetInfo = {} as NetInfoSubscription;
   }
 
-  componentDidUpdate(prevProps: Readonly<LoadingAppClassProps>): void {
-    if (this.props.firstLaunchingMessage !== prevProps.firstLaunchingMessage) {
-      this.setState({ firstLaunchingMessage: this.props.firstLaunchingMessage });
-    }
-  }
-
   componentDidMount = () => {
     this.setState({ actionButtonsDisabled: true });
     (async () => {
@@ -297,7 +287,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
           let result: string = await RPCModule.loadExistingWallet(this.state.server.uri, this.state.server.chain_name);
 
           // for testing
-          //await delay(10000);
+          //await delay(5000);
 
           //console.log('Load Wallet Exists result', result);
           if (result && !result.toLowerCase().startsWith('error')) {
@@ -685,7 +675,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     const { translate } = this.props;
     const { colors } = this.props.theme;
 
-    //console.log('render loadingAppClass - 3', screen);
+    //console.log('render loadingAppClass - 3', translate('version'));
 
     return (
       <ContextAppLoadingProvider value={this.state}>
