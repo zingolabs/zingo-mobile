@@ -48,5 +48,7 @@ export default interface AppStateLoading {
   snackbars: SnackbarType[];
   addLastSnackbar: (snackbar: SnackbarType) => void;
 
+  firstLaunchingMessage: boolean;
+
   // eslint-disable-next-line semi
 }

@@ -11,7 +11,16 @@ export default class SettingsFileImpl {
 
   // Write the server setting
   static async writeSettings(
-    name: 'server' | 'currency' | 'language' | 'sendAll' | 'privacy' | 'mode' | 'firstInstall' | 'basicFirstViewSeed',
+    name:
+      | 'server'
+      | 'currency'
+      | 'language'
+      | 'sendAll'
+      | 'privacy'
+      | 'mode'
+      | 'firstInstall'
+      | 'basicFirstViewSeed'
+      | 'version',
     value: string | boolean | ServerType,
   ) {
     const fileName = await this.getFileName();
@@ -61,12 +70,17 @@ export default class SettingsFileImpl {
         // this means when the user have funds, the seed screen will show up.
         settings.basicFirstViewSeed = true;
       }
+      if (!settings.hasOwnProperty('version')) {
+        // here we know the user is updating the App, for sure.
+        // from some version before.
+        settings.version = '';
+      }
       return settings;
     } catch (err) {
       // The File doesn't exist, so return nothing
       // Here I know 100% it is a fresh install or the user cleaned the device staorage
-      //console.log('settings read file:', err);
-      const settings: SettingsFileClass = { firstInstall: true } as SettingsFileClass;
+      console.log('settings read file:', err);
+      const settings: SettingsFileClass = { firstInstall: true, version: null } as SettingsFileClass;
       return settings;
     }
   }
