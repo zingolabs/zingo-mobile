@@ -11,6 +11,7 @@ import {
   NativeEventSubscription,
   Platform,
   Linking,
+  SafeAreaView,
 } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -56,6 +57,7 @@ import { createAlert } from '../createAlert';
 import Snackbars from '../../components/Components/Snackbars';
 import SnackbarType from '../AppState/types/SnackbarType';
 import { RPCSeedType } from '../rpc/types/RPCSeedType';
+import { Launching } from '../LoadingApp';
 
 const History = React.lazy(() => import('../../components/History'));
 const Send = React.lazy(() => import('../../components/Send'));
@@ -77,6 +79,9 @@ const en = require('../translations/en.json');
 const es = require('../translations/es.json');
 
 const Tab = createBottomTabNavigator();
+
+// for testing
+//const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 type LoadedAppProps = {
   navigation: StackScreenProps<any>['navigation'];
@@ -120,8 +125,18 @@ export default function LoadedApp(props: LoadedAppProps) {
       // update layout direction
       I18nManager.forceRTL(isRTL);
 
+      // If the App is mounting this component, I know I have to reset the firstInstall prop in settings.
+      await SettingsFileImpl.writeSettings('firstInstall', false);
+
+      // If the App is mounting this component, I know I have to update the version prop in settings.
+      await SettingsFileImpl.writeSettings('version', translate('version') as string);
+
       //I have to check what language is in the settings
       const settings = await SettingsFileImpl.readSettings();
+
+      // for testing
+      //await delay(5000);
+
       if (settings.language) {
         setLanguage(settings.language);
         i18n.locale = settings.language;
@@ -180,16 +195,15 @@ export default function LoadedApp(props: LoadedAppProps) {
 
   if (loading) {
     return (
-      <View
+      <SafeAreaView
         style={{
-          flex: 1,
-          flexDirection: 'column',
-          alignItems: 'center',
+          display: 'flex',
           justifyContent: 'center',
+          alignItems: 'center',
+          height: '100%',
         }}>
-        <Text style={{ color: '#888888', fontSize: 40, fontWeight: 'bold' }}>{translate('zingo') as string}</Text>
-        <Text style={{ color: '#888888', fontSize: 15 }}>{translate('version') as string}</Text>
-      </View>
+        <Launching translate={translate} firstLaunchingMessage={false} />
+      </SafeAreaView>
     );
   } else {
     return (
@@ -274,14 +288,11 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
   componentDidMount = () => {
     this.clearToAddr();
 
-    // If the App is mounting this component, I know I have to reset the firstInstall props in settings.
     (async () => {
-      await SettingsFileImpl.writeSettings('firstInstall', false);
-    })();
-
-    // Configure the RPC to start doing refreshes
-    (async () => {
+      // Configure the RPC to start doing refreshes
       await this.rpc.configure();
+
+      //console.log(await SettingsFileImpl.readSettings());
     })();
 
     this.appstate = AppState.addEventListener('change', async nextAppState => {
@@ -1149,7 +1160,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       );
     };
 
-    //console.log('render LoadedAppClass - 3');
+    //console.log('render LoadedAppClass - 3', translate('version'));
 
     return (
       <ContextAppLoadedProvider value={this.state}>

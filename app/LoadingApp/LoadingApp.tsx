@@ -41,6 +41,7 @@ import { isEqual } from 'lodash';
 import Snackbars from '../../components/Components/Snackbars';
 import SnackbarType from '../AppState/types/SnackbarType';
 import { RPCSeedType } from '../rpc/types/RPCSeedType';
+import Launching from './Launching';
 
 const BoldText = React.lazy(() => import('../../components/Components/BoldText'));
 const Button = React.lazy(() => import('../../components/Components/Button'));
@@ -50,6 +51,9 @@ const ChainTypeToggle = React.lazy(() => import('../../components/Components/Cha
 
 const en = require('../translations/en.json');
 const es = require('../translations/es.json');
+
+// for testing
+//const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 type LoadingAppProps = {
   navigation: StackScreenProps<any>['navigation'];
@@ -68,6 +72,7 @@ export default function LoadingApp(props: LoadingAppProps) {
   const [privacy, setPrivacy] = useState<boolean>(false);
   const [mode, setMode] = useState<'basic' | 'advanced'>('advanced'); // by default advanced
   const [background, setBackground] = useState<BackgroundType>({ batches: 0, date: 0 });
+  const [firstLaunchingMessage, setFirstLaunchingMessage] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const file = useMemo(
     () => ({
@@ -93,12 +98,23 @@ export default function LoadingApp(props: LoadingAppProps) {
       // update layout direction
       I18nManager.forceRTL(isRTL);
 
-      //I have to check what language is in the settings
+      //I have to check what language and other things are in the settings
       const settings = await SettingsFileImpl.readSettings();
       //console.log(settings);
 
+      // checking the version of the App in settings
+      //console.log('versions, old:', settings.version, ' new:', translate('version') as string);
+      if (settings.version === null) {
+        // this is a fresh install
+        setFirstLaunchingMessage(false);
+      } else if (settings.version === '' || settings.version !== (translate('version') as string)) {
+        // this is an update
+        setFirstLaunchingMessage(true);
+      }
+
       // first I need to know if this launch is a fresh install...
       // if firstInstall is true -> 100% is the first time.
+      //console.log('first install', settings.firstInstall);
       if (settings.firstInstall) {
         // basic mode
         setMode('basic');
@@ -148,6 +164,9 @@ export default function LoadingApp(props: LoadingAppProps) {
         await SettingsFileImpl.writeSettings('privacy', privacy);
       }
 
+      // for testing
+      //await delay(5000);
+
       // reading background task info
       if (Platform.OS === 'ios') {
         // this file only exists in IOS BS.
@@ -161,20 +180,19 @@ export default function LoadingApp(props: LoadingAppProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  //console.log('render loadingApp - 2');
+  //console.log('render loadingApp - 2', translate('version'));
 
   if (loading) {
     return (
-      <View
+      <SafeAreaView
         style={{
-          flex: 1,
-          flexDirection: 'column',
-          alignItems: 'center',
+          display: 'flex',
           justifyContent: 'center',
+          alignItems: 'center',
+          height: '100%',
         }}>
-        <Text style={{ color: '#888888', fontSize: 40, fontWeight: 'bold' }}>{translate('zingo') as string}</Text>
-        <Text style={{ color: '#888888', fontSize: 15 }}>{translate('version') as string}</Text>
-      </View>
+        <Launching translate={translate} firstLaunchingMessage={false} />
+      </SafeAreaView>
     );
   } else {
     return (
@@ -189,6 +207,7 @@ export default function LoadingApp(props: LoadingAppProps) {
         privacy={privacy}
         mode={mode}
         background={background}
+        firstLaunchingMessage={firstLaunchingMessage}
       />
     );
   }
@@ -206,6 +225,7 @@ type LoadingAppClassProps = {
   privacy: boolean;
   mode: 'basic' | 'advanced';
   background: BackgroundType;
+  firstLaunchingMessage: boolean;
 };
 
 export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
@@ -244,6 +264,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
       netInfo: netInfo,
       actionButtonsDisabled: !netInfo.isConnected ? true : false,
       addLastSnackbar: this.addLastSnackbar,
+      firstLaunchingMessage: props.firstLaunchingMessage,
     };
 
     this.dim = {} as EmitterSubscription;
@@ -252,6 +273,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
   }
 
   componentDidMount = () => {
+    this.setState({ actionButtonsDisabled: true });
     (async () => {
       // First, check if a wallet exists. Do it async so the basic screen has time to render
       await AsyncStorage.setItem('@background', 'no');
@@ -264,6 +286,9 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
         if (networkState.isConnected) {
           let result: string = await RPCModule.loadExistingWallet(this.state.server.uri, this.state.server.chain_name);
 
+          // for testing
+          //await delay(5000);
+
           //console.log('Load Wallet Exists result', result);
           if (result && !result.toLowerCase().startsWith('error')) {
             // here result can have an `error` field for watch-only which is actually OK.
@@ -275,11 +300,12 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
               const walletKindJSON: RPCWalletKindType = await JSON.parse(walletKindStr);
               this.setState({
                 readOnly: walletKindJSON.kind === 'Seeded' ? false : true,
+                actionButtonsDisabled: false,
               });
               this.navigateToLoadedApp();
               //console.log('navigate to LoadedApp');
             } else {
-              this.setState({ screen: 1 });
+              this.setState({ screen: 1, actionButtonsDisabled: false });
               createAlert(
                 this.setBackgroundError,
                 this.addLastSnackbar,
@@ -288,7 +314,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
               );
             }
           } else {
-            this.setState({ screen: 1 });
+            this.setState({ screen: 1, actionButtonsDisabled: false });
             createAlert(
               this.setBackgroundError,
               this.addLastSnackbar,
@@ -297,7 +323,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
             );
           }
         } else {
-          this.setState({ screen: 1 });
+          this.setState({ screen: 1, actionButtonsDisabled: false });
           this.addLastSnackbar({
             message: this.props.translate('loadedapp.connection-error') as string,
             type: 'Primary',
@@ -311,12 +337,17 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
           // this means when the user have funds, the seed screen will show up.
           await SettingsFileImpl.writeSettings('basicFirstViewSeed', false);
           this.createNewWallet();
+          this.setState({ actionButtonsDisabled: false });
           this.navigateToLoadedApp();
           //console.log('navigate to LoadedApp');
         } else {
           // for advanced mode
           await SettingsFileImpl.writeSettings('basicFirstViewSeed', true);
-          this.setState(state => ({ screen: state.screen === 3 ? 3 : 1, walletExists: false }));
+          this.setState(state => ({
+            screen: state.screen === 3 ? 3 : 1,
+            walletExists: false,
+            actionButtonsDisabled: false,
+          }));
         }
       }
     })();
@@ -639,11 +670,12 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
       customServerChainName,
       snackbars,
       mode,
+      firstLaunchingMessage,
     } = this.state;
     const { translate } = this.props;
     const { colors } = this.props.theme;
 
-    //console.log('render loadingAppClass - 3', screen);
+    //console.log('render loadingAppClass - 3', translate('version'));
 
     return (
       <ContextAppLoadingProvider value={this.state}>
@@ -657,20 +689,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
           }}>
           <Snackbars snackbars={snackbars} removeFirstSnackbar={this.removeFirstSnackbar} translate={translate} />
 
-          {screen === 0 && (
-            <View
-              style={{
-                flex: 1,
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}>
-              <Text style={{ color: colors.zingo, fontSize: 40, fontWeight: 'bold' }}>
-                {translate('zingo') as string}
-              </Text>
-              <Text style={{ color: colors.zingo, fontSize: 15 }}>{translate('version') as string}</Text>
-            </View>
-          )}
+          {screen === 0 && <Launching translate={translate} firstLaunchingMessage={firstLaunchingMessage} />}
           {screen === 1 && (
             <>
               <View
@@ -682,7 +701,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                   right: 0,
                   zIndex: 999,
                 }}>
-                {netInfo.isConnected && (
+                {netInfo.isConnected && !actionButtonsDisabled && (
                   <>
                     {mode === 'basic' ? (
                       <OptionsMenu
