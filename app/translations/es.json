@@ -36,7 +36,7 @@
     "createnewwallet": "Crear Monedero Nuevo\n(nueva semilla)",
     "opencurrentwallet": "Abrir Monedero Activo",
     "restorewalletseed": "Restaurar Monedero\ncon la Semilla",
-    "restorewalletufvk": "Restaurar Monedero\nconla Clave de Visualización",
+    "restorewalletufvk": "Restaurar Monedero\ncon la Clave de Visualización",
     "creatingwallet-label": "Error Creando el Monedero",
     "readingwallet-label": "Error Leyendo el Monedero",
     "invalidseed-label": "Semilla incorrecta",
