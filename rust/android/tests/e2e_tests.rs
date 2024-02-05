@@ -40,14 +40,18 @@ mod e2e {
     }
 
     mod darkside {
-        use darkside_tests::utils::scenarios::DarksideScenario;
+        use darkside_tests::utils::{
+            create_chainbuild_file, load_chainbuild_file,
+            scenarios::{DarksideScenario, DarksideSender},
+        };
+        use zingolib::{get_base_address, testvectors::seeds, wallet::Pool};
 
         #[tokio::test]
         async fn simple_sync_test() {
             const BLOCKCHAIN_HEIGHT: u64 = 1_000;
 
             let mut scenario = DarksideScenario::new(Some(20_000)).await;
-            scenario.build_faucet(zingolib::wallet::Pool::Orchard).await;
+            scenario.build_faucet(Pool::Orchard).await;
             scenario.stage_and_apply_blocks(BLOCKCHAIN_HEIGHT, 0).await;
 
             let (exit_code, output, error) =
@@ -58,6 +62,85 @@ mod e2e {
             println!("Error: {}", error);
 
             assert_eq!(exit_code, 0);
+        }
+
+        #[ignore]
+        #[tokio::test]
+        async fn background_sync_benchmark_chainbuild() {
+            const BLOCKCHAIN_HEIGHT: u64 = 90_000;
+            let chainbuild_file = create_chainbuild_file("background_sync_benchmark");
+            let mut scenario = DarksideScenario::new(Some(20_000)).await;
+            scenario.build_faucet(Pool::Orchard).await;
+            scenario
+                .build_client(seeds::HOSPITAL_MUSEUM_SEED.to_string(), 1)
+                .await;
+
+            // stage a send to recipient every 200 blocks (block 50, 250, 450 etc.)
+            for thousands_blocks_count in 0..BLOCKCHAIN_HEIGHT / 200 {
+                scenario
+                    .stage_and_apply_blocks(thousands_blocks_count * 200 + 49, 0)
+                    .await;
+                scenario.get_faucet().do_sync(false).await.unwrap();
+                scenario
+                    .send_and_write_transaction(
+                        DarksideSender::Faucet,
+                        &get_base_address!(scenario.get_lightclient(0), "unified"),
+                        10_000,
+                        &chainbuild_file,
+                    )
+                    .await;
+            }
+        }
+
+        #[tokio::test]
+        async fn background_sync_benchmark_test() {
+            const BLOCKCHAIN_HEIGHT: u64 = 90_000;
+            let transaction_set = load_chainbuild_file("background_sync_benchmark");
+            let mut scenario = DarksideScenario::new(Some(20_000)).await;
+            scenario.build_faucet(Pool::Orchard).await;
+            scenario
+                .build_client(seeds::HOSPITAL_MUSEUM_SEED.to_string(), 1)
+                .await;
+
+            // stage a send to recipient every 200 blocks (block 50, 250, 450 etc.)
+            for thousands_blocks_count in 0..BLOCKCHAIN_HEIGHT / 200 {
+                scenario
+                    .stage_and_apply_blocks(thousands_blocks_count * 200 + 49, 0)
+                    .await;
+                scenario.stage_next_transaction(&transaction_set).await;
+            }
+
+            scenario.stage_and_apply_blocks(BLOCKCHAIN_HEIGHT, 0).await;
+
+            // DEBUG
+            //
+            // scenario.get_lightclient(0).do_sync(false).await.unwrap();
+
+            // // assert the balance is correct
+            // assert_eq!(
+            //     scenario.get_lightclient(0).do_balance().await,
+            //     zingolib::lightclient::PoolBalances {
+            //         sapling_balance: Some(0),
+            //         verified_sapling_balance: Some(0),
+            //         spendable_sapling_balance: Some(0),
+            //         unverified_sapling_balance: Some(0),
+            //         orchard_balance: Some(4_500_000),
+            //         verified_orchard_balance: Some(4_500_000),
+            //         unverified_orchard_balance: Some(0),
+            //         spendable_orchard_balance: Some(4_500_000),
+            //         transparent_balance: Some(0),
+            //     }
+            // );
+
+            let (exit_code, output, error) =
+                zingomobile_utils::android_e2e_test("darkside_background_sync_benchmark");
+
+            println!("Exit Code: {}", exit_code);
+            println!("Output: {}", output);
+            println!("Error: {}", error);
+
+            // assert_eq!(exit_code, 0);
+            assert!(false);
         }
 
         // interrupt sync test needs updating to latest darkside framework and has not yet revealed a failing test

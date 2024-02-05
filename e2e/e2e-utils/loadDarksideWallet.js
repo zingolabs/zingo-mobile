@@ -1,4 +1,4 @@
-// loads the 'darkside' wallet for the darkside module in zingo-mobile e2e tests
+// loads the 'darkside faucet' wallet for the darkside module in zingo-mobile e2e tests
 // requires e2e test to be run by cargo test runner
 // see `rust/android/test/e2e_tests.rs` and `README.md`
 let loadDarksideWallet = async () => {
