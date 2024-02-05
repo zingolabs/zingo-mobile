@@ -11,11 +11,12 @@ let loadRecipientWallet = async () => {
   // connect to regtest network
   await element(by.id('header.drawmenu')).tap();
   await element(by.id('menu.settings')).tap();
-  await element(by.id('settings.scroll-view')).scroll(900, 'down');
+  await waitFor(element(by.text('MEMO DOWNLOAD'))).toBeVisible().whileElement(by.id('settings.scroll-view')).scroll(100, 'down');
   await element(by.id('settings.custom-server')).tap();
   await element(by.id("settings.custom-server-chain.regtest")).tap();
   await element(by.id("settings.custom-server-field")).replaceText('http://10.0.2.2:20000');
   await element(by.id('settings.button.save')).tap();
+  await waitFor(element(by.id('seed.button.OK'))).toBeVisible().withTimeout(sync_timeout);
   await element(by.id('seed.button.OK')).tap();
   await element(by.text('CONFIRM')).tap();
 

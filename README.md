@@ -152,6 +152,8 @@ lightwalletd/zcashd regtest network. Therefore, only tests in the "Offline Tests
    `cargo nextest run e2e`
    or run a specific test: <br />
    `cargo nextest run e2e::test_name`
+   or run a specific darkside test: <br />
+   `cargo nextest run e2e::darkside::test_name`
 
 Regchest is still under development and currently not able to run darkside end-to-end tests: <br />
 `cargo nextest run --features regchest -E 'test(e2e) and not test(darkside)'`
