@@ -60,6 +60,7 @@ mod e2e {
             assert_eq!(exit_code, 0);
         }
 
+        // interrupt sync test needs updating to latest darkside framework and has not yet revealed a failing test
         //     #[ignore]
         //     #[tokio::test]
         //     async fn interrupt_sync_chainbuild() {
