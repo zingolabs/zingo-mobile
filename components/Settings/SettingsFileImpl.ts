@@ -12,21 +12,13 @@ export default class SettingsFileImpl {
   // Write the server setting
   static async writeSettings(
     name:
-      |
       | 'server'
-     
       | 'currency'
-     
       | 'language'
-     
       | 'sendAll'
-     
       | 'privacy'
-     
       | 'mode'
-     
       | 'firstInstall'
-     
       | 'basicFirstViewSeed'
       | 'version'
       | 'security'
