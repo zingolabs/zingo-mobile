@@ -8,13 +8,14 @@ import Button from '../Components/Button';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
+import DetailLine from '../Components/DetailLine';
 
 type AboutProps = {
   closeModal: () => void;
 };
 const About: React.FunctionComponent<AboutProps> = ({ closeModal }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate } = context;
+  const { info, translate } = context;
   const { colors } = useTheme() as unknown as ThemeType;
 
   const arrayTxtObject = translate('about.copyright');
@@ -49,10 +50,11 @@ const About: React.FunctionComponent<AboutProps> = ({ closeModal }) => {
           padding: 20,
         }}>
         {arrayTxt.map((txt: string) => (
-          <FadeText style={{ marginBottom: 30 }} key={txt.substring(0, 10)}>
+          <FadeText style={{ marginBottom: 20 }} key={txt.substring(0, 10)}>
             {txt}
           </FadeText>
         ))}
+        <DetailLine label={translate('info.zingolib') as string} value={info.zingolib} />
       </ScrollView>
       <View
         style={{

@@ -142,7 +142,34 @@ exports[`Component About - test About - snapshot 1`] = `
       }
     }
   >
-    <View />
+    <View>
+      <View
+        style={
+          {
+            "display": "flex",
+            "marginTop": 20,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "rgb(28, 28, 30)",
+              "opacity": 0.65,
+            }
+          }
+        >
+          text translated
+        </Text>
+        <View
+          style={
+            {
+              "width": 10,
+            }
+          }
+        />
+      </View>
+    </View>
   </RCTScrollView>
   <View
     style={

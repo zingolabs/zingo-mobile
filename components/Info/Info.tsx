@@ -51,7 +51,6 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal, setZecPrice }) =
             label={translate('info.version') as string}
             value={translate('zingo') + ' ' + translate('version')}
           />
-          <DetailLine label={translate('info.zingolib') as string} value={info.zingolib} />
           <DetailLine
             label={translate('info.serverversion') as string}
             value={info.version ? info.version : (translate('loading') as string)}

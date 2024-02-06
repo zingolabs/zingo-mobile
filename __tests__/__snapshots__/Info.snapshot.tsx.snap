@@ -224,44 +224,6 @@ exports[`Component Info - test Info - snapshot 1`] = `
               }
             }
           >
-            mob-release...
-          </Text>
-        </View>
-        <View
-          style={
-            {
-              "display": "flex",
-              "marginTop": 20,
-            }
-          }
-        >
-          <Text
-            style={
-              {
-                "color": "rgb(28, 28, 30)",
-                "opacity": 0.65,
-              }
-            }
-          >
-            translated text
-          </Text>
-          <View
-            style={
-              {
-                "width": 10,
-              }
-            }
-          />
-          <Text
-            style={
-              {
-                "color": "rgb(28, 28, 30)",
-                "fontSize": 18,
-                "fontWeight": "600",
-                "opacity": 1,
-              }
-            }
-          >
             3.3.3.0
           </Text>
         </View>
