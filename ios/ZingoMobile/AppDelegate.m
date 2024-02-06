@@ -116,10 +116,10 @@ static BOOL isConnectedToWifi = false;
 - (void)applicationDidEnterBackground:(UIApplication *)application
 {
   if (@available(iOS 13.0, *)) {
-      //NSLog(@"scheduleBackgroundTask");
-      //[self scheduleBackgroundTask];
-      //NSLog(@"scheduleShedulerBackgroundTask");
-      //[self scheduleSchedulerBackgroundTask];
+      NSLog(@"scheduleBackgroundTask");
+      [self scheduleBackgroundTask];
+      NSLog(@"scheduleShedulerBackgroundTask");
+      [self scheduleSchedulerBackgroundTask];
       //[self handleBackgroundTask];
   }
 }
