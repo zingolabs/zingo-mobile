@@ -91,10 +91,10 @@ mod e2e {
                     .await;
             }
         }
-
         #[tokio::test]
         async fn background_sync_benchmark_test() {
-            const BLOCKCHAIN_HEIGHT: u64 = 90_000;
+            const BLOCKCHAIN_HEIGHT: u64 = 1_000;
+            // const BLOCKCHAIN_HEIGHT: u64 = 90_000;
             let transaction_set = load_chainbuild_file("background_sync_benchmark");
             let mut scenario = DarksideScenario::new(Some(20_000)).await;
             scenario.build_faucet(Pool::Orchard).await;

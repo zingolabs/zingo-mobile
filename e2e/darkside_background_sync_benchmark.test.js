@@ -1,6 +1,6 @@
 const { log, device, by, element } = require('detox');
 
-import { loadDarksideWallet } from "./e2e-utils/loadRecipientWallet.js";
+import { loadRecipientWallet } from "./e2e-utils/loadRecipientWallet.js";
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const check_timeout = 5000;
@@ -11,7 +11,7 @@ describe('Background sync benchmark', () => {
 
     // close app and wait
     await device.sendToHome();
-    await sleep(10000);
+    await sleep(15000);
 
     // open app and check if sync is complete
     await device.launchApp({ newInstance: false });
