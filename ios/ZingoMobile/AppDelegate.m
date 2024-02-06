@@ -339,6 +339,7 @@ static BOOL isConnectedToWifi = false;
 
     BGProcessingTaskRequest *request = [[BGProcessingTaskRequest alloc] initWithIdentifier:syncTask];
     
+    // PRODUCTION
     //NSDate *today = [[NSCalendar currentCalendar] startOfDayForDate:[NSDate date]];
     //NSDate *tomorrow = [[NSCalendar currentCalendar] dateByAddingUnit:NSCalendarUnitDay value:1 toDate:today options:0];
     
@@ -347,11 +348,10 @@ static BOOL isConnectedToWifi = false;
     //earlyMorningComponent.minute = arc4random_uniform(61);
     //NSDate *earlyMorning = [[NSCalendar currentCalendar] dateByAddingComponents:earlyMorningComponent toDate:tomorrow options:0];
     
-    // Obtiene la fecha actual
+    // DEVELOPMENT
     NSDate *now = [NSDate date];
 
-    // Agrega 2 minutos a la fecha actual
-    NSDate *twoMinutesLater = [now dateByAddingTimeInterval:120]; // 2 minutos = 120 segundos
+    NSDate *twoMinutesLater = [now dateByAddingTimeInterval:120]; // 2 minutes = 120 seconds
 
     //request.earliestBeginDate = earlyMorning;
     request.earliestBeginDate = twoMinutesLater;
@@ -374,6 +374,7 @@ static BOOL isConnectedToWifi = false;
     
     BGProcessingTaskRequest *request = [[BGProcessingTaskRequest alloc] initWithIdentifier:syncSchedulerTask];
     
+    // PRODUCTION
     //NSDate *today = [[NSCalendar currentCalendar] startOfDayForDate:[NSDate date]];
     //NSDate *tomorrow = [[NSCalendar currentCalendar] dateByAddingUnit:NSCalendarUnitDay value:1 toDate:today options:0];
     
@@ -382,11 +383,10 @@ static BOOL isConnectedToWifi = false;
     //afternoonComponent.minute = arc4random_uniform(61);
     //NSDate *afternoon = [[NSCalendar currentCalendar] dateByAddingComponents:afternoonComponent toDate:tomorrow options:0];
     
-    // Obtiene la fecha actual
+    // DEVELOPMENT
     NSDate *now = [NSDate date];
 
-    // Agrega 2 minutos a la fecha actual
-    NSDate *twoMinutesLater = [now dateByAddingTimeInterval:120]; // 2 minutos = 120 segundos
+    NSDate *twoMinutesLater = [now dateByAddingTimeInterval:120]; // 2 minutes = 120 seconds
 
     //request.earliestBeginDate = earlyMorning;
     request.earliestBeginDate = twoMinutesLater;
