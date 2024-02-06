@@ -8,6 +8,7 @@
 #import <BackgroundTasks/BackgroundTasks.h>
 #import "RPCModule.h"
 #import "rust.h"
+#import "reachability.h"
 
 #ifdef FB_SONARKIT_ENABLED
 #import <FlipperKit/FlipperClient.h>
@@ -40,6 +41,8 @@ static BOOL _syncFinished = true;
 }
 
 static NSString* syncTask = @"Zingo_Processing_Task_ID";
+static NSString* syncSchedulerTask = @"Zingo_Processing_Scheduler_Task_ID";
+static BOOL isConnectedToWifi = false;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
@@ -59,6 +62,10 @@ static NSString* syncTask = @"Zingo_Processing_Task_ID";
   rootViewController.view = rootView;
   self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
+
+  NSLog(@"handle background task");
+  [self handleBackgroundTask];
+
   return YES;
 }
 
@@ -89,8 +96,8 @@ static NSString* syncTask = @"Zingo_Processing_Task_ID";
 - (BOOL)application:(UIApplication *)application willFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
   if (@available(iOS 13.0, *)) {
-      NSLog(@"configureProcessingTask");
-      [self configureProcessingTask];
+      //NSLog(@"configureProcessingTask");
+      //[self configureProcessingTask];
   }
   return YES;
 }
@@ -98,20 +105,26 @@ static NSString* syncTask = @"Zingo_Processing_Task_ID";
 - (void)applicationWillEnterForeground:(UIApplication *)application
 {
   // cancel existing task (if any)
-  NSLog(@"scheduleProcessingTask CANCEL - foreground");
-  [self setSyncFinished:true];
-  [BGTaskScheduler.sharedScheduler cancelTaskRequestWithIdentifier:syncTask];
+  //NSLog(@"scheduleProcessingTask CANCEL - foreground");
+  //[self setSyncFinished:true];
+  //char *resp2 = execute("interrupt_sync_after_batch", "true");
+  //NSString* respStr2 = [NSString stringWithUTF8String:resp2];
+  //NSLog(@"interrupt syncing %@", respStr2);
+  //[BGTaskScheduler.sharedScheduler cancelTaskRequestWithIdentifier:syncTask];
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application
 {
   if (@available(iOS 13.0, *)) {
-      NSLog(@"scheduleProcessingTask");
-      [self scheduleProcessingTask];
+      //NSLog(@"scheduleBackgroundTask");
+      //[self scheduleBackgroundTask];
+      //NSLog(@"scheduleShedulerBackgroundTask");
+      //[self scheduleSchedulerBackgroundTask];
+      //[self handleBackgroundTask];
   }
 }
 
--(void)configureProcessingTask {
+-(void)configureProcessingTask_old {
     if (@available(iOS 13.0, *)) {
         [[BGTaskScheduler sharedScheduler] registerForTaskWithIdentifier:syncTask
                                                               usingQueue:nil
@@ -144,7 +157,9 @@ static NSString* syncTask = @"Zingo_Processing_Task_ID";
       NSLog(@"handleProcessingTask sync end %@", respStr2);
       
       [self setSyncFinished:true];
-
+      char *resp3 = execute("interrupt_sync_after_batch", "true");
+      NSString* respStr3 = [NSString stringWithUTF8String:resp3];
+      NSLog(@"interrupt syncing %@", respStr3);
       // the execute `sync` already save the wallet when finished
 
     } else {
@@ -223,7 +238,7 @@ static NSString* syncTask = @"Zingo_Processing_Task_ID";
   }
 }
 
--(void)scheduleProcessingTask {
+-(void)scheduleProcessingTask_old {
     if (@available(iOS 13.0, *)) {
         NSLog(@"schedulingProcessingTask");
         NSError *error = NULL;
@@ -235,7 +250,6 @@ static NSString* syncTask = @"Zingo_Processing_Task_ID";
         request.earliestBeginDate = nil;
         BOOL success = [[BGTaskScheduler sharedScheduler] submitTaskRequest:request error:&error];
         if (!success) {
-            // Errorcodes https://stackoverflow.com/a/58224050/872051
             NSLog(@"Failed to submit request: %@", error);
         } else {
             NSLog(@"Success submit request %@", request);
@@ -244,4 +258,134 @@ static NSString* syncTask = @"Zingo_Processing_Task_ID";
         // No fallback
     }
 }
+
+// NEW BACKGROUND SCHEDULING TASK
+
+- (void)handleBackgroundTask {
+    // We require the background task to run when connected to the power and wifi
+    Reachability *reachability = [Reachability reachabilityForInternetConnection];
+    NetworkStatus networkStatus = [reachability currentReachabilityStatus];
+    
+    if (networkStatus == ReachableViaWiFi) {
+      isConnectedToWifi = true;
+    } else {
+      isConnectedToWifi = false;
+    }
+    NSLog(@"BGTask isConnectedToWifi %@", isConnectedToWifi ? @"true" : @"false");
+    
+    [self registerTasks];
+}
+
+- (void)registerTasks {
+    BOOL bcgSyncTaskResult;
+    bcgSyncTaskResult = [[BGTaskScheduler sharedScheduler] registerForTaskWithIdentifier:syncTask usingQueue:dispatch_get_main_queue() launchHandler:^(BGTask * _Nonnull task) {
+        if (![task isKindOfClass:[BGProcessingTask class]]) {
+            return;
+        }
+        NSLog(@"BGTask BGTaskScheduler.shared.register SYNC called");
+        [self startBackgroundTask:(BGProcessingTask *)task];
+    }];
+    
+    NSLog(@"BGTask SYNC registered %d", bcgSyncTaskResult);
+
+    BOOL bcgSchedulerTaskResult;
+    bcgSchedulerTaskResult = [[BGTaskScheduler sharedScheduler] registerForTaskWithIdentifier:syncSchedulerTask usingQueue:dispatch_get_main_queue() launchHandler:^(BGTask * _Nonnull task) {
+        if (![task isKindOfClass:[BGProcessingTask class]]) {
+            return;
+        }
+        NSLog(@"BGTask BGTaskScheduler.shared.register SCHEDULER called");
+        [self scheduleSchedulerBackgroundTask];
+        [self scheduleBackgroundTask];
+        [task setTaskCompletedWithSuccess:YES];
+    }];
+    
+    NSLog(@"BGTask SCHEDULER registered %d", bcgSchedulerTaskResult);
+}
+
+
+- (void)startBackgroundTask:(BGProcessingTask *)task {
+    NSLog(@"BGTask startBackgroundTask called");
+    
+    // Schedule tasks for the next time
+    [self scheduleBackgroundTask];
+    [self scheduleSchedulerBackgroundTask];
+    
+    if (!isConnectedToWifi) {
+        NSLog(@"BGTask startBackgroundTask: not connected to the wifi");
+        [task setTaskCompletedWithSuccess:NO];
+        return;
+    }
+    
+    // Start the syncing
+    NSLog(@"configureProcessingTask run");
+    [NSThread detachNewThreadSelector:@selector(syncingProcessBackgroundTask:) toTarget:self withObject:nil];
+    [self syncingStatusProcessBackgroundTask:nil];
+    
+    task.expirationHandler = ^{
+        NSLog(@"BGTask startBackgroundTask expirationHandler called");
+        // Stop the syncing because the allocated time is about to expire
+        NSLog(@"scheduleProcessingTask CANCEL - is about to expire");
+        [self setSyncFinished:true];
+        char *resp2 = execute("interrupt_sync_after_batch", "true");
+        NSString* respStr2 = [NSString stringWithUTF8String:resp2];
+        NSLog(@"interrupt syncing %@", respStr2);
+    };
+}
+
+- (void)scheduleBackgroundTask {
+    // This method can be called as many times as needed, the previously submitted
+    // request will be overridden by the new one.
+    NSLog(@"BGTask scheduleBackgroundTask called");
+
+    BGProcessingTaskRequest *request = [[BGProcessingTaskRequest alloc] initWithIdentifier:syncTask];
+    
+    NSDate *today = [[NSCalendar currentCalendar] startOfDayForDate:[NSDate date]];
+    NSDate *tomorrow = [[NSCalendar currentCalendar] dateByAddingUnit:NSCalendarUnitDay value:1 toDate:today options:0];
+    
+    NSDateComponents *earlyMorningComponent = [[NSDateComponents alloc] init];
+    earlyMorningComponent.hour = 3;
+    earlyMorningComponent.minute = arc4random_uniform(61);
+    NSDate *earlyMorning = [[NSCalendar currentCalendar] dateByAddingComponents:earlyMorningComponent toDate:tomorrow options:0];
+    
+    request.earliestBeginDate = earlyMorning;
+    request.requiresExternalPower = YES;
+    request.requiresNetworkConnectivity = YES;
+    
+    NSError *error = nil;
+    [[BGTaskScheduler sharedScheduler] submitTaskRequest:request error:&error];
+    if (error) {
+        NSLog(@"BGTask scheduleBackgroundTask failed to submit, error: %@", error);
+    } else {
+        NSLog(@"BGTask scheduleBackgroundTask succeeded to submit");
+    }
+}
+
+- (void)scheduleSchedulerBackgroundTask {
+    // This method can be called as many times as needed, the previously submitted
+    // request will be overridden by the new one.
+    NSLog(@"BGTask scheduleSchedulerBackgroundTask called");
+    
+    BGProcessingTaskRequest *request = [[BGProcessingTaskRequest alloc] initWithIdentifier:syncSchedulerTask];
+    
+    NSDate *today = [[NSCalendar currentCalendar] startOfDayForDate:[NSDate date]];
+    NSDate *tomorrow = [[NSCalendar currentCalendar] dateByAddingUnit:NSCalendarUnitDay value:1 toDate:today options:0];
+    
+    NSDateComponents *afternoonComponent = [[NSDateComponents alloc] init];
+    afternoonComponent.hour = 14;
+    afternoonComponent.minute = arc4random_uniform(61);
+    NSDate *afternoon = [[NSCalendar currentCalendar] dateByAddingComponents:afternoonComponent toDate:tomorrow options:0];
+    
+    request.earliestBeginDate = afternoon;
+    request.requiresExternalPower = NO;
+    request.requiresNetworkConnectivity = NO;
+    
+    NSError *error = nil;
+    [[BGTaskScheduler sharedScheduler] submitTaskRequest:request error:&error];
+    if (error) {
+        NSLog(@"BGTask scheduleSchedulerBackgroundTask failed to submit, error: %@", error);
+    } else {
+        NSLog(@"BGTask scheduleSchedulerBackgroundTask succeeded to submit");
+    }
+}
+
 @end
