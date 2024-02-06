@@ -63,7 +63,7 @@ static BOOL isConnectedToWifi = false;
   self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
 
-  NSLog(@"handle background task");
+  NSLog(@"BGTask handle background task");
   [self handleBackgroundTask];
 
   return YES;
@@ -147,25 +147,25 @@ static BOOL isConnectedToWifi = false;
 
     if (exists) {
 
-      NSLog(@"handleProcessingTask sync begin");
+      NSLog(@"BGTask handleProcessingTask sync begin");
       [self setSyncFinished:false];
 
       char *resp2 = execute("sync", "");
       NSString* respStr2 = [NSString stringWithUTF8String:resp2];
       rust_free(resp2);
 
-      NSLog(@"handleProcessingTask sync end %@", respStr2);
+      NSLog(@"BGTask handleProcessingTask sync end %@", respStr2);
       
       [self setSyncFinished:true];
       char *resp3 = execute("interrupt_sync_after_batch", "true");
       NSString* respStr3 = [NSString stringWithUTF8String:resp3];
-      NSLog(@"interrupt syncing %@", respStr3);
+      NSLog(@"BGTask interrupt syncing %@", respStr3);
       // the execute `sync` already save the wallet when finished
 
     } else {
 
       [self setSyncFinished:true];
-      NSLog(@"handleProcessingTask No exists wallet");
+      NSLog(@"BGTask handleProcessingTask No exists wallet");
 
     }
 
@@ -176,7 +176,7 @@ static BOOL isConnectedToWifi = false;
 -(void)syncingStatusProcessBackgroundTask:(NSString *)noValue {
   @autoreleasepool {
 
-    NSLog(@"handleProcessingTask sync status begin %i", self.syncFinished);
+    NSLog(@"BGTask handleProcessingTask sync status begin %i", self.syncFinished);
     NSInteger prevBatch = -1;
 
     while(!self.syncFinished) {
@@ -184,7 +184,7 @@ static BOOL isConnectedToWifi = false;
       char *resp = execute("syncstatus", "");
       NSString* respStr = [NSString stringWithUTF8String:resp];
       rust_free(resp);
-      NSLog(@"handleProcessingTask sync status response %i %@", self.syncFinished, respStr);
+      NSLog(@"BGTask handleProcessingTask sync status response %i %@", self.syncFinished, respStr);
 
       NSData *data = [respStr dataUsingEncoding:NSUTF8StringEncoding];
       id jsonResp = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
@@ -192,7 +192,7 @@ static BOOL isConnectedToWifi = false;
       NSInteger batch = [batchStr integerValue];
       BOOL progress = [jsonResp valueForKey:@"in_progress"];
 
-      NSLog(@"handleProcessingTask batch number %i %@", self.syncFinished, batchStr);
+      NSLog(@"BGTask handleProcessingTask batch number %i %@", self.syncFinished, batchStr);
 
       if (prevBatch != -1 && batch > 0 && prevBatch != batch) {
         // save the wallet
@@ -207,7 +207,7 @@ static BOOL isConnectedToWifi = false;
         NSString *jsonBackgroud = [NSString stringWithFormat: @"%@%@%@%@%@", @"{\"batches\": \"", batchStr, @"\", \"date\": \"", timeStampStr, @"\"}"];
         [rpcmodule saveBackgroundFile:jsonBackgroud];
 
-        NSLog(@"handleProcessingTask save wallet & background batch %i %@ %i %@", self.syncFinished, batchStr, progress, timeStampStr);
+        NSLog(@"BGTask handleProcessingTask save wallet & background batch %i %@ %i %@", self.syncFinished, batchStr, progress, timeStampStr);
       }
       prevBatch = batch;
     }
@@ -317,18 +317,18 @@ static BOOL isConnectedToWifi = false;
     }
     
     // Start the syncing
-    NSLog(@"configureProcessingTask run");
+    NSLog(@"BGTask configureProcessingTask run");
     [NSThread detachNewThreadSelector:@selector(syncingProcessBackgroundTask:) toTarget:self withObject:nil];
     [self syncingStatusProcessBackgroundTask:nil];
     
     task.expirationHandler = ^{
         NSLog(@"BGTask startBackgroundTask expirationHandler called");
         // Stop the syncing because the allocated time is about to expire
-        NSLog(@"scheduleProcessingTask CANCEL - is about to expire");
+        NSLog(@"BGTask scheduleProcessingTask CANCEL - is about to expire");
         [self setSyncFinished:true];
         char *resp2 = execute("interrupt_sync_after_batch", "true");
         NSString* respStr2 = [NSString stringWithUTF8String:resp2];
-        NSLog(@"interrupt syncing %@", respStr2);
+        NSLog(@"BGTask interrupt syncing %@", respStr2);
     };
 }
 
