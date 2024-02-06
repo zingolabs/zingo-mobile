@@ -3,7 +3,6 @@ const { log, device, by, element } = require('detox');
 import { loadRecipientWallet } from "./e2e-utils/loadRecipientWallet.js";
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const check_timeout = 5000;
 
 describe('Background sync benchmark', () => {
   it('should indicate performance of background sync', async () => {

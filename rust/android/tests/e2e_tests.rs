@@ -116,9 +116,10 @@ mod e2e {
             let (exit_code, output, error) =
                 zingomobile_utils::android_e2e_test("darkside_background_sync_benchmark");
 
-            println!("Exit Code: {}", exit_code);
-            println!("Output: {}", output);
-            println!("Error: {}", error);
+            // DEBUG
+            // println!("Exit Code: {}", exit_code);
+            // println!("Output: {}", output);
+            // println!("Error: {}", error);
 
             // Find the resulting balance from the log
             let line = error
