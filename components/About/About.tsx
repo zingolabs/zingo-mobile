@@ -49,12 +49,15 @@ const About: React.FunctionComponent<AboutProps> = ({ closeModal }) => {
           justifyContent: 'flex-start',
           padding: 20,
         }}>
-        {arrayTxt.map((txt: string) => (
-          <FadeText style={{ marginBottom: 20 }} key={txt.substring(0, 10)}>
-            {txt}
-          </FadeText>
-        ))}
+        <FadeText>{arrayTxt[0]}</FadeText>
         <DetailLine label={translate('info.zingolib') as string} value={info.zingolib} />
+        <View style={{ marginTop: 20 }}>
+          {arrayTxt.map((txt: string, ind: number) => (
+            <View key={txt.substring(0, 10)}>
+              {ind !== 0 && <FadeText style={{ marginBottom: 20 }}>{txt}</FadeText>}
+            </View>
+          ))}
+        </View>
       </ScrollView>
       <View
         style={{
