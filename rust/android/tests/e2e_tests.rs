@@ -64,6 +64,8 @@ mod e2e {
             assert_eq!(exit_code, 0);
         }
 
+        // A test for benchmarking number of transactions synced after 20 seconds in the background
+        // This test has no asserts and should be run with --no-capture to show the final result
         #[ignore]
         #[tokio::test]
         async fn background_sync_benchmark_chainbuild() {
@@ -94,7 +96,6 @@ mod e2e {
         #[tokio::test]
         async fn background_sync_benchmark_test() {
             const BLOCKCHAIN_HEIGHT: u64 = 90_000;
-            // const BLOCKCHAIN_HEIGHT: u64 = 90_000;
             let transaction_set = load_chainbuild_file("background_sync_benchmark");
             let mut scenario = DarksideScenario::new(Some(20_000)).await;
             scenario.build_faucet(Pool::Orchard).await;
@@ -112,26 +113,6 @@ mod e2e {
 
             scenario.stage_and_apply_blocks(BLOCKCHAIN_HEIGHT, 0).await;
 
-            // DEBUG
-            //
-            // scenario.get_lightclient(0).do_sync(false).await.unwrap();
-
-            // // assert the balance is correct
-            // assert_eq!(
-            //     scenario.get_lightclient(0).do_balance().await,
-            //     zingolib::lightclient::PoolBalances {
-            //         sapling_balance: Some(0),
-            //         verified_sapling_balance: Some(0),
-            //         spendable_sapling_balance: Some(0),
-            //         unverified_sapling_balance: Some(0),
-            //         orchard_balance: Some(4_500_000),
-            //         verified_orchard_balance: Some(4_500_000),
-            //         unverified_orchard_balance: Some(0),
-            //         spendable_orchard_balance: Some(4_500_000),
-            //         transparent_balance: Some(0),
-            //     }
-            // );
-
             let (exit_code, output, error) =
                 zingomobile_utils::android_e2e_test("darkside_background_sync_benchmark");
 
@@ -139,8 +120,21 @@ mod e2e {
             println!("Output: {}", output);
             println!("Error: {}", error);
 
-            // assert_eq!(exit_code, 0);
-            assert!(false);
+            // Find the resulting balance from the log
+            let line = error
+                .lines()
+                .map(|line| line.trim())
+                .filter(|line| line.contains("Balance:"))
+                .next()
+                .unwrap();
+            let mut word = line.split_whitespace();
+            while word.next().unwrap() != "Balance:" {}
+            let balance = word.next().unwrap();
+
+            println!("RESULT");
+            println!("Balance after background sync: {}", balance);
+
+            assert_eq!(exit_code, 0);
         }
 
         // interrupt sync test needs updating to latest darkside framework and has not yet revealed a failing test

@@ -511,6 +511,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             marginTop: readOnly ? 15 : 0,
           }}>
           <ZecAmount
+            testID="header.total-balance"
             currencyName={info.currencyName ? info.currencyName : ''}
             color={colors.text}
             size={36}

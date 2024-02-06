@@ -11,15 +11,12 @@ describe('Background sync benchmark', () => {
 
     // close app and wait
     await device.sendToHome();
-    await sleep(15000);
+    await sleep(20000);
 
-    // open app and check if sync is complete
+    // open app and report the total balance, relative to the number of transactions synced in the background
     await device.launchApp({ newInstance: false });
-    try {
-      await waitFor(element(by.id('header.sync-facheck'))).toBeVisible().withTimeout(check_timeout);
-      console.log('Background sync complete');
-    } catch (error) {
-      console.log('Background sync incomplete');
-    }
+    await waitFor(element(by.id('header.total-balance.big-part'))).toBeVisible().withTimeout(sync_timeout);
+    const balance = await element(by.id('header.total-balance.big-part')).getAttributes();
+    console.log("Balance:", balance.text);
   });
 });
