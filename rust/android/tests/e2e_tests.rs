@@ -83,7 +83,7 @@ mod e2e {
                     .await;
 
                 // stage a send to recipient every 200 blocks (block 50, 1050, 2050 etc.)
-                for thousands_blocks_count in 1..=BLOCKCHAIN_HEIGHT / BLOCKS_PER_TX {
+                for tx_count in 1..=BLOCKCHAIN_HEIGHT / BLOCKS_PER_TX {
                     scenario
                         .stage_and_apply_blocks(tx_count * BLOCKS_PER_TX - 2, 0)
                         .await;
@@ -122,10 +122,10 @@ mod e2e {
                 let (exit_code, output, error) =
                     zingomobile_utils::android_e2e_test("darkside_background_sync_benchmark");
 
-                // DEBUG
-                println!("Exit Code: {}", exit_code);
-                println!("Output: {}", output);
-                println!("Error: {}", error);
+                // // DEBUG
+                // println!("Exit Code: {}", exit_code);
+                // println!("Output: {}", output);
+                // println!("Error: {}", error);
 
                 let mut lines_with_balances =
                     error.lines().filter(|line| line.contains("Balance:"));
