@@ -8,14 +8,19 @@ describe('Background sync benchmark', () => {
   it('should indicate performance of background sync', async () => {
     await loadRecipientWallet();
 
-    // close app and wait
+    // report pre-background balance
+    await waitFor(element(by.id('header.total-balance.big-part'))).toBeVisible().withTimeout(sync_timeout);
+    const startBalance = await element(by.id('header.total-balance.big-part')).getAttributes();
+    console.log("startBalance:", startBalance.text);
+
+    // send app to background and wait
     await device.sendToHome();
     await sleep(20000);
 
-    // open app and report the total balance, relative to the number of transactions synced in the background
+    // open app and report the post-background balance, relative to the number of transactions synced in the background
     await device.launchApp({ newInstance: false });
     await waitFor(element(by.id('header.total-balance.big-part'))).toBeVisible().withTimeout(sync_timeout);
-    const balance = await element(by.id('header.total-balance.big-part')).getAttributes();
-    console.log("Balance:", balance.text);
+    const endBalance = await element(by.id('header.total-balance.big-part')).getAttributes();
+    console.log("endBalance:", endBalance.text);
   });
 });

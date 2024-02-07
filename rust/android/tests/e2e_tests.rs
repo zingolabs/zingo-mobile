@@ -64,78 +64,97 @@ mod e2e {
             assert_eq!(exit_code, 0);
         }
 
-        // A test for benchmarking number of transactions synced after 20 seconds in the background
-        // This test has no asserts and should be run with --no-capture to show the final result
-        #[ignore]
-        #[tokio::test]
-        async fn background_sync_benchmark_chainbuild() {
-            const BLOCKCHAIN_HEIGHT: u64 = 90_000;
-            let chainbuild_file = create_chainbuild_file("background_sync_benchmark");
-            let mut scenario = DarksideScenario::new(Some(20_000)).await;
-            scenario.build_faucet(Pool::Orchard).await;
-            scenario
-                .build_client(seeds::HOSPITAL_MUSEUM_SEED.to_string(), 1)
-                .await;
+        // #[cfg(feature = "benchmark")]
+        mod benchmark {
+            use super::*;
 
-            // stage a send to recipient every 200 blocks (block 50, 250, 450 etc.)
-            for thousands_blocks_count in 0..BLOCKCHAIN_HEIGHT / 200 {
+            // A test for benchmarking number of transactions synced after 20 seconds in the background
+            // This test has no asserts and should be run with --no-capture to show the final result
+            #[ignore]
+            #[tokio::test]
+            async fn background_sync_benchmark_chainbuild() {
+                const BLOCKCHAIN_HEIGHT: u64 = 90_000;
+                let chainbuild_file = create_chainbuild_file("background_sync_benchmark");
+                let mut scenario = DarksideScenario::new(Some(20_000)).await;
+                scenario.build_faucet(Pool::Orchard).await;
                 scenario
-                    .stage_and_apply_blocks(thousands_blocks_count * 200 + 49, 0)
+                    .build_client(seeds::HOSPITAL_MUSEUM_SEED.to_string(), 1)
                     .await;
-                scenario.get_faucet().do_sync(false).await.unwrap();
-                scenario
-                    .send_and_write_transaction(
-                        DarksideSender::Faucet,
-                        &get_base_address!(scenario.get_lightclient(0), "unified"),
-                        10_000,
-                        &chainbuild_file,
-                    )
-                    .await;
+
+                // stage a send to recipient every 200 blocks (block 50, 250, 450 etc.)
+                for thousands_blocks_count in 0..BLOCKCHAIN_HEIGHT / 200 {
+                    scenario
+                        .stage_and_apply_blocks(thousands_blocks_count * 200 + 49, 0)
+                        .await;
+                    scenario.get_faucet().do_sync(false).await.unwrap();
+                    scenario
+                        .send_and_write_transaction(
+                            DarksideSender::Faucet,
+                            &get_base_address!(scenario.get_lightclient(0), "unified"),
+                            10_000,
+                            &chainbuild_file,
+                        )
+                        .await;
+                }
             }
-        }
-        #[tokio::test]
-        async fn background_sync_benchmark_test() {
-            const BLOCKCHAIN_HEIGHT: u64 = 90_000;
-            let transaction_set = load_chainbuild_file("background_sync_benchmark");
-            let mut scenario = DarksideScenario::new(Some(20_000)).await;
-            scenario.build_faucet(Pool::Orchard).await;
-            scenario
-                .build_client(seeds::HOSPITAL_MUSEUM_SEED.to_string(), 1)
-                .await;
-
-            // stage a send to recipient every 200 blocks (block 50, 250, 450 etc.)
-            for thousands_blocks_count in 0..BLOCKCHAIN_HEIGHT / 200 {
+            #[tokio::test]
+            async fn background_sync_benchmark_test() {
+                const BLOCKCHAIN_HEIGHT: u64 = 1_000;
+                // const BLOCKCHAIN_HEIGHT: u64 = 90_000;
+                let transaction_set = load_chainbuild_file("background_sync_benchmark");
+                let mut scenario = DarksideScenario::new(Some(20_000)).await;
+                scenario.build_faucet(Pool::Orchard).await;
                 scenario
-                    .stage_and_apply_blocks(thousands_blocks_count * 200 + 49, 0)
+                    .build_client(seeds::HOSPITAL_MUSEUM_SEED.to_string(), 1)
                     .await;
-                scenario.stage_next_transaction(&transaction_set).await;
+
+                // stage a send to recipient every 200 blocks (block 50, 250, 450 etc.)
+                for thousands_blocks_count in 0..BLOCKCHAIN_HEIGHT / 200 {
+                    scenario
+                        .stage_and_apply_blocks(thousands_blocks_count * 200 + 49, 0)
+                        .await;
+                    scenario.stage_next_transaction(&transaction_set).await;
+                }
+
+                scenario.stage_and_apply_blocks(BLOCKCHAIN_HEIGHT, 0).await;
+
+                let (exit_code, _output, error) =
+                    zingomobile_utils::android_e2e_test("darkside_background_sync_benchmark");
+
+                // DEBUG
+                // println!("Exit Code: {}", exit_code);
+                // println!("Output: {}", output);
+                // println!("Error: {}", error);
+
+                // Find the start and end balance from the log
+                let line = error
+                    .lines()
+                    .map(|line| line.trim())
+                    .filter(|line| line.contains("startBalance:"))
+                    .next()
+                    .unwrap();
+                let mut word = line.split_whitespace();
+                while word.next().unwrap() != "startBalance:" {}
+                let start_balance: f64 = word.next().unwrap().parse().unwrap();
+
+                let line = error
+                    .lines()
+                    .map(|line| line.trim())
+                    .filter(|line| line.contains("endBalance:"))
+                    .next()
+                    .unwrap();
+                let mut word = line.split_whitespace();
+                while word.next().unwrap() != "endBalance:" {}
+                let end_balance: f64 = word.next().unwrap().parse().unwrap();
+
+                let transaction_count = (end_balance - start_balance) * 1000.0;
+                let blocks_synced = transaction_count as u64 * 200;
+
+                println!("RESULT");
+                println!("Blocks synced in background: {}", blocks_synced);
+
+                assert_eq!(exit_code, 0);
             }
-
-            scenario.stage_and_apply_blocks(BLOCKCHAIN_HEIGHT, 0).await;
-
-            let (exit_code, output, error) =
-                zingomobile_utils::android_e2e_test("darkside_background_sync_benchmark");
-
-            // DEBUG
-            // println!("Exit Code: {}", exit_code);
-            // println!("Output: {}", output);
-            // println!("Error: {}", error);
-
-            // Find the resulting balance from the log
-            let line = error
-                .lines()
-                .map(|line| line.trim())
-                .filter(|line| line.contains("Balance:"))
-                .next()
-                .unwrap();
-            let mut word = line.split_whitespace();
-            while word.next().unwrap() != "Balance:" {}
-            let balance = word.next().unwrap();
-
-            println!("RESULT");
-            println!("Balance after background sync: {}", balance);
-
-            assert_eq!(exit_code, 0);
         }
 
         // interrupt sync test needs updating to latest darkside framework and has not yet revealed a failing test
