@@ -30,19 +30,11 @@ static void InitializeFlipper(UIApplication *application) {
 #endif
 
 @implementation AppDelegate
-static BOOL _syncFinished = true;
-
-+ (BOOL)syncFinished {
-  return _syncFinished;
-}
-
-+ (void)setSyncFinished:(BOOL)newSyncFinished {
-  _syncFinished = newSyncFinished;
-}
 
 static NSString* syncTask = @"Zingo_Processing_Task_ID";
 static NSString* syncSchedulerTask = @"Zingo_Processing_Scheduler_Task_ID";
 static BOOL isConnectedToWifi = false;
+static BOOL syncFinished = true;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
@@ -63,8 +55,10 @@ static BOOL isConnectedToWifi = false;
   self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
 
-  NSLog(@"BGTask handle background task");
-  [self handleBackgroundTask];
+  if (@available(iOS 13.0, *)) {
+      NSLog(@"BGTask handle background task");
+      [self handleBackgroundTask];
+  }
 
   return YES;
 }
@@ -93,24 +87,30 @@ static BOOL isConnectedToWifi = false;
                   restorationHandler:restorationHandler];
 }
 
-- (BOOL)application:(UIApplication *)application willFinishLaunchingWithOptions:(NSDictionary *)launchOptions
-{
-  if (@available(iOS 13.0, *)) {
-      //NSLog(@"configureProcessingTask");
-      //[self configureProcessingTask];
-  }
-  return YES;
-}
+//- (BOOL)application:(UIApplication *)application willFinishLaunchingWithOptions:(NSDictionary *)launchOptions
+//{
+//  if (@available(iOS 13.0, *)) {
+//      NSLog(@"configureProcessingTask");
+//      [self configureProcessingTask];
+//  }
+//  return YES;
+//}
 
 - (void)applicationWillEnterForeground:(UIApplication *)application
 {
-  // cancel existing task (if any)
-  NSLog(@"BGTask scheduleProcessingTask CANCEL - foreground");
-  [self setSyncFinished:true];
-  char *resp2 = execute("interrupt_sync_after_batch", "true");
-  NSString* respStr2 = [NSString stringWithUTF8String:resp2];
-  NSLog(@"BGTask interrupt syncing %@", respStr2);
-  [BGTaskScheduler.sharedScheduler cancelTaskRequestWithIdentifier:syncTask];
+  if (@available(iOS 13.0, *)) {
+      // cancel existing sync process
+      NSLog(@"BGTask sync finished %i", syncFinished);
+      if (!syncFinished) {
+          NSLog(@"BGTask scheduleProcessingTask CANCEL - foreground");
+          syncFinished = true;
+          char *resp2 = execute("interrupt_sync_after_batch", "true");
+          NSString* respStr2 = [NSString stringWithUTF8String:resp2];
+          NSLog(@"BGTask interrupt syncing %@", respStr2);
+      }
+      // cancel the task (if any)
+      [BGTaskScheduler.sharedScheduler cancelTaskRequestWithIdentifier:syncTask];
+  }
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application
@@ -147,16 +147,16 @@ static BOOL isConnectedToWifi = false;
 
     if (exists) {
 
-      NSLog(@"BGTask handleProcessingTask sync begin");
-      [self setSyncFinished:false];
+      NSLog(@"BGTask handleProcessingTask sync BEGIN");
+      //syncFinished = false;
 
       char *resp2 = execute("sync", "");
       NSString* respStr2 = [NSString stringWithUTF8String:resp2];
       rust_free(resp2);
 
-      NSLog(@"BGTask handleProcessingTask sync end %@", respStr2);
+      NSLog(@"BGTask handleProcessingTask sync END %@", respStr2);
       
-      [self setSyncFinished:true];
+      syncFinished = true;
       char *resp3 = execute("interrupt_sync_after_batch", "true");
       NSString* respStr3 = [NSString stringWithUTF8String:resp3];
       NSLog(@"BGTask interrupt syncing %@", respStr3);
@@ -164,7 +164,7 @@ static BOOL isConnectedToWifi = false;
 
     } else {
 
-      [self setSyncFinished:true];
+      syncFinished = true;
       NSLog(@"BGTask handleProcessingTask No exists wallet");
 
     }
@@ -176,15 +176,15 @@ static BOOL isConnectedToWifi = false;
 -(void)syncingStatusProcessBackgroundTask:(NSString *)noValue {
   @autoreleasepool {
 
-    NSLog(@"BGTask handleProcessingTask sync status begin %i", self.syncFinished);
+    NSLog(@"BGTask handleProcessingTask sync status BEGIN %i", syncFinished);
     NSInteger prevBatch = -1;
 
-    while(!self.syncFinished) {
+    while(!syncFinished) {
       [NSThread sleepForTimeInterval: 2.0];
       char *resp = execute("syncstatus", "");
       NSString* respStr = [NSString stringWithUTF8String:resp];
       rust_free(resp);
-      NSLog(@"BGTask handleProcessingTask sync status response %i %@", self.syncFinished, respStr);
+      NSLog(@"BGTask handleProcessingTask sync status response %i %@", syncFinished, respStr);
 
       NSData *data = [respStr dataUsingEncoding:NSUTF8StringEncoding];
       id jsonResp = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
@@ -192,7 +192,7 @@ static BOOL isConnectedToWifi = false;
       NSInteger batch = [batchStr integerValue];
       BOOL progress = [jsonResp valueForKey:@"in_progress"];
 
-      NSLog(@"BGTask handleProcessingTask batch number %i %@", self.syncFinished, batchStr);
+      NSLog(@"BGTask handleProcessingTask batch number %i %@", syncFinished, batchStr);
 
       if (prevBatch != -1 && batch > 0 && prevBatch != batch) {
         // save the wallet
@@ -207,10 +207,12 @@ static BOOL isConnectedToWifi = false;
         NSString *jsonBackgroud = [NSString stringWithFormat: @"%@%@%@%@%@", @"{\"batches\": \"", batchStr, @"\", \"date\": \"", timeStampStr, @"\"}"];
         [rpcmodule saveBackgroundFile:jsonBackgroud];
 
-        NSLog(@"BGTask handleProcessingTask save wallet & background batch %i %@ %i %@", self.syncFinished, batchStr, progress, timeStampStr);
+        NSLog(@"BGTask handleProcessingTask save wallet & background batch %i %@ %i %@", syncFinished, batchStr, progress, timeStampStr);
       }
       prevBatch = batch;
     }
+
+    NSLog(@"BGTask handleProcessingTask sync status END %i", syncFinished);
 
     // we don't want to save if the sync is finished:
     // 1. OS kill the task -> to save is dangerous.
@@ -259,7 +261,7 @@ static BOOL isConnectedToWifi = false;
     }
 }
 
-// NEW BACKGROUND SCHEDULING TASK
+// NEW BACKGROUND SCHEDULING TASKS
 
 - (void)handleBackgroundTask {
     // We require the background task to run when connected to the power and wifi
@@ -318,17 +320,21 @@ static BOOL isConnectedToWifi = false;
     
     // Start the syncing
     NSLog(@"BGTask configureProcessingTask run");
+    syncFinished = false;
     [NSThread detachNewThreadSelector:@selector(syncingProcessBackgroundTask:) toTarget:self withObject:nil];
     [self syncingStatusProcessBackgroundTask:nil];
+    [task setTaskCompletedWithSuccess:YES];
     
     task.expirationHandler = ^{
         NSLog(@"BGTask startBackgroundTask expirationHandler called");
         // Stop the syncing because the allocated time is about to expire
-        NSLog(@"BGTask scheduleProcessingTask CANCEL - is about to expire");
-        [self setSyncFinished:true];
-        char *resp2 = execute("interrupt_sync_after_batch", "true");
-        NSString* respStr2 = [NSString stringWithUTF8String:resp2];
-        NSLog(@"BGTask interrupt syncing %@", respStr2);
+        if (!syncFinished) {
+            NSLog(@"BGTask scheduleProcessingTask CANCEL - is about to expire");
+            syncFinished = true;
+            char *resp2 = execute("interrupt_sync_after_batch", "true");
+            NSString* respStr2 = [NSString stringWithUTF8String:resp2];
+            NSLog(@"BGTask interrupt syncing %@", respStr2);
+        }
     };
 }
 
@@ -349,12 +355,12 @@ static BOOL isConnectedToWifi = false;
     NSDate *earlyMorning = [[NSCalendar currentCalendar] dateByAddingComponents:earlyMorningComponent toDate:tomorrow options:0];
     
     // DEVELOPMENT
-    //NSDate *now = [NSDate date];
+    NSDate *now = [NSDate date];
 
-    //NSDate *twoMinutesLater = [now dateByAddingTimeInterval:120]; // 2 minutes = 120 seconds
+    NSDate *twoMinutesLater = [now dateByAddingTimeInterval:120]; // 2 minutes = 120 seconds
 
-    request.earliestBeginDate = earlyMorning;
-    //request.earliestBeginDate = twoMinutesLater;
+    //request.earliestBeginDate = earlyMorning;
+    request.earliestBeginDate = twoMinutesLater;
     request.requiresExternalPower = YES;
     request.requiresNetworkConnectivity = YES;
     
@@ -384,12 +390,12 @@ static BOOL isConnectedToWifi = false;
     NSDate *afternoon = [[NSCalendar currentCalendar] dateByAddingComponents:afternoonComponent toDate:tomorrow options:0];
     
     // DEVELOPMENT
-    //NSDate *now = [NSDate date];
+    NSDate *now = [NSDate date];
 
-    //NSDate *twoMinutesLater = [now dateByAddingTimeInterval:120]; // 2 minutes = 120 seconds
+    NSDate *fiveMinutesLater = [now dateByAddingTimeInterval:300]; // 5 minutes = 300 seconds
 
     request.earliestBeginDate = afternoon;
-    //request.earliestBeginDate = twoMinutesLater;
+    //request.earliestBeginDate = fiveMinutesLater;
     request.requiresExternalPower = NO;
     request.requiresNetworkConnectivity = NO;
     
