@@ -18,7 +18,7 @@ describe('Background sync benchmark', () => {
     await sleep(45000);
 
     // open app and report the post-background balance, relative to the number of transactions synced in the background
-    await device.launchApp({ newInstance: false });
+    await device.launchApp({ newInstance: true });
     await waitFor(element(by.id('header.total-balance.big-part'))).toBeVisible().withTimeout(sync_timeout);
     const endBalance = await element(by.id('header.total-balance.big-part')).getAttributes();
     console.log("endBalance:", endBalance.text);
