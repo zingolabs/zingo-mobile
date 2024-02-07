@@ -68,7 +68,7 @@ mod e2e {
         mod benchmark {
             use super::*;
 
-            // A test for benchmarking number of blocks synced after 20 seconds in the background
+            // A test for benchmarking number of blocks synced after 60 seconds in the background
             // This test has no asserts and should be run with --no-capture to show the final result
             #[ignore]
             #[tokio::test]
@@ -81,7 +81,7 @@ mod e2e {
                     .build_client(seeds::HOSPITAL_MUSEUM_SEED.to_string(), 1)
                     .await;
 
-                // stage a send to recipient every 200 blocks (block 50, 250, 450 etc.)
+                // stage a send to recipient every 200 blocks (block 50, 1050, 2050 etc.)
                 for thousands_blocks_count in 0..BLOCKCHAIN_HEIGHT / 200 {
                     scenario
                         .stage_and_apply_blocks(thousands_blocks_count * 200 + 49, 0)
@@ -99,7 +99,8 @@ mod e2e {
             }
             #[tokio::test]
             async fn background_sync_benchmark_test() {
-                const BLOCKCHAIN_HEIGHT: u64 = 90_000;
+                const BLOCKCHAIN_HEIGHT: u64 = 112_500;
+                const BLOCKS_PER_TX: u64 = 250;
                 let transaction_set = load_chainbuild_file("background_sync_benchmark");
                 let mut scenario = DarksideScenario::new(Some(20_000)).await;
                 scenario.build_faucet(Pool::Orchard).await;
@@ -107,23 +108,23 @@ mod e2e {
                     .build_client(seeds::HOSPITAL_MUSEUM_SEED.to_string(), 1)
                     .await;
 
-                // stage a send to recipient every 200 blocks (block 50, 250, 450 etc.)
-                for thousands_blocks_count in 0..BLOCKCHAIN_HEIGHT / 200 {
+                // stage a send to recipient every BLOCKS_PER_TX blocks
+                for tx_count in 1..=BLOCKCHAIN_HEIGHT / BLOCKS_PER_TX {
                     scenario
-                        .stage_and_apply_blocks(thousands_blocks_count * 200 + 49, 0)
+                        .stage_and_apply_blocks(tx_count * BLOCKS_PER_TX - 2, 0)
                         .await;
                     scenario.stage_next_transaction(&transaction_set).await;
                 }
 
                 scenario.stage_and_apply_blocks(BLOCKCHAIN_HEIGHT, 0).await;
 
-                let (exit_code, _output, error) =
+                let (exit_code, output, error) =
                     zingomobile_utils::android_e2e_test("darkside_background_sync_benchmark");
 
                 // DEBUG
-                // println!("Exit Code: {}", exit_code);
-                // println!("Output: {}", output);
-                // println!("Error: {}", error);
+                println!("Exit Code: {}", exit_code);
+                println!("Output: {}", output);
+                println!("Error: {}", error);
 
                 let mut lines_with_balances =
                     error.lines().filter(|line| line.contains("Balance:"));
@@ -139,7 +140,7 @@ mod e2e {
                             break;
                         }
                     }
-                    balance.unwrap().parse().unwrap()
+                    balance.unwrap().parse().expect("should find some balance")
                 }
 
                 let start_balance = find_balance_from_line(
@@ -153,8 +154,8 @@ mod e2e {
                         .expect("should find a line with end balance"),
                 );
 
-                let transaction_count = ((end_balance - start_balance) * 1000.0) as u64;
-                let blocks_synced = transaction_count * 200;
+                let transactions_synced = ((end_balance - start_balance) * 10000.0) as u64;
+                let blocks_synced = transactions_synced * BLOCKS_PER_TX;
 
                 println!("RESULT");
                 println!("Blocks synced in background: {}", blocks_synced);
