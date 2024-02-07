@@ -61,65 +61,115 @@ jest.mock('@react-native-community/netinfo', () => {
 
   return RN;
 });
+jest.mock('react-native', () => {
+  const RN = jest.requireActual('react-native');
+
+  RN.NativeModules.RPCModule = {
+    execute: jest.fn(() => '{}'),
+  };
+
+  return RN;
+});
 
 // test suite
-describe('Component Transactions - test', () => {
+describe('Component History - test', () => {
   //snapshot test
-  test('Transactions - snapshot', () => {
-    const state = defaultAppStateLoaded;
-    state.transactions = [
-      {
-        type: 'sent',
-        address: 'sent-address-12345678901234567890',
-        amount: 0.12345678,
-        position: '',
-        confirmations: 22,
-        txid: 'sent-txid-1234567890',
-        time: Date.now(),
-        zec_price: 33.33,
-        detailedTxns: [],
-      },
-      {
-        type: 'receive',
-        address: 'receive-address-12345678901234567890',
-        amount: 0.87654321,
-        position: '',
-        confirmations: 133,
-        txid: 'receive-txid-1234567890',
-        time: Date.now(),
-        zec_price: 66.66,
-        detailedTxns: [],
-      },
-    ];
-    state.uaAddress = 'UA-12345678901234567890';
-    state.addresses = [
-      {
-        uaAddress: 'UA-12345678901234567890',
-        address: 'UA-12345678901234567890',
-        addressKind: 'u',
-        containsPending: false,
-        receivers: 'ozt',
-      },
-      {
-        uaAddress: 'UA-12345678901234567890',
-        address: 'sapling-12345678901234567890',
-        addressKind: 'z',
-        containsPending: false,
-        receivers: 'z',
-      },
-      {
-        uaAddress: 'UA-12345678901234567890',
-        address: 'transparent-12345678901234567890',
-        addressKind: 't',
-        containsPending: false,
-        receivers: 't',
-      },
-    ];
-    state.translate = () => 'text translated';
-    state.info.currencyName = 'ZEC';
-    state.totalBalance.total = 1.12345678;
-    const onFunction = jest.fn();
-    const transactions = render(
+  const state = defaultAppStateLoaded;
+  state.transactions = [
+    {
+      type: 'Sent',
+      fee: 0.0001,
+      confirmations: 22,
+      txid: 'sent-txid-1234567890',
+      time: Date.now(),
+      zec_price: 33.33,
+      txDetails: [
+        {
+          address: 'sent-address-1-12345678901234567890',
+          amount: 0.12345678,
+          memos: ['hola', '  & ', 'hello'],
+        },
+        {
+          address: 'sent-address-2-09876543210987654321',
+          amount: 0,
+          memos: ['hello', '  & ', 'hola'],
+        },
+      ],
+    },
+    {
+      type: 'SendToSelf',
+      fee: 0.0001,
+      confirmations: 12,
+      txid: 'sendtoself-txid-1234567890',
+      time: Date.now(),
+      zec_price: 33.33,
+      txDetails: [
+        {
+          address: '',
+          amount: 0,
+          memos: ['orchard memo', 'sapling memo'],
+        },
+      ],
+    },
+    {
+      type: 'Received',
+      confirmations: 133,
+      txid: 'receive-txid-1234567890',
+      time: Date.now(),
+      zec_price: 66.66,
+      txDetails: [
+        {
+          address: '',
+          amount: 0.77654321,
+          pool: 'Orchard',
+          memos: ['hola', '  & ', 'hello'],
+        },
+        {
+          address: '',
+          amount: 0.1,
+          pool: 'Sapling',
+          memos: ['hello', '  & ', 'hola'],
+        },
+      ],
+    },
+  ];
+  state.uaAddress = 'UA-12345678901234567890';
+  state.addresses = [
+    {
+      uaAddress: 'UA-12345678901234567890',
+      address: 'UA-12345678901234567890',
+      addressKind: 'u',
+      containsPending: false,
+      receivers: 'ozt',
+    },
+    {
+      uaAddress: 'UA-12345678901234567890',
+      address: 'sapling-12345678901234567890',
+      addressKind: 'z',
+      containsPending: false,
+      receivers: 'z',
+    },
+    {
+      uaAddress: 'UA-12345678901234567890',
+      address: 'transparent-12345678901234567890',
+      addressKind: 't',
+      containsPending: false,
+      receivers: 't',
+    },
+  ];
+  state.translate = () => 'text translated';
+  state.info.currencyName = 'ZEC';
+  state.totalBalance.total = 1.12345678;
+  const onFunction = jest.fn();
+
+  test('History no currency, privacy normal & mode basic - snapshot', () => {
+    // no currency
+    state.currency = '';
+    // privacy normal
+    state.privacy = false;
+    // mode basic
+    state.mode = 'basic';
+    const history = render(
       <ContextAppLoadedProvider value={state}>
         <History
           doRefresh={onFunction}
@@ -128,9 +178,37 @@ describe('Component Transactions - test', () => {
           syncingStatusMoreInfoOnClick={onFunction}
           setZecPrice={onFunction}
           setComputingModalVisible={onFunction}
+          set_privacy_option={onFunction}
+          setPoolsToShieldSelectSapling={onFunction}
+          setPoolsToShieldSelectTransparent={onFunction}
         />
       </ContextAppLoadedProvider>,
     );
-    expect(transactions.toJSON()).toMatchSnapshot();
+    expect(history.toJSON()).toMatchSnapshot();
+  });
+
+  test('History currency USD, privacy high & mode advanced - snapshot', () => {
+    // no currency
+    state.currency = 'USD';
+    // privacy normal
+    state.privacy = true;
+    // mode basic
+    state.mode = 'advanced';
+    const history = render(
+      <ContextAppLoadedProvider value={state}>
+        <History
+          doRefresh={onFunction}
+          toggleMenuDrawer={onFunction}
+          poolsMoreInfoOnClick={onFunction}
+          syncingStatusMoreInfoOnClick={onFunction}
+          setZecPrice={onFunction}
+          setComputingModalVisible={onFunction}
+          set_privacy_option={onFunction}
+          setPoolsToShieldSelectSapling={onFunction}
+          setPoolsToShieldSelectTransparent={onFunction}
+        />
+      </ContextAppLoadedProvider>,
+    );
+    expect(history.toJSON()).toMatchSnapshot();
   });
 });

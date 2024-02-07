@@ -7,7 +7,6 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import CurrencyAmount from '../components/Components/CurrencyAmount';
-import ZecPrice from '../components/Components/ZecPrice';
 import ZecAmount from '../components/Components/ZecAmount';
 import BoldText from '../components/Components/BoldText';
 import FadeText from '../components/Components/FadeText';
@@ -26,19 +25,41 @@ jest.mock('react-native-localize', () => ({
 // test suite
 describe('Component Components - test', () => {
   //snapshot test
-  test('UsdAmount - snapshot', () => {
-    const usdAmount = render(
+  test('CurrencyAmount High Privacy - snapshot', () => {
+    const currencyAmount = render(
+      <CurrencyAmount
+        price={1.12345678}
+        amtZec={39.99}
+        style={{ backgroundColor: 'red' }}
+        currency={'USD'}
+        privacy={true}
+      />,
+    );
+    expect(currencyAmount.toJSON()).toMatchSnapshot();
+  });
+
+  test('CurrencyAmount Normal Privacy - snapshot', () => {
+    const currencyAmount = render(
       <CurrencyAmount price={1.12345678} amtZec={39.99} style={{ backgroundColor: 'red' }} currency={'USD'} />,
     );
-    expect(usdAmount.toJSON()).toMatchSnapshot();
+    expect(currencyAmount.toJSON()).toMatchSnapshot();
   });
 
-  test('ZecPrice - snapshot', () => {
-    const zecPrice = render(<ZecPrice price={39.99} currencyName={'ZEC'} currency={'USD'} />);
-    expect(zecPrice.toJSON()).toMatchSnapshot();
+  test('ZecAmount High Privacy - snapshot', () => {
+    const zecAmount = render(
+      <ZecAmount
+        color={'red'}
+        size={20}
+        amtZec={1.12345678}
+        style={{ backgroundColor: 'red' }}
+        currencyName={'ZEC'}
+        privacy={true}
+      />,
+    );
+    expect(zecAmount.toJSON()).toMatchSnapshot();
   });
 
-  test('ZecAmount - snapshot', () => {
+  test('ZecAmount Normal Privacy - snapshot', () => {
     const zecAmount = render(
       <ZecAmount color={'red'} size={20} amtZec={1.12345678} style={{ backgroundColor: 'red' }} currencyName={'ZEC'} />,
     );

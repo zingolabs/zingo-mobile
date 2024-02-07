@@ -1,6 +1,6 @@
 const { log, device, by, element } = require('detox');
 
-import { loadTestWallet } from "./loadTestWallet.js";
+import { loadTestWallet } from "./e2e-utils/loadTestWallet.js";
 
 describe('Renders wallet data correctly.', () => {
   // i just pulled this seed out of thin air
@@ -10,8 +10,8 @@ describe('Renders wallet data correctly.', () => {
     await element(by.text('SEND')).tap();
     
     await element(by.id('send.scan-button')).tap();
-    await expect(element(by.id('send.scan.cancel'))).toBeVisible();
-    await element(by.id('send.scan.cancel')).tap();
+    await expect(element(by.id('scan.cancel'))).toBeVisible();
+    await element(by.id('scan.cancel')).tap();
   });
   
   it('adds return address to the memo if that option is selected, and correctly renders confirm screen', async () => {
@@ -21,12 +21,12 @@ describe('Renders wallet data correctly.', () => {
     );
     await element(by.id('send.amount')).replaceText('0');
     await element(by.id('send.checkboxUA')).tap();
-    await element(by.id('send.scrollView')).scrollTo('bottom');
+    await element(by.id('send.scroll-view')).scrollTo('bottom');
     await element(by.id('send.memo-field')).replaceText("1\n2\n3\n4\n5\n6\n7\n8");
-    await element(by.id('send.scrollView')).scrollTo('bottom');
+    await element(by.id('send.scroll-view')).scrollTo('bottom');
     await element(by.id('send.button')).tap();
 
-    await element(by.id('send.confirm.scrollView')).scrollTo('bottom');
+    await element(by.id('send.confirm.scroll-view')).scrollTo('bottom');
     
     const memo = element(by.id('send.confirm-memo'));
 

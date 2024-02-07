@@ -11,14 +11,18 @@ import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import RPC from '../../app/rpc';
 import Header from '../Header';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import FadeText from '../Components/FadeText';
+import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 
 type PoolsProps = {
   closeModal: () => void;
+  set_privacy_option: (name: 'privacy', value: boolean) => Promise<void>;
 };
 
-const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal }) => {
+const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, set_privacy_option }) => {
   const context = useContext(ContextAppLoaded);
-  const { totalBalance, info, translate } = context;
+  const { totalBalance, info, translate, privacy, addLastSnackbar, someUnconfirmed } = context;
   const { colors } = useTheme() as unknown as ThemeType;
 
   useEffect(() => {
@@ -36,7 +40,14 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal }) => {
         height: '100%',
         backgroundColor: colors.background,
       }}>
-      <Header title={translate('pools.title') as string} noBalance={true} noSyncingStatus={true} noDrawMenu={true} />
+      <Header
+        title={translate('pools.title') as string}
+        noBalance={true}
+        noSyncingStatus={true}
+        noDrawMenu={true}
+        set_privacy_option={set_privacy_option}
+        addLastSnackbar={addLastSnackbar}
+      />
 
       <ScrollView
         style={{ maxHeight: '85%' }}
@@ -51,6 +62,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal }) => {
           <View style={{ display: 'flex', marginLeft: 25 }}>
             <DetailLine label={translate('pools.orchard-balance') as string}>
               <ZecAmount
+                testID="orchard-total-balance"
                 amtZec={totalBalance.orchardBal}
                 size={18}
                 currencyName={info.currencyName ? info.currencyName : ''}
@@ -60,10 +72,12 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal }) => {
                       ? 1
                       : 0.5,
                 }}
+                privacy={privacy}
               />
             </DetailLine>
             <DetailLine label={translate('pools.orchard-spendable-balance') as string}>
               <ZecAmount
+                testID="orchard-spendable-balance"
                 amtZec={totalBalance.spendableOrchard}
                 size={18}
                 currencyName={info.currencyName ? info.currencyName : ''}
@@ -72,6 +86,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal }) => {
                     ? colors.primary
                     : 'red'
                 }
+                privacy={privacy}
               />
             </DetailLine>
           </View>
@@ -83,6 +98,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal }) => {
           <View style={{ display: 'flex', marginLeft: 25 }}>
             <DetailLine label={translate('pools.sapling-balance') as string}>
               <ZecAmount
+                testID="sapling-total-balance"
                 amtZec={totalBalance.privateBal}
                 size={18}
                 currencyName={info.currencyName ? info.currencyName : ''}
@@ -92,10 +108,12 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal }) => {
                       ? 1
                       : 0.5,
                 }}
+                privacy={privacy}
               />
             </DetailLine>
             <DetailLine label={translate('pools.sapling-spendable-balance') as string}>
               <ZecAmount
+                testID="sapling-spendable-balance"
                 amtZec={totalBalance.spendablePrivate}
                 size={18}
                 currencyName={info.currencyName ? info.currencyName : ''}
@@ -104,6 +122,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal }) => {
                     ? colors.primary
                     : 'red'
                 }
+                privacy={privacy}
               />
             </DetailLine>
           </View>
@@ -115,12 +134,30 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal }) => {
           <View style={{ display: 'flex', marginLeft: 25 }}>
             <DetailLine label={translate('pools.transparent-balance') as string}>
               <ZecAmount
+                testID="transparent-balance"
                 amtZec={totalBalance.transparentBal}
                 size={18}
                 currencyName={info.currencyName ? info.currencyName : ''}
+                color={'red'}
+                privacy={privacy}
               />
             </DetailLine>
           </View>
+
+          {someUnconfirmed && (
+            <View
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                marginTop: 5,
+                backgroundColor: colors.card,
+                padding: 5,
+                borderRadius: 10,
+              }}>
+              <FontAwesomeIcon icon={faInfoCircle} size={20} color={colors.primary} style={{ marginRight: 5 }} />
+              <FadeText>{translate('send.somefunds') as string}</FadeText>
+            </View>
+          )}
         </View>
       </ScrollView>
 
@@ -132,7 +169,12 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal }) => {
           alignItems: 'center',
           marginVertical: 5,
         }}>
-        <Button type="Secondary" title={translate('close') as string} onPress={closeModal} />
+        <Button
+          testID="fund-pools.button.close"
+          type="Secondary"
+          title={translate('close') as string}
+          onPress={closeModal}
+        />
       </View>
     </SafeAreaView>
   );

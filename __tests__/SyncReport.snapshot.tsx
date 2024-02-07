@@ -46,6 +46,15 @@ jest.mock('@react-native-community/netinfo', () => ({
   },
   NetInfoStateType: NetInfoStateType,
 }));
+jest.mock('react-native', () => {
+  const RN = jest.requireActual('react-native');
+
+  RN.NativeModules.RPCModule = {
+    execute: jest.fn(() => '{}'),
+  };
+
+  return RN;
+});
 
 // test suite
 describe('Component SyncReport - test', () => {
@@ -54,24 +63,24 @@ describe('Component SyncReport - test', () => {
   state.translate = () => 'translated text';
   state.info.currencyName = 'ZEC';
   state.totalBalance.total = 1.12345678;
-  state.walletSeed.birthday = 1500100;
-  state.syncingStatusReport.syncID = 1;
-  state.syncingStatusReport.inProgress = true;
-  state.syncingStatusReport.currentBatch = 5;
-  state.syncingStatusReport.totalBatches = 50;
-  state.syncingStatusReport.currentBlock = 1800100;
-  state.syncingStatusReport.lastBlockWallet = 1800000;
-  state.syncingStatusReport.lastBlockServer = 1900100;
-  state.syncingStatusReport.secondsPerBatch = 122;
-  state.syncingStatusReport.process_end_block = 1600100;
+  state.wallet.birthday = 1500100;
+  state.syncingStatus.syncID = 1;
+  state.syncingStatus.inProgress = true;
+  state.syncingStatus.currentBatch = 5;
+  state.syncingStatus.totalBatches = 50;
+  state.syncingStatus.currentBlock = 1800100;
+  state.syncingStatus.lastBlockWallet = 1800000;
+  state.syncingStatus.lastBlockServer = 1900100;
+  state.syncingStatus.secondsPerBatch = 122;
+  state.syncingStatus.process_end_block = 1600100;
   state.netInfo.isConnected = true;
   const onClose = jest.fn();
-  test('Matches the snapshot SyncReport', () => {
-    const info: any = render(
+  test('SyncReport - snapshot', () => {
+    const sync = render(
       <ContextAppLoadedProvider value={state}>
         <SyncReport closeModal={onClose} />
       </ContextAppLoadedProvider>,
     );
-    expect(info.toJSON()).toMatchSnapshot();
+    expect(sync.toJSON()).toMatchSnapshot();
   });
 });

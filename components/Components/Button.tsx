@@ -32,12 +32,13 @@ const Button: React.FunctionComponent<ButtonProps> = ({
     type === 'Primary'
       ? {
           backgroundColor: disabled ? colors.primaryDisabled : colors.primary,
-          borderColor: colors.primary,
+          borderColor: disabled ? colors.primaryDisabled : colors.text,
           borderWidth: 2,
         }
       : type === 'Secondary'
       ? {
-          borderColor: colors.primary,
+          backgroundColor: disabled ? colors.secondaryDisabled : colors.background,
+          borderColor: disabled ? colors.primaryDisabled : colors.primary,
           borderWidth: 2,
         }
       : {
@@ -81,10 +82,11 @@ const Button: React.FunctionComponent<ButtonProps> = ({
         }}>
         <Text
           style={{
-            color: type === 'Primary' ? colors.background : colors.primary,
+            color: type === 'Primary' ? colors.background : disabled ? colors.primaryDisabled : colors.primary,
             fontWeight: 'bold',
             textTransform: 'uppercase',
             fontSize: 16,
+            textAlign: 'center',
           }}>
           {title}
         </Text>

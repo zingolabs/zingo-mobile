@@ -1,0 +1,114 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Component LoadingApp - test LoadingApp - snapshot 1`] = `
+<RCTSafeAreaView
+  style={
+    {
+      "alignItems": "center",
+      "backgroundColor": "#011401",
+      "display": "flex",
+      "height": "100%",
+      "justifyContent": "center",
+    }
+  }
+>
+  <View />
+  <RCTSafeAreaView
+    style={
+      {
+        "alignItems": "center",
+        "backgroundColor": "rgb(242, 242, 242)",
+        "display": "flex",
+        "height": "100%",
+        "justifyContent": "center",
+      }
+    }
+  >
+    <View
+      style={
+        {
+          "alignItems": "center",
+          "flex": 1,
+          "flexDirection": "column",
+          "justifyContent": "center",
+          "width": "95%",
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": undefined,
+            "fontSize": 40,
+            "fontWeight": "bold",
+          }
+        }
+      >
+        text traslated
+      </Text>
+      <Text
+        style={
+          {
+            "color": undefined,
+            "fontSize": 15,
+          }
+        }
+      >
+        text traslated
+      </Text>
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "flexDirection": "column",
+            "justifyContent": "center",
+            "marginTop": 20,
+            "padding": 10,
+            "width": "80%",
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "rgb(28, 28, 30)",
+              "fontSize": 20,
+              "fontWeight": "bold",
+              "marginTop": 10,
+              "opacity": 0,
+            }
+          }
+        >
+          text traslated
+        </Text>
+        <Text
+          style={
+            {
+              "color": "rgb(28, 28, 30)",
+              "fontSize": 15,
+              "marginTop": 10,
+              "opacity": 0,
+              "textAlign": "center",
+            }
+          }
+        >
+          text traslated
+        </Text>
+        <Text
+          style={
+            {
+              "color": "rgb(28, 28, 30)",
+              "fontSize": 15,
+              "marginBottom": 10,
+              "marginTop": 10,
+              "opacity": 0,
+            }
+          }
+        >
+          text traslated
+        </Text>
+      </View>
+    </View>
+  </RCTSafeAreaView>
+</RCTSafeAreaView>
+`;

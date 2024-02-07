@@ -1,10 +1,9 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useRef, useCallback, useContext } from 'react';
-import { View, ScrollView, Modal, Alert, Keyboard, TextInput, TouchableOpacity } from 'react-native';
+import { View, ScrollView, Modal, Keyboard, TextInput, TouchableOpacity, Platform } from 'react-native';
 import { faQrcode, faCheck, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme, useIsFocused } from '@react-navigation/native';
-import Toast from 'react-native-simple-toast';
 import { getNumberFormatSettings } from 'react-native-localize';
 import Animated, { EasingNode } from 'react-native-reanimated';
 import CheckBox from '@react-native-community/checkbox';
@@ -27,6 +26,7 @@ import PriceFetcher from '../Components/PriceFetcher';
 import RPC from '../../app/rpc';
 import Header from '../Header';
 import { RPCParseAddressType } from '../../app/rpc/types/RPCParseAddressType';
+import { createAlert } from '../../app/createAlert';
 
 type SendProps = {
   setSendPageState: (sendPageState: SendPageStateClass) => void;
@@ -38,6 +38,9 @@ type SendProps = {
   syncingStatusMoreInfoOnClick: () => void;
   poolsMoreInfoOnClick: () => void;
   setZecPrice: (p: number, d: number) => void;
+  set_privacy_option: (name: 'privacy', value: boolean) => Promise<void>;
+  setPoolsToShieldSelectSapling: (v: boolean) => void;
+  setPoolsToShieldSelectTransparent: (v: boolean) => void;
 };
 
 const Send: React.FunctionComponent<SendProps> = ({
@@ -50,9 +53,27 @@ const Send: React.FunctionComponent<SendProps> = ({
   syncingStatusMoreInfoOnClick,
   poolsMoreInfoOnClick,
   setZecPrice,
+  set_privacy_option,
+  setPoolsToShieldSelectSapling,
+  setPoolsToShieldSelectTransparent,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, info, totalBalance, sendPageState, navigation, zecPrice, sendAll, netInfo } = context;
+  const {
+    translate,
+    info,
+    totalBalance,
+    sendPageState,
+    navigation,
+    zecPrice,
+    sendAll,
+    netInfo,
+    privacy,
+    server,
+    setBackgroundError,
+    addLastSnackbar,
+    mode,
+    someUnconfirmed,
+  } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [qrcodeModalVisble, setQrcodeModalVisible] = useState(false);
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
@@ -66,9 +87,21 @@ const Send: React.FunctionComponent<SendProps> = ({
   const slideAnim = useRef(new Animated.Value(0)).current;
   const defaultFee = info.defaultFee || Utils.getFallbackDefaultFee();
   const { decimalSeparator } = getNumberFormatSettings();
-  const spendable = totalBalance.transparentBal + totalBalance.spendablePrivate + totalBalance.spendableOrchard;
-  const stillConfirming = spendable !== totalBalance.total;
-  const showShieldInfo = totalBalance && totalBalance.transparentBal > 0;
+  // transparent is not spendable.
+  const spendable = totalBalance.spendablePrivate + totalBalance.spendableOrchard;
+
+  const stillConfirming =
+    totalBalance.orchardBal !== totalBalance.spendableOrchard ||
+    totalBalance.privateBal !== totalBalance.spendablePrivate ||
+    someUnconfirmed;
+  const showShieldInfo =
+    totalBalance &&
+    (someUnconfirmed ? 0 : totalBalance.transparentBal) > 0 &&
+    (someUnconfirmed ? 0 : totalBalance.transparentBal) + totalBalance.spendablePrivate > info.defaultFee;
+  const showUpgradeInfo =
+    totalBalance &&
+    (someUnconfirmed ? 0 : totalBalance.transparentBal) === 0 &&
+    totalBalance.spendablePrivate > info.defaultFee;
 
   const getMaxAmount = useCallback((): number => {
     let max = spendable - defaultFee;
@@ -81,35 +114,30 @@ const Send: React.FunctionComponent<SendProps> = ({
   useEffect(() => {
     const getMemoEnabled = async (address: string): Promise<boolean> => {
       if (!netInfo.isConnected) {
-        Toast.show(translate('loadedapp.connection-error') as string, Toast.LONG);
+        addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
         return false;
       }
-      const result: string = await RPCModule.execute('parse', address);
+      const result: string = await RPCModule.execute('parse_address', address);
       if (result) {
-        if (result.toLowerCase().startsWith('error')) {
+        if (result.toLowerCase().startsWith('error') || result.toLowerCase() === 'null') {
           return false;
         }
       } else {
         return false;
       }
-      // TODO: check if the json parse is correct.
-      const resultJSON: RPCParseAddressType = await JSON.parse(result);
+      let resultJSON = {} as RPCParseAddressType;
+      try {
+        resultJSON = await JSON.parse(result);
+      } catch (e) {
+        return false;
+      }
 
       //console.log('parse-memo', address, resultJSON);
 
       return (
         resultJSON.status === 'success' &&
         resultJSON.address_kind !== 'transparent' &&
-        ((!!info.currencyName &&
-          info.currencyName === 'ZEC' &&
-          !!resultJSON.chain_name &&
-          (resultJSON.chain_name.toLowerCase() === 'main' || resultJSON.chain_name.toLowerCase() === 'mainnet')) ||
-          (!!info.currencyName &&
-            info.currencyName !== 'ZEC' &&
-            !!resultJSON.chain_name &&
-            (resultJSON.chain_name.toLowerCase() === 'test' ||
-              resultJSON.chain_name.toLowerCase() === 'testnet' ||
-              resultJSON.chain_name.toLowerCase() === 'regtest')))
+        resultJSON.chain_name === server.chain_name
       );
     };
 
@@ -122,40 +150,32 @@ const Send: React.FunctionComponent<SendProps> = ({
     } else {
       setMemoEnabled(false);
     }
-  }, [sendPageState.toaddr, sendPageState.toaddr.to, info.currencyName, netInfo.isConnected, translate]);
+  }, [server.chain_name, netInfo.isConnected, sendPageState.toaddr.to, translate, addLastSnackbar]);
 
   useEffect(() => {
     const parseAdressJSON = async (address: string): Promise<boolean> => {
       if (!netInfo.isConnected) {
-        Toast.show(translate('loadedapp.connection-error') as string, Toast.LONG);
+        addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
         return false;
       }
-      const result: string = await RPCModule.execute('parse', address);
+      const result: string = await RPCModule.execute('parse_address', address);
       if (result) {
-        if (result.toLowerCase().startsWith('error')) {
+        if (result.toLowerCase().startsWith('error') || result.toLowerCase() === 'null') {
           return false;
         }
       } else {
         return false;
       }
-      // TODO: check if the json parse is correct.
-      const resultJSON: RPCParseAddressType = await JSON.parse(result);
+      let resultJSON = {} as RPCParseAddressType;
+      try {
+        resultJSON = await JSON.parse(result);
+      } catch (e) {
+        return false;
+      }
 
       //console.log('parse-address', address, resultJSON.status === 'success');
 
-      return (
-        resultJSON.status === 'success' &&
-        ((!!info.currencyName &&
-          info.currencyName === 'ZEC' &&
-          !!resultJSON.chain_name &&
-          (resultJSON.chain_name.toLowerCase() === 'main' || resultJSON.chain_name.toLowerCase() === 'mainnet')) ||
-          (!!info.currencyName &&
-            info.currencyName !== 'ZEC' &&
-            !!resultJSON.chain_name &&
-            (resultJSON.chain_name.toLowerCase() === 'test' ||
-              resultJSON.chain_name.toLowerCase() === 'testnet' ||
-              resultJSON.chain_name.toLowerCase() === 'regtest')))
-      );
+      return resultJSON.status === 'success' && resultJSON.chain_name === server.chain_name;
     };
 
     var to = sendPageState.toaddr;
@@ -197,15 +217,16 @@ const Send: React.FunctionComponent<SendProps> = ({
       }
     }
   }, [
+    decimalSeparator,
+    getMaxAmount,
+    server.chain_name,
+    netInfo.isConnected,
     sendPageState.toaddr,
     sendPageState.toaddr.to,
-    sendPageState.toaddr.amount,
     sendPageState.toaddr.amountCurrency,
-    getMaxAmount,
-    decimalSeparator,
-    info.currencyName,
-    netInfo.isConnected,
+    sendPageState.toaddr.amount,
     translate,
+    addLastSnackbar,
   ]);
 
   useEffect(() => {
@@ -236,6 +257,24 @@ const Send: React.FunctionComponent<SendProps> = ({
     };
   }, [slideAnim, titleViewHeight]);
 
+  useEffect(() => {
+    (async () => {
+      if (mode === 'basic') {
+        const price = await RPC.rpc_getZecPrice();
+        // values:
+        // 0   - initial/default value
+        // -1  - error in Gemini/zingolib.
+        // -2  - error in RPCModule, likely.
+        // > 0 - real value
+        if (price <= 0) {
+          setZecPrice(price, 0);
+        } else {
+          setZecPrice(price, Date.now());
+        }
+      }
+    })();
+  }, [mode, setZecPrice]);
+
   const updateToField = async (
     address: string | null,
     amount: string | null,
@@ -253,7 +292,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     if (address !== null) {
       // Attempt to parse as URI if it starts with zcash
       if (address.startsWith('zcash:')) {
-        const target: string | ZcashURITargetClass = await parseZcashURI(address, translate);
+        const target: string | ZcashURITargetClass = await parseZcashURI(address, translate, server);
         //console.log(targets);
 
         if (typeof target !== 'string') {
@@ -275,7 +314,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           return;
         } else {
           // Show the error message as a toast
-          Toast.show(target);
+          addLastSnackbar({ message: target, type: 'Primary' });
           return;
         }
       } else {
@@ -325,7 +364,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   const confirmSend = async () => {
     if (!netInfo.isConnected) {
       setConfirmModalVisible(false);
-      Toast.show(translate('loadedapp.connection-error') as string, Toast.LONG);
+      addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
       return;
     }
     // very first interrupt syncing Just in case...
@@ -353,11 +392,17 @@ const Send: React.FunctionComponent<SendProps> = ({
 
         if (navigation) {
           navigation.navigate(translate('loadedapp.wallet-menu') as string);
-          setTimeout(() => {
-            Toast.show(`${translate('send.Broadcast')} ${txid}`, Toast.LONG);
-          }, 1000);
         }
+
+        createAlert(
+          setBackgroundError,
+          addLastSnackbar,
+          translate('send.confirm-title') as string,
+          `${translate('send.Broadcast')} ${txid}`,
+          true,
+        );
       } catch (err) {
+        setComputingModalVisible(false);
         const error = err as string;
 
         let customError = '';
@@ -375,13 +420,13 @@ const Send: React.FunctionComponent<SendProps> = ({
 
         setTimeout(() => {
           //console.log('sendtx error', error);
-          Alert.alert(
+          // if the App is in background I need to store the error
+          // and when the App come back to foreground shows it to the user.
+          createAlert(
+            setBackgroundError,
+            addLastSnackbar,
             translate('send.sending-error') as string,
             `${customError ? customError : error}`,
-            [{ text: 'OK', onPress: () => setComputingModalVisible(false) }],
-            {
-              cancelable: false,
-            },
           );
         }, 1000);
       }
@@ -398,7 +443,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     })();
   }, [isFocused]);
 
-  console.log('render Send - 4');
+  //console.log('render Send - 4');
 
   const returnPage = (
     <View
@@ -430,7 +475,10 @@ const Send: React.FunctionComponent<SendProps> = ({
             setConfirmModalVisible(false);
           }}
           confirmSend={confirmSend}
-          sendAllAmount={Number(sendPageState.toaddr.amount) === Utils.parseLocaleFloat(getMaxAmount().toFixed(8))}
+          sendAllAmount={
+            mode !== 'basic' &&
+            Number(sendPageState.toaddr.amount) === Utils.parseLocaleFloat(getMaxAmount().toFixed(8))
+          }
         />
       </Modal>
 
@@ -447,11 +495,16 @@ const Send: React.FunctionComponent<SendProps> = ({
             setZecPrice={setZecPrice}
             title={translate('send.title') as string}
             setComputingModalVisible={setComputingModalVisible}
+            setBackgroundError={setBackgroundError}
+            set_privacy_option={set_privacy_option}
+            setPoolsToShieldSelectSapling={setPoolsToShieldSelectSapling}
+            setPoolsToShieldSelectTransparent={setPoolsToShieldSelectTransparent}
+            addLastSnackbar={addLastSnackbar}
           />
         </View>
       </Animated.View>
 
-      <ScrollView contentContainerStyle={{}} testID="send.scrollView">
+      <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{}} testID="send.scroll-view">
         <View style={{ marginBottom: 30 }}>
           {[sendPageState.toaddr].map((ta, i) => {
             return (
@@ -523,9 +576,9 @@ const Send: React.FunctionComponent<SendProps> = ({
                         minWidth: 48,
                         minHeight: 48,
                       }}>
-                      <FadeText>{translate('send.amount') as string}</FadeText>
+                      <FadeText>{`${translate('send.amount')}`}</FadeText>
                     </View>
-                    {sendAll && (
+                    {sendAll && mode !== 'basic' && (
                       <TouchableOpacity
                         onPress={() =>
                           updateToField(
@@ -574,7 +627,9 @@ const Send: React.FunctionComponent<SendProps> = ({
                         flexDirection: 'row',
                         justifyContent: 'flex-start',
                       }}>
-                      <RegText style={{ marginTop: 20, marginRight: 5, fontSize: 20 }}>{'\u1647'}</RegText>
+                      <RegText style={{ marginTop: 22, marginRight: 5, fontSize: 20, transform: [{ scaleY: 1.5 }] }}>
+                        {'\u1647'}
+                      </RegText>
                       <View
                         accessible={true}
                         accessibilityLabel={translate('send.zec-acc') as string}
@@ -611,7 +666,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                           maxLength={20}
                         />
                       </View>
-                      <RegText style={{ marginTop: 19, marginRight: 10, marginLeft: 5 }}>ZEC</RegText>
                     </View>
 
                     <View style={{ display: 'flex', flexDirection: 'column' }}>
@@ -621,7 +675,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           flexDirection: 'row',
                           justifyContent: 'flex-start',
                           alignItems: 'center',
-                          marginTop: 10,
+                          marginTop: 5,
                         }}>
                         <RegText style={{ fontSize: 14 }}>{translate('send.spendable') as string}</RegText>
                         <ZecAmount
@@ -629,6 +683,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           color={stillConfirming ? 'red' : colors.money}
                           size={15}
                           amtZec={getMaxAmount()}
+                          privacy={privacy}
                         />
                       </View>
                       {stillConfirming && (
@@ -652,7 +707,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           </View>
                         </TouchableOpacity>
                       )}
-                      {showShieldInfo && (
+                      {(showShieldInfo || showUpgradeInfo) && (
                         <TouchableOpacity onPress={() => poolsMoreInfoOnClick()}>
                           <View
                             style={{
@@ -669,7 +724,11 @@ const Send: React.FunctionComponent<SendProps> = ({
                               color={colors.primary}
                               style={{ marginRight: 5 }}
                             />
-                            <FadeText>{translate('send.needtoshield') as string}</FadeText>
+                            {showShieldInfo || mode === 'basic' ? (
+                              <FadeText>{translate('send.needtoshield') as string}</FadeText>
+                            ) : showUpgradeInfo ? (
+                              <FadeText>{translate('send.needtoupgrade') as string}</FadeText>
+                            ) : null}
                           </View>
                         </TouchableOpacity>
                       )}
@@ -700,7 +759,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           flexDirection: 'row',
                           justifyContent: 'flex-start',
                         }}>
-                        <RegText style={{ marginTop: 15, marginRight: 5 }}>$</RegText>
+                        <RegText style={{ marginTop: 17, marginRight: 5 }}>$</RegText>
                         <View
                           accessible={true}
                           accessibilityLabel={translate('send.usd-acc') as string}
@@ -738,17 +797,21 @@ const Send: React.FunctionComponent<SendProps> = ({
                             maxLength={15}
                           />
                         </View>
-                        <RegText style={{ marginTop: 15, marginLeft: 5 }}>{'USD'}</RegText>
                       </View>
 
                       <View style={{ flexDirection: 'column', alignItems: 'center' }}>
-                        {/*<RegText style={{ marginBottom: 5 }}>{translate('send.price')}</RegText>*/}
-                        <CurrencyAmount
-                          style={{ marginTop: 10, fontSize: 13 }}
-                          price={zecPrice.zecPrice}
-                          amtZec={getMaxAmount()}
-                          currency={'USD'}
-                        />
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                          <RegText style={{ marginTop: 11, fontSize: 12.5 }}>
+                            {translate('send.spendable') as string}
+                          </RegText>
+                          <CurrencyAmount
+                            style={{ marginTop: 11, fontSize: 12.5 }}
+                            price={zecPrice.zecPrice}
+                            amtZec={getMaxAmount()}
+                            currency={'USD'}
+                            privacy={privacy}
+                          />
+                        </View>
                         <View style={{ marginLeft: 5 }}>
                           <PriceFetcher setZecPrice={setZecPrice} />
                         </View>
@@ -767,7 +830,9 @@ const Send: React.FunctionComponent<SendProps> = ({
                       }}>
                       <FadeText style={{ marginTop: 10 }}>{translate('send.memo') as string}</FadeText>
                       <View style={{ flexDirection: 'row' }}>
-                        <FadeText style={{ marginTop: 3 }}>{translate('send.includeua') as string}</FadeText>
+                        <FadeText style={{ marginTop: Platform.OS === 'ios' ? 5 : 3 }}>
+                          {translate('send.includeua') as string}
+                        </FadeText>
                         <CheckBox
                           testID="send.checkboxUA"
                           disabled={false}
@@ -777,8 +842,9 @@ const Send: React.FunctionComponent<SendProps> = ({
                           tintColor={colors.text}
                           onCheckColor={colors.card}
                           onFillColor={colors.primary}
-                          boxType={'square'}
-                          style={{}}
+                          onTintColor={colors.primary}
+                          boxType="square"
+                          style={{ transform: Platform.OS === 'ios' ? [{ scaleX: 0.7 }, { scaleY: 0.7 }] : [] }}
                         />
                       </View>
                     </View>
@@ -808,7 +874,9 @@ const Send: React.FunctionComponent<SendProps> = ({
                             backgroundColor: 'transparent',
                           }}
                           value={ta.memo}
-                          onChangeText={(text: string) => updateToField(null, null, null, text, null)}
+                          onChangeText={(text: string) =>
+                            updateToField(null, !ta.amount && !!text ? '0' : null, null, text, null)
+                          }
                           editable={true}
                         />
                       </View>
@@ -843,12 +911,13 @@ const Send: React.FunctionComponent<SendProps> = ({
                 if (
                   validAmount === 1 &&
                   sendPageState.toaddr.amount &&
+                  mode !== 'basic' &&
                   Number(sendPageState.toaddr.amount) === Utils.parseLocaleFloat(getMaxAmount().toFixed(8))
                 ) {
-                  Toast.show(`${translate('send.sendall-message') as string}`, Toast.LONG);
+                  addLastSnackbar({ message: `${translate('send.sendall-message') as string}`, type: 'Primary' });
                 }
                 if (!netInfo.isConnected) {
-                  Toast.show(translate('loadedapp.connection-error') as string, Toast.LONG);
+                  addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
                   return;
                 }
                 // waiting while closing the keyboard, just in case.

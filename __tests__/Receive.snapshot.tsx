@@ -36,6 +36,15 @@ jest.mock('@react-native-community/netinfo', () => {
 
   return RN;
 });
+jest.mock('react-native', () => {
+  const RN = jest.requireActual('react-native');
+
+  RN.NativeModules.RPCModule = {
+    execute: jest.fn(() => '{}'),
+  };
+
+  return RN;
+});
 
 // test suite
 describe('Component Receive - test', () => {
@@ -72,7 +81,12 @@ describe('Component Receive - test', () => {
     const onFunction = jest.fn();
     const receive = render(
       <ContextAppLoadedProvider value={state}>
-        <Receive setUaAddress={onFunction} toggleMenuDrawer={onFunction} />
+        <Receive
+          setUaAddress={onFunction}
+          toggleMenuDrawer={onFunction}
+          set_privacy_option={onFunction}
+          syncingStatusMoreInfoOnClick={onFunction}
+        />
       </ContextAppLoadedProvider>,
     );
     expect(receive.toJSON()).toMatchSnapshot();

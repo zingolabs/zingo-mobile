@@ -113,12 +113,16 @@ def enableHermes = project.ext.react.get("enableHermes", false)
 
 
 /**
- * Whether to enable building a seperate APK for each ABI.
+ * Whether to enable building a separate APK for each ABI.
  *
  * Defaults to false but can be set to true with the project properties flag
- * e.g. ./gradlew assembleDebug -Psplitapk=true
+ * e.g. ./gradlew assembleDebug -PsplitApk=true
+ *
+ * Additional option to include a universal APK
+ * e.g. ./gradlew assembleRelease -PsplitApk=true -PincludeUniversalApk=true
  */
-ext.splitapk = project.properties['splitapk'] ?: false
+ext.splitApk = project.properties['splitApk'] ?: false
+ext.includeUniversalApk = project.properties['includeUniversalApk'] ?: false
 
 android {
     namespace 'org.ZingoLabs.Zingo'
@@ -127,8 +131,12 @@ android {
     compileSdkVersion rootProject.ext.compileSdkVersion
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility = "18.0.2.1"
+        targetCompatibility = "18.0.2.1"
+    }
+
+    kotlinOptions {
+        jvmTarget = '18'
     }
 
     defaultConfig {
@@ -136,9 +144,9 @@ android {
         //applicationId 'com.ZingoMobile' // @Test
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 122 // Real
+        versionCode 131 // Real
         //versionCode 117 // @Test
-        versionName "zingo-1.2.1" // Real
+        versionName "zingo-1.3.3" // Real
         missingDimensionStrategy 'react-native-camera', 'general'
         testBuildType System.getProperty('testBuildType', 'debug')
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
@@ -146,10 +154,10 @@ android {
 
     splits {
         abi {
-            enable splitapk.toBoolean()
+            enable splitApk.toBoolean()
             reset()
             include "armeabi-v7a", "x86", "arm64-v8a", "x86_64"
-            universalApk false // If true, also generate a universal APK
+            universalApk includeUniversalApk.toBoolean()
         }
     }
 
@@ -288,7 +296,7 @@ dependencies {
     } else {
         implementation jscFlavor
     }
-	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
+	implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
 
     def work_version = "2.7.1"
 

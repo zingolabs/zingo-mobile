@@ -6,7 +6,7 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.VIBRATE"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
-
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <application
       android:name=".MainApplication"
@@ -15,6 +15,7 @@
       android:roundIcon="@mipmap/zingo_round"
       android:allowBackup="false"
       android:largeHeap="true"
+      android:usesCleartextTraffic="false"
       android:theme="@style/AppTheme">
       <uses-library android:name="org.apache.http.legacy" android:required="false"/>
       <activity
@@ -40,5 +41,12 @@
       <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
       <service android:name=".BackgroundSync" />
     </application>
+
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="https" android:host="*" />
+        </intent>
+    </queries>
 
 </manifest>

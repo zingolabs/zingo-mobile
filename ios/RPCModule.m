@@ -69,7 +69,9 @@ RCT_REMAP_METHOD(walletBackupExists,
   // Write to user's documents app directory
   NSString *fileName = [NSString stringWithFormat:@"%@/wallet.dat.txt",
                                                 documentsDirectory];
-  [data writeToFile:fileName atomically:YES encoding:NSUTF8StringEncoding error:nil];
+  if (![data writeToFile:fileName atomically:YES encoding:NSUTF8StringEncoding error:nil]) {
+    RCTLogInfo(@"Couldn't save the wallet");
+  };
 
   // RCTLogInfo(@"Saved file");
 }
@@ -82,7 +84,9 @@ RCT_REMAP_METHOD(walletBackupExists,
   // Write to user's documents app directory
   NSString *fileName = [NSString stringWithFormat:@"%@/wallet.backup.dat.txt",
                                                 documentsDirectory];
-  [data writeToFile:fileName atomically:YES encoding:NSUTF8StringEncoding error:nil];
+  if (![data writeToFile:fileName atomically:YES encoding:NSUTF8StringEncoding error:nil]) {
+    RCTLogInfo(@"Couldn't save the wallet backup");
+  };
 
   // RCTLogInfo(@"Saved backup file");
 }
@@ -190,7 +194,7 @@ RCT_REMAP_METHOD(deleteExistingWalletBackup,
   char *walletDat = save();
   NSString* walletDataStr = [NSString stringWithUTF8String:walletDat];
   rust_free(walletDat);
-
+  
   [self saveWalletFile:walletDataStr];
 }
 
@@ -204,7 +208,8 @@ RCT_REMAP_METHOD(deleteExistingWalletBackup,
   [self saveWalletBackupFile:walletDataStr];
 }
 
--(NSString*) createNewWallet:(NSString* )server {
+-(NSString*) createNewWallet:(NSString*)server
+                              chainhint:(NSString*)chainhint {
   @autoreleasepool {
     // RCTLogInfo(@"createNewWallet called");
 
@@ -212,7 +217,7 @@ RCT_REMAP_METHOD(deleteExistingWalletBackup,
                     (NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
 
-    char* seed = init_new([server UTF8String], [documentsDirectory UTF8String]);
+    char* seed = init_new([server UTF8String], [documentsDirectory UTF8String], [chainhint UTF8String], "true");
     NSString* seedStr = [NSString stringWithUTF8String:seed];
     rust_free(seed);
 
@@ -230,30 +235,32 @@ RCT_REMAP_METHOD(deleteExistingWalletBackup,
 // Create a new wallet, automatically saving it.
 RCT_REMAP_METHOD(createNewWallet,
                  server:(NSString*)server
+                 chainhint:(NSString*)chainhint
                  createNewWalletWithResolver:(RCTPromiseResolveBlock)resolve
                  rejected:(RCTPromiseRejectBlock)reject) {
   @autoreleasepool {
-    NSString* seedStr = [self createNewWallet:server];
+    NSString* seedStr = [self createNewWallet:server chainhint:chainhint];
 
     resolve(seedStr);
   }
 }
 
 // restore a wallet from a given seed and birthday. This also saves the wallet
-RCT_REMAP_METHOD(restoreWallet,
+RCT_REMAP_METHOD(restoreWalletFromSeed,
                  restoreSeed:(NSString*)restoreSeed
                  birthday:(NSString*)birthday
                  server:(NSString*)server
-                 restoreWalletWithResolver:(RCTPromiseResolveBlock)resolve
-                 restoreWalletWithRejecter:(RCTPromiseRejectBlock)reject) {
+                 chainhint:(NSString*)chainhint
+                 restoreWalletFromSeedWithResolver:(RCTPromiseResolveBlock)resolve
+                 restoreWalletFromSeedWithRejecter:(RCTPromiseRejectBlock)reject) {
   @autoreleasepool {
-    // RCTLogInfo(@"restoreWallet called with %@ %@", restoreSeed, birthday);
+    // RCTLogInfo(@"restoreWalletFromSeed called with %@ %@", restoreSeed, birthday);
 
     NSArray *paths = NSSearchPathForDirectoriesInDomains
                     (NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
 
-    char* seed = initfromseed([server UTF8String], [restoreSeed UTF8String], [birthday UTF8String], [documentsDirectory UTF8String]);
+    char* seed = initfromseed([server UTF8String], [restoreSeed UTF8String], [birthday UTF8String], [documentsDirectory UTF8String], [chainhint UTF8String], "true");
     NSString* seedStr = [NSString stringWithUTF8String:seed];
     rust_free(seed);
 
@@ -268,7 +275,37 @@ RCT_REMAP_METHOD(restoreWallet,
   }
 }
 
--(NSString*) loadExistingWallet:(NSString*)server {
+RCT_REMAP_METHOD(restoreWalletFromUfvk,
+                 restoreUfvk:(NSString*)restoreUfvk
+                 birthday:(NSString*)birthday
+                 server:(NSString*)server
+                 chainhint:(NSString*)chainhint
+                 restoreWalletFromUfvkWithResolver:(RCTPromiseResolveBlock)resolve
+                 restoreWalletFromUfvkWithRejecter:(RCTPromiseRejectBlock)reject) {
+  @autoreleasepool {
+    // RCTLogInfo(@"restoreWalletFromUfvk called with %@ %@", restoreUfvk, birthday);
+
+    NSArray *paths = NSSearchPathForDirectoriesInDomains
+                    (NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+
+    char* ufvk = initfromufvk([server UTF8String], [restoreUfvk UTF8String], [birthday UTF8String], [documentsDirectory UTF8String], [chainhint UTF8String], "true");
+    NSString* ufvkStr = [NSString stringWithUTF8String:ufvk];
+    rust_free(ufvk);
+
+    // RCTLogInfo(@"Ufvk: %@", ufvkStr);
+
+    if (![ufvkStr hasPrefix:@"Error"]) {
+      // Also save the wallet after restore
+      [self saveWalletInternal];
+    }
+
+    resolve(ufvkStr);
+  }
+}
+
+-(NSString*) loadExistingWallet:(NSString*)server
+                                 chainhint:(NSString*)chainhint {
   @autoreleasepool {
     // RCTLogInfo(@"loadExistingWallet called");
     NSString* walletDataStr = [self readWallet];
@@ -276,7 +313,7 @@ RCT_REMAP_METHOD(restoreWallet,
     NSArray *paths = NSSearchPathForDirectoriesInDomains
                     (NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
-    char* seed = initfromb64([server UTF8String], [walletDataStr UTF8String], [documentsDirectory UTF8String]);
+    char* seed = initfromb64([server UTF8String], [walletDataStr UTF8String], [documentsDirectory UTF8String], [chainhint UTF8String], "true");
     NSString* seedStr = [NSString stringWithUTF8String:seed];
     rust_free(seed);
 
@@ -289,10 +326,11 @@ RCT_REMAP_METHOD(restoreWallet,
 // Load an existing wallet from the user's app documents
 RCT_REMAP_METHOD(loadExistingWallet,
                  server:(NSString*)server
+                 chainhint:(NSString*)chainhint
                  loadExistingWalletWithResolver:(RCTPromiseResolveBlock)resolve
                  loadExistingWalletWithRejecter:(RCTPromiseRejectBlock)reject) {
   @autoreleasepool {
-    NSString *seedStr = [self loadExistingWallet:server];
+    NSString *seedStr = [self loadExistingWallet:server chainhint:chainhint];
 
     resolve(seedStr);
   }
@@ -426,4 +464,5 @@ RCT_REMAP_METHOD(runBackgroundTask,
   resolve(resp);
 }
 */
+
 @end

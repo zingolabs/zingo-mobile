@@ -3,7 +3,6 @@ import React, { useContext, useState } from 'react';
 import { View, ScrollView, SafeAreaView, TouchableOpacity, Text } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import Clipboard from '@react-native-community/clipboard';
-import Toast from 'react-native-simple-toast';
 import QRCode from 'react-native-qrcode-svg';
 
 import FadeText from '../Components/FadeText';
@@ -21,7 +20,7 @@ type PrivKeyProps = {
 };
 const PrivKey: React.FunctionComponent<PrivKeyProps> = ({ address, keyType, privKey, closeModal }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate } = context;
+  const { translate, addLastSnackbar } = context;
   const { colors } = useTheme() as unknown as ThemeType;
 
   const keyTypeString = keyType === 0 ? translate('privkey.privkey') : translate('privkey.viewkey');
@@ -39,7 +38,7 @@ const PrivKey: React.FunctionComponent<PrivKeyProps> = ({ address, keyType, priv
   const doCopy = () => {
     //if (address) {
     Clipboard.setString(privKey);
-    Toast.show(translate('privkey.tapcopy-message') as string, Toast.LONG);
+    addLastSnackbar({ message: translate('privkey.tapcopy-message') as string, type: 'Primary', duration: 'short' });
     //}
   };
 
@@ -57,6 +56,7 @@ const PrivKey: React.FunctionComponent<PrivKeyProps> = ({ address, keyType, priv
         noBalance={true}
         noSyncingStatus={true}
         noDrawMenu={true}
+        noPrivacy={true}
       />
 
       <ScrollView

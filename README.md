@@ -1,68 +1,162 @@
 # Zingo Android and iOS apps
+App Store: [https://apps.apple.com/app/zingo/id1668209531](https://apps.apple.com/app/zingo/id1668209531)  
+Google Play: [https://play.google.com/store/apps/details?id=org.ZingoLabs.Zingo](https://play.google.com/store/apps/details?id=org.ZingoLabs.Zingo)
 
-## Android build instructions
+# iOS
+## Prerequisites
+1. Yarn
+2. NodeJS (recommended version 17+)
+3. Rust (https://www.rust-lang.org/tools/install)
+4. Rustup iOS targets (`rustup target add aarch64-apple-ios x86_64-apple-ios aarch64-apple-ios-sim`)
+5. Cargo-lipo (`cargo install cargo-lipo`)
+6. Cbindgen (`cargo install cbindgen`)
+7. Cocaopods (`sudo gem install cocoapods`)
 
-### Prerequisites
-1. `docker` (for building the rust library)
-2. `yarn`
-3. `nodejs` recommended version v16.16.0 LTS.
+## Building for physical device
+1. In the `rust/ios` directory, run: <br />
+   `./build.sh` <br />
+   This step may take a long time.
+2. From the root of the project, run: <br />
+   `yarn`
+3. In the `ios` directory, run: <br />
+   `pod install`
 
-Carefully follow the instructions to [setup Android Studio for your
-operating system](https://reactnative.dev/docs/environment-setup).
-It is not neccessary to install watchman or the Android 12 system images.
+## Building for simulator
+1. In the `rust/ios` directory, run: <br />
+   `./buildsimulator.sh` <br />
+   This step may take a long time.
+2. From the root of the project, run: <br />
+   `yarn`
+3. In the `ios` directory, run: <br />
+   `pod install`
 
-If you do not have a physical device, you can create and start
-a new Android 11, API 30 emulator device compatible
-with the chip on your system and start the emulated device.
+## Launching the app
+1. In a terminal, run: <br />
+   `yarn start`
+2. In a separate terminal, run: <br />
+   `yarn ios` <br />
+   You can also open the `ios` directory in XCode and run it there.
 
-### Building
-0. Start docker daemon
-1. AS A NONROOT USER: In the `rust/` directory, run `./build.sh`.
-   This step will take a long time.
-2. From the root of the project, run `yarn install`
-3. Run `yarn react-native start` to start the dev server
-4. Run `yarn run android` to compile and install the app on an
-   emulator or connected device. You can also open the `android` directory
-   in Android Studio as a project, select 'app' and the API 30 system image
-   in the upper toolbar and click the "Run 'app'" button.
+# Android
+## Prerequisites
+1. Yarn
+2. NodeJS (recommended version 17+)
+3. Rust (https://www.rust-lang.org/tools/install)
+4. Docker (Docker Engine)
+5. OpenJDK 18 (https://jdk.java.net/archive/)
 
-## iOS build instructions
+    1. curl https://download.java.net/java/GA/jdk18.0.2/f6ad4b4450fd4d298113270ec84f30ee/9/GPL/openjdk-18.0.2_linux-x64_bin.tar.gz -o openjdk-18.0.2_linux-x64_bin.tar.gz
+    2. tar -xzvf openjdk-18.0.2_linux-x64_bin.tar.gz
 
-### Prerequisites
-1. `yarn`
-2. `nodejs` recommended version v16.16.0 LTS.
-3. Install Rust
-4. Add the ios targets `rustup target add aarch64-apple-ios x86_64-apple-ios`
-5. `cargo install cargo-lipo`
-6. `cargo install cbindgen`
-7. `sudo gem install cocoapods` to install cocoapods
+6. Android SDK Command-line Tools <br />
+   Install via Android Studio SDK Manager: <br />
+   https://developer.android.com/studio/install <br />
+   or as standalone: <br />
+   https://developer.android.com/tools  
+7. Cargo nextest (https://nexte.st/book/installing-from-source.html)
 
-### Building
-1. In the `./rust/ios` directory, run `./build.sh`.
-   This step will take a long time.
-2. In the `./ios` directory, run `pod install`
-3. From the root `./` of the project, run `yarn install`
-4. Run `yarn react-native start` to start the dev server
-5. Run `yarn run ios` to install the app on an emulator/connected device.
-   You can also open the `./ios` folder in XCode and run it there.
+The React Native tools require some environment variables to be set up in order to build apps with
+native code. <br />
+Add the following lines to your `$HOME/.bash_profile` or `$HOME/.profile` config file: <br />
+`PATH="$PATH:$ANDROID_HOME/cmdline-tools/latest/bin"` <br />
+`PATH="$PATH:$ANDROID_HOME/platform-tools"` <br />
+`PATH="$PATH:$ANDROID_HOME/emulator"` <br />
+Add the following lines to your `$HOME/.bashrc` config file: <br />
+`export ANDROID_SDK_ROOT="$HOME/Android/Sdk"` <br />
+Also, make sure your JAVA_HOME is set, for example: <br />
+`export JAVA_HOME="/usr/lib/jvm/jdk-18.0.2"`
 
-For notes on known issues and problems,
-see the [trouble-shooting notes](./TROUBLESHOOTING.md).
+## Building
+1. In the `rust` directory, run: <br />
+   `./build.sh` <br />
+   This step may take a long time.
+2. From the root of the project, run: <br />
+   `yarn`
 
-## Integration Tests
-
-### Android
-1. To create a quick-boot snapshot. From the root directory, run:
-   `./scripts/integration_tests.sh -a x86_64 -s`
-2. To run the integration tests. From the root directory, run:
-   `./scripts/integration_tests.sh -a x86_64`
-3. To test other ABIs, such as x86. Specify the target ABI with the `-a` flag:
-   `-a x86`
+## Launching the app
+### Android Studio
+1. For Android emulations, you can create a new AVD, compatible with your CPU architecture 
+   i.e. x86_64 (https://developer.android.com/studio/run/managing-avds). The recommended API is API 
+   30 (Android 11). Alternatively, you can connect to a physical device
+   (https://reactnative.dev/docs/running-on-device).
+2. In `File > Settings`, navigate to `Build, Execution and Deployment > Build Tools > Gradle` and
+   check the `Gradle JDK` matches your JDK version.
+2. In a terminal, run: <br />
+   `yarn start`
+3. Open the `android` directory in Android Studio as a project, select 'app' and the previously
+   created AVD in the upper toolbar and click the "Run 'app'" button.
+   Alternatively, launch an AVD and in a separate terminal, run: <br />
+   `yarn android` 
    
-For more information. From the root directory, run:
-`./scripts/integration_tests.sh -h`
+### Android SDK Command-line Tools (Standalone)
+You can also emulate android from the command line without using Android Studio.
+1. Check that the Android SDK cmdline-tools binaries are in the following directory path: <br />
+   `$ANDROID_HOME/cmdline-tools/latest/bin`
+2. From the root directory run: <br />
+   `scripts/start_interactive.sh -a x86` <br />
+   Outputs are generated in `android/app/build/outputs/emulator_output`
 
-The first run may take a long time to download the `x86` and `x86_64` system images.
+## Testing
+### Prerequesites
+Integration tests and end-to-end tests require a regtest server. On linux hosts, these may be run
+locally by installing the lightwalletd, zcashd and zcash-cli binaries
+(https://github.com/zingolabs/zingolib#regtest). From the `rust/android/regtest/bin/` directory run: <br />
+`ln -s path/to/lightwalletd/binary path/to/zcashd/binary path/to/zcash-cli/binary ./` <br />
+From the `rust/android/lightwalletd_bin` directory run: <br />
+`ln -s path/to/lightwalletd/binary ./`
 
-Alternatively, to run gradle managed devices integration tests. From the root directory, run:
-`./scripts/integration_tests_gradle.sh`
+Alternatively, integration tests and end-to-end tests can be run on non-linux hosts with Regchest
+(https://github.com/zingolabs/zingo-regchest). Regchest manages the zcash/lightwalletd regtest 
+network in a docker container. Before running tests, pull the latest Regchest image from docker: <br />
+`docker pull zingodevops/regchest:007`
+
+### Yarn Tests
+1. From the root directory, run: <br />
+   `yarn test`
+
+### Integration Tests
+1. Create quick-boot snapshots to speed up AVD launch times. From the root directory, run: <br />
+   `./scripts/integration_tests.sh -a x86_64 -s` <br />
+   `./scripts/integration_tests.sh -a x86 -s` <br />
+   By default, this uses Google Playstore API 30 system images. Other images may be used for testing
+   by specifying the api level and target. However, using other images with the cargo test runner
+   is still under development.
+2. To run the integration tests. From the `rust` directory, run: <br />
+   `cargo nextest run -E 'not test(e2e)'` <br />
+   Specify to run specific ABI: <br />
+   `cargo nextest run x86_64` <br />
+   `cargo nextest run x86_32` <br />
+   `cargo nextest run arm64` <br />
+   `cargo nextest run arm32` <br />
+   Specify to run a specific test on all ABIs: <br />
+   `cargo nextest run test_name` <br />
+   Specify to run a specific ABI and test: <br />
+   `cargo nextest run x86_64::test_name`
+
+To run tests with Regchest, add the `--features regchest` flag, for example: <br />
+`cargo nextest run --features regchest -E 'not test(e2e)'`
+
+For more information on running integration tests on non-default AVDs, run: <br />
+`./scripts/integration_tests.sh -h` <br />
+Without the cargo test runner these emulated android devices will not be able to connect to a
+lightwalletd/zcashd regtest network. Therefore, only tests in the "Offline Testsuite" may be tested.
+
+### End-to-End Tests
+0. Note there needs to be a lightwalletd in rust/android/lightwalletd_bin
+1. Launch the emulated AVD by clicking the 'play' icon in Android Studio's `Device Manager`.
+   Alternatively, connect to a physical device. See previous section 'Launching the app' for more
+   details.
+2. In a terminal, run: <br />
+   `yarn start`
+3. In a separate terminal, from the `rust` directory, run all tests: <br />
+   `cargo nextest run e2e`
+   or run a specific test: <br />
+   `cargo nextest run e2e::test_name`
+   or run a specific darkside test: <br />
+   `cargo nextest run e2e::darkside::test_name`
+
+Regchest is still under development and currently not able to run darkside end-to-end tests: <br />
+`cargo nextest run --features regchest -E 'test(e2e) and not test(darkside)'`
+
+# Troubleshooting
+For notes on known issues and problems, see the [trouble-shooting notes](./TROUBLESHOOTING.md).

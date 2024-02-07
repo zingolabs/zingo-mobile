@@ -7,7 +7,7 @@ pub extern "C" fn rust_free(s: *mut c_char) {
         if s.is_null() {
             return;
         }
-        CString::from_raw(s)
+        let _ = CString::from_raw(s);
     };
 }
 
@@ -15,6 +15,8 @@ pub extern "C" fn rust_free(s: *mut c_char) {
 pub extern "C" fn init_new(
     server_uri: *const c_char,
     data_dir: *const c_char,
+    chain_hint: *const c_char,
+    monitor_mempool: *const c_char,
 ) -> *mut c_char {
     let c_str = unsafe { CStr::from_ptr(server_uri) };
     let server_uri = match c_str.to_str() {
@@ -38,7 +40,31 @@ pub extern "C" fn init_new(
     }
     .to_string();
 
-    let seed = rustlib::init_new(server_uri, data_dir);
+    let c_str = unsafe { CStr::from_ptr(chain_hint) };
+    let chain_hint = match c_str.to_str() {
+        Err(_) => {
+            return CString::new("Error parsing 'chain_hint' argument".to_owned())
+                .unwrap()
+                .into_raw()
+        }
+        Ok(string) => string,
+    }
+    .to_string();
+
+    let c_str = unsafe { CStr::from_ptr(monitor_mempool) };
+    let monitor_mempool = match c_str.to_str() {
+        Err(_) => {
+            return CString::new("Error parsing 'monitor_mempool' argument".to_owned())
+                .unwrap()
+                .into_raw()
+        }
+        Ok(string) => string,
+    }
+    .to_string()
+    .parse::<bool>()
+    .unwrap();
+
+    let seed = rustlib::init_new(server_uri, data_dir, chain_hint, monitor_mempool);
 
     return CString::new(seed).unwrap().into_raw();
 }
@@ -49,6 +75,8 @@ pub extern "C" fn initfromseed(
     seed: *const c_char,
     birthday: *const c_char,
     data_dir: *const c_char,
+    chain_hint: *const c_char,
+    monitor_mempool: *const c_char,
 ) -> *mut c_char {
     let c_str = unsafe { CStr::from_ptr(server_uri) };
     let server_uri = match c_str.to_str() {
@@ -95,13 +123,134 @@ pub extern "C" fn initfromseed(
         Ok(string) => string,
     }
     .to_string();
+
+    let c_str = unsafe { CStr::from_ptr(chain_hint) };
+    let chain_hint = match c_str.to_str() {
+        Err(_) => {
+            return CString::new("Error parsing 'chain_hint' argument".to_owned())
+                .unwrap()
+                .into_raw()
+        }
+        Ok(string) => string,
+    }
+    .to_string();
+
+    let c_str = unsafe { CStr::from_ptr(monitor_mempool) };
+    let monitor_mempool = match c_str.to_str() {
+        Err(_) => {
+            return CString::new("Error parsing 'monitor_mempool' argument".to_owned())
+                .unwrap()
+                .into_raw()
+        }
+        Ok(string) => string,
+    }
+    .to_string()
+    .parse::<bool>()
+    .unwrap();
+
     let seed = rustlib::init_from_seed(
         server_uri,
         seed,
         birthday,
         data_dir,
+        chain_hint,
+        monitor_mempool,
     );
     return CString::new(seed).unwrap().into_raw();
+}
+
+#[no_mangle]
+pub extern "C" fn initfromufvk(
+    server_uri: *const c_char,
+    ufvk: *const c_char,
+    birthday: *const c_char,
+    data_dir: *const c_char,
+    chain_hint: *const c_char,
+    monitor_mempool: *const c_char,
+) -> *mut c_char {
+    let c_str = unsafe { CStr::from_ptr(server_uri) };
+    let server_uri = match c_str.to_str() {
+        Err(_) => {
+            return CString::new("Error parsing 'server_uri' argument".to_owned())
+                .unwrap()
+                .into_raw()
+        }
+        Ok(string) => string,
+    }
+    .to_string();
+
+    let c_str = unsafe { CStr::from_ptr(ufvk) };
+    let ufvk_tmp = match c_str.to_str() {
+        Err(_) => {
+            return CString::new("Error parsing 'ufvk' argument".to_owned())
+                .unwrap()
+                .into_raw()
+        }
+        Ok(string) => string,
+    }
+    .to_string();
+
+    let c_str = unsafe { CStr::from_ptr(birthday) };
+    let birthday = match c_str.to_str() {
+        Err(_) => {
+            return CString::new("Error parsing 'birthday' argument".to_owned())
+                .unwrap()
+                .into_raw()
+        }
+        Ok(string) => string,
+    }
+    .to_string()
+    .parse::<u64>()
+    .unwrap();
+
+    let c_str = unsafe { CStr::from_ptr(data_dir) };
+    let data_dir = match c_str.to_str() {
+        Err(_) => {
+            return CString::new("Error parsing 'data_dir' argument".to_owned())
+                .unwrap()
+                .into_raw()
+        }
+        Ok(string) => string,
+    }
+    .to_string();
+
+    let c_str = unsafe { CStr::from_ptr(chain_hint) };
+    let chain_hint = match c_str.to_str() {
+        Err(_) => {
+            return CString::new("Error parsing 'chain_hint' argument".to_owned())
+                .unwrap()
+                .into_raw()
+        }
+        Ok(string) => string,
+    }
+    .to_string();
+
+    let c_str = unsafe { CStr::from_ptr(monitor_mempool) };
+    let monitor_mempool = match c_str.to_str() {
+        Err(_) => {
+            return CString::new("Error parsing 'monitor_mempool' argument".to_owned())
+                .unwrap()
+                .into_raw()
+        }
+        Ok(string) => string,
+    }
+    .to_string()
+    .parse::<bool>()
+    .unwrap();
+
+    let no_seed_warning = rustlib::init_from_ufvk(
+        server_uri,
+        ufvk_tmp,
+        birthday,
+        data_dir,
+        chain_hint,
+        monitor_mempool,
+    );
+
+    // I need to see if there is some error here...
+    //let output = "Wallet created from ufvk, no seed available".to_string();
+    //return CString::new(output).unwrap().into_raw();
+    return CString::new(no_seed_warning).unwrap().into_raw();
 }
 
 #[no_mangle]
@@ -109,6 +258,8 @@ pub extern "C" fn initfromb64(
     server_uri: *const c_char,
     base64: *const c_char,
     data_dir: *const c_char,
+    chain_hint: *const c_char,
+    monitor_mempool: *const c_char,
 ) -> *mut c_char {
     let c_str = unsafe { CStr::from_ptr(server_uri) };
     let server_uri = match c_str.to_str() {
@@ -143,7 +294,31 @@ pub extern "C" fn initfromb64(
     }
     .to_string();
 
-    let seed = rustlib::init_from_b64(server_uri, base64, data_dir);
+    let c_str = unsafe { CStr::from_ptr(chain_hint) };
+    let chain_hint = match c_str.to_str() {
+        Err(_) => {
+            return CString::new("Error parsing 'chain_hint' argument".to_owned())
+                .unwrap()
+                .into_raw()
+        }
+        Ok(string) => string,
+    }
+    .to_string();
+
+    let c_str = unsafe { CStr::from_ptr(monitor_mempool) };
+    let monitor_mempool = match c_str.to_str() {
+        Err(_) => {
+            return CString::new("Error parsing 'monitor_mempool' argument".to_owned())
+                .unwrap()
+                .into_raw()
+        }
+        Ok(string) => string,
+    }
+    .to_string()
+    .parse::<bool>()
+    .unwrap();
+
+    let seed = rustlib::init_from_b64(server_uri, base64, data_dir, chain_hint, monitor_mempool);
 
     return CString::new(seed).unwrap().into_raw();
 }
@@ -185,9 +360,7 @@ pub extern "C" fn execute(cmd: *const c_char, args_list: *const c_char) -> *mut 
 }
 
 #[no_mangle]
-pub extern "C" fn get_latest_block(
-    server_uri: *const c_char,
-) -> *mut c_char {
+pub extern "C" fn get_latest_block(server_uri: *const c_char) -> *mut c_char {
     let c_str = unsafe { CStr::from_ptr(server_uri) };
     let server_uri = match c_str.to_str() {
         Err(_) => {

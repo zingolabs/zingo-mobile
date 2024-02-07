@@ -3,37 +3,38 @@ import { StackScreenProps } from '@react-navigation/stack';
 
 import {
   AppStateLoading,
-  DimensionsType,
   InfoType,
   TotalBalanceClass,
-  WalletSeedType,
-  zecPriceType,
+  WalletType,
+  ZecPriceType,
   BackgroundType,
   NetInfoType,
+  BackgroundErrorType,
+  ServerType,
 } from '../AppState';
+import SnackbarType from '../AppState/types/SnackbarType';
 
 export const defaultAppStateLoading: AppStateLoading = {
   navigation: {} as StackScreenProps<any>['navigation'],
   route: {} as StackScreenProps<any>['route'],
-  dimensions: {} as DimensionsType,
-  appState: '' as string,
+  appState: '',
   netInfo: {} as NetInfoType,
 
   screen: 0,
   actionButtonsDisabled: false,
   walletExists: false,
-  walletSeed: {} as WalletSeedType,
+  wallet: {} as WalletType,
   totalBalance: new TotalBalanceClass(),
   info: {} as InfoType,
 
-  server: '' as string,
+  server: {} as ServerType,
   currency: '',
   language: 'en',
 
   zecPrice: {
     zecPrice: 0,
     date: 0,
-  } as zecPriceType,
+  } as ZecPriceType,
   sendAll: false,
   background: {
     batches: 0,
@@ -41,6 +42,17 @@ export const defaultAppStateLoading: AppStateLoading = {
   } as BackgroundType,
 
   translate: () => '',
+  backgroundError: {} as BackgroundErrorType,
+  setBackgroundError: () => {},
+  privacy: false,
+  readOnly: false,
+  customServerShow: false,
+  customServerUri: '',
+  customServerChainName: 'main',
+  mode: 'basic',
+  snackbars: [] as SnackbarType[],
+  addLastSnackbar: () => {},
+  firstLaunchingMessage: false,
 };
 
 export const ContextAppLoading = React.createContext(defaultAppStateLoading);

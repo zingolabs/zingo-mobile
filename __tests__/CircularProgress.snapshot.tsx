@@ -9,10 +9,10 @@ import { render } from '@testing-library/react-native';
 import CircularProgress from '../components/Components/CircularProgress';
 
 // test suite
-describe('Component About - test', () => {
+describe('Component CircularProgress - test', () => {
   //snapshot test
-  test('About - snapshot', () => {
-    const about = render(
+  test('CircularProgress - snapshot', () => {
+    const circular = render(
       <CircularProgress
         size={100}
         strokeWidth={5}
@@ -21,6 +21,6 @@ describe('Component About - test', () => {
         progressPercent={(2 * 100) / 4}
       />,
     );
-    expect(about.toJSON()).toMatchSnapshot();
+    expect(circular.toJSON()).toMatchSnapshot();
   });
 });

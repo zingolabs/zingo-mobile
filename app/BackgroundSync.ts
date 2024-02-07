@@ -17,36 +17,22 @@ const BackgroundSync = async (task_data: any) => {
       networkState.type === NetInfoStateType.cellular ||
       (networkState.details !== null && networkState.details.isConnectionExpensive)
     ) {
-      console.log(
-        'BS: Not started (connected: ' + networkState.isConnected,
-        +', type: ' +
-          networkState.type +
-          +', expensive connection: ' +
-          networkState.details?.isConnectionExpensive +
-          ')',
-      );
+      //console.log(
+      //  'BS: Not started (connected: ' + networkState.isConnected,
+      //  +', type: ' +
+      //    networkState.type +
+      //    +', expensive connection: ' +
+      //    networkState.details?.isConnectionExpensive +
+      //    ')',
+      //);
       return;
     }
     // if the App goes to Foreground kill the interval
     const background = await AsyncStorage.getItem('@background');
     if (background === 'no') {
-      console.log('BS: Not started (going to foreground)');
+      //console.log('BS: Not started (going to foreground)');
       return;
     }
-    /* no need to load wallet again, it's loaded already in the RPC session.
-    const server = await AsyncStorage.getItem('@server');
-    let wallet: string = await RPCModule.loadExistingWallet(server);
-    if (wallet) {
-      if (wallet.toLowerCase().startsWith('error')) {
-        // We don't return an error message yet, just log the error and return
-        console.log(`BS: Error load wallet ${wallet}`);
-        return;
-      }
-    } else {
-      console.log('BS: Internal Error load wallet');
-      return;
-    }
-    */
 
     let batch_num = -1;
     console.log('BS:', task_data);
@@ -63,14 +49,14 @@ const BackgroundSync = async (task_data: any) => {
         networkStateSaver.type === NetInfoStateType.cellular ||
         (networkStateSaver.details !== null && networkStateSaver.details.isConnectionExpensive)
       ) {
-        console.log(
-          'BS: Interrupted (connected: ' + networkStateSaver.isConnected,
-          +', type: ' +
-            networkStateSaver.type +
-            +', expensive connection: ' +
-            networkStateSaver.details?.isConnectionExpensive +
-            ')',
-        );
+        //console.log(
+        //  'BS: Interrupted (connected: ' + networkStateSaver.isConnected,
+        //  +', type: ' +
+        //    networkStateSaver.type +
+        //    +', expensive connection: ' +
+        //    networkStateSaver.details?.isConnectionExpensive +
+        //    ')',
+        //);
         clearInterval(saver);
         finishEarly.done();
         return;
@@ -79,7 +65,7 @@ const BackgroundSync = async (task_data: any) => {
       const backgroundSaver = await AsyncStorage.getItem('@background');
       if (backgroundSaver === 'no') {
         clearInterval(saver);
-        console.log('BS: Finished (going to foreground)');
+        //console.log('BS: Finished (going to foreground)');
         finishEarly.done();
         return;
       }
@@ -87,20 +73,26 @@ const BackgroundSync = async (task_data: any) => {
       const syncStatusStr: string = await RPCModule.execute('syncstatus', '');
       if (syncStatusStr) {
         if (syncStatusStr.toLowerCase().startsWith('error')) {
-          console.log(`BS: Error sync status ${syncStatusStr}`);
+          //console.log(`BS: Error sync status ${syncStatusStr}`);
           return;
         }
       } else {
-        console.log('BS: Internal Error sync status');
+        //console.log('BS: Internal Error sync status');
         return;
       }
-      // TODO: verify this JSON parse
-      const ss: RPCSyncStatusType = await JSON.parse(syncStatusStr);
 
-      console.log('BS:', ss);
+      let ss = {} as RPCSyncStatusType;
+      try {
+        ss = await JSON.parse(syncStatusStr);
+      } catch (e) {
+        //console.log('BS: Error parsing syncstatus JSON', e);
+        return;
+      }
+
+      //console.log('BS:', ss);
       if (ss.batch_num && ss.batch_num > -1 && batch_num !== ss.batch_num) {
         await RPCModule.doSave();
-        console.log('BS: saving...');
+        //console.log('BS: saving...');
         // update batch_num with the new value, otherwise never change
         batch_num = ss.batch_num;
 
@@ -122,7 +114,7 @@ const BackgroundSync = async (task_data: any) => {
   } else {
     console.log('BS: wallet file does not exist');
   }
-  console.log('BS: Finished (end of syncing)');
+  //console.log('BS: Finished (end of syncing)');
 };
 
 export default BackgroundSync;

@@ -3,11 +3,12 @@ import Url from 'url-parse';
 import RPCModule from '../RPCModule';
 import { RPCParseAddressType } from '../rpc/types/RPCParseAddressType';
 import ZcashURITargetClass from './classes/ZcashURITargetClass';
-import { TranslateType } from '../AppState';
+import { ServerType, TranslateType } from '../AppState';
 
 const parseZcashURI = async (
   uri: string,
   translate: (key: string) => TranslateType,
+  server: ServerType,
 ): Promise<string | ZcashURITargetClass> => {
   if (!uri || uri === '') {
     return translate('uris.baduri') as string;
@@ -23,22 +24,30 @@ const parseZcashURI = async (
 
   // The first address is special, it can be the "host" part of the URI
   const address = parsedUri.pathname;
+  //console.log(address);
 
-  const resultParse: string = await RPCModule.execute('parse', address);
-  if (resultParse) {
-    if (resultParse.toLowerCase().startsWith('error')) {
-      return 'Right now it is not possible to verify the address with the server';
+  if (address) {
+    const resultParse: string = await RPCModule.execute('parse_address', address);
+    if (resultParse) {
+      if (resultParse.toLowerCase().startsWith('error') || resultParse.toLowerCase() === 'null') {
+        return translate('uris.parseerror') as string;
+      }
+    } else {
+      return translate('uris.parseerror') as string;
     }
-  } else {
-    return 'Right now it is not possible to verify the address with the server';
-  }
-  // TODO: check if the json parse is correct.
-  const resultParseJSON: RPCParseAddressType = await JSON.parse(resultParse);
+    //console.log(resultParse);
+    let resultParseJSON = {} as RPCParseAddressType;
+    try {
+      resultParseJSON = await JSON.parse(resultParse);
+    } catch (e) {
+      return translate('uris.parseerror') as string;
+    }
 
-  const validParse = resultParseJSON.status === 'success';
+    const validParse = resultParseJSON.status === 'success' && server.chain_name === resultParseJSON.chain_name;
 
-  if (address && !validParse) {
-    return `"${address || ''}" ${translate('uris.notvalid')}`;
+    if (address && !validParse) {
+      return `"${address || ''}" ${translate('uris.notvalid')}`;
+    }
   }
 
   // Has to have at least 1 element
@@ -77,18 +86,22 @@ const parseZcashURI = async (
         if (typeof target.address !== 'undefined') {
           return `${translate('uris.duplicateparameter')} "${qName}"`;
         }
-        const result: string = await RPCModule.execute('parse', value);
+        const result: string = await RPCModule.execute('parse_address', value);
         if (result) {
-          if (result.toLowerCase().startsWith('error')) {
-            return 'Right now it is not possible to verify the address with the server';
+          if (result.toLowerCase().startsWith('error') || result.toLowerCase() === 'null') {
+            return translate('uris.parseerror') as string;
           }
         } else {
-          return 'Right now it is not possible to verify the address with the server';
+          return translate('uris.parseerror') as string;
         }
-        // TODO: check if the json parse is correct.
-        const resultJSON: RPCParseAddressType = await JSON.parse(result);
+        let resultJSON = {} as RPCParseAddressType;
+        try {
+          resultJSON = await JSON.parse(result);
+        } catch (e) {
+          return translate('uris.parseerror') as string;
+        }
 
-        const valid = resultJSON.status === 'success';
+        const valid = resultJSON.status === 'success' && server.chain_name === resultJSON.chain_name;
 
         if (!valid) {
           return `"${value}" ${translate('uris.notvalid')}`;

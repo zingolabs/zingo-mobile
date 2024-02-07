@@ -40,6 +40,15 @@ jest.mock('@react-native-community/netinfo', () => {
 
   return RN;
 });
+jest.mock('react-native', () => {
+  const RN = jest.requireActual('react-native');
+
+  RN.NativeModules.RPCModule = {
+    execute: jest.fn(() => '{}'),
+  };
+
+  return RN;
+});
 jest.useFakeTimers();
 
 // test suite
@@ -103,7 +112,7 @@ describe('Component Settings - test', () => {
   };
   state.info.currencyName = 'ZEC';
   state.totalBalance.total = 1.12345678;
-  state.server = 'https://zcash.es';
+  state.server = { uri: 'https://zcash.es', chain_name: 'main' };
   state.currency = 'USD';
   state.language = 'en';
   state.sendAll = false;
@@ -121,6 +130,8 @@ describe('Component Settings - test', () => {
           set_currency_option={onSetOption}
           set_language_option={onSetOption}
           set_sendAll_option={onSetOption}
+          set_privacy_option={onSetOption}
+          set_mode_option={onSetOption}
         />
       </ContextAppLoadedProvider>,
     );

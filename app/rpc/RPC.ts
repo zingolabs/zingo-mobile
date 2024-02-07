@@ -1,16 +1,15 @@
 import {
-  SyncingStatusReportClass,
   TotalBalanceClass,
   AddressClass,
   TransactionType,
   TxDetailType,
   InfoType,
   SendJsonToTypeType,
-  WalletSeedType,
+  WalletType,
   SendProgressClass,
   WalletSettingsClass,
   TranslateType,
-  SyncingStatusType,
+  SyncingStatusClass,
 } from '../AppState';
 import RPCModule from '../RPCModule';
 import Utils from '../utils';
@@ -20,9 +19,6 @@ import { RPCNotesType } from './types/RPCNotesType';
 import { RPCOrchardNoteType } from './types/RPCOrchardNoteType';
 import { RPCSaplingNoteType } from './types/RPCSaplingNoteType';
 import { RPCUtxoNoteType } from './types/RPCUtxoNoteType';
-import { RPCTransactionType } from './types/RPCTransationType';
-import { RPCOutgoingMetadataType } from './types/RPCOutgoingMetadataType';
-import { Platform } from 'react-native';
 import { RPCInfoType } from './types/RPCInfoType';
 import { RPCDefaultFeeType } from './types/RPCDefaultFeeType';
 import { RPCWalletHeight } from './types/RPCWalletHeightType';
@@ -31,17 +27,17 @@ import { RPCSyncStatusType } from './types/RPCSyncStatusType';
 import { RPCGetOptionType } from './types/RPCGetOptionType';
 import { RPCSendProgressType } from './types/RPCSendProgressType';
 import { RPCSyncRescan } from './types/RPCSyncRescanType';
+import { RPCUfvkType } from './types/RPCUfvkType';
+import { RPCSummariesType } from './types/RPCSummariesType';
 
 export default class RPC {
-  fnSetSyncingStatusReport: (syncingStatusReport: SyncingStatusReportClass) => void;
   fnSetInfo: (info: InfoType) => void;
   fnSetTotalBalance: (totalBalance: TotalBalanceClass) => void;
   fnSetTransactionsList: (txList: TransactionType[]) => void;
   fnSetAllAddresses: (allAddresses: AddressClass[]) => void;
-  fnSetSyncingStatus: (syncingStatus: SyncingStatusType) => void;
+  fnSetSyncingStatus: (syncingStatus: SyncingStatusClass) => void;
   fnSetWalletSettings: (settings: WalletSettingsClass) => void;
   translate: (key: string) => TranslateType;
-  fetchBackgroundSyncing: () => void;
   keepAwake: (keep: boolean) => void;
 
   refreshTimerID?: NodeJS.Timeout;
@@ -56,30 +52,33 @@ export default class RPC {
   walletBirthday: number;
 
   inRefresh: boolean;
+  inSend: boolean;
   blocksPerBatch: number;
 
-  prevProgress: number;
-  prevBatchNum: number;
+  prev_batch_num: number;
   prev_sync_id: number;
+  prev_current_block: number;
   seconds_batch: number;
+  seconds_block: number;
   batches: number;
   latest_block: number;
+  sync_id: number;
 
   timers: NodeJS.Timeout[];
 
+  readOnly: boolean;
+
   constructor(
-    fnSetSyncingStatusReport: (syncingStatusReport: SyncingStatusReportClass) => void,
     fnSetTotalBalance: (totalBalance: TotalBalanceClass) => void,
     fnSetTransactionsList: (txlist: TransactionType[]) => void,
     fnSetAllAddresses: (addresses: AddressClass[]) => void,
     fnSetWalletSettings: (settings: WalletSettingsClass) => void,
     fnSetInfo: (info: InfoType) => void,
-    fnSetSyncingStatus: (syncingStatus: SyncingStatusType) => void,
+    fnSetSyncingStatus: (syncingStatus: SyncingStatusClass) => void,
     translate: (key: string) => TranslateType,
-    fetchBackgroundSyncing: () => void,
     keepAwake: (keep: boolean) => void,
+    readOnly: boolean,
   ) {
-    this.fnSetSyncingStatusReport = fnSetSyncingStatusReport;
     this.fnSetTotalBalance = fnSetTotalBalance;
     this.fnSetTransactionsList = fnSetTransactionsList;
     this.fnSetAllAddresses = fnSetAllAddresses;
@@ -87,7 +86,6 @@ export default class RPC {
     this.fnSetInfo = fnSetInfo;
     this.fnSetSyncingStatus = fnSetSyncingStatus;
     this.translate = translate;
-    this.fetchBackgroundSyncing = fetchBackgroundSyncing;
     this.keepAwake = keepAwake;
 
     this.updateDataLock = false;
@@ -98,16 +96,21 @@ export default class RPC {
     this.walletBirthday = 0;
 
     this.inRefresh = false;
+    this.inSend = false;
     this.blocksPerBatch = 100;
 
-    this.prevProgress = 0;
-    this.prevBatchNum = -1;
+    this.prev_batch_num = -1;
     this.prev_sync_id = -1;
+    this.prev_current_block = -1;
     this.seconds_batch = 0;
+    this.seconds_block = 0;
     this.batches = 0;
     this.latest_block = -1;
+    this.sync_id = -1;
 
     this.timers = [];
+
+    this.readOnly = readOnly;
   }
 
   static async rpc_setInterruptSyncAfterBatch(value: string): Promise<void> {
@@ -201,6 +204,18 @@ export default class RPC {
       }
       const defaultFeeJSON: RPCDefaultFeeType = await JSON.parse(defaultFeeStr);
 
+      let zingolibStr: string = await RPCModule.execute('version', '');
+      if (zingolibStr) {
+        if (zingolibStr.toLowerCase().startsWith('error')) {
+          console.log(`Error zingolib version ${zingolibStr}`);
+          zingolibStr = '<error>';
+        }
+      } else {
+        console.log('Internal Error zingolib version');
+        zingolibStr = '<none>';
+      }
+      //const zingolibJSON = await JSON.parse(zingolibStr);
+
       const info: InfoType = {
         chain_name: infoJSON.chain_name,
         latestBlock: infoJSON.latest_block_height,
@@ -208,9 +223,10 @@ export default class RPC {
         connections: 1,
         version: `${infoJSON.vendor}/${infoJSON.git_commit.substring(0, 6)}/${infoJSON.version}`,
         verificationProgress: 1,
-        currencyName: infoJSON.chain_name === 'main' || infoJSON.chain_name === 'mainnet' ? 'ZEC' : 'TAZ',
+        currencyName: infoJSON.chain_name === 'main' ? 'ZEC' : 'TAZ',
         solps: 0,
         defaultFee: defaultFeeJSON.defaultfee / 10 ** 8 || Utils.getFallbackDefaultFee(),
+        zingolib: zingolibStr,
       };
 
       return info;
@@ -318,62 +334,94 @@ export default class RPC {
     return '';
   }
   */
-  static async rpc_shieldTransparent(): Promise<string> {
+  static async rpc_shieldFunds(pools: string): Promise<string> {
     try {
-      const shieldStr: string = await RPCModule.execute('shield', '');
+      // using `all` or `transparent` or `sapling`...
+      const shieldStr: string = await RPCModule.execute('shield', pools);
       if (shieldStr) {
         if (shieldStr.toLowerCase().startsWith('error')) {
-          console.log(`Error shield transparent ${shieldStr}`);
+          console.log(`Error shield ${pools} ${shieldStr}`);
           return shieldStr;
         }
       } else {
-        console.log('Internal Error shield transparent');
-        return 'Error: Internal RPC Error: shield transparent';
+        console.log('Internal Error shield ' + pools);
+        return 'Error: Internal RPC Error: shield ' + pools;
       }
 
       return shieldStr;
     } catch (error) {
-      console.log(`Critical Error shield transparent ${error}`);
+      console.log(`Critical Error shield ${pools} ${error}`);
       return `Error: ${error}`;
     }
   }
 
-  static async rpc_fetchSeedAndBirthday(): Promise<WalletSeedType> {
-    try {
-      const seedStr: string = await RPCModule.execute('seed', '');
-      if (seedStr) {
-        if (seedStr.toLowerCase().startsWith('error')) {
-          console.log(`Error seed ${seedStr}`);
-          return {} as WalletSeedType;
+  static async rpc_fetchWallet(readOnly: boolean): Promise<WalletType> {
+    if (readOnly) {
+      // viewing key
+      try {
+        const ufvkStr: string = await RPCModule.execute('exportufvk', '');
+        if (ufvkStr) {
+          if (ufvkStr.toLowerCase().startsWith('error')) {
+            console.log(`Error ufvk ${ufvkStr}`);
+            return {} as WalletType;
+          }
+        } else {
+          console.log('Internal Error ufvk');
+          return {} as WalletType;
         }
-      } else {
-        console.log('Internal Error seed');
-        return {} as WalletSeedType;
-      }
-      const seedJSON: RPCSeedType = await JSON.parse(seedStr);
-      const seed: WalletSeedType = { seed: seedJSON.seed, birthday: seedJSON.birthday };
+        const ufvk: WalletType = (await JSON.parse(ufvkStr)) as RPCUfvkType;
 
-      return seed;
-    } catch (error) {
-      console.log(`Critical Error seed ${error}`);
-      return {} as WalletSeedType;
+        return ufvk;
+      } catch (error) {
+        console.log(`Critical Error ufvk / get_birthday ${error}`);
+        return {} as WalletType;
+      }
+    } else {
+      // seed
+      try {
+        const seedStr: string = await RPCModule.execute('seed', '');
+        if (seedStr) {
+          if (seedStr.toLowerCase().startsWith('error')) {
+            console.log(`Error seed ${seedStr}`);
+            return {} as WalletType;
+          }
+        } else {
+          console.log('Internal Error seed');
+          return {} as WalletType;
+        }
+        const RPCseed: RPCSeedType = await JSON.parse(seedStr);
+        const seed: WalletType = {} as WalletType;
+        if (RPCseed.seed) {
+          seed.seed = RPCseed.seed;
+        }
+        if (RPCseed.birthday) {
+          seed.birthday = RPCseed.birthday;
+        }
+
+        return seed;
+      } catch (error) {
+        console.log(`Critical Error seed ${error}`);
+        return {} as WalletType;
+      }
     }
   }
 
   // We combine detailed transactions if they are sent to the same outgoing address in the same txid. This
   // is usually done to split long memos.
   // Remember to add up both amounts and combine memos
-  static rpc_combineTxDetails(txdetails: TxDetailType[]): TxDetailType[] {
+  static rpc_combineTxDetailsByAddress(txdetails: TxDetailType[]): TxDetailType[] {
     // First, group by outgoing address.
     const m = new Map<string, TxDetailType[]>();
-    txdetails.forEach(i => {
-      const coll = m.get(i.address);
-      if (!coll) {
-        m.set(i.address, [i]);
-      } else {
-        coll.push(i);
-      }
-    });
+    txdetails
+      .filter(i => i.address !== undefined)
+      .forEach(i => {
+        const coll = m.get(i.address as string);
+        if (!coll) {
+          m.set(i.address as string, [i]);
+        } else {
+          coll.push(i);
+        }
+      });
 
     // Reduce the groups to a single TxDetail, combining memos and summing amounts
     const reducedDetailedTxns: TxDetailType[] = [];
@@ -381,24 +429,86 @@ export default class RPC {
       const totalAmount = txns.reduce((sum, i) => sum + i.amount, 0);
 
       const memos = txns
-        .filter(i => i.memo)
+        .filter(i => i.memos && i.memos.length > 0)
         .map(i => {
-          const rex = /\((\d+)\/(\d+)\)((.|[\r\n])*)/;
-          const tags = i.memo && i.memo.match(rex);
-          if (tags && tags.length >= 4) {
-            return { num: parseInt(tags[1], 10), memo: tags[3] };
-          }
+          const combinedMemo = i.memos
+            ?.filter(memo => memo)
+            .map(memo => {
+              const rex = /\((\d+)\/(\d+)\)((.|[\r\n])*)/;
+              const tags = memo.match(rex);
+              if (tags && tags.length >= 4) {
+                return { num: parseInt(tags[1], 10), memo: tags[3] };
+              }
 
-          // Just return as is
-          return { num: 0, memo: i.memo };
+              // Just return as is
+              return { num: 0, memo };
+            })
+            .sort((a, b) => a.num - b.num)
+            .map(a => a.memo);
+          return combinedMemo && combinedMemo.length > 0 ? combinedMemo.join('') : undefined;
         })
-        .sort((a, b) => a.num - b.num)
-        .map(a => a.memo);
+        .map(a => a);
 
       const detail: TxDetailType = {
         address: toaddr,
         amount: totalAmount,
-        memo: memos && memos.length > 0 ? memos.join('') : undefined,
+        memos: memos && memos.length > 0 ? [memos.join('')] : undefined,
+      };
+
+      reducedDetailedTxns.push(detail);
+    });
+
+    return reducedDetailedTxns;
+  }
+
+  // We combine detailed transactions if they are received to the same pool in the same txid. This
+  // is usually done to split long memos.
+  // Remember to add up both amounts and combine memos
+  static rpc_combineTxDetailsByPool(txdetails: TxDetailType[]): TxDetailType[] {
+    // First, group by pool.
+    const m = new Map<'Orchard' | 'Sapling' | 'Transparent', TxDetailType[]>();
+    txdetails
+      .filter(i => i.pool !== undefined)
+      .forEach(i => {
+        const coll = m.get(i.pool as 'Orchard' | 'Sapling' | 'Transparent');
+        if (!coll) {
+          m.set(i.pool as 'Orchard' | 'Sapling' | 'Transparent', [i]);
+        } else {
+          coll.push(i);
+        }
+      });
+
+    // Reduce the groups to a single TxDetail, combining memos and summing amounts
+    const reducedDetailedTxns: TxDetailType[] = [];
+    m.forEach((txns, pool) => {
+      const totalAmount = txns.reduce((sum, i) => sum + i.amount, 0);
+
+      const memos = txns
+        .filter(i => i.memos && i.memos.length > 0)
+        .map(i => {
+          const combinedMemo = i.memos
+            ?.filter(memo => memo)
+            .map(memo => {
+              const rex = /\((\d+)\/(\d+)\)((.|[\r\n])*)/;
+              const tags = memo.match(rex);
+              if (tags && tags.length >= 4) {
+                return { num: parseInt(tags[1], 10), memo: tags[3] };
+              }
+
+              // Just return as is
+              return { num: 0, memo };
+            })
+            .sort((a, b) => a.num - b.num)
+            .map(a => a.memo);
+          return combinedMemo && combinedMemo.length > 0 ? combinedMemo.join('') : undefined;
+        })
+        .map(a => a);
+
+      const detail: TxDetailType = {
+        address: '',
+        amount: totalAmount,
+        memos: memos && memos.length > 0 ? [memos.join('')] : undefined,
+        pool: pool,
       };
 
       reducedDetailedTxns.push(detail);
@@ -409,24 +519,24 @@ export default class RPC {
 
   // this is only for the first time when the App is booting.
   async configure(): Promise<void> {
-    // every minute the App try to Sync the new blocks.
+    // every 30 seconds the App try to Sync the new blocks.
     if (!this.refreshTimerID) {
       this.refreshTimerID = setInterval(() => {
-        console.log('interval refresh');
+        //console.log('interval refresh');
         this.refresh(false);
       }, 30 * 1000); // 30 seconds
-      console.log('create refresh timer', this.refreshTimerID);
+      //console.log('create refresh timer', this.refreshTimerID);
       this.timers.push(this.refreshTimerID);
     }
 
     // every 5 seconds the App update all data
     if (!this.updateTimerID) {
       this.updateTimerID = setInterval(() => {
-        console.log('interval update', this.timers);
+        //console.log('interval update', this.timers);
         this.sanitizeTimers();
         this.updateData();
       }, 5 * 1000); // 5 secs
-      console.log('create update timer', this.updateTimerID);
+      //console.log('create update timer', this.updateTimerID);
       this.timers.push(this.updateTimerID);
     }
 
@@ -436,7 +546,7 @@ export default class RPC {
       if (this.timers[i] !== this.refreshTimerID && this.timers[i] !== this.updateTimerID) {
         clearInterval(this.timers[i]);
         deleted.push(i);
-        console.log('kill item array timers', this.timers[i]);
+        //console.log('kill item array timers', this.timers[i]);
       }
     }
     // remove the cleared timers.
@@ -458,26 +568,26 @@ export default class RPC {
     if (this.refreshTimerID) {
       clearInterval(this.refreshTimerID);
       this.refreshTimerID = undefined;
-      console.log('kill refresh timer', this.refreshTimerID);
+      //console.log('kill refresh timer', this.refreshTimerID);
     }
 
     if (this.updateTimerID) {
       clearInterval(this.updateTimerID);
       this.updateTimerID = undefined;
-      console.log('kill update timer', this.updateTimerID);
+      //console.log('kill update timer', this.updateTimerID);
     }
 
     if (this.syncStatusTimerID) {
       clearInterval(this.syncStatusTimerID);
       this.syncStatusTimerID = undefined;
-      console.log('kill syncstatus timer', this.syncStatusTimerID);
+      //console.log('kill syncstatus timer', this.syncStatusTimerID);
     }
 
     // and now the array of timers...
     while (this.timers.length > 0) {
       const inter = this.timers.pop();
       clearInterval(inter);
-      console.log('kill item array timers', inter);
+      //console.log('kill item array timers', inter);
     }
   }
 
@@ -492,7 +602,7 @@ export default class RPC {
       ) {
         clearInterval(this.timers[i]);
         deleted.push(i);
-        console.log('sanitize - kill item array timers', this.timers[i]);
+        //console.log('sanitize - kill item array timers', this.timers[i]);
       }
     }
     // remove the cleared timers.
@@ -603,7 +713,8 @@ export default class RPC {
 
   async loadWalletData() {
     await this.fetchTotalBalance();
-    await this.fetchTandZandOTransactions();
+    //await this.fetchTandZandOTransactionsList();
+    await this.fetchTandZandOTransactionsSummaries();
     await this.fetchWalletSettings();
     await this.fetchInfoAndServerHeight();
   }
@@ -616,8 +727,8 @@ export default class RPC {
     }
 
     this.updateDataCtr += 1;
-    if (this.inRefresh && this.updateDataCtr % 5 !== 0) {
-      // We're refreshing, in which case update every 5th time
+    if ((this.inRefresh || this.inSend) && this.updateDataCtr % 5 !== 0) {
+      // We're refreshing, or sending, in which case update every 5th time
       return;
     }
 
@@ -630,11 +741,6 @@ export default class RPC {
     // And fetch the rest of the data.
     await this.loadWalletData();
 
-    if (Platform.OS === 'ios') {
-      // this file only exists in IOS BS.
-      this.fetchBackgroundSyncing();
-    }
-
     //console.log(`Finished update data at ${lastServerBlockHeight}`);
     this.updateDataLock = false;
   }
@@ -642,12 +748,12 @@ export default class RPC {
   async refresh(fullRefresh: boolean, fullRescan?: boolean) {
     // If we're in refresh, we don't overlap
     if (this.inRefresh) {
-      console.log('in refresh is true');
+      //console.log('in refresh is true');
       return;
     }
 
     if (this.syncStatusTimerID) {
-      console.log('syncStatusTimerID exists already');
+      //console.log('syncStatusTimerID exists already');
       return;
     }
 
@@ -659,11 +765,9 @@ export default class RPC {
     await this.fetchInfoAndServerHeight();
 
     if (!this.lastServerBlockHeight) {
-      console.log('the last server block is zero');
+      //console.log('the last server block is zero');
       return;
     }
-
-    //console.log(fullRefresh, fullRescan, this.lastWalletBlockHeight, this.lastServerBlockHeight, this.inRefresh);
 
     // if it's sending now, don't fire the sync process.
     if (
@@ -673,19 +777,29 @@ export default class RPC {
       this.lastWalletBlockHeight < this.lastServerBlockHeight
     ) {
       // If the latest block height has changed, make sure to sync. This will happen in a new thread
-      this.inRefresh = true;
-      // here we can keep the screen alive...
+      this.setInRefresh(true);
       this.keepAwake(true);
 
-      this.prevProgress = 0;
-      this.prevBatchNum = -1;
+      this.prev_batch_num = -1;
       this.prev_sync_id = -1;
       this.seconds_batch = 0;
+      this.seconds_block = 0;
       this.batches = 0;
       this.latest_block = -1;
+      this.prev_current_block = -1;
 
       // This is async, so when it is done, we finish the refresh.
       if (fullRescan) {
+        // clean the transaction list before.
+        this.fnSetTransactionsList([]);
+        this.fnSetTotalBalance({
+          orchardBal: 0,
+          privateBal: 0,
+          transparentBal: 0,
+          spendableOrchard: 0,
+          spendablePrivate: 0,
+          total: 0,
+        });
         this.doRescan()
           .then(result => {
             console.log('rescan finished', result);
@@ -696,11 +810,14 @@ export default class RPC {
               }
             }
           })
-          .catch(error => console.log('rescan error', error))
-          .finally(() => {
-            this.inRefresh = false;
-            this.keepAwake(false);
-          });
+          .catch(error => console.log('rescan error', error));
+        //.finally(() => {
+        // with the new feature shardtree I can get an error here, but
+        // doesn't mean the sync/rescan process is finished, I have to
+        // rely on syncstatus finished instead
+        //this.inRefresh = false;
+        //this.keepAwake(false);
+        //});
       } else {
         this.doSync()
           .then(result => {
@@ -712,11 +829,14 @@ export default class RPC {
               }
             }
           })
-          .catch(error => console.log('sync error', error))
-          .finally(() => {
-            this.inRefresh = false;
-            this.keepAwake(false);
-          });
+          .catch(error => console.log('sync error', error));
+        //.finally(() => {
+        // with the new feature shardtree I can get an error here, but
+        // doesn't mean the sync/rescan process is finished, I have to
+        // rely on syncstatus finished instead
+        //this.inRefresh = false;
+        //this.keepAwake(false);
+        //});
       }
 
       // We need to wait for the sync to finish. The sync is done when
@@ -725,19 +845,46 @@ export default class RPC {
         if (returnStatus.toLowerCase().startsWith('error')) {
           return;
         }
-        // TODO verify that JSON don't fail.
-        const ss: RPCSyncStatusType = await JSON.parse(returnStatus);
-
-        //console.log('sync wallet birthday', this.walletBirthday);
-        console.log('sync', this.syncStatusTimerID, 'status', ss);
-
-        // syncronize status
-        if (this.syncStatusTimerID) {
-          this.inRefresh = ss.in_progress;
+        let ss = {} as RPCSyncStatusType;
+        try {
+          ss = await JSON.parse(returnStatus);
+        } catch (e) {
+          return;
         }
 
+        //console.log('sync wallet birthday', this.walletBirthday);
+        //console.log('sync', this.syncStatusTimerID);
+        console.log(
+          'synced',
+          ss.synced_blocks,
+          'trial_decryptions',
+          ss.trial_decryptions_blocks,
+          'txn_scan',
+          ss.txn_scan_blocks,
+          'witnesses',
+          ss.witnesses_updated,
+          'TOTAL',
+          ss.total_blocks,
+          'batch_num',
+          ss.batch_num,
+          'batch_total',
+          ss.batch_total,
+          'end_block',
+          ss.end_block,
+          'start_block',
+          ss.start_block,
+        );
+        //console.log('--------------------------------------');
+
+        // synchronize status
+        if (this.syncStatusTimerID) {
+          this.setInRefresh(ss.in_progress);
+        }
+
+        this.sync_id = ss.sync_id;
+
         // if the sync_id change then reset the %
-        if (this.prev_sync_id !== ss.sync_id) {
+        if (this.prev_sync_id !== this.sync_id) {
           if (this.prev_sync_id !== -1) {
             // And fetch the rest of the data.
             await this.loadWalletData();
@@ -749,13 +896,13 @@ export default class RPC {
             await RPCModule.doSave();
 
             //console.log('sync status', ss);
-            //console.log(`new sync process id: ${ss.sync_id}. Save the wallet.`);
-            this.prevProgress = 0;
-            this.prevBatchNum = -1;
+            //console.log(`new sync process id: ${this.sync_id}. Save the wallet.`);
+            this.prev_batch_num = -1;
             this.seconds_batch = 0;
+            this.seconds_block = 0;
             this.batches = 0;
           }
-          this.prev_sync_id = ss.sync_id;
+          this.prev_sync_id = this.sync_id;
         }
 
         // Post sync updates
@@ -806,32 +953,8 @@ export default class RPC {
           process_end_block = end_block - batch_num * this.blocksPerBatch;
         }
 
-        const total_general_blocks: number = this.lastServerBlockHeight - process_end_block;
-
         //const progress_blocks: number = (synced_blocks + trial_decryptions_blocks + txn_scan_blocks) / 3;
         const progress_blocks: number = (synced_blocks + trial_decryptions_blocks + witnesses_updated) / 3;
-
-        const total_progress_blocks: number =
-          batch_total === 1 ? progress_blocks : this.blocksPerBatch * batch_num + progress_blocks;
-
-        let progress: number = (total_progress_blocks * this.blocksPerBatch) / total_general_blocks;
-
-        // not using a fake increment. But could be a good idea.
-        const increment: number = 0;
-
-        if (this.prevProgress <= progress) {
-          progress += increment;
-        } else if (this.prevProgress > progress) {
-          progress = this.prevProgress + increment;
-        }
-
-        // just in case %
-        if (progress > 100) {
-          progress = 100;
-        }
-        if (progress < 0) {
-          progress = 0;
-        }
 
         // And fetch the rest of the data.
         //await this.loadWalletData();
@@ -844,33 +967,76 @@ export default class RPC {
         if (current_block > this.lastServerBlockHeight) {
           current_block = this.lastServerBlockHeight;
         }
+        current_block = parseInt(current_block.toFixed(0), 10);
+
+        // if the current block is stalled I need to restart the App
+        let syncProcessStalled = false;
+        if (this.prev_current_block !== -1) {
+          //console.log(
+          //  'BEFORE prev current block',
+          //  this.prev_current_block,
+          //  'current block',
+          //  current_block,
+          //  'seconds',
+          //  this.seconds_block,
+          //  'blocks',
+          //  current_block - this.prev_current_block,
+          //);
+          if (current_block > 0 && this.prev_current_block === current_block) {
+            this.seconds_block += 5;
+            // 5 minutes
+            if (this.seconds_block >= 300) {
+              this.seconds_block = 0;
+              syncProcessStalled = true;
+            }
+          }
+          if (current_block > 0 && this.prev_current_block !== current_block) {
+            this.seconds_block = 0;
+            syncProcessStalled = false;
+          }
+        }
+
+        //console.log(
+        //  'AFTER prev current block',
+        //  this.prev_current_block,
+        //  'current block',
+        //  current_block,
+        //  'seconds',
+        //  this.seconds_block,
+        //  'stalled',
+        //  syncProcessStalled,
+        //);
+
+        // if current block is lower than the previous current block
+        // The user need to see something not confusing.
+        if (current_block > 0 && this.prev_current_block !== -1 && current_block < this.prev_current_block) {
+          //console.log('blocks down', current_block - this.prev_current_block);
+          // I decided to add only one fake block because otherwise could seems stalled
+          // the user expect every 5 seconds the blocks change...
+          current_block = this.prev_current_block + 1;
+        }
+
+        this.prev_current_block = current_block;
 
         this.seconds_batch += 5;
 
-        console.log('interval sync/rescan, secs', this.seconds_batch, 'timer', this.syncStatusTimerID);
+        //console.log('interval sync/rescan, secs', this.seconds_batch, 'timer', this.syncStatusTimerID);
 
+        // store SyncStatus object for a new screen
         this.fnSetSyncingStatus({
-          inProgress: ss.in_progress,
-          synced: this.lastServerBlockHeight === this.lastWalletBlockHeight,
-        } as SyncingStatusType);
-
-        // store SyncStatusReport object for a new screen
-        const statusGeneral: SyncingStatusReportClass = {
-          syncID: ss.sync_id,
+          syncID: this.sync_id,
           totalBatches: batch_total,
           currentBatch: ss.in_progress ? batch_num + 1 : 0,
           lastBlockWallet: this.lastWalletBlockHeight,
-          currentBlock: parseInt(current_block.toFixed(0), 10),
+          currentBlock: current_block,
           inProgress: ss.in_progress,
           lastError: ss.last_error,
           blocksPerBatch: this.blocksPerBatch,
           secondsPerBatch: this.seconds_batch,
           process_end_block: process_end_block,
           lastBlockServer: this.lastServerBlockHeight,
-        };
-        this.fnSetSyncingStatusReport(statusGeneral);
-
-        this.prevProgress = progress;
+          syncProcessStalled: syncProcessStalled,
+        } as SyncingStatusClass);
 
         // Close the poll timer if the sync finished(checked via promise above)
         if (!this.inRefresh) {
@@ -891,38 +1057,30 @@ export default class RPC {
           await this.fetchInfoAndServerHeight();
 
           await RPCModule.doSave();
-          this.prevProgress = 0;
-          progress = 0;
 
-          // I know it's finished.
+          // store SyncStatus object for a new screen
           this.fnSetSyncingStatus({
-            inProgress: false,
-            synced: this.lastServerBlockHeight === this.lastWalletBlockHeight,
-          } as SyncingStatusType);
-
-          // store SyncStatusReport object for a new screen
-          const statusFinished: SyncingStatusReportClass = {
-            syncID: ss.sync_id,
+            syncID: this.sync_id,
             totalBatches: 0,
             currentBatch: 0,
             lastBlockWallet: this.lastWalletBlockHeight,
-            currentBlock: parseInt(current_block.toFixed(0), 10),
+            currentBlock: current_block,
             inProgress: false,
             lastError: ss.last_error,
             blocksPerBatch: this.blocksPerBatch,
             secondsPerBatch: 0,
             process_end_block: process_end_block,
             lastBlockServer: this.lastServerBlockHeight,
-          };
-          this.fnSetSyncingStatusReport(statusFinished);
+            syncProcessStalled: false,
+          } as SyncingStatusClass);
 
           //console.log('sync status', ss);
-          console.log(`Finished refresh at ${this.lastWalletBlockHeight} id: ${ss.sync_id}`);
+          //console.log(`Finished refresh at ${this.lastWalletBlockHeight} id: ${this.sync_id}`);
         } else {
           // If we're doing a long sync, every time the batch_num changes, save the wallet
-          if (this.prevBatchNum !== batch_num) {
+          if (this.prev_batch_num !== batch_num) {
             // if finished batches really fast, the App have to save the wallet delayed.
-            if (this.prevBatchNum !== -1 && this.batches >= 1) {
+            if (this.prev_batch_num !== -1 && this.batches >= 1) {
               // And fetch the rest of the data.
               await this.loadWalletData();
 
@@ -933,32 +1091,17 @@ export default class RPC {
               await RPCModule.doSave();
               this.batches = 0;
 
-              // store SyncStatusReport object for a new screen
-              const statusBatch: SyncingStatusReportClass = {
-                syncID: ss.sync_id,
-                totalBatches: batch_total,
-                currentBatch: ss.in_progress ? batch_num + 1 : 0,
-                lastBlockWallet: this.lastWalletBlockHeight,
-                currentBlock: parseInt(current_block.toFixed(0), 10),
-                inProgress: ss.in_progress,
-                lastError: ss.last_error,
-                blocksPerBatch: this.blocksPerBatch,
-                secondsPerBatch: this.seconds_batch,
-                process_end_block: process_end_block,
-                lastBlockServer: this.lastServerBlockHeight,
-              };
-              this.fnSetSyncingStatusReport(statusBatch);
-
               //console.log('sync status', ss);
-              console.log(
-                `@@@@@@@@@@@ Saving because batch num changed ${this.prevBatchNum} - ${batch_num}. seconds: ${this.seconds_batch}`,
-              );
+              //console.log(
+              //  `@@@@@@@@@@@ Saving because batch num changed ${this.prevBatchNum} - ${batch_num}. seconds: ${this.seconds_batch}`,
+              //);
             }
-            this.batches += batch_num - this.prevBatchNum;
-            this.prevBatchNum = batch_num;
+            this.batches += batch_num - this.prev_batch_num;
+            this.prev_batch_num = batch_num;
             this.seconds_batch = 0;
           }
           // save wallet every 15 seconds in the same batch.
+          /* altum suggestion - remove the mid-batch saving...
           if (this.seconds_batch > 0 && this.seconds_batch % 15 === 0) {
             // And fetch the rest of the data.
             await this.loadWalletData();
@@ -969,32 +1112,48 @@ export default class RPC {
 
             await RPCModule.doSave();
 
-            // store SyncStatusReport object for a new screen
-            const statusSeconds: SyncingStatusReportClass = {
-              syncID: ss.sync_id,
+            // store SyncStatus object for a new screen
+            this.fnSetSyncingStatus({
+              syncID: this.sync_id,
               totalBatches: batch_total,
               currentBatch: ss.in_progress ? batch_num + 1 : 0,
               lastBlockWallet: this.lastWalletBlockHeight,
-              currentBlock: parseInt(current_block.toFixed(0), 10),
+              currentBlock: current_block,
               inProgress: ss.in_progress,
               lastError: ss.last_error,
               blocksPerBatch: this.blocksPerBatch,
               secondsPerBatch: this.seconds_batch,
               process_end_block: process_end_block,
               lastBlockServer: this.lastServerBlockHeight,
-            };
-            this.fnSetSyncingStatusReport(statusSeconds);
+              syncProcessStalled: false,
+            } as SyncingStatusClass);
 
             //console.log('sync status', ss);
-            console.log(`@@@@@@@@@@@Saving wallet. seconds: ${this.seconds_batch}`);
+            //console.log(`@@@@@@@@@@@Saving wallet. seconds: ${this.seconds_batch}`);
           }
+          */
         }
       }, 5000);
-      console.log('create sync/rescan timer', this.syncStatusTimerID);
+      //console.log('create sync/rescan timer', this.syncStatusTimerID);
       this.timers.push(this.syncStatusTimerID);
     } else {
       // Already at the latest block
-      console.log('Already have latest block, waiting for next refresh');
+      //console.log('Already have latest block, waiting for next refresh');
+      // Here I know the sync process is over, I need to inform to the UI.
+      this.fnSetSyncingStatus({
+        syncID: this.sync_id,
+        totalBatches: 0,
+        currentBatch: 0,
+        lastBlockWallet: this.lastWalletBlockHeight,
+        currentBlock: this.lastWalletBlockHeight,
+        inProgress: false,
+        lastError: '',
+        blocksPerBatch: this.blocksPerBatch,
+        secondsPerBatch: 0,
+        process_end_block: this.lastServerBlockHeight,
+        lastBlockServer: this.lastServerBlockHeight,
+        syncProcessStalled: false,
+      } as SyncingStatusClass);
     }
   }
 
@@ -1075,18 +1234,20 @@ export default class RPC {
       }
       const balanceJSON: RPCBalancesType = await JSON.parse(balanceStr);
 
-      const orchardBal: number = (balanceJSON.orchard_balance || 0) / 10 ** 8;
-      const privateBal: number = (balanceJSON.sapling_balance || 0) / 10 ** 8;
-      const transparentBal: number = (balanceJSON.transparent_balance || 0) / 10 ** 8;
+      const orchardBal: number = balanceJSON.orchard_balance || 0;
+      const privateBal: number = balanceJSON.sapling_balance || 0;
+      const transparentBal: number = balanceJSON.transparent_balance || 0;
+
+      const total = orchardBal + privateBal + transparentBal;
 
       // Total Balance
       const balance: TotalBalanceClass = {
-        orchardBal,
-        privateBal,
-        transparentBal,
+        orchardBal: orchardBal / 10 ** 8,
+        privateBal: privateBal / 10 ** 8,
+        transparentBal: transparentBal / 10 ** 8,
         spendableOrchard: (balanceJSON.spendable_orchard_balance || 0) / 10 ** 8,
         spendablePrivate: (balanceJSON.spendable_sapling_balance || 0) / 10 ** 8,
-        total: orchardBal + privateBal + transparentBal,
+        total: total / 10 ** 8,
       };
       this.fnSetTotalBalance(balance);
 
@@ -1192,117 +1353,112 @@ export default class RPC {
   }
 
   async fetchWalletBirthday(): Promise<void> {
-    const walletSeed = await RPC.rpc_fetchSeedAndBirthday();
+    const wallet = await RPC.rpc_fetchWallet(this.readOnly);
 
-    if (walletSeed) {
-      this.walletBirthday = walletSeed.birthday;
+    if (wallet) {
+      this.walletBirthday = wallet.birthday;
     }
   }
 
   // Fetch all T and Z and O transactions
-  async fetchTandZandOTransactions() {
+  async fetchTandZandOTransactionsSummaries() {
     try {
-      const listStr: string = await RPCModule.execute('list', '');
-      if (listStr) {
-        if (listStr.toLowerCase().startsWith('error')) {
-          console.log(`Error txs list ${listStr}`);
+      const summariesStr: string = await RPCModule.execute('summaries', '');
+      //console.log(summariesStr);
+      if (summariesStr) {
+        if (summariesStr.toLowerCase().startsWith('error')) {
+          console.log(`Error txs summaries ${summariesStr}`);
           return;
         }
       } else {
-        console.log('Internal Error txs list');
+        console.log('Internal Error txs summaries');
         return;
       }
-      const listJSON: RPCTransactionType[] = await JSON.parse(listStr);
+      const summariesJSON: RPCSummariesType[] = await JSON.parse(summariesStr);
 
       await this.fetchInfoAndServerHeight();
 
-      let txlist: TransactionType[] = listJSON.map((tx: RPCTransactionType) => {
-        const type = tx.outgoing_metadata ? 'sent' : 'receive';
+      let txList: TransactionType[] = [];
 
-        //if (tx.txid === '55d6efcb987e8c6b8842a4c78d4adc80d8ca4761e3ff670a730e4840d8659ead') {
-        //console.log('tran: ', tx);
-        //console.log('meta: ', tx.outgoing_metadata);
-        //console.log('--------------------------------------------------');
-        //}
+      summariesJSON
+        //.filter(tx => tx.kind !== 'Fee')
+        .forEach((tx: RPCSummariesType) => {
+          let currentTxList: TransactionType[] = txList.filter(t => t.txid === tx.txid);
+          if (currentTxList.length === 0) {
+            currentTxList = [{} as TransactionType];
+            currentTxList[0].txDetails = [];
+          }
+          let restTxList: TransactionType[] = txList.filter(t => t.txid !== tx.txid);
 
-        var txdetail: TxDetailType[] = [];
-        if (tx.outgoing_metadata) {
-          const dts: TxDetailType[] = tx.outgoing_metadata.map((o: RPCOutgoingMetadataType) => {
-            const detail: TxDetailType = {
-              address: o.address || '',
-              amount: (o.value || 0) / 10 ** 8,
-              memo: o.memo,
-            };
+          const type = tx.kind === 'Fee' ? 'Sent' : tx.kind;
+          if (!currentTxList[0].type && !!type) {
+            currentTxList[0].type = type;
+          }
+          if (tx.unconfirmed) {
+            currentTxList[0].confirmations = 0;
+          } else if (!currentTxList[0].confirmations) {
+            currentTxList[0].confirmations = this.lastServerBlockHeight
+              ? this.lastServerBlockHeight - tx.block_height + 1
+              : this.lastWalletBlockHeight - tx.block_height + 1;
+          }
+          if (!currentTxList[0].txid && !!tx.txid) {
+            currentTxList[0].txid = tx.txid;
+          }
+          if (!currentTxList[0].time && !!tx.datetime) {
+            currentTxList[0].time = tx.datetime;
+          }
+          if (!currentTxList[0].zec_price && !!tx.price && tx.price !== 'None') {
+            currentTxList[0].zec_price = tx.price;
+          }
 
-            return detail;
-          });
+          //if (tx.txid.startsWith('426e')) {
+          //  console.log('tran: ', tx);
+          //  console.log('--------------------------------------------------');
+          //}
 
-          txdetail = RPC.rpc_combineTxDetails(dts);
-        } else {
-          const detail: TxDetailType = {
-            address: tx.address || '',
-            amount: (tx.amount || 0) / 10 ** 8,
-            memo: tx.memo,
-          };
-          txdetail = [detail];
-        }
+          let currenttxdetails: TxDetailType = {} as TxDetailType;
+          if (tx.kind === 'Fee') {
+            currentTxList[0].fee = (currentTxList[0].fee ? currentTxList[0].fee : 0) + tx.amount / 10 ** 8;
+            if (currentTxList[0].txDetails.length === 0) {
+              // when only have 1 item with `Fee`, we assume this tx is `SendToSelf`.
+              currentTxList[0].type = 'SendToSelf';
+              currenttxdetails.address = '';
+              currenttxdetails.amount = 0;
+              currentTxList[0].txDetails.push(currenttxdetails);
+            }
+          } else {
+            currenttxdetails.address = !tx.to_address || tx.to_address === 'None' ? '' : tx.to_address;
+            currenttxdetails.amount = tx.amount / 10 ** 8;
+            currenttxdetails.memos = !tx.memos ? undefined : tx.memos;
+            currenttxdetails.pool = !tx.pool || tx.pool === 'None' ? undefined : tx.pool;
+            currentTxList[0].txDetails.push(currenttxdetails);
+          }
 
-        const transaction: TransactionType = {
-          type,
-          address:
-            type === 'sent'
-              ? tx.outgoing_metadata && tx.outgoing_metadata.length > 0
-                ? tx.outgoing_metadata[0].address
-                : ''
-              : tx.address,
-          amount: tx.amount / 10 ** 8,
-          confirmations: tx.unconfirmed
-            ? 0
-            : this.lastServerBlockHeight
-            ? this.lastServerBlockHeight - tx.block_height + 1
-            : 0,
-          txid: tx.txid,
-          zec_price: tx.zec_price,
-          time: tx.datetime,
-          position: tx.position,
-          detailedTxns: txdetail,
-        };
-
-        return transaction;
-      });
+          //currentTxList[0].txDetails.forEach(det => console.log(det.memos));
+          //console.log(currentTxList[0]);
+          txList = [...currentTxList, ...restTxList];
+        });
 
       //console.log(txlist);
 
-      // If you send yourself transactions, the underlying SDK doesn't handle it very well, so
-      // we suppress these in the UI to make things a bit clearer.
-      //txlist = txlist.filter((tx: Transaction) => !(tx.type === 'sent' && tx.amount < 0 && tx.detailedTxns.length === 0));
-
-      // We need to group transactions that have the same (txid and send/receive), for multi-part memos
-      const m = new Map();
-      txlist.forEach((tx: TransactionType) => {
-        const key = tx.txid + tx.type;
-        const coll = m.get(key);
-        if (!coll) {
-          m.set(key, [tx]);
-        } else {
-          coll.push(tx);
-        }
-      });
-
       // Now, combine the amounts and memos
       const combinedTxList: TransactionType[] = [];
-      m.forEach((txns: TransactionType[]) => {
-        // Get all the txdetails and merge them
+      txList.forEach((txns: TransactionType) => {
+        const combinedTx = txns;
+        if (txns.type === 'Sent' || txns.type === 'SendToSelf') {
+          // using address for `Sent` & `SendToSelf`
+          combinedTx.txDetails = RPC.rpc_combineTxDetailsByAddress(txns.txDetails);
+        } else {
+          // using pool for `Received`
+          combinedTx.txDetails = RPC.rpc_combineTxDetailsByPool(txns.txDetails);
+        }
 
-        // Clone the first tx into a new one
-        const combinedTx = Object.assign({}, txns[0]);
-        combinedTx.detailedTxns = RPC.rpc_combineTxDetails(txns.flatMap(tx => tx.detailedTxns));
-
+        //combinedTx.txDetails.forEach(det => console.log(det.memos));
+        //console.log(combinedTx);
         combinedTxList.push(combinedTx);
       });
 
-      // Sort the list by confirmations
-      combinedTxList.sort((t1, t2) => t1.confirmations - t2.confirmations);
+      //console.log(combinedTxList);
 
       this.fnSetTransactionsList(combinedTxList);
     } catch (error) {
@@ -1316,21 +1472,37 @@ export default class RPC {
     sendJson: Array<SendJsonToTypeType>,
     setSendProgress: (arg0: SendProgressClass) => void,
   ): Promise<string> {
+    // sending
+    this.setInSend(true);
+    // keep awake the screen/device while sending.
+    this.keepAwake(true);
     // First, get the previous send progress id, so we know which ID to track
     const prev: string = await this.doSendProgress();
     let prevSendId = -1;
     if (prev && !prev.toLowerCase().startsWith('error')) {
-      // TODO verify that JSON don't fail.
-      const prevProgress: RPCSendProgressType = await JSON.parse(prev);
-      prevSendId = prevProgress.id;
+      let prevProgress = {} as RPCSendProgressType;
+      try {
+        prevProgress = await JSON.parse(prev);
+        prevSendId = prevProgress.id;
+      } catch (e) {}
     }
 
     //console.log('prev progress id', prevSendId);
 
     // This is async, so fire and forget
     this.doSend(JSON.stringify(sendJson))
-      .then(r => console.log('send finished: ' + r))
-      .catch(e => console.log('Send error ' + e));
+      .then(r => console.log('End Send OK: ' + r))
+      .catch(e => console.log('End Send ERROR: ' + e))
+      .finally(() => {
+        // sending is over
+        this.setInSend(false);
+        if (!this.inRefresh) {
+          // if not syncing, then not keep awake the screen/device when the send is finished.
+          this.keepAwake(false);
+        } else {
+          this.keepAwake(true);
+        }
+      });
 
     const startTimeSeconds = new Date().getTime() / 1000;
 
@@ -1338,18 +1510,19 @@ export default class RPC {
     const sendTxPromise = new Promise<string>((resolve, reject) => {
       const intervalID = setInterval(async () => {
         const pro: string = await this.doSendProgress();
-        if (pro) {
-          if (pro.toLowerCase().startsWith('error')) {
-            return;
-          }
-        } else {
+        if (pro && pro.toLowerCase().startsWith('error')) {
           return;
         }
-        // TODO verify that JSON don't fail.
-        const progress: RPCSendProgressType = await JSON.parse(pro);
-        const sendId = progress.id;
+        let progress = {} as RPCSendProgressType;
+        let sendId = -1;
+        try {
+          progress = await JSON.parse(pro);
+          sendId = progress.id;
+        } catch (e) {
+          return;
+        }
 
-        // bacause I don't know what the user are doing, I force every 2 seconds
+        // because I don't know what the user are doing, I force every 2 seconds
         // the interrupt flag to true if the sync_interrupt is false
         if (!progress.sync_interrupt) {
           await RPC.rpc_setInterruptSyncAfterBatch('true');
@@ -1381,6 +1554,9 @@ export default class RPC {
         }
 
         //console.log(`ETA calculated = ${eta}`);
+
+        // synchronize status with inSend
+        this.setInSend(progress.sending);
 
         updatedProgress.progress = progress.progress;
         //updatedProgress.total = Math.max(progress.total, progress.progress); // sometimes, due to change, the total can be off by 1
@@ -1419,7 +1595,7 @@ export default class RPC {
 
     //console.log('jc change wallet', exists);
     if (exists && exists !== 'false') {
-      (await RPCModule.doSaveBackup()) as Promise<void>;
+      await RPCModule.doSaveBackup();
       const result = await RPCModule.deleteExistingWallet();
 
       if (!(result && result !== 'false')) {
@@ -1468,10 +1644,25 @@ export default class RPC {
 
   setInRefresh(value: boolean): void {
     this.inRefresh = value;
-    this.keepAwake(value);
   }
 
   getInRefresh(): boolean {
     return this.inRefresh;
+  }
+
+  setInSend(value: boolean): void {
+    this.inSend = value;
+  }
+
+  getInSend(): boolean {
+    return this.inSend;
+  }
+
+  setReadOnly(value: boolean): void {
+    this.readOnly = value;
+  }
+
+  getReadOnly(): boolean {
+    return this.readOnly;
   }
 }

@@ -21,38 +21,35 @@ jobs:
     runs-on: macos-12
     outputs:
       cache-found: ${{ steps.set-cache-found.outputs.cache-found }}
-    continue-on-error: true
     steps:     
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
         run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
             
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
         
       - name: Check if native rust cache exists
         id: check-build-cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: android/app/src/main/jniLibs/${{ env.ARCH }}
-          key: native-rust-${{ env.ARCH }}-${{ env.CACHE-KEY }}
+          key: native-librust-${{ env.ARCH }}-${{ env.CACHE-KEY }}
           lookup-only: true
-          fail-on-cache-miss: true
   
       - name: Set cache-found
         id: set-cache-found
-        if: ${{ ! cancelled() }}
-        run: echo "cache-found=${{ steps.check-build-cache.outcome }}" >> $GITHUB_OUTPUT
+        run: echo "cache-found=${{ steps.check-build-cache.outputs.cache-hit }}" >> $GITHUB_OUTPUT
   
   build:
     name: Build native rust
     needs: check-build-cache
-    if: ${{ needs.check-build-cache.outputs.cache-found == 'failure' }}
+    if: ${{ needs.check-build-cache.outputs.cache-found != 'true' }}
     runs-on: ubuntu-22.04
     container:
-      image: zingodevops/android_builder:stable
+      image: zingodevops/android_builder:008
     env:
       RUSTUP_HOME: /root/.rustup
     steps:
@@ -61,7 +58,7 @@ jobs:
         run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
             
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
         
@@ -102,20 +99,9 @@ jobs:
           echo "OPENSSL_PATH=armv7" >> $GITHUB_ENV
       
       - name: Cargo cache
-        id: cargo-cache
-        uses: actions/cache@v3
+        uses: Swatinem/rust-cache@v2
         with:
-          # Following cargo cache recommendations:
-          # https://doc.rust-lang.org/cargo/guide/cargo-home.html
-          path: |
-            /root/.cargo/.crates.toml
-            /root/.cargo/.crates2.json
-            /root/.cargo/bin/
-            /root/.cargo/registry/index/            
-            /root/.cargo/registry/cache/
-            /root/.cargo/registry/git/db/
-          key: cargo-${{ env.ARCH }}-${{ hashFiles('rust/Cargo.lock') }}
-          restore-keys: cargo-${{ env.ARCH }}
+          workspaces: rust
       
       - name: Cargo build
         working-directory: ./rust/android
@@ -124,20 +110,20 @@ jobs:
           AR: llvm-ar
           LD: ld
           RANLIB: llvm-ranlib
-          CC: ${{ env.CC }}23-clang
-          OPENSSL_DIR: /opt/openssl-3.0.5/${{ env.OPENSSL_PATH }}
+          CC: ${{ env.CC }}24-clang
+          OPENSSL_DIR: /opt/openssl-3.1.3/${{ env.OPENSSL_PATH }}
       
       - name: LLVM Strip
         working-directory: ./rust/target
         run: llvm-strip ./${{ env.TARGET }}/release/librust.so
       
       - name: Upload native rust
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.ARCH }}-${{ env.CACHE-KEY }}
+          name: native-librust-${{ env.ARCH }}-${{ env.CACHE-KEY }}
           path: rust/target/${{ env.TARGET }}/release/librust.so
       
-  cache-native-rust:
+  cache-native-librust:
     name: Cache native rust
     needs: build
     runs-on: macos-12
@@ -147,18 +133,19 @@ jobs:
         run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
             
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
             
       - name: Download native rust
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with: 
-          name: ${{ env.ARCH }}-${{ env.CACHE-KEY }}
+          name: native-librust-${{ env.ARCH }}-${{ env.CACHE-KEY }}
           path: android/app/src/main/jniLibs/${{ env.ARCH }}
       
       - name: Cache native rust
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: android/app/src/main/jniLibs/${{ env.ARCH }}
-          key: native-rust-${{ env.ARCH }}-${{ env.CACHE-KEY }}
+          key: native-librust-${{ env.ARCH }}-${{ env.CACHE-KEY }}
+

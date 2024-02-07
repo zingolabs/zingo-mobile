@@ -1,3 +1,5 @@
 import LoadingApp from './LoadingApp';
+import { LoadingAppClass } from './LoadingApp';
+import Launching from './Launching';
 
-export default LoadingApp;
+export { LoadingApp, LoadingAppClass, Launching };

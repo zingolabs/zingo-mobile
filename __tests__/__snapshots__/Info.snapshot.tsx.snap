@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Component Info - test Matches the snapshot Info 1`] = `
+exports[`Component Info - test Info - snapshot 1`] = `
 <RCTSafeAreaView
   style={
     {
@@ -25,17 +25,17 @@ exports[`Component Info - test Matches the snapshot Info 1`] = `
     }
     testID="header"
   >
-    <Image
-      source={
-        {
-          "testUri": "../../../assets/img/logobig-zingo.png",
-        }
-      }
+    <View
       style={
         {
-          "height": 80,
-          "resizeMode": "contain",
-          "width": 80,
+          "alignItems": "center",
+          "display": "flex",
+          "flexDirection": "row",
+          "flexWrap": "wrap",
+          "height": 40,
+          "justifyContent": "center",
+          "marginHorizontal": 5,
+          "marginTop": 12,
         }
       }
     />
@@ -51,10 +51,34 @@ exports[`Component Info - test Matches the snapshot Info 1`] = `
         {
           "alignItems": "center",
           "display": "flex",
-          "flexDirection": "row",
+          "flexDirection": "column",
           "flexWrap": "wrap",
           "justifyContent": "center",
-          "marginVertical": 5,
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": "rgb(28, 28, 30)",
+            "fontSize": 18,
+            "fontWeight": "600",
+            "marginBottom": 3,
+            "opacity": 1,
+            "paddingHorizontal": 5,
+          }
+        }
+      >
+        translated text
+      </Text>
+    </View>
+    <View
+      style={
+        {
+          "alignItems": "flex-start",
+          "left": 0,
+          "padding": 11.5,
+          "position": "absolute",
         }
       }
     >
@@ -62,27 +86,10 @@ exports[`Component Info - test Matches the snapshot Info 1`] = `
         style={
           {
             "alignItems": "center",
-            "display": "flex",
-            "flexDirection": "column",
-            "flexWrap": "wrap",
-            "justifyContent": "center",
+            "flexDirection": "row",
           }
         }
-      >
-        <Text
-          style={
-            {
-              "color": "rgb(28, 28, 30)",
-              "fontSize": 18,
-              "fontWeight": "600",
-              "opacity": 1,
-              "paddingHorizontal": 5,
-            }
-          }
-        >
-          translated text
-        </Text>
-      </View>
+      />
     </View>
     <View
       style={
@@ -94,26 +101,21 @@ exports[`Component Info - test Matches the snapshot Info 1`] = `
         }
       }
     >
-      <Text
-        style={
+      <Image
+        source={
           {
-            "color": "rgb(216, 216, 216)",
-            "fontSize": 8,
+            "testUri": "../../../assets/img/logobig-zingo.png",
           }
         }
-      >
-        translated text
-      </Text>
-      <Text
         style={
           {
-            "color": "rgb(216, 216, 216)",
-            "fontSize": 8,
+            "borderRadius": 10,
+            "height": 38,
+            "resizeMode": "contain",
+            "width": 38,
           }
         }
-      >
-        (undefinedxundefined)-undefined
-      </Text>
+      />
     </View>
     <View
       style={
@@ -185,6 +187,44 @@ exports[`Component Info - test Matches the snapshot Info 1`] = `
             }
           >
             translated text translated text
+          </Text>
+        </View>
+        <View
+          style={
+            {
+              "display": "flex",
+              "marginTop": 20,
+            }
+          }
+        >
+          <Text
+            style={
+              {
+                "color": "rgb(28, 28, 30)",
+                "opacity": 0.65,
+              }
+            }
+          >
+            translated text
+          </Text>
+          <View
+            style={
+              {
+                "width": 10,
+              }
+            }
+          />
+          <Text
+            style={
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 18,
+                "fontWeight": "600",
+                "opacity": 1,
+              }
+            }
+          >
+            mob-release...
           </Text>
         </View>
         <View
@@ -367,6 +407,7 @@ exports[`Component Info - test Matches the snapshot Info 1`] = `
       style={
         {
           "alignItems": "center",
+          "backgroundColor": "rgb(242, 242, 242)",
           "borderColor": "rgb(0, 122, 255)",
           "borderRadius": 10,
           "borderWidth": 2,
@@ -401,6 +442,7 @@ exports[`Component Info - test Matches the snapshot Info 1`] = `
               "color": "rgb(0, 122, 255)",
               "fontSize": 16,
               "fontWeight": "bold",
+              "textAlign": "center",
               "textTransform": "uppercase",
             }
           }

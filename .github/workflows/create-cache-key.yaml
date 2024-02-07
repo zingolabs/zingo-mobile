@@ -15,7 +15,7 @@ jobs:
     name: Create cache key
     runs-on: ubuntu-22.04
     container:
-      image: zingodevops/android_builder:stable
+      image: zingodevops/android_builder:008
     env:
       RUSTUP_HOME: /root/.rustup
     outputs:
@@ -26,7 +26,7 @@ jobs:
         run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
             
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
         

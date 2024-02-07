@@ -2,6 +2,8 @@ import { getNumberFormatSettings } from 'react-native-localize';
 import { ZecAmountSplitType } from './types/ZecAmountSplitType';
 import { TranslateType } from '../AppState';
 
+import randomColor from 'randomcolor';
+
 export default class Utils {
   static trimToSmall(addr?: string, numChars?: number): string {
     if (!addr) {
@@ -90,7 +92,7 @@ export default class Utils {
     return 0.0001;
   }
 
-  static getDonationAddress(chain_name: string): string {
+  static getDonationAddress(chain_name: 'main' | 'test' | 'regtest'): string {
     if (chain_name !== 'main') {
       return 'ztestsapling...';
     } else {
@@ -161,7 +163,28 @@ export default class Utils {
       .replace(new RegExp('_', 'g'), groupingSeparator);
   }
 
-  static getBlockExplorerTxIDURL(txid: string): string {
-    return `https://blockchair.com/zcash/transaction/${txid}`;
+  static getBlockExplorerTxIDURL(txid: string, chain_name: 'main' | 'test' | 'regtest'): string {
+    if (chain_name === 'test') {
+      return `https://testnet.zcashblockexplorer.com/transactions/${txid}`;
+    } else {
+      return `https://zcashblockexplorer.com/transactions/${txid}`;
+    }
+    // updated a new server
+    //return `https://blockchair.com/zcash/transaction/${txid}`;
+  }
+
+  static generateColorList(numColors: number): string[] {
+    const colorList: string[] = [];
+
+    for (let i = 0; i < numColors; i++) {
+      const color = randomColor({
+        luminosity: 'bright', // Define la luminosidad de los colores generados
+        format: 'hex', // Formato de color en hexadecimal
+      });
+
+      colorList.push(color);
+    }
+
+    return colorList;
   }
 }

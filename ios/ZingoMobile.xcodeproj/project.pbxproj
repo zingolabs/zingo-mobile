@@ -283,7 +283,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -e\n\nexport NODE_BINARY=/Users/juancarloscarmonacalvo/.nvm/versions/node/v16.16.0/bin/node\n../node_modules/react-native/scripts/react-native-xcode.sh\n";
+			shellScript = "set -e\n\nexport NODE_BINARY=~/.nvm/versions/node/v20.9.0/bin/node\n../node_modules/react-native/scripts/react-native-xcode.sh\n";
 		};
 		0D3D17FAF0DEFCD154030675 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -521,7 +521,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = ZingoMobile/ZingoMobile.entitlements;
-				CURRENT_PROJECT_VERSION = 122;
+				CURRENT_PROJECT_VERSION = 131;
 				DEVELOPMENT_TEAM = 788KRST4S8;
 				ENABLE_BITCODE = NO;
 				EXCLUDED_ARCHS = "";
@@ -538,7 +538,7 @@
 					"$(PROJECT_DIR)",
 					"$(inherited)",
 				);
-				MARKETING_VERSION = 1.2.1;
+				MARKETING_VERSION = 1.3.3;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -561,7 +561,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = ZingoMobile/ZingoMobile.entitlements;
-				CURRENT_PROJECT_VERSION = 122;
+				CURRENT_PROJECT_VERSION = 131;
 				DEVELOPMENT_TEAM = 788KRST4S8;
 				ENABLE_BITCODE = NO;
 				EXCLUDED_ARCHS = "";
@@ -578,7 +578,7 @@
 					"$(PROJECT_DIR)",
 					"$(inherited)",
 				);
-				MARKETING_VERSION = 1.2.1;
+				MARKETING_VERSION = 1.3.3;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -625,7 +625,7 @@
 				COPY_PHASE_STRIP = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = i386;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -691,7 +691,7 @@
 				COPY_PHASE_STRIP = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = i386;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;

@@ -1,3 +1,4 @@
 import LoadedApp from './LoadedApp';
+import { LoadedAppClass } from './LoadedApp';
 
-export default LoadedApp;
+export { LoadedApp, LoadedAppClass };

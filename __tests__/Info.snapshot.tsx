@@ -31,11 +31,20 @@ jest.mock('@react-native-community/netinfo', () => {
 
   return RN;
 });
+jest.mock('react-native', () => {
+  const RN = jest.requireActual('react-native');
+
+  RN.NativeModules.RPCModule = {
+    execute: jest.fn(() => '{}'),
+  };
+
+  return RN;
+});
 
 // test suite
 describe('Component Info - test', () => {
   //snapshot test
-  test('Matches the snapshot Info', () => {
+  test('Info - snapshot', () => {
     const state = defaultAppStateLoaded;
     state.info = {
       serverUri: 'https://zcash.es',
@@ -45,8 +54,9 @@ describe('Component Info - test', () => {
       verificationProgress: 0,
       currencyName: 'ZEC',
       solps: 0,
-      defaultFee: 1000,
-      chain_name: 'mainnet',
+      defaultFee: 10000,
+      chain_name: 'main',
+      zingolib: 'mob-release...',
     };
     state.zecPrice.zecPrice = 33.33;
     state.translate = () => 'translated text';

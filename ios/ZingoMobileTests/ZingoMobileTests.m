@@ -74,8 +74,9 @@
   // server OK
   // ****************************************************
   NSString *serverOK = @"https://mainnet.lightwalletd.com:9067";
+  NSString *chainhint = @"main";
   // create a new wallet
-  NSString *newWalletOK = [rpcmodule createNewWallet:serverOK];
+  NSString *newWalletOK = [rpcmodule createNewWallet:serverOK chainhint:chainhint];
   NSLog(@"Test create New Wallet OK %@", newWalletOK);
   XCTAssertFalse([newWalletOK hasPrefix:@"Error"], @"Create New Wallet fails %@", newWalletOK);
   
@@ -83,7 +84,7 @@
   [rpcmodule saveWalletInternal];
   
   // load wallet from file
-  NSString *loadWalletOK = [rpcmodule loadExistingWallet:serverOK];
+  NSString *loadWalletOK = [rpcmodule loadExistingWallet:serverOK chainhint:chainhint];
   NSLog(@"Test Load Wallet OK %@", loadWalletOK);
   XCTAssertFalse([loadWalletOK hasPrefix:@"Error"], @"Load Wallet from file fails %@", loadWalletOK);
   
@@ -103,8 +104,9 @@
   // ****************************************************
   NSString *serverKO = @"https://zuul.free2z.cash:9067";
   NSString *serverOK = @"https://mainnet.lightwalletd.com:9067";
+  NSString *chainhint = @"main";
   // create a new wallet, expecting ERROR.
-  NSString *newWalletKO = [rpcmodule createNewWallet:serverKO];
+  NSString *newWalletKO = [rpcmodule createNewWallet:serverKO chainhint:chainhint];
   NSLog(@"Test create New Wallet KO %@", newWalletKO);
   XCTAssertTrue([newWalletKO hasPrefix:@"Error"], @"Create New Wallet NOT fails, and it have to %@", newWalletKO);
   
@@ -112,12 +114,12 @@
   [rpcmodule saveWalletInternal];
   
   // load wallet from file, expecting ERROR.
-  NSString *loadWalletKO = [rpcmodule loadExistingWallet:serverKO];
+  NSString *loadWalletKO = [rpcmodule loadExistingWallet:serverKO chainhint:chainhint];
   NSLog(@"Test create Load Wallet KO %@", loadWalletKO);
   XCTAssertTrue([newWalletKO hasPrefix:@"Error"], @"Load Wallet from file NOT fails, and it have to %@", newWalletKO);
   
   // load wallet from file, expecting CORRUPT WALLET BUG.
-  NSString *loadWalletOK = [rpcmodule loadExistingWallet:serverOK];
+  NSString *loadWalletOK = [rpcmodule loadExistingWallet:serverOK chainhint:chainhint];
   NSLog(@"Test create Load Wallet KO %@", loadWalletOK);
   XCTAssertFalse([loadWalletOK hasPrefix:@"Error"], @"Load Wallet from file fails %@", loadWalletOK);
   

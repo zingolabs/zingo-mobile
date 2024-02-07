@@ -1,6 +1,5 @@
 import { StackScreenProps } from '@react-navigation/stack';
 
-import SyncingStatusReportClass from './classes/SyncingStatusReportClass';
 import TotalBalanceClass from './classes/TotalBalanceClass';
 import AddressClass from './classes/AddressClass';
 import AddressBookClass from './classes/AddressBookClass';
@@ -12,23 +11,21 @@ import WalletSettingsClass from './classes/WalletSettingsClass';
 
 import TransactionType from './types/TransactionType';
 import InfoType from './types/InfoType';
-import WalletSeedType from './types/WalletSeedType';
-import SyncingStatusType from './types/SyncingStatusType';
-import DimensionsType from './types/DimensionsType';
-import zecPriceType from './types/zecPriceType';
+import WalletType from './types/WalletType';
+import SyncingStatusClass from './classes/SyncingStatusClass';
+import ZecPriceType from './types/ZecPriceType';
 import BackgroundType from './types/BackgroundType';
 import { TranslateType } from './types/TranslateType';
 import NetInfoType from './types/NetInfoType';
+import BackgroundErrorType from './types/BackgroundErrorType';
+import ServerType from './types/ServerType';
+import SnackbarType from './types/SnackbarType';
 
 export default interface AppStateLoaded {
   navigation: StackScreenProps<any>['navigation'];
   route: StackScreenProps<any>['route'];
-  dimensions: DimensionsType;
   appState: string;
   netInfo: NetInfoType;
-
-  // Info about the current sync process
-  syncingStatusReport: SyncingStatusReportClass;
 
   // The total confirmed and unconfirmed balance in this wallet
   totalBalance: TotalBalanceClass;
@@ -61,7 +58,7 @@ export default interface AppStateLoaded {
 
   walletSettings: WalletSettingsClass;
 
-  syncingStatus: SyncingStatusType;
+  syncingStatus: SyncingStatusClass;
 
   // Data for any error or info modal
   errorModalData: ErrorModalDataClass;
@@ -69,7 +66,7 @@ export default interface AppStateLoaded {
   // Build progress from Tx
   sendProgress: SendProgressClass;
 
-  walletSeed: WalletSeedType;
+  wallet: WalletType;
 
   isMenuDrawerOpen: boolean;
 
@@ -90,22 +87,41 @@ export default interface AppStateLoaded {
   seedBackupModalVisible: boolean;
   seedServerModalVisible: boolean;
 
+  ufvkViewModalVisible: boolean;
+  ufvkChangeModalVisible: boolean;
+  ufvkBackupModalVisible: boolean;
+  ufvkServerModalVisible: boolean;
+
   syncReportModalVisible: boolean;
   poolsModalVisible: boolean;
+  insightModalVisible: boolean;
 
-  newServer: string;
+  newServer: ServerType;
 
   uaAddress: string;
 
-  server: string;
+  server: ServerType;
   language: 'en' | 'es';
   currency: 'USD' | '';
 
-  zecPrice: zecPriceType;
+  zecPrice: ZecPriceType;
   sendAll: boolean;
   background: BackgroundType;
 
   translate: (key: string) => TranslateType;
+  backgroundError: BackgroundErrorType;
+  setBackgroundError: (title: string, error: string) => void;
+
+  privacy: boolean;
+  readOnly: boolean;
+  poolsToShieldSelectSapling: boolean;
+  poolsToShieldSelectTransparent: boolean;
+
+  mode: 'basic' | 'advanced';
+  snackbars: SnackbarType[];
+  addLastSnackbar: (snackbar: SnackbarType) => void;
+  restartApp: (s: any) => void;
+  someUnconfirmed: boolean;
 
   // eslint-disable-next-line semi
 }

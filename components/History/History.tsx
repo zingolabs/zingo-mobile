@@ -21,6 +21,10 @@ type HistoryProps = {
   syncingStatusMoreInfoOnClick: () => void;
   setZecPrice: (p: number, d: number) => void;
   setComputingModalVisible: (visible: boolean) => void;
+  set_privacy_option: (name: 'privacy', value: boolean) => Promise<void>;
+  setPoolsToShieldSelectSapling: (v: boolean) => void;
+  setPoolsToShieldSelectTransparent: (v: boolean) => void;
+  setUfvkViewModalVisible?: (v: boolean) => void;
 };
 
 const History: React.FunctionComponent<HistoryProps> = ({
@@ -30,9 +34,13 @@ const History: React.FunctionComponent<HistoryProps> = ({
   syncingStatusMoreInfoOnClick,
   setZecPrice,
   setComputingModalVisible,
+  set_privacy_option,
+  setPoolsToShieldSelectSapling,
+  setPoolsToShieldSelectTransparent,
+  setUfvkViewModalVisible,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, transactions, language } = context;
+  const { translate, transactions, language, setBackgroundError, addLastSnackbar } = context;
   moment.locale(language);
 
   const { colors } = useTheme() as unknown as ThemeType;
@@ -57,7 +65,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
     setNumTx(numTx + 50);
   }, [numTx]);
 
-  console.log('render History - 4');
+  //console.log('render History - 4');
 
   return (
     <View
@@ -66,15 +74,19 @@ const History: React.FunctionComponent<HistoryProps> = ({
       style={{
         display: 'flex',
         justifyContent: 'flex-start',
-        marginBottom: 140,
         width: '100%',
+        height: '100%',
       }}>
       <Modal
         animationType="slide"
         transparent={false}
         visible={isTxDetailModalShowing}
         onRequestClose={() => setTxDetailModalShowing(false)}>
-        <TxDetail tx={txDetail} closeModal={() => setTxDetailModalShowing(false)} />
+        <TxDetail
+          tx={txDetail}
+          closeModal={() => setTxDetailModalShowing(false)}
+          set_privacy_option={set_privacy_option}
+        />
       </Modal>
 
       <Header
@@ -85,6 +97,12 @@ const History: React.FunctionComponent<HistoryProps> = ({
         setZecPrice={setZecPrice}
         title={translate('history.title') as string}
         setComputingModalVisible={setComputingModalVisible}
+        setBackgroundError={setBackgroundError}
+        set_privacy_option={set_privacy_option}
+        setPoolsToShieldSelectSapling={setPoolsToShieldSelectSapling}
+        setPoolsToShieldSelectTransparent={setPoolsToShieldSelectTransparent}
+        setUfvkViewModalVisible={setUfvkViewModalVisible}
+        addLastSnackbar={addLastSnackbar}
       />
 
       <ScrollView
@@ -98,7 +116,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
             title={translate('history.refreshing') as string}
           />
         }
-        style={{ flexGrow: 1, marginTop: 10, width: '100%', height: '100%' }}>
+        style={{ flexGrow: 1, marginTop: 10, width: '100%' }}>
         {transactionsSorted.flatMap((t, index) => {
           let txmonth = t.time ? moment(t.time * 1000).format('MMM YYYY') : '--- ----';
 
@@ -122,11 +140,10 @@ const History: React.FunctionComponent<HistoryProps> = ({
         {loadMoreButton ? (
           <View
             style={{
-              height: 150,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'flex-start',
-              marginTop: 5,
+              marginTop: 10,
               marginBottom: 30,
             }}>
             <Button type="Secondary" title={translate('history.loadmore') as string} onPress={loadMoreClicked} />
@@ -136,11 +153,10 @@ const History: React.FunctionComponent<HistoryProps> = ({
             {!!transactions && !!transactions.length && (
               <View
                 style={{
-                  height: 150,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'flex-start',
-                  marginTop: 5,
+                  marginTop: 10,
                   marginBottom: 30,
                 }}>
                 <FadeText style={{ color: colors.primary }}>{translate('history.end') as string}</FadeText>

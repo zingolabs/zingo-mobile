@@ -46,6 +46,15 @@ jest.mock('@react-native-community/netinfo', () => {
 
   return RN;
 });
+jest.mock('react-native', () => {
+  const RN = jest.requireActual('react-native');
+
+  RN.NativeModules.RPCModule = {
+    execute: jest.fn(() => '{}'),
+  };
+
+  return RN;
+});
 
 // test suite
 describe('Component Seed - test', () => {
@@ -65,7 +74,7 @@ describe('Component Seed - test', () => {
       return 'text translated';
     }
   };
-  stateLoaded.walletSeed = {
+  stateLoaded.wallet = {
     seed: 'pepe lolo titi',
     birthday: 1500100,
   };
@@ -76,7 +85,7 @@ describe('Component Seed - test', () => {
   test('Seed View - snapshot', () => {
     const seed = render(
       <ContextAppLoadedProvider value={stateLoaded}>
-        <Seed onClickOK={onOk} onClickCancel={onCancel} action={'view'} />
+        <Seed onClickOK={onOk} onClickCancel={onCancel} action={'view'} set_privacy_option={jest.fn()} />
       </ContextAppLoadedProvider>,
     );
     expect(seed.toJSON()).toMatchSnapshot();
@@ -84,7 +93,7 @@ describe('Component Seed - test', () => {
   test('Seed Change - snapshot', () => {
     const seed = render(
       <ContextAppLoadedProvider value={stateLoaded}>
-        <Seed onClickOK={onOk} onClickCancel={onCancel} action={'change'} />
+        <Seed onClickOK={onOk} onClickCancel={onCancel} action={'change'} set_privacy_option={jest.fn()} />
       </ContextAppLoadedProvider>,
     );
     expect(seed.toJSON()).toMatchSnapshot();
@@ -92,7 +101,7 @@ describe('Component Seed - test', () => {
   test('Seed Server - snapshot', () => {
     const seed = render(
       <ContextAppLoadedProvider value={stateLoaded}>
-        <Seed onClickOK={onOk} onClickCancel={onCancel} action={'server'} />
+        <Seed onClickOK={onOk} onClickCancel={onCancel} action={'server'} set_privacy_option={jest.fn()} />
       </ContextAppLoadedProvider>,
     );
     expect(seed.toJSON()).toMatchSnapshot();
@@ -100,7 +109,7 @@ describe('Component Seed - test', () => {
   test('Seed Backup - snapshot', () => {
     const seed = render(
       <ContextAppLoadedProvider value={stateLoaded}>
-        <Seed onClickOK={onOk} onClickCancel={onCancel} action={'backup'} />
+        <Seed onClickOK={onOk} onClickCancel={onCancel} action={'backup'} set_privacy_option={jest.fn()} />
       </ContextAppLoadedProvider>,
     );
     expect(seed.toJSON()).toMatchSnapshot();
@@ -120,7 +129,7 @@ describe('Component Seed - test', () => {
       return 'text translated';
     }
   };
-  stateLoading.walletSeed = {
+  stateLoading.wallet = {
     seed: 'pepe lolo titi',
     birthday: 1500100,
   };
@@ -129,7 +138,7 @@ describe('Component Seed - test', () => {
   test('Seed New - snapshot', () => {
     const seed = render(
       <ContextAppLoadingProvider value={stateLoading}>
-        <Seed onClickOK={onOk} onClickCancel={onCancel} action={'new'} />
+        <Seed onClickOK={onOk} onClickCancel={onCancel} action={'new'} set_privacy_option={jest.fn()} />
       </ContextAppLoadingProvider>,
     );
     expect(seed.toJSON()).toMatchSnapshot();
@@ -137,7 +146,7 @@ describe('Component Seed - test', () => {
   test('Seed Restore - snapshot', () => {
     const seed = render(
       <ContextAppLoadingProvider value={stateLoading}>
-        <Seed onClickOK={onOk} onClickCancel={onCancel} action={'restore'} />
+        <Seed onClickOK={onOk} onClickCancel={onCancel} action={'restore'} set_privacy_option={jest.fn()} />
       </ContextAppLoadingProvider>,
     );
     expect(seed.toJSON()).toMatchSnapshot();

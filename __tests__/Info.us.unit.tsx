@@ -31,6 +31,15 @@ jest.mock('@react-native-community/netinfo', () => {
 
   return RN;
 });
+jest.mock('react-native', () => {
+  const RN = jest.requireActual('react-native');
+
+  RN.NativeModules.RPCModule = {
+    execute: jest.fn(() => '{}'),
+  };
+
+  return RN;
+});
 
 // test suite
 describe('Component Info - test', () => {
@@ -45,12 +54,12 @@ describe('Component Info - test', () => {
       verificationProgress: 0,
       currencyName: 'ZEC',
       solps: 0,
-      defaultFee: 1000,
-      chain_name: 'mainnet',
+      defaultFee: 10000,
+      chain_name: 'main',
+      zingolib: 'mob-release...',
     };
     state.zecPrice.zecPrice = 33.33;
     state.currency = 'USD';
-    state.totalBalance.total = 1.12345678;
     const onClose = jest.fn();
     const onSet = jest.fn();
     render(
@@ -58,6 +67,6 @@ describe('Component Info - test', () => {
         <Info closeModal={onClose} setZecPrice={onSet} />
       </ContextAppLoadedProvider>,
     );
-    screen.getByText('$ 33.33 USD per ZEC');
+    screen.getByText('33.33');
   });
 });

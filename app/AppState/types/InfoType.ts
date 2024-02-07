@@ -1,5 +1,5 @@
 export default interface InfoType {
-  chain_name: string;
+  chain_name: 'main' | 'test' | 'regtest';
   serverUri: string;
   latestBlock: number;
   connections: number;
@@ -8,5 +8,6 @@ export default interface InfoType {
   currencyName: string;
   solps: number;
   defaultFee: number;
+  zingolib: string;
   // eslint-disable-next-line semi
 }

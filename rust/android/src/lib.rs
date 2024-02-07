@@ -32,6 +32,8 @@ pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RustFFI_00024Companion_initnew
     _: JObject,
     j_serveruri: JString,
     j_data_dir: JString,
+    j_chain_hint: JString,
+    j_monitor_mempool: JString,
 ) -> jstring {
     let server_uri = CString::from(CStr::from_ptr(
         env.get_string(j_serveruri).unwrap().as_ptr(),
@@ -43,7 +45,21 @@ pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RustFFI_00024Companion_initnew
         .into_string()
         .unwrap();
 
-    let seed = rustlib::init_new(server_uri, data_dir);
+    let chain_hint = CString::from(CStr::from_ptr(
+        env.get_string(j_chain_hint).unwrap().as_ptr(),
+    ))
+    .into_string()
+    .unwrap();
+
+    let monitor_mempool = CString::from(CStr::from_ptr(
+        env.get_string(j_monitor_mempool).unwrap().as_ptr(),
+    ))
+    .into_string()
+    .unwrap()
+    .parse::<bool>()
+    .unwrap();
+
+    let seed = rustlib::init_new(server_uri, data_dir, chain_hint, monitor_mempool);
 
     let output = env.new_string(seed.as_str()).unwrap();
     output.into_inner()
@@ -57,6 +73,8 @@ pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RustFFI_00024Companion_initfro
     j_seed: JString,
     j_birthday: JString,
     j_data_dir: JString,
+    j_chain_hint: JString,
+    j_monitor_mempool: JString,
 ) -> jstring {
     let server_uri = CString::from(CStr::from_ptr(
         env.get_string(j_serveruri).unwrap().as_ptr(),
@@ -78,9 +96,92 @@ pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RustFFI_00024Companion_initfro
         .into_string()
         .unwrap();
 
-    let seed = rustlib::init_from_seed(server_uri, seed_tmp, birthday, data_dir);
+    let chain_hint = CString::from(CStr::from_ptr(
+        env.get_string(j_chain_hint).unwrap().as_ptr(),
+    ))
+    .into_string()
+    .unwrap();
+
+    let monitor_mempool = CString::from(CStr::from_ptr(
+        env.get_string(j_monitor_mempool).unwrap().as_ptr(),
+    ))
+    .into_string()
+    .unwrap()
+    .parse::<bool>()
+    .unwrap();
+
+    let seed = rustlib::init_from_seed(
+        server_uri,
+        seed_tmp,
+        birthday,
+        data_dir,
+        chain_hint,
+        monitor_mempool,
+    );
 
     let output = env.new_string(seed.as_str()).unwrap();
+    output.into_inner()
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RustFFI_00024Companion_initfromufvk(
+    env: JNIEnv,
+    _: JObject,
+    j_serveruri: JString,
+    j_ufvk: JString,
+    j_birthday: JString,
+    j_data_dir: JString,
+    j_chain_hint: JString,
+    j_monitor_mempool: JString,
+) -> jstring {
+    let server_uri = CString::from(CStr::from_ptr(
+        env.get_string(j_serveruri).unwrap().as_ptr(),
+    ))
+    .into_string()
+    .unwrap();
+
+    let ufvk_tmp = CString::from(CStr::from_ptr(env.get_string(j_ufvk).unwrap().as_ptr()))
+        .into_string()
+        .unwrap();
+
+    let birthday = CString::from(CStr::from_ptr(env.get_string(j_birthday).unwrap().as_ptr()))
+        .into_string()
+        .unwrap()
+        .parse::<u64>()
+        .unwrap();
+
+    let data_dir = CString::from(CStr::from_ptr(env.get_string(j_data_dir).unwrap().as_ptr()))
+        .into_string()
+        .unwrap();
+
+    let chain_hint = CString::from(CStr::from_ptr(
+        env.get_string(j_chain_hint).unwrap().as_ptr(),
+    ))
+    .into_string()
+    .unwrap();
+
+    let monitor_mempool = CString::from(CStr::from_ptr(
+        env.get_string(j_monitor_mempool).unwrap().as_ptr(),
+    ))
+    .into_string()
+    .unwrap()
+    .parse::<bool>()
+    .unwrap();
+
+    let no_seed_warning = rustlib::init_from_ufvk(
+        server_uri,
+        ufvk_tmp,
+        birthday,
+        data_dir,
+        chain_hint,
+        monitor_mempool,
+    );
+
+    // I need to see if there is some error here...
+    //let output = env
+    //    .new_string("Wallet created from ufvk, no seed available")
+    //    .unwrap();
+    let output = env.new_string(no_seed_warning.as_str()).unwrap();
     output.into_inner()
 }
 
@@ -91,22 +192,38 @@ pub unsafe extern "C" fn Java_org_ZingoLabs_Zingo_RustFFI_00024Companion_initfro
     j_serveruri: JString,
     j_base64: JString,
     j_data_dir: JString,
+    j_chain_hint: JString,
+    j_monitor_mempool: JString,
 ) -> jstring {
-    let base64 = CString::from(CStr::from_ptr(env.get_string(j_base64).unwrap().as_ptr()))
-        .into_string()
-        .unwrap();
-
     let server_uri = CString::from(CStr::from_ptr(
         env.get_string(j_serveruri).unwrap().as_ptr(),
     ))
     .into_string()
     .unwrap();
 
+    let base64 = CString::from(CStr::from_ptr(env.get_string(j_base64).unwrap().as_ptr()))
+        .into_string()
+        .unwrap();
+
     let data_dir = CString::from(CStr::from_ptr(env.get_string(j_data_dir).unwrap().as_ptr()))
         .into_string()
         .unwrap();
 
-    let seed = rustlib::init_from_b64(server_uri, base64, data_dir);
+    let chain_hint = CString::from(CStr::from_ptr(
+        env.get_string(j_chain_hint).unwrap().as_ptr(),
+    ))
+    .into_string()
+    .unwrap();
+
+    let monitor_mempool = CString::from(CStr::from_ptr(
+        env.get_string(j_monitor_mempool).unwrap().as_ptr(),
+    ))
+    .into_string()
+    .unwrap()
+    .parse::<bool>()
+    .unwrap();
+
+    let seed = rustlib::init_from_b64(server_uri, base64, data_dir, chain_hint, monitor_mempool);
 
     let output = env.new_string(seed.as_str()).unwrap();
     output.into_inner()

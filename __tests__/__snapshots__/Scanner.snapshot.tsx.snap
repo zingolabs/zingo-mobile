@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Component Scanner - test Scanner - snapshot 1`] = `
+<RCTSafeAreaView
+  style={
+    {
+      "height": "100%",
+      "width": "100%",
+    }
+  }
+>
+  <mockQRCodeScanner />
+</RCTSafeAreaView>
+`;

@@ -29,6 +29,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
         "justifyContent": "flex-start",
       }
     }
+    keyboardShouldPersistTaps="handled"
     style={
       {
         "maxHeight": "85%",
@@ -56,24 +57,42 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
             "borderRadius": 10,
             "borderWidth": 1,
             "margin": 10,
-            "maxHeight": "40%",
+            "maxHeight": "45%",
             "padding": 10,
           }
         }
       >
-        <Text
+        <View
+          accessible={true}
+          collapsable={false}
+          focusable={true}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
           style={
             {
-              "color": "rgb(28, 28, 30)",
-              "fontSize": 18,
-              "fontWeight": "600",
               "opacity": 1,
-              "textAlign": "center",
             }
           }
         >
-          pepe lolo titi
-        </Text>
+          <Text
+            style={
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 18,
+                "fontWeight": "600",
+                "opacity": 1,
+                "textAlign": "center",
+              }
+            }
+          >
+            pepe lolo titi
+          </Text>
+        </View>
         <View
           style={
             {
@@ -137,19 +156,37 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
         >
           text translated
         </Text>
-        <Text
+        <View
+          accessible={true}
+          collapsable={false}
+          focusable={true}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
           style={
             {
-              "color": "rgb(28, 28, 30)",
-              "fontSize": 18,
-              "fontWeight": "600",
               "opacity": 1,
-              "textAlign": "center",
             }
           }
         >
-          1500100
-        </Text>
+          <Text
+            style={
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 18,
+                "fontWeight": "600",
+                "opacity": 1,
+                "textAlign": "center",
+              }
+            }
+          >
+            1500100
+          </Text>
+        </View>
       </View>
       <View
         style={
@@ -185,11 +222,10 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "rgb(0, 122, 255)",
+          "backgroundColor": "rgb(242, 242, 242)",
           "borderColor": "rgb(0, 122, 255)",
           "borderRadius": 10,
           "borderWidth": 2,
-          "color": "rgb(0, 122, 255)",
           "justifyContent": "center",
           "maxWidth": "90%",
           "minHeight": 48,
@@ -219,13 +255,16 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(242, 242, 242)",
+              "color": "rgb(0, 122, 255)",
               "fontSize": 16,
               "fontWeight": "bold",
+              "textAlign": "center",
               "textTransform": "uppercase",
             }
           }
-        />
+        >
+          text translated
+        </Text>
       </View>
     </View>
     <View
@@ -242,6 +281,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
+          "backgroundColor": "rgb(242, 242, 242)",
           "borderColor": "rgb(0, 122, 255)",
           "borderRadius": 10,
           "borderWidth": 2,
@@ -277,6 +317,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
               "color": "rgb(0, 122, 255)",
               "fontSize": 16,
               "fontWeight": "bold",
+              "textAlign": "center",
               "textTransform": "uppercase",
             }
           }
@@ -318,6 +359,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
         "justifyContent": "flex-start",
       }
     }
+    keyboardShouldPersistTaps="handled"
     style={
       {
         "maxHeight": "85%",
@@ -345,24 +387,42 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
             "borderRadius": 10,
             "borderWidth": 1,
             "margin": 10,
-            "maxHeight": "40%",
+            "maxHeight": "45%",
             "padding": 10,
           }
         }
       >
-        <Text
+        <View
+          accessible={true}
+          collapsable={false}
+          focusable={true}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
           style={
             {
-              "color": "rgb(28, 28, 30)",
-              "fontSize": 18,
-              "fontWeight": "600",
               "opacity": 1,
-              "textAlign": "center",
             }
           }
         >
-          pepe lolo titi
-        </Text>
+          <Text
+            style={
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 18,
+                "fontWeight": "600",
+                "opacity": 1,
+                "textAlign": "center",
+              }
+            }
+          >
+            pepe lolo titi
+          </Text>
+        </View>
         <View
           style={
             {
@@ -426,19 +486,37 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
         >
           text translated
         </Text>
-        <Text
+        <View
+          accessible={true}
+          collapsable={false}
+          focusable={true}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
           style={
             {
-              "color": "rgb(28, 28, 30)",
-              "fontSize": 18,
-              "fontWeight": "600",
               "opacity": 1,
-              "textAlign": "center",
             }
           }
         >
-          1500100
-        </Text>
+          <Text
+            style={
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 18,
+                "fontWeight": "600",
+                "opacity": 1,
+                "textAlign": "center",
+              }
+            }
+          >
+            1500100
+          </Text>
+        </View>
       </View>
       <View
         style={
@@ -474,11 +552,10 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "rgb(0, 122, 255)",
+          "backgroundColor": "rgb(242, 242, 242)",
           "borderColor": "rgb(0, 122, 255)",
           "borderRadius": 10,
           "borderWidth": 2,
-          "color": "rgb(0, 122, 255)",
           "justifyContent": "center",
           "maxWidth": "90%",
           "minHeight": 48,
@@ -508,13 +585,16 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(242, 242, 242)",
+              "color": "rgb(0, 122, 255)",
               "fontSize": 16,
               "fontWeight": "bold",
+              "textAlign": "center",
               "textTransform": "uppercase",
             }
           }
-        />
+        >
+          text translated
+        </Text>
       </View>
     </View>
     <View
@@ -531,6 +611,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
+          "backgroundColor": "rgb(242, 242, 242)",
           "borderColor": "rgb(0, 122, 255)",
           "borderRadius": 10,
           "borderWidth": 2,
@@ -566,6 +647,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
               "color": "rgb(0, 122, 255)",
               "fontSize": 16,
               "fontWeight": "bold",
+              "textAlign": "center",
               "textTransform": "uppercase",
             }
           }
@@ -607,6 +689,7 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
         "justifyContent": "flex-start",
       }
     }
+    keyboardShouldPersistTaps="handled"
     style={
       {
         "maxHeight": "85%",
@@ -634,24 +717,42 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
             "borderRadius": 10,
             "borderWidth": 1,
             "margin": 10,
-            "maxHeight": "40%",
+            "maxHeight": "45%",
             "padding": 10,
           }
         }
       >
-        <Text
+        <View
+          accessible={true}
+          collapsable={false}
+          focusable={true}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
           style={
             {
-              "color": "rgb(28, 28, 30)",
-              "fontSize": 18,
-              "fontWeight": "600",
               "opacity": 1,
-              "textAlign": "center",
             }
           }
         >
-          pepe lolo titi
-        </Text>
+          <Text
+            style={
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 18,
+                "fontWeight": "600",
+                "opacity": 1,
+                "textAlign": "center",
+              }
+            }
+          >
+            pepe lolo titi
+          </Text>
+        </View>
         <View
           style={
             {
@@ -715,19 +816,37 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
         >
           text translated
         </Text>
-        <Text
+        <View
+          accessible={true}
+          collapsable={false}
+          focusable={true}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
           style={
             {
-              "color": "rgb(28, 28, 30)",
-              "fontSize": 18,
-              "fontWeight": "600",
               "opacity": 1,
-              "textAlign": "center",
             }
           }
         >
-          1500100
-        </Text>
+          <Text
+            style={
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 18,
+                "fontWeight": "600",
+                "opacity": 1,
+                "textAlign": "center",
+              }
+            }
+          >
+            1500100
+          </Text>
+        </View>
       </View>
       <View
         style={
@@ -763,11 +882,10 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "rgb(0, 122, 255)",
+          "backgroundColor": "rgb(242, 242, 242)",
           "borderColor": "rgb(0, 122, 255)",
           "borderRadius": 10,
           "borderWidth": 2,
-          "color": "rgb(0, 122, 255)",
           "justifyContent": "center",
           "maxWidth": "90%",
           "minHeight": 48,
@@ -797,13 +915,16 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(242, 242, 242)",
+              "color": "rgb(0, 122, 255)",
               "fontSize": 16,
               "fontWeight": "bold",
+              "textAlign": "center",
               "textTransform": "uppercase",
             }
           }
-        />
+        >
+          text translated
+        </Text>
       </View>
     </View>
   </View>
@@ -839,6 +960,7 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
         "justifyContent": "flex-start",
       }
     }
+    keyboardShouldPersistTaps="handled"
     style={
       {
         "maxHeight": "85%",
@@ -866,7 +988,7 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
             "borderRadius": 10,
             "borderWidth": 1,
             "margin": 10,
-            "maxHeight": "40%",
+            "maxHeight": "45%",
             "padding": 10,
           }
         }
@@ -903,52 +1025,9 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
                 "minWidth": "95%",
               }
             }
-            testID="seed.seedplaceholder"
+            testID="seed.seedinput"
             value="pepe lolo titi"
           />
-        </View>
-        <View
-          style={
-            {
-              "flexDirection": "row",
-              "justifyContent": "space-between",
-            }
-          }
-        >
-          <View />
-          <View
-            accessible={true}
-            collapsable={false}
-            focusable={true}
-            onClick={[Function]}
-            onResponderGrant={[Function]}
-            onResponderMove={[Function]}
-            onResponderRelease={[Function]}
-            onResponderTerminate={[Function]}
-            onResponderTerminationRequest={[Function]}
-            onStartShouldSetResponder={[Function]}
-            style={
-              {
-                "opacity": 1,
-              }
-            }
-          >
-            <Text
-              style={
-                {
-                  "color": "rgb(28, 28, 30)",
-                  "marginTop": 0,
-                  "minHeight": 48,
-                  "padding": 10,
-                  "textAlign": "center",
-                  "textDecorationLine": "underline",
-                }
-              }
-            >
-              text translated
-            </Text>
-          </View>
-          <View />
         </View>
       </View>
       <View
@@ -1014,7 +1093,7 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
                 "minWidth": "20%",
               }
             }
-            testID="birthdayinput"
+            testID="seed.birthdayinput"
             value="1500100"
           />
         </View>
@@ -1053,11 +1132,10 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "rgb(0, 122, 255)",
+          "backgroundColor": "rgb(242, 242, 242)",
           "borderColor": "rgb(0, 122, 255)",
           "borderRadius": 10,
           "borderWidth": 2,
-          "color": "rgb(0, 122, 255)",
           "justifyContent": "center",
           "maxWidth": "90%",
           "minHeight": 48,
@@ -1087,13 +1165,16 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(242, 242, 242)",
+              "color": "rgb(0, 122, 255)",
               "fontSize": 16,
               "fontWeight": "bold",
+              "textAlign": "center",
               "textTransform": "uppercase",
             }
           }
-        />
+        >
+          text translated
+        </Text>
       </View>
     </View>
     <View
@@ -1110,6 +1191,7 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
+          "backgroundColor": "rgb(242, 242, 242)",
           "borderColor": "rgb(0, 122, 255)",
           "borderRadius": 10,
           "borderWidth": 2,
@@ -1145,6 +1227,7 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
               "color": "rgb(0, 122, 255)",
               "fontSize": 16,
               "fontWeight": "bold",
+              "textAlign": "center",
               "textTransform": "uppercase",
             }
           }
@@ -1186,6 +1269,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
         "justifyContent": "flex-start",
       }
     }
+    keyboardShouldPersistTaps="handled"
     style={
       {
         "maxHeight": "85%",
@@ -1213,24 +1297,42 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
             "borderRadius": 10,
             "borderWidth": 1,
             "margin": 10,
-            "maxHeight": "40%",
+            "maxHeight": "45%",
             "padding": 10,
           }
         }
       >
-        <Text
+        <View
+          accessible={true}
+          collapsable={false}
+          focusable={true}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
           style={
             {
-              "color": "rgb(28, 28, 30)",
-              "fontSize": 18,
-              "fontWeight": "600",
               "opacity": 1,
-              "textAlign": "center",
             }
           }
         >
-          pepe lolo titi
-        </Text>
+          <Text
+            style={
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 18,
+                "fontWeight": "600",
+                "opacity": 1,
+                "textAlign": "center",
+              }
+            }
+          >
+            pepe lolo titi
+          </Text>
+        </View>
         <View
           style={
             {
@@ -1294,19 +1396,37 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
         >
           text translated
         </Text>
-        <Text
+        <View
+          accessible={true}
+          collapsable={false}
+          focusable={true}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
           style={
             {
-              "color": "rgb(28, 28, 30)",
-              "fontSize": 18,
-              "fontWeight": "600",
               "opacity": 1,
-              "textAlign": "center",
             }
           }
         >
-          1500100
-        </Text>
+          <Text
+            style={
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 18,
+                "fontWeight": "600",
+                "opacity": 1,
+                "textAlign": "center",
+              }
+            }
+          >
+            1500100
+          </Text>
+        </View>
       </View>
       <View
         style={
@@ -1342,11 +1462,10 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "rgb(0, 122, 255)",
+          "backgroundColor": "rgb(242, 242, 242)",
           "borderColor": "rgb(0, 122, 255)",
           "borderRadius": 10,
           "borderWidth": 2,
-          "color": "rgb(0, 122, 255)",
           "justifyContent": "center",
           "maxWidth": "90%",
           "minHeight": 48,
@@ -1376,13 +1495,16 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(242, 242, 242)",
+              "color": "rgb(0, 122, 255)",
               "fontSize": 16,
               "fontWeight": "bold",
+              "textAlign": "center",
               "textTransform": "uppercase",
             }
           }
-        />
+        >
+          text translated
+        </Text>
       </View>
     </View>
     <View
@@ -1399,6 +1521,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
+          "backgroundColor": "rgb(242, 242, 242)",
           "borderColor": "rgb(0, 122, 255)",
           "borderRadius": 10,
           "borderWidth": 2,
@@ -1434,6 +1557,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
               "color": "rgb(0, 122, 255)",
               "fontSize": 16,
               "fontWeight": "bold",
+              "textAlign": "center",
               "textTransform": "uppercase",
             }
           }
@@ -1475,6 +1599,7 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
         "justifyContent": "flex-start",
       }
     }
+    keyboardShouldPersistTaps="handled"
     style={
       {
         "maxHeight": "85%",
@@ -1502,24 +1627,42 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
             "borderRadius": 10,
             "borderWidth": 1,
             "margin": 10,
-            "maxHeight": "40%",
+            "maxHeight": "45%",
             "padding": 10,
           }
         }
       >
-        <Text
+        <View
+          accessible={true}
+          collapsable={false}
+          focusable={true}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
           style={
             {
-              "color": "rgb(28, 28, 30)",
-              "fontSize": 18,
-              "fontWeight": "600",
               "opacity": 1,
-              "textAlign": "center",
             }
           }
         >
-          pepe lolo titi
-        </Text>
+          <Text
+            style={
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 18,
+                "fontWeight": "600",
+                "opacity": 1,
+                "textAlign": "center",
+              }
+            }
+          >
+            pepe lolo titi
+          </Text>
+        </View>
         <View
           style={
             {
@@ -1583,19 +1726,37 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
         >
           text translated
         </Text>
-        <Text
+        <View
+          accessible={true}
+          collapsable={false}
+          focusable={true}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
           style={
             {
-              "color": "rgb(28, 28, 30)",
-              "fontSize": 18,
-              "fontWeight": "600",
               "opacity": 1,
-              "textAlign": "center",
             }
           }
         >
-          1500100
-        </Text>
+          <Text
+            style={
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 18,
+                "fontWeight": "600",
+                "opacity": 1,
+                "textAlign": "center",
+              }
+            }
+          >
+            1500100
+          </Text>
+        </View>
       </View>
       <View
         style={
@@ -1631,11 +1792,10 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "rgb(0, 122, 255)",
+          "backgroundColor": "rgb(242, 242, 242)",
           "borderColor": "rgb(0, 122, 255)",
           "borderRadius": 10,
           "borderWidth": 2,
-          "color": "rgb(0, 122, 255)",
           "justifyContent": "center",
           "maxWidth": "90%",
           "minHeight": 48,
@@ -1665,13 +1825,16 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(242, 242, 242)",
+              "color": "rgb(0, 122, 255)",
               "fontSize": 16,
               "fontWeight": "bold",
+              "textAlign": "center",
               "textTransform": "uppercase",
             }
           }
-        />
+        >
+          text translated
+        </Text>
       </View>
     </View>
   </View>

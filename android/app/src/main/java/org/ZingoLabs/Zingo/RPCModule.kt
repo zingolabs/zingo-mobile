@@ -52,13 +52,13 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun createNewWallet(server: String, promise: Promise) {
+    fun createNewWallet(server: String, chainhint: String, promise: Promise) {
         // Log.w("MAIN", "Creating new wallet")
 
         RustFFI.initlogging()
 
         // Create a seed
-        val seed = RustFFI.initnew(server, reactContext.applicationContext.filesDir.absolutePath)
+        val seed = RustFFI.initnew(server, reactContext.applicationContext.filesDir.absolutePath, chainhint, "true")
         // Log.w("MAIN-Seed", seed)
 
         if (!seed.startsWith("Error")) {
@@ -69,13 +69,13 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun restoreWallet(seed: String, birthday: String, server: String, promise: Promise) {
+    fun restoreWalletFromSeed(seed: String, birthday: String, server: String, chainhint: String, promise: Promise) {
         // Log.w("MAIN", "Restoring wallet with seed $seed")
 
         RustFFI.initlogging()
 
-        val rseed = RustFFI.initfromseed(server, seed, birthday, reactContext.applicationContext.filesDir.absolutePath)
-        // Log.w("MAIN", seed)
+        val rseed = RustFFI.initfromseed(server, seed, birthday, reactContext.applicationContext.filesDir.absolutePath, chainhint, "true")
+        // Log.w("MAIN", rseed)
 
         if (!rseed.startsWith("Error")) {
             saveWallet()
@@ -85,7 +85,23 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun loadExistingWallet(server: String, promise: Promise) {
+    fun restoreWalletFromUfvk(ufvk: String, birthday: String, server: String, chainhint: String, promise: Promise) {
+        // Log.w("MAIN", "Restoring wallet with ufvk $ufvk")
+
+        RustFFI.initlogging()
+
+        val rufvk = RustFFI.initfromufvk(server, ufvk, birthday, reactContext.applicationContext.filesDir.absolutePath, chainhint, "true")
+        // Log.w("MAIN", rufvk)
+
+        if (!rufvk.startsWith("Error")) {
+            saveWallet()
+        }
+
+        promise.resolve(rufvk)
+    }
+
+    @ReactMethod
+    fun loadExistingWallet(server: String, chainhint: String, promise: Promise) {
         // Read the file
         val file: InputStream = MainApplication.getAppContext()?.openFileInput("wallet.dat")!!
         var fileBytes = file.readBytes()
@@ -143,7 +159,8 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
         val wseed = RustFFI.initfromb64(server,
             fileb64.toString(),
-            reactContext.applicationContext.filesDir.absolutePath)
+            reactContext.applicationContext.filesDir.absolutePath,
+            chainhint, "true")
         // Log.w("MAIN", wseed)
 
         promise.resolve(wseed)
@@ -165,7 +182,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             fileWallet2?.write(fileBytesBackup)
             fileWallet2?.close()
         } catch (e: IllegalArgumentException) {
-            // Log.e("MAIN", "Couldn't save the wallet with the backup")
+            Log.e("MAIN", "Couldn't save the wallet with the backup")
         }
 
         try {
@@ -174,7 +191,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             fileBackup2?.write(fileBytesWallet)
             fileBackup2?.close()
         } catch (e: IllegalArgumentException) {
-            // Log.e("MAIN", "Couldn't save the backup with the wallet")
+            Log.e("MAIN", "Couldn't save the backup with the wallet")
         }
 
         promise.resolve(true)
@@ -256,14 +273,14 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
         try {
             val fileBytes = Base64.decode(b64encoded, Base64.NO_WRAP)
-            // Log.w("MAIN", "file size${fileBytes.size}")
+            Log.w("MAIN", "file size: ${fileBytes.size} bytes")
 
             // Save file to disk
             val file = MainApplication.getAppContext()?.openFileOutput("wallet.dat", Context.MODE_PRIVATE)
             file?.write(fileBytes)
             file?.close()
         } catch (e: IllegalArgumentException) {
-            // Log.e("MAIN", "Couldn't save the wallet")
+            Log.e("MAIN", "Couldn't save the wallet")
         }
     }
 
@@ -285,7 +302,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             file?.write(fileBytes)
             file?.close()
         } catch (e: IllegalArgumentException) {
-            // Log.e("MAIN", "Couldn't save the wallet backup")
+            Log.e("MAIN", "Couldn't save the wallet backup")
         }
     }
 
