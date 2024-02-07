@@ -15,7 +15,7 @@ describe('Background sync benchmark', () => {
 
     // send app to background and wait
     await device.sendToHome();
-    await sleep(60000);
+    await sleep(45000);
 
     // open app and report the post-background balance, relative to the number of transactions synced in the background
     await device.launchApp({ newInstance: false });
