@@ -340,21 +340,21 @@ static BOOL isConnectedToWifi = false;
     BGProcessingTaskRequest *request = [[BGProcessingTaskRequest alloc] initWithIdentifier:syncTask];
     
     // PRODUCTION
-    //NSDate *today = [[NSCalendar currentCalendar] startOfDayForDate:[NSDate date]];
-    //NSDate *tomorrow = [[NSCalendar currentCalendar] dateByAddingUnit:NSCalendarUnitDay value:1 toDate:today options:0];
+    NSDate *today = [[NSCalendar currentCalendar] startOfDayForDate:[NSDate date]];
+    NSDate *tomorrow = [[NSCalendar currentCalendar] dateByAddingUnit:NSCalendarUnitDay value:1 toDate:today options:0];
     
-    //NSDateComponents *earlyMorningComponent = [[NSDateComponents alloc] init];
-    //earlyMorningComponent.hour = 3;
-    //earlyMorningComponent.minute = arc4random_uniform(61);
-    //NSDate *earlyMorning = [[NSCalendar currentCalendar] dateByAddingComponents:earlyMorningComponent toDate:tomorrow options:0];
+    NSDateComponents *earlyMorningComponent = [[NSDateComponents alloc] init];
+    earlyMorningComponent.hour = 3;
+    earlyMorningComponent.minute = arc4random_uniform(61);
+    NSDate *earlyMorning = [[NSCalendar currentCalendar] dateByAddingComponents:earlyMorningComponent toDate:tomorrow options:0];
     
     // DEVELOPMENT
-    NSDate *now = [NSDate date];
+    //NSDate *now = [NSDate date];
 
-    NSDate *twoMinutesLater = [now dateByAddingTimeInterval:120]; // 2 minutes = 120 seconds
+    //NSDate *twoMinutesLater = [now dateByAddingTimeInterval:120]; // 2 minutes = 120 seconds
 
-    //request.earliestBeginDate = earlyMorning;
-    request.earliestBeginDate = twoMinutesLater;
+    request.earliestBeginDate = earlyMorning;
+    //request.earliestBeginDate = twoMinutesLater;
     request.requiresExternalPower = YES;
     request.requiresNetworkConnectivity = YES;
     
@@ -375,23 +375,23 @@ static BOOL isConnectedToWifi = false;
     BGProcessingTaskRequest *request = [[BGProcessingTaskRequest alloc] initWithIdentifier:syncSchedulerTask];
     
     // PRODUCTION
-    //NSDate *today = [[NSCalendar currentCalendar] startOfDayForDate:[NSDate date]];
-    //NSDate *tomorrow = [[NSCalendar currentCalendar] dateByAddingUnit:NSCalendarUnitDay value:1 toDate:today options:0];
+    NSDate *today = [[NSCalendar currentCalendar] startOfDayForDate:[NSDate date]];
+    NSDate *tomorrow = [[NSCalendar currentCalendar] dateByAddingUnit:NSCalendarUnitDay value:1 toDate:today options:0];
     
-    //NSDateComponents *afternoonComponent = [[NSDateComponents alloc] init];
-    //afternoonComponent.hour = 14;
-    //afternoonComponent.minute = arc4random_uniform(61);
-    //NSDate *afternoon = [[NSCalendar currentCalendar] dateByAddingComponents:afternoonComponent toDate:tomorrow options:0];
+    NSDateComponents *afternoonComponent = [[NSDateComponents alloc] init];
+    afternoonComponent.hour = 14;
+    afternoonComponent.minute = arc4random_uniform(61);
+    NSDate *afternoon = [[NSCalendar currentCalendar] dateByAddingComponents:afternoonComponent toDate:tomorrow options:0];
     
     // DEVELOPMENT
-    NSDate *now = [NSDate date];
+    //NSDate *now = [NSDate date];
 
-    NSDate *twoMinutesLater = [now dateByAddingTimeInterval:120]; // 2 minutes = 120 seconds
+    //NSDate *twoMinutesLater = [now dateByAddingTimeInterval:120]; // 2 minutes = 120 seconds
 
-    //request.earliestBeginDate = earlyMorning;
-    request.earliestBeginDate = twoMinutesLater;
-    request.requiresExternalPower = YES;
-    request.requiresNetworkConnectivity = YES;
+    request.earliestBeginDate = afternoon;
+    //request.earliestBeginDate = twoMinutesLater;
+    request.requiresExternalPower = NO;
+    request.requiresNetworkConnectivity = NO;
     
     NSError *error = nil;
     [[BGTaskScheduler sharedScheduler] submitTaskRequest:request error:&error];
