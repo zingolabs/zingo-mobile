@@ -64,11 +64,11 @@ mod e2e {
             assert_eq!(exit_code, 0);
         }
 
-        // #[cfg(feature = "benchmark")]
+        #[cfg(feature = "benchmark")]
         mod benchmark {
             use super::*;
 
-            // A test for benchmarking number of transactions synced after 20 seconds in the background
+            // A test for benchmarking number of blocks synced after 20 seconds in the background
             // This test has no asserts and should be run with --no-capture to show the final result
             #[ignore]
             #[tokio::test]
@@ -99,7 +99,6 @@ mod e2e {
             }
             #[tokio::test]
             async fn background_sync_benchmark_test() {
-                // const BLOCKCHAIN_HEIGHT: u64 = 1_000;
                 const BLOCKCHAIN_HEIGHT: u64 = 90_000;
                 let transaction_set = load_chainbuild_file("background_sync_benchmark");
                 let mut scenario = DarksideScenario::new(Some(20_000)).await;
@@ -126,29 +125,36 @@ mod e2e {
                 // println!("Output: {}", output);
                 // println!("Error: {}", error);
 
-                // Find the start and end balance from the log
-                let line = error
-                    .lines()
-                    .map(|line| line.trim())
-                    .filter(|line| line.contains("startBalance:"))
-                    .next()
-                    .unwrap();
-                let mut word = line.split_whitespace();
-                while word.next().unwrap() != "startBalance:" {}
-                let start_balance: f64 = word.next().unwrap().parse().unwrap();
+                let mut lines_with_balances =
+                    error.lines().filter(|line| line.contains("Balance:"));
 
-                let line = error
-                    .lines()
-                    .map(|line| line.trim())
-                    .filter(|line| line.contains("endBalance:"))
-                    .next()
-                    .unwrap();
-                let mut word = line.split_whitespace();
-                while word.next().unwrap() != "endBalance:" {}
-                let end_balance: f64 = word.next().unwrap().parse().unwrap();
+                fn find_balance_from_line(line: &str) -> f64 {
+                    let mut balance = None;
+                    let mut words = line.split_whitespace().peekable();
 
-                let transaction_count = (end_balance - start_balance) * 1000.0;
-                let blocks_synced = transaction_count as u64 * 200;
+                    // iterate through words in line and when "Balance:" is found, take the next element
+                    while let Some(word) = words.next() {
+                        if word.contains("Balance:") {
+                            balance = words.peek().copied();
+                            break;
+                        }
+                    }
+                    balance.unwrap().parse().unwrap()
+                }
+
+                let start_balance = find_balance_from_line(
+                    lines_with_balances
+                        .next()
+                        .expect("should find a line with start balance"),
+                );
+                let end_balance = find_balance_from_line(
+                    lines_with_balances
+                        .next()
+                        .expect("should find a line with end balance"),
+                );
+
+                let transaction_count = ((end_balance - start_balance) * 1000.0) as u64;
+                let blocks_synced = transaction_count * 200;
 
                 println!("RESULT");
                 println!("Blocks synced in background: {}", blocks_synced);
