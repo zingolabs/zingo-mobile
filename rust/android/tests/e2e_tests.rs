@@ -73,8 +73,8 @@ mod e2e {
             #[ignore]
             #[tokio::test]
             async fn background_sync_benchmark_chainbuild() {
-                const BLOCKCHAIN_HEIGHT: u64 = 225_000;
-                const BLOCKS_PER_TX: u64 = 500;
+                const BLOCKCHAIN_HEIGHT: u64 = 112_500;
+                const BLOCKS_PER_TX: u64 = 250;
                 let chainbuild_file = create_chainbuild_file("background_sync_benchmark");
                 let mut scenario = DarksideScenario::new(Some(20_000)).await;
                 scenario.build_faucet(Pool::Orchard).await;
@@ -100,8 +100,8 @@ mod e2e {
             }
             #[tokio::test]
             async fn background_sync_benchmark_test() {
-                const BLOCKCHAIN_HEIGHT: u64 = 225_000;
-                const BLOCKS_PER_TX: u64 = 500;
+                const BLOCKCHAIN_HEIGHT: u64 = 112_500;
+                const BLOCKS_PER_TX: u64 = 250;
                 let transaction_set = load_chainbuild_file("background_sync_benchmark");
                 let mut scenario = DarksideScenario::new(Some(20_000)).await;
                 scenario.build_faucet(Pool::Orchard).await;
@@ -165,8 +165,8 @@ mod e2e {
             }
             #[tokio::test]
             async fn background_sync_while_closed_benchmark_test() {
-                const BLOCKCHAIN_HEIGHT: u64 = 225_000;
-                const BLOCKS_PER_TX: u64 = 500;
+                const BLOCKCHAIN_HEIGHT: u64 = 112_500;
+                const BLOCKS_PER_TX: u64 = 250;
                 let transaction_set =
                     load_chainbuild_file("background_sync_while_closed_benchmark");
                 let mut scenario = DarksideScenario::new(Some(20_000)).await;
