@@ -119,7 +119,7 @@ mod e2e {
 
                 scenario.stage_and_apply_blocks(BLOCKCHAIN_HEIGHT, 0).await;
 
-                let (exit_code, output, error) =
+                let (exit_code, _output, error) =
                     zingomobile_utils::android_e2e_test("darkside_background_sync_benchmark");
 
                 // // DEBUG
@@ -185,7 +185,7 @@ mod e2e {
 
                 scenario.stage_and_apply_blocks(BLOCKCHAIN_HEIGHT, 0).await;
 
-                let (exit_code, output, error) =
+                let (exit_code, _output, error) =
                     zingomobile_utils::android_e2e_test("darkside_background_sync_benchmark");
 
                 // // DEBUG
