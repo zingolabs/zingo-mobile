@@ -2,8 +2,11 @@
 set -Eeuo pipefail
 
 set_test_name=false
-create_snapshot=false
 timeout_seconds=1800  # default timeout set to 30 minutes
+api_level="30"
+api_target="google_apis_playstore"
+arch="x86_64"
+device="pixel_7"
 
 function check_launch() {
     emulator_status=$(adb devices | grep "emulator-5554" | cut -f1)
@@ -50,9 +53,6 @@ while getopts 'e:sx:h' OPTION; do
             test_name="$OPTARG"
             set_test_name=true
             ;;
-        s)
-            create_snapshot=true
-            ;;
         x)
             timeout_seconds="$OPTARG"
             
@@ -64,14 +64,9 @@ while getopts 'e:sx:h' OPTION; do
         h)
             echo -e "\nRun end-to-end tests. Requires Android SDK Command-line Tools."
             echo -e "\n  -e\t\tSelect test name"
-            echo -e "\n  -s\t\tCreate an AVD and snapshot for quick-boot (optional)"
-            echo -e "      \t\t  Does not run end-to-end tests"
             echo -e "\n  -x\t\tSet timeout in seconds for emulator launch and AVD boot-up (optional)"
             echo -e "      \t\t  Default: 1800"
             echo -e "      \t\t  Must be an integer"
-            echo -e "\nExamples:"
-            echo -e "  '$(basename $0) -s'          \tCreates an AVD and quick-boot snapshot for default device"
-            echo -e "  '$(basename $0) -e test_name'\tRuns test_name.test.js test for default device from snapshot"
             ;;
         ?)
             echo "Try '$(basename $0) -h' for more information." >&2
@@ -85,21 +80,8 @@ if [[ $set_test_name == false ]]; then
     exit 1
 fi
 
-api_level_default="30"
-api_target_default="google_apis_playstore"
-arch="x86_64"
-device_default="pixel_7"
-api_level=$api_level_default
-api_target=$api_target_default
-device=$device_default
-
 # Setup working directory
 cd $(git rev-parse --show-toplevel)
-if [ ! -d "./android/app" ]; then
-    echo "Error: Incorrect working directory" >&2
-    # echo "Try './scripts/$(basename $0)' from zingo-mobile root directory." >&2
-    exit 1
-fi
 
 echo -e "\nRunning yarn install..."
 # yarn global add node-gyp
@@ -183,7 +165,6 @@ nohup yarn start &> "${test_report_dir}/metro.txt" &
 yarn detox build -c android.att.debug
 yarn detox test -c android.att.debug ${test_name}.test.js
 success_status=$?
-echo "success status: ${success_status}"
 
 # Store additional test outputs
 if [ -n "$(adb -s emulator-5554 shell ls -A /sdcard/Android/media/org.ZingoLabs.Zingo/additional_test_output 2>/dev/null)" ]; then
