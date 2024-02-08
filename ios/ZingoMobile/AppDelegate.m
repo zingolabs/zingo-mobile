@@ -87,31 +87,21 @@ static BOOL syncFinished = true;
                   restorationHandler:restorationHandler];
 }
 
-//- (BOOL)application:(UIApplication *)application willFinishLaunchingWithOptions:(NSDictionary *)launchOptions
+//- (void)applicationWillEnterForeground:(UIApplication *)application
 //{
-//  if (@available(iOS 13.0, *)) {
-//      NSLog(@"configureProcessingTask");
-//      [self configureProcessingTask];
-//  }
-//  return YES;
-//}
-
-- (void)applicationWillEnterForeground:(UIApplication *)application
-{
-  if (@available(iOS 13.0, *)) {
-      // cancel existing sync process
-      NSLog(@"BGTask sync finished %i", syncFinished);
-      if (!syncFinished) {
-          NSLog(@"BGTask scheduleProcessingTask CANCEL - foreground");
-          syncFinished = true;
-          char *resp2 = execute("interrupt_sync_after_batch", "true");
-          NSString* respStr2 = [NSString stringWithUTF8String:resp2];
-          NSLog(@"BGTask interrupt syncing %@", respStr2);
-      }
+  //if (@available(iOS 13.0, *)) {
+      // cancel existing sync background process.
+  //    if (!syncFinished) {
+  //        NSLog(@"BGTask scheduleProcessingTask CANCEL - foreground");
+  //        syncFinished = true;
+  //        char *resp2 = execute("interrupt_sync_after_batch", "true");
+  //        NSString* respStr2 = [NSString stringWithUTF8String:resp2];
+  //        NSLog(@"BGTask interrupt syncing %@", respStr2);
+  //    }
       // cancel the task (if any)
-      [BGTaskScheduler.sharedScheduler cancelTaskRequestWithIdentifier:syncTask];
-  }
-}
+  //    [BGTaskScheduler.sharedScheduler cancelTaskRequestWithIdentifier:syncTask];
+  //}
+//}
 
 - (void)applicationDidEnterBackground:(UIApplication *)application
 {
@@ -120,7 +110,6 @@ static BOOL syncFinished = true;
       [self scheduleBackgroundTask];
       NSLog(@"BGTask scheduleShedulerBackgroundTask");
       [self scheduleSchedulerBackgroundTask];
-      //[self handleBackgroundTask];
   }
 }
 
@@ -148,8 +137,17 @@ static BOOL syncFinished = true;
     if (exists) {
 
       NSLog(@"BGTask handleProcessingTask sync BEGIN");
-      //syncFinished = false;
+      syncFinished = false;
 
+      // we need to sync without interruption, I run this just in case
+      char *resp = execute("interrupt_sync_after_batch", "false");
+      NSString* respStr = [NSString stringWithUTF8String:resp];
+      NSLog(@"BGTask interrupt syncing %@", respStr);
+      rust_free(resp);
+
+      // the task is running here blocking this execution until this process finished:
+      // 1. finished the syncing.
+      // 2. interrupted by a flag then it finished the current batch.
       char *resp2 = execute("sync", "");
       NSString* respStr2 = [NSString stringWithUTF8String:resp2];
       rust_free(resp2);
@@ -157,15 +155,12 @@ static BOOL syncFinished = true;
       NSLog(@"BGTask handleProcessingTask sync END %@", respStr2);
       
       syncFinished = true;
-      char *resp3 = execute("interrupt_sync_after_batch", "true");
-      NSString* respStr3 = [NSString stringWithUTF8String:resp3];
-      NSLog(@"BGTask interrupt syncing %@", respStr3);
       // the execute `sync` already save the wallet when finished
 
     } else {
 
       syncFinished = true;
-      NSLog(@"BGTask handleProcessingTask No exists wallet");
+      NSLog(@"BGTask handleProcessingTask No exists wallet file");
 
     }
 
@@ -173,7 +168,7 @@ static BOOL syncFinished = true;
 
 }
 
--(void)syncingStatusProcessBackgroundTask:(NSString *)noValue {
+-(void)syncingStatusProcessBackgroundTask:(BGProcessingTask *)task {
   @autoreleasepool {
 
     NSLog(@"BGTask handleProcessingTask sync status BEGIN %i", syncFinished);
@@ -208,11 +203,16 @@ static BOOL syncFinished = true;
         [rpcmodule saveBackgroundFile:jsonBackgroud];
 
         NSLog(@"BGTask handleProcessingTask save wallet & background batch %i %@ %i %@", syncFinished, batchStr, progress, timeStampStr);
+        NSLog(@"TIME REMAINING ======= %f", [UIApplication sharedApplication].backgroundTimeRemaining);
       }
       prevBatch = batch;
+
     }
 
     NSLog(@"BGTask handleProcessingTask sync status END %i", syncFinished);
+
+    // I need to end the Task ASAP
+    [task setTaskCompletedWithSuccess:YES];
 
     // we don't want to save if the sync is finished:
     // 1. OS kill the task -> to save is dangerous.
@@ -231,7 +231,6 @@ static BOOL syncFinished = true;
   NSString *fileName = [NSString stringWithFormat:@"%@/wallet.dat.txt",
                                                 documentsDirectory];
   BOOL fileExists = [[NSFileManager defaultManager] fileExistsAtPath:fileName];
-  // RCTLogInfo(@"Wallet exists: %d", (int)fileExists);
 
   if (fileExists) {
     return true;
@@ -322,19 +321,17 @@ static BOOL syncFinished = true;
     NSLog(@"BGTask configureProcessingTask run");
     syncFinished = false;
     [NSThread detachNewThreadSelector:@selector(syncingProcessBackgroundTask:) toTarget:self withObject:nil];
-    [self syncingStatusProcessBackgroundTask:nil];
-    [task setTaskCompletedWithSuccess:YES];
-    
+    [self syncingStatusProcessBackgroundTask:task];
+
     task.expirationHandler = ^{
         NSLog(@"BGTask startBackgroundTask expirationHandler called");
         // Stop the syncing because the allocated time is about to expire
-        if (!syncFinished) {
-            NSLog(@"BGTask scheduleProcessingTask CANCEL - is about to expire");
-            syncFinished = true;
-            char *resp2 = execute("interrupt_sync_after_batch", "true");
-            NSString* respStr2 = [NSString stringWithUTF8String:resp2];
-            NSLog(@"BGTask interrupt syncing %@", respStr2);
-        }
+        NSLog(@"BGTask scheduleProcessingTask CANCEL - is about to expire");
+        char *resp2 = execute("interrupt_sync_after_batch", "true");
+        NSString* respStr2 = [NSString stringWithUTF8String:resp2];
+        NSLog(@"BGTask interrupt syncing %@", respStr2);
+        // maybe I don't need this, because the interrupt command is going to end the sync process ASAP-ish.
+        syncFinished = true;
     };
 }
 
@@ -390,9 +387,9 @@ static BOOL syncFinished = true;
     NSDate *afternoon = [[NSCalendar currentCalendar] dateByAddingComponents:afternoonComponent toDate:tomorrow options:0];
     
     // DEVELOPMENT
-    NSDate *now = [NSDate date];
+    //NSDate *now = [NSDate date];
 
-    NSDate *fiveMinutesLater = [now dateByAddingTimeInterval:300]; // 5 minutes = 300 seconds
+    //NSDate *fiveMinutesLater = [now dateByAddingTimeInterval:300]; // 5 minutes = 300 seconds
 
     request.earliestBeginDate = afternoon;
     //request.earliestBeginDate = fiveMinutesLater;
