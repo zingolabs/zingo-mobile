@@ -40,11 +40,8 @@ mod e2e {
     }
 
     mod darkside {
-        use darkside_tests::utils::{
-            create_chainbuild_file, load_chainbuild_file,
-            scenarios::{DarksideScenario, DarksideSender},
-        };
-        use zingolib::{get_base_address, testvectors::seeds, wallet::Pool};
+        use darkside_tests::utils::scenarios::DarksideScenario;
+        use zingolib::wallet::Pool;
 
         #[tokio::test]
         async fn simple_sync_test() {
@@ -67,6 +64,10 @@ mod e2e {
         #[cfg(feature = "benchmark")]
         mod benchmark {
             use super::*;
+            use darkside_tests::utils::{
+                create_chainbuild_file, load_chainbuild_file, scenarios::DarksideSender,
+            };
+            use zingolib::{get_base_address, testvectors::seeds};
 
             // A test for benchmarking number of blocks synced after 30 seconds in the background
             // This test has no asserts and should be run with --no-capture to show the final result
