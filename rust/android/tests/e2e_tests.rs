@@ -158,9 +158,13 @@ mod e2e {
 
                 let transactions_synced = ((end_balance - start_balance) * 10000.0) as u64;
                 let blocks_synced = transactions_synced * BLOCKS_PER_TX;
+                const FOREGROUND_SYNC_OFFSET: u64 = 74000;
 
                 println!("RESULT");
-                println!("Blocks synced in background: {}", blocks_synced);
+                println!(
+                    "Approx. blocks synced in background: {}",
+                    blocks_synced - FOREGROUND_SYNC_OFFSET
+                );
 
                 assert_eq!(exit_code, 0);
             }
