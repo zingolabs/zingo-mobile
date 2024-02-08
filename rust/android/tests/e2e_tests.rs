@@ -61,7 +61,7 @@ mod e2e {
             assert_eq!(exit_code, 0);
         }
 
-        // #[cfg(feature = "benchmark")]
+        #[cfg(feature = "benchmark")]
         mod benchmark {
             use super::*;
             use darkside_tests::utils::{
@@ -161,10 +161,9 @@ mod e2e {
                 let transactions_synced =
                     ((end_balance - start_balance) * TX_TO_VALUE_RATIO) as u64;
                 let blocks_synced = transactions_synced * BLOCKS_PER_TX;
-                let blocks_synced_in_background =
-                    blocks_synced.checked_sub(FOREGROUND_SYNC_OFFSET).expect(
-                        "total blocks synced should be larger than the approx. foreground offset",
-                    );
+                let blocks_synced_in_background = blocks_synced
+                    .checked_sub(FOREGROUND_SYNC_OFFSET)
+                    .expect("total blocks synced should be larger than the foreground sync offset");
 
                 println!("RESULT");
                 println!(
