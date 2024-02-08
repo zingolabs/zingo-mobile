@@ -61,7 +61,7 @@ mod e2e {
             assert_eq!(exit_code, 0);
         }
 
-        #[cfg(feature = "benchmark")]
+        // #[cfg(feature = "benchmark")]
         mod benchmark {
             use super::*;
             use darkside_tests::utils::{
@@ -103,6 +103,8 @@ mod e2e {
             async fn background_sync_benchmark_test() {
                 const BLOCKCHAIN_HEIGHT: u64 = 112_500;
                 const BLOCKS_PER_TX: u64 = 250;
+                const TX_TO_VALUE_RATIO: f64 = 10_000.0;
+                const FOREGROUND_SYNC_OFFSET: u64 = 74_000;
                 let transaction_set = load_chainbuild_file("background_sync_benchmark");
                 let mut scenario = DarksideScenario::new(Some(20_000)).await;
                 scenario.build_faucet(Pool::Orchard).await;
@@ -156,14 +158,18 @@ mod e2e {
                         .expect("should find a line with end balance"),
                 );
 
-                let transactions_synced = ((end_balance - start_balance) * 10000.0) as u64;
+                let transactions_synced =
+                    ((end_balance - start_balance) * TX_TO_VALUE_RATIO) as u64;
                 let blocks_synced = transactions_synced * BLOCKS_PER_TX;
-                const FOREGROUND_SYNC_OFFSET: u64 = 74000;
+                let blocks_synced_in_background =
+                    blocks_synced.checked_sub(FOREGROUND_SYNC_OFFSET).expect(
+                        "total blocks synced should be larger than the approx. foreground offset",
+                    );
 
                 println!("RESULT");
                 println!(
                     "Approx. blocks synced in background: {}",
-                    blocks_synced - FOREGROUND_SYNC_OFFSET
+                    blocks_synced_in_background
                 );
 
                 assert_eq!(exit_code, 0);
