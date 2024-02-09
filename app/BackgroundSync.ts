@@ -1,11 +1,25 @@
 import RPCModule from './RPCModule';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo, { NetInfoState, NetInfoStateType } from '@react-native-community/netinfo';
-import notifee, { Notification } from '@notifee/react-native';
+import notifee, { AndroidColor, Notification } from '@notifee/react-native';
 import { RPCSyncStatusType } from './rpc/types/RPCSyncStatusType';
 
-const BackgroundSync = ((notif: Notification) => {
+const BackgroundSync = async (task_data: any) => {
+      notifee.displayNotification({
+      title: 'Foreground service',
+      body: 'This notification will exist for the lifetime of the service runner',
+      android: {
+        channelId: task_data.channelId,
+        asForegroundService: true,
+        color: AndroidColor.RED,
+        colorized: true,
+      },
+    });
+}
+const ForegroundService = ((notif: Notification) => {
   return new Promise((resolve, reject) => {
+
+    console.log("Background sync: it exists!")
     RPCModule.walletExists().then((exists: boolean) => {
       if (!exists) {
         reject("no wallet file to sync")
@@ -142,6 +156,7 @@ const BackgroundSyncOld = async (notif: Notification) => {
 };
 
 export default BackgroundSync;
+export { ForegroundService };
 
 function manuallyResolve() {
   let resolve: Function;
