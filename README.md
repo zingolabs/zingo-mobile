@@ -58,9 +58,9 @@ Google Play: [https://play.google.com/store/apps/details?id=org.ZingoLabs.Zingo]
 The React Native tools require some environment variables to be set up in order to build apps with
 native code. <br />
 Add the following lines to your `$HOME/.bash_profile` or `$HOME/.profile` config file: <br />
-`PATH="$PATH:$ANDROID_HOME/cmdline-tools/latest/bin"` <br />
-`PATH="$PATH:$ANDROID_HOME/platform-tools"` <br />
-`PATH="$PATH:$ANDROID_HOME/emulator"` <br />
+`PATH="$PATH:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin"` <br />
+`PATH="$PATH:$ANDROID_SDK_ROOT/platform-tools"` <br />
+`PATH="$PATH:$ANDROID_SDK_ROOT/emulator"` <br />
 Add the following lines to your `$HOME/.bashrc` config file: <br />
 `export ANDROID_SDK_ROOT="$HOME/Android/Sdk"` <br />
 Also, make sure your JAVA_HOME is set, for example: <br />
@@ -91,7 +91,7 @@ Also, make sure your JAVA_HOME is set, for example: <br />
 ### Android SDK Command-line Tools (Standalone)
 You can also emulate android from the command line without using Android Studio.
 1. Check that the Android SDK cmdline-tools binaries are in the following directory path: <br />
-   `$ANDROID_HOME/cmdline-tools/latest/bin`
+   `$ANDROID_SDK_ROOT/cmdline-tools/latest/bin`
 2. From the root directory run: <br />
    `scripts/start_interactive.sh -a x86` <br />
    Outputs are generated in `android/app/build/outputs/emulator_output`
@@ -152,6 +152,8 @@ lightwalletd/zcashd regtest network. Therefore, only tests in the "Offline Tests
    `cargo nextest run e2e`
    or run a specific test: <br />
    `cargo nextest run e2e::test_name`
+   or run a specific darkside test: <br />
+   `cargo nextest run e2e::darkside::test_name`
 
 Regchest is still under development and currently not able to run darkside end-to-end tests: <br />
 `cargo nextest run --features regchest -E 'test(e2e) and not test(darkside)'`

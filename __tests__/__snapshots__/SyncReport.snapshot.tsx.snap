@@ -613,6 +613,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
                 "color": "rgb(28, 28, 30)",
               }
             }
+            testID="syncreport.syncedbefore"
           >
             99999translated text25.00%
           </Text>
@@ -936,6 +937,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           "paddingRight": 20,
         }
       }
+      testID="syncreport.button.close"
     >
       <View
         style={

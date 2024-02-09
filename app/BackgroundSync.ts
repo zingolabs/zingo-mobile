@@ -1,111 +1,127 @@
 import RPCModule from './RPCModule';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import NetInfo, { NetInfoStateType } from '@react-native-community/netinfo';
+import NetInfo, { NetInfoState, NetInfoStateType } from '@react-native-community/netinfo';
+import notifee, { AndroidColor, Notification } from '@notifee/react-native';
 import { RPCSyncStatusType } from './rpc/types/RPCSyncStatusType';
 
 const BackgroundSync = async (task_data: any) => {
-  // this not interact with the server.
-  const exists = await RPCModule.walletExists();
+  notifee.displayNotification({
+    title: 'Foreground service',
+    body: 'This notification will exist for the lifetime of the service runner',
+    android: {
+      channelId: task_data.channelId,
+      asForegroundService: true,
+      color: AndroidColor.RED,
+      colorized: true,
+    },
+  });
+}
+const ForegroundService = ((notif: Notification) => {
+  return new Promise((resolve, reject) => {
 
-  // only if exists the wallet file make sense to do the sync.
-  if (exists && exists !== 'false') {
-    // only if we have connection make sense to call RPCModule.
-    const networkState = await NetInfo.fetch();
-    if (
-      !networkState.isConnected ||
-      networkState.type === NetInfoStateType.cellular ||
-      (networkState.details !== null && networkState.details.isConnectionExpensive)
-    ) {
-      //console.log(
-      //  'BS: Not started (connected: ' + networkState.isConnected,
-      //  +', type: ' +
-      //    networkState.type +
-      //    +', expensive connection: ' +
-      //    networkState.details?.isConnectionExpensive +
-      //    ')',
-      //);
-      return;
-    }
-    // if the App goes to Foreground kill the interval
-    const background = await AsyncStorage.getItem('@background');
-    if (background === 'no') {
-      //console.log('BS: Not started (going to foreground)');
-      return;
-    }
-
-    let batch_num = -1;
-    console.log('BS:', task_data);
-
-    // finishEarly has two fields: wait, and done.
-    // wait() returns a promise, which is resolved when
-    // done() is called
-    let finishEarly = manuallyResolve();
-
-    let saver = setInterval(async () => {
-      const networkStateSaver = await NetInfo.fetch();
+    console.log("Background sync: it exists!")
+    RPCModule.walletExists().then((exists: boolean) => {
+      if (!exists) {
+        reject("no wallet file to sync")
+      }
+      return NetInfo.fetch();
+    }).then((networkState: NetInfoState) => {
       if (
-        !networkStateSaver.isConnected ||
-        networkStateSaver.type === NetInfoStateType.cellular ||
-        (networkStateSaver.details !== null && networkStateSaver.details.isConnectionExpensive)
+        !networkState.isConnected ||
+        networkState.type === NetInfoStateType.cellular ||
+        (networkState.details !== null && networkState.details.isConnectionExpensive)
       ) {
-        //console.log(
-        //  'BS: Interrupted (connected: ' + networkStateSaver.isConnected,
-        //  +', type: ' +
-        //    networkStateSaver.type +
-        //    +', expensive connection: ' +
-        //    networkStateSaver.details?.isConnectionExpensive +
-        //    ')',
-        //);
-        clearInterval(saver);
-        finishEarly.done();
-        return;
+        reject("not on wifi")
       }
-      // if the App goes to Foreground kill the interval
-      const backgroundSaver = await AsyncStorage.getItem('@background');
-      if (backgroundSaver === 'no') {
-        clearInterval(saver);
-        //console.log('BS: Finished (going to foreground)');
-        finishEarly.done();
-        return;
+      return AsyncStorage.getItem('@background')
+    }).then((background: string | null) => {
+      if (background === 'no') {
+        reject("app in foreground")
       }
+      let batch_num = -1;
+      console.log('BS:', notif);
 
-      const syncStatusStr: string = await RPCModule.execute('syncstatus', '');
-      if (syncStatusStr) {
-        if (syncStatusStr.toLowerCase().startsWith('error')) {
-          //console.log(`BS: Error sync status ${syncStatusStr}`);
+      // finishEarly has two fields: wait, and done.
+      // wait() returns a promise, which is resolved when
+      // done() is called
+      let finishEarly = manuallyResolve();
+
+      let saver = setInterval(async () => {
+        const networkStateSaver = await NetInfo.fetch();
+        if (
+          !networkStateSaver.isConnected ||
+          networkStateSaver.type === NetInfoStateType.cellular ||
+          (networkStateSaver.details !== null && networkStateSaver.details.isConnectionExpensive)
+        ) {
+          //console.log(
+          //  'BS: Interrupted (connected: ' + networkStateSaver.isConnected,
+          //  +', type: ' +
+          //    networkStateSaver.type +
+          //    +', expensive connection: ' +
+          //    networkStateSaver.details?.isConnectionExpensive +
+          //    ')',
+          //);
+          clearInterval(saver);
+          finishEarly.done();
           return;
         }
-      } else {
-        //console.log('BS: Internal Error sync status');
-        return;
-      }
+        // if the App goes to Foreground kill the interval
+        const backgroundSaver = await AsyncStorage.getItem('@background');
+        if (backgroundSaver === 'no') {
+          clearInterval(saver);
+          console.log('BS: Finished (going to foreground)');
+          finishEarly.done();
+          return;
+        }
 
-      let ss = {} as RPCSyncStatusType;
-      try {
-        ss = await JSON.parse(syncStatusStr);
-      } catch (e) {
-        //console.log('BS: Error parsing syncstatus JSON', e);
-        return;
-      }
+        const syncStatusStr: string = await RPCModule.execute('syncstatus', '');
+        if (syncStatusStr) {
+          if (syncStatusStr.toLowerCase().startsWith('error')) {
+            console.log(`BS: Error sync status ${syncStatusStr}`);
+            reject(syncStatusStr);
+          }
+        } else {
+          console.log('BS: Internal Error sync status');
+          reject("Internal sync error");
+        }
 
-      //console.log('BS:', ss);
-      if (ss.batch_num && ss.batch_num > -1 && batch_num !== ss.batch_num) {
-        await RPCModule.doSave();
-        //console.log('BS: saving...');
-        // update batch_num with the new value, otherwise never change
-        batch_num = ss.batch_num;
-      }
-    }, 5000);
+        let ss = {} as RPCSyncStatusType;
+        try {
+          ss = await JSON.parse(syncStatusStr);
+        } catch (e) {
+          console.log('BS: Error parsing syncstatus JSON', e);
+          reject("cannot parse syncstatus as json");
+        }
 
-    await Promise.race([RPCModule.execute('sync', ''), finishEarly.wait()]);
-    clearInterval(saver);
-  } else {
-    console.log('BS: wallet file does not exist');
-  }
-  //console.log('BS: Finished (end of syncing)');
-};
+        console.log('BS:', ss);
+        if (ss.batch_num && ss.batch_num > -1 && batch_num !== ss.batch_num) {
+          await RPCModule.doSave();
+          console.log('BS: saving...');
+          // update batch_num with the new value, otherwise never change
+          batch_num = ss.batch_num;
+
+
+          await notifee.displayNotification({
+            // Needs to match SERVICE_NOTIFICATION_ID in BackgroundSync.kt
+            // TODO: Unify constants between Kotlin and TypeScript
+            ...notif,
+            body: 'Batch ' + batch_num + ' of ' + ss.batch_total,
+          });
+        }
+      }, 5000);
+      return Promise.race([RPCModule.execute('sync', ''), finishEarly.wait()]).then(() => {
+        clearInterval(saver);
+      })
+    }).then((result: any) => {
+      resolve(result)
+    })
+
+  })
+})
+
 
 export default BackgroundSync;
+export { ForegroundService };
 
 function manuallyResolve() {
   let resolve: Function;
