@@ -416,7 +416,7 @@
     "processingblock": "Processing Block: ",
     "totalblocks": " of a TOTAL of Blocks: ",
     "lastbackgroundsync": "LAST BACKGROUND SYNCING",
-    "batches-date": " Batches at: ",
+    "batches-date": "Date: ",
     "networkstatus": "Network Status (Internet)",
     "nointernet": "No Internet Connection.",
     "cellulardata": "Only Cellular Data.",

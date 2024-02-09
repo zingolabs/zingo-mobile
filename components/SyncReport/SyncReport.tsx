@@ -49,7 +49,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
 
   useEffect(() => {
     (async () => await RPC.rpc_setInterruptSyncAfterBatch('false'))();
-    setTimeout(() => setShowBackgroundLegend(false), 5000); // 5 seconds only
+    setTimeout(() => setShowBackgroundLegend(false), 10000); // 10 seconds only
   }, []);
 
   // ref: https://github.com/zingolabs/zingo-mobile/issues/327
@@ -219,7 +219,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
             />
           </View>
         )}
-        {background.batches > 0 && background.date > 0 && showBackgroundLegend && (
+        {background.date > 0 && showBackgroundLegend && (
           <View
             style={{
               display: 'flex',
@@ -230,7 +230,6 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
             <DetailLine
               label={translate('report.lastbackgroundsync') as string}
               value={
-                background.batches.toString() +
                 translate('report.batches-date') +
                 moment(Number(Number(background.date).toFixed(0)) * 1000).format('YYYY MMM D h:mm a')
               }
