@@ -32,7 +32,8 @@ class BackgroundSync : HeadlessJsTaskService() {
         }
     }
 
-     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    //TODO: Migrate the following service start/stop logic to BackgroundSync.ts
+/*     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
          if (intent?.action == STOP) {
              stopForeground(true)
              stopSelf()
@@ -54,12 +55,12 @@ class BackgroundSync : HeadlessJsTaskService() {
                  .setContentIntent(contentIntent)
                  .setOngoing(true)
                  .build()
-             startForeground(intent.extras!!.getInt("notifId")!!, notification)
+             //startForeground(intent.extras!!.getInt("notifId")!!, notification)
              Log.i("Foreground sync", notification.toString())
              super.onStartCommand(intent, flags, startId)
          }
          return START_STICKY
-     }
+     }*/
 
 
 
