@@ -35,6 +35,7 @@ static NSString* syncTask = @"Zingo_Processing_Task_ID";
 static NSString* syncSchedulerTask = @"Zingo_Processing_Scheduler_Task_ID";
 static BOOL isConnectedToWifi = false;
 static BOOL syncFinished = true;
+static BGProcessingTask *bgTask = nil;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
@@ -87,28 +88,32 @@ static BOOL syncFinished = true;
                   restorationHandler:restorationHandler];
 }
 
-//- (void)applicationWillEnterForeground:(UIApplication *)application
-//{
-  //if (@available(iOS 13.0, *)) {
+- (void)applicationWillEnterForeground:(UIApplication *)application
+{
+  if (@available(iOS 13.0, *)) {
       // cancel existing sync background process.
-  //    if (!syncFinished) {
-  //        NSLog(@"BGTask scheduleProcessingTask CANCEL - foreground");
-  //        syncFinished = true;
-  //        char *resp2 = execute("interrupt_sync_after_batch", "true");
-  //        NSString* respStr2 = [NSString stringWithUTF8String:resp2];
-  //        NSLog(@"BGTask interrupt syncing %@", respStr2);
-  //    }
-      // cancel the task (if any)
-  //    [BGTaskScheduler.sharedScheduler cancelTaskRequestWithIdentifier:syncTask];
-  //}
-//}
+      if (!syncFinished) {
+          NSLog(@"BGTask scheduleProcessingTask CANCEL - foreground");
+          char *resp2 = execute("interrupt_sync_after_batch", "true");
+          NSString* respStr2 = [NSString stringWithUTF8String:resp2];
+          NSLog(@"BGTask interrupt syncing %@", respStr2);
+          syncFinished = true;
+      }
+      // cancel bg task
+      if ([bgTask isKindOfClass:[BGProcessingTask class]]) {
+          [bgTask setTaskCompletedWithSuccess:NO];
+      }
+  }
+}
 
 - (void)applicationDidEnterBackground:(UIApplication *)application
 {
   if (@available(iOS 13.0, *)) {
+      bgTask = nil;
+      syncFinished = true;
       NSLog(@"BGTask scheduleBackgroundTask");
       [self scheduleBackgroundTask];
-      NSLog(@"BGTask scheduleShedulerBackgroundTask");
+      NSLog(@"BGTask scheduleSchedulerBackgroundTask");
       [self scheduleSchedulerBackgroundTask];
   }
 }
@@ -173,9 +178,29 @@ static BOOL syncFinished = true;
 
     NSLog(@"BGTask handleProcessingTask sync status BEGIN %i", syncFinished);
     NSInteger prevBatch = -1;
+    NSLog(@"Time Remaining: %f", [[UIApplication sharedApplication] backgroundTimeRemaining]);
+    //NSInteger time = [[UIApplication sharedApplication] backgroundTimeRemaining];
+
+    // when this `time remaing` is cracy big, something wrong in happening.
+    // in my testing this time is always something like 300 seconds. (the famous 5 min).
+
+    if ([UIApplication sharedApplication].backgroundTimeRemaining > 1000000) {
+      //time = 290;
+      // I prefer to end the task directly, and wait for the next scheduled task.
+      char *resp2 = execute("interrupt_sync_after_batch", "true");
+      NSString* respStr2 = [NSString stringWithUTF8String:resp2];
+      NSLog(@"BGTask interrupt syncing %@", respStr2);
+      syncFinished = true;
+      // waiting for sync finish
+      [NSThread sleepForTimeInterval: 5.0];
+      [task setTaskCompletedWithSuccess:NO];
+      return;
+    }
 
     while(!syncFinished) {
       [NSThread sleepForTimeInterval: 2.0];
+      // sleep for 2 seconds before to check the status. 0.1 seconds of running.
+      //time = time - 1.9;
       char *resp = execute("syncstatus", "");
       NSString* respStr = [NSString stringWithUTF8String:resp];
       rust_free(resp);
@@ -206,7 +231,14 @@ static BOOL syncFinished = true;
         NSLog(@"TIME REMAINING ======= %f", [UIApplication sharedApplication].backgroundTimeRemaining);
       }
       prevBatch = batch;
-
+      if ([UIApplication sharedApplication].backgroundTimeRemaining < 10) {
+        char *resp2 = execute("interrupt_sync_after_batch", "true");
+        NSString* respStr2 = [NSString stringWithUTF8String:resp2];
+        NSLog(@"BGTask interrupt syncing %@", respStr2);
+      }
+      if ([UIApplication sharedApplication].backgroundTimeRemaining < 5) {
+        syncFinished = true;
+      }
     }
 
     NSLog(@"BGTask handleProcessingTask sync status END %i", syncFinished);
@@ -284,6 +316,7 @@ static BOOL syncFinished = true;
             return;
         }
         NSLog(@"BGTask BGTaskScheduler.shared.register SYNC called");
+        bgTask = (BGProcessingTask *)task;
         [self startBackgroundTask:(BGProcessingTask *)task];
     }];
     
@@ -303,7 +336,6 @@ static BOOL syncFinished = true;
     NSLog(@"BGTask SCHEDULER registered %d", bcgSchedulerTaskResult);
 }
 
-
 - (void)startBackgroundTask:(BGProcessingTask *)task {
     NSLog(@"BGTask startBackgroundTask called");
     
@@ -321,8 +353,9 @@ static BOOL syncFinished = true;
     NSLog(@"BGTask configureProcessingTask run");
     syncFinished = false;
     [NSThread detachNewThreadSelector:@selector(syncingProcessBackgroundTask:) toTarget:self withObject:nil];
-    [self syncingStatusProcessBackgroundTask:task];
+    [self syncingStatusProcessBackgroundTask:(BGProcessingTask *)task];
 
+    __weak BGTask* weakTask = task;
     task.expirationHandler = ^{
         NSLog(@"BGTask startBackgroundTask expirationHandler called");
         // Stop the syncing because the allocated time is about to expire
@@ -332,6 +365,7 @@ static BOOL syncFinished = true;
         NSLog(@"BGTask interrupt syncing %@", respStr2);
         // maybe I don't need this, because the interrupt command is going to end the sync process ASAP-ish.
         syncFinished = true;
+        [weakTask setTaskCompletedWithSuccess:NO];
     };
 }
 
