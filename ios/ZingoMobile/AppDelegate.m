@@ -112,6 +112,11 @@ static BGProcessingTask *bgTask = nil;
 {
   if (@available(iOS 13.0, *)) {
       syncFinished = true;
+      // cancel bg task (if any)
+      if ([bgTask isKindOfClass:[BGTask class]]) {
+          NSLog(@"BGTask task CANCEL - go to foreground");
+          [bgTask setTaskCompletedWithSuccess:NO];
+      }
       bgTask = nil;
       NSLog(@"BGTask scheduleBackgroundTask");
       [self scheduleBackgroundTask];
@@ -168,21 +173,6 @@ static BGProcessingTask *bgTask = nil;
 
     NSLog(@"BGTask syncingStatusProcessBackgroundTask sync status BEGIN");
     NSInteger prevBatch = -1;
-    NSLog(@"Time Remaining: %f", [[UIApplication sharedApplication] backgroundTimeRemaining]);
-
-    // when this `time remaing` is cracy big, something wrong is happening.
-    // in my testing this time is always something like 300 seconds. (the famous 5 min).
-
-    if ([UIApplication sharedApplication].backgroundTimeRemaining > 1000000) {
-      // I prefer to end the task directly, and wait for the next scheduled task.
-      char *resp2 = execute("interrupt_sync_after_batch", "true");
-      NSString* respStr2 = [NSString stringWithUTF8String:resp2];
-      NSLog(@"BGTask syncingStatusProcessBackgroundTask interrupt syncing %@", respStr2);
-      syncFinished = true;
-      [bgTask setTaskCompletedWithSuccess:NO];
-      bgTask = nil;
-      return;
-    }
 
     while(!syncFinished) {
       [NSThread sleepForTimeInterval: 2.0];
@@ -314,6 +304,17 @@ static BGProcessingTask *bgTask = nil;
     
     if (!isConnectedToWifi) {
         NSLog(@"BGTask startBackgroundTask: not connected to the wifi");
+        [bgTask setTaskCompletedWithSuccess:NO];
+        bgTask = nil;
+        return;
+    }
+
+    // I can check the time remaining here & make a choice
+    // when this `time remaing` is cracy big, something wrong is happening.
+    // in my testing this time is always something like 300 seconds. (the famous 5 min).
+    NSLog(@"BEFORE RUN TASKS - Time Remaining: %f", [[UIApplication sharedApplication] backgroundTimeRemaining]);
+    if ([[UIApplication sharedApplication] backgroundTimeRemaining] > 1000000000) {
+        NSLog(@"BGTask startBackgroundTask: time remainig TOO cracy high %f", [[UIApplication sharedApplication] backgroundTimeRemaining]);
         [bgTask setTaskCompletedWithSuccess:NO];
         bgTask = nil;
         return;
