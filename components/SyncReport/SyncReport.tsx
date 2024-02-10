@@ -219,7 +219,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
             />
           </View>
         )}
-        {background.date > 0 && showBackgroundLegend && (
+        {background.batches > 0 && background.date > 0 && showBackgroundLegend && (
           <View
             style={{
               display: 'flex',

@@ -416,7 +416,7 @@
     "processingblock": "Procesando Bloque: ",
     "totalblocks": " de un TOTAL de Bloques: ",
     "lastbackgroundsync": "ULTIMA SINCRONIZACION EN SEGUNDO PLANO",
-    "batches-date": "Fecha: ",
+    "batches-date": " Lotes en: ",
     "networkstatus": "Estado de la Red (Internet)",
     "nointernet": "Sin conexión a Internet.",
     "cellulardata": "Usando solo Datos del Móvil.",
