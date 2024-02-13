@@ -308,7 +308,7 @@ static BGProcessingTask *bgTask = nil;
     bgTask.expirationHandler = ^{
         NSLog(@"BGTask startBackgroundTask - expirationHandler called");
         // interrupting the sync process, I can't wait to see if the process is over
-        // because I have no time enough to run all of this task
+        // because I have no time enough to run all of this task here.
         char *resp2 = execute("interrupt_sync_after_batch", "true");
         NSString* respStr2 = [NSString stringWithUTF8String:resp2];
         NSLog(@"BGTask startBackgroundTask - expirationHandler interrupt syncing %@", respStr2);
@@ -350,12 +350,12 @@ static BGProcessingTask *bgTask = nil;
     NSDate *earlyMorning = [[NSCalendar currentCalendar] dateByAddingComponents:earlyMorningComponent toDate:tomorrow options:0];
     
     // DEVELOPMENT
-    NSDate *now = [NSDate date];
+    //NSDate *now = [NSDate date];
 
-    NSDate *twoMinutesLater = [now dateByAddingTimeInterval:120]; // 2 minutes = 120 seconds
+    //NSDate *twoMinutesLater = [now dateByAddingTimeInterval:120]; // 2 minutes = 120 seconds
 
-    //request.earliestBeginDate = earlyMorning;
-    request.earliestBeginDate = twoMinutesLater;
+    request.earliestBeginDate = earlyMorning;
+    //request.earliestBeginDate = twoMinutesLater;
     request.requiresExternalPower = YES;
     request.requiresNetworkConnectivity = YES;
     
