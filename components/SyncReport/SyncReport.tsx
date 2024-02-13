@@ -219,7 +219,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
             />
           </View>
         )}
-        {background.batches > 0 && background.date > 0 && showBackgroundLegend && (
+        {background.date > 0 && showBackgroundLegend && (
           <View
             style={{
               display: 'flex',
@@ -230,8 +230,8 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
             <DetailLine
               label={translate('report.lastbackgroundsync') as string}
               value={
-                background.batches.toString() +
-                translate('report.batches-date') +
+                //background.batches.toString() +
+                //translate('report.batches-date') +
                 moment(Number(Number(background.date).toFixed(0)) * 1000).format('YYYY MMM D h:mm a')
               }
             />

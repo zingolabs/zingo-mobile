@@ -34,7 +34,6 @@ static void InitializeFlipper(UIApplication *application) {
 static NSString* syncTask = @"Zingo_Processing_Task_ID";
 static NSString* syncSchedulerTask = @"Zingo_Processing_Scheduler_Task_ID";
 static BOOL isConnectedToWifi = false;
-static BOOL syncFinished = true;
 static BGProcessingTask *bgTask = nil;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
@@ -57,7 +56,7 @@ static BGProcessingTask *bgTask = nil;
   [self.window makeKeyAndVisible];
 
   if (@available(iOS 13.0, *)) {
-      NSLog(@"BGTask handle background task");
+      NSLog(@"BGTask handleBackgroundTask");
       [self handleBackgroundTask];
   }
 
@@ -91,145 +90,124 @@ static BGProcessingTask *bgTask = nil;
 - (void)applicationWillEnterForeground:(UIApplication *)application
 {
   if (@available(iOS 13.0, *)) {
-      // cancel existing sync background process.
-      if (!syncFinished) {
-          NSLog(@"BGTask sync CANCEL - go to foreground");
-          char *resp2 = execute("interrupt_sync_after_batch", "true");
-          NSString* respStr2 = [NSString stringWithUTF8String:resp2];
-          NSLog(@"BGTask foreground interrupt syncing %@", respStr2);
-      }
-      syncFinished = true;
+      // cancel existing sync process (if any).
+      NSLog(@"BGTask foreground");
+      [self stopSyncingProcess:nil];
+
       // cancel bg task
       if ([bgTask isKindOfClass:[BGTask class]]) {
-          NSLog(@"BGTask task CANCEL - go to foreground");
-          [bgTask setTaskCompletedWithSuccess:NO];
-      }
-      bgTask = nil;
+           NSLog(@"BGTask foreground - sync task CANCEL");
+           [bgTask setTaskCompletedWithSuccess:NO];
+       }
+       bgTask = nil;
   }
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application
 {
   if (@available(iOS 13.0, *)) {
-      syncFinished = true;
-      // cancel bg task (if any)
+      // cancel existing sync process (if any).
+      NSLog(@"BGTask background");
+      [self stopSyncingProcess:nil];
+      
+      // cancel bg task
       if ([bgTask isKindOfClass:[BGTask class]]) {
-          NSLog(@"BGTask task CANCEL - go to foreground");
+          NSLog(@"BGTask background - sync task CANCEL");
           [bgTask setTaskCompletedWithSuccess:NO];
       }
       bgTask = nil;
-      NSLog(@"BGTask scheduleBackgroundTask");
+
+      NSLog(@"BGTask background - scheduleBackgroundTask");
       [self scheduleBackgroundTask];
-      NSLog(@"BGTask scheduleSchedulerBackgroundTask");
+      NSLog(@"BGTask background - scheduleSchedulerBackgroundTask");
       [self scheduleSchedulerBackgroundTask];
   }
 }
 
+-(void)stopSyncingProcess:(NSString *)noValue {
+  // if the in_progress from syncstatus is true
+  // there is a sync progress running somehow
+  // we need to stop it and the only tool I have is
+  // using the `interrupting` sync flag...
+  // and waiting for the end.
+  @autoreleasepool {
+
+    NSLog(@"BGTask stopSyncingProcess");
+    char *resp = execute("syncstatus", "");
+    NSString* respStr = [NSString stringWithUTF8String:resp];
+    rust_free(resp);
+    NSLog(@"BGTask stopSyncingProcess - status response %@", respStr);
+
+    NSData *data = [respStr dataUsingEncoding:NSUTF8StringEncoding];
+    id jsonResp = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+    NSString *inProgressStr = [jsonResp valueForKey:@"in_progress"];
+    BOOL inProgress = [inProgressStr boolValue];
+
+    while(inProgress) {
+      char *resp2 = execute("interrupt_sync_after_batch", "true");
+      NSString* respStr2 = [NSString stringWithUTF8String:resp2];
+      NSLog(@"BGTask stopSyncingProcess - interrupt syncing %@", respStr2);
+
+      [NSThread sleepForTimeInterval: 0.5];
+
+      char *resp = execute("syncstatus", "");
+      NSString* respStr = [NSString stringWithUTF8String:resp];
+      rust_free(resp);
+      NSLog(@"BGTask stopSyncingProcess - status response %@", respStr);
+
+      NSData *data = [respStr dataUsingEncoding:NSUTF8StringEncoding];
+      id jsonResp = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+      NSString *inProgressStr = [jsonResp valueForKey:@"in_progress"];
+      inProgress = [inProgressStr boolValue];
+    }
+
+    NSLog(@"BGTask stopSyncingProcess - syncing process STOPPED");
+
+  }
+
+}
 
 -(void)syncingProcessBackgroundTask:(NSString *)noValue {
   //do things with task
   @autoreleasepool {
-
-    syncFinished = false;
     
+    NSLog(@"BGTask syncingProcessBackgroundTask");
     BOOL exists = [self wallet__exists];
 
     if (exists) {
+      // stop syncing first, just in case.
+      [self stopSyncingProcess:nil];
 
       // we need to sync without interruption, I run this just in case
       char *resp = execute("interrupt_sync_after_batch", "false");
       NSString* respStr = [NSString stringWithUTF8String:resp];
-      NSLog(@"BGTask syncingProcessBackgroundTask no interrupt syncing %@", respStr);
+      NSLog(@"BGTask syncingProcessBackgroundTask - no interrupt syncing %@", respStr);
       rust_free(resp);
 
       // the task is running here blocking this execution until this process finished:
       // 1. finished the syncing.
       // 2. interrupted by a flag then it finished the current batch.
 
-      NSLog(@"BGTask syncingProcessBackgroundTask sync BEGIN");
+      NSLog(@"BGTask syncingProcessBackgroundTask - sync BEGIN");
 
       char *resp2 = execute("sync", "");
       NSString* respStr2 = [NSString stringWithUTF8String:resp2];
       rust_free(resp2);
 
-      NSLog(@"BGTask syncingProcessBackgroundTask sync END %@", respStr2);
-      
-      syncFinished = true;
+      NSLog(@"BGTask syncingProcessBackgroundTask - sync END %@", respStr2);
 
     } else {
       
-      NSLog(@"BGTask syncingProcessBackgroundTask No exists wallet file END");
-      
-      syncFinished = true;
+      NSLog(@"BGTask syncingProcessBackgroundTask - No exists wallet file END");
 
     }
 
   }
 
-}
+  NSLog(@"BGTask syncingProcessBackgroundTask - syncing task STOPPED");
+  [bgTask setTaskCompletedWithSuccess:YES];
+  bgTask = nil;  
 
--(void)syncingStatusProcessBackgroundTask:(NSString *)noValue {
-  @autoreleasepool {
-
-    NSLog(@"BGTask syncingStatusProcessBackgroundTask sync status BEGIN");
-    NSInteger prevBatch = -1;
-
-    while(!syncFinished) {
-      [NSThread sleepForTimeInterval: 2.0];
-      char *resp = execute("syncstatus", "");
-      NSString* respStr = [NSString stringWithUTF8String:resp];
-      rust_free(resp);
-      NSLog(@"BGTask syncingStatusProcessBackgroundTask sync status response %@", respStr);
-
-      NSData *data = [respStr dataUsingEncoding:NSUTF8StringEncoding];
-      id jsonResp = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-      NSString *batchStr = [jsonResp valueForKey:@"batch_num"];
-      NSInteger batch = [batchStr integerValue];
-      BOOL progress = [jsonResp valueForKey:@"in_progress"];
-
-      NSLog(@"BGTask syncingStatusProcessBackgroundTask batch number %@", batchStr);
-
-      if (prevBatch != -1 && batch > 0 && prevBatch != batch) {
-        // save the wallet
-        RPCModule *rpcmodule = [RPCModule new];
-        [rpcmodule saveWalletInternal];
-
-        // save info in background json
-        NSTimeInterval timeStamp = [[NSDate date] timeIntervalSince1970];
-        // NSTimeInterval is defined as double
-        NSNumber *timeStampObj = [NSNumber numberWithDouble: timeStamp];
-        NSString *timeStampStr = [timeStampObj stringValue];
-        NSString *jsonBackgroud = [NSString stringWithFormat: @"%@%@%@%@%@", @"{\"batches\": \"", batchStr, @"\", \"date\": \"", timeStampStr, @"\"}"];
-        [rpcmodule saveBackgroundFile:jsonBackgroud];
-
-        NSLog(@"BGTask syncingStatusProcessBackgroundTask save wallet & background batch %@ progress %i", batchStr, progress);
-        NSLog(@"TIME REMAINING ======= %f", [UIApplication sharedApplication].backgroundTimeRemaining);
-      }
-      prevBatch = batch;
-      if ([UIApplication sharedApplication].backgroundTimeRemaining < 10) {
-        NSLog(@"BGTask syncingStatusProcessBackgroundTask less than 10 secs");
-        char *resp2 = execute("interrupt_sync_after_batch", "true");
-        NSString* respStr2 = [NSString stringWithUTF8String:resp2];
-        NSLog(@"BGTask syncingStatusProcessBackgroundTask interrupt syncing %@", respStr2);
-      }
-      if ([UIApplication sharedApplication].backgroundTimeRemaining < 5) {
-        NSLog(@"BGTask syncingStatusProcessBackgroundTask less than 5 secs");
-        syncFinished = true;
-      }
-    }
-
-    NSLog(@"BGTask syncingStatusProcessBackgroundTask sync status END %i", syncFinished);
-
-    // I need to end the Task ASAP
-    [bgTask setTaskCompletedWithSuccess:YES];
-    bgTask = nil;
-    
-    // we don't want to save if the sync is finished:
-    // 1. OS kill the task -> to save is dangerous.
-    // 2. When the App go to foreground -> same.
-    // 3. If sync is finished -> the wallet is already saved.
-
-  }
 }
 
 -(BOOL)wallet__exists {
@@ -322,23 +300,36 @@ static BGProcessingTask *bgTask = nil;
     
     // Start the syncing
     NSLog(@"BGTask startBackgroundTask run sync task");
-    syncFinished = false;
-    [NSThread detachNewThreadSelector:@selector(syncingProcessBackgroundTask:) toTarget:self withObject:nil];
-    [self syncingStatusProcessBackgroundTask:nil];
+    // in order to run only one task
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_BACKGROUND, 0), ^{
+      [self syncingProcessBackgroundTask:nil];
+    });
 
-    // this trigger doesn't work, but if in some point works
-    // it finish the task properly.
-    __weak BGTask* weakTask = bgTask;
     bgTask.expirationHandler = ^{
-        NSLog(@"BGTask startBackgroundTask expirationHandler called");
-        // Stop the syncing because the allocated time is about to expire
-        NSLog(@"BGTask startBackgroundTask CANCEL - is about to expire");
+        NSLog(@"BGTask startBackgroundTask - expirationHandler called");
+        // interrupting the sync process, I can't wait to see if the process is over
+        // because I have no time enough to run all of this task
         char *resp2 = execute("interrupt_sync_after_batch", "true");
         NSString* respStr2 = [NSString stringWithUTF8String:resp2];
-        NSLog(@"BGTask startBackgroundTask interrupt syncing %@", respStr2);
-        syncFinished = true;
-        [weakTask setTaskCompletedWithSuccess:NO];
+        NSLog(@"BGTask startBackgroundTask - expirationHandler interrupt syncing %@", respStr2);
+
+        // save the wallet
+        RPCModule *rpcmodule = [RPCModule new];
+        [rpcmodule saveWalletInternal];
+        NSLog(@"BGTask startBackgroundTask - expirationHandler Save Wallet");
+
+        // save info in background json
+        NSTimeInterval timeStamp = [[NSDate date] timeIntervalSince1970];
+        // NSTimeInterval is defined as double
+        NSNumber *timeStampObj = [NSNumber numberWithDouble: timeStamp];
+        NSString *timeStampStr = [timeStampObj stringValue];
+        NSString *jsonBackgroud = [NSString stringWithFormat: @"%@%@%@%@%@", @"{\"batches\": \"", @"0", @"\", \"date\": \"", timeStampStr, @"\"}"];
+        [rpcmodule saveBackgroundFile:jsonBackgroud];
+        NSLog(@"BGTask startBackgroundTask - expirationHandler Save background JSON");
+
+        [bgTask setTaskCompletedWithSuccess:NO];
         bgTask = nil;
+        NSLog(@"BGTask startBackgroundTask - expirationHandler THE END");
     };
 }
 
@@ -359,12 +350,12 @@ static BGProcessingTask *bgTask = nil;
     NSDate *earlyMorning = [[NSCalendar currentCalendar] dateByAddingComponents:earlyMorningComponent toDate:tomorrow options:0];
     
     // DEVELOPMENT
-    //NSDate *now = [NSDate date];
+    NSDate *now = [NSDate date];
 
-    //NSDate *twoMinutesLater = [now dateByAddingTimeInterval:120]; // 2 minutes = 120 seconds
+    NSDate *twoMinutesLater = [now dateByAddingTimeInterval:120]; // 2 minutes = 120 seconds
 
-    request.earliestBeginDate = earlyMorning;
-    //request.earliestBeginDate = twoMinutesLater;
+    //request.earliestBeginDate = earlyMorning;
+    request.earliestBeginDate = twoMinutesLater;
     request.requiresExternalPower = YES;
     request.requiresNetworkConnectivity = YES;
     
