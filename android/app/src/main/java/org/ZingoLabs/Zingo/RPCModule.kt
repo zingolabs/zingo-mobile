@@ -17,9 +17,15 @@ import kotlin.concurrent.thread
 
 
 class RPCModule internal constructor(private val reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
-    //companion object {
-    //    const val TAG = "RPCModule"
-    //}
+    companion object {
+        fun saveWallet() {
+            saveWallet()
+        }
+
+        fun saveBackgroundFile(json: String) {
+            saveBackgroundFile(json)
+        }
+    }
 
     override fun getName(): String {
         return "RPCModule"
@@ -266,7 +272,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         promise.resolve(true)
     }
 
-    private fun saveWallet() {
+    fun saveWallet() {
         // Get the encoded wallet file
         val b64encoded = RustFFI.save()
         // Log.w("MAIN", b64encoded)
@@ -303,6 +309,22 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             file?.close()
         } catch (e: IllegalArgumentException) {
             Log.e("MAIN", "Couldn't save the wallet backup")
+        }
+    }
+
+    fun saveBackgroundFile(json: String) {
+        // Log.w("MAIN", b64encoded)
+
+        try {
+            val fileBytes: ByteArray = json.toByteArray()
+            Log.w("MAIN", "file background size: ${fileBytes.size} bytes")
+
+            // Save file to disk
+            val file = MainApplication.getAppContext()?.openFileOutput("background.json", Context.MODE_PRIVATE)
+            file?.write(fileBytes)
+            file?.close()
+        } catch (e: IllegalArgumentException) {
+            Log.e("MAIN", "Couldn't save the background file")
         }
     }
 
