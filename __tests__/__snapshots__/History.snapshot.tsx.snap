@@ -255,6 +255,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                 "padding": 0,
               }
             }
+            testID="header.total-balance"
           >
             <RNSVGSvgView
               align="xMidYMid"
@@ -1552,6 +1553,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                 "padding": 0,
               }
             }
+            testID="header.total-balance"
           >
             <RNSVGSvgView
               align="xMidYMid"
@@ -1641,7 +1643,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                   "padding": 0,
                 }
               }
-              testID="undefined.big-part"
+              testID="header.total-balance.big-part"
             >
                1.1234
             </Text>
@@ -1655,7 +1657,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                   "padding": 0,
                 }
               }
-              testID="undefined.small-part"
+              testID="header.total-balance.small-part"
             >
               5678
             </Text>

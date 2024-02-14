@@ -124,6 +124,7 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
               "padding": 0,
             }
           }
+          testID="header.total-balance"
         >
           <RNSVGSvgView
             align="xMidYMid"
@@ -213,7 +214,7 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
                 "padding": 0,
               }
             }
-            testID="undefined.big-part"
+            testID="header.total-balance.big-part"
           >
              1.1234
           </Text>
@@ -227,7 +228,7 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
                 "padding": 0,
               }
             }
-            testID="undefined.small-part"
+            testID="header.total-balance.small-part"
           >
             5678
           </Text>

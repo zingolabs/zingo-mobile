@@ -365,7 +365,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   minHeight: 25,
                 }}>
                 {!syncingStatus.inProgress && syncingStatus.lastBlockServer === syncingStatus.lastBlockWallet && (
-                  <View style={{ margin: 0, padding: 0 }}>
+                  <View testID="header.sync-facheck" style={{ margin: 0, padding: 0 }}>
                     <FontAwesomeIcon icon={faCheck} color={colors.primary} size={20} />
                   </View>
                 )}
@@ -511,6 +511,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             marginTop: readOnly ? 15 : 0,
           }}>
           <ZecAmount
+            testID="header.total-balance"
             currencyName={info.currencyName ? info.currencyName : ''}
             color={colors.text}
             size={36}
