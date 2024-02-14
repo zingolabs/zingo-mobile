@@ -298,6 +298,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     this.appstate = AppState.addEventListener('change', async nextAppState => {
       if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
         //console.log('App has come to the foreground!');
+        // deactivate the interruption sync flag
+        await RPC.rpc_setInterruptSyncAfterBatch('false');
         // reading background task info
         if (Platform.OS === 'ios') {
           // this file only exists in IOS BS.
