@@ -301,10 +301,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
         // deactivate the interruption sync flag
         await RPC.rpc_setInterruptSyncAfterBatch('false');
         // reading background task info
-        if (Platform.OS === 'ios') {
-          // this file only exists in IOS BS.
-          await this.fetchBackgroundSyncing();
-        }
+        await this.fetchBackgroundSyncing();
         // setting value for background task Android
         await AsyncStorage.setItem('@background', 'no');
         //console.log('background no in storage');

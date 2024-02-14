@@ -357,10 +357,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
       if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
         //console.log('App has come to the foreground!');
         // reading background task info
-        if (Platform.OS === 'ios') {
-          // this file only exists in IOS BS.
-          this.fetchBackgroundSyncing();
-        }
+        this.fetchBackgroundSyncing();
         // setting value for background task Android
         await AsyncStorage.setItem('@background', 'no');
         if (this.state.backgroundError && (this.state.backgroundError.title || this.state.backgroundError.error)) {
@@ -420,11 +417,9 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
   };
 
   fetchBackgroundSyncing = async () => {
-    const backgroundJson = await BackgroundFileImpl.readBackground();
+    const backgroundJson: BackgroundType = await BackgroundFileImpl.readBackground();
     if (backgroundJson) {
-      this.setState({
-        background: backgroundJson,
-      });
+      this.setState({ background: backgroundJson });
     }
   };
 
