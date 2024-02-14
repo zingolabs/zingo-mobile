@@ -18,6 +18,7 @@
   "restarting": "Error conectando con el servidor, la Aplicación se reiniciará en breves segundos.",
   "change-privacy": "Nueva Política de Privacidad: ",
   "change-privacy-legend": ".\nPulsar para revelar los valores ocultos.",
+  "txtcopied": "Texto copiado al Portapapeles",
   "insight": {
     "title": "Visión Financiera",
     "no-data": "No hay datos en tu Monedero que concuerden con el gráfico seleccionado.",

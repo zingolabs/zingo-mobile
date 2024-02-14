@@ -176,18 +176,36 @@ exports[`Component Info - test Info - snapshot 1`] = `
               }
             }
           />
-          <Text
+          <View
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
             style={
               {
-                "color": "rgb(28, 28, 30)",
-                "fontSize": 18,
-                "fontWeight": "600",
                 "opacity": 1,
               }
             }
           >
-            translated text translated text
-          </Text>
+            <Text
+              style={
+                {
+                  "color": "rgb(28, 28, 30)",
+                  "fontSize": 18,
+                  "fontWeight": "600",
+                  "opacity": 1,
+                }
+              }
+            >
+              translated text translated text
+            </Text>
+          </View>
         </View>
         <View
           style={
@@ -214,18 +232,36 @@ exports[`Component Info - test Info - snapshot 1`] = `
               }
             }
           />
-          <Text
+          <View
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
             style={
               {
-                "color": "rgb(28, 28, 30)",
-                "fontSize": 18,
-                "fontWeight": "600",
                 "opacity": 1,
               }
             }
           >
-            mob-release...
-          </Text>
+            <Text
+              style={
+                {
+                  "color": "rgb(28, 28, 30)",
+                  "fontSize": 18,
+                  "fontWeight": "600",
+                  "opacity": 1,
+                }
+              }
+            >
+              3.3.3.0
+            </Text>
+          </View>
         </View>
         <View
           style={
@@ -252,18 +288,36 @@ exports[`Component Info - test Info - snapshot 1`] = `
               }
             }
           />
-          <Text
+          <View
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
             style={
               {
-                "color": "rgb(28, 28, 30)",
-                "fontSize": 18,
-                "fontWeight": "600",
                 "opacity": 1,
               }
             }
           >
-            3.3.3.0
-          </Text>
+            <Text
+              style={
+                {
+                  "color": "rgb(28, 28, 30)",
+                  "fontSize": 18,
+                  "fontWeight": "600",
+                  "opacity": 1,
+                }
+              }
+            >
+              https://zcash.es
+            </Text>
+          </View>
         </View>
         <View
           style={
@@ -290,18 +344,36 @@ exports[`Component Info - test Info - snapshot 1`] = `
               }
             }
           />
-          <Text
+          <View
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
             style={
               {
-                "color": "rgb(28, 28, 30)",
-                "fontSize": 18,
-                "fontWeight": "600",
                 "opacity": 1,
               }
             }
           >
-            https://zcash.es
-          </Text>
+            <Text
+              style={
+                {
+                  "color": "rgb(28, 28, 30)",
+                  "fontSize": 18,
+                  "fontWeight": "600",
+                  "opacity": 1,
+                }
+              }
+            >
+              Mainnet
+            </Text>
+          </View>
         </View>
         <View
           style={
@@ -328,56 +400,36 @@ exports[`Component Info - test Info - snapshot 1`] = `
               }
             }
           />
-          <Text
-            style={
-              {
-                "color": "rgb(28, 28, 30)",
-                "fontSize": 18,
-                "fontWeight": "600",
-                "opacity": 1,
-              }
-            }
-          >
-            Mainnet
-          </Text>
-        </View>
-        <View
-          style={
-            {
-              "display": "flex",
-              "marginTop": 20,
-            }
-          }
-        >
-          <Text
-            style={
-              {
-                "color": "rgb(28, 28, 30)",
-                "opacity": 0.65,
-              }
-            }
-          >
-            translated text
-          </Text>
           <View
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
             style={
               {
-                "width": 10,
-              }
-            }
-          />
-          <Text
-            style={
-              {
-                "color": "rgb(28, 28, 30)",
-                "fontSize": 18,
-                "fontWeight": "600",
                 "opacity": 1,
               }
             }
           >
-            2000100
-          </Text>
+            <Text
+              style={
+                {
+                  "color": "rgb(28, 28, 30)",
+                  "fontSize": 18,
+                  "fontWeight": "600",
+                  "opacity": 1,
+                }
+              }
+            >
+              2000100
+            </Text>
+          </View>
         </View>
       </View>
     </View>
