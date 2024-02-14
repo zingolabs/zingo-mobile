@@ -1,6 +1,7 @@
 import RPCModule from './RPCModule';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo, { NetInfoStateType } from '@react-native-community/netinfo';
+import notifee from '@notifee/react-native';
 import { RPCSyncStatusType } from './rpc/types/RPCSyncStatusType';
 
 const BackgroundSync = async (task_data: any) => {
@@ -94,6 +95,17 @@ const BackgroundSync = async (task_data: any) => {
         //console.log('BS: saving...');
         // update batch_num with the new value, otherwise never change
         batch_num = ss.batch_num;
+
+        console.log('BS: channel id is:', task_data.channelId);
+
+        await notifee.displayNotification({
+          // Needs to match SERVICE_NOTIFICATION_ID in BackgroundSync.kt
+          // TODO: Unify constants between Kotlin and TypeScript
+          id: task_data.notifId.toString(),
+          body: 'Batch ' + batch_num + ' of ' + ss.batch_total,
+          title: 'Zingo Sync',
+          android: { channelId: task_data.channelId },
+        });
       }
     }, 5000);
 
