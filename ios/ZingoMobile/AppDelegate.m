@@ -175,8 +175,19 @@ static BGProcessingTask *bgTask = nil;
     BOOL exists = [self wallet__exists];
 
     if (exists) {
-      // stop syncing first, just in case.
-      [self stopSyncingProcess:nil];
+      // check the Server, because the task can run without the App.
+      char *bal = execute("balance", "");
+      NSString* balStr = [NSString stringWithUTF8String:bal];
+      NSLog(@"BGTask syncingProcessBackgroundTask - testing if server is active %@", balStr);
+      rust_free(bal);
+      if ([balStr hasPrefix:@"Error"]) {
+        // this means this task is running with the App closed
+        [self loadWalletFile:nil];
+      } else {
+        // this means the App is open,
+        // stop syncing first, just in case.
+        [self stopSyncingProcess:nil];
+      }
 
       // we need to sync without interruption, I run this just in case
       char *resp = execute("interrupt_sync_after_batch", "false");
@@ -202,12 +213,37 @@ static BGProcessingTask *bgTask = nil;
 
     }
 
+    NSLog(@"BGTask syncingProcessBackgroundTask - syncing task STOPPED");
+    [bgTask setTaskCompletedWithSuccess:YES];
+    bgTask = nil;
   }
 
-  NSLog(@"BGTask syncingProcessBackgroundTask - syncing task STOPPED");
-  [bgTask setTaskCompletedWithSuccess:YES];
-  bgTask = nil;  
+}
 
+-(void)loadWalletFile:(NSString *)noValue {
+  
+  @autoreleasepool {
+    
+      NSArray *paths = NSSearchPathForDirectoriesInDomains
+                      (NSDocumentDirectory, NSUserDomainMask, YES);
+      NSString *documentsDirectory = [paths objectAtIndex:0];
+
+      NSString *fileName = [NSString stringWithFormat:@"%@/settings.json",
+                                                    documentsDirectory];
+      NSString *content = [[NSString alloc] initWithContentsOfFile:fileName
+                                                    usedEncoding:nil
+                                                           error:nil];
+      NSData *contentData = [content dataUsingEncoding:NSUTF8StringEncoding];
+      NSDictionary *jsonObject = [NSJSONSerialization JSONObjectWithData:contentData options:kNilOptions error:nil];
+    
+      NSString *server = jsonObject[@"server"][@"uri"];
+      NSString *chainhint = jsonObject[@"server"][@"chain_name"];
+    
+      NSLog(@"Opening the wallet file - No App active - server: %@ chain: %@", server, chainhint);
+      RPCModule *rpcmodule = [RPCModule new];
+      [rpcmodule loadExistingWallet:server chainhint:chainhint];
+  }
+  
 }
 
 -(BOOL)wallet__exists {
