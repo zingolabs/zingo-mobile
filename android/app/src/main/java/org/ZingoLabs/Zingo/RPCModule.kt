@@ -3,7 +3,6 @@ package org.ZingoLabs.Zingo
 import android.content.Context
 import android.util.Log
 import android.util.Base64
-import androidx.work.PeriodicWorkRequest
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
@@ -12,21 +11,10 @@ import com.facebook.react.bridge.Promise
 //import android.util.Log
 import java.io.File
 import java.io.InputStream
-import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
 
 class RPCModule internal constructor(private val reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
-    companion object {
-        fun saveWallet() {
-            saveWallet()
-        }
-
-        fun saveBackgroundFile(json: String) {
-            saveBackgroundFile(json)
-        }
-    }
-
     override fun getName(): String {
         return "RPCModule"
     }
@@ -108,13 +96,17 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun loadExistingWallet(server: String, chainhint: String, promise: Promise) {
+        promise.resolve(loadExistingWalletNative(server, chainhint))
+    }
+
+    fun loadExistingWalletNative(server: String, chainhint: String): String {
         // Read the file
         val file: InputStream = MainApplication.getAppContext()?.openFileInput("wallet.dat")!!
         var fileBytes = file.readBytes()
         file.close()
 
-        val middle0w =        0
-        val middle1w =  6000000 // 6_000_000 - 8 pieces
+        val middle0w = 0
+        val middle1w = 6000000 // 6_000_000 - 8 pieces
         val middle2w = 12000000
         val middle3w = 18000000
         val middle4w = 24000000
@@ -125,34 +117,139 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
         var fileb64 = StringBuilder("")
         if (middle8w <= middle1w) {
-            fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle0w, middle8w - middle0w, Base64.NO_WRAP))
+            fileb64 = fileb64.append(
+                Base64.encodeToString(
+                    fileBytes,
+                    middle0w,
+                    middle8w - middle0w,
+                    Base64.NO_WRAP
+                )
+            )
         } else {
-            fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle0w, middle1w - middle0w, Base64.NO_WRAP))
+            fileb64 = fileb64.append(
+                Base64.encodeToString(
+                    fileBytes,
+                    middle0w,
+                    middle1w - middle0w,
+                    Base64.NO_WRAP
+                )
+            )
             if (middle8w <= middle2w) {
-                fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle1w, middle8w - middle1w, Base64.NO_WRAP))
+                fileb64 = fileb64.append(
+                    Base64.encodeToString(
+                        fileBytes,
+                        middle1w,
+                        middle8w - middle1w,
+                        Base64.NO_WRAP
+                    )
+                )
             } else {
-                fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle1w, middle2w - middle1w, Base64.NO_WRAP))
+                fileb64 = fileb64.append(
+                    Base64.encodeToString(
+                        fileBytes,
+                        middle1w,
+                        middle2w - middle1w,
+                        Base64.NO_WRAP
+                    )
+                )
                 if (middle8w <= middle3w) {
-                    fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle2w, middle8w - middle2w, Base64.NO_WRAP))
+                    fileb64 = fileb64.append(
+                        Base64.encodeToString(
+                            fileBytes,
+                            middle2w,
+                            middle8w - middle2w,
+                            Base64.NO_WRAP
+                        )
+                    )
                 } else {
-                    fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle2w, middle3w - middle2w, Base64.NO_WRAP))
+                    fileb64 = fileb64.append(
+                        Base64.encodeToString(
+                            fileBytes,
+                            middle2w,
+                            middle3w - middle2w,
+                            Base64.NO_WRAP
+                        )
+                    )
                     if (middle8w <= middle4w) {
-                        fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle3w, middle8w - middle3w, Base64.NO_WRAP))
+                        fileb64 = fileb64.append(
+                            Base64.encodeToString(
+                                fileBytes,
+                                middle3w,
+                                middle8w - middle3w,
+                                Base64.NO_WRAP
+                            )
+                        )
                     } else {
-                        fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle3w, middle4w - middle3w, Base64.NO_WRAP))
+                        fileb64 = fileb64.append(
+                            Base64.encodeToString(
+                                fileBytes,
+                                middle3w,
+                                middle4w - middle3w,
+                                Base64.NO_WRAP
+                            )
+                        )
                         if (middle8w <= middle5w) {
-                            fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle4w, middle8w - middle4w, Base64.NO_WRAP))
+                            fileb64 = fileb64.append(
+                                Base64.encodeToString(
+                                    fileBytes,
+                                    middle4w,
+                                    middle8w - middle4w,
+                                    Base64.NO_WRAP
+                                )
+                            )
                         } else {
-                            fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle4w, middle5w - middle4w, Base64.NO_WRAP))
+                            fileb64 = fileb64.append(
+                                Base64.encodeToString(
+                                    fileBytes,
+                                    middle4w,
+                                    middle5w - middle4w,
+                                    Base64.NO_WRAP
+                                )
+                            )
                             if (middle8w <= middle6w) {
-                                fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle5w, middle8w - middle5w, Base64.NO_WRAP))
+                                fileb64 = fileb64.append(
+                                    Base64.encodeToString(
+                                        fileBytes,
+                                        middle5w,
+                                        middle8w - middle5w,
+                                        Base64.NO_WRAP
+                                    )
+                                )
                             } else {
-                                fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle5w, middle6w - middle5w, Base64.NO_WRAP))
+                                fileb64 = fileb64.append(
+                                    Base64.encodeToString(
+                                        fileBytes,
+                                        middle5w,
+                                        middle6w - middle5w,
+                                        Base64.NO_WRAP
+                                    )
+                                )
                                 if (middle8w <= middle7w) {
-                                    fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle6w, middle8w - middle6w, Base64.NO_WRAP))
+                                    fileb64 = fileb64.append(
+                                        Base64.encodeToString(
+                                            fileBytes,
+                                            middle6w,
+                                            middle8w - middle6w,
+                                            Base64.NO_WRAP
+                                        )
+                                    )
                                 } else {
-                                    fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle6w, middle7w - middle6w, Base64.NO_WRAP))
-                                    fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle7w, middle8w - middle7w, Base64.NO_WRAP))
+                                    fileb64 = fileb64.append(
+                                        Base64.encodeToString(
+                                            fileBytes,
+                                            middle6w,
+                                            middle7w - middle6w,
+                                            Base64.NO_WRAP
+                                        )
+                                    )
+                                    fileb64 = fileb64.append(
+                                        Base64.encodeToString(
+                                            fileBytes,
+                                            middle7w,
+                                            middle8w - middle7w,
+                                            Base64.NO_WRAP
+                                        )
+                                    )
                                 }
                             }
                         }
@@ -163,13 +260,14 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
         RustFFI.initlogging()
 
-        val wseed = RustFFI.initfromb64(server,
-            fileb64.toString(),
-            reactContext.applicationContext.filesDir.absolutePath,
-            chainhint, "true")
         // Log.w("MAIN", wseed)
 
-        promise.resolve(wseed)
+        return RustFFI.initfromb64(
+            server,
+            fileb64.toString(),
+            reactContext.applicationContext.filesDir.absolutePath,
+            chainhint, "true"
+        )
     }
 
     @ReactMethod

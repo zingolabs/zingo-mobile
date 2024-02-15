@@ -7,27 +7,40 @@ import android.util.Log
 import java.io.File
 import java.util.*
 import org.json.JSONObject
+import java.io.InputStream
 import java.nio.charset.StandardCharsets
+import com.facebook.react.bridge.ReactApplicationContext
 
 class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {
 
     override fun doWork(): Result {
+        val reactContext = ReactApplicationContext(MainApplication.getAppContext())
+        val rpcModule = RPCModule(reactContext)
+
         Log.w("SCHEDULED_TASK_RUN", "Task running")
 
         // checking if the wallet file exists
         val exits: Boolean = walletExists()
 
         if (exits) {
-            // stop syncing first, just in case.
-            stopSyncingProcess()
+            // check the Server, because the task can run without the App.
+            val balance = RustFFI.execute("balance", "")
+            Log.w("SCHEDULED_TASK_RUN", "Testing if server is active: $balance")
+            if (balance.lowercase().startsWith("error")) {
+                // this means this task is running with the App closed
+                loadWalletFile(rpcModule)
+            } else {
+                // this means the App is open,
+                // stop syncing first, just in case.
+                stopSyncingProcess()
+            }
 
-            // interrupt
+            // interrupt sync to false, just in case it is true.
             val resp = RustFFI.execute("interrupt_sync_after_batch", "false")
             Log.w("SCHEDULED_TASK_RUN", "Not interrupting sync: $resp")
 
             // the task is running here blocking this execution until this process finished:
             // 1. finished the syncing.
-            // 2. interrupted by a flag then it finished the current batch.
 
             Log.w("SCHEDULED_TASK_RUN", "sync BEGIN")
             val resp2 = RustFFI.execute("sync", "")
@@ -39,25 +52,41 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
 
         }
 
-        // save the wallet file
-        RPCModule.saveWallet()
+        // save the wallet file with the new data from the sync process
+        rpcModule.saveWallet()
+        Log.w("SCHEDULED_TASK_RUN", "wallet file SAVED")
 
         // save the background JSON file
-        val timeStamp = Date().time
+        val timeStamp = Date().time / 1000
         val timeStampStr = timeStamp.toString()
         val jsonBackground = "{\"batches\": \"0\", \"date\": \"$timeStampStr\"}"
-        RPCModule.saveBackgroundFile(jsonBackground)
+        rpcModule.saveBackgroundFile(jsonBackground)
+        Log.w("SCHEDULED_TASK_RUN", "background json file SAVED")
 
         return Result.success()
     }
 
+    private fun loadWalletFile(rpcModule: RPCModule) {
+        // I have to init from wallet file in order to do the sync
+        // and I need to read the settings.json to find the server & chain type
+        val file: InputStream = MainApplication.getAppContext()?.openFileInput("settings.json")!!
+        val settingsBytes = file.readBytes()
+        file.close()
+        val settingsString = settingsBytes.toString(Charsets.UTF_8)
+        val jsonObject = JSONObject(settingsString)
+        val server = jsonObject.getJSONObject("server").getString("uri")
+        val chainhint = jsonObject.getJSONObject("server").getString("chain_name")
+        Log.w("SCHEDULED_TASK_RUN", "Opening the wallet file - No App active - server: $server chain: $chainhint")
+        rpcModule.loadExistingWalletNative(server, chainhint)
+    }
+
     private fun stopSyncingProcess() {
         val resp = RustFFI.execute("syncstatus", "")
-        Log.d("TAG", "BGTask stopSyncingProcess - status response $resp")
+        Log.w("SCHEDULED_TASK_RUN", "status response $resp")
 
-        val data: ByteArray = resp.toByteArray(StandardCharsets.UTF_8)
-        val jsonResp = JSONObject(String(data, StandardCharsets.UTF_8))
-        val inProgressStr: String = jsonResp.optString("in_progress")
+        var data: ByteArray = resp.toByteArray(StandardCharsets.UTF_8)
+        var jsonResp = JSONObject(String(data, StandardCharsets.UTF_8))
+        var inProgressStr: String = jsonResp.optString("in_progress")
         var inProgress: Boolean = inProgressStr.toBoolean()
 
         while (inProgress) {
@@ -68,11 +97,11 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
             Thread.sleep(500)
 
             val resp3 = RustFFI.execute("syncstatus", "")
-            Log.d("TAG", "BGTask stopSyncingProcess - status response $resp3")
+            Log.w("SCHEDULED_TASK_RUN", "status response $resp3")
 
-            val data: ByteArray = resp.toByteArray(StandardCharsets.UTF_8)
-            val jsonResp = JSONObject(String(data, StandardCharsets.UTF_8))
-            val inProgressStr: String = jsonResp.optString("in_progress")
+            data = resp.toByteArray(StandardCharsets.UTF_8)
+            jsonResp = JSONObject(String(data, StandardCharsets.UTF_8))
+            inProgressStr = jsonResp.optString("in_progress")
             inProgress = inProgressStr.toBoolean()
         }
 
