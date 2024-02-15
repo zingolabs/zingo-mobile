@@ -314,6 +314,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       }
       if (nextAppState.match(/inactive|background/) && this.state.appState === 'active') {
         //console.log('App is gone to the background!');
+        // re-activate the interruption sync flag
+        await RPC.rpc_setInterruptSyncAfterBatch('true');
         // setting value for background task Android
         await AsyncStorage.setItem('@background', 'yes');
         //console.log('background yes in storage');
