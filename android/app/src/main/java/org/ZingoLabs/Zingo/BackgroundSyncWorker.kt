@@ -23,6 +23,8 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
         val exists: Boolean = walletExists()
 
         if (exists) {
+            RustFFI.initlogging()
+            
             // check the Server, because the task can run without the App.
             val balance = RustFFI.execute("balance", "")
             Log.w("SCHEDULED_TASK_RUN", "Testing if server is active: $balance")
