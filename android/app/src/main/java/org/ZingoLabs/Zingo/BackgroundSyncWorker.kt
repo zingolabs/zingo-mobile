@@ -24,7 +24,7 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
 
         if (exists) {
             RustFFI.initlogging()
-            
+
             // check the Server, because the task can run without the App.
             val balance = RustFFI.execute("balance", "")
             Log.d("SCHEDULED_TASK_RUN", "Testing if server is active: $balance")
@@ -71,15 +71,19 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
     private fun loadWalletFile(rpcModule: RPCModule) {
         // I have to init from wallet file in order to do the sync
         // and I need to read the settings.json to find the server & chain type
-        val file: InputStream = MainApplication.getAppContext()?.openFileInput("settings.json")!!
-        val settingsBytes = file.readBytes()
-        file.close()
-        val settingsString = settingsBytes.toString(Charsets.UTF_8)
-        val jsonObject = JSONObject(settingsString)
-        val server = jsonObject.getJSONObject("server").getString("uri")
-        val chainhint = jsonObject.getJSONObject("server").getString("chain_name")
-        Log.d("SCHEDULED_TASK_RUN", "Opening the wallet file - No App active - server: $server chain: $chainhint")
-        rpcModule.loadExistingWalletNative(server, chainhint)
+        MainApplication.getAppContext()?.openFileInput("settings.json")?.use { file ->
+            val settingsBytes = file.readBytes()
+            file.close()
+            val settingsString = settingsBytes.toString(Charsets.UTF_8)
+            val jsonObject = JSONObject(settingsString)
+            val server = jsonObject.getJSONObject("server").getString("uri")
+            val chainhint = jsonObject.getJSONObject("server").getString("chain_name")
+            Log.d(
+                "SCHEDULED_TASK_RUN",
+                "Opening the wallet file - No App active - server: $server chain: $chainhint"
+            )
+            rpcModule.loadExistingWalletNative(server, chainhint)
+        }
     }
 
     private fun stopSyncingProcess() {
@@ -111,7 +115,7 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
 
     }
 
-    private fun walletExists() : Boolean {
+    private fun walletExists(): Boolean {
         // Check if a wallet already exists
         val file = File(MainApplication.getAppContext()?.filesDir, "wallet.dat")
         return if (file.exists()) {
