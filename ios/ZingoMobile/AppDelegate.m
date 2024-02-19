@@ -214,6 +214,24 @@ static BGProcessingTask *bgTask = nil;
     }
 
     NSLog(@"BGTask syncingProcessBackgroundTask - syncing task STOPPED");
+
+    // not sure if in this point the expirationhandler will be fired...
+    // I'm gessing NO.
+
+    // save the wallet
+    RPCModule *rpcmodule = [RPCModule new];
+    [rpcmodule saveWalletInternal];
+    NSLog(@"BGTask syncingProcessBackgroundTask - Save Wallet");
+
+    // save info in background json
+    NSTimeInterval timeStamp = [[NSDate date] timeIntervalSince1970];
+    // NSTimeInterval is defined as double
+    NSNumber *timeStampObj = [NSNumber numberWithDouble: timeStamp];
+    NSString *timeStampStr = [timeStampObj stringValue];
+    NSString *jsonBackgroud = [NSString stringWithFormat: @"%@%@%@%@%@%@%@", @"{\"batches\": \"", @"0", @"\", \"message\": \"", @"Finished OK.", @"\", \"date\": \"", timeStampStr, @"\"}"];
+    [rpcmodule saveBackgroundFile:jsonBackgroud];
+    NSLog(@"BGTask syncingProcessBackgroundTask - Save background JSON");
+
     [bgTask setTaskCompletedWithSuccess:YES];
     bgTask = nil;
   }
@@ -311,12 +329,21 @@ static BGProcessingTask *bgTask = nil;
 
 - (void)startBackgroundTask:(NSString *)noValue {
     NSLog(@"BGTask startBackgroundTask called");
+    RPCModule *rpcmodule = [RPCModule new];
     
     // Schedule tasks for the next time
     [self scheduleBackgroundTask];
     [self scheduleSchedulerBackgroundTask];
     
     if (!isConnectedToWifi) {
+        // save info in background json
+        NSTimeInterval timeStamp = [[NSDate date] timeIntervalSince1970];
+        // NSTimeInterval is defined as double
+        NSNumber *timeStampObj = [NSNumber numberWithDouble: timeStamp];
+        NSString *timeStampStr = [timeStampObj stringValue];
+        NSString *jsonBackgroud = [NSString stringWithFormat: @"%@%@%@%@%@%@%@", @"{\"batches\": \"", @"0", @"\", \"message\": \"", @"No wifi KO.", @"\", \"date\": \"", timeStampStr, @"\"}"];
+        [rpcmodule saveBackgroundFile:jsonBackgroud];
+      
         NSLog(@"BGTask startBackgroundTask: not connected to the wifi");
         [bgTask setTaskCompletedWithSuccess:NO];
         bgTask = nil;
@@ -328,6 +355,14 @@ static BGProcessingTask *bgTask = nil;
     // in my testing this time is always something like 300 seconds. (the famous 5 min).
     NSLog(@"BEFORE RUN TASKS - Time Remaining: %f", [[UIApplication sharedApplication] backgroundTimeRemaining]);
     if ([[UIApplication sharedApplication] backgroundTimeRemaining] > 1000000000) {
+        // save info in background json
+        NSTimeInterval timeStamp = [[NSDate date] timeIntervalSince1970];
+        // NSTimeInterval is defined as double
+        NSNumber *timeStampObj = [NSNumber numberWithDouble: timeStamp];
+        NSString *timeStampStr = [timeStampObj stringValue];
+        NSString *jsonBackgroud = [NSString stringWithFormat: @"%@%@%@%@%@%@%@", @"{\"batches\": \"", @"0", @"\", \"message\": \"", @"Time Remaining Error KO.", @"\", \"date\": \"", timeStampStr, @"\"}"];
+        [rpcmodule saveBackgroundFile:jsonBackgroud];
+
         NSLog(@"BGTask startBackgroundTask: time remainig TOO cracy high %f", [[UIApplication sharedApplication] backgroundTimeRemaining]);
         [bgTask setTaskCompletedWithSuccess:NO];
         bgTask = nil;
@@ -344,7 +379,7 @@ static BGProcessingTask *bgTask = nil;
     bgTask.expirationHandler = ^{
         NSLog(@"BGTask startBackgroundTask - expirationHandler called");
         // interrupting the sync process, I can't wait to see if the process is over
-        // because I have no time enough to run all of this task here.
+        // because I have no time enough to run all I need in this task.
         char *resp2 = execute("interrupt_sync_after_batch", "true");
         NSString* respStr2 = [NSString stringWithUTF8String:resp2];
         NSLog(@"BGTask startBackgroundTask - expirationHandler interrupt syncing %@", respStr2);
@@ -359,7 +394,7 @@ static BGProcessingTask *bgTask = nil;
         // NSTimeInterval is defined as double
         NSNumber *timeStampObj = [NSNumber numberWithDouble: timeStamp];
         NSString *timeStampStr = [timeStampObj stringValue];
-        NSString *jsonBackgroud = [NSString stringWithFormat: @"%@%@%@%@%@", @"{\"batches\": \"", @"0", @"\", \"date\": \"", timeStampStr, @"\"}"];
+        NSString *jsonBackgroud = [NSString stringWithFormat: @"%@%@%@%@%@%@%@", @"{\"batches\": \"", @"0", @"\", \"message\": \"", @"Expiration fired. Finished OK.", @"\", \"date\": \"", timeStampStr, @"\"}"];
         [rpcmodule saveBackgroundFile:jsonBackgroud];
         NSLog(@"BGTask startBackgroundTask - expirationHandler Save background JSON");
 
@@ -389,6 +424,8 @@ static BGProcessingTask *bgTask = nil;
     //NSDate *now = [NSDate date];
 
     //NSDate *twoMinutesLater = [now dateByAddingTimeInterval:120]; // 2 minutes = 120 seconds
+  
+    NSLog(@"BGTask scheduleBackgroundTask date calculated: %@", earlyMorning);
 
     request.earliestBeginDate = earlyMorning;
     //request.earliestBeginDate = twoMinutesLater;

@@ -10,7 +10,7 @@ export default class BackgroundFileImpl {
   // Write the server background
   static async reset() {
     const fileName = await this.getFileName();
-    const newBackground: BackgroundType = { batches: 0, date: 0 };
+    const newBackground: BackgroundType = { batches: 0, message: '', date: 0 };
 
     RNFS.writeFile(fileName, JSON.stringify(newBackground), 'utf8')
       .then(() => {
