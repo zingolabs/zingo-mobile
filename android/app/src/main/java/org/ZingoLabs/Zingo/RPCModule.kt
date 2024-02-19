@@ -55,7 +55,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         val seed = RustFFI.initnew(server, reactContext.applicationContext.filesDir.absolutePath, chainhint, "true")
         // Log.i("MAIN-Seed", seed)
 
-        if (!seed.startsWith("Error")) {
+        if (!seed.lowercase().startsWith("error")) {
             saveWallet()
         }
 
@@ -71,7 +71,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         val rseed = RustFFI.initfromseed(server, seed, birthday, reactContext.applicationContext.filesDir.absolutePath, chainhint, "true")
         // Log.i("MAIN", rseed)
 
-        if (!rseed.startsWith("Error")) {
+        if (!rseed.lowercase().startsWith("Error")) {
             saveWallet()
         }
 
@@ -87,7 +87,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         val rufvk = RustFFI.initfromufvk(server, ufvk, birthday, reactContext.applicationContext.filesDir.absolutePath, chainhint, "true")
         // Log.i("MAIN", rufvk)
 
-        if (!rufvk.startsWith("Error")) {
+        if (!rufvk.lowercase().startsWith("Error")) {
             saveWallet()
         }
 
@@ -348,7 +348,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             // Log.i("execute", "Response to $cmd : $resp")
 
             // And save it if it was a sync
-            if (cmd == "sync" && !resp.startsWith("Error")) {
+            if (cmd == "sync" && !resp.lowercase().startsWith("Error")) {
                 saveWallet()
             }
 

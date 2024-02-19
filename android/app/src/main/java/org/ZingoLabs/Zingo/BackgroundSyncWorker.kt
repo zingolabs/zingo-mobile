@@ -7,7 +7,6 @@ import android.util.Log
 import java.io.File
 import java.util.*
 import org.json.JSONObject
-import java.io.InputStream
 import java.nio.charset.StandardCharsets
 import com.facebook.react.bridge.ReactApplicationContext
 
@@ -34,7 +33,7 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
             } else {
                 // this means the App is open,
                 // stop syncing first, just in case.
-                stopSyncingProcess()
+                BSCompanion.stopSyncingProcess()
             }
 
             // interrupt sync to false, just in case it is true.
@@ -86,35 +85,6 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
         }
     }
 
-    private fun stopSyncingProcess() {
-        val resp = RustFFI.execute("syncstatus", "")
-        Log.i("SCHEDULED_TASK_RUN", "status response $resp")
-
-        var data: ByteArray = resp.toByteArray(StandardCharsets.UTF_8)
-        var jsonResp = JSONObject(String(data, StandardCharsets.UTF_8))
-        var inProgressStr: String = jsonResp.optString("in_progress")
-        var inProgress: Boolean = inProgressStr.toBoolean()
-
-        while (inProgress) {
-            // interrupt
-            val resp2 = RustFFI.execute("interrupt_sync_after_batch", "true")
-            Log.i("SCHEDULED_TASK_RUN", "Interrupting sync: $resp2")
-
-            Thread.sleep(500)
-
-            val resp3 = RustFFI.execute("syncstatus", "")
-            Log.i("SCHEDULED_TASK_RUN", "status response $resp3")
-
-            data = resp.toByteArray(StandardCharsets.UTF_8)
-            jsonResp = JSONObject(String(data, StandardCharsets.UTF_8))
-            inProgressStr = jsonResp.optString("in_progress")
-            inProgress = inProgressStr.toBoolean()
-        }
-
-        Log.i("SCHEDULED_TASK_RUN", "sync process STOPPED")
-
-    }
-
     private fun walletExists(): Boolean {
         // Check if a wallet already exists
         val file = File(MainApplication.getAppContext()?.filesDir, "wallet.dat")
@@ -124,6 +94,48 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
         } else {
             Log.i("SCHEDULED_TASK_RUN", "Wallet DOES NOT exist")
             false
+        }
+    }
+}
+
+class BSCompanion {
+    companion object {
+        fun stopSyncingProcess() {
+            val resp = RustFFI.execute("syncstatus", "")
+            Log.i("SCHEDULED_TASK_RUN", "status response $resp")
+
+            if (resp.lowercase().startsWith("error")) {
+                Log.i("SCHEDULED_TASK_RUN", "sync process STOPPED - no lightwalletd likely")
+                return
+            }
+
+            var data: ByteArray = resp.toByteArray(StandardCharsets.UTF_8)
+            var jsonResp = JSONObject(String(data, StandardCharsets.UTF_8))
+            var inProgressStr: String = jsonResp.optString("in_progress")
+            var inProgress: Boolean = inProgressStr.toBoolean()
+
+            Log.i("SCHEDULED_TASK_RUN", "in progress value $inProgress")
+
+            while (inProgress) {
+                // interrupt
+                val resp2 = RustFFI.execute("interrupt_sync_after_batch", "true")
+                Log.i("SCHEDULED_TASK_RUN", "Interrupting sync: $resp2")
+
+                Thread.sleep(500)
+
+                val resp3 = RustFFI.execute("syncstatus", "")
+                Log.i("SCHEDULED_TASK_RUN", "status response $resp3")
+
+                data = resp.toByteArray(StandardCharsets.UTF_8)
+                jsonResp = JSONObject(String(data, StandardCharsets.UTF_8))
+                inProgressStr = jsonResp.optString("in_progress")
+                inProgress = inProgressStr.toBoolean()
+
+                Log.i("SCHEDULED_TASK_RUN", "in progress value $inProgress")
+            }
+
+            Log.i("SCHEDULED_TASK_RUN", "sync process STOPPED")
+
         }
     }
 }

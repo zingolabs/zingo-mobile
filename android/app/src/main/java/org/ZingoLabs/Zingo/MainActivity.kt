@@ -33,19 +33,22 @@ class MainActivity : ReactActivity() {
     private val SYNC_DAY_SHIFT = 1.days // Move to tomorrow
     private val SYNC_START_TIME_HOURS = 3.hours // Start around 3 a.m. at night
     private val SYNC_START_TIME_MINUTES = 60.minutes // Randomize with minutes until 4 a.m.
+    private var isStarting = true
     override fun getMainComponentName(): String {
         return "Zingo!"
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.i("ON_CREATE", "Starting main activity")
-        // cancel the task if it is in execution now
-        cancelExecutingTask()
         super.onCreate(null)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onPause() {
         Log.i("ON_PAUSE", "Pausing main activity - Background")
+        // cancel the task if it is in execution now
+        BSCompanion.stopSyncingProcess()
+        cancelExecutingTask()
+        // scheduling the task.
         scheduleBackgroundTask()
         super.onPause()
     }
@@ -53,14 +56,20 @@ class MainActivity : ReactActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onResume() {
         Log.i("ON_RESUME", "Resuming main activity - Foreground")
-        // cancel the task if it is in execution now
-        cancelExecutingTask()
-        // re-scheduling the task, just in case.
-        scheduleBackgroundTask()
+        if (isStarting) {
+            isStarting = false
+        } else {
+            // cancel the task if it is in execution now
+            BSCompanion.stopSyncingProcess()
+            cancelExecutingTask()
+            // re-scheduling the task, just in case.
+            scheduleBackgroundTask()
+        }
         super.onResume()
     }
 
     private fun cancelExecutingTask() {
+        Log.i("SCHEDULING_TASK", "Cancel background Task")
         WorkManager.getInstance(this)
             .cancelUniqueWork(taskID)
     }
@@ -76,6 +85,8 @@ class MainActivity : ReactActivity() {
         // PRODUCTION - next day between 3:00 and 4:00 am.
         val targetTimeDiff = calculateTargetTimeDifference()
 
+        Log.i("SCHEDULING_TASK", "calculated target time DIFF $targetTimeDiff")
+
         // DEVELOPMENT - after 5 minutes.
         //val timeFiveMinutes: Long = 5
 
@@ -89,7 +100,7 @@ class MainActivity : ReactActivity() {
         WorkManager.getInstance(this)
             .enqueueUniquePeriodicWork(
                 taskID,
-                ExistingPeriodicWorkPolicy.KEEP,
+                ExistingPeriodicWorkPolicy.REPLACE,
                 workRequest
             )
     }
@@ -113,7 +124,8 @@ class MainActivity : ReactActivity() {
                     )
 
             val targetTimeTime = targetTime.time
-            Log.i("SCHEDULING_TASK", "calculated target time $targetTimeTime")
+            val targetTimeDate = targetTime.date
+            Log.i("SCHEDULING_TASK", "calculated target time $targetTimeTime and date $targetTimeDate")
 
             return now.until(
                 other = targetTime.toInstant(currentTimeZone),
