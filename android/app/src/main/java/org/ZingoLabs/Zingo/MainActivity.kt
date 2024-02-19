@@ -37,7 +37,7 @@ class MainActivity : ReactActivity() {
         return "Zingo!"
     }
     override fun onCreate(savedInstanceState: Bundle?) {
-        Log.d("ON_CREATE", "Starting main activity")
+        Log.i("ON_CREATE", "Starting main activity")
         // cancel the task if it is in execution now
         cancelExecutingTask()
         super.onCreate(null)
@@ -45,14 +45,14 @@ class MainActivity : ReactActivity() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onPause() {
-        Log.d("ON_PAUSE", "Pausing main activity - Background")
+        Log.i("ON_PAUSE", "Pausing main activity - Background")
         scheduleBackgroundTask()
         super.onPause()
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onResume() {
-        Log.d("ON_RESUME", "Resuming main activity - Foreground")
+        Log.i("ON_RESUME", "Resuming main activity - Foreground")
         // cancel the task if it is in execution now
         cancelExecutingTask()
         // re-scheduling the task, just in case.
@@ -85,7 +85,7 @@ class MainActivity : ReactActivity() {
             //.setInitialDelay(timeFiveMinutes, TimeUnit.MINUTES)
             .build()
 
-        Log.d("SCHEDULING_TASK", "Enqueuing the background task - Background")
+        Log.i("SCHEDULING_TASK", "Enqueuing the background task - Background")
         WorkManager.getInstance(this)
             .enqueueUniquePeriodicWork(
                 taskID,
@@ -113,7 +113,7 @@ class MainActivity : ReactActivity() {
                     )
 
             val targetTimeTime = targetTime.time
-            Log.d("SCHEDULING_TASK", "calculated target time $targetTimeTime")
+            Log.i("SCHEDULING_TASK", "calculated target time $targetTimeTime")
 
             return now.until(
                 other = targetTime.toInstant(currentTimeZone),

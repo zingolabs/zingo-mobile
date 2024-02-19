@@ -24,10 +24,10 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         // Check if a wallet already exists
         val file = File(MainApplication.getAppContext()?.filesDir, "wallet.dat")
         if (file.exists()) {
-             // Log.d("MAIN", "Wallet exists")
+             // Log.i("MAIN", "Wallet exists")
             promise.resolve(true)
         } else {
-             // Log.d("MAIN", "Wallet DOES NOT exist")
+             // Log.i("MAIN", "Wallet DOES NOT exist")
             promise.resolve(false)
         }
     }
@@ -37,23 +37,23 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         // Check if a wallet backup already exists
         val file = File(MainApplication.getAppContext()?.filesDir, "wallet.backup.dat")
         if (file.exists()) {
-            // Log.d("MAIN", "Wallet backup exists")
+            // Log.i("MAIN", "Wallet backup exists")
             promise.resolve(true)
         } else {
-            // Log.d("MAIN", "Wallet backup DOES NOT exist")
+            // Log.i("MAIN", "Wallet backup DOES NOT exist")
             promise.resolve(false)
         }
     }
 
     @ReactMethod
     fun createNewWallet(server: String, chainhint: String, promise: Promise) {
-        // Log.d("MAIN", "Creating new wallet")
+        // Log.i("MAIN", "Creating new wallet")
 
         RustFFI.initlogging()
 
         // Create a seed
         val seed = RustFFI.initnew(server, reactContext.applicationContext.filesDir.absolutePath, chainhint, "true")
-        // Log.d("MAIN-Seed", seed)
+        // Log.i("MAIN-Seed", seed)
 
         if (!seed.startsWith("Error")) {
             saveWallet()
@@ -64,12 +64,12 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun restoreWalletFromSeed(seed: String, birthday: String, server: String, chainhint: String, promise: Promise) {
-        // Log.d("MAIN", "Restoring wallet with seed $seed")
+        // Log.i("MAIN", "Restoring wallet with seed $seed")
 
         RustFFI.initlogging()
 
         val rseed = RustFFI.initfromseed(server, seed, birthday, reactContext.applicationContext.filesDir.absolutePath, chainhint, "true")
-        // Log.d("MAIN", rseed)
+        // Log.i("MAIN", rseed)
 
         if (!rseed.startsWith("Error")) {
             saveWallet()
@@ -80,12 +80,12 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun restoreWalletFromUfvk(ufvk: String, birthday: String, server: String, chainhint: String, promise: Promise) {
-        // Log.d("MAIN", "Restoring wallet with ufvk $ufvk")
+        // Log.i("MAIN", "Restoring wallet with ufvk $ufvk")
 
         RustFFI.initlogging()
 
         val rufvk = RustFFI.initfromufvk(server, ufvk, birthday, reactContext.applicationContext.filesDir.absolutePath, chainhint, "true")
-        // Log.d("MAIN", rufvk)
+        // Log.i("MAIN", rufvk)
 
         if (!rufvk.startsWith("Error")) {
             saveWallet()
@@ -260,7 +260,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
         RustFFI.initlogging()
 
-        // Log.d("MAIN", wseed)
+        // Log.i("MAIN", wseed)
 
         return RustFFI.initfromb64(
             server,
@@ -329,9 +329,9 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
             RustFFI.initlogging()
 
-            // Log.d("send", "Trying to send $sendJSON")
+            // Log.i("send", "Trying to send $sendJSON")
             val result = RustFFI.execute("send", sendJSON)
-            // Log.d("send", "Send Result: $result")
+            // Log.i("send", "Send Result: $result")
 
             promise.resolve(result)
         }
@@ -343,9 +343,9 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
             RustFFI.initlogging()
 
-            // Log.d("execute", "Executing $cmd with $args")
+            // Log.i("execute", "Executing $cmd with $args")
             val resp = RustFFI.execute(cmd, args)
-            // Log.d("execute", "Response to $cmd : $resp")
+            // Log.i("execute", "Response to $cmd : $resp")
 
             // And save it if it was a sync
             if (cmd == "sync" && !resp.startsWith("Error")) {
@@ -373,11 +373,11 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun saveWallet() {
         // Get the encoded wallet file
         val b64encoded = RustFFI.save()
-        // Log.d("MAIN", b64encoded)
+        // Log.i("MAIN", b64encoded)
 
         try {
             val fileBytes = Base64.decode(b64encoded, Base64.NO_WRAP)
-            Log.d("MAIN", "file size: ${fileBytes.size} bytes")
+            Log.i("MAIN", "file size: ${fileBytes.size} bytes")
 
             // Save file to disk
             val file = MainApplication.getAppContext()?.openFileOutput("wallet.dat", Context.MODE_PRIVATE)
@@ -395,11 +395,11 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         val fileRead = MainApplication.getAppContext()!!.openFileInput("wallet.dat")
         val fileBytes = fileRead.readBytes()
         // val fileb64 = Base64.encodeToString(fileBytes, Base64.NO_WRAP)
-        // Log.d("MAIN", b64encoded)
+        // Log.i("MAIN", b64encoded)
 
         try {
             // val fileBytes = Base64.decode(b64encoded, Base64.NO_WRAP)
-            // Log.d("MAIN", "file size${fileBytes.size}")
+            // Log.i("MAIN", "file size${fileBytes.size}")
 
             // Save file to disk
             val file = MainApplication.getAppContext()?.openFileOutput("wallet.backup.dat", Context.MODE_PRIVATE)
@@ -411,11 +411,11 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     fun saveBackgroundFile(json: String) {
-        // Log.d("MAIN", b64encoded)
+        // Log.i("MAIN", b64encoded)
 
         try {
             val fileBytes: ByteArray = json.toByteArray()
-            Log.d("MAIN", "file background size: ${fileBytes.size} bytes")
+            Log.i("MAIN", "file background size: ${fileBytes.size} bytes")
 
             // Save file to disk
             val file = MainApplication.getAppContext()?.openFileOutput("background.json", Context.MODE_PRIVATE)
@@ -428,7 +428,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun getLatestBlock(server: String, promise: Promise) {
-        // Log.d("MAIN", "Initialize Light Client")
+        // Log.i("MAIN", "Initialize Light Client")
 
         RustFFI.initlogging()
 
