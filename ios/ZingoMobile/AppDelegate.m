@@ -358,21 +358,22 @@ static BGProcessingTask *bgTask = nil;
     // I can check the time remaining here & make a choice
     // when this `time remaing` is cracy big, something wrong is happening.
     // in my testing this time is always something like 300 seconds. (the famous 5 min).
+    // PEOPLE DON"T CARE.
     NSLog(@"BEFORE RUN TASKS - Time Remaining: %f", [[UIApplication sharedApplication] backgroundTimeRemaining]);
-    if ([[UIApplication sharedApplication] backgroundTimeRemaining] > 1000000000) {
+    //if ([[UIApplication sharedApplication] backgroundTimeRemaining] > 1000000000) {
         // save info in background json
-        NSTimeInterval timeStamp = [[NSDate date] timeIntervalSince1970];
+    //    NSTimeInterval timeStamp = [[NSDate date] timeIntervalSince1970];
         // NSTimeInterval is defined as double
-        NSNumber *timeStampObj = [NSNumber numberWithDouble: timeStamp];
-        NSString *timeStampStr = [timeStampObj stringValue];
-        NSString *jsonBackgroud = [NSString stringWithFormat: @"%@%@%@%@%@%@%@", @"{\"batches\": \"", @"0", @"\", \"message\": \"", @"Time Remaining Error KO.", @"\", \"date\": \"", timeStampStr, @"\"}"];
-        [rpcmodule saveBackgroundFile:jsonBackgroud];
+    //    NSNumber *timeStampObj = [NSNumber numberWithDouble: timeStamp];
+    //    NSString *timeStampStr = [timeStampObj stringValue];
+    //    NSString *jsonBackgroud = [NSString stringWithFormat: @"%@%@%@%@%@%@%@", @"{\"batches\": \"", @"0", @"\", \"message\": \"", @"Time Remaining Error KO.", @"\", \"date\": \"", timeStampStr, @"\"}"];
+    //    [rpcmodule saveBackgroundFile:jsonBackgroud];
 
-        NSLog(@"BGTask startBackgroundTask: time remainig TOO cracy high %f", [[UIApplication sharedApplication] backgroundTimeRemaining]);
-        [bgTask setTaskCompletedWithSuccess:NO];
-        bgTask = nil;
-        return;
-    }
+    //    NSLog(@"BGTask startBackgroundTask: time remainig TOO cracy high %f", [[UIApplication sharedApplication] backgroundTimeRemaining]);
+    //    [bgTask setTaskCompletedWithSuccess:NO];
+    //    bgTask = nil;
+    //    return;
+    //}
     
     // Start the syncing
     NSLog(@"BGTask startBackgroundTask run sync task");
