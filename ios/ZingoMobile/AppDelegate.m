@@ -137,6 +137,11 @@ static BGProcessingTask *bgTask = nil;
     NSString* respStr = [NSString stringWithUTF8String:resp];
     rust_free(resp);
     NSLog(@"BGTask stopSyncingProcess - status response %@", respStr);
+    
+    if ([respStr hasPrefix:@"Error"]) {
+      NSLog(@"BGTask stopSyncingProcess - no lightwalled likely");
+      return;
+    }
 
     NSData *data = [respStr dataUsingEncoding:NSUTF8StringEncoding];
     id jsonResp = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
