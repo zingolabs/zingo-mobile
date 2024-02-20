@@ -34,6 +34,7 @@ class MainActivity : ReactActivity() {
     private val SYNC_START_TIME_HOURS = 3.hours // Start around 3 a.m. at night
     private val SYNC_START_TIME_MINUTES = 60.minutes // Randomize with minutes until 4 a.m.
     private var isStarting = true
+
     override fun getMainComponentName(): String {
         return "Zingo!"
     }
@@ -45,10 +46,6 @@ class MainActivity : ReactActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onPause() {
         Log.i("ON_PAUSE", "Pausing main activity - Background")
-        // cancel the task if it is in execution now
-        BSCompanion.stopSyncingProcess()
-        cancelExecutingTask()
-        // scheduling the task.
         scheduleBackgroundTask()
         super.onPause()
     }
@@ -60,7 +57,6 @@ class MainActivity : ReactActivity() {
             isStarting = false
         } else {
             // cancel the task if it is in execution now
-            BSCompanion.stopSyncingProcess()
             cancelExecutingTask()
             // re-scheduling the task, just in case.
             scheduleBackgroundTask()
