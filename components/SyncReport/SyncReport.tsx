@@ -235,11 +235,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
                 moment(Number(Number(background.date).toFixed(0)) * 1000).format('YYYY MMM D h:mm a')
               }
             />
-            {!!background.message && (
-              <RegText color={colors.text}>
-                {background.message}
-              </RegText>
-            )}
+            {!!background.message && <RegText color={colors.text}>{background.message}</RegText>}
           </View>
         )}
         {maxBlocks && netInfo.isConnected ? (

@@ -169,13 +169,6 @@ exports[`Component About - test About - snapshot 1`] = `
         >
           text translated
         </Text>
-        <View
-          style={
-            {
-              "width": 10,
-            }
-          }
-        />
       </View>
       <View
         style={

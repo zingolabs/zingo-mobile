@@ -192,13 +192,6 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
             <View
               style={
                 {
-                  "width": 10,
-                }
-              }
-            />
-            <View
-              style={
-                {
                   "flexDirection": "row",
                   "margin": 5,
                   "opacity": 0.5,
@@ -346,13 +339,6 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
             >
               translated text
             </Text>
-            <View
-              style={
-                {
-                  "width": 10,
-                }
-              }
-            />
             <View
               style={
                 {
@@ -543,13 +529,6 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
             <View
               style={
                 {
-                  "width": 10,
-                }
-              }
-            />
-            <View
-              style={
-                {
                   "flexDirection": "row",
                   "margin": 5,
                   "opacity": 0.5,
@@ -697,13 +676,6 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
             >
               translated text
             </Text>
-            <View
-              style={
-                {
-                  "width": 10,
-                }
-              }
-            />
             <View
               style={
                 {
@@ -891,13 +863,6 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
             >
               translated text
             </Text>
-            <View
-              style={
-                {
-                  "width": 10,
-                }
-              }
-            />
             <View
               style={
                 {
