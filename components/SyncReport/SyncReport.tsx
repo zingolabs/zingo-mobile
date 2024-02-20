@@ -219,12 +219,12 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
             />
           </View>
         )}
-        {background.date > 0 && showBackgroundLegend && (
+        {Number(background.date) > 0 && showBackgroundLegend && (
           <View
             style={{
               display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'flex-end',
+              flexDirection: 'column',
+              alignItems: 'flex-start',
               marginHorizontal: 20,
             }}>
             <DetailLine
@@ -232,12 +232,14 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
               value={
                 //background.batches.toString() +
                 //translate('report.batches-date') +
-                moment(Number(Number(background.date).toFixed(0)) * 1000).format('YYYY MMM D h:mm a') +
-                background.message
-                  ? ' - ' + background.message
-                  : ''
+                moment(Number(Number(background.date).toFixed(0)) * 1000).format('YYYY MMM D h:mm a')
               }
             />
+            {!!background.message && (
+              <RegText color={colors.text}>
+                {background.message}
+              </RegText>
+            )}
           </View>
         )}
         {maxBlocks && netInfo.isConnected ? (

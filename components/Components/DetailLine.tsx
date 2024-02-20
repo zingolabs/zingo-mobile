@@ -23,7 +23,6 @@ const DetailLine: React.FunctionComponent<DetailLineProps> = ({ label, value, ch
   return (
     <View style={{ display: 'flex', marginTop: 20 }}>
       <FadeText>{label}</FadeText>
-      <View style={{ width: 10 }} />
       {!!value && (
         <TouchableOpacity
           onPress={() => {
