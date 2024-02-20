@@ -33,7 +33,6 @@ class MainActivity : ReactActivity() {
     private val SYNC_DAY_SHIFT = 1.days // Move to tomorrow
     private val SYNC_START_TIME_HOURS = 3.hours // Start around 3 a.m. at night
     private val SYNC_START_TIME_MINUTES = 60.minutes // Randomize with minutes until 4 a.m.
-    private var isStarting = true
 
     override fun getMainComponentName(): String {
         return "Zingo!"
@@ -53,14 +52,8 @@ class MainActivity : ReactActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onResume() {
         Log.i("ON_RESUME", "Resuming main activity - Foreground")
-        if (isStarting) {
-            isStarting = false
-        } else {
-            // cancel the task if it is in execution now
-            cancelExecutingTask()
-            // re-scheduling the task, just in case.
-            scheduleBackgroundTask()
-        }
+        // cancel the task if it is in execution now
+        cancelExecutingTask()
         super.onResume()
     }
 
@@ -73,7 +66,7 @@ class MainActivity : ReactActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     private fun scheduleBackgroundTask() {
         val constraints = Constraints.Builder()
-            .setRequiresStorageNotLow(true)
+            .setRequiresStorageNotLow(false) // less restricted
             .setRequiredNetworkType(NetworkType.UNMETERED)
             .setRequiresCharging(true)
             .build()

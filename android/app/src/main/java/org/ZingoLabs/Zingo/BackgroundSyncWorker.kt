@@ -121,6 +121,7 @@ class BSCompanion {
                 val resp2 = RustFFI.execute("interrupt_sync_after_batch", "true")
                 Log.i("SCHEDULED_TASK_RUN", "Interrupting sync: $resp2")
 
+                // blocking the thread for 0.5 seconds.
                 Thread.sleep(500)
 
                 val resp3 = RustFFI.execute("syncstatus", "")
