@@ -65,10 +65,10 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
         Log.i("SCHEDULED_TASK_RUN", "wallet file SAVED")
 
         // save the background JSON file
-        val timeStamp = Date().time / 1000
-        val timeStampStr = timeStamp.toString()
-        val jsonBackground = "{\"batches\": \"0\", \"message\": \"Finished OK.\", \"date\": \"$timeStampStr\"}"
-        rpcModule.saveBackgroundFile(jsonBackground)
+        val timeStamp2 = Date().time / 1000
+        val timeStampStr2 = timeStamp2.toString()
+        val jsonBackground2 = "{\"batches\": \"0\", \"message\": \"Finished OK.\", \"date\": \"$timeStampStr2\"}"
+        rpcModule.saveBackgroundFile(jsonBackground2)
         Log.i("SCHEDULED_TASK_RUN", "background json file SAVED")
 
         return Result.success()
