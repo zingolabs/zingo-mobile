@@ -34,6 +34,7 @@ static void InitializeFlipper(UIApplication *application) {
 static NSString* syncTask = @"Zingo_Processing_Task_ID";
 static NSString* syncSchedulerTask = @"Zingo_Processing_Scheduler_Task_ID";
 static BOOL isConnectedToWifi = false;
+static BOOL isCharging = false;
 static BGProcessingTask *bgTask = nil;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
@@ -294,11 +295,22 @@ static BGProcessingTask *bgTask = nil;
     NetworkStatus networkStatus = [reachability currentReachabilityStatus];
     
     if (networkStatus == ReachableViaWiFi) {
+      // the device have Wifi.
       isConnectedToWifi = true;
     } else {
       isConnectedToWifi = false;
     }
-    NSLog(@"BGTask isConnectedToWifi %@", isConnectedToWifi ? @"true" : @"false");
+
+    UIDeviceBatteryState currentState = [[UIDevice currentDevice] batteryState];
+
+    if (currentState == UIDeviceBatteryStateCharging) {
+      // The battery is either charging, or connected to a charger.
+      isCharging = true;
+    } else {
+      isCharging = false;
+    }
+
+    NSLog(@"BGTask isConnectedToWifi %@ isCharging %@", isConnectedToWifi ? @"true" : @"false", isCharging ? @"true" : @"false");
     
     [self registerTasks];
 }
@@ -355,24 +367,19 @@ static BGProcessingTask *bgTask = nil;
         return;
     }
 
-    // I can check the time remaining here & make a choice
-    // when this `time remaing` is cracy big, something wrong is happening.
-    // in my testing this time is always something like 300 seconds. (the famous 5 min).
-    // PEOPLE DON"T CARE.
-    NSLog(@"BEFORE RUN TASKS - Time Remaining: %f", [[UIApplication sharedApplication] backgroundTimeRemaining]);
-    if ([[UIApplication sharedApplication] backgroundTimeRemaining] > 1000000000) {
+    if (!isCharging) {
         // save info in background json
         NSTimeInterval timeStamp = [[NSDate date] timeIntervalSince1970];
         // NSTimeInterval is defined as double
         NSNumber *timeStampObj = [NSNumber numberWithDouble: timeStamp];
         NSString *timeStampStr = [timeStampObj stringValue];
-        NSString *jsonBackgroud = [NSString stringWithFormat: @"%@%@%@%@%@%@%@", @"{\"batches\": \"", @"0", @"\", \"message\": \"", @"Time Remaining - Starting OK.", @"\", \"date\": \"", timeStampStr, @"\"}"];
+        NSString *jsonBackgroud = [NSString stringWithFormat: @"%@%@%@%@%@%@%@", @"{\"batches\": \"", @"0", @"\", \"message\": \"", @"No plug-in KO.", @"\", \"date\": \"", timeStampStr, @"\"}"];
         [rpcmodule saveBackgroundFile:jsonBackgroud];
-
-    //    NSLog(@"BGTask startBackgroundTask: time remainig TOO cracy high %f", [[UIApplication sharedApplication] backgroundTimeRemaining]);
-    //    [bgTask setTaskCompletedWithSuccess:NO];
-    //    bgTask = nil;
-    //    return;
+      
+        NSLog(@"BGTask startBackgroundTask: not plug in to power");
+        [bgTask setTaskCompletedWithSuccess:NO];
+        bgTask = nil;
+        return;
     }
     
     // Start the syncing
