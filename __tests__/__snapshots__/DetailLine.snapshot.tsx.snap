@@ -19,13 +19,6 @@ exports[`Component DetailLine - test DetailLine children - snapshot 1`] = `
   >
     label
   </Text>
-  <View
-    style={
-      {
-        "width": 10,
-      }
-    }
-  />
   <View />
 </View>
 `;
@@ -49,13 +42,6 @@ exports[`Component DetailLine - test DetailLine value - snapshot 1`] = `
   >
     label
   </Text>
-  <View
-    style={
-      {
-        "width": 10,
-      }
-    }
-  />
   <View
     accessible={true}
     collapsable={false}

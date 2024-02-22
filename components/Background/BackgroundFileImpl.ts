@@ -10,7 +10,7 @@ export default class BackgroundFileImpl {
   // Write the server background
   static async reset() {
     const fileName = await this.getFileName();
-    const newBackground: BackgroundType = { batches: 0, date: 0 };
+    const newBackground: BackgroundType = { batches: 0, message: '', date: 0 };
 
     RNFS.writeFile(fileName, JSON.stringify(newBackground), 'utf8')
       .then(() => {
@@ -28,10 +28,12 @@ export default class BackgroundFileImpl {
     const fileName = await this.getFileName();
 
     try {
-      return JSON.parse((await RNFS.readFile(fileName, 'utf8')).toString()) as BackgroundType;
+      const r = JSON.parse((await RNFS.readFile(fileName, 'utf8')).toString()) as BackgroundType;
+      console.log('background json', r);
+      return r;
     } catch (err) {
       // File probably doesn't exist, so return nothing
-      //console.log(err);
+      console.log('background json Error', err);
       return { batches: 0, date: 0 } as BackgroundType;
     }
   }

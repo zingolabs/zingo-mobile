@@ -123,6 +123,7 @@ describe('Component LoadedApp - test', () => {
     const mode = 'basic';
     const background = {
       batches: 0,
+      message: '',
       date: 0,
     };
     const readOnly = false;

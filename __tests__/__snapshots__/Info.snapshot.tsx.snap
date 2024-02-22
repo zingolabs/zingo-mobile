@@ -170,13 +170,6 @@ exports[`Component Info - test Info - snapshot 1`] = `
             translated text
           </Text>
           <View
-            style={
-              {
-                "width": 10,
-              }
-            }
-          />
-          <View
             accessible={true}
             collapsable={false}
             focusable={true}
@@ -225,13 +218,6 @@ exports[`Component Info - test Info - snapshot 1`] = `
           >
             translated text
           </Text>
-          <View
-            style={
-              {
-                "width": 10,
-              }
-            }
-          />
           <View
             accessible={true}
             collapsable={false}
@@ -282,13 +268,6 @@ exports[`Component Info - test Info - snapshot 1`] = `
             translated text
           </Text>
           <View
-            style={
-              {
-                "width": 10,
-              }
-            }
-          />
-          <View
             accessible={true}
             collapsable={false}
             focusable={true}
@@ -338,13 +317,6 @@ exports[`Component Info - test Info - snapshot 1`] = `
             translated text
           </Text>
           <View
-            style={
-              {
-                "width": 10,
-              }
-            }
-          />
-          <View
             accessible={true}
             collapsable={false}
             focusable={true}
@@ -393,13 +365,6 @@ exports[`Component Info - test Info - snapshot 1`] = `
           >
             translated text
           </Text>
-          <View
-            style={
-              {
-                "width": 10,
-              }
-            }
-          />
           <View
             accessible={true}
             collapsable={false}
