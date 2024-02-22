@@ -46,10 +46,10 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
         Log.i("SCHEDULED_TASK_RUN", "Task running")
 
         // save the background JSON file
-        val timeStamp = Date().time / 1000
-        val timeStampStr = timeStamp.toString()
-        val jsonBackground = "{\"batches\": \"0\", \"message\": \"Starting OK.\", \"date\": \"$timeStampStr\"}"
-        rpcModule.saveBackgroundFile(jsonBackground)
+        val timeStampStart = Date().time / 1000
+        val timeStampStrStart = timeStampStart.toString()
+        val jsonBackgroundStart = "{\"batches\": \"0\", \"message\": \"Starting OK.\", \"date\": \"$timeStampStrStart\"}"
+        rpcModule.saveBackgroundFile(jsonBackgroundStart)
         Log.i("SCHEDULED_TASK_RUN", "background json file SAVED")
 
         // checking if the wallet file exists
@@ -71,15 +71,15 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
             }
 
             // interrupt sync to false, just in case it is true.
-            val resp = RustFFI.execute("interrupt_sync_after_batch", "false")
-            Log.i("SCHEDULED_TASK_RUN", "Not interrupting sync: $resp")
+            val noInterrupting = RustFFI.execute("interrupt_sync_after_batch", "false")
+            Log.i("SCHEDULED_TASK_RUN", "Not interrupting sync: $noInterrupting")
 
             // the task is running here blocking this execution until this process finished:
             // 1. finished the syncing.
 
             Log.i("SCHEDULED_TASK_RUN", "sync BEGIN")
-            val resp2 = RustFFI.execute("sync", "")
-            Log.i("SCHEDULED_TASK_RUN", "sync END: $resp2")
+            val syncing = RustFFI.execute("sync", "")
+            Log.i("SCHEDULED_TASK_RUN", "sync END: $syncing")
 
         } else {
             Log.i("SCHEDULED_TASK_RUN", "No exists wallet file END")
@@ -92,10 +92,10 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
         Log.i("SCHEDULED_TASK_RUN", "wallet file SAVED")
 
         // save the background JSON file
-        val timeStamp2 = Date().time / 1000
-        val timeStampStr2 = timeStamp2.toString()
-        val jsonBackground2 = "{\"batches\": \"0\", \"message\": \"Finished OK.\", \"date\": \"$timeStampStr2\"}"
-        rpcModule.saveBackgroundFile(jsonBackground2)
+        val timeStampEnd = Date().time / 1000
+        val timeStampStrEnd = timeStampEnd.toString()
+        val jsonBackgroundEnd = "{\"batches\": \"0\", \"message\": \"Finished OK.\", \"date\": \"$timeStampStrEnd\"}"
+        rpcModule.saveBackgroundFile(jsonBackgroundEnd)
         Log.i("SCHEDULED_TASK_RUN", "background json file SAVED")
 
         return Result.success()
@@ -120,10 +120,10 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
     }
 
     private fun stopSyncingProcess() {
-        val resp = RustFFI.execute("syncstatus", "")
-        Log.i("SCHEDULED_TASK_RUN", "status response $resp")
+        var status = RustFFI.execute("syncstatus", "")
+        Log.i("SCHEDULED_TASK_RUN", "status response $status")
 
-        var data: ByteArray = resp.toByteArray(StandardCharsets.UTF_8)
+        var data: ByteArray = status.toByteArray(StandardCharsets.UTF_8)
         var jsonResp = JSONObject(String(data, StandardCharsets.UTF_8))
         var inProgressStr: String = jsonResp.optString("in_progress")
         var inProgress: Boolean = inProgressStr.toBoolean()
@@ -132,16 +132,16 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
 
         while (inProgress) {
             // interrupt
-            val resp2 = RustFFI.execute("interrupt_sync_after_batch", "true")
-            Log.i("SCHEDULED_TASK_RUN", "Interrupting sync: $resp2")
+            val interrupting = RustFFI.execute("interrupt_sync_after_batch", "true")
+            Log.i("SCHEDULED_TASK_RUN", "Interrupting sync: $interrupting")
 
             // blocking the thread for 0.5 seconds.
             Thread.sleep(500)
 
-            val resp3 = RustFFI.execute("syncstatus", "")
-            Log.i("SCHEDULED_TASK_RUN", "status response $resp3")
+            status = RustFFI.execute("syncstatus", "")
+            Log.i("SCHEDULED_TASK_RUN", "status response $status")
 
-            data = resp3.toByteArray(StandardCharsets.UTF_8)
+            data = status.toByteArray(StandardCharsets.UTF_8)
             jsonResp = JSONObject(String(data, StandardCharsets.UTF_8))
             inProgressStr = jsonResp.optString("in_progress")
             inProgress = inProgressStr.toBoolean()
@@ -239,8 +239,8 @@ class BSCompanion {
             val reactContext = ReactApplicationContext(MainApplication.getAppContext())
 
             // run interrupt sync, just in case.
-            val resp = RustFFI.execute("interrupt_sync_after_batch", "true")
-            Log.i("SCHEDULED_TASK_RUN", "Interrupting sync: $resp")
+            val interrupting = RustFFI.execute("interrupt_sync_after_batch", "true")
+            Log.i("SCHEDULED_TASK_RUN", "Interrupting sync: $interrupting")
 
             Log.i("SCHEDULING_TASK", "Cancel background Task")
             WorkManager.getInstance(reactContext)
