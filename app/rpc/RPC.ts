@@ -517,8 +517,17 @@ export default class RPC {
     return reducedDetailedTxns;
   }
 
-  // this is only for the first time when the App is booting.
+  // this is only for the first time when the App is booting, but
+  // there are more cases:
+  // - LoadedApp mounting component.
+  // - App go to Foreground.
+  // - Internet from Not Connected to Connected.
+  // - Cambio de Servidor.
   async configure(): Promise<void> {
+    // First things first, I need to stop an existing sync process (if any)
+    // clean start.
+    await this.stopSyncProcess();
+
     // every 30 seconds the App try to Sync the new blocks.
     if (!this.refreshTimerID) {
       this.refreshTimerID = setInterval(() => {
@@ -562,6 +571,40 @@ export default class RPC {
     setTimeout(() => {
       this.refresh(true);
     }, 1000);
+  }
+
+  sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
+
+  async stopSyncProcess(): Promise<void> {
+    let returnStatus = await this.doSyncStatus();
+    if (returnStatus.toLowerCase().startsWith('error')) {
+      return;
+    }
+    let ss = {} as RPCSyncStatusType;
+    try {
+      ss = await JSON.parse(returnStatus);
+    } catch (e) {
+      return;
+    }
+
+    console.log('stop sync process. in progress', ss.in_progress);
+
+    while (ss.in_progress) {
+      // interrupting sync process
+      await RPC.rpc_setInterruptSyncAfterBatch('true');
+
+      // sleep for half second
+      await this.sleep(500);
+
+      returnStatus = await this.doSyncStatus();
+      ss = await JSON.parse(returnStatus);
+
+      console.log('stop sync process. in progress', ss.in_progress);
+    }
+    console.log('stop sync process. STOPPED');
+
+    // NOT interrupting sync process
+    await RPC.rpc_setInterruptSyncAfterBatch('false');
   }
 
   async clearTimers(): Promise<void> {

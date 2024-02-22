@@ -141,7 +141,7 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
             val resp3 = RustFFI.execute("syncstatus", "")
             Log.i("SCHEDULED_TASK_RUN", "status response $resp3")
 
-            data = resp.toByteArray(StandardCharsets.UTF_8)
+            data = resp3.toByteArray(StandardCharsets.UTF_8)
             jsonResp = JSONObject(String(data, StandardCharsets.UTF_8))
             inProgressStr = jsonResp.optString("in_progress")
             inProgress = inProgressStr.toBoolean()
