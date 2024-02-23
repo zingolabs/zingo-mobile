@@ -31,10 +31,9 @@ static void InitializeFlipper(UIApplication *application) {
 
 @implementation AppDelegate
 
-static NSString* syncTask = @"Zingo_Processing_Task_ID";
-static NSString* syncSchedulerTask = @"Zingo_Processing_Scheduler_Task_ID";
-static BOOL isConnectedToWifi = false;
-static BGProcessingTask *bgTask = nil;
+NSString* syncTask = @"Zingo_Processing_Task_ID";
+NSString* syncSchedulerTask = @"Zingo_Processing_Scheduler_Task_ID";
+BGProcessingTask *bgTask = nil;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
@@ -56,8 +55,8 @@ static BGProcessingTask *bgTask = nil;
   [self.window makeKeyAndVisible];
 
   if (@available(iOS 13.0, *)) {
-      NSLog(@"BGTask handleBackgroundTask");
-      [self handleBackgroundTask];
+      NSLog(@"BGTask registerTasks");
+      [self registerTasks];
   }
 
   return YES;
@@ -133,36 +132,36 @@ static BGProcessingTask *bgTask = nil;
   @autoreleasepool {
 
     NSLog(@"BGTask stopSyncingProcess");
-    char *resp = execute("syncstatus", "");
-    NSString* respStr = [NSString stringWithUTF8String:resp];
-    rust_free(resp);
-    NSLog(@"BGTask stopSyncingProcess - status response %@", respStr);
+    char *status = execute("syncstatus", "");
+    NSString* statusStr = [NSString stringWithUTF8String:status];
+    rust_free(status);
+    NSLog(@"BGTask stopSyncingProcess - status response %@", statusStr);
     
-    if ([respStr hasPrefix:@"Error"]) {
+    if ([statusStr hasPrefix:@"Error"]) {
       NSLog(@"BGTask stopSyncingProcess - no lightwalled likely");
       return;
     }
 
-    NSData *data = [respStr dataUsingEncoding:NSUTF8StringEncoding];
+    NSData *data = [statusStr dataUsingEncoding:NSUTF8StringEncoding];
     id jsonResp = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
     NSString *inProgressStr = [jsonResp valueForKey:@"in_progress"];
     BOOL inProgress = [inProgressStr boolValue];
 
     while(inProgress) {
-      char *resp2 = execute("interrupt_sync_after_batch", "true");
-      NSString* respStr2 = [NSString stringWithUTF8String:resp2];
-      NSLog(@"BGTask stopSyncingProcess - interrupt syncing %@", respStr2);
+      char *interrupt = execute("interrupt_sync_after_batch", "true");
+      NSString* interruptStr = [NSString stringWithUTF8String:interrupt];
+      NSLog(@"BGTask stopSyncingProcess - interrupt syncing %@", interruptStr);
 
       [NSThread sleepForTimeInterval: 0.5];
 
-      char *resp = execute("syncstatus", "");
-      NSString* respStr = [NSString stringWithUTF8String:resp];
-      rust_free(resp);
-      NSLog(@"BGTask stopSyncingProcess - status response %@", respStr);
+      status = execute("syncstatus", "");
+      statusStr = [NSString stringWithUTF8String:status];
+      rust_free(status);
+      NSLog(@"BGTask stopSyncingProcess - status response %@", statusStr);
 
-      NSData *data = [respStr dataUsingEncoding:NSUTF8StringEncoding];
-      id jsonResp = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-      NSString *inProgressStr = [jsonResp valueForKey:@"in_progress"];
+      data = [statusStr dataUsingEncoding:NSUTF8StringEncoding];
+      jsonResp = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+      inProgressStr = [jsonResp valueForKey:@"in_progress"];
       inProgress = [inProgressStr boolValue];
     }
 
@@ -176,16 +175,27 @@ static BGProcessingTask *bgTask = nil;
   //do things with task
   @autoreleasepool {
     
+    RPCModule *rpcmodule = [RPCModule new];
+    
+    // save info in background json
+    NSTimeInterval timeStampStart = [[NSDate date] timeIntervalSince1970];
+    // NSTimeInterval is defined as double
+    NSNumber *timeStampObjStart = [NSNumber numberWithDouble: timeStampStart];
+    NSString *timeStampStrStart = [timeStampObjStart stringValue];
+    NSString *jsonBackgroudStart = [NSString stringWithFormat: @"%@%@%@%@%@%@%@", @"{\"batches\": \"", @"0", @"\", \"message\": \"", @"Starting OK.", @"\", \"date\": \"", timeStampStrStart, @"\"}"];
+    [rpcmodule saveBackgroundFile:jsonBackgroudStart];
+    NSLog(@"BGTask syncingProcessBackgroundTask - Save background JSON");
+    
     NSLog(@"BGTask syncingProcessBackgroundTask");
     BOOL exists = [self wallet__exists];
 
     if (exists) {
       // check the Server, because the task can run without the App.
-      char *bal = execute("balance", "");
-      NSString* balStr = [NSString stringWithUTF8String:bal];
-      NSLog(@"BGTask syncingProcessBackgroundTask - testing if server is active %@", balStr);
-      rust_free(bal);
-      if ([balStr hasPrefix:@"Error"]) {
+      char *balance = execute("balance", "");
+      NSString* balanceStr = [NSString stringWithUTF8String:balance];
+      NSLog(@"BGTask syncingProcessBackgroundTask - testing if server is active %@", balanceStr);
+      rust_free(balance);
+      if ([balanceStr hasPrefix:@"Error"]) {
         // this means this task is running with the App closed
         [self loadWalletFile:nil];
       } else {
@@ -195,10 +205,10 @@ static BGProcessingTask *bgTask = nil;
       }
 
       // we need to sync without interruption, I run this just in case
-      char *resp = execute("interrupt_sync_after_batch", "false");
-      NSString* respStr = [NSString stringWithUTF8String:resp];
-      NSLog(@"BGTask syncingProcessBackgroundTask - no interrupt syncing %@", respStr);
-      rust_free(resp);
+      char *noInterrupt = execute("interrupt_sync_after_batch", "false");
+      NSString* noInterruptStr = [NSString stringWithUTF8String:noInterrupt];
+      NSLog(@"BGTask syncingProcessBackgroundTask - no interrupt syncing %@", noInterruptStr);
+      rust_free(noInterrupt);
 
       // the task is running here blocking this execution until this process finished:
       // 1. finished the syncing.
@@ -206,22 +216,22 @@ static BGProcessingTask *bgTask = nil;
 
       NSLog(@"BGTask syncingProcessBackgroundTask - sync BEGIN");
 
-      char *resp2 = execute("sync", "");
-      NSString* respStr2 = [NSString stringWithUTF8String:resp2];
-      rust_free(resp2);
+      char *syncing = execute("sync", "");
+      NSString* syncingStr = [NSString stringWithUTF8String:syncing];
+      rust_free(syncing);
 
-      NSLog(@"BGTask syncingProcessBackgroundTask - sync END %@", respStr2);
+      NSLog(@"BGTask syncingProcessBackgroundTask - sync END %@", syncingStr);
 
     } else {
       
       NSLog(@"BGTask syncingProcessBackgroundTask - No exists wallet file END");
       // save info in background json
-      NSTimeInterval timeStamp = [[NSDate date] timeIntervalSince1970];
+      NSTimeInterval timeStampError = [[NSDate date] timeIntervalSince1970];
       // NSTimeInterval is defined as double
-      NSNumber *timeStampObj = [NSNumber numberWithDouble: timeStamp];
-      NSString *timeStampStr = [timeStampObj stringValue];
-      NSString *jsonBackgroud = [NSString stringWithFormat: @"%@%@%@%@%@%@%@", @"{\"batches\": \"", @"0", @"\", \"message\": \"", @"No wallet file KO.", @"\", \"date\": \"", timeStampStr, @"\"}"];
-      [rpcmodule saveBackgroundFile:jsonBackgroud];
+      NSNumber *timeStampObjError = [NSNumber numberWithDouble: timeStampError];
+      NSString *timeStampStrError = [timeStampObjError stringValue];
+      NSString *jsonBackgroudError = [NSString stringWithFormat: @"%@%@%@%@%@%@%@", @"{\"batches\": \"", @"0", @"\", \"message\": \"", @"No wallet file KO.", @"\", \"date\": \"", timeStampStrError, @"\"}"];
+      [rpcmodule saveBackgroundFile:jsonBackgroudError];
       NSLog(@"BGTask syncingProcessBackgroundTask - Save background JSON");
 
       [bgTask setTaskCompletedWithSuccess:NO];
@@ -236,17 +246,16 @@ static BGProcessingTask *bgTask = nil;
     // I'm gessing NO.
 
     // save the wallet
-    RPCModule *rpcmodule = [RPCModule new];
     [rpcmodule saveWalletInternal];
     NSLog(@"BGTask syncingProcessBackgroundTask - Save Wallet");
 
     // save info in background json
-    NSTimeInterval timeStamp = [[NSDate date] timeIntervalSince1970];
+    NSTimeInterval timeStampEnd = [[NSDate date] timeIntervalSince1970];
     // NSTimeInterval is defined as double
-    NSNumber *timeStampObj = [NSNumber numberWithDouble: timeStamp];
-    NSString *timeStampStr = [timeStampObj stringValue];
-    NSString *jsonBackgroud = [NSString stringWithFormat: @"%@%@%@%@%@%@%@", @"{\"batches\": \"", @"0", @"\", \"message\": \"", @"Finished OK.", @"\", \"date\": \"", timeStampStr, @"\"}"];
-    [rpcmodule saveBackgroundFile:jsonBackgroud];
+    NSNumber *timeStampObjEnd = [NSNumber numberWithDouble: timeStampEnd];
+    NSString *timeStampStrEnd = [timeStampObjEnd stringValue];
+    NSString *jsonBackgroudEnd = [NSString stringWithFormat: @"%@%@%@%@%@%@%@", @"{\"batches\": \"", @"0", @"\", \"message\": \"", @"Finished OK.", @"\", \"date\": \"", timeStampStrEnd, @"\"}"];
+    [rpcmodule saveBackgroundFile:jsonBackgroudEnd];
     NSLog(@"BGTask syncingProcessBackgroundTask - Save background JSON");
 
     [bgTask setTaskCompletedWithSuccess:YES];
@@ -300,25 +309,6 @@ static BGProcessingTask *bgTask = nil;
 
 // NEW BACKGROUND SCHEDULING TASKS
 
-- (void)handleBackgroundTask {
-    // We require the background task to run when connected to the power and wifi
-    Reachability *reachability = [Reachability reachabilityForInternetConnection];
-    NetworkStatus networkStatus = [reachability currentReachabilityStatus];
-    
-    if (networkStatus == ReachableViaWiFi) {
-      // the device have Wifi.
-      isConnectedToWifi = true;
-    } else {
-      isConnectedToWifi = false;
-    }
-
-    UIDeviceBatteryState currentState = [[UIDevice currentDevice] batteryState];
-
-    NSLog(@"BGTask isConnectedToWifi %@", isConnectedToWifi ? @"true" : @"false");
-    
-    [self registerTasks];
-}
-
 - (void)registerTasks {
     BOOL bcgSyncTaskResult;
     bcgSyncTaskResult = [[BGTaskScheduler sharedScheduler] registerForTaskWithIdentifier:syncTask usingQueue:dispatch_get_main_queue() 
@@ -355,20 +345,43 @@ static BGProcessingTask *bgTask = nil;
     // Schedule tasks for the next time
     [self scheduleBackgroundTask];
     [self scheduleSchedulerBackgroundTask];
+  
+    // We require the background task to run when connected to the power and wifi
+    Reachability *reachability = [Reachability reachabilityForInternetConnection];
+    NetworkStatus networkStatus = [reachability currentReachabilityStatus];
     
-    if (!isConnectedToWifi) {
-        // save info in background json
-        NSTimeInterval timeStamp = [[NSDate date] timeIntervalSince1970];
-        // NSTimeInterval is defined as double
-        NSNumber *timeStampObj = [NSNumber numberWithDouble: timeStamp];
-        NSString *timeStampStr = [timeStampObj stringValue];
-        NSString *jsonBackgroud = [NSString stringWithFormat: @"%@%@%@%@%@%@%@", @"{\"batches\": \"", @"0", @"\", \"message\": \"", @"No wifi KO.", @"\", \"date\": \"", timeStampStr, @"\"}"];
-        [rpcmodule saveBackgroundFile:jsonBackgroud];
-      
-        NSLog(@"BGTask startBackgroundTask: not connected to the wifi");
-        [bgTask setTaskCompletedWithSuccess:NO];
-        bgTask = nil;
-        return;
+    if (networkStatus != ReachableViaWiFi) {
+      // the device have NOT Wifi.
+      // save info in background json
+      NSTimeInterval timeStamp = [[NSDate date] timeIntervalSince1970];
+      // NSTimeInterval is defined as double
+      NSNumber *timeStampObj = [NSNumber numberWithDouble: timeStamp];
+      NSString *timeStampStr = [timeStampObj stringValue];
+      NSString *jsonBackgroud = [NSString stringWithFormat: @"%@%@%@%@%@%@%@", @"{\"batches\": \"", @"0", @"\", \"message\": \"", @"No wifi KO.", @"\", \"date\": \"", timeStampStr, @"\"}"];
+      [rpcmodule saveBackgroundFile:jsonBackgroud];
+    
+      NSLog(@"BGTask startBackgroundTask: not connected to the wifi");
+      [bgTask setTaskCompletedWithSuccess:NO];
+      bgTask = nil;
+      return;
+    }
+
+    UIDeviceBatteryState currentState = [[UIDevice currentDevice] batteryState];
+
+    if (currentState != UIDeviceBatteryStateCharging) {
+      // The battery is NOT either charging, or connected to a charger.
+      // save info in background json
+      NSTimeInterval timeStamp = [[NSDate date] timeIntervalSince1970];
+      // NSTimeInterval is defined as double
+      NSNumber *timeStampObj = [NSNumber numberWithDouble: timeStamp];
+      NSString *timeStampStr = [timeStampObj stringValue];
+      NSString *jsonBackgroud = [NSString stringWithFormat: @"%@%@%@%@%@%@%@", @"{\"batches\": \"", @"0", @"\", \"message\": \"", @"No plug-in KO.", @"\", \"date\": \"", timeStampStr, @"\"}"];
+      [rpcmodule saveBackgroundFile:jsonBackgroud];
+    
+      NSLog(@"BGTask startBackgroundTask: not plup-in to power");
+      [bgTask setTaskCompletedWithSuccess:NO];
+      bgTask = nil;
+      return;
     }
     
     // Start the syncing
@@ -382,9 +395,9 @@ static BGProcessingTask *bgTask = nil;
         NSLog(@"BGTask startBackgroundTask - expirationHandler called");
         // interrupting the sync process, I can't wait to see if the process is over
         // because I have no time enough to run all I need in this task.
-        char *resp2 = execute("interrupt_sync_after_batch", "true");
-        NSString* respStr2 = [NSString stringWithUTF8String:resp2];
-        NSLog(@"BGTask startBackgroundTask - expirationHandler interrupt syncing %@", respStr2);
+        char *interrupt = execute("interrupt_sync_after_batch", "true");
+        NSString* interruptStr = [NSString stringWithUTF8String:interrupt];
+        NSLog(@"BGTask startBackgroundTask - expirationHandler interrupt syncing %@", interruptStr);
 
         // save the wallet
         RPCModule *rpcmodule = [RPCModule new];
