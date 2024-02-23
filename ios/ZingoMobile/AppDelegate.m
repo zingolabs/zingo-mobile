@@ -34,7 +34,6 @@ static void InitializeFlipper(UIApplication *application) {
 static NSString* syncTask = @"Zingo_Processing_Task_ID";
 static NSString* syncSchedulerTask = @"Zingo_Processing_Scheduler_Task_ID";
 static BOOL isConnectedToWifi = false;
-static BOOL isCharging = false;
 static BGProcessingTask *bgTask = nil;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
@@ -303,14 +302,7 @@ static BGProcessingTask *bgTask = nil;
 
     UIDeviceBatteryState currentState = [[UIDevice currentDevice] batteryState];
 
-    if (currentState == UIDeviceBatteryStateCharging) {
-      // The battery is either charging, or connected to a charger.
-      isCharging = true;
-    } else {
-      isCharging = false;
-    }
-
-    NSLog(@"BGTask isConnectedToWifi %@ isCharging %@", isConnectedToWifi ? @"true" : @"false", isCharging ? @"true" : @"false");
+    NSLog(@"BGTask isConnectedToWifi %@", isConnectedToWifi ? @"true" : @"false");
     
     [self registerTasks];
 }
@@ -362,21 +354,6 @@ static BGProcessingTask *bgTask = nil;
         [rpcmodule saveBackgroundFile:jsonBackgroud];
       
         NSLog(@"BGTask startBackgroundTask: not connected to the wifi");
-        [bgTask setTaskCompletedWithSuccess:NO];
-        bgTask = nil;
-        return;
-    }
-
-    if (!isCharging) {
-        // save info in background json
-        NSTimeInterval timeStamp = [[NSDate date] timeIntervalSince1970];
-        // NSTimeInterval is defined as double
-        NSNumber *timeStampObj = [NSNumber numberWithDouble: timeStamp];
-        NSString *timeStampStr = [timeStampObj stringValue];
-        NSString *jsonBackgroud = [NSString stringWithFormat: @"%@%@%@%@%@%@%@", @"{\"batches\": \"", @"0", @"\", \"message\": \"", @"No plug-in KO.", @"\", \"date\": \"", timeStampStr, @"\"}"];
-        [rpcmodule saveBackgroundFile:jsonBackgroud];
-      
-        NSLog(@"BGTask startBackgroundTask: not plug in to power");
         [bgTask setTaskCompletedWithSuccess:NO];
         bgTask = nil;
         return;
