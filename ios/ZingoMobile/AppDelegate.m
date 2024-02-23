@@ -215,6 +215,18 @@ static BGProcessingTask *bgTask = nil;
     } else {
       
       NSLog(@"BGTask syncingProcessBackgroundTask - No exists wallet file END");
+      // save info in background json
+      NSTimeInterval timeStamp = [[NSDate date] timeIntervalSince1970];
+      // NSTimeInterval is defined as double
+      NSNumber *timeStampObj = [NSNumber numberWithDouble: timeStamp];
+      NSString *timeStampStr = [timeStampObj stringValue];
+      NSString *jsonBackgroud = [NSString stringWithFormat: @"%@%@%@%@%@%@%@", @"{\"batches\": \"", @"0", @"\", \"message\": \"", @"No wallet file KO.", @"\", \"date\": \"", timeStampStr, @"\"}"];
+      [rpcmodule saveBackgroundFile:jsonBackgroud];
+      NSLog(@"BGTask syncingProcessBackgroundTask - Save background JSON");
+
+      [bgTask setTaskCompletedWithSuccess:NO];
+      bgTask = nil;
+      return;
 
     }
 

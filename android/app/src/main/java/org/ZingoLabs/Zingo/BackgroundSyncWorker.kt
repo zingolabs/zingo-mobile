@@ -83,6 +83,12 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
 
         } else {
             Log.i("SCHEDULED_TASK_RUN", "No exists wallet file END")
+            // save the background JSON file
+            val timeStampError = Date().time / 1000
+            val timeStampStrError = timeStampError.toString()
+            val jsonBackgroundError = "{\"batches\": \"0\", \"message\": \"No wallet file KO.\", \"date\": \"$timeStampStrError\"}"
+            rpcModule.saveBackgroundFile(jsonBackgroundError)
+            Log.i("SCHEDULED_TASK_RUN", "background json file SAVED")
             return Result.failure()
 
         }
