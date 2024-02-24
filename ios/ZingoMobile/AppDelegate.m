@@ -365,24 +365,6 @@ BGProcessingTask *bgTask = nil;
       bgTask = nil;
       return;
     }
-
-    UIDeviceBatteryState currentState = [[UIDevice currentDevice] batteryState];
-
-    if (currentState != UIDeviceBatteryStateCharging) {
-      // The battery is NOT either charging, or connected to a charger.
-      // save info in background json
-      NSTimeInterval timeStamp = [[NSDate date] timeIntervalSince1970];
-      // NSTimeInterval is defined as double
-      NSNumber *timeStampObj = [NSNumber numberWithDouble: timeStamp];
-      NSString *timeStampStr = [timeStampObj stringValue];
-      NSString *jsonBackgroud = [NSString stringWithFormat: @"%@%@%@%@%@%@%@", @"{\"batches\": \"", @"0", @"\", \"message\": \"", @"No plug-in KO.", @"\", \"date\": \"", timeStampStr, @"\"}"];
-      [rpcmodule saveBackgroundFile:jsonBackgroud];
-    
-      NSLog(@"BGTask startBackgroundTask: not plup-in to power");
-      [bgTask setTaskCompletedWithSuccess:NO];
-      bgTask = nil;
-      return;
-    }
     
     // Start the syncing
     NSLog(@"BGTask startBackgroundTask run sync task");
