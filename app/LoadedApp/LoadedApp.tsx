@@ -9,7 +9,6 @@ import {
   EmitterSubscription,
   AppState,
   NativeEventSubscription,
-  Platform,
   Linking,
   SafeAreaView,
 } from 'react-native';
@@ -178,13 +177,10 @@ export default function LoadedApp(props: LoadedAppProps) {
       }
 
       // reading background task info
-      if (Platform.OS === 'ios') {
-        // this file only exists in IOS BS.
-        const backgroundJson = await BackgroundFileImpl.readBackground();
-        //console.log('background', backgroundJson);
-        if (backgroundJson) {
-          setBackground(backgroundJson);
-        }
+      const backgroundJson = await BackgroundFileImpl.readBackground();
+      //console.log('background', backgroundJson);
+      if (backgroundJson) {
+        setBackground(backgroundJson);
       }
       setLoading(false);
     })();

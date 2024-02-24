@@ -183,10 +183,9 @@ class BSCompanion {
         fun scheduleBackgroundTask() {
             val reactContext = ReactApplicationContext(MainApplication.getAppContext())
 
+            // zancas requeriment, not plug-in
             val constraints = Constraints.Builder()
-                .setRequiresStorageNotLow(false) // less restricted
                 .setRequiredNetworkType(NetworkType.UNMETERED)
-                .setRequiresCharging(true)
                 .build()
 
             // PRODUCTION - next day between 3:00 and 4:00 am.

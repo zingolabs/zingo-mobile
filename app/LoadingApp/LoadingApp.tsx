@@ -12,7 +12,6 @@ import {
   EmitterSubscription,
   AppState,
   NativeEventSubscription,
-  Platform,
   TextInput,
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
@@ -168,12 +167,9 @@ export default function LoadingApp(props: LoadingAppProps) {
       //await delay(5000);
 
       // reading background task info
-      if (Platform.OS === 'ios') {
-        // this file only exists in IOS BS.
-        const backgroundJson = await BackgroundFileImpl.readBackground();
-        if (backgroundJson) {
-          setBackground(backgroundJson);
-        }
+      const backgroundJson = await BackgroundFileImpl.readBackground();
+      if (backgroundJson) {
+        setBackground(backgroundJson);
       }
       setLoading(false);
     })();
