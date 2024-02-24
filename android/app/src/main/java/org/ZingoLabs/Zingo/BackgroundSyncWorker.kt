@@ -37,9 +37,6 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun doWork(): Result {
-        // first scheduling the same task for tomorrow
-        BSCompanion.scheduleBackgroundTask()
-
         val reactContext = ReactApplicationContext(MainApplication.getAppContext())
         val rpcModule = RPCModule(reactContext)
 
@@ -103,6 +100,9 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
         val jsonBackgroundEnd = "{\"batches\": \"0\", \"message\": \"Finished OK.\", \"date\": \"$timeStampStrEnd\"}"
         rpcModule.saveBackgroundFile(jsonBackgroundEnd)
         Log.i("SCHEDULED_TASK_RUN", "background json file SAVED")
+
+        // the last thing... scheduling the same task for tomorrow
+        BSCompanion.scheduleBackgroundTask()
 
         return Result.success()
     }
@@ -218,15 +218,15 @@ class BSCompanion {
 
             val targetTime =
                 now
-                    .plus(SYNC_DAY_SHIFT)
+                    //.plus(SYNC_DAY_SHIFT)
                     .toLocalDateTime(currentTimeZone)
                     .date
                     .atTime(
-                        hour = SYNC_START_TIME_HOURS.inWholeHours.toInt(),
+                        hour = 10, //SYNC_START_TIME_HOURS.inWholeHours.toInt(),
                         // Even though the WorkManager will trigger the work approximately at the set time, it's
                         // better to randomize time in 3-4 a.m. This generates a number between 0 (inclusive) and 60
                         // (exclusive)
-                        minute = Random.nextInt(0, SYNC_START_TIME_MINUTES.inWholeMinutes.toInt())
+                        minute = 10 //Random.nextInt(0, SYNC_START_TIME_MINUTES.inWholeMinutes.toInt())
                     )
 
             val targetTimeTime = targetTime.time
