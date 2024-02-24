@@ -218,7 +218,7 @@ class BSCompanion {
 
             val targetTime =
                 now
-                    //.plus(SYNC_DAY_SHIFT)
+                    .plus(SYNC_DAY_SHIFT)
                     .toLocalDateTime(currentTimeZone)
                     .date
                     .atTime(
