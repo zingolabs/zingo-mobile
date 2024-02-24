@@ -222,11 +222,11 @@ class BSCompanion {
                     .toLocalDateTime(currentTimeZone)
                     .date
                     .atTime(
-                        hour = 10, //SYNC_START_TIME_HOURS.inWholeHours.toInt(),
+                        hour = SYNC_START_TIME_HOURS.inWholeHours.toInt(),
                         // Even though the WorkManager will trigger the work approximately at the set time, it's
                         // better to randomize time in 3-4 a.m. This generates a number between 0 (inclusive) and 60
                         // (exclusive)
-                        minute = 10 //Random.nextInt(0, SYNC_START_TIME_MINUTES.inWholeMinutes.toInt())
+                        minute = Random.nextInt(0, SYNC_START_TIME_MINUTES.inWholeMinutes.toInt())
                     )
 
             val targetTimeTime = targetTime.time
