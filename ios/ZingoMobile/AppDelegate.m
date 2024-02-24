@@ -426,7 +426,8 @@ BGProcessingTask *bgTask = nil;
 
     request.earliestBeginDate = earlyMorning;
     //request.earliestBeginDate = twoMinutesLater;
-    request.requiresExternalPower = YES;
+    // zancas requeriment, not plug-in.
+    request.requiresExternalPower = NO;
     request.requiresNetworkConnectivity = YES;
     
     NSError *error = nil;
