@@ -230,7 +230,7 @@ BGProcessingTask *bgTask = nil;
       // NSTimeInterval is defined as double
       NSNumber *timeStampObjError = [NSNumber numberWithDouble: timeStampError];
       NSString *timeStampStrError = [timeStampObjError stringValue];
-      NSString *jsonBackgroudError = [NSString stringWithFormat: @"%@%@%@%@%@%@%@", @"{\"batches\": \"", @"0", @"\", \"message\": \"", @"No wallet file KO.", @"\", \"date\": \"", timeStampStrError, @"\"}"];
+      NSString *jsonBackgroudError = [NSString stringWithFormat: @"%@%@%@%@%@%@%@", @"{\"batches\": \"", @"0", @"\", \"message\": \"", @"No active wallet KO.", @"\", \"date\": \"", timeStampStrError, @"\"}"];
       [rpcmodule saveBackgroundFile:jsonBackgroudError];
       NSLog(@"BGTask syncingProcessBackgroundTask - Save background JSON");
 
@@ -340,31 +340,10 @@ BGProcessingTask *bgTask = nil;
 
 - (void)startBackgroundTask:(NSString *)noValue {
     NSLog(@"BGTask startBackgroundTask called");
-    RPCModule *rpcmodule = [RPCModule new];
     
     // Schedule tasks for the next time
     [self scheduleBackgroundTask];
     [self scheduleSchedulerBackgroundTask];
-  
-    // We require the background task to run when connected to the power and wifi
-    Reachability *reachability = [Reachability reachabilityForInternetConnection];
-    NetworkStatus networkStatus = [reachability currentReachabilityStatus];
-    
-    if (networkStatus != ReachableViaWiFi) {
-      // the device have NOT Wifi.
-      // save info in background json
-      NSTimeInterval timeStamp = [[NSDate date] timeIntervalSince1970];
-      // NSTimeInterval is defined as double
-      NSNumber *timeStampObj = [NSNumber numberWithDouble: timeStamp];
-      NSString *timeStampStr = [timeStampObj stringValue];
-      NSString *jsonBackgroud = [NSString stringWithFormat: @"%@%@%@%@%@%@%@", @"{\"batches\": \"", @"0", @"\", \"message\": \"", @"No wifi KO.", @"\", \"date\": \"", timeStampStr, @"\"}"];
-      [rpcmodule saveBackgroundFile:jsonBackgroud];
-    
-      NSLog(@"BGTask startBackgroundTask: not connected to the wifi");
-      [bgTask setTaskCompletedWithSuccess:NO];
-      bgTask = nil;
-      return;
-    }
     
     // Start the syncing
     NSLog(@"BGTask startBackgroundTask run sync task");
@@ -380,9 +359,10 @@ BGProcessingTask *bgTask = nil;
         char *interrupt = execute("interrupt_sync_after_batch", "true");
         NSString* interruptStr = [NSString stringWithUTF8String:interrupt];
         NSLog(@"BGTask startBackgroundTask - expirationHandler interrupt syncing %@", interruptStr);
+      
+        RPCModule *rpcmodule = [RPCModule new];
 
         // save the wallet
-        RPCModule *rpcmodule = [RPCModule new];
         [rpcmodule saveWalletInternal];
         NSLog(@"BGTask startBackgroundTask - expirationHandler Save Wallet");
 
@@ -416,18 +396,12 @@ BGProcessingTask *bgTask = nil;
     earlyMorningComponent.hour = 3;
     earlyMorningComponent.minute = arc4random_uniform(61);
     NSDate *earlyMorning = [[NSCalendar currentCalendar] dateByAddingComponents:earlyMorningComponent toDate:tomorrow options:0];
-    
-    // DEVELOPMENT
-    //NSDate *now = [NSDate date];
-
-    //NSDate *twoMinutesLater = [now dateByAddingTimeInterval:120]; // 2 minutes = 120 seconds
   
     NSLog(@"BGTask scheduleBackgroundTask date calculated: %@", earlyMorning);
 
     request.earliestBeginDate = earlyMorning;
-    //request.earliestBeginDate = twoMinutesLater;
-    // zancas requeriment, not plug-in.
-    request.requiresExternalPower = NO;
+    // zancas requeriment, not plug-in, reverted.
+    request.requiresExternalPower = YES;
     request.requiresNetworkConnectivity = YES;
     
     NSError *error = nil;
@@ -454,14 +428,8 @@ BGProcessingTask *bgTask = nil;
     afternoonComponent.hour = 14;
     afternoonComponent.minute = arc4random_uniform(61);
     NSDate *afternoon = [[NSCalendar currentCalendar] dateByAddingComponents:afternoonComponent toDate:tomorrow options:0];
-    
-    // DEVELOPMENT
-    //NSDate *now = [NSDate date];
-
-    //NSDate *fiveMinutesLater = [now dateByAddingTimeInterval:300]; // 5 minutes = 300 seconds
 
     request.earliestBeginDate = afternoon;
-    //request.earliestBeginDate = fiveMinutesLater;
     request.requiresExternalPower = NO;
     request.requiresNetworkConnectivity = NO;
     
