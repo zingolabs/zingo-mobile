@@ -83,7 +83,7 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
             // save the background JSON file
             val timeStampError = Date().time / 1000
             val timeStampStrError = timeStampError.toString()
-            val jsonBackgroundError = "{\"batches\": \"0\", \"message\": \"No wallet file KO.\", \"date\": \"$timeStampStrError\"}"
+            val jsonBackgroundError = "{\"batches\": \"0\", \"message\": \"No active wallet KO.\", \"date\": \"$timeStampStrError\"}"
             rpcModule.saveBackgroundFile(jsonBackgroundError)
             Log.i("SCHEDULED_TASK_RUN", "background json file SAVED")
             return Result.failure()
@@ -185,7 +185,9 @@ class BSCompanion {
 
             // zancas requeriment, not plug-in
             val constraints = Constraints.Builder()
+                .setRequiresStorageNotLow(false) // less restricted
                 .setRequiredNetworkType(NetworkType.UNMETERED)
+                .setRequiresCharging(true)
                 .build()
 
             // PRODUCTION - next day between 3:00 and 4:00 am.
@@ -193,13 +195,9 @@ class BSCompanion {
 
             Log.i("SCHEDULING_TASK", "calculated target time DIFF $targetTimeDiff")
 
-            // DEVELOPMENT - after 5 minutes.
-            //val timeFiveMinutes: Long = 5
-
             val workRequest = PeriodicWorkRequest.Builder(BackgroundSyncWorker::class.java, SYNC_PERIOD.toJavaDuration())
                 .setConstraints(constraints)
                 .setInitialDelay(targetTimeDiff.toJavaDuration())
-                //.setInitialDelay(timeFiveMinutes, TimeUnit.MINUTES)
                 .build()
 
             Log.i("SCHEDULING_TASK", "Enqueuing the background task - Background")
