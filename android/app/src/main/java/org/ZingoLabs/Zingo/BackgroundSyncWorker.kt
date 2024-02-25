@@ -101,9 +101,6 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
         rpcModule.saveBackgroundFile(jsonBackgroundEnd)
         Log.i("SCHEDULED_TASK_RUN", "background json file SAVED")
 
-        // the last thing... scheduling the same task for tomorrow
-        BSCompanion.scheduleBackgroundTask()
-
         return Result.success()
     }
 
@@ -207,6 +204,9 @@ class BSCompanion {
                     ExistingPeriodicWorkPolicy.REPLACE,
                     workRequest
                 )
+
+            Log.i("SCHEDULING_TASK", "Task info ${WorkManager.getInstance(reactContext).getWorkInfosForUniqueWork(
+                taskID).get()}")
         }
 
         private fun calculateTargetTimeDifference(): Duration {
