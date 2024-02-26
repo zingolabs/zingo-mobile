@@ -97,7 +97,7 @@ export default function LoadedApp(props: LoadedAppProps) {
   const [sendAll, setSendAll] = useState<boolean>(false);
   const [privacy, setPrivacy] = useState<boolean>(false);
   const [mode, setMode] = useState<'basic' | 'advanced'>('basic');
-  const [background, setBackground] = useState<BackgroundType>({ batches: 0, message: '', date: 0 });
+  const [background, setBackground] = useState<BackgroundType>({ batches: 0, message: '', date: 0, dateEnd: 0 });
   const [loading, setLoading] = useState<boolean>(true);
   const file = useMemo(
     () => ({

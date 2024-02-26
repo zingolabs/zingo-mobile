@@ -13,7 +13,7 @@ import { ThemeType } from '../app/types';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { I18n } from 'i18n-js';
 import { StackScreenProps } from '@react-navigation/stack';
-import { ServerType } from '../app/AppState';
+import { BackgroundType, ServerType } from '../app/AppState';
 
 // Crea un mock para el constructor de I18n
 jest.mock('i18n-js', () => ({
@@ -121,10 +121,11 @@ describe('Component LoadedApp - test', () => {
     const sendAll = false;
     const privacy = false;
     const mode = 'basic';
-    const background = {
+    const background: BackgroundType = {
       batches: 0,
       message: '',
       date: 0,
+      dateEnd: 0,
     };
     const readOnly = false;
     const receive = render(

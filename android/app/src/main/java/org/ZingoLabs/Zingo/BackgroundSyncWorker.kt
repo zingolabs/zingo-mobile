@@ -45,7 +45,7 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
         // save the background JSON file
         val timeStampStart = Date().time / 1000
         val timeStampStrStart = timeStampStart.toString()
-        val jsonBackgroundStart = "{\"batches\": \"0\", \"message\": \"Starting OK.\", \"date\": \"$timeStampStrStart\"}"
+        val jsonBackgroundStart = "{\"batches\": \"0\", \"message\": \"Starting OK.\", \"date\": \"$timeStampStrStart\", \"dateEnd\": \"0\"}"
         rpcModule.saveBackgroundFile(jsonBackgroundStart)
         Log.i("SCHEDULED_TASK_RUN", "background json file SAVED")
 
@@ -83,7 +83,7 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
             // save the background JSON file
             val timeStampError = Date().time / 1000
             val timeStampStrError = timeStampError.toString()
-            val jsonBackgroundError = "{\"batches\": \"0\", \"message\": \"No active wallet KO.\", \"date\": \"$timeStampStrError\"}"
+            val jsonBackgroundError = "{\"batches\": \"0\", \"message\": \"No active wallet KO.\", \"date\": \"$timeStampStrStart\", \"dateEnd\": \"$timeStampStrError\"}"
             rpcModule.saveBackgroundFile(jsonBackgroundError)
             Log.i("SCHEDULED_TASK_RUN", "background json file SAVED")
             return Result.failure()
@@ -97,7 +97,7 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
         // save the background JSON file
         val timeStampEnd = Date().time / 1000
         val timeStampStrEnd = timeStampEnd.toString()
-        val jsonBackgroundEnd = "{\"batches\": \"0\", \"message\": \"Finished OK.\", \"date\": \"$timeStampStrEnd\"}"
+        val jsonBackgroundEnd = "{\"batches\": \"0\", \"message\": \"Finished OK.\", \"date\": \"$timeStampStrStart\", \"dateEnd\": \"$timeStampStrEnd\"}"
         rpcModule.saveBackgroundFile(jsonBackgroundEnd)
         Log.i("SCHEDULED_TASK_RUN", "background json file SAVED")
 
@@ -180,7 +180,7 @@ class BSCompanion {
         fun scheduleBackgroundTask() {
             val reactContext = ReactApplicationContext(MainApplication.getAppContext())
 
-            // zancas requeriment, not plug-in
+            // zancas requeriment, not plug-in, reverted.
             val constraints = Constraints.Builder()
                 .setRequiresStorageNotLow(false) // less restricted
                 .setRequiredNetworkType(NetworkType.UNMETERED)
