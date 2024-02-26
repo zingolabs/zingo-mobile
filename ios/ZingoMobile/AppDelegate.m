@@ -34,6 +34,7 @@ static void InitializeFlipper(UIApplication *application) {
 NSString* syncTask = @"Zingo_Processing_Task_ID";
 NSString* syncSchedulerTask = @"Zingo_Processing_Scheduler_Task_ID";
 BGProcessingTask *bgTask = nil;
+NSString* timeStampStrStart = nil;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
@@ -181,8 +182,8 @@ BGProcessingTask *bgTask = nil;
     NSTimeInterval timeStampStart = [[NSDate date] timeIntervalSince1970];
     // NSTimeInterval is defined as double
     NSNumber *timeStampObjStart = [NSNumber numberWithDouble: timeStampStart];
-    NSString *timeStampStrStart = [timeStampObjStart stringValue];
-    NSString *jsonBackgroudStart = [NSString stringWithFormat: @"%@%@%@%@%@%@%@", @"{\"batches\": \"", @"0", @"\", \"message\": \"", @"Starting OK.", @"\", \"date\": \"", timeStampStrStart, @"\"}"];
+    timeStampStrStart = [timeStampObjStart stringValue];
+    NSString *jsonBackgroudStart = [NSString stringWithFormat: @"%@%@%@%@%@%@%@%@%@", @"{\"batches\": \"", @"0", @"\", \"message\": \"", @"Starting OK.", @"\", \"date\": \"", timeStampStrStart, @"\",  \"dateEnd\": \"", @"0", @"\"}"];
     [rpcmodule saveBackgroundFile:jsonBackgroudStart];
     NSLog(@"BGTask syncingProcessBackgroundTask - Save background JSON");
     
@@ -230,7 +231,7 @@ BGProcessingTask *bgTask = nil;
       // NSTimeInterval is defined as double
       NSNumber *timeStampObjError = [NSNumber numberWithDouble: timeStampError];
       NSString *timeStampStrError = [timeStampObjError stringValue];
-      NSString *jsonBackgroudError = [NSString stringWithFormat: @"%@%@%@%@%@%@%@", @"{\"batches\": \"", @"0", @"\", \"message\": \"", @"No active wallet KO.", @"\", \"date\": \"", timeStampStrError, @"\"}"];
+      NSString *jsonBackgroudError = [NSString stringWithFormat: @"%@%@%@%@%@%@%@%@%@", @"{\"batches\": \"", @"0", @"\", \"message\": \"", @"No active wallet KO.", @"\", \"date\": \"", timeStampStrStart, @"\",  \"dateEnd\": \"", timeStampStrError, @"\"}"];
       [rpcmodule saveBackgroundFile:jsonBackgroudError];
       NSLog(@"BGTask syncingProcessBackgroundTask - Save background JSON");
 
@@ -254,7 +255,7 @@ BGProcessingTask *bgTask = nil;
     // NSTimeInterval is defined as double
     NSNumber *timeStampObjEnd = [NSNumber numberWithDouble: timeStampEnd];
     NSString *timeStampStrEnd = [timeStampObjEnd stringValue];
-    NSString *jsonBackgroudEnd = [NSString stringWithFormat: @"%@%@%@%@%@%@%@", @"{\"batches\": \"", @"0", @"\", \"message\": \"", @"Finished OK.", @"\", \"date\": \"", timeStampStrEnd, @"\"}"];
+    NSString *jsonBackgroudEnd = [NSString stringWithFormat: @"%@%@%@%@%@%@%@%@%@", @"{\"batches\": \"", @"0", @"\", \"message\": \"", @"Finished OK.", @"\", \"date\": \"", timeStampStrStart, @"\",  \"dateEnd\": \"", timeStampStrEnd, @"\"}"];
     [rpcmodule saveBackgroundFile:jsonBackgroudEnd];
     NSLog(@"BGTask syncingProcessBackgroundTask - Save background JSON");
 
@@ -371,7 +372,7 @@ BGProcessingTask *bgTask = nil;
         // NSTimeInterval is defined as double
         NSNumber *timeStampObj = [NSNumber numberWithDouble: timeStamp];
         NSString *timeStampStr = [timeStampObj stringValue];
-        NSString *jsonBackgroud = [NSString stringWithFormat: @"%@%@%@%@%@%@%@", @"{\"batches\": \"", @"0", @"\", \"message\": \"", @"Expiration fired. Finished OK.", @"\", \"date\": \"", timeStampStr, @"\"}"];
+        NSString *jsonBackgroud = [NSString stringWithFormat: @"%@%@%@%@%@%@%@%@%@", @"{\"batches\": \"", @"0", @"\", \"message\": \"", @"Expiration fired. Finished OK.", @"\", \"date\": \"", timeStampStrStart, @"\",  \"dateEnd\": \"", timeStampStr, @"\"}"];
         [rpcmodule saveBackgroundFile:jsonBackgroud];
         NSLog(@"BGTask startBackgroundTask - expirationHandler Save background JSON");
 
