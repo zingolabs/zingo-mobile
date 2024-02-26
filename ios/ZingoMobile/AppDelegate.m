@@ -185,7 +185,7 @@ NSString* timeStampStrStart = nil;
     timeStampStrStart = [timeStampObjStart stringValue];
     NSString *jsonBackgroudStart = [NSString stringWithFormat: @"%@%@%@%@%@%@%@%@%@", @"{\"batches\": \"", @"0", @"\", \"message\": \"", @"Starting OK.", @"\", \"date\": \"", timeStampStrStart, @"\",  \"dateEnd\": \"", @"0", @"\"}"];
     [rpcmodule saveBackgroundFile:jsonBackgroudStart];
-    NSLog(@"BGTask syncingProcessBackgroundTask - Save background JSON");
+    NSLog(@"BGTask syncingProcessBackgroundTask - Save background JSON %@", jsonBackgroudStart);
     
     NSLog(@"BGTask syncingProcessBackgroundTask");
     BOOL exists = [self wallet__exists];
@@ -233,7 +233,7 @@ NSString* timeStampStrStart = nil;
       NSString *timeStampStrError = [timeStampObjError stringValue];
       NSString *jsonBackgroudError = [NSString stringWithFormat: @"%@%@%@%@%@%@%@%@%@", @"{\"batches\": \"", @"0", @"\", \"message\": \"", @"No active wallet KO.", @"\", \"date\": \"", timeStampStrStart, @"\",  \"dateEnd\": \"", timeStampStrError, @"\"}"];
       [rpcmodule saveBackgroundFile:jsonBackgroudError];
-      NSLog(@"BGTask syncingProcessBackgroundTask - Save background JSON");
+      NSLog(@"BGTask syncingProcessBackgroundTask - Save background JSON %@", jsonBackgroudError);
 
       [bgTask setTaskCompletedWithSuccess:NO];
       bgTask = nil;
@@ -257,7 +257,7 @@ NSString* timeStampStrStart = nil;
     NSString *timeStampStrEnd = [timeStampObjEnd stringValue];
     NSString *jsonBackgroudEnd = [NSString stringWithFormat: @"%@%@%@%@%@%@%@%@%@", @"{\"batches\": \"", @"0", @"\", \"message\": \"", @"Finished OK.", @"\", \"date\": \"", timeStampStrStart, @"\",  \"dateEnd\": \"", timeStampStrEnd, @"\"}"];
     [rpcmodule saveBackgroundFile:jsonBackgroudEnd];
-    NSLog(@"BGTask syncingProcessBackgroundTask - Save background JSON");
+    NSLog(@"BGTask syncingProcessBackgroundTask - Save background JSON %@", jsonBackgroudEnd);
 
     [bgTask setTaskCompletedWithSuccess:YES];
     bgTask = nil;
@@ -374,7 +374,7 @@ NSString* timeStampStrStart = nil;
         NSString *timeStampStr = [timeStampObj stringValue];
         NSString *jsonBackgroud = [NSString stringWithFormat: @"%@%@%@%@%@%@%@%@%@", @"{\"batches\": \"", @"0", @"\", \"message\": \"", @"Expiration fired. Finished OK.", @"\", \"date\": \"", timeStampStrStart, @"\",  \"dateEnd\": \"", timeStampStr, @"\"}"];
         [rpcmodule saveBackgroundFile:jsonBackgroud];
-        NSLog(@"BGTask startBackgroundTask - expirationHandler Save background JSON");
+        NSLog(@"BGTask startBackgroundTask - expirationHandler Save background JSON %@", jsonBackgroud);
 
         [bgTask setTaskCompletedWithSuccess:NO];
         bgTask = nil;
