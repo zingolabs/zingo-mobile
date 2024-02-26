@@ -47,7 +47,7 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
         val timeStampStrStart = timeStampStart.toString()
         val jsonBackgroundStart = "{\"batches\": \"0\", \"message\": \"Starting OK.\", \"date\": \"$timeStampStrStart\", \"dateEnd\": \"0\"}"
         rpcModule.saveBackgroundFile(jsonBackgroundStart)
-        Log.i("SCHEDULED_TASK_RUN", "background json file SAVED")
+        Log.i("SCHEDULED_TASK_RUN", "background json file SAVED $jsonBackgroundStart")
 
         // checking if the wallet file exists
         val exists: Boolean = walletExists()
@@ -85,7 +85,7 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
             val timeStampStrError = timeStampError.toString()
             val jsonBackgroundError = "{\"batches\": \"0\", \"message\": \"No active wallet KO.\", \"date\": \"$timeStampStrStart\", \"dateEnd\": \"$timeStampStrError\"}"
             rpcModule.saveBackgroundFile(jsonBackgroundError)
-            Log.i("SCHEDULED_TASK_RUN", "background json file SAVED")
+            Log.i("SCHEDULED_TASK_RUN", "background json file SAVED $jsonBackgroundError")
             return Result.failure()
 
         }
@@ -99,7 +99,7 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
         val timeStampStrEnd = timeStampEnd.toString()
         val jsonBackgroundEnd = "{\"batches\": \"0\", \"message\": \"Finished OK.\", \"date\": \"$timeStampStrStart\", \"dateEnd\": \"$timeStampStrEnd\"}"
         rpcModule.saveBackgroundFile(jsonBackgroundEnd)
-        Log.i("SCHEDULED_TASK_RUN", "background json file SAVED")
+        Log.i("SCHEDULED_TASK_RUN", "background json file SAVED $jsonBackgroundEnd")
 
         return Result.success()
     }

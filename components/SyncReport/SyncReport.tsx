@@ -234,8 +234,9 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
                   //background.batches.toString() +
                   //translate('report.batches-date') +
                   moment(Number(Number(background.date).toFixed(0)) * 1000).format('YYYY MMM D h:mm a') +
-                  ' - ' +
-                  moment(Number(Number(background.dateEnd).toFixed(0)) * 1000).format('YYYY MMM D h:mm a')
+                  (Number(background.dateEnd) > 0
+                    ? ' - ' + moment(Number(Number(background.dateEnd).toFixed(0)) * 1000).format('YYYY MMM D h:mm a')
+                    : '')
                 }
               />
               {!!background.message && <RegText color={colors.text}>{background.message}</RegText>}
