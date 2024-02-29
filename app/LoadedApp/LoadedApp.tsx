@@ -229,6 +229,7 @@ export default function LoadedApp(props: LoadedAppProps) {
         readOnly={readOnly}
         toggleTheme={props.toggleTheme}
         addressBook={addressBook}
+        toggleMode={props.toggleMode}
       />
     );
   }
@@ -249,6 +250,7 @@ type LoadedAppClassProps = {
   readOnly: boolean;
   toggleTheme: (mode: 'basic' | 'advanced') => void;
   addressBook: AddressBookFileClass[];
+  toggleMode: (mode: 'basic' | 'advanced') => void;
 };
 
 export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
@@ -975,6 +977,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     await this.rpc.clearTimers();
     if (!!state.screen && state.screen === 3) {
       await this.set_mode_option('mode', 'advanced');
+      // this function change the Theme in the App component.
+      this.props.toggleMode('advanced');
     }
     navigation.reset({
       index: 0,
