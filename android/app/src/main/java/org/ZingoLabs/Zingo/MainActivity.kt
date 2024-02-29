@@ -1,44 +1,46 @@
 package org.ZingoLabs.Zingo
 
-import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import androidx.annotation.RequiresApi
+import androidx.work.*
 import com.facebook.react.ReactActivity
-import java.util.concurrent.TimeUnit
+
 
 class MainActivity : ReactActivity() {
     /**
      * Returns the name of the main component registered from JavaScript. This is used to schedule
      * rendering of the component.
      */
-    override fun getMainComponentName(): String? {
+
+    private var isStarting = true;
+    override fun getMainComponentName(): String {
         return "Zingo!"
     }
     override fun onCreate(savedInstanceState: Bundle?) {
-        Log.w("", "Starting main activity")
-        val service = Intent(applicationContext, BackgroundSync::class.java)
-        applicationContext.stopService(service)
+        Log.i("ON_CREATE", "Starting main activity")
         super.onCreate(null)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onPause() {
-        Log.w("", "Pausing main activity")
-        val service = Intent(applicationContext, BackgroundSync::class.java)
-        val bundle = Bundle()
-
-        bundle.putString("BS: start syncing", "Native")
-
-        service.putExtras(bundle)
-
-        applicationContext.startService(service)
+        Log.i("ON_PAUSE", "Pausing main activity - Background")
+        BSCompanion.scheduleBackgroundTask()
         super.onPause()
-        //val backgroundRequest = PeriodicWorkRequest.Builder(BackgroundWorker::class.java, 15, TimeUnit.MINUTES).build()
-        //WorkManager.getInstance(application).enqueue(backgroundRequest)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onResume() {
-        val service = Intent(applicationContext, BackgroundSync::class.java)
-        applicationContext.stopService(service)
+        Log.i("ON_RESUME", "Resuming main activity - Foreground")
+        // cancel the task if it is in execution now
+        if (isStarting) {
+            // this is the time the App is launching.
+            isStarting = false
+        } else {
+            BSCompanion.cancelExecutingTask()
+        }
         super.onResume()
     }
+
 }

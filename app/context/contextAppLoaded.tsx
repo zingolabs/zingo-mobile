@@ -75,7 +75,9 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   sendAll: false,
   background: {
     batches: 0,
+    message: '',
     date: 0,
+    dateEnd: 0,
   } as BackgroundType,
 
   translate: () => '',

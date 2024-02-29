@@ -3,7 +3,6 @@ package org.ZingoLabs.Zingo
 import android.content.Context
 import android.util.Log
 import android.util.Base64
-import androidx.work.PeriodicWorkRequest
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
@@ -12,15 +11,10 @@ import com.facebook.react.bridge.Promise
 //import android.util.Log
 import java.io.File
 import java.io.InputStream
-import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
 
 class RPCModule internal constructor(private val reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
-    //companion object {
-    //    const val TAG = "RPCModule"
-    //}
-
     override fun getName(): String {
         return "RPCModule"
     }
@@ -30,10 +24,10 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         // Check if a wallet already exists
         val file = File(MainApplication.getAppContext()?.filesDir, "wallet.dat")
         if (file.exists()) {
-             // Log.w("MAIN", "Wallet exists")
+             // Log.i("MAIN", "Wallet exists")
             promise.resolve(true)
         } else {
-             // Log.w("MAIN", "Wallet DOES NOT exist")
+             // Log.i("MAIN", "Wallet DOES NOT exist")
             promise.resolve(false)
         }
     }
@@ -43,25 +37,25 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         // Check if a wallet backup already exists
         val file = File(MainApplication.getAppContext()?.filesDir, "wallet.backup.dat")
         if (file.exists()) {
-            // Log.w("MAIN", "Wallet backup exists")
+            // Log.i("MAIN", "Wallet backup exists")
             promise.resolve(true)
         } else {
-            // Log.w("MAIN", "Wallet backup DOES NOT exist")
+            // Log.i("MAIN", "Wallet backup DOES NOT exist")
             promise.resolve(false)
         }
     }
 
     @ReactMethod
     fun createNewWallet(server: String, chainhint: String, promise: Promise) {
-        // Log.w("MAIN", "Creating new wallet")
+        // Log.i("MAIN", "Creating new wallet")
 
         RustFFI.initlogging()
 
         // Create a seed
         val seed = RustFFI.initnew(server, reactContext.applicationContext.filesDir.absolutePath, chainhint, "true")
-        // Log.w("MAIN-Seed", seed)
+        // Log.i("MAIN-Seed", seed)
 
-        if (!seed.startsWith("Error")) {
+        if (!seed.lowercase().startsWith("error")) {
             saveWallet()
         }
 
@@ -70,14 +64,14 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun restoreWalletFromSeed(seed: String, birthday: String, server: String, chainhint: String, promise: Promise) {
-        // Log.w("MAIN", "Restoring wallet with seed $seed")
+        // Log.i("MAIN", "Restoring wallet with seed $seed")
 
         RustFFI.initlogging()
 
         val rseed = RustFFI.initfromseed(server, seed, birthday, reactContext.applicationContext.filesDir.absolutePath, chainhint, "true")
-        // Log.w("MAIN", rseed)
+        // Log.i("MAIN", rseed)
 
-        if (!rseed.startsWith("Error")) {
+        if (!rseed.lowercase().startsWith("Error")) {
             saveWallet()
         }
 
@@ -86,14 +80,14 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun restoreWalletFromUfvk(ufvk: String, birthday: String, server: String, chainhint: String, promise: Promise) {
-        // Log.w("MAIN", "Restoring wallet with ufvk $ufvk")
+        // Log.i("MAIN", "Restoring wallet with ufvk $ufvk")
 
         RustFFI.initlogging()
 
         val rufvk = RustFFI.initfromufvk(server, ufvk, birthday, reactContext.applicationContext.filesDir.absolutePath, chainhint, "true")
-        // Log.w("MAIN", rufvk)
+        // Log.i("MAIN", rufvk)
 
-        if (!rufvk.startsWith("Error")) {
+        if (!rufvk.lowercase().startsWith("Error")) {
             saveWallet()
         }
 
@@ -102,13 +96,17 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun loadExistingWallet(server: String, chainhint: String, promise: Promise) {
+        promise.resolve(loadExistingWalletNative(server, chainhint))
+    }
+
+    fun loadExistingWalletNative(server: String, chainhint: String): String {
         // Read the file
         val file: InputStream = MainApplication.getAppContext()?.openFileInput("wallet.dat")!!
         var fileBytes = file.readBytes()
         file.close()
 
-        val middle0w =        0
-        val middle1w =  6000000 // 6_000_000 - 8 pieces
+        val middle0w = 0
+        val middle1w = 6000000 // 6_000_000 - 8 pieces
         val middle2w = 12000000
         val middle3w = 18000000
         val middle4w = 24000000
@@ -119,34 +117,139 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
         var fileb64 = StringBuilder("")
         if (middle8w <= middle1w) {
-            fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle0w, middle8w - middle0w, Base64.NO_WRAP))
+            fileb64 = fileb64.append(
+                Base64.encodeToString(
+                    fileBytes,
+                    middle0w,
+                    middle8w - middle0w,
+                    Base64.NO_WRAP
+                )
+            )
         } else {
-            fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle0w, middle1w - middle0w, Base64.NO_WRAP))
+            fileb64 = fileb64.append(
+                Base64.encodeToString(
+                    fileBytes,
+                    middle0w,
+                    middle1w - middle0w,
+                    Base64.NO_WRAP
+                )
+            )
             if (middle8w <= middle2w) {
-                fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle1w, middle8w - middle1w, Base64.NO_WRAP))
+                fileb64 = fileb64.append(
+                    Base64.encodeToString(
+                        fileBytes,
+                        middle1w,
+                        middle8w - middle1w,
+                        Base64.NO_WRAP
+                    )
+                )
             } else {
-                fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle1w, middle2w - middle1w, Base64.NO_WRAP))
+                fileb64 = fileb64.append(
+                    Base64.encodeToString(
+                        fileBytes,
+                        middle1w,
+                        middle2w - middle1w,
+                        Base64.NO_WRAP
+                    )
+                )
                 if (middle8w <= middle3w) {
-                    fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle2w, middle8w - middle2w, Base64.NO_WRAP))
+                    fileb64 = fileb64.append(
+                        Base64.encodeToString(
+                            fileBytes,
+                            middle2w,
+                            middle8w - middle2w,
+                            Base64.NO_WRAP
+                        )
+                    )
                 } else {
-                    fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle2w, middle3w - middle2w, Base64.NO_WRAP))
+                    fileb64 = fileb64.append(
+                        Base64.encodeToString(
+                            fileBytes,
+                            middle2w,
+                            middle3w - middle2w,
+                            Base64.NO_WRAP
+                        )
+                    )
                     if (middle8w <= middle4w) {
-                        fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle3w, middle8w - middle3w, Base64.NO_WRAP))
+                        fileb64 = fileb64.append(
+                            Base64.encodeToString(
+                                fileBytes,
+                                middle3w,
+                                middle8w - middle3w,
+                                Base64.NO_WRAP
+                            )
+                        )
                     } else {
-                        fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle3w, middle4w - middle3w, Base64.NO_WRAP))
+                        fileb64 = fileb64.append(
+                            Base64.encodeToString(
+                                fileBytes,
+                                middle3w,
+                                middle4w - middle3w,
+                                Base64.NO_WRAP
+                            )
+                        )
                         if (middle8w <= middle5w) {
-                            fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle4w, middle8w - middle4w, Base64.NO_WRAP))
+                            fileb64 = fileb64.append(
+                                Base64.encodeToString(
+                                    fileBytes,
+                                    middle4w,
+                                    middle8w - middle4w,
+                                    Base64.NO_WRAP
+                                )
+                            )
                         } else {
-                            fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle4w, middle5w - middle4w, Base64.NO_WRAP))
+                            fileb64 = fileb64.append(
+                                Base64.encodeToString(
+                                    fileBytes,
+                                    middle4w,
+                                    middle5w - middle4w,
+                                    Base64.NO_WRAP
+                                )
+                            )
                             if (middle8w <= middle6w) {
-                                fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle5w, middle8w - middle5w, Base64.NO_WRAP))
+                                fileb64 = fileb64.append(
+                                    Base64.encodeToString(
+                                        fileBytes,
+                                        middle5w,
+                                        middle8w - middle5w,
+                                        Base64.NO_WRAP
+                                    )
+                                )
                             } else {
-                                fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle5w, middle6w - middle5w, Base64.NO_WRAP))
+                                fileb64 = fileb64.append(
+                                    Base64.encodeToString(
+                                        fileBytes,
+                                        middle5w,
+                                        middle6w - middle5w,
+                                        Base64.NO_WRAP
+                                    )
+                                )
                                 if (middle8w <= middle7w) {
-                                    fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle6w, middle8w - middle6w, Base64.NO_WRAP))
+                                    fileb64 = fileb64.append(
+                                        Base64.encodeToString(
+                                            fileBytes,
+                                            middle6w,
+                                            middle8w - middle6w,
+                                            Base64.NO_WRAP
+                                        )
+                                    )
                                 } else {
-                                    fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle6w, middle7w - middle6w, Base64.NO_WRAP))
-                                    fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle7w, middle8w - middle7w, Base64.NO_WRAP))
+                                    fileb64 = fileb64.append(
+                                        Base64.encodeToString(
+                                            fileBytes,
+                                            middle6w,
+                                            middle7w - middle6w,
+                                            Base64.NO_WRAP
+                                        )
+                                    )
+                                    fileb64 = fileb64.append(
+                                        Base64.encodeToString(
+                                            fileBytes,
+                                            middle7w,
+                                            middle8w - middle7w,
+                                            Base64.NO_WRAP
+                                        )
+                                    )
                                 }
                             }
                         }
@@ -157,13 +260,14 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
         RustFFI.initlogging()
 
-        val wseed = RustFFI.initfromb64(server,
+        // Log.i("MAIN", wseed)
+
+        return RustFFI.initfromb64(
+            server,
             fileb64.toString(),
             reactContext.applicationContext.filesDir.absolutePath,
-            chainhint, "true")
-        // Log.w("MAIN", wseed)
-
-        promise.resolve(wseed)
+            chainhint, "true"
+        )
     }
 
     @ReactMethod
@@ -225,9 +329,9 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
             RustFFI.initlogging()
 
-            // Log.w("send", "Trying to send $sendJSON")
+            // Log.i("send", "Trying to send $sendJSON")
             val result = RustFFI.execute("send", sendJSON)
-            // Log.w("send", "Send Result: $result")
+            // Log.i("send", "Send Result: $result")
 
             promise.resolve(result)
         }
@@ -239,12 +343,12 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
             RustFFI.initlogging()
 
-            // Log.w("execute", "Executing $cmd with $args")
+            // Log.i("execute", "Executing $cmd with $args")
             val resp = RustFFI.execute(cmd, args)
-            // Log.w("execute", "Response to $cmd : $resp")
+            // Log.i("execute", "Response to $cmd : $resp")
 
             // And save it if it was a sync
-            if (cmd == "sync" && !resp.startsWith("Error")) {
+            if (cmd == "sync" && !resp.lowercase().startsWith("Error")) {
                 saveWallet()
             }
 
@@ -266,14 +370,14 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         promise.resolve(true)
     }
 
-    private fun saveWallet() {
+    fun saveWallet() {
         // Get the encoded wallet file
         val b64encoded = RustFFI.save()
-        // Log.w("MAIN", b64encoded)
+        // Log.i("MAIN", b64encoded)
 
         try {
             val fileBytes = Base64.decode(b64encoded, Base64.NO_WRAP)
-            Log.w("MAIN", "file size: ${fileBytes.size} bytes")
+            Log.i("MAIN", "file size: ${fileBytes.size} bytes")
 
             // Save file to disk
             val file = MainApplication.getAppContext()?.openFileOutput("wallet.dat", Context.MODE_PRIVATE)
@@ -291,11 +395,11 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         val fileRead = MainApplication.getAppContext()!!.openFileInput("wallet.dat")
         val fileBytes = fileRead.readBytes()
         // val fileb64 = Base64.encodeToString(fileBytes, Base64.NO_WRAP)
-        // Log.w("MAIN", b64encoded)
+        // Log.i("MAIN", b64encoded)
 
         try {
             // val fileBytes = Base64.decode(b64encoded, Base64.NO_WRAP)
-            // Log.w("MAIN", "file size${fileBytes.size}")
+            // Log.i("MAIN", "file size${fileBytes.size}")
 
             // Save file to disk
             val file = MainApplication.getAppContext()?.openFileOutput("wallet.backup.dat", Context.MODE_PRIVATE)
@@ -306,9 +410,25 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
+    fun saveBackgroundFile(json: String) {
+        // Log.i("MAIN", b64encoded)
+
+        try {
+            val fileBytes: ByteArray = json.toByteArray()
+            Log.i("MAIN", "file background size: ${fileBytes.size} bytes")
+
+            // Save file to disk
+            val file = MainApplication.getAppContext()?.openFileOutput("background.json", Context.MODE_PRIVATE)
+            file?.write(fileBytes)
+            file?.close()
+        } catch (e: IllegalArgumentException) {
+            Log.e("MAIN", "Couldn't save the background file")
+        }
+    }
+
     @ReactMethod
     fun getLatestBlock(server: String, promise: Promise) {
-        // Log.w("MAIN", "Initialize Light Client")
+        // Log.i("MAIN", "Initialize Light Client")
 
         RustFFI.initlogging()
 

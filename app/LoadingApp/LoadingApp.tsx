@@ -12,7 +12,6 @@ import {
   EmitterSubscription,
   AppState,
   NativeEventSubscription,
-  Platform,
   TextInput,
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
@@ -71,7 +70,7 @@ export default function LoadingApp(props: LoadingAppProps) {
   const [sendAll, setSendAll] = useState<boolean>(false);
   const [privacy, setPrivacy] = useState<boolean>(false);
   const [mode, setMode] = useState<'basic' | 'advanced'>('advanced'); // by default advanced
-  const [background, setBackground] = useState<BackgroundType>({ batches: 0, message: '', date: 0 });
+  const [background, setBackground] = useState<BackgroundType>({ batches: 0, message: '', date: 0, dateEnd: 0 });
   const [firstLaunchingMessage, setFirstLaunchingMessage] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const file = useMemo(
@@ -168,12 +167,9 @@ export default function LoadingApp(props: LoadingAppProps) {
       //await delay(5000);
 
       // reading background task info
-      if (Platform.OS === 'ios') {
-        // this file only exists in IOS BS.
-        const backgroundJson = await BackgroundFileImpl.readBackground();
-        if (backgroundJson) {
-          setBackground(backgroundJson);
-        }
+      const backgroundJson = await BackgroundFileImpl.readBackground();
+      if (backgroundJson) {
+        setBackground(backgroundJson);
       }
       setLoading(false);
     })();
@@ -357,10 +353,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
       if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
         //console.log('App has come to the foreground!');
         // reading background task info
-        if (Platform.OS === 'ios') {
-          // this file only exists in IOS BS.
-          this.fetchBackgroundSyncing();
-        }
+        this.fetchBackgroundSyncing();
         // setting value for background task Android
         await AsyncStorage.setItem('@background', 'no');
         if (this.state.backgroundError && (this.state.backgroundError.title || this.state.backgroundError.error)) {
@@ -420,11 +413,9 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
   };
 
   fetchBackgroundSyncing = async () => {
-    const backgroundJson = await BackgroundFileImpl.readBackground();
+    const backgroundJson: BackgroundType = await BackgroundFileImpl.readBackground();
     if (backgroundJson) {
-      this.setState({
-        background: backgroundJson,
-      });
+      this.setState({ background: backgroundJson });
     }
   };
 

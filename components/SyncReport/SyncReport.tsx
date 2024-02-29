@@ -219,25 +219,29 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
             />
           </View>
         )}
-        {Number(background.date) > 0 && showBackgroundLegend && (
-          <View
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'flex-start',
-              marginHorizontal: 20,
-            }}>
-            <DetailLine
-              label={translate('report.lastbackgroundsync') as string}
-              value={
-                //background.batches.toString() +
-                //translate('report.batches-date') +
-                moment(Number(Number(background.date).toFixed(0)) * 1000).format('YYYY MMM D h:mm a')
-              }
-            />
-            {!!background.message && <RegText color={colors.text}>{background.message}</RegText>}
-          </View>
-        )}
+        {(Number(background.date) > 0 || Number(background.dateEnd) > 0 || !!background.message) &&
+          showBackgroundLegend && (
+            <View
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                marginHorizontal: 20,
+              }}>
+              <DetailLine
+                label={translate('report.lastbackgroundsync') as string}
+                value={
+                  //background.batches.toString() +
+                  //translate('report.batches-date') +
+                  moment(Number(Number(background.date).toFixed(0)) * 1000).format('YYYY MMM D h:mm a') +
+                  (Number(background.dateEnd) > 0
+                    ? ' - ' + moment(Number(Number(background.dateEnd).toFixed(0)) * 1000).format('YYYY MMM D h:mm a')
+                    : '')
+                }
+              />
+              {!!background.message && <RegText color={colors.text}>{background.message}</RegText>}
+            </View>
+          )}
         {maxBlocks && netInfo.isConnected ? (
           <>
             <View style={{ display: 'flex', marginHorizontal: 20, marginBottom: 30 }}>

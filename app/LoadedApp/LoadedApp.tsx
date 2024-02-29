@@ -9,7 +9,6 @@ import {
   EmitterSubscription,
   AppState,
   NativeEventSubscription,
-  Platform,
   Linking,
   SafeAreaView,
 } from 'react-native';
@@ -98,7 +97,7 @@ export default function LoadedApp(props: LoadedAppProps) {
   const [sendAll, setSendAll] = useState<boolean>(false);
   const [privacy, setPrivacy] = useState<boolean>(false);
   const [mode, setMode] = useState<'basic' | 'advanced'>('basic');
-  const [background, setBackground] = useState<BackgroundType>({ batches: 0, message: '', date: 0 });
+  const [background, setBackground] = useState<BackgroundType>({ batches: 0, message: '', date: 0, dateEnd: 0 });
   const [loading, setLoading] = useState<boolean>(true);
   const file = useMemo(
     () => ({
@@ -178,13 +177,10 @@ export default function LoadedApp(props: LoadedAppProps) {
       }
 
       // reading background task info
-      if (Platform.OS === 'ios') {
-        // this file only exists in IOS BS.
-        const backgroundJson = await BackgroundFileImpl.readBackground();
-        //console.log('background', backgroundJson);
-        if (backgroundJson) {
-          setBackground(backgroundJson);
-        }
+      const backgroundJson = await BackgroundFileImpl.readBackground();
+      //console.log('background', backgroundJson);
+      if (backgroundJson) {
+        setBackground(backgroundJson);
       }
       setLoading(false);
     })();
@@ -298,13 +294,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     this.appstate = AppState.addEventListener('change', async nextAppState => {
       if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
         //console.log('App has come to the foreground!');
-        // deactivate the interruption sync flag
-        await RPC.rpc_setInterruptSyncAfterBatch('false');
+        // deactivate the interruption sync flag. No needed.
+        //await RPC.rpc_setInterruptSyncAfterBatch('false');
         // reading background task info
-        if (Platform.OS === 'ios') {
-          // this file only exists in IOS BS.
-          await this.fetchBackgroundSyncing();
-        }
+        await this.fetchBackgroundSyncing();
         // setting value for background task Android
         await AsyncStorage.setItem('@background', 'no');
         //console.log('background no in storage');
@@ -317,6 +310,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       }
       if (nextAppState.match(/inactive|background/) && this.state.appState === 'active') {
         //console.log('App is gone to the background!');
+        // re-activate the interruption sync flag
+        await RPC.rpc_setInterruptSyncAfterBatch('true');
         // setting value for background task Android
         await AsyncStorage.setItem('@background', 'yes');
         //console.log('background yes in storage');
