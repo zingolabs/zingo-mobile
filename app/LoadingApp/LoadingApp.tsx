@@ -57,6 +57,7 @@ const es = require('../translations/es.json');
 type LoadingAppProps = {
   navigation: StackScreenProps<any>['navigation'];
   route: StackScreenProps<any>['route'];
+  toggleMode: (mode: 'basic' | 'advanced') => void;
 };
 
 const SERVER_DEFAULT_0 = serverUris()[0];
@@ -117,13 +118,16 @@ export default function LoadingApp(props: LoadingAppProps) {
       if (settings.firstInstall) {
         // basic mode
         setMode('basic');
+        props.toggleMode('basic');
         await SettingsFileImpl.writeSettings('mode', 'basic');
       } else {
         if (settings.mode === 'basic' || settings.mode === 'advanced') {
           setMode(settings.mode);
+          props.toggleMode(settings.mode);
         } else {
           // if it is not a fresh install -> advanced
           await SettingsFileImpl.writeSettings('mode', mode);
+          props.toggleMode(mode);
         }
       }
       if (settings.language === 'en' || settings.language === 'es') {
@@ -147,10 +151,8 @@ export default function LoadingApp(props: LoadingAppProps) {
       }
       if (settings.server) {
         setServer(settings.server);
-        //console.log('settings', settings.server);
       } else {
         await SettingsFileImpl.writeSettings('server', server);
-        //console.log('NO settings', settings.server);
       }
       if (settings.sendAll === true || settings.sendAll === false) {
         setSendAll(settings.sendAll);
@@ -204,6 +206,7 @@ export default function LoadingApp(props: LoadingAppProps) {
         mode={mode}
         background={background}
         firstLaunchingMessage={firstLaunchingMessage}
+        toggleMode={props.toggleMode}
       />
     );
   }
@@ -222,6 +225,7 @@ type LoadingAppClassProps = {
   mode: 'basic' | 'advanced';
   background: BackgroundType;
   firstLaunchingMessage: boolean;
+  toggleMode: (mode: 'basic' | 'advanced') => void;
 };
 
 export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
@@ -642,6 +646,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
   changeMode = async (mode: 'basic' | 'advanced') => {
     this.setState({ mode, screen: 0 });
     await SettingsFileImpl.writeSettings('mode', mode);
+    this.props.toggleMode(mode);
     // if the user selects advanced mode & wants to change to another wallet
     // and then the user wants to go to basic mode in the first screen
     // the result will be the same -> create a new wallet.

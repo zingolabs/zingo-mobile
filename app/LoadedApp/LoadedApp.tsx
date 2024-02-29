@@ -85,6 +85,7 @@ const Tab = createBottomTabNavigator();
 type LoadedAppProps = {
   navigation: StackScreenProps<any>['navigation'];
   route: StackScreenProps<any>['route'];
+  toggleMode: (mode: 'basic' | 'advanced') => void;
 };
 
 const SERVER_DEFAULT_0: ServerType = serverUris()[0];
@@ -96,7 +97,7 @@ export default function LoadedApp(props: LoadedAppProps) {
   const [server, setServer] = useState<ServerType>(SERVER_DEFAULT_0);
   const [sendAll, setSendAll] = useState<boolean>(false);
   const [privacy, setPrivacy] = useState<boolean>(false);
-  const [mode, setMode] = useState<'basic' | 'advanced'>('basic');
+  const [mode, setMode] = useState<'basic' | 'advanced'>('advanced'); // by default advanced
   const [background, setBackground] = useState<BackgroundType>({ batches: 0, message: '', date: 0, dateEnd: 0 });
   const [loading, setLoading] = useState<boolean>(true);
   const file = useMemo(
@@ -136,7 +137,7 @@ export default function LoadedApp(props: LoadedAppProps) {
       // for testing
       //await delay(5000);
 
-      if (settings.language) {
+      if (settings.language === 'en' || settings.language === 'es') {
         setLanguage(settings.language);
         i18n.locale = settings.language;
         //console.log('apploaded settings', settings.language, settings.currency);
@@ -150,7 +151,7 @@ export default function LoadedApp(props: LoadedAppProps) {
         await SettingsFileImpl.writeSettings('language', lang);
         //console.log('apploaded NO settings', languageTag);
       }
-      if (settings.currency) {
+      if (settings.currency === '' || settings.currency === 'USD') {
         setCurrency(settings.currency);
       } else {
         await SettingsFileImpl.writeSettings('currency', currency);
@@ -160,20 +161,22 @@ export default function LoadedApp(props: LoadedAppProps) {
       } else {
         await SettingsFileImpl.writeSettings('server', server);
       }
-      if (settings.sendAll) {
+      if (settings.sendAll === true || settings.sendAll === false) {
         setSendAll(settings.sendAll);
       } else {
         await SettingsFileImpl.writeSettings('sendAll', sendAll);
       }
-      if (settings.privacy) {
+      if (settings.privacy === true || settings.privacy === false) {
         setPrivacy(settings.privacy);
       } else {
         await SettingsFileImpl.writeSettings('privacy', privacy);
       }
-      if (settings.mode) {
+      if (settings.mode === 'basic' || settings.mode === 'advanced') {
         setMode(settings.mode);
+        props.toggleMode(settings.mode);
       } else {
         await SettingsFileImpl.writeSettings('mode', mode);
+        props.toggleMode(mode);
       }
 
       // reading background task info
@@ -215,6 +218,7 @@ export default function LoadedApp(props: LoadedAppProps) {
         mode={mode}
         background={background}
         readOnly={readOnly}
+        toggleMode={props.toggleMode}
       />
     );
   }
@@ -233,6 +237,7 @@ type LoadedAppClassProps = {
   mode: 'basic' | 'advanced';
   background: BackgroundType;
   readOnly: boolean;
+  toggleMode: (mode: 'basic' | 'advanced') => void;
 };
 
 export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
@@ -940,6 +945,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       poolsToShieldSelectSapling: true,
       poolsToShieldSelectTransparent: true,
     });
+    // this function change the Theme in the App component.
+    this.props.toggleMode(value as 'basic' | 'advanced');
 
     // Refetch the settings to update
     this.rpc.fetchWalletSettings();
@@ -951,6 +958,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     await this.rpc.clearTimers();
     if (!!state.screen && state.screen === 3) {
       await this.set_mode_option('mode', 'advanced');
+      // this function change the Theme in the App component.
+      this.props.toggleMode('advanced');
     }
     navigation.reset({
       index: 0,
