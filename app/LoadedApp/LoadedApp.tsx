@@ -977,8 +977,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     await this.rpc.clearTimers();
     if (!!state.screen && state.screen === 3) {
       await this.set_mode_option('mode', 'advanced');
-      // this function change the Theme in the App component.
-      this.props.toggleMode('advanced');
     }
     navigation.reset({
       index: 0,
