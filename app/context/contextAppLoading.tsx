@@ -51,7 +51,7 @@ export const defaultAppStateLoading: AppStateLoading = {
   customServerShow: false,
   customServerUri: '',
   customServerChainName: 'main',
-  mode: 'basic',
+  mode: 'advanced',
   snackbars: [] as SnackbarType[],
   addLastSnackbar: () => {},
   firstLaunchingMessage: false,

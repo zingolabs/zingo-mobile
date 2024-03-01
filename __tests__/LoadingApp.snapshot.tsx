@@ -128,7 +128,7 @@ describe('Component LoadingApp - test', () => {
       dateEnd: 0,
     };
     const firstLaunchingMessage = false;
-    const toggleMode = jest.fn();
+    const toggleTheme = jest.fn();
     const receive = render(
       <LoadingAppClass
         navigation={navigationMock}
@@ -143,7 +143,7 @@ describe('Component LoadingApp - test', () => {
         mode={mode}
         background={background}
         firstLaunchingMessage={firstLaunchingMessage}
-        toggleMode={toggleMode}
+        toggleTheme={toggleTheme}
       />,
     );
     expect(receive.toJSON()).toMatchSnapshot();

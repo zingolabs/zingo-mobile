@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -7,7 +7,6 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { LoadedApp } from './app/LoadedApp';
 import { LoadingApp } from './app/LoadingApp';
 import { ThemeType } from './app/types';
-import SettingsFileImpl from './components/Settings/SettingsFileImpl';
 
 const advancedTheme: ThemeType = {
   dark: true,
@@ -50,19 +49,8 @@ const Stack = createStackNavigator();
 const App: React.FunctionComponent = () => {
   const [theme, setTheme] = useState<ThemeType>(advancedTheme);
 
-  useEffect(() => {
-    (async () => {
-      const settings = await SettingsFileImpl.readSettings();
-      if (!!settings && !!settings.mode && settings.mode === 'advanced') {
-        setTheme(advancedTheme);
-      } else {
-        setTheme(basicTheme);
-      }
-    })();
-  }, []);
-
-  const toggleMode = (newMode: 'basic' | 'advanced') => {
-    setTheme(newMode === 'advanced' ? advancedTheme : basicTheme);
+  const toggleTheme = (mode: 'basic' | 'advanced') => {
+    setTheme(mode === 'advanced' ? advancedTheme : basicTheme);
   };
 
   //console.log('render App - 1');
@@ -75,8 +63,8 @@ const App: React.FunctionComponent = () => {
           backgroundColor: theme.colors.card,
         }}>
         <Stack.Navigator initialRouteName="LoadingApp" screenOptions={{ headerShown: false, animationEnabled: false }}>
-          <Stack.Screen name="LoadingApp">{props => <LoadingApp {...props} toggleMode={toggleMode} />}</Stack.Screen>
-          <Stack.Screen name="LoadedApp">{props => <LoadedApp {...props} toggleMode={toggleMode} />}</Stack.Screen>
+          <Stack.Screen name="LoadingApp">{props => <LoadingApp {...props} toggleTheme={toggleTheme} />}</Stack.Screen>
+          <Stack.Screen name="LoadedApp">{props => <LoadedApp {...props} toggleTheme={toggleTheme} />}</Stack.Screen>
         </Stack.Navigator>
       </SafeAreaView>
     </NavigationContainer>

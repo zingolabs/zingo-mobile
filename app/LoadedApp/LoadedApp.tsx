@@ -85,7 +85,7 @@ const Tab = createBottomTabNavigator();
 type LoadedAppProps = {
   navigation: StackScreenProps<any>['navigation'];
   route: StackScreenProps<any>['route'];
-  toggleMode: (mode: 'basic' | 'advanced') => void;
+  toggleTheme: (mode: 'basic' | 'advanced') => void;
 };
 
 const SERVER_DEFAULT_0: ServerType = serverUris()[0];
@@ -173,10 +173,10 @@ export default function LoadedApp(props: LoadedAppProps) {
       }
       if (settings.mode === 'basic' || settings.mode === 'advanced') {
         setMode(settings.mode);
-        props.toggleMode(settings.mode);
+        props.toggleTheme(settings.mode);
       } else {
         await SettingsFileImpl.writeSettings('mode', mode);
-        props.toggleMode(mode);
+        props.toggleTheme(mode);
       }
 
       // reading background task info
@@ -218,7 +218,7 @@ export default function LoadedApp(props: LoadedAppProps) {
         mode={mode}
         background={background}
         readOnly={readOnly}
-        toggleMode={props.toggleMode}
+        toggleTheme={props.toggleTheme}
       />
     );
   }
@@ -237,7 +237,7 @@ type LoadedAppClassProps = {
   mode: 'basic' | 'advanced';
   background: BackgroundType;
   readOnly: boolean;
-  toggleMode: (mode: 'basic' | 'advanced') => void;
+  toggleTheme: (mode: 'basic' | 'advanced') => void;
 };
 
 export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
@@ -781,7 +781,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
         this.setState({ seedBackupModalVisible: true });
       }
     } else if (item === 'Load Wallet From Seed') {
-      // change the mode to advance & restart the App in screen 3 directly.
+      // change to the screen 3 directly.
       const { translate } = this.state;
       Alert.alert(
         translate('loadedapp.restorewallet-title') as string,
@@ -946,7 +946,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       poolsToShieldSelectTransparent: true,
     });
     // this function change the Theme in the App component.
-    this.props.toggleMode(value as 'basic' | 'advanced');
+    this.props.toggleTheme(value as 'basic' | 'advanced');
 
     // Refetch the settings to update
     this.rpc.fetchWalletSettings();
@@ -958,8 +958,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     await this.rpc.clearTimers();
     if (!!state.screen && state.screen === 3) {
       await this.set_mode_option('mode', 'advanced');
-      // this function change the Theme in the App component.
-      this.props.toggleMode('advanced');
     }
     navigation.reset({
       index: 0,
