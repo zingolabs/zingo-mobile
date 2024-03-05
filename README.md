@@ -7,7 +7,7 @@ Google Play: [https://play.google.com/store/apps/details?id=org.ZingoLabs.Zingo]
 1. Yarn
 2. NodeJS (recommended version 17+)
 3. Rust (https://www.rust-lang.org/tools/install)
-4. Rustup iOS targets (`rustup target add aarch64-apple-ios x86_64-apple-ios aarch64-apple-ios-sim`)
+4. Rustup iOS targets (`rustup target add aarch64-apple-ios aarch64-apple-ios-sim`)
 5. Cargo-lipo (`cargo install cargo-lipo`)
 6. Cbindgen (`cargo install cbindgen`)
 7. Cocaopods (`sudo gem install cocoapods`)
