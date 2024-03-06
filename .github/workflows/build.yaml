@@ -100,7 +100,12 @@ jobs:
           echo "TARGET=armv7-linux-androideabi" >> $GITHUB_ENV
           echo "CC=armv7a-linux-androideabi" >> $GITHUB_ENV
           echo "OPENSSL_PATH=armv7" >> $GITHUB_ENV
-      
+
+      - name: Cargo NDK
+        run: |
+          cargo install --version ^3 cargo-ndk
+          rustup default nightly
+
       - name: Cargo cache
         uses: Swatinem/rust-cache@v2
         with:
