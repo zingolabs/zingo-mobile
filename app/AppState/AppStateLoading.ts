@@ -49,6 +49,7 @@ export default interface AppStateLoading {
   addLastSnackbar: (snackbar: SnackbarType) => void;
 
   firstLaunchingMessage: boolean;
+  biometricsFailed: boolean;
 
   // eslint-disable-next-line semi
 }

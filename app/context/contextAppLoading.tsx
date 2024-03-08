@@ -55,6 +55,7 @@ export const defaultAppStateLoading: AppStateLoading = {
   snackbars: [] as SnackbarType[],
   addLastSnackbar: () => {},
   firstLaunchingMessage: false,
+  biometricsFailed: false,
 };
 
 export const ContextAppLoading = React.createContext(defaultAppStateLoading);

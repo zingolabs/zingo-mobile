@@ -41,6 +41,7 @@ import Snackbars from '../../components/Components/Snackbars';
 import SnackbarType from '../AppState/types/SnackbarType';
 import { RPCSeedType } from '../rpc/types/RPCSeedType';
 import Launching from './Launching';
+import simpleBiometrics from '../simpleBiometrics';
 
 const BoldText = React.lazy(() => import('../../components/Components/BoldText'));
 const Button = React.lazy(() => import('../../components/Components/Button'));
@@ -189,7 +190,7 @@ export default function LoadingApp(props: LoadingAppProps) {
           alignItems: 'center',
           height: '100%',
         }}>
-        <Launching translate={translate} firstLaunchingMessage={false} />
+        <Launching translate={translate} firstLaunchingMessage={false} biometricsFailed={false} />
       </SafeAreaView>
     );
   } else {
@@ -265,6 +266,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
       actionButtonsDisabled: !netInfo.isConnected ? true : false,
       addLastSnackbar: this.addLastSnackbar,
       firstLaunchingMessage: props.firstLaunchingMessage,
+      biometricsFailed: false,
     };
 
     this.dim = {} as EmitterSubscription;
@@ -272,7 +274,23 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     this.unsubscribeNetInfo = {} as NetInfoSubscription;
   }
 
-  componentDidMount = () => {
+  componentDidMount = async () => {
+    // to start the App the user have to pass the security of the device
+    // (PIN or TouchID or FaceID)
+    this.setState({ biometricsFailed: false });
+    const resultBio = await simpleBiometrics({ translate: this.state.translate });
+    // can be:
+    // - true      -> the user pass the authentication
+    // - false     -> the user NOT pass the authentication
+    // - undefined -> no biometric authentication available
+    console.log('BIOMETRIC --------> ', resultBio);
+    if (resultBio === false) {
+      this.setState({ biometricsFailed: true });
+      return;
+    } else {
+      this.setState({ biometricsFailed: false });
+    }
+
     this.setState({ actionButtonsDisabled: true });
     (async () => {
       // First, check if a wallet exists. Do it async so the basic screen has time to render
@@ -667,6 +685,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
       snackbars,
       mode,
       firstLaunchingMessage,
+      biometricsFailed,
     } = this.state;
     const { translate } = this.props;
     const { colors } = this.props.theme;
@@ -685,7 +704,14 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
           }}>
           <Snackbars snackbars={snackbars} removeFirstSnackbar={this.removeFirstSnackbar} translate={translate} />
 
-          {screen === 0 && <Launching translate={translate} firstLaunchingMessage={firstLaunchingMessage} />}
+          {screen === 0 && (
+            <Launching
+              translate={translate}
+              firstLaunchingMessage={firstLaunchingMessage}
+              biometricsFailed={biometricsFailed}
+              tryAgain={this.componentDidMount}
+            />
+          )}
           {screen === 1 && (
             <>
               <View

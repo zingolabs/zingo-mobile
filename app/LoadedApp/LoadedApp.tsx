@@ -201,7 +201,7 @@ export default function LoadedApp(props: LoadedAppProps) {
           alignItems: 'center',
           height: '100%',
         }}>
-        <Launching translate={translate} firstLaunchingMessage={false} />
+        <Launching translate={translate} firstLaunchingMessage={false} biometricsFailed={false} />
       </SafeAreaView>
     );
   } else {
