@@ -91,5 +91,7 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Allow Zingo! to use FaceID to improve the security and privacy?</string>
 </dict>
 </plist>
