@@ -35,39 +35,58 @@ exports[`Component LoadingApp - test LoadingApp - snapshot 1`] = `
         }
       }
     >
-      <Text
-        style={
-          {
-            "color": undefined,
-            "fontSize": 40,
-            "fontWeight": "bold",
-          }
-        }
-      >
-        text traslated
-      </Text>
-      <Text
-        style={
-          {
-            "color": undefined,
-            "fontSize": 15,
-          }
-        }
-      >
-        text traslated
-      </Text>
       <View
         style={
           {
             "alignItems": "center",
             "flexDirection": "column",
-            "justifyContent": "center",
+            "height": "40%",
+            "justifyContent": "flex-end",
             "marginTop": 20,
             "padding": 10,
             "width": "80%",
           }
         }
       >
+        <Text
+          style={
+            {
+              "color": undefined,
+              "fontSize": 40,
+              "fontWeight": "bold",
+            }
+          }
+        >
+          text traslated
+        </Text>
+        <Text
+          style={
+            {
+              "color": undefined,
+              "fontSize": 15,
+            }
+          }
+        >
+          text traslated
+        </Text>
+      </View>
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "flexDirection": "column",
+            "height": "60%",
+            "justifyContent": "flex-start",
+            "marginTop": 20,
+            "padding": 10,
+            "width": "80%",
+          }
+        }
+      >
+        <ActivityIndicator
+          color="transparent"
+          size="large"
+        />
         <Text
           style={
             {
