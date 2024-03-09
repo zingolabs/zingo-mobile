@@ -147,7 +147,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     if (syncingStatus.syncProcessStalled && addLastSnackbar && restartApp) {
       // if the sync process is stalled -> let's restart the App.
       addLastSnackbar({ message: translate('restarting') as string, type: 'Primary', duration: 'short' });
-      setTimeout(() => restartApp({}), 3000);
+      setTimeout(() => restartApp({ startingApp: false }), 3000);
     }
   }, [addLastSnackbar, restartApp, syncingStatus.syncProcessStalled, translate]);
 
