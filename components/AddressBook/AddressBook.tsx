@@ -24,7 +24,7 @@ type AddressBookProps = {
 
 const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, setAddressBook, setSendPageState }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, language, addressBook, addressBookCurrentAddress } = context;
+  const { translate, language, addressBook, addressBookCurrentAddress, addressBookOpenPriorModal } = context;
   moment.locale(language);
 
   const { colors } = useTheme() as unknown as ThemeType;
@@ -111,6 +111,9 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
     setAction(null);
     if (addressBookCurrentAddress) {
       closeModal();
+      setTimeout(() => {
+        addressBookOpenPriorModal();
+      }, 100);
     }
   };
 

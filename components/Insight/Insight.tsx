@@ -76,10 +76,11 @@ const getPercent = (percent: number) => {
 
 type InsightProps = {
   closeModal: () => void;
+  openModal: () => void;
   set_privacy_option: (name: 'privacy', value: boolean) => Promise<void>;
 };
 
-const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, set_privacy_option }) => {
+const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, set_privacy_option, openModal }) => {
   const context = useContext(ContextAppLoaded);
   const { info, translate, privacy, addLastSnackbar } = context;
   const { colors } = useTheme() as unknown as ThemeType;
@@ -193,7 +194,14 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, set_privac
                   flexWrap: 'wrap',
                 }}>
                 {item.address !== 'fee' && (
-                  <AddressItem address={item.address} oneLine={true} onlyContact={true} withIcon={true} />
+                  <AddressItem
+                    address={item.address}
+                    oneLine={true}
+                    onlyContact={true}
+                    withIcon={true}
+                    closeModal={closeModal}
+                    openModal={openModal}
+                  />
                 )}
                 {!expandAddress[index] && !!item.address && (
                   <RegText>

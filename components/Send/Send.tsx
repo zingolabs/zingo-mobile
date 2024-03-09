@@ -479,6 +479,9 @@ const Send: React.FunctionComponent<SendProps> = ({
           closeModal={() => {
             setConfirmModalVisible(false);
           }}
+          openModal={() => {
+            setConfirmModalVisible(true);
+          }}
           confirmSend={confirmSend}
           sendAllAmount={
             mode !== 'basic' &&
@@ -518,7 +521,14 @@ const Send: React.FunctionComponent<SendProps> = ({
                   <View style={{ display: 'flex', flexDirection: 'row' }}>
                     <RegText style={{ marginRight: 10 }}>{translate('send.toaddress') as string}</RegText>
                     {validAddress === 1 && (
-                      <AddressItem address={ta.to} oneLine={true} onlyContact={true} withIcon={true} />
+                      <AddressItem
+                        address={ta.to}
+                        oneLine={true}
+                        onlyContact={true}
+                        withIcon={true}
+                        closeModal={() => {}}
+                        openModal={() => {}}
+                      />
                     )}
                   </View>
                   {validAddress === 1 && <FontAwesomeIcon icon={faCheck} color={colors.primary} />}

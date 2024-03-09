@@ -19,10 +19,17 @@ import simpleBiometrics from '../../../app/simpleBiometrics';
 type ConfirmProps = {
   defaultFee: number;
   closeModal: () => void;
+  openModal: () => void;
   confirmSend: () => void;
   sendAllAmount: boolean;
 };
-const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSend, defaultFee, sendAllAmount }) => {
+const Confirm: React.FunctionComponent<ConfirmProps> = ({
+  closeModal,
+  confirmSend,
+  defaultFee,
+  sendAllAmount,
+  openModal,
+}) => {
   const context = useContext(ContextAppLoaded);
   const {
     sendPageState,
@@ -239,7 +246,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSen
           return (
             <View key={to.id} style={{ margin: 10 }}>
               <FadeText>{translate('send.to') as string}</FadeText>
-              <AddressItem address={to.to} withIcon={true} />
+              <AddressItem address={to.to} withIcon={true} closeModal={closeModal} openModal={openModal} />
 
               <FadeText style={{ marginTop: 10 }}>{translate('send.confirm-amount') as string}</FadeText>
               <View

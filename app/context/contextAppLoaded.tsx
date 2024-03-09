@@ -95,6 +95,7 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   addressBook: [] as AddressBookFileClass[],
   launchAddressBook: () => {},
   addressBookCurrentAddress: '',
+  addressBookOpenPriorModal: () => {},
 };
 
 export const ContextAppLoaded = React.createContext(defaultAppStateLoaded);

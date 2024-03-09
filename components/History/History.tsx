@@ -85,6 +85,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
         <TxDetail
           tx={txDetail}
           closeModal={() => setTxDetailModalShowing(false)}
+          openModal={() => setTxDetailModalShowing(true)}
           set_privacy_option={set_privacy_option}
         />
       </Modal>

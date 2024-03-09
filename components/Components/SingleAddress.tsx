@@ -167,7 +167,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
               justifyContent: 'center',
               marginBottom: 30,
             }}>
-            <AddressItem address={address} />
+            <AddressItem address={address} closeModal={() => {}} openModal={() => {}} />
           </View>
         </TouchableOpacity>
       </ScrollView>

@@ -22,10 +22,11 @@ import AddressItem from '../../Components/AddressItem';
 type TxDetailProps = {
   tx: TransactionType;
   closeModal: () => void;
+  openModal: () => void;
   set_privacy_option: (name: 'privacy', value: boolean) => Promise<void>;
 };
 
-const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_privacy_option }) => {
+const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_privacy_option, openModal }) => {
   const context = useContext(ContextAppLoaded);
   const { info, translate, language, privacy, addLastSnackbar, server, currency } = context;
   const { colors } = useTheme() as unknown as ThemeType;
@@ -194,7 +195,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
                 {!!txd.address && (
                   <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: 10 }}>
                     <FadeText>{translate('history.address') as string}</FadeText>
-                    <AddressItem address={txd.address} withIcon={true} />
+                    <AddressItem address={txd.address} withIcon={true} closeModal={closeModal} openModal={openModal} />
                   </View>
                 )}
 
