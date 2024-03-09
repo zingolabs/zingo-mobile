@@ -231,7 +231,6 @@ export default function LoadedApp(props: LoadedAppProps) {
         readOnly={readOnly}
         toggleTheme={props.toggleTheme}
         addressBook={addressBook}
-        toggleMode={props.toggleMode}
       />
     );
   }
@@ -252,7 +251,6 @@ type LoadedAppClassProps = {
   readOnly: boolean;
   toggleTheme: (mode: 'basic' | 'advanced') => void;
   addressBook: AddressBookFileClass[];
-  toggleMode: (mode: 'basic' | 'advanced') => void;
 };
 
 export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {

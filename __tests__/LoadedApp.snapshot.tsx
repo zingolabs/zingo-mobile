@@ -130,7 +130,6 @@ describe('Component LoadedApp - test', () => {
     const readOnly = false;
     const toggleTheme = jest.fn();
     const addressBook = [] as AddressBookFileClass[];
-    const toggleMode = jest.fn();
     const receive = render(
       <LoadedAppClass
         navigation={navigationMock}
@@ -147,7 +146,6 @@ describe('Component LoadedApp - test', () => {
         readOnly={readOnly}
         toggleTheme={toggleTheme}
         addressBook={addressBook}
-        toggleMode={toggleMode}
       />,
     );
     expect(receive.toJSON()).toMatchSnapshot();

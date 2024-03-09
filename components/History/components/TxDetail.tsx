@@ -170,7 +170,6 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
 
           {tx.txDetails.map((txd: TxDetailType) => {
             // 30 characters per line
-            const numLines = txd.address ? (txd.address.length < 40 ? 2 : txd.address.length / 30) : 0;
             const memoTotal = txd.memos ? txd.memos.join('') : '';
             let memo = '';
             let memoUA = '';

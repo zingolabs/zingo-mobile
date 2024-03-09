@@ -139,9 +139,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
         </FadeText>
 
         <View style={{ display: 'flex', flexDirection: 'column', marginTop: 0, alignItems: 'center' }}>
-          {!!ufvk && (
-            <SingleAddress address={ufvk} addressKind={'u'} index={0} total={1} prev={() => null} next={() => null} />
-          )}
+          {!!ufvk && <SingleAddress address={ufvk} index={0} total={1} prev={() => null} next={() => null} />}
           {!ufvk && <ActivityIndicator size="large" color={colors.primary} />}
         </View>
 

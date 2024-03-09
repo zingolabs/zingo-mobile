@@ -1,4 +1,3 @@
-import { Platform } from 'react-native';
 import RNBiometrics from 'react-native-simple-biometrics';
 import { TranslateType } from './AppState';
 
