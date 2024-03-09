@@ -388,9 +388,9 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     })();
 
     this.appstate = AppState.addEventListener('change', async nextAppState => {
-      //await AsyncStorage.setItem('@server', this.state.server);
+      console.log('LOADING', 'next', nextAppState, 'prior', this.state.appState);
       if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
-        //console.log('App has come to the foreground!');
+        console.log('App LOADING has come to the foreground!');
         // reading background task info
         this.fetchBackgroundSyncing();
         // setting value for background task Android
@@ -401,7 +401,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
         }
       }
       if (nextAppState.match(/inactive|background/) && this.state.appState === 'active') {
-        //console.log('App is gone to the background!');
+        console.log('App LOADING is gone to the background!');
         // setting value for background task Android
         await AsyncStorage.setItem('@background', 'yes');
       }

@@ -11,6 +11,7 @@ import {
   NativeEventSubscription,
   Linking,
   SafeAreaView,
+  Platform,
 } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -264,7 +265,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       mode: props.mode,
       background: props.background,
       readOnly: props.readOnly,
-      appState: AppState.currentState,
+      appState: Platform.OS === 'ios' ? 'active' : AppState.currentState,
       setBackgroundError: this.setBackgroundError,
       addLastSnackbar: this.addLastSnackbar,
       restartApp: this.navigateToLoadingApp,
@@ -298,8 +299,26 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     })();
 
     this.appstate = AppState.addEventListener('change', async nextAppState => {
+      console.log('LOADED', 'next', nextAppState, 'prior', this.state.appState);
+      // in this case: background -> inactive
+      // we need to ignore it, because this happen when the App become inactive
+      // because of the passcode/Touch/Face screen.
+      if (Platform.OS === 'ios') {
+        if (this.state.appState === 'background' && nextAppState === 'inactive') {
+          return;
+        }
+        if (this.state.appState === 'inactive' && nextAppState === 'active') {
+          return;
+        }
+      }
       if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
-        //console.log('App has come to the foreground!');
+        console.log('App LOADED has come to the foreground!');
+        if (Platform.OS === 'ios') {
+          if (this.state.appState !== nextAppState) {
+            console.log('LOADED SAVED foreground', nextAppState);
+            this.setState({ appState: nextAppState });
+          }
+        }
         // (PIN or TouchID or FaceID)
         const resultBio = await simpleBiometrics({ translate: this.state.translate });
         // can be:
@@ -322,9 +341,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
             this.setBackgroundError('', '');
           }
         }
-      }
-      if (nextAppState.match(/inactive|background/) && this.state.appState === 'active') {
-        //console.log('App is gone to the background!');
+      } else if (nextAppState.match(/inactive|background/) && this.state.appState === 'active') {
+        console.log('App LOADED is gone to the background!');
         // re-activate the interruption sync flag
         await RPC.rpc_setInterruptSyncAfterBatch('true');
         // setting value for background task Android
@@ -335,9 +353,25 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
         //console.log('clear timers');
         this.setSyncingStatus(new SyncingStatusClass());
         //console.log('clear sync status state');
+        if (Platform.OS === 'ios') {
+          if (this.state.appState !== nextAppState) {
+            console.log('LOADED SAVED background', nextAppState);
+            this.setState({ appState: nextAppState });
+          }
+        }
+      } else {
+        if (Platform.OS === 'ios') {
+          if (this.state.appState !== nextAppState) {
+            console.log('LOADED SAVED', nextAppState);
+            this.setState({ appState: nextAppState });
+          }
+        }
       }
-      if (this.state.appState !== nextAppState) {
-        this.setState({ appState: nextAppState });
+      if (Platform.OS === 'android') {
+        if (this.state.appState !== nextAppState) {
+          console.log('LOADED SAVED', nextAppState);
+          this.setState({ appState: nextAppState });
+        }
       }
     });
 
