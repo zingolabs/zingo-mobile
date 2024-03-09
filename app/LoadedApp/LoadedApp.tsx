@@ -57,6 +57,7 @@ import Snackbars from '../../components/Components/Snackbars';
 import SnackbarType from '../AppState/types/SnackbarType';
 import { RPCSeedType } from '../rpc/types/RPCSeedType';
 import { Launching } from '../LoadingApp';
+import simpleBiometrics from '../simpleBiometrics';
 
 const History = React.lazy(() => import('../../components/History'));
 const Send = React.lazy(() => import('../../components/Send'));
@@ -299,18 +300,27 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     this.appstate = AppState.addEventListener('change', async nextAppState => {
       if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
         //console.log('App has come to the foreground!');
-        // deactivate the interruption sync flag. No needed.
-        //await RPC.rpc_setInterruptSyncAfterBatch('false');
-        // reading background task info
-        await this.fetchBackgroundSyncing();
-        // setting value for background task Android
-        await AsyncStorage.setItem('@background', 'no');
-        //console.log('background no in storage');
-        await this.rpc.configure();
-        //console.log('configure start timers');
-        if (this.state.backgroundError && (this.state.backgroundError.title || this.state.backgroundError.error)) {
-          Alert.alert(this.state.backgroundError.title, this.state.backgroundError.error);
-          this.setBackgroundError('', '');
+        // (PIN or TouchID or FaceID)
+        const resultBio = await simpleBiometrics({ translate: this.state.translate });
+        // can be:
+        // - true      -> the user do pass the authentication
+        // - false     -> the user do NOT pass the authentication
+        // - undefined -> no biometric authentication available -> Passcode.
+        console.log('BIOMETRIC FOREGROUND --------> ', resultBio);
+        if (resultBio === false) {
+          this.navigateToLoadingApp({ startingApp: true, biometricsFailed: true });
+        } else {
+          // reading background task info
+          await this.fetchBackgroundSyncing();
+          // setting value for background task Android
+          await AsyncStorage.setItem('@background', 'no');
+          //console.log('background no in storage');
+          await this.rpc.configure();
+          //console.log('configure start timers');
+          if (this.state.backgroundError && (this.state.backgroundError.title || this.state.backgroundError.error)) {
+            Alert.alert(this.state.backgroundError.title, this.state.backgroundError.error);
+            this.setBackgroundError('', '');
+          }
         }
       }
       if (nextAppState.match(/inactive|background/) && this.state.appState === 'active') {
@@ -381,7 +391,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
             //console.log('EVENT Loaded: YES internet connection.');
             if (this.rpc.getInRefresh()) {
               // I need to start again the App only if it is Syncing...
-              this.navigateToLoadingApp({});
+              this.navigateToLoadingApp({ startingApp: false });
             } else {
               // restart the interval process again if it is not syncing...
               await this.rpc.configure();
@@ -789,7 +799,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
         [
           {
             text: translate('confirm') as string,
-            onPress: async () => await this.onClickOKChangeWallet({ screen: 3 }),
+            onPress: async () => await this.onClickOKChangeWallet({ screen: 3, startingApp: false }),
           },
           { text: translate('cancel') as string, style: 'cancel' },
         ],
@@ -914,7 +924,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     // Refetch the settings to update
     this.rpc.fetchWalletSettings();
     if (reset) {
-      this.navigateToLoadingApp({});
+      this.navigateToLoadingApp({ startingApp: false });
     }
   };
 
@@ -1018,7 +1028,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     this.rpc.setInRefresh(false);
     this.keepAwake(false);
     this.setState({ seedBackupModalVisible: false });
-    this.navigateToLoadingApp({});
+    this.navigateToLoadingApp({ startingApp: false });
   };
 
   onClickOKServerWallet = async () => {
@@ -1072,7 +1082,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
         this.setState({ seedServerModalVisible: false });
       }
       // no need to restart the tasks because is about to restart the app.
-      this.navigateToLoadingApp({});
+      this.navigateToLoadingApp({ startingApp: false });
     }
   };
 
@@ -1139,7 +1149,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
             <Text>Loading...</Text>
           </View>
         }>
-        <Menu onItemSelected={this.onMenuItemSelected} />
+        <Menu onItemSelected={this.onMenuItemSelected} updateMenuState={this.updateMenuState} />
       </Suspense>
     );
 
@@ -1324,7 +1334,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 </View>
               }>
               <Seed
-                onClickOK={async () => await this.onClickOKChangeWallet({})}
+                onClickOK={async () => await this.onClickOKChangeWallet({ startingApp: false })}
                 onClickCancel={() => this.setState({ seedChangeModalVisible: false })}
                 action={'change'}
                 set_privacy_option={this.set_privacy_option}
@@ -1408,7 +1418,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 </View>
               }>
               <ShowUfvk
-                onClickOK={async () => await this.onClickOKChangeWallet({})}
+                onClickOK={async () => await this.onClickOKChangeWallet({ startingApp: false })}
                 onClickCancel={() => this.setState({ ufvkChangeModalVisible: false })}
                 action={'change'}
                 set_privacy_option={this.set_privacy_option}

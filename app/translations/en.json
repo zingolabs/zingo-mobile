@@ -14,6 +14,7 @@
   "biometricsfailed-button": "Try Again",
   "biometrics-title": "Authentication",
   "biometrics-message": "Do you want to be secure?",
+  "biometrics-error": "You need to pass the security check in order to perform this action.",
   "close": "Close",
   "cancel": "Cancel",
   "save": "Save",

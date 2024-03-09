@@ -266,7 +266,15 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
       actionButtonsDisabled: !netInfo.isConnected ? true : false,
       addLastSnackbar: this.addLastSnackbar,
       firstLaunchingMessage: props.firstLaunchingMessage,
-      biometricsFailed: false,
+      biometricsFailed:
+        !!props.route.params &&
+        (props.route.params.biometricsFailed === true || props.route.params.biometricsFailed === false)
+          ? props.route.params.biometricsFailed
+          : false,
+      startingApp:
+        !!props.route.params && (props.route.params.startingApp === true || props.route.params.startingApp === false)
+          ? props.route.params.startingApp
+          : true,
     };
 
     this.dim = {} as EmitterSubscription;
@@ -275,20 +283,29 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
   }
 
   componentDidMount = async () => {
-    // to start the App the user have to pass the security of the device
-    // (PIN or TouchID or FaceID)
-    this.setState({ biometricsFailed: false });
-    const resultBio = await simpleBiometrics({ translate: this.state.translate });
-    // can be:
-    // - true      -> the user pass the authentication
-    // - false     -> the user NOT pass the authentication
-    // - undefined -> no biometric authentication available
-    console.log('BIOMETRIC --------> ', resultBio);
-    if (resultBio === false) {
-      this.setState({ biometricsFailed: true });
-      return;
-    } else {
-      this.setState({ biometricsFailed: false });
+    // to start the App the first time in this session
+    // the user have to pass the security of the device
+    if (this.state.startingApp) {
+      if (!this.state.biometricsFailed) {
+        // (PIN or TouchID or FaceID)
+        this.setState({ biometricsFailed: false });
+        const resultBio = await simpleBiometrics({ translate: this.state.translate });
+        // can be:
+        // - true      -> the user do pass the authentication
+        // - false     -> the user do NOT pass the authentication
+        // - undefined -> no biometric authentication available -> Passcode.
+        console.log('BIOMETRIC --------> ', resultBio);
+        if (resultBio === false) {
+          this.setState({ biometricsFailed: true });
+          return;
+        } else {
+          this.setState({ biometricsFailed: false });
+        }
+      } else {
+        // if there is a biometric Fail, likely from the foreground check
+        // keep the App in the first screen because the user needs to try again.
+        return;
+      }
     }
 
     this.setState({ actionButtonsDisabled: true });
@@ -709,7 +726,9 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
               translate={translate}
               firstLaunchingMessage={firstLaunchingMessage}
               biometricsFailed={biometricsFailed}
-              tryAgain={this.componentDidMount}
+              tryAgain={() => {
+                this.setState({ biometricsFailed: false }, () => this.componentDidMount());
+              }}
             />
           )}
           {screen === 1 && (

@@ -50,6 +50,7 @@ export default interface AppStateLoading {
 
   firstLaunchingMessage: boolean;
   biometricsFailed: boolean;
+  startingApp: boolean;
 
   // eslint-disable-next-line semi
 }
