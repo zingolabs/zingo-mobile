@@ -169,7 +169,17 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
           {tx.txDetails.map((txd: TxDetailType) => {
             // 30 characters per line
             const numLines = txd.address ? (txd.address.length < 40 ? 2 : txd.address.length / 30) : 0;
-
+            const memoTotal = txd.memos ? txd.memos.join('') : '';
+            let memo = '';
+            let memoUA = '';
+            if (memoTotal.includes('\nReply to: \n')) {
+              let memoArray = memoTotal.split('\nReply to: \n');
+              const memoPoped = memoArray.pop();
+              memoUA = memoPoped ? memoPoped.toString() : '';
+              memo = memoArray.join('');
+            } else {
+              memo = memoTotal;
+            }
             return (
               <View
                 key={txd.address + txd.pool}
@@ -230,22 +240,35 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
                   </View>
                 </View>
 
-                {txd.memos && (
+                {(!!memo || !!memoUA) && (
                   <View style={{ marginTop: 10 }}>
                     <FadeText>{translate('history.memo') as string}</FadeText>
-                    <TouchableOpacity
-                      onPress={() => {
-                        if (txd.memos) {
-                          Clipboard.setString(txd.memos.join(''));
+                    {!!memo && (
+                      <TouchableOpacity
+                        onPress={() => {
+                          Clipboard.setString(memo);
                           addLastSnackbar({
                             message: translate('history.memocopied') as string,
                             type: 'Primary',
                             duration: 'short',
                           });
-                        }
-                      }}>
-                      <RegText>{txd.memos.join('')}</RegText>
-                    </TouchableOpacity>
+                        }}>
+                        <RegText>{memo}</RegText>
+                      </TouchableOpacity>
+                    )}
+                    {!!memoUA && (
+                      <TouchableOpacity
+                        onPress={() => {
+                          Clipboard.setString(memoUA);
+                          addLastSnackbar({
+                            message: translate('history.addresscopied') as string,
+                            type: 'Primary',
+                            duration: 'short',
+                          });
+                        }}>
+                        <RegText>{'\nReply to: \n' + memoUA}</RegText>
+                      </TouchableOpacity>
+                    )}
                   </View>
                 )}
               </View>

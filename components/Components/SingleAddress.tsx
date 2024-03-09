@@ -99,7 +99,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                 }
               }
             }}>
-            {expandQRAddress ? (
+            {expandQRAddress && !!address ? (
               <QRCode value={address} size={200} ecl="L" backgroundColor={colors.border} />
             ) : (
               <View

@@ -222,8 +222,8 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "rgb(242, 242, 242)",
-          "borderColor": "rgb(0, 122, 255)",
+          "backgroundColor": "rgb(0, 122, 255)",
+          "borderColor": "rgb(28, 28, 30)",
           "borderRadius": 10,
           "borderWidth": 2,
           "justifyContent": "center",
@@ -255,16 +255,14 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(0, 122, 255)",
+              "color": "rgb(242, 242, 242)",
               "fontSize": 16,
               "fontWeight": "bold",
               "textAlign": "center",
               "textTransform": "uppercase",
             }
           }
-        >
-          text translated
-        </Text>
+        />
       </View>
     </View>
     <View
@@ -552,8 +550,8 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "rgb(242, 242, 242)",
-          "borderColor": "rgb(0, 122, 255)",
+          "backgroundColor": "rgb(0, 122, 255)",
+          "borderColor": "rgb(28, 28, 30)",
           "borderRadius": 10,
           "borderWidth": 2,
           "justifyContent": "center",
@@ -585,16 +583,14 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(0, 122, 255)",
+              "color": "rgb(242, 242, 242)",
               "fontSize": 16,
               "fontWeight": "bold",
               "textAlign": "center",
               "textTransform": "uppercase",
             }
           }
-        >
-          text translated
-        </Text>
+        />
       </View>
     </View>
     <View
@@ -882,8 +878,8 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "rgb(242, 242, 242)",
-          "borderColor": "rgb(0, 122, 255)",
+          "backgroundColor": "rgb(0, 122, 255)",
+          "borderColor": "rgb(28, 28, 30)",
           "borderRadius": 10,
           "borderWidth": 2,
           "justifyContent": "center",
@@ -915,16 +911,14 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(0, 122, 255)",
+              "color": "rgb(242, 242, 242)",
               "fontSize": 16,
               "fontWeight": "bold",
               "textAlign": "center",
               "textTransform": "uppercase",
             }
           }
-        >
-          text translated
-        </Text>
+        />
       </View>
     </View>
   </View>
@@ -1132,8 +1126,8 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "rgb(242, 242, 242)",
-          "borderColor": "rgb(0, 122, 255)",
+          "backgroundColor": "rgb(0, 122, 255)",
+          "borderColor": "rgb(28, 28, 30)",
           "borderRadius": 10,
           "borderWidth": 2,
           "justifyContent": "center",
@@ -1165,16 +1159,14 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(0, 122, 255)",
+              "color": "rgb(242, 242, 242)",
               "fontSize": 16,
               "fontWeight": "bold",
               "textAlign": "center",
               "textTransform": "uppercase",
             }
           }
-        >
-          text translated
-        </Text>
+        />
       </View>
     </View>
     <View
@@ -1462,8 +1454,8 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "rgb(242, 242, 242)",
-          "borderColor": "rgb(0, 122, 255)",
+          "backgroundColor": "rgb(0, 122, 255)",
+          "borderColor": "rgb(28, 28, 30)",
           "borderRadius": 10,
           "borderWidth": 2,
           "justifyContent": "center",
@@ -1495,16 +1487,14 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(0, 122, 255)",
+              "color": "rgb(242, 242, 242)",
               "fontSize": 16,
               "fontWeight": "bold",
               "textAlign": "center",
               "textTransform": "uppercase",
             }
           }
-        >
-          text translated
-        </Text>
+        />
       </View>
     </View>
     <View
@@ -1792,8 +1782,8 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "rgb(242, 242, 242)",
-          "borderColor": "rgb(0, 122, 255)",
+          "backgroundColor": "rgb(0, 122, 255)",
+          "borderColor": "rgb(28, 28, 30)",
           "borderRadius": 10,
           "borderWidth": 2,
           "justifyContent": "center",
@@ -1825,16 +1815,14 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(0, 122, 255)",
+              "color": "rgb(242, 242, 242)",
               "fontSize": 16,
               "fontWeight": "bold",
               "textAlign": "center",
               "textTransform": "uppercase",
             }
           }
-        >
-          text translated
-        </Text>
+        />
       </View>
     </View>
   </View>

@@ -128,6 +128,7 @@ describe('Component LoadedApp - test', () => {
       dateEnd: 0,
     };
     const readOnly = false;
+    const toggleTheme = jest.fn();
     const receive = render(
       <LoadedAppClass
         navigation={navigationMock}
@@ -142,6 +143,7 @@ describe('Component LoadedApp - test', () => {
         mode={mode}
         background={background}
         readOnly={readOnly}
+        toggleTheme={toggleTheme}
       />,
     );
     expect(receive.toJSON()).toMatchSnapshot();

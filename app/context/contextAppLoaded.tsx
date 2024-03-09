@@ -87,7 +87,7 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   readOnly: false,
   poolsToShieldSelectSapling: true,
   poolsToShieldSelectTransparent: true,
-  mode: 'basic',
+  mode: 'advanced',
   snackbars: [] as SnackbarType[],
   addLastSnackbar: () => {},
   restartApp: () => {},

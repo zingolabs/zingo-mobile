@@ -27,7 +27,7 @@ import { RPCSyncStatusType } from './types/RPCSyncStatusType';
 import { RPCGetOptionType } from './types/RPCGetOptionType';
 import { RPCSendProgressType } from './types/RPCSendProgressType';
 import { RPCSyncRescan } from './types/RPCSyncRescanType';
-import { RPCUfvkType } from './types/RPCUfvkType';
+//import { RPCUfvkType } from './types/RPCUfvkType';
 import { RPCSummariesType } from './types/RPCSummariesType';
 
 export default class RPC {
@@ -358,6 +358,7 @@ export default class RPC {
   static async rpc_fetchWallet(readOnly: boolean): Promise<WalletType> {
     if (readOnly) {
       // viewing key
+      /*
       try {
         const ufvkStr: string = await RPCModule.execute('exportufvk', '');
         if (ufvkStr) {
@@ -373,7 +374,26 @@ export default class RPC {
 
         return ufvk;
       } catch (error) {
-        console.log(`Critical Error ufvk / get_birthday ${error}`);
+        console.log(`Critical Error ufvk ${error}`);
+        return {} as WalletType;
+      }
+      */
+      try {
+        const birthdayStr: string = await RPCModule.execute('get_birthday', '');
+        if (birthdayStr) {
+          if (birthdayStr.toLowerCase().startsWith('error')) {
+            console.log(`Error get_birthday ${birthdayStr}`);
+            return {} as WalletType;
+          }
+        } else {
+          console.log('Internal Error get_birthday');
+          return {} as WalletType;
+        }
+        const birthday: number = Number(birthdayStr);
+
+        return { birthday } as WalletType;
+      } catch (error) {
+        console.log(`Critical Error get_birthday ${error}`);
         return {} as WalletType;
       }
     } else {

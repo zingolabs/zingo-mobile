@@ -68,7 +68,10 @@ jobs:
           echo "zingolib_ref=$(echo ${GITHUB_REF} | sed 's/\//\\\//g')" >> $GITHUB_ENV
           sed -i "/^zingolib\|^zingoconfig/ s/branch = \"dev\"/rev = \"${{ env.zingolib_ref }}\"/" "rust/lib/Cargo.toml"
           if cat rust/lib/Cargo.toml | grep "^zingolib\|^zingoconfig" | grep -q "branch"; then exit 1; fi
-          cd rust && cargo update -p zingolib -p zingoconfig --aggressive
+          cd rust
+          cargo update -p zingolib -p zingoconfig --aggressive
+          cargo install --version ^3 cargo-ndk
+          rustup default nightly
       
       - name: Set envs for x86_64
         if: ${{ env.ARCH == 'x86_64' }}
@@ -97,7 +100,12 @@ jobs:
           echo "TARGET=armv7-linux-androideabi" >> $GITHUB_ENV
           echo "CC=armv7a-linux-androideabi" >> $GITHUB_ENV
           echo "OPENSSL_PATH=armv7" >> $GITHUB_ENV
-      
+
+      - name: Cargo NDK
+        run: |
+          cargo install --version ^3 cargo-ndk
+          rustup default nightly
+
       - name: Cargo cache
         uses: Swatinem/rust-cache@v2
         with:
@@ -105,13 +113,14 @@ jobs:
       
       - name: Cargo build
         working-directory: ./rust/android
-        run: cargo +nightly build -Z build-std --target ${{ env.TARGET }} --release
+        run: cargo ndk --target ${{ env.TARGET }} build --release -Z build-std 
         env:
           AR: llvm-ar
           LD: ld
           RANLIB: llvm-ranlib
           CC: ${{ env.CC }}24-clang
           OPENSSL_DIR: /opt/openssl-3.1.3/${{ env.OPENSSL_PATH }}
+          CARGO_FEATURE_STD: true
       
       - name: LLVM Strip
         working-directory: ./rust/target

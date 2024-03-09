@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
-import { View, ScrollView, SafeAreaView, Alert } from 'react-native';
+import { View, ScrollView, SafeAreaView, Alert, ActivityIndicator } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
 import Button from '../Components/Button';
@@ -10,6 +10,9 @@ import Header from '../Header';
 import SingleAddress from '../Components/SingleAddress';
 import RPC from '../../app/rpc';
 import FadeText from '../Components/FadeText';
+import RPCModule from '../../app/RPCModule';
+import { WalletType } from '../../app/AppState';
+import { RPCUfvkType } from '../../app/rpc/types/RPCUfvkType';
 
 type TextsType = {
   new: string[];
@@ -29,10 +32,40 @@ type ShowUfvkProps = {
 const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCancel, action, set_privacy_option }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, wallet, server, netInfo, mode, addLastSnackbar } = context;
-  const { ufvk } = wallet;
+  const [ufvk, setUfvk] = useState<string>(wallet.ufvk ? wallet.ufvk : '');
   const { colors } = useTheme() as unknown as ThemeType;
   const [times, setTimes] = useState(0);
   const [texts, setTexts] = useState({} as TextsType);
+
+  const getUfvk = async () => {
+    try {
+      const ufvkStr: string = await RPCModule.execute('exportufvk', '');
+      if (ufvkStr) {
+        if (ufvkStr.toLowerCase().startsWith('error')) {
+          console.log(`Error ufvk ${ufvkStr}`);
+          return {} as WalletType;
+        }
+      } else {
+        console.log('Internal Error ufvk');
+        return {} as WalletType;
+      }
+      const ufvkValue: WalletType = (await JSON.parse(ufvkStr)) as RPCUfvkType;
+
+      return ufvkValue;
+    } catch (error) {
+      console.log(`Critical Error ufvk ${error}`);
+      return {} as WalletType;
+    }
+  };
+
+  useEffect(() => {
+    if (!ufvk) {
+      (async () => {
+        const w: WalletType = await getUfvk();
+        setUfvk(w.ufvk ? w.ufvk : '');
+      })();
+    }
+  }, [ufvk]);
 
   useEffect(() => {
     const buttonTextsArray = translate('ufvk.buttontexts');
@@ -106,14 +139,10 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
         </FadeText>
 
         <View style={{ display: 'flex', flexDirection: 'column', marginTop: 0, alignItems: 'center' }}>
-          <SingleAddress
-            address={ufvk || ''}
-            addressKind={'u'}
-            index={0}
-            total={1}
-            prev={() => null}
-            next={() => null}
-          />
+          {!!ufvk && (
+            <SingleAddress address={ufvk} addressKind={'u'} index={0} total={1} prev={() => null} next={() => null} />
+          )}
+          {!ufvk && <ActivityIndicator size="large" color={colors.primary} />}
         </View>
 
         <View style={{ marginBottom: 30 }} />

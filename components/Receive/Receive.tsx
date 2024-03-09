@@ -139,7 +139,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
         }
 
         return (
-          mode &&
           !!addresses &&
           !!uaAddress && (
             <SingleAddress
@@ -166,7 +165,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
         }
 
         return (
-          mode &&
           !!addresses &&
           !!uaAddress && (
             <SingleAddress
@@ -193,7 +191,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
         }
 
         return (
-          mode &&
           !!addresses &&
           !!uaAddress && (
             <SingleAddress
