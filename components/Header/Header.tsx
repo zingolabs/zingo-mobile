@@ -31,6 +31,7 @@ import { createAlert } from '../../app/createAlert';
 import { Animated } from 'react-native';
 import SnackbarType from '../../app/AppState/types/SnackbarType';
 import FadeText from '../Components/FadeText';
+import simpleBiometrics from '../../app/simpleBiometrics';
 
 type HeaderProps = {
   poolsMoreInfoOnClick?: () => void;
@@ -322,6 +323,25 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       ],
       { cancelable: true, userInterfaceStyle: 'light' },
     );
+  };
+
+  const ufvkShowModal = async () => {
+    const resultBio = await simpleBiometrics({ translate: translate });
+    // can be:
+    // - true      -> the user do pass the authentication
+    // - false     -> the user do NOT pass the authentication
+    // - undefined -> no biometric authentication available -> Passcode.
+    console.log('BIOMETRIC --------> ', resultBio);
+    if (resultBio === false) {
+      // snack with Error & closing the menu.
+      if (addLastSnackbar) {
+        addLastSnackbar({ message: translate('biometrics-error') as string, type: 'Primary' });
+      }
+    } else {
+      if (setUfvkViewModalVisible) {
+        setUfvkViewModalVisible(true);
+      }
+    }
   };
 
   //console.log('render header');
@@ -776,7 +796,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               {setUfvkViewModalVisible &&
               !(mode === 'basic' && transactions.length <= 0) &&
               !(mode === 'basic' && totalBalance.total <= 0) ? (
-                <TouchableOpacity onPress={() => setUfvkViewModalVisible(true)}>
+                <TouchableOpacity onPress={() => ufvkShowModal()}>
                   <FontAwesomeIcon icon={faSnowflake} size={24} color={colors.zingo} />
                 </TouchableOpacity>
               ) : (
