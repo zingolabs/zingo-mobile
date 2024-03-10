@@ -78,6 +78,7 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
                   fontSize: 20,
                   fontWeight: 'bold',
                   marginTop: 10,
+                  textAlign: 'center',
                 }}>
                 {props.translate('biometricsfailed-title') as string}
               </Text>
@@ -96,6 +97,7 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
                   fontSize: 15,
                   marginTop: 10,
                   marginBottom: 10,
+                  textAlign: 'center',
                 }}>
                 {props.translate('biometricsfailed-footer') as string}
               </Text>
@@ -116,6 +118,7 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
                   fontWeight: 'bold',
                   marginTop: 10,
                   opacity: props.firstLaunchingMessage && !props.biometricsFailed ? 1 : 0,
+                  textAlign: 'center',
                 }}>
                 {props.translate('firstlaunchingmessage-title') as string}
               </Text>
@@ -136,6 +139,7 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
                   marginTop: 10,
                   marginBottom: 10,
                   opacity: props.firstLaunchingMessage && !props.biometricsFailed ? 1 : 0,
+                  textAlign: 'center',
                 }}>
                 {props.translate('firstlaunchingmessage-footer') as string}
               </Text>
