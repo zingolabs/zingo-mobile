@@ -43,7 +43,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
   // if no address I'm going to put txid here.
   const displayAddress =
     tx.txDetails.length === 1 && tx.txDetails[0].address ? (
-      <AddressItem address={tx.txDetails[0].address} oneLine={true} />
+      <AddressItem address={tx.txDetails[0].address} oneLine={true} closeModal={() => {}} openModal={() => {}} />
     ) : (
       <FadeText style={{ fontSize: 18 }}>{Utils.trimToSmall(tx.txid, 7)}</FadeText>
     );

@@ -13,12 +13,21 @@ import { faAddressCard } from '@fortawesome/free-solid-svg-icons';
 
 type AddressItemProps = {
   address: string;
+  closeModal: () => void;
+  openModal: () => void;
   oneLine?: boolean;
   onlyContact?: boolean;
   withIcon?: boolean;
 };
 
-const AddressItem: React.FunctionComponent<AddressItemProps> = ({ address, oneLine, onlyContact, withIcon }) => {
+const AddressItem: React.FunctionComponent<AddressItemProps> = ({
+  address,
+  oneLine,
+  onlyContact,
+  withIcon,
+  closeModal,
+  openModal,
+}) => {
   const context = useContext(ContextAppLoaded);
   const { translate, addLastSnackbar, addressBook, launchAddressBook, privacy } = context;
   const { colors } = useTheme() as unknown as ThemeType;
@@ -116,7 +125,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({ address, oneLi
         )}
       </View>
       {withIcon && !contact && (
-        <TouchableOpacity onPress={() => launchAddressBook(address)}>
+        <TouchableOpacity onPress={() => launchAddressBook(address, closeModal, openModal)}>
           <FontAwesomeIcon
             style={{ marginTop: 3 }}
             size={20}
