@@ -61,21 +61,20 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
         {contact && (
           <TouchableOpacity
             onPress={() => {
-              if (contact) {
-                if (!oneLine) {
-                  Clipboard.setString(contact);
-                  addLastSnackbar({
-                    message: translate('history.contactcopied') as string,
-                    type: 'Primary',
-                    duration: 'short',
-                  });
-                }
-                setExpandContact(true);
-                if (privacy) {
-                  setTimeout(() => {
-                    setExpandContact(false);
-                  }, 5000);
-                }
+              // make no sense to copy the label to the clipboard, it's useless.
+              //if (!oneLine) {
+              //  Clipboard.setString(contact);
+              //  addLastSnackbar({
+              //    message: translate('history.contactcopied') as string,
+              //    type: 'Primary',
+              //    duration: 'short',
+              //  });
+              //}
+              setExpandContact(true);
+              if (privacy) {
+                setTimeout(() => {
+                  setExpandContact(false);
+                }, 5000);
               }
             }}>
             <View style={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap' }}>
