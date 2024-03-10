@@ -371,78 +371,111 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         {!noSyncingStatus && (
           <>
             {netInfo.isConnected && !!syncingStatus.lastBlockServer && syncingStatus.syncID >= 0 ? (
-              <View
-                style={{
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  margin: 0,
-                  marginRight: 5,
-                  padding: 1,
-                  borderColor: colors.primary,
-                  borderWidth: 1,
-                  borderRadius: 10,
-                  minWidth: 25,
-                  minHeight: 25,
-                }}>
+              <>
                 {!syncingStatus.inProgress && syncingStatus.lastBlockServer === syncingStatus.lastBlockWallet && (
-                  <View style={{ margin: 0, padding: 0 }}>
-                    <FontAwesomeIcon icon={faCheck} color={colors.primary} size={20} />
+                  <View
+                    style={{
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      margin: 0,
+                      marginRight: 5,
+                      padding: 1,
+                      borderColor: colors.primary,
+                      borderWidth: 1,
+                      borderRadius: 10,
+                      minWidth: 25,
+                      minHeight: 25,
+                    }}>
+                    <View style={{ margin: 0, padding: 0 }}>
+                      <FontAwesomeIcon icon={faCheck} color={colors.primary} size={20} />
+                    </View>
                   </View>
                 )}
-                {!syncingStatus.inProgress && syncingStatus.lastBlockServer !== syncingStatus.lastBlockWallet && (
-                  <>
-                    {mode === 'basic' ? (
-                      <FontAwesomeIcon icon={faPause} color={colors.zingo} size={17} />
-                    ) : (
+                {!syncingStatus.inProgress &&
+                  syncingStatus.lastBlockServer !== syncingStatus.lastBlockWallet &&
+                  mode === 'advanced' && (
+                    <View
+                      style={{
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        margin: 0,
+                        marginRight: 5,
+                        padding: 1,
+                        borderColor: colors.zingo,
+                        borderWidth: 1,
+                        borderRadius: 10,
+                        minWidth: 25,
+                        minHeight: 25,
+                      }}>
                       <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
                         <FontAwesomeIcon icon={faPause} color={colors.zingo} size={17} />
                       </TouchableOpacity>
-                    )}
-                  </>
-                )}
+                    </View>
+                  )}
                 {syncingStatus.inProgress && (
-                  <Animated.View
+                  <View
                     style={{
-                      opacity: opacityValue,
-                      flexDirection: 'row',
-                      justifyContent: 'center',
                       alignItems: 'center',
-                      paddingHorizontal: 3,
+                      justifyContent: 'center',
+                      margin: 0,
+                      marginRight: 5,
+                      padding: 1,
+                      borderColor: colors.syncing,
+                      borderWidth: 1,
+                      borderRadius: 10,
+                      minWidth: 25,
+                      minHeight: 25,
                     }}>
-                    {mode === 'basic' ? (
-                      <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-                        <FontAwesomeIcon icon={faPlay} color={colors.syncing} size={17} />
-                        <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{`${blocksRemaining}`}</FadeText>
-                      </View>
-                    ) : (
-                      <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
+                    <Animated.View
+                      style={{
+                        opacity: opacityValue,
+                        flexDirection: 'row',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        paddingHorizontal: 3,
+                      }}>
+                      {mode === 'basic' ? (
                         <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
                           <FontAwesomeIcon icon={faPlay} color={colors.syncing} size={17} />
                           <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{`${blocksRemaining}`}</FadeText>
                         </View>
-                      </TouchableOpacity>
-                    )}
-                  </Animated.View>
+                      ) : (
+                        <TouchableOpacity
+                          onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
+                          <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                            <FontAwesomeIcon icon={faPlay} color={colors.syncing} size={17} />
+                            <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{`${blocksRemaining}`}</FadeText>
+                          </View>
+                        </TouchableOpacity>
+                      )}
+                    </Animated.View>
+                  </View>
                 )}
-              </View>
+              </>
             ) : (
-              <View
-                style={{
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  margin: 0,
-                  marginRight: 5,
-                  padding: 1,
-                  borderColor: colors.primaryDisabled,
-                  borderWidth: 1,
-                  borderRadius: 10,
-                  minWidth: 25,
-                  minHeight: 25,
-                }}>
-                <View style={{ margin: 0, padding: 0 }}>
-                  <FontAwesomeIcon icon={faWifi} color={colors.primaryDisabled} size={18} />
-                </View>
-              </View>
+              <>
+                {mode === 'advanced' && (
+                  <View
+                    style={{
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      margin: 0,
+                      marginRight: 5,
+                      padding: 1,
+                      borderColor: colors.primaryDisabled,
+                      borderWidth: 1,
+                      borderRadius: 10,
+                      minWidth: 25,
+                      minHeight: 25,
+                    }}>
+                    <Animated.View style={{ opacity: opacityValue, margin: 0, padding: 0 }}>
+                      <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
+                        <FontAwesomeIcon icon={faWifi} color={colors.primaryDisabled} size={18} />
+                      </TouchableOpacity>
+                    </Animated.View>
+                  </View>
+                )}
+              </>
             )}
             {/*syncingStatus.inProgress && blocksRemaining > 0 && (
               <View style={{ marginRight: 5 }}>
