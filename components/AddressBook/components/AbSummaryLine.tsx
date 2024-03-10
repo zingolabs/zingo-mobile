@@ -31,7 +31,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
   handleScrollToTop,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, navigation } = context;
+  const { translate, navigation, readOnly } = context;
   const { colors } = useTheme() as unknown as ThemeType;
 
   const displayAddress = item.address ? Utils.trimToSmall(item.address, 7) : 'Unknown';
@@ -92,23 +92,25 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
             <FontAwesomeIcon style={{ opacity: 0.8 }} size={20} icon={faPencil} color={colors.money} />
           </TouchableOpacity>
         </View>
-        <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
-          <TouchableOpacity
-            style={{ zIndex: 999, padding: 10 }}
-            onPress={() => {
-              // enviar
-              const sendPageState = new SendPageStateClass(new ToAddrClass(0));
-              sendPageState.toaddr.to = item.address;
-              setSendPageState(sendPageState);
-              closeModal();
-              navigation.navigate('LoadedApp', {
-                screen: translate('loadedapp.send-menu'),
-                initial: false,
-              });
-            }}>
-            <FontAwesomeIcon size={20} icon={faArrowUp} color={colors.primary} />
-          </TouchableOpacity>
-        </View>
+        {!readOnly && (
+          <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
+            <TouchableOpacity
+              style={{ zIndex: 999, padding: 10 }}
+              onPress={() => {
+                // enviar
+                const sendPageState = new SendPageStateClass(new ToAddrClass(0));
+                sendPageState.toaddr.to = item.address;
+                setSendPageState(sendPageState);
+                closeModal();
+                navigation.navigate('LoadedApp', {
+                  screen: translate('loadedapp.send-menu'),
+                  initial: false,
+                });
+              }}>
+              <FontAwesomeIcon size={20} icon={faArrowUp} color={colors.primary} />
+            </TouchableOpacity>
+          </View>
+        )}
         <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
           <TouchableOpacity
             style={{ zIndex: 999, padding: 10 }}
