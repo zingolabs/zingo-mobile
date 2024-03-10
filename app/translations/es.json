@@ -40,7 +40,9 @@
     "bothexists": "Esta etiqueta y esta dirección ya existen. ",
     "labelexists": "Esta etiqueta ya existe. ",
     "addressexists": "Esta dirección ya existe. ",
-    "select-placeholder": "Elije un Contacto..."
+    "select-placeholder": "Elije un Contacto...",
+    "delete-title": "Borrar etiqueta",
+    "delete-alert": "Realmente quieres borrar este Contacto/Apodo/Etiqueta ?"
   },
   "change-privacy-legend": ".\nPulsar para revelar los valores ocultos.",
   "txtcopied": "Texto copiado al Portapapeles",

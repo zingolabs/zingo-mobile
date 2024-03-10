@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { View, TouchableOpacity } from 'react-native';
+import { View, TouchableOpacity, Alert } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faAddressCard, faQrcode, faTrashCan, faPencil, faArrowUp } from '@fortawesome/free-solid-svg-icons';
@@ -20,6 +20,7 @@ type AbSummaryLineProps = {
   setSendPageState: (s: SendPageStateClass) => void;
   closeModal: () => void;
   handleScrollToTop: () => void;
+  doAction: (action: 'Add' | 'Modify' | 'Delete', label: string, address: string) => void;
 };
 const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
   index,
@@ -29,6 +30,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
   setSendPageState,
   closeModal,
   handleScrollToTop,
+  doAction,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, navigation, readOnly } = context;
@@ -40,6 +42,18 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
       ? Utils.trimToSmall(item.label, 8)
       : item.label
     : 'Unknown';
+
+  const onPressDelete = () => {
+    Alert.alert(
+      translate('addressbook.delete-title') as string,
+      translate('addressbook.delete-alert') as string,
+      [
+        { text: translate('confirm') as string, onPress: () => doAction('Delete', item.label, item.address) },
+        { text: translate('cancel') as string, style: 'cancel' },
+      ],
+      { cancelable: true, userInterfaceStyle: 'light' },
+    );
+  };
 
   //console.log('render Ab SummaryLine - 5', index);
 
@@ -112,13 +126,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
           </View>
         )}
         <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
-          <TouchableOpacity
-            style={{ zIndex: 999, padding: 10 }}
-            onPress={() => {
-              setCurrentItem(index);
-              setAction('Delete');
-              handleScrollToTop();
-            }}>
+          <TouchableOpacity style={{ zIndex: 999, padding: 10 }} onPress={() => onPressDelete()}>
             <FontAwesomeIcon style={{ opacity: 0.8 }} size={20} icon={faTrashCan} color={colors.money} />
           </TouchableOpacity>
         </View>

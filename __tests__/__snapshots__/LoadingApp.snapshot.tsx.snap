@@ -95,6 +95,7 @@ exports[`Component LoadingApp - test LoadingApp - snapshot 1`] = `
               "fontWeight": "bold",
               "marginTop": 10,
               "opacity": 0,
+              "textAlign": "center",
             }
           }
         >
@@ -121,6 +122,7 @@ exports[`Component LoadingApp - test LoadingApp - snapshot 1`] = `
               "marginBottom": 10,
               "marginTop": 10,
               "opacity": 0,
+              "textAlign": "center",
             }
           }
         >

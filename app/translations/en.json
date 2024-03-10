@@ -40,7 +40,9 @@
     "bothexists": "This label and this address already exists. ",
     "labelexists": "This label already exists. ",
     "addressexists": "This address already exists. ",
-    "select-placeholder": "Choose a Contact..."
+    "select-placeholder": "Choose a Contact...",
+    "delete-title": "Delete Label",
+    "delete-alert": "Do you really want to delete this Contact/Nickname/Label/Tag?"
   },
   "change-privacy-legend": ".\nTap to reveal the hidden values.",
   "txtcopied": "Text copied to Clipboard",

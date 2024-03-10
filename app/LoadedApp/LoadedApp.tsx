@@ -856,7 +856,11 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
         { cancelable: true, userInterfaceStyle: 'light' },
       );
     } else if (item === 'Address Book') {
-      this.setState({ addressBookModalVisible: true, addressBookCurrentAddress: '', addressBookOpenPriorModal: () => {} });
+      this.setState({
+        addressBookModalVisible: true,
+        addressBookCurrentAddress: '',
+        addressBookOpenPriorModal: () => {},
+      });
     }
   };
 
@@ -1558,7 +1562,13 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
             animationType="slide"
             transparent={false}
             visible={addressBookModalVisible}
-            onRequestClose={() => this.setState({ addressBookModalVisible: false, addressBookCurrentAddress: '', addressBookOpenPriorModal: () => {} })}>
+            onRequestClose={() =>
+              this.setState({
+                addressBookModalVisible: false,
+                addressBookCurrentAddress: '',
+                addressBookOpenPriorModal: () => {},
+              })
+            }>
             <Suspense
               fallback={
                 <View>
@@ -1566,7 +1576,13 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 </View>
               }>
               <AddressBook
-                closeModal={() => this.setState({ addressBookModalVisible: false, addressBookCurrentAddress: '', addressBookOpenPriorModal: () => {} })}
+                closeModal={() =>
+                  this.setState({
+                    addressBookModalVisible: false,
+                    addressBookCurrentAddress: '',
+                    addressBookOpenPriorModal: () => {},
+                  })
+                }
                 setAddressBook={this.setAddressBook}
                 setSendPageState={this.setSendPageState}
               />

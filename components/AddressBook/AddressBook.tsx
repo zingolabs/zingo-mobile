@@ -221,6 +221,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
                     setSendPageState={setSendPageState}
                     closeModal={closeModal}
                     handleScrollToTop={handleScrollToTop}
+                    doAction={doAction}
                   />
                 )}
               </View>
@@ -240,6 +241,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
                     setSendPageState={setSendPageState}
                     closeModal={closeModal}
                     handleScrollToTop={handleScrollToTop}
+                    doAction={doAction}
                   />
                 )}
               </View>
