@@ -18,6 +18,11 @@ import Header from '../../Header';
 import BoldText from '../../Components/BoldText';
 import CurrencyAmount from '../../Components/CurrencyAmount';
 import AddressItem from '../../Components/AddressItem';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+// this is for http. (red)
+import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
+// this is for https. (primary)
+//import { faLock } from '@fortawesome/free-solid-svg-icons';
 
 type TxDetailProps = {
   tx: TransactionType;
@@ -240,6 +245,11 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
                     {!!memoUA && (
                       <TouchableOpacity
                         onPress={() => {
+                          addLastSnackbar({
+                            message: translate('history.address-http') as string,
+                            type: 'Primary',
+                            duration: 'long',
+                          });
                           Clipboard.setString(memoUA);
                           addLastSnackbar({
                             message: translate('history.addresscopied') as string,
@@ -247,7 +257,9 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
                             duration: 'short',
                           });
                         }}>
-                        <RegText>{'\nReply to: \n' + memoUA}</RegText>
+                        <RegText>{'\nReply to:'}</RegText>
+                        <FontAwesomeIcon icon={faTriangleExclamation} color={'red'} size={18} />
+                        <RegText style={{ opacity: 0.4 }}>{memoUA}</RegText>
                       </TouchableOpacity>
                     )}
                   </View>

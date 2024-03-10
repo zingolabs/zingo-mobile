@@ -424,8 +424,9 @@
     "minago": " min.",
     "details": "Detalles de la Transacción",
     "pool": "Grupo",
-    "contactcopied": "Contacto copiado al portapapeles"
-  },
+    "contactcopied": "Contacto copiado al portapapeles",
+    "address-http": "¡Zingo no tiene idea de quién te envió esta dirección!\nDepende totalmente de ti autenticar al remitente.",
+    "address-https": "Dirección autenticada por Zingo"  },
   "report": {
     "title": "Informe de Sincronización",
     "running": "Ejecutando",
