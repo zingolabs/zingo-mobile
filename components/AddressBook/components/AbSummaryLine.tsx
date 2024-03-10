@@ -33,7 +33,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
   doAction,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, navigation, readOnly } = context;
+  const { translate, navigation, readOnly, mode, totalBalance } = context;
   const { colors } = useTheme() as unknown as ThemeType;
 
   const displayAddress = item.address ? Utils.trimToSmall(item.address, 7) : 'Unknown';
@@ -106,7 +106,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
             <FontAwesomeIcon style={{ opacity: 0.8 }} size={20} icon={faPencil} color={colors.money} />
           </TouchableOpacity>
         </View>
-        {!readOnly && (
+        {!readOnly && !(mode === 'basic' && totalBalance.spendableOrchard + totalBalance.spendablePrivate <= 0) && (
           <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
             <TouchableOpacity
               style={{ zIndex: 999, padding: 10 }}

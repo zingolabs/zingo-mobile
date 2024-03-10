@@ -33,7 +33,17 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
   setSendPageState,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, addLastSnackbar, addressBook, launchAddressBook, privacy, navigation, readOnly } = context;
+  const {
+    translate,
+    addLastSnackbar,
+    addressBook,
+    launchAddressBook,
+    privacy,
+    navigation,
+    readOnly,
+    mode,
+    totalBalance,
+  } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [expandAddress, setExpandAddress] = useState(false);
   const [expandContact, setExpandContact] = useState(false);
@@ -132,23 +142,27 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
           <FontAwesomeIcon style={{ marginTop: 3 }} size={20} icon={faAddressCard} color={colors.primary} />
         </TouchableOpacity>
       )}
-      {withSendIcon && setSendPageState && contact && !readOnly && (
-        <TouchableOpacity
-          style={{ marginLeft: 10 }}
-          onPress={() => {
-            // enviar
-            const sendPageState = new SendPageStateClass(new ToAddrClass(0));
-            sendPageState.toaddr.to = address;
-            setSendPageState(sendPageState);
-            closeModal();
-            navigation.navigate('LoadedApp', {
-              screen: translate('loadedapp.send-menu'),
-              initial: false,
-            });
-          }}>
-          <FontAwesomeIcon style={{ marginTop: 3 }} size={20} icon={faArrowUp} color={colors.primary} />
-        </TouchableOpacity>
-      )}
+      {withSendIcon &&
+        setSendPageState &&
+        contact &&
+        !readOnly &&
+        !(mode === 'basic' && totalBalance.spendableOrchard + totalBalance.spendablePrivate <= 0) && (
+          <TouchableOpacity
+            style={{ marginLeft: 10 }}
+            onPress={() => {
+              // enviar
+              const sendPageState = new SendPageStateClass(new ToAddrClass(0));
+              sendPageState.toaddr.to = address;
+              setSendPageState(sendPageState);
+              closeModal();
+              navigation.navigate('LoadedApp', {
+                screen: translate('loadedapp.send-menu'),
+                initial: false,
+              });
+            }}>
+            <FontAwesomeIcon style={{ marginTop: 3 }} size={20} icon={faArrowUp} color={colors.primary} />
+          </TouchableOpacity>
+        )}
     </View>
   );
 };
