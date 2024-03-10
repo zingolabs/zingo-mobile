@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { View, ScrollView, SafeAreaView, Keyboard } from 'react-native';
+import { View, ScrollView, SafeAreaView, Keyboard, Platform } from 'react-native';
 import moment from 'moment';
 import 'moment/locale/es';
 import { useTheme, useScrollToTop } from '@react-navigation/native';
@@ -111,9 +111,12 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
     setAction(null);
     if (addressBookCurrentAddress) {
       closeModal();
-      setTimeout(() => {
-        addressBookOpenPriorModal();
-      }, 100);
+      setTimeout(
+        () => {
+          addressBookOpenPriorModal();
+        },
+        Platform.OS === 'ios' ? 100 : 1,
+      );
     }
   };
 

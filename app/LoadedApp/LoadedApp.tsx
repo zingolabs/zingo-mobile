@@ -1181,13 +1181,16 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
 
   launchAddressBook = (address: string, closeModal: () => void, openModal: () => void) => {
     closeModal();
-    setTimeout(() => {
-      this.setState({
-        addressBookModalVisible: true,
-        addressBookCurrentAddress: address,
-        addressBookOpenPriorModal: openModal,
-      });
-    }, 100);
+    setTimeout(
+      () => {
+        this.setState({
+          addressBookModalVisible: true,
+          addressBookCurrentAddress: address,
+          addressBookOpenPriorModal: openModal,
+        });
+      },
+      Platform.OS === 'ios' ? 100 : 1,
+    );
   };
 
   render() {
