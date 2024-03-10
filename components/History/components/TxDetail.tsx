@@ -6,7 +6,7 @@ import moment from 'moment';
 import 'moment/locale/es';
 import { useTheme } from '@react-navigation/native';
 
-import { TransactionType, TxDetailType } from '../../../app/AppState';
+import { SendPageStateClass, TransactionType, TxDetailType } from '../../../app/AppState';
 import Utils from '../../../app/utils';
 import RegText from '../../Components/RegText';
 import ZecAmount from '../../Components/ZecAmount';
@@ -29,9 +29,16 @@ type TxDetailProps = {
   closeModal: () => void;
   openModal: () => void;
   set_privacy_option: (name: 'privacy', value: boolean) => Promise<void>;
+  setSendPageState: (s: SendPageStateClass) => void;
 };
 
-const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_privacy_option, openModal }) => {
+const TxDetail: React.FunctionComponent<TxDetailProps> = ({
+  tx,
+  closeModal,
+  set_privacy_option,
+  openModal,
+  setSendPageState,
+}) => {
   const context = useContext(ContextAppLoaded);
   const { info, translate, language, privacy, addLastSnackbar, server, currency } = context;
   const { colors } = useTheme() as unknown as ThemeType;
@@ -200,7 +207,14 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
                 {!!txd.address && (
                   <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: 10 }}>
                     <FadeText>{translate('history.address') as string}</FadeText>
-                    <AddressItem address={txd.address} withIcon={true} closeModal={closeModal} openModal={openModal} />
+                    <AddressItem
+                      address={txd.address}
+                      withIcon={true}
+                      withSendIcon={true}
+                      setSendPageState={setSendPageState}
+                      closeModal={closeModal}
+                      openModal={openModal}
+                    />
                   </View>
                 )}
 

@@ -1335,6 +1335,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 closeModal={() => this.setState({ insightModalVisible: false })}
                 openModal={() => this.setState({ insightModalVisible: true })}
                 set_privacy_option={this.set_privacy_option}
+                setSendPageState={this.setSendPageState}
               />
             </Suspense>
           </Modal>
@@ -1638,6 +1639,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                         setPoolsToShieldSelectSapling={this.setPoolsToShieldSelectSapling}
                         setPoolsToShieldSelectTransparent={this.setPoolsToShieldSelectTransparent}
                         setUfvkViewModalVisible={this.setUfvkViewModalVisible}
+                        setSendPageState={this.setSendPageState}
                       />
                     </Suspense>
                   </>

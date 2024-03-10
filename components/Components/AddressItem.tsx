@@ -5,11 +5,11 @@ import Clipboard from '@react-native-community/clipboard';
 import { ContextAppLoaded } from '../../app/context';
 import RegText from './RegText';
 import Utils from '../../app/utils';
-import { AddressBookFileClass } from '../../app/AppState';
+import { AddressBookFileClass, SendPageStateClass, ToAddrClass } from '../../app/AppState';
 import { useTheme } from '@react-navigation/native';
 import { ThemeType } from '../../app/types';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faAddressCard } from '@fortawesome/free-solid-svg-icons';
+import { faAddressCard, faArrowUp } from '@fortawesome/free-solid-svg-icons';
 
 type AddressItemProps = {
   address: string;
@@ -18,6 +18,8 @@ type AddressItemProps = {
   oneLine?: boolean;
   onlyContact?: boolean;
   withIcon?: boolean;
+  withSendIcon?: boolean;
+  setSendPageState?: (s: SendPageStateClass) => void;
 };
 
 const AddressItem: React.FunctionComponent<AddressItemProps> = ({
@@ -25,11 +27,13 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
   oneLine,
   onlyContact,
   withIcon,
+  withSendIcon,
   closeModal,
   openModal,
+  setSendPageState,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, addLastSnackbar, addressBook, launchAddressBook, privacy } = context;
+  const { translate, addLastSnackbar, addressBook, launchAddressBook, privacy, navigation, readOnly } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [expandAddress, setExpandAddress] = useState(false);
   const [expandContact, setExpandContact] = useState(false);
@@ -125,12 +129,24 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
       </View>
       {withIcon && !contact && (
         <TouchableOpacity onPress={() => launchAddressBook(address, closeModal, openModal)}>
-          <FontAwesomeIcon
-            style={{ marginTop: 3 }}
-            size={20}
-            icon={faAddressCard}
-            color={contact ? colors.zingo : colors.primary}
-          />
+          <FontAwesomeIcon style={{ marginTop: 3 }} size={20} icon={faAddressCard} color={colors.primary} />
+        </TouchableOpacity>
+      )}
+      {withSendIcon && setSendPageState && contact && !readOnly && (
+        <TouchableOpacity
+          style={{ marginLeft: 10 }}
+          onPress={() => {
+            // enviar
+            const sendPageState = new SendPageStateClass(new ToAddrClass(0));
+            sendPageState.toaddr.to = address;
+            setSendPageState(sendPageState);
+            closeModal();
+            navigation.navigate('LoadedApp', {
+              screen: translate('loadedapp.send-menu'),
+              initial: false,
+            });
+          }}>
+          <FontAwesomeIcon style={{ marginTop: 3 }} size={20} icon={faArrowUp} color={colors.primary} />
         </TouchableOpacity>
       )}
     </View>

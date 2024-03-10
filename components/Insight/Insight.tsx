@@ -18,6 +18,7 @@ import FadeText from '../Components/FadeText';
 import Header from '../Header';
 import RPCModule from '../../app/RPCModule';
 import AddressItem from '../Components/AddressItem';
+import { SendPageStateClass } from '../../app/AppState';
 
 type DataType = {
   svg: {
@@ -78,9 +79,15 @@ type InsightProps = {
   closeModal: () => void;
   openModal: () => void;
   set_privacy_option: (name: 'privacy', value: boolean) => Promise<void>;
+  setSendPageState: (s: SendPageStateClass) => void;
 };
 
-const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, set_privacy_option, openModal }) => {
+const Insight: React.FunctionComponent<InsightProps> = ({
+  closeModal,
+  set_privacy_option,
+  openModal,
+  setSendPageState,
+}) => {
   const context = useContext(ContextAppLoaded);
   const { info, translate, privacy, addLastSnackbar } = context;
   const { colors } = useTheme() as unknown as ThemeType;
@@ -199,6 +206,8 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, set_privac
                     oneLine={true}
                     onlyContact={true}
                     withIcon={true}
+                    withSendIcon={true}
+                    setSendPageState={setSendPageState}
                     closeModal={closeModal}
                     openModal={openModal}
                   />

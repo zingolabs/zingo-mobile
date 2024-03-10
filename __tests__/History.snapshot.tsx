@@ -181,6 +181,7 @@ describe('Component History - test', () => {
           set_privacy_option={onFunction}
           setPoolsToShieldSelectSapling={onFunction}
           setPoolsToShieldSelectTransparent={onFunction}
+          setSendPageState={onFunction}
         />
       </ContextAppLoadedProvider>,
     );
@@ -206,6 +207,7 @@ describe('Component History - test', () => {
           set_privacy_option={onFunction}
           setPoolsToShieldSelectSapling={onFunction}
           setPoolsToShieldSelectTransparent={onFunction}
+          setSendPageState={onFunction}
         />
       </ContextAppLoadedProvider>,
     );

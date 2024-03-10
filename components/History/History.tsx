@@ -5,7 +5,7 @@ import moment from 'moment';
 import 'moment/locale/es';
 import { useTheme } from '@react-navigation/native';
 
-import { TransactionType } from '../../app/AppState';
+import { SendPageStateClass, TransactionType } from '../../app/AppState';
 import { ThemeType } from '../../app/types';
 import FadeText from '../Components/FadeText';
 import Button from '../Components/Button';
@@ -25,6 +25,7 @@ type HistoryProps = {
   setPoolsToShieldSelectSapling: (v: boolean) => void;
   setPoolsToShieldSelectTransparent: (v: boolean) => void;
   setUfvkViewModalVisible?: (v: boolean) => void;
+  setSendPageState: (s: SendPageStateClass) => void;
 };
 
 const History: React.FunctionComponent<HistoryProps> = ({
@@ -38,6 +39,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
   setPoolsToShieldSelectSapling,
   setPoolsToShieldSelectTransparent,
   setUfvkViewModalVisible,
+  setSendPageState,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, transactions, language, setBackgroundError, addLastSnackbar } = context;
@@ -87,6 +89,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
           closeModal={() => setTxDetailModalShowing(false)}
           openModal={() => setTxDetailModalShowing(true)}
           set_privacy_option={set_privacy_option}
+          setSendPageState={setSendPageState}
         />
       </Modal>
 
