@@ -42,7 +42,8 @@
     "addressexists": "Esta dirección ya existe. ",
     "select-placeholder": "Elije un Contacto...",
     "delete-title": "Borrar etiqueta",
-    "delete-alert": "Realmente quieres borrar este Contacto/Apodo/Etiqueta ?"
+    "delete-alert": "Realmente quieres borrar este Contacto/Apodo/Etiqueta ?",
+    "likely": "Probablemente: "
   },
   "change-privacy-legend": ".\nPulsar para revelar los valores ocultos.",
   "txtcopied": "Texto copiado al Portapapeles",

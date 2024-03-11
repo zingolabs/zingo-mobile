@@ -6,7 +6,7 @@ import moment from 'moment';
 import 'moment/locale/es';
 import { useTheme } from '@react-navigation/native';
 
-import { SendPageStateClass, TransactionType, TxDetailType } from '../../../app/AppState';
+import { AddressBookFileClass, SendPageStateClass, TransactionType, TxDetailType } from '../../../app/AppState';
 import Utils from '../../../app/utils';
 import RegText from '../../Components/RegText';
 import ZecAmount from '../../Components/ZecAmount';
@@ -40,7 +40,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
   setSendPageState,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { info, translate, language, privacy, addLastSnackbar, server, currency } = context;
+  const { info, translate, language, privacy, addLastSnackbar, server, currency, addressBook } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const spendColor =
     tx.confirmations === 0 ? colors.primaryDisabled : tx.type === 'Received' ? colors.primary : colors.text;
@@ -60,6 +60,14 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
         console.log("Don't know how to open URI: " + url);
       }
     });
+  };
+
+  const contactFound: (add: string) => boolean = (add: string) => {
+    const contact: string = addressBook
+      .filter((ab: AddressBookFileClass) => ab.address === add)
+      .map((ab: AddressBookFileClass) => ab.label)
+      .join(' ');
+    return !!contact;
   };
 
   //console.log('tx', tx.txDetails);
@@ -274,6 +282,17 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
                         <RegText>{'\nReply to:'}</RegText>
                         <FontAwesomeIcon icon={faTriangleExclamation} color={'red'} size={18} />
                         <RegText style={{ opacity: 0.4 }}>{memoUA}</RegText>
+                        {contactFound(memoUA) && (
+                          <View style={{ flexDirection: 'row' }}>
+                            <RegText style={{ opacity: 0.5 }}>{translate('addressbook.likely') as string}</RegText>
+                            <AddressItem
+                              address={memoUA}
+                              onlyContact={true}
+                              closeModal={() => {}}
+                              openModal={() => {}}
+                            />
+                          </View>
+                        )}
                       </TouchableOpacity>
                     )}
                   </View>

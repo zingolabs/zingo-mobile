@@ -42,7 +42,8 @@
     "addressexists": "This address already exists. ",
     "select-placeholder": "Choose a Contact...",
     "delete-title": "Delete Label",
-    "delete-alert": "Do you really want to delete this Contact/Nickname/Label/Tag?"
+    "delete-alert": "Do you really want to delete this Contact/Nickname/Label/Tag?",
+    "likely": "Likely: "
   },
   "change-privacy-legend": ".\nTap to reveal the hidden values.",
   "txtcopied": "Text copied to Clipboard",
