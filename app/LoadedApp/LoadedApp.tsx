@@ -46,6 +46,7 @@ import {
   TranslateType,
   ServerType,
   AddressBookFileClass,
+  SecurityType,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
@@ -106,6 +107,17 @@ export default function LoadedApp(props: LoadedAppProps) {
   const [background, setBackground] = useState<BackgroundType>({ batches: 0, message: '', date: 0, dateEnd: 0 });
   const [addressBook, setAddressBook] = useState<AddressBookFileClass[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [security, setSecurity] = useState<SecurityType>({
+    startApp: true,
+    foregroundApp: true,
+    sendConfirm: true,
+    seedScreen: true,
+    ufvkScreen: true,
+    rescanScreen: true,
+    settingsScreen: true,
+    changeWalletScreen: true,
+    restoreWalletBackupScreen: true,
+  });
   const file = useMemo(
     () => ({
       en: en,
@@ -184,6 +196,11 @@ export default function LoadedApp(props: LoadedAppProps) {
         await SettingsFileImpl.writeSettings('mode', mode);
         props.toggleTheme(mode);
       }
+      if (settings.security) {
+        setSecurity(settings.security);
+      } else {
+        await SettingsFileImpl.writeSettings('security', security);
+      }
 
       // reading background task info
       const backgroundJson = await BackgroundFileImpl.readBackground();
@@ -231,6 +248,7 @@ export default function LoadedApp(props: LoadedAppProps) {
         readOnly={readOnly}
         toggleTheme={props.toggleTheme}
         addressBook={addressBook}
+        security={security}
       />
     );
   }
@@ -251,6 +269,7 @@ type LoadedAppClassProps = {
   readOnly: boolean;
   toggleTheme: (mode: 'basic' | 'advanced') => void;
   addressBook: AddressBookFileClass[];
+  security: SecurityType;
 };
 
 export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
@@ -282,6 +301,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       restartApp: this.navigateToLoadingApp,
       addressBook: props.addressBook,
       launchAddressBook: this.launchAddressBook,
+      security: props.security,
     };
 
     this.rpc = new RPC(
@@ -333,7 +353,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
           }
         }
         // (PIN or TouchID or FaceID)
-        const resultBio = await simpleBiometrics({ translate: this.state.translate });
+        const resultBio = this.state.security.foregroundApp
+          ? await simpleBiometrics({ translate: this.state.translate })
+          : true;
         // can be:
         // - true      -> the user do pass the authentication
         // - false     -> the user do NOT pass the authentication
@@ -1018,6 +1040,16 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     this.rpc.fetchWalletSettings();
   };
 
+  set_security_option = async (name: 'security', value: SecurityType): Promise<void> => {
+    await SettingsFileImpl.writeSettings(name, value);
+    this.setState({
+      security: value as SecurityType,
+    });
+
+    // Refetch the settings to update
+    this.rpc.fetchWalletSettings();
+  };
+
   navigateToLoadingApp = async (state: any) => {
     const { navigation } = this.props;
 
@@ -1375,6 +1407,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 set_sendAll_option={this.set_sendAll_option}
                 set_privacy_option={this.set_privacy_option}
                 set_mode_option={this.set_mode_option}
+                set_security_option={this.set_security_option}
               />
             </Suspense>
           </Modal>

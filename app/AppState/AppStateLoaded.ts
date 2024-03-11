@@ -20,6 +20,7 @@ import BackgroundErrorType from './types/BackgroundErrorType';
 import ServerType from './types/ServerType';
 import SnackbarType from './types/SnackbarType';
 import AddressBookFileClass from './classes/AddressBookFileClass';
+import SecurityType from './types/SecurityType';
 
 export default interface AppStateLoaded {
   navigation: StackScreenProps<any>['navigation'];
@@ -125,6 +126,7 @@ export default interface AppStateLoaded {
   launchAddressBook: (add: string, close: () => void, open: () => void) => void;
   addressBookCurrentAddress: string;
   addressBookOpenPriorModal: () => void;
+  security: SecurityType;
 
   // eslint-disable-next-line semi
 }

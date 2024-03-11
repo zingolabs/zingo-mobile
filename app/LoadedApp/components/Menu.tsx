@@ -18,7 +18,7 @@ type MenuProps = {
 
 const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuState }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, readOnly, mode, transactions, addLastSnackbar } = context;
+  const { translate, readOnly, mode, transactions, addLastSnackbar, security } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const item = {
     fontSize: 14,
@@ -31,11 +31,12 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuSt
 
   const onItemSelectedWrapper = async (value: string) => {
     if (
-      value === 'Wallet' ||
-      value === 'Rescan' ||
-      value === 'Settings' ||
-      value === 'Change Wallet' ||
-      value === 'Restore Wallet Backup'
+      (value === 'Wallet' && !readOnly && security.seedScreen) ||
+      (value === 'Wallet' && readOnly && security.ufvkScreen) ||
+      (value === 'Rescan' && security.rescanScreen) ||
+      (value === 'Settings' && security.settingsScreen) ||
+      (value === 'Change Wallet' && security.changeWalletScreen) ||
+      (value === 'Restore Wallet Backup' && security.restoreWalletBackupScreen)
     ) {
       const resultBio = await simpleBiometrics({ translate: translate });
       // can be:
@@ -54,6 +55,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuSt
       }
     } else {
       // if the user click on a screen in the menu the sync is going to continue
+      // or if the security check of the screen is false in settings
       (async () => await RPC.rpc_setInterruptSyncAfterBatch('false'))();
       onItemSelected(value);
     }

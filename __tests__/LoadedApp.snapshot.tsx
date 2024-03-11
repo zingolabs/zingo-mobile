@@ -130,6 +130,17 @@ describe('Component LoadedApp - test', () => {
     const readOnly = false;
     const toggleTheme = jest.fn();
     const addressBook = [] as AddressBookFileClass[];
+    const security = {
+      startApp: true,
+      foregroundApp: true,
+      sendConfirm: true,
+      seedScreen: true,
+      ufvkScreen: true,
+      rescanScreen: true,
+      settingsScreen: true,
+      changeWalletScreen: true,
+      restoreWalletBackupScreen: true,
+    };
     const receive = render(
       <LoadedAppClass
         navigation={navigationMock}
@@ -146,6 +157,7 @@ describe('Component LoadedApp - test', () => {
         readOnly={readOnly}
         toggleTheme={toggleTheme}
         addressBook={addressBook}
+        security={security}
       />,
     );
     expect(receive.toJSON()).toMatchSnapshot();

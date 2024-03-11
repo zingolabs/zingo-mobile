@@ -21,6 +21,7 @@ import {
   BackgroundErrorType,
   ServerType,
   AddressBookFileClass,
+  SecurityType,
 } from '../AppState';
 import SnackbarType from '../AppState/types/SnackbarType';
 
@@ -96,6 +97,7 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   launchAddressBook: () => {},
   addressBookCurrentAddress: '',
   addressBookOpenPriorModal: () => {},
+  security: {} as SecurityType,
 };
 
 export const ContextAppLoaded = React.createContext(defaultAppStateLoaded);

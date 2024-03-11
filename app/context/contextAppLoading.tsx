@@ -11,6 +11,7 @@ import {
   NetInfoType,
   BackgroundErrorType,
   ServerType,
+  SecurityType,
 } from '../AppState';
 import SnackbarType from '../AppState/types/SnackbarType';
 
@@ -57,6 +58,7 @@ export const defaultAppStateLoading: AppStateLoading = {
   firstLaunchingMessage: false,
   biometricsFailed: false,
   startingApp: true,
+  security: {} as SecurityType,
 };
 
 export const ContextAppLoading = React.createContext(defaultAppStateLoading);

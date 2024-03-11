@@ -43,6 +43,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     netInfo,
     addLastSnackbar,
     server,
+    security,
   } = context;
   const { colors } = useTheme();
   const [privacyLevel, setPrivacyLevel] = useState('-');
@@ -167,7 +168,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   ]);
 
   const confirmSendBiometrics = async () => {
-    const resultBio = await simpleBiometrics({ translate: translate });
+    const resultBio = security.sendConfirm ? await simpleBiometrics({ translate: translate }) : true;
     // can be:
     // - true      -> the user do pass the authentication
     // - false     -> the user do NOT pass the authentication

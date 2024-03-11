@@ -14,7 +14,7 @@
   "biometricsfailed-button": "Unlock",
   "biometrics-title": "Authentication",
   "biometrics-message": "Please authenticate",
-  "biometrics-error": "For security you need to authenticate again to perform this action.",
+  "biometrics-error": "For security you need to authenticate again to perform this action.\nYou Always can change this in Settings",
   "close": "Close",
   "cancel": "Cancel",
   "save": "Save",
@@ -233,7 +233,17 @@
     "mode": "Mode: ",
     "value-chain_name-main": "Mainnet",
     "value-chain_name-test": "Testnet",
-    "value-chain_name-regtest": "Regtest"
+    "value-chain_name-regtest": "Regtest",
+    "security-title": "APPLY DEVICE SECURITY TO SCREENS/OPTIONS",
+    "security-startapp": "When the App starts.",
+    "security-foregroundapp": "When the App go to the Foreground.",
+    "security-sendconfirm": "Confirm Transaction Screen.",
+    "security-seedscreen": "Wallet Seed Phrase Screen.",
+    "security-ufvkscreen": "Wallet Viewing Key Screen.",
+    "security-rescanscreen": "Rescan Wallet Screen.",
+    "security-settingsscreen": "Settings Screen.",
+    "security-changewalletscreen": "Change to another Wallet Screen.",
+    "security-restorewalletbackupscreen": "Restore Last Wallet Backup Screen."
   },
   "info": {
     "version": "Version",

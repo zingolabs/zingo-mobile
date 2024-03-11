@@ -22,6 +22,7 @@ import BackgroundErrorType from './types/BackgroundErrorType';
 import ServerType from './types/ServerType';
 import SnackbarType from './types/SnackbarType';
 import ZecPriceType from './types/ZecPriceType';
+import SecurityType from './types/SecurityType';
 
 import AppStateLoaded from './AppStateLoaded';
 import AppStateLoading from './AppStateLoading';
@@ -52,4 +53,5 @@ export {
   NetInfoType,
   ServerType,
   SnackbarType,
+  SecurityType,
 };

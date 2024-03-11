@@ -11,6 +11,7 @@ import NetInfoType from './types/NetInfoType';
 import BackgroundErrorType from './types/BackgroundErrorType';
 import ServerType from './types/ServerType';
 import SnackbarType from './types/SnackbarType';
+import SecurityType from './types/SecurityType';
 
 export default interface AppStateLoading {
   navigation: StackScreenProps<any>['navigation'];
@@ -51,6 +52,7 @@ export default interface AppStateLoading {
   firstLaunchingMessage: boolean;
   biometricsFailed: boolean;
   startingApp: boolean;
+  security: SecurityType;
 
   // eslint-disable-next-line semi
 }

@@ -14,7 +14,7 @@
   "biometricsfailed-button": "Desbloquear",
   "biometrics-title": "Autenticación",
   "biometrics-message": "Por favor autenticar",
-  "biometrics-error": "Por seguridad necesitas autenticarte de nuevo para realizar esta accion.",
+  "biometrics-error": "Por seguridad necesitas autenticarte de nuevo para realizar esta accion.\nSiempre puedes cambiar esto en Parámetros",
   "close": "Cerrar",
   "cancel": "Cancelar",
   "save": "Grabar",
@@ -233,7 +233,17 @@
     "mode": "Modo: ",
     "value-chain_name-main": "Mainnet",
     "value-chain_name-test": "Testnet",
-    "value-chain_name-regtest": "Regtest"
+    "value-chain_name-regtest": "Regtest",
+    "security-title": "APLICAR LA SEGURIDAD DEL DISPOSITIVO A PANTALLAS/OPCIONES",
+    "security-startapp": "Cuando la Aplicación Arranca.",
+    "security-foregroundapp": "Cuando la Aplicación va a Primer Plano.",
+    "security-sendconfirm": "Pantalla para Confirmar Transacción.",
+    "security-seedscreen": "Pantalla para ver la Semilla del Monedero.",
+    "security-ufvkscreen": "Pantalla para ver la Clave de Visualización del Monedero.",
+    "security-rescanscreen": "Pantalla para Re-Escanear el Monedero.",
+    "security-settingsscreen": "Pantalla de Parámetros.",
+    "security-changewalletscreen": "Pantalla para Abrir otro Monedero.",
+    "security-restorewalletbackupscreen": "Pantalla para Restaurar la última copia de Seguridad."
   },
   "info": {
     "version": "Versión",

@@ -26,7 +26,15 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faEllipsisV } from '@fortawesome/free-solid-svg-icons';
 
 import RPCModule from '../RPCModule';
-import { AppStateLoading, BackgroundType, WalletType, TranslateType, NetInfoType, ServerType } from '../AppState';
+import {
+  AppStateLoading,
+  BackgroundType,
+  WalletType,
+  TranslateType,
+  NetInfoType,
+  ServerType,
+  SecurityType,
+} from '../AppState';
 import { parseServerURI, serverUris } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import RPC from '../rpc';
@@ -75,6 +83,17 @@ export default function LoadingApp(props: LoadingAppProps) {
   const [background, setBackground] = useState<BackgroundType>({ batches: 0, message: '', date: 0, dateEnd: 0 });
   const [firstLaunchingMessage, setFirstLaunchingMessage] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
+  const [security, setSecurity] = useState<SecurityType>({
+    startApp: true,
+    foregroundApp: true,
+    sendConfirm: true,
+    seedScreen: true,
+    ufvkScreen: true,
+    rescanScreen: true,
+    settingsScreen: true,
+    changeWalletScreen: true,
+    restoreWalletBackupScreen: true,
+  });
   const file = useMemo(
     () => ({
       en: en,
@@ -165,6 +184,11 @@ export default function LoadingApp(props: LoadingAppProps) {
       } else {
         await SettingsFileImpl.writeSettings('privacy', privacy);
       }
+      if (settings.security) {
+        setSecurity(settings.security);
+      } else {
+        await SettingsFileImpl.writeSettings('security', security);
+      }
 
       // for testing
       //await delay(5000);
@@ -208,6 +232,7 @@ export default function LoadingApp(props: LoadingAppProps) {
         background={background}
         firstLaunchingMessage={firstLaunchingMessage}
         toggleTheme={props.toggleTheme}
+        security={security}
       />
     );
   }
@@ -227,6 +252,7 @@ type LoadingAppClassProps = {
   background: BackgroundType;
   firstLaunchingMessage: boolean;
   toggleTheme: (mode: 'basic' | 'advanced') => void;
+  security: SecurityType;
 };
 
 export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
@@ -275,6 +301,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
         !!props.route.params && (props.route.params.startingApp === true || props.route.params.startingApp === false)
           ? props.route.params.startingApp
           : true,
+      security: props.security,
     };
 
     this.dim = {} as EmitterSubscription;
@@ -289,7 +316,9 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
       if (!this.state.biometricsFailed) {
         // (PIN or TouchID or FaceID)
         this.setState({ biometricsFailed: false });
-        const resultBio = await simpleBiometrics({ translate: this.state.translate });
+        const resultBio = this.state.security.startApp
+          ? await simpleBiometrics({ translate: this.state.translate })
+          : true;
         // can be:
         // - true      -> the user do pass the authentication
         // - false     -> the user do NOT pass the authentication

@@ -95,6 +95,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     wallet,
     restartApp,
     someUnconfirmed,
+    security,
   } = context;
 
   let translate: (key: string) => TranslateType, netInfo: NetInfoType, mode: 'basic' | 'advanced';
@@ -326,7 +327,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   };
 
   const ufvkShowModal = async () => {
-    const resultBio = await simpleBiometrics({ translate: translate });
+    const resultBio = security.ufvkScreen ? await simpleBiometrics({ translate: translate }) : true;
     // can be:
     // - true      -> the user do pass the authentication
     // - false     -> the user do NOT pass the authentication
