@@ -14,7 +14,7 @@
   "biometricsfailed-button": "Unlock",
   "biometrics-title": "Authentication",
   "biometrics-message": "Please authenticate",
-  "biometrics-error": "For security you need to authenticate again to perform this action.\nYou Always can change this in Settings",
+  "biometrics-error": "For security you need to authenticate again to perform this action. You Always can change this in Settings",
   "close": "Close",
   "cancel": "Cancel",
   "save": "Save",
@@ -436,7 +436,7 @@
     "details": "Transaction Details",
     "pool": "Pool",
     "contactcopied": "Copied Contact to Clipboard",
-    "address-http": "Zingo has no idea who sent you this Address!\nIt's entirely up to you to authenticate the Sender.",
+    "address-http": "Zingo has no idea who sent you this Address! It's entirely up to you to authenticate the Sender.",
     "address-https": "Zingo-Authenticated Address"
   },
   "report": {

@@ -14,7 +14,7 @@
   "biometricsfailed-button": "Desbloquear",
   "biometrics-title": "Autenticación",
   "biometrics-message": "Por favor autenticar",
-  "biometrics-error": "Por seguridad necesitas autenticarte de nuevo para realizar esta accion.\nSiempre puedes cambiar esto en Parámetros",
+  "biometrics-error": "Por seguridad necesitas autenticarte de nuevo para realizar esta accion. Siempre puedes cambiarlo en Parámetros",
   "close": "Cerrar",
   "cancel": "Cancelar",
   "save": "Grabar",
@@ -436,7 +436,7 @@
     "details": "Detalles de la Transacción",
     "pool": "Grupo",
     "contactcopied": "Contacto copiado al portapapeles",
-    "address-http": "¡Zingo no tiene idea de quién te envió esta dirección!\nDepende totalmente de ti autenticar al remitente.",
+    "address-http": "¡Zingo no tiene idea de quién te envió esta dirección! Depende totalmente de ti autenticar al remitente.",
     "address-https": "Dirección autenticada por Zingo"  },
   "report": {
     "title": "Informe de Sincronización",
