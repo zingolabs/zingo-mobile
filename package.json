@@ -11,7 +11,8 @@
     "coverage": "jest --coverage",
     "postinstall": "patch-package",
     "build:bundle": "react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res && rimraf --glob android/app/src/main/res/drawable* && cd android && ./gradlew assembleRelease -PsplitApk=true && cd ..",
-    "bundle": "react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res && rimraf --glob android/app/src/main/res/drawable*"
+    "bundle": "react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res && rimraf --glob android/app/src/main/res/drawable*",
+    "cargo:update": "cd rust && cargo update -p zingolib -p zingoconfig --aggressive"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.2.0",
