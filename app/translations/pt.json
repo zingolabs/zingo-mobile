@@ -167,7 +167,7 @@
       },
       {
         "value": "pt",
-        "text": "Toda la información estará en Portugués."
+        "text": "Toda la información estará en Portugues."
       }
     ],
     "sendalls": [
@@ -227,7 +227,7 @@
     "value-currency-USD": "US Dólares",
     "value-language-en": "Inglés",
     "value-language-es": "Español",
-    "value-language-pt": "Portugués",
+    "value-language-pt": "Portugues",
     "value-sendall-true": "Activar",
     "value-sendall-false": "Desactivar",
     "value-privacy-true": "Alta",

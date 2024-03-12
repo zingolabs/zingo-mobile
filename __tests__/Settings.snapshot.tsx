@@ -94,6 +94,10 @@ describe('Component Settings - test', () => {
           value: 'es',
           text: 'text es',
         },
+        {
+          value: 'pt',
+          text: 'text pt',
+        },
       ];
     }
     if (p === 'settings.sendalls') {

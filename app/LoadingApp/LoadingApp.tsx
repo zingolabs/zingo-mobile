@@ -59,6 +59,7 @@ const ChainTypeToggle = React.lazy(() => import('../../components/Components/Cha
 
 const en = require('../translations/en.json');
 const es = require('../translations/es.json');
+const pt = require('../translations/pt.json');
 
 // for testing
 //const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -74,7 +75,7 @@ const SERVER_DEFAULT_1 = serverUris()[1];
 
 export default function LoadingApp(props: LoadingAppProps) {
   const theme = useTheme() as unknown as ThemeType;
-  const [language, setLanguage] = useState<'en' | 'es'>('en');
+  const [language, setLanguage] = useState<'en' | 'es' | 'pt'>('en');
   const [currency, setCurrency] = useState<'USD' | ''>('');
   const [server, setServer] = useState<ServerType>(SERVER_DEFAULT_0);
   const [sendAll, setSendAll] = useState<boolean>(false);
@@ -98,6 +99,7 @@ export default function LoadingApp(props: LoadingAppProps) {
     () => ({
       en: en,
       es: es,
+      pt: pt,
     }),
     [],
   );
@@ -150,15 +152,15 @@ export default function LoadingApp(props: LoadingAppProps) {
           props.toggleTheme(mode);
         }
       }
-      if (settings.language === 'en' || settings.language === 'es') {
+      if (settings.language === 'en' || settings.language === 'es' || settings.language === 'pt') {
         setLanguage(settings.language);
         i18n.locale = settings.language;
         //console.log('apploading settings', settings.language, settings.currency);
       } else {
         const lang =
-          languageTag === 'en' || languageTag === 'es'
-            ? (languageTag as 'en' | 'es')
-            : (fallback.languageTag as 'en' | 'es');
+          languageTag === 'en' || languageTag === 'es' || languageTag === 'pt'
+            ? (languageTag as 'en' | 'es' | 'pt')
+            : (fallback.languageTag as 'en' | 'es' | 'pt');
         setLanguage(lang);
         i18n.locale = lang;
         await SettingsFileImpl.writeSettings('language', lang);
@@ -243,7 +245,7 @@ type LoadingAppClassProps = {
   route: StackScreenProps<any>['route'];
   translate: (key: string) => TranslateType;
   theme: ThemeType;
-  language: 'en' | 'es';
+  language: 'en' | 'es' | 'pt';
   currency: 'USD' | '';
   server: ServerType;
   sendAll: boolean;
