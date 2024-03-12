@@ -1223,6 +1223,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
             "flexDirection": "row",
             "marginBottom": 5,
             "marginLeft": 20,
+            "marginRight": 10,
             "maxHeight": 50,
             "minHeight": 48,
           }
@@ -1245,6 +1246,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           pointerEvents="auto"
         >
           <RNCCheckbox
+            animationDuration={0.1}
             boxType="square"
             forwardedRef={null}
             onCheckColor="rgb(255, 255, 255)"
@@ -1300,6 +1302,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
             "flexDirection": "row",
             "marginBottom": 5,
             "marginLeft": 20,
+            "marginRight": 10,
             "maxHeight": 50,
             "minHeight": 48,
           }
@@ -1322,6 +1325,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           pointerEvents="auto"
         >
           <RNCCheckbox
+            animationDuration={0.1}
             boxType="square"
             forwardedRef={null}
             onCheckColor="rgb(255, 255, 255)"
@@ -1377,6 +1381,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
             "flexDirection": "row",
             "marginBottom": 5,
             "marginLeft": 20,
+            "marginRight": 10,
             "maxHeight": 50,
             "minHeight": 48,
           }
@@ -1399,6 +1404,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           pointerEvents="auto"
         >
           <RNCCheckbox
+            animationDuration={0.1}
             boxType="square"
             forwardedRef={null}
             onCheckColor="rgb(255, 255, 255)"
@@ -1454,6 +1460,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
             "flexDirection": "row",
             "marginBottom": 5,
             "marginLeft": 20,
+            "marginRight": 10,
             "maxHeight": 50,
             "minHeight": 48,
           }
@@ -1476,6 +1483,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           pointerEvents="auto"
         >
           <RNCCheckbox
+            animationDuration={0.1}
             boxType="square"
             forwardedRef={null}
             onCheckColor="rgb(255, 255, 255)"
@@ -1531,6 +1539,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
             "flexDirection": "row",
             "marginBottom": 5,
             "marginLeft": 20,
+            "marginRight": 10,
             "maxHeight": 50,
             "minHeight": 48,
           }
@@ -1553,6 +1562,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           pointerEvents="auto"
         >
           <RNCCheckbox
+            animationDuration={0.1}
             boxType="square"
             forwardedRef={null}
             onCheckColor="rgb(255, 255, 255)"
@@ -1608,6 +1618,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
             "flexDirection": "row",
             "marginBottom": 5,
             "marginLeft": 20,
+            "marginRight": 10,
             "maxHeight": 50,
             "minHeight": 48,
           }
@@ -1630,6 +1641,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           pointerEvents="auto"
         >
           <RNCCheckbox
+            animationDuration={0.1}
             boxType="square"
             forwardedRef={null}
             onCheckColor="rgb(255, 255, 255)"
@@ -1685,6 +1697,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
             "flexDirection": "row",
             "marginBottom": 5,
             "marginLeft": 20,
+            "marginRight": 10,
             "maxHeight": 50,
             "minHeight": 48,
           }
@@ -1707,6 +1720,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           pointerEvents="auto"
         >
           <RNCCheckbox
+            animationDuration={0.1}
             boxType="square"
             forwardedRef={null}
             onCheckColor="rgb(255, 255, 255)"
@@ -1762,6 +1776,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
             "flexDirection": "row",
             "marginBottom": 5,
             "marginLeft": 20,
+            "marginRight": 10,
             "maxHeight": 50,
             "minHeight": 48,
           }
@@ -1784,6 +1799,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           pointerEvents="auto"
         >
           <RNCCheckbox
+            animationDuration={0.1}
             boxType="square"
             forwardedRef={null}
             onCheckColor="rgb(255, 255, 255)"
@@ -1839,6 +1855,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
             "flexDirection": "row",
             "marginBottom": 5,
             "marginLeft": 20,
+            "marginRight": 10,
             "maxHeight": 50,
             "minHeight": 48,
           }
@@ -1861,6 +1878,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           pointerEvents="auto"
         >
           <RNCCheckbox
+            animationDuration={0.1}
             boxType="square"
             forwardedRef={null}
             onCheckColor="rgb(255, 255, 255)"
