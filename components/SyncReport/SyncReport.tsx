@@ -33,8 +33,33 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
   useEffect(() => {
     if (syncingStatus.lastBlockServer) {
       (async () => {
-        const a = [0, 500000, 1000000, 1500000, 2000000, 2500000, 3000000, 3500000, 4000000, 4500000, 5000000];
-        const l = ['0', '500K', '1M', '1.5M', '2M', '2.5M', '3M', '3.5M', '4M', '4.5M', '5M'];
+        const a = [
+          0, 500000, 1000000, 1500000, 2000000, 2500000, 3000000, 3500000, 4000000, 4500000, 5000000, 5500000, 6000000,
+          6500000, 7000000, 7500000, 8000000, 8500000, 9000000, 9500000, 10000000,
+        ];
+        const l = [
+          '0',
+          '500K',
+          '1M',
+          '1.5M',
+          '2M',
+          '2.5M',
+          '3M',
+          '3.5M',
+          '4M',
+          '4.5M',
+          '5M',
+          '5.5M',
+          '6M',
+          '6.5M',
+          '7M',
+          '7.5M',
+          '8M',
+          '8.5M',
+          '9M',
+          '9.5M',
+          '10M',
+        ];
         for (let i = 0; i < a.length; i++) {
           if (syncingStatus.lastBlockServer < a[i]) {
             setMaxBlocks(a[i]);
