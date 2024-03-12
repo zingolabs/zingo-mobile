@@ -17,6 +17,8 @@ import Utils from '../../app/utils';
 import FadeText from '../Components/FadeText';
 import Header from '../Header';
 import RPCModule from '../../app/RPCModule';
+import AddressItem from '../Components/AddressItem';
+import { SendPageStateClass } from '../../app/AppState';
 
 type DataType = {
   svg: {
@@ -75,10 +77,17 @@ const getPercent = (percent: number) => {
 
 type InsightProps = {
   closeModal: () => void;
+  openModal: () => void;
   set_privacy_option: (name: 'privacy', value: boolean) => Promise<void>;
+  setSendPageState: (s: SendPageStateClass) => void;
 };
 
-const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, set_privacy_option }) => {
+const Insight: React.FunctionComponent<InsightProps> = ({
+  closeModal,
+  set_privacy_option,
+  openModal,
+  setSendPageState,
+}) => {
   const context = useContext(ContextAppLoaded);
   const { info, translate, privacy, addLastSnackbar } = context;
   const { colors } = useTheme() as unknown as ThemeType;
@@ -170,7 +179,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, set_privac
               justifyContent: 'center',
             }}>
             {(!expandAddress[index] || item.address === 'fee') && (
-              <FontAwesomeIcon style={{ margin: 5 }} size={20} icon={faQrcode} color={item.svg.fill} />
+              <FontAwesomeIcon style={{ margin: 5 }} size={40} icon={faQrcode} color={item.svg.fill} />
             )}
             {!!item.tag && <FadeText style={{ marginHorizontal: 5 }}>{item.tag}</FadeText>}
             <TouchableOpacity
@@ -191,6 +200,18 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, set_privac
                   flexDirection: 'column',
                   flexWrap: 'wrap',
                 }}>
+                {item.address !== 'fee' && (
+                  <AddressItem
+                    address={item.address}
+                    oneLine={true}
+                    onlyContact={true}
+                    withIcon={true}
+                    withSendIcon={true}
+                    setSendPageState={setSendPageState}
+                    closeModal={closeModal}
+                    openModal={openModal}
+                  />
+                )}
                 {!expandAddress[index] && !!item.address && (
                   <RegText>
                     {item.address.length > (dimensions.width < 500 ? 10 : 20)

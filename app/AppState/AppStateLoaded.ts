@@ -2,7 +2,6 @@ import { StackScreenProps } from '@react-navigation/stack';
 
 import TotalBalanceClass from './classes/TotalBalanceClass';
 import AddressClass from './classes/AddressClass';
-import AddressBookClass from './classes/AddressBookClass';
 import ErrorModalDataClass from './classes/ErrorModalDataClass';
 import SendPageStateClass from './classes/SendPageStateClass';
 import SendProgressClass from './classes/SendProgressClass';
@@ -20,6 +19,8 @@ import NetInfoType from './types/NetInfoType';
 import BackgroundErrorType from './types/BackgroundErrorType';
 import ServerType from './types/ServerType';
 import SnackbarType from './types/SnackbarType';
+import AddressBookFileClass from './classes/AddressBookFileClass';
+import SecurityType from './types/SecurityType';
 
 export default interface AppStateLoaded {
   navigation: StackScreenProps<any>['navigation'];
@@ -37,9 +38,6 @@ export default interface AppStateLoaded {
   // List of all addresses in the wallet, including change addresses and addresses
   // that don't have any balance or are unused
   addresses: AddressClass[];
-
-  // List of Address / Label pairs
-  addressBook: AddressBookClass[];
 
   // List of all T and Z and O transactions
   transactions: TransactionType[];
@@ -95,6 +93,7 @@ export default interface AppStateLoaded {
   syncReportModalVisible: boolean;
   poolsModalVisible: boolean;
   insightModalVisible: boolean;
+  addressBookModalVisible: boolean;
 
   newServer: ServerType;
 
@@ -122,6 +121,12 @@ export default interface AppStateLoaded {
   addLastSnackbar: (snackbar: SnackbarType) => void;
   restartApp: (s: any) => void;
   someUnconfirmed: boolean;
+
+  addressBook: AddressBookFileClass[];
+  launchAddressBook: (add: string, close: () => void, open: () => void) => void;
+  addressBookCurrentAddress: string;
+  addressBookOpenPriorModal: () => void;
+  security: SecurityType;
 
   // eslint-disable-next-line semi
 }

@@ -129,6 +129,17 @@ describe('Component LoadingApp - test', () => {
     };
     const firstLaunchingMessage = false;
     const toggleTheme = jest.fn();
+    const security = {
+      startApp: true,
+      foregroundApp: true,
+      sendConfirm: true,
+      seedScreen: true,
+      ufvkScreen: true,
+      rescanScreen: true,
+      settingsScreen: true,
+      changeWalletScreen: true,
+      restoreWalletBackupScreen: true,
+    };
     const receive = render(
       <LoadingAppClass
         navigation={navigationMock}
@@ -144,6 +155,7 @@ describe('Component LoadingApp - test', () => {
         background={background}
         firstLaunchingMessage={firstLaunchingMessage}
         toggleTheme={toggleTheme}
+        security={security}
       />,
     );
     expect(receive.toJSON()).toMatchSnapshot();

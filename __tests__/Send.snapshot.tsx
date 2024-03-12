@@ -72,6 +72,7 @@ jest.mock('@react-navigation/native', () => ({
   useIsFocused: jest.fn(),
   useTheme: () => Theme,
 }));
+jest.mock('react-native-picker-select', () => 'RNPickerSelect');
 
 // test suite
 describe('Component Send - test', () => {

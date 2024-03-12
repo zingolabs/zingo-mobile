@@ -1,12 +1,13 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useRef, useCallback, useContext } from 'react';
 import { View, ScrollView, Modal, Keyboard, TextInput, TouchableOpacity, Platform } from 'react-native';
-import { faQrcode, faCheck, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
+import { faQrcode, faCheck, faInfoCircle, faAddressCard } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme, useIsFocused } from '@react-navigation/native';
 import { getNumberFormatSettings } from 'react-native-localize';
 import Animated, { EasingNode } from 'react-native-reanimated';
 import CheckBox from '@react-native-community/checkbox';
+import RNPickerSelect from 'react-native-picker-select';
 
 import FadeText from '../Components/FadeText';
 import ErrorText from '../Components/ErrorText';
@@ -14,7 +15,7 @@ import RegText from '../Components/RegText';
 import ZecAmount from '../Components/ZecAmount';
 import CurrencyAmount from '../Components/CurrencyAmount';
 import Button from '../Components/Button';
-import { SendPageStateClass, SendProgressClass, ToAddrClass } from '../../app/AppState';
+import { AddressBookFileClass, SendPageStateClass, SendProgressClass, ToAddrClass } from '../../app/AppState';
 import { parseZcashURI, ZcashURITargetClass } from '../../app/uris';
 import RPCModule from '../../app/RPCModule';
 import Utils from '../../app/utils';
@@ -27,6 +28,7 @@ import RPC from '../../app/rpc';
 import Header from '../Header';
 import { RPCParseAddressType } from '../../app/rpc/types/RPCParseAddressType';
 import { createAlert } from '../../app/createAlert';
+import AddressItem from '../Components/AddressItem';
 
 type SendProps = {
   setSendPageState: (sendPageState: SendPageStateClass) => void;
@@ -73,6 +75,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     addLastSnackbar,
     mode,
     someUnconfirmed,
+    addressBook,
   } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [qrcodeModalVisble, setQrcodeModalVisible] = useState(false);
@@ -82,6 +85,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [validAddress, setValidAddress] = useState(0); // 1 - OK, 0 - Empty, -1 - KO
   const [validAmount, setValidAmount] = useState(0); // 1 - OK, 0 - Empty, -1 - KO
   const [sendButtonEnabled, setSendButtonEnabled] = useState(false);
+  const [itemsPicker, setItemsPicker] = useState([] as { label: string; value: string }[]);
   const isFocused = useIsFocused();
 
   const slideAnim = useRef(new Animated.Value(0)).current;
@@ -275,6 +279,14 @@ const Send: React.FunctionComponent<SendProps> = ({
     })();
   }, [mode, setZecPrice]);
 
+  useEffect(() => {
+    const items = addressBook.map((item: AddressBookFileClass) => ({
+      label: item.label,
+      value: item.address,
+    }));
+    setItemsPicker(items);
+  }, [addressBook]);
+
   const updateToField = async (
     address: string | null,
     amount: string | null,
@@ -290,37 +302,25 @@ const Send: React.FunctionComponent<SendProps> = ({
     const toAddr = newToAddr;
 
     if (address !== null) {
+      toAddr.to = address;
       // Attempt to parse as URI if it starts with zcash
-      if (address.startsWith('zcash:')) {
+      if (address.toLowerCase().startsWith('zcash:')) {
         const target: string | ZcashURITargetClass = await parseZcashURI(address, translate, server);
-        //console.log(targets);
+        //console.log(target);
 
         if (typeof target !== 'string') {
           // redo the to addresses
-          let uriToAddr: ToAddrClass = new ToAddrClass(0);
           [target].forEach(tgt => {
-            const to = new ToAddrClass(Utils.getNextToAddrID());
-
-            to.to = tgt.address || '';
-            to.amount = Utils.maxPrecisionTrimmed(tgt.amount || 0);
-            to.memo = tgt.memoString || '';
-
-            uriToAddr = to;
+            toAddr.to = tgt.address || '';
+            toAddr.amount = Utils.maxPrecisionTrimmed(tgt.amount || 0);
+            toAddr.memo = tgt.memoString || '';
           });
-
-          newState.toaddr = uriToAddr;
-
-          setSendPageState(newState);
-          return;
         } else {
           // Show the error message as a toast
           addLastSnackbar({ message: target, type: 'Primary' });
-          return;
+          //return;
         }
       } else {
-        if (!toAddr) {
-          return;
-        }
         toAddr.to = address.replace(/[ \t\n\r]+/g, ''); // Remove spaces
       }
     }
@@ -461,7 +461,12 @@ const Send: React.FunctionComponent<SendProps> = ({
         transparent={false}
         visible={qrcodeModalVisble}
         onRequestClose={() => setQrcodeModalVisible(false)}>
-        <ScannerAddress updateToField={updateToField} closeModal={() => setQrcodeModalVisible(false)} />
+        <ScannerAddress
+          setAddress={(a: string) => {
+            updateToField(a, null, null, null, null);
+          }}
+          closeModal={() => setQrcodeModalVisible(false)}
+        />
       </Modal>
 
       <Modal
@@ -473,6 +478,9 @@ const Send: React.FunctionComponent<SendProps> = ({
           defaultFee={defaultFee}
           closeModal={() => {
             setConfirmModalVisible(false);
+          }}
+          openModal={() => {
+            setConfirmModalVisible(true);
           }}
           confirmSend={confirmSend}
           sendAllAmount={
@@ -510,7 +518,19 @@ const Send: React.FunctionComponent<SendProps> = ({
             return (
               <View key={i} style={{ display: 'flex', padding: 10, marginTop: 10 }}>
                 <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                  <RegText>{translate('send.toaddress') as string}</RegText>
+                  <View style={{ display: 'flex', flexDirection: 'row' }}>
+                    <RegText style={{ marginRight: 10 }}>{translate('send.toaddress') as string}</RegText>
+                    {validAddress === 1 && (
+                      <AddressItem
+                        address={ta.to}
+                        oneLine={true}
+                        onlyContact={true}
+                        withIcon={true}
+                        closeModal={() => {}}
+                        openModal={() => {}}
+                      />
+                    )}
+                  </View>
                   {validAddress === 1 && <FontAwesomeIcon icon={faCheck} color={colors.primary} />}
                   {validAddress === -1 && <ErrorText>{translate('send.invalidaddress') as string}</ErrorText>}
                 </View>
@@ -537,7 +557,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         style={{
                           color: colors.text,
                           fontWeight: '600',
-                          fontSize: 16,
+                          fontSize: 14,
                           marginLeft: 5,
                           backgroundColor: 'transparent',
                         }}
@@ -548,8 +568,27 @@ const Send: React.FunctionComponent<SendProps> = ({
                     </View>
                     <View
                       style={{
-                        width: 58,
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'center',
                       }}>
+                      {itemsPicker.length > 0 && (
+                        <RNPickerSelect
+                          value={ta.to}
+                          items={itemsPicker}
+                          placeholder={{ label: translate('addressbook.select-placeholder') as string, value: '' }}
+                          onValueChange={(itemValue: string) => {
+                            updateToField(itemValue, null, null, null, null);
+                          }}>
+                          <FontAwesomeIcon
+                            style={{ marginRight: 7 }}
+                            size={39}
+                            icon={faAddressCard}
+                            color={colors.primary}
+                          />
+                        </RNPickerSelect>
+                      )}
                       <TouchableOpacity
                         testID="send.scan-button"
                         accessible={true}
@@ -557,7 +596,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         onPress={() => {
                           setQrcodeModalVisible(true);
                         }}>
-                        <FontAwesomeIcon style={{ margin: 5 }} size={48} icon={faQrcode} color={colors.border} />
+                        <FontAwesomeIcon style={{ marginRight: 5 }} size={35} icon={faQrcode} color={colors.border} />
                       </TouchableOpacity>
                     </View>
                   </View>
@@ -651,7 +690,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           style={{
                             color: colors.text,
                             fontWeight: '600',
-                            fontSize: 18,
+                            fontSize: 16,
                             minWidth: 48,
                             minHeight: 48,
                             marginLeft: 5,
@@ -780,7 +819,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                             style={{
                               color: colors.text,
                               fontWeight: '600',
-                              fontSize: 18,
+                              fontSize: 16,
                               minWidth: 48,
                               minHeight: 48,
                               marginLeft: 5,
@@ -867,7 +906,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           style={{
                             color: colors.text,
                             fontWeight: '600',
-                            fontSize: 18,
+                            fontSize: 14,
                             minWidth: 48,
                             minHeight: 48,
                             marginLeft: 5,

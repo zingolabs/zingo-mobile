@@ -9,14 +9,16 @@ import { useTheme } from '@react-navigation/native';
 import { ContextAppLoaded } from '../../context';
 import RPC from '../../rpc';
 import { ThemeType } from '../../types';
+import simpleBiometrics from '../../simpleBiometrics';
 
 type MenuProps = {
   onItemSelected: (item: string) => Promise<void>;
+  updateMenuState: (isOpen: boolean) => void;
 };
 
-const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected }) => {
+const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuState }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, readOnly, mode, transactions } = context;
+  const { translate, readOnly, mode, transactions, addLastSnackbar, security } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const item = {
     fontSize: 14,
@@ -27,10 +29,36 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected }) => {
     height: Dimensions.get('screen').height,
   };
 
-  const onItemSelectedWrapper = (value: string) => {
-    // if the user click on a screen in the menu the sync is going to continue
-    (async () => await RPC.rpc_setInterruptSyncAfterBatch('false'))();
-    onItemSelected(value);
+  const onItemSelectedWrapper = async (value: string) => {
+    if (
+      (value === 'Wallet' && !readOnly && security.seedScreen) ||
+      (value === 'Wallet' && readOnly && security.ufvkScreen) ||
+      (value === 'Rescan' && security.rescanScreen) ||
+      (value === 'Settings' && security.settingsScreen) ||
+      (value === 'Change Wallet' && security.changeWalletScreen) ||
+      (value === 'Restore Wallet Backup' && security.restoreWalletBackupScreen)
+    ) {
+      const resultBio = await simpleBiometrics({ translate: translate });
+      // can be:
+      // - true      -> the user do pass the authentication
+      // - false     -> the user do NOT pass the authentication
+      // - undefined -> no biometric authentication available -> Passcode.
+      console.log('BIOMETRIC --------> ', resultBio);
+      if (resultBio === false) {
+        // snack with Error & closing the menu.
+        updateMenuState(false);
+        addLastSnackbar({ message: translate('biometrics-error') as string, type: 'Primary' });
+      } else {
+        // if the user click on a screen in the menu the sync is going to continue
+        (async () => await RPC.rpc_setInterruptSyncAfterBatch('false'))();
+        onItemSelected(value);
+      }
+    } else {
+      // if the user click on a screen in the menu the sync is going to continue
+      // or if the security check of the screen is false in settings
+      (async () => await RPC.rpc_setInterruptSyncAfterBatch('false'))();
+      onItemSelected(value);
+    }
   };
 
   return (
@@ -60,6 +88,13 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected }) => {
 
           <RegText testID="menu.settings" onPress={() => onItemSelectedWrapper('Settings')} style={item}>
             {translate('loadedapp.settings') as string}
+          </RegText>
+
+          <RegText
+            testID="menu.addressbook"
+            onPress={() => onItemSelectedWrapper('Address Book')}
+            style={{ ...item, color: colors.primary }}>
+            {translate('loadedapp.addressbook') as string}
           </RegText>
 
           {!(mode === 'basic' && transactions.length <= 0) && (

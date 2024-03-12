@@ -1,3 +1,4 @@
+import SecurityType from '../types/SecurityType';
 import ServerType from '../types/ServerType';
 
 export default class SettingsFileClass {
@@ -14,6 +15,7 @@ export default class SettingsFileClass {
   // - '': means the prior version doesn't have this field in settings
   // - null: means is a fresh install
   // - string: means it have a normal value
+  security: SecurityType;
 
   constructor(
     server: ServerType,
@@ -25,6 +27,7 @@ export default class SettingsFileClass {
     firstInstall: boolean,
     basicFirstViewSeed: boolean,
     version: string,
+    security: SecurityType,
   ) {
     this.server = server;
     this.currency = currency;
@@ -35,5 +38,6 @@ export default class SettingsFileClass {
     this.firstInstall = firstInstall;
     this.basicFirstViewSeed = basicFirstViewSeed;
     this.version = version;
+    this.security = security;
   }
 }

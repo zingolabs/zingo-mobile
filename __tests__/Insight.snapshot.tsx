@@ -47,7 +47,7 @@ describe('Component Insight - test', () => {
     const onClose = jest.fn();
     const insight = render(
       <ContextAppLoadedProvider value={state}>
-        <Insight closeModal={onClose} set_privacy_option={onClose} />
+        <Insight closeModal={onClose} openModal={onClose} set_privacy_option={onClose} setSendPageState={onClose} />
       </ContextAppLoadedProvider>,
     );
     expect(insight.toJSON()).toMatchSnapshot();

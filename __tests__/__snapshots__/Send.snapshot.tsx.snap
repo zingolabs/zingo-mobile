@@ -59,18 +59,28 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
               }
             }
           >
-            <Text
+            <View
               style={
                 {
-                  "color": "#c3c3c3",
-                  "fontSize": 18,
-                  "fontWeight": "600",
-                  "opacity": 1,
+                  "display": "flex",
+                  "flexDirection": "row",
                 }
               }
             >
-              text translated
-            </Text>
+              <Text
+                style={
+                  {
+                    "color": "#c3c3c3",
+                    "fontSize": 18,
+                    "fontWeight": "600",
+                    "marginRight": 10,
+                    "opacity": 1,
+                  }
+                }
+              >
+                text translated
+              </Text>
+            </View>
           </View>
           <View
             style={
@@ -109,7 +119,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                     {
                       "backgroundColor": "transparent",
                       "color": "#c3c3c3",
-                      "fontSize": 16,
+                      "fontSize": 14,
                       "fontWeight": "600",
                       "marginLeft": 5,
                     }
@@ -121,7 +131,10 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
               <View
                 style={
                   {
-                    "width": 58,
+                    "alignItems": "center",
+                    "display": "flex",
+                    "flexDirection": "row",
+                    "justifyContent": "center",
                   }
                 }
               >
@@ -159,10 +172,10 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                         "prefix": "fas",
                       }
                     }
-                    size={48}
+                    size={35}
                     style={
                       {
-                        "margin": 5,
+                        "marginRight": 5,
                       }
                     }
                   />
@@ -301,7 +314,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                       {
                         "backgroundColor": "transparent",
                         "color": "#c3c3c3",
-                        "fontSize": 18,
+                        "fontSize": 16,
                         "fontWeight": "600",
                         "marginLeft": 5,
                         "minHeight": 48,
@@ -607,7 +620,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                       {
                         "backgroundColor": "transparent",
                         "color": "#c3c3c3",
-                        "fontSize": 18,
+                        "fontSize": 16,
                         "fontWeight": "600",
                         "marginLeft": 5,
                         "minHeight": 48,
@@ -985,18 +998,28 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
               }
             }
           >
-            <Text
+            <View
               style={
                 {
-                  "color": "#c3c3c3",
-                  "fontSize": 18,
-                  "fontWeight": "600",
-                  "opacity": 1,
+                  "display": "flex",
+                  "flexDirection": "row",
                 }
               }
             >
-              text translated
-            </Text>
+              <Text
+                style={
+                  {
+                    "color": "#c3c3c3",
+                    "fontSize": 18,
+                    "fontWeight": "600",
+                    "marginRight": 10,
+                    "opacity": 1,
+                  }
+                }
+              >
+                text translated
+              </Text>
+            </View>
           </View>
           <View
             style={
@@ -1035,7 +1058,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                     {
                       "backgroundColor": "transparent",
                       "color": "#c3c3c3",
-                      "fontSize": 16,
+                      "fontSize": 14,
                       "fontWeight": "600",
                       "marginLeft": 5,
                     }
@@ -1047,7 +1070,10 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
               <View
                 style={
                   {
-                    "width": 58,
+                    "alignItems": "center",
+                    "display": "flex",
+                    "flexDirection": "row",
+                    "justifyContent": "center",
                   }
                 }
               >
@@ -1085,10 +1111,10 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                         "prefix": "fas",
                       }
                     }
-                    size={48}
+                    size={35}
                     style={
                       {
-                        "margin": 5,
+                        "marginRight": 5,
                       }
                     }
                   />
@@ -1227,7 +1253,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                       {
                         "backgroundColor": "transparent",
                         "color": "#c3c3c3",
-                        "fontSize": 18,
+                        "fontSize": 16,
                         "fontWeight": "600",
                         "marginLeft": 5,
                         "minHeight": 48,
@@ -1534,7 +1560,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                       {
                         "backgroundColor": "transparent",
                         "color": "#c3c3c3",
-                        "fontSize": 18,
+                        "fontSize": 16,
                         "fontWeight": "600",
                         "marginLeft": 5,
                         "minHeight": 48,

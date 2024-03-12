@@ -31,6 +31,7 @@ import { createAlert } from '../../app/createAlert';
 import { Animated } from 'react-native';
 import SnackbarType from '../../app/AppState/types/SnackbarType';
 import FadeText from '../Components/FadeText';
+import simpleBiometrics from '../../app/simpleBiometrics';
 
 type HeaderProps = {
   poolsMoreInfoOnClick?: () => void;
@@ -94,6 +95,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     wallet,
     restartApp,
     someUnconfirmed,
+    security,
   } = context;
 
   let translate: (key: string) => TranslateType, netInfo: NetInfoType, mode: 'basic' | 'advanced';
@@ -147,7 +149,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     if (syncingStatus.syncProcessStalled && addLastSnackbar && restartApp) {
       // if the sync process is stalled -> let's restart the App.
       addLastSnackbar({ message: translate('restarting') as string, type: 'Primary', duration: 'short' });
-      setTimeout(() => restartApp({}), 3000);
+      setTimeout(() => restartApp({ startingApp: false }), 3000);
     }
   }, [addLastSnackbar, restartApp, syncingStatus.syncProcessStalled, translate]);
 
@@ -324,6 +326,25 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     );
   };
 
+  const ufvkShowModal = async () => {
+    const resultBio = security.ufvkScreen ? await simpleBiometrics({ translate: translate }) : true;
+    // can be:
+    // - true      -> the user do pass the authentication
+    // - false     -> the user do NOT pass the authentication
+    // - undefined -> no biometric authentication available -> Passcode.
+    console.log('BIOMETRIC --------> ', resultBio);
+    if (resultBio === false) {
+      // snack with Error & closing the menu.
+      if (addLastSnackbar) {
+        addLastSnackbar({ message: translate('biometrics-error') as string, type: 'Primary' });
+      }
+    } else {
+      if (setUfvkViewModalVisible) {
+        setUfvkViewModalVisible(true);
+      }
+    }
+  };
+
   //console.log('render header');
 
   return (
@@ -351,78 +372,111 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         {!noSyncingStatus && (
           <>
             {netInfo.isConnected && !!syncingStatus.lastBlockServer && syncingStatus.syncID >= 0 ? (
-              <View
-                style={{
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  margin: 0,
-                  marginRight: 5,
-                  padding: 1,
-                  borderColor: colors.primary,
-                  borderWidth: 1,
-                  borderRadius: 10,
-                  minWidth: 25,
-                  minHeight: 25,
-                }}>
+              <>
                 {!syncingStatus.inProgress && syncingStatus.lastBlockServer === syncingStatus.lastBlockWallet && (
-                  <View style={{ margin: 0, padding: 0 }}>
-                    <FontAwesomeIcon icon={faCheck} color={colors.primary} size={20} />
+                  <View
+                    style={{
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      margin: 0,
+                      marginRight: 5,
+                      padding: 1,
+                      borderColor: colors.primary,
+                      borderWidth: 1,
+                      borderRadius: 10,
+                      minWidth: 25,
+                      minHeight: 25,
+                    }}>
+                    <View style={{ margin: 0, padding: 0 }}>
+                      <FontAwesomeIcon icon={faCheck} color={colors.primary} size={20} />
+                    </View>
                   </View>
                 )}
-                {!syncingStatus.inProgress && syncingStatus.lastBlockServer !== syncingStatus.lastBlockWallet && (
-                  <>
-                    {mode === 'basic' ? (
-                      <FontAwesomeIcon icon={faPause} color={colors.zingo} size={17} />
-                    ) : (
+                {!syncingStatus.inProgress &&
+                  syncingStatus.lastBlockServer !== syncingStatus.lastBlockWallet &&
+                  mode === 'advanced' && (
+                    <View
+                      style={{
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        margin: 0,
+                        marginRight: 5,
+                        padding: 1,
+                        borderColor: colors.zingo,
+                        borderWidth: 1,
+                        borderRadius: 10,
+                        minWidth: 25,
+                        minHeight: 25,
+                      }}>
                       <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
                         <FontAwesomeIcon icon={faPause} color={colors.zingo} size={17} />
                       </TouchableOpacity>
-                    )}
-                  </>
-                )}
+                    </View>
+                  )}
                 {syncingStatus.inProgress && (
-                  <Animated.View
+                  <View
                     style={{
-                      opacity: opacityValue,
-                      flexDirection: 'row',
-                      justifyContent: 'center',
                       alignItems: 'center',
-                      paddingHorizontal: 3,
+                      justifyContent: 'center',
+                      margin: 0,
+                      marginRight: 5,
+                      padding: 1,
+                      borderColor: colors.syncing,
+                      borderWidth: 1,
+                      borderRadius: 10,
+                      minWidth: 25,
+                      minHeight: 25,
                     }}>
-                    {mode === 'basic' ? (
-                      <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-                        <FontAwesomeIcon icon={faPlay} color={colors.syncing} size={17} />
-                        <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{`${blocksRemaining}`}</FadeText>
-                      </View>
-                    ) : (
-                      <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
+                    <Animated.View
+                      style={{
+                        opacity: opacityValue,
+                        flexDirection: 'row',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        paddingHorizontal: 3,
+                      }}>
+                      {mode === 'basic' ? (
                         <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
                           <FontAwesomeIcon icon={faPlay} color={colors.syncing} size={17} />
                           <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{`${blocksRemaining}`}</FadeText>
                         </View>
-                      </TouchableOpacity>
-                    )}
-                  </Animated.View>
+                      ) : (
+                        <TouchableOpacity
+                          onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
+                          <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                            <FontAwesomeIcon icon={faPlay} color={colors.syncing} size={17} />
+                            <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{`${blocksRemaining}`}</FadeText>
+                          </View>
+                        </TouchableOpacity>
+                      )}
+                    </Animated.View>
+                  </View>
                 )}
-              </View>
+              </>
             ) : (
-              <View
-                style={{
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  margin: 0,
-                  marginRight: 5,
-                  padding: 1,
-                  borderColor: colors.primaryDisabled,
-                  borderWidth: 1,
-                  borderRadius: 10,
-                  minWidth: 25,
-                  minHeight: 25,
-                }}>
-                <View style={{ margin: 0, padding: 0 }}>
-                  <FontAwesomeIcon icon={faWifi} color={colors.primaryDisabled} size={18} />
-                </View>
-              </View>
+              <>
+                {mode === 'advanced' && (
+                  <View
+                    style={{
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      margin: 0,
+                      marginRight: 5,
+                      padding: 1,
+                      borderColor: colors.primaryDisabled,
+                      borderWidth: 1,
+                      borderRadius: 10,
+                      minWidth: 25,
+                      minHeight: 25,
+                    }}>
+                    <Animated.View style={{ opacity: opacityValue, margin: 0, padding: 0 }}>
+                      <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
+                        <FontAwesomeIcon icon={faWifi} color={colors.primaryDisabled} size={18} />
+                      </TouchableOpacity>
+                    </Animated.View>
+                  </View>
+                )}
+              </>
             )}
             {/*syncingStatus.inProgress && blocksRemaining > 0 && (
               <View style={{ marginRight: 5 }}>
@@ -776,7 +830,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               {setUfvkViewModalVisible &&
               !(mode === 'basic' && transactions.length <= 0) &&
               !(mode === 'basic' && totalBalance.total <= 0) ? (
-                <TouchableOpacity onPress={() => setUfvkViewModalVisible(true)}>
+                <TouchableOpacity onPress={() => ufvkShowModal()}>
                   <FontAwesomeIcon icon={faSnowflake} size={24} color={colors.zingo} />
                 </TouchableOpacity>
               ) : (

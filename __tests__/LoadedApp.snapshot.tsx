@@ -13,7 +13,7 @@ import { ThemeType } from '../app/types';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { I18n } from 'i18n-js';
 import { StackScreenProps } from '@react-navigation/stack';
-import { BackgroundType, ServerType } from '../app/AppState';
+import { BackgroundType, AddressBookFileClass, ServerType } from '../app/AppState';
 
 // Crea un mock para el constructor de I18n
 jest.mock('i18n-js', () => ({
@@ -129,6 +129,18 @@ describe('Component LoadedApp - test', () => {
     };
     const readOnly = false;
     const toggleTheme = jest.fn();
+    const addressBook = [] as AddressBookFileClass[];
+    const security = {
+      startApp: true,
+      foregroundApp: true,
+      sendConfirm: true,
+      seedScreen: true,
+      ufvkScreen: true,
+      rescanScreen: true,
+      settingsScreen: true,
+      changeWalletScreen: true,
+      restoreWalletBackupScreen: true,
+    };
     const receive = render(
       <LoadedAppClass
         navigation={navigationMock}
@@ -144,6 +156,8 @@ describe('Component LoadedApp - test', () => {
         background={background}
         readOnly={readOnly}
         toggleTheme={toggleTheme}
+        addressBook={addressBook}
+        security={security}
       />,
     );
     expect(receive.toJSON()).toMatchSnapshot();

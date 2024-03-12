@@ -1,5 +1,5 @@
 import AddressClass from './classes/AddressClass';
-import AddressBookClass from './classes/AddressBookClass';
+import AddressBookFileClass from './classes/AddressBookFileClass';
 import ErrorModalDataClass from './classes/ErrorModalDataClass';
 import ReceivePageStateClass from './classes/ReceivePageStateClass';
 import SendPageStateClass from './classes/SendPageStateClass';
@@ -22,6 +22,7 @@ import BackgroundErrorType from './types/BackgroundErrorType';
 import ServerType from './types/ServerType';
 import SnackbarType from './types/SnackbarType';
 import ZecPriceType from './types/ZecPriceType';
+import SecurityType from './types/SecurityType';
 
 import AppStateLoaded from './AppStateLoaded';
 import AppStateLoading from './AppStateLoading';
@@ -30,7 +31,7 @@ export {
   AppStateLoaded,
   AppStateLoading,
   AddressClass,
-  AddressBookClass,
+  AddressBookFileClass,
   ErrorModalDataClass,
   ReceivePageStateClass,
   SendPageStateClass,
@@ -52,4 +53,5 @@ export {
   NetInfoType,
   ServerType,
   SnackbarType,
+  SecurityType,
 };

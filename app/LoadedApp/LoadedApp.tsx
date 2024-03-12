@@ -11,6 +11,7 @@ import {
   NativeEventSubscription,
   Linking,
   SafeAreaView,
+  Platform,
 } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -44,6 +45,8 @@ import {
   BackgroundType,
   TranslateType,
   ServerType,
+  AddressBookFileClass,
+  SecurityType,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
@@ -57,6 +60,9 @@ import Snackbars from '../../components/Components/Snackbars';
 import SnackbarType from '../AppState/types/SnackbarType';
 import { RPCSeedType } from '../rpc/types/RPCSeedType';
 import { Launching } from '../LoadingApp';
+import AddressBook from '../../components/AddressBook/AddressBook';
+import AddressBookFileImpl from '../../components/AddressBook/AddressBookFileImpl';
+import simpleBiometrics from '../simpleBiometrics';
 
 const History = React.lazy(() => import('../../components/History'));
 const Send = React.lazy(() => import('../../components/Send'));
@@ -99,7 +105,19 @@ export default function LoadedApp(props: LoadedAppProps) {
   const [privacy, setPrivacy] = useState<boolean>(false);
   const [mode, setMode] = useState<'basic' | 'advanced'>('advanced'); // by default advanced
   const [background, setBackground] = useState<BackgroundType>({ batches: 0, message: '', date: 0, dateEnd: 0 });
+  const [addressBook, setAddressBook] = useState<AddressBookFileClass[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [security, setSecurity] = useState<SecurityType>({
+    startApp: true,
+    foregroundApp: true,
+    sendConfirm: true,
+    seedScreen: true,
+    ufvkScreen: true,
+    rescanScreen: true,
+    settingsScreen: true,
+    changeWalletScreen: true,
+    restoreWalletBackupScreen: true,
+  });
   const file = useMemo(
     () => ({
       en: en,
@@ -178,6 +196,11 @@ export default function LoadedApp(props: LoadedAppProps) {
         await SettingsFileImpl.writeSettings('mode', mode);
         props.toggleTheme(mode);
       }
+      if (settings.security) {
+        setSecurity(settings.security);
+      } else {
+        await SettingsFileImpl.writeSettings('security', security);
+      }
 
       // reading background task info
       const backgroundJson = await BackgroundFileImpl.readBackground();
@@ -185,6 +208,11 @@ export default function LoadedApp(props: LoadedAppProps) {
       if (backgroundJson) {
         setBackground(backgroundJson);
       }
+
+      // reading the address book
+      const ab = await AddressBookFileImpl.readAddressBook();
+      setAddressBook(ab);
+
       setLoading(false);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -201,7 +229,7 @@ export default function LoadedApp(props: LoadedAppProps) {
           alignItems: 'center',
           height: '100%',
         }}>
-        <Launching translate={translate} firstLaunchingMessage={false} />
+        <Launching translate={translate} firstLaunchingMessage={false} biometricsFailed={false} />
       </SafeAreaView>
     );
   } else {
@@ -219,6 +247,8 @@ export default function LoadedApp(props: LoadedAppProps) {
         background={background}
         readOnly={readOnly}
         toggleTheme={props.toggleTheme}
+        addressBook={addressBook}
+        security={security}
       />
     );
   }
@@ -238,6 +268,8 @@ type LoadedAppClassProps = {
   background: BackgroundType;
   readOnly: boolean;
   toggleTheme: (mode: 'basic' | 'advanced') => void;
+  addressBook: AddressBookFileClass[];
+  security: SecurityType;
 };
 
 export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
@@ -263,10 +295,13 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       mode: props.mode,
       background: props.background,
       readOnly: props.readOnly,
-      appState: AppState.currentState,
+      appState: Platform.OS === 'ios' ? 'active' : AppState.currentState,
       setBackgroundError: this.setBackgroundError,
       addLastSnackbar: this.addLastSnackbar,
       restartApp: this.navigateToLoadingApp,
+      addressBook: props.addressBook,
+      launchAddressBook: this.launchAddressBook,
+      security: props.security,
     };
 
     this.rpc = new RPC(
@@ -297,24 +332,52 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     })();
 
     this.appstate = AppState.addEventListener('change', async nextAppState => {
-      if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
-        //console.log('App has come to the foreground!');
-        // deactivate the interruption sync flag. No needed.
-        //await RPC.rpc_setInterruptSyncAfterBatch('false');
-        // reading background task info
-        await this.fetchBackgroundSyncing();
-        // setting value for background task Android
-        await AsyncStorage.setItem('@background', 'no');
-        //console.log('background no in storage');
-        await this.rpc.configure();
-        //console.log('configure start timers');
-        if (this.state.backgroundError && (this.state.backgroundError.title || this.state.backgroundError.error)) {
-          Alert.alert(this.state.backgroundError.title, this.state.backgroundError.error);
-          this.setBackgroundError('', '');
+      console.log('LOADED', 'next', nextAppState, 'prior', this.state.appState);
+      // in this case: background -> inactive
+      // we need to ignore it, because this happen when the App become inactive
+      // because of the passcode/Touch/Face screen.
+      if (Platform.OS === 'ios') {
+        if (this.state.appState === 'background' && nextAppState === 'inactive') {
+          return;
+        }
+        if (this.state.appState === 'inactive' && nextAppState === 'active') {
+          return;
         }
       }
-      if (nextAppState.match(/inactive|background/) && this.state.appState === 'active') {
-        //console.log('App is gone to the background!');
+      if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
+        console.log('App LOADED has come to the foreground!');
+        if (Platform.OS === 'ios') {
+          if (this.state.appState !== nextAppState) {
+            console.log('LOADED SAVED foreground', nextAppState);
+            this.setState({ appState: nextAppState });
+          }
+        }
+        // (PIN or TouchID or FaceID)
+        const resultBio = this.state.security.foregroundApp
+          ? await simpleBiometrics({ translate: this.state.translate })
+          : true;
+        // can be:
+        // - true      -> the user do pass the authentication
+        // - false     -> the user do NOT pass the authentication
+        // - undefined -> no biometric authentication available -> Passcode.
+        console.log('BIOMETRIC FOREGROUND --------> ', resultBio);
+        if (resultBio === false) {
+          this.navigateToLoadingApp({ startingApp: true, biometricsFailed: true });
+        } else {
+          // reading background task info
+          await this.fetchBackgroundSyncing();
+          // setting value for background task Android
+          await AsyncStorage.setItem('@background', 'no');
+          //console.log('background no in storage');
+          await this.rpc.configure();
+          //console.log('configure start timers');
+          if (this.state.backgroundError && (this.state.backgroundError.title || this.state.backgroundError.error)) {
+            Alert.alert(this.state.backgroundError.title, this.state.backgroundError.error);
+            this.setBackgroundError('', '');
+          }
+        }
+      } else if (nextAppState.match(/inactive|background/) && this.state.appState === 'active') {
+        console.log('App LOADED is gone to the background!');
         // re-activate the interruption sync flag
         await RPC.rpc_setInterruptSyncAfterBatch('true');
         // setting value for background task Android
@@ -325,9 +388,25 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
         //console.log('clear timers');
         this.setSyncingStatus(new SyncingStatusClass());
         //console.log('clear sync status state');
+        if (Platform.OS === 'ios') {
+          if (this.state.appState !== nextAppState) {
+            console.log('LOADED SAVED background', nextAppState);
+            this.setState({ appState: nextAppState });
+          }
+        }
+      } else {
+        if (Platform.OS === 'ios') {
+          if (this.state.appState !== nextAppState) {
+            console.log('LOADED SAVED', nextAppState);
+            this.setState({ appState: nextAppState });
+          }
+        }
       }
-      if (this.state.appState !== nextAppState) {
-        this.setState({ appState: nextAppState });
+      if (Platform.OS === 'android') {
+        if (this.state.appState !== nextAppState) {
+          console.log('LOADED SAVED', nextAppState);
+          this.setState({ appState: nextAppState });
+        }
       }
     });
 
@@ -381,7 +460,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
             //console.log('EVENT Loaded: YES internet connection.');
             if (this.rpc.getInRefresh()) {
               // I need to start again the App only if it is Syncing...
-              this.navigateToLoadingApp({});
+              this.navigateToLoadingApp({ startingApp: false });
             } else {
               // restart the interval process again if it is not syncing...
               await this.rpc.configure();
@@ -464,6 +543,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       syncReportModalVisible: false,
       poolsModalVisible: false,
       insightModalVisible: false,
+      addressBookModalVisible: false,
+      addressBookCurrentAddress: '',
+      addressBookOpenPriorModal: () => {},
     });
   };
 
@@ -789,12 +871,18 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
         [
           {
             text: translate('confirm') as string,
-            onPress: async () => await this.onClickOKChangeWallet({ screen: 3 }),
+            onPress: async () => await this.onClickOKChangeWallet({ screen: 3, startingApp: false }),
           },
           { text: translate('cancel') as string, style: 'cancel' },
         ],
         { cancelable: true, userInterfaceStyle: 'light' },
       );
+    } else if (item === 'Address Book') {
+      this.setState({
+        addressBookModalVisible: true,
+        addressBookCurrentAddress: '',
+        addressBookOpenPriorModal: () => {},
+      });
     }
   };
 
@@ -914,7 +1002,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     // Refetch the settings to update
     this.rpc.fetchWalletSettings();
     if (reset) {
-      this.navigateToLoadingApp({});
+      this.navigateToLoadingApp({ startingApp: false });
     }
   };
 
@@ -947,6 +1035,16 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     });
     // this function change the Theme in the App component.
     this.props.toggleTheme(value as 'basic' | 'advanced');
+
+    // Refetch the settings to update
+    this.rpc.fetchWalletSettings();
+  };
+
+  set_security_option = async (name: 'security', value: SecurityType): Promise<void> => {
+    await SettingsFileImpl.writeSettings(name, value);
+    this.setState({
+      security: value as SecurityType,
+    });
 
     // Refetch the settings to update
     this.rpc.fetchWalletSettings();
@@ -1018,7 +1116,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     this.rpc.setInRefresh(false);
     this.keepAwake(false);
     this.setState({ seedBackupModalVisible: false });
-    this.navigateToLoadingApp({});
+    this.navigateToLoadingApp({ startingApp: false });
   };
 
   onClickOKServerWallet = async () => {
@@ -1072,7 +1170,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
         this.setState({ seedServerModalVisible: false });
       }
       // no need to restart the tasks because is about to restart the app.
-      this.navigateToLoadingApp({});
+      this.navigateToLoadingApp({ startingApp: false });
     }
   };
 
@@ -1093,6 +1191,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     this.setState({ backgroundError: { title, error } });
   };
 
+  setAddressBook = (addressBook: AddressBookFileClass[]) => {
+    this.setState({ addressBook });
+  };
+
   addLastSnackbar = (snackbar: SnackbarType) => {
     const newSnackbars = this.state.snackbars;
     // if the last one is the same don't do anything.
@@ -1107,6 +1209,20 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     const newSnackbars = this.state.snackbars;
     newSnackbars.shift();
     this.setState({ snackbars: newSnackbars });
+  };
+
+  launchAddressBook = (address: string, closeModal: () => void, openModal: () => void) => {
+    closeModal();
+    setTimeout(
+      () => {
+        this.setState({
+          addressBookModalVisible: true,
+          addressBookCurrentAddress: address,
+          addressBookOpenPriorModal: openModal,
+        });
+      },
+      Platform.OS === 'ios' ? 100 : 1,
+    );
   };
 
   render() {
@@ -1127,6 +1243,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       ufvkChangeModalVisible,
       ufvkBackupModalVisible,
       ufvkServerModalVisible,
+      addressBookModalVisible,
       snackbars,
     } = this.state;
     const { translate } = this.props;
@@ -1139,7 +1256,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
             <Text>Loading...</Text>
           </View>
         }>
-        <Menu onItemSelected={this.onMenuItemSelected} />
+        <Menu onItemSelected={this.onMenuItemSelected} updateMenuState={this.updateMenuState} />
       </Suspense>
     );
 
@@ -1248,7 +1365,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
               }>
               <Insight
                 closeModal={() => this.setState({ insightModalVisible: false })}
+                openModal={() => this.setState({ insightModalVisible: true })}
                 set_privacy_option={this.set_privacy_option}
+                setSendPageState={this.setSendPageState}
               />
             </Suspense>
           </Modal>
@@ -1288,6 +1407,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 set_sendAll_option={this.set_sendAll_option}
                 set_privacy_option={this.set_privacy_option}
                 set_mode_option={this.set_mode_option}
+                set_security_option={this.set_security_option}
               />
             </Suspense>
           </Modal>
@@ -1324,7 +1444,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 </View>
               }>
               <Seed
-                onClickOK={async () => await this.onClickOKChangeWallet({})}
+                onClickOK={async () => await this.onClickOKChangeWallet({ startingApp: false })}
                 onClickCancel={() => this.setState({ seedChangeModalVisible: false })}
                 action={'change'}
                 set_privacy_option={this.set_privacy_option}
@@ -1408,7 +1528,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 </View>
               }>
               <ShowUfvk
-                onClickOK={async () => await this.onClickOKChangeWallet({})}
+                onClickOK={async () => await this.onClickOKChangeWallet({ startingApp: false })}
                 onClickCancel={() => this.setState({ ufvkChangeModalVisible: false })}
                 action={'change'}
                 set_privacy_option={this.set_privacy_option}
@@ -1475,6 +1595,37 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
             </Suspense>
           </Modal>
 
+          <Modal
+            animationType="slide"
+            transparent={false}
+            visible={addressBookModalVisible}
+            onRequestClose={() =>
+              this.setState({
+                addressBookModalVisible: false,
+                addressBookCurrentAddress: '',
+                addressBookOpenPriorModal: () => {},
+              })
+            }>
+            <Suspense
+              fallback={
+                <View>
+                  <Text>{translate('loading') as string}</Text>
+                </View>
+              }>
+              <AddressBook
+                closeModal={() =>
+                  this.setState({
+                    addressBookModalVisible: false,
+                    addressBookCurrentAddress: '',
+                    addressBookOpenPriorModal: () => {},
+                  })
+                }
+                setAddressBook={this.setAddressBook}
+                setSendPageState={this.setSendPageState}
+              />
+            </Suspense>
+          </Modal>
+
           <Snackbars snackbars={snackbars} removeFirstSnackbar={this.removeFirstSnackbar} translate={translate} />
 
           {this.state.mode !== 'basic' ||
@@ -1521,6 +1672,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                         setPoolsToShieldSelectSapling={this.setPoolsToShieldSelectSapling}
                         setPoolsToShieldSelectTransparent={this.setPoolsToShieldSelectTransparent}
                         setUfvkViewModalVisible={this.setUfvkViewModalVisible}
+                        setSendPageState={this.setSendPageState}
                       />
                     </Suspense>
                   </>

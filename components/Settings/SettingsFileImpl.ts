@@ -1,6 +1,6 @@
 import * as RNFS from 'react-native-fs';
 
-import { ServerType, SettingsFileClass } from '../../app/AppState';
+import { SecurityType, ServerType, SettingsFileClass } from '../../app/AppState';
 import { serverUris } from '../../app/uris';
 import { isEqual } from 'lodash';
 
@@ -20,8 +20,9 @@ export default class SettingsFileImpl {
       | 'mode'
       | 'firstInstall'
       | 'basicFirstViewSeed'
-      | 'version',
-    value: string | boolean | ServerType,
+      | 'version'
+      | 'security',
+    value: string | boolean | ServerType | SecurityType,
   ) {
     const fileName = await this.getFileName();
     const settings = await this.readSettings();
@@ -74,6 +75,21 @@ export default class SettingsFileImpl {
         // here we know the user is updating the App, for sure.
         // from some version before.
         settings.version = '';
+      }
+      if (!settings.hasOwnProperty('security')) {
+        // this is the first time the App implemented
+        // screen security. Default values.
+        settings.security = {
+          startApp: true,
+          foregroundApp: true,
+          sendConfirm: true,
+          seedScreen: true,
+          ufvkScreen: true,
+          rescanScreen: true,
+          settingsScreen: true,
+          changeWalletScreen: true,
+          restoreWalletBackupScreen: true,
+        };
       }
       return settings;
     } catch (err) {

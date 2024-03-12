@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { View, ScrollView, SafeAreaView, TouchableOpacity, TextInput, Keyboard } from 'react-native';
+import { View, ScrollView, SafeAreaView, TouchableOpacity, TextInput, Keyboard, Platform } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faDotCircle } from '@fortawesome/free-solid-svg-icons';
@@ -17,9 +17,10 @@ import { ContextAppLoaded } from '../../app/context';
 import moment from 'moment';
 import 'moment/locale/es';
 import Header from '../Header';
-import { ServerType } from '../../app/AppState';
+import { SecurityType, ServerType } from '../../app/AppState';
 import { isEqual } from 'lodash';
 import ChainTypeToggle from '../Components/ChainTypeToggle';
+import CheckBox from '@react-native-community/checkbox';
 
 type SettingsProps = {
   closeModal: () => void;
@@ -35,6 +36,7 @@ type SettingsProps = {
   set_sendAll_option: (name: 'sendAll', value: boolean) => Promise<void>;
   set_privacy_option: (name: 'privacy', value: boolean) => Promise<void>;
   set_mode_option: (name: 'mode', value: string) => Promise<void>;
+  set_security_option: (name: 'security', value: SecurityType) => Promise<void>;
 };
 
 type Options = {
@@ -50,6 +52,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   set_sendAll_option,
   set_privacy_option,
   set_mode_option,
+  set_security_option,
   closeModal,
 }) => {
   const context = useContext(ContextAppLoaded);
@@ -64,6 +67,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     mode: modeContext,
     netInfo,
     addLastSnackbar,
+    security: securityContext,
   } = context;
 
   const memosArray = translate('settings.memos');
@@ -114,6 +118,17 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [sendAll, setSendAll] = useState(sendAllContext);
   const [privacy, setPrivacy] = useState(privacyContext);
   const [mode, setMode] = useState(modeContext);
+  // security checks box.
+  const [startApp, setStartApp] = useState(securityContext.startApp);
+  const [foregroundApp, setForegroundApp] = useState(securityContext.foregroundApp);
+  const [sendConfirm, setSendConfirm] = useState(securityContext.sendConfirm);
+  const [seedScreen, setSeedScreen] = useState(securityContext.seedScreen);
+  const [ufvkScreen, setUfvkScreen] = useState(securityContext.ufvkScreen);
+  const [rescanScreen, setRescanScreen] = useState(securityContext.rescanScreen);
+  const [settingsScreen, setSettingsScreen] = useState(securityContext.settingsScreen);
+  const [changeWalletScreen, setChangeWalletScreen] = useState(securityContext.changeWalletScreen);
+  const [restoreWalletBackupScreen, setRestoreWalletBackupScreen] = useState(securityContext.restoreWalletBackupScreen);
+
   const [customIcon, setCustomIcon] = useState(farCircle);
   const [disabled, setDisabled] = useState<boolean>();
   const [titleViewHeight, setTitleViewHeight] = useState(0);
@@ -154,6 +169,20 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     };
   }, [slideAnim, titleViewHeight]);
 
+  const securityObject: () => SecurityType = () => {
+    return {
+      startApp,
+      foregroundApp,
+      sendConfirm,
+      seedScreen,
+      ufvkScreen,
+      rescanScreen,
+      settingsScreen,
+      changeWalletScreen,
+      restoreWalletBackupScreen,
+    };
+  };
+
   const saveSettings = async () => {
     let serverUriParsed = customServerUri;
     let same_server_chain_name = true;
@@ -167,7 +196,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       languageContext === language &&
       sendAllContext === sendAll &&
       privacyContext === privacy &&
-      modeContext === mode
+      modeContext === mode &&
+      isEqual(securityContext, securityObject())
     ) {
       addLastSnackbar({ message: translate('settings.nochanges') as string, type: 'Primary' });
       return;
@@ -258,6 +288,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     if (modeContext !== mode) {
       await set_mode_option('mode', mode);
     }
+    if (!isEqual(securityContext, securityObject())) {
+      await set_security_option('security', securityObject());
+    }
 
     // I need a little time in this modal because maybe the wallet cannot be open with the new server
     let ms = 100;
@@ -315,6 +348,30 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
   const onPressServerChainName = (chain: 'main' | 'test' | 'regtest') => {
     setCustomServerChainName(chain);
+  };
+
+  const securityCheckBox = (
+    value: boolean,
+    setValue: React.Dispatch<React.SetStateAction<string | boolean>>,
+    label: string,
+  ) => {
+    return (
+      <View style={{ flexDirection: 'row', marginLeft: 20, marginBottom: 5, maxHeight: 50, minHeight: 48 }}>
+        <CheckBox
+          disabled={false}
+          value={value}
+          onValueChange={(v: boolean) => setValue(v)}
+          tintColors={{ true: colors.primary, false: colors.text }}
+          tintColor={colors.text}
+          onCheckColor={colors.card}
+          onFillColor={colors.primary}
+          onTintColor={colors.primary}
+          boxType="square"
+          style={{ marginRight: 10, transform: Platform.OS === 'ios' ? [{ scaleX: 0.7 }, { scaleY: 0.7 }] : [] }}
+        />
+        <RegText style={{ marginTop: Platform.OS === 'ios' ? 5 : 3 }}>{label}</RegText>
+      </View>
+    );
   };
 
   return (
@@ -529,6 +586,56 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 )}
               </View>
             </View>
+
+            <View style={{ display: 'flex', margin: 10 }}>
+              <BoldText>{translate('settings.security-title') as string}</BoldText>
+            </View>
+
+            {securityCheckBox(
+              startApp,
+              setStartApp as React.Dispatch<React.SetStateAction<string | boolean>>,
+              translate('settings.security-startapp') as string,
+            )}
+            {securityCheckBox(
+              foregroundApp,
+              setForegroundApp as React.Dispatch<React.SetStateAction<string | boolean>>,
+              translate('settings.security-foregroundapp') as string,
+            )}
+            {securityCheckBox(
+              sendConfirm,
+              setSendConfirm as React.Dispatch<React.SetStateAction<string | boolean>>,
+              translate('settings.security-sendconfirm') as string,
+            )}
+            {securityCheckBox(
+              seedScreen,
+              setSeedScreen as React.Dispatch<React.SetStateAction<string | boolean>>,
+              translate('settings.security-seedscreen') as string,
+            )}
+            {securityCheckBox(
+              ufvkScreen,
+              setUfvkScreen as React.Dispatch<React.SetStateAction<string | boolean>>,
+              translate('settings.security-ufvkscreen') as string,
+            )}
+            {securityCheckBox(
+              rescanScreen,
+              setRescanScreen as React.Dispatch<React.SetStateAction<string | boolean>>,
+              translate('settings.security-rescanscreen') as string,
+            )}
+            {securityCheckBox(
+              settingsScreen,
+              setSettingsScreen as React.Dispatch<React.SetStateAction<string | boolean>>,
+              translate('settings.security-settingsscreen') as string,
+            )}
+            {securityCheckBox(
+              changeWalletScreen,
+              setChangeWalletScreen as React.Dispatch<React.SetStateAction<string | boolean>>,
+              translate('settings.security-changewalletscreen') as string,
+            )}
+            {securityCheckBox(
+              restoreWalletBackupScreen,
+              setRestoreWalletBackupScreen as React.Dispatch<React.SetStateAction<string | boolean>>,
+              translate('settings.security-restorewalletbackupscreen') as string,
+            )}
 
             <View style={{ display: 'flex', margin: 10 }}>
               <BoldText>{translate('settings.threshold-title') as string}</BoldText>

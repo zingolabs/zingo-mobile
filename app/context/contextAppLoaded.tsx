@@ -13,7 +13,6 @@ import {
   InfoType,
   WalletType,
   AddressClass,
-  AddressBookClass,
   ZecPriceType,
   BackgroundType,
   SendPageStateClass,
@@ -21,6 +20,8 @@ import {
   NetInfoType,
   BackgroundErrorType,
   ServerType,
+  AddressBookFileClass,
+  SecurityType,
 } from '../AppState';
 import SnackbarType from '../AppState/types/SnackbarType';
 
@@ -34,7 +35,6 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   totalBalance: new TotalBalanceClass(),
   addressPrivateKeys: new Map(),
   addresses: [] as AddressClass[],
-  addressBook: [] as AddressBookClass[],
   transactions: [] as TransactionType[],
   sendPageState: new SendPageStateClass(new ToAddrClass(0)),
   receivePageState: new ReceivePageStateClass(''),
@@ -61,6 +61,7 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   syncReportModalVisible: false,
   poolsModalVisible: false,
   insightModalVisible: false,
+  addressBookModalVisible: false,
   newServer: {} as ServerType,
   uaAddress: '',
 
@@ -92,6 +93,11 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   addLastSnackbar: () => {},
   restartApp: () => {},
   someUnconfirmed: false,
+  addressBook: [] as AddressBookFileClass[],
+  launchAddressBook: () => {},
+  addressBookCurrentAddress: '',
+  addressBookOpenPriorModal: () => {},
+  security: {} as SecurityType,
 };
 
 export const ContextAppLoaded = React.createContext(defaultAppStateLoaded);

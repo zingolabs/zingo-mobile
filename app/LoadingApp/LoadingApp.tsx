@@ -26,7 +26,15 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faEllipsisV } from '@fortawesome/free-solid-svg-icons';
 
 import RPCModule from '../RPCModule';
-import { AppStateLoading, BackgroundType, WalletType, TranslateType, NetInfoType, ServerType } from '../AppState';
+import {
+  AppStateLoading,
+  BackgroundType,
+  WalletType,
+  TranslateType,
+  NetInfoType,
+  ServerType,
+  SecurityType,
+} from '../AppState';
 import { parseServerURI, serverUris } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import RPC from '../rpc';
@@ -41,6 +49,7 @@ import Snackbars from '../../components/Components/Snackbars';
 import SnackbarType from '../AppState/types/SnackbarType';
 import { RPCSeedType } from '../rpc/types/RPCSeedType';
 import Launching from './Launching';
+import simpleBiometrics from '../simpleBiometrics';
 
 const BoldText = React.lazy(() => import('../../components/Components/BoldText'));
 const Button = React.lazy(() => import('../../components/Components/Button'));
@@ -74,6 +83,17 @@ export default function LoadingApp(props: LoadingAppProps) {
   const [background, setBackground] = useState<BackgroundType>({ batches: 0, message: '', date: 0, dateEnd: 0 });
   const [firstLaunchingMessage, setFirstLaunchingMessage] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
+  const [security, setSecurity] = useState<SecurityType>({
+    startApp: true,
+    foregroundApp: true,
+    sendConfirm: true,
+    seedScreen: true,
+    ufvkScreen: true,
+    rescanScreen: true,
+    settingsScreen: true,
+    changeWalletScreen: true,
+    restoreWalletBackupScreen: true,
+  });
   const file = useMemo(
     () => ({
       en: en,
@@ -164,6 +184,11 @@ export default function LoadingApp(props: LoadingAppProps) {
       } else {
         await SettingsFileImpl.writeSettings('privacy', privacy);
       }
+      if (settings.security) {
+        setSecurity(settings.security);
+      } else {
+        await SettingsFileImpl.writeSettings('security', security);
+      }
 
       // for testing
       //await delay(5000);
@@ -189,7 +214,7 @@ export default function LoadingApp(props: LoadingAppProps) {
           alignItems: 'center',
           height: '100%',
         }}>
-        <Launching translate={translate} firstLaunchingMessage={false} />
+        <Launching translate={translate} firstLaunchingMessage={false} biometricsFailed={false} />
       </SafeAreaView>
     );
   } else {
@@ -207,6 +232,7 @@ export default function LoadingApp(props: LoadingAppProps) {
         background={background}
         firstLaunchingMessage={firstLaunchingMessage}
         toggleTheme={props.toggleTheme}
+        security={security}
       />
     );
   }
@@ -226,6 +252,7 @@ type LoadingAppClassProps = {
   background: BackgroundType;
   firstLaunchingMessage: boolean;
   toggleTheme: (mode: 'basic' | 'advanced') => void;
+  security: SecurityType;
 };
 
 export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
@@ -265,6 +292,16 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
       actionButtonsDisabled: !netInfo.isConnected ? true : false,
       addLastSnackbar: this.addLastSnackbar,
       firstLaunchingMessage: props.firstLaunchingMessage,
+      biometricsFailed:
+        !!props.route.params &&
+        (props.route.params.biometricsFailed === true || props.route.params.biometricsFailed === false)
+          ? props.route.params.biometricsFailed
+          : false,
+      startingApp:
+        !!props.route.params && (props.route.params.startingApp === true || props.route.params.startingApp === false)
+          ? props.route.params.startingApp
+          : true,
+      security: props.security,
     };
 
     this.dim = {} as EmitterSubscription;
@@ -272,7 +309,34 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     this.unsubscribeNetInfo = {} as NetInfoSubscription;
   }
 
-  componentDidMount = () => {
+  componentDidMount = async () => {
+    // to start the App the first time in this session
+    // the user have to pass the security of the device
+    if (this.state.startingApp) {
+      if (!this.state.biometricsFailed) {
+        // (PIN or TouchID or FaceID)
+        this.setState({ biometricsFailed: false });
+        const resultBio = this.state.security.startApp
+          ? await simpleBiometrics({ translate: this.state.translate })
+          : true;
+        // can be:
+        // - true      -> the user do pass the authentication
+        // - false     -> the user do NOT pass the authentication
+        // - undefined -> no biometric authentication available -> Passcode.
+        console.log('BIOMETRIC --------> ', resultBio);
+        if (resultBio === false) {
+          this.setState({ biometricsFailed: true });
+          return;
+        } else {
+          this.setState({ biometricsFailed: false });
+        }
+      } else {
+        // if there is a biometric Fail, likely from the foreground check
+        // keep the App in the first screen because the user needs to try again.
+        return;
+      }
+    }
+
     this.setState({ actionButtonsDisabled: true });
     (async () => {
       // First, check if a wallet exists. Do it async so the basic screen has time to render
@@ -353,9 +417,9 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     })();
 
     this.appstate = AppState.addEventListener('change', async nextAppState => {
-      //await AsyncStorage.setItem('@server', this.state.server);
+      console.log('LOADING', 'next', nextAppState, 'prior', this.state.appState);
       if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
-        //console.log('App has come to the foreground!');
+        console.log('App LOADING has come to the foreground!');
         // reading background task info
         this.fetchBackgroundSyncing();
         // setting value for background task Android
@@ -366,7 +430,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
         }
       }
       if (nextAppState.match(/inactive|background/) && this.state.appState === 'active') {
-        //console.log('App is gone to the background!');
+        console.log('App LOADING is gone to the background!');
         // setting value for background task Android
         await AsyncStorage.setItem('@background', 'yes');
       }
@@ -667,6 +731,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
       snackbars,
       mode,
       firstLaunchingMessage,
+      biometricsFailed,
     } = this.state;
     const { translate } = this.props;
     const { colors } = this.props.theme;
@@ -685,7 +750,16 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
           }}>
           <Snackbars snackbars={snackbars} removeFirstSnackbar={this.removeFirstSnackbar} translate={translate} />
 
-          {screen === 0 && <Launching translate={translate} firstLaunchingMessage={firstLaunchingMessage} />}
+          {screen === 0 && (
+            <Launching
+              translate={translate}
+              firstLaunchingMessage={firstLaunchingMessage}
+              biometricsFailed={biometricsFailed}
+              tryAgain={() => {
+                this.setState({ biometricsFailed: false }, () => this.componentDidMount());
+              }}
+            />
+          )}
           {screen === 1 && (
             <>
               <View

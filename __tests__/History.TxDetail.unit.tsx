@@ -105,7 +105,13 @@ describe('Component History TxDetail - test', () => {
     } as TransactionType;
     render(
       <ContextAppLoadedProvider value={state}>
-        <TxDetail tx={tx} closeModal={onClose} set_privacy_option={onSetOption} />
+        <TxDetail
+          tx={tx}
+          closeModal={onClose}
+          openModal={onClose}
+          set_privacy_option={onSetOption}
+          setSendPageState={onClose}
+        />
       </ContextAppLoadedProvider>,
     ).toJSON();
     screen.getByText('0.2234');
@@ -138,7 +144,13 @@ describe('Component History TxDetail - test', () => {
     } as TransactionType;
     render(
       <ContextAppLoadedProvider value={state}>
-        <TxDetail tx={txSelfSend} closeModal={onClose} set_privacy_option={onSetOption} />
+        <TxDetail
+          tx={txSelfSend}
+          closeModal={onClose}
+          openModal={onClose}
+          set_privacy_option={onSetOption}
+          setSendPageState={onClose}
+        />
       </ContextAppLoadedProvider>,
     );
     const num = screen.getAllByText('0.0000');
@@ -173,7 +185,13 @@ describe('Component History TxDetail - test', () => {
     } as TransactionType;
     render(
       <ContextAppLoadedProvider value={state}>
-        <TxDetail tx={txSelfSend} closeModal={onClose} set_privacy_option={onSetOption} />
+        <TxDetail
+          tx={txSelfSend}
+          closeModal={onClose}
+          openModal={onClose}
+          set_privacy_option={onSetOption}
+          setSendPageState={onClose}
+        />
       </ContextAppLoadedProvider>,
     );
     screen.getByText('0.8765');

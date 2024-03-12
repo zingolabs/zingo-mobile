@@ -6,7 +6,7 @@ import moment from 'moment';
 import 'moment/locale/es';
 import { useTheme } from '@react-navigation/native';
 
-import { TransactionType, TxDetailType } from '../../../app/AppState';
+import { AddressBookFileClass, SendPageStateClass, TransactionType, TxDetailType } from '../../../app/AppState';
 import Utils from '../../../app/utils';
 import RegText from '../../Components/RegText';
 import ZecAmount from '../../Components/ZecAmount';
@@ -17,20 +17,33 @@ import { ContextAppLoaded } from '../../../app/context';
 import Header from '../../Header';
 import BoldText from '../../Components/BoldText';
 import CurrencyAmount from '../../Components/CurrencyAmount';
+import AddressItem from '../../Components/AddressItem';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+// this is for http. (red)
+import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
+// this is for https. (primary)
+//import { faLock } from '@fortawesome/free-solid-svg-icons';
 
 type TxDetailProps = {
   tx: TransactionType;
   closeModal: () => void;
+  openModal: () => void;
   set_privacy_option: (name: 'privacy', value: boolean) => Promise<void>;
+  setSendPageState: (s: SendPageStateClass) => void;
 };
 
-const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_privacy_option }) => {
+const TxDetail: React.FunctionComponent<TxDetailProps> = ({
+  tx,
+  closeModal,
+  set_privacy_option,
+  openModal,
+  setSendPageState,
+}) => {
   const context = useContext(ContextAppLoaded);
-  const { info, translate, language, privacy, addLastSnackbar, server, currency } = context;
+  const { info, translate, language, privacy, addLastSnackbar, server, currency, addressBook } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const spendColor =
     tx.confirmations === 0 ? colors.primaryDisabled : tx.type === 'Received' ? colors.primary : colors.text;
-  const [expandAddress, setExpandAddress] = useState(false);
   const [expandTxid, setExpandTxid] = useState(false);
   moment.locale(language);
 
@@ -48,6 +61,16 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
       }
     });
   };
+
+  const contactFound: (add: string) => boolean = (add: string) => {
+    const contact: string = addressBook
+      .filter((ab: AddressBookFileClass) => ab.address === add)
+      .map((ab: AddressBookFileClass) => ab.label)
+      .join(' ');
+    return !!contact;
+  };
+
+  //console.log('tx', tx.txDetails);
 
   return (
     <SafeAreaView
@@ -168,7 +191,6 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
 
           {tx.txDetails.map((txd: TxDetailType) => {
             // 30 characters per line
-            const numLines = txd.address ? (txd.address.length < 40 ? 2 : txd.address.length / 30) : 0;
             const memoTotal = txd.memos ? txd.memos.join('') : '';
             let memo = '';
             let memoUA = '';
@@ -193,28 +215,14 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
                 {!!txd.address && (
                   <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: 10 }}>
                     <FadeText>{translate('history.address') as string}</FadeText>
-                    <TouchableOpacity
-                      onPress={() => {
-                        if (txd.address) {
-                          Clipboard.setString(txd.address);
-                          addLastSnackbar({
-                            message: translate('history.addresscopied') as string,
-                            type: 'Primary',
-                            duration: 'short',
-                          });
-                          setExpandAddress(true);
-                        }
-                      }}>
-                      <View style={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap' }}>
-                        {!txd.address && <RegText>{'Unknown'}</RegText>}
-                        {!expandAddress && !!txd.address && <RegText>{Utils.trimToSmall(txd.address, 10)}</RegText>}
-                        {expandAddress &&
-                          !!txd.address &&
-                          Utils.splitStringIntoChunks(txd.address, Number(numLines.toFixed(0))).map(
-                            (c: string, idx: number) => <RegText key={idx}>{c}</RegText>,
-                          )}
-                      </View>
-                    </TouchableOpacity>
+                    <AddressItem
+                      address={txd.address}
+                      withIcon={true}
+                      withSendIcon={true}
+                      setSendPageState={setSendPageState}
+                      closeModal={closeModal}
+                      openModal={openModal}
+                    />
                   </View>
                 )}
 
@@ -259,6 +267,11 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
                     {!!memoUA && (
                       <TouchableOpacity
                         onPress={() => {
+                          addLastSnackbar({
+                            message: translate('history.address-http') as string,
+                            type: 'Primary',
+                            duration: 'long',
+                          });
                           Clipboard.setString(memoUA);
                           addLastSnackbar({
                             message: translate('history.addresscopied') as string,
@@ -266,7 +279,20 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({ tx, closeModal, set_
                             duration: 'short',
                           });
                         }}>
-                        <RegText>{'\nReply to: \n' + memoUA}</RegText>
+                        <RegText>{'\nReply to:'}</RegText>
+                        <FontAwesomeIcon icon={faTriangleExclamation} color={'red'} size={18} />
+                        <RegText style={{ opacity: 0.4 }}>{memoUA}</RegText>
+                        {contactFound(memoUA) && (
+                          <View style={{ flexDirection: 'row' }}>
+                            <RegText style={{ opacity: 0.5 }}>{translate('addressbook.likely') as string}</RegText>
+                            <AddressItem
+                              address={memoUA}
+                              onlyContact={true}
+                              closeModal={() => {}}
+                              openModal={() => {}}
+                            />
+                          </View>
+                        )}
                       </TouchableOpacity>
                     )}
                   </View>

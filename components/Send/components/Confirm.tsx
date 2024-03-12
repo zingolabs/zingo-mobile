@@ -9,19 +9,27 @@ import ZecAmount from '../../Components/ZecAmount';
 import CurrencyAmount from '../../Components/CurrencyAmount';
 import Button from '../../Components/Button';
 import { useTheme } from '@react-navigation/native';
-import Utils from '../../../app/utils';
 import { ContextAppLoaded } from '../../../app/context';
 import Header from '../../Header';
 import { RPCParseAddressType } from '../../../app/rpc/types/RPCParseAddressType';
 import RPCModule from '../../../app/RPCModule';
+import AddressItem from '../../Components/AddressItem';
+import simpleBiometrics from '../../../app/simpleBiometrics';
 
 type ConfirmProps = {
   defaultFee: number;
   closeModal: () => void;
+  openModal: () => void;
   confirmSend: () => void;
   sendAllAmount: boolean;
 };
-const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSend, defaultFee, sendAllAmount }) => {
+const Confirm: React.FunctionComponent<ConfirmProps> = ({
+  closeModal,
+  confirmSend,
+  defaultFee,
+  sendAllAmount,
+  openModal,
+}) => {
   const context = useContext(ContextAppLoaded);
   const {
     sendPageState,
@@ -35,6 +43,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSen
     netInfo,
     addLastSnackbar,
     server,
+    security,
   } = context;
   const { colors } = useTheme();
   const [privacyLevel, setPrivacyLevel] = useState('-');
@@ -158,6 +167,21 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSen
     translate,
   ]);
 
+  const confirmSendBiometrics = async () => {
+    const resultBio = security.sendConfirm ? await simpleBiometrics({ translate: translate }) : true;
+    // can be:
+    // - true      -> the user do pass the authentication
+    // - false     -> the user do NOT pass the authentication
+    // - undefined -> no biometric authentication available -> Passcode.
+    console.log('BIOMETRIC --------> ', resultBio);
+    if (resultBio === false) {
+      // snack with Error
+      addLastSnackbar({ message: translate('biometrics-error') as string, type: 'Primary' });
+    } else {
+      confirmSend();
+    }
+  };
+
   useEffect(() => {
     (async () => {
       setPrivacyLevel(await getPrivacyLevel());
@@ -220,14 +244,10 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSen
           <RegText>{privacyLevel}</RegText>
         </View>
         {[sendPageState.toaddr].map(to => {
-          // 30 characters per line
-          const numLines = to.to.length < 40 ? 2 : to.to.length / 30;
           return (
             <View key={to.id} style={{ margin: 10 }}>
               <FadeText>{translate('send.to') as string}</FadeText>
-              {Utils.splitStringIntoChunks(to.to, Number(numLines.toFixed(0))).map((c: string, idx: number) => (
-                <RegText key={idx}>{c}</RegText>
-              ))}
+              <AddressItem address={to.to} withIcon={true} closeModal={closeModal} openModal={openModal} />
 
               <FadeText style={{ marginTop: 10 }}>{translate('send.confirm-amount') as string}</FadeText>
               <View
@@ -298,7 +318,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({ closeModal, confirmSen
           <Button
             type="Primary"
             title={sendAllAmount ? (translate('send.confirm-button-all') as string) : (translate('confirm') as string)}
-            onPress={confirmSend}
+            onPress={() => confirmSendBiometrics()}
           />
           <Button
             type="Secondary"

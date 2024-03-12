@@ -124,7 +124,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
                 "prefix": "fas",
               }
             }
-            size={48}
+            size={35}
           />
         </View>
       </View>
