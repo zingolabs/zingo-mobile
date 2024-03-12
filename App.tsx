@@ -33,7 +33,7 @@ const basicTheme: ThemeType = {
     card: '#011401',
     border: '#ffffff',
     primary: '#0ef8f8', // new tron color
-    primaryDisabled: '#addcdc', // new tron color disable
+    primaryDisabled: '#a0dcdc', // new tron color disable
     secondaryDisabled: '#233623',
     text: '#c3c3c3',
     zingo: '#888888',
