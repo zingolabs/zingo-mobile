@@ -8,7 +8,7 @@
   "firstlaunchingmessage-title": "Optimizing Zingo!",
   "firstlaunchingmessage-body": "This may take a while, depending on the transaction history. Please keep the app open until the process finishes.",
   "firstlaunchingmessage-footer": "Sorry for the inconvenience.",
-  "biometricsfailed-title": "Welcome",
+  "biometricsfailed-title": "Welcome!",
   "biometricsfailed-body": "For security, the application is locked.",
   "biometricsfailed-footer": "Use the authentication method to unlock.",
   "biometricsfailed-button": "Unlock",
@@ -237,13 +237,13 @@
     "security-title": "APPLY DEVICE SECURITY TO SCREENS/OPTIONS",
     "security-startapp": "When the App starts.",
     "security-foregroundapp": "When the App go to the Foreground.",
-    "security-sendconfirm": "Confirm Transaction Screen.",
-    "security-seedscreen": "Wallet Seed Phrase Screen.",
-    "security-ufvkscreen": "Wallet Viewing Key Screen.",
-    "security-rescanscreen": "Rescan Wallet Screen.",
-    "security-settingsscreen": "Settings Screen.",
-    "security-changewalletscreen": "Change to another Wallet Screen.",
-    "security-restorewalletbackupscreen": "Restore Last Wallet Backup Screen."
+    "security-sendconfirm": "Confirm Transaction.",
+    "security-seedscreen": "Wallet Seed Phrase.",
+    "security-ufvkscreen": "Wallet Viewing Key.",
+    "security-rescanscreen": "Rescan Wallet.",
+    "security-settingsscreen": "Settings.",
+    "security-changewalletscreen": "Change to another Wallet.",
+    "security-restorewalletbackupscreen": "Restore Last Wallet Backup."
   },
   "info": {
     "version": "Version",
@@ -269,7 +269,9 @@
   },
   "seed": {
     "buttontexts": {
-      "new": ["I have saved \n the seed"],
+      "new": [
+        "I have saved \n the seed"
+      ],
       "change": [
         "",
         "Open New",
@@ -282,8 +284,12 @@
         "You really want \n to change your \n actual server",
         "Are you certain?"
       ],
-      "view": ["I have saved \n the seed"],
-      "restore": ["Restore Wallet"],
+      "view": [
+        "I have saved \n the seed"
+      ],
+      "restore": [
+        "Restore Wallet"
+      ],
       "backup": [
         "",
         "Restore",
@@ -441,9 +447,9 @@
   },
   "report": {
     "title": "Sync / Rescan Report",
-    "running": "Running",
-    "finished": "Finished",
-    "paused": "Paused",
+    "running": "The wallet is Syncing...",
+    "finished": "The wallet is Fully Synced",
+    "paused": "The wallet is waiting to start syncing...",
     "server-title": "SERVER: ",
     "blocks": " Blocks. ",
     "wallet": "Wallet: ",
@@ -493,7 +499,9 @@
   },
   "ufvk": {
     "buttontexts": {
-      "new": ["I have saved \n the Viewing Key"],
+      "new": [
+        "I have saved \n the Viewing Key"
+      ],
       "change": [
         "",
         "Open New",
@@ -506,8 +514,12 @@
         "You really want \n to change your \n actual server",
         "Are you certain?"
       ],
-      "view": ["I have saved \n the Viewing Key"],
-      "restore": ["Restore Wallet"],
+      "view": [
+        "I have saved \n the Viewing Key"
+      ],
+      "restore": [
+        "Restore Wallet"
+      ],
       "backup": [
         "",
         "Restore",
@@ -543,7 +555,7 @@
   },
   "uris": {
     "baduri": "Error: Bad URI.",
-    "notvalid": "was not a valid zcash address (Unified, Sapling or Transparent)",
+    "notvalid": "Was not a valid zcash address (Unified, Sapling or Transparent)",
     "notvalidparameter": "was not understood as a valid parameter",
     "notvalidvalue": "Didn't understand parameter value",
     "noindex": "Unknown index",
