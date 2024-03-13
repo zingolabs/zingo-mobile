@@ -3,7 +3,6 @@ import React, { useContext } from 'react';
 import { ScrollView, View, Text, Dimensions } from 'react-native';
 
 import RegText from '../../../components/Components/RegText';
-import FadeText from '../../../components/Components/FadeText';
 
 import { useTheme } from '@react-navigation/native';
 import { ContextAppLoaded } from '../../context';
@@ -20,13 +19,16 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuSt
   const context = useContext(ContextAppLoaded);
   const { translate, readOnly, mode, transactions, addLastSnackbar, security } = context;
   const { colors } = useTheme() as unknown as ThemeType;
-  const item = {
-    fontSize: 14,
-    paddingTop: 15,
-  };
+
   const dimensions = {
     width: Dimensions.get('screen').width,
     height: Dimensions.get('screen').height,
+  };
+
+  const item = {
+    fontSize: 14,
+    // for small screens -> trying to avoid the scroll.
+    paddingTop: dimensions.height < 475 ? 20 : 25,
   };
 
   const onItemSelectedWrapper = async (value: string) => {
@@ -72,7 +74,9 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuSt
           backgroundColor: '#010101',
         }}
         contentContainerStyle={{ display: 'flex' }}>
-        <FadeText style={{ margin: 20 }}>{translate('loadedapp.options') as string}</FadeText>
+        <RegText color={colors.money} style={{ marginVertical: 10, marginLeft: 30 }}>
+          {translate('loadedapp.options') as string}
+        </RegText>
         <View style={{ height: 1, backgroundColor: colors.primary }} />
 
         <View style={{ display: 'flex', marginLeft: 20 }}>
