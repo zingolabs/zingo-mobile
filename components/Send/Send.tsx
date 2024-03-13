@@ -597,6 +597,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       }}>
                       {itemsPicker.length > 0 && (
                         <RNPickerSelect
+                          fixAndroidTouchableBug={true}
                           value={ta.to}
                           items={itemsPicker}
                           placeholder={{ label: translate('addressbook.select-placeholder') as string, value: '' }}
