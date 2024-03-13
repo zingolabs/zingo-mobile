@@ -124,6 +124,10 @@ const Send: React.FunctionComponent<SendProps> = ({
     return max;
   }, [spendable, defaultFee]);
 
+  const getSpendable = useCallback((): number => {
+    return spendable;
+  }, [spendable]);
+
   useEffect(() => {
     const getMemoEnabled = async (address: string): Promise<boolean> => {
       if (!netInfo.isConnected) {
@@ -217,6 +221,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           setValidAmount(-1);
         } else {
           if (
+            Utils.parseLocaleFloat(Number(getSpendable()).toFixed(8)) > 0 &&
             Utils.parseLocaleFloat(Number(to.amount).toFixed(8)) >= 0 &&
             Utils.parseLocaleFloat(Number(to.amount).toFixed(8)) <= Utils.parseLocaleFloat(getMaxAmount().toFixed(8))
           ) {
@@ -232,6 +237,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   }, [
     decimalSeparator,
     getMaxAmount,
+    getSpendable,
     server.chain_name,
     netInfo.isConnected,
     sendPageState.toaddr,
