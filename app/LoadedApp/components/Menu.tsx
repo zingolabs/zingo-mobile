@@ -24,7 +24,7 @@ type MenuProps = {
 
 const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuState, set_debugMode_option }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, readOnly, mode, transactions, addLastSnackbar, security, addLastSnackbar, debugMode } = context;
+  const { translate, readOnly, mode, transactions, addLastSnackbar, security, debugMode } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   const [onLongPressTimes, setOnLongPressTimes] = useState<number>(0);
   const item = {

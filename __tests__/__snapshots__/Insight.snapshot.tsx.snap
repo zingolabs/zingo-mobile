@@ -52,7 +52,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
         onStartShouldSetResponder={[Function]}
         style={
           {
-            "marginHorizontal": 5,
+            "marginRight": 5,
             "opacity": 1,
           }
         }

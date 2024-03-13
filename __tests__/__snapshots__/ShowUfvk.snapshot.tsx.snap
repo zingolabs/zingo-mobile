@@ -52,7 +52,7 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
         onStartShouldSetResponder={[Function]}
         style={
           {
-            "marginHorizontal": 5,
+            "marginRight": 5,
             "opacity": 1,
           }
         }
