@@ -77,7 +77,9 @@
     "basicmode": "Change to Basic Mode",
     "advancedmode": "Change to Advanced Mode",
     "noopenwallet-message": "An error occurred while the App was trying to open the active wallet.",
-    "changeserver-basic": "Change the Server and\nOpen Current Wallet"
+    "changeserver-basic": "Change the Server and\nOpen Current Wallet",
+    "alert-newwallet-title": "CREATE A NEW WALLET",
+    "alert-newwallet-body": "Can you confirm that you really want to create a new wallet and lose access to the current wallet."
   },
   "loadedapp": {
     "about": "About Zingo!",
@@ -196,6 +198,16 @@
         "text": "Advanced Mode, for the advanced user."
       }
     ],
+    "debugmodes": [
+      {
+        "value": true,
+        "text": "Enable the possibility of sending Errors/Issues to the Zingo developers."
+      },
+      {
+        "value": false,
+        "text": "Disable the possibility of sending Errors/Issues to the Zingo developers."
+      }
+    ],
     "nochanges": "No changes registered.",
     "ismemo": "You need to choose the download memos option to save.",
     "isthreshold": "You need to choose the transaction filter threshold option to save.",
@@ -217,6 +229,7 @@
     "language-title": "LANGUAGE",
     "islanguage": "You need to choose a language to save.",
     "sendall-title": "THE BUTTON 'Send All' (Amount)",
+    "debugmode-title": "DEBUG MODE",
     "privacy-title": "Switch between High or Normal Privacy",
     "mode-title": "Switch between Basic or Advanced Mode",
     "value-currency-": "No currency",
@@ -225,6 +238,8 @@
     "value-language-es": "Spanish",
     "value-sendall-true": "Enable",
     "value-sendall-false": "Disable",
+    "value-debugmode-true": "Enable",
+    "value-debugmode-false": "Disable",
     "value-privacy-true": "High",
     "value-privacy-false": "Normal",
     "privacy": "Priv: ",
@@ -234,6 +249,7 @@
     "value-chain_name-main": "Mainnet",
     "value-chain_name-test": "Testnet",
     "value-chain_name-regtest": "Regtest",
+    "keeppressing": "Keep Pressing to access to the debug mode setting",
     "security-title": "APPLY DEVICE SECURITY TO SCREENS/OPTIONS",
     "security-startapp": "When the App starts.",
     "security-foregroundapp": "When the App go to the Foreground.",
@@ -483,6 +499,33 @@
       "The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.",
       "THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE."
     ]
+  },
+  "issuereport": {
+    "title-firstdebugmode": "Debug Mode Activation",
+    "firstdebugmode": [
+      ".",
+      ".",
+      ".",
+      ".",
+      ".",
+      "."
+    ],
+    "title": "Report Issue/Error to Zingo",
+    "send-report": "Send Report",
+    "activation-message": "Welcome to Debug Mode!",
+    "activation-description": "To help us improve the application, you can activate Debug Mode. This will collect internal data about the application's performance on your device. All data will be anonymized to protect your privacy.",
+    "activation-terms": "Please review and accept the terms before proceeding.",
+    "activation-accept": "I accept the terms and activate Debug Mode",
+    "terms-title": "Terms and Conditions of Debug Mode",
+    "terms-description": "By activating Debug Mode, you are giving permission to collect internal data from the application on your device. This data will be used solely for diagnostic and improvement purposes. We guarantee that all collected data will be anonymized to protect your privacy. We will not collect personally identifiable information.",
+    "terms-question": "Do you accept the terms and want to activate Debug Mode?",
+    "terms-accept": "Yes, I accept the terms and activate Debug Mode",
+    "terms-reject": "No, I prefer not to activate Debug Mode",
+    "deactivation-title": "Deactivation of Debug Mode",
+    "deactivation-description": "At any time, you can deactivate Debug Mode from the application settings. This will stop the collection of internal data. Remember that by deactivating Debug Mode, we won't be able to receive useful information to improve the application.",
+    "deactivation-question": "Do you want to deactivate Debug Mode?",
+    "deactivation-accept": "Yes, I deactivate Debug Mode",
+    "deactivation-reject": "No, I want to continue helping improve the application"
   },
   "scanner": {
     "text" : "Scan a Unified Full Viewing Key",

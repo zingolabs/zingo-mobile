@@ -94,6 +94,7 @@ export default interface AppStateLoaded {
   poolsModalVisible: boolean;
   insightModalVisible: boolean;
   addressBookModalVisible: boolean;
+  issueReportModalVisible: boolean;
 
   newServer: ServerType;
 
@@ -127,6 +128,12 @@ export default interface AppStateLoaded {
   addressBookCurrentAddress: string;
   addressBookOpenPriorModal: () => void;
   security: SecurityType;
+
+  debugMode: boolean;
+
+  syncingStatusMoreInfoOnClick: () => void;
+  poolsMoreInfoOnClick: () => void;
+  issueReportMoreInfoOnClick: () => void;
 
   // eslint-disable-next-line semi
 }

@@ -140,6 +140,7 @@ describe('Component LoadingApp - test', () => {
       changeWalletScreen: true,
       restoreWalletBackupScreen: true,
     };
+    const debugMode = false;
     const receive = render(
       <LoadingAppClass
         navigation={navigationMock}
@@ -156,6 +157,7 @@ describe('Component LoadingApp - test', () => {
         firstLaunchingMessage={firstLaunchingMessage}
         toggleTheme={toggleTheme}
         security={security}
+        debugMode={debugMode}
       />,
     );
     expect(receive.toJSON()).toMatchSnapshot();

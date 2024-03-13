@@ -77,7 +77,9 @@
     "basicmode": "Cambiar a Modo Básico",
     "advancedmode": "Cambiar a Modo Avanzado",
     "noopenwallet-message": "Ha ocurrido un error mientras el App estaba intentando abrir el monedero activo.",
-    "changeserver-basic": "Cambiar de Servidor and\nAbrir Monedero Activo"
+    "changeserver-basic": "Cambiar de Servidor and\nAbrir Monedero Activo",
+    "alert-newwallet-title": "CREAR UNA NUEVA BILLETERA",
+    "alert-newwallet-body": "Puedes confirmar que realmente quieres crear una billetera nueva y perder el acceso a la billetera actual."
   },
   "loadedapp": {
     "about": "Sobre Zingo!",
@@ -196,6 +198,16 @@
         "text": "Modo Avanzado, para el usuario avanzado."
       }
     ],
+    "debugmodes": [
+      {
+        "value": true,
+        "text": "Activa la posibilidad de enviar Errores/Incidencias a los desarrolladores de Zingo."
+      },
+      {
+        "value": false,
+        "text": "Desactiva la posibilidad de enviar Errores/Incidencias a los desarrolladores de Zingo."
+      }
+    ],
     "nochanges": "No se han registrado cambios.",
     "ismemo": "Necesitas escoger una opción de Memorándum para poder grabar.",
     "isthreshold": "Necesitas escoger una opción de umbral para poder grabar.",
@@ -217,6 +229,7 @@
     "language-title": "IDIOMA",
     "islanguage": "Necesitas escoger un Idioma para poder grabar.",
     "sendall-title": "EL BOTON 'Enviar todo' (Cantidad)",
+    "debugmode-title": "MODO DEPURACION",
     "privacy-title": "Cambiar entre Alta Privacidad o Normal",
     "mode-title": "Cambiar entre Modo Básico o Avanzado",
     "value-currency-": "Sin moneda",
@@ -225,6 +238,8 @@
     "value-language-es": "Español",
     "value-sendall-true": "Activar",
     "value-sendall-false": "Desactivar",
+    "value-debugmode-true": "Activar",
+    "value-debugmode-false": "Desactivar",
     "value-privacy-true": "Alta",
     "value-privacy-false": "Normal",
     "privacy": "Priv: ",
@@ -234,6 +249,7 @@
     "value-chain_name-main": "Mainnet",
     "value-chain_name-test": "Testnet",
     "value-chain_name-regtest": "Regtest",
+    "keeppressing": "Sigue presionando para acceder a la configuración del modo de depuración.",
     "security-title": "APLICAR LA SEGURIDAD DEL DISPOSITIVO A PANTALLAS/OPCIONES",
     "security-startapp": "Cuando la Aplicación Arranca.",
     "security-foregroundapp": "Cuando la Aplicación va a Primer Plano.",
@@ -482,6 +498,33 @@
       "El aviso de derechos de autor anterior y este aviso de permiso se incluirán en todas las copias o partes sustanciales del Software.",
       "EL SOFTWARE SE PROPORCIONA 'TAL CUAL', SIN GARANTÍA DE NINGÚN TIPO, EXPRESA O IMPLÍCITA, INCLUYENDO, ENTRE OTRAS, LAS GARANTÍAS DE COMERCIABILIDAD, IDONEIDAD PARA UN FIN DETERMINADO Y NO VIOLACIÓN. EN NINGÚN CASO LOS AUTORES O LOS TITULARES DE LOS DERECHOS DE AUTOR SERÁN RESPONSABLES DE CUALQUIER RECLAMACIÓN, DAÑOS U OTRA RESPONSABILIDAD, YA SEA EN UNA ACCIÓN DE CONTRATO, AGRAVIO O DE CUALQUIER OTRO TIPO, QUE SURJA DE, FUERA DE O EN RELACIÓN CON EL SOFTWARE O EL USO U OTROS TRATOS EN EL SOFTWARE."
     ]
+  },
+  "issuereport": {
+    "title-firstdebugmode": "Activacion del Modo Depuracion",
+    "firstdebugmode": [
+      ".",
+      ".",
+      ".",
+      ".",
+      ".",
+      "."
+    ],
+    "title": "Reportar Incidencia/Error a Zingo",
+    "send-report": "Enviar Informe",
+    "activation-message": "¡Bienvenido al Modo de Depuración!",
+    "activation-description": "Para ayudarnos a mejorar la aplicación, puedes activar el Modo de Depuración. Esto recopilará datos internos sobre el funcionamiento de la aplicación en tu dispositivo. Todos los datos serán anonimizados para proteger tu privacidad.",
+    "activation-terms": "Por favor, revisa y acepta los términos antes de continuar.",
+    "activation-accept": "Acepto los términos y activo el Modo de Depuración",
+    "terms-title": "Términos y Condiciones del Modo de Depuración",
+    "terms-description": "Al activar el Modo de Depuración, estás dando permiso para recopilar datos internos de la aplicación en tu dispositivo. Estos datos se utilizarán únicamente con fines de diagnóstico y mejora de la aplicación. Garantizamos que todos los datos recopilados se anonimizarán para proteger tu privacidad. No recopilaremos información personal identificable.",
+    "terms-question": "¿Aceptas los términos y deseas activar el Modo de Depuración?",
+    "terms-accept": "Sí, acepto los términos y activo el Modo de Depuración",
+    "terms-reject": "No, prefiero no activar el Modo de Depuración",
+    "deactivation-title": "Desactivación del Modo de Depuración",
+    "deactivation-description": "En cualquier momento, puedes desactivar el Modo de Depuración desde la configuración de la aplicación. Esto detendrá la recopilación de datos internos. Recuerda que al desactivar el Modo de Depuración, no podremos recibir información útil para mejorar la aplicación.",
+    "deactivation-question": "¿Deseas desactivar el Modo de Depuración?",
+    "deactivation-accept": "Sí, desactivo el Modo de Depuración",
+    "deactivation-reject": "No, quiero seguir ayudando a mejorar la aplicación"
   },
   "scanner": {
     "text" : "Escanea una Clave de Visualización Totalmente Unificada",

@@ -44,8 +44,10 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
     netInfo: NetInfoType,
     privacy: boolean,
     mode: 'basic' | 'advanced',
+    debugMode: boolean,
     setBackgroundError: (title: string, error: string) => void,
-    addLastSnackbar: (snackbar: SnackbarType) => void;
+    addLastSnackbar: (snackbar: SnackbarType) => void,
+    issueReportMoreInfoOnClick: () => void;
   if (action === 'new' || action === 'restore') {
     wallet = contextLoading.wallet;
     translate = contextLoading.translate;
@@ -54,8 +56,10 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
     netInfo = contextLoading.netInfo;
     privacy = contextLoading.privacy;
     mode = contextLoading.mode;
+    debugMode = contextLoading.debugMode;
     setBackgroundError = contextLoading.setBackgroundError;
     addLastSnackbar = contextLoading.addLastSnackbar;
+    issueReportMoreInfoOnClick = contextLoading.issueReportMoreInfoOnClick;
   } else {
     wallet = contextLoaded.wallet;
     translate = contextLoaded.translate;
@@ -64,8 +68,10 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
     netInfo = contextLoaded.netInfo;
     privacy = contextLoaded.privacy;
     mode = contextLoaded.mode;
+    debugMode = contextLoaded.debugMode;
     setBackgroundError = contextLoaded.setBackgroundError;
     addLastSnackbar = contextLoaded.addLastSnackbar;
+    issueReportMoreInfoOnClick = contextLoaded.issueReportMoreInfoOnClick;
   }
 
   const { colors } = useTheme() as unknown as ThemeType;
@@ -253,8 +259,10 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
             translate={translate}
             netInfo={netInfo}
             mode={mode}
+            debugMode={debugMode}
             addLastSnackbar={addLastSnackbar}
             receivedLegend={action === 'view' ? !basicFirstViewSeed : false}
+            issueReportMoreInfoOnClick={issueReportMoreInfoOnClick}
           />
         </View>
       </Animated.View>

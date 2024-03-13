@@ -125,6 +125,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
         onStartShouldSetResponder={[Function]}
         style={
           {
+            "marginRight": 5,
             "opacity": 1,
           }
         }
@@ -164,7 +165,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
         onStartShouldSetResponder={[Function]}
         style={
           {
-            "marginHorizontal": 5,
+            "marginRight": 5,
             "opacity": 1,
           }
         }

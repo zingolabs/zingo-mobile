@@ -55,8 +55,6 @@ describe('Component Header - test', () => {
       <ContextAppLoadedProvider value={state}>
         <Header
           testID="transaction text"
-          poolsMoreInfoOnClick={onFunction}
-          syncingStatusMoreInfoOnClick={onFunction}
           toggleMenuDrawer={onFunction}
           setZecPrice={onFunction}
           title="title"

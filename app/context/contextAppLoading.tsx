@@ -59,6 +59,9 @@ export const defaultAppStateLoading: AppStateLoading = {
   biometricsFailed: false,
   startingApp: true,
   security: {} as SecurityType,
+  debugMode: false,
+  issueReportModalVisible: false,
+  issueReportMoreInfoOnClick: () => {},
 };
 
 export const ContextAppLoading = React.createContext(defaultAppStateLoading);

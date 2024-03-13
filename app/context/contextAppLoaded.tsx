@@ -62,6 +62,8 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   poolsModalVisible: false,
   insightModalVisible: false,
   addressBookModalVisible: false,
+  issueReportModalVisible: false,
+
   newServer: {} as ServerType,
   uaAddress: '',
 
@@ -98,6 +100,10 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   addressBookCurrentAddress: '',
   addressBookOpenPriorModal: () => {},
   security: {} as SecurityType,
+  debugMode: false,
+  syncingStatusMoreInfoOnClick: () => {},
+  poolsMoreInfoOnClick: () => {},
+  issueReportMoreInfoOnClick: () => {},
 };
 
 export const ContextAppLoaded = React.createContext(defaultAppStateLoaded);

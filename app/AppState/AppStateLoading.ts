@@ -54,5 +54,10 @@ export default interface AppStateLoading {
   startingApp: boolean;
   security: SecurityType;
 
+  debugMode: boolean;
+
+  issueReportModalVisible: boolean;
+  issueReportMoreInfoOnClick: () => void;
+
   // eslint-disable-next-line semi
 }

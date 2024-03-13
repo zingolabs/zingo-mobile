@@ -13,6 +13,7 @@ import {
   AppState,
   NativeEventSubscription,
   TextInput,
+  TouchableOpacity,
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { I18n } from 'i18n-js';
@@ -23,7 +24,7 @@ import NetInfo, { NetInfoStateType, NetInfoSubscription } from '@react-native-co
 import OptionsMenu from 'react-native-option-menu';
 
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faEllipsisV } from '@fortawesome/free-solid-svg-icons';
+import { faBug, faEllipsisV } from '@fortawesome/free-solid-svg-icons';
 
 import RPCModule from '../RPCModule';
 import {
@@ -50,6 +51,7 @@ import SnackbarType from '../AppState/types/SnackbarType';
 import { RPCSeedType } from '../rpc/types/RPCSeedType';
 import Launching from './Launching';
 import simpleBiometrics from '../simpleBiometrics';
+import IssueReport from '../../components/IssueReport';
 
 const BoldText = React.lazy(() => import('../../components/Components/BoldText'));
 const Button = React.lazy(() => import('../../components/Components/Button'));
@@ -82,6 +84,7 @@ export default function LoadingApp(props: LoadingAppProps) {
   const [mode, setMode] = useState<'basic' | 'advanced'>('advanced'); // by default advanced
   const [background, setBackground] = useState<BackgroundType>({ batches: 0, message: '', date: 0, dateEnd: 0 });
   const [firstLaunchingMessage, setFirstLaunchingMessage] = useState<boolean>(false);
+  const [debugMode, setDebugMode] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [security, setSecurity] = useState<SecurityType>({
     startApp: true,
@@ -140,6 +143,7 @@ export default function LoadingApp(props: LoadingAppProps) {
         setMode('basic');
         props.toggleTheme('basic');
         await SettingsFileImpl.writeSettings('mode', 'basic');
+        await SettingsFileImpl.writeSettings('firstInstall', false);
       } else {
         if (settings.mode === 'basic' || settings.mode === 'advanced') {
           setMode(settings.mode);
@@ -192,6 +196,11 @@ export default function LoadingApp(props: LoadingAppProps) {
 
       // for testing
       //await delay(5000);
+      if (settings.debugMode === true || settings.debugMode === false) {
+        setDebugMode(settings.debugMode);
+      } else {
+        await SettingsFileImpl.writeSettings('debugMode', debugMode);
+      }
 
       // reading background task info
       const backgroundJson = await BackgroundFileImpl.readBackground();
@@ -233,6 +242,7 @@ export default function LoadingApp(props: LoadingAppProps) {
         firstLaunchingMessage={firstLaunchingMessage}
         toggleTheme={props.toggleTheme}
         security={security}
+        debugMode={debugMode}
       />
     );
   }
@@ -253,6 +263,7 @@ type LoadingAppClassProps = {
   firstLaunchingMessage: boolean;
   toggleTheme: (mode: 'basic' | 'advanced') => void;
   security: SecurityType;
+  debugMode: boolean;
 };
 
 export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
@@ -302,6 +313,8 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
           ? props.route.params.startingApp
           : true,
       security: props.security,
+      debugMode: props.debugMode,
+      issueReportMoreInfoOnClick: this.issueReportMoreInfoOnClick,
     };
 
     this.dim = {} as EmitterSubscription;
@@ -339,7 +352,16 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
 
     this.setState({ actionButtonsDisabled: true });
     (async () => {
-      // First, check if a wallet exists. Do it async so the basic screen has time to render
+      // first check if it is a new release with debugMode
+      // only for advanced users
+      const settings = await SettingsFileImpl.readSettings();
+      if (settings.firstDebugMode && this.state.mode !== 'basic') {
+        this.setState({ screen: 5 });
+        await SettingsFileImpl.writeSettings('firstDebugMode', false);
+        return;
+      }
+
+      // check if a wallet exists. Do it async so the basic screen has time to render
       await AsyncStorage.setItem('@background', 'no');
       const exists = await RPCModule.walletExists();
       //console.log('Wallet Exists result', this.state.screen, exists);
@@ -395,7 +417,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
         }
       } else {
         //console.log('Loading new wallet', this.state.screen, this.state.walletExists);
-        // if no wallet file & basic mode -> create a new wallet & go directly to history screen.
+        // if no wallet file & basic mode -> create a new wallet & go directly to receive screen.
         if (this.state.mode === 'basic') {
           // setting the prop basicFirstViewSeed to false.
           // this means when the user have funds, the seed screen will show up.
@@ -675,6 +697,10 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     });
   };
 
+  issueReportMoreInfoOnClick = async () => {
+    this.setState({ issueReportModalVisible: true });
+  };
+
   setBackgroundError = (title: string, error: string) => {
     this.setState({ backgroundError: { title, error } });
   };
@@ -732,6 +758,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
       mode,
       firstLaunchingMessage,
       biometricsFailed,
+      issueReportModalVisible,
     } = this.state;
     const { translate } = this.props;
     const { colors } = this.props.theme;
@@ -748,6 +775,21 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
             height: '100%',
             backgroundColor: colors.background,
           }}>
+          <Modal
+            animationType="slide"
+            transparent={false}
+            visible={issueReportModalVisible}
+            onRequestClose={() => this.setState({ issueReportModalVisible: false })}>
+            <Suspense
+              fallback={
+                <View>
+                  <Text>{translate('loading') as string}</Text>
+                </View>
+              }>
+              <IssueReport from={'LoadingApp'} closeModal={() => this.setState({ issueReportModalVisible: false })} />
+            </Suspense>
+          </Modal>
+
           <Snackbars snackbars={snackbars} removeFirstSnackbar={this.removeFirstSnackbar} translate={translate} />
 
           {screen === 0 && (
@@ -772,7 +814,14 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                   zIndex: 999,
                 }}>
                 {netInfo.isConnected && !actionButtonsDisabled && (
-                  <>
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    {this.state.debugMode && (
+                      <TouchableOpacity onPress={() => this.issueReportMoreInfoOnClick()}>
+                        <View style={{ marginRight: 5 }}>
+                          <FontAwesomeIcon icon={faBug} color={'#A32CC4'} size={20} />
+                        </View>
+                      </TouchableOpacity>
+                    )}
                     {mode === 'basic' ? (
                       <OptionsMenu
                         customButton={<FontAwesomeIcon icon={faEllipsisV} color={'#ffffff'} size={48} />}
@@ -790,7 +839,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                         actions={[this.customServer]}
                       />
                     )}
-                  </>
+                  </View>
                 )}
               </View>
               <ScrollView
@@ -1015,7 +1064,24 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                       type="Primary"
                       title={translate('loadingapp.createnewwallet') as string}
                       disabled={actionButtonsDisabled}
-                      onPress={this.createNewWallet}
+                      onPress={() => {
+                        if (this.state.walletExists) {
+                          Alert.alert(
+                            translate('loadingapp.alert-newwallet-title') as string,
+                            translate('loadingapp.alert-newwallet-body') as string,
+                            [
+                              {
+                                text: translate('confirm') as string,
+                                onPress: () => this.createNewWallet(),
+                              },
+                              { text: translate('cancel') as string, style: 'cancel' },
+                            ],
+                            { cancelable: true, userInterfaceStyle: 'light' },
+                          );
+                        } else {
+                          this.createNewWallet();
+                        }
+                      }}
                       style={{ marginBottom: 10, marginTop: 10 }}
                     />
                   )}
@@ -1140,7 +1206,32 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                 }>
                 <ImportUfvk
                   onClickOK={(s: string, b: number) => this.doRestore(s, b, 'ufvk')}
-                  onClickCancel={() => this.setState({ screen: 1 })}
+                  onClickCancel={() => this.setState({ screen: 1, actionButtonsDisabled: false })}
+                />
+              </Suspense>
+            </Modal>
+          )}
+          {screen === 5 && (
+            <Modal
+              animationType="slide"
+              transparent={false}
+              visible={screen === 5}
+              onRequestClose={() => {
+                this.setState({ screen: 0 });
+                this.componentDidMount();
+              }}>
+              <Suspense
+                fallback={
+                  <View>
+                    <Text>{translate('loading') as string}</Text>
+                  </View>
+                }>
+                <IssueReport
+                  from={'LoadingApp-firstDebugMode'}
+                  closeModal={() => {
+                    this.setState({ screen: 0 });
+                    this.componentDidMount();
+                  }}
                 />
               </Suspense>
             </Modal>

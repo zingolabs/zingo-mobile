@@ -63,6 +63,7 @@ import { Launching } from '../LoadingApp';
 import AddressBook from '../../components/AddressBook/AddressBook';
 import AddressBookFileImpl from '../../components/AddressBook/AddressBookFileImpl';
 import simpleBiometrics from '../simpleBiometrics';
+import IssueReport from '../../components/IssueReport';
 
 const History = React.lazy(() => import('../../components/History'));
 const Send = React.lazy(() => import('../../components/Send'));
@@ -106,6 +107,7 @@ export default function LoadedApp(props: LoadedAppProps) {
   const [mode, setMode] = useState<'basic' | 'advanced'>('advanced'); // by default advanced
   const [background, setBackground] = useState<BackgroundType>({ batches: 0, message: '', date: 0, dateEnd: 0 });
   const [addressBook, setAddressBook] = useState<AddressBookFileClass[]>([]);
+  const [debugMode, setDebugMode] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [security, setSecurity] = useState<SecurityType>({
     startApp: true,
@@ -201,6 +203,11 @@ export default function LoadedApp(props: LoadedAppProps) {
       } else {
         await SettingsFileImpl.writeSettings('security', security);
       }
+      if (settings.debugMode === true || settings.debugMode === false) {
+        setDebugMode(settings.debugMode);
+      } else {
+        await SettingsFileImpl.writeSettings('debugMode', debugMode);
+      }
 
       // reading background task info
       const backgroundJson = await BackgroundFileImpl.readBackground();
@@ -249,6 +256,7 @@ export default function LoadedApp(props: LoadedAppProps) {
         toggleTheme={props.toggleTheme}
         addressBook={addressBook}
         security={security}
+        debugMode={debugMode}
       />
     );
   }
@@ -270,6 +278,7 @@ type LoadedAppClassProps = {
   toggleTheme: (mode: 'basic' | 'advanced') => void;
   addressBook: AddressBookFileClass[];
   security: SecurityType;
+  debugMode: boolean;
 };
 
 export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
@@ -299,9 +308,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       setBackgroundError: this.setBackgroundError,
       addLastSnackbar: this.addLastSnackbar,
       restartApp: this.navigateToLoadingApp,
-      addressBook: props.addressBook,
-      launchAddressBook: this.launchAddressBook,
-      security: props.security,
+      debugMode: props.debugMode,
+      syncingStatusMoreInfoOnClick: this.syncingStatusMoreInfoOnClick,
+      poolsMoreInfoOnClick: this.poolsMoreInfoOnClick,
+      issueReportMoreInfoOnClick: this.issueReportMoreInfoOnClick,
     };
 
     this.rpc = new RPC(
@@ -325,7 +335,12 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     this.clearToAddr();
 
     (async () => {
-      // Configure the RPC to start doing refreshes
+      await SettingsFileImpl.writeSettings('firstInstall', false);
+      await SettingsFileImpl.writeSettings('firstDebugMode', false);
+    })();
+
+    // Configure the RPC to start doing refreshes
+    (async () => {
       await this.rpc.configure();
 
       //console.log(await SettingsFileImpl.readSettings());
@@ -546,6 +561,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       addressBookModalVisible: false,
       addressBookCurrentAddress: '',
       addressBookOpenPriorModal: () => {},
+      issueReportModalVisible: false,
     });
   };
 
@@ -1050,6 +1066,16 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     this.rpc.fetchWalletSettings();
   };
 
+  set_debugMode_option = async (name: 'debugMode', value: boolean): Promise<void> => {
+    await SettingsFileImpl.writeSettings(name, value);
+    this.setState({
+      debugMode: value as boolean,
+    });
+
+    // Refetch the settings to update
+    this.rpc.fetchWalletSettings();
+  };
+
   navigateToLoadingApp = async (state: any) => {
     const { navigation } = this.props;
 
@@ -1187,6 +1213,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     this.setState({ poolsModalVisible: true });
   };
 
+  issueReportMoreInfoOnClick = async () => {
+    this.setState({ issueReportModalVisible: true });
+  };
+
   setBackgroundError = (title: string, error: string) => {
     this.setState({ backgroundError: { title, error } });
   };
@@ -1232,6 +1262,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       syncReportModalVisible,
       poolsModalVisible,
       insightModalVisible,
+      issueReportModalVisible,
       settingsModalVisible,
       computingModalVisible,
       rescanModalVisible,
@@ -1256,7 +1287,11 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
             <Text>Loading...</Text>
           </View>
         }>
-        <Menu onItemSelected={this.onMenuItemSelected} updateMenuState={this.updateMenuState} />
+        <Menu
+          onItemSelected={this.onMenuItemSelected}
+          updateMenuState={this.updateMenuState}
+          set_debugMode_option={this.set_debugMode_option}
+        />
       </Suspense>
     );
 
@@ -1408,6 +1443,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 set_privacy_option={this.set_privacy_option}
                 set_mode_option={this.set_mode_option}
                 set_security_option={this.set_security_option}
+                set_debugMode_option={this.set_debugMode_option}
               />
             </Suspense>
           </Modal>
@@ -1626,6 +1662,21 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
             </Suspense>
           </Modal>
 
+          <Modal
+            animationType="slide"
+            transparent={false}
+            visible={issueReportModalVisible}
+            onRequestClose={() => this.setState({ issueReportModalVisible: false })}>
+            <Suspense
+              fallback={
+                <View>
+                  <Text>{translate('loading') as string}</Text>
+                </View>
+              }>
+              <IssueReport from={'LoadedApp'} closeModal={() => this.setState({ issueReportModalVisible: false })} />
+            </Suspense>
+          </Modal>
+
           <Snackbars snackbars={snackbars} removeFirstSnackbar={this.removeFirstSnackbar} translate={translate} />
 
           {this.state.mode !== 'basic' ||
@@ -1664,8 +1715,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                       <History
                         doRefresh={this.doRefresh}
                         toggleMenuDrawer={this.toggleMenuDrawer}
-                        syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
-                        poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
                         setZecPrice={this.setZecPrice}
                         setComputingModalVisible={this.setComputingModalVisible}
                         set_privacy_option={this.set_privacy_option}
@@ -1698,8 +1747,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                             clearToAddr={this.clearToAddr}
                             setSendProgress={this.setSendProgress}
                             toggleMenuDrawer={this.toggleMenuDrawer}
-                            syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
-                            poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
                             setZecPrice={this.setZecPrice}
                             setComputingModalVisible={this.setComputingModalVisible}
                             set_privacy_option={this.set_privacy_option}
@@ -1723,7 +1770,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                       <Receive
                         setUaAddress={this.setUaAddress}
                         toggleMenuDrawer={this.toggleMenuDrawer}
-                        syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
                         set_privacy_option={this.set_privacy_option}
                         setUfvkViewModalVisible={this.setUfvkViewModalVisible}
                       />
@@ -1755,7 +1801,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                       <Receive
                         setUaAddress={this.setUaAddress}
                         toggleMenuDrawer={this.toggleMenuDrawer}
-                        syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
                         set_privacy_option={this.set_privacy_option}
                         setUfvkViewModalVisible={this.setUfvkViewModalVisible}
                       />
