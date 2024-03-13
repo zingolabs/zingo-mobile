@@ -1017,6 +1017,7 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
                 "marginLeft": 5,
                 "minHeight": 100,
                 "minWidth": "95%",
+                "textAlignVertical": "top",
               }
             }
             testID="seed.seedinput"

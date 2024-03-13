@@ -199,6 +199,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
                 minHeight: 100,
                 marginHorizontal: 5,
                 backgroundColor: 'transparent',
+                textAlignVertical: 'top',
               }}
               value={ufvkText}
               onChangeText={setUfvkText}

@@ -340,6 +340,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
                   minHeight: 100,
                   marginLeft: 5,
                   backgroundColor: 'transparent',
+                  textAlignVertical: 'top',
                 }}
                 value={seedPhrase}
                 onChangeText={(text: string) => setSeedPhrase(text)}

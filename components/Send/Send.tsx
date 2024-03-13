@@ -1,7 +1,13 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useRef, useCallback, useContext } from 'react';
 import { View, ScrollView, Modal, Keyboard, TextInput, TouchableOpacity, Platform } from 'react-native';
-import { faQrcode, faCheck, faInfoCircle, faAddressCard } from '@fortawesome/free-solid-svg-icons';
+import {
+  faQrcode,
+  faCheck,
+  faInfoCircle,
+  faAddressCard,
+  faMagnifyingGlassPlus,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme, useIsFocused } from '@react-navigation/native';
 import { getNumberFormatSettings } from 'react-native-localize';
@@ -29,6 +35,7 @@ import Header from '../Header';
 import { RPCParseAddressType } from '../../app/rpc/types/RPCParseAddressType';
 import { createAlert } from '../../app/createAlert';
 import AddressItem from '../Components/AddressItem';
+import Memo from '../Memo';
 
 type SendProps = {
   setSendPageState: (sendPageState: SendPageStateClass) => void;
@@ -86,6 +93,8 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [validAmount, setValidAmount] = useState(0); // 1 - OK, 0 - Empty, -1 - KO
   const [sendButtonEnabled, setSendButtonEnabled] = useState(false);
   const [itemsPicker, setItemsPicker] = useState([] as { label: string; value: string }[]);
+  const [memoIcon, setMemoIcon] = useState<boolean>(false);
+  const [memoModalVisible, setMemoModalVisible] = useState(false);
   const isFocused = useIsFocused();
 
   const slideAnim = useRef(new Animated.Value(0)).current;
@@ -487,6 +496,19 @@ const Send: React.FunctionComponent<SendProps> = ({
             mode !== 'basic' &&
             Number(sendPageState.toaddr.amount) === Utils.parseLocaleFloat(getMaxAmount().toFixed(8))
           }
+        />
+      </Modal>
+
+      <Modal
+        animationType="slide"
+        transparent={false}
+        visible={memoModalVisible}
+        onRequestClose={() => setMemoModalVisible(false)}>
+        <Memo
+          closeModal={() => {
+            setMemoModalVisible(false);
+          }}
+          updateToField={updateToField}
         />
       </Modal>
 
@@ -893,6 +915,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         accessibilityLabel={translate('send.memo-acc') as string}
                         style={{
                           flexGrow: 1,
+                          flexDirection: 'row',
                           borderWidth: 1,
                           borderRadius: 5,
                           borderColor: colors.text,
@@ -904,6 +927,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           testID="send.memo-field"
                           multiline
                           style={{
+                            flex: 1,
                             color: colors.text,
                             fontWeight: '600',
                             fontSize: 14,
@@ -911,13 +935,30 @@ const Send: React.FunctionComponent<SendProps> = ({
                             minHeight: 48,
                             marginLeft: 5,
                             backgroundColor: 'transparent',
+                            textAlignVertical: 'top',
                           }}
                           value={ta.memo}
                           onChangeText={(text: string) =>
                             updateToField(null, !ta.amount && !!text ? '0' : null, null, text, null)
                           }
                           editable={true}
+                          onContentSizeChange={(e: any) =>
+                            e.nativeEvent.contentSize.height > 70 ? setMemoIcon(true) : setMemoIcon(false)
+                          }
                         />
+                        {memoIcon && (
+                          <TouchableOpacity
+                            onPress={() => {
+                              setMemoModalVisible(true);
+                            }}>
+                            <FontAwesomeIcon
+                              style={{ margin: 7 }}
+                              size={30}
+                              icon={faMagnifyingGlassPlus}
+                              color={colors.border}
+                            />
+                          </TouchableOpacity>
+                        )}
                       </View>
                     </View>
                   </>

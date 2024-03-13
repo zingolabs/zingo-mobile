@@ -28,6 +28,13 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
     transparent={false}
     visible={false}
   />
+  <Modal
+    animationType="slide"
+    hardwareAccelerated={false}
+    onRequestClose={[Function]}
+    transparent={false}
+    visible={false}
+  />
   <RCTScrollView
     contentContainerStyle={{}}
     keyboardShouldPersistTaps="handled"
@@ -953,6 +960,13 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
     }
   }
 >
+  <Modal
+    animationType="slide"
+    hardwareAccelerated={false}
+    onRequestClose={[Function]}
+    transparent={false}
+    visible={false}
+  />
   <Modal
     animationType="slide"
     hardwareAccelerated={false}
