@@ -63,7 +63,7 @@
   "loadingapp": {
     "actualserver": "Actual server:",
     "changeserver": "Change the Server",
-    "createnewwallet": "Create New Wallet\n(new seed)",
+    "createnewwallet": "Create New Wallet",
     "opencurrentwallet": "Open Current Wallet",
     "restorewalletseed": "Restore wallet\nfrom Seed",
     "restorewalletufvk": "Restore wallet from\nViewing Key",
@@ -136,9 +136,9 @@
   },
   "settings": {
     "memos": [
-      { 
+      {
         "value": "none",
-        "text": "Don't download any memos. Server will not learn what transactions belong to you." 
+        "text": "Don't download any memos. Server will not learn what transactions belong to you."
       },
       {
         "value": "wallet",
@@ -369,7 +369,7 @@
     "includeua": "Include your UA:",
     "confirm-memo": "Memo",
     "duplicate-nullifier-error": "Your funds are still confirming and probably syncing. You can wait until the funds are confirmed or you can try to send now with a lower amount. The Transaction build failed!",
-    "dust-error" : "The amount that you are trying to send to a Transparent address is really tiny. The Transaction build failed!",
+    "dust-error": "The amount that you are trying to send to a Transparent address is really tiny. The Transaction build failed!",
     "needtoshield": "You have funds to shield",
     "needtoupgrade": "You have funds to upgrade",
     "fetchpricetitle": "Fetch USD Price",
@@ -377,7 +377,7 @@
     "fetch-button": "fetch",
     "confirm-privacy-level": "Privacy Level",
     "private": "Private",
-    "amountrevealed" : "Amount Revealed",
+    "amountrevealed": "Amount Revealed",
     "deshielded": "Deshielded"
   },
   "receive": {
@@ -499,7 +499,7 @@
     ]
   },
   "scanner": {
-    "text" : "Scan a Unified Full Viewing Key",
+    "text": "Scan a Unified Full Viewing Key",
     "uri-error": "URI Error:",
     "nozcash-error": "It is not a valid Zcash Address",
     "scanaddress": "Scan a Zcash Address",

@@ -34,7 +34,7 @@
     "add": "Añadir",
     "modify": "Modificar",
     "delete": "Borrar",
-    "empty": "No existe ningún Contacto/Apodo/Etiqueta todavía.",
+    "empty": "Todavía no hay contactos en su libreta de direcciones.",
     "nochanges": "No se han registrado cambios. ",
     "fillboth": "Por favor rellena ambos campos. ",
     "bothexists": "Esta etiqueta y esta dirección ya existen. ",
@@ -42,7 +42,7 @@
     "addressexists": "Esta dirección ya existe. ",
     "select-placeholder": "Elige un Contacto...",
     "delete-title": "Borrar etiqueta",
-    "delete-alert": "¿Realmente quieres borrar este Contacto/Apodo/Etiqueta?",
+    "delete-alert": "¿Realmente quieres borrar este Contacto de su libreta de direcciones?",
     "likely": "Probablemente: ",
     "thiswalletaddress": "La Dirección de este Monedero"
   },
@@ -63,7 +63,7 @@
   "loadingapp": {
     "actualserver": "Servidor Activo:",
     "changeserver": "Cambiar de Servidor",
-    "createnewwallet": "Crear Monedero Nuevo\n(nueva semilla)",
+    "createnewwallet": "Crear Nuevo Monedero",
     "opencurrentwallet": "Abrir Monedero Activo",
     "restorewalletseed": "Restaurar Monedero\ncon la Semilla",
     "restorewalletufvk": "Restaurar Monedero\ncon la Clave de Visualización",

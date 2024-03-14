@@ -63,9 +63,9 @@
   "loadingapp": {
     "actualserver": "Servidor atual:",
     "changeserver": "Alterar o servidor",
-    "createnewwallet": "Frase de Recuperação \n (nova Frase de Recuperação)",
+    "createnewwallet": "Criar uma nova carteira",
     "opencurrentwallet": "Abrir carteira atual",
-    "restorewalletseed": "Restaurar carteira\n usando sua Frase de Recuperação",
+    "restorewalletseed": "Restaurar carteira usando a \nsua Frase de Recuperação",
     "restorewalletufvk": "Restaurar carteira de\n Chave de Visualização",
     "creatingwallet-label": "Erro ao criar a Carteira",
     "readingwallet-label": "Erro ao ler a Carteira",
@@ -78,7 +78,7 @@
     "basicmode": "Mudar para o modo básico",
     "advancedmode": "Mudar para o modo avançado",
     "noopenwallet-message": "Ocorreu um erro enquanto o aplicativo tentava abrir a carteira atual.",
-    "changeserver-basic": "Altere o servidor e\n abra a carteira atual",
+    "changeserver-basic": "Altere o servidor e\nabra a carteira atual",
     "alert-newwallet-title": "CRIAR UM NOVO CARTEIRO",
     "alert-newwallet-body": "Você pode confirmar que você realmente quer criar uma nova carteira e perder o acesso à carteira atual."
   },
@@ -111,7 +111,7 @@
     "of": "de",
     "eta": "ETA",
     "sec": "sec",
-    "wallet-menu": "Histórico",
+    "wallet-menu": "HISTORICO",
     "send-menu": "ENVIAR",
     "uas-menu": "RECEBER",
     "syncing": "Pausando a sincronização para concluir a transação.",
@@ -322,7 +322,7 @@
     "tapcopy-birthday-message": "Aniversário copiado para a área de transferência",
     "birthday-readonly": "Aniversário da Carteira",
     "birthday-no-readonly": "Altura do bloco da primeira transação. (Tudo bem, se você não sabe)\nIntervalo de valores entre ",
-    "change-warning": "Se você alterar para outra carteira, não será possivel ter acesso a essa carteira sem as Frases de recuperação.",
+    "change-warning": "Se você alterar para outra carteira, não será possível ter acesso a essa carteira sem as Frases de recuperação.",
     "backup-warning": "Se você alterar para sua carteira de backup, não será possível ter acesso a essa carteira sem as Frases de recuperação.",
     "server-warning": "Se você alterar para um servidor com uma chain diferente, não terá mais acesso a essa carteira sem as Frases de Recuperação.",
     "mainnet-warning": "Nenhum backup desta carteira, disponível apenas na 'Mainnet'.",
@@ -432,7 +432,7 @@
     "sendtoself": "Enviar-si-mesmo ",
     "time": "Tempo",
     "confirmations": "Confirmações",
-    "txid": "ID de Transação",
+    "txid": "ID da Transação",
     "viewexplorer": "Visualizar no Block Explorer",
     "txcopied": "ID da Transação copiado para a Área de Transferência",
     "address": "Endereço",
@@ -491,11 +491,11 @@
   "about": {
     "copyright": [
       "Copyright (c) 2024, ZingoLabs.",
-      "Built with React Native.",
+      "",
       "The MIT License (MIT) Copyright (c) 2024 Zingo!",
-      "Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the 'Software'), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:",
-      "The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.",
-      "THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE."
+      "",
+      "",
+      ""
     ]
   },
   "scanner": {
@@ -508,13 +508,13 @@
   "ufvk": {
     "buttontexts": {
       "new": [
-        "Eu salvei \n a chave de visualização"
+        "Eu salvei a Chave \n de Visualização"
       ],
       "change": [
         "",
         "Abrir novo",
         "Você realmente deseja \n alterar sua carteira \n atual",
-        "Você tem certeza?"
+        "Tem certeza?"
       ],
       "server": [
         "",
