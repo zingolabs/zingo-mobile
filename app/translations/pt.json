@@ -137,15 +137,15 @@
   "settings": {
     "memos": [
       {
-        "value": "nenhum",
+        "value": "none",
         "text": "Não baixe nenhum MEMO. O servidor não saberá quais transações pertencem a você."
       },
       {
-        "value": "carteira",
+        "value": "wallet",
         "text": "Baixar apenas meus MEMOS. O servidor saberá quais TxIDs pertencem a você, mas não poderá ver os endereços, valores ou MEMOS."
       },
       {
-        "value": "todos",
+        "value": "all",
         "text": "Baixe todos os MEMOS na blockchain. O servidor não coletará quais os IDs de transação pertencem a você. Isso consome MUITA largura de banda."
       }
     ],
@@ -195,11 +195,11 @@
     ],
     "modes": [
       {
-        "value": "básico",
+        "value": "basic",
         "text": "Modo Básico, a maneira mais simples de usar a Zingo."
       },
       {
-        "value": "avançado",
+        "value": "advanced",
         "text": "Modo Avançado, para usuários mais avançados."
       }
     ],
@@ -427,9 +427,9 @@
     "end": "FIM",
     "loadmore": "Carregar Mais",
     "back": " Voltar",
-    "sent": "Enviado",
+    "sent": "Enviado ",
     "received": "Recebido ",
-    "sendtoself": "Enviar para si mesmo",
+    "sendtoself": "Enviar-si-mesmo ",
     "time": "Tempo",
     "confirmations": "Confirmações",
     "txid": "ID de Transação",
