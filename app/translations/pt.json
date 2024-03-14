@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo!",
-  "version": "zingo-1.3.4 (145)",
+  "version": "zingo-1.3.4 (153)",
   "loading": "carregando...",
   "connectingserver": "Conectando-se ao servidor...",
   "wait": "Aguarde um momento...",
@@ -30,7 +30,7 @@
     "new": "Novo",
     "loadmore": "Carregar Mais",
     "label": "Contacto",
-    "label-placeholder": "Nickname/Label/Tag",
+    "label-placeholder": "Apelido/Rótulo/Tag",
     "add": "Adicionar",
     "modify": "Modificar",
     "delete": "Eliminar",
@@ -65,8 +65,8 @@
     "changeserver": "Alterar o servidor",
     "createnewwallet": "Criar uma nova carteira",
     "opencurrentwallet": "Abrir carteira atual",
-    "restorewalletseed": "Restaurar carteira usando a \nsua Frase de Recuperação",
-    "restorewalletufvk": "Restaurar carteira de\n Chave de Visualização",
+    "restorewalletseed": "Restaurar carteira usando a \nsua frase de Recuperação",
+    "restorewalletufvk": "Restaurar carteira de\nChave de Visualização",
     "creatingwallet-label": "Erro ao criar a Carteira",
     "readingwallet-label": "Erro ao ler a Carteira",
     "invalidseed-label": "Frases de Recuperação invalidas",
@@ -98,12 +98,12 @@
     "fundpools": "Fundos na Pool",
     "insight": "Visão Financeira",
     "loadwalletfromseed-basic": "Restaurar carteira (avançado)",
-    "addressbook": "Address Book",
+    "addressbook": "Agenda de Endereços",
     "restoremainnet-error": "Esta opção está disponível apenas para servidores da 'Mainnet'.",
     "changeservernew-error": "Erro ao tentar mudar para um novo o servidor: ",
     "readingwallet-error": "Erro ao tentar ler a carteira com o novo servidor:",
     "changeserverold-error": "Erro ao tentar mudar para o antigo servidor: ",
-    "differentchain-error": "Você está mudando para um servidor com uma rede diferente, não terá mais acesso a esta carteira sem sua Frase de Recuperação.",
+    "differentchain-error": "Você está mudando para um servidor com uma rede diferente, não terá mais acesso a esta carteira sem sua frase de Recuperação.",
     "changingwallet-label": "Erro ao alterar a carteira",
     "restoringwallet-label": "Erro ao restaurar a Carteira",
     "computingtx": "Avaliando a Transação",
@@ -115,13 +115,13 @@
     "send-menu": "ENVIAR",
     "uas-menu": "RECEBER",
     "syncing": "Pausando a sincronização para concluir a transação.",
-    "zcash-url": "Você já tem um endereço na tela de Envio",
+    "zcash-url": "Você já possui um endereço na tela de Envio",
     "connection-error": "Sem conexão com a Internet, a Zingo não consegue funcionar corretamente desta forma.",
     "tryingnewserver": "Tentando conectar-se ao novo servidor... Pode levar alguns segundos.",
     "tryingnewserver-error": "Após 30 segundos o novo servidor não responde.",
     "readingwallet": "Lendo com sucesso a carteira atual com o servidor:",
     "restorewallet-title": "Opção Avançada",
-    "restorewallet-alert": "Confirme que você deseja restaurar uma nova carteira usando suas frases de recuperação."
+    "restorewallet-alert": "Confirme que você deseja restaurar uma nova carteira usando as suas frases de recuperação."
   },
   "rpc": {
     "parsebirthday-error": "Erro: Não foi possível analisar como um número:",
@@ -213,7 +213,7 @@
     "custom": "personalizado",
     "threshold-title": "LIMITE DO FILTRO DAS TRANSAÇÕES",
     "number": "Número...",
-    "memo-title": "Baixar MEMOS",
+    "memo-title": "BAIXAR MEMOS",
     "save": "Salvar",
     "server-acc": "Campo URI do servidor",
     "threshold-acc": "Campo Limite de Filtro das Transações",
@@ -224,7 +224,7 @@
     "language-title": "LINGUAGEM",
     "islanguage": "Você precisa escolher um idioma para salvar.",
     "sendall-title": "O BOTÃO 'Enviar Tudo' (Quantia)",
-    "privacy-title": "Alterar entre Privacidade Alta ou Média",
+    "privacy-title": "Alterar entre Privacidade Alta ou Normal",
     "mode-title": "Alterar entre o modo Básico ou Avançado",
     "value-currency-": "Sem Saldo",
     "value-currency-USD": "US Dólares",
@@ -366,7 +366,7 @@
     "nofetchprice": "Buscar preço em Dólar",
     "sendall": "Enviar Tudo",
     "sendall-message": "Você está prestes a enviar todo os fundos da sua carteira",
-    "includeua": "Inclua seu Endereço Unificado:",
+    "includeua": "Inclua o seu Endereço Unificado:",
     "confirm-memo": "MEMO",
     "duplicate-nullifier-error": "Seus fundos ainda estão sendo confirmados e provavelmente sincronizados. Você pode esperar até que os fundos sejam confirmados ou tentar enviar agora com um valor menor. A compilação da transação falhou!",
     "dust-error": "A quantia que você está tentando enviar para um endereço Transparente é muito pequena. A compilação da transação falhou!",
@@ -440,7 +440,7 @@
     "amount": "Quantia",
     "memo": "MEMO",
     "memocopied": "MEMO copiado para a Área de Transferência",
-    "txfee": "Taxa de Transação",
+    "txfee": "Taxa da Transação",
     "title-acc": "Tela da Carteira",
     "list-acc": "Lista de Transações",
     "pools": "pools...",
@@ -449,9 +449,9 @@
     "minago": "min.",
     "details": "Detalhes da Transação",
     "pool": "Pool",
-    "contactcopied": "Contacto copiado para o Clipboard",
+    "contactcopied": "Contato copiado para a Área de Transparência",
     "address-http": "Zingo não tem ideia de quem lhe enviou este Endereço! Você deve autenticar o Remetente.",
-    "address-https": "Endereço Zingo-Autenticado"
+    "address-https": "Endereço Zingo-Authenticated"
   },
   "report": {
     "title": "Relatório de Sincronização / Rescan",
@@ -491,11 +491,11 @@
   "about": {
     "copyright": [
       "Copyright (c) 2024, ZingoLabs.",
-      "",
-      "The MIT License (MIT) Copyright (c) 2024 Zingo!",
-      "",
-      "",
-      ""
+      "Construído com React Native.",
+      "A licença do MIT (MIT) Copyright (c) 2024 Zingo!",
+      "A permissão é concedida gratuitamente a qualquer pessoa que obtenha uma cópia deste software e dos arquivos de documentação associados (ao 'Software'), para negociar o Software sem restrições, incluindo, sem limitações, direitos de usar, copiar, modificar, mesclar, publicar, distribuir, sublicenciar e/ou vender cópias do Software e permitir que as pessoas a quem o Software seja fornecido o façam, sujeito às seguintes condições:",
+      "O aviso de direitos autorais acima e este aviso de permissão serão incluídos em todas as cópias ou partes substanciais do Software.",
+      "O SOFTWARE É FORNECIDO 'COMO ESTÁ', SEM GARANTIA ALGUMA, SEJA EXPRESSA OU IMPLÍCITA, MAS NÃO SE LIMITANDO ÀS GARANTIAS DE COMERCIALIZAÇÃO, ADEQUAÇÃO A UM DETERMINADO FIM E SEM VIOLAÇÕES. EM HIPÓTESE ALGUMA OS AUTORES OU DETENTORES DE DIREITOS AUTORAIS SERÃO RESPONSÁVEIS POR QUALQUER RECLAMAÇÃO, DANOS OU OUTRAS RESPONSABILIDADES, SEJA EM UMA AÇÃO DE CONTRATO, ATO ILÍCITO OU DE OUTRA FORMA, DECORRENTE A ALGO RELACIONADO A CONEXÃO, A USABILIDADE OU OUTRAS NEGOCIAÇÕES NO SOFTWARE."
     ]
   },
   "scanner": {
@@ -520,7 +520,7 @@
         "",
         "Alterar o Servidor",
         "Você realmente quer \n mudar seu servidor \n atual",
-        "Você tem certeza?"
+        "Tem certeza?"
       ],
       "view": [
         "Eu salvei \na Chave de Visualização"
@@ -532,7 +532,7 @@
         "",
         "Restaurar",
         "Você realmente deseja \n restaurar sua \n carteira de backup",
-        "Você tem certeza?"
+        "Tem certeza?"
       ]
     },
     "privkey": "Disponível/Privado ",
@@ -545,9 +545,9 @@
     "text-readonly-backup": "Antes de restaurar o backup da carteira anterior, anote cuidadosamente esta chave de visualização. É a única maneira de restaurar/acessar sua carteira atual.",
     "text-readonly-change": "Antes de acessar outra carteira, anote cuidadosamente esta chave de visualização. É a única maneira de restaurar/acessar sua carteira atual.",
     "text-readonly-server": "Antes de alterar outro servidor, anote cuidadosamente esta chave de visualização. É a única maneira de restaurar/acessar sua carteira atual.",
-    "change-warning": "Se você mudar para outra carteira, não terá mais acesso a esta carteira sem as Frases de recuperação.",
+    "change-warning": "Se você mudar para outra carteira, não terá mais acesso a esta carteira sem as frases de recuperação.",
     "backup-warning": "Se você mudar para sua carteira de backup, não terá mais acesso a esta carteira sem as Frases de recuperação",
-    "server-warning": "Se você mudar para um servidor com uma rede diferente, não terá mais acesso a esta carteira sem as Frases de recuperação.",
+    "server-warning": "Se você mudar para um servidor com uma rede diferente, não terá mais acesso a esta carteira sem as frases de recuperação.",
     "mainnet-warning": "Nenhum backup desta carteira, disponível apenas na 'MAINNET'."
   },
   "pools": {
