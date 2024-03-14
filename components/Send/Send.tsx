@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useState, useEffect, useRef, useCallback, useContext } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import { View, ScrollView, Modal, Keyboard, TextInput, TouchableOpacity, Platform } from 'react-native';
 import {
   faQrcode,
@@ -94,43 +94,52 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [sendButtonEnabled, setSendButtonEnabled] = useState(false);
   const [itemsPicker, setItemsPicker] = useState([] as { label: string; value: string }[]);
   const [memoIcon, setMemoIcon] = useState<boolean>(false);
-  const [memoModalVisible, setMemoModalVisible] = useState(false);
+  const [memoModalVisible, setMemoModalVisible] = useState<boolean>(false);
+  const [maxAmount, setMaxAmount] = useState<number>(0);
+  const [spendable, setSpendable] = useState<number>(0);
+  const [fee, setFee] = useState<number>(info.defaultFee);
+  const [stillConfirming, setStillConfirming] = useState<boolean>(false);
+  const [showShieldInfo, setShowShieldInfo] = useState<boolean>(false);
+  const [showUpgradeInfo, setShowUpgradeInfo] = useState<boolean>(false);
   const isFocused = useIsFocused();
 
   const slideAnim = useRef(new Animated.Value(0)).current;
-  const defaultFee = info.defaultFee || Utils.getFallbackDefaultFee();
   const { decimalSeparator } = getNumberFormatSettings();
-  // transparent is not spendable.
-  const spendable = totalBalance.spendablePrivate + totalBalance.spendableOrchard;
 
-  const stillConfirming =
-    totalBalance.orchardBal !== totalBalance.spendableOrchard ||
-    totalBalance.privateBal !== totalBalance.spendablePrivate ||
-    someUnconfirmed;
-  const showShieldInfo =
-    totalBalance &&
-    (someUnconfirmed ? 0 : totalBalance.transparentBal) > 0 &&
-    (someUnconfirmed ? 0 : totalBalance.transparentBal) + totalBalance.spendablePrivate > info.defaultFee;
-  const showUpgradeInfo =
-    totalBalance &&
-    (someUnconfirmed ? 0 : totalBalance.transparentBal) === 0 &&
-    totalBalance.spendablePrivate > info.defaultFee;
-
-  const getMaxAmount = useCallback((): number => {
-    let max = spendable - defaultFee;
-    if (max < 0) {
-      return 0;
+  useEffect(() => {
+    const defaultFee = info.defaultFee || Utils.getFallbackDefaultFee();
+    // transparent is not spendable.
+    const spend = totalBalance.spendablePrivate + totalBalance.spendableOrchard;
+    const max = spendable - defaultFee;
+    if (max > 0) {
+      setMaxAmount(max);
     }
-    return max;
-  }, [spendable, defaultFee]);
+    setFee(defaultFee);
+    setSpendable(spend);
 
-  const getSpendable = useCallback((): number => {
-    return spendable;
-  }, [spendable]);
-
-  const getFee = useCallback((): number => {
-    return defaultFee;
-  }, [defaultFee]);
+    const stillConf =
+      totalBalance.orchardBal !== totalBalance.spendableOrchard ||
+      totalBalance.privateBal !== totalBalance.spendablePrivate ||
+      someUnconfirmed;
+    const showShield =
+      totalBalance &&
+      (someUnconfirmed ? 0 : totalBalance.transparentBal) > 0 &&
+      (someUnconfirmed ? 0 : totalBalance.transparentBal) + totalBalance.spendablePrivate > info.defaultFee;
+    const showUpgrade =
+      totalBalance &&
+      (someUnconfirmed ? 0 : totalBalance.transparentBal) === 0 &&
+      totalBalance.spendablePrivate > info.defaultFee;
+    setStillConfirming(stillConf);
+    setShowShieldInfo(showShield);
+    setShowUpgradeInfo(showUpgrade);
+  }, [
+    info.defaultFee,
+    someUnconfirmed,
+    spendable,
+    totalBalance,
+    totalBalance.spendableOrchard,
+    totalBalance.spendablePrivate,
+  ]);
 
   useEffect(() => {
     const getMemoEnabled = async (address: string): Promise<boolean> => {
@@ -225,10 +234,9 @@ const Send: React.FunctionComponent<SendProps> = ({
           setValidAmount(-1);
         } else {
           if (
-            Utils.parseLocaleFloat(Number(getSpendable()).toFixed(8)) >=
-              Utils.parseLocaleFloat(Number(getFee()).toFixed(8)) &&
+            Utils.parseLocaleFloat(Number(spendable).toFixed(8)) >= Utils.parseLocaleFloat(Number(fee).toFixed(8)) &&
             Utils.parseLocaleFloat(Number(to.amount).toFixed(8)) >= 0 &&
-            Utils.parseLocaleFloat(Number(to.amount).toFixed(8)) <= Utils.parseLocaleFloat(getMaxAmount().toFixed(8))
+            Utils.parseLocaleFloat(Number(to.amount).toFixed(8)) <= Utils.parseLocaleFloat(maxAmount.toFixed(8))
           ) {
             setValidAmount(1);
           } else {
@@ -241,9 +249,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     }
   }, [
     decimalSeparator,
-    getMaxAmount,
-    getSpendable,
-    getFee,
     server.chain_name,
     netInfo.isConnected,
     sendPageState.toaddr,
@@ -252,6 +257,9 @@ const Send: React.FunctionComponent<SendProps> = ({
     sendPageState.toaddr.amount,
     translate,
     addLastSnackbar,
+    spendable,
+    fee,
+    maxAmount,
   ]);
 
   useEffect(() => {
@@ -307,6 +315,16 @@ const Send: React.FunctionComponent<SendProps> = ({
     }));
     setItemsPicker(items);
   }, [addressBook]);
+
+  useEffect(() => {
+    (async () => {
+      if (isFocused) {
+        await RPC.rpc_setInterruptSyncAfterBatch('true');
+      } else {
+        await RPC.rpc_setInterruptSyncAfterBatch('false');
+      }
+    })();
+  }, [isFocused]);
 
   const updateToField = async (
     address: string | null,
@@ -454,16 +472,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     });
   };
 
-  useEffect(() => {
-    (async () => {
-      if (isFocused) {
-        await RPC.rpc_setInterruptSyncAfterBatch('true');
-      } else {
-        await RPC.rpc_setInterruptSyncAfterBatch('false');
-      }
-    })();
-  }, [isFocused]);
-
   //console.log('render Send - 4');
 
   const returnPage = (
@@ -496,7 +504,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         visible={confirmModalVisible}
         onRequestClose={() => setConfirmModalVisible(false)}>
         <Confirm
-          defaultFee={defaultFee}
+          defaultFee={fee}
           closeModal={() => {
             setConfirmModalVisible(false);
           }}
@@ -505,8 +513,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           }}
           confirmSend={confirmSend}
           sendAllAmount={
-            mode !== 'basic' &&
-            Number(sendPageState.toaddr.amount) === Utils.parseLocaleFloat(getMaxAmount().toFixed(8))
+            mode !== 'basic' && Number(sendPageState.toaddr.amount) === Utils.parseLocaleFloat(maxAmount.toFixed(8))
           }
         />
       </Modal>
@@ -655,13 +662,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                     {sendAll && mode !== 'basic' && (
                       <TouchableOpacity
                         onPress={() =>
-                          updateToField(
-                            null,
-                            Utils.parseLocaleFloat(getMaxAmount().toFixed(8)).toString(),
-                            null,
-                            null,
-                            null,
-                          )
+                          updateToField(null, Utils.parseLocaleFloat(maxAmount.toFixed(8)).toString(), null, null, null)
                         }>
                         <View
                           style={{
@@ -756,7 +757,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           currencyName={info.currencyName ? info.currencyName : ''}
                           color={stillConfirming ? 'red' : colors.money}
                           size={15}
-                          amtZec={getMaxAmount()}
+                          amtZec={maxAmount}
                           privacy={privacy}
                         />
                       </View>
@@ -881,7 +882,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           <CurrencyAmount
                             style={{ marginTop: 11, fontSize: 12.5 }}
                             price={zecPrice.zecPrice}
-                            amtZec={getMaxAmount()}
+                            amtZec={maxAmount}
                             currency={'USD'}
                             privacy={privacy}
                           />
@@ -955,9 +956,14 @@ const Send: React.FunctionComponent<SendProps> = ({
                             updateToField(null, !ta.amount && !!text ? '0' : null, null, text, null)
                           }
                           editable={true}
-                          onContentSizeChange={(e: any) =>
-                            e.nativeEvent.contentSize.height > 70 ? setMemoIcon(true) : setMemoIcon(false)
-                          }
+                          onContentSizeChange={(e: any) => {
+                            if (e.nativeEvent.contentSize.height > (Platform.OS === 'android' ? 70 : 35) && !memoIcon) {
+                              setMemoIcon(true);
+                            }
+                            if (e.nativeEvent.contentSize.height <= (Platform.OS === 'android' ? 70 : 35) && memoIcon) {
+                              setMemoIcon(false);
+                            }
+                          }}
                         />
                         {memoIcon && (
                           <TouchableOpacity
@@ -995,7 +1001,7 @@ const Send: React.FunctionComponent<SendProps> = ({
               title={
                 validAmount === 1 &&
                 sendPageState.toaddr.amount &&
-                Number(sendPageState.toaddr.amount) === Utils.parseLocaleFloat(getMaxAmount().toFixed(8))
+                Number(sendPageState.toaddr.amount) === Utils.parseLocaleFloat(maxAmount.toFixed(8))
                   ? (translate('send.button-all') as string)
                   : (translate('send.button') as string)
               }
@@ -1005,7 +1011,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                   validAmount === 1 &&
                   sendPageState.toaddr.amount &&
                   mode !== 'basic' &&
-                  Number(sendPageState.toaddr.amount) === Utils.parseLocaleFloat(getMaxAmount().toFixed(8))
+                  Number(sendPageState.toaddr.amount) === Utils.parseLocaleFloat(maxAmount.toFixed(8))
                 ) {
                   addLastSnackbar({ message: `${translate('send.sendall-message') as string}`, type: 'Primary' });
                 }
