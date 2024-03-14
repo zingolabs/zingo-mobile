@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { View, ScrollView, SafeAreaView, TextInput, Dimensions, Keyboard } from 'react-native';
+import { View, ScrollView, SafeAreaView, TextInput, Dimensions, Keyboard, Platform } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import Animated, { EasingNode } from 'react-native-reanimated';
 
@@ -88,7 +88,7 @@ const Memo: React.FunctionComponent<MemoProps> = ({ closeModal, updateToField })
       </Animated.View>
 
       <ScrollView
-        style={{ maxHeight: '80%', minHeight: '80%' }}
+        style={{ maxHeight: Platform.OS === 'android' ? '80%' : '70%', minHeight: Platform.OS === 'android' ? '80%' : '70%' }}
         contentContainerStyle={{
           flexDirection: 'column',
           alignItems: 'stretch',
