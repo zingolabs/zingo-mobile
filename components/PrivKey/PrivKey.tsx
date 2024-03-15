@@ -11,6 +11,9 @@ import Utils from '../../app/utils';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
+import moment from 'moment';
+import 'moment/locale/es';
+import 'moment/locale/pt';
 
 type PrivKeyProps = {
   closeModal: () => void;
@@ -20,8 +23,9 @@ type PrivKeyProps = {
 };
 const PrivKey: React.FunctionComponent<PrivKeyProps> = ({ address, keyType, privKey, closeModal }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, addLastSnackbar } = context;
+  const { translate, addLastSnackbar, language } = context;
   const { colors } = useTheme() as unknown as ThemeType;
+  moment.locale(language);
 
   const keyTypeString = keyType === 0 ? translate('privkey.privkey') : translate('privkey.viewkey');
 

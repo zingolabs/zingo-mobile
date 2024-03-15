@@ -32,6 +32,9 @@ import { Animated } from 'react-native';
 import SnackbarType from '../../app/AppState/types/SnackbarType';
 import FadeText from '../Components/FadeText';
 import simpleBiometrics from '../../app/simpleBiometrics';
+import moment from 'moment';
+import 'moment/locale/es';
+import 'moment/locale/pt';
 
 type HeaderProps = {
   poolsMoreInfoOnClick?: () => void;
@@ -96,6 +99,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     restartApp,
     someUnconfirmed,
     security,
+    language,
   } = context;
 
   let translate: (key: string) => TranslateType, netInfo: NetInfoType, mode: 'basic' | 'advanced';
@@ -116,6 +120,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   }
 
   const { colors } = useTheme() as unknown as ThemeType;
+  moment.locale(language);
+
   const opacityValue = useRef(new Animated.Value(1)).current;
   const [showShieldButton, setShowShieldButton] = useState<boolean>(false);
   const [poolsToShield, setPoolsToShield] = useState<'' | 'all' | 'transparent' | 'sapling'>('');

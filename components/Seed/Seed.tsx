@@ -18,6 +18,9 @@ import Utils from '../../app/utils';
 import { createAlert } from '../../app/createAlert';
 import SnackbarType from '../../app/AppState/types/SnackbarType';
 import SettingsFileImpl from '../Settings/SettingsFileImpl';
+import moment from 'moment';
+import 'moment/locale/es';
+import 'moment/locale/pt';
 
 type TextsType = {
   new: string[];
@@ -45,7 +48,8 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
     privacy: boolean,
     mode: 'basic' | 'advanced',
     setBackgroundError: (title: string, error: string) => void,
-    addLastSnackbar: (snackbar: SnackbarType) => void;
+    addLastSnackbar: (snackbar: SnackbarType) => void,
+    language: 'en' | 'es' | 'pt';
   if (action === 'new' || action === 'restore') {
     wallet = contextLoading.wallet;
     translate = contextLoading.translate;
@@ -56,6 +60,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
     mode = contextLoading.mode;
     setBackgroundError = contextLoading.setBackgroundError;
     addLastSnackbar = contextLoading.addLastSnackbar;
+    language = contextLoading.language;
   } else {
     wallet = contextLoaded.wallet;
     translate = contextLoaded.translate;
@@ -66,9 +71,12 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
     mode = contextLoaded.mode;
     setBackgroundError = contextLoaded.setBackgroundError;
     addLastSnackbar = contextLoaded.addLastSnackbar;
+    language = contextLoaded.language;
   }
 
   const { colors } = useTheme() as unknown as ThemeType;
+  moment.locale(language);
+
   const [seedPhrase, setSeedPhrase] = useState('');
   const [birthdayNumber, setBirthdayNumber] = useState('');
   const [times, setTimes] = useState(0);

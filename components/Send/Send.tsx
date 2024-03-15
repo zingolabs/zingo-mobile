@@ -36,6 +36,9 @@ import { RPCParseAddressType } from '../../app/rpc/types/RPCParseAddressType';
 import { createAlert } from '../../app/createAlert';
 import AddressItem from '../Components/AddressItem';
 import Memo from '../Memo';
+import moment from 'moment';
+import 'moment/locale/es';
+import 'moment/locale/pt';
 
 type SendProps = {
   setSendPageState: (sendPageState: SendPageStateClass) => void;
@@ -83,8 +86,11 @@ const Send: React.FunctionComponent<SendProps> = ({
     mode,
     someUnconfirmed,
     addressBook,
+    language,
   } = context;
   const { colors } = useTheme() as unknown as ThemeType;
+  moment.locale(language);
+
   const [qrcodeModalVisble, setQrcodeModalVisible] = useState(false);
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
   const [titleViewHeight, setTitleViewHeight] = useState(0);

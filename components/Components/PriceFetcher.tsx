@@ -9,6 +9,7 @@ import { ContextAppLoaded } from '../../app/context';
 import moment from 'moment';
 import RPC from '../../app/rpc';
 import RegText from './RegText';
+import { ThemeType } from '../../app/types';
 
 type PriceFetcherProps = {
   setZecPrice?: (p: number, d: number) => void;
@@ -17,10 +18,12 @@ type PriceFetcherProps = {
 
 const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice, textBefore }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, zecPrice, addLastSnackbar, mode } = context;
+  const { translate, zecPrice, addLastSnackbar, mode, language } = context;
+  const { colors } = useTheme() as unknown as ThemeType;
+  moment.locale(language);
+
   const [refreshMinutes, setRefreshMinutes] = useState(0);
   const [loading, setLoading] = useState(false);
-  const { colors } = useTheme();
 
   useEffect(() => {
     const fn = () => {

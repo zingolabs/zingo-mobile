@@ -8,6 +8,9 @@ import Button from '../Components/Button';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
+import moment from 'moment';
+import 'moment/locale/es';
+import 'moment/locale/pt';
 
 type MemoProps = {
   closeModal: () => void;
@@ -21,8 +24,10 @@ type MemoProps = {
 };
 const Memo: React.FunctionComponent<MemoProps> = ({ closeModal, updateToField }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, sendPageState } = context;
+  const { translate, sendPageState, language } = context;
   const { colors } = useTheme() as unknown as ThemeType;
+  moment.locale(language);
+
   const [memo, setMemo] = useState<string>(sendPageState.toaddr.memo);
   const [titleViewHeight, setTitleViewHeight] = useState(0);
 
@@ -88,7 +93,10 @@ const Memo: React.FunctionComponent<MemoProps> = ({ closeModal, updateToField })
       </Animated.View>
 
       <ScrollView
-        style={{ maxHeight: Platform.OS === 'android' ? '80%' : '70%', minHeight: Platform.OS === 'android' ? '80%' : '70%' }}
+        style={{
+          maxHeight: Platform.OS === 'android' ? '80%' : '70%',
+          minHeight: Platform.OS === 'android' ? '80%' : '70%',
+        }}
         contentContainerStyle={{
           flexDirection: 'column',
           alignItems: 'stretch',

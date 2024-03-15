@@ -3,6 +3,7 @@ import React, { useContext, useState, useEffect, useCallback, useMemo } from 're
 import { View, ScrollView, Modal, RefreshControl } from 'react-native';
 import moment from 'moment';
 import 'moment/locale/es';
+import 'moment/locale/pt';
 import { useTheme } from '@react-navigation/native';
 
 import { SendPageStateClass, TransactionType } from '../../app/AppState';
@@ -43,9 +44,9 @@ const History: React.FunctionComponent<HistoryProps> = ({
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, transactions, language, setBackgroundError, addLastSnackbar } = context;
+  const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
-  const { colors } = useTheme() as unknown as ThemeType;
   const [isTxDetailModalShowing, setTxDetailModalShowing] = useState(false);
   const [txDetail, setTxDetail] = useState<TransactionType>({} as TransactionType);
   const [numTx, setNumTx] = useState<number>(50);

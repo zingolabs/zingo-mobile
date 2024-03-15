@@ -16,6 +16,7 @@ import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import moment from 'moment';
 import 'moment/locale/es';
+import 'moment/locale/pt';
 import Header from '../Header';
 import { SecurityType, ServerType } from '../../app/AppState';
 import { isEqual } from 'lodash';
@@ -108,6 +109,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   }
 
   const { colors } = useTheme() as unknown as ThemeType;
+  moment.locale(languageContext);
 
   const [memos, setMemos] = useState(walletSettings.download_memos);
   const [filter, setFilter] = useState(walletSettings.transaction_filter_threshold);
@@ -134,8 +136,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [titleViewHeight, setTitleViewHeight] = useState(0);
 
   const slideAnim = useRef(new Animated.Value(0)).current;
-
-  moment.locale(language);
 
   useEffect(() => {
     setCustomIcon(

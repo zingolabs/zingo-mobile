@@ -8,11 +8,15 @@ import { ThemeType } from '../../types';
 import CircularProgress from '../../../components/Components/CircularProgress';
 import { ContextAppLoaded } from '../../context';
 import Header from '../../../components/Header';
+import moment from 'moment';
+import 'moment/locale/es';
+import 'moment/locale/pt';
 
 const ComputingTxContent: React.FunctionComponent = () => {
   const context = useContext(ContextAppLoaded);
-  const { sendProgress: progress, translate } = context;
+  const { sendProgress: progress, translate, language } = context;
   const { colors } = useTheme() as unknown as ThemeType;
+  moment.locale(language);
 
   return (
     <SafeAreaView

@@ -13,6 +13,9 @@ import FadeText from '../Components/FadeText';
 import RPCModule from '../../app/RPCModule';
 import { WalletType } from '../../app/AppState';
 import { RPCUfvkType } from '../../app/rpc/types/RPCUfvkType';
+import moment from 'moment';
+import 'moment/locale/es';
+import 'moment/locale/pt';
 
 type TextsType = {
   new: string[];
@@ -31,9 +34,11 @@ type ShowUfvkProps = {
 };
 const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCancel, action, set_privacy_option }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, wallet, server, netInfo, mode, addLastSnackbar } = context;
-  const [ufvk, setUfvk] = useState<string>(wallet.ufvk ? wallet.ufvk : '');
+  const { translate, wallet, server, netInfo, mode, addLastSnackbar, language } = context;
   const { colors } = useTheme() as unknown as ThemeType;
+  moment.locale(language);
+
+  const [ufvk, setUfvk] = useState<string>(wallet.ufvk ? wallet.ufvk : '');
   const [times, setTimes] = useState(0);
   const [texts, setTexts] = useState({} as TextsType);
 

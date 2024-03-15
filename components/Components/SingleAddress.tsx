@@ -10,6 +10,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import AddressItem from './AddressItem';
+import moment from 'moment';
+import 'moment/locale/es';
+import 'moment/locale/pt';
 
 type SingleAddressProps = {
   address: string;
@@ -21,8 +24,10 @@ type SingleAddressProps = {
 
 const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, index, total, prev, next }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, privacy, addLastSnackbar } = context;
+  const { translate, privacy, addLastSnackbar, language } = context;
   const { colors } = useTheme() as unknown as ThemeType;
+  moment.locale(language);
+
   const [expandQRAddress, setExpandQRAddress] = useState(false);
 
   useEffect(() => {

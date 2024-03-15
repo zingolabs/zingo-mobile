@@ -15,6 +15,10 @@ import { RPCParseAddressType } from '../../../app/rpc/types/RPCParseAddressType'
 import RPCModule from '../../../app/RPCModule';
 import AddressItem from '../../Components/AddressItem';
 import simpleBiometrics from '../../../app/simpleBiometrics';
+import moment from 'moment';
+import 'moment/locale/es';
+import 'moment/locale/pt';
+import { ThemeType } from '../../../app/types';
 
 type ConfirmProps = {
   defaultFee: number;
@@ -44,8 +48,11 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     addLastSnackbar,
     server,
     security,
+    language,
   } = context;
-  const { colors } = useTheme();
+  const { colors } = useTheme() as unknown as ThemeType;
+  moment.locale(language);
+
   const [privacyLevel, setPrivacyLevel] = useState('-');
 
   const sendingTotal = Number(sendPageState.toaddr.amount) + defaultFee;

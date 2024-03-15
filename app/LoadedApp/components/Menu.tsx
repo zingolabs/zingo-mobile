@@ -9,6 +9,9 @@ import { ContextAppLoaded } from '../../context';
 import RPC from '../../rpc';
 import { ThemeType } from '../../types';
 import simpleBiometrics from '../../simpleBiometrics';
+import moment from 'moment';
+import 'moment/locale/es';
+import 'moment/locale/pt';
 
 type MenuProps = {
   onItemSelected: (item: string) => Promise<void>;
@@ -17,8 +20,9 @@ type MenuProps = {
 
 const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuState }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, readOnly, mode, transactions, addLastSnackbar, security } = context;
+  const { translate, readOnly, mode, transactions, addLastSnackbar, security, language } = context;
   const { colors } = useTheme() as unknown as ThemeType;
+  moment.locale(language);
 
   const dimensions = {
     width: Dimensions.get('screen').width,

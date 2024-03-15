@@ -9,6 +9,7 @@ import DetailLine from '../Components/DetailLine';
 import { ContextAppLoaded } from '../../app/context';
 import moment from 'moment';
 import 'moment/locale/es';
+import 'moment/locale/pt';
 import RPC from '../../app/rpc';
 import Header from '../Header';
 import { NetInfoStateType } from '@react-native-community/netinfo';
@@ -24,11 +25,12 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
   const context = useContext(ContextAppLoaded);
   const { syncingStatus, wallet, translate, background, language, netInfo } = context;
   const { colors } = useTheme() as unknown as ThemeType;
+  moment.locale(language);
+
   const [maxBlocks, setMaxBlocks] = useState(0);
   const [points, setPoints] = useState([] as number[]);
   const [labels, setLabels] = useState([] as string[]);
   const [showBackgroundLegend, setShowBackgroundLegend] = useState(true);
-  moment.locale(language);
 
   useEffect(() => {
     if (syncingStatus.lastBlockServer) {

@@ -15,6 +15,9 @@ import { ContextAppLoading } from '../../app/context';
 import Header from '../Header';
 import RPCModule from '../../app/RPCModule';
 import { RPCParseViewKeyType } from '../../app/rpc/types/RPCParseViewKeyType';
+import moment from 'moment';
+import 'moment/locale/es';
+import 'moment/locale/pt';
 
 type ImportUfvkProps = {
   onClickCancel: () => void;
@@ -22,8 +25,9 @@ type ImportUfvkProps = {
 };
 const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, onClickOK }) => {
   const context = useContext(ContextAppLoading);
-  const { translate, netInfo, info, server, mode, addLastSnackbar } = context;
+  const { translate, netInfo, info, server, mode, addLastSnackbar, language } = context;
   const { colors } = useTheme() as unknown as ThemeType;
+  moment.locale(language);
 
   const [ufvkText, setUfvkText] = useState('');
   const [birthday, setBirthday] = useState('');

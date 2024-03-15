@@ -4,6 +4,7 @@ import { View, ScrollView, TouchableOpacity, SafeAreaView, Linking, Text } from 
 import Clipboard from '@react-native-community/clipboard';
 import moment from 'moment';
 import 'moment/locale/es';
+import 'moment/locale/pt';
 import { useTheme } from '@react-navigation/native';
 
 import {
@@ -48,10 +49,11 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
   const context = useContext(ContextAppLoaded);
   const { info, translate, language, privacy, addLastSnackbar, server, currency, addressBook, addresses } = context;
   const { colors } = useTheme() as unknown as ThemeType;
+  moment.locale(language);
+
   const spendColor =
     tx.confirmations === 0 ? colors.primaryDisabled : tx.type === 'Received' ? colors.primary : colors.text;
   const [expandTxid, setExpandTxid] = useState(false);
-  moment.locale(language);
 
   const handleTxIDClick = (txid?: string) => {
     if (!txid) {

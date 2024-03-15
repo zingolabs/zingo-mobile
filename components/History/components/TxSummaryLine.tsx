@@ -13,6 +13,7 @@ import Utils from '../../../app/utils';
 import { ThemeType } from '../../../app/types';
 import moment from 'moment';
 import 'moment/locale/es';
+import 'moment/locale/pt';
 import { ContextAppLoaded } from '../../../app/context';
 import AddressItem from '../../Components/AddressItem';
 
@@ -33,12 +34,12 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
   const context = useContext(ContextAppLoaded);
   const { translate, language, privacy, info } = context;
   const { colors } = useTheme() as unknown as ThemeType;
+  moment.locale(language);
 
   const amountColor =
     tx.confirmations === 0 ? colors.primaryDisabled : tx.type === 'Received' ? colors.primary : colors.text;
 
   const txIcon = tx.confirmations === 0 ? faRefresh : tx.type === 'Received' ? faArrowDown : faArrowUp;
-  moment.locale(language);
 
   // if no address I'm going to put txid here.
   const displayAddress =

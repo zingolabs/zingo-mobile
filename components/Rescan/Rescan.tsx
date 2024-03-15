@@ -8,6 +8,9 @@ import Button from '../Components/Button';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
+import moment from 'moment';
+import 'moment/locale/es';
+import 'moment/locale/pt';
 
 type RescanProps = {
   closeModal: () => void;
@@ -16,8 +19,9 @@ type RescanProps = {
 
 const Rescan: React.FunctionComponent<RescanProps> = ({ closeModal, doRescan }) => {
   const context = useContext(ContextAppLoaded);
-  const { wallet, translate, netInfo, addLastSnackbar } = context;
+  const { wallet, translate, netInfo, addLastSnackbar, language } = context;
   const { colors } = useTheme() as unknown as ThemeType;
+  moment.locale(language);
 
   const doRescanAndClose = () => {
     if (!netInfo.isConnected) {
