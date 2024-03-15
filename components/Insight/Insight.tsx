@@ -19,6 +19,9 @@ import Header from '../Header';
 import RPCModule from '../../app/RPCModule';
 import AddressItem from '../Components/AddressItem';
 import { SendPageStateClass } from '../../app/AppState';
+import moment from 'moment';
+import 'moment/locale/es';
+import 'moment/locale/pt';
 
 type DataType = {
   svg: {
@@ -89,8 +92,10 @@ const Insight: React.FunctionComponent<InsightProps> = ({
   setSendPageState,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { info, translate, privacy, addLastSnackbar } = context;
+  const { info, translate, privacy, addLastSnackbar, language } = context;
   const { colors } = useTheme() as unknown as ThemeType;
+  moment.locale(language);
+
   const [pieAmounts, setPieAmounts] = useState<DataType[]>([]);
   const [expandAddress, setExpandAddress] = useState<boolean[]>([]);
   const [loading, setLoading] = useState<boolean>(false);

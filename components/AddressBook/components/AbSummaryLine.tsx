@@ -11,6 +11,9 @@ import { AddressBookFileClass, SendPageStateClass, ToAddrClass } from '../../../
 import Utils from '../../../app/utils';
 import { ThemeType } from '../../../app/types';
 import { ContextAppLoaded } from '../../../app/context';
+import moment from 'moment';
+import 'moment/locale/es';
+import 'moment/locale/pt';
 
 type AbSummaryLineProps = {
   index: number;
@@ -33,8 +36,9 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
   doAction,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, navigation, readOnly, mode, totalBalance } = context;
+  const { translate, navigation, readOnly, mode, totalBalance, language } = context;
   const { colors } = useTheme() as unknown as ThemeType;
+  moment.locale(language);
 
   const displayAddress = item.address ? Utils.trimToSmall(item.address, 7) : 'Unknown';
   const displayContact = item.label

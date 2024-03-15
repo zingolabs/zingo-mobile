@@ -3,6 +3,7 @@ import React, { useContext, useState, useEffect, useCallback, useMemo, useRef } 
 import { View, ScrollView, SafeAreaView, Keyboard, Platform } from 'react-native';
 import moment from 'moment';
 import 'moment/locale/es';
+import 'moment/locale/pt';
 import { useTheme, useScrollToTop } from '@react-navigation/native';
 import Animated, { EasingNode } from 'react-native-reanimated';
 
@@ -25,9 +26,9 @@ type AddressBookProps = {
 const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, setAddressBook, setSendPageState }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, language, addressBook, addressBookCurrentAddress, addressBookOpenPriorModal } = context;
+  const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
-  const { colors } = useTheme() as unknown as ThemeType;
   const [numTx, setNumTx] = useState<number>(50);
   const [loadMoreButton, setLoadMoreButton] = useState<boolean>(false);
   const [addressBookSorted, setAddressBookSorted] = useState<AddressBookFileClass[]>([]);

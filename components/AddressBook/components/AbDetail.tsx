@@ -11,6 +11,9 @@ import InputTextAddress from '../../Components/InputTextAddress';
 import { ZcashURITargetClass, parseZcashURI } from '../../../app/uris';
 import Button from '../../Components/Button';
 import FadeText from '../../Components/FadeText';
+import moment from 'moment';
+import 'moment/locale/es';
+import 'moment/locale/pt';
 
 type AbDetailProps = {
   index: number;
@@ -29,8 +32,10 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
   addressBookCurrentAddress,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, server, addLastSnackbar, addressBook } = context;
+  const { translate, server, addLastSnackbar, addressBook, language } = context;
   const { colors } = useTheme() as unknown as ThemeType;
+  moment.locale(language);
+
   const [label, setLabel] = useState<string>(item.label);
   const [address, setAddress] = useState<string>(item.address);
   const [action, setAction] = useState<'Add' | 'Modify' | 'Delete'>(actionProp);

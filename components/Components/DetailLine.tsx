@@ -8,6 +8,9 @@ import FadeText from './FadeText';
 import RegText from './RegText';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
+import moment from 'moment';
+import 'moment/locale/es';
+import 'moment/locale/pt';
 
 type DetailLineProps = {
   label: string;
@@ -19,7 +22,9 @@ type DetailLineProps = {
 const DetailLine: React.FunctionComponent<DetailLineProps> = ({ label, value, children, testID }) => {
   const { colors } = useTheme() as unknown as ThemeType;
   const context = useContext(ContextAppLoaded);
-  const { addLastSnackbar, translate } = context;
+  const { addLastSnackbar, translate, language } = context;
+  moment.locale(language);
+
   return (
     <View style={{ display: 'flex', marginTop: 20 }}>
       <FadeText>{label}</FadeText>

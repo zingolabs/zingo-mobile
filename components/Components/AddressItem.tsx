@@ -10,6 +10,9 @@ import { useTheme } from '@react-navigation/native';
 import { ThemeType } from '../../app/types';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faAddressCard, faArrowUp } from '@fortawesome/free-solid-svg-icons';
+import moment from 'moment';
+import 'moment/locale/es';
+import 'moment/locale/pt';
 
 type AddressItemProps = {
   address: string;
@@ -43,8 +46,11 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
     readOnly,
     mode,
     totalBalance,
+    language,
   } = context;
   const { colors } = useTheme() as unknown as ThemeType;
+  moment.locale(language);
+
   const [expandAddress, setExpandAddress] = useState(false);
   const [expandContact, setExpandContact] = useState(false);
 

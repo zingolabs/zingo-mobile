@@ -16,6 +16,7 @@ import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import moment from 'moment';
 import 'moment/locale/es';
+import 'moment/locale/pt';
 import Header from '../Header';
 import { SecurityType, ServerType } from '../../app/AppState';
 import { isEqual } from 'lodash';
@@ -108,6 +109,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   }
 
   const { colors } = useTheme() as unknown as ThemeType;
+  moment.locale(languageContext);
 
   const [memos, setMemos] = useState(walletSettings.download_memos);
   const [filter, setFilter] = useState(walletSettings.transaction_filter_threshold);
@@ -134,8 +136,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [titleViewHeight, setTitleViewHeight] = useState(0);
 
   const slideAnim = useRef(new Animated.Value(0)).current;
-
-  moment.locale(language);
 
   useEffect(() => {
     setCustomIcon(
@@ -356,7 +356,15 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     label: string,
   ) => {
     return (
-      <View style={{ flexDirection: 'row', marginLeft: 20, marginBottom: 5, maxHeight: 50, minHeight: 48 }}>
+      <View
+        style={{
+          flexDirection: 'row',
+          marginLeft: 20,
+          marginRight: 10,
+          marginBottom: 5,
+          maxHeight: 50,
+          minHeight: 48,
+        }}>
         <CheckBox
           disabled={false}
           value={value}
@@ -367,6 +375,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           onFillColor={colors.primary}
           onTintColor={colors.primary}
           boxType="square"
+          animationDuration={0.1}
           style={{ marginRight: 10, transform: Platform.OS === 'ios' ? [{ scaleX: 0.7 }, { scaleY: 0.7 }] : [] }}
         />
         <RegText style={{ marginTop: Platform.OS === 'ios' ? 5 : 3 }}>{label}</RegText>

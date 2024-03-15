@@ -1552,10 +1552,25 @@ export default class RPC {
 
     //console.log('prev progress id', prevSendId);
 
+    let sendFastError: string = '';
+
     // This is async, so fire and forget
     this.doSend(JSON.stringify(sendJson))
-      .then(r => console.log('End Send OK: ' + r))
-      .catch(e => console.log('End Send ERROR: ' + e))
+      .then(r => {
+        try {
+          const rJson = JSON.parse(r);
+          if (rJson.error) {
+            sendFastError = rJson.error;
+          }
+        } catch (e) {}
+        console.log('End Send OK: ' + r);
+      })
+      .catch(e => {
+        if (e && e.message) {
+          sendFastError = e.message;
+        }
+        console.log('End Send ERROR: ' + e);
+      })
       .finally(() => {
         // sending is over
         this.setInSend(false);
@@ -1627,7 +1642,11 @@ export default class RPC {
         updatedProgress.sendInProgress = progress.sending;
         updatedProgress.etaSeconds = progress.progress === 0 ? '...' : eta;
 
-        if (!progress.txid && !progress.error) {
+        // exists a possible problem:
+        // if the send process is really fast (likely an error) and sendprogress is over
+        // in this moment.
+
+        if (!progress.txid && !progress.error && progress.sending) {
           // Still processing
           setSendProgress(updatedProgress);
           return;
@@ -1646,6 +1665,10 @@ export default class RPC {
 
         if (progress.error) {
           reject(progress.error);
+        }
+
+        if (!progress.sending) {
+          reject(sendFastError);
         }
       }, 2000); // Every 2 seconds
     });

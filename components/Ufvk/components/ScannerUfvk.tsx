@@ -2,6 +2,9 @@ import React, { useContext } from 'react';
 import { ContextAppLoading } from '../../../app/context';
 import { BarCodeReadEvent } from 'react-native-camera';
 import Scanner from '../../Components/Scanner';
+import moment from 'moment';
+import 'moment/locale/es';
+import 'moment/locale/pt';
 
 type ScannerKeyProps = {
   setUfvkText: (k: string) => void;
@@ -9,7 +12,8 @@ type ScannerKeyProps = {
 };
 const ScannerKey: React.FunctionComponent<ScannerKeyProps> = ({ setUfvkText, closeModal }) => {
   const context = useContext(ContextAppLoading);
-  const { translate } = context;
+  const { translate, language } = context;
+  moment.locale(language);
 
   const onRead = async (e: BarCodeReadEvent) => {
     const scandata = e.data.trim();

@@ -5,6 +5,9 @@ import { ContextAppLoaded } from '../../../app/context';
 import { BarCodeReadEvent } from 'react-native-camera';
 import { RPCParseAddressType } from '../../../app/rpc/types/RPCParseAddressType';
 import Scanner from '../../Components/Scanner';
+import moment from 'moment';
+import 'moment/locale/es';
+import 'moment/locale/pt';
 
 type ScannerAddressProps = {
   setAddress: (address: string) => void;
@@ -13,7 +16,9 @@ type ScannerAddressProps = {
 
 const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ setAddress, closeModal }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, netInfo, server, addLastSnackbar } = context;
+  const { translate, netInfo, server, addLastSnackbar, language } = context;
+  moment.locale(language);
+
   const validateAddress = async (scannedAddress: string) => {
     if (!netInfo.isConnected) {
       addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });

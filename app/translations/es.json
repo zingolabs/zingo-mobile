@@ -1,11 +1,11 @@
 {
   "zingo": "Zingo!",
-  "version": "zingo-1.3.5 (153)",
+  "version": "zingo-1.3.5 (155)",
   "loading": "cargando...",
   "connectingserver": "Conectando con el servidor...",
   "wait": "Por favor espere...",
-  "workingonit": "Estamos trabajando en esta funcionalidad",
-  "firstlaunchingmessage-title": "¡Optimizando Zingo!",
+  "workingonit": "Estamos trabajando en esta funcionalidad.",
+  "firstlaunchingmessage-title": "Optimizando Zingo!",
   "firstlaunchingmessage-body": "Esto puede tardar un poco, dependiendo del historial de transacciones. Mantenga la aplicación abierta hasta que finalice el proceso.",
   "firstlaunchingmessage-footer": "Disculpe las molestias.",
   "biometricsfailed-title": "¡Bienvenido!",
@@ -14,13 +14,13 @@
   "biometricsfailed-button": "Desbloquear",
   "biometrics-title": "Autenticación",
   "biometrics-message": "Por favor autenticar",
-  "biometrics-error": "Por seguridad necesitas autenticarte de nuevo para realizar esta accion. Siempre puedes cambiarlo en Parámetros",
+  "biometrics-error": "Por seguridad necesitas autenticarte de nuevo para realizar esta acción. Siempre puedes cambiarlo en Parámetros",
   "close": "Cerrar",
   "cancel": "Cancelar",
-  "save": "Grabar",
+  "save": "Guardar",
   "confirm": "Confirmar",
-  "menudrawer-acc": "Abrir Menu Lateral",
-  "menu-acc": "Abrir Menu",
+  "menudrawer-acc": "Abrir Menú Lateral",
+  "menu-acc": "Abrir Menú",
   "donation": "Gracias por apoyar Zingo!",
   "restarting": "Error conectando con el servidor, la Aplicación se reiniciará en breves segundos.",
   "change-privacy": "Nueva Política de Privacidad: ",
@@ -34,16 +34,17 @@
     "add": "Añadir",
     "modify": "Modificar",
     "delete": "Borrar",
-    "empty": "No existe ningún Contacto/Apodo/Etiqueta todavía.",
-    "nochanges": "No se han registrado cambios.",
+    "empty": "Todavía no hay contactos en su libreta de direcciones.",
+    "nochanges": "No se han registrado cambios. ",
     "fillboth": "Por favor rellena ambos campos. ",
     "bothexists": "Esta etiqueta y esta dirección ya existen. ",
     "labelexists": "Esta etiqueta ya existe. ",
     "addressexists": "Esta dirección ya existe. ",
-    "select-placeholder": "Elije un Contacto...",
+    "select-placeholder": "Elige un Contacto...",
     "delete-title": "Borrar etiqueta",
-    "delete-alert": "Realmente quieres borrar este Contacto/Apodo/Etiqueta ?",
-    "likely": "Probablemente: "
+    "delete-alert": "¿Realmente quieres borrar este Contacto de su libreta de direcciones?",
+    "likely": "Probablemente: ",
+    "thiswalletaddress": "La Dirección de este Monedero"
   },
   "change-privacy-legend": ".\nPulsar para revelar los valores ocultos.",
   "txtcopied": "Texto copiado al Portapapeles",
@@ -51,18 +52,18 @@
     "title": "Visión Financiera",
     "no-data": "No hay datos en tu Monedero que concuerden con el gráfico seleccionado.",
     "sent": "Enviado",
-    "sends": "# envios",
-    "memobytes": "# carácteres",
+    "sends": "# envíos",
+    "memobytes": "# caracteres",
     "sent-text": "Cantidades enviadas",
-    "sends-text": "Numero de envios",
-    "memobytes-text": "Numero de carácteres",
+    "sends-text": "Número de envíos",
+    "memobytes-text": "Número de caracteres",
     "sends-unit": " env.",
     "memobytes-unit": " car."
   },
   "loadingapp": {
     "actualserver": "Servidor Activo:",
     "changeserver": "Cambiar de Servidor",
-    "createnewwallet": "Crear Monedero Nuevo\n(nueva semilla)",
+    "createnewwallet": "Crear Nuevo Monedero",
     "opencurrentwallet": "Abrir Monedero Activo",
     "restorewalletseed": "Restaurar Monedero\ncon la Semilla",
     "restorewalletufvk": "Restaurar Monedero\ncon la Clave de Visualización",
@@ -71,13 +72,15 @@
     "invalidseed-label": "Semilla incorrecta",
     "invalidseed-error": "La semilla proporcionada no es correcta. Revisa cada una de las palabras.",
     "invalidufvk-label": "Clave de Visualización incorrecta",
-    "invalidufvk-error": "La Clave de Visualización proporcionada no es correcta. Revisa la clave y/o escaneala de nuevo.",
+    "invalidufvk-error": "La Clave de Visualización proporcionada no es correcta. Revisa la clave y/o escanéala de nuevo.",
     "custom": "Otro Servidor...",
-    "nointernet-message": "No hay una conexion a internet establecida. Por favor solucione esta incidencia.",
+    "nointernet-message": "No hay una conexión a internet establecida. Por favor solucione esta incidencia.",
     "basicmode": "Cambiar a Modo Básico",
     "advancedmode": "Cambiar a Modo Avanzado",
-    "noopenwallet-message": "Ha ocurrido un error mientras el App estaba intentando abrir el monedero activo.",
-    "changeserver-basic": "Cambiar de Servidor and\nAbrir Monedero Activo"
+    "noopenwallet-message": "Ha ocurrido un error mientras la App estaba intentando abrir el monedero activo.",
+    "changeserver-basic": "Cambiar de Servidor y\nAbrir Monedero Activo",
+    "alert-newwallet-title": "CREAR UN NUEVO MONEDERO",
+    "alert-newwallet-body": "Puedes confirmar que realmente quieres crear un nuevo monedero y perder el acceso al monedero actual."
   },
   "loadedapp": {
     "about": "Sobre Zingo!",
@@ -88,19 +91,19 @@
     "walletseed-basic": "Frase Semilla de Respaldo del Monedero",
     "walletufvk": "Clave de Visualización del Monedero",
     "walletufvk-basic": "Clave de Visualización de Respaldo del Monedero",
-    "rescanwallet": "Re-Escanear el Monedero",
+    "rescanwallet": "Re-Escanear",
     "report": "Informe de Sincronización",
     "changewallet": "Abrir otro Monedero",
-    "restorebackupwallet": "Restaurar la última copia de Seguridad",
+    "restorebackupwallet": "Restaurar Copia de Seguridad",
     "fundpools": "Agrupaciones de Fondos",
     "insight": "Visión Financiera",
-    "loadwalletfromseed-basic": "Restaurar monedero (Avanzado)",
+    "loadwalletfromseed-basic": "Restaurar monedero",
     "addressbook": "Libreta de Direcciones",
     "restoremainnet-error": "Esta opción está solamente disponible para la Red: 'Mainnet'.",
     "changeservernew-error": "Error al intentar cambiar al Servidor nuevo: ",
     "readingwallet-error": "Error al intentar leer el monedero activo usando el Servidor nuevo:",
     "changeserverold-error": "Error al intentar volver a cambiar al Servidor antiguo: ",
-    "differentchain-error": "Estas cambiando a un servidor con diferente tipo de cadena, ya no tendrás acceso a este monedero sin tu frase semilla.",
+    "differentchain-error": "Estás cambiando a un servidor con diferente tipo de cadena, ya no tendrás acceso a este monedero sin tu frase semilla.",
     "changingwallet-label": "Error cambiando de Monedero",
     "restoringwallet-label": "Error restaurando el Monedero",
     "computingtx": "Procesando Transacción",
@@ -112,7 +115,7 @@
     "send-menu": "ENVIAR",
     "uas-menu": "RECIBIR",
     "syncing": "Pausando la Sincronización para poder Completar la Transacción.",
-    "zcash-url": "Tienes ya informada una dirección en la pantalla Enviar.",
+    "zcash-url": "Ya tienes una dirección en la pantalla de envío",
     "connection-error": "No existe conexión a Internet, Zingo así no puede funcionar correctamente.",
     "tryingnewserver": "Intentando conectar con el nuevo Servidor... Puede llevar varios segundos.",
     "tryingnewserver-error": "Después de 30 segundos el nuevo Servidor no responde.",
@@ -133,27 +136,27 @@
   },
   "settings": {
     "memos": [
-      { 
+      {
         "value": "none",
-        "text": "No se baja ningún Memo. El Servidor no aprenderá qué transacciones te pertenecen." 
+        "text": "No se descarga ningún Memo. El Servidor no aprenderá qué transacciones te pertenecen."
       },
       {
         "value": "wallet",
-        "text": "Solamente se bajan tus Memos. El Servidor aprenderá que transacciones te pertenecen, pero no podrá ver las direcciones, ni las cantidades ni los Memos."
+        "text": "Solamente se descargan tus Memos. El Servidor aprenderá que transacciones te pertenecen, pero no podrá ver las direcciones, ni las cantidades ni los Memos."
       },
       {
         "value": "all",
-        "text": "Se bajan absolutamente todos los Memos. El Servidor no aprenderá qué transacciones te pertenecen. Esta opción consume GRAN cantidad de ancho de banda."
+        "text": "Se descargan absolutamente todos los Memos. El Servidor no aprenderá qué transacciones te pertenecen. Esta opción consume GRAN cantidad de ancho de banda."
       }
     ],
     "currencies": [
       {
         "value": "",
-        "text": "No se consulta ningun precio de ninguna moneda, solo ZEC."
+        "text": "No se consulta ningún precio de ninguna moneda, solo ZEC."
       },
       {
         "value": "USD",
-        "text": "Puedes consultar el precio para US Dólares a parte de ZEC."
+        "text": "Puedes consultar el precio para US Dólares aparte de ZEC."
       }
     ],
     "languages": [
@@ -163,23 +166,27 @@
       },
       {
         "value": "es",
-        "text": "Toda la información estará en Español"
+        "text": "Toda la información estará en Español."
+      },
+      {
+        "value": "pt",
+        "text": "Toda la información estará en Portugués."
       }
     ],
     "sendalls": [
       {
         "value": true,
-        "text": "Activa la posibilidad de enviar toda la cantidad del monedero con un boton."
+        "text": "Activa la posibilidad de enviar toda la cantidad del monedero con un botón."
       },
       {
         "value": false,
-        "text": "Desactiva el boton para enviar toda la cantidad porque puede ser un riesgo tenerlo activado."
+        "text": "Desactiva el botón para enviar toda la cantidad porque puede ser un riesgo tenerlo activado."
       }
     ],
     "privacys": [
       {
         "value": true,
-        "text": "Alta Privacidad, toda la informacion sensible esta oculta. Pulsar para revelar los valores ocultos."
+        "text": "Alta Privacidad, toda la información sensible está oculta. Pulsar para revelar los valores ocultos."
       },
       {
         "value": false,
@@ -197,32 +204,33 @@
       }
     ],
     "nochanges": "No se han registrado cambios.",
-    "ismemo": "Necesitas escoger una opción de Memorándum para poder grabar.",
-    "isthreshold": "Necesitas escoger una opción de umbral para poder grabar.",
-    "isserver": "Necesitas escoger un Servidor Activo de la lista o rellenar una URI válida para poder grabar.",
+    "ismemo": "Necesitas escoger una opción de Memos para poder guardar.",
+    "isthreshold": "Necesitas escoger una opción de umbral para poder guardar.",
+    "isserver": "Necesitas escoger un Servidor Activo de la lista o rellenar una URI válida para poder guardar.",
     "isuri": "Necesitas rellenar una URI válida para el Servidor.",
     "title": "Parámetros",
     "server-title": "SERVIDOR",
-    "custom": "Otro",
+    "custom": "Personalizado",
     "threshold-title": "UMBRAL PARA EL FILTRO DE TRANSACCIONES",
     "number": "Número...",
-    "memo-title": "BAJAR MEMORÁNDUMS",
-    "save": "Grabar",
+    "memo-title": "DESCARGAR MEMOS",
+    "save": "Guardar",
     "server-acc": "Campo de la URI del Servidor",
     "threshold-acc": "Campo del Umbral del Filtro de Transacciones",
-    "value-memo-none": "ninguno",
-    "value-memo-wallet": "monedero",
-    "value-memo-all": "todos",
+    "value-memo-none": "Ninguno",
+    "value-memo-wallet": "Monedero",
+    "value-memo-all": "Todos",
     "currency-title": "MONEDA",
     "language-title": "IDIOMA",
-    "islanguage": "Necesitas escoger un Idioma para poder grabar.",
-    "sendall-title": "EL BOTON 'Enviar todo' (Cantidad)",
+    "islanguage": "Necesitas escoger un Idioma para poder guardar.",
+    "sendall-title": "EL BOTON 'Enviar todo'",
     "privacy-title": "Cambiar entre Alta Privacidad o Normal",
     "mode-title": "Cambiar entre Modo Básico o Avanzado",
     "value-currency-": "Sin moneda",
     "value-currency-USD": "US Dólares",
     "value-language-en": "Inglés",
     "value-language-es": "Español",
+    "value-language-pt": "Portugués",
     "value-sendall-true": "Activar",
     "value-sendall-false": "Desactivar",
     "value-privacy-true": "Alta",
@@ -234,16 +242,16 @@
     "value-chain_name-main": "Mainnet",
     "value-chain_name-test": "Testnet",
     "value-chain_name-regtest": "Regtest",
-    "security-title": "APLICAR LA SEGURIDAD DEL DISPOSITIVO A PANTALLAS/OPCIONES",
-    "security-startapp": "Cuando la Aplicación Arranca.",
-    "security-foregroundapp": "Cuando la Aplicación va a Primer Plano.",
-    "security-sendconfirm": "Pantalla para Confirmar Transacción.",
-    "security-seedscreen": "Pantalla para ver la Semilla del Monedero.",
-    "security-ufvkscreen": "Pantalla para ver la Clave de Visualización del Monedero.",
-    "security-rescanscreen": "Pantalla para Re-Escanear el Monedero.",
-    "security-settingsscreen": "Pantalla de Parámetros.",
-    "security-changewalletscreen": "Pantalla para Abrir otro Monedero.",
-    "security-restorewalletbackupscreen": "Pantalla para Restaurar la última copia de Seguridad."
+    "security-title": "USAR LA SEGURIDAD DEL DISPOSITIVO",
+    "security-startapp": "Al inicar la aplicación.",
+    "security-foregroundapp": "Aplicación va a Primer Plano.",
+    "security-sendconfirm": "Confirmar Transacción.",
+    "security-seedscreen": "Ver la Semilla del Monedero.",
+    "security-ufvkscreen": "Ver la Clave de Visualización.",
+    "security-rescanscreen": "Re-Escanear el Monedero.",
+    "security-settingsscreen": "Parámetros.",
+    "security-changewalletscreen": "Abrir otro Monedero.",
+    "security-restorewalletbackupscreen": "Restaurar copia de Seguridad."
   },
   "info": {
     "version": "Versión",
@@ -251,14 +259,14 @@
     "lightwalletd": "Lightwalletd URL",
     "network": "Red",
     "serverblock": "Altura de Bloque del Servidor",
-    "zecprice": "Precio ZEC",
+    "zecprice": "Precio del ZEC",
     "unknown": "Desconocido",
     "title": "Información del Servidor",
     "resolution": "Pantalla",
-    "tablet": "Tableta",
+    "tablet": "Tablet",
     "phone": "Teléfono",
     "errorgemini": "Error extrayendo el precio de Internet.",
-    "errorrpcmodule": "Error Interno extrayendo el precio de Internet.",
+    "errorrpcmodule": "Error Interno extrayendo el precio de Internet",
     "zingolib": "Versión de Zingolib"
   },
   "rescan": {
@@ -269,7 +277,9 @@
   },
   "seed": {
     "buttontexts": {
-      "new": ["Ya he guardado \n la semilla"],
+      "new": [
+        "Ya he guardado \n la semilla"
+      ],
       "change": [
         "",
         "Abrir Nuevo",
@@ -282,8 +292,12 @@
         "Realmente quieres \n cambiar el \n servidor activo",
         "Estás seguro/a?"
       ],
-      "view": ["Ya he guardado \n la semilla"],
-      "restore": ["Restaurar Monedero"],
+      "view": [
+        "Ya he guardado \n la semilla"
+      ],
+      "restore": [
+        "Restaurar Monedero"
+      ],
       "backup": [
         "",
         "Restaurar",
@@ -307,7 +321,7 @@
     "tapcopy-seed-message": "Frase Semilla copiada al Portapapeles",
     "tapcopy-birthday-message": "Cumpleaños copiado al Portapapeles",
     "birthday-readonly": "Cumpleaños del Monedero",
-    "birthday-no-readonly": "Altura de bloque de la primera transacción. (Está bien si no la sabes o no te acuerdas)\nRango de valores entre",
+    "birthday-no-readonly": "Altura de bloque de la primera transacción. (Está bien si no la sabes o no te acuerdas)\nRango de valores entre ",
     "change-warning": "Si cambias a otro monedero, ya no tendrás acceso a este monedero sin la frase semilla.",
     "backup-warning": "Si cambias a tu monedero anterior (copia de seguridad), ya no tendrás acceso a este monedero sin la frase semilla.",
     "server-warning": "Si cambias a un servidor con diferente tipo de cadena, ya no tendrás acceso a este monedero sin la frase semilla.",
@@ -326,14 +340,14 @@
     "title-syncing": "Enviar - Sincronizando",
     "more": "ver más...",
     "toaddress": "A la Dirección",
-    "invalidaddress": "Dirección Incorrecta!",
+    "invalidaddress": "¡Dirección Incorrecta!",
     "addressplaceholder": "Unificada, Z-Sapling o Transparente",
-    "invalidamount": "Cantidad Incorrecta!",
+    "invalidamount": "¡Cantidad Incorrecta!",
     "spendable": "Disponible: ",
     "somefunds": "Algunos fondos todavía se están confirmando o sincronizando",
-    "memo": "Memorándum (Opcional)",
+    "memo": "Memo (Opcional)",
     "button": "Enviar",
-    "button-all": "ENviar Todo",
+    "button-all": "Enviar Todo",
     "clear": "Limpiar",
     "confirm-title": "Confirmar Transacción",
     "sending-title": "Procesando",
@@ -347,15 +361,15 @@
     "scan-acc": "Escanear una Dirección",
     "zec-acc": "Campo de Cantidad en Zcash",
     "usd-acc": "Campo de Cantidad en Dólares",
-    "memo-acc": "Campo del Memorándum",
-    "amountplaceholder": "numero",
+    "memo-acc": "Campo del Memo",
+    "amountplaceholder": "número",
     "nofetchprice": "Buscar precio en USD",
     "sendall": "Enviar Todo",
     "sendall-message": "Estas a punto de enviar toda la cantidad en tu monedero",
     "includeua": "Incluir tu DU:",
-    "confirm-memo": "Memorándum",
-    "duplicate-nullifier-error": "Tus fondos están todavía confirmándose y probablemente sincronizándose. Puedes esperar hasta que tus fondos estén confirmados o puedes intentar enviar una cantidad más pequeña, La creaccion de la Transacción ha fallado!",
-    "dust-error" : "La cantidad que estás intentando enviar a una dirección Transparente is realmente infima, La creacción de la Transacción ha fallado!",
+    "confirm-memo": "Memo",
+    "duplicate-nullifier-error": "Tus fondos están todavía confirmándose y probablemente sincronizándose. Puedes esperar hasta que tus fondos estén confirmados o puedes intentar enviar una cantidad más pequeña, ¡La creación de la Transacción ha fallado!",
+    "dust-error": "La cantidad que estás intentando enviar a una dirección Transparente es realmente ínfima, ¡La creación de la Transacción ha fallado!",
     "needtoshield": "Hay fondos para blindar",
     "needtoupgrade": "Hay fondos para asignar",
     "fetchpricetitle": "Consultar Precio USD",
@@ -363,7 +377,7 @@
     "fetch-button": "consultar",
     "confirm-privacy-level": "Nivel de Privacidad",
     "private": "Privada",
-    "amountrevealed" : "Monto Revelado",
+    "amountrevealed": "Monto Revelado",
     "deshielded": "Desblindada"
   },
   "receive": {
@@ -376,7 +390,7 @@
     "more": "ver más...",
     "newu-option": "Nueva Dirección Unificada Diversificada",
     "privkey-option": "Exportar la Clave para Gastar",
-    "viewkey-option": "Exportar la Clave de Visualizacion Total",
+    "viewkey-option": "Exportar la Clave de Visualización Total",
     "import-option": "Importar una Clave...",
     "title-acc": "Pantalla de Recibir",
     "z-title": "Z-Sapling",
@@ -394,12 +408,12 @@
     "shield-message-all": "Blindados en Tx:",
     "shield-message-transparent": "Blindados en Tx:",
     "shield-message-sapling": "Asignados en Tx:",
-    "shield-error-all": "Error Blindando :",
-    "shield-error-transparent": "Error Blindando :",
-    "shield-error-sapling": "Error Asignando :",
+    "shield-error-all": "Error Blindando:",
+    "shield-error-transparent": "Error Blindando:",
+    "shield-error-sapling": "Error Asignando:",
     "shield-legend-all": "Aumenta tu balance blindado gastable en: ",
     "shield-legend-transparent": "Aumenta tu balance blindado gastable en: ",
-    "shield-legend-sapling": "Migra tus fondos al mas nuevo blindaje: ",
+    "shield-legend-sapling": "Migra tus fondos al más nuevo blindaje: ",
     "shield-title-all": "Blindar Todos los fondos",
     "shield-title-transparent": "Blindar fondos",
     "shield-title-sapling": "Asignar fondos a la última versión",
@@ -424,32 +438,33 @@
     "address": "Dirección",
     "addresscopied": "Dirección copiada al portapapeles",
     "amount": "Cantidad",
-    "memo": "Memorándum",
-    "memocopied": "Memorándum copiado al portapapeles",
+    "memo": "Memo",
+    "memocopied": "Memo copiado al portapapeles",
     "txfee": "Comisión por Transacción",
     "title-acc": "Pantalla del Monedero",
     "list-acc": "Lista de Transacciones",
-    "pools": "grupos...",
+    "pools": "pools...",
     "history": "Histórico",
     "sure": "¿Seguro? ",
     "minago": " min.",
     "details": "Detalles de la Transacción",
-    "pool": "Grupo",
+    "pool": "Pool",
     "contactcopied": "Contacto copiado al portapapeles",
     "address-http": "¡Zingo no tiene idea de quién te envió esta dirección! Depende totalmente de ti autenticar al remitente.",
-    "address-https": "Dirección autenticada por Zingo"  },
+    "address-https": "Dirección autenticada por Zingo"
+  },
   "report": {
     "title": "Informe de Sincronización",
-    "running": "Ejecutando",
-    "finished": "Finalizado",
-    "paused": "Pausado",
+    "running": "El monedero se está sincronizando...",
+    "finished": "El monedero está totalmente sincronizado",
+    "paused": "El monedero está esperando para empezar a sincronizar...",
     "server-title": "SERVIDOR: ",
     "blocks": " Bloques. ",
     "wallet": "Monedero: ",
     "syncedbefore": "Sincronizado antes: ",
     "syncednow": "Sincronizado ahora: ",
     "notyetsynced": "No Sincronizado todavía: ",
-    "batches": "LOTES: ",
+    "batches": "LOTES",
     "processingbatch": "Procesando Lote: ",
     "totalbatches": " de un TOTAL de Lotes: ",
     "blocksperbatch": "Bloques por Lote",
@@ -462,7 +477,7 @@
     "networkstatus": "Estado de la Red (Internet)",
     "nointernet": "Sin conexión a Internet.",
     "cellulardata": "Usando solo Datos del Móvil.",
-    "connectionexpensive": "conexión Costosa/Cara."
+    "connectionexpensive": "Conexión Costosa"
   },
   "import": {
     "title": "Clave de Visualización",
@@ -478,21 +493,23 @@
       "Copyright (c) 2024, ZingoLabs.",
       "Construida con React Native.",
       "La Licencia MIT (MIT) Copyright (c) 2024 Zingo!",
-      "Por la presente se otorga permiso, sin cargo, a cualquier persona que obtenga una copia de este software y los archivos de documentación asociados (el 'Software'), para operar con el Software sin restricciones, incluidos, entre otros, los derechos de uso, copia, modificación, fusión , publicar, distribuir, otorgar sublicencias y/o vender copias del Software, y permitir que las personas a las que se les proporcione el Software lo hagan, sujeto a las siguientes condiciones:",
+      "Por la presente se otorga permiso, sin cargo, a cualquier persona que obtenga una copia de este software y los archivos de documentación asociados (el 'Software'), para operar con el Software sin restricciones, incluidos, entre otros, los derechos de uso, copia, modificación, fusión, publicar, distribuir, otorgar sublicencias y/o vender copias del Software, y permitir que las personas a las que se les proporcione el Software lo hagan, sujeto a las siguientes condiciones:",
       "El aviso de derechos de autor anterior y este aviso de permiso se incluirán en todas las copias o partes sustanciales del Software.",
       "EL SOFTWARE SE PROPORCIONA 'TAL CUAL', SIN GARANTÍA DE NINGÚN TIPO, EXPRESA O IMPLÍCITA, INCLUYENDO, ENTRE OTRAS, LAS GARANTÍAS DE COMERCIABILIDAD, IDONEIDAD PARA UN FIN DETERMINADO Y NO VIOLACIÓN. EN NINGÚN CASO LOS AUTORES O LOS TITULARES DE LOS DERECHOS DE AUTOR SERÁN RESPONSABLES DE CUALQUIER RECLAMACIÓN, DAÑOS U OTRA RESPONSABILIDAD, YA SEA EN UNA ACCIÓN DE CONTRATO, AGRAVIO O DE CUALQUIER OTRO TIPO, QUE SURJA DE, FUERA DE O EN RELACIÓN CON EL SOFTWARE O EL USO U OTROS TRATOS EN EL SOFTWARE."
     ]
   },
   "scanner": {
-    "text" : "Escanea una Clave de Visualización Totalmente Unificada",
+    "text": "Escanea una Clave de Visualización Totalmente Unificada",
     "uri-error": "URI Error:",
     "nozcash-error": "No es una dirección Zcash válida",
     "scanaddress": "Escanea una dirección Zcash",
-    "noviewkey-error": "No es una Clave de Visualización Totalmente Unificada valida"
+    "noviewkey-error": "No es una Clave de Visualización Totalmente Unificada válida"
   },
   "ufvk": {
     "buttontexts": {
-      "new": ["Ya he guardado \n la clave de visualización"],
+      "new": [
+        "Ya he guardado \n la clave de visualización"
+      ],
       "change": [
         "",
         "Abrir Nuevo",
@@ -505,8 +522,12 @@
         "Realmente quieres \n cambiar el \n servidor activo",
         "Estás seguro/a?"
       ],
-      "view": ["Ya he guardado \n la clave de visualización"],
-      "restore": ["Restaurar Monedero"],
+      "view": [
+        "Ya he guardado \n la clave de visualización"
+      ],
+      "restore": [
+        "Restaurar Monedero"
+      ],
       "backup": [
         "",
         "Restaurar",
@@ -515,15 +536,15 @@
       ]
     },
     "privkey": "Gastar/Privada ",
-    "viewkey": "Clave de Visualizacion",
+    "viewkey": "Clave de Visualización ",
     "nokey": "Sin Clave",
     "tapcopy-message": "Clave copiada al portapapeles",
     "title": "Clave",
     "address": "Dirección",
-    "text-readonly": "Antes de cerrar esta ventana, escriba cuidadosamente esta clave de visualizacion. Es la única manera que puedes restaurar/acceder tu monedero actual.",
-    "text-readonly-backup": "Antes de restaurar la copia de seguridad del monedero anterior, escriba cuidadosamente esta clave de visualizacion. Es la única manera que puedes restaurar/acceder tu monedero actual.",
-    "text-readonly-change": "Antes de acceder a otro monedero, escriba cuidadosamente esta clave de visualizacion. Es la única manera que puedes restaurar/acceder tu monedero actual.",
-    "text-readonly-server": "Antes de usar otro servidor, escriba cuidadosamente esta clave de visualizacion. Es la única manera que puedes restaurar/acceder tu monedero actual.",
+    "text-readonly": "Antes de cerrar esta ventana, escriba cuidadosamente esta clave de visualización. Es la única manera que puedes restaurar/acceder tu monedero actual.",
+    "text-readonly-backup": "Antes de restaurar la copia de seguridad del monedero anterior, escriba cuidadosamente esta clave de visualización. Es la única manera que puedes restaurar/acceder tu monedero actual.",
+    "text-readonly-change": "Antes de acceder a otro monedero, escriba cuidadosamente esta clave de visualización. Es la única manera que puedes restaurar/acceder tu monedero actual.",
+    "text-readonly-server": "Antes de usar otro servidor, escriba cuidadosamente esta clave de visualización. Es la única manera que puedes restaurar/acceder tu monedero actual.",
     "change-warning": "Si cambias a otro monedero, ya no tendrás acceso a este monedero sin la frase semilla.",
     "backup-warning": "Si cambias a tu monedero anterior (copia de seguridad), ya no tendrás acceso a este monedero sin la frase semilla.",
     "server-warning": "Si cambias a un servidor con diferente tipo de cadena, ya no tendrás acceso a este monedero sin la frase semilla.",
@@ -541,10 +562,10 @@
     "transparent-balance": "Cantidad Total"
   },
   "uris": {
-    "baduri": "Error: URI erronea.",
-    "notvalid": "no era una dirección válida para zcash (Unificada, Sapling or Transparente)",
+    "baduri": "Error: URI errónea.",
+    "notvalid": "No era una dirección válida para zcash (Unificada, Sapling o Transparente)",
     "notvalidparameter": "no fue entendido como un parámetro válido",
-    "notvalidvalue": "no fue entendido como un valor válido",
+    "notvalidvalue": "No fue entendido como un valor válido",
     "noindex": "Indice desconocido",
     "duplicateparameter": "Parámetro duplicado",
     "base64": "No se pudo interpretar (base64)",

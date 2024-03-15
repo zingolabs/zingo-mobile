@@ -13,6 +13,9 @@ import { RPCParseAddressType } from '../../app/rpc/types/RPCParseAddressType';
 import { ThemeType } from '../../app/types';
 import ErrorText from './ErrorText';
 import RegText from './RegText';
+import moment from 'moment';
+import 'moment/locale/es';
+import 'moment/locale/pt';
 
 type InputTextAddressProps = {
   address: string;
@@ -27,8 +30,10 @@ const InputTextAddress: React.FunctionComponent<InputTextAddressProps> = ({
   disabled,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { netInfo, addLastSnackbar, translate, server } = context;
+  const { netInfo, addLastSnackbar, translate, server, language } = context;
   const { colors } = useTheme() as unknown as ThemeType;
+  moment.locale(language);
+
   const [qrcodeModalVisble, setQrcodeModalVisible] = useState(false);
   const [validAddress, setValidAddress] = useState(0); // 1 - OK, 0 - Empty, -1 - KO
 

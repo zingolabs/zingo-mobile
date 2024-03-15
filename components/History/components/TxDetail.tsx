@@ -4,9 +4,16 @@ import { View, ScrollView, TouchableOpacity, SafeAreaView, Linking, Text } from 
 import Clipboard from '@react-native-community/clipboard';
 import moment from 'moment';
 import 'moment/locale/es';
+import 'moment/locale/pt';
 import { useTheme } from '@react-navigation/native';
 
-import { AddressBookFileClass, SendPageStateClass, TransactionType, TxDetailType } from '../../../app/AppState';
+import {
+  AddressBookFileClass,
+  AddressClass,
+  SendPageStateClass,
+  TransactionType,
+  TxDetailType,
+} from '../../../app/AppState';
 import Utils from '../../../app/utils';
 import RegText from '../../Components/RegText';
 import ZecAmount from '../../Components/ZecAmount';
@@ -40,12 +47,13 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
   setSendPageState,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { info, translate, language, privacy, addLastSnackbar, server, currency, addressBook } = context;
+  const { info, translate, language, privacy, addLastSnackbar, server, currency, addressBook, addresses } = context;
   const { colors } = useTheme() as unknown as ThemeType;
+  moment.locale(language);
+
   const spendColor =
     tx.confirmations === 0 ? colors.primaryDisabled : tx.type === 'Received' ? colors.primary : colors.text;
   const [expandTxid, setExpandTxid] = useState(false);
-  moment.locale(language);
 
   const handleTxIDClick = (txid?: string) => {
     if (!txid) {
@@ -63,11 +71,13 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
   };
 
   const contactFound: (add: string) => boolean = (add: string) => {
-    const contact: string = addressBook
-      .filter((ab: AddressBookFileClass) => ab.address === add)
-      .map((ab: AddressBookFileClass) => ab.label)
-      .join(' ');
-    return !!contact;
+    const contact: AddressBookFileClass[] = addressBook.filter((ab: AddressBookFileClass) => ab.address === add);
+    return contact.length >= 1;
+  };
+
+  const thisWalletAddress: (add: string) => boolean = (add: string) => {
+    const address: AddressClass[] = addresses.filter((a: AddressClass) => a.address === add);
+    return address.length >= 1;
   };
 
   //console.log('tx', tx.txDetails);
@@ -267,11 +277,13 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
                     {!!memoUA && (
                       <TouchableOpacity
                         onPress={() => {
-                          addLastSnackbar({
-                            message: translate('history.address-http') as string,
-                            type: 'Primary',
-                            duration: 'long',
-                          });
+                          if (!thisWalletAddress(memoUA)) {
+                            addLastSnackbar({
+                              message: translate('history.address-http') as string,
+                              type: 'Primary',
+                              duration: 'long',
+                            });
+                          }
                           Clipboard.setString(memoUA);
                           addLastSnackbar({
                             message: translate('history.addresscopied') as string,
@@ -280,17 +292,28 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
                           });
                         }}>
                         <RegText>{'\nReply to:'}</RegText>
-                        <FontAwesomeIcon icon={faTriangleExclamation} color={'red'} size={18} />
-                        <RegText style={{ opacity: 0.4 }}>{memoUA}</RegText>
+                        {!thisWalletAddress(memoUA) && (
+                          <FontAwesomeIcon icon={faTriangleExclamation} color={'red'} size={18} />
+                        )}
+                        <RegText style={{ opacity: thisWalletAddress(memoUA) ? 0.6 : 0.4 }}>{memoUA}</RegText>
                         {contactFound(memoUA) && (
                           <View style={{ flexDirection: 'row' }}>
-                            <RegText style={{ opacity: 0.5 }}>{translate('addressbook.likely') as string}</RegText>
+                            {!thisWalletAddress(memoUA) && (
+                              <RegText style={{ opacity: 0.6 }}>{translate('addressbook.likely') as string}</RegText>
+                            )}
                             <AddressItem
                               address={memoUA}
                               onlyContact={true}
                               closeModal={() => {}}
                               openModal={() => {}}
                             />
+                          </View>
+                        )}
+                        {!contactFound(memoUA) && thisWalletAddress(memoUA) && (
+                          <View style={{ flexDirection: 'row' }}>
+                            <RegText color={colors.primaryDisabled}>
+                              {translate('addressbook.thiswalletaddress') as string}
+                            </RegText>
                           </View>
                         )}
                       </TouchableOpacity>

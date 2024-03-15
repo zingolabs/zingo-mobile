@@ -1,7 +1,13 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useState, useEffect, useRef, useCallback, useContext } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import { View, ScrollView, Modal, Keyboard, TextInput, TouchableOpacity, Platform } from 'react-native';
-import { faQrcode, faCheck, faInfoCircle, faAddressCard } from '@fortawesome/free-solid-svg-icons';
+import {
+  faQrcode,
+  faCheck,
+  faInfoCircle,
+  faAddressCard,
+  faMagnifyingGlassPlus,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme, useIsFocused } from '@react-navigation/native';
 import { getNumberFormatSettings } from 'react-native-localize';
@@ -29,6 +35,10 @@ import Header from '../Header';
 import { RPCParseAddressType } from '../../app/rpc/types/RPCParseAddressType';
 import { createAlert } from '../../app/createAlert';
 import AddressItem from '../Components/AddressItem';
+import Memo from '../Memo';
+import moment from 'moment';
+import 'moment/locale/es';
+import 'moment/locale/pt';
 
 type SendProps = {
   setSendPageState: (sendPageState: SendPageStateClass) => void;
@@ -76,8 +86,11 @@ const Send: React.FunctionComponent<SendProps> = ({
     mode,
     someUnconfirmed,
     addressBook,
+    language,
   } = context;
   const { colors } = useTheme() as unknown as ThemeType;
+  moment.locale(language);
+
   const [qrcodeModalVisble, setQrcodeModalVisible] = useState(false);
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
   const [titleViewHeight, setTitleViewHeight] = useState(0);
@@ -86,34 +99,53 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [validAmount, setValidAmount] = useState(0); // 1 - OK, 0 - Empty, -1 - KO
   const [sendButtonEnabled, setSendButtonEnabled] = useState(false);
   const [itemsPicker, setItemsPicker] = useState([] as { label: string; value: string }[]);
+  const [memoIcon, setMemoIcon] = useState<boolean>(false);
+  const [memoModalVisible, setMemoModalVisible] = useState<boolean>(false);
+  const [maxAmount, setMaxAmount] = useState<number>(0);
+  const [spendable, setSpendable] = useState<number>(0);
+  const [fee, setFee] = useState<number>(info.defaultFee);
+  const [stillConfirming, setStillConfirming] = useState<boolean>(false);
+  const [showShieldInfo, setShowShieldInfo] = useState<boolean>(false);
+  const [showUpgradeInfo, setShowUpgradeInfo] = useState<boolean>(false);
   const isFocused = useIsFocused();
 
   const slideAnim = useRef(new Animated.Value(0)).current;
-  const defaultFee = info.defaultFee || Utils.getFallbackDefaultFee();
   const { decimalSeparator } = getNumberFormatSettings();
-  // transparent is not spendable.
-  const spendable = totalBalance.spendablePrivate + totalBalance.spendableOrchard;
 
-  const stillConfirming =
-    totalBalance.orchardBal !== totalBalance.spendableOrchard ||
-    totalBalance.privateBal !== totalBalance.spendablePrivate ||
-    someUnconfirmed;
-  const showShieldInfo =
-    totalBalance &&
-    (someUnconfirmed ? 0 : totalBalance.transparentBal) > 0 &&
-    (someUnconfirmed ? 0 : totalBalance.transparentBal) + totalBalance.spendablePrivate > info.defaultFee;
-  const showUpgradeInfo =
-    totalBalance &&
-    (someUnconfirmed ? 0 : totalBalance.transparentBal) === 0 &&
-    totalBalance.spendablePrivate > info.defaultFee;
-
-  const getMaxAmount = useCallback((): number => {
-    let max = spendable - defaultFee;
-    if (max < 0) {
-      return 0;
+  useEffect(() => {
+    const defaultFee = info.defaultFee || Utils.getFallbackDefaultFee();
+    // transparent is not spendable.
+    const spend = totalBalance.spendablePrivate + totalBalance.spendableOrchard;
+    const max = spendable - defaultFee;
+    if (max > 0) {
+      setMaxAmount(max);
     }
-    return max;
-  }, [spendable, defaultFee]);
+    setFee(defaultFee);
+    setSpendable(spend);
+
+    const stillConf =
+      totalBalance.orchardBal !== totalBalance.spendableOrchard ||
+      totalBalance.privateBal !== totalBalance.spendablePrivate ||
+      someUnconfirmed;
+    const showShield =
+      totalBalance &&
+      (someUnconfirmed ? 0 : totalBalance.transparentBal) > 0 &&
+      (someUnconfirmed ? 0 : totalBalance.transparentBal) + totalBalance.spendablePrivate > info.defaultFee;
+    const showUpgrade =
+      totalBalance &&
+      (someUnconfirmed ? 0 : totalBalance.transparentBal) === 0 &&
+      totalBalance.spendablePrivate > info.defaultFee;
+    setStillConfirming(stillConf);
+    setShowShieldInfo(showShield);
+    setShowUpgradeInfo(showUpgrade);
+  }, [
+    info.defaultFee,
+    someUnconfirmed,
+    spendable,
+    totalBalance,
+    totalBalance.spendableOrchard,
+    totalBalance.spendablePrivate,
+  ]);
 
   useEffect(() => {
     const getMemoEnabled = async (address: string): Promise<boolean> => {
@@ -208,8 +240,9 @@ const Send: React.FunctionComponent<SendProps> = ({
           setValidAmount(-1);
         } else {
           if (
+            Utils.parseLocaleFloat(Number(spendable).toFixed(8)) >= Utils.parseLocaleFloat(Number(fee).toFixed(8)) &&
             Utils.parseLocaleFloat(Number(to.amount).toFixed(8)) >= 0 &&
-            Utils.parseLocaleFloat(Number(to.amount).toFixed(8)) <= Utils.parseLocaleFloat(getMaxAmount().toFixed(8))
+            Utils.parseLocaleFloat(Number(to.amount).toFixed(8)) <= Utils.parseLocaleFloat(maxAmount.toFixed(8))
           ) {
             setValidAmount(1);
           } else {
@@ -222,7 +255,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     }
   }, [
     decimalSeparator,
-    getMaxAmount,
     server.chain_name,
     netInfo.isConnected,
     sendPageState.toaddr,
@@ -231,6 +263,9 @@ const Send: React.FunctionComponent<SendProps> = ({
     sendPageState.toaddr.amount,
     translate,
     addLastSnackbar,
+    spendable,
+    fee,
+    maxAmount,
   ]);
 
   useEffect(() => {
@@ -286,6 +321,16 @@ const Send: React.FunctionComponent<SendProps> = ({
     }));
     setItemsPicker(items);
   }, [addressBook]);
+
+  useEffect(() => {
+    (async () => {
+      if (isFocused) {
+        await RPC.rpc_setInterruptSyncAfterBatch('true');
+      } else {
+        await RPC.rpc_setInterruptSyncAfterBatch('false');
+      }
+    })();
+  }, [isFocused]);
 
   const updateToField = async (
     address: string | null,
@@ -433,16 +478,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     });
   };
 
-  useEffect(() => {
-    (async () => {
-      if (isFocused) {
-        await RPC.rpc_setInterruptSyncAfterBatch('true');
-      } else {
-        await RPC.rpc_setInterruptSyncAfterBatch('false');
-      }
-    })();
-  }, [isFocused]);
-
   //console.log('render Send - 4');
 
   const returnPage = (
@@ -475,7 +510,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         visible={confirmModalVisible}
         onRequestClose={() => setConfirmModalVisible(false)}>
         <Confirm
-          defaultFee={defaultFee}
+          defaultFee={fee}
           closeModal={() => {
             setConfirmModalVisible(false);
           }}
@@ -484,9 +519,21 @@ const Send: React.FunctionComponent<SendProps> = ({
           }}
           confirmSend={confirmSend}
           sendAllAmount={
-            mode !== 'basic' &&
-            Number(sendPageState.toaddr.amount) === Utils.parseLocaleFloat(getMaxAmount().toFixed(8))
+            mode !== 'basic' && Number(sendPageState.toaddr.amount) === Utils.parseLocaleFloat(maxAmount.toFixed(8))
           }
+        />
+      </Modal>
+
+      <Modal
+        animationType="slide"
+        transparent={false}
+        visible={memoModalVisible}
+        onRequestClose={() => setMemoModalVisible(false)}>
+        <Memo
+          closeModal={() => {
+            setMemoModalVisible(false);
+          }}
+          updateToField={updateToField}
         />
       </Modal>
 
@@ -575,6 +622,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       }}>
                       {itemsPicker.length > 0 && (
                         <RNPickerSelect
+                          fixAndroidTouchableBug={true}
                           value={ta.to}
                           items={itemsPicker}
                           placeholder={{ label: translate('addressbook.select-placeholder') as string, value: '' }}
@@ -620,13 +668,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                     {sendAll && mode !== 'basic' && (
                       <TouchableOpacity
                         onPress={() =>
-                          updateToField(
-                            null,
-                            Utils.parseLocaleFloat(getMaxAmount().toFixed(8)).toString(),
-                            null,
-                            null,
-                            null,
-                          )
+                          updateToField(null, Utils.parseLocaleFloat(maxAmount.toFixed(8)).toString(), null, null, null)
                         }>
                         <View
                           style={{
@@ -721,7 +763,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           currencyName={info.currencyName ? info.currencyName : ''}
                           color={stillConfirming ? 'red' : colors.money}
                           size={15}
-                          amtZec={getMaxAmount()}
+                          amtZec={maxAmount}
                           privacy={privacy}
                         />
                       </View>
@@ -846,7 +888,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           <CurrencyAmount
                             style={{ marginTop: 11, fontSize: 12.5 }}
                             price={zecPrice.zecPrice}
-                            amtZec={getMaxAmount()}
+                            amtZec={maxAmount}
                             currency={'USD'}
                             privacy={privacy}
                           />
@@ -893,6 +935,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         accessibilityLabel={translate('send.memo-acc') as string}
                         style={{
                           flexGrow: 1,
+                          flexDirection: 'row',
                           borderWidth: 1,
                           borderRadius: 5,
                           borderColor: colors.text,
@@ -904,6 +947,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           testID="send.memo-field"
                           multiline
                           style={{
+                            flex: 1,
                             color: colors.text,
                             fontWeight: '600',
                             fontSize: 14,
@@ -911,13 +955,35 @@ const Send: React.FunctionComponent<SendProps> = ({
                             minHeight: 48,
                             marginLeft: 5,
                             backgroundColor: 'transparent',
+                            textAlignVertical: 'top',
                           }}
                           value={ta.memo}
                           onChangeText={(text: string) =>
                             updateToField(null, !ta.amount && !!text ? '0' : null, null, text, null)
                           }
                           editable={true}
+                          onContentSizeChange={(e: any) => {
+                            if (e.nativeEvent.contentSize.height > (Platform.OS === 'android' ? 70 : 35) && !memoIcon) {
+                              setMemoIcon(true);
+                            }
+                            if (e.nativeEvent.contentSize.height <= (Platform.OS === 'android' ? 70 : 35) && memoIcon) {
+                              setMemoIcon(false);
+                            }
+                          }}
                         />
+                        {memoIcon && (
+                          <TouchableOpacity
+                            onPress={() => {
+                              setMemoModalVisible(true);
+                            }}>
+                            <FontAwesomeIcon
+                              style={{ margin: 7 }}
+                              size={30}
+                              icon={faMagnifyingGlassPlus}
+                              color={colors.border}
+                            />
+                          </TouchableOpacity>
+                        )}
                       </View>
                     </View>
                   </>
@@ -941,7 +1007,7 @@ const Send: React.FunctionComponent<SendProps> = ({
               title={
                 validAmount === 1 &&
                 sendPageState.toaddr.amount &&
-                Number(sendPageState.toaddr.amount) === Utils.parseLocaleFloat(getMaxAmount().toFixed(8))
+                Number(sendPageState.toaddr.amount) === Utils.parseLocaleFloat(maxAmount.toFixed(8))
                   ? (translate('send.button-all') as string)
                   : (translate('send.button') as string)
               }
@@ -951,7 +1017,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                   validAmount === 1 &&
                   sendPageState.toaddr.amount &&
                   mode !== 'basic' &&
-                  Number(sendPageState.toaddr.amount) === Utils.parseLocaleFloat(getMaxAmount().toFixed(8))
+                  Number(sendPageState.toaddr.amount) === Utils.parseLocaleFloat(maxAmount.toFixed(8))
                 ) {
                   addLastSnackbar({ message: `${translate('send.sendall-message') as string}`, type: 'Primary' });
                 }

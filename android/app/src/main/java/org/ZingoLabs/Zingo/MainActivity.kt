@@ -1,10 +1,7 @@
 package org.ZingoLabs.Zingo
 
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import androidx.annotation.RequiresApi
-import androidx.work.*
 import com.facebook.react.ReactActivity
 
 
@@ -14,7 +11,7 @@ class MainActivity : ReactActivity() {
      * rendering of the component.
      */
 
-    private var isStarting = true;
+    private var isStarting = true
     override fun getMainComponentName(): String {
         return "Zingo!"
     }
@@ -23,14 +20,17 @@ class MainActivity : ReactActivity() {
         super.onCreate(null)
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
+
     override fun onPause() {
         Log.i("ON_PAUSE", "Pausing main activity - Background")
-        BSCompanion.scheduleBackgroundTask()
+        // oreo 8.0 (SDK 26)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            BSCompanion.scheduleBackgroundTask()
+        }
         super.onPause()
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
+
     override fun onResume() {
         Log.i("ON_RESUME", "Resuming main activity - Foreground")
         // cancel the task if it is in execution now
@@ -38,7 +38,10 @@ class MainActivity : ReactActivity() {
             // this is the time the App is launching.
             isStarting = false
         } else {
-            BSCompanion.cancelExecutingTask()
+            // oreo 8.0 (SDK 26)
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                BSCompanion.cancelExecutingTask()
+            }
         }
         super.onResume()
     }

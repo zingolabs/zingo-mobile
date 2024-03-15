@@ -9,14 +9,18 @@ import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
 import DetailLine from '../Components/DetailLine';
+import moment from 'moment';
+import 'moment/locale/es';
+import 'moment/locale/pt';
 
 type AboutProps = {
   closeModal: () => void;
 };
 const About: React.FunctionComponent<AboutProps> = ({ closeModal }) => {
   const context = useContext(ContextAppLoaded);
-  const { info, translate } = context;
+  const { info, translate, language } = context;
   const { colors } = useTheme() as unknown as ThemeType;
+  moment.locale(language);
 
   const arrayTxtObject = translate('about.copyright');
   let arrayTxt: string[] = [];

@@ -11,6 +11,9 @@ import PriceFetcher from '../Components/PriceFetcher';
 import Header from '../Header';
 import CurrencyAmount from '../Components/CurrencyAmount';
 import RegText from '../Components/RegText';
+import moment from 'moment';
+import 'moment/locale/es';
+import 'moment/locale/pt';
 
 type InfoProps = {
   closeModal: () => void;
@@ -19,8 +22,9 @@ type InfoProps = {
 
 const Info: React.FunctionComponent<InfoProps> = ({ closeModal, setZecPrice }) => {
   const context = useContext(ContextAppLoaded);
-  const { info, translate, currency, zecPrice, privacy } = context;
+  const { info, translate, currency, zecPrice, privacy, language } = context;
   const { colors } = useTheme() as unknown as ThemeType;
+  moment.locale(language);
 
   return (
     <SafeAreaView

@@ -14,6 +14,9 @@ import Header from '../Header';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import FadeText from '../Components/FadeText';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
+import moment from 'moment';
+import 'moment/locale/es';
+import 'moment/locale/pt';
 
 type PoolsProps = {
   closeModal: () => void;
@@ -22,8 +25,9 @@ type PoolsProps = {
 
 const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, set_privacy_option }) => {
   const context = useContext(ContextAppLoaded);
-  const { totalBalance, info, translate, privacy, addLastSnackbar, someUnconfirmed } = context;
+  const { totalBalance, info, translate, privacy, addLastSnackbar, someUnconfirmed, language } = context;
   const { colors } = useTheme() as unknown as ThemeType;
+  moment.locale(language);
 
   useEffect(() => {
     (async () => await RPC.rpc_setInterruptSyncAfterBatch('false'))();

@@ -10,6 +10,9 @@ import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
 import RegText from '../Components/RegText';
 import { Scene } from 'react-native-tab-view/lib/typescript/src/types';
+import moment from 'moment';
+import 'moment/locale/es';
+import 'moment/locale/pt';
 
 type ReceiveProps = {
   setUaAddress: (uaAddress: string) => void;
@@ -27,8 +30,10 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   setUfvkViewModalVisible,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, addresses, uaAddress, mode, addLastSnackbar } = context;
+  const { translate, addresses, uaAddress, mode, addLastSnackbar, language } = context;
   const { colors } = useTheme() as unknown as ThemeType;
+  moment.locale(language);
+
   const [index, setIndex] = useState(0);
   const [routes, setRoutes] = useState<{ key: string; title: string }[]>([]);
 
