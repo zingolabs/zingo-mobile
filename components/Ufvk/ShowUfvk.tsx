@@ -82,6 +82,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
     setTimes(action === 'change' || action === 'backup' || action === 'server' ? 1 : 0);
   }, [action, translate]);
 
+  // because this screen is fired from more places than the menu.
   useEffect(() => {
     (async () => await RPC.rpc_setInterruptSyncAfterBatch('false'))();
   }, []);

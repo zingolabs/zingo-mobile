@@ -86,6 +86,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
     }
   }, [syncingStatus.lastBlockServer]);
 
+  // because this screen is fired from more places than the menu.
   useEffect(() => {
     (async () => await RPC.rpc_setInterruptSyncAfterBatch('false'))();
     setTimeout(() => setShowBackgroundLegend(false), 10000); // 10 seconds only

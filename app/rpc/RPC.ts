@@ -1668,11 +1668,18 @@ export default class RPC {
         if (progress.txid) {
           // And refresh data (full refresh)
           this.refresh(true);
-
+          // send process is about to finish - reactivate the syncing flag
+          if (progress.sync_interrupt) {
+            await RPC.rpc_setInterruptSyncAfterBatch('false');
+          }
           resolve(progress.txid);
         }
 
         if (progress.error) {
+          // send process is about to finish - reactivate the syncing flag
+          if (progress.sync_interrupt) {
+            await RPC.rpc_setInterruptSyncAfterBatch('false');
+          }
           reject(progress.error);
         }
 
@@ -1684,6 +1691,10 @@ export default class RPC {
         }
 
         if (sendError) {
+          // send process is about to finish - reactivate the syncing flag
+          if (progress.sync_interrupt) {
+            await RPC.rpc_setInterruptSyncAfterBatch('false');
+          }
           reject(sendError);
         }
       }, 2000); // Every 2 seconds

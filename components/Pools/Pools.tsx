@@ -29,6 +29,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, set_privacy_op
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
+  // because this screen is fired from more places than the menu.
   useEffect(() => {
     (async () => await RPC.rpc_setInterruptSyncAfterBatch('false'))();
   }, []);

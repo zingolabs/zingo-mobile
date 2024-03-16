@@ -193,6 +193,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
     translate,
   ]);
 
+  // because this screen is fired from more places than the menu.
   useEffect(() => {
     if (action !== 'new' && action !== 'restore') {
       (async () => await RPC.rpc_setInterruptSyncAfterBatch('false'))();

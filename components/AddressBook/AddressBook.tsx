@@ -16,6 +16,7 @@ import AbSummaryLine from './components/AbSummaryLine';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
 import AddressBookFileImpl from './AddressBookFileImpl';
+import RPC from '../../app/rpc';
 
 type AddressBookProps = {
   closeModal: () => void;
@@ -55,6 +56,11 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
       }
     });
   }, [addressBook, numTx]);
+
+  // because this screen is fired from more places than the menu.
+  useEffect(() => {
+    (async () => await RPC.rpc_setInterruptSyncAfterBatch('false'))();
+  }, []);
 
   useEffect(() => {
     (async () => {

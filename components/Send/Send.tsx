@@ -412,7 +412,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
       return;
     }
-    // very first interrupt syncing Just in case...
+    // first interrupt syncing Just in case...
     await RPC.rpc_setInterruptSyncAfterBatch('true');
     // First, close the confirm modal and show the "computing" modal
     setConfirmModalVisible(false);

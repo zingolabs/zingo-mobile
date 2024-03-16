@@ -19,6 +19,7 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import { ThemeType } from '../../../app/types';
+import RPC from '../../../app/rpc';
 
 type ConfirmProps = {
   defaultFee: number;
@@ -198,6 +199,11 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
       setPrivacyLevel(await getPrivacyLevel());
     })();
   }, [getPrivacyLevel]);
+
+  // the App is about to send - activate the interrupt syncing flag
+  useEffect(() => {
+    (async () => await RPC.rpc_setInterruptSyncAfterBatch('true'))();
+  }, []);
 
   //console.log(sendPageState, price, defaultFee);
 
