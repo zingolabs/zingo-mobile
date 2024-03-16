@@ -29,7 +29,7 @@ const Memo: React.FunctionComponent<MemoProps> = ({ closeModal, updateToField })
   moment.locale(language);
 
   const [memo, setMemo] = useState<string>(sendPageState.toaddr.memo);
-  const [titleViewHeight, setTitleViewHeight] = useState(0);
+  const [titleViewHeight, setTitleViewHeight] = useState<number>(0);
 
   const slideAnim = useRef(new Animated.Value(0)).current;
 

@@ -34,7 +34,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
   const [addressBookSorted, setAddressBookSorted] = useState<AddressBookFileClass[]>([]);
 
   const [currentItem, setCurrentItem] = useState<number | null>(null);
-  const [titleViewHeight, setTitleViewHeight] = useState(0);
+  const [titleViewHeight, setTitleViewHeight] = useState<number>(0);
   const [action, setAction] = useState<'Add' | 'Modify' | 'Delete' | null>(null);
 
   const slideAnim = useRef(new Animated.Value(0)).current;

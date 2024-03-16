@@ -34,8 +34,8 @@ const InputTextAddress: React.FunctionComponent<InputTextAddressProps> = ({
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
-  const [qrcodeModalVisble, setQrcodeModalVisible] = useState(false);
-  const [validAddress, setValidAddress] = useState(0); // 1 - OK, 0 - Empty, -1 - KO
+  const [qrcodeModalVisble, setQrcodeModalVisible] = useState<boolean>(false);
+  const [validAddress, setValidAddress] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
 
   useEffect(() => {
     const parseAdressJSON = async (addr: string): Promise<boolean> => {

@@ -77,16 +77,16 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
-  const [seedPhrase, setSeedPhrase] = useState('');
-  const [birthdayNumber, setBirthdayNumber] = useState('');
-  const [times, setTimes] = useState(0);
-  const [texts, setTexts] = useState({} as TextsType);
-  const [readOnly, setReadOnly] = useState(true);
-  const [titleViewHeight, setTitleViewHeight] = useState(0);
-  const [latestBlock, setLatestBlock] = useState(0);
-  const [expandSeed, setExpandSeed] = useState(false);
-  const [expandBirthday, setExpandBithday] = useState(false);
-  const [basicFirstViewSeed, setBasicFirstViewSeed] = useState(true);
+  const [seedPhrase, setSeedPhrase] = useState<string>('');
+  const [birthdayNumber, setBirthdayNumber] = useState<string>('');
+  const [times, setTimes] = useState<number>(0);
+  const [texts, setTexts] = useState<TextsType>({} as TextsType);
+  const [readOnly, setReadOnly] = useState<boolean>(true);
+  const [titleViewHeight, setTitleViewHeight] = useState<number>(0);
+  const [latestBlock, setLatestBlock] = useState<number>(0);
+  const [expandSeed, setExpandSeed] = useState<boolean>(false);
+  const [expandBirthday, setExpandBithday] = useState<boolean>(false);
+  const [basicFirstViewSeed, setBasicFirstViewSeed] = useState<boolean>(true);
 
   const slideAnim = useRef(new Animated.Value(0)).current;
 

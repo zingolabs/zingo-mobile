@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useRef, useState } from 'react';
 import { View, ScrollView, SafeAreaView, TouchableOpacity, TextInput, Keyboard, Platform } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faDotCircle } from '@fortawesome/free-solid-svg-icons';
+import { IconDefinition, faDotCircle } from '@fortawesome/free-solid-svg-icons';
 import { faCircle as farCircle } from '@fortawesome/free-regular-svg-icons';
 import Animated, { EasingNode } from 'react-native-reanimated';
 
@@ -111,29 +111,31 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(languageContext);
 
-  const [memos, setMemos] = useState(walletSettings.download_memos);
-  const [filter, setFilter] = useState(walletSettings.transaction_filter_threshold);
-  const [customServerUri, setCustomServerUri] = useState(serverContext.uri);
-  const [customServerChainName, setCustomServerChainName] = useState(serverContext.chain_name);
-  const [currency, setCurrency] = useState(currencyContext);
-  const [language, setLanguage] = useState(languageContext);
-  const [sendAll, setSendAll] = useState(sendAllContext);
-  const [privacy, setPrivacy] = useState(privacyContext);
-  const [mode, setMode] = useState(modeContext);
+  const [memos, setMemos] = useState<string>(walletSettings.download_memos);
+  const [filter, setFilter] = useState<string>(walletSettings.transaction_filter_threshold);
+  const [customServerUri, setCustomServerUri] = useState<string>(serverContext.uri);
+  const [customServerChainName, setCustomServerChainName] = useState<string>(serverContext.chain_name);
+  const [currency, setCurrency] = useState<string>(currencyContext);
+  const [language, setLanguage] = useState<string>(languageContext);
+  const [sendAll, setSendAll] = useState<boolean>(sendAllContext);
+  const [privacy, setPrivacy] = useState<boolean>(privacyContext);
+  const [mode, setMode] = useState<string>(modeContext);
   // security checks box.
-  const [startApp, setStartApp] = useState(securityContext.startApp);
-  const [foregroundApp, setForegroundApp] = useState(securityContext.foregroundApp);
-  const [sendConfirm, setSendConfirm] = useState(securityContext.sendConfirm);
-  const [seedScreen, setSeedScreen] = useState(securityContext.seedScreen);
-  const [ufvkScreen, setUfvkScreen] = useState(securityContext.ufvkScreen);
-  const [rescanScreen, setRescanScreen] = useState(securityContext.rescanScreen);
-  const [settingsScreen, setSettingsScreen] = useState(securityContext.settingsScreen);
-  const [changeWalletScreen, setChangeWalletScreen] = useState(securityContext.changeWalletScreen);
-  const [restoreWalletBackupScreen, setRestoreWalletBackupScreen] = useState(securityContext.restoreWalletBackupScreen);
+  const [startApp, setStartApp] = useState<boolean>(securityContext.startApp);
+  const [foregroundApp, setForegroundApp] = useState<boolean>(securityContext.foregroundApp);
+  const [sendConfirm, setSendConfirm] = useState<boolean>(securityContext.sendConfirm);
+  const [seedScreen, setSeedScreen] = useState<boolean>(securityContext.seedScreen);
+  const [ufvkScreen, setUfvkScreen] = useState<boolean>(securityContext.ufvkScreen);
+  const [rescanScreen, setRescanScreen] = useState<boolean>(securityContext.rescanScreen);
+  const [settingsScreen, setSettingsScreen] = useState<boolean>(securityContext.settingsScreen);
+  const [changeWalletScreen, setChangeWalletScreen] = useState<boolean>(securityContext.changeWalletScreen);
+  const [restoreWalletBackupScreen, setRestoreWalletBackupScreen] = useState<boolean>(
+    securityContext.restoreWalletBackupScreen,
+  );
 
-  const [customIcon, setCustomIcon] = useState(farCircle);
+  const [customIcon, setCustomIcon] = useState<IconDefinition>(farCircle);
   const [disabled, setDisabled] = useState<boolean>();
-  const [titleViewHeight, setTitleViewHeight] = useState(0);
+  const [titleViewHeight, setTitleViewHeight] = useState<number>(0);
 
   const slideAnim = useRef(new Animated.Value(0)).current;
 

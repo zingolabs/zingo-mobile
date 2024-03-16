@@ -22,8 +22,8 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
-  const [refreshMinutes, setRefreshMinutes] = useState(0);
-  const [loading, setLoading] = useState(false);
+  const [refreshMinutes, setRefreshMinutes] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const fn = () => {

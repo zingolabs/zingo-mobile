@@ -91,14 +91,14 @@ const Send: React.FunctionComponent<SendProps> = ({
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
-  const [qrcodeModalVisble, setQrcodeModalVisible] = useState(false);
-  const [confirmModalVisible, setConfirmModalVisible] = useState(false);
-  const [titleViewHeight, setTitleViewHeight] = useState(0);
-  const [memoEnabled, setMemoEnabled] = useState(false);
-  const [validAddress, setValidAddress] = useState(0); // 1 - OK, 0 - Empty, -1 - KO
-  const [validAmount, setValidAmount] = useState(0); // 1 - OK, 0 - Empty, -1 - KO
-  const [sendButtonEnabled, setSendButtonEnabled] = useState(false);
-  const [itemsPicker, setItemsPicker] = useState([] as { label: string; value: string }[]);
+  const [qrcodeModalVisble, setQrcodeModalVisible] = useState<boolean>(false);
+  const [confirmModalVisible, setConfirmModalVisible] = useState<boolean>(false);
+  const [titleViewHeight, setTitleViewHeight] = useState<number>(0);
+  const [memoEnabled, setMemoEnabled] = useState<boolean>(false);
+  const [validAddress, setValidAddress] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
+  const [validAmount, setValidAmount] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
+  const [sendButtonEnabled, setSendButtonEnabled] = useState<boolean>(false);
+  const [itemsPicker, setItemsPicker] = useState<{ label: string; value: string }[]>([]);
   const [memoIcon, setMemoIcon] = useState<boolean>(false);
   const [memoModalVisible, setMemoModalVisible] = useState<boolean>(false);
   const [maxAmount, setMaxAmount] = useState<number>(0);

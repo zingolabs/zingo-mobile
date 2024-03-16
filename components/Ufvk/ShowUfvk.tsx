@@ -39,8 +39,8 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
   moment.locale(language);
 
   const [ufvk, setUfvk] = useState<string>(wallet.ufvk ? wallet.ufvk : '');
-  const [times, setTimes] = useState(0);
-  const [texts, setTexts] = useState({} as TextsType);
+  const [times, setTimes] = useState<number>(0);
+  const [texts, setTexts] = useState<TextsType>({} as TextsType);
 
   const getUfvk = async () => {
     try {

@@ -17,6 +17,7 @@ type CurrencyAmountProps = {
 
 const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({ price, style, amtZec, currency, privacy }) => {
   const [privacyHigh, setPrivacyHigh] = useState<boolean>(privacy || false);
+  const [currencyString, setCurrencyString] = useState<string>('');
   const { colors } = useTheme() as unknown as ThemeType;
   const { decimalSeparator } = getNumberFormatSettings();
 
@@ -30,17 +31,20 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({ price, s
     }
   }, [privacyHigh, privacy]);
 
-  var currencyString;
+  useEffect(() => {
+    var currencyStr;
 
-  if (typeof price === 'undefined' || typeof amtZec === 'undefined' || price <= 0) {
-    currencyString = '-' + decimalSeparator + '--';
-  } else {
-    const currencyAmount = price * amtZec;
-    currencyString = currencyAmount.toFixed(2);
-    if (currencyString === '0.00' && amtZec > 0) {
-      currencyString = '< 0.01';
+    if (typeof price === 'undefined' || typeof amtZec === 'undefined' || price <= 0) {
+      currencyStr = '-' + decimalSeparator + '--';
+    } else {
+      const currencyAmo = price * amtZec;
+      currencyStr = currencyAmo.toFixed(2);
+      if (currencyStr === '0.00' && amtZec > 0) {
+        currencyStr = '< 0.01';
+      }
     }
-  }
+    setCurrencyString(currencyStr);
+  }, [amtZec, decimalSeparator, price]);
 
   const onPress = () => {
     setPrivacyHigh(false);

@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { View, ScrollView, TouchableOpacity, SafeAreaView, Linking, Text } from 'react-native';
 import Clipboard from '@react-native-community/clipboard';
 import moment from 'moment';
@@ -51,9 +51,14 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
-  const spendColor =
-    tx.confirmations === 0 ? colors.primaryDisabled : tx.type === 'Received' ? colors.primary : colors.text;
-  const [expandTxid, setExpandTxid] = useState(false);
+  const [spendColor, setSpendColor] = useState<string>('');
+  const [expandTxid, setExpandTxid] = useState<boolean>(false);
+
+  useEffect(() => {
+    const spendCo =
+      tx.confirmations === 0 ? colors.primaryDisabled : tx.type === 'Received' ? colors.primary : colors.text;
+    setSpendColor(spendCo);
+  }, [colors.primary, colors.primaryDisabled, colors.text, tx.confirmations, tx.type]);
 
   const handleTxIDClick = (txid?: string) => {
     if (!txid) {

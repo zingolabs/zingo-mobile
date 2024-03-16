@@ -28,7 +28,8 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
-  const [expandQRAddress, setExpandQRAddress] = useState(false);
+  const [expandQRAddress, setExpandQRAddress] = useState<boolean>(false);
+  const [multi, setMulti] = useState<boolean>(false);
 
   useEffect(() => {
     if (privacy) {
@@ -44,7 +45,10 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
     }
   }, [expandQRAddress, privacy]);
 
-  const multi = total > 1;
+  useEffect(() => {
+    const mult = total > 1;
+    setMulti(mult);
+  }, [total]);
 
   const doCopy = () => {
     if (address) {

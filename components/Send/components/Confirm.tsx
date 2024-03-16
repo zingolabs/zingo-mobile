@@ -53,9 +53,8 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
-  const [privacyLevel, setPrivacyLevel] = useState('-');
-
-  const sendingTotal = Number(sendPageState.toaddr.amount) + defaultFee;
+  const [privacyLevel, setPrivacyLevel] = useState<string>('-');
+  const [sendingTotal, setSendingTotal] = useState<number>(0);
 
   const getPrivacyLevel = useCallback(async () => {
     if (!netInfo.isConnected) {
@@ -188,6 +187,11 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
       confirmSend();
     }
   };
+
+  useEffect(() => {
+    const sendingTot = Number(sendPageState.toaddr.amount) + defaultFee;
+    setSendingTotal(sendingTot);
+  }, [defaultFee, sendPageState.toaddr.amount]);
 
   useEffect(() => {
     (async () => {

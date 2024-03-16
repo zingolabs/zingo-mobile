@@ -29,11 +29,11 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
-  const [ufvkText, setUfvkText] = useState('');
-  const [birthday, setBirthday] = useState('');
-  const [qrcodeModalVisible, setQrcodeModalVisible] = useState(false);
-  const [titleViewHeight, setTitleViewHeight] = useState(0);
-  const [latestBlock, setLatestBlock] = useState(0);
+  const [ufvkText, setUfvkText] = useState<string>('');
+  const [birthday, setBirthday] = useState<string>('');
+  const [qrcodeModalVisible, setQrcodeModalVisible] = useState<boolean>(false);
+  const [titleViewHeight, setTitleViewHeight] = useState<number>(0);
+  const [latestBlock, setLatestBlock] = useState<number>(0);
 
   const slideAnim = useRef(new Animated.Value(0)).current;
 
