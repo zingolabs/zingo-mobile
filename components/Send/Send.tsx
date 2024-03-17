@@ -651,7 +651,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                               items={itemsPicker}
                               placeholder={{
                                 label: translate('addressbook.select-placeholder') as string,
-                                value: '',
+                                value: ta.to,
                                 color: colors.primary,
                               }}
                               useNativeAndroidPickerStyle={false}
