@@ -97,7 +97,7 @@
     "restorebackupwallet": "Restore Last Wallet Backup",
     "fundpools": "Fund Pools",
     "insight": "Financial Insight",
-    "loadwalletfromseed-basic": "Restore wallet (Advanced)",
+    "loadwalletfromseed-basic": "Restore wallet",
     "addressbook": "Address Book",
     "restoremainnet-error": "This option is only available for 'Mainnet' servers.",
     "changeservernew-error": "Error trying to change the server to the new one: ",
@@ -378,7 +378,9 @@
     "confirm-privacy-level": "Privacy Level",
     "private": "Private",
     "amountrevealed": "Amount Revealed",
-    "deshielded": "Deshielded"
+    "deshielded": "Deshielded",
+    "lose-address-title": "SELECT A NEW ADDRESS",
+    "lose-address-alert": "You already have a valid address in the address field. Do you want to replace it?"
   },
   "receive": {
     "u-title": "Unified Address",

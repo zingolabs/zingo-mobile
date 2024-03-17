@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useRef, useContext } from 'react';
-import { View, ScrollView, Modal, Keyboard, TextInput, TouchableOpacity, Platform } from 'react-native';
+import { View, ScrollView, Modal, Keyboard, TextInput, TouchableOpacity, Platform, Alert } from 'react-native';
 import {
   faQrcode,
   faCheck,
@@ -107,6 +107,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [stillConfirming, setStillConfirming] = useState<boolean>(false);
   const [showShieldInfo, setShowShieldInfo] = useState<boolean>(false);
   const [showUpgradeInfo, setShowUpgradeInfo] = useState<boolean>(false);
+  const [updatingToField, setUpdatingToField] = useState<boolean>(false);
   const isFocused = useIsFocused();
 
   const slideAnim = useRef(new Animated.Value(0)).current;
@@ -331,6 +332,27 @@ const Send: React.FunctionComponent<SendProps> = ({
       }
     })();
   }, [isFocused]);
+
+  const showAlertAsync = (): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      Alert.alert(
+        translate('send.lose-address-title') as string,
+        translate('send.lose-address-alert') as string,
+        [
+          {
+            text: translate('confirm') as string,
+            onPress: () => resolve(),
+          },
+          {
+            text: translate('cancel') as string,
+            style: 'cancel',
+            onPress: () => reject(),
+          },
+        ],
+        { cancelable: false, userInterfaceStyle: 'light' },
+      );
+    });
+  };
 
   const updateToField = async (
     address: string | null,
@@ -621,21 +643,51 @@ const Send: React.FunctionComponent<SendProps> = ({
                         justifyContent: 'center',
                       }}>
                       {itemsPicker.length > 0 && (
-                        <RNPickerSelect
-                          fixAndroidTouchableBug={true}
-                          value={ta.to}
-                          items={itemsPicker}
-                          placeholder={{ label: translate('addressbook.select-placeholder') as string, value: '' }}
-                          onValueChange={(itemValue: string) => {
-                            updateToField(itemValue, null, null, null, null);
-                          }}>
-                          <FontAwesomeIcon
-                            style={{ marginRight: 7 }}
-                            size={39}
-                            icon={faAddressCard}
-                            color={colors.primary}
-                          />
-                        </RNPickerSelect>
+                        <>
+                          {!updatingToField ? (
+                            <RNPickerSelect
+                              fixAndroidTouchableBug={true}
+                              value={ta.to}
+                              items={itemsPicker}
+                              placeholder={{
+                                label: translate('addressbook.select-placeholder') as string,
+                                value: '',
+                                color: colors.primary,
+                              }}
+                              useNativeAndroidPickerStyle={false}
+                              onValueChange={async (itemValue: string) => {
+                                if (validAddress === 1 && ta.to && itemValue && ta.to !== itemValue) {
+                                  setUpdatingToField(true);
+                                  await showAlertAsync()
+                                    .then(() => {
+                                      updateToField(itemValue, null, null, null, null);
+                                    })
+                                    .catch(() => {
+                                      updateToField(ta.to, null, null, null, null);
+                                    });
+                                  setTimeout(() => {
+                                    setUpdatingToField(false);
+                                  }, 500);
+                                } else if (ta.to !== itemValue) {
+                                  updateToField(itemValue, null, null, null, null);
+                                }
+                              }}>
+                              <FontAwesomeIcon
+                                style={{ marginRight: 7 }}
+                                size={39}
+                                icon={faAddressCard}
+                                color={colors.primary}
+                              />
+                            </RNPickerSelect>
+                          ) : (
+                            <FontAwesomeIcon
+                              style={{ marginRight: 7 }}
+                              size={39}
+                              icon={faAddressCard}
+                              color={colors.primaryDisabled}
+                            />
+                          )}
+                        </>
                       )}
                       <TouchableOpacity
                         testID="send.scan-button"
