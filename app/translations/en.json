@@ -44,7 +44,8 @@
     "delete-title": "Delete Label",
     "delete-alert": "Do you really want to delete this Contact/Nickname/Label/Tag?",
     "likely": "Likely: ",
-    "thiswalletaddress": "This Wallet's Address"
+    "thiswalletaddress": "This Wallet's Address",
+    "addto": "Add to "
   },
   "change-privacy-legend": ".\nTap to reveal the hidden values.",
   "txtcopied": "Text copied to Clipboard",

@@ -44,7 +44,8 @@
     "delete-title": "Borrar etiqueta",
     "delete-alert": "¿Realmente quieres borrar este Contacto de su libreta de direcciones?",
     "likely": "Probablemente: ",
-    "thiswalletaddress": "La Dirección de este Monedero"
+    "thiswalletaddress": "La Dirección de este Monedero",
+    "addto": "Añadir a "
   },
   "change-privacy-legend": ".\nPulsar para revelar los valores ocultos.",
   "txtcopied": "Texto copiado al Portapapeles",

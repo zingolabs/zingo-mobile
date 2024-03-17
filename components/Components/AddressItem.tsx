@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
-import { TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import Clipboard from '@react-native-community/clipboard';
 import { ContextAppLoaded } from '../../app/context';
 import RegText from './RegText';
@@ -153,9 +153,27 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
           </TouchableOpacity>
         )}
       </View>
-      {withIcon && !contact && (
+      {withIcon && !contact && oneLine && (
         <TouchableOpacity onPress={() => launchAddressBook(address, closeModal, openModal)}>
-          <FontAwesomeIcon style={{ marginTop: 3 }} size={20} icon={faAddressCard} color={colors.primary} />
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+              paddingHorizontal: 4,
+              paddingBottom: 2,
+              borderWidth: 1,
+              borderColor: colors.primary,
+              borderRadius: 5,
+            }}>
+            <Text style={{ fontSize: 13, color: colors.border }}>{translate('addressbook.addto') as string}</Text>
+            <FontAwesomeIcon style={{ marginTop: 3 }} size={20} icon={faAddressCard} color={colors.primary} />
+          </View>
+        </TouchableOpacity>
+      )}
+      {withIcon && !contact && !oneLine && (
+        <TouchableOpacity onPress={() => launchAddressBook(address, closeModal, openModal)}>
+          <FontAwesomeIcon style={{ marginTop: 3 }} size={22} icon={faAddressCard} color={colors.primary} />
         </TouchableOpacity>
       )}
       {withSendIcon &&

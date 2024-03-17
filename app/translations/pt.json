@@ -44,7 +44,8 @@
     "delete-title": "Eliminar rótulo",
     "delete-alert": "Você realmente deseja excluir este contato/apelido/etiqueta/etiqueta?",
     "likely": "Curtir: ",
-    "thiswalletaddress": "Endereço desta Carteira"
+    "thiswalletaddress": "Endereço desta Carteira",
+    "addto": "Adicionar à"
   },
   "change-privacy-legend": ".\nToque para revelar os valores ocultos.",
   "txtcopied": "Texto copiado para a Área de Transferência",
