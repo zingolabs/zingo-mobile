@@ -379,7 +379,9 @@
     "confirm-privacy-level": "Nível de Privacidade",
     "private": "Privado",
     "amountrevealed": "Quantia Revelada",
-    "deshielded": "Desblindada"
+    "deshielded": "Desblindada",
+    "lose-address-title": "SELECT A NEW ADDRESS",
+    "lose-address-alert": "You already have a valid address in the address field. Do you want to replace it?"
   },
   "receive": {
     "u-title": "Endereço Unificados",

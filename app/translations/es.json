@@ -42,7 +42,7 @@
     "addressexists": "Esta dirección ya existe. ",
     "select-placeholder": "Elige un Contacto...",
     "delete-title": "Borrar etiqueta",
-    "delete-alert": "¿Realmente quieres borrar este Contacto de su libreta de direcciones?",
+    "delete-alert": "¿Realmente quieres borrar este Contacto de tu libreta de direcciones?",
     "likely": "Probablemente: ",
     "thiswalletaddress": "La Dirección de este Monedero",
     "addto": "Añadir a "
@@ -379,7 +379,9 @@
     "confirm-privacy-level": "Nivel de Privacidad",
     "private": "Privada",
     "amountrevealed": "Monto Revelado",
-    "deshielded": "Desblindada"
+    "deshielded": "Desblindada",
+    "lose-address-title": "SELECCIONAR UNA NUEVA DIRECCIÓN",
+    "lose-address-alert": "Ya tienes una dirección válida en el campo de dirección. ¿Desea sustituirla?"
   },
   "receive": {
     "u-title": "Dirección Unificada",
