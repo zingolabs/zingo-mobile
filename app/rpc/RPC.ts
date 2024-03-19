@@ -1552,7 +1552,9 @@ export default class RPC {
 
     //console.log('prev progress id', prevSendId);
 
-    let sendFastError: string = '';
+    // sometimes we need the result of send as well
+    let sendError: string = '';
+    let sendTxid: string = '';
 
     // This is async, so fire and forget
     this.doSend(JSON.stringify(sendJson))
@@ -1560,14 +1562,18 @@ export default class RPC {
         try {
           const rJson = JSON.parse(r);
           if (rJson.error) {
-            sendFastError = rJson.error;
+            sendError = rJson.error;
+          } else if (rJson.txid) {
+            sendTxid = rJson.txid;
           }
-        } catch (e) {}
+        } catch (e) {
+          sendError = r;
+        }
         console.log('End Send OK: ' + r);
       })
       .catch(e => {
         if (e && e.message) {
-          sendFastError = e.message;
+          sendError = e.message;
         }
         console.log('End Send ERROR: ' + e);
       })
@@ -1614,7 +1620,7 @@ export default class RPC {
           return;
         }
 
-        //console.log('progress', progress);
+        console.log('progress', progress);
 
         // Calculate ETA.
         let secondsPerComputation = 3; // default
@@ -1646,7 +1652,10 @@ export default class RPC {
         // if the send process is really fast (likely an error) and sendprogress is over
         // in this moment.
 
-        if (!progress.txid && !progress.error && progress.sending) {
+        // sometimes the progress.sending is false and txid and error are null
+        // in this moment I can use the values from the command send
+
+        if (!progress.txid && !progress.error && !sendTxid && !sendError) {
           // Still processing
           setSendProgress(updatedProgress);
           return;
@@ -1667,8 +1676,15 @@ export default class RPC {
           reject(progress.error);
         }
 
-        if (!progress.sending) {
-          reject(sendFastError);
+        if (sendTxid) {
+          // And refresh data (full refresh)
+          this.refresh(true);
+
+          resolve(sendTxid);
+        }
+
+        if (sendError) {
+          reject(sendError);
         }
       }, 2000); // Every 2 seconds
     });
