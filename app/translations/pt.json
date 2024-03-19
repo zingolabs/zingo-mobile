@@ -578,5 +578,6 @@
     "noaddress": "Nenhum endereço válido informado",
     "oneentry": "RI deve ter pelo menos 1 entrada",
     "parseerror": "nesse momento não é possível verificar o endereço com o servidor"
-  }
+  },
+  "donation-button": "Doar para Zingo "
 }

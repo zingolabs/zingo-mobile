@@ -578,5 +578,6 @@
     "noaddress": "No tenía una dirección",
     "oneentry": "URI Debería tener al menos una entrada",
     "parseerror": "En este momento no es posible verificar la dirección en el Servidor"
-  }
+  },
+  "donation-button": "Donar a Zingo "
 }

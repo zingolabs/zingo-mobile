@@ -22,7 +22,6 @@
   "menudrawer-acc": "Open Menu Drawer",
   "menu-acc": "Open Menu",
   "donation": "Thanks for supporting Zingo!",
-  "donation-button": "Donate To Zingo ",
   "restarting": "Error connecting to the Server, the App will restart in a few seconds.",
   "change-privacy": "New privacy policy: ",
   "addressbook": {
@@ -579,5 +578,6 @@
     "noaddress": "Didn't have an address",
     "oneentry": "URI Should have at least 1 entry",
     "parseerror": "Right now it is not possible to verify the address with the server"
-  }
+  },
+  "donation-button": "Donate To Zingo "
 }
