@@ -93,15 +93,15 @@ export default class Utils {
   }
 
   static getDonationAddress(chain_name: 'main' | 'test' | 'regtest'): string {
-    if (chain_name !== 'main') {
-      return 'ztestsapling...';
+    if (chain_name === 'main') {
+      return 'u000001...';
     } else {
-      return 'z...';
+      return 'utest000001...';
     }
   }
 
-  static getDefaultDonationAmount(): number {
-    return 0.1;
+  static getDefaultDonationAmount(): string {
+    return '0.01';
   }
 
   static getDefaultDonationMemo(translate: (key: string) => TranslateType): string {

@@ -1,12 +1,13 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useRef, useContext } from 'react';
-import { View, ScrollView, Modal, Keyboard, TextInput, TouchableOpacity, Platform, Alert } from 'react-native';
+import { View, ScrollView, Modal, Keyboard, TextInput, TouchableOpacity, Platform, Alert, Text } from 'react-native';
 import {
   faQrcode,
   faCheck,
   faInfoCircle,
   faAddressCard,
   faMagnifyingGlassPlus,
+  faMoneyCheckDollar,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme, useIsFocused } from '@react-navigation/native';
@@ -1046,49 +1047,91 @@ const Send: React.FunctionComponent<SendProps> = ({
           <View
             style={{
               flexGrow: 1,
-              flexDirection: 'row',
+              flexDirection: 'column',
               justifyContent: 'center',
               alignItems: 'center',
               marginVertical: 5,
             }}>
-            <Button
-              testID="send.button"
-              accessible={true}
-              accessibilityLabel={'title ' + translate('send.button')}
-              type="Primary"
-              title={
-                validAmount === 1 &&
-                sendPageState.toaddr.amount &&
-                Number(sendPageState.toaddr.amount) === Utils.parseLocaleFloat(maxAmount.toFixed(8))
-                  ? (translate('send.button-all') as string)
-                  : (translate('send.button') as string)
-              }
-              disabled={!sendButtonEnabled}
-              onPress={() => {
-                if (
+            <View
+              style={{
+                flexGrow: 1,
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginBottom: 20,
+              }}>
+              <Button
+                testID="send.button"
+                accessible={true}
+                accessibilityLabel={'title ' + translate('send.button')}
+                type="Primary"
+                title={
                   validAmount === 1 &&
                   sendPageState.toaddr.amount &&
-                  mode !== 'basic' &&
                   Number(sendPageState.toaddr.amount) === Utils.parseLocaleFloat(maxAmount.toFixed(8))
-                ) {
-                  addLastSnackbar({ message: `${translate('send.sendall-message') as string}`, type: 'Primary' });
+                    ? (translate('send.button-all') as string)
+                    : (translate('send.button') as string)
                 }
-                if (!netInfo.isConnected) {
-                  addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
-                  return;
-                }
-                // waiting while closing the keyboard, just in case.
-                setTimeout(async () => {
-                  setConfirmModalVisible(true);
-                }, 100);
-              }}
-            />
-            <Button
-              type="Secondary"
-              style={{ marginLeft: 10 }}
-              title={translate('send.clear') as string}
-              onPress={() => clearToAddr()}
-            />
+                disabled={!sendButtonEnabled}
+                onPress={() => {
+                  if (
+                    validAmount === 1 &&
+                    sendPageState.toaddr.amount &&
+                    mode !== 'basic' &&
+                    Number(sendPageState.toaddr.amount) === Utils.parseLocaleFloat(maxAmount.toFixed(8))
+                  ) {
+                    addLastSnackbar({ message: `${translate('send.sendall-message') as string}`, type: 'Primary' });
+                  }
+                  if (!netInfo.isConnected) {
+                    addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
+                    return;
+                  }
+                  // waiting while closing the keyboard, just in case.
+                  setTimeout(async () => {
+                    setConfirmModalVisible(true);
+                  }, 100);
+                }}
+              />
+              <Button
+                type="Secondary"
+                style={{ marginLeft: 10 }}
+                title={translate('send.clear') as string}
+                onPress={() => clearToAddr()}
+              />
+            </View>
+            <TouchableOpacity
+              onPress={() => {
+                console.log(
+                  Utils.getDonationAddress(server.chain_name),
+                  Utils.getDefaultDonationAmount(),
+                  null,
+                  Utils.getDefaultDonationMemo(translate),
+                  true,
+                );
+                // fill the fields in the screen with the donation data
+                updateToField(
+                  Utils.getDonationAddress(server.chain_name),
+                  Utils.getDefaultDonationAmount(),
+                  null,
+                  Utils.getDefaultDonationMemo(translate),
+                  true,
+                );
+              }}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  paddingHorizontal: 4,
+                  paddingBottom: 2,
+                  borderWidth: 1,
+                  borderColor: colors.primary,
+                  borderRadius: 5,
+                }}>
+                <Text style={{ fontSize: 13, color: colors.border }}>{translate('donation-button') as string}</Text>
+                <FontAwesomeIcon style={{ marginTop: 3 }} size={20} icon={faMoneyCheckDollar} color={colors.primary} />
+              </View>
+            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
