@@ -1552,6 +1552,7 @@ export default class RPC {
 
     //console.log('prev progress id', prevSendId);
 
+    // sometimes we need the result of send as well
     let sendError: string = '';
     let sendTxid: string = '';
 
