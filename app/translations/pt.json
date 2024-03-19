@@ -45,7 +45,7 @@
     "delete-alert": "Você realmente deseja excluir este contato/apelido/etiqueta/etiqueta?",
     "likely": "Curtir: ",
     "thiswalletaddress": "Endereço desta Carteira",
-    "addto": "Adicionar à"
+    "addto": "Adicionar à "
   },
   "change-privacy-legend": ".\nToque para revelar os valores ocultos.",
   "txtcopied": "Texto copiado para a Área de Transferência",
@@ -244,15 +244,15 @@
     "value-chain_name-test": "Testnet",
     "value-chain_name-regtest": "Regtest",
     "security-title": "APLICAR SEGURANÇA DO DISPOSITIVO PARA AS TRANS/OPÇÕES",
-    "security-startapp": "Quando o aplicativo inicia.",
-    "security-foregroundapp": "Quando o aplicativo vai para o primeiro plano.",
-    "security-sendconfirm": "Confirmar Transação.",
-    "security-seedscreen": "Backup das Chaves da Carteira.",
-    "security-ufvkscreen": "Chave de Visualização da Carteira.",
-    "security-rescanscreen": "Rescanear a Carteira.",
-    "security-settingsscreen": "Configurações.",
-    "security-changewalletscreen": "Abrir outra carteira.",
-    "security-restorewalletbackupscreen": "Restaurar último backup da carteira."
+    "security-startapp": "Quando o aplicativo inicia",
+    "security-foregroundapp": "Quando o aplicativo vai para o primeiro plano",
+    "security-sendconfirm": "Confirmar Transação",
+    "security-seedscreen": "Backup das Chaves da Carteira",
+    "security-ufvkscreen": "Chave de Visualização da Carteira",
+    "security-rescanscreen": "Rescanear a Carteira",
+    "security-settingsscreen": "Configurações",
+    "security-changewalletscreen": "Abrir outra carteira",
+    "security-restorewalletbackupscreen": "Restaurar último backup da carteira"
   },
   "info": {
     "version": "Versão",
@@ -380,8 +380,8 @@
     "private": "Privado",
     "amountrevealed": "Quantia Revelada",
     "deshielded": "Desblindada",
-    "lose-address-title": "SELECT A NEW ADDRESS",
-    "lose-address-alert": "You already have a valid address in the address field. Do you want to replace it?"
+    "lose-address-title": "SELECIONE UM NOVO ENDEREÇO",
+    "lose-address-alert": "Você já tem um endereço válido no campo de endereço. Deseja substituí-lo?"
   },
   "receive": {
     "u-title": "Endereço Unificados",
