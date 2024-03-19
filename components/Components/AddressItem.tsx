@@ -58,7 +58,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
   const [contact, setContact] = useState<string>('');
 
   useEffect(() => {
-    const numLinesAdd = address.length < 40 ? 2 : address.length / 30;
+    const numLinesAdd = address ? (address.length < 40 ? 2 : address.length / 30) : 0;
     const cont: string = addressBook
       .filter((ab: AddressBookFileClass) => ab.address === address)
       .map((ab: AddressBookFileClass) => ab.label)
