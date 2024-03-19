@@ -1686,7 +1686,10 @@ export default class RPC {
         if (sendTxid) {
           // And refresh data (full refresh)
           this.refresh(true);
-
+          // send process is about to finish - reactivate the syncing flag
+          if (progress.sync_interrupt) {
+            await RPC.rpc_setInterruptSyncAfterBatch('false');
+          }
           resolve(sendTxid);
         }
 
