@@ -84,7 +84,17 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
               }
             }}>
             {expandQRAddress && !!address ? (
-              <QRCode value={address} size={200} ecl="L" backgroundColor={colors.border} />
+              <QRCode
+                value={address}
+                size={200}
+                ecl="L"
+                backgroundColor={colors.border}
+                logo={require('../../assets/img/logobig-zingo.png')}
+                logoSize={35}
+                logoBackgroundColor={colors.border}
+                logoBorderRadius={10} /* android not soported */
+                logoMargin={5}
+              />
             ) : (
               <View
                 style={{

@@ -90,7 +90,17 @@ const PrivKey: React.FunctionComponent<PrivKeyProps> = ({ address, keyType, priv
           </View>
 
           <View style={{ padding: 10, backgroundColor: colors.border, marginTop: 15, marginBottom: 20 }}>
-            <QRCode value={privKey} size={225} ecl="L" backgroundColor={colors.border} />
+            <QRCode
+              value={privKey}
+              size={225}
+              ecl="L"
+              backgroundColor={colors.border}
+              logo={require('../../assets/img/logobig-zingo.png')}
+              logoSize={35}
+              logoBackgroundColor={colors.border}
+              logoBorderRadius={10} /* android not soported */
+              logoMargin={5}
+            />
           </View>
           <TouchableOpacity onPress={doCopy}>
             <Text style={{ color: colors.text, textDecorationLine: 'underline', marginBottom: 5, minHeight: 48 }}>
