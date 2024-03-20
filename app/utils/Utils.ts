@@ -93,11 +93,12 @@ export default class Utils {
   }
 
   static getDonationAddress(chain_name: 'main' | 'test' | 'regtest'): string {
+    // donations only for mainnet.
     if (chain_name === 'main') {
-      return 'u000001...';
-    } else {
-      return 'utest000001...';
+      // tresury UA -> we need a fresh one.
+      return '';
     }
+    return '';
   }
 
   static getDefaultDonationAmount(): string {

@@ -1099,39 +1099,57 @@ const Send: React.FunctionComponent<SendProps> = ({
                 onPress={() => clearToAddr()}
               />
             </View>
-            <TouchableOpacity
-              onPress={() => {
-                console.log(
-                  Utils.getDonationAddress(server.chain_name),
-                  Utils.getDefaultDonationAmount(),
-                  null,
-                  Utils.getDefaultDonationMemo(translate),
-                  true,
-                );
-                // fill the fields in the screen with the donation data
-                updateToField(
-                  Utils.getDonationAddress(server.chain_name),
-                  Utils.getDefaultDonationAmount(),
-                  null,
-                  Utils.getDefaultDonationMemo(translate),
-                  true,
-                );
-              }}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  paddingHorizontal: 4,
-                  paddingBottom: 2,
-                  borderWidth: 1,
-                  borderColor: colors.primary,
-                  borderRadius: 5,
+            {server.chain_name === 'main' && (
+              <TouchableOpacity
+                onPress={async () => {
+                  if (
+                    sendPageState.toaddr.to &&
+                    sendPageState.toaddr.to !== Utils.getDonationAddress(server.chain_name)
+                  ) {
+                    await showAlertAsync()
+                      .then(() => {
+                        // fill the fields in the screen with the donation data
+                        updateToField(
+                          Utils.getDonationAddress(server.chain_name),
+                          Utils.getDefaultDonationAmount(),
+                          null,
+                          Utils.getDefaultDonationMemo(translate),
+                          true,
+                        );
+                      })
+                      .catch(() => {});
+                  } else {
+                    // fill the fields in the screen with the donation data
+                    updateToField(
+                      Utils.getDonationAddress(server.chain_name),
+                      Utils.getDefaultDonationAmount(),
+                      null,
+                      Utils.getDefaultDonationMemo(translate),
+                      true,
+                    );
+                  }
                 }}>
-                <Text style={{ fontSize: 13, color: colors.border }}>{translate('donation-button') as string}</Text>
-                <FontAwesomeIcon style={{ marginTop: 3 }} size={20} icon={faMoneyCheckDollar} color={colors.primary} />
-              </View>
-            </TouchableOpacity>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    paddingHorizontal: 4,
+                    paddingBottom: 2,
+                    borderWidth: 1,
+                    borderColor: colors.primary,
+                    borderRadius: 5,
+                  }}>
+                  <Text style={{ fontSize: 13, color: colors.border }}>{translate('donation-button') as string}</Text>
+                  <FontAwesomeIcon
+                    style={{ marginTop: 3 }}
+                    size={20}
+                    icon={faMoneyCheckDollar}
+                    color={colors.primary}
+                  />
+                </View>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
       </ScrollView>
