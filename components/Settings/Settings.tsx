@@ -523,6 +523,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                           {' (' + s.region + ')'}
                         </RegText>
                       )}
+                      {s.latency && (
+                        <RegText key={'tex-' + s.region} style={{ marginLeft: 10 }} color={colors.primaryDisabled}>
+                          {' (' + s.latency + ')'}
+                        </RegText>
+                      )}
                     </View>
                   </TouchableOpacity>
                 ) : null,

@@ -81,7 +81,9 @@
     "noopenwallet-message": "Ocorreu um erro enquanto o aplicativo tentava abrir a carteira atual.",
     "changeserver-basic": "Altere o servidor e\nabra a carteira atual",
     "alert-newwallet-title": "CRIAR UM NOVO CARTEIRO",
-    "alert-newwallet-body": "Você pode confirmar que você realmente quer criar uma nova carteira e perder o acesso à carteira atual."
+    "alert-newwallet-body": "Você pode confirmar que você realmente quer criar uma nova carteira e perder o acesso à carteira atual.",
+    "serverfirsttry": "Tentando executar a ação com um servidor diferente. O servidor atual pode estar falhando.",
+    "serversecondtry": "Não parece haver nenhum problema com o servidor. Algo mais está acontecendo."
   },
   "loadedapp": {
     "about": "Sobre a Zingo!",
@@ -122,7 +124,9 @@
     "tryingnewserver-error": "Após 30 segundos o novo servidor não responde.",
     "readingwallet": "Lendo com sucesso a carteira atual com o servidor:",
     "restorewallet-title": "Opção Avançada",
-    "restorewallet-alert": "Confirme que você deseja restaurar uma nova carteira usando as suas frases de recuperação."
+    "restorewallet-alert": "Confirme que você deseja restaurar uma nova carteira usando as suas frases de recuperação.",
+    "selectingserver": "Verificando os servidores da lista para selecionar o mais otimizado.",
+    "selectingserversame": "Seu servidor real já é o mais otimizado."
   },
   "rpc": {
     "parsebirthday-error": "Erro: Não foi possível analisar como um número:",

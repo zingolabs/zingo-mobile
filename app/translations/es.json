@@ -81,7 +81,9 @@
     "noopenwallet-message": "Ha ocurrido un error mientras la App estaba intentando abrir el monedero activo.",
     "changeserver-basic": "Cambiar de Servidor y\nAbrir Monedero Activo",
     "alert-newwallet-title": "CREAR UN NUEVO MONEDERO",
-    "alert-newwallet-body": "Puedes confirmar que realmente quieres crear un nuevo monedero y perder el acceso al monedero actual."
+    "alert-newwallet-body": "Puedes confirmar que realmente quieres crear un nuevo monedero y perder el acceso al monedero actual.",
+    "serverfirsttry": "Intentando realizar la acción con un servidor diferente. El servidor actual puede estar fallando.",
+    "server secondtry": "No parece haber ningún problema con el servidor. Algo más está sucediendo."
   },
   "loadedapp": {
     "about": "Sobre Zingo!",
@@ -122,7 +124,9 @@
     "tryingnewserver-error": "Después de 30 segundos el nuevo Servidor no responde.",
     "readingwallet": "Leyendo satisfactoriamente el monedero activo usando el Servidor:",
     "restorewallet-title": "Opción Avanzada",
-    "restorewallet-alert": "Confirmar que quiere restaurar un nuevo monedero usando su frase semilla."
+    "restorewallet-alert": "Confirmar que quiere restaurar un nuevo monedero usando su frase semilla.",
+    "selectingserver": "Chequeando los servidores de la lista para seleccionar el más optimizado.",
+    "selectingserversame": "Su servidor actual ya es el más optimizado."
   },
   "rpc": {
     "parsebirthday-error": "Error: No es posible convertirlo en un número:",

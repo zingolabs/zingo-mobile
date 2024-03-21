@@ -13,6 +13,7 @@ import {
   AppState,
   NativeEventSubscription,
   TextInput,
+  ActivityIndicator,
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { I18n } from 'i18n-js';
@@ -45,7 +46,6 @@ import BackgroundFileImpl from '../../components/Background/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '../createAlert';
 import { RPCWalletKindType } from '../rpc/types/RPCWalletKindType';
-import { isEqual } from 'lodash';
 import Snackbars from '../../components/Components/Snackbars';
 import SnackbarType from '../AppState/types/SnackbarType';
 import { RPCSeedType } from '../rpc/types/RPCSeedType';
@@ -72,8 +72,15 @@ type LoadingAppProps = {
   toggleTheme: (mode: 'basic' | 'advanced') => void;
 };
 
-const SERVER_DEFAULT_0 = serverUris(() => {})[0];
-const SERVER_DEFAULT_1 = serverUris(() => {})[1];
+const SERVER_DEFAULT_0: ServerType = {
+  uri: serverUris(() => {})[0].uri,
+  chain_name: serverUris(() => {})[0].chain_name,
+} as ServerType;
+
+//const SERVER_DEFAULT_1: ServerType = {
+//  uri: serverUris(() => {})[1].uri,
+//  chain_name: serverUris(() => {})[1].chain_name,
+//} as ServerType;
 
 export default function LoadingApp(props: LoadingAppProps) {
   const theme = useTheme() as unknown as ThemeType;
@@ -363,7 +370,9 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
         const networkState = await NetInfo.fetch();
         if (networkState.isConnected) {
           let result: string = await RPCModule.loadExistingWallet(this.state.server.uri, this.state.server.chain_name);
-          result = 'Error: pepe es guay';
+          if (this.state.serverErrorTries === 0 || true) {
+            result = 'Error: pepe es guay';
+          }
 
           // for testing
           //await delay(5000);
@@ -384,10 +393,16 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
               this.navigateToLoadedApp();
               //console.log('navigate to LoadedApp');
             } else {
-              await this.loadExistingWalletErrorHandle(result);
+              await this.loadExistingWalletErrorHandle(
+                result,
+                this.state.translate('loadingapp.readingwallet-label') as string,
+              );
             }
           } else {
-            await this.loadExistingWalletErrorHandle(result);
+            await this.loadExistingWalletErrorHandle(
+              result,
+              this.state.translate('loadingapp.readingwallet-label') as string,
+            );
           }
         } else {
           this.setState({ screen: 1, actionButtonsDisabled: false });
@@ -454,8 +469,8 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
             type: state.type,
             isConnectionExpensive: state.details && state.details.isConnectionExpensive,
           },
-          screen: screen !== 0 ? 1 : screen,
-          actionButtonsDisabled: !state.isConnected ? true : false,
+          screen: screen !== 0 ? 1 : 0,
+          actionButtonsDisabled: true,
         });
         if (isConnected !== state.isConnected) {
           if (!state.isConnected) {
@@ -467,7 +482,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
           } else {
             //console.log('EVENT Loading: YESSSSS internet connection.');
             if (screen !== 0) {
-              this.setState({ screen: screen === 3 ? 3 : 0 });
+              this.setState({ screen: screen === 3 ? 3 : screen !== 0 ? 1 : 0 });
               // I need some time until the network is fully ready.
               setTimeout(() => this.componentDidMount(), 1000);
             }
@@ -483,29 +498,31 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     this.unsubscribeNetInfo && typeof this.unsubscribeNetInfo === 'function' && this.unsubscribeNetInfo();
   };
 
-  loadExistingWalletErrorHandle = async (result: string) => {
+  loadExistingWalletErrorHandle = async (result: string, title: string) => {
     if (this.state.serverErrorTries === 0) {
       // first try
       this.setState({ screen: 1, actionButtonsDisabled: true });
-      this.addLastSnackbar({
-        message: 'Trying to open your wallet with a different server. The current server may be failing.' as string,
-        type: 'Primary',
-        duration: 'longer',
-      });
+      setTimeout(() => {
+        this.addLastSnackbar({
+          message: this.state.translate('loadingapp.serverfirsttry') as string,
+          type: 'Primary',
+          duration: 'longer',
+        });
+      }, 1000);
       const servers = await selectingServer(serverUris(this.props.translate));
       const fasterServer: ServerType = servers
         .filter((s: ServerUrisType) => s.latency !== null && s.uri !== this.state.server.uri)
         .sort((a, b) => (a.latency ? a.latency : Infinity) - (b.latency ? b.latency : Infinity))
         .map((s: ServerUrisType) => {
           return { uri: s.uri, chain_name: s.chain_name };
-        })[0];
+        })[0] as ServerType;
       console.log(fasterServer);
       this.setState({
         server: fasterServer,
       });
       await SettingsFileImpl.writeSettings('server', fasterServer);
       Alert.alert(
-        this.state.translate('loadingapp.readingwallet-label') as string,
+        title,
         result,
         [
           {
@@ -523,18 +540,19 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     } else {
       // second try
       this.addLastSnackbar({
-        message:
-          "There doesn't seem to be any problem with the server. Your wallet is failing when trying to load." as string,
+        message: this.state.translate('loadingapp.serversecondtry') as string,
         type: 'Primary',
-        duration: 'long',
+        duration: 'longer',
       });
-      createAlert(
-        this.setBackgroundError,
-        this.addLastSnackbar,
-        this.props.translate('loadingapp.readingwallet-label') as string,
-        result,
-      );
-      this.setState({ actionButtonsDisabled: false, serverErrorTries: 0 });
+      setTimeout(() => {
+        createAlert(
+          this.setBackgroundError,
+          this.addLastSnackbar,
+          this.props.translate('loadingapp.readingwallet-label') as string,
+          result,
+        );
+        this.setState({ actionButtonsDisabled: false, serverErrorTries: 0 });
+      }, 1000);
     }
   };
 
@@ -545,31 +563,31 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     }
   };
 
-  usingDefaultServer_0 = async (mode: 'basic' | 'advanced') => {
-    this.setState({ actionButtonsDisabled: true });
-    if (SERVER_DEFAULT_0) {
-      await SettingsFileImpl.writeSettings('server', SERVER_DEFAULT_0);
-      this.setState({ server: SERVER_DEFAULT_0 });
-    }
-    if (mode === 'basic') {
-      this.setState({ actionButtonsDisabled: false }, () => this.componentDidMount());
-    } else {
-      this.setState({ actionButtonsDisabled: false });
-    }
-  };
+  //usingDefaultServer_0 = async (mode: 'basic' | 'advanced') => {
+  //  this.setState({ actionButtonsDisabled: true });
+  //  if (SERVER_DEFAULT_0) {
+  //    await SettingsFileImpl.writeSettings('server', SERVER_DEFAULT_0);
+  //    this.setState({ server: SERVER_DEFAULT_0 });
+  //  }
+  //  if (mode === 'basic') {
+  //    this.setState({ actionButtonsDisabled: false }, () => this.componentDidMount());
+  //  } else {
+  //    this.setState({ actionButtonsDisabled: false });
+  //  }
+  //};
 
-  usingDefaultServer_1 = async (mode: 'basic' | 'advanced') => {
-    this.setState({ actionButtonsDisabled: true });
-    if (SERVER_DEFAULT_1) {
-      await SettingsFileImpl.writeSettings('server', SERVER_DEFAULT_1);
-      this.setState({ server: SERVER_DEFAULT_1 });
-    }
-    if (mode === 'basic') {
-      this.setState({ actionButtonsDisabled: false }, () => this.componentDidMount());
-    } else {
-      this.setState({ actionButtonsDisabled: false });
-    }
-  };
+  //usingDefaultServer_1 = async (mode: 'basic' | 'advanced') => {
+  //  this.setState({ actionButtonsDisabled: true });
+  //  if (SERVER_DEFAULT_1) {
+  //    await SettingsFileImpl.writeSettings('server', SERVER_DEFAULT_1);
+  //    this.setState({ server: SERVER_DEFAULT_1 });
+  //  }
+  //  if (mode === 'basic') {
+  //    this.setState({ actionButtonsDisabled: false }, () => this.componentDidMount());
+  //  } else {
+  //    this.setState({ actionButtonsDisabled: false });
+  //  }
+  //};
 
   usingCustomServer = async () => {
     if (!this.state.customServerUri) {
@@ -603,7 +621,10 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
   createNewWallet = () => {
     this.setState({ actionButtonsDisabled: true });
     setTimeout(async () => {
-      const seed: string = await RPCModule.createNewWallet(this.state.server.uri, this.state.server.chain_name);
+      let seed: string = await RPCModule.createNewWallet(this.state.server.uri, this.state.server.chain_name);
+      //if (this.state.serverErrorTries === 0 || true) {
+      //  seed = 'Error: pepe es guay';
+      //}
 
       if (seed && !seed.toLowerCase().startsWith('error')) {
         let wallet = {} as WalletType;
@@ -630,13 +651,14 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
           walletExists: true,
         }));
       } else {
-        this.setState({ actionButtonsDisabled: false });
-        createAlert(
-          this.setBackgroundError,
-          this.addLastSnackbar,
-          this.props.translate('loadingapp.creatingwallet-label') as string,
-          seed,
-        );
+        //this.setState({ actionButtonsDisabled: false });
+        //createAlert(
+        //  this.setBackgroundError,
+        //  this.addLastSnackbar,
+        //  this.props.translate('loadingapp.creatingwallet-label') as string,
+        //  seed,
+        //);
+        this.loadExistingWalletErrorHandle(seed, this.props.translate('loadingapp.creatingwallet-label') as string);
       }
     });
   };
@@ -691,6 +713,10 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
           this.state.server.chain_name,
         );
       }
+      //if (this.state.serverErrorTries === 0 || true) {
+      //  result = 'Error: pepe es guay';
+      //}
+
       //console.log(seed_ufvk);
       //console.log(result);
       if (result && !result.toLowerCase().startsWith('error')) {
@@ -710,14 +736,15 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
           );
         }
       } else {
-        this.setState({ actionButtonsDisabled: false });
+        //this.setState({ actionButtonsDisabled: false });
         // this message work for both.
-        createAlert(
-          this.setBackgroundError,
-          this.addLastSnackbar,
-          this.props.translate('loadingapp.readingwallet-label') as string,
-          result,
-        );
+        //createAlert(
+        //  this.setBackgroundError,
+        //  this.addLastSnackbar,
+        //  this.props.translate('loadingapp.readingwallet-label') as string,
+        //  result,
+        //);
+        this.loadExistingWalletErrorHandle(result, this.props.translate('loadingapp.readingwallet-label') as string);
       }
     });
   };
@@ -1017,57 +1044,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                     </View>
                   )}
 
-                  {netInfo.isConnected &&
-                    !customServerShow &&
-                    isEqual(server, SERVER_DEFAULT_1) &&
-                    !!SERVER_DEFAULT_0.uri && (
-                      <Button
-                        type="Primary"
-                        title={
-                          (mode === 'basic'
-                            ? translate('loadingapp.changeserver-basic')
-                            : translate('loadingapp.changeserver')) as string
-                        }
-                        disabled={actionButtonsDisabled}
-                        onPress={() => this.usingDefaultServer_0(mode)}
-                        style={{ marginBottom: 10 }}
-                      />
-                    )}
-                  {netInfo.isConnected &&
-                    !customServerShow &&
-                    isEqual(server, SERVER_DEFAULT_0) &&
-                    !!SERVER_DEFAULT_1.uri && (
-                      <Button
-                        type="Primary"
-                        title={
-                          (mode === 'basic'
-                            ? translate('loadingapp.changeserver-basic')
-                            : translate('loadingapp.changeserver')) as string
-                        }
-                        disabled={actionButtonsDisabled}
-                        onPress={() => this.usingDefaultServer_1(mode)}
-                        style={{ marginBottom: 10 }}
-                      />
-                    )}
-                  {netInfo.isConnected &&
-                    !customServerShow &&
-                    !isEqual(server, SERVER_DEFAULT_0) &&
-                    !isEqual(server, SERVER_DEFAULT_1) &&
-                    !!SERVER_DEFAULT_0.uri && (
-                      <Button
-                        type="Primary"
-                        title={
-                          (mode === 'basic'
-                            ? translate('loadingapp.changeserver-basic')
-                            : translate('loadingapp.changeserver')) as string
-                        }
-                        disabled={actionButtonsDisabled}
-                        onPress={() => this.usingDefaultServer_0(mode)}
-                        style={{ marginBottom: 10 }}
-                      />
-                    )}
-
-                  {mode !== 'basic' && netInfo.isConnected && (
+                  {netInfo.isConnected && (
                     <Button
                       testID="loadingapp.createnewwallet"
                       type="Primary"
@@ -1091,11 +1068,11 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                           this.createNewWallet();
                         }
                       }}
-                      style={{ marginBottom: 10, marginTop: 10 }}
+                      style={{ marginBottom: mode === 'advanced' ? 10 : 30, marginTop: 10 }}
                     />
                   )}
 
-                  {mode !== 'basic' && netInfo.isConnected && walletExists && (
+                  {netInfo.isConnected && walletExists && (
                     <Button
                       type="Primary"
                       title={translate('loadingapp.opencurrentwallet') as string}
@@ -1154,6 +1131,10 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                         </BoldText>
                       </View>
                     </View>
+                  )}
+
+                  {netInfo.isConnected && actionButtonsDisabled && (
+                    <ActivityIndicator size="large" color={colors.primary} style={{ marginVertical: 20 }} />
                   )}
                 </View>
               </ScrollView>

@@ -29,7 +29,7 @@ export default class SettingsFileImpl {
     const settings = await this.readSettings();
     const newSettings: SettingsFileClass = { ...settings, [name]: value };
 
-    //console.log(' settings write', newSettings);
+    console.log(' settings write', newSettings);
 
     RNFS.writeFile(fileName, JSON.stringify(newSettings), 'utf8')
       .then(() => {
@@ -48,21 +48,34 @@ export default class SettingsFileImpl {
       const settings: SettingsFileClass = JSON.parse((await RNFS.readFile(fileName, 'utf8')).toString());
       // If server as string is found, I need to convert to: ServerType
       // if not, I'm losing the value
-      if (settings.server) {
+      if (!settings.hasOwnProperty('server')) {
+        settings.server = {
+          uri: serverUris(() => {})[0].uri,
+          chain_name: serverUris(() => {})[0].chain_name,
+        } as ServerType;
+      } else {
         if (typeof settings.server === 'string') {
           const ss: ServerType = { uri: settings.server, chain_name: 'main' };
-          const standard = serverUris(() => {}).find((s: ServerType) => isEqual(s, ss));
+          const standard = serverUris(() => {}).find((s: ServerUrisType) =>
+            isEqual({ uri: s.uri, chain_name: s.chain_name } as ServerType, ss as ServerType),
+          );
           if (standard) {
-            settings.server = ss;
+            settings.server = ss as ServerType;
           } else {
             // here probably the user have a cumtom server, but we don't know
             // what is the chain_name -> we assign the default server.
-            settings.server = serverUris(() => {})[0];
+            settings.server = {
+              uri: serverUris(() => {})[0].uri,
+              chain_name: serverUris(() => {})[0].chain_name,
+            } as ServerType;
           }
         } else {
           if (!settings.server.uri || !settings.server.chain_name) {
             // if one or both field/s don't have valid value -> we assign the default server.
-            settings.server = serverUris(() => {})[0];
+            settings.server = {
+              uri: serverUris(() => {})[0].uri,
+              chain_name: serverUris(() => {})[0].chain_name,
+            } as ServerType;
           }
         }
       }
@@ -100,18 +113,20 @@ export default class SettingsFileImpl {
         // - custom server -> mainnet (not in the list)
         // - custom server -> testnet or regtest
         if (
-          serverUris(() => {}).filter(
-            (s: ServerUrisType) =>
-              s.uri === settings.server.uri && s.chain_name === settings.server.chain_name && s.default,
-          )
+          serverUris(() => {})
+            .filter((s: ServerUrisType) => s.default)
+            .find((s: ServerUrisType) =>
+              isEqual({ uri: s.uri, chain_name: s.chain_name } as ServerType, settings.server as ServerType),
+            )
         ) {
           // default servers -> auto - to make easier and faster UX to the user
           settings.selectServer = 'auto';
         } else if (
-          serverUris(() => {}).filter(
-            (s: ServerUrisType) =>
-              s.uri === settings.server.uri && s.chain_name === settings.server.chain_name && !s.default,
-          )
+          serverUris(() => {})
+            .filter((s: ServerUrisType) => !s.default)
+            .find((s: ServerUrisType) =>
+              isEqual({ uri: s.uri, chain_name: s.chain_name } as ServerType, settings.server as ServerType),
+            )
         ) {
           // new servers -> in the list - the user changed the default server in some point
           settings.selectServer = 'list';

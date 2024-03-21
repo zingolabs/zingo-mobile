@@ -51,15 +51,17 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   };
 
   useEffect(() => {
-    const uadd = addresses.filter(a => a.addressKind === 'u') || [];
-    const zadd = addresses.filter(a => a.uaAddress === uaAddress && a.addressKind === 'z') || [];
-    const tadd = addresses.filter(a => a.uaAddress === uaAddress && a.addressKind === 't') || [];
-    setUaddrs(uadd);
-    setZaddrs(zadd);
-    setTaddrs(tadd);
+    if (addresses && addresses.length && uaAddress) {
+      const uadd = addresses.filter(a => a.addressKind === 'u') || [];
+      const zadd = addresses.filter(a => a.uaAddress === uaAddress && a.addressKind === 'z') || [];
+      const tadd = addresses.filter(a => a.uaAddress === uaAddress && a.addressKind === 't') || [];
+      setUaddrs(uadd);
+      setZaddrs(zadd);
+      setTaddrs(tadd);
 
-    const uaAddressIndex = uadd.findIndex(a => a.address === uaAddress);
-    setUIndex(uaAddressIndex);
+      const uaAddressIndex = uadd.findIndex(a => a.address === uaAddress);
+      setUIndex(uaAddressIndex);
+    }
   }, [addresses, uaAddress]);
 
   const prev = (type: string) => {

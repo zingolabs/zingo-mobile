@@ -276,7 +276,14 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
           alignItems: 'center',
           marginVertical: 5,
         }}>
-        <Button type="Primary" title={translate('import.button') as string} onPress={okButton} />
+        <Button
+          type="Primary"
+          title={translate('import.button') as string}
+          onPress={() => {
+            Keyboard.dismiss();
+            okButton;
+          }}
+        />
         <Button
           type="Secondary"
           title={translate('cancel') as string}

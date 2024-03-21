@@ -505,14 +505,8 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
               await SettingsFileImpl.writeSettings('basicFirstViewSeed', true);
             }
             if (times === 0) {
-              if (action === 'restore') {
-                // waiting while closing the keyboard, just in case.
-                setTimeout(async () => {
-                  onClickOK(seedPhrase, Number(birthdayNumber));
-                }, 100);
-              } else {
-                onClickOK(seedPhrase, Number(birthdayNumber));
-              }
+              Keyboard.dismiss();
+              onClickOK(seedPhrase, Number(birthdayNumber));
             } else if (times === 1) {
               onPressOK();
             }

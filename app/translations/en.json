@@ -81,7 +81,9 @@
     "noopenwallet-message": "An error occurred while the App was trying to open the active wallet.",
     "changeserver-basic": "Change the Server and\nOpen Current Wallet",
     "alert-newwallet-title": "CREATE A NEW WALLET",
-    "alert-newwallet-body": "Can you confirm that you really want to create a new wallet and lose access to the current wallet."
+    "alert-newwallet-body": "Can you confirm that you really want to create a new wallet and lose access to the current wallet.",
+    "serverfirsttry": "Trying to perform the action with a different server. The current server may be failing.",
+    "serversecondtry": "It doesn't seem to be any problem with the server. Someting else is happening."
   },
   "loadedapp": {
     "about": "About Zingo!",
@@ -122,7 +124,9 @@
     "tryingnewserver-error": "After 30 seconds the new server doesn't respond.",
     "readingwallet": "Reading successfully the wallet with the server:",
     "restorewallet-title": "Advanced Option",
-    "restorewallet-alert": "Confirm that you want to restore a new wallet using your seed phrase."
+    "restorewallet-alert": "Confirm that you want to restore a new wallet using your seed phrase.",
+    "selectingserver": "Checking the servers in the list to select the most optimized one.",
+    "selectingserversame": "Your actual server is the most optimized one already."
   },
   "rpc": {
     "parsebirthday-error": "Error: Couldn't parse as a number:",
