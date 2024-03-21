@@ -370,9 +370,9 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
         const networkState = await NetInfo.fetch();
         if (networkState.isConnected) {
           let result: string = await RPCModule.loadExistingWallet(this.state.server.uri, this.state.server.chain_name);
-          if (this.state.serverErrorTries === 0 || true) {
-            result = 'Error: pepe es guay';
-          }
+          //if (this.state.serverErrorTries === 0 || true) {
+          //  result = 'Error: pepe es guay';
+          //}
 
           // for testing
           //await delay(5000);

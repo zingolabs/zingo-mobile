@@ -29,7 +29,7 @@ export default class SettingsFileImpl {
     const settings = await this.readSettings();
     const newSettings: SettingsFileClass = { ...settings, [name]: value };
 
-    console.log(' settings write', newSettings);
+    //console.log(' settings write', newSettings);
 
     RNFS.writeFile(fileName, JSON.stringify(newSettings), 'utf8')
       .then(() => {
