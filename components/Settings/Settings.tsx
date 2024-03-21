@@ -18,7 +18,7 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import Header from '../Header';
-import { SecurityType, ServerType } from '../../app/AppState';
+import { SecurityType, ServerType, ServerUrisType } from '../../app/AppState';
 import { isEqual } from 'lodash';
 import ChainTypeToggle from '../Components/ChainTypeToggle';
 import CheckBox from '@react-native-community/checkbox';
@@ -141,11 +141,13 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
   useEffect(() => {
     setCustomIcon(
-      serverUris().find((s: ServerType) => isEqual(s, { uri: customServerUri, chain_name: customServerChainName }))
+      serverUris(translate).filter(
+        (s: ServerUrisType) => s.uri === customServerUri && s.chain_name === customServerChainName,
+      )
         ? farCircle
         : faDotCircle,
     );
-  }, [customServerChainName, customServerUri]);
+  }, [customServerChainName, customServerUri, translate]);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
@@ -490,7 +492,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             </View>
 
             <View style={{ display: 'flex', marginLeft: 25 }}>
-              {serverUris().map((s: ServerType, i: number) =>
+              {serverUris(translate).map((s: ServerUrisType, i: number) =>
                 s.uri ? (
                   <TouchableOpacity
                     testID={
@@ -516,6 +518,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                       <RegText key={'tex-' + s.uri} style={{ marginLeft: 10 }}>
                         {s.uri}
                       </RegText>
+                      {s.region && (
+                        <RegText key={'tex-' + s.region} style={{ marginLeft: 10 }} color={colors.primaryDisabled}>
+                          {' (' + s.region + ')'}
+                        </RegText>
+                      )}
                     </View>
                   </TouchableOpacity>
                 ) : null,

@@ -53,6 +53,8 @@ export default interface AppStateLoading {
   biometricsFailed: boolean;
   startingApp: boolean;
   security: SecurityType;
+  selectServer: 'auto' | 'list' | 'custom';
+  serverErrorTries: number;
 
   // eslint-disable-next-line semi
 }

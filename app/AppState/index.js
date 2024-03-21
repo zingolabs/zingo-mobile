@@ -23,6 +23,7 @@ import ServerType from './types/ServerType';
 import SnackbarType from './types/SnackbarType';
 import ZecPriceType from './types/ZecPriceType';
 import SecurityType from './types/SecurityType';
+import ServerUrisType from './types/ServerUrisType';
 
 import AppStateLoaded from './AppStateLoaded';
 import AppStateLoading from './AppStateLoading';
@@ -54,4 +55,5 @@ export {
   ServerType,
   SnackbarType,
   SecurityType,
+  ServerUrisType,
 };

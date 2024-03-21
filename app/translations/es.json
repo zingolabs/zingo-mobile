@@ -252,7 +252,17 @@
     "security-rescanscreen": "Re-Escanear el Monedero",
     "security-settingsscreen": "Parámetros",
     "security-changewalletscreen": "Abrir otro Monedero",
-    "security-restorewalletbackupscreen": "Restaurar copia de Seguridad"
+    "security-restorewalletbackupscreen": "Restaurar copia de Seguridad",
+    "na": "America del Norte",
+    "usa": "EEUU",
+    "sa": "America del Sur",
+    "ea": "Europa & Africa",
+    "ao": "Asia & Oceania",
+    "hk": "Hong Kong",
+    "canada": "Canada",
+    "france": "Francia",
+    "netherlands": "Paises Bajos",
+    "uk": "Reino Unido"
   },
   "info": {
     "version": "Versión",

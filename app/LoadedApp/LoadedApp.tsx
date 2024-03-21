@@ -95,7 +95,7 @@ type LoadedAppProps = {
   toggleTheme: (mode: 'basic' | 'advanced') => void;
 };
 
-const SERVER_DEFAULT_0: ServerType = serverUris()[0];
+const SERVER_DEFAULT_0: ServerType = serverUris(() => {})[0];
 
 export default function LoadedApp(props: LoadedAppProps) {
   const theme = useTheme() as unknown as ThemeType;
@@ -119,6 +119,7 @@ export default function LoadedApp(props: LoadedAppProps) {
     changeWalletScreen: true,
     restoreWalletBackupScreen: true,
   });
+  const [selectServer, setSelectServer] = useState<'auto' | 'list' | 'custom'>('auto');
   const file = useMemo(
     () => ({
       en: en,
@@ -203,6 +204,11 @@ export default function LoadedApp(props: LoadedAppProps) {
       } else {
         await SettingsFileImpl.writeSettings('security', security);
       }
+      if (settings.selectServer) {
+        setSelectServer(settings.selectServer);
+      } else {
+        await SettingsFileImpl.writeSettings('selectServer', selectServer);
+      }
 
       // reading background task info
       const backgroundJson = await BackgroundFileImpl.readBackground();
@@ -251,6 +257,7 @@ export default function LoadedApp(props: LoadedAppProps) {
         toggleTheme={props.toggleTheme}
         addressBook={addressBook}
         security={security}
+        selectServer={selectServer}
       />
     );
   }
@@ -272,6 +279,7 @@ type LoadedAppClassProps = {
   toggleTheme: (mode: 'basic' | 'advanced') => void;
   addressBook: AddressBookFileClass[];
   security: SecurityType;
+  selectServer: 'auto' | 'list' | 'custom';
 };
 
 export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
@@ -304,6 +312,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       addressBook: props.addressBook,
       launchAddressBook: this.launchAddressBook,
       security: props.security,
+      selectServer: props.selectServer,
     };
 
     this.rpc = new RPC(

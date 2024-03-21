@@ -34,6 +34,7 @@ import {
   NetInfoType,
   ServerType,
   SecurityType,
+  ServerUrisType,
 } from '../AppState';
 import { parseServerURI, serverUris } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
@@ -50,6 +51,7 @@ import SnackbarType from '../AppState/types/SnackbarType';
 import { RPCSeedType } from '../rpc/types/RPCSeedType';
 import Launching from './Launching';
 import simpleBiometrics from '../simpleBiometrics';
+import selectingServer from '../selectingServer';
 
 const BoldText = React.lazy(() => import('../../components/Components/BoldText'));
 const Button = React.lazy(() => import('../../components/Components/Button'));
@@ -70,8 +72,8 @@ type LoadingAppProps = {
   toggleTheme: (mode: 'basic' | 'advanced') => void;
 };
 
-const SERVER_DEFAULT_0 = serverUris()[0];
-const SERVER_DEFAULT_1 = serverUris()[1];
+const SERVER_DEFAULT_0 = serverUris(() => {})[0];
+const SERVER_DEFAULT_1 = serverUris(() => {})[1];
 
 export default function LoadingApp(props: LoadingAppProps) {
   const theme = useTheme() as unknown as ThemeType;
@@ -95,6 +97,7 @@ export default function LoadingApp(props: LoadingAppProps) {
     changeWalletScreen: true,
     restoreWalletBackupScreen: true,
   });
+  const [selectServer, setSelectServer] = useState<'auto' | 'list' | 'custom'>('auto');
   const file = useMemo(
     () => ({
       en: en,
@@ -191,6 +194,11 @@ export default function LoadingApp(props: LoadingAppProps) {
       } else {
         await SettingsFileImpl.writeSettings('security', security);
       }
+      if (settings.selectServer) {
+        setSelectServer(settings.selectServer);
+      } else {
+        await SettingsFileImpl.writeSettings('selectServer', selectServer);
+      }
 
       // for testing
       //await delay(5000);
@@ -235,6 +243,7 @@ export default function LoadingApp(props: LoadingAppProps) {
         firstLaunchingMessage={firstLaunchingMessage}
         toggleTheme={props.toggleTheme}
         security={security}
+        selectServer={selectServer}
       />
     );
   }
@@ -255,6 +264,7 @@ type LoadingAppClassProps = {
   firstLaunchingMessage: boolean;
   toggleTheme: (mode: 'basic' | 'advanced') => void;
   security: SecurityType;
+  selectServer: 'auto' | 'list' | 'custom';
 };
 
 export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
@@ -304,6 +314,8 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
           ? props.route.params.startingApp
           : true,
       security: props.security,
+      selectServer: props.selectServer,
+      // serverErrorTries -> 0 (context).
     };
 
     this.dim = {} as EmitterSubscription;
@@ -351,6 +363,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
         const networkState = await NetInfo.fetch();
         if (networkState.isConnected) {
           let result: string = await RPCModule.loadExistingWallet(this.state.server.uri, this.state.server.chain_name);
+          result = 'Error: pepe es guay';
 
           // for testing
           //await delay(5000);
@@ -371,22 +384,10 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
               this.navigateToLoadedApp();
               //console.log('navigate to LoadedApp');
             } else {
-              this.setState({ screen: 1, actionButtonsDisabled: false });
-              createAlert(
-                this.setBackgroundError,
-                this.addLastSnackbar,
-                this.props.translate('loadingapp.readingwallet-label') as string,
-                result,
-              );
+              await this.loadExistingWalletErrorHandle(result);
             }
           } else {
-            this.setState({ screen: 1, actionButtonsDisabled: false });
-            createAlert(
-              this.setBackgroundError,
-              this.addLastSnackbar,
-              this.props.translate('loadingapp.readingwallet-label') as string,
-              result,
-            );
+            await this.loadExistingWalletErrorHandle(result);
           }
         } else {
           this.setState({ screen: 1, actionButtonsDisabled: false });
@@ -480,6 +481,61 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     this.dim && typeof this.dim.remove === 'function' && this.dim.remove();
     this.appstate && typeof this.appstate.remove === 'function' && this.appstate.remove();
     this.unsubscribeNetInfo && typeof this.unsubscribeNetInfo === 'function' && this.unsubscribeNetInfo();
+  };
+
+  loadExistingWalletErrorHandle = async (result: string) => {
+    if (this.state.serverErrorTries === 0) {
+      // first try
+      this.setState({ screen: 1, actionButtonsDisabled: true });
+      this.addLastSnackbar({
+        message: 'Trying to open your wallet with a different server. The current server may be failing.' as string,
+        type: 'Primary',
+        duration: 'longer',
+      });
+      const servers = await selectingServer(serverUris(this.props.translate));
+      const fasterServer: ServerType = servers
+        .filter((s: ServerUrisType) => s.latency !== null && s.uri !== this.state.server.uri)
+        .sort((a, b) => (a.latency ? a.latency : Infinity) - (b.latency ? b.latency : Infinity))
+        .map((s: ServerUrisType) => {
+          return { uri: s.uri, chain_name: s.chain_name };
+        })[0];
+      console.log(fasterServer);
+      this.setState({
+        server: fasterServer,
+      });
+      await SettingsFileImpl.writeSettings('server', fasterServer);
+      Alert.alert(
+        this.state.translate('loadingapp.readingwallet-label') as string,
+        result,
+        [
+          {
+            onPress: () => {
+              this.setState({
+                startingApp: false,
+                serverErrorTries: 1,
+              });
+              this.componentDidMount();
+            },
+          },
+        ],
+        { cancelable: false, userInterfaceStyle: 'light' },
+      );
+    } else {
+      // second try
+      this.addLastSnackbar({
+        message:
+          "There doesn't seem to be any problem with the server. Your wallet is failing when trying to load." as string,
+        type: 'Primary',
+        duration: 'long',
+      });
+      createAlert(
+        this.setBackgroundError,
+        this.addLastSnackbar,
+        this.props.translate('loadingapp.readingwallet-label') as string,
+        result,
+      );
+      this.setState({ actionButtonsDisabled: false, serverErrorTries: 0 });
+    }
   };
 
   fetchBackgroundSyncing = async () => {

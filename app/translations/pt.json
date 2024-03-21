@@ -252,7 +252,17 @@
     "security-rescanscreen": "Rescanear a Carteira",
     "security-settingsscreen": "Configurações",
     "security-changewalletscreen": "Abrir outra carteira",
-    "security-restorewalletbackupscreen": "Restaurar último backup da carteira"
+    "security-restorewalletbackupscreen": "Restaurar último backup da carteira",
+    "na": "America do Norte",
+    "usa": "EUA",
+    "sa": "America do Sul",
+    "ea": "Europa & Africa",
+    "ao": "Asia & Oceania",
+    "hk": "Hong Kong",
+    "canada": "Canada",
+    "france": "França",
+    "netherlands": "Holanda",
+    "uk": "Reino Unido"
   },
   "info": {
     "version": "Versão",

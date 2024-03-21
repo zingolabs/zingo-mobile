@@ -252,7 +252,17 @@
     "security-rescanscreen": "Rescan Wallet",
     "security-settingsscreen": "Settings",
     "security-changewalletscreen": "Change to another Wallet",
-    "security-restorewalletbackupscreen": "Restore Last Wallet Backup"
+    "security-restorewalletbackupscreen": "Restore Last Wallet Backup",
+    "na": "North America",
+    "usa": "USA",
+    "sa": "South America",
+    "ea": "Europe & Africa",
+    "ao": "Asia & Oceania",
+    "hk": "Hong Kong",
+    "canada": "Canada",
+    "france": "France",
+    "netherlands": "Netherlands",
+    "uk": "UK"
   },
   "info": {
     "version": "Version",
