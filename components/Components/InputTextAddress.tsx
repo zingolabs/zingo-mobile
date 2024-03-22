@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { View, TouchableOpacity, TextInput, Modal } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faCheck, faQrcode } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faQrcode, faXmark } from '@fortawesome/free-solid-svg-icons';
 //import { TouchableOpacity } from 'react-native-gesture-handler';
 
 import { ContextAppLoaded } from '../../app/context';
@@ -126,6 +126,14 @@ const InputTextAddress: React.FunctionComponent<InputTextAddressProps> = ({
                 alignItems: 'center',
                 justifyContent: 'center',
               }}>
+              {address && (
+                <TouchableOpacity
+                  onPress={() => {
+                    setAddress('');
+                  }}>
+                  <FontAwesomeIcon style={{ marginRight: 5 }} size={25} icon={faXmark} color={colors.primaryDisabled} />
+                </TouchableOpacity>
+              )}
               <TouchableOpacity
                 testID="send.scan-button"
                 disabled={disabled}

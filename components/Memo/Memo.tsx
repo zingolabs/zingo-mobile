@@ -1,6 +1,15 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { View, ScrollView, SafeAreaView, TextInput, Dimensions, Keyboard, Platform } from 'react-native';
+import {
+  View,
+  ScrollView,
+  SafeAreaView,
+  TextInput,
+  Dimensions,
+  Keyboard,
+  Platform,
+  TouchableOpacity,
+} from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import Animated, { EasingNode } from 'react-native-reanimated';
 
@@ -11,6 +20,8 @@ import Header from '../Header';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faXmark } from '@fortawesome/free-solid-svg-icons';
 
 type MemoProps = {
   closeModal: () => void;
@@ -114,6 +125,7 @@ const Memo: React.FunctionComponent<MemoProps> = ({ closeModal, updateToField })
             minWidth: 48,
             minHeight: dimensions.height * 0.5,
             maxHeight: dimensions.height * 0.5,
+            flexDirection: 'row',
           }}>
           <TextInput
             testID="send.memo-field"
@@ -133,6 +145,14 @@ const Memo: React.FunctionComponent<MemoProps> = ({ closeModal, updateToField })
             onChangeText={(text: string) => setMemo(text)}
             editable={true}
           />
+          {memo && (
+            <TouchableOpacity
+              onPress={() => {
+                setMemo('');
+              }}>
+              <FontAwesomeIcon style={{ margin: 10 }} size={25} icon={faXmark} color={colors.primaryDisabled} />
+            </TouchableOpacity>
+          )}
         </View>
       </ScrollView>
       <View

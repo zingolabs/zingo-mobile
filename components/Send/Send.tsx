@@ -8,6 +8,7 @@ import {
   faAddressCard,
   faMagnifyingGlassPlus,
   faMoneyCheckDollar,
+  faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme, useIsFocused } from '@react-navigation/native';
@@ -643,6 +644,19 @@ const Send: React.FunctionComponent<SendProps> = ({
                         alignItems: 'center',
                         justifyContent: 'center',
                       }}>
+                      {ta.to && (
+                        <TouchableOpacity
+                          onPress={() => {
+                            updateToField('', null, null, null, null);
+                          }}>
+                          <FontAwesomeIcon
+                            style={{ marginRight: 5 }}
+                            size={25}
+                            icon={faXmark}
+                            color={colors.primaryDisabled}
+                          />
+                        </TouchableOpacity>
+                      )}
                       {itemsPicker.length > 0 && (
                         <>
                           {!updatingToField ? (
@@ -1024,6 +1038,19 @@ const Send: React.FunctionComponent<SendProps> = ({
                             }
                           }}
                         />
+                        {ta.memo && (
+                          <TouchableOpacity
+                            onPress={() => {
+                              updateToField(null, null, null, '', null);
+                            }}>
+                            <FontAwesomeIcon
+                              style={{ marginTop: 7, marginRight: memoIcon ? 0 : 7 }}
+                              size={25}
+                              icon={faXmark}
+                              color={colors.primaryDisabled}
+                            />
+                          </TouchableOpacity>
+                        )}
                         {memoIcon && (
                           <TouchableOpacity
                             onPress={() => {

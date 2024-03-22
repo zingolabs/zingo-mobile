@@ -2,7 +2,7 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { View, ScrollView, SafeAreaView, TouchableOpacity, Modal, TextInput, Keyboard } from 'react-native';
 import { useTheme } from '@react-navigation/native';
-import { faQrcode } from '@fortawesome/free-solid-svg-icons';
+import { faQrcode, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import Animated, { EasingNode } from 'react-native-reanimated';
 
@@ -210,6 +210,14 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
               editable={true}
             />
           </View>
+          {ufvkText && (
+            <TouchableOpacity
+              onPress={() => {
+                setUfvkText('');
+              }}>
+              <FontAwesomeIcon style={{ margin: 0 }} size={25} icon={faXmark} color={colors.primaryDisabled} />
+            </TouchableOpacity>
+          )}
           <TouchableOpacity
             onPress={() => {
               setQrcodeModalVisible(true);
