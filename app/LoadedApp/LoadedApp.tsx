@@ -47,7 +47,6 @@ import {
   ServerType,
   AddressBookFileClass,
   SecurityType,
-  ServerUrisType,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
@@ -64,7 +63,6 @@ import { Launching } from '../LoadingApp';
 import AddressBook from '../../components/AddressBook/AddressBook';
 import AddressBookFileImpl from '../../components/AddressBook/AddressBookFileImpl';
 import simpleBiometrics from '../simpleBiometrics';
-import selectingServer from '../selectingServer';
 
 const History = React.lazy(() => import('../../components/History'));
 const Send = React.lazy(() => import('../../components/Send'));
@@ -343,38 +341,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     (async () => {
       // Configure the RPC to start doing refreshes
       await this.rpc.configure();
-
-      // if the server selection is `auto` we need to calculate the fastest server
-      // and store it.
-      if (this.state.selectServer === 'auto') {
-        if (this.state.mode === 'advanced') {
-          this.addLastSnackbar({
-            message: this.state.translate('loadedapp.selectingserver') as string,
-            type: 'Primary',
-            duration: 'longer',
-          });
-        }
-        const servers = await selectingServer(serverUris(this.props.translate));
-        const fasterServer: ServerType = servers
-          .filter((s: ServerUrisType) => s.latency !== null)
-          .sort((a, b) => (a.latency ? a.latency : Infinity) - (b.latency ? b.latency : Infinity))
-          .map((s: ServerUrisType) => {
-            return { uri: s.uri, chain_name: s.chain_name };
-          })[0] as ServerType;
-        console.log(fasterServer);
-        // if this server is the same -> do nothing
-        if (!isEqual(this.state.server, fasterServer)) {
-          this.set_server_option('server', fasterServer, this.state.mode === 'advanced' ? true : false, true);
-        } else {
-          if (this.state.mode === 'advanced') {
-            this.addLastSnackbar({
-              message: this.state.translate('loadedapp.selectingserversame') as string,
-              type: 'Primary',
-              duration: 'long',
-            });
-          }
-        }
-      }
 
       //console.log(await SettingsFileImpl.readSettings());
     })();

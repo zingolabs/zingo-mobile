@@ -360,7 +360,22 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
 
     this.setState({ actionButtonsDisabled: true });
     (async () => {
-      // First, check if a wallet exists. Do it async so the basic screen has time to render
+      // First, if it's server automatic
+      // here I need to check the servers and select the best one
+      // likely only when the user install or update the new version with this feature.
+      if (this.state.selectServer === 'auto') {
+        setTimeout(() => {
+          this.addLastSnackbar({
+            message: this.state.translate('loadedapp.selectingserver') as string,
+            type: 'Primary',
+            duration: 'longer',
+          });
+        }, 1000);
+        // not a different one, can be the same.
+        await this.selectTheBestServer(false);
+      }
+
+      // Second, check if a wallet exists. Do it async so the basic screen has time to render
       await AsyncStorage.setItem('@background', 'no');
       const exists = await RPCModule.walletExists();
       //console.log('Wallet Exists result', this.state.screen, exists);
@@ -371,7 +386,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
         if (networkState.isConnected) {
           let result: string = await RPCModule.loadExistingWallet(this.state.server.uri, this.state.server.chain_name);
           //if (this.state.serverErrorTries === 0 || true) {
-          //  result = 'Error: pepe es guay';
+          //result = 'Error: pepe es guay';
           //}
 
           // for testing
@@ -498,6 +513,23 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     this.unsubscribeNetInfo && typeof this.unsubscribeNetInfo === 'function' && this.unsubscribeNetInfo();
   };
 
+  selectTheBestServer = async (aDifferentOne: boolean) => {
+    const servers = await selectingServer(serverUris(this.props.translate));
+    const fasterServer: ServerType = servers
+      .filter((s: ServerUrisType) => s.latency !== null && s.uri !== (aDifferentOne ? this.state.server.uri : ''))
+      .sort((a, b) => (a.latency ? a.latency : Infinity) - (b.latency ? b.latency : Infinity))
+      .map((s: ServerUrisType) => {
+        return { uri: s.uri, chain_name: s.chain_name };
+      })[0] as ServerType;
+    console.log(fasterServer);
+    this.setState({
+      server: fasterServer,
+      selectServer: 'list',
+    });
+    await SettingsFileImpl.writeSettings('server', fasterServer);
+    await SettingsFileImpl.writeSettings('selectServer', 'list');
+  };
+
   loadExistingWalletErrorHandle = async (result: string, title: string) => {
     if (this.state.serverErrorTries === 0) {
       // first try
@@ -509,34 +541,13 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
           duration: 'longer',
         });
       }, 1000);
-      const servers = await selectingServer(serverUris(this.props.translate));
-      const fasterServer: ServerType = servers
-        .filter((s: ServerUrisType) => s.latency !== null && s.uri !== this.state.server.uri)
-        .sort((a, b) => (a.latency ? a.latency : Infinity) - (b.latency ? b.latency : Infinity))
-        .map((s: ServerUrisType) => {
-          return { uri: s.uri, chain_name: s.chain_name };
-        })[0] as ServerType;
-      console.log(fasterServer);
+      // a different server.
+      await this.selectTheBestServer(true);
       this.setState({
-        server: fasterServer,
+        startingApp: false,
+        serverErrorTries: 1,
       });
-      await SettingsFileImpl.writeSettings('server', fasterServer);
-      Alert.alert(
-        title,
-        result,
-        [
-          {
-            onPress: () => {
-              this.setState({
-                startingApp: false,
-                serverErrorTries: 1,
-              });
-              this.componentDidMount();
-            },
-          },
-        ],
-        { cancelable: false, userInterfaceStyle: 'light' },
-      );
+      this.componentDidMount();
     } else {
       // second try
       this.addLastSnackbar({
@@ -545,12 +556,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
         duration: 'longer',
       });
       setTimeout(() => {
-        createAlert(
-          this.setBackgroundError,
-          this.addLastSnackbar,
-          this.props.translate('loadingapp.readingwallet-label') as string,
-          result,
-        );
+        createAlert(this.setBackgroundError, this.addLastSnackbar, title, result);
         this.setState({ actionButtonsDisabled: false, serverErrorTries: 0 });
       }, 1000);
     }
@@ -1082,6 +1088,10 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                     />
                   )}
 
+                  {netInfo.isConnected && actionButtonsDisabled && (
+                    <ActivityIndicator size="large" color={colors.primary} style={{ marginVertical: 20 }} />
+                  )}
+
                   {mode !== 'basic' && netInfo.isConnected && (
                     <View style={{ marginTop: 20, display: 'flex', alignItems: 'center' }}>
                       <Button
@@ -1131,10 +1141,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                         </BoldText>
                       </View>
                     </View>
-                  )}
-
-                  {netInfo.isConnected && actionButtonsDisabled && (
-                    <ActivityIndicator size="large" color={colors.primary} style={{ marginVertical: 20 }} />
                   )}
                 </View>
               </ScrollView>
