@@ -158,12 +158,21 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       setListIcon(faDotCircle);
       setListServerUri(serverContext.uri);
       setListServerChainName(serverContext.chain_name);
+      // I have to update them in auto as well
+      // with the same server
+      setAutoServerUri(serverContext.uri);
+      setAutoServerChainName(serverContext.chain_name);
     } else if (selectServerContext === 'custom') {
       setCustomIcon(faDotCircle);
       setCustomServerUri(serverContext.uri);
       setCustomServerChainName(serverContext.chain_name);
+      // I have to update them in auto as well
+      // with the first of the list
+      setAutoServerUri(serverUris(translate)[0].uri);
+      setAutoServerChainName(serverUris(translate)[0].chain_name);
     }
-  }, [selectServerContext, serverContext.chain_name, serverContext.uri]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // only the first time
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
@@ -207,19 +216,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     let serverUriParsed = '';
     let chain_nameParsed = '';
     if (selectServer === 'auto') {
-      if (autoServerUri) {
-        serverUriParsed = autoServerUri;
-      } else {
-        serverUriParsed = selectServerContext === 'list' ? serverContext.uri : serverUris(translate)[0].uri;
-        setAutoServerUri(serverUriParsed);
-      }
-      if (autoServerChainName) {
-        chain_nameParsed = autoServerChainName;
-      } else {
-        chain_nameParsed =
-          selectServerContext === 'list' ? serverContext.chain_name : serverUris(translate)[0].chain_name;
-        setAutoServerChainName(chain_nameParsed);
-      }
+      serverUriParsed = autoServerUri;
+      chain_nameParsed = autoServerChainName;
     } else if (selectServer === 'list') {
       serverUriParsed = listServerUri;
       chain_nameParsed = listServerChainName;
@@ -262,7 +260,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       return;
     }
 
-    if (serverContext.uri !== customServerUri) {
+    if (serverContext.uri !== serverUriParsed) {
       const resultUri = parseServerURI(serverUriParsed, translate);
       if (resultUri.toLowerCase().startsWith('error')) {
         addLastSnackbar({ message: translate('settings.isuri') as string, type: 'Primary' });
@@ -643,8 +641,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                   disabled={disabled}
                   style={{ marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
                   onPress={() => {
-                    //setCustomServerUri('');
-                    //setCustomServerChainName('');
                     setAutoIcon(farCircle);
                     setListIcon(farCircle);
                     setCustomIcon(faDotCircle);
