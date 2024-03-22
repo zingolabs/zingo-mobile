@@ -38,6 +38,7 @@ type SettingsProps = {
   set_privacy_option: (name: 'privacy', value: boolean) => Promise<void>;
   set_mode_option: (name: 'mode', value: string) => Promise<void>;
   set_security_option: (name: 'security', value: SecurityType) => Promise<void>;
+  set_selectServer_option: (name: 'selectServer', value: string) => Promise<void>;
 };
 
 type Options = {
@@ -54,6 +55,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   set_privacy_option,
   set_mode_option,
   set_security_option,
+  set_selectServer_option,
   closeModal,
 }) => {
   const context = useContext(ContextAppLoaded);
@@ -69,6 +71,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     netInfo,
     addLastSnackbar,
     security: securityContext,
+    selectServer: selectServerContext,
   } = context;
 
   const memosArray = translate('settings.memos');
@@ -113,8 +116,12 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
   const [memos, setMemos] = useState<string>(walletSettings.download_memos);
   const [filter, setFilter] = useState<string>(walletSettings.transaction_filter_threshold);
-  const [customServerUri, setCustomServerUri] = useState<string>(serverContext.uri);
-  const [customServerChainName, setCustomServerChainName] = useState<string>(serverContext.chain_name);
+  const [autoServerUri, setAutoServerUri] = useState<string>('');
+  const [autoServerChainName, setAutoServerChainName] = useState<string>('');
+  const [listServerUri, setListServerUri] = useState<string>('');
+  const [listServerChainName, setListServerChainName] = useState<string>('');
+  const [customServerUri, setCustomServerUri] = useState<string>('');
+  const [customServerChainName, setCustomServerChainName] = useState<string>('');
   const [currency, setCurrency] = useState<string>(currencyContext);
   const [language, setLanguage] = useState<string>(languageContext);
   const [sendAll, setSendAll] = useState<boolean>(sendAllContext);
@@ -132,22 +139,31 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [restoreWalletBackupScreen, setRestoreWalletBackupScreen] = useState<boolean>(
     securityContext.restoreWalletBackupScreen,
   );
+  const [selectServer, setSelectServer] = useState<'auto' | 'list' | 'custom'>(selectServerContext);
 
   const [customIcon, setCustomIcon] = useState<IconDefinition>(farCircle);
+  const [autoIcon, setAutoIcon] = useState<IconDefinition>(farCircle);
+  const [listIcon, setListIcon] = useState<IconDefinition>(farCircle);
   const [disabled, setDisabled] = useState<boolean>();
   const [titleViewHeight, setTitleViewHeight] = useState<number>(0);
 
   const slideAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    setCustomIcon(
-      serverUris(translate).filter(
-        (s: ServerUrisType) => s.uri === customServerUri && s.chain_name === customServerChainName,
-      )
-        ? farCircle
-        : faDotCircle,
-    );
-  }, [customServerChainName, customServerUri, translate]);
+    if (selectServerContext === 'auto') {
+      setAutoIcon(faDotCircle);
+      setAutoServerUri(serverContext.uri);
+      setAutoServerChainName(serverContext.chain_name);
+    } else if (selectServerContext === 'list') {
+      setListIcon(faDotCircle);
+      setListServerUri(serverContext.uri);
+      setListServerChainName(serverContext.chain_name);
+    } else if (selectServerContext === 'custom') {
+      setCustomIcon(faDotCircle);
+      setCustomServerUri(serverContext.uri);
+      setCustomServerChainName(serverContext.chain_name);
+    }
+  }, [selectServerContext, serverContext.chain_name, serverContext.uri]);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
@@ -188,20 +204,43 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   };
 
   const saveSettings = async () => {
-    let serverUriParsed = customServerUri;
+    let serverUriParsed = '';
+    let chain_nameParsed = '';
+    if (selectServer === 'auto') {
+      if (autoServerUri) {
+        serverUriParsed = autoServerUri;
+      } else {
+        serverUriParsed = selectServerContext === 'list' ? serverContext.uri : serverUris(translate)[0].uri;
+        setAutoServerUri(serverUriParsed);
+      }
+      if (autoServerChainName) {
+        chain_nameParsed = autoServerChainName;
+      } else {
+        chain_nameParsed =
+          selectServerContext === 'list' ? serverContext.chain_name : serverUris(translate)[0].chain_name;
+        setAutoServerChainName(chain_nameParsed);
+      }
+    } else if (selectServer === 'list') {
+      serverUriParsed = listServerUri;
+      chain_nameParsed = listServerChainName;
+    } else if (selectServer === 'custom') {
+      serverUriParsed = customServerUri;
+      chain_nameParsed = customServerChainName;
+    }
     let same_server_chain_name = true;
     const chain_name = serverContext.chain_name;
     if (
       walletSettings.download_memos === memos &&
       walletSettings.transaction_filter_threshold === filter &&
-      serverContext.uri === customServerUri &&
-      serverContext.chain_name === customServerChainName &&
+      serverContext.uri === serverUriParsed &&
+      serverContext.chain_name === chain_nameParsed &&
       currencyContext === currency &&
       languageContext === language &&
       sendAllContext === sendAll &&
       privacyContext === privacy &&
       modeContext === mode &&
-      isEqual(securityContext, securityObject())
+      isEqual(securityContext, securityObject()) &&
+      selectServerContext === selectServer
     ) {
       addLastSnackbar({ message: translate('settings.nochanges') as string, type: 'Primary' });
       return;
@@ -214,7 +253,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       addLastSnackbar({ message: translate('settings.isthreshold') as string, type: 'Primary' });
       return;
     }
-    if (!serverUriParsed) {
+    if (!serverUriParsed || !chain_nameParsed) {
       addLastSnackbar({ message: translate('settings.isserver') as string, type: 'Primary' });
       return;
     }
@@ -236,7 +275,13 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         // and I save it in the state ASAP.
         if (serverUriParsed !== resultUri) {
           serverUriParsed = resultUri;
-          setCustomServerUri(resultUri);
+          if (selectServer === 'auto') {
+            setAutoServerUri(serverUriParsed);
+          } else if (selectServer === 'list') {
+            setListServerUri(serverUriParsed);
+          } else if (selectServer === 'custom') {
+            setCustomServerUri(serverUriParsed);
+          }
         }
       }
     }
@@ -246,7 +291,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       return;
     }
 
-    if (serverContext.uri !== serverUriParsed || serverContext.chain_name !== customServerChainName) {
+    if (serverContext.uri !== serverUriParsed || serverContext.chain_name !== chain_nameParsed) {
       setDisabled(true);
       addLastSnackbar({ message: translate('loadedapp.tryingnewserver') as string, type: 'Primary' });
       const { result, timeout, new_chain_name } = await checkServerURI(serverUriParsed, serverContext.uri);
@@ -295,16 +340,19 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     if (!isEqual(securityContext, securityObject())) {
       await set_security_option('security', securityObject());
     }
+    if (selectServerContext !== selectServer) {
+      await set_selectServer_option('selectServer', selectServer);
+    }
 
     // I need a little time in this modal because maybe the wallet cannot be open with the new server
     let ms = 100;
-    if (serverContext.uri !== serverUriParsed || serverContext.chain_name !== customServerChainName) {
+    if (serverContext.uri !== serverUriParsed || serverContext.chain_name !== chain_nameParsed) {
       if (languageContext !== language) {
         await set_language_option('language', language, false);
       }
       set_server_option(
         'server',
-        { uri: serverUriParsed, chain_name: customServerChainName } as ServerType,
+        { uri: serverUriParsed, chain_name: chain_nameParsed } as ServerType,
         true,
         same_server_chain_name,
       );
@@ -492,56 +540,110 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             </View>
 
             <View style={{ display: 'flex', marginLeft: 25 }}>
-              {serverUris(translate).map((s: ServerUrisType, i: number) =>
-                s.uri ? (
-                  <TouchableOpacity
-                    testID={
-                      i === 0
-                        ? 'settings.firstServer'
-                        : i === 1
-                        ? 'settings.secondServer'
-                        : 'settings.' + i.toString + '-Server'
-                    }
-                    disabled={disabled}
-                    key={'touch-' + s.uri}
-                    style={{ marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
-                    onPress={() => {
-                      setCustomServerUri(s.uri);
-                      setCustomServerChainName(s.chain_name);
-                    }}>
-                    <View style={{ display: 'flex', flexDirection: 'row', marginTop: 10 }}>
-                      <FontAwesomeIcon
-                        icon={customServerUri === s.uri ? faDotCircle : farCircle}
-                        size={20}
-                        color={colors.border}
-                      />
-                      <RegText key={'tex-' + s.uri} style={{ marginLeft: 10 }}>
-                        {s.uri}
-                      </RegText>
-                      {s.region && (
-                        <RegText key={'tex-' + s.region} style={{ marginLeft: 10 }} color={colors.primaryDisabled}>
-                          {' (' + s.region + ')'}
+              <View>
+                <TouchableOpacity
+                  testID="settings.auto-server"
+                  disabled={disabled}
+                  style={{ marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
+                  onPress={() => {
+                    setAutoIcon(faDotCircle);
+                    setListIcon(farCircle);
+                    setCustomIcon(farCircle);
+                    setSelectServer('auto');
+                  }}>
+                  <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
+                    {autoIcon && <FontAwesomeIcon icon={autoIcon} size={20} color={colors.border} />}
+                    <RegText style={{ marginLeft: 10 }}>{translate('settings.server-auto') as string}</RegText>
+                    {autoIcon === faDotCircle && <FadeText style={{ marginLeft: 10 }}>{autoServerUri}</FadeText>}
+                  </View>
+                </TouchableOpacity>
+              </View>
+              <View>
+                <TouchableOpacity
+                  testID="settings.list-server"
+                  disabled={disabled}
+                  style={{ marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
+                  onPress={() => {
+                    setAutoIcon(farCircle);
+                    setListIcon(faDotCircle);
+                    setCustomIcon(farCircle);
+                    setSelectServer('list');
+                  }}>
+                  <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
+                    {listIcon && <FontAwesomeIcon icon={listIcon} size={20} color={colors.border} />}
+                    <RegText style={{ marginLeft: 10 }}>{translate('settings.server-list') as string}</RegText>
+                    {listIcon === faDotCircle && <FadeText style={{ marginLeft: 10 }}>{listServerUri}</FadeText>}
+                  </View>
+                </TouchableOpacity>
+              </View>
+              {selectServer === 'list' &&
+                serverUris(translate).map((s: ServerUrisType, i: number) =>
+                  s.uri ? (
+                    <TouchableOpacity
+                      testID={
+                        i === 0
+                          ? 'settings.firstServer'
+                          : i === 1
+                          ? 'settings.secondServer'
+                          : 'settings.' + i.toString + '-Server'
+                      }
+                      disabled={disabled}
+                      key={'touch-' + s.uri}
+                      style={{ marginLeft: 25, marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
+                      onPress={() => {
+                        setListServerUri(s.uri);
+                        setListServerChainName(s.chain_name);
+                        setSelectServer('list');
+                        setAutoIcon(farCircle);
+                        setListIcon(faDotCircle);
+                        setCustomIcon(farCircle);
+                      }}>
+                      <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
+                        <FontAwesomeIcon
+                          icon={listServerUri === s.uri ? faDotCircle : farCircle}
+                          size={20}
+                          color={colors.border}
+                        />
+                        <RegText key={'tex-' + s.uri} style={{ marginLeft: 10 }}>
+                          {s.uri}
                         </RegText>
-                      )}
-                      {s.latency && (
-                        <RegText key={'tex-' + s.region} style={{ marginLeft: 10 }} color={colors.primaryDisabled}>
-                          {' (' + s.latency + ')'}
-                        </RegText>
-                      )}
-                    </View>
-                  </TouchableOpacity>
-                ) : null,
-              )}
+                        {s.region && (
+                          <RegText key={'tex-' + s.region} style={{ marginLeft: 10 }} color={colors.primaryDisabled}>
+                            {' (' + s.region + ')'}
+                          </RegText>
+                        )}
+                        {s.latency && (
+                          <RegText key={'tex-' + s.region} style={{ marginLeft: 10 }} color={colors.primaryDisabled}>
+                            {' (' + s.latency + ')'}
+                          </RegText>
+                        )}
+                      </View>
+                    </TouchableOpacity>
+                  ) : null,
+                )}
 
               <View>
                 <TouchableOpacity
                   testID="settings.custom-server"
                   disabled={disabled}
                   style={{ marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
-                  onPress={() => setCustomServerUri('')}>
-                  <View style={{ display: 'flex', flexDirection: 'row', marginTop: 10 }}>
+                  onPress={() => {
+                    //setCustomServerUri('');
+                    //setCustomServerChainName('');
+                    setAutoIcon(farCircle);
+                    setListIcon(farCircle);
+                    setCustomIcon(faDotCircle);
+                    setSelectServer('custom');
+                  }}>
+                  <View
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      marginTop: 10,
+                    }}>
                     {customIcon && <FontAwesomeIcon icon={customIcon} size={20} color={colors.border} />}
-                    <RegText style={{ marginLeft: 10 }}>{translate('settings.custom') as string}</RegText>
+                    <RegText style={{ marginLeft: 10 }}>{translate('settings.server-custom') as string}</RegText>
                   </View>
                 </TouchableOpacity>
 

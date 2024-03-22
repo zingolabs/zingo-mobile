@@ -1098,6 +1098,16 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     this.rpc.fetchWalletSettings();
   };
 
+  set_selectServer_option = async (name: 'selectServer', value: string): Promise<void> => {
+    await SettingsFileImpl.writeSettings(name, value);
+    this.setState({
+      selectServer: value as 'auto' | 'list' | 'custom',
+    });
+
+    // Refetch the settings to update
+    this.rpc.fetchWalletSettings();
+  };
+
   navigateToLoadingApp = async (state: any) => {
     const { navigation } = this.props;
 
@@ -1456,6 +1466,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 set_privacy_option={this.set_privacy_option}
                 set_mode_option={this.set_mode_option}
                 set_security_option={this.set_security_option}
+                set_selectServer_option={this.set_selectServer_option}
               />
             </Suspense>
           </Modal>

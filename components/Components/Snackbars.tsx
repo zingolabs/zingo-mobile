@@ -33,7 +33,7 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
     if (snackbars.length > 0 && !snacking) {
       const currentSnackbar = snackbars[0];
       //console.log('show snackbar', currentSnackbar);
-      setDuration(currentSnackbar.duration === 'short' ? 1000 : currentSnackbar.duration === 'long' ? 4000 : 8000);
+      setDuration(currentSnackbar.duration === 'longer' ? 8000 : currentSnackbar.duration === 'short' ? 1000 : 4000);
       setSnacking(true);
       Snackbar.show({
         text: currentSnackbar.message,
