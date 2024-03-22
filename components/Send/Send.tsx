@@ -98,7 +98,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [titleViewHeight, setTitleViewHeight] = useState<number>(0);
   const [memoEnabled, setMemoEnabled] = useState<boolean>(false);
   const [validAddress, setValidAddress] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
-  const [validAmount, setValidAmount] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
+  const [validAmount, setValidAmount] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - Invalid number, -2 - Invalid Amount
   const [sendButtonEnabled, setSendButtonEnabled] = useState<boolean>(false);
   const [itemsPicker, setItemsPicker] = useState<{ label: string; value: string }[]>([]);
   const [memoIcon, setMemoIcon] = useState<boolean>(false);
@@ -233,27 +233,27 @@ const Send: React.FunctionComponent<SendProps> = ({
     let invalid = false;
     if (to.amountCurrency !== '') {
       if (isNaN(Number(to.amountCurrency))) {
-        setValidAmount(-1);
+        setValidAmount(-1); // invalid number
         invalid = true;
       }
     }
     if (!invalid) {
       if (to.amount !== '') {
         if (isNaN(Number(to.amount))) {
-          setValidAmount(-1);
+          setValidAmount(-1); // invalid number
         } else {
           if (
             Utils.parseLocaleFloat(Number(spendable).toFixed(8)) >= Utils.parseLocaleFloat(Number(fee).toFixed(8)) &&
             Utils.parseLocaleFloat(Number(to.amount).toFixed(8)) >= 0 &&
             Utils.parseLocaleFloat(Number(to.amount).toFixed(8)) <= Utils.parseLocaleFloat(maxAmount.toFixed(8))
           ) {
-            setValidAmount(1);
+            setValidAmount(1); // valid
           } else {
-            setValidAmount(-1);
+            setValidAmount(-2); // invalid amount
           }
         }
       } else {
-        setValidAmount(0);
+        setValidAmount(0); // empty
       }
     }
   }, [
@@ -753,7 +753,8 @@ const Send: React.FunctionComponent<SendProps> = ({
                       </TouchableOpacity>
                     )}
                   </View>
-                  {validAmount === -1 && <ErrorText>{translate('send.invalidamount') as string}</ErrorText>}
+                  {validAmount === -1 && <ErrorText>{translate('send.invalidnumber') as string}</ErrorText>}
+                  {validAmount === -2 && <ErrorText>{translate('send.invalidamount') as string}</ErrorText>}
                 </View>
 
                 <View

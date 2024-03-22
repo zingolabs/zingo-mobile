@@ -360,6 +360,7 @@
     "invalidaddress": "Endereço Inválido!",
     "addressplaceholder": "Unificado, Z-Sapling ou Transparente",
     "invalidamount": "Quantia Invalida!",
+    "invalidnumber": "Número Inválido!",
     "spendable": "Disponível: ",
     "somefunds": "Alguns fundos ainda estão sendo confirmados ou sincronizados",
     "memo": "MEMOS (Opcional)",
