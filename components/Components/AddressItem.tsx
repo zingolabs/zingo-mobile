@@ -194,7 +194,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
                 initial: false,
               });
             }}>
-            <FontAwesomeIcon style={{ marginTop: 3 }} size={20} icon={faArrowUp} color={colors.primary} />
+            <FontAwesomeIcon style={{ marginTop: 3 }} size={30} icon={faArrowUp} color={colors.primary} />
           </TouchableOpacity>
         )}
     </View>

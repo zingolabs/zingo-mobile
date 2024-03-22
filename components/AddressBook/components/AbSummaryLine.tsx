@@ -107,7 +107,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
               setAction('Modify');
               handleScrollToTop();
             }}>
-            <FontAwesomeIcon style={{ opacity: 0.8 }} size={20} icon={faPencil} color={colors.money} />
+            <FontAwesomeIcon style={{ opacity: 0.8 }} size={25} icon={faPencil} color={colors.money} />
           </TouchableOpacity>
         </View>
         {!readOnly && !(mode === 'basic' && totalBalance.spendableOrchard + totalBalance.spendablePrivate <= 0) && (
@@ -125,13 +125,13 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
                   initial: false,
                 });
               }}>
-              <FontAwesomeIcon size={20} icon={faArrowUp} color={colors.primary} />
+              <FontAwesomeIcon size={30} icon={faArrowUp} color={colors.primary} />
             </TouchableOpacity>
           </View>
         )}
         <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
           <TouchableOpacity style={{ zIndex: 999, padding: 10 }} onPress={() => onPressDelete()}>
-            <FontAwesomeIcon style={{ opacity: 0.8 }} size={20} icon={faTrashCan} color={colors.money} />
+            <FontAwesomeIcon style={{ opacity: 0.8 }} size={25} icon={faTrashCan} color={colors.money} />
           </TouchableOpacity>
         </View>
       </View>
