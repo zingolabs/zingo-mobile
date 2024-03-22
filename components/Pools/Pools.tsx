@@ -124,7 +124,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, set_privacy_op
                 currencyName={info.currencyName ? info.currencyName : ''}
                 color={
                   totalBalance.spendablePrivate > 0 && totalBalance.spendablePrivate === totalBalance.privateBal
-                    ? colors.primary
+                    ? colors.syncing
                     : 'red'
                 }
                 privacy={privacy}
