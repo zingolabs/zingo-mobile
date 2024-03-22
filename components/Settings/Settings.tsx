@@ -607,13 +607,28 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                         <RegText key={'tex-' + s.uri} style={{ marginLeft: 10 }}>
                           {s.uri}
                         </RegText>
+                      </View>
+                      <View
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          marginBottom: 5,
+                          marginLeft: 20,
+                        }}>
                         {s.region && (
-                          <RegText key={'tex-' + s.region} style={{ marginLeft: 10 }} color={colors.primaryDisabled}>
+                          <RegText
+                            key={'tex-' + s.region}
+                            style={{ marginLeft: 10, fontSize: 14 }}
+                            color={colors.primaryDisabled}>
                             {' (' + s.region + ')'}
                           </RegText>
                         )}
                         {s.latency && (
-                          <RegText key={'tex-' + s.region} style={{ marginLeft: 10 }} color={colors.primaryDisabled}>
+                          <RegText
+                            key={'tex-' + s.region}
+                            style={{ marginLeft: 10, fontSize: 14 }}
+                            color={colors.primaryDisabled}>
                             {' (' + s.latency + ')'}
                           </RegText>
                         )}
