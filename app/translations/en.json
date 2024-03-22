@@ -218,6 +218,9 @@
     "server-auto": "Automatic",
     "server-list": "List",
     "server-custom": "Custom",
+    "server-auto-text": "The next time the application starts, it will calculate which is the best server in the list and make it active.",
+    "server-list-text": "Select a server from the list.",
+    "server-custom-text": "Fill in the information of the server you want to use.",
     "threshold-title": "TRANSACTION FILTER THRESHOLD",
     "number": "Number...",
     "memo-title": "MEMO DOWNLOAD",
@@ -268,7 +271,8 @@
     "canada": "Canada",
     "france": "France",
     "netherlands": "Netherlands",
-    "uk": "UK"
+    "uk": "UK",
+    "select-placeholder": "Choose a Server..."
   },
   "info": {
     "version": "Version",

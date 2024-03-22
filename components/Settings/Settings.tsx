@@ -22,6 +22,7 @@ import { SecurityType, ServerType, ServerUrisType } from '../../app/AppState';
 import { isEqual } from 'lodash';
 import ChainTypeToggle from '../Components/ChainTypeToggle';
 import CheckBox from '@react-native-community/checkbox';
+import RNPickerSelect from 'react-native-picker-select';
 
 type SettingsProps = {
   closeModal: () => void;
@@ -120,6 +121,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [autoServerChainName, setAutoServerChainName] = useState<string>('');
   const [listServerUri, setListServerUri] = useState<string>('');
   const [listServerChainName, setListServerChainName] = useState<string>('');
+  const [itemsPicker, setItemsPicker] = useState<{ label: string; value: object }[]>([]);
   const [customServerUri, setCustomServerUri] = useState<string>('');
   const [customServerChainName, setCustomServerChainName] = useState<string>('');
   const [currency, setCurrency] = useState<string>(currencyContext);
@@ -173,6 +175,14 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // only the first time
+
+  useEffect(() => {
+    const items = serverUris(translate).map((item: ServerUrisType) => ({
+      label: (item.region ? item.region + ' ' : '') + item.uri,
+      value: { uri: item.uri, chain_name: item.chain_name } as ServerType,
+    }));
+    setItemsPicker(items);
+  }, [translate]);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
@@ -542,7 +552,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 <TouchableOpacity
                   testID="settings.auto-server"
                   disabled={disabled}
-                  style={{ marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
+                  style={{ marginRight: 10, marginBottom: 0, maxHeight: 50, minHeight: 48 }}
                   onPress={() => {
                     setAutoIcon(faDotCircle);
                     setListIcon(farCircle);
@@ -556,84 +566,71 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                   </View>
                 </TouchableOpacity>
               </View>
+              <View style={{ display: 'flex' }}>
+                <FadeText>{translate('settings.server-auto-text') as string}</FadeText>
+              </View>
+
               <View>
-                <TouchableOpacity
-                  testID="settings.list-server"
-                  disabled={disabled}
-                  style={{ marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
-                  onPress={() => {
-                    setAutoIcon(farCircle);
-                    setListIcon(faDotCircle);
-                    setCustomIcon(farCircle);
-                    setSelectServer('list');
-                  }}>
-                  <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
+                {!disabled && itemsPicker.length > 0 ? (
+                  <RNPickerSelect
+                    fixAndroidTouchableBug={true}
+                    value={listServerUri}
+                    items={itemsPicker}
+                    placeholder={{
+                      label: translate('settings.select-placeholder') as string,
+                      value: listServerUri,
+                      color: colors.primary,
+                    }}
+                    useNativeAndroidPickerStyle={false}
+                    onValueChange={(item: ServerType) => {
+                      if (item) {
+                        setAutoIcon(farCircle);
+                        setListIcon(faDotCircle);
+                        setCustomIcon(farCircle);
+                        setSelectServer('list');
+                        if (item.uri) {
+                          setListServerUri(item.uri);
+                        }
+                        if (item.chain_name) {
+                          setListServerChainName(item.chain_name);
+                        }
+                      }
+                    }}>
+                    <View
+                      style={{
+                        marginRight: 10,
+                        marginBottom: 5,
+                        maxHeight: 50,
+                        minHeight: 48,
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                      }}>
+                      {listIcon && <FontAwesomeIcon icon={listIcon} size={20} color={colors.border} />}
+                      <RegText style={{ marginLeft: 10 }}>{translate('settings.server-list') as string}</RegText>
+                      {listIcon === faDotCircle && <FadeText style={{ marginLeft: 10 }}>{listServerUri}</FadeText>}
+                    </View>
+                  </RNPickerSelect>
+                ) : (
+                  <View
+                    style={{
+                      marginRight: 10,
+                      marginBottom: 5,
+                      maxHeight: 50,
+                      minHeight: 48,
+                      display: 'flex',
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                    }}>
                     {listIcon && <FontAwesomeIcon icon={listIcon} size={20} color={colors.border} />}
                     <RegText style={{ marginLeft: 10 }}>{translate('settings.server-list') as string}</RegText>
                     {listIcon === faDotCircle && <FadeText style={{ marginLeft: 10 }}>{listServerUri}</FadeText>}
                   </View>
-                </TouchableOpacity>
-              </View>
-              {selectServer === 'list' &&
-                serverUris(translate).map((s: ServerUrisType, i: number) =>
-                  s.uri ? (
-                    <TouchableOpacity
-                      testID={
-                        i === 0
-                          ? 'settings.firstServer'
-                          : i === 1
-                          ? 'settings.secondServer'
-                          : 'settings.' + i.toString + '-Server'
-                      }
-                      disabled={disabled}
-                      key={'touch-' + s.uri}
-                      style={{ marginLeft: 25, marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
-                      onPress={() => {
-                        setListServerUri(s.uri);
-                        setListServerChainName(s.chain_name);
-                        setSelectServer('list');
-                        setAutoIcon(farCircle);
-                        setListIcon(faDotCircle);
-                        setCustomIcon(farCircle);
-                      }}>
-                      <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
-                        <FontAwesomeIcon
-                          icon={listServerUri === s.uri ? faDotCircle : farCircle}
-                          size={20}
-                          color={colors.border}
-                        />
-                        <RegText key={'tex-' + s.uri} style={{ marginLeft: 10 }}>
-                          {s.uri}
-                        </RegText>
-                      </View>
-                      <View
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          marginBottom: 5,
-                          marginLeft: 20,
-                        }}>
-                        {s.region && (
-                          <RegText
-                            key={'tex-' + s.region}
-                            style={{ marginLeft: 10, fontSize: 14 }}
-                            color={colors.primaryDisabled}>
-                            {' (' + s.region + ')'}
-                          </RegText>
-                        )}
-                        {s.latency && (
-                          <RegText
-                            key={'tex-' + s.region}
-                            style={{ marginLeft: 10, fontSize: 14 }}
-                            color={colors.primaryDisabled}>
-                            {' (' + s.latency + ')'}
-                          </RegText>
-                        )}
-                      </View>
-                    </TouchableOpacity>
-                  ) : null,
                 )}
+              </View>
+              <View style={{ display: 'flex' }}>
+                <FadeText>{translate('settings.server-list-text') as string}</FadeText>
+              </View>
 
               <View>
                 <TouchableOpacity
@@ -657,6 +654,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                     <RegText style={{ marginLeft: 10 }}>{translate('settings.server-custom') as string}</RegText>
                   </View>
                 </TouchableOpacity>
+                {customIcon === farCircle && (
+                  <View style={{ display: 'flex' }}>
+                    <FadeText>{translate('settings.server-custom-text') as string}</FadeText>
+                  </View>
+                )}
 
                 {customIcon === faDotCircle && (
                   <View>

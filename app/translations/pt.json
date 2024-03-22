@@ -218,6 +218,9 @@
     "server-auto": "Automatico",
     "server-list": "Lista",
     "server-custom": "Personalizado",
+    "server-auto-text": "Na próxima vez que o aplicativo for iniciado, ele calculará qual é o melhor servidor da lista e o ativará.",
+    "server-list-text": "Selecione um servidor na lista.",
+    "server-custom-text": "Preencha as informações do servidor que deseja usar.",
     "threshold-title": "LIMITE DO FILTRO DAS TRANSAÇÕES",
     "number": "Número...",
     "memo-title": "BAIXAR MEMOS",
@@ -268,7 +271,8 @@
     "canada": "Canada",
     "france": "França",
     "netherlands": "Holanda",
-    "uk": "Reino Unido"
+    "uk": "Reino Unido",
+    "select-placeholder": "escolha um servidor..."
   },
   "info": {
     "version": "Versão",

@@ -218,6 +218,9 @@
     "server-auto": "Automatico",
     "server-list": "Lista",
     "server-custom": "Personalizado",
+    "server-auto-text": "La proxima vez que se inicie la aplicacion, calculara cual es el mejor servidor de la lista y lo pondra como activo.",
+    "server-list-text": "Selecciona un servidor de la lista.",
+    "server-custom-text": "Rellena la informacion del servidor que quieres usar.",
     "threshold-title": "UMBRAL PARA EL FILTRO DE TRANSACCIONES",
     "number": "Número...",
     "memo-title": "DESCARGAR MEMOS",
@@ -268,7 +271,8 @@
     "canada": "Canada",
     "france": "Francia",
     "netherlands": "Paises Bajos",
-    "uk": "Reino Unido"
+    "uk": "Reino Unido",
+    "select-placeholder": "Elige un Servidor..."
   },
   "info": {
     "version": "Versión",
