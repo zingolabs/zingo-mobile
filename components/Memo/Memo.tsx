@@ -105,8 +105,8 @@ const Memo: React.FunctionComponent<MemoProps> = ({ closeModal, updateToField })
 
       <ScrollView
         style={{
-          maxHeight: Platform.OS === 'android' ? '80%' : '70%',
-          minHeight: Platform.OS === 'android' ? '80%' : '70%',
+          maxHeight: Platform.OS === 'android' ? '70%' : '70%',
+          minHeight: Platform.OS === 'android' ? '50%' : '50%',
         }}
         contentContainerStyle={{
           flexDirection: 'column',
