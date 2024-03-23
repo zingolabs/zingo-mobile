@@ -55,7 +55,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
         { text: translate('confirm') as string, onPress: () => doAction('Delete', item.label, item.address) },
         { text: translate('cancel') as string, style: 'cancel' },
       ],
-      { cancelable: true, userInterfaceStyle: 'light' },
+      { cancelable: false, userInterfaceStyle: 'light' },
     );
   };
 

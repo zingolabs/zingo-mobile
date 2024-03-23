@@ -81,7 +81,7 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
         { text: translate('send.fetch-button') as string, onPress: () => onPressFetch() },
         { text: translate('cancel') as string, style: 'cancel' },
       ],
-      { cancelable: true, userInterfaceStyle: 'light' },
+      { cancelable: false, userInterfaceStyle: 'light' },
     );
   };
 
