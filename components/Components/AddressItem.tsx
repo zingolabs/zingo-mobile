@@ -67,7 +67,10 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
     setNumLinesAddress(numLinesAdd);
     setNumLinesContact(numLinesCon);
     setContact(cont);
-  }, [address, addressBook]);
+    // the address prop make no sense that it is going to change,
+    // but the address book can change in any moment.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [addressBook]);
 
   useEffect(() => {
     if (!oneLine) {

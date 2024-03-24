@@ -10,9 +10,6 @@ import Header from '../Header';
 import SingleAddress from '../Components/SingleAddress';
 import RPC from '../../app/rpc';
 import FadeText from '../Components/FadeText';
-import RPCModule from '../../app/RPCModule';
-import { WalletType } from '../../app/AppState';
-import { RPCUfvkType } from '../../app/rpc/types/RPCUfvkType';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
@@ -38,39 +35,8 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
-  const [ufvk, setUfvk] = useState<string>(wallet.ufvk ? wallet.ufvk : '');
   const [times, setTimes] = useState<number>(0);
   const [texts, setTexts] = useState<TextsType>({} as TextsType);
-
-  const getUfvk = async () => {
-    try {
-      const ufvkStr: string = await RPCModule.execute('exportufvk', '');
-      if (ufvkStr) {
-        if (ufvkStr.toLowerCase().startsWith('error')) {
-          console.log(`Error ufvk ${ufvkStr}`);
-          return {} as WalletType;
-        }
-      } else {
-        console.log('Internal Error ufvk');
-        return {} as WalletType;
-      }
-      const ufvkValue: WalletType = (await JSON.parse(ufvkStr)) as RPCUfvkType;
-
-      return ufvkValue;
-    } catch (error) {
-      console.log(`Critical Error ufvk ${error}`);
-      return {} as WalletType;
-    }
-  };
-
-  useEffect(() => {
-    if (!ufvk) {
-      (async () => {
-        const w: WalletType = await getUfvk();
-        setUfvk(w.ufvk ? w.ufvk : '');
-      })();
-    }
-  }, [ufvk]);
 
   useEffect(() => {
     const buttonTextsArray = translate('ufvk.buttontexts');
@@ -145,8 +111,10 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
         </FadeText>
 
         <View style={{ display: 'flex', flexDirection: 'column', marginTop: 0, alignItems: 'center' }}>
-          {!!ufvk && <SingleAddress address={ufvk} index={0} total={1} prev={() => null} next={() => null} />}
-          {!ufvk && <ActivityIndicator size="large" color={colors.primary} />}
+          {!!wallet.ufvk && (
+            <SingleAddress address={wallet.ufvk} index={0} total={1} prev={() => null} next={() => null} />
+          )}
+          {!wallet.ufvk && <ActivityIndicator size="large" color={colors.primary} />}
         </View>
 
         <View style={{ marginBottom: 30 }} />
@@ -168,7 +136,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
             mode === 'basic' ? (translate('cancel') as string) : !!texts && !!texts[action] ? texts[action][times] : ''
           }
           onPress={() => {
-            if (!ufvk) {
+            if (!wallet.ufvk) {
               return;
             }
             if (!netInfo.isConnected && times > 0) {

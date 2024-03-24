@@ -44,8 +44,15 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
     const amountCo =
       tx.confirmations === 0 ? colors.primaryDisabled : tx.type === 'Received' ? colors.primary : colors.text;
 
-    const txIc = tx.confirmations === 0 ? faRefresh : tx.type === 'Received' ? faArrowDown : faArrowUp;
+    setAmountColor(amountCo);
+  }, [colors.primary, colors.primaryDisabled, colors.text, tx.confirmations, tx.type]);
 
+  useEffect(() => {
+    const txIc = tx.confirmations === 0 ? faRefresh : tx.type === 'Received' ? faArrowDown : faArrowUp;
+    setTxIcon(txIc);
+  }, [tx.confirmations, tx.type]);
+
+  useEffect(() => {
     // if no address I'm going to put txid here.
     const displayAdd =
       tx.txDetails.length === 1 && tx.txDetails[0].address ? (
@@ -53,10 +60,8 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
       ) : (
         <FadeText style={{ fontSize: 18 }}>{Utils.trimToSmall(tx.txid, 7)}</FadeText>
       );
-    setAmountColor(amountCo);
-    setTxIcon(txIc);
     setDisplayAddress(displayAdd);
-  }, [colors.primary, colors.primaryDisabled, colors.text, tx.confirmations, tx.txDetails, tx.txid, tx.type]);
+  }, [tx.txDetails, tx.txid]);
 
   //console.log('render TxSummaryLine - 5', index);
 
