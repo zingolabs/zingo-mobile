@@ -24,7 +24,7 @@ exports[`Component Memo - test Memo - snapshot 1`] = `
     style={
       {
         "maxHeight": "70%",
-        "minHeight": "70%",
+        "minHeight": "50%",
       }
     }
   >

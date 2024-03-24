@@ -817,7 +817,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
             onStartShouldSetResponder={[Function]}
             style={
               {
-                "marginBottom": 5,
+                "marginBottom": 0,
                 "marginRight": 10,
                 "maxHeight": 50,
                 "minHeight": 48,
@@ -883,28 +883,132 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
             </View>
           </View>
         </View>
-        <View>
-          <View
-            accessible={true}
-            collapsable={false}
-            focusable={true}
-            onClick={[Function]}
-            onResponderGrant={[Function]}
-            onResponderMove={[Function]}
-            onResponderRelease={[Function]}
-            onResponderTerminate={[Function]}
-            onResponderTerminationRequest={[Function]}
-            onStartShouldSetResponder={[Function]}
+        <View
+          style={
+            {
+              "display": "flex",
+            }
+          }
+        >
+          <Text
             style={
               {
-                "marginBottom": 5,
-                "marginRight": 10,
-                "maxHeight": 50,
-                "minHeight": 48,
-                "opacity": 1,
+                "color": "rgb(28, 28, 30)",
+                "opacity": 0.65,
               }
             }
-            testID="settings.list-server"
+          >
+            text translated
+          </Text>
+        </View>
+        <View>
+          <RNPickerSelect
+            fixAndroidTouchableBug={true}
+            items={
+              [
+                {
+                  "label": "text translated https://mainnet.lightwalletd.com:9067",
+                  "value": {
+                    "chain_name": "main",
+                    "uri": "https://mainnet.lightwalletd.com:9067",
+                  },
+                },
+                {
+                  "label": "text translated https://lwd1.zcash-infra.com:9067",
+                  "value": {
+                    "chain_name": "main",
+                    "uri": "https://lwd1.zcash-infra.com:9067",
+                  },
+                },
+                {
+                  "label": "text translated https://na.lightwalletd.com:443",
+                  "value": {
+                    "chain_name": "main",
+                    "uri": "https://na.lightwalletd.com:443",
+                  },
+                },
+                {
+                  "label": "text translated https://sa.lightwalletd.com:443",
+                  "value": {
+                    "chain_name": "main",
+                    "uri": "https://sa.lightwalletd.com:443",
+                  },
+                },
+                {
+                  "label": "text translated https://eu.lightwalletd.com:443",
+                  "value": {
+                    "chain_name": "main",
+                    "uri": "https://eu.lightwalletd.com:443",
+                  },
+                },
+                {
+                  "label": "text translated https://ai.lightwalletd.com:443",
+                  "value": {
+                    "chain_name": "main",
+                    "uri": "https://ai.lightwalletd.com:443",
+                  },
+                },
+                {
+                  "label": "text translated https://lwd2.zcash-infra.com:9067",
+                  "value": {
+                    "chain_name": "main",
+                    "uri": "https://lwd2.zcash-infra.com:9067",
+                  },
+                },
+                {
+                  "label": "text translated https://lwd3.zcash-infra.com:9067",
+                  "value": {
+                    "chain_name": "main",
+                    "uri": "https://lwd3.zcash-infra.com:9067",
+                  },
+                },
+                {
+                  "label": "text translated https://lwd4.zcash-infra.com:9067",
+                  "value": {
+                    "chain_name": "main",
+                    "uri": "https://lwd4.zcash-infra.com:9067",
+                  },
+                },
+                {
+                  "label": "text translated https://lwd5.zcash-infra.com:9067",
+                  "value": {
+                    "chain_name": "main",
+                    "uri": "https://lwd5.zcash-infra.com:9067",
+                  },
+                },
+                {
+                  "label": "text translated https://lwd6.zcash-infra.com:9067",
+                  "value": {
+                    "chain_name": "main",
+                    "uri": "https://lwd6.zcash-infra.com:9067",
+                  },
+                },
+                {
+                  "label": "text translated https://lwd7.zcash-infra.com:9067",
+                  "value": {
+                    "chain_name": "main",
+                    "uri": "https://lwd7.zcash-infra.com:9067",
+                  },
+                },
+                {
+                  "label": "text translated https://lwd8.zcash-infra.com:9067",
+                  "value": {
+                    "chain_name": "main",
+                    "uri": "https://lwd8.zcash-infra.com:9067",
+                  },
+                },
+              ]
+            }
+            onValueChange={[Function]}
+            placeholder={
+              {
+                "color": "rgb(0, 122, 255)",
+                "label": "text translated",
+                "value": "",
+              }
+            }
+            useNativeAndroidPickerStyle={false}
+            value=""
           >
             <View
               style={
@@ -912,7 +1016,10 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                   "alignItems": "center",
                   "display": "flex",
                   "flexDirection": "row",
-                  "marginTop": 10,
+                  "marginBottom": 5,
+                  "marginRight": 10,
+                  "maxHeight": 50,
+                  "minHeight": 48,
                 }
               }
             >
@@ -961,7 +1068,25 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                 text translated
               </Text>
             </View>
-          </View>
+          </RNPickerSelect>
+        </View>
+        <View
+          style={
+            {
+              "display": "flex",
+            }
+          }
+        >
+          <Text
+            style={
+              {
+                "color": "rgb(28, 28, 30)",
+                "opacity": 0.65,
+              }
+            }
+          >
+            text translated
+          </Text>
         </View>
         <View>
           <View
@@ -1041,6 +1166,24 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                 text translated
               </Text>
             </View>
+          </View>
+          <View
+            style={
+              {
+                "display": "flex",
+              }
+            }
+          >
+            <Text
+              style={
+                {
+                  "color": "rgb(28, 28, 30)",
+                  "opacity": 0.65,
+                }
+              }
+            >
+              text translated
+            </Text>
           </View>
         </View>
       </View>
