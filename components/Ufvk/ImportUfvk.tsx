@@ -29,7 +29,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
-  const [ufvkText, setUfvkText] = useState<string>('');
+  const [seedufvkText, setSeedufvkText] = useState<string>('');
   const [birthday, setBirthday] = useState<string>('');
   const [qrcodeModalVisible, setQrcodeModalVisible] = useState<boolean>(false);
   const [titleViewHeight, setTitleViewHeight] = useState<number>(0);
@@ -86,7 +86,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
     //if (!valid) {
     //  return;
     //}
-    onClickOK(ufvkText.trim(), Number(birthday));
+    onClickOK(seedufvkText.trimEnd().trimStart(), Number(birthday));
   };
 
   // zingolib interfase have no way to initialize a `lightclient` with no action associated...
@@ -138,7 +138,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
         transparent={false}
         visible={qrcodeModalVisible}
         onRequestClose={() => setQrcodeModalVisible(false)}>
-        <ScannerUfvk setUfvkText={setUfvkText} closeModal={() => setQrcodeModalVisible(false)} />
+        <ScannerUfvk setUfvkText={setSeedufvkText} closeModal={() => setQrcodeModalVisible(false)} />
       </Modal>
 
       <Animated.View style={{ marginTop: slideAnim }}>
@@ -205,15 +205,15 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
                 backgroundColor: 'transparent',
                 textAlignVertical: 'top',
               }}
-              value={ufvkText}
-              onChangeText={setUfvkText}
+              value={seedufvkText}
+              onChangeText={setSeedufvkText}
               editable={true}
             />
           </View>
-          {ufvkText && (
+          {seedufvkText && (
             <TouchableOpacity
               onPress={() => {
-                setUfvkText('');
+                setSeedufvkText('');
               }}>
               <FontAwesomeIcon style={{ margin: 0 }} size={25} icon={faXmark} color={colors.primaryDisabled} />
             </TouchableOpacity>
@@ -289,7 +289,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
           title={translate('import.button') as string}
           onPress={() => {
             Keyboard.dismiss();
-            okButton;
+            okButton();
           }}
         />
         <Button
