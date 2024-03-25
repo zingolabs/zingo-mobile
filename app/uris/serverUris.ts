@@ -19,6 +19,13 @@ const serverUris = (translate: (key: string) => TranslateType | void): ServerUri
     },
     // new servers (not default)
     {
+      uri: 'https://test.zec.rocks:443',
+      region: translate('settings.usa') as string,
+      chain_name: 'main',
+      default: true,
+      latency: null,
+    },
+    {
       uri: 'https://na.lightwalletd.com:443',
       region: translate('settings.na') as string,
       chain_name: 'main',
