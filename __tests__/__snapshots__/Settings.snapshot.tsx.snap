@@ -921,6 +921,13 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                   },
                 },
                 {
+                  "label": "text translated https://test.zec.rocks:443",
+                  "value": {
+                    "chain_name": "main",
+                    "uri": "https://test.zec.rocks:443",
+                  },
+                },
+                {
                   "label": "text translated https://na.lightwalletd.com:443",
                   "value": {
                     "chain_name": "main",
