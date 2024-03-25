@@ -112,7 +112,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
 
         <View style={{ display: 'flex', flexDirection: 'column', marginTop: 0, alignItems: 'center' }}>
           {!!wallet.ufvk && (
-            <SingleAddress address={wallet.ufvk} index={0} total={1} prev={() => null} next={() => null} />
+            <SingleAddress address={wallet.ufvk} ufvk={true} index={0} total={1} prev={() => null} next={() => null} />
           )}
           {!wallet.ufvk && <ActivityIndicator size="large" color={colors.primary} />}
         </View>
