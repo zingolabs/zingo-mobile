@@ -82,7 +82,7 @@
     "alert-newwallet-title": "CREAR UN NUEVO MONEDERO",
     "alert-newwallet-body": "Puedes confirmar que realmente quieres crear un nuevo monedero y perder el acceso al monedero actual.",
     "serverfirsttry": "Intentando realizar la acción con un servidor diferente. El servidor actual puede estar fallando.",
-    "server secondtry": "No parece haber ningún problema con el servidor. Algo más está sucediendo."
+    "serversecondtry": "No parece haber ningún problema con el servidor. Ocurre algo diferente."
   },
   "loadedapp": {
     "about": "Sobre Zingo!",
