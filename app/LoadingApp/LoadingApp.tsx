@@ -1092,7 +1092,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                               },
                               { text: translate('cancel') as string, style: 'cancel' },
                             ],
-                            { cancelable: true, userInterfaceStyle: 'light' },
+                            { cancelable: false, userInterfaceStyle: 'light' },
                           );
                         } else {
                           this.createNewWallet();

@@ -889,7 +889,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
           },
           { text: translate('cancel') as string, style: 'cancel' },
         ],
-        { cancelable: true, userInterfaceStyle: 'light' },
+        { cancelable: false, userInterfaceStyle: 'light' },
       );
     } else if (item === 'Address Book') {
       this.setState({

@@ -332,7 +332,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         { text: translate('confirm') as string, onPress: () => shieldFunds() },
         { text: translate('cancel') as string, style: 'cancel' },
       ],
-      { cancelable: true, userInterfaceStyle: 'light' },
+      { cancelable: false, userInterfaceStyle: 'light' },
     );
   };
 
