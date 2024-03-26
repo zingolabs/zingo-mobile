@@ -121,7 +121,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [autoServerChainName, setAutoServerChainName] = useState<string>('');
   const [listServerUri, setListServerUri] = useState<string>('');
   const [listServerChainName, setListServerChainName] = useState<string>('');
-  const [itemsPicker, setItemsPicker] = useState<{ label: string; value: object }[]>([]);
+  const [itemsPicker, setItemsPicker] = useState<{ label: string; value: string }[]>([]);
   const [customServerUri, setCustomServerUri] = useState<string>('');
   const [customServerChainName, setCustomServerChainName] = useState<string>('');
   const [currency, setCurrency] = useState<string>(currencyContext);
@@ -179,7 +179,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   useEffect(() => {
     const items = serverUris(translate).map((item: ServerUrisType) => ({
       label: (item.region ? item.region + ' ' : '') + item.uri,
-      value: { uri: item.uri, chain_name: item.chain_name } as ServerType,
+      value: item.uri,
     }));
     setItemsPicker(items);
   }, [translate]);
@@ -582,17 +582,19 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                       color: colors.primary,
                     }}
                     useNativeAndroidPickerStyle={false}
-                    onValueChange={(item: ServerType) => {
+                    onValueChange={(item: string) => {
+                      console.log(JSON.stringify(item));
                       if (item) {
                         setAutoIcon(farCircle);
                         setListIcon(faDotCircle);
                         setCustomIcon(farCircle);
                         setSelectServer('list');
-                        if (item.uri) {
-                          setListServerUri(item.uri);
-                        }
-                        if (item.chain_name) {
-                          setListServerChainName(item.chain_name);
+                        setListServerUri(item);
+                        const cnItem = serverUris(translate).find((s: ServerUrisType) => s.uri === item);
+                        if (cnItem) {
+                          setListServerChainName(cnItem.chain_name);
+                        } else {
+                          console.log('chain name not found');
                         }
                       }
                     }}>
