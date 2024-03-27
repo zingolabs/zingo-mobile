@@ -1719,6 +1719,7 @@ export default class RPC {
 
     //console.log('jc change wallet', exists);
     if (exists && exists !== 'false') {
+      await this.stopSyncProcess();
       await RPCModule.doSaveBackup();
       const result = await RPCModule.deleteExistingWallet();
 
@@ -1736,6 +1737,7 @@ export default class RPC {
 
     //console.log('jc change wallet', exists);
     if (exists && exists !== 'false') {
+      await this.stopSyncProcess();
       const result = await RPCModule.deleteExistingWallet();
 
       if (!(result && result !== 'false')) {
@@ -1756,6 +1758,7 @@ export default class RPC {
 
       //console.log('jc restore wallet', existsWallet);
       if (existsWallet && existsWallet !== 'false') {
+        await this.stopSyncProcess();
         await RPCModule.restoreExistingWalletBackup();
       } else {
         return this.translate('rpc.walletnotfound-error');

@@ -808,7 +808,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     await this.rpc.refresh(false);
   };
 
-  doRescan = () => {
+  doRescan = async () => {
+    await this.rpc.stopSyncProcess();
     this.rpc.refresh(false, true);
   };
 
