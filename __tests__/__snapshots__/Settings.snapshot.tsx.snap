@@ -908,101 +908,59 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               [
                 {
                   "label": "text translated https://mainnet.lightwalletd.com:9067",
-                  "value": {
-                    "chain_name": "main",
-                    "uri": "https://mainnet.lightwalletd.com:9067",
-                  },
+                  "value": "https://mainnet.lightwalletd.com:9067",
                 },
                 {
                   "label": "text translated https://lwd1.zcash-infra.com:9067",
-                  "value": {
-                    "chain_name": "main",
-                    "uri": "https://lwd1.zcash-infra.com:9067",
-                  },
+                  "value": "https://lwd1.zcash-infra.com:9067",
                 },
                 {
                   "label": "text translated https://test.zec.rocks:443",
-                  "value": {
-                    "chain_name": "main",
-                    "uri": "https://test.zec.rocks:443",
-                  },
+                  "value": "https://test.zec.rocks:443",
                 },
                 {
                   "label": "text translated https://na.lightwalletd.com:443",
-                  "value": {
-                    "chain_name": "main",
-                    "uri": "https://na.lightwalletd.com:443",
-                  },
+                  "value": "https://na.lightwalletd.com:443",
                 },
                 {
                   "label": "text translated https://sa.lightwalletd.com:443",
-                  "value": {
-                    "chain_name": "main",
-                    "uri": "https://sa.lightwalletd.com:443",
-                  },
+                  "value": "https://sa.lightwalletd.com:443",
                 },
                 {
                   "label": "text translated https://eu.lightwalletd.com:443",
-                  "value": {
-                    "chain_name": "main",
-                    "uri": "https://eu.lightwalletd.com:443",
-                  },
+                  "value": "https://eu.lightwalletd.com:443",
                 },
                 {
                   "label": "text translated https://ai.lightwalletd.com:443",
-                  "value": {
-                    "chain_name": "main",
-                    "uri": "https://ai.lightwalletd.com:443",
-                  },
+                  "value": "https://ai.lightwalletd.com:443",
                 },
                 {
                   "label": "text translated https://lwd2.zcash-infra.com:9067",
-                  "value": {
-                    "chain_name": "main",
-                    "uri": "https://lwd2.zcash-infra.com:9067",
-                  },
+                  "value": "https://lwd2.zcash-infra.com:9067",
                 },
                 {
                   "label": "text translated https://lwd3.zcash-infra.com:9067",
-                  "value": {
-                    "chain_name": "main",
-                    "uri": "https://lwd3.zcash-infra.com:9067",
-                  },
+                  "value": "https://lwd3.zcash-infra.com:9067",
                 },
                 {
                   "label": "text translated https://lwd4.zcash-infra.com:9067",
-                  "value": {
-                    "chain_name": "main",
-                    "uri": "https://lwd4.zcash-infra.com:9067",
-                  },
+                  "value": "https://lwd4.zcash-infra.com:9067",
                 },
                 {
                   "label": "text translated https://lwd5.zcash-infra.com:9067",
-                  "value": {
-                    "chain_name": "main",
-                    "uri": "https://lwd5.zcash-infra.com:9067",
-                  },
+                  "value": "https://lwd5.zcash-infra.com:9067",
                 },
                 {
                   "label": "text translated https://lwd6.zcash-infra.com:9067",
-                  "value": {
-                    "chain_name": "main",
-                    "uri": "https://lwd6.zcash-infra.com:9067",
-                  },
+                  "value": "https://lwd6.zcash-infra.com:9067",
                 },
                 {
                   "label": "text translated https://lwd7.zcash-infra.com:9067",
-                  "value": {
-                    "chain_name": "main",
-                    "uri": "https://lwd7.zcash-infra.com:9067",
-                  },
+                  "value": "https://lwd7.zcash-infra.com:9067",
                 },
                 {
                   "label": "text translated https://lwd8.zcash-infra.com:9067",
-                  "value": {
-                    "chain_name": "main",
-                    "uri": "https://lwd8.zcash-infra.com:9067",
-                  },
+                  "value": "https://lwd8.zcash-infra.com:9067",
                 },
               ]
             }
