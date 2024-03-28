@@ -923,7 +923,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                     alignItems: 'center',
                     justifyContent: 'center',
                   }}>
-                  <View style={{ marginBottom: 50, display: 'flex', alignItems: 'center' }}>
+                  <View style={{ marginBottom: 30, display: 'flex', alignItems: 'center' }}>
                     <Text style={{ color: colors.zingo, fontSize: 40, fontWeight: 'bold' }}>
                       {translate('zingo') as string}
                     </Text>
@@ -1048,7 +1048,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                     </>
                   )}
 
-                  {mode === 'basic' && netInfo.isConnected && (
+                  {netInfo.isConnected && (
                     <View
                       style={{
                         display: 'flex',
@@ -1061,7 +1061,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                         style={{
                           display: 'flex',
                           flexDirection: 'column',
-                          marginTop: 20,
+                          marginTop: 10,
                           borderColor: colors.primary,
                           borderWidth: 1,
                           borderRadius: 5,
@@ -1112,7 +1112,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                     />
                   )}
 
-                  {mode !== 'basic' && netInfo.isConnected && (
+                  {netInfo.isConnected && (
                     <View style={{ marginTop: 20, display: 'flex', alignItems: 'center' }}>
                       <Button
                         testID="loadingapp.restorewalletseed"
