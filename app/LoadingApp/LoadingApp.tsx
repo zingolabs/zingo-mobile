@@ -714,8 +714,8 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
       return;
     }
     if (
-      (seed_ufvk.startsWith('uview') && this.state.server.chain_name !== 'main') ||
-      (seed_ufvk.startsWith('utestview') && this.state.server.chain_name === 'main')
+      (seed_ufvk.toLowerCase().startsWith('uview') && this.state.server.chain_name !== 'main') ||
+      (seed_ufvk.toLowerCase().startsWith('utestview') && this.state.server.chain_name === 'main')
     ) {
       createAlert(
         this.setBackgroundError,
@@ -737,7 +737,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
       }
 
       let type: 'seed' | 'ufvk' = 'seed';
-      if (seed_ufvk.startsWith('uview') || seed_ufvk.startsWith('utestview')) {
+      if (seed_ufvk.toLowerCase().startsWith('uview') || seed_ufvk.toLowerCase().startsWith('utestview')) {
         // this is a UFVK
         type = 'ufvk';
       }
