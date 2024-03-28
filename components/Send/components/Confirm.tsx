@@ -256,10 +256,34 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
           />
           <CurrencyAmount amtZec={sendingTotal} price={zecPrice.zecPrice} currency={currency} privacy={privacy} />
         </View>
-        <View style={{ marginHorizontal: 10 }}>
-          <FadeText style={{ marginTop: 10 }}>{translate('send.confirm-privacy-level') as string}</FadeText>
-          <RegText>{privacyLevel}</RegText>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+          <View style={{ marginHorizontal: 10 }}>
+            <FadeText style={{ marginTop: 10 }}>{translate('send.confirm-privacy-level') as string}</FadeText>
+            <RegText>{privacyLevel}</RegText>
+          </View>
+          <View style={{ margin: 10 }}>
+            <FadeText>{translate('send.fee') as string}</FadeText>
+            <ZecAmount
+              currencyName={info.currencyName ? info.currencyName : ''}
+              size={18}
+              amtZec={defaultFee}
+              privacy={privacy}
+            />
+          </View>
+          {!!currency && (
+            <View style={{ margin: 10, alignItems: 'flex-end' }}>
+              <FadeText style={{ opacity: 0 }}>{translate('send.fee') as string}</FadeText>
+              <CurrencyAmount
+                style={{ fontSize: 18 }}
+                amtZec={defaultFee}
+                price={zecPrice.zecPrice}
+                currency={currency}
+                privacy={privacy}
+              />
+            </View>
+          )}
         </View>
+
         {[sendPageState.toaddr].map(to => {
           return (
             <View key={to.id} style={{ margin: 10 }}>
@@ -298,30 +322,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
             </View>
           );
         })}
-
-        <View style={{ margin: 10, marginBottom: 30 }}>
-          <FadeText>{translate('send.fee') as string}</FadeText>
-          <View
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-            }}>
-            <ZecAmount
-              currencyName={info.currencyName ? info.currencyName : ''}
-              size={18}
-              amtZec={defaultFee}
-              privacy={privacy}
-            />
-            <CurrencyAmount
-              style={{ fontSize: 18 }}
-              amtZec={defaultFee}
-              price={zecPrice.zecPrice}
-              currency={currency}
-              privacy={privacy}
-            />
-          </View>
-        </View>
+        <View style={{ marginBottom: 30 }} />
       </ScrollView>
 
       <View
