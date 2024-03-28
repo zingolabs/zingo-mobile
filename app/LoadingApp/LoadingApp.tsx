@@ -1112,10 +1112,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                     />
                   )}
 
-                  {netInfo.isConnected && actionButtonsDisabled && (
-                    <ActivityIndicator size="large" color={colors.primary} style={{ marginVertical: 20 }} />
-                  )}
-
                   {mode !== 'basic' && netInfo.isConnected && (
                     <View style={{ marginTop: 20, display: 'flex', alignItems: 'center' }}>
                       <Button
@@ -1152,6 +1148,10 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                         </BoldText>
                       </View>
                     </View>
+                  )}
+
+                  {netInfo.isConnected && actionButtonsDisabled && (
+                    <ActivityIndicator size="large" color={colors.primary} style={{ marginVertical: 20 }} />
                   )}
                 </View>
               </ScrollView>
