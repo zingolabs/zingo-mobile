@@ -1048,7 +1048,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                     </>
                   )}
 
-                  {netInfo.isConnected && (
+                  {netInfo.isConnected && walletExists && (
                     <View
                       style={{
                         display: 'flex',
@@ -1081,7 +1081,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                       title={translate('loadingapp.createnewwallet') as string}
                       disabled={actionButtonsDisabled}
                       onPress={() => {
-                        if (this.state.walletExists) {
+                        if (walletExists) {
                           Alert.alert(
                             translate('loadingapp.alert-newwallet-title') as string,
                             translate('loadingapp.alert-newwallet-body') as string,

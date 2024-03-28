@@ -51,8 +51,13 @@ const InputTextAddress: React.FunctionComponent<InputTextAddressProps> = ({
       } else {
         return false;
       }
-      // TODO: check if the json parse is correct.
-      const resultJSON: RPCParseAddressType = await JSON.parse(result);
+      let resultJSON: RPCParseAddressType = {} as RPCParseAddressType;
+      try {
+        resultJSON = await JSON.parse(result);
+      } catch (e) {
+        console.log('parse address JSON error', e);
+        return false;
+      }
 
       //console.log('parse-address', address, resultJSON.status === 'success');
 
