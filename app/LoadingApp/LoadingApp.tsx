@@ -876,7 +876,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
             />
           )}
           {screen === 1 && (
-            <>
+            <View style={{ width: '100%', height: '100%' }}>
               <View
                 style={{
                   backgroundColor: colors.card,
@@ -1155,7 +1155,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                   )}
                 </View>
               </ScrollView>
-            </>
+            </View>
           )}
           {screen === 2 && wallet && (
             <Modal

@@ -395,7 +395,7 @@
     "needtoupgrade": "You have funds to upgrade",
     "fetchpricetitle": "Fetch USD Price",
     "fetchpricebody": "Please confirm that you want to fetch the USD price from the Internet.",
-    "fetch-button": "fetch",
+    "fetch-button": "Fetch",
     "confirm-privacy-level": "Privacy Level",
     "private": "Private",
     "amountrevealed": "Amount Revealed",
