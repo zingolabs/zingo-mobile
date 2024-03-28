@@ -16,6 +16,7 @@ import AbSummaryLine from './components/AbSummaryLine';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
 import AddressBookFileImpl from './AddressBookFileImpl';
+import RPC from '../../app/rpc';
 
 type AddressBookProps = {
   closeModal: () => void;
@@ -34,7 +35,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
   const [addressBookSorted, setAddressBookSorted] = useState<AddressBookFileClass[]>([]);
 
   const [currentItem, setCurrentItem] = useState<number | null>(null);
-  const [titleViewHeight, setTitleViewHeight] = useState(0);
+  const [titleViewHeight, setTitleViewHeight] = useState<number>(0);
   const [action, setAction] = useState<'Add' | 'Modify' | 'Delete' | null>(null);
 
   const slideAnim = useRef(new Animated.Value(0)).current;
@@ -55,6 +56,11 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
       }
     });
   }, [addressBook, numTx]);
+
+  // because this screen is fired from more places than the menu.
+  useEffect(() => {
+    (async () => await RPC.rpc_setInterruptSyncAfterBatch('false'))();
+  }, []);
 
   useEffect(() => {
     (async () => {

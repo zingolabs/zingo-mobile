@@ -184,7 +184,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({
               justifyContent: 'center',
             }}>
             {(!expandAddress[index] || item.address === 'fee') && (
-              <FontAwesomeIcon style={{ margin: 5 }} size={40} icon={faQrcode} color={item.svg.fill} />
+              <FontAwesomeIcon style={{ margin: 5 }} size={45} icon={faQrcode} color={item.svg.fill} />
             )}
             {!!item.tag && <FadeText style={{ marginHorizontal: 5 }}>{item.tag}</FadeText>}
             <TouchableOpacity

@@ -141,6 +141,7 @@ describe('Component LoadedApp - test', () => {
       changeWalletScreen: true,
       restoreWalletBackupScreen: true,
     };
+    const selectServer = 'auto';
     const receive = render(
       <LoadedAppClass
         navigation={navigationMock}
@@ -158,6 +159,7 @@ describe('Component LoadedApp - test', () => {
         toggleTheme={toggleTheme}
         addressBook={addressBook}
         security={security}
+        selectServer={selectServer}
       />,
     );
     expect(receive.toJSON()).toMatchSnapshot();

@@ -127,6 +127,7 @@ export default interface AppStateLoaded {
   addressBookCurrentAddress: string;
   addressBookOpenPriorModal: () => void;
   security: SecurityType;
+  selectServer: 'auto' | 'list' | 'custom';
 
   // eslint-disable-next-line semi
 }

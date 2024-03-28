@@ -1,12 +1,14 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useRef, useContext } from 'react';
-import { View, ScrollView, Modal, Keyboard, TextInput, TouchableOpacity, Platform } from 'react-native';
+import { View, ScrollView, Modal, Keyboard, TextInput, TouchableOpacity, Platform, Alert, Text } from 'react-native';
 import {
   faQrcode,
   faCheck,
   faInfoCircle,
   faAddressCard,
   faMagnifyingGlassPlus,
+  faMoneyCheckDollar,
+  faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme, useIsFocused } from '@react-navigation/native';
@@ -91,14 +93,14 @@ const Send: React.FunctionComponent<SendProps> = ({
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
-  const [qrcodeModalVisble, setQrcodeModalVisible] = useState(false);
-  const [confirmModalVisible, setConfirmModalVisible] = useState(false);
-  const [titleViewHeight, setTitleViewHeight] = useState(0);
-  const [memoEnabled, setMemoEnabled] = useState(false);
-  const [validAddress, setValidAddress] = useState(0); // 1 - OK, 0 - Empty, -1 - KO
-  const [validAmount, setValidAmount] = useState(0); // 1 - OK, 0 - Empty, -1 - KO
-  const [sendButtonEnabled, setSendButtonEnabled] = useState(false);
-  const [itemsPicker, setItemsPicker] = useState([] as { label: string; value: string }[]);
+  const [qrcodeModalVisble, setQrcodeModalVisible] = useState<boolean>(false);
+  const [confirmModalVisible, setConfirmModalVisible] = useState<boolean>(false);
+  const [titleViewHeight, setTitleViewHeight] = useState<number>(0);
+  const [memoEnabled, setMemoEnabled] = useState<boolean>(false);
+  const [validAddress, setValidAddress] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
+  const [validAmount, setValidAmount] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - Invalid number, -2 - Invalid Amount
+  const [sendButtonEnabled, setSendButtonEnabled] = useState<boolean>(false);
+  const [itemsPicker, setItemsPicker] = useState<{ label: string; value: string }[]>([]);
   const [memoIcon, setMemoIcon] = useState<boolean>(false);
   const [memoModalVisible, setMemoModalVisible] = useState<boolean>(false);
   const [maxAmount, setMaxAmount] = useState<number>(0);
@@ -107,6 +109,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [stillConfirming, setStillConfirming] = useState<boolean>(false);
   const [showShieldInfo, setShowShieldInfo] = useState<boolean>(false);
   const [showUpgradeInfo, setShowUpgradeInfo] = useState<boolean>(false);
+  const [updatingToField, setUpdatingToField] = useState<boolean>(false);
   const isFocused = useIsFocused();
 
   const slideAnim = useRef(new Animated.Value(0)).current;
@@ -230,27 +233,27 @@ const Send: React.FunctionComponent<SendProps> = ({
     let invalid = false;
     if (to.amountCurrency !== '') {
       if (isNaN(Number(to.amountCurrency))) {
-        setValidAmount(-1);
+        setValidAmount(-1); // invalid number
         invalid = true;
       }
     }
     if (!invalid) {
       if (to.amount !== '') {
         if (isNaN(Number(to.amount))) {
-          setValidAmount(-1);
+          setValidAmount(-1); // invalid number
         } else {
           if (
             Utils.parseLocaleFloat(Number(spendable).toFixed(8)) >= Utils.parseLocaleFloat(Number(fee).toFixed(8)) &&
             Utils.parseLocaleFloat(Number(to.amount).toFixed(8)) >= 0 &&
             Utils.parseLocaleFloat(Number(to.amount).toFixed(8)) <= Utils.parseLocaleFloat(maxAmount.toFixed(8))
           ) {
-            setValidAmount(1);
+            setValidAmount(1); // valid
           } else {
-            setValidAmount(-1);
+            setValidAmount(-2); // invalid amount
           }
         }
       } else {
-        setValidAmount(0);
+        setValidAmount(0); // empty
       }
     }
   }, [
@@ -332,6 +335,27 @@ const Send: React.FunctionComponent<SendProps> = ({
     })();
   }, [isFocused]);
 
+  const showAlertAsync = (): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      Alert.alert(
+        translate('send.lose-address-title') as string,
+        translate('send.lose-address-alert') as string,
+        [
+          {
+            text: translate('confirm') as string,
+            onPress: () => resolve(),
+          },
+          {
+            text: translate('cancel') as string,
+            style: 'cancel',
+            onPress: () => reject(),
+          },
+        ],
+        { cancelable: false, userInterfaceStyle: 'light' },
+      );
+    });
+  };
+
   const updateToField = async (
     address: string | null,
     amount: string | null,
@@ -412,7 +436,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
       return;
     }
-    // very first interrupt syncing Just in case...
+    // first interrupt syncing Just in case...
     await RPC.rpc_setInterruptSyncAfterBatch('true');
     // First, close the confirm modal and show the "computing" modal
     setConfirmModalVisible(false);
@@ -620,22 +644,65 @@ const Send: React.FunctionComponent<SendProps> = ({
                         alignItems: 'center',
                         justifyContent: 'center',
                       }}>
-                      {itemsPicker.length > 0 && (
-                        <RNPickerSelect
-                          fixAndroidTouchableBug={true}
-                          value={ta.to}
-                          items={itemsPicker}
-                          placeholder={{ label: translate('addressbook.select-placeholder') as string, value: '' }}
-                          onValueChange={(itemValue: string) => {
-                            updateToField(itemValue, null, null, null, null);
+                      {ta.to && (
+                        <TouchableOpacity
+                          onPress={() => {
+                            updateToField('', null, null, null, null);
                           }}>
                           <FontAwesomeIcon
-                            style={{ marginRight: 7 }}
-                            size={39}
-                            icon={faAddressCard}
-                            color={colors.primary}
+                            style={{ marginRight: 5 }}
+                            size={25}
+                            icon={faXmark}
+                            color={colors.primaryDisabled}
                           />
-                        </RNPickerSelect>
+                        </TouchableOpacity>
+                      )}
+                      {itemsPicker.length > 0 && (
+                        <>
+                          {!updatingToField ? (
+                            <RNPickerSelect
+                              fixAndroidTouchableBug={true}
+                              value={ta.to}
+                              items={itemsPicker}
+                              placeholder={{
+                                label: translate('addressbook.select-placeholder') as string,
+                                value: ta.to,
+                                color: colors.primary,
+                              }}
+                              useNativeAndroidPickerStyle={false}
+                              onValueChange={async (itemValue: string) => {
+                                if (validAddress === 1 && ta.to && itemValue && ta.to !== itemValue) {
+                                  setUpdatingToField(true);
+                                  await showAlertAsync()
+                                    .then(() => {
+                                      updateToField(itemValue, null, null, null, null);
+                                    })
+                                    .catch(() => {
+                                      updateToField(ta.to, null, null, null, null);
+                                    });
+                                  setTimeout(() => {
+                                    setUpdatingToField(false);
+                                  }, 500);
+                                } else if (ta.to !== itemValue) {
+                                  updateToField(itemValue, null, null, null, null);
+                                }
+                              }}>
+                              <FontAwesomeIcon
+                                style={{ marginRight: 7 }}
+                                size={39}
+                                icon={faAddressCard}
+                                color={colors.primary}
+                              />
+                            </RNPickerSelect>
+                          ) : (
+                            <FontAwesomeIcon
+                              style={{ marginRight: 7 }}
+                              size={39}
+                              icon={faAddressCard}
+                              color={colors.primaryDisabled}
+                            />
+                          )}
+                        </>
                       )}
                       <TouchableOpacity
                         testID="send.scan-button"
@@ -686,7 +753,8 @@ const Send: React.FunctionComponent<SendProps> = ({
                       </TouchableOpacity>
                     )}
                   </View>
-                  {validAmount === -1 && <ErrorText>{translate('send.invalidamount') as string}</ErrorText>}
+                  {validAmount === -1 && <ErrorText>{translate('send.invalidnumber') as string}</ErrorText>}
+                  {validAmount === -2 && <ErrorText>{translate('send.invalidamount') as string}</ErrorText>}
                 </View>
 
                 <View
@@ -971,6 +1039,19 @@ const Send: React.FunctionComponent<SendProps> = ({
                             }
                           }}
                         />
+                        {ta.memo && (
+                          <TouchableOpacity
+                            onPress={() => {
+                              updateToField(null, null, null, '', null);
+                            }}>
+                            <FontAwesomeIcon
+                              style={{ marginTop: 7, marginRight: memoIcon ? 0 : 7 }}
+                              size={25}
+                              icon={faXmark}
+                              color={colors.primaryDisabled}
+                            />
+                          </TouchableOpacity>
+                        )}
                         {memoIcon && (
                           <TouchableOpacity
                             onPress={() => {
@@ -994,49 +1075,109 @@ const Send: React.FunctionComponent<SendProps> = ({
           <View
             style={{
               flexGrow: 1,
-              flexDirection: 'row',
+              flexDirection: 'column',
               justifyContent: 'center',
               alignItems: 'center',
               marginVertical: 5,
             }}>
-            <Button
-              testID="send.button"
-              accessible={true}
-              accessibilityLabel={'title ' + translate('send.button')}
-              type="Primary"
-              title={
-                validAmount === 1 &&
-                sendPageState.toaddr.amount &&
-                Number(sendPageState.toaddr.amount) === Utils.parseLocaleFloat(maxAmount.toFixed(8))
-                  ? (translate('send.button-all') as string)
-                  : (translate('send.button') as string)
-              }
-              disabled={!sendButtonEnabled}
-              onPress={() => {
-                if (
+            <View
+              style={{
+                flexGrow: 1,
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginBottom: 20,
+              }}>
+              <Button
+                testID="send.button"
+                accessible={true}
+                accessibilityLabel={'title ' + translate('send.button')}
+                type="Primary"
+                title={
                   validAmount === 1 &&
                   sendPageState.toaddr.amount &&
-                  mode !== 'basic' &&
                   Number(sendPageState.toaddr.amount) === Utils.parseLocaleFloat(maxAmount.toFixed(8))
-                ) {
-                  addLastSnackbar({ message: `${translate('send.sendall-message') as string}`, type: 'Primary' });
+                    ? (translate('send.button-all') as string)
+                    : (translate('send.button') as string)
                 }
-                if (!netInfo.isConnected) {
-                  addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
-                  return;
-                }
-                // waiting while closing the keyboard, just in case.
-                setTimeout(async () => {
-                  setConfirmModalVisible(true);
-                }, 100);
-              }}
-            />
-            <Button
-              type="Secondary"
-              style={{ marginLeft: 10 }}
-              title={translate('send.clear') as string}
-              onPress={() => clearToAddr()}
-            />
+                disabled={!sendButtonEnabled}
+                onPress={() => {
+                  if (
+                    validAmount === 1 &&
+                    sendPageState.toaddr.amount &&
+                    mode !== 'basic' &&
+                    Number(sendPageState.toaddr.amount) === Utils.parseLocaleFloat(maxAmount.toFixed(8))
+                  ) {
+                    addLastSnackbar({ message: `${translate('send.sendall-message') as string}`, type: 'Primary' });
+                  }
+                  if (!netInfo.isConnected) {
+                    addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
+                    return;
+                  }
+                  // waiting while closing the keyboard, just in case.
+                  setTimeout(async () => {
+                    setConfirmModalVisible(true);
+                  }, 100);
+                }}
+              />
+              <Button
+                type="Secondary"
+                style={{ marginLeft: 10 }}
+                title={translate('send.clear') as string}
+                onPress={() => clearToAddr()}
+              />
+            </View>
+            {server.chain_name === 'main' && (
+              <TouchableOpacity
+                onPress={async () => {
+                  if (
+                    sendPageState.toaddr.to &&
+                    sendPageState.toaddr.to !== Utils.getDonationAddress(server.chain_name)
+                  ) {
+                    await showAlertAsync()
+                      .then(() => {
+                        // fill the fields in the screen with the donation data
+                        updateToField(
+                          Utils.getDonationAddress(server.chain_name),
+                          Utils.getDefaultDonationAmount(),
+                          null,
+                          Utils.getDefaultDonationMemo(translate),
+                          true,
+                        );
+                      })
+                      .catch(() => {});
+                  } else {
+                    // fill the fields in the screen with the donation data
+                    updateToField(
+                      Utils.getDonationAddress(server.chain_name),
+                      Utils.getDefaultDonationAmount(),
+                      null,
+                      Utils.getDefaultDonationMemo(translate),
+                      true,
+                    );
+                  }
+                }}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    paddingHorizontal: 4,
+                    paddingBottom: 2,
+                    borderWidth: 1,
+                    borderColor: colors.primary,
+                    borderRadius: 5,
+                  }}>
+                  <Text style={{ fontSize: 13, color: colors.border }}>{translate('donation-button') as string}</Text>
+                  <FontAwesomeIcon
+                    style={{ marginTop: 3 }}
+                    size={20}
+                    icon={faMoneyCheckDollar}
+                    color={colors.primary}
+                  />
+                </View>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
       </ScrollView>

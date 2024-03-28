@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
-import { TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import Clipboard from '@react-native-community/clipboard';
 import { ContextAppLoaded } from '../../app/context';
 import RegText from './RegText';
@@ -51,15 +51,25 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
-  const [expandAddress, setExpandAddress] = useState(false);
-  const [expandContact, setExpandContact] = useState(false);
+  const [expandAddress, setExpandAddress] = useState<boolean>(false);
+  const [expandContact, setExpandContact] = useState<boolean>(false);
+  const [numLinesAddress, setNumLinesAddress] = useState<number>(0);
+  const [numLinesContact, setNumLinesContact] = useState<number>(0);
+  const [contact, setContact] = useState<string>('');
 
-  const numLinesAddress = address ? (address.length < 40 ? 2 : address.length / 30) : 0;
-  const contact: string = addressBook
-    .filter((ab: AddressBookFileClass) => ab.address === address)
-    .map((ab: AddressBookFileClass) => ab.label)
-    .join(' ');
-  const numLinesContact = contact ? (contact.length < 20 ? 1 : contact.length / 20) : 0;
+  useEffect(() => {
+    const numLinesAdd = address ? (address.length < 40 ? 2 : address.length / 30) : 0;
+    const cont: string = addressBook
+      .filter((ab: AddressBookFileClass) => ab.address === address)
+      .map((ab: AddressBookFileClass) => ab.label)
+      .join(' ');
+    const numLinesCon = cont ? (cont.length < 20 ? 1 : cont.length / 20) : 0;
+    setNumLinesAddress(numLinesAdd);
+    setNumLinesContact(numLinesCon);
+    setContact(cont);
+    // the address prop make no sense that it is going to change,
+    // but the address book can change in any moment.
+  }, [address, addressBook]);
 
   useEffect(() => {
     if (!oneLine) {
@@ -68,6 +78,8 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
       }
     }
   }, [oneLine, privacy]);
+
+  //console.log('addressItem - render');
 
   return (
     <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start' }}>
@@ -143,9 +155,27 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
           </TouchableOpacity>
         )}
       </View>
-      {withIcon && !contact && (
+      {withIcon && !contact && oneLine && (
         <TouchableOpacity onPress={() => launchAddressBook(address, closeModal, openModal)}>
-          <FontAwesomeIcon style={{ marginTop: 3 }} size={20} icon={faAddressCard} color={colors.primary} />
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+              paddingHorizontal: 4,
+              paddingBottom: 2,
+              borderWidth: 1,
+              borderColor: colors.primary,
+              borderRadius: 5,
+            }}>
+            <Text style={{ fontSize: 13, color: colors.border }}>{translate('addressbook.addto') as string}</Text>
+            <FontAwesomeIcon style={{ marginTop: 3 }} size={20} icon={faAddressCard} color={colors.primary} />
+          </View>
+        </TouchableOpacity>
+      )}
+      {withIcon && !contact && !oneLine && (
+        <TouchableOpacity onPress={() => launchAddressBook(address, closeModal, openModal)}>
+          <FontAwesomeIcon style={{ marginTop: 3 }} size={22} icon={faAddressCard} color={colors.primary} />
         </TouchableOpacity>
       )}
       {withSendIcon &&
@@ -166,7 +196,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
                 initial: false,
               });
             }}>
-            <FontAwesomeIcon style={{ marginTop: 3 }} size={20} icon={faArrowUp} color={colors.primary} />
+            <FontAwesomeIcon style={{ marginTop: 3 }} size={30} icon={faArrowUp} color={colors.primary} />
           </TouchableOpacity>
         )}
     </View>

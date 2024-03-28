@@ -98,6 +98,7 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   addressBookCurrentAddress: '',
   addressBookOpenPriorModal: () => {},
   security: {} as SecurityType,
+  selectServer: 'auto',
 };
 
 export const ContextAppLoaded = React.createContext(defaultAppStateLoaded);

@@ -20,15 +20,17 @@ type SingleAddressProps = {
   total: number;
   prev: () => void;
   next: () => void;
+  ufvk?: boolean;
 };
 
-const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, index, total, prev, next }) => {
+const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, index, total, prev, next, ufvk }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, privacy, addLastSnackbar, language } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
-  const [expandQRAddress, setExpandQRAddress] = useState(false);
+  const [expandQRAddress, setExpandQRAddress] = useState<boolean>(false);
+  const [multi, setMulti] = useState<boolean>(false);
 
   useEffect(() => {
     if (privacy) {
@@ -44,7 +46,10 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
     }
   }, [expandQRAddress, privacy]);
 
-  const multi = total > 1;
+  useEffect(() => {
+    const mult = total > 1;
+    setMulti(mult);
+  }, [total]);
 
   const doCopy = () => {
     if (address) {
@@ -79,22 +84,64 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
                 }
               }
             }}>
-            {expandQRAddress && !!address ? (
-              <QRCode value={address} size={200} ecl="L" backgroundColor={colors.border} />
-            ) : (
-              <View
-                style={{
-                  width: 200,
-                  height: 200,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  borderWidth: 1,
-                  borderColor: colors.text,
-                }}>
-                <Text style={{ color: colors.zingo, textDecorationLine: 'underline', marginTop: 15, minHeight: 48 }}>
-                  {translate('seed.tapreveal') as string}
-                </Text>
-              </View>
+            {!!address && (
+              <>
+                {ufvk ? (
+                  <>
+                    {expandQRAddress ? (
+                      <QRCode
+                        value={address}
+                        size={200}
+                        ecl="L"
+                        backgroundColor={colors.border}
+                        logo={require('../../assets/img/logobig-zingo.png')}
+                        logoSize={35}
+                        logoBackgroundColor={colors.border}
+                        logoBorderRadius={10} /* android not soported */
+                        logoMargin={5}
+                      />
+                    ) : (
+                      <View
+                        style={{
+                          width: 200,
+                          height: 200,
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          borderWidth: 1,
+                          borderColor: colors.text,
+                        }}>
+                        <Text
+                          style={{
+                            color: colors.zingo,
+                            textDecorationLine: 'underline',
+                            marginTop: 15,
+                            minHeight: 48,
+                          }}>
+                          {translate('seed.tapreveal') as string}
+                        </Text>
+                      </View>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {privacy ? (
+                      <QRCode value={address} size={200} ecl="L" backgroundColor={colors.border} />
+                    ) : (
+                      <QRCode
+                        value={address}
+                        size={200}
+                        ecl="L"
+                        backgroundColor={colors.border}
+                        logo={require('../../assets/img/logobig-zingo.png')}
+                        logoSize={35}
+                        logoBackgroundColor={colors.border}
+                        logoBorderRadius={10} /* android not soported */
+                        logoMargin={5}
+                      />
+                    )}
+                  </>
+                )}
+              </>
             )}
           </TouchableOpacity>
         </View>

@@ -1,9 +1,9 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faArrowDown, faArrowUp, faRefresh } from '@fortawesome/free-solid-svg-icons';
+import { IconDefinition, faArrowDown, faArrowUp, faRefresh } from '@fortawesome/free-solid-svg-icons';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
 import ZecAmount from '../../Components/ZecAmount';
@@ -36,18 +36,32 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
-  const amountColor =
-    tx.confirmations === 0 ? colors.primaryDisabled : tx.type === 'Received' ? colors.primary : colors.text;
+  const [amountColor, setAmountColor] = useState<string>('');
+  const [txIcon, setTxIcon] = useState<IconDefinition>(faRefresh);
+  const [displayAddress, setDisplayAddress] = useState<React.JSX.Element>();
 
-  const txIcon = tx.confirmations === 0 ? faRefresh : tx.type === 'Received' ? faArrowDown : faArrowUp;
+  useEffect(() => {
+    const amountCo =
+      tx.confirmations === 0 ? colors.primaryDisabled : tx.type === 'Received' ? colors.primary : colors.text;
 
-  // if no address I'm going to put txid here.
-  const displayAddress =
-    tx.txDetails.length === 1 && tx.txDetails[0].address ? (
-      <AddressItem address={tx.txDetails[0].address} oneLine={true} closeModal={() => {}} openModal={() => {}} />
-    ) : (
-      <FadeText style={{ fontSize: 18 }}>{Utils.trimToSmall(tx.txid, 7)}</FadeText>
-    );
+    setAmountColor(amountCo);
+  }, [colors.primary, colors.primaryDisabled, colors.text, tx.confirmations, tx.type]);
+
+  useEffect(() => {
+    const txIc = tx.confirmations === 0 ? faRefresh : tx.type === 'Received' ? faArrowDown : faArrowUp;
+    setTxIcon(txIc);
+  }, [tx.confirmations, tx.type]);
+
+  useEffect(() => {
+    // if no address I'm going to put txid here.
+    const displayAdd =
+      tx.txDetails.length === 1 && tx.txDetails[0].address ? (
+        <AddressItem address={tx.txDetails[0].address} oneLine={true} closeModal={() => {}} openModal={() => {}} />
+      ) : (
+        <FadeText style={{ fontSize: 18 }}>{Utils.trimToSmall(tx.txid, 7)}</FadeText>
+      );
+    setDisplayAddress(displayAdd);
+  }, [tx.txDetails, tx.txid]);
 
   //console.log('render TxSummaryLine - 5', index);
 

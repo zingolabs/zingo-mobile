@@ -7,6 +7,7 @@ import { useTheme } from '@react-navigation/native';
 import { BarCodeReadEvent } from 'react-native-camera';
 import RegText from './RegText';
 import Button from './Button';
+import { ThemeType } from '../../app/types/ThemeType';
 
 type ScannerProps = {
   onRead: (e: BarCodeReadEvent) => void;
@@ -16,7 +17,7 @@ type ScannerProps = {
 };
 
 const Scanner: React.FunctionComponent<ScannerProps> = ({ onRead, doCancel, title, button }) => {
-  const { colors } = useTheme();
+  const { colors } = useTheme() as unknown as ThemeType;
   return (
     <SafeAreaView
       style={{

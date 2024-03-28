@@ -95,7 +95,10 @@ type LoadedAppProps = {
   toggleTheme: (mode: 'basic' | 'advanced') => void;
 };
 
-const SERVER_DEFAULT_0: ServerType = serverUris()[0];
+const SERVER_DEFAULT_0: ServerType = {
+  uri: serverUris(() => {})[0].uri,
+  chain_name: serverUris(() => {})[0].chain_name,
+} as ServerType;
 
 export default function LoadedApp(props: LoadedAppProps) {
   const theme = useTheme() as unknown as ThemeType;
@@ -119,6 +122,7 @@ export default function LoadedApp(props: LoadedAppProps) {
     changeWalletScreen: true,
     restoreWalletBackupScreen: true,
   });
+  const [selectServer, setSelectServer] = useState<'auto' | 'list' | 'custom'>('auto');
   const file = useMemo(
     () => ({
       en: en,
@@ -203,6 +207,11 @@ export default function LoadedApp(props: LoadedAppProps) {
       } else {
         await SettingsFileImpl.writeSettings('security', security);
       }
+      if (settings.selectServer) {
+        setSelectServer(settings.selectServer);
+      } else {
+        await SettingsFileImpl.writeSettings('selectServer', selectServer);
+      }
 
       // reading background task info
       const backgroundJson = await BackgroundFileImpl.readBackground();
@@ -251,6 +260,7 @@ export default function LoadedApp(props: LoadedAppProps) {
         toggleTheme={props.toggleTheme}
         addressBook={addressBook}
         security={security}
+        selectServer={selectServer}
       />
     );
   }
@@ -272,6 +282,7 @@ type LoadedAppClassProps = {
   toggleTheme: (mode: 'basic' | 'advanced') => void;
   addressBook: AddressBookFileClass[];
   security: SecurityType;
+  selectServer: 'auto' | 'list' | 'custom';
 };
 
 export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
@@ -304,6 +315,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       addressBook: props.addressBook,
       launchAddressBook: this.launchAddressBook,
       security: props.security,
+      selectServer: props.selectServer,
     };
 
     this.rpc = new RPC(
@@ -796,7 +808,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     await this.rpc.refresh(false);
   };
 
-  doRescan = () => {
+  doRescan = async () => {
+    await this.rpc.stopSyncProcess();
     this.rpc.refresh(false, true);
   };
 
@@ -877,7 +890,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
           },
           { text: translate('cancel') as string, style: 'cancel' },
         ],
-        { cancelable: true, userInterfaceStyle: 'light' },
+        { cancelable: false, userInterfaceStyle: 'light' },
       );
     } else if (item === 'Address Book') {
       this.setState({
@@ -1046,6 +1059,16 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     await SettingsFileImpl.writeSettings(name, value);
     this.setState({
       security: value as SecurityType,
+    });
+
+    // Refetch the settings to update
+    this.rpc.fetchWalletSettings();
+  };
+
+  set_selectServer_option = async (name: 'selectServer', value: string): Promise<void> => {
+    await SettingsFileImpl.writeSettings(name, value);
+    this.setState({
+      selectServer: value as 'auto' | 'list' | 'custom',
     });
 
     // Refetch the settings to update
@@ -1410,6 +1433,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 set_privacy_option={this.set_privacy_option}
                 set_mode_option={this.set_mode_option}
                 set_security_option={this.set_security_option}
+                set_selectServer_option={this.set_selectServer_option}
               />
             </Suspense>
           </Modal>
