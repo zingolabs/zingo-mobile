@@ -1111,6 +1111,10 @@ const Send: React.FunctionComponent<SendProps> = ({
                     addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
                     return;
                   }
+                  // if the address is transparent - clean the memo field
+                  if (!memoEnabled) {
+                    updateToField(null, null, null, '', false);
+                  }
                   // waiting while closing the keyboard, just in case.
                   setTimeout(async () => {
                     setConfirmModalVisible(true);
