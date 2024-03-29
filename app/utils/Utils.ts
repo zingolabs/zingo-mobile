@@ -93,15 +93,16 @@ export default class Utils {
   }
 
   static getDonationAddress(chain_name: 'main' | 'test' | 'regtest'): string {
-    if (chain_name !== 'main') {
-      return 'ztestsapling...';
-    } else {
-      return 'z...';
+    // donations only for mainnet.
+    if (chain_name === 'main') {
+      // UA -> we need a fresh one.
+      return 'u1w47nzy4z5g9zvm4h2s4ztpl8vrdmlclqz5sz02742zs5j3tz232u4safvv9kplg7g06wpk5fx0k0rx3r9gg4qk6nkg4c0ey57l0dyxtatqf8403xat7vyge7mmen7zwjcgvryg22khtg3327s6mqqkxnpwlnrt27kxhwg37qys2kpn2d2jl2zkk44l7j7hq9az82594u3qaescr3c9v';
     }
+    return '';
   }
 
-  static getDefaultDonationAmount(): number {
-    return 0.1;
+  static getDefaultDonationAmount(): string {
+    return '0.01';
   }
 
   static getDefaultDonationMemo(translate: (key: string) => TranslateType): string {

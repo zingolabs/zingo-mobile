@@ -13,6 +13,7 @@ import {
   AppState,
   NativeEventSubscription,
   TextInput,
+  ActivityIndicator,
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { I18n } from 'i18n-js';
@@ -34,6 +35,7 @@ import {
   NetInfoType,
   ServerType,
   SecurityType,
+  ServerUrisType,
 } from '../AppState';
 import { parseServerURI, serverUris } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
@@ -44,12 +46,12 @@ import BackgroundFileImpl from '../../components/Background/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '../createAlert';
 import { RPCWalletKindType } from '../rpc/types/RPCWalletKindType';
-import { isEqual } from 'lodash';
 import Snackbars from '../../components/Components/Snackbars';
 import SnackbarType from '../AppState/types/SnackbarType';
 import { RPCSeedType } from '../rpc/types/RPCSeedType';
 import Launching from './Launching';
 import simpleBiometrics from '../simpleBiometrics';
+import selectingServer from '../selectingServer';
 
 const BoldText = React.lazy(() => import('../../components/Components/BoldText'));
 const Button = React.lazy(() => import('../../components/Components/Button'));
@@ -70,8 +72,15 @@ type LoadingAppProps = {
   toggleTheme: (mode: 'basic' | 'advanced') => void;
 };
 
-const SERVER_DEFAULT_0 = serverUris()[0];
-const SERVER_DEFAULT_1 = serverUris()[1];
+const SERVER_DEFAULT_0: ServerType = {
+  uri: serverUris(() => {})[0].uri,
+  chain_name: serverUris(() => {})[0].chain_name,
+} as ServerType;
+
+//const SERVER_DEFAULT_1: ServerType = {
+//  uri: serverUris(() => {})[1].uri,
+//  chain_name: serverUris(() => {})[1].chain_name,
+//} as ServerType;
 
 export default function LoadingApp(props: LoadingAppProps) {
   const theme = useTheme() as unknown as ThemeType;
@@ -95,6 +104,7 @@ export default function LoadingApp(props: LoadingAppProps) {
     changeWalletScreen: true,
     restoreWalletBackupScreen: true,
   });
+  const [selectServer, setSelectServer] = useState<'auto' | 'list' | 'custom'>('auto');
   const file = useMemo(
     () => ({
       en: en,
@@ -191,6 +201,11 @@ export default function LoadingApp(props: LoadingAppProps) {
       } else {
         await SettingsFileImpl.writeSettings('security', security);
       }
+      if (settings.selectServer) {
+        setSelectServer(settings.selectServer);
+      } else {
+        await SettingsFileImpl.writeSettings('selectServer', selectServer);
+      }
 
       // for testing
       //await delay(5000);
@@ -235,6 +250,7 @@ export default function LoadingApp(props: LoadingAppProps) {
         firstLaunchingMessage={firstLaunchingMessage}
         toggleTheme={props.toggleTheme}
         security={security}
+        selectServer={selectServer}
       />
     );
   }
@@ -255,6 +271,7 @@ type LoadingAppClassProps = {
   firstLaunchingMessage: boolean;
   toggleTheme: (mode: 'basic' | 'advanced') => void;
   security: SecurityType;
+  selectServer: 'auto' | 'list' | 'custom';
 };
 
 export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
@@ -304,6 +321,8 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
           ? props.route.params.startingApp
           : true,
       security: props.security,
+      selectServer: props.selectServer,
+      // serverErrorTries -> 0 (context).
     };
 
     this.dim = {} as EmitterSubscription;
@@ -341,7 +360,22 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
 
     this.setState({ actionButtonsDisabled: true });
     (async () => {
-      // First, check if a wallet exists. Do it async so the basic screen has time to render
+      // First, if it's server automatic
+      // here I need to check the servers and select the best one
+      // likely only when the user install or update the new version with this feature.
+      if (this.state.selectServer === 'auto') {
+        setTimeout(() => {
+          this.addLastSnackbar({
+            message: this.state.translate('loadedapp.selectingserver') as string,
+            type: 'Primary',
+            duration: 'longer',
+          });
+        }, 1000);
+        // not a different one, can be the same.
+        await this.selectTheBestServer(false);
+      }
+
+      // Second, check if a wallet exists. Do it async so the basic screen has time to render
       await AsyncStorage.setItem('@background', 'no');
       const exists = await RPCModule.walletExists();
       //console.log('Wallet Exists result', this.state.screen, exists);
@@ -351,6 +385,9 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
         const networkState = await NetInfo.fetch();
         if (networkState.isConnected) {
           let result: string = await RPCModule.loadExistingWallet(this.state.server.uri, this.state.server.chain_name);
+          //if (this.state.serverErrorTries === 0 || true) {
+          //  result = 'Error: pepe es guay';
+          //}
 
           // for testing
           //await delay(5000);
@@ -371,21 +408,19 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
               this.navigateToLoadedApp();
               //console.log('navigate to LoadedApp');
             } else {
-              this.setState({ screen: 1, actionButtonsDisabled: false });
-              createAlert(
-                this.setBackgroundError,
-                this.addLastSnackbar,
-                this.props.translate('loadingapp.readingwallet-label') as string,
+              await this.walletErrorHandle(
                 result,
+                this.state.translate('loadingapp.readingwallet-label') as string,
+                1,
+                true,
               );
             }
           } else {
-            this.setState({ screen: 1, actionButtonsDisabled: false });
-            createAlert(
-              this.setBackgroundError,
-              this.addLastSnackbar,
-              this.props.translate('loadingapp.readingwallet-label') as string,
+            await this.walletErrorHandle(
               result,
+              this.state.translate('loadingapp.readingwallet-label') as string,
+              1,
+              true,
             );
           }
         } else {
@@ -453,8 +488,8 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
             type: state.type,
             isConnectionExpensive: state.details && state.details.isConnectionExpensive,
           },
-          screen: screen !== 0 ? 1 : screen,
-          actionButtonsDisabled: !state.isConnected ? true : false,
+          screen: screen !== 0 ? 1 : 0,
+          actionButtonsDisabled: true,
         });
         if (isConnected !== state.isConnected) {
           if (!state.isConnected) {
@@ -466,7 +501,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
           } else {
             //console.log('EVENT Loading: YESSSSS internet connection.');
             if (screen !== 0) {
-              this.setState({ screen: screen === 3 ? 3 : 0 });
+              this.setState({ screen: screen === 3 ? 3 : screen !== 0 ? 1 : 0 });
               // I need some time until the network is fully ready.
               setTimeout(() => this.componentDidMount(), 1000);
             }
@@ -482,6 +517,81 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     this.unsubscribeNetInfo && typeof this.unsubscribeNetInfo === 'function' && this.unsubscribeNetInfo();
   };
 
+  selectTheBestServer = async (aDifferentOne: boolean) => {
+    const servers = await selectingServer(serverUris(this.props.translate));
+    const fasterServer: ServerType = servers
+      .filter((s: ServerUrisType) => s.latency !== null && s.uri !== (aDifferentOne ? this.state.server.uri : ''))
+      .sort((a, b) => (a.latency ? a.latency : Infinity) - (b.latency ? b.latency : Infinity))
+      .map((s: ServerUrisType) => {
+        return { uri: s.uri, chain_name: s.chain_name };
+      })[0] as ServerType;
+    console.log(fasterServer);
+    this.setState({
+      server: fasterServer,
+      selectServer: 'list',
+    });
+    await SettingsFileImpl.writeSettings('server', fasterServer);
+    await SettingsFileImpl.writeSettings('selectServer', 'list');
+  };
+
+  checkServer: (s: ServerType) => Promise<boolean> = async (server: ServerType) => {
+    const resp: string = await RPCModule.getLatestBlock(server.uri);
+    console.log('check server', resp);
+
+    if (resp && !resp.toLowerCase().startsWith('error')) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  walletErrorHandle = async (result: string, title: string, screen: number, start: boolean) => {
+    // first check the actual server
+    const workingServer = await this.checkServer(this.state.server);
+    if (workingServer) {
+      // the server is working -> this error is something not related with the server availability
+      createAlert(this.setBackgroundError, this.addLastSnackbar, title, result);
+      this.setState({ actionButtonsDisabled: false, serverErrorTries: 0, screen });
+    } else {
+      // let's change to another server
+      if (this.state.serverErrorTries === 0) {
+        // first try
+        this.setState({ screen: 1, actionButtonsDisabled: true });
+        setTimeout(() => {
+          this.addLastSnackbar({
+            message: this.state.translate('loadingapp.serverfirsttry') as string,
+            type: 'Primary',
+            duration: 'longer',
+          });
+        }, 1000);
+        // a different server.
+        await this.selectTheBestServer(true);
+        if (start) {
+          this.setState({
+            startingApp: false,
+            serverErrorTries: 1,
+            screen,
+          });
+          this.componentDidMount();
+        } else {
+          createAlert(this.setBackgroundError, this.addLastSnackbar, title, result);
+          this.setState({ actionButtonsDisabled: false, serverErrorTries: 0, screen });
+        }
+      } else {
+        // second try
+        this.addLastSnackbar({
+          message: this.state.translate('loadingapp.serversecondtry') as string,
+          type: 'Primary',
+          duration: 'longer',
+        });
+        setTimeout(() => {
+          createAlert(this.setBackgroundError, this.addLastSnackbar, title, result);
+          this.setState({ actionButtonsDisabled: false, serverErrorTries: 0, screen });
+        }, 1000);
+      }
+    }
+  };
+
   fetchBackgroundSyncing = async () => {
     const backgroundJson: BackgroundType = await BackgroundFileImpl.readBackground();
     if (backgroundJson) {
@@ -489,31 +599,31 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     }
   };
 
-  usingDefaultServer_0 = async (mode: 'basic' | 'advanced') => {
-    this.setState({ actionButtonsDisabled: true });
-    if (SERVER_DEFAULT_0) {
-      await SettingsFileImpl.writeSettings('server', SERVER_DEFAULT_0);
-      this.setState({ server: SERVER_DEFAULT_0 });
-    }
-    if (mode === 'basic') {
-      this.setState({ actionButtonsDisabled: false }, () => this.componentDidMount());
-    } else {
-      this.setState({ actionButtonsDisabled: false });
-    }
-  };
+  //usingDefaultServer_0 = async (mode: 'basic' | 'advanced') => {
+  //  this.setState({ actionButtonsDisabled: true });
+  //  if (SERVER_DEFAULT_0) {
+  //    await SettingsFileImpl.writeSettings('server', SERVER_DEFAULT_0);
+  //    this.setState({ server: SERVER_DEFAULT_0 });
+  //  }
+  //  if (mode === 'basic') {
+  //    this.setState({ actionButtonsDisabled: false }, () => this.componentDidMount());
+  //  } else {
+  //    this.setState({ actionButtonsDisabled: false });
+  //  }
+  //};
 
-  usingDefaultServer_1 = async (mode: 'basic' | 'advanced') => {
-    this.setState({ actionButtonsDisabled: true });
-    if (SERVER_DEFAULT_1) {
-      await SettingsFileImpl.writeSettings('server', SERVER_DEFAULT_1);
-      this.setState({ server: SERVER_DEFAULT_1 });
-    }
-    if (mode === 'basic') {
-      this.setState({ actionButtonsDisabled: false }, () => this.componentDidMount());
-    } else {
-      this.setState({ actionButtonsDisabled: false });
-    }
-  };
+  //usingDefaultServer_1 = async (mode: 'basic' | 'advanced') => {
+  //  this.setState({ actionButtonsDisabled: true });
+  //  if (SERVER_DEFAULT_1) {
+  //    await SettingsFileImpl.writeSettings('server', SERVER_DEFAULT_1);
+  //    this.setState({ server: SERVER_DEFAULT_1 });
+  //  }
+  //  if (mode === 'basic') {
+  //    this.setState({ actionButtonsDisabled: false }, () => this.componentDidMount());
+  //  } else {
+  //    this.setState({ actionButtonsDisabled: false });
+  //  }
+  //};
 
   usingCustomServer = async () => {
     if (!this.state.customServerUri) {
@@ -547,7 +657,10 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
   createNewWallet = () => {
     this.setState({ actionButtonsDisabled: true });
     setTimeout(async () => {
-      const seed: string = await RPCModule.createNewWallet(this.state.server.uri, this.state.server.chain_name);
+      let seed: string = await RPCModule.createNewWallet(this.state.server.uri, this.state.server.chain_name);
+      //if (this.state.serverErrorTries === 0 || true) {
+      //  seed = 'Error: pepe es guay';
+      //}
 
       if (seed && !seed.toLowerCase().startsWith('error')) {
         let wallet = {} as WalletType;
@@ -574,38 +687,42 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
           walletExists: true,
         }));
       } else {
-        this.setState({ actionButtonsDisabled: false });
-        createAlert(
-          this.setBackgroundError,
-          this.addLastSnackbar,
-          this.props.translate('loadingapp.creatingwallet-label') as string,
-          seed,
-        );
+        //this.setState({ actionButtonsDisabled: false });
+        //createAlert(
+        //  this.setBackgroundError,
+        //  this.addLastSnackbar,
+        //  this.props.translate('loadingapp.creatingwallet-label') as string,
+        //  seed,
+        //);
+        this.walletErrorHandle(seed, this.props.translate('loadingapp.creatingwallet-label') as string, 1, false);
       }
     });
   };
 
-  getwalletToRestore = async (type: 'seed' | 'ufvk') => {
-    this.setState({ wallet: {} as WalletType, screen: type === 'seed' ? 3 : 4 });
+  getwalletToRestore = async () => {
+    this.setState({ wallet: {} as WalletType, screen: 3 });
   };
 
-  doRestore = async (seed_ufvk: string, birthday: number, type: 'seed' | 'ufvk') => {
+  doRestore = async (seed_ufvk: string, birthday: number) => {
     if (!seed_ufvk) {
-      if (type === 'seed') {
-        createAlert(
-          this.setBackgroundError,
-          this.addLastSnackbar,
-          this.props.translate('loadingapp.invalidseed-label') as string,
-          this.props.translate('loadingapp.invalidseed-error') as string,
-        );
-      } else {
-        createAlert(
-          this.setBackgroundError,
-          this.addLastSnackbar,
-          this.props.translate('loadingapp.invalidufvk-label') as string,
-          this.props.translate('loadingapp.invalidufvk-error') as string,
-        );
-      }
+      createAlert(
+        this.setBackgroundError,
+        this.addLastSnackbar,
+        this.props.translate('loadingapp.emptyseedufvk-label') as string,
+        this.props.translate('loadingapp.emptyseedufvk-error') as string,
+      );
+      return;
+    }
+    if (
+      (seed_ufvk.toLowerCase().startsWith('uview') && this.state.server.chain_name !== 'main') ||
+      (seed_ufvk.toLowerCase().startsWith('utestview') && this.state.server.chain_name === 'main')
+    ) {
+      createAlert(
+        this.setBackgroundError,
+        this.addLastSnackbar,
+        this.props.translate('loadingapp.invalidseedufvk-label') as string,
+        this.props.translate('loadingapp.invalidseedufvk-error') as string,
+      );
       return;
     }
 
@@ -617,6 +734,12 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
       }
       if (isNaN(parseInt(walletBirthday, 10))) {
         walletBirthday = '0';
+      }
+
+      let type: 'seed' | 'ufvk' = 'seed';
+      if (seed_ufvk.toLowerCase().startsWith('uview') || seed_ufvk.toLowerCase().startsWith('utestview')) {
+        // this is a UFVK
+        type = 'ufvk';
       }
 
       let result: string;
@@ -635,6 +758,10 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
           this.state.server.chain_name,
         );
       }
+      //if (this.state.serverErrorTries === 0 || true) {
+      //  result = 'Error: pepe es guay';
+      //}
+
       //console.log(seed_ufvk);
       //console.log(result);
       if (result && !result.toLowerCase().startsWith('error')) {
@@ -644,24 +771,10 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
           this.setState({ actionButtonsDisabled: false, readOnly: type === 'seed' ? false : true });
           this.navigateToLoadedApp();
         } else {
-          this.setState({ actionButtonsDisabled: false });
-          // this message work for both.
-          createAlert(
-            this.setBackgroundError,
-            this.addLastSnackbar,
-            this.props.translate('loadingapp.readingwallet-label') as string,
-            result,
-          );
+          this.walletErrorHandle(result, this.props.translate('loadingapp.readingwallet-label') as string, 3, false);
         }
       } else {
-        this.setState({ actionButtonsDisabled: false });
-        // this message work for both.
-        createAlert(
-          this.setBackgroundError,
-          this.addLastSnackbar,
-          this.props.translate('loadingapp.readingwallet-label') as string,
-          result,
-        );
+        this.walletErrorHandle(result, this.props.translate('loadingapp.readingwallet-label') as string, 3, false);
       }
     });
   };
@@ -763,7 +876,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
             />
           )}
           {screen === 1 && (
-            <>
+            <View style={{ width: '100%', height: '100%' }}>
               <View
                 style={{
                   backgroundColor: colors.card,
@@ -777,16 +890,16 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                   <>
                     {mode === 'basic' ? (
                       <OptionsMenu
-                        customButton={<FontAwesomeIcon icon={faEllipsisV} color={'#ffffff'} size={48} />}
-                        buttonStyle={{ width: 48, padding: 10, resizeMode: 'contain' }}
+                        customButton={<FontAwesomeIcon icon={faEllipsisV} color={'#ffffff'} size={40} />}
+                        buttonStyle={{ width: 40, padding: 10, resizeMode: 'contain' }}
                         destructiveIndex={5}
                         options={[translate('loadingapp.advancedmode'), translate('cancel')]}
                         actions={[() => this.changeMode('advanced')]}
                       />
                     ) : (
                       <OptionsMenu
-                        customButton={<FontAwesomeIcon icon={faEllipsisV} color={'#ffffff'} size={48} />}
-                        buttonStyle={{ width: 48, padding: 10, resizeMode: 'contain' }}
+                        customButton={<FontAwesomeIcon icon={faEllipsisV} color={'#ffffff'} size={40} />}
+                        buttonStyle={{ width: 40, padding: 10, resizeMode: 'contain' }}
                         destructiveIndex={5}
                         options={[translate('loadingapp.custom'), translate('cancel')]}
                         actions={[this.customServer]}
@@ -810,7 +923,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                     alignItems: 'center',
                     justifyContent: 'center',
                   }}>
-                  <View style={{ marginBottom: 50, display: 'flex', alignItems: 'center' }}>
+                  <View style={{ marginBottom: 30, display: 'flex', alignItems: 'center' }}>
                     <Text style={{ color: colors.zingo, fontSize: 40, fontWeight: 'bold' }}>
                       {translate('zingo') as string}
                     </Text>
@@ -935,7 +1048,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                     </>
                   )}
 
-                  {mode === 'basic' && netInfo.isConnected && (
+                  {netInfo.isConnected && walletExists && (
                     <View
                       style={{
                         display: 'flex',
@@ -948,7 +1061,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                         style={{
                           display: 'flex',
                           flexDirection: 'column',
-                          marginTop: 20,
+                          marginTop: 10,
                           borderColor: colors.primary,
                           borderWidth: 1,
                           borderRadius: 5,
@@ -961,64 +1074,14 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                     </View>
                   )}
 
-                  {netInfo.isConnected &&
-                    !customServerShow &&
-                    isEqual(server, SERVER_DEFAULT_1) &&
-                    !!SERVER_DEFAULT_0.uri && (
-                      <Button
-                        type="Primary"
-                        title={
-                          (mode === 'basic'
-                            ? translate('loadingapp.changeserver-basic')
-                            : translate('loadingapp.changeserver')) as string
-                        }
-                        disabled={actionButtonsDisabled}
-                        onPress={() => this.usingDefaultServer_0(mode)}
-                        style={{ marginBottom: 10 }}
-                      />
-                    )}
-                  {netInfo.isConnected &&
-                    !customServerShow &&
-                    isEqual(server, SERVER_DEFAULT_0) &&
-                    !!SERVER_DEFAULT_1.uri && (
-                      <Button
-                        type="Primary"
-                        title={
-                          (mode === 'basic'
-                            ? translate('loadingapp.changeserver-basic')
-                            : translate('loadingapp.changeserver')) as string
-                        }
-                        disabled={actionButtonsDisabled}
-                        onPress={() => this.usingDefaultServer_1(mode)}
-                        style={{ marginBottom: 10 }}
-                      />
-                    )}
-                  {netInfo.isConnected &&
-                    !customServerShow &&
-                    !isEqual(server, SERVER_DEFAULT_0) &&
-                    !isEqual(server, SERVER_DEFAULT_1) &&
-                    !!SERVER_DEFAULT_0.uri && (
-                      <Button
-                        type="Primary"
-                        title={
-                          (mode === 'basic'
-                            ? translate('loadingapp.changeserver-basic')
-                            : translate('loadingapp.changeserver')) as string
-                        }
-                        disabled={actionButtonsDisabled}
-                        onPress={() => this.usingDefaultServer_0(mode)}
-                        style={{ marginBottom: 10 }}
-                      />
-                    )}
-
-                  {mode !== 'basic' && netInfo.isConnected && (
+                  {netInfo.isConnected && (
                     <Button
                       testID="loadingapp.createnewwallet"
                       type="Primary"
                       title={translate('loadingapp.createnewwallet') as string}
                       disabled={actionButtonsDisabled}
                       onPress={() => {
-                        if (this.state.walletExists) {
+                        if (walletExists) {
                           Alert.alert(
                             translate('loadingapp.alert-newwallet-title') as string,
                             translate('loadingapp.alert-newwallet-body') as string,
@@ -1029,17 +1092,17 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                               },
                               { text: translate('cancel') as string, style: 'cancel' },
                             ],
-                            { cancelable: true, userInterfaceStyle: 'light' },
+                            { cancelable: false, userInterfaceStyle: 'light' },
                           );
                         } else {
                           this.createNewWallet();
                         }
                       }}
-                      style={{ marginBottom: 10, marginTop: 10 }}
+                      style={{ marginBottom: mode === 'advanced' ? 10 : 30, marginTop: 10 }}
                     />
                   )}
 
-                  {mode !== 'basic' && netInfo.isConnected && walletExists && (
+                  {netInfo.isConnected && walletExists && (
                     <Button
                       type="Primary"
                       title={translate('loadingapp.opencurrentwallet') as string}
@@ -1049,27 +1112,14 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                     />
                   )}
 
-                  {mode !== 'basic' && netInfo.isConnected && (
+                  {netInfo.isConnected && (
                     <View style={{ marginTop: 20, display: 'flex', alignItems: 'center' }}>
                       <Button
                         testID="loadingapp.restorewalletseed"
                         type="Secondary"
-                        title={translate('loadingapp.restorewalletseed') as string}
+                        title={translate('loadingapp.restorewalletseedufvk') as string}
                         disabled={actionButtonsDisabled}
-                        onPress={() => this.getwalletToRestore('seed')}
-                        style={{ marginBottom: 10 }}
-                      />
-                    </View>
-                  )}
-
-                  {mode !== 'basic' && netInfo.isConnected && (
-                    <View style={{ marginTop: 20, display: 'flex', alignItems: 'center' }}>
-                      <Button
-                        testID="loadingapp.restorewalletufvk"
-                        type="Secondary"
-                        title={translate('loadingapp.restorewalletufvk') as string}
-                        disabled={actionButtonsDisabled}
-                        onPress={() => this.getwalletToRestore('ufvk')}
+                        onPress={() => this.getwalletToRestore()}
                         style={{ marginBottom: 10 }}
                       />
                     </View>
@@ -1099,9 +1149,13 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                       </View>
                     </View>
                   )}
+
+                  {netInfo.isConnected && actionButtonsDisabled && (
+                    <ActivityIndicator size="large" color={colors.primary} style={{ marginVertical: 20 }} />
+                  )}
                 </View>
               </ScrollView>
-            </>
+            </View>
           )}
           {screen === 2 && wallet && (
             <Modal
@@ -1136,29 +1190,8 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                     <Text>{translate('loading') as string}</Text>
                   </View>
                 }>
-                <Seed
-                  onClickOK={(s: string, b: number) => this.doRestore(s, b, 'seed')}
-                  onClickCancel={() => this.setState({ screen: 1, actionButtonsDisabled: false })}
-                  action={'restore'}
-                  set_privacy_option={this.set_privacy_option}
-                />
-              </Suspense>
-            </Modal>
-          )}
-          {screen === 4 && (
-            <Modal
-              animationType="slide"
-              transparent={false}
-              visible={screen === 4}
-              onRequestClose={() => this.setState({ screen: 1 })}>
-              <Suspense
-                fallback={
-                  <View>
-                    <Text>{translate('loading') as string}</Text>
-                  </View>
-                }>
                 <ImportUfvk
-                  onClickOK={(s: string, b: number) => this.doRestore(s, b, 'ufvk')}
+                  onClickOK={(s: string, b: number) => this.doRestore(s, b)}
                   onClickCancel={() => this.setState({ screen: 1 })}
                 />
               </Suspense>

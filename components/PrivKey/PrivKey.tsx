@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { View, ScrollView, SafeAreaView, TouchableOpacity, Text } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import Clipboard from '@react-native-community/clipboard';
@@ -27,17 +27,20 @@ const PrivKey: React.FunctionComponent<PrivKeyProps> = ({ address, keyType, priv
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
-  const keyTypeString = keyType === 0 ? translate('privkey.privkey') : translate('privkey.viewkey');
+  const [expandAddress, setExpandAddress] = useState<boolean>(false);
+  const [keyTypeString, setKeyTypeString] = useState<string>('');
+  const [keyChunks, setKeyChunks] = useState<string[]>([]);
 
-  // 30 characters per line
-  const numLines = privKey.length < 40 ? 2 : privKey.length / 30;
-  const keyChunks = Utils.splitStringIntoChunks(privKey, Number(numLines.toFixed(0)));
+  useEffect(() => {
+    const keyTypeStr = keyType === 0 ? translate('privkey.privkey') : translate('privkey.viewkey');
 
-  const [expandAddress, setExpandAddress] = useState(false);
+    // 30 characters per line
+    const numLines = privKey.length < 40 ? 2 : privKey.length / 30;
+    const keyChu = Utils.splitStringIntoChunks(privKey, Number(numLines.toFixed(0)));
 
-  //if (!privKey) {
-  //  privKey = translate('privkey.nokey');
-  //}
+    setKeyTypeString(keyTypeStr as string);
+    setKeyChunks(keyChu);
+  }, [keyType, privKey, translate]);
 
   const doCopy = () => {
     //if (address) {
@@ -87,7 +90,17 @@ const PrivKey: React.FunctionComponent<PrivKeyProps> = ({ address, keyType, priv
           </View>
 
           <View style={{ padding: 10, backgroundColor: colors.border, marginTop: 15, marginBottom: 20 }}>
-            <QRCode value={privKey} size={225} ecl="L" backgroundColor={colors.border} />
+            <QRCode
+              value={privKey}
+              size={225}
+              ecl="L"
+              backgroundColor={colors.border}
+              logo={require('../../assets/img/logobig-zingo.png')}
+              logoSize={35}
+              logoBackgroundColor={colors.border}
+              logoBorderRadius={10} /* android not soported */
+              logoMargin={5}
+            />
           </View>
           <TouchableOpacity onPress={doCopy}>
             <Text style={{ color: colors.text, textDecorationLine: 'underline', marginBottom: 5, minHeight: 48 }}>

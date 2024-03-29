@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo!",
-  "version": "zingo-1.3.5 (155)",
+  "version": "zingo-1.3.7 (162)",
   "loading": "loading...",
   "connectingserver": "Connecting to the server...",
   "wait": "Please wait...",
@@ -44,7 +44,8 @@
     "delete-title": "Delete Label",
     "delete-alert": "Do you really want to delete this Contact/Nickname/Label/Tag?",
     "likely": "Likely: ",
-    "thiswalletaddress": "This Wallet's Address"
+    "thiswalletaddress": "This Wallet's Address",
+    "addto": "Add to "
   },
   "change-privacy-legend": ".\nTap to reveal the hidden values.",
   "txtcopied": "Text copied to Clipboard",
@@ -65,14 +66,13 @@
     "changeserver": "Change the Server",
     "createnewwallet": "Create New Wallet",
     "opencurrentwallet": "Open Current Wallet",
-    "restorewalletseed": "Restore wallet\nfrom Seed",
-    "restorewalletufvk": "Restore wallet from\nViewing Key",
+    "restorewalletseedufvk": "Restore wallet",
     "creatingwallet-label": "Error creating Wallet",
     "readingwallet-label": "Error reading Wallet",
-    "invalidseed-label": "Invalid Seed Phrase",
-    "invalidseed-error": "The seed phrase was invalid. Review every single word of the seed.",
-    "invalidufvk-label": "Invalid Unified Full Viewing Key",
-    "invalidufvk-error": "The Viewing Key was invalid. Review the Key and/or scan it again.",
+    "invalidseedufvk-label": "Invalid Seed Phrase / Viewing Key",
+    "invalidseedufvk-error": "The Seed Phrase / Viewing Key was invalid. Review the value and fix it.",
+    "emptyseedufvk-label": "Invalid Seed Phrase / Viewing Key",
+    "emptyseedufvk-error": "The Seed Phrase / Viewing Key was empty. Review the value and fix it.",
     "custom": "Custom Server...",
     "nointernet-message": "There is no established internet connection. Please fix this issue.",
     "basicmode": "Change to Basic Mode",
@@ -80,7 +80,9 @@
     "noopenwallet-message": "An error occurred while the App was trying to open the active wallet.",
     "changeserver-basic": "Change the Server and\nOpen Current Wallet",
     "alert-newwallet-title": "CREATE A NEW WALLET",
-    "alert-newwallet-body": "Can you confirm that you really want to create a new wallet and lose access to the current wallet."
+    "alert-newwallet-body": "Can you confirm that you really want to create a new wallet and lose access to the current wallet.",
+    "serverfirsttry": "Trying to perform the action with a different server. The current server may be failing.",
+    "serversecondtry": "It doesn't seem to be any problem with the server. Someting else is happening."
   },
   "loadedapp": {
     "about": "About Zingo!",
@@ -97,7 +99,7 @@
     "restorebackupwallet": "Restore Last Wallet Backup",
     "fundpools": "Fund Pools",
     "insight": "Financial Insight",
-    "loadwalletfromseed-basic": "Restore wallet (Advanced)",
+    "loadwalletfromseed-basic": "Restore wallet",
     "addressbook": "Address Book",
     "restoremainnet-error": "This option is only available for 'Mainnet' servers.",
     "changeservernew-error": "Error trying to change the server to the new one: ",
@@ -121,7 +123,9 @@
     "tryingnewserver-error": "After 30 seconds the new server doesn't respond.",
     "readingwallet": "Reading successfully the wallet with the server:",
     "restorewallet-title": "Advanced Option",
-    "restorewallet-alert": "Confirm that you want to restore a new wallet using your seed phrase."
+    "restorewallet-alert": "Confirm that you want to restore a new wallet using your seed phrase.",
+    "selectingserver": "Checking the servers in the list to select the most optimized one.",
+    "selectingserversame": "Your actual server is the most optimized one already."
   },
   "rpc": {
     "parsebirthday-error": "Error: Couldn't parse as a number:",
@@ -210,7 +214,12 @@
     "isuri": "You need to fill out a valid Server URI.",
     "title": "Settings",
     "server-title": "SERVER",
-    "custom": "custom",
+    "server-auto": "Automatic",
+    "server-list": "List",
+    "server-custom": "Custom",
+    "server-auto-text": "The next time the application starts, it will calculate which is the best server in the list and make it active.",
+    "server-list-text": "Select a server from the list.",
+    "server-custom-text": "Fill in the information of the server you want to use.",
     "threshold-title": "TRANSACTION FILTER THRESHOLD",
     "number": "Number...",
     "memo-title": "MEMO DOWNLOAD",
@@ -243,15 +252,26 @@
     "value-chain_name-test": "Testnet",
     "value-chain_name-regtest": "Regtest",
     "security-title": "APPLY DEVICE SECURITY TO SCREENS/OPTIONS",
-    "security-startapp": "When the App starts.",
-    "security-foregroundapp": "When the App go to the Foreground.",
-    "security-sendconfirm": "Confirm Transaction.",
-    "security-seedscreen": "Wallet Seed Phrase.",
-    "security-ufvkscreen": "Wallet Viewing Key.",
-    "security-rescanscreen": "Rescan Wallet.",
-    "security-settingsscreen": "Settings.",
-    "security-changewalletscreen": "Change to another Wallet.",
-    "security-restorewalletbackupscreen": "Restore Last Wallet Backup."
+    "security-startapp": "When the App starts",
+    "security-foregroundapp": "When the App go to the Foreground",
+    "security-sendconfirm": "Confirm Transaction",
+    "security-seedscreen": "Wallet Seed Phrase",
+    "security-ufvkscreen": "Wallet Viewing Key",
+    "security-rescanscreen": "Rescan Wallet",
+    "security-settingsscreen": "Settings",
+    "security-changewalletscreen": "Change to another Wallet",
+    "security-restorewalletbackupscreen": "Restore Last Wallet Backup",
+    "na": "North America",
+    "usa": "USA",
+    "sa": "South America",
+    "ea": "Europe & Africa",
+    "ao": "Asia & Oceania",
+    "hk": "Hong Kong",
+    "canada": "Canada",
+    "france": "France",
+    "netherlands": "Netherlands",
+    "uk": "UK",
+    "select-placeholder": "Choose a Server..."
   },
   "info": {
     "version": "Version",
@@ -343,6 +363,7 @@
     "invalidaddress": "Invalid Address!",
     "addressplaceholder": "Unified, Z-Sapling or Transparent",
     "invalidamount": "Invalid Amount!",
+    "invalidnumber": "Invalid Number!",
     "spendable": "Spendable: ",
     "somefunds": "Some funds still confirming or syncing",
     "memo": "Memo (Optional)",
@@ -374,11 +395,13 @@
     "needtoupgrade": "You have funds to upgrade",
     "fetchpricetitle": "Fetch USD Price",
     "fetchpricebody": "Please confirm that you want to fetch the USD price from the Internet.",
-    "fetch-button": "fetch",
+    "fetch-button": "Fetch",
     "confirm-privacy-level": "Privacy Level",
     "private": "Private",
     "amountrevealed": "Amount Revealed",
-    "deshielded": "Deshielded"
+    "deshielded": "Deshielded",
+    "lose-address-title": "SELECT A NEW ADDRESS",
+    "lose-address-alert": "You already have a valid address in the address field. Do you want to replace it?"
   },
   "receive": {
     "u-title": "Unified Address",
@@ -480,12 +503,12 @@
     "connectionexpensive": "Connection Expensive."
   },
   "import": {
-    "title": "Viewing Key",
-    "key-label": "Enter the Unified Full Viewing key",
-    "birthday": "Key Birthday",
-    "text": "Restoring from viewing key requires a rescan, and may take a long time to complete.",
+    "title": "Seed Phrase / Viewing Key",
+    "key-label": "Enter your Seed Phrase or Viewing key",
+    "birthday": "Birthday",
+    "text": "Restoring from Seed Phrase or Viewing Key requires a rescan, and may take a long time to complete.",
     "button": "Restore Wallet",
-    "key-acc": "Key Field",
+    "key-acc": "Seed-Key Field",
     "birthday-acc": "Birthday Field"
   },
   "about": {
@@ -575,5 +598,6 @@
     "noaddress": "Didn't have an address",
     "oneentry": "URI Should have at least 1 entry",
     "parseerror": "Right now it is not possible to verify the address with the server"
-  }
+  },
+  "donation-button": "Donate To Zingo "
 }

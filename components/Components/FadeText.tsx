@@ -2,6 +2,7 @@
 import React from 'react';
 import { Text, TextStyle } from 'react-native';
 import { useTheme } from '@react-navigation/native';
+import { ThemeType } from '../../app/types/ThemeType';
 
 type FadeTextProps = {
   style?: TextStyle;
@@ -9,7 +10,7 @@ type FadeTextProps = {
 };
 
 const FadeText: React.FunctionComponent<FadeTextProps> = ({ style, children }) => {
-  const { colors } = useTheme();
+  const { colors } = useTheme() as unknown as ThemeType;
 
   return <Text style={{ opacity: 0.65, color: colors.text, ...style }}>{children}</Text>;
 };

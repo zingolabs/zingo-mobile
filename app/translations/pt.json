@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo!",
-  "version": "zingo-1.3.5 (155)",
+  "version": "zingo-1.3.7 (162)",
   "loading": "carregando...",
   "connectingserver": "Conectando-se ao servidor...",
   "wait": "Aguarde um momento...",
@@ -44,7 +44,8 @@
     "delete-title": "Eliminar rótulo",
     "delete-alert": "Você realmente deseja excluir este contato/apelido/etiqueta/etiqueta?",
     "likely": "Curtir: ",
-    "thiswalletaddress": "Endereço desta Carteira"
+    "thiswalletaddress": "Endereço desta Carteira",
+    "addto": "Adicionar à "
   },
   "change-privacy-legend": ".\nToque para revelar os valores ocultos.",
   "txtcopied": "Texto copiado para a Área de Transferência",
@@ -65,14 +66,13 @@
     "changeserver": "Alterar o servidor",
     "createnewwallet": "Criar uma nova carteira",
     "opencurrentwallet": "Abrir carteira atual",
-    "restorewalletseed": "Restaurar carteira usando a \nsua frase de Recuperação",
-    "restorewalletufvk": "Restaurar carteira de\nChave de Visualização",
+    "restorewalletseedufvk": "Restaurar carteira",
     "creatingwallet-label": "Erro ao criar a Carteira",
     "readingwallet-label": "Erro ao ler a Carteira",
-    "invalidseed-label": "Frases de Recuperação invalidas",
-    "invalidseed-error": "As Frases de Recuperação estavam invalida, por favor revise cada frase da sua chave.",
-    "invalidufvk-label": "Chave de Visualização Unificada Completa Inválida",
-    "invalidufvk-error": "As Chaves de Visualização estavam invalidas. Revise a Chave e/ou escaneie novamente.",
+    "invalidseedufvk-label": "Frases de Recuperação / Chave de Visualização invalidas",
+    "invalidseedufvk-error": "As Frases de Recuperação / Chave de Visualização estava invalida, Revise o valor e corrija-o.",
+    "emptyseedufvk-label": "Frases de Recuperação / Chave de Visualização invalidas",
+    "emptyseedufvk-error": "As Frases de Recuperação /Chave de Visualização estava vazia, Revise o valor e corrija-o.",
     "custom": "Servidor Personalizado...",
     "nointernet-message": "Não há conexão com a Internet estabelecida. Por favor, corrija esse problema",
     "basicmode": "Mudar para o modo básico",
@@ -80,7 +80,9 @@
     "noopenwallet-message": "Ocorreu um erro enquanto o aplicativo tentava abrir a carteira atual.",
     "changeserver-basic": "Altere o servidor e\nabra a carteira atual",
     "alert-newwallet-title": "CRIAR UM NOVO CARTEIRO",
-    "alert-newwallet-body": "Você pode confirmar que você realmente quer criar uma nova carteira e perder o acesso à carteira atual."
+    "alert-newwallet-body": "Você pode confirmar que você realmente quer criar uma nova carteira e perder o acesso à carteira atual.",
+    "serverfirsttry": "Tentando executar a ação com um servidor diferente. O servidor atual pode estar falhando.",
+    "serversecondtry": "Não parece haver nenhum problema com o servidor. Algo mais está acontecendo."
   },
   "loadedapp": {
     "about": "Sobre a Zingo!",
@@ -121,7 +123,9 @@
     "tryingnewserver-error": "Após 30 segundos o novo servidor não responde.",
     "readingwallet": "Lendo com sucesso a carteira atual com o servidor:",
     "restorewallet-title": "Opção Avançada",
-    "restorewallet-alert": "Confirme que você deseja restaurar uma nova carteira usando as suas frases de recuperação."
+    "restorewallet-alert": "Confirme que você deseja restaurar uma nova carteira usando as suas frases de recuperação.",
+    "selectingserver": "Verificando os servidores da lista para selecionar o mais otimizado.",
+    "selectingserversame": "Seu servidor real já é o mais otimizado."
   },
   "rpc": {
     "parsebirthday-error": "Erro: Não foi possível analisar como um número:",
@@ -210,7 +214,12 @@
     "isuri": "Você precisa preencher um URI de um servidor válido.",
     "title": "Configurações",
     "server-title": "SERVIDOR",
-    "custom": "personalizado",
+    "server-auto": "Automatico",
+    "server-list": "Lista",
+    "server-custom": "Personalizado",
+    "server-auto-text": "Na próxima vez que o aplicativo for iniciado, ele calculará qual é o melhor servidor da lista e o ativará.",
+    "server-list-text": "Selecione um servidor na lista.",
+    "server-custom-text": "Preencha as informações do servidor que deseja usar.",
     "threshold-title": "LIMITE DO FILTRO DAS TRANSAÇÕES",
     "number": "Número...",
     "memo-title": "BAIXAR MEMOS",
@@ -243,15 +252,26 @@
     "value-chain_name-test": "Testnet",
     "value-chain_name-regtest": "Regtest",
     "security-title": "APLICAR SEGURANÇA DO DISPOSITIVO PARA AS TRANS/OPÇÕES",
-    "security-startapp": "Quando o aplicativo inicia.",
-    "security-foregroundapp": "Quando o aplicativo vai para o primeiro plano.",
-    "security-sendconfirm": "Confirmar Transação.",
-    "security-seedscreen": "Backup das Chaves da Carteira.",
-    "security-ufvkscreen": "Chave de Visualização da Carteira.",
-    "security-rescanscreen": "Rescanear a Carteira.",
-    "security-settingsscreen": "Configurações.",
-    "security-changewalletscreen": "Abrir outra carteira.",
-    "security-restorewalletbackupscreen": "Restaurar último backup da carteira."
+    "security-startapp": "Quando o aplicativo inicia",
+    "security-foregroundapp": "Quando o aplicativo vai para o primeiro plano",
+    "security-sendconfirm": "Confirmar Transação",
+    "security-seedscreen": "Backup das Chaves da Carteira",
+    "security-ufvkscreen": "Chave de Visualização da Carteira",
+    "security-rescanscreen": "Rescanear a Carteira",
+    "security-settingsscreen": "Configurações",
+    "security-changewalletscreen": "Abrir outra carteira",
+    "security-restorewalletbackupscreen": "Restaurar último backup da carteira",
+    "na": "America do Norte",
+    "usa": "EUA",
+    "sa": "America do Sul",
+    "ea": "Europa & Africa",
+    "ao": "Asia & Oceania",
+    "hk": "Hong Kong",
+    "canada": "Canada",
+    "france": "França",
+    "netherlands": "Holanda",
+    "uk": "Reino Unido",
+    "select-placeholder": "escolha um servidor..."
   },
   "info": {
     "version": "Versão",
@@ -343,6 +363,7 @@
     "invalidaddress": "Endereço Inválido!",
     "addressplaceholder": "Unificado, Z-Sapling ou Transparente",
     "invalidamount": "Quantia Invalida!",
+    "invalidnumber": "Número Inválido!",
     "spendable": "Disponível: ",
     "somefunds": "Alguns fundos ainda estão sendo confirmados ou sincronizados",
     "memo": "MEMOS (Opcional)",
@@ -374,11 +395,13 @@
     "needtoupgrade": "Você tem fundos para atualizar",
     "fetchpricetitle": "Buscar preço em USD",
     "fetchpricebody": "Confirme que você deseja obter o preço em USD na Internet.",
-    "fetch-button": "buscar",
+    "fetch-button": "Buscar",
     "confirm-privacy-level": "Nível de Privacidade",
     "private": "Privado",
     "amountrevealed": "Quantia Revelada",
-    "deshielded": "Desblindada"
+    "deshielded": "Desblindada",
+    "lose-address-title": "SELECIONE UM NOVO ENDEREÇO",
+    "lose-address-alert": "Você já tem um endereço válido no campo de endereço. Deseja substituí-lo?"
   },
   "receive": {
     "u-title": "Endereço Unificados",
@@ -480,12 +503,12 @@
     "connectionexpensive": "Conexão com os Dados Móveis ."
   },
   "import": {
-    "title": "Chave de Visualização",
-    "key-label": "Insira a Chave de Visualização Unificada Completa",
-    "birthday": "Chave de Aniversário",
-    "text": "A restauração da chave de visualização requer uma nova verificação e pode levar muito tempo para ser concluída.",
+    "title": "Frases de recuperação / Chave de Visualização",
+    "key-label": "Insira a Frases de recuperação / Chave de Visualização",
+    "birthday": "Aniversário",
+    "text": "A restauração da frases de recuperação / chave de visualização requer uma nova verificação e pode levar muito tempo para ser concluída.",
     "button": "Restaurar Carteira",
-    "key-acc": "Campo de Chave",
+    "key-acc": "Campo de Frase-Chave",
     "birthday-acc": "Campo de Aniversário"
   },
   "about": {
@@ -575,5 +598,6 @@
     "noaddress": "Nenhum endereço válido informado",
     "oneentry": "RI deve ter pelo menos 1 entrada",
     "parseerror": "nesse momento não é possível verificar o endereço com o servidor"
-  }
+  },
+  "donation-button": "Doar para Zingo "
 }

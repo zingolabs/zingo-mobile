@@ -27,8 +27,8 @@ import { RPCSyncStatusType } from './types/RPCSyncStatusType';
 import { RPCGetOptionType } from './types/RPCGetOptionType';
 import { RPCSendProgressType } from './types/RPCSendProgressType';
 import { RPCSyncRescan } from './types/RPCSyncRescanType';
-//import { RPCUfvkType } from './types/RPCUfvkType';
 import { RPCSummariesType } from './types/RPCSummariesType';
+import { RPCUfvkType } from './types/RPCUfvkType';
 
 export default class RPC {
   fnSetInfo: (info: InfoType) => void;
@@ -357,8 +357,7 @@ export default class RPC {
 
   static async rpc_fetchWallet(readOnly: boolean): Promise<WalletType> {
     if (readOnly) {
-      // viewing key
-      /*
+      // only viewing key & birthday
       try {
         const ufvkStr: string = await RPCModule.execute('exportufvk', '');
         if (ufvkStr) {
@@ -370,34 +369,23 @@ export default class RPC {
           console.log('Internal Error ufvk');
           return {} as WalletType;
         }
-        const ufvk: WalletType = (await JSON.parse(ufvkStr)) as RPCUfvkType;
+        const RPCufvk: WalletType = (await JSON.parse(ufvkStr)) as RPCUfvkType;
 
-        return ufvk;
+        const wallet: WalletType = {} as WalletType;
+        if (RPCufvk.birthday) {
+          wallet.birthday = RPCufvk.birthday;
+        }
+        if (RPCufvk.ufvk) {
+          wallet.ufvk = RPCufvk.ufvk;
+        }
+
+        return wallet;
       } catch (error) {
         console.log(`Critical Error ufvk ${error}`);
         return {} as WalletType;
       }
-      */
-      try {
-        const birthdayStr: string = await RPCModule.execute('get_birthday', '');
-        if (birthdayStr) {
-          if (birthdayStr.toLowerCase().startsWith('error')) {
-            console.log(`Error get_birthday ${birthdayStr}`);
-            return {} as WalletType;
-          }
-        } else {
-          console.log('Internal Error get_birthday');
-          return {} as WalletType;
-        }
-        const birthday: number = Number(birthdayStr);
-
-        return { birthday } as WalletType;
-      } catch (error) {
-        console.log(`Critical Error get_birthday ${error}`);
-        return {} as WalletType;
-      }
     } else {
-      // seed
+      // seed & viewing key & birthday
       try {
         const seedStr: string = await RPCModule.execute('seed', '');
         if (seedStr) {
@@ -410,15 +398,35 @@ export default class RPC {
           return {} as WalletType;
         }
         const RPCseed: RPCSeedType = await JSON.parse(seedStr);
-        const seed: WalletType = {} as WalletType;
+
+        const ufvkStr: string = await RPCModule.execute('exportufvk', '');
+        if (ufvkStr) {
+          if (ufvkStr.toLowerCase().startsWith('error')) {
+            console.log(`Error ufvk ${ufvkStr}`);
+            return {} as WalletType;
+          }
+        } else {
+          console.log('Internal Error ufvk');
+          return {} as WalletType;
+        }
+        const RPCufvk: WalletType = (await JSON.parse(ufvkStr)) as RPCUfvkType;
+
+        const wallet: WalletType = {} as WalletType;
         if (RPCseed.seed) {
-          seed.seed = RPCseed.seed;
+          wallet.seed = RPCseed.seed;
         }
         if (RPCseed.birthday) {
-          seed.birthday = RPCseed.birthday;
+          wallet.birthday = RPCseed.birthday;
+        }
+        if (RPCufvk.ufvk) {
+          wallet.ufvk = RPCufvk.ufvk;
         }
 
-        return seed;
+        if (RPCseed.birthday !== RPCufvk.birthday) {
+          console.log('seed birthday', RPCseed.birthday, 'ufvk birthday', RPCufvk.birthday);
+        }
+
+        return wallet;
       } catch (error) {
         console.log(`Critical Error seed ${error}`);
         return {} as WalletType;
@@ -1552,7 +1560,9 @@ export default class RPC {
 
     //console.log('prev progress id', prevSendId);
 
-    let sendFastError: string = '';
+    // sometimes we need the result of send as well
+    let sendError: string = '';
+    let sendTxid: string = '';
 
     // This is async, so fire and forget
     this.doSend(JSON.stringify(sendJson))
@@ -1560,14 +1570,18 @@ export default class RPC {
         try {
           const rJson = JSON.parse(r);
           if (rJson.error) {
-            sendFastError = rJson.error;
+            sendError = rJson.error;
+          } else if (rJson.txid) {
+            sendTxid = rJson.txid;
           }
-        } catch (e) {}
+        } catch (e) {
+          sendError = r;
+        }
         console.log('End Send OK: ' + r);
       })
       .catch(e => {
         if (e && e.message) {
-          sendFastError = e.message;
+          sendError = e.message;
         }
         console.log('End Send ERROR: ' + e);
       })
@@ -1614,7 +1628,7 @@ export default class RPC {
           return;
         }
 
-        //console.log('progress', progress);
+        console.log('progress', progress);
 
         // Calculate ETA.
         let secondsPerComputation = 3; // default
@@ -1646,7 +1660,10 @@ export default class RPC {
         // if the send process is really fast (likely an error) and sendprogress is over
         // in this moment.
 
-        if (!progress.txid && !progress.error && progress.sending) {
+        // sometimes the progress.sending is false and txid and error are null
+        // in this moment I can use the values from the command send
+
+        if (!progress.txid && !progress.error && !sendTxid && !sendError) {
           // Still processing
           setSendProgress(updatedProgress);
           return;
@@ -1659,16 +1676,37 @@ export default class RPC {
         if (progress.txid) {
           // And refresh data (full refresh)
           this.refresh(true);
-
+          // send process is about to finish - reactivate the syncing flag
+          if (progress.sync_interrupt) {
+            await RPC.rpc_setInterruptSyncAfterBatch('false');
+          }
           resolve(progress.txid);
         }
 
         if (progress.error) {
+          // send process is about to finish - reactivate the syncing flag
+          if (progress.sync_interrupt) {
+            await RPC.rpc_setInterruptSyncAfterBatch('false');
+          }
           reject(progress.error);
         }
 
-        if (!progress.sending) {
-          reject(sendFastError);
+        if (sendTxid) {
+          // And refresh data (full refresh)
+          this.refresh(true);
+          // send process is about to finish - reactivate the syncing flag
+          if (progress.sync_interrupt) {
+            await RPC.rpc_setInterruptSyncAfterBatch('false');
+          }
+          resolve(sendTxid);
+        }
+
+        if (sendError) {
+          // send process is about to finish - reactivate the syncing flag
+          if (progress.sync_interrupt) {
+            await RPC.rpc_setInterruptSyncAfterBatch('false');
+          }
+          reject(sendError);
         }
       }, 2000); // Every 2 seconds
     });
@@ -1681,6 +1719,7 @@ export default class RPC {
 
     //console.log('jc change wallet', exists);
     if (exists && exists !== 'false') {
+      await this.stopSyncProcess();
       await RPCModule.doSaveBackup();
       const result = await RPCModule.deleteExistingWallet();
 
@@ -1698,6 +1737,7 @@ export default class RPC {
 
     //console.log('jc change wallet', exists);
     if (exists && exists !== 'false') {
+      await this.stopSyncProcess();
       const result = await RPCModule.deleteExistingWallet();
 
       if (!(result && result !== 'false')) {
@@ -1718,6 +1758,7 @@ export default class RPC {
 
       //console.log('jc restore wallet', existsWallet);
       if (existsWallet && existsWallet !== 'false') {
+        await this.stopSyncProcess();
         await RPCModule.restoreExistingWalletBackup();
       } else {
         return this.translate('rpc.walletnotfound-error');

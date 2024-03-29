@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { View, TouchableOpacity, TextInput, Modal } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faCheck, faQrcode } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faQrcode, faXmark } from '@fortawesome/free-solid-svg-icons';
 //import { TouchableOpacity } from 'react-native-gesture-handler';
 
 import { ContextAppLoaded } from '../../app/context';
@@ -34,8 +34,8 @@ const InputTextAddress: React.FunctionComponent<InputTextAddressProps> = ({
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
-  const [qrcodeModalVisble, setQrcodeModalVisible] = useState(false);
-  const [validAddress, setValidAddress] = useState(0); // 1 - OK, 0 - Empty, -1 - KO
+  const [qrcodeModalVisble, setQrcodeModalVisible] = useState<boolean>(false);
+  const [validAddress, setValidAddress] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
 
   useEffect(() => {
     const parseAdressJSON = async (addr: string): Promise<boolean> => {
@@ -51,8 +51,13 @@ const InputTextAddress: React.FunctionComponent<InputTextAddressProps> = ({
       } else {
         return false;
       }
-      // TODO: check if the json parse is correct.
-      const resultJSON: RPCParseAddressType = await JSON.parse(result);
+      let resultJSON: RPCParseAddressType = {} as RPCParseAddressType;
+      try {
+        resultJSON = await JSON.parse(result);
+      } catch (e) {
+        console.log('parse address JSON error', e);
+        return false;
+      }
 
       //console.log('parse-address', address, resultJSON.status === 'success');
 
@@ -126,6 +131,14 @@ const InputTextAddress: React.FunctionComponent<InputTextAddressProps> = ({
                 alignItems: 'center',
                 justifyContent: 'center',
               }}>
+              {address && (
+                <TouchableOpacity
+                  onPress={() => {
+                    setAddress('');
+                  }}>
+                  <FontAwesomeIcon style={{ marginRight: 5 }} size={25} icon={faXmark} color={colors.primaryDisabled} />
+                </TouchableOpacity>
+              )}
               <TouchableOpacity
                 testID="send.scan-button"
                 disabled={disabled}

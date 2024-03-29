@@ -21,6 +21,8 @@ import SettingsFileImpl from '../Settings/SettingsFileImpl';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
+import { faXmark } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
 type TextsType = {
   new: string[];
@@ -77,16 +79,16 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
-  const [seedPhrase, setSeedPhrase] = useState('');
-  const [birthdayNumber, setBirthdayNumber] = useState('');
-  const [times, setTimes] = useState(0);
-  const [texts, setTexts] = useState({} as TextsType);
-  const [readOnly, setReadOnly] = useState(true);
-  const [titleViewHeight, setTitleViewHeight] = useState(0);
-  const [latestBlock, setLatestBlock] = useState(0);
-  const [expandSeed, setExpandSeed] = useState(false);
-  const [expandBirthday, setExpandBithday] = useState(false);
-  const [basicFirstViewSeed, setBasicFirstViewSeed] = useState(true);
+  const [seedPhrase, setSeedPhrase] = useState<string>('');
+  const [birthdayNumber, setBirthdayNumber] = useState<string>('');
+  const [times, setTimes] = useState<number>(0);
+  const [texts, setTexts] = useState<TextsType>({} as TextsType);
+  const [readOnly, setReadOnly] = useState<boolean>(true);
+  const [titleViewHeight, setTitleViewHeight] = useState<number>(0);
+  const [latestBlock, setLatestBlock] = useState<number>(0);
+  const [expandSeed, setExpandSeed] = useState<boolean>(false);
+  const [expandBirthday, setExpandBithday] = useState<boolean>(false);
+  const [basicFirstViewSeed, setBasicFirstViewSeed] = useState<boolean>(true);
 
   const slideAnim = useRef(new Animated.Value(0)).current;
 
@@ -193,6 +195,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
     translate,
   ]);
 
+  // because this screen is fired from more places than the menu.
   useEffect(() => {
     if (action !== 'new' && action !== 'restore') {
       (async () => await RPC.rpc_setInterruptSyncAfterBatch('false'))();
@@ -228,7 +231,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
         },
         { text: translate('cancel') as string, onPress: () => onClickCancel(), style: 'cancel' },
       ],
-      { cancelable: true, userInterfaceStyle: 'light' },
+      { cancelable: false, userInterfaceStyle: 'light' },
     );
   };
 
@@ -322,38 +325,46 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
               </RegText>
             </TouchableOpacity>
           ) : (
-            <View
-              accessible={true}
-              accessibilityLabel={translate('seed.seed-acc') as string}
-              style={{
-                margin: 0,
-                borderWidth: 1,
-                borderRadius: 10,
-                borderColor: colors.text,
-                maxWidth: '100%',
-                maxHeight: '70%',
-                minWidth: '95%',
-                minHeight: 100,
-              }}>
-              <TextInput
-                testID="seed.seedinput"
-                placeholder={translate('seed.seedplaceholder') as string}
-                placeholderTextColor={colors.placeholder}
-                multiline
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <View
+                accessible={true}
+                accessibilityLabel={translate('seed.seed-acc') as string}
                 style={{
-                  color: colors.text,
-                  fontWeight: '600',
-                  fontSize: 16,
-                  minWidth: '95%',
+                  margin: 0,
+                  borderWidth: 1,
+                  borderRadius: 10,
+                  borderColor: colors.text,
+                  width: 'auto',
+                  flex: 1,
                   minHeight: 100,
-                  marginLeft: 5,
-                  backgroundColor: 'transparent',
-                  textAlignVertical: 'top',
-                }}
-                value={seedPhrase}
-                onChangeText={(text: string) => setSeedPhrase(text)}
-                editable={true}
-              />
+                }}>
+                <TextInput
+                  testID="seed.seedinput"
+                  placeholder={translate('seed.seedplaceholder') as string}
+                  placeholderTextColor={colors.placeholder}
+                  multiline
+                  style={{
+                    color: colors.text,
+                    fontWeight: '600',
+                    fontSize: 16,
+                    minHeight: 100,
+                    marginLeft: 5,
+                    backgroundColor: 'transparent',
+                    textAlignVertical: 'top',
+                  }}
+                  value={seedPhrase}
+                  onChangeText={(text: string) => setSeedPhrase(text)}
+                  editable={true}
+                />
+              </View>
+              {seedPhrase && (
+                <TouchableOpacity
+                  onPress={() => {
+                    setSeedPhrase('');
+                  }}>
+                  <FontAwesomeIcon style={{ marginLeft: 5 }} size={25} icon={faXmark} color={colors.primaryDisabled} />
+                </TouchableOpacity>
+              )}
             </View>
           )}
           {action !== 'restore' && (
@@ -504,14 +515,8 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
               await SettingsFileImpl.writeSettings('basicFirstViewSeed', true);
             }
             if (times === 0) {
-              if (action === 'restore') {
-                // waiting while closing the keyboard, just in case.
-                setTimeout(async () => {
-                  onClickOK(seedPhrase, Number(birthdayNumber));
-                }, 100);
-              } else {
-                onClickOK(seedPhrase, Number(birthdayNumber));
-              }
+              Keyboard.dismiss();
+              onClickOK(seedPhrase, Number(birthdayNumber));
             } else if (times === 1) {
               onPressOK();
             }

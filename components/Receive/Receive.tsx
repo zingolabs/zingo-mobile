@@ -13,6 +13,7 @@ import { Scene } from 'react-native-tab-view/lib/typescript/src/types';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
+import { AddressClass } from '../../app/AppState';
 
 type ReceiveProps = {
   setUaAddress: (uaAddress: string) => void;
@@ -34,43 +35,45 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
-  const [index, setIndex] = useState(0);
+  const [index, setIndex] = useState<number>(0);
   const [routes, setRoutes] = useState<{ key: string; title: string }[]>([]);
 
-  const [displayAddress, setDisplayAddress] = useState(uaAddress);
-  const [oindex, setOIndex] = useState(0);
-  const [zindex, setZIndex] = useState(0);
-  const [tindex, setTIndex] = useState(0);
-
-  const uaddrs = addresses.filter(a => a.addressKind === 'u') || [];
-  const zaddrs = addresses.filter(a => a.uaAddress === uaAddress && a.addressKind === 'z') || [];
-  const taddrs = addresses.filter(a => a.uaAddress === uaAddress && a.addressKind === 't') || [];
+  const [uindex, setUIndex] = useState<number>(0);
+  const [zindex, setZIndex] = useState<number>(0);
+  const [tindex, setTIndex] = useState<number>(0);
+  const [uaddrs, setUaddrs] = useState<AddressClass[]>([]);
+  const [zaddrs, setZaddrs] = useState<AddressClass[]>([]);
+  const [taddrs, setTaddrs] = useState<AddressClass[]>([]);
 
   const dimensions = {
     width: Dimensions.get('screen').width,
     height: Dimensions.get('screen').height,
   };
 
-  if (displayAddress) {
-    const displayAddressIndex = uaddrs.findIndex(a => a.address === displayAddress);
+  useEffect(() => {
+    if (addresses && addresses.length && uaAddress) {
+      const uadd = addresses.filter(a => a.addressKind === 'u') || [];
+      const zadd = addresses.filter(a => a.uaAddress === uaAddress && a.addressKind === 'z') || [];
+      const tadd = addresses.filter(a => a.uaAddress === uaAddress && a.addressKind === 't') || [];
+      setUaddrs(uadd);
+      setZaddrs(zadd);
+      setTaddrs(tadd);
 
-    if (oindex !== displayAddressIndex && displayAddressIndex >= 0) {
-      setOIndex(displayAddressIndex);
-      setUaAddress(displayAddress);
+      const uaAddressIndex = uadd.findIndex(a => a.address === uaAddress);
+      setUIndex(uaAddressIndex);
     }
-  }
+  }, [addresses, uaAddress]);
 
   const prev = (type: string) => {
-    setDisplayAddress('');
     if (type === 'u') {
       if (uaddrs.length === 0) {
         return;
       }
-      let newIndex = oindex - 1;
+      let newIndex = uindex - 1;
       if (newIndex < 0) {
         newIndex = uaddrs.length - 1;
       }
-      setOIndex(newIndex);
+      setUIndex(newIndex);
       setUaAddress(uaddrs[newIndex].address);
     } else if (type === 'z') {
       if (zaddrs.length === 0) {
@@ -94,13 +97,12 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   };
 
   const next = (type: string) => {
-    setDisplayAddress('');
     if (type === 'u') {
       if (uaddrs.length === 0) {
         return;
       }
-      const newIndex = (oindex + 1) % uaddrs.length;
-      setOIndex(newIndex);
+      const newIndex = (uindex + 1) % uaddrs.length;
+      setUIndex(newIndex);
       setUaAddress(uaddrs[newIndex].address);
     } else if (type === 'z') {
       if (zaddrs.length === 0) {
@@ -138,7 +140,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
         //let uaddrKind = '';
         //let receivers = '';
         if (uaddrs.length > 0) {
-          uaddr = uaddrs[oindex].address;
+          uaddr = uaddrs[uindex].address;
           //uaddrKind = uaddrs[oindex].addressKind;
           //receivers = uaddrs[oindex].receivers;
         }
@@ -148,7 +150,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
           !!uaAddress && (
             <SingleAddress
               address={uaddr}
-              index={oindex}
+              index={uindex}
               total={uaddrs.length}
               prev={() => {
                 prev('u');

@@ -47,7 +47,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
-  const [isTxDetailModalShowing, setTxDetailModalShowing] = useState(false);
+  const [isTxDetailModalShowing, setTxDetailModalShowing] = useState<boolean>(false);
   const [txDetail, setTxDetail] = useState<TransactionType>({} as TransactionType);
   const [numTx, setNumTx] = useState<number>(50);
   const [loadMoreButton, setLoadMoreButton] = useState<boolean>(numTx < (transactions.length || 0));

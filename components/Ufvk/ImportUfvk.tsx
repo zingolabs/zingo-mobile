@@ -2,7 +2,7 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { View, ScrollView, SafeAreaView, TouchableOpacity, Modal, TextInput, Keyboard } from 'react-native';
 import { useTheme } from '@react-navigation/native';
-import { faQrcode } from '@fortawesome/free-solid-svg-icons';
+import { faQrcode, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import Animated, { EasingNode } from 'react-native-reanimated';
 
@@ -29,11 +29,11 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
-  const [ufvkText, setUfvkText] = useState('');
-  const [birthday, setBirthday] = useState('');
-  const [qrcodeModalVisible, setQrcodeModalVisible] = useState(false);
-  const [titleViewHeight, setTitleViewHeight] = useState(0);
-  const [latestBlock, setLatestBlock] = useState(0);
+  const [seedufvkText, setSeedufvkText] = useState<string>('');
+  const [birthday, setBirthday] = useState<string>('');
+  const [qrcodeModalVisible, setQrcodeModalVisible] = useState<boolean>(false);
+  const [titleViewHeight, setTitleViewHeight] = useState<number>(0);
+  const [latestBlock, setLatestBlock] = useState<number>(0);
 
   const slideAnim = useRef(new Animated.Value(0)).current;
 
@@ -86,7 +86,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
     //if (!valid) {
     //  return;
     //}
-    onClickOK(ufvkText.trim(), Number(birthday));
+    onClickOK(seedufvkText.trimEnd().trimStart(), Number(birthday));
   };
 
   // zingolib interfase have no way to initialize a `lightclient` with no action associated...
@@ -138,7 +138,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
         transparent={false}
         visible={qrcodeModalVisible}
         onRequestClose={() => setQrcodeModalVisible(false)}>
-        <ScannerUfvk setUfvkText={setUfvkText} closeModal={() => setQrcodeModalVisible(false)} />
+        <ScannerUfvk setUfvkText={setSeedufvkText} closeModal={() => setQrcodeModalVisible(false)} />
       </Modal>
 
       <Animated.View style={{ marginTop: slideAnim }}>
@@ -205,11 +205,19 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
                 backgroundColor: 'transparent',
                 textAlignVertical: 'top',
               }}
-              value={ufvkText}
-              onChangeText={setUfvkText}
+              value={seedufvkText}
+              onChangeText={setSeedufvkText}
               editable={true}
             />
           </View>
+          {seedufvkText && (
+            <TouchableOpacity
+              onPress={() => {
+                setSeedufvkText('');
+              }}>
+              <FontAwesomeIcon style={{ margin: 0 }} size={25} icon={faXmark} color={colors.primaryDisabled} />
+            </TouchableOpacity>
+          )}
           <TouchableOpacity
             onPress={() => {
               setQrcodeModalVisible(true);
@@ -276,7 +284,14 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
           alignItems: 'center',
           marginVertical: 5,
         }}>
-        <Button type="Primary" title={translate('import.button') as string} onPress={okButton} />
+        <Button
+          type="Primary"
+          title={translate('import.button') as string}
+          onPress={() => {
+            Keyboard.dismiss();
+            okButton();
+          }}
+        />
         <Button
           type="Secondary"
           title={translate('cancel') as string}

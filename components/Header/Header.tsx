@@ -125,31 +125,35 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   const opacityValue = useRef(new Animated.Value(1)).current;
   const [showShieldButton, setShowShieldButton] = useState<boolean>(false);
   const [poolsToShield, setPoolsToShield] = useState<'' | 'all' | 'transparent' | 'sapling'>('');
+  const [blocksRemaining, setBlocksRemaining] = useState<number>(0);
 
-  let currentBlock, lastBlockServer;
-  if (wallet.birthday < syncingStatus.currentBlock) {
-    currentBlock = syncingStatus.currentBlock - wallet.birthday;
-    lastBlockServer = syncingStatus.lastBlockServer - wallet.birthday;
-  } else {
-    currentBlock = syncingStatus.currentBlock;
-    lastBlockServer = syncingStatus.lastBlockServer;
-  }
-  /*
-  let percent = ((currentBlock * 100) / lastBlockServer).toFixed(2);
-  if (Number(percent) < 0) {
-    percent = '0.00';
-  }
-  if (Number(percent) >= 100) {
-    percent = '99.99';
-  }
-  */
-  let blocksRemaining = lastBlockServer - currentBlock;
-  // just in case, this value is weird...
-  // if the syncing is still inProgress and this value is cero -> it is better for UX to see 1.
-  // this use case is really rare.
-  if (blocksRemaining <= 0) {
-    blocksRemaining = 1;
-  }
+  useEffect(() => {
+    let currentBl, lastBlockSe;
+    if (wallet.birthday < syncingStatus.currentBlock) {
+      currentBl = syncingStatus.currentBlock - wallet.birthday;
+      lastBlockSe = syncingStatus.lastBlockServer - wallet.birthday;
+    } else {
+      currentBl = syncingStatus.currentBlock;
+      lastBlockSe = syncingStatus.lastBlockServer;
+    }
+    /*
+    let percent = ((currentBlock * 100) / lastBlockServer).toFixed(2);
+    if (Number(percent) < 0) {
+      percent = '0.00';
+    }
+    if (Number(percent) >= 100) {
+      percent = '99.99';
+    }
+    */
+    let blocksRe = lastBlockSe - currentBl;
+    // just in case, this value is weird...
+    // if the syncing is still inProgress and this value is cero -> it is better for UX to see 1.
+    // this use case is really rare.
+    if (blocksRe <= 0) {
+      blocksRe = 1;
+    }
+    setBlocksRemaining(blocksRe);
+  }, [syncingStatus.currentBlock, syncingStatus.lastBlockServer, wallet.birthday]);
 
   useEffect(() => {
     if (syncingStatus.syncProcessStalled && addLastSnackbar && restartApp) {
@@ -328,7 +332,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         { text: translate('confirm') as string, onPress: () => shieldFunds() },
         { text: translate('cancel') as string, style: 'cancel' },
       ],
-      { cancelable: true, userInterfaceStyle: 'light' },
+      { cancelable: false, userInterfaceStyle: 'light' },
     );
   };
 

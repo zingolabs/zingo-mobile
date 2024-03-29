@@ -1,6 +1,6 @@
 import * as RNFS from 'react-native-fs';
 
-import { SecurityType, ServerType, SettingsFileClass } from '../../app/AppState';
+import { SecurityType, ServerType, ServerUrisType, SettingsFileClass } from '../../app/AppState';
 import { serverUris } from '../../app/uris';
 import { isEqual } from 'lodash';
 
@@ -21,7 +21,8 @@ export default class SettingsFileImpl {
       | 'firstInstall'
       | 'basicFirstViewSeed'
       | 'version'
-      | 'security',
+      | 'security'
+      | 'selectServer',
     value: string | boolean | ServerType | SecurityType,
   ) {
     const fileName = await this.getFileName();
@@ -47,21 +48,34 @@ export default class SettingsFileImpl {
       const settings: SettingsFileClass = JSON.parse((await RNFS.readFile(fileName, 'utf8')).toString());
       // If server as string is found, I need to convert to: ServerType
       // if not, I'm losing the value
-      if (settings.server) {
+      if (!settings.hasOwnProperty('server')) {
+        settings.server = {
+          uri: serverUris(() => {})[0].uri,
+          chain_name: serverUris(() => {})[0].chain_name,
+        } as ServerType;
+      } else {
         if (typeof settings.server === 'string') {
           const ss: ServerType = { uri: settings.server, chain_name: 'main' };
-          const standard = serverUris().find((s: ServerType) => isEqual(s, ss));
+          const standard = serverUris(() => {}).find((s: ServerUrisType) =>
+            isEqual({ uri: s.uri, chain_name: s.chain_name } as ServerType, ss as ServerType),
+          );
           if (standard) {
-            settings.server = ss;
+            settings.server = ss as ServerType;
           } else {
             // here probably the user have a cumtom server, but we don't know
             // what is the chain_name -> we assign the default server.
-            settings.server = serverUris()[0];
+            settings.server = {
+              uri: serverUris(() => {})[0].uri,
+              chain_name: serverUris(() => {})[0].chain_name,
+            } as ServerType;
           }
         } else {
           if (!settings.server.uri || !settings.server.chain_name) {
             // if one or both field/s don't have valid value -> we assign the default server.
-            settings.server = serverUris()[0];
+            settings.server = {
+              uri: serverUris(() => {})[0].uri,
+              chain_name: serverUris(() => {})[0].chain_name,
+            } as ServerType;
           }
         }
       }
@@ -90,6 +104,37 @@ export default class SettingsFileImpl {
           changeWalletScreen: true,
           restoreWalletBackupScreen: true,
         };
+      }
+      if (!settings.hasOwnProperty('selectServer')) {
+        // this is the first time the App have selection server
+        // here just exists 4 options:
+        // - lightwalletd or zcash-infra (default)
+        // - custom server -> mainnet (new - not default)
+        // - custom server -> mainnet (not in the list)
+        // - custom server -> testnet or regtest
+        if (
+          serverUris(() => {})
+            .filter((s: ServerUrisType) => s.default)
+            .find((s: ServerUrisType) =>
+              isEqual({ uri: s.uri, chain_name: s.chain_name } as ServerType, settings.server as ServerType),
+            )
+        ) {
+          // default servers -> auto - to make easier and faster UX to the user
+          settings.selectServer = 'auto';
+        } else if (
+          serverUris(() => {})
+            .filter((s: ServerUrisType) => !s.default)
+            .find((s: ServerUrisType) =>
+              isEqual({ uri: s.uri, chain_name: s.chain_name } as ServerType, settings.server as ServerType),
+            )
+        ) {
+          // new servers -> in the list - the user changed the default server in some point
+          settings.selectServer = 'list';
+        } else {
+          // new servers -> not in the list - the user changed the default server in some point to
+          // another totally unknown or the user is using a non mainnet server.
+          settings.selectServer = 'custom';
+        }
       }
       return settings;
     } catch (err) {

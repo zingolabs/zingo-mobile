@@ -49,6 +49,7 @@ jest.mock('react-native', () => {
 
   return RN;
 });
+jest.mock('react-native-picker-select', () => 'RNPickerSelect');
 jest.useFakeTimers();
 
 // test suite
@@ -137,6 +138,7 @@ describe('Component Settings - test', () => {
           set_privacy_option={onSetOption}
           set_mode_option={onSetOption}
           set_security_option={onSetOption}
+          set_selectServer_option={onSetOption}
         />
       </ContextAppLoadedProvider>,
     );

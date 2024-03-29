@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo!",
-  "version": "zingo-1.3.5 (155)",
+  "version": "zingo-1.3.7 (162)",
   "loading": "cargando...",
   "connectingserver": "Conectando con el servidor...",
   "wait": "Por favor espere...",
@@ -42,9 +42,10 @@
     "addressexists": "Esta dirección ya existe. ",
     "select-placeholder": "Elige un Contacto...",
     "delete-title": "Borrar etiqueta",
-    "delete-alert": "¿Realmente quieres borrar este Contacto de su libreta de direcciones?",
+    "delete-alert": "¿Realmente quieres borrar este Contacto de tu libreta de direcciones?",
     "likely": "Probablemente: ",
-    "thiswalletaddress": "La Dirección de este Monedero"
+    "thiswalletaddress": "La Dirección de este Monedero",
+    "addto": "Añadir a "
   },
   "change-privacy-legend": ".\nPulsar para revelar los valores ocultos.",
   "txtcopied": "Texto copiado al Portapapeles",
@@ -65,14 +66,13 @@
     "changeserver": "Cambiar de Servidor",
     "createnewwallet": "Crear Nuevo Monedero",
     "opencurrentwallet": "Abrir Monedero Activo",
-    "restorewalletseed": "Restaurar Monedero\ncon la Semilla",
-    "restorewalletufvk": "Restaurar Monedero\ncon la Clave de Visualización",
+    "restorewalletseedufvk": "Restaurar Monedero",
     "creatingwallet-label": "Error Creando el Monedero",
     "readingwallet-label": "Error Leyendo el Monedero",
-    "invalidseed-label": "Semilla incorrecta",
-    "invalidseed-error": "La semilla proporcionada no es correcta. Revisa cada una de las palabras.",
-    "invalidufvk-label": "Clave de Visualización incorrecta",
-    "invalidufvk-error": "La Clave de Visualización proporcionada no es correcta. Revisa la clave y/o escanéala de nuevo.",
+    "invalidseedufvk-label": "Semilla / Clave de Visualización incorrecta",
+    "invalidseedufvk-error": "La semilla / Clave de Visualización proporcionada no es correcta. Revisa el contenido y corrigelo.",
+    "emptyseedufvk-label": "Semilla / Clave de Visualización incorrecta",
+    "emptyseedufvk-error": "La semilla / Clave de Visualización proporcionada está vacia. Revisa el contenido y corrigelo.",
     "custom": "Otro Servidor...",
     "nointernet-message": "No hay una conexión a internet establecida. Por favor solucione esta incidencia.",
     "basicmode": "Cambiar a Modo Básico",
@@ -80,7 +80,9 @@
     "noopenwallet-message": "Ha ocurrido un error mientras la App estaba intentando abrir el monedero activo.",
     "changeserver-basic": "Cambiar de Servidor y\nAbrir Monedero Activo",
     "alert-newwallet-title": "CREAR UN NUEVO MONEDERO",
-    "alert-newwallet-body": "Puedes confirmar que realmente quieres crear un nuevo monedero y perder el acceso al monedero actual."
+    "alert-newwallet-body": "Puedes confirmar que realmente quieres crear un nuevo monedero y perder el acceso al monedero actual.",
+    "serverfirsttry": "Intentando realizar la acción con un servidor diferente. El servidor actual puede estar fallando.",
+    "serversecondtry": "No parece haber ningún problema con el servidor. Ocurre algo diferente."
   },
   "loadedapp": {
     "about": "Sobre Zingo!",
@@ -121,7 +123,9 @@
     "tryingnewserver-error": "Después de 30 segundos el nuevo Servidor no responde.",
     "readingwallet": "Leyendo satisfactoriamente el monedero activo usando el Servidor:",
     "restorewallet-title": "Opción Avanzada",
-    "restorewallet-alert": "Confirmar que quiere restaurar un nuevo monedero usando su frase semilla."
+    "restorewallet-alert": "Confirmar que quiere restaurar un nuevo monedero usando su frase semilla.",
+    "selectingserver": "Chequeando los servidores de la lista para seleccionar el más optimizado.",
+    "selectingserversame": "Su servidor actual ya es el más optimizado."
   },
   "rpc": {
     "parsebirthday-error": "Error: No es posible convertirlo en un número:",
@@ -210,7 +214,12 @@
     "isuri": "Necesitas rellenar una URI válida para el Servidor.",
     "title": "Parámetros",
     "server-title": "SERVIDOR",
-    "custom": "Personalizado",
+    "server-auto": "Automatico",
+    "server-list": "Lista",
+    "server-custom": "Personalizado",
+    "server-auto-text": "La proxima vez que se inicie la aplicacion, calculara cual es el mejor servidor de la lista y lo pondra como activo.",
+    "server-list-text": "Selecciona un servidor de la lista.",
+    "server-custom-text": "Rellena la informacion del servidor que quieres usar.",
     "threshold-title": "UMBRAL PARA EL FILTRO DE TRANSACCIONES",
     "number": "Número...",
     "memo-title": "DESCARGAR MEMOS",
@@ -243,15 +252,26 @@
     "value-chain_name-test": "Testnet",
     "value-chain_name-regtest": "Regtest",
     "security-title": "USAR LA SEGURIDAD DEL DISPOSITIVO",
-    "security-startapp": "Al inicar la aplicación.",
-    "security-foregroundapp": "Aplicación va a Primer Plano.",
-    "security-sendconfirm": "Confirmar Transacción.",
-    "security-seedscreen": "Ver la Semilla del Monedero.",
-    "security-ufvkscreen": "Ver la Clave de Visualización.",
-    "security-rescanscreen": "Re-Escanear el Monedero.",
-    "security-settingsscreen": "Parámetros.",
-    "security-changewalletscreen": "Abrir otro Monedero.",
-    "security-restorewalletbackupscreen": "Restaurar copia de Seguridad."
+    "security-startapp": "Al inicar la aplicación",
+    "security-foregroundapp": "Aplicación va a Primer Plano",
+    "security-sendconfirm": "Confirmar Transacción",
+    "security-seedscreen": "Ver la Semilla del Monedero",
+    "security-ufvkscreen": "Ver la Clave de Visualización",
+    "security-rescanscreen": "Re-Escanear el Monedero",
+    "security-settingsscreen": "Parámetros",
+    "security-changewalletscreen": "Abrir otro Monedero",
+    "security-restorewalletbackupscreen": "Restaurar copia de Seguridad",
+    "na": "America del Norte",
+    "usa": "EEUU",
+    "sa": "America del Sur",
+    "ea": "Europa & Africa",
+    "ao": "Asia & Oceania",
+    "hk": "Hong Kong",
+    "canada": "Canada",
+    "france": "Francia",
+    "netherlands": "Paises Bajos",
+    "uk": "Reino Unido",
+    "select-placeholder": "Elige un Servidor..."
   },
   "info": {
     "version": "Versión",
@@ -343,6 +363,7 @@
     "invalidaddress": "¡Dirección Incorrecta!",
     "addressplaceholder": "Unificada, Z-Sapling o Transparente",
     "invalidamount": "¡Cantidad Incorrecta!",
+    "invalidnumber": "¡Número Incorrecto!",
     "spendable": "Disponible: ",
     "somefunds": "Algunos fondos todavía se están confirmando o sincronizando",
     "memo": "Memo (Opcional)",
@@ -374,11 +395,13 @@
     "needtoupgrade": "Hay fondos para asignar",
     "fetchpricetitle": "Consultar Precio USD",
     "fetchpricebody": "Por favor confirma que quieres recuperar/consultar el precio en USD de internet.",
-    "fetch-button": "consultar",
+    "fetch-button": "Consultar",
     "confirm-privacy-level": "Nivel de Privacidad",
     "private": "Privada",
     "amountrevealed": "Monto Revelado",
-    "deshielded": "Desblindada"
+    "deshielded": "Desblindada",
+    "lose-address-title": "SELECCIONAR UNA NUEVA DIRECCIÓN",
+    "lose-address-alert": "Ya tienes una dirección válida en el campo de dirección. ¿Desea sustituirla?"
   },
   "receive": {
     "u-title": "Dirección Unificada",
@@ -480,12 +503,12 @@
     "connectionexpensive": "Conexión Costosa"
   },
   "import": {
-    "title": "Clave de Visualización",
-    "key-label": "Introduce la Clave de Visualización Totalmente Unificada",
-    "birthday": "Cumpleaños de la Clave",
-    "text": "Importar una Clave implica un Re-escaneo completo, y puede tomar mucho tiempo completarlo.",
+    "title": "Semilla / Clave de Visualización",
+    "key-label": "Introduce tu Semilla / Clave de Visualización",
+    "birthday": "Cumpleaños",
+    "text": "Importar una Semilla / Clave de Visualización implica un Re-escaneo completo, y puede tomar mucho tiempo completarlo.",
     "button": "Restaurar Monedero",
-    "key-acc": "Campo Clave",
+    "key-acc": "Campo Semilla-Clave",
     "birthday-acc": "Campo Cumpleaños"
   },
   "about": {
@@ -575,5 +598,6 @@
     "noaddress": "No tenía una dirección",
     "oneentry": "URI Debería tener al menos una entrada",
     "parseerror": "En este momento no es posible verificar la dirección en el Servidor"
-  }
+  },
+  "donation-button": "Donar a Zingo "
 }
