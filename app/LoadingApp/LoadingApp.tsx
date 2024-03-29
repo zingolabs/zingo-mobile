@@ -890,16 +890,16 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                   <>
                     {mode === 'basic' ? (
                       <OptionsMenu
-                        customButton={<FontAwesomeIcon icon={faEllipsisV} color={'#ffffff'} size={48} />}
-                        buttonStyle={{ width: 48, padding: 10, resizeMode: 'contain' }}
+                        customButton={<FontAwesomeIcon icon={faEllipsisV} color={'#ffffff'} size={40} />}
+                        buttonStyle={{ width: 40, padding: 10, resizeMode: 'contain' }}
                         destructiveIndex={5}
                         options={[translate('loadingapp.advancedmode'), translate('cancel')]}
                         actions={[() => this.changeMode('advanced')]}
                       />
                     ) : (
                       <OptionsMenu
-                        customButton={<FontAwesomeIcon icon={faEllipsisV} color={'#ffffff'} size={48} />}
-                        buttonStyle={{ width: 48, padding: 10, resizeMode: 'contain' }}
+                        customButton={<FontAwesomeIcon icon={faEllipsisV} color={'#ffffff'} size={40} />}
+                        buttonStyle={{ width: 40, padding: 10, resizeMode: 'contain' }}
                         destructiveIndex={5}
                         options={[translate('loadingapp.custom'), translate('cancel')]}
                         actions={[this.customServer]}
