@@ -21,6 +21,8 @@ import SettingsFileImpl from '../Settings/SettingsFileImpl';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
+import 'moment/locale/ru';
+
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
@@ -51,7 +53,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
     mode: 'basic' | 'advanced',
     setBackgroundError: (title: string, error: string) => void,
     addLastSnackbar: (snackbar: SnackbarType) => void,
-    language: 'en' | 'es' | 'pt';
+    language: 'en' | 'es' | 'pt' | 'ru';
   if (action === 'new' || action === 'restore') {
     wallet = contextLoading.wallet;
     translate = contextLoading.translate;

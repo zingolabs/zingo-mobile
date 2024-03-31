@@ -13,6 +13,8 @@ import { Scene } from 'react-native-tab-view/lib/typescript/src/types';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
+import 'moment/locale/ru';
+
 import { AddressClass } from '../../app/AppState';
 
 type ReceiveProps = {

@@ -4,6 +4,8 @@ import { View, ScrollView, Modal, RefreshControl } from 'react-native';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
+import 'moment/locale/ru';
+
 import { useTheme } from '@react-navigation/native';
 
 import { SendPageStateClass, TransactionType } from '../../app/AppState';

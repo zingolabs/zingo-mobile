@@ -8,6 +8,7 @@ import Scanner from '../../Components/Scanner';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
+import 'moment/locale/ru';
 
 type ScannerAddressProps = {
   setAddress: (address: string) => void;

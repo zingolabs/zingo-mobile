@@ -51,6 +51,10 @@ jest.mock('moment/locale/pt', () => () => ({
   defineLocale: jest.fn(),
 }));
 
+jest.mock('moment/locale/ru', () => () => ({
+  defineLocale: jest.fn(),
+}));
+
 jest.mock('react-native-gesture-handler', () => {
   const View = require('react-native').View;
   return {

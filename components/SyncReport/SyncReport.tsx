@@ -10,6 +10,8 @@ import { ContextAppLoaded } from '../../app/context';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
+import 'moment/locale/ru';
+
 import RPC from '../../app/rpc';
 import Header from '../Header';
 import { NetInfoStateType } from '@react-native-community/netinfo';

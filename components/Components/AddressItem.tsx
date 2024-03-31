@@ -13,6 +13,7 @@ import { faAddressCard, faArrowUp } from '@fortawesome/free-solid-svg-icons';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
+import 'moment/locale/ru';
 
 type AddressItemProps = {
   address: string;

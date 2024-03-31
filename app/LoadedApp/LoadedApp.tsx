@@ -83,6 +83,7 @@ const ComputingTxContent = React.lazy(() => import('./components/ComputingTxCont
 const en = require('../translations/en.json');
 const es = require('../translations/es.json');
 const pt = require('../translations/pt.json');
+const ru = require('../translations/ru.json');
 
 const Tab = createBottomTabNavigator();
 
@@ -102,7 +103,7 @@ const SERVER_DEFAULT_0: ServerType = {
 
 export default function LoadedApp(props: LoadedAppProps) {
   const theme = useTheme() as unknown as ThemeType;
-  const [language, setLanguage] = useState<'en' | 'es' | 'pt'>('en');
+  const [language, setLanguage] = useState<'en' | 'es' | 'pt' | 'ru'>('en');
   const [currency, setCurrency] = useState<'USD' | ''>('');
   const [server, setServer] = useState<ServerType>(SERVER_DEFAULT_0);
   const [sendAll, setSendAll] = useState<boolean>(false);
@@ -128,6 +129,7 @@ export default function LoadedApp(props: LoadedAppProps) {
       en: en,
       es: es,
       pt: pt,
+      ru: ru,
     }),
     [],
   );
@@ -161,15 +163,20 @@ export default function LoadedApp(props: LoadedAppProps) {
       // for testing
       //await delay(5000);
 
-      if (settings.language === 'en' || settings.language === 'es' || settings.language === 'pt') {
+      if (
+        settings.language === 'en' ||
+        settings.language === 'es' ||
+        settings.language === 'pt' ||
+        settings.language === 'ru'
+      ) {
         setLanguage(settings.language);
         i18n.locale = settings.language;
         //console.log('apploaded settings', settings.language, settings.currency);
       } else {
         const lang =
-          languageTag === 'en' || languageTag === 'es' || languageTag === 'pt'
-            ? (languageTag as 'en' | 'es' | 'pt')
-            : (fallback.languageTag as 'en' | 'es' | 'pt');
+          languageTag === 'en' || languageTag === 'es' || languageTag === 'pt' || languageTag === 'ru'
+            ? (languageTag as 'en' | 'es' | 'pt' | 'ru')
+            : (fallback.languageTag as 'en' | 'es' | 'pt' | 'ru');
         setLanguage(lang);
         i18n.locale = lang;
         await SettingsFileImpl.writeSettings('language', lang);
@@ -271,7 +278,7 @@ type LoadedAppClassProps = {
   route: StackScreenProps<any>['route'];
   translate: (key: string) => TranslateType;
   theme: ThemeType;
-  language: 'en' | 'es' | 'pt';
+  language: 'en' | 'es' | 'pt' | 'ru';
   currency: 'USD' | '';
   server: ServerType;
   sendAll: boolean;
@@ -1026,7 +1033,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
   set_language_option = async (name: 'language', value: string, reset: boolean): Promise<void> => {
     await SettingsFileImpl.writeSettings(name, value);
     this.setState({
-      language: value as 'en' | 'es' | 'pt',
+      language: value as 'en' | 'es' | 'pt' | 'ru',
     });
 
     // Refetch the settings to update

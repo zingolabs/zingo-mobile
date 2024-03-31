@@ -100,7 +100,7 @@ export default interface AppStateLoaded {
   uaAddress: string;
 
   server: ServerType;
-  language: 'en' | 'es' | 'pt';
+  language: 'en' | 'es' | 'pt' | 'ru';
   currency: 'USD' | '';
 
   zecPrice: ZecPriceType;

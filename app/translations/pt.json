@@ -7,7 +7,7 @@
   "workingonit": "Estamos trabalhando neste recurso.",
   "firstlaunchingmessage-title": "Otimizando a Zingo!",
   "firstlaunchingmessage-body": "Isso pode demorar um pouco, dependendo do histórico de transações. Por favor, mantenha o aplicativo aberto até que o processo termine",
-  "firstlaunchingmessage-footer": "Desculpe pela inconveniência.",
+  "firstlaunchingmessage-footer": "Obrigado.",
   "biometricsfailed-title": "Bem-vindo!",
   "biometricsfailed-body": "Por segurança, o aplicativo está bloqueado.",
   "biometricsfailed-footer": "Use o método de autenticação para desbloquear.",
@@ -125,7 +125,7 @@
     "readingwallet": "Lendo com sucesso a carteira atual com o servidor:",
     "restorewallet-title": "Opção Avançada",
     "restorewallet-alert": "Confirme que você deseja restaurar uma nova carteira usando as suas frases de recuperação.",
-    "selectingserver": "Verificando os servidores da lista para selecionar o mais otimizado.",
+    "selectingserver": "Determinando a melhor lightwalletd.",
     "selectingserversame": "Seu servidor real já é o mais otimizado."
   },
   "rpc": {
@@ -176,6 +176,10 @@
       {
         "value": "pt",
         "text": "Todas as informações estarão em português."
+      },
+      {
+        "value": "ru",
+        "text": "Todas as informações estarão em russo."
       }
     ],
     "sendalls": [
@@ -272,7 +276,8 @@
     "france": "França",
     "netherlands": "Holanda",
     "uk": "Reino Unido",
-    "select-placeholder": "escolha um servidor..."
+    "select-placeholder": "escolha um servidor...",
+    "value-language-ru": "Russo"
   },
   "info": {
     "version": "Versão",

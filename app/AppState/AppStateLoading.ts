@@ -28,7 +28,7 @@ export default interface AppStateLoading {
 
   server: ServerType;
   currency: 'USD' | '';
-  language: 'en' | 'es' | 'pt';
+  language: 'en' | 'es' | 'pt' | 'ru';
 
   zecPrice: ZecPriceType;
   sendAll: boolean;

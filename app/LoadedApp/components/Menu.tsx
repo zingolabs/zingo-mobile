@@ -12,6 +12,7 @@ import simpleBiometrics from '../../simpleBiometrics';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
+import 'moment/locale/ru';
 
 type MenuProps = {
   onItemSelected: (item: string) => Promise<void>;

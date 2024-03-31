@@ -17,6 +17,8 @@ import { ContextAppLoaded } from '../../app/context';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
+import 'moment/locale/ru';
+
 import Header from '../Header';
 import { SecurityType, ServerType, ServerUrisType } from '../../app/AppState';
 import { isEqual } from 'lodash';

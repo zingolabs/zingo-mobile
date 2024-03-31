@@ -14,6 +14,7 @@ import Header from '../Header';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
+import 'moment/locale/ru';
 
 type PrivKeyProps = {
   closeModal: () => void;

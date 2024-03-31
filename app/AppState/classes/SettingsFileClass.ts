@@ -4,7 +4,7 @@ import ServerType from '../types/ServerType';
 export default class SettingsFileClass {
   server: ServerType;
   currency: 'USD' | '';
-  language: 'en' | 'es' | 'pt';
+  language: 'en' | 'es' | 'pt' | 'ru';
   sendAll: boolean;
   privacy: boolean;
   mode: 'basic' | 'advanced';
@@ -21,7 +21,7 @@ export default class SettingsFileClass {
   constructor(
     server: ServerType,
     currency: 'USD' | '',
-    language: 'en' | 'es' | 'pt',
+    language: 'en' | 'es' | 'pt' | 'ru',
     sendAll: boolean,
     privacy: boolean,
     mode: 'basic' | 'advanced',

@@ -260,7 +260,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
         uniffi.rustlib.initLogging()
 
-        // Log.i("MAIN", wseed)
+        Log.i("MAIN", "file size: $middle8w")
 
         return uniffi.rustlib.initFromB64(
             server,
