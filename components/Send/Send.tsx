@@ -1134,13 +1134,13 @@ const Send: React.FunctionComponent<SendProps> = ({
                 onPress={async () => {
                   if (
                     sendPageState.toaddr.to &&
-                    sendPageState.toaddr.to !== Utils.getDonationAddress(server.chain_name)
+                    sendPageState.toaddr.to !== (await Utils.getDonationAddress(server.chain_name))
                   ) {
                     await showAlertAsync()
-                      .then(() => {
+                      .then(async () => {
                         // fill the fields in the screen with the donation data
                         updateToField(
-                          Utils.getDonationAddress(server.chain_name),
+                          await Utils.getDonationAddress(server.chain_name),
                           Utils.getDefaultDonationAmount(),
                           null,
                           Utils.getDefaultDonationMemo(translate),
@@ -1151,7 +1151,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                   } else {
                     // fill the fields in the screen with the donation data
                     updateToField(
-                      Utils.getDonationAddress(server.chain_name),
+                      await Utils.getDonationAddress(server.chain_name),
                       Utils.getDefaultDonationAmount(),
                       null,
                       Utils.getDefaultDonationMemo(translate),

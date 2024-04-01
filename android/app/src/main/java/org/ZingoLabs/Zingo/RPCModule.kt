@@ -427,4 +427,16 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         promise.resolve(resp)
     }
 
+    @ReactMethod
+    fun getDeveloperDonationAddress(promise: Promise) {
+        // Log.i("MAIN", "Initialize Light Client")
+
+        uniffi.rustlib.initLogging()
+
+        // Initialize Light Client
+        val resp = uniffi.rustlib.getDeveloperDonationAddress()
+
+        promise.resolve(resp)
+    }
+
 }

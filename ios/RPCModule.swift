@@ -353,4 +353,25 @@ class RPCModule: NSObject {
       self.getLatestBlockAsync(dict)
   }
 
+  @objc(getDeveloperDonationAddress:reject:)
+  func getDeveloperDonationAddress(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      self.getDeveloperDonationAddressAsync(dict)
+  }
+
+  func getDeveloperDonationAddressAsync(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = getDeveloperDonationAddress()
+          let respStr = String(resp)
+          resolve(respStr)
+      } else {
+          NSLog("Error getting latest block server")
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+              resolve("Error: [Native] Getting developer donation address. Command arguments problem.")
+          }
+      }
+  }
+
+
+
 }
