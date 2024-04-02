@@ -5,11 +5,11 @@ WORKDIR /opt/zingo/rust/lib/
 
 
 # add the local rust code into the container
-# COPY android/ /opt/zingo/rust/android/
+COPY android/ /opt/zingo/rust/android/
 COPY lib/ /opt/zingo/rust/lib/
 COPY Cargo.lock /opt/zingo/rust/Cargo.lock
 COPY Cargo.toml /opt/zingo/rust/Cargo.toml
-# COPY ios/ /opt/zingo/rust/ios/
+COPY ios/ /opt/zingo/rust/ios/
 COPY zingomobile_utils/ /opt/zingo/rust/zingomobile_utils/
 
 RUN cargo install --version ^3 cargo-ndk
