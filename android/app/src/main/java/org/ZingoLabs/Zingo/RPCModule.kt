@@ -49,10 +49,10 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun createNewWallet(server: String, chainhint: String, promise: Promise) {
         // Log.i("MAIN", "Creating new wallet")
 
-        RustFFI.initlogging()
+        uniffi.rustlib.initLogging()
 
         // Create a seed
-        val seed = RustFFI.initnew(server, reactContext.applicationContext.filesDir.absolutePath, chainhint, "true")
+        val seed = uniffi.rustlib.initNew(server, reactContext.applicationContext.filesDir.absolutePath, chainhint, true)
         // Log.i("MAIN-Seed", seed)
 
         if (!seed.lowercase().startsWith("error")) {
@@ -66,9 +66,9 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun restoreWalletFromSeed(seed: String, birthday: String, server: String, chainhint: String, promise: Promise) {
         // Log.i("MAIN", "Restoring wallet with seed $seed")
 
-        RustFFI.initlogging()
+        uniffi.rustlib.initLogging()
 
-        val rseed = RustFFI.initfromseed(server, seed, birthday, reactContext.applicationContext.filesDir.absolutePath, chainhint, "true")
+        val rseed = uniffi.rustlib.initFromSeed(server, seed, birthday.toULong(), reactContext.applicationContext.filesDir.absolutePath, chainhint, true)
         // Log.i("MAIN", rseed)
 
         if (!rseed.lowercase().startsWith("Error")) {
@@ -82,9 +82,9 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun restoreWalletFromUfvk(ufvk: String, birthday: String, server: String, chainhint: String, promise: Promise) {
         // Log.i("MAIN", "Restoring wallet with ufvk $ufvk")
 
-        RustFFI.initlogging()
+        uniffi.rustlib.initLogging()
 
-        val rufvk = RustFFI.initfromufvk(server, ufvk, birthday, reactContext.applicationContext.filesDir.absolutePath, chainhint, "true")
+        val rufvk = uniffi.rustlib.initFromUfvk(server, ufvk, birthday.toULong(), reactContext.applicationContext.filesDir.absolutePath, chainhint, true)
         // Log.i("MAIN", rufvk)
 
         if (!rufvk.lowercase().startsWith("Error")) {
@@ -258,15 +258,15 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             }
         }
 
-        RustFFI.initlogging()
+        uniffi.rustlib.initLogging()
 
         // Log.i("MAIN", wseed)
 
-        return RustFFI.initfromb64(
+        return uniffi.rustlib.initFromB64(
             server,
             fileb64.toString(),
             reactContext.applicationContext.filesDir.absolutePath,
-            chainhint, "true"
+            chainhint, true
         )
     }
 
@@ -327,10 +327,10 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         // Run on a new thread so as to not block the UI
         thread {
 
-            RustFFI.initlogging()
+            uniffi.rustlib.initLogging()
 
             // Log.i("send", "Trying to send $sendJSON")
-            val result = RustFFI.execute("send", sendJSON)
+            val result = uniffi.rustlib.execute("send", sendJSON)
             // Log.i("send", "Send Result: $result")
 
             promise.resolve(result)
@@ -341,10 +341,10 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun execute(cmd: String, args: String, promise: Promise) {
         thread {
 
-            RustFFI.initlogging()
+            uniffi.rustlib.initLogging()
 
             // Log.i("execute", "Executing $cmd with $args")
-            val resp = RustFFI.execute(cmd, args)
+            val resp = uniffi.rustlib.execute(cmd, args)
             // Log.i("execute", "Response to $cmd : $resp")
 
             // And save it if it was a sync
@@ -372,7 +372,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     fun saveWallet() {
         // Get the encoded wallet file
-        val b64encoded = RustFFI.save()
+        val b64encoded = uniffi.rustlib.saveToB64()
         // Log.i("MAIN", b64encoded)
 
         try {
@@ -430,10 +430,10 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun getLatestBlock(server: String, promise: Promise) {
         // Log.i("MAIN", "Initialize Light Client")
 
-        RustFFI.initlogging()
+        uniffi.rustlib.initLogging()
 
         // Initialize Light Client
-        val resp = RustFFI.getlatestblock(server)
+        val resp = uniffi.rustlib.getLatestBlock(server)
 
         promise.resolve(resp)
     }

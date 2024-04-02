@@ -84,7 +84,7 @@ class MainApplication : Application(), ReactApplication {
         }
 
         init {
-            System.loadLibrary("rust")
+            System.loadLibrary("uniffi_rustlib")
         }
     }
 }
