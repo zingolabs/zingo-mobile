@@ -8,7 +8,6 @@
 #import <BackgroundTasks/BackgroundTasks.h>
 #import "RPCModule.h"
 #import "rust.h"
-#import "reachability.h"
 
 #ifdef FB_SONARKIT_ENABLED
 #import <FlipperKit/FlipperClient.h>
