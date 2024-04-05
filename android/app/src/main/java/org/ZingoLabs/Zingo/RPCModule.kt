@@ -328,7 +328,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             uniffi.rustlib.initLogging()
 
             // Log.i("execute", "Executing $cmd with $args")
-            val resp = uniffi.rustlib.execute(cmd, args)
+            val resp = uniffi.rustlib.executeCommand(cmd, args)
             // Log.i("execute", "Response to $cmd : $resp")
 
             // And save it if it was a sync
@@ -417,7 +417,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         uniffi.rustlib.initLogging()
 
         // Initialize Light Client
-        val resp = uniffi.rustlib.getLatestBlock(server)
+        val resp = uniffi.rustlib.getLatestBlockServer(server)
 
         promise.resolve(resp)
     }
