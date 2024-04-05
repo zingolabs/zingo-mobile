@@ -7,6 +7,7 @@
 
 import Foundation
 import UIKit
+import BackgroundTasks
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -15,7 +16,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   private var monitor: NWPathMonitor?
   private let workerQueue = DispatchQueue(label: "Monitor")
   private var isConnectedToWifi = false
-  private var window: UIWindow?
+  var window: UIWindow?
   private var bridge: RCTBridge!
   private var bgTask: BGProcessingTask? = nil
   private var timeStampStrStart: NSString? = nil
@@ -48,11 +49,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.stopSyncingProcess(nil)
 
         // cancel bg task
-        if let bgTask = bgTask as? BGTask {
+        if let bgTask = self.bgTask {
             NSLog("BGTask foreground - sync task CANCEL")
             bgTask.setTaskCompleted(success: false)
         }
-        bgTask = nil
+        self.bgTask = nil
     }
   }
 
@@ -63,11 +64,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.stopSyncingProcess(nil)
 
         // Cancel bg task
-        if let bgTask = bgTask as? BGTask {
+        if let bgTask = bgTask {
             NSLog("BGTask background - sync task CANCEL")
             bgTask.setTaskCompleted(success: false)
         }
-        bgTask = nil
+        self.bgTask = nil
 
         NSLog("BGTask background - scheduleBackgroundTask")
         self.scheduleBackgroundTask()
@@ -87,7 +88,7 @@ extension AppDelegate {
             } else {
                 self?.isConnectedToWifi = false
             }
-            LoggerProxy.event("BGTask isConnectedToWifi \(path.status == .satisfied)")
+            NSLog("BGTask isConnectedToWifi \(path.status == .satisfied)")
         }
         monitor?.start(queue: workerQueue)
         
@@ -99,23 +100,23 @@ extension AppDelegate {
             forTaskWithIdentifier: bcgTaskId,
             using: DispatchQueue.main
         ) { [self] task in
-            LoggerProxy.event("BGTask BGTaskScheduler.shared.register SYNC called")
+          NSLog("BGTask BGTaskScheduler.shared.register SYNC called")
             guard let task = task as? BGProcessingTask else {
                 return
             }
             
             NSLog("BGTask BGTaskScheduler.shared.register SYNC called")
-            self.bgTask = bgTask
-            self.startBackgroundTask(nil)
+            self.bgTask = task
+            self.startBackgroundTask(task)
         }
 
-        LoggerProxy.event("BGTask SYNC registered \(bcgSyncTaskResult)")
+        NSLog("BGTask SYNC registered \(bcgSyncTaskResult)")
 
         let bcgSchedulerTaskResult = BGTaskScheduler.shared.register(
             forTaskWithIdentifier: bcgSchedulerTaskId,
             using: DispatchQueue.main
         ) { [self] task in
-            LoggerProxy.event("BGTask BGTaskScheduler.shared.register SCHEDULER called")
+            NSLog("BGTask BGTaskScheduler.shared.register SCHEDULER called")
             guard let task = task as? BGProcessingTask else {
                 return
             }
@@ -126,18 +127,18 @@ extension AppDelegate {
             task.setTaskCompleted(success: true)
         }
         
-        LoggerProxy.event("BGTask SCHEDULER registered \(bcgSchedulerTaskResult)")
+        NSLog("BGTask SCHEDULER registered \(bcgSchedulerTaskResult)")
     }
     
     private func startBackgroundTask(_ task: BGProcessingTask) {
-        LoggerProxy.event("BGTask startBackgroundTask called")
+        NSLog("BGTask startBackgroundTask called")
         
         // schedule tasks for the next time
         scheduleBackgroundTask()
         scheduleSchedulerBackgroundTask()
 
         guard isConnectedToWifi else {
-            LoggerProxy.event("BGTask startBackgroundTask: not connected to the wifi")
+            NSLog("BGTask startBackgroundTask: not connected to the wifi")
             task.setTaskCompleted(success: false)
             return
         }
@@ -154,11 +155,9 @@ extension AppDelegate {
             NSLog("BGTask startBackgroundTask - expirationHandler called")
             // Interrumpir el proceso de sincronización, no puedo esperar a ver si el proceso ha terminado
             // porque no tengo suficiente tiempo para ejecutar todo lo que necesito en esta tarea.
-            if let interrupt = execute("interrupt_sync_after_batch", "true") {
-                let interruptStr = String(cString: interrupt)
-                NSLog("BGTask startBackgroundTask - expirationHandler interrupt syncing \(interruptStr)")
-            }
-
+            let interruptStr = executeCommand(cmd: "interrupt_sync_after_batch", args: "true")
+            NSLog("BGTask startBackgroundTask - expirationHandler interrupt syncing \(interruptStr)")
+            
             let rpcmodule = RPCModule()
 
             // Guardar la billetera
@@ -168,12 +167,12 @@ extension AppDelegate {
             // Guardar información en JSON de fondo
             let timeStamp = Date().timeIntervalSince1970
             let timeStampStr = String(format: "%.0f", timeStamp)
-            let jsonBackground = "{\"batches\": \"0\", \"message\": \"Expiration fired. Finished OK.\", \"date\": \"\(timeStampStrStart)\", \"dateEnd\": \"\(timeStampStr)\"}"
+            let jsonBackground = "{\"batches\": \"0\", \"message\": \"Expiration fired. Finished OK.\", \"date\": \"\(String(describing: self.timeStampStrStart))\", \"dateEnd\": \"\(timeStampStr)\"}"
             rpcmodule.saveBackgroundFile(jsonBackground)
             NSLog("BGTask startBackgroundTask - expirationHandler Save background JSON \(jsonBackground)")
 
-            bgTask.setTaskCompleted(success: false)
-            bgTask = nil
+            self.bgTask?.setTaskCompleted(success: false)
+            self.bgTask = nil
             NSLog("BGTask startBackgroundTask - expirationHandler THE END")
         }
 
@@ -182,13 +181,13 @@ extension AppDelegate {
     func scheduleBackgroundTask() {
         // This method can be called as many times as needed, the previously submitted
         // request will be overridden by the new one.
-        LoggerProxy.event("BGTask scheduleBackgroundTask called")
+        NSLog("BGTask scheduleBackgroundTask called")
         
         let request = BGProcessingTaskRequest(identifier: bcgTaskId)
         
         let today = Calendar.current.startOfDay(for: .now)
         guard let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: today) else {
-            LoggerProxy.event("BGTask scheduleBackgroundTask failed to schedule time")
+            NSLog("BGTask scheduleBackgroundTask failed to schedule time")
             return
         }
         
@@ -200,22 +199,22 @@ extension AppDelegate {
         
         do {
             try BGTaskScheduler.shared.submit(request)
-            LoggerProxy.event("BGTask scheduleBackgroundTask succeeded to submit")
+            NSLog("BGTask scheduleBackgroundTask succeeded to submit")
         } catch {
-            LoggerProxy.event("BGTask scheduleBackgroundTask failed to submit, error: \(error)")
+            NSLog("BGTask scheduleBackgroundTask failed to submit, error: \(error)")
         }
     }
     
     func scheduleSchedulerBackgroundTask() {
         // This method can be called as many times as needed, the previously submitted
         // request will be overridden by the new one.
-        LoggerProxy.event("BGTask scheduleSchedulerBackgroundTask called")
+        NSLog("BGTask scheduleSchedulerBackgroundTask called")
         
         let request = BGProcessingTaskRequest(identifier: bcgSchedulerTaskId)
         
         let today = Calendar.current.startOfDay(for: .now)
         guard let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: today) else {
-            LoggerProxy.event("BGTask scheduleSchedulerBackgroundTask failed to schedule time")
+            NSLog("BGTask scheduleSchedulerBackgroundTask failed to schedule time")
             return
         }
         
@@ -227,54 +226,45 @@ extension AppDelegate {
         
         do {
             try BGTaskScheduler.shared.submit(request)
-            LoggerProxy.event("BGTask scheduleSchedulerBackgroundTask succeeded to submit")
+            NSLog("BGTask scheduleSchedulerBackgroundTask succeeded to submit")
         } catch {
-            LoggerProxy.event("BGTask scheduleSchedulerBackgroundTask failed to submit, error: \(error)")
+            NSLog("BGTask scheduleSchedulerBackgroundTask failed to submit, error: \(error)")
         }
     }
 
     func stopSyncingProcess(_ noValue: String?) {
       autoreleasepool {
         NSLog("BGTask stopSyncingProcess")
-        guard let status = execute("syncstatus", "") else {
+        let statusStr = executeCommand(cmd: "syncstatus", args: "")
+        if statusStr.lowercased().hasPrefix("error") {
             NSLog("BGTask stopSyncingProcess - no lightwalled likely")
             return
         }
-        let statusStr = String(cString: status)
-        rust_free(status)
-
         NSLog("BGTask stopSyncingProcess - status response \(statusStr)")
 
         guard let data = statusStr.data(using: .utf8),
               let jsonResp = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
-              let inProgressStr = jsonResp["in_progress"] as? String,
-              let inProgress = Bool(inProgressStr) else {
+              var inProgress = jsonResp["in_progress"] as? Bool else {
             NSLog("BGTask stopSyncingProcess - error parsing JSON response")
             return
         }
 
         while inProgress {
-            guard let interrupt = execute("interrupt_sync_after_batch", "true") else {
-                NSLog("BGTask stopSyncingProcess - error interrupting syncing")
-                return
-            }
-            let interruptStr = String(cString: interrupt)
+            let interruptStr = executeCommand(cmd: "interrupt_sync_after_batch", args: "true")
             NSLog("BGTask stopSyncingProcess - interrupt syncing \(interruptStr)")
 
             Thread.sleep(forTimeInterval: 0.5)
 
-            guard let newStatus = execute("syncstatus", "") else {
+            let newStatusStr = executeCommand(cmd: "syncstatus", args: "")
+            if newStatusStr.lowercased().hasPrefix("error") {
                 NSLog("BGTask stopSyncingProcess - error getting new status")
                 return
             }
-            let newStatusStr = String(cString: newStatus)
-            rust_free(newStatus)
             NSLog("BGTask stopSyncingProcess - status response \(newStatusStr)")
 
             guard let newData = newStatusStr.data(using: .utf8),
                   let newJsonResp = try? JSONSerialization.jsonObject(with: newData, options: []) as? [String: Any],
-                  let newInProgressStr = newJsonResp["in_progress"] as? String,
-                  let newInProgress = Bool(newInProgressStr) else {
+                  let newInProgress = newJsonResp["in_progress"] as? Bool else {
                 NSLog("BGTask stopSyncingProcess - error parsing new JSON response")
                 return
             }
@@ -302,10 +292,9 @@ extension AppDelegate {
 
         if exists {
             // Verificar si el servidor está activo
-            let balance = execute("balance", "")
-            let balanceStr = String(cString: balance)
+          let balance = executeCommand(cmd: "balance", args: "")
+            let balanceStr = String(balance)
             NSLog("BGTask syncingProcessBackgroundTask - testing if server is active \(balanceStr)")
-            rust_free(balance)
             if balanceStr.hasPrefix("Error") {
                 // La tarea se está ejecutando con la aplicación cerrada
                 self.loadWalletFile(nil)
@@ -315,16 +304,14 @@ extension AppDelegate {
             }
 
             // Ejecutar la sincronización sin interrupciones
-            let noInterrupt = execute("interrupt_sync_after_batch", "false")
-            let noInterruptStr = String(cString: noInterrupt)
+          let noInterrupt = executeCommand(cmd: "interrupt_sync_after_batch", args: "false")
+            let noInterruptStr = String(noInterrupt)
             NSLog("BGTask syncingProcessBackgroundTask - no interrupt syncing \(noInterruptStr)")
-            rust_free(noInterrupt)
 
             // Ejecutar la sincronización
             NSLog("BGTask syncingProcessBackgroundTask - sync BEGIN")
-            let syncing = execute("sync", "")
-            let syncingStr = String(cString: syncing)
-            rust_free(syncing)
+            let syncing = executeCommand(cmd: "sync", args: "")
+            let syncingStr = String(syncing)
             NSLog("BGTask syncingProcessBackgroundTask - sync END \(syncingStr)")
 
         } else {
@@ -386,11 +373,11 @@ extension AppDelegate {
 
         NSLog("Opening the wallet file - No App active - server: \(serverURI) chain: \(chainhint)")
         let rpcmodule = RPCModule()
-        rpcmodule.loadExistingWallet(serverURI: serverURI, chainhint: chainhint)
+        let loadStr = rpcmodule.loadExistingWallet(server: serverURI, chainhint: chainhint)
       }
     }
 
-    func walletExists() -> Bool {
+    func wallet__exists() -> Bool {
       let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
       guard let documentsDirectory = paths.first else {
         return false
