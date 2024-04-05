@@ -196,6 +196,8 @@ extension AppDelegate {
         request.earliestBeginDate = earlyMorning
         request.requiresExternalPower = true
         request.requiresNetworkConnectivity = true
+      
+        NSLog("BGTask scheduleBackgroundTask date calculated: \(String(describing: earlyMorning))")
         
         do {
             try BGTaskScheduler.shared.submit(request)
@@ -223,6 +225,8 @@ extension AppDelegate {
         request.earliestBeginDate = afternoon
         request.requiresExternalPower = false
         request.requiresNetworkConnectivity = false
+      
+        NSLog("BGTask scheduleSchedulerBackgroundTask date calculated: \(String(describing: afternoon))")
         
         do {
             try BGTaskScheduler.shared.submit(request)
