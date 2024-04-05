@@ -202,7 +202,7 @@ class RPCModule: NSObject {
           let seedStr = String(seed)
           //rust_free(seed)
 
-          if !seedStr.hasPrefix("Error") {
+          if !seedStr.lowercased().hasPrefix("error") {
               saveWalletInternal()
           }
 
@@ -232,7 +232,7 @@ class RPCModule: NSObject {
           let seedStr = String(seed)
           //rust_free(seed)
 
-          if !seedStr.hasPrefix("Error") {
+          if !seedStr.lowercased().hasPrefix("error") {
             self.saveWalletInternal()
           }
 
@@ -254,7 +254,7 @@ class RPCModule: NSObject {
           let ufvkStr = String(ufvk)
           //rust_free(ufvk)
 
-          if !ufvkStr.hasPrefix("Error") {
+          if !ufvkStr.lowercased().hasPrefix("error") {
             self.saveWalletInternal()
           }
 
@@ -329,7 +329,7 @@ class RPCModule: NSObject {
 
           // RCTLogInfo(@"Got resp for execute (%@): %@", method, respStr);
 
-          if method == "sync" && !respStr.hasPrefix("Error") {
+          if method == "sync" && !respStr.lowercased().hasPrefix("error") {
               // Also save the wallet after sync
               saveWalletInternal()
           }
