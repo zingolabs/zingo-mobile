@@ -19,7 +19,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   var window: UIWindow?
   private var bridge: RCTBridge!
   private var bgTask: BGProcessingTask? = nil
-  private var timeStampStrStart: NSString? = nil
+  private var timeStampStrStart: String? = nil
 
 
   func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
@@ -46,12 +46,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     if #available(iOS 13.0, *) {
         // cancel existing sync process (if any).
         NSLog("BGTask foreground")
-        self.stopSyncingProcess(nil)
+        self.stopSyncingProcess()
 
         // cancel bg task
-        if let bgTask = self.bgTask {
+        if let task = self.bgTask {
             NSLog("BGTask foreground - sync task CANCEL")
-            bgTask.setTaskCompleted(success: false)
+            task.setTaskCompleted(success: false)
         }
         self.bgTask = nil
     }
@@ -61,12 +61,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     if #available(iOS 13.0, *) {
         // Cancel existing sync process (if any).
         NSLog("BGTask background")
-        self.stopSyncingProcess(nil)
+        self.stopSyncingProcess()
 
         // Cancel bg task
-        if let bgTask = bgTask {
+        if let task = self.bgTask {
             NSLog("BGTask background - sync task CANCEL")
-            bgTask.setTaskCompleted(success: false)
+            task.setTaskCompleted(success: false)
         }
         self.bgTask = nil
 
@@ -100,7 +100,7 @@ extension AppDelegate {
             forTaskWithIdentifier: bcgTaskId,
             using: DispatchQueue.main
         ) { [self] task in
-          NSLog("BGTask BGTaskScheduler.shared.register SYNC called")
+            NSLog("BGTask BGTaskScheduler.shared.register SYNC called")
             guard let task = task as? BGProcessingTask else {
                 return
             }
@@ -146,11 +146,10 @@ extension AppDelegate {
         // Iniciar la sincronización
         NSLog("BGTask startBackgroundTask run sync task")
         // Para ejecutar solo una tarea
-        DispatchQueue.global(qos: .background).async {
-            self.syncingProcessBackgroundTask(nil)
-        }
+        //DispatchQueue.global(qos: .background).async {
+        self.syncingProcessBackgroundTask()
+        //}
 
-        
         task.expirationHandler = {
             NSLog("BGTask startBackgroundTask - expirationHandler called")
             // Interrumpir el proceso de sincronización, no puedo esperar a ver si el proceso ha terminado
@@ -171,7 +170,9 @@ extension AppDelegate {
             rpcmodule.saveBackgroundFile(jsonBackground)
             NSLog("BGTask startBackgroundTask - expirationHandler Save background JSON \(jsonBackground)")
 
-            self.bgTask?.setTaskCompleted(success: false)
+            if let task = self.bgTask {
+              task.setTaskCompleted(success: false)
+            }
             self.bgTask = nil
             NSLog("BGTask startBackgroundTask - expirationHandler THE END")
         }
@@ -236,7 +237,7 @@ extension AppDelegate {
         }
     }
 
-    func stopSyncingProcess(_ noValue: String?) {
+    func stopSyncingProcess() {
       autoreleasepool {
         NSLog("BGTask stopSyncingProcess")
         let statusStr = executeCommand(cmd: "syncstatus", args: "")
@@ -280,14 +281,14 @@ extension AppDelegate {
       }
     }
 
-    func syncingProcessBackgroundTask(_ noValue: String?) {
+    func syncingProcessBackgroundTask() {
       autoreleasepool {
         let rpcmodule = RPCModule()
 
         // Guardar información en JSON de fondo
         let timeStampStart = Date().timeIntervalSince1970
-        let timeStampStrStart = String(format: "%.0f", timeStampStart)
-        let jsonBackgroundStart = "{\"batches\": \"0\", \"message\": \"Starting OK.\", \"date\": \"\(timeStampStrStart)\", \"dateEnd\": \"0\"}"
+        self.timeStampStrStart = String(format: "%.0f", timeStampStart)
+        let jsonBackgroundStart = "{\"batches\": \"0\", \"message\": \"Starting OK.\", \"date\": \"\(String(describing: timeStampStrStart))\", \"dateEnd\": \"0\"}"
         rpcmodule.saveBackgroundFile(jsonBackgroundStart)
         NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundStart)")
 
@@ -296,19 +297,19 @@ extension AppDelegate {
 
         if exists {
             // Verificar si el servidor está activo
-          let balance = executeCommand(cmd: "balance", args: "")
+            let balance = executeCommand(cmd: "balance", args: "")
             let balanceStr = String(balance)
             NSLog("BGTask syncingProcessBackgroundTask - testing if server is active \(balanceStr)")
             if balanceStr.hasPrefix("Error") {
                 // La tarea se está ejecutando con la aplicación cerrada
-                self.loadWalletFile(nil)
+                self.loadWalletFile()
             } else {
                 // La aplicación está abierta, detener la sincronización por si acaso.
-                self.stopSyncingProcess(nil)
+                self.stopSyncingProcess()
             }
 
             // Ejecutar la sincronización sin interrupciones
-          let noInterrupt = executeCommand(cmd: "interrupt_sync_after_batch", args: "false")
+            let noInterrupt = executeCommand(cmd: "interrupt_sync_after_batch", args: "false")
             let noInterruptStr = String(noInterrupt)
             NSLog("BGTask syncingProcessBackgroundTask - no interrupt syncing \(noInterruptStr)")
 
@@ -325,11 +326,13 @@ extension AppDelegate {
             // Guardar información en JSON de fondo
             let timeStampError = Date().timeIntervalSince1970
             let timeStampStrError = String(format: "%.0f", timeStampError)
-            let jsonBackgroundError = "{\"batches\": \"0\", \"message\": \"No active wallet KO.\", \"date\": \"\(timeStampStrStart)\", \"dateEnd\": \"\(timeStampStrError)\"}"
+          let jsonBackgroundError = "{\"batches\": \"0\", \"message\": \"No active wallet KO.\", \"date\": \"\(String(describing: timeStampStrStart))\", \"dateEnd\": \"\(timeStampStrError)\"}"
             rpcmodule.saveBackgroundFile(jsonBackgroundError)
             NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundError)")
 
-            bgTask?.setTaskCompleted(success: false)
+            if let task = self.bgTask {
+              task.setTaskCompleted(success: false)
+            }
             bgTask = nil
             return
         }
@@ -343,16 +346,18 @@ extension AppDelegate {
         // Guardar información en JSON de fondo
         let timeStampEnd = Date().timeIntervalSince1970
         let timeStampStrEnd = String(format: "%.0f", timeStampEnd)
-        let jsonBackgroundEnd = "{\"batches\": \"0\", \"message\": \"Finished OK.\", \"date\": \"\(timeStampStrStart)\", \"dateEnd\": \"\(timeStampStrEnd)\"}"
+        let jsonBackgroundEnd = "{\"batches\": \"0\", \"message\": \"Finished OK.\", \"date\": \"\(String(describing: timeStampStrStart))\", \"dateEnd\": \"\(timeStampStrEnd)\"}"
         rpcmodule.saveBackgroundFile(jsonBackgroundEnd)
         NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundEnd)")
 
-        bgTask?.setTaskCompleted(success: true)
+        if let task = self.bgTask {
+          task.setTaskCompleted(success: false)
+        }
         bgTask = nil
       }
     }
 
-    func loadWalletFile(_ noValue: String?) {
+    func loadWalletFile() {
       autoreleasepool {
         let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
         guard let documentsDirectory = paths.first else {
