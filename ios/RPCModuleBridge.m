@@ -27,9 +27,6 @@ RCT_EXTERN_METHOD(createNewWallet:
     resolver:(RCTPromiseResolveBlock)resolve 
     rejecter:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(restoreWalletFromSeed: 
-    (RCTPromiseResolveBlock)resolve 
-    rejecter:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(walletBackupExists: 
     (NSString)restoreSeed 
     birthdayer:(NSString)birthday 
     serverer:(NSString)server 

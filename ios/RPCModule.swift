@@ -19,132 +19,125 @@ class RPCModule: NSObject {
   @objc(walletExists:rejecter:)
   func walletExists(resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-      guard let documentsDirectory = paths.first else {
-          //reject("1", "Error: directory not found", nil)
-          return
-      }
-
-      let fileName = "\(documentsDirectory)/wallet.dat.txt"
-      let fileExists = FileManager.default.fileExists(atPath: fileName)
-      
-      if fileExists {
-          resolve("true")
+      if let documentsDirectory = paths.first {
+        let fileName = "\(documentsDirectory)/wallet.dat.txt"
+        let fileExists = FileManager.default.fileExists(atPath: fileName)
+        if fileExists {
+            resolve("true")
+        } else {
+            resolve("false")
+        }
       } else {
-          resolve("false")
+        resolve("false")
       }
   }
 
   @objc(walletBackupExists:rejecter:)
   func walletBackupExists(resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-      guard let documentsDirectory = paths.first else {
-          //reject("1", "No se pudo encontrar el directorio de documentos", nil)
-          return
-      }
-
-      let fileName = "\(documentsDirectory)/wallet.backup.dat.txt"
-      let fileExists = FileManager.default.fileExists(atPath: fileName)
-      
-      if fileExists {
-          resolve("true")
+      if let documentsDirectory = paths.first {
+        let fileName = "\(documentsDirectory)/wallet.backup.dat.txt"
+        let fileExists = FileManager.default.fileExists(atPath: fileName)
+        if fileExists {
+            resolve("true")
+        } else {
+            resolve("false")
+        }
       } else {
-          resolve("false")
+        resolve("false")
       }
   }
 
   func saveWalletFile(_ data: String) {
       let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-      guard let documentsDirectory = paths.first else {
-          print("No se pudo encontrar el directorio de documentos")
-          return
-      }
-
-      let fileName = "\(documentsDirectory)/wallet.dat.txt"
-      do {
-          try data.write(toFile: fileName, atomically: true, encoding: .utf8)
-      } catch {
-          print("Error al guardar la billetera:", error.localizedDescription)
+      if let documentsDirectory = paths.first {
+        let fileName = "\(documentsDirectory)/wallet.dat.txt"
+        do {
+            try data.write(toFile: fileName, atomically: true, encoding: .utf8)
+        } catch {
+            NSLog("Error save wallet \(error.localizedDescription)")
+        }
+      } else {
+        NSLog("Error save wallet")
       }
   }
 
   func saveWalletBackupFile(_ data: String) {
       let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-      guard let documentsDirectory = paths.first else {
-          print("No se pudo encontrar el directorio de documentos")
-          return
-      }
-
-      let fileName = "\(documentsDirectory)/wallet.backup.dat.txt"
-      do {
-          try data.write(toFile: fileName, atomically: true, encoding: .utf8)
-      } catch {
-          print("Error al guardar la copia de seguridad de la billetera:", error.localizedDescription)
+      if let documentsDirectory = paths.first {
+        let fileName = "\(documentsDirectory)/wallet.backup.dat.txt"
+        do {
+            try data.write(toFile: fileName, atomically: true, encoding: .utf8)
+        } catch {
+            NSLog("Error save backup wallet \(error.localizedDescription)")
+        }
+      } else {
+        NSLog("Error save backup wallet")
       }
   }
 
   func saveBackgroundFile(_ data: String) {
       let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-      guard let documentsDirectory = paths.first else {
-          print("Couldn't find the documents directory")
-          return
-      }
-
-      let fileName = "\(documentsDirectory)/background.json"
-      do {
-          try data.write(toFile: fileName, atomically: true, encoding: .utf8)
-      } catch {
-          print("Couldn't save the file:", error.localizedDescription)
+      if let documentsDirectory = paths.first {
+        let fileName = "\(documentsDirectory)/background.json"
+        do {
+            try data.write(toFile: fileName, atomically: true, encoding: .utf8)
+        } catch {
+            NSLog("Error save background file \(error.localizedDescription)")
+        }
+      } else {
+        NSLog("Error save background file")
       }
   }
 
   func readWallet() -> String? {
       let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-      guard let documentsDirectory = paths.first else {
-          print("Couldn't find the documents directory")
-          return nil
-      }
-
-      let fileName = "\(documentsDirectory)/wallet.dat.txt"
-      do {
-          let content = try String(contentsOfFile: fileName, encoding: .utf8)
-          return content
-      } catch {
-          print("Error reading file:", error.localizedDescription)
-          return nil
+      if let documentsDirectory = paths.first {
+        let fileName = "\(documentsDirectory)/wallet.dat.txt"
+        do {
+            let content = try String(contentsOfFile: fileName, encoding: .utf8)
+            return content
+        } catch {
+            NSLog("Error reading wallet \(error.localizedDescription)")
+            return nil
+        }
+      } else {
+        NSLog("Error reading wallet")
+        return nil
       }
   }
 
   func readWalletBackup() -> String? {
       let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-      guard let documentsDirectory = paths.first else {
-          print("Couldn't find the documents directory")
-          return nil
-      }
-
-      let fileName = "\(documentsDirectory)/wallet.backup.dat.txt"
-      do {
-          let content = try String(contentsOfFile: fileName, encoding: .utf8)
-          return content
-      } catch {
-          print("Error reading file:", error.localizedDescription)
-          return nil
+      if let documentsDirectory = paths.first {
+        let fileName = "\(documentsDirectory)/wallet.backup.dat.txt"
+        do {
+            let content = try String(contentsOfFile: fileName, encoding: .utf8)
+            return content
+        } catch {
+            print("Error reading backup wallet:", error.localizedDescription)
+            return nil
+        }
+      } else {
+        NSLog("Error reading backup wallet")
+        return nil
       }
   }
 
   func deleteExistingWallet() -> Bool {
       let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-      guard let documentsDirectory = paths.first else {
-          print("Couldn't find the documents directory")
-          return false
-      }
-
-      let fileName = "\(documentsDirectory)/wallet.dat.txt"
-      do {
-          try FileManager.default.removeItem(atPath: fileName)
-          return true
-      } catch {
-          print("Error deleting wallet:", error.localizedDescription)
-          return false
+      if let documentsDirectory = paths.first {
+        let fileName = "\(documentsDirectory)/wallet.dat.txt"
+        do {
+            try FileManager.default.removeItem(atPath: fileName)
+            return true
+        } catch {
+            NSLog("Error deleting wallet \(error.localizedDescription)")
+            return false
+        }
+      } else {
+        NSLog("Error deleting wallet")
+        return false
       }
   }
 
@@ -160,25 +153,23 @@ class RPCModule: NSObject {
   @objc(deleteExistingWalletBackup:rejecter:)
   func deleteExistingWalletBackup(resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
       let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-      guard let documentsDirectory = paths.first else {
-          print("Couldn't find the documents directory")
-          resolve("false")
-          return
-      }
-
-      let fileName = "\(documentsDirectory)/wallet.backup.dat.txt"
-      do {
-          try FileManager.default.removeItem(atPath: fileName)
-          resolve("true")
-      } catch {
-          print("Error deleting backup wallet:", error.localizedDescription)
-          resolve("false")
+      if let documentsDirectory = paths.first {
+        let fileName = "\(documentsDirectory)/wallet.backup.dat.txt"
+        do {
+            try FileManager.default.removeItem(atPath: fileName)
+            resolve("true")
+        } catch {
+            NSLog("Error deleting backup wallet \(error.localizedDescription)")
+            resolve("false")
+        }
+      } else {
+        NSLog("Error deleting backup wallet")
+        resolve("false")
       }
   }
 
   func saveWalletInternal() {
       let walletDataStr = saveToB64()
-      //rust_free(walletDat)
       saveWalletFile(walletDataStr)
   }
 
@@ -186,57 +177,50 @@ class RPCModule: NSObject {
       if let walletDataStr = readWallet() {
           saveWalletBackupFile(walletDataStr)
       } else {
-          print("Error: Unable to read wallet for backup")
+          NSLog("Error: Unable to read wallet for backup")
       }
   }
 
   func createNewWallet(server: String, chainhint: String) -> String {
       autoreleasepool {
           let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-          guard let documentsDirectory = paths.first else {
-              print("Couldn't find the documents directory")
-              return "Error: Couldn't find documents directory"
+          if let documentsDirectory = paths.first {
+            let seed = initNew(serveruri: server, datadir: documentsDirectory, chainhint: chainhint, monitorMempool: true)
+            let seedStr = String(seed)
+            if !seedStr.lowercased().hasPrefix("error") {
+                saveWalletInternal()
+            }
+            return seedStr
+          } else {
+            NSLog("Error creating new wallet")
+            return ""
           }
-
-          let seed = initNew(serveruri: server, datadir: documentsDirectory, chainhint: chainhint, monitorMempool: true)
-          let seedStr = String(seed)
-          //rust_free(seed)
-
-          if !seedStr.lowercased().hasPrefix("error") {
-              saveWalletInternal()
-          }
-
-          return seedStr
       }
   }
 
   @objc(createNewWallet:chainhinter:resolver:rejecter:)
   func createNewWallet(server: String, chainhint: String, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global().async {
-        let seedStr = self.createNewWallet(server: server, chainhint: chainhint)
+          let seedStr = self.createNewWallet(server: server, chainhint: chainhint)
           resolve(seedStr)
       }
   }
 
-  @objc(restoreWalletFromSeed:birthdayer:chainhinter:serverer:resolver:rejecter:)
+  @objc(restoreWalletFromSeed:birthdayer:serverer:chainhinter:resolver:rejecter:)
   func restoreWalletFromSeed(restoreSeed: String, birthday: String, server: String, chainhint: String, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global().async {
           let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-          guard let documentsDirectory = paths.first else {
-              print("Couldn't find the documents directory")
-              resolve("Error: Couldn't find documents directory")
-              return
+          if let documentsDirectory = paths.first {
+              let seed = initFromSeed(serveruri: server, seed: restoreSeed, birthday: UInt64(birthday) ?? 0, datadir: documentsDirectory, chainhint: chainhint, monitorMempool: true)
+              let seedStr = String(seed)
+              if !seedStr.lowercased().hasPrefix("error") {
+                self.saveWalletInternal()
+              }
+              resolve(seedStr)
+          } else {
+              NSLog("Error restoring wallet from seed")
+              resolve("")
           }
-
-        let seed = initFromSeed(serveruri: server, seed: restoreSeed, birthday: UInt64(birthday) ?? 0, datadir: documentsDirectory, chainhint: chainhint, monitorMempool: true)
-          let seedStr = String(seed)
-          //rust_free(seed)
-
-          if !seedStr.lowercased().hasPrefix("error") {
-            self.saveWalletInternal()
-          }
-
-          resolve(seedStr)
       }
   }
 
@@ -244,38 +228,36 @@ class RPCModule: NSObject {
   func restoreWalletFromUfvk(restoreUfvk: String, birthday: String, server: String, chainhint: String, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
       DispatchQueue.global().async {
           let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-          guard let documentsDirectory = paths.first else {
-              print("Couldn't find the documents directory")
-              resolve("Error: Couldn't find documents directory")
-              return
+          if let documentsDirectory = paths.first {
+              let ufvk = initFromUfvk(serveruri: server, ufvk: restoreUfvk, birthday: UInt64(birthday) ?? 0, datadir: documentsDirectory, chainhint: chainhint, monitorMempool: true)
+              let ufvkStr = String(ufvk)
+              if !ufvkStr.lowercased().hasPrefix("error") {
+                self.saveWalletInternal()
+              }
+              resolve(ufvkStr)
+          } else {
+              NSLog("Error restoring wallet from ufvk")
+              resolve("")
           }
-
-          let ufvk = initFromUfvk(serveruri: server, ufvk: restoreUfvk, birthday: UInt64(birthday) ?? 0, datadir: documentsDirectory, chainhint: chainhint, monitorMempool: true)
-          let ufvkStr = String(ufvk)
-          //rust_free(ufvk)
-
-          if !ufvkStr.lowercased().hasPrefix("error") {
-            self.saveWalletInternal()
-          }
-
-          resolve(ufvkStr)
       }
   }
 
   func loadExistingWallet(server: String, chainhint: String) -> String {
       autoreleasepool {
-          // RCTLogInfo(@"loadExistingWallet called");
-          let walletDataStr = readWallet()
-
           let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-          let documentsDirectory = paths[0]
-          let seed = initFromB64(serveruri: server, datab64: walletDataStr!, datadir: documentsDirectory, chainhint: chainhint, monitorMempool: true)
-          let seedStr = String(seed)
-          //rust_free(seed)
-
-          // RCTLogInfo(@"Seed: %@", seedStr);
-
-          return seedStr
+          if let documentsDirectory = paths.first {
+              if let walletDataStr = readWallet() {
+                let seed = initFromB64(serveruri: server, datab64: walletDataStr, datadir: documentsDirectory, chainhint: chainhint, monitorMempool: true)
+                let seedStr = String(seed)
+                return seedStr
+              } else {
+                NSLog("Error loading existing wallet")
+                return ""
+              }
+          } else {
+              NSLog("Error loading existing wallet")
+              return ""
+          }
       }
   }
 
@@ -290,14 +272,15 @@ class RPCModule: NSObject {
   @objc(restoreExistingWalletBackup:rejecter:)
   func restoreExistingWalletBackup(resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
       autoreleasepool {
-          // RCTLogInfo(@"rstoreExistingWallet backup called");
-          let backupDataStr = self.readWalletBackup()
-          let walletDataStr = self.readWallet()
-
-          self.saveWalletFile(backupDataStr!)
-          self.saveWalletBackupFile(walletDataStr!)
-
-          resolve("true")
+          if let backupDataStr = self.readWalletBackup(),
+             let walletDataStr = self.readWallet() {
+            self.saveWalletFile(backupDataStr)
+            self.saveWalletBackupFile(walletDataStr)
+            resolve("true")
+          } else {
+            NSLog("Error restoring existing wallet backup")
+            resolve("false")
+          }
       }
   }
 
@@ -315,26 +298,22 @@ class RPCModule: NSObject {
 
   func doExecuteOnThread(_ dict: [String: Any]) {
       autoreleasepool {
-          guard let method = dict["method"] as? String,
-                let args = dict["args"] as? String,
-                let resolve = dict["resolve"] as? RCTPromiseResolveBlock else {
-              return
+          if let method = dict["method"] as? String,
+             let args = dict["args"] as? String,
+             let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            let resp = executeCommand(cmd: method, args: args)
+            let respStr = String(resp)
+            if method == "sync" && !respStr.lowercased().hasPrefix("error") {
+                // Also save the wallet after sync
+                saveWalletInternal()
+            }
+            resolve(respStr)
+          } else {
+            NSLog("Error executing a command")
+            if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+              resolve("")
+            }
           }
-
-          // RCTLogInfo(@"execute called with %@", method);
-
-        let resp = executeCommand(cmd: method, args: args)
-          let respStr = String(resp)
-          //rust_free(resp)
-
-          // RCTLogInfo(@"Got resp for execute (%@): %@", method, respStr);
-
-          if method == "sync" && !respStr.lowercased().hasPrefix("error") {
-              // Also save the wallet after sync
-              saveWalletInternal()
-          }
-
-          resolve(respStr)
       }
   }
 
@@ -355,16 +334,17 @@ class RPCModule: NSObject {
   }
 
   func getLatestBlockAsync(_ dict: [AnyHashable: Any]) {
-      guard let server = dict["server"] as? String,
-            let resolve = dict["resolve"] as? RCTPromiseResolveBlock else {
-          return
+      if let server = dict["server"] as? String,
+         let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        let resp = getLatestBlockServer(serveruri: server)
+        let respStr = String(resp)
+        resolve(respStr)
+      } else {
+        NSLog("Error getting latest block server")
+        if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          resolve("")
+        }
       }
-
-      let resp = getLatestBlockServer(serveruri: server)
-      let respStr = String(resp)
-      //rust_free(resp)
-
-      resolve(respStr)
   }
 
 }
