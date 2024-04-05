@@ -71,7 +71,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         val rseed = uniffi.rustlib.initFromSeed(server, seed, birthday.toULong(), reactContext.applicationContext.filesDir.absolutePath, chainhint, true)
         // Log.i("MAIN", rseed)
 
-        if (!rseed.lowercase().startsWith("Error")) {
+        if (!rseed.lowercase().startsWith("error")) {
             saveWallet()
         }
 
@@ -87,7 +87,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         val rufvk = uniffi.rustlib.initFromUfvk(server, ufvk, birthday.toULong(), reactContext.applicationContext.filesDir.absolutePath, chainhint, true)
         // Log.i("MAIN", rufvk)
 
-        if (!rufvk.lowercase().startsWith("Error")) {
+        if (!rufvk.lowercase().startsWith("error")) {
             saveWallet()
         }
 
@@ -332,7 +332,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             // Log.i("execute", "Response to $cmd : $resp")
 
             // And save it if it was a sync
-            if (cmd == "sync" && !resp.lowercase().startsWith("Error")) {
+            if (cmd == "sync" && !resp.lowercase().startsWith("error")) {
                 saveWallet()
             }
 
