@@ -321,22 +321,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
-
-    @ReactMethod
-    fun doSend(sendJSON: String, promise: Promise) {
-        // Run on a new thread so as to not block the UI
-        thread {
-
-            uniffi.rustlib.initLogging()
-
-            // Log.i("send", "Trying to send $sendJSON")
-            val result = uniffi.rustlib.execute("send", sendJSON)
-            // Log.i("send", "Send Result: $result")
-
-            promise.resolve(result)
-        }
-    }
-
     @ReactMethod
     fun execute(cmd: String, args: String, promise: Promise) {
         thread {

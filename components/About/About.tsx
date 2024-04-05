@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect } from 'react';
+import React, { useContext } from 'react';
 import { View, ScrollView, SafeAreaView } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
@@ -12,7 +12,6 @@ import DetailLine from '../Components/DetailLine';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
-import RPCModuleSwift from '../../app/RPCModule/RPCModuleSwift';
 
 type AboutProps = {
   closeModal: () => void;
@@ -28,13 +27,6 @@ const About: React.FunctionComponent<AboutProps> = ({ closeModal }) => {
   if (typeof arrayTxtObject === 'object') {
     arrayTxt = arrayTxtObject as string[];
   }
-
-  useEffect(() => {
-    (async () => {
-      const exists = await RPCModuleSwift.walletExists();
-      console.log('rpcmodule swift', exists);
-    })();
-  }, []);
 
   return (
     <SafeAreaView
