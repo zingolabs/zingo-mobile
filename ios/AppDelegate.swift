@@ -192,8 +192,8 @@ extension AppDelegate {
             return
         }
         
-        let earlyMorningComponent = DateComponents(hour: 11, minute: 20)
-        let earlyMorning = Calendar.current.date(byAdding: earlyMorningComponent, to: today)
+        let earlyMorningComponent = DateComponents(hour: 3, minute: Int.random(in: 0...60))
+        let earlyMorning = Calendar.current.date(byAdding: earlyMorningComponent, to: tomorrow)
         request.earliestBeginDate = earlyMorning
         request.requiresExternalPower = true
         request.requiresNetworkConnectivity = true
