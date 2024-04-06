@@ -193,7 +193,9 @@ class ExecuteVersionFromSeed {
         System.out.println("\nVersion:")
         System.out.println(version)
         // we used for zingolib version: `mob-release` & `mob-prerelease`
-        assertThat(version).isNotNull()isNotEqualTo("")
+        assertThat(version).isNotNull()
+        assertThat(version).isNotEmpty()
+        assertThat(version).isNotEqualTo("")
     }
 }
 
