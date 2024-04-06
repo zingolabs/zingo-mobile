@@ -382,7 +382,7 @@ extension AppDelegate {
 
         NSLog("Opening the wallet file - No App active - server: \(serverURI) chain: \(chainhint)")
         let rpcmodule = RPCModule()
-        let loadStr = rpcmodule.loadExistingWallet(server: serverURI, chainhint: chainhint)
+        _ = rpcmodule.loadExistingWallet(server: serverURI, chainhint: chainhint)
       }
     }
 
