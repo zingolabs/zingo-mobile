@@ -44,7 +44,7 @@
     "select-placeholder": "Escolha um Contato",
     "delete-title": "Excluir Contato",
     "delete-alert": "Você realmente deseja excluir este Contato/Apelido?",
-    "likely": "Curtir: ",
+    "likely": "Provavelmente: ",
     "thiswalletaddress": "Endereço desta Carteira",
     "addto": "Adicionar à "
   },
@@ -96,8 +96,8 @@
     "walletufvk-basic": "Chave de Visualização de Backup da Carteira",
     "rescanwallet": "Rescanear a Carteira",
     "report": "Sincronizar / Relatório de Rescan",
-    "changewallet": "Abrir outra carteira",
-    "restorebackupwallet": "Restaurar último backup da carteira",
+    "changewallet": "Abrir outra Carteira",
+    "restorebackupwallet": "Restaurar Último Backup da Carteira",
     "fundpools": "Fundos na Pool",
     "insight": "Visão Financeira",
     "loadwalletfromseed-basic": "Restaurar Carteira",
@@ -195,11 +195,11 @@
     "privacys": [
       {
         "value": true,
-        "text": "Alta privacidade, todas as informações confidenciais ficam ocultas. Toque para revelar os valores ocultos."
+        "text": "Privacidade Alta, todas as informações confidenciais ficam ocultas. Toque para revelar os valores ocultos."
       },
       {
         "value": false,
-        "text": "Privacidade normal, você pode ver todas as informações."
+        "text": "Privacidade Normal, você pode ver todas as informações."
       }
     ],
     "modes": [
@@ -219,7 +219,7 @@
     "isuri": "Você precisa preencher um URI de um servidor válido.",
     "title": "Configurações",
     "server-title": "SERVIDOR",
-    "server-auto": "Automatico",
+    "server-auto": "Automático",
     "server-list": "Lista",
     "server-custom": "Personalizado",
     "server-auto-text": "Na próxima vez que o aplicativo for iniciado, ele calculará qual é o melhor servidor da lista e o ativará.",
@@ -256,27 +256,27 @@
     "value-chain_name-main": "Mainnet",
     "value-chain_name-test": "Testnet",
     "value-chain_name-regtest": "Regtest",
-    "security-title": "APLICAR SEGURANÇA DO DISPOSITIVO PARA AS TRANS/OPÇÕES",
-    "security-startapp": "Quando o aplicativo inicia",
+    "security-title": "APLICAR SEGURANÇA DO DISPOSITIVO PARA AS TELAS/OPÇÕES",
+    "security-startapp": "Quando o App inicia",
     "security-foregroundapp": "Quando o aplicativo vai para o primeiro plano",
     "security-sendconfirm": "Confirmar Transação",
     "security-seedscreen": "Backup das Chaves da Carteira",
     "security-ufvkscreen": "Chave de Visualização da Carteira",
     "security-rescanscreen": "Rescanear a Carteira",
     "security-settingsscreen": "Configurações",
-    "security-changewalletscreen": "Abrir outra carteira",
-    "security-restorewalletbackupscreen": "Restaurar último backup da carteira",
+    "security-changewalletscreen": "Abrir outra Carteira",
+    "security-restorewalletbackupscreen": "Restaurar Último Backup da Carteira",
     "na": "America do Norte",
     "usa": "EUA",
     "sa": "America do Sul",
     "ea": "Europa & Africa",
-    "ao": "Asia & Oceania",
+    "ao": "Ásia & Oceânia",
     "hk": "Hong Kong",
     "canada": "Canada",
     "france": "França",
     "netherlands": "Holanda",
     "uk": "Reino Unido",
-    "select-placeholder": "escolha um servidor...",
+    "select-placeholder": "Escolha um Servidor...",
     "value-language-ru": "Russo"
   },
   "info": {
@@ -304,17 +304,17 @@
   "seed": {
     "buttontexts": {
       "new": [
-        "eu salvei \n as Frases de Recuperação"
+        "Eu salvei \n as Frases de Recuperação"
       ],
       "change": [
         "",
-        "Abrir novo",
+        "Abrir Nova Carteira",
         "Você realmente quer\n alterar para a sua \n carteira atual",
         "Tem certeza?"
       ],
       "server": [
         "",
-        "Alterar servidor",
+        "Alterar Servidor",
         "Você realmente quer \n alterar para o seu \n servidor atual",
         "Tem certeza?"
       ],
@@ -338,18 +338,18 @@
     "view": "Visualizar",
     "restore": "Restaurar",
     "backup": "Backup",
-    "text-readonly": "Antes de fechar esta tela, anote cuidadosamente essas Frases de recuperação. É a única maneira de restaurar/acessar sua carteira atual.",
-    "text-readonly-backup": "Antes de restaurar o backup da carteira anterior, anote cuidadosamente suas Frases de recuperação. É a única maneira de restaurar/acessar sua carteira atual.",
+    "text-readonly": "Antes de fechar esta tela, anote cuidadosamente essas frases de recuperação. É a única maneira de restaurar/acessar sua carteira atual.",
+    "text-readonly-backup": "Antes de restaurar o backup da carteira anterior, anote cuidadosamente suas frases de recuperação. É a única maneira de restaurar/acessar sua carteira atual.",
     "text-readonly-change": "Antes de acessar outra carteira, anote cuidadosamente essas Frases de recuperação. É a única maneira de restaurar/acessar sua carteira atual.",
-    "text-readonly-server": "Antes de mudar para outro servidor, anote cuidadosamente suas Frases de recuperação. É a única maneira de restaurar/acessar sua carteira atual.",
+    "text-readonly-server": "Antes de mudar para outro servidor, anote cuidadosamente suas frases de recuperação. É a única maneira de restaurar/acessar sua carteira atual.",
     "text-no-readonly": "Insira suas Frases de Recuperação (24 Frases)",
     "tapcopy": "Clique para Copiar",
-    "tapcopy-seed-message": "Frases de Recuperação copiada para a área de transferência",
-    "tapcopy-birthday-message": "Aniversário copiado para a área de transferência",
+    "tapcopy-seed-message": "Frases de Recuperação copiada para a Área de Transferência",
+    "tapcopy-birthday-message": "Aniversário copiado para a Área de Transferência",
     "birthday-readonly": "Aniversário da Carteira",
     "birthday-no-readonly": "Altura do bloco da primeira transação. (Tudo bem, se você não sabe)\nIntervalo de valores entre ",
-    "change-warning": "Se você alterar para outra carteira, não será possível ter acesso a essa carteira sem as Frases de recuperação.",
-    "backup-warning": "Se você alterar para sua carteira de backup, não será possível ter acesso a essa carteira sem as Frases de recuperação.",
+    "change-warning": "Se você alterar para outra carteira, não será possível ter acesso a essa carteira sem as Frases de Recuperação.",
+    "backup-warning": "Se você alterar para sua carteira de backup, não será possível ter acesso a essa carteira sem as Frases de Recuperação.",
     "server-warning": "Se você alterar para um servidor com uma rede diferente, não terá mais acesso a essa carteira sem as Frases de Recuperação.",
     "mainnet-warning": "Nenhum backup desta carteira, disponível apenas na 'Mainnet'.",
     "seedplaceholder": "Frases de Recuperação (24 Frases)",
@@ -407,10 +407,10 @@
     "amountrevealed": "Quantia Revelada",
     "deshielded": "Desblindada",
     "lose-address-title": "SELECIONE UM NOVO ENDEREÇO",
-    "lose-address-alert": "Você já tem um endereço válido no campo de endereço. Deseja substituí-lo?"
+    "lose-address-alert": "Você já possui um endereço válido no campo de endereço. Deseja substituí-lo?"
   },
   "receive": {
-    "u-title": "Endereço Unificados",
+    "u-title": "Endereço Unificado",
     "noaddress": "Sem Endereço",
     "unoprivkey": "Nenhum endereço unificado para importar a Chave de Gastos",
     "unoviewkey": "Nenhum endereço unificado para importar a Chave de Visualização completa",
@@ -522,7 +522,7 @@
       "Copyright (c) 2024, ZingoLabs.",
       "Construído com React Native.",
       "A licença do MIT (MIT) Copyright (c) 2024 Zingo!",
-      "A permissão é concedida gratuitamente a qualquer pessoa que obtenha uma cópia deste software e dos arquivos de documentação associados (ao 'Software'), para negociar o Software sem restrições, incluindo, sem limitações, direitos de usar, copiar, modificar, mesclar, publicar, distribuir, sublicenciar e/ou vender cópias do Software e permitir que as pessoas a quem o Software seja fornecido o façam, sujeito às seguintes condições:",
+      "A permissão é concedida gratuitamente a qualquer pessoa que obtenha uma cópia deste software e dos arquivos de documentação associados, para negociá-lo sem restrições, incluindo, sem limitações, direitos de usar, copiar, modificar, mesclar, publicar, distribuir, sublicenciar e/ou vender cópias do Software e permitir que as pessoas a quem o mesmo seja fornecido o façam, sujeito às seguintes condições:",
       "O aviso de direitos autorais acima e este aviso de permissão serão incluídos em todas as cópias ou partes substanciais do Software.",
       "O SOFTWARE É FORNECIDO 'COMO ESTÁ', SEM GARANTIA ALGUMA, SEJA EXPRESSA OU IMPLÍCITA, MAS NÃO SE LIMITANDO ÀS GARANTIAS DE COMERCIALIZAÇÃO, ADEQUAÇÃO A UM DETERMINADO FIM E SEM VIOLAÇÕES. EM HIPÓTESE ALGUMA OS AUTORES OU DETENTORES DE DIREITOS AUTORAIS SERÃO RESPONSÁVEIS POR QUALQUER RECLAMAÇÃO, DANOS OU OUTRAS RESPONSABILIDADES, SEJA EM UMA AÇÃO DE CONTRATO, ATO ILÍCITO OU DE OUTRA FORMA, DECORRENTE A ALGO RELACIONADO A CONEXÃO, A USABILIDADE OU OUTRAS NEGOCIAÇÕES NO SOFTWARE."
     ]
@@ -541,7 +541,7 @@
       ],
       "change": [
         "",
-        "Abrir novo",
+        "Abrir Nova Carteira",
         "Você realmente deseja \n alterar sua carteira \n atual",
         "Tem certeza?"
       ],
