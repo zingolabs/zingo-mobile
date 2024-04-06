@@ -166,7 +166,7 @@ extension AppDelegate {
             // Guardar información en JSON de fondo
             let timeStamp = Date().timeIntervalSince1970
             let timeStampStr = String(format: "%.0f", timeStamp)
-            let jsonBackground = "{\"batches\": \"0\", \"message\": \"Expiration fired. Finished OK.\", \"date\": \"\(String(describing: self.timeStampStrStart))\", \"dateEnd\": \"\(timeStampStr)\"}"
+          let jsonBackground = "{\"batches\": \"0\", \"message\": \"Expiration fired. Finished OK.\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"\(timeStampStr)\"}"
             rpcmodule.saveBackgroundFile(jsonBackground)
             NSLog("BGTask startBackgroundTask - expirationHandler Save background JSON \(jsonBackground)")
 
@@ -192,8 +192,8 @@ extension AppDelegate {
             return
         }
         
-        let earlyMorningComponent = DateComponents(hour: 3, minute: Int.random(in: 0...60))
-        let earlyMorning = Calendar.current.date(byAdding: earlyMorningComponent, to: tomorrow)
+        let earlyMorningComponent = DateComponents(hour: 11, minute: 20)
+        let earlyMorning = Calendar.current.date(byAdding: earlyMorningComponent, to: today)
         request.earliestBeginDate = earlyMorning
         request.requiresExternalPower = true
         request.requiresNetworkConnectivity = true
@@ -288,7 +288,7 @@ extension AppDelegate {
         // Guardar información en JSON de fondo
         let timeStampStart = Date().timeIntervalSince1970
         self.timeStampStrStart = String(format: "%.0f", timeStampStart)
-        let jsonBackgroundStart = "{\"batches\": \"0\", \"message\": \"Starting OK.\", \"date\": \"\(String(describing: timeStampStrStart))\", \"dateEnd\": \"0\"}"
+        let jsonBackgroundStart = "{\"batches\": \"0\", \"message\": \"Starting OK.\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"0\"}"
         rpcmodule.saveBackgroundFile(jsonBackgroundStart)
         NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundStart)")
 
@@ -326,7 +326,7 @@ extension AppDelegate {
             // Guardar información en JSON de fondo
             let timeStampError = Date().timeIntervalSince1970
             let timeStampStrError = String(format: "%.0f", timeStampError)
-          let jsonBackgroundError = "{\"batches\": \"0\", \"message\": \"No active wallet KO.\", \"date\": \"\(String(describing: timeStampStrStart))\", \"dateEnd\": \"\(timeStampStrError)\"}"
+          let jsonBackgroundError = "{\"batches\": \"0\", \"message\": \"No active wallet KO.\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"\(timeStampStrError)\"}"
             rpcmodule.saveBackgroundFile(jsonBackgroundError)
             NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundError)")
 
@@ -346,7 +346,7 @@ extension AppDelegate {
         // Guardar información en JSON de fondo
         let timeStampEnd = Date().timeIntervalSince1970
         let timeStampStrEnd = String(format: "%.0f", timeStampEnd)
-        let jsonBackgroundEnd = "{\"batches\": \"0\", \"message\": \"Finished OK.\", \"date\": \"\(String(describing: timeStampStrStart))\", \"dateEnd\": \"\(timeStampStrEnd)\"}"
+        let jsonBackgroundEnd = "{\"batches\": \"0\", \"message\": \"Finished OK.\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"\(timeStampStrEnd)\"}"
         rpcmodule.saveBackgroundFile(jsonBackgroundEnd)
         NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundEnd)")
 
