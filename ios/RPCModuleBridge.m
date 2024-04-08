@@ -10,58 +10,58 @@
 @interface RCT_EXTERN_MODULE(RPCModule, NSObject)
 
 RCT_EXTERN_METHOD(walletExists: 
+    (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(walletBackupExists:
     (RCTPromiseResolveBlock)resolve 
-    rejecter:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(walletBackupExists: 
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(deleteExistingWallet:
     (RCTPromiseResolveBlock)resolve 
-    rejecter:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(deleteExistingWallet: 
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(deleteExistingWalletBackup:
     (RCTPromiseResolveBlock)resolve 
-    rejecter:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(deleteExistingWalletBackup: 
-    (RCTPromiseResolveBlock)resolve 
-    rejecter:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(createNewWallet: 
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(createNewWallet:
     (NSString)server 
-    chainhinter:(NSString)chainhint 
-    resolver:(RCTPromiseResolveBlock)resolve 
-    rejecter:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(restoreWalletFromSeed: 
+                  chainhint:(NSString)chainhint
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(restoreWalletFromSeed:
     (NSString)restoreSeed 
-    birthdayer:(NSString)birthday 
-    serverer:(NSString)server 
-    chainhinter:(NSString)chainhint 
-    resolver:(RCTPromiseResolveBlock)resolve 
-    rejecter:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(restoreWalletFromUfvk: 
+                  birthday:(NSString)birthday
+                  server:(NSString)server
+                  chainhint:(NSString)chainhint
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(restoreWalletFromUfvk:
     (NSString)restoreUfvk 
-    birthdayer:(NSString)birthday 
-    serverer:(NSString)server 
-    chainhinter:(NSString)chainhint 
-    resolver:(RCTPromiseResolveBlock)resolve 
-    rejecter:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(loadExistingWallet: 
+                  birthday:(NSString)birthday
+                  server:(NSString)server
+                  chainhint:(NSString)chainhint
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(loadExistingWallet:
     (NSString)server 
-    chainhinter:(NSString)chainhint 
-    resolver:(RCTPromiseResolveBlock)resolve 
-    rejecter:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(restoreExistingWalletBackup: 
+                  chainhint:(NSString)chainhint
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(restoreExistingWalletBackup:
     (RCTPromiseResolveBlock)resolve 
-    rejecter:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(doSave: 
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(doSave:
     (RCTPromiseResolveBlock)resolve 
-    rejecter:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(doSaveBackup: 
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(doSaveBackup:
     (RCTPromiseResolveBlock)resolve 
-    rejecter:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(execute: 
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(execute:
     (NSString)method 
-    argser:(NSString)args 
-    resolver:(RCTPromiseResolveBlock)resolve 
-    rejecter:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(getLatestBlock: 
+                  args:(NSString)args
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(getLatestBlock:
     (NSString)server 
-    resolver:(RCTPromiseResolveBlock)resolve 
-    rejecter:(RCTPromiseRejectBlock)reject)
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
 
 @end
