@@ -2,16 +2,12 @@ package org.ZingoLabs.Zingo
 
 import android.app.Application
 import android.content.Context
-import android.content.Intent
 import com.facebook.react.*
-import com.facebook.react.bridge.*
-import com.facebook.react.jstasks.HeadlessJsTaskConfig
 import com.facebook.soloader.SoLoader
-import java.lang.reflect.InvocationTargetException
+import java.lang.ref.WeakReference
 
 
 class MainApplication : Application(), ReactApplication {
-
 
     private val mReactNativeHost: ReactNativeHost = object : ReactNativeHost(this) {
         override fun getUseDeveloperSupport(): Boolean {
@@ -38,49 +34,16 @@ class MainApplication : Application(), ReactApplication {
 
     override fun onCreate() {
         super.onCreate()
-        MainApplication.context = getApplicationContext()
+        context = WeakReference(applicationContext)
 
 
         SoLoader.init(this, false)
-        // initializeFlipper(this, reactNativeHost.reactInstanceManager)
     }
 
-
-
     companion object {
-        /**
-         * Loads Flipper in React Native templates. Call this in the onCreate method with something like
-         * initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
-         *
-         * @param context
-         * @param reactInstanceManager
-         */
-        private fun initializeFlipper(
-                context: Context, reactInstanceManager: ReactInstanceManager) {
-            if (BuildConfig.DEBUG) {
-                try { /*
-                         We use reflection here to pick up the class that initializes Flipper,
-                         since Flipper library is not available in release mode
-                      */
-                    val aClass = Class.forName("org.ZingoLabs.Zingo.ReactNativeFlipper")
-                    aClass
-                            .getMethod("initializeFlipper", Context::class.java, ReactInstanceManager::class.java)
-                            .invoke(null, context, reactInstanceManager)
-                } catch (e: ClassNotFoundException) {
-                    e.printStackTrace()
-                } catch (e: NoSuchMethodException) {
-                    e.printStackTrace()
-                } catch (e: IllegalAccessException) {
-                    e.printStackTrace()
-                } catch (e: InvocationTargetException) {
-                    e.printStackTrace()
-                }
-            }
-        }
-
-        private var context: Context? = null
+        private var context: WeakReference<Context>? = null
         fun getAppContext(): Context? {
-            return context
+            return context?.get()
         }
 
         init {
