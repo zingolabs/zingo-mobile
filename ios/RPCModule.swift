@@ -182,20 +182,18 @@ class RPCModule: NSObject {
   }
 
   func createNewWallet(server: String, chainhint: String) -> String {
-      autoreleasepool {
-          let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-          if let documentsDirectory = paths.first {
+        let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
+        if let documentsDirectory = paths.first {
             let seed = initNew(serveruri: server, datadir: documentsDirectory, chainhint: chainhint, monitorMempool: true)
             let seedStr = String(seed)
             if !seedStr.lowercased().hasPrefix("error") {
                 saveWalletInternal()
             }
             return seedStr
-          } else {
+        } else {
             NSLog("Error creating new wallet")
             return ""
-          }
-      }
+        }
   }
 
   @objc(createNewWallet:chainhinter:resolver:rejecter:)
@@ -243,45 +241,39 @@ class RPCModule: NSObject {
   }
 
   func loadExistingWallet(server: String, chainhint: String) -> String {
-      autoreleasepool {
-          let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-          if let documentsDirectory = paths.first {
-              if let walletDataStr = readWallet() {
-                let seed = initFromB64(serveruri: server, datab64: walletDataStr, datadir: documentsDirectory, chainhint: chainhint, monitorMempool: true)
-                let seedStr = String(seed)
-                return seedStr
-              } else {
-                NSLog("Error loading existing wallet")
-                return ""
-              }
-          } else {
-              NSLog("Error loading existing wallet")
-              return ""
-          }
-      }
+        let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
+        if let documentsDirectory = paths.first {
+            if let walletDataStr = readWallet() {
+            let seed = initFromB64(serveruri: server, datab64: walletDataStr, datadir: documentsDirectory, chainhint: chainhint, monitorMempool: true)
+            let seedStr = String(seed)
+            return seedStr
+            } else {
+            NSLog("Error loading existing wallet")
+            return ""
+            }
+        } else {
+            NSLog("Error loading existing wallet")
+            return ""
+        }
   }
 
   @objc(loadExistingWallet:chainhinter:resolver:rejecter:)
   func loadExistingWallet(server: String, chainhint: String, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
-      autoreleasepool {
-          let seedStr = self.loadExistingWallet(server: server, chainhint: chainhint)
-          resolve(seedStr)
-      }
+        let seedStr = self.loadExistingWallet(server: server, chainhint: chainhint)
+        resolve(seedStr)
   }
 
   @objc(restoreExistingWalletBackup:rejecter:)
   func restoreExistingWalletBackup(resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
-      autoreleasepool {
-          if let backupDataStr = self.readWalletBackup(),
-             let walletDataStr = self.readWallet() {
-            self.saveWalletFile(backupDataStr)
-            self.saveWalletBackupFile(walletDataStr)
-            resolve("true")
-          } else {
-            NSLog("Error restoring existing wallet backup")
-            resolve("false")
-          }
-      }
+        if let backupDataStr = self.readWalletBackup(),
+            let walletDataStr = self.readWallet() {
+        self.saveWalletFile(backupDataStr)
+        self.saveWalletBackupFile(walletDataStr)
+        resolve("true")
+        } else {
+        NSLog("Error restoring existing wallet backup")
+        resolve("false")
+        }
   }
 
   @objc(doSave:rejecter:)
@@ -297,24 +289,22 @@ class RPCModule: NSObject {
   }
 
   func doExecuteOnThread(_ dict: [String: Any]) {
-      autoreleasepool {
-          if let method = dict["method"] as? String,
-             let args = dict["args"] as? String,
-             let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-            let resp = executeCommand(cmd: method, args: args)
-            let respStr = String(resp)
-            if method == "sync" && !respStr.lowercased().hasPrefix("error") {
-                // Also save the wallet after sync
-                saveWalletInternal()
-            }
-            resolve(respStr)
-          } else {
-            NSLog("Error executing a command")
-            if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-              resolve("")
-            }
-          }
-      }
+        if let method = dict["method"] as? String,
+            let args = dict["args"] as? String,
+            let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        let resp = executeCommand(cmd: method, args: args)
+        let respStr = String(resp)
+        if method == "sync" && !respStr.lowercased().hasPrefix("error") {
+            // Also save the wallet after sync
+            saveWalletInternal()
+        }
+        resolve(respStr)
+        } else {
+        NSLog("Error executing a command")
+        if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            resolve("")
+        }
+        }
   }
 
   @objc(execute:argser:resolver:rejecter:)

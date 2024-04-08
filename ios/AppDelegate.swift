@@ -238,7 +238,6 @@ extension AppDelegate {
     }
 
     func stopSyncingProcess() {
-      autoreleasepool {
         NSLog("BGTask stopSyncingProcess")
         let statusStr = executeCommand(cmd: "syncstatus", args: "")
         if statusStr.lowercased().hasPrefix("error") {
@@ -278,11 +277,9 @@ extension AppDelegate {
         }
 
         NSLog("BGTask stopSyncingProcess - syncing process STOPPED")
-      }
     }
 
     func syncingProcessBackgroundTask() {
-      autoreleasepool {
         let rpcmodule = RPCModule()
 
         // Guardar información en JSON de fondo
@@ -354,11 +351,9 @@ extension AppDelegate {
           task.setTaskCompleted(success: false)
         }
         bgTask = nil
-      }
     }
 
     func loadWalletFile() {
-      autoreleasepool {
         let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
         guard let documentsDirectory = paths.first else {
             NSLog("Error: Unable to find documents directory")
@@ -383,7 +378,6 @@ extension AppDelegate {
         NSLog("Opening the wallet file - No App active - server: \(serverURI) chain: \(chainhint)")
         let rpcmodule = RPCModule()
         _ = rpcmodule.loadExistingWallet(server: serverURI, chainhint: chainhint)
-      }
     }
 
     func wallet__exists() -> Bool {
