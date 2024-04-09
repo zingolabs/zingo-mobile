@@ -143,30 +143,28 @@ extension AppDelegate {
             return
         }
         
-        // Iniciar la sincronización
+        // Start sync process
         NSLog("BGTask startBackgroundTask run sync task")
-        // Para ejecutar solo una tarea
-        //DispatchQueue.global(qos: .background).async {
+        // to run only one task
         self.syncingProcessBackgroundTask()
-        //}
 
         task.expirationHandler = {
             NSLog("BGTask startBackgroundTask - expirationHandler called")
-            // Interrumpir el proceso de sincronización, no puedo esperar a ver si el proceso ha terminado
-            // porque no tengo suficiente tiempo para ejecutar todo lo que necesito en esta tarea.
+            // stop the sync process, can't wait to check if the process is over.
+            // have no time here
             let interruptStr = executeCommand(cmd: "interrupt_sync_after_batch", args: "true")
             NSLog("BGTask startBackgroundTask - expirationHandler interrupt syncing \(interruptStr)")
             
             let rpcmodule = RPCModule()
 
-            // Guardar la billetera
+            // save the wallet
             rpcmodule.saveWalletInternal()
             NSLog("BGTask startBackgroundTask - expirationHandler Save Wallet")
 
-            // Guardar información en JSON de fondo
+            // save the background file
             let timeStamp = Date().timeIntervalSince1970
             let timeStampStr = String(format: "%.0f", timeStamp)
-          let jsonBackground = "{\"batches\": \"0\", \"message\": \"Expiration fired. Finished OK.\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"\(timeStampStr)\"}"
+            let jsonBackground = "{\"batches\": \"0\", \"message\": \"Finished OK.\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"\(timeStampStr)\"}"
             rpcmodule.saveBackgroundFile(jsonBackground)
             NSLog("BGTask startBackgroundTask - expirationHandler Save background JSON \(jsonBackground)")
 
@@ -282,7 +280,7 @@ extension AppDelegate {
     func syncingProcessBackgroundTask() {
         let rpcmodule = RPCModule()
 
-        // Guardar información en JSON de fondo
+        // save the background file
         let timeStampStart = Date().timeIntervalSince1970
         self.timeStampStrStart = String(format: "%.0f", timeStampStart)
         let jsonBackgroundStart = "{\"batches\": \"0\", \"message\": \"Starting OK.\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"0\"}"
@@ -293,37 +291,37 @@ extension AppDelegate {
         let exists = self.wallet__exists()
 
         if exists {
-            // Verificar si el servidor está activo
+            // chaeck the server
             let balance = executeCommand(cmd: "balance", args: "")
             let balanceStr = String(balance)
             NSLog("BGTask syncingProcessBackgroundTask - testing if server is active \(balanceStr)")
             if balanceStr.hasPrefix("Error") {
-                // La tarea se está ejecutando con la aplicación cerrada
+                // this task is running with the App closed.
                 self.loadWalletFile()
             } else {
-                // La aplicación está abierta, detener la sincronización por si acaso.
+                // the App is open, stop the sync first, just in case.
                 self.stopSyncingProcess()
             }
 
-            // Ejecutar la sincronización sin interrupciones
+            // deactivate the flag for interrupting the sync process.
             let noInterrupt = executeCommand(cmd: "interrupt_sync_after_batch", args: "false")
             let noInterruptStr = String(noInterrupt)
             NSLog("BGTask syncingProcessBackgroundTask - no interrupt syncing \(noInterruptStr)")
 
-            // Ejecutar la sincronización
+            // run the sync process.
             NSLog("BGTask syncingProcessBackgroundTask - sync BEGIN")
             let syncing = executeCommand(cmd: "sync", args: "")
             let syncingStr = String(syncing)
             NSLog("BGTask syncingProcessBackgroundTask - sync END \(syncingStr)")
 
         } else {
-            // No existe el archivo de billetera
+            // no wallet file
             NSLog("BGTask syncingProcessBackgroundTask - No exists wallet file END")
 
-            // Guardar información en JSON de fondo
+            // save the background file
             let timeStampError = Date().timeIntervalSince1970
             let timeStampStrError = String(format: "%.0f", timeStampError)
-          let jsonBackgroundError = "{\"batches\": \"0\", \"message\": \"No active wallet KO.\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"\(timeStampStrError)\"}"
+            let jsonBackgroundError = "{\"batches\": \"0\", \"message\": \"No active wallet KO.\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"\(timeStampStrError)\"}"
             rpcmodule.saveBackgroundFile(jsonBackgroundError)
             NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundError)")
 
@@ -336,11 +334,11 @@ extension AppDelegate {
 
         NSLog("BGTask syncingProcessBackgroundTask - syncing task STOPPED")
 
-        // Guardar la billetera
+        // save the wallet
         rpcmodule.saveWalletInternal()
         NSLog("BGTask syncingProcessBackgroundTask - Save Wallet")
 
-        // Guardar información en JSON de fondo
+        // save the background file
         let timeStampEnd = Date().timeIntervalSince1970
         let timeStampStrEnd = String(format: "%.0f", timeStampEnd)
         let jsonBackgroundEnd = "{\"batches\": \"0\", \"message\": \"Finished OK.\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"\(timeStampStrEnd)\"}"
@@ -386,7 +384,7 @@ extension AppDelegate {
         return false
       }
 
-      // Escribir en el directorio de documentos de la aplicación del usuario
+      // to check if the wallet file exists.
       let fileName = "\(documentsDirectory)/wallet.dat.txt"
       return FileManager.default.fileExists(atPath: fileName)
     }
