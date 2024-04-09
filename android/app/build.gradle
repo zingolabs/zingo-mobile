@@ -266,7 +266,7 @@ android.applicationVariants.all { variant ->
     def t = tasks.register("generate${variant.name.capitalize()}UniFFIBindings", Exec) {
         workingDir "${rootProject.projectDir}/../rust"
         // Runs the bindings generation, note that you must have uniffi-bindgen installed and in your PATH environment variable
-        commandLine 'cargo', 'run', '--features=uniffi/cli', '--bin', 'uniffi-bindgen', 
+        commandLine 'cargo', 'run', '--release', '--features=uniffi/cli', '--bin', 'uniffi-bindgen', 
         'generate', '../rust/lib/src/rustlib.udl', '--language', 'kotlin', 
         '--out-dir', "${buildDir}/generated/source/uniffi/${variant.name}/java"
     }
