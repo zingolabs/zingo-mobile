@@ -192,7 +192,6 @@ class ExecuteVersionFromSeed {
         val version = uniffi.rustlib.executeCommand("version", "")
         println("\nVersion:")
         println(version)
-        // we used for zingolib version: `mob-release` & `mob-prerelease`
         assertThat(version).isNotNull()
         assertThat(version).isNotEmpty()
         assertThat(version).isNotEqualTo("")
