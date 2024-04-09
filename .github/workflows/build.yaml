@@ -112,7 +112,7 @@ jobs:
           workspaces: rust
       
       - name: Cargo build
-        working-directory: ./rust/android
+        working-directory: ./rust/lib
         run: cargo ndk --target ${{ env.TARGET }} build --release -Z build-std 
         env:
           AR: llvm-ar
@@ -124,13 +124,17 @@ jobs:
       
       - name: LLVM Strip
         working-directory: ./rust/target
-        run: llvm-strip ./${{ env.TARGET }}/release/librust.so
+        run: llvm-strip ./${{ env.TARGET }}/release/librustlib.so
+
+      - name: Rename the rust lib for uniffi compatibility
+        working-directory: ./rust/target/${{ env.TARGET }}/release
+        run: mv ./librustlib.so ./libuniffi_rustlib.so
       
       - name: Upload native rust
         uses: actions/upload-artifact@v4
         with:
           name: native-librust-${{ env.ARCH }}-${{ env.CACHE-KEY }}
-          path: rust/target/${{ env.TARGET }}/release/librust.so
+          path: rust/target/${{ env.TARGET }}/release/libuniffi_rustlib.so
       
   cache-native-librust:
     name: Cache native rust

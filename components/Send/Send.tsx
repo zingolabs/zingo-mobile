@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useState, useEffect, useRef, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, ScrollView, Modal, Keyboard, TextInput, TouchableOpacity, Platform, Alert, Text } from 'react-native';
 import {
   faQrcode,
@@ -13,7 +13,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme, useIsFocused } from '@react-navigation/native';
 import { getNumberFormatSettings } from 'react-native-localize';
-import Animated, { EasingNode } from 'react-native-reanimated';
+import Animated, { Easing, useSharedValue, withTiming } from 'react-native-reanimated';
 import CheckBox from '@react-native-community/checkbox';
 import RNPickerSelect from 'react-native-picker-select';
 
@@ -112,7 +112,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [updatingToField, setUpdatingToField] = useState<boolean>(false);
   const isFocused = useIsFocused();
 
-  const slideAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useSharedValue(0);
   const { decimalSeparator } = getNumberFormatSettings();
 
   useEffect(() => {
@@ -277,20 +277,10 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
-      Animated.timing(slideAnim, {
-        toValue: 0 - titleViewHeight + 25,
-        duration: 100,
-        easing: EasingNode.linear,
-        //useNativeDriver: true,
-      }).start();
+      slideAnim.value = withTiming(0 - titleViewHeight + 25, { duration: 100, easing: Easing.linear });
     });
     const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 100,
-        easing: EasingNode.linear,
-        //useNativeDriver: true,
-      }).start();
+      slideAnim.value = withTiming(0, { duration: 100, easing: Easing.linear });
     });
 
     return () => {

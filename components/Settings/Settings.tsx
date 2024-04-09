@@ -1,11 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { View, ScrollView, SafeAreaView, TouchableOpacity, TextInput, Keyboard, Platform } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { IconDefinition, faDotCircle } from '@fortawesome/free-solid-svg-icons';
 import { faCircle as farCircle } from '@fortawesome/free-regular-svg-icons';
-import Animated, { EasingNode } from 'react-native-reanimated';
+import Animated, { Easing, useSharedValue, withTiming } from 'react-native-reanimated';
 
 import RegText from '../Components/RegText';
 import FadeText from '../Components/FadeText';
@@ -149,7 +149,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [disabled, setDisabled] = useState<boolean>();
   const [titleViewHeight, setTitleViewHeight] = useState<number>(0);
 
-  const slideAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useSharedValue(0);
 
   useEffect(() => {
     if (selectServerContext === 'auto') {
@@ -186,20 +186,10 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
-      Animated.timing(slideAnim, {
-        toValue: 0 - titleViewHeight + 25,
-        duration: 100,
-        easing: EasingNode.linear,
-        //useNativeDriver: true,
-      }).start();
+      slideAnim.value = withTiming(0 - titleViewHeight + 25, { duration: 100, easing: Easing.linear });
     });
     const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 100,
-        easing: EasingNode.linear,
-        //useNativeDriver: true,
-      }).start();
+      slideAnim.value = withTiming(0, { duration: 100, easing: Easing.linear });
     });
 
     return () => {

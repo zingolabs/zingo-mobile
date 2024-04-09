@@ -1,10 +1,10 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { View, ScrollView, SafeAreaView, TouchableOpacity, Modal, TextInput, Keyboard } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { faQrcode, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import Animated, { EasingNode } from 'react-native-reanimated';
+import Animated, { Easing, useSharedValue, withTiming } from 'react-native-reanimated';
 
 import FadeText from '../Components/FadeText';
 import RegText from '../Components/RegText';
@@ -35,24 +35,14 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
   const [titleViewHeight, setTitleViewHeight] = useState<number>(0);
   const [latestBlock, setLatestBlock] = useState<number>(0);
 
-  const slideAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useSharedValue(0);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
-      Animated.timing(slideAnim, {
-        toValue: 0 - titleViewHeight + 25,
-        duration: 100,
-        easing: EasingNode.linear,
-        //useNativeDriver: true,
-      }).start();
+      slideAnim.value = withTiming(0 - titleViewHeight + 25, { duration: 100, easing: Easing.linear });
     });
     const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 100,
-        easing: EasingNode.linear,
-        //useNativeDriver: true,
-      }).start();
+      slideAnim.value = withTiming(0, { duration: 100, easing: Easing.linear });
     });
 
     return () => {

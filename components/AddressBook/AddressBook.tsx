@@ -5,7 +5,7 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import { useTheme, useScrollToTop } from '@react-navigation/native';
-import Animated, { EasingNode } from 'react-native-reanimated';
+import Animated, { Easing, useSharedValue, withTiming } from 'react-native-reanimated';
 
 import { AddressBookFileClass, SendPageStateClass } from '../../app/AppState';
 import { ThemeType } from '../../app/types';
@@ -38,7 +38,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
   const [titleViewHeight, setTitleViewHeight] = useState<number>(0);
   const [action, setAction] = useState<'Add' | 'Modify' | 'Delete' | null>(null);
 
-  const slideAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useSharedValue(0);
   const scrollViewRef = useRef<ScrollView>(null);
 
   useScrollToTop(scrollViewRef);
@@ -82,20 +82,10 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
-      Animated.timing(slideAnim, {
-        toValue: 0 - titleViewHeight + 25,
-        duration: 100,
-        easing: EasingNode.linear,
-        //useNativeDriver: true,
-      }).start();
+      slideAnim.value = withTiming(0 - titleViewHeight + 25, { duration: 100, easing: Easing.linear });
     });
     const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 100,
-        easing: EasingNode.linear,
-        //useNativeDriver: true,
-      }).start();
+      slideAnim.value = withTiming(0, { duration: 100, easing: Easing.linear });
     });
 
     return () => {

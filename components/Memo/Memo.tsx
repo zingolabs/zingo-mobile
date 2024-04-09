@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   View,
   ScrollView,
@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
-import Animated, { EasingNode } from 'react-native-reanimated';
+import Animated, { Easing, useSharedValue, withTiming } from 'react-native-reanimated';
 
 import Button from '../Components/Button';
 import { ThemeType } from '../../app/types';
@@ -42,7 +42,7 @@ const Memo: React.FunctionComponent<MemoProps> = ({ closeModal, updateToField })
   const [memo, setMemo] = useState<string>(sendPageState.toaddr.memo);
   const [titleViewHeight, setTitleViewHeight] = useState<number>(0);
 
-  const slideAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useSharedValue(0);
 
   const dimensions = {
     width: Dimensions.get('screen').width,
@@ -56,20 +56,10 @@ const Memo: React.FunctionComponent<MemoProps> = ({ closeModal, updateToField })
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
-      Animated.timing(slideAnim, {
-        toValue: 0 - titleViewHeight + 25,
-        duration: 100,
-        easing: EasingNode.linear,
-        //useNativeDriver: true,
-      }).start();
+      slideAnim.value = withTiming(0 - titleViewHeight + 25, { duration: 100, easing: Easing.linear });
     });
     const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 100,
-        easing: EasingNode.linear,
-        //useNativeDriver: true,
-      }).start();
+      slideAnim.value = withTiming(0, { duration: 100, easing: Easing.linear });
     });
 
     return () => {

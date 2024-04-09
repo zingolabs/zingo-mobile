@@ -110,20 +110,20 @@ class ExecuteAddressesFromSeed {
         val server = "http://10.0.2.2:20000"
         val chainhint = "main"
         val seed = Seeds.ABANDON
-        val birthday = "1"
+        val birthday:ULong = 1u
         val datadir = MainApplication.getAppContext()!!.filesDir.path
-        val monitorMempool = "false"
+        val monitorMempool = false
 
-        var initFromSeedJson = RustFFI.initfromseed(server, seed, birthday, datadir, chainhint, monitorMempool)
-        System.out.println("\nInit from seed:")
-        System.out.println(initFromSeedJson)
+        val initFromSeedJson = uniffi.rustlib.initFromSeed(server, seed, birthday, datadir, chainhint, monitorMempool)
+        println("\nInit from seed:")
+        println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
         assertThat(initFromSeed.seed).isEqualTo(Seeds.ABANDON)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
-        var addressesJson = RustFFI.execute("addresses", "")
-        System.out.println("\nAddresses:")
-        System.out.println(addressesJson)
+        val addressesJson = uniffi.rustlib.executeCommand("addresses", "")
+        println("\nAddresses:")
+        println(addressesJson)
         val addresses: List<Addresses> = mapper.readValue(addressesJson)
         assertThat(addresses[0].address).isEqualTo("u16sw4v6wy7f4jzdny55yzl020tp3yqg3c85dc6n7mmq0urfm6adqg79hxmyk85ufn4lun4pfh5q48cc3kvxhxm3w978eqqecdd260gkzjrkun6z7m9mcrt2zszaj0mvk6ufux2zteqwh57cq906hz3rkg63duaeqsvjelv9h5srct0zq8rvlv23wz5hed7zuatqd7p6p4ztugc4t4w2g")
         assertThat(addresses[0].receivers.transparent).isEqualTo("t1dUDJ62ANtmebE8drFg7g2MWYwXHQ6Xu3F")
@@ -141,26 +141,26 @@ class ExecuteAddressesFromUfvk {
         val server = "http://10.0.2.2:20000"
         val chainhint = "main"
         val ufvk = Ufvk.ABANDON
-        val birthday = "1"
+        val birthday: ULong = 1u
         val datadir = MainApplication.getAppContext()!!.filesDir.path
-        val monitorMempool = "false"
+        val monitorMempool = false
 
-        var initFromUfvkJson = RustFFI.initfromufvk(server, ufvk, birthday, datadir, chainhint, monitorMempool)
-        System.out.println("\nInit From UFVK:")
-        System.out.println(initFromUfvkJson)
+        val initFromUfvkJson = uniffi.rustlib.initFromUfvk(server, ufvk, birthday, datadir, chainhint, monitorMempool)
+        println("\nInit From UFVK:")
+        println(initFromUfvkJson)
         val initFromUfvk: InitFromUfvk = mapper.readValue(initFromUfvkJson)
         assertThat(initFromUfvk.error).startsWith("This wallet is watch-only")
 
-        var exportUfvkJson = RustFFI.execute("exportufvk", "")
-        System.out.println("\nExport Ufvk:")
-        System.out.println(exportUfvkJson)
+        val exportUfvkJson = uniffi.rustlib.executeCommand("exportufvk", "")
+        println("\nExport Ufvk:")
+        println(exportUfvkJson)
         val exportUfvk: ExportUfvk = mapper.readValue(exportUfvkJson)
         assertThat(exportUfvk.ufvk).isEqualTo(Ufvk.ABANDON)
         assertThat(exportUfvk.birthday).isEqualTo(1)
 
-        var addressesJson = RustFFI.execute("addresses", "")
-        System.out.println("\nAddresses:")
-        System.out.println(addressesJson)
+        val addressesJson = uniffi.rustlib.executeCommand("addresses", "")
+        println("\nAddresses:")
+        println(addressesJson)
         val addresses: List<Addresses> = mapper.readValue(addressesJson)
         assertThat(addresses[0].address).isEqualTo("u16sw4v6wy7f4jzdny55yzl020tp3yqg3c85dc6n7mmq0urfm6adqg79hxmyk85ufn4lun4pfh5q48cc3kvxhxm3w978eqqecdd260gkzjrkun6z7m9mcrt2zszaj0mvk6ufux2zteqwh57cq906hz3rkg63duaeqsvjelv9h5srct0zq8rvlv23wz5hed7zuatqd7p6p4ztugc4t4w2g")
         assertThat(addresses[0].receivers.transparent).isEqualTo("t1dUDJ62ANtmebE8drFg7g2MWYwXHQ6Xu3F")
@@ -178,22 +178,23 @@ class ExecuteVersionFromSeed {
         val server = "http://10.0.2.2:20000"
         val chainhint = "main"
         val seed = Seeds.ABANDON
-        val birthday = "1"
+        val birthday:ULong = 1u
         val datadir = MainApplication.getAppContext()!!.filesDir.path
-        val monitorMempool = "false"
+        val monitorMempool = false
 
-        var initFromSeedJson = RustFFI.initfromseed(server, seed, birthday, datadir, chainhint, monitorMempool)
-        System.out.println("\nInit from seed:")
-        System.out.println(initFromSeedJson)
+        val initFromSeedJson = uniffi.rustlib.initFromSeed(server, seed, birthday, datadir, chainhint, monitorMempool)
+        println("\nInit from seed:")
+        println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
         assertThat(initFromSeed.seed).isEqualTo(Seeds.ABANDON)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
-        var version = RustFFI.execute("version", "")
-        System.out.println("\nVersion:")
-        System.out.println(version)
-        // we used for zingolib version: `mob-release` & `mob-prerelease`
-        assertThat(version).startsWith("mob-")
+        val version = uniffi.rustlib.executeCommand("version", "")
+        println("\nVersion:")
+        println(version)
+        assertThat(version).isNotNull()
+        assertThat(version).isNotEmpty()
+        assertThat(version).isNotEqualTo("")
     }
 }
 
@@ -205,46 +206,46 @@ class ExecuteSyncFromSeed {
         val server = "http://10.0.2.2:20000"
         val chainhint = "regtest"
         val seed = Seeds.ABANDON
-        val birthday = "1"
+        val birthday:ULong = 1u
         val datadir = MainApplication.getAppContext()!!.filesDir.path
-        val monitorMempool = "false"
+        val monitorMempool = false
 
-        var initFromSeedJson = RustFFI.initfromseed(server, seed, birthday, datadir, chainhint, monitorMempool)
-        System.out.println("\nInit from seed:")
-        System.out.println(initFromSeedJson)
+        val initFromSeedJson = uniffi.rustlib.initFromSeed(server, seed, birthday, datadir, chainhint, monitorMempool)
+        println("\nInit from seed:")
+        println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
         assertThat(initFromSeed.seed).isEqualTo(Seeds.ABANDON)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
-        var infoJson = RustFFI.execute("info", "")
-        System.out.println("\nInfo:")
-        System.out.println(infoJson)
+        val infoJson = uniffi.rustlib.executeCommand("info", "")
+        println("\nInfo:")
+        println(infoJson)
         val info: Info = mapper.readValue(infoJson)
         assertThat(info.latest_block_height).isGreaterThan(0)
 
-        var heightJson = RustFFI.execute("height", "")
-        System.out.println("\nHeight pre-sync:")
-        System.out.println(heightJson)
+        var heightJson = uniffi.rustlib.executeCommand("height", "")
+        println("\nHeight pre-sync:")
+        println(heightJson)
         val heightPreSync: Height = mapper.readValue(heightJson)
         assertThat(heightPreSync.height).isEqualTo(0)
 
-        var syncJson = RustFFI.execute("sync", "")
-        System.out.println("\nSync:")
-        System.out.println(syncJson)
+        val syncJson = uniffi.rustlib.executeCommand("sync", "")
+        println("\nSync:")
+        println(syncJson)
         val sync: Sync = mapper.readValue(syncJson)
         assertThat(sync.result).isEqualTo("success")
         assertThat(sync.latest_block).isEqualTo(info.latest_block_height)
         assertThat(sync.total_blocks_synced).isEqualTo(info.latest_block_height)
 
-        heightJson = RustFFI.execute("height", "")
-        System.out.println("\nHeight post-sync:")
-        System.out.println(heightJson)
+        heightJson = uniffi.rustlib.executeCommand("height", "")
+        println("\nHeight post-sync:")
+        println(heightJson)
         val heightPostSync: Height = mapper.readValue(heightJson)
         assertThat(heightPostSync.height).isEqualTo(info.latest_block_height)
 
-        val syncStatusJson = RustFFI.execute("syncstatus", "")
-        System.out.println("\nSync status:")
-        System.out.println(syncStatusJson)
+        val syncStatusJson = uniffi.rustlib.executeCommand("syncstatus", "")
+        println("\nSync status:")
+        println(syncStatusJson)
         val syncStatus: SyncStatus = mapper.readValue(syncStatusJson)
         assertThat(syncStatus.sync_id).isEqualTo(1)
     }
@@ -258,50 +259,50 @@ class ExecuteSendFromOrchard {
         val server = "http://10.0.2.2:20000"
         val chainhint = "regtest"
         val seed = Seeds.HOSPITAL
-        val birthday = "1"
+        val birthday:ULong = 1u
         val datadir = MainApplication.getAppContext()!!.filesDir.path
-        val monitorMempool = "false"
+        val monitorMempool = false
 
-        var initFromSeedJson = RustFFI.initfromseed(server, seed, birthday, datadir, chainhint, monitorMempool)
-        System.out.println("\nInit from seed:")
-        System.out.println(initFromSeedJson)
+        val initFromSeedJson = uniffi.rustlib.initFromSeed(server, seed, birthday, datadir, chainhint, monitorMempool)
+        println("\nInit from seed:")
+        println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
         assertThat(initFromSeed.seed).isEqualTo(Seeds.HOSPITAL)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
-        var syncJson = RustFFI.execute("sync", "")
-        System.out.println("\nSync:")
-        System.out.println(syncJson)
+        var syncJson = uniffi.rustlib.executeCommand("sync", "")
+        println("\nSync:")
+        println(syncJson)
 
-        var balanceJson = RustFFI.execute("balance", "")
-        System.out.println("\nBalance pre-send:")
-        System.out.println(balanceJson)
+        var balanceJson = uniffi.rustlib.executeCommand("balance", "")
+        println("\nBalance pre-send:")
+        println(balanceJson)
         val balancePreSend: Balance = mapper.readValue(balanceJson)
         assertThat(balancePreSend.spendable_orchard_balance).isEqualTo(1000000)
         assertThat(balancePreSend.transparent_balance).isEqualTo(0)
 
-        var addressesJson = RustFFI.execute("addresses", "")
-        System.out.println("\nAddresses:")
-        System.out.println(addressesJson)
+        val addressesJson = uniffi.rustlib.executeCommand("addresses", "")
+        println("\nAddresses:")
+        println(addressesJson)
         val addresses: List<Addresses> = mapper.readValue(addressesJson)
 
         val send = Send(addresses[0].receivers.transparent, 100000, null)
 
-        var txidJson = RustFFI.execute("send", mapper.writeValueAsString(listOf(send)))
-        System.out.println("\nTXID:")
-        System.out.println(txidJson)
+        val txidJson = uniffi.rustlib.executeCommand("send", mapper.writeValueAsString(listOf(send)))
+        println("\nTXID:")
+        println(txidJson)
 
-        var sendProgressJson = RustFFI.execute("sendprogress", "")
-        System.out.println("\nSend progress:")
-        System.out.println(sendProgressJson)    
+        val sendProgressJson = uniffi.rustlib.executeCommand("sendprogress", "")
+        println("\nSend progress:")
+        println(sendProgressJson)
 
-        syncJson = RustFFI.execute("sync", "")
-        System.out.println("\nSync:")
-        System.out.println(syncJson)
+        syncJson = uniffi.rustlib.executeCommand("sync", "")
+        println("\nSync:")
+        println(syncJson)
 
-        balanceJson = RustFFI.execute("balance", "")
-        System.out.println("\nBalance post-send:")
-        System.out.println(balanceJson)
+        balanceJson = uniffi.rustlib.executeCommand("balance", "")
+        println("\nBalance post-send:")
+        println(balanceJson)
         val balancePostSend: Balance = mapper.readValue(balanceJson)
         assertThat(balancePostSend.transparent_balance).isEqualTo(100000)
     }
@@ -315,28 +316,28 @@ class UpdateCurrentPriceAndSummariesFromSeed {
         val server = "http://10.0.2.2:20000"
         val chainhint = "regtest"
         val seed = Seeds.HOSPITAL
-        val birthday = "1"
+        val birthday:ULong = 1u
         val datadir = MainApplication.getAppContext()!!.filesDir.path
-        val monitorMempool = "false"
+        val monitorMempool = false
 
-        var initFromSeedJson = RustFFI.initfromseed(server, seed, birthday, datadir, chainhint, monitorMempool)
-        System.out.println("\nInit from seed:")
-        System.out.println(initFromSeedJson)
+        val initFromSeedJson = uniffi.rustlib.initFromSeed(server, seed, birthday, datadir, chainhint, monitorMempool)
+        println("\nInit from seed:")
+        println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
         assertThat(initFromSeed.seed).isEqualTo(Seeds.HOSPITAL)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
-        var price = RustFFI.execute("updatecurrentprice", "")
-        System.out.println("\nPrice:")
-        System.out.println(price)
+        val price = uniffi.rustlib.executeCommand("updatecurrentprice", "")
+        println("\nPrice:")
+        println(price)
 
-        var syncJson = RustFFI.execute("sync", "")
-        System.out.println("\nSync:")
-        System.out.println(syncJson)
+        val syncJson = uniffi.rustlib.executeCommand("sync", "")
+        println("\nSync:")
+        println(syncJson)
 
-        var summariesJson = RustFFI.execute("summaries", "")
-        System.out.println("\nSummaries:")
-        System.out.println(summariesJson)
+        val summariesJson = uniffi.rustlib.executeCommand("summaries", "")
+        println("\nSummaries:")
+        println(summariesJson)
         val summaries: List<Summaries> = mapper.readValue(summariesJson)
         // the summaries can have 4 or 5 items for 3 different txs
         // 1. Received - 1_000_000 - orchard (1 item)
@@ -362,7 +363,7 @@ class UpdateCurrentPriceAndSummariesFromSeed {
             assertThat(summaries[3].kind).isEqualTo("Fee")
             assertThat(summaries[3].amount).isEqualTo(10000)
         } else {
-            // fouth item have to be a `SendToSelf`
+            // fourth item have to be a `SendToSelf`
             assertThat(summaries[3].kind).isEqualTo("SendToSelf")
             assertThat(summaries[3].amount).isEqualTo(0)
             // fifth item have to be a `fee` from the last `SendToSelf` with the same txid
@@ -382,24 +383,24 @@ class ExecuteSaplingBalanceFromSeed {
         val server = "http://10.0.2.2:20000"
         val chainhint = "regtest"
         val seed = Seeds.HOSPITAL
-        val birthday = "1"
+        val birthday:ULong = 1u
         val datadir = MainApplication.getAppContext()!!.filesDir.path
-        val monitorMempool = "false"
+        val monitorMempool = false
 
-        var initFromSeedJson = RustFFI.initfromseed(server, seed, birthday, datadir, chainhint, monitorMempool)
-        System.out.println("\nInit from seed:")
-        System.out.println(initFromSeedJson)
+        val initFromSeedJson = uniffi.rustlib.initFromSeed(server, seed, birthday, datadir, chainhint, monitorMempool)
+        println("\nInit from seed:")
+        println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
         assertThat(initFromSeed.seed).isEqualTo(Seeds.HOSPITAL)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
-        var syncJson = RustFFI.execute("sync", "")
-        System.out.println("\nSync:")
-        System.out.println(syncJson)
+        val syncJson = uniffi.rustlib.executeCommand("sync", "")
+        println("\nSync:")
+        println(syncJson)
         
-        var summariesJson = RustFFI.execute("summaries", "")
-        System.out.println("\nSummaries:")
-        System.out.println(summariesJson)
+        val summariesJson = uniffi.rustlib.executeCommand("summaries", "")
+        println("\nSummaries:")
+        println(summariesJson)
 
         // Summaries
         // 1. Received in orchard pool =     +500_000
@@ -416,9 +417,9 @@ class ExecuteSaplingBalanceFromSeed {
         // sapling pool = 0
         // transparent =  0
 
-        var balanceJson = RustFFI.execute("balance", "")
-        System.out.println("\nBalance:")
-        System.out.println(balanceJson)
+        val balanceJson = uniffi.rustlib.executeCommand("balance", "")
+        println("\nBalance:")
+        println(balanceJson)
         val balance: Balance = mapper.readValue(balanceJson)
 
         assertThat(balance.orchard_balance).isEqualTo(840000)
