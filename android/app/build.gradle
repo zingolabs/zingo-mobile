@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
 apply plugin: 'kotlin-android'
 
 import com.android.build.OutputFile
@@ -344,6 +345,18 @@ dependencies {
 
     // uniffi needs this
     implementation "net.java.dev.jna:jna:5.9.0@aar"
+
+    // Import the Firebase BoM
+    implementation platform('com.google.firebase:firebase-bom:32.8.0')
+
+    // TODO: Add the dependencies for Firebase products you want to use
+    // When using the BoM, don't specify versions in Firebase dependencies
+    implementation("com.google.firebase:firebase-inappmessaging-display")
+    implementation 'com.google.firebase:firebase-analytics'
+
+    // Add the dependencies for any other desired Firebase products
+    // https://firebase.google.com/docs/android/setup#available-libraries
+
 }
 
 // Run this once to be able to run the application with BUCK

@@ -80,3 +80,7 @@ buck-out/
 
 # bundle file
 /**/index.android.bundle
+
+# firebase
+/**/google-services.json
+/**/GoogleService-Info.plist
