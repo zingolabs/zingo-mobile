@@ -226,8 +226,10 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
         style={
           {
             "color": "rgb(28, 28, 30)",
+            "fontSize": 18,
+            "fontWeight": "900",
             "marginTop": 0,
-            "opacity": 0.65,
+            "opacity": 1,
             "padding": 20,
             "textAlign": "center",
           }

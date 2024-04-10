@@ -21,6 +21,7 @@ jest.mock('react-native-localize', () => ({
     };
   },
 }));
+jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
 
 // test suite
 describe('Component Components - test', () => {
