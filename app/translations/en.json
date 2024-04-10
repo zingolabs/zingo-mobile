@@ -193,7 +193,7 @@
         "text": "Disable the sending all button because could be a risk to have it."
       }
     ],
-    "donation": [
+    "donations": [
       {
         "value": true,
         "text": "Send a Zenny (0.01 ZEC) to Zingo in every send transaction that you submmit."

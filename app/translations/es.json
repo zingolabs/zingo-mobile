@@ -193,7 +193,7 @@
         "text": "Desactiva el botón para enviar toda la cantidad porque puede ser un riesgo tenerlo activado."
       }
     ],
-    "donation": [
+    "donations": [
       {
         "value": true,
         "text": "Envía un Zenny (0.01 ZEC) a Zingo en cada transacción de envío que realices."
