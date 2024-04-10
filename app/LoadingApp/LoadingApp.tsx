@@ -52,6 +52,7 @@ import { RPCSeedType } from '../rpc/types/RPCSeedType';
 import Launching from './Launching';
 import simpleBiometrics from '../simpleBiometrics';
 import selectingServer from '../selectingServer';
+import { isEqual } from 'lodash';
 
 const BoldText = React.lazy(() => import('../../components/Components/BoldText'));
 const Button = React.lazy(() => import('../../components/Components/Button'));
@@ -526,6 +527,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
 
   selectTheBestServer = async (aDifferentOne: boolean) => {
     const servers = await selectingServer(serverUris(this.props.translate));
+    const actualServer = this.state.server;
     const fasterServer: ServerType = servers
       .filter((s: ServerUrisType) => s.latency !== null && s.uri !== (aDifferentOne ? this.state.server.uri : ''))
       .sort((a, b) => (a.latency ? a.latency : Infinity) - (b.latency ? b.latency : Infinity))
@@ -539,6 +541,22 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     });
     await SettingsFileImpl.writeSettings('server', fasterServer);
     await SettingsFileImpl.writeSettings('selectServer', 'list');
+    // message with the result only for advanced users
+    if (this.state.mode === 'advanced') {
+      if (isEqual(actualServer, fasterServer)) {
+        this.addLastSnackbar({
+          message: this.state.translate('loadedapp.selectingserversame') as string,
+          type: 'Primary',
+          duration: 'long',
+        });
+      } else {
+        this.addLastSnackbar({
+          message: (this.state.translate('loadedapp.selectingserverbest') as string) + ' ' + fasterServer.uri,
+          type: 'Primary',
+          duration: 'long',
+        });
+      }
+    }
   };
 
   checkServer: (s: ServerType) => Promise<boolean> = async (server: ServerType) => {

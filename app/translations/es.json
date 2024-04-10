@@ -126,7 +126,8 @@
     "restorewallet-title": "Opción Avanzada",
     "restorewallet-alert": "Confirmar que quiere restaurar un nuevo monedero usando su frase semilla.",
     "selectingserver": "Determinando el mejor lightwalletd.",
-    "selectingserversame": "Su servidor actual ya es el más optimizado."
+    "selectingserversame": "Su servidor actual ya es el más optimizado.",
+    "selectingserverbest": "En este momento este es el servidor más optimizado:"
   },
   "rpc": {
     "parsebirthday-error": "Error: No es posible convertirlo en un número:",

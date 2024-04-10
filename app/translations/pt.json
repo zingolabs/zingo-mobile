@@ -126,7 +126,8 @@
     "restorewallet-title": "Opção Avançada",
     "restorewallet-alert": "Confirme que você deseja restaurar uma nova carteira usando as suas frases de recuperação.",
     "selectingserver": "Determinando a melhor lightwalletd.",
-    "selectingserversame": "Seu servidor atual já é o mais otimizado."
+    "selectingserversame": "Seu servidor atual já é o mais otimizado.",
+    "selectingserverbest": "Neste momento ele é o servidor mais otimizado:"
   },
   "rpc": {
     "parsebirthday-error": "Erro: Não foi possível analisar como um número:",
