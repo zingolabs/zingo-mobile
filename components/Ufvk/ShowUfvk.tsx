@@ -9,11 +9,11 @@ import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
 import SingleAddress from '../Components/SingleAddress';
 import RPC from '../../app/rpc';
-import FadeText from '../Components/FadeText';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
+import RegText from '../Components/RegText';
 
 type TextsType = {
   new: string[];
@@ -105,11 +105,11 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
           alignItems: 'stretch',
           justifyContent: 'flex-start',
         }}>
-        <FadeText style={{ marginTop: 0, padding: 20, textAlign: 'center' }}>
+        <RegText style={{ marginTop: 0, padding: 20, textAlign: 'center', fontWeight: '900' }}>
           {action === 'backup' || action === 'change' || action === 'server'
             ? (translate(`ufvk.text-readonly-${action}`) as string)
             : (translate('ufvk.text-readonly') as string)}
-        </FadeText>
+        </RegText>
 
         <View style={{ display: 'flex', flexDirection: 'column', marginTop: 0, alignItems: 'center' }}>
           {!!wallet.ufvk && (
