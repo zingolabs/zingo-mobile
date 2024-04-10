@@ -1647,6 +1647,11 @@
   resolved "https://registry.yarnpkg.com/@react-native-firebase/analytics/-/analytics-19.1.2.tgz#5f161f33d340804c3c8a6cf7710dd0908266285e"
   integrity sha512-hIQl/7Rvfp11HMTJcqCGRf9HeYiVypoeP9zmDjN7CQwq54/eIw59FM+0I0WpT29NsMQv+nUkK9YTF18wSmVYOg==
 
+"@react-native-firebase/app-types@^6.7.2":
+  version "6.7.2"
+  resolved "https://registry.yarnpkg.com/@react-native-firebase/app-types/-/app-types-6.7.2.tgz#d2e1530af5702e00578914b41468898c10d3289c"
+  integrity sha512-pIwc6e0ZINw6PJqNVsAxzOVJUDg6au2TdulY+ZOYQ11SPDs5I2n9likoGrElPmJjajT4s9h87uz/6PWP2k9PxQ==
+
 "@react-native-firebase/app@^19.1.2":
   version "19.1.2"
   resolved "https://registry.yarnpkg.com/@react-native-firebase/app/-/app-19.1.2.tgz#a4b0b70b698e98ebdbebf76d12b6c8c54821094e"

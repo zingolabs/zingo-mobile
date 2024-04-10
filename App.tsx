@@ -1,8 +1,9 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useState } from 'react';
-import { SafeAreaView } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Alert, SafeAreaView } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import messaging, { FirebaseMessagingTypes } from '@react-native-firebase/messaging';
 
 import { LoadedApp } from './app/LoadedApp';
 import { LoadingApp } from './app/LoadingApp';
@@ -46,8 +47,22 @@ const basicTheme: ThemeType = {
 
 const Stack = createStackNavigator();
 
-const App: React.FunctionComponent = () => {
+type AppProps = {
+  granted: boolean;
+};
+
+const App: React.FunctionComponent<AppProps> = ({ granted }) => {
   const [theme, setTheme] = useState<ThemeType>(advancedTheme);
+
+  useEffect(() => {
+    if (granted) {
+      const unsubscribe = messaging().onMessage(async (remoteMessage: FirebaseMessagingTypes.RemoteMessage) => {
+        Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
+      });
+
+      return unsubscribe;
+    }
+  }, [granted]);
 
   const toggleTheme = (mode: 'basic' | 'advanced') => {
     setTheme(mode === 'advanced' ? advancedTheme : basicTheme);
