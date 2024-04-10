@@ -105,6 +105,7 @@ export default interface AppStateLoaded {
 
   zecPrice: ZecPriceType;
   sendAll: boolean;
+  donation: boolean;
   background: BackgroundType;
 
   translate: (key: string) => TranslateType;

@@ -103,6 +103,18 @@ describe('Component Settings - test', () => {
         },
       ];
     }
+    if (p === 'settings.donations') {
+      return [
+        {
+          value: true,
+          text: 'text true',
+        },
+        {
+          value: false,
+          text: 'text false',
+        },
+      ];
+    }
     return 'text translated';
   };
   state.info.currencyName = 'ZEC';
@@ -111,6 +123,7 @@ describe('Component Settings - test', () => {
   state.currency = 'USD';
   state.language = 'en';
   state.sendAll = false;
+  state.donation = false;
   state.walletSettings.download_memos = 'wallet';
   state.walletSettings.transaction_filter_threshold = '500';
   const onClose = jest.fn();
@@ -125,6 +138,7 @@ describe('Component Settings - test', () => {
           set_currency_option={onSetOption}
           set_language_option={onSetOption}
           set_sendAll_option={onSetOption}
+          set_donation_option={onSetOption}
           set_privacy_option={onSetOption}
           set_mode_option={onSetOption}
           set_security_option={onSetOption}

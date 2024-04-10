@@ -6,6 +6,7 @@ export default class SettingsFileClass {
   currency: 'USD' | '';
   language: 'en' | 'es' | 'pt' | 'ru';
   sendAll: boolean;
+  donation: boolean;
   privacy: boolean;
   mode: 'basic' | 'advanced';
   firstInstall: boolean;
@@ -23,6 +24,7 @@ export default class SettingsFileClass {
     currency: 'USD' | '',
     language: 'en' | 'es' | 'pt' | 'ru',
     sendAll: boolean,
+    donation: boolean,
     privacy: boolean,
     mode: 'basic' | 'advanced',
     firstInstall: boolean,
@@ -35,6 +37,7 @@ export default class SettingsFileClass {
     this.currency = currency;
     this.language = language;
     this.sendAll = sendAll;
+    this.donation = donation;
     this.privacy = privacy;
     this.mode = mode;
     this.firstInstall = firstInstall;

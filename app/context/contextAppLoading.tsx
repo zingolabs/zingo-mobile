@@ -37,6 +37,7 @@ export const defaultAppStateLoading: AppStateLoading = {
     date: 0,
   } as ZecPriceType,
   sendAll: false,
+  donation: false,
   background: {
     batches: 0,
     message: '',

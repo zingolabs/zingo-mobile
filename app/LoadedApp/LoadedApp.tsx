@@ -107,6 +107,7 @@ export default function LoadedApp(props: LoadedAppProps) {
   const [currency, setCurrency] = useState<'USD' | ''>('');
   const [server, setServer] = useState<ServerType>(SERVER_DEFAULT_0);
   const [sendAll, setSendAll] = useState<boolean>(false);
+  const [donation, setDonation] = useState<boolean>(false);
   const [privacy, setPrivacy] = useState<boolean>(false);
   const [mode, setMode] = useState<'basic' | 'advanced'>('advanced'); // by default advanced
   const [background, setBackground] = useState<BackgroundType>({ batches: 0, message: '', date: 0, dateEnd: 0 });
@@ -197,6 +198,11 @@ export default function LoadedApp(props: LoadedAppProps) {
       } else {
         await SettingsFileImpl.writeSettings('sendAll', sendAll);
       }
+      if (settings.donation === true || settings.donation === false) {
+        setDonation(settings.donation);
+      } else {
+        await SettingsFileImpl.writeSettings('donation', donation);
+      }
       if (settings.privacy === true || settings.privacy === false) {
         setPrivacy(settings.privacy);
       } else {
@@ -260,6 +266,7 @@ export default function LoadedApp(props: LoadedAppProps) {
         currency={currency}
         server={server}
         sendAll={sendAll}
+        donation={donation}
         privacy={privacy}
         mode={mode}
         background={background}
@@ -282,6 +289,7 @@ type LoadedAppClassProps = {
   currency: 'USD' | '';
   server: ServerType;
   sendAll: boolean;
+  donation: boolean;
   privacy: boolean;
   mode: 'basic' | 'advanced';
   background: BackgroundType;
@@ -311,6 +319,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       language: props.language,
       currency: props.currency,
       sendAll: props.sendAll,
+      donation: props.donation,
       privacy: props.privacy,
       mode: props.mode,
       background: props.background,
@@ -1053,6 +1062,16 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     this.rpc.fetchWalletSettings();
   };
 
+  set_donation_option = async (name: 'donation', value: boolean): Promise<void> => {
+    await SettingsFileImpl.writeSettings(name, value);
+    this.setState({
+      donation: value as boolean,
+    });
+
+    // Refetch the settings to update
+    this.rpc.fetchWalletSettings();
+  };
+
   set_privacy_option = async (name: 'privacy', value: boolean): Promise<void> => {
     await SettingsFileImpl.writeSettings(name, value);
     this.setState({
@@ -1452,6 +1471,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 set_currency_option={this.set_currency_option}
                 set_language_option={this.set_language_option}
                 set_sendAll_option={this.set_sendAll_option}
+                set_donation_option={this.set_donation_option}
                 set_privacy_option={this.set_privacy_option}
                 set_mode_option={this.set_mode_option}
                 set_security_option={this.set_security_option}

@@ -193,6 +193,17 @@
         "text": "Disable the sending all button because could be a risk to have it."
       }
     ],
+    "donation": [
+      {
+        "value": true,
+        "text": "Send a Zenny (0.01 ZEC) to Zingo in every send transaction that you submmit."
+      },
+      {
+        "value": false,
+        "text": "Not send any donation to Zingo in your send transactions."
+      }
+    ],
+
     "privacys": [
       {
         "value": true,
@@ -239,6 +250,7 @@
     "language-title": "LANGUAGE",
     "islanguage": "You need to choose a language to save.",
     "sendall-title": "THE BUTTON 'Send All' (Amount)",
+    "donation-title": "Donations to Zingo Developers",
     "privacy-title": "Switch between High or Normal Privacy",
     "mode-title": "Switch between Basic or Advanced Mode",
     "value-currency-": "No currency",
@@ -248,6 +260,8 @@
     "value-language-pt": "Portuguese",
     "value-sendall-true": "Enable",
     "value-sendall-false": "Disable",
+    "value-donation-true": "Yes",
+    "value-donation-false": "No",
     "value-privacy-true": "High",
     "value-privacy-false": "Normal",
     "privacy": "Priv: ",

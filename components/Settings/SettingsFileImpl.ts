@@ -16,6 +16,7 @@ export default class SettingsFileImpl {
       | 'currency'
       | 'language'
       | 'sendAll'
+      | 'donation'
       | 'privacy'
       | 'mode'
       | 'firstInstall'

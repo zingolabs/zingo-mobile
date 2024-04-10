@@ -38,6 +38,7 @@ type SettingsProps = {
   set_currency_option: (name: 'currency', value: string) => Promise<void>;
   set_language_option: (name: 'language', value: string, reset: boolean) => Promise<void>;
   set_sendAll_option: (name: 'sendAll', value: boolean) => Promise<void>;
+  set_donation_option: (name: 'donation', value: boolean) => Promise<void>;
   set_privacy_option: (name: 'privacy', value: boolean) => Promise<void>;
   set_mode_option: (name: 'mode', value: string) => Promise<void>;
   set_security_option: (name: 'security', value: SecurityType) => Promise<void>;
@@ -55,6 +56,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   set_currency_option,
   set_language_option,
   set_sendAll_option,
+  set_donation_option,
   set_privacy_option,
   set_mode_option,
   set_security_option,
@@ -69,6 +71,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     currency: currencyContext,
     language: languageContext,
     sendAll: sendAllContext,
+    donation: donationContext,
     privacy: privacyContext,
     mode: modeContext,
     netInfo,
@@ -102,6 +105,12 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     SENDALLS = sendAllsArray as Options[];
   }
 
+  const donationsArray = translate('settings.donations');
+  let DONATIONS: Options[] = [];
+  if (typeof donationsArray === 'object') {
+    DONATIONS = donationsArray as Options[];
+  }
+
   const privacysArray = translate('settings.privacys');
   let PRIVACYS: Options[] = [];
   if (typeof privacysArray === 'object') {
@@ -129,6 +138,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [currency, setCurrency] = useState<string>(currencyContext);
   const [language, setLanguage] = useState<string>(languageContext);
   const [sendAll, setSendAll] = useState<boolean>(sendAllContext);
+  const [donation, setDonation] = useState<boolean>(donationContext);
   const [privacy, setPrivacy] = useState<boolean>(privacyContext);
   const [mode, setMode] = useState<string>(modeContext);
   // security checks box.
@@ -237,6 +247,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       currencyContext === currency &&
       languageContext === language &&
       sendAllContext === sendAll &&
+      donationContext === donation &&
       privacyContext === privacy &&
       modeContext === mode &&
       isEqual(securityContext, securityObject()) &&
@@ -330,6 +341,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     }
     if (sendAllContext !== sendAll) {
       await set_sendAll_option('sendAll', sendAll);
+    }
+    if (donationContext !== donation) {
+      await set_donation_option('donation', donation);
     }
     if (privacyContext !== privacy) {
       await set_privacy_option('privacy', privacy);
@@ -507,6 +521,20 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
         {modeContext !== 'basic' && (
           <>
+            <View style={{ display: 'flex', margin: 10 }}>
+              <BoldText>{translate('settings.donation-title') as string}</BoldText>
+            </View>
+
+            <View style={{ display: 'flex', marginLeft: 25 }}>
+              {optionsRadio(
+                DONATIONS,
+                setDonation as React.Dispatch<React.SetStateAction<string | boolean>>,
+                Boolean,
+                donation,
+                'donation',
+              )}
+            </View>
+
             <View style={{ display: 'flex', margin: 10 }}>
               <BoldText>{translate('settings.privacy-title') as string}</BoldText>
             </View>

@@ -119,6 +119,7 @@ describe('Component LoadingApp - test', () => {
       chain_name: 'main',
     };
     const sendAll = false;
+    const donation = false;
     const privacy = false;
     const mode = 'basic';
     const background: BackgroundType = {
@@ -151,6 +152,7 @@ describe('Component LoadingApp - test', () => {
         currency={currency}
         server={server}
         sendAll={sendAll}
+        donation={donation}
         privacy={privacy}
         mode={mode}
         background={background}

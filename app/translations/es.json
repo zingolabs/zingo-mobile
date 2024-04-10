@@ -193,6 +193,16 @@
         "text": "Desactiva el botón para enviar toda la cantidad porque puede ser un riesgo tenerlo activado."
       }
     ],
+    "donation": [
+      {
+        "value": true,
+        "text": "Envía un Zenny (0.01 ZEC) a Zingo en cada transacción de envío que realices."
+      },
+      {
+        "value": false,
+        "text": "No enviar ninguna donación a Zingo en tus transacciones de envío."
+      }
+    ],
     "privacys": [
       {
         "value": true,
@@ -239,6 +249,7 @@
     "language-title": "IDIOMA",
     "islanguage": "Necesitas escoger un Idioma para poder guardar.",
     "sendall-title": "EL BOTON 'Enviar todo'",
+    "donation-title": "Donaciones a los desarrolladores de Zingo",
     "privacy-title": "Cambiar entre Alta Privacidad o Normal",
     "mode-title": "Cambiar entre Modo Básico o Avanzado",
     "value-currency-": "Sin moneda",
@@ -248,6 +259,8 @@
     "value-language-pt": "Portugués",
     "value-sendall-true": "Activar",
     "value-sendall-false": "Desactivar",
+    "value-donation-true": "Si",
+    "value-donation-false": "No",
     "value-privacy-true": "Alta",
     "value-privacy-false": "Normal",
     "privacy": "Priv: ",

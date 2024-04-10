@@ -90,6 +90,7 @@ export default function LoadingApp(props: LoadingAppProps) {
   const [currency, setCurrency] = useState<'USD' | ''>('');
   const [server, setServer] = useState<ServerType>(SERVER_DEFAULT_0);
   const [sendAll, setSendAll] = useState<boolean>(false);
+  const [donation, setDonation] = useState<boolean>(false);
   const [privacy, setPrivacy] = useState<boolean>(false);
   const [mode, setMode] = useState<'basic' | 'advanced'>('advanced'); // by default advanced
   const [background, setBackground] = useState<BackgroundType>({ batches: 0, message: '', date: 0, dateEnd: 0 });
@@ -199,6 +200,11 @@ export default function LoadingApp(props: LoadingAppProps) {
       } else {
         await SettingsFileImpl.writeSettings('sendAll', sendAll);
       }
+      if (settings.donation === true || settings.donation === false) {
+        setDonation(settings.donation);
+      } else {
+        await SettingsFileImpl.writeSettings('donation', donation);
+      }
       if (settings.privacy === true || settings.privacy === false) {
         setPrivacy(settings.privacy);
       } else {
@@ -252,6 +258,7 @@ export default function LoadingApp(props: LoadingAppProps) {
         currency={currency}
         server={server}
         sendAll={sendAll}
+        donation={donation}
         privacy={privacy}
         mode={mode}
         background={background}
@@ -273,6 +280,7 @@ type LoadingAppClassProps = {
   currency: 'USD' | '';
   server: ServerType;
   sendAll: boolean;
+  donation: boolean;
   privacy: boolean;
   mode: 'basic' | 'advanced';
   background: BackgroundType;
@@ -310,6 +318,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
       language: props.language,
       currency: props.currency,
       sendAll: props.sendAll,
+      donation: props.donation,
       privacy: props.privacy,
       mode: props.mode,
       background: props.background,
