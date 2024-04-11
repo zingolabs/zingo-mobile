@@ -63,7 +63,7 @@ RCT_EXTERN_METHOD(getLatestBlock:
     (NSString)server 
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(getDeveloperDonationAddress:
+RCT_EXTERN_METHOD(getDonationAddress:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 

@@ -353,13 +353,13 @@ class RPCModule: NSObject {
       self.getLatestBlockAsync(dict)
   }
 
-  @objc(getDeveloperDonationAddress:reject:)
-  func getDeveloperDonationAddress(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+  @objc(getDonationAddress:reject:)
+  func getDonationAddress(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       let dict: [String: Any] = ["resolve": resolve]
-      self.getDeveloperDonationAddressAsync(dict)
+      self.getDonationAddressAsync(dict)
   }
 
-  func getDeveloperDonationAddressAsync(_ dict: [AnyHashable: Any]) {
+  func getDonationAddressAsync(_ dict: [AnyHashable: Any]) {
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
           let resp = getDeveloperDonationAddress()
           let respStr = String(resp)

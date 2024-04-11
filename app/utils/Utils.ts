@@ -97,7 +97,7 @@ export default class Utils {
     // donations only for mainnet.
     if (chain_name === 'main') {
       // UA -> we need a fresh one.
-      const ua: string = await RPCModule.getDeveloperDonationAddress();
+      const ua: string = await RPCModule.getDonationAddress();
       return ua;
     }
     return '';
