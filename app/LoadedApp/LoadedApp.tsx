@@ -748,40 +748,53 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
   };
 
   getSendManyJSON = async (): Promise<SendJsonToTypeType[]> => {
-    const { sendPageState, uaAddress } = this.state;
-    const json: Array<SendJsonToTypeType> = [sendPageState.toaddr].flatMap((to: ToAddrClass) => {
-      const memo = `${to.memo || ''}${to.includeUAMemo ? '\nReply to: \n' + uaAddress : ''}`;
-      const amount = parseInt((Number(to.amount) * 10 ** 8).toFixed(0), 10);
+    const { sendPageState, uaAddress, addresses, server } = this.state;
+    let sendToSelf: boolean = false;
+    let donationAddress: boolean = false;
+    const json: Promise<SendJsonToTypeType[][]> = Promise.all(
+      [sendPageState.toaddr].flatMap(async (to: ToAddrClass) => {
+        const memo = `${to.memo || ''}${to.includeUAMemo ? '\nReply to: \n' + uaAddress : ''}`;
+        const amount = parseInt((Number(to.amount) * 10 ** 8).toFixed(0), 10);
 
-      if (memo === '') {
-        return [{ address: to.to, amount } as SendJsonToTypeType];
-      } else if (memo.length <= 512) {
-        return [{ address: to.to, amount, memo } as SendJsonToTypeType];
-      } else {
-        // If the memo is more than 512 bytes, then we split it into multiple transactions.
-        // Each memo will be `(xx/yy)memo_part`. The prefix "(xx/yy)" is 7 bytes long, so
-        // we'll split the memo into 512-7 = 505 bytes length
-        const splits = Utils.utf16Split(memo, 505);
-        const tos = [];
+        const myAddress: AddressClass[] = addresses.filter((a: AddressClass) => a.address === to.to);
+        sendToSelf = myAddress.length >= 1;
 
-        // The first one contains all the tx value
-        tos.push({ address: to.to, amount, memo: `(1/${splits.length})${splits[0]}` } as SendJsonToTypeType);
+        donationAddress = to.to === (await Utils.getDonationAddress(server.chain_name));
 
-        for (let i = 1; i < splits.length; i++) {
-          tos.push({
-            address: to.to,
-            amount: 0,
-            memo: `(${i + 1}/${splits.length})${splits[i]}`,
-          } as SendJsonToTypeType);
+        if (memo === '') {
+          return [{ address: to.to, amount } as SendJsonToTypeType];
+        } else if (memo.length <= 512) {
+          return [{ address: to.to, amount, memo } as SendJsonToTypeType];
+        } else {
+          // If the memo is more than 512 bytes, then we split it into multiple transactions.
+          // Each memo will be `(xx/yy)memo_part`. The prefix "(xx/yy)" is 7 bytes long, so
+          // we'll split the memo into 512-7 = 505 bytes length
+          const splits = Utils.utf16Split(memo, 505);
+          const tos = [];
+
+          // The first one contains all the tx value
+          tos.push({ address: to.to, amount, memo: `(1/${splits.length})${splits[0]}` } as SendJsonToTypeType);
+
+          for (let i = 1; i < splits.length; i++) {
+            tos.push({
+              address: to.to,
+              amount: 0,
+              memo: `(${i + 1}/${splits.length})${splits[i]}`,
+            } as SendJsonToTypeType);
+          }
+
+          return tos;
         }
-
-        return tos;
-      }
-    });
+      }),
+    );
+    const jsonFlat: SendJsonToTypeType[] = (await json).flat();
 
     const donationTransaction: SendJsonToTypeType[] = [];
 
-    if (this.state.donation && this.state.server.chain_name === 'main') {
+    // we need to exclude 2 use cases:
+    // 1. send to self (make no sense to do a donation here)
+    // 2. send to donation UA (make no sense to do a double donation)
+    if (this.state.donation && this.state.server.chain_name === 'main' && !sendToSelf && !donationAddress) {
       donationTransaction.push({
         address: await Utils.getDonationAddress(this.state.server.chain_name),
         amount: parseInt((Number(Utils.getDefaultDonationAmount()) * 10 ** 8).toFixed(0), 10),
@@ -794,7 +807,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     //console.log(json);
     //console.log(donationTransaction);
 
-    return [...json, ...donationTransaction];
+    return [...jsonFlat, ...donationTransaction];
   };
 
   sendTransaction = async (setSendProgress: (arg0: SendProgressClass) => void): Promise<String> => {

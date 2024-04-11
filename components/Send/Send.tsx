@@ -23,7 +23,13 @@ import RegText from '../Components/RegText';
 import ZecAmount from '../Components/ZecAmount';
 import CurrencyAmount from '../Components/CurrencyAmount';
 import Button from '../Components/Button';
-import { AddressBookFileClass, SendPageStateClass, SendProgressClass, ToAddrClass } from '../../app/AppState';
+import {
+  AddressBookFileClass,
+  AddressClass,
+  SendPageStateClass,
+  SendProgressClass,
+  ToAddrClass,
+} from '../../app/AppState';
 import { parseZcashURI, ZcashURITargetClass } from '../../app/uris';
 import RPCModule from '../../app/RPCModule';
 import Utils from '../../app/utils';
@@ -91,6 +97,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     addressBook,
     language,
     donation,
+    addresses,
   } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
@@ -112,6 +119,8 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [showShieldInfo, setShowShieldInfo] = useState<boolean>(false);
   const [showUpgradeInfo, setShowUpgradeInfo] = useState<boolean>(false);
   const [updatingToField, setUpdatingToField] = useState<boolean>(false);
+  const [sendToSelf, setSendToSelf] = useState<boolean>(false);
+  const [donationAddress, setDonationAddress] = useState<boolean>(false);
   const isFocused = useIsFocused();
 
   const slideAnim = useSharedValue(0);
@@ -331,6 +340,20 @@ const Send: React.FunctionComponent<SendProps> = ({
     })();
   }, [isFocused]);
 
+  useEffect(() => {
+    const address = sendPageState.toaddr.to;
+    if (address) {
+      (async () => {
+        const myAddress: AddressClass[] = addresses.filter((a: AddressClass) => a.address === address);
+        const sendToS = myAddress.length >= 1;
+
+        const donationA = address === (await Utils.getDonationAddress(server.chain_name));
+        setSendToSelf(sendToS);
+        setDonationAddress(donationA);
+      })();
+    }
+  }, [addresses, sendPageState.toaddr.to, server.chain_name]);
+
   const showAlertAsync = (): Promise<void> => {
     return new Promise((resolve, reject) => {
       Alert.alert(
@@ -531,7 +554,11 @@ const Send: React.FunctionComponent<SendProps> = ({
         onRequestClose={() => setConfirmModalVisible(false)}>
         <Confirm
           defaultFee={fee}
-          donationAmount={donation ? Number(Utils.getDefaultDonationAmount()) : 0}
+          donationAmount={
+            donation && server.chain_name === 'main' && !sendToSelf && !donationAddress
+              ? Number(Utils.getDefaultDonationAmount())
+              : 0
+          }
           closeModal={() => {
             setConfirmModalVisible(false);
           }}
