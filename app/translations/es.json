@@ -421,7 +421,8 @@
     "amountrevealed": "Monto Revelado",
     "deshielded": "Desblindada",
     "lose-address-title": "SELECCIONAR UNA NUEVA DIRECCIÓN",
-    "lose-address-alert": "Ya tienes una dirección válida en el campo de dirección. ¿Desea sustituirla?"
+    "lose-address-alert": "Ya tienes una dirección válida en el campo de dirección. ¿Desea sustituirla?",
+    "confirm-donation": "Donación a Zingo"
   },
   "receive": {
     "u-title": "Dirección Unificada",
@@ -619,5 +620,6 @@
     "oneentry": "URI Debería tener al menos una entrada",
     "parseerror": "En este momento no es posible verificar la dirección en el Servidor"
   },
-  "donation-button": "Donar a Zingo "
+  "donation-button": "Donar a Zingo ",
+  "donation-legend": "Estás donando a Zingo activamente, Gracias"
 }

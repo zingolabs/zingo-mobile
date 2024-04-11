@@ -25,6 +25,7 @@ import RPC from '../../../app/rpc';
 
 type ConfirmProps = {
   defaultFee: number;
+  donationAmount: number;
   closeModal: () => void;
   openModal: () => void;
   confirmSend: () => void;
@@ -34,6 +35,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   closeModal,
   confirmSend,
   defaultFee,
+  donationAmount,
   sendAllAmount,
   openModal,
 }) => {
@@ -192,9 +194,9 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   };
 
   useEffect(() => {
-    const sendingTot = Number(sendPageState.toaddr.amount) + defaultFee;
+    const sendingTot = Number(sendPageState.toaddr.amount) + defaultFee + donationAmount;
     setSendingTotal(sendingTot);
-  }, [defaultFee, sendPageState.toaddr.amount]);
+  }, [defaultFee, donationAmount, sendPageState.toaddr.amount]);
 
   useEffect(() => {
     (async () => {
@@ -291,6 +293,32 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
             <View key={to.id} style={{ margin: 10 }}>
               <FadeText>{translate('send.to') as string}</FadeText>
               <AddressItem address={to.to} withIcon={true} closeModal={closeModal} openModal={openModal} />
+
+              {donationAmount > 0 && (
+                <>
+                  <FadeText style={{ marginTop: 10 }}>{translate('send.confirm-donation') as string}</FadeText>
+                  <View
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                    }}>
+                    <ZecAmount
+                      currencyName={info.currencyName ? info.currencyName : ''}
+                      size={18}
+                      amtZec={donationAmount}
+                      privacy={privacy}
+                    />
+                    <CurrencyAmount
+                      style={{ fontSize: 18 }}
+                      amtZec={donationAmount}
+                      price={zecPrice.zecPrice}
+                      currency={currency}
+                      privacy={privacy}
+                    />
+                  </View>
+                </>
+              )}
 
               <FadeText style={{ marginTop: 10 }}>{translate('send.confirm-amount') as string}</FadeText>
               <View

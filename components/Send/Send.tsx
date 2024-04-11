@@ -90,6 +90,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     someUnconfirmed,
     addressBook,
     language,
+    donation,
   } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
@@ -120,7 +121,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     const defaultFee = info.defaultFee || Utils.getFallbackDefaultFee();
     // transparent is not spendable.
     const spend = totalBalance.spendablePrivate + totalBalance.spendableOrchard;
-    const max = spendable - defaultFee;
+    const max = spend - defaultFee - (donation ? Number(Utils.getDefaultDonationAmount()) : 0);
     if (max > 0) {
       setMaxAmount(max);
     }
@@ -134,15 +135,16 @@ const Send: React.FunctionComponent<SendProps> = ({
     const showShield =
       totalBalance &&
       (someUnconfirmed ? 0 : totalBalance.transparentBal) > 0 &&
-      (someUnconfirmed ? 0 : totalBalance.transparentBal) + totalBalance.spendablePrivate > info.defaultFee;
+      (someUnconfirmed ? 0 : totalBalance.transparentBal) + totalBalance.spendablePrivate > defaultFee;
     const showUpgrade =
       totalBalance &&
       (someUnconfirmed ? 0 : totalBalance.transparentBal) === 0 &&
-      totalBalance.spendablePrivate > info.defaultFee;
+      totalBalance.spendablePrivate > defaultFee;
     setStillConfirming(stillConf);
     setShowShieldInfo(showShield);
     setShowUpgradeInfo(showUpgrade);
   }, [
+    donation,
     info.defaultFee,
     someUnconfirmed,
     spendable,
@@ -244,7 +246,9 @@ const Send: React.FunctionComponent<SendProps> = ({
           setValidAmount(-1); // invalid number
         } else {
           if (
-            Utils.parseLocaleFloat(Number(spendable).toFixed(8)) >= Utils.parseLocaleFloat(Number(fee).toFixed(8)) &&
+            Utils.parseLocaleFloat(Number(spendable).toFixed(8)) >=
+              Utils.parseLocaleFloat(Number(fee).toFixed(8)) +
+                (donation ? Number(Utils.getDefaultDonationAmount()) : 0) &&
             Utils.parseLocaleFloat(Number(to.amount).toFixed(8)) >= 0 &&
             Utils.parseLocaleFloat(Number(to.amount).toFixed(8)) <= Utils.parseLocaleFloat(maxAmount.toFixed(8))
           ) {
@@ -258,6 +262,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       }
     }
   }, [
+    donation,
     decimalSeparator,
     server.chain_name,
     netInfo.isConnected,
@@ -526,6 +531,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         onRequestClose={() => setConfirmModalVisible(false)}>
         <Confirm
           defaultFee={fee}
+          donationAmount={donation ? Number(Utils.getDefaultDonationAmount()) : 0}
           closeModal={() => {
             setConfirmModalVisible(false);
           }}
@@ -1130,14 +1136,41 @@ const Send: React.FunctionComponent<SendProps> = ({
               />
             </View>
             {server.chain_name === 'main' && (
-              <TouchableOpacity
-                onPress={async () => {
-                  if (
-                    sendPageState.toaddr.to &&
-                    sendPageState.toaddr.to !== (await Utils.getDonationAddress(server.chain_name))
-                  ) {
-                    await showAlertAsync()
-                      .then(async () => {
+              <>
+                {donation ? (
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      paddingHorizontal: 4,
+                      paddingBottom: 2,
+                      borderWidth: 1,
+                      borderColor: colors.primary,
+                      borderRadius: 5,
+                    }}>
+                    <Text style={{ fontSize: 13, color: colors.border }}>{translate('donation-legend') as string}</Text>
+                  </View>
+                ) : (
+                  <TouchableOpacity
+                    onPress={async () => {
+                      if (
+                        sendPageState.toaddr.to &&
+                        sendPageState.toaddr.to !== (await Utils.getDonationAddress(server.chain_name))
+                      ) {
+                        await showAlertAsync()
+                          .then(async () => {
+                            // fill the fields in the screen with the donation data
+                            updateToField(
+                              await Utils.getDonationAddress(server.chain_name),
+                              Utils.getDefaultDonationAmount(),
+                              null,
+                              Utils.getDefaultDonationMemo(translate),
+                              true,
+                            );
+                          })
+                          .catch(() => {});
+                      } else {
                         // fill the fields in the screen with the donation data
                         updateToField(
                           await Utils.getDonationAddress(server.chain_name),
@@ -1146,39 +1179,32 @@ const Send: React.FunctionComponent<SendProps> = ({
                           Utils.getDefaultDonationMemo(translate),
                           true,
                         );
-                      })
-                      .catch(() => {});
-                  } else {
-                    // fill the fields in the screen with the donation data
-                    updateToField(
-                      await Utils.getDonationAddress(server.chain_name),
-                      Utils.getDefaultDonationAmount(),
-                      null,
-                      Utils.getDefaultDonationMemo(translate),
-                      true,
-                    );
-                  }
-                }}>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    paddingHorizontal: 4,
-                    paddingBottom: 2,
-                    borderWidth: 1,
-                    borderColor: colors.primary,
-                    borderRadius: 5,
-                  }}>
-                  <Text style={{ fontSize: 13, color: colors.border }}>{translate('donation-button') as string}</Text>
-                  <FontAwesomeIcon
-                    style={{ marginTop: 3 }}
-                    size={20}
-                    icon={faMoneyCheckDollar}
-                    color={colors.primary}
-                  />
-                </View>
-              </TouchableOpacity>
+                      }
+                    }}>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        paddingHorizontal: 4,
+                        paddingBottom: 2,
+                        borderWidth: 1,
+                        borderColor: colors.primary,
+                        borderRadius: 5,
+                      }}>
+                      <Text style={{ fontSize: 13, color: colors.border }}>
+                        {translate('donation-button') as string}
+                      </Text>
+                      <FontAwesomeIcon
+                        style={{ marginTop: 3 }}
+                        size={20}
+                        icon={faMoneyCheckDollar}
+                        color={colors.primary}
+                      />
+                    </View>
+                  </TouchableOpacity>
+                )}
+              </>
             )}
           </View>
         </View>

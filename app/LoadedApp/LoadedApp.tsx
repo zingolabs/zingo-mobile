@@ -747,7 +747,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     }
   };
 
-  getSendManyJSON = (): Array<SendJsonToTypeType> => {
+  getSendManyJSON = async (): Promise<SendJsonToTypeType[]> => {
     const { sendPageState, uaAddress } = this.state;
     const json: Array<SendJsonToTypeType> = [sendPageState.toaddr].flatMap((to: ToAddrClass) => {
       const memo = `${to.memo || ''}${to.includeUAMemo ? '\nReply to: \n' + uaAddress : ''}`;
@@ -779,16 +779,28 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       }
     });
 
+    const donationTransaction: SendJsonToTypeType[] = [];
+
+    if (this.state.donation && this.state.server.chain_name === 'main') {
+      donationTransaction.push({
+        address: await Utils.getDonationAddress(this.state.server.chain_name),
+        amount: parseInt((Number(Utils.getDefaultDonationAmount()) * 10 ** 8).toFixed(0), 10),
+        memo:
+          Utils.getDefaultDonationMemo(this.state.translate) + '\n' + this.state.translate('settings.donation-title'),
+      });
+    }
+
     //console.log('Sending:');
     //console.log(json);
+    //console.log(donationTransaction);
 
-    return json;
+    return [...json, ...donationTransaction];
   };
 
   sendTransaction = async (setSendProgress: (arg0: SendProgressClass) => void): Promise<String> => {
     try {
       // Construct a sendJson from the sendPage state
-      const sendJson = this.getSendManyJSON();
+      const sendJson = await this.getSendManyJSON();
       const txid = await this.rpc.sendTransaction(sendJson, setSendProgress);
 
       return txid;

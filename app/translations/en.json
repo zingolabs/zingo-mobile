@@ -422,7 +422,8 @@
     "amountrevealed": "Amount Revealed",
     "deshielded": "Deshielded",
     "lose-address-title": "SELECT A NEW ADDRESS",
-    "lose-address-alert": "You already have a valid address in the address field. Do you want to replace it?"
+    "lose-address-alert": "You already have a valid address in the address field. Do you want to replace it?",
+    "confirm-donation": "Donation to Zingo"
   },
   "receive": {
     "u-title": "Unified Address",
@@ -620,5 +621,6 @@
     "oneentry": "URI Should have at least 1 entry",
     "parseerror": "Right now it is not possible to verify the address with the server"
   },
-  "donation-button": "Donate To Zingo "
+  "donation-button": "Donate To Zingo ",
+  "donation-legend": "You are donating to Zingo activately, Thanks"
 }

@@ -421,7 +421,8 @@
     "amountrevealed": "Quantia Revelada",
     "deshielded": "Desblindada",
     "lose-address-title": "SELECIONE UM NOVO ENDEREÇO",
-    "lose-address-alert": "Você já possui um endereço válido no campo de endereço. Deseja substituí-lo?"
+    "lose-address-alert": "Você já possui um endereço válido no campo de endereço. Deseja substituí-lo?",
+    "confirm-donation": "Doação para Zingo"
   },
   "receive": {
     "u-title": "Endereço Unificado",
@@ -619,5 +620,6 @@
     "oneentry": "RI deve ter pelo menos 1 entrada",
     "parseerror": "nesse momento não é possível verificar o endereço com o servidor"
   },
-  "donation-button": "Doar para Zingo "
+  "donation-button": "Doar para Zingo ",
+  "donation-legend": "Você está doando para Zingo ativamente, Obrigado"
 }
