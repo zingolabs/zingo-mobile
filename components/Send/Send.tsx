@@ -121,6 +121,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [updatingToField, setUpdatingToField] = useState<boolean>(false);
   const [sendToSelf, setSendToSelf] = useState<boolean>(false);
   const [donationAddress, setDonationAddress] = useState<boolean>(false);
+  const [negativeMaxAount, setNegativeMaxAount] = useState<boolean>(false);
   const isFocused = useIsFocused();
 
   const slideAnim = useSharedValue(0);
@@ -131,8 +132,12 @@ const Send: React.FunctionComponent<SendProps> = ({
     // transparent is not spendable.
     const spend = totalBalance.spendablePrivate + totalBalance.spendableOrchard;
     const max = spend - defaultFee - (donation ? Number(Utils.getDefaultDonationAmount()) : 0);
-    if (max > 0) {
+    if (max >= 0) {
+      // if max is 0 then the user can send a memo with amount 0.
       setMaxAmount(max);
+    } else {
+      // if max is less than 0 then the user CANNOT send anything.
+      setNegativeMaxAount(true);
     }
     setFee(defaultFee);
     setSpendable(spend);
@@ -156,7 +161,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     donation,
     info.defaultFee,
     someUnconfirmed,
-    spendable,
     totalBalance,
     totalBalance.spendableOrchard,
     totalBalance.spendablePrivate,
@@ -860,12 +864,43 @@ const Send: React.FunctionComponent<SendProps> = ({
                         <RegText style={{ fontSize: 14 }}>{translate('send.spendable') as string}</RegText>
                         <ZecAmount
                           currencyName={info.currencyName ? info.currencyName : ''}
-                          color={stillConfirming ? 'red' : colors.money}
+                          color={stillConfirming || negativeMaxAount ? 'red' : colors.money}
                           size={15}
                           amtZec={maxAmount}
                           privacy={privacy}
                         />
                       </View>
+                      {negativeMaxAount && (
+                        <TouchableOpacity onPress={() => poolsMoreInfoOnClick()}>
+                          <View
+                            style={{
+                              display: 'flex',
+                              flexDirection: 'row',
+                              marginTop: 5,
+                              backgroundColor: colors.card,
+                              padding: 5,
+                              borderRadius: 10,
+                            }}>
+                            <FontAwesomeIcon
+                              icon={faInfoCircle}
+                              size={20}
+                              color={colors.primary}
+                              style={{ marginRight: 5 }}
+                            />
+                            <FadeText>{'( '}</FadeText>
+                            {donation && (
+                              <FadeText>
+                                {(translate('send.confirm-donation') as string) +
+                                  ': ' +
+                                  Utils.getDefaultDonationAmount() +
+                                  ', '}
+                              </FadeText>
+                            )}
+                            {!!fee && <FadeText>{(translate('send.fee') as string) + ': ' + fee.toString()}</FadeText>}
+                            <FadeText>{' )'}</FadeText>
+                          </View>
+                        </TouchableOpacity>
+                      )}
                       {stillConfirming && (
                         <TouchableOpacity onPress={() => poolsMoreInfoOnClick()}>
                           <View
@@ -1127,6 +1162,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                 title={
                   validAmount === 1 &&
                   sendPageState.toaddr.amount &&
+                  mode !== 'basic' &&
                   Number(sendPageState.toaddr.amount) === Utils.parseLocaleFloat(maxAmount.toFixed(8))
                     ? (translate('send.button-all') as string)
                     : (translate('send.button') as string)
