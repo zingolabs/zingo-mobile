@@ -48,21 +48,21 @@ const basicTheme: ThemeType = {
 const Stack = createStackNavigator();
 
 type AppProps = {
-  granted: boolean;
+  notificationPermission: boolean;
 };
 
-const App: React.FunctionComponent<AppProps> = ({ granted }) => {
+const App: React.FunctionComponent<AppProps> = ({ notificationPermission }) => {
   const [theme, setTheme] = useState<ThemeType>(advancedTheme);
 
   useEffect(() => {
-    if (granted) {
+    if (notificationPermission) {
       const unsubscribe = messaging().onMessage(async (remoteMessage: FirebaseMessagingTypes.RemoteMessage) => {
         Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
       });
 
       return unsubscribe;
     }
-  }, [granted]);
+  }, [notificationPermission]);
 
   const toggleTheme = (mode: 'basic' | 'advanced') => {
     setTheme(mode === 'advanced' ? advancedTheme : basicTheme);
