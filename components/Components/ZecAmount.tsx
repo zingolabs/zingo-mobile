@@ -128,7 +128,7 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
                 margin: 0,
                 padding: 0,
               }}>
-              {' ' + Utils.toLocaleFloat(splits.bigPart)}
+              {' ' + splits.bigPart}
             </Text>
           )}
           {splits.smallPart !== '0000' && !privacyHigh && (

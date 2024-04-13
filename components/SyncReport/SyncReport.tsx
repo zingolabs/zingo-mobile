@@ -18,6 +18,7 @@ import { NetInfoStateType } from '@react-native-community/netinfo';
 import RegText from '../Components/RegText';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCloudDownload } from '@fortawesome/free-solid-svg-icons';
+import Utils from '../../app/utils';
 
 type SyncReportProps = {
   closeModal: () => void;
@@ -228,7 +229,6 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
   //console.log('wallet', wallet_old_synced, wallet_new_synced, wallet_for_synced);
   //console.log('wallet %', wallet_old_synced_percent, wallet_new_synced_percent, wallet_for_synced_percent);
   //console.log(maxBlocks, labels, points);
-  //console.log('report', background.batches, background.date, Number(background.date).toFixed(0));
 
   //console.log('render sync report - 5', syncingStatus);
 
@@ -579,7 +579,10 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
                         }}
                       />
                       <Text style={{ color: colors.text }}>
-                        {wallet_1 + (translate('report.blocks') as string) + wallet_old_synced_percent.toFixed(2) + '%'}
+                        {wallet_1 +
+                          (translate('report.blocks') as string) +
+                          Utils.parseNumberFloatToStringLocale(wallet_old_synced_percent, 2) +
+                          '%'}
                       </Text>
                     </View>
                   )}
@@ -606,7 +609,10 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
                         }}
                       />
                       <Text testID="syncreport.syncednow" style={{ color: colors.text }}>
-                        {wallet_2 + (translate('report.blocks') as string) + wallet_new_synced_percent.toFixed(2) + '%'}
+                        {wallet_2 +
+                          (translate('report.blocks') as string) +
+                          Utils.parseNumberFloatToStringLocale(wallet_new_synced_percent, 2) +
+                          '%'}
                       </Text>
                     </View>
                   )}
@@ -633,7 +639,10 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
                         }}
                       />
                       <Text testID="syncreport.notyetsynced" style={{ color: colors.text }}>
-                        {wallet_3 + (translate('report.blocks') as string) + wallet_for_synced_percent.toFixed(2) + '%'}
+                        {wallet_3 +
+                          (translate('report.blocks') as string) +
+                          Utils.parseNumberFloatToStringLocale(wallet_for_synced_percent, 2) +
+                          '%'}
                       </Text>
                     </View>
                   )}

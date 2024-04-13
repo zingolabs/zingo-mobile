@@ -22,6 +22,7 @@ import 'moment/locale/ru';
 
 import { ThemeType } from '../../../app/types';
 import RPC from '../../../app/rpc';
+import Utils from '../../../app/utils';
 
 type ConfirmProps = {
   defaultFee: number;
@@ -69,14 +70,21 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
 
     let from: 'orchard' | 'orchard+sapling' | 'sapling' | '' = '';
     // amount + fee
-    if (Number(sendPageState.toaddr.amount) + defaultFee <= totalBalance.spendableOrchard) {
+    if (
+      Utils.parseStringLocaletoNumberFloat(sendPageState.toaddr.amount) + defaultFee <=
+      totalBalance.spendableOrchard
+    ) {
       from = 'orchard';
     } else if (
       totalBalance.spendableOrchard > 0 &&
-      Number(sendPageState.toaddr.amount) + defaultFee <= totalBalance.spendableOrchard + totalBalance.spendablePrivate
+      Utils.parseStringLocaletoNumberFloat(sendPageState.toaddr.amount) + defaultFee <=
+        totalBalance.spendableOrchard + totalBalance.spendablePrivate
     ) {
       from = 'orchard+sapling';
-    } else if (Number(sendPageState.toaddr.amount) + defaultFee <= totalBalance.spendablePrivate) {
+    } else if (
+      Utils.parseStringLocaletoNumberFloat(sendPageState.toaddr.amount) + defaultFee <=
+      totalBalance.spendablePrivate
+    ) {
       from = 'sapling';
     }
 
@@ -194,7 +202,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   };
 
   useEffect(() => {
-    const sendingTot = Number(sendPageState.toaddr.amount) + defaultFee + donationAmount;
+    const sendingTot = Utils.parseStringLocaletoNumberFloat(sendPageState.toaddr.amount) + defaultFee + donationAmount;
     setSendingTotal(sendingTot);
   }, [defaultFee, donationAmount, sendPageState.toaddr.amount]);
 
@@ -330,12 +338,12 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                 <ZecAmount
                   currencyName={info.currencyName ? info.currencyName : ''}
                   size={18}
-                  amtZec={Number(to.amount)}
+                  amtZec={Utils.parseStringLocaletoNumberFloat(to.amount)}
                   privacy={privacy}
                 />
                 <CurrencyAmount
                   style={{ fontSize: 18 }}
-                  amtZec={Number(to.amount)}
+                  amtZec={Utils.parseStringLocaletoNumberFloat(to.amount)}
                   price={zecPrice.zecPrice}
                   currency={currency}
                   privacy={privacy}

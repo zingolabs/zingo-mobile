@@ -547,7 +547,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
           const to = new ToAddrClass(Utils.getNextToAddrID());
 
           to.to = tgt.address || '';
-          to.amount = Utils.maxPrecisionTrimmed(tgt.amount || 0);
+          to.amount = Utils.parseNumberFloatToStringLocale(tgt.amount || 0, 8);
           to.memo = tgt.memoString || '';
 
           uriToAddr = to;
@@ -754,7 +754,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     const json: Promise<SendJsonToTypeType[][]> = Promise.all(
       [sendPageState.toaddr].flatMap(async (to: ToAddrClass) => {
         const memo = `${to.memo || ''}${to.includeUAMemo ? '\nReply to: \n' + uaAddress : ''}`;
-        const amount = parseInt((Number(to.amount) * 10 ** 8).toFixed(0), 10);
+        const amount = parseInt((Utils.parseStringLocaletoNumberFloat(to.amount) * 10 ** 8).toFixed(0), 10);
 
         const myAddress: AddressClass[] = addresses.filter((a: AddressClass) => a.address === to.to);
         sendToSelf = myAddress.length >= 1;
@@ -797,15 +797,18 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     if (this.state.donation && this.state.server.chain_name === 'main' && !sendToSelf && !donationAddress) {
       donationTransaction.push({
         address: await Utils.getDonationAddress(this.state.server.chain_name),
-        amount: parseInt((Number(Utils.getDefaultDonationAmount()) * 10 ** 8).toFixed(0), 10),
+        amount: parseInt(
+          (Utils.parseStringLocaletoNumberFloat(Utils.getDefaultDonationAmount()) * 10 ** 8).toFixed(0),
+          10,
+        ),
         memo:
           Utils.getDefaultDonationMemo(this.state.translate) + '\n' + this.state.translate('settings.donation-title'),
       });
     }
 
-    //console.log('Sending:');
-    //console.log(json);
-    //console.log(donationTransaction);
+    console.log('Sending:');
+    console.log(jsonFlat);
+    console.log(donationTransaction);
 
     return [...jsonFlat, ...donationTransaction];
   };

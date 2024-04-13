@@ -36,6 +36,7 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
+import Utils from '../../app/utils';
 
 type HeaderProps = {
   poolsMoreInfoOnClick?: () => void;
@@ -137,15 +138,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       currentBl = syncingStatus.currentBlock;
       lastBlockSe = syncingStatus.lastBlockServer;
     }
-    /*
-    let percent = ((currentBlock * 100) / lastBlockServer).toFixed(2);
-    if (Number(percent) < 0) {
-      percent = '0.00';
-    }
-    if (Number(percent) >= 100) {
-      percent = '99.99';
-    }
-    */
     let blocksRe = lastBlockSe - currentBl;
     // just in case, this value is weird...
     // if the syncing is still inProgress and this value is cero -> it is better for UX to see 1.
@@ -663,24 +655,31 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             ) as string) +
               ` ${
                 poolsToShield === 'sapling' && totalBalance.spendablePrivate > info.defaultFee
-                  ? (totalBalance.spendablePrivate - info.defaultFee).toFixed(8)
+                  ? Utils.parseNumberFloatToStringLocale(totalBalance.spendablePrivate - info.defaultFee, 8)
                   : poolsToShield === 'transparent' &&
                     (someUnconfirmed ? 0 : totalBalance.transparentBal) > info.defaultFee
-                  ? ((someUnconfirmed ? 0 : totalBalance.transparentBal) - info.defaultFee).toFixed(8)
+                  ? Utils.parseNumberFloatToStringLocale(
+                      (someUnconfirmed ? 0 : totalBalance.transparentBal) - info.defaultFee,
+                      8,
+                    )
                   : poolsToShieldSelectSapling &&
                     poolsToShieldSelectTransparent &&
                     totalBalance.spendablePrivate + (someUnconfirmed ? 0 : totalBalance.transparentBal) >
                       info.defaultFee
-                  ? (
+                  ? Utils.parseNumberFloatToStringLocale(
                       totalBalance.spendablePrivate +
-                      (someUnconfirmed ? 0 : totalBalance.transparentBal) -
-                      info.defaultFee
-                    ).toFixed(8)
+                        (someUnconfirmed ? 0 : totalBalance.transparentBal) -
+                        info.defaultFee,
+                      8,
+                    )
                   : poolsToShieldSelectSapling && totalBalance.spendablePrivate > info.defaultFee
-                  ? (totalBalance.spendablePrivate - info.defaultFee).toFixed(8)
+                  ? Utils.parseNumberFloatToStringLocale(totalBalance.spendablePrivate - info.defaultFee, 8)
                   : poolsToShieldSelectTransparent &&
                     (someUnconfirmed ? 0 : totalBalance.transparentBal) > info.defaultFee
-                  ? ((someUnconfirmed ? 0 : totalBalance.transparentBal) - info.defaultFee).toFixed(8)
+                  ? Utils.parseNumberFloatToStringLocale(
+                      (someUnconfirmed ? 0 : totalBalance.transparentBal) - info.defaultFee,
+                      8,
+                    )
                   : 0
               }`}
           </FadeText>

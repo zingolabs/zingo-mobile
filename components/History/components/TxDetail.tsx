@@ -214,7 +214,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
             if (memoTotal.includes('\nReply to: \n')) {
               let memoArray = memoTotal.split('\nReply to: \n');
               const memoPoped = memoArray.pop();
-              memoUA = memoPoped ? memoPoped.toString() : '';
+              memoUA = memoPoped ? memoPoped : '';
               memo = memoArray.join('');
             } else {
               memo = memoTotal;

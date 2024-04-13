@@ -4,8 +4,8 @@ import { Text, View, TextStyle, TouchableOpacity } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { getNumberFormatSettings } from 'react-native-localize';
 
-import Utils from '../../app/utils';
 import { ThemeType } from '../../app/types';
+import Utils from '../../app/utils';
 
 type CurrencyAmountProps = {
   price?: number;
@@ -20,6 +20,7 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({ price, s
   const [currencyString, setCurrencyString] = useState<string>('');
   const { colors } = useTheme() as unknown as ThemeType;
   const { decimalSeparator } = getNumberFormatSettings();
+  const zeroString = '0';
 
   useEffect(() => {
     setPrivacyHigh(privacy || false);
@@ -38,9 +39,9 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({ price, s
       currencyStr = '-' + decimalSeparator + '--';
     } else {
       const currencyAmo = price * amtZec;
-      currencyStr = currencyAmo.toFixed(2);
-      if (currencyStr === '0.00' && amtZec > 0) {
-        currencyStr = '< 0.01';
+      currencyStr = Utils.parseNumberFloatToStringLocale(currencyAmo, 2);
+      if (currencyStr === zeroString && amtZec > 0) {
+        currencyStr = '< 0' + decimalSeparator + '01';
       }
     }
     setCurrencyString(currencyStr);
@@ -63,7 +64,7 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({ price, s
               </Text>
             ) : (
               <Text style={{ color: colors.money, fontSize: 20, fontWeight: '700', ...style }}>
-                {' ' + Utils.toLocaleFloat(currencyString)}
+                {' ' + currencyString}
               </Text>
             )}
           </View>

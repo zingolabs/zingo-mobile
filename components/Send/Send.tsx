@@ -131,7 +131,8 @@ const Send: React.FunctionComponent<SendProps> = ({
     const defaultFee = info.defaultFee || Utils.getFallbackDefaultFee();
     // transparent is not spendable.
     const spend = totalBalance.spendablePrivate + totalBalance.spendableOrchard;
-    const max = spend - defaultFee - (donation ? Number(Utils.getDefaultDonationAmount()) : 0);
+    const max =
+      spend - defaultFee - (donation ? Utils.parseStringLocaletoNumberFloat(Utils.getDefaultDonationAmount()) : 0);
     if (max >= 0) {
       // if max is 0 then the user can send a memo with amount 0.
       setMaxAmount(max);
@@ -243,27 +244,25 @@ const Send: React.FunctionComponent<SendProps> = ({
       setValidAddress(0);
     }
 
-    to.amount = to.amount.replace(decimalSeparator, '.');
-    to.amountCurrency = to.amountCurrency.replace(decimalSeparator, '.');
-
     let invalid = false;
     if (to.amountCurrency !== '') {
-      if (isNaN(Number(to.amountCurrency))) {
+      if (isNaN(Utils.parseStringLocaletoNumberFloat(to.amountCurrency))) {
         setValidAmount(-1); // invalid number
         invalid = true;
       }
     }
     if (!invalid) {
       if (to.amount !== '') {
-        if (isNaN(Number(to.amount))) {
+        if (isNaN(Utils.parseStringLocaletoNumberFloat(to.amount))) {
           setValidAmount(-1); // invalid number
         } else {
           if (
-            Utils.parseLocaleFloat(Number(spendable).toFixed(8)) >=
-              Utils.parseLocaleFloat(Number(fee).toFixed(8)) +
-                (donation ? Number(Utils.getDefaultDonationAmount()) : 0) &&
-            Utils.parseLocaleFloat(Number(to.amount).toFixed(8)) >= 0 &&
-            Utils.parseLocaleFloat(Number(to.amount).toFixed(8)) <= Utils.parseLocaleFloat(maxAmount.toFixed(8))
+            Utils.parseStringLocaletoNumberFloat(spendable.toFixed(8)) >=
+              Utils.parseStringLocaletoNumberFloat(fee.toFixed(8)) +
+                (donation ? Utils.parseStringLocaletoNumberFloat(Utils.getDefaultDonationAmount()) : 0) &&
+            Utils.parseStringLocaletoNumberFloat(to.amount) >= 0 &&
+            Utils.parseStringLocaletoNumberFloat(to.amount) <=
+              Utils.parseStringLocaletoNumberFloat(maxAmount.toFixed(8))
           ) {
             setValidAmount(1); // valid
           } else {
@@ -404,7 +403,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           // redo the to addresses
           [target].forEach(tgt => {
             toAddr.to = tgt.address || '';
-            toAddr.amount = Utils.maxPrecisionTrimmed(tgt.amount || 0);
+            toAddr.amount = Utils.parseNumberFloatToStringLocale(tgt.amount || 0, 8);
             toAddr.memo = tgt.memoString || '';
           });
         } else {
@@ -418,27 +417,35 @@ const Send: React.FunctionComponent<SendProps> = ({
     }
 
     if (amount !== null) {
-      toAddr.amount = amount.replace(decimalSeparator, '.').substring(0, 20);
-      if (isNaN(Number(toAddr.amount))) {
+      console.log('update field', amount);
+      toAddr.amount = amount.substring(0, 20);
+      if (isNaN(Utils.parseStringLocaletoNumberFloat(toAddr.amount))) {
         toAddr.amountCurrency = '';
       } else if (toAddr.amount && zecPrice && zecPrice.zecPrice > 0) {
-        toAddr.amountCurrency = Utils.toLocaleFloat((parseFloat(toAddr.amount) * zecPrice.zecPrice).toFixed(2));
+        toAddr.amountCurrency = Utils.parseNumberFloatToStringLocale(
+          Utils.parseStringLocaletoNumberFloat(toAddr.amount) * zecPrice.zecPrice,
+          2,
+        );
       } else {
         toAddr.amountCurrency = '';
       }
-      toAddr.amount = toAddr.amount.replace('.', decimalSeparator);
+      console.log('update field 2', toAddr.amount, toAddr.amountCurrency);
     }
 
     if (amountCurrency !== null) {
-      toAddr.amountCurrency = amountCurrency.replace(decimalSeparator, '.').substring(0, 15);
-      if (isNaN(Number(toAddr.amountCurrency))) {
+      console.log('update field', amountCurrency);
+      toAddr.amountCurrency = amountCurrency.substring(0, 15);
+      if (isNaN(Utils.parseStringLocaletoNumberFloat(toAddr.amountCurrency))) {
         toAddr.amount = '';
       } else if (toAddr.amountCurrency && zecPrice && zecPrice.zecPrice > 0) {
-        toAddr.amount = Utils.toLocaleFloat(Utils.maxPrecisionTrimmed(parseFloat(amountCurrency) / zecPrice.zecPrice));
+        toAddr.amount = Utils.parseNumberFloatToStringLocale(
+          Utils.parseStringLocaletoNumberFloat(toAddr.amountCurrency) / zecPrice.zecPrice,
+          8,
+        );
       } else {
         toAddr.amount = '';
       }
-      toAddr.amountCurrency = toAddr.amountCurrency.replace('.', decimalSeparator);
+      console.log('update field 2', toAddr.amount, toAddr.amountCurrency);
     }
 
     if (memo !== null) {
@@ -451,6 +458,7 @@ const Send: React.FunctionComponent<SendProps> = ({
 
     newState.toaddr = newToAddr;
     setSendPageState(newState);
+    console.log(newState);
   };
 
   const confirmSend = async () => {
@@ -525,7 +533,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     });
   };
 
-  //console.log('render Send - 4');
+  //console.log('render Send - 4', sendPageState);
 
   const returnPage = (
     <View
@@ -560,7 +568,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           defaultFee={fee}
           donationAmount={
             donation && server.chain_name === 'main' && !sendToSelf && !donationAddress
-              ? Number(Utils.getDefaultDonationAmount())
+              ? Utils.parseStringLocaletoNumberFloat(Utils.getDefaultDonationAmount())
               : 0
           }
           closeModal={() => {
@@ -571,7 +579,9 @@ const Send: React.FunctionComponent<SendProps> = ({
           }}
           confirmSend={confirmSend}
           sendAllAmount={
-            mode !== 'basic' && Number(sendPageState.toaddr.amount) === Utils.parseLocaleFloat(maxAmount.toFixed(8))
+            mode !== 'basic' &&
+            Utils.parseStringLocaletoNumberFloat(sendPageState.toaddr.amount) ===
+              Utils.parseStringLocaletoNumberFloat(maxAmount.toFixed(8))
           }
         />
       </Modal>
@@ -769,9 +779,9 @@ const Send: React.FunctionComponent<SendProps> = ({
                     </View>
                     {sendAll && mode !== 'basic' && (
                       <TouchableOpacity
-                        onPress={() =>
-                          updateToField(null, Utils.parseLocaleFloat(maxAmount.toFixed(8)).toString(), null, null, null)
-                        }>
+                        onPress={() => {
+                          updateToField(null, Utils.parseNumberFloatToStringLocale(maxAmount, 8), null, null, null);
+                        }}>
                         <View
                           style={{
                             alignItems: 'center',
@@ -841,7 +851,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                             marginLeft: 5,
                             backgroundColor: 'transparent',
                           }}
-                          value={ta.amount.toString()}
+                          value={ta.amount}
                           onChangeText={(text: string) => updateToField(null, text.substring(0, 20), null, null, null)}
                           onEndEditing={(e: any) =>
                             updateToField(null, e.nativeEvent.text.substring(0, 20), null, null, null)
@@ -896,7 +906,13 @@ const Send: React.FunctionComponent<SendProps> = ({
                                   ', '}
                               </FadeText>
                             )}
-                            {!!fee && <FadeText>{(translate('send.fee') as string) + ': ' + fee.toString()}</FadeText>}
+                            {!!fee && (
+                              <FadeText>
+                                {(translate('send.fee') as string) +
+                                  ': ' +
+                                  Utils.parseNumberFloatToStringLocale(fee, 8)}
+                              </FadeText>
+                            )}
                             <FadeText>{' )'}</FadeText>
                           </View>
                         </TouchableOpacity>
@@ -1001,7 +1017,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                               marginLeft: 5,
                               backgroundColor: 'transparent',
                             }}
-                            value={ta.amountCurrency.toString()}
+                            value={ta.amountCurrency}
                             onChangeText={(text: string) =>
                               updateToField(null, null, text.substring(0, 15), null, null)
                             }
@@ -1163,7 +1179,8 @@ const Send: React.FunctionComponent<SendProps> = ({
                   validAmount === 1 &&
                   sendPageState.toaddr.amount &&
                   mode !== 'basic' &&
-                  Number(sendPageState.toaddr.amount) === Utils.parseLocaleFloat(maxAmount.toFixed(8))
+                  Utils.parseStringLocaletoNumberFloat(sendPageState.toaddr.amount) ===
+                    Utils.parseStringLocaletoNumberFloat(maxAmount.toFixed(8))
                     ? (translate('send.button-all') as string)
                     : (translate('send.button') as string)
                 }
@@ -1173,7 +1190,8 @@ const Send: React.FunctionComponent<SendProps> = ({
                     validAmount === 1 &&
                     sendPageState.toaddr.amount &&
                     mode !== 'basic' &&
-                    Number(sendPageState.toaddr.amount) === Utils.parseLocaleFloat(maxAmount.toFixed(8))
+                    Utils.parseStringLocaletoNumberFloat(sendPageState.toaddr.amount) ===
+                      Utils.parseStringLocaletoNumberFloat(maxAmount.toFixed(8))
                   ) {
                     addLastSnackbar({ message: `${translate('send.sendall-message') as string}`, type: 'Primary' });
                   }

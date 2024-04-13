@@ -1038,7 +1038,7 @@ export default class RPC {
         if (current_block > this.lastServerBlockHeight) {
           current_block = this.lastServerBlockHeight;
         }
-        current_block = parseInt(current_block.toFixed(0), 10);
+        current_block = Number(current_block.toFixed(0));
 
         // if the current block is stalled I need to restart the App
         let syncProcessStalled = false;

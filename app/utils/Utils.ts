@@ -41,27 +41,35 @@ export default class Utils {
       return { bigPart: '--', smallPart: '' };
     }
 
-    let bigPart = Utils.maxPrecision(zecValue);
-    let smallPart = '';
+    const { decimalSeparator } = getNumberFormatSettings();
 
-    if (bigPart.indexOf('.') >= 0) {
-      const decimalPart = bigPart.substr(bigPart.indexOf('.') + 1);
+    const intPart = parseInt(zecValue.toString(), 10);
+    let bigPart = Utils.parseNumberFloatToStringLocale(zecValue, 8);
+    let smallPart = '';
+    let decimalPart = '';
+
+    if (bigPart.indexOf(`${decimalSeparator}`) >= 0) {
+      decimalPart = bigPart.substr(bigPart.indexOf(`${decimalSeparator}`) + 1);
       if (decimalPart.length > 4) {
         smallPart = decimalPart.substr(4);
-        bigPart = bigPart.substr(0, bigPart.length - smallPart.length);
+        decimalPart = decimalPart.substr(0, decimalPart.length - smallPart.length);
 
         // Pad the small part with trailing 0s
         while (smallPart.length < 4) {
           smallPart += '0';
         }
+      } else {
+        while (decimalPart.length < 4) {
+          decimalPart += '0';
+        }
+        smallPart = '0000';
       }
+    } else {
+      decimalPart = '0000';
+      smallPart = '0000';
     }
 
-    // if (smallPart === '0000') {
-    //   smallPart = '';
-    // }
-
-    return { bigPart, smallPart };
+    return { bigPart: intPart + decimalSeparator + decimalPart, smallPart };
   }
 
   static splitStringIntoChunks(s: string, numChunks: number): string[] {
@@ -104,19 +112,13 @@ export default class Utils {
   }
 
   static getDefaultDonationAmount(): string {
-    return '0.01';
+    const { decimalSeparator } = getNumberFormatSettings();
+
+    return '0' + decimalSeparator + '01';
   }
 
   static getDefaultDonationMemo(translate: (key: string) => TranslateType): string {
     return translate('donation') as string;
-  }
-
-  static getZecToCurrencyString(price: number, zecValue: number, currency: 'USD' | ''): string {
-    if (!price || !zecValue) {
-      return `${currency} --`;
-    }
-
-    return `${currency} ${(price * zecValue).toFixed(2)}`;
   }
 
   static utf16Split(s: string, chunksize: number): string[] {
@@ -147,23 +149,18 @@ export default class Utils {
     return ans;
   }
 
-  static parseLocaleFloat(stringNumber: string): number {
-    const { decimalSeparator, groupingSeparator } = getNumberFormatSettings();
+  static parseStringLocaletoNumberFloat(stringValue: string): number {
+    const { decimalSeparator } = getNumberFormatSettings();
 
-    return Number(
-      stringNumber
-        .replace(new RegExp(`\\${groupingSeparator}`, 'g'), '')
-        .replace(new RegExp(`\\${decimalSeparator}`), '.'),
-    );
+    return Number(stringValue.replace(new RegExp(`\\${decimalSeparator}`), '.'));
   }
 
-  static toLocaleFloat(stringNumber: string): string {
-    const { decimalSeparator, groupingSeparator } = getNumberFormatSettings();
+  static parseNumberFloatToStringLocale(numberValue: number, toFixed: number): string {
+    const { decimalSeparator } = getNumberFormatSettings();
 
-    return stringNumber
-      .replace(new RegExp(',', 'g'), '_')
-      .replace(new RegExp('\\.'), decimalSeparator)
-      .replace(new RegExp('_', 'g'), groupingSeparator);
+    let stringValue = Utils.maxPrecisionTrimmed(Number(numberValue.toFixed(toFixed)));
+
+    return stringValue.replace(new RegExp('\\.'), `${decimalSeparator}`);
   }
 
   static getBlockExplorerTxIDURL(txid: string, chain_name: 'main' | 'test' | 'regtest'): string {
