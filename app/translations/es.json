@@ -196,11 +196,11 @@
     "donations": [
       {
         "value": true,
-        "text": "Envía un Zenny (0.01 ZEC) a Zingo en cada transacción de envío que realices."
+        "text": "Envía un Zenny (0.01 ZEC) a ZingoLabs en cada transacción."
       },
       {
         "value": false,
-        "text": "No enviar ninguna donación a Zingo en tus transacciones de envío."
+        "text": "No pagar para incentivar un sistema más seguro."
       }
     ],
     "privacys": [
@@ -249,7 +249,7 @@
     "language-title": "IDIOMA",
     "islanguage": "Necesitas escoger un Idioma para poder guardar.",
     "sendall-title": "EL BOTON 'Enviar todo'",
-    "donation-title": "Donaciones a los desarrolladores de Zingo",
+    "donation-title": "Propina para ZingoLabs",
     "privacy-title": "Cambiar entre Alta Privacidad o Normal",
     "mode-title": "Cambiar entre Modo Básico o Avanzado",
     "value-currency-": "Sin moneda",

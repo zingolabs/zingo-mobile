@@ -196,14 +196,13 @@
     "donations": [
       {
         "value": true,
-        "text": "Send a Zenny (0.01 ZEC) to Zingo in every send transaction that you submmit."
+        "text": "Tip ZingoLabs a Zenny (0.01 ZEC) in every transaction."
       },
       {
         "value": false,
-        "text": "Not send any donation to Zingo in your send transactions."
+        "text": "Don't pay to incentivize a more secure system."
       }
     ],
-
     "privacys": [
       {
         "value": true,
@@ -250,7 +249,7 @@
     "language-title": "LANGUAGE",
     "islanguage": "You need to choose a language to save.",
     "sendall-title": "THE BUTTON 'Send All' (Amount)",
-    "donation-title": "Donations to Zingo Developers",
+    "donation-title": "Tip ZingoLabs",
     "privacy-title": "Switch between High or Normal Privacy",
     "mode-title": "Switch between Basic or Advanced Mode",
     "value-currency-": "No currency",
