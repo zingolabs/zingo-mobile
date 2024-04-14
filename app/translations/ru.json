@@ -195,11 +195,11 @@
     "donations": [
       {
         "value": true,
-        "text": "Чаевые ZingoLabs в размере (0.01 ZEC) за каждую транзакцию."
+        "text": "Чаевые для ZingoLabs в размере (0.01 ZEC) за каждую транзакцию."
       },
       {
         "value": false,
-        "text": "Не платите, чтобы стимулировать создание более безопасной системы."
+        "text": "Чаевые позволяют улучшать кошелёк и повышать его безопасность."
       }
     ],
     "privacys": [
@@ -248,7 +248,7 @@
     "language-title": "ЯЗЫК",
     "islanguage": "Выберите язык для приложения.",
     "sendall-title": "КНОПКА 'Отправить все' (сумма)",
-    "donation-title": "Совет ZingoLabs",
+    "donation-title": "Поддержать ZingoLabs",
     "privacy-title": "Переключение между высоким или обычным режимом конфиденциальности",
     "mode-title": "Переключение между основным или расширенным режимом",
     "value-currency-": "Без указания валюты",
@@ -497,7 +497,7 @@
     "address-https": "Zingo-аутентифицированный адрес"
   },
   "report": {
-    "title": "Отчет о синхронизации / сканировании",
+    "title": "Отчёт о синхронизации",
     "running": "Синхронизация кошелька...",
     "finished": "Кошелек полностью синхронизирован",
     "paused": "Кошелек ожидает начала синхронизации...",
@@ -595,13 +595,13 @@
   },
   "pools": {
     "title": "Ваши активы в пулах",
-    "orchard-title": "ORCHARD (УА)",
+    "orchard-title": "ORCHARD (Унифицированный адрес)",
     "orchard-balance": "Общий баланс",
     "orchard-spendable-balance": "Доступный баланс",
-    "sapling-title": "SAPLING (Приватный)",
+    "sapling-title": "SAPLING (Приватный Z-адрес)",
     "sapling-balance": "Общий баланс",
     "sapling-spendable-balance": "Доступный баланс",
-    "transparent-title": "ПРОЗРАЧНЫЙ",
+    "transparent-title": "ПРОЗРАЧНЫЙ (T-адрес)",
     "transparent-balance": "Общий баланс"
   },
   "uris": {

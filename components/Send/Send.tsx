@@ -136,8 +136,10 @@ const Send: React.FunctionComponent<SendProps> = ({
     if (max >= 0) {
       // if max is 0 then the user can send a memo with amount 0.
       setMaxAmount(max);
+      setNegativeMaxAount(false);
     } else {
       // if max is less than 0 then the user CANNOT send anything.
+      setMaxAmount(0);
       setNegativeMaxAount(true);
     }
     setFee(defaultFee);
@@ -148,13 +150,10 @@ const Send: React.FunctionComponent<SendProps> = ({
       totalBalance.privateBal !== totalBalance.spendablePrivate ||
       someUnconfirmed;
     const showShield =
-      totalBalance &&
       (someUnconfirmed ? 0 : totalBalance.transparentBal) > 0 &&
       (someUnconfirmed ? 0 : totalBalance.transparentBal) + totalBalance.spendablePrivate > defaultFee;
     const showUpgrade =
-      totalBalance &&
-      (someUnconfirmed ? 0 : totalBalance.transparentBal) === 0 &&
-      totalBalance.spendablePrivate > defaultFee;
+      (someUnconfirmed ? 0 : totalBalance.transparentBal) === 0 && totalBalance.spendablePrivate > defaultFee;
     setStillConfirming(stillConf);
     setShowShieldInfo(showShield);
     setShowUpgradeInfo(showUpgrade);
@@ -162,9 +161,11 @@ const Send: React.FunctionComponent<SendProps> = ({
     donation,
     info.defaultFee,
     someUnconfirmed,
-    totalBalance,
+    totalBalance.orchardBal,
+    totalBalance.privateBal,
     totalBalance.spendableOrchard,
     totalBalance.spendablePrivate,
+    totalBalance.transparentBal,
   ]);
 
   useEffect(() => {
@@ -903,7 +904,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                                 {(translate('send.confirm-donation') as string) +
                                   ': ' +
                                   Utils.getDefaultDonationAmount() +
-                                  ', '}
+                                  ' '}
                               </FadeText>
                             )}
                             {!!fee && (
