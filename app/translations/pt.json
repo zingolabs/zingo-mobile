@@ -85,7 +85,7 @@
     "serverfirsttry": "Tentando executar a ação com um servidor diferente. O servidor atual pode estar falhando.",
     "serversecondtry": "Não parece haver nenhum problema com o servidor. Algo mais está acontecendo.",
     "alert-donation-title": "APOIAR A ZINGOLABS",
-    "alert-donation-body": "Você quer dar apoio financeiro ao Zingolabs? Você estaria disposto a dar uma gorjeta a um Zenny (0. 1 ZEC) em cada transação. Se sim, pressione confirmar, caso contrário, pressione Cancelar."
+    "alert-donation-body": "Você quer dar apoio financeiro ao Zingolabs? Você estaria disposto a dar uma gorjeta a um Zenny (0.01 ZEC) em cada transação. Se sim, pressione confirmar, caso contrário, pressione Cancelar."
   },
   "loadedapp": {
     "about": "Sobre a Zingo!",
@@ -198,7 +198,7 @@
     "donations": [
       {
         "value": true,
-        "text": "Dê gorjeta ao ZingoLabs a Zenny (0,01 ZEC) em cada transação."
+        "text": "Dê gorjeta ao ZingoLabs a Zenny (0.01 ZEC) em cada transação."
       },
       {
         "value": false,
