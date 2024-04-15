@@ -358,7 +358,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     }
   }, [addresses, sendPageState.toaddr.to, server.chain_name]);
 
-  const showAlertAsync = (): Promise<void> => {
+  const showAddressAlertAsync = (): Promise<void> => {
     return new Promise((resolve, reject) => {
       Alert.alert(
         translate('send.lose-address-title') as string,
@@ -719,7 +719,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                               onValueChange={async (itemValue: string) => {
                                 if (validAddress === 1 && ta.to && itemValue && ta.to !== itemValue) {
                                   setUpdatingToField(true);
-                                  await showAlertAsync()
+                                  await showAddressAlertAsync()
                                     .then(() => {
                                       updateToField(itemValue, null, null, null, null);
                                     })
@@ -1240,7 +1240,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         sendPageState.toaddr.to &&
                         sendPageState.toaddr.to !== (await Utils.getDonationAddress(server.chain_name))
                       ) {
-                        await showAlertAsync()
+                        await showAddressAlertAsync()
                           .then(async () => {
                             // fill the fields in the screen with the donation data
                             updateToField(

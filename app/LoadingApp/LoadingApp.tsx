@@ -79,11 +79,6 @@ const SERVER_DEFAULT_0: ServerType = {
   chain_name: serverUris(() => {})[0].chain_name,
 } as ServerType;
 
-//const SERVER_DEFAULT_1: ServerType = {
-//  uri: serverUris(() => {})[1].uri,
-//  chain_name: serverUris(() => {})[1].chain_name,
-//} as ServerType;
-
 export default function LoadingApp(props: LoadingAppProps) {
   const theme = useTheme() as unknown as ThemeType;
   const [language, setLanguage] = useState<'en' | 'es' | 'pt' | 'ru'>('en');
@@ -108,6 +103,7 @@ export default function LoadingApp(props: LoadingAppProps) {
     restoreWalletBackupScreen: true,
   });
   const [selectServer, setSelectServer] = useState<'auto' | 'list' | 'custom'>('auto');
+  const [donationAlert, setDonationAlert] = useState<boolean>(false);
   const file = useMemo(
     () => ({
       en: en,
@@ -146,6 +142,11 @@ export default function LoadingApp(props: LoadingAppProps) {
       } else if (settings.version === '' || settings.version !== (translate('version') as string)) {
         // this is an update
         setFirstLaunchingMessage(true);
+      }
+
+      // new donation feature.
+      if (settings.firstInstall || settings.firstUpdateWithDonation) {
+        setDonationAlert(true);
       }
 
       // first I need to know if this launch is a fresh install...
@@ -266,6 +267,7 @@ export default function LoadingApp(props: LoadingAppProps) {
         toggleTheme={props.toggleTheme}
         security={security}
         selectServer={selectServer}
+        donationAlert={donationAlert}
       />
     );
   }
@@ -288,6 +290,7 @@ type LoadingAppClassProps = {
   toggleTheme: (mode: 'basic' | 'advanced') => void;
   security: SecurityType;
   selectServer: 'auto' | 'list' | 'custom';
+  donationAlert: boolean;
 };
 
 export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
@@ -340,6 +343,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
       security: props.security,
       selectServer: props.selectServer,
       // serverErrorTries -> 0 (context).
+      donationAlert: props.donationAlert,
     };
 
     this.dim = {} as EmitterSubscription;
@@ -376,6 +380,17 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     }
 
     this.setState({ actionButtonsDisabled: true });
+
+    // Here the App ask about the new donation feature if needed.
+    if (this.state.donationAlert) {
+      await this.showDonationAlertAsync()
+        .then(() => {
+          this.setState({ donation: true });
+          SettingsFileImpl.writeSettings('donation', true);
+        })
+        .catch(() => {});
+    }
+
     (async () => {
       // First, if it's server automatic
       // here I need to check the servers and select the best one
@@ -532,6 +547,27 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     this.dim && typeof this.dim.remove === 'function' && this.dim.remove();
     this.appstate && typeof this.appstate.remove === 'function' && this.appstate.remove();
     this.unsubscribeNetInfo && typeof this.unsubscribeNetInfo === 'function' && this.unsubscribeNetInfo();
+  };
+
+  showDonationAlertAsync = (): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      Alert.alert(
+        this.state.translate('loadingapp.alert-donation-title') as string,
+        this.state.translate('loadingapp.alert-donation-body') as string,
+        [
+          {
+            text: this.state.translate('confirm') as string,
+            onPress: () => resolve(),
+          },
+          {
+            text: this.state.translate('cancel') as string,
+            style: 'cancel',
+            onPress: () => reject(),
+          },
+        ],
+        { cancelable: false, userInterfaceStyle: 'light' },
+      );
+    });
   };
 
   selectTheBestServer = async (aDifferentOne: boolean) => {

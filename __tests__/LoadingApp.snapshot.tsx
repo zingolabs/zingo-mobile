@@ -142,6 +142,7 @@ describe('Component LoadingApp - test', () => {
       restoreWalletBackupScreen: true,
     };
     const selectServer = 'auto';
+    const donationAlert = false;
     const receive = render(
       <LoadingAppClass
         navigation={navigationMock}
@@ -160,6 +161,7 @@ describe('Component LoadingApp - test', () => {
         toggleTheme={toggleTheme}
         security={security}
         selectServer={selectServer}
+        donationAlert={donationAlert}
       />,
     );
     expect(receive.toJSON()).toMatchSnapshot();

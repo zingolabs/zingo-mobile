@@ -83,7 +83,9 @@
     "alert-newwallet-title": "CREATE A NEW WALLET",
     "alert-newwallet-body": "Can you confirm that you really want to create a new wallet and lose access to the current wallet.",
     "serverfirsttry": "Trying to perform the action with a different server. The current server may be failing.",
-    "serversecondtry": "It doesn't seem to be any problem with the server. Someting else is happening."
+    "serversecondtry": "It doesn't seem to be any problem with the server. Someting else is happening.",
+    "alert-donation-title": "SUPPORT ZINGOLABS",
+    "alert-donation-body": "Do you want to give financial support to Zingolabs? You would be willing to tip one Zenny (0.01 ZEC) on each transaction. If so, press confirm, otherwise press Cancel."
   },
   "loadedapp": {
     "about": "About Zingo!",

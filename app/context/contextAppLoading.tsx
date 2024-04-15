@@ -62,6 +62,7 @@ export const defaultAppStateLoading: AppStateLoading = {
   security: {} as SecurityType,
   selectServer: 'auto',
   serverErrorTries: 0,
+  donationAlert: false,
 };
 
 export const ContextAppLoading = React.createContext(defaultAppStateLoading);

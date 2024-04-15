@@ -56,6 +56,7 @@ export default interface AppStateLoading {
   security: SecurityType;
   selectServer: 'auto' | 'list' | 'custom';
   serverErrorTries: number;
+  donationAlert: boolean;
 
   // eslint-disable-next-line semi
 }

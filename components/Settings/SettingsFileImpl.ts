@@ -23,7 +23,8 @@ export default class SettingsFileImpl {
       | 'basicFirstViewSeed'
       | 'version'
       | 'security'
-      | 'selectServer',
+      | 'selectServer'
+      | 'firstUpdateWithDonation',
     value: string | boolean | ServerType | SecurityType,
   ) {
     const fileName = await this.getFileName();
@@ -136,6 +137,10 @@ export default class SettingsFileImpl {
           // another totally unknown or the user is using a non mainnet server.
           settings.selectServer = 'custom';
         }
+      }
+      if (!settings.hasOwnProperty('donation')) {
+        // this means the App shows up an Alert asking about the tip/donation new feature.
+        settings.firstUpdateWithDonation = true;
       }
       return settings;
     } catch (err) {

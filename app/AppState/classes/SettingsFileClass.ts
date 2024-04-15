@@ -18,6 +18,7 @@ export default class SettingsFileClass {
   // - string: means it have a normal value
   security: SecurityType;
   selectServer: 'auto' | 'list' | 'custom';
+  firstUpdateWithDonation: boolean;
 
   constructor(
     server: ServerType,
@@ -32,6 +33,7 @@ export default class SettingsFileClass {
     version: string,
     security: SecurityType,
     selectServer: 'auto' | 'list' | 'custom',
+    firstUpdateWithDonation: boolean,
   ) {
     this.server = server;
     this.currency = currency;
@@ -45,5 +47,6 @@ export default class SettingsFileClass {
     this.version = version;
     this.security = security;
     this.selectServer = selectServer;
+    this.firstUpdateWithDonation = firstUpdateWithDonation;
   }
 }

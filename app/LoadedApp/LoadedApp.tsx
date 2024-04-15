@@ -152,8 +152,10 @@ export default function LoadedApp(props: LoadedAppProps) {
       // update layout direction
       I18nManager.forceRTL(isRTL);
 
-      // If the App is mounting this component, I know I have to reset the firstInstall prop in settings.
+      // If the App is mounting this component,
+      // I know I have to reset the firstInstall & firstUpdateWithDonation prop in settings.
       await SettingsFileImpl.writeSettings('firstInstall', false);
+      await SettingsFileImpl.writeSettings('firstUpdateWithDonation', false);
 
       // If the App is mounting this component, I know I have to update the version prop in settings.
       await SettingsFileImpl.writeSettings('version', translate('version') as string);
