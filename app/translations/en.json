@@ -21,7 +21,7 @@
   "confirm": "Confirm",
   "menudrawer-acc": "Open Menu Drawer",
   "menu-acc": "Open Menu",
-  "donation": "Thanks for supporting Zingo!",
+  "donation": "Thanks for supporting ZingoLabs!",
   "restarting": "Error connecting to the Server, the App will restart in a few seconds.",
   "change-privacy": "New privacy policy: ",
   "warning-binance": "WARNING: Binance is collecting and holding user funds without timely recourse. Do NOT deposit into Binance from this Wallet.",
@@ -422,7 +422,7 @@
     "deshielded": "Deshielded",
     "lose-address-title": "SELECT A NEW ADDRESS",
     "lose-address-alert": "You already have a valid address in the address field. Do you want to replace it?",
-    "confirm-donation": "Donation to Zingo"
+    "confirm-donation": "Donation to ZingoLabs"
   },
   "receive": {
     "u-title": "Unified Address",
@@ -620,6 +620,6 @@
     "oneentry": "URI Should have at least 1 entry",
     "parseerror": "Right now it is not possible to verify the address with the server"
   },
-  "donation-button": "Donate To Zingo ",
-  "donation-legend": "You are donating to Zingo activately, Thanks"
+  "donation-button": "Donate To ZingoLabs ",
+  "donation-legend": "You are donating to ZingoLabs activately, Thanks"
 }

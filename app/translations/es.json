@@ -21,7 +21,7 @@
   "confirm": "Confirmar",
   "menudrawer-acc": "Abrir Menú Lateral",
   "menu-acc": "Abrir Menú",
-  "donation": "Gracias por apoyar Zingo!",
+  "donation": "Gracias por apoyar ZingoLabs!",
   "restarting": "Error conectando con el servidor, la Aplicación se reiniciará en breves segundos.",
   "change-privacy": "Nueva Política de Privacidad: ",
   "warning-binance": "ADVERTENCIA: Binance recopila y retiene los fondos de los usuarios sin un recurso oportuno. NO deposite en Binance desde este Monedero.",
@@ -422,7 +422,7 @@
     "deshielded": "Desblindada",
     "lose-address-title": "SELECCIONAR UNA NUEVA DIRECCIÓN",
     "lose-address-alert": "Ya tienes una dirección válida en el campo de dirección. ¿Desea sustituirla?",
-    "confirm-donation": "Donación a Zingo"
+    "confirm-donation": "Donación a ZingoLabs"
   },
   "receive": {
     "u-title": "Dirección Unificada",
@@ -620,6 +620,6 @@
     "oneentry": "URI Debería tener al menos una entrada",
     "parseerror": "En este momento no es posible verificar la dirección en el Servidor"
   },
-  "donation-button": "Donar a Zingo ",
-  "donation-legend": "Estás donando a Zingo activamente, Gracias"
+  "donation-button": "Donar a ZingoLabs ",
+  "donation-legend": "Estás donando a ZingoLabs activamente, Gracias"
 }
