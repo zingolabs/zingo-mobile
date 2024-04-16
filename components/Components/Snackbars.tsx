@@ -69,6 +69,14 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
     }
   }, [duration, handleSnackbarClose, snackbars, snackbars.length]);
 
+  useEffect(() => {
+    return () => {
+      setTimeout(() => {
+        Snackbar.dismiss();
+      }, 2000);
+    };
+  }, []);
+
   //console.log('snackbars', snackbars);
 
   return <View />;
