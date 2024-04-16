@@ -123,13 +123,14 @@ const serverUris = (translate: (key: string) => TranslateType | void): ServerUri
       default: false,
       latency: null,
     },
-    {
-      uri: 'https://lwd8.zcash-infra.com:9067',
-      region: translate('settings.uk') as string,
-      chain_name: 'main',
-      default: false,
-      latency: null,
-    },
+    // this server seems KO al the time.
+    //{
+    //  uri: 'https://lwd8.zcash-infra.com:9067',
+    //  region: translate('settings.uk') as string,
+    //  chain_name: 'main',
+    //  default: false,
+    //  latency: null,
+    //},
   ];
 };
 
