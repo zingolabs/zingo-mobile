@@ -35,7 +35,8 @@ const parseServerURI = (uri: string, translate: (key: string) => TranslateType):
         uri.includes('na.lightwalletd') ||
         uri.includes('sa.lightwalletd') ||
         uri.includes('eu.lightwalletd') ||
-        uri.includes('ai.lightwalletd')
+        uri.includes('ai.lightwalletd') ||
+        uri.includes('zec.rocks')
           ? '443'
           : '9067';
     }
