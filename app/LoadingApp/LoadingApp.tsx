@@ -573,12 +573,18 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
   selectTheBestServer = async (aDifferentOne: boolean) => {
     const servers = await selectingServer(serverUris(this.props.translate));
     const actualServer = this.state.server;
-    const fasterServer: ServerType = servers
-      .filter((s: ServerUrisType) => s.latency !== null && s.uri !== (aDifferentOne ? this.state.server.uri : ''))
-      .sort((a, b) => (a.latency ? a.latency : Infinity) - (b.latency ? b.latency : Infinity))
-      .map((s: ServerUrisType) => {
-        return { uri: s.uri, chain_name: s.chain_name };
-      })[0] as ServerType;
+    let fasterServer: ServerType = this.state.server;
+    if (servers.length > 0) {
+      const serversSorted: ServerType[] = servers
+        .filter((s: ServerUrisType) => s.latency !== null && s.uri !== (aDifferentOne ? this.state.server.uri : ''))
+        .sort((a, b) => (a.latency ? a.latency : Infinity) - (b.latency ? b.latency : Infinity))
+        .map((s: ServerUrisType) => {
+          return { uri: s.uri, chain_name: s.chain_name };
+        });
+      if (serversSorted.length > 0) {
+        fasterServer = serversSorted[0];
+      }
+    }
     console.log(fasterServer);
     this.setState({
       server: fasterServer,
