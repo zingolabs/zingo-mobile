@@ -39,6 +39,9 @@
         </intent-filter>
       </activity>
       <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
+      <meta-date
+        android:name="com.google.firebase.messaging.default_notification_icon"
+        android:resource="@mipmap/zingo" />
     </application>
 
     <queries>
