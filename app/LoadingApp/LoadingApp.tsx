@@ -20,6 +20,7 @@ import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
 import { StackScreenProps } from '@react-navigation/stack';
 import NetInfo, { NetInfoStateType, NetInfoSubscription } from '@react-native-community/netinfo';
+import messaging from '@react-native-firebase/messaging';
 
 import OptionsMenu from 'react-native-option-menu';
 
@@ -356,6 +357,19 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
         // keep the App in the first screen because the user needs to try again.
         return;
       }
+    }
+
+    const t = await messaging().getToken();
+    console.log('token', t);
+    try {
+      const personalizedMessage = 'Hello, pepe!';
+      messaging().sendMessage({
+        notification: { body: personalizedMessage },
+        fcmOptions: {},
+      });
+      Alert.alert('message sended');
+    } catch (error: any) {
+      Alert.alert('error sending message', error.message);
     }
 
     this.setState({ actionButtonsDisabled: true });

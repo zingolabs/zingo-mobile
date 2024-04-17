@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useState } from 'react';
-import { Alert, SafeAreaView } from 'react-native';
+import { Alert, PermissionsAndroid, Platform, SafeAreaView } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import messaging, { FirebaseMessagingTypes } from '@react-native-firebase/messaging';
@@ -47,40 +47,62 @@ const basicTheme: ThemeType = {
 
 const Stack = createStackNavigator();
 
-type AppProps = {
-  notificationPermission: boolean;
-};
-
-const App: React.FunctionComponent<AppProps> = ({ notificationPermission }) => {
+const App: React.FunctionComponent = () => {
   const [theme, setTheme] = useState<ThemeType>(advancedTheme);
 
   useEffect(() => {
-    if (notificationPermission) {
-      const unsubscribe = messaging().onMessage(async (remoteMessage: FirebaseMessagingTypes.RemoteMessage) => {
-        Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
-      });
-
-      return unsubscribe;
-    }
-  }, [notificationPermission]);
-
-  useEffect(() => {
     (async () => {
-      const t = await messaging().getToken();
-      console.log('token', t);
-      const personalizedMessage = `Hello, pepe!`; 
-      messaging().sendMessage({
-        notification: { body: personalizedMessage, },
-        fcmOptions: {},
-      });
+      const granted = await requestNofificationPermission();
+      if (granted) {
+        const unsubscribe = messaging().onMessage(async (remoteMessage: FirebaseMessagingTypes.RemoteMessage) => {
+          Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
+        });
+
+        return unsubscribe;
+      }
     })();
   }, []);
+
+  const requestNofificationPermission = async (): Promise<boolean> => {
+    let granted = false;
+    if (Platform.OS === 'ios') {
+      // IOS
+      const authStatus = await messaging().requestPermission();
+      const enabled =
+        authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+        authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+      if (enabled) {
+        console.log('IOS Authorization status:', authStatus);
+        granted = true;
+      }
+    } else {
+      // Android
+      const authStatusCheck = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
+
+      console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&', authStatusCheck);
+
+      if (!authStatusCheck) {
+        const authStatus = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
+        const enabled = authStatus === 'granted';
+
+        if (enabled) {
+          console.log('Android Authorization status:', authStatus);
+          granted = true;
+        }
+      } else {
+        console.log('Android Authorization status:', authStatusCheck);
+        granted = true;
+      }
+    }
+    return granted;
+  };
 
   const toggleTheme = (mode: 'basic' | 'advanced') => {
     setTheme(mode === 'advanced' ? advancedTheme : basicTheme);
   };
 
-  console.log('render App - 1');
+  //console.log('render App - 1');
   return (
     <NavigationContainer theme={theme}>
       <SafeAreaView
