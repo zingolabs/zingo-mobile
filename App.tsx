@@ -64,11 +64,23 @@ const App: React.FunctionComponent<AppProps> = ({ notificationPermission }) => {
     }
   }, [notificationPermission]);
 
+  useEffect(() => {
+    (async () => {
+      const t = await messaging().getToken();
+      console.log('token', t);
+      const personalizedMessage = `Hello, pepe!`; 
+      messaging().sendMessage({
+        notification: { body: personalizedMessage, },
+        fcmOptions: {},
+      });
+    })();
+  }, []);
+
   const toggleTheme = (mode: 'basic' | 'advanced') => {
     setTheme(mode === 'advanced' ? advancedTheme : basicTheme);
   };
 
-  //console.log('render App - 1');
+  console.log('render App - 1');
   return (
     <NavigationContainer theme={theme}>
       <SafeAreaView

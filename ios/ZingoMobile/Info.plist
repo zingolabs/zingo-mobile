@@ -93,5 +93,7 @@
 	<false/>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Allow Zingo! to use FaceID to improve the security and privacy?</string>
+	<key>NSUserNotificationsUsageDescription</key>
+	<string>Allow Zingo! to use Push Notifications to improve your Experience?</string>
 </dict>
 </plist>

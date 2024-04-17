@@ -40,7 +40,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       self.handleBackgroundTask()
     }
     
-    Firebase.configure()
+    FirebaseApp.configure()
 
     return true
   }
