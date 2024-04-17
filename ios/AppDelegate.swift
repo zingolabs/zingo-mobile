@@ -8,6 +8,7 @@
 import Foundation
 import UIKit
 import BackgroundTasks
+import Firebase
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -38,8 +39,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       NSLog("BGTask registerTasks")
       self.handleBackgroundTask()
     }
+    
+    Firebase.configure()
 
     return true
+  }
+  
+  // For handling notifications while the app is in the foreground
+  func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+    Messaging.messaging().appDidReceiveMessage(userInfo)
+    completionHandler(.newData)
   }
 
   func applicationWillEnterForeground(_ application: UIApplication) {
