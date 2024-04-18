@@ -97,8 +97,8 @@ export default class Utils {
     return Utils.nextToAddrID++;
   }
 
-  static getFallbackDefaultFee(): number {
-    return 0.0001;
+  static getShieldingFee(): number {
+    return 0.0002;
   }
 
   static async getDonationAddress(chain_name: 'main' | 'test' | 'regtest'): Promise<string> {

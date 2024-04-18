@@ -54,7 +54,6 @@ describe('Component Info - test', () => {
       verificationProgress: 0,
       currencyName: 'ZEC',
       solps: 0,
-      defaultFee: 10000,
       chain_name: 'main',
       zingolib: 'mob-release...',
     };

@@ -26,6 +26,7 @@ import Button from '../Components/Button';
 import {
   AddressBookFileClass,
   AddressClass,
+  SendJsonToTypeType,
   SendPageStateClass,
   SendProgressClass,
   ToAddrClass,
@@ -48,6 +49,7 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
+import { RPCProposeType } from '../../app/rpc/types/RPCProposeType';
 
 type SendProps = {
   setSendPageState: (sendPageState: SendPageStateClass) => void;
@@ -114,7 +116,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [memoModalVisible, setMemoModalVisible] = useState<boolean>(false);
   const [maxAmount, setMaxAmount] = useState<number>(0);
   const [spendable, setSpendable] = useState<number>(0);
-  const [fee, setFee] = useState<number>(info.defaultFee);
+  const [fee, setFee] = useState<number>(0);
   const [stillConfirming, setStillConfirming] = useState<boolean>(false);
   const [showShieldInfo, setShowShieldInfo] = useState<boolean>(false);
   const [showUpgradeInfo, setShowUpgradeInfo] = useState<boolean>(false);
@@ -127,12 +129,73 @@ const Send: React.FunctionComponent<SendProps> = ({
   const slideAnim = useSharedValue(0);
   const { decimalSeparator } = getNumberFormatSettings();
 
+  const runPropose = async (proposeJSON: string): Promise<string> => {
+    try {
+      const proposeStr: string = await RPCModule.execute('propose', proposeJSON);
+      if (proposeStr) {
+        if (proposeStr.toLowerCase().startsWith('error')) {
+          console.log(`Error propose ${proposeStr}`);
+          return proposeStr;
+        }
+      } else {
+        console.log('Internal Error propose');
+        return 'Error: Internal RPC Error: propose';
+      }
+
+      return proposeStr;
+    } catch (error) {
+      console.log(`Critical Error propose ${error}`);
+      return `Error: ${error}`;
+    }
+  };
+
+  const calculateFeeWithPropose = async (amount: number, address: string, memo: string = ''): Promise<void> => {
+    // if no address make no sense to run the propose.
+    if (!address || validAddress !== 1) {
+      setFee(0);
+      return;
+    }
+    // if this is not a valid number no sense to run the propose.
+    if (isNaN(amount)) {
+      setFee(0);
+      return;
+    }
+    const proposeTransaction: SendJsonToTypeType[] = [
+      {
+        amount: amount * 10 ** 8,
+        address: address,
+        memo: memo,
+      },
+    ];
+    let proposeFee = 0;
+    const runProposeStr = await runPropose(JSON.stringify(proposeTransaction));
+    console.log(proposeTransaction, runProposeStr);
+    if (runProposeStr.toLowerCase().startsWith('error')) {
+      // snack with error
+      Alert.alert('Calculating the FEE', runProposeStr);
+    } else {
+      const runProposeJson: RPCProposeType = JSON.parse(runProposeStr);
+      if (runProposeJson.error) {
+        // snack with error
+        Alert.alert('Calculating the FEE', runProposeJson.error);
+      } else {
+        if (runProposeJson.fee) {
+          proposeFee = runProposeJson.fee / 10 ** 8;
+        }
+      }
+    }
+    setFee(proposeFee);
+  };
+
   useEffect(() => {
-    const defaultFee = info.defaultFee || Utils.getFallbackDefaultFee();
+    calculateFeeWithPropose(Utils.parseStringLocaletoNumberFloat(sendPageState.toaddr.amount), sendPageState.toaddr.to);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sendPageState.toaddr.to, validAddress]);
+
+  useEffect(() => {
     // transparent is not spendable.
     const spend = totalBalance.spendablePrivate + totalBalance.spendableOrchard;
-    const max =
-      spend - defaultFee - (donation ? Utils.parseStringLocaletoNumberFloat(Utils.getDefaultDonationAmount()) : 0);
+    const max = spend - fee - (donation ? Utils.parseStringLocaletoNumberFloat(Utils.getDefaultDonationAmount()) : 0);
     if (max >= 0) {
       // if max is 0 then the user can send a memo with amount 0.
       setMaxAmount(max);
@@ -142,7 +205,6 @@ const Send: React.FunctionComponent<SendProps> = ({
       setMaxAmount(0);
       setNegativeMaxAount(true);
     }
-    setFee(defaultFee);
     setSpendable(spend);
 
     const stillConf =
@@ -151,15 +213,15 @@ const Send: React.FunctionComponent<SendProps> = ({
       someUnconfirmed;
     const showShield =
       (someUnconfirmed ? 0 : totalBalance.transparentBal) > 0 &&
-      (someUnconfirmed ? 0 : totalBalance.transparentBal) + totalBalance.spendablePrivate > defaultFee;
+      (someUnconfirmed ? 0 : totalBalance.transparentBal) + totalBalance.spendablePrivate > fee;
     const showUpgrade =
-      (someUnconfirmed ? 0 : totalBalance.transparentBal) === 0 && totalBalance.spendablePrivate > defaultFee;
+      (someUnconfirmed ? 0 : totalBalance.transparentBal) === 0 && totalBalance.spendablePrivate > fee;
     setStillConfirming(stillConf);
     setShowShieldInfo(showShield);
     setShowUpgradeInfo(showUpgrade);
   }, [
     donation,
-    info.defaultFee,
+    fee,
     someUnconfirmed,
     totalBalance.orchardBal,
     totalBalance.privateBal,
@@ -355,6 +417,9 @@ const Send: React.FunctionComponent<SendProps> = ({
         setSendToSelf(sendToS);
         setDonationAddress(donationA);
       })();
+    } else {
+      setSendToSelf(false);
+      setDonationAddress(false);
     }
   }, [addresses, sendPageState.toaddr.to, server.chain_name]);
 
@@ -418,7 +483,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     }
 
     if (amount !== null) {
-      console.log('update field', amount);
+      //console.log('update field', amount);
       toAddr.amount = amount.substring(0, 20);
       if (isNaN(Utils.parseStringLocaletoNumberFloat(toAddr.amount))) {
         toAddr.amountCurrency = '';
@@ -430,11 +495,11 @@ const Send: React.FunctionComponent<SendProps> = ({
       } else {
         toAddr.amountCurrency = '';
       }
-      console.log('update field 2', toAddr.amount, toAddr.amountCurrency);
+      //console.log('update field 2', toAddr.amount, toAddr.amountCurrency);
     }
 
     if (amountCurrency !== null) {
-      console.log('update field', amountCurrency);
+      //console.log('update field', amountCurrency);
       toAddr.amountCurrency = amountCurrency.substring(0, 15);
       if (isNaN(Utils.parseStringLocaletoNumberFloat(toAddr.amountCurrency))) {
         toAddr.amount = '';
@@ -446,7 +511,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       } else {
         toAddr.amount = '';
       }
-      console.log('update field 2', toAddr.amount, toAddr.amountCurrency);
+      //console.log('update field 2', toAddr.amount, toAddr.amountCurrency);
     }
 
     if (memo !== null) {
@@ -459,7 +524,7 @@ const Send: React.FunctionComponent<SendProps> = ({
 
     newState.toaddr = newToAddr;
     setSendPageState(newState);
-    console.log(newState);
+    //console.log(newState);
   };
 
   const confirmSend = async () => {
@@ -566,7 +631,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         visible={confirmModalVisible}
         onRequestClose={() => setConfirmModalVisible(false)}>
         <Confirm
-          defaultFee={fee}
+          calculatedFee={fee}
           donationAmount={
             donation && server.chain_name === 'main' && !sendToSelf && !donationAddress
               ? Utils.parseStringLocaletoNumberFloat(Utils.getDefaultDonationAmount())
@@ -584,6 +649,7 @@ const Send: React.FunctionComponent<SendProps> = ({
             Utils.parseStringLocaletoNumberFloat(sendPageState.toaddr.amount) ===
               Utils.parseStringLocaletoNumberFloat(maxAmount.toFixed(8))
           }
+          calculateFeeWithPropose={calculateFeeWithPropose}
         />
       </Modal>
 
@@ -881,42 +947,38 @@ const Send: React.FunctionComponent<SendProps> = ({
                           privacy={privacy}
                         />
                       </View>
-                      {negativeMaxAount && (
-                        <TouchableOpacity onPress={() => poolsMoreInfoOnClick()}>
-                          <View
-                            style={{
-                              display: 'flex',
-                              flexDirection: 'row',
-                              marginTop: 5,
-                              backgroundColor: colors.card,
-                              padding: 5,
-                              borderRadius: 10,
-                            }}>
-                            <FontAwesomeIcon
-                              icon={faInfoCircle}
-                              size={20}
-                              color={colors.primary}
-                              style={{ marginRight: 5 }}
-                            />
-                            <FadeText>{'( '}</FadeText>
-                            {donation && (
-                              <FadeText>
-                                {(translate('send.confirm-donation') as string) +
-                                  ': ' +
-                                  Utils.getDefaultDonationAmount() +
-                                  ' '}
-                              </FadeText>
-                            )}
-                            {!!fee && (
-                              <FadeText>
-                                {(translate('send.fee') as string) +
-                                  ': ' +
-                                  Utils.parseNumberFloatToStringLocale(fee, 8)}
-                              </FadeText>
-                            )}
-                            <FadeText>{' )'}</FadeText>
-                          </View>
-                        </TouchableOpacity>
+                      {(donation || !!fee) && (
+                        <View
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            marginTop: 5,
+                            backgroundColor: colors.card,
+                            padding: 5,
+                            borderRadius: 10,
+                          }}>
+                          <FontAwesomeIcon
+                            icon={faInfoCircle}
+                            size={20}
+                            color={colors.primary}
+                            style={{ marginRight: 5 }}
+                          />
+                          <FadeText>{'( '}</FadeText>
+                          {donation && !sendToSelf && !donationAddress && (
+                            <FadeText>
+                              {(translate('send.confirm-donation') as string) +
+                                ': ' +
+                                Utils.getDefaultDonationAmount() +
+                                ' '}
+                            </FadeText>
+                          )}
+                          {!!fee && (
+                            <FadeText>
+                              {(translate('send.fee') as string) + ': ' + Utils.parseNumberFloatToStringLocale(fee, 8)}
+                            </FadeText>
+                          )}
+                          <FadeText>{' )'}</FadeText>
+                        </View>
                       )}
                       {stillConfirming && (
                         <TouchableOpacity onPress={() => poolsMoreInfoOnClick()}>

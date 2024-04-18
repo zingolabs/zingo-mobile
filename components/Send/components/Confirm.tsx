@@ -25,20 +25,22 @@ import RPC from '../../../app/rpc';
 import Utils from '../../../app/utils';
 
 type ConfirmProps = {
-  defaultFee: number;
+  calculatedFee: number;
   donationAmount: number;
   closeModal: () => void;
   openModal: () => void;
   confirmSend: () => void;
   sendAllAmount: boolean;
+  calculateFeeWithPropose: (amount: number, address: string, memo: string) => Promise<void>;
 };
 const Confirm: React.FunctionComponent<ConfirmProps> = ({
   closeModal,
   confirmSend,
-  defaultFee,
+  calculatedFee,
   donationAmount,
   sendAllAmount,
   openModal,
+  calculateFeeWithPropose,
 }) => {
   const context = useContext(ContextAppLoaded);
   const {
@@ -62,6 +64,10 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   const [privacyLevel, setPrivacyLevel] = useState<string>('-');
   const [sendingTotal, setSendingTotal] = useState<number>(0);
 
+  const memoTotal: string = `${sendPageState.toaddr.memo || ''}${
+    sendPageState.toaddr.includeUAMemo ? '\nReply to: \n' + uaAddress : ''
+  }`;
+
   const getPrivacyLevel = useCallback(async () => {
     if (!netInfo.isConnected) {
       addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
@@ -71,18 +77,18 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     let from: 'orchard' | 'orchard+sapling' | 'sapling' | '' = '';
     // amount + fee
     if (
-      Utils.parseStringLocaletoNumberFloat(sendPageState.toaddr.amount) + defaultFee <=
+      Utils.parseStringLocaletoNumberFloat(sendPageState.toaddr.amount) + calculatedFee <=
       totalBalance.spendableOrchard
     ) {
       from = 'orchard';
     } else if (
       totalBalance.spendableOrchard > 0 &&
-      Utils.parseStringLocaletoNumberFloat(sendPageState.toaddr.amount) + defaultFee <=
+      Utils.parseStringLocaletoNumberFloat(sendPageState.toaddr.amount) + calculatedFee <=
         totalBalance.spendableOrchard + totalBalance.spendablePrivate
     ) {
       from = 'orchard+sapling';
     } else if (
-      Utils.parseStringLocaletoNumberFloat(sendPageState.toaddr.amount) + defaultFee <=
+      Utils.parseStringLocaletoNumberFloat(sendPageState.toaddr.amount) + calculatedFee <=
       totalBalance.spendablePrivate
     ) {
       from = 'sapling';
@@ -176,7 +182,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     return '-';
   }, [
     addLastSnackbar,
-    defaultFee,
+    calculatedFee,
     netInfo.isConnected,
     sendPageState.toaddr.amount,
     sendPageState.toaddr.to,
@@ -202,9 +208,10 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   };
 
   useEffect(() => {
-    const sendingTot = Utils.parseStringLocaletoNumberFloat(sendPageState.toaddr.amount) + defaultFee + donationAmount;
+    const sendingTot =
+      Utils.parseStringLocaletoNumberFloat(sendPageState.toaddr.amount) + calculatedFee + donationAmount;
     setSendingTotal(sendingTot);
-  }, [defaultFee, donationAmount, sendPageState.toaddr.amount]);
+  }, [calculatedFee, donationAmount, sendPageState.toaddr.amount]);
 
   useEffect(() => {
     (async () => {
@@ -217,7 +224,16 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     (async () => await RPC.rpc_setInterruptSyncAfterBatch('true'))();
   }, []);
 
-  //console.log(sendPageState, price, defaultFee);
+  useEffect(() => {
+    calculateFeeWithPropose(
+      Utils.parseStringLocaletoNumberFloat(sendPageState.toaddr.amount),
+      sendPageState.toaddr.to,
+      memoTotal,
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  //console.log(sendPageState, price, calculatedFee);
 
   return (
     <SafeAreaView
@@ -278,7 +294,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
             <ZecAmount
               currencyName={info.currencyName ? info.currencyName : ''}
               size={18}
-              amtZec={defaultFee}
+              amtZec={calculatedFee}
               privacy={privacy}
             />
           </View>
@@ -287,7 +303,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
               <FadeText style={{ opacity: 0 }}>{translate('send.fee') as string}</FadeText>
               <CurrencyAmount
                 style={{ fontSize: 18 }}
-                amtZec={defaultFee}
+                amtZec={calculatedFee}
                 price={zecPrice.zecPrice}
                 currency={currency}
                 privacy={privacy}
@@ -352,9 +368,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
               {!!to.memo && (
                 <>
                   <FadeText style={{ marginTop: 10 }}>{translate('send.confirm-memo') as string}</FadeText>
-                  <RegText testID="send.confirm-memo">
-                    {`${to.memo || ''}${to.includeUAMemo ? '\nReply to: \n' + uaAddress : ''}`}
-                  </RegText>
+                  <RegText testID="send.confirm-memo">{memoTotal}</RegText>
                 </>
               )}
             </View>

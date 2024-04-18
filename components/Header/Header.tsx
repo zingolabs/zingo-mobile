@@ -160,7 +160,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     setShowShieldButton(
       !readOnly &&
         totalBalance &&
-        (someUnconfirmed ? 0 : totalBalance.transparentBal) + totalBalance.spendablePrivate > info.defaultFee,
+        (someUnconfirmed ? 0 : totalBalance.transparentBal) + totalBalance.spendablePrivate > Utils.getShieldingFee(),
     );
 
     if ((someUnconfirmed ? 0 : totalBalance.transparentBal) > 0 && totalBalance.spendablePrivate > 0) {
@@ -172,15 +172,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     } else {
       setPoolsToShield('');
     }
-  }, [
-    mode,
-    readOnly,
-    totalBalance,
-    totalBalance.transparentBal,
-    totalBalance.spendablePrivate,
-    info.defaultFee,
-    someUnconfirmed,
-  ]);
+  }, [mode, readOnly, totalBalance, totalBalance.transparentBal, totalBalance.spendablePrivate, someUnconfirmed]);
 
   useEffect(() => {
     // for basic mode always have to be 'all', It's easier for the user.
@@ -654,30 +646,30 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               }`,
             ) as string) +
               ` ${
-                poolsToShield === 'sapling' && totalBalance.spendablePrivate > info.defaultFee
-                  ? Utils.parseNumberFloatToStringLocale(totalBalance.spendablePrivate - info.defaultFee, 8)
+                poolsToShield === 'sapling' && totalBalance.spendablePrivate > Utils.getShieldingFee()
+                  ? Utils.parseNumberFloatToStringLocale(totalBalance.spendablePrivate - Utils.getShieldingFee(), 8)
                   : poolsToShield === 'transparent' &&
-                    (someUnconfirmed ? 0 : totalBalance.transparentBal) > info.defaultFee
+                    (someUnconfirmed ? 0 : totalBalance.transparentBal) > Utils.getShieldingFee()
                   ? Utils.parseNumberFloatToStringLocale(
-                      (someUnconfirmed ? 0 : totalBalance.transparentBal) - info.defaultFee,
+                      (someUnconfirmed ? 0 : totalBalance.transparentBal) - Utils.getShieldingFee(),
                       8,
                     )
                   : poolsToShieldSelectSapling &&
                     poolsToShieldSelectTransparent &&
                     totalBalance.spendablePrivate + (someUnconfirmed ? 0 : totalBalance.transparentBal) >
-                      info.defaultFee
+                      Utils.getShieldingFee()
                   ? Utils.parseNumberFloatToStringLocale(
                       totalBalance.spendablePrivate +
                         (someUnconfirmed ? 0 : totalBalance.transparentBal) -
-                        info.defaultFee,
+                        Utils.getShieldingFee(),
                       8,
                     )
-                  : poolsToShieldSelectSapling && totalBalance.spendablePrivate > info.defaultFee
-                  ? Utils.parseNumberFloatToStringLocale(totalBalance.spendablePrivate - info.defaultFee, 8)
+                  : poolsToShieldSelectSapling && totalBalance.spendablePrivate > Utils.getShieldingFee()
+                  ? Utils.parseNumberFloatToStringLocale(totalBalance.spendablePrivate - Utils.getShieldingFee(), 8)
                   : poolsToShieldSelectTransparent &&
-                    (someUnconfirmed ? 0 : totalBalance.transparentBal) > info.defaultFee
+                    (someUnconfirmed ? 0 : totalBalance.transparentBal) > Utils.getShieldingFee()
                   ? Utils.parseNumberFloatToStringLocale(
-                      (someUnconfirmed ? 0 : totalBalance.transparentBal) - info.defaultFee,
+                      (someUnconfirmed ? 0 : totalBalance.transparentBal) - Utils.getShieldingFee(),
                       8,
                     )
                   : 0
@@ -703,20 +695,20 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               }
               onPress={onPressShieldFunds}
               disabled={
-                poolsToShield === 'sapling' && totalBalance.spendablePrivate > info.defaultFee
+                poolsToShield === 'sapling' && totalBalance.spendablePrivate > Utils.getShieldingFee()
                   ? false
                   : poolsToShield === 'transparent' &&
-                    (someUnconfirmed ? 0 : totalBalance.transparentBal) > info.defaultFee
+                    (someUnconfirmed ? 0 : totalBalance.transparentBal) > Utils.getShieldingFee()
                   ? false
                   : poolsToShieldSelectSapling &&
                     poolsToShieldSelectTransparent &&
                     totalBalance.spendablePrivate + (someUnconfirmed ? 0 : totalBalance.transparentBal) >
-                      info.defaultFee
+                      Utils.getShieldingFee()
                   ? false
-                  : poolsToShieldSelectSapling && totalBalance.spendablePrivate > info.defaultFee
+                  : poolsToShieldSelectSapling && totalBalance.spendablePrivate > Utils.getShieldingFee()
                   ? false
                   : poolsToShieldSelectTransparent &&
-                    (someUnconfirmed ? 0 : totalBalance.transparentBal) > info.defaultFee
+                    (someUnconfirmed ? 0 : totalBalance.transparentBal) > Utils.getShieldingFee()
                   ? false
                   : true
               }

@@ -7,7 +7,6 @@ export default interface InfoType {
   verificationProgress: number;
   currencyName: string;
   solps: number;
-  defaultFee: number;
   zingolib: string;
   // eslint-disable-next-line semi
 }

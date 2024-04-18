@@ -154,7 +154,6 @@ describe('Component Send - test', () => {
   state.currency = 'USD';
   state.info.currencyName = 'ZEC';
   state.zecPrice.zecPrice = 33.33;
-  state.info.defaultFee = 10000;
   state.totalBalance.total = 1.12345678;
   state.totalBalance.orchardBal = 0.6;
   state.totalBalance.spendableOrchard = 0.3;

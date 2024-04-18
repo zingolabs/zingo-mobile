@@ -12,7 +12,6 @@ import {
   SyncingStatusClass,
 } from '../AppState';
 import RPCModule from '../RPCModule';
-import Utils from '../utils';
 import { RPCAddressType } from './types/RPCAddressType';
 import { RPCBalancesType } from './types/RPCBalancesType';
 import { RPCNotesType } from './types/RPCNotesType';
@@ -20,7 +19,6 @@ import { RPCOrchardNoteType } from './types/RPCOrchardNoteType';
 import { RPCSaplingNoteType } from './types/RPCSaplingNoteType';
 import { RPCUtxoNoteType } from './types/RPCUtxoNoteType';
 import { RPCInfoType } from './types/RPCInfoType';
-import { RPCDefaultFeeType } from './types/RPCDefaultFeeType';
 import { RPCWalletHeight } from './types/RPCWalletHeightType';
 import { RPCSeedType } from './types/RPCSeedType';
 import { RPCSyncStatusType } from './types/RPCSyncStatusType';
@@ -29,6 +27,7 @@ import { RPCSendProgressType } from './types/RPCSendProgressType';
 import { RPCSyncRescan } from './types/RPCSyncRescanType';
 import { RPCSummariesType } from './types/RPCSummariesType';
 import { RPCUfvkType } from './types/RPCUfvkType';
+import { RPCSendType } from './types/RPCSendType';
 
 export default class RPC {
   fnSetInfo: (info: InfoType) => void;
@@ -192,18 +191,6 @@ export default class RPC {
       }
       const infoJSON: RPCInfoType = await JSON.parse(infoStr);
 
-      const defaultFeeStr: string = await RPCModule.execute('defaultfee', '');
-      if (defaultFeeStr) {
-        if (defaultFeeStr.toLowerCase().startsWith('error')) {
-          console.log(`Error defaultfee ${defaultFeeStr}`);
-          return {} as InfoType;
-        }
-      } else {
-        console.log('Internal Error defaultfee');
-        return {} as InfoType;
-      }
-      const defaultFeeJSON: RPCDefaultFeeType = await JSON.parse(defaultFeeStr);
-
       let zingolibStr: string = await RPCModule.execute('version', '');
       if (zingolibStr) {
         if (zingolibStr.toLowerCase().startsWith('error')) {
@@ -225,13 +212,12 @@ export default class RPC {
         verificationProgress: 1,
         currencyName: infoJSON.chain_name === 'main' ? 'ZEC' : 'TAZ',
         solps: 0,
-        defaultFee: defaultFeeJSON.defaultfee / 10 ** 8 || Utils.getFallbackDefaultFee(),
         zingolib: zingolibStr,
       };
 
       return info;
     } catch (error) {
-      console.log(`Critical Error info and/or defaultfee ${error}`);
+      console.log(`Critical Error info ${error}`);
       return {} as InfoType;
     }
   }
@@ -1483,8 +1469,8 @@ export default class RPC {
           }
 
           //if (tx.txid.startsWith('426e')) {
-          //  console.log('tran: ', tx);
-          //  console.log('--------------------------------------------------');
+          //console.log('tran: ', tx);
+          //console.log('--------------------------------------------------');
           //}
 
           let currenttxdetails: TxDetailType = {} as TxDetailType;
@@ -1568,7 +1554,7 @@ export default class RPC {
     this.doSend(JSON.stringify(sendJson))
       .then(r => {
         try {
-          const rJson = JSON.parse(r);
+          const rJson: RPCSendType = JSON.parse(r);
           if (rJson.error) {
             sendError = rJson.error;
           } else if (rJson.txid) {

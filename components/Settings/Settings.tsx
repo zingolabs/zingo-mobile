@@ -603,7 +603,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                     }}
                     useNativeAndroidPickerStyle={false}
                     onValueChange={(item: string) => {
-                      console.log(JSON.stringify(item));
+                      //console.log(JSON.stringify(item));
                       if (item) {
                         setAutoIcon(farCircle);
                         setListIcon(faDotCircle);
