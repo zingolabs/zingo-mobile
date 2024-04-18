@@ -610,27 +610,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                         }
                       }
                     >
-                      ( 
-                    </Text>
-                    <Text
-                      style={
-                        {
-                          "color": "#c3c3c3",
-                          "opacity": 0.65,
-                        }
-                      }
-                    >
-                      text translated: 10000
-                    </Text>
-                    <Text
-                      style={
-                        {
-                          "color": "#c3c3c3",
-                          "opacity": 0.65,
-                        }
-                      }
-                    >
-                       )
+                      text translated
                     </Text>
                   </View>
                 </View>
@@ -1637,7 +1617,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                           }
                           testID="undefined.big-part"
                         >
-                           0.0000
+                           0.5000
                         </Text>
                       </View>
                     </View>
@@ -1704,27 +1684,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                         }
                       }
                     >
-                      ( 
-                    </Text>
-                    <Text
-                      style={
-                        {
-                          "color": "#c3c3c3",
-                          "opacity": 0.65,
-                        }
-                      }
-                    >
-                      text translated: 10000
-                    </Text>
-                    <Text
-                      style={
-                        {
-                          "color": "#c3c3c3",
-                          "opacity": 0.65,
-                        }
-                      }
-                    >
-                       )
+                      text translated
                     </Text>
                   </View>
                 </View>
@@ -1955,7 +1915,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                             }
                           }
                         >
-                           0
+                           16.66
                         </Text>
                       </View>
                     </View>

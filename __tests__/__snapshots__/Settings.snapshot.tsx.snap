@@ -1173,10 +1173,6 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                   "label": "text translated https://lwd7.zcash-infra.com:9067",
                   "value": "https://lwd7.zcash-infra.com:9067",
                 },
-                {
-                  "label": "text translated https://lwd8.zcash-infra.com:9067",
-                  "value": "https://lwd8.zcash-infra.com:9067",
-                },
               ]
             }
             onValueChange={[Function]}
