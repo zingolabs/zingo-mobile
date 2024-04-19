@@ -47,7 +47,7 @@ class MainApplication : Application(), ReactApplication {
         }
 
         init {
-            System.loadLibrary("uniffi_rustlib")
+            System.loadLibrary("uniffi_zingo")
         }
     }
 }

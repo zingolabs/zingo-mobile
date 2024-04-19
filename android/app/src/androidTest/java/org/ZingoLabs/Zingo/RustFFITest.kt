@@ -114,14 +114,14 @@ class ExecuteAddressesFromSeed {
         val datadir = MainApplication.getAppContext()!!.filesDir.path
         val monitorMempool = false
 
-        val initFromSeedJson = uniffi.rustlib.initFromSeed(server, seed, birthday, datadir, chainhint, monitorMempool)
+        val initFromSeedJson = uniffi.zingo.initFromSeed(server, seed, birthday, datadir, chainhint, monitorMempool)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
         assertThat(initFromSeed.seed).isEqualTo(Seeds.ABANDON)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
-        val addressesJson = uniffi.rustlib.executeCommand("addresses", "")
+        val addressesJson = uniffi.zingo.executeCommand("addresses", "")
         println("\nAddresses:")
         println(addressesJson)
         val addresses: List<Addresses> = mapper.readValue(addressesJson)
@@ -145,20 +145,20 @@ class ExecuteAddressesFromUfvk {
         val datadir = MainApplication.getAppContext()!!.filesDir.path
         val monitorMempool = false
 
-        val initFromUfvkJson = uniffi.rustlib.initFromUfvk(server, ufvk, birthday, datadir, chainhint, monitorMempool)
+        val initFromUfvkJson = uniffi.zingo.initFromUfvk(server, ufvk, birthday, datadir, chainhint, monitorMempool)
         println("\nInit From UFVK:")
         println(initFromUfvkJson)
         val initFromUfvk: InitFromUfvk = mapper.readValue(initFromUfvkJson)
         assertThat(initFromUfvk.error).startsWith("This wallet is watch-only")
 
-        val exportUfvkJson = uniffi.rustlib.executeCommand("exportufvk", "")
+        val exportUfvkJson = uniffi.zingo.executeCommand("exportufvk", "")
         println("\nExport Ufvk:")
         println(exportUfvkJson)
         val exportUfvk: ExportUfvk = mapper.readValue(exportUfvkJson)
         assertThat(exportUfvk.ufvk).isEqualTo(Ufvk.ABANDON)
         assertThat(exportUfvk.birthday).isEqualTo(1)
 
-        val addressesJson = uniffi.rustlib.executeCommand("addresses", "")
+        val addressesJson = uniffi.zingo.executeCommand("addresses", "")
         println("\nAddresses:")
         println(addressesJson)
         val addresses: List<Addresses> = mapper.readValue(addressesJson)
@@ -182,14 +182,14 @@ class ExecuteVersionFromSeed {
         val datadir = MainApplication.getAppContext()!!.filesDir.path
         val monitorMempool = false
 
-        val initFromSeedJson = uniffi.rustlib.initFromSeed(server, seed, birthday, datadir, chainhint, monitorMempool)
+        val initFromSeedJson = uniffi.zingo.initFromSeed(server, seed, birthday, datadir, chainhint, monitorMempool)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
         assertThat(initFromSeed.seed).isEqualTo(Seeds.ABANDON)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
-        val version = uniffi.rustlib.executeCommand("version", "")
+        val version = uniffi.zingo.executeCommand("version", "")
         println("\nVersion:")
         println(version)
         assertThat(version).isNotNull()
@@ -210,26 +210,26 @@ class ExecuteSyncFromSeed {
         val datadir = MainApplication.getAppContext()!!.filesDir.path
         val monitorMempool = false
 
-        val initFromSeedJson = uniffi.rustlib.initFromSeed(server, seed, birthday, datadir, chainhint, monitorMempool)
+        val initFromSeedJson = uniffi.zingo.initFromSeed(server, seed, birthday, datadir, chainhint, monitorMempool)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
         assertThat(initFromSeed.seed).isEqualTo(Seeds.ABANDON)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
-        val infoJson = uniffi.rustlib.executeCommand("info", "")
+        val infoJson = uniffi.zingo.executeCommand("info", "")
         println("\nInfo:")
         println(infoJson)
         val info: Info = mapper.readValue(infoJson)
         assertThat(info.latest_block_height).isGreaterThan(0)
 
-        var heightJson = uniffi.rustlib.executeCommand("height", "")
+        var heightJson = uniffi.zingo.executeCommand("height", "")
         println("\nHeight pre-sync:")
         println(heightJson)
         val heightPreSync: Height = mapper.readValue(heightJson)
         assertThat(heightPreSync.height).isEqualTo(0)
 
-        val syncJson = uniffi.rustlib.executeCommand("sync", "")
+        val syncJson = uniffi.zingo.executeCommand("sync", "")
         println("\nSync:")
         println(syncJson)
         val sync: Sync = mapper.readValue(syncJson)
@@ -237,13 +237,13 @@ class ExecuteSyncFromSeed {
         assertThat(sync.latest_block).isEqualTo(info.latest_block_height)
         assertThat(sync.total_blocks_synced).isEqualTo(info.latest_block_height)
 
-        heightJson = uniffi.rustlib.executeCommand("height", "")
+        heightJson = uniffi.zingo.executeCommand("height", "")
         println("\nHeight post-sync:")
         println(heightJson)
         val heightPostSync: Height = mapper.readValue(heightJson)
         assertThat(heightPostSync.height).isEqualTo(info.latest_block_height)
 
-        val syncStatusJson = uniffi.rustlib.executeCommand("syncstatus", "")
+        val syncStatusJson = uniffi.zingo.executeCommand("syncstatus", "")
         println("\nSync status:")
         println(syncStatusJson)
         val syncStatus: SyncStatus = mapper.readValue(syncStatusJson)
@@ -263,44 +263,44 @@ class ExecuteSendFromOrchard {
         val datadir = MainApplication.getAppContext()!!.filesDir.path
         val monitorMempool = false
 
-        val initFromSeedJson = uniffi.rustlib.initFromSeed(server, seed, birthday, datadir, chainhint, monitorMempool)
+        val initFromSeedJson = uniffi.zingo.initFromSeed(server, seed, birthday, datadir, chainhint, monitorMempool)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
         assertThat(initFromSeed.seed).isEqualTo(Seeds.HOSPITAL)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
-        var syncJson = uniffi.rustlib.executeCommand("sync", "")
+        var syncJson = uniffi.zingo.executeCommand("sync", "")
         println("\nSync:")
         println(syncJson)
 
-        var balanceJson = uniffi.rustlib.executeCommand("balance", "")
+        var balanceJson = uniffi.zingo.executeCommand("balance", "")
         println("\nBalance pre-send:")
         println(balanceJson)
         val balancePreSend: Balance = mapper.readValue(balanceJson)
         assertThat(balancePreSend.spendable_orchard_balance).isEqualTo(1000000)
         assertThat(balancePreSend.transparent_balance).isEqualTo(0)
 
-        val addressesJson = uniffi.rustlib.executeCommand("addresses", "")
+        val addressesJson = uniffi.zingo.executeCommand("addresses", "")
         println("\nAddresses:")
         println(addressesJson)
         val addresses: List<Addresses> = mapper.readValue(addressesJson)
 
         val send = Send(addresses[0].receivers.transparent, 100000, null)
 
-        val txidJson = uniffi.rustlib.executeCommand("send", mapper.writeValueAsString(listOf(send)))
+        val txidJson = uniffi.zingo.executeCommand("send", mapper.writeValueAsString(listOf(send)))
         println("\nTXID:")
         println(txidJson)
 
-        val sendProgressJson = uniffi.rustlib.executeCommand("sendprogress", "")
+        val sendProgressJson = uniffi.zingo.executeCommand("sendprogress", "")
         println("\nSend progress:")
         println(sendProgressJson)
 
-        syncJson = uniffi.rustlib.executeCommand("sync", "")
+        syncJson = uniffi.zingo.executeCommand("sync", "")
         println("\nSync:")
         println(syncJson)
 
-        balanceJson = uniffi.rustlib.executeCommand("balance", "")
+        balanceJson = uniffi.zingo.executeCommand("balance", "")
         println("\nBalance post-send:")
         println(balanceJson)
         val balancePostSend: Balance = mapper.readValue(balanceJson)
@@ -320,22 +320,22 @@ class UpdateCurrentPriceAndSummariesFromSeed {
         val datadir = MainApplication.getAppContext()!!.filesDir.path
         val monitorMempool = false
 
-        val initFromSeedJson = uniffi.rustlib.initFromSeed(server, seed, birthday, datadir, chainhint, monitorMempool)
+        val initFromSeedJson = uniffi.zingo.initFromSeed(server, seed, birthday, datadir, chainhint, monitorMempool)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
         assertThat(initFromSeed.seed).isEqualTo(Seeds.HOSPITAL)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
-        val price = uniffi.rustlib.executeCommand("updatecurrentprice", "")
+        val price = uniffi.zingo.executeCommand("updatecurrentprice", "")
         println("\nPrice:")
         println(price)
 
-        val syncJson = uniffi.rustlib.executeCommand("sync", "")
+        val syncJson = uniffi.zingo.executeCommand("sync", "")
         println("\nSync:")
         println(syncJson)
 
-        val summariesJson = uniffi.rustlib.executeCommand("summaries", "")
+        val summariesJson = uniffi.zingo.executeCommand("summaries", "")
         println("\nSummaries:")
         println(summariesJson)
         val summaries: List<Summaries> = mapper.readValue(summariesJson)
@@ -387,18 +387,18 @@ class ExecuteSaplingBalanceFromSeed {
         val datadir = MainApplication.getAppContext()!!.filesDir.path
         val monitorMempool = false
 
-        val initFromSeedJson = uniffi.rustlib.initFromSeed(server, seed, birthday, datadir, chainhint, monitorMempool)
+        val initFromSeedJson = uniffi.zingo.initFromSeed(server, seed, birthday, datadir, chainhint, monitorMempool)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
         assertThat(initFromSeed.seed).isEqualTo(Seeds.HOSPITAL)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
-        val syncJson = uniffi.rustlib.executeCommand("sync", "")
+        val syncJson = uniffi.zingo.executeCommand("sync", "")
         println("\nSync:")
         println(syncJson)
         
-        val summariesJson = uniffi.rustlib.executeCommand("summaries", "")
+        val summariesJson = uniffi.zingo.executeCommand("summaries", "")
         println("\nSummaries:")
         println(summariesJson)
 
@@ -417,7 +417,7 @@ class ExecuteSaplingBalanceFromSeed {
         // sapling pool = 0
         // transparent =  0
 
-        val balanceJson = uniffi.rustlib.executeCommand("balance", "")
+        val balanceJson = uniffi.zingo.executeCommand("balance", "")
         println("\nBalance:")
         println(balanceJson)
         val balance: Balance = mapper.readValue(balanceJson)

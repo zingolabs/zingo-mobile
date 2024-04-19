@@ -53,10 +53,10 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
         val exists: Boolean = walletExists()
 
         if (exists) {
-            uniffi.rustlib.initLogging()
+            uniffi.zingo.initLogging()
 
             // check the Server, because the task can run without the App.
-            val balance = uniffi.rustlib.executeCommand("balance", "")
+            val balance = uniffi.zingo.executeCommand("balance", "")
             Log.i("SCHEDULED_TASK_RUN", "Testing if server is active: $balance")
             if (balance.lowercase().startsWith("error")) {
                 // this means this task is running with the App closed
@@ -68,14 +68,14 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
             }
 
             // interrupt sync to false, just in case it is true.
-            val noInterrupting = uniffi.rustlib.executeCommand("interrupt_sync_after_batch", "false")
+            val noInterrupting = uniffi.zingo.executeCommand("interrupt_sync_after_batch", "false")
             Log.i("SCHEDULED_TASK_RUN", "Not interrupting sync: $noInterrupting")
 
             // the task is running here blocking this execution until this process finished:
             // 1. finished the syncing.
 
             Log.i("SCHEDULED_TASK_RUN", "sync BEGIN")
-            val syncing = uniffi.rustlib.executeCommand("sync", "")
+            val syncing = uniffi.zingo.executeCommand("sync", "")
             Log.i("SCHEDULED_TASK_RUN", "sync END: $syncing")
 
         } else {
@@ -123,7 +123,7 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
     }
 
     private fun stopSyncingProcess() {
-        var status = uniffi.rustlib.executeCommand("syncstatus", "")
+        var status = uniffi.zingo.executeCommand("syncstatus", "")
         Log.i("SCHEDULED_TASK_RUN", "status response $status")
 
         var data: ByteArray = status.toByteArray(StandardCharsets.UTF_8)
@@ -135,13 +135,13 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
 
         while (inProgress) {
             // interrupt
-            val interrupting = uniffi.rustlib.executeCommand("interrupt_sync_after_batch", "true")
+            val interrupting = uniffi.zingo.executeCommand("interrupt_sync_after_batch", "true")
             Log.i("SCHEDULED_TASK_RUN", "Interrupting sync: $interrupting")
 
             // blocking the thread for 0.5 seconds.
             Thread.sleep(500)
 
-            status = uniffi.rustlib.executeCommand("syncstatus", "")
+            status = uniffi.zingo.executeCommand("syncstatus", "")
             Log.i("SCHEDULED_TASK_RUN", "status response $status")
 
             data = status.toByteArray(StandardCharsets.UTF_8)
@@ -242,7 +242,7 @@ class BSCompanion {
             val reactContext = ReactApplicationContext(MainApplication.getAppContext())
 
             // run interrupt sync, just in case.
-            val interrupting = uniffi.rustlib.executeCommand("interrupt_sync_after_batch", "true")
+            val interrupting = uniffi.zingo.executeCommand("interrupt_sync_after_batch", "true")
             Log.i("SCHEDULED_TASK_RUN", "Interrupting sync: $interrupting")
 
             Log.i("SCHEDULING_TASK", "Cancel background Task")

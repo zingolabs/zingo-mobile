@@ -10,4 +10,4 @@
 #import <React/RCTConvert.h>
 #import <React/RCTBundleURLProvider.h>
 
-#import "rustlibFFI.h"
+#import "zingoFFI.h"

@@ -49,10 +49,10 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun createNewWallet(server: String, chainhint: String, promise: Promise) {
         // Log.i("MAIN", "Creating new wallet")
 
-        uniffi.rustlib.initLogging()
+        uniffi.zingo.initLogging()
 
         // Create a seed
-        val seed = uniffi.rustlib.initNew(server, reactContext.applicationContext.filesDir.absolutePath, chainhint, true)
+        val seed = uniffi.zingo.initNew(server, reactContext.applicationContext.filesDir.absolutePath, chainhint, true)
         // Log.i("MAIN-Seed", seed)
 
         if (!seed.lowercase().startsWith("error")) {
@@ -66,9 +66,9 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun restoreWalletFromSeed(seed: String, birthday: String, server: String, chainhint: String, promise: Promise) {
         // Log.i("MAIN", "Restoring wallet with seed $seed")
 
-        uniffi.rustlib.initLogging()
+        uniffi.zingo.initLogging()
 
-        val rseed = uniffi.rustlib.initFromSeed(server, seed, birthday.toULong(), reactContext.applicationContext.filesDir.absolutePath, chainhint, true)
+        val rseed = uniffi.zingo.initFromSeed(server, seed, birthday.toULong(), reactContext.applicationContext.filesDir.absolutePath, chainhint, true)
         // Log.i("MAIN", rseed)
 
         if (!rseed.lowercase().startsWith("error")) {
@@ -82,9 +82,9 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun restoreWalletFromUfvk(ufvk: String, birthday: String, server: String, chainhint: String, promise: Promise) {
         // Log.i("MAIN", "Restoring wallet with ufvk $ufvk")
 
-        uniffi.rustlib.initLogging()
+        uniffi.zingo.initLogging()
 
-        val rufvk = uniffi.rustlib.initFromUfvk(server, ufvk, birthday.toULong(), reactContext.applicationContext.filesDir.absolutePath, chainhint, true)
+        val rufvk = uniffi.zingo.initFromUfvk(server, ufvk, birthday.toULong(), reactContext.applicationContext.filesDir.absolutePath, chainhint, true)
         // Log.i("MAIN", rufvk)
 
         if (!rufvk.lowercase().startsWith("error")) {
@@ -258,11 +258,11 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             }
         }
 
-        uniffi.rustlib.initLogging()
+        uniffi.zingo.initLogging()
 
         Log.i("MAIN", "file size: $middle8w")
 
-        return uniffi.rustlib.initFromB64(
+        return uniffi.zingo.initFromB64(
             server,
             fileb64.toString(),
             reactContext.applicationContext.filesDir.absolutePath,
@@ -325,10 +325,10 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun execute(cmd: String, args: String, promise: Promise) {
         thread {
 
-            uniffi.rustlib.initLogging()
+            uniffi.zingo.initLogging()
 
             // Log.i("execute", "Executing $cmd with $args")
-            val resp = uniffi.rustlib.executeCommand(cmd, args)
+            val resp = uniffi.zingo.executeCommand(cmd, args)
             // Log.i("execute", "Response to $cmd : $resp")
 
             // And save it if it was a sync
@@ -356,7 +356,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     fun saveWallet() {
         // Get the encoded wallet file
-        val b64encoded: String = uniffi.rustlib.saveToB64()
+        val b64encoded: String = uniffi.zingo.saveToB64()
         if (b64encoded.lowercase().startsWith("error")) {
             // with error don't save the file. Obviously.
             Log.e("MAIN", "Couldn't save the wallet. $b64encoded")
@@ -419,10 +419,10 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun getLatestBlock(server: String, promise: Promise) {
         // Log.i("MAIN", "Initialize Light Client")
 
-        uniffi.rustlib.initLogging()
+        uniffi.zingo.initLogging()
 
         // Initialize Light Client
-        val resp = uniffi.rustlib.getLatestBlockServer(server)
+        val resp = uniffi.zingo.getLatestBlockServer(server)
 
         promise.resolve(resp)
     }
@@ -431,10 +431,10 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun getDonationAddress(promise: Promise) {
         // Log.i("MAIN", "Initialize Light Client")
 
-        uniffi.rustlib.initLogging()
+        uniffi.zingo.initLogging()
 
         // Initialize Light Client
-        val resp = uniffi.rustlib.getDeveloperDonationAddress()
+        val resp = uniffi.zingo.getDeveloperDonationAddress()
 
         promise.resolve(resp)
     }

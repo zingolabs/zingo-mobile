@@ -1,11 +1,11 @@
 #!/bin/bash
 
 cd ../lib
-cargo run --release --bin uniffi-bindgen generate ../lib/src/rustlib.udl --language swift --out-dir ./Generated
+cargo run --release --bin uniffi-bindgen generate ../lib/src/zingo.udl --language swift --out-dir ./Generated
 cargo lipo --release --targets aarch64-apple-ios-sim
 
-cp ./Generated/rustlib.swift ../../ios
-cp ./Generated/rustlibFFI.h ../../ios
-cp ./Generated/rustlibFFI.modulemap ../../ios
+cp ./Generated/zingo.swift ../../ios
+cp ./Generated/zingoFFI.h ../../ios
+cp ./Generated/zingoFFI.modulemap ../../ios
 
-cp ../target/universal/release/librustlib.a ../../ios/libuniffi_rustlib.a
+cp ../target/universal/release/libzingo.a ../../ios/libuniffi_zingo.a
