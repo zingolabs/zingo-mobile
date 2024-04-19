@@ -423,7 +423,7 @@
     "deshielded": "Деэкранировано",
     "lose-address-title": "ВЫБЕРИТЕ НОВЫЙ АДРЕС",
     "lose-address-alert": "У вас уже есть действительный адрес в поле для адреса. Вы желаете его заменить?",
-    "confirm-donation": "Задонатить на разработку ZingoLabs"
+    "confirm-donation": "Пожертвование"
   },
   "receive": {
     "u-title": "Унифицированный адрес",

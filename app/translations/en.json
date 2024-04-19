@@ -424,7 +424,7 @@
     "deshielded": "Deshielded",
     "lose-address-title": "SELECT A NEW ADDRESS",
     "lose-address-alert": "You already have a valid address in the address field. Do you want to replace it?",
-    "confirm-donation": "Donation to ZingoLabs"
+    "confirm-donation": "Donation"
   },
   "receive": {
     "u-title": "Unified Address",

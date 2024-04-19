@@ -424,7 +424,7 @@
     "deshielded": "Desblindada",
     "lose-address-title": "SELECCIONAR UNA NUEVA DIRECCIÓN",
     "lose-address-alert": "Ya tienes una dirección válida en el campo de dirección. ¿Desea sustituirla?",
-    "confirm-donation": "Donación a ZingoLabs"
+    "confirm-donation": "Donación"
   },
   "receive": {
     "u-title": "Dirección Unificada",
