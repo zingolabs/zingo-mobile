@@ -84,3 +84,7 @@ buck-out/
 # firebase
 /**/google-services.json
 /**/GoogleService-Info.plist
+/**/zingo-b6332-254f9b5f5a8a.json
+
+# env file
+/**/.env

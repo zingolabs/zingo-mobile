@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useState } from 'react';
-import { Alert, PermissionsAndroid, Platform, SafeAreaView } from 'react-native';
+import { Alert, Platform, SafeAreaView } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import messaging, { FirebaseMessagingTypes } from '@react-native-firebase/messaging';
@@ -8,6 +8,11 @@ import messaging, { FirebaseMessagingTypes } from '@react-native-firebase/messag
 import { LoadedApp } from './app/LoadedApp';
 import { LoadingApp } from './app/LoadingApp';
 import { ThemeType } from './app/types';
+
+let PermissionsAndroid: any;
+if (Platform.OS === 'android') {
+  PermissionsAndroid = require('react-native/Libraries/PermissionsAndroid/PermissionsAndroid')
+}
 
 const advancedTheme: ThemeType = {
   dark: true,
@@ -58,7 +63,9 @@ const App: React.FunctionComponent = () => {
           Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
         });
 
-        return unsubscribe;
+        return () => {
+          unsubscribe;
+        }
       }
     })();
   }, []);

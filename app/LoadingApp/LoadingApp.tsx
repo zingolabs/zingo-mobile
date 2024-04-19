@@ -14,6 +14,7 @@ import {
   NativeEventSubscription,
   TextInput,
   ActivityIndicator,
+  Platform,
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { I18n } from 'i18n-js';
@@ -63,6 +64,8 @@ const ChainTypeToggle = React.lazy(() => import('../../components/Components/Cha
 const en = require('../translations/en.json');
 const es = require('../translations/es.json');
 const pt = require('../translations/pt.json');
+
+const FIREBASE_API_URL = 'https://fcm.googleapis.com/v1/projects/993414412228/messages:send';
 
 // for testing
 //const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -361,15 +364,34 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
 
     const t = await messaging().getToken();
     console.log('token', t);
-    try {
-      const personalizedMessage = 'Hello, pepe!';
-      messaging().sendMessage({
-        notification: { body: personalizedMessage },
-        fcmOptions: {},
-      });
-      Alert.alert('message sended');
-    } catch (error: any) {
-      Alert.alert('error sending message', error.message);
+    const notification = {
+      title: 'title',
+      body: 'body',
+    };
+    const message = {
+      to: t,
+      notification,
+      fcmOptions: {},
+    };
+    if (Platform.OS === 'android') {
+      // Android
+      try {
+        const personalizedMessage = 'Hello, pepe!';
+        messaging().sendMessage(message);
+        Alert.alert('message sended');
+      } catch (error: any) {
+        Alert.alert('error sending message', error.message);
+      }
+    } else {
+      // IOS
+      fetch(FIREBASE_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authentication: require('../../zingo-b6332-254f9b5f5a8a.json')
+        },
+        body: JSON.stringify(message),
+      }).then((response) => response.json()).then((json) => console.log(json)).catch((error) => console.log(error));
     }
 
     this.setState({ actionButtonsDisabled: true });
