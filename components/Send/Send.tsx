@@ -150,23 +150,26 @@ const Send: React.FunctionComponent<SendProps> = ({
   };
 
   const calculateFeeWithPropose = async (amount: number, address: string, memo: string = ''): Promise<void> => {
-    // if no address make no sense to run the propose.
-    if (!address || validAddress !== 1) {
-      setFee(0);
-      return;
-    }
     // if this is not a valid number no sense to run the propose.
     if (isNaN(amount)) {
       setFee(0);
       return;
     }
-    const proposeTransaction: SendJsonToTypeType[] = [
-      {
-        amount: amount * 10 ** 8,
-        address: address,
-        memo: memo,
-      },
-    ];
+    const amountFormatted = parseInt((amount * 10 ** 8).toFixed(0), 10);
+    const proposeTransaction: SendJsonToTypeType[] = memo
+      ? [
+          {
+            amount: amountFormatted,
+            address: address,
+            memo: memo,
+          },
+        ]
+      : [
+          {
+            amount: amountFormatted,
+            address: address,
+          },
+        ];
     let proposeFee = 0;
     const runProposeStr = await runPropose(JSON.stringify(proposeTransaction));
     console.log(proposeTransaction, runProposeStr);
@@ -920,9 +923,13 @@ const Send: React.FunctionComponent<SendProps> = ({
                           }}
                           value={ta.amount}
                           onChangeText={(text: string) => updateToField(null, text.substring(0, 20), null, null, null)}
-                          onEndEditing={(e: any) =>
-                            updateToField(null, e.nativeEvent.text.substring(0, 20), null, null, null)
-                          }
+                          onEndEditing={(e: any) => {
+                            updateToField(null, e.nativeEvent.text.substring(0, 20), null, null, null);
+                            calculateFeeWithPropose(
+                              Utils.parseStringLocaletoNumberFloat(e.nativeEvent.text.substring(0, 20)),
+                              ta.to,
+                            );
+                          }}
                           editable={true}
                           maxLength={20}
                         />
