@@ -852,6 +852,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                     {sendAll && mode !== 'basic' && (
                       <TouchableOpacity
                         onPress={() => {
+                          calculateFeeWithPropose(maxAmount, sendPageState.toaddr.to);
                           updateToField(null, Utils.parseNumberFloatToStringLocale(maxAmount, 8), null, null, null);
                         }}>
                         <View
@@ -1285,7 +1286,10 @@ const Send: React.FunctionComponent<SendProps> = ({
                 type="Secondary"
                 style={{ marginLeft: 10 }}
                 title={translate('send.clear') as string}
-                onPress={() => clearToAddr()}
+                onPress={() => {
+                  clearToAddr();
+                  setFee(0);
+                }}
               />
             </View>
             {server.chain_name === 'main' && (
