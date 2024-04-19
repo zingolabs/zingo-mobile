@@ -175,12 +175,14 @@ const Send: React.FunctionComponent<SendProps> = ({
     console.log(proposeTransaction, runProposeStr);
     if (runProposeStr.toLowerCase().startsWith('error')) {
       // snack with error
-      Alert.alert('Calculating the FEE', runProposeStr);
+      console.log(runProposeStr);
+      //Alert.alert('Calculating the FEE', runProposeStr);
     } else {
       const runProposeJson: RPCProposeType = JSON.parse(runProposeStr);
       if (runProposeJson.error) {
         // snack with error
-        Alert.alert('Calculating the FEE', runProposeJson.error);
+        console.log(runProposeJson.error);
+        //Alert.alert('Calculating the FEE', runProposeJson.error);
       } else {
         if (runProposeJson.fee) {
           proposeFee = runProposeJson.fee / 10 ** 8;
