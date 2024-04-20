@@ -205,8 +205,6 @@ const Send: React.FunctionComponent<SendProps> = ({
         Utils.parseStringLocaletoNumberFloat(sendPageState.toaddr.amount),
         sendPageState.toaddr.to,
       );
-    } else {
-      setFee(0);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [validAddress, validAmount]);
@@ -874,9 +872,14 @@ const Send: React.FunctionComponent<SendProps> = ({
                     {sendAll && mode !== 'basic' && (
                       <TouchableOpacity
                         onPress={() => {
-                          //updateToField(null, Utils.parseNumberFloatToStringLocale(maxAmount, 8), null, null, null);
+                          if (fee > 0) {
+                            updateToField(null, Utils.parseNumberFloatToStringLocale(maxAmount, 8), null, null, null);
+                          }
                           calculateFeeWithPropose(maxAmount, sendPageState.toaddr.to);
                           setSendAllClick(true);
+                          setTimeout(() => {
+                            setSendAllClick(false);
+                          }, 1000);
                         }}>
                         <View
                           style={{
@@ -917,7 +920,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         flexDirection: 'row',
                         justifyContent: 'flex-start',
                       }}>
-                      <RegText style={{ marginTop: 22, marginRight: 5, fontSize: 20, transform: [{ scaleY: 1.5 }] }}>
+                      <RegText style={{ marginTop: 17, marginRight: 5, fontSize: 20, transform: [{ scaleY: 1.5 }] }}>
                         {'\u1647'}
                       </RegText>
                       <View
@@ -1117,9 +1120,11 @@ const Send: React.FunctionComponent<SendProps> = ({
                             onChangeText={(text: string) =>
                               updateToField(null, null, text.substring(0, 15), null, null)
                             }
-                            onEndEditing={(e: any) =>
-                              updateToField(null, null, e.nativeEvent.text.substring(0, 15), null, null)
-                            }
+                            onEndEditing={(e: any) => {
+                              updateToField(null, null, e.nativeEvent.text.substring(0, 15), null, null);
+                              // re-calculate the fee with the zec amount in the other field
+                              calculateFeeWithPropose(Utils.parseStringLocaletoNumberFloat(ta.amount), ta.to);
+                            }}
                             editable={true}
                             maxLength={15}
                           />
