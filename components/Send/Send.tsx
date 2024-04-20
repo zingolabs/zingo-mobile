@@ -124,6 +124,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [sendToSelf, setSendToSelf] = useState<boolean>(false);
   const [donationAddress, setDonationAddress] = useState<boolean>(false);
   const [negativeMaxAount, setNegativeMaxAount] = useState<boolean>(false);
+  const [sendAllClick, setSendAllClick] = useState<boolean>(false);
   const isFocused = useIsFocused();
 
   const slideAnim = useSharedValue(0);
@@ -150,24 +151,28 @@ const Send: React.FunctionComponent<SendProps> = ({
   };
 
   const calculateFeeWithPropose = async (amount: number, address: string, memo: string = ''): Promise<void> => {
-    // if this is not a valid number no sense to run the propose.
-    if (isNaN(amount)) {
-      setFee(0);
-      return;
-    }
-    const amountFormatted = parseInt((amount * 10 ** 8).toFixed(0), 10);
     const proposeTransaction: SendJsonToTypeType[] = memo
       ? [
           {
-            amount: amountFormatted,
-            address: address,
+            amount:
+              validAmount === 1
+                ? parseInt((amount * 10 ** 8).toFixed(0), 10)
+                : validAmount === -2
+                ? parseInt((maxAmount * 10 ** 8).toFixed(0), 10)
+                : 0,
+            address: validAddress === 1 ? address : '',
             memo: memo,
           },
         ]
       : [
           {
-            amount: amountFormatted,
-            address: address,
+            amount:
+              validAmount === 1
+                ? parseInt((amount * 10 ** 8).toFixed(0), 10)
+                : validAmount === -2
+                ? parseInt((maxAmount * 10 ** 8).toFixed(0), 10)
+                : 0,
+            address: validAddress === 1 ? address : '',
           },
         ];
     let proposeFee = 0;
@@ -193,9 +198,18 @@ const Send: React.FunctionComponent<SendProps> = ({
   };
 
   useEffect(() => {
-    calculateFeeWithPropose(Utils.parseStringLocaletoNumberFloat(sendPageState.toaddr.amount), sendPageState.toaddr.to);
+    if (validAddress === 0 && validAmount === 0) {
+      setFee(0);
+    } else if (validAddress !== -1 && validAmount !== -1) {
+      calculateFeeWithPropose(
+        Utils.parseStringLocaletoNumberFloat(sendPageState.toaddr.amount),
+        sendPageState.toaddr.to,
+      );
+    } else {
+      setFee(0);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sendPageState.toaddr.to, validAddress]);
+  }, [validAddress, validAmount]);
 
   useEffect(() => {
     // transparent is not spendable.
@@ -205,12 +219,19 @@ const Send: React.FunctionComponent<SendProps> = ({
       // if max is 0 then the user can send a memo with amount 0.
       setMaxAmount(max);
       setNegativeMaxAount(false);
+      if (sendAllClick) {
+        updateToField(null, Utils.parseNumberFloatToStringLocale(max, 8), null, null, null);
+      }
     } else {
       // if max is less than 0 then the user CANNOT send anything.
       setMaxAmount(0);
       setNegativeMaxAount(true);
+      if (sendAllClick) {
+        updateToField(null, '0', null, null, null);
+      }
     }
     setSpendable(spend);
+    setSendAllClick(false);
 
     const stillConf =
       totalBalance.orchardBal !== totalBalance.spendableOrchard ||
@@ -224,6 +245,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     setStillConfirming(stillConf);
     setShowShieldInfo(showShield);
     setShowUpgradeInfo(showUpgrade);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     donation,
     fee,
@@ -852,8 +874,9 @@ const Send: React.FunctionComponent<SendProps> = ({
                     {sendAll && mode !== 'basic' && (
                       <TouchableOpacity
                         onPress={() => {
+                          //updateToField(null, Utils.parseNumberFloatToStringLocale(maxAmount, 8), null, null, null);
                           calculateFeeWithPropose(maxAmount, sendPageState.toaddr.to);
-                          updateToField(null, Utils.parseNumberFloatToStringLocale(maxAmount, 8), null, null, null);
+                          setSendAllClick(true);
                         }}>
                         <View
                           style={{
@@ -1287,8 +1310,8 @@ const Send: React.FunctionComponent<SendProps> = ({
                 style={{ marginLeft: 10 }}
                 title={translate('send.clear') as string}
                 onPress={() => {
-                  clearToAddr();
                   setFee(0);
+                  clearToAddr();
                 }}
               />
             </View>
