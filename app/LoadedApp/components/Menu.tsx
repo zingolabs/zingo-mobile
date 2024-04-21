@@ -155,6 +155,11 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuSt
               {translate('loadedapp.loadwalletfromseed-basic') as string}
             </RegText>
           )}
+          {mode === 'basic' && (
+            <RegText onPress={() => onItemSelectedWrapper('Tip ZingoLabs')} style={item}>
+              {translate('loadedapp.tipzingolabs-basic') as string}
+            </RegText>
+          )}
         </View>
       </ScrollView>
       <View

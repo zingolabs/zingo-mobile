@@ -85,7 +85,7 @@
     "serverfirsttry": "Tentando executar a ação com um servidor diferente. O servidor atual pode estar falhando.",
     "serversecondtry": "Não parece haver nenhum problema com o servidor. Algo mais está acontecendo.",
     "alert-donation-title": "APOIAR A ZINGOLABS",
-    "alert-donation-body": "Você quer dar apoio financeiro ao Zingolabs? Você estaria disposto a dar uma gorjeta a um Zenny (0.01 ZEC) em cada transação. Se sim, pressione confirmar, caso contrário, pressione Cancelar."
+    "alert-donation-body": "Você quer ajudar o ZingoLabs a tornar o Zcash mais útil? Opte por dar uma gorjeta de um Zenny (0.01 ZEC) para ZingoLabs em cada transação! Se sim, pressione confirmar, caso contrário, pressione Cancelar."
   },
   "loadedapp": {
     "about": "Sobre a Zingo!",
@@ -104,6 +104,7 @@
     "insight": "Visão Financeira",
     "loadwalletfromseed-basic": "Restaurar Carteira",
     "addressbook": "Agenda de Endereços",
+    "tipzingolabs-basic": "Apoiar a ZingoLabs",
     "restoremainnet-error": "Esta opção está disponível apenas para servidores da 'Mainnet'.",
     "changeservernew-error": "Erro ao tentar alterar para um novo servidor: ",
     "readingwallet-error": "Erro ao tentar ler a carteira com o novo servidor:",

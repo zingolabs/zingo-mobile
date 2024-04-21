@@ -953,6 +953,25 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
         ],
         { cancelable: false, userInterfaceStyle: 'light' },
       );
+    } else if (item === 'Tip ZingoLabs') {
+      // change to the screen 3 directly.
+      const { translate } = this.state;
+      Alert.alert(
+        translate('loadingapp.alert-donation-title') as string,
+        translate('loadingapp.alert-donation-body') as string,
+        [
+          {
+            text: translate('confirm') as string,
+            onPress: async () => await this.set_donation_option('donation', true),
+          },
+          {
+            text: translate('cancel') as string,
+            onPress: async () => await this.set_donation_option('donation', false),
+            style: 'cancel',
+          },
+        ],
+        { cancelable: false, userInterfaceStyle: 'light' },
+      );
     } else if (item === 'Address Book') {
       this.setState({
         addressBookModalVisible: true,

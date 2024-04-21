@@ -84,8 +84,8 @@
     "alert-newwallet-body": "Can you confirm that you really want to create a new wallet and lose access to the current wallet.",
     "serverfirsttry": "Trying to perform the action with a different server. The current server may be failing.",
     "serversecondtry": "It doesn't seem to be any problem with the server. Someting else is happening.",
-    "alert-donation-title": "SUPPORT ZINGOLABS",
-    "alert-donation-body": "Do you want to give financial support to Zingolabs? You would be willing to tip one Zenny (0.01 ZEC) on each transaction. If so, press confirm, otherwise press Cancel."
+    "alert-donation-title": "TIP ZINGOLABS",
+    "alert-donation-body": "Do you want to help ZingoLabs make Zcash more useful? Opt in to tip one Zenny (0.01 ZEC) to ZingoLabs with each transaction! If so, press confirm, otherwise press Cancel."
   },
   "loadedapp": {
     "about": "About Zingo!",
@@ -104,6 +104,7 @@
     "insight": "Financial Insight",
     "loadwalletfromseed-basic": "Restore wallet",
     "addressbook": "Address Book",
+    "tipzingolabs-basic": "Tip ZingoLabs",
     "restoremainnet-error": "This option is only available for 'Mainnet' servers.",
     "changeservernew-error": "Error trying to change the server to the new one: ",
     "readingwallet-error": "Error trying to read the wallet with the new server:",

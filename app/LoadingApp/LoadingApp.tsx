@@ -382,7 +382,8 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     this.setState({ actionButtonsDisabled: true });
 
     // Here the App ask about the new donation feature if needed.
-    if (this.state.donationAlert) {
+    // only for Advance Users
+    if (this.state.donationAlert && this.state.mode === 'advanced') {
       await this.showDonationAlertAsync()
         .then(() => {
           this.setState({ donation: true });

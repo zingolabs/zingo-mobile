@@ -84,8 +84,8 @@
     "alert-newwallet-body": "Puedes confirmar que realmente quieres crear un nuevo monedero y perder el acceso al monedero actual.",
     "serverfirsttry": "Intentando realizar la acción con un servidor diferente. El servidor actual puede estar fallando.",
     "serversecondtry": "No parece haber ningún problema con el servidor. Ocurre algo diferente.",
-    "alert-donation-title": "DAR SOPORTE A ZINGOLABS",
-    "alert-donation-body": "¿Quieres dar apoyo financiero a Zingolabs? Estaría dispuesto a dar una propina de un Zenny (0.01 ZEC) en cada transacción. Si es así, presione confirmar, de lo contrario presione Cancelar."
+    "alert-donation-title": "APOYAR A ZINGOLABS",
+    "alert-donation-body": "¿Quieres ayudar a ZingoLabs a que Zcash sea más útil? Opta por dar una propina de un Zenny (0.01 ZEC) a ZingoLabs con cada transacción! Si es así, presione confirmar, de lo contrario presione Cancelar."
   },
   "loadedapp": {
     "about": "Sobre Zingo!",
@@ -104,6 +104,7 @@
     "insight": "Visión Financiera",
     "loadwalletfromseed-basic": "Restaurar monedero",
     "addressbook": "Libreta de Direcciones",
+    "tipzingolabs-basic": "Apoyar a ZingoLabs",
     "restoremainnet-error": "Esta opción está solamente disponible para la Red: 'Mainnet'.",
     "changeservernew-error": "Error al intentar cambiar al Servidor nuevo: ",
     "readingwallet-error": "Error al intentar leer el monedero activo usando el Servidor nuevo:",
