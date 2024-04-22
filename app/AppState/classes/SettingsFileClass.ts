@@ -5,7 +5,7 @@ import ServerType from '../types/ServerType';
 
 export default class SettingsFileClass {
   server: ServerType;
-  currency: CurrencyEnum.USD | '';
+  currency: CurrencyEnum;
   language: LanguageEnum;
   sendAll: boolean;
   donation: boolean;
@@ -24,7 +24,7 @@ export default class SettingsFileClass {
 
   constructor(
     server: ServerType,
-    currency: CurrencyEnum.USD | '',
+    currency: CurrencyEnum,
     language: LanguageEnum,
     sendAll: boolean,
     donation: boolean,

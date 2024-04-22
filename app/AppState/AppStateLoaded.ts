@@ -104,7 +104,7 @@ export default interface AppStateLoaded {
 
   server: ServerType;
   language: LanguageEnum;
-  currency: CurrencyEnum | '';
+  currency: CurrencyEnum;
 
   zecPrice: ZecPriceType;
   sendAll: boolean;

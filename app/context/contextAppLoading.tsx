@@ -15,6 +15,7 @@ import {
   LanguageEnum,
 } from '../AppState';
 import SnackbarType from '../AppState/types/SnackbarType';
+import { CurrencyEnum } from '../AppState/enums/CurrencyEnum';
 
 export const defaultAppStateLoading: AppStateLoading = {
   navigation: {} as StackScreenProps<any>['navigation'],
@@ -30,7 +31,7 @@ export const defaultAppStateLoading: AppStateLoading = {
   info: {} as InfoType,
 
   server: {} as ServerType,
-  currency: '',
+  currency: CurrencyEnum.noCurrency,
   language: LanguageEnum.en,
 
   zecPrice: {

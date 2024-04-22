@@ -173,7 +173,7 @@ describe('Component History - test', () => {
 
   test('History no currency, privacy normal & mode basic - snapshot', () => {
     // no currency
-    state.currency = '';
+    state.currency = CurrencyEnum.noCurrency;
     // privacy normal
     state.privacy = false;
     // mode basic

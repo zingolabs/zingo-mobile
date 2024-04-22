@@ -12,7 +12,7 @@ type CurrencyAmountProps = {
   price?: number;
   amtZec?: number;
   style?: TextStyle;
-  currency: CurrencyEnum | '';
+  currency: CurrencyEnum;
   privacy?: boolean;
 };
 

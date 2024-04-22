@@ -24,6 +24,7 @@ import { ThemeType } from '../../../app/types';
 import RPC from '../../../app/rpc';
 import Utils from '../../../app/utils';
 import { CommandEnum } from '../../../app/AppState';
+import { CurrencyEnum } from '../../../app/AppState/enums/CurrencyEnum';
 
 type ConfirmProps = {
   calculatedFee: number;
@@ -299,7 +300,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
               privacy={privacy}
             />
           </View>
-          {!!currency && (
+          {currency === CurrencyEnum.USD && (
             <View style={{ margin: 10, alignItems: 'flex-end' }}>
               <FadeText style={{ opacity: 0 }}>{translate('send.fee') as string}</FadeText>
               <CurrencyAmount

@@ -29,7 +29,7 @@ export default interface AppStateLoading {
   info: InfoType;
 
   server: ServerType;
-  currency: CurrencyEnum.USD | '';
+  currency: CurrencyEnum;
   language: LanguageEnum;
 
   zecPrice: ZecPriceType;

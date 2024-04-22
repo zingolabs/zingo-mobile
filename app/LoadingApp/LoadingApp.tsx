@@ -85,7 +85,7 @@ const SERVER_DEFAULT_0: ServerType = {
 export default function LoadingApp(props: LoadingAppProps) {
   const theme = useTheme() as unknown as ThemeType;
   const [language, setLanguage] = useState<LanguageEnum>(LanguageEnum.en);
-  const [currency, setCurrency] = useState<CurrencyEnum | ''>('');
+  const [currency, setCurrency] = useState<CurrencyEnum>(CurrencyEnum.noCurrency);
   const [server, setServer] = useState<ServerType>(SERVER_DEFAULT_0);
   const [sendAll, setSendAll] = useState<boolean>(false);
   const [donation, setDonation] = useState<boolean>(false);
@@ -192,7 +192,7 @@ export default function LoadingApp(props: LoadingAppProps) {
         await SettingsFileImpl.writeSettings('language', lang);
         //console.log('apploading NO settings', languageTag);
       }
-      if (settings.currency === '' || settings.currency === CurrencyEnum.USD) {
+      if (settings.currency === CurrencyEnum.noCurrency || settings.currency === CurrencyEnum.USD) {
         setCurrency(settings.currency);
       } else {
         await SettingsFileImpl.writeSettings('currency', currency);
@@ -285,7 +285,7 @@ type LoadingAppClassProps = {
   translate: (key: string) => TranslateType;
   theme: ThemeType;
   language: LanguageEnum;
-  currency: CurrencyEnum | '';
+  currency: CurrencyEnum;
   server: ServerType;
   sendAll: boolean;
   donation: boolean;

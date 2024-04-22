@@ -20,11 +20,12 @@ import 'moment/locale/pt';
 import 'moment/locale/ru';
 
 import Header from '../Header';
-import { SecurityType, ServerType, ServerUrisType } from '../../app/AppState';
+import { LanguageEnum, SecurityType, ServerType, ServerUrisType } from '../../app/AppState';
 import { isEqual } from 'lodash';
 import ChainTypeToggle from '../Components/ChainTypeToggle';
 import CheckBox from '@react-native-community/checkbox';
 import RNPickerSelect from 'react-native-picker-select';
+import { CurrencyEnum } from '../../app/AppState/enums/CurrencyEnum';
 
 type SettingsProps = {
   closeModal: () => void;
@@ -35,8 +36,8 @@ type SettingsProps = {
     toast: boolean,
     same_server_chain_name: boolean,
   ) => Promise<void>;
-  set_currency_option: (name: 'currency', value: string) => Promise<void>;
-  set_language_option: (name: 'language', value: string, reset: boolean) => Promise<void>;
+  set_currency_option: (name: 'currency', value: CurrencyEnum) => Promise<void>;
+  set_language_option: (name: 'language', value: LanguageEnum, reset: boolean) => Promise<void>;
   set_sendAll_option: (name: 'sendAll', value: boolean) => Promise<void>;
   set_donation_option: (name: 'donation', value: boolean) => Promise<void>;
   set_privacy_option: (name: 'privacy', value: boolean) => Promise<void>;
@@ -135,8 +136,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [itemsPicker, setItemsPicker] = useState<{ label: string; value: string }[]>([]);
   const [customServerUri, setCustomServerUri] = useState<string>('');
   const [customServerChainName, setCustomServerChainName] = useState<string>('');
-  const [currency, setCurrency] = useState<string>(currencyContext);
-  const [language, setLanguage] = useState<string>(languageContext);
+  const [currency, setCurrency] = useState<CurrencyEnum>(currencyContext);
+  const [language, setLanguage] = useState<LanguageEnum>(languageContext);
   const [sendAll, setSendAll] = useState<boolean>(sendAllContext);
   const [donation, setDonation] = useState<boolean>(donationContext);
   const [privacy, setPrivacy] = useState<boolean>(privacyContext);

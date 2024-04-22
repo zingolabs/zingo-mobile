@@ -170,7 +170,7 @@ describe('Component Send - test', () => {
 
   test('Send no currency, privacy normal & mode basic - snapshot', () => {
     // no currency
-    state.currency = '';
+    state.currency = CurrencyEnum.noCurrency;
     // privacy normal
     state.privacy = false;
     // mode basic
