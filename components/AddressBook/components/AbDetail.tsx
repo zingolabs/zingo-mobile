@@ -3,7 +3,7 @@ import React, { useContext, useState, useEffect } from 'react';
 import { View, TextInput } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
-import { AddressBookFileClass } from '../../../app/AppState';
+import { AddressBookActionEnum, AddressBookFileClass } from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
 import RegText from '../../Components/RegText';
 import { ContextAppLoaded } from '../../../app/context';
@@ -20,8 +20,8 @@ type AbDetailProps = {
   index: number;
   item: AddressBookFileClass;
   cancel: () => void;
-  action: 'Add' | 'Modify' | 'Delete';
-  doAction: (action: 'Add' | 'Modify' | 'Delete', label: string, address: string) => void;
+  action: AddressBookActionEnum;
+  doAction: (action: AddressBookActionEnum, label: string, address: string) => void;
   addressBookCurrentAddress?: string;
 };
 const AbDetail: React.FunctionComponent<AbDetailProps> = ({
@@ -39,7 +39,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
 
   const [label, setLabel] = useState<string>(item.label);
   const [address, setAddress] = useState<string>(item.address);
-  const [action, setAction] = useState<'Add' | 'Modify' | 'Delete'>(actionProp);
+  const [action, setAction] = useState<AddressBookActionEnum>(actionProp);
   const [error, setError] = useState<string>('');
   const [errorAddress, setErrorAddress] = useState<string>('');
 
@@ -48,7 +48,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
       setAddress(addressBookCurrentAddress);
     }
     if (item.label !== label && item.address !== address) {
-      setAction('Add');
+      setAction(AddressBookActionEnum.Add);
     } else {
       setAction(actionProp);
     }

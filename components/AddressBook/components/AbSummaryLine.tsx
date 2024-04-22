@@ -7,7 +7,7 @@ import { faAddressCard, faQrcode, faTrashCan, faPencil, faArrowUp } from '@forta
 //import { TouchableOpacity } from 'react-native-gesture-handler';
 
 import FadeText from '../../Components/FadeText';
-import { AddressBookFileClass, SendPageStateClass, ToAddrClass } from '../../../app/AppState';
+import { AddressBookActionEnum, AddressBookFileClass, SendPageStateClass, ToAddrClass } from '../../../app/AppState';
 import Utils from '../../../app/utils';
 import { ThemeType } from '../../../app/types';
 import { ContextAppLoaded } from '../../../app/context';
@@ -20,11 +20,11 @@ type AbSummaryLineProps = {
   index: number;
   item: AddressBookFileClass;
   setCurrentItem: (b: number) => void;
-  setAction: (action: 'Add' | 'Modify' | 'Delete') => void;
+  setAction: (action: AddressBookActionEnum) => void;
   setSendPageState: (s: SendPageStateClass) => void;
   closeModal: () => void;
   handleScrollToTop: () => void;
-  doAction: (action: 'Add' | 'Modify' | 'Delete', label: string, address: string) => void;
+  doAction: (action: AddressBookActionEnum, label: string, address: string) => void;
 };
 const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
   index,
@@ -53,7 +53,10 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
       translate('addressbook.delete-title') as string,
       translate('addressbook.delete-alert') as string,
       [
-        { text: translate('confirm') as string, onPress: () => doAction('Delete', item.label, item.address) },
+        {
+          text: translate('confirm') as string,
+          onPress: () => doAction(AddressBookActionEnum.Delete, item.label, item.address),
+        },
         { text: translate('cancel') as string, style: 'cancel' },
       ],
       { cancelable: false, userInterfaceStyle: 'light' },
@@ -77,7 +80,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
           <TouchableOpacity
             onPress={() => {
               setCurrentItem(index);
-              setAction('Modify');
+              setAction(AddressBookActionEnum.Modify);
               handleScrollToTop();
             }}>
             <View style={{ flexDirection: 'row', marginBottom: 5 }}>
@@ -105,7 +108,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
             style={{ zIndex: 999, padding: 10 }}
             onPress={() => {
               setCurrentItem(index);
-              setAction('Modify');
+              setAction(AddressBookActionEnum.Modify);
               handleScrollToTop();
             }}>
             <FontAwesomeIcon style={{ opacity: 0.8 }} size={25} icon={faPencil} color={colors.money} />

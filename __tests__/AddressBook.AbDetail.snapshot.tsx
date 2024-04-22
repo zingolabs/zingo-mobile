@@ -9,7 +9,7 @@ import { render } from '@testing-library/react-native';
 import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
 import { ThemeType } from '../app/types';
 import AbDetail from '../components/AddressBook/components/AbDetail';
-import { AddressBookFileClass } from '../app/AppState';
+import { AddressBookActionEnum, AddressBookFileClass } from '../app/AppState';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -84,7 +84,13 @@ describe('Component Address Book Details - test', () => {
   test('Address Book Datails - Add - snapshot', () => {
     const ab: any = render(
       <ContextAppLoadedProvider value={state}>
-        <AbDetail index={-1} item={{} as AddressBookFileClass} cancel={onCancel} action={'Add'} doAction={onAction} />
+        <AbDetail
+          index={-1}
+          item={{} as AddressBookFileClass}
+          cancel={onCancel}
+          action={AddressBookActionEnum.Add}
+          doAction={onAction}
+        />
       </ContextAppLoadedProvider>,
     );
     expect(ab.toJSON()).toMatchSnapshot();
@@ -92,7 +98,13 @@ describe('Component Address Book Details - test', () => {
   test('Address Book Datails - Modify - snapshot', () => {
     const ab: any = render(
       <ContextAppLoadedProvider value={state}>
-        <AbDetail index={0} item={state.addressBook[0]} cancel={onCancel} action={'Modify'} doAction={onAction} />
+        <AbDetail
+          index={0}
+          item={state.addressBook[0]}
+          cancel={onCancel}
+          action={AddressBookActionEnum.Modify}
+          doAction={onAction}
+        />
       </ContextAppLoadedProvider>,
     );
     expect(ab.toJSON()).toMatchSnapshot();
@@ -100,7 +112,13 @@ describe('Component Address Book Details - test', () => {
   test('Address Book Datails - Delete - snapshot', () => {
     const ab: any = render(
       <ContextAppLoadedProvider value={state}>
-        <AbDetail index={1} item={state.addressBook[1]} cancel={onCancel} action={'Delete'} doAction={onAction} />
+        <AbDetail
+          index={1}
+          item={state.addressBook[1]}
+          cancel={onCancel}
+          action={AddressBookActionEnum.Delete}
+          doAction={onAction}
+        />
       </ContextAppLoadedProvider>,
     );
     expect(ab.toJSON()).toMatchSnapshot();

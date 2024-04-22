@@ -9,7 +9,7 @@ import 'moment/locale/ru';
 import { useTheme, useScrollToTop } from '@react-navigation/native';
 import Animated, { Easing, useSharedValue, withTiming } from 'react-native-reanimated';
 
-import { AddressBookFileClass, SendPageStateClass } from '../../app/AppState';
+import { AddressBookActionEnum, AddressBookFileClass, SendPageStateClass } from '../../app/AppState';
 import { ThemeType } from '../../app/types';
 import FadeText from '../Components/FadeText';
 import Button from '../Components/Button';
@@ -38,7 +38,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
 
   const [currentItem, setCurrentItem] = useState<number | null>(null);
   const [titleViewHeight, setTitleViewHeight] = useState<number>(0);
-  const [action, setAction] = useState<'Add' | 'Modify' | 'Delete' | null>(null);
+  const [action, setAction] = useState<AddressBookActionEnum | null>(null);
 
   const slideAnim = useSharedValue(0);
   const scrollViewRef = useRef<ScrollView>(null);
@@ -73,9 +73,9 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
       if (addressBookCurrentAddress) {
         const index: number = abs.findIndex((i: AddressBookFileClass) => i.address === addressBookCurrentAddress);
         if (index === -1) {
-          setAction('Add');
+          setAction(AddressBookActionEnum.Add);
         } else {
-          setAction('Modify');
+          setAction(AddressBookActionEnum.Modify);
         }
         setCurrentItem(index);
       }
@@ -102,7 +102,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
 
   const newAddressBookItem = () => {
     setCurrentItem(-1);
-    setAction('Add');
+    setAction(AddressBookActionEnum.Add);
   };
 
   const cancel = () => {
@@ -119,7 +119,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
     }
   };
 
-  const doAction = async (a: 'Add' | 'Modify' | 'Delete', label: string, address: string) => {
+  const doAction = async (a: AddressBookActionEnum, label: string, address: string) => {
     if (!label || !address) {
       return;
     }

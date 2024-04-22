@@ -26,6 +26,7 @@ import SecurityType from './types/SecurityType';
 import ServerUrisType from './types/ServerUrisType';
 
 import { CommandEnum } from './enums/CommandEnum';
+import { AddressBookActionEnum } from './enums/AddressBookActionEnum';
 
 import AppStateLoaded from './AppStateLoaded';
 import AppStateLoading from './AppStateLoading';
@@ -59,4 +60,5 @@ export {
   SecurityType,
   ServerUrisType,
   CommandEnum,
+  AddressBookActionEnum,
 };
