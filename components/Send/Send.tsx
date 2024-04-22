@@ -378,8 +378,14 @@ const Send: React.FunctionComponent<SendProps> = ({
   ]);
 
   useEffect(() => {
-    setSendButtonEnabled(validAddress === 1 && validAmount === 1);
-  }, [validAddress, validAmount]);
+    setSendButtonEnabled(
+      // send amount 0 with transparent address make no sense.
+      // you always get `dust` error.
+      validAddress === 1 &&
+        validAmount === 1 &&
+        !(!memoEnabled && Utils.parseStringLocaletoNumberFloat(sendPageState.toaddr.amount) === 0),
+    );
+  }, [memoEnabled, sendPageState.toaddr.amount, validAddress, validAmount]);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
