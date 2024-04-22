@@ -13,9 +13,10 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
+import { MenuItemEnum } from '../../AppState';
 
 type MenuProps = {
-  onItemSelected: (item: string) => Promise<void>;
+  onItemSelected: (item: MenuItemEnum) => Promise<void>;
   updateMenuState: (isOpen: boolean) => void;
 };
 
@@ -36,14 +37,14 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuSt
     paddingTop: dimensions.height < 475 ? 20 : 25,
   };
 
-  const onItemSelectedWrapper = async (value: string) => {
+  const onItemSelectedWrapper = async (value: MenuItemEnum) => {
     if (
-      (value === 'Wallet' && !readOnly && security.seedScreen) ||
-      (value === 'Wallet' && readOnly && security.ufvkScreen) ||
-      (value === 'Rescan' && security.rescanScreen) ||
-      (value === 'Settings' && security.settingsScreen) ||
-      (value === 'Change Wallet' && security.changeWalletScreen) ||
-      (value === 'Restore Wallet Backup' && security.restoreWalletBackupScreen)
+      (value === MenuItemEnum.Wallet && !readOnly && security.seedScreen) ||
+      (value === MenuItemEnum.Wallet && readOnly && security.ufvkScreen) ||
+      (value === MenuItemEnum.Rescan && security.rescanScreen) ||
+      (value === MenuItemEnum.Settings && security.settingsScreen) ||
+      (value === MenuItemEnum.ChangeWallet && security.changeWalletScreen) ||
+      (value === MenuItemEnum.RestoreWalletBackup && security.restoreWalletBackupScreen)
     ) {
       const resultBio = await simpleBiometrics({ translate: translate });
       // can be:
@@ -85,26 +86,29 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuSt
         <View style={{ height: 1, backgroundColor: colors.primary }} />
 
         <View style={{ display: 'flex', marginLeft: 20 }}>
-          <RegText onPress={() => onItemSelectedWrapper('About')} style={item}>
+          <RegText onPress={() => onItemSelectedWrapper(MenuItemEnum.About)} style={item}>
             {translate('loadedapp.about') as string}
           </RegText>
 
           {mode !== 'basic' && (
-            <RegText onPress={() => onItemSelectedWrapper('Info')} style={item}>
+            <RegText onPress={() => onItemSelectedWrapper(MenuItemEnum.Info)} style={item}>
               {translate('loadedapp.info') as string}
             </RegText>
           )}
 
-          <RegText testID="menu.settings" onPress={() => onItemSelectedWrapper('Settings')} style={item}>
+          <RegText testID="menu.settings" onPress={() => onItemSelectedWrapper(MenuItemEnum.Settings)} style={item}>
             {translate('loadedapp.settings') as string}
           </RegText>
 
-          <RegText testID="menu.addressbook" onPress={() => onItemSelectedWrapper('Address Book')} style={item}>
+          <RegText
+            testID="menu.addressbook"
+            onPress={() => onItemSelectedWrapper(MenuItemEnum.AddressBook)}
+            style={item}>
             {translate('loadedapp.addressbook') as string}
           </RegText>
 
           {!(mode === 'basic' && transactions.length <= 0) && (
-            <RegText onPress={() => onItemSelectedWrapper('Wallet')} style={item}>
+            <RegText onPress={() => onItemSelectedWrapper(MenuItemEnum.Wallet)} style={item}>
               {readOnly
                 ? mode === 'basic'
                   ? (translate('loadedapp.walletufvk-basic') as string)
@@ -116,47 +120,56 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuSt
           )}
 
           {mode !== 'basic' && (
-            <RegText onPress={() => onItemSelectedWrapper('Rescan')} style={item}>
+            <RegText onPress={() => onItemSelectedWrapper(MenuItemEnum.Rescan)} style={item}>
               {translate('loadedapp.rescanwallet') as string}
             </RegText>
           )}
 
           {mode !== 'basic' && (
-            <RegText testID="menu.syncreport" onPress={() => onItemSelectedWrapper('Sync Report')} style={item}>
+            <RegText
+              testID="menu.syncreport"
+              onPress={() => onItemSelectedWrapper(MenuItemEnum.SyncReport)}
+              style={item}>
               {translate('loadedapp.report') as string}
             </RegText>
           )}
 
           {mode !== 'basic' && (
-            <RegText testID="menu.fund-pools" onPress={() => onItemSelectedWrapper('Fund Pools')} style={item}>
+            <RegText
+              testID="menu.fund-pools"
+              onPress={() => onItemSelectedWrapper(MenuItemEnum.FundPools)}
+              style={item}>
               {translate('loadedapp.fundpools') as string}
             </RegText>
           )}
 
           {!(mode === 'basic' && transactions.length <= 0) && (
-            <RegText onPress={() => onItemSelectedWrapper('Insight')} style={item}>
+            <RegText onPress={() => onItemSelectedWrapper(MenuItemEnum.Insight)} style={item}>
               {translate('loadedapp.insight') as string}
             </RegText>
           )}
 
           {mode !== 'basic' && (
-            <RegText testID="menu.changewallet" onPress={() => onItemSelectedWrapper('Change Wallet')} style={item}>
+            <RegText
+              testID="menu.changewallet"
+              onPress={() => onItemSelectedWrapper(MenuItemEnum.ChangeWallet)}
+              style={item}>
               {translate('loadedapp.changewallet') as string}
             </RegText>
           )}
 
           {mode !== 'basic' && (
-            <RegText onPress={() => onItemSelectedWrapper('Restore Wallet Backup')} style={item}>
+            <RegText onPress={() => onItemSelectedWrapper(MenuItemEnum.RestoreWalletBackup)} style={item}>
               {translate('loadedapp.restorebackupwallet') as string}
             </RegText>
           )}
           {mode === 'basic' && transactions.length === 0 && (
-            <RegText onPress={() => onItemSelectedWrapper('Load Wallet From Seed')} style={item}>
+            <RegText onPress={() => onItemSelectedWrapper(MenuItemEnum.LoadWalletFromSeed)} style={item}>
               {translate('loadedapp.loadwalletfromseed-basic') as string}
             </RegText>
           )}
           {mode === 'basic' && (
-            <RegText onPress={() => onItemSelectedWrapper('Tip ZingoLabs')} style={item}>
+            <RegText onPress={() => onItemSelectedWrapper(MenuItemEnum.TipZingoLabs)} style={item}>
               {translate('loadedapp.tipzingolabs-basic') as string}
             </RegText>
           )}

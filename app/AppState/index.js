@@ -27,6 +27,8 @@ import ServerUrisType from './types/ServerUrisType';
 
 import { CommandEnum } from './enums/CommandEnum';
 import { AddressBookActionEnum } from './enums/AddressBookActionEnum';
+import { MenuItemEnum } from './enums/MenuItemEnum';
+import { LanguageEnum } from './enums/LanguageEnum';
 
 import AppStateLoaded from './AppStateLoaded';
 import AppStateLoading from './AppStateLoading';
@@ -61,4 +63,6 @@ export {
   ServerUrisType,
   CommandEnum,
   AddressBookActionEnum,
+  MenuItemEnum,
+  LanguageEnum,
 };

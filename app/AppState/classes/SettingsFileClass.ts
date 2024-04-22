@@ -1,10 +1,12 @@
+import { CurrencyEnum } from '../enums/CurrencyEnum';
+import { LanguageEnum } from '../enums/LanguageEnum';
 import SecurityType from '../types/SecurityType';
 import ServerType from '../types/ServerType';
 
 export default class SettingsFileClass {
   server: ServerType;
-  currency: 'USD' | '';
-  language: 'en' | 'es' | 'pt' | 'ru';
+  currency: CurrencyEnum.USD | '';
+  language: LanguageEnum;
   sendAll: boolean;
   donation: boolean;
   privacy: boolean;
@@ -22,8 +24,8 @@ export default class SettingsFileClass {
 
   constructor(
     server: ServerType,
-    currency: 'USD' | '',
-    language: 'en' | 'es' | 'pt' | 'ru',
+    currency: CurrencyEnum.USD | '',
+    language: LanguageEnum,
     sendAll: boolean,
     donation: boolean,
     privacy: boolean,

@@ -37,6 +37,7 @@ import {
   SecurityType,
   ServerUrisType,
   CommandEnum,
+  LanguageEnum,
 } from '../AppState';
 import { parseServerURI, serverUris } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
@@ -54,6 +55,7 @@ import Launching from './Launching';
 import simpleBiometrics from '../simpleBiometrics';
 import selectingServer from '../selectingServer';
 import { isEqual } from 'lodash';
+import { CurrencyEnum } from '../AppState/enums/CurrencyEnum';
 
 const BoldText = React.lazy(() => import('../../components/Components/BoldText'));
 const Button = React.lazy(() => import('../../components/Components/Button'));
@@ -82,8 +84,8 @@ const SERVER_DEFAULT_0: ServerType = {
 
 export default function LoadingApp(props: LoadingAppProps) {
   const theme = useTheme() as unknown as ThemeType;
-  const [language, setLanguage] = useState<'en' | 'es' | 'pt' | 'ru'>('en');
-  const [currency, setCurrency] = useState<'USD' | ''>('');
+  const [language, setLanguage] = useState<LanguageEnum>(LanguageEnum.en);
+  const [currency, setCurrency] = useState<CurrencyEnum | ''>('');
   const [server, setServer] = useState<ServerType>(SERVER_DEFAULT_0);
   const [sendAll, setSendAll] = useState<boolean>(false);
   const [donation, setDonation] = useState<boolean>(false);
@@ -121,7 +123,7 @@ export default function LoadingApp(props: LoadingAppProps) {
   useEffect(() => {
     (async () => {
       // fallback if no available language fits
-      const fallback = { languageTag: 'en', isRTL: false };
+      const fallback = { languageTag: LanguageEnum.en, isRTL: false };
 
       //console.log(RNLocalize.findBestAvailableLanguage(Object.keys(file)));
       //console.log(RNLocalize.getLocales());
@@ -169,25 +171,28 @@ export default function LoadingApp(props: LoadingAppProps) {
         }
       }
       if (
-        settings.language === 'en' ||
-        settings.language === 'es' ||
-        settings.language === 'pt' ||
-        settings.language === 'ru'
+        settings.language === LanguageEnum.en ||
+        settings.language === LanguageEnum.es ||
+        settings.language === LanguageEnum.pt ||
+        settings.language === LanguageEnum.ru
       ) {
         setLanguage(settings.language);
         i18n.locale = settings.language;
         //console.log('apploading settings', settings.language, settings.currency);
       } else {
         const lang =
-          languageTag === 'en' || languageTag === 'es' || languageTag === 'pt' || languageTag === 'ru'
-            ? (languageTag as 'en' | 'es' | 'pt' | 'ru')
-            : (fallback.languageTag as 'en' | 'es' | 'pt');
+          languageTag === LanguageEnum.en ||
+          languageTag === LanguageEnum.es ||
+          languageTag === LanguageEnum.pt ||
+          languageTag === LanguageEnum.ru
+            ? (languageTag as LanguageEnum)
+            : (fallback.languageTag as LanguageEnum);
         setLanguage(lang);
         i18n.locale = lang;
         await SettingsFileImpl.writeSettings('language', lang);
         //console.log('apploading NO settings', languageTag);
       }
-      if (settings.currency === '' || settings.currency === 'USD') {
+      if (settings.currency === '' || settings.currency === CurrencyEnum.USD) {
         setCurrency(settings.currency);
       } else {
         await SettingsFileImpl.writeSettings('currency', currency);
@@ -279,8 +284,8 @@ type LoadingAppClassProps = {
   route: StackScreenProps<any>['route'];
   translate: (key: string) => TranslateType;
   theme: ThemeType;
-  language: 'en' | 'es' | 'pt' | 'ru';
-  currency: 'USD' | '';
+  language: LanguageEnum;
+  currency: CurrencyEnum | '';
   server: ServerType;
   sendAll: boolean;
   donation: boolean;

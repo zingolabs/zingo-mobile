@@ -12,6 +12,8 @@ import BackgroundErrorType from './types/BackgroundErrorType';
 import ServerType from './types/ServerType';
 import SnackbarType from './types/SnackbarType';
 import SecurityType from './types/SecurityType';
+import { CurrencyEnum } from './enums/CurrencyEnum';
+import { LanguageEnum } from './enums/LanguageEnum';
 
 export default interface AppStateLoading {
   navigation: StackScreenProps<any>['navigation'];
@@ -27,8 +29,8 @@ export default interface AppStateLoading {
   info: InfoType;
 
   server: ServerType;
-  currency: 'USD' | '';
-  language: 'en' | 'es' | 'pt' | 'ru';
+  currency: CurrencyEnum.USD | '';
+  language: LanguageEnum;
 
   zecPrice: ZecPriceType;
   sendAll: boolean;

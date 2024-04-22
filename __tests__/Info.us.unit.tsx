@@ -8,6 +8,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react-native';
 import Info from '../components/Info';
 import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
+import { CurrencyEnum } from '../app/AppState/enums/CurrencyEnum';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -58,7 +59,7 @@ describe('Component Info - test', () => {
       zingolib: 'mob-release...',
     };
     state.zecPrice.zecPrice = 33.33;
-    state.currency = 'USD';
+    state.currency = CurrencyEnum.USD;
     const onClose = jest.fn();
     const onSet = jest.fn();
     render(

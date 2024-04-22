@@ -51,6 +51,7 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import { RPCProposeType } from '../../app/rpc/types/RPCProposeType';
+import { CurrencyEnum } from '../../app/AppState/enums/CurrencyEnum';
 
 type SendProps = {
   setSendPageState: (sendPageState: SendPageStateClass) => void;
@@ -1147,7 +1148,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                             style={{ marginTop: 11, fontSize: 12.5 }}
                             price={zecPrice.zecPrice}
                             amtZec={maxAmount}
-                            currency={'USD'}
+                            currency={CurrencyEnum.USD}
                             privacy={privacy}
                           />
                         </View>

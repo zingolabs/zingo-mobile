@@ -37,6 +37,7 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import Utils from '../../app/utils';
+import { CurrencyEnum } from '../../app/AppState/enums/CurrencyEnum';
 
 type HeaderProps = {
   poolsMoreInfoOnClick?: () => void;
@@ -614,7 +615,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         </View>
       )}
 
-      {currency === 'USD' && !noBalance && (
+      {currency === CurrencyEnum.USD && !noBalance && (
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <CurrencyAmount
             style={{ marginTop: 0, marginBottom: 5 }}

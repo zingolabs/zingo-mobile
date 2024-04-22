@@ -12,6 +12,7 @@ import {
   BackgroundErrorType,
   ServerType,
   SecurityType,
+  LanguageEnum,
 } from '../AppState';
 import SnackbarType from '../AppState/types/SnackbarType';
 
@@ -30,7 +31,7 @@ export const defaultAppStateLoading: AppStateLoading = {
 
   server: {} as ServerType,
   currency: '',
-  language: 'en',
+  language: LanguageEnum.en,
 
   zecPrice: {
     zecPrice: 0,

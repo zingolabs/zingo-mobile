@@ -21,6 +21,9 @@ import ServerType from './types/ServerType';
 import SnackbarType from './types/SnackbarType';
 import AddressBookFileClass from './classes/AddressBookFileClass';
 import SecurityType from './types/SecurityType';
+import { MenuItemEnum } from './enums/MenuItemEnum';
+import { LanguageEnum } from './enums/LanguageEnum';
+import { CurrencyEnum } from './enums/CurrencyEnum';
 
 export default interface AppStateLoaded {
   navigation: StackScreenProps<any>['navigation'];
@@ -68,7 +71,7 @@ export default interface AppStateLoaded {
 
   isMenuDrawerOpen: boolean;
 
-  selectedMenuDrawerItem: string;
+  selectedMenuDrawerItem: MenuItemEnum | null;
 
   aboutModalVisible: boolean;
 
@@ -100,8 +103,8 @@ export default interface AppStateLoaded {
   uaAddress: string;
 
   server: ServerType;
-  language: 'en' | 'es' | 'pt' | 'ru';
-  currency: 'USD' | '';
+  language: LanguageEnum;
+  currency: CurrencyEnum | '';
 
   zecPrice: ZecPriceType;
   sendAll: boolean;

@@ -12,6 +12,7 @@ import BoldText from '../components/Components/BoldText';
 import FadeText from '../components/Components/FadeText';
 import ErrorText from '../components/Components/ErrorText';
 import RegText from '../components/Components/RegText';
+import { CurrencyEnum } from '../app/AppState/enums/CurrencyEnum';
 
 jest.mock('react-native-localize', () => ({
   getNumberFormatSettings: () => {
@@ -28,42 +29,46 @@ describe('Component Components - test', () => {
   //unit test
   test('CurrencyAmount - High Privacy - price=2.9826 and amtZec=1.00098 result $ -.-- USD', () => {
     const text: any = render(
-      <CurrencyAmount price={2.9826} amtZec={1.00098} style={{}} currency={'USD'} privacy={true} />,
+      <CurrencyAmount price={2.9826} amtZec={1.00098} style={{}} currency={CurrencyEnum.USD} privacy={true} />,
     ).toJSON();
     expect(text.type).toBe('View');
     expect(text.children[0].children[0].children[0].children[0]).toBe('$');
     expect(text.children[0].children[0].children[1].children[0]).toBe(' -.--');
   });
   test('CurrencyAmount - price undefined result $ -- USD', () => {
-    const text: any = render(<CurrencyAmount amtZec={1} style={{}} currency={'USD'} />).toJSON();
+    const text: any = render(<CurrencyAmount amtZec={1} style={{}} currency={CurrencyEnum.USD} />).toJSON();
     expect(text.type).toBe('View');
     expect(text.children[0].children[0].children[0].children[0]).toBe('$');
     expect(text.children[0].children[0].children[1].children[0]).toBe(' -.--');
   });
 
   test('CurrencyAmount - price 0 result $ -- USD', () => {
-    const text: any = render(<CurrencyAmount price={0} amtZec={1} style={{}} currency={'USD'} />).toJSON();
+    const text: any = render(<CurrencyAmount price={0} amtZec={1} style={{}} currency={CurrencyEnum.USD} />).toJSON();
     expect(text.type).toBe('View');
     expect(text.children[0].children[0].children[0].children[0]).toBe('$');
     expect(text.children[0].children[0].children[1].children[0]).toBe(' -.--');
   });
 
   test('CurrencyAmount - amtZec undefined result $ -- USD', () => {
-    const text: any = render(<CurrencyAmount price={1} style={{}} currency={'USD'} />).toJSON();
+    const text: any = render(<CurrencyAmount price={1} style={{}} currency={CurrencyEnum.USD} />).toJSON();
     expect(text.type).toBe('View');
     expect(text.children[0].children[0].children[0].children[0]).toBe('$');
     expect(text.children[0].children[0].children[1].children[0]).toBe(' -.--');
   });
 
   test('CurrencyAmount - price * amtZec really tiny result $ < 0.01 USD', () => {
-    const text: any = render(<CurrencyAmount price={0.001} amtZec={1} style={{}} currency={'USD'} />).toJSON();
+    const text: any = render(
+      <CurrencyAmount price={0.001} amtZec={1} style={{}} currency={CurrencyEnum.USD} />,
+    ).toJSON();
     expect(text.type).toBe('View');
     expect(text.children[0].children[0].children[0].children[0]).toBe('$');
     expect(text.children[0].children[0].children[1].children[0]).toBe(' < 0.01');
   });
 
   test('CurrencyAmount - price=2.9826 and amtZec=1.00098 result $ 2.99 USD', () => {
-    const text: any = render(<CurrencyAmount price={2.9826} amtZec={1.00098} style={{}} currency={'USD'} />).toJSON();
+    const text: any = render(
+      <CurrencyAmount price={2.9826} amtZec={1.00098} style={{}} currency={CurrencyEnum.USD} />,
+    ).toJSON();
     expect(text.type).toBe('View');
     expect(text.children[0].children[0].children[0].children[0]).toBe('$');
     expect(text.children[0].children[0].children[1].children[0]).toBe(' 2.99');
@@ -71,7 +76,7 @@ describe('Component Components - test', () => {
 
   test("CurrencyAmount - style={backgroundColor: 'red'} result same", () => {
     const text: any = render(
-      <CurrencyAmount price={2.9826} amtZec={1.00098} style={{ backgroundColor: 'red' }} currency={'USD'} />,
+      <CurrencyAmount price={2.9826} amtZec={1.00098} style={{ backgroundColor: 'red' }} currency={CurrencyEnum.USD} />,
     ).toJSON();
     expect(text.type).toBe('View');
     expect(text.children[0].children[0].children[0].props.style.backgroundColor).toBe('red');

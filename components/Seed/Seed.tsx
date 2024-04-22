@@ -10,7 +10,7 @@ import FadeText from '../Components/FadeText';
 import Button from '../Components/Button';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded, ContextAppLoading } from '../../app/context';
-import { InfoType, NetInfoType, ServerType, TranslateType, WalletType } from '../../app/AppState';
+import { InfoType, LanguageEnum, NetInfoType, ServerType, TranslateType, WalletType } from '../../app/AppState';
 import RPCModule from '../../app/RPCModule';
 import RPC from '../../app/rpc';
 import Header from '../Header';
@@ -53,7 +53,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
     mode: 'basic' | 'advanced',
     setBackgroundError: (title: string, error: string) => void,
     addLastSnackbar: (snackbar: SnackbarType) => void,
-    language: 'en' | 'es' | 'pt' | 'ru';
+    language: LanguageEnum;
   if (action === 'new' || action === 'restore') {
     wallet = contextLoading.wallet;
     translate = contextLoading.translate;

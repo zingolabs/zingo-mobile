@@ -12,6 +12,7 @@ import BoldText from '../components/Components/BoldText';
 import FadeText from '../components/Components/FadeText';
 import ErrorText from '../components/Components/ErrorText';
 import RegText from '../components/Components/RegText';
+import { CurrencyEnum } from '../app/AppState/enums/CurrencyEnum';
 
 jest.mock('react-native-localize', () => ({
   getNumberFormatSettings: () => {
@@ -32,7 +33,7 @@ describe('Component Components - test', () => {
         price={1.12345678}
         amtZec={39.99}
         style={{ backgroundColor: 'red' }}
-        currency={'USD'}
+        currency={CurrencyEnum.USD}
         privacy={true}
       />,
     );
@@ -41,7 +42,12 @@ describe('Component Components - test', () => {
 
   test('CurrencyAmount Normal Privacy - snapshot', () => {
     const currencyAmount = render(
-      <CurrencyAmount price={1.12345678} amtZec={39.99} style={{ backgroundColor: 'red' }} currency={'USD'} />,
+      <CurrencyAmount
+        price={1.12345678}
+        amtZec={39.99}
+        style={{ backgroundColor: 'red' }}
+        currency={CurrencyEnum.USD}
+      />,
     );
     expect(currencyAmount.toJSON()).toMatchSnapshot();
   });

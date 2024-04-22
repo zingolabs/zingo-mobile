@@ -8,6 +8,8 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import Settings from '../components/Settings';
 import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
+import { CurrencyEnum } from '../app/AppState/enums/CurrencyEnum';
+import { LanguageEnum } from '../app/AppState';
 
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
   FontAwesomeIcon: '',
@@ -70,7 +72,7 @@ describe('Component Settings - test', () => {
           text: 'text no currency',
         },
         {
-          value: 'USD',
+          value: CurrencyEnum.USD,
           text: 'text USD',
         },
       ];
@@ -78,16 +80,20 @@ describe('Component Settings - test', () => {
     if (p === 'settings.languages') {
       return [
         {
-          value: 'en',
+          value: LanguageEnum.en,
           text: 'text en',
         },
         {
-          value: 'es',
+          value: LanguageEnum.es,
           text: 'text es',
         },
         {
-          value: 'pt',
+          value: LanguageEnum.pt,
           text: 'text pt',
+        },
+        {
+          value: LanguageEnum.ru,
+          text: 'text ru',
         },
       ];
     }
@@ -120,8 +126,8 @@ describe('Component Settings - test', () => {
   state.info.currencyName = 'ZEC';
   state.totalBalance.total = 1.12345678;
   state.server = { uri: 'https://zcash.es', chain_name: 'main' };
-  state.currency = 'USD';
-  state.language = 'en';
+  state.currency = CurrencyEnum.USD;
+  state.language = LanguageEnum.en;
   state.sendAll = false;
   state.donation = false;
   state.walletSettings.download_memos = 'wallet';

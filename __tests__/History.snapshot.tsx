@@ -8,6 +8,7 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import History from '../components/History';
 import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
+import { CurrencyEnum } from '../app/AppState/enums/CurrencyEnum';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -198,7 +199,7 @@ describe('Component History - test', () => {
 
   test('History currency USD, privacy high & mode advanced - snapshot', () => {
     // no currency
-    state.currency = 'USD';
+    state.currency = CurrencyEnum.USD;
     // privacy normal
     state.privacy = true;
     // mode basic

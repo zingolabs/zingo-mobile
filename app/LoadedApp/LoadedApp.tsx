@@ -48,6 +48,8 @@ import {
   AddressBookFileClass,
   SecurityType,
   CommandEnum,
+  MenuItemEnum,
+  LanguageEnum,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
@@ -64,6 +66,7 @@ import { Launching } from '../LoadingApp';
 import AddressBook from '../../components/AddressBook/AddressBook';
 import AddressBookFileImpl from '../../components/AddressBook/AddressBookFileImpl';
 import simpleBiometrics from '../simpleBiometrics';
+import { CurrencyEnum } from '../AppState/enums/CurrencyEnum';
 
 const History = React.lazy(() => import('../../components/History'));
 const Send = React.lazy(() => import('../../components/Send'));
@@ -104,8 +107,8 @@ const SERVER_DEFAULT_0: ServerType = {
 
 export default function LoadedApp(props: LoadedAppProps) {
   const theme = useTheme() as unknown as ThemeType;
-  const [language, setLanguage] = useState<'en' | 'es' | 'pt' | 'ru'>('en');
-  const [currency, setCurrency] = useState<'USD' | ''>('');
+  const [language, setLanguage] = useState<LanguageEnum>(LanguageEnum.en);
+  const [currency, setCurrency] = useState<CurrencyEnum | ''>('');
   const [server, setServer] = useState<ServerType>(SERVER_DEFAULT_0);
   const [sendAll, setSendAll] = useState<boolean>(false);
   const [donation, setDonation] = useState<boolean>(false);
@@ -143,7 +146,7 @@ export default function LoadedApp(props: LoadedAppProps) {
   useEffect(() => {
     (async () => {
       // fallback if no available language fits
-      const fallback = { languageTag: 'en', isRTL: false };
+      const fallback = { languageTag: LanguageEnum.en, isRTL: false };
 
       //console.log(RNLocalize.findBestAvailableLanguage(Object.keys(file)));
       //console.log(RNLocalize.getLocales());
@@ -168,25 +171,28 @@ export default function LoadedApp(props: LoadedAppProps) {
       //await delay(5000);
 
       if (
-        settings.language === 'en' ||
-        settings.language === 'es' ||
-        settings.language === 'pt' ||
-        settings.language === 'ru'
+        settings.language === LanguageEnum.en ||
+        settings.language === LanguageEnum.es ||
+        settings.language === LanguageEnum.pt ||
+        settings.language === LanguageEnum.ru
       ) {
         setLanguage(settings.language);
         i18n.locale = settings.language;
         //console.log('apploaded settings', settings.language, settings.currency);
       } else {
         const lang =
-          languageTag === 'en' || languageTag === 'es' || languageTag === 'pt' || languageTag === 'ru'
-            ? (languageTag as 'en' | 'es' | 'pt' | 'ru')
-            : (fallback.languageTag as 'en' | 'es' | 'pt' | 'ru');
+          languageTag === LanguageEnum.en ||
+          languageTag === LanguageEnum.es ||
+          languageTag === LanguageEnum.pt ||
+          languageTag === LanguageEnum.ru
+            ? (languageTag as LanguageEnum)
+            : (fallback.languageTag as LanguageEnum);
         setLanguage(lang);
         i18n.locale = lang;
         await SettingsFileImpl.writeSettings('language', lang);
         //console.log('apploaded NO settings', languageTag);
       }
-      if (settings.currency === '' || settings.currency === 'USD') {
+      if (settings.currency === '' || settings.currency === CurrencyEnum.USD) {
         setCurrency(settings.currency);
       } else {
         await SettingsFileImpl.writeSettings('currency', currency);
@@ -288,8 +294,8 @@ type LoadedAppClassProps = {
   route: StackScreenProps<any>['route'];
   translate: (key: string) => TranslateType;
   theme: ThemeType;
-  language: 'en' | 'es' | 'pt' | 'ru';
-  currency: 'USD' | '';
+  language: LanguageEnum;
+  currency: CurrencyEnum | '';
   server: ServerType;
   sendAll: boolean;
   donation: boolean;
@@ -898,7 +904,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     }
   };
 
-  onMenuItemSelected = async (item: string) => {
+  onMenuItemSelected = async (item: MenuItemEnum) => {
     this.setState({
       isMenuDrawerOpen: false,
       selectedMenuDrawerItem: item,
@@ -907,39 +913,39 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     await this.fetchWallet();
 
     // Depending on the menu item, open the appropriate modal
-    if (item === 'About') {
+    if (item === MenuItemEnum.About) {
       this.setState({ aboutModalVisible: true });
-    } else if (item === 'Rescan') {
+    } else if (item === MenuItemEnum.Rescan) {
       this.setState({ rescanModalVisible: true });
-    } else if (item === 'Settings') {
+    } else if (item === MenuItemEnum.Settings) {
       this.setState({ settingsModalVisible: true });
-    } else if (item === 'Info') {
+    } else if (item === MenuItemEnum.Info) {
       this.setState({ infoModalVisible: true });
-    } else if (item === 'Sync Report') {
+    } else if (item === MenuItemEnum.SyncReport) {
       this.setState({ syncReportModalVisible: true });
-    } else if (item === 'Fund Pools') {
+    } else if (item === MenuItemEnum.FundPools) {
       this.setState({ poolsModalVisible: true });
-    } else if (item === 'Insight') {
+    } else if (item === MenuItemEnum.Insight) {
       this.setState({ insightModalVisible: true });
-    } else if (item === 'Wallet') {
+    } else if (item === MenuItemEnum.Wallet) {
       if (this.state.readOnly) {
         this.setState({ ufvkViewModalVisible: true });
       } else {
         this.setState({ seedViewModalVisible: true });
       }
-    } else if (item === 'Change Wallet') {
+    } else if (item === MenuItemEnum.ChangeWallet) {
       if (this.state.readOnly) {
         this.setState({ ufvkChangeModalVisible: true });
       } else {
         this.setState({ seedChangeModalVisible: true });
       }
-    } else if (item === 'Restore Wallet Backup') {
+    } else if (item === MenuItemEnum.RestoreWalletBackup) {
       if (this.state.readOnly) {
         this.setState({ ufvkBackupModalVisible: true });
       } else {
         this.setState({ seedBackupModalVisible: true });
       }
-    } else if (item === 'Load Wallet From Seed') {
+    } else if (item === MenuItemEnum.LoadWalletFromSeed) {
       // change to the screen 3 directly.
       const { translate } = this.state;
       Alert.alert(
@@ -954,7 +960,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
         ],
         { cancelable: false, userInterfaceStyle: 'light' },
       );
-    } else if (item === 'Tip ZingoLabs') {
+    } else if (item === MenuItemEnum.TipZingoLabs) {
       // change to the screen 3 directly.
       const { translate } = this.state;
       Alert.alert(
@@ -973,7 +979,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
         ],
         { cancelable: false, userInterfaceStyle: 'light' },
       );
-    } else if (item === 'Address Book') {
+    } else if (item === MenuItemEnum.AddressBook) {
       this.setState({
         addressBookModalVisible: true,
         addressBookCurrentAddress: '',
@@ -1082,7 +1088,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
   set_currency_option = async (name: 'currency', value: string): Promise<void> => {
     await SettingsFileImpl.writeSettings(name, value);
     this.setState({
-      currency: value as 'USD' | '',
+      currency: value as CurrencyEnum | '',
     });
 
     // Refetch the settings to update
@@ -1092,7 +1098,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
   set_language_option = async (name: 'language', value: string, reset: boolean): Promise<void> => {
     await SettingsFileImpl.writeSettings(name, value);
     this.setState({
-      language: value as 'en' | 'es' | 'pt' | 'ru',
+      language: value as LanguageEnum,
     });
 
     // Refetch the settings to update

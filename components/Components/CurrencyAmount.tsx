@@ -6,12 +6,13 @@ import { getNumberFormatSettings } from 'react-native-localize';
 
 import { ThemeType } from '../../app/types';
 import Utils from '../../app/utils';
+import { CurrencyEnum } from '../../app/AppState/enums/CurrencyEnum';
 
 type CurrencyAmountProps = {
   price?: number;
   amtZec?: number;
   style?: TextStyle;
-  currency: 'USD' | '';
+  currency: CurrencyEnum | '';
   privacy?: boolean;
 };
 
@@ -52,7 +53,7 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({ price, s
     setTimeout(() => setPrivacyHigh(true), 5000);
   };
 
-  if (currency === 'USD') {
+  if (currency === CurrencyEnum.USD) {
     return (
       <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
         <TouchableOpacity disabled={!privacyHigh} onPress={onPress}>

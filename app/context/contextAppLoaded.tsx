@@ -22,6 +22,7 @@ import {
   ServerType,
   AddressBookFileClass,
   SecurityType,
+  LanguageEnum,
 } from '../AppState';
 import SnackbarType from '../AppState/types/SnackbarType';
 
@@ -44,7 +45,7 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   sendProgress: new SendProgressClass(0, 0, 0),
   wallet: {} as WalletType,
   isMenuDrawerOpen: false,
-  selectedMenuDrawerItem: '',
+  selectedMenuDrawerItem: null,
   aboutModalVisible: false,
   computingModalVisible: false,
   settingsModalVisible: false,
@@ -67,7 +68,7 @@ export const defaultAppStateLoaded: AppStateLoaded = {
 
   server: {} as ServerType,
   currency: '',
-  language: 'en',
+  language: LanguageEnum.en,
 
   zecPrice: {
     zecPrice: 0,

@@ -15,6 +15,7 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
+import { CurrencyEnum } from '../../app/AppState/enums/CurrencyEnum';
 
 type InfoProps = {
   closeModal: () => void;
@@ -82,7 +83,7 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal, setZecPrice }) =
             label={translate('info.serverblock') as string}
             value={info.latestBlock ? info.latestBlock.toString() : (translate('loading') as string)}
           />
-          {currency === 'USD' && (
+          {currency === CurrencyEnum.USD && (
             <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
               <DetailLine label={translate('info.zecprice') as string}>
                 {zecPrice.zecPrice === -1 && (
