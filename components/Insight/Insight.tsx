@@ -18,7 +18,7 @@ import FadeText from '../Components/FadeText';
 import Header from '../Header';
 import RPCModule from '../../app/RPCModule';
 import AddressItem from '../Components/AddressItem';
-import { SendPageStateClass } from '../../app/AppState';
+import { CommandEnum, SendPageStateClass } from '../../app/AppState';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
@@ -112,15 +112,15 @@ const Insight: React.FunctionComponent<InsightProps> = ({
       let resultStr: string = '';
       switch (tab) {
         case 'sent':
-          resultStr = await RPCModule.execute('value_to_address', '');
+          resultStr = await RPCModule.execute(CommandEnum.value_to_address, '');
           //console.log('################# value', resultStr);
           break;
         case 'sends':
-          resultStr = await RPCModule.execute('sends_to_address', '');
+          resultStr = await RPCModule.execute(CommandEnum.sends_to_address, '');
           //console.log('################# sends', resultStr);
           break;
         case 'memobytes':
-          resultStr = await RPCModule.execute('memobytes_to_address', '');
+          resultStr = await RPCModule.execute(CommandEnum.memobytes_to_address, '');
           //console.log('################# memobytes', resultStr);
           break;
         default:

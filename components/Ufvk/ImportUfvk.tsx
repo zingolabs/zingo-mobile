@@ -19,6 +19,7 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
+import { CommandEnum } from '../../app/AppState';
 
 type ImportUfvkProps = {
   onClickCancel: () => void;
@@ -84,7 +85,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
   // the validation of the ufvk will be when we try to `restore from ufvk'...
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const validateKey = async (scannedKey: string): Promise<boolean> => {
-    const result: string = await RPCModule.execute('parse_viewkey', scannedKey);
+    const result: string = await RPCModule.execute(CommandEnum.parse_viewkey, scannedKey);
     //console.log(result);
     if (result) {
       if (result.toLowerCase().startsWith('error')) {

@@ -36,6 +36,7 @@ import {
   ServerType,
   SecurityType,
   ServerUrisType,
+  CommandEnum,
 } from '../AppState';
 import { parseServerURI, serverUris } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
@@ -431,7 +432,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
             const resultJson: RPCSeedType = await JSON.parse(result);
             if (!resultJson.error || (resultJson.error && resultJson.error.startsWith('This wallet is watch-only'))) {
               // Load the wallet and navigate to the transactions screen
-              const walletKindStr: string = await RPCModule.execute('wallet_kind', '');
+              const walletKindStr: string = await RPCModule.execute(CommandEnum.wallet_kind, '');
               //console.log(walletKindStr);
               const walletKindJSON: RPCWalletKindType = await JSON.parse(walletKindStr);
               this.setState({

@@ -25,6 +25,8 @@ import ZecPriceType from './types/ZecPriceType';
 import SecurityType from './types/SecurityType';
 import ServerUrisType from './types/ServerUrisType';
 
+import { CommandEnum } from './enums/CommandEnum';
+
 import AppStateLoaded from './AppStateLoaded';
 import AppStateLoading from './AppStateLoading';
 
@@ -56,4 +58,5 @@ export {
   SnackbarType,
   SecurityType,
   ServerUrisType,
+  CommandEnum,
 };

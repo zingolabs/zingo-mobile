@@ -23,6 +23,7 @@ import 'moment/locale/ru';
 import { ThemeType } from '../../../app/types';
 import RPC from '../../../app/rpc';
 import Utils from '../../../app/utils';
+import { CommandEnum } from '../../../app/AppState';
 
 type ConfirmProps = {
   calculatedFee: number;
@@ -98,7 +99,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
       return '-';
     }
 
-    const result: string = await RPCModule.execute('parse_address', sendPageState.toaddr.to);
+    const result: string = await RPCModule.execute(CommandEnum.parse_address, sendPageState.toaddr.to);
     if (result) {
       if (result.toLowerCase().startsWith('error') || result.toLowerCase() === 'null') {
         return '-';

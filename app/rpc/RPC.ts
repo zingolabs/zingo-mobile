@@ -10,6 +10,7 @@ import {
   WalletSettingsClass,
   TranslateType,
   SyncingStatusClass,
+  CommandEnum,
 } from '../AppState';
 import RPCModule from '../RPCModule';
 import { RPCAddressType } from './types/RPCAddressType';
@@ -114,7 +115,7 @@ export default class RPC {
 
   static async rpc_setInterruptSyncAfterBatch(value: string): Promise<void> {
     try {
-      const resultStr: string = await RPCModule.execute('interrupt_sync_after_batch', value);
+      const resultStr: string = await RPCModule.execute(CommandEnum.interrupt_sync_after_batch, value);
 
       if (resultStr) {
         if (resultStr.toLowerCase().startsWith('error')) {
@@ -135,7 +136,7 @@ export default class RPC {
       // -1  - error in Gemini/zingolib.
       // -2  - error in RPCModule, likely.
       // > 0 - real value
-      const resultStr: string = await RPCModule.execute('updatecurrentprice', '');
+      const resultStr: string = await RPCModule.execute(CommandEnum.updatecurrentprice, '');
       //console.log(resultStr);
 
       if (resultStr) {
@@ -157,7 +158,7 @@ export default class RPC {
 
   static async rpc_setWalletSettingOption(name: string, value: string): Promise<string> {
     try {
-      const resultStr: string = await RPCModule.execute('setoption', `${name}=${value}`);
+      const resultStr: string = await RPCModule.execute(CommandEnum.setoption, `${name}=${value}`);
 
       if (resultStr) {
         if (resultStr.toLowerCase().startsWith('error')) {
@@ -179,7 +180,7 @@ export default class RPC {
   // Special method to get the Info object. This is used both internally and by the Loading screen
   static async rpc_getInfoObject(): Promise<InfoType> {
     try {
-      const infoStr: string = await RPCModule.execute('info', '');
+      const infoStr: string = await RPCModule.execute(CommandEnum.info, '');
       if (infoStr) {
         if (infoStr.toLowerCase().startsWith('error')) {
           console.log(`Error info ${infoStr}`);
@@ -191,7 +192,7 @@ export default class RPC {
       }
       const infoJSON: RPCInfoType = await JSON.parse(infoStr);
 
-      let zingolibStr: string = await RPCModule.execute('version', '');
+      let zingolibStr: string = await RPCModule.execute(CommandEnum.version, '');
       if (zingolibStr) {
         if (zingolibStr.toLowerCase().startsWith('error')) {
           console.log(`Error zingolib version ${zingolibStr}`);
@@ -234,7 +235,7 @@ export default class RPC {
 
   static async rpc_fetchWalletHeight(): Promise<number> {
     try {
-      const heightStr: string = await RPCModule.execute('height', '');
+      const heightStr: string = await RPCModule.execute(CommandEnum.height, '');
       if (heightStr) {
         if (heightStr.toLowerCase().startsWith('error')) {
           console.log(`Error wallet height ${heightStr}`);
@@ -254,7 +255,7 @@ export default class RPC {
   }
   /*
   static async rpc_getPrivKeyAsString(address: string): Promise<string> {
-    const privKeyStr = await RPCModule.execute('export', address);
+    const privKeyStr = await RPCModule.execute(CommandEnum.export, address);
     //console.log(privKeyStr);
 
     let privKeyJSON;
@@ -274,7 +275,7 @@ export default class RPC {
   }
 
   static async rpc_getViewKeyAsString(address: string): Promise<string> {
-    const viewKeyStr = await RPCModule.execute('export', address);
+    const viewKeyStr = await RPCModule.execute(CommandEnum.export, address);
     //console.log(viewKeyStr);
 
     let viewKeyJSON;
@@ -294,7 +295,7 @@ export default class RPC {
   }
 
   static async rpc_createNewAddress(addressType: 'tzo'): Promise<string> {
-    const addrStr = await RPCModule.execute('new', addressType);
+    const addrStr = await RPCModule.execute(CommandEnum.new, addressType);
     const addrJSON = await JSON.parse(addrStr);
 
     //console.log(addrJSON);
@@ -311,7 +312,7 @@ export default class RPC {
 
   static async rpc_doImportPrivKey(key: string, birthday: string): Promise<string | string[]> {
     const args = { key, birthday: parseInt(birthday, 10), norescan: true };
-    const address = await RPCModule.execute('import', JSON.stringify(args));
+    const address = await RPCModule.execute(CommandEnum.import, JSON.stringify(args));
 
     if (address) {
       return address;
@@ -323,7 +324,7 @@ export default class RPC {
   static async rpc_shieldFunds(pools: string): Promise<string> {
     try {
       // using `all` or `transparent` or `sapling`...
-      const shieldStr: string = await RPCModule.execute('shield', pools);
+      const shieldStr: string = await RPCModule.execute(CommandEnum.shield, pools);
       if (shieldStr) {
         if (shieldStr.toLowerCase().startsWith('error')) {
           console.log(`Error shield ${pools} ${shieldStr}`);
@@ -345,7 +346,7 @@ export default class RPC {
     if (readOnly) {
       // only viewing key & birthday
       try {
-        const ufvkStr: string = await RPCModule.execute('exportufvk', '');
+        const ufvkStr: string = await RPCModule.execute(CommandEnum.exportufvk, '');
         if (ufvkStr) {
           if (ufvkStr.toLowerCase().startsWith('error')) {
             console.log(`Error ufvk ${ufvkStr}`);
@@ -373,7 +374,7 @@ export default class RPC {
     } else {
       // seed & viewing key & birthday
       try {
-        const seedStr: string = await RPCModule.execute('seed', '');
+        const seedStr: string = await RPCModule.execute(CommandEnum.seed, '');
         if (seedStr) {
           if (seedStr.toLowerCase().startsWith('error')) {
             console.log(`Error seed ${seedStr}`);
@@ -385,7 +386,7 @@ export default class RPC {
         }
         const RPCseed: RPCSeedType = await JSON.parse(seedStr);
 
-        const ufvkStr: string = await RPCModule.execute('exportufvk', '');
+        const ufvkStr: string = await RPCModule.execute(CommandEnum.exportufvk, '');
         if (ufvkStr) {
           if (ufvkStr.toLowerCase().startsWith('error')) {
             console.log(`Error ufvk ${ufvkStr}`);
@@ -670,7 +671,7 @@ export default class RPC {
 
   async doRescan(): Promise<string> {
     try {
-      const rescanStr: string = await RPCModule.execute('rescan', '');
+      const rescanStr: string = await RPCModule.execute(CommandEnum.rescan, '');
       if (rescanStr) {
         if (rescanStr.toLowerCase().startsWith('error')) {
           console.log(`Error rescan ${rescanStr}`);
@@ -690,7 +691,7 @@ export default class RPC {
 
   async doSync(): Promise<string> {
     try {
-      const syncStr: string = await RPCModule.execute('sync', '');
+      const syncStr: string = await RPCModule.execute(CommandEnum.sync, '');
       if (syncStr) {
         if (syncStr.toLowerCase().startsWith('error')) {
           console.log(`Error sync ${syncStr}`);
@@ -710,7 +711,7 @@ export default class RPC {
 
   async doSyncStatus(): Promise<string> {
     try {
-      const syncStatusStr: string = await RPCModule.execute('syncstatus', '');
+      const syncStatusStr: string = await RPCModule.execute(CommandEnum.syncstatus, '');
       if (syncStatusStr) {
         if (syncStatusStr.toLowerCase().startsWith('error')) {
           console.log(`Error sync status ${syncStatusStr}`);
@@ -730,7 +731,7 @@ export default class RPC {
 
   async doSend(sendJSON: string): Promise<string> {
     try {
-      const sendStr: string = await RPCModule.execute('send', sendJSON);
+      const sendStr: string = await RPCModule.execute(CommandEnum.send, sendJSON);
       if (sendStr) {
         if (sendStr.toLowerCase().startsWith('error')) {
           console.log(`Error send ${sendStr}`);
@@ -750,7 +751,7 @@ export default class RPC {
 
   async doSendProgress(): Promise<string> {
     try {
-      const sendProgressStr: string = await RPCModule.execute('sendprogress', '');
+      const sendProgressStr: string = await RPCModule.execute(CommandEnum.sendprogress, '');
       if (sendProgressStr) {
         if (sendProgressStr.toLowerCase().startsWith('error')) {
           console.log(`Error send progress ${sendProgressStr}`);
@@ -1216,7 +1217,7 @@ export default class RPC {
 
   async fetchWalletSettings(): Promise<void> {
     try {
-      const download_memos_str: string = await RPCModule.execute('getoption', 'download_memos');
+      const download_memos_str: string = await RPCModule.execute(CommandEnum.getoption, 'download_memos');
       if (download_memos_str) {
         if (download_memos_str.toLowerCase().startsWith('error')) {
           console.log(`Error download memos ${download_memos_str}`);
@@ -1267,7 +1268,7 @@ export default class RPC {
   // This method will get the total balances
   async fetchTotalBalance() {
     try {
-      const addressesStr: string = await RPCModule.execute('addresses', '');
+      const addressesStr: string = await RPCModule.execute(CommandEnum.addresses, '');
       if (addressesStr) {
         if (addressesStr.toLowerCase().startsWith('error')) {
           console.log(`Error addresses ${addressesStr}`);
@@ -1279,7 +1280,7 @@ export default class RPC {
       }
       const addressesJSON: RPCAddressType[] = await JSON.parse(addressesStr);
 
-      const balanceStr: string = await RPCModule.execute('balance', '');
+      const balanceStr: string = await RPCModule.execute(CommandEnum.balance, '');
       if (balanceStr) {
         if (balanceStr.toLowerCase().startsWith('error')) {
           console.log(`Error balance ${balanceStr}`);
@@ -1309,7 +1310,7 @@ export default class RPC {
       this.fnSetTotalBalance(balance);
 
       // Fetch pending notes and UTXOs
-      const pendingNotes: string = await RPCModule.execute('notes', '');
+      const pendingNotes: string = await RPCModule.execute(CommandEnum.notes, '');
       if (pendingNotes) {
         if (pendingNotes.toLowerCase().startsWith('error')) {
           console.log(`Error notes ${pendingNotes}`);
@@ -1390,7 +1391,7 @@ export default class RPC {
 
   async fetchWalletHeight(): Promise<void> {
     try {
-      const heightStr: string = await RPCModule.execute('height', '');
+      const heightStr: string = await RPCModule.execute(CommandEnum.height, '');
       if (heightStr) {
         if (heightStr.toLowerCase().startsWith('error')) {
           console.log(`Error wallet height ${heightStr}`);
@@ -1420,7 +1421,7 @@ export default class RPC {
   // Fetch all T and Z and O transactions
   async fetchTandZandOTransactionsSummaries() {
     try {
-      const summariesStr: string = await RPCModule.execute('summaries', '');
+      const summariesStr: string = await RPCModule.execute(CommandEnum.summaries, '');
       //console.log(summariesStr);
       if (summariesStr) {
         if (summariesStr.toLowerCase().startsWith('error')) {

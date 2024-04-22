@@ -17,6 +17,7 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
+import { CommandEnum } from '../../app/AppState';
 
 type InputTextAddressProps = {
   address: string;
@@ -44,7 +45,7 @@ const InputTextAddress: React.FunctionComponent<InputTextAddressProps> = ({
         addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
         return false;
       }
-      const result: string = await RPCModule.execute('parse_address', addr);
+      const result: string = await RPCModule.execute(CommandEnum.parse_address, addr);
       if (result) {
         if (result.toLowerCase().startsWith('error') || result.toLowerCase() === 'null') {
           return false;

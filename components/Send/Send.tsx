@@ -26,6 +26,7 @@ import Button from '../Components/Button';
 import {
   AddressBookFileClass,
   AddressClass,
+  CommandEnum,
   SendJsonToTypeType,
   SendPageStateClass,
   SendProgressClass,
@@ -132,7 +133,7 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   const runPropose = async (proposeJSON: string): Promise<string> => {
     try {
-      const proposeStr: string = await RPCModule.execute('propose', proposeJSON);
+      const proposeStr: string = await RPCModule.execute(CommandEnum.propose, proposeJSON);
       if (proposeStr) {
         if (proposeStr.toLowerCase().startsWith('error')) {
           console.log(`Error propose ${proposeStr}`);
@@ -261,7 +262,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
         return false;
       }
-      const result: string = await RPCModule.execute('parse_address', address);
+      const result: string = await RPCModule.execute(CommandEnum.parse_address, address);
       if (result) {
         if (result.toLowerCase().startsWith('error') || result.toLowerCase() === 'null') {
           return false;
@@ -302,7 +303,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
         return false;
       }
-      const result: string = await RPCModule.execute('parse_address', address);
+      const result: string = await RPCModule.execute(CommandEnum.parse_address, address);
       if (result) {
         if (result.toLowerCase().startsWith('error') || result.toLowerCase() === 'null') {
           return false;

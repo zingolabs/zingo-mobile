@@ -3,7 +3,7 @@ import Url from 'url-parse';
 import RPCModule from '../RPCModule';
 import { RPCParseAddressType } from '../rpc/types/RPCParseAddressType';
 import ZcashURITargetClass from './classes/ZcashURITargetClass';
-import { ServerType, TranslateType } from '../AppState';
+import { CommandEnum, ServerType, TranslateType } from '../AppState';
 
 const parseZcashURI = async (
   uri: string,
@@ -27,7 +27,7 @@ const parseZcashURI = async (
   //console.log(address);
 
   if (address) {
-    const resultParse: string = await RPCModule.execute('parse_address', address);
+    const resultParse: string = await RPCModule.execute(CommandEnum.parse_address, address);
     if (resultParse) {
       if (resultParse.toLowerCase().startsWith('error') || resultParse.toLowerCase() === 'null') {
         return translate('uris.parseerror') as string;
@@ -86,7 +86,7 @@ const parseZcashURI = async (
         if (typeof target.address !== 'undefined') {
           return `${translate('uris.duplicateparameter')} "${qName}"`;
         }
-        const result: string = await RPCModule.execute('parse_address', value);
+        const result: string = await RPCModule.execute(CommandEnum.parse_address, value);
         if (result) {
           if (result.toLowerCase().startsWith('error') || result.toLowerCase() === 'null') {
             return translate('uris.notvalid') as string;

@@ -47,6 +47,7 @@ import {
   ServerType,
   AddressBookFileClass,
   SecurityType,
+  CommandEnum,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
@@ -1067,7 +1068,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
 
       // we need to restore the old server because the new doesn't have the seed of the current wallet.
       const old_settings = await SettingsFileImpl.readSettings();
-      await RPCModule.execute('changeserver', old_settings.server.uri);
+      await RPCModule.execute(CommandEnum.changeserver, old_settings.server.uri);
 
       // go to the seed screen for changing the wallet for another in the new server or cancel this action.
       this.fetchWallet();
@@ -1237,7 +1238,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
   onClickOKServerWallet = async () => {
     if (this.state.newServer) {
       const beforeServer = this.state.server;
-      const resultStr: string = await RPCModule.execute('changeserver', this.state.newServer.uri);
+      const resultStr: string = await RPCModule.execute(CommandEnum.changeserver, this.state.newServer.uri);
       if (resultStr.toLowerCase().startsWith('error')) {
         //console.log(`Error change server ${value} - ${resultStr}`);
         this.addLastSnackbar({
