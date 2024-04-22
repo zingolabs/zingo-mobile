@@ -915,8 +915,24 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                   "value": "https://lwd1.zcash-infra.com:9067",
                 },
                 {
-                  "label": "text translated https://test.zec.rocks:443",
-                  "value": "https://test.zec.rocks:443",
+                  "label": "text translated https://zec.rocks:443",
+                  "value": "https://zec.rocks:443",
+                },
+                {
+                  "label": "text translated https://na.zec.rocks:443",
+                  "value": "https://na.zec.rocks:443",
+                },
+                {
+                  "label": "text translated https://sa.zec.rocks:443",
+                  "value": "https://sa.zec.rocks:443",
+                },
+                {
+                  "label": "text translated https://eu.zec.rocks:443",
+                  "value": "https://eu.zec.rocks:443",
+                },
+                {
+                  "label": "text translated https://ap.zec.rocks:443",
+                  "value": "https://ap.zec.rocks:443",
                 },
                 {
                   "label": "text translated https://na.lightwalletd.com:443",
