@@ -52,6 +52,7 @@ import {
   LanguageEnum,
   ModeEnum,
   CurrencyEnum,
+  SelectServerEnum,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
@@ -129,7 +130,7 @@ export default function LoadedApp(props: LoadedAppProps) {
     changeWalletScreen: true,
     restoreWalletBackupScreen: true,
   });
-  const [selectServer, setSelectServer] = useState<'auto' | 'list' | 'custom'>('auto');
+  const [selectServer, setSelectServer] = useState<SelectServerEnum>(SelectServerEnum.auto);
   const file = useMemo(
     () => ({
       en: en,
@@ -307,7 +308,7 @@ type LoadedAppClassProps = {
   toggleTheme: (mode: ModeEnum) => void;
   addressBook: AddressBookFileClass[];
   security: SecurityType;
-  selectServer: 'auto' | 'list' | 'custom';
+  selectServer: SelectServerEnum;
 };
 
 export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
@@ -1166,7 +1167,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
   set_selectServer_option = async (name: 'selectServer', value: string): Promise<void> => {
     await SettingsFileImpl.writeSettings(name, value);
     this.setState({
-      selectServer: value as 'auto' | 'list' | 'custom',
+      selectServer: value as SelectServerEnum,
     });
 
     // Refetch the settings to update

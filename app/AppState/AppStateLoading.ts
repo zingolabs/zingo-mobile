@@ -15,6 +15,7 @@ import SecurityType from './types/SecurityType';
 import { CurrencyEnum } from './enums/CurrencyEnum';
 import { LanguageEnum } from './enums/LanguageEnum';
 import { ModeEnum } from './enums/ModeEnum';
+import { SelectServerEnum } from './enums/SelectServerEnum';
 
 export default interface AppStateLoading {
   navigation: StackScreenProps<any>['navigation'];
@@ -57,7 +58,7 @@ export default interface AppStateLoading {
   biometricsFailed: boolean;
   startingApp: boolean;
   security: SecurityType;
-  selectServer: 'auto' | 'list' | 'custom';
+  selectServer: SelectServerEnum;
   serverErrorTries: number;
   donationAlert: boolean;
 

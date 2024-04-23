@@ -1,6 +1,7 @@
 import { CurrencyEnum } from '../enums/CurrencyEnum';
 import { LanguageEnum } from '../enums/LanguageEnum';
 import { ModeEnum } from '../enums/ModeEnum';
+import { SelectServerEnum } from '../enums/SelectServerEnum';
 import SecurityType from '../types/SecurityType';
 import ServerType from '../types/ServerType';
 
@@ -20,7 +21,7 @@ export default class SettingsFileClass {
   // - null: means is a fresh install
   // - string: means it have a normal value
   security: SecurityType;
-  selectServer: 'auto' | 'list' | 'custom';
+  selectServer: SelectServerEnum;
   firstUpdateWithDonation: boolean;
 
   constructor(
@@ -35,7 +36,7 @@ export default class SettingsFileClass {
     basicFirstViewSeed: boolean,
     version: string,
     security: SecurityType,
-    selectServer: 'auto' | 'list' | 'custom',
+    selectServer: SelectServerEnum,
     firstUpdateWithDonation: boolean,
   ) {
     this.server = server;

@@ -25,6 +25,7 @@ import { MenuItemEnum } from './enums/MenuItemEnum';
 import { LanguageEnum } from './enums/LanguageEnum';
 import { CurrencyEnum } from './enums/CurrencyEnum';
 import { ModeEnum } from './enums/ModeEnum';
+import { SelectServerEnum } from './enums/SelectServerEnum';
 
 export default interface AppStateLoaded {
   navigation: StackScreenProps<any>['navigation'];
@@ -132,7 +133,7 @@ export default interface AppStateLoaded {
   addressBookCurrentAddress: string;
   addressBookOpenPriorModal: () => void;
   security: SecurityType;
-  selectServer: 'auto' | 'list' | 'custom';
+  selectServer: SelectServerEnum;
 
   // eslint-disable-next-line semi
 }

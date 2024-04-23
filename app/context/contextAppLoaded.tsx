@@ -25,6 +25,7 @@ import {
   LanguageEnum,
   ModeEnum,
   CurrencyEnum,
+  SelectServerEnum,
 } from '../AppState';
 import SnackbarType from '../AppState/types/SnackbarType';
 
@@ -102,7 +103,7 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   addressBookCurrentAddress: '',
   addressBookOpenPriorModal: () => {},
   security: {} as SecurityType,
-  selectServer: 'auto',
+  selectServer: SelectServerEnum.auto,
 };
 
 export const ContextAppLoaded = React.createContext(defaultAppStateLoaded);

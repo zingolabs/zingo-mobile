@@ -15,6 +15,7 @@ import {
   LanguageEnum,
   ModeEnum,
   CurrencyEnum,
+  SelectServerEnum,
 } from '../AppState';
 import SnackbarType from '../AppState/types/SnackbarType';
 
@@ -63,7 +64,7 @@ export const defaultAppStateLoading: AppStateLoading = {
   biometricsFailed: false,
   startingApp: true,
   security: {} as SecurityType,
-  selectServer: 'auto',
+  selectServer: SelectServerEnum.auto,
   serverErrorTries: 0,
   donationAlert: false,
 };

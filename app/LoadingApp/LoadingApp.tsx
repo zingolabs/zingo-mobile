@@ -40,6 +40,7 @@ import {
   LanguageEnum,
   CurrencyEnum,
   ModeEnum,
+  SelectServerEnum,
 } from '../AppState';
 import { parseServerURI, serverUris } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
@@ -106,7 +107,7 @@ export default function LoadingApp(props: LoadingAppProps) {
     changeWalletScreen: true,
     restoreWalletBackupScreen: true,
   });
-  const [selectServer, setSelectServer] = useState<'auto' | 'list' | 'custom'>('auto');
+  const [selectServer, setSelectServer] = useState<SelectServerEnum>(SelectServerEnum.auto);
   const [donationAlert, setDonationAlert] = useState<boolean>(false);
   const file = useMemo(
     () => ({
@@ -296,7 +297,7 @@ type LoadingAppClassProps = {
   firstLaunchingMessage: boolean;
   toggleTheme: (mode: ModeEnum.basic | ModeEnum.advanced) => void;
   security: SecurityType;
-  selectServer: 'auto' | 'list' | 'custom';
+  selectServer: SelectServerEnum;
   donationAlert: boolean;
 };
 
@@ -403,7 +404,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
       // First, if it's server automatic
       // here I need to check the servers and select the best one
       // likely only when the user install or update the new version with this feature.
-      if (this.state.selectServer === 'auto') {
+      if (this.state.selectServer === SelectServerEnum.auto) {
         setTimeout(() => {
           this.addLastSnackbar({
             message: this.state.translate('loadedapp.selectingserver') as string,
@@ -596,10 +597,10 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     console.log(fasterServer);
     this.setState({
       server: fasterServer,
-      selectServer: 'list',
+      selectServer: SelectServerEnum.list,
     });
     await SettingsFileImpl.writeSettings('server', fasterServer);
-    await SettingsFileImpl.writeSettings('selectServer', 'list');
+    await SettingsFileImpl.writeSettings('selectServer', SelectServerEnum.list);
     // message with the result only for advanced users
     if (this.state.mode === ModeEnum.advanced) {
       if (isEqual(actualServer, fasterServer)) {

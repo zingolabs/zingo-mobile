@@ -1,6 +1,6 @@
 import * as RNFS from 'react-native-fs';
 
-import { SecurityType, ServerType, ServerUrisType, SettingsFileClass } from '../../app/AppState';
+import { SecurityType, SelectServerEnum, ServerType, ServerUrisType, SettingsFileClass } from '../../app/AppState';
 import { serverUris } from '../../app/uris';
 import { isEqual } from 'lodash';
 
@@ -122,7 +122,7 @@ export default class SettingsFileImpl {
             )
         ) {
           // default servers -> auto - to make easier and faster UX to the user
-          settings.selectServer = 'auto';
+          settings.selectServer = SelectServerEnum.auto;
         } else if (
           serverUris(() => {})
             .filter((s: ServerUrisType) => !s.default)
@@ -131,11 +131,11 @@ export default class SettingsFileImpl {
             )
         ) {
           // new servers -> in the list - the user changed the default server in some point
-          settings.selectServer = 'list';
+          settings.selectServer = SelectServerEnum.list;
         } else {
           // new servers -> not in the list - the user changed the default server in some point to
           // another totally unknown or the user is using a non mainnet server.
-          settings.selectServer = 'custom';
+          settings.selectServer = SelectServerEnum.custom;
         }
       }
       if (!settings.hasOwnProperty('donation')) {

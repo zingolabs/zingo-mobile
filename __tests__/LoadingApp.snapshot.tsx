@@ -13,7 +13,7 @@ import { ThemeType } from '../app/types';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { I18n } from 'i18n-js';
 import { StackScreenProps } from '@react-navigation/stack';
-import { BackgroundType, LanguageEnum, ModeEnum, ServerType } from '../app/AppState';
+import { BackgroundType, LanguageEnum, ModeEnum, SelectServerEnum, ServerType } from '../app/AppState';
 import { CurrencyEnum } from '../app/AppState/enums/CurrencyEnum';
 
 // Crea un mock para el constructor de I18n
@@ -142,7 +142,7 @@ describe('Component LoadingApp - test', () => {
       changeWalletScreen: true,
       restoreWalletBackupScreen: true,
     };
-    const selectServer = 'auto';
+    const selectServer = SelectServerEnum.auto;
     const donationAlert = false;
     const receive = render(
       <LoadingAppClass

@@ -20,7 +20,15 @@ import 'moment/locale/pt';
 import 'moment/locale/ru';
 
 import Header from '../Header';
-import { LanguageEnum, SecurityType, ServerType, ServerUrisType, ModeEnum, CurrencyEnum } from '../../app/AppState';
+import {
+  LanguageEnum,
+  SecurityType,
+  ServerType,
+  ServerUrisType,
+  ModeEnum,
+  CurrencyEnum,
+  SelectServerEnum,
+} from '../../app/AppState';
 import { isEqual } from 'lodash';
 import ChainTypeToggle from '../Components/ChainTypeToggle';
 import CheckBox from '@react-native-community/checkbox';
@@ -153,7 +161,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [restoreWalletBackupScreen, setRestoreWalletBackupScreen] = useState<boolean>(
     securityContext.restoreWalletBackupScreen,
   );
-  const [selectServer, setSelectServer] = useState<'auto' | 'list' | 'custom'>(selectServerContext);
+  const [selectServer, setSelectServer] = useState<SelectServerEnum>(selectServerContext);
 
   const [customIcon, setCustomIcon] = useState<IconDefinition>(farCircle);
   const [autoIcon, setAutoIcon] = useState<IconDefinition>(farCircle);
@@ -164,11 +172,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const slideAnim = useSharedValue(0);
 
   useEffect(() => {
-    if (selectServerContext === 'auto') {
+    if (selectServerContext === SelectServerEnum.auto) {
       setAutoIcon(faDotCircle);
       setAutoServerUri(serverContext.uri);
       setAutoServerChainName(serverContext.chain_name);
-    } else if (selectServerContext === 'list') {
+    } else if (selectServerContext === SelectServerEnum.list) {
       setListIcon(faDotCircle);
       setListServerUri(serverContext.uri);
       setListServerChainName(serverContext.chain_name);
@@ -176,7 +184,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       // with the same server
       setAutoServerUri(serverContext.uri);
       setAutoServerChainName(serverContext.chain_name);
-    } else if (selectServerContext === 'custom') {
+    } else if (selectServerContext === SelectServerEnum.custom) {
       setCustomIcon(faDotCircle);
       setCustomServerUri(serverContext.uri);
       setCustomServerChainName(serverContext.chain_name);
@@ -227,13 +235,13 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const saveSettings = async () => {
     let serverUriParsed = '';
     let chain_nameParsed = '';
-    if (selectServer === 'auto') {
+    if (selectServer === SelectServerEnum.auto) {
       serverUriParsed = autoServerUri;
       chain_nameParsed = autoServerChainName;
-    } else if (selectServer === 'list') {
+    } else if (selectServer === SelectServerEnum.list) {
       serverUriParsed = listServerUri;
       chain_nameParsed = listServerChainName;
-    } else if (selectServer === 'custom') {
+    } else if (selectServer === SelectServerEnum.custom) {
       serverUriParsed = customServerUri;
       chain_nameParsed = customServerChainName;
     }
@@ -286,11 +294,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         // and I save it in the state ASAP.
         if (serverUriParsed !== resultUri) {
           serverUriParsed = resultUri;
-          if (selectServer === 'auto') {
+          if (selectServer === SelectServerEnum.auto) {
             setAutoServerUri(serverUriParsed);
-          } else if (selectServer === 'list') {
+          } else if (selectServer === SelectServerEnum.list) {
             setListServerUri(serverUriParsed);
-          } else if (selectServer === 'custom') {
+          } else if (selectServer === SelectServerEnum.custom) {
             setCustomServerUri(serverUriParsed);
           }
         }
@@ -577,7 +585,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                     setAutoIcon(faDotCircle);
                     setListIcon(farCircle);
                     setCustomIcon(farCircle);
-                    setSelectServer('auto');
+                    setSelectServer(SelectServerEnum.auto);
                   }}>
                   <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
                     {autoIcon && <FontAwesomeIcon icon={autoIcon} size={20} color={colors.border} />}
@@ -608,7 +616,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                         setAutoIcon(farCircle);
                         setListIcon(faDotCircle);
                         setCustomIcon(farCircle);
-                        setSelectServer('list');
+                        setSelectServer(SelectServerEnum.list);
                         setListServerUri(item);
                         const cnItem = serverUris(translate).find((s: ServerUrisType) => s.uri === item);
                         if (cnItem) {
@@ -663,7 +671,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                     setAutoIcon(farCircle);
                     setListIcon(farCircle);
                     setCustomIcon(faDotCircle);
-                    setSelectServer('custom');
+                    setSelectServer(SelectServerEnum.custom);
                   }}>
                   <View
                     style={{
