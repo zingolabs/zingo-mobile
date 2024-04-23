@@ -16,7 +16,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme } from '@react-navigation/native';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Alert, Image, Text, TouchableOpacity, View } from 'react-native';
-import { NetInfoType, TranslateType, ModeEnum, CurrencyEnum, SnackbarDurationEnum } from '../../app/AppState';
+import {
+  NetInfoType,
+  TranslateType,
+  ModeEnum,
+  CurrencyEnum,
+  SnackbarDurationEnum,
+  PoolToShieldEnum,
+} from '../../app/AppState';
 import { ContextAppLoaded } from '../../app/context';
 import { ThemeType } from '../../app/types';
 import CurrencyAmount from '../Components/CurrencyAmount';
@@ -126,7 +133,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
 
   const opacityValue = useRef(new Animated.Value(1)).current;
   const [showShieldButton, setShowShieldButton] = useState<boolean>(false);
-  const [poolsToShield, setPoolsToShield] = useState<'' | 'all' | 'transparent' | 'sapling'>('');
+  const [poolsToShield, setPoolsToShield] = useState<PoolToShieldEnum>(PoolToShieldEnum.noPoolToShield);
   const [blocksRemaining, setBlocksRemaining] = useState<number>(0);
 
   useEffect(() => {
@@ -168,20 +175,24 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     );
 
     if ((someUnconfirmed ? 0 : totalBalance.transparentBal) > 0 && totalBalance.spendablePrivate > 0) {
-      setPoolsToShield('all');
+      setPoolsToShield(PoolToShieldEnum.allPoolToShield);
     } else if ((someUnconfirmed ? 0 : totalBalance.transparentBal) > 0) {
-      setPoolsToShield('transparent');
+      setPoolsToShield(PoolToShieldEnum.transparentPoolToShield);
     } else if (totalBalance.spendablePrivate > 0) {
-      setPoolsToShield('sapling');
+      setPoolsToShield(PoolToShieldEnum.saplingPoolToShield);
     } else {
-      setPoolsToShield('');
+      setPoolsToShield(PoolToShieldEnum.noPoolToShield);
     }
   }, [mode, readOnly, totalBalance, totalBalance.transparentBal, totalBalance.spendablePrivate, someUnconfirmed]);
 
   useEffect(() => {
     // for basic mode always have to be 'all', It's easier for the user.
-    if (mode === ModeEnum.basic && (poolsToShield === 'sapling' || poolsToShield === 'transparent')) {
-      setPoolsToShield('all');
+    if (
+      mode === ModeEnum.basic &&
+      (poolsToShield === PoolToShieldEnum.saplingPoolToShield ||
+        poolsToShield === PoolToShieldEnum.transparentPoolToShield)
+    ) {
+      setPoolsToShield(PoolToShieldEnum.allPoolToShield);
       if (setPoolsToShieldSelectSapling) {
         setPoolsToShieldSelectSapling(true);
       }
@@ -199,15 +210,15 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       return;
     }
 
-    let pools: 'all' | 'transparent' | 'sapling' | '' = poolsToShield;
+    let pools: PoolToShieldEnum = poolsToShield;
 
-    if (pools === 'all') {
+    if (pools === PoolToShieldEnum.allPoolToShield) {
       if (!poolsToShieldSelectSapling && !poolsToShieldSelectTransparent) {
-        pools = '';
+        pools = PoolToShieldEnum.noPoolToShield;
       } else if (poolsToShieldSelectSapling && !poolsToShieldSelectTransparent) {
-        pools = 'sapling';
+        pools = PoolToShieldEnum.saplingPoolToShield;
       } else if (!poolsToShieldSelectSapling && poolsToShieldSelectTransparent) {
-        pools = 'transparent';
+        pools = PoolToShieldEnum.transparentPoolToShield;
       }
     }
 
@@ -293,28 +304,28 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     Alert.alert(
       translate(
         `history.shield-title-${
-          poolsToShield !== 'all'
+          poolsToShield !== PoolToShieldEnum.allPoolToShield
             ? poolsToShield
             : poolsToShieldSelectSapling && poolsToShieldSelectTransparent
-            ? 'all'
+            ? PoolToShieldEnum.allPoolToShield
             : poolsToShieldSelectSapling
-            ? 'sapling'
+            ? PoolToShieldEnum.saplingPoolToShield
             : poolsToShieldSelectTransparent
-            ? 'transparent'
-            : 'all'
+            ? PoolToShieldEnum.transparentPoolToShield
+            : PoolToShieldEnum.allPoolToShield
         }`,
       ) as string,
       translate(
         `history.shield-alert-${
-          poolsToShield !== 'all'
+          poolsToShield !== PoolToShieldEnum.allPoolToShield
             ? poolsToShield
             : poolsToShieldSelectSapling && poolsToShieldSelectTransparent
-            ? 'all'
+            ? PoolToShieldEnum.allPoolToShield
             : poolsToShieldSelectSapling
-            ? 'sapling'
+            ? PoolToShieldEnum.saplingPoolToShield
             : poolsToShieldSelectTransparent
-            ? 'transparent'
-            : 'all'
+            ? PoolToShieldEnum.transparentPoolToShield
+            : PoolToShieldEnum.allPoolToShield
         }`,
       ) as string,
       [
@@ -638,15 +649,15 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           <FadeText style={{ fontSize: 8 }}>
             {(translate(
               `history.shield-legend-${
-                poolsToShield !== 'all'
+                poolsToShield !== PoolToShieldEnum.allPoolToShield
                   ? poolsToShield
                   : poolsToShieldSelectSapling && poolsToShieldSelectTransparent
-                  ? 'all'
+                  ? PoolToShieldEnum.allPoolToShield
                   : poolsToShieldSelectSapling
-                  ? 'sapling'
+                  ? PoolToShieldEnum.saplingPoolToShield
                   : poolsToShieldSelectTransparent
-                  ? 'transparent'
-                  : 'all'
+                  ? PoolToShieldEnum.transparentPoolToShield
+                  : PoolToShieldEnum.allPoolToShield
               }`,
             ) as string) +
               ` ${
@@ -685,15 +696,15 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               title={
                 translate(
                   `history.shield-${
-                    poolsToShield !== 'all'
+                    poolsToShield !== PoolToShieldEnum.allPoolToShield
                       ? poolsToShield
                       : poolsToShieldSelectSapling && poolsToShieldSelectTransparent
-                      ? 'all'
+                      ? PoolToShieldEnum.allPoolToShield
                       : poolsToShieldSelectSapling
-                      ? 'sapling'
+                      ? PoolToShieldEnum.saplingPoolToShield
                       : poolsToShieldSelectTransparent
-                      ? 'transparent'
-                      : 'all'
+                      ? PoolToShieldEnum.transparentPoolToShield
+                      : PoolToShieldEnum.allPoolToShield
                   }`,
                 ) as string
               }
@@ -718,7 +729,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               }
             />
             {mode !== ModeEnum.basic &&
-              poolsToShield === 'all' &&
+              poolsToShield === PoolToShieldEnum.allPoolToShield &&
               setPoolsToShieldSelectSapling &&
               setPoolsToShieldSelectTransparent && (
                 <View style={{ alignItems: 'flex-start' }}>

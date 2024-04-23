@@ -62,6 +62,7 @@ import simpleBiometrics from '../simpleBiometrics';
 import selectingServer from '../selectingServer';
 import { isEqual } from 'lodash';
 import { RPCWalletKindEnum } from '../rpc/enums/RPCWalletKindEnum';
+import { RestoreFromTypeEnum } from '../AppState';
 
 const BoldText = React.lazy(() => import('../../components/Components/BoldText'));
 const Button = React.lazy(() => import('../../components/Components/Button'));
@@ -825,14 +826,14 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
         walletBirthday = '0';
       }
 
-      let type: 'seed' | 'ufvk' = 'seed';
+      let type: RestoreFromTypeEnum = RestoreFromTypeEnum.seedRestoreFrom;
       if (seed_ufvk.toLowerCase().startsWith('uview') || seed_ufvk.toLowerCase().startsWith('utestview')) {
         // this is a UFVK
-        type = 'ufvk';
+        type = RestoreFromTypeEnum.ufvkRestoreFrom;
       }
 
       let result: string;
-      if (type === 'seed') {
+      if (type === RestoreFromTypeEnum.seedRestoreFrom) {
         result = await RPCModule.restoreWalletFromSeed(
           seed_ufvk.toLowerCase(),
           walletBirthday || '0',
@@ -857,7 +858,10 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
         // here result can have an `error` field for watch-only which is actually OK.
         const resultJson: RPCSeedType = await JSON.parse(result);
         if (!resultJson.error || (resultJson.error && resultJson.error.startsWith('This wallet is watch-only'))) {
-          this.setState({ actionButtonsDisabled: false, readOnly: type === 'seed' ? false : true });
+          this.setState({
+            actionButtonsDisabled: false,
+            readOnly: type === RestoreFromTypeEnum.seedRestoreFrom ? false : true,
+          });
           this.navigateToLoadedApp();
         } else {
           this.walletErrorHandle(result, this.props.translate('loadingapp.readingwallet-label') as string, 3, false);
