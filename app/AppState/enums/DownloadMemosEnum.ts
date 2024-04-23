@@ -1,5 +1,5 @@
 export enum DownloadMemosEnum {
-  all = 'all',
-  none = 'none',
-  wallet = 'wallet',
+  allMemos = 'all',
+  noneMemos = 'none',
+  walletMemos = 'wallet',
 }

@@ -64,7 +64,7 @@ export default class SettingsFileImpl {
         } as ServerType;
       } else {
         if (typeof settings.server === 'string') {
-          const ss: ServerType = { uri: settings.server, chain_name: ChainNameEnum.main };
+          const ss: ServerType = { uri: settings.server, chain_name: ChainNameEnum.mainChainName };
           const standard = serverUris(() => {}).find((s: ServerUrisType) =>
             isEqual({ uri: s.uri, chain_name: s.chain_name } as ServerType, ss as ServerType),
           );

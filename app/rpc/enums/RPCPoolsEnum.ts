@@ -1,5 +1,5 @@
 export enum RPCPoolsEnum {
-  orchard = 'orchard',
-  sapling = 'sapling',
-  transparent = 'transparent',
+  orchardRPCPool = 'orchard',
+  saplingRPCPool = 'sapling',
+  transparentRPCPool = 'transparent',
 }

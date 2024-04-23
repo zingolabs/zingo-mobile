@@ -65,7 +65,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
         : action === 'server'
         ? (translate('ufvk.server-warning') as string)
         : '') +
-        (server.chain_name !== ChainNameEnum.main && (action === 'change' || action === 'server')
+        (server.chain_name !== ChainNameEnum.mainChainName && (action === 'change' || action === 'server')
           ? '\n' + (translate('ufvk.mainnet-warning') as string)
           : ''),
       [

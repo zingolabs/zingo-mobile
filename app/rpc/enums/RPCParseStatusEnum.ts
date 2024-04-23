@@ -1,4 +1,4 @@
 export enum RPCParseStatusEnum {
-  success = 'success',
-  InvalidAddress = 'Invalid address',
+  successParse = 'success',
+  InvalidAddressParse = 'Invalid address',
 }

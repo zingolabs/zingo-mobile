@@ -6,6 +6,9 @@ import { RPCReceiversEnum } from '../enums/RPCReceiversEnum';
 export type RPCParseAddressType = {
   status: RPCParseStatusEnum;
   chain_name?: ChainNameEnum;
-  address_kind?: RPCAdressKindEnum.unified | RPCAdressKindEnum.sapling | RPCAdressKindEnum.transparent;
+  address_kind?:
+    | RPCAdressKindEnum.unifiedAddressKind
+    | RPCAdressKindEnum.saplingAddressKind
+    | RPCAdressKindEnum.transparentAddressKind;
   receivers_available?: RPCReceiversEnum[];
 };

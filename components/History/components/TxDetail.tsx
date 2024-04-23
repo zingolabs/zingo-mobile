@@ -187,7 +187,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
               {expandTxid && !!tx.txid && (
                 <>
                   <RegText>{tx.txid}</RegText>
-                  {server.chain_name !== ChainNameEnum.regtest && (
+                  {server.chain_name !== ChainNameEnum.regtestChainName && (
                     <TouchableOpacity onPress={() => handleTxIDClick(tx.txid)}>
                       <Text style={{ color: colors.text, textDecorationLine: 'underline', margin: 15 }}>
                         {translate('history.viewexplorer') as string}

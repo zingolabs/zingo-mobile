@@ -618,7 +618,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         </View>
       )}
 
-      {currency === CurrencyEnum.USD && !noBalance && (
+      {currency === CurrencyEnum.USDCurrency && !noBalance && (
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <CurrencyAmount
             style={{ marginTop: 0, marginBottom: 5 }}

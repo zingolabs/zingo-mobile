@@ -1,5 +1,5 @@
 export enum PoolEnum {
-  Orchard = 'Orchard',
-  Sapling = 'Sapling',
-  Transparent = 'Transparent',
+  OrchardPool = 'Orchard',
+  SaplingPool = 'Sapling',
+  TransparentPool = 'Transparent',
 }

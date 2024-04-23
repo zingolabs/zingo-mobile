@@ -33,7 +33,7 @@ describe('Component Components - test', () => {
         price={1.12345678}
         amtZec={39.99}
         style={{ backgroundColor: 'red' }}
-        currency={CurrencyEnum.USD}
+        currency={CurrencyEnum.USDCurrency}
         privacy={true}
       />,
     );
@@ -46,7 +46,7 @@ describe('Component Components - test', () => {
         price={1.12345678}
         amtZec={39.99}
         style={{ backgroundColor: 'red' }}
-        currency={CurrencyEnum.USD}
+        currency={CurrencyEnum.USDCurrency}
       />,
     );
     expect(currencyAmount.toJSON()).toMatchSnapshot();

@@ -103,7 +103,7 @@ export default class Utils {
 
   static async getDonationAddress(chain_name: ChainNameEnum): Promise<string> {
     // donations only for mainnet.
-    if (chain_name === ChainNameEnum.main) {
+    if (chain_name === ChainNameEnum.mainChainName) {
       // UA -> we need a fresh one.
       const ua: string = await RPCModule.getDonationAddress();
       return ua;
@@ -164,7 +164,7 @@ export default class Utils {
   }
 
   static getBlockExplorerTxIDURL(txid: string, chain_name: ChainNameEnum): string {
-    if (chain_name === ChainNameEnum.test) {
+    if (chain_name === ChainNameEnum.testChainName) {
       return `https://testnet.zcashblockexplorer.com/transactions/${txid}`;
     } else {
       return `https://zcashblockexplorer.com/transactions/${txid}`;

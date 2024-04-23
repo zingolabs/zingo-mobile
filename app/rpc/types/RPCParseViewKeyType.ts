@@ -6,6 +6,6 @@ import { RPCPoolsEnum } from '../enums/RPCPoolsEnum';
 export type RPCParseViewKeyType = {
   status: RPCParseStatusEnum;
   chain_name?: ChainNameEnum;
-  address_kind?: RPCAdressKindEnum.ufvk;
+  address_kind?: RPCAdressKindEnum.ufvkAddressKind;
   pools_available?: RPCPoolsEnum[];
 };

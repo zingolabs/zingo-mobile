@@ -180,13 +180,13 @@ describe('Component History TxDetail - test', () => {
         {
           address: '',
           amount: 0.77654321,
-          pool: PoolEnum.Orchard,
+          pool: PoolEnum.OrchardPool,
           memos: ['hola', '  & ', 'hello'],
         },
         {
           address: '',
           amount: 0.1,
-          pool: PoolEnum.Sapling,
+          pool: PoolEnum.SaplingPool,
           memos: ['hello', '  & ', 'hola'],
         },
       ],

@@ -1,5 +1,5 @@
 export enum ChainNameEnum {
-  main = 'main',
-  test = 'test',
-  regtest = 'regtest',
+  mainChainName = 'main',
+  testChainName = 'test',
+  regtestChainName = 'regtest',
 }

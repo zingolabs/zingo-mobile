@@ -214,7 +214,7 @@ export default class RPC {
         connections: 1,
         version: `${infoJSON.vendor}/${infoJSON.git_commit.substring(0, 6)}/${infoJSON.version}`,
         verificationProgress: 1,
-        currencyName: infoJSON.chain_name === ChainNameEnum.main ? 'ZEC' : 'TAZ',
+        currencyName: infoJSON.chain_name === ChainNameEnum.mainChainName ? 'ZEC' : 'TAZ',
         solps: 0,
         zingolib: zingolibStr,
       };
@@ -1442,7 +1442,7 @@ export default class RPC {
       let txList: TransactionType[] = [];
 
       summariesJSON
-        //.filter(tx => tx.kind !== 'Fee')
+        //.filter(tx => tx.kind !== TransactionTypeEnum.Fee)
         .forEach((tx: RPCSummariesType) => {
           let currentTxList: TransactionType[] = txList.filter(t => t.txid === tx.txid);
           if (currentTxList.length === 0) {
@@ -1451,7 +1451,7 @@ export default class RPC {
           }
           let restTxList: TransactionType[] = txList.filter(t => t.txid !== tx.txid);
 
-          const type = tx.kind === 'Fee' ? TransactionTypeEnum.Sent : tx.kind;
+          const type = tx.kind === TransactionTypeEnum.Fee ? TransactionTypeEnum.Sent : tx.kind;
           if (!currentTxList[0].type && !!type) {
             currentTxList[0].type = type;
           }
@@ -1478,7 +1478,7 @@ export default class RPC {
           //}
 
           let currenttxdetails: TxDetailType = {} as TxDetailType;
-          if (tx.kind === 'Fee') {
+          if (tx.kind === TransactionTypeEnum.Fee) {
             currentTxList[0].fee = (currentTxList[0].fee ? currentTxList[0].fee : 0) + tx.amount / 10 ** 8;
             if (currentTxList[0].txDetails.length === 0) {
               // when only have 1 item with `Fee`, we assume this tx is `SendToSelf`.

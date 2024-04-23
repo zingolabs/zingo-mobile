@@ -51,15 +51,15 @@ describe('Component Settings - test', () => {
     if (p === 'settings.memos') {
       return [
         {
-          value: DownloadMemosEnum.none,
+          value: DownloadMemosEnum.noneMemos,
           text: 'text none',
         },
         {
-          value: DownloadMemosEnum.wallet,
+          value: DownloadMemosEnum.walletMemos,
           text: 'text wallet',
         },
         {
-          value: DownloadMemosEnum.all,
+          value: DownloadMemosEnum.allMemos,
           text: 'text all',
         },
       ];
@@ -71,7 +71,7 @@ describe('Component Settings - test', () => {
           text: 'text no currency',
         },
         {
-          value: CurrencyEnum.USD,
+          value: CurrencyEnum.USDCurrency,
           text: 'text USD',
         },
       ];
@@ -124,12 +124,12 @@ describe('Component Settings - test', () => {
   };
   state.info.currencyName = 'ZEC';
   state.totalBalance.total = 1.12345678;
-  state.server = { uri: 'https://zcash.es', chain_name: ChainNameEnum.main };
-  state.currency = CurrencyEnum.USD;
+  state.server = { uri: 'https://zcash.es', chain_name: ChainNameEnum.mainChainName };
+  state.currency = CurrencyEnum.USDCurrency;
   state.language = LanguageEnum.en;
   state.sendAll = false;
   state.donation = false;
-  state.walletSettings.download_memos = DownloadMemosEnum.wallet;
+  state.walletSettings.download_memos = DownloadMemosEnum.walletMemos;
   state.walletSettings.transaction_filter_threshold = '500';
   const onClose = jest.fn();
   const onSetOption = jest.fn();

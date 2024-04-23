@@ -195,7 +195,7 @@ export default function LoadedApp(props: LoadedAppProps) {
         await SettingsFileImpl.writeSettings('language', lang);
         //console.log('apploaded NO settings', languageTag);
       }
-      if (settings.currency === CurrencyEnum.noCurrency || settings.currency === CurrencyEnum.USD) {
+      if (settings.currency === CurrencyEnum.noCurrency || settings.currency === CurrencyEnum.USDCurrency) {
         setCurrency(settings.currency);
       } else {
         await SettingsFileImpl.writeSettings('currency', currency);
@@ -806,7 +806,12 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     // we need to exclude 2 use cases:
     // 1. send to self (make no sense to do a donation here)
     // 2. send to donation UA (make no sense to do a double donation)
-    if (this.state.donation && this.state.server.chain_name === ChainNameEnum.main && !sendToSelf && !donationAddress) {
+    if (
+      this.state.donation &&
+      this.state.server.chain_name === ChainNameEnum.mainChainName &&
+      !sendToSelf &&
+      !donationAddress
+    ) {
       donationTransaction.push({
         address: await Utils.getDonationAddress(this.state.server.chain_name),
         amount: parseInt(
@@ -1199,7 +1204,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     // if the App is working with a test server
     // no need to do backups of the wallets.
     let resultStr = '';
-    if (server.chain_name === ChainNameEnum.main) {
+    if (server.chain_name === ChainNameEnum.mainChainName) {
       resultStr = (await this.rpc.changeWallet()) as string;
     } else {
       resultStr = (await this.rpc.changeWalletNoBackup()) as string;
@@ -1269,7 +1274,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
 
       let resultStr2 = '';
       // if the server was testnet or regtest -> no need backup the wallet.
-      if (beforeServer.chain_name === ChainNameEnum.main) {
+      if (beforeServer.chain_name === ChainNameEnum.mainChainName) {
         // backup
         resultStr2 = (await this.rpc.changeWallet()) as string;
       } else {

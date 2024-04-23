@@ -115,13 +115,13 @@ describe('Component Send - test', () => {
         {
           address: '',
           amount: 0.77654321,
-          pool: PoolEnum.Orchard,
+          pool: PoolEnum.OrchardPool,
           memos: ['hola', '  & ', 'hello'],
         },
         {
           address: '',
           amount: 0.1,
-          pool: PoolEnum.Sapling,
+          pool: PoolEnum.SaplingPool,
           memos: ['hello', '  & ', 'hola'],
         },
       ],
@@ -152,7 +152,7 @@ describe('Component Send - test', () => {
     },
   ];
   state.translate = () => 'text translated';
-  state.currency = CurrencyEnum.USD;
+  state.currency = CurrencyEnum.USDCurrency;
   state.info.currencyName = 'ZEC';
   state.zecPrice.zecPrice = 33.33;
   state.totalBalance.total = 1.12345678;
@@ -198,7 +198,7 @@ describe('Component Send - test', () => {
 
   test('Send currency USD, privacy high & mode advanced - snapshot', () => {
     // no currency
-    state.currency = CurrencyEnum.USD;
+    state.currency = CurrencyEnum.USDCurrency;
     // privacy normal
     state.privacy = true;
     // mode basic

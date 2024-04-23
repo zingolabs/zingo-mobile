@@ -214,7 +214,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
         : action === 'server'
         ? (translate('seed.server-warning') as string)
         : '') +
-        (server.chain_name !== ChainNameEnum.main && (action === 'change' || action === 'server')
+        (server.chain_name !== ChainNameEnum.mainChainName && (action === 'change' || action === 'server')
           ? '\n' + (translate('seed.mainnet-warning') as string)
           : ''),
       [

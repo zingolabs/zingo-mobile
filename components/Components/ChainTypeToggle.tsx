@@ -26,7 +26,7 @@ const ChainTypeToggle: React.FunctionComponent<ChainTypeToggleProps> = ({
       <TouchableOpacity
         testID="settings.custom-server-chain.mainnet"
         style={{ marginHorizontal: 5 }}
-        onPress={() => onPress(ChainNameEnum.main)}>
+        onPress={() => onPress(ChainNameEnum.mainChainName)}>
         <View
           style={{
             flexDirection: 'row',
@@ -39,8 +39,9 @@ const ChainTypeToggle: React.FunctionComponent<ChainTypeToggleProps> = ({
               flexDirection: 'row',
               justifyContent: 'center',
               alignItems: 'center',
-              borderWidth: customServerChainName === ChainNameEnum.main ? 2 : 1,
-              borderColor: customServerChainName === ChainNameEnum.main ? colors.primary : colors.primaryDisabled,
+              borderWidth: customServerChainName === ChainNameEnum.mainChainName ? 2 : 1,
+              borderColor:
+                customServerChainName === ChainNameEnum.mainChainName ? colors.primary : colors.primaryDisabled,
               borderRadius: 5,
               paddingHorizontal: 5,
             }}>
@@ -52,7 +53,7 @@ const ChainTypeToggle: React.FunctionComponent<ChainTypeToggleProps> = ({
               }}>
               {translate('settings.value-chain_name-main') as string}
             </Text>
-            {customServerChainName === ChainNameEnum.main && (
+            {customServerChainName === ChainNameEnum.mainChainName && (
               <FontAwesomeIcon icon={faCashRegister} size={14} color={colors.primary} />
             )}
           </View>
@@ -61,7 +62,7 @@ const ChainTypeToggle: React.FunctionComponent<ChainTypeToggleProps> = ({
       <TouchableOpacity
         testID="settings.custom-server-chain.testnet"
         style={{ marginHorizontal: 5 }}
-        onPress={() => onPress(ChainNameEnum.test)}>
+        onPress={() => onPress(ChainNameEnum.testChainName)}>
         <View
           style={{
             flexDirection: 'row',
@@ -74,8 +75,9 @@ const ChainTypeToggle: React.FunctionComponent<ChainTypeToggleProps> = ({
               flexDirection: 'row',
               justifyContent: 'center',
               alignItems: 'center',
-              borderWidth: customServerChainName === ChainNameEnum.test ? 2 : 1,
-              borderColor: customServerChainName === ChainNameEnum.test ? colors.primary : colors.primaryDisabled,
+              borderWidth: customServerChainName === ChainNameEnum.testChainName ? 2 : 1,
+              borderColor:
+                customServerChainName === ChainNameEnum.testChainName ? colors.primary : colors.primaryDisabled,
               borderRadius: 5,
               paddingHorizontal: 5,
             }}>
@@ -87,7 +89,7 @@ const ChainTypeToggle: React.FunctionComponent<ChainTypeToggleProps> = ({
               }}>
               {translate('settings.value-chain_name-test') as string}
             </Text>
-            {customServerChainName === ChainNameEnum.test && (
+            {customServerChainName === ChainNameEnum.testChainName && (
               <FontAwesomeIcon icon={faCashRegister} size={14} color={colors.primary} />
             )}
           </View>
@@ -96,7 +98,7 @@ const ChainTypeToggle: React.FunctionComponent<ChainTypeToggleProps> = ({
       <TouchableOpacity
         testID="settings.custom-server-chain.regtest"
         style={{ marginHorizontal: 5 }}
-        onPress={() => onPress(ChainNameEnum.regtest)}>
+        onPress={() => onPress(ChainNameEnum.regtestChainName)}>
         <View
           style={{
             flexDirection: 'row',
@@ -109,8 +111,9 @@ const ChainTypeToggle: React.FunctionComponent<ChainTypeToggleProps> = ({
               flexDirection: 'row',
               justifyContent: 'center',
               alignItems: 'center',
-              borderWidth: customServerChainName === ChainNameEnum.regtest ? 2 : 1,
-              borderColor: customServerChainName === ChainNameEnum.regtest ? colors.primary : colors.primaryDisabled,
+              borderWidth: customServerChainName === ChainNameEnum.regtestChainName ? 2 : 1,
+              borderColor:
+                customServerChainName === ChainNameEnum.regtestChainName ? colors.primary : colors.primaryDisabled,
               borderRadius: 5,
               paddingHorizontal: 5,
             }}>
@@ -122,7 +125,7 @@ const ChainTypeToggle: React.FunctionComponent<ChainTypeToggleProps> = ({
               }}>
               {translate('settings.value-chain_name-regtest') as string}
             </Text>
-            {customServerChainName === ChainNameEnum.regtest && (
+            {customServerChainName === ChainNameEnum.regtestChainName && (
               <FontAwesomeIcon icon={faCashRegister} size={14} color={colors.primary} />
             )}
           </View>

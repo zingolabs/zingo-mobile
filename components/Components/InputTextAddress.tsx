@@ -64,7 +64,7 @@ const InputTextAddress: React.FunctionComponent<InputTextAddressProps> = ({
 
       //console.log('parse-address', address, resultJSON.status === RPCParseStatusEnum.success);
 
-      return resultJSON.status === RPCParseStatusEnum.success && resultJSON.chain_name === server.chain_name;
+      return resultJSON.status === RPCParseStatusEnum.successParse && resultJSON.chain_name === server.chain_name;
     };
 
     if (address) {

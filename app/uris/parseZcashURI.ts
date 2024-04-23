@@ -45,7 +45,7 @@ const parseZcashURI = async (
     }
 
     const validParse =
-      resultParseJSON.status === RPCParseStatusEnum.success && server.chain_name === resultParseJSON.chain_name;
+      resultParseJSON.status === RPCParseStatusEnum.successParse && server.chain_name === resultParseJSON.chain_name;
 
     if (address && !validParse) {
       return `"${address || ''}" ${translate('uris.notvalid')}`;
@@ -103,7 +103,8 @@ const parseZcashURI = async (
           return translate('uris.parseerror') as string;
         }
 
-        const valid = resultJSON.status === RPCParseStatusEnum.success && server.chain_name === resultJSON.chain_name;
+        const valid =
+          resultJSON.status === RPCParseStatusEnum.successParse && server.chain_name === resultJSON.chain_name;
 
         if (!valid) {
           return `"${value}" ${translate('uris.notvalid')}`;

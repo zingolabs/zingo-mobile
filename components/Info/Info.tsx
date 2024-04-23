@@ -70,11 +70,11 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal, setZecPrice }) =
             value={
               !info.chain_name
                 ? (translate('loading') as string)
-                : info.chain_name === ChainNameEnum.main
+                : info.chain_name === ChainNameEnum.mainChainName
                 ? 'Mainnet'
-                : info.chain_name === ChainNameEnum.test
+                : info.chain_name === ChainNameEnum.testChainName
                 ? 'Testnet'
-                : info.chain_name === ChainNameEnum.regtest
+                : info.chain_name === ChainNameEnum.regtestChainName
                 ? 'Regtest'
                 : (translate('info.unknown') as string) + ' (' + info.chain_name + ')'
             }
@@ -83,7 +83,7 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal, setZecPrice }) =
             label={translate('info.serverblock') as string}
             value={info.latestBlock ? info.latestBlock.toString() : (translate('loading') as string)}
           />
-          {currency === CurrencyEnum.USD && (
+          {currency === CurrencyEnum.USDCurrency && (
             <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
               <DetailLine label={translate('info.zecprice') as string}>
                 {zecPrice.zecPrice === -1 && (

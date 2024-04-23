@@ -120,7 +120,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
 
     //console.log('parse-address', address, resultJSON.status === RPCParseStatusEnum.success);
 
-    if (resultJSON.status !== RPCParseStatusEnum.success || resultJSON.chain_name !== server.chain_name) {
+    if (resultJSON.status !== RPCParseStatusEnum.successParse || resultJSON.chain_name !== server.chain_name) {
       return '-';
     }
 
@@ -129,8 +129,8 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     // Private -> orchard to orchard (UA with orchard receiver)
     if (
       from === 'orchard' &&
-      resultJSON.address_kind === RPCAdressKindEnum.unified &&
-      resultJSON.receivers_available?.includes(RPCReceiversEnum.orchard)
+      resultJSON.address_kind === RPCAdressKindEnum.unifiedAddressKind &&
+      resultJSON.receivers_available?.includes(RPCReceiversEnum.orchardReceiver)
     ) {
       return translate('send.private') as string;
     }
@@ -138,10 +138,10 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     // Private -> sapling to sapling (ZA or UA with sapling receiver and NO orchard receiver)
     if (
       from === 'sapling' &&
-      (resultJSON.address_kind === RPCAdressKindEnum.sapling ||
-        (resultJSON.address_kind === RPCAdressKindEnum.unified &&
-          resultJSON.receivers_available?.includes(RPCReceiversEnum.sapling) &&
-          !resultJSON.receivers_available?.includes(RPCReceiversEnum.orchard)))
+      (resultJSON.address_kind === RPCAdressKindEnum.saplingAddressKind ||
+        (resultJSON.address_kind === RPCAdressKindEnum.unifiedAddressKind &&
+          resultJSON.receivers_available?.includes(RPCReceiversEnum.saplingReceiver) &&
+          !resultJSON.receivers_available?.includes(RPCReceiversEnum.orchardReceiver)))
     ) {
       return translate('send.private') as string;
     }
@@ -149,18 +149,18 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     // Amount Revealed -> orchard to sapling (ZA or UA with sapling receiver)
     if (
       from === 'orchard' &&
-      (resultJSON.address_kind === RPCAdressKindEnum.sapling ||
-        (resultJSON.address_kind === RPCAdressKindEnum.unified &&
-          resultJSON.receivers_available?.includes(RPCReceiversEnum.sapling)))
+      (resultJSON.address_kind === RPCAdressKindEnum.saplingAddressKind ||
+        (resultJSON.address_kind === RPCAdressKindEnum.unifiedAddressKind &&
+          resultJSON.receivers_available?.includes(RPCReceiversEnum.saplingReceiver)))
     ) {
       return translate('send.amountrevealed') as string;
     }
 
     // Amount Revealed -> sapling to orchard (UA with orchard receiver)
     if (
-      from === RPCAdressKindEnum.sapling &&
-      resultJSON.address_kind === RPCAdressKindEnum.unified &&
-      resultJSON.receivers_available?.includes(RPCReceiversEnum.orchard)
+      from === RPCAdressKindEnum.saplingAddressKind &&
+      resultJSON.address_kind === RPCAdressKindEnum.unifiedAddressKind &&
+      resultJSON.receivers_available?.includes(RPCReceiversEnum.orchardReceiver)
     ) {
       return translate('send.amountrevealed') as string;
     }
@@ -169,10 +169,10 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     // UA with sapling receiver)
     if (
       from === 'orchard+sapling' &&
-      (resultJSON.address_kind === RPCAdressKindEnum.sapling ||
-        (resultJSON.address_kind === RPCAdressKindEnum.unified &&
-          (resultJSON.receivers_available?.includes(RPCReceiversEnum.orchard) ||
-            resultJSON.receivers_available?.includes(RPCReceiversEnum.sapling))))
+      (resultJSON.address_kind === RPCAdressKindEnum.saplingAddressKind ||
+        (resultJSON.address_kind === RPCAdressKindEnum.unifiedAddressKind &&
+          (resultJSON.receivers_available?.includes(RPCReceiversEnum.orchardReceiver) ||
+            resultJSON.receivers_available?.includes(RPCReceiversEnum.saplingReceiver))))
     ) {
       return translate('send.amountrevealed') as string;
     }
@@ -305,7 +305,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
               privacy={privacy}
             />
           </View>
-          {currency === CurrencyEnum.USD && (
+          {currency === CurrencyEnum.USDCurrency && (
             <View style={{ margin: 10, alignItems: 'flex-end' }}>
               <FadeText style={{ opacity: 0 }}>{translate('send.fee') as string}</FadeText>
               <CurrencyAmount

@@ -107,7 +107,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
 
     //console.log('parse ufvk', scannedKey, resultJSON);
 
-    const valid = resultJSON.status === RPCParseStatusEnum.success && resultJSON.chain_name === server.chain_name;
+    const valid = resultJSON.status === RPCParseStatusEnum.successParse && resultJSON.chain_name === server.chain_name;
 
     if (valid) {
       return true;

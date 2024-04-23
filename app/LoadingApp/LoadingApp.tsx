@@ -198,7 +198,7 @@ export default function LoadingApp(props: LoadingAppProps) {
         await SettingsFileImpl.writeSettings('language', lang);
         //console.log('apploading NO settings', languageTag);
       }
-      if (settings.currency === CurrencyEnum.noCurrency || settings.currency === CurrencyEnum.USD) {
+      if (settings.currency === CurrencyEnum.noCurrency || settings.currency === CurrencyEnum.USDCurrency) {
         setCurrency(settings.currency);
       } else {
         await SettingsFileImpl.writeSettings('currency', currency);
@@ -729,7 +729,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
         server: { uri, chain_name },
         customServerShow: false,
         customServerUri: '',
-        customServerChainName: ChainNameEnum.main,
+        customServerChainName: ChainNameEnum.mainChainName,
       });
     }
     this.setState({ actionButtonsDisabled: false });
@@ -766,7 +766,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
           return;
         }
         // default values for wallet options
-        this.set_wallet_option('download_memos', DownloadMemosEnum.wallet);
+        this.set_wallet_option('download_memos', DownloadMemosEnum.walletMemos);
         //await this.set_wallet_option('transaction_filter_threshold', '500');
         // basic mode -> same screen.
         this.setState(state => ({
@@ -803,8 +803,8 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
       return;
     }
     if (
-      (seed_ufvk.toLowerCase().startsWith('uview') && this.state.server.chain_name !== ChainNameEnum.main) ||
-      (seed_ufvk.toLowerCase().startsWith('utestview') && this.state.server.chain_name === ChainNameEnum.main)
+      (seed_ufvk.toLowerCase().startsWith('uview') && this.state.server.chain_name !== ChainNameEnum.mainChainName) ||
+      (seed_ufvk.toLowerCase().startsWith('utestview') && this.state.server.chain_name === ChainNameEnum.mainChainName)
     ) {
       createAlert(
         this.setBackgroundError,

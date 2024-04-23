@@ -130,13 +130,13 @@ describe('Component History - test', () => {
         {
           address: '',
           amount: 0.77654321,
-          pool: PoolEnum.Orchard,
+          pool: PoolEnum.OrchardPool,
           memos: ['hola', '  & ', 'hello'],
         },
         {
           address: '',
           amount: 0.1,
-          pool: PoolEnum.Sapling,
+          pool: PoolEnum.SaplingPool,
           memos: ['hello', '  & ', 'hola'],
         },
       ],
@@ -199,7 +199,7 @@ describe('Component History - test', () => {
 
   test('History currency USD, privacy high & mode advanced - snapshot', () => {
     // no currency
-    state.currency = CurrencyEnum.USD;
+    state.currency = CurrencyEnum.USDCurrency;
     // privacy normal
     state.privacy = true;
     // mode basic

@@ -53,7 +53,7 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ setAddre
 
     //console.log('parse-1', scannedAddress, resultJSON);
 
-    const valid = resultJSON.status === RPCParseStatusEnum.success && server.chain_name === resultJSON.chain_name;
+    const valid = resultJSON.status === RPCParseStatusEnum.successParse && server.chain_name === resultJSON.chain_name;
 
     if (valid) {
       setAddress(scannedAddress);

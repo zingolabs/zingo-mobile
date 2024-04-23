@@ -5,7 +5,7 @@ export default class WalletSettingsClass {
   transaction_filter_threshold: string;
 
   constructor() {
-    this.download_memos = DownloadMemosEnum.wallet;
+    this.download_memos = DownloadMemosEnum.walletMemos;
     this.transaction_filter_threshold = '500';
   }
 }

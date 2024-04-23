@@ -285,8 +285,8 @@ const Send: React.FunctionComponent<SendProps> = ({
       //console.log('parse-memo', address, resultJSON);
 
       return (
-        resultJSON.status === RPCParseStatusEnum.success &&
-        resultJSON.address_kind !== RPCAdressKindEnum.transparent &&
+        resultJSON.status === RPCParseStatusEnum.successParse &&
+        resultJSON.address_kind !== RPCAdressKindEnum.transparentAddressKind &&
         resultJSON.chain_name === server.chain_name
       );
     };
@@ -325,7 +325,7 @@ const Send: React.FunctionComponent<SendProps> = ({
 
       //console.log('parse-address', address, resultJSON.status === RPCParseStatusEnum.success);
 
-      return resultJSON.status === RPCParseStatusEnum.success && resultJSON.chain_name === server.chain_name;
+      return resultJSON.status === RPCParseStatusEnum.successParse && resultJSON.chain_name === server.chain_name;
     };
 
     var to = sendPageState.toaddr;
@@ -670,7 +670,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         <Confirm
           calculatedFee={fee}
           donationAmount={
-            donation && server.chain_name === ChainNameEnum.main && !sendToSelf && !donationAddress
+            donation && server.chain_name === ChainNameEnum.mainChainName && !sendToSelf && !donationAddress
               ? Utils.parseStringLocaletoNumberFloat(Utils.getDefaultDonationAmount())
               : 0
           }
@@ -1152,7 +1152,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                             style={{ marginTop: 11, fontSize: 12.5 }}
                             price={zecPrice.zecPrice}
                             amtZec={maxAmount}
-                            currency={CurrencyEnum.USD}
+                            currency={CurrencyEnum.USDCurrency}
                             privacy={privacy}
                           />
                         </View>
@@ -1332,7 +1332,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                 }}
               />
             </View>
-            {server.chain_name === ChainNameEnum.main && (
+            {server.chain_name === ChainNameEnum.mainChainName && (
               <>
                 {donation ? (
                   <View

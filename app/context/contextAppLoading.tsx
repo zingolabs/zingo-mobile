@@ -57,7 +57,7 @@ export const defaultAppStateLoading: AppStateLoading = {
   readOnly: false,
   customServerShow: false,
   customServerUri: '',
-  customServerChainName: ChainNameEnum.main,
+  customServerChainName: ChainNameEnum.mainChainName,
   mode: ModeEnum.advanced,
   snackbars: [] as SnackbarType[],
   addLastSnackbar: () => {},

@@ -55,11 +55,11 @@ describe('Component Info - test', () => {
       verificationProgress: 0,
       currencyName: 'ZEC',
       solps: 0,
-      chain_name: ChainNameEnum.main,
+      chain_name: ChainNameEnum.mainChainName,
       zingolib: 'mob-release...',
     };
     state.zecPrice.zecPrice = 33.33;
-    state.currency = CurrencyEnum.USD;
+    state.currency = CurrencyEnum.USDCurrency;
     const onClose = jest.fn();
     const onSet = jest.fn();
     render(
