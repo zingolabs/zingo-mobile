@@ -33,6 +33,7 @@ import { ModeEnum } from './enums/ModeEnum';
 import { CurrencyEnum } from './enums/CurrencyEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
 import { ChainNameEnum } from './enums/ChainNameEnum';
+import { DownloadMemosEnum } from './enums/DownloadMemosEnum';
 
 import AppStateLoaded from './AppStateLoaded';
 import AppStateLoading from './AppStateLoading';
@@ -73,4 +74,5 @@ export {
   CurrencyEnum,
   SelectServerEnum,
   ChainNameEnum,
+  DownloadMemosEnum,
 };

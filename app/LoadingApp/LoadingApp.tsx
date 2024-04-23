@@ -42,6 +42,7 @@ import {
   ModeEnum,
   SelectServerEnum,
   ChainNameEnum,
+  DownloadMemosEnum,
 } from '../AppState';
 import { parseServerURI, serverUris } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
@@ -763,7 +764,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
           return;
         }
         // default values for wallet options
-        this.set_wallet_option('download_memos', 'wallet');
+        this.set_wallet_option('download_memos', DownloadMemosEnum.wallet);
         //await this.set_wallet_option('transaction_filter_threshold', '500');
         // basic mode -> same screen.
         this.setState(state => ({

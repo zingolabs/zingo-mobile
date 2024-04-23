@@ -8,7 +8,7 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import Settings from '../components/Settings';
 import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
-import { LanguageEnum, CurrencyEnum, ChainNameEnum } from '../app/AppState';
+import { LanguageEnum, CurrencyEnum, ChainNameEnum, DownloadMemosEnum } from '../app/AppState';
 
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
   FontAwesomeIcon: '',
@@ -51,15 +51,15 @@ describe('Component Settings - test', () => {
     if (p === 'settings.memos') {
       return [
         {
-          value: 'none',
+          value: DownloadMemosEnum.none,
           text: 'text none',
         },
         {
-          value: 'wallet',
+          value: DownloadMemosEnum.wallet,
           text: 'text wallet',
         },
         {
-          value: 'all',
+          value: DownloadMemosEnum.all,
           text: 'text all',
         },
       ];
@@ -129,7 +129,7 @@ describe('Component Settings - test', () => {
   state.language = LanguageEnum.en;
   state.sendAll = false;
   state.donation = false;
-  state.walletSettings.download_memos = 'wallet';
+  state.walletSettings.download_memos = DownloadMemosEnum.wallet;
   state.walletSettings.transaction_filter_threshold = '500';
   const onClose = jest.fn();
   const onSetOption = jest.fn();
