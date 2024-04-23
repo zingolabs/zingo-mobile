@@ -1,7 +1,9 @@
+import { SnackbarDurationEnum } from '../enums/SnackbarDurationEnum';
+
 export default interface SnackbarType {
   message: string;
   type: 'Primary';
-  duration?: 'short' | 'long' | 'longer';
+  duration?: SnackbarDurationEnum;
 
   // eslint-disable-next-line semi
 }

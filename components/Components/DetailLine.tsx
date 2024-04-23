@@ -12,6 +12,7 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
+import { SnackbarDurationEnum } from '../../app/AppState';
 
 type DetailLineProps = {
   label: string;
@@ -36,7 +37,7 @@ const DetailLine: React.FunctionComponent<DetailLineProps> = ({ label, value, ch
             addLastSnackbar({
               message: translate('txtcopied') as string,
               type: 'Primary',
-              duration: 'short',
+              duration: SnackbarDurationEnum.short,
             });
           }}>
           <RegText testID={testID} color={colors.text}>

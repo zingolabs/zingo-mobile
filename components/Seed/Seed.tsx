@@ -19,6 +19,7 @@ import {
   WalletType,
   ModeEnum,
   ChainNameEnum,
+  SnackbarDurationEnum,
 } from '../../app/AppState';
 import RPCModule from '../../app/RPCModule';
 import RPC from '../../app/rpc';
@@ -306,7 +307,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
                     addLastSnackbar({
                       message: translate('seed.tapcopy-seed-message') as string,
                       type: 'Primary',
-                      duration: 'short',
+                      duration: SnackbarDurationEnum.short,
                     });
                   }
                   setExpandSeed(true);
@@ -379,7 +380,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
                       addLastSnackbar({
                         message: translate('seed.tapcopy-seed-message') as string,
                         type: 'Primary',
-                        duration: 'short',
+                        duration: SnackbarDurationEnum.short,
                       });
                     }
                   }
@@ -412,7 +413,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
                     addLastSnackbar({
                       message: translate('seed.tapcopy-birthday-message') as string,
                       type: 'Primary',
-                      duration: 'short',
+                      duration: SnackbarDurationEnum.short,
                     });
                   }
                   setExpandBithday(true);

@@ -18,7 +18,7 @@ import FadeText from '../Components/FadeText';
 import Header from '../Header';
 import RPCModule from '../../app/RPCModule';
 import AddressItem from '../Components/AddressItem';
-import { CommandEnum, SendPageStateClass } from '../../app/AppState';
+import { CommandEnum, SendPageStateClass, SnackbarDurationEnum } from '../../app/AppState';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
@@ -195,7 +195,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({
                   addLastSnackbar({
                     message: translate('history.addresscopied') as string,
                     type: 'Primary',
-                    duration: 'short',
+                    duration: SnackbarDurationEnum.short,
                   });
                   selectExpandAddress(index);
                 }

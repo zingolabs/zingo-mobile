@@ -15,6 +15,7 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
+import { SnackbarDurationEnum } from '../../app/AppState';
 
 type PrivKeyProps = {
   closeModal: () => void;
@@ -46,7 +47,11 @@ const PrivKey: React.FunctionComponent<PrivKeyProps> = ({ address, keyType, priv
   const doCopy = () => {
     //if (address) {
     Clipboard.setString(privKey);
-    addLastSnackbar({ message: translate('privkey.tapcopy-message') as string, type: 'Primary', duration: 'short' });
+    addLastSnackbar({
+      message: translate('privkey.tapcopy-message') as string,
+      type: 'Primary',
+      duration: SnackbarDurationEnum.short,
+    });
     //}
   };
 

@@ -43,6 +43,7 @@ import {
   SelectServerEnum,
   ChainNameEnum,
   DownloadMemosEnum,
+  SnackbarDurationEnum,
 } from '../AppState';
 import { parseServerURI, serverUris } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
@@ -411,7 +412,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
           this.addLastSnackbar({
             message: this.state.translate('loadedapp.selectingserver') as string,
             type: 'Primary',
-            duration: 'longer',
+            duration: SnackbarDurationEnum.longer,
           });
         }, 1000);
         // not a different one, can be the same.
@@ -609,13 +610,13 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
         this.addLastSnackbar({
           message: this.state.translate('loadedapp.selectingserversame') as string,
           type: 'Primary',
-          duration: 'long',
+          duration: SnackbarDurationEnum.long,
         });
       } else {
         this.addLastSnackbar({
           message: (this.state.translate('loadedapp.selectingserverbest') as string) + ' ' + fasterServer.uri,
           type: 'Primary',
-          duration: 'long',
+          duration: SnackbarDurationEnum.long,
         });
       }
     }
@@ -648,7 +649,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
           this.addLastSnackbar({
             message: this.state.translate('loadingapp.serverfirsttry') as string,
             type: 'Primary',
-            duration: 'longer',
+            duration: SnackbarDurationEnum.longer,
           });
         }, 1000);
         // a different server.
@@ -669,7 +670,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
         this.addLastSnackbar({
           message: this.state.translate('loadingapp.serversecondtry') as string,
           type: 'Primary',
-          duration: 'longer',
+          duration: SnackbarDurationEnum.longer,
         });
         setTimeout(() => {
           createAlert(this.setBackgroundError, this.addLastSnackbar, title, result);

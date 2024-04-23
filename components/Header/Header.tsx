@@ -16,7 +16,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme } from '@react-navigation/native';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Alert, Image, Text, TouchableOpacity, View } from 'react-native';
-import { NetInfoType, TranslateType, ModeEnum, CurrencyEnum } from '../../app/AppState';
+import { NetInfoType, TranslateType, ModeEnum, CurrencyEnum, SnackbarDurationEnum } from '../../app/AppState';
 import { ContextAppLoaded } from '../../app/context';
 import { ThemeType } from '../../app/types';
 import CurrencyAmount from '../Components/CurrencyAmount';
@@ -151,7 +151,11 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   useEffect(() => {
     if (syncingStatus.syncProcessStalled && addLastSnackbar && restartApp) {
       // if the sync process is stalled -> let's restart the App.
-      addLastSnackbar({ message: translate('restarting') as string, type: 'Primary', duration: 'short' });
+      addLastSnackbar({
+        message: translate('restarting') as string,
+        type: 'Primary',
+        duration: SnackbarDurationEnum.short,
+      });
       setTimeout(() => restartApp({ startingApp: false }), 3000);
     }
   }, [addLastSnackbar, restartApp, syncingStatus.syncProcessStalled, translate]);

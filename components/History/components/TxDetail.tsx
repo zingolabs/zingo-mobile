@@ -14,6 +14,7 @@ import {
   AddressClass,
   ChainNameEnum,
   SendPageStateClass,
+  SnackbarDurationEnum,
   TransactionType,
   TxDetailType,
 } from '../../../app/AppState';
@@ -171,7 +172,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
                   addLastSnackbar({
                     message: translate('history.txcopied') as string,
                     type: 'Primary',
-                    duration: 'short',
+                    duration: SnackbarDurationEnum.short,
                   });
                   setExpandTxid(true);
                 }
@@ -276,7 +277,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
                           addLastSnackbar({
                             message: translate('history.memocopied') as string,
                             type: 'Primary',
-                            duration: 'short',
+                            duration: SnackbarDurationEnum.short,
                           });
                         }}>
                         <RegText>{memo}</RegText>
@@ -289,14 +290,14 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
                             addLastSnackbar({
                               message: translate('history.address-http') as string,
                               type: 'Primary',
-                              duration: 'long',
+                              duration: SnackbarDurationEnum.long,
                             });
                           }
                           Clipboard.setString(memoUA);
                           addLastSnackbar({
                             message: translate('history.addresscopied') as string,
                             type: 'Primary',
-                            duration: 'short',
+                            duration: SnackbarDurationEnum.short,
                           });
                         }}>
                         <RegText>{'\nReply to:'}</RegText>

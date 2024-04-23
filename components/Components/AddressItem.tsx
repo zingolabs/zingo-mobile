@@ -5,7 +5,13 @@ import Clipboard from '@react-native-community/clipboard';
 import { ContextAppLoaded } from '../../app/context';
 import RegText from './RegText';
 import Utils from '../../app/utils';
-import { AddressBookFileClass, SendPageStateClass, ToAddrClass, ModeEnum } from '../../app/AppState';
+import {
+  AddressBookFileClass,
+  SendPageStateClass,
+  ToAddrClass,
+  ModeEnum,
+  SnackbarDurationEnum,
+} from '../../app/AppState';
 import { useTheme } from '@react-navigation/native';
 import { ThemeType } from '../../app/types';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -100,7 +106,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
               //  addLastSnackbar({
               //    message: translate('history.contactcopied') as string,
               //    type: 'Primary',
-              //    duration: 'short',
+              //    duration: SnackbarDurationEnum.short,
               //  });
               //}
               setExpandContact(true);
@@ -134,7 +140,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
                 addLastSnackbar({
                   message: translate('history.addresscopied') as string,
                   type: 'Primary',
-                  duration: 'short',
+                  duration: SnackbarDurationEnum.short,
                 });
                 setExpandAddress(true);
                 if (privacy) {
