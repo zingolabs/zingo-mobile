@@ -18,6 +18,7 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import { CommandEnum } from '../../app/AppState';
+import { RPCParseStatusEnum } from '../../app/rpc/enums/RPCParseStatusEnum';
 
 type InputTextAddressProps = {
   address: string;
@@ -61,9 +62,9 @@ const InputTextAddress: React.FunctionComponent<InputTextAddressProps> = ({
         return false;
       }
 
-      //console.log('parse-address', address, resultJSON.status === 'success');
+      //console.log('parse-address', address, resultJSON.status === RPCParseStatusEnum.success);
 
-      return resultJSON.status === 'success' && resultJSON.chain_name === server.chain_name;
+      return resultJSON.status === RPCParseStatusEnum.success && resultJSON.chain_name === server.chain_name;
     };
 
     if (address) {

@@ -8,7 +8,7 @@ export type RPCSummariesType = {
   amount: number;
   to_address?: string;
   memos?: string[];
-  kind: TransactionTypeEnum | 'Fee';
+  kind: TransactionTypeEnum;
   pool?: PoolEnum | 'None';
   unconfirmed: boolean;
 };

@@ -4,6 +4,7 @@ import RPCModule from '../RPCModule';
 import { RPCParseAddressType } from '../rpc/types/RPCParseAddressType';
 import ZcashURITargetClass from './classes/ZcashURITargetClass';
 import { CommandEnum, ServerType, TranslateType } from '../AppState';
+import { RPCParseStatusEnum } from '../rpc/enums/RPCParseStatusEnum';
 
 const parseZcashURI = async (
   uri: string,
@@ -43,7 +44,8 @@ const parseZcashURI = async (
       return translate('uris.parseerror') as string;
     }
 
-    const validParse = resultParseJSON.status === 'success' && server.chain_name === resultParseJSON.chain_name;
+    const validParse =
+      resultParseJSON.status === RPCParseStatusEnum.success && server.chain_name === resultParseJSON.chain_name;
 
     if (address && !validParse) {
       return `"${address || ''}" ${translate('uris.notvalid')}`;
@@ -101,7 +103,7 @@ const parseZcashURI = async (
           return translate('uris.parseerror') as string;
         }
 
-        const valid = resultJSON.status === 'success' && server.chain_name === resultJSON.chain_name;
+        const valid = resultJSON.status === RPCParseStatusEnum.success && server.chain_name === resultJSON.chain_name;
 
         if (!valid) {
           return `"${value}" ${translate('uris.notvalid')}`;

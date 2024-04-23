@@ -54,6 +54,8 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import { RPCProposeType } from '../../app/rpc/types/RPCProposeType';
+import { RPCParseStatusEnum } from '../../app/rpc/enums/RPCParseStatusEnum';
+import { RPCAdressKindEnum } from '../../app/rpc/enums/RPCAddressKindEnum';
 
 type SendProps = {
   setSendPageState: (sendPageState: SendPageStateClass) => void;
@@ -283,8 +285,8 @@ const Send: React.FunctionComponent<SendProps> = ({
       //console.log('parse-memo', address, resultJSON);
 
       return (
-        resultJSON.status === 'success' &&
-        resultJSON.address_kind !== 'transparent' &&
+        resultJSON.status === RPCParseStatusEnum.success &&
+        resultJSON.address_kind !== RPCAdressKindEnum.transparent &&
         resultJSON.chain_name === server.chain_name
       );
     };
@@ -321,9 +323,9 @@ const Send: React.FunctionComponent<SendProps> = ({
         return false;
       }
 
-      //console.log('parse-address', address, resultJSON.status === 'success');
+      //console.log('parse-address', address, resultJSON.status === RPCParseStatusEnum.success);
 
-      return resultJSON.status === 'success' && resultJSON.chain_name === server.chain_name;
+      return resultJSON.status === RPCParseStatusEnum.success && resultJSON.chain_name === server.chain_name;
     };
 
     var to = sendPageState.toaddr;

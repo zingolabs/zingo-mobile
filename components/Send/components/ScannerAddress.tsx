@@ -10,6 +10,7 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import { CommandEnum } from '../../../app/AppState';
+import { RPCParseStatusEnum } from '../../../app/rpc/enums/RPCParseStatusEnum';
 
 type ScannerAddressProps = {
   setAddress: (address: string) => void;
@@ -52,7 +53,7 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ setAddre
 
     //console.log('parse-1', scannedAddress, resultJSON);
 
-    const valid = resultJSON.status === 'success' && server.chain_name === resultJSON.chain_name;
+    const valid = resultJSON.status === RPCParseStatusEnum.success && server.chain_name === resultJSON.chain_name;
 
     if (valid) {
       setAddress(scannedAddress);

@@ -61,6 +61,7 @@ import Launching from './Launching';
 import simpleBiometrics from '../simpleBiometrics';
 import selectingServer from '../selectingServer';
 import { isEqual } from 'lodash';
+import { RPCWalletKindEnum } from '../rpc/enums/RPCWalletKindEnum';
 
 const BoldText = React.lazy(() => import('../../components/Components/BoldText'));
 const Button = React.lazy(() => import('../../components/Components/Button'));
@@ -446,7 +447,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
               //console.log(walletKindStr);
               const walletKindJSON: RPCWalletKindType = await JSON.parse(walletKindStr);
               this.setState({
-                readOnly: walletKindJSON.kind === 'Seeded' ? false : true,
+                readOnly: walletKindJSON.kind === RPCWalletKindEnum.Seeded ? false : true,
                 actionButtonsDisabled: false,
               });
               this.navigateToLoadedApp();

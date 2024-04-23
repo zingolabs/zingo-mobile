@@ -25,6 +25,9 @@ import RPC from '../../../app/rpc';
 import Utils from '../../../app/utils';
 import { CommandEnum } from '../../../app/AppState';
 import { CurrencyEnum } from '../../../app/AppState';
+import { RPCAdressKindEnum } from '../../../app/rpc/enums/RPCAddressKindEnum';
+import { RPCReceiversEnum } from '../../../app/rpc/enums/RPCReceiversEnum';
+import { RPCParseStatusEnum } from '../../../app/rpc/enums/RPCParseStatusEnum';
 
 type ConfirmProps = {
   calculatedFee: number;
@@ -115,9 +118,9 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
       return '-';
     }
 
-    //console.log('parse-address', address, resultJSON.status === 'success');
+    //console.log('parse-address', address, resultJSON.status === RPCParseStatusEnum.success);
 
-    if (resultJSON.status !== 'success' || resultJSON.chain_name !== server.chain_name) {
+    if (resultJSON.status !== RPCParseStatusEnum.success || resultJSON.chain_name !== server.chain_name) {
       return '-';
     }
 
@@ -126,8 +129,8 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     // Private -> orchard to orchard (UA with orchard receiver)
     if (
       from === 'orchard' &&
-      resultJSON.address_kind === 'unified' &&
-      resultJSON.receivers_available?.includes('orchard')
+      resultJSON.address_kind === RPCAdressKindEnum.unified &&
+      resultJSON.receivers_available?.includes(RPCReceiversEnum.orchard)
     ) {
       return translate('send.private') as string;
     }
@@ -135,10 +138,10 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     // Private -> sapling to sapling (ZA or UA with sapling receiver and NO orchard receiver)
     if (
       from === 'sapling' &&
-      (resultJSON.address_kind === 'sapling' ||
-        (resultJSON.address_kind === 'unified' &&
-          resultJSON.receivers_available?.includes('sapling') &&
-          !resultJSON.receivers_available?.includes('orchard')))
+      (resultJSON.address_kind === RPCAdressKindEnum.sapling ||
+        (resultJSON.address_kind === RPCAdressKindEnum.unified &&
+          resultJSON.receivers_available?.includes(RPCReceiversEnum.sapling) &&
+          !resultJSON.receivers_available?.includes(RPCReceiversEnum.orchard)))
     ) {
       return translate('send.private') as string;
     }
@@ -146,17 +149,18 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     // Amount Revealed -> orchard to sapling (ZA or UA with sapling receiver)
     if (
       from === 'orchard' &&
-      (resultJSON.address_kind === 'sapling' ||
-        (resultJSON.address_kind === 'unified' && resultJSON.receivers_available?.includes('sapling')))
+      (resultJSON.address_kind === RPCAdressKindEnum.sapling ||
+        (resultJSON.address_kind === RPCAdressKindEnum.unified &&
+          resultJSON.receivers_available?.includes(RPCReceiversEnum.sapling)))
     ) {
       return translate('send.amountrevealed') as string;
     }
 
     // Amount Revealed -> sapling to orchard (UA with orchard receiver)
     if (
-      from === 'sapling' &&
-      resultJSON.address_kind === 'unified' &&
-      resultJSON.receivers_available?.includes('orchard')
+      from === RPCAdressKindEnum.sapling &&
+      resultJSON.address_kind === RPCAdressKindEnum.unified &&
+      resultJSON.receivers_available?.includes(RPCReceiversEnum.orchard)
     ) {
       return translate('send.amountrevealed') as string;
     }
@@ -165,9 +169,10 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     // UA with sapling receiver)
     if (
       from === 'orchard+sapling' &&
-      (resultJSON.address_kind === 'sapling' ||
-        (resultJSON.address_kind === 'unified' &&
-          (resultJSON.receivers_available?.includes('orchard') || resultJSON.receivers_available?.includes('sapling'))))
+      (resultJSON.address_kind === RPCAdressKindEnum.sapling ||
+        (resultJSON.address_kind === RPCAdressKindEnum.unified &&
+          (resultJSON.receivers_available?.includes(RPCReceiversEnum.orchard) ||
+            resultJSON.receivers_available?.includes(RPCReceiversEnum.sapling))))
     ) {
       return translate('send.amountrevealed') as string;
     }
