@@ -74,8 +74,8 @@ const ChainTypeToggle: React.FunctionComponent<ChainTypeToggleProps> = ({
               flexDirection: 'row',
               justifyContent: 'center',
               alignItems: 'center',
-              borderWidth: customServerChainName === 'test' ? 2 : 1,
-              borderColor: customServerChainName === 'test' ? colors.primary : colors.primaryDisabled,
+              borderWidth: customServerChainName === ChainNameEnum.test ? 2 : 1,
+              borderColor: customServerChainName === ChainNameEnum.test ? colors.primary : colors.primaryDisabled,
               borderRadius: 5,
               paddingHorizontal: 5,
             }}>
@@ -87,7 +87,7 @@ const ChainTypeToggle: React.FunctionComponent<ChainTypeToggleProps> = ({
               }}>
               {translate('settings.value-chain_name-test') as string}
             </Text>
-            {customServerChainName === 'test' && (
+            {customServerChainName === ChainNameEnum.test && (
               <FontAwesomeIcon icon={faCashRegister} size={14} color={colors.primary} />
             )}
           </View>
@@ -109,8 +109,8 @@ const ChainTypeToggle: React.FunctionComponent<ChainTypeToggleProps> = ({
               flexDirection: 'row',
               justifyContent: 'center',
               alignItems: 'center',
-              borderWidth: customServerChainName === 'regtest' ? 2 : 1,
-              borderColor: customServerChainName === 'regtest' ? colors.primary : colors.primaryDisabled,
+              borderWidth: customServerChainName === ChainNameEnum.regtest ? 2 : 1,
+              borderColor: customServerChainName === ChainNameEnum.regtest ? colors.primary : colors.primaryDisabled,
               borderRadius: 5,
               paddingHorizontal: 5,
             }}>
@@ -122,7 +122,7 @@ const ChainTypeToggle: React.FunctionComponent<ChainTypeToggleProps> = ({
               }}>
               {translate('settings.value-chain_name-regtest') as string}
             </Text>
-            {customServerChainName === 'regtest' && (
+            {customServerChainName === ChainNameEnum.regtest && (
               <FontAwesomeIcon icon={faCashRegister} size={14} color={colors.primary} />
             )}
           </View>

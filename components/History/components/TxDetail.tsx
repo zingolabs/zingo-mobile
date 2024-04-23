@@ -12,6 +12,7 @@ import { useTheme } from '@react-navigation/native';
 import {
   AddressBookFileClass,
   AddressClass,
+  ChainNameEnum,
   SendPageStateClass,
   TransactionType,
   TxDetailType,
@@ -180,7 +181,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
               {expandTxid && !!tx.txid && (
                 <>
                   <RegText>{tx.txid}</RegText>
-                  {server.chain_name !== 'regtest' && (
+                  {server.chain_name !== ChainNameEnum.regtest && (
                     <TouchableOpacity onPress={() => handleTxIDClick(tx.txid)}>
                       <Text style={{ color: colors.text, textDecorationLine: 'underline', margin: 15 }}>
                         {translate('history.viewexplorer') as string}
