@@ -53,7 +53,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
       setAction(actionProp);
     }
     setError('');
-    if ((!label || !address) && action === 'Modify') {
+    if ((!label || !address) && action === AddressBookActionEnum.Modify) {
       setError(translate('addressbook.fillboth') as string);
     }
     if (item.label !== label && addressBook.filter((elem: AddressBookFileClass) => elem.label === label).length > 0) {
@@ -72,7 +72,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
       ) {
         setError(translate('addressbook.addressexists') as string);
       } else {
-        if (item.label === label && item.address === address && action === 'Modify') {
+        if (item.label === label && item.address === address && action === AddressBookActionEnum.Modify) {
           setError(translate('addressbook.nochanges') as string);
         }
       }
@@ -160,7 +160,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
             placeholderTextColor={colors.placeholder}
             value={label}
             onChangeText={(text: string) => setLabel(text)}
-            editable={action !== 'Delete'}
+            editable={action !== AddressBookActionEnum.Delete}
           />
         </View>
       </View>
@@ -168,7 +168,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
         address={address}
         setAddress={updateAddress}
         setError={setErrorAddress}
-        disabled={action === 'Delete'}
+        disabled={action === AddressBookActionEnum.Delete}
       />
       {(!!error || !!errorAddress) && (
         <View
@@ -197,7 +197,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
           onPress={() => {
             doAction(action, label, address);
           }}
-          disabled={action === 'Delete' ? false : error || errorAddress ? true : false}
+          disabled={action === AddressBookActionEnum.Delete ? false : error || errorAddress ? true : false}
         />
         <Button type="Secondary" title={translate('cancel') as string} style={{ marginLeft: 10 }} onPress={cancel} />
       </View>

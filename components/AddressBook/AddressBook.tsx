@@ -124,7 +124,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
       return;
     }
     let ab: AddressBookFileClass[] = [];
-    if (a === 'Delete') {
+    if (a === AddressBookActionEnum.Delete) {
       ab = await AddressBookFileImpl.removeAddressBookItem(label, address);
     } else {
       ab = await AddressBookFileImpl.writeAddressBookItem(label, address);
