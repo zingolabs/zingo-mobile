@@ -9,7 +9,7 @@ import { render } from '@testing-library/react-native';
 import Send from '../components/Send';
 import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
 import { ThemeType } from '../app/types';
-import { ModeEnum, CurrencyEnum, TransactionTypeEnum } from '../app/AppState';
+import { ModeEnum, CurrencyEnum, TransactionTypeEnum, PoolEnum } from '../app/AppState';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -115,13 +115,13 @@ describe('Component Send - test', () => {
         {
           address: '',
           amount: 0.77654321,
-          pool: 'Orchard',
+          pool: PoolEnum.Orchard,
           memos: ['hola', '  & ', 'hello'],
         },
         {
           address: '',
           amount: 0.1,
-          pool: 'Sapling',
+          pool: PoolEnum.Sapling,
           memos: ['hello', '  & ', 'hola'],
         },
       ],

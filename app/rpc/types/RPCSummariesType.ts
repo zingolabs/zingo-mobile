@@ -1,4 +1,4 @@
-import { TransactionTypeEnum } from '../../AppState';
+import { PoolEnum, TransactionTypeEnum } from '../../AppState';
 
 export type RPCSummariesType = {
   block_height: number; // not using.
@@ -9,6 +9,6 @@ export type RPCSummariesType = {
   to_address?: string;
   memos?: string[];
   kind: TransactionTypeEnum | 'Fee';
-  pool?: 'Orchard' | 'Sapling' | 'Transparent' | 'None';
+  pool?: PoolEnum | 'None';
   unconfirmed: boolean;
 };

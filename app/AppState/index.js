@@ -36,6 +36,7 @@ import { ChainNameEnum } from './enums/ChainNameEnum';
 import { DownloadMemosEnum } from './enums/DownloadMemosEnum';
 import { SnackbarDurationEnum } from './enums/SnackbarDurationEnum';
 import { TransactionTypeEnum } from './enums/TransactionTypeEnum';
+import { PoolEnum } from './enums/PoolEnum';
 
 import AppStateLoaded from './AppStateLoaded';
 import AppStateLoading from './AppStateLoading';
@@ -79,4 +80,5 @@ export {
   DownloadMemosEnum,
   SnackbarDurationEnum,
   TransactionTypeEnum,
+  PoolEnum,
 };

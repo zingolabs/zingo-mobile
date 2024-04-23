@@ -13,6 +13,7 @@ import {
   CommandEnum,
   ChainNameEnum,
   TransactionTypeEnum,
+  PoolEnum,
 } from '../AppState';
 import RPCModule from '../RPCModule';
 import { RPCAddressType } from './types/RPCAddressType';
@@ -483,13 +484,13 @@ export default class RPC {
   // Remember to add up both amounts and combine memos
   static rpc_combineTxDetailsByPool(txdetails: TxDetailType[]): TxDetailType[] {
     // First, group by pool.
-    const m = new Map<'Orchard' | 'Sapling' | 'Transparent', TxDetailType[]>();
+    const m = new Map<PoolEnum, TxDetailType[]>();
     txdetails
       .filter(i => i.pool !== undefined)
       .forEach(i => {
-        const coll = m.get(i.pool as 'Orchard' | 'Sapling' | 'Transparent');
+        const coll = m.get(i.pool as PoolEnum);
         if (!coll) {
-          m.set(i.pool as 'Orchard' | 'Sapling' | 'Transparent', [i]);
+          m.set(i.pool as PoolEnum, [i]);
         } else {
           coll.push(i);
         }
