@@ -8,7 +8,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react-native';
 import TxDetail from '../components/History/components/TxDetail';
 import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
-import { TransactionType } from '../app/AppState';
+import { TransactionType, TransactionTypeEnum } from '../app/AppState';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -92,7 +92,7 @@ describe('Component History TxDetail - test', () => {
     state.info.currencyName = 'ZEC';
     state.totalBalance.total = 1.12345678;
     const tx = {
-      type: 'Sent',
+      type: TransactionTypeEnum.Sent,
       fee: 0.0001,
       confirmations: 22,
       txid: 'sent-txid-1234567890',
@@ -136,7 +136,7 @@ describe('Component History TxDetail - test', () => {
     state.info.currencyName = 'ZEC';
     state.totalBalance.total = 1.12345678;
     const txSelfSend = {
-      type: 'SendToSelf',
+      type: TransactionTypeEnum.SendToSelf,
       fee: 0.0001,
       confirmations: 12,
       txid: 'sendtoself-txid-1234567890',
@@ -171,7 +171,7 @@ describe('Component History TxDetail - test', () => {
     state.info.currencyName = 'ZEC';
     state.totalBalance.total = 1.12345678;
     const txSelfSend = {
-      type: 'Received',
+      type: TransactionTypeEnum.Received,
       confirmations: 133,
       txid: 'receive-txid-1234567890',
       time: Date.now(),

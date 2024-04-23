@@ -8,7 +8,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 
 import ZecAmount from '../../Components/ZecAmount';
 import FadeText from '../../Components/FadeText';
-import { TransactionType } from '../../../app/AppState';
+import { TransactionType, TransactionTypeEnum } from '../../../app/AppState';
 import Utils from '../../../app/utils';
 import { ThemeType } from '../../../app/types';
 import moment from 'moment';
@@ -44,13 +44,18 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
 
   useEffect(() => {
     const amountCo =
-      tx.confirmations === 0 ? colors.primaryDisabled : tx.type === 'Received' ? colors.primary : colors.text;
+      tx.confirmations === 0
+        ? colors.primaryDisabled
+        : tx.type === TransactionTypeEnum.Received
+        ? colors.primary
+        : colors.text;
 
     setAmountColor(amountCo);
   }, [colors.primary, colors.primaryDisabled, colors.text, tx.confirmations, tx.type]);
 
   useEffect(() => {
-    const txIc = tx.confirmations === 0 ? faRefresh : tx.type === 'Received' ? faArrowDown : faArrowUp;
+    const txIc =
+      tx.confirmations === 0 ? faRefresh : tx.type === TransactionTypeEnum.Received ? faArrowDown : faArrowUp;
     setTxIcon(txIc);
   }, [tx.confirmations, tx.type]);
 
@@ -107,9 +112,9 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
             {displayAddress}
             <View style={{ display: 'flex', flexDirection: 'row' }}>
               <FadeText style={{ opacity: 1, fontWeight: 'bold', color: amountColor }}>
-                {tx.type === 'Sent'
+                {tx.type === TransactionTypeEnum.Sent
                   ? (translate('history.sent') as string)
-                  : tx.type === 'Received'
+                  : tx.type === TransactionTypeEnum.Received
                   ? (translate('history.received') as string)
                   : (translate('history.sendtoself') as string)}
               </FadeText>

@@ -12,6 +12,7 @@ import {
   SyncingStatusClass,
   CommandEnum,
   ChainNameEnum,
+  TransactionTypeEnum,
 } from '../AppState';
 import RPCModule from '../RPCModule';
 import { RPCAddressType } from './types/RPCAddressType';
@@ -1449,7 +1450,7 @@ export default class RPC {
           }
           let restTxList: TransactionType[] = txList.filter(t => t.txid !== tx.txid);
 
-          const type = tx.kind === 'Fee' ? 'Sent' : tx.kind;
+          const type = tx.kind === 'Fee' ? TransactionTypeEnum.Sent : tx.kind;
           if (!currentTxList[0].type && !!type) {
             currentTxList[0].type = type;
           }
@@ -1480,7 +1481,7 @@ export default class RPC {
             currentTxList[0].fee = (currentTxList[0].fee ? currentTxList[0].fee : 0) + tx.amount / 10 ** 8;
             if (currentTxList[0].txDetails.length === 0) {
               // when only have 1 item with `Fee`, we assume this tx is `SendToSelf`.
-              currentTxList[0].type = 'SendToSelf';
+              currentTxList[0].type = TransactionTypeEnum.SendToSelf;
               currenttxdetails.address = '';
               currenttxdetails.amount = 0;
               currentTxList[0].txDetails.push(currenttxdetails);
@@ -1504,7 +1505,7 @@ export default class RPC {
       const combinedTxList: TransactionType[] = [];
       txList.forEach((txns: TransactionType) => {
         const combinedTx = txns;
-        if (txns.type === 'Sent' || txns.type === 'SendToSelf') {
+        if (txns.type === TransactionTypeEnum.Sent || txns.type === TransactionTypeEnum.SendToSelf) {
           // using address for `Sent` & `SendToSelf`
           combinedTx.txDetails = RPC.rpc_combineTxDetailsByAddress(txns.txDetails);
         } else {

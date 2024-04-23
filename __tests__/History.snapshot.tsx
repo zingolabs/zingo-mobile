@@ -8,7 +8,7 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import History from '../components/History';
 import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
-import { CurrencyEnum, ModeEnum } from '../app/AppState';
+import { CurrencyEnum, ModeEnum, TransactionTypeEnum } from '../app/AppState';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -86,7 +86,7 @@ describe('Component History - test', () => {
   const state = defaultAppStateLoaded;
   state.transactions = [
     {
-      type: 'Sent',
+      type: TransactionTypeEnum.Sent,
       fee: 0.0001,
       confirmations: 22,
       txid: 'sent-txid-1234567890',
@@ -106,7 +106,7 @@ describe('Component History - test', () => {
       ],
     },
     {
-      type: 'SendToSelf',
+      type: TransactionTypeEnum.SendToSelf,
       fee: 0.0001,
       confirmations: 12,
       txid: 'sendtoself-txid-1234567890',
@@ -121,7 +121,7 @@ describe('Component History - test', () => {
       ],
     },
     {
-      type: 'Received',
+      type: TransactionTypeEnum.Received,
       confirmations: 133,
       txid: 'receive-txid-1234567890',
       time: Date.now(),

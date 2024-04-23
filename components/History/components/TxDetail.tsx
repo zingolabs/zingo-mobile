@@ -16,6 +16,7 @@ import {
   SendPageStateClass,
   SnackbarDurationEnum,
   TransactionType,
+  TransactionTypeEnum,
   TxDetailType,
 } from '../../../app/AppState';
 import Utils from '../../../app/utils';
@@ -60,7 +61,11 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
 
   useEffect(() => {
     const spendCo =
-      tx.confirmations === 0 ? colors.primaryDisabled : tx.type === 'Received' ? colors.primary : colors.text;
+      tx.confirmations === 0
+        ? colors.primaryDisabled
+        : tx.type === TransactionTypeEnum.Received
+        ? colors.primary
+        : colors.text;
     setSpendColor(spendCo);
   }, [colors.primary, colors.primaryDisabled, colors.text, tx.confirmations, tx.type]);
 
@@ -128,9 +133,9 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
             borderColor: colors.border,
           }}>
           <BoldText style={{ textAlign: 'center', textTransform: 'capitalize', color: spendColor }}>
-            {tx.type === 'Sent'
+            {tx.type === TransactionTypeEnum.Sent
               ? (translate('history.sent') as string)
-              : tx.type === 'Received'
+              : tx.type === TransactionTypeEnum.Received
               ? (translate('history.received') as string)
               : (translate('history.sendtoself') as string)}
           </BoldText>
