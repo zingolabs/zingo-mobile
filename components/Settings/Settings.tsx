@@ -20,12 +20,11 @@ import 'moment/locale/pt';
 import 'moment/locale/ru';
 
 import Header from '../Header';
-import { LanguageEnum, SecurityType, ServerType, ServerUrisType } from '../../app/AppState';
+import { LanguageEnum, SecurityType, ServerType, ServerUrisType, ModeEnum, CurrencyEnum } from '../../app/AppState';
 import { isEqual } from 'lodash';
 import ChainTypeToggle from '../Components/ChainTypeToggle';
 import CheckBox from '@react-native-community/checkbox';
 import RNPickerSelect from 'react-native-picker-select';
-import { CurrencyEnum } from '../../app/AppState/enums/CurrencyEnum';
 
 type SettingsProps = {
   closeModal: () => void;
@@ -520,7 +519,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           )}
         </View>
 
-        {modeContext !== 'basic' && (
+        {modeContext !== ModeEnum.basic && (
           <>
             <View style={{ display: 'flex', margin: 10 }}>
               <BoldText>{translate('settings.donation-title') as string}</BoldText>

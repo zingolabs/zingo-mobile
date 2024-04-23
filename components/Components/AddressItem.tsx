@@ -5,7 +5,7 @@ import Clipboard from '@react-native-community/clipboard';
 import { ContextAppLoaded } from '../../app/context';
 import RegText from './RegText';
 import Utils from '../../app/utils';
-import { AddressBookFileClass, SendPageStateClass, ToAddrClass } from '../../app/AppState';
+import { AddressBookFileClass, SendPageStateClass, ToAddrClass, ModeEnum } from '../../app/AppState';
 import { useTheme } from '@react-navigation/native';
 import { ThemeType } from '../../app/types';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -183,7 +183,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
         setSendPageState &&
         contact &&
         !readOnly &&
-        !(mode === 'basic' && totalBalance.spendableOrchard + totalBalance.spendablePrivate <= 0) && (
+        !(mode === ModeEnum.basic && totalBalance.spendableOrchard + totalBalance.spendablePrivate <= 0) && (
           <TouchableOpacity
             style={{ marginLeft: 10 }}
             onPress={() => {

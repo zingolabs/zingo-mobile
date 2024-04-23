@@ -50,6 +50,8 @@ import {
   CommandEnum,
   MenuItemEnum,
   LanguageEnum,
+  ModeEnum,
+  CurrencyEnum,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
@@ -66,7 +68,6 @@ import { Launching } from '../LoadingApp';
 import AddressBook from '../../components/AddressBook/AddressBook';
 import AddressBookFileImpl from '../../components/AddressBook/AddressBookFileImpl';
 import simpleBiometrics from '../simpleBiometrics';
-import { CurrencyEnum } from '../AppState/enums/CurrencyEnum';
 
 const History = React.lazy(() => import('../../components/History'));
 const Send = React.lazy(() => import('../../components/Send'));
@@ -97,7 +98,7 @@ const Tab = createBottomTabNavigator();
 type LoadedAppProps = {
   navigation: StackScreenProps<any>['navigation'];
   route: StackScreenProps<any>['route'];
-  toggleTheme: (mode: 'basic' | 'advanced') => void;
+  toggleTheme: (mode: ModeEnum) => void;
 };
 
 const SERVER_DEFAULT_0: ServerType = {
@@ -113,7 +114,7 @@ export default function LoadedApp(props: LoadedAppProps) {
   const [sendAll, setSendAll] = useState<boolean>(false);
   const [donation, setDonation] = useState<boolean>(false);
   const [privacy, setPrivacy] = useState<boolean>(false);
-  const [mode, setMode] = useState<'basic' | 'advanced'>('advanced'); // by default advanced
+  const [mode, setMode] = useState<ModeEnum>(ModeEnum.advanced); // by default advanced
   const [background, setBackground] = useState<BackgroundType>({ batches: 0, message: '', date: 0, dateEnd: 0 });
   const [addressBook, setAddressBook] = useState<AddressBookFileClass[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -217,7 +218,7 @@ export default function LoadedApp(props: LoadedAppProps) {
       } else {
         await SettingsFileImpl.writeSettings('privacy', privacy);
       }
-      if (settings.mode === 'basic' || settings.mode === 'advanced') {
+      if (settings.mode === ModeEnum.basic || settings.mode === ModeEnum.advanced) {
         setMode(settings.mode);
         props.toggleTheme(settings.mode);
       } else {
@@ -300,10 +301,10 @@ type LoadedAppClassProps = {
   sendAll: boolean;
   donation: boolean;
   privacy: boolean;
-  mode: 'basic' | 'advanced';
+  mode: ModeEnum;
   background: BackgroundType;
   readOnly: boolean;
-  toggleTheme: (mode: 'basic' | 'advanced') => void;
+  toggleTheme: (mode: ModeEnum) => void;
   addressBook: AddressBookFileClass[];
   security: SecurityType;
   selectServer: 'auto' | 'list' | 'custom';
@@ -659,7 +660,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
   setTransactionList = async (transactions: TransactionType[]) => {
     const basicFirstViewSeed = (await SettingsFileImpl.readSettings()).basicFirstViewSeed;
     // only for basic mode
-    if (this.state.mode === 'basic') {
+    if (this.state.mode === ModeEnum.basic) {
       // only if the user doesn't see the seed the first time
       if (!basicFirstViewSeed) {
         // only if the App are in foreground
@@ -1141,12 +1142,12 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
   set_mode_option = async (name: 'mode', value: string): Promise<void> => {
     await SettingsFileImpl.writeSettings(name, value);
     this.setState({
-      mode: value as 'basic' | 'advanced',
+      mode: value as ModeEnum,
       poolsToShieldSelectSapling: true,
       poolsToShieldSelectTransparent: true,
     });
     // this function change the Theme in the App component.
-    this.props.toggleTheme(value as 'basic' | 'advanced');
+    this.props.toggleTheme(value as ModeEnum);
 
     // Refetch the settings to update
     this.rpc.fetchWalletSettings();
@@ -1177,7 +1178,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
 
     await this.rpc.clearTimers();
     if (!!state.screen && state.screen === 3) {
-      await this.set_mode_option('mode', 'advanced');
+      await this.set_mode_option('mode', ModeEnum.advanced);
     }
     navigation.reset({
       index: 0,
@@ -1752,12 +1753,12 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
 
           <Snackbars snackbars={snackbars} removeFirstSnackbar={this.removeFirstSnackbar} translate={translate} />
 
-          {this.state.mode !== 'basic' ||
-          (this.state.mode === 'basic' &&
-            (!(this.state.mode === 'basic' && this.state.transactions.length <= 0) ||
+          {this.state.mode !== ModeEnum.basic ||
+          (this.state.mode === ModeEnum.basic &&
+            (!(this.state.mode === ModeEnum.basic && this.state.transactions.length <= 0) ||
               (!this.state.readOnly &&
                 !(
-                  this.state.mode === 'basic' &&
+                  this.state.mode === ModeEnum.basic &&
                   this.state.totalBalance.spendableOrchard + this.state.totalBalance.spendablePrivate <= 0
                 )))) ? (
             <Tab.Navigator
@@ -1804,7 +1805,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
               </Tab.Screen>
               {!this.state.readOnly &&
                 !(
-                  this.state.mode === 'basic' &&
+                  this.state.mode === ModeEnum.basic &&
                   this.state.totalBalance.spendableOrchard + this.state.totalBalance.spendablePrivate <= 0
                 ) && (
                   <Tab.Screen name={translate('loadedapp.send-menu') as string}>

@@ -13,7 +13,7 @@ import { ThemeType } from '../app/types';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { I18n } from 'i18n-js';
 import { StackScreenProps } from '@react-navigation/stack';
-import { BackgroundType, AddressBookFileClass, ServerType, LanguageEnum } from '../app/AppState';
+import { BackgroundType, AddressBookFileClass, ServerType, LanguageEnum, ModeEnum } from '../app/AppState';
 import { CurrencyEnum } from '../app/AppState/enums/CurrencyEnum';
 
 // Crea un mock para el constructor de I18n
@@ -122,7 +122,7 @@ describe('Component LoadedApp - test', () => {
     const sendAll = false;
     const donation = false;
     const privacy = false;
-    const mode = 'basic';
+    const mode = ModeEnum.basic;
     const background: BackgroundType = {
       batches: 0,
       message: '',

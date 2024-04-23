@@ -15,7 +15,7 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 
-import { AddressClass } from '../../app/AppState';
+import { AddressClass, ModeEnum } from '../../app/AppState';
 
 type ReceiveProps = {
   setUaAddress: (uaAddress: string) => void;
@@ -128,7 +128,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
       { key: 'zaddr', title: translate('receive.z-title') as string },
       { key: 'taddr', title: translate('receive.t-title') as string },
     ];
-    setRoutes(mode === 'basic' ? basicModeRoutes : advancedModeRoutes);
+    setRoutes(mode === ModeEnum.basic ? basicModeRoutes : advancedModeRoutes);
   }, [mode, translate]);
 
   const renderScene: (
@@ -223,11 +223,11 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
       color: string;
     },
   ) => ReactNode = ({ route, focused, color }) => (
-    <View style={{ width: (dimensions.width - 20) / (mode === 'basic' ? 1 : 3), alignItems: 'center' }}>
+    <View style={{ width: (dimensions.width - 20) / (mode === ModeEnum.basic ? 1 : 3), alignItems: 'center' }}>
       <RegText
         style={{
-          fontWeight: mode === 'basic' ? 'normal' : focused ? 'bold' : 'normal',
-          fontSize: mode === 'basic' ? 14 : focused ? 15 : 14,
+          fontWeight: mode === ModeEnum.basic ? 'normal' : focused ? 'bold' : 'normal',
+          fontSize: mode === ModeEnum.basic ? 14 : focused ? 15 : 14,
           color: color,
         }}>
         {route.title ? route.title : ''}

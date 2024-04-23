@@ -10,6 +10,7 @@ import moment from 'moment';
 import RPC from '../../app/rpc';
 import RegText from './RegText';
 import { ThemeType } from '../../app/types';
+import { ModeEnum } from '../../app/AppState';
 
 type PriceFetcherProps = {
   setZecPrice?: (p: number, d: number) => void;
@@ -105,7 +106,9 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
         </View>
       )}
       {!loading && (
-        <TouchableOpacity disabled={loading} onPress={() => (mode === 'basic' ? onPressFetch() : onPressFetchAlert())}>
+        <TouchableOpacity
+          disabled={loading}
+          onPress={() => (mode === ModeEnum.basic ? onPressFetch() : onPressFetchAlert())}>
           <View
             style={{
               flexDirection: 'row',

@@ -23,9 +23,10 @@ import {
   AddressBookFileClass,
   SecurityType,
   LanguageEnum,
+  ModeEnum,
+  CurrencyEnum,
 } from '../AppState';
 import SnackbarType from '../AppState/types/SnackbarType';
-import { CurrencyEnum } from '../AppState/enums/CurrencyEnum';
 
 export const defaultAppStateLoaded: AppStateLoaded = {
   navigation: {} as StackScreenProps<any>['navigation'],
@@ -91,7 +92,7 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   readOnly: false,
   poolsToShieldSelectSapling: true,
   poolsToShieldSelectTransparent: true,
-  mode: 'advanced',
+  mode: ModeEnum.advanced,
   snackbars: [] as SnackbarType[],
   addLastSnackbar: () => {},
   restartApp: () => {},

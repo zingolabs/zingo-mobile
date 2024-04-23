@@ -10,7 +10,15 @@ import FadeText from '../Components/FadeText';
 import Button from '../Components/Button';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded, ContextAppLoading } from '../../app/context';
-import { InfoType, LanguageEnum, NetInfoType, ServerType, TranslateType, WalletType } from '../../app/AppState';
+import {
+  InfoType,
+  LanguageEnum,
+  NetInfoType,
+  ServerType,
+  TranslateType,
+  WalletType,
+  ModeEnum,
+} from '../../app/AppState';
 import RPCModule from '../../app/RPCModule';
 import RPC from '../../app/rpc';
 import Header from '../Header';
@@ -50,7 +58,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
     server: ServerType,
     netInfo: NetInfoType,
     privacy: boolean,
-    mode: 'basic' | 'advanced',
+    mode: ModeEnum.basic | ModeEnum.advanced,
     setBackgroundError: (title: string, error: string) => void,
     addLastSnackbar: (snackbar: SnackbarType) => void,
     language: LanguageEnum;
@@ -479,12 +487,12 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
         }}>
         <Button
           testID="seed.button.OK"
-          type={mode === 'basic' ? 'Secondary' : 'Primary'}
+          type={mode === ModeEnum.basic ? 'Secondary' : 'Primary'}
           style={{
-            backgroundColor: mode === 'basic' ? colors.background : colors.primary,
+            backgroundColor: mode === ModeEnum.basic ? colors.background : colors.primary,
           }}
           title={
-            mode === 'basic'
+            mode === ModeEnum.basic
               ? !basicFirstViewSeed
                 ? (translate('seed.showtransactions') as string)
                 : (translate('close') as string)
@@ -503,7 +511,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
               return;
             }
             // the user just see the seed for the first time.
-            if (mode === 'basic' && !basicFirstViewSeed) {
+            if (mode === ModeEnum.basic && !basicFirstViewSeed) {
               await SettingsFileImpl.writeSettings('basicFirstViewSeed', true);
             }
             if (times === 0) {

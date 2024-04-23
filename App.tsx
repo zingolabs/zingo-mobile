@@ -7,6 +7,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { LoadedApp } from './app/LoadedApp';
 import { LoadingApp } from './app/LoadingApp';
 import { ThemeType } from './app/types';
+import { ModeEnum } from './app/AppState';
 
 const advancedTheme: ThemeType = {
   dark: true,
@@ -49,8 +50,8 @@ const Stack = createStackNavigator();
 const App: React.FunctionComponent = () => {
   const [theme, setTheme] = useState<ThemeType>(advancedTheme);
 
-  const toggleTheme = (mode: 'basic' | 'advanced') => {
-    setTheme(mode === 'advanced' ? advancedTheme : basicTheme);
+  const toggleTheme = (mode: ModeEnum) => {
+    setTheme(mode === ModeEnum.advanced ? advancedTheme : basicTheme);
   };
 
   //console.log('render App - 1');

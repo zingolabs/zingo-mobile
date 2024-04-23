@@ -31,6 +31,8 @@ import {
   SendPageStateClass,
   SendProgressClass,
   ToAddrClass,
+  ModeEnum,
+  CurrencyEnum,
 } from '../../app/AppState';
 import { parseZcashURI, ZcashURITargetClass } from '../../app/uris';
 import RPCModule from '../../app/RPCModule';
@@ -51,7 +53,6 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import { RPCProposeType } from '../../app/rpc/types/RPCProposeType';
-import { CurrencyEnum } from '../../app/AppState/enums/CurrencyEnum';
 
 type SendProps = {
   setSendPageState: (sendPageState: SendPageStateClass) => void;
@@ -405,7 +406,7 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   useEffect(() => {
     (async () => {
-      if (mode === 'basic') {
+      if (mode === ModeEnum.basic) {
         const price = await RPC.rpc_getZecPrice();
         // values:
         // 0   - initial/default value
@@ -678,7 +679,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           }}
           confirmSend={confirmSend}
           sendAllAmount={
-            mode !== 'basic' &&
+            mode !== ModeEnum.basic &&
             Utils.parseStringLocaletoNumberFloat(sendPageState.toaddr.amount) ===
               Utils.parseStringLocaletoNumberFloat(maxAmount.toFixed(8))
           }
@@ -877,7 +878,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       }}>
                       <FadeText>{`${translate('send.amount')}`}</FadeText>
                     </View>
-                    {sendAll && mode !== 'basic' && (
+                    {sendAll && mode !== ModeEnum.basic && (
                       <TouchableOpacity
                         onPress={() => {
                           if (fee > 0) {
@@ -1062,7 +1063,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                               color={colors.primary}
                               style={{ marginRight: 5 }}
                             />
-                            {showShieldInfo || mode === 'basic' ? (
+                            {showShieldInfo || mode === ModeEnum.basic ? (
                               <FadeText>{translate('send.needtoshield') as string}</FadeText>
                             ) : showUpgradeInfo ? (
                               <FadeText>{translate('send.needtoupgrade') as string}</FadeText>
@@ -1287,7 +1288,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                 title={
                   validAmount === 1 &&
                   sendPageState.toaddr.amount &&
-                  mode !== 'basic' &&
+                  mode !== ModeEnum.basic &&
                   Utils.parseStringLocaletoNumberFloat(sendPageState.toaddr.amount) ===
                     Utils.parseStringLocaletoNumberFloat(maxAmount.toFixed(8))
                     ? (translate('send.button-all') as string)
@@ -1298,7 +1299,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                   if (
                     validAmount === 1 &&
                     sendPageState.toaddr.amount &&
-                    mode !== 'basic' &&
+                    mode !== ModeEnum.basic &&
                     Utils.parseStringLocaletoNumberFloat(sendPageState.toaddr.amount) ===
                       Utils.parseStringLocaletoNumberFloat(maxAmount.toFixed(8))
                   ) {

@@ -1,5 +1,6 @@
 import { CurrencyEnum } from '../enums/CurrencyEnum';
 import { LanguageEnum } from '../enums/LanguageEnum';
+import { ModeEnum } from '../enums/ModeEnum';
 import SecurityType from '../types/SecurityType';
 import ServerType from '../types/ServerType';
 
@@ -10,7 +11,7 @@ export default class SettingsFileClass {
   sendAll: boolean;
   donation: boolean;
   privacy: boolean;
-  mode: 'basic' | 'advanced';
+  mode: ModeEnum;
   firstInstall: boolean;
   basicFirstViewSeed: boolean;
   version: string | null;
@@ -29,7 +30,7 @@ export default class SettingsFileClass {
     sendAll: boolean,
     donation: boolean,
     privacy: boolean,
-    mode: 'basic' | 'advanced',
+    mode: ModeEnum,
     firstInstall: boolean,
     basicFirstViewSeed: boolean,
     version: string,

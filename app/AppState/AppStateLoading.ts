@@ -14,6 +14,7 @@ import SnackbarType from './types/SnackbarType';
 import SecurityType from './types/SecurityType';
 import { CurrencyEnum } from './enums/CurrencyEnum';
 import { LanguageEnum } from './enums/LanguageEnum';
+import { ModeEnum } from './enums/ModeEnum';
 
 export default interface AppStateLoading {
   navigation: StackScreenProps<any>['navigation'];
@@ -48,7 +49,7 @@ export default interface AppStateLoading {
   customServerUri: string;
   customServerChainName: 'main' | 'test' | 'regtest';
 
-  mode: 'basic' | 'advanced';
+  mode: ModeEnum;
   snackbars: SnackbarType[];
   addLastSnackbar: (snackbar: SnackbarType) => void;
 

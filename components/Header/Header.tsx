@@ -16,7 +16,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme } from '@react-navigation/native';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Alert, Image, Text, TouchableOpacity, View } from 'react-native';
-import { NetInfoType, TranslateType } from '../../app/AppState';
+import { NetInfoType, TranslateType, ModeEnum } from '../../app/AppState';
 import { ContextAppLoaded } from '../../app/context';
 import { ThemeType } from '../../app/types';
 import CurrencyAmount from '../Components/CurrencyAmount';
@@ -51,7 +51,7 @@ type HeaderProps = {
   testID?: string;
   translate?: (key: string) => TranslateType;
   netInfo?: NetInfoType;
-  mode?: 'basic' | 'advanced';
+  mode?: ModeEnum.basic | ModeEnum.advanced;
   setComputingModalVisible?: (visible: boolean) => void;
   setBackgroundError?: (title: string, error: string) => void;
   noPrivacy?: boolean;
@@ -105,7 +105,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     language,
   } = context;
 
-  let translate: (key: string) => TranslateType, netInfo: NetInfoType, mode: 'basic' | 'advanced';
+  let translate: (key: string) => TranslateType, netInfo: NetInfoType, mode: ModeEnum.basic | ModeEnum.advanced;
   if (translateProp) {
     translate = translateProp;
   } else {
@@ -177,7 +177,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
 
   useEffect(() => {
     // for basic mode always have to be 'all', It's easier for the user.
-    if (mode === 'basic' && (poolsToShield === 'sapling' || poolsToShield === 'transparent')) {
+    if (mode === ModeEnum.basic && (poolsToShield === 'sapling' || poolsToShield === 'transparent')) {
       setPoolsToShield('all');
       if (setPoolsToShieldSelectSapling) {
         setPoolsToShieldSelectSapling(true);
@@ -390,7 +390,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 )}
                 {!syncingStatus.inProgress &&
                   syncingStatus.lastBlockServer !== syncingStatus.lastBlockWallet &&
-                  mode === 'advanced' && (
+                  mode === ModeEnum.advanced && (
                     <View
                       style={{
                         alignItems: 'center',
@@ -431,7 +431,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                         alignItems: 'center',
                         paddingHorizontal: 3,
                       }}>
-                      {mode === 'basic' ? (
+                      {mode === ModeEnum.basic ? (
                         <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
                           <FontAwesomeIcon icon={faPlay} color={colors.syncing} size={17} />
                           <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{`${blocksRemaining}`}</FadeText>
@@ -451,7 +451,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               </>
             ) : (
               <>
-                {mode === 'advanced' && (
+                {mode === ModeEnum.advanced && (
                   <View
                     style={{
                       alignItems: 'center',
@@ -476,7 +476,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             )}
             {/*syncingStatus.inProgress && blocksRemaining > 0 && (
               <View style={{ marginRight: 5 }}>
-                {mode === 'basic' ? (
+                {mode === ModeEnum.basic ? (
                   <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
                     <FadeText style={{ fontSize: 10 }}>{`${blocksRemaining}`}</FadeText>
                   </View>
@@ -491,7 +491,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               )*/}
             {(!netInfo.isConnected || netInfo.type === NetInfoStateType.cellular || netInfo.isConnectionExpensive) && (
               <>
-                {mode !== 'basic' && (
+                {mode !== ModeEnum.basic && (
                   <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
                     <FontAwesomeIcon icon={faCloudDownload} color={!netInfo.isConnected ? 'red' : 'yellow'} size={20} />
                   </TouchableOpacity>
@@ -500,7 +500,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             )}
           </>
         )}
-        {mode !== 'basic' && !noPrivacy && set_privacy_option && addLastSnackbar && (
+        {mode !== ModeEnum.basic && !noPrivacy && set_privacy_option && addLastSnackbar && (
           <TouchableOpacity
             style={{ marginHorizontal: 5 }}
             onPress={() => {
@@ -568,7 +568,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             privacy={privacy}
             smallPrefix={true}
           />
-          {mode !== 'basic' &&
+          {mode !== ModeEnum.basic &&
             (totalBalance.orchardBal !== totalBalance.spendableOrchard ||
               totalBalance.privateBal > 0 ||
               totalBalance.transparentBal > 0) && (
@@ -714,7 +714,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   : true
               }
             />
-            {mode !== 'basic' &&
+            {mode !== ModeEnum.basic &&
               poolsToShield === 'all' &&
               setPoolsToShieldSelectSapling &&
               setPoolsToShieldSelectTransparent && (
@@ -831,8 +831,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           {readOnly && (
             <>
               {setUfvkViewModalVisible &&
-              !(mode === 'basic' && transactions.length <= 0) &&
-              !(mode === 'basic' && totalBalance.total <= 0) ? (
+              !(mode === ModeEnum.basic && transactions.length <= 0) &&
+              !(mode === ModeEnum.basic && totalBalance.total <= 0) ? (
                 <TouchableOpacity onPress={() => ufvkShowModal()}>
                   <FontAwesomeIcon icon={faSnowflake} size={24} color={colors.zingo} />
                 </TouchableOpacity>

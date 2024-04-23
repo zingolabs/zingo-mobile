@@ -24,6 +24,7 @@ import SecurityType from './types/SecurityType';
 import { MenuItemEnum } from './enums/MenuItemEnum';
 import { LanguageEnum } from './enums/LanguageEnum';
 import { CurrencyEnum } from './enums/CurrencyEnum';
+import { ModeEnum } from './enums/ModeEnum';
 
 export default interface AppStateLoaded {
   navigation: StackScreenProps<any>['navigation'];
@@ -120,7 +121,7 @@ export default interface AppStateLoaded {
   poolsToShieldSelectSapling: boolean;
   poolsToShieldSelectTransparent: boolean;
 
-  mode: 'basic' | 'advanced';
+  mode: ModeEnum;
   snackbars: SnackbarType[];
   addLastSnackbar: (snackbar: SnackbarType) => void;
   restartApp: (s: any) => void;

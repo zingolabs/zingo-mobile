@@ -14,6 +14,7 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import RegText from '../Components/RegText';
+import { ModeEnum } from '../../app/AppState';
 
 type TextsType = {
   new: string[];
@@ -129,12 +130,16 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
           marginVertical: 5,
         }}>
         <Button
-          type={mode === 'basic' ? 'Secondary' : 'Primary'}
+          type={mode === ModeEnum.basic ? 'Secondary' : 'Primary'}
           style={{
-            backgroundColor: mode === 'basic' ? colors.background : colors.primary,
+            backgroundColor: mode === ModeEnum.basic ? colors.background : colors.primary,
           }}
           title={
-            mode === 'basic' ? (translate('cancel') as string) : !!texts && !!texts[action] ? texts[action][times] : ''
+            mode === ModeEnum.basic
+              ? (translate('cancel') as string)
+              : !!texts && !!texts[action]
+              ? texts[action][times]
+              : ''
           }
           onPress={() => {
             if (!wallet.ufvk) {

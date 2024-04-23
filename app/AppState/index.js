@@ -29,6 +29,8 @@ import { CommandEnum } from './enums/CommandEnum';
 import { AddressBookActionEnum } from './enums/AddressBookActionEnum';
 import { MenuItemEnum } from './enums/MenuItemEnum';
 import { LanguageEnum } from './enums/LanguageEnum';
+import { ModeEnum } from './enums/ModeEnum';
+import { CurrencyEnum } from './enums/CurrencyEnum';
 
 import AppStateLoaded from './AppStateLoaded';
 import AppStateLoading from './AppStateLoading';
@@ -65,4 +67,6 @@ export {
   AddressBookActionEnum,
   MenuItemEnum,
   LanguageEnum,
+  ModeEnum,
+  CurrencyEnum,
 };

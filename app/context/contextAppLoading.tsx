@@ -13,9 +13,10 @@ import {
   ServerType,
   SecurityType,
   LanguageEnum,
+  ModeEnum,
+  CurrencyEnum,
 } from '../AppState';
 import SnackbarType from '../AppState/types/SnackbarType';
-import { CurrencyEnum } from '../AppState/enums/CurrencyEnum';
 
 export const defaultAppStateLoading: AppStateLoading = {
   navigation: {} as StackScreenProps<any>['navigation'],
@@ -55,7 +56,7 @@ export const defaultAppStateLoading: AppStateLoading = {
   customServerShow: false,
   customServerUri: '',
   customServerChainName: 'main',
-  mode: 'advanced',
+  mode: ModeEnum.advanced,
   snackbars: [] as SnackbarType[],
   addLastSnackbar: () => {},
   firstLaunchingMessage: false,

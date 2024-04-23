@@ -7,7 +7,13 @@ import { faAddressCard, faQrcode, faTrashCan, faPencil, faArrowUp } from '@forta
 //import { TouchableOpacity } from 'react-native-gesture-handler';
 
 import FadeText from '../../Components/FadeText';
-import { AddressBookActionEnum, AddressBookFileClass, SendPageStateClass, ToAddrClass } from '../../../app/AppState';
+import {
+  AddressBookActionEnum,
+  AddressBookFileClass,
+  SendPageStateClass,
+  ToAddrClass,
+  ModeEnum,
+} from '../../../app/AppState';
 import Utils from '../../../app/utils';
 import { ThemeType } from '../../../app/types';
 import { ContextAppLoaded } from '../../../app/context';
@@ -114,25 +120,26 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
             <FontAwesomeIcon style={{ opacity: 0.8 }} size={25} icon={faPencil} color={colors.money} />
           </TouchableOpacity>
         </View>
-        {!readOnly && !(mode === 'basic' && totalBalance.spendableOrchard + totalBalance.spendablePrivate <= 0) && (
-          <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
-            <TouchableOpacity
-              style={{ zIndex: 999, padding: 10 }}
-              onPress={() => {
-                // enviar
-                const sendPageState = new SendPageStateClass(new ToAddrClass(0));
-                sendPageState.toaddr.to = item.address;
-                setSendPageState(sendPageState);
-                closeModal();
-                navigation.navigate('LoadedApp', {
-                  screen: translate('loadedapp.send-menu'),
-                  initial: false,
-                });
-              }}>
-              <FontAwesomeIcon size={30} icon={faArrowUp} color={colors.primary} />
-            </TouchableOpacity>
-          </View>
-        )}
+        {!readOnly &&
+          !(mode === ModeEnum.basic && totalBalance.spendableOrchard + totalBalance.spendablePrivate <= 0) && (
+            <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
+              <TouchableOpacity
+                style={{ zIndex: 999, padding: 10 }}
+                onPress={() => {
+                  // enviar
+                  const sendPageState = new SendPageStateClass(new ToAddrClass(0));
+                  sendPageState.toaddr.to = item.address;
+                  setSendPageState(sendPageState);
+                  closeModal();
+                  navigation.navigate('LoadedApp', {
+                    screen: translate('loadedapp.send-menu'),
+                    initial: false,
+                  });
+                }}>
+                <FontAwesomeIcon size={30} icon={faArrowUp} color={colors.primary} />
+              </TouchableOpacity>
+            </View>
+          )}
         <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
           <TouchableOpacity style={{ zIndex: 999, padding: 10 }} onPress={() => onPressDelete()}>
             <FontAwesomeIcon style={{ opacity: 0.8 }} size={25} icon={faTrashCan} color={colors.money} />

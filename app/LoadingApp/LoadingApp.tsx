@@ -38,6 +38,8 @@ import {
   ServerUrisType,
   CommandEnum,
   LanguageEnum,
+  CurrencyEnum,
+  ModeEnum,
 } from '../AppState';
 import { parseServerURI, serverUris } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
@@ -55,7 +57,6 @@ import Launching from './Launching';
 import simpleBiometrics from '../simpleBiometrics';
 import selectingServer from '../selectingServer';
 import { isEqual } from 'lodash';
-import { CurrencyEnum } from '../AppState/enums/CurrencyEnum';
 
 const BoldText = React.lazy(() => import('../../components/Components/BoldText'));
 const Button = React.lazy(() => import('../../components/Components/Button'));
@@ -74,7 +75,7 @@ const ru = require('../translations/ru.json');
 type LoadingAppProps = {
   navigation: StackScreenProps<any>['navigation'];
   route: StackScreenProps<any>['route'];
-  toggleTheme: (mode: 'basic' | 'advanced') => void;
+  toggleTheme: (mode: ModeEnum.basic | ModeEnum.advanced) => void;
 };
 
 const SERVER_DEFAULT_0: ServerType = {
@@ -90,7 +91,7 @@ export default function LoadingApp(props: LoadingAppProps) {
   const [sendAll, setSendAll] = useState<boolean>(false);
   const [donation, setDonation] = useState<boolean>(false);
   const [privacy, setPrivacy] = useState<boolean>(false);
-  const [mode, setMode] = useState<'basic' | 'advanced'>('advanced'); // by default advanced
+  const [mode, setMode] = useState<ModeEnum.basic | ModeEnum.advanced>(ModeEnum.advanced); // by default advanced
   const [background, setBackground] = useState<BackgroundType>({ batches: 0, message: '', date: 0, dateEnd: 0 });
   const [firstLaunchingMessage, setFirstLaunchingMessage] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
@@ -157,11 +158,11 @@ export default function LoadingApp(props: LoadingAppProps) {
       //console.log('first install', settings.firstInstall);
       if (settings.firstInstall) {
         // basic mode
-        setMode('basic');
-        props.toggleTheme('basic');
-        await SettingsFileImpl.writeSettings('mode', 'basic');
+        setMode(ModeEnum.basic);
+        props.toggleTheme(ModeEnum.basic);
+        await SettingsFileImpl.writeSettings('mode', ModeEnum.basic);
       } else {
-        if (settings.mode === 'basic' || settings.mode === 'advanced') {
+        if (settings.mode === ModeEnum.basic || settings.mode === ModeEnum.advanced) {
           setMode(settings.mode);
           props.toggleTheme(settings.mode);
         } else {
@@ -290,10 +291,10 @@ type LoadingAppClassProps = {
   sendAll: boolean;
   donation: boolean;
   privacy: boolean;
-  mode: 'basic' | 'advanced';
+  mode: ModeEnum.basic | ModeEnum.advanced;
   background: BackgroundType;
   firstLaunchingMessage: boolean;
-  toggleTheme: (mode: 'basic' | 'advanced') => void;
+  toggleTheme: (mode: ModeEnum.basic | ModeEnum.advanced) => void;
   security: SecurityType;
   selectServer: 'auto' | 'list' | 'custom';
   donationAlert: boolean;
@@ -389,7 +390,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
 
     // Here the App ask about the new donation feature if needed.
     // only for Advance Users
-    if (this.state.donationAlert && this.state.mode === 'advanced') {
+    if (this.state.donationAlert && this.state.mode === ModeEnum.advanced) {
       await this.showDonationAlertAsync()
         .then(() => {
           this.setState({ donation: true });
@@ -472,7 +473,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
       } else {
         //console.log('Loading new wallet', this.state.screen, this.state.walletExists);
         // if no wallet file & basic mode -> create a new wallet & go directly to history screen.
-        if (this.state.mode === 'basic') {
+        if (this.state.mode === ModeEnum.basic) {
           // setting the prop basicFirstViewSeed to false.
           // this means when the user have funds, the seed screen will show up.
           await SettingsFileImpl.writeSettings('basicFirstViewSeed', false);
@@ -600,7 +601,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     await SettingsFileImpl.writeSettings('server', fasterServer);
     await SettingsFileImpl.writeSettings('selectServer', 'list');
     // message with the result only for advanced users
-    if (this.state.mode === 'advanced') {
+    if (this.state.mode === ModeEnum.advanced) {
       if (isEqual(actualServer, fasterServer)) {
         this.addLastSnackbar({
           message: this.state.translate('loadedapp.selectingserversame') as string,
@@ -682,26 +683,26 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     }
   };
 
-  //usingDefaultServer_0 = async (mode: 'basic' | 'advanced') => {
+  //usingDefaultServer_0 = async (mode: ModeEnum.basic | ModeEnum.advanced) => {
   //  this.setState({ actionButtonsDisabled: true });
   //  if (SERVER_DEFAULT_0) {
   //    await SettingsFileImpl.writeSettings('server', SERVER_DEFAULT_0);
   //    this.setState({ server: SERVER_DEFAULT_0 });
   //  }
-  //  if (mode === 'basic') {
+  //  if (mode === ModeEnum.basic) {
   //    this.setState({ actionButtonsDisabled: false }, () => this.componentDidMount());
   //  } else {
   //    this.setState({ actionButtonsDisabled: false });
   //  }
   //};
 
-  //usingDefaultServer_1 = async (mode: 'basic' | 'advanced') => {
+  //usingDefaultServer_1 = async (mode: ModeEnum.basic | ModeEnum.advanced) => {
   //  this.setState({ actionButtonsDisabled: true });
   //  if (SERVER_DEFAULT_1) {
   //    await SettingsFileImpl.writeSettings('server', SERVER_DEFAULT_1);
   //    this.setState({ server: SERVER_DEFAULT_1 });
   //  }
-  //  if (mode === 'basic') {
+  //  if (mode === ModeEnum.basic) {
   //    this.setState({ actionButtonsDisabled: false }, () => this.componentDidMount());
   //  } else {
   //    this.setState({ actionButtonsDisabled: false });
@@ -765,7 +766,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
         // basic mode -> same screen.
         this.setState(state => ({
           wallet,
-          screen: state.mode === 'basic' ? state.screen : 2,
+          screen: state.mode === ModeEnum.basic ? state.screen : 2,
           actionButtonsDisabled: false,
           walletExists: true,
         }));
@@ -905,7 +906,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     this.setState({ snackbars: newSnackbars });
   };
 
-  changeMode = async (mode: 'basic' | 'advanced') => {
+  changeMode = async (mode: ModeEnum.basic | ModeEnum.advanced) => {
     this.setState({ mode, screen: 0 });
     await SettingsFileImpl.writeSettings('mode', mode);
     this.props.toggleTheme(mode);
@@ -971,13 +972,13 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                 }}>
                 {netInfo.isConnected && !actionButtonsDisabled && (
                   <>
-                    {mode === 'basic' ? (
+                    {mode === ModeEnum.basic ? (
                       <OptionsMenu
                         customButton={<FontAwesomeIcon icon={faEllipsisV} color={'#ffffff'} size={40} />}
                         buttonStyle={{ width: 40, padding: 10, resizeMode: 'contain' }}
                         destructiveIndex={5}
                         options={[translate('loadingapp.advancedmode'), translate('cancel')]}
-                        actions={[() => this.changeMode('advanced')]}
+                        actions={[() => this.changeMode(ModeEnum.advanced)]}
                       />
                     ) : (
                       <OptionsMenu
@@ -1181,7 +1182,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                           this.createNewWallet();
                         }
                       }}
-                      style={{ marginBottom: mode === 'advanced' ? 10 : 30, marginTop: 10 }}
+                      style={{ marginBottom: mode === ModeEnum.advanced ? 10 : 30, marginTop: 10 }}
                     />
                   )}
 
