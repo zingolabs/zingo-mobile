@@ -16,6 +16,7 @@ import {
   ModeEnum,
   CurrencyEnum,
   SelectServerEnum,
+  ChainNameEnum,
 } from '../AppState';
 import SnackbarType from '../AppState/types/SnackbarType';
 
@@ -56,7 +57,7 @@ export const defaultAppStateLoading: AppStateLoading = {
   readOnly: false,
   customServerShow: false,
   customServerUri: '',
-  customServerChainName: 'main',
+  customServerChainName: ChainNameEnum.main,
   mode: ModeEnum.advanced,
   snackbars: [] as SnackbarType[],
   addLastSnackbar: () => {},

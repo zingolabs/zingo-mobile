@@ -33,6 +33,7 @@ import {
   ToAddrClass,
   ModeEnum,
   CurrencyEnum,
+  ChainNameEnum,
 } from '../../app/AppState';
 import { parseZcashURI, ZcashURITargetClass } from '../../app/uris';
 import RPCModule from '../../app/RPCModule';
@@ -667,7 +668,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         <Confirm
           calculatedFee={fee}
           donationAmount={
-            donation && server.chain_name === 'main' && !sendToSelf && !donationAddress
+            donation && server.chain_name === ChainNameEnum.main && !sendToSelf && !donationAddress
               ? Utils.parseStringLocaletoNumberFloat(Utils.getDefaultDonationAmount())
               : 0
           }
@@ -1329,7 +1330,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                 }}
               />
             </View>
-            {server.chain_name === 'main' && (
+            {server.chain_name === ChainNameEnum.main && (
               <>
                 {donation ? (
                   <View

@@ -53,6 +53,7 @@ import {
   ModeEnum,
   CurrencyEnum,
   SelectServerEnum,
+  ChainNameEnum,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
@@ -805,7 +806,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     // we need to exclude 2 use cases:
     // 1. send to self (make no sense to do a donation here)
     // 2. send to donation UA (make no sense to do a double donation)
-    if (this.state.donation && this.state.server.chain_name === 'main' && !sendToSelf && !donationAddress) {
+    if (this.state.donation && this.state.server.chain_name === ChainNameEnum.main && !sendToSelf && !donationAddress) {
       donationTransaction.push({
         address: await Utils.getDonationAddress(this.state.server.chain_name),
         amount: parseInt(
@@ -1198,7 +1199,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     // if the App is working with a test server
     // no need to do backups of the wallets.
     let resultStr = '';
-    if (server.chain_name === 'main') {
+    if (server.chain_name === ChainNameEnum.main) {
       resultStr = (await this.rpc.changeWallet()) as string;
     } else {
       resultStr = (await this.rpc.changeWalletNoBackup()) as string;
@@ -1268,7 +1269,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
 
       let resultStr2 = '';
       // if the server was testnet or regtest -> no need backup the wallet.
-      if (beforeServer.chain_name === 'main') {
+      if (beforeServer.chain_name === ChainNameEnum.main) {
         // backup
         resultStr2 = (await this.rpc.changeWallet()) as string;
       } else {

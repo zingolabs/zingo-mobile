@@ -16,7 +16,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme } from '@react-navigation/native';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Alert, Image, Text, TouchableOpacity, View } from 'react-native';
-import { NetInfoType, TranslateType, ModeEnum } from '../../app/AppState';
+import { NetInfoType, TranslateType, ModeEnum, CurrencyEnum } from '../../app/AppState';
 import { ContextAppLoaded } from '../../app/context';
 import { ThemeType } from '../../app/types';
 import CurrencyAmount from '../Components/CurrencyAmount';
@@ -37,7 +37,6 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import Utils from '../../app/utils';
-import { CurrencyEnum } from '../../app/AppState/enums/CurrencyEnum';
 
 type HeaderProps = {
   poolsMoreInfoOnClick?: () => void;

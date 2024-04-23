@@ -1,6 +1,6 @@
 import { getNumberFormatSettings } from 'react-native-localize';
 import { ZecAmountSplitType } from './types/ZecAmountSplitType';
-import { TranslateType } from '../AppState';
+import { ChainNameEnum, TranslateType } from '../AppState';
 
 import randomColor from 'randomcolor';
 import RPCModule from '../RPCModule';
@@ -101,9 +101,9 @@ export default class Utils {
     return 0.0002;
   }
 
-  static async getDonationAddress(chain_name: 'main' | 'test' | 'regtest'): Promise<string> {
+  static async getDonationAddress(chain_name: ChainNameEnum): Promise<string> {
     // donations only for mainnet.
-    if (chain_name === 'main') {
+    if (chain_name === ChainNameEnum.main) {
       // UA -> we need a fresh one.
       const ua: string = await RPCModule.getDonationAddress();
       return ua;
@@ -163,7 +163,7 @@ export default class Utils {
     return stringValue.replace(new RegExp('\\.'), `${decimalSeparator}`);
   }
 
-  static getBlockExplorerTxIDURL(txid: string, chain_name: 'main' | 'test' | 'regtest'): string {
+  static getBlockExplorerTxIDURL(txid: string, chain_name: ChainNameEnum): string {
     if (chain_name === 'test') {
       return `https://testnet.zcashblockexplorer.com/transactions/${txid}`;
     } else {

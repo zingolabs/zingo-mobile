@@ -20,8 +20,9 @@ import {
   LanguageEnum,
   ModeEnum,
   SelectServerEnum,
+  ChainNameEnum,
+  CurrencyEnum,
 } from '../app/AppState';
-import { CurrencyEnum } from '../app/AppState/enums/CurrencyEnum';
 
 // Crea un mock para el constructor de I18n
 jest.mock('i18n-js', () => ({
@@ -124,7 +125,7 @@ describe('Component LoadedApp - test', () => {
     const currency = CurrencyEnum.noCurrency;
     const server: ServerType = {
       uri: 'https://mainnet.lightwalletd.com:9067',
-      chain_name: 'main',
+      chain_name: ChainNameEnum.main,
     };
     const sendAll = false;
     const donation = false;

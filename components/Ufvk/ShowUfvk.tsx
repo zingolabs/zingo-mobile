@@ -14,7 +14,7 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import RegText from '../Components/RegText';
-import { ModeEnum } from '../../app/AppState';
+import { ChainNameEnum, ModeEnum } from '../../app/AppState';
 
 type TextsType = {
   new: string[];
@@ -65,7 +65,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
         : action === 'server'
         ? (translate('ufvk.server-warning') as string)
         : '') +
-        (server.chain_name !== 'main' && (action === 'change' || action === 'server')
+        (server.chain_name !== ChainNameEnum.main && (action === 'change' || action === 'server')
           ? '\n' + (translate('ufvk.mainnet-warning') as string)
           : ''),
       [

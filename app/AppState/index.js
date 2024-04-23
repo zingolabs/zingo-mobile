@@ -31,6 +31,8 @@ import { MenuItemEnum } from './enums/MenuItemEnum';
 import { LanguageEnum } from './enums/LanguageEnum';
 import { ModeEnum } from './enums/ModeEnum';
 import { CurrencyEnum } from './enums/CurrencyEnum';
+import { SelectServerEnum } from './enums/SelectServerEnum';
+import { ChainNameEnum } from './enums/ChainNameEnum';
 
 import AppStateLoaded from './AppStateLoaded';
 import AppStateLoading from './AppStateLoading';
@@ -69,4 +71,6 @@ export {
   LanguageEnum,
   ModeEnum,
   CurrencyEnum,
+  SelectServerEnum,
+  ChainNameEnum,
 };

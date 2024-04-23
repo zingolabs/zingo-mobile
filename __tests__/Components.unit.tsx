@@ -12,7 +12,7 @@ import BoldText from '../components/Components/BoldText';
 import FadeText from '../components/Components/FadeText';
 import ErrorText from '../components/Components/ErrorText';
 import RegText from '../components/Components/RegText';
-import { CurrencyEnum } from '../app/AppState/enums/CurrencyEnum';
+import { CurrencyEnum } from '../app/AppState';
 
 jest.mock('react-native-localize', () => ({
   getNumberFormatSettings: () => {

@@ -11,6 +11,7 @@ import {
   TranslateType,
   SyncingStatusClass,
   CommandEnum,
+  ChainNameEnum,
 } from '../AppState';
 import RPCModule from '../RPCModule';
 import { RPCAddressType } from './types/RPCAddressType';
@@ -211,7 +212,7 @@ export default class RPC {
         connections: 1,
         version: `${infoJSON.vendor}/${infoJSON.git_commit.substring(0, 6)}/${infoJSON.version}`,
         verificationProgress: 1,
-        currencyName: infoJSON.chain_name === 'main' ? 'ZEC' : 'TAZ',
+        currencyName: infoJSON.chain_name === ChainNameEnum.main ? 'ZEC' : 'TAZ',
         solps: 0,
         zingolib: zingolibStr,
       };

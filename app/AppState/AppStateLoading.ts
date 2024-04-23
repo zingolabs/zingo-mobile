@@ -12,10 +12,12 @@ import BackgroundErrorType from './types/BackgroundErrorType';
 import ServerType from './types/ServerType';
 import SnackbarType from './types/SnackbarType';
 import SecurityType from './types/SecurityType';
+
 import { CurrencyEnum } from './enums/CurrencyEnum';
 import { LanguageEnum } from './enums/LanguageEnum';
 import { ModeEnum } from './enums/ModeEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
+import { ChainNameEnum } from './enums/ChainNameEnum';
 
 export default interface AppStateLoading {
   navigation: StackScreenProps<any>['navigation'];
@@ -48,7 +50,7 @@ export default interface AppStateLoading {
 
   customServerShow: boolean;
   customServerUri: string;
-  customServerChainName: 'main' | 'test' | 'regtest';
+  customServerChainName: ChainNameEnum;
 
   mode: ModeEnum;
   snackbars: SnackbarType[];

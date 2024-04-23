@@ -8,8 +8,7 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import History from '../components/History';
 import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
-import { CurrencyEnum } from '../app/AppState/enums/CurrencyEnum';
-import { ModeEnum } from '../app/AppState';
+import { CurrencyEnum, ModeEnum } from '../app/AppState';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({

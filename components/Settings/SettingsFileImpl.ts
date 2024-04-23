@@ -1,6 +1,13 @@
 import * as RNFS from 'react-native-fs';
 
-import { SecurityType, SelectServerEnum, ServerType, ServerUrisType, SettingsFileClass } from '../../app/AppState';
+import {
+  ChainNameEnum,
+  SecurityType,
+  SelectServerEnum,
+  ServerType,
+  ServerUrisType,
+  SettingsFileClass,
+} from '../../app/AppState';
 import { serverUris } from '../../app/uris';
 import { isEqual } from 'lodash';
 
@@ -57,7 +64,7 @@ export default class SettingsFileImpl {
         } as ServerType;
       } else {
         if (typeof settings.server === 'string') {
-          const ss: ServerType = { uri: settings.server, chain_name: 'main' };
+          const ss: ServerType = { uri: settings.server, chain_name: ChainNameEnum.main };
           const standard = serverUris(() => {}).find((s: ServerUrisType) =>
             isEqual({ uri: s.uri, chain_name: s.chain_name } as ServerType, ss as ServerType),
           );

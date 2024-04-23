@@ -28,6 +28,7 @@ import {
   ModeEnum,
   CurrencyEnum,
   SelectServerEnum,
+  ChainNameEnum,
 } from '../../app/AppState';
 import { isEqual } from 'lodash';
 import ChainTypeToggle from '../Components/ChainTypeToggle';
@@ -420,7 +421,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     ));
   };
 
-  const onPressServerChainName = (chain: 'main' | 'test' | 'regtest') => {
+  const onPressServerChainName = (chain: ChainNameEnum) => {
     setCustomServerChainName(chain);
   };
 

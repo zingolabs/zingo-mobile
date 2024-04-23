@@ -15,7 +15,7 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
-import { CurrencyEnum } from '../../app/AppState/enums/CurrencyEnum';
+import { ChainNameEnum, CurrencyEnum } from '../../app/AppState';
 
 type InfoProps = {
   closeModal: () => void;
@@ -70,11 +70,11 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal, setZecPrice }) =
             value={
               !info.chain_name
                 ? (translate('loading') as string)
-                : info.chain_name === 'main'
+                : info.chain_name === ChainNameEnum.main
                 ? 'Mainnet'
-                : info.chain_name === 'test'
+                : info.chain_name === ChainNameEnum.test
                 ? 'Testnet'
-                : info.chain_name === 'regtest'
+                : info.chain_name === ChainNameEnum.regtest
                 ? 'Regtest'
                 : (translate('info.unknown') as string) + ' (' + info.chain_name + ')'
             }

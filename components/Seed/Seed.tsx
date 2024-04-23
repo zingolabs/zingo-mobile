@@ -18,6 +18,7 @@ import {
   TranslateType,
   WalletType,
   ModeEnum,
+  ChainNameEnum,
 } from '../../app/AppState';
 import RPCModule from '../../app/RPCModule';
 import RPC from '../../app/rpc';
@@ -212,7 +213,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
         : action === 'server'
         ? (translate('seed.server-warning') as string)
         : '') +
-        (server.chain_name !== 'main' && (action === 'change' || action === 'server')
+        (server.chain_name !== ChainNameEnum.main && (action === 'change' || action === 'server')
           ? '\n' + (translate('seed.mainnet-warning') as string)
           : ''),
       [

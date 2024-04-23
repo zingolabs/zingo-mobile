@@ -6,7 +6,7 @@ import { getNumberFormatSettings } from 'react-native-localize';
 
 import { ThemeType } from '../../app/types';
 import Utils from '../../app/utils';
-import { CurrencyEnum } from '../../app/AppState/enums/CurrencyEnum';
+import { CurrencyEnum } from '../../app/AppState';
 
 type CurrencyAmountProps = {
   price?: number;

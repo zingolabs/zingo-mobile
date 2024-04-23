@@ -41,6 +41,7 @@ import {
   CurrencyEnum,
   ModeEnum,
   SelectServerEnum,
+  ChainNameEnum,
 } from '../AppState';
 import { parseServerURI, serverUris } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
@@ -725,7 +726,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
         server: { uri, chain_name },
         customServerShow: false,
         customServerUri: '',
-        customServerChainName: 'main',
+        customServerChainName: ChainNameEnum.main,
       });
     }
     this.setState({ actionButtonsDisabled: false });
@@ -799,8 +800,8 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
       return;
     }
     if (
-      (seed_ufvk.toLowerCase().startsWith('uview') && this.state.server.chain_name !== 'main') ||
-      (seed_ufvk.toLowerCase().startsWith('utestview') && this.state.server.chain_name === 'main')
+      (seed_ufvk.toLowerCase().startsWith('uview') && this.state.server.chain_name !== ChainNameEnum.main) ||
+      (seed_ufvk.toLowerCase().startsWith('utestview') && this.state.server.chain_name === ChainNameEnum.main)
     ) {
       createAlert(
         this.setBackgroundError,
@@ -887,7 +888,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     }
   };
 
-  onPressServerChainName = (chain: 'main' | 'test' | 'regtest') => {
+  onPressServerChainName = (chain: ChainNameEnum) => {
     this.setState({ customServerChainName: chain });
   };
 

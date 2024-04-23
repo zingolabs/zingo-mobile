@@ -7,11 +7,12 @@ import SendPageStateClass from './classes/SendPageStateClass';
 import SendProgressClass from './classes/SendProgressClass';
 import ReceivePageStateClass from './classes/ReceivePageStateClass';
 import WalletSettingsClass from './classes/WalletSettingsClass';
+import AddressBookFileClass from './classes/AddressBookFileClass';
+import SyncingStatusClass from './classes/SyncingStatusClass';
 
 import TransactionType from './types/TransactionType';
 import InfoType from './types/InfoType';
 import WalletType from './types/WalletType';
-import SyncingStatusClass from './classes/SyncingStatusClass';
 import ZecPriceType from './types/ZecPriceType';
 import BackgroundType from './types/BackgroundType';
 import { TranslateType } from './types/TranslateType';
@@ -19,8 +20,8 @@ import NetInfoType from './types/NetInfoType';
 import BackgroundErrorType from './types/BackgroundErrorType';
 import ServerType from './types/ServerType';
 import SnackbarType from './types/SnackbarType';
-import AddressBookFileClass from './classes/AddressBookFileClass';
 import SecurityType from './types/SecurityType';
+
 import { MenuItemEnum } from './enums/MenuItemEnum';
 import { LanguageEnum } from './enums/LanguageEnum';
 import { CurrencyEnum } from './enums/CurrencyEnum';

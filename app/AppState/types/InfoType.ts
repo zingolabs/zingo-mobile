@@ -1,5 +1,7 @@
+import { ChainNameEnum } from '../enums/ChainNameEnum';
+
 export default interface InfoType {
-  chain_name: 'main' | 'test' | 'regtest';
+  chain_name: ChainNameEnum;
   serverUri: string;
   latestBlock: number;
   connections: number;

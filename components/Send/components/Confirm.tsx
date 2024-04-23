@@ -24,7 +24,7 @@ import { ThemeType } from '../../../app/types';
 import RPC from '../../../app/rpc';
 import Utils from '../../../app/utils';
 import { CommandEnum } from '../../../app/AppState';
-import { CurrencyEnum } from '../../../app/AppState/enums/CurrencyEnum';
+import { CurrencyEnum } from '../../../app/AppState';
 
 type ConfirmProps = {
   calculatedFee: number;

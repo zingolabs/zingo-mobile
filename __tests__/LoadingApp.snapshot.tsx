@@ -13,8 +13,15 @@ import { ThemeType } from '../app/types';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { I18n } from 'i18n-js';
 import { StackScreenProps } from '@react-navigation/stack';
-import { BackgroundType, LanguageEnum, ModeEnum, SelectServerEnum, ServerType } from '../app/AppState';
-import { CurrencyEnum } from '../app/AppState/enums/CurrencyEnum';
+import {
+  BackgroundType,
+  ChainNameEnum,
+  LanguageEnum,
+  ModeEnum,
+  SelectServerEnum,
+  ServerType,
+  CurrencyEnum,
+} from '../app/AppState';
 
 // Crea un mock para el constructor de I18n
 jest.mock('i18n-js', () => ({
@@ -117,7 +124,7 @@ describe('Component LoadingApp - test', () => {
     const currency = CurrencyEnum.noCurrency;
     const server: ServerType = {
       uri: 'https://mainnet.lightwalletd.com:9067',
-      chain_name: 'main',
+      chain_name: ChainNameEnum.main,
     };
     const sendAll = false;
     const donation = false;

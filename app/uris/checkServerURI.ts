@@ -1,15 +1,15 @@
-import { CommandEnum } from '../AppState';
+import { ChainNameEnum, CommandEnum } from '../AppState';
 import RPCModule from '../RPCModule';
 import { RPCInfoType } from '../rpc/types/RPCInfoType';
 
 type checkServerURIReturn = {
   result: boolean;
   timeout: boolean;
-  new_chain_name?: 'main' | 'test' | 'regtest';
+  new_chain_name?: ChainNameEnum;
 };
 
 const checkServerURI = async (uri: string, oldUri: string): Promise<checkServerURIReturn> => {
-  let new_chain_name: 'main' | 'test' | 'regtest' | undefined;
+  let new_chain_name: ChainNameEnum | undefined;
 
   try {
     const resultStrServerPromise = RPCModule.execute(CommandEnum.changeserver, uri);
