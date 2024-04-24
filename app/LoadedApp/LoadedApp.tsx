@@ -58,6 +58,8 @@ import {
   UfvkActionEnum,
   SettingsNameEnum,
   RouteEnums,
+  SnackbarType,
+  AppStateStatusEnum,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
@@ -68,7 +70,6 @@ import BackgroundFileImpl from '../../components/Background/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '../createAlert';
 import Snackbars from '../../components/Components/Snackbars';
-import SnackbarType from '../AppState/types/SnackbarType';
 import { RPCSeedType } from '../rpc/types/RPCSeedType';
 import { Launching } from '../LoadingApp';
 import AddressBook from '../../components/AddressBook/AddressBook';
@@ -340,7 +341,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       mode: props.mode,
       background: props.background,
       readOnly: props.readOnly,
-      appState: Platform.OS === 'ios' ? 'active' : AppState.currentState,
+      appState: Platform.OS === 'ios' ? AppStateStatusEnum.active : AppState.currentState,
       setBackgroundError: this.setBackgroundError,
       addLastSnackbar: this.addLastSnackbar,
       restartApp: this.navigateToLoadingApp,
@@ -381,14 +382,14 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       console.log('LOADED', 'prior', this.state.appState, 'next', nextAppState);
       if (Platform.OS === 'ios') {
         if (
-          (this.state.appState === 'inactive' && nextAppState === 'active') ||
-          (this.state.appState === 'active' && nextAppState === 'inactive')
+          (this.state.appState === AppStateStatusEnum.inactive && nextAppState === AppStateStatusEnum.active) ||
+          (this.state.appState === AppStateStatusEnum.active && nextAppState === AppStateStatusEnum.inactive)
         ) {
           console.log('LOADED SAVED IOS do nothing', nextAppState);
           this.setState({ appState: nextAppState });
           return;
         }
-        if (this.state.appState === 'inactive' && nextAppState === 'background') {
+        if (this.state.appState === AppStateStatusEnum.inactive && nextAppState === AppStateStatusEnum.background) {
           console.log('App LOADED IOS is gone to the background!');
           // re-activate the interruption sync flag
           await RPC.rpc_setInterruptSyncAfterBatch('true');
@@ -405,13 +406,15 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
           return;
         }
       }
-      if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
+      if (
+        (this.state.appState === AppStateStatusEnum.inactive ||
+          this.state.appState === AppStateStatusEnum.background) &&
+        nextAppState === AppStateStatusEnum.active
+      ) {
         console.log('App LOADED Android & IOS has come to the foreground!');
         if (Platform.OS === 'ios') {
-          if (this.state.appState !== nextAppState) {
-            console.log('LOADED SAVED IOS foreground', nextAppState);
-            this.setState({ appState: nextAppState });
-          }
+          console.log('LOADED SAVED IOS foreground', nextAppState);
+          this.setState({ appState: nextAppState });
         }
         // (PIN or TouchID or FaceID)
         const resultBio = this.state.security.foregroundApp
@@ -437,7 +440,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
             this.setBackgroundError('', '');
           }
         }
-      } else if (this.state.appState === 'active' && nextAppState.match(/inactive|background/)) {
+      } else if (
+        this.state.appState === AppStateStatusEnum.active &&
+        (nextAppState === AppStateStatusEnum.inactive || nextAppState === AppStateStatusEnum.background)
+      ) {
         console.log('App LOADED is gone to the background!');
         // re-activate the interruption sync flag
         await RPC.rpc_setInterruptSyncAfterBatch('true');
@@ -450,10 +456,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
         this.setSyncingStatus(new SyncingStatusClass());
         //console.log('clear sync status state');
         if (Platform.OS === 'ios') {
-          if (this.state.appState !== nextAppState) {
-            console.log('LOADED SAVED IOS background', nextAppState);
-            this.setState({ appState: nextAppState });
-          }
+          console.log('LOADED SAVED IOS background', nextAppState);
+          this.setState({ appState: nextAppState });
         }
       } else {
         if (Platform.OS === 'ios') {

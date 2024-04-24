@@ -22,13 +22,13 @@ import {
   SnackbarDurationEnum,
   SeedActionEnum,
   SettingsNameEnum,
+  SnackbarType,
 } from '../../app/AppState';
 import RPCModule from '../../app/RPCModule';
 import RPC from '../../app/rpc';
 import Header from '../Header';
 import Utils from '../../app/utils';
 import { createAlert } from '../../app/createAlert';
-import SnackbarType from '../../app/AppState/types/SnackbarType';
 import SettingsFileImpl from '../Settings/SettingsFileImpl';
 import moment from 'moment';
 import 'moment/locale/es';

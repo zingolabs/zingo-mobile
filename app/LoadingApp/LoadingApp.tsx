@@ -48,6 +48,8 @@ import {
   SettingsNameEnum,
   RouteEnums,
   WalletOptionEnum,
+  SnackbarType,
+  AppStateStatusEnum,
 } from '../AppState';
 import { parseServerURI, serverUris } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
@@ -59,7 +61,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '../createAlert';
 import { RPCWalletKindType } from '../rpc/types/RPCWalletKindType';
 import Snackbars from '../../components/Components/Snackbars';
-import SnackbarType from '../AppState/types/SnackbarType';
 import { RPCSeedType } from '../rpc/types/RPCSeedType';
 import Launching from './Launching';
 import simpleBiometrics from '../simpleBiometrics';
@@ -505,7 +506,11 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
 
     this.appstate = AppState.addEventListener('change', async nextAppState => {
       console.log('LOADING', 'next', nextAppState, 'prior', this.state.appState);
-      if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
+      if (
+        (this.state.appState === AppStateStatusEnum.inactive ||
+          this.state.appState === AppStateStatusEnum.background) &&
+        nextAppState === AppStateStatusEnum.active
+      ) {
         console.log('App LOADING has come to the foreground!');
         // reading background task info
         this.fetchBackgroundSyncing();
@@ -516,7 +521,10 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
           this.setBackgroundError('', '');
         }
       }
-      if (nextAppState.match(/inactive|background/) && this.state.appState === 'active') {
+      if (
+        (nextAppState === AppStateStatusEnum.inactive || nextAppState === AppStateStatusEnum.background) &&
+        this.state.appState === AppStateStatusEnum.active
+      ) {
         console.log('App LOADING is gone to the background!');
         // setting value for background task Android
         await AsyncStorage.setItem('@background', 'yes');

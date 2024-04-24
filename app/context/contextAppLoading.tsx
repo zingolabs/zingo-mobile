@@ -17,13 +17,14 @@ import {
   CurrencyEnum,
   SelectServerEnum,
   ChainNameEnum,
+  SnackbarType,
+  AppStateStatusEnum,
 } from '../AppState';
-import SnackbarType from '../AppState/types/SnackbarType';
 
 export const defaultAppStateLoading: AppStateLoading = {
   navigation: {} as StackScreenProps<any>['navigation'],
   route: {} as StackScreenProps<any>['route'],
-  appState: '',
+  appState: AppStateStatusEnum.unknown,
   netInfo: {} as NetInfoType,
 
   screen: 0,

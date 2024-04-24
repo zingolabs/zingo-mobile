@@ -44,6 +44,7 @@ import { UfvkActionEnum } from './enums/UfvkActionEnum';
 import { SettingsNameEnum } from './enums/SettingsNameEnum';
 import { RouteEnums } from './enums/RouteEnums';
 import { WalletOptionEnum } from './enums/WalletOptionEnum';
+import { AppStateStatusEnum } from './enums/AppStateStatusEnum';
 
 import AppStateLoaded from './AppStateLoaded';
 import AppStateLoading from './AppStateLoading';
@@ -95,4 +96,5 @@ export {
   SettingsNameEnum,
   RouteEnums,
   WalletOptionEnum,
+  AppStateStatusEnum,
 };

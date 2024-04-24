@@ -24,6 +24,7 @@ import {
   SnackbarDurationEnum,
   PoolToShieldEnum,
   SettingsNameEnum,
+  SnackbarType,
 } from '../../app/AppState';
 import { ContextAppLoaded } from '../../app/context';
 import { ThemeType } from '../../app/types';
@@ -37,7 +38,6 @@ import RPC from '../../app/rpc';
 import { RPCShieldType } from '../../app/rpc/types/RPCShieldType';
 import { createAlert } from '../../app/createAlert';
 import { Animated } from 'react-native';
-import SnackbarType from '../../app/AppState/types/SnackbarType';
 import FadeText from '../Components/FadeText';
 import simpleBiometrics from '../../app/simpleBiometrics';
 import moment from 'moment';

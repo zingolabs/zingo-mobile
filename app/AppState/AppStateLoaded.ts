@@ -27,11 +27,12 @@ import { LanguageEnum } from './enums/LanguageEnum';
 import { CurrencyEnum } from './enums/CurrencyEnum';
 import { ModeEnum } from './enums/ModeEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
+import { AppStateStatus } from 'react-native';
 
 export default interface AppStateLoaded {
   navigation: StackScreenProps<any>['navigation'];
   route: StackScreenProps<any>['route'];
-  appState: string;
+  appState: AppStateStatus;
   netInfo: NetInfoType;
 
   // The total confirmed and unconfirmed balance in this wallet

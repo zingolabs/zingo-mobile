@@ -18,11 +18,12 @@ import { LanguageEnum } from './enums/LanguageEnum';
 import { ModeEnum } from './enums/ModeEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
 import { ChainNameEnum } from './enums/ChainNameEnum';
+import { AppStateStatus } from 'react-native';
 
 export default interface AppStateLoading {
   navigation: StackScreenProps<any>['navigation'];
   route: StackScreenProps<any>['route'];
-  appState: string;
+  appState: AppStateStatus;
   netInfo: NetInfoType;
 
   screen: number;

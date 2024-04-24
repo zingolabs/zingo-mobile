@@ -1,7 +1,7 @@
 import React, { useEffect, useCallback, useState } from 'react';
 import { View } from 'react-native';
 import Snackbar from 'react-native-snackbar';
-import SnackbarType from '../../app/AppState/types/SnackbarType';
+import { SnackbarType } from '../../app/AppState';
 import { SnackbarDurationEnum, TranslateType } from '../../app/AppState';
 import { ThemeType } from '../../app/types';
 import { useTheme } from '@react-navigation/native';
