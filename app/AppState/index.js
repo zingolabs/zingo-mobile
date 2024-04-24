@@ -48,6 +48,7 @@ import { AppStateStatusEnum } from './enums/AppStateStatusEnum';
 import { CurrencyNameEnum } from './enums/CurrencyNameEnum';
 import { ButtonTypeEnum } from './enums/ButtonTypeEnum';
 import { AddressKindEnum } from './enums/AddressKindEnum';
+import { ReceiverEnum } from './enums/ReceiverEnum';
 
 import AppStateLoaded from './AppStateLoaded';
 import AppStateLoading from './AppStateLoading';
@@ -103,4 +104,5 @@ export {
   CurrencyNameEnum,
   ButtonTypeEnum,
   AddressKindEnum,
+  ReceiverEnum,
 };

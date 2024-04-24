@@ -14,6 +14,7 @@ import {
   CurrencyNameEnum,
   ModeEnum,
   PoolEnum,
+  ReceiverEnum,
   TransactionTypeEnum,
 } from '../app/AppState';
 
@@ -156,21 +157,21 @@ describe('Component History - test', () => {
       address: 'UA-12345678901234567890',
       addressKind: AddressKindEnum.u,
       containsPending: false,
-      receivers: 'ozt',
+      receivers: ReceiverEnum.o + ReceiverEnum.z + ReceiverEnum.t,
     },
     {
       uaAddress: 'UA-12345678901234567890',
       address: 'sapling-12345678901234567890',
       addressKind: AddressKindEnum.z,
       containsPending: false,
-      receivers: 'z',
+      receivers: ReceiverEnum.z,
     },
     {
       uaAddress: 'UA-12345678901234567890',
       address: 'transparent-12345678901234567890',
       addressKind: AddressKindEnum.t,
       containsPending: false,
-      receivers: 't',
+      receivers: ReceiverEnum.t,
     },
   ];
   state.translate = () => 'text translated';

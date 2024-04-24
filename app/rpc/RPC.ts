@@ -17,6 +17,7 @@ import {
   WalletOptionEnum,
   CurrencyNameEnum,
   AddressKindEnum,
+  ReceiverEnum,
 } from '../AppState';
 import RPCModule from '../RPCModule';
 import { RPCAddressType } from './types/RPCAddressType';
@@ -1365,9 +1366,9 @@ export default class RPC {
       addressesJSON.forEach((u: RPCAddressType) => {
         // If this has any unconfirmed txns, show that in the UI
         const receivers: string =
-          (u.receivers.orchard_exists ? 'o' : '') +
-          (u.receivers.sapling ? 'z' : '') +
-          (u.receivers.transparent ? 't' : '');
+          (u.receivers.orchard_exists ? ReceiverEnum.o : '') +
+          (u.receivers.sapling ? ReceiverEnum.z : '') +
+          (u.receivers.transparent ? ReceiverEnum.t : '');
         if (u.address) {
           const abu = new AddressClass(u.address, u.address, AddressKindEnum.u, receivers);
           if (pendingAddress.has(abu.address)) {
