@@ -46,6 +46,7 @@ import {
   SnackbarDurationEnum,
   SeedActionEnum,
   SettingsNameEnum,
+  RouteEnums,
 } from '../AppState';
 import { parseServerURI, serverUris } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
@@ -742,7 +743,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     const { navigation } = this.props;
     navigation.reset({
       index: 0,
-      routes: [{ name: 'LoadedApp', params: { readOnly: this.state.readOnly } }],
+      routes: [{ name: RouteEnums.LoadedApp, params: { readOnly: this.state.readOnly } }],
     });
   };
 

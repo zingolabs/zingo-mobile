@@ -57,6 +57,7 @@ import {
   SeedActionEnum,
   UfvkActionEnum,
   SettingsNameEnum,
+  RouteEnums,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
@@ -484,7 +485,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
         this.readUrl(url);
       } else {
         this.closeAllModals();
-        this.state.navigation.navigate('LoadedApp', {
+        this.state.navigation.navigate(RouteEnums.LoadedApp, {
           screen: this.state.translate('loadedapp.send-menu'),
           initial: false,
         });
@@ -572,7 +573,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
 
         this.setSendPageState(newSendPageState);
         this.closeAllModals();
-        this.state.navigation.navigate('LoadedApp', {
+        this.state.navigation.navigate(RouteEnums.LoadedApp, {
           screen: this.state.translate('loadedapp.send-menu'),
           initial: false,
         });
@@ -1194,7 +1195,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       index: 0,
       routes: [
         {
-          name: 'LoadingApp',
+          name: RouteEnums.LoadingApp,
           params: state,
         },
       ],

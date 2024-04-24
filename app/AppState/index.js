@@ -42,6 +42,7 @@ import { PoolToShieldEnum } from './enums/PoolToShieldEnum';
 import { SeedActionEnum } from './enums/SeedActionEnum';
 import { UfvkActionEnum } from './enums/UfvkActionEnum';
 import { SettingsNameEnum } from './enums/SettingsNameEnum';
+import { RouteEnums } from './enums/RouteEnums';
 
 import AppStateLoaded from './AppStateLoaded';
 import AppStateLoading from './AppStateLoading';
@@ -91,4 +92,5 @@ export {
   SeedActionEnum,
   UfvkActionEnum,
   SettingsNameEnum,
+  RouteEnums,
 };

@@ -7,7 +7,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { LoadedApp } from './app/LoadedApp';
 import { LoadingApp } from './app/LoadingApp';
 import { ThemeType } from './app/types';
-import { ModeEnum } from './app/AppState';
+import { ModeEnum, RouteEnums } from './app/AppState';
 
 const advancedTheme: ThemeType = {
   dark: true,
@@ -63,9 +63,15 @@ const App: React.FunctionComponent = () => {
           justifyContent: 'center',
           backgroundColor: theme.colors.card,
         }}>
-        <Stack.Navigator initialRouteName="LoadingApp" screenOptions={{ headerShown: false, animationEnabled: false }}>
-          <Stack.Screen name="LoadingApp">{props => <LoadingApp {...props} toggleTheme={toggleTheme} />}</Stack.Screen>
-          <Stack.Screen name="LoadedApp">{props => <LoadedApp {...props} toggleTheme={toggleTheme} />}</Stack.Screen>
+        <Stack.Navigator
+          initialRouteName={RouteEnums.LoadingApp}
+          screenOptions={{ headerShown: false, animationEnabled: false }}>
+          <Stack.Screen name={RouteEnums.LoadingApp}>
+            {props => <LoadingApp {...props} toggleTheme={toggleTheme} />}
+          </Stack.Screen>
+          <Stack.Screen name={RouteEnums.LoadedApp}>
+            {props => <LoadedApp {...props} toggleTheme={toggleTheme} />}
+          </Stack.Screen>
         </Stack.Navigator>
       </SafeAreaView>
     </NavigationContainer>

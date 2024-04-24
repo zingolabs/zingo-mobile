@@ -11,6 +11,7 @@ import {
   ToAddrClass,
   ModeEnum,
   SnackbarDurationEnum,
+  RouteEnums,
 } from '../../app/AppState';
 import { useTheme } from '@react-navigation/native';
 import { ThemeType } from '../../app/types';
@@ -198,7 +199,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
               sendPageState.toaddr.to = address;
               setSendPageState(sendPageState);
               closeModal();
-              navigation.navigate('LoadedApp', {
+              navigation.navigate(RouteEnums.LoadedApp, {
                 screen: translate('loadedapp.send-menu'),
                 initial: false,
               });

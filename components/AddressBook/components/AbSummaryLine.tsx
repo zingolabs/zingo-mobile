@@ -13,6 +13,7 @@ import {
   SendPageStateClass,
   ToAddrClass,
   ModeEnum,
+  RouteEnums,
 } from '../../../app/AppState';
 import Utils from '../../../app/utils';
 import { ThemeType } from '../../../app/types';
@@ -131,7 +132,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
                   sendPageState.toaddr.to = item.address;
                   setSendPageState(sendPageState);
                   closeModal();
-                  navigation.navigate('LoadedApp', {
+                  navigation.navigate(RouteEnums.LoadedApp, {
                     screen: translate('loadedapp.send-menu'),
                     initial: false,
                   });
