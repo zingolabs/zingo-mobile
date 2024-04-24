@@ -1,5 +1,5 @@
 export enum RPCReceiversEnum {
-  orchardReceiver = 'orchard',
-  saplingReceiver = 'sapling',
-  transparentReceiver = 'transparent',
+  orchardRPCReceiver = 'orchard',
+  saplingRPCReceiver = 'sapling',
+  transparentRPCReceiver = 'transparent',
 }

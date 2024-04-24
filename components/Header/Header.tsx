@@ -661,9 +661,10 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               }`,
             ) as string) +
               ` ${
-                poolsToShield === 'sapling' && totalBalance.spendablePrivate > Utils.getShieldingFee()
+                poolsToShield === PoolToShieldEnum.saplingPoolToShield &&
+                totalBalance.spendablePrivate > Utils.getShieldingFee()
                   ? Utils.parseNumberFloatToStringLocale(totalBalance.spendablePrivate - Utils.getShieldingFee(), 8)
-                  : poolsToShield === 'transparent' &&
+                  : poolsToShield === PoolToShieldEnum.transparentPoolToShield &&
                     (someUnconfirmed ? 0 : totalBalance.transparentBal) > Utils.getShieldingFee()
                   ? Utils.parseNumberFloatToStringLocale(
                       (someUnconfirmed ? 0 : totalBalance.transparentBal) - Utils.getShieldingFee(),
@@ -710,9 +711,10 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               }
               onPress={onPressShieldFunds}
               disabled={
-                poolsToShield === 'sapling' && totalBalance.spendablePrivate > Utils.getShieldingFee()
+                poolsToShield === PoolToShieldEnum.saplingPoolToShield &&
+                totalBalance.spendablePrivate > Utils.getShieldingFee()
                   ? false
-                  : poolsToShield === 'transparent' &&
+                  : poolsToShield === PoolToShieldEnum.transparentPoolToShield &&
                     (someUnconfirmed ? 0 : totalBalance.transparentBal) > Utils.getShieldingFee()
                   ? false
                   : poolsToShieldSelectSapling &&

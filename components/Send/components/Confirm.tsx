@@ -23,7 +23,7 @@ import 'moment/locale/ru';
 import { ThemeType } from '../../../app/types';
 import RPC from '../../../app/rpc';
 import Utils from '../../../app/utils';
-import { ButtonTypeEnum, CommandEnum } from '../../../app/AppState';
+import { ButtonTypeEnum, CommandEnum, PrivacyLevelFromEnum } from '../../../app/AppState';
 import { CurrencyEnum } from '../../../app/AppState';
 import { RPCAdressKindEnum } from '../../../app/rpc/enums/RPCAddressKindEnum';
 import { RPCReceiversEnum } from '../../../app/rpc/enums/RPCReceiversEnum';
@@ -79,27 +79,27 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
       return '-';
     }
 
-    let from: 'orchard' | 'orchard+sapling' | 'sapling' | '' = '';
+    let from: PrivacyLevelFromEnum = PrivacyLevelFromEnum.nonePrivacyLevel;
     // amount + fee
     if (
       Utils.parseStringLocaletoNumberFloat(sendPageState.toaddr.amount) + calculatedFee <=
       totalBalance.spendableOrchard
     ) {
-      from = 'orchard';
+      from = PrivacyLevelFromEnum.orchardPrivacyLevel;
     } else if (
       totalBalance.spendableOrchard > 0 &&
       Utils.parseStringLocaletoNumberFloat(sendPageState.toaddr.amount) + calculatedFee <=
         totalBalance.spendableOrchard + totalBalance.spendablePrivate
     ) {
-      from = 'orchard+sapling';
+      from = PrivacyLevelFromEnum.orchardAndSaplingPrivacyLevel;
     } else if (
       Utils.parseStringLocaletoNumberFloat(sendPageState.toaddr.amount) + calculatedFee <=
       totalBalance.spendablePrivate
     ) {
-      from = 'sapling';
+      from = PrivacyLevelFromEnum.saplingPrivacyLevel;
     }
 
-    if (from === '') {
+    if (from === PrivacyLevelFromEnum.nonePrivacyLevel) {
       return '-';
     }
 
@@ -128,39 +128,39 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
 
     // Private -> orchard to orchard (UA with orchard receiver)
     if (
-      from === 'orchard' &&
+      from === PrivacyLevelFromEnum.orchardPrivacyLevel &&
       resultJSON.address_kind === RPCAdressKindEnum.unifiedAddressKind &&
-      resultJSON.receivers_available?.includes(RPCReceiversEnum.orchardReceiver)
+      resultJSON.receivers_available?.includes(RPCReceiversEnum.orchardRPCReceiver)
     ) {
       return translate('send.private') as string;
     }
 
     // Private -> sapling to sapling (ZA or UA with sapling receiver and NO orchard receiver)
     if (
-      from === 'sapling' &&
+      from === PrivacyLevelFromEnum.saplingPrivacyLevel &&
       (resultJSON.address_kind === RPCAdressKindEnum.saplingAddressKind ||
         (resultJSON.address_kind === RPCAdressKindEnum.unifiedAddressKind &&
-          resultJSON.receivers_available?.includes(RPCReceiversEnum.saplingReceiver) &&
-          !resultJSON.receivers_available?.includes(RPCReceiversEnum.orchardReceiver)))
+          resultJSON.receivers_available?.includes(RPCReceiversEnum.saplingRPCReceiver) &&
+          !resultJSON.receivers_available?.includes(RPCReceiversEnum.orchardRPCReceiver)))
     ) {
       return translate('send.private') as string;
     }
 
     // Amount Revealed -> orchard to sapling (ZA or UA with sapling receiver)
     if (
-      from === 'orchard' &&
+      from === PrivacyLevelFromEnum.orchardPrivacyLevel &&
       (resultJSON.address_kind === RPCAdressKindEnum.saplingAddressKind ||
         (resultJSON.address_kind === RPCAdressKindEnum.unifiedAddressKind &&
-          resultJSON.receivers_available?.includes(RPCReceiversEnum.saplingReceiver)))
+          resultJSON.receivers_available?.includes(RPCReceiversEnum.saplingRPCReceiver)))
     ) {
       return translate('send.amountrevealed') as string;
     }
 
     // Amount Revealed -> sapling to orchard (UA with orchard receiver)
     if (
-      from === RPCAdressKindEnum.saplingAddressKind &&
+      from === PrivacyLevelFromEnum.saplingPrivacyLevel &&
       resultJSON.address_kind === RPCAdressKindEnum.unifiedAddressKind &&
-      resultJSON.receivers_available?.includes(RPCReceiversEnum.orchardReceiver)
+      resultJSON.receivers_available?.includes(RPCReceiversEnum.orchardRPCReceiver)
     ) {
       return translate('send.amountrevealed') as string;
     }
@@ -168,19 +168,21 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     // Amount Revealed -> sapling+orchard to orchard or sapling (UA with orchard receiver or ZA or
     // UA with sapling receiver)
     if (
-      from === 'orchard+sapling' &&
+      from === PrivacyLevelFromEnum.orchardAndSaplingPrivacyLevel &&
       (resultJSON.address_kind === RPCAdressKindEnum.saplingAddressKind ||
         (resultJSON.address_kind === RPCAdressKindEnum.unifiedAddressKind &&
-          (resultJSON.receivers_available?.includes(RPCReceiversEnum.orchardReceiver) ||
-            resultJSON.receivers_available?.includes(RPCReceiversEnum.saplingReceiver))))
+          (resultJSON.receivers_available?.includes(RPCReceiversEnum.orchardRPCReceiver) ||
+            resultJSON.receivers_available?.includes(RPCReceiversEnum.saplingRPCReceiver))))
     ) {
       return translate('send.amountrevealed') as string;
     }
 
     // Deshielded -> orchard or sapling or orchard+sapling to transparent
     if (
-      (from === 'orchard' || from === 'sapling' || from === 'orchard+sapling') &&
-      resultJSON.address_kind === 'transparent'
+      (from === PrivacyLevelFromEnum.orchardPrivacyLevel ||
+        from === PrivacyLevelFromEnum.saplingPrivacyLevel ||
+        from === PrivacyLevelFromEnum.orchardAndSaplingPrivacyLevel) &&
+      resultJSON.address_kind === RPCAdressKindEnum.transparentAddressKind
     ) {
       return translate('send.deshielded') as string;
     }

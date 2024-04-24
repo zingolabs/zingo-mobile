@@ -49,6 +49,7 @@ import { CurrencyNameEnum } from './enums/CurrencyNameEnum';
 import { ButtonTypeEnum } from './enums/ButtonTypeEnum';
 import { AddressKindEnum } from './enums/AddressKindEnum';
 import { ReceiverEnum } from './enums/ReceiverEnum';
+import { PrivacyLevelFromEnum } from './enums/PrivacyLevelFromEnum';
 
 import AppStateLoaded from './AppStateLoaded';
 import AppStateLoading from './AppStateLoading';
@@ -105,4 +106,5 @@ export {
   ButtonTypeEnum,
   AddressKindEnum,
   ReceiverEnum,
+  PrivacyLevelFromEnum,
 };
