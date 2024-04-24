@@ -20,11 +20,11 @@ const parseServerURI = (uri: string, translate: (key: string) => TranslateType):
 
   if (!port) {
     // I need to verify if the URI have a standard port like `443` or `80`
-    if (parsedUri.protocol === 'http:' && uri.includes(':80')) {
+    if (parsedUri.protocol === 'http:' && uri.endsWith(':80')) {
       // loking for 80
       port = '80';
     }
-    if (parsedUri.protocol === 'https:' && uri.includes(':443')) {
+    if (parsedUri.protocol === 'https:' && uri.endsWith(':443')) {
       // loking for 443
       port = '443';
     }

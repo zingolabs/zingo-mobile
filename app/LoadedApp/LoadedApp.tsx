@@ -237,7 +237,11 @@ export default function LoadedApp(props: LoadedAppProps) {
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.security, security);
       }
-      if (settings.selectServer) {
+      if (
+        settings.selectServer === SelectServerEnum.auto ||
+        settings.selectServer === SelectServerEnum.custom ||
+        settings.selectServer === SelectServerEnum.list
+      ) {
         setSelectServer(settings.selectServer);
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.selectServer, selectServer);

@@ -235,7 +235,11 @@ export default function LoadingApp(props: LoadingAppProps) {
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.security, security);
       }
-      if (settings.selectServer) {
+      if (
+        settings.selectServer === SelectServerEnum.auto ||
+        settings.selectServer === SelectServerEnum.custom ||
+        settings.selectServer === SelectServerEnum.list
+      ) {
         setSelectServer(settings.selectServer);
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.selectServer, selectServer);
@@ -303,10 +307,10 @@ type LoadingAppClassProps = {
   sendAll: boolean;
   donation: boolean;
   privacy: boolean;
-  mode: ModeEnum.basic | ModeEnum.advanced;
+  mode: ModeEnum;
   background: BackgroundType;
   firstLaunchingMessage: boolean;
-  toggleTheme: (mode: ModeEnum.basic | ModeEnum.advanced) => void;
+  toggleTheme: (mode: ModeEnum) => void;
   security: SecurityType;
   selectServer: SelectServerEnum;
   donationAlert: boolean;

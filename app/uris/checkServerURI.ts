@@ -13,7 +13,7 @@ const checkServerURI = async (uri: string, oldUri: string): Promise<checkServerU
 
   try {
     const resultStrServerPromise = RPCModule.execute(CommandEnum.changeserver, uri);
-    const timeoutServerPromise = new Promise((resolve, reject) => {
+    const timeoutServerPromise = new Promise((_, reject) => {
       setTimeout(() => {
         reject(new Error('Promise changeserver Timeout 30 seconds'));
       }, 30000);
