@@ -14,6 +14,7 @@ import {
   ChainNameEnum,
   TransactionTypeEnum,
   PoolEnum,
+  WalletOptionEnum,
 } from '../AppState';
 import RPCModule from '../RPCModule';
 import { RPCAddressType } from './types/RPCAddressType';
@@ -1220,7 +1221,10 @@ export default class RPC {
 
   async fetchWalletSettings(): Promise<void> {
     try {
-      const download_memos_str: string = await RPCModule.execute(CommandEnum.getoption, 'download_memos');
+      const download_memos_str: string = await RPCModule.execute(
+        CommandEnum.getoption,
+        WalletOptionEnum.download_memos,
+      );
       if (download_memos_str) {
         if (download_memos_str.toLowerCase().startsWith('error')) {
           console.log(`Error download memos ${download_memos_str}`);
@@ -1233,8 +1237,8 @@ export default class RPC {
       const download_memos_json: RPCGetOptionType = await JSON.parse(download_memos_str);
 
       const transaction_filter_threshold_str: string = await RPCModule.execute(
-        'getoption',
-        'transaction_filter_threshold',
+        CommandEnum.getoption,
+        WalletOptionEnum.transaction_filter_threshold,
       );
       if (transaction_filter_threshold_str) {
         if (transaction_filter_threshold_str.toLowerCase().startsWith('error')) {

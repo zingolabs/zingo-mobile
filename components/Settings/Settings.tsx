@@ -30,6 +30,7 @@ import {
   SelectServerEnum,
   ChainNameEnum,
   SettingsNameEnum,
+  WalletOptionEnum,
 } from '../../app/AppState';
 import { isEqual } from 'lodash';
 import ChainTypeToggle from '../Components/ChainTypeToggle';
@@ -341,10 +342,10 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     }
 
     if (walletSettings.download_memos !== memos) {
-      await set_wallet_option('download_memos', memos);
+      await set_wallet_option(WalletOptionEnum.download_memos, memos);
     }
     if (walletSettings.transaction_filter_threshold !== filter) {
-      await set_wallet_option('transaction_filter_threshold', filter);
+      await set_wallet_option(WalletOptionEnum.transaction_filter_threshold, filter);
     }
     if (currencyContext !== currency) {
       await set_currency_option(SettingsNameEnum.currency, currency);
