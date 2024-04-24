@@ -12,6 +12,7 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
+import { ButtonTypeEnum } from '../../app/AppState';
 
 type RescanProps = {
   closeModal: () => void;
@@ -26,7 +27,7 @@ const Rescan: React.FunctionComponent<RescanProps> = ({ closeModal, doRescan }) 
 
   const doRescanAndClose = () => {
     if (!netInfo.isConnected) {
-      addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
+      addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
       return;
     }
     doRescan();
@@ -69,9 +70,9 @@ const Rescan: React.FunctionComponent<RescanProps> = ({ closeModal, doRescan }) 
           alignItems: 'center',
           marginVertical: 5,
         }}>
-        <Button type="Primary" title={translate('rescan.button') as string} onPress={doRescanAndClose} />
+        <Button type={ButtonTypeEnum.Primary} title={translate('rescan.button') as string} onPress={doRescanAndClose} />
         <Button
-          type="Secondary"
+          type={ButtonTypeEnum.Secondary}
           title={translate('cancel') as string}
           style={{ marginLeft: 10 }}
           onPress={closeModal}

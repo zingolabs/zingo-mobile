@@ -31,6 +31,7 @@ import {
   ChainNameEnum,
   SettingsNameEnum,
   WalletOptionEnum,
+  ButtonTypeEnum,
 } from '../../app/AppState';
 import { isEqual } from 'lodash';
 import ChainTypeToggle from '../Components/ChainTypeToggle';
@@ -264,30 +265,30 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       isEqual(securityContext, securityObject()) &&
       selectServerContext === selectServer
     ) {
-      addLastSnackbar({ message: translate('settings.nochanges') as string, type: 'Primary' });
+      addLastSnackbar({ message: translate('settings.nochanges') as string });
       return;
     }
     if (!memos) {
-      addLastSnackbar({ message: translate('settings.ismemo') as string, type: 'Primary' });
+      addLastSnackbar({ message: translate('settings.ismemo') as string });
       return;
     }
     if (!filter) {
-      addLastSnackbar({ message: translate('settings.isthreshold') as string, type: 'Primary' });
+      addLastSnackbar({ message: translate('settings.isthreshold') as string });
       return;
     }
     if (!serverUriParsed || !chain_nameParsed) {
-      addLastSnackbar({ message: translate('settings.isserver') as string, type: 'Primary' });
+      addLastSnackbar({ message: translate('settings.isserver') as string });
       return;
     }
     if (!language) {
-      addLastSnackbar({ message: translate('settings.islanguage') as string, type: 'Primary' });
+      addLastSnackbar({ message: translate('settings.islanguage') as string });
       return;
     }
 
     if (serverContext.uri !== serverUriParsed) {
       const resultUri = parseServerURI(serverUriParsed, translate);
       if (resultUri.toLowerCase().startsWith('error')) {
-        addLastSnackbar({ message: translate('settings.isuri') as string, type: 'Primary' });
+        addLastSnackbar({ message: translate('settings.isuri') as string });
         return;
       } else {
         // url-parse sometimes is too wise, and if you put:
@@ -309,22 +310,21 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     }
 
     if (!netInfo.isConnected) {
-      addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
+      addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
       return;
     }
 
     if (serverContext.uri !== serverUriParsed || serverContext.chain_name !== chain_nameParsed) {
       setDisabled(true);
-      addLastSnackbar({ message: translate('loadedapp.tryingnewserver') as string, type: 'Primary' });
+      addLastSnackbar({ message: translate('loadedapp.tryingnewserver') as string });
       const { result, timeout, new_chain_name } = await checkServerURI(serverUriParsed, serverContext.uri);
       if (!result) {
         // if the server checking takes more then 30 seconds.
         if (timeout === true) {
-          addLastSnackbar({ message: translate('loadedapp.tryingnewserver-error') as string, type: 'Primary' });
+          addLastSnackbar({ message: translate('loadedapp.tryingnewserver-error') as string });
         } else {
           addLastSnackbar({
             message: (translate('loadedapp.changeservernew-error') as string) + serverUriParsed,
-            type: 'Primary',
           });
         }
         // in this point the sync process is blocked, who knows why.
@@ -336,7 +336,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         //console.log('new', new_chain_name, 'old', chain_name);
         if (new_chain_name && new_chain_name !== chain_name) {
           same_server_chain_name = false;
-          addLastSnackbar({ message: translate('loadedapp.differentchain-error') as string, type: 'Primary' });
+          addLastSnackbar({ message: translate('loadedapp.differentchain-error') as string });
         }
       }
     }
@@ -874,7 +874,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         <Button
           testID="settings.button.save"
           disabled={disabled}
-          type="Primary"
+          type={ButtonTypeEnum.Primary}
           title={translate('settings.save') as string}
           onPress={() => {
             // waiting while closing the keyboard, just in case.
@@ -885,7 +885,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         />
         <Button
           disabled={disabled}
-          type="Secondary"
+          type={ButtonTypeEnum.Secondary}
           title={translate('cancel') as string}
           style={{ marginLeft: 10 }}
           onPress={closeModal}

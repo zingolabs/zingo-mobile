@@ -23,7 +23,7 @@ import 'moment/locale/ru';
 import { ThemeType } from '../../../app/types';
 import RPC from '../../../app/rpc';
 import Utils from '../../../app/utils';
-import { CommandEnum } from '../../../app/AppState';
+import { ButtonTypeEnum, CommandEnum } from '../../../app/AppState';
 import { CurrencyEnum } from '../../../app/AppState';
 import { RPCAdressKindEnum } from '../../../app/rpc/enums/RPCAddressKindEnum';
 import { RPCReceiversEnum } from '../../../app/rpc/enums/RPCReceiversEnum';
@@ -75,7 +75,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
 
   const getPrivacyLevel = useCallback(async () => {
     if (!netInfo.isConnected) {
-      addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
+      addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
       return '-';
     }
 
@@ -208,7 +208,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     console.log('BIOMETRIC --------> ', resultBio);
     if (resultBio === false) {
       // snack with Error
-      addLastSnackbar({ message: translate('biometrics-error') as string, type: 'Primary' });
+      addLastSnackbar({ message: translate('biometrics-error') as string });
     } else {
       confirmSend();
     }
@@ -383,12 +383,12 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
         }}>
         <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
           <Button
-            type="Primary"
+            type={ButtonTypeEnum.Primary}
             title={sendAllAmount ? (translate('send.confirm-button-all') as string) : (translate('confirm') as string)}
             onPress={() => confirmSendBiometrics()}
           />
           <Button
-            type="Secondary"
+            type={ButtonTypeEnum.Secondary}
             style={{ marginLeft: 20 }}
             title={translate('cancel') as string}
             onPress={closeModal}

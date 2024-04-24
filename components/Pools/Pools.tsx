@@ -18,7 +18,7 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
-import { SettingsNameEnum } from '../../app/AppState';
+import { ButtonTypeEnum, SettingsNameEnum } from '../../app/AppState';
 
 type PoolsProps = {
   closeModal: () => void;
@@ -178,7 +178,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, set_privacy_op
         }}>
         <Button
           testID="fund-pools.button.close"
-          type="Secondary"
+          type={ButtonTypeEnum.Secondary}
           title={translate('close') as string}
           onPress={closeModal}
         />

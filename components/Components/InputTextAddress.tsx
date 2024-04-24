@@ -43,7 +43,7 @@ const InputTextAddress: React.FunctionComponent<InputTextAddressProps> = ({
   useEffect(() => {
     const parseAdressJSON = async (addr: string): Promise<boolean> => {
       if (!netInfo.isConnected) {
-        addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
+        addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
         return false;
       }
       const result: string = await RPCModule.execute(CommandEnum.parse_address, addr);

@@ -15,7 +15,7 @@ export const createAlert = async (
   } else {
     if (toast) {
       setTimeout(() => {
-        addLastSnackbar({ message: error, type: 'Primary' });
+        addLastSnackbar({ message: error });
       }, 1000);
     } else {
       Alert.alert(title, error);

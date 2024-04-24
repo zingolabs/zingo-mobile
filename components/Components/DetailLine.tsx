@@ -36,7 +36,6 @@ const DetailLine: React.FunctionComponent<DetailLineProps> = ({ label, value, ch
             Clipboard.setString(value);
             addLastSnackbar({
               message: translate('txtcopied') as string,
-              type: 'Primary',
               duration: SnackbarDurationEnum.short,
             });
           }}>

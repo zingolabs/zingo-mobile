@@ -55,7 +55,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuSt
       if (resultBio === false) {
         // snack with Error & closing the menu.
         updateMenuState(false);
-        addLastSnackbar({ message: translate('biometrics-error') as string, type: 'Primary' });
+        addLastSnackbar({ message: translate('biometrics-error') as string });
       } else {
         // if the user click on a screen in the menu the sync is going to continue
         (async () => await RPC.rpc_setInterruptSyncAfterBatch('false'))();

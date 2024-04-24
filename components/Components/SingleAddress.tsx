@@ -58,7 +58,6 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
       Clipboard.setString(address);
       addLastSnackbar({
         message: translate('history.addresscopied') as string,
-        type: 'Primary',
         duration: SnackbarDurationEnum.short,
       });
     }
@@ -79,7 +78,6 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
                 Clipboard.setString(address);
                 addLastSnackbar({
                   message: translate('history.addresscopied') as string,
-                  type: 'Primary',
                   duration: SnackbarDurationEnum.short,
                 });
                 setExpandQRAddress(true);
@@ -213,7 +211,6 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
               Clipboard.setString(address);
               addLastSnackbar({
                 message: translate('history.addresscopied') as string,
-                type: 'Primary',
                 duration: SnackbarDurationEnum.short,
               });
             }

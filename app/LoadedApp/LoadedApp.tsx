@@ -493,7 +493,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
           screen: this.state.translate('loadedapp.send-menu'),
           initial: false,
         });
-        this.addLastSnackbar({ message: this.state.translate('loadedapp.zcash-url') as string, type: 'Primary' });
+        this.addLastSnackbar({ message: this.state.translate('loadedapp.zcash-url') as string });
       }
     });
 
@@ -519,7 +519,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
             this.setSyncingStatus(new SyncingStatusClass());
             this.addLastSnackbar({
               message: this.props.translate('loadedapp.connection-error') as string,
-              type: 'Primary',
             });
           } else {
             //console.log('EVENT Loaded: YES internet connection.');
@@ -584,7 +583,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
         return;
       } else {
         // Show the error message as a toast
-        this.addLastSnackbar({ message: target, type: 'Primary' });
+        this.addLastSnackbar({ message: target });
         return;
       }
     }
@@ -1048,7 +1047,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
           if (toast) {
             this.addLastSnackbar({
               message: `${this.props.translate('loadedapp.readingwallet')} ${value.uri}`,
-              type: 'Primary',
             });
           }
           await SettingsFileImpl.writeSettings(name, value);
@@ -1084,7 +1082,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       if (toast) {
         this.addLastSnackbar({
           message: `${this.props.translate('loadedapp.readingwallet-error')} ${value.uri}`,
-          type: 'Primary',
         });
       }
 
@@ -1265,7 +1262,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
         //console.log(`Error change server ${value} - ${resultStr}`);
         this.addLastSnackbar({
           message: `${this.props.translate('loadedapp.changeservernew-error')} ${resultStr}`,
-          type: 'Primary',
         });
         return;
       } else {

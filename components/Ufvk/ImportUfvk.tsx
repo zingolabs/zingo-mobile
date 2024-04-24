@@ -19,7 +19,7 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
-import { CommandEnum } from '../../app/AppState';
+import { ButtonTypeEnum, CommandEnum } from '../../app/AppState';
 import { RPCParseStatusEnum } from '../../app/rpc/enums/RPCParseStatusEnum';
 
 type ImportUfvkProps = {
@@ -72,7 +72,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
 
   const okButton = async () => {
     if (!netInfo.isConnected) {
-      addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
+      addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
       return;
     }
     //const valid = await validateKey(ufvkText);
@@ -90,18 +90,18 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
     //console.log(result);
     if (result) {
       if (result.toLowerCase().startsWith('error')) {
-        addLastSnackbar({ message: `${translate('scanner.noviewkey-error')}`, type: 'Primary' });
+        addLastSnackbar({ message: `${translate('scanner.noviewkey-error')}` });
         return false;
       }
     } else {
-      addLastSnackbar({ message: `${translate('scanner.noviewkey-error')}`, type: 'Primary' });
+      addLastSnackbar({ message: `${translate('scanner.noviewkey-error')}` });
       return false;
     }
     let resultJSON = {} as RPCParseViewKeyType;
     try {
       resultJSON = await JSON.parse(result);
     } catch (e) {
-      addLastSnackbar({ message: `${translate('scanner.noviewkey-error')}`, type: 'Primary' });
+      addLastSnackbar({ message: `${translate('scanner.noviewkey-error')}` });
       return false;
     }
 
@@ -112,7 +112,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
     if (valid) {
       return true;
     } else {
-      addLastSnackbar({ message: `${translate('scanner.noviewkey-error')}`, type: 'Primary' });
+      addLastSnackbar({ message: `${translate('scanner.noviewkey-error')}` });
       return false;
     }
   };
@@ -278,7 +278,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
           marginVertical: 5,
         }}>
         <Button
-          type="Primary"
+          type={ButtonTypeEnum.Primary}
           title={translate('import.button') as string}
           onPress={() => {
             Keyboard.dismiss();
@@ -286,7 +286,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
           }}
         />
         <Button
-          type="Secondary"
+          type={ButtonTypeEnum.Secondary}
           title={translate('cancel') as string}
           style={{ marginLeft: 10 }}
           onPress={onClickCancel}

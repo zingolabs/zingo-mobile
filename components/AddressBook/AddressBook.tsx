@@ -9,7 +9,7 @@ import 'moment/locale/ru';
 import { useTheme, useScrollToTop } from '@react-navigation/native';
 import Animated, { Easing, useSharedValue, withTiming } from 'react-native-reanimated';
 
-import { AddressBookActionEnum, AddressBookFileClass, SendPageStateClass } from '../../app/AppState';
+import { AddressBookActionEnum, AddressBookFileClass, ButtonTypeEnum, SendPageStateClass } from '../../app/AppState';
 import { ThemeType } from '../../app/types';
 import FadeText from '../Components/FadeText';
 import Button from '../Components/Button';
@@ -259,7 +259,11 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
               marginTop: 5,
               marginBottom: 30,
             }}>
-            <Button type="Secondary" title={translate('addressbook.loadmore') as string} onPress={loadMoreClicked} />
+            <Button
+              type={ButtonTypeEnum.Secondary}
+              title={translate('addressbook.loadmore') as string}
+              onPress={loadMoreClicked}
+            />
           </View>
         ) : (
           <>
@@ -290,12 +294,12 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
           }}>
           <Button
             testID="addressbook.button.new"
-            type="Primary"
+            type={ButtonTypeEnum.Primary}
             title={translate('addressbook.new') as string}
             onPress={() => newAddressBookItem()}
           />
           <Button
-            type="Secondary"
+            type={ButtonTypeEnum.Secondary}
             title={translate('cancel') as string}
             style={{ marginLeft: 10 }}
             onPress={closeModal}

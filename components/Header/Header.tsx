@@ -25,6 +25,7 @@ import {
   PoolToShieldEnum,
   SettingsNameEnum,
   SnackbarType,
+  ButtonTypeEnum,
 } from '../../app/AppState';
 import { ContextAppLoaded } from '../../app/context';
 import { ThemeType } from '../../app/types';
@@ -161,7 +162,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       // if the sync process is stalled -> let's restart the App.
       addLastSnackbar({
         message: translate('restarting') as string,
-        type: 'Primary',
         duration: SnackbarDurationEnum.short,
       });
       setTimeout(() => restartApp({ startingApp: false }), 3000);
@@ -347,7 +347,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     if (resultBio === false) {
       // snack with Error & closing the menu.
       if (addLastSnackbar) {
-        addLastSnackbar({ message: translate('biometrics-error') as string, type: 'Primary' });
+        addLastSnackbar({ message: translate('biometrics-error') as string });
       }
     } else {
       if (setUfvkViewModalVisible) {
@@ -526,7 +526,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                     : (((translate('settings.value-privacy-true') as string) +
                         translate('change-privacy-legend')) as string)
                 }`,
-                type: 'Primary',
               });
               set_privacy_option(SettingsNameEnum.privacy, !privacy);
             }}>
@@ -693,7 +692,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           </FadeText>
           <View style={{ margin: 5, flexDirection: 'row' }}>
             <Button
-              type="Primary"
+              type={ButtonTypeEnum.Primary}
               title={
                 translate(
                   `history.shield-${

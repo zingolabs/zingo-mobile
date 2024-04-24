@@ -19,6 +19,7 @@ import RegText from '../Components/RegText';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCloudDownload } from '@fortawesome/free-solid-svg-icons';
 import Utils from '../../app/utils';
+import { ButtonTypeEnum } from '../../app/AppState';
 
 type SyncReportProps = {
   closeModal: () => void;
@@ -708,7 +709,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
           alignItems: 'center',
           marginVertical: 5,
         }}>
-        <Button type="Secondary" title={translate('close') as string} onPress={closeModal} />
+        <Button type={ButtonTypeEnum.Secondary} title={translate('close') as string} onPress={closeModal} />
       </View>
     </SafeAreaView>
   );

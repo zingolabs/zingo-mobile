@@ -13,6 +13,7 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
+import { ButtonTypeEnum } from '../../app/AppState';
 
 type AboutProps = {
   closeModal: () => void;
@@ -72,7 +73,7 @@ const About: React.FunctionComponent<AboutProps> = ({ closeModal }) => {
           alignItems: 'center',
           marginVertical: 5,
         }}>
-        <Button type="Secondary" title={translate('close') as string} onPress={closeModal} />
+        <Button type={ButtonTypeEnum.Secondary} title={translate('close') as string} onPress={closeModal} />
       </View>
     </SafeAreaView>
   );

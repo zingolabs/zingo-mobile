@@ -15,7 +15,7 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
-import { SnackbarDurationEnum } from '../../app/AppState';
+import { ButtonTypeEnum, SnackbarDurationEnum } from '../../app/AppState';
 
 type PrivKeyProps = {
   closeModal: () => void;
@@ -49,7 +49,6 @@ const PrivKey: React.FunctionComponent<PrivKeyProps> = ({ address, keyType, priv
     Clipboard.setString(privKey);
     addLastSnackbar({
       message: translate('privkey.tapcopy-message') as string,
-      type: 'Primary',
       duration: SnackbarDurationEnum.short,
     });
     //}
@@ -137,7 +136,7 @@ const PrivKey: React.FunctionComponent<PrivKeyProps> = ({ address, keyType, priv
           alignItems: 'center',
           marginVertical: 5,
         }}>
-        <Button type="Secondary" title={translate('close') as string} onPress={closeModal} />
+        <Button type={ButtonTypeEnum.Secondary} title={translate('close') as string} onPress={closeModal} />
       </View>
     </SafeAreaView>
   );

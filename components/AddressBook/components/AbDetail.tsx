@@ -3,7 +3,7 @@ import React, { useContext, useState, useEffect } from 'react';
 import { View, TextInput } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
-import { AddressBookActionEnum, AddressBookFileClass } from '../../../app/AppState';
+import { AddressBookActionEnum, AddressBookFileClass, ButtonTypeEnum } from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
 import RegText from '../../Components/RegText';
 import { ContextAppLoaded } from '../../../app/context';
@@ -108,7 +108,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
         });
       } else {
         // Show the error message as a toast
-        addLastSnackbar({ message: target, type: 'Primary' });
+        addLastSnackbar({ message: target });
         //return;
       }
     } else {
@@ -192,14 +192,19 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
         }}>
         <Button
           testID="addressbook.button.action"
-          type="Primary"
+          type={ButtonTypeEnum.Primary}
           title={translate(`addressbook.${action.toLowerCase()}`) as string}
           onPress={() => {
             doAction(action, label, address);
           }}
           disabled={action === AddressBookActionEnum.Delete ? false : error || errorAddress ? true : false}
         />
-        <Button type="Secondary" title={translate('cancel') as string} style={{ marginLeft: 10 }} onPress={cancel} />
+        <Button
+          type={ButtonTypeEnum.Secondary}
+          title={translate('cancel') as string}
+          style={{ marginLeft: 10 }}
+          onPress={cancel}
+        />
       </View>
     </View>
   );

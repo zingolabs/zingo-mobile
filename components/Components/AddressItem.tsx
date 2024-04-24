@@ -106,7 +106,6 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
               //  Clipboard.setString(contact);
               //  addLastSnackbar({
               //    message: translate('history.contactcopied') as string,
-              //    type: 'Primary',
               //    duration: SnackbarDurationEnum.short,
               //  });
               //}
@@ -140,7 +139,6 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
                 Clipboard.setString(address);
                 addLastSnackbar({
                   message: translate('history.addresscopied') as string,
-                  type: 'Primary',
                   duration: SnackbarDurationEnum.short,
                 });
                 setExpandAddress(true);

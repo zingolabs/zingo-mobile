@@ -8,7 +8,7 @@ import 'moment/locale/ru';
 
 import { useTheme } from '@react-navigation/native';
 
-import { SendPageStateClass, SettingsNameEnum, TransactionType } from '../../app/AppState';
+import { ButtonTypeEnum, SendPageStateClass, SettingsNameEnum, TransactionType } from '../../app/AppState';
 import { ThemeType } from '../../app/types';
 import FadeText from '../Components/FadeText';
 import Button from '../Components/Button';
@@ -153,7 +153,11 @@ const History: React.FunctionComponent<HistoryProps> = ({
               marginTop: 10,
               marginBottom: 30,
             }}>
-            <Button type="Secondary" title={translate('history.loadmore') as string} onPress={loadMoreClicked} />
+            <Button
+              type={ButtonTypeEnum.Secondary}
+              title={translate('history.loadmore') as string}
+              onPress={loadMoreClicked}
+            />
           </View>
         ) : (
           <>

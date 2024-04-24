@@ -14,7 +14,7 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import RegText from '../Components/RegText';
-import { ChainNameEnum, ModeEnum, SettingsNameEnum, UfvkActionEnum } from '../../app/AppState';
+import { ButtonTypeEnum, ChainNameEnum, ModeEnum, SettingsNameEnum, UfvkActionEnum } from '../../app/AppState';
 
 type TextsType = {
   new: string[];
@@ -133,7 +133,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
           marginVertical: 5,
         }}>
         <Button
-          type={mode === ModeEnum.basic ? 'Secondary' : 'Primary'}
+          type={mode === ModeEnum.basic ? ButtonTypeEnum.Secondary : ButtonTypeEnum.Primary}
           style={{
             backgroundColor: mode === ModeEnum.basic ? colors.background : colors.primary,
           }}
@@ -149,7 +149,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
               return;
             }
             if (!netInfo.isConnected && times > 0) {
-              addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
+              addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
               return;
             }
             if (times === 0) {
@@ -161,7 +161,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
         />
         {times > 0 && (
           <Button
-            type="Secondary"
+            type={ButtonTypeEnum.Secondary}
             title={translate('cancel') as string}
             style={{ marginLeft: 10 }}
             onPress={onClickCancel}

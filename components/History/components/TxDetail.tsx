@@ -12,6 +12,7 @@ import { useTheme } from '@react-navigation/native';
 import {
   AddressBookFileClass,
   AddressClass,
+  ButtonTypeEnum,
   ChainNameEnum,
   SendPageStateClass,
   SettingsNameEnum,
@@ -177,7 +178,6 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
                   Clipboard.setString(tx.txid);
                   addLastSnackbar({
                     message: translate('history.txcopied') as string,
-                    type: 'Primary',
                     duration: SnackbarDurationEnum.short,
                   });
                   setExpandTxid(true);
@@ -272,7 +272,6 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
                           Clipboard.setString(memo);
                           addLastSnackbar({
                             message: translate('history.memocopied') as string,
-                            type: 'Primary',
                             duration: SnackbarDurationEnum.short,
                           });
                         }}>
@@ -285,14 +284,12 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
                           if (!thisWalletAddress(memoUA)) {
                             addLastSnackbar({
                               message: translate('history.address-http') as string,
-                              type: 'Primary',
                               duration: SnackbarDurationEnum.long,
                             });
                           }
                           Clipboard.setString(memoUA);
                           addLastSnackbar({
                             message: translate('history.addresscopied') as string,
-                            type: 'Primary',
                             duration: SnackbarDurationEnum.short,
                           });
                         }}>
@@ -331,7 +328,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
         </View>
       </ScrollView>
       <View style={{ flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', margin: 10 }}>
-        <Button type="Secondary" title={translate('close') as string} onPress={closeModal} />
+        <Button type={ButtonTypeEnum.Secondary} title={translate('close') as string} onPress={closeModal} />
       </View>
     </SafeAreaView>
   );

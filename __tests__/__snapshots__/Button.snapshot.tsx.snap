@@ -60,7 +60,7 @@ exports[`Component Button - test Button Primary - snapshot 1`] = `
         }
       }
     >
-      Primary
+      Primary button
     </Text>
   </View>
 </View>
@@ -126,7 +126,7 @@ exports[`Component Button - test Button Secondary - snapshot 1`] = `
         }
       }
     >
-      Secondary
+      Secondary button
     </Text>
   </View>
 </View>

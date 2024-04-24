@@ -50,6 +50,7 @@ import {
   WalletOptionEnum,
   SnackbarType,
   AppStateStatusEnum,
+  ButtonTypeEnum,
 } from '../AppState';
 import { parseServerURI, serverUris } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
@@ -418,7 +419,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
         setTimeout(() => {
           this.addLastSnackbar({
             message: this.state.translate('loadedapp.selectingserver') as string,
-            type: 'Primary',
             duration: SnackbarDurationEnum.longer,
           });
         }, 1000);
@@ -478,7 +478,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
           this.setState({ screen: 1, actionButtonsDisabled: false });
           this.addLastSnackbar({
             message: this.props.translate('loadedapp.connection-error') as string,
-            type: 'Primary',
           });
         }
       } else {
@@ -554,7 +553,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
             //console.log('EVENT Loading: No internet connection.');
             this.addLastSnackbar({
               message: this.props.translate('loadedapp.connection-error') as string,
-              type: 'Primary',
             });
           } else {
             //console.log('EVENT Loading: YESSSSS internet connection.');
@@ -623,13 +621,11 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
       if (isEqual(actualServer, fasterServer)) {
         this.addLastSnackbar({
           message: this.state.translate('loadedapp.selectingserversame') as string,
-          type: 'Primary',
           duration: SnackbarDurationEnum.long,
         });
       } else {
         this.addLastSnackbar({
           message: (this.state.translate('loadedapp.selectingserverbest') as string) + ' ' + fasterServer.uri,
-          type: 'Primary',
           duration: SnackbarDurationEnum.long,
         });
       }
@@ -662,7 +658,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
         setTimeout(() => {
           this.addLastSnackbar({
             message: this.state.translate('loadingapp.serverfirsttry') as string,
-            type: 'Primary',
             duration: SnackbarDurationEnum.longer,
           });
         }, 1000);
@@ -683,7 +678,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
         // second try
         this.addLastSnackbar({
           message: this.state.translate('loadingapp.serversecondtry') as string,
-          type: 'Primary',
           duration: SnackbarDurationEnum.longer,
         });
         setTimeout(() => {
@@ -735,7 +729,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     const uri: string = parseServerURI(this.state.customServerUri, this.state.translate);
     const chain_name = this.state.customServerChainName;
     if (uri.toLowerCase().startsWith('error')) {
-      this.addLastSnackbar({ message: this.state.translate('settings.isuri') as string, type: 'Primary' });
+      this.addLastSnackbar({ message: this.state.translate('settings.isuri') as string });
     } else {
       await SettingsFileImpl.writeSettings(SettingsNameEnum.server, { uri, chain_name });
       this.setState({
@@ -903,7 +897,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     if (this.state.netInfo.isConnected) {
       this.setState({ customServerShow: true });
     } else {
-      this.addLastSnackbar({ message: this.props.translate('loadedapp.connection-error') as string, type: 'Primary' });
+      this.addLastSnackbar({ message: this.props.translate('loadedapp.connection-error') as string });
     }
   };
 
@@ -1098,14 +1092,14 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                       </View>
                       <View style={{ flexDirection: 'row' }}>
                         <Button
-                          type="Primary"
+                          type={ButtonTypeEnum.Primary}
                           title={translate('save') as string}
                           disabled={actionButtonsDisabled}
                           onPress={this.usingCustomServer}
                           style={{ marginBottom: 10 }}
                         />
                         <Button
-                          type="Secondary"
+                          type={ButtonTypeEnum.Secondary}
                           title={translate('cancel') as string}
                           disabled={actionButtonsDisabled}
                           onPress={() => this.setState({ customServerShow: false })}
@@ -1182,7 +1176,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                   {netInfo.isConnected && (
                     <Button
                       testID="loadingapp.createnewwallet"
-                      type="Primary"
+                      type={ButtonTypeEnum.Primary}
                       title={translate('loadingapp.createnewwallet') as string}
                       disabled={actionButtonsDisabled}
                       onPress={() => {
@@ -1209,7 +1203,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
 
                   {netInfo.isConnected && walletExists && (
                     <Button
-                      type="Primary"
+                      type={ButtonTypeEnum.Primary}
                       title={translate('loadingapp.opencurrentwallet') as string}
                       disabled={actionButtonsDisabled}
                       onPress={this.componentDidMount}
@@ -1221,7 +1215,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                     <View style={{ marginTop: 20, display: 'flex', alignItems: 'center' }}>
                       <Button
                         testID="loadingapp.restorewalletseed"
-                        type="Secondary"
+                        type={ButtonTypeEnum.Secondary}
                         title={translate('loadingapp.restorewalletseedufvk') as string}
                         disabled={actionButtonsDisabled}
                         onPress={() => this.getwalletToRestore()}

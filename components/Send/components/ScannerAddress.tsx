@@ -24,7 +24,7 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ setAddre
 
   const validateAddress = async (scannedAddress: string) => {
     if (!netInfo.isConnected) {
-      addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
+      addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
       return;
     }
     if (scannedAddress.toLowerCase().startsWith('zcash:')) {
@@ -36,18 +36,18 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ setAddre
     const result: string = await RPCModule.execute(CommandEnum.parse_address, scannedAddress);
     if (result) {
       if (result.toLowerCase().startsWith('error') || result.toLowerCase() === 'null') {
-        addLastSnackbar({ message: translate('scanner.nozcash-error') as string, type: 'Primary' });
+        addLastSnackbar({ message: translate('scanner.nozcash-error') as string });
         return;
       }
     } else {
-      addLastSnackbar({ message: translate('scanner.nozcash-error') as string, type: 'Primary' });
+      addLastSnackbar({ message: translate('scanner.nozcash-error') as string });
       return;
     }
     let resultJSON = {} as RPCParseAddressType;
     try {
       resultJSON = await JSON.parse(result);
     } catch (e) {
-      addLastSnackbar({ message: translate('scanner.nozcash-error') as string, type: 'Primary' });
+      addLastSnackbar({ message: translate('scanner.nozcash-error') as string });
       return;
     }
 

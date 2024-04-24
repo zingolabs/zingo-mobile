@@ -18,7 +18,13 @@ import FadeText from '../Components/FadeText';
 import Header from '../Header';
 import RPCModule from '../../app/RPCModule';
 import AddressItem from '../Components/AddressItem';
-import { CommandEnum, SendPageStateClass, SettingsNameEnum, SnackbarDurationEnum } from '../../app/AppState';
+import {
+  ButtonTypeEnum,
+  CommandEnum,
+  SendPageStateClass,
+  SettingsNameEnum,
+  SnackbarDurationEnum,
+} from '../../app/AppState';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
@@ -194,7 +200,6 @@ const Insight: React.FunctionComponent<InsightProps> = ({
                   Clipboard.setString(item.address);
                   addLastSnackbar({
                     message: translate('history.addresscopied') as string,
-                    type: 'Primary',
                     duration: SnackbarDurationEnum.short,
                   });
                   selectExpandAddress(index);
@@ -408,7 +413,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({
           alignItems: 'center',
           marginVertical: 5,
         }}>
-        <Button type="Secondary" title={translate('close') as string} onPress={closeModal} />
+        <Button type={ButtonTypeEnum.Secondary} title={translate('close') as string} onPress={closeModal} />
       </View>
     </SafeAreaView>
   );

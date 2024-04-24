@@ -23,6 +23,7 @@ import {
   SeedActionEnum,
   SettingsNameEnum,
   SnackbarType,
+  ButtonTypeEnum,
 } from '../../app/AppState';
 import RPCModule from '../../app/RPCModule';
 import RPC from '../../app/rpc';
@@ -315,7 +316,6 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
                   if (addLastSnackbar) {
                     addLastSnackbar({
                       message: translate('seed.tapcopy-seed-message') as string,
-                      type: 'Primary',
                       duration: SnackbarDurationEnum.short,
                     });
                   }
@@ -388,7 +388,6 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
                     if (addLastSnackbar) {
                       addLastSnackbar({
                         message: translate('seed.tapcopy-seed-message') as string,
-                        type: 'Primary',
                         duration: SnackbarDurationEnum.short,
                       });
                     }
@@ -421,7 +420,6 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
                   if (addLastSnackbar) {
                     addLastSnackbar({
                       message: translate('seed.tapcopy-birthday-message') as string,
-                      type: 'Primary',
                       duration: SnackbarDurationEnum.short,
                     });
                   }
@@ -498,7 +496,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
         }}>
         <Button
           testID="seed.button.OK"
-          type={mode === ModeEnum.basic ? 'Secondary' : 'Primary'}
+          type={mode === ModeEnum.basic ? ButtonTypeEnum.Secondary : ButtonTypeEnum.Primary}
           style={{
             backgroundColor: mode === ModeEnum.basic ? colors.background : colors.primary,
           }}
@@ -517,7 +515,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
             }
             if (!netInfo.isConnected && (times > 0 || action === SeedActionEnum.restore)) {
               if (addLastSnackbar) {
-                addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
+                addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
               }
               return;
             }
@@ -535,7 +533,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
         />
         {(times > 0 || action === SeedActionEnum.restore) && (
           <Button
-            type="Secondary"
+            type={ButtonTypeEnum.Secondary}
             title={translate('cancel') as string}
             style={{ marginLeft: 10 }}
             onPress={onClickCancel}

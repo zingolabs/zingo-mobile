@@ -35,6 +35,7 @@ import {
   CurrencyEnum,
   ChainNameEnum,
   SettingsNameEnum,
+  ButtonTypeEnum,
 } from '../../app/AppState';
 import { parseZcashURI, ZcashURITargetClass } from '../../app/uris';
 import RPCModule from '../../app/RPCModule';
@@ -265,7 +266,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   useEffect(() => {
     const getMemoEnabled = async (address: string): Promise<boolean> => {
       if (!netInfo.isConnected) {
-        addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
+        addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
         return false;
       }
       const result: string = await RPCModule.execute(CommandEnum.parse_address, address);
@@ -306,7 +307,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   useEffect(() => {
     const parseAdressJSON = async (address: string): Promise<boolean> => {
       if (!netInfo.isConnected) {
-        addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
+        addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
         return false;
       }
       const result: string = await RPCModule.execute(CommandEnum.parse_address, address);
@@ -512,7 +513,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           });
         } else {
           // Show the error message as a toast
-          addLastSnackbar({ message: target, type: 'Primary' });
+          addLastSnackbar({ message: target });
           //return;
         }
       } else {
@@ -568,7 +569,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   const confirmSend = async () => {
     if (!netInfo.isConnected) {
       setConfirmModalVisible(false);
-      addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
+      addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
       return;
     }
     // first interrupt syncing Just in case...
@@ -1288,7 +1289,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                 testID="send.button"
                 accessible={true}
                 accessibilityLabel={'title ' + translate('send.button')}
-                type="Primary"
+                type={ButtonTypeEnum.Primary}
                 title={
                   validAmount === 1 &&
                   sendPageState.toaddr.amount &&
@@ -1307,10 +1308,10 @@ const Send: React.FunctionComponent<SendProps> = ({
                     Utils.parseStringLocaletoNumberFloat(sendPageState.toaddr.amount) ===
                       Utils.parseStringLocaletoNumberFloat(maxAmount.toFixed(8))
                   ) {
-                    addLastSnackbar({ message: `${translate('send.sendall-message') as string}`, type: 'Primary' });
+                    addLastSnackbar({ message: `${translate('send.sendall-message') as string}` });
                   }
                   if (!netInfo.isConnected) {
-                    addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
+                    addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
                     return;
                   }
                   // if the address is transparent - clean the memo field
@@ -1324,7 +1325,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                 }}
               />
               <Button
-                type="Secondary"
+                type={ButtonTypeEnum.Secondary}
                 style={{ marginLeft: 10 }}
                 title={translate('send.clear') as string}
                 onPress={() => {

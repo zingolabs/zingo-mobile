@@ -24,6 +24,7 @@ import 'moment/locale/ru';
 
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
+import { ButtonTypeEnum } from '../../app/AppState';
 
 type MemoProps = {
   closeModal: () => void;
@@ -155,9 +156,9 @@ const Memo: React.FunctionComponent<MemoProps> = ({ closeModal, updateToField })
           alignItems: 'center',
           marginVertical: 5,
         }}>
-        <Button type="Primary" title={translate('save') as string} onPress={doSaveAndClose} />
+        <Button type={ButtonTypeEnum.Primary} title={translate('save') as string} onPress={doSaveAndClose} />
         <Button
-          type="Secondary"
+          type={ButtonTypeEnum.Secondary}
           title={translate('cancel') as string}
           style={{ marginLeft: 10 }}
           onPress={closeModal}
