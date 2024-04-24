@@ -8,6 +8,7 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import Receive from '../components/Receive';
 import { ContextAppLoadedProvider, defaultAppStateLoaded } from '../app/context';
+import { CurrencyNameEnum } from '../app/AppState';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -76,7 +77,7 @@ describe('Component Receive - test', () => {
       },
     ];
     state.translate = () => 'text translated';
-    state.info.currencyName = 'ZEC';
+    state.info.currencyName = CurrencyNameEnum.ZEC;
     state.totalBalance.total = 1.12345678;
     const onFunction = jest.fn();
     const receive = render(

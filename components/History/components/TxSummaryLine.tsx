@@ -124,7 +124,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
           <ZecAmount
             style={{ flexGrow: 1, alignSelf: 'baseline', justifyContent: 'flex-end', paddingRight: 5 }}
             size={18}
-            currencyName={info.currencyName ? info.currencyName : ''}
+            currencyName={info.currencyName}
             color={amountColor}
             amtZec={tx.txDetails.reduce((s, d) => s + d.amount, 0) + (tx.fee ? tx.fee : 0)}
             privacy={privacy}

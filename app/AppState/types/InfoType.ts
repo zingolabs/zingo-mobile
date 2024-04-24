@@ -1,4 +1,5 @@
 import { ChainNameEnum } from '../enums/ChainNameEnum';
+import { CurrencyNameEnum } from '../enums/CurrencyNameEnum';
 
 export default interface InfoType {
   chain_name: ChainNameEnum;
@@ -7,7 +8,7 @@ export default interface InfoType {
   connections: number;
   version: string;
   verificationProgress: number;
-  currencyName: string;
+  currencyName: CurrencyNameEnum;
   solps: number;
   zingolib: string;
   // eslint-disable-next-line semi

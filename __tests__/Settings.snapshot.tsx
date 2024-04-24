@@ -8,7 +8,7 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import Settings from '../components/Settings';
 import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
-import { LanguageEnum, CurrencyEnum, ChainNameEnum, DownloadMemosEnum } from '../app/AppState';
+import { LanguageEnum, CurrencyEnum, ChainNameEnum, DownloadMemosEnum, CurrencyNameEnum } from '../app/AppState';
 
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
   FontAwesomeIcon: '',
@@ -122,7 +122,7 @@ describe('Component Settings - test', () => {
     }
     return 'text translated';
   };
-  state.info.currencyName = 'ZEC';
+  state.info.currencyName = CurrencyNameEnum.ZEC;
   state.totalBalance.total = 1.12345678;
   state.server = { uri: 'https://zcash.es', chain_name: ChainNameEnum.mainChainName };
   state.currency = CurrencyEnum.USDCurrency;

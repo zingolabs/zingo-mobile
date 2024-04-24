@@ -9,7 +9,7 @@ import { render } from '@testing-library/react-native';
 import Send from '../components/Send';
 import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
 import { ThemeType } from '../app/types';
-import { ModeEnum, CurrencyEnum, TransactionTypeEnum, PoolEnum } from '../app/AppState';
+import { ModeEnum, CurrencyEnum, TransactionTypeEnum, PoolEnum, CurrencyNameEnum } from '../app/AppState';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -153,7 +153,7 @@ describe('Component Send - test', () => {
   ];
   state.translate = () => 'text translated';
   state.currency = CurrencyEnum.USDCurrency;
-  state.info.currencyName = 'ZEC';
+  state.info.currencyName = CurrencyNameEnum.ZEC;
   state.zecPrice.zecPrice = 33.33;
   state.totalBalance.total = 1.12345678;
   state.totalBalance.orchardBal = 0.6;

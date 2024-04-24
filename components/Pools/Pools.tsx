@@ -72,7 +72,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, set_privacy_op
                 testID="orchard-total-balance"
                 amtZec={totalBalance.orchardBal}
                 size={18}
-                currencyName={info.currencyName ? info.currencyName : ''}
+                currencyName={info.currencyName}
                 style={{
                   opacity:
                     totalBalance.spendableOrchard > 0 && totalBalance.spendableOrchard === totalBalance.orchardBal
@@ -87,7 +87,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, set_privacy_op
                 testID="orchard-spendable-balance"
                 amtZec={totalBalance.spendableOrchard}
                 size={18}
-                currencyName={info.currencyName ? info.currencyName : ''}
+                currencyName={info.currencyName}
                 color={
                   totalBalance.spendableOrchard > 0 && totalBalance.spendableOrchard === totalBalance.orchardBal
                     ? colors.primary
@@ -108,7 +108,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, set_privacy_op
                 testID="sapling-total-balance"
                 amtZec={totalBalance.privateBal}
                 size={18}
-                currencyName={info.currencyName ? info.currencyName : ''}
+                currencyName={info.currencyName}
                 style={{
                   opacity:
                     totalBalance.spendablePrivate > 0 && totalBalance.spendablePrivate === totalBalance.privateBal
@@ -123,7 +123,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, set_privacy_op
                 testID="sapling-spendable-balance"
                 amtZec={totalBalance.spendablePrivate}
                 size={18}
-                currencyName={info.currencyName ? info.currencyName : ''}
+                currencyName={info.currencyName}
                 color={
                   totalBalance.spendablePrivate > 0 && totalBalance.spendablePrivate === totalBalance.privateBal
                     ? colors.syncing
@@ -144,7 +144,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, set_privacy_op
                 testID="transparent-balance"
                 amtZec={totalBalance.transparentBal}
                 size={18}
-                currencyName={info.currencyName ? info.currencyName : ''}
+                currencyName={info.currencyName}
                 color={'red'}
                 privacy={privacy}
               />

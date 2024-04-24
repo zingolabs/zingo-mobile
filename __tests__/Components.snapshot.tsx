@@ -12,7 +12,7 @@ import BoldText from '../components/Components/BoldText';
 import FadeText from '../components/Components/FadeText';
 import ErrorText from '../components/Components/ErrorText';
 import RegText from '../components/Components/RegText';
-import { CurrencyEnum } from '../app/AppState';
+import { CurrencyEnum, CurrencyNameEnum } from '../app/AppState';
 
 jest.mock('react-native-localize', () => ({
   getNumberFormatSettings: () => {
@@ -59,7 +59,7 @@ describe('Component Components - test', () => {
         size={20}
         amtZec={1.12345678}
         style={{ backgroundColor: 'red' }}
-        currencyName={'ZEC'}
+        currencyName={CurrencyNameEnum.ZEC}
         privacy={true}
       />,
     );
@@ -68,7 +68,13 @@ describe('Component Components - test', () => {
 
   test('ZecAmount Normal Privacy - snapshot', () => {
     const zecAmount = render(
-      <ZecAmount color={'red'} size={20} amtZec={1.12345678} style={{ backgroundColor: 'red' }} currencyName={'ZEC'} />,
+      <ZecAmount
+        color={'red'}
+        size={20}
+        amtZec={1.12345678}
+        style={{ backgroundColor: 'red' }}
+        currencyName={CurrencyNameEnum.ZEC}
+      />,
     );
     expect(zecAmount.toJSON()).toMatchSnapshot();
   });

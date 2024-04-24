@@ -8,7 +8,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react-native';
 import TxDetail from '../components/History/components/TxDetail';
 import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
-import { PoolEnum, TransactionType, TransactionTypeEnum } from '../app/AppState';
+import { CurrencyNameEnum, PoolEnum, TransactionType, TransactionTypeEnum } from '../app/AppState';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -89,7 +89,7 @@ describe('Component History TxDetail - test', () => {
   const onSetOption = jest.fn();
 
   test('History TxDetail - sent transaction with 2 addresses', () => {
-    state.info.currencyName = 'ZEC';
+    state.info.currencyName = CurrencyNameEnum.ZEC;
     state.totalBalance.total = 1.12345678;
     const tx = {
       type: TransactionTypeEnum.Sent,
@@ -133,7 +133,7 @@ describe('Component History TxDetail - test', () => {
   });
 
   test('History TxDetail - self sent transaction', () => {
-    state.info.currencyName = 'ZEC';
+    state.info.currencyName = CurrencyNameEnum.ZEC;
     state.totalBalance.total = 1.12345678;
     const txSelfSend = {
       type: TransactionTypeEnum.SendToSelf,
@@ -168,7 +168,7 @@ describe('Component History TxDetail - test', () => {
   });
 
   test('History TxDetail - received transaction with 2 pools', () => {
-    state.info.currencyName = 'ZEC';
+    state.info.currencyName = CurrencyNameEnum.ZEC;
     state.totalBalance.total = 1.12345678;
     const txSelfSend = {
       type: TransactionTypeEnum.Received,

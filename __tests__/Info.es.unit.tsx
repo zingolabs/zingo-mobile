@@ -8,7 +8,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react-native';
 import Info from '../components/Info';
 import { ContextAppLoadedProvider, defaultAppStateLoaded } from '../app/context';
-import { CurrencyEnum, ChainNameEnum } from '../app/AppState';
+import { CurrencyEnum, ChainNameEnum, CurrencyNameEnum } from '../app/AppState';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -53,7 +53,7 @@ describe('Component Info - test', () => {
       connections: 0,
       version: '3.3.3.0',
       verificationProgress: 0,
-      currencyName: 'ZEC',
+      currencyName: CurrencyNameEnum.ZEC,
       solps: 0,
       chain_name: ChainNameEnum.mainChainName,
       zingolib: 'mob-release...',

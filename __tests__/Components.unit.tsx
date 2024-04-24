@@ -12,7 +12,7 @@ import BoldText from '../components/Components/BoldText';
 import FadeText from '../components/Components/FadeText';
 import ErrorText from '../components/Components/ErrorText';
 import RegText from '../components/Components/RegText';
-import { CurrencyEnum } from '../app/AppState';
+import { CurrencyEnum, CurrencyNameEnum } from '../app/AppState';
 
 jest.mock('react-native-localize', () => ({
   getNumberFormatSettings: () => {
@@ -91,28 +91,30 @@ describe('Component Components - test', () => {
   });
 
   test('ZecAmount - High Privacy - amtZec -1.123456789 rounded up result -.---- ZEC', () => {
-    const text: any = render(<ZecAmount amtZec={-1.123456789} currencyName={'ZEC'} privacy={true} />).toJSON();
+    const text: any = render(
+      <ZecAmount amtZec={-1.123456789} currencyName={CurrencyNameEnum.ZEC} privacy={true} />,
+    ).toJSON();
     expect(text.type).toBe('View');
     expect(text.children[0].children[0].children[1].type).toBe('Text');
     expect(text.children[0].children[0].children[1].children[0]).toBe(' -.----');
   });
 
   test('ZecAmount - All props missing result -- ZEC', () => {
-    const text: any = render(<ZecAmount currencyName={'ZEC'} />).toJSON();
+    const text: any = render(<ZecAmount currencyName={CurrencyNameEnum.ZEC} />).toJSON();
     expect(text.type).toBe('View');
     expect(text.children[0].children[0].children[1].type).toBe('Text');
     expect(text.children[0].children[0].children[1].children[0]).toBe(' --');
   });
 
   test('ZecAmount - amtZec 0 result 0.00000000 ZEC', () => {
-    const text: any = render(<ZecAmount amtZec={0} currencyName={'ZEC'} />).toJSON();
+    const text: any = render(<ZecAmount amtZec={0} currencyName={CurrencyNameEnum.ZEC} />).toJSON();
     expect(text.type).toBe('View');
     expect(text.children[0].children[0].children[1].type).toBe('Text');
     expect(text.children[0].children[0].children[1].children[0]).toBe(' 0.0000');
   });
 
   test('ZecAmount - amtZec -1.123456789 rounded up result -1.12345679 ZEC', () => {
-    const text: any = render(<ZecAmount amtZec={-1.123456789} currencyName={'ZEC'} />).toJSON();
+    const text: any = render(<ZecAmount amtZec={-1.123456789} currencyName={CurrencyNameEnum.ZEC} />).toJSON();
     expect(text.type).toBe('View');
     expect(text.children[0].children[0].children[1].type).toBe('Text');
     expect(text.children[0].children[0].children[1].children[0]).toBe(' -1.1234');
@@ -121,7 +123,7 @@ describe('Component Components - test', () => {
   });
 
   test('ZecAmount - amtZec 1.123456781 rounded down result 1.12345678 ZEC', () => {
-    const text: any = render(<ZecAmount amtZec={1.123456781} currencyName={'ZEC'} />).toJSON();
+    const text: any = render(<ZecAmount amtZec={1.123456781} currencyName={CurrencyNameEnum.ZEC} />).toJSON();
     expect(text.type).toBe('View');
     expect(text.children[0].children[0].children[1].type).toBe('Text');
     expect(text.children[0].children[0].children[1].children[0]).toBe(' 1.1234');
@@ -130,7 +132,7 @@ describe('Component Components - test', () => {
   });
 
   test("ZecAmount - color 'red' result same", () => {
-    const text: any = render(<ZecAmount color={'red'} currencyName={'ZEC'} />).toJSON();
+    const text: any = render(<ZecAmount color={'red'} currencyName={CurrencyNameEnum.ZEC} />).toJSON();
     expect(text.type).toBe('View');
     expect(text.children[0].children[0].children[1].type).toBe('Text');
     expect(text.children[0].children[0].children[1].children[0]).toBe(' --');
@@ -141,7 +143,7 @@ describe('Component Components - test', () => {
   });
 
   test('ZecAmount - size 11 result same and same * 0.7', () => {
-    const text: any = render(<ZecAmount size={11} currencyName={'ZEC'} />).toJSON();
+    const text: any = render(<ZecAmount size={11} currencyName={CurrencyNameEnum.ZEC} />).toJSON();
     expect(text.type).toBe('View');
     expect(text.children[0].children[0].children[1].type).toBe('Text');
     expect(text.children[0].children[0].children[1].children[0]).toBe(' --');
@@ -152,7 +154,9 @@ describe('Component Components - test', () => {
   });
 
   test("ZecAmount - View style backgroundColor 'red' result same", () => {
-    const text: any = render(<ZecAmount style={{ backgroundColor: 'red' }} currencyName={'ZEC'} />).toJSON();
+    const text: any = render(
+      <ZecAmount style={{ backgroundColor: 'red' }} currencyName={CurrencyNameEnum.ZEC} />,
+    ).toJSON();
     expect(text.type).toBe('View');
     expect(text.props.style.backgroundColor).toBe('red');
     expect(text.children[0].children[0].children[1].type).toBe('Text');
@@ -161,8 +165,8 @@ describe('Component Components - test', () => {
     expect(text.children[0].children[0].children[2].children).toBe(null);
   });
 
-  test("ZecAmount - zecSymbol 'ZzZ' result same", () => {
-    const text: any = render(<ZecAmount currencyName={'ZzZ'} />).toJSON();
+  test("ZecAmount - zecSymbol undefined result '---", () => {
+    const text: any = render(<ZecAmount />).toJSON();
     expect(text.type).toBe('View');
     expect(text.children[0].children[0].children[1].type).toBe('Text');
     expect(text.children[0].children[0].children[1].children[0]).toBe(' --');

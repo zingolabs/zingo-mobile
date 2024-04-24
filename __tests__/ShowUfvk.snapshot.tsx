@@ -8,7 +8,7 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import { ShowUfvk } from '../components/Ufvk';
 import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
-import { UfvkActionEnum } from '../app/AppState';
+import { CurrencyNameEnum, UfvkActionEnum } from '../app/AppState';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -47,7 +47,7 @@ describe('Component ShowUfvk - test', () => {
   //snapshot test
   const state = defaultAppStateLoaded;
   state.translate = () => 'text translated';
-  state.info.currencyName = 'ZEC';
+  state.info.currencyName = CurrencyNameEnum.ZEC;
   state.totalBalance.total = 1.12345678;
   state.wallet.ufvk =
     'uview1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890';

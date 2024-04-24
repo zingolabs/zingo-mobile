@@ -283,7 +283,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
           </BoldText>
 
           <ZecAmount
-            currencyName={info.currencyName ? info.currencyName : ''}
+            currencyName={info.currencyName}
             amtZec={sendingTotal}
             privacy={privacy}
             size={36}
@@ -298,12 +298,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
           </View>
           <View style={{ margin: 10 }}>
             <FadeText>{translate('send.fee') as string}</FadeText>
-            <ZecAmount
-              currencyName={info.currencyName ? info.currencyName : ''}
-              size={18}
-              amtZec={calculatedFee}
-              privacy={privacy}
-            />
+            <ZecAmount currencyName={info.currencyName} size={18} amtZec={calculatedFee} privacy={privacy} />
           </View>
           {currency === CurrencyEnum.USDCurrency && (
             <View style={{ margin: 10, alignItems: 'flex-end' }}>
@@ -334,12 +329,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                       flexDirection: 'row',
                       justifyContent: 'space-between',
                     }}>
-                    <ZecAmount
-                      currencyName={info.currencyName ? info.currencyName : ''}
-                      size={18}
-                      amtZec={donationAmount}
-                      privacy={privacy}
-                    />
+                    <ZecAmount currencyName={info.currencyName} size={18} amtZec={donationAmount} privacy={privacy} />
                     <CurrencyAmount
                       style={{ fontSize: 18 }}
                       amtZec={donationAmount}
@@ -359,7 +349,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                   justifyContent: 'space-between',
                 }}>
                 <ZecAmount
-                  currencyName={info.currencyName ? info.currencyName : ''}
+                  currencyName={info.currencyName}
                   size={18}
                   amtZec={Utils.parseStringLocaletoNumberFloat(to.amount)}
                   privacy={privacy}

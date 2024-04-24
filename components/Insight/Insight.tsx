@@ -246,7 +246,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({
             <RegText>{getPercent(percent)}</RegText>
             {tab === 'sent' ? (
               <ZecAmount
-                currencyName={info.currencyName ? info.currencyName : ''}
+                currencyName={info.currencyName}
                 size={15}
                 amtZec={item.value}
                 style={{ marginHorizontal: 5 }}

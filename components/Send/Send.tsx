@@ -989,7 +989,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         }}>
                         <RegText style={{ fontSize: 14 }}>{translate('send.spendable') as string}</RegText>
                         <ZecAmount
-                          currencyName={info.currencyName ? info.currencyName : ''}
+                          currencyName={info.currencyName}
                           color={stillConfirming || negativeMaxAount ? 'red' : colors.money}
                           size={15}
                           amtZec={maxAmount}

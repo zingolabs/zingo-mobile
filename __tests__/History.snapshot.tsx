@@ -8,7 +8,7 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import History from '../components/History';
 import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
-import { CurrencyEnum, ModeEnum, PoolEnum, TransactionTypeEnum } from '../app/AppState';
+import { CurrencyEnum, CurrencyNameEnum, ModeEnum, PoolEnum, TransactionTypeEnum } from '../app/AppState';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -167,7 +167,7 @@ describe('Component History - test', () => {
     },
   ];
   state.translate = () => 'text translated';
-  state.info.currencyName = 'ZEC';
+  state.info.currencyName = CurrencyNameEnum.ZEC;
   state.totalBalance.total = 1.12345678;
   const onFunction = jest.fn();
 

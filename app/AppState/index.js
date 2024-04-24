@@ -45,6 +45,7 @@ import { SettingsNameEnum } from './enums/SettingsNameEnum';
 import { RouteEnums } from './enums/RouteEnums';
 import { WalletOptionEnum } from './enums/WalletOptionEnum';
 import { AppStateStatusEnum } from './enums/AppStateStatusEnum';
+import { CurrencyNameEnum } from './enums/CurrencyNameEnum';
 
 import AppStateLoaded from './AppStateLoaded';
 import AppStateLoading from './AppStateLoading';
@@ -97,4 +98,5 @@ export {
   RouteEnums,
   WalletOptionEnum,
   AppStateStatusEnum,
+  CurrencyNameEnum,
 };

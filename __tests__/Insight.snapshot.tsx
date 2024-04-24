@@ -8,6 +8,7 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import Insight from '../components/Insight';
 import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
+import { CurrencyNameEnum } from '../app/AppState';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -42,7 +43,7 @@ describe('Component Insight - test', () => {
     state.translate = () => {
       return 'text translated';
     };
-    state.info.currencyName = 'ZEC';
+    state.info.currencyName = CurrencyNameEnum.ZEC;
     state.totalBalance.total = 1.25691111;
     const onClose = jest.fn();
     const insight = render(

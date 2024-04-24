@@ -8,6 +8,7 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import Header from '../components/Header';
 import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
+import { CurrencyNameEnum } from '../app/AppState';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -48,7 +49,7 @@ describe('Component Header - test', () => {
   test('Header Complex - snapshot', () => {
     const state = defaultAppStateLoaded;
     state.translate = () => 'text translated';
-    state.info.currencyName = 'ZEC';
+    state.info.currencyName = CurrencyNameEnum.ZEC;
     state.totalBalance.total = 1.12345678;
     const onFunction = jest.fn();
     const header = render(

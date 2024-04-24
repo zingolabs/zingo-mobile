@@ -576,7 +576,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             marginTop: readOnly ? 15 : 0,
           }}>
           <ZecAmount
-            currencyName={info.currencyName ? info.currencyName : ''}
+            currencyName={info.currencyName}
             color={colors.text}
             size={36}
             amtZec={totalBalance.total}
@@ -620,7 +620,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           }}>
           <RegText color={colors.primary}>{translate('seed.youreceived') as string}</RegText>
           <ZecAmount
-            currencyName={info.currencyName ? info.currencyName : ''}
+            currencyName={info.currencyName}
             color={colors.primary}
             size={18}
             amtZec={totalBalance.total}

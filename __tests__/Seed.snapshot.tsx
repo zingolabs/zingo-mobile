@@ -13,7 +13,7 @@ import {
   defaultAppStateLoading,
   ContextAppLoadingProvider,
 } from '../app/context';
-import { SeedActionEnum } from '../app/AppState';
+import { CurrencyNameEnum, SeedActionEnum } from '../app/AppState';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -69,7 +69,7 @@ describe('Component Seed - test', () => {
     seed: 'pepe lolo titi',
     birthday: 1500100,
   };
-  stateLoaded.info.currencyName = 'ZEC';
+  stateLoaded.info.currencyName = CurrencyNameEnum.ZEC;
   stateLoaded.totalBalance.total = 1.12345678;
   const onOk = jest.fn();
   const onCancel = jest.fn();

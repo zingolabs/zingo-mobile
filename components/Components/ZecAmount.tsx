@@ -7,13 +7,14 @@ import { getNumberFormatSettings } from 'react-native-localize';
 import Utils from '../../app/utils';
 import { ThemeType } from '../../app/types';
 import { SvgXml } from 'react-native-svg';
+import { CurrencyNameEnum } from '../../app/AppState';
 
 type ZecAmountProps = {
   color?: string;
   size?: number;
   amtZec?: number;
   style?: TextStyle;
-  currencyName: string;
+  currencyName?: CurrencyNameEnum;
   privacy?: boolean;
   smallPrefix?: boolean;
   testID?: string;
@@ -46,10 +47,6 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
 
   if (!size) {
     size = 24;
-  }
-
-  if (!currencyName) {
-    currencyName = '---';
   }
 
   if (!color) {
@@ -85,7 +82,7 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
             margin: 0,
             padding: 0,
           }}>
-          {currencyName === 'ZEC' ? (
+          {!!currencyName && currencyName === CurrencyNameEnum.ZEC ? (
             <SvgXml
               width={size * 2 * (smallPrefix ? 0.7 : 1)}
               height={size * (smallPrefix ? 0.7 : 1)}
@@ -104,7 +101,7 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
                 margin: 0,
                 padding: 0,
               }}>
-              {currencyName}
+              {currencyName ? currencyName : '---'}
             </Text>
           )}
           {privacyHigh ? (
