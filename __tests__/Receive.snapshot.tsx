@@ -8,7 +8,7 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import Receive from '../components/Receive';
 import { ContextAppLoadedProvider, defaultAppStateLoaded } from '../app/context';
-import { CurrencyNameEnum } from '../app/AppState';
+import { AddressKindEnum, CurrencyNameEnum } from '../app/AppState';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -57,21 +57,21 @@ describe('Component Receive - test', () => {
       {
         uaAddress: 'UA-12345678901234567890',
         address: 'UA-12345678901234567890',
-        addressKind: 'u',
+        addressKind: AddressKindEnum.u,
         containsPending: false,
         receivers: 'ozt',
       },
       {
         uaAddress: 'UA-12345678901234567890',
         address: 'sapling-12345678901234567890',
-        addressKind: 'z',
+        addressKind: AddressKindEnum.z,
         containsPending: false,
         receivers: 'z',
       },
       {
         uaAddress: 'UA-12345678901234567890',
         address: 'transparent-12345678901234567890',
-        addressKind: 't',
+        addressKind: AddressKindEnum.t,
         containsPending: false,
         receivers: 't',
       },

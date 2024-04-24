@@ -8,7 +8,14 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import History from '../components/History';
 import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
-import { CurrencyEnum, CurrencyNameEnum, ModeEnum, PoolEnum, TransactionTypeEnum } from '../app/AppState';
+import {
+  AddressKindEnum,
+  CurrencyEnum,
+  CurrencyNameEnum,
+  ModeEnum,
+  PoolEnum,
+  TransactionTypeEnum,
+} from '../app/AppState';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -147,21 +154,21 @@ describe('Component History - test', () => {
     {
       uaAddress: 'UA-12345678901234567890',
       address: 'UA-12345678901234567890',
-      addressKind: 'u',
+      addressKind: AddressKindEnum.u,
       containsPending: false,
       receivers: 'ozt',
     },
     {
       uaAddress: 'UA-12345678901234567890',
       address: 'sapling-12345678901234567890',
-      addressKind: 'z',
+      addressKind: AddressKindEnum.z,
       containsPending: false,
       receivers: 'z',
     },
     {
       uaAddress: 'UA-12345678901234567890',
       address: 'transparent-12345678901234567890',
-      addressKind: 't',
+      addressKind: AddressKindEnum.t,
       containsPending: false,
       receivers: 't',
     },

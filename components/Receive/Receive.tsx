@@ -15,7 +15,7 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 
-import { AddressClass, ModeEnum, SettingsNameEnum } from '../../app/AppState';
+import { AddressClass, AddressKindEnum, ModeEnum, SettingsNameEnum } from '../../app/AppState';
 
 type ReceiveProps = {
   setUaAddress: (uaAddress: string) => void;
@@ -54,9 +54,9 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
 
   useEffect(() => {
     if (addresses && addresses.length && uaAddress) {
-      const uadd = addresses.filter(a => a.addressKind === 'u') || [];
-      const zadd = addresses.filter(a => a.uaAddress === uaAddress && a.addressKind === 'z') || [];
-      const tadd = addresses.filter(a => a.uaAddress === uaAddress && a.addressKind === 't') || [];
+      const uadd = addresses.filter(a => a.addressKind === AddressKindEnum.u) || [];
+      const zadd = addresses.filter(a => a.uaAddress === uaAddress && a.addressKind === AddressKindEnum.z) || [];
+      const tadd = addresses.filter(a => a.uaAddress === uaAddress && a.addressKind === AddressKindEnum.t) || [];
       setUaddrs(uadd);
       setZaddrs(zadd);
       setTaddrs(tadd);
@@ -66,8 +66,8 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     }
   }, [addresses, uaAddress]);
 
-  const prev = (type: string) => {
-    if (type === 'u') {
+  const prev = (type: AddressKindEnum) => {
+    if (type === AddressKindEnum.u) {
       if (uaddrs.length === 0) {
         return;
       }
@@ -77,7 +77,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
       }
       setUIndex(newIndex);
       setUaAddress(uaddrs[newIndex].address);
-    } else if (type === 'z') {
+    } else if (type === AddressKindEnum.z) {
       if (zaddrs.length === 0) {
         return;
       }
@@ -86,7 +86,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
         newIndex = zaddrs.length - 1;
       }
       setZIndex(newIndex);
-    } else if (type === 't') {
+    } else if (type === AddressKindEnum.t) {
       if (taddrs.length === 0) {
         return;
       }
@@ -98,21 +98,21 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     }
   };
 
-  const next = (type: string) => {
-    if (type === 'u') {
+  const next = (type: AddressKindEnum) => {
+    if (type === AddressKindEnum.u) {
       if (uaddrs.length === 0) {
         return;
       }
       const newIndex = (uindex + 1) % uaddrs.length;
       setUIndex(newIndex);
       setUaAddress(uaddrs[newIndex].address);
-    } else if (type === 'z') {
+    } else if (type === AddressKindEnum.z) {
       if (zaddrs.length === 0) {
         return;
       }
       const newIndex = (zindex + 1) % zaddrs.length;
       setZIndex(newIndex);
-    } else if (type === 't') {
+    } else if (type === AddressKindEnum.t) {
       if (taddrs.length === 0) {
         return;
       }
@@ -155,10 +155,10 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
               index={uindex}
               total={uaddrs.length}
               prev={() => {
-                prev('u');
+                prev(AddressKindEnum.u);
               }}
               next={() => {
-                next('u');
+                next(AddressKindEnum.u);
               }}
             />
           )
@@ -180,10 +180,10 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
               index={zindex}
               total={zaddrs.length}
               prev={() => {
-                prev('z');
+                prev(AddressKindEnum.z);
               }}
               next={() => {
-                next('z');
+                next(AddressKindEnum.z);
               }}
             />
           )
@@ -205,10 +205,10 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
               index={tindex}
               total={taddrs.length}
               prev={() => {
-                prev('t');
+                prev(AddressKindEnum.t);
               }}
               next={() => {
-                next('t');
+                next(AddressKindEnum.t);
               }}
             />
           )

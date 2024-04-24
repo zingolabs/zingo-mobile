@@ -16,6 +16,7 @@ import {
   PoolEnum,
   WalletOptionEnum,
   CurrencyNameEnum,
+  AddressKindEnum,
 } from '../AppState';
 import RPCModule from '../RPCModule';
 import { RPCAddressType } from './types/RPCAddressType';
@@ -1368,21 +1369,21 @@ export default class RPC {
           (u.receivers.sapling ? 'z' : '') +
           (u.receivers.transparent ? 't' : '');
         if (u.address) {
-          const abu = new AddressClass(u.address, u.address, 'u', receivers);
+          const abu = new AddressClass(u.address, u.address, AddressKindEnum.u, receivers);
           if (pendingAddress.has(abu.address)) {
             abu.containsPending = true;
           }
           allAddresses.push(abu);
         }
         if (u.receivers.sapling) {
-          const abz = new AddressClass(u.address, u.receivers.sapling, 'z', receivers);
+          const abz = new AddressClass(u.address, u.receivers.sapling, AddressKindEnum.z, receivers);
           if (pendingAddress.has(abz.address)) {
             abz.containsPending = true;
           }
           allAddresses.push(abz);
         }
         if (u.receivers.transparent) {
-          const abt = new AddressClass(u.address, u.receivers.transparent, 't', receivers);
+          const abt = new AddressClass(u.address, u.receivers.transparent, AddressKindEnum.t, receivers);
           if (pendingAddress.has(abt.address)) {
             abt.containsPending = true;
           }
