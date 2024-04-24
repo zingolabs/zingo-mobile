@@ -41,6 +41,7 @@ import { RestoreFromTypeEnum } from './enums/RestoreFromTypeEnum';
 import { PoolToShieldEnum } from './enums/PoolToShieldEnum';
 import { SeedActionEnum } from './enums/SeedActionEnum';
 import { UfvkActionEnum } from './enums/UfvkActionEnum';
+import { SettingsNameEnum } from './enums/SettingsNameEnum';
 
 import AppStateLoaded from './AppStateLoaded';
 import AppStateLoading from './AppStateLoading';
@@ -89,4 +90,5 @@ export {
   PoolToShieldEnum,
   SeedActionEnum,
   UfvkActionEnum,
+  SettingsNameEnum,
 };

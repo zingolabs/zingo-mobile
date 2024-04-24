@@ -56,6 +56,7 @@ import {
   ChainNameEnum,
   SeedActionEnum,
   UfvkActionEnum,
+  SettingsNameEnum,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
@@ -163,11 +164,11 @@ export default function LoadedApp(props: LoadedAppProps) {
 
       // If the App is mounting this component,
       // I know I have to reset the firstInstall & firstUpdateWithDonation prop in settings.
-      await SettingsFileImpl.writeSettings('firstInstall', false);
-      await SettingsFileImpl.writeSettings('firstUpdateWithDonation', false);
+      await SettingsFileImpl.writeSettings(SettingsNameEnum.firstInstall, false);
+      await SettingsFileImpl.writeSettings(SettingsNameEnum.firstUpdateWithDonation, false);
 
       // If the App is mounting this component, I know I have to update the version prop in settings.
-      await SettingsFileImpl.writeSettings('version', translate('version') as string);
+      await SettingsFileImpl.writeSettings(SettingsNameEnum.version, translate('version') as string);
 
       //I have to check what language is in the settings
       const settings = await SettingsFileImpl.readSettings();
@@ -194,50 +195,50 @@ export default function LoadedApp(props: LoadedAppProps) {
             : (fallback.languageTag as LanguageEnum);
         setLanguage(lang);
         i18n.locale = lang;
-        await SettingsFileImpl.writeSettings('language', lang);
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.language, lang);
         //console.log('apploaded NO settings', languageTag);
       }
       if (settings.currency === CurrencyEnum.noCurrency || settings.currency === CurrencyEnum.USDCurrency) {
         setCurrency(settings.currency);
       } else {
-        await SettingsFileImpl.writeSettings('currency', currency);
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.currency, currency);
       }
       if (settings.server) {
         setServer(settings.server);
       } else {
-        await SettingsFileImpl.writeSettings('server', server);
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.server, server);
       }
       if (settings.sendAll === true || settings.sendAll === false) {
         setSendAll(settings.sendAll);
       } else {
-        await SettingsFileImpl.writeSettings('sendAll', sendAll);
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.sendAll, sendAll);
       }
       if (settings.donation === true || settings.donation === false) {
         setDonation(settings.donation);
       } else {
-        await SettingsFileImpl.writeSettings('donation', donation);
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.donation, donation);
       }
       if (settings.privacy === true || settings.privacy === false) {
         setPrivacy(settings.privacy);
       } else {
-        await SettingsFileImpl.writeSettings('privacy', privacy);
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.privacy, privacy);
       }
       if (settings.mode === ModeEnum.basic || settings.mode === ModeEnum.advanced) {
         setMode(settings.mode);
         props.toggleTheme(settings.mode);
       } else {
-        await SettingsFileImpl.writeSettings('mode', mode);
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.mode, mode);
         props.toggleTheme(mode);
       }
       if (settings.security) {
         setSecurity(settings.security);
       } else {
-        await SettingsFileImpl.writeSettings('security', security);
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.security, security);
       }
       if (settings.selectServer) {
         setSelectServer(settings.selectServer);
       } else {
-        await SettingsFileImpl.writeSettings('selectServer', selectServer);
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.selectServer, selectServer);
       }
 
       // reading background task info
@@ -679,7 +680,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     } else {
       // for advanced mode
       if (!basicFirstViewSeed) {
-        await SettingsFileImpl.writeSettings('basicFirstViewSeed', true);
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.basicFirstViewSeed, true);
       }
     }
     if (deepDiff(this.state.transactions, transactions)) {
@@ -979,11 +980,11 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
         [
           {
             text: translate('confirm') as string,
-            onPress: async () => await this.set_donation_option('donation', true),
+            onPress: async () => await this.set_donation_option(SettingsNameEnum.donation, true),
           },
           {
             text: translate('cancel') as string,
-            onPress: async () => await this.set_donation_option('donation', false),
+            onPress: async () => await this.set_donation_option(SettingsNameEnum.donation, false),
             style: 'cancel',
           },
         ],
@@ -1006,7 +1007,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
   };
 
   set_server_option = async (
-    name: 'server',
+    name: SettingsNameEnum.server,
     value: ServerType,
     toast: boolean,
     same_server_chain_name: boolean,
@@ -1095,7 +1096,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     }
   };
 
-  set_currency_option = async (name: 'currency', value: CurrencyEnum): Promise<void> => {
+  set_currency_option = async (name: SettingsNameEnum.currency, value: CurrencyEnum): Promise<void> => {
     await SettingsFileImpl.writeSettings(name, value);
     this.setState({
       currency: value as CurrencyEnum,
@@ -1105,7 +1106,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     this.rpc.fetchWalletSettings();
   };
 
-  set_language_option = async (name: 'language', value: string, reset: boolean): Promise<void> => {
+  set_language_option = async (name: SettingsNameEnum.language, value: string, reset: boolean): Promise<void> => {
     await SettingsFileImpl.writeSettings(name, value);
     this.setState({
       language: value as LanguageEnum,
@@ -1118,7 +1119,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     }
   };
 
-  set_sendAll_option = async (name: 'sendAll', value: boolean): Promise<void> => {
+  set_sendAll_option = async (name: SettingsNameEnum.sendAll, value: boolean): Promise<void> => {
     await SettingsFileImpl.writeSettings(name, value);
     this.setState({
       sendAll: value as boolean,
@@ -1128,7 +1129,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     this.rpc.fetchWalletSettings();
   };
 
-  set_donation_option = async (name: 'donation', value: boolean): Promise<void> => {
+  set_donation_option = async (name: SettingsNameEnum.donation, value: boolean): Promise<void> => {
     await SettingsFileImpl.writeSettings(name, value);
     this.setState({
       donation: value as boolean,
@@ -1138,7 +1139,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     this.rpc.fetchWalletSettings();
   };
 
-  set_privacy_option = async (name: 'privacy', value: boolean): Promise<void> => {
+  set_privacy_option = async (name: SettingsNameEnum.privacy, value: boolean): Promise<void> => {
     await SettingsFileImpl.writeSettings(name, value);
     this.setState({
       privacy: value as boolean,
@@ -1148,7 +1149,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     this.rpc.fetchWalletSettings();
   };
 
-  set_mode_option = async (name: 'mode', value: string): Promise<void> => {
+  set_mode_option = async (name: SettingsNameEnum.mode, value: string): Promise<void> => {
     await SettingsFileImpl.writeSettings(name, value);
     this.setState({
       mode: value as ModeEnum,
@@ -1162,7 +1163,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     this.rpc.fetchWalletSettings();
   };
 
-  set_security_option = async (name: 'security', value: SecurityType): Promise<void> => {
+  set_security_option = async (name: SettingsNameEnum.security, value: SecurityType): Promise<void> => {
     await SettingsFileImpl.writeSettings(name, value);
     this.setState({
       security: value as SecurityType,
@@ -1172,7 +1173,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     this.rpc.fetchWalletSettings();
   };
 
-  set_selectServer_option = async (name: 'selectServer', value: string): Promise<void> => {
+  set_selectServer_option = async (name: SettingsNameEnum.selectServer, value: string): Promise<void> => {
     await SettingsFileImpl.writeSettings(name, value);
     this.setState({
       selectServer: value as SelectServerEnum,
@@ -1187,7 +1188,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
 
     await this.rpc.clearTimers();
     if (!!state.screen && state.screen === 3) {
-      await this.set_mode_option('mode', ModeEnum.advanced);
+      await this.set_mode_option(SettingsNameEnum.mode, ModeEnum.advanced);
     }
     navigation.reset({
       index: 0,
@@ -1266,7 +1267,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
         //console.log(`change server ok ${value}`);
       }
 
-      await SettingsFileImpl.writeSettings('server', this.state.newServer);
+      await SettingsFileImpl.writeSettings(SettingsNameEnum.server, this.state.newServer);
       this.setState({
         server: this.state.newServer,
         newServer: {} as ServerType,

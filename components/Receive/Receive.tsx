@@ -15,13 +15,13 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 
-import { AddressClass, ModeEnum } from '../../app/AppState';
+import { AddressClass, ModeEnum, SettingsNameEnum } from '../../app/AppState';
 
 type ReceiveProps = {
   setUaAddress: (uaAddress: string) => void;
   toggleMenuDrawer: () => void;
   syncingStatusMoreInfoOnClick: () => void;
-  set_privacy_option: (name: 'privacy', value: boolean) => Promise<void>;
+  set_privacy_option: (name: SettingsNameEnum.privacy, value: boolean) => Promise<void>;
   setUfvkViewModalVisible?: (v: boolean) => void;
 };
 

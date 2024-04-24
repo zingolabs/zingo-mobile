@@ -7,6 +7,7 @@ import {
   ServerType,
   ServerUrisType,
   SettingsFileClass,
+  SettingsNameEnum,
 } from '../../app/AppState';
 import { serverUris } from '../../app/uris';
 import { isEqual } from 'lodash';
@@ -17,23 +18,7 @@ export default class SettingsFileImpl {
   }
 
   // Write the server setting
-  static async writeSettings(
-    name:
-      | 'server'
-      | 'currency'
-      | 'language'
-      | 'sendAll'
-      | 'donation'
-      | 'privacy'
-      | 'mode'
-      | 'firstInstall'
-      | 'basicFirstViewSeed'
-      | 'version'
-      | 'security'
-      | 'selectServer'
-      | 'firstUpdateWithDonation',
-    value: string | boolean | ServerType | SecurityType,
-  ) {
+  static async writeSettings(name: SettingsNameEnum, value: string | boolean | ServerType | SecurityType) {
     const fileName = await this.getFileName();
     const settings = await this.readSettings();
     const newSettings: SettingsFileClass = { ...settings, [name]: value };
@@ -57,7 +42,7 @@ export default class SettingsFileImpl {
       const settings: SettingsFileClass = JSON.parse((await RNFS.readFile(fileName, 'utf8')).toString());
       // If server as string is found, I need to convert to: ServerType
       // if not, I'm losing the value
-      if (!settings.hasOwnProperty('server')) {
+      if (!settings.hasOwnProperty(SettingsNameEnum.server)) {
         settings.server = {
           uri: serverUris(() => {})[0].uri,
           chain_name: serverUris(() => {})[0].chain_name,
@@ -88,18 +73,18 @@ export default class SettingsFileImpl {
           }
         }
       }
-      if (!settings.hasOwnProperty('basicFirstViewSeed')) {
+      if (!settings.hasOwnProperty(SettingsNameEnum.basicFirstViewSeed)) {
         // by default we assume the user saw the seed,
         // only if the user is basic and is creating a new wallet -> false.
         // this means when the user have funds, the seed screen will show up.
         settings.basicFirstViewSeed = true;
       }
-      if (!settings.hasOwnProperty('version')) {
+      if (!settings.hasOwnProperty(SettingsNameEnum.version)) {
         // here we know the user is updating the App, for sure.
         // from some version before.
         settings.version = '';
       }
-      if (!settings.hasOwnProperty('security')) {
+      if (!settings.hasOwnProperty(SettingsNameEnum.security)) {
         // this is the first time the App implemented
         // screen security. Default values.
         settings.security = {
@@ -114,7 +99,7 @@ export default class SettingsFileImpl {
           restoreWalletBackupScreen: true,
         };
       }
-      if (!settings.hasOwnProperty('selectServer')) {
+      if (!settings.hasOwnProperty(SettingsNameEnum.selectServer)) {
         // this is the first time the App have selection server
         // here just exists 4 options:
         // - lightwalletd or zcash-infra (default)
@@ -145,7 +130,7 @@ export default class SettingsFileImpl {
           settings.selectServer = SelectServerEnum.custom;
         }
       }
-      if (!settings.hasOwnProperty('donation')) {
+      if (!settings.hasOwnProperty(SettingsNameEnum.donation)) {
         // this means the App shows up an Alert asking about the tip/donation new feature.
         settings.firstUpdateWithDonation = true;
       }

@@ -21,6 +21,7 @@ import {
   ChainNameEnum,
   SnackbarDurationEnum,
   SeedActionEnum,
+  SettingsNameEnum,
 } from '../../app/AppState';
 import RPCModule from '../../app/RPCModule';
 import RPC from '../../app/rpc';
@@ -50,7 +51,7 @@ type SeedProps = {
   onClickOK: (seedPhrase: string, birthdayNumber: number) => void;
   onClickCancel: () => void;
   action: SeedActionEnum;
-  set_privacy_option: (name: 'privacy', value: boolean) => Promise<void>;
+  set_privacy_option: (name: SettingsNameEnum.privacy, value: boolean) => Promise<void>;
 };
 const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, action, set_privacy_option }) => {
   const contextLoaded = useContext(ContextAppLoaded);
@@ -522,7 +523,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
             }
             // the user just see the seed for the first time.
             if (mode === ModeEnum.basic && !basicFirstViewSeed) {
-              await SettingsFileImpl.writeSettings('basicFirstViewSeed', true);
+              await SettingsFileImpl.writeSettings(SettingsNameEnum.basicFirstViewSeed, true);
             }
             if (times === 0) {
               Keyboard.dismiss();

@@ -23,6 +23,7 @@ import {
   CurrencyEnum,
   SnackbarDurationEnum,
   PoolToShieldEnum,
+  SettingsNameEnum,
 } from '../../app/AppState';
 import { ContextAppLoaded } from '../../app/context';
 import { ThemeType } from '../../app/types';
@@ -61,7 +62,7 @@ type HeaderProps = {
   setComputingModalVisible?: (visible: boolean) => void;
   setBackgroundError?: (title: string, error: string) => void;
   noPrivacy?: boolean;
-  set_privacy_option?: (name: 'privacy', value: boolean) => Promise<void>;
+  set_privacy_option?: (name: SettingsNameEnum.privacy, value: boolean) => Promise<void>;
   setPoolsToShieldSelectSapling?: (v: boolean) => void;
   setPoolsToShieldSelectTransparent?: (v: boolean) => void;
   setUfvkViewModalVisible?: (v: boolean) => void;
@@ -527,7 +528,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 }`,
                 type: 'Primary',
               });
-              set_privacy_option('privacy', !privacy);
+              set_privacy_option(SettingsNameEnum.privacy, !privacy);
             }}>
             <View
               style={{

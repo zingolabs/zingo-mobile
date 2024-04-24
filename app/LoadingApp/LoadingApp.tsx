@@ -45,6 +45,7 @@ import {
   DownloadMemosEnum,
   SnackbarDurationEnum,
   SeedActionEnum,
+  SettingsNameEnum,
 } from '../AppState';
 import { parseServerURI, serverUris } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
@@ -167,14 +168,14 @@ export default function LoadingApp(props: LoadingAppProps) {
         // basic mode
         setMode(ModeEnum.basic);
         props.toggleTheme(ModeEnum.basic);
-        await SettingsFileImpl.writeSettings('mode', ModeEnum.basic);
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.mode, ModeEnum.basic);
       } else {
         if (settings.mode === ModeEnum.basic || settings.mode === ModeEnum.advanced) {
           setMode(settings.mode);
           props.toggleTheme(settings.mode);
         } else {
           // if it is not a fresh install -> advanced
-          await SettingsFileImpl.writeSettings('mode', mode);
+          await SettingsFileImpl.writeSettings(SettingsNameEnum.mode, mode);
           props.toggleTheme(mode);
         }
       }
@@ -197,43 +198,43 @@ export default function LoadingApp(props: LoadingAppProps) {
             : (fallback.languageTag as LanguageEnum);
         setLanguage(lang);
         i18n.locale = lang;
-        await SettingsFileImpl.writeSettings('language', lang);
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.language, lang);
         //console.log('apploading NO settings', languageTag);
       }
       if (settings.currency === CurrencyEnum.noCurrency || settings.currency === CurrencyEnum.USDCurrency) {
         setCurrency(settings.currency);
       } else {
-        await SettingsFileImpl.writeSettings('currency', currency);
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.currency, currency);
       }
       if (settings.server) {
         setServer(settings.server);
       } else {
-        await SettingsFileImpl.writeSettings('server', server);
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.server, server);
       }
       if (settings.sendAll === true || settings.sendAll === false) {
         setSendAll(settings.sendAll);
       } else {
-        await SettingsFileImpl.writeSettings('sendAll', sendAll);
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.sendAll, sendAll);
       }
       if (settings.donation === true || settings.donation === false) {
         setDonation(settings.donation);
       } else {
-        await SettingsFileImpl.writeSettings('donation', donation);
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.donation, donation);
       }
       if (settings.privacy === true || settings.privacy === false) {
         setPrivacy(settings.privacy);
       } else {
-        await SettingsFileImpl.writeSettings('privacy', privacy);
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.privacy, privacy);
       }
       if (settings.security) {
         setSecurity(settings.security);
       } else {
-        await SettingsFileImpl.writeSettings('security', security);
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.security, security);
       }
       if (settings.selectServer) {
         setSelectServer(settings.selectServer);
       } else {
-        await SettingsFileImpl.writeSettings('selectServer', selectServer);
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.selectServer, selectServer);
       }
 
       // for testing
@@ -401,7 +402,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
       await this.showDonationAlertAsync()
         .then(() => {
           this.setState({ donation: true });
-          SettingsFileImpl.writeSettings('donation', true);
+          SettingsFileImpl.writeSettings(SettingsNameEnum.donation, true);
         })
         .catch(() => {});
     }
@@ -483,14 +484,14 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
         if (this.state.mode === ModeEnum.basic) {
           // setting the prop basicFirstViewSeed to false.
           // this means when the user have funds, the seed screen will show up.
-          await SettingsFileImpl.writeSettings('basicFirstViewSeed', false);
+          await SettingsFileImpl.writeSettings(SettingsNameEnum.basicFirstViewSeed, false);
           this.createNewWallet();
           this.setState({ actionButtonsDisabled: false });
           this.navigateToLoadedApp();
           //console.log('navigate to LoadedApp');
         } else {
           // for advanced mode
-          await SettingsFileImpl.writeSettings('basicFirstViewSeed', true);
+          await SettingsFileImpl.writeSettings(SettingsNameEnum.basicFirstViewSeed, true);
           this.setState(state => ({
             screen: state.screen === 3 ? 3 : 1,
             walletExists: false,
@@ -605,8 +606,8 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
       server: fasterServer,
       selectServer: SelectServerEnum.list,
     });
-    await SettingsFileImpl.writeSettings('server', fasterServer);
-    await SettingsFileImpl.writeSettings('selectServer', SelectServerEnum.list);
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.server, fasterServer);
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.selectServer, SelectServerEnum.list);
     // message with the result only for advanced users
     if (this.state.mode === ModeEnum.advanced) {
       if (isEqual(actualServer, fasterServer)) {
@@ -693,7 +694,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
   //usingDefaultServer_0 = async (mode: ModeEnum.basic | ModeEnum.advanced) => {
   //  this.setState({ actionButtonsDisabled: true });
   //  if (SERVER_DEFAULT_0) {
-  //    await SettingsFileImpl.writeSettings('server', SERVER_DEFAULT_0);
+  //    await SettingsFileImpl.writeSettings(SettingsNameEnum.server, SERVER_DEFAULT_0);
   //    this.setState({ server: SERVER_DEFAULT_0 });
   //  }
   //  if (mode === ModeEnum.basic) {
@@ -706,7 +707,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
   //usingDefaultServer_1 = async (mode: ModeEnum.basic | ModeEnum.advanced) => {
   //  this.setState({ actionButtonsDisabled: true });
   //  if (SERVER_DEFAULT_1) {
-  //    await SettingsFileImpl.writeSettings('server', SERVER_DEFAULT_1);
+  //    await SettingsFileImpl.writeSettings(SettingsNameEnum.server, SERVER_DEFAULT_1);
   //    this.setState({ server: SERVER_DEFAULT_1 });
   //  }
   //  if (mode === ModeEnum.basic) {
@@ -726,7 +727,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     if (uri.toLowerCase().startsWith('error')) {
       this.addLastSnackbar({ message: this.state.translate('settings.isuri') as string, type: 'Primary' });
     } else {
-      await SettingsFileImpl.writeSettings('server', { uri, chain_name });
+      await SettingsFileImpl.writeSettings(SettingsNameEnum.server, { uri, chain_name });
       this.setState({
         server: { uri, chain_name },
         customServerShow: false,
@@ -877,7 +878,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     await RPC.rpc_setWalletSettingOption(name, value);
   };
 
-  set_privacy_option = async (name: 'privacy', value: boolean): Promise<void> => {
+  set_privacy_option = async (name: SettingsNameEnum.privacy, value: boolean): Promise<void> => {
     await SettingsFileImpl.writeSettings(name, value);
     this.setState({
       privacy: value as boolean,
@@ -918,7 +919,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
 
   changeMode = async (mode: ModeEnum.basic | ModeEnum.advanced) => {
     this.setState({ mode, screen: 0 });
-    await SettingsFileImpl.writeSettings('mode', mode);
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.mode, mode);
     this.props.toggleTheme(mode);
     // if the user selects advanced mode & wants to change to another wallet
     // and then the user wants to go to basic mode in the first screen

@@ -8,7 +8,7 @@ import 'moment/locale/ru';
 
 import { useTheme } from '@react-navigation/native';
 
-import { SendPageStateClass, TransactionType } from '../../app/AppState';
+import { SendPageStateClass, SettingsNameEnum, TransactionType } from '../../app/AppState';
 import { ThemeType } from '../../app/types';
 import FadeText from '../Components/FadeText';
 import Button from '../Components/Button';
@@ -24,7 +24,7 @@ type HistoryProps = {
   syncingStatusMoreInfoOnClick: () => void;
   setZecPrice: (p: number, d: number) => void;
   setComputingModalVisible: (visible: boolean) => void;
-  set_privacy_option: (name: 'privacy', value: boolean) => Promise<void>;
+  set_privacy_option: (name: SettingsNameEnum.privacy, value: boolean) => Promise<void>;
   setPoolsToShieldSelectSapling: (v: boolean) => void;
   setPoolsToShieldSelectTransparent: (v: boolean) => void;
   setUfvkViewModalVisible?: (v: boolean) => void;

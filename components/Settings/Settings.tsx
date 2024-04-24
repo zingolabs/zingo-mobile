@@ -29,6 +29,7 @@ import {
   CurrencyEnum,
   SelectServerEnum,
   ChainNameEnum,
+  SettingsNameEnum,
 } from '../../app/AppState';
 import { isEqual } from 'lodash';
 import ChainTypeToggle from '../Components/ChainTypeToggle';
@@ -39,19 +40,19 @@ type SettingsProps = {
   closeModal: () => void;
   set_wallet_option: (name: string, value: string) => Promise<void>;
   set_server_option: (
-    name: 'server',
+    name: SettingsNameEnum.server,
     value: ServerType,
     toast: boolean,
     same_server_chain_name: boolean,
   ) => Promise<void>;
-  set_currency_option: (name: 'currency', value: CurrencyEnum) => Promise<void>;
-  set_language_option: (name: 'language', value: LanguageEnum, reset: boolean) => Promise<void>;
-  set_sendAll_option: (name: 'sendAll', value: boolean) => Promise<void>;
-  set_donation_option: (name: 'donation', value: boolean) => Promise<void>;
-  set_privacy_option: (name: 'privacy', value: boolean) => Promise<void>;
-  set_mode_option: (name: 'mode', value: string) => Promise<void>;
-  set_security_option: (name: 'security', value: SecurityType) => Promise<void>;
-  set_selectServer_option: (name: 'selectServer', value: string) => Promise<void>;
+  set_currency_option: (name: SettingsNameEnum.currency, value: CurrencyEnum) => Promise<void>;
+  set_language_option: (name: SettingsNameEnum.language, value: LanguageEnum, reset: boolean) => Promise<void>;
+  set_sendAll_option: (name: SettingsNameEnum.sendAll, value: boolean) => Promise<void>;
+  set_donation_option: (name: SettingsNameEnum.donation, value: boolean) => Promise<void>;
+  set_privacy_option: (name: SettingsNameEnum.privacy, value: boolean) => Promise<void>;
+  set_mode_option: (name: SettingsNameEnum.mode, value: string) => Promise<void>;
+  set_security_option: (name: SettingsNameEnum.security, value: SecurityType) => Promise<void>;
+  set_selectServer_option: (name: SettingsNameEnum.selectServer, value: string) => Promise<void>;
 };
 
 type Options = {
@@ -327,7 +328,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         }
         // in this point the sync process is blocked, who knows why.
         // if I save the actual server before the customization... is going to work.
-        set_server_option('server', serverContext, false, same_server_chain_name);
+        set_server_option(SettingsNameEnum.server, serverContext, false, same_server_chain_name);
         setDisabled(false);
         return;
       } else {
@@ -346,35 +347,35 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       await set_wallet_option('transaction_filter_threshold', filter);
     }
     if (currencyContext !== currency) {
-      await set_currency_option('currency', currency);
+      await set_currency_option(SettingsNameEnum.currency, currency);
     }
     if (sendAllContext !== sendAll) {
-      await set_sendAll_option('sendAll', sendAll);
+      await set_sendAll_option(SettingsNameEnum.sendAll, sendAll);
     }
     if (donationContext !== donation) {
-      await set_donation_option('donation', donation);
+      await set_donation_option(SettingsNameEnum.donation, donation);
     }
     if (privacyContext !== privacy) {
-      await set_privacy_option('privacy', privacy);
+      await set_privacy_option(SettingsNameEnum.privacy, privacy);
     }
     if (modeContext !== mode) {
-      await set_mode_option('mode', mode);
+      await set_mode_option(SettingsNameEnum.mode, mode);
     }
     if (!isEqual(securityContext, securityObject())) {
-      await set_security_option('security', securityObject());
+      await set_security_option(SettingsNameEnum.security, securityObject());
     }
     if (selectServerContext !== selectServer) {
-      await set_selectServer_option('selectServer', selectServer);
+      await set_selectServer_option(SettingsNameEnum.selectServer, selectServer);
     }
 
     // I need a little time in this modal because maybe the wallet cannot be open with the new server
     let ms = 100;
     if (serverContext.uri !== serverUriParsed || serverContext.chain_name !== chain_nameParsed) {
       if (languageContext !== language) {
-        await set_language_option('language', language, false);
+        await set_language_option(SettingsNameEnum.language, language, false);
       }
       set_server_option(
-        'server',
+        SettingsNameEnum.server,
         { uri: serverUriParsed, chain_name: chain_nameParsed } as ServerType,
         true,
         same_server_chain_name,
@@ -382,7 +383,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       ms = 1500;
     } else {
       if (languageContext !== language) {
-        await set_language_option('language', language, true);
+        await set_language_option(SettingsNameEnum.language, language, true);
       }
     }
 
@@ -396,7 +397,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     setOption: React.Dispatch<React.SetStateAction<string | boolean>>,
     typeOption: StringConstructor | BooleanConstructor,
     valueOption: string | boolean,
-    label: string,
+    label: string, // in lowercase to match with the translation json files.
   ) => {
     return DATA.map(item => (
       <View key={'view-' + item.value}>
