@@ -14,7 +14,7 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import RegText from '../Components/RegText';
-import { ChainNameEnum, ModeEnum } from '../../app/AppState';
+import { ChainNameEnum, ModeEnum, UfvkActionEnum } from '../../app/AppState';
 
 type TextsType = {
   new: string[];
@@ -28,7 +28,7 @@ type TextsType = {
 type ShowUfvkProps = {
   onClickOK: () => void;
   onClickCancel: () => void;
-  action: 'change' | 'view' | 'backup' | 'server';
+  action: UfvkActionEnum;
   set_privacy_option: (name: 'privacy', value: boolean) => Promise<void>;
 };
 const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCancel, action, set_privacy_option }) => {
@@ -47,7 +47,9 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
       buttonTexts = buttonTextsArray as TextsType;
       setTexts(buttonTexts);
     }
-    setTimes(action === 'change' || action === 'backup' || action === 'server' ? 1 : 0);
+    setTimes(
+      action === UfvkActionEnum.change || action === UfvkActionEnum.backup || action === UfvkActionEnum.server ? 1 : 0,
+    );
   }, [action, translate]);
 
   // because this screen is fired from more places than the menu.
@@ -58,14 +60,15 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
   const onPressOK = () => {
     Alert.alert(
       !!texts && !!texts[action] ? texts[action][3] : '',
-      (action === 'change'
+      (action === UfvkActionEnum.change
         ? (translate('ufvk.change-warning') as string)
-        : action === 'backup'
+        : action === UfvkActionEnum.backup
         ? (translate('ufvk.backup-warning') as string)
-        : action === 'server'
+        : action === UfvkActionEnum.server
         ? (translate('ufvk.server-warning') as string)
         : '') +
-        (server.chain_name !== ChainNameEnum.mainChainName && (action === 'change' || action === 'server')
+        (server.chain_name !== ChainNameEnum.mainChainName &&
+        (action === UfvkActionEnum.change || action === UfvkActionEnum.server)
           ? '\n' + (translate('ufvk.mainnet-warning') as string)
           : ''),
       [
@@ -107,7 +110,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
           justifyContent: 'flex-start',
         }}>
         <RegText style={{ marginTop: 0, padding: 20, textAlign: 'center', fontWeight: '900' }}>
-          {action === 'backup' || action === 'change' || action === 'server'
+          {action === UfvkActionEnum.backup || action === UfvkActionEnum.change || action === UfvkActionEnum.server
             ? (translate(`ufvk.text-readonly-${action}`) as string)
             : (translate('ufvk.text-readonly') as string)}
         </RegText>

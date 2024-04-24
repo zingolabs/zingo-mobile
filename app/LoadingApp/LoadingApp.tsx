@@ -44,6 +44,7 @@ import {
   ChainNameEnum,
   DownloadMemosEnum,
   SnackbarDurationEnum,
+  SeedActionEnum,
 } from '../AppState';
 import { parseServerURI, serverUris } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
@@ -1265,7 +1266,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                 <Seed
                   onClickOK={() => this.navigateToLoadedApp()}
                   onClickCancel={() => this.navigateToLoadedApp()}
-                  action={'new'}
+                  action={SeedActionEnum.new}
                   set_privacy_option={this.set_privacy_option}
                 />
               </Suspense>

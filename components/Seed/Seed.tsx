@@ -20,6 +20,7 @@ import {
   ModeEnum,
   ChainNameEnum,
   SnackbarDurationEnum,
+  SeedActionEnum,
 } from '../../app/AppState';
 import RPCModule from '../../app/RPCModule';
 import RPC from '../../app/rpc';
@@ -48,7 +49,7 @@ type TextsType = {
 type SeedProps = {
   onClickOK: (seedPhrase: string, birthdayNumber: number) => void;
   onClickCancel: () => void;
-  action: 'new' | 'change' | 'view' | 'restore' | 'backup' | 'server';
+  action: SeedActionEnum;
   set_privacy_option: (name: 'privacy', value: boolean) => Promise<void>;
 };
 const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, action, set_privacy_option }) => {
@@ -64,7 +65,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
     setBackgroundError: (title: string, error: string) => void,
     addLastSnackbar: (snackbar: SnackbarType) => void,
     language: LanguageEnum;
-  if (action === 'new' || action === 'restore') {
+  if (action === SeedActionEnum.new || action === SeedActionEnum.restore) {
     wallet = contextLoading.wallet;
     translate = contextLoading.translate;
     info = contextLoading.info;
@@ -140,9 +141,15 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
       setTexts(buttonTexts);
     }
     setReadOnly(
-      action === 'new' || action === 'view' || action === 'change' || action === 'backup' || action === 'server',
+      action === SeedActionEnum.new ||
+        action === SeedActionEnum.view ||
+        action === SeedActionEnum.change ||
+        action === SeedActionEnum.backup ||
+        action === SeedActionEnum.server,
     );
-    setTimes(action === 'change' || action === 'backup' || action === 'server' ? 1 : 0);
+    setTimes(
+      action === SeedActionEnum.change || action === SeedActionEnum.backup || action === SeedActionEnum.server ? 1 : 0,
+    );
     setSeedPhrase(wallet.seed || '');
     setBirthdayNumber((wallet.birthday && wallet.birthday.toString()) || '');
   }, [action, wallet.seed, wallet.birthday, wallet, translate]);
@@ -162,7 +169,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
   }, [slideAnim, titleViewHeight]);
 
   useEffect(() => {
-    if (action === 'restore') {
+    if (action === SeedActionEnum.restore) {
       if (info.latestBlock) {
         setLatestBlock(info.latestBlock);
       } else {
@@ -199,7 +206,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
 
   // because this screen is fired from more places than the menu.
   useEffect(() => {
-    if (action !== 'new' && action !== 'restore') {
+    if (action !== SeedActionEnum.new && action !== SeedActionEnum.restore) {
       (async () => await RPC.rpc_setInterruptSyncAfterBatch('false'))();
     }
   }, [action]);
@@ -207,21 +214,22 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
   const onPressOK = () => {
     Alert.alert(
       !!texts && !!texts[action] ? texts[action][3] : '',
-      (action === 'change'
+      (action === SeedActionEnum.change
         ? (translate('seed.change-warning') as string)
-        : action === 'backup'
+        : action === SeedActionEnum.backup
         ? (translate('seed.backup-warning') as string)
-        : action === 'server'
+        : action === SeedActionEnum.server
         ? (translate('seed.server-warning') as string)
         : '') +
-        (server.chain_name !== ChainNameEnum.mainChainName && (action === 'change' || action === 'server')
+        (server.chain_name !== ChainNameEnum.mainChainName &&
+        (action === SeedActionEnum.change || action === SeedActionEnum.server)
           ? '\n' + (translate('seed.mainnet-warning') as string)
           : ''),
       [
         {
           text: translate('confirm') as string,
           onPress: () => {
-            if (action === 'restore') {
+            if (action === SeedActionEnum.restore) {
               // waiting while closing the keyboard, just in case.
               setTimeout(async () => {
                 onClickOK(seedPhrase, Number(birthdayNumber));
@@ -267,7 +275,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
             netInfo={netInfo}
             mode={mode}
             addLastSnackbar={addLastSnackbar}
-            receivedLegend={action === 'view' ? !basicFirstViewSeed : false}
+            receivedLegend={action === SeedActionEnum.view ? !basicFirstViewSeed : false}
           />
         </View>
       </Animated.View>
@@ -284,7 +292,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
         }}>
         <RegText style={{ marginTop: 0, padding: 20, textAlign: 'center', fontWeight: '900' }}>
           {readOnly
-            ? action === 'backup' || action === 'change' || action === 'server'
+            ? action === SeedActionEnum.backup || action === SeedActionEnum.change || action === SeedActionEnum.server
               ? (translate(`seed.text-readonly-${action}`) as string)
               : (translate('seed.text-readonly') as string)
             : (translate('seed.text-no-readonly') as string)}
@@ -369,7 +377,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
               )}
             </View>
           )}
-          {action !== 'restore' && (
+          {action !== SeedActionEnum.restore && (
             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
               <View />
               <TouchableOpacity
@@ -506,7 +514,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
             if (!seedPhrase) {
               return;
             }
-            if (!netInfo.isConnected && (times > 0 || action === 'restore')) {
+            if (!netInfo.isConnected && (times > 0 || action === SeedActionEnum.restore)) {
               if (addLastSnackbar) {
                 addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
               }
@@ -524,7 +532,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
             }
           }}
         />
-        {(times > 0 || action === 'restore') && (
+        {(times > 0 || action === SeedActionEnum.restore) && (
           <Button
             type="Secondary"
             title={translate('cancel') as string}

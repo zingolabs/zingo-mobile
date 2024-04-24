@@ -54,6 +54,8 @@ import {
   CurrencyEnum,
   SelectServerEnum,
   ChainNameEnum,
+  SeedActionEnum,
+  UfvkActionEnum,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
@@ -1558,7 +1560,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
               <Seed
                 onClickOK={() => this.setState({ seedViewModalVisible: false })}
                 onClickCancel={() => this.setState({ seedViewModalVisible: false })}
-                action={'view'}
+                action={SeedActionEnum.view}
                 set_privacy_option={this.set_privacy_option}
               />
             </Suspense>
@@ -1578,7 +1580,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
               <Seed
                 onClickOK={async () => await this.onClickOKChangeWallet({ startingApp: false })}
                 onClickCancel={() => this.setState({ seedChangeModalVisible: false })}
-                action={'change'}
+                action={SeedActionEnum.change}
                 set_privacy_option={this.set_privacy_option}
               />
             </Suspense>
@@ -1598,7 +1600,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
               <Seed
                 onClickOK={async () => await this.onClickOKRestoreBackup()}
                 onClickCancel={() => this.setState({ seedBackupModalVisible: false })}
-                action={'backup'}
+                action={SeedActionEnum.backup}
                 set_privacy_option={this.set_privacy_option}
               />
             </Suspense>
@@ -1622,7 +1624,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                   await this.rpc.configure();
                   this.setState({ seedServerModalVisible: false });
                 }}
-                action={'server'}
+                action={SeedActionEnum.server}
                 set_privacy_option={this.set_privacy_option}
               />
             </Suspense>
@@ -1642,7 +1644,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
               <ShowUfvk
                 onClickOK={() => this.setState({ ufvkViewModalVisible: false })}
                 onClickCancel={() => this.setState({ ufvkViewModalVisible: false })}
-                action={'view'}
+                action={UfvkActionEnum.view}
                 set_privacy_option={this.set_privacy_option}
               />
             </Suspense>
@@ -1662,7 +1664,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
               <ShowUfvk
                 onClickOK={async () => await this.onClickOKChangeWallet({ startingApp: false })}
                 onClickCancel={() => this.setState({ ufvkChangeModalVisible: false })}
-                action={'change'}
+                action={UfvkActionEnum.change}
                 set_privacy_option={this.set_privacy_option}
               />
             </Suspense>
@@ -1682,7 +1684,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
               <ShowUfvk
                 onClickOK={async () => await this.onClickOKRestoreBackup()}
                 onClickCancel={() => this.setState({ ufvkBackupModalVisible: false })}
-                action={'backup'}
+                action={UfvkActionEnum.backup}
                 set_privacy_option={this.set_privacy_option}
               />
             </Suspense>
@@ -1706,7 +1708,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                   await this.rpc.configure();
                   this.setState({ ufvkServerModalVisible: false });
                 }}
-                action={'server'}
+                action={UfvkActionEnum.server}
                 set_privacy_option={this.set_privacy_option}
               />
             </Suspense>
