@@ -82,18 +82,18 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     let from: PrivacyLevelFromEnum = PrivacyLevelFromEnum.nonePrivacyLevel;
     // amount + fee
     if (
-      Utils.parseStringLocaletoNumberFloat(sendPageState.toaddr.amount) + calculatedFee <=
+      Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount) + calculatedFee <=
       totalBalance.spendableOrchard
     ) {
       from = PrivacyLevelFromEnum.orchardPrivacyLevel;
     } else if (
       totalBalance.spendableOrchard > 0 &&
-      Utils.parseStringLocaletoNumberFloat(sendPageState.toaddr.amount) + calculatedFee <=
+      Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount) + calculatedFee <=
         totalBalance.spendableOrchard + totalBalance.spendablePrivate
     ) {
       from = PrivacyLevelFromEnum.orchardAndSaplingPrivacyLevel;
     } else if (
-      Utils.parseStringLocaletoNumberFloat(sendPageState.toaddr.amount) + calculatedFee <=
+      Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount) + calculatedFee <=
       totalBalance.spendablePrivate
     ) {
       from = PrivacyLevelFromEnum.saplingPrivacyLevel;
@@ -218,7 +218,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
 
   useEffect(() => {
     const sendingTot =
-      Utils.parseStringLocaletoNumberFloat(sendPageState.toaddr.amount) + calculatedFee + donationAmount;
+      Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount) + calculatedFee + donationAmount;
     setSendingTotal(sendingTot);
   }, [calculatedFee, donationAmount, sendPageState.toaddr.amount]);
 
@@ -235,7 +235,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
 
   useEffect(() => {
     calculateFeeWithPropose(
-      Utils.parseStringLocaletoNumberFloat(sendPageState.toaddr.amount),
+      Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount),
       sendPageState.toaddr.to,
       memoTotal,
     );
@@ -353,12 +353,12 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                 <ZecAmount
                   currencyName={info.currencyName}
                   size={18}
-                  amtZec={Utils.parseStringLocaletoNumberFloat(to.amount)}
+                  amtZec={Utils.parseStringLocaleToNumberFloat(to.amount)}
                   privacy={privacy}
                 />
                 <CurrencyAmount
                   style={{ fontSize: 18 }}
-                  amtZec={Utils.parseStringLocaletoNumberFloat(to.amount)}
+                  amtZec={Utils.parseStringLocaleToNumberFloat(to.amount)}
                   price={zecPrice.zecPrice}
                   currency={currency}
                   privacy={privacy}

@@ -210,7 +210,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       setFee(0);
     } else if (validAddress !== -1 && validAmount !== -1) {
       calculateFeeWithPropose(
-        Utils.parseStringLocaletoNumberFloat(sendPageState.toaddr.amount),
+        Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount),
         sendPageState.toaddr.to,
       );
     }
@@ -220,7 +220,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   useEffect(() => {
     // transparent is not spendable.
     const spend = totalBalance.spendablePrivate + totalBalance.spendableOrchard;
-    const max = spend - fee - (donation ? Utils.parseStringLocaletoNumberFloat(Utils.getDefaultDonationAmount()) : 0);
+    const max = spend - fee - (donation ? Utils.parseStringLocaleToNumberFloat(Utils.getDefaultDonationAmount()) : 0);
     if (max >= 0) {
       // if max is 0 then the user can send a memo with amount 0.
       setMaxAmount(max);
@@ -344,23 +344,23 @@ const Send: React.FunctionComponent<SendProps> = ({
 
     let invalid = false;
     if (to.amountCurrency !== '') {
-      if (isNaN(Utils.parseStringLocaletoNumberFloat(to.amountCurrency))) {
+      if (isNaN(Utils.parseStringLocaleToNumberFloat(to.amountCurrency))) {
         setValidAmount(-1); // invalid number
         invalid = true;
       }
     }
     if (!invalid) {
       if (to.amount !== '') {
-        if (isNaN(Utils.parseStringLocaletoNumberFloat(to.amount))) {
+        if (isNaN(Utils.parseStringLocaleToNumberFloat(to.amount))) {
           setValidAmount(-1); // invalid number
         } else {
           if (
-            Utils.parseStringLocaletoNumberFloat(spendable.toFixed(8)) >=
-              Utils.parseStringLocaletoNumberFloat(fee.toFixed(8)) +
-                (donation ? Utils.parseStringLocaletoNumberFloat(Utils.getDefaultDonationAmount()) : 0) &&
-            Utils.parseStringLocaletoNumberFloat(to.amount) >= 0 &&
-            Utils.parseStringLocaletoNumberFloat(to.amount) <=
-              Utils.parseStringLocaletoNumberFloat(maxAmount.toFixed(8))
+            Utils.parseStringLocaleToNumberFloat(spendable.toFixed(8)) >=
+              Utils.parseStringLocaleToNumberFloat(fee.toFixed(8)) +
+                (donation ? Utils.parseStringLocaleToNumberFloat(Utils.getDefaultDonationAmount()) : 0) &&
+            Utils.parseStringLocaleToNumberFloat(to.amount) >= 0 &&
+            Utils.parseStringLocaleToNumberFloat(to.amount) <=
+              Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8))
           ) {
             setValidAmount(1); // valid
           } else {
@@ -393,7 +393,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       // you always get `dust` error.
       validAddress === 1 &&
         validAmount === 1 &&
-        !(!memoEnabled && Utils.parseStringLocaletoNumberFloat(sendPageState.toaddr.amount) === 0),
+        !(!memoEnabled && Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount) === 0),
     );
   }, [memoEnabled, sendPageState.toaddr.amount, validAddress, validAmount]);
 
@@ -526,11 +526,11 @@ const Send: React.FunctionComponent<SendProps> = ({
     if (amount !== null) {
       //console.log('update field', amount);
       toAddr.amount = amount.substring(0, 20);
-      if (isNaN(Utils.parseStringLocaletoNumberFloat(toAddr.amount))) {
+      if (isNaN(Utils.parseStringLocaleToNumberFloat(toAddr.amount))) {
         toAddr.amountCurrency = '';
       } else if (toAddr.amount && zecPrice && zecPrice.zecPrice > 0) {
         toAddr.amountCurrency = Utils.parseNumberFloatToStringLocale(
-          Utils.parseStringLocaletoNumberFloat(toAddr.amount) * zecPrice.zecPrice,
+          Utils.parseStringLocaleToNumberFloat(toAddr.amount) * zecPrice.zecPrice,
           2,
         );
       } else {
@@ -542,11 +542,11 @@ const Send: React.FunctionComponent<SendProps> = ({
     if (amountCurrency !== null) {
       //console.log('update field', amountCurrency);
       toAddr.amountCurrency = amountCurrency.substring(0, 15);
-      if (isNaN(Utils.parseStringLocaletoNumberFloat(toAddr.amountCurrency))) {
+      if (isNaN(Utils.parseStringLocaleToNumberFloat(toAddr.amountCurrency))) {
         toAddr.amount = '';
       } else if (toAddr.amountCurrency && zecPrice && zecPrice.zecPrice > 0) {
         toAddr.amount = Utils.parseNumberFloatToStringLocale(
-          Utils.parseStringLocaletoNumberFloat(toAddr.amountCurrency) / zecPrice.zecPrice,
+          Utils.parseStringLocaleToNumberFloat(toAddr.amountCurrency) / zecPrice.zecPrice,
           8,
         );
       } else {
@@ -675,7 +675,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           calculatedFee={fee}
           donationAmount={
             donation && server.chain_name === ChainNameEnum.mainChainName && !sendToSelf && !donationAddress
-              ? Utils.parseStringLocaletoNumberFloat(Utils.getDefaultDonationAmount())
+              ? Utils.parseStringLocaleToNumberFloat(Utils.getDefaultDonationAmount())
               : 0
           }
           closeModal={() => {
@@ -687,8 +687,8 @@ const Send: React.FunctionComponent<SendProps> = ({
           confirmSend={confirmSend}
           sendAllAmount={
             mode !== ModeEnum.basic &&
-            Utils.parseStringLocaletoNumberFloat(sendPageState.toaddr.amount) ===
-              Utils.parseStringLocaletoNumberFloat(maxAmount.toFixed(8))
+            Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount) ===
+              Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8))
           }
           calculateFeeWithPropose={calculateFeeWithPropose}
         />
@@ -971,7 +971,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           onEndEditing={(e: any) => {
                             updateToField(null, e.nativeEvent.text.substring(0, 20), null, null, null);
                             calculateFeeWithPropose(
-                              Utils.parseStringLocaletoNumberFloat(e.nativeEvent.text.substring(0, 20)),
+                              Utils.parseStringLocaleToNumberFloat(e.nativeEvent.text.substring(0, 20)),
                               ta.to,
                             );
                           }}
@@ -1139,7 +1139,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                             onEndEditing={(e: any) => {
                               updateToField(null, null, e.nativeEvent.text.substring(0, 15), null, null);
                               // re-calculate the fee with the zec amount in the other field
-                              calculateFeeWithPropose(Utils.parseStringLocaletoNumberFloat(ta.amount), ta.to);
+                              calculateFeeWithPropose(Utils.parseStringLocaleToNumberFloat(ta.amount), ta.to);
                             }}
                             editable={true}
                             maxLength={15}
@@ -1296,8 +1296,8 @@ const Send: React.FunctionComponent<SendProps> = ({
                   validAmount === 1 &&
                   sendPageState.toaddr.amount &&
                   mode !== ModeEnum.basic &&
-                  Utils.parseStringLocaletoNumberFloat(sendPageState.toaddr.amount) ===
-                    Utils.parseStringLocaletoNumberFloat(maxAmount.toFixed(8))
+                  Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount) ===
+                    Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8))
                     ? (translate('send.button-all') as string)
                     : (translate('send.button') as string)
                 }
@@ -1307,8 +1307,8 @@ const Send: React.FunctionComponent<SendProps> = ({
                     validAmount === 1 &&
                     sendPageState.toaddr.amount &&
                     mode !== ModeEnum.basic &&
-                    Utils.parseStringLocaletoNumberFloat(sendPageState.toaddr.amount) ===
-                      Utils.parseStringLocaletoNumberFloat(maxAmount.toFixed(8))
+                    Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount) ===
+                      Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8))
                   ) {
                     addLastSnackbar({ message: `${translate('send.sendall-message') as string}` });
                   }

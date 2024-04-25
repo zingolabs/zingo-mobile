@@ -149,7 +149,7 @@ export default class Utils {
     return ans;
   }
 
-  static parseStringLocaletoNumberFloat(stringValue: string): number {
+  static parseStringLocaleToNumberFloat(stringValue: string): number {
     const { decimalSeparator } = getNumberFormatSettings();
 
     return Number(stringValue.replace(new RegExp(`\\${decimalSeparator}`), '.'));

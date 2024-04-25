@@ -777,7 +777,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     const json: Promise<SendJsonToTypeType[][]> = Promise.all(
       [sendPageState.toaddr].flatMap(async (to: ToAddrClass) => {
         const memo = `${to.memo || ''}${to.includeUAMemo ? '\nReply to: \n' + uaAddress : ''}`;
-        const amount = parseInt((Utils.parseStringLocaletoNumberFloat(to.amount) * 10 ** 8).toFixed(0), 10);
+        const amount = parseInt((Utils.parseStringLocaleToNumberFloat(to.amount) * 10 ** 8).toFixed(0), 10);
 
         const myAddress: AddressClass[] = addresses.filter((a: AddressClass) => a.address === to.to);
         sendToSelf = myAddress.length >= 1;
@@ -826,7 +826,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       donationTransaction.push({
         address: await Utils.getDonationAddress(this.state.server.chain_name),
         amount: parseInt(
-          (Utils.parseStringLocaletoNumberFloat(Utils.getDefaultDonationAmount()) * 10 ** 8).toFixed(0),
+          (Utils.parseStringLocaleToNumberFloat(Utils.getDefaultDonationAmount()) * 10 ** 8).toFixed(0),
           10,
         ),
         memo:
