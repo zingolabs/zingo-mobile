@@ -410,7 +410,7 @@
     "nofetchprice": "Buscar precio en USD",
     "sendall": "Enviar Todo",
     "sendall-message": "Estas a punto de enviar toda la cantidad en tu monedero",
-    "includeua": "Incluir tu DU:",
+    "includeua": "Incluir tu Dirección de Vuelta:",
     "confirm-memo": "Memo",
     "duplicate-nullifier-error": "Tus fondos están todavía confirmándose y probablemente sincronizándose. Puedes esperar hasta que tus fondos estén confirmados o puedes intentar enviar una cantidad más pequeña, ¡La creación de la Transacción ha fallado!",
     "dust-error": "La cantidad que estás intentando enviar a una dirección Transparente es realmente ínfima, ¡La creación de la Transacción ha fallado!",

@@ -270,6 +270,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         return false;
       }
       const result: string = await RPCModule.execute(CommandEnum.parse_address, address);
+      //console.log(result);
       if (result) {
         if (result.toLowerCase().startsWith('error') || result.toLowerCase() === 'null') {
           return false;
@@ -311,6 +312,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         return false;
       }
       const result: string = await RPCModule.execute(CommandEnum.parse_address, address);
+      //console.log(result);
       if (result) {
         if (result.toLowerCase().startsWith('error') || result.toLowerCase() === 'null') {
           return false;
@@ -325,7 +327,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         return false;
       }
 
-      //console.log('parse-address', address, resultJSON.status === RPCParseStatusEnum.success);
+      //console.log('parse-address', address, resultJSON, resultJSON.status === RPCParseStatusEnum.successParse);
 
       return resultJSON.status === RPCParseStatusEnum.successParse && resultJSON.chain_name === server.chain_name;
     };

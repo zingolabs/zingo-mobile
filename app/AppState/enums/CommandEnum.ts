@@ -20,7 +20,7 @@ export enum CommandEnum {
   sync = 'sync',
   syncstatus = 'syncstatus',
   addresses = 'addresses',
-  parse_address = 'parse_addres',
+  parse_address = 'parse_address',
   parse_viewkey = 'parse_viewkey',
   propose = 'propose',
   balance = 'balance',

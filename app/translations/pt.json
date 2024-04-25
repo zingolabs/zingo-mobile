@@ -410,7 +410,7 @@
     "nofetchprice": "Buscar preço em Dólar",
     "sendall": "Enviar Tudo",
     "sendall-message": "Você está prestes a enviar todo os fundos da sua carteira",
-    "includeua": "Inclua o seu Endereço Unificado:",
+    "includeua": "Inclua seu endereço de retorno:",
     "confirm-memo": "MEMO",
     "duplicate-nullifier-error": "Seus fundos ainda estão sendo confirmados e provavelmente sincronizados. Você pode esperar até que os fundos sejam confirmados ou tentar enviar agora com um valor menor. A compilação da transação falhou!",
     "dust-error": "A quantia que você está tentando enviar para um endereço Transparente é muito pequena. A compilação da transação falhou!",
