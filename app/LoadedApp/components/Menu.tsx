@@ -39,8 +39,8 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuSt
 
   const onItemSelectedWrapper = async (value: MenuItemEnum) => {
     if (
-      (value === MenuItemEnum.Wallet && !readOnly && security.seedScreen) ||
-      (value === MenuItemEnum.Wallet && readOnly && security.ufvkScreen) ||
+      (value === MenuItemEnum.WalletSeedUfvk && !readOnly && security.seedScreen) ||
+      (value === MenuItemEnum.WalletSeedUfvk && readOnly && security.ufvkScreen) ||
       (value === MenuItemEnum.Rescan && security.rescanScreen) ||
       (value === MenuItemEnum.Settings && security.settingsScreen) ||
       (value === MenuItemEnum.ChangeWallet && security.changeWalletScreen) ||
@@ -108,7 +108,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuSt
           </RegText>
 
           {!(mode === ModeEnum.basic && transactions.length <= 0) && (
-            <RegText onPress={() => onItemSelectedWrapper(MenuItemEnum.Wallet)} style={item}>
+            <RegText onPress={() => onItemSelectedWrapper(MenuItemEnum.WalletSeedUfvk)} style={item}>
               {readOnly
                 ? mode === ModeEnum.basic
                   ? (translate('loadedapp.walletufvk-basic') as string)

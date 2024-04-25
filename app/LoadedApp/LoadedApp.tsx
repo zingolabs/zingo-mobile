@@ -946,7 +946,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       this.setState({ poolsModalVisible: true });
     } else if (item === MenuItemEnum.Insight) {
       this.setState({ insightModalVisible: true });
-    } else if (item === MenuItemEnum.Wallet) {
+    } else if (item === MenuItemEnum.WalletSeedUfvk) {
       if (this.state.readOnly) {
         this.setState({ ufvkViewModalVisible: true });
       } else {

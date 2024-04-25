@@ -1,5 +1,5 @@
 export enum MenuItemEnum {
-  Wallet = 'Wallet',
+  WalletSeedUfvk = 'Wallet Seed Ufvk',
   Rescan = 'Rescan',
   Settings = 'Settings',
   ChangeWallet = 'Change Wallet',
