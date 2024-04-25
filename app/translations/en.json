@@ -226,6 +226,16 @@
         "text": "Advanced Mode, for the advanced user."
       }
     ],
+    "rescanmenuoptions": [
+      {
+        "value": true,
+        "text": "Enable/Show the menu option to rescan the wallet."
+      },
+      {
+        "value": false,
+        "text": "Disable/Hide the menu option to rescan the wallet."
+      }
+    ],
     "nochanges": "No changes registered.",
     "ismemo": "You need to choose the download memos option to save.",
     "isthreshold": "You need to choose the transaction filter threshold option to save.",
@@ -255,6 +265,7 @@
     "donation-title": "Tip ZingoLabs",
     "privacy-title": "Switch between High or Normal Privacy",
     "mode-title": "Switch between Basic or Advanced Mode",
+    "rescanmenuoption-title": "THE RESCAN MENU OPTION",
     "value-currency-": "No currency",
     "value-currency-USD": "US Dollar",
     "value-language-en": "English",
@@ -273,6 +284,8 @@
     "value-chain_name-main": "Mainnet",
     "value-chain_name-test": "Testnet",
     "value-chain_name-regtest": "Regtest",
+    "value-rescanmenuoption-true": "Enable",
+    "value-rescanmenuoption-false": "Disable",
     "security-title": "APPLY DEVICE SECURITY TO SCREENS/OPTIONS",
     "security-startapp": "When the App starts",
     "security-foregroundapp": "When the App go to the Foreground",

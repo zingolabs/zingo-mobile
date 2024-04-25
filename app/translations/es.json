@@ -226,6 +226,16 @@
         "text": "Modo Avanzado, para el usuario avanzado."
       }
     ],
+    "rescanmenuoptions": [
+      {
+        "value": true,
+        "text": "Activar/Mostrar la opción de menú para re-escanear el monedero."
+      },
+      {
+        "value": false,
+        "text": "Desactivar/Ocultar la opción de menú para re-escanear el monedero."
+      }
+    ],
     "nochanges": "No se han registrado cambios.",
     "ismemo": "Necesitas escoger una opción de Memos para poder guardar.",
     "isthreshold": "Necesitas escoger una opción de umbral para poder guardar.",
@@ -255,6 +265,7 @@
     "donation-title": "Propina para ZingoLabs",
     "privacy-title": "Cambiar entre Alta Privacidad o Normal",
     "mode-title": "Cambiar entre Modo Básico o Avanzado",
+    "rescanmenuoption-title": "LA OPCIÓN DE MENU RE-ESCANEAR",
     "value-currency-": "Sin moneda",
     "value-currency-USD": "US Dólares",
     "value-language-en": "Inglés",
@@ -273,6 +284,8 @@
     "value-chain_name-main": "Mainnet",
     "value-chain_name-test": "Testnet",
     "value-chain_name-regtest": "Regtest",
+    "value-rescanmenuoption-true": "Activar",
+    "value-rescanmenuoption-false": "Desactivar",
     "security-title": "USAR LA SEGURIDAD DEL DISPOSITIVO",
     "security-startapp": "Al inicar la aplicación",
     "security-foregroundapp": "Aplicación va a Primer Plano",

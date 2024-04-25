@@ -137,6 +137,7 @@ export default function LoadedApp(props: LoadedAppProps) {
     restoreWalletBackupScreen: true,
   });
   const [selectServer, setSelectServer] = useState<SelectServerEnum>(SelectServerEnum.auto);
+  const [rescanMenuOption, setRescanMenuOption] = useState<boolean>(false);
   const file = useMemo(
     () => ({
       en: en,
@@ -246,6 +247,11 @@ export default function LoadedApp(props: LoadedAppProps) {
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.selectServer, selectServer);
       }
+      if (settings.rescanMenuOption === true || settings.rescanMenuOption === false) {
+        setRescanMenuOption(settings.rescanMenuOption);
+      } else {
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.rescanMenuOption, rescanMenuOption);
+      }
 
       // reading background task info
       const backgroundJson = await BackgroundFileImpl.readBackground();
@@ -296,6 +302,7 @@ export default function LoadedApp(props: LoadedAppProps) {
         addressBook={addressBook}
         security={security}
         selectServer={selectServer}
+        rescanMenuOption={rescanMenuOption}
       />
     );
   }
@@ -319,6 +326,7 @@ type LoadedAppClassProps = {
   addressBook: AddressBookFileClass[];
   security: SecurityType;
   selectServer: SelectServerEnum;
+  rescanMenuOption: boolean;
 };
 
 export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
@@ -353,6 +361,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       launchAddressBook: this.launchAddressBook,
       security: props.security,
       selectServer: props.selectServer,
+      rescanMenuOption: props.rescanMenuOption,
     };
 
     this.rpc = new RPC(
@@ -1189,6 +1198,16 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     this.rpc.fetchWalletSettings();
   };
 
+  set_rescanMenuOption_option = async (name: SettingsNameEnum.rescanMenuOption, value: boolean): Promise<void> => {
+    await SettingsFileImpl.writeSettings(name, value);
+    this.setState({
+      rescanMenuOption: value as boolean,
+    });
+
+    // Refetch the settings to update
+    this.rpc.fetchWalletSettings();
+  };
+
   navigateToLoadingApp = async (state: any) => {
     const { navigation } = this.props;
 
@@ -1548,6 +1567,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 set_mode_option={this.set_mode_option}
                 set_security_option={this.set_security_option}
                 set_selectServer_option={this.set_selectServer_option}
+                set_rescanMenuOption_option={this.set_rescanMenuOption_option}
               />
             </Suspense>
           </Modal>

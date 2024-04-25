@@ -120,6 +120,7 @@ export default function LoadingApp(props: LoadingAppProps) {
   });
   const [selectServer, setSelectServer] = useState<SelectServerEnum>(SelectServerEnum.auto);
   const [donationAlert, setDonationAlert] = useState<boolean>(false);
+  const [rescanMenuOption, setRescanMenuOption] = useState<boolean>(false);
   const file = useMemo(
     () => ({
       en: en,
@@ -244,6 +245,11 @@ export default function LoadingApp(props: LoadingAppProps) {
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.selectServer, selectServer);
       }
+      if (settings.rescanMenuOption === true || settings.rescanMenuOption === false) {
+        setRescanMenuOption(settings.rescanMenuOption);
+      } else {
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.rescanMenuOption, rescanMenuOption);
+      }
 
       // for testing
       //await delay(5000);
@@ -291,6 +297,7 @@ export default function LoadingApp(props: LoadingAppProps) {
         security={security}
         selectServer={selectServer}
         donationAlert={donationAlert}
+        rescanMenuOption={rescanMenuOption}
       />
     );
   }
@@ -314,6 +321,7 @@ type LoadingAppClassProps = {
   security: SecurityType;
   selectServer: SelectServerEnum;
   donationAlert: boolean;
+  rescanMenuOption: boolean;
 };
 
 export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
@@ -367,6 +375,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
       selectServer: props.selectServer,
       // serverErrorTries -> 0 (context).
       donationAlert: props.donationAlert,
+      rescanMenuOption: props.rescanMenuOption,
     };
 
     this.dim = {} as EmitterSubscription;

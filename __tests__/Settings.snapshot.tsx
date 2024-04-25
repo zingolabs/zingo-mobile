@@ -120,6 +120,18 @@ describe('Component Settings - test', () => {
         },
       ];
     }
+    if (p === 'settings.rescanmenuoptions') {
+      return [
+        {
+          value: true,
+          text: 'text true',
+        },
+        {
+          value: false,
+          text: 'text false',
+        },
+      ];
+    }
     return 'text translated';
   };
   state.info.currencyName = CurrencyNameEnum.ZEC;
@@ -128,6 +140,7 @@ describe('Component Settings - test', () => {
   state.currency = CurrencyEnum.USDCurrency;
   state.language = LanguageEnum.en;
   state.sendAll = false;
+  state.rescanMenuOption = false;
   state.donation = false;
   state.walletSettings.download_memos = DownloadMemosEnum.walletMemos;
   state.walletSettings.transaction_filter_threshold = '500';
@@ -148,6 +161,7 @@ describe('Component Settings - test', () => {
           set_mode_option={onSetOption}
           set_security_option={onSetOption}
           set_selectServer_option={onSetOption}
+          set_rescanMenuOption_option={onSetOption}
         />
       </ContextAppLoadedProvider>,
     );

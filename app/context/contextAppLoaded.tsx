@@ -105,6 +105,7 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   addressBookOpenPriorModal: () => {},
   security: {} as SecurityType,
   selectServer: SelectServerEnum.auto,
+  rescanMenuOption: false,
 };
 
 export const ContextAppLoaded = React.createContext(defaultAppStateLoaded);

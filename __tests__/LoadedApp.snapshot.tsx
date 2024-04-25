@@ -128,6 +128,7 @@ describe('Component LoadedApp - test', () => {
       chain_name: ChainNameEnum.mainChainName,
     };
     const sendAll = false;
+    const rescanMenuOption = false;
     const donation = false;
     const privacy = false;
     const mode = ModeEnum.basic;
@@ -171,6 +172,7 @@ describe('Component LoadedApp - test', () => {
         addressBook={addressBook}
         security={security}
         selectServer={selectServer}
+        rescanMenuOption={rescanMenuOption}
       />,
     );
     expect(receive.toJSON()).toMatchSnapshot();

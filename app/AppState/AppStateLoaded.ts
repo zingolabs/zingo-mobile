@@ -136,6 +136,7 @@ export default interface AppStateLoaded {
   addressBookOpenPriorModal: () => void;
   security: SecurityType;
   selectServer: SelectServerEnum;
+  rescanMenuOption: boolean;
 
   // eslint-disable-next-line semi
 }

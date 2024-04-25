@@ -55,6 +55,7 @@ type SettingsProps = {
   set_mode_option: (name: SettingsNameEnum.mode, value: string) => Promise<void>;
   set_security_option: (name: SettingsNameEnum.security, value: SecurityType) => Promise<void>;
   set_selectServer_option: (name: SettingsNameEnum.selectServer, value: string) => Promise<void>;
+  set_rescanMenuOption_option: (name: SettingsNameEnum.rescanMenuOption, value: boolean) => Promise<void>;
 };
 
 type Options = {
@@ -73,6 +74,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   set_mode_option,
   set_security_option,
   set_selectServer_option,
+  set_rescanMenuOption_option,
   closeModal,
 }) => {
   const context = useContext(ContextAppLoaded);
@@ -90,6 +92,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     addLastSnackbar,
     security: securityContext,
     selectServer: selectServerContext,
+    rescanMenuOption: rescanMenuOptionContext,
   } = context;
 
   const memosArray = translate('settings.memos');
@@ -135,6 +138,12 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     MODES = modesArray as Options[];
   }
 
+  const rescanMenuOptionsArray = translate('settings.rescanmenuoptions');
+  let RESCANMENUOPTION: Options[] = [];
+  if (typeof rescanMenuOptionsArray === 'object') {
+    RESCANMENUOPTION = rescanMenuOptionsArray as Options[];
+  }
+
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(languageContext);
 
@@ -166,6 +175,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     securityContext.restoreWalletBackupScreen,
   );
   const [selectServer, setSelectServer] = useState<SelectServerEnum>(selectServerContext);
+  const [rescanMenuOption, setRescanMenuOption] = useState<boolean>(rescanMenuOptionContext);
 
   const [customIcon, setCustomIcon] = useState<IconDefinition>(farCircle);
   const [autoIcon, setAutoIcon] = useState<IconDefinition>(farCircle);
@@ -263,7 +273,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       privacyContext === privacy &&
       modeContext === mode &&
       isEqual(securityContext, securityObject()) &&
-      selectServerContext === selectServer
+      selectServerContext === selectServer &&
+      rescanMenuOptionContext === rescanMenuOption
     ) {
       addLastSnackbar({ message: translate('settings.nochanges') as string });
       return;
@@ -367,6 +378,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     }
     if (selectServerContext !== selectServer) {
       await set_selectServer_option(SettingsNameEnum.selectServer, selectServer);
+    }
+    if (rescanMenuOptionContext !== rescanMenuOption) {
+      await set_rescanMenuOption_option(SettingsNameEnum.rescanMenuOption, rescanMenuOption);
     }
 
     // I need a little time in this modal because maybe the wallet cannot be open with the new server
@@ -571,6 +585,20 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 Boolean,
                 sendAll,
                 'sendall',
+              )}
+            </View>
+
+            <View style={{ display: 'flex', margin: 10 }}>
+              <BoldText>{translate('settings.rescanmenuoption-title') as string}</BoldText>
+            </View>
+
+            <View style={{ display: 'flex', marginLeft: 25 }}>
+              {optionsRadio(
+                RESCANMENUOPTION,
+                setRescanMenuOption as React.Dispatch<React.SetStateAction<string | boolean>>,
+                Boolean,
+                rescanMenuOption,
+                'rescanmenuoption',
               )}
             </View>
 

@@ -23,6 +23,7 @@ export default class SettingsFileClass {
   security: SecurityType;
   selectServer: SelectServerEnum;
   firstUpdateWithDonation: boolean;
+  rescanMenuOption: boolean;
 
   constructor(
     server: ServerType,
@@ -38,6 +39,7 @@ export default class SettingsFileClass {
     security: SecurityType,
     selectServer: SelectServerEnum,
     firstUpdateWithDonation: boolean,
+    rescanMenuOption: boolean,
   ) {
     this.server = server;
     this.currency = currency;
@@ -52,5 +54,6 @@ export default class SettingsFileClass {
     this.security = security;
     this.selectServer = selectServer;
     this.firstUpdateWithDonation = firstUpdateWithDonation;
+    this.rescanMenuOption = rescanMenuOption;
   }
 }

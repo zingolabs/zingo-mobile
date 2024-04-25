@@ -127,6 +127,7 @@ describe('Component LoadingApp - test', () => {
       chain_name: ChainNameEnum.mainChainName,
     };
     const sendAll = false;
+    const rescanMenuOption = false;
     const donation = false;
     const privacy = false;
     const mode = ModeEnum.basic;
@@ -170,6 +171,7 @@ describe('Component LoadingApp - test', () => {
         security={security}
         selectServer={selectServer}
         donationAlert={donationAlert}
+        rescanMenuOption={rescanMenuOption}
       />,
     );
     expect(receive.toJSON()).toMatchSnapshot();

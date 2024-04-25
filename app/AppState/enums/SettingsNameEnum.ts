@@ -12,4 +12,5 @@ export enum SettingsNameEnum {
   security = 'security',
   selectServer = 'selectServer',
   firstUpdateWithDonation = 'firstUpdateWithDonation',
+  rescanMenuOption = 'rescanMenuOption',
 }

@@ -64,6 +64,7 @@ export default interface AppStateLoading {
   selectServer: SelectServerEnum;
   serverErrorTries: number;
   donationAlert: boolean;
+  rescanMenuOption: boolean;
 
   // eslint-disable-next-line semi
 }

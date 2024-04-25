@@ -69,6 +69,7 @@ export const defaultAppStateLoading: AppStateLoading = {
   selectServer: SelectServerEnum.auto,
   serverErrorTries: 0,
   donationAlert: false,
+  rescanMenuOption: false,
 };
 
 export const ContextAppLoading = React.createContext(defaultAppStateLoading);
