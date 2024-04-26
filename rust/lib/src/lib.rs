@@ -6,7 +6,7 @@ extern crate android_logger;
 
 #[cfg(target_os = "android")]
 use android_logger::{Config, FilterBuilder};
-use base64::engine::general_purpose::STANDARD;
+use base64::{engine::general_purpose::STANDARD, DecodeError};
 #[cfg(target_os = "android")]
 use log::Level;
 
@@ -171,12 +171,13 @@ pub fn init_from_b64(
     }
     let decoded_bytes = match STANDARD_NO_PAD.decode(&base64_data) {
         Ok(b) => b,
-        Err(e) => match STANDARD.decode(&base64_data) {
+        Err(base64::DecodeError::InvalidPadding) => match STANDARD.decode(&base64_data) {
             Ok(b) => b,
             Err(e) => {
                 return format!("Error: Decoding Base64: {}", e);
             }
         },
+        _ => todo!(),
     };
 
     let lightclient =
