@@ -10,7 +10,6 @@ use base64::engine::general_purpose::STANDARD;
 #[cfg(target_os = "android")]
 use log::Level;
 
-use base64::engine::general_purpose::STANDARD_NO_PAD;
 use std::cell::RefCell;
 use std::sync::{Arc, Mutex};
 use zingoconfig::{construct_lightwalletd_uri, ChainType, RegtestNetwork, ZingoConfig};
@@ -188,7 +187,10 @@ pub fn init_from_b64(
 }
 
 fn decode_with_error_failover(base64_data: &str) -> Result<Vec<u8>, String> {
-    match base64::Engine::decode(&STANDARD_NO_PAD, &base64_data) {
+    match base64::Engine::decode(
+        &base64::engine::general_purpose::STANDARD_NO_PAD,
+        &base64_data,
+    ) {
         Ok(b) => Ok(b),
         Err(base64::DecodeError::InvalidPadding) => {
             match base64::Engine::decode(&STANDARD, &base64_data) {
@@ -224,7 +226,7 @@ pub fn save_to_b64() -> String {
     };
 
     match lightclient.export_save_buffer_runtime() {
-        Ok(buf) => base64::Engine::encode(&STANDARD_NO_PAD, &buf),
+        Ok(buf) => base64::Engine::encode(&base64::engine::general_purpose::STANDARD_NO_PAD, &buf),
         Err(e) => {
             format!("Error: {}", e)
         }
