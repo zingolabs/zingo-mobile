@@ -6,7 +6,7 @@ extern crate android_logger;
 
 #[cfg(target_os = "android")]
 use android_logger::{Config, FilterBuilder};
-use base64::{engine::general_purpose::STANDARD, DecodeError};
+use base64::engine::general_purpose::STANDARD;
 #[cfg(target_os = "android")]
 use log::Level;
 
@@ -169,15 +169,9 @@ pub fn init_from_b64(
         Ok((c, h)) => (config, _lightwalletd_uri) = (c, h),
         Err(s) => return s,
     }
-    let decoded_bytes = match STANDARD_NO_PAD.decode(&base64_data) {
-        Ok(b) => b,
-        Err(base64::DecodeError::InvalidPadding) => match STANDARD.decode(&base64_data) {
-            Ok(b) => b,
-            Err(e) => {
-                return format!("Error: Decoding Base64: {}", e);
-            }
-        },
-        _ => todo!(),
+    let decoded_bytes = match decode_with_error_failover(&base64_data) {
+        Ok(vu8) => vu8,
+        Err(e) => return e,
     };
 
     let lightclient =
@@ -190,6 +184,27 @@ pub fn init_from_b64(
     lock_client_return_seed(lightclient)
 }
 
+fn decode_with_error_failover(base64_data: &str) -> Result<Vec<u8>, String> {
+    match STANDARD_NO_PAD.decode(&base64_data) {
+        Ok(b) => Ok(b),
+        Err(base64::DecodeError::InvalidPadding) => match STANDARD.decode(&base64_data) {
+            Ok(b) => Ok(b),
+            Err(e) => {
+                return Err(format!("Error: Decoding Base64: {}", e));
+            }
+        },
+        _ => todo!(),
+    }
+}
+/*
+#cfg(test)]
+mod test {
+    #[test]
+    fn decode_b64(){
+
+    }
+}
+*/
 pub fn save_to_b64() -> String {
     // Return the wallet as a base64 encoded string
     let lightclient: Arc<LightClient>;
