@@ -157,6 +157,8 @@ pub fn init_from_ufvk(
     lock_client_return_seed(lightclient)
 }
 
+/// Mobile devices don't support Rust FS load operations, so we load data from a base64
+/// encoded buffer.
 pub fn init_from_b64(
     server_uri: String,
     base64_data: String,
