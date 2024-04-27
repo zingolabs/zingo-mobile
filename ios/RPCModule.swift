@@ -48,10 +48,10 @@ class RPCModule: NSObject {
       }
   }
 
-  func saveWalletFile(_ base64ENcodedData: String) {
+  func saveWalletFile(_ base64EncodedData: String) {
       // we need to decode the content first.
       // and save it after as a String (UTF8).
-      if let data = Data(base64Encoded: b64encoded, options: .ignoreUnknownCharacters) {
+      if let data = Data(base64Encoded: base64EncodedData, options: .ignoreUnknownCharacters) {
         let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
         if let documentsDirectory = paths.first {
             let fileName = "\(documentsDirectory)/wallet.dat.txt"
