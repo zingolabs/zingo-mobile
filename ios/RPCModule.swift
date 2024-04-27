@@ -48,31 +48,42 @@ class RPCModule: NSObject {
       }
   }
 
-  func saveWalletFile(_ data: String) {
-      let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-      if let documentsDirectory = paths.first {
-        let fileName = "\(documentsDirectory)/wallet.dat.txt"
-        do {
-            try data.write(toFile: fileName, atomically: true, encoding: .utf8)
-        } catch {
-            NSLog("Error save wallet \(error.localizedDescription)")
+  func saveWalletFile(_ base64ENcodedData: String) {
+      // we need to decode the content first.
+      // and save it after as a String (UTF8).
+      if let data = Data(base64Encoded: b64encoded, options: .ignoreUnknownCharacters) {
+        let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
+        if let documentsDirectory = paths.first {
+            let fileName = "\(documentsDirectory)/wallet.dat.txt"
+            do {
+                try data.write(toFile: fileName, atomically: true, encoding: .utf8)
+            } catch {
+                NSLog("Error save wallet \(error.localizedDescription)")
+            }
+        } else {
+            NSLog("Error save wallet")
         }
       } else {
-        NSLog("Error save wallet")
+        NSLog("could not decode b64 content to save wallet.")
       }
   }
-
-  func saveWalletBackupFile(_ data: String) {
-      let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-      if let documentsDirectory = paths.first {
-        let fileName = "\(documentsDirectory)/wallet.backup.dat.txt"
-        do {
-            try data.write(toFile: fileName, atomically: true, encoding: .utf8)
-        } catch {
-            NSLog("Error save backup wallet \(error.localizedDescription)")
+  func saveWalletBackupFile(_ base64ENcodedData: String) {
+      // we need to decode the content first.
+      // and save it after as a String (UTF8).
+      if let data = Data(base64Encoded: b64encoded, options: .ignoreUnknownCharacters) {
+        let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
+        if let documentsDirectory = paths.first {
+            let fileName = "\(documentsDirectory)/wallet.backup.dat.txt"
+            do {
+                try data.write(toFile: fileName, atomically: true, encoding: .utf8)
+            } catch {
+                NSLog("Error save backup wallet \(error.localizedDescription)")
+            }
+        } else {
+            NSLog("Error save backup wallet")
         }
       } else {
-        NSLog("Error save backup wallet")
+        NSLog("could not decode b64 content to save backup wallet.")
       }
   }
 
