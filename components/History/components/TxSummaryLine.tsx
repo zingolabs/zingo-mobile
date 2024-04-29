@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { IconDefinition, faArrowDown, faArrowUp, faRefresh } from '@fortawesome/free-solid-svg-icons';
+import { IconDefinition, faArrowDown, faArrowUp, faRefresh, faComment } from '@fortawesome/free-solid-svg-icons';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
 import ZecAmount from '../../Components/ZecAmount';
@@ -40,6 +40,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
   const [amountColor, setAmountColor] = useState<string>('');
   const [txIcon, setTxIcon] = useState<IconDefinition>(faRefresh);
   const [displayAddress, setDisplayAddress] = useState<React.JSX.Element | null>(null);
+  const [haveMemo, setHaveMemo] = useState<boolean>(false);
 
   useEffect(() => {
     const amountCo =
@@ -65,6 +66,13 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
         <AddressItem address={tx.txDetails[0].address} oneLine={true} closeModal={() => {}} openModal={() => {}} />
       ) : null;
     setDisplayAddress(displayAdd);
+
+    // if have any memo
+    const memos = tx.txDetails
+      .filter(txd => txd.memos && txd.memos.length > 0)
+      .map(txd => txd.memos)
+      .filter(m => !!m);
+    setHaveMemo(memos && memos.length > 0);
   }, [tx.txDetails]);
 
   //console.log('render TxSummaryLine - 5', index);
@@ -100,12 +108,14 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
             borderBottomWidth: 1,
             borderBottomColor: colors.border,
           }}>
-          <FontAwesomeIcon
-            style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
-            size={30}
-            icon={txIcon}
-            color={amountColor}
-          />
+          <View style={{ display: 'flex' }}>
+            <FontAwesomeIcon
+              style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
+              size={30}
+              icon={txIcon}
+              color={amountColor}
+            />
+          </View>
           <View style={{ display: 'flex' }}>
             {!!displayAddress && displayAddress}
             <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
@@ -118,6 +128,9 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
                   : (translate('history.sendtoself') as string)}
               </FadeText>
               <FadeText>{tx.time ? moment((tx.time || 0) * 1000).format('MMM D, h:mm a') : '--'}</FadeText>
+              {haveMemo && (
+                <FontAwesomeIcon style={{ marginLeft: 10 }} size={15} icon={faComment} color={colors.primaryDisabled} />
+              )}
             </View>
           </View>
           <ZecAmount
