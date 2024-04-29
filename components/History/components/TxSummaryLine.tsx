@@ -96,7 +96,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
             flexDirection: 'row',
             alignItems: 'center',
             marginTop: 15,
-            paddingBottom: displayAddress ? 15 : 0,
+            paddingBottom: 10,
             borderBottomWidth: 1,
             borderBottomColor: colors.border,
           }}>
@@ -121,7 +121,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
             </View>
           </View>
           <ZecAmount
-            style={{ flexGrow: 1, alignSelf: 'baseline', justifyContent: 'flex-end', paddingRight: 5 }}
+            style={{ flexGrow: 1, alignSelf: 'auto', justifyContent: 'flex-end', paddingRight: 5 }}
             size={18}
             currencyName={info.currencyName}
             color={amountColor}
