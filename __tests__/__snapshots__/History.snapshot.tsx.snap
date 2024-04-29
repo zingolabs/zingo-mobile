@@ -697,41 +697,16 @@ exports[`Component History - test History currency USD, privacy high & mode adva
           <View
             style={
               {
+                "alignItems": "center",
                 "borderBottomColor": "rgb(216, 216, 216)",
                 "borderBottomWidth": 1,
                 "display": "flex",
                 "flexDirection": "row",
                 "marginTop": 15,
-                "paddingBottom": 15,
+                "paddingBottom": 10,
               }
             }
           >
-            <
-              color="rgb(28, 28, 30)"
-              icon={
-                {
-                  "icon": [
-                    384,
-                    512,
-                    [
-                      8593,
-                    ],
-                    "f062",
-                    "M214.6 41.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 141.2V448c0 17.7 14.3 32 32 32s32-14.3 32-32V141.2L329.4 246.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z",
-                  ],
-                  "iconName": "arrow-up",
-                  "prefix": "fas",
-                }
-              }
-              size={24}
-              style={
-                {
-                  "marginLeft": 5,
-                  "marginRight": 5,
-                  "marginTop": 5,
-                }
-              }
-            />
             <View
               style={
                 {
@@ -739,20 +714,44 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                 }
               }
             >
-              <Text
-                style={
+              <
+                color="rgb(28, 28, 30)"
+                icon={
                   {
-                    "color": "rgb(28, 28, 30)",
-                    "fontSize": 18,
-                    "opacity": 0.65,
+                    "icon": [
+                      384,
+                      512,
+                      [
+                        8593,
+                      ],
+                      "f062",
+                      "M214.6 41.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 141.2V448c0 17.7 14.3 32 32 32s32-14.3 32-32V141.2L329.4 246.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z",
+                    ],
+                    "iconName": "arrow-up",
+                    "prefix": "fas",
                   }
                 }
-              >
-                sent-tx...4567890
-              </Text>
+                size={30}
+                style={
+                  {
+                    "marginLeft": 5,
+                    "marginRight": 5,
+                    "marginTop": 0,
+                  }
+                }
+              />
+            </View>
+            <View
+              style={
+                {
+                  "display": "flex",
+                }
+              }
+            >
               <View
                 style={
                   {
+                    "alignItems": "center",
                     "display": "flex",
                     "flexDirection": "row",
                   }
@@ -762,6 +761,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                   style={
                     {
                       "color": "rgb(28, 28, 30)",
+                      "fontSize": 18,
                       "fontWeight": "bold",
                       "opacity": 1,
                     }
@@ -779,12 +779,36 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                 >
                   Dec 13, 8:00 am
                 </Text>
+                <
+                  icon={
+                    {
+                      "icon": [
+                        512,
+                        512,
+                        [
+                          128489,
+                          61669,
+                        ],
+                        "f075",
+                        "M512 240c0 114.9-114.6 208-256 208c-37.1 0-72.3-6.4-104.1-17.9c-11.9 8.7-31.3 20.6-54.3 30.6C73.6 471.1 44.7 480 16 480c-6.5 0-12.3-3.9-14.8-9.9c-2.5-6-1.1-12.8 3.4-17.4l0 0 0 0 0 0 0 0 .3-.3c.3-.3 .7-.7 1.3-1.4c1.1-1.2 2.8-3.1 4.9-5.7c4.1-5 9.6-12.4 15.2-21.6c10-16.6 19.5-38.4 21.4-62.9C17.7 326.8 0 285.1 0 240C0 125.1 114.6 32 256 32s256 93.1 256 208z",
+                      ],
+                      "iconName": "comment",
+                      "prefix": "fas",
+                    }
+                  }
+                  size={15}
+                  style={
+                    {
+                      "marginLeft": 10,
+                    }
+                  }
+                />
               </View>
             </View>
             <View
               style={
                 {
-                  "alignSelf": "baseline",
+                  "alignSelf": "auto",
                   "flexDirection": "row",
                   "flexGrow": 1,
                   "justifyContent": "flex-end",
@@ -937,41 +961,16 @@ exports[`Component History - test History currency USD, privacy high & mode adva
           <View
             style={
               {
+                "alignItems": "center",
                 "borderBottomColor": "rgb(216, 216, 216)",
                 "borderBottomWidth": 1,
                 "display": "flex",
                 "flexDirection": "row",
                 "marginTop": 15,
-                "paddingBottom": 15,
+                "paddingBottom": 10,
               }
             }
           >
-            <
-              color="rgb(28, 28, 30)"
-              icon={
-                {
-                  "icon": [
-                    384,
-                    512,
-                    [
-                      8593,
-                    ],
-                    "f062",
-                    "M214.6 41.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 141.2V448c0 17.7 14.3 32 32 32s32-14.3 32-32V141.2L329.4 246.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z",
-                  ],
-                  "iconName": "arrow-up",
-                  "prefix": "fas",
-                }
-              }
-              size={24}
-              style={
-                {
-                  "marginLeft": 5,
-                  "marginRight": 5,
-                  "marginTop": 5,
-                }
-              }
-            />
             <View
               style={
                 {
@@ -979,20 +978,44 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                 }
               }
             >
-              <Text
-                style={
+              <
+                color="rgb(28, 28, 30)"
+                icon={
                   {
-                    "color": "rgb(28, 28, 30)",
-                    "fontSize": 18,
-                    "opacity": 0.65,
+                    "icon": [
+                      384,
+                      512,
+                      [
+                        8593,
+                      ],
+                      "f062",
+                      "M214.6 41.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 141.2V448c0 17.7 14.3 32 32 32s32-14.3 32-32V141.2L329.4 246.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z",
+                    ],
+                    "iconName": "arrow-up",
+                    "prefix": "fas",
                   }
                 }
-              >
-                sendtos...4567890
-              </Text>
+                size={30}
+                style={
+                  {
+                    "marginLeft": 5,
+                    "marginRight": 5,
+                    "marginTop": 0,
+                  }
+                }
+              />
+            </View>
+            <View
+              style={
+                {
+                  "display": "flex",
+                }
+              }
+            >
               <View
                 style={
                   {
+                    "alignItems": "center",
                     "display": "flex",
                     "flexDirection": "row",
                   }
@@ -1002,6 +1025,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                   style={
                     {
                       "color": "rgb(28, 28, 30)",
+                      "fontSize": 18,
                       "fontWeight": "bold",
                       "opacity": 1,
                     }
@@ -1019,12 +1043,36 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                 >
                   Dec 13, 8:00 am
                 </Text>
+                <
+                  icon={
+                    {
+                      "icon": [
+                        512,
+                        512,
+                        [
+                          128489,
+                          61669,
+                        ],
+                        "f075",
+                        "M512 240c0 114.9-114.6 208-256 208c-37.1 0-72.3-6.4-104.1-17.9c-11.9 8.7-31.3 20.6-54.3 30.6C73.6 471.1 44.7 480 16 480c-6.5 0-12.3-3.9-14.8-9.9c-2.5-6-1.1-12.8 3.4-17.4l0 0 0 0 0 0 0 0 .3-.3c.3-.3 .7-.7 1.3-1.4c1.1-1.2 2.8-3.1 4.9-5.7c4.1-5 9.6-12.4 15.2-21.6c10-16.6 19.5-38.4 21.4-62.9C17.7 326.8 0 285.1 0 240C0 125.1 114.6 32 256 32s256 93.1 256 208z",
+                      ],
+                      "iconName": "comment",
+                      "prefix": "fas",
+                    }
+                  }
+                  size={15}
+                  style={
+                    {
+                      "marginLeft": 10,
+                    }
+                  }
+                />
               </View>
             </View>
             <View
               style={
                 {
-                  "alignSelf": "baseline",
+                  "alignSelf": "auto",
                   "flexDirection": "row",
                   "flexGrow": 1,
                   "justifyContent": "flex-end",
@@ -1177,41 +1225,16 @@ exports[`Component History - test History currency USD, privacy high & mode adva
           <View
             style={
               {
+                "alignItems": "center",
                 "borderBottomColor": "rgb(216, 216, 216)",
                 "borderBottomWidth": 1,
                 "display": "flex",
                 "flexDirection": "row",
                 "marginTop": 15,
-                "paddingBottom": 15,
+                "paddingBottom": 10,
               }
             }
           >
-            <
-              color="rgb(0, 122, 255)"
-              icon={
-                {
-                  "icon": [
-                    384,
-                    512,
-                    [
-                      8595,
-                    ],
-                    "f063",
-                    "M169.4 470.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 370.8 224 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 306.7L54.6 265.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z",
-                  ],
-                  "iconName": "arrow-down",
-                  "prefix": "fas",
-                }
-              }
-              size={24}
-              style={
-                {
-                  "marginLeft": 5,
-                  "marginRight": 5,
-                  "marginTop": 5,
-                }
-              }
-            />
             <View
               style={
                 {
@@ -1219,20 +1242,44 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                 }
               }
             >
-              <Text
-                style={
+              <
+                color="rgb(0, 122, 255)"
+                icon={
                   {
-                    "color": "rgb(28, 28, 30)",
-                    "fontSize": 18,
-                    "opacity": 0.65,
+                    "icon": [
+                      384,
+                      512,
+                      [
+                        8595,
+                      ],
+                      "f063",
+                      "M169.4 470.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 370.8 224 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 306.7L54.6 265.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z",
+                    ],
+                    "iconName": "arrow-down",
+                    "prefix": "fas",
                   }
                 }
-              >
-                receive...4567890
-              </Text>
+                size={30}
+                style={
+                  {
+                    "marginLeft": 5,
+                    "marginRight": 5,
+                    "marginTop": 0,
+                  }
+                }
+              />
+            </View>
+            <View
+              style={
+                {
+                  "display": "flex",
+                }
+              }
+            >
               <View
                 style={
                   {
+                    "alignItems": "center",
                     "display": "flex",
                     "flexDirection": "row",
                   }
@@ -1242,6 +1289,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                   style={
                     {
                       "color": "rgb(0, 122, 255)",
+                      "fontSize": 18,
                       "fontWeight": "bold",
                       "opacity": 1,
                     }
@@ -1259,12 +1307,36 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                 >
                   Dec 13, 8:00 am
                 </Text>
+                <
+                  icon={
+                    {
+                      "icon": [
+                        512,
+                        512,
+                        [
+                          128489,
+                          61669,
+                        ],
+                        "f075",
+                        "M512 240c0 114.9-114.6 208-256 208c-37.1 0-72.3-6.4-104.1-17.9c-11.9 8.7-31.3 20.6-54.3 30.6C73.6 471.1 44.7 480 16 480c-6.5 0-12.3-3.9-14.8-9.9c-2.5-6-1.1-12.8 3.4-17.4l0 0 0 0 0 0 0 0 .3-.3c.3-.3 .7-.7 1.3-1.4c1.1-1.2 2.8-3.1 4.9-5.7c4.1-5 9.6-12.4 15.2-21.6c10-16.6 19.5-38.4 21.4-62.9C17.7 326.8 0 285.1 0 240C0 125.1 114.6 32 256 32s256 93.1 256 208z",
+                      ],
+                      "iconName": "comment",
+                      "prefix": "fas",
+                    }
+                  }
+                  size={15}
+                  style={
+                    {
+                      "marginLeft": 10,
+                    }
+                  }
+                />
               </View>
             </View>
             <View
               style={
                 {
-                  "alignSelf": "baseline",
+                  "alignSelf": "auto",
                   "flexDirection": "row",
                   "flexGrow": 1,
                   "justifyContent": "flex-end",
@@ -1820,41 +1892,16 @@ exports[`Component History - test History no currency, privacy normal & mode bas
           <View
             style={
               {
+                "alignItems": "center",
                 "borderBottomColor": "rgb(216, 216, 216)",
                 "borderBottomWidth": 1,
                 "display": "flex",
                 "flexDirection": "row",
                 "marginTop": 15,
-                "paddingBottom": 15,
+                "paddingBottom": 10,
               }
             }
           >
-            <
-              color="rgb(28, 28, 30)"
-              icon={
-                {
-                  "icon": [
-                    384,
-                    512,
-                    [
-                      8593,
-                    ],
-                    "f062",
-                    "M214.6 41.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 141.2V448c0 17.7 14.3 32 32 32s32-14.3 32-32V141.2L329.4 246.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z",
-                  ],
-                  "iconName": "arrow-up",
-                  "prefix": "fas",
-                }
-              }
-              size={24}
-              style={
-                {
-                  "marginLeft": 5,
-                  "marginRight": 5,
-                  "marginTop": 5,
-                }
-              }
-            />
             <View
               style={
                 {
@@ -1862,20 +1909,44 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                 }
               }
             >
-              <Text
-                style={
+              <
+                color="rgb(28, 28, 30)"
+                icon={
                   {
-                    "color": "rgb(28, 28, 30)",
-                    "fontSize": 18,
-                    "opacity": 0.65,
+                    "icon": [
+                      384,
+                      512,
+                      [
+                        8593,
+                      ],
+                      "f062",
+                      "M214.6 41.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 141.2V448c0 17.7 14.3 32 32 32s32-14.3 32-32V141.2L329.4 246.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z",
+                    ],
+                    "iconName": "arrow-up",
+                    "prefix": "fas",
                   }
                 }
-              >
-                sent-tx...4567890
-              </Text>
+                size={30}
+                style={
+                  {
+                    "marginLeft": 5,
+                    "marginRight": 5,
+                    "marginTop": 0,
+                  }
+                }
+              />
+            </View>
+            <View
+              style={
+                {
+                  "display": "flex",
+                }
+              }
+            >
               <View
                 style={
                   {
+                    "alignItems": "center",
                     "display": "flex",
                     "flexDirection": "row",
                   }
@@ -1885,6 +1956,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                   style={
                     {
                       "color": "rgb(28, 28, 30)",
+                      "fontSize": 18,
                       "fontWeight": "bold",
                       "opacity": 1,
                     }
@@ -1902,12 +1974,36 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                 >
                   Dec 13, 8:00 am
                 </Text>
+                <
+                  icon={
+                    {
+                      "icon": [
+                        512,
+                        512,
+                        [
+                          128489,
+                          61669,
+                        ],
+                        "f075",
+                        "M512 240c0 114.9-114.6 208-256 208c-37.1 0-72.3-6.4-104.1-17.9c-11.9 8.7-31.3 20.6-54.3 30.6C73.6 471.1 44.7 480 16 480c-6.5 0-12.3-3.9-14.8-9.9c-2.5-6-1.1-12.8 3.4-17.4l0 0 0 0 0 0 0 0 .3-.3c.3-.3 .7-.7 1.3-1.4c1.1-1.2 2.8-3.1 4.9-5.7c4.1-5 9.6-12.4 15.2-21.6c10-16.6 19.5-38.4 21.4-62.9C17.7 326.8 0 285.1 0 240C0 125.1 114.6 32 256 32s256 93.1 256 208z",
+                      ],
+                      "iconName": "comment",
+                      "prefix": "fas",
+                    }
+                  }
+                  size={15}
+                  style={
+                    {
+                      "marginLeft": 10,
+                    }
+                  }
+                />
               </View>
             </View>
             <View
               style={
                 {
-                  "alignSelf": "baseline",
+                  "alignSelf": "auto",
                   "flexDirection": "row",
                   "flexGrow": 1,
                   "justifyContent": "flex-end",
@@ -2075,41 +2171,16 @@ exports[`Component History - test History no currency, privacy normal & mode bas
           <View
             style={
               {
+                "alignItems": "center",
                 "borderBottomColor": "rgb(216, 216, 216)",
                 "borderBottomWidth": 1,
                 "display": "flex",
                 "flexDirection": "row",
                 "marginTop": 15,
-                "paddingBottom": 15,
+                "paddingBottom": 10,
               }
             }
           >
-            <
-              color="rgb(28, 28, 30)"
-              icon={
-                {
-                  "icon": [
-                    384,
-                    512,
-                    [
-                      8593,
-                    ],
-                    "f062",
-                    "M214.6 41.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 141.2V448c0 17.7 14.3 32 32 32s32-14.3 32-32V141.2L329.4 246.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z",
-                  ],
-                  "iconName": "arrow-up",
-                  "prefix": "fas",
-                }
-              }
-              size={24}
-              style={
-                {
-                  "marginLeft": 5,
-                  "marginRight": 5,
-                  "marginTop": 5,
-                }
-              }
-            />
             <View
               style={
                 {
@@ -2117,20 +2188,44 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                 }
               }
             >
-              <Text
-                style={
+              <
+                color="rgb(28, 28, 30)"
+                icon={
                   {
-                    "color": "rgb(28, 28, 30)",
-                    "fontSize": 18,
-                    "opacity": 0.65,
+                    "icon": [
+                      384,
+                      512,
+                      [
+                        8593,
+                      ],
+                      "f062",
+                      "M214.6 41.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 141.2V448c0 17.7 14.3 32 32 32s32-14.3 32-32V141.2L329.4 246.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z",
+                    ],
+                    "iconName": "arrow-up",
+                    "prefix": "fas",
                   }
                 }
-              >
-                sendtos...4567890
-              </Text>
+                size={30}
+                style={
+                  {
+                    "marginLeft": 5,
+                    "marginRight": 5,
+                    "marginTop": 0,
+                  }
+                }
+              />
+            </View>
+            <View
+              style={
+                {
+                  "display": "flex",
+                }
+              }
+            >
               <View
                 style={
                   {
+                    "alignItems": "center",
                     "display": "flex",
                     "flexDirection": "row",
                   }
@@ -2140,6 +2235,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                   style={
                     {
                       "color": "rgb(28, 28, 30)",
+                      "fontSize": 18,
                       "fontWeight": "bold",
                       "opacity": 1,
                     }
@@ -2157,12 +2253,36 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                 >
                   Dec 13, 8:00 am
                 </Text>
+                <
+                  icon={
+                    {
+                      "icon": [
+                        512,
+                        512,
+                        [
+                          128489,
+                          61669,
+                        ],
+                        "f075",
+                        "M512 240c0 114.9-114.6 208-256 208c-37.1 0-72.3-6.4-104.1-17.9c-11.9 8.7-31.3 20.6-54.3 30.6C73.6 471.1 44.7 480 16 480c-6.5 0-12.3-3.9-14.8-9.9c-2.5-6-1.1-12.8 3.4-17.4l0 0 0 0 0 0 0 0 .3-.3c.3-.3 .7-.7 1.3-1.4c1.1-1.2 2.8-3.1 4.9-5.7c4.1-5 9.6-12.4 15.2-21.6c10-16.6 19.5-38.4 21.4-62.9C17.7 326.8 0 285.1 0 240C0 125.1 114.6 32 256 32s256 93.1 256 208z",
+                      ],
+                      "iconName": "comment",
+                      "prefix": "fas",
+                    }
+                  }
+                  size={15}
+                  style={
+                    {
+                      "marginLeft": 10,
+                    }
+                  }
+                />
               </View>
             </View>
             <View
               style={
                 {
-                  "alignSelf": "baseline",
+                  "alignSelf": "auto",
                   "flexDirection": "row",
                   "flexGrow": 1,
                   "justifyContent": "flex-end",
@@ -2316,41 +2436,16 @@ exports[`Component History - test History no currency, privacy normal & mode bas
           <View
             style={
               {
+                "alignItems": "center",
                 "borderBottomColor": "rgb(216, 216, 216)",
                 "borderBottomWidth": 1,
                 "display": "flex",
                 "flexDirection": "row",
                 "marginTop": 15,
-                "paddingBottom": 15,
+                "paddingBottom": 10,
               }
             }
           >
-            <
-              color="rgb(0, 122, 255)"
-              icon={
-                {
-                  "icon": [
-                    384,
-                    512,
-                    [
-                      8595,
-                    ],
-                    "f063",
-                    "M169.4 470.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 370.8 224 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 306.7L54.6 265.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z",
-                  ],
-                  "iconName": "arrow-down",
-                  "prefix": "fas",
-                }
-              }
-              size={24}
-              style={
-                {
-                  "marginLeft": 5,
-                  "marginRight": 5,
-                  "marginTop": 5,
-                }
-              }
-            />
             <View
               style={
                 {
@@ -2358,20 +2453,44 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                 }
               }
             >
-              <Text
-                style={
+              <
+                color="rgb(0, 122, 255)"
+                icon={
                   {
-                    "color": "rgb(28, 28, 30)",
-                    "fontSize": 18,
-                    "opacity": 0.65,
+                    "icon": [
+                      384,
+                      512,
+                      [
+                        8595,
+                      ],
+                      "f063",
+                      "M169.4 470.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 370.8 224 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 306.7L54.6 265.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z",
+                    ],
+                    "iconName": "arrow-down",
+                    "prefix": "fas",
                   }
                 }
-              >
-                receive...4567890
-              </Text>
+                size={30}
+                style={
+                  {
+                    "marginLeft": 5,
+                    "marginRight": 5,
+                    "marginTop": 0,
+                  }
+                }
+              />
+            </View>
+            <View
+              style={
+                {
+                  "display": "flex",
+                }
+              }
+            >
               <View
                 style={
                   {
+                    "alignItems": "center",
                     "display": "flex",
                     "flexDirection": "row",
                   }
@@ -2381,6 +2500,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                   style={
                     {
                       "color": "rgb(0, 122, 255)",
+                      "fontSize": 18,
                       "fontWeight": "bold",
                       "opacity": 1,
                     }
@@ -2398,12 +2518,36 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                 >
                   Dec 13, 8:00 am
                 </Text>
+                <
+                  icon={
+                    {
+                      "icon": [
+                        512,
+                        512,
+                        [
+                          128489,
+                          61669,
+                        ],
+                        "f075",
+                        "M512 240c0 114.9-114.6 208-256 208c-37.1 0-72.3-6.4-104.1-17.9c-11.9 8.7-31.3 20.6-54.3 30.6C73.6 471.1 44.7 480 16 480c-6.5 0-12.3-3.9-14.8-9.9c-2.5-6-1.1-12.8 3.4-17.4l0 0 0 0 0 0 0 0 .3-.3c.3-.3 .7-.7 1.3-1.4c1.1-1.2 2.8-3.1 4.9-5.7c4.1-5 9.6-12.4 15.2-21.6c10-16.6 19.5-38.4 21.4-62.9C17.7 326.8 0 285.1 0 240C0 125.1 114.6 32 256 32s256 93.1 256 208z",
+                      ],
+                      "iconName": "comment",
+                      "prefix": "fas",
+                    }
+                  }
+                  size={15}
+                  style={
+                    {
+                      "marginLeft": 10,
+                    }
+                  }
+                />
               </View>
             </View>
             <View
               style={
                 {
-                  "alignSelf": "baseline",
+                  "alignSelf": "auto",
                   "flexDirection": "row",
                   "flexGrow": 1,
                   "justifyContent": "flex-end",
