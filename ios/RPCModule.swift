@@ -48,39 +48,42 @@ class RPCModule: NSObject {
       }
   }
 
-  func saveWalletFile(_ base64EncodedData: String) {
-      // we need to decode the content first.
-      // and save it after as a String (UTF8).
-      if let data = Data(base64Encoded: base64EncodedData, options: .ignoreUnknownCharacters) {
+  func saveWalletFile(_ base64EncodedString: String) {
+      // need to decode the content first.
+      // save the decoded binary data
+      if let base64DecodedData = Data(base64Encoded: base64EncodedString) {
         let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
         if let documentsDirectory = paths.first {
             let fileName = "\(documentsDirectory)/wallet.dat.txt"
             do {
-                try data.write(toFile: fileName, atomically: true, encoding: .utf8)
+              //NSLog("decoded data \(base64DecodedData)")
+              try base64DecodedData.write(to: URL(fileURLWithPath: fileName))
             } catch {
                 NSLog("Error save wallet \(error.localizedDescription)")
             }
         } else {
-            NSLog("Error save wallet")
+            NSLog("Error save wallet directory")
         }
       } else {
         NSLog("could not decode b64 content to save wallet.")
       }
   }
-  func saveWalletBackupFile(_ base64ENcodedData: String) {
+  
+  func saveWalletBackupFile(_ base64EncodedString: String) {
       // we need to decode the content first.
-      // and save it after as a String (UTF8).
-      if let data = Data(base64Encoded: b64encoded, options: .ignoreUnknownCharacters) {
+      // save the decoded binary data
+      if let base64DecodedData = Data(base64Encoded: base64EncodedString) {
         let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
         if let documentsDirectory = paths.first {
             let fileName = "\(documentsDirectory)/wallet.backup.dat.txt"
             do {
-                try data.write(toFile: fileName, atomically: true, encoding: .utf8)
+              //NSLog("decoded data \(base64DecodedData)")
+              try base64DecodedData.write(to: URL(fileURLWithPath: fileName))
             } catch {
-                NSLog("Error save backup wallet \(error.localizedDescription)")
+              NSLog("Error save backup wallet \(error.localizedDescription)")
             }
         } else {
-            NSLog("Error save backup wallet")
+          NSLog("Error save backup wallet directory")
         }
       } else {
         NSLog("could not decode b64 content to save backup wallet.")
@@ -101,12 +104,14 @@ class RPCModule: NSObject {
       }
   }
 
-  func readWallet() -> String? {
+  // old way to read the wallet file -> Encoded Utf8 String
+  func readWalletUtf8String() -> String? {
       let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
       if let documentsDirectory = paths.first {
         let fileName = "\(documentsDirectory)/wallet.dat.txt"
         do {
             let content = try String(contentsOfFile: fileName, encoding: .utf8)
+            //NSLog("load encoded utf8 string wallet \(content)")
             return content
         } catch {
             NSLog("Error reading wallet \(error.localizedDescription)")
@@ -118,15 +123,35 @@ class RPCModule: NSObject {
       }
   }
 
-  func readWalletBackup() -> String? {
+  // new way to read the wallet file -> Decoded Data
+  func readWallet() -> Data? {
+      let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
+      if let documentsDirectory = paths.first {
+        let fileName = "\(documentsDirectory)/wallet.dat.txt"
+        do {
+            let content = try Data(contentsOf: URL(fileURLWithPath: fileName))
+            //NSLog("load decoded data wallet \(content)")
+            return content
+        } catch {
+            NSLog("Error reading wallet \(error.localizedDescription)")
+            return nil
+        }
+      } else {
+        NSLog("Error reading wallet")
+        return nil
+      }
+  }
+
+  func readWalletBackup() -> Data? {
       let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
       if let documentsDirectory = paths.first {
         let fileName = "\(documentsDirectory)/wallet.backup.dat.txt"
         do {
-            let content = try String(contentsOfFile: fileName, encoding: .utf8)
+            let content = try Data(contentsOf: URL(fileURLWithPath: fileName))
+            //NSLog("load decoded data backup wallet \(content)")
             return content
         } catch {
-            print("Error reading backup wallet:", error.localizedDescription)
+            NSLog("Error reading backup wallet \(error.localizedDescription)")
             return nil
         }
       } else {
@@ -180,13 +205,13 @@ class RPCModule: NSObject {
   }
 
   func saveWalletInternal() {
-      let walletDataStr = saveToB64()
-      self.saveWalletFile(walletDataStr)
+      let walletEncodedString = saveToB64()
+      self.saveWalletFile(walletEncodedString)
   }
 
   func saveWalletBackupInternal() {
-      if let walletDataStr = readWallet() {
-          self.saveWalletBackupFile(walletDataStr)
+      if let walletData = readWallet() {
+        self.saveWalletBackupFile(walletData.base64EncodedString())
       } else {
           NSLog("Error: Unable to read wallet for backup")
       }
@@ -248,10 +273,27 @@ class RPCModule: NSObject {
   func loadExistingWallet(server: String, chainhint: String) -> String {
       let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
       if let documentsDirectory = paths.first {
-          if let walletDataStr = self.readWallet() {
-                let seed = initFromB64(serveruri: server, datab64: walletDataStr, datadir: documentsDirectory, chainhint: chainhint, monitorMempool: true)
-                let seedStr = String(seed)
-                return seedStr
+            if let walletData = self.readWallet() {
+                // first attemp with the new format -> decoded data
+                // I need to encode first
+                let walletEncodedString = walletData.base64EncodedString()
+                var seed = initFromB64(serveruri: server, datab64: walletEncodedString, datadir: documentsDirectory, chainhint: chainhint, monitorMempool: true)
+                var seedStr = String(seed)
+                if seedStr.lowercased().hasPrefix("error") {
+                  NSLog("First attemp: \(seedStr)")
+                  // second attemp with the old format -> Utf8 encoded
+                  if let walletEncodedUtf8String = self.readWalletUtf8String() {
+                    seed = initFromB64(serveruri: server, datab64: walletEncodedUtf8String, datadir: documentsDirectory, chainhint: chainhint, monitorMempool: true)
+                    seedStr = String(seed)
+                    NSLog("Second attemp: \(seedStr)")
+                    return seedStr
+                  } else {
+                    NSLog("Error loading existing wallet")
+                    return "Error: [Native] Loading a wallet. Reading wallet problem."
+                  }
+                } else {
+                  return seedStr
+                }
             } else {
                 NSLog("Error loading existing wallet")
                 return "Error: [Native] Loading a wallet. Reading wallet problem."
@@ -270,10 +312,10 @@ class RPCModule: NSObject {
 
   @objc(restoreExistingWalletBackup:reject:)
   func restoreExistingWalletBackup(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      if let backupDataStr = self.readWalletBackup(),
-         let walletDataStr = self.readWallet() {
-        self.saveWalletFile(backupDataStr)
-        self.saveWalletBackupFile(walletDataStr)
+      if let backupData = self.readWalletBackup(),
+         let walletData = self.readWallet() {
+        self.saveWalletFile(backupData.base64EncodedString())
+        self.saveWalletBackupFile(walletData.base64EncodedString())
         resolve("true")
       } else {
         NSLog("Error restoring existing wallet backup")
