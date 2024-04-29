@@ -452,24 +452,20 @@ export default class RPC {
 
       const memos = txns
         .filter(i => i.memos && i.memos.length > 0)
-        .map(i => {
-          const combinedMemo = i.memos
-            ?.filter(memo => memo)
-            .map(memo => {
-              const rex = /\((\d+)\/(\d+)\)((.|[\r\n])*)/;
-              const tags = memo.match(rex);
-              if (tags && tags.length >= 4) {
-                return { num: parseInt(tags[1], 10), memo: tags[3] };
-              }
+        .map(a => a.memos)
+        .flat()
+        .map(memo => {
+          const rex = /\((\d+)\/(\d+)\)((.|[\r\n])*)/;
+          const tags = memo?.match(rex);
+          if (tags && tags.length >= 4) {
+            return { num: parseInt(tags[1], 10), memo: tags[3] };
+          }
 
-              // Just return as is
-              return { num: 0, memo };
-            })
-            .sort((a, b) => a.num - b.num)
-            .map(a => a.memo);
-          return combinedMemo && combinedMemo.length > 0 ? combinedMemo.join('') : undefined;
+          // Just return as is
+          return { num: 0, memo };
         })
-        .map(a => a);
+        .sort((a, b) => a.num - b.num)
+        .map(a => a.memo);
 
       const detail: TxDetailType = {
         address: toaddr,
@@ -507,24 +503,20 @@ export default class RPC {
 
       const memos = txns
         .filter(i => i.memos && i.memos.length > 0)
-        .map(i => {
-          const combinedMemo = i.memos
-            ?.filter(memo => memo)
-            .map(memo => {
-              const rex = /\((\d+)\/(\d+)\)((.|[\r\n])*)/;
-              const tags = memo.match(rex);
-              if (tags && tags.length >= 4) {
-                return { num: parseInt(tags[1], 10), memo: tags[3] };
-              }
+        .map(a => a.memos)
+        .flat()
+        .map(memo => {
+          const rex = /\((\d+)\/(\d+)\)((.|[\r\n])*)/;
+          const tags = memo?.match(rex);
+          if (tags && tags.length >= 4) {
+            return { num: parseInt(tags[1], 10), memo: tags[3] };
+          }
 
-              // Just return as is
-              return { num: 0, memo };
-            })
-            .sort((a, b) => a.num - b.num)
-            .map(a => a.memo);
-          return combinedMemo && combinedMemo.length > 0 ? combinedMemo.join('') : undefined;
+          // Just return as is
+          return { num: 0, memo };
         })
-        .map(a => a);
+        .sort((a, b) => a.num - b.num)
+        .map(a => a.memo);
 
       const detail: TxDetailType = {
         address: '',
