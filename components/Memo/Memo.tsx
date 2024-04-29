@@ -25,6 +25,7 @@ import 'moment/locale/ru';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { ButtonTypeEnum } from '../../app/AppState';
+import FadeText from '../Components/FadeText';
 
 type MemoProps = {
   closeModal: () => void;
@@ -116,8 +117,8 @@ const Memo: React.FunctionComponent<MemoProps> = ({ closeModal, updateToField })
             borderRadius: 5,
             borderColor: colors.text,
             minWidth: 48,
-            minHeight: dimensions.height * 0.5,
-            maxHeight: dimensions.height * 0.5,
+            minHeight: dimensions.height * 0.3,
+            maxHeight: dimensions.height * 0.4,
             flexDirection: 'row',
           }}>
           <TextInput
@@ -137,6 +138,7 @@ const Memo: React.FunctionComponent<MemoProps> = ({ closeModal, updateToField })
             value={memo}
             onChangeText={(text: string) => setMemo(text)}
             editable={true}
+            maxLength={500}
           />
           {memo && (
             <TouchableOpacity
@@ -146,6 +148,16 @@ const Memo: React.FunctionComponent<MemoProps> = ({ closeModal, updateToField })
               <FontAwesomeIcon style={{ margin: 10 }} size={25} icon={faXmark} color={colors.primaryDisabled} />
             </TouchableOpacity>
           )}
+        </View>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'flex-end',
+            alignItems: 'center',
+          }}>
+          <FadeText style={{ marginTop: 5, fontWeight: 'bold' }}>{`${memo.length.toString()} `}</FadeText>
+          <FadeText style={{ marginTop: 5 }}>{translate('loadedapp.of') as string}</FadeText>
+          <FadeText style={{ marginTop: 5 }}>{' 500 '}</FadeText>
         </View>
       </ScrollView>
       <View

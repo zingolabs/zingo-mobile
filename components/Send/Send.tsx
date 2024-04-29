@@ -1237,6 +1237,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                               setMemoIcon(false);
                             }
                           }}
+                          maxLength={500}
                         />
                         {ta.memo && (
                           <TouchableOpacity
@@ -1265,6 +1266,17 @@ const Send: React.FunctionComponent<SendProps> = ({
                           </TouchableOpacity>
                         )}
                       </View>
+                    </View>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        justifyContent: 'flex-end',
+                        alignItems: 'center',
+                      }}>
+                      <FadeText
+                        style={{ marginTop: 5, fontWeight: 'bold' }}>{`${ta.memo.length.toString()} `}</FadeText>
+                      <FadeText style={{ marginTop: 5 }}>{translate('loadedapp.of') as string}</FadeText>
+                      <FadeText style={{ marginTop: 5 }}>{' 500 '}</FadeText>
                     </View>
                   </>
                 )}

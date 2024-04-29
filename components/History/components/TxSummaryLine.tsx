@@ -9,7 +9,6 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import ZecAmount from '../../Components/ZecAmount';
 import FadeText from '../../Components/FadeText';
 import { TransactionType, TransactionTypeEnum } from '../../../app/AppState';
-import Utils from '../../../app/utils';
 import { ThemeType } from '../../../app/types';
 import moment from 'moment';
 import 'moment/locale/es';
@@ -40,7 +39,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
 
   const [amountColor, setAmountColor] = useState<string>('');
   const [txIcon, setTxIcon] = useState<IconDefinition>(faRefresh);
-  const [displayAddress, setDisplayAddress] = useState<React.JSX.Element>();
+  const [displayAddress, setDisplayAddress] = useState<React.JSX.Element | null>(null);
 
   useEffect(() => {
     const amountCo =
@@ -64,11 +63,9 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
     const displayAdd =
       tx.txDetails.length === 1 && tx.txDetails[0].address ? (
         <AddressItem address={tx.txDetails[0].address} oneLine={true} closeModal={() => {}} openModal={() => {}} />
-      ) : (
-        <FadeText style={{ fontSize: 18 }}>{Utils.trimToSmall(tx.txid, 7)}</FadeText>
-      );
+      ) : null;
     setDisplayAddress(displayAdd);
-  }, [tx.txDetails, tx.txid]);
+  }, [tx.txDetails]);
 
   //console.log('render TxSummaryLine - 5', index);
 
@@ -97,21 +94,23 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
           style={{
             display: 'flex',
             flexDirection: 'row',
+            alignItems: 'center',
             marginTop: 15,
-            paddingBottom: 15,
+            paddingBottom: displayAddress ? 15 : 0,
             borderBottomWidth: 1,
             borderBottomColor: colors.border,
           }}>
           <FontAwesomeIcon
-            style={{ marginLeft: 5, marginRight: 5, marginTop: 5 }}
-            size={24}
+            style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
+            size={30}
             icon={txIcon}
             color={amountColor}
           />
           <View style={{ display: 'flex' }}>
-            {displayAddress}
-            <View style={{ display: 'flex', flexDirection: 'row' }}>
-              <FadeText style={{ opacity: 1, fontWeight: 'bold', color: amountColor }}>
+            {!!displayAddress && displayAddress}
+            <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+              <FadeText
+                style={{ opacity: 1, fontWeight: 'bold', color: amountColor, fontSize: displayAddress ? 14 : 18 }}>
                 {tx.type === TransactionTypeEnum.Sent
                   ? (translate('history.sent') as string)
                   : tx.type === TransactionTypeEnum.Received

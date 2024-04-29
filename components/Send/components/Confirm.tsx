@@ -287,11 +287,11 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
           <ZecAmount
             currencyName={info.currencyName}
             amtZec={sendingTotal}
-            privacy={privacy}
+            privacy={false}
             size={36}
             smallPrefix={true}
           />
-          <CurrencyAmount amtZec={sendingTotal} price={zecPrice.zecPrice} currency={currency} privacy={privacy} />
+          <CurrencyAmount amtZec={sendingTotal} price={zecPrice.zecPrice} currency={currency} privacy={false} />
         </View>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
           <View style={{ marginHorizontal: 10 }}>
