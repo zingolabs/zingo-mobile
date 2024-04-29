@@ -207,7 +207,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     // - true      -> the user do pass the authentication
     // - false     -> the user do NOT pass the authentication
     // - undefined -> no biometric authentication available -> Passcode.
-    console.log('BIOMETRIC --------> ', resultBio);
+    //console.log('BIOMETRIC --------> ', resultBio);
     if (resultBio === false) {
       // snack with Error
       addLastSnackbar({ message: translate('biometrics-error') as string });

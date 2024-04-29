@@ -397,7 +397,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
         // - true      -> the user do pass the authentication
         // - false     -> the user do NOT pass the authentication
         // - undefined -> no biometric authentication available -> Passcode.
-        console.log('BIOMETRIC --------> ', resultBio);
+        //console.log('BIOMETRIC --------> ', resultBio);
         if (resultBio === false) {
           this.setState({ biometricsFailed: true });
           return;
@@ -517,7 +517,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     })();
 
     this.appstate = AppState.addEventListener('change', async nextAppState => {
-      console.log('LOADING', 'next', nextAppState, 'prior', this.state.appState);
+      //console.log('LOADING', 'next', nextAppState, 'prior', this.state.appState);
       if (
         (this.state.appState === AppStateStatusEnum.inactive ||
           this.state.appState === AppStateStatusEnum.background) &&
@@ -647,7 +647,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
 
   checkServer: (s: ServerType) => Promise<boolean> = async (server: ServerType) => {
     const resp: string = await RPCModule.getLatestBlock(server.uri);
-    console.log('check server', resp);
+    //console.log('check server', resp);
 
     if (resp && !resp.toLowerCase().startsWith('error')) {
       return true;

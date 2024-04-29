@@ -73,7 +73,6 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
       .map(txd => txd.memos)
       .flat()
       .filter(m => !!m);
-    console.log(memos);
     setHaveMemo(memos && memos.length > 0);
   }, [tx.txDetails]);
 

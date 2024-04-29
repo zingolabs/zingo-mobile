@@ -343,7 +343,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     // - true      -> the user do pass the authentication
     // - false     -> the user do NOT pass the authentication
     // - undefined -> no biometric authentication available -> Passcode.
-    console.log('BIOMETRIC --------> ', resultBio);
+    //console.log('BIOMETRIC --------> ', resultBio);
     if (resultBio === false) {
       // snack with Error & closing the menu.
       if (addLastSnackbar) {

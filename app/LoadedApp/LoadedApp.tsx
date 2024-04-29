@@ -392,18 +392,18 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     })();
 
     this.appstate = AppState.addEventListener('change', async nextAppState => {
-      console.log('LOADED', 'prior', this.state.appState, 'next', nextAppState);
+      //console.log('LOADED', 'prior', this.state.appState, 'next', nextAppState);
       if (Platform.OS === 'ios') {
         if (
           (this.state.appState === AppStateStatusEnum.inactive && nextAppState === AppStateStatusEnum.active) ||
           (this.state.appState === AppStateStatusEnum.active && nextAppState === AppStateStatusEnum.inactive)
         ) {
-          console.log('LOADED SAVED IOS do nothing', nextAppState);
+          //console.log('LOADED SAVED IOS do nothing', nextAppState);
           this.setState({ appState: nextAppState });
           return;
         }
         if (this.state.appState === AppStateStatusEnum.inactive && nextAppState === AppStateStatusEnum.background) {
-          console.log('App LOADED IOS is gone to the background!');
+          //console.log('App LOADED IOS is gone to the background!');
           // re-activate the interruption sync flag
           await RPC.rpc_setInterruptSyncAfterBatch('true');
           // setting value for background task Android
@@ -411,10 +411,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
           //console.log('background yes in storage');
           this.rpc.setInRefresh(false);
           await this.rpc.clearTimers();
-          console.log('clear timers IOS');
+          //console.log('clear timers IOS');
           this.setSyncingStatus(new SyncingStatusClass());
           //console.log('clear sync status state');
-          console.log('LOADED SAVED IOS background', nextAppState);
+          //console.log('LOADED SAVED IOS background', nextAppState);
           this.setState({ appState: nextAppState });
           return;
         }
@@ -426,7 +426,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       ) {
         console.log('App LOADED Android & IOS has come to the foreground!');
         if (Platform.OS === 'ios') {
-          console.log('LOADED SAVED IOS foreground', nextAppState);
+          //console.log('LOADED SAVED IOS foreground', nextAppState);
           this.setState({ appState: nextAppState });
         }
         // (PIN or TouchID or FaceID)
@@ -437,7 +437,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
         // - true      -> the user do pass the authentication
         // - false     -> the user do NOT pass the authentication
         // - undefined -> no biometric authentication available -> Passcode.
-        console.log('BIOMETRIC FOREGROUND --------> ', resultBio);
+        //console.log('BIOMETRIC FOREGROUND --------> ', resultBio);
         if (resultBio === false) {
           this.navigateToLoadingApp({ startingApp: true, biometricsFailed: true });
         } else {
@@ -447,7 +447,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
           await AsyncStorage.setItem('@background', 'no');
           //console.log('background no in storage');
           await this.rpc.configure();
-          console.log('configure start timers Android & IOS');
+          //console.log('configure start timers Android & IOS');
           if (this.state.backgroundError && (this.state.backgroundError.title || this.state.backgroundError.error)) {
             Alert.alert(this.state.backgroundError.title, this.state.backgroundError.error);
             this.setBackgroundError('', '');
@@ -465,24 +465,24 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
         //console.log('background yes in storage');
         this.rpc.setInRefresh(false);
         await this.rpc.clearTimers();
-        console.log('clear timers');
+        //console.log('clear timers');
         this.setSyncingStatus(new SyncingStatusClass());
         //console.log('clear sync status state');
         if (Platform.OS === 'ios') {
-          console.log('LOADED SAVED IOS background', nextAppState);
+          //console.log('LOADED SAVED IOS background', nextAppState);
           this.setState({ appState: nextAppState });
         }
       } else {
         if (Platform.OS === 'ios') {
           if (this.state.appState !== nextAppState) {
-            console.log('LOADED SAVED IOS', nextAppState);
+            //console.log('LOADED SAVED IOS', nextAppState);
             this.setState({ appState: nextAppState });
           }
         }
       }
       if (Platform.OS === 'android') {
         if (this.state.appState !== nextAppState) {
-          console.log('LOADED SAVED Android', nextAppState);
+          //console.log('LOADED SAVED Android', nextAppState);
           this.setState({ appState: nextAppState });
         }
       }
