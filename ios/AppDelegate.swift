@@ -158,16 +158,24 @@ extension AppDelegate {
             let rpcmodule = RPCModule()
 
             // save the wallet
-            rpcmodule.saveWalletInternal()
-            NSLog("BGTask startBackgroundTask - expirationHandler Save Wallet")
+            do {
+              try rpcmodule.saveWalletInternal()
+              NSLog("BGTask startBackgroundTask - expirationHandler Save Wallet")
+            } catch {
+              NSLog("BGTask startBackgroundTask - expirationHandler Save Wallet error: \(error.localizedDescription)")
+            }
 
             // save the background file
             let timeStamp = Date().timeIntervalSince1970
             let timeStampStr = String(format: "%.0f", timeStamp)
             let jsonBackground = "{\"batches\": \"0\", \"message\": \"Finished OK.\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"\(timeStampStr)\"}"
-            rpcmodule.saveBackgroundFile(jsonBackground)
-            NSLog("BGTask startBackgroundTask - expirationHandler Save background JSON \(jsonBackground)")
-
+            do {
+              try rpcmodule.saveBackgroundFile(jsonBackground)
+              NSLog("BGTask startBackgroundTask - expirationHandler Save background JSON \(jsonBackground)")
+            } catch {
+              NSLog("BGTask startBackgroundTask - expirationHandler Save background JSON \(jsonBackground) error: \(error.localizedDescription)")
+            }
+          
             if let task = self.bgTask {
               task.setTaskCompleted(success: false)
             }
@@ -284,8 +292,12 @@ extension AppDelegate {
         let timeStampStart = Date().timeIntervalSince1970
         self.timeStampStrStart = String(format: "%.0f", timeStampStart)
         let jsonBackgroundStart = "{\"batches\": \"0\", \"message\": \"Starting OK.\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"0\"}"
-        rpcmodule.saveBackgroundFile(jsonBackgroundStart)
-        NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundStart)")
+        do {
+          try rpcmodule.saveBackgroundFile(jsonBackgroundStart)
+          NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundStart)")
+        } catch {
+          NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundStart) error: \(error.localizedDescription)")
+        }
 
         NSLog("BGTask syncingProcessBackgroundTask")
         let exists = self.wallet__exists()
@@ -322,9 +334,13 @@ extension AppDelegate {
             let timeStampError = Date().timeIntervalSince1970
             let timeStampStrError = String(format: "%.0f", timeStampError)
             let jsonBackgroundError = "{\"batches\": \"0\", \"message\": \"No active wallet KO.\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"\(timeStampStrError)\"}"
-            rpcmodule.saveBackgroundFile(jsonBackgroundError)
-            NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundError)")
-
+            do {
+              try rpcmodule.saveBackgroundFile(jsonBackgroundError)
+              NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundError)")
+            } catch {
+              NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundError) error: \(error.localizedDescription)")
+            }
+            
             if let task = self.bgTask {
               task.setTaskCompleted(success: false)
             }
@@ -335,15 +351,24 @@ extension AppDelegate {
         NSLog("BGTask syncingProcessBackgroundTask - syncing task STOPPED")
 
         // save the wallet
-        rpcmodule.saveWalletInternal()
-        NSLog("BGTask syncingProcessBackgroundTask - Save Wallet")
+        do {
+          try rpcmodule.saveWalletInternal()
+          NSLog("BGTask syncingProcessBackgroundTask - Save Wallet")
+        } catch {
+          NSLog("BGTask syncingProcessBackgroundTask - Save Wallet error: \(error.localizedDescription)")
+        }
+        
 
         // save the background file
         let timeStampEnd = Date().timeIntervalSince1970
         let timeStampStrEnd = String(format: "%.0f", timeStampEnd)
         let jsonBackgroundEnd = "{\"batches\": \"0\", \"message\": \"Finished OK.\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"\(timeStampStrEnd)\"}"
-        rpcmodule.saveBackgroundFile(jsonBackgroundEnd)
-        NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundEnd)")
+        do {
+          try rpcmodule.saveBackgroundFile(jsonBackgroundEnd)
+          NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundEnd)")
+        } catch {
+          NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundEnd) error: \(error.localizedDescription)")
+        }
 
         if let task = self.bgTask {
           task.setTaskCompleted(success: false)
@@ -375,7 +400,11 @@ extension AppDelegate {
 
         NSLog("Opening the wallet file - No App active - server: \(serverURI) chain: \(chainhint)")
         let rpcmodule = RPCModule()
-        _ = rpcmodule.loadExistingWallet(server: serverURI, chainhint: chainhint)
+        do {
+          _ = try rpcmodule.loadExistingWallet(server: serverURI, chainhint: chainhint)
+        } catch {
+          NSLog("Error: Unable to load the wallet. error: \(error.localizedDescription)")
+        }
     }
 
     func wallet__exists() -> Bool {
