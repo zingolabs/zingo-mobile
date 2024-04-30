@@ -281,13 +281,13 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
                     {!!memoUA && (
                       <TouchableOpacity
                         onPress={() => {
+                          Clipboard.setString(memoUA);
                           if (!thisWalletAddress(memoUA)) {
                             addLastSnackbar({
                               message: translate('history.address-http') as string,
                               duration: SnackbarDurationEnum.long,
                             });
                           }
-                          Clipboard.setString(memoUA);
                           addLastSnackbar({
                             message: translate('history.addresscopied') as string,
                             duration: SnackbarDurationEnum.short,
