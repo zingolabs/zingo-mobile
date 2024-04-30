@@ -3,7 +3,7 @@ import Url from 'url-parse';
 import RPCModule from '../RPCModule';
 import { RPCParseAddressType } from '../rpc/types/RPCParseAddressType';
 import ZcashURITargetClass from './classes/ZcashURITargetClass';
-import { CommandEnum, ServerType, TranslateType, Globals } from '../AppState';
+import { CommandEnum, ServerType, TranslateType, GlobalConst } from '../AppState';
 import { RPCParseStatusEnum } from '../rpc/enums/RPCParseStatusEnum';
 
 const parseZcashURI = async (
@@ -16,7 +16,7 @@ const parseZcashURI = async (
   }
 
   const parsedUri = new Url(uri, true);
-  if (!parsedUri || parsedUri.protocol.toLowerCase() !== 'zcash:') {
+  if (!parsedUri || parsedUri.protocol.toLowerCase() !== GlobalConst.zcash) {
     return translate('uris.baduri') as string;
   }
   //console.log(parsedUri);
@@ -30,7 +30,7 @@ const parseZcashURI = async (
   if (address) {
     const resultParse: string = await RPCModule.execute(CommandEnum.parse_address, address);
     if (resultParse) {
-      if (resultParse.toLowerCase().startsWith(Globals.error) || resultParse.toLowerCase() === 'null') {
+      if (resultParse.toLowerCase().startsWith(GlobalConst.error) || resultParse.toLowerCase() === 'null') {
         return translate('uris.parseerror') as string;
       }
     } else {
@@ -90,7 +90,7 @@ const parseZcashURI = async (
         }
         const result: string = await RPCModule.execute(CommandEnum.parse_address, value);
         if (result) {
-          if (result.toLowerCase().startsWith(Globals.error) || result.toLowerCase() === 'null') {
+          if (result.toLowerCase().startsWith(GlobalConst.error) || result.toLowerCase() === 'null') {
             return translate('uris.notvalid') as string;
           }
         } else {

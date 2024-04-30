@@ -36,7 +36,7 @@ import {
   ChainNameEnum,
   SettingsNameEnum,
   ButtonTypeEnum,
-  Globals,
+  GlobalConst,
 } from '../../app/AppState';
 import { parseZcashURI, ZcashURITargetClass } from '../../app/uris';
 import RPCModule from '../../app/RPCModule';
@@ -143,7 +143,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     try {
       const proposeStr: string = await RPCModule.execute(CommandEnum.propose, proposeJSON);
       if (proposeStr) {
-        if (proposeStr.toLowerCase().startsWith(Globals.error)) {
+        if (proposeStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error propose ${proposeStr}`);
           return proposeStr;
         }
@@ -187,7 +187,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     let proposeFee = 0;
     const runProposeStr = await runPropose(JSON.stringify(proposeTransaction));
     console.log(proposeTransaction, runProposeStr);
-    if (runProposeStr.toLowerCase().startsWith(Globals.error)) {
+    if (runProposeStr.toLowerCase().startsWith(GlobalConst.error)) {
       // snack with error
       console.log(runProposeStr);
       //Alert.alert('Calculating the FEE', runProposeStr);
@@ -273,7 +273,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       const result: string = await RPCModule.execute(CommandEnum.parse_address, address);
       //console.log(result);
       if (result) {
-        if (result.toLowerCase().startsWith(Globals.error) || result.toLowerCase() === 'null') {
+        if (result.toLowerCase().startsWith(GlobalConst.error) || result.toLowerCase() === 'null') {
           return false;
         }
       } else {
@@ -315,7 +315,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       const result: string = await RPCModule.execute(CommandEnum.parse_address, address);
       //console.log(result);
       if (result) {
-        if (result.toLowerCase().startsWith(Globals.error) || result.toLowerCase() === 'null') {
+        if (result.toLowerCase().startsWith(GlobalConst.error) || result.toLowerCase() === 'null') {
           return false;
         }
       } else {
@@ -441,9 +441,9 @@ const Send: React.FunctionComponent<SendProps> = ({
   useEffect(() => {
     (async () => {
       if (isFocused) {
-        await RPC.rpc_setInterruptSyncAfterBatch('true');
+        await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.true);
       } else {
-        await RPC.rpc_setInterruptSyncAfterBatch('false');
+        await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.false);
       }
     })();
   }, [isFocused]);
@@ -503,7 +503,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     if (address !== null) {
       toAddr.to = address;
       // Attempt to parse as URI if it starts with zcash
-      if (address.toLowerCase().startsWith('zcash:')) {
+      if (address.toLowerCase().startsWith(GlobalConst.zcash)) {
         const target: string | ZcashURITargetClass = await parseZcashURI(address, translate, server);
         //console.log(target);
 
@@ -576,7 +576,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       return;
     }
     // first interrupt syncing Just in case...
-    await RPC.rpc_setInterruptSyncAfterBatch('true');
+    await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.true);
     // First, close the confirm modal and show the "computing" modal
     setConfirmModalVisible(false);
     setComputingModalVisible(true);

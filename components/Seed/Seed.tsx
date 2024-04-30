@@ -24,7 +24,7 @@ import {
   SettingsNameEnum,
   SnackbarType,
   ButtonTypeEnum,
-  Globals,
+  GlobalConst,
 } from '../../app/AppState';
 import RPCModule from '../../app/RPCModule';
 import RPC from '../../app/rpc';
@@ -179,7 +179,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
         (async () => {
           const resp: string = await RPCModule.getLatestBlock(server.uri);
           //console.log(resp);
-          if (resp && !resp.toLowerCase().startsWith(Globals.error)) {
+          if (resp && !resp.toLowerCase().startsWith(GlobalConst.error)) {
             setLatestBlock(Number(resp));
           } else {
             //console.log('error latest block', resp);
@@ -210,7 +210,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
   // because this screen is fired from more places than the menu.
   useEffect(() => {
     if (action !== SeedActionEnum.new && action !== SeedActionEnum.restore) {
-      (async () => await RPC.rpc_setInterruptSyncAfterBatch('false'))();
+      (async () => await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.false))();
     }
   }, [action]);
 

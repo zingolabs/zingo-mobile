@@ -13,7 +13,7 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
-import { MenuItemEnum, ModeEnum } from '../../AppState';
+import { GlobalConst, MenuItemEnum, ModeEnum } from '../../AppState';
 
 type MenuProps = {
   onItemSelected: (item: MenuItemEnum) => Promise<void>;
@@ -58,13 +58,13 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuSt
         addLastSnackbar({ message: translate('biometrics-error') as string });
       } else {
         // if the user click on a screen in the menu the sync is going to continue
-        (async () => await RPC.rpc_setInterruptSyncAfterBatch('false'))();
+        (async () => await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.false))();
         onItemSelected(value);
       }
     } else {
       // if the user click on a screen in the menu the sync is going to continue
       // or if the security check of the screen is false in settings
-      (async () => await RPC.rpc_setInterruptSyncAfterBatch('false'))();
+      (async () => await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.false))();
       onItemSelected(value);
     }
   };

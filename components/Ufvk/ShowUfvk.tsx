@@ -14,7 +14,14 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import RegText from '../Components/RegText';
-import { ButtonTypeEnum, ChainNameEnum, ModeEnum, SettingsNameEnum, UfvkActionEnum } from '../../app/AppState';
+import {
+  ButtonTypeEnum,
+  ChainNameEnum,
+  GlobalConst,
+  ModeEnum,
+  SettingsNameEnum,
+  UfvkActionEnum,
+} from '../../app/AppState';
 
 type TextsType = {
   new: string[];
@@ -54,7 +61,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
 
   // because this screen is fired from more places than the menu.
   useEffect(() => {
-    (async () => await RPC.rpc_setInterruptSyncAfterBatch('false'))();
+    (async () => await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.false))();
   }, []);
 
   const onPressOK = () => {

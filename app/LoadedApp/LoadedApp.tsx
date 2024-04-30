@@ -60,7 +60,7 @@ import {
   RouteEnums,
   SnackbarType,
   AppStateStatusEnum,
-  Globals,
+  GlobalConst,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
@@ -406,7 +406,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
         if (this.state.appState === AppStateStatusEnum.inactive && nextAppState === AppStateStatusEnum.background) {
           //console.log('App LOADED IOS is gone to the background!');
           // re-activate the interruption sync flag
-          await RPC.rpc_setInterruptSyncAfterBatch('true');
+          await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.true);
           // setting value for background task Android
           await AsyncStorage.setItem('@background', 'yes');
           //console.log('background yes in storage');
@@ -460,7 +460,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       ) {
         console.log('App LOADED is gone to the background!');
         // re-activate the interruption sync flag
-        await RPC.rpc_setInterruptSyncAfterBatch('true');
+        await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.true);
         // setting value for background task Android
         await AsyncStorage.setItem('@background', 'yes');
         //console.log('background yes in storage');
@@ -568,7 +568,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     //console.log(url);
     // Attempt to parse as URI if it starts with zcash
     // only if it is a spendable wallet
-    if (url.startsWith('zcash:') && !this.state.readOnly) {
+    if (url.startsWith(GlobalConst.zcash) && !this.state.readOnly) {
       const target: string | ZcashURITargetClass = await parseZcashURI(url, this.state.translate, this.state.server);
       //console.log(targets);
 
@@ -1049,7 +1049,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       //   But I have to restart the sync if needed.
       let result: string = await RPCModule.loadExistingWallet(value.uri, value.chain_name);
       //console.log(result);
-      if (result && !result.toLowerCase().startsWith(Globals.error)) {
+      if (result && !result.toLowerCase().startsWith(GlobalConst.error)) {
         // here result can have an `error` field for watch-only which is actually OK.
         const resultJson: RPCSeedType = await JSON.parse(result);
         if (
@@ -1240,7 +1240,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     }
 
     //console.log("jc change", resultStr);
-    if (resultStr.toLowerCase().startsWith(Globals.error)) {
+    if (resultStr.toLowerCase().startsWith(GlobalConst.error)) {
       //console.log(`Error change wallet. ${resultStr}`);
       createAlert(
         this.setBackgroundError,
@@ -1261,7 +1261,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     const resultStr = (await this.rpc.restoreBackup()) as string;
 
     //console.log("jc restore", resultStr);
-    if (resultStr.toLowerCase().startsWith(Globals.error)) {
+    if (resultStr.toLowerCase().startsWith(GlobalConst.error)) {
       //console.log(`Error restore backup wallet. ${resultStr}`);
       createAlert(
         this.setBackgroundError,
@@ -1282,7 +1282,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     if (this.state.newServer) {
       const beforeServer = this.state.server;
       const resultStr: string = await RPCModule.execute(CommandEnum.changeserver, this.state.newServer.uri);
-      if (resultStr.toLowerCase().startsWith(Globals.error)) {
+      if (resultStr.toLowerCase().startsWith(GlobalConst.error)) {
         //console.log(`Error change server ${value} - ${resultStr}`);
         this.addLastSnackbar({
           message: `${this.props.translate('loadedapp.changeservernew-error')} ${resultStr}`,
@@ -1311,7 +1311,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       }
 
       //console.log("jc change", resultStr);
-      if (resultStr2.toLowerCase().startsWith(Globals.error)) {
+      if (resultStr2.toLowerCase().startsWith(GlobalConst.error)) {
         //console.log(`Error change wallet. ${resultStr}`);
         createAlert(
           this.setBackgroundError,

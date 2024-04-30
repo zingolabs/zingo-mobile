@@ -3,7 +3,7 @@ import React, { useContext, useState, useEffect } from 'react';
 import { View, TextInput } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
-import { AddressBookActionEnum, AddressBookFileClass, ButtonTypeEnum } from '../../../app/AppState';
+import { AddressBookActionEnum, AddressBookFileClass, ButtonTypeEnum, GlobalConst } from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
 import RegText from '../../Components/RegText';
 import { ContextAppLoaded } from '../../../app/context';
@@ -97,7 +97,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
     }
     let newAddress: string = addr;
     // Attempt to parse as URI if it starts with zcash
-    if (addr.toLowerCase().startsWith('zcash:')) {
+    if (addr.toLowerCase().startsWith(GlobalConst.zcash)) {
       const target: string | ZcashURITargetClass = await parseZcashURI(addr, translate, server);
       //console.log(targets);
 

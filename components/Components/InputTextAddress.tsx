@@ -17,7 +17,7 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
-import { CommandEnum, Globals } from '../../app/AppState';
+import { CommandEnum, GlobalConst } from '../../app/AppState';
 import { RPCParseStatusEnum } from '../../app/rpc/enums/RPCParseStatusEnum';
 
 type InputTextAddressProps = {
@@ -48,7 +48,7 @@ const InputTextAddress: React.FunctionComponent<InputTextAddressProps> = ({
       }
       const result: string = await RPCModule.execute(CommandEnum.parse_address, addr);
       if (result) {
-        if (result.toLowerCase().startsWith(Globals.error) || result.toLowerCase() === 'null') {
+        if (result.toLowerCase().startsWith(GlobalConst.error) || result.toLowerCase() === 'null') {
           return false;
         }
       } else {

@@ -1,5 +1,5 @@
 import Url from 'url-parse';
-import { TranslateType } from '../AppState';
+import { GlobalConst, TranslateType } from '../AppState';
 
 const parseServerURI = (uri: string, translate: (key: string) => TranslateType): string => {
   if (!uri || uri === '') {
@@ -11,7 +11,7 @@ const parseServerURI = (uri: string, translate: (key: string) => TranslateType):
     !parsedUri ||
     !parsedUri.hostname ||
     !parsedUri.protocol ||
-    (parsedUri.protocol !== 'http:' && parsedUri.protocol !== 'https:')
+    (parsedUri.protocol !== GlobalConst.http && parsedUri.protocol !== GlobalConst.https)
   ) {
     return translate('uris.baduri') as string;
   }
@@ -20,13 +20,13 @@ const parseServerURI = (uri: string, translate: (key: string) => TranslateType):
 
   if (!port) {
     // I need to verify if the URI have a standard port like `443` or `80`
-    if (parsedUri.protocol === 'http:' && uri.endsWith(':80')) {
+    if (parsedUri.protocol === GlobalConst.http && uri.endsWith(':' + GlobalConst.port80)) {
       // loking for 80
-      port = '80';
+      port = GlobalConst.port80;
     }
-    if (parsedUri.protocol === 'https:' && uri.endsWith(':443')) {
+    if (parsedUri.protocol === GlobalConst.https && uri.endsWith(':' + GlobalConst.port443)) {
       // loking for 443
-      port = '443';
+      port = GlobalConst.port443;
     }
     // by default -> 9067
     // for some `lightwalletd` -> 443
@@ -37,8 +37,8 @@ const parseServerURI = (uri: string, translate: (key: string) => TranslateType):
         uri.includes('eu.lightwalletd') ||
         uri.includes('ai.lightwalletd') ||
         uri.includes('zec.rocks')
-          ? '443'
-          : '9067';
+          ? GlobalConst.port443
+          : GlobalConst.port9067;
     }
   }
 

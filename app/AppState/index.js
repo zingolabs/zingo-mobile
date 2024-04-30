@@ -51,7 +51,7 @@ import { AddressKindEnum } from './enums/AddressKindEnum';
 import { ReceiverEnum } from './enums/ReceiverEnum';
 import { PrivacyLevelFromEnum } from './enums/PrivacyLevelFromEnum';
 
-import { Globals } from './const/GlobalConst';
+import { GlobalConst } from './const/GlobalConst';
 
 import AppStateLoaded from './AppStateLoaded';
 import AppStateLoading from './AppStateLoading';
@@ -109,5 +109,5 @@ export {
   AddressKindEnum,
   ReceiverEnum,
   PrivacyLevelFromEnum,
-  Globals,
+  GlobalConst,
 };

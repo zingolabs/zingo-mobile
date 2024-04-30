@@ -18,7 +18,7 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
-import { ButtonTypeEnum, SettingsNameEnum } from '../../app/AppState';
+import { ButtonTypeEnum, GlobalConst, SettingsNameEnum } from '../../app/AppState';
 
 type PoolsProps = {
   closeModal: () => void;
@@ -33,7 +33,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, set_privacy_op
 
   // because this screen is fired from more places than the menu.
   useEffect(() => {
-    (async () => await RPC.rpc_setInterruptSyncAfterBatch('false'))();
+    (async () => await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.false))();
   }, []);
 
   //console.log(totalBalance);

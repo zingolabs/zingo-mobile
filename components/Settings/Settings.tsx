@@ -32,7 +32,7 @@ import {
   SettingsNameEnum,
   WalletOptionEnum,
   ButtonTypeEnum,
-  Globals,
+  GlobalConst,
 } from '../../app/AppState';
 import { isEqual } from 'lodash';
 import ChainTypeToggle from '../Components/ChainTypeToggle';
@@ -299,7 +299,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
     if (serverContext.uri !== serverUriParsed) {
       const resultUri = parseServerURI(serverUriParsed, translate);
-      if (resultUri.toLowerCase().startsWith(Globals.error)) {
+      if (resultUri.toLowerCase().startsWith(GlobalConst.error)) {
         addLastSnackbar({ message: translate('settings.isuri') as string });
         return;
       } else {
@@ -738,7 +738,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                       }}>
                       <TextInput
                         testID="settings.custom-server-field"
-                        placeholder={'https://------.---:---'}
+                        placeholder={GlobalConst.serverPlaceHolder}
                         placeholderTextColor={colors.placeholder}
                         style={{
                           color: colors.text,

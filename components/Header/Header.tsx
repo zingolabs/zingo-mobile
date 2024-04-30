@@ -26,7 +26,7 @@ import {
   SettingsNameEnum,
   SnackbarType,
   ButtonTypeEnum,
-  Globals,
+  GlobalConst,
 } from '../../app/AppState';
 import { ContextAppLoaded } from '../../app/context';
 import { ThemeType } from '../../app/types';
@@ -232,11 +232,11 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     // We need to activate this flag because if the App is syncing
     // while shielding, then it going to finish the current batch
     // and after that it run the shield process.
-    await RPC.rpc_setInterruptSyncAfterBatch('true');
+    await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.true);
     const shieldStr = await RPC.rpc_shieldFunds(pools);
 
     if (shieldStr) {
-      if (shieldStr.toLowerCase().startsWith(Globals.error)) {
+      if (shieldStr.toLowerCase().startsWith(GlobalConst.error)) {
         createAlert(
           setBackgroundError,
           addLastSnackbar,
@@ -266,7 +266,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         }
       }
       setComputingModalVisible(false);
-      await RPC.rpc_setInterruptSyncAfterBatch('false');
+      await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.false);
     }
   };
 

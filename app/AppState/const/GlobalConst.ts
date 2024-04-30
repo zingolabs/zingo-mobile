@@ -1,3 +1,15 @@
-export const Globals = {
+export const GlobalConst = {
   error: 'error',
+  zcash: 'zcash:',
+  port80: '80',
+  port443: '443',
+  port9067: '9067',
+  http: 'http:',
+  https: 'https:',
+  serverPlaceHolder: 'https://------.---:---',
+  uview: 'uview',
+  utestview: 'utestview',
+  success: 'success',
+  true: 'true',
+  false: 'false',
 };

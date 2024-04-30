@@ -19,7 +19,7 @@ import RegText from '../Components/RegText';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCloudDownload } from '@fortawesome/free-solid-svg-icons';
 import Utils from '../../app/utils';
-import { ButtonTypeEnum } from '../../app/AppState';
+import { ButtonTypeEnum, GlobalConst } from '../../app/AppState';
 
 type SyncReportProps = {
   closeModal: () => void;
@@ -92,7 +92,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
 
   // because this screen is fired from more places than the menu.
   useEffect(() => {
-    (async () => await RPC.rpc_setInterruptSyncAfterBatch('false'))();
+    (async () => await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.false))();
     setTimeout(() => setShowBackgroundLegend(false), 10000); // 10 seconds only
   }, []);
 

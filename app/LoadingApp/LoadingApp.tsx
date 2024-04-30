@@ -51,7 +51,7 @@ import {
   SnackbarType,
   AppStateStatusEnum,
   ButtonTypeEnum,
-  Globals,
+  GlobalConst,
 } from '../AppState';
 import { parseServerURI, serverUris } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
@@ -445,7 +445,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
       const exists = await RPCModule.walletExists();
       //console.log('Wallet Exists result', this.state.screen, exists);
 
-      if (exists && exists !== 'false') {
+      if (exists && exists !== GlobalConst.false) {
         this.setState({ walletExists: true });
         const networkState = await NetInfo.fetch();
         if (networkState.isConnected) {
@@ -458,7 +458,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
           //await delay(5000);
 
           //console.log('Load Wallet Exists result', result);
-          if (result && !result.toLowerCase().startsWith(Globals.error)) {
+          if (result && !result.toLowerCase().startsWith(GlobalConst.error)) {
             // here result can have an `error` field for watch-only which is actually OK.
             const resultJson: RPCSeedType = await JSON.parse(result);
             if (!resultJson.error || (resultJson.error && resultJson.error.startsWith('This wallet is watch-only'))) {
@@ -650,7 +650,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     const resp: string = await RPCModule.getLatestBlock(server.uri);
     //console.log('check server', resp);
 
-    if (resp && !resp.toLowerCase().startsWith(Globals.error)) {
+    if (resp && !resp.toLowerCase().startsWith(GlobalConst.error)) {
       return true;
     } else {
       return false;
@@ -742,7 +742,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     this.setState({ actionButtonsDisabled: true });
     const uri: string = parseServerURI(this.state.customServerUri, this.state.translate);
     const chain_name = this.state.customServerChainName;
-    if (uri.toLowerCase().startsWith(Globals.error)) {
+    if (uri.toLowerCase().startsWith(GlobalConst.error)) {
       this.addLastSnackbar({ message: this.state.translate('settings.isuri') as string });
     } else {
       await SettingsFileImpl.writeSettings(SettingsNameEnum.server, { uri, chain_name });
@@ -772,7 +772,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
       //  seed = 'Error: pepe es guay';
       //}
 
-      if (seed && !seed.toLowerCase().startsWith(Globals.error)) {
+      if (seed && !seed.toLowerCase().startsWith(GlobalConst.error)) {
         let wallet = {} as WalletType;
         try {
           wallet = JSON.parse(seed);
@@ -824,8 +824,10 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
       return;
     }
     if (
-      (seed_ufvk.toLowerCase().startsWith('uview') && this.state.server.chain_name !== ChainNameEnum.mainChainName) ||
-      (seed_ufvk.toLowerCase().startsWith('utestview') && this.state.server.chain_name === ChainNameEnum.mainChainName)
+      (seed_ufvk.toLowerCase().startsWith(GlobalConst.uview) &&
+        this.state.server.chain_name !== ChainNameEnum.mainChainName) ||
+      (seed_ufvk.toLowerCase().startsWith(GlobalConst.utestview) &&
+        this.state.server.chain_name === ChainNameEnum.mainChainName)
     ) {
       createAlert(
         this.setBackgroundError,
@@ -847,7 +849,10 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
       }
 
       let type: RestoreFromTypeEnum = RestoreFromTypeEnum.seedRestoreFrom;
-      if (seed_ufvk.toLowerCase().startsWith('uview') || seed_ufvk.toLowerCase().startsWith('utestview')) {
+      if (
+        seed_ufvk.toLowerCase().startsWith(GlobalConst.uview) ||
+        seed_ufvk.toLowerCase().startsWith(GlobalConst.utestview)
+      ) {
         // this is a UFVK
         type = RestoreFromTypeEnum.ufvkRestoreFrom;
       }
@@ -874,7 +879,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
 
       //console.log(seed_ufvk);
       //console.log(result);
-      if (result && !result.toLowerCase().startsWith(Globals.error)) {
+      if (result && !result.toLowerCase().startsWith(GlobalConst.error)) {
         // here result can have an `error` field for watch-only which is actually OK.
         const resultJson: RPCSeedType = await JSON.parse(result);
         if (!resultJson.error || (resultJson.error && resultJson.error.startsWith('This wallet is watch-only'))) {
@@ -1087,7 +1092,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                           alignItems: 'center',
                         }}>
                         <TextInput
-                          placeholder={'https://------.---:---'}
+                          placeholder={GlobalConst.serverPlaceHolder}
                           placeholderTextColor={colors.placeholder}
                           style={{
                             color: colors.text,

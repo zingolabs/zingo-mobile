@@ -9,7 +9,13 @@ import 'moment/locale/ru';
 import { useTheme, useScrollToTop } from '@react-navigation/native';
 import Animated, { Easing, useSharedValue, withTiming } from 'react-native-reanimated';
 
-import { AddressBookActionEnum, AddressBookFileClass, ButtonTypeEnum, SendPageStateClass } from '../../app/AppState';
+import {
+  AddressBookActionEnum,
+  AddressBookFileClass,
+  ButtonTypeEnum,
+  GlobalConst,
+  SendPageStateClass,
+} from '../../app/AppState';
 import { ThemeType } from '../../app/types';
 import FadeText from '../Components/FadeText';
 import Button from '../Components/Button';
@@ -61,7 +67,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
 
   // because this screen is fired from more places than the menu.
   useEffect(() => {
-    (async () => await RPC.rpc_setInterruptSyncAfterBatch('false'))();
+    (async () => await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.false))();
   }, []);
 
   useEffect(() => {

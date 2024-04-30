@@ -1,4 +1,4 @@
-import { Globals, ServerUrisType } from './AppState';
+import { GlobalConst, ServerUrisType } from './AppState';
 import RPCModule from './RPCModule';
 
 const calculateLatency = async (server: ServerUrisType, index: number) => {
@@ -8,7 +8,7 @@ const calculateLatency = async (server: ServerUrisType, index: number) => {
 
   const end: number = Date.now();
   let latency = null;
-  if (resp && !resp.toLowerCase().startsWith(Globals.error)) {
+  if (resp && !resp.toLowerCase().startsWith(GlobalConst.error)) {
     latency = end - start;
   }
   console.log('******* server LAST BLOCK', server.uri, index, resp, latency, 'ms');
