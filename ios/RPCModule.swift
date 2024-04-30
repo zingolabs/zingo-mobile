@@ -16,45 +16,56 @@ class RPCModule: NSObject {
       return true
   }
   
+  func getDocumentsDirectory() -> String? {
+    let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
+    if let pathsFirst = paths.first {
+      return pathsFirst
+    } else {
+      return nil
+    }
+  }
+  
+  func getFileName(_ file: String) -> String? {
+    if let documentsDirectory = getDocumentsDirectory() {
+      let fileName = "\(documentsDirectory)/\(file)"
+      return fileName
+    } else {
+      return nil
+    }
+  }
+  
+  func fileExists(_ fileName: String) -> String {
+    let fileExists = FileManager.default.fileExists(atPath: fileName)
+    if fileExists {
+      return "true"
+    } else {
+      return "false"
+    }
+  }
+  
   @objc(walletExists:reject:)
   func walletExists(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-      if let documentsDirectory = paths.first {
-        let fileName = "\(documentsDirectory)/wallet.dat.txt"
-        let fileExists = FileManager.default.fileExists(atPath: fileName)
-        if fileExists {
-            resolve("true")
-        } else {
-            resolve("false")
-        }
-      } else {
-        resolve("false")
-      }
+    if let fileName = getFileName("wallet.dat.txt") {
+      resolve(fileExists(fileName))
+    } else {
+      resolve("false")
+    }
   }
 
   @objc(walletBackupExists:reject:)
   func walletBackupExists(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-      if let documentsDirectory = paths.first {
-        let fileName = "\(documentsDirectory)/wallet.backup.dat.txt"
-        let fileExists = FileManager.default.fileExists(atPath: fileName)
-        if fileExists {
-            resolve("true")
-        } else {
-            resolve("false")
-        }
-      } else {
-        resolve("false")
-      }
+    if let fileName = getFileName("wallet.backup.dat.txt") {
+      resolve(fileExists(fileName))
+    } else {
+      resolve("false")
+    }
   }
 
   func saveWalletFile(_ base64EncodedString: String) {
       // need to decode the content first.
       // save the decoded binary data
       if let base64DecodedData = Data(base64Encoded: base64EncodedString) {
-        let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-        if let documentsDirectory = paths.first {
-            let fileName = "\(documentsDirectory)/wallet.dat.txt"
+        if let fileName = getFileName("wallet.dat.txt") {
             do {
               //NSLog("decoded data \(base64DecodedData)")
               try base64DecodedData.write(to: URL(fileURLWithPath: fileName))
@@ -73,9 +84,7 @@ class RPCModule: NSObject {
       // we need to decode the content first.
       // save the decoded binary data
       if let base64DecodedData = Data(base64Encoded: base64EncodedString) {
-        let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-        if let documentsDirectory = paths.first {
-            let fileName = "\(documentsDirectory)/wallet.backup.dat.txt"
+        if let fileName = getFileName("wallet.backup.dat.txt") {
             do {
               //NSLog("decoded data \(base64DecodedData)")
               try base64DecodedData.write(to: URL(fileURLWithPath: fileName))
@@ -91,117 +100,105 @@ class RPCModule: NSObject {
   }
 
   func saveBackgroundFile(_ data: String) {
-      let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-      if let documentsDirectory = paths.first {
-        let fileName = "\(documentsDirectory)/background.json"
-        do {
-            try data.write(toFile: fileName, atomically: true, encoding: .utf8)
-        } catch {
-            NSLog("Error save background file \(error.localizedDescription)")
-        }
-      } else {
-        NSLog("Error save background file")
+    if let fileName = getFileName("background.json") {
+      do {
+        try data.write(toFile: fileName, atomically: true, encoding: .utf8)
+      } catch {
+        NSLog("Error save background file \(error.localizedDescription)")
       }
+    } else {
+      NSLog("Error save background file")
+    }
   }
 
   // old way to read the wallet file -> Encoded Utf8 String
   func readWalletUtf8String() -> String? {
-      let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-      if let documentsDirectory = paths.first {
-        let fileName = "\(documentsDirectory)/wallet.dat.txt"
-        do {
-            let content = try String(contentsOfFile: fileName, encoding: .utf8)
-            //NSLog("load encoded utf8 string wallet \(content)")
-            return content
-        } catch {
-            NSLog("Error reading wallet \(error.localizedDescription)")
-            return nil
-        }
-      } else {
-        NSLog("Error reading wallet")
+    if let fileName = getFileName("wallet.dat.txt") {
+      do {
+        let content = try String(contentsOfFile: fileName, encoding: .utf8)
+        //NSLog("load encoded utf8 string wallet \(content)")
+        return content
+      } catch {
+        NSLog("Error reading wallet \(error.localizedDescription)")
         return nil
       }
+    } else {
+      NSLog("Error reading wallet")
+      return nil
+    }
   }
 
   // new way to read the wallet file -> Decoded Data
   func readWallet() -> Data? {
-      let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-      if let documentsDirectory = paths.first {
-        let fileName = "\(documentsDirectory)/wallet.dat.txt"
-        do {
-            let content = try Data(contentsOf: URL(fileURLWithPath: fileName))
-            //NSLog("load decoded data wallet \(content)")
-            return content
-        } catch {
-            NSLog("Error reading wallet \(error.localizedDescription)")
-            return nil
-        }
-      } else {
-        NSLog("Error reading wallet")
+    if let fileName = getFileName("wallet.dat.txt") {
+      do {
+        let content = try Data(contentsOf: URL(fileURLWithPath: fileName))
+        //NSLog("load decoded data wallet \(content)")
+        return content
+      } catch {
+        NSLog("Error reading wallet \(error.localizedDescription)")
         return nil
       }
+    } else {
+      NSLog("Error reading wallet")
+      return nil
+    }
   }
 
   func readWalletBackup() -> Data? {
-      let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-      if let documentsDirectory = paths.first {
-        let fileName = "\(documentsDirectory)/wallet.backup.dat.txt"
-        do {
-            let content = try Data(contentsOf: URL(fileURLWithPath: fileName))
-            //NSLog("load decoded data backup wallet \(content)")
-            return content
-        } catch {
-            NSLog("Error reading backup wallet \(error.localizedDescription)")
-            return nil
-        }
-      } else {
-        NSLog("Error reading backup wallet")
+    if let fileName = getFileName("wallet.backup.dat.txt") {
+      do {
+        let content = try Data(contentsOf: URL(fileURLWithPath: fileName))
+        //NSLog("load decoded data backup wallet \(content)")
+        return content
+      } catch {
+        NSLog("Error reading backup wallet \(error.localizedDescription)")
         return nil
       }
+    } else {
+      NSLog("Error reading backup wallet")
+      return nil
+    }
   }
 
   func deleteExistingWallet() -> Bool {
-      let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-      if let documentsDirectory = paths.first {
-        let fileName = "\(documentsDirectory)/wallet.dat.txt"
-        do {
-            try FileManager.default.removeItem(atPath: fileName)
-            return true
-        } catch {
-            NSLog("Error deleting wallet \(error.localizedDescription)")
-            return false
-        }
-      } else {
-        NSLog("Error deleting wallet")
+    if let fileName = getFileName("wallet.dat.txt") {
+      do {
+        try FileManager.default.removeItem(atPath: fileName)
+        return true
+      } catch {
+        NSLog("Error deleting wallet \(error.localizedDescription)")
         return false
       }
+    } else {
+      NSLog("Error deleting wallet")
+      return false
+    }
   }
 
   @objc(deleteExistingWallet:reject:)
   func deleteExistingWallet(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      if deleteExistingWallet() {
-          resolve("true")
-      } else {
-          resolve("false")
-      }
+    if self.deleteExistingWallet() {
+      resolve("true")
+    } else {
+      resolve("false")
+    }
   }
 
   @objc(deleteExistingWalletBackup:reject:)
   func deleteExistingWalletBackup(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-      if let documentsDirectory = paths.first {
-        let fileName = "\(documentsDirectory)/wallet.backup.dat.txt"
-        do {
-            try FileManager.default.removeItem(atPath: fileName)
-            resolve("true")
-        } catch {
-            NSLog("Error deleting backup wallet \(error.localizedDescription)")
-            resolve("false")
-        }
-      } else {
-        NSLog("Error deleting backup wallet")
+    if let fileName = getFileName("wallet.backup.dat.txt") {
+      do {
+        try FileManager.default.removeItem(atPath: fileName)
+        resolve("true")
+      } catch {
+        NSLog("Error deleting backup wallet \(error.localizedDescription)")
         resolve("false")
       }
+    } else {
+      NSLog("Error deleting backup wallet")
+      resolve("false")
+    }
   }
 
   func saveWalletInternal() {
@@ -213,13 +210,12 @@ class RPCModule: NSObject {
       if let walletData = readWallet() {
         self.saveWalletBackupFile(walletData.base64EncodedString())
       } else {
-          NSLog("Error: Unable to read wallet for backup")
+          NSLog("Error Unable to read wallet for backup")
       }
   }
 
   func createNewWallet(server: String, chainhint: String) -> String {
-        let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-        if let documentsDirectory = paths.first {
+        if let documentsDirectory = getDocumentsDirectory() {
             let seed = initNew(serveruri: server, datadir: documentsDirectory, chainhint: chainhint, monitorMempool: true)
             let seedStr = String(seed)
             if !seedStr.lowercased().hasPrefix("error") {
@@ -240,8 +236,7 @@ class RPCModule: NSObject {
 
   @objc(restoreWalletFromSeed:birthday:server:chainhint:resolve:reject:)
   func restoreWalletFromSeed(_ restoreSeed: String, birthday: String, server: String, chainhint: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-      if let documentsDirectory = paths.first {
+      if let documentsDirectory = getDocumentsDirectory() {
           let seed = initFromSeed(serveruri: server, seed: restoreSeed, birthday: UInt64(birthday) ?? 0, datadir: documentsDirectory, chainhint: chainhint, monitorMempool: true)
           let seedStr = String(seed)
           if !seedStr.lowercased().hasPrefix("error") {
@@ -256,8 +251,7 @@ class RPCModule: NSObject {
 
   @objc(restoreWalletFromUfvk:birthday:server:chainhint:resolve:reject:)
   func restoreWalletFromUfvk(_ restoreUfvk: String, birthday: String, server: String, chainhint: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-      if let documentsDirectory = paths.first {
+      if let documentsDirectory = getDocumentsDirectory() {
           let ufvk = initFromUfvk(serveruri: server, ufvk: restoreUfvk, birthday: UInt64(birthday) ?? 0, datadir: documentsDirectory, chainhint: chainhint, monitorMempool: true)
           let ufvkStr = String(ufvk)
           if !ufvkStr.lowercased().hasPrefix("error") {
@@ -271,8 +265,7 @@ class RPCModule: NSObject {
   }
 
   func loadExistingWallet(server: String, chainhint: String) -> String {
-      let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-      if let documentsDirectory = paths.first {
+      if let documentsDirectory = getDocumentsDirectory() {
             if let walletData = self.readWallet() {
                 // first attemp with the new format -> decoded data
                 // I need to encode first
