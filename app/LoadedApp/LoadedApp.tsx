@@ -60,6 +60,7 @@ import {
   RouteEnums,
   SnackbarType,
   AppStateStatusEnum,
+  Globals,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
@@ -1048,7 +1049,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       //   But I have to restart the sync if needed.
       let result: string = await RPCModule.loadExistingWallet(value.uri, value.chain_name);
       //console.log(result);
-      if (result && !result.toLowerCase().startsWith('error')) {
+      if (result && !result.toLowerCase().startsWith(Globals.error)) {
         // here result can have an `error` field for watch-only which is actually OK.
         const resultJson: RPCSeedType = await JSON.parse(result);
         if (
@@ -1239,7 +1240,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     }
 
     //console.log("jc change", resultStr);
-    if (resultStr.toLowerCase().startsWith('error')) {
+    if (resultStr.toLowerCase().startsWith(Globals.error)) {
       //console.log(`Error change wallet. ${resultStr}`);
       createAlert(
         this.setBackgroundError,
@@ -1260,7 +1261,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     const resultStr = (await this.rpc.restoreBackup()) as string;
 
     //console.log("jc restore", resultStr);
-    if (resultStr.toLowerCase().startsWith('error')) {
+    if (resultStr.toLowerCase().startsWith(Globals.error)) {
       //console.log(`Error restore backup wallet. ${resultStr}`);
       createAlert(
         this.setBackgroundError,
@@ -1281,7 +1282,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     if (this.state.newServer) {
       const beforeServer = this.state.server;
       const resultStr: string = await RPCModule.execute(CommandEnum.changeserver, this.state.newServer.uri);
-      if (resultStr.toLowerCase().startsWith('error')) {
+      if (resultStr.toLowerCase().startsWith(Globals.error)) {
         //console.log(`Error change server ${value} - ${resultStr}`);
         this.addLastSnackbar({
           message: `${this.props.translate('loadedapp.changeservernew-error')} ${resultStr}`,
@@ -1310,7 +1311,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       }
 
       //console.log("jc change", resultStr);
-      if (resultStr2.toLowerCase().startsWith('error')) {
+      if (resultStr2.toLowerCase().startsWith(Globals.error)) {
         //console.log(`Error change wallet. ${resultStr}`);
         createAlert(
           this.setBackgroundError,

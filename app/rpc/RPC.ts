@@ -18,6 +18,7 @@ import {
   CurrencyNameEnum,
   AddressKindEnum,
   ReceiverEnum,
+  Globals,
 } from '../AppState';
 import RPCModule from '../RPCModule';
 import { RPCAddressType } from './types/RPCAddressType';
@@ -125,7 +126,7 @@ export default class RPC {
       const resultStr: string = await RPCModule.execute(CommandEnum.interrupt_sync_after_batch, value);
 
       if (resultStr) {
-        if (resultStr.toLowerCase().startsWith('error')) {
+        if (resultStr.toLowerCase().startsWith(Globals.error)) {
           console.log(`Error setting interrupt_sync_after_batch ${resultStr}`);
         }
       } else {
@@ -147,7 +148,7 @@ export default class RPC {
       //console.log(resultStr);
 
       if (resultStr) {
-        if (resultStr.toLowerCase().startsWith('error') || isNaN(parseFloat(resultStr))) {
+        if (resultStr.toLowerCase().startsWith(Globals.error) || isNaN(parseFloat(resultStr))) {
           console.log(`Error fetching price ${resultStr}`);
           return -1;
         } else {
@@ -168,7 +169,7 @@ export default class RPC {
       const resultStr: string = await RPCModule.execute(CommandEnum.setoption, `${name}=${value}`);
 
       if (resultStr) {
-        if (resultStr.toLowerCase().startsWith('error')) {
+        if (resultStr.toLowerCase().startsWith(Globals.error)) {
           console.log(`Error setting option ${resultStr}`);
           return resultStr;
         }
@@ -189,7 +190,7 @@ export default class RPC {
     try {
       const infoStr: string = await RPCModule.execute(CommandEnum.info, '');
       if (infoStr) {
-        if (infoStr.toLowerCase().startsWith('error')) {
+        if (infoStr.toLowerCase().startsWith(Globals.error)) {
           console.log(`Error info ${infoStr}`);
           return {} as InfoType;
         }
@@ -201,7 +202,7 @@ export default class RPC {
 
       let zingolibStr: string = await RPCModule.execute(CommandEnum.version, '');
       if (zingolibStr) {
-        if (zingolibStr.toLowerCase().startsWith('error')) {
+        if (zingolibStr.toLowerCase().startsWith(Globals.error)) {
           console.log(`Error zingolib version ${zingolibStr}`);
           zingolibStr = '<error>';
         }
@@ -244,7 +245,7 @@ export default class RPC {
     try {
       const heightStr: string = await RPCModule.execute(CommandEnum.height, '');
       if (heightStr) {
-        if (heightStr.toLowerCase().startsWith('error')) {
+        if (heightStr.toLowerCase().startsWith(Globals.error)) {
           console.log(`Error wallet height ${heightStr}`);
           return 0;
         }
@@ -333,7 +334,7 @@ export default class RPC {
       // using `all` or `transparent` or `sapling`...
       const shieldStr: string = await RPCModule.execute(CommandEnum.shield, pools);
       if (shieldStr) {
-        if (shieldStr.toLowerCase().startsWith('error')) {
+        if (shieldStr.toLowerCase().startsWith(Globals.error)) {
           console.log(`Error shield ${pools} ${shieldStr}`);
           return shieldStr;
         }
@@ -355,7 +356,7 @@ export default class RPC {
       try {
         const ufvkStr: string = await RPCModule.execute(CommandEnum.exportufvk, '');
         if (ufvkStr) {
-          if (ufvkStr.toLowerCase().startsWith('error')) {
+          if (ufvkStr.toLowerCase().startsWith(Globals.error)) {
             console.log(`Error ufvk ${ufvkStr}`);
             return {} as WalletType;
           }
@@ -383,7 +384,7 @@ export default class RPC {
       try {
         const seedStr: string = await RPCModule.execute(CommandEnum.seed, '');
         if (seedStr) {
-          if (seedStr.toLowerCase().startsWith('error')) {
+          if (seedStr.toLowerCase().startsWith(Globals.error)) {
             console.log(`Error seed ${seedStr}`);
             return {} as WalletType;
           }
@@ -395,7 +396,7 @@ export default class RPC {
 
         const ufvkStr: string = await RPCModule.execute(CommandEnum.exportufvk, '');
         if (ufvkStr) {
-          if (ufvkStr.toLowerCase().startsWith('error')) {
+          if (ufvkStr.toLowerCase().startsWith(Globals.error)) {
             console.log(`Error ufvk ${ufvkStr}`);
             return {} as WalletType;
           }
@@ -591,7 +592,7 @@ export default class RPC {
 
   async stopSyncProcess(): Promise<void> {
     let returnStatus = await this.doSyncStatus();
-    if (returnStatus.toLowerCase().startsWith('error')) {
+    if (returnStatus.toLowerCase().startsWith(Globals.error)) {
       return;
     }
     let ss = {} as RPCSyncStatusType;
@@ -672,7 +673,7 @@ export default class RPC {
     try {
       const rescanStr: string = await RPCModule.execute(CommandEnum.rescan, '');
       if (rescanStr) {
-        if (rescanStr.toLowerCase().startsWith('error')) {
+        if (rescanStr.toLowerCase().startsWith(Globals.error)) {
           console.log(`Error rescan ${rescanStr}`);
           return rescanStr;
         }
@@ -692,7 +693,7 @@ export default class RPC {
     try {
       const syncStr: string = await RPCModule.execute(CommandEnum.sync, '');
       if (syncStr) {
-        if (syncStr.toLowerCase().startsWith('error')) {
+        if (syncStr.toLowerCase().startsWith(Globals.error)) {
           console.log(`Error sync ${syncStr}`);
           return syncStr;
         }
@@ -712,7 +713,7 @@ export default class RPC {
     try {
       const syncStatusStr: string = await RPCModule.execute(CommandEnum.syncstatus, '');
       if (syncStatusStr) {
-        if (syncStatusStr.toLowerCase().startsWith('error')) {
+        if (syncStatusStr.toLowerCase().startsWith(Globals.error)) {
           console.log(`Error sync status ${syncStatusStr}`);
           return syncStatusStr;
         }
@@ -732,7 +733,7 @@ export default class RPC {
     try {
       const sendStr: string = await RPCModule.execute(CommandEnum.send, sendJSON);
       if (sendStr) {
-        if (sendStr.toLowerCase().startsWith('error')) {
+        if (sendStr.toLowerCase().startsWith(Globals.error)) {
           console.log(`Error send ${sendStr}`);
           return sendStr;
         }
@@ -752,7 +753,7 @@ export default class RPC {
     try {
       const sendProgressStr: string = await RPCModule.execute(CommandEnum.sendprogress, '');
       if (sendProgressStr) {
-        if (sendProgressStr.toLowerCase().startsWith('error')) {
+        if (sendProgressStr.toLowerCase().startsWith(Globals.error)) {
           console.log(`Error send progress ${sendProgressStr}`);
           return sendProgressStr;
         }
@@ -860,7 +861,7 @@ export default class RPC {
         this.doRescan()
           .then(result => {
             console.log('rescan finished', result);
-            if (result && !result.toLowerCase().startsWith('error')) {
+            if (result && !result.toLowerCase().startsWith(Globals.error)) {
               const resultJSON: RPCSyncRescan = JSON.parse(result);
               if (resultJSON.result === 'success' && resultJSON.latest_block) {
                 this.latest_block = resultJSON.latest_block;
@@ -879,7 +880,7 @@ export default class RPC {
         this.doSync()
           .then(result => {
             console.log('sync finished', result);
-            if (result && !result.toLowerCase().startsWith('error')) {
+            if (result && !result.toLowerCase().startsWith(Globals.error)) {
               const resultJSON: RPCSyncRescan = JSON.parse(result);
               if (resultJSON.result === 'success' && resultJSON.latest_block) {
                 this.latest_block = resultJSON.latest_block;
@@ -899,7 +900,7 @@ export default class RPC {
       // We need to wait for the sync to finish. The sync is done when
       this.syncStatusTimerID = setInterval(async () => {
         const returnStatus = await this.doSyncStatus();
-        if (returnStatus.toLowerCase().startsWith('error')) {
+        if (returnStatus.toLowerCase().startsWith(Globals.error)) {
           return;
         }
         let ss = {} as RPCSyncStatusType;
@@ -1221,7 +1222,7 @@ export default class RPC {
         WalletOptionEnum.download_memos,
       );
       if (download_memos_str) {
-        if (download_memos_str.toLowerCase().startsWith('error')) {
+        if (download_memos_str.toLowerCase().startsWith(Globals.error)) {
           console.log(`Error download memos ${download_memos_str}`);
           return;
         }
@@ -1236,7 +1237,7 @@ export default class RPC {
         WalletOptionEnum.transaction_filter_threshold,
       );
       if (transaction_filter_threshold_str) {
-        if (transaction_filter_threshold_str.toLowerCase().startsWith('error')) {
+        if (transaction_filter_threshold_str.toLowerCase().startsWith(Globals.error)) {
           console.log(`Error transaction filter threshold ${transaction_filter_threshold_str}`);
           return;
         }
@@ -1272,7 +1273,7 @@ export default class RPC {
     try {
       const addressesStr: string = await RPCModule.execute(CommandEnum.addresses, '');
       if (addressesStr) {
-        if (addressesStr.toLowerCase().startsWith('error')) {
+        if (addressesStr.toLowerCase().startsWith(Globals.error)) {
           console.log(`Error addresses ${addressesStr}`);
           return;
         }
@@ -1284,7 +1285,7 @@ export default class RPC {
 
       const balanceStr: string = await RPCModule.execute(CommandEnum.balance, '');
       if (balanceStr) {
-        if (balanceStr.toLowerCase().startsWith('error')) {
+        if (balanceStr.toLowerCase().startsWith(Globals.error)) {
           console.log(`Error balance ${balanceStr}`);
           return;
         }
@@ -1314,7 +1315,7 @@ export default class RPC {
       // Fetch pending notes and UTXOs
       const pendingNotes: string = await RPCModule.execute(CommandEnum.notes, '');
       if (pendingNotes) {
-        if (pendingNotes.toLowerCase().startsWith('error')) {
+        if (pendingNotes.toLowerCase().startsWith(Globals.error)) {
           console.log(`Error notes ${pendingNotes}`);
           return;
         }
@@ -1395,7 +1396,7 @@ export default class RPC {
     try {
       const heightStr: string = await RPCModule.execute(CommandEnum.height, '');
       if (heightStr) {
-        if (heightStr.toLowerCase().startsWith('error')) {
+        if (heightStr.toLowerCase().startsWith(Globals.error)) {
           console.log(`Error wallet height ${heightStr}`);
           return;
         }
@@ -1426,7 +1427,7 @@ export default class RPC {
       const summariesStr: string = await RPCModule.execute(CommandEnum.summaries, '');
       //console.log(summariesStr);
       if (summariesStr) {
-        if (summariesStr.toLowerCase().startsWith('error')) {
+        if (summariesStr.toLowerCase().startsWith(Globals.error)) {
           console.log(`Error txs summaries ${summariesStr}`);
           return;
         }
@@ -1539,7 +1540,7 @@ export default class RPC {
     // First, get the previous send progress id, so we know which ID to track
     const prev: string = await this.doSendProgress();
     let prevSendId = -1;
-    if (prev && !prev.toLowerCase().startsWith('error')) {
+    if (prev && !prev.toLowerCase().startsWith(Globals.error)) {
       let prevProgress = {} as RPCSendProgressType;
       try {
         prevProgress = await JSON.parse(prev);
@@ -1591,7 +1592,7 @@ export default class RPC {
     const sendTxPromise = new Promise<string>((resolve, reject) => {
       const intervalID = setInterval(async () => {
         const pro: string = await this.doSendProgress();
-        if (pro && pro.toLowerCase().startsWith('error')) {
+        if (pro && pro.toLowerCase().startsWith(Globals.error)) {
           return;
         }
         let progress = {} as RPCSendProgressType;

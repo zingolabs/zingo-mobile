@@ -23,7 +23,7 @@ import 'moment/locale/ru';
 import { ThemeType } from '../../../app/types';
 import RPC from '../../../app/rpc';
 import Utils from '../../../app/utils';
-import { ButtonTypeEnum, CommandEnum, PrivacyLevelFromEnum } from '../../../app/AppState';
+import { ButtonTypeEnum, CommandEnum, PrivacyLevelFromEnum, Globals } from '../../../app/AppState';
 import { CurrencyEnum } from '../../../app/AppState';
 import { RPCAdressKindEnum } from '../../../app/rpc/enums/RPCAddressKindEnum';
 import { RPCReceiversEnum } from '../../../app/rpc/enums/RPCReceiversEnum';
@@ -105,7 +105,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
 
     const result: string = await RPCModule.execute(CommandEnum.parse_address, sendPageState.toaddr.to);
     if (result) {
-      if (result.toLowerCase().startsWith('error') || result.toLowerCase() === 'null') {
+      if (result.toLowerCase().startsWith(Globals.error) || result.toLowerCase() === 'null') {
         return '-';
       }
     } else {

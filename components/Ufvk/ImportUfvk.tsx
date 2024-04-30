@@ -19,7 +19,7 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
-import { ButtonTypeEnum, CommandEnum } from '../../app/AppState';
+import { ButtonTypeEnum, CommandEnum, Globals } from '../../app/AppState';
 import { RPCParseStatusEnum } from '../../app/rpc/enums/RPCParseStatusEnum';
 
 type ImportUfvkProps = {
@@ -61,7 +61,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
       (async () => {
         const resp: string = await RPCModule.getLatestBlock(server.uri);
         //console.log(resp);
-        if (resp && !resp.toLowerCase().startsWith('error')) {
+        if (resp && !resp.toLowerCase().startsWith(Globals.error)) {
           setLatestBlock(Number(resp));
         } else {
           //console.log('error latest block', resp);
@@ -89,7 +89,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
     const result: string = await RPCModule.execute(CommandEnum.parse_viewkey, scannedKey);
     //console.log(result);
     if (result) {
-      if (result.toLowerCase().startsWith('error')) {
+      if (result.toLowerCase().startsWith(Globals.error)) {
         addLastSnackbar({ message: `${translate('scanner.noviewkey-error')}` });
         return false;
       }

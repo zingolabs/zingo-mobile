@@ -51,6 +51,7 @@ import {
   SnackbarType,
   AppStateStatusEnum,
   ButtonTypeEnum,
+  Globals,
 } from '../AppState';
 import { parseServerURI, serverUris } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
@@ -457,7 +458,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
           //await delay(5000);
 
           //console.log('Load Wallet Exists result', result);
-          if (result && !result.toLowerCase().startsWith('error')) {
+          if (result && !result.toLowerCase().startsWith(Globals.error)) {
             // here result can have an `error` field for watch-only which is actually OK.
             const resultJson: RPCSeedType = await JSON.parse(result);
             if (!resultJson.error || (resultJson.error && resultJson.error.startsWith('This wallet is watch-only'))) {
@@ -649,7 +650,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     const resp: string = await RPCModule.getLatestBlock(server.uri);
     //console.log('check server', resp);
 
-    if (resp && !resp.toLowerCase().startsWith('error')) {
+    if (resp && !resp.toLowerCase().startsWith(Globals.error)) {
       return true;
     } else {
       return false;
@@ -741,7 +742,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     this.setState({ actionButtonsDisabled: true });
     const uri: string = parseServerURI(this.state.customServerUri, this.state.translate);
     const chain_name = this.state.customServerChainName;
-    if (uri.toLowerCase().startsWith('error')) {
+    if (uri.toLowerCase().startsWith(Globals.error)) {
       this.addLastSnackbar({ message: this.state.translate('settings.isuri') as string });
     } else {
       await SettingsFileImpl.writeSettings(SettingsNameEnum.server, { uri, chain_name });
@@ -771,7 +772,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
       //  seed = 'Error: pepe es guay';
       //}
 
-      if (seed && !seed.toLowerCase().startsWith('error')) {
+      if (seed && !seed.toLowerCase().startsWith(Globals.error)) {
         let wallet = {} as WalletType;
         try {
           wallet = JSON.parse(seed);
@@ -873,7 +874,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
 
       //console.log(seed_ufvk);
       //console.log(result);
-      if (result && !result.toLowerCase().startsWith('error')) {
+      if (result && !result.toLowerCase().startsWith(Globals.error)) {
         // here result can have an `error` field for watch-only which is actually OK.
         const resultJson: RPCSeedType = await JSON.parse(result);
         if (!resultJson.error || (resultJson.error && resultJson.error.startsWith('This wallet is watch-only'))) {

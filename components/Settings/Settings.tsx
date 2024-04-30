@@ -32,6 +32,7 @@ import {
   SettingsNameEnum,
   WalletOptionEnum,
   ButtonTypeEnum,
+  Globals,
 } from '../../app/AppState';
 import { isEqual } from 'lodash';
 import ChainTypeToggle from '../Components/ChainTypeToggle';
@@ -298,7 +299,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
     if (serverContext.uri !== serverUriParsed) {
       const resultUri = parseServerURI(serverUriParsed, translate);
-      if (resultUri.toLowerCase().startsWith('error')) {
+      if (resultUri.toLowerCase().startsWith(Globals.error)) {
         addLastSnackbar({ message: translate('settings.isuri') as string });
         return;
       } else {

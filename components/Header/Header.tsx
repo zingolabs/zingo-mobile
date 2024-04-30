@@ -26,6 +26,7 @@ import {
   SettingsNameEnum,
   SnackbarType,
   ButtonTypeEnum,
+  Globals,
 } from '../../app/AppState';
 import { ContextAppLoaded } from '../../app/context';
 import { ThemeType } from '../../app/types';
@@ -235,7 +236,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     const shieldStr = await RPC.rpc_shieldFunds(pools);
 
     if (shieldStr) {
-      if (shieldStr.toLowerCase().startsWith('error')) {
+      if (shieldStr.toLowerCase().startsWith(Globals.error)) {
         createAlert(
           setBackgroundError,
           addLastSnackbar,

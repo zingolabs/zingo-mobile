@@ -1,4 +1,4 @@
-import { ChainNameEnum, CommandEnum } from '../AppState';
+import { ChainNameEnum, CommandEnum, Globals } from '../AppState';
 import RPCModule from '../RPCModule';
 import { RPCInfoType } from '../rpc/types/RPCInfoType';
 
@@ -21,7 +21,7 @@ const checkServerURI = async (uri: string, oldUri: string): Promise<checkServerU
 
     const resultStrServer: string = await Promise.race([resultStrServerPromise, timeoutServerPromise]);
 
-    if (!resultStrServer || resultStrServer.toLowerCase().startsWith('error')) {
+    if (!resultStrServer || resultStrServer.toLowerCase().startsWith(Globals.error)) {
       // I have to restore the old server again. Just in case.
       //console.log('changeserver', resultStrServer);
       await RPCModule.execute(CommandEnum.changeserver, oldUri);
@@ -38,7 +38,7 @@ const checkServerURI = async (uri: string, oldUri: string): Promise<checkServerU
 
       const infoStr: string = await Promise.race([infoStrPromise, timeoutInfoPromise]);
 
-      if (!infoStr || infoStr.toLowerCase().startsWith('error')) {
+      if (!infoStr || infoStr.toLowerCase().startsWith(Globals.error)) {
         //console.log('info', infoStr);
         // I have to restore the old server again.
         await RPCModule.execute(CommandEnum.changeserver, oldUri);

@@ -36,6 +36,7 @@ import {
   ChainNameEnum,
   SettingsNameEnum,
   ButtonTypeEnum,
+  Globals,
 } from '../../app/AppState';
 import { parseZcashURI, ZcashURITargetClass } from '../../app/uris';
 import RPCModule from '../../app/RPCModule';
@@ -142,7 +143,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     try {
       const proposeStr: string = await RPCModule.execute(CommandEnum.propose, proposeJSON);
       if (proposeStr) {
-        if (proposeStr.toLowerCase().startsWith('error')) {
+        if (proposeStr.toLowerCase().startsWith(Globals.error)) {
           console.log(`Error propose ${proposeStr}`);
           return proposeStr;
         }
@@ -186,7 +187,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     let proposeFee = 0;
     const runProposeStr = await runPropose(JSON.stringify(proposeTransaction));
     console.log(proposeTransaction, runProposeStr);
-    if (runProposeStr.toLowerCase().startsWith('error')) {
+    if (runProposeStr.toLowerCase().startsWith(Globals.error)) {
       // snack with error
       console.log(runProposeStr);
       //Alert.alert('Calculating the FEE', runProposeStr);
@@ -272,7 +273,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       const result: string = await RPCModule.execute(CommandEnum.parse_address, address);
       //console.log(result);
       if (result) {
-        if (result.toLowerCase().startsWith('error') || result.toLowerCase() === 'null') {
+        if (result.toLowerCase().startsWith(Globals.error) || result.toLowerCase() === 'null') {
           return false;
         }
       } else {
@@ -314,7 +315,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       const result: string = await RPCModule.execute(CommandEnum.parse_address, address);
       //console.log(result);
       if (result) {
-        if (result.toLowerCase().startsWith('error') || result.toLowerCase() === 'null') {
+        if (result.toLowerCase().startsWith(Globals.error) || result.toLowerCase() === 'null') {
           return false;
         }
       } else {

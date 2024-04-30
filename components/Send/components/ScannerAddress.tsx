@@ -9,7 +9,7 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
-import { CommandEnum } from '../../../app/AppState';
+import { CommandEnum, Globals } from '../../../app/AppState';
 import { RPCParseStatusEnum } from '../../../app/rpc/enums/RPCParseStatusEnum';
 
 type ScannerAddressProps = {
@@ -35,7 +35,7 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ setAddre
 
     const result: string = await RPCModule.execute(CommandEnum.parse_address, scannedAddress);
     if (result) {
-      if (result.toLowerCase().startsWith('error') || result.toLowerCase() === 'null') {
+      if (result.toLowerCase().startsWith(Globals.error) || result.toLowerCase() === 'null') {
         addLastSnackbar({ message: translate('scanner.nozcash-error') as string });
         return;
       }

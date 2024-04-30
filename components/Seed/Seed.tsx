@@ -24,6 +24,7 @@ import {
   SettingsNameEnum,
   SnackbarType,
   ButtonTypeEnum,
+  Globals,
 } from '../../app/AppState';
 import RPCModule from '../../app/RPCModule';
 import RPC from '../../app/rpc';
@@ -178,7 +179,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
         (async () => {
           const resp: string = await RPCModule.getLatestBlock(server.uri);
           //console.log(resp);
-          if (resp && !resp.toLowerCase().startsWith('error')) {
+          if (resp && !resp.toLowerCase().startsWith(Globals.error)) {
             setLatestBlock(Number(resp));
           } else {
             //console.log('error latest block', resp);
