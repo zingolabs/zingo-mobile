@@ -11,6 +11,11 @@ import React
 @objc(RPCModule)
 class RPCModule: NSObject {
   
+  private let walletFileName = "wallet.dat.txt"
+  private let walletBackupFileName = "wallet.backup.dat.txt"
+  private let backgroundFileName = "background.json"
+  private let errorPrefix = "error"
+  
   @objc
   static func requiresMainQueueSetup() -> Bool {
       return true
@@ -45,7 +50,7 @@ class RPCModule: NSObject {
   
   @objc(walletExists:reject:)
   func walletExists(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-    if let fileName = getFileName("wallet.dat.txt") {
+    if let fileName = getFileName(walletFileName) {
       resolve(fileExists(fileName))
     } else {
       resolve("false")
@@ -54,7 +59,7 @@ class RPCModule: NSObject {
 
   @objc(walletBackupExists:reject:)
   func walletBackupExists(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-    if let fileName = getFileName("wallet.backup.dat.txt") {
+    if let fileName = getFileName(walletBackupFileName) {
       resolve(fileExists(fileName))
     } else {
       resolve("false")
@@ -65,7 +70,7 @@ class RPCModule: NSObject {
       // need to decode the content first.
       // save the decoded binary data
       if let base64DecodedData = Data(base64Encoded: base64EncodedString) {
-        if let fileName = getFileName("wallet.dat.txt") {
+        if let fileName = getFileName(walletFileName) {
             do {
               //NSLog("decoded data \(base64DecodedData)")
               try base64DecodedData.write(to: URL(fileURLWithPath: fileName))
@@ -84,7 +89,7 @@ class RPCModule: NSObject {
       // we need to decode the content first.
       // save the decoded binary data
       if let base64DecodedData = Data(base64Encoded: base64EncodedString) {
-        if let fileName = getFileName("wallet.backup.dat.txt") {
+        if let fileName = getFileName(walletBackupFileName) {
             do {
               //NSLog("decoded data \(base64DecodedData)")
               try base64DecodedData.write(to: URL(fileURLWithPath: fileName))
@@ -100,7 +105,7 @@ class RPCModule: NSObject {
   }
 
   func saveBackgroundFile(_ data: String) {
-    if let fileName = getFileName("background.json") {
+    if let fileName = getFileName(backgroundFileName) {
       do {
         try data.write(toFile: fileName, atomically: true, encoding: .utf8)
       } catch {
@@ -113,7 +118,7 @@ class RPCModule: NSObject {
 
   // old way to read the wallet file -> Encoded Utf8 String
   func readWalletUtf8String() -> String? {
-    if let fileName = getFileName("wallet.dat.txt") {
+    if let fileName = getFileName(walletFileName) {
       do {
         let content = try String(contentsOfFile: fileName, encoding: .utf8)
         //NSLog("load encoded utf8 string wallet \(content)")
@@ -130,7 +135,7 @@ class RPCModule: NSObject {
 
   // new way to read the wallet file -> Decoded Data
   func readWallet() -> Data? {
-    if let fileName = getFileName("wallet.dat.txt") {
+    if let fileName = getFileName(walletFileName) {
       do {
         let content = try Data(contentsOf: URL(fileURLWithPath: fileName))
         //NSLog("load decoded data wallet \(content)")
@@ -146,7 +151,7 @@ class RPCModule: NSObject {
   }
 
   func readWalletBackup() -> Data? {
-    if let fileName = getFileName("wallet.backup.dat.txt") {
+    if let fileName = getFileName(walletBackupFileName) {
       do {
         let content = try Data(contentsOf: URL(fileURLWithPath: fileName))
         //NSLog("load decoded data backup wallet \(content)")
@@ -162,7 +167,7 @@ class RPCModule: NSObject {
   }
 
   func deleteExistingWallet() -> Bool {
-    if let fileName = getFileName("wallet.dat.txt") {
+    if let fileName = getFileName(walletFileName) {
       do {
         try FileManager.default.removeItem(atPath: fileName)
         return true
@@ -187,7 +192,7 @@ class RPCModule: NSObject {
 
   @objc(deleteExistingWalletBackup:reject:)
   func deleteExistingWalletBackup(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-    if let fileName = getFileName("wallet.backup.dat.txt") {
+    if let fileName = getFileName(walletBackupFileName) {
       do {
         try FileManager.default.removeItem(atPath: fileName)
         resolve("true")
@@ -218,7 +223,7 @@ class RPCModule: NSObject {
         if let documentsDirectory = getDocumentsDirectory() {
             let seed = initNew(serveruri: server, datadir: documentsDirectory, chainhint: chainhint, monitorMempool: true)
             let seedStr = String(seed)
-            if !seedStr.lowercased().hasPrefix("error") {
+            if !seedStr.lowercased().hasPrefix(errorPrefix) {
                 self.saveWalletInternal()
             }
             return seedStr
@@ -239,7 +244,7 @@ class RPCModule: NSObject {
       if let documentsDirectory = getDocumentsDirectory() {
           let seed = initFromSeed(serveruri: server, seed: restoreSeed, birthday: UInt64(birthday) ?? 0, datadir: documentsDirectory, chainhint: chainhint, monitorMempool: true)
           let seedStr = String(seed)
-          if !seedStr.lowercased().hasPrefix("error") {
+          if !seedStr.lowercased().hasPrefix(errorPrefix) {
               self.saveWalletInternal()
           }
           resolve(seedStr)
@@ -254,7 +259,7 @@ class RPCModule: NSObject {
       if let documentsDirectory = getDocumentsDirectory() {
           let ufvk = initFromUfvk(serveruri: server, ufvk: restoreUfvk, birthday: UInt64(birthday) ?? 0, datadir: documentsDirectory, chainhint: chainhint, monitorMempool: true)
           let ufvkStr = String(ufvk)
-          if !ufvkStr.lowercased().hasPrefix("error") {
+          if !ufvkStr.lowercased().hasPrefix(errorPrefix) {
               self.saveWalletInternal()
           }
           resolve(ufvkStr)
@@ -284,7 +289,7 @@ class RPCModule: NSObject {
                     return seedStr
                   } else {
                     NSLog("Error loading existing wallet")
-                    return "Error: [Native] Loading a wallet. Reading wallet problem."
+                    return "Error: [Native] Loading a wallet. Reading wallet problem. Old wallet format utf8 encoded failed."
                   }
                 } else {
                   return seedStr
@@ -336,7 +341,7 @@ class RPCModule: NSObject {
          let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
           let resp = executeCommand(cmd: method, args: args)
           let respStr = String(resp)
-          if method == "sync" && !respStr.lowercased().hasPrefix("error") {
+          if method == "sync" && !respStr.lowercased().hasPrefix(errorPrefix) {
               // Also save the wallet after sync
               self.saveWalletInternal()
           }
@@ -344,7 +349,7 @@ class RPCModule: NSObject {
       } else {
           NSLog("Error executing a command")
           if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-              resolve("Error: [Native] Executing command. Command arguments problem.")
+              resolve("Error: [Native] Executing command. Command argument resolve problem.")
           }
       }
   }
@@ -374,7 +379,7 @@ class RPCModule: NSObject {
       } else {
           NSLog("Error getting latest block server")
           if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-              resolve("Error: [Native] Getting server latest block. Command arguments problem.")
+              resolve("Error: [Native] Getting server latest block. Command argument resolve problem.")
           }
       }
   }
