@@ -1197,11 +1197,11 @@ const Send: React.FunctionComponent<SendProps> = ({
                         justifyContent: 'space-between',
                         alignItems: 'center',
                       }}>
-                      <FadeText style={{ marginTop: 10, marginBottom: 5 }}>{translate('send.memo') as string}</FadeText>
+                      <FadeText style={{ marginTop: 10, marginBottom: 15 }}>
+                        {translate('send.memo') as string}
+                      </FadeText>
                       <View style={{ flexDirection: 'row' }}>
-                        <FadeText style={{ marginTop: Platform.OS === 'ios' ? 5 : 7 }}>
-                          {translate('send.includeua') as string}
-                        </FadeText>
+                        <FadeText style={{ marginTop: 6 }}>{translate('send.includeua') as string}</FadeText>
                         <CheckBox
                           testID="send.checkboxUA"
                           disabled={false}
