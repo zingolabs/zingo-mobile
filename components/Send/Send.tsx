@@ -59,6 +59,7 @@ import 'moment/locale/ru';
 import { RPCProposeType } from '../../app/rpc/types/RPCProposeType';
 import { RPCParseStatusEnum } from '../../app/rpc/enums/RPCParseStatusEnum';
 import { RPCAdressKindEnum } from '../../app/rpc/enums/RPCAddressKindEnum';
+import { Buffer } from 'buffer';
 
 type SendProps = {
   setSendPageState: (sendPageState: SendPageStateClass) => void;
@@ -119,6 +120,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [memoEnabled, setMemoEnabled] = useState<boolean>(false);
   const [validAddress, setValidAddress] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
   const [validAmount, setValidAmount] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - Invalid number, -2 - Invalid Amount
+  const [validMemo, setValidMemo] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
   const [sendButtonEnabled, setSendButtonEnabled] = useState<boolean>(false);
   const [itemsPicker, setItemsPicker] = useState<{ label: string; value: string }[]>([]);
   const [memoIcon, setMemoIcon] = useState<boolean>(false);
@@ -343,6 +345,17 @@ const Send: React.FunctionComponent<SendProps> = ({
       setValidAddress(0);
     }
 
+    if (to.memo) {
+      const len = Buffer.byteLength(to.memo, 'utf8');
+      if (len > 500) {
+        setValidMemo(-1);
+      } else {
+        setValidMemo(1);
+      }
+    } else {
+      setValidMemo(0);
+    }
+
     let invalid = false;
     if (to.amountCurrency !== '') {
       if (isNaN(Utils.parseStringLocaleToNumberFloat(to.amountCurrency))) {
@@ -381,6 +394,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     sendPageState.toaddr.to,
     sendPageState.toaddr.amountCurrency,
     sendPageState.toaddr.amount,
+    sendPageState.toaddr.memo,
     translate,
     addLastSnackbar,
     spendable,
@@ -394,9 +408,10 @@ const Send: React.FunctionComponent<SendProps> = ({
       // you always get `dust` error.
       validAddress === 1 &&
         validAmount === 1 &&
+        validMemo === 1 &&
         !(!memoEnabled && Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount) === 0),
     );
-  }, [memoEnabled, sendPageState.toaddr.amount, validAddress, validAmount]);
+  }, [memoEnabled, sendPageState.toaddr.amount, validAddress, validAmount, validMemo]);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
@@ -639,6 +654,11 @@ const Send: React.FunctionComponent<SendProps> = ({
         }, 1000);
       }
     });
+  };
+
+  const countMemoBytes = (memo: string) => {
+    const len = Buffer.byteLength(memo, 'utf8');
+    return len;
   };
 
   //console.log('render Send - 4', sendPageState);
@@ -1275,7 +1295,11 @@ const Send: React.FunctionComponent<SendProps> = ({
                         alignItems: 'center',
                       }}>
                       <FadeText
-                        style={{ marginTop: 5, fontWeight: 'bold' }}>{`${ta.memo.length.toString()} `}</FadeText>
+                        style={{
+                          marginTop: 5,
+                          fontWeight: 'bold',
+                          color: validMemo === -1 ? 'red' : colors.text,
+                        }}>{`${countMemoBytes(ta.memo)} `}</FadeText>
                       <FadeText style={{ marginTop: 5 }}>{translate('loadedapp.of') as string}</FadeText>
                       <FadeText style={{ marginTop: 5 }}>{' 500 '}</FadeText>
                     </View>
