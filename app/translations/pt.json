@@ -105,6 +105,7 @@
     "loadwalletfromseed-basic": "Restaurar Carteira",
     "addressbook": "Agenda de Endereços",
     "tipzingolabs-basic": "Apoiar a ZingoLabs",
+    "votefornym": "Vote em Nym",
     "restoremainnet-error": "Esta opção está disponível apenas para servidores da 'Mainnet'.",
     "changeservernew-error": "Erro ao tentar alterar para um novo servidor: ",
     "readingwallet-error": "Erro ao tentar ler a carteira com o novo servidor:",
@@ -130,7 +131,8 @@
     "restorewallet-alert": "Confirme que você deseja restaurar uma nova carteira usando as suas frases de recuperação.",
     "selectingserver": "Determinando a melhor lightwalletd.",
     "selectingserversame": "Seu servidor atual já é o mais otimizado.",
-    "selectingserverbest": "Neste momento ele é o servidor mais otimizado:"
+    "selectingserverbest": "Neste momento ele é o servidor mais otimizado:",
+    "nymmemo": "Eu preciso de segurança de rede Nym"
   },
   "rpc": {
     "parsebirthday-error": "Erro: Não foi possível analisar como um número:",

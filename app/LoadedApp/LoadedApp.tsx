@@ -1014,6 +1014,31 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
         addressBookCurrentAddress: '',
         addressBookOpenPriorModal: () => {},
       });
+    } else if (item === MenuItemEnum.VoteForNym) {
+      if (this.state.sendPageState.toaddr.to === '') {
+        // open send screen with a donation for nym
+        const newSendPageState = new SendPageStateClass(new ToAddrClass(0));
+        let uriToAddr: ToAddrClass = new ToAddrClass(0);
+        const to = new ToAddrClass(Utils.getNextToAddrID());
+
+        to.to = await Utils.getDonationAddress(this.state.server.chain_name);
+        to.amount = Utils.getDefaultDonationAmount();
+        to.memo = this.state.translate('loadedapp.nymmemo') as string;
+        to.includeUAMemo = true;
+
+        uriToAddr = to;
+
+        newSendPageState.toaddr = uriToAddr;
+
+        this.setSendPageState(newSendPageState);
+      } else {
+        this.addLastSnackbar({ message: this.state.translate('loadedapp.zcash-url') as string });
+      }
+      this.closeAllModals();
+      this.state.navigation.navigate(RouteEnums.LoadedApp, {
+        screen: this.state.translate('loadedapp.send-menu'),
+        initial: false,
+      });
     }
   };
 

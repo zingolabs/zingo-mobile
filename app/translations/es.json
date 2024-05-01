@@ -105,6 +105,7 @@
     "loadwalletfromseed-basic": "Restaurar monedero",
     "addressbook": "Libreta de Direcciones",
     "tipzingolabs-basic": "Apoyar a ZingoLabs",
+    "votefornym": "Vota por Nym",
     "restoremainnet-error": "Esta opción está solamente disponible para la Red: 'Mainnet'.",
     "changeservernew-error": "Error al intentar cambiar al Servidor nuevo: ",
     "readingwallet-error": "Error al intentar leer el monedero activo usando el Servidor nuevo:",
@@ -130,7 +131,8 @@
     "restorewallet-alert": "Confirmar que quiere restaurar un nuevo monedero usando su frase semilla.",
     "selectingserver": "Determinando el mejor lightwalletd.",
     "selectingserversame": "Su servidor actual ya es el más optimizado.",
-    "selectingserverbest": "En este momento este es el servidor más optimizado:"
+    "selectingserverbest": "En este momento este es el servidor más optimizado:",
+    "nymmemo": "Necesito seguridad de red Nym"
   },
   "rpc": {
     "parsebirthday-error": "Error: No es posible convertirlo en un número:",

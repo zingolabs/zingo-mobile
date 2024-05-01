@@ -173,6 +173,11 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuSt
               {translate('loadedapp.tipzingolabs-basic') as string}
             </RegText>
           )}
+          {mode !== ModeEnum.basic && (
+            <RegText onPress={() => onItemSelectedWrapper(MenuItemEnum.VoteForNym)} style={item}>
+              {translate('loadedapp.votefornym') as string}
+            </RegText>
+          )}
         </View>
       </ScrollView>
       <View

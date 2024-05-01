@@ -105,6 +105,7 @@
     "loadwalletfromseed-basic": "Restore wallet",
     "addressbook": "Address Book",
     "tipzingolabs-basic": "Tip ZingoLabs",
+    "votefornym": "Vote for Nym",
     "restoremainnet-error": "This option is only available for 'Mainnet' servers.",
     "changeservernew-error": "Error trying to change the server to the new one: ",
     "readingwallet-error": "Error trying to read the wallet with the new server:",
@@ -130,7 +131,8 @@
     "restorewallet-alert": "Confirm that you want to restore a new wallet using your seed phrase.",
     "selectingserver": "Determining the best lightwalletd.",
     "selectingserversame": "Your actual server is the most optimized one already.",
-    "selectingserverbest": "In this moment this is the most optimized server:"
+    "selectingserverbest": "In this moment this is the most optimized server:",
+    "nymmemo": "I need Nym network security"
   },
   "rpc": {
     "parsebirthday-error": "Error: Couldn't parse as a number:",
