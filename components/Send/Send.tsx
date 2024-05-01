@@ -891,7 +891,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                   </View>
                 </View>
 
-                <View style={{ marginTop: 10, display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                   <View style={{ flexDirection: 'row', justifyContent: 'flex-end', minWidth: 48, minHeight: 48 }}>
                     <View
                       style={{
@@ -957,7 +957,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         flexDirection: 'row',
                         justifyContent: 'flex-start',
                       }}>
-                      <RegText style={{ marginTop: 17, marginRight: 5, fontSize: 20, transform: [{ scaleY: 1.5 }] }}>
+                      <RegText style={{ marginTop: 18, marginRight: 5, fontSize: 20, transform: [{ scaleY: 1.5 }] }}>
                         {'\u1647'}
                       </RegText>
                       <View
@@ -1197,9 +1197,9 @@ const Send: React.FunctionComponent<SendProps> = ({
                         justifyContent: 'space-between',
                         alignItems: 'center',
                       }}>
-                      <FadeText style={{ marginTop: 10 }}>{translate('send.memo') as string}</FadeText>
+                      <FadeText style={{ marginTop: 10, marginBottom: 5 }}>{translate('send.memo') as string}</FadeText>
                       <View style={{ flexDirection: 'row' }}>
-                        <FadeText style={{ marginTop: Platform.OS === 'ios' ? 5 : 3 }}>
+                        <FadeText style={{ marginTop: Platform.OS === 'ios' ? 5 : 7 }}>
                           {translate('send.includeua') as string}
                         </FadeText>
                         <CheckBox
