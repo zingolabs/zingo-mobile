@@ -246,7 +246,6 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                 "display": "flex",
                 "flexDirection": "row",
                 "justifyContent": "space-between",
-                "marginTop": 10,
               }
             }
           >
@@ -331,7 +330,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                       "fontSize": 20,
                       "fontWeight": "600",
                       "marginRight": 5,
-                      "marginTop": 17,
+                      "marginTop": 18,
                       "opacity": 1,
                       "transform": [
                         {
@@ -1319,7 +1318,6 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                 "display": "flex",
                 "flexDirection": "row",
                 "justifyContent": "space-between",
-                "marginTop": 10,
               }
             }
           >
@@ -1404,7 +1402,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                       "fontSize": 20,
                       "fontWeight": "600",
                       "marginRight": 5,
-                      "marginTop": 17,
+                      "marginTop": 18,
                       "opacity": 1,
                       "transform": [
                         {
