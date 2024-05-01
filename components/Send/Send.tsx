@@ -408,7 +408,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       // you always get `dust` error.
       validAddress === 1 &&
         validAmount === 1 &&
-        validMemo === 1 &&
+        validMemo !== -1 &&
         !(!memoEnabled && Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount) === 0),
     );
   }, [memoEnabled, sendPageState.toaddr.amount, validAddress, validAmount, validMemo]);

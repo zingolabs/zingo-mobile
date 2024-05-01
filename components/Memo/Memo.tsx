@@ -26,6 +26,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { ButtonTypeEnum } from '../../app/AppState';
 import FadeText from '../Components/FadeText';
+import { Buffer } from 'buffer';
 
 type MemoProps = {
   closeModal: () => void;
@@ -71,6 +72,11 @@ const Memo: React.FunctionComponent<MemoProps> = ({ closeModal, updateToField })
       !!keyboardDidHideListener && keyboardDidHideListener.remove();
     };
   }, [slideAnim, titleViewHeight]);
+
+  const countMemoBytes = (memoStr: string) => {
+    const len = Buffer.byteLength(memoStr, 'utf8');
+    return len;
+  };
 
   return (
     <SafeAreaView
@@ -155,7 +161,12 @@ const Memo: React.FunctionComponent<MemoProps> = ({ closeModal, updateToField })
             justifyContent: 'flex-end',
             alignItems: 'center',
           }}>
-          <FadeText style={{ marginTop: 5, fontWeight: 'bold' }}>{`${memo.length.toString()} `}</FadeText>
+          <FadeText
+            style={{
+              marginTop: 5,
+              fontWeight: 'bold',
+              color: countMemoBytes(memo) > 500 ? 'red' : colors.text,
+            }}>{`${countMemoBytes(memo)} `}</FadeText>
           <FadeText style={{ marginTop: 5 }}>{translate('loadedapp.of') as string}</FadeText>
           <FadeText style={{ marginTop: 5 }}>{' 500 '}</FadeText>
         </View>
@@ -168,7 +179,12 @@ const Memo: React.FunctionComponent<MemoProps> = ({ closeModal, updateToField })
           alignItems: 'center',
           marginVertical: 5,
         }}>
-        <Button type={ButtonTypeEnum.Primary} title={translate('save') as string} onPress={doSaveAndClose} />
+        <Button
+          type={ButtonTypeEnum.Primary}
+          title={translate('save') as string}
+          onPress={doSaveAndClose}
+          disabled={countMemoBytes(memo) > 500}
+        />
         <Button
           type={ButtonTypeEnum.Secondary}
           title={translate('cancel') as string}
