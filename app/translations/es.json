@@ -438,7 +438,8 @@
     "deshielded": "Desblindada",
     "lose-address-title": "SELECCIONAR UNA NUEVA DIRECCIÓN",
     "lose-address-alert": "Ya tienes una dirección válida en el campo de dirección. ¿Desea sustituirla?",
-    "confirm-donation": "Donación"
+    "confirm-donation": "Donación",
+    "donation-minimum-message": "La cantidad mínima para donaciones es un Zenny (0,01 ZEC), inténtalo de nuevo y gracias."
   },
   "receive": {
     "u-title": "Dirección Unificada",

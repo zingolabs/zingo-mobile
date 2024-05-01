@@ -1316,6 +1316,16 @@ const Send: React.FunctionComponent<SendProps> = ({
                 }
                 disabled={!sendButtonEnabled}
                 onPress={() => {
+                  // donation - a Zenny is the minimum
+                  if (
+                    donationAddress &&
+                    Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount) <
+                      Utils.parseStringLocaleToNumberFloat(Utils.getDefaultDonationAmount())
+                  ) {
+                    addLastSnackbar({ message: `${translate('send.donation-minimum-message') as string}` });
+                    updateToField(null, Utils.getDefaultDonationAmount(), null, null, false);
+                    return;
+                  }
                   if (
                     validAmount === 1 &&
                     sendPageState.toaddr.amount &&

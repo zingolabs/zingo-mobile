@@ -438,7 +438,8 @@
     "deshielded": "Deshielded",
     "lose-address-title": "SELECT A NEW ADDRESS",
     "lose-address-alert": "You already have a valid address in the address field. Do you want to replace it?",
-    "confirm-donation": "Donation"
+    "confirm-donation": "Donation",
+    "donation-minimum-message": "The minimum amount for donations is a Zenny (0.01 ZEC), Try again and Thanks."
   },
   "receive": {
     "u-title": "Unified Address",
