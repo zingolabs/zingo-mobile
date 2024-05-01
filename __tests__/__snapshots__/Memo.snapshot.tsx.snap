@@ -183,6 +183,11 @@ memo10"
     }
   >
     <View
+      accessibilityState={
+        {
+          "disabled": false,
+        }
+      }
       accessible={true}
       collapsable={false}
       focusable={true}
