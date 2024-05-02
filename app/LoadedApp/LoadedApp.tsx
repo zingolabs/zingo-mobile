@@ -61,6 +61,8 @@ import {
   SnackbarType,
   AppStateStatusEnum,
   GlobalConst,
+  SnackbarDurationEnum,
+  TransactionTypeEnum,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
@@ -706,6 +708,64 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       // set someUnconfirmed as well here when I know there is something new in transactions
       const unconfirmed: number =
         transactions.length > 0 ? transactions.filter((tx: TransactionType) => tx.confirmations === 0).length : 0;
+      // if a transaction go from 0 confirmations to > 0 -> Show a message about a transaction is confirmed
+      this.state.transactions.length > 0 &&
+        this.state.transactions
+          .filter((txOld: TransactionType) => !txOld.confirmations || txOld.confirmations === 0)
+          .forEach((txOld: TransactionType) => {
+            const txNew = transactions.filter((tx: TransactionType) => tx.txid === txOld.txid);
+            console.log('old', txOld);
+            console.log('new', txNew);
+            // the transaction is confirmed
+            if (txNew.length > 0 && txNew[0].confirmations > 0) {
+              let message: string = '';
+              if (txNew[0].type === TransactionTypeEnum.Received) {
+                message =
+                  (this.state.translate('loadedapp.incoming-funds') as string) +
+                  (this.state.translate('history.received') as string) +
+                  ' ' +
+                  Utils.parseNumberFloatToStringLocale(
+                    txNew[0].txDetails.reduce((s, d) => s + d.amount, 0),
+                    8,
+                  ) +
+                  ' ' +
+                  this.state.info.currencyName;
+              } else if (txNew[0].type === TransactionTypeEnum.SendToSelf) {
+                message =
+                  (this.state.translate('loadedapp.transaction-confirmed') as string) +
+                  (this.state.translate('history.sendtoself') as string) +
+                  (txNew[0].fee
+                    ? ((' ' + this.state.translate('send.fee')) as string) +
+                      ' ' +
+                      Utils.parseNumberFloatToStringLocale(txNew[0].fee, 8) +
+                      ' ' +
+                      this.state.info.currencyName
+                    : '');
+              } else {
+                message =
+                  (this.state.translate('loadedapp.payment-made') as string) +
+                  (this.state.translate('history.sent') as string) +
+                  ' ' +
+                  Utils.parseNumberFloatToStringLocale(
+                    txNew[0].txDetails.reduce((s, d) => s + d.amount, 0),
+                    8,
+                  ) +
+                  ' ' +
+                  this.state.info.currencyName;
+              }
+              this.addLastSnackbar({
+                message,
+                duration: SnackbarDurationEnum.long,
+              });
+            }
+            // the transaction is gone -> Likely Reverted by the server
+            if (txNew.length === 0) {
+              this.addLastSnackbar({
+                message: this.state.translate('loadedapp.transaction-reverted') as string,
+                duration: SnackbarDurationEnum.long,
+              });
+            }
+          });
       this.setState({ transactions, someUnconfirmed: unconfirmed > 0 });
     }
   };

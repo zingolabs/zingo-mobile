@@ -132,7 +132,11 @@
     "selectingserver": "Determinando el mejor lightwalletd.",
     "selectingserversame": "Su servidor actual ya es el más optimizado.",
     "selectingserverbest": "En este momento este es el servidor más optimizado:",
-    "nymmemo": "Necesito seguridad de red Nym"
+    "nymmemo": "Necesito seguridad de red Nym",
+    "incoming-funds": "Fondos entrantes\n",
+    "transaction-confirmed": "Transacción confirmada\n",
+    "payment-made": "Pago realizado\n",
+    "transaction-reverted": "La transacción fue revertida por el servidor, vuelva a intentarlo."
   },
   "rpc": {
     "parsebirthday-error": "Error: No es posible convertirlo en un número:",
