@@ -73,7 +73,7 @@ jobs:
       - name: Build Universal rust lib & uniffi lib and copy to ios folder
         working-directory: ./rust/ios
         run: |
-          sudo ./buildsimulator.sh
+          sudo ./build.sh
       
       - name: Upload native rust
         uses: actions/upload-artifact@v4
@@ -81,7 +81,7 @@ jobs:
           name: native-ios-uniffi-universal-${{ env.CACHE-KEY }}
           path: ios/libuniffi_zingo.a
       
-  cache-native-librust:
+  cache-native-ios-uniffi:
     name: Cache native rust
     needs: build
     runs-on: macos-12

@@ -124,7 +124,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: android/app/src/main/jniLibs/${{ env.ABI }}
-          key: native-librust-${{ env.ABI }}-${{ env.CACHE-KEY }}
+          key: native-android-uniffi-${{ env.ABI }}-${{ env.CACHE-KEY }}
           fail-on-cache-miss: true
       
       - name: Setup Java

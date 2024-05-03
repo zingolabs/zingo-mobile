@@ -36,7 +36,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: android/app/src/main/jniLibs/${{ env.ARCH }}
-          key: native-librust-${{ env.ARCH }}-${{ env.CACHE-KEY }}
+          key: native-android-uniffi-${{ env.ARCH }}-${{ env.CACHE-KEY }}
           lookup-only: true
   
       - name: Set cache-found
@@ -133,10 +133,10 @@ jobs:
       - name: Upload native rust
         uses: actions/upload-artifact@v4
         with:
-          name: native-librust-${{ env.ARCH }}-${{ env.CACHE-KEY }}
+          name: native-android-uniffi-${{ env.ARCH }}-${{ env.CACHE-KEY }}
           path: rust/target/${{ env.TARGET }}/release/libuniffi_zingo.so
       
-  cache-native-librust:
+  cache-native-android-uniffi:
     name: Cache native rust
     needs: build
     runs-on: macos-12
@@ -153,12 +153,12 @@ jobs:
       - name: Download native rust
         uses: actions/download-artifact@v4
         with: 
-          name: native-librust-${{ env.ARCH }}-${{ env.CACHE-KEY }}
+          name: native-android-uniffi-${{ env.ARCH }}-${{ env.CACHE-KEY }}
           path: android/app/src/main/jniLibs/${{ env.ARCH }}
       
       - name: Cache native rust
         uses: actions/cache@v4
         with:
           path: android/app/src/main/jniLibs/${{ env.ARCH }}
-          key: native-librust-${{ env.ARCH }}-${{ env.CACHE-KEY }}
+          key: native-android-uniffi-${{ env.ARCH }}-${{ env.CACHE-KEY }}
 
