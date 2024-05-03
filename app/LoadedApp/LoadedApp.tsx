@@ -78,6 +78,7 @@ import { Launching } from '../LoadingApp';
 import AddressBook from '../../components/AddressBook/AddressBook';
 import AddressBookFileImpl from '../../components/AddressBook/AddressBookFileImpl';
 import simpleBiometrics from '../simpleBiometrics';
+import { Buffer } from 'buffer';
 
 const History = React.lazy(() => import('../../components/History'));
 const Send = React.lazy(() => import('../../components/Send'));
@@ -856,7 +857,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
 
         if (memo === '') {
           return [{ address: to.to, amount } as SendJsonToTypeType];
-        } else if (memo.length <= 512) {
+        } else if (Buffer.byteLength(memo, 'utf8') <= 512) {
           return [{ address: to.to, amount, memo } as SendJsonToTypeType];
         } else {
           // If the memo is more than 512 bytes, then we split it into multiple transactions.

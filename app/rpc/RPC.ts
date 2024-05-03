@@ -1611,7 +1611,9 @@ export default class RPC {
         }
 
         const updatedProgress = new SendProgressClass(0, 0, 0);
-        if (sendId === prevSendId) {
+        // if the send command fails really fast then the sendID never change.
+        // In this case I need to finish this promise right away.
+        if (sendId === prevSendId && !sendTxid && !sendError) {
           //console.log('progress id', sendId);
           // Still not started, so wait for more time
           //setSendProgress(updatedProgress);

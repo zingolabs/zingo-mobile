@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { View, ScrollView, Modal, Keyboard, TextInput, TouchableOpacity, Platform, Alert, Text } from 'react-native';
 import {
   faQrcode,
@@ -110,6 +110,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     language,
     donation,
     addresses,
+    uaAddress,
   } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
@@ -207,6 +208,13 @@ const Send: React.FunctionComponent<SendProps> = ({
     }
     setFee(proposeFee);
   };
+
+  const memoTotal = useCallback(
+    (memo: string, includeUAMemo: boolean) => {
+      return `${memo || ''}${includeUAMemo ? '\nReply to: \n' + uaAddress : ''}`;
+    },
+    [uaAddress],
+  );
 
   useEffect(() => {
     if (validAddress === 0 && validAmount === 0) {
@@ -346,8 +354,8 @@ const Send: React.FunctionComponent<SendProps> = ({
     }
 
     if (to.memo) {
-      const len = Buffer.byteLength(to.memo, 'utf8');
-      if (len > 500) {
+      const len = Buffer.byteLength(memoTotal(to.memo, to.includeUAMemo), 'utf8');
+      if (len > 512) {
         setValidMemo(-1);
       } else {
         setValidMemo(1);
@@ -395,11 +403,14 @@ const Send: React.FunctionComponent<SendProps> = ({
     sendPageState.toaddr.amountCurrency,
     sendPageState.toaddr.amount,
     sendPageState.toaddr.memo,
+    sendPageState.toaddr.includeUAMemo,
     translate,
     addLastSnackbar,
     spendable,
     fee,
     maxAmount,
+    uaAddress,
+    memoTotal,
   ]);
 
   useEffect(() => {
@@ -656,8 +667,8 @@ const Send: React.FunctionComponent<SendProps> = ({
     });
   };
 
-  const countMemoBytes = (memo: string) => {
-    const len = Buffer.byteLength(memo, 'utf8');
+  const countMemoBytes = (memo: string, includeUAMemo: boolean) => {
+    const len = Buffer.byteLength(memoTotal(memo, includeUAMemo), 'utf8');
     return len;
   };
 
@@ -1258,7 +1269,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                               setMemoIcon(false);
                             }
                           }}
-                          maxLength={500}
+                          maxLength={512}
                         />
                         {ta.memo && (
                           <TouchableOpacity
@@ -1299,9 +1310,9 @@ const Send: React.FunctionComponent<SendProps> = ({
                           marginTop: 5,
                           fontWeight: 'bold',
                           color: validMemo === -1 ? 'red' : colors.text,
-                        }}>{`${countMemoBytes(ta.memo)} `}</FadeText>
+                        }}>{`${countMemoBytes(ta.memo, ta.includeUAMemo)} `}</FadeText>
                       <FadeText style={{ marginTop: 5 }}>{translate('loadedapp.of') as string}</FadeText>
-                      <FadeText style={{ marginTop: 5 }}>{' 500 '}</FadeText>
+                      <FadeText style={{ marginTop: 5 }}>{' 512 '}</FadeText>
                     </View>
                   </>
                 )}
