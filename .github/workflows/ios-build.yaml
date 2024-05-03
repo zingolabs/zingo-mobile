@@ -60,16 +60,15 @@ jobs:
         if: ${{ contains(github.repository, 'zingolib') }}
         run: |
           echo "zingolib_ref=$(echo ${GITHUB_REF} | sed 's/\//\\\//g')" >> $GITHUB_ENV
-          sed -i "/^zingolib\|^zingoconfig/ s/branch = \"dev\"/rev = \"${{ env.zingolib_ref }}\"/" "rust/lib/Cargo.toml"
+          sudo sed -i "/^zingolib\|^zingoconfig/ s/branch = \"dev\"/rev = \"${{ env.zingolib_ref }}\"/" "rust/lib/Cargo.toml"
           if cat rust/lib/Cargo.toml | grep "^zingolib\|^zingoconfig" | grep -q "branch"; then exit 1; fi
           cd rust
-          cargo update -p zingolib -p zingoconfig --aggressive
-          rustup default nightly
-          cargo install cargo-lipo
+          sudo cargo update -p zingolib -p zingoconfig --aggressive
+          sudo rustup default nightly
 
-      - name:
+      - name: Install Cargo Lipo
         run: |
-          cargo install cargo-lipo
+          sudo cargo install cargo-lipo
       
       - name: Build Universal rust lib & uniffi lib and copy to ios folder
         run: |
