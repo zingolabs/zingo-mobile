@@ -43,7 +43,7 @@ export default class Utils {
 
     const { decimalSeparator } = getNumberFormatSettings();
 
-    const intPart = parseInt(zecValue.toString(), 10);
+    const intPart = parseInt(Utils.parseNumberFloatToStringLocale(zecValue, 8), 10);
     let bigPart = Utils.parseNumberFloatToStringLocale(zecValue, 8);
     let smallPart = '';
     let decimalPart = '';

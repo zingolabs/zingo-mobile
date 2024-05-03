@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useContext, useCallback } from 'react';
-import { View, ScrollView, Modal, Keyboard, TextInput, TouchableOpacity, Platform, Alert, Text } from 'react-native';
+import { View, ScrollView, Modal, Keyboard, TextInput, TouchableOpacity, Platform, Text } from 'react-native';
 import {
   faQrcode,
   faCheck,
@@ -60,6 +60,7 @@ import { RPCProposeType } from '../../app/rpc/types/RPCProposeType';
 import { RPCParseStatusEnum } from '../../app/rpc/enums/RPCParseStatusEnum';
 import { RPCAdressKindEnum } from '../../app/rpc/enums/RPCAddressKindEnum';
 import { Buffer } from 'buffer';
+import ShowAddressAlertAsync from './components/ShowAddressAlertAsync';
 
 type SendProps = {
   setSendPageState: (sendPageState: SendPageStateClass) => void;
@@ -491,27 +492,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     }
   }, [addresses, sendPageState.toaddr.to, server.chain_name]);
 
-  const showAddressAlertAsync = (): Promise<void> => {
-    return new Promise((resolve, reject) => {
-      Alert.alert(
-        translate('send.lose-address-title') as string,
-        translate('send.lose-address-alert') as string,
-        [
-          {
-            text: translate('confirm') as string,
-            onPress: () => resolve(),
-          },
-          {
-            text: translate('cancel') as string,
-            style: 'cancel',
-            onPress: () => reject(),
-          },
-        ],
-        { cancelable: false, userInterfaceStyle: 'light' },
-      );
-    });
-  };
-
   const updateToField = async (
     address: string | null,
     amount: string | null,
@@ -858,7 +838,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                               onValueChange={async (itemValue: string) => {
                                 if (validAddress === 1 && ta.to && itemValue && ta.to !== itemValue) {
                                   setUpdatingToField(true);
-                                  await showAddressAlertAsync()
+                                  await ShowAddressAlertAsync(translate)
                                     .then(() => {
                                       updateToField(itemValue, null, null, null, null);
                                     })
@@ -1413,24 +1393,22 @@ const Send: React.FunctionComponent<SendProps> = ({
                 ) : (
                   <TouchableOpacity
                     onPress={async () => {
+                      let update = false;
                       if (
                         sendPageState.toaddr.to &&
                         sendPageState.toaddr.to !== (await Utils.getDonationAddress(server.chain_name))
                       ) {
-                        await showAddressAlertAsync()
+                        await ShowAddressAlertAsync(translate)
                           .then(async () => {
                             // fill the fields in the screen with the donation data
-                            updateToField(
-                              await Utils.getDonationAddress(server.chain_name),
-                              Utils.getDefaultDonationAmount(),
-                              null,
-                              Utils.getDefaultDonationMemo(translate),
-                              true,
-                            );
+                            update = true;
                           })
                           .catch(() => {});
                       } else {
                         // fill the fields in the screen with the donation data
+                        update = true;
+                      }
+                      if (update) {
                         updateToField(
                           await Utils.getDonationAddress(server.chain_name),
                           Utils.getDefaultDonationAmount(),

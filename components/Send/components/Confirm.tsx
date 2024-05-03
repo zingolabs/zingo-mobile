@@ -242,7 +242,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  //console.log(sendPageState, price, calculatedFee);
+  //console.log(sendPageState, calculatedFee, Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount));
 
   return (
     <SafeAreaView

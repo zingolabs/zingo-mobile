@@ -79,6 +79,7 @@ import AddressBook from '../../components/AddressBook/AddressBook';
 import AddressBookFileImpl from '../../components/AddressBook/AddressBookFileImpl';
 import simpleBiometrics from '../simpleBiometrics';
 import { Buffer } from 'buffer';
+import ShowAddressAlertAsync from '../../components/Send/components/ShowAddressAlertAsync';
 
 const History = React.lazy(() => import('../../components/History'));
 const Send = React.lazy(() => import('../../components/Send'));
@@ -501,17 +502,15 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
 
     this.linking = Linking.addEventListener('url', async ({ url }) => {
       //console.log(url);
-      const { to } = this.state.sendPageState.toaddr;
-      if (url !== null && to === '') {
+      if (url !== null) {
         this.readUrl(url);
-      } else {
-        this.closeAllModals();
-        this.state.navigation.navigate(RouteEnums.LoadedApp, {
-          screen: this.state.translate('loadedapp.send-menu'),
-          initial: false,
-        });
-        this.addLastSnackbar({ message: this.state.translate('loadedapp.zcash-url') as string });
       }
+
+      this.closeAllModals();
+      this.state.navigation.navigate(RouteEnums.LoadedApp, {
+        screen: this.state.translate('loadedapp.send-menu'),
+        initial: false,
+      });
     });
 
     this.unsubscribeNetInfo = NetInfo.addEventListener(async state => {
@@ -576,32 +575,43 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       //console.log(targets);
 
       if (typeof target !== 'string') {
-        // redo the to addresses
-        const newSendPageState = new SendPageStateClass(new ToAddrClass(0));
-        let uriToAddr: ToAddrClass = new ToAddrClass(0);
-        [target].forEach(tgt => {
-          const to = new ToAddrClass(Utils.getNextToAddrID());
+        let update = false;
+        if (
+          this.state.sendPageState.toaddr.to &&
+          target.address &&
+          this.state.sendPageState.toaddr.to !== target.address
+        ) {
+          await ShowAddressAlertAsync(this.state.translate)
+            .then(async () => {
+              // fill the fields in the screen with the donation data
+              update = true;
+            })
+            .catch(() => {});
+        } else if (target.address) {
+          // fill the fields in the screen with the donation data
+          update = true;
+        }
+        if (update) {
+          // redo the to addresses
+          const newSendPageState = new SendPageStateClass(new ToAddrClass(0));
+          let uriToAddr: ToAddrClass = new ToAddrClass(0);
+          [target].forEach(tgt => {
+            const to = new ToAddrClass(Utils.getNextToAddrID());
 
-          to.to = tgt.address || '';
-          to.amount = Utils.parseNumberFloatToStringLocale(tgt.amount || 0, 8);
-          to.memo = tgt.memoString || '';
+            to.to = tgt.address || '';
+            to.amount = Utils.parseNumberFloatToStringLocale(tgt.amount || 0, 8);
+            to.memo = tgt.memoString || '';
 
-          uriToAddr = to;
-        });
+            uriToAddr = to;
+          });
 
-        newSendPageState.toaddr = uriToAddr;
+          newSendPageState.toaddr = uriToAddr;
 
-        this.setSendPageState(newSendPageState);
-        this.closeAllModals();
-        this.state.navigation.navigate(RouteEnums.LoadedApp, {
-          screen: this.state.translate('loadedapp.send-menu'),
-          initial: false,
-        });
-        return;
+          this.setSendPageState(newSendPageState);
+        }
       } else {
         // Show the error message as a toast
         this.addLastSnackbar({ message: target });
-        return;
       }
     }
   };
@@ -1076,8 +1086,22 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
         addressBookOpenPriorModal: () => {},
       });
     } else if (item === MenuItemEnum.VoteForNym) {
-      if (this.state.sendPageState.toaddr.to === '') {
-        // open send screen with a donation for nym
+      let update = false;
+      if (
+        this.state.sendPageState.toaddr.to &&
+        this.state.sendPageState.toaddr.to !== (await Utils.getDonationAddress(this.state.server.chain_name))
+      ) {
+        await ShowAddressAlertAsync(this.state.translate)
+          .then(async () => {
+            // fill the fields in the screen with the donation data
+            update = true;
+          })
+          .catch(() => {});
+      } else {
+        // fill the fields in the screen with the donation data
+        update = true;
+      }
+      if (update) {
         const newSendPageState = new SendPageStateClass(new ToAddrClass(0));
         let uriToAddr: ToAddrClass = new ToAddrClass(0);
         const to = new ToAddrClass(Utils.getNextToAddrID());
@@ -1092,8 +1116,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
         newSendPageState.toaddr = uriToAddr;
 
         this.setSendPageState(newSendPageState);
-      } else {
-        this.addLastSnackbar({ message: this.state.translate('loadedapp.zcash-url') as string });
       }
       this.closeAllModals();
       this.state.navigation.navigate(RouteEnums.LoadedApp, {
