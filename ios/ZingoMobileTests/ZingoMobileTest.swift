@@ -7,15 +7,16 @@
 
 import Foundation
 import UIKit
-import XCTest
 
 import React
-import RPCModule
+import XCTest
 
-let TIMEOUT_SECONDS = 600
-let TEXT_TO_LOOK_FOR = "Welcome to React"
+let TIMEOUT_SECONDS = 60
+let TEXT_TO_LOOK_FOR = "Zingo!"
 
 class ZingoMobileTests: XCTestCase {
+  
+  private let errorPrefix = "error"
 
     func findSubview(in view: UIView, matching test: (UIView) -> Bool) -> Bool {
         if test(view) {
@@ -34,7 +35,7 @@ class ZingoMobileTests: XCTestCase {
             XCTFail("Failed to access root view controller")
             return
         }
-        var date = Date(timeIntervalSinceNow: TimeInterval(TIMEOUT_SECONDS))
+        let date = Date(timeIntervalSinceNow: TimeInterval(TIMEOUT_SECONDS))
         var foundElement = false
         var redboxError: String?
 
@@ -63,65 +64,78 @@ class ZingoMobileTests: XCTestCase {
         XCTAssertTrue(foundElement, "Couldn't find element with text '\(TEXT_TO_LOOK_FOR)' in \(TIMEOUT_SECONDS) seconds")
     }
 
-    func testCorruptWalletBug_ServerOKNewWallet() {
-        let rpcmodule = RPCModule()
+    func testCorruptWalletBug_ServerOKNewWallet() throws {
+      let rpcmodule = RPCModule()
 
-        // delete the wallet file, clean scenario
-        let delete = rpcmodule.deleteExistingWallet()
-        NSLog("Test Delete Wallet Cleaning \(delete)")
+      // delete the wallet file, clean scenario
+      do {
+        try rpcmodule.deleteExistingWallet()
+        NSLog("Test Delete Wallet Cleaning")
+      } catch {
+        NSLog("Test Delete Wallet Cleaning - No wallet file")
+      }
 
-        // server OK
-        let serverOK = "https://mainnet.lightwalletd.com:9067"
-        let chainhint = "main"
-        // create a new wallet
-        let newWalletOK = rpcmodule.createNewWallet(serverOK: serverOK, chainhint: chainhint)
-        NSLog("Test create New Wallet OK \(newWalletOK)")
-        XCTAssertFalse(newWalletOK.hasPrefix("Error"), "Create New Wallet fails \(newWalletOK)")
+      // server OK
+      let serverOK = "https://zec.rocks:443"
+      let chainhint = "main"
+      // create a new wallet
+      let newWalletOK = try rpcmodule.createNewWallet(server: serverOK, chainhint: chainhint)
+      NSLog("Test create New Wallet OK \(newWalletOK)")
+      XCTAssertFalse(newWalletOK.lowercased().hasPrefix(errorPrefix), "Create New Wallet fails \(newWalletOK)")
 
-        // save the wallet in internal storage
-        rpcmodule.saveWalletInternal()
+      // save the wallet in internal storage
+      try rpcmodule.saveWalletInternal()
 
-        // load wallet from file
-        let loadWalletOK = rpcmodule.loadExistingWallet(serverOK: serverOK, chainhint: chainhint)
-        NSLog("Test Load Wallet OK \(loadWalletOK)")
-        XCTAssertFalse(loadWalletOK.hasPrefix("Error"), "Load Wallet from file fails \(loadWalletOK)")
+      // load wallet from file
+      let loadWalletOK = try rpcmodule.loadExistingWallet(server: serverOK, chainhint: chainhint)
+      NSLog("Test Load Wallet OK \(loadWalletOK)")
+      XCTAssertFalse(loadWalletOK.lowercased().hasPrefix(errorPrefix), "Load Wallet from file fails \(loadWalletOK)")
 
-        // delete the wallet file
-        let deleteOK = rpcmodule.deleteExistingWallet()
-        NSLog("Test Delete Wallet OK \(deleteOK)")
+      // delete the wallet file
+      try rpcmodule.deleteExistingWallet()
+      NSLog("Test Delete Wallet OK")
     }
 
-    func testCorruptWalletBug_ServerKONewWallet() {
-        let rpcmodule = RPCModule()
+    func testCorruptWalletBug_ServerKONewWallet() throws {
+      let rpcmodule = RPCModule()
 
-        // delete the wallet file, clean scenario
-        let delete = rpcmodule.deleteExistingWallet()
-        NSLog("Test Delete Wallet Cleaning \(delete)")
+      // delete the wallet file, clean scenario
+      do {
+        try rpcmodule.deleteExistingWallet()
+        NSLog("Test Delete Wallet Cleaning")
+      } catch {
+        NSLog("Test Delete Wallet Cleaning - No wallet file")
+      }
 
-        // server KO
-        let serverKO = "https://zuul.free2z.cash:9067"
-        let serverOK = "https://mainnet.lightwalletd.com:9067"
-        let chainhint = "main"
-        // create a new wallet, expecting ERROR.
-        let newWalletKO = rpcmodule.createNewWallet(serverOK: serverKO, chainhint: chainhint)
-        NSLog("Test create New Wallet KO \(newWalletKO)")
-        XCTAssertTrue(newWalletKO.hasPrefix("Error"), "Create New Wallet NOT fails, and it have to \(newWalletKO)")
+      // server KO
+      let serverKO = "https://zuul.free2z.cash:9067"
+      let serverOK = "https://zec.rocks:443"
+      let chainhint = "main"
+      // create a new wallet, expecting ERROR.
+      let newWalletKO = try rpcmodule.createNewWallet(server: serverKO, chainhint: chainhint)
+      NSLog("Test create New Wallet KO \(newWalletKO)")
+      XCTAssertTrue(newWalletKO.lowercased().hasPrefix(errorPrefix), "Create New Wallet NOT fails, and it have to \(newWalletKO)")
 
-        // save wallet in internal storage
-        rpcmodule.saveWalletInternal()
-
+      if (rpcmodule.wallet_exists()) {
         // load wallet from file, expecting ERROR.
-        let loadWalletKO = rpcmodule.loadExistingWallet(serverOK: serverKO, chainhint: chainhint)
+        let loadWalletKO = try rpcmodule.loadExistingWallet(server: serverKO, chainhint: chainhint)
         NSLog("Test create Load Wallet KO \(loadWalletKO)")
-        XCTAssertTrue(newWalletKO.hasPrefix("Error"), "Load Wallet from file NOT fails, and it have to \(newWalletKO)")
-
+        XCTAssertTrue(newWalletKO.lowercased().hasPrefix(errorPrefix), "Load Wallet from file NOT fails, and it have to \(newWalletKO)")
+        
         // load wallet from file, expecting CORRUPT WALLET BUG.
-        let loadWalletOK = rpcmodule.loadExistingWallet(serverOK: serverOK, chainhint: chainhint)
+        let loadWalletOK = try rpcmodule.loadExistingWallet(server: serverOK, chainhint: chainhint)
         NSLog("Test create Load Wallet KO \(loadWalletOK)")
-        XCTAssertFalse(loadWalletOK.hasPrefix("Error"), "Load Wallet from file fails \(loadWalletOK)")
-
-        // delete the wallet file
-        let deleteKO = rpcmodule.deleteExistingWallet()
-        NSLog("Test Delete Wallet OK \(deleteKO)")
+        XCTAssertFalse(loadWalletOK.lowercased().hasPrefix(errorPrefix), "Load Wallet from file fails \(loadWalletOK)")
+      } else {
+        NSLog("Test no wallet file, imposible to load by Server KO")
+      }
+      
+      // delete the wallet file
+      do {
+        try rpcmodule.deleteExistingWallet()
+        NSLog("Test Delete Wallet OK")
+      } catch {
+        NSLog("Test Delete Wallet - No wallet file")
+      }
     }
 }

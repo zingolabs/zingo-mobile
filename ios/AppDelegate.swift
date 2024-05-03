@@ -300,7 +300,7 @@ extension AppDelegate {
         }
 
         NSLog("BGTask syncingProcessBackgroundTask")
-        let exists = self.wallet__exists()
+        let exists = rpcmodule.wallet_exists()
 
         if exists {
             // chaeck the server
@@ -405,17 +405,6 @@ extension AppDelegate {
         } catch {
           NSLog("Error: Unable to load the wallet. error: \(error.localizedDescription)")
         }
-    }
-
-    func wallet__exists() -> Bool {
-      let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-      guard let documentsDirectory = paths.first else {
-        return false
-      }
-
-      // to check if the wallet file exists.
-      let fileName = "\(documentsDirectory)/wallet.dat.txt"
-      return FileManager.default.fileExists(atPath: fileName)
     }
 
 }

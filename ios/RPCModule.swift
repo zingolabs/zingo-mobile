@@ -54,6 +54,20 @@ class RPCModule: NSObject {
     }
   }
   
+  func wallet_exists() -> Bool {
+    do {
+      let fileName = try getFileName(walletFileName)
+      if (fileExists(fileName) == "true") {
+        return true
+      } else {
+        return false
+      }
+    } catch {
+      NSLog("wallet exists error: \(error.localizedDescription)")
+      return false
+    }
+  }
+  
   @objc(walletExists:reject:)
   func walletExists(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     do {
