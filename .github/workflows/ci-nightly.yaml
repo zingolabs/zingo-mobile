@@ -15,25 +15,37 @@ jobs:
   create-cache-key:
     uses: ./.github/workflows/create-cache-key.yaml
     
-  build:
+  android-build:
     strategy:
       matrix:
         arch: [ x86_64, x86, arm64-v8a, armeabi-v7a ]
-    uses: ./.github/workflows/build.yaml
+    uses: ./.github/workflows/android-build.yaml
     needs: create-cache-key
     with:
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
       arch: ${{ matrix.arch }}
        
-  integration-test:
+  android-integration-test:
     strategy:
       matrix:
         abi: [ x86_64, x86, arm64-v8a, armeabi-v7a ]
       fail-fast: false
-    uses: ./.github/workflows/integration-test.yaml
-    needs: [ create-timestamp, create-cache-key, build ]
+    uses: ./.github/workflows/android-integration-test.yaml
+    needs: [ create-timestamp, create-cache-key, android-build ]
     with:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
       abi: ${{ matrix.abi }}  
       
+  ios-build:
+    uses: ./.github/workflows/ios-build.yaml
+    needs: create-cache-key
+    with:
+      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+       
+  ios-integration-test:
+    uses: ./.github/workflows/ios-integration-test.yaml
+    needs: [ create-timestamp, create-cache-key, ios-build ]
+    with:
+      timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
+      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
