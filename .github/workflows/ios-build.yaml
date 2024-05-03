@@ -71,8 +71,9 @@ jobs:
           sudo cargo install cargo-lipo
       
       - name: Build Universal rust lib & uniffi lib and copy to ios folder
+        working-directory: ./rust/ios
         run: |
-          sudo ./rust/ios/buildsimulator.sh
+          sudo ./buildsimulator.sh
       
       - name: Upload native rust
         uses: actions/upload-artifact@v4
