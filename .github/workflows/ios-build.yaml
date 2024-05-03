@@ -66,10 +66,14 @@ jobs:
           cargo update -p zingolib -p zingoconfig --aggressive
           rustup default nightly
           cargo install cargo-lipo
+
+      - name:
+        run: |
+          cargo install cargo-lipo
       
       - name: Build Universal rust lib & uniffi lib and copy to ios folder
         run: |
-          ./rust/ios/buildsimulator.sh
+          sudo ./rust/ios/buildsimulator.sh
       
       - name: Upload native rust
         uses: actions/upload-artifact@v4
