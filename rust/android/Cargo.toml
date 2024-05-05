@@ -12,8 +12,8 @@ regchest = []
 zingoconfig = { workspace = true }
 zingomobile_utils = { path = "../zingomobile_utils" }
 regchest_utils = { git="https://github.com/zingolabs/zingo-regchest", default-features=true, branch = "dev" }
-zingo-testutils = { git="https://github.com/zingolabs/zingolib", default-features=true, branch = "dev"}
-darkside-tests = { git="https://github.com/zingolabs/zingolib", default-features=true, branch = "dev"}
+zingo-testutils = { git="https://github.com/fluidvanadium/zingolib", default-features=true, branch = "send_proposed_transactions" }
+darkside-tests = { git="https://github.com/fluidvanadium/zingolib", default-features=true, branch = "send_proposed_transactions" }
 tokio =  { version = "1.24", features = [ "full" ] }
 json = "0.12.4"
 env_logger = "0.10.0"
